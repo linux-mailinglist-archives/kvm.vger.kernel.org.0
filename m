@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 276632E7D6E
-	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:30:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C9452E7D71
+	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:30:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbgLaA2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 19:28:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
+        id S1726799AbgLaA3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 19:29:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726688AbgLaA2u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Dec 2020 19:28:50 -0500
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902E7C0617A7
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:42 -0800 (PST)
-Received: by mail-qk1-x749.google.com with SMTP id s66so13595366qkh.10
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:42 -0800 (PST)
+        with ESMTP id S1726773AbgLaA3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Dec 2020 19:29:00 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29B0C0617AB
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:44 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id l8so31412352ybj.16
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=8ANnx6AvMPuAyAMKxozebrm5eQtYsGkfZPsOWk0XO8s=;
-        b=rVBqmfJjho2XG5nRs0AINrhMHs5IAP8aScZFDDQUtuyNLrGcdZqe17gSZgdPfTnDjr
-         oiN5IIVQs5IdHgVJUESSU5ZKlzt8Xc/lMRtSRdxWgZGSKBSeOZ2VXhN0a+7WraqCqlb/
-         AvTk0T26bEk56/QxThAzKEEPDpMqmBA3TLuLCXDkgBuO+D+IJFMKcE8odWIT4xZSG079
-         5e3VKt+f/JJpqNG055WJsJPlR3ezxVnUGbOZjYb6sktpP2mcA7kdKQ8vghB2l46IRn9J
-         yzXWxvldNS9HzGXsFjfKLXmHE4qTfazjL+Qn9qVqj05rPiRRn1pO344/GaPDLRHt4ChD
-         9w4g==
+        bh=uVgCl7Nu2FXUG56acnNl/pxMnIlKTrWSEFVB9EZQEgA=;
+        b=BJ2saRRgGYmNkHST+OHJwIlTUSitobyo5wgejFmXy5xfCg6xSaYArcCOTEYxCCu95U
+         YWKCmMqsisWCZS3hxI3HnDbCy5Ros0QQDgNSw2jXRIKVUgK5qYsoWCnd1/Zr9Am3Jpf3
+         1LXOXXhpQe68JSKwm1hGr16/CuH+MjxjWS1CSjne44ZFILzQNMDIhoOsoWom4ED8qC8X
+         A81GKMwT+ClV9tL5J53kIlHdgcVtG3bIHgfuDn6RUFSH5461/5f9jAaZtl1yqg1j41yL
+         avtBwbEgi96C0KQvIYLPq2IA7Gnvu5Qc9GpiOacbuWk/DMyJ0xiNJ4GMtEBBpV5IJi+J
+         PD+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=8ANnx6AvMPuAyAMKxozebrm5eQtYsGkfZPsOWk0XO8s=;
-        b=SDQIHxOy78r596BpAWPKD4X41j7spNTDWw4ASEHn04rJhIsby2uq0sXXI+iZqVSvNf
-         SYgIZJpIKGbevdBqDtsGrBtsC23Y968DB0pgvbLdmFH+z09hXOp+0YeWqt/JAra3nifw
-         hGXxQjx/5b18ZayGIA/4mYlxxiS43P+dt6V0cglf7qqSpKSFT+YbBiAbh8l4McM6XNts
-         bnMV4w2MGaqlh+t1/ucZB6boRPt5U/21ZFSoH+CppAOZmI8UFuEngzGcmByvUFAZElnk
-         X9uPX4dlCwubSdxJa3Dniy1dpjNF+JxIaCjAGiNU6bVHYLRl00TTwMDPNi9Atau/XfFY
-         Vfow==
-X-Gm-Message-State: AOAM530FBAygXGwGAYAWYsJZSC5v83R+GeCeHru5U0+6Whg43LYDnoDp
-        ozcU1HoLclRNtPZcPoHBkJxjNIb2GdU=
-X-Google-Smtp-Source: ABdhPJxeWir92fZ6IxS7tj0vsL1m/7kjxVmvp449e/9f0pAau+7nBvcKgkpymvsRDq/D8vw4iajihq/uxaY=
+        bh=uVgCl7Nu2FXUG56acnNl/pxMnIlKTrWSEFVB9EZQEgA=;
+        b=ARB1hxnALMIJTWY6CZb5et3S98YPo7KZ5kmiSAG2yESZySSgPlM9xrE/u2iOp6QcYo
+         M2t7cCVAYK6q8eiGrUbm+OnxUe0rcOHewaHpiNQOIrI9D8nR6Ucj2+MwyFmZFcw2mtwx
+         do0DDQ00G1Q1Hs4HAaO0g0XFsnoP/3t5gpXzy/U54oeaAll0Xb5DWaBWbBdSgabKjsFu
+         h5udtAga+fi9rN5L4NHaj6qCSjg9SAxWQD/xfQ5OIkZ1klik/wLBCudGSxhfoIJZA2s/
+         frmIYwiyTnZGs4SDE2QUHEMsmVzdyaeuXfWWUSDW5lV+GrR+ffysr0e3//ATzwKUBX0o
+         X/sQ==
+X-Gm-Message-State: AOAM532TPvW0N81enDDcJxilC8tTTuWKeCl16/8mI8VhDi4bELIcHWwp
+        HFHYnSq6wVln3aH2rL65+8Xj0GgY2Oc=
+X-Google-Smtp-Source: ABdhPJxRcor84DKLBK+eKyb4sF+wbye6f6qXwCr9kBSPQnUHfIL18nDVMp+WW7CEI0G/PeDoxrWqFnvHCnw=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a0c:f046:: with SMTP id b6mr59156219qvl.14.1609374461656;
- Wed, 30 Dec 2020 16:27:41 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:6b46:: with SMTP id o6mr79807409ybm.409.1609374464238;
+ Wed, 30 Dec 2020 16:27:44 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 30 Dec 2020 16:27:00 -0800
+Date:   Wed, 30 Dec 2020 16:27:01 -0800
 In-Reply-To: <20201231002702.2223707-1-seanjc@google.com>
-Message-Id: <20201231002702.2223707-8-seanjc@google.com>
+Message-Id: <20201231002702.2223707-9-seanjc@google.com>
 Mime-Version: 1.0
 References: <20201231002702.2223707-1-seanjc@google.com>
 X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [PATCH 7/9] KVM: SVM: Use asm goto to handle unexpected #UD on SVM instructions
+Subject: [PATCH 8/9] KVM: x86: Kill off __ex() and __kvm_handle_fault_on_reboot()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -73,146 +73,117 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add svm_asm*() macros, a la the existing vmx_asm*() macros, to handle
-faults on SVM instructions instead of using the generic __ex(), a.k.a.
-__kvm_handle_fault_on_reboot().  Using asm goto generates slightly
-better code as it eliminates the in-line JMP+CALL sequences that are
-needed by __kvm_handle_fault_on_reboot() to avoid triggering BUG()
-from fixup (which generates bad stack traces).
+Remove the __kvm_handle_fault_on_reboot() and __ex() macros now that all
+VMX and SVM instructions use asm goto to handle the fault (or in the
+case of VMREAD, completely custom logic).  Drop kvm_spurious_fault()'s
+asmlinkage annotation as __kvm_handle_fault_on_reboot() was the only
+flow that invoked it from assembly code.
 
-Using SVM specific macros also drops the last user of __ex() and the
-the last asm linkage to kvm_spurious_fault(), and adds a helper for
-VMSAVE, which may gain an addition call site in the future (as part
-of optimizing the SVM context switching).
-
+Cc: Uros Bizjak <ubizjak@gmail.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c     |  3 +-
- arch/x86/kvm/svm/svm.c     | 16 +----------
- arch/x86/kvm/svm/svm_ops.h | 59 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 62 insertions(+), 16 deletions(-)
- create mode 100644 arch/x86/kvm/svm/svm_ops.h
+ arch/x86/include/asm/kvm_host.h | 25 +------------------------
+ arch/x86/kvm/svm/sev.c          |  2 --
+ arch/x86/kvm/svm/svm.c          |  2 --
+ arch/x86/kvm/vmx/vmx_ops.h      |  2 --
+ arch/x86/kvm/x86.c              |  9 ++++++++-
+ 5 files changed, 9 insertions(+), 31 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3ab7b46087b7..51ba20ffaedb 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1634,30 +1634,7 @@ enum {
+ #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+ #define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+ 
+-asmlinkage void kvm_spurious_fault(void);
+-
+-/*
+- * Hardware virtualization extension instructions may fault if a
+- * reboot turns off virtualization while processes are running.
+- * Usually after catching the fault we just panic; during reboot
+- * instead the instruction is ignored.
+- */
+-#define __kvm_handle_fault_on_reboot(insn)				\
+-	"666: \n\t"							\
+-	insn "\n\t"							\
+-	"jmp	668f \n\t"						\
+-	"667: \n\t"							\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_begin \n\t"			\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"call	kvm_spurious_fault \n\t"				\
+-	"1: \n\t"							\
+-	".pushsection .discard.instr_end \n\t"				\
+-	".long 1b - . \n\t"						\
+-	".popsection \n\t"						\
+-	"668: \n\t"							\
+-	_ASM_EXTABLE(666b, 667b)
++void kvm_spurious_fault(void);
+ 
+ #define KVM_ARCH_WANT_MMU_NOTIFIER
+ int kvm_unmap_hva_range(struct kvm *kvm, unsigned long start, unsigned long end,
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 9858d5ae9ddd..4511d7ccdb19 100644
+index 4511d7ccdb19..e7080e5056a4 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -22,6 +22,7 @@
- 
- #include "x86.h"
- #include "svm.h"
-+#include "svm_ops.h"
+@@ -26,8 +26,6 @@
  #include "cpuid.h"
  #include "trace.h"
  
-@@ -2001,7 +2002,7 @@ void sev_es_vcpu_load(struct vcpu_svm *svm, int cpu)
- 	 * of which one step is to perform a VMLOAD. Since hardware does not
- 	 * perform a VMSAVE on VMRUN, the host savearea must be updated.
- 	 */
--	asm volatile(__ex("vmsave") : : "a" (__sme_page_pa(sd->save_area)) : "memory");
-+	vmsave(__sme_page_pa(sd->save_area));
- 
- 	/*
- 	 * Certain MSRs are restored on VMEXIT, only save ones that aren't
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
+-
+ static u8 sev_enc_bit;
+ static int sev_flush_asids(void);
+ static DECLARE_RWSEM(sev_deactivate_lock);
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cce0143a6f80..4308ab5ca27e 100644
+index 4308ab5ca27e..e4907e490c24 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -41,6 +41,7 @@
- #include "trace.h"
- 
+@@ -43,8 +43,6 @@
  #include "svm.h"
-+#include "svm_ops.h"
+ #include "svm_ops.h"
  
- #define __ex(x) __kvm_handle_fault_on_reboot(x)
- 
-@@ -246,21 +247,6 @@ u32 svm_msrpm_offset(u32 msr)
- 
- #define MAX_INST_SIZE 15
- 
--static inline void clgi(void)
--{
--	asm volatile (__ex("clgi"));
--}
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
 -
--static inline void stgi(void)
--{
--	asm volatile (__ex("stgi"));
--}
+ MODULE_AUTHOR("Qumranet");
+ MODULE_LICENSE("GPL");
+ 
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index 692b0c31c9c8..7b6fbe103c61 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -10,8 +10,6 @@
+ #include "evmcs.h"
+ #include "vmcs.h"
+ 
+-#define __ex(x) __kvm_handle_fault_on_reboot(x)
 -
--static inline void invlpga(unsigned long addr, u32 asid)
--{
--	asm volatile (__ex("invlpga %1, %0") : : "c"(asid), "a"(addr));
--}
--
- static int get_max_npt_level(void)
+ asmlinkage void vmread_error(unsigned long field, bool fault);
+ __attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+ 							 bool fault);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3f7c1fc7a3ce..836912b42030 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -412,7 +412,14 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_apic_base);
+ 
+-asmlinkage __visible noinstr void kvm_spurious_fault(void)
++/*
++ * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
++ *
++ * Hardware virtualization extension instructions may fault if a reboot turns
++ * off virtualization while processes are running.  Usually after catching the
++ * fault we just panic; during reboot instead the instruction is ignored.
++ */
++noinstr void kvm_spurious_fault(void)
  {
- #ifdef CONFIG_X86_64
-diff --git a/arch/x86/kvm/svm/svm_ops.h b/arch/x86/kvm/svm/svm_ops.h
-new file mode 100644
-index 000000000000..0c8377aee52c
---- /dev/null
-+++ b/arch/x86/kvm/svm/svm_ops.h
-@@ -0,0 +1,59 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_X86_SVM_OPS_H
-+#define __KVM_X86_SVM_OPS_H
-+
-+#include <linux/compiler_types.h>
-+
-+#include <asm/kvm_host.h>
-+
-+#define svm_asm(insn, clobber...)				\
-+do {								\
-+	asm_volatile_goto("1: " __stringify(insn) "\n\t"	\
-+			  _ASM_EXTABLE(1b, %l[fault])		\
-+			  ::: clobber : fault);			\
-+	return;							\
-+fault:								\
-+	kvm_spurious_fault();					\
-+} while (0)
-+
-+#define svm_asm1(insn, op1, clobber...)				\
-+do {								\
-+	asm_volatile_goto("1: "  __stringify(insn) " %0\n\t"	\
-+			  _ASM_EXTABLE(1b, %l[fault])		\
-+			  :: op1 : clobber : fault);		\
-+	return;							\
-+fault:								\
-+	kvm_spurious_fault();					\
-+} while (0)
-+
-+#define svm_asm2(insn, op1, op2, clobber...)				\
-+do {									\
-+	asm_volatile_goto("1: "  __stringify(insn) " %1, %0\n\t"	\
-+			  _ASM_EXTABLE(1b, %l[fault])			\
-+			  :: op1, op2 : clobber : fault);		\
-+	return;								\
-+fault:									\
-+	kvm_spurious_fault();						\
-+} while (0)
-+
-+static inline void clgi(void)
-+{
-+	svm_asm(clgi);
-+}
-+
-+static inline void stgi(void)
-+{
-+	svm_asm(stgi);
-+}
-+
-+static inline void invlpga(unsigned long addr, u32 asid)
-+{
-+	svm_asm2(invlpga, "c"(asid), "a"(addr));
-+}
-+
-+static inline void vmsave(hpa_t pa)
-+{
-+	svm_asm1(vmsave, "a" (pa), "memory");
-+}
-+
-+#endif /* __KVM_X86_SVM_OPS_H */
+ 	/* Fault while not rebooting.  We want the trace. */
+ 	BUG_ON(!kvm_rebooting);
 -- 
 2.29.2.729.g45daf8777d-goog
 
