@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED2FD2E7D63
-	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F24492E7D67
+	for <lists+kvm@lfdr.de>; Thu, 31 Dec 2020 01:30:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726547AbgLaA2F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 30 Dec 2020 19:28:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60354 "EHLO
+        id S1726589AbgLaA2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 30 Dec 2020 19:28:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726289AbgLaA2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 30 Dec 2020 19:28:04 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70FBCC061573
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:24 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id w8so31234409ybj.14
-        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:24 -0800 (PST)
+        with ESMTP id S1726579AbgLaA2H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 30 Dec 2020 19:28:07 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BFAC06179B
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:26 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id j1so31401917ybj.11
+        for <kvm@vger.kernel.org>; Wed, 30 Dec 2020 16:27:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=nVNkPdtrx1pwYAnHz8fVa4ArTvLcKWdQz2N8fgjsYlM=;
-        b=L0O4vl41jxnecCnVk0EWmu28x4N/hKzJ0akivHyV4IV9xyaU7e7EsZR766gERgfDM1
-         MSTYIhErSO+ttCt1GCuxqu/6z4j74wEbVhEdtnLcfx+oNTNAvn1Hn7D3r/xAeGLaVOip
-         jnQ1gH01F6/lNqJy1Lu0ZnPRD5KcuH2DjHgbJBv8I8n8Mqh9XF3vuHFq6DiN5BwXOWJW
-         XRuZCGTJRXIYMbaVwK/ZrDFE7p/EfgbZoVb2mBm44SsI6ZBrP+t0P6+9I8+6zcFKQnH1
-         WcS0wxDWQ9KQkeoMwCKl3chaXMM/765TBfof9gSPcxjakaVbrdoeDufOy/n3sVjFKKSp
-         o7Ow==
+        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=rOxjhQpHu1RfWA8cWpiD6IGTVkEoEMcY9+NA6EUVZWk=;
+        b=eWtJP4mxfNkHF6+f0Z+ZCUumhU5z4MG+btS9lZOP0MGoxttBnbiPVrOv/cs3QKr2pe
+         yYHU/MiR5+CfS5HKckQfismEZ2onO1b43xvLt19DiaRfuuz7E5vm7ESC7NurhcvFBG4Y
+         SIfyDAtMkAP2H3hvQd5HaKqfz6yoYoHBQorZSe+M7OH5gl0ySennnI9r2vuP5DPL3QMb
+         NrfC+9yDGuMgcc9CPRSs9qNhB9PENGEY8C/jssqK9C16avVIu5pID2cquJ/3YPi0X5Nk
+         xc5IqvX88gxCaEJ89h4E4N/UN8ewUCKNETDimIU3V1m4b24vBykeCZS9R9QY100hftEU
+         lkHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc;
-        bh=nVNkPdtrx1pwYAnHz8fVa4ArTvLcKWdQz2N8fgjsYlM=;
-        b=qOH3Si/JuUPscRbhcuO/mEqFvdberG+eYd4R415x/23bUB3BeigCrlAyXairMhPnO0
-         c6uLIwMCkGTFfDTO5XOg3fniNfd4lDtHkKOcmAgTAdoifQ3/MAYPphfYT8SKNZxpWP9P
-         3JUuQ+4GLshdh/jYkRlTTu21Ce+mlZNaoMONqreCbCcJ3Bsol3Lrtu261JHN6EcEvQnF
-         yVcqxoY4b9V+VIy66kqSrHnsVk9s0LxpfrXsFVK2sZjdXWIIj8kAuV1nNd7zYRXpcxTO
-         /IflWAlYRsAnzhK6/8rdFm7n/MupPTsHLlC3qekN0FxGOfl3Wivu54YbNTM4GwwoPrxW
-         oH4Q==
-X-Gm-Message-State: AOAM531aIpBBvC7gnylqEVVNpOWuxGBGoFQh/7d4rE3l7JQ95Hb4I2R1
-        K5gidMEi6xF7RYvGfwIHrJnlbRNcB4Q=
-X-Google-Smtp-Source: ABdhPJx5QnpnlhcOcBUNeZBAOJ8GALDkMb+HgNFOlORprDIX+e9KbOgwSKgWQbjQzrivQTkLmx/F07Dd2Wk=
+        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=rOxjhQpHu1RfWA8cWpiD6IGTVkEoEMcY9+NA6EUVZWk=;
+        b=kPdq6SfGAh81cDL4WjEjqDdpaBZVN+mRcEGjhIuKrUPcEe5Vsfs8NEwo7auY8kHrCl
+         imDE7pfqDym3oJd57ncoF7tEOhvQineyY9FsV1iUuqi4zaDjmyGxodcjBDYpmA/dpECb
+         2EH8ikEBJzWFalSCQp9/rabySWdiETjHYOT7qMC5oqVuWMP2Tt4FyFfkiwjjC33fcAQ+
+         +G7P8YxOzGpVcp2qOcXerJ6olZC2Vm1apRUDEGPeBJPuo7p5OAvrSs2QDtefdvcuwQP9
+         NqhRWPuh+WlqfrQ9yGKOx1dBkEgZoMgtTz5RhMAnC83jg1Hz9mwgRU47hWn9XGUamR3V
+         zSNQ==
+X-Gm-Message-State: AOAM5330Xo9sjuKO7Y9H//SCT+CFjhReWP/NFYilKSYSFYsY5YzGC3tc
+        IzQw3ocIdEhvqsWhUnj+BAEI/7kXun4=
+X-Google-Smtp-Source: ABdhPJxzJSFVMtUWiaSVuoQJJUIlDSp5lHxECjas4or3vPMGlBJ8HdaSd0PwczifhPn2MQG8W/VGjRXTDA0=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:16c5:: with SMTP id 188mr79343598ybw.62.1609374443673;
- Wed, 30 Dec 2020 16:27:23 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:38d0:: with SMTP id f199mr75851834yba.8.1609374446107;
+ Wed, 30 Dec 2020 16:27:26 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 30 Dec 2020 16:26:53 -0800
-Message-Id: <20201231002702.2223707-1-seanjc@google.com>
+Date:   Wed, 30 Dec 2020 16:26:54 -0800
+In-Reply-To: <20201231002702.2223707-1-seanjc@google.com>
+Message-Id: <20201231002702.2223707-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20201231002702.2223707-1-seanjc@google.com>
 X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [PATCH 0/9] x86/virt: KVM: x86: Exception handling fixes/cleanups
+Subject: [PATCH 1/9] x86/virt: Eat faults on VMXOFF in reboot flows
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -70,71 +73,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series is a conglomeration of three previous series/patches and a bit
-of new code.  None of the previous series are directly related, but they
-are all needed to achieve the overarching goal of nuking
-__kvm_handle_fault_on_reboot(), which is a rather ugly inline asm macro
-that has the unfortunate side effect of inserting in-line JMP+CALL
-sequences.
+Silently ignore all faults on VMXOFF in the reboot flows as such faults
+are all but guaranteed to be due to the CPU not being in VMX root.
+Because (a) VMXOFF may be executed in NMI context, e.g. after VMXOFF but
+before CR4.VMXE is cleared, (b) there's no way to query the CPU's VMX
+state without faulting, and (c) the whole point is to get out of VMX
+root, eating faults is the simplest way to achieve the desired behaior.
 
-Patches 1-3 are resurrected from a series by David Reed[1] to fix VMXOFF
-bugs in the reboot flows.
+Technically, VMXOFF can fault (or fail) for other reasons, but all other
+fault and failure scenarios are mode related, i.e. the kernel would have
+to magically end up in RM, V86, compat mode, at CPL>0, or running with
+the SMI Transfer Monitor active.  The kernel is beyond hosed if any of
+those scenarios are encountered; trying to do something fancy in the
+error path to handle them cleanly is pointless.
 
-Patch 4 is a patch from Uros Bizjak to get rid of custom inline asm in
-nested VMX.  This already received Paolo's "Queued, thanks." blessing,
-but has not been pushed to kvm.git.  It's included here as there is an
-indirect dependency in patch 8.
+Fixes: 1e9931146c74 ("x86: asm/virtext.h: add cpu_vmxoff() inline function")
+Reported-by: David P. Reed <dpreed@deepplum.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/virtext.h | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-Patches 5-6 are minor tweaks to KVM's VMX{ON/OFF} paths to use the
-kernel's now-fault-tolerant VMXOFF instead of KVM's custom asm.
-
-Patch 7 replaces SVM's __ex()/__kvm_handle_fault_on_reboot() with more
-tailored asm goto macros, similar to the existing VMX asm_vmx*() macros.
-This is largely an excuse to get rid of __kvm_handle_fault_on_reboot();
-the actual benefits of removing JMP+CALL are likely negligible as SVM only
-has a few uses of the macro (versus VMX's bajillion VMREADs/VMWRITEs).
-
-Patch 8 removes __ex()/__kvm_handle_fault_on_reboot().
-
-Patch 9 is a very trimmed down version of a different patch from Uros[3],
-which cleaned up the __ex()/__kvm_handle_fault_on_reboot() code, as
-opposed to zapping them entirely.
-
-[1] https://lkml.kernel.org/r/20200704203809.76391-1-dpreed@deepplum.com
-[2] https://lkml.kernel.org/r/20201029134145.107560-1-ubizjak@gmail.com
-[3] https://lkml.kernel.org/r/20201221194800.46962-1-ubizjak@gmail.com
-
-David P. Reed (1):
-  x86/virt: Mark flags and memory as clobbered by VMXOFF
-
-Sean Christopherson (6):
-  x86/virt: Eat faults on VMXOFF in reboot flows
-  x86/reboot: Force all cpus to exit VMX root if VMX is supported
-  KVM: VMX: Move Intel PT shenanigans out of VMXON/VMXOFF flows
-  KVM: VMX: Use the kernel's version of VMXOFF
-  KVM: SVM: Use asm goto to handle unexpected #UD on SVM instructions
-  KVM: x86: Kill off __ex() and __kvm_handle_fault_on_reboot()
-
-Uros Bizjak (2):
-  KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
-  KVM: x86: Move declaration of kvm_spurious_fault() to x86.h
-
- arch/x86/include/asm/kvm_host.h | 25 --------------
- arch/x86/include/asm/virtext.h  | 25 ++++++++++----
- arch/x86/kernel/reboot.c        | 30 ++++++-----------
- arch/x86/kvm/svm/sev.c          |  5 ++-
- arch/x86/kvm/svm/svm.c          | 18 +---------
- arch/x86/kvm/svm/svm_ops.h      | 59 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/nested.c       | 32 ++----------------
- arch/x86/kvm/vmx/vmenter.S      |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 28 ++++++----------
- arch/x86/kvm/vmx/vmx.h          |  1 +
- arch/x86/kvm/vmx/vmx_ops.h      |  4 +--
- arch/x86/kvm/x86.c              |  9 ++++-
- arch/x86/kvm/x86.h              |  2 ++
- 13 files changed, 117 insertions(+), 123 deletions(-)
- create mode 100644 arch/x86/kvm/svm/svm_ops.h
-
+diff --git a/arch/x86/include/asm/virtext.h b/arch/x86/include/asm/virtext.h
+index 9aad0e0876fb..fda3e7747c22 100644
+--- a/arch/x86/include/asm/virtext.h
++++ b/arch/x86/include/asm/virtext.h
+@@ -30,15 +30,22 @@ static inline int cpu_has_vmx(void)
+ }
+ 
+ 
+-/** Disable VMX on the current CPU
++/**
++ * cpu_vmxoff() - Disable VMX on the current CPU
+  *
+- * vmxoff causes a undefined-opcode exception if vmxon was not run
+- * on the CPU previously. Only call this function if you know VMX
+- * is enabled.
++ * Disable VMX and clear CR4.VMXE (even if VMXOFF faults)
++ *
++ * Note, VMXOFF causes a #UD if the CPU is !post-VMXON, but it's impossible to
++ * atomically track post-VMXON state, e.g. this may be called in NMI context.
++ * Eat all faults as all other faults on VMXOFF faults are mode related, i.e.
++ * faults are guaranteed to be due to the !post-VMXON check unless the CPU is
++ * magically in RM, VM86, compat mode, or at CPL>0.
+  */
+ static inline void cpu_vmxoff(void)
+ {
+-	asm volatile ("vmxoff");
++	asm_volatile_goto("1: vmxoff\n\t"
++			  _ASM_EXTABLE(1b, %l[fault]) :::: fault);
++fault:
+ 	cr4_clear_bits(X86_CR4_VMXE);
+ }
+ 
 -- 
 2.29.2.729.g45daf8777d-goog
 
