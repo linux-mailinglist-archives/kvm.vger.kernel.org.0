@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 989BC2E919F
-	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 09:19:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F3302E91A4
+	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 09:20:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726562AbhADIRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 03:17:41 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:9952 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726163AbhADIRk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jan 2021 03:17:40 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4D8T3f5CKTzj2BH;
-        Mon,  4 Jan 2021 16:16:14 +0800 (CST)
+        id S1726796AbhADIRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 03:17:46 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10103 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726655AbhADIRq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jan 2021 03:17:46 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4D8T3G3CvKzMF8l;
+        Mon,  4 Jan 2021 16:15:54 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.184.196) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 4 Jan 2021 16:16:50 +0800
+ 14.3.498.0; Mon, 4 Jan 2021 16:16:52 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Marc Zyngier <maz@kernel.org>, Eric Auger <eric.auger@redhat.com>,
         "Will Deacon" <will@kernel.org>,
@@ -28,77 +28,142 @@ CC:     Alex Williamson <alex.williamson@redhat.com>,
         Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <lushenming@huawei.com>
-Subject: [RFC PATCH v2 1/4] KVM: arm64: GICv4.1: Add function to get VLPI state
-Date:   Mon, 4 Jan 2021 16:16:10 +0800
-Message-ID: <20210104081613.100-2-lushenming@huawei.com>
+Subject: [RFC PATCH v2 2/4] KVM: arm64: GICv4.1: Try to save hw pending state in save_pending_tables
+Date:   Mon, 4 Jan 2021 16:16:11 +0800
+Message-ID: <20210104081613.100-3-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210104081613.100-1-lushenming@huawei.com>
 References: <20210104081613.100-1-lushenming@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.184.196]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With GICv4.1 and the vPE unmapped, which indicates the invalidation
-of any VPT caches associated with the vPE, we can get the VLPI state
-by peeking at the VPT. So we add a function for this.
+After pausing all vCPUs and devices capable of interrupting, in order
+to save the information of all interrupts, besides flushing the pending
+states in kvm’s vgic, we also try to flush the states of VLPIs in the
+virtual pending tables into guest RAM, but we need to have GICv4.1 and
+safely unmap the vPEs first.
 
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- arch/arm64/kvm/vgic/vgic-v4.c | 24 ++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.h    |  1 +
- 2 files changed, 25 insertions(+)
+ arch/arm64/kvm/vgic/vgic-v3.c | 58 +++++++++++++++++++++++++++++++----
+ 1 file changed, 52 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index 66508b03094f..f211a7c32704 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -203,6 +203,30 @@ void vgic_v4_configure_vsgis(struct kvm *kvm)
- 	kvm_arm_resume_guest(kvm);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 9cdf39a94a63..a58c94127cb0 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -1,6 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
++#include <linux/irq.h>
++#include <linux/irqdomain.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
+@@ -356,6 +358,38 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+ 	return 0;
  }
  
 +/*
-+ * Must be called with GICv4.1 and the vPE unmapped, which
-+ * indicates the invalidation of any VPT caches associated
-+ * with the vPE, thus we can get the VLPI state by peeking
-+ * at the VPT.
++ * The deactivation of the doorbell interrupt will trigger the
++ * unmapping of the associated vPE.
 + */
-+int vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val)
++static void unmap_all_vpes(struct vgic_dist *dist)
 +{
-+	struct its_vpe *vpe = &irq->target_vcpu->arch.vgic_cpu.vgic_v3.its_vpe;
-+	int mask = BIT(irq->intid % BITS_PER_BYTE);
-+	void *va;
-+	u8 *ptr;
++	struct irq_desc *desc;
++	int i;
 +
-+	if (!irq->hw || !kvm_vgic_global_state.has_gicv4_1)
-+		return -EINVAL;
++	if (!kvm_vgic_global_state.has_gicv4_1)
++		return;
 +
-+	va = page_address(vpe->vpt_page);
-+	ptr = va + irq->intid / BITS_PER_BYTE;
++	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
++		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
++		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
++	}
++}
 +
-+	*val = !!(*ptr & mask);
++static void map_all_vpes(struct vgic_dist *dist)
++{
++	struct irq_desc *desc;
++	int i;
 +
-+	return 0;
++	if (!kvm_vgic_global_state.has_gicv4_1)
++		return;
++
++	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
++		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
++		irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
++	}
 +}
 +
  /**
-  * vgic_v4_init - Initialize the GICv4 data structures
-  * @kvm:	Pointer to the VM being initialized
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 64fcd7511110..9c9b43e0d0b0 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -317,5 +317,6 @@ bool vgic_supports_direct_msis(struct kvm *kvm);
- int vgic_v4_init(struct kvm *kvm);
- void vgic_v4_teardown(struct kvm *kvm);
- void vgic_v4_configure_vsgis(struct kvm *kvm);
-+int vgic_v4_get_vlpi_state(struct vgic_irq *irq, bool *val);
+  * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
+  * kvm lock and all vcpu lock must be held
+@@ -365,14 +399,18 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_irq *irq;
+ 	gpa_t last_ptr = ~(gpa_t)0;
+-	int ret;
++	int ret = 0;
+ 	u8 val;
  
- #endif
++	/* As a preparation for getting any VLPI states. */
++	unmap_all_vpes(dist);
++
+ 	list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+ 		int byte_offset, bit_nr;
+ 		struct kvm_vcpu *vcpu;
+ 		gpa_t pendbase, ptr;
+ 		bool stored;
++		bool is_pending = irq->pending_latch;
+ 
+ 		vcpu = irq->target_vcpu;
+ 		if (!vcpu)
+@@ -387,24 +425,32 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+ 		if (ptr != last_ptr) {
+ 			ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+ 			if (ret)
+-				return ret;
++				goto out;
+ 			last_ptr = ptr;
+ 		}
+ 
+ 		stored = val & (1U << bit_nr);
+-		if (stored == irq->pending_latch)
++
++		if (irq->hw)
++			vgic_v4_get_vlpi_state(irq, &is_pending);
++
++		if (stored == is_pending)
+ 			continue;
+ 
+-		if (irq->pending_latch)
++		if (is_pending)
+ 			val |= 1 << bit_nr;
+ 		else
+ 			val &= ~(1 << bit_nr);
+ 
+ 		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+ 		if (ret)
+-			return ret;
++			goto out;
+ 	}
+-	return 0;
++
++out:
++	map_all_vpes(dist);
++
++	return ret;
+ }
+ 
+ /**
 -- 
 2.19.1
 
