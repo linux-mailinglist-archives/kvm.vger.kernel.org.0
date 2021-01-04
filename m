@@ -2,673 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C5362E961D
-	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 14:35:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E2C62E9611
+	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 14:32:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726673AbhADNen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 08:34:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19766 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725840AbhADNem (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Jan 2021 08:34:42 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 104DXSvg021531;
-        Mon, 4 Jan 2021 08:33:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=u8FX1FD/1NQRvp7KyjK38JehSDvJdNZEKtfFagPt8l4=;
- b=U/cJf3qFcJ4DhdicquT6I/47ANhwWDaWSUl9m7Uxxmeq1++Xh3a697OyerRzrJbYaYKj
- Ho6nr8wl0RpG6JLrwMRmLBc+WWxbDC1bBLBRhsNAclMeJnu0+tGBMQK+JkVjAdbJ70kG
- n1pqZWmGzLMDlyB6N7SLqdN3w3q/G4PBjv4GkKAu/YHlqLqm4paLG7qCdSnJWlno8PPb
- ObsOmSnLCzurFq5AAB4qPhp55r0GuMNFR4isqXzE2GiQvp5JsLiiS6jOFmVVQDESx3uo
- CeXAdLVAWJClR3UtwfGSoAn3Rlt920UOtiwgm5J7Yv057V+VYtJBSIiOoN0yjc6kMiLt JQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2d2tqme-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 08:33:50 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 104DXbMY022179;
-        Mon, 4 Jan 2021 08:33:50 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2d2tqk0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 08:33:50 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 104DXXHq003879;
-        Mon, 4 Jan 2021 13:33:46 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 35u3pmh9dd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 13:33:46 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 104DXiKb35127670
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Jan 2021 13:33:44 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 603724203F;
-        Mon,  4 Jan 2021 13:33:44 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E190042042;
-        Mon,  4 Jan 2021 13:33:43 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.0.177])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  4 Jan 2021 13:33:43 +0000 (GMT)
-Date:   Mon, 4 Jan 2021 14:11:34 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, pbonzini@redhat.com, cohuck@redhat.com,
-        lvivier@redhat.com, nadav.amit@gmail.com
-Subject: Re: [kvm-unit-tests PATCH v1 05/12] lib/alloc_page: fix and improve
- the page allocator
-Message-ID: <20210104141134.08b85525@ibm-vm>
-In-Reply-To: <ddb73d1c-8dc3-50cc-e88a-7434313ade1d@oracle.com>
-References: <20201216201200.255172-1-imbrenda@linux.ibm.com>
-        <20201216201200.255172-6-imbrenda@linux.ibm.com>
-        <ddb73d1c-8dc3-50cc-e88a-7434313ade1d@oracle.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727326AbhADNa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 08:30:29 -0500
+Received: from mga07.intel.com ([134.134.136.100]:23242 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726666AbhADNa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jan 2021 08:30:28 -0500
+IronPort-SDR: 0m1hGqyg//CUplEbGe58Ee4dysT23WHLgQ80lHgB3HaX72/ThfYZ8sDg/u2H+px/fk3jOG1h1x
+ DFBWT2u/MHzg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9853"; a="241034459"
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="241034459"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2021 05:22:49 -0800
+IronPort-SDR: JocRUK8k8ASaPNfd+Pt3539+sNH+2EnMZDn4Mr51/hdscxbK30Rb/5xYht4apSanqajY8f+mBv
+ lFykmFgSMkXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="461944689"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by fmsmga001.fm.intel.com with ESMTP; 04 Jan 2021 05:22:46 -0800
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 15/17] KVM: vmx/pmu: Rewrite applicable_counters field in guest PEBS records
+Date:   Mon,  4 Jan 2021 21:15:40 +0800
+Message-Id: <20210104131542.495413-16-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210104131542.495413-1-like.xu@linux.intel.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-04_08:2021-01-04,2021-01-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- phishscore=0 adultscore=0 impostorscore=0 malwarescore=0 mlxscore=0
- bulkscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101040087
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 24 Dec 2020 10:17:06 -0800
-Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
+The PEBS event counters scheduled by host may different to the counters
+required by guest. The host counter index will be leaked into the guest
+PEBS record and the guest driver will be confused by the counter indexes
+in the "Applicable Counters" field of the PEBS records and ignore them.
 
-> On 12/16/20 12:11 PM, Claudio Imbrenda wrote:
-> > This patch introduces some improvements to the code, mostly
-> > readability improvements, but also some semantic details, and
-> > improvements in the documentation.
-> >
-> > * introduce and use pfn_t to semantically tag parameters as PFNs
-> > * remove the PFN macro, use virt_to_pfn instead
-> > * rename area_or_metadata_contains and area_contains to
-> > area_contains_pfn and usable_area_contains_pfn respectively
-> > * fix/improve comments in lib/alloc_page.h
-> > * move some wrapper functions to the header
-> >
-> > Fixes: 8131e91a4b61 ("lib/alloc_page: complete rewrite of the page
-> > allocator") Fixes: 34c950651861 ("lib/alloc_page: allow reserving
-> > arbitrary memory ranges")
-> >
-> > Signed-off-by: Claudio Imbrenda<imbrenda@linux.ibm.com>
-> > ---
-> >   lib/alloc_page.h |  49 +++++++++-----
-> >   lib/alloc_page.c | 165
-> > +++++++++++++++++++++++------------------------ 2 files changed,
-> > 116 insertions(+), 98 deletions(-)
-> >
-> > diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-> > index b6aace5..d8550c6 100644
-> > --- a/lib/alloc_page.h
-> > +++ b/lib/alloc_page.h
-> > @@ -8,6 +8,7 @@
-> >   #ifndef ALLOC_PAGE_H
-> >   #define ALLOC_PAGE_H 1
-> >   
-> > +#include <stdbool.h>
-> >   #include <asm/memory_areas.h>
-> >   
-> >   #define AREA_ANY -1
-> > @@ -23,7 +24,7 @@ bool page_alloc_initialized(void);
-> >    * top_pfn is the physical frame number of the first page
-> > immediately after
-> >    * the end of the area to initialize
-> >    */
-> > -void page_alloc_init_area(u8 n, uintptr_t base_pfn, uintptr_t
-> > top_pfn); +void page_alloc_init_area(u8 n, phys_addr_t base_pfn,
-> > phys_addr_t top_pfn); 
-> >   /* Enables the page allocator. At least one area must have been
-> > initialized */ void page_alloc_ops_enable(void);
-> > @@ -37,9 +38,12 @@ void *memalign_pages_area(unsigned int areas,
-> > size_t alignment, size_t size); 
-> >   /*
-> >    * Allocate aligned memory from any area.
-> > - * Equivalent to memalign_pages_area(~0, alignment, size).
-> > + * Equivalent to memalign_pages_area(AREA_ANY, alignment, size).
-> >    */
-> > -void *memalign_pages(size_t alignment, size_t size);
-> > +static inline void *memalign_pages(size_t alignment, size_t size)
-> > +{
-> > +	return memalign_pages_area(AREA_ANY, alignment, size);
-> > +}
-> >   
-> >   /*
-> >    * Allocate naturally aligned memory from the specified areas.
-> > @@ -48,16 +52,22 @@ void *memalign_pages(size_t alignment, size_t
-> > size); void *alloc_pages_area(unsigned int areas, unsigned int
-> > order); 
-> >   /*
-> > - * Allocate one page from any area.
-> > - * Equivalent to alloc_pages(0);
-> > + * Allocate naturally aligned memory from any area.  
-> 
-> 
-> This one allocates page size memory and the comment should reflect
-> that.
+Before the guest PEBS overflow PMI is injected into the guest through
+global status, KVM needs to rewrite the "Applicable Counters" field with
+the right enabled guest pebs counter idx(s) in the guest PEBS records.
 
-I'll fix the comment
+Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 +
+ arch/x86/kvm/pmu.c              |  1 +
+ arch/x86/kvm/vmx/pmu_intel.c    | 84 +++++++++++++++++++++++++++++++--
+ 3 files changed, 82 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index ea204c628f45..e6394ac54f81 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -452,6 +452,7 @@ struct kvm_pmu {
+ 	u64 ds_area;
+ 	u64 cached_ds_area;
+ 	struct gfn_to_hva_cache ds_area_cache;
++	struct gfn_to_hva_cache pebs_buffer_base_cache;
+ 	u64 pebs_enable;
+ 	u64 pebs_enable_mask;
+ 	u64 pebs_data_cfg;
+@@ -459,6 +460,7 @@ struct kvm_pmu {
  
-> > + * Equivalent to alloc_pages_area(AREA_ANY, order);
-> >    */
-> > -void *alloc_page(void);
-> > +static inline void *alloc_pages(unsigned int order)
-> > +{
-> > +	return alloc_pages_area(AREA_ANY, order);
-> > +}
-> >   
-> >   /*
-> > - * Allocate naturally aligned memory from any area.
-> > - * Equivalent to alloc_pages_area(~0, order);
-> > + * Allocate one page from any area.
-> > + * Equivalent to alloc_pages(0);
-> >    */
-> > -void *alloc_pages(unsigned int order);
-> > +static inline void *alloc_page(void)
-> > +{
-> > +	return alloc_pages(0);
-> > +}
-> >   
-> >   /*
-> >    * Frees a memory block allocated with any of the memalign_pages*
-> > or @@ -66,23 +76,32 @@ void *alloc_pages(unsigned int order);
-> >    */
-> >   void free_pages(void *mem);
-> >   
-> > -/* For backwards compatibility */
-> > +/*
-> > + * Free one page.
-> > + * Equivalent to free_pages(mem).
-> > + */
-> >   static inline void free_page(void *mem)
-> >   {
-> >   	return free_pages(mem);
-> >   }
-> >   
-> > -/* For backwards compatibility */
-> > +/*
-> > + * Free pages by order.
-> > + * Equivalent to free_pages(mem).
-> > + */
-> >   static inline void free_pages_by_order(void *mem, unsigned int
-> > order) {
-> >   	free_pages(mem);
-> >   }
-> >   
-> >   /*
-> > - * Allocates and reserves the specified memory range if possible.
-> > - * Returns NULL in case of failure.
-> > + * Allocates and reserves the specified physical memory range if
-> > possible.
-> > + * If the specified range cannot be reserved in its entirety, no
-> > action is
-> > + * performed and false is returned.
-> > + *
-> > + * Returns true in case of success, false otherwise.
-> >    */
-> > -void *alloc_pages_special(uintptr_t addr, size_t npages);
-> > +bool alloc_pages_special(phys_addr_t addr, size_t npages);
-> >   
-> >   /*
-> >    * Frees a reserved memory range that had been reserved with
-> > @@ -91,6 +110,6 @@ void *alloc_pages_special(uintptr_t addr, size_t
-> > npages);
-> >    * exactly, it can also be a subset, in which case only the
-> > specified
-> >    * pages will be freed and unreserved.
-> >    */
-> > -void free_pages_special(uintptr_t addr, size_t npages);
-> > +void free_pages_special(phys_addr_t addr, size_t npages);
-> >   
-> >   #endif
-> > diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> > index ed0ff02..8d2700d 100644
-> > --- a/lib/alloc_page.c
-> > +++ b/lib/alloc_page.c
-> > @@ -17,25 +17,29 @@
-> >   
-> >   #define IS_ALIGNED_ORDER(x,order) IS_ALIGNED((x),BIT_ULL(order))
-> >   #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
-> > -#define PFN(x) ((uintptr_t)(x) >> PAGE_SHIFT)
-> >   
-> >   #define ORDER_MASK	0x3f
-> >   #define ALLOC_MASK	0x40
-> >   #define SPECIAL_MASK	0x80
-> >   
-> > +typedef phys_addr_t pfn_t;
-> > +
-> >   struct mem_area {
-> >   	/* Physical frame number of the first usable frame in the
-> > area */
-> > -	uintptr_t base;
-> > +	pfn_t base;
-> >   	/* Physical frame number of the first frame outside the
-> > area */
-> > -	uintptr_t top;
-> > -	/* Combination of SPECIAL_MASK, ALLOC_MASK, and order */
-> > +	pfn_t top;
-> > +	/* Per page metadata, each entry is a combination *_MASK
-> > and order */ u8 *page_states;
-> >   	/* One freelist for each possible block size, up to
-> > NLISTS */ struct linked_list freelists[NLISTS];
-> >   };
-> >   
-> > +/* Descriptors for each possible area */
-> >   static struct mem_area areas[MAX_AREAS];
-> > +/* Mask of initialized areas */
-> >   static unsigned int areas_mask;
-> > +/* Protects areas and areas mask */
-> >   static struct spinlock lock;
-> >   
-> >   bool page_alloc_initialized(void)
-> > @@ -43,12 +47,24 @@ bool page_alloc_initialized(void)
-> >   	return areas_mask != 0;
-> >   }
-> >   
-> > -static inline bool area_or_metadata_contains(struct mem_area *a,
-> > uintptr_t pfn) +/*
-> > + * Each memory area contains an array of metadata entries at the
-> > very
-> > + * beginning. The usable memory follows immediately afterwards.
-> > + * This function returns true if the given pfn falls anywhere
-> > within the
-> > + * memory area, including the metadata area.
-> > + */
-> > +static inline bool area_contains_pfn(struct mem_area *a, pfn_t pfn)
-> >   {
-> > -	return (pfn >= PFN(a->page_states)) && (pfn < a->top);
-> > +	return (pfn >= virt_to_pfn(a->page_states)) && (pfn <
-> > a->top); }
-> >   
-> > -static inline bool area_contains(struct mem_area *a, uintptr_t pfn)
-> > +/*
-> > + * Each memory area contains an array of metadata entries at the
-> > very
-> > + * beginning. The usable memory follows immediately afterwards.
-> > + * This function returns true if the given pfn falls in the usable
-> > range of
-> > + * the given memory area.
-> > + */
-> > +static inline bool usable_area_contains_pfn(struct mem_area *a,
-> > pfn_t pfn) {
-> >   	return (pfn >= a->base) && (pfn < a->top);
-> >   }
-> > @@ -69,21 +85,19 @@ static inline bool area_contains(struct
-> > mem_area *a, uintptr_t pfn) */
-> >   static void split(struct mem_area *a, void *addr)
-> >   {
-> > -	uintptr_t pfn = PFN(addr);
-> > -	struct linked_list *p;
-> > -	uintptr_t i, idx;
-> > +	pfn_t pfn = virt_to_pfn(addr);
-> > +	pfn_t i, idx;
-> >   	u8 order;
-> >   
-> > -	assert(a && area_contains(a, pfn));
-> > +	assert(a && usable_area_contains_pfn(a, pfn));
-> >   	idx = pfn - a->base;
-> >   	order = a->page_states[idx];
-> >   	assert(!(order & ~ORDER_MASK) && order && (order <
-> > NLISTS)); assert(IS_ALIGNED_ORDER(pfn, order));
-> > -	assert(area_contains(a, pfn + BIT(order) - 1));
-> > +	assert(usable_area_contains_pfn(a, pfn + BIT(order) - 1));
-> >   
-> >   	/* Remove the block from its free list */
-> > -	p = list_remove(addr);
-> > -	assert(p);
-> > +	list_remove(addr);
-> >   
-> >   	/* update the block size for each page in the block */
-> >   	for (i = 0; i < BIT(order); i++) {
-> > @@ -92,9 +106,9 @@ static void split(struct mem_area *a, void *addr)
-> >   	}
-> >   	order--;
-> >   	/* add the first half block to the appropriate free list
-> > */
-> > -	list_add(a->freelists + order, p);
-> > +	list_add(a->freelists + order, addr);
-> >   	/* add the second half block to the appropriate free list
-> > */
-> > -	list_add(a->freelists + order, (void *)((pfn + BIT(order))
-> > * PAGE_SIZE));
-> > +	list_add(a->freelists + order, pfn_to_virt(pfn +
-> > BIT(order))); }
-> >   
-> >   /*
-> > @@ -105,7 +119,7 @@ static void split(struct mem_area *a, void
-> > *addr) */
-> >   static void *page_memalign_order(struct mem_area *a, u8 al, u8 sz)
-> >   {
-> > -	struct linked_list *p, *res = NULL;
-> > +	struct linked_list *p;
-> >   	u8 order;
-> >   
-> >   	assert((al < NLISTS) && (sz < NLISTS));
-> > @@ -130,17 +144,17 @@ static void *page_memalign_order(struct
-> > mem_area *a, u8 al, u8 sz) for (; order > sz; order--)
-> >   		split(a, p);
-> >   
-> > -	res = list_remove(p);
-> > -	memset(a->page_states + (PFN(res) - a->base), ALLOC_MASK |
-> > order, BIT(order));
-> > -	return res;
-> > +	list_remove(p);
-> > +	memset(a->page_states + (virt_to_pfn(p) - a->base),
-> > ALLOC_MASK | order, BIT(order));
-> > +	return p;
-> >   }
-> >   
-> > -static struct mem_area *get_area(uintptr_t pfn)
-> > +static struct mem_area *get_area(pfn_t pfn)
-> >   {
-> >   	uintptr_t i;
-> >   
-> >   	for (i = 0; i < MAX_AREAS; i++)
-> > -		if ((areas_mask & BIT(i)) && area_contains(areas +
-> > i, pfn))
-> > +		if ((areas_mask & BIT(i)) &&
-> > usable_area_contains_pfn(areas + i, pfn)) return areas + i;
-> >   	return NULL;
-> >   }
-> > @@ -160,17 +174,16 @@ static struct mem_area *get_area(uintptr_t
-> > pfn)
-> >    * - all of the pages of the two blocks must have the same block
-> > size
-> >    * - the function is called with the lock held
-> >    */
-> > -static bool coalesce(struct mem_area *a, u8 order, uintptr_t pfn,
-> > uintptr_t pfn2) +static bool coalesce(struct mem_area *a, u8 order,
-> > pfn_t pfn, pfn_t pfn2) {
-> > -	uintptr_t first, second, i;
-> > -	struct linked_list *li;
-> > +	pfn_t first, second, i;
-> >   
-> >   	assert(IS_ALIGNED_ORDER(pfn, order) &&
-> > IS_ALIGNED_ORDER(pfn2, order)); assert(pfn2 == pfn + BIT(order));
-> >   	assert(a);
-> >   
-> >   	/* attempting to coalesce two blocks that belong to
-> > different areas */
-> > -	if (!area_contains(a, pfn) || !area_contains(a, pfn2 +
-> > BIT(order) - 1))
-> > +	if (!usable_area_contains_pfn(a, pfn) ||
-> > !usable_area_contains_pfn(a, pfn2 + BIT(order) - 1)) return false;
-> >   	first = pfn - a->base;
-> >   	second = pfn2 - a->base;
-> > @@ -179,17 +192,15 @@ static bool coalesce(struct mem_area *a, u8
-> > order, uintptr_t pfn, uintptr_t pfn2 return false;
-> >   
-> >   	/* we can coalesce, remove both blocks from their
-> > freelists */
-> > -	li = list_remove((void *)(pfn2 << PAGE_SHIFT));
-> > -	assert(li);
-> > -	li = list_remove((void *)(pfn << PAGE_SHIFT));
-> > -	assert(li);
-> > +	list_remove(pfn_to_virt(pfn2));
-> > +	list_remove(pfn_to_virt(pfn));
-> >   	/* check the metadata entries and update with the new
-> > size */ for (i = 0; i < (2ull << order); i++) {
-> >   		assert(a->page_states[first + i] == order);
-> >   		a->page_states[first + i] = order + 1;
-> >   	}
-> >   	/* finally add the newly coalesced block to the
-> > appropriate freelist */
-> > -	list_add(a->freelists + order + 1, li);
-> > +	list_add(a->freelists + order + 1, pfn_to_virt(pfn));
-> >   	return true;
-> >   }
-> >   
-> > @@ -209,7 +220,7 @@ static bool coalesce(struct mem_area *a, u8
-> > order, uintptr_t pfn, uintptr_t pfn2 */
-> >   static void _free_pages(void *mem)
-> >   {
-> > -	uintptr_t pfn2, pfn = PFN(mem);
-> > +	pfn_t pfn2, pfn = virt_to_pfn(mem);
-> >   	struct mem_area *a = NULL;
-> >   	uintptr_t i, p;
-> >   	u8 order;
-> > @@ -232,7 +243,7 @@ static void _free_pages(void *mem)
-> >   	/* ensure that the block is aligned properly for its size
-> > */ assert(IS_ALIGNED_ORDER(pfn, order));
-> >   	/* ensure that the area can contain the whole block */
-> > -	assert(area_contains(a, pfn + BIT(order) - 1));
-> > +	assert(usable_area_contains_pfn(a, pfn + BIT(order) - 1));
-> >   
-> >   	for (i = 0; i < BIT(order); i++) {
-> >   		/* check that all pages of the block have
-> > consistent metadata */ @@ -268,63 +279,68 @@ void free_pages(void
-> > *mem) spin_unlock(&lock);
-> >   }
-> >   
-> > -static void *_alloc_page_special(uintptr_t addr)
-> > +static bool _alloc_page_special(pfn_t pfn)
-> >   {
-> >   	struct mem_area *a;
-> > -	uintptr_t mask, i;
-> > +	pfn_t mask, i;
-> >   
-> > -	a = get_area(PFN(addr));
-> > -	assert(a);
-> > -	i = PFN(addr) - a->base;
-> > +	a = get_area(pfn);
-> > +	if (!a)
-> > +		return false;
-> > +	i = pfn - a->base;
-> >   	if (a->page_states[i] & (ALLOC_MASK | SPECIAL_MASK))
-> > -		return NULL;
-> > +		return false;
-> >   	while (a->page_states[i]) {
-> > -		mask = GENMASK_ULL(63, PAGE_SHIFT +
-> > a->page_states[i]);
-> > -		split(a, (void *)(addr & mask));
-> > +		mask = GENMASK_ULL(63, a->page_states[i]);
-> > +		split(a, pfn_to_virt(pfn & mask));
-> >   	}
-> >   	a->page_states[i] = SPECIAL_MASK;
-> > -	return (void *)addr;
-> > +	return true;
-> >   }
-> >   
-> > -static void _free_page_special(uintptr_t addr)
-> > +static void _free_page_special(pfn_t pfn)
-> >   {
-> >   	struct mem_area *a;
-> > -	uintptr_t i;
-> > +	pfn_t i;
-> >   
-> > -	a = get_area(PFN(addr));
-> > +	a = get_area(pfn);
-> >   	assert(a);
-> > -	i = PFN(addr) - a->base;
-> > +	i = pfn - a->base;
-> >   	assert(a->page_states[i] == SPECIAL_MASK);
-> >   	a->page_states[i] = ALLOC_MASK;
-> > -	_free_pages((void *)addr);
-> > +	_free_pages(pfn_to_virt(pfn));
-> >   }
-> >   
-> > -void *alloc_pages_special(uintptr_t addr, size_t n)
-> > +bool alloc_pages_special(phys_addr_t addr, size_t n)  
-> 
-> 
-> The convention for these alloc functions seems to be that of
-> returning void *. For example, alloc_pages_area(), alloc_pages() etc.
->  Probably we should maintain the convention or change all of their
-> return type.
-
-what if you try to allocate memory that is not directly addressable?
-(e.g. on x86_32)
-
-you pass a phys_addr_t and it succeeds, but you can't get a pointer to
-it, how should I indicate success/failure?
-
-> >   {
-> > -	uintptr_t i;
-> > +	pfn_t pfn;
-> > +	size_t i;
-> >   
-> >   	assert(IS_ALIGNED(addr, PAGE_SIZE));
-> > +	pfn = addr >> PAGE_SHIFT;
-> >   	spin_lock(&lock);
-> >   	for (i = 0; i < n; i++)
-> > -		if (!_alloc_page_special(addr + i * PAGE_SIZE))
-> > +		if (!_alloc_page_special(pfn + i))  
-> 
-> 
-> Can the PFN macro be used here instead of the 'pfn' variable ?
-
-I remove the PFN macro in this patch, also addr is not a virtual
-address.
-
-> >   			break;
-> >   	if (i < n) {
-> >   		for (n = 0 ; n < i; n++)
-> > -			_free_page_special(addr + n * PAGE_SIZE);
-> > -		addr = 0;
-> > +			_free_page_special(pfn + n);
-> > +		n = 0;
-> >   	}
-> >   	spin_unlock(&lock);
-> > -	return (void *)addr;
-> > +	return n;
-> >   }
-> >   
-> > -void free_pages_special(uintptr_t addr, size_t n)
-> > +void free_pages_special(phys_addr_t addr, size_t n)
-> >   {
-> > -	uintptr_t i;
-> > +	pfn_t pfn;
-> > +	size_t i;
-> >   
-> >   	assert(IS_ALIGNED(addr, PAGE_SIZE));
-> > +	pfn = addr >> PAGE_SHIFT;
-> >   	spin_lock(&lock);
-> >   	for (i = 0; i < n; i++)
-> > -		_free_page_special(addr + i * PAGE_SIZE);
-> > +		_free_page_special(pfn + i);  
-> 
-> 
-> Can the PFN macro be used here instead of the 'pfn' variable ?
-
-same as above
-
-> >   	spin_unlock(&lock);
-> >   }
-> >   
-> > @@ -351,11 +367,6 @@ void *alloc_pages_area(unsigned int area,
-> > unsigned int order) return page_memalign_order_area(area, order,
-> > order); }
-> >   
-> > -void *alloc_pages(unsigned int order)
-> > -{
-> > -	return alloc_pages_area(AREA_ANY, order);
-> > -}
-> > -
-> >   /*
-> >    * Allocates (1 << order) physically contiguous aligned pages.
-> >    * Returns NULL if the allocation was not possible.
-> > @@ -370,18 +381,6 @@ void *memalign_pages_area(unsigned int area,
-> > size_t alignment, size_t size) return
-> > page_memalign_order_area(area, size, alignment); }
-> >   
-> > -void *memalign_pages(size_t alignment, size_t size)
-> > -{
-> > -	return memalign_pages_area(AREA_ANY, alignment, size);
-> > -}
-> > -
-> > -/*
-> > - * Allocates one page
-> > - */
-> > -void *alloc_page()
-> > -{
-> > -	return alloc_pages(0);
-> > -}
-> >   
-> >   static struct alloc_ops page_alloc_ops = {
-> >   	.memalign = memalign_pages,
-> > @@ -416,7 +415,7 @@ void page_alloc_ops_enable(void)
-> >    * - the memory area to add does not overlap with existing areas
-> >    * - the memory area to add has at least 5 pages available
-> >    */
-> > -static void _page_alloc_init_area(u8 n, uintptr_t start_pfn,
-> > uintptr_t top_pfn) +static void _page_alloc_init_area(u8 n, pfn_t
-> > start_pfn, pfn_t top_pfn) {
-> >   	size_t table_size, npages, i;
-> >   	struct mem_area *a;
-> > @@ -437,7 +436,7 @@ static void _page_alloc_init_area(u8 n,
-> > uintptr_t start_pfn, uintptr_t top_pfn) 
-> >   	/* fill in the values of the new area */
-> >   	a = areas + n;
-> > -	a->page_states = (void *)(start_pfn << PAGE_SHIFT);
-> > +	a->page_states = pfn_to_virt(start_pfn);
-> >   	a->base = start_pfn + table_size;
-> >   	a->top = top_pfn;
-> >   	npages = top_pfn - a->base;
-> > @@ -447,14 +446,14 @@ static void _page_alloc_init_area(u8 n,
-> > uintptr_t start_pfn, uintptr_t top_pfn) for (i = 0; i < MAX_AREAS;
-> > i++) { if (!(areas_mask & BIT(i)))
-> >   			continue;
-> > -		assert(!area_or_metadata_contains(areas + i,
-> > start_pfn));
-> > -		assert(!area_or_metadata_contains(areas + i,
-> > top_pfn - 1));
-> > -		assert(!area_or_metadata_contains(a,
-> > PFN(areas[i].page_states)));
-> > -		assert(!area_or_metadata_contains(a, areas[i].top
-> > - 1));
-> > +		assert(!area_contains_pfn(areas + i, start_pfn));
-> > +		assert(!area_contains_pfn(areas + i, top_pfn - 1));
-> > +		assert(!area_contains_pfn(a,
-> > virt_to_pfn(areas[i].page_states)));
-> > +		assert(!area_contains_pfn(a, areas[i].top - 1));
-> >   	}
-> >   	/* initialize all freelists for the new area */
-> >   	for (i = 0; i < NLISTS; i++)
-> > -		a->freelists[i].next = a->freelists[i].prev =
-> > a->freelists + i;
-> > +		a->freelists[i].prev = a->freelists[i].next =
-> > a->freelists + i; 
-> >   	/* initialize the metadata for the available memory */
-> >   	for (i = a->base; i < a->top; i += 1ull << order) {
-> > @@ -473,13 +472,13 @@ static void _page_alloc_init_area(u8 n,
-> > uintptr_t start_pfn, uintptr_t top_pfn) assert(order < NLISTS);
-> >   		/* initialize the metadata and add to the
-> > freelist */ memset(a->page_states + (i - a->base), order,
-> > BIT(order));
-> > -		list_add(a->freelists + order, (void *)(i <<
-> > PAGE_SHIFT));
-> > +		list_add(a->freelists + order, pfn_to_virt(i));
-> >   	}
-> >   	/* finally mark the area as present */
-> >   	areas_mask |= BIT(n);
-> >   }
-> >   
-> > -static void __page_alloc_init_area(u8 n, uintptr_t cutoff,
-> > uintptr_t base_pfn, uintptr_t *top_pfn) +static void
-> > __page_alloc_init_area(u8 n, pfn_t cutoff, pfn_t base_pfn, pfn_t
-> > *top_pfn) { if (*top_pfn > cutoff) {
-> >   		spin_lock(&lock);
-> > @@ -500,7 +499,7 @@ static void __page_alloc_init_area(u8 n,
-> > uintptr_t cutoff, uintptr_t base_pfn, u
-> >    * Prerequisites:
-> >    * see _page_alloc_init_area
-> >    */
-> > -void page_alloc_init_area(u8 n, uintptr_t base_pfn, uintptr_t
-> > top_pfn) +void page_alloc_init_area(u8 n, phys_addr_t base_pfn,
-> > phys_addr_t top_pfn) {
-> >   	if (n != AREA_ANY_NUMBER) {
-> >   		__page_alloc_init_area(n, 0, base_pfn, &top_pfn);
-> >  
+ 	bool counter_cross_mapped;
+ 	bool need_rewrite_ds_pebs_interrupt_threshold;
++	bool need_rewrite_pebs_records;
+ 
+ 	/*
+ 	 * The gate to release perf_events not marked in
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index c0f18b304933..581653589108 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -77,6 +77,7 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
+ 
+ 	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
+ 		if (perf_event->attr.precise_ip) {
++			pmu->need_rewrite_pebs_records = pmu->counter_cross_mapped;
+ 			/* Indicate PEBS overflow PMI to guest. */
+ 			__set_bit(GLOBAL_STATUS_BUFFER_OVF_BIT,
+ 				(unsigned long *)&pmu->global_status);
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index b69e7c47fb05..4c095c31db38 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -557,22 +557,96 @@ static int rewrite_ds_pebs_interrupt_threshold(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
+ 
++static int rewrite_ds_pebs_records(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	struct kvm_pmc *pmc = NULL;
++	struct debug_store *ds = NULL;
++	gpa_t gpa;
++	u64 pebs_buffer_base, offset, buffer_base, status, new_status, format_size;
++	int srcu_idx, bit, ret = 0;
++
++	if (!pmu->counter_cross_mapped)
++		return ret;
++
++	ds = kmalloc(sizeof(struct debug_store), GFP_KERNEL);
++	if (!ds)
++		return -ENOMEM;
++
++	ret = -EFAULT;
++	srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
++	if (kvm_read_guest_cached(vcpu->kvm, &pmu->ds_area_cache,
++			ds, sizeof(struct debug_store)))
++		goto out;
++
++	if (ds->pebs_index <= ds->pebs_buffer_base)
++		goto out;
++
++	pebs_buffer_base = ds->pebs_buffer_base;
++	offset = offsetof(struct pebs_basic, applicable_counters);
++	buffer_base = 0;
++
++	gpa = kvm_mmu_gva_to_gpa_system(vcpu, pebs_buffer_base, NULL);
++	if (kvm_gfn_to_hva_cache_init(vcpu->kvm, &pmu->pebs_buffer_base_cache,
++			gpa, sizeof(struct pebs_basic)))
++		goto out;
++
++	do {
++		ret = -EFAULT;
++		if (kvm_read_guest_offset_cached(vcpu->kvm, &pmu->pebs_buffer_base_cache,
++				&status, buffer_base + offset, sizeof(u64)))
++			goto out;
++		if (kvm_read_guest_offset_cached(vcpu->kvm, &pmu->pebs_buffer_base_cache,
++				&format_size, buffer_base, sizeof(u64)))
++			goto out;
++
++		new_status = 0ull;
++		for_each_set_bit(bit, (unsigned long *)&pmu->pebs_enable, X86_PMC_IDX_MAX) {
++			pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, bit);
++
++			if (!pmc || !pmc->perf_event)
++				continue;
++
++			if (test_bit(pmc->perf_event->hw.idx, (unsigned long *)&status))
++				new_status |= BIT_ULL(pmc->idx);
++		}
++		if (kvm_write_guest_offset_cached(vcpu->kvm, &pmu->pebs_buffer_base_cache,
++				&new_status, buffer_base + offset, sizeof(u64)))
++			goto out;
++
++		ret = 0;
++		buffer_base += format_size >> 48;
++	} while (pebs_buffer_base + buffer_base < ds->pebs_index);
++
++out:
++	srcu_read_unlock(&vcpu->kvm->srcu, srcu_idx);
++	kfree(ds);
++	return ret;
++}
++
+ static void intel_pmu_handle_event(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+-	int ret;
++	int ret1, ret2;
++
++	if (pmu->need_rewrite_pebs_records) {
++		pmu->need_rewrite_pebs_records = false;
++		ret1 = rewrite_ds_pebs_records(vcpu);
++	}
+ 
+ 	if (!(pmu->global_ctrl & pmu->pebs_enable))
+-		return;
++		goto out;
+ 
+ 	if (pmu->counter_cross_mapped && pmu->need_rewrite_ds_pebs_interrupt_threshold) {
+-		ret = rewrite_ds_pebs_interrupt_threshold(vcpu);
+ 		pmu->need_rewrite_ds_pebs_interrupt_threshold = false;
++		ret2 = rewrite_ds_pebs_interrupt_threshold(vcpu);
+ 	}
+ 
+-	if (ret == -ENOMEM)
++out:
++
++	if (ret1 == -ENOMEM || ret2 == -ENOMEM)
+ 		pr_debug_ratelimited("%s: Fail to emulate guest PEBS due to OOM.", __func__);
+-	else if (ret == -EFAULT)
++	else if (ret1 == -EFAULT || ret2 == -EFAULT)
+ 		pr_debug_ratelimited("%s: Fail to emulate guest PEBS due to GPA fault.", __func__);
+ }
+ 
+-- 
+2.29.2
 
