@@ -2,99 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0151D2E8E63
-	for <lists+kvm@lfdr.de>; Sun,  3 Jan 2021 22:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E956C2E8F12
+	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 01:58:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727479AbhACVTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 3 Jan 2021 16:19:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41976 "EHLO
+        id S1727409AbhADA4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 3 Jan 2021 19:56:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727459AbhACVTa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 3 Jan 2021 16:19:30 -0500
-Received: from forward100j.mail.yandex.net (forward100j.mail.yandex.net [IPv6:2a02:6b8:0:801:2::100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B72C061573;
-        Sun,  3 Jan 2021 13:18:49 -0800 (PST)
-Received: from myt5-e5be2b47c7a3.qloud-c.yandex.net (myt5-e5be2b47c7a3.qloud-c.yandex.net [IPv6:2a02:6b8:c00:2583:0:640:e5be:2b47])
-        by forward100j.mail.yandex.net (Yandex) with ESMTP id F2CF250E1201;
-        Mon,  4 Jan 2021 00:18:46 +0300 (MSK)
-Received: from myt4-ee976ce519ac.qloud-c.yandex.net (myt4-ee976ce519ac.qloud-c.yandex.net [2a02:6b8:c00:1da4:0:640:ee97:6ce5])
-        by myt5-e5be2b47c7a3.qloud-c.yandex.net (mxback/Yandex) with ESMTP id 7Um83cj7X1-IkEKS9P2;
-        Mon, 04 Jan 2021 00:18:46 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1609708726;
-        bh=/09hiXrWBDEpRbuWT3AYbPbd36CF9zxIC8Go8TuFXi8=;
-        h=In-Reply-To:From:To:Subject:Message-ID:Cc:Date:References;
-        b=eJlyBt83Zh3O+wgnsiTxPgh02qkTLFZqcsm54Y+e8dhmPajog55K/ZKEZcZ6T8+q0
-         7gq7Z1La44K/xbPNkvrYPccf4nVKBMVUxQQzHH0BV9C2HusLIHdcXDXgK7o2JVgaSA
-         RG0TBl/ap+PRrYCHhwSoua2ec4GO1xI7/nzAlFus=
-Authentication-Results: myt5-e5be2b47c7a3.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by myt4-ee976ce519ac.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id uKXDdlGSmJ-IjIGUj2v;
-        Mon, 04 Jan 2021 00:18:45 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH 0/5] virtio/vsock: introduce SOCK_SEQPACKET support.
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Arseniy Krasnov <oxffffaa@gmail.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210103195454.1954169-1-arseny.krasnov@kaspersky.com>
-From:   stsp <stsp2@yandex.ru>
-Message-ID: <b93e36c7-fd0b-6c5c-f598-234520b9fe01@yandex.ru>
-Date:   Mon, 4 Jan 2021 00:18:44 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        with ESMTP id S1727239AbhADA4D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 3 Jan 2021 19:56:03 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07F7C061574
+        for <kvm@vger.kernel.org>; Sun,  3 Jan 2021 16:55:22 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id d203so30382526oia.0
+        for <kvm@vger.kernel.org>; Sun, 03 Jan 2021 16:55:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9Tk8aeB1lMcqEvmEiRLSZYEP/rdW9yQtGNUZwFbieVA=;
+        b=sMiglgVYI4ufM+s8kU4v0P9/sZIVAhkSjgP8Olk5dNiz3iubEo9aoIhiXBrgK0hBVE
+         CbjAu/q5DBsK+0FPml0ajiu0EBK7aaxDmwPN7G0yrlU1YI63gThFZOgIEXZPEeyMDXM2
+         9JJRcUC+zwXemO7Phe8/8ptV/dIQOX3SAJDhgoUfXg9yic84YGqABaSXocUXMLn14bEU
+         sSLSax/UlPJfSmzrV2gEIzX9pmxHhW2GYgbL1tu8nnEkLr0vRGTeVsECPP7C4jrPvyEC
+         4XFa2le+BS9fnXe5iLHbNJKBQLGwoXHP3H4JtV9ba6dC7Jxjqic3tChBOJXfGmZHJYS/
+         98wA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9Tk8aeB1lMcqEvmEiRLSZYEP/rdW9yQtGNUZwFbieVA=;
+        b=h6I524zkANQNwMVKU1sI82A6FOUcabgPJVR9vd63D68F5hPQWk6HwbaMte1VHIaI8j
+         ikL2SeyZeI3vVNVQDY5A/1VPYCqgrGJkyz5PqiT8rPoxvhAQQzKoiFgob+0XKtLk29wU
+         k2RrUHHt1U25HCnOZh0I1MvdU1LUTJIGAYP5XO1fsgiWRwY68B0jXVMhtPCW90tTUQfh
+         Xrn6rNyDJ3SfCyU+JYYWTWC+c70yEjDC7jf9lC5vi9QWR3ygA6h+P0z28DdPZDhz5pjp
+         IBALCGn5lK0/nSSTUx0+U+IRYKwszW23r6Kqp0Cyj7Bkg1iLEHUtfojmw9FDrDQPQoeI
+         TlkA==
+X-Gm-Message-State: AOAM532CRO0Y/81GC/RnnsnN2Twr93i+tx8F+s+WT2AOaqHnHdya3NQL
+        XldhfIKzCHeoyXQZpFwRmibacj2nUc0cHYYK3OI=
+X-Google-Smtp-Source: ABdhPJxEA3Uh0Tn3CslwYOpdh8Z7+sidzeFScoIgaReNMBhrRVx1b1YI8CYsXHXGBhzsoEwrpkoHqvnMzeh88UcTmNc=
+X-Received: by 2002:aca:d98a:: with SMTP id q132mr16624669oig.33.1609721722186;
+ Sun, 03 Jan 2021 16:55:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210103195454.1954169-1-arseny.krasnov@kaspersky.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+References: <CAP8WD_bZXpQnENCay5hDaoTQDHm26nRj9Lsa1PMQsd2wNHxe5A@mail.gmail.com>
+In-Reply-To: <CAP8WD_bZXpQnENCay5hDaoTQDHm26nRj9Lsa1PMQsd2wNHxe5A@mail.gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 4 Jan 2021 08:55:11 +0800
+Message-ID: <CANRm+CyA39vwmfLgxfCGzKszKPurUQoG4NbB4nH=7eiUJ3r_0A@mail.gmail.com>
+Subject: Re: kvm_arch_para_features() call triggers invalid opcode on i486
+To:     whiteheadm@acm.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseny, thanks for your work on this!
-
-I did a small review in a hope it helps.
-Also it may be cool to have the driver feature
-for that (so that the host can see if its supported).
-But I guess this was already said by Michael. :)
-
-03.01.2021 22:54, Arseny Krasnov пишет:
-> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
-> do it, new packet operation was added: it marks start of record (with
-> record length in header). To send record, packet with start marker is
-> sent first, then all data is transmitted as 'RW' packets. On receiver's
-> side, length of record is known from packet with start record marker.
-> Now as  packets of one socket are not reordered neither on vsock nor on
-> vhost transport layers, these marker allows to restore original record
-> on receiver's side. When each 'RW' packet is inserted to rx queue of
-> receiver, user is woken up, data is copied to user's buffer and credit
-> update message is sent. If there is no user waiting for data, credit
-> won't be updated and sender will wait. Also,  if user's buffer is full,
-> and record is bigger, all unneeded data will be dropped (with sending of
-> credit update message).
-> 	'MSG_EOR' flag is implemented with special value of 'flags' field
-> in packet header. When record is received with such flags, 'MSG_EOR' is
-> set in 'recvmsg()' flags. 'MSG_TRUNC' flag is also supported.
-> 	In this implementation maximum length of datagram is not limited
-> as in stream socket.
+On Mon, 4 Jan 2021 at 00:42, tedheadster <tedheadster@gmail.com> wrote:
 >
->   drivers/vhost/vsock.c                   |   6 +-
->   include/linux/virtio_vsock.h            |   7 +
->   include/net/af_vsock.h                  |   4 +
->   include/uapi/linux/virtio_vsock.h       |   9 +
->   net/vmw_vsock/af_vsock.c                | 457 +++++++++++++++++++-----
->   net/vmw_vsock/virtio_transport.c        |   3 +
->   net/vmw_vsock/virtio_transport_common.c | 323 ++++++++++++++---
->   7 files changed, 673 insertions(+), 136 deletions(-)
+> Paolo,
+>   I am doing regression testing on a first generation i486 and came up
+> with a kernel crash because it incorrectly thinks the processor
+> supports KVM features. Yes, we do still support the ancient i486.
 >
+> This processor does NOT have the cpuid instruction, and I believe
+> testing for it returns -1 (not supported) in two's-compliment form.
+>
+> I think the -1 is not checked for, and this is causing
+> kvm_arch_para_features() to think it _does_ support
+> KVM_CPUID_FEATURES, causing it to later execute an invalid opcode
+> (cpuid).
 
+Please try the latest Linus tree or kvm/queue, it will not have this
+issue since commit 64b38bd1906bb ("x86/kvm: do not setup pv tlb flush
+when not paravirtualized").
+
+    Wanpeng
