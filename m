@@ -2,188 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 737842E953C
-	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 13:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB7002E95D5
+	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 14:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726240AbhADMrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 07:47:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1478 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725889AbhADMrq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 4 Jan 2021 07:47:46 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 104CVrRO131846;
-        Mon, 4 Jan 2021 07:46:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ewbAY50v/8FSpvqbM398JgtgepRI2tpoNwMV7GL3pvY=;
- b=DTF+ZyCvDdR6uM1LM8twZ7mlboBptES+dArJQjRpvTLroBHmtKBVZZan4rPgYuDAG4vT
- RhxZf1Z/JLanlJnDSZ87EWUcupm8e2PGTBd0TeJ/WfO9PZLz/ynJd959aD0ZTy3aJjzj
- /oy1OQXUjrpo8gNiphKxU6MoNy9UkiVpvgBbKciqS7aPKonmwD2t528fZWnY7gwuBkEI
- sv7Pqc5l5v+mLyJkNHc23fY6XzbnwsVifyVvvZ7Hgdxb3TpVWgVBV0zLvtBx72ERN78v
- aOaeY3OSHfnYowTnfoa3T1pUaTQCu3IHsEvFnXeU8QH0AVlJcfEdzK2weVXHQp4AOnaB Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2cp9ga6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 07:46:39 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 104CW9dc136633;
-        Mon, 4 Jan 2021 07:46:38 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2cp9g98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 07:46:38 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 104CVSIM013181;
-        Mon, 4 Jan 2021 12:46:36 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 35tg3h9vr6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 04 Jan 2021 12:46:35 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 104CkXJB33489154
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 4 Jan 2021 12:46:33 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDABA11C052;
-        Mon,  4 Jan 2021 12:46:32 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E5E6B11C04C;
-        Mon,  4 Jan 2021 12:46:31 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.76.119])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon,  4 Jan 2021 12:46:31 +0000 (GMT)
-Date:   Mon, 4 Jan 2021 13:46:29 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
-        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
-        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
-        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Subject: Re: [EXTERNAL] Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20210104134629.49997b53.pasic@linux.ibm.com>
-In-Reply-To: <20210104071550.GA22585@ram-ibm-com.ibm.com>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
-        <20201204054415.579042-12-david@gibson.dropbear.id.au>
-        <20201214182240.2abd85eb.cohuck@redhat.com>
-        <20201217054736.GH310465@yekko.fritz.box>
-        <20201217123842.51063918.cohuck@redhat.com>
-        <20201217151530.54431f0e@bahia.lan>
-        <20201218124111.4957eb50.cohuck@redhat.com>
-        <20210104071550.GA22585@ram-ibm-com.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727071AbhADNXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 08:23:45 -0500
+Received: from mga07.intel.com ([134.134.136.100]:23242 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726670AbhADNXp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jan 2021 08:23:45 -0500
+IronPort-SDR: z3GaPBpNJXsp3hPwymkFdKkGh4l7rgaWDTqIRgyRe6G0uwFvusOIdtN1DW06KozexoOPqJuZVD
+ 1EXxE5CwSsxw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9853"; a="241034275"
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="241034275"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2021 05:21:58 -0800
+IronPort-SDR: lzkg6p1+6NNiOiPW0WCngqzsAykXSvhzo6MF0xRaVv+20Y4hbGs1eCqQOjmuombyCV/BN9xHlb
+ OGno8NOe65Uw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.78,474,1599548400"; 
+   d="scan'208";a="461944497"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by fmsmga001.fm.intel.com with ESMTP; 04 Jan 2021 05:21:55 -0800
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS via DS
+Date:   Mon,  4 Jan 2021 21:15:25 +0800
+Message-Id: <20210104131542.495413-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-04_07:2021-01-04,2021-01-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- malwarescore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
- adultscore=0 bulkscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101040081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 3 Jan 2021 23:15:50 -0800
-Ram Pai <linuxram@us.ibm.com> wrote:
+The Precise Event Based Sampling (PEBS) facility on Intel Ice Lake Server
+platforms can provide an architectural state of the instruction executed
+after the guest instruction that caused the event. This patch set enables
+the PEBS via DS feature for KVM guests on the Ice Lake Server.
 
-> On Fri, Dec 18, 2020 at 12:41:11PM +0100, Cornelia Huck wrote:
-> > On Thu, 17 Dec 2020 15:15:30 +0100
-[..]
-> > > > > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
-> > > > > > >  {
-> > > > > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
-> > > > > > >          error_setg(errp,
-> > > > > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
-> > > > > > >          }
-> > > > > > >      }
-> > > > > > >  
-> > > > > > > +    /* add migration blocker */
-> > > > > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
-> > > > > > > +    /* NB: This can fail if --only-migratable is used */
-> > > > > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);      
-> > > > > > 
-> > > > > > Just so that I understand: is PEF something that is enabled by the host
-> > > > > > (and the guest is either secured or doesn't start), or is it using a
-> > > > > > model like s390x PV where the guest initiates the transition into
-> > > > > > secured mode?      
-> > > > > 
-> > > > > Like s390x PV it's initiated by the guest.
-> > > > >     
-> > > > > > Asking because s390x adds the migration blocker only when the
-> > > > > > transition is actually happening (i.e. guests that do not transition
-> > > > > > into secure mode remain migratable.) This has the side effect that you
-> > > > > > might be able to start a machine with --only-migratable that
-> > > > > > transitions into a non-migratable machine via a guest action, if I'm
-> > > > > > not mistaken. Without the new object, I don't see a way to block with
-> > > > > > --only-migratable; with it, we should be able to do that. Not sure what
-> > > > > > the desirable behaviour is here.      
-> > > > >     
-> > > 
-> > > The purpose of --only-migratable is specifically to prevent the machine
-> > > to transition to a non-migrate state IIUC. The guest transition to
-> > > secure mode should be nacked in this case.  
-> > 
-> > Yes, that's what happens for s390x: The guest tries to transition, QEMU
-> > can't add a migration blocker and fails the instruction used for
-> > transitioning, the guest sees the error.
-> > 
-> > The drawback is that we see the failure only when we already launched
-> > the machine and the guest tries to transition. If I start QEMU with
-> > --only-migratable, it will refuse to start when non-migratable devices
-> > are configured in the command line, so I see the issue right from the
-> > start. (For s390x, that would possibly mean that we should not even
-> > present the cpu feature bit when only_migratable is set?)  
-> 
-> What happens in s390x,  if the guest tries to transition to secure, when
-> the secure object is NOT configured on the machine?
-> 
+We can use PEBS feature on the linux guest like native:
 
-Nothing in particular.
+  # perf record -e instructions:ppp ./br_instr a
+  # perf record -c 100000 -e instructions:pp ./br_instr a
 
-> On PEF systems, the transition fails and the guest is terminated.
-> 
-> My point is -- QEMU will not be able to predict in advance, what the
-> guest might or might not do, regardless of what devices and objects are
-> configured in the machine.   If the guest does something unexpected, it
-> has to be terminated.
+The guest PEBS will be disabled on purpose when host is using PEBS. 
+By default, KVM disables the co-existence of guest PEBS and host PEBS.
 
-We can't fail transition to secure when the secure object is not
-configured on the machine, because that would break pre-existing
-setups. This feature is still to be shipped, but secure execution has
-already been shipped, but without migration support.
+The whole patch set could be divided into three parts and the first two
+parts enables the basic PEBS via DS feature which could be considered
+to be merged and no regression about host perf is expected.
 
-That's why when you have both the secure object configured, and mandate
-migratability, the we can fail. Actually we should fail now, because the
-two options are not compatible: you can't have a qemu that is guaranteed
-to be migratable, and guaranteed to be able to operate in secure
-execution mode today. Failing early, and not on the guests opt-in would
-be preferable.
+Compared to the first version, an important change here is the removal
+of the forced 1-1 mapping of the virtual to physical PMC and we handle
+the cross-mapping issue carefully in the part 3 which may address
+artificial competition concern from PeterZ.
 
-After migration support is added, the combo should be fine, and probably
-also the default for secure execution machines.
- 
-> 
-> So one possible design choice is to let the guest know that migration
-> must be facilitated. It can then decide if it wants to continue as a
-> normal VM or terminate itself, or take the plunge and switch to secure.
-> A well behaving guest will not switch to secure.
-> 
+In general, there are 2 code paths to emulate guest PEBS facility.
 
-I don't understand this point. Sorry.
+1) Fast path (part 2, patch 0004-0012)
 
-Regards,
-Halil
+This is when the host assigned physical PMC has an identical index as
+the virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+It works as the 1-1 mapping that we did in the first version.
 
-[..]
+2) Slow path (part 3, patch 0012-0017)
+
+This is when the host assigned physical PMC has a different index
+from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
+In this case, KVM needs to rewrite the PEBS records to change the
+applicable counter indexes to the virtual PMC indexes, which would
+otherwise contain the physical counter index written by PEBS facility,
+and switch the counter reset values to the offset corresponding to
+the physical counter indexes in the DS data structure. 
+
+Large PEBS needs to be disabled by KVM rewriting the
+pebs_interrupt_threshold filed in DS to only one record in
+the slow path.  This is because a guest may implicitly drain PEBS buffer,
+e.g., context switch. KVM doesn't get a chance to update the PEBS buffer.
+The physical PMC index will confuse the guest. The difficulty comes
+when multiple events get rescheduled inside the guest. Hence disabling
+large PEBS in this case might be an easy and safe way to keep it corrects
+as an initial step here. 
+
+We don't expect this change would break any guest 
+code, which can generally tolerate
+earlier PMIs. In the fast path with 1:1 mapping this is not needed.
+
+The rewriting work is performed before delivering a vPMI to the guest to
+notify the guest to read the record (before entering the guest, where
+interrupt has been disabled so no counter reschedule would happen
+at that point on the host).
+
+For the DS area virtualization, the PEBS hardware is registered with the
+guest virtual address (gva) of the guest DS memory.
+In the past, the difficulty is that the host needs to pin the guest
+DS memory, as the page fault caused by the PEBS hardware can't be fixed.
+This isn't needed from ICX thanks to the hardware support.
+
+KVM rewriting the guest DS area needs to walk the guest page tables to
+translate gva to host virtual address (hva).
+
+To reduce the translation overhead, we cache the translation on the first
+time of DS memory rewriting. The cached translation is valid to use by
+KVM until the guest disables PEBS (VMExits to KVM), which means the guest
+may do re-allocation of the PEBS buffer next time and KVM needs
+to re-walk the guest pages tables to update the cached translation.
+
+In summary, this patch set enables the guest PEBS to retrieve the correct
+information from its own PEBS records on the Ice Lake server platforms
+when host is not using PEBS facility at the same time. And we expect it
+should work when migrating to another Ice Lake.
+
+Here are the results of pebs test from guest/host for same workload:
+
+perf report on guest:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250
+# Overhead  Command   Shared Object      Symbol
+  57.74%  br_instr  br_instr           [.] lfsr_cond
+  41.40%  br_instr  br_instr           [.] cmp_end
+   0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+
+perf report on host:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386
+# Overhead  Command   Shared Object     Symbol
+  57.90%  br_instr  br_instr          [.] lfsr_cond
+  41.95%  br_instr  br_instr          [.] cmp_end
+   0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+   
+Conclusion: the profiling results on the guest are similar to that on the host.
+
+Please check more details in each commit and feel free to comment.
+
+v2->v3 Changelog:
+- drop the counter_freezing check and disable guest PEBS when host uses PEBS;
+- use kvm_read/write_guest_[offset]_cached() to reduce memory rewrite overhead;
+- use GLOBAL_STATUS_BUFFER_OVF_BIT instead of 62;
+- make intel_pmu_handle_event() static;
+- rebased to kvm-queue d45f89f7437d;
+
+Previous:
+https://lore.kernel.org/kvm/20201109021254.79755-1-like.xu@linux.intel.com/
+
+Like Xu (17):
+  KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+  KVM: vmx/pmu: Use IA32_PERF_CAPABILITIES to adjust features visibility
+  KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+  perf: x86/ds: Handle guest PEBS overflow PMI and inject it to guest
+  KVM: x86/pmu: Reprogram guest PEBS event to emulate guest PEBS counter
+  KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+  KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to manage guest DS buffer
+  KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+  KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+  KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+  KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+  KVM: x86/pmu: Disable guest PEBS when counters are cross-mapped
+  KVM: x86/pmu: Add hook to emulate pebs for cross-mapped counters
+  KVM: vmx/pmu: Limit pebs_interrupt_threshold in the guest DS area
+  KVM: vmx/pmu: Rewrite applicable_counters field in guest PEBS records
+  KVM: x86/pmu: Save guest pebs reset values when pebs is configured
+  KVM: x86/pmu: Adjust guest pebs reset values for crpss-mapped counters
+
+ arch/x86/events/intel/core.c     |  45 +++++
+ arch/x86/events/intel/ds.c       |  62 +++++++
+ arch/x86/include/asm/kvm_host.h  |  18 ++
+ arch/x86/include/asm/msr-index.h |   6 +
+ arch/x86/kvm/pmu.c               |  92 +++++++--
+ arch/x86/kvm/pmu.h               |  20 ++
+ arch/x86/kvm/vmx/capabilities.h  |  17 +-
+ arch/x86/kvm/vmx/pmu_intel.c     | 310 ++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c           |  29 +++
+ arch/x86/kvm/x86.c               |  12 +-
+ 10 files changed, 592 insertions(+), 19 deletions(-)
+
+-- 
+2.29.2
+
