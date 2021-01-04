@@ -2,136 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9127C2E9333
-	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 11:22:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 737842E953C
+	for <lists+kvm@lfdr.de>; Mon,  4 Jan 2021 13:48:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbhADKUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 05:20:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49070 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726026AbhADKUg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jan 2021 05:20:36 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2978C061793;
-        Mon,  4 Jan 2021 02:19:55 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id y23so18788035wmi.1;
-        Mon, 04 Jan 2021 02:19:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=cshuBm7yB0Z3cSiR7jcnuEYzCYnzDpnl22WbZG/ju9A=;
-        b=M3Ngc5/MMNzyhU8I5x5YBEM7KEyJ85Y0XLmLQEYrJWsFHN5N8VXe8Z5MPFYwnuMrMi
-         Hx/9Mpra2YpHPrZqELXd73hWlIY1XRevN88LOhXt/adUP5lVVlBhj5VnV87P+RePmuu3
-         /TxKZ1oCnspXNA+t3jR/wrELwh2BuSY7bWFn2E/79tRNqFoewT5tm7XidnRDq7zPg7Q2
-         khd0qeLDq3dGyBhVMs4alfzPYBZOOpeshQQ1oolYQHB4q8SS84uIKrKeG5sjd96cYb9M
-         3166FELfa+cTzCd1qV4jEU6jT4zvv7+XkmPr/gbsNiRm2SPSO8V58fKTXkJR8anaqW2Q
-         W6TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=cshuBm7yB0Z3cSiR7jcnuEYzCYnzDpnl22WbZG/ju9A=;
-        b=j3+93wUe0snB+zLeb2wmZzy2h95ySsP17I62uZJbppXRRFkzD++bvPrwMvx59+j7i3
-         1WBa8oTy6FiFiu2j1Dl2VFq1w6LfTZNV9g8LbqWY5z1kADHNhSgGxa07wxKPW5Di2MLa
-         AroobeCy1yZfp4ihO9QRQ1wRKgaSEhE4acyfTTOFQ+j9Phti4bQHm4tfT2rGQT7lmgAU
-         SmtDcPiz85uOP2nPgd+4hhZe9pw7X3Qa2DM2oePPsaXGAWRr7uzFrerRgNGpPDY3FDxo
-         xGMfwrnqfWR3C6U34W5YX5UdBVay+Do6fehvw3m70s5CQ+aYNa6zUrLavqFZw2c809vG
-         15IA==
-X-Gm-Message-State: AOAM532rUC+qn8fcGwXFApt6OPfQHyqN4OpC7tFct46Y6cYieuK3PJik
-        NOJZZJMIjnKNKacRHJQxwkA=
-X-Google-Smtp-Source: ABdhPJwOuLImjmAuXi0UyWjGYMZg6gZNFDNyltiw/uCmka2l2gwaY0RUZ3EWHJG5F8u9t7/5Zt9cRw==
-X-Received: by 2002:a1c:e246:: with SMTP id z67mr26166545wmg.166.1609755594674;
-        Mon, 04 Jan 2021 02:19:54 -0800 (PST)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id b9sm35686661wmd.32.2021.01.04.02.19.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Jan 2021 02:19:53 -0800 (PST)
-Date:   Mon, 4 Jan 2021 10:19:52 +0000
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2] vhost/vsock: add IOTLB API support
-Message-ID: <20210104101952.GA344891@stefanha-x1.localdomain>
-References: <20201223143638.123417-1-sgarzare@redhat.com>
+        id S1726240AbhADMrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 07:47:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1478 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725889AbhADMrq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 4 Jan 2021 07:47:46 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 104CVrRO131846;
+        Mon, 4 Jan 2021 07:46:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ewbAY50v/8FSpvqbM398JgtgepRI2tpoNwMV7GL3pvY=;
+ b=DTF+ZyCvDdR6uM1LM8twZ7mlboBptES+dArJQjRpvTLroBHmtKBVZZan4rPgYuDAG4vT
+ RhxZf1Z/JLanlJnDSZ87EWUcupm8e2PGTBd0TeJ/WfO9PZLz/ynJd959aD0ZTy3aJjzj
+ /oy1OQXUjrpo8gNiphKxU6MoNy9UkiVpvgBbKciqS7aPKonmwD2t528fZWnY7gwuBkEI
+ sv7Pqc5l5v+mLyJkNHc23fY6XzbnwsVifyVvvZ7Hgdxb3TpVWgVBV0zLvtBx72ERN78v
+ aOaeY3OSHfnYowTnfoa3T1pUaTQCu3IHsEvFnXeU8QH0AVlJcfEdzK2weVXHQp4AOnaB Ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2cp9ga6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jan 2021 07:46:39 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 104CW9dc136633;
+        Mon, 4 Jan 2021 07:46:38 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35v2cp9g98-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jan 2021 07:46:38 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 104CVSIM013181;
+        Mon, 4 Jan 2021 12:46:36 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 35tg3h9vr6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 04 Jan 2021 12:46:35 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 104CkXJB33489154
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 4 Jan 2021 12:46:33 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EDABA11C052;
+        Mon,  4 Jan 2021 12:46:32 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5E6B11C04C;
+        Mon,  4 Jan 2021 12:46:31 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.76.119])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon,  4 Jan 2021 12:46:31 +0000 (GMT)
+Date:   Mon, 4 Jan 2021 13:46:29 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Ram Pai <linuxram@us.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
+        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
+        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
+        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
+        qemu-ppc@nongnu.org, pbonzini@redhat.com
+Subject: Re: [EXTERNAL] Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20210104134629.49997b53.pasic@linux.ibm.com>
+In-Reply-To: <20210104071550.GA22585@ram-ibm-com.ibm.com>
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+        <20201204054415.579042-12-david@gibson.dropbear.id.au>
+        <20201214182240.2abd85eb.cohuck@redhat.com>
+        <20201217054736.GH310465@yekko.fritz.box>
+        <20201217123842.51063918.cohuck@redhat.com>
+        <20201217151530.54431f0e@bahia.lan>
+        <20201218124111.4957eb50.cohuck@redhat.com>
+        <20210104071550.GA22585@ram-ibm-com.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
-Content-Disposition: inline
-In-Reply-To: <20201223143638.123417-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-04_07:2021-01-04,2021-01-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ malwarescore=0 clxscore=1011 lowpriorityscore=0 impostorscore=0
+ adultscore=0 bulkscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101040081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, 3 Jan 2021 23:15:50 -0800
+Ram Pai <linuxram@us.ibm.com> wrote:
 
---Q68bSM7Ycu6FN28Q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Fri, Dec 18, 2020 at 12:41:11PM +0100, Cornelia Huck wrote:
+> > On Thu, 17 Dec 2020 15:15:30 +0100
+[..]
+> > > > > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
+> > > > > > >  {
+> > > > > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
+> > > > > > >          error_setg(errp,
+> > > > > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
+> > > > > > >          }
+> > > > > > >      }
+> > > > > > >  
+> > > > > > > +    /* add migration blocker */
+> > > > > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
+> > > > > > > +    /* NB: This can fail if --only-migratable is used */
+> > > > > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);      
+> > > > > > 
+> > > > > > Just so that I understand: is PEF something that is enabled by the host
+> > > > > > (and the guest is either secured or doesn't start), or is it using a
+> > > > > > model like s390x PV where the guest initiates the transition into
+> > > > > > secured mode?      
+> > > > > 
+> > > > > Like s390x PV it's initiated by the guest.
+> > > > >     
+> > > > > > Asking because s390x adds the migration blocker only when the
+> > > > > > transition is actually happening (i.e. guests that do not transition
+> > > > > > into secure mode remain migratable.) This has the side effect that you
+> > > > > > might be able to start a machine with --only-migratable that
+> > > > > > transitions into a non-migratable machine via a guest action, if I'm
+> > > > > > not mistaken. Without the new object, I don't see a way to block with
+> > > > > > --only-migratable; with it, we should be able to do that. Not sure what
+> > > > > > the desirable behaviour is here.      
+> > > > >     
+> > > 
+> > > The purpose of --only-migratable is specifically to prevent the machine
+> > > to transition to a non-migrate state IIUC. The guest transition to
+> > > secure mode should be nacked in this case.  
+> > 
+> > Yes, that's what happens for s390x: The guest tries to transition, QEMU
+> > can't add a migration blocker and fails the instruction used for
+> > transitioning, the guest sees the error.
+> > 
+> > The drawback is that we see the failure only when we already launched
+> > the machine and the guest tries to transition. If I start QEMU with
+> > --only-migratable, it will refuse to start when non-migratable devices
+> > are configured in the command line, so I see the issue right from the
+> > start. (For s390x, that would possibly mean that we should not even
+> > present the cpu feature bit when only_migratable is set?)  
+> 
+> What happens in s390x,  if the guest tries to transition to secure, when
+> the secure object is NOT configured on the machine?
+> 
 
-On Wed, Dec 23, 2020 at 03:36:38PM +0100, Stefano Garzarella wrote:
-> This patch enables the IOTLB API support for vhost-vsock devices,
-> allowing the userspace to emulate an IOMMU for the guest.
->=20
-> These changes were made following vhost-net, in details this patch:
-> - exposes VIRTIO_F_ACCESS_PLATFORM feature and inits the iotlb
->   device if the feature is acked
-> - implements VHOST_GET_BACKEND_FEATURES and
->   VHOST_SET_BACKEND_FEATURES ioctls
-> - calls vq_meta_prefetch() before vq processing to prefetch vq
->   metadata address in IOTLB
-> - provides .read_iter, .write_iter, and .poll callbacks for the
->   chardev; they are used by the userspace to exchange IOTLB messages
->=20
-> This patch was tested specifying "intel_iommu=3Dstrict" in the guest
-> kernel command line. I used QEMU with a patch applied [1] to fix a
-> simple issue (that patch was merged in QEMU v5.2.0):
->     $ qemu -M q35,accel=3Dkvm,kernel-irqchip=3Dsplit \
->            -drive file=3Dfedora.qcow2,format=3Dqcow2,if=3Dvirtio \
->            -device intel-iommu,intremap=3Don,device-iotlb=3Don \
->            -device vhost-vsock-pci,guest-cid=3D3,iommu_platform=3Don,ats=
-=3Don
->=20
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg09077.html
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->=20
-> The patch is the same of v1, but I re-tested it with:
-> - QEMU v5.2.0-551-ga05f8ecd88
-> - Linux 5.9.15 (host)
-> - Linux 5.9.15 and 5.10.0 (guest)
-> Now, enabling 'ats' it works well, there are just a few simple changes.
->=20
-> v1: https://www.spinics.net/lists/kernel/msg3716022.html
-> v2:
-> - updated commit message about QEMU version and string used to test
-> - rebased on mst/vhost branch
->=20
-> Thanks,
-> Stefano
-> ---
->  drivers/vhost/vsock.c | 68 +++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 65 insertions(+), 3 deletions(-)
+Nothing in particular.
 
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> On PEF systems, the transition fails and the guest is terminated.
+> 
+> My point is -- QEMU will not be able to predict in advance, what the
+> guest might or might not do, regardless of what devices and objects are
+> configured in the machine.   If the guest does something unexpected, it
+> has to be terminated.
 
---Q68bSM7Ycu6FN28Q
-Content-Type: application/pgp-signature; name="signature.asc"
+We can't fail transition to secure when the secure object is not
+configured on the machine, because that would break pre-existing
+setups. This feature is still to be shipped, but secure execution has
+already been shipped, but without migration support.
 
------BEGIN PGP SIGNATURE-----
+That's why when you have both the secure object configured, and mandate
+migratability, the we can fail. Actually we should fail now, because the
+two options are not compatible: you can't have a qemu that is guaranteed
+to be migratable, and guaranteed to be able to operate in secure
+execution mode today. Failing early, and not on the guests opt-in would
+be preferable.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/y68gACgkQnKSrs4Gr
-c8jFlggAxynl8f/xErtZe/4q3P7uG8fRfOuje/XSlmzcxtlgQOv+t7r/vKjWzGwb
-ZJ52k6PN1dlbuQHyBf1TDre9nNqW17YteqL+em0hfvynsHV6WREOpJPLnVcbOWkF
-/vMadG9PxDkagfVN7ZOEzeLewJM4ZxAjYaZe9ADM2aq6MoxhiC4oCICmOK2UBbu3
-t/bVIhCL/cZs0nMO5cGfpz8u0ZenAiVPsXmbEiynMhhFd1pNWu1XsB6BGqJgZ4oJ
-1BvYrA3RWKmvq/EK15JIKzHJrNuP5mh0bGrWKXOj4ubUTRYnjVMWfwtfDpjKUlGB
-W77zh8Sm5xfKTDndtPmChInD+yd2iQ==
-=9iMg
------END PGP SIGNATURE-----
+After migration support is added, the combo should be fine, and probably
+also the default for secure execution machines.
+ 
+> 
+> So one possible design choice is to let the guest know that migration
+> must be facilitated. It can then decide if it wants to continue as a
+> normal VM or terminate itself, or take the plunge and switch to secure.
+> A well behaving guest will not switch to secure.
+> 
 
---Q68bSM7Ycu6FN28Q--
+I don't understand this point. Sorry.
+
+Regards,
+Halil
+
+[..]
