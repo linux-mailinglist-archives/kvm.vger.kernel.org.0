@@ -2,294 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 143322EB45E
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 21:42:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 243CD2EB4B9
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 22:13:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727958AbhAEUmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 15:42:42 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46630 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726844AbhAEUmm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Jan 2021 15:42:42 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 105KVGJX130187;
-        Tue, 5 Jan 2021 15:41:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- message-id : reply-to : references : mime-version : content-type :
- in-reply-to : subject; s=pp1;
- bh=phc0tnMpOo5J27tJHmUZkv7jbvSFzzbE53ug8/HImdo=;
- b=TvljTEBe7b+oFxuKzoseHqyK3WNnBnmy2Y7LrcU73O3Lav+2krXWlOqDDPCe37LHeonv
- dOpnLAJLmp9F2PG6F7fu8mohXF2so13sRi/IoO/yt8MYrv0xT5T0a4BqnUiRgpcED3f7
- V9xHeHGMD75lwdE/Mr3OaSt+Psdrwy+c0GLIQzL1X/66cYS6GmAiKJgNU2qz734AAwrk
- dvfrfOovDwx61a/EvSdAqnTn4eaeoiftC8g/tUM9sNQssnSEDZuv2aS70z84DcCm/MT0
- LQHHQuytu0Wen8AES+onGLywMJHyCv/mShTkIgUpr3jPNImyVvhSZNj9cNxFkwBdfgfb Hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35vy4y8bcr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 15:41:37 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 105KWGtd136573;
-        Tue, 5 Jan 2021 15:41:36 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35vy4y8bbn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 15:41:36 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 105KcaFD020824;
-        Tue, 5 Jan 2021 20:41:34 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 35tgf8b7b3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 20:41:34 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 105KfVHc37880148
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Jan 2021 20:41:31 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ADEF45204F;
-        Tue,  5 Jan 2021 20:41:31 +0000 (GMT)
-Received: from ram-ibm-com.ibm.com (unknown [9.163.29.145])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 8D1215204E;
-        Tue,  5 Jan 2021 20:41:27 +0000 (GMT)
-Date:   Tue, 5 Jan 2021 12:41:25 -0800
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
-        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
-        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
-        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Message-ID: <20210105204125.GE4102@ram-ibm-com.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20201204054415.579042-12-david@gibson.dropbear.id.au>
- <20201214182240.2abd85eb.cohuck@redhat.com>
- <20201217054736.GH310465@yekko.fritz.box>
- <20201217123842.51063918.cohuck@redhat.com>
- <20201217151530.54431f0e@bahia.lan>
- <20201218124111.4957eb50.cohuck@redhat.com>
- <20210104071550.GA22585@ram-ibm-com.ibm.com>
- <20210104134629.49997b53.pasic@linux.ibm.com>
- <20210104184026.GD4102@ram-ibm-com.ibm.com>
- <20210105115614.7daaadd6.pasic@linux.ibm.com>
+        id S1728487AbhAEVMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 16:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35344 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725940AbhAEVMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 16:12:16 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 135BBC061793
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 13:11:30 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id g3so427699plp.2
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 13:11:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=I+ecmB8P4LM1sQ+xFfF2GmApzt0t3GO8C8SxXkADzN0=;
+        b=mLOqKmsuKDEyTHjWJIAfJaxvoDZRfRxfiSxvvExeBSacNcJZLogu1EvG/so3xFk/2y
+         sVJk6KS9w5QK/wL1G3WWG6PREdcpkzS4BSb6Y21Q1JSBVhveqp9EFDcek5BhUaMm//81
+         lkGGBm/Ycch9uK8XkgR3XHjIqPA/gDjZtLdI424lq0q/Yi2rILw6yj9oaMoL7Hb0ZkXM
+         ttM0ut0b4uv2twPKYL0rOwhhlHhsF/DAmv1yQUHz+JX3AOZ7a+yLsQPnpfCezGfResyb
+         wDinvdvYslJUIplqgdzuruWsFOzEmuVznOuqqT9/GRkAbQrrSF9DapO8eyTfwDVO8QZj
+         +8vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=I+ecmB8P4LM1sQ+xFfF2GmApzt0t3GO8C8SxXkADzN0=;
+        b=ms7nm/OL0fDKdHV8JrTv2t1KDSnqT6YV2f9G1stBUYdkpXgeB12nQuXahmeE4CfI9/
+         iyQvhLVYybm+QHADVjluJQfV8hIdcz0XoXDE6OIO5foQ3/a3Ly4H8TGrZnjPxjilu9YL
+         JZ6d4s1x4Ms9wm2Wg5n9h14a54iqVyI8CK7dOCvpQ3IYXFpPyCU6Jk8if44xHlhoA4qx
+         oFMLuTyFHxYntmouCZo5j57Umk9XLLoqiwMck7etH2BYfF2BmDfyhAPTrA6B5wcq4mIy
+         L1gtVKZ/+w8OEFi7BD5hFD3YnFRksHF4Bg+TD7U9WzqXQOYqLkIgB+ZJfIW/aVzpXVvD
+         zvXw==
+X-Gm-Message-State: AOAM530wO3JvB1eG2NrWB0z0rUKZV6bcSbQDmPKtBrE6PF/gAKtQWGUD
+        YXSLbnXYAfnCqpUqDPPoKAQZwA==
+X-Google-Smtp-Source: ABdhPJx62s0Z1sHl9ITSwkjI4AAY7sPOOHbNnPhM/zQv0birx4XEWtVCyg2Iu/CAsrAoNjD55MhDBA==
+X-Received: by 2002:a17:90a:c798:: with SMTP id gn24mr995980pjb.49.1609881089352;
+        Tue, 05 Jan 2021 13:11:29 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id s21sm112537pga.12.2021.01.05.13.11.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jan 2021 13:11:28 -0800 (PST)
+Date:   Tue, 5 Jan 2021 13:11:18 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 06/17] KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR
+ emulation for extended PEBS
+Message-ID: <X/TV9nZw49XFwDF/@google.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-7-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210105115614.7daaadd6.pasic@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-Subject: RE: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-05_06:2021-01-05,2021-01-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- priorityscore=1501 adultscore=0 malwarescore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 lowpriorityscore=0 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101050116
+In-Reply-To: <20210104131542.495413-7-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
-> On Mon, 4 Jan 2021 10:40:26 -0800
-> Ram Pai <linuxram@us.ibm.com> wrote:
+On Mon, Jan 04, 2021, Like Xu wrote:
+> If IA32_PERF_CAPABILITIES.PEBS_BASELINE [bit 14] is set, the
+> IA32_PEBS_ENABLE MSR exists and all architecturally enumerated fixed
+> and general purpose counters have corresponding bits in IA32_PEBS_ENABLE
+> that enable generation of PEBS records. The general-purpose counter bits
+> start at bit IA32_PEBS_ENABLE[0], and the fixed counter bits start at
+> bit IA32_PEBS_ENABLE[32].
 > 
-> > On Mon, Jan 04, 2021 at 01:46:29PM +0100, Halil Pasic wrote:
-> > > On Sun, 3 Jan 2021 23:15:50 -0800
-> > > Ram Pai <linuxram@us.ibm.com> wrote:
-> > >   
-> > > > On Fri, Dec 18, 2020 at 12:41:11PM +0100, Cornelia Huck wrote:  
-> > > > > On Thu, 17 Dec 2020 15:15:30 +0100  
-> > > [..]  
-> > > > > > > > > > +int kvmppc_svm_init(SecurableGuestMemory *sgm, Error **errp)
-> > > > > > > > > >  {
-> > > > > > > > > >      if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
-> > > > > > > > > >          error_setg(errp,
-> > > > > > > > > > @@ -54,6 +58,11 @@ static int kvmppc_svm_init(Error **errp)
-> > > > > > > > > >          }
-> > > > > > > > > >      }
-> > > > > > > > > >  
-> > > > > > > > > > +    /* add migration blocker */
-> > > > > > > > > > +    error_setg(&pef_mig_blocker, "PEF: Migration is not implemented");
-> > > > > > > > > > +    /* NB: This can fail if --only-migratable is used */
-> > > > > > > > > > +    migrate_add_blocker(pef_mig_blocker, &error_fatal);        
-> > > > > > > > > 
-> > > > > > > > > Just so that I understand: is PEF something that is enabled by the host
-> > > > > > > > > (and the guest is either secured or doesn't start), or is it using a
-> > > > > > > > > model like s390x PV where the guest initiates the transition into
-> > > > > > > > > secured mode?        
-> > > > > > > > 
-> > > > > > > > Like s390x PV it's initiated by the guest.
-> > > > > > > >       
-> > > > > > > > > Asking because s390x adds the migration blocker only when the
-> > > > > > > > > transition is actually happening (i.e. guests that do not transition
-> > > > > > > > > into secure mode remain migratable.) This has the side effect that you
-> > > > > > > > > might be able to start a machine with --only-migratable that
-> > > > > > > > > transitions into a non-migratable machine via a guest action, if I'm
-> > > > > > > > > not mistaken. Without the new object, I don't see a way to block with
-> > > > > > > > > --only-migratable; with it, we should be able to do that. Not sure what
-> > > > > > > > > the desirable behaviour is here.        
-> > > > > > > >       
-> > > > > > 
-> > > > > > The purpose of --only-migratable is specifically to prevent the machine
-> > > > > > to transition to a non-migrate state IIUC. The guest transition to
-> > > > > > secure mode should be nacked in this case.    
-> > > > > 
-> > > > > Yes, that's what happens for s390x: The guest tries to transition, QEMU
-> > > > > can't add a migration blocker and fails the instruction used for
-> > > > > transitioning, the guest sees the error.
-> > > > > 
-> > > > > The drawback is that we see the failure only when we already launched
-> > > > > the machine and the guest tries to transition. If I start QEMU with
-> > > > > --only-migratable, it will refuse to start when non-migratable devices
-> > > > > are configured in the command line, so I see the issue right from the
-> > > > > start. (For s390x, that would possibly mean that we should not even
-> > > > > present the cpu feature bit when only_migratable is set?)    
-> > > > 
-> > > > What happens in s390x,  if the guest tries to transition to secure, when
-> > > > the secure object is NOT configured on the machine?
-> > > >   
-> > > 
-> > > Nothing in particular.
-> > >   
-> > > > On PEF systems, the transition fails and the guest is terminated.
-> > > > 
-> > > > My point is -- QEMU will not be able to predict in advance, what the
-> > > > guest might or might not do, regardless of what devices and objects are
-> > > > configured in the machine.   If the guest does something unexpected, it
-> > > > has to be terminated.  
-> > > 
-> > > We can't fail transition to secure when the secure object is not
-> > > configured on the machine, because that would break pre-existing
-> > > setups.  
-> > 
-> > So the instruction to switch-to-secure; which I believe is a ultracall
-> > on S390,  
+> When guest PEBS is enabled, the IA32_PEBS_ENABLE MSR will be
+> added to the perf_guest_switch_msr() and switched during the
+> VMX transitions just like CORE_PERF_GLOBAL_CTRL MSR.
 > 
-> Yes it is an ultravisor call. 
+> Originally-by: Andi Kleen <ak@linux.intel.com>
+> Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+> Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+> Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  arch/x86/events/intel/core.c     | 20 ++++++++++++++++++++
+>  arch/x86/include/asm/kvm_host.h  |  1 +
+>  arch/x86/include/asm/msr-index.h |  6 ++++++
+>  arch/x86/kvm/vmx/pmu_intel.c     | 28 ++++++++++++++++++++++++++++
+>  4 files changed, 55 insertions(+)
 > 
-> > will return success even though the switch-to-secure has failed?
-> 
-> No, I don't think so.
-> 
-> > Will the guest continue as a normal guest or as a secure guest?
-> > 
-> 
-> I think the guest will give up. It definitely can't continue as secure
-> because the conversion to secure failed. And it should not continue as
-> non-secure because that's not what the user asked for.
-> 
-> I'm not sure you got my point. My point is: we may not break existing
-> setups when adding new features. Secure execution can work without secure
-> object today, and what works today shall keep working tomorrow and
-> beyond.
-> 
-> > > This feature is still to be shipped, but secure execution has
-> > > already been shipped, but without migration support.
-> > > 
-> > > That's why when you have both the secure object configured, and mandate
-> > > migratability, the we can fail. Actually we should fail now, because the
-> > > two options are not compatible: you can't have a qemu that is guaranteed
-> > > to be migratable, and guaranteed to be able to operate in secure
-> > > execution mode today. Failing early, and not on the guests opt-in would
-> > > be preferable.
-> > > 
-> > > After migration support is added, the combo should be fine, and probably
-> > > also the default for secure execution machines.
-> > >   
-> > > > 
-> > > > So one possible design choice is to let the guest know that migration
-> > > > must be facilitated. It can then decide if it wants to continue as a
-> > > > normal VM or terminate itself, or take the plunge and switch to secure.
-> > > > A well behaving guest will not switch to secure.
-> > > >   
-> > > 
-> > > I don't understand this point. Sorry.  
-> > 
-> > Qemu will present the 'must-support-migrate' and the 'secure-object' capability
-> > to the guest.
-> 
-> How does the qemu preset the 'must-support-migrate' and the
-> 'secure-object' capability to the guest on (PPC and especially on s390)? 
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index af457f8cb29d..6453b8a6834a 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -3715,6 +3715,26 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+>  		*nr = 2;
+>  	}
+>  
+> +	if (cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask) {
+> +		arr[1].msr = MSR_IA32_PEBS_ENABLE;
+> +		arr[1].host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask;
+> +		arr[1].guest = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
+> +		/*
+> +		 * The guest PEBS will be disabled once the host PEBS is enabled
+> +		 * since the both enabled case may brings a unknown PMI to
+> +		 * confuse host and the guest PEBS overflow PMI would be missed.
+> +		 */
+> +		if (arr[1].host)
+> +			arr[1].guest = 0;
+> +		arr[0].guest |= arr[1].guest;
 
-This can be modeled with device tree properties on PPC. However, I
-figure, my proposal has its own flaws; as admitted below.
+Can't you modify the code that strips the PEBS counters from the guest's
+value instead of poking into the array entry after the fact?
 
+Also, why is this scenario even allowed?  Can't we force exclude_guest for
+events that use PEBS?
 
-> And
-> please clarify what do you mean by 'secure-object'. I used to believe I
-> understood, but now I have the feeling I don't understand.
+> +		*nr = 2;
+> +	} else if (*nr == 1) {
+> +		/* Remove MSR_IA32_PEBS_ENABLE from MSR switch list in KVM */
+> +		arr[1].msr = MSR_IA32_PEBS_ENABLE;
+> +		arr[1].host = arr[1].guest = 0;
+> +		*nr = 2;
 
-Its the feature that enables the machine to be capable of running secure
-guests.
+Similar to above, rather then check "*nr == 1", this should properly integrate
+with the "x86_pmu.pebs && x86_pmu.pebs_no_isolation" logic instead of poking
+into the array after the fact.
 
+By incorporating both suggestions, the logic can be streamlined significantly,
+and IMO makes the overall flow much more understandable.  Untested...
 
-> 
-> > 
-> > The secure-aware guest, has three choices
-> >    (a) terminate itself. OR
-> >    (b) not call the switch-to-secure ucall, and continue as normal guest. OR
-> >    (c) call the switch-to-secure ucall.
-> > 
-> > Legacy guests which are not aware of secure-object, will continue to do
-> > (b).   
-> > New Guests which are secure-object aware, will observe that 
-> > 'must-support-migrate' and 'secure-object' capabilities are
-> > incompatible.  Hence will choose (a) or (b), but will never choose
-> > (c).
-> > 
-> 
-> The first problem is, IMHO, that you want to expose QEMU internals to the
-> guest. For the guest, there is no such thing as 'must-support-migrate'
-> (AFAIK).
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index d4569bfa83e3..c5cc7e558c8e 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -3708,24 +3708,39 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr)
+        arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+        arr[0].host = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+        arr[0].guest = x86_pmu.intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+-       if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+-               arr[0].guest &= ~cpuc->pebs_enabled;
+-       else
+-               arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++
++       /*
++        * Disable PEBS in the guest if PEBS is used by the host; enabling PEBS
++        * in both will lead to unexpected PMIs in the host and/or missed PMIs
++        * in the guest.
++        */
++       if (cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask) {
++               if (x86_pmu.flags & PMU_FL_PEBS_ALL)
++                       arr[0].guest &= ~cpuc->pebs_enabled;
++               else
++                       arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++       }
+        *nr = 1;
 
-right. good point.  The key point is, migration must be
-transparent to the guest. And that is where; I realize, my proposal falters.
-
-> 
-> The other problem is, that migration and secure are not inherently
-> incompatible. On s390x it is the property of the current host
-> implementation, that we can't do migration for secure. But this can
-> change in the future. 
-
-> 
-> > 
-> > 
-> > The main difference between my proposal and the other proposal is...
-> > 
-> >   In my proposal the guest makes the compatibility decision and acts
-> >   accordingly.  In the other proposal QEMU makes the compatibility
-> >   decision and acts accordingly. I argue that QEMU cannot make a good
-> >   compatibility decision, because it wont know in advance, if the guest
-> >   will or will-not switch-to-secure.
-> > 
-> 
-> You have a point there when you say that QEMU does not know in advance,
-> if the guest will or will-not switch-to-secure. I made that argument
-> regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
-> was to flip that property on demand when the conversion occurs. David
-> explained to me that this is not possible for ppc, and that having the
-> "securable-guest-memory" property (or whatever the name will be)
-> specified is a strong indication, that the VM is intended to be used as
-> a secure VM (thus it is OK to hurt the case where the guest does not
-> try to transition). That argument applies here as well.
-
-As suggested by Cornelia Huck, what if QEMU disabled the
-"securable-guest-memory" property if 'must-support-migrate' is enabled?
-Offcourse; this has to be done with a big fat warning stating
-"secure-guest-memory" feature is disabled on the machine.
-Doing so, will continue to support guest that do not try to transition.
-Guest that try to transition will fail and terminate themselves.
-
-> 
-> But more importantly, as I explained above, the guest does not know if
-> migration and secure are incompatible or not. So the guest can't make a
-> good decision.
-
-Agree.
-
-RP
+-       if (x86_pmu.pebs && x86_pmu.pebs_no_isolation) {
+-               /*
+-                * If PMU counter has PEBS enabled it is not enough to
+-                * disable counter on a guest entry since PEBS memory
+-                * write can overshoot guest entry and corrupt guest
+-                * memory. Disabling PEBS solves the problem.
+-                *
+-                * Don't do this if the CPU already enforces it.
+-                */
++       if (x86_pmu.pebs) {
+                arr[1].msr = MSR_IA32_PEBS_ENABLE;
+-               arr[1].host = cpuc->pebs_enabled;
+-               arr[1].guest = 0;
++               arr[1].host = cpuc->pebs_enabled & ~cpuc->intel_ctrl_guest_mask;
++
++               /*
++                * Host and guest PEBS are mutually exclusive.  Load the guest
++                * value iff PEBS is disabled in the host.  If PEBS is enabled
++                * in the host and the CPU supports PEBS isolation, disabling
++                * the counters is sufficient (see above); skip the MSR loads
++                * by stuffing guest=host (KVM will remove the entry).  Without
++                * isolation, PEBS must be explicitly disabled prior to
++                * VM-Enter to prevent PEBS writes from overshooting VM-Enter.
++                */
++               if (!arr[1].host)
++                       arr[1].guest = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
++               else if (x86_pmu.pebs_no_isolation)
++                       arr[1].guest = 0;
++               else
++                       arr[1].guest = arr[1].host;
+                *nr = 2;
+        }
