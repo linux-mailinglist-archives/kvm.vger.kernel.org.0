@@ -2,61 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D09E62EB511
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 22:55:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0DBCF2EB645
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 00:33:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729958AbhAEVy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 16:54:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38584 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729248AbhAEVy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 16:54:26 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 0BB9F22D71;
-        Tue,  5 Jan 2021 21:53:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609883626;
-        bh=kNBRJ/aYElKhpZB7C2UbcKqb2wXkZAMaMM77Gk3XDSQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=HmNwYF6TQtua/muVF6OsQfV0fKaR4+E2K6/aHXQ26zu+OwlSOcTw88T9RIHV6bTun
-         CtESrkScGVvZEEBtRetIM33xaztogp0I5dD7GWBgCUMNQrRpByqei06SF3YBaERCjT
-         AjbCCabU+qnwgYhAjDKwoLRup6HsA7Jmkpn5dJEW7UCv15xVieJlPvHsLqRA7aSE9G
-         YrqUY/HsGL3JnWhV+3unPlBreYkr1Fv6XmXN2tb7EB1v5+fsU7QmNgDzDEBnMu4b1u
-         MEcvmW5hDlCJSGjnoABthpqMwBfPmuMggzsrYGh7HL5KYnh+WLFVOzEVO2+LEJZxVU
-         5Hf0AB1skjFcQ==
-Received: from pdx-korg-docbuild-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-1.ci.codeaurora.org (Postfix) with ESMTP id E51F06012A;
-        Tue,  5 Jan 2021 21:53:45 +0000 (UTC)
-Subject: Re: [GIT PULL] vhost: bugfix
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210105072145-mutt-send-email-mst@kernel.org>
-References: <20210105072145-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210105072145-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: e13a6915a03ffc3ce332d28c141a335e25187fa3
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9f1abbe97c08ba7ed609791627533a805a1b2c66
-Message-Id: <160988362586.4244.11494741917772052343.pr-tracker-bot@kernel.org>
-Date:   Tue, 05 Jan 2021 21:53:45 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
+        id S1727043AbhAEXcW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 18:32:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726610AbhAEXcV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 18:32:21 -0500
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E30C061574
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 15:31:41 -0800 (PST)
+Received: by mail-qt1-x84a.google.com with SMTP id w3so902533qti.17
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 15:31:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=dDiuE/L+TEOVkofWeADZyQOWx+prBVUG+hG/zE7qjqw=;
+        b=g0QzlZiBXFKXnhwcB2i5sdfEuv61jQ/gqu5LPmOitwt436dX8/BoHXI5hB7eRkLIfs
+         ZZ5pXK56kfNdrrSz2v88EaseQ/vE7rvZMyii/saTD1b555ShCSSLo10RQTfzsBh9nQlg
+         kQTUeoodNDdBM5WFHuAMBgseEWiO5eX+tGsE/z19RmgZiQ+SVfANI5sXKtVjBEeiIwi6
+         6qUtS25WleI4JxfxUuDEGU1ORzvHKEqDvVPMujBJjYgZI4PwhAbDIkc2/xs9i75rRkGK
+         F8ct/L3iru64+Z1/V3DV9HOyVETB9DWAe/Pm/dmikgC6jyVhP3+SHuisGhnsxBT/cQpB
+         nCfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=dDiuE/L+TEOVkofWeADZyQOWx+prBVUG+hG/zE7qjqw=;
+        b=IfAE6CBbHd33eA5qmx5TiMHXmLhsXgXGH8wHU9PXuzBIgpjmRTAfLgxfZkkCnONpV4
+         V0Cgl+5NGnk1qpy6Nsr3EspZDgW7h+nnW364st8rtzQOko0F85i9WnV3PA+BjJZafmn8
+         a96SVGmZv1eT9xra6eyWhsndG61ggnsJLSWd5ivjMwiSLGVapLoHNm3gRAvyP3wMxenU
+         L9j6jShksW6BCoP4Bj/PIxGOrvUhpYTAUnzW7AoH7IZMeIqXkq5FsNF8USiwcgkYu9ZG
+         qjUL8w2g6zNPNHH4YNI9RIyTbJ8hll5NDvitf1nJnDytr5eve0cAcQXRsegPL7PYxNk7
+         rFPQ==
+X-Gm-Message-State: AOAM532PAc18mC/b5kN4HCXdZGbBRkDvL5GGZK/d/pzgJYqTjbbhEDTu
+        78p6kknypxVUQZcofBj54X8KNdR2uNcp
+X-Google-Smtp-Source: ABdhPJyuqHDKvNJCgAD1VSvNZHytfUGZ2RnhLCOtS6Vfa+72p2t5/2Gh8C8r309kAlPmQART5K58nDKsBsTv
+Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
+ (user=bgardon job=sendgmr) by 2002:a0c:f74a:: with SMTP id
+ e10mr1887824qvo.47.1609889500231; Tue, 05 Jan 2021 15:31:40 -0800 (PST)
+Date:   Tue,  5 Jan 2021 15:31:34 -0800
+Message-Id: <20210105233136.2140335-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
+Subject: [PATCH 1/3] kvm: x86/mmu: Clarify TDP MMU page list invariants
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Leo Hou <leohou1402@gmail.com>, Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Tue, 5 Jan 2021 07:21:45 -0500:
+The tdp_mmu_roots and tdp_mmu_pages in struct kvm_arch should only contain
+pages with tdp_mmu_page set to true. tdp_mmu_pages should not contain any
+pages with a non-zero root_count and tdp_mmu_roots should only contain
+pages with a positive root_count, unless a thread holds the MMU lock and
+is in the process of modifying the list. Various functions expect these
+invariants to be maintained, but they are not explictily documented. Add
+to the comments on both fields to document the above invariants.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9f1abbe97c08ba7ed609791627533a805a1b2c66
-
-Thank you!
-
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 39707e72b062..2389735a29f3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1010,9 +1010,21 @@ struct kvm_arch {
+ 	 */
+ 	bool tdp_mmu_enabled;
+ 
+-	/* List of struct tdp_mmu_pages being used as roots */
++	/*
++	 * List of struct tdp_mmu_pages being used as roots.
++	 * All struct kvm_mmu_pages in the list should have
++	 * tdp_mmu_page set.
++	 * All struct kvm_mmu_pages in the list should have a positive
++	 * root_count except when a thread holds the MMU lock and is removing
++	 * an entry from the list.
++	 */
+ 	struct list_head tdp_mmu_roots;
+-	/* List of struct tdp_mmu_pages not being used as roots */
++
++	/*
++	 * List of struct tdp_mmu_pages not being used as roots.
++	 * All struct kvm_mmu_pages in the list should have
++	 * tdp_mmu_page set and a root_count of 0.
++	 */
+ 	struct list_head tdp_mmu_pages;
+ };
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.29.2.729.g45daf8777d-goog
+
