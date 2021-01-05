@@ -2,125 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E26A2EA148
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 01:09:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 374892EA18F
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 01:41:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727685AbhAEAH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 19:07:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726974AbhAEAH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jan 2021 19:07:27 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC65C061793
-        for <kvm@vger.kernel.org>; Mon,  4 Jan 2021 16:06:42 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id a12so68640656lfl.6
-        for <kvm@vger.kernel.org>; Mon, 04 Jan 2021 16:06:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=dtfbCjxo+5cbIU7/zANgM3ErdTiEw3LvQQnQM2kgHrg=;
-        b=pT8uS0riSGPOon/6wWIN+SoA6jkP1rhTpYbNvPF0EvnkP6yBfPi57mYut3LYCk80TE
-         RO/wY5MxQep/ku+pVmcMGRmH/PQgSCLiZ/kITw5Bu1rbY2eoLlTJ103XF155k1swOm+N
-         JdJ2D7peZR/HDwZKxWeZxMzShF92Tc0JQNisFtomf3CxA2P0paXapTC7MFNUJgOGMjbQ
-         xA8SWFy+vyrsD5mdHtSjkgXUdaqDn7TTVW5X09x4xBG+d+MkO37InV4bGfVF6xqdF5zC
-         VIImvszQhUyZgahncQxshNTpL2tUXQ7XigSlCA0PjUjqXO+2qMvwqTR3YP0GjcdhyfeU
-         clXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=dtfbCjxo+5cbIU7/zANgM3ErdTiEw3LvQQnQM2kgHrg=;
-        b=s/Bta+ShB2DktJRfvBA7v6fmUL8WR5L6rjko95Zqz8zbBqqLACGRC+XYIBDkrVzjBU
-         m6ta9bgmYyNfp2PXsJFHXTY8zi/mQXrI3pqwWbShFxlMZLGQDie/4V0ZVioYuUdYvkbZ
-         3KeL2Qbq/E/hlxN/nhHV01mjWyxeWUIvrOjXcwYSajc8VP7zc4WGWvG8bmToaGiXwGvu
-         blyVUkDmGUc1OSjU3rMQjZo4Dr7HxxAx+0hV3cwNBwA8WhjH2CkH12JS+HMt4FLj4Hq2
-         2upPnSCcmh9W4nWrdczNguTRBSbeku4u5wjECu0ox4laaDcFL6GAy8/YjzFnD/5tz8H6
-         JUFQ==
-X-Gm-Message-State: AOAM533Yy07FZtz/tl7mC/XxOEnNLtuFG+yHTl/gAvJd8Td4Cvayndtp
-        TRm82z42wzx5zuyDuX04SH4=
-X-Google-Smtp-Source: ABdhPJz7lDQQWpD7e8Odp9HveWUxzF8GwcXeD2V9HifekwUdYVAluqxHawF6yjMvbdjeeW58Z7iQRg==
-X-Received: by 2002:a05:651c:3db:: with SMTP id f27mr38722962ljp.494.1609805198370;
-        Mon, 04 Jan 2021 16:06:38 -0800 (PST)
-Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id n8sm7476534lfi.48.2021.01.04.16.06.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Jan 2021 16:06:37 -0800 (PST)
-Message-ID: <18093b808face7696a07a66ac55bafbaa6a98424.camel@gmail.com>
-Subject: Re: [RFC 2/2] KVM: add initial support for ioregionfd blocking
- read/write operations
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-Date:   Mon, 04 Jan 2021 16:06:23 -0800
-In-Reply-To: <9c1a10a5-2863-02af-bd9f-8a7b77f7e382@redhat.com>
-References: <cover.1609231373.git.eafanasova@gmail.com>
-         <a13b23ca540a8846891895462d2fb139ec597237.1609231374.git.eafanasova@gmail.com>
-         <72556405-8501-26bc-4939-69e312857e91@redhat.com>
-         <90e04958a3f57bbc1b0fcee4810942f031640a05.camel@gmail.com>
-         <9c1a10a5-2863-02af-bd9f-8a7b77f7e382@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+        id S1726365AbhAEAkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 19:40:31 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53406 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbhAEAkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jan 2021 19:40:31 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1050ZLeO180866;
+        Tue, 5 Jan 2021 00:39:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=9JPhEgnXfezee4UwBY5wlaKC/W5VSot/NGX6wVtN1Ms=;
+ b=uragTyLS5PStCaJ5iOa3sPz2L8A0QzQNOgdp29k5aJorojiusp125ErN0SFVIEJ40FnN
+ TGXzsoHFNa9DUMx4O2R3S6pKAmdjzNEFQZe1ALWiYwl16uYKSUq8MuuwZ8Sa9ev+HyZr
+ 77EIZvDpJpfYaTkVoM/uPjaJhP1O2cHwOQf0Adj56x+0pQFbLtXQE5kC3lWxTKPpH9mM
+ Z5+9jqpg9pRL0Q+ZoYYFzpInLB1+ooErVYu2u0RDt6c/7wdW0CHjpHsMONnJk9AAJ6sa
+ WdmJgzcTTAOp6YjU93pijGSyd+RGw2lGPJ2knTjqxMP5SCiINAaBU/r4MGJqOJW3jLai zg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 35tg8qxrn9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 05 Jan 2021 00:39:45 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1050UKsd070001;
+        Tue, 5 Jan 2021 00:39:45 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 35uxnrxfgf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 05 Jan 2021 00:39:45 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 1050diRI031099;
+        Tue, 5 Jan 2021 00:39:44 GMT
+Received: from localhost.localdomain (/10.159.130.83)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 05 Jan 2021 00:39:43 +0000
+Subject: Re: [kvm-unit-tests PATCH v1 06/12] lib/alloc.h: remove align_min
+ from struct alloc_ops
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, pbonzini@redhat.com, cohuck@redhat.com,
+        lvivier@redhat.com, nadav.amit@gmail.com
+References: <20201216201200.255172-1-imbrenda@linux.ibm.com>
+ <20201216201200.255172-7-imbrenda@linux.ibm.com>
+ <efd03516-a0cc-b897-5b12-e25114103f71@oracle.com>
+ <20210104140510.25ee0c71@ibm-vm>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <ccac6f66-30a3-199a-23f9-00b196a74b7d@oracle.com>
+Date:   Mon, 4 Jan 2021 16:39:31 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210104140510.25ee0c71@ibm-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9854 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
+ malwarescore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101050000
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9854 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 phishscore=0 bulkscore=0
+ spamscore=0 impostorscore=0 suspectscore=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 malwarescore=0 lowpriorityscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101050000
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-01-04 at 13:37 +0800, Jason Wang wrote:
-> On 2021/1/4 上午4:37, Elena Afanasova wrote:
-> > On Thu, 2020-12-31 at 11:46 +0800, Jason Wang wrote:
-> > > On 2020/12/29 下午6:02, Elena Afanasova wrote:
-> > > > Signed-off-by: Elena Afanasova<eafanasova@gmail.com>
-> > > > ---
-> > > >    virt/kvm/ioregion.c | 157
-> > > > ++++++++++++++++++++++++++++++++++++++++++++
-> > > >    1 file changed, 157 insertions(+)
-> > > > 
-> > > > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> > > > index a200c3761343..8523f4126337 100644
-> > > > --- a/virt/kvm/ioregion.c
-> > > > +++ b/virt/kvm/ioregion.c
-> > > > @@ -4,6 +4,33 @@
-> > > >    #include <kvm/iodev.h>
-> > > >    #include "eventfd.h"
-> > > >    
-> > > > +/* Wire protocol */
-> > > > +struct ioregionfd_cmd {
-> > > > +	__u32 info;
-> > > > +	__u32 padding;
-> > > > +	__u64 user_data;
-> > > > +	__u64 offset;
-> > > > +	__u64 data;
-> > > > +};
-> > > > +
-> > > I wonder do we need a seq in the protocol. It might be useful if
-> > > we
-> > > allow a pair of file descriptors to be used for multiple
-> > > different
-> > > ranges.
-> > > 
-> > I think it might be helpful in the case of out-of-order requests.
-> > In the case of in order requests seq field seems not to be
-> > necessary
-> > since there will be cmds/replies serialization. I’ll include the
-> > synchronization code in a RFC v2 series.
-> 
-> See my reply to V1. It might be helpful for the case of using single 
-> ioregionfd for multiple ranges.
-> 
-Ok, thank you!
 
-> Thanks
-> 
-> 
-> > > Thanks
-> > > 
-> > > 
-> > > > +struct ioregionfd_resp {
-> > > > +	__u64 data;
-> > > > +	__u8 pad[24];
-> > > > +};
-
+On 1/4/21 5:05 AM, Claudio Imbrenda wrote:
+> On Thu, 24 Dec 2020 10:17:20 -0800
+> Krish Sadhukhan <krish.sadhukhan@oracle.com> wrote:
+>
+>> On 12/16/20 12:11 PM, Claudio Imbrenda wrote:
+>>> Remove align_min from struct alloc_ops, since it is no longer used.
+>>>
+>>> Signed-off-by: Claudio Imbrenda<imbrenda@linux.ibm.com>
+>>> ---
+>>>    lib/alloc.h      | 1 -
+>>>    lib/alloc_page.c | 1 -
+>>>    lib/alloc_phys.c | 9 +++++----
+>>>    lib/vmalloc.c    | 1 -
+>>>    4 files changed, 5 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/lib/alloc.h b/lib/alloc.h
+>>> index 9b4b634..db90b01 100644
+>>> --- a/lib/alloc.h
+>>> +++ b/lib/alloc.h
+>>> @@ -25,7 +25,6 @@
+>>>    struct alloc_ops {
+>>>    	void *(*memalign)(size_t alignment, size_t size);
+>>>    	void (*free)(void *ptr);
+>>> -	size_t align_min;
+>>>    };
+>>>    
+>>>    extern struct alloc_ops *alloc_ops;
+>>> diff --git a/lib/alloc_page.c b/lib/alloc_page.c
+>>> index 8d2700d..b1cdf21 100644
+>>> --- a/lib/alloc_page.c
+>>> +++ b/lib/alloc_page.c
+>>> @@ -385,7 +385,6 @@ void *memalign_pages_area(unsigned int area,
+>>> size_t alignment, size_t size) static struct alloc_ops
+>>> page_alloc_ops = { .memalign = memalign_pages,
+>>>    	.free = free_pages,
+>>> -	.align_min = PAGE_SIZE,
+>>>    };
+>>>    
+>>>    /*
+>>> diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
+>>> index 72e20f7..a4d2bf2 100644
+>>> --- a/lib/alloc_phys.c
+>>> +++ b/lib/alloc_phys.c
+>>> @@ -29,8 +29,8 @@ static phys_addr_t base, top;
+>>>    static void *early_memalign(size_t alignment, size_t size);
+>>>    static struct alloc_ops early_alloc_ops = {
+>>>    	.memalign = early_memalign,
+>>> -	.align_min = DEFAULT_MINIMUM_ALIGNMENT
+>>>    };
+>>> +static size_t align_min;
+>>
+>> I don't see any caller of phys_alloc_set_minimum_alignment(). So when
+> lib/arm/setup.c:150
+> lib/powerpc/setup.c:150
+>
+>> you are comparing against this variable in phys_alloc_aligned_safe()
+>> below, you are comparing against zero. Is that what you is intended
+>> or should 'align_min' be set some default ?
+> if the architecture specific code did not specify anything better, 0 is
+> ok.
+>   
+>>>    
+>>>    struct alloc_ops *alloc_ops = &early_alloc_ops;
+>>>    
+>>> @@ -39,8 +39,7 @@ void phys_alloc_show(void)
+>>>    	int i;
+>>>    
+>>>    	spin_lock(&lock);
+>>> -	printf("phys_alloc minimum alignment: %#" PRIx64 "\n",
+>>> -		(u64)early_alloc_ops.align_min);
+>>> +	printf("phys_alloc minimum alignment: %#" PRIx64 "\n",
+>>> (u64)align_min); for (i = 0; i < nr_regions; ++i)
+>>>    		printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
+>>>    			(u64)regions[i].base,
+>>> @@ -64,7 +63,7 @@ void phys_alloc_set_minimum_alignment(phys_addr_t
+>>> align) {
+>>>    	assert(align && !(align & (align - 1)));
+>>>    	spin_lock(&lock);
+>>> -	early_alloc_ops.align_min = align;
+>>> +	align_min = align;
+>>>    	spin_unlock(&lock);
+>>>    }
+>>>    
+>>> @@ -83,6 +82,8 @@ static phys_addr_t
+>>> phys_alloc_aligned_safe(phys_addr_t size, top_safe = MIN(top_safe,
+>>> 1ULL << 32);
+>>>    	assert(base < top_safe);
+>>> +	if (align < align_min)
+>>> +		align = align_min;
+>>>    
+>>>    	addr = ALIGN(base, align);
+>>>    	size += addr - base;
+>>> diff --git a/lib/vmalloc.c b/lib/vmalloc.c
+>>> index 7a49adf..e146162 100644
+>>> --- a/lib/vmalloc.c
+>>> +++ b/lib/vmalloc.c
+>>> @@ -190,7 +190,6 @@ static void vm_free(void *mem)
+>>>    static struct alloc_ops vmalloc_ops = {
+>>>    	.memalign = vm_memalign,
+>>>    	.free = vm_free,
+>>> -	.align_min = PAGE_SIZE,
+>>>    };
+>>>    
+>>>    void __attribute__((__weak__)) find_highmem(void)
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
