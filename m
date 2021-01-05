@@ -2,339 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4832D2EB05D
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 17:42:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D3952EB0DB
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 18:04:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729897AbhAEQlH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 11:41:07 -0500
-Received: from mail-dm6nam10on2069.outbound.protection.outlook.com ([40.107.93.69]:34305
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729878AbhAEQlH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 11:41:07 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jyyKzOFdP9cS01Or/CNvAJp/iE9I97KNj2+cRhqnfiHbw46ZrBYEj4oYOWn8gnNFOozm8r2mHN/fGNsEczm4M1ZE9rX4IDlNBqLd9oFfd9tzBJWonx1fbMjZNLG2IhN5Kd6cJtx/jZaUXXD1BQ62CgD7GEfJ3PKSxUu6VZgH5Yox23ksSTAdhacRx191UaiqVGcU4GYbj4LCkWVXK/Bfnur+0xuwBQre0ie6lIqvm0MoGtRWKw7waUOu4vo064jyAdjjccF0nnOUcRidZ+yeDaJrUH+400UubgGJLdTyOtB5tUgeugYUgCHYny/XhettBv5HAJ6q3kUIv0LuQNESdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p/Nq6ERcvzdMzZjHNW8sKgBleQmIGLKc/KsoKWIOhMY=;
- b=FF09nivEQp9s8MPAZDdUbTlvauFYHprxC7vD7NL8IwjC3inS6jOpdJOmqSmIPbhPANVTlhoX8omsRoTfKS22M4woqWV8q8o1mPVXrfYPQhrNxIf+6tYdS3VohyAkv9jfm8Nm4BPKPN3UuPyCiRC1Up1zEWTvKNFouZXxH/Y257fUdLc/L78pg/CMwun/No5lrS7WUvxuf0CFdlHYzKqwLyEcI5GFfl5oTRrPXS3mAdkrrGNy/iWuYv2CSVOeJDdVK6Vucj3rvFA4vlJOHPuT7jsCJRMZ79r5txnctJfmvukHIePFD5zwq+oJ9HnCbXYYqoRTuHrb/MLduVY+zZs41g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+        id S1730112AbhAERCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 12:02:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52684 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729175AbhAERC3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 12:02:29 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F83C061793
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 09:01:49 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id y5so4454iow.5
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 09:01:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p/Nq6ERcvzdMzZjHNW8sKgBleQmIGLKc/KsoKWIOhMY=;
- b=ZL2FU1Vz5vASiCkoYNcEf0Zi7Z8pfJqFrklWRunxtiocdzkrBN0Vannx4dxx4nwfQSga4PrKkUmnHNs7c9+rmkUnUNuhWEceubZxrqGYIsrNfvbFL7ab+zeJqQJ1pmbX5Ttd8UJ585goSVRI8dwhWkfxCLz0T7iblNmle/7yuNY=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4431.namprd12.prod.outlook.com (2603:10b6:806:95::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3721.20; Tue, 5 Jan
- 2021 16:40:13 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::18a2:699:70b3:2b8a]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::18a2:699:70b3:2b8a%6]) with mapi id 15.20.3721.024; Tue, 5 Jan 2021
- 16:40:13 +0000
-From:   Brijesh Singh <brijesh.singh@amd.com>
-To:     qemu-devel@nongnu.org
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Eric Blake <eblake@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v2] target/i386/sev: add support to query the attestation report
-Date:   Tue,  5 Jan 2021 10:39:42 -0600
-Message-Id: <20210105163943.30510-1-brijesh.singh@amd.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN4PR0201CA0049.namprd02.prod.outlook.com
- (2603:10b6:803:20::11) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Sf4YpKTj/HMrZ5s5TxhMokVL1pjpg+DMaLsX0y0lU84=;
+        b=LjKqHaBiOayO/Tk0Zxk5fwBdIHJQPARgBM2ug7sivYkTHgJOt3HjtSudBJo+4dSz39
+         smUZSzDTI/pVfKPjUSorcA/iJ7efUibFZPpOn6VIPmVtBsws0cjCOIOdheTFIhMqkCbV
+         k0s+mpoH0Ggb5whUz6QcZ+E0vDRPTjtbCc8TU0qKPdLF+auhC7um8SxhDkkSyuacOSBu
+         /MxjG+rWQhNBFuU+2LAtnr+ANF5FFgrn0MbK1huaE8JFG8gV05nsedgFE+EKgekLLlO9
+         C2FyOK5PSBd4V1vuVe2wVClqyHIsbrdXkD9Ck+G+em6DmN4g8M0ODZyPm24KBEt4Sso8
+         AUNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Sf4YpKTj/HMrZ5s5TxhMokVL1pjpg+DMaLsX0y0lU84=;
+        b=mFenVgRyOB6qbUYibQYdBlf7P8mgS1WU/qI4hQBd4RsawcvDIBEBEBFbfaVvTYDMDU
+         B7MyktP/x/1tPxk14aOTjzAIwiTo3bStIsUqDhJLNsPTw0s8CQ8Ka4qLgy+PW6jKTvy8
+         v49MsbtD2JhPYVzeaLZwqHTHj7RN+I3/3eKEvKKVXOibjqYvl2nZMAWe0KPK7k/cVHfe
+         rDuO09qbJHTZVHYex2EGG9mv5H3zARiR6RtkYx+vlVvZVY8tDDWACVIJzL9FpAfA6fzJ
+         e99xmAmXICo/I7qjZfZocPbL5oxQuB7pWLgrZ1RrCc7yM7yxyKFpg+pvNfzqmGSzf/aK
+         X/Kg==
+X-Gm-Message-State: AOAM530H6USRxNrUFMlxUQkAL0eFCYa0mFtsxzXZi4/R+OaMu6fCkWmp
+        +nA5cK3wTxz9uRnogn4j76AWWpsn1Zz6Kq6fdjWCVg==
+X-Google-Smtp-Source: ABdhPJxJyF+4S94nRtPBym4/Q0pwgE+3GP9xY0xlmvykqnG2bNRPzrJFH2D0f2MYL4qHT2ezCf9pqRW+rEXiU0TSuMc=
+X-Received: by 2002:a6b:6b18:: with SMTP id g24mr36792ioc.189.1609866108265;
+ Tue, 05 Jan 2021 09:01:48 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from sbrijesh-desktop.amd.com (165.204.77.1) by SN4PR0201CA0049.namprd02.prod.outlook.com (2603:10b6:803:20::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3742.6 via Frontend Transport; Tue, 5 Jan 2021 16:40:12 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 142e6d6e-c3cc-4ea8-384d-08d8b198930d
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4431:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44319E3BDF6878AFD21BCDE2E5D10@SA0PR12MB4431.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1265;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OYdiYNyoizsQe1EbeOct7ZsJettbtXu+kGhYBo4UEoCRKHDYgVhsbSkJcpTiUr+Bw0ok+ZdB4VdLG+QpWmkZ2QSjVV0jGqtP16Bc141n6prpFbc5bukXw9gHh8ZuEm9GXMJVxQc0uQo0z6lgQGrCerBFJgbc0P63L71oNO+Aw+EoJdtJ/zkrD/LTFZ9B9bERHsHOzYMLDyjuF6/lJR1qAsKt02BafEMS1EKr+qLEhTBRAi4AaqzZaAoeg6xnan4tFVRUBKzMplmJEG9sVCAvfRUD6rI3qsKIl2rDUWY4NURCSohl453TjQ/k1t96kLQ0Gb1HSgWJPmPf/r+Rl0Zsjoi+w29jNPcPULfPH51cEp2HYnXkTPQRx8g12sRB1NVVD9hKB4FR9C6m2YzgJIzX4w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(346002)(366004)(376002)(39850400004)(6666004)(316002)(66476007)(86362001)(2616005)(16526019)(26005)(6486002)(4326008)(8676002)(8936002)(2906002)(54906003)(83380400001)(36756003)(6916009)(52116002)(186003)(66556008)(7696005)(66946007)(5660300002)(478600001)(956004)(1076003)(44832011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?8pxezmSwdLCH7/BmG7CCI5QNAjjI4hwqjWm0jsvL3cKvdrcqpraynw12B963?=
- =?us-ascii?Q?fIVnTN3jDsMWLPmbmrWaLICeB//D3vLPNwWE0jMROBl9s7r5QO8tVSPVYQUi?=
- =?us-ascii?Q?GUfRPHiLfqw6e1COtyCEYF86I9BKeBovefC6JciLFgWdU8RV+FbkB+fGGZbx?=
- =?us-ascii?Q?0rIGYFOrn6LLKIfyQAqtsj1D61AIRgrE1zdbLTNFoXpeukvG+PHHKVjRastY?=
- =?us-ascii?Q?fktGC5ykPAHzv2IynZ3BYsks0U5DURKw5hnLGaRd4mBQWRSSeR66uQoO71uH?=
- =?us-ascii?Q?lPYzamzKRJ6IvgZSDsGkeSJYSXruW2RVuASem10Bqz0z+DrIrcGPZ7L3joq4?=
- =?us-ascii?Q?pjTflhEiLPiLE8ILy4fX9ZaJ+jcZzuSARvnIDxCEnY7xwJdSVmNpXZjanuOl?=
- =?us-ascii?Q?9NhWLRezEl5y+tbvMt1IN5e9EL43Nxhzp1/eAlawLrKtp5vIc/5kkozj+thm?=
- =?us-ascii?Q?Kx3JRcK7jWx6udKuu6766RP8fYAo6ZOJcvcSDKcw7crXgWlnMbK+2fjxI8/Q?=
- =?us-ascii?Q?wpA9ZynKQyWK3y8aSepXDhwOu9IWBjfjbD4KvbqvwtCihc8whM5jl8c+wOKm?=
- =?us-ascii?Q?ECQRYF1HxriHMDn5s5FPuhNtH73zb1bEflLVL+rCc5GG7Hz4J1opa9x2WQHY?=
- =?us-ascii?Q?FJUTk/wUmQt8Vdel3wG1B03RA4tDl6qcT+a9+BjJAPe4fSoznWnmPpsK5G0h?=
- =?us-ascii?Q?XG2ycw+4Co6fM10dzLylb5398FxxVeVUThkEIeEQtMNJkl56ANQut9kbv/PV?=
- =?us-ascii?Q?hpFNXD272RV856JRegIUoxwphIPnfFbWzG0Nk2TjKMwDKqoOjdIJmZKQgDS7?=
- =?us-ascii?Q?zZ5JEmUDd8M+DuP0vpNMMih+w+ozU1j+eKBkyV250JSewrF/DnNkz46ebeQM?=
- =?us-ascii?Q?wz+X4oQBzPX84XVUdHzeCQNorEeaRElbSsL9ERpOZbU/3iamATItMzIOi1Wq?=
- =?us-ascii?Q?y1Ku+5P3XfpXTL8AX1gN7WW/ZktUMJdEEDju+7EV4VfVaCN2q7wzgkwF8Tck?=
- =?us-ascii?Q?BCiw?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2021 16:40:13.2418
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 142e6d6e-c3cc-4ea8-384d-08d8b198930d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yWsRJGt7YjtVzkFDD2XUH3WnO/QVU0p0h3tZ5+mcxSc1Hdet1/LS4PQUzH6IsJKr+oq4WGhW+Pr5mLsX9aZODw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4431
+References: <4bf6fcae-20e7-3eae-83ec-51fb52110487@oracle.com> <8A352C2E-E7D2-4873-807F-635A595DCAEF@gmail.com>
+In-Reply-To: <8A352C2E-E7D2-4873-807F-635A595DCAEF@gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 5 Jan 2021 09:01:37 -0800
+Message-ID: <CANgfPd_cbBxWHmPsw0x5NfKrMXzij3YAAiaq665zxn5nnraPGg@mail.gmail.com>
+Subject: Re: reproducible BUG() in kvm_mmu_get_root() in TDP MMU
+To:     leohou1402 <leohou1402@gmail.com>
+Cc:     "maciej.szmigiero@oracle.com" <maciej.szmigiero@oracle.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "cannonmatthews@google.com" <cannonmatthews@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "pshier@google.com" <pshier@google.com>,
+        "pfeiner@google.com" <pfeiner@google.com>,
+        "junaids@google.com" <junaids@google.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "yulei.kernel@gmail.com" <yulei.kernel@gmail.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The SEV FW >= 0.23 added a new command that can be used to query the
-attestation report containing the SHA-256 digest of the guest memory
-and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
+On Mon, Jan 4, 2021 at 6:37 PM leohou1402 <leohou1402@gmail.com> wrote:
+>
+>  On 1/5/2021 07:09=EF=BC=8CMaciej S. Szmigiero<maciej.szmigiero@oracle.co=
+m> wrote=EF=BC=9A
+>
+> > Hi,
+>
+> > I am hitting a reproducible BUG() with KVM TDP MMU.
+>
+> > The reproducer based on set_memory_region_test.c from KVM selftests
+> > is available here:
+> > https://gist.github.com/maciejsszmigiero/890218151c242d99f63ea0825334c6=
+c0
+>
+> > The test simply moves a memslot a bit back and forth on the host
+> > while the guest is concurrently writing around the area being
+> > moved.
+>
+> > The code runs fine on the default KVM MMU but triggers a BUG() when
+> > TDP MMU is enabled by adding "tdp_mmu=3D1" kvm module parameter.
+>
+> > The backtrace is:
+> > [ 1308.455120] kernel BUG at arch/x86/kvm/mmu/mmu_internal.h:100!
+> > [ 1308.524951] invalid opcode: 0000 [#1] SMP PTI
+> > [ 1308.577080] CPU: 92 PID: 18675 Comm: memslot_move_te Not tainted 5.1=
+1.0-rc2+ #80
+> > [ 1308.665617] Hardware name: Oracle Corporation ORACLE SERVER X7-2c/SE=
+RVER MODULE ASSY, , BIOS 46070300 12/20/2019
+> > [ 1308.787438] RIP: 0010:kvm_tdp_mmu_get_vcpu_root_hpa+0x10c/0x120 [kvm=
+]
+> > [ 1308.864587] Code: db 74 1c b8 00 00 00 80 48 03 43 40 72 1e 48 c7 c2=
+ 00 00 00 80 48 2b 15 92 0a 1d d3 48 01 d0 5b 41 5c 41 5d 41 5e 41 5f 5d c3=
+ <0f> 0b > 48 8b 15 eb e8 3c d3 eb e7 66 0f 1f 84 00 00 00 00 00 0f 1f
+> > [ 1309.089393] RSP: 0018:ffffa65affa73d10 EFLAGS: 00010246
+> > [ 1309.151922] RAX: 0000000000000000 RBX: ffff9b46829bac78 RCX: 0000000=
+000000000
+> > [ 1309.237334] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffa65=
+ada1bd000
+> > [ 1309.322744] RBP: ffffa65affa73d38 R08: 0000000000000000 R09: ffff9b4=
+54e443200
+> > [ 1309.408156] R10: 0000000000000000 R11: 0000000000000001 R12: 0000000=
+000001794
+> > [ 1309.493567] R13: ffffa65ada1bd000 R14: ffff9b454e443040 R15: ffffa65=
+ada1d2418
+> > [ 1309.578977] FS:  00007fdb0430b700(0000) GS:ffff9ba3bfa00000(0000) kn=
+lGS:0000000000000000
+> > [ 1309.675833] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [ 1309.744605] CR2: 0000000000000000 CR3: 0000006090046006 CR4: 0000000=
+0007726e0
+> > [ 1309.830018] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000=
+000000000
+> > [ 1309.915428] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000=
+000000400
+> > [ 1310.000837] PKRU: 55555554
+> > [ 1310.033199] Call Trace:
+> > [ 1310.062445]  kvm_mmu_load+0x29e/0x480 [kvm]
+> > [ 1310.112542]  vcpu_enter_guest+0x112d/0x15b0 [kvm]
+> > [ 1310.168865]  ? vmx_vcpu_load+0x2e/0x40 [kvm_intel]
+> > [ 1310.226201]  kvm_arch_vcpu_ioctl_run+0xf9/0x580 [kvm]
+> > [ 1310.286685]  kvm_vcpu_ioctl+0x247/0x600 [kvm]
+> > [ 1310.338838]  ? tick_program_event+0x44/0x70
+> > [ 1310.388888]  ? __audit_syscall_entry+0xdd/0x130
+> > [ 1310.443101]  __x64_sys_ioctl+0x92/0xd0
+> > [ 1310.487946]  do_syscall_64+0x37/0x50
+> > [ 1310.530711]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > [ 1310.591158] RIP: 0033:0x7fdb44a06307
+> > [ 1310.633925] Code: 44 00 00 48 8b 05 69 1b 2d 00 64 c7 00 26 00 00 00=
+ 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05=
+ <48> 3d 01 f0 > ff ff 73 01 c3 48 8b 0d 39 1b 2d 00 f7 d8 64 89 01 48
+> > [ 1310.858726] RSP: 002b:00007fdb0430ae78 EFLAGS: 00000246 ORIG_RAX: 00=
+00000000000010
+> > [ 1310.949338] RAX: ffffffffffffffda RBX: 00000000019662f0 RCX: 00007fd=
+b44a06307
+> > [ 1311.034747] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000=
+000000007
+> > [ 1311.120159] RBP: 0000000001965000 R08: 000000000040b2ff R09: 0000000=
+000000000
+> > [ 1311.205567] R10: 00007fdb0430a2a0 R11: 0000000000000246 R12: 0000000=
+000000000
+> > [ 1311.291738] R13: 0000000001965000 R14: 0000000000000000 R15: 00007fd=
+b0430b700
+> > [ 1311.377873] Modules linked in: kvm_intel kvm xt_comment xt_owner ip6=
+t_rpfilter ip6t_REJECT nf_reject_ipv6 ipt_REJECT nf_reject_ipv4 xt_conntrac=
+k ebtable_nat ebtable_broute ip6table_nat ip6table_mangle ip6table_security=
+ ip6table_raw iptable_nat nf_nat iptable_mangle iptable_security iptable_ra=
+w nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set ebtable_filter ebtables=
+ ip6table_filter ip6_tables iptable_filter rpcrdma ib_isert iscsi_target_mo=
+d ib_iser ib_srpt target_core_mod ib_srp scsi_transport_srp ib_ipoib rdma_u=
+cm ib_umad iw_cxgb4 rdma_cm iw_cm ib_cm intel_rapl_msr intel_rapl_common sk=
+x_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp bnxt_r=
+e ib_uverbs mgag200 ib_core drm_kms_helper cec drm iTCO_wdt iTCO_vendor_sup=
+port sg irqbypass pcspkr syscopyarea sysfillrect sysimgblt i2c_i801 ioatdma=
+ fb_sys_fops joydev i2c_algo_bit i2c_smbus lpc_ich intel_pch_thermal dca ip=
+_tables vfat fat xfs sd_mod t10_pi be2iscsi bnx2i cnic uio cxgb4i cxgb4 tls=
+ cxgb3i cxgb3 mdio libcxgbi
+> > [ 1311.377953]  libcxgb qla4xxx iscsi_boot_sysfs crct10dif_pclmul crc32=
+_pclmul ghash_clmulni_intel aesni_intel crypto_simd cryptd glue_helper bnxt=
+_en wmi sunrpc dm_mirror dm_region_hash dm_log dm_mod iscsi_tcp libiscsi_tc=
+p libiscsi scsi_transport_iscsi [last unloaded: kvm]
+> > [ 1312.712917] ---[ end trace 4716cc8fd037784d ]---
+> > [ 1312.884672] RIP: 0010:kvm_tdp_mmu_get_vcpu_root_hpa+0x10c/0x120 [kvm=
+]
+> > [ 1312.962622] Code: db 74 1c b8 00 00 00 80 48 03 43 40 72 1e 48 c7 c2=
+ 00 00 00 80 48 2b 15 92 0a 1d d3 48 01 d0 5b 41 5c 41 5d 41 5e 41 5f 5d c3=
+ <0f> 0b 48 8b 15 eb e8 3c d3 eb e7 66 0f 1f 84 00 00 00 00 00 0f 1f
+> > [ 1313.189000] RSP: 0018:ffffa65affa73d10 EFLAGS: 00010246
+> > [ 1313.252321] RAX: 0000000000000000 RBX: ffff9b46829bac78 RCX: 0000000=
+000000000
+> > [ 1313.338522] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffa65=
+ada1bd000
+> > [ 1313.424727] RBP: ffffa65affa73d38 R08: 0000000000000000 R09: ffff9b4=
+54e443200
+> > [ 1313.510932] R10: 0000000000000000 R11: 0000000000000001 R12: 0000000=
+000001794
+> > [ 1313.597140] R13: ffffa65ada1bd000 R14: ffff9b454e443040 R15: ffffa65=
+ada1d2418
+> > [ 1313.683343] FS:  00007fdb0430b700(0000) GS:ffff9ba3bfa00000(0000) kn=
+lGS:0000000000000000
+> > [ 1313.780987] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [ 1313.850556] CR2: 0000000000000000 CR3: 0000006090046006 CR4: 0000000=
+0007726e0
+> > [ 1313.936759] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000=
+000000000
+> > [ 1314.022964] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000=
+000000400
+> > [ 1314.109171] PKRU: 55555554
+> > [ 1314.142325] Kernel panic - not syncing: Fatal exception
+> > [ 1314.205755] Kernel Offset: 0x11a00000 from 0xffffffff81000000 (reloc=
+ation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > [ 1315.367254] ---[ end Kernel panic - not syncing: Fatal exception ]--=
+-
+>
+> > It looks like there might be an inbalance of kvm_mmu_get_root()
+> > and kvm_mmu_put_root() somewhere but I couldn't really nail it down.
+>
+> > I've tried with and without "KVM: x86/mmu: Bug fixes and cleanups in
+> > get_mmio_spte()" series applied, doesn't make any difference.
+>
+> > Thanks,
+> > Maciej
+>
+> Hi, Maciej,
+>
+> I think you should post the environment of your hardware and software sys=
+tem, such as which distribution hostOS is, kernel version, CPU model, etc .
+>
+> Leo Hou
 
-Note, we already have a command (LAUNCH_MEASURE) that can be used to
-query the SHA-256 digest of the guest memory encrypted through the
-LAUNCH_UPDATE. The main difference between previous and this command
-is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-command the ATTESATION_REPORT command can be called while the guest
-is running.
-
-Add a QMP interface "query-sev-attestation-report" that can be used
-to get the report encoded in base64.
-
-Cc: James Bottomley <jejb@linux.ibm.com>
-Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
----
-v2:
-  * add trace event.
-  * fix the goto to return NULL on failure.
-  * make the mnonce as a base64 encoded string
-
- linux-headers/linux/kvm.h |  8 +++++
- qapi/misc-target.json     | 38 ++++++++++++++++++++++
- target/i386/monitor.c     |  6 ++++
- target/i386/sev-stub.c    |  7 +++++
- target/i386/sev.c         | 66 +++++++++++++++++++++++++++++++++++++++
- target/i386/sev_i386.h    |  2 ++
- target/i386/trace-events  |  1 +
- 7 files changed, 128 insertions(+)
-
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 56ce14ad20..6d0f8101ba 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -1585,6 +1585,8 @@ enum sev_cmd_id {
- 	KVM_SEV_DBG_ENCRYPT,
- 	/* Guest certificates commands */
- 	KVM_SEV_CERT_EXPORT,
-+	/* Attestation report */
-+	KVM_SEV_GET_ATTESTATION_REPORT,
- 
- 	KVM_SEV_NR_MAX,
- };
-@@ -1637,6 +1639,12 @@ struct kvm_sev_dbg {
- 	__u32 len;
- };
- 
-+struct kvm_sev_attestation_report {
-+	__u8 mnonce[16];
-+	__u64 uaddr;
-+	__u32 len;
-+};
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-index 06ef8757f0..5907a2dfaa 100644
---- a/qapi/misc-target.json
-+++ b/qapi/misc-target.json
-@@ -285,3 +285,41 @@
- ##
- { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
-   'if': 'defined(TARGET_ARM)' }
-+
-+
-+##
-+# @SevAttestationReport:
-+#
-+# The struct describes attestation report for a Secure Encrypted Virtualization
-+# feature.
-+#
-+# @data:  guest attestation report (base64 encoded)
-+#
-+#
-+# Since: 5.2
-+##
-+{ 'struct': 'SevAttestationReport',
-+  'data': { 'data': 'str'},
-+  'if': 'defined(TARGET_I386)' }
-+
-+##
-+# @query-sev-attestation-report:
-+#
-+# This command is used to get the SEV attestation report, and is supported on AMD
-+# X86 platforms only.
-+#
-+# @mnonce: a random 16 bytes value encoded in base64 (it will be included in report)
-+#
-+# Returns: SevAttestationReport objects.
-+#
-+# Since: 5.3
-+#
-+# Example:
-+#
-+# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
-+# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
-+#
-+##
-+{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
-+  'returns': 'SevAttestationReport',
-+  'if': 'defined(TARGET_I386)' }
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 1bc91442b1..0c8377f900 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -736,3 +736,9 @@ void qmp_sev_inject_launch_secret(const char *packet_hdr,
- {
-     sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
- }
-+
-+SevAttestationReport *
-+qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
-+{
-+    return sev_get_attestation_report(mnonce, errp);
-+}
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index c1fecc2101..cdc9a014ee 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -54,3 +54,10 @@ int sev_inject_launch_secret(const char *hdr, const char *secret,
- {
-     return 1;
- }
-+
-+SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp)
-+{
-+    error_setg(errp, "SEV is not available in this QEMU");
-+    return NULL;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 1546606811..d1f90a1d8a 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -492,6 +492,72 @@ out:
-     return cap;
- }
- 
-+SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp)
-+{
-+    struct kvm_sev_attestation_report input = {};
-+    SevAttestationReport *report = NULL;
-+    SevGuestState *sev = sev_guest;
-+    guchar *data;
-+    guchar *buf;
-+    gsize len;
-+    int err = 0, ret;
-+
-+    if (!sev_enabled()) {
-+        error_setg(errp, "SEV is not enabled");
-+        return NULL;
-+    }
-+
-+    /* lets decode the mnonce string */
-+    buf = g_base64_decode(mnonce, &len);
-+    if (!buf) {
-+        error_setg(errp, "SEV: failed to decode mnonce input");
-+        return NULL;
-+    }
-+
-+    /* verify the input mnonce length */
-+    if (len != sizeof(input.mnonce)) {
-+        error_setg(errp, "SEV: mnonce must be %ld bytes (got %ld)",
-+                sizeof(input.mnonce), len);
-+        g_free(buf);
-+        return NULL;
-+    }
-+
-+    /* Query the report length */
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+            &input, &err);
-+    if (ret < 0) {
-+        if (err != SEV_RET_INVALID_LEN) {
-+            error_setg(errp, "failed to query the attestation report length "
-+                    "ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-+            return NULL;
-+        }
-+    }
-+
-+    data = g_malloc(input.len);
-+    input.uaddr = (unsigned long)data;
-+    memcpy(input.mnonce, buf, sizeof(input.mnonce));
-+
-+    /* Query the report */
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-+            &input, &err);
-+    if (ret) {
-+        error_setg_errno(errp, errno, "Failed to get attestation report"
-+                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-+        goto e_free_data;
-+    }
-+
-+    report = g_new0(SevAttestationReport, 1);
-+    report->data = g_base64_encode(data, input.len);
-+
-+    trace_kvm_sev_attestation_report(mnonce, report->data);
-+
-+e_free_data:
-+    g_free(data);
-+    g_free(buf);
-+    return report;
-+}
-+
- static int
- sev_read_file_base64(const char *filename, guchar **data, gsize *len)
- {
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 4db6960f60..e2d0774708 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -35,5 +35,7 @@ extern uint32_t sev_get_cbit_position(void);
- extern uint32_t sev_get_reduced_phys_bits(void);
- extern char *sev_get_launch_measurement(void);
- extern SevCapability *sev_get_capabilities(Error **errp);
-+extern SevAttestationReport *
-+sev_get_attestation_report(const char *mnonce, Error **errp);
- 
- #endif
-diff --git a/target/i386/trace-events b/target/i386/trace-events
-index a22ab24e21..8d6437404d 100644
---- a/target/i386/trace-events
-+++ b/target/i386/trace-events
-@@ -10,3 +10,4 @@ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIx64
- kvm_sev_launch_measurement(const char *value) "data %s"
- kvm_sev_launch_finish(void) ""
- kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
-+kvm_sev_attestation_report(const char *mnonce, const char *data) "mnonce %s data %s"
--- 
-2.17.1
-
+Thanks for reporting this Maciej. I'll look into it this week. As Leo
+Hou said, it would be helpful to know more about the environment you
+ran this test on. Your theory about a get / put roots imbalance seems
+like a good explanation. I'll see if I can find such an imbalance.
+Ben
