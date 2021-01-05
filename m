@@ -2,199 +2,754 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB842EA069
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 00:08:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A18C2EA140
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 01:05:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727319AbhADXF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 4 Jan 2021 18:05:59 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:33744 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726026AbhADXF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 4 Jan 2021 18:05:59 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 104N4kNh148330;
-        Mon, 4 Jan 2021 23:05:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : from :
- subject : message-id : date : mime-version : content-type :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=R+Urid1nNCPc0SbRLStPFQ/ReLPBwhZsCxh99cL8MxU=;
- b=XCNEPR7EhiqyL9p+u5iYcsX+QjlT0errClETLM9eNMXGae63WlwOuLCY5MuNKJwEHgob
- jr9H8skv3ReBevs6yow9opM0Zo9RG3E3l8QQ4QABauMi0UI5je4mVcaxsuq9NM2goihl
- igT/6hkwhMhoHlPpxrIhJ+iXdrfkdva0NvBVkEdf5MBZ7jBwG9pK5Uui01lgf3PzGZMf
- U/nIIDXR6d8TtfS/1Se8vVDprWpdrhqGn1ZOWhvjfvKDiMscOAV7rsYXztBFsh6kYei9
- 7p7WPbedS8bAxDgvud5tN0xdllWsPfG92poimjzJTcgJ+NDSsG0RQHJtX99qmoGLmI0y 6A== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 35tebapn6s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 04 Jan 2021 23:05:11 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 104MuMIc029624;
-        Mon, 4 Jan 2021 23:05:11 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 35uxnru5sh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 04 Jan 2021 23:05:11 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 104N59ht015513;
-        Mon, 4 Jan 2021 23:05:09 GMT
-Received: from [192.168.1.3] (/89.66.140.113)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 04 Jan 2021 23:05:09 +0000
-To:     Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>,
-        Cannon Matthews <cannonmatthews@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Xiao Guangrong <xiaoguangrong.eric"@gmail.com
-From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: reproducible BUG() in kvm_mmu_get_root() in TDP MMU
-Message-ID: <4bf6fcae-20e7-3eae-83ec-51fb52110487@oracle.com>
-Date:   Tue, 5 Jan 2021 00:05:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1727268AbhAEADk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 4 Jan 2021 19:03:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35612 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727199AbhAEADk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 4 Jan 2021 19:03:40 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B88DC061574
+        for <kvm@vger.kernel.org>; Mon,  4 Jan 2021 16:02:57 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id y19so68408598lfa.13
+        for <kvm@vger.kernel.org>; Mon, 04 Jan 2021 16:02:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=ScTzh83+xndfVCA6pMzFUQN8QtUT7mvo/XerzVishas=;
+        b=Jg14Xff++KcXpWntJZ+5EZnVAjwAqJZ4w7aXeZZvM3QDO5djaXNW3OspCNQNVv9V+i
+         9GW0XwJno+k2OXOUOsr+64b4B4f0Y6lNabjQSuhTUNAjGHNFp/HP86bEVF/XImUpHDEA
+         kHJDLi1HV+1S1CDOshM+kNwXHYUSKmAPLtNLeV5b8MEeFxumZ4jyl0r+EMLv1/CJ4g2O
+         axSseyy1gORq2QLLRdaMQW9kdFK/e4BEk5t4+TQdC8x6ewyEgMLaTz2yHrP1F6/LyDRf
+         LaObeydJROjcbcoCBr5DSpIkJs8p2dagBEskGDU2ffS+Hkxk2kCOQbs62QE+44c7kR7c
+         dPsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=ScTzh83+xndfVCA6pMzFUQN8QtUT7mvo/XerzVishas=;
+        b=lxPc4atoEPKhvpfwGVgpOcmC9WR54o/zQejG8aYN+r7eiYnvn5GJ+UTcIww0CDxudI
+         WOGPWHizkOHz1VJoZsUQ70DvdtIER8xb9RqrmpWKWKPkQRy0ZLYcRhyB4Os3aHLr8n+0
+         Ro7pkjf/7I/lwm+RW1o/EnaTfqyZUXcVKEtTZiThqAoRtwX8EdiZ6l0Gahmlovi6s9oY
+         J23Azjm2B/1S5bs+0Ya9XP59Ois76Ksr51p8QVIeyYUmw27rVnHkQ0nyHsx24bYCPJJi
+         4xLBvFP4QtauydeTy08at2JTzykQOxalsIKtJJ0M6pH+pG1P7T2/UHw8kgzBOubVw467
+         bzIw==
+X-Gm-Message-State: AOAM533Ko+V8nTQ5/v+9FzOcpst7M8o4s/apXjMc85cJ93iU6AeoNdhu
+        tHRVp5rFbiKMUB/gpbTOss4=
+X-Google-Smtp-Source: ABdhPJzZHUJ5j3IcJvhp3Y0DkmBLw418KFuvF+xPuinVz2AGet+7MmhQk0py443HCONphKl6rTeB4g==
+X-Received: by 2002:a2e:9d95:: with SMTP id c21mr28599841ljj.51.1609804975726;
+        Mon, 04 Jan 2021 16:02:55 -0800 (PST)
+Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
+        by smtp.gmail.com with ESMTPSA id x125sm7433249lff.58.2021.01.04.16.02.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Jan 2021 16:02:55 -0800 (PST)
+Message-ID: <29955fdc90d2efab7b79c91b9a97183e95243cc1.camel@gmail.com>
+Subject: Re: [RFC 1/2] KVM: add initial support for KVM_SET_IOREGION
+From:   Elena Afanasova <eafanasova@gmail.com>
+To:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Cc:     stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Date:   Mon, 04 Jan 2021 16:02:43 -0800
+In-Reply-To: <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
+References: <cover.1609231373.git.eafanasova@gmail.com>
+         <d4af2bcbd2c6931a24ba99236248529c3bfb6999.1609231374.git.eafanasova@gmail.com>
+         <d79bdf44-9088-e005-3840-03f6bad22ed7@redhat.com>
+         <0cc68c81d6fae042d8a84bf90dd77eecd4da7cc8.camel@gmail.com>
+         <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: base64
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9854 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 spamscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101040138
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9854 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0
- priorityscore=1501 spamscore=0 mlxscore=0 clxscore=1011 bulkscore=0
- lowpriorityscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101040139
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksDQoNCkkgYW0gaGl0dGluZyBhIHJlcHJvZHVjaWJsZSBCVUcoKSB3aXRoIEtWTSBURFAg
-TU1VLg0KDQpUaGUgcmVwcm9kdWNlciBiYXNlZCBvbiBzZXRfbWVtb3J5X3JlZ2lvbl90ZXN0
-LmMgZnJvbSBLVk0gc2VsZnRlc3RzDQppcyBhdmFpbGFibGUgaGVyZToNCmh0dHBzOi8vZ2lz
-dC5naXRodWIuY29tL21hY2llanNzem1pZ2llcm8vODkwMjE4MTUxYzI0MmQ5OWY2M2VhMDgy
-NTMzNGM2YzANCg0KVGhlIHRlc3Qgc2ltcGx5IG1vdmVzIGEgbWVtc2xvdCBhIGJpdCBiYWNr
-IGFuZCBmb3J0aCBvbiB0aGUgaG9zdA0Kd2hpbGUgdGhlIGd1ZXN0IGlzIGNvbmN1cnJlbnRs
-eSB3cml0aW5nIGFyb3VuZCB0aGUgYXJlYSBiZWluZw0KbW92ZWQuDQoNClRoZSBjb2RlIHJ1
-bnMgZmluZSBvbiB0aGUgZGVmYXVsdCBLVk0gTU1VIGJ1dCB0cmlnZ2VycyBhIEJVRygpIHdo
-ZW4NClREUCBNTVUgaXMgZW5hYmxlZCBieSBhZGRpbmcgInRkcF9tbXU9MSIga3ZtIG1vZHVs
-ZSBwYXJhbWV0ZXIuDQoNClRoZSBiYWNrdHJhY2UgaXM6DQpbIDEzMDguNDU1MTIwXSBrZXJu
-ZWwgQlVHIGF0IGFyY2gveDg2L2t2bS9tbXUvbW11X2ludGVybmFsLmg6MTAwIQ0KWyAxMzA4
-LjUyNDk1MV0gaW52YWxpZCBvcGNvZGU6IDAwMDAgWyMxXSBTTVAgUFRJDQpbIDEzMDguNTc3
-MDgwXSBDUFU6IDkyIFBJRDogMTg2NzUgQ29tbTogbWVtc2xvdF9tb3ZlX3RlIE5vdCB0YWlu
-dGVkIDUuMTEuMC1yYzIrICM4MA0KWyAxMzA4LjY2NTYxN10gSGFyZHdhcmUgbmFtZTogT3Jh
-Y2xlIENvcnBvcmF0aW9uIE9SQUNMRSBTRVJWRVIgWDctMmMvU0VSVkVSIE1PRFVMRSBBU1NZ
-LCAsIEJJT1MgNDYwNzAzMDAgMTIvMjAvMjAxOQ0KWyAxMzA4Ljc4NzQzOF0gUklQOiAwMDEw
-Omt2bV90ZHBfbW11X2dldF92Y3B1X3Jvb3RfaHBhKzB4MTBjLzB4MTIwIFtrdm1dDQpbIDEz
-MDguODY0NTg3XSBDb2RlOiBkYiA3NCAxYyBiOCAwMCAwMCAwMCA4MCA0OCAwMyA0MyA0MCA3
-MiAxZSA0OCBjNyBjMiAwMCAwMCAwMCA4MCA0OCAyYiAxNSA5MiAwYSAxZCBkMyA0OCAwMSBk
-MCA1YiA0MSA1YyA0MSA1ZCA0MSA1ZSA0MSA1ZiA1ZCBjMyA8MGY+IDBiIDQ4IDhiIDE1IGVi
-IGU4IDNjIGQzIGViIGU3IDY2IDBmIDFmIDg0IDAwIDAwIDAwIDAwIDAwIDBmIDFmDQpbIDEz
-MDkuMDg5MzkzXSBSU1A6IDAwMTg6ZmZmZmE2NWFmZmE3M2QxMCBFRkxBR1M6IDAwMDEwMjQ2
-DQpbIDEzMDkuMTUxOTIyXSBSQVg6IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmOWI0Njgy
-OWJhYzc4IFJDWDogMDAwMDAwMDAwMDAwMDAwMA0KWyAxMzA5LjIzNzMzNF0gUkRYOiAwMDAw
-MDAwMDAwMDAwMDAwIFJTSTogMDAwMDAwMDAwMDAwMDAwMCBSREk6IGZmZmZhNjVhZGExYmQw
-MDANClsgMTMwOS4zMjI3NDRdIFJCUDogZmZmZmE2NWFmZmE3M2QzOCBSMDg6IDAwMDAwMDAw
-MDAwMDAwMDAgUjA5OiBmZmZmOWI0NTRlNDQzMjAwDQpbIDEzMDkuNDA4MTU2XSBSMTA6IDAw
-MDAwMDAwMDAwMDAwMDAgUjExOiAwMDAwMDAwMDAwMDAwMDAxIFIxMjogMDAwMDAwMDAwMDAw
-MTc5NA0KWyAxMzA5LjQ5MzU2N10gUjEzOiBmZmZmYTY1YWRhMWJkMDAwIFIxNDogZmZmZjli
-NDU0ZTQ0MzA0MCBSMTU6IGZmZmZhNjVhZGExZDI0MTgNClsgMTMwOS41Nzg5NzddIEZTOiAg
-MDAwMDdmZGIwNDMwYjcwMCgwMDAwKSBHUzpmZmZmOWJhM2JmYTAwMDAwKDAwMDApIGtubEdT
-OjAwMDAwMDAwMDAwMDAwMDANClsgMTMwOS42NzU4MzNdIENTOiAgMDAxMCBEUzogMDAwMCBF
-UzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNClsgMTMwOS43NDQ2MDVdIENSMjogMDAw
-MDAwMDAwMDAwMDAwMCBDUjM6IDAwMDAwMDYwOTAwNDYwMDYgQ1I0OiAwMDAwMDAwMDAwNzcy
-NmUwDQpbIDEzMDkuODMwMDE4XSBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAw
-MDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KWyAxMzA5LjkxNTQyOF0gRFIzOiAw
-MDAwMDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAw
-MDA0MDANClsgMTMxMC4wMDA4MzddIFBLUlU6IDU1NTU1NTU0DQpbIDEzMTAuMDMzMTk5XSBD
-YWxsIFRyYWNlOg0KWyAxMzEwLjA2MjQ0NV0gIGt2bV9tbXVfbG9hZCsweDI5ZS8weDQ4MCBb
-a3ZtXQ0KWyAxMzEwLjExMjU0Ml0gIHZjcHVfZW50ZXJfZ3Vlc3QrMHgxMTJkLzB4MTViMCBb
-a3ZtXQ0KWyAxMzEwLjE2ODg2NV0gID8gdm14X3ZjcHVfbG9hZCsweDJlLzB4NDAgW2t2bV9p
-bnRlbF0NClsgMTMxMC4yMjYyMDFdICBrdm1fYXJjaF92Y3B1X2lvY3RsX3J1bisweGY5LzB4
-NTgwIFtrdm1dDQpbIDEzMTAuMjg2Njg1XSAga3ZtX3ZjcHVfaW9jdGwrMHgyNDcvMHg2MDAg
-W2t2bV0NClsgMTMxMC4zMzg4MzhdICA/IHRpY2tfcHJvZ3JhbV9ldmVudCsweDQ0LzB4NzAN
-ClsgMTMxMC4zODg4ODhdICA/IF9fYXVkaXRfc3lzY2FsbF9lbnRyeSsweGRkLzB4MTMwDQpb
-IDEzMTAuNDQzMTAxXSAgX194NjRfc3lzX2lvY3RsKzB4OTIvMHhkMA0KWyAxMzEwLjQ4Nzk0
-Nl0gIGRvX3N5c2NhbGxfNjQrMHgzNy8weDUwDQpbIDEzMTAuNTMwNzExXSAgZW50cnlfU1lT
-Q0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NDQvMHhhOQ0KWyAxMzEwLjU5MTE1OF0gUklQOiAw
-MDMzOjB4N2ZkYjQ0YTA2MzA3DQpbIDEzMTAuNjMzOTI1XSBDb2RlOiA0NCAwMCAwMCA0OCA4
-YiAwNSA2OSAxYiAyZCAwMCA2NCBjNyAwMCAyNiAwMCAwMCAwMCA0OCBjNyBjMCBmZiBmZiBm
-ZiBmZiBjMyA2NiAyZSAwZiAxZiA4NCAwMCAwMCAwMCAwMCAwMCBiOCAxMCAwMCAwMCAwMCAw
-ZiAwNSA8NDg+IDNkIDAxIGYwIGZmIGZmIDczIDAxIGMzIDQ4IDhiIDBkIDM5IDFiIDJkIDAw
-IGY3IGQ4IDY0IDg5IDAxIDQ4DQpbIDEzMTAuODU4NzI2XSBSU1A6IDAwMmI6MDAwMDdmZGIw
-NDMwYWU3OCBFRkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDEwDQpb
-IDEzMTAuOTQ5MzM4XSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAxOTY2
-MmYwIFJDWDogMDAwMDdmZGI0NGEwNjMwNw0KWyAxMzExLjAzNDc0N10gUkRYOiAwMDAwMDAw
-MDAwMDAwMDAwIFJTSTogMDAwMDAwMDAwMDAwYWU4MCBSREk6IDAwMDAwMDAwMDAwMDAwMDcN
-ClsgMTMxMS4xMjAxNTldIFJCUDogMDAwMDAwMDAwMTk2NTAwMCBSMDg6IDAwMDAwMDAwMDA0
-MGIyZmYgUjA5OiAwMDAwMDAwMDAwMDAwMDAwDQpbIDEzMTEuMjA1NTY3XSBSMTA6IDAwMDA3
-ZmRiMDQzMGEyYTAgUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDAwMDAwMDAwMDAw
-MA0KWyAxMzExLjI5MTczOF0gUjEzOiAwMDAwMDAwMDAxOTY1MDAwIFIxNDogMDAwMDAwMDAw
-MDAwMDAwMCBSMTU6IDAwMDA3ZmRiMDQzMGI3MDANClsgMTMxMS4zNzc4NzNdIE1vZHVsZXMg
-bGlua2VkIGluOiBrdm1faW50ZWwga3ZtIHh0X2NvbW1lbnQgeHRfb3duZXIgaXA2dF9ycGZp
-bHRlciBpcDZ0X1JFSkVDVCBuZl9yZWplY3RfaXB2NiBpcHRfUkVKRUNUIG5mX3JlamVjdF9p
-cHY0IHh0X2Nvbm50cmFjayBlYnRhYmxlX25hdCBlYnRhYmxlX2Jyb3V0ZSBpcDZ0YWJsZV9u
-YXQgaXA2dGFibGVfbWFuZ2xlIGlwNnRhYmxlX3NlY3VyaXR5IGlwNnRhYmxlX3JhdyBpcHRh
-YmxlX25hdCBuZl9uYXQgaXB0YWJsZV9tYW5nbGUgaXB0YWJsZV9zZWN1cml0eSBpcHRhYmxl
-X3JhdyBuZl9jb25udHJhY2sgbmZfZGVmcmFnX2lwdjYgbmZfZGVmcmFnX2lwdjQgaXBfc2V0
-IGVidGFibGVfZmlsdGVyIGVidGFibGVzIGlwNnRhYmxlX2ZpbHRlciBpcDZfdGFibGVzIGlw
-dGFibGVfZmlsdGVyIHJwY3JkbWEgaWJfaXNlcnQgaXNjc2lfdGFyZ2V0X21vZCBpYl9pc2Vy
-IGliX3NycHQgdGFyZ2V0X2NvcmVfbW9kIGliX3NycCBzY3NpX3RyYW5zcG9ydF9zcnAgaWJf
-aXBvaWIgcmRtYV91Y20gaWJfdW1hZCBpd19jeGdiNCByZG1hX2NtIGl3X2NtIGliX2NtIGlu
-dGVsX3JhcGxfbXNyIGludGVsX3JhcGxfY29tbW9uIHNreF9lZGFjIG5maXQgbGlibnZkaW1t
-IHg4Nl9wa2dfdGVtcF90aGVybWFsIGludGVsX3Bvd2VyY2xhbXAgY29yZXRlbXAgYm54dF9y
-ZSBpYl91dmVyYnMgbWdhZzIwMCBpYl9jb3JlIGRybV9rbXNfaGVscGVyIGNlYyBkcm0gaVRD
-T193ZHQgaVRDT192ZW5kb3Jfc3VwcG9ydCBzZyBpcnFieXBhc3MgcGNzcGtyIHN5c2NvcHlh
-cmVhIHN5c2ZpbGxyZWN0IHN5c2ltZ2JsdCBpMmNfaTgwMSBpb2F0ZG1hIGZiX3N5c19mb3Bz
-IGpveWRldiBpMmNfYWxnb19iaXQgaTJjX3NtYnVzIGxwY19pY2ggaW50ZWxfcGNoX3RoZXJt
-YWwgZGNhIGlwX3RhYmxlcyB2ZmF0IGZhdCB4ZnMgc2RfbW9kIHQxMF9waSBiZTJpc2NzaSBi
-bngyaSBjbmljIHVpbyBjeGdiNGkgY3hnYjQgdGxzIGN4Z2IzaSBjeGdiMyBtZGlvIGxpYmN4
-Z2JpDQpbIDEzMTEuMzc3OTUzXSAgbGliY3hnYiBxbGE0eHh4IGlzY3NpX2Jvb3Rfc3lzZnMg
-Y3JjdDEwZGlmX3BjbG11bCBjcmMzMl9wY2xtdWwgZ2hhc2hfY2xtdWxuaV9pbnRlbCBhZXNu
-aV9pbnRlbCBjcnlwdG9fc2ltZCBjcnlwdGQgZ2x1ZV9oZWxwZXIgYm54dF9lbiB3bWkgc3Vu
-cnBjIGRtX21pcnJvciBkbV9yZWdpb25faGFzaCBkbV9sb2cgZG1fbW9kIGlzY3NpX3RjcCBs
-aWJpc2NzaV90Y3AgbGliaXNjc2kgc2NzaV90cmFuc3BvcnRfaXNjc2kgW2xhc3QgdW5sb2Fk
-ZWQ6IGt2bV0NClsgMTMxMi43MTI5MTddIC0tLVsgZW5kIHRyYWNlIDQ3MTZjYzhmZDAzNzc4
-NGQgXS0tLQ0KWyAxMzEyLjg4NDY3Ml0gUklQOiAwMDEwOmt2bV90ZHBfbW11X2dldF92Y3B1
-X3Jvb3RfaHBhKzB4MTBjLzB4MTIwIFtrdm1dDQpbIDEzMTIuOTYyNjIyXSBDb2RlOiBkYiA3
-NCAxYyBiOCAwMCAwMCAwMCA4MCA0OCAwMyA0MyA0MCA3MiAxZSA0OCBjNyBjMiAwMCAwMCAw
-MCA4MCA0OCAyYiAxNSA5MiAwYSAxZCBkMyA0OCAwMSBkMCA1YiA0MSA1YyA0MSA1ZCA0MSA1
-ZSA0MSA1ZiA1ZCBjMyA8MGY+IDBiIDQ4IDhiIDE1IGViIGU4IDNjIGQzIGViIGU3IDY2IDBm
-IDFmIDg0IDAwIDAwIDAwIDAwIDAwIDBmIDFmDQpbIDEzMTMuMTg5MDAwXSBSU1A6IDAwMTg6
-ZmZmZmE2NWFmZmE3M2QxMCBFRkxBR1M6IDAwMDEwMjQ2DQpbIDEzMTMuMjUyMzIxXSBSQVg6
-IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmOWI0NjgyOWJhYzc4IFJDWDogMDAwMDAwMDAw
-MDAwMDAwMA0KWyAxMzEzLjMzODUyMl0gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogMDAw
-MDAwMDAwMDAwMDAwMCBSREk6IGZmZmZhNjVhZGExYmQwMDANClsgMTMxMy40MjQ3MjddIFJC
-UDogZmZmZmE2NWFmZmE3M2QzOCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiBmZmZmOWI0
-NTRlNDQzMjAwDQpbIDEzMTMuNTEwOTMyXSBSMTA6IDAwMDAwMDAwMDAwMDAwMDAgUjExOiAw
-MDAwMDAwMDAwMDAwMDAxIFIxMjogMDAwMDAwMDAwMDAwMTc5NA0KWyAxMzEzLjU5NzE0MF0g
-UjEzOiBmZmZmYTY1YWRhMWJkMDAwIFIxNDogZmZmZjliNDU0ZTQ0MzA0MCBSMTU6IGZmZmZh
-NjVhZGExZDI0MTgNClsgMTMxMy42ODMzNDNdIEZTOiAgMDAwMDdmZGIwNDMwYjcwMCgwMDAw
-KSBHUzpmZmZmOWJhM2JmYTAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANClsg
-MTMxMy43ODA5ODddIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAw
-ODAwNTAwMzMNClsgMTMxMy44NTA1NTZdIENSMjogMDAwMDAwMDAwMDAwMDAwMCBDUjM6IDAw
-MDAwMDYwOTAwNDYwMDYgQ1I0OiAwMDAwMDAwMDAwNzcyNmUwDQpbIDEzMTMuOTM2NzU5XSBE
-UjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAw
-MDAwMDAwMDAwMA0KWyAxMzE0LjAyMjk2NF0gRFIzOiAwMDAwMDAwMDAwMDAwMDAwIERSNjog
-MDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA0MDANClsgMTMxNC4xMDkxNzFd
-IFBLUlU6IDU1NTU1NTU0DQpbIDEzMTQuMTQyMzI1XSBLZXJuZWwgcGFuaWMgLSBub3Qgc3lu
-Y2luZzogRmF0YWwgZXhjZXB0aW9uDQpbIDEzMTQuMjA1NzU1XSBLZXJuZWwgT2Zmc2V0OiAw
-eDExYTAwMDAwIGZyb20gMHhmZmZmZmZmZjgxMDAwMDAwIChyZWxvY2F0aW9uIHJhbmdlOiAw
-eGZmZmZmZmZmODAwMDAwMDAtMHhmZmZmZmZmZmJmZmZmZmZmKQ0KWyAxMzE1LjM2NzI1NF0g
-LS0tWyBlbmQgS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEZhdGFsIGV4Y2VwdGlvbiBd
-LS0tDQoNCkl0IGxvb2tzIGxpa2UgdGhlcmUgbWlnaHQgYmUgYW4gaW5iYWxhbmNlIG9mIGt2
-bV9tbXVfZ2V0X3Jvb3QoKQ0KYW5kIGt2bV9tbXVfcHV0X3Jvb3QoKSBzb21ld2hlcmUgYnV0
-IEkgY291bGRuJ3QgcmVhbGx5IG5haWwgaXQgZG93bi4NCg0KSSd2ZSB0cmllZCB3aXRoIGFu
-ZCB3aXRob3V0ICJLVk06IHg4Ni9tbXU6IEJ1ZyBmaXhlcyBhbmQgY2xlYW51cHMgaW4NCmdl
-dF9tbWlvX3NwdGUoKSIgc2VyaWVzIGFwcGxpZWQsIGRvZXNuJ3QgbWFrZSBhbnkgZGlmZmVy
-ZW5jZS4NCg0KVGhhbmtzLA0KTWFjaWVqDQoNCg==
+On Mon, 2021-01-04 at 13:34 +0800, Jason Wang wrote:
+> On 2021/1/4 上午4:32, Elena Afanasova wrote:
+> > On Thu, 2020-12-31 at 11:45 +0800, Jason Wang wrote:
+> > > On 2020/12/29 下午6:02, Elena Afanasova wrote:
+> > > > This vm ioctl adds or removes an ioregionfd MMIO/PIO region.
+> > > How about FAST_MMIO?
+> > > 
+> > I’ll add KVM_IOREGION_FAST_MMIO flag support. So this may be
+> > suitable
+> > for triggers which could use posted writes. The struct
+> > ioregionfd_cmd
+> > size bits and the data field will be unused in this case.
+> 
+> Note that eventfd checks for length and have datamatch support. Do
+> we 
+> need to do something similar.
+> 
+Do you think datamatch support is necessary for ioregionfd?
+
+> I guess the idea is to have a generic interface to let eventfd work
+> for 
+> ioregion as well.
+> 
+It seems that posted writes is the only "fast" case in ioregionfd. So I
+was thinking about using FAST_MMIO for this case only. Maybe in some
+cases it will be better to just use ioeventfd. But I'm not sure.
+
+> 
+> > > > Guest
+> > > > read and write accesses are dispatched through the given
+> > > > ioregionfd
+> > > > instead of returning from ioctl(KVM_RUN). Regions can be
+> > > > deleted by
+> > > > setting fds to -1.
+> > > > 
+> > > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+> > > > ---
+> > > >    arch/x86/kvm/Kconfig     |   1 +
+> > > >    arch/x86/kvm/Makefile    |   1 +
+> > > >    arch/x86/kvm/x86.c       |   1 +
+> > > >    include/linux/kvm_host.h |  17 +++
+> > > >    include/uapi/linux/kvm.h |  23 ++++
+> > > >    virt/kvm/Kconfig         |   3 +
+> > > >    virt/kvm/eventfd.c       |  25 +++++
+> > > >    virt/kvm/eventfd.h       |  14 +++
+> > > >    virt/kvm/ioregion.c      | 233
+> > > > +++++++++++++++++++++++++++++++++++++++
+> > > >    virt/kvm/ioregion.h      |  15 +++
+> > > >    virt/kvm/kvm_main.c      |  20 +++-
+> > > >    11 files changed, 350 insertions(+), 3 deletions(-)
+> > > >    create mode 100644 virt/kvm/eventfd.h
+> > > >    create mode 100644 virt/kvm/ioregion.c
+> > > >    create mode 100644 virt/kvm/ioregion.h
+> > > > 
+> > > > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > > > index f92dfd8ef10d..b914ef375199 100644
+> > > > --- a/arch/x86/kvm/Kconfig
+> > > > +++ b/arch/x86/kvm/Kconfig
+> > > > @@ -33,6 +33,7 @@ config KVM
+> > > >    	select HAVE_KVM_IRQ_BYPASS
+> > > >    	select HAVE_KVM_IRQ_ROUTING
+> > > >    	select HAVE_KVM_EVENTFD
+> > > > +	select KVM_IOREGION
+> > > >    	select KVM_ASYNC_PF
+> > > >    	select USER_RETURN_NOTIFIER
+> > > >    	select KVM_MMIO
+> > > > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> > > > index b804444e16d4..b3b17dc9f7d4 100644
+> > > > --- a/arch/x86/kvm/Makefile
+> > > > +++ b/arch/x86/kvm/Makefile
+> > > > @@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
+> > > >    kvm-y			+= $(KVM)/kvm_main.o
+> > > > $(KVM)/coalesced_mmio.o \
+> > > >    				$(KVM)/eventfd.o
+> > > > $(KVM)/irqchip.o
+> > > > $(KVM)/vfio.o
+> > > >    kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
+> > > > +kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
+> > > >    
+> > > >    kvm-y			+= x86.o emulate.o i8259.o
+> > > > irq.o
+> > > > lapic.o \
+> > > >    			   i8254.o ioapic.o irq_comm.o cpuid.o
+> > > > pmu.o
+> > > > mtrr.o \
+> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > > index e545a8a613b1..ddb28f5ca252 100644
+> > > > --- a/arch/x86/kvm/x86.c
+> > > > +++ b/arch/x86/kvm/x86.c
+> > > > @@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct
+> > > > kvm
+> > > > *kvm, long ext)
+> > > >    	case KVM_CAP_X86_USER_SPACE_MSR:
+> > > >    	case KVM_CAP_X86_MSR_FILTER:
+> > > >    	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+> > > > +	case KVM_CAP_IOREGIONFD:
+> > > >    		r = 1;
+> > > >    		break;
+> > > >    	case KVM_CAP_SYNC_REGS:
+> > > > diff --git a/include/linux/kvm_host.h
+> > > > b/include/linux/kvm_host.h
+> > > > index 7f2e2a09ebbd..7cd667dddba9 100644
+> > > > --- a/include/linux/kvm_host.h
+> > > > +++ b/include/linux/kvm_host.h
+> > > > @@ -470,6 +470,10 @@ struct kvm {
+> > > >    		struct mutex      resampler_lock;
+> > > >    	} irqfds;
+> > > >    	struct list_head ioeventfds;
+> > > > +#endif
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +	struct list_head ioregions_mmio;
+> > > > +	struct list_head ioregions_pio;
+> > > >    #endif
+> > > >    	struct kvm_vm_stat stat;
+> > > >    	struct kvm_arch arch;
+> > > > @@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct
+> > > > kvm
+> > > > *kvm, struct kvm_ioeventfd *args)
+> > > >    
+> > > >    #endif /* CONFIG_HAVE_KVM_EVENTFD */
+> > > >    
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +void kvm_ioregionfd_init(struct kvm *kvm);
+> > > > +int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion
+> > > > *args);
+> > > > +
+> > > > +#else
+> > > > +
+> > > > +static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
+> > > > +static inline int kvm_ioregionfd(struct kvm *kvm, struct
+> > > > kvm_ioregion *args)
+> > > > +{
+> > > > +	return -ENOSYS;
+> > > > +}
+> > > > +#endif
+> > > > +
+> > > >    void kvm_arch_irq_routing_update(struct kvm *kvm);
+> > > >    
+> > > >    static inline void kvm_make_request(int req, struct kvm_vcpu
+> > > > *vcpu)
+> > > > diff --git a/include/uapi/linux/kvm.h
+> > > > b/include/uapi/linux/kvm.h
+> > > > index ca41220b40b8..81e775778c66 100644
+> > > > --- a/include/uapi/linux/kvm.h
+> > > > +++ b/include/uapi/linux/kvm.h
+> > > > @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
+> > > >    	__u8  pad[36];
+> > > >    };
+> > > >    
+> > > > +enum {
+> > > > +	kvm_ioregion_flag_nr_pio,
+> > > > +	kvm_ioregion_flag_nr_posted_writes,
+> > > > +	kvm_ioregion_flag_nr_max,
+> > > > +};
+> > > > +
+> > > > +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
+> > > > +#define KVM_IOREGION_POSTED_WRITES (1 <<
+> > > > kvm_ioregion_flag_nr_posted_writes)
+> > > > +
+> > > > +#define KVM_IOREGION_VALID_FLAG_MASK ((1 <<
+> > > > kvm_ioregion_flag_nr_max) - 1)
+> > > > +
+> > > > +struct kvm_ioregion {
+> > > > +	__u64 guest_paddr; /* guest physical address */
+> > > > +	__u64 memory_size; /* bytes */
+> > > > +	__u64 user_data;
+> > > What will this field do? Is it a token?
+> > > 
+> > Yes, it’s an opaque token that can be used by userspace in order to
+> > determine which MemoryRegion to dispatch.
+> 
+> This part I don't understand. Userspace should know the fd number
+> (which 
+> I guess should be sufficient?).
+> 
+I think the user_data field can be useful if same fd is registered with
+multiple GPA ranges.
+
+> 
+> > > > +	__s32 rfd;
+> > > > +	__s32 wfd;
+> > > > +	__u32 flags;
+> > > > +	__u8  pad[28];
+> > > > +};
+> > > Is this possible to register the same fd with multiple GPA
+> > > ranges?
+> > > If
+> > > not, do we need to check for fd collision?
+> > > 
+> > Yes, it’s possible to register the same fd with multiple GPA
+> > ranges.
+> > 
+> > > > +
+> > > >    #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+> > > >    #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+> > > >    #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> > > > @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
+> > > >    #define KVM_CAP_X86_USER_SPACE_MSR 188
+> > > >    #define KVM_CAP_X86_MSR_FILTER 189
+> > > >    #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+> > > > +#define KVM_CAP_IOREGIONFD 191
+> > > >    
+> > > >    #ifdef KVM_CAP_IRQ_ROUTING
+> > > >    
+> > > > @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
+> > > >    					struct
+> > > > kvm_userspace_memory_region)
+> > > >    #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+> > > >    #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> > > > +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct
+> > > > kvm_ioregion)
+> > > >    
+> > > >    /* enable ucontrol for s390 */
+> > > >    struct kvm_s390_ucas_mapping {
+> > > > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > > > index 1c37ccd5d402..5e6620bbf000 100644
+> > > > --- a/virt/kvm/Kconfig
+> > > > +++ b/virt/kvm/Kconfig
+> > > > @@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
+> > > >           bool
+> > > >           select EVENTFD
+> > > >    
+> > > > +config KVM_IOREGION
+> > > > +       bool
+> > > > +
+> > > >    config KVM_MMIO
+> > > >           bool
+> > > >    
+> > > > diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> > > > index c2323c27a28b..aadb73903f8b 100644
+> > > > --- a/virt/kvm/eventfd.c
+> > > > +++ b/virt/kvm/eventfd.c
+> > > > @@ -27,6 +27,7 @@
+> > > >    #include <trace/events/kvm.h>
+> > > >    
+> > > >    #include <kvm/iodev.h>
+> > > > +#include "ioregion.h"
+> > > >    
+> > > >    #ifdef CONFIG_HAVE_KVM_IRQFD
+> > > >    
+> > > > @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops
+> > > > ioeventfd_ops = {
+> > > >    	.destructor = ioeventfd_destructor,
+> > > >    };
+> > > >    
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +/* assumes kvm->slots_lock held */
+> > > > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
+> > > > +			  u64 start, u64 size)
+> > > > +{
+> > > > +	struct _ioeventfd *_p;
+> > > > +
+> > > > +	list_for_each_entry(_p, &kvm->ioeventfds, list)
+> > > > +		if (_p->bus_idx == bus_idx &&
+> > > > +		    overlap(start, size, _p->addr,
+> > > > +			    !_p->length ? 8 : _p->length))
+> > > > +			return true;
+> > > > +
+> > > > +	return false;
+> > > > +}
+> > > > +#endif
+> > > > +
+> > > >    /* assumes kvm->slots_lock held */
+> > > >    static bool
+> > > >    ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd
+> > > > *p)
+> > > > @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm,
+> > > > struct _ioeventfd *p)
+> > > >    		       _p->datamatch == p->datamatch))))
+> > > >    			return true;
+> > > >    
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx ==
+> > > > KVM_PIO_BUS)
+> > > > +		if (kvm_ioregion_collides(kvm, p->bus_idx, p-
+> > > > >addr,
+> > > > +					  !p->length ? 8 : p-
+> > > > >length))
+> > > > +			return true;
+> > > > +#endif
+> > > > +
+> > > >    	return false;
+> > > >    }
+> > > >    
+> > > > diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
+> > > > new file mode 100644
+> > > > index 000000000000..73a621eebae3
+> > > > --- /dev/null
+> > > > +++ b/virt/kvm/eventfd.h
+> > > > @@ -0,0 +1,14 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > > +#ifndef __KVM_EVENTFD_H__
+> > > > +#define __KVM_EVENTFD_H__
+> > > > +
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64
+> > > > start,
+> > > > u64 size);
+> > > > +#else
+> > > > +static inline bool
+> > > > +kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start,
+> > > > u64
+> > > > size)
+> > > > +{
+> > > > +	return false;
+> > > > +}
+> > > > +#endif
+> > > > +#endif
+> > > > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
+> > > > new file mode 100644
+> > > > index 000000000000..a200c3761343
+> > > > --- /dev/null
+> > > > +++ b/virt/kvm/ioregion.c
+> > > > @@ -0,0 +1,233 @@
+> > > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > > +#include <linux/kvm_host.h>
+> > > > +#include <linux/fs.h>
+> > > > +#include <kvm/iodev.h>
+> > > > +#include "eventfd.h"
+> > > > +
+> > > > +void
+> > > > +kvm_ioregionfd_init(struct kvm *kvm)
+> > > > +{
+> > > > +	INIT_LIST_HEAD(&kvm->ioregions_mmio);
+> > > > +	INIT_LIST_HEAD(&kvm->ioregions_pio);
+> > > > +}
+> > > > +
+> > > > +struct ioregion {
+> > > > +	struct list_head     list;
+> > > > +	u64                  paddr;
+> > > > +	u64                  size;
+> > > > +	struct file         *rf;
+> > > > +	struct file         *wf;
+> > > > +	u64                  user_data;
+> > > > +	struct kvm_io_device dev;
+> > > > +	bool                 posted_writes;
+> > > > +};
+> > > > +
+> > > > +static inline struct ioregion *
+> > > > +to_ioregion(struct kvm_io_device *dev)
+> > > > +{
+> > > > +	return container_of(dev, struct ioregion, dev);
+> > > > +}
+> > > > +
+> > > > +/* assumes kvm->slots_lock held */
+> > > > +static void
+> > > > +ioregion_release(struct ioregion *p)
+> > > > +{
+> > > > +	fput(p->rf);
+> > > > +	fput(p->wf);
+> > > > +	list_del(&p->list);
+> > > > +	kfree(p);
+> > > > +}
+> > > > +
+> > > > +static int
+> > > > +ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device
+> > > > *this,
+> > > > gpa_t addr,
+> > > > +	      int len, void *val)
+> > > > +{
+> > > > +	return 0;
+> > > > +}
+> > > > +
+> > > > +static int
+> > > > +ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device
+> > > > *this,
+> > > > gpa_t addr,
+> > > > +		int len, const void *val)
+> > > > +{
+> > > > +	return 0;
+> > > > +}
+> > > > +
+> > > > +/*
+> > > > + * This function is called as KVM is completely shutting
+> > > > down.  We
+> > > > do not
+> > > > + * need to worry about locking just nuke anything we have as
+> > > > quickly as possible
+> > > > + */
+> > > > +static void
+> > > > +ioregion_destructor(struct kvm_io_device *this)
+> > > > +{
+> > > > +	struct ioregion *p = to_ioregion(this);
+> > > > +
+> > > > +	ioregion_release(p);
+> > > > +}
+> > > > +
+> > > > +static const struct kvm_io_device_ops ioregion_ops = {
+> > > > +	.read       = ioregion_read,
+> > > > +	.write      = ioregion_write,
+> > > > +	.destructor = ioregion_destructor,
+> > > > +};
+> > > > +
+> > > > +static inline struct list_head *
+> > > > +get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
+> > > > +{
+> > > > +	return (bus_idx == KVM_MMIO_BUS) ?
+> > > > +		&kvm->ioregions_mmio : &kvm->ioregions_pio;
+> > > > +}
+> > > > +
+> > > > +/* check for not overlapping case and reverse */
+> > > > +inline bool
+> > > > +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
+> > > > +{
+> > > > +	u64 end1 = start1 + size1 - 1;
+> > > > +	u64 end2 = start2 + size2 - 1;
+> > > > +
+> > > > +	return !(end1 < start2 || start1 >= end2);
+> > > > +}
+> > > > +
+> > > > +/* assumes kvm->slots_lock held */
+> > > > +bool
+> > > > +kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
+> > > > +		      u64 start, u64 size)
+> > > > +{
+> > > > +	struct ioregion *_p;
+> > > > +	struct list_head *ioregions;
+> > > > +
+> > > > +	ioregions = get_ioregion_list(kvm, bus_idx);
+> > > > +	list_for_each_entry(_p, ioregions, list)
+> > > > +		if (overlap(start, size, _p->paddr, _p->size))
+> > > > +			return true;
+> > > > +
+> > > > +	return false;
+> > > > +}
+> > > > +
+> > > > +/* assumes kvm->slots_lock held */
+> > > > +static bool
+> > > > +ioregion_collision(struct kvm *kvm, struct ioregion *p, enum
+> > > > kvm_bus bus_idx)
+> > > > +{
+> > > > +	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p-
+> > > > >size) ||
+> > > > +	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p-
+> > > > >size))
+> > > > +		return true;
+> > > > +
+> > > > +	return false;
+> > > > +}
+> > > > +
+> > > > +static enum kvm_bus
+> > > > +get_bus_from_flags(__u32 flags)
+> > > > +{
+> > > > +	if (flags & KVM_IOREGION_PIO)
+> > > > +		return KVM_PIO_BUS;
+> > > > +	return KVM_MMIO_BUS;
+> > > > +}
+> > > > +
+> > > > +int
+> > > > +kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
+> > > > +{
+> > > > +	struct ioregion *p;
+> > > > +	bool is_posted_writes;
+> > > > +	struct file *rfile, *wfile;
+> > > > +	enum kvm_bus bus_idx;
+> > > > +	int ret = 0;
+> > > > +
+> > > > +	if (!args->memory_size)
+> > > > +		return -EINVAL;
+> > > > +	if ((args->guest_paddr + args->memory_size - 1) < args-
+> > > > > guest_paddr)
+> > > > +		return -EINVAL;
+> > > > +	if (args->flags & ~KVM_IOREGION_VALID_FLAG_MASK)
+> > > > +		return -EINVAL;
+> > > > +
+> > > > +	rfile = fget(args->rfd);
+> > > > +	if (!rfile)
+> > > > +		return -EBADF;
+> > > > +	wfile = fget(args->wfd);
+> > > > +	if (!wfile) {
+> > > > +		fput(rfile);
+> > > > +		return -EBADF;
+> > > > +	}
+> > > > +	if ((rfile->f_flags & O_NONBLOCK) || (wfile->f_flags &
+> > > > O_NONBLOCK)) {
+> > > > +		ret = -EINVAL;
+> > > > +		goto fail;
+> > > > +	}
+> > > Instead of checking nonblocking, can we poll here?
+> > > 
+> > Yes, it’s possible. It would be necessary in the case of out-of-
+> > order
+> > requests. But since multiple in-flight messages don’t seem to be a
+> > use
+> > case I’m not sure if it’s necessary. Typically device register
+> > accesses
+> > should not take a long time, so making them asynchronous doesn't
+> > seem
+> > like a practical advantage. Also this might complicate the code and
+> > make it slower. What do you think?
+> 
+> One issue I saw is that, if we register a single fd for e.g two
+> regions. 
+> And those two regions were read in parallel from guest. It looks to
+> me 
+> we don't have any synchronization in the current code.
+> 
+Yes, you are right. That’s why there will be cmds/replies serialization
+in a v2 series.
+
+> 
+> > > > +	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT);
+> > > > +	if (!p) {
+> > > > +		ret = -ENOMEM;
+> > > > +		goto fail;
+> > > > +	}
+> > > > +
+> > > > +	INIT_LIST_HEAD(&p->list);
+> > > > +	p->paddr = args->guest_paddr;
+> > > > +	p->size = args->memory_size;
+> > > > +	p->user_data = args->user_data;
+> > > > +	p->rf = rfile;
+> > > > +	p->wf = wfile;
+> > > > +	is_posted_writes = args->flags &
+> > > > KVM_IOREGION_POSTED_WRITES;
+> > > > +	p->posted_writes = is_posted_writes ? true : false;
+> > > > +	bus_idx = get_bus_from_flags(args->flags);
+> > > > +
+> > > > +	mutex_lock(&kvm->slots_lock);
+> > > > +
+> > > > +	if (ioregion_collision(kvm, p, bus_idx)) {
+> > > > +		ret = -EEXIST;
+> > > > +		goto unlock_fail;
+> > > > +	}
+> > > > +	kvm_iodevice_init(&p->dev, &ioregion_ops);
+> > > > +	ret = kvm_io_bus_register_dev(kvm, bus_idx, p->paddr,
+> > > > p->size,
+> > > > +				      &p->dev);
+> > > > +	if (ret < 0)
+> > > > +		goto unlock_fail;
+> > > We probably need to register to FAST_MMIO when bus_idx is MMIO.
+> > > 
+> > > 
+> > > > +	list_add_tail(&p->list, get_ioregion_list(kvm,
+> > > > bus_idx));
+> > > > +
+> > > > +	mutex_unlock(&kvm->slots_lock);
+> > > > +
+> > > > +	return 0;
+> > > > +
+> > > > +unlock_fail:
+> > > > +	mutex_unlock(&kvm->slots_lock);
+> > > > +	kfree(p);
+> > > > +fail:
+> > > > +	fput(rfile);
+> > > > +	fput(wfile);
+> > > > +
+> > > > +	return ret;
+> > > > +}
+> > > > +
+> > > > +static int
+> > > > +kvm_rm_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
+> > > > +{
+> > > > +	struct ioregion         *p, *tmp;
+> > > > +	enum kvm_bus             bus_idx;
+> > > > +	int                      ret = -ENOENT;
+> > > > +	struct list_head        *ioregions;
+> > > > +
+> > > > +	if (args->rfd != -1 || args->wfd != -1)
+> > > > +		return -EINVAL;
+> > > If we want to use ioregion fd for doorbell, rfd is probably not
+> > > necessary here.
+> > > 
+> > This condition is simply a requirement that region can be deleted
+> > in
+> > the case of both fds are set to -1.
+> 
+> Ok.
+> 
+> Thanks
+> 
+> 
+> > > Thanks
+> > > 
+> > > 
+> > > > +
+> > > > +	bus_idx = get_bus_from_flags(args->flags);
+> > > > +	ioregions = get_ioregion_list(kvm, bus_idx);
+> > > > +
+> > > > +	mutex_lock(&kvm->slots_lock);
+> > > > +
+> > > > +	list_for_each_entry_safe(p, tmp, ioregions, list) {
+> > > > +		if (p->paddr == args->guest_paddr  &&
+> > > > +		    p->size == args->memory_size) {
+> > > > +			kvm_io_bus_unregister_dev(kvm, bus_idx,
+> > > > &p-
+> > > > > dev);
+> > > > +			ioregion_release(p);
+> > > > +			ret = 0;
+> > > > +			break;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > > +	mutex_unlock(&kvm->slots_lock);
+> > > > +
+> > > > +	return ret;
+> > > > +}
+> > > > +
+> > > > +int
+> > > > +kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
+> > > > +{
+> > > > +	if (args->rfd == -1 || args->wfd == -1)
+> > > > +		return kvm_rm_ioregion(kvm, args);
+> > > > +	return kvm_set_ioregion(kvm, args);
+> > > > +}
+> > > > diff --git a/virt/kvm/ioregion.h b/virt/kvm/ioregion.h
+> > > > new file mode 100644
+> > > > index 000000000000..23ffa812ec7a
+> > > > --- /dev/null
+> > > > +++ b/virt/kvm/ioregion.h
+> > > > @@ -0,0 +1,15 @@
+> > > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > > +#ifndef __KVM_IOREGION_H__
+> > > > +#define __KVM_IOREGION_H__
+> > > > +
+> > > > +#ifdef CONFIG_KVM_IOREGION
+> > > > +inline bool overlap(u64 start1, u64 size1, u64 start2, u64
+> > > > size2);
+> > > > +bool kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64
+> > > > start, u64 size);
+> > > > +#else
+> > > > +static inline bool
+> > > > +kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start,
+> > > > u64
+> > > > size)
+> > > > +{
+> > > > +	return false;
+> > > > +}
+> > > > +#endif
+> > > > +#endif
+> > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > > index 2541a17ff1c4..385d8ec6350d 100644
+> > > > --- a/virt/kvm/kvm_main.c
+> > > > +++ b/virt/kvm/kvm_main.c
+> > > > @@ -747,6 +747,7 @@ static struct kvm *kvm_create_vm(unsigned
+> > > > long
+> > > > type)
+> > > >    	mmgrab(current->mm);
+> > > >    	kvm->mm = current->mm;
+> > > >    	kvm_eventfd_init(kvm);
+> > > > +	kvm_ioregionfd_init(kvm);
+> > > >    	mutex_init(&kvm->lock);
+> > > >    	mutex_init(&kvm->irq_lock);
+> > > >    	mutex_init(&kvm->slots_lock);
+> > > > @@ -3708,6 +3709,16 @@ static long kvm_vm_ioctl(struct file
+> > > > *filp,
+> > > >    		r = kvm_vm_ioctl_set_memory_region(kvm,
+> > > > &kvm_userspace_mem);
+> > > >    		break;
+> > > >    	}
+> > > > +	case KVM_SET_IOREGION: {
+> > > > +		struct kvm_ioregion data;
+> > > > +
+> > > > +		r = -EFAULT;
+> > > > +		if (copy_from_user(&data, argp, sizeof(data)))
+> > > > +			goto out;
+> > > > +
+> > > > +		r = kvm_ioregionfd(kvm, &data);
+> > > > +		break;
+> > > > +	}
+> > > >    	case KVM_GET_DIRTY_LOG: {
+> > > >    		struct kvm_dirty_log log;
+> > > >    
+> > > > @@ -4301,9 +4312,12 @@ int kvm_io_bus_register_dev(struct kvm
+> > > > *kvm,
+> > > > enum kvm_bus bus_idx, gpa_t addr,
+> > > >    	if (!bus)
+> > > >    		return -ENOMEM;
+> > > >    
+> > > > -	/* exclude ioeventfd which is limited by maximum fd */
+> > > > -	if (bus->dev_count - bus->ioeventfd_count >
+> > > > NR_IOBUS_DEVS - 1)
+> > > > -		return -ENOSPC;
+> > > > +	/* enforce hard limit if kmemcg is disabled and
+> > > > +	 * exclude ioeventfd which is limited by maximum fd
+> > > > +	 */
+> > > > +	if (!memcg_kmem_enabled())
+> > > > +		if (bus->dev_count - bus->ioeventfd_count >
+> > > > NR_IOBUS_DEVS - 1)
+> > > > +			return -ENOSPC;
+> > > >    
+> > > >    	new_bus = kmalloc(struct_size(bus, range, bus-
+> > > > >dev_count + 1),
+> > > >    			  GFP_KERNEL_ACCOUNT);
+
