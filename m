@@ -2,68 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77A4A2EA733
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 10:24:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9997E2EA73E
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 10:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727942AbhAEJXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 04:23:36 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9715 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725860AbhAEJXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 04:23:34 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D96Sc6ynhzl16w;
-        Tue,  5 Jan 2021 17:21:36 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 5 Jan 2021 17:22:38 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-CC:     Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "James Morse" <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [PATCH] arm64/smp: Remove unused variable irq in arch_show_interrupts()
-Date:   Tue, 5 Jan 2021 17:22:21 +0800
-Message-ID: <20210105092221.15144-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+        id S1727752AbhAEJZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 04:25:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48224 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726394AbhAEJZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 04:25:55 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E3B9620756;
+        Tue,  5 Jan 2021 09:25:13 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kwiaV-005Oa8-O2; Tue, 05 Jan 2021 09:25:11 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Tue, 05 Jan 2021 09:25:11 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shenming Lu <lushenming@huawei.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v2 3/4] KVM: arm64: GICv4.1: Restore VLPI's pending
+ state to physical side
+In-Reply-To: <20210104081613.100-4-lushenming@huawei.com>
+References: <20210104081613.100-1-lushenming@huawei.com>
+ <20210104081613.100-4-lushenming@huawei.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <76a7b9cca485dc8157d3be53189eac69@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The local variable irq is added in commit a26388152531 ("arm64:
-Remove custom IRQ stat accounting"), but forget to remove in
-commit 5089bc51f81f ("arm64/smp: Use irq_desc_kstat_cpu() in
-arch_show_interrupts()"). Just remove it.
+On 2021-01-04 08:16, Shenming Lu wrote:
+> From: Zenghui Yu <yuzenghui@huawei.com>
+> 
+> When setting the forwarding path of a VLPI (switch to the HW mode),
+> we could also transfer the pending state from irq->pending_latch to
+> VPT (especially in migration, the pending states of VLPIs are restored
+> into kvm’s vgic first). And we currently send "INT+VSYNC" to trigger
+> a VLPI to pending.
+> 
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v4.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v4.c 
+> b/arch/arm64/kvm/vgic/vgic-v4.c
+> index f211a7c32704..7945d6d09cdd 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v4.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v4.c
+> @@ -454,6 +454,18 @@ int kvm_vgic_v4_set_forwarding(struct kvm *kvm, 
+> int virq,
+>  	irq->host_irq	= virq;
+>  	atomic_inc(&map.vpe->vlpi_count);
+> 
+> +	/* Transfer pending state */
+> +	ret = irq_set_irqchip_state(irq->host_irq,
+> +				    IRQCHIP_STATE_PENDING,
+> +				    irq->pending_latch);
+> +	WARN_RATELIMIT(ret, "IRQ %d", irq->host_irq);
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- arch/arm64/kernel/smp.c | 1 -
- 1 file changed, 1 deletion(-)
+Why do this if pending_latch is 0, which is likely to be
+the overwhelming case?
 
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index 6bc3a3698c3d..376343d6f13a 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -807,7 +807,6 @@ int arch_show_interrupts(struct seq_file *p, int prec)
- 	unsigned int cpu, i;
- 
- 	for (i = 0; i < NR_IPI; i++) {
--		unsigned int irq = irq_desc_get_irq(ipi_desc[i]);
- 		seq_printf(p, "%*s%u:%s", prec - 1, "IPI", i,
- 			   prec >= 4 ? " " : "");
- 		for_each_online_cpu(cpu)
+> +
+> +	/*
+> +	 * Let it be pruned from ap_list later and don't bother
+> +	 * the List Register.
+> +	 */
+> +	irq->pending_latch = false;
+
+What guarantees the pruning? Pruning only happens on vcpu exit,
+which means we may have the same interrupt via both the LR and
+the stream interface, which I don't believe is legal (it is
+like having two LRs holding the same interrupt).
+
+> +
+>  out:
+>  	mutex_unlock(&its->its_lock);
+>  	return ret;
+
+Thanks,
+
+         M.
 -- 
-2.19.1
-
+Jazz is not dead. It just smells funny...
