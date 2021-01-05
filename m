@@ -2,150 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED16C2EAA18
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 12:41:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 024682EAA29
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 12:49:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729750AbhAELk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 06:40:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43966 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729744AbhAELk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 06:40:57 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 017BB22286;
-        Tue,  5 Jan 2021 11:40:16 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1kwkhB-005Q61-Lt; Tue, 05 Jan 2021 11:40:14 +0000
+        id S1729793AbhAELsz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 06:48:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37597 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729791AbhAELsz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Jan 2021 06:48:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609847248;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ClUuOmIXrBPfDVSqFPOKOMOGcWLMSgCQAXE3Y+wG7Kk=;
+        b=ZWDD9FszUOnwQTKvzWU1znMZIiz+tnk7RF5XbM7effrG2DN3XjDobLYuxF52q7XH2RGvGQ
+        62SvimLkgbWHKG59ZxzQ5C6RAR5z80LdjIW36mz9yirum3kor3QlMsbel+cTTMItXzEAHA
+        r6htS17d+F1+TCFKPdkcYz9uTUL79VU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-EJkwCziqPrG0DoQtqa5jUw-1; Tue, 05 Jan 2021 06:47:26 -0500
+X-MC-Unique: EJkwCziqPrG0DoQtqa5jUw-1
+Received: by mail-wr1-f70.google.com with SMTP id d2so14669202wrr.5
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 03:47:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ClUuOmIXrBPfDVSqFPOKOMOGcWLMSgCQAXE3Y+wG7Kk=;
+        b=d7fviAjnCzqs96mu4aPie09MF3TiulV0geUkpEmmy6yuPf1+kwUCWUhuODmD3ZdSaA
+         dzf6hVH+TmvhAvx0hKtaJLyT1kaO8wYhLkCr8RmWilTGNgXpuOKXswRrSZI0yB/l+HR3
+         G3ysIERufMbzOCxvkLHPTWEc2A8VxKYtCEn0ayJHtsdq7WKy+SvWpl7IGViiMrMo2i9c
+         udoLep7SNJ9tURYDSdRzC+MI8noGcaqfkzqPMzhA8J1PHvTLtMy2t8CT1GzUGJjF9n/b
+         B0SxBIJ/ZUrSgMmzMa2SPHqkPDhuSnPFtm7lFn3IRsJAIYkdc1m/yhmrDyMIphsd2V9C
+         2fvA==
+X-Gm-Message-State: AOAM533KCbN49Y+BItZGbYKN72k/XXCzR5AkR+I2NImf44OttjeW9VaU
+        TyHSBzgzX8xxz8VV/FwVwf10jsoIUxaH9q/iaYC3BOmVmkfr8vY+aEtcSG1YvAkjgMg7szjl4bx
+        P0UNzQUbrQua7
+X-Received: by 2002:adf:f891:: with SMTP id u17mr85387365wrp.253.1609847245441;
+        Tue, 05 Jan 2021 03:47:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx9I904n6T6jfhAhM0sgcAhzqezyiAlcELO+BwqoCvvPl9Z7tOkscAOuPKTxJP3uSvTmSjxlw==
+X-Received: by 2002:adf:f891:: with SMTP id u17mr85387347wrp.253.1609847245243;
+        Tue, 05 Jan 2021 03:47:25 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id f77sm3622230wmf.42.2021.01.05.03.47.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Jan 2021 03:47:24 -0800 (PST)
+Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
+To:     Yang Zhong <yang.zhong@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, bp@alien8.de
+Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        tony.luck@intel.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        kyung.min.park@intel.com, x86@kernel.org
+References: <20210105004909.42000-1-yang.zhong@intel.com>
+ <20210105004909.42000-2-yang.zhong@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
+Date:   Tue, 5 Jan 2021 12:47:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 05 Jan 2021 11:40:13 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Shenming Lu <lushenming@huawei.com>
-Cc:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v2 2/4] KVM: arm64: GICv4.1: Try to save hw pending
- state in save_pending_tables
-In-Reply-To: <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
-References: <20210104081613.100-1-lushenming@huawei.com>
- <20210104081613.100-3-lushenming@huawei.com>
- <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <6f09084b32e239176b3f9b4b00874a51@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20210105004909.42000-2-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-01-05 09:13, Marc Zyngier wrote:
-> On 2021-01-04 08:16, Shenming Lu wrote:
->> After pausing all vCPUs and devices capable of interrupting, in order
->> to save the information of all interrupts, besides flushing the 
->> pending
->> states in kvm’s vgic, we also try to flush the states of VLPIs in the
->> virtual pending tables into guest RAM, but we need to have GICv4.1 and
->> safely unmap the vPEs first.
->> 
->> Signed-off-by: Shenming Lu <lushenming@huawei.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-v3.c | 58 
->> +++++++++++++++++++++++++++++++----
->>  1 file changed, 52 insertions(+), 6 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c 
->> b/arch/arm64/kvm/vgic/vgic-v3.c
->> index 9cdf39a94a63..a58c94127cb0 100644
->> --- a/arch/arm64/kvm/vgic/vgic-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
->> @@ -1,6 +1,8 @@
->>  // SPDX-License-Identifier: GPL-2.0-only
->> 
->>  #include <linux/irqchip/arm-gic-v3.h>
->> +#include <linux/irq.h>
->> +#include <linux/irqdomain.h>
->>  #include <linux/kvm.h>
->>  #include <linux/kvm_host.h>
->>  #include <kvm/arm_vgic.h>
->> @@ -356,6 +358,38 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
->> *kvm, struct vgic_irq *irq)
->>  	return 0;
->>  }
->> 
->> +/*
->> + * The deactivation of the doorbell interrupt will trigger the
->> + * unmapping of the associated vPE.
->> + */
->> +static void unmap_all_vpes(struct vgic_dist *dist)
->> +{
->> +	struct irq_desc *desc;
->> +	int i;
->> +
->> +	if (!kvm_vgic_global_state.has_gicv4_1)
->> +		return;
->> +
->> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
->> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
->> +		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
->> +	}
->> +}
->> +
->> +static void map_all_vpes(struct vgic_dist *dist)
->> +{
->> +	struct irq_desc *desc;
->> +	int i;
->> +
->> +	if (!kvm_vgic_global_state.has_gicv4_1)
->> +		return;
->> +
->> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
->> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
->> +		irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
->> +	}
->> +}
->> +
->>  /**
->>   * vgic_v3_save_pending_tables - Save the pending tables into guest 
->> RAM
->>   * kvm lock and all vcpu lock must be held
->> @@ -365,14 +399,18 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
->>  	struct vgic_dist *dist = &kvm->arch.vgic;
->>  	struct vgic_irq *irq;
->>  	gpa_t last_ptr = ~(gpa_t)0;
->> -	int ret;
->> +	int ret = 0;
->>  	u8 val;
->> 
->> +	/* As a preparation for getting any VLPI states. */
->> +	unmap_all_vpes(dist);
+On 05/01/21 01:49, Yang Zhong wrote:
+> From: Kyung Min Park <kyung.min.park@intel.com>
 > 
-> What if the VPEs are not mapped yet? Is it possible to snapshot a VM
-> that has not run at all?
+> Add AVX version of the Vector Neural Network (VNNI) Instructions.
+> 
+> A processor supports AVX VNNI instructions if CPUID.0x07.0x1:EAX[4] is
+> present. The following instructions are available when this feature is
+> present.
+>    1. VPDPBUS: Multiply and Add Unsigned and Signed Bytes
+>    2. VPDPBUSDS: Multiply and Add Unsigned and Signed Bytes with Saturation
+>    3. VPDPWSSD: Multiply and Add Signed Word Integers
+>    4. VPDPWSSDS: Multiply and Add Signed Integers with Saturation
+> 
+> The only in-kernel usage of this is kvm passthrough. The CPU feature
+> flag is shown as "avx_vnni" in /proc/cpuinfo.
+> 
+> This instruction is currently documented in the latest "extensions"
+> manual (ISE). It will appear in the "main" manual (SDM) in the future.
+> 
+> Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> Reviewed-by: Tony Luck <tony.luck@intel.com>
+> ---
+>   arch/x86/include/asm/cpufeatures.h | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index f5ef2d5b9231..d10d9962bd9b 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -293,6 +293,7 @@
+>   #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
+>   
+>   /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+> +#define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+>   #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
+>   
+>   /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
+> 
 
-More questions: what happens to vSGIs that were mapped to the VPEs?
-Can they safely be restarted? The spec is not saying much on the 
-subject.
+Boris, is it possible to have a topic branch for this patch?
 
-Once the unmap has taken place, it won't be possible to read their state
-via GICR_VSGIRPEND, and only the memory state can be used. This probably
-needs to be tracked as well.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
