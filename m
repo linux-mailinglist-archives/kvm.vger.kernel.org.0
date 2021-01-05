@@ -2,195 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4497A2EB655
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 00:37:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D45BE2EB658
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 00:39:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbhAEXfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 18:35:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1046 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725838AbhAEXfp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Jan 2021 18:35:45 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 105NWv8v131611;
-        Tue, 5 Jan 2021 18:34:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- message-id : reply-to : references : mime-version : content-type :
- in-reply-to : subject; s=pp1;
- bh=SEMgVBXBgS8oXklCCsiQh4hDhP2dBEwhEUJwWn9ZcM8=;
- b=m3pIleuvatum4n0oqf4UYyqBb+lxrXdMpmLe3vQsgIIXlu5/rt4vHe2BTsvymRf0WeFD
- Yr3lAGQmCi5sjbuhpqFdcWwny72tvZG6lCGPutgKY2PzTkmwrmMHsXb8kRQaK/6KuImY
- PtU06cAcSz1eAVBPxBFLqjJtoOJ7YGrgUs8hqC+O2Pa/LmTinplzz0uOZmexEyDD4Sux
- WPSehLdUi8UCFLRXJ/zg84o+NcwkQpX5MAgAn+qogPUW8OF5yLEqNRWK7qryio6wBIg0
- tLciWKgnPK4Y7vU89/8a/LpSxngO2YxMiqVT19NtVBLhZ7PmpOq23olKLXC9bcrRIgSi ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35w1rag58t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 18:34:49 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 105NYnrd135879;
-        Tue, 5 Jan 2021 18:34:49 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 35w1rag58d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 18:34:49 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 105NW66K004358;
-        Tue, 5 Jan 2021 23:34:47 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 35u3pmjq9x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 05 Jan 2021 23:34:47 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 105NYfEo31457672
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 5 Jan 2021 23:34:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9F7D4C052;
-        Tue,  5 Jan 2021 23:34:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B18E54C04A;
-        Tue,  5 Jan 2021 23:34:40 +0000 (GMT)
-Received: from ram-ibm-com.ibm.com (unknown [9.163.29.145])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue,  5 Jan 2021 23:34:40 +0000 (GMT)
-Date:   Tue, 5 Jan 2021 15:34:38 -0800
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
-        thuth@redhat.com, cohuck@redhat.com, berrange@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
-        mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
-        rth@twiddle.net
-Message-ID: <20210105233438.GB22585@ram-ibm-com.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-11-david@gibson.dropbear.id.au>
+        id S1726049AbhAEXjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 18:39:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58546 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbhAEXjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 18:39:04 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E096C061793
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 15:38:24 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id u12so1430894ilv.3
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 15:38:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SsxI/LAwtO/bx2buEvRVyl52jPyp0BQhf9Sqjo4vgY4=;
+        b=LbkNuAxlye2AIUfs3jL8sQPAiMTLjh9g89vq4QTv9XPoEZo8fpl71CdgQ0MWV9Sau1
+         YC1lgMUWCuhr5g5b1lONvM5iqEfC+iFtgKzNdte0suDix5oMraeaCA+u/bPK2USTxygB
+         Brf/ptbyjfbja1gJ24LSP0kT4hXze5w4fV2h7yEmrK+GKYVWG/adXDSB2krrvqSzFBGM
+         lf0goeMMxJuFqNOPNDnpo5AqhiBwtjv8MCtTZIUZbdr2VJzOva18LpB4ALdOXzfZ3WQC
+         32LMT/zJQSTKfR4TJbBMgSctb1Ps4Kulf4JDVPF/NKMvTodgN0RKMZN5pTAY6Ms9C65W
+         XtYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SsxI/LAwtO/bx2buEvRVyl52jPyp0BQhf9Sqjo4vgY4=;
+        b=NfuecaoqxPNbS423yOW3Ug9YOqN6ycsjHJwMcaaErUlNlQ0SpEf3tGM7MU2MN0sY6r
+         3XblfEwscd3YFCbP2dMpStQDVtObNR3m8RQiNf0iHcMSqE3Wi7PYNfPpF7AB3JAMW6Uo
+         qVQDR9RgfwS19+5p59jrvUcsD1bpKmJPfrUTLcBZKkKlHhnvRrk/FtYhCWJ7VfvmDlG0
+         JX6ZO3Pb8Gq177vVg49/5PZBIJ79qzbPm990Zx4rHKUwojr9V9TUi6/MsV+98PZD/ZPE
+         +yuMXPsyBvstvt0yJeoif50ncQhEIyJwFivWWFZmWipRC2pdCfvV7lW3HIB0WDwZpw/X
+         MjIQ==
+X-Gm-Message-State: AOAM531ps+puM02bcN0/iXxM2hY03kheTZiPSjS/ciVOSZTPpda5xpSA
+        fiJCdOrnLs/Ik0PSLy/2o4fRwpvLQ7pFSPyy2jLDhP2mTpjH4w==
+X-Google-Smtp-Source: ABdhPJw/+4uGNL1y32X1cAE8EqL2gDZpLyzCMOoGvOlSEaU2KP0Ei/vOb9MIYb4iw8CLjupa5ZZ+vVcHjrT78MbDYDs=
+X-Received: by 2002:a05:6e02:f93:: with SMTP id v19mr1908740ilo.154.1609889903542;
+ Tue, 05 Jan 2021 15:38:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201204054415.579042-11-david@gibson.dropbear.id.au>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-Subject: Re:  [for-6.0 v5 10/13] spapr: Add PEF based securable guest memory
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-05_09:2021-01-05,2021-01-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 mlxscore=0 suspectscore=0
- adultscore=0 impostorscore=0 clxscore=1015 mlxlogscore=999 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101050134
+References: <20210105233136.2140335-1-bgardon@google.com> <20210105233136.2140335-2-bgardon@google.com>
+In-Reply-To: <20210105233136.2140335-2-bgardon@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 5 Jan 2021 15:38:12 -0800
+Message-ID: <CANgfPd8TXa3GG4mQ7MD0wBrUOTdRDeR0z50uDmbcR88rQMn5FQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kvm: x86/mmu: Ensure TDP MMU roots are freed after yield
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Leo Hou <leohou1402@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 04, 2020 at 04:44:12PM +1100, David Gibson wrote:
-> Some upcoming POWER machines have a system called PEF (Protected
-> Execution Facility) which uses a small ultravisor to allow guests to
-> run in a way that they can't be eavesdropped by the hypervisor.  The
-> effect is roughly similar to AMD SEV, although the mechanisms are
-> quite different.
-> 
-> Most of the work of this is done between the guest, KVM and the
-> ultravisor, with little need for involvement by qemu.  However qemu
-> does need to tell KVM to allow secure VMs.
-> 
-> Because the availability of secure mode is a guest visible difference
-> which depends on having the right hardware and firmware, we don't
-> enable this by default.  In order to run a secure guest you need to
-> create a "pef-guest" object and set the securable-guest-memory machine
-> property to point to it.
-> 
-> Note that this just *allows* secure guests, the architecture of PEF is
-> such that the guest still needs to talk to the ultravisor to enter
-> secure mode.  Qemu has no directl way of knowing if the guest is in
-> secure mode, and certainly can't know until well after machine
-> creation time.
-> 
-> To start a PEF-capable guest, use the command line options:
->     -object pef-guest,id=pef0 -machine securable-guest-memory=pef0
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> Acked-by: Ram Pai <linuxram@us.ibm.com>
+On Tue, Jan 5, 2021 at 3:31 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> Many TDP MMU functions which need to perform some action on all TDP MMU
+> roots hold a reference on that root so that they can safely drop the MMU
+> lock in order to yield to other threads. However, when releasing the
+> reference on the root, there is a bug: the root will not be freed even
+> if its reference count (root_count) is reduced to 0. Ensure that these
+> roots are properly freed.
+>
+> Reported-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Fixes: faaf05b00aec ("kvm: x86/mmu: Support zapping SPTEs in the TDP MMU")
+> Fixes: 063afacd8730 ("kvm: x86/mmu: Support invalidate range MMU notifier for TDP MMU")
+> Fixes: a6a0b05da9f3 ("kvm: x86/mmu: Support dirty logging for the TDP MMU")
+> Fixes: 14881998566d ("kvm: x86/mmu: Support disabling dirty logging for the tdp MMU")
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
->  hw/ppc/meson.build   |   1 +
->  hw/ppc/pef.c         | 115 +++++++++++++++++++++++++++++++++++++++++++
->  hw/ppc/spapr.c       |  10 ++++
->  include/hw/ppc/pef.h |  26 ++++++++++
->  target/ppc/kvm.c     |  18 -------
->  target/ppc/kvm_ppc.h |   6 ---
->  6 files changed, 152 insertions(+), 24 deletions(-)
->  create mode 100644 hw/ppc/pef.c
->  create mode 100644 include/hw/ppc/pef.h
-> 
-> diff --git a/hw/ppc/meson.build b/hw/ppc/meson.build
-> index ffa2ec37fa..218631c883 100644
-> --- a/hw/ppc/meson.build
-> +++ b/hw/ppc/meson.build
-> @@ -27,6 +27,7 @@ ppc_ss.add(when: 'CONFIG_PSERIES', if_true: files(
->    'spapr_nvdimm.c',
->    'spapr_rtas_ddw.c',
->    'spapr_numa.c',
-> +  'pef.c',
->  ))
->  ppc_ss.add(when: 'CONFIG_SPAPR_RNG', if_true: files('spapr_rng.c'))
->  ppc_ss.add(when: ['CONFIG_PSERIES', 'CONFIG_LINUX'], if_true: files(
-> diff --git a/hw/ppc/pef.c b/hw/ppc/pef.c
-> new file mode 100644
-> index 0000000000..3ae3059cfe
-> --- /dev/null
-> +++ b/hw/ppc/pef.c
-> @@ -0,0 +1,115 @@
-> +/*
-> + * PEF (Protected Execution Facility) for POWER support
-> + *
-> + * Copyright David Gibson, Redhat Inc. 2020
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "qapi/error.h"
-> +#include "qom/object_interfaces.h"
-> +#include "sysemu/kvm.h"
-> +#include "migration/blocker.h"
-> +#include "exec/securable-guest-memory.h"
-> +#include "hw/ppc/pef.h"
-> +
-> +#define TYPE_PEF_GUEST "pef-guest"
-> +#define PEF_GUEST(obj)                                  \
-> +    OBJECT_CHECK(PefGuestState, (obj), TYPE_PEF_GUEST)
-> +
-> +typedef struct PefGuestState PefGuestState;
-> +
-> +/**
-> + * PefGuestState:
-> + *
-> + * The PefGuestState object is used for creating and managing a PEF
-> + * guest.
-> + *
-> + * # $QEMU \
-> + *         -object pef-guest,id=pef0 \
-> + *         -machine ...,securable-guest-memory=pef0
-> + */
-> +struct PefGuestState {
-> +    Object parent_obj;
-> +};
-> +
-> +#ifdef CONFIG_KVM
-> +static int kvmppc_svm_init(Error **errp)
+>  arch/x86/kvm/mmu/tdp_mmu.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 75db27fda8f3..5ec6fae36e33 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -83,6 +83,12 @@ void kvm_tdp_mmu_free_root(struct kvm *kvm, struct kvm_mmu_page *root)
+>         kmem_cache_free(mmu_page_header_cache, root);
+>  }
+>
+> +static void tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
 > +{
-> +    if (!kvm_check_extension(kvm_state, KVM_CAP_PPC_SECURABLE_GUEST)) {
-                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
-KVM defines this macro as KVM_CAP_PPC_SECURE_GUEST. Unless we patch KVM,
-    we are stuck with KVM_CAP_PPC_SECURE_GUEST.
+> +       if (kvm_mmu_put_root(kvm, root))
+> +               kvm_tdp_mmu_free_root(kvm, root);
+> +}
+> +
+>  static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
+>                                                    int level)
+>  {
+> @@ -456,7 +462,7 @@ bool kvm_tdp_mmu_zap_gfn_range(struct kvm *kvm, gfn_t start, gfn_t end)
+>
+>                 flush |= zap_gfn_range(kvm, root, start, end, true);
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>
+>         return flush;
+> @@ -648,7 +654,7 @@ static int kvm_tdp_mmu_handle_hva_range(struct kvm *kvm, unsigned long start,
+>                                        gfn_end, data);
+>                 }
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>
+>         return ret;
+> @@ -852,7 +858,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm, struct kvm_memory_slot *slot,
+>                 spte_set |= wrprot_gfn_range(kvm, root, slot->base_gfn,
+>                              slot->base_gfn + slot->npages, min_level);
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>
+>         return spte_set;
+> @@ -920,7 +926,7 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>                 spte_set |= clear_dirty_gfn_range(kvm, root, slot->base_gfn,
+>                                 slot->base_gfn + slot->npages);
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>
+>         return spte_set;
+> @@ -1043,7 +1049,7 @@ bool kvm_tdp_mmu_slot_set_dirty(struct kvm *kvm, struct kvm_memory_slot *slot)
+>                 spte_set |= set_dirty_gfn_range(kvm, root, slot->base_gfn,
+>                                 slot->base_gfn + slot->npages);
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>         return spte_set;
+>  }
+> @@ -1103,7 +1109,7 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+>                 zap_collapsible_spte_range(kvm, root, slot->base_gfn,
+>                                            slot->base_gfn + slot->npages);
+>
+> -               kvm_mmu_put_root(kvm, root);
+> +               tdp_mmu_put_root(kvm, root);
+>         }
+>  }
+>
+> --
+> 2.29.2.729.g45daf8777d-goog
+>
 
-RP
++Sean Christopherson, for whom I used a stale email address.
+.
+I tested this series by running kvm-unit-tests on an Intel Skylake
+machine. It did not introduce any new failures. I also ran the
+set_memory_region_test, but was unable to reproduce Maciej's problem.
+Maciej, if you'd be willing to confirm this series solves the problem
+you observed, or provide more details on the setup in which you
+observed it, I'd appreciate it.
