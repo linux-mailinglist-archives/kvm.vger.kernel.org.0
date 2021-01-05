@@ -2,172 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29D482EAA9C
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 13:25:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C4452EAB74
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 14:04:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727995AbhAEMZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 07:25:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726602AbhAEMZk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 07:25:40 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91333C061798
-        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 04:24:31 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id c133so2842232wme.4
-        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 04:24:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=95fcQ7XOzwxPXY92PHMXKGjY9iDFTd+3y3erYQ9GO9s=;
-        b=iIG6RHpaEDCYDyHHaHHz5lfqneKL//162o6PaecyRMmpgqZZ5U5KUefBSFTnAGQi+R
-         wqietjz3diqRGXleLo4HCy0fTHlUgUBSZ4kHjhT65Nrx9ckCvaqjWiDAqKCGMvNJos72
-         fPOOnFKHjb9+rYcHOI6J73EafrnWkxZU1e+hM9c7kYg0Toh/jOYpWM9uSN1ePIsrOHdQ
-         ZCB3nB0ECeEsFGdMh4nMnogIcT9zPeiTwG9At5oUkqW627rO+LCZZ1f9ZYn22xH+RxoJ
-         qFBXGavyiC+ex0VSFxq+Y2baqg2Rfx1Fg6DMT1atmtOGPJ3aA/f8Z+CK2b3XcEvT/QXR
-         SM4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=95fcQ7XOzwxPXY92PHMXKGjY9iDFTd+3y3erYQ9GO9s=;
-        b=t9YbfKSVj67zLLNnlW3jgERUSrl2UaT3/8WMOvFnqlKfNaOrsMYq1OKuC7wGGkTT5s
-         CUJZvkDSyZ5EQYEV1Bb4DIkA4CARbz9p/1KuqwhJ5BmsLvf4UO7CbPTv0nllXJGZ5bYJ
-         4CQVG1c3UgGT6JZTZeuPssuEl3FTYKf0Tm94Gw5N1GaCBrh9QKexi80N+z3P009xgtK4
-         yvDh0uh55tJw+pC81oFW4IndtHuLmmklze/qlWGKKzCodTFJC4EbV/XEuPLAsU2uLHIC
-         kohHFV6Z/f3FHfyZXnccwTD52q73fYey91KblV8hBAZmSFovxVj93MAHRloEuqEApEoo
-         hhEQ==
-X-Gm-Message-State: AOAM5301sJuC4E42t2cFnYPj9DpEhtHZy5fGwmkhpHu8ZLsDswWm2QnT
-        es0ZR434axHA8LjwamSWu1ltQA==
-X-Google-Smtp-Source: ABdhPJzorTi7ks7HQy2lPJ0gpjzOHvfFV47zjsVnH3IZt0rAIvgZ6KHOYmU//Cm9oLOW/QQz86qGVg==
-X-Received: by 2002:a1c:9c52:: with SMTP id f79mr3233640wme.3.1609849470379;
-        Tue, 05 Jan 2021 04:24:30 -0800 (PST)
-Received: from f2.redhat.com (bzq-79-183-72-147.red.bezeqint.net. [79.183.72.147])
-        by smtp.gmail.com with ESMTPSA id 138sm4242281wma.41.2021.01.05.04.24.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 05 Jan 2021 04:24:29 -0800 (PST)
-From:   Yuri Benditovich <yuri.benditovich@daynix.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-Cc:     yan@daynix.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/7] vhost: support for hash report virtio-net feature
-Date:   Tue,  5 Jan 2021 14:24:11 +0200
-Message-Id: <20210105122416.16492-3-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210105122416.16492-1-yuri.benditovich@daynix.com>
-References: <20210105122416.16492-1-yuri.benditovich@daynix.com>
+        id S1730492AbhAENDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 08:03:39 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:10389 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729689AbhAENDi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 08:03:38 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4D9CLp3N5yz7QY8;
+        Tue,  5 Jan 2021 21:01:54 +0800 (CST)
+Received: from [10.174.184.196] (10.174.184.196) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 5 Jan 2021 21:02:38 +0800
+Subject: Re: [RFC PATCH v2 2/4] KVM: arm64: GICv4.1: Try to save hw pending
+ state in save_pending_tables
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210104081613.100-1-lushenming@huawei.com>
+ <20210104081613.100-3-lushenming@huawei.com>
+ <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <0fa19ab1-60ba-9067-e1aa-ee78191c52ed@huawei.com>
+Date:   Tue, 5 Jan 2021 21:02:26 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
+MIME-Version: 1.0
+In-Reply-To: <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.184.196]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to the virtio specification if VIRTIO_NET_F_HASH_REPORT
-feature acked the virtio-net header is extended to hold the hash
-value and hash report type.
+On 2021/1/5 17:13, Marc Zyngier wrote:
+> On 2021-01-04 08:16, Shenming Lu wrote:
+>> After pausing all vCPUs and devices capable of interrupting, in order
+>> to save the information of all interrupts, besides flushing the pending
+>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
+>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
+>> safely unmap the vPEs first.
+>>
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-v3.c | 58 +++++++++++++++++++++++++++++++----
+>>  1 file changed, 52 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 9cdf39a94a63..a58c94127cb0 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -1,6 +1,8 @@
+>>  // SPDX-License-Identifier: GPL-2.0-only
+>>
+>>  #include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/irq.h>
+>> +#include <linux/irqdomain.h>
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -356,6 +358,38 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
+>> *kvm, struct vgic_irq *irq)
+>>      return 0;
+>>  }
+>>
+>> +/*
+>> + * The deactivation of the doorbell interrupt will trigger the
+>> + * unmapping of the associated vPE.
+>> + */
+>> +static void unmap_all_vpes(struct vgic_dist *dist)
+>> +{
+>> +    struct irq_desc *desc;
+>> +    int i;
+>> +
+>> +    if (!kvm_vgic_global_state.has_gicv4_1)
+>> +        return;
+>> +
+>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +        irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+>> +    }
+>> +}
+>> +
+>> +static void map_all_vpes(struct vgic_dist *dist)
+>> +{
+>> +    struct irq_desc *desc;
+>> +    int i;
+>> +
+>> +    if (!kvm_vgic_global_state.has_gicv4_1)
+>> +        return;
+>> +
+>> +    for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +        desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +        irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
+>> +    }
+>> +}
+>> +
+>>  /**
+>>   * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
+>>   * kvm lock and all vcpu lock must be held
+>> @@ -365,14 +399,18 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>      struct vgic_dist *dist = &kvm->arch.vgic;
+>>      struct vgic_irq *irq;
+>>      gpa_t last_ptr = ~(gpa_t)0;
+>> -    int ret;
+>> +    int ret = 0;
+>>      u8 val;
+>>
+>> +    /* As a preparation for getting any VLPI states. */
+>> +    unmap_all_vpes(dist);
+> 
+> What if the VPEs are not mapped yet? Is it possible to snapshot a VM
+> that has not run at all?
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- drivers/vhost/net.c | 37 +++++++++++++++++++++++++++++--------
- 1 file changed, 29 insertions(+), 8 deletions(-)
+What I see in QEMU is that the saving of the pending tables would only be
+called when stopping the VM and it needs the current VM state to be RUNNING.
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 531a00d703cd..31a894b9a992 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,7 +73,8 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			 (1ULL << VIRTIO_F_ACCESS_PLATFORM)
-+			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT)
- };
- 
- enum {
-@@ -1108,14 +1109,16 @@ static void handle_rx(struct vhost_net *net)
- 		.msg_controllen = 0,
- 		.msg_flags = MSG_DONTWAIT,
- 	};
--	struct virtio_net_hdr hdr = {
--		.flags = 0,
--		.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+	struct virtio_net_hdr_v1_hash hdrv1 = {
-+		{
-+			.flags = 0,
-+			.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+		}
- 	};
- 	size_t total_len = 0;
- 	int err, mergeable;
- 	s16 headcount;
--	size_t vhost_hlen, sock_hlen;
-+	size_t vhost_hlen, sock_hlen, extra_hlen;
- 	size_t vhost_len, sock_len;
- 	bool busyloop_intr = false;
- 	struct socket *sock;
-@@ -1137,9 +1140,12 @@ static void handle_rx(struct vhost_net *net)
- 	vhost_hlen = nvq->vhost_hlen;
- 	sock_hlen = nvq->sock_hlen;
- 
-+
- 	vq_log = unlikely(vhost_has_feature(vq, VHOST_F_LOG_ALL)) ?
- 		vq->log : NULL;
- 	mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-+	extra_hlen = vhost_has_feature(vq, VIRTIO_NET_F_HASH_REPORT) ?
-+		sizeof(hdrv1) - sizeof(hdrv1.hdr) : 0;
- 
- 	do {
- 		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-@@ -1201,8 +1207,8 @@ static void handle_rx(struct vhost_net *net)
- 		}
- 		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
- 		if (unlikely(vhost_hlen)) {
--			if (copy_to_iter(&hdr, sizeof(hdr),
--					 &fixup) != sizeof(hdr)) {
-+			if (copy_to_iter(&hdrv1, sizeof(struct virtio_net_hdr),
-+					 &fixup) != sizeof(struct virtio_net_hdr)) {
- 				vq_err(vq, "Unable to write vnet_hdr "
- 				       "at addr %p\n", vq->iov->iov_base);
- 				goto out;
-@@ -1211,7 +1217,7 @@ static void handle_rx(struct vhost_net *net)
- 			/* Header came from socket; we'll need to patch
- 			 * ->num_buffers over if VIRTIO_NET_F_MRG_RXBUF
- 			 */
--			iov_iter_advance(&fixup, sizeof(hdr));
-+			iov_iter_advance(&fixup, sizeof(struct virtio_net_hdr));
- 		}
- 		/* TODO: Should check and handle checksum. */
- 
-@@ -1223,6 +1229,18 @@ static void handle_rx(struct vhost_net *net)
- 			vhost_discard_vq_desc(vq, headcount);
- 			goto out;
- 		}
-+		if (unlikely(extra_hlen)) {
-+			if (unlikely(vhost_hlen)) {
-+				if (copy_to_iter(&hdrv1.hash_value, extra_hlen,
-+						&fixup) != extra_hlen) {
-+					vq_err(vq, "Unable to write extra_hdr "
-+					"at addr %p\n", vq->iov->iov_base);
-+					goto out;
-+				}
-+			} else {
-+				iov_iter_advance(&fixup, extra_hlen);
-+			}
-+		}
- 		nvq->done_idx += headcount;
- 		if (nvq->done_idx > VHOST_NET_BATCH)
- 			vhost_net_signal_used(nvq);
-@@ -1624,6 +1642,9 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 			       (1ULL << VIRTIO_F_VERSION_1))) ?
- 			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
- 			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT)) {
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	}
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
--- 
-2.17.1
+> 
+>> +
+>>      list_for_each_entry(irq, &dist->lpi_list_head, lpi_list) {
+>>          int byte_offset, bit_nr;
+>>          struct kvm_vcpu *vcpu;
+>>          gpa_t pendbase, ptr;
+>>          bool stored;
+>> +        bool is_pending = irq->pending_latch;
+>>
+>>          vcpu = irq->target_vcpu;
+>>          if (!vcpu)
+>> @@ -387,24 +425,32 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>          if (ptr != last_ptr) {
+>>              ret = kvm_read_guest_lock(kvm, ptr, &val, 1);
+>>              if (ret)
+>> -                return ret;
+>> +                goto out;
+>>              last_ptr = ptr;
+>>          }
+>>
+>>          stored = val & (1U << bit_nr);
+>> -        if (stored == irq->pending_latch)
+>> +
+>> +        if (irq->hw)
+>> +            vgic_v4_get_vlpi_state(irq, &is_pending);
+> 
+> You don't check the return value here, so I wonder why the checks
+> in vgic_v4_get_vlpi_state().
 
+Since I have already checked the condition and reported in save_its_tables
+(patch 4), I just check in get_vlpi_state and don't report again here.
+
+> 
+> Another thing that worries me is that vgic_v4_get_vlpi_state() doesn't
+> have any cache invalidation, and can end-up hitting in the CPU cache
+> (there is no guarantee of coherency between the GIC and the CPU, only
+> that the GIC will have flushed its caches).
+> 
+> I'd expect this to happen at unmap time, though, in order to avoid
+> repeated single byte invalidations.
+
+Ok, I will add a cache invalidation at unmap time.
+
+> 
+>> +
+>> +        if (stored == is_pending)
+>>              continue;
+>>
+>> -        if (irq->pending_latch)
+>> +        if (is_pending)
+>>              val |= 1 << bit_nr;
+>>          else
+>>              val &= ~(1 << bit_nr);
+>>
+>>          ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>>          if (ret)
+>> -            return ret;
+>> +            goto out;
+>>      }
+>> -    return 0;
+>> +
+>> +out:
+>> +    map_all_vpes(dist);
+>> +
+>> +    return ret;
+>>  }
+>>
+>>  /**
+> 
+> Thanks,
+> 
+>         M.
