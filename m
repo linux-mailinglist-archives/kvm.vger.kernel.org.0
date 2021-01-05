@@ -2,154 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1E782EB13F
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 18:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21FE62EB17C
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 18:37:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729230AbhAERUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 12:20:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55754 "EHLO
+        id S1730431AbhAERhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 12:37:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbhAERUv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 12:20:51 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660E9C061793
-        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 09:20:11 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id iq13so15991pjb.3
-        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 09:20:11 -0800 (PST)
+        with ESMTP id S1728897AbhAERhe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 12:37:34 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3EB0C061574
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 09:36:53 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id r17so400910ilo.11
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 09:36:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1pPTiUUmwCILGPwhqjMlwzdtjWGk5FIG2OkWDCPGKCI=;
-        b=St40kywpxzGWUQJd/PTqmSp7Jly2sPjPC7KB2YdngnWIp+3e+N0nbh2JSmwihXWJCR
-         mUUSEIaD5/Sjrp0JY0tqAbfaEBzr7JfQzxJFtQ3njvG6I8mV2BoW7Co2RIzbgA7CzlxQ
-         rIsaSONJQQTKM0qbal8BS+leW3BfFGo0FrYU5DnlXlOXDXE7IcC2eOELl16KFSSR0mfF
-         fo6VkDbLSTUl9X6jh5OBzSspXl+2SCBX2HADmvsYAizYZ5boi3ThNvZjypkPl+lxdekC
-         tM8d4NUFKIvYicaYOIxBDVVym8Px2ENHemIRqsbXkQJeeP5WZ8t/t11IF1oiECO8rgtn
-         SNaw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iYUbdn46eLLJUQGutNwUga7LivqPsgBrhoaqA3UjSMc=;
+        b=C7rW8Vdc6213/7dex6sGc3MF9LPSadvWCiBhsLWUZ0baN3pEYGmG0dPeWinzaKYMhm
+         L4eaM6Kl79/+NkB/wI7Iv4LyIVGubn5OA8mRSKHP+cSvQRG3rxNC4T7AC6xQJ9bUblKv
+         w5fLP1TQLV8vPRwCGDs4kWL6ma2xbosoaEN0nDA9S984ub5ajvNXw4eGbYo0MZuL2Gn9
+         CpzZVqWT4gkvY8VTA7QX8aFARGlJXfmadxv3ZgSgWwbr6lDTYn6IyfaGZ8kOXpHX793y
+         3CLUh/0bul/6nF3nBaWeoHsPsNez0AP8tRiqgdYKrrSoIzE1GtHG2pZkXBGQU0D8337D
+         kzZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1pPTiUUmwCILGPwhqjMlwzdtjWGk5FIG2OkWDCPGKCI=;
-        b=KXcuNcQQh7YLEn7OjbyJppJ2v3+EVAZU7VL3xeNalT/VZzx67j9t5y+VFaWjpcEaJD
-         3ilqVvQG1z6AjIWEFE712f4duN7jgEULr93C3Z3F3Bd6L1VcGNHo7RAHSum3sCRHCiMP
-         pKTI9IXjTA8vzr2Tqdt9Ix7RfFufEKHWjQdJCEs7KuiTWZuPrC75JbcVWXbU1zs0XJoc
-         8DSaQre0M3CUfYqCgcCQF9AFLQ1U7Sin/59VNSnpxbtbrMlFUhIOR21ZyreEiNeL4STx
-         aYcSrFxw2sKOnDaypQeB68FNpN4WSgcTBoInl9sLB+OtfY3Pnjs39YnW3ATlGIZsNwbt
-         hw6Q==
-X-Gm-Message-State: AOAM533MGaL38WPJfszyi0e6fQJBD9FTun4+OMoCcaGaP5ozK2Fe+ceh
-        5INTM9bMmNthu0Xh9qZIlUVBNw==
-X-Google-Smtp-Source: ABdhPJw6GzCJksECMVDlqVq/QteStNuKR9J7lDD7rWOeSSJOM7ScY+4Nt3tgCDF+gJbIo/kAKlaOLw==
-X-Received: by 2002:a17:902:d916:b029:da:3e9e:cd7c with SMTP id c22-20020a170902d916b02900da3e9ecd7cmr330723plz.27.1609867210796;
-        Tue, 05 Jan 2021 09:20:10 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id 14sm7319pfy.55.2021.01.05.09.20.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jan 2021 09:20:10 -0800 (PST)
-Date:   Tue, 5 Jan 2021 09:20:03 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 1/3] KVM: SVM: use vmsave/vmload for saving/restoring
- additional host state
-Message-ID: <X/Sfw15OWarseivB@google.com>
-References: <20210105143749.557054-1-michael.roth@amd.com>
- <20210105143749.557054-2-michael.roth@amd.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iYUbdn46eLLJUQGutNwUga7LivqPsgBrhoaqA3UjSMc=;
+        b=iTanb2Bn6YZgLW9VbWi/WvmqSTJ53YYvoi5B6hzAgU0lXk1tkPmrv+1enaRdmtKXLD
+         3oCPEbVIEFbREvFKCMC/pm2nW851PiUxS5nVmxCbYIFXA2YX//aO649Rkz2ttw6f2P6k
+         ECcM5QpGsOUqwSjH6TdMXRNTYIcpV+g79UTCTg8oxMkVVsyrbSk8rzeFCoFXH1uVA+E6
+         AOs7jXmfBvgT+PnQIHcGdJFnwaC7Q4MrCRziiXO0reFLV9O3K8U4tZ04A2lIvt1PtSQS
+         A6iTozLlPLcZGtI9MLxX+mMp/9r7QR50Ye82bFNJT2BK4BEjaF06xOp2awG/QAiK5ShN
+         lCvQ==
+X-Gm-Message-State: AOAM531E9IsVloszY0nEhgHKr+68ZXCIDqs74AMQpE6X9HHToRKhQlbK
+        aOEZYdjiG8Izdz9HF5ssqbA61phEHbt5NBt1dec=
+X-Google-Smtp-Source: ABdhPJyqlVfZpAO6yv6nGmppmW7gpKPg65l4Vu1XOlAeCnxF0P7r3nwdAcmxzlnVeenovVNhgkvSpmqhcmiuN6qc2kU=
+X-Received: by 2002:a92:c942:: with SMTP id i2mr650901ilq.227.1609868212964;
+ Tue, 05 Jan 2021 09:36:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210105143749.557054-2-michael.roth@amd.com>
+References: <20201203124703.168-1-jiangyifei@huawei.com> <20201203124703.168-14-jiangyifei@huawei.com>
+ <CAKmqyKM5m3_w6=Jd+EdTatY9G0YBm1mFjh+5FodnVmFfKydyZw@mail.gmail.com> <1889871dcdf74ac3b495d75e6fd2aeaf@huawei.com>
+In-Reply-To: <1889871dcdf74ac3b495d75e6fd2aeaf@huawei.com>
+From:   Alistair Francis <alistair23@gmail.com>
+Date:   Tue, 5 Jan 2021 09:36:25 -0800
+Message-ID: <CAKmqyKMg+cmLm6fBN23KCoVajgbY-3YRF3K=m4HaHOoehckGHA@mail.gmail.com>
+Subject: Re: [PATCH RFC v4 13/15] target/riscv: Introduce dynamic time
+ frequency for virt machine
+To:     Jiangyifei <jiangyifei@huawei.com>
+Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+        "open list:RISC-V" <qemu-riscv@nongnu.org>,
+        "Zhangxiaofeng (F)" <victor.zhangxiaofeng@huawei.com>,
+        Sagar Karandikar <sagark@eecs.berkeley.edu>,
+        "open list:Overall" <kvm@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+        Anup Patel <anup.patel@wdc.com>,
+        yinyipeng <yinyipeng1@huawei.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "dengkai (A)" <dengkai1@huawei.com>,
+        "Wubin (H)" <wu.wubin@huawei.com>,
+        Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 05, 2021, Michael Roth wrote:
-> @@ -3703,16 +3688,9 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->  	if (sev_es_guest(svm->vcpu.kvm)) {
->  		__svm_sev_es_vcpu_run(svm->vmcb_pa);
->  	} else {
-> -		__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
-> -
-> -#ifdef CONFIG_X86_64
-> -		native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
-> -#else
-> -		loadsegment(fs, svm->host.fs);
-> -#ifndef CONFIG_X86_32_LAZY_GS
-> -		loadsegment(gs, svm->host.gs);
-> -#endif
-> -#endif
-> +		__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs,
-> +			       page_to_phys(per_cpu(svm_data,
-> +						    vcpu->cpu)->save_area));
+On Mon, Dec 14, 2020 at 11:31 PM Jiangyifei <jiangyifei@huawei.com> wrote:
+>
+>
+> > -----Original Message-----
+> > From: Alistair Francis [mailto:alistair23@gmail.com]
+> > Sent: Wednesday, December 9, 2020 6:26 AM
+> > To: Jiangyifei <jiangyifei@huawei.com>
+> > Cc: qemu-devel@nongnu.org Developers <qemu-devel@nongnu.org>; open
+> > list:RISC-V <qemu-riscv@nongnu.org>; Zhangxiaofeng (F)
+> > <victor.zhangxiaofeng@huawei.com>; Sagar Karandikar
+> > <sagark@eecs.berkeley.edu>; open list:Overall <kvm@vger.kernel.org>;
+> > libvir-list@redhat.com; Bastian Koppelmann
+> > <kbastian@mail.uni-paderborn.de>; Anup Patel <anup.patel@wdc.com>;
+> > yinyipeng <yinyipeng1@huawei.com>; Alistair Francis
+> > <Alistair.Francis@wdc.com>; kvm-riscv@lists.infradead.org; Palmer Dabbelt
+> > <palmer@dabbelt.com>; dengkai (A) <dengkai1@huawei.com>; Wubin (H)
+> > <wu.wubin@huawei.com>; Zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > Subject: Re: [PATCH RFC v4 13/15] target/riscv: Introduce dynamic time
+> > frequency for virt machine
+> >
+> > On Thu, Dec 3, 2020 at 4:57 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
+> > >
+> > > Currently, time base frequency was fixed as SIFIVE_CLINT_TIMEBASE_FREQ.
+> > > Here introduce "time-frequency" property to set time base frequency
+> > > dynamically of which default value is still
+> > > SIFIVE_CLINT_TIMEBASE_FREQ. The virt machine uses frequency of the first
+> > cpu to create clint and fdt.
+> > >
+> > > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> > > Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+> > > ---
+> > >  hw/riscv/virt.c    | 18 ++++++++++++++----
+> > >  target/riscv/cpu.c |  3 +++
+> > >  target/riscv/cpu.h |  2 ++
+> > >  3 files changed, 19 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c index
+> > > 47b7018193..788a7237b6 100644
+> > > --- a/hw/riscv/virt.c
+> > > +++ b/hw/riscv/virt.c
+> > > @@ -178,7 +178,7 @@ static void create_pcie_irq_map(void *fdt, char
+> > > *nodename,  }
+> > >
+> > >  static void create_fdt(RISCVVirtState *s, const struct MemmapEntry
+> > *memmap,
+> > > -    uint64_t mem_size, const char *cmdline)
+> > > +    uint64_t mem_size, const char *cmdline, uint64_t
+> > > + timebase_frequency)
+> > >  {
+> > >      void *fdt;
+> > >      int i, cpu, socket;
+> > > @@ -225,7 +225,7 @@ static void create_fdt(RISCVVirtState *s, const
+> > > struct MemmapEntry *memmap,
+> > >
+> > >      qemu_fdt_add_subnode(fdt, "/cpus");
+> > >      qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
+> > > -                          SIFIVE_CLINT_TIMEBASE_FREQ);
+> > > +                          timebase_frequency);
+> > >      qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
+> > >      qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
+> > >      qemu_fdt_add_subnode(fdt, "/cpus/cpu-map"); @@ -510,6 +510,7
+> > @@
+> > > static void virt_machine_init(MachineState *machine)
+> > >      target_ulong firmware_end_addr, kernel_start_addr;
+> > >      uint32_t fdt_load_addr;
+> > >      uint64_t kernel_entry;
+> > > +    uint64_t timebase_frequency = 0;
+> > >      DeviceState *mmio_plic, *virtio_plic, *pcie_plic;
+> > >      int i, j, base_hartid, hart_count;
+> > >      CPUState *cs;
+> > > @@ -553,12 +554,20 @@ static void virt_machine_init(MachineState
+> > *machine)
+> > >                                  hart_count, &error_abort);
+> > >          sysbus_realize(SYS_BUS_DEVICE(&s->soc[i]), &error_abort);
+> > >
+> > > +        if (!timebase_frequency) {
+> > > +            timebase_frequency = RISCV_CPU(first_cpu)->env.frequency;
+> > > +        }
+> > > +        /* If vcpu's time frequency is not specified, we use default
+> > frequency */
+> > > +        if (!timebase_frequency) {
+> > > +            timebase_frequency = SIFIVE_CLINT_TIMEBASE_FREQ;
+> > > +        }
+> > > +
+> > >          /* Per-socket CLINT */
+> > >          sifive_clint_create(
+> > >              memmap[VIRT_CLINT].base + i *
+> > memmap[VIRT_CLINT].size,
+> > >              memmap[VIRT_CLINT].size, base_hartid, hart_count,
+> > >              SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE,
+> > SIFIVE_TIME_BASE,
+> > > -            SIFIVE_CLINT_TIMEBASE_FREQ, true);
+> > > +            timebase_frequency, true);
+> > >
+> > >          /* Per-socket PLIC hart topology configuration string */
+> > >          plic_hart_config_len =
+> > > @@ -610,7 +619,8 @@ static void virt_machine_init(MachineState
+> > *machine)
+> > >          main_mem);
+> > >
+> > >      /* create device tree */
+> > > -    create_fdt(s, memmap, machine->ram_size,
+> > machine->kernel_cmdline);
+> > > +    create_fdt(s, memmap, machine->ram_size,
+> > machine->kernel_cmdline,
+> > > +               timebase_frequency);
+> > >
+> > >      /* boot rom */
+> > >      memory_region_init_rom(mask_rom, NULL, "riscv_virt_board.mrom",
+> > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c index
+> > > 439dc89ee7..66f35bcbbf 100644
+> > > --- a/target/riscv/cpu.c
+> > > +++ b/target/riscv/cpu.c
+> > > @@ -494,6 +494,8 @@ static void riscv_cpu_realize(DeviceState *dev,
+> > > Error **errp)
+> > >
+> > >      riscv_cpu_register_gdb_regs_for_features(cs);
+> > >
+> > > +    env->user_frequency = env->frequency;
+> > > +
+> > >      qemu_init_vcpu(cs);
+> > >      cpu_reset(cs);
+> > >
+> > > @@ -531,6 +533,7 @@ static Property riscv_cpu_properties[] = {
+> > >      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+> > >      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+> > >      DEFINE_PROP_UINT64("resetvec", RISCVCPU, cfg.resetvec,
+> > > DEFAULT_RSTVEC),
+> > > +    DEFINE_PROP_UINT64("time-frequency", RISCVCPU, env.frequency, 0),
+> >
+> > Why not set the default to SIFIVE_CLINT_TIMEBASE_FREQ?
+> >
+>
+> When the time frequency is not specified, it will follow the host or the migration
+> source. And we define 0 as equivalent to not specified time frequency.
+>
+> > Also, QEMU now has a clock API, is using that instead a better option?
+> >
+>
+> Sorry, I didn't find the clock API. Could you tell me what the API is.
+> I think that the time frequency is option of KVM VCPU. So it is appropriate to put this
+> option in the CPU.
 
-Does this need to use __sme_page_pa()?
+The clock API is documented here:
+https://gitlab.com/qemu-project/qemu/-/blob/master/docs/devel/clocks.rst
 
->  	}
->  
->  	/*
+I'm not sure if it applies to KVM, but it is at least worth considering.
 
-...
+Alistair
 
-> diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-> index 6feb8c08f45a..89f4e8e7bf0e 100644
-> --- a/arch/x86/kvm/svm/vmenter.S
-> +++ b/arch/x86/kvm/svm/vmenter.S
-> @@ -33,6 +33,7 @@
->   * __svm_vcpu_run - Run a vCPU via a transition to SVM guest mode
->   * @vmcb_pa:	unsigned long
->   * @regs:	unsigned long * (to guest registers)
-> + * @hostsa_pa:	unsigned long
->   */
->  SYM_FUNC_START(__svm_vcpu_run)
->  	push %_ASM_BP
-> @@ -47,6 +48,9 @@ SYM_FUNC_START(__svm_vcpu_run)
->  #endif
->  	push %_ASM_BX
->  
-> +	/* Save @hostsa_pa */
-> +	push %_ASM_ARG3
-> +
->  	/* Save @regs. */
->  	push %_ASM_ARG2
->  
-> @@ -154,6 +158,12 @@ SYM_FUNC_START(__svm_vcpu_run)
->  	xor %r15d, %r15d
->  #endif
->  
-> +	/* "POP" @hostsa_pa to RAX. */
-> +	pop %_ASM_AX
-> +
-> +	/* Restore host user state and FS/GS base */
-> +	vmload %_ASM_AX
-
-This VMLOAD needs the "handle fault on reboot" goo.  Seeing the code, I think
-I'd prefer to handle this in C code, especially if Paolo takes the svm_ops.h
-patch[*].  Actually, I think with that patch it'd make sense to move the
-existing VMSAVE+VMLOAD for the guest into svm.c, too.  And completely unrelated,
-the fault handling in svm/vmenter.S can be cleaned up a smidge to eliminate the
-JMPs.
-
-Paolo, what do you think about me folding these patches into my series to do the
-above cleanups?  And maybe sending a pull request for the end result?  (I'd also
-like to add on a patch to use the user return MSR mechanism for MSR_TSC_AUX).
-
-[*] https://lkml.kernel.org/r/20201231002702.2223707-8-seanjc@google.com
-
-> +
->  	pop %_ASM_BX
->  
->  #ifdef CONFIG_X86_64
-> -- 
-> 2.25.1
-> 
+>
+> Yifei
+>
+> > Alistair
+> >
+> > >      DEFINE_PROP_END_OF_LIST(),
+> > >  };
+> > >
+> > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h index
+> > > 16d6050ead..f5b6c34176 100644
+> > > --- a/target/riscv/cpu.h
+> > > +++ b/target/riscv/cpu.h
+> > > @@ -243,6 +243,8 @@ struct CPURISCVState {
+> > >      uint64_t kvm_timer_time;
+> > >      uint64_t kvm_timer_compare;
+> > >      uint64_t kvm_timer_state;
+> > > +    uint64_t user_frequency;
+> > > +    uint64_t frequency;
+> > >  };
+> > >
+> > >  OBJECT_DECLARE_TYPE(RISCVCPU, RISCVCPUClass,
+> > > --
+> > > 2.19.1
+> > >
+> > >
