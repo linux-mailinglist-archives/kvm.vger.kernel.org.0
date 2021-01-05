@@ -2,102 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 240AF2EAA82
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 13:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1BCA2EAA91
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 13:24:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727690AbhAEMPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 07:15:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35780 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726231AbhAEMPj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 07:15:39 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D4DC061574;
-        Tue,  5 Jan 2021 04:14:59 -0800 (PST)
-Received: from zn.tnic (p200300ec2f103700516ef90d43f797fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:3700:516e:f90d:43f7:97fe])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8C4C81EC03CE;
-        Tue,  5 Jan 2021 13:14:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1609848897;
+        id S1728438AbhAEMXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 07:23:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20434 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728381AbhAEMXS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 5 Jan 2021 07:23:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609849312;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=RF566gcx4bAK61IE/QfhQTdQnYQn1pp0i7xMLkNYktk=;
-        b=ATkefP+A8d3f/dc/yazlw9dUeXvMHJ//SfznAbr2iCTSm69LbcHbnIr9MD+MI4Ytqn+zCL
-        FCTQlQ/pOnrgOmEne7o/eGRcaoKaWN3GvBrjkw32SlivHh+7doVO6e4YvXCbzg42LJupJZ
-        YaM3AJxTXn24p+Z/A39HKMdC8KUXKWA=
-Date:   Tue, 5 Jan 2021 13:14:56 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Yang Zhong <yang.zhong@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, tony.luck@intel.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, kyung.min.park@intel.com, x86@kernel.org
-Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
-Message-ID: <20210105121456.GE28649@zn.tnic>
-References: <20210105004909.42000-1-yang.zhong@intel.com>
- <20210105004909.42000-2-yang.zhong@intel.com>
- <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=U39k5ipMHANWOJWrOXSYV59iZX09Ei6dL9ebZb8Ogeg=;
+        b=h0lLt4/Tksg6sI88+7rwPMzNQCYPJcQNpokcL+CsnYogR/Knm6EeB1j/rMH0Xv7n/UlUQX
+        LlkU39FznW/EwWqgsRi0jFX8bk+O+VXF0sqjFU3xTMPuUBN4p4SuN8NmJrzE+D7PpMZsIo
+        x0Aay4OYfwQIX3GQJGqZpcZNh9OuCUg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-522-iKMYHQx1P2SVWYte9haiLA-1; Tue, 05 Jan 2021 07:21:51 -0500
+X-MC-Unique: iKMYHQx1P2SVWYte9haiLA-1
+Received: by mail-wm1-f69.google.com with SMTP id f187so1179176wme.3
+        for <kvm@vger.kernel.org>; Tue, 05 Jan 2021 04:21:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=U39k5ipMHANWOJWrOXSYV59iZX09Ei6dL9ebZb8Ogeg=;
+        b=PK4A1etEJ5mp6VSTjiet4uH9j8vzc4upDrqPkTxLopjVTcB0y5U55eU28m6tVDucxB
+         u4zrrgjZB6uY1TU9FdktnsHWSD8WaSY9WPUox8dm+OHGVci71qjjyPEOIIusEWkmHJYp
+         U8kiQ54gfPlWK+QvXNY9byNFo1+QYZEv4vjlo1h1vvH2o/ZefcOb15Yw+ilvXNGnSo2A
+         tbEUxlWRjKI8CldySKl0dyqXE8PXjwBriZtLRHybEQe/TUwwfsvyQDsB8LHZdqgIIoj7
+         Xy5mJO6HLhJY7mGubUIU9Ub4ldF5/bWRGCXD63aYckwVPtHf4zgzYNOcJS6UTXXf+DpJ
+         tj2A==
+X-Gm-Message-State: AOAM5307LMcSNhlqdABQydwtB103p2mD3H0/GbTNhou3XDWlo8aKdJw8
+        fVL4B50ih3nmn/idqxDxQ19ZyEKrGSOJAG8ijNV7LhAIWZWnsYWy/hWzaS2xmd33qJitE9KXJV/
+        r6rnMpwBIAVTx
+X-Received: by 2002:adf:bb0e:: with SMTP id r14mr85949740wrg.159.1609849309287;
+        Tue, 05 Jan 2021 04:21:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxRxC04NYGeb6WaL98Uxtwkp2M43zTcBL2qoRpI0IP4stOIB1HKct8R0XtAhgJEy1jrpROFhg==
+X-Received: by 2002:adf:bb0e:: with SMTP id r14mr85949711wrg.159.1609849308953;
+        Tue, 05 Jan 2021 04:21:48 -0800 (PST)
+Received: from redhat.com (bzq-79-178-32-166.red.bezeqint.net. [79.178.32.166])
+        by smtp.gmail.com with ESMTPSA id y7sm3716921wmb.37.2021.01.05.04.21.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jan 2021 04:21:48 -0800 (PST)
+Date:   Tue, 5 Jan 2021 07:21:45 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
+Subject: [GIT PULL] vhost: bugfix
+Message-ID: <20210105072145-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 05, 2021 at 12:47:23PM +0100, Paolo Bonzini wrote:
-> On 05/01/21 01:49, Yang Zhong wrote:
-> > From: Kyung Min Park <kyung.min.park@intel.com>
-> > 
-> > Add AVX version of the Vector Neural Network (VNNI) Instructions.
-> > 
-> > A processor supports AVX VNNI instructions if CPUID.0x07.0x1:EAX[4] is
-> > present. The following instructions are available when this feature is
-> > present.
-> >    1. VPDPBUS: Multiply and Add Unsigned and Signed Bytes
-> >    2. VPDPBUSDS: Multiply and Add Unsigned and Signed Bytes with Saturation
-> >    3. VPDPWSSD: Multiply and Add Signed Word Integers
-> >    4. VPDPWSSDS: Multiply and Add Signed Integers with Saturation
-> > 
-> > The only in-kernel usage of this is kvm passthrough. The CPU feature
-> > flag is shown as "avx_vnni" in /proc/cpuinfo.
-> > 
-> > This instruction is currently documented in the latest "extensions"
-> > manual (ISE). It will appear in the "main" manual (SDM) in the future.
-> > 
-> > Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > Reviewed-by: Tony Luck <tony.luck@intel.com>
-> > ---
-> >   arch/x86/include/asm/cpufeatures.h | 1 +
-> >   1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> > index f5ef2d5b9231..d10d9962bd9b 100644
-> > --- a/arch/x86/include/asm/cpufeatures.h
-> > +++ b/arch/x86/include/asm/cpufeatures.h
-> > @@ -293,6 +293,7 @@
-> >   #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
-> >   /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
-> > +#define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
-> >   #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
-> >   /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
-> > 
-> 
-> Boris, is it possible to have a topic branch for this patch?
+The following changes since commit 418eddef050d5f6393c303a94e3173847ab85466:
 
-Just take it through your tree pls.
+  vdpa: Use simpler version of ida allocation (2020-12-18 16:14:31 -0500)
 
-Acked-by: Borislav Petkov <bp@suse.de>
+are available in the Git repository at:
 
-Thx.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
--- 
-Regards/Gruss,
-    Boris.
+for you to fetch changes up to e13a6915a03ffc3ce332d28c141a335e25187fa3:
 
-https://people.kernel.org/tglx/notes-about-netiquette
+  vhost/vsock: add IOTLB API support (2020-12-27 05:49:01 -0500)
+
+----------------------------------------------------------------
+vhost: bugfix
+
+This fixes configs with vhost vsock behind a viommu.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Stefano Garzarella (1):
+      vhost/vsock: add IOTLB API support
+
+ drivers/vhost/vsock.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 65 insertions(+), 3 deletions(-)
+
