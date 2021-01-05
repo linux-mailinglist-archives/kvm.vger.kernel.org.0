@@ -2,63 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ADA62EA990
-	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 12:11:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED16C2EAA18
+	for <lists+kvm@lfdr.de>; Tue,  5 Jan 2021 12:41:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728789AbhAELJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 06:09:46 -0500
-Received: from foss.arm.com ([217.140.110.172]:52806 "EHLO foss.arm.com"
+        id S1729750AbhAELk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 06:40:58 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43966 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727764AbhAELJp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 06:09:45 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1EB131FB;
-        Tue,  5 Jan 2021 03:09:00 -0800 (PST)
-Received: from [10.163.89.46] (unknown [10.163.89.46])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A4C113F70D;
-        Tue,  5 Jan 2021 03:08:55 -0800 (PST)
-Subject: Re: [PATCH] arm64/smp: Remove unused variable irq in
- arch_show_interrupts()
-To:     Catalin Marinas <catalin.marinas@arm.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        wanghaibin.wang@huawei.com, Will Deacon <will@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20210105092221.15144-1-zhukeqian1@huawei.com>
- <20210105100847.GB11802@gaia>
-From:   Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <8deed54d-d184-69b8-fce9-d87128a7d880@arm.com>
-Date:   Tue, 5 Jan 2021 16:39:15 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1729744AbhAELk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 06:40:57 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 017BB22286;
+        Tue,  5 Jan 2021 11:40:16 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kwkhB-005Q61-Lt; Tue, 05 Jan 2021 11:40:14 +0000
 MIME-Version: 1.0
-In-Reply-To: <20210105100847.GB11802@gaia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Tue, 05 Jan 2021 11:40:13 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shenming Lu <lushenming@huawei.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v2 2/4] KVM: arm64: GICv4.1: Try to save hw pending
+ state in save_pending_tables
+In-Reply-To: <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
+References: <20210104081613.100-1-lushenming@huawei.com>
+ <20210104081613.100-3-lushenming@huawei.com>
+ <b0f0b2544f8e231ebb5b5545be226164@kernel.org>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <6f09084b32e239176b3f9b4b00874a51@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: lushenming@huawei.com, eric.auger@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, cohuck@redhat.com, lorenzo.pieralisi@arm.com, wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/5/21 3:38 PM, Catalin Marinas wrote:
-> On Tue, Jan 05, 2021 at 05:22:21PM +0800, Keqian Zhu wrote:
->> The local variable irq is added in commit a26388152531 ("arm64:
->> Remove custom IRQ stat accounting"), but forget to remove in
->> commit 5089bc51f81f ("arm64/smp: Use irq_desc_kstat_cpu() in
->> arch_show_interrupts()"). Just remove it.
->>
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+On 2021-01-05 09:13, Marc Zyngier wrote:
+> On 2021-01-04 08:16, Shenming Lu wrote:
+>> After pausing all vCPUs and devices capable of interrupting, in order
+>> to save the information of all interrupts, besides flushing the 
+>> pending
+>> states in kvm’s vgic, we also try to flush the states of VLPIs in the
+>> virtual pending tables into guest RAM, but we need to have GICv4.1 and
+>> safely unmap the vPEs first.
+>> 
+>> Signed-off-by: Shenming Lu <lushenming@huawei.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-v3.c | 58 
+>> +++++++++++++++++++++++++++++++----
+>>  1 file changed, 52 insertions(+), 6 deletions(-)
+>> 
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c 
+>> b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 9cdf39a94a63..a58c94127cb0 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -1,6 +1,8 @@
+>>  // SPDX-License-Identifier: GPL-2.0-only
+>> 
+>>  #include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/irq.h>
+>> +#include <linux/irqdomain.h>
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -356,6 +358,38 @@ int vgic_v3_lpi_sync_pending_status(struct kvm
+>> *kvm, struct vgic_irq *irq)
+>>  	return 0;
+>>  }
+>> 
+>> +/*
+>> + * The deactivation of the doorbell interrupt will trigger the
+>> + * unmapping of the associated vPE.
+>> + */
+>> +static void unmap_all_vpes(struct vgic_dist *dist)
+>> +{
+>> +	struct irq_desc *desc;
+>> +	int i;
+>> +
+>> +	if (!kvm_vgic_global_state.has_gicv4_1)
+>> +		return;
+>> +
+>> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +		irq_domain_deactivate_irq(irq_desc_get_irq_data(desc));
+>> +	}
+>> +}
+>> +
+>> +static void map_all_vpes(struct vgic_dist *dist)
+>> +{
+>> +	struct irq_desc *desc;
+>> +	int i;
+>> +
+>> +	if (!kvm_vgic_global_state.has_gicv4_1)
+>> +		return;
+>> +
+>> +	for (i = 0; i < dist->its_vm.nr_vpes; i++) {
+>> +		desc = irq_to_desc(dist->its_vm.vpes[i]->irq);
+>> +		irq_domain_activate_irq(irq_desc_get_irq_data(desc), false);
+>> +	}
+>> +}
+>> +
+>>  /**
+>>   * vgic_v3_save_pending_tables - Save the pending tables into guest 
+>> RAM
+>>   * kvm lock and all vcpu lock must be held
+>> @@ -365,14 +399,18 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
+>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>>  	struct vgic_irq *irq;
+>>  	gpa_t last_ptr = ~(gpa_t)0;
+>> -	int ret;
+>> +	int ret = 0;
+>>  	u8 val;
+>> 
+>> +	/* As a preparation for getting any VLPI states. */
+>> +	unmap_all_vpes(dist);
 > 
-> I already queued a similar fix in arm64 for-next/fixes (it should appear
-> in linux-next at some point)
+> What if the VPEs are not mapped yet? Is it possible to snapshot a VM
+> that has not run at all?
 
-I too sent this fix yesterday as well :) as it was preventing a clean
-build on v5.11-rc2. Missed to check this on arm64 for-next/fixes though
-I did check on linux-next.
+More questions: what happens to vSGIs that were mapped to the VPEs?
+Can they safely be restarted? The spec is not saying much on the 
+subject.
+
+Once the unmap has taken place, it won't be possible to read their state
+via GICR_VSGIRPEND, and only the memory state can be used. This probably
+needs to be tracked as well.
+
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
