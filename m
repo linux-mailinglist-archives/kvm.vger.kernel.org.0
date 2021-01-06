@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E0B5D2EB6D2
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:24:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E622EB6CC
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:24:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbhAFAYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 19:24:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37380 "EHLO
+        id S1726472AbhAFAYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 19:24:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725789AbhAFAYs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 19:24:48 -0500
+        with ESMTP id S1726244AbhAFAYK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 19:24:10 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13317C0617A4
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB02C06179F
         for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 16:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=DbomEl/wA7I8yvYafwa6fpPKm5fC2uvDH4uSum5rBiw=; b=TI4fAvWvepLibLrfR2nU4/Arq9
-        l9awfqJQCHCL2p6uMEzt6axYTrKzSmkZ/oNZ39tKgD9sB4O0rAxWbUG4VVwD+nlOca8IMh34tMIuk
-        sKH9MPNH3wdp8VMllJOLOhC0s4N6MPser99L5CZxEqUOjP+UTsiVqiuaRZkFaKF3kcJwF/5h3PR9Q
-        cOTkko05IqoRqTEhl/8uX1ZirbglN6BG+Hm25MoDY5PaVcKu1YV4SufK0MO/sheGn05MboN4uFtHh
-        2BJYHx74pkXNxtsB8OqUXbdd/eGwVJ5kAPBWph7X7RRW7jf4N+pHmqGXIDs7FIOg8X8asJE3kgr+8
-        OF68SvQw==;
+        bh=Bl/X+U+GWKGXkOizMADC+1uhUYiVzybTnXj88JzYPL0=; b=t950RH1JeIhvBMTxymgLPKfBZg
+        aTd8X1FxTkTt3WZlf3/yoEWJi09qa8pqsDuqru0yCLg4dQDFHge4uFTWpsg+S15r/YNJDSQ1x0xnW
+        ozzR3yGP5V6iIOfO+l5udBQ6hffBhteAxSdGuwn7vEo9giEBSS48ldq/K70uC4uwB3/4C1ImdhMX0
+        O5kqZjKuiRPZJvan+Lxb05GLx8OdIcgCH0KTNuirsw1FTgAxTrZLxTVW4qZi7P0PL8hc6+4tkPA+Q
+        DaCD55dHwJMSXghURp9hKjFtkOoTeIZ8X85uRfDCy2Jv4huRqbjg1wmW3D/L3aHS+MdcqIEEg7T9E
+        o8ysJXsg==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kwwbi-0004Zt-DN; Wed, 06 Jan 2021 00:23:22 +0000
+        id 1kwwbi-0004Zu-Dy; Wed, 06 Jan 2021 00:23:22 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kwwbh-001Nit-BF; Wed, 06 Jan 2021 00:23:21 +0000
+        id 1kwwbh-001Niw-By; Wed, 06 Jan 2021 00:23:21 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v4 03/16] KVM: x86/xen: Fix coexistence of Xen and Hyper-V hypercalls
-Date:   Wed,  6 Jan 2021 00:23:01 +0000
-Message-Id: <20210106002314.328380-4-dwmw2@infradead.org>
+Subject: [PATCH v4 04/16] KVM: x86/xen: add KVM_XEN_HVM_SET_ATTR/KVM_XEN_HVM_GET_ATTR
+Date:   Wed,  6 Jan 2021 00:23:02 +0000
+Message-Id: <20210106002314.328380-5-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210106002314.328380-1-dwmw2@infradead.org>
 References: <20210106002314.328380-1-dwmw2@infradead.org>
@@ -52,206 +52,169 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+From: Joao Martins <joao.m.martins@oracle.com>
 
-Disambiguate Xen vs. Hyper-V calls by adding 'orl $0x80000000, %eax'
-at the start of the Hyper-V hypercall page when Xen hypercalls are
-also enabled.
+This will be used to set up shared info pages etc.
 
-That bit is reserved in the Hyper-V ABI, and those hypercall numbers
-will never be used by Xen (because it does precisely the same trick).
-
-Switch to using kvm_vcpu_write_guest() while we're at it, instead of
-open-coding it.
-
+Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/hyperv.c                         | 40 ++++++++++++++-----
- arch/x86/kvm/xen.c                            |  6 +++
- .../selftests/kvm/x86_64/xen_vmcall_test.c    | 39 +++++++++++++++---
- 3 files changed, 68 insertions(+), 17 deletions(-)
+ arch/x86/kvm/x86.c       | 20 ++++++++++++++++++++
+ arch/x86/kvm/xen.c       | 24 ++++++++++++++++++++++++
+ arch/x86/kvm/xen.h       |  2 ++
+ include/linux/kvm_host.h | 30 +++++++++++++++---------------
+ include/uapi/linux/kvm.h | 11 +++++++++++
+ 5 files changed, 72 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 922c69dcca4d..5f4487bb7849 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -23,6 +23,7 @@
- #include "ioapic.h"
- #include "cpuid.h"
- #include "hyperv.h"
-+#include "xen.h"
- 
- #include <linux/cpu.h>
- #include <linux/kvm_host.h>
-@@ -1139,9 +1140,9 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
- 			hv->hv_hypercall &= ~HV_X64_MSR_HYPERCALL_ENABLE;
- 		break;
- 	case HV_X64_MSR_HYPERCALL: {
--		u64 gfn;
--		unsigned long addr;
--		u8 instructions[4];
-+		u8 instructions[9];
-+		int i = 0;
-+		u64 addr;
- 
- 		/* if guest os id is not set hypercall should remain disabled */
- 		if (!hv->hv_guest_os_id)
-@@ -1150,16 +1151,33 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
- 			hv->hv_hypercall = data;
- 			break;
- 		}
--		gfn = data >> HV_X64_MSR_HYPERCALL_PAGE_ADDRESS_SHIFT;
--		addr = gfn_to_hva(kvm, gfn);
--		if (kvm_is_error_hva(addr))
--			return 1;
--		kvm_x86_ops.patch_hypercall(vcpu, instructions);
--		((unsigned char *)instructions)[3] = 0xc3; /* ret */
--		if (__copy_to_user((void __user *)addr, instructions, 4))
-+
-+		/*
-+		 * If Xen and Hyper-V hypercalls are both enabled, disambiguate
-+		 * the same way Xen itself does, by setting the bit 31 of EAX
-+		 * which is RsvdZ in the 32-bit Hyper-V hypercall ABI and just
-+		 * going to be clobbered on 64-bit.
-+		 */
-+		if (kvm_xen_hypercall_enabled(kvm)) {
-+			/* orl $0x80000000, %eax */
-+			instructions[i++] = 0x0d;
-+			instructions[i++] = 0x00;
-+			instructions[i++] = 0x00;
-+			instructions[i++] = 0x00;
-+			instructions[i++] = 0x80;
-+		}
-+
-+		/* vmcall/vmmcall */
-+		kvm_x86_ops.patch_hypercall(vcpu, instructions + i);
-+		i += 3;
-+
-+		/* ret */
-+		((unsigned char *)instructions)[i++] = 0xc3;
-+
-+		addr = data & HV_X64_MSR_HYPERCALL_PAGE_ADDRESS_MASK;
-+		if (kvm_vcpu_write_guest(vcpu, addr, instructions, i))
- 			return 1;
- 		hv->hv_hypercall = data;
--		mark_page_dirty(kvm, gfn);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index e391f4dfe457..600d2b64928e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5618,6 +5618,26 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		r = 0;
  		break;
  	}
- 	case HV_X64_MSR_REFERENCE_TSC:
++	case KVM_XEN_HVM_GET_ATTR: {
++		struct kvm_xen_hvm_attr xha;
++
++		r = -EFAULT;
++		if (copy_from_user(&xha, argp, sizeof(xha)))
++			goto out;
++		r = kvm_xen_hvm_get_attr(kvm, &xha);
++		if (copy_to_user(argp, &xha, sizeof(xha)))
++			goto out;
++		break;
++	}
++	case KVM_XEN_HVM_SET_ATTR: {
++		struct kvm_xen_hvm_attr xha;
++
++		r = -EFAULT;
++		if (copy_from_user(&xha, argp, sizeof(xha)))
++			goto out;
++		r = kvm_xen_hvm_set_attr(kvm, &xha);
++		break;
++	}
+ 	case KVM_SET_CLOCK: {
+ 		struct kvm_clock_data user_ns;
+ 		u64 now_ns;
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index b76d121a86c0..503935d8212e 100644
+index 503935d8212e..c0b2c67e0235 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -8,6 +8,7 @@
+@@ -16,6 +16,30 @@
  
- #include "x86.h"
- #include "xen.h"
-+#include "hyperv.h"
+ #include "trace.h"
  
- #include <linux/kvm_host.h>
- 
-@@ -99,6 +100,11 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- 
- 	input = (u64)kvm_register_read(vcpu, VCPU_REGS_RAX);
- 
-+	/* Hyper-V hypercalls get bit 31 set in EAX */
-+	if ((input & 0x80000000) &&
-+	    kvm_hv_hypercall_enabled(vcpu->kvm))
-+		return kvm_hv_hypercall(vcpu);
++int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
++{
++	int r = -ENOENT;
 +
- 	longmode = is_64_bit_mode(vcpu);
- 	if (!longmode) {
- 		params[0] = (u32)kvm_rbx_read(vcpu);
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-index 3f1dd93626e5..24f279e1a66b 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-@@ -15,6 +15,7 @@
- 
- #define HCALL_REGION_GPA	0xc0000000ULL
- #define HCALL_REGION_SLOT	10
-+#define PAGE_SIZE		4096
- 
- static struct kvm_vm *vm;
- 
-@@ -22,7 +23,12 @@ static struct kvm_vm *vm;
- #define ARGVALUE(x) (0xdeadbeef5a5a0000UL + x)
- #define RETVALUE 0xcafef00dfbfbffffUL
- 
--#define XEN_HYPERCALL_MSR 0x40000000
-+#define XEN_HYPERCALL_MSR	0x40000200
-+#define HV_GUEST_OS_ID_MSR	0x40000000
-+#define HV_HYPERCALL_MSR	0x40000001
++	switch (data->type) {
++	default:
++		break;
++	}
 +
-+#define HVCALL_SIGNAL_EVENT		0x005d
-+#define HV_STATUS_INVALID_ALIGNMENT	4
- 
- static void guest_code(void)
++	return r;
++}
++
++int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
++{
++	int r = -ENOENT;
++
++	switch (data->type) {
++	default:
++		break;
++	}
++
++	return r;
++}
++
+ int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data)
  {
-@@ -30,6 +36,7 @@ static void guest_code(void)
- 	unsigned long rdi = ARGVALUE(1);
- 	unsigned long rsi = ARGVALUE(2);
- 	unsigned long rdx = ARGVALUE(3);
-+	unsigned long rcx;
- 	register unsigned long r10 __asm__("r10") = ARGVALUE(4);
- 	register unsigned long r8 __asm__("r8") = ARGVALUE(5);
- 	register unsigned long r9 __asm__("r9") = ARGVALUE(6);
-@@ -41,18 +48,38 @@ static void guest_code(void)
- 			     "r"(r10), "r"(r8), "r"(r9));
- 	GUEST_ASSERT(rax == RETVALUE);
+ 	struct kvm *kvm = vcpu->kvm;
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index 81e12f716d2e..d06b5afcc1f2 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -9,6 +9,8 @@
+ #ifndef __ARCH_X86_KVM_XEN_H__
+ #define __ARCH_X86_KVM_XEN_H__
  
--	/* Now fill in the hypercall page */
-+	/* Fill in the Xen hypercall page */
- 	__asm__ __volatile__("wrmsr" : : "c" (XEN_HYPERCALL_MSR),
- 			     "a" (HCALL_REGION_GPA & 0xffffffff),
- 			     "d" (HCALL_REGION_GPA >> 32));
++int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
++int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
+ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+ int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data);
  
--	/* And invoke the same hypercall that way */
-+	/* Set Hyper-V Guest OS ID */
-+	__asm__ __volatile__("wrmsr" : : "c" (HV_GUEST_OS_ID_MSR),
-+			     "a" (0x5a), "d" (0));
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f3b1013fb22c..398ed0c99606 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -33,6 +33,21 @@
+ 
+ #include <linux/kvm_types.h>
+ 
++struct kvm_host_map {
++	/*
++	 * Only valid if the 'pfn' is managed by the host kernel (i.e. There is
++	 * a 'struct page' for it. When using mem= kernel parameter some memory
++	 * can be used as guest memory but they are not managed by host
++	 * kernel).
++	 * If 'pfn' is not managed by the host kernel, this field is
++	 * initialized to KVM_UNMAPPED_PAGE.
++	 */
++	struct page *page;
++	void *hva;
++	kvm_pfn_t pfn;
++	kvm_pfn_t gfn;
++};
 +
-+	/* Hyper-V hypercall page */
-+	u64 msrval = HCALL_REGION_GPA + PAGE_SIZE + 1;
-+	__asm__ __volatile__("wrmsr" : : "c" (HV_HYPERCALL_MSR),
-+			     "a" (msrval & 0xffffffff),
-+			     "d" (msrval >> 32));
+ #include <asm/kvm_host.h>
+ #include <linux/kvm_dirty_ring.h>
+ 
+@@ -226,21 +241,6 @@ enum {
+ 
+ #define KVM_UNMAPPED_PAGE	((void *) 0x500 + POISON_POINTER_DELTA)
+ 
+-struct kvm_host_map {
+-	/*
+-	 * Only valid if the 'pfn' is managed by the host kernel (i.e. There is
+-	 * a 'struct page' for it. When using mem= kernel parameter some memory
+-	 * can be used as guest memory but they are not managed by host
+-	 * kernel).
+-	 * If 'pfn' is not managed by the host kernel, this field is
+-	 * initialized to KVM_UNMAPPED_PAGE.
+-	 */
+-	struct page *page;
+-	void *hva;
+-	kvm_pfn_t pfn;
+-	kvm_pfn_t gfn;
+-};
+-
+ /*
+  * Used to check if the mapping is valid or not. Never use 'kvm_host_map'
+  * directly to check for that.
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 32b59efc2c30..7b5fed0cb2ad 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1583,6 +1583,17 @@ struct kvm_pv_cmd {
+ /* Available with KVM_CAP_DIRTY_LOG_RING */
+ #define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
+ 
++#define KVM_XEN_HVM_GET_ATTR	_IOWR(KVMIO, 0xc8, struct kvm_xen_hvm_attr)
++#define KVM_XEN_HVM_SET_ATTR	_IOW(KVMIO,  0xc9, struct kvm_xen_hvm_attr)
 +
-+	/* Invoke a Xen hypercall */
- 	__asm__ __volatile__("call *%1" : "=a"(rax) :
- 			     "r"(HCALL_REGION_GPA + INPUTVALUE * 32),
- 			     "a"(rax), "D"(rdi), "S"(rsi), "d"(rdx),
- 			     "r"(r10), "r"(r8), "r"(r9));
- 	GUEST_ASSERT(rax == RETVALUE);
- 
-+	/* Invoke a Hyper-V hypercall */
-+	rax = 0;
-+	rcx = HVCALL_SIGNAL_EVENT;	/* code */
-+	rdx = 0x5a5a5a5a;		/* ingpa (badly aligned) */
-+	__asm__ __volatile__("call *%1" : "=a"(rax) :
-+			     "r"(HCALL_REGION_GPA + PAGE_SIZE),
-+			     "a"(rax), "c"(rcx), "d"(rdx),
-+			     "r"(r8));
-+	GUEST_ASSERT(rax == HV_STATUS_INVALID_ALIGNMENT);
++struct kvm_xen_hvm_attr {
++	__u16 type;
 +
- 	GUEST_DONE();
- }
- 
-@@ -73,11 +100,11 @@ int main(int argc, char *argv[])
- 	};
- 	vm_ioctl(vm, KVM_XEN_HVM_CONFIG, &hvmc);
- 
--	/* Map a region for the hypercall page */
-+	/* Map a region for the hypercall pages */
- 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-                                     HCALL_REGION_GPA, HCALL_REGION_SLOT,
--				    getpagesize(), 0);
--	virt_map(vm, HCALL_REGION_GPA, HCALL_REGION_GPA, 1, 0);
-+				    2 * getpagesize(), 0);
-+	virt_map(vm, HCALL_REGION_GPA, HCALL_REGION_GPA, 2, 0);
- 
- 	for (;;) {
- 		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++	union {
++		__u64 pad[4];
++	} u;
++};
++
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+ 	/* Guest initialization commands */
 -- 
 2.29.2
 
