@@ -2,244 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D5212EB80B
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 03:24:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B8EB2EB81A
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 03:38:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725917AbhAFCXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 21:23:06 -0500
-Received: from mga14.intel.com ([192.55.52.115]:11615 "EHLO mga14.intel.com"
+        id S1726008AbhAFCho (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 21:37:44 -0500
+Received: from mga18.intel.com ([134.134.136.126]:55722 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725836AbhAFCXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 21:23:06 -0500
-IronPort-SDR: POJS33rztDDH2fqKX+mYWFztx7ziIFl8UeTeuu0G5sazk07/j+6agfSST7hF+JlJNqcUCxAHPf
- mUYlO6PdxV9w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="176434265"
+        id S1725730AbhAFCho (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 21:37:44 -0500
+IronPort-SDR: kjHKXhCRDBTJ6MEhdNrU8lgMsg5I8RiCtrMzPMId+nWQx4mD5VCSXUzv3k/bH/eOkNm66IZXzT
+ geCa9kY+rvIQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="164916478"
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="176434265"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 18:22:24 -0800
-IronPort-SDR: lvosCEofn3NqCPoTagqfaij5BFhfdz+7ucbXBM2pvQxhyHHusFgMIc0CmyRifS5l2Hkguw+Db9
- 5NWW9fVO7z3Q==
+   d="scan'208";a="164916478"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 18:35:58 -0800
+IronPort-SDR: l8eZWSbUu3gwxGLlJVi+r6FoPsncy+NcV1PA5yxUi50xwIoJFgzmBu5gPx8BBeNYoGWRq8fPym
+ bAJELIHMJ4RQ==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="395463872"
-Received: from zhuoxuan-mobl.amr.corp.intel.com ([10.251.29.237])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 18:22:20 -0800
-Message-ID: <9741ab3dc20c8149ae300bb9b2e2b154da919297.camel@intel.com>
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, joro@8bytes.org,
-        vkuznets@redhat.com, wanpengli@tencent.com, corbet@lwn.net,
-        jmattson@google.com
-Date:   Wed, 06 Jan 2021 15:22:17 +1300
-In-Reply-To: <cover.1609890536.git.kai.huang@intel.com>
-References: <cover.1609890536.git.kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.2 (3.38.2-1.fc33) 
+   d="scan'208";a="398061314"
+Received: from allen-box.sh.intel.com ([10.239.159.28])
+  by fmsmga002.fm.intel.com with ESMTP; 05 Jan 2021 18:35:51 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     tglx@linutronix.de, ashok.raj@intel.com, kevin.tian@intel.com,
+        dave.jiang@intel.com, megha.dey@intel.com, dwmw2@infradead.org
+Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
+        dan.j.williams@intel.com, dmaengine@vger.kernel.org,
+        eric.auger@redhat.com, jacob.jun.pan@intel.com, jgg@mellanox.com,
+        kvm@vger.kernel.org, kwankhede@nvidia.com,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        maz@kernel.org, mona.hossain@intel.com, netanelg@mellanox.com,
+        parav@mellanox.com, pbonzini@redhat.com, rafael@kernel.org,
+        samuel.ortiz@intel.com, sanjay.k.kumar@intel.com,
+        shahafs@mellanox.com, tony.luck@intel.com, vkoul@kernel.org,
+        yan.y.zhao@linux.intel.com, yi.l.liu@intel.com,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [RFC PATCH v2 1/1] platform-msi: Add platform check for subdevice irq domain
+Date:   Wed,  6 Jan 2021 10:27:49 +0800
+Message-Id: <20210106022749.2769057-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sorry that I made mistake when copy and paste Jim's email address :( 
-Remove the wrong email address (mattson@google.com) and add the correct one
-(jmattson@gmail.com). Really apologize for the noise.
+The pci_subdevice_msi_create_irq_domain() should fail if the underlying
+platform is not able to support IMS (Interrupt Message Storage). Otherwise,
+the isolation of interrupt is not guaranteed.
 
-Thanks,
--Kai
+For x86, IMS is only supported on bare metal for now. We could enable it
+in the virtualization environments in the future if interrupt HYPERCALL
+domain is supported or the hardware has the capability of interrupt
+isolation for subdevices.
 
-On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
-> --- Disclaimer ---
-> 
-> These patches were originally written by Sean Christopherson while at Intel.
-> Now that Sean has left Intel, I (Kai) have taken over getting them upstream.
-> This series needs more review before it can be merged.  It is being posted
-> publicly and under RFC so Sean and others can review it. Maintainers are safe
-> ignoring it for now.
-> 
-> ------------------
-> 
-> Hi all,
-> 
-> This series adds KVM SGX virtualization support. The first 12 patches starting
-> with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
-> support KVM SGX virtualization, while the rest are patches to KVM subsystem.
-> 
-> Please help to review this series. Also I'd like to hear what is the proper
-> way to merge this series, since it contains change to both x86/SGX and KVM
-> subsystem. Any feedback is highly appreciated. And please let me know if I
-> forgot to CC anyone, or anyone wants to be removed from CC. Thanks in advance!
-> 
-> This series is based against latest tip tree's x86/sgx branch. You can also get
-> the code from tip branch of kvm-sgx repo on github:
-> 
->         https://github.com/intel/kvm-sgx.git tip
-> 
-> It also requires Qemu changes to create VM with SGX support. You can find Qemu
-> repo here:
-> 
-> 	https://github.com/intel/qemu-sgx.git next
-> 
-> Please refer to README.md of above qemu-sgx repo for detail on how to create
-> guest with SGX support. At meantime, for your quick reference you can use below
-> command to create SGX guest:
-> 
-> 	#qemu-system-x86_64 -smp 4 -m 2G -drive file=<your_vm_image>,if=virtio \
-> 		-cpu host,+sgx_provisionkey \
-> 		-sgx-epc id=epc1,memdev=mem1 \
-> 		-object memory-backend-epc,id=mem1,size=64M,prealloc
-> 
-> Please note that the SGX relevant part is:
-> 
-> 		-cpu host,+sgx_provisionkey \
-> 		-sgx-epc id=epc1,memdev=mem1 \
-> 		-object memory-backend-epc,id=mem1,size=64M,prealloc
-> 
-> And you can change other parameters of your qemu command based on your needs.
-> 
-> =========
-> KVM SGX virtualization Overview
-> 
-> - Virtual EPC
-> 
-> "Virtual EPC" is the EPC section exposed by KVM to guest so SGX software in
-> guest can discover it and use it to create SGX enclaves. KVM exposes SGX to 
-> guest via CPUID, and exposes one or more "virtual EPC" sections for guest.
-> The size of "virtual EPC" is passed as Qemu parameter when creating the
-> guest, and the base address is calcualted internally according to guest's
-> configuration.
-> 
-> To support virtual EPC, add a new misc device /dev/sgx_virt_epc to SGX
-> core/driver to allow userspace (Qemu) to allocate "raw" EPC, and use it as
-> "virtual EPC" for guest. Obviously, unlike EPC allocated for host SGX driver,
-> virtual EPC allocated via /dev/sgx_virt_epc doesn't have enclave associated,
-> and how virtual EPC is used by guest is compeletely controlled by guest's SGX
-> software.
-> 
-> Implement the "raw" EPC allocation in the x86 core-SGX subsystem via
-> /dev/sgx_virt_epc rather than in KVM. Doing so has two major advantages:
-> 
->   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
->     just another memory backend for guests.
-> 
->   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
->     does not have to export any symbols, changes to reclaim flows don't
->     need to be routed through KVM, SGX's dirty laundry doesn't have to
->     get aired out for the world to see, and so on and so forth.
-> 
-> The virtual EPC allocated to guests is currently not reclaimable, due to
-> reclaiming EPC from KVM guests is not currently supported. Due to the
-> complications of handling reclaim conflicts between guest and host, KVM
-> EPC oversubscription, which allows total virtual EPC size greater than
-> physical EPC by being able to reclaiming guests' EPC, is significantly more
-> complex than basic support for SGX virtualization.
-> 
-> - Support SGX virtualization without SGX Launch Control unlocked mode
-> 
-> Although SGX driver requires SGX Launch Control unlocked mode to work, SGX
-> virtualization doesn't, since how enclave is created is completely controlled
-> by guest SGX software, which is not necessarily linux. Therefore, this series
-> allows KVM to expose SGX to guest even SGX Launch Control is in locked mode,
-> or is not present at all. The reason is the goal of SGX virtualization, or
-> virtualization in general, is to expose hardware feature to guest, but not to
-> make assumption how guest will use it. Therefore, KVM should support SGX guest
-> as long as hardware is able to, to have chance to support more potential use
-> cases in cloud environment.
-> 
-> - Support exposing SGX2
-> 
-> Due to the same reason above, SGX2 feature detection is added to core SGX code
-> to allow KVM to expose SGX2 to guest, even currently SGX driver doesn't support
-> SGX2, because SGX2 can work just fine in guest w/o any interaction to host SGX
-> driver.
-> 
-> - Restricit SGX guest access to provisioning key
-> 
-> To grant guest being able to fully use SGX, guest needs to be able to create
-> provisioning enclave. However provisioning key is sensitive and is restricted by
-> /dev/sgx_provision in host SGX driver, therefore KVM SGX virtualization follows
-> the same role: a new KVM_CAP_SGX_ATTRIBUTE is added to KVM uAPI, and only file
-> descriptor of /dev/sgx_provision is passed to that CAP by usersppace hypervisor
-> (Qemu) when creating the guest, it can access provisioning bit. This is done by
-> making KVM trape ECREATE instruction from guest, and check the provisioning bit
-> in ECREATE's attribute.
-> 
-> 
-> Kai Huang (1):
->   x86/sgx: Add helper to update SGX_LEPUBKEYHASHn MSRs
-> 
-> Sean Christopherson (22):
->   x86/sgx: Split out adding EPC page to free list to separate helper
->   x86/sgx: Add enum for SGX_CHILD_PRESENT error code
->   x86/sgx: Introduce virtual EPC for use by KVM guests
->   x86/cpufeatures: Add SGX1 and SGX2 sub-features
->   x86/cpu/intel: Allow SGX virtualization without Launch Control support
->   x86/sgx: Expose SGX architectural definitions to the kernel
->   x86/sgx: Move ENCLS leaf definitions to sgx_arch.h
->   x86/sgx: Add SGX2 ENCLS leaf definitions (EAUG, EMODPR and EMODT)
->   x86/sgx: Add encls_faulted() helper
->   x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
->   x86/sgx: Move provisioning device creation out of SGX driver
->   KVM: VMX: Convert vcpu_vmx.exit_reason to a union
->   KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
->   KVM: x86: Define new #PF SGX error code bit
->   KVM: x86: Add SGX feature leaf to reverse CPUID lookup
->   KVM: VMX: Add basic handling of VM-Exit from SGX enclave
->   KVM: VMX: Frame in ENCLS handler for SGX virtualization
->   KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
->   KVM: VMX: Add emulation of SGX Launch Control LE hash MSRs
->   KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
->   KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
->   KVM: x86: Add capability to grant VM access to privileged SGX
->     attribute
-> 
->  Documentation/virt/kvm/api.rst                |  23 +
->  arch/x86/Kconfig                              |  12 +
->  arch/x86/include/asm/cpufeature.h             |   5 +-
->  arch/x86/include/asm/cpufeatures.h            |   6 +-
->  arch/x86/include/asm/disabled-features.h      |   7 +-
->  arch/x86/include/asm/kvm_host.h               |   5 +
->  arch/x86/include/asm/required-features.h      |   2 +-
->  arch/x86/include/asm/sgx.h                    |  19 +
->  .../cpu/sgx/arch.h => include/asm/sgx_arch.h} |  20 +
->  arch/x86/include/asm/vmx.h                    |   1 +
->  arch/x86/include/uapi/asm/vmx.h               |   1 +
->  arch/x86/kernel/cpu/common.c                  |   4 +
->  arch/x86/kernel/cpu/feat_ctl.c                |  50 +-
->  arch/x86/kernel/cpu/sgx/Makefile              |   1 +
->  arch/x86/kernel/cpu/sgx/driver.c              |  17 -
->  arch/x86/kernel/cpu/sgx/encl.c                |   2 +-
->  arch/x86/kernel/cpu/sgx/encls.h               |  29 +-
->  arch/x86/kernel/cpu/sgx/ioctl.c               |  23 +-
->  arch/x86/kernel/cpu/sgx/main.c                |  79 ++-
->  arch/x86/kernel/cpu/sgx/sgx.h                 |   5 +-
->  arch/x86/kernel/cpu/sgx/virt.c                | 318 ++++++++++++
->  arch/x86/kernel/cpu/sgx/virt.h                |  14 +
->  arch/x86/kvm/Makefile                         |   2 +
->  arch/x86/kvm/cpuid.c                          |  58 ++-
->  arch/x86/kvm/cpuid.h                          |   1 +
->  arch/x86/kvm/vmx/nested.c                     |  70 ++-
->  arch/x86/kvm/vmx/nested.h                     |   5 +
->  arch/x86/kvm/vmx/sgx.c                        | 462 ++++++++++++++++++
->  arch/x86/kvm/vmx/sgx.h                        |  34 ++
->  arch/x86/kvm/vmx/vmcs12.c                     |   1 +
->  arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
->  arch/x86/kvm/vmx/vmx.c                        | 171 +++++--
->  arch/x86/kvm/vmx/vmx.h                        |  27 +-
->  arch/x86/kvm/x86.c                            |  24 +
->  include/uapi/linux/kvm.h                      |   1 +
->  tools/testing/selftests/sgx/defines.h         |   2 +-
->  36 files changed, 1366 insertions(+), 139 deletions(-)
->  create mode 100644 arch/x86/include/asm/sgx.h
->  rename arch/x86/{kernel/cpu/sgx/arch.h => include/asm/sgx_arch.h} (96%)
->  create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
->  create mode 100644 arch/x86/kernel/cpu/sgx/virt.h
->  create mode 100644 arch/x86/kvm/vmx/sgx.c
->  create mode 100644 arch/x86/kvm/vmx/sgx.h
-> 
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+Link: https://lore.kernel.org/linux-pci/87pn4nk7nn.fsf@nanos.tec.linutronix.de/
+Link: https://lore.kernel.org/linux-pci/877dqrnzr3.fsf@nanos.tec.linutronix.de/
+Link: https://lore.kernel.org/linux-pci/877dqqmc2h.fsf@nanos.tec.linutronix.de/
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+ arch/x86/pci/common.c       | 47 +++++++++++++++++++++++++++++++++++++
+ drivers/base/platform-msi.c |  8 +++++++
+ include/linux/msi.h         |  1 +
+ 3 files changed, 56 insertions(+)
 
+
+Background:
+Learnt from the discussions in this thread:
+
+https://lore.kernel.org/linux-pci/160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com/
+
+The device IMS (Interrupt Message Storage) should not be enabled in any
+virtualization environments unless there is a HYPERCALL domain which
+makes the changes in the message store managed by the hypervisor.
+
+As the initial step, we allow the IMS to be enabled only if we are
+running on the bare metal. It's easy to enable IMS in the virtualization
+environments if above preconditions are met in the future.
+
+We ever thought about moving on_bare_metal() to a generic file so that
+it could be well maintained and used. But we need some suggestions about
+where to put it. Your comments are very appreciated.
+
+This patch is only for comments purpose. Please don't merge it. We will
+include it in the Intel IMS implementation later once we reach a
+consensus.
+
+Change log:
+v1->v2:
+ - v1:
+   https://lore.kernel.org/linux-pci/20201210004624.345282-1-baolu.lu@linux.intel.com/
+ - Rename probably_on_bare_metal() with on_bare_metal();
+ - Some vendors might use the same name for both bare metal and virtual
+   environment. Before we add vendor specific code to distinguish
+   between them, let's return false in on_bare_metal(). This won't
+   introduce any regression. The only impact is that the coming new
+   platform msi feature won't be supported until the vendor specific code
+   is provided.
+
+Best regards,
+baolu
+
+diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
+index 3507f456fcd0..963e0401f2b2 100644
+--- a/arch/x86/pci/common.c
++++ b/arch/x86/pci/common.c
+@@ -724,3 +724,50 @@ struct pci_dev *pci_real_dma_dev(struct pci_dev *dev)
+ 	return dev;
+ }
+ #endif
++
++/*
++ * We want to figure out which context we are running in. But the hardware
++ * does not introduce a reliable way (instruction, CPUID leaf, MSR, whatever)
++ * which can be manipulated by the VMM to let the OS figure out where it runs.
++ * So we go with the below probably on_bare_metal() function as a replacement
++ * for definitely on_bare_metal() to go forward only for the very simple reason
++ * that this is the only option we have.
++ *
++ * People might use the same vendor name for both bare metal and virtual
++ * environment. We can remove those names once we have vendor specific code to
++ * distinguish between them.
++ */
++static const char * const vmm_vendor_name[] = {
++	"QEMU", "Bochs", "KVM", "Xen", "VMware", "VMW", "VMware Inc.",
++	"innotek GmbH", "Oracle Corporation", "Parallels", "BHYVE",
++	"Microsoft Corporation", "Amazon EC2"
++};
++
++static bool on_bare_metal(void)
++{
++	int i;
++
++	if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
++		return false;
++
++	for (i = 0; i < ARRAY_SIZE(vmm_vendor_name); i++)
++		if (dmi_match(DMI_SYS_VENDOR, vmm_vendor_name[i]))
++			return false;
++
++	pr_info("System running on bare metal, report to bugzilla.kernel.org if not the case.");
++
++	return true;
++}
++
++bool arch_support_pci_device_ims(struct pci_dev *pdev)
++{
++	/*
++	 * When we are running in a VMM context, the device IMS could only be
++	 * enabled when the underlying hardware supports interrupt isolation
++	 * of the subdevice, or any mechanism (trap, hypercall) is added so
++	 * that changes in the interrupt message store could be managed by the
++	 * VMM. For now, we only support the device IMS when we are running on
++	 * the bare metal.
++	 */
++	return on_bare_metal();
++}
+diff --git a/drivers/base/platform-msi.c b/drivers/base/platform-msi.c
+index 8432a1bf4e28..88e5fe4dae67 100644
+--- a/drivers/base/platform-msi.c
++++ b/drivers/base/platform-msi.c
+@@ -512,6 +512,11 @@ struct irq_domain *device_msi_create_irq_domain(struct fwnode_handle *fn,
+ #ifdef CONFIG_PCI
+ #include <linux/pci.h>
+ 
++bool __weak arch_support_pci_device_ims(struct pci_dev *pdev)
++{
++	return false;
++}
++
+ /**
+  * pci_subdevice_msi_create_irq_domain - Create an irq domain for subdevices
+  * @pdev:	Pointer to PCI device for which the subdevice domain is created
+@@ -523,6 +528,9 @@ struct irq_domain *pci_subdevice_msi_create_irq_domain(struct pci_dev *pdev,
+ 	struct irq_domain *domain, *pdev_msi;
+ 	struct fwnode_handle *fn;
+ 
++	if (!arch_support_pci_device_ims(pdev))
++		return NULL;
++
+ 	/*
+ 	 * Retrieve the MSI domain of the underlying PCI device's MSI
+ 	 * domain. The PCI device domain's parent domain is also the parent
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index f319d7c6a4ef..6fda81c4b859 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -478,6 +478,7 @@ struct irq_domain *device_msi_create_irq_domain(struct fwnode_handle *fn,
+ 						struct irq_domain *parent);
+ 
+ # ifdef CONFIG_PCI
++bool arch_support_pci_device_ims(struct pci_dev *pdev);
+ struct irq_domain *pci_subdevice_msi_create_irq_domain(struct pci_dev *pdev,
+ 						       struct msi_domain_info *info);
+ # endif
+-- 
+2.25.1
 
