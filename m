@@ -2,203 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4657A2EC5A1
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 22:24:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39FC32EC5BC
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 22:31:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbhAFVYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 16:24:20 -0500
-Received: from mga12.intel.com ([192.55.52.136]:30030 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725815AbhAFVYU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 16:24:20 -0500
-IronPort-SDR: hD3dLIJjFLYCSJ4/4ejU0QBL5/7xoPJ3ac/36HiViMy/ZPe0iqVi+k2RTiOLtBAAbAcqFy34eT
- mPOfjKAe2P4g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="156525939"
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="156525939"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 13:23:39 -0800
-IronPort-SDR: 05lJEBiiVneqcV8EL9Bf//Hj7fsNtf0Ij9ZvKNDPOA/shVQKzAPttNk2r/Z24CtqeUGvCz9RuT
- 2ILKSgXYVZOQ==
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="422318399"
-Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 13:23:38 -0800
-Subject: Re: [RFC PATCH 11/23] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1609890536.git.kai.huang@intel.com>
- <6b29d1ee66715b40aba847b31cbdac71cbb22524.1609890536.git.kai.huang@intel.com>
- <863820fc-f0d2-6be6-52db-ab3eefe36f64@intel.com>
- <X/Yl9UTLhYHg6AVi@google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
- oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
- 2UnKuZuSBu7lgOE193+7Uks3416N2hTkyKUSNkduyoZ9F5twiBhxPJwPtn/wnch6n5RsoXsb
- ygOEDxLEsSk/7eyFycjE+btUtAWZtx+HseyaGfqkZK0Z9bT1lsaHecmB203xShwCPT49Blxz
- VOab8668QpaEOdLGhtvrVYVK7x4skyT3nGWcgDCl5/Vp3TWA4K+IofwvXzX2ON/Mj7aQwf5W
- iC+3nWC7q0uxKwwsddJ0Nu+dpA/UORQWa1NiAftEoSpk5+nUUi0WE+5DRm0H+TXKBWMGNCFn
- c6+EKg5zQaa8KqymHcOrSXNPmzJuXvDQ8uj2J8XuzCZfK4uy1+YdIr0yyEMI7mdh4KX50LO1
- pmowEqDh7dLShTOif/7UtQYrzYq9cPnjU2ZW4qd5Qz2joSGTG9eCXLz5PRe5SqHxv6ljk8mb
- ApNuY7bOXO/A7T2j5RwXIlcmssqIjBcxsRRoIbpCwWWGjkYjzYCjgsNFL6rt4OL11OUF37wL
- QcTl7fbCGv53KfKPdYD5hcbguLKi/aCccJK18ZwNjFhqr4MliQARAQABzShEYXZpZCBDaHJp
- c3RvcGhlciBIYW5zZW4gPGRhdmVAc3I3MS5uZXQ+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJ
- CgsEFgIDAQIeAQIXgAUCTo3k0QIZAQAKCRBoNZUwcMmSsMO2D/421Xg8pimb9mPzM5N7khT0
- 2MCnaGssU1T59YPE25kYdx2HntwdO0JA27Wn9xx5zYijOe6B21ufrvsyv42auCO85+oFJWfE
- K2R/IpLle09GDx5tcEmMAHX6KSxpHmGuJmUPibHVbfep2aCh9lKaDqQR07gXXWK5/yU1Dx0r
- VVFRaHTasp9fZ9AmY4K9/BSA3VkQ8v3OrxNty3OdsrmTTzO91YszpdbjjEFZK53zXy6tUD2d
- e1i0kBBS6NLAAsqEtneplz88T/v7MpLmpY30N9gQU3QyRC50jJ7LU9RazMjUQY1WohVsR56d
- ORqFxS8ChhyJs7BI34vQusYHDTp6PnZHUppb9WIzjeWlC7Jc8lSBDlEWodmqQQgp5+6AfhTD
- kDv1a+W5+ncq+Uo63WHRiCPuyt4di4/0zo28RVcjtzlGBZtmz2EIC3vUfmoZbO/Gn6EKbYAn
- rzz3iU/JWV8DwQ+sZSGu0HmvYMt6t5SmqWQo/hyHtA7uF5Wxtu1lCgolSQw4t49ZuOyOnQi5
- f8R3nE7lpVCSF1TT+h8kMvFPv3VG7KunyjHr3sEptYxQs4VRxqeirSuyBv1TyxT+LdTm6j4a
- mulOWf+YtFRAgIYyyN5YOepDEBv4LUM8Tz98lZiNMlFyRMNrsLV6Pv6SxhrMxbT6TNVS5D+6
- UorTLotDZKp5+M7BTQRUY85qARAAsgMW71BIXRgxjYNCYQ3Xs8k3TfAvQRbHccky50h99TUY
- sqdULbsb3KhmY29raw1bgmyM0a4DGS1YKN7qazCDsdQlxIJp9t2YYdBKXVRzPCCsfWe1dK/q
- 66UVhRPP8EGZ4CmFYuPTxqGY+dGRInxCeap/xzbKdvmPm01Iw3YFjAE4PQ4hTMr/H76KoDbD
- cq62U50oKC83ca/PRRh2QqEqACvIH4BR7jueAZSPEDnzwxvVgzyeuhwqHY05QRK/wsKuhq7s
- UuYtmN92Fasbxbw2tbVLZfoidklikvZAmotg0dwcFTjSRGEg0Gr3p/xBzJWNavFZZ95Rj7Et
- db0lCt0HDSY5q4GMR+SrFbH+jzUY/ZqfGdZCBqo0cdPPp58krVgtIGR+ja2Mkva6ah94/oQN
- lnCOw3udS+Eb/aRcM6detZr7XOngvxsWolBrhwTQFT9D2NH6ryAuvKd6yyAFt3/e7r+HHtkU
- kOy27D7IpjngqP+b4EumELI/NxPgIqT69PQmo9IZaI/oRaKorYnDaZrMXViqDrFdD37XELwQ
- gmLoSm2VfbOYY7fap/AhPOgOYOSqg3/Nxcapv71yoBzRRxOc4FxmZ65mn+q3rEM27yRztBW9
- AnCKIc66T2i92HqXCw6AgoBJRjBkI3QnEkPgohQkZdAb8o9WGVKpfmZKbYBo4pEAEQEAAcLB
- XwQYAQIACQUCVGPOagIbDAAKCRBoNZUwcMmSsJeCEACCh7P/aaOLKWQxcnw47p4phIVR6pVL
- e4IEdR7Jf7ZL00s3vKSNT+nRqdl1ugJx9Ymsp8kXKMk9GSfmZpuMQB9c6io1qZc6nW/3TtvK
- pNGz7KPPtaDzvKA4S5tfrWPnDr7n15AU5vsIZvgMjU42gkbemkjJwP0B1RkifIK60yQqAAlT
- YZ14P0dIPdIPIlfEPiAWcg5BtLQU4Wg3cNQdpWrCJ1E3m/RIlXy/2Y3YOVVohfSy+4kvvYU3
- lXUdPb04UPw4VWwjcVZPg7cgR7Izion61bGHqVqURgSALt2yvHl7cr68NYoFkzbNsGsye9ft
- M9ozM23JSgMkRylPSXTeh5JIK9pz2+etco3AfLCKtaRVysjvpysukmWMTrx8QnI5Nn5MOlJj
- 1Ov4/50JY9pXzgIDVSrgy6LYSMc4vKZ3QfCY7ipLRORyalFDF3j5AGCMRENJjHPD6O7bl3Xo
- 4DzMID+8eucbXxKiNEbs21IqBZbbKdY1GkcEGTE7AnkA3Y6YB7I/j9mQ3hCgm5muJuhM/2Fr
- OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
- ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
- z5cecg==
-Message-ID: <7df437ee-e1f3-440c-377b-dbe39820fd44@intel.com>
-Date:   Wed, 6 Jan 2021 13:23:37 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726234AbhAFVaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 16:30:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbhAFVai (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 16:30:38 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A47C061575
+        for <kvm@vger.kernel.org>; Wed,  6 Jan 2021 13:29:58 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id c79so2468511pfc.2
+        for <kvm@vger.kernel.org>; Wed, 06 Jan 2021 13:29:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oKwFg1foqPPQlWIN0jba7AoqjGdlRQ7YxJt5702//gk=;
+        b=PcvabGtplXxFEbb1VDcktLNut0BuCBy11Zvvm7QukHEVYX+bb+s0yuezHzIcRNtnqh
+         rxVzRacRBE2oI5N2Ubz/cmIRYLFqmanuelgEievD5t6qZyaZM5GrABwf05O8jMsuAWNm
+         AIg8wR5opjJ99sDxl/Gw5LDwDeLGN+dWdO05KHUwHjvb3lhVP+ihzwtx4KkdADvXazPd
+         Er3u3zRoI55W0ai5MT6LZg9tD8KsZO+N3FTBaVKFtn0a5Uw0vT+t2b9Q5pM79CCKSarL
+         HEOtQwA8nuQpoMIHbTBmspTQ2RlfHxS5jGAZz5XrcGlI5fYLFFaPtTqHszHZtdrTcmCR
+         IGkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oKwFg1foqPPQlWIN0jba7AoqjGdlRQ7YxJt5702//gk=;
+        b=czoOsptUaND4qnKrwt8IxPKgPTyDtiuwc2fxvCUmJRL1bZqlL9Kq722XfqroxSqA1Y
+         WbMXsOY74k0FRk7xrGKGvoumq2l3hcgnytmh+cxK/3oSoNov+wGt8FkiIXWN60RAEpBC
+         eKfnwffF53ad+U8BUZSaR4qwuhgVxEbBrWzdVgeEIJssoUKjQoDIg68gGZc2O6W+VMXH
+         XaOYOek+dz3ppHQdLgXTuRCKxSNJg/xqSJV35I0tV3tg95sbuYvuRpPYF3+f4u/cqimK
+         SK7WS4mduGmjm1/46jpdxkM0dI7R9jmfOpmVSCvc5Uv5LrmIbpx48sU+yl/Hbd5nqY0K
+         AhOA==
+X-Gm-Message-State: AOAM531m1SFN5TIJYRNJNLOJYqVzl297i92775h34fL002r2Ur8j2c6W
+        Qbadg2QV964/gRjz/+0PoFMN+DrTEPqfvg==
+X-Google-Smtp-Source: ABdhPJxSvFR4x+2YGtqxVR32iAzT2P3QhwiWaRIoUe6V6gqzwuHr/UgO3aZEEVp6KjFUPwX61NZLmg==
+X-Received: by 2002:a63:1f47:: with SMTP id q7mr6515888pgm.10.1609968597827;
+        Wed, 06 Jan 2021 13:29:57 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id t6sm2900646pjg.49.2021.01.06.13.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jan 2021 13:29:57 -0800 (PST)
+Date:   Wed, 6 Jan 2021 13:29:50 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Leo Hou <leohou1402@gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: x86/mmu: Ensure TDP MMU roots are freed
+ after yield
+Message-ID: <X/Yrzgli82BOBgiJ@google.com>
+References: <20210106185951.2966575-1-bgardon@google.com>
 MIME-Version: 1.0
-In-Reply-To: <X/Yl9UTLhYHg6AVi@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210106185951.2966575-1-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/21 1:04 PM, Sean Christopherson wrote:
-> On Wed, Jan 06, 2021, Dave Hansen wrote:
->> On 1/5/21 5:56 PM, Kai Huang wrote:
->>> From: Sean Christopherson <sean.j.christopherson@intel.com>
->>>
->>> Provide wrappers around __ecreate() and __einit() to hide the ugliness
->>> of overloading the ENCLS return value to encode multiple error formats
->>> in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
->>> of SGX virtualization, and on an exception, KVM needs the trapnr so that
->>> it can inject the correct fault into the guest.
->>
->> This is missing a bit of a step about how and why ECREATE needs to be
->> run in the host in the first place.
+On Wed, Jan 06, 2021, Ben Gardon wrote:
+> Many TDP MMU functions which need to perform some action on all TDP MMU
+> roots hold a reference on that root so that they can safely drop the MMU
+> lock in order to yield to other threads. However, when releasing the
+> reference on the root, there is a bug: the root will not be freed even
+> if its reference count (root_count) is reduced to 0.
 > 
-> There's (hopefully) good info in the KVM usage patch that can be borrowed:
+> To simplify acquiring and releasing references on TDP MMU root pages, and
+> to ensure that these roots are properly freed, move the get/put operations
+> into the TDP MMU root iterator macro. Not all functions which use the macro
+> currently get and put a reference to the root, but adding this behavior is
+> harmless.
+
+I wouldn't say it's harmless, it creates the potential for refcount leaks where
+they otherwise wouldn't be possible (the early loop exit scenario).  Not saying
+this is the wrong approach, just that it's not without downsides.
+
+Maybe preemptively add tdp_mmu_root_iter_break(), which would just be a wrapper
+around kvm_mmu_put_root(), but might help readability (if it's ever needed)?
+Not sure that's a good idea, someone will probably just remove the dead code in
+the future :-)
+
+> Moving the get/put operations into the iterator macro also helps
+> simplify control flow when a root does need to be freed. Note that using
+> the list_for_each_entry_unsafe macro would not have been appropriate in
+
+s/list_for_each_entry_unsafe/list_for_each_entry_safe
+
+> this situation because it could keep a reference to the next root across
+> an MMU lock release + reacquire.
+
+Use of "reference" is a confusing; above it means refcounts, here it means a
+pointer _without_ an elevated refcount.  Something like this?
+
+  ... would not have been apprporiate in this situation because it could keep
+  a pointer to the next root across an MMU lock release + reacquire without
+  pinning the next root.
+
+> Reported-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Fixes: faaf05b00aec ("kvm: x86/mmu: Support zapping SPTEs in the TDP MMU")
+> Fixes: 063afacd8730 ("kvm: x86/mmu: Support invalidate range MMU notifier for TDP MMU")
+> Fixes: a6a0b05da9f3 ("kvm: x86/mmu: Support dirty logging for the TDP MMU")
+> Fixes: 14881998566d ("kvm: x86/mmu: Support disabling dirty logging for the tdp MMU")
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 97 +++++++++++++++++---------------------
+>  1 file changed, 44 insertions(+), 53 deletions(-)
 > 
->   Add an ECREATE handler that will be used to intercept ECREATE for the
->   purpose of enforcing and enclave's MISCSELECT, ATTRIBUTES and XFRM, i.e.
->   to allow userspace to restrict SGX features via CPUID.  ECREATE will be
->   intercepted when any of the aforementioned masks diverges from hardware
->   in order to enforce the desired CPUID model, i.e. inject #GP if the
->   guest attempts to set a bit that hasn't been enumerated as allowed-1 in
->   CPUID.
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 75db27fda8f3..6e076b66973c 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -44,8 +44,44 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+>  	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+>  }
+>  
+> -#define for_each_tdp_mmu_root(_kvm, _root)			    \
+> -	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)
+> +static void tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
+> +{
+> +	if (kvm_mmu_put_root(kvm, root))
+> +		kvm_tdp_mmu_free_root(kvm, root);
+> +}
+> +
+> +static inline bool tdp_mmu_next_root_valid(struct kvm *kvm,
+> +					   struct kvm_mmu_page *root)
+> +{
 
-OK, so in plain language: the bare-metal kernel must intercept ECREATE
-to be able to impose policies on guests.  When it does this, the
-bare-metal kernel runs ECREATE against the userspace mapping of the
-virtualized EPC.
+Maybe add lockdep annotations here?  A couple callers already have 'em.
 
->>> diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
->>> new file mode 100644
->>> index 000000000000..0d643b985085
->>> --- /dev/null
->>> +++ b/arch/x86/include/asm/sgx.h
->>> @@ -0,0 +1,16 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +#ifndef _ASM_X86_SGX_H
->>> +#define _ASM_X86_SGX_H
->>> +
->>> +#include <linux/types.h>
->>> +
->>> +#ifdef CONFIG_X86_SGX_VIRTUALIZATION
->>> +struct sgx_pageinfo;
->>> +
->>> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
->>> +		     int *trapnr);
->>> +int sgx_virt_einit(void __user *sigstruct, void __user *token,
->>> +		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
->>> +#endif
->>> +
->>> +#endif /* _ASM_X86_SGX_H */
->>> diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
->>> index d625551ccf25..4e9810ba9259 100644
->>> --- a/arch/x86/kernel/cpu/sgx/virt.c
->>> +++ b/arch/x86/kernel/cpu/sgx/virt.c
->>> @@ -261,3 +261,58 @@ int __init sgx_virt_epc_init(void)
->>>  
->>>  	return misc_register(&sgx_virt_epc_dev);
->>>  }
->>> +
->>> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
->>> +		     int *trapnr)
->>> +{
->>> +	int ret;
->>> +
->>> +	__uaccess_begin();
->>> +	ret = __ecreate(pageinfo, (void *)secs);
->>> +	__uaccess_end();
->>
->> The __uaccess_begin/end() worries me.  There are *very* few of these in
->> the kernel and it seems like something we want to use as sparingly as
->> possible.
->>
->> Why don't we just use the kernel mapping for 'secs' and not have to deal
->> with stac/clac?
-> 
-> The kernel mapping isn't readily available. 
+> +	if (list_entry_is_head(root, &kvm->arch.tdp_mmu_roots, link))
+> +		return false;
+> +
+> +	kvm_mmu_get_root(kvm, root);
+> +	return true;
+> +
+> +}
+> +
+> +static inline struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+> +						     struct kvm_mmu_page *root)
+> +{
+> +	struct kvm_mmu_page *next_root;
+> +
+> +	next_root = list_next_entry(root, link);
+> +	tdp_mmu_put_root(kvm, root);
+> +	return next_root;
+> +}
+> +
+> +/*
+> + * Note: this iterator gets and puts references to the roots it iterates over.
+> + * This makes it safe to release the MMU lock and yield within the loop, but
+> + * if exiting the loop early, the caller must drop the reference to the most
+> + * recent root. (Unless keeping a live reference is desirable.)
+> + */
+> +#define for_each_tdp_mmu_root(_kvm, _root)				\
+> +	for (_root = list_first_entry(&_kvm->arch.tdp_mmu_roots,	\
+> +				      typeof(*_root), link);		\
+> +	     tdp_mmu_next_root_valid(_kvm, _root);			\
+> +	     _root = tdp_mmu_next_root(_kvm, _root))
+>  
+>  bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+>  {
+> @@ -128,7 +164,11 @@ static struct kvm_mmu_page *get_tdp_mmu_vcpu_root(struct kvm_vcpu *vcpu)
+>  	/* Check for an existing root before allocating a new one. */
+>  	for_each_tdp_mmu_root(kvm, root) {
+>  		if (root->role.word == role.word) {
+> -			kvm_mmu_get_root(kvm, root);
+> +			/*
+> +			 * The iterator already acquired a reference to this
+> +			 * root, so simply return early without dropping the
+> +			 * reference.
+> +			 */
+>  			spin_unlock(&kvm->mmu_lock);
 
-Oh, duh.  There's no kernel mapping for EPC... it's not RAM in the first
-place.
+I vote to open code use of list_for_each_entry() for this one specific case,
+it's very much a one-off flow (relative to the other iteration scenarios).
 
-> At this point, it's not even
-> guaranteed that @secs points at an EPC page.  Unlike the driver code, where the
-> EPC page is allocated on-demand by the kernel, the pointer here is userspace
-> (technically guest) controlled.  The caller (KVM) is responsible for ensuring
-> it's a valid userspace address, but the SGX/EPC specific checks are mostly
-> deferred to hardware.
-
-Ahh, got it.  Kai, could we get some of this into comments or the changelog?
-
-
->> I'm also just generally worried about casting away an __user without
->> doing any checking.  How is that OK?
-> 
-> Short answer, KVM validates the virtual addresses.
-> 
-> KVM validates the host virtual addresses (HVA) when creating a memslot (maps
-> GPA->HVA).  The HVAs that are passed to these helpers are generated/retrieved
-> by KVM translating GVA->GPA->HVA; the GPA->HVA stage ensures the address is in a
-> valid memslot, and thus a valid user address.
-
-There is something a *bit* unpalatable about having KVM fill an
-'unsigned long' only to cast it to a (void __user *), the to cast it
-back to a (void *) to pass it to the SGX inlines.
-
-I guess sparse would catch us in the window that it is __user if someone
-tried to dereference it.
-
-Adding access_ok()'s sounds like a good idea to me.  Or, at *least*
-commenting why they're not necessary.
+>  			return root;
+>  		}
