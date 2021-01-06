@@ -2,204 +2,379 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 504232EC48A
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 21:14:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC47A2EC522
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 21:37:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727207AbhAFUNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 15:13:35 -0500
-Received: from mga09.intel.com ([134.134.136.24]:21805 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727187AbhAFUNe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 15:13:34 -0500
-IronPort-SDR: tJZYT97O2o5nsHtVTLr3wiDkQnF74ZJR/zR5Hjosxw331Xo0Y236L1hhsRFlOKPNwKwX9RKnQB
- v74dTq1jOXAQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="177483433"
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="177483433"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 12:12:53 -0800
-IronPort-SDR: rTYlajJyn/nG1I/BSs6V2/0B25e4DMLxXmEeZ6Y9PgxFy+87MmNCBQq+Dp4RchfhVYm15sPVw2
- xqk33bMxAzHA==
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="422301686"
-Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 12:12:52 -0800
-Subject: Re: [RFC PATCH 11/23] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+        id S1727057AbhAFUgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 15:36:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726993AbhAFUgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 15:36:20 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4CFC06134C
+        for <kvm@vger.kernel.org>; Wed,  6 Jan 2021 12:35:39 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id y8so2139161plp.8
+        for <kvm@vger.kernel.org>; Wed, 06 Jan 2021 12:35:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rpgaHqZdAQi//OLheAHzcPh/oj58gqDnQnAtqDbjIek=;
+        b=M2RYLE1u4rg2Tnz3d5Ep1gK13P1bnVWvYie5JNo8jIVoGtoaiQo1UAMBx1jz5KI1h0
+         LSQyLDbSNhZy0oH21v1pNuayB0pjudglZwOWk85jlXL8unN1Ax6KIkIdTbg+2nDJu/X1
+         uG6T5kyWsoBIK4koqL/H4t8nZl1KRm+y/W6QX27EGGgw6cUbZlswR4eYfpbwdOaWnACG
+         OkIET3OfO8tfbY3YtbAyjeedh9PLMGMVfRJBvRefFyw6FFMHV78sv9PQFvErdMxTIaX1
+         JStI12dOr4C0J+M1jTNJLLm6LpJf38sIQBacYC7kOIoFiP0zmI1x8jpcaA+FMnEbtNpp
+         rd0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=rpgaHqZdAQi//OLheAHzcPh/oj58gqDnQnAtqDbjIek=;
+        b=Kfz4UQITlHoDi89oW4StTZ/LQ0wXi/34FokSKemd3/CLcF68bkQYlMyO+6no8pV4ul
+         dKnDlzMomlEhkLskVroGwhtb9FI3xwTiOjF/Xgy4ar6v7rQzeHbZUeiKeFnHecVveotA
+         YVZ3n9tbFhj2DyOxUIjJOG4zmt+ujv6b5x4mSbkrsQPwDYby6Se94/V20TmQpcHDzxIE
+         jPVwHC7YeB6Spz0vvFbqrtbgvRPbl2SKLp+C46TdC9/QQNLuy60r6PT6IT7vcOKlWSdq
+         0Od5XYIaxEGDJkaDMTu6KmTp8PlW7ClRtibKcbJTalyopXWto8bDn77jsrma7jaB61nQ
+         47TQ==
+X-Gm-Message-State: AOAM5339hIhL8oBKtlCQYH+TP2ROUXCoW+zlOs/G6tzbSaVCRBk3O/Cf
+        tdw4WGxkDcEC9Mzn84mH11L7IA==
+X-Google-Smtp-Source: ABdhPJzc97vTks5U3qA5TdFKvDCxCCE+oM/a147afORlBA/aZobUGWp0U91i9sQIUm2p5e3DniwyoQ==
+X-Received: by 2002:a17:902:b706:b029:dc:3817:4da5 with SMTP id d6-20020a170902b706b02900dc38174da5mr5953028pls.23.1609965339106;
+        Wed, 06 Jan 2021 12:35:39 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id m22sm3839902pgj.46.2021.01.06.12.35.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jan 2021 12:35:38 -0800 (PST)
+Date:   Wed, 6 Jan 2021 12:35:31 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM
+ guests
+Message-ID: <X/YfE28guNBxcpui@google.com>
 References: <cover.1609890536.git.kai.huang@intel.com>
- <6b29d1ee66715b40aba847b31cbdac71cbb22524.1609890536.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <863820fc-f0d2-6be6-52db-ab3eefe36f64@intel.com>
-Date:   Wed, 6 Jan 2021 12:12:52 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
+ <2e424ff3-51cb-d6ed-6c5f-190e1d4fe21a@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <6b29d1ee66715b40aba847b31cbdac71cbb22524.1609890536.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2e424ff3-51cb-d6ed-6c5f-190e1d4fe21a@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/21 5:56 PM, Kai Huang wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+On Wed, Jan 06, 2021, Dave Hansen wrote:
+> On 1/5/21 5:55 PM, Kai Huang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
+> > index 95aad183bb65..02993a327a1f 100644
+> > --- a/arch/x86/kernel/cpu/sgx/main.c
+> > +++ b/arch/x86/kernel/cpu/sgx/main.c
+> > @@ -9,9 +9,11 @@
+> >  #include <linux/sched/mm.h>
+> >  #include <linux/sched/signal.h>
+> >  #include <linux/slab.h>
+> > +#include "arch.h"
+> >  #include "driver.h"
+> >  #include "encl.h"
+> >  #include "encls.h"
+> > +#include "virt.h"
+> >  
+> >  struct sgx_epc_section sgx_epc_sections[SGX_MAX_EPC_SECTIONS];
+> >  static int sgx_nr_epc_sections;
+> > @@ -726,7 +728,8 @@ static void __init sgx_init(void)
+> >  	if (!sgx_page_reclaimer_init())
+> >  		goto err_page_cache;
+> >  
+> > -	ret = sgx_drv_init();
+> > +	/* Success if the native *or* virtual EPC driver initialized cleanly. */
+> > +	ret = !!sgx_drv_init() & !!sgx_virt_epc_init();
+> >  	if (ret)
+> >  		goto err_kthread;
 > 
-> Provide wrappers around __ecreate() and __einit() to hide the ugliness
-> of overloading the ENCLS return value to encode multiple error formats
-> in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
-> of SGX virtualization, and on an exception, KVM needs the trapnr so that
-> it can inject the correct fault into the guest.
+> FWIW, I hate that conditional.  But, I tried to write to to be something
+> more sane and failed.
 
-This is missing a bit of a step about how and why ECREATE needs to be
-run in the host in the first place.
+Heh, you're welcome :-D
 
-> diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
-> new file mode 100644
-> index 000000000000..0d643b985085
-> --- /dev/null
-> +++ b/arch/x86/include/asm/sgx.h
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_X86_SGX_H
-> +#define _ASM_X86_SGX_H
-> +
-> +#include <linux/types.h>
-> +
-> +#ifdef CONFIG_X86_SGX_VIRTUALIZATION
-> +struct sgx_pageinfo;
-> +
-> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-> +		     int *trapnr);
-> +int sgx_virt_einit(void __user *sigstruct, void __user *token,
-> +		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
-> +#endif
-> +
-> +#endif /* _ASM_X86_SGX_H */
-> diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
-> index d625551ccf25..4e9810ba9259 100644
-> --- a/arch/x86/kernel/cpu/sgx/virt.c
-> +++ b/arch/x86/kernel/cpu/sgx/virt.c
-> @@ -261,3 +261,58 @@ int __init sgx_virt_epc_init(void)
->  
->  	return misc_register(&sgx_virt_epc_dev);
->  }
-> +
-> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-> +		     int *trapnr)
-> +{
-> +	int ret;
-> +
-> +	__uaccess_begin();
-> +	ret = __ecreate(pageinfo, (void *)secs);
-> +	__uaccess_end();
-
-The __uaccess_begin/end() worries me.  There are *very* few of these in
-the kernel and it seems like something we want to use as sparingly as
-possible.
-
-Why don't we just use the kernel mapping for 'secs' and not have to deal
-with stac/clac?
-
-I'm also just generally worried about casting away an __user without
-doing any checking.  How is that OK?
-
-> +	if (encls_faulted(ret)) {
-> +		*trapnr = ENCLS_TRAPNR(ret);
-> +		return -EFAULT;
-> +	}
-> +
-> +	/* ECREATE doesn't return an error code, it faults or succeeds. */
-> +	WARN_ON_ONCE(ret);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(sgx_virt_ecreate);
-> +
-> +static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
-> +			    void __user *secs)
-> +{
-> +	int ret;
-> +
-> +	__uaccess_begin();
-> +	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
-> +	__uaccess_end();
-> +	return ret;
-> +}
-
-If casting away one __user wasn't good enough, we get three! :)
-
-We need some more background in the changelog on why this is OK.
-
-> +int sgx_virt_einit(void __user *sigstruct, void __user *token,
-> +		   void __user *secs, u64 *lepubkeyhash, int *trapnr)
-> +{
-> +	int ret;
-> +
-> +	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
-> +		ret = __sgx_virt_einit(sigstruct, token, secs);
-> +	} else {
-> +		preempt_disable();
-> +
-> +		sgx_update_lepubkeyhash(lepubkeyhash);
-> +
-> +		ret = __sgx_virt_einit(sigstruct, token, secs);
-> +		preempt_enable();
-> +	}
-> +
-> +	if (encls_faulted(ret)) {
-> +		*trapnr = ENCLS_TRAPNR(ret);
-> +		return -EFAULT;
-> +	}
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(sgx_virt_einit);
+> > diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+> > new file mode 100644
+> > index 000000000000..d625551ccf25
+> > --- /dev/null
+> > +++ b/arch/x86/kernel/cpu/sgx/virt.c
+> > @@ -0,0 +1,263 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*  Copyright(c) 2016-20 Intel Corporation. */
+> > +
+> > +#include <linux/miscdevice.h>
+> > +#include <linux/mm.h>
+> > +#include <linux/mman.h>
+> > +#include <linux/sched/mm.h>
+> > +#include <linux/sched/signal.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/xarray.h>
+> > +#include <asm/sgx.h>
+> > +#include <uapi/asm/sgx.h>
+> > +
+> > +#include "encls.h"
+> > +#include "sgx.h"
+> > +#include "virt.h"
+> > +
+> > +struct sgx_virt_epc {
+> > +	struct xarray page_array;
+> > +	struct mutex lock;
+> > +	struct mm_struct *mm;
+> > +};
+> > +
+> > +static struct mutex virt_epc_lock;
+> > +static struct list_head virt_epc_zombie_pages;
 > 
+> What does the lock protect?
 
+Effectively, the list of zombie SECS pages.  Not sure why I used a generic name.
+
+> What are zombie pages?
+
+My own terminology for SECS pages whose virtual EPC has been destroyed but can't
+be reclaimed due to them having child EPC pages in other virtual EPCs.
+
+> BTW, if zombies are SECS-only, shouldn't that be in the name rather than
+> "epc"?
+
+I used the virt_epc prefix/namespace to tag it as a global list.  I've no
+argument against something like zombie_secs_pages.
+
+> > +static int __sgx_virt_epc_fault(struct sgx_virt_epc *epc,
+> > +				struct vm_area_struct *vma, unsigned long addr)
+> > +{
+> > +	struct sgx_epc_page *epc_page;
+> > +	unsigned long index, pfn;
+> > +	int ret;
+> > +
+> > +	/* epc->lock must already have been hold */
+> 
+> 	/* epc->lock must already be held */
+> 
+> Wouldn't this be better as:
+> 
+> WARN_ON(!mutex_is_locked(&epc->lock));
+> 
+> ?
+
+Or just proper lockdep?
+ 
+> > +	/* Calculate index of EPC page in virtual EPC's page_array */
+> > +	index = vma->vm_pgoff + PFN_DOWN(addr - vma->vm_start);
+> > +
+> > +	epc_page = xa_load(&epc->page_array, index);
+> > +	if (epc_page)
+> > +		return 0;
+> > +
+> > +	epc_page = sgx_alloc_epc_page(epc, false);
+> > +	if (IS_ERR(epc_page))
+> > +		return PTR_ERR(epc_page);
+> > +
+> > +	ret = xa_err(xa_store(&epc->page_array, index, epc_page, GFP_KERNEL));
+> > +	if (ret)
+> > +		goto err_free;
+> > +
+> > +	pfn = PFN_DOWN(sgx_get_epc_phys_addr(epc_page));
+> > +
+> > +	ret = vmf_insert_pfn(vma, addr, pfn);
+> > +	if (ret != VM_FAULT_NOPAGE) {
+> > +		ret = -EFAULT;
+> > +		goto err_delete;
+> > +	}
+> > +
+> > +	return 0;
+> > +
+> > +err_delete:
+> > +	xa_erase(&epc->page_array, index);
+> > +err_free:
+> > +	sgx_free_epc_page(epc_page);
+> > +	return ret;
+> > +}
+> > +
+> > +static vm_fault_t sgx_virt_epc_fault(struct vm_fault *vmf)
+> > +{
+> > +	struct vm_area_struct *vma = vmf->vma;
+> > +	struct sgx_virt_epc *epc = vma->vm_private_data;
+> > +	int ret;
+> > +
+> > +	mutex_lock(&epc->lock);
+> > +	ret = __sgx_virt_epc_fault(epc, vma, vmf->address);
+> > +	mutex_unlock(&epc->lock);
+> > +
+> > +	if (!ret)
+> > +		return VM_FAULT_NOPAGE;
+> > +
+> > +	if (ret == -EBUSY && (vmf->flags & FAULT_FLAG_ALLOW_RETRY)) {
+> > +		mmap_read_unlock(vma->vm_mm);
+> > +		return VM_FAULT_RETRY;
+> > +	}
+> > +
+> > +	return VM_FAULT_SIGBUS;
+> > +}
+> > +
+> > +const struct vm_operations_struct sgx_virt_epc_vm_ops = {
+> > +	.fault = sgx_virt_epc_fault,
+> > +};
+> > +
+> > +static int sgx_virt_epc_mmap(struct file *file, struct vm_area_struct *vma)
+> > +{
+> > +	struct sgx_virt_epc *epc = file->private_data;
+> > +
+> > +	if (!(vma->vm_flags & VM_SHARED))
+> > +		return -EINVAL;
+> > +
+> > +	/*
+> > +	 * Don't allow mmap() from child after fork(), since child and parent
+> > +	 * cannot map to the same EPC.
+> > +	 */
+> > +	if (vma->vm_mm != epc->mm)
+> > +		return -EINVAL;
+> 
+> I mentioned this below, but I'm not buying this logic.  I know it would
+> be *bad*, but I don't see why the kernel needs to keep it from happening.
+
+There's no known use case (KVM doesn't support sharing a VM across multiple
+mm structs), and supporting multiple mm structs is a nightmare; see the driver
+for the amount of pain incurred.
+
+And IIRC, supporting VMM (KVM) EPC oversubscription, which may or may not ever
+happen, was borderline impossible if virtual EPC supports multiple mm structs as
+the interaction between KVM and virtual EPC is a disaster in that case.
+
+> > +	vma->vm_ops = &sgx_virt_epc_vm_ops;
+> > +	/* Don't copy VMA in fork() */
+> > +	vma->vm_flags |= VM_PFNMAP | VM_IO | VM_DONTDUMP | VM_DONTCOPY;
+> > +	vma->vm_private_data = file->private_data;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int sgx_virt_epc_free_page(struct sgx_epc_page *epc_page)
+> > +{
+> > +	int ret;
+> > +
+> > +	if (!epc_page)
+> > +		return 0;
+> 
+> I always worry about these.  Why is passing NULL around OK?
+
+I suspect I did it to mimic kfree() behavior.  I don't _think_ the radix (now
+xarray) usage will ever encounter a NULL entry.
+
+> 
+> > +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
+> > +	if (ret) {
+> > +		/*
+> > +		 * Only SGX_CHILD_PRESENT is expected, which is because of
+> > +		 * EREMOVE-ing an SECS still with child, in which case it can
+> > +		 * be handled by EREMOVE-ing the SECS again after all pages in
+> > +		 * virtual EPC have been EREMOVE-ed. See comments in below in
+> > +		 * sgx_virt_epc_release().
+> > +		 */
+> > +		WARN_ON_ONCE(ret != SGX_CHILD_PRESENT);
+> > +		return ret;
+> > +	}
+> 
+> I find myself wondering what errors could cause the WARN_ON_ONCE() to be
+> hit.  The SDM indicates that it's only:
+> 
+> 	SGX_ENCLAVE_ACT If there are still logical processors executing
+> 			inside the enclave.
+> 
+> Should that be mentioned in the comment?
+
+And faults, which are also spliced into the return value by the ENCLS macros.
+I do remember hitting this WARN when I broke things, though I can't remember
+whether it was a fault or the SGX_ENCLAVE_ACT scenario.  Probably the latter?
+
+> > +
+> > +	__sgx_free_epc_page(epc_page);
+> > +	return 0;
+> > +}
+> > +
+
+...
+
+> > +	xa_for_each(&epc->page_array, index, entry) {
+> > +		epc_page = entry;
+> 
+> Then, talk about the error condition here:
+> 
+> > +		/*
+> > +		 * Error here means that EREMOVE failed due to a SECS page
+> > +		 * still has child on *another* EPC instance.  Put it to a
+> > +		 * temporary SECS list which will be spliced to 'zombie page
+> > +		 * list' and will be EREMOVE-ed again when freeing another
+> > +		 * virtual EPC instance.
+> > +		 */
+> 
+> Surprise, I've got another rewrite:
+> 
+> 		/*
+> 		 * An EREMOVE failure here means that the SECS page
+> 		 * still has children.  But, since all children in this
+> 		 * 'sgx_virt_epc' have been removed, the SECS page must
+> 		 * have a child on another instance.
+> 		 */
+> 
+> > +		if (sgx_virt_epc_free_page(epc_page))
+> > +			list_add_tail(&epc_page->list, &secs_pages);
+> 
+> Why move these over to &secs_list here?  I think it's to avoid another
+> xa_for_each() below, but it's not clear.
+
+Yes?  IIRC, the sole motivation is to make the list_split_tail() operation as
+short as possible while holding the global virt_epc_lock.
+ 
+> > +		xa_erase(&epc->page_array, index);
+> > +	}
+> > +
+
+...
+ 	
+> > +	mutex_lock(&virt_epc_lock);
+> > +	list_for_each_entry_safe(epc_page, tmp, &virt_epc_zombie_pages, list) {
+> > +		/*
+> > +		 * Speculatively remove the page from the list of zombies, if
+> > +		 * the page is successfully EREMOVE it will be added to the
+> > +		 * list of free pages.  If EREMOVE fails, throw the page on the
+> > +		 * local list, which will be spliced on at the end.
+> > +		 */
+> > +		list_del(&epc_page->list);
+> > +
+> > +		if (sgx_virt_epc_free_page(epc_page))
+> > +			list_add_tail(&epc_page->list, &secs_pages);
+> 
+> I don't get this.  Couldn't you do without the unconditional list_del()
+> and instead just do:
+> 
+> 		if (!sgx_virt_epc_free_page(epc_page))
+> 			list_del(&epc_page->list);
+> 
+> Or does the free() code clobber the list_head?  If that's the case,
+> maybe you should say that explicitly.
+
+More or less.  EPC pages need to be removed from their list before freeing, once
+a page is freed it is owned by the allocator.  Deleting after freeing leads to
+list corruption if a different thread allocates the page and adds it to a
+different list.
+ 
+> > +	}
+> > +
+> > +	if (!list_empty(&secs_pages))
+> > +		list_splice_tail(&secs_pages, &virt_epc_zombie_pages);
+> > +	mutex_unlock(&virt_epc_lock);
+> > +
+> > +	kfree(epc);
+> > +
+> > +	return 0;
+> > +}
