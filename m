@@ -2,112 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AC672EC722
+	by mail.lfdr.de (Postfix) with ESMTP id 020ED2EC721
 	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 00:58:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727280AbhAFX50 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 18:57:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47828 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726293AbhAFX50 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 18:57:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609977360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cjDyoQgR4+M9JyvM9051ALlS1QRgqHD8UEz36SRbsyU=;
-        b=GJK5F/67/EdZcm4LzMXzPasEnm/kqDZJPonwmw2V0hTbEZb9sBCUpXz3zof+GK2PNB3nQE
-        IO0oPN3AwA9M/QC7ye5p4MbDRUocrL/SzkyiFI77S7CbQccaxyVHcmbY/0r9cyijO2vYWW
-        BKM9R3idVMMrZxHyDyUQY9TmwUu7wBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-s9svPryjMkqmV43MsbksdQ-1; Wed, 06 Jan 2021 18:55:58 -0500
-X-MC-Unique: s9svPryjMkqmV43MsbksdQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02E93801817;
-        Wed,  6 Jan 2021 23:55:57 +0000 (UTC)
-Received: from starship (unknown [10.35.206.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1152310016FA;
-        Wed,  6 Jan 2021 23:55:49 +0000 (UTC)
-Message-ID: <747878595173b72dfa95f73f4e73c6cabb199bd8.camel@redhat.com>
-Subject: Re: [PATCH 5/6] KVM: nSVM: always leave the nested state first on
- KVM_SET_NESTED_STATE
-From:   Maxim Levitsky <mlevitsk@redhat.com>
+        id S1727886AbhAFX5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 18:57:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:32815 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727872AbhAFX5E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 18:57:04 -0500
+IronPort-SDR: cVMUEBR7kTFKpc73SNJxA8CE4rN5BwH3dgk83vkH2ZjKnRhcYWR5FFXl6nRPWSwBvNh5Yj8aIJ
+ Tvf9IxN9taGg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="177451826"
+X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
+   d="scan'208";a="177451826"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 15:56:22 -0800
+IronPort-SDR: j6WUj/gWO9W7Ve7KuqDF1q8xpKu3w0o7dStw9MRRzmzOUWlMqTV12Yck7soddl44FOhHO0kzJ2
+ OFM1vob4BvJQ==
+X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
+   d="scan'208";a="462841494"
+Received: from vastrong-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.243])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 15:56:18 -0800
+Date:   Thu, 7 Jan 2021 12:56:15 +1300
+From:   Kai Huang <kai.huang@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>
-Date:   Thu, 07 Jan 2021 01:55:48 +0200
-In-Reply-To: <X/X13wD58Oi/0XpX@google.com>
-References: <20210106105001.449974-1-mlevitsk@redhat.com>
-         <20210106105001.449974-6-mlevitsk@redhat.com> <X/X13wD58Oi/0XpX@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
-MIME-Version: 1.0
+Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2
+ sub-features
+Message-Id: <20210107125615.f11d6498ba119a6e2e7adacb@intel.com>
+In-Reply-To: <X/ZFjUO83lDdQBPL@google.com>
+References: <cover.1609890536.git.kai.huang@intel.com>
+        <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
+        <6d28e858-a5c0-6ce8-8c0d-2fdfbea3734b@intel.com>
+        <20210107111206.c8207e64540a8361c04259b7@intel.com>
+        <b3e11134-cd8e-2b51-1363-58898832ba38@intel.com>
+        <20210107115637.c1e0bf2c823f933943ee813b@intel.com>
+        <X/ZFjUO83lDdQBPL@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-01-06 at 09:39 -0800, Sean Christopherson wrote:
-> On Wed, Jan 06, 2021, Maxim Levitsky wrote:
-> > This should prevent bad things from happening if the user calls the
-> > KVM_SET_NESTED_STATE twice.
-> 
-> This doesn't exactly inspire confidence, nor does it provide much help to
-> readers that don't already know why KVM should "leave nested" before processing
-> the rest of kvm_state.
-> 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  arch/x86/kvm/svm/nested.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, 6 Jan 2021 15:19:41 -0800 Sean Christopherson wrote:
+> On Thu, Jan 07, 2021, Kai Huang wrote:
+> > On Wed, 6 Jan 2021 14:21:39 -0800 Dave Hansen wrote:
+> > > On 1/6/21 2:12 PM, Kai Huang wrote:
+> > > > On Wed, 6 Jan 2021 11:39:46 -0800 Dave Hansen wrote:
+> > > >> On 1/5/21 5:55 PM, Kai Huang wrote:
+> > > >>> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> > > >>> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> > > >>> @@ -97,6 +97,8 @@ static void clear_sgx_caps(void)
+> > > >>>  {
+> > > >>>  	setup_clear_cpu_cap(X86_FEATURE_SGX);
+> > > >>>  	setup_clear_cpu_cap(X86_FEATURE_SGX_LC);
+> > > >>> +	setup_clear_cpu_cap(X86_FEATURE_SGX1);
+> > > >>> +	setup_clear_cpu_cap(X86_FEATURE_SGX2);
+> > > >>>  }
+> > > >> Logically, I think you want this *after* the "Allow SGX virtualization
+> > > >> without Launch Control support" patch.  As it stands, this will totally
+> > > >> disable SGX (including virtualization) if launch control is unavailable.
+> > > >>
+> > > > To me it is better to be here, since clear_sgx_caps(), which disables SGX
+> > > > totally, should logically clear all SGX feature bits, no matter later patch's
+> > > > behavior. So when new SGX bits are introduced, clear_sgx_caps() should clear
+> > > > them too. Otherwise the logic of this patch (adding new SGX feature bits) is
+> > > > not complete IMHO.
+> > > > 
+> > > > And actually in later patch "Allow SGX virtualization without Launch Control
+> > > > support", a new clear_sgx_lc() is added, and is called when LC is not
+> > > > available but SGX virtualization is enabled, to make sure only SGX_LC bit is
+> > > > cleared in this case. I don't quite understand why we need to clear SGX1 and
+> > > > SGX2 in clear_sgx_caps() after the later patch.
+> > > 
+> > > I was talking about patch ordering.  It could be argued that this goes
+> > > after the content of patch 05/23.  Please _consider_ changing the ordering.
+> > > 
+> > > If that doesn't work for some reason, please at least call out in the
+> > > changelog that it leaves a temporarily funky situation.
+> > > 
 > > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index c1a3d0e996add..3aa18016832d0 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1154,8 +1154,9 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
-> >  	if (is_smm(vcpu) && (kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
-> >  		return -EINVAL;
-> >  
-> > +	svm_leave_nested(svm);
-> 
-> nVMX sets a really bad example in that it does vmx_leave_nested(), and many
-> other things, long before it has vetted the incoming state.  That's not the end
-> of the word as the caller is likely going to exit if this ioctl() fails, but it
-> would be nice to avoid such behavior with nSVM, especially since it appears to
-> be trivially easy to do svm_leave_nested() iff the ioctl() will succeed.
-
-I agree with you. So if I understand correctly I should move the unconditional 
-svm_leave_nested(svm) after all the checks are done? I 
-
-Best regards,
-	Maxim Levitsky
-
-> 
-> > +
-> >  	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE)) {
-> > -		svm_leave_nested(svm);
-> >  		svm_set_gif(svm, !!(kvm_state->flags & KVM_STATE_NESTED_GIF_SET));
-> >  		return 0;
-> >  	}
-> > -- 
-> > 2.26.2
+> > The later patch currently uses SGX1 bit, which is the reason that this patch
+> > needs be before later patch.
 > > 
+> > Sean,
+> > 
+> > I think it is OK to remove SGX1 bit check in later patch, since I have
+> > never seen a machine with SGX bit in CPUID, but w/o SGX1.
+> 
+> The SGX1 check is "needed" to handle the case where SGX is supported but was
+> soft-disabled, e.g. because software disable a machine check bank by writing an
+> MCi_CTL MSR.
+> 
+> > If we remove SGX1 bit check in later, we can put this patch after the later
+> > patch.
+> > 
+> > Do you have comment here? If you are OK, I'll remove SGX1 bit check in later
+> > patch and reorder the patch.
+> 
+> Hmm, I'm not sure why the SGX driver was merged without explicitly checking for
+> SGX1 support.  I'm pretty sure we had an explicit SGX1 check in the driver path
+> at some point.  My guess is that the SGX1 change ended up in the KVM series
+> through a mishandled rebase.
+> 
+> Moving the check later won't break anything that's not already broken.  But,
+> arguably checking SGX1 is a bug fix of sorts, e.g. to guard against broken
+> firmware, and should go in as a standalone patch destined for stable.  The
+> kernel can't prevent SGX from being soft-disabled after boot, but IMO it should
+> cleanly handle the case where SGX was soft-disabled _before_ boot.
 
-
+It seems I need to dig some history. Thanks Sean for the info!
