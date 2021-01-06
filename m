@@ -2,264 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C6F72EB6DC
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:27:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F6FE2EB6FC
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:45:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbhAFA01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 19:26:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37662 "EHLO
+        id S1727345AbhAFAnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 19:43:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726680AbhAFA00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 19:26:26 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A21E3C0617A0
-        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 16:25:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=/C8di9xXHodwqGPB90VsDEPR5hgOyNhOqCC0TApGH+s=; b=sr2A30oxxDmPq5QIIKblFcQ/IY
-        31t/TVxekmbmxSMqa6MTclQf3c7cs3ejgOGUjcJ++DTj19zB4Q/kwphQ3N1CPYWWGKYo6YxdoaqOs
-        unjRKepELHKISR0LaWPbLWeT5lovqvo59sZ8jApwlqdfXjCHWgZhwZ9hiTNypN6WOJrdyvfFsVdhO
-        jDN3sbaC29AbqVUVpkluSznRfsBZPkzBIVgOMJ9ePjKD1nj1z50vNUyP717fi3mN5rPqcKztayrXn
-        Yn6cO/wwzTIUEhb6gRQwZvcBBU791i9nBLZrHMIURpASQMIezXcOL3V0UkvJ59dj7thkAgpZYXAzg
-        +I3xRTIQ==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1kwwbh-001pA6-W7; Wed, 06 Jan 2021 00:23:36 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kwwbh-001NjW-Jw; Wed, 06 Jan 2021 00:23:21 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v4 16/16] KVM: x86/xen: Add event channel interrupt vector upcall
-Date:   Wed,  6 Jan 2021 00:23:14 +0000
-Message-Id: <20210106002314.328380-17-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210106002314.328380-1-dwmw2@infradead.org>
-References: <20210106002314.328380-1-dwmw2@infradead.org>
+        with ESMTP id S1727335AbhAFAnX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 19:43:23 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C88C061793;
+        Tue,  5 Jan 2021 16:42:42 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id d8so1551502otq.6;
+        Tue, 05 Jan 2021 16:42:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rJIW+TkPHzwAadsvHwzFBYVv7eO9qsc4zllpELWrOHY=;
+        b=vYgYsI83SZA8A5U0getZRGvfhjMCAL5Ne8nN37EtfYwvQppWY/NfjnZ4mGukHW93BH
+         RCzpxpmlS1KT+8L0xC9/2/oRZTCg0mReYfVd/YcraTS1pH8pUfKbA91BcW6CoehdHY6X
+         gmItY2fXMuXfrt2CFgAU79pFRn3xpnMvtz1ya/KbFC9sS5vsQSc07ACc+7efcxzDVp5I
+         NsHyaKrEM2a4NSzqiNNF0lGBGfxWqfl/L4v091ViSEFrAP2Bqwcuu/mSDibQ/IzTAHRb
+         74boqnDUhGfg27UkJBkjUOyRsniYh1L53cn+e3J5LqvHJJt6NXAHSiCVA+NM55jkWe0L
+         CtEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rJIW+TkPHzwAadsvHwzFBYVv7eO9qsc4zllpELWrOHY=;
+        b=hqL3rSrrPjG+bsZkJ4ByfQx1OLUbi3+M1iCw9ukes8UUKl4af3HqtV++p4J8sAu47q
+         OgKnnmphUpOimA/DjWRbnITUKIyZOm1Nk3HlPSqJR0LZwGRQcktkTB8w0UFjitzEuhWc
+         y62RUpxF8UPERoWNRM6yAaF4AxD2yXBDSPktSVBazdjnXuDWfYv4g3Uu1tAEU4Nd+GSU
+         J2Umzb2WVSN7qhfMvomTPPrncATGHM+b4+iszTuRmWFc/p98IVY+FjiVCrH1b8rcM/fz
+         0qmyJtaaD/mCdWah71o+HHapfQx/K1Vy0Q8JxKM5gHGglQFs0xR0VvG7viuBcNr4f7MN
+         S9gg==
+X-Gm-Message-State: AOAM530aORZnwUSP+yOJ4UI3ue/JqEo7+aC+pSLZUNnU+tCWrjz/K3u7
+        VK+86Bc2wu2FKEvf9EmOu/ihyzLVPsjm1U5PyTR0o1Fn
+X-Google-Smtp-Source: ABdhPJw7uTz6EV6kWmBFWPuO1J4Mue7BQ1TFNTgr7/WHNUxB12RqCFbcDGM8pUG8APcybpqefZ2MWaiaZYPq2LbecAg=
+X-Received: by 2002:a05:6830:4f:: with SMTP id d15mr1541713otp.185.1609893762440;
+ Tue, 05 Jan 2021 16:42:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20210105192844.296277-1-nitesh@redhat.com>
+In-Reply-To: <20210105192844.296277-1-nitesh@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 6 Jan 2021 08:42:31 +0800
+Message-ID: <CANRm+CwW0NfqD3e+xEZtKrpV+igwZoCp_Tz_5sztj2-8WXGu0A@mail.gmail.com>
+Subject: Re: [PATCH] Revert "KVM: x86: Unconditionally enable irqs in guest context"
+To:     Nitesh Narayan Lal <nitesh@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        seanjc@google.com, w90p710@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Wed, 6 Jan 2021 at 06:30, Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>
+> This reverts commit d7a08882a0a4b4e176691331ee3f492996579534.
+>
+> After the introduction of the patch:
+>
+>         87fa7f3e9: x86/kvm: Move context tracking where it belongs
+>
+> since we have moved guest_exit_irqoff closer to the VM-Exit, explicit
+> enabling of irqs to process pending interrupts should not be required
+> within vcpu_enter_guest anymore.
+>
+> Conflicts:
+>         arch/x86/kvm/svm.c
+>
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> ---
+>  arch/x86/kvm/svm/svm.c |  9 +++++++++
+>  arch/x86/kvm/x86.c     | 11 -----------
+>  2 files changed, 9 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index cce0143a6f80..c9b2fbb32484 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4187,6 +4187,15 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+>
+>  static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+>  {
+> +       kvm_before_interrupt(vcpu);
+> +       local_irq_enable();
+> +       /*
+> +        * We must have an instruction with interrupts enabled, so
+> +        * the timer interrupt isn't delayed by the interrupt shadow.
+> +        */
+> +       asm("nop");
+> +       local_irq_disable();
+> +       kvm_after_interrupt(vcpu);
+>  }
 
-It turns out that we can't handle event channels *entirely* in userspace
-by delivering them as ExtINT, because KVM is a bit picky about when it
-accepts ExtINT interrupts from a legacy PIC. The in-kernel local APIC
-has to have LVT0 configured in APIC_MODE_EXTINT and unmasked, which
-isn't necessarily the case for Xen guests especially on secondary CPUs.
+Why do we need to reintroduce this part?
 
-To cope with this, add kvm_xen_get_interrupt() which checks the
-evtchn_pending_upcall field in the Xen vcpu_info, and delivers the Xen
-upcall vector (configured by KVM_XEN_ATTR_TYPE_UPCALL_VECTOR) if it's
-set regardless of LAPIC LVT0 configuration. This gives us the minimum
-support we need for completely userspace-based implementation of event
-channels.
-
-This does mean that vcpu_enter_guest() needs to check for the
-evtchn_pending_upcall flag being set, because it can't rely on someone
-having set KVM_REQ_EVENT unless we were to add some way for userspace to
-do so manually.
-
-But actually, I don't quite see how that works reliably for interrupts
-injected with KVM_INTERRUPT either. In kvm_vcpu_ioctl_interrupt() the
-KVM_REQ_EVENT request is set once, but that'll get cleared the first time
-through vcpu_enter_guest(). So if the first exit is for something *else*
-without interrupts being enabled yet, won't the KVM_REQ_EVENT request
-have been consumed already and just be lost?
-
-I wonder if my addition of '|| kvm_xen_has_interrupt(vcpu)' should
-actually be '|| kvm_has_injectable_intr(vcpu)' to fix that pre-existing
-bug?
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/irq.c              |  7 +++++
- arch/x86/kvm/x86.c              |  3 +-
- arch/x86/kvm/xen.c              | 52 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/xen.h              |  1 +
- include/uapi/linux/kvm.h        |  2 ++
- 6 files changed, 65 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 3fb236d99e77..51ac9e158396 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -907,6 +907,7 @@ struct msr_bitmap_range {
- struct kvm_xen {
- 	bool long_mode;
- 	bool shinfo_set;
-+	u8 upcall_vector;
- 	struct gfn_to_hva_cache shinfo_cache;
- };
- 
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 814698e5b152..24668b51b5c8 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -14,6 +14,7 @@
- #include "irq.h"
- #include "i8254.h"
- #include "x86.h"
-+#include "xen.h"
- 
- /*
-  * check if there are pending timer events
-@@ -56,6 +57,9 @@ int kvm_cpu_has_extint(struct kvm_vcpu *v)
- 	if (!lapic_in_kernel(v))
- 		return v->arch.interrupt.injected;
- 
-+	if (kvm_xen_has_interrupt(v))
-+		return 1;
-+
- 	if (!kvm_apic_accept_pic_intr(v))
- 		return 0;
- 
-@@ -110,6 +114,9 @@ static int kvm_cpu_get_extint(struct kvm_vcpu *v)
- 	if (!lapic_in_kernel(v))
- 		return v->arch.interrupt.nr;
- 
-+	if (kvm_xen_has_interrupt(v))
-+		return v->kvm->arch.xen.upcall_vector;
-+
- 	if (irqchip_split(v->kvm)) {
- 		int vector = v->arch.pending_external_vector;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e7a639e998d5..cf1c1db090d2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8935,7 +8935,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			kvm_x86_ops.msr_filter_changed(vcpu);
- 	}
- 
--	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
-+	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-+	    kvm_xen_has_interrupt(vcpu)) {
- 		++vcpu->stat.req_event;
- 		kvm_apic_accept_events(vcpu);
- 		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 17cbb4462b7e..4bc9da9fcfb8 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -176,6 +176,45 @@ void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
- 	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
- }
- 
-+int kvm_xen_has_interrupt(struct kvm_vcpu *v)
-+{
-+	u8 rc = 0;
-+
-+	/*
-+	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
-+	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
-+	 */
-+	if (v->arch.xen.vcpu_info_set && v->kvm->arch.xen.upcall_vector) {
-+		struct gfn_to_hva_cache *ghc = &v->arch.xen.vcpu_info_cache;
-+		struct kvm_memslots *slots = kvm_memslots(v->kvm);
-+		unsigned int offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
-+
-+		/* No need for compat handling here */
-+		BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=
-+			     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
-+		BUILD_BUG_ON(sizeof(rc) !=
-+			     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
-+		BUILD_BUG_ON(sizeof(rc) !=
-+			     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
-+
-+		/*
-+		 * For efficiency, this mirrors the checks for using the valid
-+		 * cache in kvm_read_guest_offset_cached(), but just uses
-+		 * __get_user() instead. And falls back to the slow path.
-+		 */
-+		if (likely(slots->generation == ghc->generation &&
-+			   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
-+			/* Fast path */
-+			__get_user(rc, (u8 __user *)ghc->hva + offset);
-+		} else {
-+			/* Slow path */
-+			kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
-+						      sizeof(rc));
-+		}
-+	}
-+	return rc;
-+}
-+
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- {
- 	struct kvm_vcpu *v;
-@@ -245,6 +284,14 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		v->arch.xen.last_state_ns = ktime_get_ns();
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
-+		if (data->u.vector < 0x10)
-+			return -EINVAL;
-+
-+		kvm->arch.xen.upcall_vector = data->u.vector;
-+		r = 0;
-+		break;
-+
- 	default:
- 		break;
- 	}
-@@ -303,6 +350,11 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		}
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
-+		data->u.vector = kvm->arch.xen.upcall_vector;
-+		r = 0;
-+		break;
-+
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 407e717476d6..d64916ac4a12 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -11,6 +11,7 @@
- 
- void kvm_xen_setup_runstate_page(struct kvm_vcpu *vcpu);
- void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu);
-+int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index a075d7297da6..0926d469b2f7 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1593,6 +1593,7 @@ struct kvm_xen_hvm_attr {
- 
- 	union {
- 		__u8 long_mode;
-+		__u8 vector;
- 		struct {
- 			__u64 gfn;
- 		} shared_info;
-@@ -1610,6 +1611,7 @@ struct kvm_xen_hvm_attr {
- #define KVM_XEN_ATTR_TYPE_VCPU_INFO		0x2
- #define KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO	0x3
- #define KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE		0x4
-+#define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x5
- 
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
--- 
-2.29.2
-
+    Wanpeng
