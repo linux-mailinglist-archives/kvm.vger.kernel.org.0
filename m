@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89D1B2EB7DF
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 02:59:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA892EB7E0
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 02:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbhAFB41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 20:56:27 -0500
-Received: from mga09.intel.com ([134.134.136.24]:32445 "EHLO mga09.intel.com"
+        id S1726097AbhAFB4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 20:56:31 -0500
+Received: from mga09.intel.com ([134.134.136.24]:32451 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726097AbhAFB41 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 20:56:27 -0500
-IronPort-SDR: M4o+d1zZhW2T5W3gXctG2A1KbGUBZcHmsAuP3qMgaq4o3q74CPd+FkChMeLBHeWXKB9cFB/GqA
- q9sipNK8+zbA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="177365934"
+        id S1725860AbhAFB4b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 20:56:31 -0500
+IronPort-SDR: BdnvU3zu7Sv+dHSSevITYnO7XxMLpZEg/e/iLiapy+ouey5Vi+Bf1JbyMU03qJFb3NsQLZS3tc
+ +1BvEBrAXgGw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="177365937"
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="177365934"
+   d="scan'208";a="177365937"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:55:46 -0800
-IronPort-SDR: wuXTfR50WMsrOItXHtiZxK8kxLKK32Co1G5k5J+iLsgrz1lLzefT2Ukyz7A/uT2jEvhXrbasCT
- 9ujNCeMCf1+A==
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:55:50 -0800
+IronPort-SDR: 7Ps4N4I8rk04pBsrE4wagmi+xI9hpAs7xZ+hgZPwzMK4WxlpRfCmOcbK30FRf20+4c6xjK+w+a
+ 8Wp9TnrHZnaQ==
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="421993171"
+   d="scan'208";a="421993191"
 Received: from zhuoxuan-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.29.237])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:55:42 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:55:47 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
         bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM guests
-Date:   Wed,  6 Jan 2021 14:55:20 +1300
-Message-Id: <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
+Subject: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Date:   Wed,  6 Jan 2021 14:55:21 +1300
+Message-Id: <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1609890536.git.kai.huang@intel.com>
 References: <cover.1609890536.git.kai.huang@intel.com>
@@ -44,393 +44,148 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add a misc device /dev/sgx_virt_epc to allow userspace to allocate "raw"
-EPC without an associated enclave.  The intended and only known use case
-for raw EPC allocation is to expose EPC to a KVM guest, hence the
-virt_epc moniker, virt.{c,h} files and X86_SGX_VIRTUALIZATION Kconfig.
-
-Modify sgx_init() to always try to initialize virtual EPC driver, even
-when SGX driver is disabled due to SGX Launch Control is in locked mode,
-or not present at all, since SGX virtualization allows to expose SGX to
-guests that support non-LC configurations.
-
-Implement the "raw" EPC allocation in the x86 core-SGX subsystem via
-/dev/sgx_virt_epc rather than in KVM. Doing so has two major advantages:
-
-  - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
-    just another memory backend for guests.
-
-  - EPC management is wholly contained in the SGX subsystem, e.g. SGX
-    does not have to export any symbols, changes to reclaim flows don't
-    need to be routed through KVM, SGX's dirty laundry doesn't have to
-    get aired out for the world to see, and so on and so forth.
-
-The virtual EPC allocated to guests is currently not reclaimable, due to
-oversubscription of EPC for KVM guests is not currently supported. Due
-to the complications of handling reclaim conflicts between guest and
-host, KVM EPC oversubscription is significantly more complex than basic
-support for SGX virtualization.
+Add a feature word to hold SGX features enumerated via CPUID.0x12.0x0,
+along with flags for SGX1 and SGX2. As part of virtualizing SGX, KVM
+needs to expose the SGX CPUID leafs to its guest. SGX1 and SGX2 need to
+be in a dedicated feature word so that they can be queried via KVM's
+reverse CPUID lookup to properly emulate the expected guest behavior.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Co-developed-by: Kai Huang <kai.huang@intel.com>
+ [Kai: Also clear SGX1 and SGX2 bits in clear_sgx_caps().]
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/Kconfig                 |  12 ++
- arch/x86/kernel/cpu/sgx/Makefile |   1 +
- arch/x86/kernel/cpu/sgx/main.c   |   5 +-
- arch/x86/kernel/cpu/sgx/virt.c   | 263 +++++++++++++++++++++++++++++++
- arch/x86/kernel/cpu/sgx/virt.h   |  14 ++
- 5 files changed, 294 insertions(+), 1 deletion(-)
- create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
- create mode 100644 arch/x86/kernel/cpu/sgx/virt.h
+ arch/x86/include/asm/cpufeature.h        | 5 +++--
+ arch/x86/include/asm/cpufeatures.h       | 6 +++++-
+ arch/x86/include/asm/disabled-features.h | 7 ++++++-
+ arch/x86/include/asm/required-features.h | 2 +-
+ arch/x86/kernel/cpu/common.c             | 4 ++++
+ arch/x86/kernel/cpu/feat_ctl.c           | 2 ++
+ 6 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 618d1aabccb8..a7318175509b 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1947,6 +1947,18 @@ config X86_SGX
+diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
+index 59bf91c57aa8..efbdba5170a3 100644
+--- a/arch/x86/include/asm/cpufeature.h
++++ b/arch/x86/include/asm/cpufeature.h
+@@ -30,6 +30,7 @@ enum cpuid_leafs
+ 	CPUID_7_ECX,
+ 	CPUID_8000_0007_EBX,
+ 	CPUID_7_EDX,
++	CPUID_12_EAX,
+ };
  
- 	  If unsure, say N.
+ #ifdef CONFIG_X86_FEATURE_NAMES
+@@ -89,7 +90,7 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+ 	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 17, feature_bit) ||	\
+ 	   CHECK_BIT_IN_MASK_WORD(REQUIRED_MASK, 18, feature_bit) ||	\
+ 	   REQUIRED_MASK_CHECK					  ||	\
+-	   BUILD_BUG_ON_ZERO(NCAPINTS != 19))
++	   BUILD_BUG_ON_ZERO(NCAPINTS != 20))
  
-+config X86_SGX_VIRTUALIZATION
-+	bool "Software Guard eXtensions (SGX) Virtualization"
-+	depends on X86_SGX && KVM_INTEL
-+	help
-+
-+	  Enables KVM guests to create SGX enclaves.
-+
-+	  This includes support to expose "raw" unreclaimable enclave memory to
-+	  guests via a device node, e.g. /dev/sgx_virt_epc.
-+
-+	  If unsure, say N.
-+
- config EFI
- 	bool "EFI runtime service support"
- 	depends on ACPI
-diff --git a/arch/x86/kernel/cpu/sgx/Makefile b/arch/x86/kernel/cpu/sgx/Makefile
-index 91d3dc784a29..7a25bf63adfb 100644
---- a/arch/x86/kernel/cpu/sgx/Makefile
-+++ b/arch/x86/kernel/cpu/sgx/Makefile
-@@ -3,3 +3,4 @@ obj-y += \
- 	encl.o \
- 	ioctl.o \
- 	main.o
-+obj-$(CONFIG_X86_SGX_VIRTUALIZATION)	+= virt.o
-diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-index 95aad183bb65..02993a327a1f 100644
---- a/arch/x86/kernel/cpu/sgx/main.c
-+++ b/arch/x86/kernel/cpu/sgx/main.c
-@@ -9,9 +9,11 @@
- #include <linux/sched/mm.h>
- #include <linux/sched/signal.h>
- #include <linux/slab.h>
-+#include "arch.h"
- #include "driver.h"
- #include "encl.h"
- #include "encls.h"
-+#include "virt.h"
+ #define DISABLED_MASK_BIT_SET(feature_bit)				\
+ 	 ( CHECK_BIT_IN_MASK_WORD(DISABLED_MASK,  0, feature_bit) ||	\
+@@ -112,7 +113,7 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
+ 	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 17, feature_bit) ||	\
+ 	   CHECK_BIT_IN_MASK_WORD(DISABLED_MASK, 18, feature_bit) ||	\
+ 	   DISABLED_MASK_CHECK					  ||	\
+-	   BUILD_BUG_ON_ZERO(NCAPINTS != 19))
++	   BUILD_BUG_ON_ZERO(NCAPINTS != 20))
  
- struct sgx_epc_section sgx_epc_sections[SGX_MAX_EPC_SECTIONS];
- static int sgx_nr_epc_sections;
-@@ -726,7 +728,8 @@ static void __init sgx_init(void)
- 	if (!sgx_page_reclaimer_init())
- 		goto err_page_cache;
+ #define cpu_has(c, bit)							\
+ 	(__builtin_constant_p(bit) && REQUIRED_MASK_BIT_SET(bit) ? 1 :	\
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index f5ef2d5b9231..62b58cda034a 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -13,7 +13,7 @@
+ /*
+  * Defines x86 CPU feature bits
+  */
+-#define NCAPINTS			19	   /* N 32-bit words worth of info */
++#define NCAPINTS			20	   /* N 32-bit words worth of info */
+ #define NBUGINTS			1	   /* N 32-bit bug flags */
  
--	ret = sgx_drv_init();
-+	/* Success if the native *or* virtual EPC driver initialized cleanly. */
-+	ret = !!sgx_drv_init() & !!sgx_virt_epc_init();
- 	if (ret)
- 		goto err_kthread;
+ /*
+@@ -383,6 +383,10 @@
+ #define X86_FEATURE_CORE_CAPABILITIES	(18*32+30) /* "" IA32_CORE_CAPABILITIES MSR */
+ #define X86_FEATURE_SPEC_CTRL_SSBD	(18*32+31) /* "" Speculative Store Bypass Disable */
  
-diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
-new file mode 100644
-index 000000000000..d625551ccf25
---- /dev/null
-+++ b/arch/x86/kernel/cpu/sgx/virt.c
-@@ -0,0 +1,263 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*  Copyright(c) 2016-20 Intel Corporation. */
++/* Intel-defined SGX features, CPUID level 0x00000012:0 (EAX), word 19 */
++#define X86_FEATURE_SGX1		(19*32+ 0) /* SGX1 leaf functions */
++#define X86_FEATURE_SGX2		(19*32+ 1) /* SGX2 leaf functions */
 +
-+#include <linux/miscdevice.h>
-+#include <linux/mm.h>
-+#include <linux/mman.h>
-+#include <linux/sched/mm.h>
-+#include <linux/sched/signal.h>
-+#include <linux/slab.h>
-+#include <linux/xarray.h>
-+#include <asm/sgx.h>
-+#include <uapi/asm/sgx.h>
+ /*
+  * BUG word(s)
+  */
+diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
+index 7947cb1782da..dfb8bbf21e2f 100644
+--- a/arch/x86/include/asm/disabled-features.h
++++ b/arch/x86/include/asm/disabled-features.h
+@@ -28,12 +28,16 @@
+ # define DISABLE_CYRIX_ARR	(1<<(X86_FEATURE_CYRIX_ARR & 31))
+ # define DISABLE_CENTAUR_MCR	(1<<(X86_FEATURE_CENTAUR_MCR & 31))
+ # define DISABLE_PCID		0
++# define DISABLE_SGX1		0
++# define DISABLE_SGX2		0
+ #else
+ # define DISABLE_VME		0
+ # define DISABLE_K6_MTRR	0
+ # define DISABLE_CYRIX_ARR	0
+ # define DISABLE_CENTAUR_MCR	0
+ # define DISABLE_PCID		(1<<(X86_FEATURE_PCID & 31))
++# define DISABLE_SGX1		(1<<(X86_FEATURE_SGX1 & 31))
++# define DISABLE_SGX2		(1<<(X86_FEATURE_SGX2 & 31))
+ #endif /* CONFIG_X86_64 */
+ 
+ #ifdef CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS
+@@ -91,6 +95,7 @@
+ 			 DISABLE_ENQCMD)
+ #define DISABLED_MASK17	0
+ #define DISABLED_MASK18	0
+-#define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
++#define DISABLED_MASK19	(DISABLE_SGX1|DISABLE_SGX2)
++#define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+ 
+ #endif /* _ASM_X86_DISABLED_FEATURES_H */
+diff --git a/arch/x86/include/asm/required-features.h b/arch/x86/include/asm/required-features.h
+index 3ff0d48469f2..6a02e04c90fb 100644
+--- a/arch/x86/include/asm/required-features.h
++++ b/arch/x86/include/asm/required-features.h
+@@ -101,6 +101,6 @@
+ #define REQUIRED_MASK16	0
+ #define REQUIRED_MASK17	0
+ #define REQUIRED_MASK18	0
+-#define REQUIRED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 19)
++#define REQUIRED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+ 
+ #endif /* _ASM_X86_REQUIRED_FEATURES_H */
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 35ad8480c464..8746499aa415 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -932,6 +932,10 @@ void get_cpu_cap(struct cpuinfo_x86 *c)
+ 		c->x86_capability[CPUID_D_1_EAX] = eax;
+ 	}
+ 
++	/* Additional Intel-defined SGX flags: level 0x00000012 */
++	if (c->cpuid_level >= 0x00000012)
++		c->x86_capability[CPUID_12_EAX] = cpuid_eax(0x00000012);
 +
-+#include "encls.h"
-+#include "sgx.h"
-+#include "virt.h"
-+
-+struct sgx_virt_epc {
-+	struct xarray page_array;
-+	struct mutex lock;
-+	struct mm_struct *mm;
-+};
-+
-+static struct mutex virt_epc_lock;
-+static struct list_head virt_epc_zombie_pages;
-+
-+static int __sgx_virt_epc_fault(struct sgx_virt_epc *epc,
-+				struct vm_area_struct *vma, unsigned long addr)
-+{
-+	struct sgx_epc_page *epc_page;
-+	unsigned long index, pfn;
-+	int ret;
-+
-+	/* epc->lock must already have been hold */
-+
-+	/* Calculate index of EPC page in virtual EPC's page_array */
-+	index = vma->vm_pgoff + PFN_DOWN(addr - vma->vm_start);
-+
-+	epc_page = xa_load(&epc->page_array, index);
-+	if (epc_page)
-+		return 0;
-+
-+	epc_page = sgx_alloc_epc_page(epc, false);
-+	if (IS_ERR(epc_page))
-+		return PTR_ERR(epc_page);
-+
-+	ret = xa_err(xa_store(&epc->page_array, index, epc_page, GFP_KERNEL));
-+	if (ret)
-+		goto err_free;
-+
-+	pfn = PFN_DOWN(sgx_get_epc_phys_addr(epc_page));
-+
-+	ret = vmf_insert_pfn(vma, addr, pfn);
-+	if (ret != VM_FAULT_NOPAGE) {
-+		ret = -EFAULT;
-+		goto err_delete;
-+	}
-+
-+	return 0;
-+
-+err_delete:
-+	xa_erase(&epc->page_array, index);
-+err_free:
-+	sgx_free_epc_page(epc_page);
-+	return ret;
-+}
-+
-+static vm_fault_t sgx_virt_epc_fault(struct vm_fault *vmf)
-+{
-+	struct vm_area_struct *vma = vmf->vma;
-+	struct sgx_virt_epc *epc = vma->vm_private_data;
-+	int ret;
-+
-+	mutex_lock(&epc->lock);
-+	ret = __sgx_virt_epc_fault(epc, vma, vmf->address);
-+	mutex_unlock(&epc->lock);
-+
-+	if (!ret)
-+		return VM_FAULT_NOPAGE;
-+
-+	if (ret == -EBUSY && (vmf->flags & FAULT_FLAG_ALLOW_RETRY)) {
-+		mmap_read_unlock(vma->vm_mm);
-+		return VM_FAULT_RETRY;
-+	}
-+
-+	return VM_FAULT_SIGBUS;
-+}
-+
-+const struct vm_operations_struct sgx_virt_epc_vm_ops = {
-+	.fault = sgx_virt_epc_fault,
-+};
-+
-+static int sgx_virt_epc_mmap(struct file *file, struct vm_area_struct *vma)
-+{
-+	struct sgx_virt_epc *epc = file->private_data;
-+
-+	if (!(vma->vm_flags & VM_SHARED))
-+		return -EINVAL;
-+
-+	/*
-+	 * Don't allow mmap() from child after fork(), since child and parent
-+	 * cannot map to the same EPC.
-+	 */
-+	if (vma->vm_mm != epc->mm)
-+		return -EINVAL;
-+
-+	vma->vm_ops = &sgx_virt_epc_vm_ops;
-+	/* Don't copy VMA in fork() */
-+	vma->vm_flags |= VM_PFNMAP | VM_IO | VM_DONTDUMP | VM_DONTCOPY;
-+	vma->vm_private_data = file->private_data;
-+
-+	return 0;
-+}
-+
-+static int sgx_virt_epc_free_page(struct sgx_epc_page *epc_page)
-+{
-+	int ret;
-+
-+	if (!epc_page)
-+		return 0;
-+
-+	/*
-+	 * Explicitly EREMOVE virtual EPC page. Virtual EPC is only used by
-+	 * guest, and in normal condition guest should have done EREMOVE for
-+	 * all EPC pages before they are freed here. But it's possible guest
-+	 * is killed or crashed unnormally in which case EREMOVE has not been
-+	 * done. Do EREMOVE unconditionally here to cover both cases, because
-+	 * it's not possible to tell whether guest has done EREMOVE, since
-+	 * virtual EPC page status is not tracked. And it is fine to EREMOVE
-+	 * EPC page multiple times.
-+	 */
-+	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-+	if (ret) {
-+		/*
-+		 * Only SGX_CHILD_PRESENT is expected, which is because of
-+		 * EREMOVE-ing an SECS still with child, in which case it can
-+		 * be handled by EREMOVE-ing the SECS again after all pages in
-+		 * virtual EPC have been EREMOVE-ed. See comments in below in
-+		 * sgx_virt_epc_release().
-+		 */
-+		WARN_ON_ONCE(ret != SGX_CHILD_PRESENT);
-+		return ret;
-+	}
-+
-+	__sgx_free_epc_page(epc_page);
-+	return 0;
-+}
-+
-+static int sgx_virt_epc_release(struct inode *inode, struct file *file)
-+{
-+	struct sgx_virt_epc *epc = file->private_data;
-+	struct sgx_epc_page *epc_page, *tmp, *entry;
-+	unsigned long index;
-+
-+	LIST_HEAD(secs_pages);
-+
-+	mmdrop(epc->mm);
-+
-+	xa_for_each(&epc->page_array, index, entry) {
-+		/*
-+		 * Virtual EPC pages are not tracked, so it's possible for
-+		 * EREMOVE to fail due to, e.g. a SECS page still has children
-+		 * if guest was shutdown unexpectedly. If it is the case, leave
-+		 * it in the xarray and retry EREMOVE below later.
-+		 */
-+		if (sgx_virt_epc_free_page(entry))
-+			continue;
-+
-+		xa_erase(&epc->page_array, index);
-+	}
-+
-+	/*
-+	 * Retry all failed pages after iterating through the entire tree, at
-+	 * which point all children should be removed and the SECS pages can be
-+	 * nuked as well...unless userspace has exposed multiple instance of
-+	 * virtual EPC to a single VM.
-+	 */
-+	xa_for_each(&epc->page_array, index, entry) {
-+		epc_page = entry;
-+		/*
-+		 * Error here means that EREMOVE failed due to a SECS page
-+		 * still has child on *another* EPC instance.  Put it to a
-+		 * temporary SECS list which will be spliced to 'zombie page
-+		 * list' and will be EREMOVE-ed again when freeing another
-+		 * virtual EPC instance.
-+		 */
-+		if (sgx_virt_epc_free_page(epc_page))
-+			list_add_tail(&epc_page->list, &secs_pages);
-+
-+		xa_erase(&epc->page_array, index);
-+	}
-+
-+	/*
-+	 * Third time's a charm.  Try to EREMOVE zombie SECS pages from virtual
-+	 * EPC instances that were previously released, i.e. free SECS pages
-+	 * that were in limbo due to having children in *this* EPC instance.
-+	 */
-+	mutex_lock(&virt_epc_lock);
-+	list_for_each_entry_safe(epc_page, tmp, &virt_epc_zombie_pages, list) {
-+		/*
-+		 * Speculatively remove the page from the list of zombies, if
-+		 * the page is successfully EREMOVE it will be added to the
-+		 * list of free pages.  If EREMOVE fails, throw the page on the
-+		 * local list, which will be spliced on at the end.
-+		 */
-+		list_del(&epc_page->list);
-+
-+		if (sgx_virt_epc_free_page(epc_page))
-+			list_add_tail(&epc_page->list, &secs_pages);
-+	}
-+
-+	if (!list_empty(&secs_pages))
-+		list_splice_tail(&secs_pages, &virt_epc_zombie_pages);
-+	mutex_unlock(&virt_epc_lock);
-+
-+	kfree(epc);
-+
-+	return 0;
-+}
-+
-+static int sgx_virt_epc_open(struct inode *inode, struct file *file)
-+{
-+	struct sgx_virt_epc *epc;
-+
-+	epc = kzalloc(sizeof(struct sgx_virt_epc), GFP_KERNEL);
-+	if (!epc)
-+		return -ENOMEM;
-+	/*
-+	 * Keep the current->mm to virtual EPC. It will be checked in
-+	 * sgx_virt_epc_mmap() to prevent, in case of fork, child being
-+	 * able to mmap() to the same virtual EPC pages.
-+	 */
-+	mmgrab(current->mm);
-+	epc->mm = current->mm;
-+	mutex_init(&epc->lock);
-+	xa_init(&epc->page_array);
-+
-+	file->private_data = epc;
-+
-+	return 0;
-+}
-+
-+static const struct file_operations sgx_virt_epc_fops = {
-+	.owner			= THIS_MODULE,
-+	.open			= sgx_virt_epc_open,
-+	.release		= sgx_virt_epc_release,
-+	.mmap			= sgx_virt_epc_mmap,
-+};
-+
-+static struct miscdevice sgx_virt_epc_dev = {
-+	.minor = MISC_DYNAMIC_MINOR,
-+	.name = "sgx_virt_epc",
-+	.nodename = "sgx_virt_epc",
-+	.fops = &sgx_virt_epc_fops,
-+};
-+
-+int __init sgx_virt_epc_init(void)
-+{
-+	INIT_LIST_HEAD(&virt_epc_zombie_pages);
-+	mutex_init(&virt_epc_lock);
-+
-+	return misc_register(&sgx_virt_epc_dev);
-+}
-diff --git a/arch/x86/kernel/cpu/sgx/virt.h b/arch/x86/kernel/cpu/sgx/virt.h
-new file mode 100644
-index 000000000000..e5434541a122
---- /dev/null
-+++ b/arch/x86/kernel/cpu/sgx/virt.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause) */
-+#ifndef _ASM_X86_SGX_VIRT_H
-+#define _ASM_X86_SGX_VIRT_H
-+
-+#ifdef CONFIG_X86_SGX_VIRTUALIZATION
-+int __init sgx_virt_epc_init(void);
-+#else
-+static inline int __init sgx_virt_epc_init(void)
-+{
-+	return -ENODEV;
-+}
-+#endif
-+
-+#endif /* _ASM_X86_SGX_VIRT_H */
+ 	/* AMD-defined flags: level 0x80000001 */
+ 	eax = cpuid_eax(0x80000000);
+ 	c->extended_cpuid_level = eax;
+diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+index 3b1b01f2b248..4fcd57fdc682 100644
+--- a/arch/x86/kernel/cpu/feat_ctl.c
++++ b/arch/x86/kernel/cpu/feat_ctl.c
+@@ -97,6 +97,8 @@ static void clear_sgx_caps(void)
+ {
+ 	setup_clear_cpu_cap(X86_FEATURE_SGX);
+ 	setup_clear_cpu_cap(X86_FEATURE_SGX_LC);
++	setup_clear_cpu_cap(X86_FEATURE_SGX1);
++	setup_clear_cpu_cap(X86_FEATURE_SGX2);
+ }
+ 
+ static int __init nosgx(char *str)
 -- 
 2.29.2
 
