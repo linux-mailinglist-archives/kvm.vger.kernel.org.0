@@ -2,158 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 248792EBFD9
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 15:51:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E843F2EC01E
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 16:07:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726459AbhAFOuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 09:50:55 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:58034 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726430AbhAFOuz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 09:50:55 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 106EnBtL073453;
-        Wed, 6 Jan 2021 14:50:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=JNAWPyCWJviERlMveN84cGDDBJa0fe4FORaMFulnrXA=;
- b=pdrQMB4wQFgciCdqy3CV0t/YZDEEXKbIEZT+0IfmCxSNakwe8DESAMnpJv3NrZ84TVBe
- keQUI4BzM14jX+tzFd9/xdyg7A63HowUQ5vKeI/bv6mfB8KszejWKud4cPx6TCQRiTN9
- I9QNw1I6Vo/qeQ+tmqsqymHkj2YqZyLF/I1rviU3eLNnKJbttVUB7jTR1BaFmA6Z9k5I
- s0qhouDqoUbxxJ23wxYX0VM1Qjhd23JKtbZKSvrKs9vN7fkH0Pc+zEa58RbN+HqwlhR/
- S/WZWXUZnbPpfUx3l8ry51WkySozoi/ohmSEVmfYgNnoyULZ3DWs1+WP4UpREmjxQOuu kg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 35wepm85t6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 06 Jan 2021 14:50:09 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 106EfNi5078445;
-        Wed, 6 Jan 2021 14:50:09 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 35w3g15dsq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Jan 2021 14:50:09 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 106Eo7DV010722;
-        Wed, 6 Jan 2021 14:50:08 GMT
-Received: from [10.39.251.70] (/10.39.251.70)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Jan 2021 06:50:06 -0800
-Subject: Re: [PATCH V1 1/5] vfio: maintain dma_list order
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
- <1609861013-129801-2-git-send-email-steven.sistare@oracle.com>
- <20210105170229.73799d97@omen.home>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <e17f46d5-9523-4644-ff15-e71653c07459@oracle.com>
-Date:   Wed, 6 Jan 2021 09:50:06 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726289AbhAFPG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 10:06:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32433 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726244AbhAFPG5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 10:06:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609945530;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fYex91jA6x2qKKHkVZTfUQgO63knxON/afs5s1CqX+c=;
+        b=BgXXo23H6h0vg7z6i3sl2Eavn+asLtfWiIsPAZRlK7Sd6eckuMFmq0i8wNo5MaMquYhZOn
+        7QCVm06eWgEJVmH7tZHpevuCBPRAXN6HKPSJ1VocKXEv3amnEBQ+bMvWvRbhRHN8X2NsNC
+        9WYfbTAtMrY/dr5tn/NNZNiJlGKhaNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-539-bzuZCdR_M3qUSfSnOXgp2Q-1; Wed, 06 Jan 2021 10:05:27 -0500
+X-MC-Unique: bzuZCdR_M3qUSfSnOXgp2Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BACB9CC03;
+        Wed,  6 Jan 2021 15:05:26 +0000 (UTC)
+Received: from localhost (ovpn-113-208.ams2.redhat.com [10.36.113.208])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F35410021AA;
+        Wed,  6 Jan 2021 15:05:26 +0000 (UTC)
+Date:   Wed, 6 Jan 2021 15:05:25 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        jag.raman@oracle.com, elena.ufimtseva@oracle.com
+Subject: Re: [RFC 1/2] KVM: add initial support for KVM_SET_IOREGION
+Message-ID: <20210106150525.GB130669@stefanha-x1.localdomain>
+References: <cover.1609231373.git.eafanasova@gmail.com>
+ <d4af2bcbd2c6931a24ba99236248529c3bfb6999.1609231374.git.eafanasova@gmail.com>
+ <d79bdf44-9088-e005-3840-03f6bad22ed7@redhat.com>
+ <0cc68c81d6fae042d8a84bf90dd77eecd4da7cc8.camel@gmail.com>
+ <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
+ <29955fdc90d2efab7b79c91b9a97183e95243cc1.camel@gmail.com>
+ <47e8b7e8-d9b8-b2a2-c014-05942d99452a@redhat.com>
+ <20210105102517.GA31084@stefanha-x1.localdomain>
+ <f9cd33f6-c30d-4e5a-bc45-8f42109fe1ce@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210105170229.73799d97@omen.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9855 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101060092
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9855 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 spamscore=0
- impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 clxscore=1015 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101060093
+In-Reply-To: <f9cd33f6-c30d-4e5a-bc45-8f42109fe1ce@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/2021 7:02 PM, Alex Williamson wrote:
-> Hi Steven,
-> 
-> On Tue,  5 Jan 2021 07:36:49 -0800
-> Steve Sistare <steven.sistare@oracle.com> wrote:
-> 
->> Keep entries properly sorted in the dma_list rb_tree
-> 
-> Nothing here changes the order of entries in the tree, they're already
-> sorted.  The second chunk is the only thing that touches the tree
-> construction, but that appears to be just a micro optimization that
-> we've already used vfio_find_dma() to verify that a new entry doesn't
-> overlap any existing entries, therefore if the start of the new entry
-> is less than the test entry, the end must also be less.  The tree is
-> not changed afaict.
+--H+4ONPRPur6+Ovig
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Agreed.  Bad explanation on my part.
+On Wed, Jan 06, 2021 at 01:21:43PM +0800, Jason Wang wrote:
+>=20
+> On 2021/1/5 =E4=B8=8B=E5=8D=886:25, Stefan Hajnoczi wrote:
+> > On Tue, Jan 05, 2021 at 11:53:01AM +0800, Jason Wang wrote:
+> > > On 2021/1/5 =E4=B8=8A=E5=8D=888:02, Elena Afanasova wrote:
+> > > > On Mon, 2021-01-04 at 13:34 +0800, Jason Wang wrote:
+> > > > > On 2021/1/4 =E4=B8=8A=E5=8D=884:32, Elena Afanasova wrote:
+> > > > > > On Thu, 2020-12-31 at 11:45 +0800, Jason Wang wrote:
+> > > > > > > On 2020/12/29 =E4=B8=8B=E5=8D=886:02, Elena Afanasova wrote:
+> > > > > > > > This vm ioctl adds or removes an ioregionfd MMIO/PIO region=
+.
+> > > > > > > How about FAST_MMIO?
+> > > > > > >=20
+> > > > > > I=E2=80=99ll add KVM_IOREGION_FAST_MMIO flag support. So this m=
+ay be
+> > > > > > suitable
+> > > > > > for triggers which could use posted writes. The struct
+> > > > > > ioregionfd_cmd
+> > > > > > size bits and the data field will be unused in this case.
+> > > > > Note that eventfd checks for length and have datamatch support. D=
+o
+> > > > > we
+> > > > > need to do something similar.
+> > > > >=20
+> > > > Do you think datamatch support is necessary for ioregionfd?
+> > >=20
+> > > I'm not sure. But if we don't have this support, it probably means we=
+ can't
+> > > use eventfd for ioregionfd.
+> > This is an interesting question because ioregionfd and ioeventfd have
+> > different semantics. While it would be great to support all ioeventfd
+> > features in ioregionfd, I'm not sure that is possible. I think ioeventf=
+d
+> > will remain useful for devices that only need a doorbell write register=
+.
+> >=20
+> > The differences:
+> >=20
+> > 1. ioeventfd has datamatch. This could be implemented in ioregionfd so
+> >     that a datamatch failure results in the classic ioctl(KVM_RETURN)
+> >     MMIO/PIO exit reason and the VMM can handle the access.
+> >=20
+> >     I'm not sure if this feature is useful though. Most of the time
+> >     ioregionfd users want to handle all accesses to the region and the
+> >     VMM may not even know how to handle register accesses because they
+> >     can only be handled in a dedicated thread or an out-of-process
+> >     device.
+>=20
+>=20
+> It's about whether or not the current semantic of ioregion is sufficient =
+for
+> implementing doorbell.
+>=20
+> E.g in the case of virtio, the virtqueue index is encoded in the write to
+> the doorbell. And if a single MMIO area is used for all virtqueues,
+> datamatch is probably a must in this case.
 
->> so that iterating
->> over multiple entries across a range with gaps works, without requiring
->> one to delete each visited entry as in vfio_dma_do_unmap.
-> 
-> As above, I don't see that the tree is changed, so this is just a
-> manipulation of our search function, changing it from a "find any
-> vfio_dma within this range" to a "find the vfio_dma with the lowest
-> iova with this range".  But find-any and find-first are computationally
-> different, so I don't think we should blindly replace one with the
-> other.  Wouldn't it make more sense to add a vfio_find_first_dma()
-> function in patch 4/ to handle this case?  Thanks,
+struct ioregionfd_cmd contains not just the register offset, but also
+the value written by the guest. Therefore datamatch is not necessary.
 
-Sure, will do.
+Datamatch would only be useful as some kind of more complex optimization
+where different values writtent to the same register dispatch to
+different fds.
 
-- Steve
+> > > > > I guess the idea is to have a generic interface to let eventfd wo=
+rk
+> > > > > for
+> > > > > ioregion as well.
+> > > > >=20
+> > > > It seems that posted writes is the only "fast" case in ioregionfd. =
+So I
+> > > > was thinking about using FAST_MMIO for this case only. Maybe in som=
+e
+> > > > cases it will be better to just use ioeventfd. But I'm not sure.
+> > >=20
+> > > To be a generic infrastructure, it's better to have this, but we can =
+listen
+> > > from the opinion of others.
+> > I think we want both FAST_MMIO and regular MMIO options for posted
+> > writes:
+> >=20
+> > 1. FAST_MMIO - ioregionfd_cmd size and data fields are zero and do not
+> >     contain information about the nature of the guest access. This is
+> >     fine for ioeventfd doorbell style registers because we don't need
+> >     that information.
+>=20
+>=20
+> Is FAST_MMIO always for doorbell? If not, we probably need the size and
+> data.
 
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++-------
->>  1 file changed, 11 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 5fbf0c1..02228d0 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -157,20 +157,24 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
->>  static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
->>  				      dma_addr_t start, size_t size)
->>  {
->> +	struct vfio_dma *res = 0;
->>  	struct rb_node *node = iommu->dma_list.rb_node;
->>  
->>  	while (node) {
->>  		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
->>  
->> -		if (start + size <= dma->iova)
->> +		if (start < dma->iova + dma->size) {
->> +			res = dma;
->> +			if (start >= dma->iova)
->> +				break;
->>  			node = node->rb_left;
->> -		else if (start >= dma->iova + dma->size)
->> +		} else {
->>  			node = node->rb_right;
->> -		else
->> -			return dma;
->> +		}
->>  	}
->> -
->> -	return NULL;
->> +	if (res && size && res->iova >= start + size)
->> +		res = 0;
->> +	return res;
->>  }
->>  
->>  static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
->> @@ -182,7 +186,7 @@ static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
->>  		parent = *link;
->>  		dma = rb_entry(parent, struct vfio_dma, node);
->>  
->> -		if (new->iova + new->size <= dma->iova)
->> +		if (new->iova < dma->iova)
->>  			link = &(*link)->rb_left;
->>  		else
->>  			link = &(*link)->rb_right;
-> 
+My understanding is that FAST_MMIO only provides the guest physical
+address and no additional information. In fact, I'm not even sure if we
+know whether the access is a read or a write.
+
+So there is extremely limited information to work with and it's
+basically only useful for doorbell writes.
+
+> > 2. Regular MMIO - ioregionfd_cmd size and data fields contain valid dat=
+a
+> >     about the nature of the guest access. This is needed when the devic=
+e
+> >     register is more than a simple "kick" doorbell. For example, if the
+> >     device needs to know the value that the guest wrote.
+> >=20
+> > I suggest defining an additional KVM_SET_IOREGION flag called
+> > KVM_IOREGION_FAST_MMIO that can be set together with
+> > KVM_IOREGION_POSTED_WRITES.
+>=20
+>=20
+> If we need to expose FAST_MMIO to userspace, we probably need to define i=
+ts
+> semantics which is probably not easy since it's an architecture
+> optimization.
+
+Maybe the name KVM_IOREGION_FAST_MMIO name should be changed to
+something more specific like KVM_IOREGION_OFFSET_ONLY, meaning that only
+the offset field is valid.
+
+I haven't checked if and how other architectures implement FAST_MMIO,
+but they will at least be able to provide the offset :).
+
+> > KVM_IOREGION_PIO cannot be used together with KVM_IOREGION_FAST_MMIO.
+> >=20
+> > In theory KVM_IOREGION_POSTED_WRITES doesn't need to be set with
+> > KVM_IOREGION_FAST_MMIO. Userspace would have to send back a struct
+> > ioregionfd_resp to acknowledge that the write has been handled.
+>=20
+>=20
+> Right, and it also depends on whether or not the hardware support (e.g
+> whether or not it can decode the instructions).
+
+The KVM_IOREGION_FAST_MMIO flag should be documented as an optimization
+hint. If hardware doesn't support FAST_MMIO then struct ioregionfd_cmd
+will contain all fields. Userspace will be able to process the cmd
+either way.
+
+Stefan
+
+--H+4ONPRPur6+Ovig
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/10bUACgkQnKSrs4Gr
+c8iLvwgAq+L7035forG8ztElKZcRsTHV/5nfZr20ruGRiBfIWX/Mav9cF55gd2+p
+2/BDRBvXDTNFN+6PbuZZTu3r5NFYcPob2i5nSgEqTO6hkBT8w+Ph/5EONbE4pY99
+LO+uNli6i/9RccS0pwM0uDuHvsC/c+ysua6DPlokKUTMnVfpLor4yzNdk1/IW+BW
+9CSh7zOXBN3Awg3e/rUmp+O9n4fOpD/aHR7af4Sg6nyB77RFpJwa6f+1EiqhXnG0
+uPlX5zEF23TaS8xwOM69L3DjPWT25z76ftGoJSsj8a2RJ5lM0i5VqfWJ1S4h/Wep
+l9YnSMl7/y1D6+FiLSe4UrGo85kIWQ==
+=xrbX
+-----END PGP SIGNATURE-----
+
+--H+4ONPRPur6+Ovig--
+
