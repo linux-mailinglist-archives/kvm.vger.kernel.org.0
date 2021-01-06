@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B02C2EBCC0
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 11:53:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A87132EBCC2
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 11:53:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726837AbhAFKvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 05:51:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27227 "EHLO
+        id S1726889AbhAFKv4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 05:51:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25955 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726780AbhAFKvw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 05:51:52 -0500
+        by vger.kernel.org with ESMTP id S1726845AbhAFKvy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 05:51:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609930226;
+        s=mimecast20190719; t=1609930228;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4QxMA+cVz43np+3lUK6WKIRMH8Gubjyttk2lLsha7SA=;
-        b=hkSBtYV9qkULTG3vtHICCBp85WBW5GrtziiT8q8Y7ViL5c+RHtJxMZlsySKW8eCCzVtk/B
-        C1JQPn8+QBLGS6+CsHrJLxrnovDT5hO6s7DIm1h6I5fuYeXskuL5nXPKb1k3M9x1P8RLpp
-        +NoeWPETkTHNvuLORLiXjTvH3Rzbfwk=
+        bh=BoXbd9bXO+SBQ5e4XC54WHCcJ8ZKbMXQCmg8EWaguMQ=;
+        b=fICDkwqkdT+Xdu4z0ai+IW8GSxSDNXK9foUV3fMmTvcLBpjcjWDRLNR1H9fnwCUtCmVQuU
+        FCuennpnxQpHxQtljBbJKgsLm+bTAyntsnhX5NKm+IYTBxECLtIqhZazzAjCb54u8u/0zp
+        KbwHti5PW7Bb2OgWScpW8i5jblWsD2w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-GVjCmVPJPA6CyTKXWIArfA-1; Wed, 06 Jan 2021 05:50:23 -0500
-X-MC-Unique: GVjCmVPJPA6CyTKXWIArfA-1
+ us-mta-413-QlOqh-kiPF6chVDXe609QA-1; Wed, 06 Jan 2021 05:50:27 -0500
+X-MC-Unique: QlOqh-kiPF6chVDXe609QA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41388800D55;
-        Wed,  6 Jan 2021 10:50:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 429441005504;
+        Wed,  6 Jan 2021 10:50:25 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.196])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 630C1669FC;
-        Wed,  6 Jan 2021 10:50:17 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A779B669FC;
+        Wed,  6 Jan 2021 10:50:21 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Ingo Molnar <mingo@redhat.com>,
@@ -47,10 +47,10 @@ Cc:     Ingo Molnar <mingo@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
-        Maxim Levitsky <mlevitsk@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH 3/6] KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES on nested vmexit
-Date:   Wed,  6 Jan 2021 12:49:58 +0200
-Message-Id: <20210106105001.449974-4-mlevitsk@redhat.com>
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 4/6] KVM: nSVM: correctly restore nested_run_pending on migration
+Date:   Wed,  6 Jan 2021 12:49:59 +0200
+Message-Id: <20210106105001.449974-5-mlevitsk@redhat.com>
 In-Reply-To: <20210106105001.449974-1-mlevitsk@redhat.com>
 References: <20210106105001.449974-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -60,44 +60,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It is possible to exit the nested guest mode, entered by
-svm_set_nested_state prior to first vm entry to it (e.g due to pending event)
-if the nested run was not pending during the migration.
-
-In this case we must not switch to the nested msr permission bitmap.
-Also add a warning to catch similar cases in the future.
-
-CC: stable@vger.kernel.org
-Fixes: a7d5c7ce41ac1 ("KVM: nSVM: delay MSR permission processing to first nested VM run")
+The code to store it on the migration exists, but no code was restoring it.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/x86/kvm/svm/nested.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 18b71e73a9935..6208d3a5a3fdb 100644
+index 6208d3a5a3fdb..c1a3d0e996add 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -199,6 +199,10 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -1203,6 +1203,10 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	 * in the registers, the save area of the nested state instead
+ 	 * contains saved L1 state.
+ 	 */
 +
-+	if (WARN_ON_ONCE(!is_guest_mode(&svm->vcpu)))
-+		return false;
++	if (kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING)
++		svm->nested.nested_run_pending = true;
 +
- 	if (!nested_svm_vmrun_msrpm(svm)) {
- 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
- 		vcpu->run->internal.suberror =
-@@ -598,6 +602,8 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
- 	svm->nested.vmcb12_gpa = 0;
- 	WARN_ON_ONCE(svm->nested.nested_run_pending);
- 
-+	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, &svm->vcpu);
-+
- 	/* in case we halted in L2 */
- 	svm->vcpu.arch.mp_state = KVM_MP_STATE_RUNNABLE;
+ 	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+ 	hsave->save = *save;
  
 -- 
 2.26.2
