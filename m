@@ -2,131 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 775D72EB6A9
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:04:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DA742EB6D7
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 01:26:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbhAFAEA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 19:04:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34055 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725948AbhAFAD7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 5 Jan 2021 19:03:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609891353;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rqhr6scVf/TnXzwQhEOyu7WWWB5S6EJyia+/dIzLf8M=;
-        b=KRLye7m4UP2K1sl8+xHjVjXyHGLhdNQ3/VG7/MmmksqouGENbbYlHEjSRDMALSsOoefcVT
-        eY5zJzCRQ/6UtllwovAu48MIVeTKyIjsMcOMIHTu0i4a4D2aZIHNGAzDte9EkJnfAQTiPE
-        8hxB9Bdahk30/wAlZf4sbRxDtygtOfw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-mzZhezLlNdm14GO6z2K7UQ-1; Tue, 05 Jan 2021 19:02:31 -0500
-X-MC-Unique: mzZhezLlNdm14GO6z2K7UQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50A90800D55;
-        Wed,  6 Jan 2021 00:02:30 +0000 (UTC)
-Received: from omen.home (ovpn-112-183.phx2.redhat.com [10.3.112.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 093345D9CD;
-        Wed,  6 Jan 2021 00:02:29 +0000 (UTC)
-Date:   Tue, 5 Jan 2021 17:02:29 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steve Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V1 1/5] vfio: maintain dma_list order
-Message-ID: <20210105170229.73799d97@omen.home>
-In-Reply-To: <1609861013-129801-2-git-send-email-steven.sistare@oracle.com>
-References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
-        <1609861013-129801-2-git-send-email-steven.sistare@oracle.com>
+        id S1726677AbhAFAZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 19:25:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726328AbhAFAZS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 19:25:18 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7DDC061793
+        for <kvm@vger.kernel.org>; Tue,  5 Jan 2021 16:24:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=lUen2KjqNOUACjCPDLFaUqf5FgyBXKrzDGaKMoO5pmc=; b=VabqpZ0ruiaudFJShhhwk1GTKU
+        Dh/VPUyT5mlIJz9hQbREN09xitjt2fKL8eAGQzQXEGCgqJuz4RpdUD7L/lzOn5job2YDYGnxWkcB7
+        kn8Sgq0Q7EGh4R64zALZF58ZJtOpfujScDHE2Bme03L0b0u0VLHTSniGHTFx9Iv4YNPVcW/OMnfvu
+        qF8871U45c3CzIG8TyHPX8roAAtCfvvoaVV0fBdgGkEd6jGQytJHYjcNG7MMPoricC6pjnXt/fAv7
+        XCZgP1bukeko4r5+BCxjEsRK38HE6QA5W6IP50WGkbSQysE6n81LLfd2yz48/mbxWBsK8QeUMdvxc
+        wMPoyEVw==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1kwwbh-001pA3-L9; Wed, 06 Jan 2021 00:23:36 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1kwwbh-001Nil-8o; Wed, 06 Jan 2021 00:23:21 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+Subject: [PATCH v4 00/16] KVM: Add minimal support for Xen HVM guests
+Date:   Wed,  6 Jan 2021 00:22:58 +0000
+Message-Id: <20210106002314.328380-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Steven,
+This patch set provides enough kernel support to allow hosting Xen HVM 
+guests in KVM. It allows hypercalls to be trapped to userspace for 
+handling, uses the existing KVM functions for writing system clock and 
+pvclock information to Xen shared pages, and adds Xen runstate info and 
+event channel upcall vector delivery.
 
-On Tue,  5 Jan 2021 07:36:49 -0800
-Steve Sistare <steven.sistare@oracle.com> wrote:
+It's based on the first section of a patch set that Joao posted as 
+RFC last year^W^W in 2019:
 
-> Keep entries properly sorted in the dma_list rb_tree
+https://lore.kernel.org/kvm/20190220201609.28290-1-joao.m.martins@oracle.com/
 
-Nothing here changes the order of entries in the tree, they're already
-sorted.  The second chunk is the only thing that touches the tree
-construction, but that appears to be just a micro optimization that
-we've already used vfio_find_dma() to verify that a new entry doesn't
-overlap any existing entries, therefore if the start of the new entry
-is less than the test entry, the end must also be less.  The tree is
-not changed afaict.
+I've updated and reworked the original a bit, including (in my v1):
+ • Support for 32-bit guests
+ • 64-bit second support in wallclock
+ • Time counters for runnable/blocked states in runstate support
+ • Self-tests
+ • Fixed Viridian coexistence
+ • No new KVM_CAP_XEN_xxx, just more bits returned by KVM_CAP_XEN_HVM
 
-> so that iterating
-> over multiple entries across a range with gaps works, without requiring
-> one to delete each visited entry as in vfio_dma_do_unmap.
+v2: 
+ • Remember the RCU read-critical sections on using the shared info pages
+ • Fix 32-bit build of compat structures (which we use there too)
+ • Use RUNSTATE_blocked as initial state not RUNSTATE_runnable
+ • Include documentation, add cosmetic KVM_XEN_HVM_CONFIG_HYPERCALL_MSR
 
-As above, I don't see that the tree is changed, so this is just a
-manipulation of our search function, changing it from a "find any
-vfio_dma within this range" to a "find the vfio_dma with the lowest
-iova with this range".  But find-any and find-first are computationally
-different, so I don't think we should blindly replace one with the
-other.  Wouldn't it make more sense to add a vfio_find_first_dma()
-function in patch 4/ to handle this case?  Thanks,
+v3:
+ • Stop mapping the shared pages; use kvm_guest_write_cached() instead.
+ • Use kvm_setup_pvclock_page() for Xen pvclock writes too.
+ • Fix CPU numbering confusion and update documentation accordingly.
+ • Support HVMIRQ_callback_vector delivery based on evtchn_upcall_pending.
 
-Alex
+v4:
+ • Rebase on top of the KVM changes merged into 5.11-rc1.
+ • Drop the kvm_{un,}map_gfn() cleanup as it isn't used since v2 anyway.
+ • Trivial cosmetic cleanup (superfluous parens, remove declaration of a
+   function removed in v3, etc.)
 
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 5fbf0c1..02228d0 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -157,20 +157,24 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
->  static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
->  				      dma_addr_t start, size_t size)
->  {
-> +	struct vfio_dma *res = 0;
->  	struct rb_node *node = iommu->dma_list.rb_node;
->  
->  	while (node) {
->  		struct vfio_dma *dma = rb_entry(node, struct vfio_dma, node);
->  
-> -		if (start + size <= dma->iova)
-> +		if (start < dma->iova + dma->size) {
-> +			res = dma;
-> +			if (start >= dma->iova)
-> +				break;
->  			node = node->rb_left;
-> -		else if (start >= dma->iova + dma->size)
-> +		} else {
->  			node = node->rb_right;
-> -		else
-> -			return dma;
-> +		}
->  	}
-> -
-> -	return NULL;
-> +	if (res && size && res->iova >= start + size)
-> +		res = 0;
-> +	return res;
->  }
->  
->  static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
-> @@ -182,7 +186,7 @@ static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
->  		parent = *link;
->  		dma = rb_entry(parent, struct vfio_dma, node);
->  
-> -		if (new->iova + new->size <= dma->iova)
-> +		if (new->iova < dma->iova)
->  			link = &(*link)->rb_left;
->  		else
->  			link = &(*link)->rb_right;
+With the addition in v3 of the callback vector support, we can now 
+successfully boot Linux guests. Other callback types can be handled 
+entirely from userspace, but the vector injection needs kernel support 
+because it doesn't quite work to inject it as ExtINT.
+
+We will work on a little bit more event channel offload in future patches,
+as discussed, but those are purely optimisations. There's a bunch of work
+for us to do in userspace before those get to the top of our list, and
+this patch set should be functionally complete as it is.
+
+We're working on pushing out rust-vmm support to make use of this, and
+Joao's qemu patches from last year should still also work with minor
+tweaks where I've "improved" the KVM←→userspace ABI.
+
+David Woodhouse (7):
+      KVM: x86/xen: Fix coexistence of Xen and Hyper-V hypercalls
+      KVM: x86/xen: latch long_mode when hypercall page is set up
+      KVM: x86/xen: add definitions of compat_shared_info, compat_vcpu_info
+      xen: add wc_sec_hi to struct shared_info
+      KVM: x86: declare Xen HVM shared info capability and add test case
+      KVM: Add documentation for Xen hypercall and shared_info updates
+      KVM: x86/xen: Add event channel interrupt vector upcall
+
+Joao Martins (9):
+      KVM: x86/xen: fix Xen hypercall page msr handling
+      KVM: x86/xen: intercept xen hypercalls if enabled
+      KVM: x86/xen: add KVM_XEN_HVM_SET_ATTR/KVM_XEN_HVM_GET_ATTR
+      KVM: x86/xen: register shared_info page
+      KVM: x86/xen: update wallclock region
+      KVM: x86/xen: register vcpu info
+      KVM: x86/xen: setup pvclock updates
+      KVM: x86/xen: register vcpu time info region
+      KVM: x86/xen: register runstate info
+
+ Documentation/virt/kvm/api.rst                     | 124 +++++-
+ arch/x86/include/asm/kvm_host.h                    |  24 +
+ arch/x86/include/asm/xen/interface.h               |   3 +
+ arch/x86/kvm/Makefile                              |   2 +-
+ arch/x86/kvm/hyperv.c                              |  40 +-
+ arch/x86/kvm/irq.c                                 |   7 +
+ arch/x86/kvm/trace.h                               |  36 ++
+ arch/x86/kvm/x86.c                                 | 134 ++++--
+ arch/x86/kvm/x86.h                                 |   1 +
+ arch/x86/kvm/xen.c                                 | 495 +++++++++++++++++++++
+ arch/x86/kvm/xen.h                                 |  68 +++
+ include/linux/kvm_host.h                           |  30 +-
+ include/uapi/linux/kvm.h                           |  50 +++
+ include/xen/interface/xen.h                        |   4 +-
+ tools/testing/selftests/kvm/Makefile               |   3 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         |   1 +
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 194 ++++++++
+ .../testing/selftests/kvm/x86_64/xen_vmcall_test.c | 150 +++++++
+ 18 files changed, 1288 insertions(+), 78 deletions(-)
+
+
 
