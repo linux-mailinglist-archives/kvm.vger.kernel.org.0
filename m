@@ -2,103 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7132D2EC70A
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 00:44:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD22C2EC71C
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 00:56:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727431AbhAFXoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 18:44:37 -0500
-Received: from mga02.intel.com ([134.134.136.20]:8761 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727331AbhAFXog (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 18:44:36 -0500
-IronPort-SDR: mBlw5TEqfFAOFYJsw7wSQcm1RFrz8nTaChMebx4Kslh2EiVvwoHDBZ5SkgkxPCvfnHOpwTttOV
- ec5dVKrN+niA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="164421082"
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="164421082"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 15:43:56 -0800
-IronPort-SDR: RQhtnWKlH9bjfOpg8zgGOr4wchcYa7MgrzmHWd7icAVQrDmPzWRsbrmI0W7pCYeqz+dNmjBwrN
- 6Z4IVAAMqC0w==
-X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="422355595"
-Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 15:43:55 -0800
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1609890536.git.kai.huang@intel.com>
- <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
- <6d28e858-a5c0-6ce8-8c0d-2fdfbea3734b@intel.com>
- <20210107111206.c8207e64540a8361c04259b7@intel.com>
- <b3e11134-cd8e-2b51-1363-58898832ba38@intel.com>
- <20210107124037.c37b313b016514c361c7f49e@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <a522e1cf-ccb9-bfbb-c3da-abe51422046e@intel.com>
-Date:   Wed, 6 Jan 2021 15:43:54 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727745AbhAFXzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 18:55:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46703 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726918AbhAFXzi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 18:55:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609977251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+xDcXzm9y5pEimgXpveqhDSEufujttVDu3XNu82fIqU=;
+        b=hQsyo3DrqU4rbzihNQUPx75c3LPV/ttMwCiBYUvLrmYrGysJkdIgGQ8emYrwjUMGxfqiCC
+        kRwQJ87IOtIOJ8AOw1qpwBelj8Indwf8Y9PpoXQcHMaqyMTcAcOBcCyqCjFkcKNnhYARwq
+        nnkyJIhXoQQWX6b9sb74kVKv9R0NSpI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-pkYhRmgnPpG7XgXQqMc6Vg-1; Wed, 06 Jan 2021 18:54:08 -0500
+X-MC-Unique: pkYhRmgnPpG7XgXQqMc6Vg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0288410054FF;
+        Wed,  6 Jan 2021 23:54:06 +0000 (UTC)
+Received: from starship (unknown [10.35.206.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 25A625D9CD;
+        Wed,  6 Jan 2021 23:54:01 +0000 (UTC)
+Message-ID: <d4dd81b7bfd4c977ff4b4e1fa6da98e0f06c5fc0.camel@redhat.com>
+Subject: Re: [PATCH 4/6] KVM: nSVM: correctly restore nested_run_pending on
+ migration
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>
+Date:   Thu, 07 Jan 2021 01:54:00 +0200
+In-Reply-To: <X/XzBUTPRhwVPCGx@google.com>
+References: <20210106105001.449974-1-mlevitsk@redhat.com>
+         <20210106105001.449974-5-mlevitsk@redhat.com> <X/XzBUTPRhwVPCGx@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210107124037.c37b313b016514c361c7f49e@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/21 3:40 PM, Kai Huang wrote:
-> So a better way is to put "Allow SGX virtualization without Launch Control
-> Support" at the beginning of this series? If so, the Kconfig
-> X86_SGX_VIRTUALIZATION needs to be in separate patch at the very beginning.
+On Wed, 2021-01-06 at 09:27 -0800, Sean Christopherson wrote:
+> On Wed, Jan 06, 2021, Maxim Levitsky wrote:
+> > The code to store it on the migration exists, but no code was restoring it.
+> > 
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/svm/nested.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> > index 6208d3a5a3fdb..c1a3d0e996add 100644
+> > --- a/arch/x86/kvm/svm/nested.c
+> > +++ b/arch/x86/kvm/svm/nested.c
+> > @@ -1203,6 +1203,10 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+> >  	 * in the registers, the save area of the nested state instead
+> >  	 * contains saved L1 state.
+> >  	 */
+> > +
+> > +	if (kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING)
+> > +		svm->nested.nested_run_pending = true;
 > 
-> Does above make sense? 
+> This should be:
 
-I think it's worth trying.  No promises that anyone will like the end
-result, but give it a shot and I'll take a look.
+Yes, if someone already set the nested state before, but
+I also sent a patch that forces nesteded mode exit in this
+case.
+
+Still 100% agree, that this would be better.
+Thanks for the review,
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> 	svm->nested.nested_run_pending =
+> 		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
+> 
+> > +
+> >  	copy_vmcb_control_area(&hsave->control, &svm->vmcb->control);
+> >  	hsave->save = *save;
+> >  
+> > -- 
+> > 2.26.2
+> > 
+
+
