@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7DF92EC66D
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 23:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C4EC2EC670
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 23:59:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbhAFW5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 17:57:23 -0500
-Received: from mga12.intel.com ([192.55.52.136]:27781 "EHLO mga12.intel.com"
+        id S1726900AbhAFW7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 17:59:25 -0500
+Received: from mga18.intel.com ([134.134.136.126]:38024 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726303AbhAFW5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 17:57:23 -0500
-IronPort-SDR: q8It7YVX0totSyyB1J/PoatfPOMeVilX9rGvhpY3koPOhKPGZrCZ2hI4xCLFEJQ/K6HM8TsPiH
- p1OO+QMARsSg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="156534795"
+        id S1726371AbhAFW7Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 17:59:25 -0500
+IronPort-SDR: t/mLkB9S6FzBFJ4k5xb4NUOjromO0K4iwspl3k4Oq5CrhkbwPfTZM4/DYrLdoIdqKZRjxjoDUz
+ Km30a7D/A/7g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="165044821"
 X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="156534795"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 14:56:42 -0800
-IronPort-SDR: GUO7qR4BmgRFYvQ9i8+yVbkFV3Uim74fHpQ6zaJB/OFTbThvtCBlfg0fDZweg3PGPOOucmC1li
- v/xpPuRqFMUw==
+   d="scan'208";a="165044821"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 14:58:44 -0800
+IronPort-SDR: IusFO7RdEcRgkXbiUXRFSUyW0kAxwjbz3znxvh7G1dg5pA+c2mLbX4oMRkz8ixm0za/GjNIZuF
+ yC4RhfrP2Mqw==
 X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="361748184"
+   d="scan'208";a="462828307"
 Received: from vastrong-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.243])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 14:56:39 -0800
-Date:   Thu, 7 Jan 2021 11:56:37 +1300
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 14:58:41 -0800
+Date:   Thu, 7 Jan 2021 11:58:39 +1300
 From:   Kai Huang <kai.huang@intel.com>
 To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>, <seanjc@google.com>, <jarkko@kernel.org>,
-        <luto@kernel.org>, <haitao.huang@intel.com>, <pbonzini@redhat.com>,
-        <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <hpa@zytor.com>
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
-Message-Id: <20210107115637.c1e0bf2c823f933943ee813b@intel.com>
-In-Reply-To: <b3e11134-cd8e-2b51-1363-58898832ba38@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>, <jarkko@kernel.org>, <luto@kernel.org>,
+        <haitao.huang@intel.com>, <pbonzini@redhat.com>, <bp@alien8.de>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <hpa@zytor.com>
+Subject: Re: [RFC PATCH 11/23] x86/sgx: Add helpers to expose ECREATE and
+ EINIT to KVM
+Message-Id: <20210107115839.0767102e8186e9bc89fa0a61@intel.com>
+In-Reply-To: <7df437ee-e1f3-440c-377b-dbe39820fd44@intel.com>
 References: <cover.1609890536.git.kai.huang@intel.com>
-        <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
-        <6d28e858-a5c0-6ce8-8c0d-2fdfbea3734b@intel.com>
-        <20210107111206.c8207e64540a8361c04259b7@intel.com>
-        <b3e11134-cd8e-2b51-1363-58898832ba38@intel.com>
+        <6b29d1ee66715b40aba847b31cbdac71cbb22524.1609890536.git.kai.huang@intel.com>
+        <863820fc-f0d2-6be6-52db-ab3eefe36f64@intel.com>
+        <X/Yl9UTLhYHg6AVi@google.com>
+        <7df437ee-e1f3-440c-377b-dbe39820fd44@intel.com>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -49,56 +49,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 6 Jan 2021 14:21:39 -0800 Dave Hansen wrote:
-> On 1/6/21 2:12 PM, Kai Huang wrote:
-> > On Wed, 6 Jan 2021 11:39:46 -0800 Dave Hansen wrote:
-> >> On 1/5/21 5:55 PM, Kai Huang wrote:
-> >>> --- a/arch/x86/kernel/cpu/feat_ctl.c
-> >>> +++ b/arch/x86/kernel/cpu/feat_ctl.c
-> >>> @@ -97,6 +97,8 @@ static void clear_sgx_caps(void)
-> >>>  {
-> >>>  	setup_clear_cpu_cap(X86_FEATURE_SGX);
-> >>>  	setup_clear_cpu_cap(X86_FEATURE_SGX_LC);
-> >>> +	setup_clear_cpu_cap(X86_FEATURE_SGX1);
-> >>> +	setup_clear_cpu_cap(X86_FEATURE_SGX2);
-> >>>  }
-> >> Logically, I think you want this *after* the "Allow SGX virtualization
-> >> without Launch Control support" patch.  As it stands, this will totally
-> >> disable SGX (including virtualization) if launch control is unavailable.
-> > To me it is better to be here, since clear_sgx_caps(), which disables SGX
-> > totally, should logically clear all SGX feature bits, no matter later patch's
-> > behavior. So when new SGX bits are introduced, clear_sgx_caps() should clear
-> > them too. Otherwise the logic of this patch (adding new SGX feature bits) is
-> > not complete IMHO.
+On Wed, 6 Jan 2021 13:23:37 -0800 Dave Hansen wrote:
+> On 1/6/21 1:04 PM, Sean Christopherson wrote:
+> > On Wed, Jan 06, 2021, Dave Hansen wrote:
+> >> On 1/5/21 5:56 PM, Kai Huang wrote:
+> >>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> >>>
+> >>> Provide wrappers around __ecreate() and __einit() to hide the ugliness
+> >>> of overloading the ENCLS return value to encode multiple error formats
+> >>> in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
+> >>> of SGX virtualization, and on an exception, KVM needs the trapnr so that
+> >>> it can inject the correct fault into the guest.
+> >>
+> >> This is missing a bit of a step about how and why ECREATE needs to be
+> >> run in the host in the first place.
 > > 
-> > And actually in later patch "Allow SGX virtualization without Launch Control
-> > support", a new clear_sgx_lc() is added, and is called when LC is not
-> > available but SGX virtualization is enabled, to make sure only SGX_LC bit is
-> > cleared in this case. I don't quite understand why we need to clear SGX1 and
-> > SGX2 in clear_sgx_caps() after the later patch.
+> > There's (hopefully) good info in the KVM usage patch that can be borrowed:
+> > 
+> >   Add an ECREATE handler that will be used to intercept ECREATE for the
+> >   purpose of enforcing and enclave's MISCSELECT, ATTRIBUTES and XFRM, i.e.
+> >   to allow userspace to restrict SGX features via CPUID.  ECREATE will be
+> >   intercepted when any of the aforementioned masks diverges from hardware
+> >   in order to enforce the desired CPUID model, i.e. inject #GP if the
+> >   guest attempts to set a bit that hasn't been enumerated as allowed-1 in
+> >   CPUID.
 > 
-> I was talking about patch ordering.  It could be argued that this goes
-> after the content of patch 05/23.  Please _consider_ changing the ordering.
+> OK, so in plain language: the bare-metal kernel must intercept ECREATE
+> to be able to impose policies on guests.  When it does this, the
+> bare-metal kernel runs ECREATE against the userspace mapping of the
+> virtualized EPC.
+
+Thanks. I'll add this to commit message.
+
 > 
-> If that doesn't work for some reason, please at least call out in the
-> changelog that it leaves a temporarily funky situation.
+> >>> diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
+> >>> new file mode 100644
+> >>> index 000000000000..0d643b985085
+> >>> --- /dev/null
+> >>> +++ b/arch/x86/include/asm/sgx.h
+> >>> @@ -0,0 +1,16 @@
+> >>> +/* SPDX-License-Identifier: GPL-2.0 */
+> >>> +#ifndef _ASM_X86_SGX_H
+> >>> +#define _ASM_X86_SGX_H
+> >>> +
+> >>> +#include <linux/types.h>
+> >>> +
+> >>> +#ifdef CONFIG_X86_SGX_VIRTUALIZATION
+> >>> +struct sgx_pageinfo;
+> >>> +
+> >>> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
+> >>> +		     int *trapnr);
+> >>> +int sgx_virt_einit(void __user *sigstruct, void __user *token,
+> >>> +		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
+> >>> +#endif
+> >>> +
+> >>> +#endif /* _ASM_X86_SGX_H */
+> >>> diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+> >>> index d625551ccf25..4e9810ba9259 100644
+> >>> --- a/arch/x86/kernel/cpu/sgx/virt.c
+> >>> +++ b/arch/x86/kernel/cpu/sgx/virt.c
+> >>> @@ -261,3 +261,58 @@ int __init sgx_virt_epc_init(void)
+> >>>  
+> >>>  	return misc_register(&sgx_virt_epc_dev);
+> >>>  }
+> >>> +
+> >>> +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
+> >>> +		     int *trapnr)
+> >>> +{
+> >>> +	int ret;
+> >>> +
+> >>> +	__uaccess_begin();
+> >>> +	ret = __ecreate(pageinfo, (void *)secs);
+> >>> +	__uaccess_end();
+> >>
+> >> The __uaccess_begin/end() worries me.  There are *very* few of these in
+> >> the kernel and it seems like something we want to use as sparingly as
+> >> possible.
+> >>
+> >> Why don't we just use the kernel mapping for 'secs' and not have to deal
+> >> with stac/clac?
+> > 
+> > The kernel mapping isn't readily available. 
 > 
+> Oh, duh.  There's no kernel mapping for EPC... it's not RAM in the first
+> place.
+> 
+> > At this point, it's not even
+> > guaranteed that @secs points at an EPC page.  Unlike the driver code, where the
+> > EPC page is allocated on-demand by the kernel, the pointer here is userspace
+> > (technically guest) controlled.  The caller (KVM) is responsible for ensuring
+> > it's a valid userspace address, but the SGX/EPC specific checks are mostly
+> > deferred to hardware.
+> 
+> Ahh, got it.  Kai, could we get some of this into comments or the changelog?
 
-The later patch currently uses SGX1 bit, which is the reason that this patch
-needs be before later patch.
-
-Sean,
-
-I think it is OK to remove SGX1 bit check in later patch, since I have
-never seen a machine with SGX bit in CPUID, but w/o SGX1. If we remove SGX1 bit
-check in later, we can put this patch after the later patch.
-
-Do you have comment here? If you are OK, I'll remove SGX1 bit check in later
-patch and reorder the patch.
-
-
-
-
-
-
-
+Yes I'll add some into comments.
