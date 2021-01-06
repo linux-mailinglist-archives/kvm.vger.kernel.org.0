@@ -2,117 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CB832EC2E7
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 19:03:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 872C82EC2F8
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 19:09:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbhAFSC4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 13:02:56 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:60642 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbhAFSC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 13:02:56 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 106Hn0Wr066124;
-        Wed, 6 Jan 2021 18:02:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=2lt3ykkXLU7Z05NRvknGfNq8ZldSt2677ItCZlpH1Cw=;
- b=ziGf732eXm4y4bArZ7Ykz4J8coQGXeg0yZ6trcTx3QbeqiwsPwzxu1ZryO5F9l9MO3Fk
- XWRToc5p7g3mWQHHOhs+2CPxh2YgHgYwxFST6b20QQ2bTbLaCRBwCykP9b7YEnTE8shn
- heADdXVW0RF9Wv3e1vusvI+SzSpXxg2y229SngcnoI66rdahmNxQQgMycliXEw4w5C8h
- ugX7GYnYXluTiCochiFDV6UGL2OQBur2h1k429rfFyW3XKnLlipdPwgM4iQ0fgvpZEDC
- CwWvROWkqT9fvyALWHwEae5U9TCUFa1jTnS8dS0vYeM8woX7M0UtqsAe7ShpIVfSVa23 cg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2130.oracle.com with ESMTP id 35wcuxsj2e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 06 Jan 2021 18:02:10 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 106Hpdr9105870;
-        Wed, 6 Jan 2021 18:02:10 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 35w3g1e147-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 06 Jan 2021 18:02:10 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 106I28jq006145;
-        Wed, 6 Jan 2021 18:02:09 GMT
-Received: from [192.168.1.3] (/89.66.140.113)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 06 Jan 2021 10:02:08 -0800
-Subject: Re: [PATCH 2/3] kvm: x86/mmu: Ensure TDP MMU roots are freed after
- yield
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Leo Hou <leohou1402@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-References: <20210105233136.2140335-1-bgardon@google.com>
- <20210105233136.2140335-2-bgardon@google.com>
- <CANgfPd8TXa3GG4mQ7MD0wBrUOTdRDeR0z50uDmbcR88rQMn5FQ@mail.gmail.com>
- <e94e674e-1775-3c67-97f0-8c61e1add554@oracle.com>
- <CANgfPd-QPUwigK5um8DWQ5Y_M+JGRie_N_vkYtZdNE1WQbn3mA@mail.gmail.com>
- <4471c5e6-16a1-65c4-aa59-185091a2ebbc@oracle.com>
- <CANgfPd_jJmFT_ZLW9M0=AMP8fH9JnA2Jm1aymOwPBfnbL6odSw@mail.gmail.com>
-From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Message-ID: <7e1e20f7-4630-3329-41c9-ddd6597d2486@oracle.com>
-Date:   Wed, 6 Jan 2021 19:02:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726244AbhAFSIk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 13:08:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbhAFSIk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 13:08:40 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9010C061575
+        for <kvm@vger.kernel.org>; Wed,  6 Jan 2021 10:07:59 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id be12so1942237plb.4
+        for <kvm@vger.kernel.org>; Wed, 06 Jan 2021 10:07:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=li/GOl/KjoXYB/kM32ILGJQY9xV9Xb+bAy3Ws88LvI0=;
+        b=G4G0xD9tjCCh0tMUqSmps7tvPQGUuyIpjM2UHnaooPGnXVl/5lMqEP2h/oIPI/5DLk
+         OW1i21NQosW1QV6NJKWL5hg98YJ6ls6JEZm1aNwsT7/9kTDmudiZFGCbyfStZLvVQTlT
+         AFW4rGz510zkhSX77+QjOvY8z2GYCHgfbBnY4WOiLRZGTABvJ6Bxbdy8aYhxx5+grXv7
+         ugWNu6w1oUhjfGQnBKueZgn86DrOWrx/r2fSEMPqDBzbdSqEv1iByBTRCGtpcyXDgWtz
+         tbmc1M2cVOMXRpx7Uj+Wnp+cdwroYCNO+2CEJ4fEwNWWO6CvVJ7WRTn30uSPm1yNHFki
+         1FlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=li/GOl/KjoXYB/kM32ILGJQY9xV9Xb+bAy3Ws88LvI0=;
+        b=qPZ6JXVM1z8HZPZd0aDz0U2zrkCk1Y/SaFifas5B0LQZEGVSF0ax9Q+h7dNMdS06Cw
+         SF1igB01BKrrvxsljg1mT1jjlcBQiVsShc6nHLzxMMpmokJ5AGX03GPHlG13eB9T8FaJ
+         5M2ucmq0u071Omd0tEK3/xscs1sFeUcHud3HaVYw8UOH6g3Q39ASjiLNXu82bQK6eI67
+         3i5OMRK6GdtZYINoQLSFRCRJKkAOCDlgw6O3lmvaaDbetDZixAPTzBKOFnJ9F+WCzy6E
+         vU9qHh/w+S2mWk0co3kcFCK2plfDlVtOVIl+qTsXIsAs7clbY810ykwFXTNp8RtH4Ny6
+         V/HA==
+X-Gm-Message-State: AOAM531pQEFuaHJqsmIXfkrvyKB6Esh25FAxHF86nZi4XpY5kTC5ZADH
+        Dybh2HrJz3Qb0zi3k34s7a3Wnw==
+X-Google-Smtp-Source: ABdhPJwswpe5K1Pu3QoJal8mFFt/BLf2x1bIlEr+tYpSTIMc6GOafuNzaX//pofuFihvWTv/VSvWpg==
+X-Received: by 2002:a17:902:d202:b029:da:d86b:78be with SMTP id t2-20020a170902d202b02900dad86b78bemr5307588ply.0.1609956479208;
+        Wed, 06 Jan 2021 10:07:59 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id m22sm3647018pgj.46.2021.01.06.10.07.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jan 2021 10:07:58 -0800 (PST)
+Date:   Wed, 6 Jan 2021 10:07:51 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH 0/2] RFC: VMX: fix for disappearing L1->L2 event
+ injection on L1 migration
+Message-ID: <X/X8d2XijuPxLOGG@google.com>
+References: <20210106105306.450602-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CANgfPd_jJmFT_ZLW9M0=AMP8fH9JnA2Jm1aymOwPBfnbL6odSw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9855 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101060103
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9856 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
- clxscore=1015 spamscore=0 impostorscore=0 priorityscore=1501 mlxscore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101060103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210106105306.450602-1-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06.01.2021 18:56, Ben Gardon wrote:
-> On Wed, Jan 6, 2021 at 9:37 AM Maciej S. Szmigiero
-> <maciej.szmigiero@oracle.com> wrote:
->>
->> On 06.01.2021 18:28, Ben Gardon wrote:
->>> On Wed, Jan 6, 2021 at 1:26 AM Maciej S. Szmigiero
->>> <maciej.szmigiero@oracle.com> wrote:
->>>>
->>>> Thanks for looking at it Ben.
->>>>
->>>> On 06.01.2021 00:38, Ben Gardon wrote:
->>>> (..)
->>>>>
->>>>> +Sean Christopherson, for whom I used a stale email address.
->>>>> .
->>>>> I tested this series by running kvm-unit-tests on an Intel Skylake
->>>>> machine. It did not introduce any new failures. I also ran the
->>>>> set_memory_region_test
->>>>
->>>> It's "memslot_move_test" that is crashing the kernel - a memslot
->>>> move test based on "set_memory_region_test".
->>>
->>> I apologize if I'm being very dense, but I can't find this test
->>> anywhere.
->>
->> No problem, the reproducer is available here:
->> https://urldefense.com/v3/__https://gist.github.com/maciejsszmigiero/890218151c242d99f63ea0825334c6c0__;!!GqivPVa7Brio!N4KXBbUfHtzFMD33RIWVJQmeTtSrFm4n-Ve84kFEkuewBJNuaOpsdmdoqTGnw8DT_EktHA$
->> as I stated in my original report.
+On Wed, Jan 06, 2021, Maxim Levitsky wrote:
+> This is VMX version of the same issue as I reproduced on SVM.
 > 
-> Ah, that makes sense now. I didn't realize there were more files below
-> the .config. I added your test and can now reproduce the issue!
+> Unlike SVM, this version has 2 pending issues to resolve.
+> 
+> 1. This seems to break 'vmx' kvm-unit-test in
+> 'error code <-> (!URG || prot_mode) [+]' case.
+> 
+> The test basically tries to do nested vm entry with unrestricted guest disabled,
+> real mode, and for some reason that works without patch 2 of this series and it
+> doesn't cause the #GP to be injected, but with this patch the test complains
+> about unexpected #GP.
 
-That's great!
-Thanks for looking at it once again.
+An unexpected #GP for that test is very unlikely.  The various sub-tests under
+vmx_controls_test() should never fully enter the guest as GUEST.RFLAGS is set to
+an invalid value.  And, that specific test does VM-Enter with URG=0 and
+CR0.PG/PE=0, which is also invalid.  The unit test uses test_vmx_valid_controls(),
+which is a wee bit misleading, as the "early" consistency checks that cause
+VM-Fail are expected to succeed, while the VM-Enter is still expected to "fail"
+due to a consistency check VM-Exit.
 
-Maciej
+> I suspect that this test case is broken, but this has to be investigated.
+> 
+> 2. L1 MTF injections are lost since kvm has no notion of them, this is TBD to
+> be fixed.
+> 
+> This was lightly tested on my nested migration test which no VMX sadly still
+> crashes and burns on an (likely) unrelated issue.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (2):
+>   KVM: VMX: create vmx_process_injected_event
+>   KVM: nVMX: fix for disappearing L1->L2 event injection on L1 migration
+> 
+>  arch/x86/kvm/vmx/nested.c | 12 ++++----
+>  arch/x86/kvm/vmx/vmx.c    | 60 ++++++++++++++++++++++++---------------
+>  arch/x86/kvm/vmx/vmx.h    |  4 +++
+>  3 files changed, 47 insertions(+), 29 deletions(-)
+> 
+> -- 
+> 2.26.2
+> 
+> 
