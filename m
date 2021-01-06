@@ -2,126 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 768532EBDB5
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 13:28:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74F8E2EBE13
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 13:57:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726580AbhAFM2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 07:28:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59678 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726576AbhAFM2O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 07:28:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2492D205F4;
-        Wed,  6 Jan 2021 12:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1609936053;
-        bh=AjV2Q+OVfwxiH3Qul0Uz3pdpDvwVndFsEygdUMtHOrc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OOIbYKqBKvqAgpSiY7GUsT+eqakMKfgcB8gZrBM5k8x5s0x7QG5xfVEPVyo+DIgSp
-         ZHC4gojAc28aVah7jj21EulkowmVKrWoP+e+jvwKMnOSiJPMGogjf3+2tPoy5zi8JQ
-         102NkmpBz6d/lOZeIAS7H4j4q8fqdBUkzM9H93Ag=
-Date:   Wed, 6 Jan 2021 13:28:54 +0100
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     =?utf-8?B?5p2O5o23?= <jie6.li@samsung.com>
-Cc:     "mst@redhat.com" <mst@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        =?utf-8?B?5L2V5YW0?= <xing84.he@samsung.com>,
-        =?utf-8?B?5ZCV6auY6aOe?= <gaofei.lv@samsung.com>
-Subject: Re: [PATCH] uio: uio_pci_generic: don't fail probe if pdev->irq
- equals to IRQ_NOTCONNECTED
-Message-ID: <X/WtBj9bLp+kr+jE@kroah.com>
-References: <CGME20210106114851epcms5p81f6ba47c45047d28fda8f201b54d3ae6@epcms5p8>
- <1269705030.4191784.1609933731961@mail-kr5-0>
+        id S1727211AbhAFM4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 07:56:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbhAFM4s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 07:56:48 -0500
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D253C06134D
+        for <kvm@vger.kernel.org>; Wed,  6 Jan 2021 04:56:08 -0800 (PST)
+Received: by mail-pj1-x1043.google.com with SMTP id hk16so1536978pjb.4
+        for <kvm@vger.kernel.org>; Wed, 06 Jan 2021 04:56:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=rY00u7ZHZHQvBPLzT9Cho2+wNz3atgl+Ai2dfz0jYr0=;
+        b=tDCVNQeTQylq1yz2pjqPL4hry5RIz4CGIuwMYQTcdJUiIIMzOdopVSup6zEXdwpEFO
+         tpgGTtp6E6x4jLCv+6bupbey4inAJK3tuBOdtKYVK0o/rio4jarl5LMx+mFgoNySuEbW
+         zOWAJHL/AK3zPlAlwkmxCF0goC0D4OocRXo+KHIzIU1fatzgZgWcL6Rf5sGybrcGlsD/
+         ImqwI2FRT4YOGqhwD6PTZc8keTX6w/mk/CS+57iLAQ+8F4okcMfbDaPECHKLBsNrwToX
+         mzyevkB7CRJO6ZVBsfXsKEMNJcVQsVlqE9cWy8H81Fc0o8BQ7idJpKWJDy7kCllKW8Wj
+         o/ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=rY00u7ZHZHQvBPLzT9Cho2+wNz3atgl+Ai2dfz0jYr0=;
+        b=fubvqA2BFt5L3l8ZcizYiOwFuvlstp2/0g03Efz3n8WZgb3qoAz62F6uC3zfVAHbRF
+         /zvqYAzaSqPor1D/N+pSlJBEecMWX8vNoor08g0x5IDEs05Yaj3fUCS9Ne9RzMO3M6Zf
+         DefI+PURny/PvUuXywcAFPoMcDDVC+EadER3hTGtnrKnG6hfP33TYPqHa9c2B+6u9iXY
+         UAK6w2aanx6g5k5gczZ6xb0Y6hH7PTJ1J7ecqwnu3zJJQPUleyjUcAOw1A95hwKnRUm8
+         Ligd3MLx3IjqyiemxCjxhjI7EzEJz0tX+GSadbSCcyqhBmw1QUWl5p+jyied0ROTcma9
+         F5Ew==
+X-Gm-Message-State: AOAM5310cu6mSMq9XKCg3pVyl5yOpMRoHw/VC9rGJr/glSjeGDe/5KBQ
+        W2HdF0mkHsj5o10PtYFiuEDl1EFshSt+0vZFWQ==
+X-Google-Smtp-Source: ABdhPJz121TUbxz0SVnyXXBfE1G/AUynHdqn8F0q1Q88R2U9Fl2+oDGd9N+7sapZ2nH4EZstMXHY546ZW/ky0PAfIeI=
+X-Received: by 2002:a17:902:7e42:b029:dc:f98:44e2 with SMTP id
+ a2-20020a1709027e42b02900dc0f9844e2mr4225780pln.49.1609937767691; Wed, 06 Jan
+ 2021 04:56:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1269705030.4191784.1609933731961@mail-kr5-0>
+Received: by 2002:a05:6a10:17cd:0:0:0:0 with HTTP; Wed, 6 Jan 2021 04:56:07
+ -0800 (PST)
+Reply-To: aisha.gaddafi206@gmail.com
+From:   Mrs Aisha Al-Qaddafi <capt.stephane001@gmail.com>
+Date:   Wed, 6 Jan 2021 04:56:07 -0800
+Message-ID: <CA+WFhWMJZrguyJpMS1bm0sqGJ3ttqLx3CqfYOTuG14nvCW8c2A@mail.gmail.com>
+Subject: From Mrs Rose,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 06, 2021 at 07:48:51PM +0800, 李捷 wrote:
-> From 0fbcd7e386898d829d3000d094358a91e626ee4a Mon Sep 17 00:00:00 2001
-> From: Jie Li <jie6.li@samsung.com>
-> Date: Mon, 7 Dec 2020 08:05:07 +0800
-> Subject: [PATCH] uio: uio_pci_generic: don't fail probe if pdev->irq equals to
->  IRQ_NOTCONNECTED
-> 
-> Some devices use 255 as default value of Interrupt Line register, and this
-> maybe causes pdev->irq is set as IRQ_NOTCONNECTED in some scenarios. For
-> example, NVMe controller connects to Intel Volume Management Device (VMD).
-> In this situation, IRQ_NOTCONNECTED means INTx line is not connected, not
-> fault. If bind uio_pci_generic to these devices, uio frame will return
-> -ENOTCONN through request_irq.
-> 
-> This patch allows binding uio_pci_generic to device with dev->irq of
-> IRQ_NOTCONNECTED.
-> 
-> Signed-off-by: Jie Li <jie6.li@samsung.com>
-> Acked-by: Kyungsan Kim <ks0204.kim@samsung.com>
-> ---
->  drivers/uio/uio_pci_generic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.c
-> index b8e44d16279f..c7d681fef198 100644
-> --- a/drivers/uio/uio_pci_generic.c
-> +++ b/drivers/uio/uio_pci_generic.c
-> @@ -92,7 +92,7 @@ static int probe(struct pci_dev *pdev,
->   gdev->info.version = DRIVER_VERSION;
->   gdev->info.release = release;
->   gdev->pdev = pdev;
-> - if (pdev->irq) {
-> + if (pdev->irq && (pdev->irq != IRQ_NOTCONNECTED)) {
->    gdev->info.irq = pdev->irq;
->    gdev->info.irq_flags = IRQF_SHARED;
->    gdev->info.handler = irqhandler;
-> --
-> 2.17.1
-> 
->  
-> 
->  
-> 
-> Best regards, 
-> 
-> Jie Li
-> 
-> [cid]
-> 
-> *
-> 
+Dear friend,
 
+Can you join me and help people?
 
+It's my pleasure to have contact with you, based on the critical
+condition I find myself and my desire to will part of my property to
+the Orphans, Disable, blind, Old and poor people who have nothing to
+eat, although, it's not financial problem I have but my health, you
+might have know that cancer is not what to talk  about at home I have
+been in the hospital for 5 months now I am Mrs Rose Banneth and I am
+married to Mr. Abaulkarim banneth who worked with Tunisia embassy in
+Burkina Faso for nine years before he died in the year 2008.We were
+married for eleven years without a child. He died after a brief
+illness that lasted for five days.
 
+Since his death I decided not to remarry. When my late husband was
+alive he deposited the sum of US$ 8.2million  (Eight million two
+hundred thousand dollars)  in a bank in Burkina Faso for me, Presently
+this money is still in bank. I want you to help me use this money for
+the poor people around you in your Country it is the Almighty God
+direction that I choose you to do this with your heart.
 
-Hi,
+My Doctors told me that I don't have much time to live because of the
+cancer problem and i don t want to live this money in the bank for
+Government instead I decided to use it for Old people who cannot work
+again and Orphans who have nothing to eat because i am Orphan, Having
+known my condition I decided to hand over this fund to a responsible
+person that have fear of God to receive this money and use  it for the
+needy instead of this money be forgotten to the bank. Can you have the
+time to do this? If so please, i want you to contact me here my
+private email address mrsrosebanneth89@gmail.com
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- Your patch is malformed (tabs converted to spaces, linewrapped, etc.)
-  and can not be applied.  Please read the file,
-  Documentation/email-clients.txt in order to fix this.
-
-- Your patch was attached, please place it inline so that it can be
-  applied directly from the email message itself.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
+I wait for your response.
+My regards,
+Mrs Rose Banneth
+written from Hospital
