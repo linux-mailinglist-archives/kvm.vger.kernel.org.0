@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E21182EB7EA
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 02:59:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 657612EB7EB
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 02:59:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726656AbhAFB5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 5 Jan 2021 20:57:51 -0500
-Received: from mga09.intel.com ([134.134.136.24]:32527 "EHLO mga09.intel.com"
+        id S1726657AbhAFB57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 5 Jan 2021 20:57:59 -0500
+Received: from mga02.intel.com ([134.134.136.20]:45147 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725965AbhAFB5u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 5 Jan 2021 20:57:50 -0500
-IronPort-SDR: A5uj8wGWRXmCoHdbDGwVMyT8nFE1vWhYLGzhtJ2jUfvyx2Ns+m4j8uEJWArOUTcY1FER89ECaB
- Xz9+4l1SZj5Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="177366107"
+        id S1726063AbhAFB56 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 5 Jan 2021 20:57:58 -0500
+IronPort-SDR: yK6QZBxePrqn8Pipe99t5nAr6Ng8qprOFlILKNal/aBDdWpj3/tDVcaqvROT4L3CfSXjbLRWWR
+ g0I/L/Yu4AYg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9855"; a="164284452"
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="177366107"
+   d="scan'208";a="164284452"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:57:10 -0800
-IronPort-SDR: VOceH0Jp9keMAWIHOiPOKwasrGCW188Tf+5BsWzIX35+6/tythllayOWtX8hBR9pVZ8i0tT9kG
- kzb688iIxJjg==
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:57:15 -0800
+IronPort-SDR: 0v/DiqZ0eV23jk58Y4M54Gj0z0mKC0zdQOEJLTtOP4Dr3VYk7XZkvjDWm6EdNn3/bVv92qKg5I
+ bo/3ES8jNxIw==
 X-IronPort-AV: E=Sophos;i="5.78,478,1599548400"; 
-   d="scan'208";a="421993456"
+   d="scan'208";a="421993465"
 Received: from zhuoxuan-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.29.237])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:57:06 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2021 17:57:12 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
@@ -31,9 +31,9 @@ Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         mattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
         wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH 14/23] KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
-Date:   Wed,  6 Jan 2021 14:56:44 +1300
-Message-Id: <620abe3034190372421b8c9a5e0a7b1734d7734d.1609890536.git.kai.huang@intel.com>
+Subject: [RFC PATCH 15/23] KVM: x86: Define new #PF SGX error code bit
+Date:   Wed,  6 Jan 2021 14:56:45 +1300
+Message-Id: <71de1da6c9ca5795b28be1ff6696b96c1dc28cf7.1609890536.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1609890536.git.kai.huang@intel.com>
 References: <cover.1609890536.git.kai.huang@intel.com>
@@ -45,47 +45,39 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Export the gva_to_gpa() helpers for use by SGX virtualization when
-executing ENCLS[ECREATE] and ENCLS[EINIT] on behalf of the guest.
-To execute ECREATE and EINIT, KVM must obtain the GPA of the target
-Secure Enclave Control Structure (SECS) in order to get its
-corresponding HVA.
-
-Because the SECS must reside in the Enclave Page Cache (EPC), copying
-the SECS's data to a host-controlled buffer via existing exported
-helpers is not a viable option as the EPC is not readable or writable
-by the kernel.
-
-SGX virtualization will also use gva_to_gpa() to obtain HVAs for
-non-EPC pages in order to pass user pointers directly to ECREATE and
-EINIT, which avoids having to copy pages worth of data into the kernel.
+Page faults that are signaled by the SGX Enclave Page Cache Map (EPCM),
+as opposed to the traditional IA32/EPT page tables, set an SGX bit in
+the error code to indicate that the #PF was induced by SGX.  KVM will
+need to emulate this behavior as part of its trap-and-execute scheme for
+virtualizing SGX Launch Control, e.g. to inject SGX-induced #PFs if
+EINIT faults in the host, and to support live migration.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/kvm/x86.c | 2 ++
+ arch/x86/include/asm/kvm_host.h | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 078a39d489fe..c195494da0ea 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5866,6 +5866,7 @@ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
- 	u32 access = (kvm_x86_ops.get_cpl(vcpu) == 3) ? PFERR_USER_MASK : 0;
- 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
- }
-+EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_read);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 324ddd7fd0aa..b1cbcfff0265 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -216,6 +216,7 @@ enum x86_intercept_stage;
+ #define PFERR_RSVD_BIT 3
+ #define PFERR_FETCH_BIT 4
+ #define PFERR_PK_BIT 5
++#define PFERR_SGX_BIT 15
+ #define PFERR_GUEST_FINAL_BIT 32
+ #define PFERR_GUEST_PAGE_BIT 33
  
-  gpa_t kvm_mmu_gva_to_gpa_fetch(struct kvm_vcpu *vcpu, gva_t gva,
- 				struct x86_exception *exception)
-@@ -5882,6 +5883,7 @@ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
- 	access |= PFERR_WRITE_MASK;
- 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
- }
-+EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_write);
+@@ -225,6 +226,7 @@ enum x86_intercept_stage;
+ #define PFERR_RSVD_MASK (1U << PFERR_RSVD_BIT)
+ #define PFERR_FETCH_MASK (1U << PFERR_FETCH_BIT)
+ #define PFERR_PK_MASK (1U << PFERR_PK_BIT)
++#define PFERR_SGX_MASK (1U << PFERR_SGX_BIT)
+ #define PFERR_GUEST_FINAL_MASK (1ULL << PFERR_GUEST_FINAL_BIT)
+ #define PFERR_GUEST_PAGE_MASK (1ULL << PFERR_GUEST_PAGE_BIT)
  
- /* uses this to access any guest's mapped memory without checking CPL */
- gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
 -- 
 2.29.2
 
