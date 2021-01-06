@@ -2,72 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8AC72EC32B
-	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 19:21:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0654A2EC339
+	for <lists+kvm@lfdr.de>; Wed,  6 Jan 2021 19:29:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726986AbhAFSVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 13:21:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726822AbhAFSVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 13:21:36 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BAA3C061575
-        for <kvm@vger.kernel.org>; Wed,  6 Jan 2021 10:20:56 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id k10so3175468wmi.3
-        for <kvm@vger.kernel.org>; Wed, 06 Jan 2021 10:20:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QfbeWsTRTl5t+yoIzvqBpOs8fewM/q2gZY0NpUaJFJ0=;
-        b=KKUyO72RiIV2lTc2BzL4v5d4Wax+ixJXUKre5AzfybcTMoRmqt/av+KsWYg2hS1AOz
-         bdNdHofJ4C5gkVDP6zCjV599rXtajM8vLrMNdUkkE+MhYt+C53xiVcrKFbtTYDQ9yaDx
-         ziEHTWDQ8VFx1wjOcQzj/gm2lQVSzB73a+dZcGTkjJovunCyJys/JafYbxqen0ZIdIkm
-         Z0PE3ZlYdXju2PWwj/hWIn1EqAL69+pks3qupMz0qHbKAM/vAc5sboRCGhRI4R0hTTdt
-         risWwGGAu6EGxvtOIh8Z8M5O4hlaiX9/xYLPmTDg7IgEDDFYPDUNUePWCLq0V46hhR1D
-         fzog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QfbeWsTRTl5t+yoIzvqBpOs8fewM/q2gZY0NpUaJFJ0=;
-        b=SVinKOU6SMxMJSorwrmoJ/YsUQAnMMW2ykVbcgqx4NtW1vtHDJ6pIGpLZUCT7htL0R
-         S4odaNs1YYCR1iYQ4po/YjTS+PquvPDpTXM13gLZsmTozco0fnARNqxfrjEg6vRmPcn0
-         F47ZTGCCVlkYKV7fLkOow5yreLRMnhU8bF1B3/8loW0dbp7cmubyi1eBmPKeNaArBO7K
-         mBZzDi/Gav+3URi8SjuJ7zhKOplKsZFR3gHutRw75b8USToVOP5HyJ+TPEKKz2FtBG+f
-         RZ2xDyeS1e2HlIhWi8yXaB0nkPXcYIHpN9+78utr7ZKW5jSy6OVMvVcc2Qz9UN40uP0r
-         uvGw==
-X-Gm-Message-State: AOAM533/OLPM7flUZjI77w4kfEW/E3KvG8Yi9gSRIlyWeSwToe3Q25Fq
-        25XVi2ISGnkcisX4dM2kYU4=
-X-Google-Smtp-Source: ABdhPJzTMCojHyc3I3zeK/plHO8a7afnD7azaRHN5Jwo51vHLO6QKkdnUWYGLJef50BbNkQxyfT6YA==
-X-Received: by 2002:a05:600c:4e87:: with SMTP id f7mr325351wmq.163.1609957255178;
-        Wed, 06 Jan 2021 10:20:55 -0800 (PST)
-Received: from [192.168.1.36] (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id z21sm3853080wmk.20.2021.01.06.10.20.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Jan 2021 10:20:54 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Subject: Re: [PATCH v2 02/24] target/mips/translate: Expose check_mips_64() to
- 32-bit mode
-To:     Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        kvm@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-References: <20201215225757.764263-1-f4bug@amsat.org>
- <20201215225757.764263-3-f4bug@amsat.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1f23c2f4-28b9-ac3b-356e-ea9cc0213690@amsat.org>
-Date:   Wed, 6 Jan 2021 19:20:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726063AbhAFS3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 13:29:38 -0500
+Received: from mga06.intel.com ([134.134.136.31]:2208 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725789AbhAFS3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 13:29:38 -0500
+IronPort-SDR: 4Gsuhjy3wHsiaCMof9Fo9KbLn9V/DTRnLjQW6XIXbEaUwRTQ4cJKNOtlGcCldxhvVSjigVYxhD
+ Cdvt0o+4W13A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="238865982"
+X-IronPort-AV: E=Sophos;i="5.79,327,1602572400"; 
+   d="scan'208";a="238865982"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 10:28:57 -0800
+IronPort-SDR: Na7B4blBWW/+7ZdhM5YtU7vcGUWcZ2RnceYkJrVXwu96boOIh+BmGVBgaEtF6IO9wf9T1qr2Wn
+ w3w5ofFjX1Pg==
+X-IronPort-AV: E=Sophos;i="5.79,327,1602572400"; 
+   d="scan'208";a="422260322"
+Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 10:28:56 -0800
+Subject: Re: [RFC PATCH 02/23] x86/sgx: Add enum for SGX_CHILD_PRESENT error
+ code
+To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+References: <cover.1609890536.git.kai.huang@intel.com>
+ <2a41e15dfda722dd1e34feeda34ce864cd82361b.1609890536.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <05f6945b-418a-b4eb-406a-0f0a23cb939f@intel.com>
+Date:   Wed, 6 Jan 2021 10:28:55 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201215225757.764263-3-f4bug@amsat.org>
+In-Reply-To: <2a41e15dfda722dd1e34feeda34ce864cd82361b.1609890536.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -75,73 +90,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On 1/5/21 5:55 PM, Kai Huang wrote:
+> Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+> failures are expected, but only due to SGX_CHILD_PRESENT.
 
-ping for code review? :)
+This dances around the fact that this is an architectural error-code.
+Could that be explicit?  Maybe the subject should be:
 
-Due to the "Simplify ISA definitions"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg770056.html
-patch #3 is not necessary.
-
-This is the last patch unreviewed.
-
-On 12/15/20 11:57 PM, Philippe Mathieu-Daudé wrote:
-> To allow compiling 64-bit specific translation code more
-> generically (and removing #ifdef'ry), allow compiling
-> check_mips_64() on 32-bit targets.
-> If ever called on 32-bit, we obviously emit a reserved
-> instruction exception.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  target/mips/translate.h | 2 --
->  target/mips/translate.c | 8 +++-----
->  2 files changed, 3 insertions(+), 7 deletions(-)
-> 
-> diff --git a/target/mips/translate.h b/target/mips/translate.h
-> index a9eab69249f..942d803476c 100644
-> --- a/target/mips/translate.h
-> +++ b/target/mips/translate.h
-> @@ -127,9 +127,7 @@ void generate_exception_err(DisasContext *ctx, int excp, int err);
->  void generate_exception_end(DisasContext *ctx, int excp);
->  void gen_reserved_instruction(DisasContext *ctx);
->  void check_insn(DisasContext *ctx, uint64_t flags);
-> -#ifdef TARGET_MIPS64
->  void check_mips_64(DisasContext *ctx);
-> -#endif
->  void check_cp1_enabled(DisasContext *ctx);
->  
->  void gen_base_offset_addr(DisasContext *ctx, TCGv addr, int base, int offset);
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 5c62b32c6ae..af543d1f375 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -2972,18 +2972,16 @@ static inline void check_ps(DisasContext *ctx)
->      check_cp1_64bitmode(ctx);
->  }
->  
-> -#ifdef TARGET_MIPS64
->  /*
-> - * This code generates a "reserved instruction" exception if 64-bit
-> - * instructions are not enabled.
-> + * This code generates a "reserved instruction" exception if cpu is not
-> + * 64-bit or 64-bit instructions are not enabled.
->   */
->  void check_mips_64(DisasContext *ctx)
->  {
-> -    if (unlikely(!(ctx->hflags & MIPS_HFLAG_64))) {
-> +    if (unlikely((TARGET_LONG_BITS != 64) || !(ctx->hflags & MIPS_HFLAG_64))) {
-
-Since TARGET_LONG_BITS is known at build time, this can be simplified
-as:
-
-if ((TARGET_LONG_BITS != 64) || unlikely!(ctx->hflags & MIPS_HFLAG_64)))
-
->          gen_reserved_instruction(ctx);
->      }
->  }
-> -#endif
->  
->  #ifndef CONFIG_USER_ONLY
->  static inline void check_mvh(DisasContext *ctx)
-> 
+	Add SGX_CHILD_PRESENT hardware error code
