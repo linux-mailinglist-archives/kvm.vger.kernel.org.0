@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 385C32EE889
+	by mail.lfdr.de (Postfix) with ESMTP id A53DB2EE88A
 	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:27:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727344AbhAGW0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:26:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46358 "EHLO
+        id S1728512AbhAGW0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:26:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728516AbhAGW0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:26:16 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0FFC0612FB
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:25:58 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id g185so6832742wmf.3
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:25:58 -0800 (PST)
+        with ESMTP id S1726646AbhAGW0S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:26:18 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B8E5C0612F6
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:26:03 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id t16so7145514wra.3
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:26:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=RlmjZD/A3T2fr0JUoH85vuwC1Fo52rRxQmVB1QjBz9E=;
-        b=SBMuA4EtFqwEkxXdKSMPXgSAj5wO/ro1U0KG3liHYmdnBG8jNhHd3jQFjxQMVPmtuQ
-         djha6PXbWdgHLoBYZZp0NTWSPTsV+dVZb9mQvq1lc2Id0/jLLwWoqu4OlN93PI3Qt9B7
-         +aHRMKklepcEu/z3bOSwAd2zZWXM4frr5tPFC9ISQC+ikKfTuaBSzmlFPXiEA+emzwux
-         C4g1kt2Eu1Zb9rAmUGwnh62YQUShiUMouxwhGtycXrW0rMK2Wtxyspcm+12W4/5NnvCJ
-         af3Bqe9WZ2CCR0Cw3QDw72F2W4BQv1wF5AxgZP17OzkknmMt90a4UqO5+UyA4Zc1L9JZ
-         dLww==
+        bh=xMINXm1sTVzeUT3ZE6sRQjEA5ZHRpEpLUaOQgOSkVsQ=;
+        b=EHAE3Ol5/HOD8NEgpNC9Z7QLjkfjlPScUCA/+1Ni7Wvc/Ouh8RmBNpTvF44ACC+O94
+         ui3rGx1wKxHQQoWQyUnB9heNVZifzrLk54YRq8z3DH4E8rDIK8hHUaSM/Kf04dakP5vJ
+         Fd/RQeSsatodFbulCqF6x8TiPphBSmQSoE2oFdRH4mW2S4ao8xDf4CPQc974T0fgAWgw
+         KUM9zTusnII0RIHXs5cxNPaR4GTj5lKYOe9TbQos2ZzdL0gfkCVrktIaf+TvwrLhWRw7
+         fAdNPsepUBUnfdlphWJmcp2vcwOQupadPCDedEMM2CG1BB56BBZBMIvmFZBdizHwPzJH
+         WgPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=RlmjZD/A3T2fr0JUoH85vuwC1Fo52rRxQmVB1QjBz9E=;
-        b=r1n5XZvbHDQGR9kcdjFudc7TZh++fNcchqs+EVNlEHSb78o3rKpt2wTkbSfrR8tYA1
-         DZolcDgZvEG6G94S7LCyD40tTVAZUOfxkAN6Ok4/Bd8rA2at0Qq98PggIjDlCyyqfKPN
-         uhNuEtBTrwpWzzziYDm6Q5P9aaBJ5g0qDfGqcr1moOjfWb2k1Msoav6T3tgP9N8/InrE
-         puHU+ZS7LH2NqyKevRQGIPNU6a2HHqyHvqHrCyuGJv6ev85v0yvaUvKyWpn8mHSMFco6
-         L4xbnfShqIBKczlaUFG/ROnLnOA6dqQALMu+bmRBgzwPyIw5wIkpmt3/wG8pcgh0y/a7
-         qXjQ==
-X-Gm-Message-State: AOAM532HTetQfX+gS0FRIMN0kAil3DniAs8eW1DPhUYhdJhwU27J196U
-        4jbjXRzhqBQV6yMSwEj9/cc=
-X-Google-Smtp-Source: ABdhPJwoJVLzZ/qFA+Cy7r9W3UMAsAZQYt1Z3j0t6hvrmnMMZTF2r3KKkM6n6BLOL4rOpv3nSHSgnw==
-X-Received: by 2002:a1c:5410:: with SMTP id i16mr543118wmb.30.1610058357273;
-        Thu, 07 Jan 2021 14:25:57 -0800 (PST)
+        bh=xMINXm1sTVzeUT3ZE6sRQjEA5ZHRpEpLUaOQgOSkVsQ=;
+        b=Igx3HgWY+QqKTheGOucTF1Agi7TKBBcq0mBAuOrmtPQ3ePDRrVFNmN/s6FxwHoyoTr
+         C9DhKJJB8U03tqS5m40Zf5s2E4tL3Kgg2BKbeAaXM0wAFWAoMmxyUfCM4vz3abFObXEJ
+         PhzS4Xb7EYyaMTgE6hNICGMljPnhYUBAHM+sxHaI+Sb0SaEBZxY9Hi2zOgj9kdw2TJxZ
+         y0wRHZ+NXfU/GnL2x3wSSVA8gv1Sr1DjxAhZH4dPoHc15qn7UxqI/FH1KoZurdoy2BH7
+         7I5DjKv6ws4kT6lboo80lElLlnaRm4Mlpb+82HNRHg5KBjXglIXhMmVCiSTJWvvPJmXo
+         LGSA==
+X-Gm-Message-State: AOAM5317c4iSQ5YiEjqS++SXctGRmNPAIY85iXtO0hKzrNcrZTlAgXaj
+        B2cPday4U0E87W3vO0rEZ7Y=
+X-Google-Smtp-Source: ABdhPJwjVucGLGwLTP8ZlzahNzVV4CW6S2hcO4HB4SrTqZzAZcO7bXWXd4P/foDdI4h565pPc3KKDw==
+X-Received: by 2002:a5d:60c1:: with SMTP id x1mr660228wrt.271.1610058362338;
+        Thu, 07 Jan 2021 14:26:02 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id z3sm11193357wrn.59.2021.01.07.14.25.55
+        by smtp.gmail.com with ESMTPSA id i9sm10795243wrs.70.2021.01.07.14.26.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:25:56 -0800 (PST)
+        Thu, 07 Jan 2021 14:26:01 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -58,11 +58,10 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Paul Burton <paulburton@kernel.org>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 35/66] target/mips/translate: Extract decode_opc_legacy() from decode_opc()
-Date:   Thu,  7 Jan 2021 23:22:22 +0100
-Message-Id: <20210107222253.20382-36-f4bug@amsat.org>
+        Paul Burton <paulburton@kernel.org>
+Subject: [PULL 36/66] target/mips/translate: Expose check_mips_64() to 32-bit mode
+Date:   Thu,  7 Jan 2021 23:22:23 +0100
+Message-Id: <20210107222253.20382-37-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,88 +72,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we will slowly move to decodetree generated decoders,
-extract the legacy decoding from decode_opc(), so new
-decoders are added in decode_opc() while old code is
-removed from decode_opc_legacy().
+To allow compiling 64-bit specific translation code more
+generically (and removing #ifdef'ry), allow compiling
+check_mips_64() on 32-bit targets.
+If ever called on 32-bit, we obviously emit a reserved
+instruction exception.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201215225757.764263-2-f4bug@amsat.org>
+Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-Id: <20201215225757.764263-3-f4bug@amsat.org>
 ---
- target/mips/translate.c | 45 ++++++++++++++++++++++++-----------------
- 1 file changed, 26 insertions(+), 19 deletions(-)
+ target/mips/translate.h | 2 --
+ target/mips/translate.c | 8 +++-----
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
+diff --git a/target/mips/translate.h b/target/mips/translate.h
+index c70bca998fb..402bc5e8846 100644
+--- a/target/mips/translate.h
++++ b/target/mips/translate.h
+@@ -128,9 +128,7 @@ void generate_exception_err(DisasContext *ctx, int excp, int err);
+ void generate_exception_end(DisasContext *ctx, int excp);
+ void gen_reserved_instruction(DisasContext *ctx);
+ void check_insn(DisasContext *ctx, uint64_t flags);
+-#ifdef TARGET_MIPS64
+ void check_mips_64(DisasContext *ctx);
+-#endif
+ void check_cp1_enabled(DisasContext *ctx);
+ 
+ void gen_base_offset_addr(DisasContext *ctx, TCGv addr, int base, int offset);
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 39b57794b36..7d2120dd51c 100644
+index 7d2120dd51c..69fa8a50790 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -30518,30 +30518,13 @@ static void gen_msa(CPUMIPSState *env, DisasContext *ctx)
- 
+@@ -2972,18 +2972,16 @@ static inline void check_ps(DisasContext *ctx)
+     check_cp1_64bitmode(ctx);
  }
  
--static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-+static bool decode_opc_legacy(CPUMIPSState *env, DisasContext *ctx)
+-#ifdef TARGET_MIPS64
+ /*
+- * This code generates a "reserved instruction" exception if 64-bit
+- * instructions are not enabled.
++ * This code generates a "reserved instruction" exception if cpu is not
++ * 64-bit or 64-bit instructions are not enabled.
+  */
+ void check_mips_64(DisasContext *ctx)
  {
-     int32_t offset;
-     int rs, rt, rd, sa;
-     uint32_t op, op1;
-     int16_t imm;
- 
--    /* make sure instructions are on a word boundary */
--    if (ctx->base.pc_next & 0x3) {
--        env->CP0_BadVAddr = ctx->base.pc_next;
--        generate_exception_err(ctx, EXCP_AdEL, EXCP_INST_NOTAVAIL);
--        return;
--    }
--
--    /* Handle blikely not taken case */
--    if ((ctx->hflags & MIPS_HFLAG_BMASK_BASE) == MIPS_HFLAG_BL) {
--        TCGLabel *l1 = gen_new_label();
--
--        tcg_gen_brcondi_tl(TCG_COND_NE, bcond, 0, l1);
--        tcg_gen_movi_i32(hflags, ctx->hflags & ~MIPS_HFLAG_BMASK);
--        gen_goto_tb(ctx, 1, ctx->base.pc_next + 4);
--        gen_set_label(l1);
--    }
--
-     op = MASK_OP_MAJOR(ctx->opcode);
-     rs = (ctx->opcode >> 21) & 0x1f;
-     rt = (ctx->opcode >> 16) & 0x1f;
-@@ -31269,8 +31252,32 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-         break;
-     default:            /* Invalid */
-         MIPS_INVAL("major opcode");
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    /* make sure instructions are on a word boundary */
-+    if (ctx->base.pc_next & 0x3) {
-+        env->CP0_BadVAddr = ctx->base.pc_next;
-+        generate_exception_err(ctx, EXCP_AdEL, EXCP_INST_NOTAVAIL);
-+        return;
-+    }
-+
-+    /* Handle blikely not taken case */
-+    if ((ctx->hflags & MIPS_HFLAG_BMASK_BASE) == MIPS_HFLAG_BL) {
-+        TCGLabel *l1 = gen_new_label();
-+
-+        tcg_gen_brcondi_tl(TCG_COND_NE, bcond, 0, l1);
-+        tcg_gen_movi_i32(hflags, ctx->hflags & ~MIPS_HFLAG_BMASK);
-+        gen_goto_tb(ctx, 1, ctx->base.pc_next + 4);
-+        gen_set_label(l1);
-+    }
-+
-+    if (!decode_opc_legacy(env, ctx)) {
+-    if (unlikely(!(ctx->hflags & MIPS_HFLAG_64))) {
++    if (unlikely((TARGET_LONG_BITS != 64) || !(ctx->hflags & MIPS_HFLAG_64))) {
          gen_reserved_instruction(ctx);
--        break;
      }
  }
+-#endif
  
+ #ifndef CONFIG_USER_ONLY
+ static inline void check_mvh(DisasContext *ctx)
 -- 
 2.26.2
 
