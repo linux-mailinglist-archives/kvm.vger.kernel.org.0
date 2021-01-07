@@ -2,117 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F3242EC766
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 01:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF9B72EC767
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 01:51:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbhAGAso (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 19:48:44 -0500
-Received: from mga06.intel.com ([134.134.136.31]:4505 "EHLO mga06.intel.com"
+        id S1726157AbhAGAtl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 19:49:41 -0500
+Received: from mga14.intel.com ([192.55.52.115]:8486 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725789AbhAGAsn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 6 Jan 2021 19:48:43 -0500
-IronPort-SDR: m0zW+EqcDhplMwVBxQyb3jga75n9i52Pltw9kZIVCsOubGkjbKKp097xE4x/lHQLTCG9swxynp
- G0c2ltsbsksA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="238903452"
+        id S1725822AbhAGAtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 6 Jan 2021 19:49:41 -0500
+IronPort-SDR: /sK50LeWqUVDUld/MQmAwAaRKNwCenuZ4iEhFJgv8NLP2fLikBT5fCmhvuNoJJ/DN25ZA3GMlo
+ ZrH037fiY8vA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="176577074"
 X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="238903452"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 16:48:03 -0800
-IronPort-SDR: mhCI1uAfnQQJGCV9dUPkVWE68a4BVR4lT0HS/KDddX7iWBWMu0wY5GOwQvAUvRiuKT1EVjdzkl
- t1xvcwtuxsoA==
+   d="scan'208";a="176577074"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 16:49:00 -0800
+IronPort-SDR: O/tAIoH/e6wzBN/hJ/53Wn3/uI+Nfdqkj/oN8SUrOKEq6kdWIm3gYVWnVAS2vwXq2RCnIOTF4c
+ KNakaqe9f6Fg==
 X-IronPort-AV: E=Sophos;i="5.79,328,1602572400"; 
-   d="scan'208";a="379493301"
-Received: from naljabex-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.117.182])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 16:48:00 -0800
-Date:   Thu, 7 Jan 2021 13:47:58 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM
- guests
-Message-Id: <20210107134758.ba0b5d950282973eaefe1ded@intel.com>
-In-Reply-To: <X/YfE28guNBxcpui@google.com>
+   d="scan'208";a="422378664"
+Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 16:48:59 -0800
+Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
+        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        corbet@lwn.net
 References: <cover.1609890536.git.kai.huang@intel.com>
-        <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
-        <2e424ff3-51cb-d6ed-6c5f-190e1d4fe21a@intel.com>
-        <X/YfE28guNBxcpui@google.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <1772bbf4-54bd-e43f-a71f-d72f9a6a9bad@intel.com>
+ <20210107133441.0983ca20f7909186b8ff8fa1@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <d586730e-d02f-8059-0a81-cbfd762deacf@intel.com>
+Date:   Wed, 6 Jan 2021 16:48:58 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210107133441.0983ca20f7909186b8ff8fa1@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> > > +static struct mutex virt_epc_lock;
-> > > +static struct list_head virt_epc_zombie_pages;
-> > 
-> > What does the lock protect?
+On 1/6/21 4:34 PM, Kai Huang wrote:
+> On Wed, 6 Jan 2021 09:07:13 -0800 Dave Hansen wrote:
+>> Does the *ABI* here preclude doing oversubscription in the future?
 > 
-> Effectively, the list of zombie SECS pages.  Not sure why I used a generic name.
-> 
-> > What are zombie pages?
-> 
-> My own terminology for SECS pages whose virtual EPC has been destroyed but can't
-> be reclaimed due to them having child EPC pages in other virtual EPCs.
-> 
-> > BTW, if zombies are SECS-only, shouldn't that be in the name rather than
-> > "epc"?
-> 
-> I used the virt_epc prefix/namespace to tag it as a global list.  I've no
-> argument against something like zombie_secs_pages.
+> I am Sorry what *ABI* do you mean?
 
-I'll change to zombie_secs_pages, and lock name to zombie_secs_pages_lock,
-respectively.
+Oh boy.
 
+https://en.wikipedia.org/wiki/Application_binary_interface
 
-[...]
+In your patch set that you are posting, /dev/sgx_virt_epc is a new
+interface: a new ABI.  If we accept your contribution, programs will be
+build around and expect Linux to support this ABI.  An ABI is a contract
+between software written to use it and the kernel.  The kernel tries
+*really* hard to never break its contracts with applications.
 
-> > > +static int sgx_virt_epc_free_page(struct sgx_epc_page *epc_page)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	if (!epc_page)
-> > > +		return 0;
-> > 
-> > I always worry about these.  Why is passing NULL around OK?
+OK, now that we have that out of the way, I'll ask my question in
+another way:
+
+Your series adds some new interfaces, including /dev/sgx_virt_epc.  If
+the kernel wants to add oversubscription in the future, will old binary
+application users of /dev/sgx_virt_epc be able to support
+oversubscription?  Or, would users of /dev/sgx_virt_epc need to change
+to support oversubscription?
+
+>> Also, didn't we call this "Flexible Launch Control"?
 > 
-> I suspect I did it to mimic kfree() behavior.  I don't _think_ the radix (now
-> xarray) usage will ever encounter a NULL entry.
-
-I'll remove the NULL page check.
-
+> I am actually a little bit confused about all those terms here. I don't think
+> from spec's perspective, there's such thing "Flexible Launch Control", but I
+> think everyone knows what does it mean. But I am not sure whether it is
+> commonly used by community. 
 > 
-> > 
-> > > +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-> > > +	if (ret) {
-> > > +		/*
-> > > +		 * Only SGX_CHILD_PRESENT is expected, which is because of
-> > > +		 * EREMOVE-ing an SECS still with child, in which case it can
-> > > +		 * be handled by EREMOVE-ing the SECS again after all pages in
-> > > +		 * virtual EPC have been EREMOVE-ed. See comments in below in
-> > > +		 * sgx_virt_epc_release().
-> > > +		 */
-> > > +		WARN_ON_ONCE(ret != SGX_CHILD_PRESENT);
-> > > +		return ret;
-> > > +	}
-> > 
-> > I find myself wondering what errors could cause the WARN_ON_ONCE() to be
-> > hit.  The SDM indicates that it's only:
-> > 
-> > 	SGX_ENCLAVE_ACT If there are still logical processors executing
-> > 			inside the enclave.
-> > 
-> > Should that be mentioned in the comment?
-> 
-> And faults, which are also spliced into the return value by the ENCLS macros.
-> I do remember hitting this WARN when I broke things, though I can't remember
-> whether it was a fault or the SGX_ENCLAVE_ACT scenario.  Probably the latter?
+> I think using FLC is fine if we only want to mention unlocked mode. But if you
+> want to mention both, IMHO it would be better to specifically use LC locked
+> mode and unlocked mode, since technically there's third case that LC is not
+> present at all.
 
-I'll add a comment saying that there should be no active logical processor
-still running inside guest's enclave. We cannot handle SGX_ENCLAVE_ACT here
-anyway.
+Could you go over the changelogs from Jarkko's patches and at least make
+these consistent with those?
+
+
+>>> or is not present at all. The reason is the goal of SGX virtualization, or
+>>> virtualization in general, is to expose hardware feature to guest, but not to
+>>> make assumption how guest will use it. Therefore, KVM should support SGX guest
+>>> as long as hardware is able to, to have chance to support more potential use
+>>> cases in cloud environment.
+>>
+>> This is kinda long-winded and misses a lot of important context.  How about:
+>>
+>> SGX hardware supports two "launch control" modes to limit which enclaves
+>> can run.  In the "locked" mode, the hardware prevents enclaves from
+>> running unless they are blessed by a third party. 
+> 
+> or "by Intel".
+
+From what I understand, Intel had to bless the enclaves but the
+architecture itself doesn't say "Intel must bless them".  But, yeah, in
+practice, it had to be Intel.
+
+>>> - Support exposing SGX2
+>>>
+>>> Due to the same reason above, SGX2 feature detection is added to core SGX code
+>>> to allow KVM to expose SGX2 to guest, even currently SGX driver doesn't support
+>>> SGX2, because SGX2 can work just fine in guest w/o any interaction to host SGX
+>>> driver.
+>>>
+>>> - Restricit SGX guest access to provisioning key
+>>>
+>>> To grant guest being able to fully use SGX, guest needs to be able to create
+>>> provisioning enclave.
+>>
+>> "enclave" or "enclaves"?
+> 
+> I think should be "enclave", inside one VM, there should only be one
+> provisioning enclave.
+
+This is where the language becomes important.  Is the provisioning
+enclave a one-shot deal?  You create one per guest and can never create
+another?  Or, can you restart it?  Can you architecturally have more
+than one active at once?  Or, can you only create one once the first one
+dies?
+
+You'll write that sentence differently based on the answers.
+
