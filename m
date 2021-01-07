@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C93F82EE868
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F3B2EE869
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:25:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728230AbhAGWY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:24:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46044 "EHLO
+        id S1728253AbhAGWYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:24:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728206AbhAGWY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:24:28 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCB3C0612FB
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:23:28 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id y23so6835681wmi.1
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:23:28 -0800 (PST)
+        with ESMTP id S1728249AbhAGWYd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:24:33 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2EAC0612FD
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:23:33 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 190so6374786wmz.0
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:23:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=CCcScCerij69CQ6oZxOAaSELOgitQBqHQwR1Q8IbG/E=;
-        b=Gh1Hsp51UHuTegHxXpED3GcTcd9CTxlel1n8ImSOclnsGAX/HRzESqbamlHxeNmmHB
-         gaEDPEqoOCVUJBCa3QkTdiYiVZUfwysSUvJ+BRur0iiPySyeMh3ZRRhsaLucT0PQhDGx
-         5ec4RWI8RUw0dXZhqpHAM69kVjDWwGiCMx8mG6YxtIlbQFN3Sd0ArfN8O1k3AaynPgh/
-         Y3Vs+tXzvW4LFM7iGQKBDiBFe2bnADHhdFTjzBpX6D+q4wuk9f8P6t3WGtV97Plgb5s1
-         9XnjK927XYUa1zGPHqN0IQiAuD8L48E82yWwwkN3nIZgl9L2wqh/xfqDY7WRTYA5C22N
-         dJTA==
+        bh=3Ch2a+v0V9pkwP2v4j689PWjNoR3rWExCE6zEXoddgE=;
+        b=F57d2OKfrrp3wKUvNPdjKLIL1JjNbvqvSnUIGGYAFlnUEwYJnSrIJsmBM3RopRak9i
+         ls8Hc9/z/VQpZL94Dgnuyez4a+4GmKVJ62vwUqMEXw1LqLFfAnKx55tyLiO+x6i6DKlE
+         I0v9utPtcgZ8vGF/WVznVUUdeCoFsO1n67keu/29bZzyZxHHiX4COkED1sqeGQ5J+Rue
+         fnz389ZQnM28/Y/Kexe39hHI8ybzDH8A3IrPf4WghREr8/W7OGaCfc7hgc7dOzvInRDF
+         UsU6w7c3BBPtLA+fqNYIJKRDRbKhtE8ErP0MIJocmoo9Meg5sLsXnXF1VF4Uqu2Kg36R
+         zsnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=CCcScCerij69CQ6oZxOAaSELOgitQBqHQwR1Q8IbG/E=;
-        b=dKWM6gXNldNDwWac75gTQ+i0rxgGH59zZxjctT6nwyeeeuh87QJ48jRdzqHzbpwDOh
-         WQutdQ0FhSiF0VzmO+pwgZqRbrdLa5gOKsKBGPrDTdq+doCd07ANbdgCOk/Jjxm4s/vP
-         GiqHTX3NhalxC2mJCEggiV07S+iJxfHJXj9aNYjp3yuARkzd+rNFDlSwY3WUpi1pJACA
-         zn0Cs3e8yPQCHHmNGLGECF9zFqfqcwebIjOys3UyAaKu7pyFe0RtPpLIrIZMYJa6f4xK
-         MRRjyELKiX4D7sI/G1a65wB9bt2xnvqvS03d+oR19TZZm31+uxFpwy2WZRN3HuTrHJNG
-         oCiw==
-X-Gm-Message-State: AOAM533pewfRHKRmxvzpnp70cOBYS2ttrxqn4iDQ5nJORWERLzGnC0U8
-        wAW6UWOjV1VObUYhSbz+Wms=
-X-Google-Smtp-Source: ABdhPJy/gw9y0iLygnNYCRbNVdeUgo3SJN/NH5crn6wIfiA04NxP/S7hfoDf86Rn9ZrhmLpdiaeK+g==
-X-Received: by 2002:a7b:cb4f:: with SMTP id v15mr489712wmj.123.1610058207316;
-        Thu, 07 Jan 2021 14:23:27 -0800 (PST)
+        bh=3Ch2a+v0V9pkwP2v4j689PWjNoR3rWExCE6zEXoddgE=;
+        b=mfkAsZsrX6eF5RdZZ8U3Q281H709IvTutc5hk1oVBxl4TJFyGuO14LA3rjKt8VGB7p
+         vF7L9prFR7y/MQtNrKpXhivnG49TEEYWTxhHaEPtoytGVxi26GPTgnoOcUXjAzNXI4ZN
+         tShtuvwL9LnstZAUS/g9COMAHu/Nd4YhkttLswLXRq33Wfp+AIHFhH17FSW0sKW9UFqf
+         5YP96rIb1ihVoBfiApbLFlMm1bTvrbKEe/KuyJuh9S3boWUSENc+Bwa92Pw8AwWiHGAb
+         VYex/vEw3rlMTV0odHfUsXWYNEA9WkSwdcYVW+q7/KXeXW038i1oLWsmCRq8NdxxNiPK
+         uBsg==
+X-Gm-Message-State: AOAM530UsnXx1nRCaNF3nlbLrnZxs3EVPSm/D9k+em5u9WHmsRJfcH2z
+        HogKEZeNc55x5avTOjX3bEE=
+X-Google-Smtp-Source: ABdhPJzdXdIKcSBucUT3pYndkmoS5x60aKLlSZfLFhp/WfE/w7yrlfWqPpWEEiHMXDU748QZYuCVww==
+X-Received: by 2002:a1c:9692:: with SMTP id y140mr528197wmd.128.1610058212530;
+        Thu, 07 Jan 2021 14:23:32 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id c7sm11506623wro.16.2021.01.07.14.23.25
+        by smtp.gmail.com with ESMTPSA id h3sm9671549wmm.4.2021.01.07.14.23.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:23:26 -0800 (PST)
+        Thu, 07 Jan 2021 14:23:31 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 06/66] target/mips/mips-defs: Rename CPU_MIPSxx Release 1 as CPU_MIPSxxR1
-Date:   Thu,  7 Jan 2021 23:21:53 +0100
-Message-Id: <20210107222253.20382-7-f4bug@amsat.org>
+Subject: [PULL 07/66] target/mips/mips-defs: Introduce CPU_MIPS64 and cpu_type_is_64bit()
+Date:   Thu,  7 Jan 2021 23:21:54 +0100
+Message-Id: <20210107222253.20382-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,106 +73,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-'CPU_MIPS32' and 'CPU_MIPS64' definitions concern CPUs implementing
-the "Release 1" ISA. Rename it with the 'R1' suffix, as the other
-CPU definitions do.
+MIPS 64-bit ISA is introduced with MIPS3.
 
+Introduce the CPU_MIPS64 definition aliased to the MIPS3 ISA,
+and the cpu_type_is_64bit() method to check if a CPU supports
+this ISA (thus is 64-bit).
+
+Suggested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20210104221154.3127610-4-f4bug@amsat.org>
+Message-Id: <20210104221154.3127610-5-f4bug@amsat.org>
 ---
- target/mips/mips-defs.h          |  8 ++++----
- target/mips/translate_init.c.inc | 14 +++++++-------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ target/mips/cpu.h       | 5 +++++
+ target/mips/mips-defs.h | 4 +++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 0c2d397e4a9..9c45744c5c1 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1305,6 +1305,11 @@ static inline bool ase_mt_available(CPUMIPSState *env)
+     return env->CP0_Config3 & (1 << CP0C3_MT);
+ }
+ 
++static inline bool cpu_type_is_64bit(const char *cpu_type)
++{
++    return cpu_type_supports_isa(cpu_type, CPU_MIPS64);
++}
++
+ void cpu_set_exception_base(int vp_index, target_ulong address);
+ 
+ /* addr.c */
 diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index 48544ba73b4..1630ae20d59 100644
+index 1630ae20d59..89a9a4dda31 100644
 --- a/target/mips/mips-defs.h
 +++ b/target/mips/mips-defs.h
-@@ -72,12 +72,12 @@
+@@ -13,7 +13,7 @@
+  */
+ #define ISA_MIPS1         0x0000000000000001ULL
+ #define ISA_MIPS2         0x0000000000000002ULL
+-#define ISA_MIPS3         0x0000000000000004ULL
++#define ISA_MIPS3         0x0000000000000004ULL /* 64-bit */
+ #define ISA_MIPS4         0x0000000000000008ULL
+ #define ISA_MIPS5         0x0000000000000010ULL
+ #define ISA_MIPS32        0x0000000000000020ULL
+@@ -71,6 +71,8 @@
+ #define CPU_LOONGSON2E  (CPU_MIPS3 | INSN_LOONGSON2E)
  #define CPU_LOONGSON2F  (CPU_MIPS3 | INSN_LOONGSON2F | ASE_LMMI)
  
++#define CPU_MIPS64      (ISA_MIPS3)
++
  /* MIPS Technologies "Release 1" */
--#define CPU_MIPS32      (CPU_MIPS2 | ISA_MIPS32)
--#define CPU_MIPS64      (CPU_MIPS5 | CPU_MIPS32 | ISA_MIPS64)
-+#define CPU_MIPS32R1    (CPU_MIPS2 | ISA_MIPS32)
-+#define CPU_MIPS64R1    (CPU_MIPS5 | CPU_MIPS32R1 | ISA_MIPS64)
- 
- /* MIPS Technologies "Release 2" */
--#define CPU_MIPS32R2    (CPU_MIPS32 | ISA_MIPS32R2)
--#define CPU_MIPS64R2    (CPU_MIPS64 | CPU_MIPS32R2 | ISA_MIPS64R2)
-+#define CPU_MIPS32R2    (CPU_MIPS32R1 | ISA_MIPS32R2)
-+#define CPU_MIPS64R2    (CPU_MIPS64R1 | CPU_MIPS32R2 | ISA_MIPS64R2)
- 
- /* MIPS Technologies "Release 3" */
- #define CPU_MIPS32R3    (CPU_MIPS32R2 | ISA_MIPS32R3)
-diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
-index cac3d241831..0ba3cf18ef7 100644
---- a/target/mips/translate_init.c.inc
-+++ b/target/mips/translate_init.c.inc
-@@ -72,7 +72,7 @@ const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x1278FF17,
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_MIPS32,
-+        .insn_flags = CPU_MIPS32R1,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-@@ -94,7 +94,7 @@ const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x1258FF17,
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_MIPS32 | ASE_MIPS16,
-+        .insn_flags = CPU_MIPS32R1 | ASE_MIPS16,
-         .mmu_type = MMU_TYPE_FMT,
-     },
-     {
-@@ -114,7 +114,7 @@ const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x1278FF17,
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_MIPS32,
-+        .insn_flags = CPU_MIPS32R1,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-@@ -134,7 +134,7 @@ const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x1258FF17,
-         .SEGBITS = 32,
-         .PABITS = 32,
--        .insn_flags = CPU_MIPS32 | ASE_MIPS16,
-+        .insn_flags = CPU_MIPS32R1 | ASE_MIPS16,
-         .mmu_type = MMU_TYPE_FMT,
-     },
-     {
-@@ -552,7 +552,7 @@ const mips_def_t mips_defs[] =
-         .CP0_Status_rw_bitmask = 0x12F8FFFF,
-         .SEGBITS = 42,
-         .PABITS = 36,
--        .insn_flags = CPU_MIPS64,
-+        .insn_flags = CPU_MIPS64R1,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-@@ -578,7 +578,7 @@ const mips_def_t mips_defs[] =
-         .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
-         .SEGBITS = 42,
-         .PABITS = 36,
--        .insn_flags = CPU_MIPS64,
-+        .insn_flags = CPU_MIPS64R1,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
-@@ -607,7 +607,7 @@ const mips_def_t mips_defs[] =
-         .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
-         .SEGBITS = 40,
-         .PABITS = 36,
--        .insn_flags = CPU_MIPS64 | ASE_MIPS3D,
-+        .insn_flags = CPU_MIPS64R1 | ASE_MIPS3D,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-     {
+ #define CPU_MIPS32R1    (CPU_MIPS2 | ISA_MIPS32)
+ #define CPU_MIPS64R1    (CPU_MIPS5 | CPU_MIPS32R1 | ISA_MIPS64)
 -- 
 2.26.2
 
