@@ -2,88 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1126D2ED621
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 18:56:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EBC102ED641
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 19:01:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728965AbhAGRz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 12:55:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34113 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728251AbhAGRz1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 12:55:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610042041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K6GQmzJAdTbPNgN/TmIYptrmtmdvKcTL/LS3Q66JubM=;
-        b=dt07wlikwzGF23HlS6detPW3oGBilTfrsWUKFt08IR9TMbWtJ82aCPdAn14mmtEChveZDr
-        1dkcwNUXDFe4rWYjyiHPk2/pw7YAzyLKesj/LTkSC6XPDN3oJy/YLK7jnw8PM0YpgKZe3v
-        fxLukp52mfQX+vJPqCEYcNc2BXcyAqQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-urJpSbynO5KuQT19ACTM6Q-1; Thu, 07 Jan 2021 12:54:00 -0500
-X-MC-Unique: urJpSbynO5KuQT19ACTM6Q-1
-Received: by mail-ed1-f71.google.com with SMTP id y19so3583532edw.16
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 09:54:00 -0800 (PST)
+        id S1729088AbhAGSAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 13:00:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728273AbhAGSAn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 13:00:43 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB232C0612F6;
+        Thu,  7 Jan 2021 10:00:02 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id dk8so8674302edb.1;
+        Thu, 07 Jan 2021 10:00:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:references:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MjU7hC1ZlO0b74jFg9ZywySOI1ZO5CsVl4MzCXVYPGc=;
+        b=EF7jAUH7PG+AWd63ehZRfFnTZzTfZC6ou5iHsCaFFQvzbQo0JdzfCFGNlJYik9tevJ
+         8WiggIiJ+W18sG9SpoZUpXLru5GQeYLZYfdyhoD4bjDxul75cc+Ace9kSvZuYuflAgIb
+         RG9t6mzqBphTlXYx4wyuCo9WhyiU+zwAh2f9OTOxrkpeumJ7qLi2UnKd+EidtmRoqJdi
+         Bs8tNB10lGI8U6L3xPho5HOI3u75Ll9aRvxzD08BFUlQbPEn+Ssu70LDEwzsicM7cEQs
+         qMacDkEke/XGivPNgYEgPlmYZZgh53uYTVrIxvzBJe7hBC9/9pkR3pkdwMDN0AcLGqFo
+         +6LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:sender:from:to:cc:references:subject:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=K6GQmzJAdTbPNgN/TmIYptrmtmdvKcTL/LS3Q66JubM=;
-        b=C6FCBncWa9+9sdqo52TNBfZXFgNcnzm7p6lSi1yqJEzAxig9TSnQCNXXuG4v8VZRW+
-         omj1tiXDFPg2WEhcCuyFZyl/VmkaO2M2i4U4SZct3Z0Pz3t5qZuT8vFCLAz5ZD5HEAtw
-         BR0M3GO+fRtkk54vOIkSsauaDKKZLbQK5W/GcjCuWmg4rZqjSQuz4cgt+6l314b7G3Vz
-         OieSr0zPRv3USGT188BKOzYChUC8TIuHk9ZWUZ48a7TETEb7nMDn03VShwmzuRf8bTmY
-         TVKuFr5wRZnZQTyBlGlFHoUiV7qnmh6/j6pYzaF++IwfPIbTHtln/F68ZecnlhHTCPex
-         6U5g==
-X-Gm-Message-State: AOAM533XCeQllolDLTkbbxpzg7vWFkjuARr7jAePK/8EUo+wpiEbU7PA
-        Wsx0HFA3WvrNr0ADXZPVlEnRYWWrM4iV9AGpQ2GBclnCRNfC7Iu7Nc+R/3lgztfrtAA55shlAMa
-        2dy47DsnQkzsJ
-X-Received: by 2002:a17:907:e9e:: with SMTP id ho30mr3052502ejc.529.1610042039044;
-        Thu, 07 Jan 2021 09:53:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUmwEXqBL7daFEotytllonxdak4JkeaZiDz9BhtX0hPPREL2/RRc65HY2CrqgZeN6FTCLGzw==
-X-Received: by 2002:a17:907:e9e:: with SMTP id ho30mr3052492ejc.529.1610042038914;
-        Thu, 07 Jan 2021 09:53:58 -0800 (PST)
+        bh=MjU7hC1ZlO0b74jFg9ZywySOI1ZO5CsVl4MzCXVYPGc=;
+        b=OrsTpZhlMsJ3I+t8cSdq2N8HpstRmbcdncwfSv+mcbUaxr+U/au20YnoO9TDnVtyV/
+         QHTnoxpq7cmTuXB0PDeObbX13W13cg6gDMff+OWrYl9KhlFCQRX6ERJ7LgncNhbB+Dsa
+         fvYTIKr4diWJOo2IklNqcaY4ni3mFHKNIbOmbiwIdJ2YzVDvM8OeHdO6BtAANfu19EPh
+         ruPujBOpOjkAXqD+05ZHwbmUqoUWZQRT0ApAZCcfufQNmPn/a0D1Z6KXxNke5IVCRSJP
+         b6qJGbKW1sUYSZKpsui2jME2VAEk0h4CT5OAXkAohbZlgHGBZ/ZAYy7te0eALPHeQadG
+         vM4A==
+X-Gm-Message-State: AOAM532NhqbbmWdiFXndiWm2BHWc8zsJNM4pF/+KhfyPFGcbkR8/3m17
+        GFR8TYTkoRaX1giX9UQs6xo=
+X-Google-Smtp-Source: ABdhPJwaX379R6wTIVqh/ItvPrM/BvfiylTPwkuFTHPpTQDeNQLlLG6o65dTmhJFmdcC8OyfAacKow==
+X-Received: by 2002:a50:fc13:: with SMTP id i19mr2594263edr.281.1610042401515;
+        Thu, 07 Jan 2021 10:00:01 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dd18sm2694365ejb.53.2021.01.07.09.53.57
+        by smtp.googlemail.com with ESMTPSA id pk19sm2739022ejb.32.2021.01.07.10.00.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jan 2021 09:53:58 -0800 (PST)
-Subject: Re: [PATCH v3 1/2] KVM: x86/mmu: Ensure TDP MMU roots are freed after
- yield
-To:     Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Peter Shier <pshier@google.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Leo Hou <leohou1402@gmail.com>
-References: <20210107001935.3732070-1-bgardon@google.com>
- <X/dHpSoi5AkPIrfc@google.com>
+        Thu, 07 Jan 2021 10:00:00 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a1a9346c-e403-618a-91e8-02ce4b7105c8@redhat.com>
-Date:   Thu, 7 Jan 2021 18:53:56 +0100
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+References: <20210107093854.882483-1-mlevitsk@redhat.com>
+ <20210107093854.882483-2-mlevitsk@redhat.com> <X/c+FzXGfk/3LUC2@google.com>
+ <6d7bac03-2270-e908-2e66-1cc4f9425294@redhat.com>
+Subject: Re: [PATCH v2 1/4] KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES
+ on nested vmexit
+Message-ID: <28958ec1-5ca4-f4a7-e8d7-189e87235cff@redhat.com>
+Date:   Thu, 7 Jan 2021 18:59:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <X/dHpSoi5AkPIrfc@google.com>
+In-Reply-To: <6d7bac03-2270-e908-2e66-1cc4f9425294@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/01/21 18:40, Sean Christopherson wrote:
-> /*
->   * The yield_safe() variant of the TDP root iterator gets and puts references to
->   * the roots it iterates over.  This makes it safe to release the MMU lock and
->   * yield within the loop, but the caller MUST NOT exit the loop early.
->   */
+On 07/01/21 18:51, Paolo Bonzini wrote:
+> On 07/01/21 18:00, Sean Christopherson wrote:
+>> Ugh, I assume this is due to one of the "premature" 
+>> nested_ops->check_events()
+>> calls that are necessitated by the event mess?  I'm guessing 
+>> kvm_vcpu_running()
+>> is the culprit?
+>>
+>> If my assumption is correct, this bug affects nVMX as well.
 > 
+> Yes, though it may be latent.  For SVM it was until we started 
+> allocating svm->nested on demand.
+> 
+>> Rather than clear the request blindly on any nested VM-Exit, what
+>> about something like the following?
+> 
+> I think your patch is overkill, KVM_REQ_GET_NESTED_STATE_PAGES is only 
+> set from KVM_SET_NESTED_STATE so it cannot happen while the VM runs.
 
-Nicer, thanks!
+... and when leaving SMM.  But in either case, there cannot be something 
+else causing a nested vmexit before the request is set, because SMM does 
+not support VMX operation.  So I still don't think that it justifies the 
+extra code and indirection.
 
 Paolo
-
