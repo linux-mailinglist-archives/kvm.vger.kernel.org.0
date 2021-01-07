@@ -2,103 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 041E72EE76A
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 22:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 065A02EE859
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:23:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727359AbhAGVHB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 16:07:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45769 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727260AbhAGVHA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 16:07:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610053534;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dIdzS01a8gJ0BSbSt0S8IGEZ5+kBms8lbRwvPKGFMig=;
-        b=YF8A+N6yXBgPHiD4Qd1tQfp2+gLjIg8loHIZaueoZqFg7laaTq5B4oto9KosbTzq2NR2tF
-        KCruuskp5V1vA2JZcJX1LcGtRAah/S+DJ6blv8RQ1nbeLuHH9zBbTCpsHeXXXZqU2R9d6n
-        AqM64o0Et8HTtQyIxi4jFdJ4JDIesBM=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-bham6m8FNsWevgFe_Z1rhA-1; Thu, 07 Jan 2021 16:05:32 -0500
-X-MC-Unique: bham6m8FNsWevgFe_Z1rhA-1
-Received: by mail-ed1-f69.google.com with SMTP id g14so3785236edt.12
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 13:05:32 -0800 (PST)
+        id S1728136AbhAGWXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:23:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45896 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727888AbhAGWXh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:23:37 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE91FC0612F4
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:22:56 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id k10so6358049wmi.3
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:22:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CVOh3zHgwfBfd1YKdXDSVA4owP2D+qRdHedUeP9R50U=;
+        b=j9p+gJSAIiUrYLg64VSGmdFyNxwbA5nXjEK0O1lI9b4hBwaeeTSvHT3i86e72dHpAi
+         WKY+wFe5vPLnuz+y9Z3WOUfn3vZlBNtK3Hj2uCXFmHND6WS6AQ5M7gOauPDY9mA6tokJ
+         N4mGOCo7WMeh6146OUhXLIgpYD78CPlL0Rx+Jvjw+Rf2q7DMGyBh4zkKn1CfSjMn0PXo
+         NXjEbaZDHB4WVZzklgMPsK5DthHD5Ed4BdMF0BlkMasWkIXGxKbDSWfZqPFPTZbXLYn+
+         rdIdrO/ZKfBfIW6It0Cbj7wvoMRb4q/lJJmk8ooflkpDK7oL2OrLVSsqRn3M8rSKlKjW
+         JS4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dIdzS01a8gJ0BSbSt0S8IGEZ5+kBms8lbRwvPKGFMig=;
-        b=MAOtUC9mM0cvfoZ5xNjjqUwydC+MAq7Bpye05Lezd+bkByD4GVd5PdwZxM7+oWF+Mn
-         UPeR2+MjYwQOwmblx9VeTyw7GqsnFBB4rDMqjK904TBqBfypr4PQZpDY4A0E71W3OL+k
-         64PlhSoLwn0p10THlHXSInDS9NcB6VqxumbZtHlD/wszh1n/x3aSMgIt7r0vYYaYuj4t
-         Bx84Crp9WiKuZ4hZBwDjWR85Gt1xRXUXvFNyqvyJAPTnlTh9a1s0V/yEEDbVIwR4udRw
-         uuY3DBzZYGqWfsA9Uj0rE7I1JQWZWjr5U2Z2sc8wJREaFM/xdzPhaN/Fr3tUr5ZZo2Y6
-         ogtw==
-X-Gm-Message-State: AOAM5310ePwXPyk441FM3Wwwk1hPgqmL3KZfuoeQ3pBKq6Zx9jks8/ZY
-        XoBkkUmpAdv7kVKKTTt3ZdN7PV/IJVObBHcI5oumrCGODsegQGy5mHxEte+kNk2IwTzE3Hedk7c
-        mMfPzZeKeEinZ
-X-Received: by 2002:a05:6402:366:: with SMTP id s6mr2968561edw.44.1610053531392;
-        Thu, 07 Jan 2021 13:05:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxD6r7qM/y/nJixYthNZKTD1TNM3xO9CPOLbUoLYL0SZ0n9WyQfrM+H7t/SdIyQf4XnL2cLTw==
-X-Received: by 2002:a05:6402:366:: with SMTP id s6mr2968544edw.44.1610053531240;
-        Thu, 07 Jan 2021 13:05:31 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f11sm2840573ejd.40.2021.01.07.13.05.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jan 2021 13:05:30 -0800 (PST)
-Subject: Re: [PATCH v2 2/4] KVM: nSVM: correctly restore nested_run_pending on
- migration
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>
-References: <20210107093854.882483-1-mlevitsk@redhat.com>
- <20210107093854.882483-3-mlevitsk@redhat.com>
- <98f35e0a-d82b-cac0-b267-00fcba00c185@redhat.com>
- <X/ds0sUw/me4e/g1@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2885afd8-7f1f-f797-ce05-a85550039dc5@redhat.com>
-Date:   Thu, 7 Jan 2021 22:05:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=CVOh3zHgwfBfd1YKdXDSVA4owP2D+qRdHedUeP9R50U=;
+        b=EzNeUj4pUXj7ZrYmRGJMIj93dUJwf2+NGNZ2ey/GtiCdFOh0A5iWG168boBB9B+27Y
+         qY16/n+q8FKVaVFCB3Iz2YTMBbBf6ky4bJeH7Im7PxDs1YJfln2EgUb8BzrBzcmR14+J
+         CVqTOEb42uRS083JgNL2f9IsagbdsW8cI84nHAy6ocHVARV3wFGVz0DD+N9vKv2EKmWR
+         PjzEWGuD6xPqdRMQqVzZos7TyETKJdvGFgS8FrDfAK+LOzt4j5jvuVZ0HzG0kazZffFB
+         lVnK5Sa4wLMZ8FoPLfxV1kwkKgpwntprFlWjWgH4bTz1IBskgVnLEOqeu5fISEziU/ez
+         gK2g==
+X-Gm-Message-State: AOAM533RAvZ1X/GLfJV9buGC8zLHfULJmz87wHIE2t1qbzpoixE+yhqo
+        4Ek+COiDAY8O5Gz5Lk/0ojrnSw2g+LM=
+X-Google-Smtp-Source: ABdhPJz9HrYiMVU3ybn2w0SEfyu/2liRpw1SQvQFcdd9PtavU0ZgtWeJ3iLLBv5u/q1xHkXrB8WXoA==
+X-Received: by 2002:a1c:e0d4:: with SMTP id x203mr537320wmg.68.1610058175749;
+        Thu, 07 Jan 2021 14:22:55 -0800 (PST)
+Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
+        by smtp.gmail.com with ESMTPSA id i16sm10175060wrx.89.2021.01.07.14.22.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Jan 2021 14:22:55 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Laurent Vivier <laurent@vivier.eu>, kvm@vger.kernel.org,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paul Burton <paulburton@kernel.org>
+Subject: [PULL 00/66] MIPS patches for 2021-01-07
+Date:   Thu,  7 Jan 2021 23:21:47 +0100
+Message-Id: <20210107222253.20382-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <X/ds0sUw/me4e/g1@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/01/21 21:19, Sean Christopherson wrote:
->> That said, the v1 change had some appeal to it.
-> 
-> Which v1 change are you referring to?
-
-Moving the to-be-injected event from eventinj to vcpu->arch, and from 
-there to vmcb02 on the next vmentry's inject_pending_event.
-
->> In the VMX case (if properly implemented) it would allow removing the weird
->> nested_run_pending case from prepare_vmcs02_early.  I think it's a valuable
->> invariant that there are no events in the VMCS after each KVM_RUN iteration,
->> and this special case is breaking the invariant.
->
-> Hmm, as weird as that code is, I think it's actually the most architecturally
-> correct behavior.
-
-I was referring to the "then" branch therein. :)
-
-Paolo
-
+The following changes since commit 470dd6bd360782f5137f7e3376af6a44658eb1d3=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-060121-4'=
+ into staging (2021-01-06 22:18:36 +0000)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://gitlab.com/philmd/qemu.git tags/mips-20210107=0D
+=0D
+for you to fetch changes up to f97d339d612b86d8d336a11f01719a10893d6707:=0D
+=0D
+  docs/system: Remove deprecated 'fulong2e' machine alias (2021-01-07 22:57=
+:49 +0100)=0D
+=0D
+----------------------------------------------------------------=0D
+MIPS patches queue=0D
+=0D
+- Simplify CPU/ISA definitions=0D
+- Various maintenance code movements in translate.c=0D
+- Convert part of the MSA ASE instructions to decodetree=0D
+- Convert some instructions removed from Release 6 to decodetree=0D
+- Remove deprecated 'fulong2e' machine alias=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Jiaxun Yang (1):=0D
+  target/mips/addr: Add translation helpers for KSEG1=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (65):=0D
+  target/mips: Add CP0 Config0 register definitions for MIPS3 ISA=0D
+  target/mips: Replace CP0_Config0 magic values by proper definitions=0D
+  target/mips/mips-defs: Remove USE_HOST_FLOAT_REGS comment=0D
+  target/mips/mips-defs: Reorder CPU_MIPS5 definition=0D
+  target/mips/mips-defs: Rename CPU_MIPSxx Release 1 as CPU_MIPSxxR1=0D
+  target/mips/mips-defs: Introduce CPU_MIPS64 and cpu_type_is_64bit()=0D
+  hw/mips/boston: Check 64-bit support with cpu_type_is_64bit()=0D
+  target/mips/mips-defs: Use ISA_MIPS32 definition to check Release 1=0D
+  target/mips/mips-defs: Use ISA_MIPS32R2 definition to check Release 2=0D
+  target/mips/mips-defs: Use ISA_MIPS32R3 definition to check Release 3=0D
+  target/mips/mips-defs: Use ISA_MIPS32R5 definition to check Release 5=0D
+  target/mips/mips-defs: Use ISA_MIPS32R6 definition to check Release 6=0D
+  target/mips/mips-defs: Rename ISA_MIPS32 as ISA_MIPS_R1=0D
+  target/mips/mips-defs: Rename ISA_MIPS32R2 as ISA_MIPS_R2=0D
+  target/mips/mips-defs: Rename ISA_MIPS32R3 as ISA_MIPS_R3=0D
+  target/mips/mips-defs: Rename ISA_MIPS32R5 as ISA_MIPS_R5=0D
+  target/mips/mips-defs: Rename ISA_MIPS32R6 as ISA_MIPS_R6=0D
+  target/mips: Inline cpu_state_reset() in mips_cpu_reset()=0D
+  target/mips: Extract FPU helpers to 'fpu_helper.h'=0D
+  target/mips: Add !CONFIG_USER_ONLY comment after #endif=0D
+  target/mips: Remove consecutive CONFIG_USER_ONLY ifdefs=0D
+  target/mips: Move common helpers from helper.c to cpu.c=0D
+  target/mips: Rename helper.c as tlb_helper.c=0D
+  target/mips: Fix code style for checkpatch.pl=0D
+  target/mips: Move mmu_init() functions to tlb_helper.c=0D
+  target/mips: Rename translate_init.c as cpu-defs.c=0D
+  target/mips/translate: Extract DisasContext structure=0D
+  target/mips/translate: Add declarations for generic code=0D
+  target/mips: Replace gen_exception_err(err=3D0) by gen_exception_end()=0D
+  target/mips: Replace gen_exception_end(EXCP_RI) by=0D
+    gen_rsvd_instruction=0D
+  target/mips: Declare generic FPU functions in 'translate.h'=0D
+  target/mips: Extract FPU specific definitions to translate.h=0D
+  target/mips: Only build TCG code when CONFIG_TCG is set=0D
+  target/mips/translate: Extract decode_opc_legacy() from decode_opc()=0D
+  target/mips/translate: Expose check_mips_64() to 32-bit mode=0D
+  target/mips: Introduce ase_msa_available() helper=0D
+  target/mips: Simplify msa_reset()=0D
+  target/mips: Use CP0_Config3 to set MIPS_HFLAG_MSA=0D
+  target/mips: Simplify MSA TCG logic=0D
+  target/mips: Remove now unused ASE_MSA definition=0D
+  target/mips: Alias MSA vector registers on FPU scalar registers=0D
+  target/mips: Extract msa_translate_init() from mips_tcg_init()=0D
+  target/mips: Remove CPUMIPSState* argument from gen_msa*() methods=0D
+  target/mips: Explode gen_msa_branch() as gen_msa_BxZ_V/BxZ()=0D
+  target/mips: Move msa_reset() to msa_helper.c=0D
+  target/mips: Extract MSA helpers from op_helper.c=0D
+  target/mips: Extract MSA helper definitions=0D
+  target/mips: Declare gen_msa/_branch() in 'translate.h'=0D
+  target/mips: Extract MSA translation routines=0D
+  target/mips: Pass TCGCond argument to MSA gen_check_zero_element()=0D
+  target/mips: Introduce decode tree bindings for MSA ASE=0D
+  target/mips: Use decode_ase_msa() generated from decodetree=0D
+  target/mips: Extract LSA/DLSA translation generators=0D
+  target/mips: Introduce decodetree helpers for MSA LSA/DLSA opcodes=0D
+  target/mips: Introduce decodetree helpers for Release6 LSA/DLSA=0D
+    opcodes=0D
+  target/mips: Remove now unreachable LSA/DLSA opcodes code=0D
+  target/mips: Convert Rel6 Special2 opcode to decodetree=0D
+  target/mips: Convert Rel6 COP1X opcode to decodetree=0D
+  target/mips: Convert Rel6 CACHE/PREF opcodes to decodetree=0D
+  target/mips: Convert Rel6 LWL/LWR/SWL/SWR opcodes to decodetree=0D
+  target/mips: Convert Rel6 LWLE/LWRE/SWLE/SWRE opcodes to decodetree=0D
+  target/mips: Convert Rel6 LDL/LDR/SDL/SDR opcodes to decodetree=0D
+  target/mips: Convert Rel6 LLD/SCD opcodes to decodetree=0D
+  target/mips: Convert Rel6 LL/SC opcodes to decodetree=0D
+  docs/system: Remove deprecated 'fulong2e' machine alias=0D
+=0D
+ docs/system/deprecated.rst                    |    5 -=0D
+ docs/system/removed-features.rst              |    5 +=0D
+ target/mips/cpu.h                             |   23 +-=0D
+ target/mips/fpu_helper.h                      |   59 +=0D
+ target/mips/helper.h                          |  436 +-=0D
+ target/mips/internal.h                        |   64 +-=0D
+ target/mips/mips-defs.h                       |   47 +-=0D
+ target/mips/translate.h                       |  168 +=0D
+ target/mips/msa_helper.h.inc                  |  443 ++=0D
+ target/mips/mips32r6.decode                   |   36 +=0D
+ target/mips/mips64r6.decode                   |   26 +=0D
+ target/mips/msa32.decode                      |   28 +=0D
+ target/mips/msa64.decode                      |   17 +=0D
+ hw/mips/boston.c                              |    6 +-=0D
+ hw/mips/fuloong2e.c                           |    1 -=0D
+ linux-user/mips/cpu_loop.c                    |    7 +-=0D
+ target/mips/addr.c                            |   10 +=0D
+ target/mips/cp0_helper.c                      |   18 +-=0D
+ target/mips/cp0_timer.c                       |    4 +-=0D
+ target/mips/cpu.c                             |  255 +-=0D
+ target/mips/fpu_helper.c                      |    5 +-=0D
+ target/mips/gdbstub.c                         |    1 +=0D
+ target/mips/kvm.c                             |   13 +-=0D
+ target/mips/machine.c                         |    1 +=0D
+ target/mips/msa_helper.c                      |  430 ++=0D
+ target/mips/msa_translate.c                   | 2286 ++++++++++=0D
+ target/mips/op_helper.c                       |  396 +-=0D
+ target/mips/rel6_translate.c                  |   44 +=0D
+ target/mips/{helper.c =3D> tlb_helper.c}        |  266 +-=0D
+ target/mips/translate.c                       | 3839 +++--------------=0D
+ target/mips/translate_addr_const.c            |   61 +=0D
+ .../{translate_init.c.inc =3D> cpu-defs.c.inc}  |  114 +-=0D
+ target/mips/meson.build                       |   21 +-=0D
+ 33 files changed, 4727 insertions(+), 4408 deletions(-)=0D
+ create mode 100644 target/mips/fpu_helper.h=0D
+ create mode 100644 target/mips/translate.h=0D
+ create mode 100644 target/mips/msa_helper.h.inc=0D
+ create mode 100644 target/mips/mips32r6.decode=0D
+ create mode 100644 target/mips/mips64r6.decode=0D
+ create mode 100644 target/mips/msa32.decode=0D
+ create mode 100644 target/mips/msa64.decode=0D
+ create mode 100644 target/mips/msa_translate.c=0D
+ create mode 100644 target/mips/rel6_translate.c=0D
+ rename target/mips/{helper.c =3D> tlb_helper.c} (87%)=0D
+ create mode 100644 target/mips/translate_addr_const.c=0D
+ rename target/mips/{translate_init.c.inc =3D> cpu-defs.c.inc} (92%)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
