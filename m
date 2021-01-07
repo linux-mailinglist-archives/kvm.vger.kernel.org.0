@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD5D92EE8AE
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:30:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 470032EE8AF
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:30:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728475AbhAGW25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:28:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46834 "EHLO
+        id S1728676AbhAGW3X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:29:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728239AbhAGW25 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:28:57 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8640DC0612F6
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:28:16 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id 190so6381522wmz.0
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:28:16 -0800 (PST)
+        with ESMTP id S1728405AbhAGW3X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:29:23 -0500
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D59C0612FB
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:28:21 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id m5so7114856wrx.9
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:28:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Yq3mxfTZKdf/fjKj8fFk3v2tF8q6uI5ug94fHU9oH8s=;
-        b=Gd82pxS4+zzvVBDBN4HENJ44Mz7QxhZU8UloC1P6jP13F72cJ1g34MUWYAWomwmLeN
-         2/A/ouAET0qQIZ38QJbEmi1RMN3rf1WPjaSCpzvlBzTVdPI3Z4/TbI3S1LLx54yFTwFp
-         5ti2dy+nF9HmEr8DCSO4RtzQmHPOEF8iby5YeukNi9AlSJqS+3pKPdqGHnVpHNKOzOus
-         P9QwZVrNPwz2VNdmmyINVxIEiQIyHv/dewREky1tgJyp3NaCaXh89mYxWSEAXQIAFnVw
-         JQ2WyK9sDprS+omnTUjYMY3S0BevUtsCalHviNOwMRPGdurcSm8BPgTOGQzRhHiE/HLO
-         P0aQ==
+        bh=ADeLjBIuNm8Db2lkSUMCJRDAVngCOHiUxA4Y6spWn0I=;
+        b=DsPiUBFgZubvxf2GePgfLlQAvIsVAdsSz4Pr9D3xFLnGnAV6kscnE/yLi/H5oybGLJ
+         lf6RlFYc8SoacNkGAukiY77zsn/ei6qXWVMzAh0raYVJ+BZGXSc3gX+fw1NAah1cI+zw
+         8PgNNKqAdzIlWOklbEDv9+ZAVUtEE4XqP6XZUxNg7IYik2MvFnSkGbKXZH2iCmoneHUa
+         wUTrY0iosyh0IdFd1OolVkHkDYyuWJHnSG47p28Wsmkh7VI+05X3pkbvPLTWqeme9Ypg
+         IddKtUBE2yWH2SK57efV4dnc4mdZxos5u/NcrMP1Z8oJkPnAuAvXAt7NCZK8CIzc4U2w
+         CjKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=Yq3mxfTZKdf/fjKj8fFk3v2tF8q6uI5ug94fHU9oH8s=;
-        b=Vyofm2nY6sV9+dvi+C8JeBLo3/6pmDogu9BKZlVXU3euXzjayY8NtJ9Siew3C24GFr
-         2w5tIuN+4q1mqFwSkXuChYPndwbMc4N4Cn85qb9MwNCA6UGkZwf9YqieqxuFI20VrPk8
-         V++n1GH5pOGpg6azN9KcHgw5Djv3OEVGMx+X266Soni0DTyZwN/rDM0fB/9BBKNY2CW8
-         DG8GPgwLRaq3mw+MVf4lo4rRrHK7M1RxEq//jcZRs4es432kRRMopVjrKK9YTmaCLQD0
-         MsUcpMiv31KJhEvxYnNxGsS7M1SDpaJm1s249Lw15UY8KlBXu2SmTj+8QVqrOamsB23I
-         Ok2Q==
-X-Gm-Message-State: AOAM531JhaoU37qhIN8QjrEG92q6RMX9NRaCbirawqIlBD+3q3KgNprc
-        dnuuER3AkzUFQ21/btH93U0=
-X-Google-Smtp-Source: ABdhPJxD8yDTAfSjw1MvU0PUYHwY/6OzpFw719ayDQklkKKFRhWW9uo0SP6oCkINV8b+kAq1EiW3TA==
-X-Received: by 2002:a7b:c184:: with SMTP id y4mr534072wmi.92.1610058495363;
-        Thu, 07 Jan 2021 14:28:15 -0800 (PST)
+        bh=ADeLjBIuNm8Db2lkSUMCJRDAVngCOHiUxA4Y6spWn0I=;
+        b=YU0iSXVtvsMEX2RcvRCqunw50cK/sekFpXqZE7e4TPgkchivrP6dbL9WKobE+20h6v
+         GohcjML0Rx14B+IBfyOwESSky8Z13mIXvFATXtIsW5jf9PD9pbYwnlp+fpAa1elbvht8
+         IZtxcYtBnMFt+CH5BdblKQRBOiLrHAgb4VMZ/j7l/vjik9ymO/nY2dDPzjM1/GjVGil8
+         73XOCFDYcUoNBQ+P+0NSkbaFJcz3qJYGleDv7o3W5bFcV8f2jcFYk2oqpgnrJDTp7l3F
+         Y+Q+5wPtkgcqNnwjHXCxGEShQjCVALJrkJg/h8VCZDPSvoLHZnhJ3mdyle32KOQuh+aT
+         LLng==
+X-Gm-Message-State: AOAM531XHgpXiEEgZMVCt5Ee+LdwTe3ua5WBB/9NaViMb868cdcT4tlh
+        SSIJNsAFAiQ1zmuBLPaMd54=
+X-Google-Smtp-Source: ABdhPJwmwG+IOuURAtgZfJZeyY0mGhHbK6Zox4gOBAU8vjb6V2st3D0j0ccmQnWMvuf9SjqNPgJ4VQ==
+X-Received: by 2002:a5d:684b:: with SMTP id o11mr667739wrw.157.1610058500527;
+        Thu, 07 Jan 2021 14:28:20 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id m14sm10311543wrh.94.2021.01.07.14.28.14
+        by smtp.gmail.com with ESMTPSA id m17sm11788101wrn.0.2021.01.07.14.28.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:28:14 -0800 (PST)
+        Thu, 07 Jan 2021 14:28:19 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 62/66] target/mips: Convert Rel6 LWLE/LWRE/SWLE/SWRE opcodes to decodetree
-Date:   Thu,  7 Jan 2021 23:22:49 +0100
-Message-Id: <20210107222253.20382-63-f4bug@amsat.org>
+Subject: [PULL 63/66] target/mips: Convert Rel6 LDL/LDR/SDL/SDR opcodes to decodetree
+Date:   Thu,  7 Jan 2021 23:22:50 +0100
+Message-Id: <20210107222253.20382-64-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,58 +73,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-LWLE/LWRE/SWLE/SWRE (EVA) opcodes have been removed from
-the Release 6. Add a single decodetree entry for the opcodes,
-triggering Reserved Instruction if ever used.
+LDL/LDR/SDL/SDR opcodes have been removed from the Release 6.
+
+Add a single decodetree entry for the opcodes, triggering
+Reserved Instruction if ever used.
 
 Remove unreachable check_insn_opc_removed() calls.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201208203704.243704-11-f4bug@amsat.org>
+Message-Id: <20201208203704.243704-12-f4bug@amsat.org>
 ---
- target/mips/mips32r6.decode | 5 +++++
- target/mips/translate.c     | 4 ----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ target/mips/mips64r6.decode | 6 ++++++
+ target/mips/translate.c     | 5 +----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/mips32r6.decode b/target/mips/mips32r6.decode
-index 89a0085fafd..3ec50704cf2 100644
---- a/target/mips/mips32r6.decode
-+++ b/target/mips/mips32r6.decode
-@@ -20,6 +20,11 @@ REMOVED             010011 ----- ----- ----- ----- ------   # COP1X (COP3)
+diff --git a/target/mips/mips64r6.decode b/target/mips/mips64r6.decode
+index e812224341e..8c3fc5dae9c 100644
+--- a/target/mips/mips64r6.decode
++++ b/target/mips/mips64r6.decode
+@@ -10,8 +10,14 @@
+ #       (Document Number: MD00087-2B-MIPS64BIS-AFP-6.06)
+ #
  
- REMOVED             011100 ----- ----- ----- ----- ------   # SPECIAL2
++&REMOVED            !extern
+ &lsa                rd rt rs sa !extern
  
-+REMOVED             011111 ----- ----- ----------  011001   # LWLE
-+REMOVED             011111 ----- ----- ----------  011010   # LWRE
-+REMOVED             011111 ----- ----- ----------  100001   # SWLE
-+REMOVED             011111 ----- ----- ----------  100010   # SWRE
+ @lsa                ...... rs:5 rt:5 rd:5 ... sa:2 ......   &lsa
+ 
+ DLSA                000000 ..... ..... ..... 000 .. 010101  @lsa
 +
- REMOVED             100010 ----- ----- ----------------     # LWL
- REMOVED             100110 ----- ----- ----------------     # LWR
- REMOVED             101010 ----- ----- ----------------     # SWL
++REMOVED             011010 ----- ----- ----------------     # LDL
++REMOVED             011011 ----- ----- ----------------     # LDR
++REMOVED             101100 ----- ----- ----------------     # SDL
++REMOVED             101101 ----- ----- ----------------     # SDR
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 0d729293f6b..73efbd24585 100644
+index 73efbd24585..f46d7c5f80b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -28122,8 +28122,6 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-         switch (op1) {
-         case OPC_LWLE:
-         case OPC_LWRE:
--            check_insn_opc_removed(ctx, ISA_MIPS_R6);
--            /* fall through */
-         case OPC_LBUE:
-         case OPC_LHUE:
-         case OPC_LBE:
-@@ -28135,8 +28133,6 @@ static void decode_opc_special3(CPUMIPSState *env, DisasContext *ctx)
-             return;
-         case OPC_SWLE:
-         case OPC_SWRE:
--            check_insn_opc_removed(ctx, ISA_MIPS_R6);
--            /* fall through */
-         case OPC_SBE:
-         case OPC_SHE:
-         case OPC_SWE:
+@@ -28871,11 +28871,10 @@ static bool decode_opc_legacy(CPUMIPSState *env, DisasContext *ctx)
+         if (ctx->insn_flags & INSN_R5900) {
+             check_insn_opc_user_only(ctx, INSN_R5900);
+         }
++        check_insn_opc_removed(ctx, ISA_MIPS_R6);
+         /* fall through */
+     case OPC_LDL:
+     case OPC_LDR:
+-        check_insn_opc_removed(ctx, ISA_MIPS_R6);
+-        /* fall through */
+     case OPC_LWU:
+     case OPC_LD:
+         check_insn(ctx, ISA_MIPS3);
+@@ -28884,8 +28883,6 @@ static bool decode_opc_legacy(CPUMIPSState *env, DisasContext *ctx)
+         break;
+     case OPC_SDL:
+     case OPC_SDR:
+-        check_insn_opc_removed(ctx, ISA_MIPS_R6);
+-        /* fall through */
+     case OPC_SD:
+         check_insn(ctx, ISA_MIPS3);
+         check_mips_64(ctx);
 -- 
 2.26.2
 
