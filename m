@@ -2,122 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AC152ED58B
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 18:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAD4A2ED5B8
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 18:34:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729001AbhAGR1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 12:27:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55758 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726780AbhAGR1O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 12:27:14 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162C1C0612F6
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 09:26:34 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id x126so4277648pfc.7
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 09:26:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6lWkPYmqT0bK/p92szu7J/reIaTk7BKnOinjKdXvDN8=;
-        b=H58Wk18/UoqqmlC3FTHkIhsh5gQb7JOahE4qtlxf2WAsFOWRKSWzfyzBQUG4a1T4Xr
-         NIvrYLeLcsaP/9EJtK6gnVr4ygLmGlPWDKCCijCB0Cc1SKVu6GS4QvJHE/KXSfLxu0zW
-         TlEhQ3AvR+4kpFRhII6qUaLoipkhhQy03/rtDmPoQq+MqYWvdJf7NtyQP1nHw7NzY+cM
-         iV4tiF+t5aGrrOEdbCYSS3YoakbJVvD0mw8IQLQ9I8upo81SZmJ9/N55LOwrwJ1nC3HV
-         KZd9PUL73CyNUCwYGDFMTdoDKtUto+iWIezfC9NJtUlfqBNHCr4yZeojX9xaZP+xNBQG
-         OwoA==
+        id S1727874AbhAGRe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 12:34:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27193 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726406AbhAGReZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 12:34:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610040779;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NWnOL4WW0a/zTNNmDoc+8E5RK1NTv6x+0aetcVGVDMk=;
+        b=D0GF20tKXX+z/0P4hDvUiBn3Pn0kGcLg/Ex2WIP8woG+G6og/ZP0YAUJCfVimsjtFEy7AT
+        b0Qb7+bGNoSGtoDRDXajrQgEId/+71UYQXSyChd6OvYvl13w/iKHvvWQDIUHY5uk7YOwvy
+        7OEdNy/WrAYKblzGjfl24MJcfUfiv9A=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-340-P3p6Yo9iNXiHJcvM-0__RQ-1; Thu, 07 Jan 2021 12:32:56 -0500
+X-MC-Unique: P3p6Yo9iNXiHJcvM-0__RQ-1
+Received: by mail-wr1-f71.google.com with SMTP id g17so2928040wrr.11
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 09:32:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6lWkPYmqT0bK/p92szu7J/reIaTk7BKnOinjKdXvDN8=;
-        b=MLtQMdcaRfdtvmjBPgzhk6jSvyfXN13N8WzxEV//gqwNZtsBBNGV+nOTKyoHunIZxN
-         qtxqNiAJ4LZbd9VaDk2sK++9egeB1lZ0qYwGT6WxURAtXEBqG3Zj143vCzDe6LWzG0+c
-         dl7anGQLC3i44SGeLh57Krg21JwkkNVHqv/LfIa4GFm6IRavzJ6c9kEb/8943W4eYHJO
-         96ksM7DJbLcKwU+LQ+fPXxF8O3jL7hlYDN80rJRHhLCsXDvnOVOv06/xPU9p8Vq4AgXG
-         k2FC+KaDp/myl/4E6sYbBnv1MUhtz/TCufqMHCBrVmodfPwrJ2k0x/LI6+Tpp9C+RxxV
-         Y7tw==
-X-Gm-Message-State: AOAM532m8w9lGbCVAIDzwx86cCOoY3LPjqO+LODeLzkVunstQ0Dwv6L+
-        SY9pc7PEkV8auEPZ0uXtf57l8g==
-X-Google-Smtp-Source: ABdhPJw/q/FMr9jxp6eEm5Nw6T0uz/rVWWCYZLX+6kNy8PPMligfp/kv10WzO7sQoFhXVM51+CcjMw==
-X-Received: by 2002:a63:7402:: with SMTP id p2mr2866216pgc.101.1610040393358;
-        Thu, 07 Jan 2021 09:26:33 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id z5sm6581160pff.44.2021.01.07.09.26.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 09:26:32 -0800 (PST)
-Date:   Thu, 7 Jan 2021 09:26:25 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Steve Rutherford <srutherford@google.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Borislav Petkov <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "dovmurik@linux.vnet.ibm.com" <dovmurik@linux.vnet.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "frankeh@us.ibm.com" <frankeh@us.ibm.com>, jon.grimm@amd.com
-Subject: Re: [PATCH v2 1/9] KVM: x86: Add AMD SEV specific Hypercall3
-Message-ID: <X/dEQRZpSb+oQloX@google.com>
-References: <CABayD+esy0yeKi9W3wQw+ou4y4840LPCwd-PHhN1J6Uh_fvSjA@mail.gmail.com>
- <765f86ae-7c68-6722-c6e0-c6150ce69e59@amd.com>
- <20201211225542.GA30409@ashkalra_ubuntu_server>
- <20201212045603.GA27415@ashkalra_ubuntu_server>
- <20201218193956.GJ2956@work-vm>
- <E79E09A2-F314-4B59-B7AE-07B1D422DF2B@amd.com>
- <20201218195641.GL2956@work-vm>
- <20210106230555.GA13999@ashkalra_ubuntu_server>
- <CABayD+dQwaeCnr5_+DUpvbQ42O6cZBMO79pEEzi5WXPO=NH3iA@mail.gmail.com>
- <20210107170728.GA16965@ashkalra_ubuntu_server>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NWnOL4WW0a/zTNNmDoc+8E5RK1NTv6x+0aetcVGVDMk=;
+        b=gWGa9nfpH7ZBm+wDURHyUwwOeLCybsQk2/fyb51wUMAA0RID+oQrZRa8+Tgf0YymFl
+         JeIsKznMYmC0P9WrilMkOyawZu0xvggaxRU3dAB6yexPITdM7lPK6vMpDKfhsk2jcLI5
+         us2Iwxuz6nV4MwtuiCzId0NYZhM510n2SOUnpJzCe438Noy8MPu/eIA0HgPwBjCifAKb
+         gZC4AtdIAzzcTG1iJKyw8XwO7SzQA3/Ur7sTWDQO4pBwIiEmPazxiv8+C9NHQqeJddB3
+         wwJjxxFUOkFI+y1MogJqiD6OPJdCbdHj3lBKT2isBkgIjlo9mvtNRcKorrSgwOrVFwTm
+         Ii9Q==
+X-Gm-Message-State: AOAM5312m+UKQK7gOXalz4htvOjN8jJpHU8kiZPCnHkeoBkFyH3Dp6MO
+        1YixVR59VM0iYLuCb3kldTCYRYC0EmQIzhmFLtzUbw39fGlmnnlWm+xDPYY3NOeCrikFebO+NYl
+        E8J2pMQ1t6oL5
+X-Received: by 2002:adf:9e47:: with SMTP id v7mr9842388wre.185.1610040775460;
+        Thu, 07 Jan 2021 09:32:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyzj6ERrKiiz6nNF/uGUGOK1Po7cuE8q0EYgZ+0gIBiGZ0O8mAcqYSykk7g7I+hTptjodXSOw==
+X-Received: by 2002:adf:9e47:: with SMTP id v7mr9842375wre.185.1610040775315;
+        Thu, 07 Jan 2021 09:32:55 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t188sm8326807wmf.9.2021.01.07.09.32.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jan 2021 09:32:54 -0800 (PST)
+Subject: Re: [PATCH v3 2/2] KVM: x86/mmu: Clarify TDP MMU page list invariants
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Leo Hou <leohou1402@gmail.com>
+References: <20210107001935.3732070-1-bgardon@google.com>
+ <20210107001935.3732070-2-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <12a3a6fd-557f-ae6f-4687-c4c4b2a79587@redhat.com>
+Date:   Thu, 7 Jan 2021 18:32:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210107170728.GA16965@ashkalra_ubuntu_server>
+In-Reply-To: <20210107001935.3732070-2-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 07, 2021, Ashish Kalra wrote:
-> Hello Steve,
-> 
-> On Wed, Jan 06, 2021 at 05:01:33PM -0800, Steve Rutherford wrote:
-> > Avoiding an rbtree for such a small (but unstable) list seems correct.
-> > 
-> > For the unencrypted region list strategy, the only questions that I
-> > have are fairly secondary.
-> > - How should the kernel upper bound the size of the list in the face
-> > of malicious guests, but still support large guests? (Something
-> > similar to the size provided in the bitmap API would work).
-> 
-> I am thinking of another scenario, where a malicious guest can make
-> infinite/repetetive hypercalls and DOS attack the host. 
-> 
-> But probably this is a more generic issue, this can be done by any guest
-> and under any hypervisor, i don't know what kind of mitigations exist
-> for such a scenario ?
-> 
-> Potentially, the guest memory donation model can handle such an attack,
-> because in this model, the hypervisor will expect only one hypercall,
-> any repetetive hypercalls can make the hypervisor disable the guest ?
+On 07/01/21 01:19, Ben Gardon wrote:
+>   
+> -	/* List of struct tdp_mmu_pages being used as roots */
+> +	/*
+> +	 * List of struct tdp_mmu_pages being used as roots.
+                           ^^^
 
-KVM doesn't need to explicitly bound its tracking structures, it just needs to
-use GFP_KERNEL_ACCOUNT when allocating kernel memory for the structures so that
-the memory will be accounted to the task/process/VM.  Shadow MMU pages are the
-only exception that comes to mind; they're still accounted properly, but KVM
-also explicitly limits them for a variety of reasons.
+s/tdp/kvm/
 
-The size of the list will naturally be bounded by the size of the guest; and
-assuming KVM proactively merges adjancent regions, that upper bound is probably
-reasonably low compared to other allocations, e.g. the aforementioned MMU pages.
+Queued with this change, thanks.
 
-And, using a list means a malicious guest will get automatically throttled as
-the latency of walking the list (to merge/delete existing entries) will increase
-with the size of the list.
+Paolo
+
+> +	 * All struct kvm_mmu_pages in the list should have
+> +	 * tdp_mmu_page set.
+> +	 * All struct kvm_mmu_pages in the list should have a positive
+> +	 * root_count except when a thread holds the MMU lock and is removing
+> +	 * an entry from the list.
+> +	 */
+>   	struct list_head tdp_mmu_roots;
+> -	/* List of struct tdp_mmu_pages not being used as roots */
+> +
+> +	/*
+> +	 * List of struct tdp_mmu_pages not being used as roots.
+> +	 * All struct kvm_mmu_pages in the list should have
+> +	 * tdp_mmu_page set and a root_count of 0.
+> +	 */
+
