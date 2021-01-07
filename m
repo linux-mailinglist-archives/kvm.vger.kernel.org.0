@@ -2,206 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8D992EC91C
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 04:32:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 695222EC93E
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 04:58:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbhAGDcY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 6 Jan 2021 22:32:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30841 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725803AbhAGDcY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 22:32:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609990257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U+/u2mtb9GMxGWw+uUOBZFq3KZDJJRiRzeenoJ8GAzM=;
-        b=QAERUorSFnhFOceJTsEtXJs9wYv7r0X9ev4EX5yK7Hwe2mcVX/6zltKm2nj/9sR5GG5GoC
-        VEGz2GKlgdd9JG7VovQOzgrbws+zT8I3qDbELvEphix75eXVisMhHR5NOKwwJUtuwp+dcq
-        nPurWvU+Y9GWunZHHRYQIG4ECBLQl64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-G3JoosHlOWSh2GsT2XJnBA-1; Wed, 06 Jan 2021 22:30:55 -0500
-X-MC-Unique: G3JoosHlOWSh2GsT2XJnBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59F30107ACE6;
-        Thu,  7 Jan 2021 03:30:54 +0000 (UTC)
-Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 75D9A5D9D2;
-        Thu,  7 Jan 2021 03:30:49 +0000 (UTC)
-Subject: Re: [RFC 1/2] KVM: add initial support for KVM_SET_IOREGION
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        jag.raman@oracle.com, elena.ufimtseva@oracle.com
-References: <cover.1609231373.git.eafanasova@gmail.com>
- <d4af2bcbd2c6931a24ba99236248529c3bfb6999.1609231374.git.eafanasova@gmail.com>
- <d79bdf44-9088-e005-3840-03f6bad22ed7@redhat.com>
- <0cc68c81d6fae042d8a84bf90dd77eecd4da7cc8.camel@gmail.com>
- <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
- <29955fdc90d2efab7b79c91b9a97183e95243cc1.camel@gmail.com>
- <47e8b7e8-d9b8-b2a2-c014-05942d99452a@redhat.com>
- <20210105102517.GA31084@stefanha-x1.localdomain>
- <f9cd33f6-c30d-4e5a-bc45-8f42109fe1ce@redhat.com>
- <20210106150525.GB130669@stefanha-x1.localdomain>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <32b49857-4ac7-0646-929d-c9238b50bc49@redhat.com>
-Date:   Thu, 7 Jan 2021 11:30:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726647AbhAGD54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 6 Jan 2021 22:57:56 -0500
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:41383 "EHLO
+        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726532AbhAGD5z (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 6 Jan 2021 22:57:55 -0500
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 44B005804CF;
+        Wed,  6 Jan 2021 22:57:09 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 06 Jan 2021 22:57:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
+        subject:to:cc:references:from:message-id:date:mime-version
+        :in-reply-to:content-type:content-transfer-encoding; s=fm1; bh=g
+        tq4DjSFmmNh2QS36UUKCFmBXgbvhcLixEM16k+fVp0=; b=0fjnLsqHjLlq6pFWR
+        gqMkAdvtppT4u9ugPpK1ZKpQ6Yw3CA2MFdHCGGickUomOdPwBYXWeiSO66yVxiV6
+        T+9HA+1VSLHOLlK5LUvYHhcvDLuthUE7wbgVvDuFe4Z7Dm2819fEKoS06i3Ev0hH
+        SQ4OzfH2HX3/jAtnbul7opltXb0f5sZDLJ8IsUHadPX3J0iKtY1RdxMOApCDB1qI
+        sf5rVIjjSOd77HbBRqtoaD5rteeGnyisKHQJuaB0eiZkv69XDdKTJQuoh/j6A7Hs
+        sWn6p/I1Fpc3Y4GjzFAfL7bB0C3GZolofPYccpqk+Mai6j4T3klXd6I0RAyKP9sk
+        yLz4w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; bh=gtq4DjSFmmNh2QS36UUKCFmBXgbvhcLixEM16k+fV
+        p0=; b=pbNEsmBxiunUMPOQRk50Qxpp6S5niIVRLBLBOGIf52cPkXJv/byRQAX3f
+        vyKuLznjF2F95i0QDtrEmK0/Yn+WqwSV6lHmlXcS5TJAVGg2TRgPEkQlk7EKbWe4
+        P0qvFvV1dr27ACX63yAw2uGLCWnMvo2j6bPjIFCQYRb31KAqM7RyNvYTJJW5g85T
+        JPiBoCisZeKYPhtxcVbmFaursERhll2lkh+haYKkka/Z6vjNrtraVH4qy2BY8s20
+        4EKBPSArwSqPdrQElamyOcbljcaPqFyoRqxmajWMbg92Yz8ZRLFEqWHmIiH9qGz3
+        bOgzNzkuJ3xTA5KZQ/H8KKpP/P7oQ==
+X-ME-Sender: <xms:lIb2X5biJ2kChfXPh7DfOgwQzputJsV0XQPakylPXj2nMFYHx9O7KA>
+    <xme:lIb2X6Dwam23sdWND26Qh9ZqmoBzT417Blgi4Ej5PKi92UvdfcLuYGs3KX6I9BclU
+    oEQt28KikweAG-UUEQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdegtddgudefgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeflihgr
+    gihunhcujggrnhhguceojhhirgiguhhnrdihrghnghesfhhlhihgohgrthdrtghomheqne
+    cuggftrfgrthhtvghrnhepueeljefhheeljeekieeghefhtdelveevuddtlefgkeegtddv
+    keeifeejfeevieehnecuffhomhgrihhnpehgihhtlhgrsgdrtghomhdpmhgrihhlqdgrrh
+    gthhhivhgvrdgtohhmnecukfhppeeghedrfeefrdehtddrvdehgeenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjihgrgihunhdrhigrnhhgse
+    hflhihghhorghtrdgtohhm
+X-ME-Proxy: <xmx:lIb2X78rCvC9Ym-K9W420UgOvNR1mCHyHI0BxS-jZjERua5MOJ_u-g>
+    <xmx:lIb2X69CNILCRbpRwo_E_-BVsPR3y58JQlTd4xiC6_8X1Z3iQOLPkw>
+    <xmx:lIb2XyciSIhPkkYNfrkOy7yoVgqIgf0Z0B_um5H6XF5438eJQojuIw>
+    <xmx:lYb2X81i7yBfLpL1aDTM9ntUeMUO34x4zhYiiHmAf-r1jfWXnellxw>
+Received: from [0.0.0.0] (li1000-254.members.linode.com [45.33.50.254])
+        by mail.messagingengine.com (Postfix) with ESMTPA id A73C5108005B;
+        Wed,  6 Jan 2021 22:57:01 -0500 (EST)
+Subject: Re: [PATCH v2 02/24] target/mips/translate: Expose check_mips_64() to
+ 32-bit mode
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc:     Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        kvm <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20201215225757.764263-1-f4bug@amsat.org>
+ <20201215225757.764263-3-f4bug@amsat.org>
+ <1f23c2f4-28b9-ac3b-356e-ea9cc0213690@amsat.org>
+ <CAAdtpL65=s-eUGKjXe-KzyqyHs1+a1qwHyp72xNRNo0gHxE8Hg@mail.gmail.com>
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <ae7677ba-7820-a0a1-e9b2-8373899e99b0@flygoat.com>
+Date:   Thu, 7 Jan 2021 11:56:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210106150525.GB130669@stefanha-x1.localdomain>
+In-Reply-To: <CAAdtpL65=s-eUGKjXe-KzyqyHs1+a1qwHyp72xNRNo0gHxE8Hg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/1/6 下午11:05, Stefan Hajnoczi wrote:
-> On Wed, Jan 06, 2021 at 01:21:43PM +0800, Jason Wang wrote:
->> On 2021/1/5 下午6:25, Stefan Hajnoczi wrote:
->>> On Tue, Jan 05, 2021 at 11:53:01AM +0800, Jason Wang wrote:
->>>> On 2021/1/5 上午8:02, Elena Afanasova wrote:
->>>>> On Mon, 2021-01-04 at 13:34 +0800, Jason Wang wrote:
->>>>>> On 2021/1/4 上午4:32, Elena Afanasova wrote:
->>>>>>> On Thu, 2020-12-31 at 11:45 +0800, Jason Wang wrote:
->>>>>>>> On 2020/12/29 下午6:02, Elena Afanasova wrote:
->>>>>>>>> This vm ioctl adds or removes an ioregionfd MMIO/PIO region.
->>>>>>>> How about FAST_MMIO?
->>>>>>>>
->>>>>>> I’ll add KVM_IOREGION_FAST_MMIO flag support. So this may be
->>>>>>> suitable
->>>>>>> for triggers which could use posted writes. The struct
->>>>>>> ioregionfd_cmd
->>>>>>> size bits and the data field will be unused in this case.
->>>>>> Note that eventfd checks for length and have datamatch support. Do
->>>>>> we
->>>>>> need to do something similar.
->>>>>>
->>>>> Do you think datamatch support is necessary for ioregionfd?
->>>> I'm not sure. But if we don't have this support, it probably means we can't
->>>> use eventfd for ioregionfd.
->>> This is an interesting question because ioregionfd and ioeventfd have
->>> different semantics. While it would be great to support all ioeventfd
->>> features in ioregionfd, I'm not sure that is possible. I think ioeventfd
->>> will remain useful for devices that only need a doorbell write register.
->>>
->>> The differences:
->>>
->>> 1. ioeventfd has datamatch. This could be implemented in ioregionfd so
->>>      that a datamatch failure results in the classic ioctl(KVM_RETURN)
->>>      MMIO/PIO exit reason and the VMM can handle the access.
->>>
->>>      I'm not sure if this feature is useful though. Most of the time
->>>      ioregionfd users want to handle all accesses to the region and the
->>>      VMM may not even know how to handle register accesses because they
->>>      can only be handled in a dedicated thread or an out-of-process
->>>      device.
+在 2021/1/7 上午2:37, Philippe Mathieu-Daudé 写道:
+> On Wed, Jan 6, 2021 at 7:20 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi,
 >>
->> It's about whether or not the current semantic of ioregion is sufficient for
->> implementing doorbell.
+>> ping for code review? :)
+> FWIW the full series (rebased on mips-next) is available here:
+> https://gitlab.com/philmd/qemu/-/commits/mips_msa_decodetree
+
+Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+
+- Jiaxun
+
+>
+>> Due to the "Simplify ISA definitions"
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg770056.html
+>> patch #3 is not necessary.
 >>
->> E.g in the case of virtio, the virtqueue index is encoded in the write to
->> the doorbell. And if a single MMIO area is used for all virtqueues,
->> datamatch is probably a must in this case.
-> struct ioregionfd_cmd contains not just the register offset, but also
-> the value written by the guest. Therefore datamatch is not necessary.
->
-> Datamatch would only be useful as some kind of more complex optimization
-> where different values writtent to the same register dispatch to
-> different fds.
-
-
-That's exactly the case of virtio. Consider queue 1,2 shares the MMIO 
-register. We need use datamatch to dispatch the notification to 
-different eventfds.
-
-
->
->>>>>> I guess the idea is to have a generic interface to let eventfd work
->>>>>> for
->>>>>> ioregion as well.
->>>>>>
->>>>> It seems that posted writes is the only "fast" case in ioregionfd. So I
->>>>> was thinking about using FAST_MMIO for this case only. Maybe in some
->>>>> cases it will be better to just use ioeventfd. But I'm not sure.
->>>> To be a generic infrastructure, it's better to have this, but we can listen
->>>> from the opinion of others.
->>> I think we want both FAST_MMIO and regular MMIO options for posted
->>> writes:
+>> This is the last patch unreviewed.
+>>
+>> On 12/15/20 11:57 PM, Philippe Mathieu-Daudé wrote:
+>>> To allow compiling 64-bit specific translation code more
+>>> generically (and removing #ifdef'ry), allow compiling
+>>> check_mips_64() on 32-bit targets.
+>>> If ever called on 32-bit, we obviously emit a reserved
+>>> instruction exception.
 >>>
->>> 1. FAST_MMIO - ioregionfd_cmd size and data fields are zero and do not
->>>      contain information about the nature of the guest access. This is
->>>      fine for ioeventfd doorbell style registers because we don't need
->>>      that information.
->>
->> Is FAST_MMIO always for doorbell? If not, we probably need the size and
->> data.
-> My understanding is that FAST_MMIO only provides the guest physical
-> address and no additional information. In fact, I'm not even sure if we
-> know whether the access is a read or a write.
->
-> So there is extremely limited information to work with and it's
-> basically only useful for doorbell writes.
->
->>> 2. Regular MMIO - ioregionfd_cmd size and data fields contain valid data
->>>      about the nature of the guest access. This is needed when the device
->>>      register is more than a simple "kick" doorbell. For example, if the
->>>      device needs to know the value that the guest wrote.
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>   target/mips/translate.h | 2 --
+>>>   target/mips/translate.c | 8 +++-----
+>>>   2 files changed, 3 insertions(+), 7 deletions(-)
 >>>
->>> I suggest defining an additional KVM_SET_IOREGION flag called
->>> KVM_IOREGION_FAST_MMIO that can be set together with
->>> KVM_IOREGION_POSTED_WRITES.
->>
->> If we need to expose FAST_MMIO to userspace, we probably need to define its
->> semantics which is probably not easy since it's an architecture
->> optimization.
-> Maybe the name KVM_IOREGION_FAST_MMIO name should be changed to
-> something more specific like KVM_IOREGION_OFFSET_ONLY, meaning that only
-> the offset field is valid.
-
-
-Or we can do like what eventfd did, implies FAST_MMIO when memory_size 
-is zero (kvm_assign_ioeventfd()):
-
-     if (!args->len && bus_idx == KVM_MMIO_BUS) {
-         ret = kvm_assign_ioeventfd_idx(kvm, KVM_FAST_MMIO_BUS, args);
-         if (ret < 0)
-             goto fast_fail;
-     }
-
-
->
-> I haven't checked if and how other architectures implement FAST_MMIO,
-> but they will at least be able to provide the offset :).
->
->>> KVM_IOREGION_PIO cannot be used together with KVM_IOREGION_FAST_MMIO.
+>>> diff --git a/target/mips/translate.h b/target/mips/translate.h
+>>> index a9eab69249f..942d803476c 100644
+>>> --- a/target/mips/translate.h
+>>> +++ b/target/mips/translate.h
+>>> @@ -127,9 +127,7 @@ void generate_exception_err(DisasContext *ctx, int excp, int err);
+>>>   void generate_exception_end(DisasContext *ctx, int excp);
+>>>   void gen_reserved_instruction(DisasContext *ctx);
+>>>   void check_insn(DisasContext *ctx, uint64_t flags);
+>>> -#ifdef TARGET_MIPS64
+>>>   void check_mips_64(DisasContext *ctx);
+>>> -#endif
+>>>   void check_cp1_enabled(DisasContext *ctx);
 >>>
->>> In theory KVM_IOREGION_POSTED_WRITES doesn't need to be set with
->>> KVM_IOREGION_FAST_MMIO. Userspace would have to send back a struct
->>> ioregionfd_resp to acknowledge that the write has been handled.
+>>>   void gen_base_offset_addr(DisasContext *ctx, TCGv addr, int base, int offset);
+>>> diff --git a/target/mips/translate.c b/target/mips/translate.c
+>>> index 5c62b32c6ae..af543d1f375 100644
+>>> --- a/target/mips/translate.c
+>>> +++ b/target/mips/translate.c
+>>> @@ -2972,18 +2972,16 @@ static inline void check_ps(DisasContext *ctx)
+>>>       check_cp1_64bitmode(ctx);
+>>>   }
+>>>
+>>> -#ifdef TARGET_MIPS64
+>>>   /*
+>>> - * This code generates a "reserved instruction" exception if 64-bit
+>>> - * instructions are not enabled.
+>>> + * This code generates a "reserved instruction" exception if cpu is not
+>>> + * 64-bit or 64-bit instructions are not enabled.
+>>>    */
+>>>   void check_mips_64(DisasContext *ctx)
+>>>   {
+>>> -    if (unlikely(!(ctx->hflags & MIPS_HFLAG_64))) {
+>>> +    if (unlikely((TARGET_LONG_BITS != 64) || !(ctx->hflags & MIPS_HFLAG_64))) {
+>> Since TARGET_LONG_BITS is known at build time, this can be simplified
+>> as:
 >>
->> Right, and it also depends on whether or not the hardware support (e.g
->> whether or not it can decode the instructions).
-> The KVM_IOREGION_FAST_MMIO flag should be documented as an optimization
-> hint. If hardware doesn't support FAST_MMIO then struct ioregionfd_cmd
-> will contain all fields. Userspace will be able to process the cmd
-> either way.
-
-
-You mean always have a fallback to MMIO for FAST_MMIO? That should be 
-fine but looks less optimal than the implying FAST_MMIO for zero length. 
-I still think introducing "FAST_MMIO" may bring confusion for users ...
-
-Thanks
-
-
->
-> Stefan
+>> if ((TARGET_LONG_BITS != 64) || unlikely!(ctx->hflags & MIPS_HFLAG_64)))
+>>
+>>>           gen_reserved_instruction(ctx);
+>>>       }
+>>>   }
+>>> -#endif
+>>>
+>>>   #ifndef CONFIG_USER_ONLY
+>>>   static inline void check_mvh(DisasContext *ctx)
+>>>
 
