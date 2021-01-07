@@ -2,109 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83E8B2EC9C9
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 06:03:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E41A02ECA5E
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 07:11:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbhAGFDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 00:03:36 -0500
-Received: from mga17.intel.com ([192.55.52.151]:10836 "EHLO mga17.intel.com"
+        id S1726478AbhAGGKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 01:10:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49042 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726099AbhAGFDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 00:03:36 -0500
-IronPort-SDR: fpMxqaeS0L/CCJbOMdgtTPazRjHIpKWpQ7AIOVV7RylGeebqSpMPMn2O8W288IfCgwm+AV9AtS
- wDpx4nzxLI7A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="157157523"
-X-IronPort-AV: E=Sophos;i="5.79,329,1602572400"; 
-   d="scan'208";a="157157523"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:02:55 -0800
-IronPort-SDR: nfZMMDBDowd23VBcIpR+GjehUDmPrVKGCUALcRShWjaeUTee0iIc9XN1BbqtHfOlBMV52XjV0h
- /ljICI+MzqEg==
-X-IronPort-AV: E=Sophos;i="5.79,329,1602572400"; 
-   d="scan'208";a="422440143"
-Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:02:54 -0800
-Subject: Re: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM
- guests
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1609890536.git.kai.huang@intel.com>
- <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
- <2e424ff3-51cb-d6ed-6c5f-190e1d4fe21a@intel.com>
- <20210107144203.589d4b2a7a2d2b53c4af7560@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <bd0ff2d8-3425-2f69-5fa7-8da701d55e42@intel.com>
-Date:   Wed, 6 Jan 2021 21:02:54 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726231AbhAGGKB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 01:10:01 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A85C122E00;
+        Thu,  7 Jan 2021 06:09:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1609999760;
+        bh=azMCNDuhleHdkWuj5ghRek+hs2L4YJMzasQokmJS3f4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=g8XG4po+R+2ujO3Y3ib4/2LENKfD9oBEAxhEM99mJwydTyIvNu/NZVVdq5A2A+h2W
+         k+pr+erNProR3XWHKdM50a26SA5otfCx2Ats+WEps8m41eqxp+rkTKbR/H7GmKR2Ko
+         oGweSuLabtC9JzF6W5IRHnelrMDeM5JRZGgxKaOERTnyaQusdakAJpEkdwwVvm49JN
+         6voYxPoDFOKK0XPTvN6Sha/PYhzXV/sfamKmjl6VZ+EUGbKl8YwzgRrimbq+jHdNS6
+         P1PJROd9CdC5SVojxjMmosd/mMs2yGs3ac6Hr1jOVzbzN0Cy8JuSl7BG7gt/4sniq4
+         0NvWPUJkOpo6A==
+Date:   Thu, 7 Jan 2021 08:09:16 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC PATCH v2 1/1] platform-msi: Add platform check for
+ subdevice irq domain
+Message-ID: <20210107060916.GY31158@unreal>
+References: <20210106022749.2769057-1-baolu.lu@linux.intel.com>
+ <20210106060613.GU31158@unreal>
+ <3d2620f9-bbd4-3dd0-8e29-0cfe492a109f@linux.intel.com>
+ <20210106104017.GV31158@unreal>
+ <20210106152339.GA552508@nvidia.com>
+ <20210106160158.GX31158@unreal>
+ <MWHPR11MB18867EE2F4FA0382DCFEEE2B8CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20210107144203.589d4b2a7a2d2b53c4af7560@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MWHPR11MB18867EE2F4FA0382DCFEEE2B8CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/21 5:42 PM, Kai Huang wrote:
->> I understand why this made sense for regular enclaves, but I'm having a
->> harder time here.  If you mmap(fd, MAP_SHARED), fork(), and then pass
->> that mapping through to two different guests, you get to hold the
->> pieces, just like if you did the same with normal memory.
->>
->> Why does the kernel need to enforce this policy?
-> Does Sean's reply in another email satisfy you?
+On Thu, Jan 07, 2021 at 02:04:29AM +0000, Tian, Kevin wrote:
+> > From: Leon Romanovsky <leon@kernel.org>
+> > Sent: Thursday, January 7, 2021 12:02 AM
+> >
+> > On Wed, Jan 06, 2021 at 11:23:39AM -0400, Jason Gunthorpe wrote:
+> > > On Wed, Jan 06, 2021 at 12:40:17PM +0200, Leon Romanovsky wrote:
+> > >
+> > > > I asked what will you do when QEMU will gain needed functionality?
+> > > > Will you remove QEMU from this list? If yes, how such "new" kernel will
+> > > > work on old QEMU versions?
+> > >
+> > > The needed functionality is some VMM hypercall, so presumably new
+> > > kernels that support calling this hypercall will be able to discover
+> > > if the VMM hypercall exists and if so superceed this entire check.
+> >
+> > Let's not speculate, do we have well-known path?
+> > Will such patch be taken to stable@/distros?
+> >
+>
+> There are two functions introduced in this patch. One is to detect whether
+> running on bare metal or in a virtual machine. The other is for deciding
+> whether the platform supports ims. Currently the two are identical because
+> ims is supported only on bare metal at current stage. In the future it will look
+> like below when ims can be enabled in a VM:
+>
+> bool arch_support_pci_device_ims(struct pci_dev *pdev)
+> {
+> 	return on_bare_metal() || hypercall_irq_domain_supported();
+> }
+>
+> The VMM vendor list is for on_bare_metal, and suppose a vendor will
+> never be removed once being added to the list since the fact of running
+> in a VM never changes, regardless of whether this hypervisor supports
+> extra VMM hypercalls.
 
-I'm not totally convinced.
+This is what I imagined, this list will be forever, and this worries me.
 
-Please give it a go in the changelog for the next one and try to
-convince me that this is a good idea.  Focus on what the downsides will
-be if the kernel does not enforce this policy.  What will break, and why
-will it be bad?  Why is the kernel in the best position to thwart the
-badness?
+I don't know if it is true or not, but guess that at least Oracle and
+Microsoft bare metal devices and VMs will have same DMI_SYS_VENDOR.
+
+It means that this on_bare_metal() function won't work reliably in many
+cases. Also being part of include/linux/msi.h, at some point of time,
+this function will be picked by the users outside for the non-IMS cases.
+
+I didn't even mention custom forks of QEMU which are prohibited to change
+DMI_SYS_VENDOR and private clouds with custom solutions.
+
+The current array makes DMI_SYS_VENDOR interface as some sort of ABI. If in the future,
+the QEMU will decide to use more hipster name, for example "qEmU", this function
+won't work.
+
+I'm aware that DMI_SYS_VENDOR is used heavily in the kernel code and
+various names for the same company are good example how not reliable it.
+
+The most hilarious example is "Dell/Dell Inc./Dell Inc/Dell Computer Corporation/Dell Computer",
+but other companies are not far from them.
+
+Luckily enough, this identification is used for hardware product that
+was released to the market and their name will be stable for that
+specific model. It is not the case here where we need to ensure future
+compatibility too (old kernel on new VM emulator).
+
+I'm not in position to say yes or no to this patch and don't have plans to do it.
+Just expressing my feeling that this solution is too hacky for my taste.
+
+Thanks
