@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AE4662ECCFB
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 10:42:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9F8C2ECCFD
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 10:42:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727688AbhAGJkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 04:40:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31963 "EHLO
+        id S1727727AbhAGJkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 04:40:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41604 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727610AbhAGJks (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 04:40:48 -0500
+        by vger.kernel.org with ESMTP id S1727610AbhAGJkw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 04:40:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610012362;
+        s=mimecast20190719; t=1610012366;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QpH2fjiVtXz9ckPRo6YT7XYAC/uU1d0touoV4p4Y/5U=;
-        b=MQc5cWy1ts4tnUzn5bqjWjuAgeKo0PxXMt5HYgD0d8zQGherXtrE6J9NIHE6EJaG8Tx8Rr
-        C/Nj/csznwM5HwQYFIfZifqTCqizE0HcyqxHRro5cJjZBAOFGIJZI5pylVrgS5SGtN9gVi
-        Q/Re9JFxupU0Rhmc4Bkh8/xYin2qIro=
+        bh=/rUDn4iUvZuPv1RG4V69vuqnelYUdquiGujPqeCfAnA=;
+        b=YE4wXhDitRzgVI7IN80dJzghK65AZ2Scem55IwuCJ0+Mfj0gxmUYmYiRxz3C+z6zooLFN4
+        /FC//A8fX5hxNNmKSHq87hdGOgPTjKHv6idJB15pqWi2OeHsW64Xsarf0VKbXGu/Wi6C8z
+        N1LXv0N0BbJ7mLHexE2Ldo+TLJ6IWug=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-KXA1ZzSDMxGau1ymw8qfVQ-1; Thu, 07 Jan 2021 04:39:20 -0500
-X-MC-Unique: KXA1ZzSDMxGau1ymw8qfVQ-1
+ us-mta-231-m098VikkMHCG-6o0mpOXiA-1; Thu, 07 Jan 2021 04:39:24 -0500
+X-MC-Unique: m098VikkMHCG-6o0mpOXiA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADD4D801817;
-        Thu,  7 Jan 2021 09:39:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1BDA10054FF;
+        Thu,  7 Jan 2021 09:39:22 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 126E019714;
-        Thu,  7 Jan 2021 09:39:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2375E19D7D;
+        Thu,  7 Jan 2021 09:39:18 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -48,9 +48,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 3/4] KVM: nSVM: always leave the nested state first on KVM_SET_NESTED_STATE
-Date:   Thu,  7 Jan 2021 11:38:53 +0200
-Message-Id: <20210107093854.882483-4-mlevitsk@redhat.com>
+Subject: [PATCH v2 4/4] KVM: nSVM: mark vmcb as dirty when forcingly leaving the guest mode
+Date:   Thu,  7 Jan 2021 11:38:54 +0200
+Message-Id: <20210107093854.882483-5-mlevitsk@redhat.com>
 In-Reply-To: <20210107093854.882483-1-mlevitsk@redhat.com>
 References: <20210107093854.882483-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -60,8 +60,8 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This should prevent bad things from happening if the user calls the
-KVM_SET_NESTED_STATE twice.
+We overwrite most of vmcb fields while doing so, so we must
+mark it as dirty.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
@@ -69,17 +69,17 @@ Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index cc3130ab612e5..e91d40c8d8c91 100644
+index e91d40c8d8c91..c340fbad88566 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -1200,6 +1200,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 * in the registers, the save area of the nested state instead
- 	 * contains saved L1 state.
- 	 */
-+	svm_leave_nested(svm);
+@@ -760,6 +760,7 @@ void svm_leave_nested(struct vcpu_svm *svm)
+ 		leave_guest_mode(&svm->vcpu);
+ 		copy_vmcb_control_area(&vmcb->control, &hsave->control);
+ 		nested_svm_uninit_mmu_context(&svm->vcpu);
++		vmcb_mark_all_dirty(svm->vmcb);
+ 	}
  
- 	svm->nested.nested_run_pending =
- 		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
+ 	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, &svm->vcpu);
 -- 
 2.26.2
 
