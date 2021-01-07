@@ -2,106 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 096462ECE7A
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 12:15:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADA362ECEA6
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 12:22:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727756AbhAGLPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 06:15:10 -0500
-Received: from mail.wangsu.com ([123.103.51.227]:54794 "EHLO wangsu.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726415AbhAGLPK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 06:15:10 -0500
-X-Greylist: delayed 1082 seconds by postgrey-1.27 at vger.kernel.org; Thu, 07 Jan 2021 06:15:09 EST
-Received: from DESKTOP-IVCA4LL (unknown [218.107.205.212])
-        by app2 (Coremail) with SMTP id 4zNnewBXS8y06PZfdHgEAA--.5367S2;
-        Thu, 07 Jan 2021 18:55:50 +0800 (CST)
-Date:   Thu, 7 Jan 2021 18:55:49 +0800
-From:   "Xinlong Lin" <linxl3@wangsu.com>
-To:     "Sean Christopherson" <seanjc@google.com>,
-        vkuznets <vkuznets@redhat.com>
-Cc:     "Nitesh Narayan Lal" <nitesh@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        kvm <kvm@vger.kernel.org>, w90p710 <w90p710@gmail.com>,
-        pbonzini <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>
-Subject: Re: Re: [PATCH] Revert "KVM: x86: Unconditionally enable irqs in guest context"
-References: <20210105192844.296277-1-nitesh@redhat.com>, 
-        <874kjuidgp.fsf@vitty.brq.redhat.com>, 
-        <X/XvWG18aBWocvvf@google.com>
-X-Priority: 3
-X-GUID: AC7D6AA7-9F08-4226-B628-E8232D89EDBB
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.18.95[cn]
-Mime-Version: 1.0
-Message-ID: <2021010718554863665911@wangsu.com>
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: base64
-X-CM-TRANSID: 4zNnewBXS8y06PZfdHgEAA--.5367S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr4DGr4kCw4xKFyUGw47CFg_yoW5GFW8pF
-        W8CF1vkFs3Xa4xK392ywsFga1av3ykKwsxArs5GayIyw4jyw18Xr47GrZ0yFn5Zw4ruF1S
-        vr1F9F9xCFWUAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkFb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-        cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-        v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4UJVW0owA2z4x0Y4vE
-        x4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzx
-        vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VCjz48v1sIEY20_Gr4l
-        Ox8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4xvF2IEb7IF0Fy264kE64k0F2
-        4lc2xSY4AK67AK6r4DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I
-        3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxV
-        WUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAF
-        wI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcI
-        k0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
-        JVW8JwCE64xvF2IEb7IF0Fy7YxBIdaVFxhVjvjDU0xZFpf9x07jdTmDUUUUU=
-X-CM-SenderInfo: holq5zmt6zt0xjvxhudrp/
+        id S1727717AbhAGLV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 06:21:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35538 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726925AbhAGLV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 06:21:58 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E3407221E9;
+        Thu,  7 Jan 2021 11:21:17 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kxTLv-005p1o-Sg; Thu, 07 Jan 2021 11:21:16 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Qian Cai <qcai@redhat.com>,
+        Shannon Zhao <shannon.zhao@linux.alibaba.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.11, take #1
+Date:   Thu,  7 Jan 2021 11:20:43 +0000
+Message-Id: <20210107112101.2297944-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, dbrazdil@google.com, eric.auger@redhat.com, mark.rutland@arm.com, natechancellor@gmail.com, qcai@redhat.com, shannon.zhao@linux.alibaba.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMjAyMS0wMS0wNyBhdMKgMDE6MTEsIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6Cj5PbiBX
-ZWQsIEphbiAwNiwgMjAyMSwgVml0YWx5IEt1em5ldHNvdiB3cm90ZToKPj4gTml0ZXNoIE5hcmF5
-YW4gTGFsIDxuaXRlc2hAcmVkaGF0LmNvbT4gd3JpdGVzOgo+PiA+IGRpZmYgLS1naXQgYS9hcmNo
-L3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2LmMKPj4gPiBpbmRleCAzZjdjMWZjN2Ez
-Y2UuLjNlMTdjOWZmY2FkOCAxMDA2NDQKPj4gPiAtLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMKPj4g
-PiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMKPj4gPiBAQCAtOTAyMywxOCArOTAyMyw3IEBAIHN0
-YXRpYyBpbnQgdmNwdV9lbnRlcl9ndWVzdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ID7CoAo+
-PiA+wqAga3ZtX3g4Nl9vcHMuaGFuZGxlX2V4aXRfaXJxb2ZmKHZjcHUpOwo+PiA+wqAKPj4gPiAt
-CS8qCj4+ID4gLQkqIENvbnN1bWUgYW55IHBlbmRpbmcgaW50ZXJydXB0cywgaW5jbHVkaW5nIHRo
-ZSBwb3NzaWJsZSBzb3VyY2Ugb2YKPj4gPiAtCSogVk0tRXhpdCBvbiBTVk0KPj4KPj4gSSBraW5k
-IG9mIGxpa2VkIHRoaXMgcGFydCBvZiB0aGUgY29tbWVudCwgdGhlIG5ldyAob2xkKSBvbmUgaW4K
-Pj4gc3ZtX2hhbmRsZV9leGl0X2lycW9mZigpIGRvZXNuJ3QgYWN0dWFsbHkgZXhwbGFpbiB3aGF0
-J3MgZ29pbmcgb24uCj4+Cj4+ID4gYW5kIGFueSB0aWNrcyB0aGF0IG9jY3VyIGJldHdlZW4gVk0t
-RXhpdCBhbmQgbm93Lgo+Pgo+PiBMb29raW5nIGJhY2ssIEkgZG9uJ3QgcXVpdGUgdW5kZXJzdGFu
-ZCB3aHkgd2Ugd2FudGVkIHRvIGFjY291bnQgdGlja3MKPj4gYmV0d2VlbiB2bWV4aXQgYW5kIGV4
-aXRpbmcgZ3Vlc3QgY29udGV4dCBhcyAnZ3Vlc3QnIGluIHRoZSBmaXJzdCBwbGFjZTsKPj4gdG8g
-bXkgdW5kZXJzdGFuZ2luZyAnZ3Vlc3QgdGltZScgaXMgdGltZSBzcGVudCB3aXRoaW4gVk1YIG5v
-bi1yb290Cj4+IG9wZXJhdGlvbiwgdGhlIHJlc3QgaXMgS1ZNIG92ZXJoZWFkIChzeXN0ZW0pLgo+
-Cj5XaXRoIHRpY2stYmFzZWQgYWNjb3VudGluZywgaWYgdGhlIHRpY2sgSVJRIGlzIHJlY2VpdmVk
-IGFmdGVyIFBGX1ZDUFUgaXMgY2xlYXJlZAo+dGhlbiB0aGF0IHRpY2sgd2lsbCBiZSBhY2NvdW50
-ZWQgdG8gdGhlIGhvc3Qvc3lzdGVtLsKgIFRoZSBtb3RpdmF0aW9uIGZvciBvcGVuaW5nCj5hbiBJ
-UlEgd2luZG93IGFmdGVyIFZNLUV4aXQgaXMgdG8gaGFuZGxlIHRoZSBjYXNlIHdoZXJlIHRoZSBn
-dWVzdCBpcyBjb25zdGFudGx5Cj5leGl0aW5nIGZvciBhIGRpZmZlcmVudCByZWFzb24gX2p1c3Rf
-IGJlZm9yZSB0aGUgdGljayBhcnJpdmVzLCBlLmcuIGlmIHRoZSBndWVzdAo+aGFzIGl0cyB0aWNr
-IGNvbmZpZ3VyZWQgc3VjaCB0aGF0IHRoZSBndWVzdCBhbmQgaG9zdCB0aWNrcyBnZXQgc3luY2hy
-b25pemVkCj5pbiBhIGJhZCB3YXkuCj4KPlRoaXMgaXMgYSBub24taXNzdWUgd2hlbiB1c2luZyBD
-T05GSUdfVklSVF9DUFVfQUNDT1VOVElOR19HRU49eSwgYXQgbGVhc3Qgd2l0aCBhCj5zdGFibGUg
-VFNDLCBhcyB0aGUgYWNjb3VudGluZyBoYXBwZW5zIGR1cmluZyBndWVzdF9leGl0X2lycW9mZigp
-IGl0c2VsZi4KPkFjY291bnRpbmcgbWlnaHQgYmUgbGVzcy10aGFuLXN0ZWxsYXIgaWYgVFNDIGlz
-IHVuc3RhYmxlLCBidXQgSSBkb24ndCB0aGluayBpdAo+d291bGQgYmUgYXMgYmluYXJ5IG9mIGEg
-ZmFpbHVyZSBhcyB0aWNrLWJhc2VkIGFjY291bnRpbmcuIAoKSWYgSSBkb24ndCBzcGVjaWZ5ICJu
-b2h6X2Z1bGwiIGluIGJvb3QgY29tbWFuZCBsaW5lIHdoZW4gdXNpbmcKQ09ORklHX1ZJUlRfQ1BV
-X0FDQ09VTlRJTkdfR0VOPXksIFdpbGwgdGhlIHByb2JsZW0gc3RpbGwgZXhpc3Q/Cgo+Cj4+IEl0
-IHNlZW1zIHRvIG1hdGNoIGhvdyB0aGUgYWNjb3VudGluZyBpcyBkb25lIG5vd2FkYXlzIGFmdGVy
-IFRnbHgncwo+PiA4N2ZhN2YzZTk4YTEgKCJ4ODYva3ZtOiBNb3ZlIGNvbnRleHQgdHJhY2tpbmcg
-d2hlcmUgaXQgYmVsb25ncyIpLgo+Pgo+PiA+IC0JKiBBbiBpbnN0cnVjdGlvbiBpcyByZXF1aXJl
-ZCBhZnRlciBsb2NhbF9pcnFfZW5hYmxlKCkgdG8gZnVsbHkgdW5ibG9jawo+PiA+IC0JKiBpbnRl
-cnJ1cHRzIG9uIHByb2Nlc3NvcnMgdGhhdCBpbXBsZW1lbnQgYW4gaW50ZXJydXB0IHNoYWRvdywg
-dGhlCj4+ID4gLQkqIHN0YXQuZXhpdHMgaW5jcmVtZW50IHdpbGwgZG8gbmljZWx5Lgo+PiA+IC0J
-Ki8KPj4gPiAtCWt2bV9iZWZvcmVfaW50ZXJydXB0KHZjcHUpOwo+PiA+IC0JbG9jYWxfaXJxX2Vu
-YWJsZSgpOwo+PiA+wqAgKyt2Y3B1LT5zdGF0LmV4aXRzOwo+PiA+IC0JbG9jYWxfaXJxX2Rpc2Fi
-bGUoKTsKPj4gPiAtCWt2bV9hZnRlcl9pbnRlcnJ1cHQodmNwdSk7Cj4+ID7CoAo+PiA+wqAgaWYg
-KGxhcGljX2luX2tlcm5lbCh2Y3B1KSkgewo+PiA+wqAgczY0IGRlbHRhID0gdmNwdS0+YXJjaC5h
-cGljLT5sYXBpY190aW1lci5hZHZhbmNlX2V4cGlyZV9kZWx0YTsKPj4KPj4gRldJVywKPj4KPj4g
-UmV2aWV3ZWQtYnk6IFZpdGFseSBLdXpuZXRzb3YgPHZrdXpuZXRzQHJlZGhhdC5jb20+Cj4+Cj4+
-IC0tCj4+IFZpdGFseQo+Pg==
+Hi Paolo,
 
+Happy New Year!
+
+Here's a first set of fixes for 5.11, most of which are just
+cleanups. I may have some more meaty stuff next week, but let's ease
+back into it as gently as possible...
+
+Please pull,
+
+	M.
+
+The following changes since commit 3a514592b698588326924625b6948a10c35fadd5:
+
+  Merge remote-tracking branch 'origin/kvm-arm64/psci-relay' into kvmarm-master/next (2020-12-09 10:00:24 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.11-1
+
+for you to fetch changes up to 45ba7b195a369f35cb39094fdb32efe5908b34ad:
+
+  arm64: cpufeature: remove non-exist CONFIG_KVM_ARM_HOST (2021-01-05 13:22:07 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.11, take #1
+
+- VM init cleanups
+- PSCI relay cleanups
+- Kill CONFIG_KVM_ARM_PMU
+- Fixup __init annotations
+- Fixup reg_to_encoding()
+- Fix spurious PMCR_EL0 access
+
+----------------------------------------------------------------
+Alexandru Elisei (5):
+      KVM: Documentation: Add arm64 KVM_RUN error codes
+      KVM: arm64: arch_timer: Remove VGIC initialization check
+      KVM: arm64: Move double-checked lock to kvm_vgic_map_resources()
+      KVM: arm64: Update comment in kvm_vgic_map_resources()
+      KVM: arm64: Remove redundant call to kvm_pmu_vcpu_reset()
+
+David Brazdil (6):
+      KVM: arm64: Prevent use of invalid PSCI v0.1 function IDs
+      KVM: arm64: Use lm_alias in nVHE-only VA conversion
+      KVM: arm64: Skip computing hyp VA layout for VHE
+      KVM: arm64: Minor cleanup of hyp variables used in host
+      KVM: arm64: Remove unused includes in psci-relay.c
+      KVM: arm64: Move skip_host_instruction to adjust_pc.h
+
+Marc Zyngier (6):
+      KVM: arm64: Don't access PMCR_EL0 when no PMU is available
+      KVM: arm64: Declutter host PSCI 0.1 handling
+      KVM: arm64: Consolidate dist->ready setting into kvm_vgic_map_resources()
+      KVM: arm64: Fix hyp_cpu_pm_{init,exit} __init annotation
+      KVM: arm64: Remove spurious semicolon in reg_to_encoding()
+      KVM: arm64: Replace KVM_ARM_PMU with HW_PERF_EVENTS
+
+Shannon Zhao (1):
+      arm64: cpufeature: remove non-exist CONFIG_KVM_ARM_HOST
+
+ Documentation/virt/kvm/api.rst             |  9 ++++-
+ arch/arm64/include/asm/kvm_host.h          | 23 ++++++++++++
+ arch/arm64/kernel/cpufeature.c             |  2 +-
+ arch/arm64/kernel/smp.c                    |  2 +-
+ arch/arm64/kvm/Kconfig                     |  8 ----
+ arch/arm64/kvm/Makefile                    |  2 +-
+ arch/arm64/kvm/arch_timer.c                |  7 ++--
+ arch/arm64/kvm/arm.c                       | 32 +++++++++-------
+ arch/arm64/kvm/hyp/include/hyp/adjust_pc.h |  9 +++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c         | 12 +-----
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c          |  6 +--
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c       | 59 +++++++++++-------------------
+ arch/arm64/kvm/pmu-emul.c                  |  2 -
+ arch/arm64/kvm/sys_regs.c                  |  6 ++-
+ arch/arm64/kvm/va_layout.c                 |  7 ++--
+ arch/arm64/kvm/vgic/vgic-init.c            | 11 +++++-
+ arch/arm64/kvm/vgic/vgic-v2.c              | 20 +++-------
+ arch/arm64/kvm/vgic/vgic-v3.c              | 21 +++--------
+ include/kvm/arm_pmu.h                      |  2 +-
+ 19 files changed, 122 insertions(+), 118 deletions(-)
