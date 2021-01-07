@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A9612EE87A
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:26:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD73D2EE87D
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:26:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728364AbhAGWZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:25:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46194 "EHLO
+        id S1728388AbhAGWZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:25:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727624AbhAGWZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:25:16 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E318C0612FC
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:24:36 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id c5so7105998wrp.6
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:24:36 -0800 (PST)
+        with ESMTP id S1728377AbhAGWZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:25:22 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C4DC0612F4
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:24:41 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id 91so7126291wrj.7
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:24:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LDza1xPJHLgPcRTP3LkN+2X1iZhd2c06drajcL8+MJU=;
-        b=u7McaY5ZOFPgSgui9Y82tO0QSZuNWvAtKwv1fJAJ3BzvICR2REIrXHvhezyAD/caAz
-         awSqgWTLvWnOY8zw7Zz5gwtrvPeui0P1VAGCO+zvYPy8gOB2LkZSvhA9QEjmD6Li4N3E
-         Usp9xMHF6tCUriJroaGarSi1mjk7Do+jmXyStVih6KykFVMqRI5FC952hSS+NogEdmTm
-         lqiFpzt6RpUuKryqezm4mHFD+Oz4zx9F789e4ZLEeK9xrd7d47Xmp0ngdC+DHZwyLAgi
-         DQog/Xll9uXaPNxKyPjXJRqa+uD9dHCSiMZhViGvI+ZIyCz0N6AXP/laxVpNCuB2Uc8F
-         Czhw==
+        bh=BdvOr2p5e3AFDonK5fThCYYux8AoIQfWjQUjO/9FW44=;
+        b=hwGpYqgsBrt8RY1HuRli/31VBn1stCz3HY4qy/2+KSAaVLUC7MW6I9MfTElD83ThLH
+         Rq+rb4jUfjGfZYieLVG9pVMoKpYAF1arCFLNegnLfcEPYShSmWIspdbf6+CLDuaQbBss
+         vcbh3zOt26pmnUaAOcFOOmu7zzKtTjKIKrwolxpFOrehkyxV9/Zw+KvzFWu78wO2yQfN
+         saupQoB/fXaR7Dl+193mozULT5+JUTrLiWWAba6Eaa8rR2FJAd4Z41LnlaHzziManKR3
+         Vae67dVp0JdgU7mADLcjh74NkaEr9caPF9io499T76mMSyqCOKMLQ6m3Q3htQMk2DPUD
+         mRyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=LDza1xPJHLgPcRTP3LkN+2X1iZhd2c06drajcL8+MJU=;
-        b=t1uA4ziOBt5uhInUg/+LZE/GLc9kuP8M20ombs4nFnK/MsAlTaJv0WE0ODLbkwyssP
-         WcMBEoRmcy//OcZ/cdpEs3ywIomfk8cfKisz6IO/YGzsZslMyX7d/PNIJvpn2Rg6gvlK
-         aLVvbh0Pp4sP/oxMrL98vWt8PXWYzeCar0/Oi7sdQlzkgwgEXNQtSh+Q9zPanh111g89
-         1nGcgaR2+4ne0D3e7T0Fcz8hMHgSKeP0PiSCysVGpVAGBWklhP2uq6VzLRWM5Do32NRy
-         F7xJB6YBmOCDxRe1TyPd/necmsF40QMEqfZMwl5GBZHNyZBy8JP0PoLcMaTOypSr7d9n
-         hJPg==
-X-Gm-Message-State: AOAM532ZYUFG9EriI0no2NUeHLl+XuMcexRZUSy1G+2cB3bYZs2TGDlq
-        24zCnglztRk5t3CM+ysnZp0=
-X-Google-Smtp-Source: ABdhPJzZbJj2jP0coNCZGst8B6hah0/bCVtvfFQLvcALnm39BBi1/wYWYtIpo/dUiEchSaYAkdfcWw==
-X-Received: by 2002:adf:e406:: with SMTP id g6mr657530wrm.255.1610058275274;
-        Thu, 07 Jan 2021 14:24:35 -0800 (PST)
+        bh=BdvOr2p5e3AFDonK5fThCYYux8AoIQfWjQUjO/9FW44=;
+        b=X2QrVkQmstJkzARq0TzdOZqhXM4KaE/Br1RHVNDt1AOVvtCZ66SOHGIFB6VSievOZ1
+         kKPHsOuknh38oDjPJRHzen4vJCkGYUchBlBzEcXqEQp27mq1iOotLiZOeAurLtL+Atao
+         quxdZI6SoXFsqVGpPrdQpuRuyk/CA34DaMuZy1CuGnSgM087rNlEwxkHviv0z/nyZykX
+         ARCc72+dZzhzMommgyM9l4895fxZ3MuRv9qsWHTTut6lDD7hhov8clMz1e795je3N3zM
+         IWz/ViLSdhJBqNteLMFzFtA/qnGqlTLq3Vlhqif8Y9QolsmhaUsrKFgk/MBNe4uUAMjR
+         b7VQ==
+X-Gm-Message-State: AOAM531eKZBii6M17Ge31rwyRa6t1/Q7inLb9ZkGJFOF7cIvIw8py4Mw
+        AfFYZpjede2fmpeYp4PLBuc=
+X-Google-Smtp-Source: ABdhPJwoOP4/MnQmrVOFNw4uDBAloO9OP/Lwaa31bQpI1Ive3RvPcRsEVeF3b1fqUYw6lGLA+fd/1Q==
+X-Received: by 2002:a5d:6cd4:: with SMTP id c20mr671220wrc.57.1610058280376;
+        Thu, 07 Jan 2021 14:24:40 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id k1sm10356498wrn.46.2021.01.07.14.24.34
+        by smtp.gmail.com with ESMTPSA id m21sm9418533wml.13.2021.01.07.14.24.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:24:34 -0800 (PST)
+        Thu, 07 Jan 2021 14:24:39 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 19/66] target/mips: Inline cpu_state_reset() in mips_cpu_reset()
-Date:   Thu,  7 Jan 2021 23:22:06 +0100
-Message-Id: <20210107222253.20382-20-f4bug@amsat.org>
+Subject: [PULL 20/66] target/mips: Extract FPU helpers to 'fpu_helper.h'
+Date:   Thu,  7 Jan 2021 23:22:07 +0100
+Message-Id: <20210107222253.20382-21-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,58 +73,277 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201214183739.500368-2-f4bug@amsat.org>
----
- target/mips/cpu.c | 26 +++++++++-----------------
- 1 file changed, 9 insertions(+), 17 deletions(-)
+Extract FPU specific helpers from "internal.h" to "fpu_helper.h".
 
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 12126d37f16..4a251e2d3e8 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -104,10 +104,16 @@ static bool mips_cpu_has_work(CPUState *cs)
- 
- #include "translate_init.c.inc"
- 
--/* TODO QOM'ify CPU reset and remove */
--static void cpu_state_reset(CPUMIPSState *env)
-+static void mips_cpu_reset(DeviceState *dev)
- {
--    CPUState *cs = env_cpu(env);
-+    CPUState *cs = CPU(dev);
-+    MIPSCPU *cpu = MIPS_CPU(cs);
-+    MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(cpu);
-+    CPUMIPSState *env = &cpu->env;
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201120210844.2625602-2-f4bug@amsat.org>
+---
+ target/mips/fpu_helper.h         | 59 ++++++++++++++++++++++++++++++++
+ target/mips/internal.h           | 49 --------------------------
+ linux-user/mips/cpu_loop.c       |  1 +
+ target/mips/fpu_helper.c         |  1 +
+ target/mips/gdbstub.c            |  1 +
+ target/mips/kvm.c                |  1 +
+ target/mips/machine.c            |  1 +
+ target/mips/msa_helper.c         |  1 +
+ target/mips/op_helper.c          |  2 +-
+ target/mips/translate.c          |  1 +
+ target/mips/translate_init.c.inc |  2 ++
+ 11 files changed, 69 insertions(+), 50 deletions(-)
+ create mode 100644 target/mips/fpu_helper.h
+
+diff --git a/target/mips/fpu_helper.h b/target/mips/fpu_helper.h
+new file mode 100644
+index 00000000000..1c2d6d35a71
+--- /dev/null
++++ b/target/mips/fpu_helper.h
+@@ -0,0 +1,59 @@
++/*
++ * Helpers for emulation of FPU-related MIPS instructions.
++ *
++ *  Copyright (C) 2004-2005  Jocelyn Mayer
++ *
++ * SPDX-License-Identifier: LGPL-2.1-or-later
++ */
++#include "fpu/softfloat-helpers.h"
++#include "cpu.h"
 +
-+    mcc->parent_reset(dev);
++extern const FloatRoundMode ieee_rm[4];
 +
-+    memset(env, 0, offsetof(CPUMIPSState, end_reset_fields));
++uint32_t float_class_s(uint32_t arg, float_status *fst);
++uint64_t float_class_d(uint64_t arg, float_status *fst);
++
++static inline void restore_rounding_mode(CPUMIPSState *env)
++{
++    set_float_rounding_mode(ieee_rm[env->active_fpu.fcr31 & 3],
++                            &env->active_fpu.fp_status);
++}
++
++static inline void restore_flush_mode(CPUMIPSState *env)
++{
++    set_flush_to_zero((env->active_fpu.fcr31 & (1 << FCR31_FS)) != 0,
++                      &env->active_fpu.fp_status);
++}
++
++static inline void restore_snan_bit_mode(CPUMIPSState *env)
++{
++    set_snan_bit_is_one((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) == 0,
++                        &env->active_fpu.fp_status);
++}
++
++static inline void restore_fp_status(CPUMIPSState *env)
++{
++    restore_rounding_mode(env);
++    restore_flush_mode(env);
++    restore_snan_bit_mode(env);
++}
++
++/* MSA */
++
++enum CPUMIPSMSADataFormat {
++    DF_BYTE = 0,
++    DF_HALF,
++    DF_WORD,
++    DF_DOUBLE
++};
++
++static inline void restore_msa_fp_status(CPUMIPSState *env)
++{
++    float_status *status = &env->active_tc.msa_fp_status;
++    int rounding_mode = (env->active_tc.msacsr & MSACSR_RM_MASK) >> MSACSR_RM;
++    bool flush_to_zero = (env->active_tc.msacsr & MSACSR_FS_MASK) != 0;
++
++    set_float_rounding_mode(ieee_rm[rounding_mode], status);
++    set_flush_to_zero(flush_to_zero, status);
++    set_flush_inputs_to_zero(flush_to_zero, status);
++}
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 77a648bcf9c..f159187b246 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -9,7 +9,6 @@
+ #define MIPS_INTERNAL_H
  
-     /* Reset registers to their default values */
-     env->CP0_PRid = env->cpu_model->CP0_PRid;
-@@ -330,20 +336,6 @@ static void cpu_state_reset(CPUMIPSState *env)
-         /* UHI interface can be used to obtain argc and argv */
-         env->active_tc.gpr[4] = -1;
-     }
+ #include "exec/memattrs.h"
+-#include "fpu/softfloat-helpers.h"
+ 
+ /*
+  * MMU types, the first four entries have the same layout as the
+@@ -75,13 +74,6 @@ struct mips_def_t {
+ extern const struct mips_def_t mips_defs[];
+ extern const int mips_defs_number;
+ 
+-enum CPUMIPSMSADataFormat {
+-    DF_BYTE = 0,
+-    DF_HALF,
+-    DF_WORD,
+-    DF_DOUBLE
+-};
+-
+ void mips_cpu_do_interrupt(CPUState *cpu);
+ bool mips_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ void mips_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+@@ -220,49 +212,8 @@ bool mips_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                        bool probe, uintptr_t retaddr);
+ 
+ /* op_helper.c */
+-uint32_t float_class_s(uint32_t arg, float_status *fst);
+-uint64_t float_class_d(uint64_t arg, float_status *fst);
+-
+-extern const FloatRoundMode ieee_rm[4];
+-
+ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask);
+ 
+-static inline void restore_rounding_mode(CPUMIPSState *env)
+-{
+-    set_float_rounding_mode(ieee_rm[env->active_fpu.fcr31 & 3],
+-                            &env->active_fpu.fp_status);
 -}
 -
--static void mips_cpu_reset(DeviceState *dev)
+-static inline void restore_flush_mode(CPUMIPSState *env)
 -{
--    CPUState *s = CPU(dev);
--    MIPSCPU *cpu = MIPS_CPU(s);
--    MIPSCPUClass *mcc = MIPS_CPU_GET_CLASS(cpu);
--    CPUMIPSState *env = &cpu->env;
+-    set_flush_to_zero((env->active_fpu.fcr31 & (1 << FCR31_FS)) != 0,
+-                      &env->active_fpu.fp_status);
+-}
 -
--    mcc->parent_reset(dev);
+-static inline void restore_snan_bit_mode(CPUMIPSState *env)
+-{
+-    set_snan_bit_is_one((env->active_fpu.fcr31 & (1 << FCR31_NAN2008)) == 0,
+-                        &env->active_fpu.fp_status);
+-}
 -
--    memset(env, 0, offsetof(CPUMIPSState, end_reset_fields));
+-static inline void restore_fp_status(CPUMIPSState *env)
+-{
+-    restore_rounding_mode(env);
+-    restore_flush_mode(env);
+-    restore_snan_bit_mode(env);
+-}
 -
--    cpu_state_reset(env);
+-static inline void restore_msa_fp_status(CPUMIPSState *env)
+-{
+-    float_status *status = &env->active_tc.msa_fp_status;
+-    int rounding_mode = (env->active_tc.msacsr & MSACSR_RM_MASK) >> MSACSR_RM;
+-    bool flush_to_zero = (env->active_tc.msacsr & MSACSR_FS_MASK) != 0;
+-
+-    set_float_rounding_mode(ieee_rm[rounding_mode], status);
+-    set_flush_to_zero(flush_to_zero, status);
+-    set_flush_inputs_to_zero(flush_to_zero, status);
+-}
+-
+ static inline void restore_pamask(CPUMIPSState *env)
+ {
+     if (env->hflags & MIPS_HFLAG_ELPA) {
+diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+index 19947448a25..9d813ece4e7 100644
+--- a/linux-user/mips/cpu_loop.c
++++ b/linux-user/mips/cpu_loop.c
+@@ -23,6 +23,7 @@
+ #include "cpu_loop-common.h"
+ #include "elf.h"
+ #include "internal.h"
++#include "fpu_helper.h"
  
- #ifndef CONFIG_USER_ONLY
-     if (kvm_enabled()) {
+ # ifdef TARGET_ABI_MIPSO32
+ #  define MIPS_SYSCALL_NUMBER_UNUSED -1
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 91b6a2e11fc..6dd853259e2 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -27,6 +27,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
+ #include "fpu/softfloat.h"
++#include "fpu_helper.h"
+ 
+ 
+ /* Complex FPU operations which may need stack space. */
+diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
+index e39f8d75cf0..f1c2a2cf6d6 100644
+--- a/target/mips/gdbstub.c
++++ b/target/mips/gdbstub.c
+@@ -21,6 +21,7 @@
+ #include "cpu.h"
+ #include "internal.h"
+ #include "exec/gdbstub.h"
++#include "fpu_helper.h"
+ 
+ int mips_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ {
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 477692566a4..a5b6fe35dbc 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -24,6 +24,7 @@
+ #include "sysemu/runstate.h"
+ #include "kvm_mips.h"
+ #include "hw/boards.h"
++#include "fpu_helper.h"
+ 
+ #define DEBUG_KVM 0
+ 
+diff --git a/target/mips/machine.c b/target/mips/machine.c
+index 77afe654e91..b5fda6a2786 100644
+--- a/target/mips/machine.c
++++ b/target/mips/machine.c
+@@ -2,6 +2,7 @@
+ #include "cpu.h"
+ #include "internal.h"
+ #include "migration/cpu.h"
++#include "fpu_helper.h"
+ 
+ static int cpu_post_load(void *opaque, int version_id)
+ {
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 249f0fdad80..b89b4c44902 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -23,6 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "fpu/softfloat.h"
++#include "fpu_helper.h"
+ 
+ /* Data format min and max values */
+ #define DF_BITS(df) (1 << ((df) + 3))
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 5aa97902e98..3386b8228e9 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -24,7 +24,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
+ #include "exec/memop.h"
+-
++#include "fpu_helper.h"
+ 
+ /*****************************************************************************/
+ /* Exceptions processing helpers */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index e813add99c5..f8f0f95509c 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -35,6 +35,7 @@
+ #include "exec/translator.h"
+ #include "exec/log.h"
+ #include "qemu/qemu-print.h"
++#include "fpu_helper.h"
+ 
+ #define MIPS_DEBUG_DISAS 0
+ 
+diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
+index 0ba3cf18ef7..044052fb77c 100644
+--- a/target/mips/translate_init.c.inc
++++ b/target/mips/translate_init.c.inc
+@@ -18,6 +18,8 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include "fpu_helper.h"
++
+ /* CPU / CPU family specific config register values. */
+ 
+ /* Have config1, uncached coherency */
 -- 
 2.26.2
 
