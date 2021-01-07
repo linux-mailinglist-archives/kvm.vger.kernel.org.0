@@ -2,119 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 634A92ECC46
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 10:05:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10FAF2ECCB1
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 10:28:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726328AbhAGJFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 04:05:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33828 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726110AbhAGJFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 04:05:36 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CB8C0612F4
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 01:04:55 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id k10so4511093wmi.3
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 01:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=o8yL9n6HozE/Ex7MpyYHQRdFZh6hCZGjqNJdBYi9rxY=;
-        b=BZNxmvRE/fhiKHRJzoYgrsU7xE+Z2bPnN3/aRBoRO+rCIWT22vHuFE+OZ4CdNMtGjQ
-         7fcjDd3Bp587obk6VDB1lpxjBiKLqIUDR0NyTPYIeKxjQQp7m6uctU301BAgKZp8eNpd
-         GAsN97T6YiaQ7CTRg/VfVYmdeQBcM5Jz02kpH7/9ySbWefzlhgMRvYzKbFBxEb9D8CQd
-         C3EtR4WKCjfNM4ulu71EwCCRhGRmmvYDELk3IsgWDXiRuKK1OItTHdXV8SMLyT2nbWMG
-         jnpbILHhgM+dQw2yI4IPp2QPN5c/zitVxR/zpkxDWfUWeDTVxFdm4mA6pKiDRW5YlyE1
-         GlvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=o8yL9n6HozE/Ex7MpyYHQRdFZh6hCZGjqNJdBYi9rxY=;
-        b=HATeDcUgVcD4qv9IDtjjwFM4UznFsb3hvfUWWza2LXqXSrhJZX35R3opNEjjOEjIKd
-         hdFDGKLf4xa2nDOaGjE25ODLOIjNJo0S3d0bbY7YjxKhyRQ6/SfwaDdA1EsvGvNEzvpA
-         MY7J4WqWOVY8f4+AOKFv0kue16Jy5LqdpRhTs55glInlu4kvog1C0ou9fd8hDJQ0YZFT
-         cZdGkRWvNz0mJdyOpGI5i9GZD1mjyo0zYlZMNchuG+A9hNCxRHDuGjskext3kwUqCGBA
-         /pV/gRropRSiqkfloDyshARrxANEri7JHfVEkuqUjSl5dmrDUBoQbpmNQd8TVK4YLYwT
-         +rYg==
-X-Gm-Message-State: AOAM533mmQ5bkwAUa9zLbigu/IdOBzwiuQy8SDe0jekwkml3SfjJ7mHT
-        zFo1DUwdHqh9pXbPMR95nCOaomPnZxU=
-X-Google-Smtp-Source: ABdhPJzCvph+Xqy8cmtQC5h/uhi/H8Oq2k9dRPL8gJ47bIyKbE+cmlyESYr4OyYwfxGz9184I/pGUQ==
-X-Received: by 2002:a1c:2ed2:: with SMTP id u201mr7067931wmu.79.1610010294442;
-        Thu, 07 Jan 2021 01:04:54 -0800 (PST)
-Received: from [192.168.1.36] (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id s12sm6530722wmh.29.2021.01.07.01.04.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jan 2021 01:04:53 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Subject: Re: [PATCH v2 03/24] target/mips/cpu: Introduce isa_rel6_available()
- helper
-To:     Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org
-References: <20201215225757.764263-1-f4bug@amsat.org>
- <20201215225757.764263-4-f4bug@amsat.org>
- <508441db-8748-1b55-5f39-e6a778c0bdc0@linaro.org>
- <40e8df0f-01ab-6693-785b-257b8d3144bf@amsat.org>
- <af357960-40f2-b9e6-485f-d1cf36a4e95d@flygoat.com>
- <b1e8b44c-ae6f-786c-abe0-9a03eb5d3d63@flygoat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0a0d8d4d-a0b6-dde5-e32d-17746ef57d53@amsat.org>
-Date:   Thu, 7 Jan 2021 10:04:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1727420AbhAGJ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 04:26:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45678 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727294AbhAGJ0x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 04:26:53 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4F1F523333;
+        Thu,  7 Jan 2021 09:26:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1610011571;
+        bh=ocDJtJI92hSvv87v7zQC5Co/Ose6YDdrm8p+0C/IJM8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=occebe3eK+e1I/sfF7TfkDnyJGw2ryKuMp0ceub2byakk7nH/HjmoAp+UElWSsYCS
+         cC43gUGZsNzUaZHxFDTICBjFwVAyor8kL1cMK+X9ydUo+q20IgQfHACYEZ+NWghYix
+         ri4n2vcUlFbE51FYukpL+SHHLjw0UkX6USgqipxQ=
+Date:   Thu, 7 Jan 2021 10:27:31 +0100
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     =?utf-8?B?5p2O5o23?= <jie6.li@samsung.com>
+Cc:     "mst@redhat.com" <mst@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?utf-8?B?6rmA6rK97IKw?= <ks0204.kim@samsung.com>,
+        =?utf-8?B?5L2V5YW0?= <xing84.he@samsung.com>,
+        =?utf-8?B?5ZCV6auY6aOe?= <gaofei.lv@samsung.com>
+Subject: Re: [PATCH] uio: uio_pci_generic: don't fail probe if pdev->irq
+ equals to IRQ_NOTCONNECTED
+Message-ID: <X/bUA2li9RyoFN7P@kroah.com>
+References: <CGME20210107075037epcms5p2b53d8edb70df2ad0f75613ecbbcf9456@epcms5p2>
+ <20210107075037epcms5p2b53d8edb70df2ad0f75613ecbbcf9456@epcms5p2>
 MIME-Version: 1.0
-In-Reply-To: <b1e8b44c-ae6f-786c-abe0-9a03eb5d3d63@flygoat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210107075037epcms5p2b53d8edb70df2ad0f75613ecbbcf9456@epcms5p2>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/16/20 4:14 AM, Jiaxun Yang wrote:
-> 在 2020/12/16 上午10:50, Jiaxun Yang 写道:
->> TBH I do think it doesn't sounds like a good idea to make 32-bit
->> and 64-bit different. In fact ISA_MIPS32R6 is always set for targets
->> with ISA_MIPS64R6.
->>
->> We're treating MIPS64R6 as a superset of MIPS32R6, and ISA_MIPS3
->> is used to tell if a CPU supports 64-bit.
->>
->> FYI:
->> https://commons.wikimedia.org/wiki/File:MIPS_instruction_set_family.svg
+On Thu, Jan 07, 2021 at 03:50:37PM +0800, 李捷 wrote:
+> From 0fbcd7e386898d829d3000d094358a91e626ee4a Mon Sep 17 00:00:00 2001
+> From: Jie Li <jie6.li@samsung.com>
+> Date: Mon, 7 Dec 2020 08:05:07 +0800
+> Subject: [PATCH] uio: uio_pci_generic: don't fail probe if pdev->irq equals to
+>  IRQ_NOTCONNECTED
 > 
-> Just add more cents here...
-> The current method we handle R6 makes me a little bit annoying.
+> Some devices use 255 as default value of Interrupt Line register, and this
+> maybe causes pdev->irq is set as IRQ_NOTCONNECTED in some scenarios. For
+> example, NVMe controller connects to Intel Volume Management Device (VMD).
+> In this situation, IRQ_NOTCONNECTED means INTx line is not connected, not
+> fault. If bind uio_pci_generic to these devices, uio frame will return
+> -ENOTCONN through request_irq.
 > 
-> Given that MIPS is backward compatible until R5, and R6 reorganized a lot
-> of opcodes, I do think decoding procdure of R6 should be dedicated from
-> the rest,
-> otherwise we may fall into the hell of finding difference between R6 and
-> previous
-> ISAs, also I've heard some R6 only ASEs is occupying opcodes marked as
-> "removed in R6", so it doesn't looks like a wise idea to check removed
-> in R6
-> in helpers.
+> This patch allows binding uio_pci_generic to device with dev->irq of
+> IRQ_NOTCONNECTED.
+> 
+> Signed-off-by: Jie Li <jie6.li@samsung.com>
+> Acked-by: Kyungsan Kim <ks0204.kim@samsung.com>
+> ---
+>  drivers/uio/uio_pci_generic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.c
+> index b8e44d16279f..c7d681fef198 100644
+> --- a/drivers/uio/uio_pci_generic.c
+> +++ b/drivers/uio/uio_pci_generic.c
+> @@ -92,7 +92,7 @@ static int probe(struct pci_dev *pdev,
+>         gdev->info.version = DRIVER_VERSION;
+>         gdev->info.release = release;
+>         gdev->pdev = pdev;
+> -       if (pdev->irq) {
+> +       if (pdev->irq && (pdev->irq != IRQ_NOTCONNECTED)) {
+>                 gdev->info.irq = pdev->irq;
+>                 gdev->info.irq_flags = IRQF_SHARED;
+>                 gdev->info.handler = irqhandler;
+> --
+> 2.17.1
+> 
+> 
+>  
+> 
+> [cid]
+> 
+> *
+> 
 
-I think we are in agreement :) Your comment seems what I addressed
-last month as this series:
-https://gitlab.com/philmd/qemu/-/commits/mips_decodetree_lsa_r6/
-(I'll try to rebase it and post during the week-end.)
 
-> So we may end up having four series of decodetrees for ISA
-> Series1: MIPS-II, MIPS32, MIPS32R2, MIPS32R5 (32bit "old" ISAs)
-> Series2: MIPS-III, MIPS64, MIPS64R2, MIPS64R5 (64bit "old" ISAs)
-> 
-> Series3: MIPS32R6 (32bit "new" ISAs)
-> Series4: MIPS64R6 (64bit "new" ISAs)
-> 
-> Thanks
-> 
-> - Jiaxun
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- Your patch was attached, please place it inline so that it can be
+  applied directly from the email message itself.
+
+- Your email was sent in html format, which is rejected by the kernel
+  mailing lists and make it impossible for anyone to find in the
+  archives.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
