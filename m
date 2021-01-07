@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F3432EE89D
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:28:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9779D2EE8A0
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:28:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728604AbhAGW1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:27:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46580 "EHLO
+        id S1728642AbhAGW2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:28:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727624AbhAGW1l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:27:41 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D92C0612F4
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:27:25 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id r3so7145524wrt.2
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:27:25 -0800 (PST)
+        with ESMTP id S1728654AbhAGW2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:28:11 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19684C0612F6
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:27:31 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id w5so7090801wrm.11
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:27:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gjB8bSNOV3jK0kQvU1bZejwEpXnNKlR5+WxJ3oM/DJ4=;
-        b=PU3XqAa4BYeNMoZIxAy6I2AgQiJaVnK77ogvCg+xEnqHGMYT44Q8XQqLMuQZS3OMc4
-         BH6ydZ3jiPQFw4w7ujUAneoJXDGAymLsiFy/d8Kuuy04v7pHsGgApouhSmlEVRL7V7+x
-         v0KPqIqs7GQafgcS7X7K0cF4btSwTJ1sNiwTocQtPO7ZJ2YlxS/CfltLzu80U1+2LbzW
-         bMXNEv13zSCP/C4dfhE+sVwSXs+9O2JKT+tPXRpzGh2pEr08ug/d6jQmFqgqFEDUnbq/
-         upTfXilz8SEwUQ9ROf2eIscQ5OB9g2i/FJvodHKkPn4w4mqQdL+8R1mVJXOtLuabEiFH
-         UzLw==
+        bh=ohRDermR0mkMdvDegF26EL3fB4ZqSyCTCt3CGv8BgrM=;
+        b=M5r+kM5DZjbfRhNpxNL3p0BG8wITpq8mG64LiBbLdkx7JMj6suGBuzCB9HS3zLZM3M
+         DJnzzNAnb/DlKN5XhGOZ3N3mVfiKBRW4/qXJok2UkxEaxX7/XxivnaJHQncio8B+GK41
+         YuaJ0ao8w7jUEyc4jeKI7UgsRl1Y32u42HDxz1ETqCdLta7yXnEUxUePHsgO0jzsQPdS
+         tYeTWAoto5lFVWIIFnUnjkLp4XCi2jAsywUhgFWOLbzA8vLCpLkYXUeybOQpD0xPd1yT
+         soZUlzPqRPcLPATx8HPE6iKppRmg5IIWeC38TLsFCUNLn/Vk3WlDx+XLkyL4kUMGWPs3
+         pCZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=gjB8bSNOV3jK0kQvU1bZejwEpXnNKlR5+WxJ3oM/DJ4=;
-        b=JmKKdfNIE3VFOzzescEUlznEJXS97/t1uggvEOpjBd9Y6x1LEdfF8OiBvONkzRmbjb
-         juYzSiXYqIk1SCgd7MKVLHgOVES8G3L3TK42nW195PMUuUQaaVSyHv2NHqH/GtQSluer
-         EDbEceJvzsIdy2zz+IWDql/PDcG930V+ZYzOcGjL06k4aM57eJu1JGHEoNfplX46EnFl
-         OK39VOuGVwXedACEDpUscukIOsFqfKUeMNZSj3cASiwF2583m9Y6SUs7aaPSm4CtDsId
-         ViVqxjPMa0owsq6qVY7rhO1Niv/lqnzKp2VYfiKfRDB6qxu/OXoH5Pfw4LR3BoHmj5Va
-         ovJA==
-X-Gm-Message-State: AOAM531DeUTa/LpaQolxLd+DNHDHFo4gSSanaaltXUHmFcPv7jED7Iyq
-        TAnXOZcIQENAVSpui4ZxO5c=
-X-Google-Smtp-Source: ABdhPJz2mhf6HC/yzYIQFD2jHFGCi1FU5ZgTRDBf8Mb3coydjvfxWtxN8gwuIWOi82ze45o+vViPiw==
-X-Received: by 2002:a5d:6983:: with SMTP id g3mr705027wru.168.1610058444739;
-        Thu, 07 Jan 2021 14:27:24 -0800 (PST)
+        bh=ohRDermR0mkMdvDegF26EL3fB4ZqSyCTCt3CGv8BgrM=;
+        b=cbqu1VFE9HXVekVfhkRznzI7Uhdx2U3nRKMouqFRA2XECdD2ILJWsJNW3F5vo7WtSp
+         gMwE9TjeQbyjrdhkVGqiTL+oEKtwBiXnZqatZ1q+COVGIusP/+NwxWk3AMAF+X4vBVKK
+         8mHx5aVKCB60IB6F+9PbVP06r+WsE9VC2ga4z3Wu9U5X1TNcfly+6vSnoggB5e9Y2SzJ
+         srYMsshphF6ZYgKYe4+A3D9usEReJ5AiDJBTWqctSWxCqg2kGSTCYvNJkEcAagWvqL2Q
+         fu4qEavGB6xnkxDOFl0MoqxxuCvNE9LLyMp85H3EEg38n/bw6PbHp3RJeYT/Oaz19R2X
+         2wDQ==
+X-Gm-Message-State: AOAM5306EI5MLipLmKhcWIus3IXlOYBNW+hqKba+l3H0purJD1NaEcpc
+        fMo2IR6Oz0jEHKQOOMBHz48=
+X-Google-Smtp-Source: ABdhPJzmlF9GZ/x2TYLqqOujsEGL9AtgxyOtqF9BsHqaARz0MImBXI7atAOgqyLObw3GtnMCJZgMtQ==
+X-Received: by 2002:a5d:4882:: with SMTP id g2mr650959wrq.273.1610058449889;
+        Thu, 07 Jan 2021 14:27:29 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id x18sm11886030wrg.55.2021.01.07.14.27.23
+        by smtp.gmail.com with ESMTPSA id w189sm9557825wmg.31.2021.01.07.14.27.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:27:24 -0800 (PST)
+        Thu, 07 Jan 2021 14:27:29 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 52/66] target/mips: Introduce decode tree bindings for MSA ASE
-Date:   Thu,  7 Jan 2021 23:22:39 +0100
-Message-Id: <20210107222253.20382-53-f4bug@amsat.org>
+Subject: [PULL 53/66] target/mips: Use decode_ase_msa() generated from decodetree
+Date:   Thu,  7 Jan 2021 23:22:40 +0100
+Message-Id: <20210107222253.20382-54-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,153 +73,179 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce the 'msa32' decodetree config for the 32-bit MSA ASE.
-
-We start by decoding:
-- the branch instructions,
-- all instructions based on the MSA opcode.
+Now that we can decode the MSA ASE with decode_ase_msa(),
+use it and remove the previous code, now unreachable.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201215225757.764263-20-f4bug@amsat.org>
-Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-Id: <20201215225757.764263-21-f4bug@amsat.org>
 Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/translate.h     |  3 +++
- target/mips/msa32.decode    | 24 ++++++++++++++++++++++++
- target/mips/msa_translate.c | 36 ++++++++++++++++++++++++++++++++++++
- target/mips/meson.build     |  5 +++++
- 4 files changed, 68 insertions(+)
- create mode 100644 target/mips/msa32.decode
+ target/mips/translate.h     | 12 ------------
+ target/mips/msa_translate.c | 29 +----------------------------
+ target/mips/translate.c     | 32 ++++++++++----------------------
+ 3 files changed, 11 insertions(+), 62 deletions(-)
 
 diff --git a/target/mips/translate.h b/target/mips/translate.h
-index c61c11978c2..858e47cf833 100644
+index 858e47cf833..35e9c4cd135 100644
 --- a/target/mips/translate.h
 +++ b/target/mips/translate.h
-@@ -167,4 +167,7 @@ void msa_translate_init(void);
- void gen_msa(DisasContext *ctx);
- void gen_msa_branch(DisasContext *ctx, uint32_t op1);
+@@ -82,8 +82,6 @@ enum {
+     OPC_BC1      = (0x08 << 21) | OPC_CP1, /* bc */
+     OPC_BC1ANY2  = (0x09 << 21) | OPC_CP1,
+     OPC_BC1ANY4  = (0x0A << 21) | OPC_CP1,
+-    OPC_BZ_V     = (0x0B << 21) | OPC_CP1,
+-    OPC_BNZ_V    = (0x0F << 21) | OPC_CP1,
+     OPC_S_FMT    = (FMT_S << 21) | OPC_CP1,
+     OPC_D_FMT    = (FMT_D << 21) | OPC_CP1,
+     OPC_E_FMT    = (FMT_E << 21) | OPC_CP1,
+@@ -93,14 +91,6 @@ enum {
+     OPC_PS_FMT   = (FMT_PS << 21) | OPC_CP1,
+     OPC_BC1EQZ   = (0x09 << 21) | OPC_CP1,
+     OPC_BC1NEZ   = (0x0D << 21) | OPC_CP1,
+-    OPC_BZ_B     = (0x18 << 21) | OPC_CP1,
+-    OPC_BZ_H     = (0x19 << 21) | OPC_CP1,
+-    OPC_BZ_W     = (0x1A << 21) | OPC_CP1,
+-    OPC_BZ_D     = (0x1B << 21) | OPC_CP1,
+-    OPC_BNZ_B    = (0x1C << 21) | OPC_CP1,
+-    OPC_BNZ_H    = (0x1D << 21) | OPC_CP1,
+-    OPC_BNZ_W    = (0x1E << 21) | OPC_CP1,
+-    OPC_BNZ_D    = (0x1F << 21) | OPC_CP1,
+ };
  
-+/* decodetree generated */
-+bool decode_ase_msa(DisasContext *ctx, uint32_t insn);
-+
- #endif
-diff --git a/target/mips/msa32.decode b/target/mips/msa32.decode
-new file mode 100644
-index 00000000000..d69675132b8
---- /dev/null
-+++ b/target/mips/msa32.decode
-@@ -0,0 +1,24 @@
-+# MIPS SIMD Architecture Module instruction set
-+#
-+# Copyright (C) 2020  Philippe Mathieu-Daudé
-+#
-+# SPDX-License-Identifier: LGPL-2.1-or-later
-+#
-+# Reference:
-+#       MIPS Architecture for Programmers Volume IV-j
-+#       The MIPS32 SIMD Architecture Module, Revision 1.12
-+#       (Document Number: MD00866-2B-MSA32-AFP-01.12)
-+#
-+
-+&msa_bz             df wt s16
-+
-+@bz                 ...... ... ..   wt:5 s16:16             &msa_bz df=3
-+@bz_df              ...... ... df:2 wt:5 s16:16             &msa_bz
-+
-+BZ_V                010001 01011  ..... ................    @bz
-+BNZ_V               010001 01111  ..... ................    @bz
-+
-+BZ_x                010001 110 .. ..... ................    @bz_df
-+BNZ_x               010001 111 .. ..... ................    @bz_df
-+
-+MSA                 011110 --------------------------
+ #define MASK_CP1_FUNC(op)           (MASK_CP1(op) | (op & 0x3F))
+@@ -164,8 +154,6 @@ extern TCGv bcond;
+ 
+ /* MSA */
+ void msa_translate_init(void);
+-void gen_msa(DisasContext *ctx);
+-void gen_msa_branch(DisasContext *ctx, uint32_t op1);
+ 
+ /* decodetree generated */
+ bool decode_ase_msa(DisasContext *ctx, uint32_t insn);
 diff --git a/target/mips/msa_translate.c b/target/mips/msa_translate.c
-index 52bd428759a..5efb0a1fc8a 100644
+index 5efb0a1fc8a..8a48f889aa2 100644
 --- a/target/mips/msa_translate.c
 +++ b/target/mips/msa_translate.c
+@@ -412,33 +412,6 @@ static bool trans_BNZ_x(DisasContext *ctx, arg_msa_bz *a)
+     return gen_msa_BxZ(ctx, a->df, a->wt, a->s16, true);
+ }
+ 
+-void gen_msa_branch(DisasContext *ctx, uint32_t op1)
+-{
+-    uint8_t df = (ctx->opcode >> 21) & 0x3;
+-    uint8_t wt = (ctx->opcode >> 16) & 0x1f;
+-    int64_t s16 = (int16_t)ctx->opcode;
+-
+-    switch (op1) {
+-    case OPC_BZ_V:
+-    case OPC_BNZ_V:
+-        gen_msa_BxZ_V(ctx, wt, s16, (op1 == OPC_BZ_V) ?
+-                                    TCG_COND_EQ : TCG_COND_NE);
+-        break;
+-    case OPC_BZ_B:
+-    case OPC_BZ_H:
+-    case OPC_BZ_W:
+-    case OPC_BZ_D:
+-        gen_msa_BxZ(ctx, df, wt, s16, false);
+-        break;
+-    case OPC_BNZ_B:
+-    case OPC_BNZ_H:
+-    case OPC_BNZ_W:
+-    case OPC_BNZ_D:
+-        gen_msa_BxZ(ctx, df, wt, s16, true);
+-        break;
+-    }
+-}
+-
+ static void gen_msa_i8(DisasContext *ctx)
+ {
+ #define MASK_MSA_I8(op)    (MASK_MSA_MINOR(op) | (op & (0x03 << 24)))
+@@ -2188,7 +2161,7 @@ static void gen_msa_vec(DisasContext *ctx)
+     }
+ }
+ 
+-void gen_msa(DisasContext *ctx)
++static void gen_msa(DisasContext *ctx)
+ {
+     uint32_t opcode = ctx->opcode;
+ 
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 01fe4609c9d..3da12e31351 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
 @@ -6,6 +6,7 @@
   *  Copyright (c) 2006 Thiemo Seufer (MIPS32R2 support)
   *  Copyright (c) 2009 CodeSourcery (MIPS16 and microMIPS support)
   *  Copyright (c) 2012 Jia Liu & Dongxue Zhang (MIPS ASE DSP support)
 + *  Copyright (c) 2020 Philippe Mathieu-Daudé
   *
-  * SPDX-License-Identifier: LGPL-2.1-or-later
-  */
-@@ -16,6 +17,9 @@
- #include "fpu_helper.h"
- #include "internal.h"
- 
-+/* Include the auto-generated decoder.  */
-+#include "decode-msa32.c.inc"
-+
- #define OPC_MSA (0x1E << 26)
- 
- #define MASK_MSA_MINOR(op)          (MASK_OP_MAJOR(op) | (op & 0x3F))
-@@ -370,6 +374,16 @@ static bool gen_msa_BxZ_V(DisasContext *ctx, int wt, int s16, TCGCond cond)
-     return true;
- }
- 
-+static bool trans_BZ_V(DisasContext *ctx, arg_msa_bz *a)
-+{
-+    return gen_msa_BxZ_V(ctx, a->wt, a->s16, TCG_COND_EQ);
-+}
-+
-+static bool trans_BNZ_V(DisasContext *ctx, arg_msa_bz *a)
-+{
-+    return gen_msa_BxZ_V(ctx, a->wt, a->s16, TCG_COND_NE);
-+}
-+
- static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
- {
-     check_msa_access(ctx);
-@@ -388,6 +402,16 @@ static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
-     return true;
- }
- 
-+static bool trans_BZ_x(DisasContext *ctx, arg_msa_bz *a)
-+{
-+    return gen_msa_BxZ(ctx, a->df, a->wt, a->s16, false);
-+}
-+
-+static bool trans_BNZ_x(DisasContext *ctx, arg_msa_bz *a)
-+{
-+    return gen_msa_BxZ(ctx, a->df, a->wt, a->s16, true);
-+}
-+
- void gen_msa_branch(DisasContext *ctx, uint32_t op1)
- {
-     uint8_t df = (ctx->opcode >> 21) & 0x3;
-@@ -2261,3 +2285,15 @@ void gen_msa(DisasContext *ctx)
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+@@ -135,8 +136,6 @@ enum {
+     OPC_JIALC    = (0x3E << 26),
+     /* MDMX ASE specific */
+     OPC_MDMX     = (0x1E << 26),
+-    /* MSA ASE, same as MDMX */
+-    OPC_MSA      = OPC_MDMX,
+     /* Cache and prefetch */
+     OPC_CACHE    = (0x2F << 26),
+     OPC_PREF     = (0x33 << 26),
+@@ -28828,21 +28827,6 @@ static bool decode_opc_legacy(CPUMIPSState *env, DisasContext *ctx)
+             }
+             break;
+         }
+-        case OPC_BZ_V:
+-        case OPC_BNZ_V:
+-        case OPC_BZ_B:
+-        case OPC_BZ_H:
+-        case OPC_BZ_W:
+-        case OPC_BZ_D:
+-        case OPC_BNZ_B:
+-        case OPC_BNZ_H:
+-        case OPC_BNZ_W:
+-        case OPC_BNZ_D:
+-            if (ase_msa_available(env)) {
+-                gen_msa_branch(ctx, op1);
+-                break;
+-            }
+-            /* fall through */
+         default:
+             MIPS_INVAL("cp1");
+             gen_reserved_instruction(ctx);
+@@ -29024,16 +29008,13 @@ static bool decode_opc_legacy(CPUMIPSState *env, DisasContext *ctx)
+             gen_compute_branch(ctx, op, 4, rs, rt, offset, 4);
+         }
          break;
+-    case OPC_MSA: /* OPC_MDMX */
++    case OPC_MDMX: /* MMI_OPC_LQ */
+         if (ctx->insn_flags & INSN_R5900) {
+ #if defined(TARGET_MIPS64)
+-            gen_mmi_lq(env, ctx);    /* MMI_OPC_LQ */
++            gen_mmi_lq(env, ctx);
+ #endif
+         } else {
+             /* MDMX: Not implemented. */
+-            if (ase_msa_available(env)) {
+-                gen_msa(ctx);
+-            }
+         }
+         break;
+     case OPC_PCREL:
+@@ -29066,6 +29047,13 @@ static void decode_opc(CPUMIPSState *env, DisasContext *ctx)
+         gen_set_label(l1);
      }
- }
+ 
++    /* Transition to the auto-generated decoder.  */
 +
-+static bool trans_MSA(DisasContext *ctx, arg_MSA *a)
-+{
-+    gen_msa(ctx);
++    /* ISA extensions */
++    if (ase_msa_available(env) && decode_ase_msa(ctx, ctx->opcode)) {
++        return;
++    }
 +
-+    return true;
-+}
-+
-+bool decode_ase_msa(DisasContext *ctx, uint32_t insn)
-+{
-+    return decode_msa32(ctx, insn);
-+}
-diff --git a/target/mips/meson.build b/target/mips/meson.build
-index 2aa4d81300b..e6285abd044 100644
---- a/target/mips/meson.build
-+++ b/target/mips/meson.build
-@@ -1,4 +1,9 @@
-+gen = [
-+  decodetree.process('msa32.decode', extra_args: [ '--static-decode=decode_msa32' ]),
-+]
-+
- mips_ss = ss.source_set()
-+mips_ss.add(gen)
- mips_ss.add(files(
-   'cpu.c',
-   'gdbstub.c',
+     if (!decode_opc_legacy(env, ctx)) {
+         gen_reserved_instruction(ctx);
+     }
 -- 
 2.26.2
 
