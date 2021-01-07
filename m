@@ -2,164 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 688262ED5D5
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 18:41:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2490B2ED617
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 18:53:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728338AbhAGRll (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 12:41:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726438AbhAGRll (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 12:41:41 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07C4C0612F8
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 09:41:00 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id c13so1607246pfi.12
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 09:41:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ILMPwCwZrBJ1HMfYPpc9UDsKQwFZc17yoGrjxBe8NiI=;
-        b=K9lAta31bHz+XI4lQJtLUqRu5RcufMnNjXJo+/bdjD0p9WrHHbUYeZQGmSZ1fAZz8B
-         nvWIKhZnKvYhNujvKH6UslFurON7uXp5dU1M+l/QmGFyYlOMpjTpGytFXN9P2fKMgRel
-         uyyjS7Y5Km6xgNzEZqqtIREQyVXfHGbVBOhODyO+Ym9Xq2hHXNci9WYpUShSWI1LyW0D
-         u0AcR1XmNrj+xNIyE2rMUf8/SJ+L+LhHGCIRxqHpI++IQ3f0WjeIK/dQK1YkXfWIBT0q
-         /gAU/0jlm+S+wsX0KeTdTxAWlRSOhVK/4n+2zvx2Ja62VUURI69aPsMrTTNB28VgV4aD
-         luQw==
+        id S1727160AbhAGRxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 12:53:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60559 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726406AbhAGRxN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 7 Jan 2021 12:53:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610041906;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OkDwbK8IfmJF0Hr3Qh558ED/UuHRGCr75d2VK7D/Q/s=;
+        b=ZcSqUrhCvLVFNRIQNDW+TpGgJ9YdiXfwSBHjzzqgLt0akTsdCHJfxlMtdXCWNlqu6WT4Mw
+        xiEI/qssExLYTYxqiGuEOBtK98hKHmfxHbLl6ghiFeCvu7gscir7RBPOIAC7OE6Fz0fvWw
+        mGYHuV3rej/xZwzTkki6gl8Y9aPE79c=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-ZaBi9Gk0NAaJAGAeiSLOnQ-1; Thu, 07 Jan 2021 12:51:45 -0500
+X-MC-Unique: ZaBi9Gk0NAaJAGAeiSLOnQ-1
+Received: by mail-ej1-f70.google.com with SMTP id k3so2666085ejr.16
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 09:51:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ILMPwCwZrBJ1HMfYPpc9UDsKQwFZc17yoGrjxBe8NiI=;
-        b=X/J+uBWdlIwsKRREXEisViLokIsW3ggJ5zoRvfkRKWAa525O+qBXeALzUgbIOGdUQS
-         fVTSlDzoh6y4zTup+S7MIN65U6w7m024dnQfVLKHjWHQppDPeLtSZYUkPEHwsEZ+dngz
-         z7yQSrdPg0WHKifkmC7UGFsPMYq36ws65IY3n/qx9Eh9yy+Q3LBtob2c1HYlM6//GMg0
-         Qg2eKg6kwlC8T60nDdODk9iGT+w4J+0GS/I8aaWv6KpNOTD7gi93Q4069eJRsOVrDR1M
-         iGrgO8lLXwEV5tX/sIma2xAFZDiS8W4DOtbRDVjLnKXBFlTs/F15XQmBnP8CD+wIk+a+
-         /YXA==
-X-Gm-Message-State: AOAM530U7HVGu0j1kYp1EGRhXvAKxV3xN3eRnsaZKwuHekiOBTr3zowD
-        +GZVpQe/VVJ5DX9QdctqS5p5MA==
-X-Google-Smtp-Source: ABdhPJzeg8rKSRJuruFkRQ8suzf3GzFrW7d4yz50DhxnuoFnh3A9BYIV8IfaypxEpes87r4wapgiYw==
-X-Received: by 2002:a65:5209:: with SMTP id o9mr2934295pgp.34.1610041260269;
-        Thu, 07 Jan 2021 09:41:00 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id a12sm7145470pgq.5.2021.01.07.09.40.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 09:40:59 -0800 (PST)
-Date:   Thu, 7 Jan 2021 09:40:53 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Leo Hou <leohou1402@gmail.com>
-Subject: Re: [PATCH v3 1/2] KVM: x86/mmu: Ensure TDP MMU roots are freed
- after yield
-Message-ID: <X/dHpSoi5AkPIrfc@google.com>
-References: <20210107001935.3732070-1-bgardon@google.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OkDwbK8IfmJF0Hr3Qh558ED/UuHRGCr75d2VK7D/Q/s=;
+        b=BQBRDAeuU6JVw/eLWpBuTxc7XLMD7XG7WQL4fqJIRupmbbJvgqb0zatFegD8m4jwbb
+         GZt1bkSGDlyknyJsPUr/P+uQBFfOHvDysrGEkfC6h827jWRCRLvbPq0+Vxfhj09G/v49
+         SNLTWelsShERqCl0QHy5YTv3FJi3xhDA15SHXpnkuQJz24lnpS8cSHaAM9crqK3dq9wP
+         K0Ra7EXMVdsRsl3dy598noDLQVq8m5zhotgAoxnAbmS4AzyPXnQSmmAvx4ieJ/02tmsy
+         A/A0Ggt1FoM4wzgilnihsPB2dd+pRIjVvJs1qeTHCRpXjGwYFnTGprtIN4Y6DUBZgt6g
+         6m5Q==
+X-Gm-Message-State: AOAM532JzccpgXl8PgMw1Nas8OuQm+e4bop1MPPN3I4Cb+TT3bL8uwhH
+        3jcBE7J9v2IAQkZLhOd3suiu1O5oIzFy2OhjbTN//nTqtzxTq8L85L9hY6z3q1EZtDGDW7X31ZV
+        3AGnsQd9Sw/oT
+X-Received: by 2002:aa7:c1c6:: with SMTP id d6mr2479095edp.275.1610041903719;
+        Thu, 07 Jan 2021 09:51:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxN/p5/M7sj/WcIDyEcNEVUJOA95N29zcxUhH2LnQL60mF6K3LnmeFxFKqOoK++QenuSVjG9w==
+X-Received: by 2002:aa7:c1c6:: with SMTP id d6mr2479087edp.275.1610041903539;
+        Thu, 07 Jan 2021 09:51:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id lr24sm2688040ejb.41.2021.01.07.09.51.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jan 2021 09:51:42 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-kernel@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+References: <20210107093854.882483-1-mlevitsk@redhat.com>
+ <20210107093854.882483-2-mlevitsk@redhat.com> <X/c+FzXGfk/3LUC2@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/4] KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES
+ on nested vmexit
+Message-ID: <6d7bac03-2270-e908-2e66-1cc4f9425294@redhat.com>
+Date:   Thu, 7 Jan 2021 18:51:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210107001935.3732070-1-bgardon@google.com>
+In-Reply-To: <X/c+FzXGfk/3LUC2@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the future, please document the changes in each revision, e.g. in a cover
-letter or in the ignored part of the diff.
-
-On Wed, Jan 06, 2021, Ben Gardon wrote:
-> Many TDP MMU functions which need to perform some action on all TDP MMU
-> roots hold a reference on that root so that they can safely drop the MMU
-> lock in order to yield to other threads. However, when releasing the
-> reference on the root, there is a bug: the root will not be freed even
-> if its reference count (root_count) is reduced to 0.
+On 07/01/21 18:00, Sean Christopherson wrote:
+> Ugh, I assume this is due to one of the "premature" nested_ops->check_events()
+> calls that are necessitated by the event mess?  I'm guessing kvm_vcpu_running()
+> is the culprit?
 > 
-> To simplify acquiring and releasing references on TDP MMU root pages, and
-> to ensure that these roots are properly freed, move the get/put operations
-> into another TDP MMU root iterator macro.
-> 
-> Moving the get/put operations into an iterator macro also helps
-> simplify control flow when a root does need to be freed. Note that using
-> the list_for_each_entry_safe macro would not have been appropriate in
-> this situation because it could keep a pointer to the next root across
-> an MMU lock release + reacquire, during which time that root could be
-> freed.
-> 
-> Reported-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Fixes: faaf05b00aec ("kvm: x86/mmu: Support zapping SPTEs in the TDP MMU")
-> Fixes: 063afacd8730 ("kvm: x86/mmu: Support invalidate range MMU notifier for TDP MMU")
-> Fixes: a6a0b05da9f3 ("kvm: x86/mmu: Support dirty logging for the TDP MMU")
-> Fixes: 14881998566d ("kvm: x86/mmu: Support disabling dirty logging for the tdp MMU")
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+> If my assumption is correct, this bug affects nVMX as well.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
+Yes, though it may be latent.  For SVM it was until we started 
+allocating svm->nested on demand.
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 104 +++++++++++++++++--------------------
->  1 file changed, 48 insertions(+), 56 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 75db27fda8f3..d4191ed193cd 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -44,7 +44,48 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->  	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
->  }
->  
-> -#define for_each_tdp_mmu_root(_kvm, _root)			    \
-> +static void tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root)
-> +{
-> +	if (kvm_mmu_put_root(kvm, root))
-> +		kvm_tdp_mmu_free_root(kvm, root);
-> +}
-> +
-> +static inline bool tdp_mmu_next_root_valid(struct kvm *kvm,
-> +					   struct kvm_mmu_page *root)
-> +{
-> +	lockdep_assert_held(&kvm->mmu_lock);
-> +
-> +	if (list_entry_is_head(root, &kvm->arch.tdp_mmu_roots, link))
-> +		return false;
-> +
-> +	kvm_mmu_get_root(kvm, root);
-> +	return true;
-> +
-> +}
-> +
-> +static inline struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-> +						     struct kvm_mmu_page *root)
-> +{
-> +	struct kvm_mmu_page *next_root;
-> +
-> +	next_root = list_next_entry(root, link);
-> +	tdp_mmu_put_root(kvm, root);
-> +	return next_root;
-> +}
-> +
-> +/*
-> + * Note: this iterator gets and puts references to the roots it iterates over.
+> Rather than clear the request blindly on any nested VM-Exit, what
+> about something like the following?
 
-Maybe refer to it as "the yield_safe() variant" instead of "this" so that the
-comment makes sense with minimal context?
+I think your patch is overkill, KVM_REQ_GET_NESTED_STATE_PAGES is only 
+set from KVM_SET_NESTED_STATE so it cannot happen while the VM runs.
 
-> + * This makes it safe to release the MMU lock and yield within the loop, but
-> + * if exiting the loop early, the caller must drop the reference to the most
-> + * recent root. (Unless keeping a live reference is desirable.)
-> + */
+Something like this is small enough and works well.
 
-Rather than encourage manually dropping the reference, what adding about a scary
-warning about not exiting the loop early?  At this point, it seems unlikely that
-we'll end up with a legitimate use case for exiting yield_safe() early.  And if
-we do, I think it'd be better to provide a macro to do the bookeeping instead of
-open coding it in the caller.  And maybe throw a blurb into the changelog about
-that so future developers understand that that scary warning isn't set in stone?
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index a622e63739b4..cb4c6ee10029 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -595,6 +596,8 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+  	svm->nested.vmcb12_gpa = 0;
+  	WARN_ON_ONCE(svm->nested.nested_run_pending);
 
-/*
- * The yield_safe() variant of the TDP root iterator gets and puts references to
- * the roots it iterates over.  This makes it safe to release the MMU lock and
- * yield within the loop, but the caller MUST NOT exit the loop early.
- */
++	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, &svm->vcpu);
++
+  	/* in case we halted in L2 */
+  	svm->vcpu.arch.mp_state = KVM_MP_STATE_RUNNABLE;
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index e2f26564a12d..0fbb46990dfc 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4442,6 +4442,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 
+vm_exit_reason,
+  	/* trying to cancel vmlaunch/vmresume is a bug */
+  	WARN_ON_ONCE(vmx->nested.nested_run_pending);
+
++	kvm_clear_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
++
+  	/* Service the TLB flush request for L2 before switching to L1. */
+  	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+  		kvm_vcpu_flush_tlb_current(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3f7c1fc7a3ce..b7e784b5489c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8789,7 +8789,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+
+  	if (kvm_request_pending(vcpu)) {
+  		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+-			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
++			if (WARN_ON_ONCE(!is_guest_mode(&svm->vcpu)))
++				;
++			else if 
+(unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+  				r = 0;
+  				goto out;
+  			}
+
