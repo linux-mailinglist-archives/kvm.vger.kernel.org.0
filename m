@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E318A2EE891
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:27:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D30CF2EE893
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 23:27:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728400AbhAGW1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 17:27:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46478 "EHLO
+        id S1728541AbhAGW1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 17:27:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727612AbhAGW1E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 17:27:04 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4921DC0612F4
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:26:49 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id c5so7110011wrp.6
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:26:49 -0800 (PST)
+        with ESMTP id S1728408AbhAGW1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 17:27:09 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B0B1C0612FC
+        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 14:26:54 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id r7so7120938wrc.5
+        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 14:26:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TAJNbn2BbAaev8vAtWe0g+lbpxYHDjLc2DhiH9wBBYA=;
-        b=IsMM9sYb0osTtqOwV004HCtHqwZnJxLCcuymKn9d10Y/qUNr3dAt4sq75d2rtatyxq
-         SpRmcetokXI/DabI/Lv/fXnemrR90gVFbIFnKNlkPKB967/tP5eorFZqWsEtv90QfJv5
-         faQSMDf94aZqRWv3lyXg/mrokK7Wp0Ehi1M44XI5mu9Hb0IYbPK7iOeaiSr3qP4AgPGp
-         jXYhX+sjuRF/d4nD3L2Xmp4oLhiiDc6adBDC8dutI2wnMvNtNirUfVq5nXBmOBbOofrA
-         CC/L/yjO9srhl8WB4Ya0fEpAAYv7hIt7oelLhrQbeZyjLwA15RRNnlD8a1gjnYqw2EmX
-         OcIw==
+        bh=bnGMuEIL+4VmlV+xdWwg0SJvZ11jLh/bemgKxGT4D88=;
+        b=Sbw38LZaOgKRsa2cr7ciETm4KuxJk1r/FTDMGg1cFdjsnLucprvjzuOP7dWJP4GOB/
+         rkUsNjC0bgAwZxDolwnejxMTHZ6s3GqpH32OY2Vn9yq0m7hO78ySx3f2zJF/m2pXng7i
+         qmG+M8wmkx2e8qWt11DlBj9ZTLfdcjmhcElcGNQxp2wr38xJbxPiSA3qw1yd5qGpiB9G
+         PgLSJa2zZRi77oo6gFaGWQCFDs8Ucx4vuWBZdSORt3w76fXwyNIN2oDEND2pa0cEe2h1
+         kq+LWM/Sx4IV44XlnQivufBXnPza4me3f3y83wbwxgU7wbMa0VpSH3U3SWMEJ+g0eifA
+         fGfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=TAJNbn2BbAaev8vAtWe0g+lbpxYHDjLc2DhiH9wBBYA=;
-        b=ea814CXDtcf9kudn40mBxeTJOJl8NaNUqqWvmGb4dMR8qSHFTQYtueS2RmzNsLwR9F
-         A2FApHDqY4E9LqMX9r7p1O6/yFounPjv6W5LnscA6yTlK2VLBaF/pk39VFSFPF6WGSs1
-         0mCOGaOKWrsDcbOB9XE8pkSRXvOrqp9OA/ZPnuZnzNpI4QTuisu/j5MmWEhWsQD+CWqV
-         4MXP2qBtOTLfQESK2ZV7iwRPF8faq3qJ79ADDnH7fTjDltag6q1jmFFQ/HX/kerpsOpV
-         5wUfcvAlgZpTBzyhfuF+7f7nIheHZqFB/LQ1pf2DfyTqXxc3OGpc+1Gkz+yXfoiYxqUr
-         neOg==
-X-Gm-Message-State: AOAM5335pH5NqXYkNv4BkdA/oRn++tgCFTDaItGiEjIRFC7XiAzXYUDi
-        scox6M6az5UrJcJ1fgSGOSQ=
-X-Google-Smtp-Source: ABdhPJwY0HPV3lgS9e/0aRYZQN/VGQFKpVtCKmCbNNmLnINx/LTY348Lja+Zhea7D8VbG8YD+FdgUQ==
-X-Received: by 2002:adf:a1d5:: with SMTP id v21mr703246wrv.24.1610058408097;
-        Thu, 07 Jan 2021 14:26:48 -0800 (PST)
+        bh=bnGMuEIL+4VmlV+xdWwg0SJvZ11jLh/bemgKxGT4D88=;
+        b=BCslxNkBxej+l2RDcFo7/KPkBy7NhtPm08zoDuP5sna5kzZYJfjgVlBgpq8TZXtGUy
+         9mrlLdE4ax0BgC6g1pmNoGCPULxUZKMYoIXWIxjXw7ttyitOpHxaNSqBLZ45MRFe7ebh
+         npoJYfpR4kgpvkECkviRI9hGL314tZlOTedtp6vGj+qHCIlQSA29Jq61m4dWBIqWLV5x
+         yeHPfuqBVZXE3baFwFG+Ksrc4+d3QJ1Nc/pCwjZaFoZP8dyfP+/U7HfRBHwgm1SKH5pz
+         +FArGplu6TCcfZBM5u10xbSvWV5lh8juPo1DvF/an3xymAk9druw+WwA4ShTnmiZ0tWL
+         2JNA==
+X-Gm-Message-State: AOAM530Fe784e/Xa7gdvF/aDqjWFgnpLqrPQbYQNy56sm+y8aQnRWRCc
+        1Ol8GKNdifYbgzoDpKEPpwU=
+X-Google-Smtp-Source: ABdhPJxePIlJhzELurqoS+K7alNqibaKNHaRCBr8+ZkgFJMw/suk4RQ4msNEseH0yAh1UdMXMgkIOQ==
+X-Received: by 2002:adf:ec8c:: with SMTP id z12mr687776wrn.208.1610058413020;
+        Thu, 07 Jan 2021 14:26:53 -0800 (PST)
 Received: from x1w.redhat.com (241.red-88-10-103.dynamicip.rima-tde.net. [88.10.103.241])
-        by smtp.gmail.com with ESMTPSA id h3sm9681113wmm.4.2021.01.07.14.26.46
+        by smtp.gmail.com with ESMTPSA id n9sm10110262wrq.41.2021.01.07.14.26.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 14:26:47 -0800 (PST)
+        Thu, 07 Jan 2021 14:26:52 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -60,9 +60,9 @@ Cc:     libvir-list@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Paul Burton <paulburton@kernel.org>,
         Richard Henderson <richard.henderson@linaro.org>
-Subject: [PULL 45/66] target/mips: Explode gen_msa_branch() as gen_msa_BxZ_V/BxZ()
-Date:   Thu,  7 Jan 2021 23:22:32 +0100
-Message-Id: <20210107222253.20382-46-f4bug@amsat.org>
+Subject: [PULL 46/66] target/mips: Move msa_reset() to msa_helper.c
+Date:   Thu,  7 Jan 2021 23:22:33 +0100
+Message-Id: <20210107222253.20382-47-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
 References: <20210107222253.20382-1-f4bug@amsat.org>
@@ -73,126 +73,143 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation of using the decodetree script, explode
-gen_msa_branch() as following:
+translate_init.c.inc mostly contains CPU definitions.
+msa_reset() doesn't belong here, move it with the MSA
+helpers.
 
-- OPC_BZ_V              -> BxZ_V(EQ)
-- OPC_BNZ_V             -> BxZ_V(NE)
-- OPC_BZ_[BHWD]         -> BxZ(false)
-- OPC_BNZ_[BHWD]        -> BxZ(true)
+One comment style is updated to avoid checkpatch.pl warning.
 
-Reviewed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20201215225757.764263-15-f4bug@amsat.org>
 Tested-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-Id: <20201208003702.4088927-10-f4bug@amsat.org>
 ---
- target/mips/translate.c | 71 ++++++++++++++++++++++++++++-------------
- 1 file changed, 49 insertions(+), 22 deletions(-)
+ target/mips/internal.h     |  2 ++
+ target/mips/cpu.c          |  1 +
+ target/mips/msa_helper.c   | 36 ++++++++++++++++++++++++++++++++++++
+ target/mips/cpu-defs.c.inc | 36 ------------------------------------
+ 4 files changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 18cebe26bde..0e7b2abe8bb 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28615,49 +28615,76 @@ static void gen_check_zero_element(TCGv tresult, uint8_t df, uint8_t wt)
-     tcg_temp_free_i64(t1);
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 1048781bcf4..5dd17ff7333 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -199,6 +199,8 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
+ 
+ void mips_tcg_init(void);
+ 
++void msa_reset(CPUMIPSState *env);
++
+ /* cp0_timer.c */
+ uint32_t cpu_mips_get_count(CPUMIPSState *env);
+ void cpu_mips_store_count(CPUMIPSState *env, uint32_t value);
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 4c590b90b25..f45164012a4 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -33,6 +33,7 @@
+ #include "hw/qdev-clock.h"
+ #include "hw/semihosting/semihost.h"
+ #include "qapi/qapi-commands-machine-target.h"
++#include "fpu_helper.h"
+ 
+ #if !defined(CONFIG_USER_ONLY)
+ 
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index b89b4c44902..f0d728c03f0 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -8201,3 +8201,39 @@ void helper_msa_ffint_u_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+ 
+     msa_move_v(pwd, pwx);
  }
- 
-+static bool gen_msa_BxZ_V(DisasContext *ctx, int wt, int s16, TCGCond cond)
++
++void msa_reset(CPUMIPSState *env)
 +{
-+    TCGv_i64 t0;
-+
-+    check_msa_access(ctx);
-+
-+    if (ctx->hflags & MIPS_HFLAG_BMASK) {
-+        gen_reserved_instruction(ctx);
-+        return true;
++    if (!ase_msa_available(env)) {
++        return;
 +    }
-+    t0 = tcg_temp_new_i64();
-+    tcg_gen_or_i64(t0, msa_wr_d[wt << 1], msa_wr_d[(wt << 1) + 1]);
-+    tcg_gen_setcondi_i64(cond, t0, t0, 0);
-+    tcg_gen_trunc_i64_tl(bcond, t0);
-+    tcg_temp_free_i64(t0);
 +
-+    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
++#ifdef CONFIG_USER_ONLY
++    /* MSA access enabled */
++    env->CP0_Config5 |= 1 << CP0C5_MSAEn;
++    env->CP0_Status |= (1 << CP0St_CU1) | (1 << CP0St_FR);
++#endif
 +
-+    ctx->hflags |= MIPS_HFLAG_BC;
-+    ctx->hflags |= MIPS_HFLAG_BDS32;
++    /*
++     * MSA CSR:
++     * - non-signaling floating point exception mode off (NX bit is 0)
++     * - Cause, Enables, and Flags are all 0
++     * - round to nearest / ties to even (RM bits are 0)
++     */
++    env->active_tc.msacsr = 0;
 +
-+    return true;
++    restore_msa_fp_status(env);
++
++    /* tininess detected after rounding.*/
++    set_float_detect_tininess(float_tininess_after_rounding,
++                              &env->active_tc.msa_fp_status);
++
++    /* clear float_status exception flags */
++    set_float_exception_flags(0, &env->active_tc.msa_fp_status);
++
++    /* clear float_status nan mode */
++    set_default_nan_mode(0, &env->active_tc.msa_fp_status);
++
++    /* set proper signanling bit meaning ("1" means "quiet") */
++    set_snan_bit_is_one(0, &env->active_tc.msa_fp_status);
 +}
-+
-+static bool gen_msa_BxZ(DisasContext *ctx, int df, int wt, int s16, bool if_not)
-+{
-+    check_msa_access(ctx);
-+
-+    if (ctx->hflags & MIPS_HFLAG_BMASK) {
-+        gen_reserved_instruction(ctx);
-+        return true;
-+    }
-+
-+    gen_check_zero_element(bcond, df, wt);
-+    if (if_not) {
-+        tcg_gen_setcondi_tl(TCG_COND_EQ, bcond, bcond, 0);
-+    }
-+
-+    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
-+    ctx->hflags |= MIPS_HFLAG_BC;
-+    ctx->hflags |= MIPS_HFLAG_BDS32;
-+
-+    return true;
-+}
-+
- static void gen_msa_branch(DisasContext *ctx, uint32_t op1)
- {
-     uint8_t df = (ctx->opcode >> 21) & 0x3;
-     uint8_t wt = (ctx->opcode >> 16) & 0x1f;
-     int64_t s16 = (int16_t)ctx->opcode;
+diff --git a/target/mips/cpu-defs.c.inc b/target/mips/cpu-defs.c.inc
+index 3d44b394773..ba22ff4bcd1 100644
+--- a/target/mips/cpu-defs.c.inc
++++ b/target/mips/cpu-defs.c.inc
+@@ -18,8 +18,6 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
  
--    check_msa_access(ctx);
+-#include "fpu_helper.h"
 -
--    if (ctx->hflags & MIPS_HFLAG_BMASK) {
--        gen_reserved_instruction(ctx);
+ /* CPU / CPU family specific config register values. */
+ 
+ /* Have config1, uncached coherency */
+@@ -975,37 +973,3 @@ static void mvp_init(CPUMIPSState *env)
+                              (0x0 << CP0MVPC1_PCX) | (0x0 << CP0MVPC1_PCP2) |
+                              (0x1 << CP0MVPC1_PCP1);
+ }
+-
+-static void msa_reset(CPUMIPSState *env)
+-{
+-    if (!ase_msa_available(env)) {
 -        return;
 -    }
-     switch (op1) {
-     case OPC_BZ_V:
-     case OPC_BNZ_V:
--        {
--            TCGv_i64 t0 = tcg_temp_new_i64();
--            tcg_gen_or_i64(t0, msa_wr_d[wt << 1], msa_wr_d[(wt << 1) + 1]);
--            tcg_gen_setcondi_i64((op1 == OPC_BZ_V) ?
--                    TCG_COND_EQ : TCG_COND_NE, t0, t0, 0);
--            tcg_gen_trunc_i64_tl(bcond, t0);
--            tcg_temp_free_i64(t0);
--        }
-+        gen_msa_BxZ_V(ctx, wt, s16, (op1 == OPC_BZ_V) ?
-+                                    TCG_COND_EQ : TCG_COND_NE);
-         break;
-     case OPC_BZ_B:
-     case OPC_BZ_H:
-     case OPC_BZ_W:
-     case OPC_BZ_D:
--        gen_check_zero_element(bcond, df, wt);
-+        gen_msa_BxZ(ctx, df, wt, s16, false);
-         break;
-     case OPC_BNZ_B:
-     case OPC_BNZ_H:
-     case OPC_BNZ_W:
-     case OPC_BNZ_D:
--        gen_check_zero_element(bcond, df, wt);
--        tcg_gen_setcondi_tl(TCG_COND_EQ, bcond, bcond, 0);
-+        gen_msa_BxZ(ctx, df, wt, s16, true);
-         break;
-     }
 -
--    ctx->btarget = ctx->base.pc_next + (s16 << 2) + 4;
+-#ifdef CONFIG_USER_ONLY
+-    /* MSA access enabled */
+-    env->CP0_Config5 |= 1 << CP0C5_MSAEn;
+-    env->CP0_Status |= (1 << CP0St_CU1) | (1 << CP0St_FR);
+-#endif
 -
--    ctx->hflags |= MIPS_HFLAG_BC;
--    ctx->hflags |= MIPS_HFLAG_BDS32;
- }
- 
- static void gen_msa_i8(DisasContext *ctx)
+-    /* MSA CSR:
+-       - non-signaling floating point exception mode off (NX bit is 0)
+-       - Cause, Enables, and Flags are all 0
+-       - round to nearest / ties to even (RM bits are 0) */
+-    env->active_tc.msacsr = 0;
+-
+-    restore_msa_fp_status(env);
+-
+-    /* tininess detected after rounding.*/
+-    set_float_detect_tininess(float_tininess_after_rounding,
+-                              &env->active_tc.msa_fp_status);
+-
+-    /* clear float_status exception flags */
+-    set_float_exception_flags(0, &env->active_tc.msa_fp_status);
+-
+-    /* clear float_status nan mode */
+-    set_default_nan_mode(0, &env->active_tc.msa_fp_status);
+-
+-    /* set proper signanling bit meaning ("1" means "quiet") */
+-    set_snan_bit_is_one(0, &env->active_tc.msa_fp_status);
+-}
 -- 
 2.26.2
 
