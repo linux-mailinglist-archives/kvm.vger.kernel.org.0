@@ -2,42 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DE4C2EC9BA
-	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 06:01:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83E8B2EC9C9
+	for <lists+kvm@lfdr.de>; Thu,  7 Jan 2021 06:03:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725859AbhAGFBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 00:01:35 -0500
-Received: from mga12.intel.com ([192.55.52.136]:21240 "EHLO mga12.intel.com"
+        id S1726483AbhAGFDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 00:03:36 -0500
+Received: from mga17.intel.com ([192.55.52.151]:10836 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725272AbhAGFBf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 00:01:35 -0500
-IronPort-SDR: lrPGntUn4BFPMCtvVC75u+aokevL7soJC99YOYugSliSddj14c9zEiQhyEEiQats7+y/3bIibN
- YQw8YEovzz/g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="156563081"
+        id S1726099AbhAGFDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 00:03:36 -0500
+IronPort-SDR: fpMxqaeS0L/CCJbOMdgtTPazRjHIpKWpQ7AIOVV7RylGeebqSpMPMn2O8W288IfCgwm+AV9AtS
+ wDpx4nzxLI7A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9856"; a="157157523"
 X-IronPort-AV: E=Sophos;i="5.79,329,1602572400"; 
-   d="scan'208";a="156563081"
+   d="scan'208";a="157157523"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:00:54 -0800
-IronPort-SDR: cVmLnxWvLi5+9X4Eu2t6+L9selqf1RNtHyMxTxgKDXRVGS+zWuFIi5s/EYjgiRYxrDWBaIQzfM
- LM+1u5Z1/dZA==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:02:55 -0800
+IronPort-SDR: nfZMMDBDowd23VBcIpR+GjehUDmPrVKGCUALcRShWjaeUTee0iIc9XN1BbqtHfOlBMV52XjV0h
+ /ljICI+MzqEg==
 X-IronPort-AV: E=Sophos;i="5.79,329,1602572400"; 
-   d="scan'208";a="422439802"
+   d="scan'208";a="422440143"
 Received: from jmonroe1-mobl2.amr.corp.intel.com (HELO [10.212.12.85]) ([10.212.12.85])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:00:53 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2021 21:02:54 -0800
 Subject: Re: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM
  guests
 To:     Kai Huang <kai.huang@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 References: <cover.1609890536.git.kai.huang@intel.com>
  <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
  <2e424ff3-51cb-d6ed-6c5f-190e1d4fe21a@intel.com>
- <X/YfE28guNBxcpui@google.com>
- <20210107134758.ba0b5d950282973eaefe1ded@intel.com>
- <33d9bec8-9427-b9cd-a9fb-ca5c44e4d2fe@intel.com>
- <20210107143855.b316478af5d94ffa89bd6f41@intel.com>
+ <20210107144203.589d4b2a7a2d2b53c4af7560@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -82,23 +79,32 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <8fbe2dad-594a-c84c-f902-54a85ddc7512@intel.com>
-Date:   Wed, 6 Jan 2021 21:00:53 -0800
+Message-ID: <bd0ff2d8-3425-2f69-5fa7-8da701d55e42@intel.com>
+Date:   Wed, 6 Jan 2021 21:02:54 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210107143855.b316478af5d94ffa89bd6f41@intel.com>
+In-Reply-To: <20210107144203.589d4b2a7a2d2b53c4af7560@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/6/21 5:38 PM, Kai Huang wrote:
->> Could we dump out the *actual* error code with a WARN(), please?  If we
->> see a warning, I'd rather not have to disassemble the instructions and
->> check against register values to see whether the error code was sane.
-> Sure. But WARN_ONCE() should be used, right, instead of WARN()?
+On 1/6/21 5:42 PM, Kai Huang wrote:
+>> I understand why this made sense for regular enclaves, but I'm having a
+>> harder time here.  If you mmap(fd, MAP_SHARED), fork(), and then pass
+>> that mapping through to two different guests, you get to hold the
+>> pieces, just like if you did the same with normal memory.
+>>
+>> Why does the kernel need to enforce this policy?
+> Does Sean's reply in another email satisfy you?
 
-Whatever will let you get a printf-format string out and only happens once.
+I'm not totally convinced.
+
+Please give it a go in the changelog for the next one and try to
+convince me that this is a good idea.  Focus on what the downsides will
+be if the kernel does not enforce this policy.  What will break, and why
+will it be bad?  Why is the kernel in the best position to thwart the
+badness?
