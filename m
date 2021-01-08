@@ -2,113 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F8E22EF0BC
-	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 11:36:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7C972EF0C1
+	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 11:36:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727726AbhAHKf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jan 2021 05:35:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57064 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726752AbhAHKf3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 8 Jan 2021 05:35:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610102042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9jaCobpp/gjZ1BrAW63KVqKbg+WZam2J/wlrqVXlE/U=;
-        b=GjZRGu/5tFOLIAoaDM2OL0XDemAkaNO9u+E19hViCIt2GCEh0rp7rH98IZ8QGhM057bjC6
-        KxdNtWFuyOLd4BwqbhP0i9BLFU5JMTpqtuZK0py/d3C6YXNfxe1vr/hsQFGMR5l3MD0/JJ
-        bJmFOCT5ZdQBFE3/VUr0tf3zA8P39J0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-MJvxZoQwNH2FnKj_kgawxg-1; Fri, 08 Jan 2021 05:34:00 -0500
-X-MC-Unique: MJvxZoQwNH2FnKj_kgawxg-1
-Received: by mail-wr1-f70.google.com with SMTP id i4so3953597wrm.21
-        for <kvm@vger.kernel.org>; Fri, 08 Jan 2021 02:34:00 -0800 (PST)
+        id S1727323AbhAHKgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jan 2021 05:36:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727199AbhAHKgJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jan 2021 05:36:09 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD6DC0612F9
+        for <kvm@vger.kernel.org>; Fri,  8 Jan 2021 02:35:28 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id n26so13880800eju.6
+        for <kvm@vger.kernel.org>; Fri, 08 Jan 2021 02:35:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rIkyMw46PHgBF6q3fnsb9totx5EdQT6p6Pt/NidcJGw=;
+        b=TgAnAp0olUK3niT2aiPTjGy9oIaTiyXPIST+AkXJxfEHYOhofnGzNggKAu+7RN1HLj
+         bxsylWpaFt/xV8gwXrSYMIygVeN1EMdmCtsJerazyA6/eOC1zN8lepzf8nCkQkRuwCgQ
+         Jj9mE5ym3ZKhT1kO8YPvMk8F0AIFfyuQbLf87rsXP48DDjRddYN+V6O88sJEbR0zfBiz
+         664c0XMdXX8pOsYDagjoPR4ZQYalZGnORAl/Mgs7wnrL3y0OMNvGlsPdjWqQLkzCp2Db
+         fHjOiQoObrv08hricV5nd1VSoJe3dCj9c9UztttazxB0EScN8FuHbSqXex5KFG7ipaTx
+         JYRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9jaCobpp/gjZ1BrAW63KVqKbg+WZam2J/wlrqVXlE/U=;
-        b=abNRGO5tuWnSyIgCKssiSqhjSDxoFEBp8o/iSssBtwc6LFdo4V8ySgDBS76TVtll3y
-         K37YK0wWuqXS74ylOa0V9sK5Mf8NplCQ4k4EFwzi7wxbBWlj8iSvRSMJ8k4GilWAQ5Jv
-         wdF5d90YXAubZ+A3dmn7HMxmDhs7WY+NK5nolbODF4i3/kVHI5orhg9mlqDW7H2tOUk1
-         KAOMcNzebV9VUqiFICpDsLsl6s81lnhTVALS7r18WDSpBzr+ZNchQpuTg03JRTvIYHsl
-         ZDnmEXXrRqS2dhbLemNT5QXVI5UHcXZma6ugk1lNqgiC6LK0lDGiEGEQd3Nbx4uvwYmg
-         MYwg==
-X-Gm-Message-State: AOAM531Fy3Z3oL4hZtV+F59HWkU5TosQ3MRr+LSOtKKjuDmCzUeIUHhy
-        rouSPXq/LFeP6H7g0vdcY2lzg32j0Co/d+qfDDKA9xa+K3GcK+kwmf5n5bC8uTm9U2zet0o2sPr
-        gKF34FMcHD2TH
-X-Received: by 2002:a5d:4f8a:: with SMTP id d10mr2905564wru.219.1610102039579;
-        Fri, 08 Jan 2021 02:33:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx/cYGRiEYoK1vucKO1euIdsck18nMG94piouLVJf/5RHsxZEuyqqUoFQjJC0gMXLBgDrQOUQ==
-X-Received: by 2002:a5d:4f8a:: with SMTP id d10mr2905551wru.219.1610102039359;
-        Fri, 08 Jan 2021 02:33:59 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id s25sm13327280wrs.49.2021.01.08.02.33.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 02:33:58 -0800 (PST)
-Date:   Fri, 8 Jan 2021 11:33:35 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Arseniy Krasnov <oxffffaa@gmail.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru
-Subject: Re: [PATCH 0/5] virtio/vsock: introduce SOCK_SEQPACKET support.
-Message-ID: <20210108103335.iabhzk4r6fpsiopt@steredhat>
-References: <20210103195454.1954169-1-arseny.krasnov@kaspersky.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rIkyMw46PHgBF6q3fnsb9totx5EdQT6p6Pt/NidcJGw=;
+        b=JL/Nu3iMYQFp60nlGtkuD6+8TOLCt7IFGe6bRvvY+YyKoc/XJAcja3wsEJyOfUyT8u
+         BlC1MINWnD84vCqcT5C+7z1SeYVwcwKgsnxjJw5HM5P7c+lXq5BhhdgmHK1MelwqoKSQ
+         gD7XSh/P61iQu2v09Emn3LMtYJTarN3ic5/h+bziooQFWg/uiMPfXBsLwtNs2GKrHA32
+         M4wKO6Ew3q16zRnwNhKIYrDPu0uW0y7kxJbPghvRwNhHsTyq+1a4CN608fzua18LLIqp
+         l4EF3LYsXKRuDNdeSSUSokBrJ8i25V6W34WTzqDqP2NjO+pHE4i24QiGlj3TA0OV8CF7
+         1fkg==
+X-Gm-Message-State: AOAM533utuQovAmfnaHYCp5fSgq1deqTQ+DpL2IlyBQt+iaRqebgzwL+
+        MN0TGY48oO6SXhU+ZWYN/aZNuUegrE5nknrjySZf4g==
+X-Google-Smtp-Source: ABdhPJwNeqDHR8Vw/jQ1m1utg9NjAfhdr0YmkxZXdHVGF/kVuB/ddQZ9+1qyrCgWmdCr4d2lpDNh/bt995E2SfE+o04=
+X-Received: by 2002:a17:906:1151:: with SMTP id i17mr2307267eja.250.1610102127258;
+ Fri, 08 Jan 2021 02:35:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210103195454.1954169-1-arseny.krasnov@kaspersky.com>
+References: <20210107222253.20382-1-f4bug@amsat.org>
+In-Reply-To: <20210107222253.20382-1-f4bug@amsat.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Fri, 8 Jan 2021 10:35:16 +0000
+Message-ID: <CAFEAcA-6SD7304G=tXUYWZMYekZ=+ZXaMc26faTNnHFxw9MWqg@mail.gmail.com>
+Subject: Re: [PULL 00/66] MIPS patches for 2021-01-07
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Paul Burton <paulburton@kernel.org>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Libvirt <libvir-list@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseny,
+On Thu, 7 Jan 2021 at 22:25, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> The following changes since commit 470dd6bd360782f5137f7e3376af6a44658eb1=
+d3:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-060121-=
+4' into staging (2021-01-06 22:18:36 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/philmd/qemu.git tags/mips-20210107
+>
+> for you to fetch changes up to f97d339d612b86d8d336a11f01719a10893d6707:
+>
+>   docs/system: Remove deprecated 'fulong2e' machine alias (2021-01-07 22:=
+57:49 +0100)
+>
+> ----------------------------------------------------------------
+> MIPS patches queue
+>
+> - Simplify CPU/ISA definitions
+> - Various maintenance code movements in translate.c
+> - Convert part of the MSA ASE instructions to decodetree
+> - Convert some instructions removed from Release 6 to decodetree
+> - Remove deprecated 'fulong2e' machine alias
 
-On Sun, Jan 03, 2021 at 10:54:52PM +0300, Arseny Krasnov wrote:
->	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->do it, new packet operation was added: it marks start of record (with
->record length in header). To send record, packet with start marker is
->sent first, then all data is transmitted as 'RW' packets. On receiver's
->side, length of record is known from packet with start record marker.
->Now as  packets of one socket are not reordered neither on vsock nor on
->vhost transport layers, these marker allows to restore original record
->on receiver's side. When each 'RW' packet is inserted to rx queue of
->receiver, user is woken up, data is copied to user's buffer and credit
->update message is sent. If there is no user waiting for data, credit
->won't be updated and sender will wait. Also,  if user's buffer is full,
->and record is bigger, all unneeded data will be dropped (with sending of
->credit update message).
->	'MSG_EOR' flag is implemented with special value of 'flags' field
->in packet header. When record is received with such flags, 'MSG_EOR' is
->set in 'recvmsg()' flags. 'MSG_TRUNC' flag is also supported.
->	In this implementation maximum length of datagram is not limited
->as in stream socket.
+Hi; this failed to build on some of my hosts:
 
-I did a a quick review. I like the idea of adding SOCK_SEQPACKET, but 
-the series needs more work.
-Some patches miss the SoB, the commit messages are very minimal.
-Anyway I like that you shared your patches, but please use RFC tag if 
-they are not ready to be merged.
+[1/4674] Generating 'libqemu-mipsel-softmmu.fa.p/decode-mips64r6.c.inc'.
+FAILED: libqemu-mipsel-softmmu.fa.p/decode-mips64r6.c.inc
+/usr/bin/python3 /home/petmay01/qemu-for-merges/scripts/decodetree.py
+../../target/mips/mips64r6.decode --static-deco
+de=3Ddecode_mips64r6 -o libqemu-mipsel-softmmu.fa.p/decode-mips64r6.c.inc
+Traceback (most recent call last):
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+1397, in <module>
+    main()
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+1308, in main
+    parse_file(f, toppat)
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+994, in parse_file
+    for line in f:
+  File "/usr/lib/python3.6/encodings/ascii.py", line 26, in decode
+    return codecs.ascii_decode(input, self.errors)[0]
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position
+80: ordinal not in range(128)
+[2/4674] Generating 'libqemu-mipsel-softmmu.fa.p/decode-msa64.c.inc'.
+FAILED: libqemu-mipsel-softmmu.fa.p/decode-msa64.c.inc
+/usr/bin/python3 /home/petmay01/qemu-for-merges/scripts/decodetree.py
+../../target/mips/msa64.decode --static-decode=3D
+decode_msa64 -o libqemu-mipsel-softmmu.fa.p/decode-msa64.c.inc
+Traceback (most recent call last):
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+1397, in <module>
+    main()
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+1308, in main
+    parse_file(f, toppat)
+  File "/home/petmay01/qemu-for-merges/scripts/decodetree.py", line
+994, in parse_file
+    for line in f:
+  File "/usr/lib/python3.6/encodings/ascii.py", line 26, in decode
+    return codecs.ascii_decode(input, self.errors)[0]
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position
+93: ordinal not in range(128)
 
-Another suggestion is to move the patches that modify the core 
-(af_vsock.c) before the transport modifications to make the review 
-easier.
+etc.
 
-I'd also like to see new tests in tools/testing/vsock/vsock_test.c
+Looks like decodetree fails to cope with non-ASCII characters in
+its input file -- probably this depends on the host locale settings:
+I think these hosts run in the 'C' locale.
 
-Thanks,
-Stefano
-
+thanks
+-- PMM
