@@ -2,160 +2,473 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 092BD2EF319
-	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 14:34:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7122E2EF4B7
+	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 16:20:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbhAHNeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jan 2021 08:34:06 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:50544 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725816AbhAHNeE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jan 2021 08:34:04 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 108DPdUd109883;
-        Fri, 8 Jan 2021 13:32:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=S4zkW1M4aTxRNcJblTq8nmnAoFttecuVr7DB3iYS6lc=;
- b=u43BWw/YI46k+PZDdz6WgFXEaetk1U74Zlf6i1GzYDfBCjp2TclctQZfEm69hfePQ3lF
- cLN/e1XxgUS2OeTwOaaTys0uRP1vUFZEKV3i/6tXp/NaKhytTrPuVZ8wiGwQCbSUbxys
- P60h0XHWLot0qHkXh9mVOxr89HvQ6nVgMAvA+OPttZmzmXyf+fgt3zfqNS5eqXGIFtig
- uyVdf/PpYc/lmKRfaqoHjE5emwYXEjn20lwGfJZRlhSkp6SrMtJaxZ1JWh9NwbiwE/Ov
- FjYEbhHZEolr0NNoVTS9y8SvZnd50yp4LcmRpMM97dXdvLPbhRCG7O4hC+MoKZ+oUAW+ Rg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 35wepmh24m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Fri, 08 Jan 2021 13:32:43 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 108DKYVC100966;
-        Fri, 8 Jan 2021 13:32:42 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 35v4rfafy5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 08 Jan 2021 13:32:42 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 108DWXDO026007;
-        Fri, 8 Jan 2021 13:32:33 GMT
-Received: from [192.168.1.6] (/116.231.20.68)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 08 Jan 2021 13:32:33 +0000
-Subject: Re: [RFC v2 06/13] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
-        parav@nvidia.com, akpm@linux-foundation.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
-References: <20201222145221.711-1-xieyongji@bytedance.com>
- <20201222145221.711-7-xieyongji@bytedance.com>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <f8dcb8d0-0024-1f78-d1a7-e487ca3deda7@oracle.com>
-Date:   Fri, 8 Jan 2021 21:32:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20201222145221.711-7-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=utf-8
+        id S1726880AbhAHPUC convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 8 Jan 2021 10:20:02 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2855 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725817AbhAHPUB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jan 2021 10:20:01 -0500
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4DC6DY2yL2z5D5C;
+        Fri,  8 Jan 2021 23:18:05 +0800 (CST)
+Received: from dggema713-chm.china.huawei.com (10.3.20.77) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 8 Jan 2021 23:19:17 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ dggema713-chm.china.huawei.com (10.3.20.77) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 8 Jan 2021 23:19:16 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2106.002; Fri, 8 Jan 2021 15:19:14 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Eric Auger <eric.auger@redhat.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "linuxarm@openeuler.org" <linuxarm@openeuler.org>
+Subject: RE: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+Thread-Topic: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+Thread-Index: AQHWvAgGhwjLBSYC0UyC6ARc2a6ugaoeJVMQ
+Date:   Fri, 8 Jan 2021 15:19:14 +0000
+Message-ID: <510be72d8b934f78960157a76966a093@huawei.com>
+References: <20201116110030.32335-1-eric.auger@redhat.com>
+ <20201116110030.32335-13-eric.auger@redhat.com>
+In-Reply-To: <20201116110030.32335-13-eric.auger@redhat.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9857 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 bulkscore=0
- suspectscore=0 spamscore=0 adultscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101080076
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9857 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 spamscore=0
- impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 clxscore=1011 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101080076
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.94.9]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/22/20 10:52 PM, Xie Yongji wrote:
-> This VDUSE driver enables implementing vDPA devices in userspace.
-> Both control path and data path of vDPA devices will be able to
-> be handled in userspace.
-> 
-> In the control path, the VDUSE driver will make use of message
-> mechnism to forward the config operation from vdpa bus driver
-> to userspace. Userspace can use read()/write() to receive/reply
-> those control messages.
-> 
-> In the data path, the VDUSE driver implements a MMU-based on-chip
-> IOMMU driver which supports mapping the kernel dma buffer to a
-> userspace iova region dynamically. Userspace can access those
-> iova region via mmap(). Besides, the eventfd mechanism is used to
-> trigger interrupt callbacks and receive virtqueue kicks in userspace
-> 
-> Now we only support virtio-vdpa bus driver with this patch applied.
-> 
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->  Documentation/driver-api/vduse.rst                 |   74 ++
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
->  drivers/vdpa/Kconfig                               |    8 +
->  drivers/vdpa/Makefile                              |    1 +
->  drivers/vdpa/vdpa_user/Makefile                    |    5 +
->  drivers/vdpa/vdpa_user/eventfd.c                   |  221 ++++
->  drivers/vdpa/vdpa_user/eventfd.h                   |   48 +
->  drivers/vdpa/vdpa_user/iova_domain.c               |  442 ++++++++
->  drivers/vdpa/vdpa_user/iova_domain.h               |   93 ++
->  drivers/vdpa/vdpa_user/vduse.h                     |   59 ++
->  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1121 ++++++++++++++++++++
->  include/uapi/linux/vdpa.h                          |    1 +
->  include/uapi/linux/vduse.h                         |   99 ++
->  13 files changed, 2173 insertions(+)
->  create mode 100644 Documentation/driver-api/vduse.rst
->  create mode 100644 drivers/vdpa/vdpa_user/Makefile
->  create mode 100644 drivers/vdpa/vdpa_user/eventfd.c
->  create mode 100644 drivers/vdpa/vdpa_user/eventfd.h
->  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
->  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
->  create mode 100644 drivers/vdpa/vdpa_user/vduse.h
->  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
->  create mode 100644 include/uapi/linux/vduse.h
-> 
-> diff --git a/Documentation/driver-api/vduse.rst b/Documentation/driver-api/vduse.rst
-> new file mode 100644
-> index 000000000000..da9b3040f20a
-> --- /dev/null
-> +++ b/Documentation/driver-api/vduse.rst
-> @@ -0,0 +1,74 @@
-> +==================================
-> +VDUSE - "vDPA Device in Userspace"
-> +==================================
-> +
-> +vDPA (virtio data path acceleration) device is a device that uses a
-> +datapath which complies with the virtio specifications with vendor
-> +specific control path. vDPA devices can be both physically located on
-> +the hardware or emulated by software. VDUSE is a framework that makes it
-> +possible to implement software-emulated vDPA devices in userspace.
-> +
+Hi Eric,
 
-Could you explain a bit more why need a VDUSE framework?
-Software emulated vDPA devices is more likely used by debugging only when
-don't have real hardware.
-Do you think do the emulation in kernel space is not enough?
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@redhat.com]
+> Sent: 16 November 2020 11:00
+> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
+> alex.williamson@redhat.com
+> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+> Thodi <shameerali.kolothum.thodi@huawei.com>;
+> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
+> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
+> Subject: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
+> 
+> In preparation for vSVA, let's register a DMA fault response region,
+> where the userspace will push the page responses and increment the
+> head of the buffer. The kernel will pop those responses and inject them
+> on iommu side.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c         | 114 +++++++++++++++++++++++++---
+>  drivers/vfio/pci/vfio_pci_private.h |   5 ++
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  39 ++++++++++
+>  include/uapi/linux/vfio.h           |  32 ++++++++
+>  4 files changed, 181 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 65a83fd0e8c0..e9a904ce3f0d 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -318,9 +318,20 @@ static void vfio_pci_dma_fault_release(struct
+> vfio_pci_device *vdev,
+>  	kfree(vdev->fault_pages);
+>  }
+> 
+> -static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> -				   struct vfio_pci_region *region,
+> -				   struct vm_area_struct *vma)
+> +static void
+> +vfio_pci_dma_fault_response_release(struct vfio_pci_device *vdev,
+> +				    struct vfio_pci_region *region)
+> +{
+> +	if (vdev->dma_fault_response_wq)
+> +		destroy_workqueue(vdev->dma_fault_response_wq);
+> +	kfree(vdev->fault_response_pages);
+> +	vdev->fault_response_pages = NULL;
+> +}
+> +
+> +static int __vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> +				     struct vfio_pci_region *region,
+> +				     struct vm_area_struct *vma,
+> +				     u8 *pages)
+>  {
+>  	u64 phys_len, req_len, pgoff, req_start;
+>  	unsigned long long addr;
+> @@ -333,14 +344,14 @@ static int vfio_pci_dma_fault_mmap(struct
+> vfio_pci_device *vdev,
+>  		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+>  	req_start = pgoff << PAGE_SHIFT;
+> 
+> -	/* only the second page of the producer fault region is mmappable */
+> +	/* only the second page of the fault region is mmappable */
+>  	if (req_start < PAGE_SIZE)
+>  		return -EINVAL;
+> 
+>  	if (req_start + req_len > phys_len)
+>  		return -EINVAL;
+> 
+> -	addr = virt_to_phys(vdev->fault_pages);
+> +	addr = virt_to_phys(pages);
+>  	vma->vm_private_data = vdev;
+>  	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
+> 
+> @@ -349,13 +360,29 @@ static int vfio_pci_dma_fault_mmap(struct
+> vfio_pci_device *vdev,
+>  	return ret;
+>  }
+> 
+> -static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> -					     struct vfio_pci_region *region,
+> -					     struct vfio_info_cap *caps)
+> +static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
+> +				   struct vfio_pci_region *region,
+> +				   struct vm_area_struct *vma)
+> +{
+> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
+> vdev->fault_pages);
+> +}
+> +
+> +static int
+> +vfio_pci_dma_fault_response_mmap(struct vfio_pci_device *vdev,
+> +				struct vfio_pci_region *region,
+> +				struct vm_area_struct *vma)
+> +{
+> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
+> vdev->fault_response_pages);
+> +}
+> +
+> +static int __vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> +					       struct vfio_pci_region *region,
+> +					       struct vfio_info_cap *caps,
+> +					       u32 cap_id)
+>  {
+>  	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
+>  	struct vfio_region_info_cap_fault cap = {
+> -		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
+> +		.header.id = cap_id,
+>  		.header.version = 1,
+>  		.version = 1,
+>  	};
+> @@ -383,6 +410,14 @@ static int vfio_pci_dma_fault_add_capability(struct
+> vfio_pci_device *vdev,
+>  	return ret;
+>  }
+> 
+> +static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
+> +					     struct vfio_pci_region *region,
+> +					     struct vfio_info_cap *caps)
+> +{
+> +	return __vfio_pci_dma_fault_add_capability(vdev, region, caps,
+> +						   VFIO_REGION_INFO_CAP_DMA_FAULT);
+> +}
+> +
+>  static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
+>  	.rw		= vfio_pci_dma_fault_rw,
+>  	.release	= vfio_pci_dma_fault_release,
+> @@ -390,6 +425,13 @@ static const struct vfio_pci_regops
+> vfio_pci_dma_fault_regops = {
+>  	.add_capability = vfio_pci_dma_fault_add_capability,
+>  };
+> 
+> +static const struct vfio_pci_regops vfio_pci_dma_fault_response_regops = {
+> +	.rw		= vfio_pci_dma_fault_response_rw,
+> +	.release	= vfio_pci_dma_fault_response_release,
+> +	.mmap		= vfio_pci_dma_fault_response_mmap,
+> +	.add_capability = vfio_pci_dma_fault_add_capability,
+> +};
+> +
+>  int vfio_pci_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
+>  {
+>  	struct vfio_pci_device *vdev = (struct vfio_pci_device *)data;
+> @@ -500,6 +542,55 @@ static int vfio_pci_dma_fault_init(struct
+> vfio_pci_device *vdev)
+>  	return ret;
+>  }
+> 
+> +#define DMA_FAULT_RESPONSE_RING_LENGTH 512
+> +
+> +static int vfio_pci_dma_fault_response_init(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_region_dma_fault_response *header;
+> +	struct iommu_domain *domain;
+> +	size_t size;
+> +	bool nested;
+> +	int ret;
+> +
+> +	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
+> +	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING,
+> &nested);
+
+The above will fail((Thanks to Zengtao for reporting this) if the Guest is
+booted in "enable_unsafe_noiommu_mode" (CONFIG_VFIO_NOIOMMU)
+and dpdk testpmd is attempted.
+
+This is because even though there is an iommu group created for this
+mode, no iommu domain gets attached to it. And results in below
+crash,
+
+root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0 -l 0-1 -n 2 -- -i
+EAL: Detected 8 lcore(s)
+EAL: Detected 1 NUMA nodes
+EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+EAL: Selected IOVA mode 'PA'
+EAL: No available hugepages reported in hugepages-32768kB
+EAL: No available hugepages reported in hugepages-64kB
+EAL: No available hugepages reported in hugepages-1048576kB
+EAL: Probing VFIO support...
+EAL: VFIO support initialized
+EAL:   Invalid NUMA socket, default to 0
+EAL:   using IOMMU type 8 (No-IOMMU)
+[   84.942213] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+[   84.943047] Mem abort info:
+---
+
+I have pushed a temp fix for this in my test branch here,
+https://github.com/hisilicon/kernel-dev/commit/7784d96fbac9c48e8093ec9dbf43a172b1cbe3c3
+
+Please take a look.
+
+(I am seeing another issue with testpmd + vsmmu. I will explain that in another thread).
 
 Thanks,
-Bob
+Shameer
 
-> +How VDUSE works
-> +------------
-> +Each userspace vDPA device is created by the VDUSE_CREATE_DEV ioctl on
-> +the VDUSE character device (/dev/vduse). Then a file descriptor pointing
-> +to the new resources will be returned, which can be used to implement the
-> +userspace vDPA device's control path and data path.
-> +
-> +To implement control path, the read/write operations to the file descriptor
-> +will be used to receive/reply the control messages from/to VDUSE driver.
-> +Those control messages are based on the vdpa_config_ops which defines a
-> +unified interface to control different types of vDPA device.
-> +
 
+
+  
+> +	if (ret || !nested)
+> +		return ret;
+> +
+> +	mutex_init(&vdev->fault_response_queue_lock);
+> +
+> +	/*
+> +	 * We provision 1 page for the header and space for
+> +	 * DMA_FAULT_RING_LENGTH fault records in the ring buffer.
+> +	 */
+> +	size = ALIGN(sizeof(struct iommu_page_response) *
+> +		     DMA_FAULT_RESPONSE_RING_LENGTH, PAGE_SIZE) +
+> PAGE_SIZE;
+> +
+> +	vdev->fault_response_pages = kzalloc(size, GFP_KERNEL);
+> +	if (!vdev->fault_response_pages)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_register_dev_region(vdev,
+> +		VFIO_REGION_TYPE_NESTED,
+> +		VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE,
+> +		&vfio_pci_dma_fault_response_regops, size,
+> +		VFIO_REGION_INFO_FLAG_READ |
+> VFIO_REGION_INFO_FLAG_WRITE |
+> +		VFIO_REGION_INFO_FLAG_MMAP,
+> +		vdev->fault_response_pages);
+> +	if (ret)
+> +		goto out;
+> +
+> +	header = (struct vfio_region_dma_fault_response
+> *)vdev->fault_response_pages;
+> +	header->entry_size = sizeof(struct iommu_page_response);
+> +	header->nb_entries = DMA_FAULT_RESPONSE_RING_LENGTH;
+> +	header->offset = PAGE_SIZE;
+> +
+> +	return 0;
+> +out:
+> +	vdev->fault_response_pages = NULL;
+> +	return ret;
+> +}
+> +
+>  static int vfio_pci_enable(struct vfio_pci_device *vdev)
+>  {
+>  	struct pci_dev *pdev = vdev->pdev;
+> @@ -602,6 +693,10 @@ static int vfio_pci_enable(struct vfio_pci_device
+> *vdev)
+>  	if (ret)
+>  		goto disable_exit;
+> 
+> +	ret = vfio_pci_dma_fault_response_init(vdev);
+> +	if (ret)
+> +		goto disable_exit;
+> +
+>  	vfio_pci_probe_mmaps(vdev);
+> 
+>  	return 0;
+> @@ -2227,6 +2322,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const
+> struct pci_device_id *id)
+>  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+>  	mutex_init(&vdev->vma_lock);
+>  	INIT_LIST_HEAD(&vdev->vma_list);
+> +	INIT_LIST_HEAD(&vdev->dummy_resources_list);
+>  	init_rwsem(&vdev->memory_lock);
+> 
+>  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h
+> b/drivers/vfio/pci/vfio_pci_private.h
+> index e180b5435c8f..035634521cd0 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -144,7 +144,9 @@ struct vfio_pci_device {
+>  	struct eventfd_ctx	*err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+>  	u8			*fault_pages;
+> +	u8			*fault_response_pages;
+>  	struct mutex		fault_queue_lock;
+> +	struct mutex		fault_response_queue_lock;
+>  	struct list_head	dummy_resources_list;
+>  	struct mutex		ioeventfds_lock;
+>  	struct list_head	ioeventfds_list;
+> @@ -189,6 +191,9 @@ extern long vfio_pci_ioeventfd(struct vfio_pci_device
+> *vdev, loff_t offset,
+>  extern size_t vfio_pci_dma_fault_rw(struct vfio_pci_device *vdev,
+>  				    char __user *buf, size_t count,
+>  				    loff_t *ppos, bool iswrite);
+> +extern size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev,
+> +					     char __user *buf, size_t count,
+> +					     loff_t *ppos, bool iswrite);
+> 
+>  extern int vfio_pci_init_perm_bits(void);
+>  extern void vfio_pci_uninit_perm_bits(void);
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 164120607469..efde0793360b 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -400,6 +400,45 @@ size_t vfio_pci_dma_fault_rw(struct vfio_pci_device
+> *vdev, char __user *buf,
+>  	return ret;
+>  }
+> 
+> +size_t vfio_pci_dma_fault_response_rw(struct vfio_pci_device *vdev, char
+> __user *buf,
+> +				      size_t count, loff_t *ppos, bool iswrite)
+> +{
+> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) -
+> VFIO_PCI_NUM_REGIONS;
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	void *base = vdev->region[i].data;
+> +	int ret = -EFAULT;
+> +
+> +	if (pos >= vdev->region[i].size)
+> +		return -EINVAL;
+> +
+> +	count = min(count, (size_t)(vdev->region[i].size - pos));
+> +
+> +	if (iswrite) {
+> +		struct vfio_region_dma_fault_response *header =
+> +			(struct vfio_region_dma_fault_response *)base;
+> +		uint32_t  new_head;
+> +
+> +		if (pos != 0 || count != 4)
+> +			return -EINVAL;
+> +
+> +		if (copy_from_user((void *)&new_head, buf, count))
+> +			return -EFAULT;
+> +
+> +		if (new_head >= header->nb_entries)
+> +			return -EINVAL;
+> +
+> +		mutex_lock(&vdev->fault_response_queue_lock);
+> +		header->head = new_head;
+> +		mutex_unlock(&vdev->fault_response_queue_lock);
+> +	} else {
+> +		if (copy_to_user(buf, base + pos, count))
+> +			return -EFAULT;
+> +	}
+> +	*ppos += count;
+> +	ret = count;
+> +	return ret;
+> +}
+> +
+>  static void vfio_pci_ioeventfd_do_write(struct vfio_pci_ioeventfd *ioeventfd,
+>  					bool test_mem)
+>  {
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 1e5c82f9d14d..5d106db7a4c5 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -345,6 +345,7 @@ struct vfio_region_info_cap_type {
+> 
+>  #define VFIO_REGION_TYPE_NESTED			(2)
+>  #define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT	(1)
+> +#define VFIO_REGION_SUBTYPE_NESTED_DMA_FAULT_RESPONSE	(2)
+> 
+>  /**
+>   * struct vfio_region_gfx_edid - EDID region layout.
+> @@ -1022,6 +1023,17 @@ struct vfio_region_info_cap_fault {
+>  	__u32 version;
+>  };
+> 
+> +/*
+> + * Capability exposed by the DMA fault response region
+> + * @version: ABI version
+> + */
+> +#define VFIO_REGION_INFO_CAP_DMA_FAULT_RESPONSE	7
+> +
+> +struct vfio_region_info_cap_fault_response {
+> +	struct vfio_info_cap_header header;
+> +	__u32 version;
+> +};
+> +
+>  /*
+>   * DMA Fault Region Layout
+>   * @tail: index relative to the start of the ring buffer at which the
+> @@ -1042,6 +1054,26 @@ struct vfio_region_dma_fault {
+>  	__u32   head;
+>  };
+> 
+> +/*
+> + * DMA Fault Response Region Layout
+> + * @head: index relative to the start of the ring buffer at which the
+> + *        producer (userspace) insert responses into the buffer
+> + * @entry_size: fault ring buffer entry size in bytes
+> + * @nb_entries: max capacity of the fault ring buffer
+> + * @offset: ring buffer offset relative to the start of the region
+> + * @tail: index relative to the start of the ring buffer at which the
+> + *        consumer (kernel) finds the next item in the buffer
+> + */
+> +struct vfio_region_dma_fault_response {
+> +	/* Write-Only */
+> +	__u32   head;
+> +	/* Read-Only */
+> +	__u32   entry_size;
+> +	__u32	nb_entries;
+> +	__u32	offset;
+> +	__u32   tail;
+> +};
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+> 
+>  /**
+> --
+> 2.21.3
 
