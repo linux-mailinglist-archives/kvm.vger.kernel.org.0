@@ -2,295 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80D562EEAF2
-	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 02:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53CC02EEB03
+	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 02:46:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728770AbhAHBaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 20:30:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47134 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729552AbhAHBaE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 20:30:04 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AB36C061282
-        for <kvm@vger.kernel.org>; Thu,  7 Jan 2021 17:29:07 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id m8so7015791qvt.14
-        for <kvm@vger.kernel.org>; Thu, 07 Jan 2021 17:29:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=ZHuHq1gX+rq+gSbDq4B8XNZLvR61GpcraAJJ94pG5jI=;
-        b=n3wOhNlwvyXw4HZZk7N77vwCHd/iR01CfCyBgoB0P4g5WYyP9L4b/JLXPZX6lUKD+C
-         LVQeyta6aZyaSpnIA1WLGCK60IK9lm6I9BwRlKijkskFOcLqLkxfjYw4iQJkrYHRKEfB
-         wIg0N6KnqF95/looJaAv6BGrD8C0RxqhISgjozlHJzjZaLzW7tpxULLbKAQiyQ/BADAA
-         GtOj1cRzgOILZnCqWiyGwiHVTY1VE0gp/XqlI6emnrhOnC4POLIGcjvArNe0i6Xmd38Z
-         WcHMfyoeiQEg3eoQCIauLC5Zgt1Brrdni9kIXFsvnSfbNhcvYDuIsKglZyGoMideN5/4
-         9faA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ZHuHq1gX+rq+gSbDq4B8XNZLvR61GpcraAJJ94pG5jI=;
-        b=kWRWMeerXZ/aqGq5psn65bXh8der67EmmDUGr+oAKJ+s1mszaCuAdYbPDBkdfME5OP
-         8Z3RvXSsQzWlFLJKYx8UGv6YmO49cOhJmXHPUtqUVIZK7vwWDVHmo6OZsCCk/KLWd0v2
-         SWRqgk5R9oIBCxbb72H5kAaF7dutrnmO3UeJTGBP+lopOsl90FQr1Hs9AItX4+VSzeYt
-         Du8z39759xZ6wBma9Klm+cULt80VcYPkNVFyS2y8dL0fBRhVAIVB3njdN07ag00a788u
-         dsQWZ+xcSfEJfmXyXwS6sCbht1iw9oCR/gc2tlIiEGuEHyXiD3/f885Uykw8AbhTX0IA
-         V76Q==
-X-Gm-Message-State: AOAM5321SB4sico7T1oaqcjiNUjtLiwY4liDYtx+l89WFKpYFaFJcAca
-        ErA20MfV2eeBCfkIdbLNYRZdB6Lmo1Cd
-X-Google-Smtp-Source: ABdhPJxtCr1FuLGd3jUgdrALOLHJ3pQLuqVJ8xwNqCOs0HZRNRe/Kj6a1CL5fBPQ4THyxzd2Di1MC3ME9aMm
-Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
-X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
- (user=vipinsh job=sendgmr) by 2002:ad4:4f11:: with SMTP id
- fb17mr1429085qvb.46.1610069346396; Thu, 07 Jan 2021 17:29:06 -0800 (PST)
-Date:   Thu,  7 Jan 2021 17:28:46 -0800
-In-Reply-To: <20210108012846.4134815-1-vipinsh@google.com>
-Message-Id: <20210108012846.4134815-3-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20210108012846.4134815-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.29.2.729.g45daf8777d-goog
-Subject: [Patch v4 2/2] cgroup: svm: Encryption IDs cgroup documentation.
-From:   Vipin Sharma <vipinsh@google.com>
-To:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
-        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
-        tj@kernel.org, lizefan@huawei.com, hannes@cmpxchg.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, corbet@lwn.net
-Cc:     joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, gingell@google.com,
-        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1729738AbhAHBot (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 20:44:49 -0500
+Received: from mga09.intel.com ([134.134.136.24]:27993 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727634AbhAHBot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 20:44:49 -0500
+IronPort-SDR: Si3ZSqnHgNXJ5Oe/4GkdoR0rojBIxungBMAtXuvzP2j+9mAYkgLuTngLHBCciz2ctSHd/d9qAf
+ KyMxNpLz/uCg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9857"; a="177672366"
+X-IronPort-AV: E=Sophos;i="5.79,330,1602572400"; 
+   d="scan'208";a="177672366"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2021 17:43:03 -0800
+IronPort-SDR: ON+qHfVnF5AMtTJnehcONNkXAML15iZdFZM1+reyav651reoeq5IukL1a3LNVcdYWcUqw20BY6
+ aFnaxTtJmSAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.79,330,1602572400"; 
+   d="scan'208";a="379938010"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by orsmga008.jf.intel.com with ESMTP; 07 Jan 2021 17:42:59 -0800
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RESEND v13 00/10] KVM: x86/pmu: Guest Last Branch Recording Enabling
+Date:   Fri,  8 Jan 2021 09:36:54 +0800
+Message-Id: <20210108013704.134985-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Documentation for both cgroup versions, v1 and v2, of Encryption IDs
-controller. This new controller is used to track and limit usage of
-hardware memory encryption capabilities on the CPUs.
+Hi geniuses,
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Reviewed-by: David Rientjes <rientjes@google.com>
-Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
+Please help review this rebased version which enables the guest LBR.
+
+We already upstreamed the guest LBR support in the host perf, please
+check more details in each commit and feel free to test and comment.
+
+v13->v13 RESEND Changelog:
+- Reviewed-by: Andi Kleen <ak@linux.intel.com>
+
+v12->v13 Changelog:
+- remove perf patches since they're merged already;
+- add a minor patch to refactor MSR_IA32_DEBUGCTLMSR set/get handler;
+- add a minor patch to expose vmx_set_intercept_for_msr();
+- add a minor patch to adjust features visibility via IA32_PERF_CAPABILITIES;
+- spilt the big patch to three pieces (0004-0006) for better understanding and review;
+- make the LBR_FMT exposure patch as the last step to enable guest LBR;
+
+Previous:
+https://lore.kernel.org/kvm/20201030035220.102403-1-like.xu@linux.intel.com/
+
 ---
- .../admin-guide/cgroup-v1/encryption_ids.rst  | 108 ++++++++++++++++++
- Documentation/admin-guide/cgroup-v2.rst       |  78 ++++++++++++-
- 2 files changed, 184 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/admin-guide/cgroup-v1/encryption_ids.rst
 
-diff --git a/Documentation/admin-guide/cgroup-v1/encryption_ids.rst b/Documentation/admin-guide/cgroup-v1/encryption_ids.rst
-new file mode 100644
-index 000000000000..891143b4e229
---- /dev/null
-+++ b/Documentation/admin-guide/cgroup-v1/encryption_ids.rst
-@@ -0,0 +1,108 @@
-+=========================
-+Encryption IDs Controller
-+=========================
-+
-+Overview
-+========
-+There are multiple hardware memory encryption capabilities provided by the
-+hardware vendors, like Secure Encrypted Virtualization (SEV) and SEV Encrypted
-+State (SEV-ES) from AMD.
-+
-+These features are being used in encrypting virtual machines (VMs) and user
-+space programs. However, only a small number of keys/IDs can be used
-+simultaneously.
-+
-+This limited availability of these IDs requires system admin to optimize
-+allocation, control, and track the usage of the resources in the cloud
-+infrastructure. This resource also needs to be protected from getting exhausted
-+by some malicious program and causing starvation for other programs.
-+
-+Encryption IDs controller provides capability to register the resource for
-+controlling and tracking through the cgroups.
-+
-+How to Enable Controller
-+========================
-+
-+- Enable Encryption controller::
-+
-+        CONFIG_CGROUP_ENCRYPTION_IDS=y
-+
-+- Above options will build Encryption controller support in the kernel.
-+  To mount the Encryption controller::
-+
-+        mount -t cgroup -o encryption none /sys/fs/cgroup/encryption
-+
-+
-+Interface Files
-+===============
-+Each encryption ID type have their own interface files,
-+encryption_id.[ID TYPE].{max, current, stat}, where "ID TYPE" can be sev and
-+sev-es.
-+
-+  encryption_ids.[ID TYPE].stat
-+        A read-only flat-keyed single value file. This file exists only in the
-+        root cgroup.
-+
-+        It shows the total number of encryption IDs available and currently in
-+        use on the platform::
-+          # cat encryption.sev.stat
-+          total 509
-+          used 0
-+
-+  encryption_ids.[ID TYPE].max
-+        A read-write file which exists on the non-root cgroups. File is used to
-+        set maximum count of "[ID TYPE]" which can be used in the cgroup.
-+
-+        Limit can be set to max by::
-+          # echo max > encryption.sev.max
-+
-+        Limit can be set by::
-+          # echo 100 > encryption.sev.max
-+
-+        This file shows the max limit of the encryption ID in the cgroup::
-+          # cat encryption.sev.max
-+          max
-+
-+        OR::
-+          # cat encryption.sev.max
-+          100
-+
-+        Limits can be set more than the "total" capacity value in the
-+        encryption_ids.[ID TYPE].stat file, however, the controller ensures
-+        that the usage never exceeds the "total" and the max limit.
-+
-+  encryption_ids.[ID TYPE].current
-+        A read-only single value file which exists on non-root cgroups.
-+
-+        Shows the total number of encrypted IDs being used in the cgroup.
-+
-+Hierarchy
-+=========
-+
-+Encryption IDs controller supports hierarchical accounting. It supports
-+following features:
-+
-+1. Current usage in the cgroup shows IDs used in the cgroup and its descendent cgroups.
-+2. Current usage can never exceed the corresponding max limit set in the cgroup
-+   and its ancestor's chain up to the root.
-+
-+Suppose the following example hierarchy::
-+
-+                        root
-+                        /  \
-+                       A    B
-+                       |
-+                       C
-+
-+1. A will show the count of IDs used in A and C.
-+2. C's current IDs usage may not exceed any of the max limits set in C, A, or
-+   root.
-+
-+Migration and ownership
-+=======================
-+
-+An encryption ID is charged to the cgroup in which it is used first, and
-+stays charged to that cgroup until that ID is freed. Migrating a process
-+to a different cgroup do not move the charge to the destination cgroup
-+where the process has moved.
-+
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 63521cd36ce5..b6ea47b9e882 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -63,8 +63,11 @@ v1 is available under :ref:`Documentation/admin-guide/cgroup-v1/index.rst <cgrou
-        5-7-1. RDMA Interface Files
-      5-8. HugeTLB
-        5.8-1. HugeTLB Interface Files
--     5-8. Misc
--       5-8-1. perf_event
-+     5-9. Encryption IDs
-+       5.9-1 Encryption IDs Interface Files
-+       5.9-2 Migration and Ownership
-+     5-10. Misc
-+       5-10-1. perf_event
-      5-N. Non-normative information
-        5-N-1. CPU controller root cgroup process behaviour
-        5-N-2. IO controller root cgroup process behaviour
-@@ -2160,6 +2163,77 @@ HugeTLB Interface Files
- 	are local to the cgroup i.e. not hierarchical. The file modified event
- 	generated on this file reflects only the local events.
- 
-+Encryption IDs
-+--------------
-+
-+There are multiple hardware memory encryption capabilities provided by the
-+hardware vendors, like Secure Encrypted Virtualization (SEV) and SEV Encrypted
-+State (SEV-ES) from AMD.
-+
-+These features are being used in encrypting virtual machines (VMs) and user
-+space programs. However, only a small number of keys/IDs can be used
-+simultaneously.
-+
-+This limited availability of these IDs requires system admin to optimize
-+allocation, control, and track the usage of the resources in the cloud
-+infrastructure. This resource also needs to be protected from getting exhausted
-+by some malicious program and causing starvation for other programs.
-+
-+Encryption IDs controller provides capability to register the resource for
-+controlling and tracking through the cgroups.
-+
-+Encryption IDs Interface Files
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Each encryption ID type have their own interface files,
-+encryption_id.[ID TYPE].{max, current, stat}, where "ID TYPE" can be sev and
-+sev-es.
-+
-+  encryption_ids.[ID TYPE].stat
-+        A read-only flat-keyed single value file. This file exists only in the
-+        root cgroup.
-+
-+        It shows the total number of encryption IDs available and currently in
-+        use on the platform::
-+          # cat encryption.sev.stat
-+          total 509
-+          used 0
-+
-+  encryption_ids.[ID TYPE].max
-+        A read-write file which exists on the non-root cgroups. File is used to
-+        set maximum count of "[ID TYPE]" which can be used in the cgroup.
-+
-+        Limit can be set to max by::
-+          # echo max > encryption.sev.max
-+
-+        Limit can be set by::
-+          # echo 100 > encryption.sev.max
-+
-+        This file shows the max limit of the encryption ID in the cgroup::
-+          # cat encryption.sev.max
-+          max
-+
-+        OR::
-+          # cat encryption.sev.max
-+          100
-+
-+        Limits can be set more than the "total" capacity value in the
-+        encryption_ids.[ID TYPE].stat file, however, the controller ensures
-+        that the usage never exceeds the "total" and the max limit.
-+
-+  encryption_ids.[ID TYPE].current
-+        A read-only single value file which exists on non-root cgroups.
-+
-+        Shows the total number of encrypted IDs being used in the cgroup.
-+
-+Migration and Ownership
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+An encryption ID is charged to the cgroup in which it is used first, and
-+stays charged to that cgroup until that ID is freed. Migrating a process
-+to a different cgroup do not move the charge to the destination cgroup
-+where the process has moved.
-+
- Misc
- ----
- 
+The last branch recording (LBR) is a performance monitor unit (PMU)
+feature on Intel processors that records a running trace of the most
+recent branches taken by the processor in the LBR stack. This patch
+series is going to enable this feature for plenty of KVM guests.
+
+with this patch set, the following error will be gone forever and cloud
+developers can better understand their programs with less profiling overhead:
+
+  $ perf record -b lbr ${WORKLOAD}
+  or $ perf record --call-graph lbr ${WORKLOAD}
+  Error:
+  cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
+
+The user space could configure whether it's enabled or not for each
+guest via MSR_IA32_PERF_CAPABILITIES msr. As a first step, a guest
+could only enable LBR feature if its cpu model is the same as the
+host since the LBR feature is still one of model specific features.
+
+If it's enabled on the guest, the guest LBR driver would accesses the
+LBR MSR (including IA32_DEBUGCTLMSR and records MSRs) as host does.
+The first guest access on the LBR related MSRs is always interceptible.
+The KVM trap would create a special LBR event (called guest LBR event)
+which enables the callstack mode and none of hardware counter is assigned.
+The host perf would enable and schedule this event as usual. 
+
+Guest's first access to a LBR registers gets trapped to KVM, which
+creates a guest LBR perf event. It's a regular LBR perf event which gets
+the LBR facility assigned from the perf subsystem. Once that succeeds,
+the LBR stack msrs are passed through to the guest for efficient accesses.
+However, if another host LBR event comes in and takes over the LBR
+facility, the LBR msrs will be made interceptible, and guest following
+accesses to the LBR msrs will be trapped and meaningless. 
+
+Because saving/restoring tens of LBR MSRs (e.g. 32 LBR stack entries) in
+VMX transition brings too excessive overhead to frequent vmx transition
+itself, the guest LBR event would help save/restore the LBR stack msrs
+during the context switching with the help of native LBR event callstack
+mechanism, including LBR_SELECT msr.
+
+If the guest no longer accesses the LBR-related MSRs within a scheduling
+time slice and the LBR enable bit is unset, vPMU would release its guest
+LBR event as a normal event of a unused vPMC and the pass-through
+state of the LBR stack msrs would be canceled.
+
+---
+
+LBR testcase:
+echo 1 > /proc/sys/kernel/watchdog
+echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
+echo 5000 > /proc/sys/kernel/perf_event_max_sample_rate
+echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
+./perf record -b ./br_instr a
+
+- Perf report on the host:
+Samples: 72K of event 'cycles', Event count (approx.): 72512
+Overhead  Command   Source Shared Object           Source Symbol                           Target Symbol                           Basic Block Cycles
+  12.12%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           1
+  11.05%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             5
+   8.81%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             4
+   5.04%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           20
+   4.92%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             6
+   4.88%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           6
+   4.58%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           5
+
+- Perf report on the guest:
+Samples: 92K of event 'cycles', Event count (approx.): 92544
+Overhead  Command   Source Shared Object  Source Symbol                                   Target Symbol                                   Basic Block Cycles
+  12.03%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   1
+  11.09%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     5
+   8.57%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     4
+   5.08%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     6
+   5.06%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   20
+   4.87%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   6
+   4.70%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   5
+
+Conclusion: the profiling results on the guest are similar to that on the host.
+
+Like Xu (10):
+  KVM: x86: Move common set/get handler of MSR_IA32_DEBUGCTLMSR to VMX
+  KVM: x86/vmx: Make vmx_set_intercept_for_msr() non-static
+  KVM: x86/pmu: Use IA32_PERF_CAPABILITIES to adjust features visibility
+  KVM: vmx/pmu: Clear PMU_CAP_LBR_FMT when guest LBR is disabled
+  KVM: vmx/pmu: Create a guest LBR event when vcpu sets DEBUGCTLMSR_LBR
+  KVM: vmx/pmu: Pass-through LBR msrs when the guest LBR event is ACTIVE
+  KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
+  KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
+  KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES
+  KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
+
+ arch/x86/kvm/pmu.c              |  12 +-
+ arch/x86/kvm/pmu.h              |   5 +
+ arch/x86/kvm/vmx/capabilities.h |  22 ++-
+ arch/x86/kvm/vmx/pmu_intel.c    | 292 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c          |  52 +++++-
+ arch/x86/kvm/vmx/vmx.h          |  28 +++
+ arch/x86/kvm/x86.c              |  15 +-
+ 7 files changed, 400 insertions(+), 26 deletions(-)
+
 -- 
-2.29.2.729.g45daf8777d-goog
+2.29.2
 
