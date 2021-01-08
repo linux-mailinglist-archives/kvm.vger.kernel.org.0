@@ -2,88 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F14D2EF1B0
-	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 12:56:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 092BD2EF319
+	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 14:34:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726792AbhAHLzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jan 2021 06:55:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59224 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726535AbhAHLzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jan 2021 06:55:50 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93DD8C0612F5
-        for <kvm@vger.kernel.org>; Fri,  8 Jan 2021 03:55:09 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id b2so10951715edm.3
-        for <kvm@vger.kernel.org>; Fri, 08 Jan 2021 03:55:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=TT5sj4iaJu43b/QUazBJnf2Em/sDqdQRPcN8vEMLGlQ=;
-        b=rOMcP/FDfddJ59bQmtIUlvjeCooqpYpQiXi+F9rkYjJb0e3/5guxuBDdpS1aG3OS3f
-         4rGQmIvAtvwTaVYaQ2AQm50pCldwNB3xUfHiemBZmgfl6rTxRWNWFxyfF6eeaiVrkuZI
-         QHkMnKzc36bzydvsVoOun79GNo/EFyFNi+yqJpjAyYKXpvMUguJxDeDIZiHbgVzFc+gX
-         JWtg5fM0lJo+q7PccuRnnjAyIWdj1D+kcfDDt6/LaZxDD6Nv8u7PfgMOwGex0DRJ3w3B
-         mrjb6zm3VabCFhwTFqPF2s7ydaWR+IaXKvb8F4N8Rt/8JPsN001DCFBXS1wj6PMGe0DX
-         l9gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=TT5sj4iaJu43b/QUazBJnf2Em/sDqdQRPcN8vEMLGlQ=;
-        b=J9F96bzXX4cARUB5ldgZEowDYIFIlvqCatpiJ4dt/EkCUjxEB1S+myrZNwZR9RjDuw
-         D+mku3dUm9b+lT2owf4rPyDJsTZYP9UnXPSJJS0TIlIasQfQWyLPA2uT5Dguc723Jcrh
-         YsreBtR/fbmviq4yytubxGSnbR3GqsaG/ZJAKPi7ffixvMatYrNLsFEGvlMv5kq8gqYk
-         Lvz5LQIZuXIyD8ViVK6O/zdP+Sn4LN7CaDCLDLil0dCZzEBKDf0P+xJO6f6yusjvKpLZ
-         3h4oDtlNqrdXa9CYFdOrlAQx8bVQB/NkHgybnIx5zDslSUiXRSs1ZT07fRVWjQiiS9EA
-         RBJQ==
-X-Gm-Message-State: AOAM5330/dUkY7U78drTKyGexcJEhrAP+nri8s2x5z2UQgwBUJ0MlCTV
-        WyXmNECU3ZsitqWFYk1PsJBdo2OaqypZZwG0jIGYOQ==
-X-Google-Smtp-Source: ABdhPJyckDc+/6Etn43fiZ1uuKRn9BA9d8GkrLLZ6s1Q5Flec1t+BGz2awu6YoKhKr7qMj04u6ErSWGkmPsfbPWb7u0=
-X-Received: by 2002:a50:fd18:: with SMTP id i24mr5140256eds.146.1610106908338;
- Fri, 08 Jan 2021 03:55:08 -0800 (PST)
+        id S1727441AbhAHNeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jan 2021 08:34:06 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:50544 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725816AbhAHNeE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jan 2021 08:34:04 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 108DPdUd109883;
+        Fri, 8 Jan 2021 13:32:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=S4zkW1M4aTxRNcJblTq8nmnAoFttecuVr7DB3iYS6lc=;
+ b=u43BWw/YI46k+PZDdz6WgFXEaetk1U74Zlf6i1GzYDfBCjp2TclctQZfEm69hfePQ3lF
+ cLN/e1XxgUS2OeTwOaaTys0uRP1vUFZEKV3i/6tXp/NaKhytTrPuVZ8wiGwQCbSUbxys
+ P60h0XHWLot0qHkXh9mVOxr89HvQ6nVgMAvA+OPttZmzmXyf+fgt3zfqNS5eqXGIFtig
+ uyVdf/PpYc/lmKRfaqoHjE5emwYXEjn20lwGfJZRlhSkp6SrMtJaxZ1JWh9NwbiwE/Ov
+ FjYEbhHZEolr0NNoVTS9y8SvZnd50yp4LcmRpMM97dXdvLPbhRCG7O4hC+MoKZ+oUAW+ Rg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 35wepmh24m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 08 Jan 2021 13:32:43 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 108DKYVC100966;
+        Fri, 8 Jan 2021 13:32:42 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 35v4rfafy5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Jan 2021 13:32:42 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 108DWXDO026007;
+        Fri, 8 Jan 2021 13:32:33 GMT
+Received: from [192.168.1.6] (/116.231.20.68)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 08 Jan 2021 13:32:33 +0000
+Subject: Re: [RFC v2 06/13] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        jasowang@redhat.com, stefanha@redhat.com, sgarzare@redhat.com,
+        parav@nvidia.com, akpm@linux-foundation.org, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+References: <20201222145221.711-1-xieyongji@bytedance.com>
+ <20201222145221.711-7-xieyongji@bytedance.com>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <f8dcb8d0-0024-1f78-d1a7-e487ca3deda7@oracle.com>
+Date:   Fri, 8 Jan 2021 21:32:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210107222253.20382-1-f4bug@amsat.org> <CAFEAcA-6SD7304G=tXUYWZMYekZ=+ZXaMc26faTNnHFxw9MWqg@mail.gmail.com>
- <CAAdtpL7CKT3gG8VCP4K1COjfqbG+pP_p_LG5Py8rmjUJH4foMg@mail.gmail.com>
-In-Reply-To: <CAAdtpL7CKT3gG8VCP4K1COjfqbG+pP_p_LG5Py8rmjUJH4foMg@mail.gmail.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 8 Jan 2021 11:54:57 +0000
-Message-ID: <CAFEAcA_Sx3b3ppxUdnuUSkc-xJmGhp8WZ57jN6tDziwRNxQ-MQ@mail.gmail.com>
-Subject: Re: [PULL 00/66] MIPS patches for 2021-01-07
-To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Paul Burton <paulburton@kernel.org>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Libvirt <libvir-list@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201222145221.711-7-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9857 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 bulkscore=0
+ suspectscore=0 spamscore=0 adultscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101080076
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9857 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 clxscore=1011 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101080076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 8 Jan 2021 at 11:28, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
-> Le ven. 8 janv. 2021 11:35, Peter Maydell <peter.maydell@linaro.org> a =
-=C3=A9crit :
->> Looks like decodetree fails to cope with non-ASCII characters in
->> its input file -- probably this depends on the host locale settings:
->> I think these hosts run in the 'C' locale.
->
->
-> Can you provide more information on your host so we can cover it in Gitla=
-b-CI?
+On 12/22/20 10:52 PM, Xie Yongji wrote:
+> This VDUSE driver enables implementing vDPA devices in userspace.
+> Both control path and data path of vDPA devices will be able to
+> be handled in userspace.
+> 
+> In the control path, the VDUSE driver will make use of message
+> mechnism to forward the config operation from vdpa bus driver
+> to userspace. Userspace can use read()/write() to receive/reply
+> those control messages.
+> 
+> In the data path, the VDUSE driver implements a MMU-based on-chip
+> IOMMU driver which supports mapping the kernel dma buffer to a
+> userspace iova region dynamically. Userspace can access those
+> iova region via mmap(). Besides, the eventfd mechanism is used to
+> trigger interrupt callbacks and receive virtqueue kicks in userspace
+> 
+> Now we only support virtio-vdpa bus driver with this patch applied.
+> 
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>  Documentation/driver-api/vduse.rst                 |   74 ++
+>  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+>  drivers/vdpa/Kconfig                               |    8 +
+>  drivers/vdpa/Makefile                              |    1 +
+>  drivers/vdpa/vdpa_user/Makefile                    |    5 +
+>  drivers/vdpa/vdpa_user/eventfd.c                   |  221 ++++
+>  drivers/vdpa/vdpa_user/eventfd.h                   |   48 +
+>  drivers/vdpa/vdpa_user/iova_domain.c               |  442 ++++++++
+>  drivers/vdpa/vdpa_user/iova_domain.h               |   93 ++
+>  drivers/vdpa/vdpa_user/vduse.h                     |   59 ++
+>  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1121 ++++++++++++++++++++
+>  include/uapi/linux/vdpa.h                          |    1 +
+>  include/uapi/linux/vduse.h                         |   99 ++
+>  13 files changed, 2173 insertions(+)
+>  create mode 100644 Documentation/driver-api/vduse.rst
+>  create mode 100644 drivers/vdpa/vdpa_user/Makefile
+>  create mode 100644 drivers/vdpa/vdpa_user/eventfd.c
+>  create mode 100644 drivers/vdpa/vdpa_user/eventfd.h
+>  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+>  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+>  create mode 100644 drivers/vdpa/vdpa_user/vduse.h
+>  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
+>  create mode 100644 include/uapi/linux/vduse.h
+> 
+> diff --git a/Documentation/driver-api/vduse.rst b/Documentation/driver-api/vduse.rst
+> new file mode 100644
+> index 000000000000..da9b3040f20a
+> --- /dev/null
+> +++ b/Documentation/driver-api/vduse.rst
+> @@ -0,0 +1,74 @@
+> +==================================
+> +VDUSE - "vDPA Device in Userspace"
+> +==================================
+> +
+> +vDPA (virtio data path acceleration) device is a device that uses a
+> +datapath which complies with the virtio specifications with vendor
+> +specific control path. vDPA devices can be both physically located on
+> +the hardware or emulated by software. VDUSE is a framework that makes it
+> +possible to implement software-emulated vDPA devices in userspace.
+> +
 
-It's just the windows crossbuilds on x86-64 Linux, and also the
-aarch32-on-aarch64 chroot. I'm pretty sure that the only relevant
-detail here is going to be the host LANG/etc environment variable
-settings when 'make' is run, though.
+Could you explain a bit more why need a VDUSE framework?
+Software emulated vDPA devices is more likely used by debugging only when
+don't have real hardware.
+Do you think do the emulation in kernel space is not enough?
 
-thanks
--- PMM
+Thanks,
+Bob
+
+> +How VDUSE works
+> +------------
+> +Each userspace vDPA device is created by the VDUSE_CREATE_DEV ioctl on
+> +the VDUSE character device (/dev/vduse). Then a file descriptor pointing
+> +to the new resources will be returned, which can be used to implement the
+> +userspace vDPA device's control path and data path.
+> +
+> +To implement control path, the read/write operations to the file descriptor
+> +will be used to receive/reply the control messages from/to VDUSE driver.
+> +Those control messages are based on the vdpa_config_ops which defines a
+> +unified interface to control different types of vDPA device.
+> +
+
+
