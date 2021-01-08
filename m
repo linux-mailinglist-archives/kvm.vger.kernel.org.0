@@ -2,211 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFD842EEA72
-	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 01:34:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E4542EEA89
+	for <lists+kvm@lfdr.de>; Fri,  8 Jan 2021 01:50:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729586AbhAHAdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 7 Jan 2021 19:33:15 -0500
-Received: from mail-dm6nam11on2075.outbound.protection.outlook.com ([40.107.223.75]:19297
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        id S1729556AbhAHAsz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 7 Jan 2021 19:48:55 -0500
+Received: from mail-dm6nam12on2067.outbound.protection.outlook.com ([40.107.243.67]:40737
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729569AbhAHAdP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 7 Jan 2021 19:33:15 -0500
+        id S1727695AbhAHAsz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 7 Jan 2021 19:48:55 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mVd+YNgyGGu+TNqbnkfnrBect6BUboeEw5/jKL8Riw4fRR269eDdJ6TGNcr4fSmzrideuZRt0cuJBswNc+7ep1ag8GPiNMXBwv5Ld1VLgJDjrx5iZN3ImzMsHrzegeFjFrOyx+UFHWZ3yWjk7JXE5V+Ls4jCBOWA8dQvTjCh8lDhFxtMfT+F+x8mr0pYX7iVYwtkrRvE0JKf5fHdDnHMVNIxbmodUox0IRdDWi4X8pN9mc9gPM29IUjIBRtcUX0jy2azPu+Lnb4C86//uwiv4yOIscD6wiz3ph/kDIPu2/oZBnWZO5b4D3UcsgWr91LN5VZ8V3xubdPCNCZ02Tx54w==
+ b=G0PtN8jsyNuSXGASRuiAp+9WlbKgAbEwAOqkit1A2igykiglBs2fBQfnXpTLKE22Wetwufx5fgES+9CHmzMWsLeGYZvL6l9bFuqlKb0EDiFCA00lbNtKRwTzedUvCBPValDfEmIPP4JMcbqNafd18n53lfFjIy2LFgqKxIau6cKjDMVSHrZIE3NOzM+0VjCxbUCRhSyuVjU8fkADp7NNGJXi31bFphoY/MnWmD9VzNrmMRrvO/bV+OQPw1vS8W87fRa5ciFLCUZnNDV9G4dHu9eADhcpwZ3rewfst3mMY5qSw6Cg2zlPbPR4OqeGSc/8OfqIj3Dll0FjDa/mi7J+AA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xpYVhPcqQy1RWh0Yczdx51udwvbXVlewbquSOZUq62s=;
- b=HB/002ieWOWfyDkDO8xx+h8buwJ+l5o/tzl6MEGbkva9JCxUV1XLYwDYYSpHiQINRqam9Y+U0xIQH5dOnK0r8KTdb5ebcBVLXVMQucUBou9zol6EkA1zPL1mTg7bJR8QI6UDOWJKk+OrqpDdLBkjc+52IOUo4J8vsV5za7IutHLwCHF+a55sc5XYCPi5J1Yz/Qcwdoa69TbhDXrToIM874o9dWcDTbBPXhmDgn4fDYEm+QcEail5wmIDqwa0J4G8ELDjT5UMLY2Uv+1T6CTcaCaVc9Gq7VGdowkRP9icdUCfktfzKu/KRaV0BIxVw0N/a8bGgJDm60ZgjajDS7MRsA==
+ bh=wNx26IEDsNsmPhCjL3p7QVqCsAQNb0xxAw9cYej024s=;
+ b=IMYbo95N92AKbBaRByGYKYQG5icPk0KqphVcoP2ptC+gmjNjbeD/b6NEpTNd3AoYMh0JZChf1gekFGJrkyWV2AvL47LD70xnpjP87pNZfS7RnrGUKcOJIBcIR/XGs68KPLaYTRZ2YifY9eKlpwWmZ2i7nTnnpHo5aEnVwRQEdYc3Wj3H3OzLagiNmr5bD3mVoMVQdq5elgt6UOM3pxMgDd91WVerClkVNjbO8cju36nJ7dQY6puD9p30q9y0MnmzAnjlP6VSCvw/EbDK+lr0CspscxS6j1tFxhnewbTd30zP3gFCmYwTqE+U0hHXCoNHiTrlLLUyIawrIYzWZxz9Eg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xpYVhPcqQy1RWh0Yczdx51udwvbXVlewbquSOZUq62s=;
- b=aCL3e9NV9j5Vzbpv4/1YUCPjWKIfB36P8kPJ1sdQEFe2zqJeRWykSlVAqirLcosL2L/6yaqS/ThhC240kl6ZpPV3okIABEWuA5lK/hSGD+HFTOMgAWt7JAUPVqH9PehT6uTv0nupIuDiZ9vWMlyz8hLc6o1eBpV9OpcHNz6xgCY=
+ bh=wNx26IEDsNsmPhCjL3p7QVqCsAQNb0xxAw9cYej024s=;
+ b=tkY8+KdsHj3B/npAHy5HV2FQni9mEMGkBBarVlTlbvZ0Dt97bkBNvDElAAxuEjvMoo6x7qnaf5tp5G8JiCwRV+Bl/WYFPD7YbZ8xOnNLSL0u71zuFTL/RVKGj7KMv1xOJ3oDor3eJAl14H9qDqNFMl0feWmxO+QLe/N3UUSDYIE=
 Authentication-Results: google.com; dkim=none (message not signed)
  header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from BY5PR12MB4131.namprd12.prod.outlook.com (2603:10b6:a03:212::13)
- by BYAPR12MB3288.namprd12.prod.outlook.com (2603:10b6:a03:130::33) with
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN1PR12MB2541.namprd12.prod.outlook.com (2603:10b6:802:24::30) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3721.20; Fri, 8 Jan
- 2021 00:32:21 +0000
-Received: from BY5PR12MB4131.namprd12.prod.outlook.com
- ([fe80::2432:5fa6:a1f:61f0]) by BY5PR12MB4131.namprd12.prod.outlook.com
- ([fe80::2432:5fa6:a1f:61f0%5]) with mapi id 15.20.3742.006; Fri, 8 Jan 2021
- 00:32:21 +0000
-Date:   Thu, 7 Jan 2021 18:32:11 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3721.23; Fri, 8 Jan
+ 2021 00:48:02 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::209d:4e20:fc9e:a726]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::209d:4e20:fc9e:a726%6]) with mapi id 15.20.3742.006; Fri, 8 Jan 2021
+ 00:48:02 +0000
+Date:   Fri, 8 Jan 2021 00:47:56 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 1/3] KVM: SVM: use vmsave/vmload for saving/restoring
- additional host state
-Message-ID: <20210108003211.qsarrzb3uwjq4wu5@amd.com>
-References: <20210105143749.557054-1-michael.roth@amd.com>
- <20210105143749.557054-2-michael.roth@amd.com>
- <X/Sfw15OWarseivB@google.com>
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        Borislav Petkov <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "dovmurik@linux.vnet.ibm.com" <dovmurik@linux.vnet.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "frankeh@us.ibm.com" <frankeh@us.ibm.com>, jon.grimm@amd.com
+Subject: Re: [PATCH v2 1/9] KVM: x86: Add AMD SEV specific Hypercall3
+Message-ID: <20210108004756.GA17895@ashkalra_ubuntu_server>
+References: <765f86ae-7c68-6722-c6e0-c6150ce69e59@amd.com>
+ <20201211225542.GA30409@ashkalra_ubuntu_server>
+ <20201212045603.GA27415@ashkalra_ubuntu_server>
+ <20201218193956.GJ2956@work-vm>
+ <E79E09A2-F314-4B59-B7AE-07B1D422DF2B@amd.com>
+ <20201218195641.GL2956@work-vm>
+ <20210106230555.GA13999@ashkalra_ubuntu_server>
+ <CABayD+dQwaeCnr5_+DUpvbQ42O6cZBMO79pEEzi5WXPO=NH3iA@mail.gmail.com>
+ <20210107013414.GA14098@ashkalra_ubuntu_server>
+ <20210107080513.GA16781@ashkalra_ubuntu_server>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <X/Sfw15OWarseivB@google.com>
-X-Originating-IP: [165.204.10.250]
-X-ClientProxiedBy: MN2PR07CA0002.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::12) To BY5PR12MB4131.namprd12.prod.outlook.com
- (2603:10b6:a03:212::13)
+In-Reply-To: <20210107080513.GA16781@ashkalra_ubuntu_server>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN4PR0801CA0019.namprd08.prod.outlook.com
+ (2603:10b6:803:29::29) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.10.250) by MN2PR07CA0002.namprd07.prod.outlook.com (2603:10b6:208:1a0::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3742.6 via Frontend Transport; Fri, 8 Jan 2021 00:32:21 +0000
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN4PR0801CA0019.namprd08.prod.outlook.com (2603:10b6:803:29::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3742.6 via Frontend Transport; Fri, 8 Jan 2021 00:48:01 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 60f4d17f-c0d5-48c1-7a95-08d8b36cdcda
-X-MS-TrafficTypeDiagnostic: BYAPR12MB3288:
+X-MS-Office365-Filtering-Correlation-Id: bec0195b-5c60-40c4-f447-08d8b36f0dca
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2541:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BYAPR12MB3288B16F7B5B5729367F372195AE0@BYAPR12MB3288.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2541FCA143F3CEFD42E4B3088EAE0@SN1PR12MB2541.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AzEdj/yN1EfwuBulKQl2bNCDjvIYe/yu8EXd/VSAZ9MCQ6AwgxBQccbpP+Rwa8ko6VSeSZtgXo63zn4uj8gT7jx4VrpDVFJ110UrkSldEYuToSVEQx5qlZdfhI+zbpyspjiECV1SRXPCV4k1X2oExQ9C7Dz9c7DGkaX499pVv+KaOWMZHS+LMlTnMZiCMNt8WfUw9/cruJXwr8Ia8SNZNSOwU2S/nrVoECY/M5ZK1/Sak8zWF425frIWc96HFHkbQeot9Qw+gVykrdgq7pO/HFc8wgtcLOz4eHX3XhNxbOxOJOMhm3zIZ6kiz4EBzQOEW/wmpO+jPs6AgydvNwo6GBa+17DPHSa6d1YNFqcDMqPXkFd8dyRGhooERV3Oiln75Ob2EXiAFZtS6JVVwdG3Ldv+GFlDydJgt3L/mXDcde1MR9VWaSpO9Wt787ZYywr5YoY9V8cRTTmn08KWc1bYpg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(136003)(346002)(39860400002)(366004)(6486002)(2616005)(7416002)(6916009)(52116002)(83380400001)(45080400002)(66946007)(66476007)(6496006)(8676002)(6666004)(86362001)(956004)(8936002)(54906003)(66556008)(1076003)(478600001)(966005)(2906002)(5660300002)(44832011)(26005)(316002)(186003)(16526019)(36756003)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?jR3LUg/co833xZsIuBS3y0rG1iKTRUtDEE88fEiK82HsAwUvSFpzvovXPfmE?=
- =?us-ascii?Q?eLPU67hadbgbuzljqJaKpuBON+DK3tDq0WjfgPXeSeZyx6Za2QIKUfkJHhlc?=
- =?us-ascii?Q?F33S9xblA2RwXWUV7z4NpBFvXU8old84kSdVXpVDRtyLCSjE/wLfl/fvoHMC?=
- =?us-ascii?Q?3mEczKBUWJMrwafJC26OnpmeWAkKRmLQ7nOcLPyOhaC8NutdXCj6oDl0ZzDS?=
- =?us-ascii?Q?7YLxVfALb2lEhJ75s0ynOTiok0UfL7qmMQiLDMYQ49BnBkp4si5R02q4dEQ6?=
- =?us-ascii?Q?Y0Bdcam5Xe6e5rSrEDhZxOg/g5KV9V9y6T+U/w0zAgMKAX4dwy+alZqP59/P?=
- =?us-ascii?Q?czGqT4kwRTSL+GyUyiLMrvptxtGhc9eHFWxb3r6YdNod8BsX27t/g2K09sw1?=
- =?us-ascii?Q?HERrZdGYe5rE2LacXCaAAu08VlSDoaIibwNolK3Hrr0ZOXneIPBvHFRdUvaZ?=
- =?us-ascii?Q?7n/PMd2QY+Pn/hqb2pRAT+coTh5/jHqVlI0MWkugwYmoASb0r9m2QqDncSl+?=
- =?us-ascii?Q?HeDqSuZP+MFL4JxqWkvsybNbvFGrsAQ6nddEopjbdJCduNx4nFPqt3SiIrdZ?=
- =?us-ascii?Q?6zFiahjj0PHVwbvD0GSDxAAcm2QsuLAuO4VErtd38bVMKeM+Ky9yTMPZDFT9?=
- =?us-ascii?Q?0vL7Ziu3XMaRvSCTHLAW1DBHfCdVCqXI1obELYPuZ6pkHu0WQbEbGk25WjYV?=
- =?us-ascii?Q?aO/u10cXAA9dFW74cVepBr1U2t8HKUEkPydu9/TJ3VRvdLFourD+NSxaqMSb?=
- =?us-ascii?Q?ptVeUKGGzFrkKFHAeUUFTHP3Wa1CrYJbXyfZzFwHbm85AgNmTcwYTZ3GcUEq?=
- =?us-ascii?Q?U8mwehvsWwRzxCks/aRwujxGyDJ+3bIoD5I5wYcE9qwnN2lof2XsIvixnjeT?=
- =?us-ascii?Q?4f9NnCNYW9qj7N6wIh8YkAO+uNBBptkh5NLghaktposj0Wse5y7LIft2C7I8?=
- =?us-ascii?Q?bC9GJHv84AzLvGeqqIqkn9NwYUC+mOT6jgwtF/YLnBpb4MHpconRm6Dz9NcQ?=
- =?us-ascii?Q?ey+z?=
+X-Microsoft-Antispam-Message-Info: e4IjyP0g6FNEoPHG4yO50BE7tgLVTiKV3S/56Zz13NsyPxOXiCBpA7TmHPxygtABY5tzzdGybphjDX1Aj3Sze9OtWsq9ZViUWMnMMrKAqbnmkxsbf6bH1qicITRszvEKBOeyAuzGr0OBJJlz8Ep6TPUoVX2mFUvXgRvAt4OAoooJsc6DbBxy97nrgwkphPxHF1MHZ5aZW4lY9M/eqsDQisaePKETjEbQ1vrbYkIafCHP68KVvbF+HQr8p6msAm6PH9CKz/ooIdhC3xHBZ6jv80VgEUAYAXoH2rAZ0QyLjoJrBShIMlA35rpNk5m5JoaIBCEEWDX61eyal1E3vgyMHcpVmYIGYb/2r7z4Z4wGBOsSwi9QgIwW+6415fnCl+m6QzrKovRzYxaj3aM1DXOhgw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(376002)(346002)(366004)(39860400002)(4326008)(6496006)(956004)(66556008)(1076003)(44832011)(54906003)(33716001)(33656002)(8936002)(7416002)(316002)(2906002)(186003)(5660300002)(6916009)(66946007)(86362001)(55016002)(83380400001)(66476007)(478600001)(16526019)(6666004)(9686003)(52116002)(26005)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?2Vso2aBMPFUOAqtbQ2dUH8YV84KhvAMG2hpEng+eTsopF28xhXho4WaC1mUD?=
+ =?us-ascii?Q?ZyvY9vFyX06r03UN90muzAaVKYaqUwNX6eloRBXb+0O5v/z0IX4jtZHRYvhO?=
+ =?us-ascii?Q?xRPw3IanUfS5Kd4+PjjH0puYTH+OZWsFcnoYcV8MVF0PSLc6miTapdiDivDH?=
+ =?us-ascii?Q?6DfeDtIps0uF8JB92ifs5kVhHuraMNNEeNtXHmL25znXyXMs4P6p6LYWtPUC?=
+ =?us-ascii?Q?Rb/4EaI3rFNyGdDc89TQbm5ZHjnoZ6bihYUghvXgEYh8nokqJKCDeWeDCf6b?=
+ =?us-ascii?Q?SEQEHVQmzF2FyA7DURz28FuAY7EnqSSVr5tLJrGKxgpXDM6kYJOjjiVeoea1?=
+ =?us-ascii?Q?G+l6233tzugANjqrpnwex0uQLR0ZY7nZxNYzicSo5n5v9zos5JscRXWOb/HM?=
+ =?us-ascii?Q?mX3y/Gz9ILfMZX12s3mSrQEtjd7FXtNGk1B6sFGzE4vVN4KxhZ+aT8kjhMQ2?=
+ =?us-ascii?Q?J8juXyUEY2T5urJFZx9Nug2JSlenYGnit1HpgAOxZ9zgr0tP+RSUK6n+wTpJ?=
+ =?us-ascii?Q?h46DN8KCYpBLZ4TQvG8EqueRdHEcsiIz7heyfDatVnroIedRgM4sdFaKX6nh?=
+ =?us-ascii?Q?PI8tyMnTBoDBvwdYrNSbGhbmm60BgttAYne23AKjXTXGzn042i0qPcZkDG5S?=
+ =?us-ascii?Q?AJYNk1JBD/BIlH3A5GMxr/U1IB+ppydSEgEYmcHdrGJIVDchddh3Q9+zi+4M?=
+ =?us-ascii?Q?jd6UVcoJHep92+fA26jEJsqWu4BAbq1ZUN/W4XL+xm61un8s0pJKllaQqv0a?=
+ =?us-ascii?Q?tPByTtziANgj97pFo1Fr72tV0+MnmxkVlmo4kMAzuovHTtJ81KNyTO/KwXVC?=
+ =?us-ascii?Q?qQVL8YAVTGydGchLlaO4yclg4pGIqNGg3FQWEuAt6hTlLFtTgcV6sgH4wAYV?=
+ =?us-ascii?Q?FZdiZ4L2h+hhFQ4mr43oHJSGfWUztEhPLNuYD9F/BBkq1qN6LRhBxK0BBGkm?=
+ =?us-ascii?Q?WPuQUebXV0uM2OH7YOqFYT72O/YBEqLKNkrhiMx33YVLqCi7C3YOXsyGEjeN?=
+ =?us-ascii?Q?hida?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4131.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2021 00:32:21.5164
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2021 00:48:02.6431
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 60f4d17f-c0d5-48c1-7a95-08d8b36cdcda
+X-MS-Exchange-CrossTenant-Network-Message-Id: bec0195b-5c60-40c4-f447-08d8b36f0dca
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rdRb8vErBNjSrFPjsAjQdnoHXD2oCiBkcmuptf23tRZX3HrctAXhwyntc9L40MjPa753PN0/4gbK3kpbe9mUQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3288
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZpqWlP4J3CdDXb05UB5x0rtUMtXKWlHBX0PrzZImX7+cvEyf8pd21b2kyHaV4MdUJf3DuBXbTLriuJ+xtiJ/mA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2541
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 05, 2021 at 09:20:03AM -0800, Sean Christopherson wrote:
-> On Tue, Jan 05, 2021, Michael Roth wrote:
-> > @@ -3703,16 +3688,9 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> >  	if (sev_es_guest(svm->vcpu.kvm)) {
-> >  		__svm_sev_es_vcpu_run(svm->vmcb_pa);
-> >  	} else {
-> > -		__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
-> > -
-> > -#ifdef CONFIG_X86_64
-> > -		native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
-> > -#else
-> > -		loadsegment(fs, svm->host.fs);
-> > -#ifndef CONFIG_X86_32_LAZY_GS
-> > -		loadsegment(gs, svm->host.gs);
-> > -#endif
-> > -#endif
-> > +		__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs,
-> > +			       page_to_phys(per_cpu(svm_data,
-> > +						    vcpu->cpu)->save_area));
-> 
-> Does this need to use __sme_page_pa()?
+> On Thu, Jan 07, 2021 at 01:34:14AM +0000, Ashish Kalra wrote:
+> > Hello Steve,
+> > 
+> > My thoughts here ...
+> > 
+> > On Wed, Jan 06, 2021 at 05:01:33PM -0800, Steve Rutherford wrote:
+> > > Avoiding an rbtree for such a small (but unstable) list seems correct.
+> > > 
+> > 
+> > I agree.
+> > 
+> > > For the unencrypted region list strategy, the only questions that I
+> > > have are fairly secondary.
+> > > - How should the kernel upper bound the size of the list in the face
+> > > of malicious guests, but still support large guests? (Something
+> > > similar to the size provided in the bitmap API would work).
+> > > - What serialization format should be used for the ioctl API?
+> > > (Usermode could send down a pointer to a user region and a size. The
+> > > kernel could then populate that with an array of structs containing
+> > > bases and limits for unencrypted regions.)
+> > > - How will the kernel tag a guest as having exceeded its maximum list
+> > > size, in order to indicate that the list is now incomplete? (Track a
+> > > poison bit, and send it up when getting the serialized list of
+> > > regions).
+> > > 
+> > > In my view, there are two main competitors to this strategy:
+> > > - (Existing) Bitmap API
+> > > - A guest memory donation based model
+> > > 
+> > > The existing bitmap API avoids any issues with growing too large,
+> > > since it's size is predictable.
+> > > 
+> > > To elaborate on the memory donation based model, the guest could put
+> > > an encryption status data structure into unencrypted guest memory, and
+> > > then use a hypercall to inform the host where the base of that
+> > > structure is located. The main advantage of this is that it side steps
+> > > any issues around malicious guests causing large allocations.
+> > > 
+> > > The unencrypted region list seems very practical. It's biggest
+> > > advantage over the bitmap is how cheap it will be to pass the
+> > > structure up from the kernel. A memory donation based model could
+> > > achieve similar performance, but with some additional complexity.
+> > > 
+> > > Does anyone view the memory donation model as worth the complexity?
+> > > Does anyone think the simplicity of the bitmap is a better tradeoff
+> > > compared to an unencrypted region list?
+> > 
+> > One advantage in sticking with the bitmap is that it maps very nicely to
+> > the dirty bitmap page tracking logic in KVM/Qemu. The way Brijesh
+> > designed and implemented it is very similar to dirty page bitmap tracking
+> > and syncing between KVM and Qemu. The same logic is re-used for the page
+> > encryption bitmap which means quite mininal changes and code resuse in
+> > Qemu. 
+> > 
+> > Any changes to the backing data structure, will require additional
+> > mapping logic to be added to Qemu.
+> > 
+> > This is one advantage in keeping the bitmap logic.
+> > 
 
-Oddly enough the current patch seems to work even with SME enabled. Not
-sure why though since as Tom pointed out we do use it elsewhere with the
-SME bit set. But should be setting it either way.
-
-> 
-> >  	}
-> >  
-> >  	/*
-> 
-> ...
-> 
-> > diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-> > index 6feb8c08f45a..89f4e8e7bf0e 100644
-> > --- a/arch/x86/kvm/svm/vmenter.S
-> > +++ b/arch/x86/kvm/svm/vmenter.S
-> > @@ -33,6 +33,7 @@
-> >   * __svm_vcpu_run - Run a vCPU via a transition to SVM guest mode
-> >   * @vmcb_pa:	unsigned long
-> >   * @regs:	unsigned long * (to guest registers)
-> > + * @hostsa_pa:	unsigned long
-> >   */
-> >  SYM_FUNC_START(__svm_vcpu_run)
-> >  	push %_ASM_BP
-> > @@ -47,6 +48,9 @@ SYM_FUNC_START(__svm_vcpu_run)
-> >  #endif
-> >  	push %_ASM_BX
-> >  
-> > +	/* Save @hostsa_pa */
-> > +	push %_ASM_ARG3
-> > +
-> >  	/* Save @regs. */
-> >  	push %_ASM_ARG2
-> >  
-> > @@ -154,6 +158,12 @@ SYM_FUNC_START(__svm_vcpu_run)
-> >  	xor %r15d, %r15d
-> >  #endif
-> >  
-> > +	/* "POP" @hostsa_pa to RAX. */
-> > +	pop %_ASM_AX
-> > +
-> > +	/* Restore host user state and FS/GS base */
-> > +	vmload %_ASM_AX
-> 
-> This VMLOAD needs the "handle fault on reboot" goo.  Seeing the code, I think
-
-Ah, yes, I overlooked that with the rework.
-
-> I'd prefer to handle this in C code, especially if Paolo takes the svm_ops.h
-> patch[*].  Actually, I think with that patch it'd make sense to move the
-> existing VMSAVE+VMLOAD for the guest into svm.c, too.  And completely unrelated,
-> the fault handling in svm/vmenter.S can be cleaned up a smidge to eliminate the
-> JMPs.
-> 
-> Paolo, what do you think about me folding these patches into my series to do the
-> above cleanups?  And maybe sending a pull request for the end result?  (I'd also
-> like to add on a patch to use the user return MSR mechanism for MSR_TSC_AUX).
-
-No complaints on my end at least :) But happy to send a v4 with SME bit fix
-and reboot handling if you think that's worthwhile (and other suggested changes
-as well, but not sure exactly what you have in mind there). Can also help with
-any testing of course.
+So if nobody is in favor of keeping the (current) bitmap logic, we will
+move to the unencrypted region list approach.
 
 Thanks,
-
-Mike
-
-> 
-> [*] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flkml.kernel.org%2Fr%2F20201231002702.2223707-8-seanjc%40google.com&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C78b8a6cc557c4b7cda2e08d8b19e28e4%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637454640153346851%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=r2dX27RJ569gloShKvha%2BUtcf0%2B5vNc%2Fn6E1dREJDm0%3D&amp;reserved=0
-> 
-> > +
-> >  	pop %_ASM_BX
-> >  
-> >  #ifdef CONFIG_X86_64
-> > -- 
-> > 2.25.1
-> > 
+Ashish
