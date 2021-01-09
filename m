@@ -2,132 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A10FF2EFCA6
-	for <lists+kvm@lfdr.de>; Sat,  9 Jan 2021 02:20:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E68DE2EFD4F
+	for <lists+kvm@lfdr.de>; Sat,  9 Jan 2021 04:10:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725844AbhAIBUW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jan 2021 20:20:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46810 "EHLO
+        id S1726363AbhAIDKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jan 2021 22:10:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725815AbhAIBUW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jan 2021 20:20:22 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE871C061573;
-        Fri,  8 Jan 2021 17:19:41 -0800 (PST)
-Received: from zn.tnic (p200300ec2f0a31002d28d593016b8c5a.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:3100:2d28:d593:16b:8c5a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5A9361EC04CC;
-        Sat,  9 Jan 2021 02:19:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1610155180;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=CFrCvmLh0QxnlTvwTjbIqnbyBw3zF45rv41UWBEPge4=;
-        b=CHOdcpFV+4hQLdWlyX8mGglWpXyY1OIll7sXvcqTg/5IcMGJYFgGP7ZbA+104ipzhSilLu
-        tO52tDZqZrP0NmD6CBY/1vccbu6EhOZfDxGONVTbNxOZ0lqjWDNb1ftw4YLtTqKZ+AKpp5
-        xCaDqCs4za1JDhVLQqlmkmiP6YGENP8=
-Date:   Sat, 9 Jan 2021 02:19:39 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
-Message-ID: <20210109011939.GL4042@zn.tnic>
-References: <cover.1609890536.git.kai.huang@intel.com>
- <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
- <20210106221527.GB24607@zn.tnic>
- <20210107120946.ef5bae4961d0be91eff56d6b@intel.com>
- <20210107064125.GB14697@zn.tnic>
- <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
- <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
- <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
- <20210108071722.GA4042@zn.tnic>
- <X/jxCOLG+HUO4QlZ@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <X/jxCOLG+HUO4QlZ@google.com>
+        with ESMTP id S1725836AbhAIDKT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jan 2021 22:10:19 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0403C061573;
+        Fri,  8 Jan 2021 19:09:38 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id j1so6689141pld.3;
+        Fri, 08 Jan 2021 19:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=fQoQ591DRcLcx1zBs38ERO9HILV+4vRtO0mx9yq+xxk=;
+        b=tK95k3WSzIGI2ktKiBx/Yc2pT7JqIGFuxCw9xB4BZuzRqqVyOjo5wqbw2kJa+N9TAj
+         3QTR1pST+DQNZBN4e/mKgdsIH2xNsWQ+yShoDArGGiLmot5XUFUTOffPFVRSxiAghoKc
+         XiJ3KGdV/Eoe7t9BN/4LTx90ecVcH0u6p22e1EqURknTRS01ft2TW9oq/qCq3ggKdWfQ
+         HC0nOPLfqpZH7PErVqqQHy1TRcromD8X3xGDHWmfZdQqABwFQMXP6Spl+T9kcbRTjCZx
+         425ZxzG7mEYTpG1/l+aFIf58+fl75ExTQMgtrrkBMc9BjIYBhMXcizVYShC6zQkLIDrH
+         zASA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=fQoQ591DRcLcx1zBs38ERO9HILV+4vRtO0mx9yq+xxk=;
+        b=HfEn/G611Ix6hH6eAEYpsuKAK+8diz1oj/vbhJSkmrmP/mINSaawb345clTqICsT1L
+         eOTVU6M/OVecxsQfn0s3DHXnmHQc5Cg1/BkuUieDhdX1p/MFiuI7vRfjP5i19UogwOnd
+         POVafrX61N6Wedn7IGq9PmDAiLLxIzV/wmM8e+gsLBte07fgOMss71P7ynILsP5mMR+V
+         FICJXS7zqcGfTFSOKXkdeOirrY1QtKTCI+jmCZWy2pYyAV7YUrCTIg7MdsvPae4ba7CL
+         ityOTj3UOL7ZqOyzaniRbHfsrmmrLsQKIcfTdpMyc72NRNMSoqFEg4sLCPY1HCmBNDAH
+         KvgQ==
+X-Gm-Message-State: AOAM533ESsJqMKh6ce3bwnemkBTnkbAHhi1TuSXSP1g8ybkGatsX2ogP
+        dP5HuwHD0ddOQ0DeFdvW+bE=
+X-Google-Smtp-Source: ABdhPJzZtqIcJB2oop8heybvKQtx+XyKUJjT/k/OeanQ/dLSyo21ZUmO1VK/VMQtHgGn5L0F/j8NqA==
+X-Received: by 2002:a17:90a:2ec1:: with SMTP id h1mr7034337pjs.18.1610161778311;
+        Fri, 08 Jan 2021 19:09:38 -0800 (PST)
+Received: from jordon-HP-15-Notebook-PC.domain.name ([122.171.171.27])
+        by smtp.gmail.com with ESMTPSA id 9sm10258074pfn.188.2021.01.08.19.09.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Jan 2021 19:09:37 -0800 (PST)
+From:   Souptick Joarder <jrdr.linux@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Souptick Joarder <jrdr.linux@gmail.com>
+Subject: [PATCH] kvm: x86: Mark __kvm_vcpu_halt() as static
+Date:   Sat,  9 Jan 2021 08:39:32 +0530
+Message-Id: <1610161772-5144-1-git-send-email-jrdr.linux@gmail.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 08, 2021 at 03:55:52PM -0800, Sean Christopherson wrote:
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index dc921d76e42e..21f92d81d5a5 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -7,7 +7,25 @@
->  #include <asm/processor.h>
->  #include <uapi/asm/kvm_para.h>
-> 
-> -extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
-> +/*
-> + * Hardware-defined CPUID leafs that are scattered in the kernel, but need to
-> + * be directly by KVM.  Note, these word values conflict with the kernel's
-> + * "bug" caps, but KVM doesn't use those.
+Kernel test robot throws below warning ->
 
-This feels like another conflict waiting to happen if KVM decides to use
-them at some point...
+>> arch/x86/kvm/x86.c:7979:5: warning: no previous prototype for
+>> '__kvm_vcpu_halt' [-Wmissing-prototypes]
+    7979 | int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int
+reason)
+         |     ^~~~~~~~~~~~~~~
 
-So let me get this straight: KVM wants to use X86_FEATURE_* which
-means, those numbers must map to the respective words in its CPUID caps
-representation kvm_cpu_caps, AFAICT.
+Marking __kvm_vcpu_halt() as static as it is used inside this file.
 
-Then, it wants the leafs to correspond to the hardware leafs layout so
-that it can do:
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+---
+ arch/x86/kvm/x86.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
-
-which comes straight from CPUID.
-
-So lemme look at one word:
-
-        kvm_cpu_cap_mask(CPUID_1_EDX,
-                F(FPU) | F(VME) | F(DE) | F(PSE) |
-                F(TSC) | F(MSR) | F(PAE) | F(MCE) |
-		...
-
-
-it would build the bitmask of the CPUID leaf using X86_FEATURE_* bits
-and then mask it out with the hardware leaf read from CPUID.
-
-But why?
-
-Why doesn't it simply build those leafs in kvm_cpu_caps from the leafs
-we've already queried?
-
-Oh it does so a bit earlier:
-
-        memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
-               sizeof(kvm_cpu_caps));
-
-and that kvm_cpu_cap_mask() call is to clear some bits in kvm_cpu_caps
-which is kvm-specific thing (not supported stuff etc).
-
-But then why does kvm_cpu_cap_mask() does cpuid_count()? Didn't it just
-read the bits from boot_cpu_data.x86_capability? And those bits we do
-query and massage extensively during boot. So why does KVM needs to
-query CPUID again instead of using what we've already queried?
-
-Maybe I'm missing something kvm-specific.
-
-In any case, this feels somewhat weird: you have *_cpu_has() on
-baremetal abstracting almost completely from CPUID by collecting all
-feature bits it needs into its own structure - x86_capability[] along
-with accessors for it - and then you want to "abstract back" to CPUID
-leafs from that interface. I wonder why.
-
-Anyway, more questions tomorrow.
-
-Gnight and good luck. :)
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 61499e1..c2fdf14 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -109,6 +109,7 @@
+ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+ static void store_regs(struct kvm_vcpu *vcpu);
+ static int sync_regs(struct kvm_vcpu *vcpu);
++static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason);
+ 
+ struct kvm_x86_ops kvm_x86_ops __read_mostly;
+ EXPORT_SYMBOL_GPL(kvm_x86_ops);
+@@ -7976,7 +7977,7 @@ void kvm_arch_exit(void)
+ 	kmem_cache_destroy(x86_fpu_cache);
+ }
+ 
+-int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
++static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+ {
+ 	++vcpu->stat.halt_exits;
+ 	if (lapic_in_kernel(vcpu)) {
 -- 
-Regards/Gruss,
-    Boris.
+1.9.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
