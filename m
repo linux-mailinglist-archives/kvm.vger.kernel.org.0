@@ -2,137 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F0F2EFC6D
-	for <lists+kvm@lfdr.de>; Sat,  9 Jan 2021 01:52:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83E722EFC90
+	for <lists+kvm@lfdr.de>; Sat,  9 Jan 2021 02:03:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726886AbhAIAtp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 8 Jan 2021 19:49:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40196 "EHLO
+        id S1726396AbhAIBCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 8 Jan 2021 20:02:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726960AbhAIAtj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 8 Jan 2021 19:49:39 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7B7C0617AA
-        for <kvm@vger.kernel.org>; Fri,  8 Jan 2021 16:48:08 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id o8so17219460ybq.22
-        for <kvm@vger.kernel.org>; Fri, 08 Jan 2021 16:48:08 -0800 (PST)
+        with ESMTP id S1726390AbhAIBCe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 8 Jan 2021 20:02:34 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C33C0613D3
+        for <kvm@vger.kernel.org>; Fri,  8 Jan 2021 17:01:32 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id v19so8692812pgj.12
+        for <kvm@vger.kernel.org>; Fri, 08 Jan 2021 17:01:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=fVKJcIBGyQ8ofth+2r+58SAdhl2FPbPE0WCNDEMMDk4=;
-        b=sV2kXazNx3+wC2Yq0tFCfvFkxuQ8uXG6rdN9zX9NROD55PWnPh0AprGhmarvvrE/Ks
-         srn/Y6hNixdWjZTmVJ7muGoFZ8Y2hVc645/zNmkyR+beufPJ/zSPTPJuLharLBkugmvg
-         kBwiMT3XRfhsnHEuUNh8KkhGlHZwZX8EijET8Vi0AkNpX28n/ZQij+4/fdsEhC5K161y
-         YrtOpmHIbDWQ6sIYluL6KJfdJo4h2nER3g3BkRS2UvRgqMbQjNBMWM1LAovL62/sCMKI
-         1GM+jxKOyBr3luJeuF1iy4bYYqD6cdjeBXn3RSgV67SvlDWQutqGDxRzBaSIGFCh5hKg
-         6EAw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VAuMoiKLdCWGFL+8WHc++7W2S54mQ6a1Rj7M8Uus0Wc=;
+        b=WoEOzI7mMwukLesyNRiiF7wLtxLHWF9IQ8lW2Gh3+KHiWHn3D7yB2Y3Pdaeu+E1qEK
+         FujfpjdW3i3jcQQgkOAMCDDQQBhfK8/iOjK5BTul7NrR8SSU2zx8FU4vvwCe82vmZaUp
+         3LPk/7lFL8fNGLemZ+fCYqAbjAcaV1klLozdIDYs0++wy3SqkZQJ3FWDjV/KADDCikv2
+         zyW83GXED2qQo62rJGudK3xXHI0ahQY1WeIEcxU0n7UKrHOR5Csv+N/aN56Nl2Uh70fu
+         fPm+e1ls3Unfz+3Ec3+5dxd6zEuUol/9tWJY+ByHgk3sKYTkPPwveKHr8/oA/APRhwpn
+         33Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=fVKJcIBGyQ8ofth+2r+58SAdhl2FPbPE0WCNDEMMDk4=;
-        b=kb+ks/q4x41HHuxd3/rcwqrxmmqlHstAMAL7J2HC94h5Y+GvmSZ/SFzGHEURtZGTi3
-         y5zfVQ0DJMuOEcViGRCEFhaiaCYoxNKkmNeCBGzmCyzgvRR3K5mglizsq3tzwS5+1Cfd
-         CQcf6p0YrkhzJ1s7udP6dFHVbDv1az5jn6GvJD1pQ4dxYgf25h0YxKZfxQ3/Y70SuIri
-         vnGxRaB7VDQt5y2vRDWlAOMARDD67RMaEPidekdeF7dUVzf/Zx8XRR6rHZHS7RYPk60w
-         lcrGqzQOrfIywBZnzT/DY/OEakTMdczdQmv0+LjQJnZpWKdmhtxlmc3wtRxeaxI7vLpA
-         Rjpg==
-X-Gm-Message-State: AOAM530jtY+a8Am46MaO2xwqzqO3JTHXMeZG25PD4z2On0RwIjo9dsvr
-        AjbzorYA5gI3oAGSUuOfvGL8TjpP0Qk=
-X-Google-Smtp-Source: ABdhPJwkUpCfLMqhX7OFP7/TPxLCfPGVqnIV++qq6RbW6+AzZ8TZu4ZGF0NRg7hqrAiAuHqTHJm1tlBGHBk=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:3ac3:: with SMTP id h186mr8587398yba.155.1610153288080;
- Fri, 08 Jan 2021 16:48:08 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  8 Jan 2021 16:47:14 -0800
-In-Reply-To: <20210109004714.1341275-1-seanjc@google.com>
-Message-Id: <20210109004714.1341275-14-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210109004714.1341275-1-seanjc@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 13/13] KVM: SVM: Skip SEV cache flush if no ASIDs have been used
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VAuMoiKLdCWGFL+8WHc++7W2S54mQ6a1Rj7M8Uus0Wc=;
+        b=GKlwfyJv4DLB+LYyjGVA4FyyXqCjmrjiZbNCdxqAq5j43m9s2Vk9S7L1yl4nkNJTg9
+         VeQGhBJ2RVm2FGhRBIOKg8aS4jfTQHcNDBrJjPcd4BcW1qwiVHMxDKpx9R6Z38/cnDdd
+         I3tX1y81Ymu7st3KCA4o6h5xKsnXuDBJzx40jNbmL4/WJpnifgtFS+wzwv8508AvJS+a
+         A5LoDK2SvNTogLG8fu0+/VVwB51oxsKXs6woAG3lHGGXUzTfYP4anpYNq7ocEO6WZjhZ
+         t7q2ocycGmzP2EQU9oGcsgeR/Ej8mSt5beWq3vF89zsGSGiHqLrZaO81FLTBP6vE32e5
+         Zb0A==
+X-Gm-Message-State: AOAM531MOISu09Y3o+oxryTwFkKcNWhfYbjbM1T7Xu9IstiYktWayzWM
+        MzO21AkF7r1zRhw3QzPWzGZ58g==
+X-Google-Smtp-Source: ABdhPJymWC2GjzMYRUkUGpMULobhStzMJlfi0GalUgRhKIrG5Au05nevOKY7Kn09HZeAtO+ItpCCvw==
+X-Received: by 2002:a63:a516:: with SMTP id n22mr9418531pgf.125.1610154091913;
+        Fri, 08 Jan 2021 17:01:31 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 21sm10048096pfx.84.2021.01.08.17.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Jan 2021 17:01:31 -0800 (PST)
+Date:   Fri, 8 Jan 2021 17:01:24 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Message-ID: <X/kAZEXSZuOjq3h9@google.com>
+References: <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
+ <20210106221527.GB24607@zn.tnic>
+ <20210107120946.ef5bae4961d0be91eff56d6b@intel.com>
+ <20210107064125.GB14697@zn.tnic>
+ <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
+ <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
+ <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
+ <20210108071722.GA4042@zn.tnic>
+ <X/jxCOLG+HUO4QlZ@google.com>
+ <20210109003502.GK4042@zn.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210109003502.GK4042@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip SEV's expensive WBINVD and DF_FLUSH if there are no SEV ASIDs
-waiting to be reclaimed, e.g. if SEV was never used.  This "fixes" an
-issue where the DF_FLUSH fails during hardware teardown if the original
-SEV_INIT failed.  Ideally, SEV wouldn't be marked as enabled in KVM if
-SEV_INIT fails, but that's a problem for another day.
+On Sat, Jan 09, 2021, Borislav Petkov wrote:
+> On Fri, Jan 08, 2021 at 03:55:52PM -0800, Sean Christopherson wrote:
+> > To be fair, this is the third time we've got conflicting, direct feedback on
+> > this exact issue.  I do agree that it doesn't make sense to burn a whole word
+> > for just two features, I guess I just feel like whining.
+> > 
+> > [*] https://lore.kernel.org/kvm/20180828102140.GA31102@nazgul.tnic/
+> > [*] https://lore.kernel.org/linux-sgx/20190924162520.GJ19317@zn.tnic/
+> 
+> Well, sorry that I confused you guys but in hindsight we probably should
+> have stopped you right then and there from imposing kvm requirements on
+> the machinery behind *_cpu_has() and kvm should have been a regular user
+> of those interfaces like the rest of the kernel code - nothing more.
+> 
+> And if you'd like to do your own X86_FEATURE_* querying but then extend
+> it with its own functionality, then that should have been decoupled.
+> 
+> And I will look at your patch later when brain is actually awake but
+> I strongly feel that in order to avoid such situations in the future,
+> *_cpu_has() internal functionality should be separate from kvm's
+> respective CPUID leafs representation. For obvious reasons.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+I kinda agree, but I'd prefer not to fully decouple KVM's CPUID stuff.  The more
+manual definitions/translations we have to create, the more likely it is that
+we'll screw something up.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index b4a9c12cf8ce..eb8e4dca4bf2 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -51,9 +51,14 @@ struct enc_region {
- 	unsigned long size;
- };
- 
--static int sev_flush_asids(void)
-+static int sev_flush_asids(int min_asid, int max_asid)
- {
--	int ret, error = 0;
-+	int ret, pos, error = 0;
-+
-+	/* Check if there are any ASIDs to reclaim before performing a flush */
-+	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
-+	if (pos >= max_asid)
-+		return -EBUSY;
- 
- 	/*
- 	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
-@@ -75,14 +80,7 @@ static int sev_flush_asids(void)
- /* Must be called with the sev_bitmap_lock held */
- static bool __sev_recycle_asids(int min_asid, int max_asid)
- {
--	int pos;
--
--	/* Check if there are any ASIDs to reclaim before performing a flush */
--	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
--	if (pos >= max_asid)
--		return false;
--
--	if (sev_flush_asids())
-+	if (sev_flush_asids(min_asid, max_asid))
- 		return false;
- 
- 	/* The flush process will flush all reclaimable SEV and SEV-ES ASIDs */
-@@ -1316,10 +1314,10 @@ void sev_hardware_teardown(void)
- 	if (!sev_enabled)
- 		return;
- 
-+	sev_flush_asids(0, max_sev_asid);
-+
- 	bitmap_free(sev_asid_bitmap);
- 	bitmap_free(sev_reclaim_asid_bitmap);
--
--	sev_flush_asids();
- }
- 
- int sev_cpu_init(struct svm_cpu_data *sd)
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
+> And if there should be some partial sharing - if that makes sense at all
+> - then that should be first agreed upon.
 
+Assuming the code I wrote actually works, I think that gets KVM to the point
+where handling scattered features isn't awful, which should eliminate most of
+the friction.  KVM would still be relying on the internals of *_cpu_has(), but
+there are quite a few build-time assertions that help keep things aligned.  And,
+what's best for the kernel will be what's best for KVM the vast majority of the
+time, e.g. I don't anticipate the kernel scattering densely populated words just
+for giggles.
