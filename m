@@ -2,174 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7AEC2F063A
-	for <lists+kvm@lfdr.de>; Sun, 10 Jan 2021 10:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13F802F0644
+	for <lists+kvm@lfdr.de>; Sun, 10 Jan 2021 11:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726324AbhAJJtY convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sun, 10 Jan 2021 04:49:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36428 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725807AbhAJJtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Jan 2021 04:49:24 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 5040322D01
-        for <kvm@vger.kernel.org>; Sun, 10 Jan 2021 09:48:43 +0000 (UTC)
-Received: by pdx-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 436BB86729; Sun, 10 Jan 2021 09:48:43 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 211109] Hard kernel freeze due to large cpu allocation.
-Date:   Sun, 10 Jan 2021 09:48:43 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: vytautas.mickus.exc@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-211109-28872-DHuAR2aOOr@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-211109-28872@https.bugzilla.kernel.org/>
-References: <bug-211109-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726210AbhAJKEr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 10 Jan 2021 05:04:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbhAJKEq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Jan 2021 05:04:46 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08C7C0617A2
+        for <kvm@vger.kernel.org>; Sun, 10 Jan 2021 02:04:04 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id x16so20486416ejj.7
+        for <kvm@vger.kernel.org>; Sun, 10 Jan 2021 02:04:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ntHLah0q+SvwKSjeDWR+MVFLLttqY1N89uUPbqPMpiA=;
+        b=ZGwx+oiiGqvNDB+EaNh7KH6pXXDJEN6Q1ZH/kdatn05h3TURc1jdAQPJK2Hd1dt3y9
+         oX9qanMfO/pXUBOO5CoyFgf6lRFCoVfxQ3mFPJHZnlvUdkDjlt0GIj245r6osobCwOlt
+         rV7pJn8gsCpRiAAnmMLALjrtwokfqMai7FP927XnZ5UzVr16916CyigDjon5TNvYTytQ
+         cn9l6tUn9hlp6zO8JVbySRHAx75MxIw0hNpWAiOdFrdHTMSmNqGtIFyqUALoWPUJdkEf
+         eeYy6crslJzT0GNwXexlvaM5HjhSavw0e4FhTYttSXZE+kdUSJspWEvV5UqgUW+OpJNe
+         OdgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ntHLah0q+SvwKSjeDWR+MVFLLttqY1N89uUPbqPMpiA=;
+        b=rUFAQX4xHO9tVD7I/pCGi274oPK1zUGUA3uvM1Oke87aEqfIw+JGBujCVlaGLCdh8/
+         HkgqvvzoeIcFtW4Dync650LFnHUy3uVRFQs+eP7w6Zavqw/t0StL8odCYcMCBoeDIyK6
+         idArJ0viWT1TnLz7/d34V+wWcVMvWHRWEhQN9u9SqI2y8/oTx/PBE2QskCpWXeEX7iFG
+         S4k06IpwtnmqPZCSSTZZ5YQCuAHDYD9DGVBZl8I6uool8Uv8VXZH/CbKPR4I03Gy39Gg
+         Wd5GZortAWDZDh/RQhdm65iJmKC3Wu7wGgCbpy5dPc8hqWPe1dTRWyf2h46PCOqdpqta
+         fX6g==
+X-Gm-Message-State: AOAM533MMR4EvRZ2ExY6m6+BHNzei3qjJ2RRY/e0JHktseiCeTBDSBa9
+        3FLdYXUgeuGrVeYrGDqUFlKya1Y2k3P6hEzs6jlk
+X-Google-Smtp-Source: ABdhPJxxW/yAqeYuRuPessHdacKwHtFahI0Eg6d90J6rPXonweRKhqtq6PPHcOf9f2M6pT+y8/HK7s5rhlXTDDVOoNY=
+X-Received: by 2002:a17:907:1629:: with SMTP id hb41mr7211587ejc.197.1610273043284;
+ Sun, 10 Jan 2021 02:04:03 -0800 (PST)
 MIME-Version: 1.0
+References: <20201222145221.711-1-xieyongji@bytedance.com> <20201222145221.711-7-xieyongji@bytedance.com>
+ <f8dcb8d0-0024-1f78-d1a7-e487ca3deda7@oracle.com>
+In-Reply-To: <f8dcb8d0-0024-1f78-d1a7-e487ca3deda7@oracle.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Sun, 10 Jan 2021 18:03:52 +0800
+Message-ID: <CACycT3u859hX5ChcxVS2EMmF4-vu5H+io_CcNWSKaN8NFA9cXg@mail.gmail.com>
+Subject: Re: Re: [RFC v2 06/13] vduse: Introduce VDUSE - vDPA Device in Userspace
+To:     Bob Liu <bob.liu@oracle.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
+        Parav Pandit <parav@nvidia.com>, akpm@linux-foundation.org,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=211109
+On Fri, Jan 8, 2021 at 9:32 PM Bob Liu <bob.liu@oracle.com> wrote:
+>
+> On 12/22/20 10:52 PM, Xie Yongji wrote:
+> > This VDUSE driver enables implementing vDPA devices in userspace.
+> > Both control path and data path of vDPA devices will be able to
+> > be handled in userspace.
+> >
+> > In the control path, the VDUSE driver will make use of message
+> > mechnism to forward the config operation from vdpa bus driver
+> > to userspace. Userspace can use read()/write() to receive/reply
+> > those control messages.
+> >
+> > In the data path, the VDUSE driver implements a MMU-based on-chip
+> > IOMMU driver which supports mapping the kernel dma buffer to a
+> > userspace iova region dynamically. Userspace can access those
+> > iova region via mmap(). Besides, the eventfd mechanism is used to
+> > trigger interrupt callbacks and receive virtqueue kicks in userspace
+> >
+> > Now we only support virtio-vdpa bus driver with this patch applied.
+> >
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> > ---
+> >  Documentation/driver-api/vduse.rst                 |   74 ++
+> >  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+> >  drivers/vdpa/Kconfig                               |    8 +
+> >  drivers/vdpa/Makefile                              |    1 +
+> >  drivers/vdpa/vdpa_user/Makefile                    |    5 +
+> >  drivers/vdpa/vdpa_user/eventfd.c                   |  221 ++++
+> >  drivers/vdpa/vdpa_user/eventfd.h                   |   48 +
+> >  drivers/vdpa/vdpa_user/iova_domain.c               |  442 ++++++++
+> >  drivers/vdpa/vdpa_user/iova_domain.h               |   93 ++
+> >  drivers/vdpa/vdpa_user/vduse.h                     |   59 ++
+> >  drivers/vdpa/vdpa_user/vduse_dev.c                 | 1121 ++++++++++++++++++++
+> >  include/uapi/linux/vdpa.h                          |    1 +
+> >  include/uapi/linux/vduse.h                         |   99 ++
+> >  13 files changed, 2173 insertions(+)
+> >  create mode 100644 Documentation/driver-api/vduse.rst
+> >  create mode 100644 drivers/vdpa/vdpa_user/Makefile
+> >  create mode 100644 drivers/vdpa/vdpa_user/eventfd.c
+> >  create mode 100644 drivers/vdpa/vdpa_user/eventfd.h
+> >  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+> >  create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+> >  create mode 100644 drivers/vdpa/vdpa_user/vduse.h
+> >  create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
+> >  create mode 100644 include/uapi/linux/vduse.h
+> >
+> > diff --git a/Documentation/driver-api/vduse.rst b/Documentation/driver-api/vduse.rst
+> > new file mode 100644
+> > index 000000000000..da9b3040f20a
+> > --- /dev/null
+> > +++ b/Documentation/driver-api/vduse.rst
+> > @@ -0,0 +1,74 @@
+> > +==================================
+> > +VDUSE - "vDPA Device in Userspace"
+> > +==================================
+> > +
+> > +vDPA (virtio data path acceleration) device is a device that uses a
+> > +datapath which complies with the virtio specifications with vendor
+> > +specific control path. vDPA devices can be both physically located on
+> > +the hardware or emulated by software. VDUSE is a framework that makes it
+> > +possible to implement software-emulated vDPA devices in userspace.
+> > +
+>
+> Could you explain a bit more why need a VDUSE framework?
 
---- Comment #1 from Vytautas Mickus (vytautas.mickus.exc@gmail.com) ---
-VM configuration xml:
-```
-<domain type='kvm' id='1'>
-  <name>minikube</name>
-  <uuid>b2dc4e44-53b6-433f-850c-a638294a1cf5</uuid>
-  <memory unit='KiB'>6144000</memory>
-  <currentMemory unit='KiB'>6144000</currentMemory>
-  <vcpu placement='static'>31</vcpu>
-  <resource>
-    <partition>/machine</partition>
-  </resource>
-  <os>
-    <type arch='x86_64' machine='pc-i440fx-5.1'>hvm</type>
-    <boot dev='cdrom'/>
-    <boot dev='hd'/>
-    <bootmenu enable='no'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-    <pae/>
-  </features>
-  <cpu mode='host-passthrough' check='none' migratable='on'/>
-  <clock offset='utc'/>
-  <on_poweroff>destroy</on_poweroff>
-  <on_reboot>restart</on_reboot>
-  <on_crash>destroy</on_crash>
-  <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <source file='/home/vytautas/.minikube/machines/minikube/boot2docker.iso'
-index='2'/>
-      <backingStore/>
-      <target dev='hdc' bus='scsi'/>
-      <readonly/>
-      <alias name='scsi0-0-2'/>
-      <address type='drive' controller='0' bus='0' target='0' unit='2'/>
-    </disk>
-    <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' io='threads'/>
-      <source
-file='/home/vytautas/.minikube/machines/minikube/minikube.rawdisk' index='1'/>
-      <backingStore/>
-      <target dev='hda' bus='virtio'/>
-      <alias name='virtio-disk0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x05'
-function='0x0'/>
-    </disk>
-    <controller type='usb' index='0' model='piix3-uhci'>
-      <alias name='usb'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x01'
-function='0x2'/>
-    </controller>
-    <controller type='pci' index='0' model='pci-root'>
-      <alias name='pci.0'/>
-    </controller>
-    <controller type='scsi' index='0' model='lsilogic'>
-      <alias name='scsi0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x04'
-function='0x0'/>
-    </controller>
-    <interface type='network'>
-      <mac address='e0:58:91:b9:3c:cd'/>
-      <source network='default' portid='cd0c40d3-2faf-479e-990d-1a5956405a2e'
-bridge='virbr0'/>
-      <target dev='vnet0'/>
-      <model type='virtio'/>
-      <alias name='net0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x02'
-function='0x0'/>
-    </interface>
-    <interface type='network'>
-      <mac address='8c:a0:a6:01:80:c5'/>
-      <source network='minikube-net'
-portid='23d86a93-40be-42c0-85e6-be14a3991f14' bridge='virbr1'/>
-      <target dev='vnet1'/>
-      <model type='virtio'/>
-      <alias name='net1'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x03'
-function='0x0'/>
-    </interface>
-    <serial type='pty'>
-      <source path='/dev/pts/3'/>
-      <target type='isa-serial' port='0'>
-        <model name='isa-serial'/>
-      </target>
-      <alias name='serial0'/>
-    </serial>
-    <console type='pty' tty='/dev/pts/3'>
-      <source path='/dev/pts/3'/>
-      <target type='serial' port='0'/>
-      <alias name='serial0'/>
-    </console>
-    <input type='mouse' bus='ps2'>
-      <alias name='input0'/>
-    </input>
-    <input type='keyboard' bus='ps2'>
-      <alias name='input1'/>
-    </input>
-    <memballoon model='virtio'>
-      <alias name='balloon0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x06'
-function='0x0'/>
-    </memballoon>
-    <rng model='virtio'>
-      <backend model='random'>/dev/random</backend>
-      <alias name='rng0'/>
-      <address type='pci' domain='0x0000' bus='0x00' slot='0x07'
-function='0x0'/>
-    </rng>
-  </devices>
-  <seclabel type='dynamic' model='dac' relabel='yes'>
-    <label>+65534:+992</label>
-    <imagelabel>+65534:+992</imagelabel>
-  </seclabel>
-</domain>
-```
+This can be used to implement a userspace I/O (such as storage,
+network and so on) solution (virtio-based) for both container and VM.
 
--- 
-You may reply to this email to add a comment.
+> Software emulated vDPA devices is more likely used by debugging only when
+> don't have real hardware.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+I think software emulated vDPA devices should be also useful in other
+cases, just like FUSE does.
+
+> Do you think do the emulation in kernel space is not enough?
+>
+
+Doing the emulation in userspace should be more flexible.
+
+Thanks,
+Yongji
