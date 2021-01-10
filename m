@@ -2,113 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CCEE2F061E
-	for <lists+kvm@lfdr.de>; Sun, 10 Jan 2021 10:09:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB55C2F0639
+	for <lists+kvm@lfdr.de>; Sun, 10 Jan 2021 10:47:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725956AbhAJJIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 10 Jan 2021 04:08:49 -0500
-Received: from mga12.intel.com ([192.55.52.136]:13938 "EHLO mga12.intel.com"
+        id S1726305AbhAJJqd convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sun, 10 Jan 2021 04:46:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36214 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725807AbhAJJIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 10 Jan 2021 04:08:48 -0500
-IronPort-SDR: R4ELyBeOsOj9loycJda/NjbauaIyP02IpbybE9FKa0LpqMlXOF7SzlUcWEyEba/5hZ9ua1kbJn
- qN4dsAygA8fA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9859"; a="156933671"
-X-IronPort-AV: E=Sophos;i="5.79,336,1602572400"; 
-   d="scan'208";a="156933671"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2021 01:08:08 -0800
-IronPort-SDR: KP5jeN2C8Carec+zIm/PwpLs67WQUUwlWxk0W9mV3EIUf5B0IwyRzHqXhUnAOeg7I9Ir0frAb3
- IUW2FoWaSRHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,336,1602572400"; 
-   d="scan'208";a="380643426"
-Received: from local-michael-cet-test.sh.intel.com ([10.239.159.149])
-  by orsmga008.jf.intel.com with ESMTP; 10 Jan 2021 01:08:06 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, kvm@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [kvm-unit-tests PATCH] x86/access: Fixed test stuck issue on new 52bit machine
-Date:   Sun, 10 Jan 2021 17:19:42 +0800
-Message-Id: <20210110091942.12835-1-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
+        id S1725807AbhAJJqc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 10 Jan 2021 04:46:32 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id F12E322D01
+        for <kvm@vger.kernel.org>; Sun, 10 Jan 2021 09:45:51 +0000 (UTC)
+Received: by pdx-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E87E186729; Sun, 10 Jan 2021 09:45:51 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 211109] New: Hard kernel freeze due to large cpu allocation.
+Date:   Sun, 10 Jan 2021 09:45:51 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: vytautas.mickus.exc@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-211109-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the application is tested on a machine with 52bit-physical-address, the
-synthesized 52bit GPA triggers EPT(4-Level) fast_page_fault infinitely. On the
-other hand, there's no reserved bits in 51:max_physical_address on machines with
-52bit-physical-address.
+https://bugzilla.kernel.org/show_bug.cgi?id=211109
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- x86/access.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+            Bug ID: 211109
+           Summary: Hard kernel freeze due to large cpu allocation.
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 5.9.9-95-tkg-MuQSS-llvm
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: vytautas.mickus.exc@gmail.com
+        Regression: No
 
-diff --git a/x86/access.c b/x86/access.c
-index 7dc9eb6..bec1c4d 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -15,6 +15,7 @@ static _Bool verbose = false;
- typedef unsigned long pt_element_t;
- static int invalid_mask;
- static int page_table_levels;
-+static int max_phyaddr;
- 
- #define PT_BASE_ADDR_MASK ((pt_element_t)((((pt_element_t)1 << 36) - 1) & PAGE_MASK))
- #define PT_PSE_BASE_ADDR_MASK (PT_BASE_ADDR_MASK & ~(1ull << 21))
-@@ -394,9 +395,10 @@ static void ac_emulate_access(ac_test_t *at, unsigned flags)
-     if (!F(AC_PDE_ACCESSED))
-         at->ignore_pde = PT_ACCESSED_MASK;
- 
--    pde_valid = F(AC_PDE_PRESENT)
--        && !F(AC_PDE_BIT51) && !F(AC_PDE_BIT36) && !F(AC_PDE_BIT13)
-+    pde_valid = F(AC_PDE_PRESENT) && !F(AC_PDE_BIT36) && !F(AC_PDE_BIT13)
-         && !(F(AC_PDE_NX) && !F(AC_CPU_EFER_NX));
-+    if (max_phyaddr < 52)
-+        pde_valid &= !F(AC_PDE_BIT51);
- 
-     if (!pde_valid) {
-         at->expected_fault = 1;
-@@ -420,9 +422,10 @@ static void ac_emulate_access(ac_test_t *at, unsigned flags)
- 
-     at->expected_pde |= PT_ACCESSED_MASK;
- 
--    pte_valid = F(AC_PTE_PRESENT)
--        && !F(AC_PTE_BIT51) && !F(AC_PTE_BIT36)
-+    pte_valid = F(AC_PTE_PRESENT) && !F(AC_PTE_BIT36)
-         && !(F(AC_PTE_NX) && !F(AC_CPU_EFER_NX));
-+    if (max_phyaddr < 52)
-+        pte_valid &= !F(AC_PTE_BIT51);
- 
-     if (!pte_valid) {
-         at->expected_fault = 1;
-@@ -964,13 +967,11 @@ static int ac_test_run(void)
-     shadow_cr4 = read_cr4();
-     shadow_efer = rdmsr(MSR_EFER);
- 
--    if (cpuid_maxphyaddr() >= 52) {
--        invalid_mask |= AC_PDE_BIT51_MASK;
--        invalid_mask |= AC_PTE_BIT51_MASK;
--    }
--    if (cpuid_maxphyaddr() >= 37) {
-+    if (max_phyaddr  >= 37 && max_phyaddr < 52) {
-         invalid_mask |= AC_PDE_BIT36_MASK;
-         invalid_mask |= AC_PTE_BIT36_MASK;
-+        invalid_mask |= AC_PDE_BIT51_MASK;
-+        invalid_mask |= AC_PTE_BIT51_MASK;
-     }
- 
-     if (this_cpu_has(X86_FEATURE_PKU)) {
-@@ -1038,6 +1039,7 @@ int main(void)
-     int r;
- 
-     printf("starting test\n\n");
-+    max_phyaddr = cpuid_maxphyaddr();
-     page_table_levels = 4;
-     r = ac_test_run();
- 
+Allocating a large amount of vcpu (30,31) on a system with 32 threads (16 core
+ryzen 3950x) causes hard freeze of the whole system. While 16-17 vcpu
+allocation is fine.
+
+This was seen while using minikube
+```
+minikube start --cni=calico --container-runtime=cri-o --cpus=$(($(nproc) - 1))
+--driver=kvm2 -n 3
+```
+
+Last journal entry is:
+```
+Jan 10 10:14:51 rig libvirtd[2269]: operation failed: domain 'minikube' already
+exists with uuid 4aacd29f-bd5f-418d-b267-42b79f75fbab
+```
+At which point minikube sees that the domain already exists and launches it.
+Hard freeze is immediate.
+
+OS:
+Linux rig 5.9.9-95-tkg-MuQSS-llvm #1 TKG SMP PREEMPT Sun, 22 Nov 2020 07:41:26
++0000 x86_64 GNU/Linux
+
+os-release:
+```
+NAME="Arch Linux"
+PRETTY_NAME="Arch Linux"
+ID=arch
+BUILD_ID=rolling
+```
+
 -- 
-2.17.2
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are watching the assignee of the bug.
