@@ -2,109 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EED22F1C6C
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:33:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 923542F1CF7
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:48:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389576AbhAKRdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 12:33:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27736 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389573AbhAKRda (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 12:33:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610386324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zsTOKgciTV89wIpixObU4B7sv76RXsMzj7Th3SejzMQ=;
-        b=TG+yET7T8TXhtt4nVvh0VRd/WhUCMbhfooXcJAZKFHNHYPJJBDnaPJp3Bz2dWaDHBma/we
-        DFAYors+/886estPDFZbAZgY70MMd28//yBGETH1j5cYmY1Xne0A3cV2+wdzdtdmF7s2Zi
-        Bso+kxSA7Qu1pfubmPw9caUFEdHQ6dY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-Cd9UEke5OzWThzqMzk3NTg-1; Mon, 11 Jan 2021 12:32:02 -0500
-X-MC-Unique: Cd9UEke5OzWThzqMzk3NTg-1
-Received: by mail-ej1-f71.google.com with SMTP id d19so179627ejo.18
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:32:02 -0800 (PST)
+        id S2388654AbhAKRse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 12:48:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727750AbhAKRse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 12:48:34 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A39D0C061795
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:47:53 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id d26so618060wrb.12
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:47:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=7PomrZU0jMeuj2pSx76rGsVMpY5/lWRJj77kNrVmTOQ=;
+        b=eN3dBxOzR44brDRBdWt3v4cXwY6j30skPdqKuTGRWe/DKoQpXBEbYCNfUfWnxSmOMu
+         XBy0JNbmcqHL9/5eTyQHRZK0TylvdmoTIQtrHYnXogIczvSNKQKMvqS2IDa41gSpOeb0
+         jCa+KqJnWspIoTNo5Vo72FWylPM+UqOOAL93Y9lhyE/E+JSasH8i1x5Qt4PEIRazuKwW
+         47iItS+Yn4S8d/GkngwvwwLE36JBsUFx206rpGBdpMxlY9JBo+PoakQ2ux2Lr1L6YVLy
+         T4Sq750nq5cgVMPwYor3Gt9Bgx5x9vcasoQAVPtwwZubrFxLtHxMm/RPTAu3LFDIRtjD
+         wmlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zsTOKgciTV89wIpixObU4B7sv76RXsMzj7Th3SejzMQ=;
-        b=aEAqJ1UvAen4QXiuiU5yew853e6ARweg5fEGqpvxTXffDgQfGLuNQEf02mYVRweq0D
-         a4FG6igmX427o636xUzGWytpCxhiwDfjA1C1mI/3awHZmlubWNVRItDZOwi3wlU+gnz4
-         iNoh3rX7JEsvUP/6GDHgByEaCGFLlO1afVBHiznLcNmKD9p5Hl3oNcl5QRBxX2E9STRi
-         elvanyBEOb3vYSwGP41OdLTAReYZkWyps1LNzF7t1QT+Dx6lEkxS27aiHopBHIiUQZOY
-         wG0U9g3P6U7dWFvg8mFlVJQHu8RSeE1A57qzgFDhTpYELuhW9DO4ShG849ky7JELcXOS
-         toBQ==
-X-Gm-Message-State: AOAM533butG71uNtPeIAl3XFycXMZ3Gfx6b8v1v8Ecm17GtMvqacuCmD
-        cngmatVPRFiEdt0/mOumnW4Y93BY2rG8f1HnqwoIUxqgONfuALVOYvnREeL4qXLlUa+fOa73EzB
-        QRXXIoVZqJfTy
-X-Received: by 2002:a17:906:65a:: with SMTP id t26mr378403ejb.394.1610386321099;
-        Mon, 11 Jan 2021 09:32:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwKXahcCk4gQhje80Bzfm9XS00VyakRL8IiG/KJMIUcgS2sE1kIv09C/lVjahr+RnI3fQ1uvw==
-X-Received: by 2002:a17:906:65a:: with SMTP id t26mr378393ejb.394.1610386320959;
-        Mon, 11 Jan 2021 09:32:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dk16sm105625ejb.85.2021.01.11.09.31.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Jan 2021 09:32:00 -0800 (PST)
-Subject: Re: [PATCH 0/2] Use static_call for kvm_x86_ops
-To:     Jason Baron <jbaron@akamai.com>, kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, aarcange@redhat.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1610379877.git.jbaron@akamai.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f56312ed-32d5-f1ca-8ca8-6de20daa955e@redhat.com>
-Date:   Mon, 11 Jan 2021 18:31:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=7PomrZU0jMeuj2pSx76rGsVMpY5/lWRJj77kNrVmTOQ=;
+        b=fUs/8wmluzHJHGxVQfIighlLnitsW4PbzLzVYsUv8mh+NldJQKT3HqYSapscL0wI9D
+         zb7mxLvzFGbpd6X37JMTybhsPozrVBMBwt3qElJtRF1AHCbabccjyHkobzMcNdqoanYK
+         cz3ysLHIxo1P46gMb6i6VbPKRjHQP3GmeMuzKdQBDawYvuxz37NS3nTE9CYsH7wclCTr
+         XAYvjPt9/N/KEvitRb/DV+xmJxG+3UFxIIAQHxdxKT2M08tPAhLBLm4VztQ98k1UgtPs
+         Jg6E8d7W6qziUuZQq7/FwmChbmPCtWMVUEv6XrpnxBCSoHys+qaxJRWBqrCRrjvVg6OJ
+         bVGw==
+X-Gm-Message-State: AOAM530AZvofHD0Jzf3ej74T34QVq1Xtz15VePjL3d9MfEki5sPTVdE9
+        87e+FhLPgcTDU0ffVSBxsYeOAQ==
+X-Google-Smtp-Source: ABdhPJyEoJCuSw+5tRtzaJyx6mVyGEBtWFwj20lKG9ywN4EzrcnynxBCh/RF0f45AqXVj56ADnb/VQ==
+X-Received: by 2002:a5d:5385:: with SMTP id d5mr269757wrv.384.1610387272416;
+        Mon, 11 Jan 2021 09:47:52 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id v20sm26616wml.34.2021.01.11.09.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 09:47:51 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 8337D1FF7E;
+        Mon, 11 Jan 2021 17:47:50 +0000 (GMT)
+References: <20210111152020.1422021-1-philmd@redhat.com>
+ <20210111152020.1422021-2-philmd@redhat.com>
+User-agent: mu4e 1.5.7; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Huacai Chen <chenhuacai@kernel.org>,
+        Greg Kurz <groug@kaod.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+        Amit Shah <amit@kernel.org>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>,
+        qemu-s390x@nongnu.org, Paul Durrant <paul@xen.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Max Reitz <mreitz@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+        Halil Pasic <pasic@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
+        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Stefano Stabellini <sstabellini@kernel.org>,
+        xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Laurent Vivier <laurent@vivier.eu>,
+        Thomas Huth <thuth@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Subject: Re: [PATCH 1/2] sysemu/runstate: Let runstate_is_running() return bool
+Date:   Mon, 11 Jan 2021 17:46:36 +0000
+In-reply-to: <20210111152020.1422021-2-philmd@redhat.com>
+Message-ID: <87o8hvnz5l.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <cover.1610379877.git.jbaron@akamai.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/01/21 17:57, Jason Baron wrote:
-> Hi,
-> 
-> Convert kvm_x86_ops to use static_call. Shows good performance
-> gains for cpuid loop micro-benchmark (resulsts included in patch 2).
-> 
-> Thanks,
-> 
-> -Jason
-> 
-> Jason Baron (2):
->    KVM: x86: introduce definitions to support static calls for kvm_x86_ops
->    KVM: x86: use static calls to reduce kvm_x86_ops overhead
-> 
->   arch/x86/include/asm/kvm_host.h |  71 +++++++++-
->   arch/x86/kvm/cpuid.c            |   2 +-
->   arch/x86/kvm/hyperv.c           |   4 +-
->   arch/x86/kvm/irq.c              |   2 +-
->   arch/x86/kvm/kvm_cache_regs.h   |  10 +-
->   arch/x86/kvm/lapic.c            |  28 ++--
->   arch/x86/kvm/mmu.h              |   6 +-
->   arch/x86/kvm/mmu/mmu.c          |  12 +-
->   arch/x86/kvm/mmu/spte.c         |   2 +-
->   arch/x86/kvm/pmu.c              |   2 +-
->   arch/x86/kvm/trace.h            |   4 +-
->   arch/x86/kvm/x86.c              | 299 ++++++++++++++++++++--------------------
->   arch/x86/kvm/x86.h              |   6 +-
->   13 files changed, 259 insertions(+), 189 deletions(-)
-> 
 
-Thank you thank you thank you! :)
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-(Except that now I have to find another task for a new KVM developer, 
-but that's not a big deal).
+> runstate_check() returns a boolean. runstate_is_running()
+> returns what runstate_check() returns, also a boolean.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Paolo
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
+--=20
+Alex Benn=C3=A9e
