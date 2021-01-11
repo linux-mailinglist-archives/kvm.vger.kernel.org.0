@@ -2,137 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC52F2F2428
+	by mail.lfdr.de (Postfix) with ESMTP id 4E4982F2427
 	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 01:34:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404011AbhALAZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 19:25:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59964 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390737AbhAKWpn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 17:45:43 -0500
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0141EC061795
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 14:45:03 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id i18so145669ooh.5
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 14:45:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O6kpvfJukcSfzCE8pUQQCjHIT6O76tXxg9rP/f6B+4o=;
-        b=p1aPlWShuhKkImVn7MGucoVZAZix8VzDlfAzzEinRVGv+R4jXCLuH4buasWXMvHN8u
-         p57itQKrg0IiSRt08vLyEpcZnCMOcYS2PfCM1cXymUb4rkiWMF3JIKt/NnIlBqMk/29k
-         Guc04C9Q27972coInhcL2+HafSp/onmNdGzDPwIPeAay3qZtuU8vnznOoxDBbdvBIzfP
-         sPafwQqEM5c9wi46verEsT5u7122qmDkjpnHjvlsgDWGYKXSfolsrAr8JCGbu3R+B36s
-         6MBakNPiacJm3HjXc5xHpHQ3K5vP0z9DzIE6GxH1U3ByJx1qSubOQpFngerO30sgjPyX
-         g7TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O6kpvfJukcSfzCE8pUQQCjHIT6O76tXxg9rP/f6B+4o=;
-        b=pYPdsr+cgTX9bLRCCskW4lReZtpgfPm71SAc1E+8K1yC4zNR0C2gXTQN02r36s+oG8
-         hYmrlB/DwFHuOLOmWdEnQBedfhQOPw03InvUvlIlgyHE+nKWVQ+tUoNFoyuJQqvM3cM+
-         ML8Cv4+A1yx8t6Cv8PWoBl/F2tQvp9A2RDpEFZZHC+6fOJYsVgo8LeWhQPN2+kkcgS+k
-         T6m8v8aNyMDeOihq9IW0brZcaTdX+sAqi43fYNt5PcyPaoM/Gk9LeMEtFVzUW6Z1POft
-         QiHzk4ia6/lDRQw/z4QOy/bxKeVnL1xXRm1eYG3mevIp6YqPXnrUmz8kl+TwZ2apApvp
-         jg6g==
-X-Gm-Message-State: AOAM530xrD44bk5zqobWji+zHhDTTFNvlB95Hw/SV6HRwmKfybiTl1bw
-        9D0cALc30ftTnz02q9k9oNSjll4G/evbdWPFK1vKlQ==
-X-Google-Smtp-Source: ABdhPJzkhny7kvYdHxhBKmqcMFa1AfruRGU61uyaRwGVzukCfaf+okOYn9JpZnSnjjewZU6Ogd5CB9JmmBniRlmn8Wo=
-X-Received: by 2002:a4a:e294:: with SMTP id k20mr966042oot.82.1610405102002;
- Mon, 11 Jan 2021 14:45:02 -0800 (PST)
+        id S2404189AbhALAZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 19:25:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15778 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2390779AbhAKWvv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 17:51:51 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BMgo5U073366;
+        Mon, 11 Jan 2021 17:51:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gFlsFNC1Oe0RvfBumwJid1hGTPKfT0h2UQQ/7FjjipI=;
+ b=QxMc0RU1KK5Zyf7JQBFjVUoHzUNEUqqgJ6lw5RxAlJhFX8uDglm/QMQUL/yJj8P2E6yU
+ bDkDuF+nzDF8rMThvCE6oxrU7VJoGf4BVyCUewqoGnC+YrDo/bK92zbH0+HlNnX9nXbT
+ KW1tzwbwmZxTczMiRmCb+ta8dr24SgVA5KOMv8dvJ5QCeRqXZuVAUPLyRbM42fRQQ137
+ QcjhtOl2lZxCedVD9WX228D/07OJdoqRBB75EoFuz5A3VAGcwppRVaHsJM95MX2Tf3jv
+ 6H4h3j+wJKMsx861t2XryCA3sJJyn/3XFAhQdoB8pjNCFa44EgW3c5UYtKS6ktKVfQSq Sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 360yq185fq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 17:51:06 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BMihOL081865;
+        Mon, 11 Jan 2021 17:51:06 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 360yq185fc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 17:51:06 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BMlwCM025548;
+        Mon, 11 Jan 2021 22:51:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdadyy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 22:51:04 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BMouTR30540188
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Jan 2021 22:50:56 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 491C5A405B;
+        Mon, 11 Jan 2021 22:51:01 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86787A4051;
+        Mon, 11 Jan 2021 22:51:00 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.92.32])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon, 11 Jan 2021 22:51:00 +0000 (GMT)
+Date:   Mon, 11 Jan 2021 23:50:58 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 07/15] s390/vfio-ap: introduce shadow APCB
+Message-ID: <20210111235058.32ed94b5.pasic@linux.ibm.com>
+In-Reply-To: <20201223011606.5265-8-akrowiak@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-8-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <000000000000d5173d05b7097755@google.com>
-In-Reply-To: <000000000000d5173d05b7097755@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 11 Jan 2021 14:44:50 -0800
-Message-ID: <CALMp9eSKrn0zcmSuOE6GFi400PMgK+yeypS7+prtwBckgdW0vQ@mail.gmail.com>
-Subject: Re: UBSAN: shift-out-of-bounds in kvm_vcpu_after_set_cpuid
-To:     syzbot <syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com>
-Cc:     Borislav Petkov <bp@alien8.de>, "H . Peter Anvin" <hpa@zytor.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-11_32:2021-01-11,2021-01-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ mlxlogscore=999 bulkscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
+ suspectscore=0 adultscore=0 impostorscore=0 mlxscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101110122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It looks like userspace can possibly induce this by providing guest
-CPUID information with a "physical address width" of 64 in leaf
-0x80000008.
+On Tue, 22 Dec 2020 20:15:58 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Perhaps cpuid_query_maxphyaddr() should just look at the low 5 bits of
-CPUID.80000008H:EAX? Better would be to return an error for
-out-of-range values, but I understand that the kvm community's stance
-is that, in general, guest CPUID information should not be validated
-by kvm.
-
-On Tue, Dec 22, 2020 at 12:36 AM syzbot
-<syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    5e60366d Merge tag 'fallthrough-fixes-clang-5.11-rc1' of g..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=11c7046b500000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=db720fe37a6a41d8
-> dashboard link: https://syzkaller.appspot.com/bug?extid=e87846c48bf72bc85311
-> compiler:       gcc (GCC) 10.1.0-syz 20200507
-> userspace arch: i386
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com
->
-> ================================================================================
-> UBSAN: shift-out-of-bounds in arch/x86/kvm/mmu.h:52:16
-> shift exponent 64 is too large for 64-bit type 'long long unsigned int'
-> CPU: 1 PID: 11156 Comm: syz-executor.1 Not tainted 5.10.0-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> Call Trace:
->  __dump_stack lib/dump_stack.c:79 [inline]
->  dump_stack+0x107/0x163 lib/dump_stack.c:120
->  ubsan_epilogue+0xb/0x5a lib/ubsan.c:148
->  __ubsan_handle_shift_out_of_bounds.cold+0xb1/0x181 lib/ubsan.c:395
->  rsvd_bits arch/x86/kvm/mmu.h:52 [inline]
->  kvm_vcpu_after_set_cpuid.cold+0x35/0x3a arch/x86/kvm/cpuid.c:181
->  kvm_vcpu_ioctl_set_cpuid+0x28e/0x970 arch/x86/kvm/cpuid.c:273
->  kvm_arch_vcpu_ioctl+0x1091/0x2d70 arch/x86/kvm/x86.c:4699
->  kvm_vcpu_ioctl+0x7b9/0xdb0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3386
->  kvm_vcpu_compat_ioctl+0x1a2/0x340 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3430
->  __do_compat_sys_ioctl+0x1d3/0x230 fs/ioctl.c:842
->  do_syscall_32_irqs_on arch/x86/entry/common.c:78 [inline]
->  __do_fast_syscall_32+0x56/0x80 arch/x86/entry/common.c:137
->  do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:160
->  entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-> RIP: 0023:0xf7fe8549
-> Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 eb 0d 90 90 90 90 90 90 90 90 90 90 90 90
-> RSP: 002b:00000000f55e20cc EFLAGS: 00000296 ORIG_RAX: 0000000000000036
-> RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 000000004008ae8a
-> RDX: 00000000200000c0 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> ================================================================================
->
->
+> The APCB is a field within the CRYCB that provides the AP configuration
+> to a KVM guest. Let's introduce a shadow copy of the KVM guest's APCB and
+> maintain it for the lifespan of the guest.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>  drivers/s390/crypto/vfio_ap_ops.c     | 15 +++++++++++++++
+>  drivers/s390/crypto/vfio_ap_private.h |  2 ++
+>  2 files changed, 17 insertions(+)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 2d58b39977be..44b3a81cadfb 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -293,6 +293,20 @@ static void vfio_ap_matrix_init(struct ap_config_info *info,
+>  	matrix->adm_max = info->apxa ? info->Nd : 15;
+>  }
+>  
+> +static bool vfio_ap_mdev_has_crycb(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	return (matrix_mdev->kvm && matrix_mdev->kvm->arch.crypto.crycbd);
+> +}
+> +
+> +static void vfio_ap_mdev_commit_shadow_apcb(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	if (vfio_ap_mdev_has_crycb(matrix_mdev))
+> +		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
+> +					  matrix_mdev->shadow_apcb.apm,
+> +					  matrix_mdev->shadow_apcb.aqm,
+> +					  matrix_mdev->shadow_apcb.adm);
+> +}
+> +
+>  static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>  {
+>  	struct ap_matrix_mdev *matrix_mdev;
+> @@ -308,6 +322,7 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>  
+>  	matrix_mdev->mdev = mdev;
+>  	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
+> +	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->shadow_apcb);
+>  	hash_init(matrix_mdev->qtable);
+>  	mdev_set_drvdata(mdev, matrix_mdev);
+>  	matrix_mdev->pqap_hook.hook = handle_pqap;
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index 4e5cc72fc0db..d2d26ba18602 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -75,6 +75,7 @@ struct ap_matrix {
+>   * @list:	allows the ap_matrix_mdev struct to be added to a list
+>   * @matrix:	the adapters, usage domains and control domains assigned to the
+>   *		mediated matrix device.
+> + * @shadow_apcb:    the shadow copy of the APCB field of the KVM guest's CRYCB
+>   * @group_notifier: notifier block used for specifying callback function for
+>   *		    handling the VFIO_GROUP_NOTIFY_SET_KVM event
+>   * @kvm:	the struct holding guest's state
+> @@ -82,6 +83,7 @@ struct ap_matrix {
+>  struct ap_matrix_mdev {
+>  	struct list_head node;
+>  	struct ap_matrix matrix;
+> +	struct ap_matrix shadow_apcb;
+>  	struct notifier_block group_notifier;
+>  	struct notifier_block iommu_notifier;
+>  	struct kvm *kvm;
+
+What happened to the following hunk from v12?
+
+@@ -1218,13 +1233,9 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+ 	if (ret)
+ 		return NOTIFY_DONE;
+ 
+-	/* If there is no CRYCB pointer, then we can't copy the masks */
+-	if (!matrix_mdev->kvm->arch.crypto.crycbd)
+-		return NOTIFY_DONE;
+-
+-	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
+-				  matrix_mdev->matrix.aqm,
+-				  matrix_mdev->matrix.adm);
++	memcpy(&matrix_mdev->shadow_apcb, &matrix_mdev->matrix,
++	       sizeof(matrix_mdev->shadow_apcb));
++	vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+ 
+ 	return NOTIFY_OK;
+ }
