@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3C4F2F2034
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:59:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E48EF2F2028
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:58:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391413AbhAKT6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 14:58:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52202 "EHLO
+        id S2391393AbhAKT6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 14:58:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391280AbhAKT6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 14:58:53 -0500
+        with ESMTP id S2391379AbhAKT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 14:58:13 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B14DC0617A6
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B79C0617A3
         for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 11:57:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=fM/Edm8ws3OR84ugO2auApPCSjtZhOaO3u6TKN/TtAM=; b=J2J0UI0KIi7PIGNa2gJTlFMB2o
-        MhzAfZaeL1WpfEpNHgDf+QJmnPFJUoJDW+FyLQ36XMHOW4ZvJPenQSgz/Ofn09pbMj/sMoAOhz1b5
-        peYM91Q70ABZJNaX8KU6MdIs/oReTi7MYi22f4D9wrKCBmc7nLprsXqc71FAZ3qr6Jj1dIPn8SK2I
-        ElM7fpmMFtxMabAXXePKcnw6UPIDyglPIG1Y1wexyDFiGALY6mS8CHNyC/xG/lAn0zImnhwdXPX8h
-        Zpu+XokFBvBHvj5rAsC7gVb8ZEvMk8Gx51JJaskgTmEq05tiya6QU84acIn3di1IDscX0OYrUaw6L
-        F0H7iQtw==;
+        bh=RS+RfrioTQjzStJdTZKjWLCu7R7I1go12LkxDEA+lqY=; b=a4QQXugVKdp3SoEoxJBYutG9i+
+        WsoDnzod1DK7+akskQIfV9a9pn/aeDbgAkjGu8jZhXJ3jXLLeQu0Aov/M03lp6UCAZTGe4DDrKZ+W
+        O6rk79UlfVhoMOivuEPedeVxDmMywYlszh1/NZPNB3qXCAjtBlv1e9Yw1bUFdgQwCjNVGlN9jD+pO
+        SXzVbqYTWywvDZcfpjTice5qAd8t7k9BK/qQwYucLUvoA4Cc5k6LyquGod/tglUtIWwB++b3AVG/g
+        /uI8QwvyzszG1USVbHoziemFUwytOcIqfuWauzEHa0QCKxnoHD5FgSHFlpPZtUjB5a/4JrPT+5A3i
+        HFMUMRgg==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kz3Jg-0001h5-Js; Mon, 11 Jan 2021 19:57:29 +0000
+        id 1kz3Jg-0001h6-KX; Mon, 11 Jan 2021 19:57:28 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kz3Jf-0001Ha-HU; Mon, 11 Jan 2021 19:57:27 +0000
+        id 1kz3Jf-0001Hd-IF; Mon, 11 Jan 2021 19:57:27 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v5 05/16] KVM: x86/xen: latch long_mode when hypercall page is set up
-Date:   Mon, 11 Jan 2021 19:57:14 +0000
-Message-Id: <20210111195725.4601-6-dwmw2@infradead.org>
+Subject: [PATCH v5 06/16] KVM: x86/xen: add definitions of compat_shared_info, compat_vcpu_info
+Date:   Mon, 11 Jan 2021 19:57:15 +0000
+Message-Id: <20210111195725.4601-7-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210111195725.4601-1-dwmw2@infradead.org>
 References: <20210111195725.4601-1-dwmw2@infradead.org>
@@ -54,103 +54,59 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
+There aren't a lot of differences for the things that the kernel needs
+to care about, but there are a few.
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |  6 ++++++
- arch/x86/kvm/xen.c              | 16 +++++++++++++++-
- include/uapi/linux/kvm.h        |  3 +++
- 3 files changed, 24 insertions(+), 1 deletion(-)
+ arch/x86/kvm/xen.h | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index cf2af8efebe8..4ca6e060b578 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -894,6 +894,11 @@ struct msr_bitmap_range {
- 	unsigned long *bitmap;
- };
+diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+index d06b5afcc1f2..317c1325dade 100644
+--- a/arch/x86/kvm/xen.h
++++ b/arch/x86/kvm/xen.h
+@@ -20,4 +20,40 @@ static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
+ 		KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
+ }
  
-+/* Xen emulation context */
-+struct kvm_xen {
-+	bool long_mode;
++
++/* 32-bit compatibility definitions, also used natively in 32-bit build */
++#include <asm/pvclock-abi.h>
++#include <asm/xen/interface.h>
++
++struct compat_arch_vcpu_info {
++	unsigned int cr2;
++	unsigned int pad[5];
 +};
 +
- enum kvm_irqchip_mode {
- 	KVM_IRQCHIP_NONE,
- 	KVM_IRQCHIP_KERNEL,       /* created with KVM_CREATE_IRQCHIP */
-@@ -973,6 +978,7 @@ struct kvm_arch {
- 	struct hlist_head mask_notifier_list;
- 
- 	struct kvm_hv hyperv;
-+	struct kvm_xen xen;
- 
- 	#ifdef CONFIG_KVM_MMU_AUDIT
- 	int audit_point;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index c0b2c67e0235..52cb9e465542 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -21,6 +21,13 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 	int r = -ENOENT;
- 
- 	switch (data->type) {
-+	case KVM_XEN_ATTR_TYPE_LONG_MODE:
-+		if (!IS_ENABLED(CONFIG_64BIT) && data->u.long_mode)
-+			return -EINVAL;
++struct compat_vcpu_info {
++        uint8_t evtchn_upcall_pending;
++        uint8_t evtchn_upcall_mask;
++        uint32_t evtchn_pending_sel;
++        struct compat_arch_vcpu_info arch;
++        struct pvclock_vcpu_time_info time;
++}; /* 64 bytes (x86) */
 +
-+		kvm->arch.xen.long_mode = !!data->u.long_mode;
-+		r = 0;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -33,6 +40,10 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 	int r = -ENOENT;
- 
- 	switch (data->type) {
-+	case KVM_XEN_ATTR_TYPE_LONG_MODE:
-+		data->u.long_mode = kvm->arch.xen.long_mode;
-+		r = 0;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -45,6 +56,10 @@ int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data)
- 	struct kvm *kvm = vcpu->kvm;
- 	u32 page_num = data & ~PAGE_MASK;
- 	u64 page_addr = data & PAGE_MASK;
-+	bool lm = is_long_mode(vcpu);
++struct compat_arch_shared_info {
++	unsigned int max_pfn;
++	unsigned int pfn_to_mfn_frame_list_list;
++	unsigned int nmi_reason;
++	unsigned int p2m_cr3;
++	unsigned int p2m_vaddr;
++	unsigned int p2m_generation;
++	uint32_t wc_sec_hi;
++};
 +
-+	/* Latch long_mode for shared_info pages etc. */
-+	vcpu->kvm->arch.xen.long_mode = lm;
- 
- 	/*
- 	 * If Xen hypercall intercept is enabled, fill the hypercall
-@@ -79,7 +94,6 @@ int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data)
- 				return 1;
- 		}
- 	} else {
--		int lm = is_long_mode(vcpu);
- 		u8 *blob_addr = lm ? (u8 *)(long)kvm->arch.xen_hvm_config.blob_addr_64
- 				   : (u8 *)(long)kvm->arch.xen_hvm_config.blob_addr_32;
- 		u8 blob_size = lm ? kvm->arch.xen_hvm_config.blob_size_64
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 31d4eb100efd..3293866d5ee1 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1592,10 +1592,13 @@ struct kvm_xen_hvm_attr {
- 	__u16 type;
- 	__u16 pad[3];
- 	union {
-+		__u8 long_mode;
- 		__u64 pad[4];
- 	} u;
- };
- 
-+#define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
++struct compat_shared_info {
++	struct compat_vcpu_info vcpu_info[MAX_VIRT_CPUS];
++	uint32_t evtchn_pending[32];
++	uint32_t evtchn_mask[32];
++	struct pvclock_wall_clock wc;
++	struct compat_arch_shared_info arch;
++};
 +
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
- 	/* Guest initialization commands */
+ #endif /* __ARCH_X86_KVM_XEN_H__ */
 -- 
 2.29.2
 
