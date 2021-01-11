@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAB342F202A
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:58:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBCE52F202C
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:59:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391387AbhAKT6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 14:58:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52044 "EHLO
+        id S2391396AbhAKT6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 14:58:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390052AbhAKT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S2391377AbhAKT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 11 Jan 2021 14:58:13 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F546C061786
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DF9C06179F
         for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 11:57:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=d9XnHRRw32bis0FEs4oWJD3nnQ6CJO3uyeP5ug69dVE=; b=DIgG1a8qlBSNUj7MfhkiWYolbI
-        p8BvML8m8+PStGtbiJezDgd3IPSb7AFYstzMfbwZZiPnhPPQ4xmm464hl5B3wP7X7Zn88snmcU1Xo
-        dyywNiE0SZHDDHYxG7nWCyEtSSZWwNv5nrYwm6BjKFZ5zkLt4CESqIRjzGuIRlWITsWhkNJiUgjjq
-        QYT+QxIKSrJsWu4aRuHbKLwgpJJaN7qfQ2c7xM0LPqLkKlP5FQosVzKjjHxJwZHvMm4Va7Kcd5kmE
-        9rfM1qGgkXv4tUVjvyXZYAix9MPgwZ/lw19ckzCPrTy3btT0in0MNAV8OgMW16jvSOEXHPWsiUwhu
-        jSyG2nSQ==;
+        bh=cCxJxylhdPJxP9NvV6aGcy+ZFbUDaJSF1lHjG6wnXMc=; b=R+JyKb7gv+WhzniJZTRhocdCGO
+        KhsXcJput5c7GEqaWiDeTrdeLuvgD6eRa+spETCP4dBo3j8AzujVcTiq8EfgKBHBMrBiamyQgKh5P
+        NEURPHemzTiaYxiX9Ez957krHFEnvbQLNAz2HG9o3hDqtJ2ISsC/HXdNXLJijXe4+bOsGUNX1wyuL
+        5IPKCNJWWf3mzPdBoHNwjTfcZAYlkvGu2Ixu2KxgiSXbLsKgi36aXgcx5T4Qq5w4H96b2sMJPk1Cv
+        Cv28FXmna7BM+O4xnW4l+kZnuTswLJLTyH1WZT/cRU3XmkmX/RvUJiwmBFFkfUzy+4lhMfYOJOX8r
+        4Cb6stvg==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kz3Jg-0001h8-N8; Mon, 11 Jan 2021 19:57:29 +0000
+        id 1kz3Jg-0001hC-NV; Mon, 11 Jan 2021 19:57:29 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kz3Jf-0001Hm-KP; Mon, 11 Jan 2021 19:57:27 +0000
+        id 1kz3Jf-0001Hp-L9; Mon, 11 Jan 2021 19:57:27 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v5 09/16] KVM: x86/xen: update wallclock region
-Date:   Mon, 11 Jan 2021 19:57:18 +0000
-Message-Id: <20210111195725.4601-10-dwmw2@infradead.org>
+Subject: [PATCH v5 10/16] KVM: x86/xen: register vcpu info
+Date:   Mon, 11 Jan 2021 19:57:19 +0000
+Message-Id: <20210111195725.4601-11-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210111195725.4601-1-dwmw2@infradead.org>
 References: <20210111195725.4601-1-dwmw2@infradead.org>
@@ -54,130 +54,115 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joao Martins <joao.m.martins@oracle.com>
 
-Wallclock on Xen is written in the shared_info page.
-
-To that purpose, export kvm_write_wall_clock() and pass on the GPA of
-its location to populate the shared_info wall clock data.
+The vcpu info supersedes the per vcpu area of the shared info page and
+the guest vcpus will use this instead.
 
 Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/x86.c | 17 ++++++++++++-----
- arch/x86/kvm/x86.h |  1 +
- arch/x86/kvm/xen.c | 28 +++++++++++++++++++++++++++-
- 3 files changed, 40 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/xen.c              | 30 ++++++++++++++++++++++++++++++
+ include/uapi/linux/kvm.h        |  5 +++++
+ 3 files changed, 37 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fd0a4ff1157e..0cdebdcaa4c2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1927,15 +1927,14 @@ static s64 get_kvmclock_base_ns(void)
- }
- #endif
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 07ae5887afa1..421d082d772d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -523,6 +523,8 @@ struct kvm_vcpu_hv {
+ /* Xen HVM per vcpu emulation context */
+ struct kvm_vcpu_xen {
+ 	u64 hypercall_rip;
++	bool vcpu_info_set;
++	struct gfn_to_hva_cache vcpu_info_cache;
+ };
  
--static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
-+void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock, int sec_hi_ofs)
- {
- 	int version;
- 	int r;
- 	struct pvclock_wall_clock wc;
-+	u32 wc_sec_hi;
- 	u64 wall_nsec;
- 
--	kvm->arch.wall_clock = wall_clock;
--
- 	if (!wall_clock)
- 		return;
- 
-@@ -1964,6 +1963,12 @@ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
- 
- 	kvm_write_guest(kvm, wall_clock, &wc, sizeof(wc));
- 
-+	if (sec_hi_ofs) {
-+		wc_sec_hi = wall_nsec >> 32;
-+		kvm_write_guest(kvm, wall_clock + sec_hi_ofs,
-+				&wc_sec_hi, sizeof(wc_sec_hi));
-+	}
-+
- 	version++;
- 	kvm_write_guest(kvm, wall_clock, &version, sizeof(version));
- }
-@@ -3121,13 +3126,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
- 			return 1;
- 
--		kvm_write_wall_clock(vcpu->kvm, data);
-+		vcpu->kvm->arch.wall_clock = data;
-+		kvm_write_wall_clock(vcpu->kvm, data, 0);
- 		break;
- 	case MSR_KVM_WALL_CLOCK:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE))
- 			return 1;
- 
--		kvm_write_wall_clock(vcpu->kvm, data);
-+		vcpu->kvm->arch.wall_clock = data;
-+		kvm_write_wall_clock(vcpu->kvm, data, 0);
- 		break;
- 	case MSR_KVM_SYSTEM_TIME_NEW:
- 		if (!guest_pv_has(vcpu, KVM_FEATURE_CLOCKSOURCE2))
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index c5ee0f5ce0f1..8982a7bf2041 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -247,6 +247,7 @@ static inline bool kvm_vcpu_latch_init(struct kvm_vcpu *vcpu)
- 	return is_smm(vcpu) || kvm_x86_ops.apic_init_signal_blocked(vcpu);
- }
- 
-+void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock, int sec_hi_ofs);
- void kvm_inject_realmode_interrupt(struct kvm_vcpu *vcpu, int irq, int inc_eip);
- 
- void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ struct kvm_vcpu_arch {
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 9dd9c42842b8..e5117a611737 100644
+index e5117a611737..4bc72e0b9928 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -19,14 +19,40 @@
+@@ -58,6 +58,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
  
- static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
  {
-+	gpa_t gpa = gfn_to_gpa(gfn);
-+	int wc_ofs, sec_hi_ofs;
- 	int ret;
++	struct kvm_vcpu *v;
+ 	int r = -ENOENT;
  
- 	ret = kvm_gfn_to_hva_cache_init(kvm, &kvm->arch.xen.shinfo_cache,
--					gfn_to_gpa(gfn), PAGE_SIZE);
-+					gpa, PAGE_SIZE);
- 	if (ret)
- 		return ret;
+ 	switch (data->type) {
+@@ -73,6 +74,23 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
+ 		break;
  
- 	kvm->arch.xen.shinfo_set = true;
++	case KVM_XEN_ATTR_TYPE_VCPU_INFO:
++		v = kvm_get_vcpu_by_id(kvm, data->u.vcpu_attr.vcpu_id);
++		if (!v)
++			return -EINVAL;
 +
-+	/* Paranoia checks on the 32-bit struct layout */
-+	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
-+	BUILD_BUG_ON(offsetof(struct compat_shared_info, arch.wc_sec_hi) != 0x924);
-+	BUILD_BUG_ON(offsetof(struct pvclock_vcpu_time_info, version) != 0);
++		/* No compat necessary here. */
++		BUILD_BUG_ON(sizeof(struct vcpu_info) !=
++			     sizeof(struct compat_vcpu_info));
++		r = kvm_gfn_to_hva_cache_init(kvm, &v->arch.xen.vcpu_info_cache,
++					      data->u.vcpu_attr.gpa,
++					      sizeof(struct vcpu_info));
++		if (r)
++			return r;
 +
-+	/* 32-bit location by default */
-+	wc_ofs = offsetof(struct compat_shared_info, wc);
-+	sec_hi_ofs = offsetof(struct compat_shared_info, arch.wc_sec_hi);
++		v->arch.xen.vcpu_info_set = true;
++		break;
 +
-+#ifdef CONFIG_X86_64
-+	/* Paranoia checks on the 64-bit struct layout */
-+	BUILD_BUG_ON(offsetof(struct shared_info, wc) != 0xc00);
-+	BUILD_BUG_ON(offsetof(struct shared_info, wc_sec_hi) != 0xc0c);
-+
-+	if (kvm->arch.xen.long_mode) {
-+		wc_ofs = offsetof(struct shared_info, wc);
-+		sec_hi_ofs = offsetof(struct shared_info, wc_sec_hi);
-+	}
-+#endif
-+
-+	kvm_write_wall_clock(kvm, gpa + wc_ofs, sec_hi_ofs - wc_ofs);
-+	kvm_make_all_cpus_request(kvm, KVM_REQ_MASTERCLOCK_UPDATE);
-+
- 	return 0;
- }
+ 	default:
+ 		break;
+ 	}
+@@ -83,6 +101,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ {
+ 	int r = -ENOENT;
++	struct kvm_vcpu *v;
  
+ 	switch (data->type) {
+ 	case KVM_XEN_ATTR_TYPE_LONG_MODE:
+@@ -97,6 +116,17 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		}
+ 		break;
+ 
++	case KVM_XEN_ATTR_TYPE_VCPU_INFO:
++		v = kvm_get_vcpu_by_id(kvm, data->u.vcpu_attr.vcpu_id);
++		if (!v)
++			return -EINVAL;
++
++		if (v->arch.xen.vcpu_info_set) {
++			data->u.vcpu_attr.gpa = v->arch.xen.vcpu_info_cache.gpa;
++			r = 0;
++		}
++		break;
++
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 0c04bb6eda09..5ab0063d109a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1596,12 +1596,17 @@ struct kvm_xen_hvm_attr {
+ 		struct {
+ 			__u64 gfn;
+ 		} shared_info;
++		struct {
++			__u32 vcpu_id;
++			__u64 gpa;
++		} vcpu_attr;
+ 		__u64 pad[4];
+ 	} u;
+ };
+ 
+ #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
+ #define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
++#define KVM_XEN_ATTR_TYPE_VCPU_INFO		0x2
+ 
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
 -- 
 2.29.2
 
