@@ -2,102 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E45C2F1D72
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 19:06:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF0702F1D96
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 19:09:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389210AbhAKSGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 13:06:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52510 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727030AbhAKSGI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 13:06:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610388281;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YDFmgDgRxNAaH6RohnUOtmiFzfn10DX+8iq8uU5yc/I=;
-        b=CJxnkNXvH84OkSUa4wDPCjAVaozZ+Zekt64TwKbsM4nxt8Vq0aSJbC5mjF+b6iAETtg5sd
-        rT8tguDcFWgpBx2ZdraTtpRyjCNNwKCSSk6TgJM2VfyBd2SUpC6yX74lycfldqTmEI6aSP
-        +Yah4VlDnMgL+y5VgHp3dW1tahAt/JI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-J4N8intHOCKhgS4lRCw6-g-1; Mon, 11 Jan 2021 13:04:40 -0500
-X-MC-Unique: J4N8intHOCKhgS4lRCw6-g-1
-Received: by mail-ed1-f71.google.com with SMTP id dh21so54109edb.6
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:04:39 -0800 (PST)
+        id S2390206AbhAKSIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 13:08:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389665AbhAKSIc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 13:08:32 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35728C061786
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:07:52 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id x126so399379pfc.7
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:07:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FzYi5CFHX7yAe6C21w/ewHOkjzBSVorYsZxNkxZbkLM=;
+        b=Cf2SHU/6ht8TunF5tqJEWjahTp11UIqc4oE8ZfJA3t+1AFVBY55f7BO+Ch4Sptba3d
+         xoS04jtiBWO6s4KeWpA4DbtGt764iAV6oOXYetqSo8Uh08vD4Vg/C01Vn+ToRq8CfjXX
+         CYUpL3p5bg4WAQqEG3iz9nOucPiVm1/PS25QJqiKTJ/79K8pFNgH8P0dq3aG3GIoWhNe
+         Azb++dM3F5iuTAlLeKLWLcBuitWjf2c+MKM2C5abRuhnQzWn4MP3CPoVH3hNiw3ZDdYu
+         WBGoP6z3/ROXRWBxodFqG5otUxD2x29yT6/lgkThBW7n0j6N+FTeWj2BUUZBLSbivGEW
+         r4mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YDFmgDgRxNAaH6RohnUOtmiFzfn10DX+8iq8uU5yc/I=;
-        b=TDRfggyxxF7Zl2ICzsNi+vRRnJRM9jKNSbCit5zQpl5Jzq+wz1W/YozbJeTEYsxG6a
-         3j5/aKjZY+qwQ/59JQNsujZn8Q4nhh26dYKsy1j92UcaGaU9ZLpVYRp1OzeFwiS6JxCo
-         WHU5hpROHdJXdphX3Ohw63LugIz6N9X4R/ivt2Xm+Sxb7u8vntOb5c5sp8Wqjw8Hmpi7
-         AYBbw9xpLELRcLc1kbvBjh/veBxP3P4TOnm2HxiAdgezFN85xfBPq3GNszsVzGeRhN5B
-         ivGwESdrj+nEzrHN8jdUIM+R9SAD046jOb5EeURD6PNN7rgvLzJ3QlK0VOqbO2Qc75kw
-         VP7g==
-X-Gm-Message-State: AOAM531WSoREkBIGn+H5oPhH6hoCuWpA4AxB7/YeE5OeubnWn6ROyAk5
-        YXQ02QtvxsYlCPeQZuhhTKlnPt2GBX2GTAgB/7A8Nliqzf+3YWr7lNACPCQYMDNKMkfjcPSfiwe
-        znWjEDHbUK2Ol
-X-Received: by 2002:a17:906:e206:: with SMTP id gf6mr485199ejb.342.1610388278594;
-        Mon, 11 Jan 2021 10:04:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz/eIATFh+PBzF3J4BtSB/ymjE8fFcXELl6KOECpzo5ZQ+s0HAQLJXiUQrwWyl4CzkEtxKzhA==
-X-Received: by 2002:a17:906:e206:: with SMTP id gf6mr485177ejb.342.1610388278343;
-        Mon, 11 Jan 2021 10:04:38 -0800 (PST)
-Received: from [192.168.1.36] (129.red-88-21-205.staticip.rima-tde.net. [88.21.205.129])
-        by smtp.gmail.com with ESMTPSA id n16sm273664edq.62.2021.01.11.10.04.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Jan 2021 10:04:37 -0800 (PST)
-Subject: Re: [for-6.0 v5 01/13] qom: Allow optional sugar props
-To:     David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
-        pbonzini@redhat.com, frankja@linux.ibm.com, brijesh.singh@amd.com,
-        dgilbert@redhat.com, qemu-devel@nongnu.org
-Cc:     thuth@redhat.com, cohuck@redhat.com, berrange@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
-        mdroth@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>,
-        pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
-        qemu-ppc@nongnu.org, rth@twiddle.net
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-2-david@gibson.dropbear.id.au>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <380065a5-f656-6f4b-edfe-ce9199f8bc62@redhat.com>
-Date:   Mon, 11 Jan 2021 19:04:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FzYi5CFHX7yAe6C21w/ewHOkjzBSVorYsZxNkxZbkLM=;
+        b=ANj+nDzV7ih5OkqzlfwuLqHHefzacjP4++VdZrS8AEppMm8WsbvtVWGx5LPdD0WhCl
+         jW2W5bNttDDv9RdiT72JUUfsSTw/o7GkqAHIlvePcrnS9f/Vnn3mw6PxQDSsE5qyDi/z
+         IBVf6mbxwafSI4COPDcDPfAfx0ZrUloWBqEPMaklVJuhZbAOXN03pUZuBUTENrfGRz0u
+         T3Bg6bVh031kIj4ggAfTB1j/ZwvyLqxQvb1cJo7gG307nqc1KiNjEOCZDOyFmsuZbZi3
+         zE3CQ0zYeskvv3j8FknaFLMrjYlZvNFu5vBv614uoyAS+N1HakjE1mKWG3Ol6XBHm+8v
+         1lvQ==
+X-Gm-Message-State: AOAM530MrNaa2kKry7KA0R8/sLaAFmdL0GsDw1A4mZL46T1nksC6NXU4
+        8RIYzChI24H+VlvYTOIWTD/epw==
+X-Google-Smtp-Source: ABdhPJy7Yt/kUlgbKAw0hyBc7JlPxMxVO5s9HLF5Xa/jBlMZ2QxouheJnaUbtcDPOqoEdNS0mqU+RQ==
+X-Received: by 2002:a63:5023:: with SMTP id e35mr756868pgb.56.1610388471618;
+        Mon, 11 Jan 2021 10:07:51 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id z13sm41478pjt.45.2021.01.11.10.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 10:07:50 -0800 (PST)
+Date:   Mon, 11 Jan 2021 10:07:44 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH 01/13] KVM: SVM: Free sev_asid_bitmap during init if SEV
+ setup fails
+Message-ID: <X/yT8H883tUkQV2M@google.com>
+References: <20210109004714.1341275-1-seanjc@google.com>
+ <20210109004714.1341275-2-seanjc@google.com>
+ <34921a58-ce49-f0fd-e321-c5363e91f3f5@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20201204054415.579042-2-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <34921a58-ce49-f0fd-e321-c5363e91f3f5@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/4/20 6:44 AM, David Gibson wrote:
-> From: Greg Kurz <groug@kaod.org>
+On Mon, Jan 11, 2021, Tom Lendacky wrote:
+> On 1/8/21 6:47 PM, Sean Christopherson wrote:
+> > Free sev_asid_bitmap if the reclaim bitmap allocation fails, othwerise
+> > it will be leaked as sev_hardware_teardown() frees the bitmaps if and
+> > only if SEV is fully enabled (which obviously isn't the case if SEV
+> > setup fails).
 > 
-> Global properties have an @optional field, which allows to apply a given
-> property to a given type even if one of its subclasses doesn't support
-> it. This is especially used in the compat code when dealing with the
-> "disable-modern" and "disable-legacy" properties and the "virtio-pci"
-> type.
-> 
-> Allow object_register_sugar_prop() to set this field as well.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Message-Id: <159738953558.377274.16617742952571083440.stgit@bahia.lan>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  include/qom/object.h |  3 ++-
->  qom/object.c         |  4 +++-
->  softmmu/vl.c         | 16 ++++++++++------
->  3 files changed, 15 insertions(+), 8 deletions(-)
+> The svm_sev_enabled() function is only based on CONFIG_KVM_AMD_SEV and
+> max_sev_asid. So sev_hardware_teardown() should still free everything if it
+> was allocated since we never change max_sev_asid, no?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Aha!  You're correct.  This is needed once svm_sev_enabled() is gone, but is not
+an actual bug in upstream.
 
+I created the commit before the long New Years weekend, but stupidly didn't
+write a changelog.  I then forgot that my series effectively introduce the bug
+and incorrectly moved this patch to the front and treated it as an upstream bug
+fix when retroactively writing the changelog.
+
+Thanks!
