@@ -2,127 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 492942F1BAF
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:01:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA1D2F1C11
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:17:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730381AbhAKRBR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 12:01:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38396 "EHLO
+        id S2388085AbhAKRRP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 12:17:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38287 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725858AbhAKRBR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 12:01:17 -0500
+        by vger.kernel.org with ESMTP id S1727753AbhAKRRO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 12:17:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610384391;
+        s=mimecast20190719; t=1610385348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dAbia5X5Wfsy+2KYaMzsoyacoja8ZI6cmkAKrusv3O8=;
-        b=NspEyJm/fNEzsrJL8Xl2zsm6zoOaJg1M/gQUj8eBxMozc1eZndjnmNGe8iViSFMzh96JvC
-        JxRxIjkgtEkmblrnfAZjCOEprmk8LRa0Z/phMOkdi9bMMasZtvdO8maYzQT77yzM0ZgAAI
-        PPinYnqVwa6AoTs7FMbeTE5ctWAuLeU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-20-RNd2wBhmMKmZafH7QugEPQ-1; Mon, 11 Jan 2021 11:59:49 -0500
-X-MC-Unique: RNd2wBhmMKmZafH7QugEPQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 537E19CC15;
-        Mon, 11 Jan 2021 16:59:47 +0000 (UTC)
-Received: from gondolin (ovpn-112-169.ams2.redhat.com [10.36.112.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0AD795DA6F;
-        Mon, 11 Jan 2021 16:59:16 +0000 (UTC)
-Date:   Mon, 11 Jan 2021 17:59:14 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
-        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
-        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
-        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20210111175914.13adfa2e.cohuck@redhat.com>
-In-Reply-To: <20210105204125.GE4102@ram-ibm-com.ibm.com>
-References: <20201204054415.579042-12-david@gibson.dropbear.id.au>
-        <20201214182240.2abd85eb.cohuck@redhat.com>
-        <20201217054736.GH310465@yekko.fritz.box>
-        <20201217123842.51063918.cohuck@redhat.com>
-        <20201217151530.54431f0e@bahia.lan>
-        <20201218124111.4957eb50.cohuck@redhat.com>
-        <20210104071550.GA22585@ram-ibm-com.ibm.com>
-        <20210104134629.49997b53.pasic@linux.ibm.com>
-        <20210104184026.GD4102@ram-ibm-com.ibm.com>
-        <20210105115614.7daaadd6.pasic@linux.ibm.com>
-        <20210105204125.GE4102@ram-ibm-com.ibm.com>
-Organization: Red Hat GmbH
+        bh=XG4nE77l9V+rRZuoWuOzDt9ZOhzNiCqRWdt18ZZfUjs=;
+        b=UCINYGTvcxJXkN+Ktr0d6Oe6/i5FX6vwwxbBLqC2UkciHHezuFGmbPPuJmBPuLph/WY1HU
+        Gt2fu8dRKgZZivqA44K2JwelMkgmSc1e+iwAV4jw8DmLLNNBnTTM5WPArNRPwmH7BJ3Deh
+        kFEcGNG4I2smuOAFasNwqaYEAS8Ii1w=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-F_UaqxqbPNiNNISNqg80Zg-1; Mon, 11 Jan 2021 12:15:46 -0500
+X-MC-Unique: F_UaqxqbPNiNNISNqg80Zg-1
+Received: by mail-ed1-f71.google.com with SMTP id d12so8536766edx.23
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:15:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=XG4nE77l9V+rRZuoWuOzDt9ZOhzNiCqRWdt18ZZfUjs=;
+        b=jP4RNzR/FvnLxlqNfXB7jzZgWlFc8d6dhS2QRMYwvlwWd1TyYXsv9zVKIdwbM6kcg7
+         lrVK4zqxKC6tVMCvxDXbAYJ69KiQiTv6Y1VlvPR1FNg/dz8kYd/apRc/3/UuqIJBqMgA
+         +rO2WEpZEoJ+2AjPk4iQILSA4893fjjkGRXrRTbCO+eUmwFfyNgA4Y0U8szcVI3JYK8u
+         mZJxr2eLmOAnWaiFRq0DKccmI/MZEkAzuFrk2b6GDAhlZ8XvIPKa0k8IPA/gt2+w1bEC
+         XBPZnZzciMANnbtsYLGBZNM9tjC/CUs815OXK/RcVSXjIRyflepiezKoPhJMQBz/Y7w/
+         YI6g==
+X-Gm-Message-State: AOAM532pyocaoXgA9goGI1aSt06uLc4dY33EssR2k6vwposn/Kq31W3u
+        Ihgz0gHO4BGW++CeQMOkkc7EXVpeREKS6fCmm2JfMVDO6ELgT1ea0If9dzE4qw+M0Ax7YRo/4jx
+        vveeh5oFLZSJQ
+X-Received: by 2002:a05:6402:318f:: with SMTP id di15mr275587edb.237.1610385345332;
+        Mon, 11 Jan 2021 09:15:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwtU8IgVCF7zsM451sQJKQOHdiAFlqQKj7bLZn7B0U5ai/6SyhYTAzdtk72H5Nhzn+BgqLiKQ==
+X-Received: by 2002:a05:6402:318f:: with SMTP id di15mr275559edb.237.1610385345089;
+        Mon, 11 Jan 2021 09:15:45 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a13sm211657edb.76.2021.01.11.09.15.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 09:15:44 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Cun Li <cun.jia.li@gmail.com>
+Cc:     seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Cun Li <cun.jia.li@gmail.com>,
+        pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: update depracated jump label API
+In-Reply-To: <20210111152435.50275-1-cun.jia.li@gmail.com>
+References: <20210111152435.50275-1-cun.jia.li@gmail.com>
+Date:   Mon, 11 Jan 2021 18:15:43 +0100
+Message-ID: <87h7nn8ke8.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 5 Jan 2021 12:41:25 -0800
-Ram Pai <linuxram@us.ibm.com> wrote:
+Cun Li <cun.jia.li@gmail.com> writes:
 
-> On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
-> > On Mon, 4 Jan 2021 10:40:26 -0800
-> > Ram Pai <linuxram@us.ibm.com> wrote:
+> The use of 'struct static_key' and 'static_key_false' is
+> deprecated. Use the new API.
+>
+> Signed-off-by: Cun Li <cun.jia.li@gmail.com>
+> ---
+>  arch/x86/kvm/lapic.h         | 6 +++---
+>  arch/x86/kvm/mmu/mmu_audit.c | 4 ++--
+>  arch/x86/kvm/x86.c           | 2 +-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index 4fb86e3a9dd3..b7aa76e2678e 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -176,7 +176,7 @@ extern struct static_key kvm_no_apic_vcpu;
+>  
+>  static inline bool lapic_in_kernel(struct kvm_vcpu *vcpu)
+>  {
+> -	if (static_key_false(&kvm_no_apic_vcpu))
+> +	if (static_branch_unlikely(&kvm_no_apic_vcpu))
+>  		return vcpu->arch.apic;
+>  	return true;
+>  }
+> @@ -185,7 +185,7 @@ extern struct static_key_deferred apic_hw_disabled;
+>  
+>  static inline int kvm_apic_hw_enabled(struct kvm_lapic *apic)
+>  {
+> -	if (static_key_false(&apic_hw_disabled.key))
+> +	if (static_branch_unlikely(&apic_hw_disabled.key))
+>  		return apic->vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE;
+>  	return MSR_IA32_APICBASE_ENABLE;
+>  }
+> @@ -194,7 +194,7 @@ extern struct static_key_deferred apic_sw_disabled;
+>  
+>  static inline bool kvm_apic_sw_enabled(struct kvm_lapic *apic)
+>  {
+> -	if (static_key_false(&apic_sw_disabled.key))
+> +	if (static_branch_unlikely(&apic_sw_disabled.key))
+>  		return apic->sw_enabled;
+>  	return true;
+>  }
+> diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
+> index c8d51a37e2ce..8a4b3510151a 100644
+> --- a/arch/x86/kvm/mmu/mmu_audit.c
+> +++ b/arch/x86/kvm/mmu/mmu_audit.c
+> @@ -234,7 +234,7 @@ static void audit_vcpu_spte(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  static bool mmu_audit;
+> -static struct static_key mmu_audit_key;
+> +static DEFINE_STATIC_KEY_FALSE(mmu_audit_key);
+>  
+>  static void __kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
+>  {
+> @@ -250,7 +250,7 @@ static void __kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
+>  
+>  static inline void kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
+>  {
+> -	if (static_key_false((&mmu_audit_key)))
+> +	if (static_branch_unlikely((&mmu_audit_key)))
+>  		__kvm_mmu_audit(vcpu, point);
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9a8969a6dd06..b8c05ef26942 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10339,7 +10339,7 @@ bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
+>  	return (vcpu->arch.apic_base & MSR_IA32_APICBASE_BSP) != 0;
+>  }
+>  
+> -struct static_key kvm_no_apic_vcpu __read_mostly;
+> +__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_no_apic_vcpu);
+>  EXPORT_SYMBOL_GPL(kvm_no_apic_vcpu);
+>  
+>  void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
 
-> > > The main difference between my proposal and the other proposal is...
-> > > 
-> > >   In my proposal the guest makes the compatibility decision and acts
-> > >   accordingly.  In the other proposal QEMU makes the compatibility
-> > >   decision and acts accordingly. I argue that QEMU cannot make a good
-> > >   compatibility decision, because it wont know in advance, if the guest
-> > >   will or will-not switch-to-secure.
-> > >   
-> > 
-> > You have a point there when you say that QEMU does not know in advance,
-> > if the guest will or will-not switch-to-secure. I made that argument
-> > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
-> > was to flip that property on demand when the conversion occurs. David
-> > explained to me that this is not possible for ppc, and that having the
-> > "securable-guest-memory" property (or whatever the name will be)
-> > specified is a strong indication, that the VM is intended to be used as
-> > a secure VM (thus it is OK to hurt the case where the guest does not
-> > try to transition). That argument applies here as well.  
-> 
-> As suggested by Cornelia Huck, what if QEMU disabled the
-> "securable-guest-memory" property if 'must-support-migrate' is enabled?
-> Offcourse; this has to be done with a big fat warning stating
-> "secure-guest-memory" feature is disabled on the machine.
-> Doing so, will continue to support guest that do not try to transition.
-> Guest that try to transition will fail and terminate themselves.
+mmu_audit_key can only be true or false so it would also be nice to use 
+static_branch_enable()/static_branch_disable() for it and not
+static_key_slow_inc()/static_key_slow_dec() we currently use (as it
+sounds weird to increment 'false').
 
-Just to recap the s390x situation:
+kvm_no_apic_vcpu is different, we actually need to increase it with
+every vCPU which doesn't have LAPIC but maybe we can at least switch to
+static_branch_inc()/static_branch_dec(). It is still weird we initialize
+it to 'false' but it seems to be a documented behavior. From
+include/linux/jump_label.h:
 
-- We currently offer a cpu feature that indicates secure execution to
-  be available to the guest if the host supports it.
-- When we introduce the secure object, we still need to support
-  previous configurations and continue to offer the cpu feature, even
-  if the secure object is not specified.
-- As migration is currently not supported for secured guests, we add a
-  blocker once the guest actually transitions. That means that
-  transition fails if --only-migratable was specified on the command
-  line. (Guests not transitioning will obviously not notice anything.)
-- With the secure object, we will already fail starting QEMU if
-  --only-migratable was specified.
+"... Thus, static_branch_inc() can be thought of as a 'make more true'
+ and static_branch_dec() as a 'make more false'"
 
-My suggestion is now that we don't even offer the cpu feature if
---only-migratable has been specified. For a guest that does not want to
-transition to secure mode, nothing changes; a guest that wants to
-transition to secure mode will notice that the feature is not available
-and fail appropriately (or ultimately, when the ultravisor call fails).
-We'd still fail starting QEMU for the secure object + --only-migratable
-combination.
+so .. oh well.
 
-Does that make sense?
+-- 
+Vitaly
 
