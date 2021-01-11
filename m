@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E21D2F202B
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:59:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F87B2F203D
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:00:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391384AbhAKT6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 14:58:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52046 "EHLO
+        id S2391471AbhAKT7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 14:59:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391324AbhAKT6N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 14:58:13 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6023EC061794
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 11:57:33 -0800 (PST)
+        with ESMTP id S2391461AbhAKT7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 14:59:09 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC1FC06179F
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 11:58:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=1qwNwrIFDu4e0qSxR1YkNf1iRcj1rDIsKqfExd0JJk8=; b=B1Y3erkSC/PBw6OGGoLKrMMTsL
-        ycuNFmxA6ajK5YlW4RkjdAJbcIBRLoILC1HBcKrA4VX2oDCn5mrEwfeUCMBxyHbNe0u79TnpeHNln
-        shjS0upPZyDVPO7Vty/yWzy5O3ioYSYZb1SmJH4lyZnlk7JFw980L4TAe6Y7k5wRikisocoMqh1Of
-        0kbNyrOGXgNYkf410z4TJ8MnWu+r0Ze9Bd5G74CbBpOnBUmaKM5fd+U5cLF0XOaWvqhRVRE/iawyb
-        8Nwn8rJu3FiZ3kSJrJxEIkLCG3uTq0dJvXjgcht1aG31fIvo5tELcPSazeGBMGx1oovlFIDKLBOlw
-        Bm1wYnXg==;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
+        To:From:Reply-To:Content-ID:Content-Description;
+        bh=UZxsZCJj+A96sO4NsFY+p0+ZZOwM+RCEN/D65QmcJVM=; b=CqGDh9+M+4hcOi0D9qStwz7OWD
+        Y3+FDvpLRDO9lTFOrCcHSseR75fvhkk8YHc/y6odWuEqCs5HRHBUoPasuj+glDspVGQkFvtoErCUo
+        BeXUEOWX9mI6ELesB1aIWL2eic1eO6Q+laQFgW04hz1HXSlrazQDf4eqzAflHxNHE+XOI0VXd4pN8
+        dikV3WtHpj/5LmN0REcITAHruNA643dJJtG2MiDYAefW3riSXugM/kuFcINdLFArRiV+sAuCVd6QR
+        2KyaWuWNPHQAaZG5syVuQ0PD7HDBghgyoN2m3xy68nksr32LLRsnFES3XsB28QGK7AfGqNb5ZqxY/
+        6ClFrS2w==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kz3Jg-0001hI-QG; Mon, 11 Jan 2021 19:57:29 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1kz3Jg-003kSa-56; Mon, 11 Jan 2021 19:57:37 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kz3Jf-0001Hy-NO; Mon, 11 Jan 2021 19:57:27 +0000
+        id 1kz3Jf-0001I1-OM; Mon, 11 Jan 2021 19:57:27 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,312 +38,289 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v5 13/16] KVM: x86/xen: register runstate info
-Date:   Mon, 11 Jan 2021 19:57:22 +0000
-Message-Id: <20210111195725.4601-14-dwmw2@infradead.org>
+Subject: [PATCH v5 14/16] KVM: x86: declare Xen HVM shared info capability and add test case
+Date:   Mon, 11 Jan 2021 19:57:23 +0000
+Message-Id: <20210111195725.4601-15-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210111195725.4601-1-dwmw2@infradead.org>
 References: <20210111195725.4601-1-dwmw2@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joao Martins <joao.m.martins@oracle.com>
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Allow emulator to register vcpu runstates which allow Xen guests
-to use that for steal clock. The 'preempted' state of KVM steal clock
-equates to 'runnable' state, 'running' has similar meanings for both and
-'offline' is used when system admin needs to bring vcpu offline or
-hotplug.
+Instead of adding a plethora of new KVM_CAP_XEN_FOO capabilities, just
+add bits to the return value of KVM_CAP_XEN_HVM.
 
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/include/asm/kvm_host.h |   5 ++
- arch/x86/kvm/x86.c              |  10 +++
- arch/x86/kvm/xen.c              | 148 +++++++++++++++++++++++++++++++-
- arch/x86/kvm/xen.h              |   8 ++
- include/uapi/linux/kvm.h        |   1 +
- 5 files changed, 171 insertions(+), 1 deletion(-)
+ arch/x86/kvm/x86.c                            |   3 +-
+ include/uapi/linux/kvm.h                      |   3 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    | 194 ++++++++++++++++++
+ 4 files changed, 200 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index cd65bd43fc5f..73f285ebb181 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -523,10 +523,15 @@ struct kvm_vcpu_hv {
- /* Xen HVM per vcpu emulation context */
- struct kvm_vcpu_xen {
- 	u64 hypercall_rip;
-+	u32 current_runstate;
- 	bool vcpu_info_set;
- 	bool vcpu_time_info_set;
-+	bool runstate_set;
- 	struct gfn_to_hva_cache vcpu_info_cache;
- 	struct gfn_to_hva_cache vcpu_time_info_cache;
-+	struct gfn_to_hva_cache runstate_cache;
-+	u64 last_steal;
-+	u64 last_state_ns;
- };
- 
- struct kvm_vcpu_arch {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1cf503d559eb..f3f07b0265fc 100644
+index f3f07b0265fc..25ef3b7ad49d 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2946,6 +2946,11 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 	struct kvm_host_map map;
- 	struct kvm_steal_time *st;
- 
-+	if (vcpu->arch.xen.runstate_set) {
-+		kvm_xen_setup_runstate_page(vcpu);
-+		return;
-+	}
-+
- 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
- 		return;
- 
-@@ -3999,6 +4004,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	struct kvm_host_map map;
- 	struct kvm_steal_time *st;
- 
-+	if (vcpu->arch.xen.runstate_set) {
-+		kvm_xen_runstate_set_preempted(vcpu);
-+		return;
-+	}
-+
- 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
- 		return;
- 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 1cca46effec8..17cbb4462b7e 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -11,9 +11,11 @@
- #include "hyperv.h"
- 
- #include <linux/kvm_host.h>
-+#include <linux/sched/stat.h>
- 
- #include <trace/events/kvm.h>
- #include <xen/interface/xen.h>
-+#include <xen/interface/vcpu.h>
- 
- #include "trace.h"
- 
-@@ -56,6 +58,124 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- 	return 0;
- }
- 
-+static void kvm_xen_update_runstate(struct kvm_vcpu *v, int state, u64 steal_ns)
-+{
-+	struct kvm_vcpu_xen *vcpu_xen = &v->arch.xen;
-+	struct vcpu_runstate_info runstate;
-+	unsigned int offset = offsetof(struct compat_vcpu_runstate_info, state_entry_time);
-+	u64 now, delta;
-+
-+	BUILD_BUG_ON(sizeof(struct compat_vcpu_runstate_info) != 0x2c);
-+
-+#ifdef CONFIG_X86_64
-+	/*
-+	 * The only difference is alignment of uint64_t in 32-bit.
-+	 * So the first field 'state' is accessed via *runstate_state
-+	 * which is unmodified, while the other fields are accessed
-+	 * through 'runstate->' which we tweak here by adding 4.
-+	 */
-+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state_entry_time) !=
-+		     offsetof(struct compat_vcpu_runstate_info, state_entry_time) + 4);
-+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, time) !=
-+		     offsetof(struct compat_vcpu_runstate_info, time) + 4);
-+
-+	offset = offsetof(struct vcpu_runstate_info, state_entry_time);
-+#endif
-+	/*
-+	 * Although it's called "state_entry_time" and explicitly documented
-+	 * as being "the system time at which the VCPU was last scheduled to
-+	 * run", Xen just treats it as a counter for HVM domains too.
-+	 */
-+	if (kvm_read_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-+					 &runstate.state_entry_time, offset,
-+					 sizeof(u64) * 5))
-+		return;
-+
-+	runstate.state_entry_time = XEN_RUNSTATE_UPDATE |
-+		(runstate.state_entry_time + 1);
-+
-+	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-+					  &runstate.state_entry_time, offset,
-+					  sizeof(u64)))
-+		return;
-+	smp_wmb();
-+
-+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=
-+		     offsetof(struct compat_vcpu_runstate_info, state));
-+	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state) !=
-+		     sizeof(((struct compat_vcpu_runstate_info *)0)->state));
-+	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-+					  &state,
-+					  offsetof(struct vcpu_runstate_info, state),
-+					  sizeof(runstate.state)))
-+		return;
-+
-+	now = ktime_get_ns();
-+	delta = now - vcpu_xen->last_state_ns - steal_ns;
-+	runstate.time[vcpu_xen->current_runstate] += delta;
-+	if (steal_ns)
-+		runstate.time[RUNSTATE_runnable] += steal_ns;
-+
-+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state_entry_time) !=
-+		     offsetof(struct vcpu_runstate_info, time) - sizeof(u64));
-+	BUILD_BUG_ON(offsetof(struct compat_vcpu_runstate_info, state_entry_time) !=
-+		     offsetof(struct compat_vcpu_runstate_info, time) - sizeof(u64));
-+	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->time) !=
-+		     sizeof(((struct compat_vcpu_runstate_info *)0)->time));
-+	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-+					  &runstate.time[0],
-+					  offset + sizeof(u64),
-+					  sizeof(runstate.time)))
-+		return;
-+	smp_wmb();
-+	vcpu_xen->current_runstate = state;
-+	vcpu_xen->last_state_ns = now;
-+
-+	runstate.state_entry_time &= ~XEN_RUNSTATE_UPDATE;
-+	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-+					  &runstate.state_entry_time, offset,
-+					  sizeof(u64)))
-+		return;
-+}
-+
-+void kvm_xen_runstate_set_preempted(struct kvm_vcpu *v)
-+{
-+	struct kvm_vcpu_xen *vcpu_xen = &v->arch.xen;
-+	int new_state;
-+
-+	BUILD_BUG_ON(sizeof(struct compat_vcpu_runstate_info) != 0x2c);
-+	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=
-+		     offsetof(struct compat_vcpu_runstate_info, state));
-+	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state) !=
-+		     sizeof(((struct compat_vcpu_runstate_info *)0)->state));
-+
-+	if (v->preempted) {
-+		new_state = RUNSTATE_runnable;
-+	} else {
-+		new_state = RUNSTATE_blocked;
-+		vcpu_xen->last_steal = current->sched_info.run_delay;
-+	}
-+
-+	kvm_xen_update_runstate(v, new_state, 0);
-+}
-+
-+void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
-+{
-+	struct kvm_vcpu_xen *vcpu_xen = &v->arch.xen;
-+	u64 steal_time = 0;
-+
-+	/*
-+	 * If the CPU was blocked when it last stopped, presumably
-+	 * it became unblocked at some point because it's being run
-+	 * again now. The scheduler run_delay is the runnable time,
-+	 * to be subtracted from the blocked time.
-+	 */
-+	if (vcpu_xen->current_runstate == RUNSTATE_blocked)
-+		steal_time = current->sched_info.run_delay - vcpu_xen->last_steal;
-+
-+	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
-+}
-+
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- {
- 	struct kvm_vcpu *v;
-@@ -78,7 +198,6 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		v = kvm_get_vcpu_by_id(kvm, data->u.vcpu_attr.vcpu_id);
- 		if (!v)
- 			return -EINVAL;
--
- 		/* No compat necessary here. */
- 		BUILD_BUG_ON(sizeof(struct vcpu_info) !=
- 			     sizeof(struct compat_vcpu_info));
-@@ -110,6 +229,22 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
+@@ -3765,7 +3765,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
  		break;
- 
-+	case KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE:
-+		v = kvm_get_vcpu_by_id(kvm, data->u.vcpu_attr.vcpu_id);
-+		if (!v)
-+			return -EINVAL;
-+
-+		r = kvm_gfn_to_hva_cache_init(kvm, &v->arch.xen.runstate_cache,
-+					      data->u.vcpu_attr.gpa,
-+					      sizeof(struct vcpu_runstate_info));
-+		if (r)
-+			return r;
-+
-+		v->arch.xen.runstate_set = true;
-+		v->arch.xen.current_runstate = RUNSTATE_blocked;
-+		v->arch.xen.last_state_ns = ktime_get_ns();
-+		break;
-+
- 	default:
+ 	case KVM_CAP_XEN_HVM:
+ 		r = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
+-		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
++		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
++		    KVM_XEN_HVM_CONFIG_SHARED_INFO;
  		break;
- 	}
-@@ -157,6 +292,17 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		}
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE:
-+		v = kvm_get_vcpu_by_id(kvm, data->u.vcpu_attr.vcpu_id);
-+		if (!v)
-+			return -EINVAL;
-+
-+		if (v->arch.xen.runstate_set) {
-+			data->u.vcpu_attr.gpa = v->arch.xen.runstate_cache.gpa;
-+			r = 0;
-+		}
-+		break;
-+
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 317c1325dade..407e717476d6 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -9,6 +9,8 @@
- #ifndef __ARCH_X86_KVM_XEN_H__
- #define __ARCH_X86_KVM_XEN_H__
- 
-+void kvm_xen_setup_runstate_page(struct kvm_vcpu *vcpu);
-+void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu);
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
-@@ -56,4 +58,10 @@ struct compat_shared_info {
- 	struct compat_arch_shared_info arch;
- };
- 
-+struct compat_vcpu_runstate_info {
-+    int state;
-+    uint64_t state_entry_time;
-+    uint64_t time[4];
-+} __attribute__((packed));
-+
- #endif /* __ARCH_X86_KVM_XEN_H__ */
+ 	case KVM_CAP_SYNC_REGS:
+ 		r = KVM_SYNC_X86_VALID_FIELDS;
 diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6e91c004ae68..0571a7bbb13b 100644
+index 0571a7bbb13b..e468f923e7dd 100644
 --- a/include/uapi/linux/kvm.h
 +++ b/include/uapi/linux/kvm.h
-@@ -1608,6 +1608,7 @@ struct kvm_xen_hvm_attr {
+@@ -1150,6 +1150,7 @@ struct kvm_x86_mce {
+ #ifdef KVM_CAP_XEN_HVM
+ #define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
+ #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
++#define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+ 
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+@@ -1585,6 +1586,7 @@ struct kvm_pv_cmd {
+ /* Available with KVM_CAP_DIRTY_LOG_RING */
+ #define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
+ 
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
+ #define KVM_XEN_HVM_GET_ATTR	_IOWR(KVMIO, 0xc8, struct kvm_xen_hvm_attr)
+ #define KVM_XEN_HVM_SET_ATTR	_IOW(KVMIO,  0xc9, struct kvm_xen_hvm_attr)
+ 
+@@ -1604,6 +1606,7 @@ struct kvm_xen_hvm_attr {
+ 	} u;
+ };
+ 
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
+ #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
  #define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
  #define KVM_XEN_ATTR_TYPE_VCPU_INFO		0x2
- #define KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO	0x3
-+#define KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE		0x4
- 
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 44a4128b4061..0fc29726f777 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -60,6 +60,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
+ TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
+ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/user_msr_test
++TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+new file mode 100644
+index 000000000000..c8c696a6d41c
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+@@ -0,0 +1,194 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * svm_vmcall_test
++ *
++ * Copyright © 2020 Amazon.com, Inc. or its affiliates.
++ *
++ * Xen shared_info / pvclock testing
++ */
++
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++
++#include <stdint.h>
++#include <time.h>
++
++#define VCPU_ID		5
++
++#define SHINFO_REGION_GPA	0xc0000000ULL
++#define SHINFO_REGION_SLOT	10
++#define PAGE_SIZE		4096
++
++#define PVTIME_ADDR	(SHINFO_REGION_GPA + PAGE_SIZE)
++#define RUNSTATE_ADDR	(SHINFO_REGION_GPA + PAGE_SIZE + 0x20)
++
++static struct kvm_vm *vm;
++
++#define XEN_HYPERCALL_MSR	0x40000000
++
++struct pvclock_vcpu_time_info {
++        u32   version;
++        u32   pad0;
++        u64   tsc_timestamp;
++        u64   system_time;
++        u32   tsc_to_system_mul;
++        s8    tsc_shift;
++        u8    flags;
++        u8    pad[2];
++} __attribute__((__packed__)); /* 32 bytes */
++
++struct pvclock_wall_clock {
++        u32   version;
++        u32   sec;
++        u32   nsec;
++} __attribute__((__packed__));
++
++struct vcpu_runstate_info {
++    uint32_t state;
++    uint64_t state_entry_time;
++    uint64_t time[4];
++};
++
++static void guest_code(void)
++{
++	struct vcpu_runstate_info *rs = (void *)RUNSTATE_ADDR;
++
++	/* Scribble on the runstate, just to make sure that... */
++	rs->state = 0x5a;
++
++	GUEST_SYNC(1);
++
++	/* ... it is being set to RUNSTATE_running */
++	GUEST_ASSERT(rs->state == 0);
++	GUEST_DONE();
++}
++
++static int cmp_timespec(struct timespec *a, struct timespec *b)
++{
++	if (a->tv_sec > b->tv_sec)
++		return 1;
++	else if (a->tv_sec < b->tv_sec)
++		return -1;
++	else if (a->tv_nsec > b->tv_nsec)
++		return 1;
++	else if (a->tv_nsec < b->tv_nsec)
++		return -1;
++	else
++		return 0;
++}
++
++int main(int argc, char *argv[])
++{
++	struct timespec min_ts, max_ts, vm_ts;
++
++	if (!(kvm_check_cap(KVM_CAP_XEN_HVM) &
++	      KVM_XEN_HVM_CONFIG_SHARED_INFO) ) {
++		print_skip("KVM_XEN_HVM_CONFIG_SHARED_INFO not available");
++		exit(KSFT_SKIP);
++	}
++
++	clock_gettime(CLOCK_REALTIME, &min_ts);
++
++	vm = vm_create_default(VCPU_ID, 0, (void *) guest_code);
++	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
++
++	/* Map a region for the shared_info page */
++	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
++                                    SHINFO_REGION_GPA, SHINFO_REGION_SLOT,
++				    2 * getpagesize(), 0);
++	virt_map(vm, SHINFO_REGION_GPA, SHINFO_REGION_GPA, 2, 0);
++
++	struct kvm_xen_hvm_attr lm = {
++		.type = KVM_XEN_ATTR_TYPE_LONG_MODE,
++		.u.long_mode = 1,
++	};
++	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &lm);
++
++	struct kvm_xen_hvm_attr ha = {
++		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
++		.u.shared_info.gfn = SHINFO_REGION_GPA / PAGE_SIZE,
++	};
++	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &ha);
++
++	struct kvm_xen_hvm_attr vi = {
++		.type = KVM_XEN_ATTR_TYPE_VCPU_INFO,
++		.u.vcpu_attr.vcpu_id = VCPU_ID,
++		.u.vcpu_attr.gpa = SHINFO_REGION_GPA + 40,
++	};
++	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &vi);
++
++	struct kvm_xen_hvm_attr pvclock = {
++		.type = KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO,
++		.u.vcpu_attr.vcpu_id = VCPU_ID,
++		.u.vcpu_attr.gpa = PVTIME_ADDR,
++	};
++	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &pvclock);
++
++	struct kvm_xen_hvm_attr st = {
++		.type = KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE,
++		.u.vcpu_attr.vcpu_id = VCPU_ID,
++		.u.vcpu_attr.gpa = RUNSTATE_ADDR,
++	};
++	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &st);
++
++	for (;;) {
++		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
++		struct ucall uc;
++
++		vcpu_run(vm, VCPU_ID);
++
++		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
++			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
++			    run->exit_reason,
++			    exit_reason_str(run->exit_reason));
++
++		switch (get_ucall(vm, VCPU_ID, &uc)) {
++		case UCALL_ABORT:
++			TEST_FAIL("%s", (const char *)uc.args[0]);
++			/* NOT REACHED */
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
++		}
++	}
++
++ done:
++	clock_gettime(CLOCK_REALTIME, &max_ts);
++
++	/*
++	 * Just a *really* basic check that things are being put in the
++	 * right place. The actual calculations are much the same for
++	 * Xen as they are for the KVM variants, so no need to check.
++	 */
++	struct pvclock_wall_clock *wc;
++	struct pvclock_vcpu_time_info *ti, *ti2;
++	struct vcpu_runstate_info *rs;
++
++	wc = addr_gva2hva(vm, SHINFO_REGION_GPA + 0xc00);
++	ti = addr_gva2hva(vm, SHINFO_REGION_GPA + 0x40 + 0x20);
++	ti2 = addr_gva2hva(vm, PVTIME_ADDR);
++	rs = addr_gva2hva(vm, RUNSTATE_ADDR);
++
++	vm_ts.tv_sec = wc->sec;
++	vm_ts.tv_nsec = wc->nsec;
++        TEST_ASSERT(wc->version && !(wc->version & 1),
++		    "Bad wallclock version %x", wc->version);
++	TEST_ASSERT(cmp_timespec(&min_ts, &vm_ts) <= 0, "VM time too old");
++	TEST_ASSERT(cmp_timespec(&max_ts, &vm_ts) >= 0, "VM time too new");
++
++	TEST_ASSERT(ti->version && !(ti->version & 1),
++		    "Bad time_info version %x", ti->version);
++	TEST_ASSERT(ti2->version && !(ti2->version & 1),
++		    "Bad time_info version %x", ti->version);
++
++	/* Check for RUNSTATE_blocked */
++	TEST_ASSERT(rs->state == 2, "Not RUNSTATE_blocked");
++	TEST_ASSERT(rs->time[0], "No RUNSTATE_running time");
++	TEST_ASSERT(rs->time[2], "No RUNSTATE_blocked time");
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.29.2
 
