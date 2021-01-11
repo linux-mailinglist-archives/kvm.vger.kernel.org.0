@@ -2,149 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C89B2F1E23
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 19:38:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7B312F1EAD
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 20:10:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390147AbhAKShz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 13:37:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
+        id S2390851AbhAKTJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 14:09:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389472AbhAKShy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 13:37:54 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3D4C061795
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:37:14 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id g15so214373pgu.9
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:37:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pCOlRO55eXFQukgRUNBby75TymOdy5cq/jN7UKhXIac=;
-        b=vm2LNexJa0GaiGIP/zgOeIfs0skXIM92P13a+f+s9HZM3ulZE8p27wxrVr2/hvKMOA
-         2HVEwlJRAs5BzLnSsKHwEfIqDfF1bsUSnkTlFB3/Flla1ksUzRN6Vho3cO+1ttrfGB9S
-         PJLeHGuYnlmg3+2mCgosX7i/nZzVdTJ9+07mAvHoBHmCrBOXBKWPtviTGbJoKoBGmUcA
-         NFTY+uXYB4AeJkRrkfPZSb3dx9PveAUeDNqScMr/aj6xZ8Yu4tXW8fo8ZUtz0lCGxjj8
-         zyl0oaj+FWTnqfJWYJgou4w/OZYSei2tM6/p3+O1UVsQ0EzJZ0/7AmMgLlCrF+hMvn1g
-         2vZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pCOlRO55eXFQukgRUNBby75TymOdy5cq/jN7UKhXIac=;
-        b=Uwb5Du/5bo9/G/1eUs1ZcrBKx3o3tsqFj748AgFlZgzl2TKcIYDbLe3ItkOCFuTVOQ
-         zHky43GvaYkXPQD42SsOi2WOv1bP4l/seZFMFhjNLyxfdXulvX/4hzTEVJueHNIMJvtZ
-         B9TaO10H40bkXSD83tv34ah8EXTRczgwV/zsboDHOEGFkEdSf7d5TJBidYDXd8PfsjKa
-         Io4AZnGZO9niJmAKY9Ys1YVHgMFTubWrdOQb3DA1k5NAVK1OoEietJ2LDz8xal8nP0Ct
-         lfld+QIvJ9qtIfV2Cz5q+7WPIb2ugtYZFTkZf+7jo4DVdFEhhDqXYgTBJAr3bi2o4jSl
-         GVqw==
-X-Gm-Message-State: AOAM532wAxdP46bycbs/bhiD7QVJ4K6ZBaC33o9FR6/YZ/UZtlEYXzDf
-        SdfcljRUT6YudHCkMWMsRoGYjQ==
-X-Google-Smtp-Source: ABdhPJyDkP5gaID6U6928S4cv3FLe7QxyIhXLPwbS6eW/UtvRY3u0QuUjdc96/aVTlE0RJmwX1iHYg==
-X-Received: by 2002:a63:ec4d:: with SMTP id r13mr835054pgj.53.1610390233745;
-        Mon, 11 Jan 2021 10:37:13 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id m4sm422919pgv.16.2021.01.11.10.37.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 10:37:13 -0800 (PST)
-Date:   Mon, 11 Jan 2021 10:37:05 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, mattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-Message-ID: <X/ya0XnsQn4xb/1L@google.com>
-References: <cover.1609890536.git.kai.huang@intel.com>
- <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
+        with ESMTP id S2387783AbhAKTJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 14:09:43 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A29D8C061786;
+        Mon, 11 Jan 2021 11:09:02 -0800 (PST)
+Received: from zn.tnic (p200300ec2f088f005dbd09e41b233316.dip0.t-ipconnect.de [IPv6:2003:ec:2f08:8f00:5dbd:9e4:1b23:3316])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 209F21EC0535;
+        Mon, 11 Jan 2021 20:09:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1610392141;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=FanHOoh2hy7l6LGf+AGyElqhb1QEUzzHXgdlqb+1V/o=;
+        b=qppRsOAH5oyxha2Ytgu5DQ9d7UeLMhnjzM/+SjaoV1pvk/los7OGC7c7CcXlxuOkJQJy6/
+        PdCa3QjA3lDSIXIwxnJIf1rJoPVIKdZENwzyhW1wRqj8zKw3Vw6Vq9vx1fCy5KdLqTJ1OQ
+        CgCfu8U14ac0M2huNuSxggp75IBxHyo=
+Date:   Mon, 11 Jan 2021 20:09:01 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Message-ID: <20210111190901.GG25645@zn.tnic>
+References: <20210106221527.GB24607@zn.tnic>
+ <20210107120946.ef5bae4961d0be91eff56d6b@intel.com>
+ <20210107064125.GB14697@zn.tnic>
+ <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
+ <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
+ <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
+ <20210108071722.GA4042@zn.tnic>
+ <X/jxCOLG+HUO4QlZ@google.com>
+ <20210109011939.GL4042@zn.tnic>
+ <X/yQyUx4+veuSO0e@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
+In-Reply-To: <X/yQyUx4+veuSO0e@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021, Jarkko Sakkinen wrote:
-> On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
-> >   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
-> >     just another memory backend for guests.
+On Mon, Jan 11, 2021 at 09:54:17AM -0800, Sean Christopherson wrote:
+> Yes, but KVM including the bug caps in kvm_cpu_caps is extremely unlikely, and
+> arguably flat out wrong.  Currently, kvm_cpu_caps includes only CPUID-based
+> features that can be exposed direcly to the guest.  I could see a scenario where
+> KVM exposed "bug" capabilities to the guest via a paravirt interface, but I
+> would expect that KVM would either filter and expose the kernel's bug caps
+> without userspace input, or would add a KVM-defined paravirt CPUID leaf to
+> enumerate the caps and track _that_ in kvm_cpu_caps.
 > 
-> Why this an advantage? No objection, just a question.
+> Anyways, I agree that overlapping the bug caps it's a bit of unnecessary
+> cleverness.  I'm not opposed to incorporating NBUGINTS into KVM, but that would
+> mean explicitly pulling in even more x86_capability implementation details.
 
-There are zero KVM changes required to support exposing EPC to a guest.  KVM's
-MMU is completely ignorant of what physical backing is used for any given host
-virtual address.  KVM has to be aware of various VM_* flags, e.g. VM_PFNMAP and
-VM_IO, but that code is arch agnostic and is quite isolated.
+Also, the kernel and kvm being part of it :) kinda tries to fix those
+bugs and not expose them to the guest so exposing a bug would probably
+be only for testing purposes...
 
-> >   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
-> >     does not have to export any symbols, changes to reclaim flows don't
-> >     need to be routed through KVM, SGX's dirty laundry doesn't have to
-> >     get aired out for the world to see, and so on and so forth.
+> That part is deliberate and isn't a dependency so much as how things are
+> implemented.  The true dependency is on the bit offsets within each word. 
+
+Right.
+
+> The kernel could completely rescramble the word numbering and KVM
+> would chug along happily. What KVM won't play nice with is if the
+> kernel broke up a hardware- defined, gathered CPUID leaf/word into
+> scattered features spread out amongst multiple Linux-defined words.
+
+Yes, kvm wants the bits just as they are in the CPUID leafs from the hw.
+
+> It's mostly historical; before the kvm_cpu_caps concept was introduced, the code
+> had grown organically to include both boot_cpu_data and raw CPUID info.  The
+> vast, vast majority of the time, doing CPUID is likely redundant.  But, as noted
+> in commit d8577a4c238f ("KVM: x86: Do host CPUID at load time to mask KVM cpu
+> caps"), the code is quite cheap and runs once at KVM load.  My argument back
+> then was, and still is, that an extra bit of paranoia is justified since the
+> code and operations are quite nearly free.
+
+Ok.
+
+> This particular dependency can be broken, and quite easily at that.  Rather than
+> memcpy() boot_cpu_data.x86_capability, it's trivially easy to redefine the F()
+> macro to invoke boot_cpu_has(), which would allow dropping the memcpy().  The
+> big downside, and why I didn't post the code, is that doing so means every
+> feature routed through F() requires some form of BT+Jcc (or CMOVcc) sequence,
+> whereas the mempcy() approach allows the F() features to be encoded as a single
+> literal by the compiler.
 > 
-> No comments to this before understanding code changes better.
+> From a latency perspective, the extra code is negligible.  The big issue is that
+> all those extra checks add 2k+ bytes of code.  Eliminating the mempcy() doesn't
+> actually break KVM's dependency on the bit offsets, so we'd be bloating kvm.ko
+> by a noticeable amount without providing substantial value.
 > 
-> > The virtual EPC allocated to guests is currently not reclaimable, due to
-> > reclaiming EPC from KVM guests is not currently supported. Due to the
-> > complications of handling reclaim conflicts between guest and host, KVM
-> > EPC oversubscription, which allows total virtual EPC size greater than
-> > physical EPC by being able to reclaiming guests' EPC, is significantly more
-> > complex than basic support for SGX virtualization.
+> And, this behavior is mostly opportunistic; the true justification/motiviation
+> for taking a dependency on the X86_FEATURE_* bit offsets is for communication
+> with userspace, querying the guest CPU model, and runtime checks.
+
+Ok, I guess we'll try to find a middle ground here and not let stuff
+grow too ugly to live.
+
+> It's effectively for communication with userspace.  Userspace, via ioctl(),
+> dictates the vCPU model to KVM, including the exact CPUID results. 
+
+And using the CPUID leafs with the exact bit positions is sort of an
+"interface" there, I see.
+
+> to properly
+> virtualize/emulate the defined vCPU model, KVM must query the dictated CPUID
+> results to determine what features are supported, what guest operations
+> should fault, etc...  E.g. if the vCPU model, via CPUID, states that SMEP isn't
+> supported then KVM needs to inject a #GP if the guest attempts to set CR4.SMEP.
 > 
-> I think it should be really in the center of the patch set description that
-> this patch set implements segmentation of EPC, not oversubscription. It should
-> be clear immediately. It's a core part of knowing "what I'm looking at".
+> KVM also uses the hardware-defined CPUID ABI to advertise which features are
+> supported by both hardware and KVM.  This is the kvm_cpu_cap stuff, where KVM
+> reads boot_cpu_data to see what features were enabled by the kernel.
 
-Technically, it doesn't implement EPC segmentation of EPC.  It implements
-non-reclaimable EPC allocation.  Even that is somewhat untrue as the EPC can be
-forcefully reclaimed, but doing so will destroy the guest contents.
+Right.
 
-Userspace can oversubscribe the EPC to KVM guests, but it would need to kill,
-migrate, or pause one or more VMs if the pool of physical EPC were exhausted.
+> It would be possible for KVM to break the dependency on X86_FEATURE_* bit
+> offsets by defining a translation layer, but I strongly feel that adding manual
+> translations will do more harm than good as it increases the odds of us botching
+> a translation or using the wrong feature flag, creates potential namespace
+> conflicts, etc...
 
-> > - Support SGX virtualization without SGX Launch Control unlocked mode
-> > 
-> > Although SGX driver requires SGX Launch Control unlocked mode to work, SGX
-> > virtualization doesn't, since how enclave is created is completely controlled
-> > by guest SGX software, which is not necessarily linux. Therefore, this series
-> > allows KVM to expose SGX to guest even SGX Launch Control is in locked mode,
-> > or is not present at all. The reason is the goal of SGX virtualization, or
-> > virtualization in general, is to expose hardware feature to guest, but not to
-> > make assumption how guest will use it. Therefore, KVM should support SGX guest
-> > as long as hardware is able to, to have chance to support more potential use
-> > cases in cloud environment.
-> 
-> AFAIK the convergence point with the FLC was, and is that Linux never enables
-> SGX with locked MSRs.
-> 
-> And I don't understand, if it is not fine to allow locked SGX for a *process*,
-> why is it fine for a *virtual machine*? They have a lot same.
+Ok, lemme see if we might encounter more issues down the road...
 
-Because it's a completely different OS/kernel.  If the user has a kernel that
-supports locked SGX, then so be it.  There's no novel circumvention of the
-kernel policy, e.g. the user could simply boot the non-upstream kernel directly,
-and running an upstream kernel in the guest will not cause the kernel to support
-SGX.
++enum kvm_only_cpuid_leafs {
++       CPUID_12_EAX     = NCAPINTS,
++       NR_KVM_CPU_CAPS,
++
++       NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
++};
++
 
-There are any number of things that are allowed in a KVM guest that are not
-allowed in a bare metal process.
+What happens when we decide to allocate a separate leaf for CPUID_12_EAX
+down the road?
 
-> I cannot remember out of top of my head, could the Intel SHA256 be read when
-> booted with unlocked MSRs. If that is the case, then you can still support
-> guests with that configuration.
+You do it already here
 
-No, it's not guaranteed to be readable as firmware could have already changed
-the values in the MSRs.
+Subject: [PATCH 04/13] x86/cpufeatures: Assign dedicated feature word for AMD mem encryption
 
-> Context-dependent guidelines tend to also trash code big time. Also, for the
-> sake of a sane kernel code base, I would consider only supporting unlocked
-> MSRs.
+for the AMD leaf.
 
-It's one line of a code to teach the kernel driver not to load if the MSRs are
-locked.  And IMO, that one line of code is a net positive as it makes it clear
-in the driver itself that it chooses not support locked MSRs, even if SGX itself
-is fully enabled.
+I'm thinking this way around - from scattered to a hw one - should be ok
+because that should work easily. The other way around, taking a hw leaf
+and scattering it around x86_capability[] array elems would probably be
+nasty but with your change that should work too.
+
+Yah, I'm just hypothesizing here - I don't think this "other way around"
+will ever happen...
+
+Hmm, yap, I can cautiously say that with your change we should be ok...
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
