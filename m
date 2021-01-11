@@ -2,275 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 301B22F2101
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:42:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD10B2F2150
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 22:01:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390945AbhAKUl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 15:41:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43468 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2390886AbhAKUl2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 15:41:28 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BKVNne021266;
-        Mon, 11 Jan 2021 15:40:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Rd/CYkrC9/BckZNFZA/yc85QHZUj4XEltpvT2uWcUlA=;
- b=BWNokI9NfflDXOpGsmY5/dsv6A5oVZDe6jwrZvAKgQINQN7Xoh9tHX84MRbg1aO14JeD
- mXB5sujS6eXfRrVw5xnIMy+R2ykhEf4pt3YgXCj5EtUJBQ9bWI8xHImdMg8/fWy2bDfr
- EkENB6YXozKlYdQXnnCDJc6JgY0ljZBtbhxxePJqs/0HaUwWRw+5uyzpZMG4rA53EkQm
- sNq2vwtPdWe6ZSn4yzqtpQA1DE4UAvimXO9UlMatk+FAxEsOehSwDPOkbfuEjwaM++SB
- bcyNG94edpGjUEB6bwe+o2x1LpiFeEcYadLvxf9Pqh5VXOz0ziYZiT1+UD+bLFyKZ5C0 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 360wgfgr91-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 15:40:45 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BKWQYV024750;
-        Mon, 11 Jan 2021 15:40:45 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 360wgfgr81-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 15:40:45 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BKaA3j008961;
-        Mon, 11 Jan 2021 20:40:43 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 35y448aq7d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 20:40:43 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BKeePT47120798
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Jan 2021 20:40:40 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AE925AE058;
-        Mon, 11 Jan 2021 20:40:40 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB5F8AE045;
-        Mon, 11 Jan 2021 20:40:39 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.62.86])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 11 Jan 2021 20:40:39 +0000 (GMT)
-Date:   Mon, 11 Jan 2021 21:40:37 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 06/15] s390/vfio-ap: allow assignment of unavailable
- AP queues to mdev device
-Message-ID: <20210111214037.477f0f03.pasic@linux.ibm.com>
-In-Reply-To: <20201223011606.5265-7-akrowiak@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-7-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1731664AbhAKVAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 16:00:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37252 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731436AbhAKVAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 16:00:21 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22C78C061794
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:59:41 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id b8so175720plx.0
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:59:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=jtUdywQM4flxySRPrfE1NwzGE3CmnKKdPKinhrqCi+s=;
+        b=HUGlibvo5wvekMs7VGccZDkE2vCjozw6xPPRUWnq0pc5143HYx2PvyAkqIjesN56iD
+         j5ZdBDDgI+Qn2Vhqu83fHwQdroFelGhPkipUeYb4zvVzCGHE3bU7+8vZJ1HQWBWjzLSM
+         Fh76lbIcWEaqHkXiiTRVmSAOhlMJvhneduSx5p64QIjXmMqtUSuyQL8Q4rRSABSk+Rig
+         dNtcm6bC2btaZ8OVojXy0rTdbehqbsx/8tzZUX5iFKACEZloqcC65fkrAHiT/W00h2CV
+         dK2FOBT+2doLHy49XOY7jc4m2J55mQY89Q3cHoccIg/GzsjjQbWsWk+UKijkrNxLxyJH
+         PPag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=jtUdywQM4flxySRPrfE1NwzGE3CmnKKdPKinhrqCi+s=;
+        b=JJDcepWtfS/CoDRxcUl/YC99QIducXjRZSNzrLkl2YZo9NZ1fIjY9nuDbJL+nQ7sM3
+         5hD0y/yUhKJpngQx537zfK1Yg8eX4bzpzb7ffCDrVozpStp0jPJWZEys3ib3Pe+zvSFo
+         IJ6v/7nYXBOImwudeoogHkMzUBcSBuGZTQnjuMIW7XbvtqsL/vUw6hZJKMk5/73SY1fa
+         R+t+65jPkfYlSdzqE2auEfJBbZU8IxnPuhPkpDZlhEZ453KQ4ZXhby8VrVscOpBveZDI
+         qWVoKU0IsuM5ogXSY5fTXIxQcTGBFjKOQp7zpIDWAhLFAVbelrdG1N7MEaSTToa+tbhq
+         lX/g==
+X-Gm-Message-State: AOAM532jb40rWZinpd3k+Nib8tie3KxOYmXqHscGDUR1TkRew93d1R1z
+        Qxgflz4a+FenoMpTu9ZRiKKHyQ==
+X-Google-Smtp-Source: ABdhPJzK8V7iAQwaYLtUe2fmiOZBmzQjNNjxJn/CsAUKmc3YxZaCpeC/C2vIM2jsJnYGcPzpt4voCQ==
+X-Received: by 2002:a17:902:830a:b029:da:df3b:459a with SMTP id bd10-20020a170902830ab02900dadf3b459amr1130093plb.75.1610398780412;
+        Mon, 11 Jan 2021 12:59:40 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id a2sm647153pgi.8.2021.01.11.12.59.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 12:59:39 -0800 (PST)
+Date:   Mon, 11 Jan 2021 12:59:33 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH 11/13] KVM: SVM: Drop redundant svm_sev_enabled() helper
+Message-ID: <X/y8NU4hWWKgGrJo@google.com>
+References: <20210109004714.1341275-1-seanjc@google.com>
+ <20210109004714.1341275-12-seanjc@google.com>
+ <89efe8fb-6495-5634-9378-a7dbb57f9d81@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-11_30:2021-01-11,2021-01-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- impostorscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0 mlxscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101110112
+In-Reply-To: <89efe8fb-6495-5634-9378-a7dbb57f9d81@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 20:15:57 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> The current implementation does not allow assignment of an AP adapter or
-> domain to an mdev device if each APQN resulting from the assignment
-> does not reference an AP queue device that is bound to the vfio_ap device
-> driver. This patch allows assignment of AP resources to the matrix mdev as
-> long as the APQNs resulting from the assignment:
->    1. Are not reserved by the AP BUS for use by the zcrypt device drivers.
->    2. Are not assigned to another matrix mdev.
+On Mon, Jan 11, 2021, Tom Lendacky wrote:
+> On 1/8/21 6:47 PM, Sean Christopherson wrote:
+> > Replace calls to svm_sev_enabled() with direct checks on sev_enabled, or
+> > in the case of svm_mem_enc_op, simply drop the call to svm_sev_enabled().
+> > This effectively replaces checks against a valid max_sev_asid with checks
+> > against sev_enabled.  sev_enabled is forced off by sev_hardware_setup()
+> > if max_sev_asid is invalid, all call sites are guaranteed to run after
+> > sev_hardware_setup(), and all of the checks care about SEV being fully
+> > enabled (as opposed to intentionally handling the scenario where
+> > max_sev_asid is valid but SEV enabling fails due to OOM).
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/svm/sev.c | 6 +++---
+> >   arch/x86/kvm/svm/svm.h | 5 -----
+> >   2 files changed, 3 insertions(+), 8 deletions(-)
+> > 
 > 
-> The rationale behind this is twofold:
->    1. The AP architecture does not preclude assignment of APQNs to an AP
->       configuration that are not available to the system.
->    2. APQNs that do not reference a queue device bound to the vfio_ap
->       device driver will not be assigned to the guest's CRYCB, so the
->       guest will not get access to queues not bound to the vfio_ap driver.
+> With CONFIG_KVM=y, CONFIG_KVM_AMD=y and CONFIG_CRYPTO_DEV_CCP_DD=m, I get
+> the following build warning:
 
-You didn't tell us about the changed error code.
+...
 
-Also notice that this point we don't have neither filtering nor in-use.
-This used to be patch 11, and most of that stuff used to be in place. But
-I'm going to trust you, if you say its fine to enable it this early.
+> In function ‘bitmap_zero’,
+>     inlined from ‘__sev_recycle_asids’ at arch/x86/kvm/svm/sev.c:92:2,
+>     inlined from ‘sev_asid_new’ at arch/x86/kvm/svm/sev.c:113:16,
+>     inlined from ‘sev_guest_init’ at arch/x86/kvm/svm/sev.c:195:9:
+> ./include/linux/bitmap.h:238:2: warning: argument 1 null where non-null expected [-Wnonnull]
+>   238 |  memset(dst, 0, len);
+>       |  ^~~~~~~~~~~~~~~~~~~
 
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 241 ++++++++----------------------
->  1 file changed, 62 insertions(+), 179 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index cdcc6378b4a5..2d58b39977be 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -379,134 +379,37 @@ static struct attribute_group *vfio_ap_mdev_type_groups[] = {
->  	NULL,
->  };
->  
-> -struct vfio_ap_queue_reserved {
-> -	unsigned long *apid;
-> -	unsigned long *apqi;
-> -	bool reserved;
-> -};
-> +#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
-> +			 "already assigned to %s"
->  
-> -/**
-> - * vfio_ap_has_queue
-> - *
-> - * @dev: an AP queue device
-> - * @data: a struct vfio_ap_queue_reserved reference
-> - *
-> - * Flags whether the AP queue device (@dev) has a queue ID containing the APQN,
-> - * apid or apqi specified in @data:
-> - *
-> - * - If @data contains both an apid and apqi value, then @data will be flagged
-> - *   as reserved if the APID and APQI fields for the AP queue device matches
-> - *
-> - * - If @data contains only an apid value, @data will be flagged as
-> - *   reserved if the APID field in the AP queue device matches
-> - *
-> - * - If @data contains only an apqi value, @data will be flagged as
-> - *   reserved if the APQI field in the AP queue device matches
-> - *
-> - * Returns 0 to indicate the input to function succeeded. Returns -EINVAL if
-> - * @data does not contain either an apid or apqi.
-> - */
-> -static int vfio_ap_has_queue(struct device *dev, void *data)
-> +static void vfio_ap_mdev_log_sharing_err(const char *mdev_name,
-> +					 unsigned long *apm,
-> +					 unsigned long *aqm)
-[..]
-> -	return 0;
-> +	for_each_set_bit_inv(apid, apm, AP_DEVICES)
-> +		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
-> +			pr_warn(MDEV_SHARING_ERR, apid, apqi, mdev_name);
+Ah, because that config "silently" disables CONFIG_KVM_AMD_SEV.  The warning
+pops up because svm_sev_enabled() included !IS_ENABLED(CONFIG_KVM_AMD_SEV) and
+that was enough for the compiler to understand that svm_mem_enc_op() was a nop.
 
-I would prefer dev_warn() here. We know which device is about to get
-more queues, and this device can provide a clue regarding the initiator.
+That being said, unless I'm missing something, this is a false positive the
+compiler's part, e.g. the warning occurs even if sev_enabled is false be default,
+i.e. CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT=n.
 
-Also I believe a warning is too heavy handed here. Warnings should not
-be ignored. This is a condition that can emerge during normal operation,
-AFAIU. Or am I worng?
+Anyways, I'm leaning towards "fixing" this by defining sev_enabled and
+sev_es_enabled to false if CONFIG_KVM_AMD_SEV=n.  It'd be a worthwhile change to
+condition the default values on CONFIG_KVM_AMD_SEV anyways, so it'd kill two
+birds with one stone.  Long term, I'm tempted to exporing conditioning all of
+sev.c on CONFIG_KVM_AMD_SEV=y, but there are just enough functions exposed via
+svm.h that make me think it wouldn't be worth the effort.
 
->  }
->  
->  /**
->   * vfio_ap_mdev_verify_no_sharing
->   *
-> - * Verifies that the APQNs derived from the cross product of the AP adapter IDs
-> - * and AP queue indexes comprising the AP matrix are not configured for another
-> - * mediated device. AP queue sharing is not allowed.
-> + * Verifies that each APQN derived from the Cartesian product of the AP adapter
-> + * IDs and AP queue indexes comprising the AP matrix are not configured for
-> + * another mediated device. AP queue sharing is not allowed.
->   *
-> - * @matrix_mdev: the mediated matrix device
-> + * @matrix_mdev: the mediated matrix device to which the APQNs being verified
-> + *		 are assigned.
-> + * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
-> + * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
->   *
-> - * Returns 0 if the APQNs are not shared, otherwise; returns -EADDRINUSE.
-> + * Returns 0 if the APQNs are not shared, otherwise; returns -EBUSY.
->   */
-> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
-> +static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev,
-> +					  unsigned long *mdev_apm,
-> +					  unsigned long *mdev_aqm)
->  {
->  	struct ap_matrix_mdev *lstdev;
->  	DECLARE_BITMAP(apm, AP_DEVICES);
-> @@ -523,20 +426,31 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->  		 * We work on full longs, as we can only exclude the leftover
->  		 * bits in non-inverse order. The leftover is all zeros.
->  		 */
-> -		if (!bitmap_and(apm, matrix_mdev->matrix.apm,
-> -				lstdev->matrix.apm, AP_DEVICES))
-> +		if (!bitmap_and(apm, mdev_apm, lstdev->matrix.apm, AP_DEVICES))
->  			continue;
->  
-> -		if (!bitmap_and(aqm, matrix_mdev->matrix.aqm,
-> -				lstdev->matrix.aqm, AP_DOMAINS))
-> +		if (!bitmap_and(aqm, mdev_aqm, lstdev->matrix.aqm, AP_DOMAINS))
->  			continue;
->  
-> -		return -EADDRINUSE;
-> +		vfio_ap_mdev_log_sharing_err(dev_name(mdev_dev(lstdev->mdev)),
-> +					     apm, aqm);
-> +
-> +		return -EBUSY;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 1b9174a49b65..7e14514dd083 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -28,12 +28,17 @@
+ #define __ex(x) __kvm_handle_fault_on_reboot(x)
 
-Why do we change -EADDRINUSE to -EBUSY? This gets bubbled up to
-userspace, or? So a tool that checks for the other mdev has it
-condition by checking for -EADDRINUSE, would be confused...
+ /* enable/disable SEV support */
++#ifdef CONFIG_KVM_AMD_SEV
+ static bool sev_enabled = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+ module_param_named(sev, sev_enabled, bool, 0444);
 
->  	}
->  
->  	return 0;
->  }
->  
-> +static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev *matrix_mdev,
-> +				       unsigned long *mdev_apm,
-> +				       unsigned long *mdev_aqm)
-> +{
-> +	if (ap_apqn_in_matrix_owned_by_def_drv(mdev_apm, mdev_aqm))
-> +		return -EADDRNOTAVAIL;
-> +
-> +	return vfio_ap_mdev_verify_no_sharing(matrix_mdev, mdev_apm, mdev_aqm);
-> +}
-> +
->  static void vfio_ap_mdev_link_queue(struct ap_matrix_mdev *matrix_mdev,
->  				    struct vfio_ap_queue *q)
->  {
-> @@ -608,10 +522,10 @@ static void vfio_ap_mdev_link_adapter(struct ap_matrix_mdev *matrix_mdev,
->   *	   driver; or, if no APQIs have yet been assigned, the APID is not
->   *	   contained in an APQN bound to the vfio_ap device driver.
->   *
-> - *	4. -EADDRINUSE
-> + *	4. -EBUSY
->   *	   An APQN derived from the cross product of the APID being assigned
->   *	   and the APQIs previously assigned is being used by another mediated
-> - *	   matrix device
-> + *	   matrix device or the mdev lock could not be acquired.
+ /* enable/disable SEV-ES support */
+ static bool sev_es_enabled = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+ module_param_named(sev_es, sev_es_enabled, bool, 0444);
++#else
++#define sev_enabled false
++#define sev_es_enabled false
++#endif /* CONFIG_KVM_AMD_SEV */
 
-This is premature. We don't use try_lock yet.
+ static u8 sev_enc_bit;
+ static int sev_flush_asids(void);
+@@ -1253,11 +1258,12 @@ void sev_vm_destroy(struct kvm *kvm)
 
-[..]
+ void __init sev_hardware_setup(void)
+ {
++#ifdef CONFIG_KVM_AMD_SEV
+        unsigned int eax, ebx, ecx, edx;
+        bool sev_es_supported = false;
+        bool sev_supported = false;
 
->  static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
->  				     unsigned long apqi)
->  {
-> @@ -774,10 +660,10 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
->   *	   driver; or, if no APIDs have yet been assigned, the APQI is not
->   *	   contained in an APQN bound to the vfio_ap device driver.
->   *
-> - *	4. -EADDRINUSE
-> + *	4. -BUSY
->   *	   An APQN derived from the cross product of the APQI being assigned
->   *	   and the APIDs previously assigned is being used by another mediated
-> - *	   matrix device
-> + *	   matrix device or the mdev lock could not be acquired.
+-       if (!IS_ENABLED(CONFIG_KVM_AMD_SEV) || !sev_enabled)
++       if (!sev_enabled)
+                goto out;
 
-Same here as above.
+        /* Does the CPU support SEV? */
+@@ -1310,6 +1316,7 @@ void __init sev_hardware_setup(void)
+ out:
+        sev_enabled = sev_supported;
+        sev_es_enabled = sev_es_supported;
++#endif
+ }
 
-Otherwise looks good.
-
-[..]
+ void sev_hardware_teardown(void)
