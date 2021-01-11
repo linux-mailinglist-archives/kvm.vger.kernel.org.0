@@ -2,203 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E07C2F1D27
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:55:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 845362F1D3F
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 18:58:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731782AbhAKRzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 12:55:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730148AbhAKRzG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 12:55:06 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59CAFC061794
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:54:26 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id m6so379253pfm.6
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:54:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XZK48QQkN7RA/sEENBWwlUGiy2uTgtWa4ATvegDKvSs=;
-        b=aEZcEqf4OGBNlRjjwVWr69Hps/SK9P4rbPeLlf8LadRkkLQOovL9a1lBLUoK+NQB3L
-         1/b4OaGa/dComerO+eBsVvy7IB3niugBqtCqc3f1+qJAQZM5IqPPjYsKPI+2KJr/uOFg
-         PPSxqmDlKhvzk/5Lj6u92OuxIghkme4+SKNAB+FQmHsAiDrMSE6WU/j/bhnc8bFJS42K
-         D9XSlWW9z2OLTXa0d53C8XnQPAfKLYAz1RMUHf1GSKBq5fCUoPM/Rf6XkgFS5yZ/wLYN
-         ZKco7rnOaplGHqjjM+zU02mV9+s5i2cgJ5WV/pXdrCe5D6BdhOTPypRWKyiIGaNAgUKk
-         1b7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XZK48QQkN7RA/sEENBWwlUGiy2uTgtWa4ATvegDKvSs=;
-        b=sb5COr/D8XwuANZJrZIm66Q2Oxs67RlFXVC0mtRs5fhz9M1vusGtFK70lceoeTmboQ
-         bjMSxxCxB6doUKNi10e+wzZLraI8jkHLaRgpn3IeuKcK8tF67DUeB2YOzu7fnzsTSQEH
-         tT1ZWwtjIZa/ogHO8hZZY0kR8XBHV5owhok6E1sOEjMB3dVaycsoXH478nfuXONHRlL7
-         dxhBf0APGIsebreC8T6mKD3LR8gV724pvnpMIZ4ifdthXikl+GdwQX3CHVhuindX0eRx
-         veTFRmXtlRgZ7Fvpp+bSEHxHPtVOEn81fk2SVJd+BW9zcOPHfkCwikA0GOAhsd7Zi60m
-         D0kQ==
-X-Gm-Message-State: AOAM533geZwIoTzJZZ/Eirc3q6c0fTjmv5DU3tigbfHi2pwVIJ7S8yKr
-        2juJ4E2U0Ee8dIZ21bs1LvZfjg==
-X-Google-Smtp-Source: ABdhPJztDbUBmlhXsgvntTJYjVR3Va3PSFpz1zDXPImRo+aUglquL+8zCV1/sxXJ6CG/O5dCCHDOhw==
-X-Received: by 2002:a63:cf06:: with SMTP id j6mr634537pgg.195.1610387665245;
-        Mon, 11 Jan 2021 09:54:25 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id f9sm257059pfa.41.2021.01.11.09.54.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 09:54:24 -0800 (PST)
-Date:   Mon, 11 Jan 2021 09:54:17 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
-Message-ID: <X/yQyUx4+veuSO0e@google.com>
-References: <381b25a0dc0ed3e4579d50efb3634329132a2c02.1609890536.git.kai.huang@intel.com>
- <20210106221527.GB24607@zn.tnic>
- <20210107120946.ef5bae4961d0be91eff56d6b@intel.com>
- <20210107064125.GB14697@zn.tnic>
- <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
- <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
- <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
- <20210108071722.GA4042@zn.tnic>
- <X/jxCOLG+HUO4QlZ@google.com>
- <20210109011939.GL4042@zn.tnic>
+        id S2389793AbhAKR55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 12:57:57 -0500
+Received: from mail-eopbgr700042.outbound.protection.outlook.com ([40.107.70.42]:61408
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2389680AbhAKR54 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 12:57:56 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FnAptpP1xYUuvmeD030ocQmgoUyD8+2YM97Nc2y6fD4DVeaH4mKS5tgY+ChrLE0sEei4+AW1d0uF3op4lrbCMliobXzAHb+XoRw4rBXuFIEI/ikm5WDISxNrl3AysfNxB1Cb0r2xd6KVtl5FCVP7sPEKFZDDwa7p/dATLfILMws2u0+7JWGNS50AbygYY2wWzawcM5/w9pDynbH8zCdAA/NS4q1Tyl5Wh0S0bCb3RA6KZGADzFhFQFdUt1xa8QaE7AL9qW4WgRA9/2VatkAluZ2yJj0R+PkDLmOOIV72JxrjQtl52WxXl6OEUMLC4LsSvky3w/FmFDLav043n7dR7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tOexZLTqOUWjQ34uYOxmDKfYCjTMjV4q/h5afrItHlc=;
+ b=BMPBSsNPuksSt2LxNebZSvg9/WwYuV0X99q1y7512T3XrWPNd5Qza38dzfGl0eTRiISlSBFi8YUnvqp3HJFGc/vadZl2HgtmoA1PBCuuhAZ4vny3gsHmg/KDjwMm3/9/cZHP7kW4U1Z1z6/DcdaFzEdRlM5WaBTxH1xIPEg9Rszs0P5WFCzAhKmAckS0DjdWSvLu04GnR0vbvjxAErNySa9HV0RiNPop7fjsmNGOXQ488Fe5gXqDo5DGWoVj2lfiLW/Zs/6GOiklNJ59Mr0rBkpeFwdz4CGv3H9idwZATpWCTZZRMJEsMWzjgiDYkngBEvax1vTwa0FtbJzH2eFDvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tOexZLTqOUWjQ34uYOxmDKfYCjTMjV4q/h5afrItHlc=;
+ b=zLl94wP+bo7B78TQjSejmtXkPOtI/V9sTVCbbNlsrnXE1obl3tOKjY+S62ndNg4m/eWP0sFDWEM8spy40S6qiytUDabUuzg6I2EkqDu2V4p7GYOHYID1ftYDSmYMaXa/U6PTMHMR1xy1rKsIn9Jn53qh377kmJeM7ZrL7/LoIqE=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR12MB1450.namprd12.prod.outlook.com (2603:10b6:4:3::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3742.6; Mon, 11 Jan 2021 17:57:07 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::d95e:b9d:1d6a:e845]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::d95e:b9d:1d6a:e845%12]) with mapi id 15.20.3742.012; Mon, 11 Jan 2021
+ 17:57:07 +0000
+Subject: Re: [PATCH 11/13] KVM: SVM: Drop redundant svm_sev_enabled() helper
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+References: <20210109004714.1341275-1-seanjc@google.com>
+ <20210109004714.1341275-12-seanjc@google.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <89efe8fb-6495-5634-9378-a7dbb57f9d81@amd.com>
+Date:   Mon, 11 Jan 2021 11:57:03 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20210109004714.1341275-12-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [67.79.209.213]
+X-ClientProxiedBy: SN6PR05CA0032.namprd05.prod.outlook.com
+ (2603:10b6:805:de::45) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210109011939.GL4042@zn.tnic>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN6PR05CA0032.namprd05.prod.outlook.com (2603:10b6:805:de::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.2 via Frontend Transport; Mon, 11 Jan 2021 17:57:06 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 228beb36-92fb-48c1-26e5-08d8b65a4fbb
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1450:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1450766503E081A5AF2DAA70ECAB0@DM5PR12MB1450.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RaQOg+xZhQUangGseFUAb4UpnJIl3b7kDm37f+KR55kLFH4R+4WIBY1x14N/s+S48Viq9vY/UaKVCjO4+87hpd7BXQDEG6/1MqCzu7JjudbUH+LBsd9jYEw8pIGEkodPXwyFHePQRbJyiDPQbQQYBi2GatnKDJJJ5Hci1Kb+tUNdlVyRhNGMQ7Cji20/ogFv3Phe/wR6rMQaP0OD+EpH/fFIYMmlHPt//F70jCySeOQWWvbb82Pq6jy8q20RS2eEP8fb9Qw7puP2YBSfAQK57073NTEu9usntUYWq+ChsgAw6DbsQNOnTBz4dNV2rbWaomyggX6NQ6al5HlwLpDa296UMVNE4jezufLVZAzfC+1M77xQuGSa1dhsu72U+PUubkO8ZK2pK0m/MoRi2tDHChEYz78pwN9fKjmY1P8kUQ8T3mY8G7mdvoJdpG9qexKzv2GMihfXflEHIDNYelgbfFQE1Ny02NAMK7cJLyoaLRE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(396003)(136003)(376002)(346002)(36756003)(86362001)(8676002)(66946007)(66556008)(6486002)(110136005)(316002)(5660300002)(2616005)(2906002)(16526019)(956004)(8936002)(6512007)(54906003)(53546011)(26005)(186003)(6666004)(52116002)(7416002)(31696002)(4326008)(478600001)(66476007)(31686004)(83380400001)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?VEgvWjNRVE5OU1RPeDl2d3JkbzdrRXozaEFkbHhMUkxhMEtyVVFYdVhLMkNk?=
+ =?utf-8?B?RG5YQjJOUFpEKzd3dHRqM2JmVm1zQ2NsRHBRZzZ5TjNkMWh0VUhYZTAya2to?=
+ =?utf-8?B?WUJoWlBmTWV4TnZ3eUpJTEQ3VnVwVGx5WVVjSllFVy84UHFzcERTQW4yVGJz?=
+ =?utf-8?B?Y2RSUGthRTJUMkhZeFFJQjdybDAvYllvb2d4RlF5cE93ellGUzlQZHRHekpS?=
+ =?utf-8?B?T3A2ZzB0UzBGaFBDWWVGZ1JOczcwb0N4dTNkWldURFNqQXkzc1F0SGpMNmV2?=
+ =?utf-8?B?T3pveUdCdXFqODVpTzEwdVVERUFaaHhvN01kN01nMFVmejY2WHNWelhiRDR5?=
+ =?utf-8?B?SDlHNzFNSzdyeTMxbXFIR1VZWlBldHZ4a0JGallLMTIrbHJBSjQyMk03Q3ll?=
+ =?utf-8?B?WmJ5RUsrNG4yR09HOVpQdDFZTGI1UkpzMTJjRGxxekE0UTRxWTVQSGxlaGJF?=
+ =?utf-8?B?aGdDamU0WGNQVUx4aGZkbFJNNXBMblJQUTZDckJrUkpiL0xBZjUwRkszY010?=
+ =?utf-8?B?QlB4eHRtL2I2QnZ5ZVp0R21DaSsrTTcwMmhrTWhoK3F2aXRSRVk1VXp6ZEVu?=
+ =?utf-8?B?S1dnK1cycWQxYzJVVVNGRllMRmQ3YitZZDNRWWthYzd0WWMyMm94czFzNURQ?=
+ =?utf-8?B?alo0YmZERE8xY1QyMGIyWjBsUyt4a3NKWE9zZWZLN1M4dVYvK2pSdEVlc1ZZ?=
+ =?utf-8?B?ZHBrTjV4TWdEeU5vUWdVU21Ic2pEYVd6V0tLYytQcDc2VXJNcWI0b3VHYXF1?=
+ =?utf-8?B?dkpsZ2s5MllTdHR5a1dkOHhIT2FNOWZGejZaVGFJS1dUK05pVzlYYzluc1cz?=
+ =?utf-8?B?QXpRb1FCVXQyNmluQ2dETEM2MXlLOEpsM3U4YVN5WWQ2WmdJQ3c1MWVQVERm?=
+ =?utf-8?B?TUV6UmNQVW9nQ0tKcjM4OTYvRVVxN0ZTMUh3VS9FZHRwQUVncGxzclRPNS9I?=
+ =?utf-8?B?UENldEJpUmRaRGVqZlo5VEtnWndTcENRL05yWkkySkZ3MnloZDh0ZDFBbklD?=
+ =?utf-8?B?TU5LN2lhTW1UMHJtd2IyY25OS0NIcjNndndKZG9EM2l1YTZVZCszU2QzMWpS?=
+ =?utf-8?B?ZFdmajh5TDQzYU5jZWUraGFENkRKbHNNNENza28ydmpQd2JHMDRsdzVRQjU1?=
+ =?utf-8?B?bjNDazRBZW11aEdlRDNGdm5aY1RlUHptdlhxbTUxL0JodmN5RFBlWCtJUTlj?=
+ =?utf-8?B?R1BIMkdUeDh2UkU4eThScW12UTN5c3NxQkJmNnZ5ZGZJcmRFVHd1eDhNdmdC?=
+ =?utf-8?B?aEV1T0tjaDF6MDFkQVNYbWFvMDJ5QUFvYkVUbjR5aUozR2lFYXlJVE92eEZM?=
+ =?utf-8?Q?Eelk3VgYBPO1n2+fr7xut0AyKeKnEBNCc+?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2021 17:57:07.2702
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 228beb36-92fb-48c1-26e5-08d8b65a4fbb
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BEydXlPd6auSv3GyB75ghrDh8/BlzEkoGNewBCBbKp+/qrFgnnrTqMKyyzml6M8jKERf8kD0tABgBNsiLoovLw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1450
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 09, 2021, Borislav Petkov wrote:
-> On Fri, Jan 08, 2021 at 03:55:52PM -0800, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> > index dc921d76e42e..21f92d81d5a5 100644
-> > --- a/arch/x86/kvm/cpuid.h
-> > +++ b/arch/x86/kvm/cpuid.h
-> > @@ -7,7 +7,25 @@
-> >  #include <asm/processor.h>
-> >  #include <uapi/asm/kvm_para.h>
-> > 
-> > -extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
-> > +/*
-> > + * Hardware-defined CPUID leafs that are scattered in the kernel, but need to
-> > + * be directly by KVM.  Note, these word values conflict with the kernel's
-> > + * "bug" caps, but KVM doesn't use those.
+On 1/8/21 6:47 PM, Sean Christopherson wrote:
+> Replace calls to svm_sev_enabled() with direct checks on sev_enabled, or
+> in the case of svm_mem_enc_op, simply drop the call to svm_sev_enabled().
+> This effectively replaces checks against a valid max_sev_asid with checks
+> against sev_enabled.  sev_enabled is forced off by sev_hardware_setup()
+> if max_sev_asid is invalid, all call sites are guaranteed to run after
+> sev_hardware_setup(), and all of the checks care about SEV being fully
+> enabled (as opposed to intentionally handling the scenario where
+> max_sev_asid is valid but SEV enabling fails due to OOM).
 > 
-> This feels like another conflict waiting to happen if KVM decides to use
-> them at some point...
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/svm/sev.c | 6 +++---
+>   arch/x86/kvm/svm/svm.h | 5 -----
+>   2 files changed, 3 insertions(+), 8 deletions(-)
+> 
 
-Yes, but KVM including the bug caps in kvm_cpu_caps is extremely unlikely, and
-arguably flat out wrong.  Currently, kvm_cpu_caps includes only CPUID-based
-features that can be exposed direcly to the guest.  I could see a scenario where
-KVM exposed "bug" capabilities to the guest via a paravirt interface, but I
-would expect that KVM would either filter and expose the kernel's bug caps
-without userspace input, or would add a KVM-defined paravirt CPUID leaf to
-enumerate the caps and track _that_ in kvm_cpu_caps.
+With CONFIG_KVM=y, CONFIG_KVM_AMD=y and CONFIG_CRYPTO_DEV_CCP_DD=m, I get
+the following build warning:
 
-Anyways, I agree that overlapping the bug caps it's a bit of unnecessary
-cleverness.  I'm not opposed to incorporating NBUGINTS into KVM, but that would
-mean explicitly pulling in even more x86_capability implementation details.
+make: Entering directory '/root/kernels/kvm-build-x86_64'
+  DESCEND  objtool               
+  CALL    scripts/atomic/check-atomics.sh
+  CALL    scripts/checksyscalls.sh
+  CHK     include/generated/compile.h                                                           
+  CC      arch/x86/kvm/svm/svm.o                                                                                                                                                                
+  CC      arch/x86/kvm/svm/nested.o                                                             
+  CC      arch/x86/kvm/svm/avic.o                                                                                                                                                               
+  CC      arch/x86/kvm/svm/sev.o          
+In file included from ./include/linux/cpumask.h:12,     
+                 from ./arch/x86/include/asm/cpumask.h:5,
+                 from ./arch/x86/include/asm/msr.h:11,
+                 from ./arch/x86/include/asm/processor.h:22,
+                 from ./arch/x86/include/asm/cpufeature.h:5,                                                                                                                                    
+                 from ./arch/x86/include/asm/thread_info.h:53,
+                 from ./include/linux/thread_info.h:38,
+                 from ./arch/x86/include/asm/preempt.h:7,
+                 from ./include/linux/preempt.h:78,
+                 from ./include/linux/percpu.h:6,
+                 from ./include/linux/context_tracking_state.h:5,
+                 from ./include/linux/hardirq.h:5,
+                 from ./include/linux/kvm_host.h:7,
+                 from arch/x86/kvm/svm/sev.c:11:
+In function ‘bitmap_zero’,
+    inlined from ‘__sev_recycle_asids’ at arch/x86/kvm/svm/sev.c:92:2,
+    inlined from ‘sev_asid_new’ at arch/x86/kvm/svm/sev.c:113:16,
+    inlined from ‘sev_guest_init’ at arch/x86/kvm/svm/sev.c:195:9:
+./include/linux/bitmap.h:238:2: warning: argument 1 null where non-null expected [-Wnonnull]
+  238 |  memset(dst, 0, len);
+      |  ^~~~~~~~~~~~~~~~~~~
+In file included from ./arch/x86/include/asm/string.h:5,
+                 from ./include/linux/string.h:20,
+                 from ./include/linux/bitmap.h:9,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/cpumask.h:5,
+                 from ./arch/x86/include/asm/msr.h:11,
+                 from ./arch/x86/include/asm/processor.h:22,
+                 from ./arch/x86/include/asm/cpufeature.h:5,
+                 from ./arch/x86/include/asm/thread_info.h:53,
+                 from ./include/linux/thread_info.h:38,
+                 from ./arch/x86/include/asm/preempt.h:7,
+                 from ./include/linux/preempt.h:78,
+                 from ./include/linux/percpu.h:6,
+                 from ./include/linux/context_tracking_state.h:5,
+                 from ./include/linux/hardirq.h:5,
+                 from ./include/linux/kvm_host.h:7,
+                 from arch/x86/kvm/svm/sev.c:11:
+arch/x86/kvm/svm/sev.c: In function ‘sev_guest_init’:
+./arch/x86/include/asm/string_64.h:18:7: note: in a call to function ‘memset’ declared here
+   18 | void *memset(void *s, int c, size_t n);
+      |       ^~~~~~
 
-> So let me get this straight: KVM wants to use X86_FEATURE_* which
-> means, those numbers must map to the respective words in its CPUID caps
-> representation kvm_cpu_caps, AFAICT.
+Thanks,
+Tom
 
-That part is deliberate and isn't a dependency so much as how things are
-implemented.  The true dependency is on the bit offsets within each word.  The
-kernel could completely rescramble the word numbering and KVM would chug along
-happily.  What KVM won't play nice with is if the kernel broke up a hardware-
-defined, gathered CPUID leaf/word into scattered features spread out amongst
-multiple Linux-defined words.
-
-> Then, it wants the leafs to correspond to the hardware leafs layout so
-> that it can do:
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 8c34c467a09d..1b9174a49b65 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1052,7 +1052,7 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   	struct kvm_sev_cmd sev_cmd;
+>   	int r;
+>   
+> -	if (!svm_sev_enabled() || !sev_enabled)
+> +	if (!sev_enabled)
+>   		return -ENOTTY;
+>   
+>   	if (!argp)
+> @@ -1314,7 +1314,7 @@ void __init sev_hardware_setup(void)
+>   
+>   void sev_hardware_teardown(void)
+>   {
+> -	if (!svm_sev_enabled())
+> +	if (!sev_enabled)
+>   		return;
+>   
+>   	bitmap_free(sev_asid_bitmap);
+> @@ -1325,7 +1325,7 @@ void sev_hardware_teardown(void)
+>   
+>   int sev_cpu_init(struct svm_cpu_data *sd)
+>   {
+> -	if (!svm_sev_enabled())
+> +	if (!sev_enabled)
+>   		return 0;
+>   
+>   	sd->sev_vmcbs = kmalloc_array(max_sev_asid + 1, sizeof(void *),
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 4eb4bab0ca3e..8cb4395b58a0 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -569,11 +569,6 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
+>   
+>   extern unsigned int max_sev_asid;
+>   
+> -static inline bool svm_sev_enabled(void)
+> -{
+> -	return IS_ENABLED(CONFIG_KVM_AMD_SEV) ? max_sev_asid : 0;
+> -}
+> -
+>   void sev_vm_destroy(struct kvm *kvm);
+>   int svm_mem_enc_op(struct kvm *kvm, void __user *argp);
+>   int svm_register_enc_region(struct kvm *kvm,
 > 
-> 	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
-> 
-> which comes straight from CPUID.
-> 
-> So lemme look at one word:
-> 
->         kvm_cpu_cap_mask(CPUID_1_EDX,
->                 F(FPU) | F(VME) | F(DE) | F(PSE) |
->                 F(TSC) | F(MSR) | F(PAE) | F(MCE) |
-> 		...
-> 
-> 
-> it would build the bitmask of the CPUID leaf using X86_FEATURE_* bits
-> and then mask it out with the hardware leaf read from CPUID.
-> 
-> But why?
-> 
-> Why doesn't it simply build those leafs in kvm_cpu_caps from the leafs
-> we've already queried?
-> 
-> Oh it does so a bit earlier:
-> 
->         memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
->                sizeof(kvm_cpu_caps));
-> 
-> and that kvm_cpu_cap_mask() call is to clear some bits in kvm_cpu_caps
-> which is kvm-specific thing (not supported stuff etc).
-> 
-> But then why does kvm_cpu_cap_mask() does cpuid_count()? Didn't it just
-> read the bits from boot_cpu_data.x86_capability? And those bits we do
-> query and massage extensively during boot. So why does KVM needs to
-> query CPUID again instead of using what we've already queried?
-
-It's mostly historical; before the kvm_cpu_caps concept was introduced, the code
-had grown organically to include both boot_cpu_data and raw CPUID info.  The
-vast, vast majority of the time, doing CPUID is likely redundant.  But, as noted
-in commit d8577a4c238f ("KVM: x86: Do host CPUID at load time to mask KVM cpu
-caps"), the code is quite cheap and runs once at KVM load.  My argument back
-then was, and still is, that an extra bit of paranoia is justified since the
-code and operations are quite nearly free.
-
-This particular dependency can be broken, and quite easily at that.  Rather than
-memcpy() boot_cpu_data.x86_capability, it's trivially easy to redefine the F()
-macro to invoke boot_cpu_has(), which would allow dropping the memcpy().  The
-big downside, and why I didn't post the code, is that doing so means every
-feature routed through F() requires some form of BT+Jcc (or CMOVcc) sequence,
-whereas the mempcy() approach allows the F() features to be encoded as a single
-literal by the compiler.
-
-From a latency perspective, the extra code is negligible.  The big issue is that
-all those extra checks add 2k+ bytes of code.  Eliminating the mempcy() doesn't
-actually break KVM's dependency on the bit offsets, so we'd be bloating kvm.ko
-by a noticeable amount without providing substantial value.
-
-And, this behavior is mostly opportunistic; the true justification/motiviation
-for taking a dependency on the X86_FEATURE_* bit offsets is for communication
-with userspace, querying the guest CPU model, and runtime checks.
-
-> Maybe I'm missing something kvm-specific.
-> 
-> In any case, this feels somewhat weird: you have *_cpu_has() on
-> baremetal abstracting almost completely from CPUID by collecting all
-> feature bits it needs into its own structure - x86_capability[] along
-> with accessors for it - and then you want to "abstract back" to CPUID
-> leafs from that interface. I wonder why.
-
-It's effectively for communication with userspace.  Userspace, via ioctl(),
-dictates the vCPU model to KVM, including the exact CPUID results.  to properly
-virtualize/emulate the defined vCPU model, KVM must query the dictated CPUID
-results to determine what features are supported, what guest operations
-should fault, etc...  E.g. if the vCPU model, via CPUID, states that SMEP isn't
-supported then KVM needs to inject a #GP if the guest attempts to set CR4.SMEP.
-
-KVM also uses the hardware-defined CPUID ABI to advertise which features are
-supported by both hardware and KVM.  This is the kvm_cpu_cap stuff, where KVM
-reads boot_cpu_data to see what features were enabled by the kernel.
-
-It would be possible for KVM to break the dependency on X86_FEATURE_* bit
-offsets by defining a translation layer, but I strongly feel that adding manual
-translations will do more harm than good as it increases the odds of us botching
-a translation or using the wrong feature flag, creates potential namespace
-conflicts, etc...
