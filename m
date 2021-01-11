@@ -2,180 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 379112F1050
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 11:47:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B38432F11D9
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 12:49:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729329AbhAKKoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 05:44:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37056 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729285AbhAKKoT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 05:44:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610361772;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ixUVOIGb/XAJr3qxQXdPsUM6DBOCljtoBWyj9OZ5agw=;
-        b=itKxLEmnKH0KsbhfYWV3FkkWYSU3tJsMQRn32XOJ1gurzq1IC1fzOkJpCQfDbaSUfExMA6
-        3ghFCNxvG5uXYNmEtkvhcD1Bds9xiawbO2/N7t5jR9DqkIz/7hOmOoA4GA6FOTuAbFr0fS
-        7GIMQxiKdVS8t/AGBUHV/zduCbXL2I8=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-u5me133ONGm_Y_Qw2CKhtQ-1; Mon, 11 Jan 2021 05:42:51 -0500
-X-MC-Unique: u5me133ONGm_Y_Qw2CKhtQ-1
-Received: by mail-ed1-f72.google.com with SMTP id p17so8082728edx.22
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 02:42:51 -0800 (PST)
+        id S1730173AbhAKLsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 06:48:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729974AbhAKLsB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 06:48:01 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9BEC061794
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 03:47:21 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id 30so12384128pgr.6
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 03:47:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=aF/Yu0x3hnsxoa1QDIoOTSGgFkDsUETWdFvZDHJc4Y4=;
+        b=aJ9Zx37rav5ow0hfm+zvYA4YpChzO84DX+7RDFSNmP1ZychE9aEqjmVqn1HoUJ88wN
+         Y+yXeuHsjDYTQd8sEkk3GWA3d4tdpLE+cFmMCJxHH7C+Bh8vr75Nf4iyCULTrtA48DoU
+         k/UfHmv1ctA1mk/8GLcCffdEpkK7U1bay8eOgQ0dM7cpexlMnainYF5spW/a5JMnQsna
+         9yDKLZ9f7LpdIzigvi6wvYTblo60JvbxLfljNjg6OOh0FKH0JMh2O21w5TbVrbk5+PGw
+         99/haS8pBcE5vUojNaPcaGPWf51aqX6Kkyg7nXCaVnASWhQ+L6hEwYMmYTtRs5weuXZS
+         GuEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ixUVOIGb/XAJr3qxQXdPsUM6DBOCljtoBWyj9OZ5agw=;
-        b=lGG3bGde3ouXAB9QcLG6njI+T1GkXUiM8GnlEw2krmDoZg21xRCr98ejT/KH9R82EF
-         eMbbVSjdTbu6HDVd/UmyIuGBp89SvPBcVnFLx7bgrkilhKgyZu56tv6wIGuOJlrg0Dor
-         RbJVaIGzXOlzxpz8UhVYHHPZqpYYDX9K/Uz4epu2VY5fxi9JiONLxYe8zkcObLoXo+JY
-         eOcZVo0AX5Fij+sonEbcDf8Iz7ygO9hho8NI85BRqdYOYmPDnohIKH/onDemkdmhzVEn
-         uQkPBJ9MmUB6blyNTa8ekNF9Agta0bOt7sE2Agn74qxDfW1R26OWqvVVjwWptcAvzZgE
-         f3hg==
-X-Gm-Message-State: AOAM533qNTT7MBJlKv931qCwUhXztk7Smcg2Ot2VWIshkqnJP0wjdeD1
-        fGv3NKOjS/1rT6+VNZxZBGC2Huipf93wwSgxmtWv8wO1HVeRfBwKkUmIMxbOSFOr4pGWbTQvtzA
-        aSS7tfnlrX66X
-X-Received: by 2002:a50:eb44:: with SMTP id z4mr13431750edp.167.1610361770117;
-        Mon, 11 Jan 2021 02:42:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxbX/oCXfXUXqADHbp1OPdT3DJnuK1Y9QdQdoj+RWltqZSTQDeEQcUQrrvFvmimNu19OBmQQQ==
-X-Received: by 2002:a50:eb44:: with SMTP id z4mr13431733edp.167.1610361769920;
-        Mon, 11 Jan 2021 02:42:49 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id ca4sm7536916edb.80.2021.01.11.02.42.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 02:42:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 03/13] KVM: SVM: Move SEV module params/variables to sev.c
-In-Reply-To: <20210109004714.1341275-4-seanjc@google.com>
-References: <20210109004714.1341275-1-seanjc@google.com>
- <20210109004714.1341275-4-seanjc@google.com>
-Date:   Mon, 11 Jan 2021 11:42:48 +0100
-Message-ID: <87sg7792l3.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=aF/Yu0x3hnsxoa1QDIoOTSGgFkDsUETWdFvZDHJc4Y4=;
+        b=rZ7UTI5nahvAzBcx5eH2jIMMwbcKsOygh2j3BGNmxKZ+beIUhHRbTJLyiz+YflRvNb
+         F3sKq+JlBFaBjXvmDAonchI9oxOgrBVReNqD/AVt96UTVyvxVfmu5a3hllWJKvP10fqJ
+         G44RWZKP1HeNehk3UqVO9rcTLa3/LGeXm8HoR5dxELsD8LB2lhPW6OY8a4rOu4dfob5P
+         /RKQ9/mOfzY/XEehu5GwQwvRVs+C+pyjmYlNERfAlMJcdVftyN/lwBDc+cMCFlQq7SGT
+         QeVJSwGE0VkwokY5LKyDQSRbHa5ilUPmtQQSnnI4YhnfRah6Y6PRv6c/FAsmI4gwhTnP
+         H24w==
+X-Gm-Message-State: AOAM533bfVqbTg/7UwzyyAkSEqdr7tuxHsaWu+swsH00eWWs1kGeQxEm
+        y4dvryLWEtmIyxETPpwHeS1a47Dm1ygmktUd4oo=
+X-Google-Smtp-Source: ABdhPJwAp2ziJIgC4Tkmn5V7R3bpxEuVxFR25Bm+sHHEJ+cteL9IzBZA7PekvUFkOACe1BMjYXdxXGYtHYUR7wSc7ts=
+X-Received: by 2002:a65:48cb:: with SMTP id o11mr18866858pgs.121.1610365641185;
+ Mon, 11 Jan 2021 03:47:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Mon, 11 Jan 2021 11:47:10 +0000
+Message-ID: <CAJSP0QWWg__21otbMXAXWGD1FaHYLzZP7axZ47Unq6jtMvdfsA@mail.gmail.com>
+Subject: Call for Google Summer of Code 2021 project ideas
+To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        rust-vmm@lists.opendev.org,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        Alexander Graf <agraf@csgraf.de>,
+        Alberto Garcia <berto@igalia.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Julia Suvorova <jusual@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Dear QEMU, KVM, and rust-vmm community,
+QEMU will apply for Google Summer of Code
+(https://summerofcode.withgoogle.com/) again this year.  This internship
+program offers paid, 10-week, remote work internships for
+contributing to open source.  QEMU can act as an umbrella organization
+for KVM kernel and rust-vmm projects too.
 
-> Unconditionally invoke sev_hardware_setup() when configuring SVM and
-> handle clearing the module params/variable 'sev' and 'sev_es' in
-> sev_hardware_setup().  This allows making said variables static within
-> sev.c and reduces the odds of a collision with guest code, e.g. the guest
-> side of things has already laid claim to 'sev_enabled'.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 11 +++++++++++
->  arch/x86/kvm/svm/svm.c | 15 +--------------
->  arch/x86/kvm/svm/svm.h |  2 --
->  3 files changed, 12 insertions(+), 16 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0eeb6e1b803d..8ba93b8fa435 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -27,6 +27,14 @@
->  
->  #define __ex(x) __kvm_handle_fault_on_reboot(x)
->  
-> +/* enable/disable SEV support */
-> +static int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> +module_param(sev, int, 0444);
-> +
-> +/* enable/disable SEV-ES support */
-> +static int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> +module_param(sev_es, int, 0444);
+Please post project ideas on the QEMU wiki before February 14th:
+https://wiki.qemu.org/Google_Summer_of_Code_2021
 
-Two stupid questions (and not really related to your patch) for
-self-eduacation if I may:
+What's new this year:
+ * The number of internship hours has been halved to 175 hours over
+   10 weeks. Project ideas must be smaller to fit and students will have
+   more flexibility with their working hours.
+ * Eligibility has been expanded to include "licensed coding school or
+   similar type of program".
 
-1) Why do we rely on CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT (which
-sound like it control the guest side of things) to set defaults here? 
+Good project ideas are suitable for 175 hours (10 weeks half-day) work by a
+competent programmer who is not yet familiar with the codebase.  In
+addition, they are:
+ * Well-defined - the scope is clear
+ * Self-contained - there are few dependencies
+ * Uncontroversial - they are acceptable to the community
+ * Incremental - they produce deliverables along the way
 
-2) It appears to be possible to do 'modprobe kvm_amd sev=0 sev_es=1' and
-this looks like a bogus configuration, should we make an effort to
-validate the correctness upon module load?
+Feel free to post ideas even if you are unable to mentor the project.
+It doesn't hurt to share the idea!
 
-> +
->  static u8 sev_enc_bit;
->  static int sev_flush_asids(void);
->  static DECLARE_RWSEM(sev_deactivate_lock);
-> @@ -1249,6 +1257,9 @@ void __init sev_hardware_setup(void)
->  	bool sev_es_supported = false;
->  	bool sev_supported = false;
->  
-> +	if (!IS_ENABLED(CONFIG_KVM_AMD_SEV) || !sev)
-> +		goto out;
-> +
->  	/* Does the CPU support SEV? */
->  	if (!boot_cpu_has(X86_FEATURE_SEV))
->  		goto out;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ccf52c5531fb..f89f702b2a58 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -189,14 +189,6 @@ module_param(vls, int, 0444);
->  static int vgif = true;
->  module_param(vgif, int, 0444);
->  
-> -/* enable/disable SEV support */
-> -int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> -module_param(sev, int, 0444);
-> -
-> -/* enable/disable SEV-ES support */
-> -int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> -module_param(sev_es, int, 0444);
-> -
->  bool __read_mostly dump_invalid_vmcb;
->  module_param(dump_invalid_vmcb, bool, 0644);
->  
-> @@ -976,12 +968,7 @@ static __init int svm_hardware_setup(void)
->  		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
->  	}
->  
-> -	if (IS_ENABLED(CONFIG_KVM_AMD_SEV) && sev) {
-> -		sev_hardware_setup();
-> -	} else {
-> -		sev = false;
-> -		sev_es = false;
-> -	}
-> +	sev_hardware_setup();
->  
->  	svm_adjust_mmio_mask();
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0fe874ae5498..8e169835f52a 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -408,8 +408,6 @@ static inline bool gif_set(struct vcpu_svm *svm)
->  #define MSR_CR3_LONG_MBZ_MASK			0xfff0000000000000U
->  #define MSR_INVALID				0xffffffffU
->  
-> -extern int sev;
-> -extern int sev_es;
->  extern bool dump_invalid_vmcb;
->  
->  u32 svm_msrpm_offset(u32 msr);
+I will review project ideas and keep you up-to-date on QEMU's
+acceptance into GSoC.
 
--- 
-Vitaly
+For more background on QEMU internships, check out this video:
+https://www.youtube.com/watch?v=xNVCX7YMUL8
 
+Stefan
