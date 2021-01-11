@@ -2,101 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E832F1D45
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 19:00:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E45C2F1D72
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 19:06:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389342AbhAKR7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 12:59:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732669AbhAKR7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 12:59:17 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33B73C061786
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:58:37 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id m6so402469pfk.1
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 09:58:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=2lm70Ggq7phoaQdO9eh1J8nKy568IRUhnAqo2gDpwug=;
-        b=Yi1bvgxwKfXTkZnOP72Pmv2jaenl99ZsFBSzUvtEwJ17uzJQss8ZzOego2XKqv4otc
-         evFFIrPaX1U27ZqTvupdxeRvKk45MrdmtGy+JZx144XDMfu4dg8xG6Bc+1XQgYUdjTxb
-         74ZhoVogcEQjbpjheC6e34dQ7qkWzH+JktjuOTsneshLfedvfBcfsCNWo+AI0oPAkOht
-         HEth2dS89lsqGBY7pNWjqVGISAMT1RUJzW/hH3mD9a0JfD9VziDVA7osIB+UK2tWNYeL
-         nJViH2v83mqPgS8j5BikrBPJTErIqCU33ZZP5j8NDDPmL10cAxvmX0toekm0gt7u5vJV
-         jrPQ==
+        id S2389210AbhAKSGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 13:06:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52510 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727030AbhAKSGI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 13:06:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610388281;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YDFmgDgRxNAaH6RohnUOtmiFzfn10DX+8iq8uU5yc/I=;
+        b=CJxnkNXvH84OkSUa4wDPCjAVaozZ+Zekt64TwKbsM4nxt8Vq0aSJbC5mjF+b6iAETtg5sd
+        rT8tguDcFWgpBx2ZdraTtpRyjCNNwKCSSk6TgJM2VfyBd2SUpC6yX74lycfldqTmEI6aSP
+        +Yah4VlDnMgL+y5VgHp3dW1tahAt/JI=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-J4N8intHOCKhgS4lRCw6-g-1; Mon, 11 Jan 2021 13:04:40 -0500
+X-MC-Unique: J4N8intHOCKhgS4lRCw6-g-1
+Received: by mail-ed1-f71.google.com with SMTP id dh21so54109edb.6
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 10:04:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=2lm70Ggq7phoaQdO9eh1J8nKy568IRUhnAqo2gDpwug=;
-        b=c/AZs0whSEJ0jLIRNHOurwOYvkGfNyoDRS2QOGYOOmzBUY9aLcV1UUAcniMvp+LGI1
-         Tv2RUmr38ljxKfnaKBfd+ZSk5TcZ6W0LqdM08Tk/kVEIB9SANot7d9WSk9Q2kAlfLO3u
-         XlJ5/3QWvxOCudIoRMeeZcdLY2W0vgJOW+16hyyJ/Z30kyvr9laoT1W3fYCj5mAKP2xq
-         J3/89G3a4bsYTFiOE6yJLN7QRU4YQRzdJCrkNizw87zz9lmORk/oCoxK1bc60xg1+58W
-         yJ0o2HjLmihuKA+UO3fumNQCxhZuUtt+ZTZdaT0wMCd6B1khow1aOvJ74hlKwIZLcDUX
-         Q88A==
-X-Gm-Message-State: AOAM531r/XGzxD9/nqOwS0t8udXTbX8B1tHID3bRXawdG3OmM6HNgZ2Y
-        MtYCN16NK81VD9cEshfjfgtKUg==
-X-Google-Smtp-Source: ABdhPJyl9l6RFQcpeTXKU39dwIVyADDHDqn4PQCQHlG/RcoPfTkeFWsCm2MbiPbtssnq7luGy2r0Gw==
-X-Received: by 2002:aa7:843a:0:b029:19d:b279:73c9 with SMTP id q26-20020aa7843a0000b029019db27973c9mr765662pfn.3.1610387916649;
-        Mon, 11 Jan 2021 09:58:36 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id 84sm277900pfy.9.2021.01.11.09.58.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 09:58:35 -0800 (PST)
-Date:   Mon, 11 Jan 2021 09:58:29 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 06/13] x86/sev: Rename global "sev_enabled" flag to
- "sev_guest"
-Message-ID: <X/yRxYCrEuaq2oVX@google.com>
-References: <20210109004714.1341275-1-seanjc@google.com>
- <20210109004714.1341275-7-seanjc@google.com>
- <f6ed8566-6521-92f0-927e-1764d8074ce6@amd.com>
- <5b3a5d5e-befe-8be2-bbc4-7e7a8ebbe316@amd.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YDFmgDgRxNAaH6RohnUOtmiFzfn10DX+8iq8uU5yc/I=;
+        b=TDRfggyxxF7Zl2ICzsNi+vRRnJRM9jKNSbCit5zQpl5Jzq+wz1W/YozbJeTEYsxG6a
+         3j5/aKjZY+qwQ/59JQNsujZn8Q4nhh26dYKsy1j92UcaGaU9ZLpVYRp1OzeFwiS6JxCo
+         WHU5hpROHdJXdphX3Ohw63LugIz6N9X4R/ivt2Xm+Sxb7u8vntOb5c5sp8Wqjw8Hmpi7
+         AYBbw9xpLELRcLc1kbvBjh/veBxP3P4TOnm2HxiAdgezFN85xfBPq3GNszsVzGeRhN5B
+         ivGwESdrj+nEzrHN8jdUIM+R9SAD046jOb5EeURD6PNN7rgvLzJ3QlK0VOqbO2Qc75kw
+         VP7g==
+X-Gm-Message-State: AOAM531WSoREkBIGn+H5oPhH6hoCuWpA4AxB7/YeE5OeubnWn6ROyAk5
+        YXQ02QtvxsYlCPeQZuhhTKlnPt2GBX2GTAgB/7A8Nliqzf+3YWr7lNACPCQYMDNKMkfjcPSfiwe
+        znWjEDHbUK2Ol
+X-Received: by 2002:a17:906:e206:: with SMTP id gf6mr485199ejb.342.1610388278594;
+        Mon, 11 Jan 2021 10:04:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz/eIATFh+PBzF3J4BtSB/ymjE8fFcXELl6KOECpzo5ZQ+s0HAQLJXiUQrwWyl4CzkEtxKzhA==
+X-Received: by 2002:a17:906:e206:: with SMTP id gf6mr485177ejb.342.1610388278343;
+        Mon, 11 Jan 2021 10:04:38 -0800 (PST)
+Received: from [192.168.1.36] (129.red-88-21-205.staticip.rima-tde.net. [88.21.205.129])
+        by smtp.gmail.com with ESMTPSA id n16sm273664edq.62.2021.01.11.10.04.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Jan 2021 10:04:37 -0800 (PST)
+Subject: Re: [for-6.0 v5 01/13] qom: Allow optional sugar props
+To:     David Gibson <david@gibson.dropbear.id.au>, pair@us.ibm.com,
+        pbonzini@redhat.com, frankja@linux.ibm.com, brijesh.singh@amd.com,
+        dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc:     thuth@redhat.com, cohuck@redhat.com, berrange@redhat.com,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
+        mdroth@linux.vnet.ibm.com, Greg Kurz <groug@kaod.org>,
+        pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, rth@twiddle.net
+References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
+ <20201204054415.579042-2-david@gibson.dropbear.id.au>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <380065a5-f656-6f4b-edfe-ce9199f8bc62@redhat.com>
+Date:   Mon, 11 Jan 2021 19:04:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <20201204054415.579042-2-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5b3a5d5e-befe-8be2-bbc4-7e7a8ebbe316@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021, Tom Lendacky wrote:
-> On 1/11/21 10:02 AM, Tom Lendacky wrote:
-> > On 1/8/21 6:47 PM, Sean Christopherson wrote:
-> > > Use "guest" instead of "enabled" for the global "running as an SEV guest"
-> > > flag to avoid confusion over whether "sev_enabled" refers to the guest or
-> > > the host.  This will also allow KVM to usurp "sev_enabled" for its own
-> > > purposes.
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > 
-> > Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+On 12/4/20 6:44 AM, David Gibson wrote:
+> From: Greg Kurz <groug@kaod.org>
 > 
-> Ah, I tried building with CONFIG_KVM=y and CONFIG_KVM_AMD=y and got a build
-> error:
+> Global properties have an @optional field, which allows to apply a given
+> property to a given type even if one of its subclasses doesn't support
+> it. This is especially used in the compat code when dealing with the
+> "disable-modern" and "disable-legacy" properties and the "virtio-pci"
+> type.
 > 
-> In file included from arch/x86/kvm/svm/svm.c:43:
-> arch/x86/kvm/svm/svm.h:222:20: error: ‘sev_guest’ redeclared as different
-> kind of symbol
+> Allow object_register_sugar_prop() to set this field as well.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Message-Id: <159738953558.377274.16617742952571083440.stgit@bahia.lan>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  include/qom/object.h |  3 ++-
+>  qom/object.c         |  4 +++-
+>  softmmu/vl.c         | 16 ++++++++++------
+>  3 files changed, 15 insertions(+), 8 deletions(-)
 
-Dang, didn't consider that scenario, obviously.  The irony of introducing a
-conflict while trying to avoid conflicts...
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
