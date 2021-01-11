@@ -2,130 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F36D2F0CFE
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 07:46:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 650272F0EA4
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 10:00:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727337AbhAKGpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 01:45:12 -0500
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:52710 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbhAKGpM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 01:45:12 -0500
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 4683575FF8;
-        Mon, 11 Jan 2021 09:44:26 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail; t=1610347466;
-        bh=aApp4LN/QtkPAOSm6mJdV5wecd76/VDE+Frwf2Hzg/U=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=P4h/crwpaYLkch4uHMleAiBG2IJv3G8TGD2wMJ4YIMNA8y6dCrCxHV0+JeUGrklvO
-         8+l7vSoCkCyEvfx2B8GNaaAlSDQptsffUkgstb8vzPXxiX+jZiYL19KFkI+21E3y66
-         +u7NVvjdcHIBn19C+2LYidS/T3NLeeizf5r8QGH8=
-Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 4FA9875FFB;
-        Mon, 11 Jan 2021 09:44:25 +0300 (MSK)
-Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
- (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Mon, 11
- Jan 2021 09:44:24 +0300
-Subject: Re: [PATCH 3/5] af_vsock: send/receive loops for SOCK_SEQPACKET.
-To:     stsp <stsp2@yandex.ru>, Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Arseniy Krasnov <oxffffaa@gmail.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20210103195454.1954169-1-arseny.krasnov@kaspersky.com>
- <20210103200347.1956354-1-arseny.krasnov@kaspersky.com>
- <8ffb1753-c95b-c8f3-6ed9-112bf35623be@yandex.ru>
-From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <61ee202f-58bc-0bd2-5aa7-3a84993d055e@kaspersky.com>
-Date:   Mon, 11 Jan 2021 09:44:24 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727991AbhAKJAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 04:00:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45260 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727623AbhAKJAP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 04:00:15 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 530C822581;
+        Mon, 11 Jan 2021 08:59:34 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kyt2y-006cel-8W; Mon, 11 Jan 2021 08:59:32 +0000
 MIME-Version: 1.0
-In-Reply-To: <8ffb1753-c95b-c8f3-6ed9-112bf35623be@yandex.ru>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.64.68.129]
-X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
- (10.64.67.243)
-X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 01/11/2021 06:22:17
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 161021 [Jan 11 2021]
-X-KSE-AntiSpam-Info: LuaCore: 419 419 70b0c720f8ddd656e5f4eb4a4449cf8ce400df94
-X-KSE-AntiSpam-Info: Version: 5.9.16.0
-X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
-X-KSE-AntiSpam-Info: {Tracking_content_type, plain}
-X-KSE-AntiSpam-Info: {Tracking_date, moscow}
-X-KSE-AntiSpam-Info: {Tracking_c_tr_enc, eight_bit}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: kaspersky.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/11/2021 06:25:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11.01.2021 5:48:00
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-KLMS-Rule-ID: 52
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2021/01/11 04:28:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/01/11 04:10:00 #16053498
-X-KLMS-AntiVirus-Status: Clean, skipped
+Date:   Mon, 11 Jan 2021 08:59:30 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Haibo Xu <haibo.xu@linaro.org>
+Cc:     arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
+        kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization
+ support
+In-Reply-To: <CAJc+Z1GFHp17+ROTyDnfS4QLs0kCEVBCD7+OBkHZA53q-zmiLQ@mail.gmail.com>
+References: <20201210160002.1407373-1-maz@kernel.org>
+ <CAJc+Z1GFHp17+ROTyDnfS4QLs0kCEVBCD7+OBkHZA53q-zmiLQ@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <47c1fd0431cb6dddcd9e81213b84c019@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: haibo.xu@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Hmm, are you sure you need to convert
-> "err" to the pointer, just to return true/false
-> as the return value?
-> How about still returning "err" itself?
+Hi Haibo,
 
-In this case i need to reserve some value for
-"err" as success, because both 0 and negative
-values are passed to caller when this function
-returns false(check failed). May be i will
-inline this function.
+On 2021-01-11 07:20, Haibo Xu wrote:
+> On Fri, 11 Dec 2020 at 00:00, Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> This is a rework of the NV series that I posted 10 months ago[1], as a
+>> lot of the KVM code has changed since, and the series apply anymore
+>> (not that anybody really cares as the the HW is, as usual, made of
+>> unobtainium...).
+>> 
+>> From the previous version:
+>> 
+>> - Integration with the new page-table code
+>> - New exception injection code
+>> - No more messing with the nVHE code
+>> - No AArch32!!!!
+>> - Rebased on v5.10-rc4 + kvmarm/next for 5.11
+>> 
+>> From a functionality perspective, you can expect a L2 guest to work,
+>> but don't even think of L3, as we only partially emulate the
+>> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug, PMU,
+>> as well as anything that would require a Stage-1 PTW. What we want to
+>> achieve is that with NV disabled, there is no performance overhead and
+>> no regression.
+>> 
+>> The series is roughly divided in 5 parts: exception handling, memory
+>> virtualization, interrupts and timers for ARMv8.3, followed by the
+>> ARMv8.4 support. There are of course some dependencies, but you'll
+>> hopefully get the gist of it.
+>> 
+>> For the most courageous of you, I've put out a branch[2]. Of course,
+>> you'll need some userspace. Andre maintains a hacked version of
+>> kvmtool[3] that takes a --nested option, allowing the guest to be
+>> started at EL2. You can run the whole stack in the Foundation
+>> model. Don't be in a hurry ;-).
+>> 
+> 
+> Hi Marc,
+> 
+> I got a kernel BUG message when booting the L2 guest kernel with the
+> kvmtool on a FVP setup.
+> Could you help have a look about the BUG message as well as my
+> environment configuration?
+> I think It probably caused by some local configurations of the FVP 
+> setup.
 
-> Its not very clear (only for me perhaps) how
-> dequeue_total and len correlate. Are they
-> equal here? Would you need to check that
-> dequeued_total >= record_len?
-> I mean, its just a bit strange that you check
-> dequeued_total>0 and no longer use that var
-> inside the block.
+No, this is likely a bug in your L1 guest, which was fixed in -rc3:
 
-When "dequeued_total > 0" record copy is succeed.
-"len" is length of user  buffer. I think i can
-replace "dequeued_total" to some flag, like "error",
-because in SOCK_SEQPACKET mode record could be
-copied whole or error returned.
+2a5f1b67ec57 ("KVM: arm64: Don't access PMCR_EL0 when no PMU is 
+available")
 
+and was found in the exact same circumstances. Alternatively, and if
+you don't want to change your L1 guest, you can just pass the --pmu
+option to kvmtool when starting the L1 guest.
+
+Hope this helps,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
