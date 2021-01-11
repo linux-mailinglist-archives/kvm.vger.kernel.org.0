@@ -2,106 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDF3A2F20C9
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:29:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 301B22F2101
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:42:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730520AbhAKU3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 15:29:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730079AbhAKU3U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 15:29:20 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8192C061794
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:28:40 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id v3so92554plz.13
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:28:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=iI1rIqMfwu1P4fzKj9/kRKSVEqcKsOkLrborReGYEMY=;
-        b=n//tBuPfufjrPGNJXimcbOspw3o6JHeeJgul4/wExnnP7yEohCopxZJdpmS/N3xGs1
-         jC12nWIQusxHhtJaHdbXXugkwhS25diUWmISXfKnFmqbWTcm5Ybdvgc9ngrbkYGmFn+3
-         aznnz9kqMDwRIitTKgPuRdQNyWzpWHYJl/s2Nl8MPUVV3A3RrBtUQXQqjW5LieB67Ysq
-         8qYGk7jD76Qmpe6o9nIoysK/O6Ct94Gr6NNbTsL7kfWMQUXzxeHWRDaDQmjmuMGR/7dU
-         J6MQB6BauelnswIQQax5lnYo+P2d1CntVXjxAo5bQsp3DFsWGm2gGjFe3NAwPYX2s3oB
-         3ikw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=iI1rIqMfwu1P4fzKj9/kRKSVEqcKsOkLrborReGYEMY=;
-        b=VWKJnoRUQ4QPf7XpWBtftwSgqnaAC4A73uYoet1KPI3D510CyZ0lFFdzE5j18OJmUZ
-         unGSICcLHgrBLZOVINWIXqhOuGXh8weO80h+WjAMiPqFtAGfvljwRcrM8OkfMZInqJQJ
-         UnD4xLLI7cEAzYWsOOsdEbarbILfXbIXuqlmh+mNDEqZruf9i7EcxCR5HEL2wRLvE/ee
-         A5i4gEHnwk2uPGL/+UGYhAUVXuaqHAcL1jej37POLxsY/nUDjXy7qbDO1yaQ4bc5a+Fk
-         gP9lT1H8Zzo+x1uuVQT6bGzFqdSrOgsOkxcbkzvWPKdNYDQc/GzCP3GX5qshcCxVPDZY
-         SzVw==
-X-Gm-Message-State: AOAM532PJNzxHYbUUPzNLshAzGIzZ92n2vDkaBrjI09SVWo+/y21xtDC
-        Z7XcH4tMZtAdjXtuZCaJ0Qe4WA==
-X-Google-Smtp-Source: ABdhPJxLa4YAAAAxOU0c3cvwB++tHRjVUn4t6n6xS0vZyxzTZIdEn4q2B+D/klf5X3Ttp7TLsNfY2w==
-X-Received: by 2002:a17:902:ee11:b029:db:c0d6:581a with SMTP id z17-20020a170902ee11b02900dbc0d6581amr1069008plb.54.1610396920141;
-        Mon, 11 Jan 2021 12:28:40 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id w18sm471444pfj.120.2021.01.11.12.28.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jan 2021 12:28:39 -0800 (PST)
-Date:   Mon, 11 Jan 2021 12:28:32 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 06/13] x86/sev: Rename global "sev_enabled" flag to
- "sev_guest"
-Message-ID: <X/y08JZkm/+TJCHr@google.com>
-References: <20210109004714.1341275-1-seanjc@google.com>
- <20210109004714.1341275-7-seanjc@google.com>
- <f6ed8566-6521-92f0-927e-1764d8074ce6@amd.com>
- <5b3a5d5e-befe-8be2-bbc4-7e7a8ebbe316@amd.com>
- <X/yRxYCrEuaq2oVX@google.com>
+        id S2390945AbhAKUl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 15:41:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43468 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2390886AbhAKUl2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 15:41:28 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BKVNne021266;
+        Mon, 11 Jan 2021 15:40:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Rd/CYkrC9/BckZNFZA/yc85QHZUj4XEltpvT2uWcUlA=;
+ b=BWNokI9NfflDXOpGsmY5/dsv6A5oVZDe6jwrZvAKgQINQN7Xoh9tHX84MRbg1aO14JeD
+ mXB5sujS6eXfRrVw5xnIMy+R2ykhEf4pt3YgXCj5EtUJBQ9bWI8xHImdMg8/fWy2bDfr
+ EkENB6YXozKlYdQXnnCDJc6JgY0ljZBtbhxxePJqs/0HaUwWRw+5uyzpZMG4rA53EkQm
+ sNq2vwtPdWe6ZSn4yzqtpQA1DE4UAvimXO9UlMatk+FAxEsOehSwDPOkbfuEjwaM++SB
+ bcyNG94edpGjUEB6bwe+o2x1LpiFeEcYadLvxf9Pqh5VXOz0ziYZiT1+UD+bLFyKZ5C0 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 360wgfgr91-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 15:40:45 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BKWQYV024750;
+        Mon, 11 Jan 2021 15:40:45 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 360wgfgr81-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 15:40:45 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BKaA3j008961;
+        Mon, 11 Jan 2021 20:40:43 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 35y448aq7d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 20:40:43 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BKeePT47120798
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Jan 2021 20:40:40 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AE925AE058;
+        Mon, 11 Jan 2021 20:40:40 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EB5F8AE045;
+        Mon, 11 Jan 2021 20:40:39 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.62.86])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Mon, 11 Jan 2021 20:40:39 +0000 (GMT)
+Date:   Mon, 11 Jan 2021 21:40:37 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 06/15] s390/vfio-ap: allow assignment of unavailable
+ AP queues to mdev device
+Message-ID: <20210111214037.477f0f03.pasic@linux.ibm.com>
+In-Reply-To: <20201223011606.5265-7-akrowiak@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-7-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <X/yRxYCrEuaq2oVX@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-11_30:2021-01-11,2021-01-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ priorityscore=1501 mlxlogscore=999 spamscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101110112
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021, Sean Christopherson wrote:
-> On Mon, Jan 11, 2021, Tom Lendacky wrote:
-> > On 1/11/21 10:02 AM, Tom Lendacky wrote:
-> > > On 1/8/21 6:47 PM, Sean Christopherson wrote:
-> > > > Use "guest" instead of "enabled" for the global "running as an SEV guest"
-> > > > flag to avoid confusion over whether "sev_enabled" refers to the guest or
-> > > > the host.  This will also allow KVM to usurp "sev_enabled" for its own
-> > > > purposes.
-> > > > 
-> > > > No functional change intended.
-> > > > 
-> > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > 
-> > > Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > 
-> > Ah, I tried building with CONFIG_KVM=y and CONFIG_KVM_AMD=y and got a build
-> > error:
-> > 
-> > In file included from arch/x86/kvm/svm/svm.c:43:
-> > arch/x86/kvm/svm/svm.h:222:20: error: ‘sev_guest’ redeclared as different
-> > kind of symbol
-> 
-> Dang, didn't consider that scenario, obviously.  The irony of introducing a
-> conflict while trying to avoid conflicts...
+On Tue, 22 Dec 2020 20:15:57 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Even better than coming up with a new name, sev_enabled can be removed entirely
-as it's really just sev_active() stored in a separate bool.
+> The current implementation does not allow assignment of an AP adapter or
+> domain to an mdev device if each APQN resulting from the assignment
+> does not reference an AP queue device that is bound to the vfio_ap device
+> driver. This patch allows assignment of AP resources to the matrix mdev as
+> long as the APQNs resulting from the assignment:
+>    1. Are not reserved by the AP BUS for use by the zcrypt device drivers.
+>    2. Are not assigned to another matrix mdev.
+> 
+> The rationale behind this is twofold:
+>    1. The AP architecture does not preclude assignment of APQNs to an AP
+>       configuration that are not available to the system.
+>    2. APQNs that do not reference a queue device bound to the vfio_ap
+>       device driver will not be assigned to the guest's CRYCB, so the
+>       guest will not get access to queues not bound to the vfio_ap driver.
+
+You didn't tell us about the changed error code.
+
+Also notice that this point we don't have neither filtering nor in-use.
+This used to be patch 11, and most of that stuff used to be in place. But
+I'm going to trust you, if you say its fine to enable it this early.
+
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 241 ++++++++----------------------
+>  1 file changed, 62 insertions(+), 179 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index cdcc6378b4a5..2d58b39977be 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -379,134 +379,37 @@ static struct attribute_group *vfio_ap_mdev_type_groups[] = {
+>  	NULL,
+>  };
+>  
+> -struct vfio_ap_queue_reserved {
+> -	unsigned long *apid;
+> -	unsigned long *apqi;
+> -	bool reserved;
+> -};
+> +#define MDEV_SHARING_ERR "Userspace may not re-assign queue %02lx.%04lx " \
+> +			 "already assigned to %s"
+>  
+> -/**
+> - * vfio_ap_has_queue
+> - *
+> - * @dev: an AP queue device
+> - * @data: a struct vfio_ap_queue_reserved reference
+> - *
+> - * Flags whether the AP queue device (@dev) has a queue ID containing the APQN,
+> - * apid or apqi specified in @data:
+> - *
+> - * - If @data contains both an apid and apqi value, then @data will be flagged
+> - *   as reserved if the APID and APQI fields for the AP queue device matches
+> - *
+> - * - If @data contains only an apid value, @data will be flagged as
+> - *   reserved if the APID field in the AP queue device matches
+> - *
+> - * - If @data contains only an apqi value, @data will be flagged as
+> - *   reserved if the APQI field in the AP queue device matches
+> - *
+> - * Returns 0 to indicate the input to function succeeded. Returns -EINVAL if
+> - * @data does not contain either an apid or apqi.
+> - */
+> -static int vfio_ap_has_queue(struct device *dev, void *data)
+> +static void vfio_ap_mdev_log_sharing_err(const char *mdev_name,
+> +					 unsigned long *apm,
+> +					 unsigned long *aqm)
+[..]
+> -	return 0;
+> +	for_each_set_bit_inv(apid, apm, AP_DEVICES)
+> +		for_each_set_bit_inv(apqi, aqm, AP_DOMAINS)
+> +			pr_warn(MDEV_SHARING_ERR, apid, apqi, mdev_name);
+
+I would prefer dev_warn() here. We know which device is about to get
+more queues, and this device can provide a clue regarding the initiator.
+
+Also I believe a warning is too heavy handed here. Warnings should not
+be ignored. This is a condition that can emerge during normal operation,
+AFAIU. Or am I worng?
+
+>  }
+>  
+>  /**
+>   * vfio_ap_mdev_verify_no_sharing
+>   *
+> - * Verifies that the APQNs derived from the cross product of the AP adapter IDs
+> - * and AP queue indexes comprising the AP matrix are not configured for another
+> - * mediated device. AP queue sharing is not allowed.
+> + * Verifies that each APQN derived from the Cartesian product of the AP adapter
+> + * IDs and AP queue indexes comprising the AP matrix are not configured for
+> + * another mediated device. AP queue sharing is not allowed.
+>   *
+> - * @matrix_mdev: the mediated matrix device
+> + * @matrix_mdev: the mediated matrix device to which the APQNs being verified
+> + *		 are assigned.
+> + * @mdev_apm: mask indicating the APIDs of the APQNs to be verified
+> + * @mdev_aqm: mask indicating the APQIs of the APQNs to be verified
+>   *
+> - * Returns 0 if the APQNs are not shared, otherwise; returns -EADDRINUSE.
+> + * Returns 0 if the APQNs are not shared, otherwise; returns -EBUSY.
+>   */
+> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
+> +static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev,
+> +					  unsigned long *mdev_apm,
+> +					  unsigned long *mdev_aqm)
+>  {
+>  	struct ap_matrix_mdev *lstdev;
+>  	DECLARE_BITMAP(apm, AP_DEVICES);
+> @@ -523,20 +426,31 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
+>  		 * We work on full longs, as we can only exclude the leftover
+>  		 * bits in non-inverse order. The leftover is all zeros.
+>  		 */
+> -		if (!bitmap_and(apm, matrix_mdev->matrix.apm,
+> -				lstdev->matrix.apm, AP_DEVICES))
+> +		if (!bitmap_and(apm, mdev_apm, lstdev->matrix.apm, AP_DEVICES))
+>  			continue;
+>  
+> -		if (!bitmap_and(aqm, matrix_mdev->matrix.aqm,
+> -				lstdev->matrix.aqm, AP_DOMAINS))
+> +		if (!bitmap_and(aqm, mdev_aqm, lstdev->matrix.aqm, AP_DOMAINS))
+>  			continue;
+>  
+> -		return -EADDRINUSE;
+> +		vfio_ap_mdev_log_sharing_err(dev_name(mdev_dev(lstdev->mdev)),
+> +					     apm, aqm);
+> +
+> +		return -EBUSY;
+
+Why do we change -EADDRINUSE to -EBUSY? This gets bubbled up to
+userspace, or? So a tool that checks for the other mdev has it
+condition by checking for -EADDRINUSE, would be confused...
+
+>  	}
+>  
+>  	return 0;
+>  }
+>  
+> +static int vfio_ap_mdev_validate_masks(struct ap_matrix_mdev *matrix_mdev,
+> +				       unsigned long *mdev_apm,
+> +				       unsigned long *mdev_aqm)
+> +{
+> +	if (ap_apqn_in_matrix_owned_by_def_drv(mdev_apm, mdev_aqm))
+> +		return -EADDRNOTAVAIL;
+> +
+> +	return vfio_ap_mdev_verify_no_sharing(matrix_mdev, mdev_apm, mdev_aqm);
+> +}
+> +
+>  static void vfio_ap_mdev_link_queue(struct ap_matrix_mdev *matrix_mdev,
+>  				    struct vfio_ap_queue *q)
+>  {
+> @@ -608,10 +522,10 @@ static void vfio_ap_mdev_link_adapter(struct ap_matrix_mdev *matrix_mdev,
+>   *	   driver; or, if no APQIs have yet been assigned, the APID is not
+>   *	   contained in an APQN bound to the vfio_ap device driver.
+>   *
+> - *	4. -EADDRINUSE
+> + *	4. -EBUSY
+>   *	   An APQN derived from the cross product of the APID being assigned
+>   *	   and the APQIs previously assigned is being used by another mediated
+> - *	   matrix device
+> + *	   matrix device or the mdev lock could not be acquired.
+
+This is premature. We don't use try_lock yet.
+
+[..]
+
+>  static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
+>  				     unsigned long apqi)
+>  {
+> @@ -774,10 +660,10 @@ static void vfio_ap_mdev_link_domain(struct ap_matrix_mdev *matrix_mdev,
+>   *	   driver; or, if no APIDs have yet been assigned, the APQI is not
+>   *	   contained in an APQN bound to the vfio_ap device driver.
+>   *
+> - *	4. -EADDRINUSE
+> + *	4. -BUSY
+>   *	   An APQN derived from the cross product of the APQI being assigned
+>   *	   and the APIDs previously assigned is being used by another mediated
+> - *	   matrix device
+> + *	   matrix device or the mdev lock could not be acquired.
+
+Same here as above.
+
+Otherwise looks good.
+
+[..]
