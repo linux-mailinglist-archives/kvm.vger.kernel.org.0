@@ -2,264 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4957A2F203B
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:00:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A29A2F2040
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:00:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391464AbhAKT7M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 14:59:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52202 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727096AbhAKT7J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 14:59:09 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79231C0617B1
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 11:58:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=2aOnV0EieaLWAXhur2vqcCJW2JGY+y9dTkT8sEdYGjg=; b=wYDEFmF9Qaz0aXh1cje7YlNZ5o
-        0c0YTpLDx/H22ZloVSwoYtZBDhUgD3JPsM81tWYX9m8viKP0YJwf/UaAMpg96PF3EGOZ/bgZuyJkf
-        iCrmujrRTAXf3BFoyN2NL8K8fAuwPS7nWZwQQSwrgnqQFx8wF3HHG86r7z1H8geo5tz3KVesi4c1W
-        jFWokWvu1m8UZZqG5kuSSmyTHTYJCjJNk/yjhm5uLlJ9NM2WvFpOMF9VLK0EMsHC8t6PD+ZPVnnf6
-        nhcuTqpqH4oEzp0y4bUOACmkNMpvTb+3EERHop6CPqnycg/DRYs5tpjXM40QOOc6bJfCSj+oAHwas
-        n6MO9q9g==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1kz3Jg-003kSc-6k; Mon, 11 Jan 2021 19:57:37 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kz3Jf-0001I7-Q7; Mon, 11 Jan 2021 19:57:27 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v5 16/16] KVM: x86/xen: Add event channel interrupt vector upcall
-Date:   Mon, 11 Jan 2021 19:57:25 +0000
-Message-Id: <20210111195725.4601-17-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210111195725.4601-1-dwmw2@infradead.org>
-References: <20210111195725.4601-1-dwmw2@infradead.org>
+        id S2404084AbhAKT7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 14:59:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21696 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731772AbhAKT7m (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 14:59:42 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BJgskZ196225;
+        Mon, 11 Jan 2021 14:58:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ message-id : reply-to : references : mime-version : content-type :
+ in-reply-to : subject; s=pp1;
+ bh=HlnbdNAo/94mEI3tW5H4udb4sNucEjNi1gf15FFs+2g=;
+ b=WOtrlOc2dHAfPVKG8WVaHzwIXAhGWs9l+IRZw9edGTWr5UKnBx6L7JXGUFbHapsskZss
+ tR2l6eRZkh3Vi/rZZZfMypAc4NlyVQL4HtmJiBS+xjgAzCXNqPQE7qXHzH4qeWLTaELy
+ 82lpx0/kkutbP5YTfMbVO9s2Mn4ypsK8woa4ql+rMrQruOJ4mILZqzAGh+WsZS6IRwYx
+ JqjPZHJV/Mvg6a/2pYhGeStDnKxsYpm9eOEjm6BcVj6mBzJ4eqBQLwaKDwCSobnF0K/A
+ 3aargxd8gv6rl8C6scmVFL+11vaPAVmDGoF6OnJWsWcSOMfyDe7t3Y9oJvV7CRshSrTu UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 360w2sgaqx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 14:58:44 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BJhLWa000880;
+        Mon, 11 Jan 2021 14:58:44 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 360w2sgaqd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 14:58:44 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BJwg2x025212;
+        Mon, 11 Jan 2021 19:58:42 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 35y4489br1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 19:58:42 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BJwd8x43319708
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 11 Jan 2021 19:58:39 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D668AE053;
+        Mon, 11 Jan 2021 19:58:39 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D80EAE051;
+        Mon, 11 Jan 2021 19:58:33 +0000 (GMT)
+Received: from ram-ibm-com.ibm.com (unknown [9.163.29.145])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 11 Jan 2021 19:58:33 +0000 (GMT)
+Date:   Mon, 11 Jan 2021 11:58:30 -0800
+From:   Ram Pai <linuxram@us.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
+        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
+        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
+        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
+        qemu-ppc@nongnu.org, pbonzini@redhat.com
+Message-ID: <20210111195830.GA23898@ram-ibm-com.ibm.com>
+Reply-To: Ram Pai <linuxram@us.ibm.com>
+References: <20201217054736.GH310465@yekko.fritz.box>
+ <20201217123842.51063918.cohuck@redhat.com>
+ <20201217151530.54431f0e@bahia.lan>
+ <20201218124111.4957eb50.cohuck@redhat.com>
+ <20210104071550.GA22585@ram-ibm-com.ibm.com>
+ <20210104134629.49997b53.pasic@linux.ibm.com>
+ <20210104184026.GD4102@ram-ibm-com.ibm.com>
+ <20210105115614.7daaadd6.pasic@linux.ibm.com>
+ <20210105204125.GE4102@ram-ibm-com.ibm.com>
+ <20210111175914.13adfa2e.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210111175914.13adfa2e.cohuck@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-TM-AS-GCONF: 00
+Subject: RE: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-11_30:2021-01-11,2021-01-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ impostorscore=0 malwarescore=0 adultscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
+ spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101110105
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Mon, Jan 11, 2021 at 05:59:14PM +0100, Cornelia Huck wrote:
+> On Tue, 5 Jan 2021 12:41:25 -0800
+> Ram Pai <linuxram@us.ibm.com> wrote:
+> 
+> > On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
+> > > On Mon, 4 Jan 2021 10:40:26 -0800
+> > > Ram Pai <linuxram@us.ibm.com> wrote:
+> 
+> > > > The main difference between my proposal and the other proposal is...
+> > > > 
+> > > >   In my proposal the guest makes the compatibility decision and acts
+> > > >   accordingly.  In the other proposal QEMU makes the compatibility
+> > > >   decision and acts accordingly. I argue that QEMU cannot make a good
+> > > >   compatibility decision, because it wont know in advance, if the guest
+> > > >   will or will-not switch-to-secure.
+> > > >   
+> > > 
+> > > You have a point there when you say that QEMU does not know in advance,
+> > > if the guest will or will-not switch-to-secure. I made that argument
+> > > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
+> > > was to flip that property on demand when the conversion occurs. David
+> > > explained to me that this is not possible for ppc, and that having the
+> > > "securable-guest-memory" property (or whatever the name will be)
+> > > specified is a strong indication, that the VM is intended to be used as
+> > > a secure VM (thus it is OK to hurt the case where the guest does not
+> > > try to transition). That argument applies here as well.  
+> > 
+> > As suggested by Cornelia Huck, what if QEMU disabled the
+> > "securable-guest-memory" property if 'must-support-migrate' is enabled?
+> > Offcourse; this has to be done with a big fat warning stating
+> > "secure-guest-memory" feature is disabled on the machine.
+> > Doing so, will continue to support guest that do not try to transition.
+> > Guest that try to transition will fail and terminate themselves.
+> 
+> Just to recap the s390x situation:
+> 
+> - We currently offer a cpu feature that indicates secure execution to
+>   be available to the guest if the host supports it.
+> - When we introduce the secure object, we still need to support
+>   previous configurations and continue to offer the cpu feature, even
+>   if the secure object is not specified.
+> - As migration is currently not supported for secured guests, we add a
+>   blocker once the guest actually transitions. That means that
+>   transition fails if --only-migratable was specified on the command
+>   line. (Guests not transitioning will obviously not notice anything.)
+> - With the secure object, we will already fail starting QEMU if
+>   --only-migratable was specified.
+> 
+> My suggestion is now that we don't even offer the cpu feature if
+> --only-migratable has been specified. For a guest that does not want to
+> transition to secure mode, nothing changes; a guest that wants to
+> transition to secure mode will notice that the feature is not available
+> and fail appropriately (or ultimately, when the ultravisor call fails).
 
-It turns out that we can't handle event channels *entirely* in userspace
-by delivering them as ExtINT, because KVM is a bit picky about when it
-accepts ExtINT interrupts from a legacy PIC. The in-kernel local APIC
-has to have LVT0 configured in APIC_MODE_EXTINT and unmasked, which
-isn't necessarily the case for Xen guests especially on secondary CPUs.
 
-To cope with this, add kvm_xen_get_interrupt() which checks the
-evtchn_pending_upcall field in the Xen vcpu_info, and delivers the Xen
-upcall vector (configured by KVM_XEN_ATTR_TYPE_UPCALL_VECTOR) if it's
-set regardless of LAPIC LVT0 configuration. This gives us the minimum
-support we need for completely userspace-based implementation of event
-channels.
+On POWER, secure-execution is not **automatically** enabled even when
+the host supports it.  The feature is enabled only if the secure-object
+is configured, and the host supports it.
 
-This does mean that vcpu_enter_guest() needs to check for the
-evtchn_pending_upcall flag being set, because it can't rely on someone
-having set KVM_REQ_EVENT unless we were to add some way for userspace to
-do so manually.
+However the behavior proposed above will be consistent on POWER and
+on s390x,  when '--only-migratable' is specified and 'secure-object'
+is NOT specified.
 
-But actually, I don't quite see how that works reliably for interrupts
-injected with KVM_INTERRUPT either. In kvm_vcpu_ioctl_interrupt() the
-KVM_REQ_EVENT request is set once, but that'll get cleared the first time
-through vcpu_enter_guest(). So if the first exit is for something *else*
-without interrupts being enabled yet, won't the KVM_REQ_EVENT request
-have been consumed already and just be lost?
+So I am in agreement till now. 
 
-I wonder if my addition of '|| kvm_xen_has_interrupt(vcpu)' should
-actually be '|| kvm_has_injectable_intr(vcpu)' to fix that pre-existing
-bug?
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/irq.c              |  7 +++++
- arch/x86/kvm/x86.c              |  3 +-
- arch/x86/kvm/xen.c              | 52 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/xen.h              |  1 +
- include/uapi/linux/kvm.h        |  2 ++
- 6 files changed, 65 insertions(+), 1 deletion(-)
+> We'd still fail starting QEMU for the secure object + --only-migratable
+> combination.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 73f285ebb181..b1cc73a19021 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -907,6 +907,7 @@ struct msr_bitmap_range {
- struct kvm_xen {
- 	bool long_mode;
- 	bool shinfo_set;
-+	u8 upcall_vector;
- 	struct gfn_to_hva_cache shinfo_cache;
- };
- 
-diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
-index 814698e5b152..24668b51b5c8 100644
---- a/arch/x86/kvm/irq.c
-+++ b/arch/x86/kvm/irq.c
-@@ -14,6 +14,7 @@
- #include "irq.h"
- #include "i8254.h"
- #include "x86.h"
-+#include "xen.h"
- 
- /*
-  * check if there are pending timer events
-@@ -56,6 +57,9 @@ int kvm_cpu_has_extint(struct kvm_vcpu *v)
- 	if (!lapic_in_kernel(v))
- 		return v->arch.interrupt.injected;
- 
-+	if (kvm_xen_has_interrupt(v))
-+		return 1;
-+
- 	if (!kvm_apic_accept_pic_intr(v))
- 		return 0;
- 
-@@ -110,6 +114,9 @@ static int kvm_cpu_get_extint(struct kvm_vcpu *v)
- 	if (!lapic_in_kernel(v))
- 		return v->arch.interrupt.nr;
- 
-+	if (kvm_xen_has_interrupt(v))
-+		return v->kvm->arch.xen.upcall_vector;
-+
- 	if (irqchip_split(v->kvm)) {
- 		int vector = v->arch.pending_external_vector;
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 25ef3b7ad49d..aa3c38fa3f31 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8950,7 +8950,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			kvm_x86_ops.msr_filter_changed(vcpu);
- 	}
- 
--	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win) {
-+	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-+	    kvm_xen_has_interrupt(vcpu)) {
- 		++vcpu->stat.req_event;
- 		kvm_apic_accept_events(vcpu);
- 		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 17cbb4462b7e..4bc9da9fcfb8 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -176,6 +176,45 @@ void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
- 	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
- }
- 
-+int kvm_xen_has_interrupt(struct kvm_vcpu *v)
-+{
-+	u8 rc = 0;
-+
-+	/*
-+	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
-+	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
-+	 */
-+	if (v->arch.xen.vcpu_info_set && v->kvm->arch.xen.upcall_vector) {
-+		struct gfn_to_hva_cache *ghc = &v->arch.xen.vcpu_info_cache;
-+		struct kvm_memslots *slots = kvm_memslots(v->kvm);
-+		unsigned int offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
-+
-+		/* No need for compat handling here */
-+		BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=
-+			     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
-+		BUILD_BUG_ON(sizeof(rc) !=
-+			     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
-+		BUILD_BUG_ON(sizeof(rc) !=
-+			     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
-+
-+		/*
-+		 * For efficiency, this mirrors the checks for using the valid
-+		 * cache in kvm_read_guest_offset_cached(), but just uses
-+		 * __get_user() instead. And falls back to the slow path.
-+		 */
-+		if (likely(slots->generation == ghc->generation &&
-+			   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
-+			/* Fast path */
-+			__get_user(rc, (u8 __user *)ghc->hva + offset);
-+		} else {
-+			/* Slow path */
-+			kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
-+						      sizeof(rc));
-+		}
-+	}
-+	return rc;
-+}
-+
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- {
- 	struct kvm_vcpu *v;
-@@ -245,6 +284,14 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		v->arch.xen.last_state_ns = ktime_get_ns();
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
-+		if (data->u.vector < 0x10)
-+			return -EINVAL;
-+
-+		kvm->arch.xen.upcall_vector = data->u.vector;
-+		r = 0;
-+		break;
-+
- 	default:
- 		break;
- 	}
-@@ -303,6 +350,11 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		}
- 		break;
- 
-+	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
-+		data->u.vector = kvm->arch.xen.upcall_vector;
-+		r = 0;
-+		break;
-+
- 	default:
- 		break;
- 	}
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index 407e717476d6..d64916ac4a12 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -11,6 +11,7 @@
- 
- void kvm_xen_setup_runstate_page(struct kvm_vcpu *vcpu);
- void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu);
-+int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index e468f923e7dd..f814cccc0d00 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1595,6 +1595,7 @@ struct kvm_xen_hvm_attr {
- 	__u16 pad[3];
- 	union {
- 		__u8 long_mode;
-+		__u8 vector;
- 		struct {
- 			__u64 gfn;
- 		} shared_info;
-@@ -1612,6 +1613,7 @@ struct kvm_xen_hvm_attr {
- #define KVM_XEN_ATTR_TYPE_VCPU_INFO		0x2
- #define KVM_XEN_ATTR_TYPE_VCPU_TIME_INFO	0x3
- #define KVM_XEN_ATTR_TYPE_VCPU_RUNSTATE		0x4
-+#define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x5
- 
- /* Secure Encrypted Virtualization command */
- enum sev_cmd_id {
--- 
-2.29.2
+Why fail? 
 
+Instead, print a warning and  disable the secure-object; which will
+disable your cpu-feature. Guests that do not transition to secure, will
+continue to operate, and guests that transition to secure, will fail.
+
+RP
