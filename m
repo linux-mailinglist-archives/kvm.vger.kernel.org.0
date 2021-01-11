@@ -2,215 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FD182F2421
+	by mail.lfdr.de (Postfix) with ESMTP id 0EF8F2F2420
 	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 01:34:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405520AbhALAZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2405524AbhALAZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 11 Jan 2021 19:25:42 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11626 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390860AbhAKW66 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 17:58:58 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BMWTfE041235;
-        Mon, 11 Jan 2021 17:58:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=rVjaQP4fgVvBR9iD7xY89CE8z2PPJLAcmFwF05lKHqw=;
- b=QDIyANZ+MldXGQlEl/oL3pED/IDwZPU32sHP7T1QRWczFK44WZSilYyJPqd9jzVXZS4N
- UWJClGNypmAg+2Fk4u4uhwS5DsPQLs2eN3Z6TvqnXknsAKsfxzVRqWwDXigxTOyj9vlN
- zLFNFwiIbrrP6S5WMxSsAcbKhEqOctFerBUaVrMuoTYPCtTcQbgQo6TcPg5x73S9Ku8P
- q2UdibJ332crpvNsviyvv+wjvkuETPQJJ9gK5HQIybJwxPDWwzO/O45AYbvxji4+yPV3
- ooFsJ7+QoJjjiYVi79pVJFEgJLcqJM/WwHORLYBo4Ton20UBGdBKuaf9KpRnQqN9LlCg 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 360y93rv9h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 17:58:14 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BMY6xv045482;
-        Mon, 11 Jan 2021 17:58:14 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 360y93rv93-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 17:58:14 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BMqFre028522;
-        Mon, 11 Jan 2021 22:58:12 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdae63-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 22:58:12 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BMw9I745482492
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Jan 2021 22:58:09 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90238A4051;
-        Mon, 11 Jan 2021 22:58:09 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D7BA7A4040;
-        Mon, 11 Jan 2021 22:58:08 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.92.32])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Mon, 11 Jan 2021 22:58:08 +0000 (GMT)
-Date:   Mon, 11 Jan 2021 23:58:06 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 08/15] s390/vfio-ap: sysfs attribute to display the
- guest's matrix
-Message-ID: <20210111235806.5df42658.pasic@linux.ibm.com>
-In-Reply-To: <20201223011606.5265-9-akrowiak@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-9-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390879AbhAKXB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 18:01:59 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D744C061794
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 15:01:15 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id j1so331041pld.3
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 15:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xOPKNqy/+sbhY4IEndRdEvmmTtUbPEVweZlVM1PfEvA=;
+        b=u44tO9OPlRjZKL3SImVA+n+tnToeXY8svGWzY7PZRxycFVDlgThBGHfjLOEGNnmbKk
+         755WLEqRgzjpX6amRZYWGK+0KW+G2NuKzN0x+z8nwI+wJSs2sUHkOaPk+5j+S43ZbH4S
+         jO12rEV09tg44ckeIv/BCZlhlg/41ujryuV40F5vYIciL22M6Xqq3vOYZ3SG3Pe4qUJA
+         3w1pFpKebNtQt3sua/ByHE6jRMybltvhJsptyZ9Ku/aRQ6aOAXxZ6E4l0XF+8FF1DT5V
+         MlOo24QPNzNYoKaF1VVIvORd3ZYcHJ0g18wZu7S4rBZaWSIaajHeBAVGJ5MZg30ceJcG
+         uHEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xOPKNqy/+sbhY4IEndRdEvmmTtUbPEVweZlVM1PfEvA=;
+        b=RxFrVNr+0zXNFBkMwRphCoBNFMLjRDkW3zs9R6vOJ8Nq5K9GGVqmE+vh3cTYDDG9F7
+         JhYsGZNCQMihgt4zzs4GDKl8TsPupre2Je0naX0Ehky6Qk8nsZYc2Z0kU2pKywfyyHjk
+         sv3V+VGOvxV6EipvK07/OTLCXBUNEw6IgP80AntAE69YmbUB3KH+hKsDRiz6OO5XOW+k
+         RF4TfHjKZng/uZ0AKNZuPm9QcKOPteucrqz5KX8g3rfrwFseOlmKhj38g43Cyk3oWhFA
+         haLiZVhiYZyyJl++jeGv3Xys6bqVn6IPf2qyQ4O+ab4Z1q1CTfHZeeBqgvbgHO94pRW3
+         YXzw==
+X-Gm-Message-State: AOAM5301aAVLWdwJYCT8hz0Sdn69jh08TxKkg+WNyJRVo2tceNzG3+KE
+        ROqK/aeTjdooEYOWOPvbRfZDKQ==
+X-Google-Smtp-Source: ABdhPJydGNoJGAYJDTyPYiciKOeziGNqWQ8xAXi3qDj10yzGvHULOj/oIrYKIDIkcVFI4Ri7PR5gYQ==
+X-Received: by 2002:a17:90b:e96:: with SMTP id fv22mr1198135pjb.92.1610406074679;
+        Mon, 11 Jan 2021 15:01:14 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id a29sm689291pfr.73.2021.01.11.15.01.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 15:01:13 -0800 (PST)
+Date:   Mon, 11 Jan 2021 15:01:06 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     syzbot <syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: UBSAN: shift-out-of-bounds in kvm_vcpu_after_set_cpuid
+Message-ID: <X/zYsnfXpd6DT34D@google.com>
+References: <000000000000d5173d05b7097755@google.com>
+ <CALMp9eSKrn0zcmSuOE6GFi400PMgK+yeypS7+prtwBckgdW0vQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-11_32:2021-01-11,2021-01-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 bulkscore=0 suspectscore=0 mlxscore=0 spamscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 phishscore=0
- mlxlogscore=999 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101110122
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eSKrn0zcmSuOE6GFi400PMgK+yeypS7+prtwBckgdW0vQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 20:15:59 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Mon, Jan 11, 2021, Jim Mattson wrote:
+> It looks like userspace can possibly induce this by providing guest
+> CPUID information with a "physical address width" of 64 in leaf
+> 0x80000008.
 
-> The matrix of adapters and domains configured in a guest's APCB may
-> differ from the matrix of adapters and domains assigned to the matrix mdev,
-> so this patch introduces a sysfs attribute to display the matrix of
-> adapters and domains that are or will be assigned to the APCB of a guest
-> that is or will be using the matrix mdev. For a matrix mdev denoted by
-> $uuid, the guest matrix can be displayed as follows:
-> 
->    cat /sys/devices/vfio_ap/matrix/$uuid/guest_matrix
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+It was actually the opposite, where userspace provides '0' and caused '63 - 0 + 1'
+to overflow.  KVM controls the upper bound, and rsvd_bits() explicitly handles
+'end < start', so an absurdly large maxpa is handled correctly.
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Aleady fixed by Paolo in commit 2f80d502d627 ("KVM: x86: fix shift out of bounds
+reported by UBSAN").
 
-But because vfio_ap_mdev_commit_shadow_apcb() is not used (see prev
-patch) the attribute won't show the guest matrix at this point. :(
+> Perhaps cpuid_query_maxphyaddr() should just look at the low 5 bits of
+> CPUID.80000008H:EAX? Better would be to return an error for
+> out-of-range values, but I understand that the kvm community's stance
+> is that, in general, guest CPUID information should not be validated
+> by kvm.
 
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 51 ++++++++++++++++++++++---------
->  1 file changed, 37 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 44b3a81cadfb..1b1d5975ee0e 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -894,29 +894,24 @@ static ssize_t control_domains_show(struct device *dev,
->  }
->  static DEVICE_ATTR_RO(control_domains);
->  
-> -static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
-> -			   char *buf)
-> +static ssize_t vfio_ap_mdev_matrix_show(struct ap_matrix *matrix, char *buf)
->  {
-> -	struct mdev_device *mdev = mdev_from_dev(dev);
-> -	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  	char *bufpos = buf;
->  	unsigned long apid;
->  	unsigned long apqi;
->  	unsigned long apid1;
->  	unsigned long apqi1;
-> -	unsigned long napm_bits = matrix_mdev->matrix.apm_max + 1;
-> -	unsigned long naqm_bits = matrix_mdev->matrix.aqm_max + 1;
-> +	unsigned long napm_bits = matrix->apm_max + 1;
-> +	unsigned long naqm_bits = matrix->aqm_max + 1;
->  	int nchars = 0;
->  	int n;
->  
-> -	apid1 = find_first_bit_inv(matrix_mdev->matrix.apm, napm_bits);
-> -	apqi1 = find_first_bit_inv(matrix_mdev->matrix.aqm, naqm_bits);
-> -
-> -	mutex_lock(&matrix_dev->lock);
-> +	apid1 = find_first_bit_inv(matrix->apm, napm_bits);
-> +	apqi1 = find_first_bit_inv(matrix->aqm, naqm_bits);
->  
->  	if ((apid1 < napm_bits) && (apqi1 < naqm_bits)) {
-> -		for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, napm_bits) {
-> -			for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
-> +		for_each_set_bit_inv(apid, matrix->apm, napm_bits) {
-> +			for_each_set_bit_inv(apqi, matrix->aqm,
->  					     naqm_bits) {
->  				n = sprintf(bufpos, "%02lx.%04lx\n", apid,
->  					    apqi);
-> @@ -925,25 +920,52 @@ static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
->  			}
->  		}
->  	} else if (apid1 < napm_bits) {
-> -		for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, napm_bits) {
-> +		for_each_set_bit_inv(apid, matrix->apm, napm_bits) {
->  			n = sprintf(bufpos, "%02lx.\n", apid);
->  			bufpos += n;
->  			nchars += n;
->  		}
->  	} else if (apqi1 < naqm_bits) {
-> -		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, naqm_bits) {
-> +		for_each_set_bit_inv(apqi, matrix->aqm, naqm_bits) {
->  			n = sprintf(bufpos, ".%04lx\n", apqi);
->  			bufpos += n;
->  			nchars += n;
->  		}
->  	}
->  
-> +	return nchars;
-> +}
-> +
-> +static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
-> +			   char *buf)
-> +{
-> +	ssize_t nchars;
-> +	struct mdev_device *mdev = mdev_from_dev(dev);
-> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
-> +
-> +	mutex_lock(&matrix_dev->lock);
-> +	nchars = vfio_ap_mdev_matrix_show(&matrix_mdev->matrix, buf);
->  	mutex_unlock(&matrix_dev->lock);
->  
->  	return nchars;
->  }
->  static DEVICE_ATTR_RO(matrix);
->  
-> +static ssize_t guest_matrix_show(struct device *dev,
-> +				 struct device_attribute *attr, char *buf)
-> +{
-> +	ssize_t nchars;
-> +	struct mdev_device *mdev = mdev_from_dev(dev);
-> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
-> +
-> +	mutex_lock(&matrix_dev->lock);
-> +	nchars = vfio_ap_mdev_matrix_show(&matrix_mdev->shadow_apcb, buf);
-> +	mutex_unlock(&matrix_dev->lock);
-> +
-> +	return nchars;
-> +}
-> +static DEVICE_ATTR_RO(guest_matrix);
-> +
->  static struct attribute *vfio_ap_mdev_attrs[] = {
->  	&dev_attr_assign_adapter.attr,
->  	&dev_attr_unassign_adapter.attr,
-> @@ -953,6 +975,7 @@ static struct attribute *vfio_ap_mdev_attrs[] = {
->  	&dev_attr_unassign_control_domain.attr,
->  	&dev_attr_control_domains.attr,
->  	&dev_attr_matrix.attr,
-> +	&dev_attr_guest_matrix.attr,
->  	NULL,
->  };
->  
-
+And rob Paolo of his crazy^Wbrilliant bit math shenanigans? :-D
