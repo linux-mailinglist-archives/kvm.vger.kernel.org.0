@@ -2,174 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A29A2F2040
-	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:00:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDF3A2F20C9
+	for <lists+kvm@lfdr.de>; Mon, 11 Jan 2021 21:29:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404084AbhAKT7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 14:59:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21696 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731772AbhAKT7m (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 14:59:42 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10BJgskZ196225;
-        Mon, 11 Jan 2021 14:58:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- message-id : reply-to : references : mime-version : content-type :
- in-reply-to : subject; s=pp1;
- bh=HlnbdNAo/94mEI3tW5H4udb4sNucEjNi1gf15FFs+2g=;
- b=WOtrlOc2dHAfPVKG8WVaHzwIXAhGWs9l+IRZw9edGTWr5UKnBx6L7JXGUFbHapsskZss
- tR2l6eRZkh3Vi/rZZZfMypAc4NlyVQL4HtmJiBS+xjgAzCXNqPQE7qXHzH4qeWLTaELy
- 82lpx0/kkutbP5YTfMbVO9s2Mn4ypsK8woa4ql+rMrQruOJ4mILZqzAGh+WsZS6IRwYx
- JqjPZHJV/Mvg6a/2pYhGeStDnKxsYpm9eOEjm6BcVj6mBzJ4eqBQLwaKDwCSobnF0K/A
- 3aargxd8gv6rl8C6scmVFL+11vaPAVmDGoF6OnJWsWcSOMfyDe7t3Y9oJvV7CRshSrTu UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 360w2sgaqx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 14:58:44 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10BJhLWa000880;
-        Mon, 11 Jan 2021 14:58:44 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 360w2sgaqd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 14:58:44 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10BJwg2x025212;
-        Mon, 11 Jan 2021 19:58:42 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 35y4489br1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 11 Jan 2021 19:58:42 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10BJwd8x43319708
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 11 Jan 2021 19:58:39 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D668AE053;
-        Mon, 11 Jan 2021 19:58:39 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D80EAE051;
-        Mon, 11 Jan 2021 19:58:33 +0000 (GMT)
-Received: from ram-ibm-com.ibm.com (unknown [9.163.29.145])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 11 Jan 2021 19:58:33 +0000 (GMT)
-Date:   Mon, 11 Jan 2021 11:58:30 -0800
-From:   Ram Pai <linuxram@us.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
-        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
-        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        dgilbert@redhat.com, qemu-s390x@nongnu.org, rth@twiddle.net,
-        berrange@redhat.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Message-ID: <20210111195830.GA23898@ram-ibm-com.ibm.com>
-Reply-To: Ram Pai <linuxram@us.ibm.com>
-References: <20201217054736.GH310465@yekko.fritz.box>
- <20201217123842.51063918.cohuck@redhat.com>
- <20201217151530.54431f0e@bahia.lan>
- <20201218124111.4957eb50.cohuck@redhat.com>
- <20210104071550.GA22585@ram-ibm-com.ibm.com>
- <20210104134629.49997b53.pasic@linux.ibm.com>
- <20210104184026.GD4102@ram-ibm-com.ibm.com>
- <20210105115614.7daaadd6.pasic@linux.ibm.com>
- <20210105204125.GE4102@ram-ibm-com.ibm.com>
- <20210111175914.13adfa2e.cohuck@redhat.com>
+        id S1730520AbhAKU3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 15:29:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730079AbhAKU3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 15:29:20 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8192C061794
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:28:40 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id v3so92554plz.13
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 12:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=iI1rIqMfwu1P4fzKj9/kRKSVEqcKsOkLrborReGYEMY=;
+        b=n//tBuPfufjrPGNJXimcbOspw3o6JHeeJgul4/wExnnP7yEohCopxZJdpmS/N3xGs1
+         jC12nWIQusxHhtJaHdbXXugkwhS25diUWmISXfKnFmqbWTcm5Ybdvgc9ngrbkYGmFn+3
+         aznnz9kqMDwRIitTKgPuRdQNyWzpWHYJl/s2Nl8MPUVV3A3RrBtUQXQqjW5LieB67Ysq
+         8qYGk7jD76Qmpe6o9nIoysK/O6Ct94Gr6NNbTsL7kfWMQUXzxeHWRDaDQmjmuMGR/7dU
+         J6MQB6BauelnswIQQax5lnYo+P2d1CntVXjxAo5bQsp3DFsWGm2gGjFe3NAwPYX2s3oB
+         3ikw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=iI1rIqMfwu1P4fzKj9/kRKSVEqcKsOkLrborReGYEMY=;
+        b=VWKJnoRUQ4QPf7XpWBtftwSgqnaAC4A73uYoet1KPI3D510CyZ0lFFdzE5j18OJmUZ
+         unGSICcLHgrBLZOVINWIXqhOuGXh8weO80h+WjAMiPqFtAGfvljwRcrM8OkfMZInqJQJ
+         UnD4xLLI7cEAzYWsOOsdEbarbILfXbIXuqlmh+mNDEqZruf9i7EcxCR5HEL2wRLvE/ee
+         A5i4gEHnwk2uPGL/+UGYhAUVXuaqHAcL1jej37POLxsY/nUDjXy7qbDO1yaQ4bc5a+Fk
+         gP9lT1H8Zzo+x1uuVQT6bGzFqdSrOgsOkxcbkzvWPKdNYDQc/GzCP3GX5qshcCxVPDZY
+         SzVw==
+X-Gm-Message-State: AOAM532PJNzxHYbUUPzNLshAzGIzZ92n2vDkaBrjI09SVWo+/y21xtDC
+        Z7XcH4tMZtAdjXtuZCaJ0Qe4WA==
+X-Google-Smtp-Source: ABdhPJxLa4YAAAAxOU0c3cvwB++tHRjVUn4t6n6xS0vZyxzTZIdEn4q2B+D/klf5X3Ttp7TLsNfY2w==
+X-Received: by 2002:a17:902:ee11:b029:db:c0d6:581a with SMTP id z17-20020a170902ee11b02900dbc0d6581amr1069008plb.54.1610396920141;
+        Mon, 11 Jan 2021 12:28:40 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id w18sm471444pfj.120.2021.01.11.12.28.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Jan 2021 12:28:39 -0800 (PST)
+Date:   Mon, 11 Jan 2021 12:28:32 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH 06/13] x86/sev: Rename global "sev_enabled" flag to
+ "sev_guest"
+Message-ID: <X/y08JZkm/+TJCHr@google.com>
+References: <20210109004714.1341275-1-seanjc@google.com>
+ <20210109004714.1341275-7-seanjc@google.com>
+ <f6ed8566-6521-92f0-927e-1764d8074ce6@amd.com>
+ <5b3a5d5e-befe-8be2-bbc4-7e7a8ebbe316@amd.com>
+ <X/yRxYCrEuaq2oVX@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210111175914.13adfa2e.cohuck@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-TM-AS-GCONF: 00
-Subject: RE: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-11_30:2021-01-11,2021-01-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 malwarescore=0 adultscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101110105
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <X/yRxYCrEuaq2oVX@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021 at 05:59:14PM +0100, Cornelia Huck wrote:
-> On Tue, 5 Jan 2021 12:41:25 -0800
-> Ram Pai <linuxram@us.ibm.com> wrote:
-> 
-> > On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
-> > > On Mon, 4 Jan 2021 10:40:26 -0800
-> > > Ram Pai <linuxram@us.ibm.com> wrote:
-> 
-> > > > The main difference between my proposal and the other proposal is...
+On Mon, Jan 11, 2021, Sean Christopherson wrote:
+> On Mon, Jan 11, 2021, Tom Lendacky wrote:
+> > On 1/11/21 10:02 AM, Tom Lendacky wrote:
+> > > On 1/8/21 6:47 PM, Sean Christopherson wrote:
+> > > > Use "guest" instead of "enabled" for the global "running as an SEV guest"
+> > > > flag to avoid confusion over whether "sev_enabled" refers to the guest or
+> > > > the host.  This will also allow KVM to usurp "sev_enabled" for its own
+> > > > purposes.
 > > > > 
-> > > >   In my proposal the guest makes the compatibility decision and acts
-> > > >   accordingly.  In the other proposal QEMU makes the compatibility
-> > > >   decision and acts accordingly. I argue that QEMU cannot make a good
-> > > >   compatibility decision, because it wont know in advance, if the guest
-> > > >   will or will-not switch-to-secure.
-> > > >   
+> > > > No functional change intended.
+> > > > 
+> > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > > > 
-> > > You have a point there when you say that QEMU does not know in advance,
-> > > if the guest will or will-not switch-to-secure. I made that argument
-> > > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
-> > > was to flip that property on demand when the conversion occurs. David
-> > > explained to me that this is not possible for ppc, and that having the
-> > > "securable-guest-memory" property (or whatever the name will be)
-> > > specified is a strong indication, that the VM is intended to be used as
-> > > a secure VM (thus it is OK to hurt the case where the guest does not
-> > > try to transition). That argument applies here as well.  
+> > > Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 > > 
-> > As suggested by Cornelia Huck, what if QEMU disabled the
-> > "securable-guest-memory" property if 'must-support-migrate' is enabled?
-> > Offcourse; this has to be done with a big fat warning stating
-> > "secure-guest-memory" feature is disabled on the machine.
-> > Doing so, will continue to support guest that do not try to transition.
-> > Guest that try to transition will fail and terminate themselves.
+> > Ah, I tried building with CONFIG_KVM=y and CONFIG_KVM_AMD=y and got a build
+> > error:
+> > 
+> > In file included from arch/x86/kvm/svm/svm.c:43:
+> > arch/x86/kvm/svm/svm.h:222:20: error: ‘sev_guest’ redeclared as different
+> > kind of symbol
 > 
-> Just to recap the s390x situation:
-> 
-> - We currently offer a cpu feature that indicates secure execution to
->   be available to the guest if the host supports it.
-> - When we introduce the secure object, we still need to support
->   previous configurations and continue to offer the cpu feature, even
->   if the secure object is not specified.
-> - As migration is currently not supported for secured guests, we add a
->   blocker once the guest actually transitions. That means that
->   transition fails if --only-migratable was specified on the command
->   line. (Guests not transitioning will obviously not notice anything.)
-> - With the secure object, we will already fail starting QEMU if
->   --only-migratable was specified.
-> 
-> My suggestion is now that we don't even offer the cpu feature if
-> --only-migratable has been specified. For a guest that does not want to
-> transition to secure mode, nothing changes; a guest that wants to
-> transition to secure mode will notice that the feature is not available
-> and fail appropriately (or ultimately, when the ultravisor call fails).
+> Dang, didn't consider that scenario, obviously.  The irony of introducing a
+> conflict while trying to avoid conflicts...
 
-
-On POWER, secure-execution is not **automatically** enabled even when
-the host supports it.  The feature is enabled only if the secure-object
-is configured, and the host supports it.
-
-However the behavior proposed above will be consistent on POWER and
-on s390x,  when '--only-migratable' is specified and 'secure-object'
-is NOT specified.
-
-So I am in agreement till now. 
-
-
-> We'd still fail starting QEMU for the secure object + --only-migratable
-> combination.
-
-Why fail? 
-
-Instead, print a warning and  disable the secure-object; which will
-disable your cpu-feature. Guests that do not transition to secure, will
-continue to operate, and guests that transition to secure, will fail.
-
-RP
+Even better than coming up with a new name, sev_enabled can be removed entirely
+as it's really just sev_active() stored in a separate bool.
