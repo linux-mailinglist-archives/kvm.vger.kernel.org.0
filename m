@@ -2,208 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 958FF2F3D81
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BFD12F3DC8
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437997AbhALVhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 16:37:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42090 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2437153AbhALVWg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 16:22:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610486469;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XLFSIDj1yb2peaSE/tJnoIhEfZLTdfvc3qPuS09xnb4=;
-        b=aOA6mbXx8q22kdfZubzGFTER47drgElw8/KWqedpi/UgCb76Rdcn8EISnapG+8e8pEFdxH
-        GduGKhN9O+cLEvTkbXmbb/K1OOzM36NwH+AsJ2Yabns+MWeAcQvcaTkAhZ0HKWjUcstCYa
-        pOqZsjNgLScEXtWQIMstjjYL2VxOPaY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-Zwx1QS4kPn2XRswLQlixLA-1; Tue, 12 Jan 2021 16:21:05 -0500
-X-MC-Unique: Zwx1QS4kPn2XRswLQlixLA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9A3B107ACF7;
-        Tue, 12 Jan 2021 21:21:01 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0D29CA0;
-        Tue, 12 Jan 2021 21:20:59 +0000 (UTC)
-Date:   Tue, 12 Jan 2021 14:20:59 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: Re: [PATCH 1/5] vfio/iommu_type1: Fixes vfio_dma_populate_bitmap to
- avoid dirty lose
-Message-ID: <20210112142059.074c1b0f@omen.home.shazbot.org>
-In-Reply-To: <20210107092901.19712-2-zhukeqian1@huawei.com>
-References: <20210107092901.19712-1-zhukeqian1@huawei.com>
-        <20210107092901.19712-2-zhukeqian1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1732066AbhALVqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 16:46:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731990AbhALVn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 16:43:58 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A48EC0617A9
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:42:58 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id t17so51581qvv.17
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=U+CbYhEX3bk6CbEgkAzVDMsXIsxbjmYTO8NB12RiUfg=;
+        b=ZYv6sEPqBHAArWWsUp2QL2JuEOAXcxNJ/TbleUpNix3Zom4HvsFXD6eBgs0/JiuL8S
+         RcC1e//0CvYuIWl8eVu13IUXE/CsevnVnke/u6pKoUh8iiHXOER4VvVQafnlPnmlAft8
+         IPP4Z4TjBYoZLIA6As9ZWQ3/6zwgdW1r/QykaNd0NxkuFhTYSFysEDk58A8TKx8oCI+4
+         niiR71NrYJaivrHtLYhDIPWFeH4AHZhSo8YIrSKNB19Oq8kd94F/lH+OGNbCfTSoPYIe
+         fJ8FVeeiInuJ3Tlo0Ydy1IEQ4MNRWlX3hErJuv9pGKd75FQd+Htl2xNJa6mB45RXHbDK
+         5RGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=U+CbYhEX3bk6CbEgkAzVDMsXIsxbjmYTO8NB12RiUfg=;
+        b=F13pz6H6g1R1vI0RaGR1ZWwMqcc6VZr79ygJ5Wi7hFjbgq8LcArOwfQoVUod3u3WKR
+         X+Bp8v4pxPsPeuQoprQ9oYXi8Io4DCTI9q9nP/nWjHG6nUmSuAu4s9cH7lXj+Buw3Z1F
+         8ltVFaXotdvlAGMOWRwlGyi7AIo6Bbh0QwDOxFVa8fYHkd1fUx5KfQc9WcSc3mw3a/Sk
+         wDqzkIf8kg9Zjn11X8VG++sRS3yIPdPZhsH7T/oVLUf9a+9f/d18/N9UzSEX4AEKEEB5
+         j6pNPz3sHHZdlHTV1vjYrCQihto7qmx+AlDElLeqSX9Ru1/pH8viI4zc62aZ0ZDGaKby
+         cyFw==
+X-Gm-Message-State: AOAM531p0sC1mFsMHhivVpZCx4pYUty9wAkh5xRrp6r4l2y0bE9NNyT5
+        3OE5hDeEfJm4BpuTkEckfI9NmtudFrin
+X-Google-Smtp-Source: ABdhPJwcwZH2KZ2pN7t1zlwuuRyYOL6A378R4xORgoSVJhlmFt3unwT0CSROZTnrTQpMBKu6C2QJNlR2YppO
+Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
+X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
+ (user=bgardon job=sendgmr) by 2002:a0c:da87:: with SMTP id
+ z7mr1679434qvj.41.1610487777488; Tue, 12 Jan 2021 13:42:57 -0800 (PST)
+Date:   Tue, 12 Jan 2021 13:42:47 -0800
+Message-Id: <20210112214253.463999-1-bgardon@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
+Subject: [PATCH 0/6] KVM: selftests: Perf test cleanups and memslot
+ modification test
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Thomas Huth <thuth@redhat.com>, Jacob Xu <jacobhxu@google.com>,
+        Makarand Sonare <makarandsonare@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 7 Jan 2021 17:28:57 +0800
-Keqian Zhu <zhukeqian1@huawei.com> wrote:
+This series contains a few cleanups that didn't make it into previous
+series, including some cosmetic changes and small bug fixes. The series
+also lays the groundwork for a memslot modification test which stresses
+the memslot update and page fault code paths in an attempt to expose races.
 
-> Defer checking whether vfio_dma is of fully-dirty in update_user_bitmap
-> is easy to lose dirty log. For example, after promoting pinned_scope of
-> vfio_iommu, vfio_dma is not considered as fully-dirty, then we may lose
-> dirty log that occurs before vfio_iommu is promoted.
->
-> The key point is that pinned-dirty is not a real dirty tracking way, it
-> can't continuously track dirty pages, but just restrict dirty scope. It
-> is essentially the same as fully-dirty. Fully-dirty is of full-scope and
-> pinned-dirty is of pinned-scope.
-> 
-> So we must mark pinned-dirty or fully-dirty after we start dirty tracking
-> or clear dirty bitmap, to ensure that dirty log is marked right away.
+Tested: dirty_log_perf_test, memslot_modification_stress_test, and
+	demand_paging_test were run, with all the patches in this series
+	applied, on an Intel Skylake machine.
 
-I was initially convinced by these first three patches, but upon
-further review, I think the premise is wrong.  AIUI, the concern across
-these patches is that our dirty bitmap is only populated with pages
-dirtied by pinning and we only take into account the pinned page dirty
-scope at the time the bitmap is retrieved by the user.  You suppose
-this presents a gap where if a vendor driver has not yet identified
-with a page pinning scope that the entire bitmap should be considered
-dirty regardless of whether that driver later pins pages prior to the
-user retrieving the dirty bitmap.
+	echo Y > /sys/module/kvm/parameters/tdp_mmu; \
+	./memslot_modification_stress_test -i 1000 -v 64 -b 1G; \
+	./memslot_modification_stress_test -i 1000 -v 64 -b 64M -o; \
+	./dirty_log_perf_test -v 64 -b 1G; \
+	./dirty_log_perf_test -v 64 -b 64M -o; \
+	./demand_paging_test -v 64 -b 1G; \
+	./demand_paging_test -v 64 -b 64M -o; \
+	echo N > /sys/module/kvm/parameters/tdp_mmu; \
+	./memslot_modification_stress_test -i 1000 -v 64 -b 1G; \
+	./memslot_modification_stress_test -i 1000 -v 64 -b 64M -o; \
+	./dirty_log_perf_test -v 64 -b 1G; \
+	./dirty_log_perf_test -v 64 -b 64M -o; \
+	./demand_paging_test -v 64 -b 1G; \
+	./demand_paging_test -v 64 -b 64M -o
 
-I don't think this is how we intended the cooperation between the iommu
-driver and vendor driver to work.  By pinning pages a vendor driver is
-not declaring that only their future dirty page scope is limited to
-pinned pages, instead they're declaring themselves as a participant in
-dirty page tracking and take responsibility for pinning any necessary
-pages.  For example we might extend VFIO_IOMMU_DIRTY_PAGES_FLAG_START
-to trigger a blocking notification to groups to not only begin dirty
-tracking, but also to synchronously register their current device DMA
-footprint.  This patch would require a vendor driver to possibly perform
-a gratuitous page pinning in order to set the scope prior to dirty
-logging being enabled, or else the initial bitmap will be fully dirty.
+	The tests behaved as expected, and fixed the problem of the
+	population stage being skipped in dirty_log_perf_test. This can be
+	seen in the output, with the population stage taking about the time
+	dirty pass 1 took and dirty pass 1 falling closer to the times for
+	the other passes.
 
-Therefore, I don't see that this series is necessary or correct.  Kirti,
-does this match your thinking?
+Note that when running these tests, the -o option causes the test to take
+much longer as the work each vCPU must do increases proportional to the
+number of vCPUs.
 
-Thinking about these semantics, it seems there might still be an issue
-if a group with non-pinned-page dirty scope is detached with dirty
-logging enabled.  It seems this should in fact fully populate the dirty
-bitmaps at the time it's removed since we don't know the extent of its
-previous DMA, nor will the group be present to trigger the full bitmap
-when the user retrieves the dirty bitmap.  Creating fully populated
-bitmaps at the time tracking is enabled negates our ability to take
-advantage of later enlightenment though.  Thanks,
+You can view this series in Gerrit at:
+https://linux-review.googlesource.com/c/linux/kernel/git/torvalds/linux/+/7216
 
-Alex
+Ben Gardon (6):
+  KVM: selftests: Rename timespec_diff_now to timespec_elapsed
+  KVM: selftests: Avoid flooding debug log while populating memory
+  KVM: selftests: Convert iterations to int in dirty_log_perf_test
+  KVM: selftests: Fix population stage in dirty_log_perf_test
+  KVM: selftests: Add option to overlap vCPU memory access
+  KVM: selftests: Add memslot modification stress test
 
-> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++++++++++++++-----------
->  1 file changed, 22 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index bceda5e8baaa..b0a26e8e0adf 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -224,7 +224,7 @@ static void vfio_dma_bitmap_free(struct vfio_dma *dma)
->  	dma->bitmap = NULL;
->  }
->  
-> -static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
-> +static void vfio_dma_populate_bitmap_pinned(struct vfio_dma *dma, size_t pgsize)
->  {
->  	struct rb_node *p;
->  	unsigned long pgshift = __ffs(pgsize);
-> @@ -236,6 +236,25 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
->  	}
->  }
->  
-> +static void vfio_dma_populate_bitmap_full(struct vfio_dma *dma, size_t pgsize)
-> +{
-> +	unsigned long pgshift = __ffs(pgsize);
-> +	unsigned long nbits = dma->size >> pgshift;
-> +
-> +	bitmap_set(dma->bitmap, 0, nbits);
-> +}
-> +
-> +static void vfio_dma_populate_bitmap(struct vfio_iommu *iommu,
-> +				     struct vfio_dma *dma)
-> +{
-> +	size_t pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> +
-> +	if (iommu->pinned_page_dirty_scope)
-> +		vfio_dma_populate_bitmap_pinned(dma, pgsize);
-> +	else if (dma->iommu_mapped)
-> +		vfio_dma_populate_bitmap_full(dma, pgsize);
-> +}
-> +
->  static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
->  {
->  	struct rb_node *n;
-> @@ -257,7 +276,7 @@ static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu)
->  			}
->  			return ret;
->  		}
-> -		vfio_dma_populate_bitmap(dma, pgsize);
-> +		vfio_dma_populate_bitmap(iommu, dma);
->  	}
->  	return 0;
->  }
-> @@ -987,13 +1006,6 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->  	unsigned long shift = bit_offset % BITS_PER_LONG;
->  	unsigned long leftover;
->  
-> -	/*
-> -	 * mark all pages dirty if any IOMMU capable device is not able
-> -	 * to report dirty pages and all pages are pinned and mapped.
-> -	 */
-> -	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
-> -		bitmap_set(dma->bitmap, 0, nbits);
-> -
->  	if (shift) {
->  		bitmap_shift_left(dma->bitmap, dma->bitmap, shift,
->  				  nbits + shift);
-> @@ -1019,7 +1031,6 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->  	struct vfio_dma *dma;
->  	struct rb_node *n;
->  	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-> -	size_t pgsize = (size_t)1 << pgshift;
->  	int ret;
->  
->  	/*
-> @@ -1055,7 +1066,7 @@ static int vfio_iova_dirty_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
->  		 * pages which are marked dirty by vfio_dma_rw()
->  		 */
->  		bitmap_clear(dma->bitmap, 0, dma->size >> pgshift);
-> -		vfio_dma_populate_bitmap(dma, pgsize);
-> +		vfio_dma_populate_bitmap(iommu, dma);
->  	}
->  	return 0;
->  }
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/demand_paging_test.c        |  40 +++-
+ .../selftests/kvm/dirty_log_perf_test.c       |  72 +++---
+ .../selftests/kvm/include/perf_test_util.h    |   4 +-
+ .../testing/selftests/kvm/include/test_util.h |   2 +-
+ .../selftests/kvm/lib/perf_test_util.c        |  25 ++-
+ tools/testing/selftests/kvm/lib/test_util.c   |   2 +-
+ .../kvm/memslot_modification_stress_test.c    | 211 ++++++++++++++++++
+ 9 files changed, 307 insertions(+), 51 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/memslot_modification_stress_test.c
+
+-- 
+2.30.0.284.gd98b1dd5eaa7-goog
 
