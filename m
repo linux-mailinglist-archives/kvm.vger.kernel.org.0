@@ -2,110 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1C432F3630
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:53:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFF672F363A
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:55:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404194AbhALQvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 11:51:09 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9532 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729923AbhALQvI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 11:51:08 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CGjLKb116183;
-        Tue, 12 Jan 2021 11:50:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=+xDJ/GwXzqZnZwWAa2hTpBrf6xeezV+MBDuicE0JjlQ=;
- b=JPuFuNr8vASY2+cmA/WpN4fKyt9oTubScEL07X58eYPhHl4WDNx1R6cAnzO5X0p+2pYf
- Rs4MvFQDfdzUHyIPAEjbqxBByVBB6HgTYYvq1q89JY5tchuLrn2+Ez2nubsqqSgGQ6jw
- FlwFz7iD4ET4rG5pnIGsGsUqWQynLys6dvZmo7Cqu+e8K95bSsu02naueBNDBCcI5zsD
- R/Gc85ns3T8X9ICMOh4L4CfY9CbIteRt87a0pda21fbGbT2+ZlyLMGRSYpKudu0noIhA
- CcTu5K1FHotXujSeOWaeQSXruquNYwN63ScZlQQ5AcZzx2JW035zs9sMpHSf6b4vSmjp qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 361fjp03bh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 11:50:26 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CGm0n4121443;
-        Tue, 12 Jan 2021 11:50:26 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 361fjp03ag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 11:50:26 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CGmCDY019800;
-        Tue, 12 Jan 2021 16:50:24 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdbgc8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 16:50:24 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CGoGF731588636
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Jan 2021 16:50:16 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7FC805204F;
-        Tue, 12 Jan 2021 16:50:21 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.60.135])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id BF42852052;
-        Tue, 12 Jan 2021 16:50:20 +0000 (GMT)
-Date:   Tue, 12 Jan 2021 17:50:19 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 10/15] s390/zcrypt: driver callback to indicate
- resource in use
-Message-ID: <20210112175019.3e8de88c.pasic@linux.ibm.com>
-In-Reply-To: <20201223011606.5265-11-akrowiak@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-11-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S2390816AbhALQys (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 11:54:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40010 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390516AbhALQys (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 11:54:48 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57D5AC061795
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 08:54:07 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id b5so2048444pjk.2
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 08:54:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BvNPTfqT/5f4cwjyqGfBMaYw7woP/GveWw32QYUqvjQ=;
+        b=m8vzTv31OLpB/Cx5Y7zqFtD1Mg1Ek0UYCQUnr2j8V7D+AXHUCqTa/U5XPzKqj56C1A
+         KBQb7IbW9vKAUk11kd/UY2LKV4ipQijWbWIOShsmgx+Y0TWrzXgKtz+C3eeybAeZ5Bjw
+         2/Mi2/orPtgb6Ezypwnixca4ZUv2FPG6xyKU9Zzry9TA7EwxugDm0HCqeZdBbTv42ziZ
+         1uKFv5F9SzNVPL+ksK08s5q/Gp16+78QSSROeE+/YoG+Z6Y0C13LgnR40ua+ilJ8uFXf
+         i1w7ED7IlE6sOnGL3yfMYWFVmcXFwPxFEMisoFK/3a+XAhYUaeZWODvqj+oSC9VaT9GK
+         C6XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BvNPTfqT/5f4cwjyqGfBMaYw7woP/GveWw32QYUqvjQ=;
+        b=PcM5BVdIb6IflTnPgRdon3U+am0HTw/mHZylErkziaOwgNM7HePI4pMNhoBb+fhkUX
+         5u6HvezmBrbReFlkx0CgY8MlcH5pVQkZMtMwfGLJvFQHRw/BXkIDGVdYbq6MRBAaT9vz
+         wjIF82cLXml23vvveYCCvx0noRS6yyTl0KDFO5VO+dArrQJxPdic72SErL05Hy6/I99B
+         zfa6r4rkgTRHgWUdgVK5AWZXRcq99Nm09ooxKrjiZvNS618I3nY6k5ZT3qHs8v0d/UER
+         rLSmuLVY9NESiE6OLWL7xDq7LdfmP6NmjW1rlh2aQ7YwkqX645CGtgn06JxQ1vyzYg0/
+         I2qw==
+X-Gm-Message-State: AOAM532iUu24jjiYaa4wTkJ+pHL5+Ljp5mMlIKPWZXcf79p8W2mREqr3
+        4/nrwgr9CXtUX8zzlHzwcw8xRQ==
+X-Google-Smtp-Source: ABdhPJyDT2FjXRhiezNWphPPvJWhCSrfs/NCvloIzCEVdKgu+rtZoKa3mNCAs3vrPbn9eMtLMSYZQQ==
+X-Received: by 2002:a17:902:ee83:b029:da:3483:3957 with SMTP id a3-20020a170902ee83b02900da34833957mr92959pld.38.1610470446670;
+        Tue, 12 Jan 2021 08:54:06 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 21sm3742730pfx.84.2021.01.12.08.54.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 08:54:05 -0800 (PST)
+Date:   Tue, 12 Jan 2021 08:53:59 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        syzbot <syzbot+e87846c48bf72bc85311@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: UBSAN: shift-out-of-bounds in kvm_vcpu_after_set_cpuid
+Message-ID: <X/3UJ7EtyAb2Ww+6@google.com>
+References: <000000000000d5173d05b7097755@google.com>
+ <CALMp9eSKrn0zcmSuOE6GFi400PMgK+yeypS7+prtwBckgdW0vQ@mail.gmail.com>
+ <X/zYsnfXpd6DT34D@google.com>
+ <f1aa1f3c-1dac-2357-ee1c-ab505513382f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-12_12:2021-01-12,2021-01-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- mlxscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- malwarescore=0 spamscore=0 bulkscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101120091
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1aa1f3c-1dac-2357-ee1c-ab505513382f@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 20:16:01 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> Introduces a new driver callback to prevent a root user from unbinding
-> an AP queue from its device driver if the queue is in use. The callback
-> will be invoked whenever a change to the AP bus's sysfs apmask or aqmask
-> attributes would result in one or more AP queues being removed from its
-> driver. If the callback responds in the affirmative for any driver
-> queried, the change to the apmask or aqmask will be rejected with a device
-> busy error.
+On Tue, Jan 12, 2021, Paolo Bonzini wrote:
+> On 12/01/21 00:01, Sean Christopherson wrote:
+> > > Perhaps cpuid_query_maxphyaddr() should just look at the low 5 bits of
+> > > CPUID.80000008H:EAX?
 > 
-> For this patch, only non-default drivers will be queried. Currently,
-> there is only one non-default driver, the vfio_ap device driver. The
-> vfio_ap device driver facilitates pass-through of an AP queue to a
-> guest. The idea here is that a guest may be administered by a different
-> sysadmin than the host and we don't want AP resources to unexpectedly
-> disappear from a guest's AP configuration (i.e., adapters and domains
-> assigned to the matrix mdev). This will enforce the proper procedure for
-> removing AP resources intended for guest usage which is to
-> first unassign them from the matrix mdev, then unbind them from the
-> vfio_ap device driver.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+> The low 6 bits I guess---yes, that would make sense and it would have also
+> fixed the bug.
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+No, that wouldn't have fixed this specific bug.  In this case, the issue was
+CPUID.80000008H:AL == 0; masking off bits 7:6 wouldn't have changed anything.
+
+And, masking bits 7:6 is architecturally wrong.  Both the SDM and APM state that
+bits 7:0 contain the number of PA bits.
+
+KVM could reject guest.MAXPA > host.MAXPA, but arbitrarily dropping bits would
+be wrong.
