@@ -2,72 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF4F52F2418
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 01:34:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 943B92F23ED
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 01:34:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404261AbhALAZo convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 11 Jan 2021 19:25:44 -0500
-Received: from mga12.intel.com ([192.55.52.136]:62818 "EHLO mga12.intel.com"
+        id S1727853AbhALA1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 19:27:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40996 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404265AbhALAU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 19:20:29 -0500
-IronPort-SDR: DwR2lQaDFogLqE8ijp8sI3PNfS5jvXGUHNYhsEq5/a5Xvbaoftjtm++xaBIOWjtb66oaL3madS
- JoZSpU57DAoQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="157137541"
-X-IronPort-AV: E=Sophos;i="5.79,339,1602572400"; 
-   d="scan'208";a="157137541"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 16:19:48 -0800
-IronPort-SDR: aqdBNyn52akoW8rjvnjp++hTANTqiRH7IXlyDIrYsT4y7Jq/9nx53iDsD2wTG0am1aiwYYx1+B
- CDOD6AZ4xOEQ==
-X-IronPort-AV: E=Sophos;i="5.79,339,1602572400"; 
-   d="scan'208";a="567336276"
-Received: from edelafu-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.142.150])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 16:19:45 -0800
-Date:   Tue, 12 Jan 2021 13:19:44 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 01/23] x86/sgx: Split out adding EPC page to free
- list to separate helper
-Message-Id: <20210112131944.9d69bb30cf4b94b6f6f25e7b@intel.com>
-In-Reply-To: <31681b840aac59a8d8dcb05f2356d25cf09e1f11.camel@kernel.org>
+        id S1726398AbhALA1a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 19:27:30 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2746C22D49;
+        Tue, 12 Jan 2021 00:26:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610411209;
+        bh=8SIf2TTWWqiqMK2vhuQElzWPcH4QmiAT927JgE3F9pY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZbuLkPOEQ7Z0M0dW4uCvQ+VZkToYdSAKRInDXg0q8a+BwEvF58POEo+rcr/8oCl7e
+         /BaANW16zOBslYMMy3ASNWC7UunHi5gfDc9OVsLbX6H1Y1iYMIegT8LEipE+CaA+7n
+         rvcQKxOqKBXAMTNRMc4OWQEP4itC4GtYRKwUjvEfWiefTMBcG1GQmpsmIkktF6NH4c
+         1bZFxv1vsxAmWRLfkwZGV7jL8MgHxqlc6USly0pn6ga58nQoqeum7bUVRXaBjQGgQD
+         /sYoI2Bo9/adUKcqxDtcAfcpVFLS6XVBLr+M5hqI45i9JGjiXQT3TjJjRbWbSKXGl7
+         xaT35ubXoNdZA==
+Date:   Tue, 12 Jan 2021 02:26:43 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 02/23] x86/sgx: Add enum for SGX_CHILD_PRESENT error
+ code
+Message-ID: <X/zsw6J2qFOXSamE@kernel.org>
 References: <cover.1609890536.git.kai.huang@intel.com>
-        <3d50c2614ff8a46b44062a398fd8644bcda92132.1609890536.git.kai.huang@intel.com>
-        <31681b840aac59a8d8dcb05f2356d25cf09e1f11.camel@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+ <2a41e15dfda722dd1e34feeda34ce864cd82361b.1609890536.git.kai.huang@intel.com>
+ <05f6945b-418a-b4eb-406a-0f0a23cb939f@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05f6945b-418a-b4eb-406a-0f0a23cb939f@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Jan 2021 00:38:40 +0200 Jarkko Sakkinen wrote:
-> On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > SGX virtualization requires to allocate "raw" EPC and use it as virtual
-> > EPC for SGX guest.  Unlike EPC used by SGX driver, virtual EPC doesn't
-> > track how EPC pages are used in VM, e.g. (de)construction of enclaves,
-> > so it cannot guarantee EREMOVE success, e.g. it doesn't have a priori
-> > knowledge of which pages are SECS with non-zero child counts.
-> > 
-> > Split sgx_free_page() into two parts so that the "add to free list"
-> > part can be used by virtual EPC without having to modify the EREMOVE
-> > logic in sgx_free_page().
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+On Wed, Jan 06, 2021 at 10:28:55AM -0800, Dave Hansen wrote:
+> On 1/5/21 5:55 PM, Kai Huang wrote:
+> > Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+> > failures are expected, but only due to SGX_CHILD_PRESENT.
 > 
-> I have a better idea with the same outcome for KVM.
+> This dances around the fact that this is an architectural error-code.
+> Could that be explicit?  Maybe the subject should be:
 > 
-> https://lore.kernel.org/linux-sgx/20210111223610.62261-1-jarkko@kernel.org/T/#t
+> 	Add SGX_CHILD_PRESENT hardware error code
 
-I agree with your patch this one can be replaced. I'll include your patch in
-next version, and once it is upstreamed, it can be removed in my series.
+Yeah, a valid point. Please, change this.
 
-Sean, please let me know if you have objection.
+/Jarkko
