@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6B32F3DA4
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97D1F2F3DBD
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393397AbhALVoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 16:44:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
+        id S2393433AbhALVpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 16:45:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388560AbhALVoX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 16:44:23 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F5CC0617BD
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:03 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id g17so130439ybh.5
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:03 -0800 (PST)
+        with ESMTP id S2393395AbhALVoY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 16:44:24 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6074FC061382
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:05 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id x17so101235ybs.12
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=QesXjU8b1dHyvLy/TubleiHBc9h4FBDuAQnl/uZ5MtQ=;
-        b=kbYf2CU35PRWQho9pYs5dH+xvLWBEOhB+l+RXMA6rL2UwKnFHlFdPahz6Et8cbS4EO
-         AApERsLHBYn9nyVPLvgrdkoJjNZlfWR/PF9MBgTvs6eH4PYfZM89O/LR8R8stzy4YyHu
-         /AwOKH3pkP3F6epxE0ZzhzkQpgq+UnOHiIJqYgFz7VZvjFCnxiV02ndnxyRkgJdQQTVx
-         ngPiLN97VsnKkQUa+0tXlawzxFHfFTKnpFlubO17fDagV1Mj1Nl8EJeAkeF7ARrKmnmZ
-         IEIwVzjZhSTTJLeCW/lxoWf83OFoR57KhuZrYCUUr5lU945ysFpiUJwNd2Hho1zApzJ9
-         dcJQ==
+        bh=16jbzAetGxf2Iv1g2IYZbvaGAz4mTMe0xFaX8UvhNy8=;
+        b=tmIvX70kf0AHC4077r/GFIgFMtTnN+ZuZyI7xh65Jyok9zaS1lSl7Zz+YbJ+acDWye
+         /OqgiaUfGzobMJF/iSMhTiI0k29jAxIgpMDYotVyW1YVr7z+4oyKqYsCBStXQ9Iu0F+q
+         sBJlMXozAWqF42QCdpv4Pmmesi1Xq+/hy5jP0dkMqBOP0NlXlNeM+iM9u0hrXF4lYTJD
+         2W6Ptq/dtbm6qOmgYqkoViv6pQ5E/chYSZcJ8mCj6CmcDybFQ4Ed86p/9xkmHqXFFGk5
+         aH8kbii/6/elVIL73n5Wxg/efKxRNhH8PMw9/GrPaCBdzcZnfmxfSClzqmviDOS5gEQD
+         B1bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=QesXjU8b1dHyvLy/TubleiHBc9h4FBDuAQnl/uZ5MtQ=;
-        b=G1qFgMWbDcpCqLSJzs4M9wihMoE9Q0aI4eCdGoEXBY701Sx91jVZHXLXpy6tNJlss1
-         Z3wLzQkr1v8rle9VCI6oUvlDdfcXRFK8teKsjWOdVrvah7nN9KacNz7R4BzA74Bmo2rO
-         hi1yBZ7aPgbzD9Glgw5lnfzYxVYS3eVJtoalKUlcBXe0ls/Xr/lOZngo6q/SIkf2vIIh
-         3oLugqaJGsZ0PlF0RA6CJhXIZ9sBBUHbC8mpq481M74rD2f6kMgRWnYyO8d30Q4jy8wN
-         L3Hu2aIq8dXZcgLYzmkEbC8vGeZQgi1Pfb+9Yhgxoza1d8DvoDYSpt90MJfnG1kYxTmN
-         emiQ==
-X-Gm-Message-State: AOAM5331o30gsMagtF9TZGtZphBgp/rW4vA6s6rOmrrY68aqMMSOR2m3
-        fQQQpa3hWwmLkpS+ZiftvxL22m2e39Tt
-X-Google-Smtp-Source: ABdhPJxM/RMdfYC4s6KuwnYuG2v9RBQprCahhsWA2zJ3lBz3mnKteeAAsA6CHiFsY/USr4csAyrs9HlEMIg8
+        bh=16jbzAetGxf2Iv1g2IYZbvaGAz4mTMe0xFaX8UvhNy8=;
+        b=Afi/CncyZI1CI922esZ4013lo1aa7M5v4RdcVY4Mn2mQGzB+QKUf5XNzbuuSLdXykB
+         oyieKTBTDlZkcySTY0fwOuig3NPENOjwNFk24vc86vPFLAi7RmGguDCZ3c2TQU+6YHdR
+         KxlCRKo2JLATGR6Fs/e+ibiq2SrQWxGwo50vcJiZTDk+Q7QuT1kr2cA8AWDIC7ewfUOb
+         RdSCb7leBXoWDxdmN1wn97Y4AVKfPbSBeMYEMSESf+mFRPlymXnwWTlUruPEDpGziql7
+         dL5ZWuzgtq+f8dCee8xCyP1yIniM0CfIXqUt4/6OoKmuw+7ZtcZgrdN1lEzutNbU1dKj
+         dhbw==
+X-Gm-Message-State: AOAM533t4jzVzejMcLrOkstyIdyOTRq16gO/6fBzSjxG6XHJczn7nILD
+        PdoICyiBdZjPdC9f648yiDqfT8YU0DSN
+X-Google-Smtp-Source: ABdhPJxTjoIqSDq8yGZNncNeEfmIVI0e54UPHQjHvk8yhSLAZXhHCFW85AWEH4wSxU3IYMR8Yk3pRl1zS/D9
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a25:1241:: with SMTP id
- 62mr2347892ybs.366.1610487782652; Tue, 12 Jan 2021 13:43:02 -0800 (PST)
-Date:   Tue, 12 Jan 2021 13:42:50 -0800
+ (user=bgardon job=sendgmr) by 2002:a25:cb42:: with SMTP id
+ b63mr2317704ybg.521.1610487784576; Tue, 12 Jan 2021 13:43:04 -0800 (PST)
+Date:   Tue, 12 Jan 2021 13:42:51 -0800
 In-Reply-To: <20210112214253.463999-1-bgardon@google.com>
-Message-Id: <20210112214253.463999-4-bgardon@google.com>
+Message-Id: <20210112214253.463999-5-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210112214253.463999-1-bgardon@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 3/6] KVM: selftests: Convert iterations to int in dirty_log_perf_test
+Subject: [PATCH 4/6] KVM: selftests: Fix population stage in dirty_log_perf_test
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -67,126 +67,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to add an iteration -1 to indicate that the memory population
-phase has not yet completed, convert the interations counters to ints.
-
-No functional change intended.
+Currently the population stage in the dirty_log_perf_test does nothing
+as the per-vCPU iteration counters are not initialized and the loop does
+not wait for each vCPU. Remedy those errors.
 
 Reviewed-by: Jacob Xu <jacobhxu@google.com>
+Reviewed-by: Makarand Sonare <makarandsonare@google.com>
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- .../selftests/kvm/dirty_log_perf_test.c       | 26 +++++++++----------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_perf_test.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index 15a9c45bdb5f..3875f22d7283 100644
+index 3875f22d7283..fb6eb7fa0b45 100644
 --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
 +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -28,8 +28,8 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- /* Host variables */
- static u64 dirty_log_manual_caps;
- static bool host_quit;
--static uint64_t iteration;
--static uint64_t vcpu_last_completed_iteration[KVM_MAX_VCPUS];
-+static int iteration;
-+static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+@@ -139,14 +139,19 @@ static void run_test(enum vm_guest_mode mode, void *arg)
  
- static void *vcpu_worker(void *data)
- {
-@@ -48,7 +48,7 @@ static void *vcpu_worker(void *data)
- 	run = vcpu_state(vm, vcpu_id);
- 
- 	while (!READ_ONCE(host_quit)) {
--		uint64_t current_iteration = READ_ONCE(iteration);
-+		int current_iteration = READ_ONCE(iteration);
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
- 		ret = _vcpu_run(vm, vcpu_id);
-@@ -61,17 +61,17 @@ static void *vcpu_worker(void *data)
- 
- 		pr_debug("Got sync event from vCPU %d\n", vcpu_id);
- 		vcpu_last_completed_iteration[vcpu_id] = current_iteration;
--		pr_debug("vCPU %d updated last completed iteration to %lu\n",
-+		pr_debug("vCPU %d updated last completed iteration to %d\n",
- 			 vcpu_id, vcpu_last_completed_iteration[vcpu_id]);
- 
- 		if (current_iteration) {
- 			pages_count += vcpu_args->pages;
- 			total = timespec_add(total, ts_diff);
--			pr_debug("vCPU %d iteration %lu dirty memory time: %ld.%.9lds\n",
-+			pr_debug("vCPU %d iteration %d dirty memory time: %ld.%.9lds\n",
- 				vcpu_id, current_iteration, ts_diff.tv_sec,
- 				ts_diff.tv_nsec);
- 		} else {
--			pr_debug("vCPU %d iteration %lu populate memory time: %ld.%.9lds\n",
-+			pr_debug("vCPU %d iteration %d populate memory time: %ld.%.9lds\n",
- 				vcpu_id, current_iteration, ts_diff.tv_sec,
- 				ts_diff.tv_nsec);
- 		}
-@@ -81,7 +81,7 @@ static void *vcpu_worker(void *data)
+ 	clock_gettime(CLOCK_MONOTONIC, &start);
+ 	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
++		vcpu_last_completed_iteration[vcpu_id] = -1;
++
+ 		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+ 			       &perf_test_args.vcpu_args[vcpu_id]);
  	}
  
- 	avg = timespec_div(total, vcpu_last_completed_iteration[vcpu_id]);
--	pr_debug("\nvCPU %d dirtied 0x%lx pages over %lu iterations in %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
-+	pr_debug("\nvCPU %d dirtied 0x%lx pages over %d iterations in %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
- 		vcpu_id, pages_count, vcpu_last_completed_iteration[vcpu_id],
- 		total.tv_sec, total.tv_nsec, avg.tv_sec, avg.tv_nsec);
+-	/* Allow the vCPU to populate memory */
++	/* Allow the vCPUs to populate memory */
+ 	pr_debug("Starting iteration %d - Populating\n", iteration);
+-	while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) != iteration)
+-		;
++	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
++		while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) !=
++		       iteration)
++			;
++	}
  
-@@ -144,7 +144,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	}
- 
- 	/* Allow the vCPU to populate memory */
--	pr_debug("Starting iteration %lu - Populating\n", iteration);
-+	pr_debug("Starting iteration %d - Populating\n", iteration);
- 	while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id]) != iteration)
- 		;
- 
-@@ -168,7 +168,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		clock_gettime(CLOCK_MONOTONIC, &start);
- 		iteration++;
- 
--		pr_debug("Starting iteration %lu\n", iteration);
-+		pr_debug("Starting iteration %d\n", iteration);
- 		for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
- 			while (READ_ONCE(vcpu_last_completed_iteration[vcpu_id])
- 			       != iteration)
-@@ -177,7 +177,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 		ts_diff = timespec_elapsed(start);
- 		vcpu_dirty_total = timespec_add(vcpu_dirty_total, ts_diff);
--		pr_info("Iteration %lu dirty memory time: %ld.%.9lds\n",
-+		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
- 			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 		clock_gettime(CLOCK_MONOTONIC, &start);
-@@ -186,7 +186,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		ts_diff = timespec_elapsed(start);
- 		get_dirty_log_total = timespec_add(get_dirty_log_total,
- 						   ts_diff);
--		pr_info("Iteration %lu get dirty log time: %ld.%.9lds\n",
-+		pr_info("Iteration %d get dirty log time: %ld.%.9lds\n",
- 			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 		if (dirty_log_manual_caps) {
-@@ -197,7 +197,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 			ts_diff = timespec_elapsed(start);
- 			clear_dirty_log_total = timespec_add(clear_dirty_log_total,
- 							     ts_diff);
--			pr_info("Iteration %lu clear dirty log time: %ld.%.9lds\n",
-+			pr_info("Iteration %d clear dirty log time: %ld.%.9lds\n",
- 				iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
- 		}
- 	}
-@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
- 	while ((opt = getopt(argc, argv, "hi:p:m:b:f:v:")) != -1) {
- 		switch (opt) {
- 		case 'i':
--			p.iterations = strtol(optarg, NULL, 10);
-+			p.iterations = atoi(optarg);
- 			break;
- 		case 'p':
- 			p.phys_offset = strtoull(optarg, NULL, 0);
+ 	ts_diff = timespec_elapsed(start);
+ 	pr_info("Populate memory time: %ld.%.9lds\n",
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
