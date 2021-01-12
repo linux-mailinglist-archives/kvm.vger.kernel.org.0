@@ -2,177 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6F512F3AC8
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:42:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2C002F3AD6
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393106AbhALTlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 14:41:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
+        id S2406787AbhALTnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 14:43:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732196AbhALTlg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 14:41:36 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7650FC061786
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:40:56 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id t6so1981804plq.1
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:40:56 -0800 (PST)
+        with ESMTP id S2406619AbhALTnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 14:43:00 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582D8C0617A2
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:56 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id y23so3237084wmi.1
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hPaJJwg8MTOSNiRBibVEGrx1HwOpvfxrWoAXKh+WulM=;
-        b=auBKf9s7D1W2kYZXznvNER4bC+hHK8sBoZQbhpUb9hh1MrRreiXgOlF+E39eW6y2oB
-         o2aRwPVdeqslvRwRESPvicu0U57HODD/AZn1jPSzT6MiW5ESsLEaeF0f157rOLcyLZZq
-         vItrN7/M9EZbN0wsGcTiFn9ZItaffsjhqHyr5ltmu3PXBuqGqY/xnufQq7xRLCGT3nqE
-         668JqSlaokH5ixIGZpwEf9FmOhwD/wHih4WpZnK65GeBwdWtwv3PI7J/BDkJ2LbbvYq0
-         0meCDAsLnj30hZpLgLwkF6NbcopW0Q929Lbsr35UF7CLeKSUZSQRbjlAnk1cnsc4e1NB
-         I7Tg==
+        d=daynix-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=9oioH7fTimHXbwiOIluI6SOkD883+857JncYScStEP4=;
+        b=JmO6IQKgjQY+7ho4ih3Bdmj0eRPnup/UlujCGZhO4AJhanp3QH0J71/SQjiI8RlftE
+         LxVkn1U86G3tkyTL1V1ekzv7AG4aQUuBC1r0RvRBoERwudQRkTXIem4aavnr56WrANo8
+         gOtBpR9pRxwKu1xDJhfk/82GSYbgzv2ibgNt5w0f4THTbGm6h2zSgqNsqz15NEjpA55j
+         jhso19OBmu3jzIh6d8tb1TXJSzru4eS/fD3T3nWv1umUB8RNCOvvnnPdOKeCNLkCN3mh
+         BIGrXTEThybGX1OaJSNIbNpsSW/dNQUVwxByoyviBmYkIkBVcUXJ03lrcjitMvDn4T//
+         igkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hPaJJwg8MTOSNiRBibVEGrx1HwOpvfxrWoAXKh+WulM=;
-        b=Z1fPdCYfUtdCheKkyN7yETEmzp4nKY12MHFifNGHV+tKqUr0BXNjSwb+hR1cNAPsnK
-         D0QfUrsd4IZRrMxq6+WckBDtLIrZv0ilP5GnMD41Ywe0UnHOKaNGCr77LO1wr4euHpRw
-         w8Mrdta7ZWTJCk0VNev+b7PPUIpUhY8sG15D2faDaNrdAH5yAsgiEfj4TvdELyoDgdZ0
-         p4TZIi9ryZ8oN9OlYrWcQBENTTRO3jlV/4GVqIPulLF2KA7gu2XggGVuV31SuacdhJLY
-         owtN8UqIwWamGdzSfdAJrkqtO4reVy2BTkCmujFamGfDnyuQqcnW444Tk748QslbxB98
-         zJvA==
-X-Gm-Message-State: AOAM530rmeR6gQ2emUoMKDPkq5dHINb/Tz2fQgACRnYnrdxHjVXXTo+A
-        vtbcK0wI65SojZOhG3Jb39hBhQ==
-X-Google-Smtp-Source: ABdhPJxnBQWV+yw0DsBXg9V4v/r75GpT0aU6Sp7wlpYXIuX9YyY3Q8I1/gBmDZIyC2TGC5xLZF1vtQ==
-X-Received: by 2002:a17:902:724b:b029:de:229a:47f1 with SMTP id c11-20020a170902724bb02900de229a47f1mr791709pll.10.1610480455876;
-        Tue, 12 Jan 2021 11:40:55 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id r20sm4608042pgb.3.2021.01.12.11.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 11:40:55 -0800 (PST)
-Date:   Tue, 12 Jan 2021 11:40:48 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wei Huang <wei.huang2@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, joro@8bytes.org,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, mlevitsk@redhat.com
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
- VM instructions
-Message-ID: <X/37QBMHxH8otaMa@google.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210112063703.539893-1-wei.huang2@amd.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=9oioH7fTimHXbwiOIluI6SOkD883+857JncYScStEP4=;
+        b=rLxWvbhmCW6fzosECY/I3yKCnfPVHF7XdpPlMR/7I7Q5Z8zWUeEZcGjkRsTY+X3Zc9
+         a06QrTb3DAE6viIcu+jtYdkC00RMayqpsvICoKwv2kc7cFWN1aFa5oPqeumyJ0iqEpp5
+         ONYMiR30/jmaWXQ7DWMlYw/4q1/8eqdLNzwDTYoQp7JmROKF95fxn4sqQ3Scd2WobP4c
+         BpP3gmTtgKj1bOnJ0Yu4zJOIhx1QWnGw2OCb/YnggraHBOeiMwlU4ynaTfud4trxbhBs
+         PHQaXocJtweqYYrEXu0vrVnk00I6j/KO/De/catdnXKg1W8hiLyQUspJUsbAFX6cvqQe
+         7GLA==
+X-Gm-Message-State: AOAM533/NEvsQjeJZ82Ln6CzozEwrFCtLuLutmNw6fAlkvmDbSHiOkSg
+        Ov4sjMfF1ALndslgQUaumFpMIg==
+X-Google-Smtp-Source: ABdhPJxLSdWWpfIxaQGNHeFfQoIuyfHcKNbVYBL99mebz4m6+1+6/6514Is75EyggDSS6XrPJMXKGw==
+X-Received: by 2002:a1c:b742:: with SMTP id h63mr780567wmf.122.1610480514861;
+        Tue, 12 Jan 2021 11:41:54 -0800 (PST)
+Received: from f2.redhat.com (bzq-79-183-72-147.red.bezeqint.net. [79.183.72.147])
+        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.41.51
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 12 Jan 2021 11:41:54 -0800 (PST)
+From:   Yuri Benditovich <yuri.benditovich@daynix.com>
+To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
+        jasowang@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        john.fastabend@gmail.com, kpsingh@kernel.org,
+        rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org,
+        herbert@gondor.apana.org.au, steffen.klassert@secunet.com,
+        nogikh@google.com, pablo@netfilter.org, decui@microsoft.com,
+        cai@lca.pw, jakub@cloudflare.com, elver@google.com,
+        pabeni@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Cc:     yan@daynix.com
+Subject: [RFC PATCH 0/7] Support for virtio-net hash reporting
+Date:   Tue, 12 Jan 2021 21:41:36 +0200
+Message-Id: <20210112194143.1494-1-yuri.benditovich@daynix.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021, Wei Huang wrote:
-> +/* Emulate SVM VM execution instructions */
-> +static int svm_emulate_vm_instr(struct kvm_vcpu *vcpu, u8 modrm)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	switch (modrm) {
-> +	case 0xd8: /* VMRUN */
-> +		return vmrun_interception(svm);
-> +	case 0xda: /* VMLOAD */
-> +		return vmload_interception(svm);
-> +	case 0xdb: /* VMSAVE */
-> +		return vmsave_interception(svm);
-> +	default:
-> +		/* inject a #GP for all other cases */
-> +		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +		return 1;
-> +	}
-> +}
-v> +
->  static int gp_interception(struct vcpu_svm *svm)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
->  	u32 error_code = svm->vmcb->control.exit_info_1;
-> -
-> -	WARN_ON_ONCE(!enable_vmware_backdoor);
-> +	int rc;
->  
->  	/*
-> -	 * VMware backdoor emulation on #GP interception only handles IN{S},
-> -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
-> +	 * Only VMware backdoor and SVM VME errata are handled. Neither of
-> +	 * them has non-zero error codes.
->  	 */
->  	if (error_code) {
->  		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
->  		return 1;
->  	}
-> -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> +
-> +	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
-> +	if (rc > 1)
-> +		rc = svm_emulate_vm_instr(vcpu, rc);
-> +	return rc;
->  }
- 
-...
-  
-> +static int is_vm_instr_opcode(struct x86_emulate_ctxt *ctxt)
-> +{
-> +	unsigned long rax;
-> +
-> +	if (ctxt->b != 0x1)
-> +		return 0;
-> +
-> +	switch (ctxt->modrm) {
-> +	case 0xd8: /* VMRUN */
-> +	case 0xda: /* VMLOAD */
-> +	case 0xdb: /* VMSAVE */
-> +		rax = kvm_register_read(emul_to_vcpu(ctxt), VCPU_REGS_RAX);
-> +		if (!kvm_is_host_reserved_region(rax))
-> +			return 0;
-> +		break;
-> +	default:
-> +		return 0;
-> +	}
-> +
-> +	return ctxt->modrm;
-> +}
-> +
->  static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
->  {
->  	switch (ctxt->opcode_len) {
-> @@ -7305,6 +7327,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->  	bool writeback = true;
->  	bool write_fault_to_spt;
-> +	int vminstr;
->  
->  	if (unlikely(!kvm_x86_ops.can_emulate_instruction(vcpu, insn, insn_len)))
->  		return 1;
-> @@ -7367,10 +7390,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		}
->  	}
->  
-> -	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
-> -	    !is_vmware_backdoor_opcode(ctxt)) {
-> -		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> -		return 1;
-> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
-> +		vminstr = is_vm_instr_opcode(ctxt);
-> +		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
-> +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +			return 1;
-> +		}
-> +		if (vminstr)
-> +			return vminstr;
+Existing TUN module is able to use provided "steering eBPF" to
+calculate per-packet hash and derive the destination queue to
+place the packet to. The eBPF uses mapped configuration data
+containing a key for hash calculation and indirection table
+with array of queues' indices.
 
-I'm pretty sure this doesn't correctly handle a VM-instr in L2 that hits a bad
-L0 GPA and that L1 wants to intercept.  The intercept bitmap isn't checked until
-x86_emulate_insn(), and the vm*_interception() helpers expect nested VM-Exits to
-be handled further up the stack.
+This series of patches adds support for virtio-net hash reporting
+feature as defined in virtio specification. It extends the TUN module
+and the "steering eBPF" as follows:
 
->  	}
->  
->  	/*
-> -- 
-> 2.27.0
-> 
+Extended steering eBPF calculates the hash value and hash type, keeps
+hash value in the skb->hash and returns index of destination virtqueue
+and the type of the hash. TUN module keeps returned hash type in
+(currently unused) field of the skb. 
+skb->__unused renamed to 'hash_report_type'.
+
+When TUN module is called later to allocate and fill the virtio-net
+header and push it to destination virtqueue it populates the hash
+and the hash type into virtio-net header.
+
+VHOST driver is made aware of respective virtio-net feature that
+extends the virtio-net header to report the hash value and hash report
+type.
+
+Yuri Benditovich (7):
+  skbuff: define field for hash report type
+  vhost: support for hash report virtio-net feature
+  tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
+  tun: free bpf_program by bpf_prog_put instead of bpf_prog_destroy
+  tun: add ioctl code TUNSETHASHPOPULATION
+  tun: populate hash in virtio-net header when needed
+  tun: report new tun feature IFF_HASH
+
+ drivers/net/tun.c           | 43 +++++++++++++++++++++++++++++++------
+ drivers/vhost/net.c         | 37 ++++++++++++++++++++++++-------
+ include/linux/skbuff.h      |  7 +++++-
+ include/uapi/linux/if_tun.h |  2 ++
+ 4 files changed, 74 insertions(+), 15 deletions(-)
+
+-- 
+2.17.1
+
