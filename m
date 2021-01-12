@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 695862F3183
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 14:26:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDE302F3186
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 14:26:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733062AbhALNWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 08:22:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23966 "EHLO
+        id S1733101AbhALNWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 08:22:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35366 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729886AbhALNWA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 08:22:00 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CD4CFs041999;
-        Tue, 12 Jan 2021 08:21:20 -0500
+        by vger.kernel.org with ESMTP id S1733056AbhALNWC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 08:22:02 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CD58ov063841;
+        Tue, 12 Jan 2021 08:21:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=m0k3f7bFzGurrGkPGQ/GE6kJKwkkGBRgc9Ll7yqhDzw=;
- b=MYH9OxuLP7DhrlpCENLh8A9guzt9kprzRhiPacLgYJpUVG9WOwuIcvfxDmUdkarI6Zp2
- B7bV96woSkb0Lzh4p2rIzI2qycTOJJwa+xmUTI6LITGBCg6hSqd0Hon24+InjWdfxjGW
- 67/maA69NTrdwLd8kMuBhcSn0+DHAexR1TxiTRT+OuHWGxTzBuuEjVErlw1IKXyuOrba
- KuIugefOzYWxE5Z30M9hFbADOwgONfvVlxvqxkH1JDKL9WHkIzlvQBqF8JBvail4LbyH
- gqlxbuum2xO2qfUda8gC1qbXxjQNuTqooeHjBi8Q4U6lcWgUHzATpC8EWY/j+R+Yp8Sz bQ== 
+ bh=I5DBPI8+i1zVFTn1s3zgO+6a9Pz5GfCH27yR9otAvbo=;
+ b=bYMSpN4QtCmuaYKpN3VztvTyRev7H3aew18sNl71TQIIGpdFFhdcrg3jyYhcLZwrHzsv
+ VK+dRrR7F1fnXuJ0b7UPAqmPvlRfWN1TIS56eUNlkQYrPI1py3MbkEH+4xY7sOnMazjn
+ 0Z+88aNPLbKGr+yeYYXjfU1V/mBomXtUdJZNxVbcjQL23urilAgHppHAf7jevFMNIvwn
+ Xf9sFBjv+Z8s1rDk5w50T2AhFyR7SJRKOM3Fk/SOhDebIzEVkuPzQvELHR2aZVzzIJZJ
+ HoMA2qZikfktd5OQmYA6gdgoUht5Z6XkKE5+xY0Ztn7du1sqNr8THtqw6dHVeh3Ras9f 2Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361b8htt68-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361bvhsm89-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 08:21:20 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CD4I7E042316;
-        Tue, 12 Jan 2021 08:21:20 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361b8htt5c-1
+        Tue, 12 Jan 2021 08:21:21 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CD5gsW066139;
+        Tue, 12 Jan 2021 08:21:21 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361bvhsm7b-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 08:21:19 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CDI18L023615;
-        Tue, 12 Jan 2021 13:21:17 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdb8vy-1
+        Tue, 12 Jan 2021 08:21:21 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CDHJWZ016229;
+        Tue, 12 Jan 2021 13:21:18 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 35y4489vdg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 13:21:17 +0000
+        Tue, 12 Jan 2021 13:21:18 +0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CDLEYc37290472
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CDLFZh37421528
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 12 Jan 2021 13:21:15 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D94854C050;
-        Tue, 12 Jan 2021 13:21:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C90A94C040;
+        Tue, 12 Jan 2021 13:21:15 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DD744C044;
-        Tue, 12 Jan 2021 13:21:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 0D54E4C052;
+        Tue, 12 Jan 2021 13:21:15 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
         Tue, 12 Jan 2021 13:21:14 +0000 (GMT)
@@ -59,9 +59,9 @@ To:     kvm@vger.kernel.org
 Cc:     thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
         imbrenda@linux.ibm.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 6/9] s390x: sie: Add first SIE test
-Date:   Tue, 12 Jan 2021 08:20:51 -0500
-Message-Id: <20210112132054.49756-7-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v4 7/9] s390x: Add diag318 intercept test
+Date:   Tue, 12 Jan 2021 08:20:52 -0500
+Message-Id: <20210112132054.49756-8-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210112132054.49756-1-frankja@linux.ibm.com>
 References: <20210112132054.49756-1-frankja@linux.ibm.com>
@@ -70,172 +70,107 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-12_07:2021-01-12,2021-01-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxscore=0 phishscore=0 adultscore=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 spamscore=0 impostorscore=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 mlxscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101120073
+ engine=8.12.0-2009150000 definitions=main-2101120071
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's check if we get the correct interception data on a few
-diags. This commit is more of an addition of boilerplate code than a
-real test.
+Not much to test except for the privilege and specification
+exceptions.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- s390x/Makefile      |   1 +
- s390x/sie.c         | 113 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   3 ++
- 3 files changed, 117 insertions(+)
- create mode 100644 s390x/sie.c
+ lib/s390x/sclp.c  |  1 +
+ lib/s390x/sclp.h  |  6 +++++-
+ s390x/intercept.c | 19 +++++++++++++++++++
+ 3 files changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index e0bccc8..9e6e60d 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -19,6 +19,7 @@ tests += $(TEST_DIR)/smp.elf
- tests += $(TEST_DIR)/sclp.elf
- tests += $(TEST_DIR)/css.elf
- tests += $(TEST_DIR)/uv-guest.elf
-+tests += $(TEST_DIR)/sie.elf
+diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+index 06819a6..7a9b2c5 100644
+--- a/lib/s390x/sclp.c
++++ b/lib/s390x/sclp.c
+@@ -138,6 +138,7 @@ void sclp_facilities_setup(void)
+ 	assert(read_info);
  
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- ifneq ($(HOST_KEY_DOCUMENT),)
-diff --git a/s390x/sie.c b/s390x/sie.c
-new file mode 100644
-index 0000000..cfc746f
---- /dev/null
-+++ b/s390x/sie.c
-@@ -0,0 +1,113 @@
-+#include <libcflat.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/arch_def.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+#include <alloc_page.h>
-+#include <vmalloc.h>
-+#include <asm/facility.h>
-+#include <mmu.h>
+ 	cpu = sclp_get_cpu_entries();
++	sclp_facilities.has_diag318 = read_info->byte_134_diag318;
+ 	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
+ 		/*
+ 		 * The logic for only reading the facilities from the
+diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+index 6c86037..58f8e54 100644
+--- a/lib/s390x/sclp.h
++++ b/lib/s390x/sclp.h
+@@ -105,7 +105,8 @@ extern struct sclp_facilities sclp_facilities;
+ 
+ struct sclp_facilities {
+ 	uint64_t has_sief2 : 1;
+-	uint64_t : 63;
++	uint64_t has_diag318 : 1;
++	uint64_t : 62;
+ };
+ 
+ typedef struct ReadInfo {
+@@ -130,6 +131,9 @@ typedef struct ReadInfo {
+     uint16_t highest_cpu;
+     uint8_t  _reserved5[124 - 122];     /* 122-123 */
+     uint32_t hmfai;
++    uint8_t reserved7[134 - 128];
++    uint8_t byte_134_diag318 : 1;
++    uint8_t : 7;
+     struct CPUEntry entries[0];
+ } __attribute__((packed)) ReadInfo;
+ 
+diff --git a/s390x/intercept.c b/s390x/intercept.c
+index cde2f5f..86e57e1 100644
+--- a/s390x/intercept.c
++++ b/s390x/intercept.c
+@@ -8,6 +8,7 @@
+  *  Thomas Huth <thuth@redhat.com>
+  */
+ #include <libcflat.h>
 +#include <sclp.h>
-+#include <sie.h>
-+
-+static u8 *guest;
-+static u8 *guest_instr;
-+static struct vm vm;
-+
-+static void handle_validity(struct vm *vm)
-+{
-+	report(0, "VALIDITY: %x", vm->sblk->ipb >> 16);
-+}
-+
-+static void sie(struct vm *vm)
-+{
-+	while (vm->sblk->icptcode == 0) {
-+		sie64a(vm->sblk, &vm->save_area);
-+		if (vm->sblk->icptcode == ICPT_VALIDITY)
-+			handle_validity(vm);
-+	}
-+	vm->save_area.guest.grs[14] = vm->sblk->gg14;
-+	vm->save_area.guest.grs[15] = vm->sblk->gg15;
-+}
-+
-+static void sblk_cleanup(struct vm *vm)
-+{
-+	vm->sblk->icptcode = 0;
-+}
-+
-+static void test_diag(u32 instr)
-+{
-+	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
-+	vm.sblk->gpsw.mask = 0x0000000180000000ULL;
-+
-+	memset(guest_instr, 0, PAGE_SIZE);
-+	memcpy(guest_instr, &instr, 4);
-+	sie(&vm);
-+	report(vm.sblk->icptcode == ICPT_INST &&
-+	       vm.sblk->ipa == instr >> 16 && vm.sblk->ipb == instr << 16,
-+	       "Intercept data");
-+	sblk_cleanup(&vm);
-+}
-+
-+static struct {
-+	const char *name;
-+	u32 instr;
-+} tests[] = {
-+	{ "10", 0x83020010 },
-+	{ "44", 0x83020044 },
-+	{ "9c", 0x8302009c },
-+	{ NULL, 0 }
-+};
-+
-+static void test_diags(void)
-+{
-+	int i;
-+
-+	for (i = 0; tests[i].name; i++) {
-+		report_prefix_push(tests[i].name);
-+		test_diag(tests[i].instr);
-+		report_prefix_pop();
-+	}
-+}
-+
-+static void setup_guest(void)
-+{
-+	setup_vm();
-+
-+	/* Allocate 1MB as guest memory */
-+	guest = alloc_pages(8);
-+	/* The first two pages are the lowcore */
-+	guest_instr = guest + PAGE_SIZE * 2;
-+
-+	vm.sblk = alloc_page();
-+
-+	vm.sblk->cpuflags = CPUSTAT_ZARCH | CPUSTAT_RUNNING;
-+	vm.sblk->prefix = 0;
-+	/*
-+	 * Pageable guest with the same ASCE as the test programm, but
-+	 * the guest memory 0x0 is offset to start at the allocated
-+	 * guest pages and end after 1MB.
-+	 *
-+	 * It's not pretty but faster and easier than managing guest ASCEs.
-+	 */
-+	vm.sblk->mso = (u64)guest;
-+	vm.sblk->msl = (u64)guest;
-+	vm.sblk->ihcpu = 0xffff;
-+
-+	vm.sblk->crycbd = (uint64_t)alloc_page();
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("sie");
-+	if (!sclp_facilities.has_sief2) {
-+		report_skip("SIEF2 facility unavailable");
-+		goto done;
-+	}
-+
-+	setup_guest();
-+	test_diags();
-+done:
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3feb8bc..2298be6 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -96,3 +96,6 @@ smp = 2
+ #include <asm/asm-offsets.h>
+ #include <asm/interrupt.h>
+ #include <asm/page.h>
+@@ -152,6 +153,23 @@ static void test_testblock(void)
+ 	check_pgm_int_code(PGM_INT_CODE_ADDRESSING);
+ }
  
- [uv-guest]
- file = uv-guest.elf
++static void test_diag318(void)
++{
++	expect_pgm_int();
++	enter_pstate();
++	asm volatile("diag %0,0,0x318\n" : : "d" (0x42));
++	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
 +
-+[sie]
-+file = sie.elf
++	if (!sclp_facilities.has_diag318)
++		expect_pgm_int();
++
++	asm volatile("diag %0,0,0x318\n" : : "d" (0x42));
++
++	if (!sclp_facilities.has_diag318)
++		check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
++
++}
++
+ struct {
+ 	const char *name;
+ 	void (*func)(void);
+@@ -162,6 +180,7 @@ struct {
+ 	{ "stap", test_stap, false },
+ 	{ "stidp", test_stidp, false },
+ 	{ "testblock", test_testblock, false },
++	{ "diag318", test_diag318, false },
+ 	{ NULL, NULL, false }
+ };
+ 
 -- 
 2.25.1
 
