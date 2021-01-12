@@ -2,481 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECBD72F2ED0
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 13:18:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C5DE2F2ED4
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 13:18:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732887AbhALMQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 07:16:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48159 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732873AbhALMQp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 07:16:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610453717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ovKUsdhx+K2sEOzDkyXjp+F1QS460AJdQNlzt4NEb2Y=;
-        b=BJm+IQgfsqjTtjR9KaaoLB0LrAPIGdSq0kLQiPdSBxWUuOoP32nX1t8JdSQB6BfITaK8zL
-        VEdplWbVLEu7IBCwmEasmRTMP8jjCPxpIfw0wj51hbRact0BoXZ2MkYlHYUoYr2fLeVCtD
-        q5E30KPxL+BU/OthNCsbeNqlX6MyPpI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-eNcEWiEQP1aGWEbUAr0YMg-1; Tue, 12 Jan 2021 07:15:15 -0500
-X-MC-Unique: eNcEWiEQP1aGWEbUAr0YMg-1
-Received: by mail-ej1-f69.google.com with SMTP id r26so923709ejx.6
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 04:15:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ovKUsdhx+K2sEOzDkyXjp+F1QS460AJdQNlzt4NEb2Y=;
-        b=oNpIe8MlFRsWu6obbR9a3iZv2qTKXLnnGItz8FbjScI8qy/LwViWnzKaRgDzA0Sob2
-         5r9zQbh0Wq/Od1718aSs/qea/eqNZ4kJWSD3QP6m9UXYQooo+XUf6ZyEDGIUKDWgwPEV
-         wxk4ebkgUo56RRM++jCVNaAyskwUMX5bIkY3b8UhK2e5xOfIGSXT4VIi5Hkrp91JTOfK
-         Y5mSLHf5RpDCgaq9kfeLn1QVsepYOliiSq9yPiJk4JDnPqjX2MaYCEHCW+OJjhucoieS
-         Ek9weVaq+mxyNHhGFbgXg7P4mlYrMJzmBzKNn+qaimIQbNtVdRzVRMf9No3/9+qOyhE2
-         7ssQ==
-X-Gm-Message-State: AOAM533/eEalx6RVIuFiojsgDX9nr5JvO5Ro5w7N6wU56/BYoFa7ZA5l
-        a2VtvWW+ohzIceU8r7+68kQdEadg4wne8nqoqDDUUIbPgepPjG9PSs2yrwQCPO15Ml7PpXBn16T
-        Culk+g6ALaklF
-X-Received: by 2002:a17:906:cd06:: with SMTP id oz6mr3043340ejb.25.1610453714083;
-        Tue, 12 Jan 2021 04:15:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwBNUL7RYrMmiooKbGdjnheXY+j3zeD8b5AvGhUZPjMtfE1dOCBahdI/DQptE6L0UxeNYDUrg==
-X-Received: by 2002:a17:906:cd06:: with SMTP id oz6mr3043316ejb.25.1610453713691;
-        Tue, 12 Jan 2021 04:15:13 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id u16sm1361105eds.10.2021.01.12.04.15.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 04:15:12 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, joro@8bytes.org, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, wei.huang2@amd.com, mlevitsk@redhat.com
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered
- by VM instructions
-In-Reply-To: <20210112063703.539893-1-wei.huang2@amd.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-Date:   Tue, 12 Jan 2021 13:15:11 +0100
-Message-ID: <87eeiq8i7k.fsf@vitty.brq.redhat.com>
+        id S1732675AbhALMRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 07:17:30 -0500
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:21019 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732299AbhALMRa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 07:17:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1610453847; x=1641989847;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tF+5LWSipsSfv/MpNTU2XOkSQBgOPGBmsF5sLnQRVvI=;
+  b=A1FvrYH7NKrhzLt0kkpD9RYxfl9Kqi8AjptzODDcmyd4npmojVXPTz7f
+   /bqegMuf1w7twUocRHBoDVOOzzR0JC0zwbr3caiA7J4D2N2QQELs8FKHz
+   8Arr1ecsIGLGBLNA0b9rb388vbOQH0gnrwIbj7/+80zrDcMhDQ/IIS3x5
+   o=;
+X-IronPort-AV: E=Sophos;i="5.79,341,1602547200"; 
+   d="scan'208";a="77011747"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1d-16425a8d.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 12 Jan 2021 12:16:39 +0000
+Received: from EX13D08EUB004.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-1d-16425a8d.us-east-1.amazon.com (Postfix) with ESMTPS id 1E6F6100F90;
+        Tue, 12 Jan 2021 12:16:29 +0000 (UTC)
+Received: from uf6ed9c851f4556.ant.amazon.com (10.43.161.68) by
+ EX13D08EUB004.ant.amazon.com (10.43.166.158) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 12 Jan 2021 12:16:15 +0000
+From:   Adrian Catangiu <acatan@amazon.com>
+To:     <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>
+CC:     <gregkh@linuxfoundation.org>, <graf@amazon.com>, <arnd@arndb.de>,
+        <ebiederm@xmission.com>, <rppt@kernel.org>, <0x7f454c46@gmail.com>,
+        <borntraeger@de.ibm.com>, <Jason@zx2c4.com>, <jannh@google.com>,
+        <w@1wt.eu>, <colmmacc@amazon.com>, <luto@kernel.org>,
+        <tytso@mit.edu>, <ebiggers@kernel.org>, <dwmw@amazon.co.uk>,
+        <bonzini@gnu.org>, <sblbir@amazon.com>, <raduweis@amazon.com>,
+        <corbet@lwn.net>, <mst@redhat.com>, <mhocko@kernel.org>,
+        <rafael@kernel.org>, <pavel@ucw.cz>, <mpe@ellerman.id.au>,
+        <areber@redhat.com>, <ovzxemul@gmail.com>, <avagin@gmail.com>,
+        <ptikhomirov@virtuozzo.com>, <gil@azul.com>, <asmehra@redhat.com>,
+        <dgunigun@redhat.com>, <vijaysun@ca.ibm.com>, <oridgar@gmail.com>,
+        <ghammer@redhat.com>, Adrian Catangiu <acatan@amazon.com>
+Subject: [PATCH v4 0/2] System Generation ID driver and VMGENID backend
+Date:   Tue, 12 Jan 2021 14:15:58 +0200
+Message-ID: <1610453760-13812-1-git-send-email-acatan@amazon.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Originating-IP: [10.43.161.68]
+X-ClientProxiedBy: EX13D50UWC001.ant.amazon.com (10.43.162.96) To
+ EX13D08EUB004.ant.amazon.com (10.43.166.158)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wei Huang <wei.huang2@amd.com> writes:
-
-> From: Bandan Das <bsd@redhat.com>
->
-> While running VM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
-> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
-> before checking VMCB's instruction intercept. If EAX falls into such
-> memory areas, #GP is triggered before VMEXIT. This causes problem under
-> nested virtualization. To solve this problem, KVM needs to trap #GP and
-> check the instructions triggering #GP. For VM execution instructions,
-> KVM emulates these instructions; otherwise it re-injects #GP back to
-> guest VMs.
->
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> Co-developed-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |   8 +-
->  arch/x86/kvm/mmu.h              |   1 +
->  arch/x86/kvm/mmu/mmu.c          |   7 ++
->  arch/x86/kvm/svm/svm.c          | 157 +++++++++++++++++++-------------
->  arch/x86/kvm/svm/svm.h          |   8 ++
->  arch/x86/kvm/vmx/vmx.c          |   2 +-
->  arch/x86/kvm/x86.c              |  37 +++++++-
->  7 files changed, 146 insertions(+), 74 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3d6616f6f6ef..0ddc309f5a14 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1450,10 +1450,12 @@ extern u64 kvm_mce_cap_supported;
->   *			     due to an intercepted #UD (see EMULTYPE_TRAP_UD).
->   *			     Used to test the full emulator from userspace.
->   *
-> - * EMULTYPE_VMWARE_GP - Set when emulating an intercepted #GP for VMware
-> + * EMULTYPE_PARAVIRT_GP - Set when emulating an intercepted #GP for VMware
->   *			backdoor emulation, which is opt in via module param.
->   *			VMware backoor emulation handles select instructions
-> - *			and reinjects the #GP for all other cases.
-> + *			and reinjects #GP for all other cases. This also
-> + *			handles other cases where #GP condition needs to be
-> + *			handled and emulated appropriately
->   *
->   * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
->   *		 case the CR2/GPA value pass on the stack is valid.
-> @@ -1463,7 +1465,7 @@ extern u64 kvm_mce_cap_supported;
->  #define EMULTYPE_SKIP		    (1 << 2)
->  #define EMULTYPE_ALLOW_RETRY_PF	    (1 << 3)
->  #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
-> -#define EMULTYPE_VMWARE_GP	    (1 << 5)
-> +#define EMULTYPE_PARAVIRT_GP	    (1 << 5)
->  #define EMULTYPE_PF		    (1 << 6)
->  
->  int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 581925e476d6..1a2fff4e7140 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -219,5 +219,6 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
->  
->  int kvm_mmu_post_init_vm(struct kvm *kvm);
->  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
-> +bool kvm_is_host_reserved_region(u64 gpa);
-
-Just a suggestion: "kvm_gpa_in_host_reserved()" maybe? 
-
->  
->  #endif
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6d16481aa29d..c5c4aaf01a1a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -50,6 +50,7 @@
->  #include <asm/io.h>
->  #include <asm/vmx.h>
->  #include <asm/kvm_page_track.h>
-> +#include <asm/e820/api.h>
->  #include "trace.h"
->  
->  extern bool itlb_multihit_kvm_mitigation;
-> @@ -5675,6 +5676,12 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
->  }
->  EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
->  
-> +bool kvm_is_host_reserved_region(u64 gpa)
-> +{
-> +	return e820__mbapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED);
-> +}
-
-While _e820__mapped_any()'s doc says '..  checks if any part of the
-range <start,end> is mapped ..' it seems to me that the real check is
-[start, end) so we should use 'gpa' instead of 'gpa-1', no?
-
-> +EXPORT_SYMBOL_GPL(kvm_is_host_reserved_region);
-> +
->  void kvm_mmu_zap_all(struct kvm *kvm)
->  {
->  	struct kvm_mmu_page *sp, *node;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 7ef171790d02..74620d32aa82 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -288,6 +288,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  		if (!(efer & EFER_SVME)) {
->  			svm_leave_nested(svm);
->  			svm_set_gif(svm, true);
-> +			clr_exception_intercept(svm, GP_VECTOR);
->  
->  			/*
->  			 * Free the nested guest state, unless we are in SMM.
-> @@ -309,6 +310,10 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  
->  	svm->vmcb->save.efer = efer | EFER_SVME;
->  	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
-> +	/* Enable GP interception for SVM instructions if needed */
-> +	if (efer & EFER_SVME)
-> +		set_exception_intercept(svm, GP_VECTOR);
-> +
->  	return 0;
->  }
->  
-> @@ -1957,22 +1962,104 @@ static int ac_interception(struct vcpu_svm *svm)
->  	return 1;
->  }
->  
-> +static int vmload_interception(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *nested_vmcb;
-> +	struct kvm_host_map map;
-> +	int ret;
-> +
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> +	if (ret) {
-> +		if (ret == -EINVAL)
-> +			kvm_inject_gp(&svm->vcpu, 0);
-> +		return 1;
-> +	}
-> +
-> +	nested_vmcb = map.hva;
-> +
-> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> +
-> +	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
-> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vmsave_interception(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *nested_vmcb;
-> +	struct kvm_host_map map;
-> +	int ret;
-> +
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> +	if (ret) {
-> +		if (ret == -EINVAL)
-> +			kvm_inject_gp(&svm->vcpu, 0);
-> +		return 1;
-> +	}
-> +
-> +	nested_vmcb = map.hva;
-> +
-> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> +
-> +	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
-> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vmrun_interception(struct vcpu_svm *svm)
-> +{
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	return nested_svm_vmrun(svm);
-> +}
-> +
-> +/* Emulate SVM VM execution instructions */
-> +static int svm_emulate_vm_instr(struct kvm_vcpu *vcpu, u8 modrm)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	switch (modrm) {
-> +	case 0xd8: /* VMRUN */
-> +		return vmrun_interception(svm);
-> +	case 0xda: /* VMLOAD */
-> +		return vmload_interception(svm);
-> +	case 0xdb: /* VMSAVE */
-> +		return vmsave_interception(svm);
-> +	default:
-> +		/* inject a #GP for all other cases */
-> +		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +		return 1;
-> +	}
-> +}
-> +
->  static int gp_interception(struct vcpu_svm *svm)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
->  	u32 error_code = svm->vmcb->control.exit_info_1;
-> -
-> -	WARN_ON_ONCE(!enable_vmware_backdoor);
-> +	int rc;
->  
->  	/*
-> -	 * VMware backdoor emulation on #GP interception only handles IN{S},
-> -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
-> +	 * Only VMware backdoor and SVM VME errata are handled. Neither of
-> +	 * them has non-zero error codes.
->  	 */
->  	if (error_code) {
->  		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
->  		return 1;
->  	}
-> -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> +
-> +	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
-> +	if (rc > 1)
-> +		rc = svm_emulate_vm_instr(vcpu, rc);
-> +	return rc;
->  }
->  
->  static bool is_erratum_383(void)
-> @@ -2113,66 +2200,6 @@ static int vmmcall_interception(struct vcpu_svm *svm)
->  	return kvm_emulate_hypercall(&svm->vcpu);
->  }
->  
-> -static int vmload_interception(struct vcpu_svm *svm)
-> -{
-> -	struct vmcb *nested_vmcb;
-> -	struct kvm_host_map map;
-> -	int ret;
-> -
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> -	if (ret) {
-> -		if (ret == -EINVAL)
-> -			kvm_inject_gp(&svm->vcpu, 0);
-> -		return 1;
-> -	}
-> -
-> -	nested_vmcb = map.hva;
-> -
-> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> -
-> -	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
-> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> -
-> -	return ret;
-> -}
-> -
-> -static int vmsave_interception(struct vcpu_svm *svm)
-> -{
-> -	struct vmcb *nested_vmcb;
-> -	struct kvm_host_map map;
-> -	int ret;
-> -
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> -	if (ret) {
-> -		if (ret == -EINVAL)
-> -			kvm_inject_gp(&svm->vcpu, 0);
-> -		return 1;
-> -	}
-> -
-> -	nested_vmcb = map.hva;
-> -
-> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> -
-> -	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
-> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> -
-> -	return ret;
-> -}
-> -
-> -static int vmrun_interception(struct vcpu_svm *svm)
-> -{
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	return nested_svm_vmrun(svm);
-> -}
-> -
-
-Maybe if you'd do it the other way around and put gp_interception()
-after vm{load,save,run}_interception(), the diff (and code churn)
-would've been smaller? 
-
->  void svm_set_gif(struct vcpu_svm *svm, bool value)
->  {
->  	if (value) {
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0fe874ae5498..d5dffcf59afa 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -350,6 +350,14 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
->  	recalc_intercepts(svm);
->  }
->  
-> +static inline bool is_exception_intercept(struct vcpu_svm *svm, u32 bit)
-> +{
-> +	struct vmcb *vmcb = get_host_vmcb(svm);
-> +
-> +	WARN_ON_ONCE(bit >= 32);
-> +	return vmcb_is_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> +}
-> +
->  static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
->  {
->  	struct vmcb *vmcb = get_host_vmcb(svm);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2af05d3b0590..5fac2f7cba24 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4774,7 +4774,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  			kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
->  			return 1;
->  		}
-> -		return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> +		return kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
->  	}
->  
->  	/*
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9a8969a6dd06..c3662fc3b1bc 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7014,7 +7014,7 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  	++vcpu->stat.insn_emulation_fail;
->  	trace_kvm_emulate_insn_failed(vcpu);
->  
-> -	if (emulation_type & EMULTYPE_VMWARE_GP) {
-> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
->  		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
->  		return 1;
->  	}
-> @@ -7267,6 +7267,28 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
->  	return false;
->  }
->  
-> +static int is_vm_instr_opcode(struct x86_emulate_ctxt *ctxt)
-
-Nit: it seems we either return '0' or 'ctxt->modrm' which is 'u8', so
-'u8' instead of 'int' maybe?
-
-> +{
-> +	unsigned long rax;
-> +
-> +	if (ctxt->b != 0x1)
-> +		return 0;
-> +
-> +	switch (ctxt->modrm) {
-> +	case 0xd8: /* VMRUN */
-> +	case 0xda: /* VMLOAD */
-> +	case 0xdb: /* VMSAVE */
-> +		rax = kvm_register_read(emul_to_vcpu(ctxt), VCPU_REGS_RAX);
-> +		if (!kvm_is_host_reserved_region(rax))
-> +			return 0;
-> +		break;
-> +	default:
-> +		return 0;
-> +	}
-> +
-> +	return ctxt->modrm;
-> +}
-> +
->  static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
->  {
->  	switch (ctxt->opcode_len) {
-> @@ -7305,6 +7327,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->  	bool writeback = true;
->  	bool write_fault_to_spt;
-> +	int vminstr;
->  
->  	if (unlikely(!kvm_x86_ops.can_emulate_instruction(vcpu, insn, insn_len)))
->  		return 1;
-> @@ -7367,10 +7390,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		}
->  	}
->  
-> -	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
-> -	    !is_vmware_backdoor_opcode(ctxt)) {
-> -		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> -		return 1;
-> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
-> +		vminstr = is_vm_instr_opcode(ctxt);
-> +		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
-> +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +			return 1;
-> +		}
-> +		if (vminstr)
-> +			return vminstr;
->  	}
->  
->  	/*
-
--- 
-Vitaly
+VGhpcyBmZWF0dXJlIGlzIGFpbWVkIGF0IHZpcnR1YWxpemVkIG9yIGNvbnRhaW5lcml6ZWQgZW52
+aXJvbm1lbnRzCndoZXJlIFZNIG9yIGNvbnRhaW5lciBzbmFwc2hvdHRpbmcgZHVwbGljYXRlcyBt
+ZW1vcnkgc3RhdGUsIHdoaWNoIGlzIGEKY2hhbGxlbmdlIGZvciBhcHBsaWNhdGlvbnMgdGhhdCB3
+YW50IHRvIGdlbmVyYXRlIHVuaXF1ZSBkYXRhIHN1Y2ggYXMKcmVxdWVzdCBJRHMsIFVVSURzLCBh
+bmQgY3J5cHRvZ3JhcGhpYyBub25jZXMuCgpUaGUgcGF0Y2ggc2V0IGludHJvZHVjZXMgYSBtZWNo
+YW5pc20gdGhhdCBwcm92aWRlcyBhIHVzZXJzcGFjZQppbnRlcmZhY2UgZm9yIGFwcGxpY2F0aW9u
+cyBhbmQgbGlicmFyaWVzIHRvIGJlIG1hZGUgYXdhcmUgb2YgdW5pcXVlbmVzcwpicmVha2luZyBl
+dmVudHMgc3VjaCBhcyBWTSBvciBjb250YWluZXIgc25hcHNob3R0aW5nLCBhbmQgYWxsb3cgdGhl
+bSB0bwpyZWFjdCBhbmQgYWRhcHQgdG8gc3VjaCBldmVudHMuCgpTb2x2aW5nIHRoZSB1bmlxdWVu
+ZXNzIHByb2JsZW0gc3Ryb25nbHkgZW5vdWdoIGZvciBjcnlwdG9ncmFwaGljCnB1cnBvc2VzIHJl
+cXVpcmVzIGEgbWVjaGFuaXNtIHdoaWNoIGNhbiBkZXRlcm1pbmlzdGljYWxseSByZXNlZWQKdXNl
+cnNwYWNlIFBSTkdzIHdpdGggbmV3IGVudHJvcHkgYXQgcmVzdG9yZSB0aW1lLiBUaGlzIG1lY2hh
+bmlzbSBtdXN0CmFsc28gc3VwcG9ydCB0aGUgaGlnaC10aHJvdWdocHV0IGFuZCBsb3ctbGF0ZW5j
+eSB1c2UtY2FzZXMgdGhhdCBsZWQKcHJvZ3JhbW1lcnMgdG8gcGljayBhIHVzZXJzcGFjZSBQUk5H
+IGluIHRoZSBmaXJzdCBwbGFjZTsgYmUgdXNhYmxlIGJ5CmJvdGggYXBwbGljYXRpb24gY29kZSBh
+bmQgbGlicmFyaWVzOyBhbGxvdyB0cmFuc3BhcmVudCByZXRyb2ZpdHRpbmcKYmVoaW5kIGV4aXN0
+aW5nIHBvcHVsYXIgUFJORyBpbnRlcmZhY2VzIHdpdGhvdXQgY2hhbmdpbmcgYXBwbGljYXRpb24K
+Y29kZTsgaXQgbXVzdCBiZSBlZmZpY2llbnQsIGVzcGVjaWFsbHkgb24gc25hcHNob3QgcmVzdG9y
+ZTsgYW5kIGJlCnNpbXBsZSBlbm91Z2ggZm9yIHdpZGUgYWRvcHRpb24uCgpUaGUgZmlyc3QgcGF0
+Y2ggaW4gdGhlIHNldCBpbXBsZW1lbnRzIGEgZGV2aWNlIGRyaXZlciB3aGljaCBleHBvc2VzIGEK
+cmVhZC1vbmx5IGRldmljZSAvZGV2L3N5c2dlbmlkIHRvIHVzZXJzcGFjZSwgd2hpY2ggY29udGFp
+bnMgYQptb25vdG9uaWNhbGx5IGluY3JlYXNpbmcgdTMyIGdlbmVyYXRpb24gY291bnRlci4gTGli
+cmFyaWVzIGFuZAphcHBsaWNhdGlvbnMgYXJlIGV4cGVjdGVkIHRvIG9wZW4oKSB0aGUgZGV2aWNl
+LCBhbmQgdGhlbiBjYWxsIHJlYWQoKQp3aGljaCBibG9ja3MgdW50aWwgdGhlIFN5c0dlbklkIGNo
+YW5nZXMuIEZvbGxvd2luZyBhbiB1cGRhdGUsIHJlYWQoKQpjYWxscyBubyBsb25nZXIgYmxvY2sg
+dW50aWwgdGhlIGFwcGxpY2F0aW9uIGFja25vd2xlZGdlcyB0aGUgbmV3ClN5c0dlbklkIGJ5IHdy
+aXRlKClpbmcgaXQgYmFjayB0byB0aGUgZGV2aWNlLiBOb24tYmxvY2tpbmcgcmVhZCgpIGNhbGxz
+CnJldHVybiBFQUdBSU4gd2hlbiB0aGVyZSBpcyBubyBuZXcgU3lzR2VuSWQgYXZhaWxhYmxlLiBB
+bHRlcm5hdGl2ZWx5LApsaWJyYXJpZXMgY2FuIG1tYXAoKSB0aGUgZGV2aWNlIHRvIGdldCBhIHNp
+bmdsZSBzaGFyZWQgcGFnZSB3aGljaApjb250YWlucyB0aGUgbGF0ZXN0IFN5c0dlbklkIGF0IG9m
+ZnNldCAwLgoKU3lzR2VuSWQgYWxzbyBzdXBwb3J0cyBhIG5vdGlmaWNhdGlvbiBtZWNoYW5pc20g
+ZXhwb3NlZCBhcyB0d28gSU9DVExzCm9uIHRoZSBkZXZpY2UuIFNZU0dFTklEX0dFVF9PVVREQVRF
+RF9XQVRDSEVSUyBpbW1lZGlhdGVseSByZXR1cm5zIHRoZQpudW1iZXIgb2YgZmlsZSBkZXNjcmlw
+dG9ycyB0byB0aGUgZGV2aWNlIHRoYXQgd2VyZSBvcGVuIGR1cmluZyB0aGUgbGFzdApTeXNHZW5J
+ZCBjaGFuZ2UgYnV0IGhhdmUgbm90IHlldCBhY2tub3dsZWRnZWQgdGhlIG5ldyBpZC4KU1lTR0VO
+SURfV0FJVF9XQVRDSEVSUyBibG9ja3MgdW50aWwgdGhlcmUgYXJlIG5vIG9wZW4gZmlsZSBoYW5k
+bGVzIG9uCnRoZSBkZXZpY2Ugd2hpY2ggaGF2ZW7igJl0IGFja25vd2xlZGdlZCB0aGUgbmV3IGlk
+LiBUaGVzZSB0d28gaW50ZXJmYWNlcwphcmUgaW50ZW5kZWQgZm9yIHNlcnZlcmxlc3MgYW5kIGNv
+bnRhaW5lciBjb250cm9sIHBsYW5lcywgd2hpY2ggd2FudCB0bwpjb25maXJtIHRoYXQgYWxsIGFw
+cGxpY2F0aW9uIGNvZGUgaGFzIGRldGVjdGVkIGFuZCByZWFjdGVkIHRvIHRoZSBuZXcKU3lzR2Vu
+SWQgYmVmb3JlIHNlbmRpbmcgYW4gaW52b2tlIHRvIHRoZSBuZXdseS1yZXN0b3JlZCBzYW5kYm94
+LgoKVGhlIHNlY29uZCBwYXRjaCBpbiB0aGUgc2V0IGFkZHMgYSBWbUdlbklkIGRyaXZlciB3aGlj
+aCBtYWtlcyB1c2Ugb2YKdGhlIEFDUEkgdm1nZW5pZCBkZXZpY2UgdG8gZHJpdmUgU3lzR2VuSWQg
+YW5kIHRvIHJlc2VlZCBrZXJuZWwgZW50cm9weQpvbiBWTSBzbmFwc2hvdHMuCgotLS0KCnYzIC0+
+IHY0OgoKICAtIHNwbGl0IGZ1bmN0aW9uYWxpdHkgaW4gdHdvIHNlcGFyYXRlIGtlcm5lbCBtb2R1
+bGVzOiAKICAgIDEuIGRyaXZlcnMvbWlzYy9zeXNnZW5pZC5jIHdoaWNoIHByb3ZpZGVzIHRoZSBn
+ZW5lcmljIHVzZXJzcGFjZQogICAgICAgaW50ZXJmYWNlIGFuZCBtZWNoYW5pc21zCiAgICAyLiBk
+cml2ZXJzL3ZpcnQvdm1nZW5pZC5jIGFzIFZNR0VOSUQgYWNwaSBkZXZpY2UgZHJpdmVyIHRoYXQg
+c2VlZHMKICAgICAgIGtlcm5lbCBlbnRyb3B5IGFuZCBhY3RzIGFzIGEgZHJpdmluZyBiYWNrZW5k
+IGZvciB0aGUgZ2VuZXJpYwogICAgICAgc3lzZ2VuaWQKICAtIHJlbmFtZWQgL2Rldi92bWdlbmlk
+IC0+IC9kZXYvc3lzZ2VuaWQKICAtIHJlbmFtZWQgdWFwaSBoZWFkZXIgZmlsZSB2bWdlbmlkLmgg
+LT4gc3lzZ2VuaWQuaAogIC0gcmVuYW1lZCBpb2N0bHMgVk1HRU5JRF8qIC0+IFNZU0dFTklEXyoK
+ICAtIGFkZGVkIOKAmG1pbl9nZW7igJkgcGFyYW1ldGVyIHRvIFNZU0dFTklEX0ZPUkNFX0dFTl9V
+UERBVEUgaW9jdGwKICAtIGZpeGVkIHJhY2VzIGluIGRvY3VtZW50YXRpb24gZXhhbXBsZXMKICAt
+IHZhcmlvdXMgc3R5bGUgbml0cwogIC0gcmViYXNlZCBvbiB0b3Agb2YgbGludXMgbGF0ZXN0Cgp2
+MiAtPiB2MzoKCiAgLSBzZXBhcmF0ZSB0aGUgY29yZSBkcml2ZXIgbG9naWMgYW5kIGludGVyZmFj
+ZSwgZnJvbSB0aGUgQUNQSSBkZXZpY2UuCiAgICBUaGUgQUNQSSB2bWdlbmlkIGRldmljZSBpcyBu
+b3cgb25lIHBvc3NpYmxlIGJhY2tlbmQuCiAgLSBmaXggaXNzdWUgd2hlbiB0aW1lb3V0PTAgaW4g
+Vk1HRU5JRF9XQUlUX1dBVENIRVJTCiAgLSBhZGQgbG9ja2luZyB0byBhdm9pZCByYWNlcyBiZXR3
+ZWVuIGZzIG9wcyBoYW5kbGVycyBhbmQgaHcgaXJxCiAgICBkcml2ZW4gZ2VuZXJhdGlvbiB1cGRh
+dGVzCiAgLSBjaGFuZ2UgVk1HRU5JRF9XQUlUX1dBVENIRVJTIGlvY3RsIHNvIGlmIHRoZSBjdXJy
+ZW50IGNhbGxlciBpcwogICAgb3V0ZGF0ZWQgb3IgYSBnZW5lcmF0aW9uIGNoYW5nZSBoYXBwZW5z
+IHdoaWxlIHdhaXRpbmcgKHRodXMgbWFraW5nCiAgICBjdXJyZW50IGNhbGxlciBvdXRkYXRlZCks
+IHRoZSBpb2N0bCByZXR1cm5zIC1FSU5UUiB0byBzaWduYWwgdGhlCiAgICB1c2VyIHRvIGhhbmRs
+ZSBldmVudCBhbmQgcmV0cnkuIEZpeGVzIGJsb2NraW5nIG9uIG9uZXNlbGYuCiAgLSBhZGQgVk1H
+RU5JRF9GT1JDRV9HRU5fVVBEQVRFIGlvY3RsIGNvbmRpdGlvbmVkIGJ5CiAgICBDQVBfQ0hFQ0tQ
+T0lOVF9SRVNUT1JFIGNhcGFiaWxpdHksIHRocm91Z2ggd2hpY2ggc29mdHdhcmUgY2FuIGZvcmNl
+CiAgICBnZW5lcmF0aW9uIGJ1bXAuCgp2MSAtPiB2MjoKCiAgLSBleHBvc2UgdG8gdXNlcnNwYWNl
+IGEgbW9ub3RvbmljYWxseSBpbmNyZWFzaW5nIHUzMiBWbSBHZW4gQ291bnRlcgogICAgaW5zdGVh
+ZCBvZiB0aGUgaHcgVm1HZW4gVVVJRAogIC0gc2luY2UgdGhlIGh3L2h5cGVydmlzb3ItcHJvdmlk
+ZWQgMTI4LWJpdCBVVUlEIGlzIG5vdCBwdWJsaWMKICAgIGFueW1vcmUsIGFkZCBpdCB0byB0aGUg
+a2VybmVsIFJORyBhcyBkZXZpY2UgcmFuZG9tbmVzcwogIC0gaW5zZXJ0IGRyaXZlciBwYWdlIGNv
+bnRhaW5pbmcgVm0gR2VuIENvdW50ZXIgaW4gdGhlIHVzZXIgdm1hIGluCiAgICB0aGUgZHJpdmVy
+J3MgbW1hcCBoYW5kbGVyIGluc3RlYWQgb2YgdXNpbmcgYSBmYXVsdCBoYW5kbGVyCiAgLSB0dXJu
+IGRyaXZlciBpbnRvIGEgbWlzYyBkZXZpY2UgZHJpdmVyIHRvIGF1dG8tY3JlYXRlIC9kZXYvdm1n
+ZW5pZAogIC0gY2hhbmdlIGlvY3RsIGFyZyB0byBhdm9pZCBsZWFraW5nIGtlcm5lbCBzdHJ1Y3Rz
+IHRvIHVzZXJzcGFjZQogIC0gdXBkYXRlIGRvY3VtZW50YXRpb24KICAtIHZhcmlvdXMgbml0cwog
+IC0gcmViYXNlIG9uIHRvcCBvZiBsaW51cyBsYXRlc3QKCkFkcmlhbiBDYXRhbmdpdSAoMik6CiAg
+ZHJpdmVycy9taXNjOiBzeXNnZW5pZDogYWRkIHN5c3RlbSBnZW5lcmF0aW9uIGlkIGRyaXZlcgog
+IGRyaXZlcnMvdmlydDogdm1nZW5pZDogYWRkIHZtIGdlbmVyYXRpb24gaWQgZHJpdmVyCgogRG9j
+dW1lbnRhdGlvbi9taXNjLWRldmljZXMvc3lzZ2VuaWQucnN0IHwgMjQwICsrKysrKysrKysrKysr
+KysrKysrKysrKysKIERvY3VtZW50YXRpb24vdmlydC92bWdlbmlkLnJzdCAgICAgICAgICB8ICAz
+NCArKysrCiBkcml2ZXJzL21pc2MvS2NvbmZpZyAgICAgICAgICAgICAgICAgICAgfCAgMTYgKysK
+IGRyaXZlcnMvbWlzYy9NYWtlZmlsZSAgICAgICAgICAgICAgICAgICB8ICAgMSArCiBkcml2ZXJz
+L21pc2Mvc3lzZ2VuaWQuYyAgICAgICAgICAgICAgICAgfCAyOTggKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKIGRyaXZlcnMvdmlydC9LY29uZmlnICAgICAgICAgICAgICAgICAgICB8
+ICAxNCArKwogZHJpdmVycy92aXJ0L01ha2VmaWxlICAgICAgICAgICAgICAgICAgIHwgICAxICsK
+IGRyaXZlcnMvdmlydC92bWdlbmlkLmMgICAgICAgICAgICAgICAgICB8IDE1MyArKysrKysrKysr
+KysrKysrCiBpbmNsdWRlL3VhcGkvbGludXgvc3lzZ2VuaWQuaCAgICAgICAgICAgfCAgMTggKysK
+IDkgZmlsZXMgY2hhbmdlZCwgNzc1IGluc2VydGlvbnMoKykKIGNyZWF0ZSBtb2RlIDEwMDY0NCBE
+b2N1bWVudGF0aW9uL21pc2MtZGV2aWNlcy9zeXNnZW5pZC5yc3QKIGNyZWF0ZSBtb2RlIDEwMDY0
+NCBEb2N1bWVudGF0aW9uL3ZpcnQvdm1nZW5pZC5yc3QKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2
+ZXJzL21pc2Mvc3lzZ2VuaWQuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmlydC92bWdl
+bmlkLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL3VhcGkvbGludXgvc3lzZ2VuaWQuaAoK
+LS0gCjIuNy40CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIChSb21hbmlhKSBTLlIuTC4g
+cmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3RyZWV0LCBVQkM1LCBmbG9vciAyLCBJ
+YXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBSZWdpc3RlcmVkIGluIFJvbWFuaWEu
+IFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
