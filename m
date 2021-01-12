@@ -2,76 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AE9C2F2615
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:09:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BA072F2642
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:27:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727114AbhALCIp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 21:08:45 -0500
-Received: from mga04.intel.com ([192.55.52.120]:30909 "EHLO mga04.intel.com"
+        id S1728521AbhALCZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 21:25:25 -0500
+Received: from mga07.intel.com ([134.134.136.100]:3978 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbhALCIo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 21:08:44 -0500
-IronPort-SDR: Y6IGrWOxPA23pDtEPqThFXcSGumA/HxcgLRf0hJeSxR0dNpJvjgE2I7eLrL0UtD6eWKPjoQ8Mc
- QO3diSIRXaEg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="175388174"
+        id S1726645AbhALCZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 21:25:25 -0500
+IronPort-SDR: HBvjqQw+qmT8B2VPezNAmfGXZJP8VMTFx3jayVp762W55HauBFPYis8GmzcJI+2t+03Fafthla
+ RxhHwf+RlPhA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="242040056"
 X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="175388174"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:08:02 -0800
-IronPort-SDR: pBUVGzuPoEV51Z+y+cy/1aj9XGB2p7Sr2rmHd8b2zOWZtqUnrDzt9aSzXJh3k47V5EKBN0N2hb
- nCX2AX9lcgzA==
+   d="scan'208";a="242040056"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:24:44 -0800
+IronPort-SDR: nL9ruWuxWD/nCSoKNLHntIVgvGs+7b30LkClJCvHR6ZkTXHJz13vYx27RQZ0c2k9D+YvWkrFH0
+ DQVKUMA3cIXA==
 X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="352829883"
-Received: from tpotnis-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.76.146])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:07:58 -0800
-Date:   Tue, 12 Jan 2021 15:07:56 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, mattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-Message-Id: <20210112150756.f3fb039ac1bb176262da5e52@intel.com>
-In-Reply-To: <X/0DRMx7FC5ssg0p@kernel.org>
-References: <cover.1609890536.git.kai.huang@intel.com>
-        <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
-        <20210112141428.038533b6cd5f674c906a3c43@intel.com>
-        <X/0DRMx7FC5ssg0p@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+   d="scan'208";a="381240943"
+Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.144.101])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 11 Jan 2021 18:24:40 -0800
+Date:   Tue, 12 Jan 2021 10:13:21 +0800
+From:   Yang Zhong <yang.zhong@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, tony.luck@intel.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kyung.min.park@intel.com, x86@kernel.org,
+        yang.zhong@intel.com
+Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
+Message-ID: <20210112021321.GA9922@yangzhon-Virtual>
+References: <20210105004909.42000-1-yang.zhong@intel.com>
+ <20210105004909.42000-2-yang.zhong@intel.com>
+ <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
+ <20210105121456.GE28649@zn.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210105121456.GE28649@zn.tnic>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> > > > 
-> > > > To support virtual EPC, add a new misc device /dev/sgx_virt_epc to SGX
-> > > > core/driver to allow userspace (Qemu) to allocate "raw" EPC, and use it as
-> > > > "virtual EPC" for guest. Obviously, unlike EPC allocated for host SGX driver,
-> > > > virtual EPC allocated via /dev/sgx_virt_epc doesn't have enclave associated,
-> > > > and how virtual EPC is used by guest is compeletely controlled by guest's SGX
-> > > > software.
+On Tue, Jan 05, 2021 at 01:14:56PM +0100, Borislav Petkov wrote:
+> On Tue, Jan 05, 2021 at 12:47:23PM +0100, Paolo Bonzini wrote:
+> > On 05/01/21 01:49, Yang Zhong wrote:
+> > > From: Kyung Min Park <kyung.min.park@intel.com>
 > > > 
-> > > I think that /dev/sgx_vepc would be a clear enough name for the device. This
-> > > text has now a bit confusing "terminology" related to this.
+> > > Add AVX version of the Vector Neural Network (VNNI) Instructions.
+> > > 
+> > > A processor supports AVX VNNI instructions if CPUID.0x07.0x1:EAX[4] is
+> > > present. The following instructions are available when this feature is
+> > > present.
+> > >    1. VPDPBUS: Multiply and Add Unsigned and Signed Bytes
+> > >    2. VPDPBUSDS: Multiply and Add Unsigned and Signed Bytes with Saturation
+> > >    3. VPDPWSSD: Multiply and Add Signed Word Integers
+> > >    4. VPDPWSSDS: Multiply and Add Signed Integers with Saturation
+> > > 
+> > > The only in-kernel usage of this is kvm passthrough. The CPU feature
+> > > flag is shown as "avx_vnni" in /proc/cpuinfo.
+> > > 
+> > > This instruction is currently documented in the latest "extensions"
+> > > manual (ISE). It will appear in the "main" manual (SDM) in the future.
+> > > 
+> > > Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
+> > > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> > > Reviewed-by: Tony Luck <tony.luck@intel.com>
+> > > ---
+> > >   arch/x86/include/asm/cpufeatures.h | 1 +
+> > >   1 file changed, 1 insertion(+)
+> > > 
+> > > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> > > index f5ef2d5b9231..d10d9962bd9b 100644
+> > > --- a/arch/x86/include/asm/cpufeatures.h
+> > > +++ b/arch/x86/include/asm/cpufeatures.h
+> > > @@ -293,6 +293,7 @@
+> > >   #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
+> > >   /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+> > > +#define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+> > >   #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
+> > >   /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
+> > > 
 > > 
-> > /dev/sgx_virt_epc may be clearer from userspace's perspective, for instance,
-> > if people see /dev/sgx_vepc, they may have to think about what it is,
-> > while /dev/sgx_virt_epc they may not.
-> > 
-> > But I don't have strong objection here. Does anyone has anything to say here?
+> > Boris, is it possible to have a topic branch for this patch?
 > 
-> It's already an abberevation to start with, why leave it halfways?
+> Just take it through your tree pls.
 > 
-> Especially when three remaining words have been shrunk to single
-> characters ('E', 'P' and 'C').
-> 
+> Acked-by: Borislav Petkov <bp@suse.de>
+>
+  
+  Paolo, Boris has acked this kernel patch, and if i need send new patchset to add this 
+  acked-by info ? or kvm tree will directly pull this patchset? thanks.
 
-I have expressed my opinion above. And as I said I don't have strong objection
-here. I'll change to /dev/sgx_vepc if no one opposes.
+  Yang  
+
+   
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
