@@ -2,122 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 226652F34A9
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 16:52:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EF0F2F3503
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392073AbhALPwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 10:52:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54684 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392062AbhALPwD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 10:52:03 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B404C061794
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 07:51:23 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id b3so1285969pft.3
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 07:51:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=meDQXX3XD75fr/Eh+OZMYbgkflSWbsrFgrToIxKFeB8=;
-        b=RZrg0tk6bQj6DM1AY7MNXKv0DnzfmYK79bq8YdEH9FgAWrXF1PWqAgRIuyDTG2x1Ue
-         Kq7t8LhYNncsed4/aJtjfDjt5Q+/IDfcIfj4z8vImrp9Unrey24ogvuDw6mWPO57GOiY
-         mUeWmw3DU9OI1VrqFTdtR5xqdIGczh/qwfRsIAWMjWXwc9A7IcVBfOCWjcsHORg96squ
-         rfls/Pd0lBtrHN8nyBh9tFE0xy38qWk5fl+z7ZDxucHiM+mFW/NyPqb2DBv3b7YeGoM0
-         Va7/xZNPnjH9fPd5Avq8igc18BEEpC2bEm/kD4ijfDtA17nBo+jSxSDp1xC0AtPa/5vW
-         eAPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=meDQXX3XD75fr/Eh+OZMYbgkflSWbsrFgrToIxKFeB8=;
-        b=aDIVBbySu+m4WevofbyX4/YvKmjkDB3XkAVTAQ6wBAEfy9LRpMvRDW4GG0hCoJs/KW
-         1BCuKYv92HBwOeINChSiLUzlAuoBGWPKk85ABOixif1OJtbOWb4DIsrD9SBUDe04b3Gt
-         KiN8q1aMKQGh4Z103MlFC9zSLsYdL+8SKtwMb1R6Mtts5A+Xcs5XQ98ynmeJVCzLi1nZ
-         LaPyaeH2aYgu3DMX8gpwKy0vr7Tjse+WmZ4u1xnf8KDHoEzDD7YNBRdvk+tzSvX4S01n
-         f+8N9UHW2+19UYEQg9tH0beH/T/TP/Jf3cUd6/JAUo8seqbpxBvtuQVBNrzDiD1ElBzr
-         e2jA==
-X-Gm-Message-State: AOAM533dzi12UlS1g03+slvYuJ0UT4ZaoBPjDQr8eVIydBQeUhMRjBH7
-        cf1ADJ94ssdeGvvnteTdw397zw==
-X-Google-Smtp-Source: ABdhPJwa0jFvja1e809QMhaIsVsedI0V1Nmc2CmTBYN6vm75qgQa7r6ag6ohSpXAYbQeMQ/UZSWv9A==
-X-Received: by 2002:a63:2347:: with SMTP id u7mr5279301pgm.189.1610466682707;
-        Tue, 12 Jan 2021 07:51:22 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:1d60:88a3:44d6:6b86? ([2601:646:c200:1ef2:1d60:88a3:44d6:6b86])
-        by smtp.gmail.com with ESMTPSA id k15sm3625781pfp.115.2021.01.12.07.51.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Jan 2021 07:51:21 -0800 (PST)
+        id S2392170AbhALQFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 11:05:05 -0500
+Received: from foss.arm.com ([217.140.110.172]:48980 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392027AbhALQFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 11:05:05 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1DD51FB;
+        Tue, 12 Jan 2021 08:04:19 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29ADD3F719;
+        Tue, 12 Jan 2021 08:04:18 -0800 (PST)
+Subject: Re: [PATCH 7/9] KVM: arm64: Simplify argument passing to
+ vgic_uaccess_[read|write]
+To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
+Cc:     james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+References: <20201212185010.26579-1-eric.auger@redhat.com>
+ <20201212185010.26579-8-eric.auger@redhat.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ee2ec95e-4262-a364-b037-c43f3d396760@arm.com>
+Date:   Tue, 12 Jan 2021 16:04:24 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <20201212185010.26579-8-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by VM instructions
-Date:   Tue, 12 Jan 2021 07:51:19 -0800
-Message-Id: <8FAC639B-5EC6-42EE-B886-33AEF3CD5E26@amacapital.net>
-References: <jpgturmgnu6.fsf@linux.bootlegged.copy>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        seanjc@google.com, joro@8bytes.org, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, dgilbert@redhat.com
-In-Reply-To: <jpgturmgnu6.fsf@linux.bootlegged.copy>
-To:     Bandan Das <bsd@redhat.com>
-X-Mailer: iPhone Mail (18C66)
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Eric,
 
-> On Jan 12, 2021, at 7:46 AM, Bandan Das <bsd@redhat.com> wrote:
->=20
-> =EF=BB=BFAndy Lutomirski <luto@amacapital.net> writes:
-> ...
->>>>>> #endif diff --git a/arch/x86/kvm/mmu/mmu.c
->>>>>> b/arch/x86/kvm/mmu/mmu.c index 6d16481aa29d..c5c4aaf01a1a 100644
->>>>>> --- a/arch/x86/kvm/mmu/mmu.c +++ b/arch/x86/kvm/mmu/mmu.c @@
->>>>>> -50,6 +50,7 @@ #include <asm/io.h> #include <asm/vmx.h> #include
->>>>>> <asm/kvm_page_track.h> +#include <asm/e820/api.h> #include
->>>>>> "trace.h"
->>>>>>=20
->>>>>> extern bool itlb_multihit_kvm_mitigation; @@ -5675,6 +5676,12 @@
->>>>>> void kvm_mmu_slot_set_dirty(struct kvm *kvm, }
->>>>>> EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
->>>>>>=20
->>>>>> +bool kvm_is_host_reserved_region(u64 gpa) +{ + return
->>>>>> e820__mbapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED); +}
->>>>> While _e820__mapped_any()'s doc says '..  checks if any part of
->>>>> the range <start,end> is mapped ..' it seems to me that the real
->>>>> check is [start, end) so we should use 'gpa' instead of 'gpa-1',
->>>>> no?
->>>> Why do you need to check GPA at all?
->>>>=20
->>> To reduce the scope of the workaround.
->>>=20
->>> The errata only happens when you use one of SVM instructions in the
->>> guest with EAX that happens to be inside one of the host reserved
->>> memory regions (for example SMM).
->>=20
->> This code reduces the scope of the workaround at the cost of
->> increasing the complexity of the workaround and adding a nonsensical
->> coupling between KVM and host details and adding an export that really
->> doesn=E2=80=99t deserve to be exported.
->>=20
->> Is there an actual concrete benefit to this check?
->=20
-> Besides reducing the scope, my intention for the check was that we should
-> know if such exceptions occur for any other undiscovered reasons with othe=
-r
-> memory types rather than hiding them under this workaround.
+On 12/12/20 6:50 PM, Eric Auger wrote:
+> Instead of converting the vgic_io_device handle to a kvm_io_device
+> handled and then do the oppositive, pass a vgic_io_device pointer all
+> along the call chain.
 
-Ask AMD?
+To me, it looks like the commit message describes what the patch does instead of
+why it does it.
 
-I would also believe that someone somewhere has a firmware that simply omits=
- the problematic region instead of listing it as reserved.
+What are "vgic_io_device handle" and "kvm_io_device handled"?
 
->=20
-> Bandan
->=20
->=20
->=20
+Thanks,
+Alex
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-mmio.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> index b2d73fc0d1ef..48c6067fc5ec 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -938,10 +938,9 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+>  	return region;
+>  }
+>  
+> -static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+> +static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+>  			     gpa_t addr, u32 *val)
+>  {
+> -	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+>  	const struct vgic_register_region *region;
+>  	struct kvm_vcpu *r_vcpu;
+>  
+> @@ -960,10 +959,9 @@ static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+>  	return 0;
+>  }
+>  
+> -static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
+> +static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+>  			      gpa_t addr, const u32 *val)
+>  {
+> -	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
+>  	const struct vgic_register_region *region;
+>  	struct kvm_vcpu *r_vcpu;
+>  
+> @@ -986,9 +984,9 @@ int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
+>  		 bool is_write, int offset, u32 *val)
+>  {
+>  	if (is_write)
+> -		return vgic_uaccess_write(vcpu, &dev->dev, offset, val);
+> +		return vgic_uaccess_write(vcpu, dev, offset, val);
+>  	else
+> -		return vgic_uaccess_read(vcpu, &dev->dev, offset, val);
+> +		return vgic_uaccess_read(vcpu, dev, offset, val);
+>  }
+>  
+>  static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
