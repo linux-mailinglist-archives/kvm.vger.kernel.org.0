@@ -2,114 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C74852F3828
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:14:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DA4A2F38B9
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:25:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406397AbhALSNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 13:13:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56874 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406341AbhALSMw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 13:12:52 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5F7C061786
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:28 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id m9so2036206pji.4
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=g0L8hmPn9GuXc9nZO+Oou7JZXqfcIc+E8Ihxm6+j3DU=;
-        b=UT0gYjhnNhJ+NBN73bHFodwS8foa8jvrx4VmOboLjqDbrgRqkha4K2C69MJnR6Sqf5
-         H2gUwLNolfgumTqWw5nf9oo7A6B6j8Te/VpjlEhGDHrr1uDFEa3WCBf6N1nwmpfd7vNU
-         IeiQQ/gUvG3/xt/JtGO5PXOyNTf36L5gA2i+hrltGwouhR2tClE5m/2AsUqq0hP0qfqP
-         GDuLNIMzumJgBhT3uYKCtOgGh1fuayZNIwIf8FCXghVM/V5+YFsuTrSGtZxim2DXSzWL
-         uYiFzkvXeSm7xQpvCqfwLicmmy2eLViDEfKavNF9z1tR6S3efmaZwa3CHkh/qqEyrAZ+
-         hDug==
+        id S2436561AbhALSXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 13:23:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57335 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2406632AbhALSXf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 13:23:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610475726;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ltzSMsOBmoKeRI1L4IOCgQ7n1ZwKFysvzmkyq562kMs=;
+        b=jVj6xSJOSm65BeYrnYAI1HHEXzlLL2tgyIET/5o2de49gl9qc6Mt03Ss7Gio+H0CYwcBv5
+        rf2HFXSfoBAGbD6KsdXxJ4Y+5gxCx/Ia7lFq2df2HXdzE59a7dx3fo30VWfGk8tJMTX88h
+        1pyQk5VLPEaXznHbHdmcIQn26T68F/8=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-d5jmNgDwMJSyqLKi2i6qjQ-1; Tue, 12 Jan 2021 13:22:04 -0500
+X-MC-Unique: d5jmNgDwMJSyqLKi2i6qjQ-1
+Received: by mail-qk1-f198.google.com with SMTP id 189so2178546qko.1
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:22:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=g0L8hmPn9GuXc9nZO+Oou7JZXqfcIc+E8Ihxm6+j3DU=;
-        b=DMhRlzh43JnR3q2lw35fBEAb/D5wpupUrsdgX70s4yjfFk0pOARwl4hekwOCwLEiUE
-         vmLFHABC4Fm8DZ8AR3pA1WHxdooFc27pXYMmhi06i283yST9ru04GrBejxsOTS6wD9wv
-         Esv6s42gSaFsilTSRfnX186BlucgXXZ751FRQthQrL0XsPsG3HJOyNmsndiPsetjpT7k
-         Lskgv+ZZQXZ5vB6tJYT+hcyjLVYgwkaNTD0L3/0IuSDjowzrwaZSJMI90LbzR+GOoFfb
-         f/HBKnuuJSeIasuTjyY/zbtc0wKTY7kNgCBYXOXSZIMIz9MgdzJrOjJObPWeKRNOMlqC
-         cxMQ==
-X-Gm-Message-State: AOAM530/VfBInBHoAcZQvCyf2yGIxfmsMKg5eZlrAxDeCjm4fYBR73ys
-        e9qijd5RvaRmjQWWNZm6LULp8D+G6Coj
-X-Google-Smtp-Source: ABdhPJy+BhtXRABw6D2zuNKJQwmN0hyHQI3MsRgEDguv9uWdT8S5ve5nVaC82N7Wy6MFXkyveNHCcsSyooM+
-Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a17:90b:ec2:: with SMTP id
- gz2mr328174pjb.143.1610475088336; Tue, 12 Jan 2021 10:11:28 -0800 (PST)
-Date:   Tue, 12 Jan 2021 10:10:41 -0800
-In-Reply-To: <20210112181041.356734-1-bgardon@google.com>
-Message-Id: <20210112181041.356734-25-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210112181041.356734-1-bgardon@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 24/24] kvm: x86/mmu: Allow parallel page faults for the TDP MMU
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ben Gardon <bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ltzSMsOBmoKeRI1L4IOCgQ7n1ZwKFysvzmkyq562kMs=;
+        b=Rt+SBnOCTHapmpmsvgt3dcd7rg2FqBQ6SCiBj2Ie7xQWXJcJcRYHCFe+bdJlea+Hyf
+         0wv34m8zJwrP7mnUAbWBY3NVSG9EjPJEhpnXWdDmvDijIaljL7UlCuA31emNVTRqm3j9
+         BwSLBNUB/xSDGiwwtfuM2wG3zypIBrbImm9aH4EUFtN481WSbMsXUZL+kbeFoqx6FTlh
+         ea34hq4pFXodRpJf+fq/dkADCgT8uevLUJGMdYqKCaMm6tbUy8Ccxss1EP+ogPz8C9H2
+         wJxmK6Eor3ms9JLetzIUD2TPrWaheUdbXJxCdZpcm9HDAa68Qg98L5v3oSbZ4bmIBiBx
+         dBiA==
+X-Gm-Message-State: AOAM530fo5GHIzBMtsavOKkrMoD/Pz6X2FVgcjoX6Iqw4MvxeWe/G6Zo
+        NUOb043LsRbpCwm+jFvXiqZ/96X1au+NF6e/XJq9bqpk6vQDX3t0kugDGW4etTGStwg8vqrcuiT
+        /YOXW1mSHXpWfv6vKXScqUvRDCrRh
+X-Received: by 2002:ac8:5441:: with SMTP id d1mr270421qtq.384.1610475724532;
+        Tue, 12 Jan 2021 10:22:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzxrsSzZftWuMuBvJWz3zjdZXTF9Rj/KikTBG5Gvotrb499zSfZZnuj1AhLDoewu2jIs4sw+lQd5WdkoGYx0ic=
+X-Received: by 2002:ac8:5441:: with SMTP id d1mr270398qtq.384.1610475724263;
+ Tue, 12 Jan 2021 10:22:04 -0800 (PST)
+MIME-Version: 1.0
+References: <20201120185105.279030-1-eperezma@redhat.com> <20201120185105.279030-7-eperezma@redhat.com>
+ <20201207165848.GM203660@stefanha-x1.localdomain>
+In-Reply-To: <20201207165848.GM203660@stefanha-x1.localdomain>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Tue, 12 Jan 2021 19:21:27 +0100
+Message-ID: <CAJaqyWc4oLzL02GKpPSwEGRxK+UxjOGBAPLzrgrgKRZd9C81GA@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/27] virtio: Add virtio_queue_get_used_notify_split
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     qemu-level <qemu-devel@nongnu.org>,
+        Lars Ganrot <lars.ganrot@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        Salil Mehta <mehta.salil.lnk@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Liran Alon <liralon@gmail.com>,
+        Rob Miller <rob.miller@broadcom.com>,
+        Max Gurtovoy <maxgu14@gmail.com>,
+        Alex Barba <alex.barba@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jim Harford <jim.harford@broadcom.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Harpreet Singh Anand <hanand@xilinx.com>,
+        Christophe Fontaine <cfontain@redhat.com>,
+        vm <vmireyno@marvell.com>, Daniel Daly <dandaly0@gmail.com>,
+        Michael Lilja <ml@napatech.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Nitin Shrivastav <nitin.shrivastav@broadcom.com>,
+        Lee Ballard <ballle98@gmail.com>,
+        Dmytro Kazantsev <dmytro.kazantsev@gmail.com>,
+        Juan Quintela <quintela@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Howard Cai <howard.cai@gmail.com>,
+        Xiao W Wang <xiao.w.wang@intel.com>,
+        Sean Mooney <smooney@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        Eli Cohen <eli@mellanox.com>, Siwei Liu <loseweigh@gmail.com>,
+        Stephen Finucane <stephenfin@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make the last few changes necessary to enable the TDP MMU to handle page
-faults in parallel while holding the mmu_lock in read mode.
+On Mon, Dec 7, 2020 at 5:58 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>
+> On Fri, Nov 20, 2020 at 07:50:44PM +0100, Eugenio P=C3=A9rez wrote:
+> > This function is just used for a few commits, so SW LM is developed
+> > incrementally, and it is deleted after it is useful.
+> >
+> > For a few commits, only the events (irqfd, eventfd) are forwarded.
+>
+> s/eventfd/ioeventfd/ (irqfd is also an eventfd)
+>
 
-Reviewed-by: Peter Feiner <pfeiner@google.com>
+Oops, will fix, thanks!
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+> > +bool virtio_queue_get_used_notify_split(VirtQueue *vq)
+> > +{
+> > +    VRingMemoryRegionCaches *caches;
+> > +    hwaddr pa =3D offsetof(VRingUsed, flags);
+> > +    uint16_t flags;
+> > +
+> > +    RCU_READ_LOCK_GUARD();
+> > +
+> > +    caches =3D vring_get_region_caches(vq);
+> > +    assert(caches);
+> > +    flags =3D virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
+> > +    return !(VRING_USED_F_NO_NOTIFY & flags);
+> > +}
+>
+> QEMU stores the notification status:
+>
+> void virtio_queue_set_notification(VirtQueue *vq, int enable)
+> {
+>     vq->notification =3D enable; <---- here
+>
+>     if (!vq->vring.desc) {
+>         return;
+>     }
+>
+>     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+>         virtio_queue_packed_set_notification(vq, enable);
+>     } else {
+>         virtio_queue_split_set_notification(vq, enable);
+>
+> I'm wondering why it's necessary to fetch from guest RAM instead of
+> using vq->notification? It also works for both split and packed
+> queues so the code would be simpler.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 280d7cd6f94b..fa111ceb67d4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3724,7 +3724,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 		return r;
- 
- 	r = RET_PF_RETRY;
--	kvm_mmu_lock(vcpu->kvm);
-+
-+	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
-+		kvm_mmu_lock_shared(vcpu->kvm);
-+	else
-+		kvm_mmu_lock(vcpu->kvm);
-+
- 	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
- 		goto out_unlock;
- 	r = make_mmu_pages_available(vcpu);
-@@ -3739,7 +3744,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 				 prefault, is_tdp);
- 
- out_unlock:
--	kvm_mmu_unlock(vcpu->kvm);
-+	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
-+		kvm_mmu_unlock_shared(vcpu->kvm);
-+	else
-+		kvm_mmu_unlock(vcpu->kvm);
- 	kvm_release_pfn_clean(pfn);
- 	return r;
- }
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
+To use vq->notification makes sense at the end of the series.
+
+However, at this stage (just routing notifications, not descriptors),
+vhost device is the one updating that flag, not qemu. Since we cannot
+just migrate used ring memory to qemu without migrating descriptors
+ring too, qemu needs to check guest's memory looking for vhost device
+updates on that flag.
+
+I can see how that deserves better documentation or even a better
+name. Also, this function should be in the shadow vq file, not
+virtio.c.
+
+Thanks!
 
