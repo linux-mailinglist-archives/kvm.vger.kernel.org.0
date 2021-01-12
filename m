@@ -2,183 +2,461 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 804272F2D65
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:06:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73AFE2F2D9C
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:12:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726295AbhALLGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 06:06:42 -0500
-Received: from foss.arm.com ([217.140.110.172]:44106 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726119AbhALLGm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 06:06:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3B8C13D5
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
-Received: from mail-pl1-f182.google.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 911C63F73C
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
-Received: by mail-pl1-f182.google.com with SMTP id x12so1205014plr.10
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
-X-Gm-Message-State: AOAM530d8ftSVaSEG9YQ5hdjBglN80F9rfXROKprAdMUliSpZnjJU4eD
-        DbfzsQ0LDTahyLBxjIvawlrw2afi7tfDNc8h3Dg=
-X-Google-Smtp-Source: ABdhPJzsg6zT++OpgkFhHve/i+0GEamVqvPpEfMSkAHJGOtMcZmOT2hTATjzTkckorSJ3yItCQexaSYbcqy/caLFHkw=
-X-Received: by 2002:a17:90a:f28f:: with SMTP id fs15mr4087906pjb.121.1610449555888;
- Tue, 12 Jan 2021 03:05:55 -0800 (PST)
-MIME-Version: 1.0
-References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
- <1599734733-6431-3-git-send-email-yi.l.liu@intel.com> <CAFp+6iFob_fy1cTgcEv0FOXBo70AEf3Z1UvXgPep62XXnLG9Gw@mail.gmail.com>
- <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
-In-Reply-To: <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
-From:   Vivek Gautam <vivek.gautam@arm.com>
-Date:   Tue, 12 Jan 2021 16:35:45 +0530
-X-Gmail-Original-Message-ID: <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
-Message-ID: <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
-Subject: Re: [PATCH v7 02/16] iommu/smmu: Report empty domain nesting info
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Sun, Yi Y" <yi.y.sun@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "stefanha@gmail.com" <stefanha@gmail.com>,
-        Will Deacon <will@kernel.org>,
-        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
-        Roedel <joro@8bytes.org>," <iommu@lists.linux-foundation.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Wu, Hao" <hao.wu@intel.com>, Robin Murphy <robin.murphy@arm.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>
+        id S1727626AbhALLLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 06:11:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40416 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726149AbhALLLM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 06:11:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610449784;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kHla5Y18WcNXMDpJK4x4nqGCKuLzkoEQod1r3luey3A=;
+        b=ONoyS7+H/TYC2rrNjlJ3ihQzk3Ce0p+GiYMpCHZSw5pAZcIKCycdXQsBORB32S6fHhxyzT
+        2DIiYpxpASlP4KExNRIqnReS+FGBAaKzK8ZUvtnVPWPXpn4m1fdG9OIWcQhbrkcf1ZgXgO
+        tmjCvLy7fKEEUrjDPztE5Fd2rQqK/L4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-i56Q0a1GPGKP4EM-siPAyQ-1; Tue, 12 Jan 2021 06:09:40 -0500
+X-MC-Unique: i56Q0a1GPGKP4EM-siPAyQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57181014E79;
+        Tue, 12 Jan 2021 11:09:38 +0000 (UTC)
+Received: from starship (unknown [10.35.206.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B086779D6;
+        Tue, 12 Jan 2021 11:09:31 +0000 (UTC)
+Message-ID: <f95acfbbff46109092881874c8c78edcf58a72e8.camel@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered
+ by VM instructions
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com
+Date:   Tue, 12 Jan 2021 13:09:30 +0200
+In-Reply-To: <20210112063703.539893-1-wei.huang2@amd.com>
+References: <20210112063703.539893-1-wei.huang2@amd.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Yi,
+On Tue, 2021-01-12 at 00:37 -0600, Wei Huang wrote:
+> From: Bandan Das <bsd@redhat.com>
+> 
+> While running VM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
+> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
+> before checking VMCB's instruction intercept. If EAX falls into such
+> memory areas, #GP is triggered before VMEXIT. This causes problem under
+> nested virtualization. To solve this problem, KVM needs to trap #GP and
+> check the instructions triggering #GP. For VM execution instructions,
+> KVM emulates these instructions; otherwise it re-injects #GP back to
+> guest VMs.
+> 
+> Signed-off-by: Bandan Das <bsd@redhat.com>
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+
+This is the ultimate fix for this bug that I had in mind, 
+but I didn't dare to develop it, thinking it won't be accepted 
+due to the added complexity.
+
+From a cursory look this look all right, and I will review 
+and test this either today or tomorrow.
+
+Thank you very much for doing the right fix for this bug.
+
+Best regards,
+	Maxim Levitsky
+
+> ---
+>  arch/x86/include/asm/kvm_host.h |   8 +-
+>  arch/x86/kvm/mmu.h              |   1 +
+>  arch/x86/kvm/mmu/mmu.c          |   7 ++
+>  arch/x86/kvm/svm/svm.c          | 157 +++++++++++++++++++-------------
+>  arch/x86/kvm/svm/svm.h          |   8 ++
+>  arch/x86/kvm/vmx/vmx.c          |   2 +-
+>  arch/x86/kvm/x86.c              |  37 +++++++-
+>  7 files changed, 146 insertions(+), 74 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 3d6616f6f6ef..0ddc309f5a14 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1450,10 +1450,12 @@ extern u64 kvm_mce_cap_supported;
+>   *			     due to an intercepted #UD (see EMULTYPE_TRAP_UD).
+>   *			     Used to test the full emulator from userspace.
+>   *
+> - * EMULTYPE_VMWARE_GP - Set when emulating an intercepted #GP for VMware
+> + * EMULTYPE_PARAVIRT_GP - Set when emulating an intercepted #GP for VMware
+>   *			backdoor emulation, which is opt in via module param.
+>   *			VMware backoor emulation handles select instructions
+> - *			and reinjects the #GP for all other cases.
+> + *			and reinjects #GP for all other cases. This also
+> + *			handles other cases where #GP condition needs to be
+> + *			handled and emulated appropriately
+>   *
+>   * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
+>   *		 case the CR2/GPA value pass on the stack is valid.
+> @@ -1463,7 +1465,7 @@ extern u64 kvm_mce_cap_supported;
+>  #define EMULTYPE_SKIP		    (1 << 2)
+>  #define EMULTYPE_ALLOW_RETRY_PF	    (1 << 3)
+>  #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
+> -#define EMULTYPE_VMWARE_GP	    (1 << 5)
+> +#define EMULTYPE_PARAVIRT_GP	    (1 << 5)
+>  #define EMULTYPE_PF		    (1 << 6)
+>  
+>  int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index 581925e476d6..1a2fff4e7140 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -219,5 +219,6 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+>  
+>  int kvm_mmu_post_init_vm(struct kvm *kvm);
+>  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
+> +bool kvm_is_host_reserved_region(u64 gpa);
+>  
+>  #endif
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6d16481aa29d..c5c4aaf01a1a 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -50,6 +50,7 @@
+>  #include <asm/io.h>
+>  #include <asm/vmx.h>
+>  #include <asm/kvm_page_track.h>
+> +#include <asm/e820/api.h>
+>  #include "trace.h"
+>  
+>  extern bool itlb_multihit_kvm_mitigation;
+> @@ -5675,6 +5676,12 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
+>  
+> +bool kvm_is_host_reserved_region(u64 gpa)
+> +{
+> +	return e820__mapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_is_host_reserved_region);
+> +
+>  void kvm_mmu_zap_all(struct kvm *kvm)
+>  {
+>  	struct kvm_mmu_page *sp, *node;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7ef171790d02..74620d32aa82 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -288,6 +288,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>  		if (!(efer & EFER_SVME)) {
+>  			svm_leave_nested(svm);
+>  			svm_set_gif(svm, true);
+> +			clr_exception_intercept(svm, GP_VECTOR);
+>  
+>  			/*
+>  			 * Free the nested guest state, unless we are in SMM.
+> @@ -309,6 +310,10 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>  
+>  	svm->vmcb->save.efer = efer | EFER_SVME;
+>  	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
+> +	/* Enable GP interception for SVM instructions if needed */
+> +	if (efer & EFER_SVME)
+> +		set_exception_intercept(svm, GP_VECTOR);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1957,22 +1962,104 @@ static int ac_interception(struct vcpu_svm *svm)
+>  	return 1;
+>  }
+>  
+> +static int vmload_interception(struct vcpu_svm *svm)
+> +{
+> +	struct vmcb *nested_vmcb;
+> +	struct kvm_host_map map;
+> +	int ret;
+> +
+> +	if (nested_svm_check_permissions(svm))
+> +		return 1;
+> +
+> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+> +	if (ret) {
+> +		if (ret == -EINVAL)
+> +			kvm_inject_gp(&svm->vcpu, 0);
+> +		return 1;
+> +	}
+> +
+> +	nested_vmcb = map.hva;
+> +
+> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+> +
+> +	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
+> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+> +
+> +	return ret;
+> +}
+> +
+> +static int vmsave_interception(struct vcpu_svm *svm)
+> +{
+> +	struct vmcb *nested_vmcb;
+> +	struct kvm_host_map map;
+> +	int ret;
+> +
+> +	if (nested_svm_check_permissions(svm))
+> +		return 1;
+> +
+> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+> +	if (ret) {
+> +		if (ret == -EINVAL)
+> +			kvm_inject_gp(&svm->vcpu, 0);
+> +		return 1;
+> +	}
+> +
+> +	nested_vmcb = map.hva;
+> +
+> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+> +
+> +	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
+> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+> +
+> +	return ret;
+> +}
+> +
+> +static int vmrun_interception(struct vcpu_svm *svm)
+> +{
+> +	if (nested_svm_check_permissions(svm))
+> +		return 1;
+> +
+> +	return nested_svm_vmrun(svm);
+> +}
+> +
+> +/* Emulate SVM VM execution instructions */
+> +static int svm_emulate_vm_instr(struct kvm_vcpu *vcpu, u8 modrm)
+> +{
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	switch (modrm) {
+> +	case 0xd8: /* VMRUN */
+> +		return vmrun_interception(svm);
+> +	case 0xda: /* VMLOAD */
+> +		return vmload_interception(svm);
+> +	case 0xdb: /* VMSAVE */
+> +		return vmsave_interception(svm);
+> +	default:
+> +		/* inject a #GP for all other cases */
+> +		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+> +		return 1;
+> +	}
+> +}
+> +
+>  static int gp_interception(struct vcpu_svm *svm)
+>  {
+>  	struct kvm_vcpu *vcpu = &svm->vcpu;
+>  	u32 error_code = svm->vmcb->control.exit_info_1;
+> -
+> -	WARN_ON_ONCE(!enable_vmware_backdoor);
+> +	int rc;
+>  
+>  	/*
+> -	 * VMware backdoor emulation on #GP interception only handles IN{S},
+> -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
+> +	 * Only VMware backdoor and SVM VME errata are handled. Neither of
+> +	 * them has non-zero error codes.
+>  	 */
+>  	if (error_code) {
+>  		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+>  		return 1;
+>  	}
+> -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
+> +
+> +	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
+> +	if (rc > 1)
+> +		rc = svm_emulate_vm_instr(vcpu, rc);
+> +	return rc;
+>  }
+>  
+>  static bool is_erratum_383(void)
+> @@ -2113,66 +2200,6 @@ static int vmmcall_interception(struct vcpu_svm *svm)
+>  	return kvm_emulate_hypercall(&svm->vcpu);
+>  }
+>  
+> -static int vmload_interception(struct vcpu_svm *svm)
+> -{
+> -	struct vmcb *nested_vmcb;
+> -	struct kvm_host_map map;
+> -	int ret;
+> -
+> -	if (nested_svm_check_permissions(svm))
+> -		return 1;
+> -
+> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+> -	if (ret) {
+> -		if (ret == -EINVAL)
+> -			kvm_inject_gp(&svm->vcpu, 0);
+> -		return 1;
+> -	}
+> -
+> -	nested_vmcb = map.hva;
+> -
+> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+> -
+> -	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
+> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+> -
+> -	return ret;
+> -}
+> -
+> -static int vmsave_interception(struct vcpu_svm *svm)
+> -{
+> -	struct vmcb *nested_vmcb;
+> -	struct kvm_host_map map;
+> -	int ret;
+> -
+> -	if (nested_svm_check_permissions(svm))
+> -		return 1;
+> -
+> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+> -	if (ret) {
+> -		if (ret == -EINVAL)
+> -			kvm_inject_gp(&svm->vcpu, 0);
+> -		return 1;
+> -	}
+> -
+> -	nested_vmcb = map.hva;
+> -
+> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+> -
+> -	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
+> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+> -
+> -	return ret;
+> -}
+> -
+> -static int vmrun_interception(struct vcpu_svm *svm)
+> -{
+> -	if (nested_svm_check_permissions(svm))
+> -		return 1;
+> -
+> -	return nested_svm_vmrun(svm);
+> -}
+> -
+>  void svm_set_gif(struct vcpu_svm *svm, bool value)
+>  {
+>  	if (value) {
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 0fe874ae5498..d5dffcf59afa 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -350,6 +350,14 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
+>  	recalc_intercepts(svm);
+>  }
+>  
+> +static inline bool is_exception_intercept(struct vcpu_svm *svm, u32 bit)
+> +{
+> +	struct vmcb *vmcb = get_host_vmcb(svm);
+> +
+> +	WARN_ON_ONCE(bit >= 32);
+> +	return vmcb_is_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
+> +}
+> +
+>  static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
+>  {
+>  	struct vmcb *vmcb = get_host_vmcb(svm);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 2af05d3b0590..5fac2f7cba24 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4774,7 +4774,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+>  			kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+>  			return 1;
+>  		}
+> -		return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
+> +		return kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
+>  	}
+>  
+>  	/*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9a8969a6dd06..c3662fc3b1bc 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7014,7 +7014,7 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+>  	++vcpu->stat.insn_emulation_fail;
+>  	trace_kvm_emulate_insn_failed(vcpu);
+>  
+> -	if (emulation_type & EMULTYPE_VMWARE_GP) {
+> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
+>  		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+>  		return 1;
+>  	}
+> @@ -7267,6 +7267,28 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+>  	return false;
+>  }
+>  
+> +static int is_vm_instr_opcode(struct x86_emulate_ctxt *ctxt)
+> +{
+> +	unsigned long rax;
+> +
+> +	if (ctxt->b != 0x1)
+> +		return 0;
+> +
+> +	switch (ctxt->modrm) {
+> +	case 0xd8: /* VMRUN */
+> +	case 0xda: /* VMLOAD */
+> +	case 0xdb: /* VMSAVE */
+> +		rax = kvm_register_read(emul_to_vcpu(ctxt), VCPU_REGS_RAX);
+> +		if (!kvm_is_host_reserved_region(rax))
+> +			return 0;
+> +		break;
+> +	default:
+> +		return 0;
+> +	}
+> +
+> +	return ctxt->modrm;
+> +}
+> +
+>  static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+>  {
+>  	switch (ctxt->opcode_len) {
+> @@ -7305,6 +7327,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+>  	bool writeback = true;
+>  	bool write_fault_to_spt;
+> +	int vminstr;
+>  
+>  	if (unlikely(!kvm_x86_ops.can_emulate_instruction(vcpu, insn, insn_len)))
+>  		return 1;
+> @@ -7367,10 +7390,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		}
+>  	}
+>  
+> -	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
+> -	    !is_vmware_backdoor_opcode(ctxt)) {
+> -		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+> -		return 1;
+> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
+> +		vminstr = is_vm_instr_opcode(ctxt);
+> +		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
+> +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+> +			return 1;
+> +		}
+> +		if (vminstr)
+> +			return vminstr;
+>  	}
+>  
+>  	/*
 
 
-On Tue, Jan 12, 2021 at 2:51 PM Liu, Yi L <yi.l.liu@intel.com> wrote:
->
-> Hi Vivek,
->
-> > From: Vivek Gautam <vivek.gautam@arm.com>
-> > Sent: Tuesday, January 12, 2021 2:50 PM
-> >
-> > Hi Yi,
-> >
-> >
-> > On Thu, Sep 10, 2020 at 4:13 PM Liu Yi L <yi.l.liu@intel.com> wrote:
-> > >
-> > > This patch is added as instead of returning a boolean for
-> > DOMAIN_ATTR_NESTING,
-> > > iommu_domain_get_attr() should return an iommu_nesting_info handle.
-> > For
-> > > now, return an empty nesting info struct for now as true nesting is not
-> > > yet supported by the SMMUs.
-> > >
-> > > Cc: Will Deacon <will@kernel.org>
-> > > Cc: Robin Murphy <robin.murphy@arm.com>
-> > > Cc: Eric Auger <eric.auger@redhat.com>
-> > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > > ---
-> > > v5 -> v6:
-> > > *) add review-by from Eric Auger.
-> > >
-> > > v4 -> v5:
-> > > *) address comments from Eric Auger.
-> > > ---
-> > >  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 29
-> > +++++++++++++++++++++++++++--
-> > >  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 29
-> > +++++++++++++++++++++++++++--
-> > >  2 files changed, 54 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > > index 7196207..016e2e5 100644
-> > > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > > @@ -3019,6 +3019,32 @@ static struct iommu_group
-> > *arm_smmu_device_group(struct device *dev)
-> > >         return group;
-> > >  }
-> > >
-> > > +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain
-> > *smmu_domain,
-> > > +                                       void *data)
-> > > +{
-> > > +       struct iommu_nesting_info *info = (struct iommu_nesting_info
-> > *)data;
-> > > +       unsigned int size;
-> > > +
-> > > +       if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> > > +               return -ENODEV;
-> > > +
-> > > +       size = sizeof(struct iommu_nesting_info);
-> > > +
-> > > +       /*
-> > > +        * if provided buffer size is smaller than expected, should
-> > > +        * return 0 and also the expected buffer size to caller.
-> > > +        */
-> > > +       if (info->argsz < size) {
-> > > +               info->argsz = size;
-> > > +               return 0;
-> > > +       }
-> > > +
-> > > +       /* report an empty iommu_nesting_info for now */
-> > > +       memset(info, 0x0, size);
-> > > +       info->argsz = size;
-> > > +       return 0;
-> > > +}
-> > > +
-> > >  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
-> > >                                     enum iommu_attr attr, void *data)
-> > >  {
-> > > @@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct
-> > iommu_domain *domain,
-> > >         case IOMMU_DOMAIN_UNMANAGED:
-> > >                 switch (attr) {
-> > >                 case DOMAIN_ATTR_NESTING:
-> > > -                       *(int *)data = (smmu_domain->stage ==
-> > ARM_SMMU_DOMAIN_NESTED);
-> > > -                       return 0;
-> > > +                       return arm_smmu_domain_nesting_info(smmu_domain,
-> > data);
-> >
-> > Thanks for the patch.
-> > This would unnecessarily overflow 'data' for any caller that's expecting only
-> > an int data. Dump from one such issue that I was seeing when testing
-> > this change along with local kvmtool changes is pasted below [1].
-> >
-> > I could get around with the issue by adding another (iommu_attr) -
-> > DOMAIN_ATTR_NESTING_INFO that returns (iommu_nesting_info).
->
-> nice to hear from you. At first, we planned to have a separate iommu_attr
-> for getting nesting_info. However, we considered there is no existing user
-> which gets DOMAIN_ATTR_NESTING, so we decided to reuse it for iommu nesting
-> info. Could you share me the code base you are using? If the error you
-> encountered is due to this change, so there should be a place which gets
-> DOMAIN_ATTR_NESTING.
-
-I am currently working on top of Eric's tree for nested stage support [1].
-My best guess was that the vfio_pci_dma_fault_init() method [2] that is
-requesting DOMAIN_ATTR_NESTING causes stack overflow, and corruption.
-That's when I added a new attribute.
-
-I will soon publish my patches to the list for review. Let me know
-your thoughts.
-
-[1] https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
-[2] https://github.com/eauger/linux/blob/5.10-rc4-2stage-v13/drivers/vfio/pci/vfio_pci.c#L494
-
-Thanks
-Vivek
-
->
-> Regards,
-> Yi Liu
-
-[snip]
