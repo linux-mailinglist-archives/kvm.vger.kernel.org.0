@@ -2,86 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D45512F37AA
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:53:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E26242F37C0
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391593AbhALRvp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 12:51:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727622AbhALRvo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 12:51:44 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89AFAC061786;
-        Tue, 12 Jan 2021 09:51:04 -0800 (PST)
-Received: from zn.tnic (p200300ec2f0e8c0065ae075541957fe3.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8c00:65ae:755:4195:7fe3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DF3E91EC03CE;
-        Tue, 12 Jan 2021 18:51:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1610473863;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=g21PW6bH7/Y4DkJPbzn13xs2fcNMYU2M4iSPH3WNfsg=;
-        b=Rh+gphchdji41pzbPhuF/kEbktBn9sFtpvqmZau1ROc7ww9P6vR9Pd6TePjXYzpUZ3TAUH
-        3s02ZBNs9sC1l+11NwQHuvLHY+3Sbb3W/B6lgxtai3Ynh972Z1Jz4/SgUgKT3famkztCLS
-        xObUTMfSsfACO3ZQJURV2Rnq0gbZgLE=
-Date:   Tue, 12 Jan 2021 18:51:02 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
-Message-ID: <20210112175102.GJ13086@zn.tnic>
-References: <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
- <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
- <20210108071722.GA4042@zn.tnic>
- <X/jxCOLG+HUO4QlZ@google.com>
- <20210109011939.GL4042@zn.tnic>
- <X/yQyUx4+veuSO0e@google.com>
- <20210111190901.GG25645@zn.tnic>
- <X/yk6zcJTLXJwIrJ@google.com>
- <20210112121359.GC13086@zn.tnic>
- <X/3ZSKDWoPcCsV/w@google.com>
+        id S2389393AbhALR4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 12:56:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62268 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731029AbhALR4o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 12:56:44 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CHYrMh038909;
+        Tue, 12 Jan 2021 12:55:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MHWdrGw14uYtb4TGJ5A7+n2JEJmQ4jGo6SgmNA4cpFk=;
+ b=SfzK4ajuPVM373mTedmtjd5b0ooqMqreOnkpGPfihUZie7VQh9tn57digjIYRr/oiu7S
+ fn4KSzU+VMn3lCfDDXk6W+MglybbwafN5hAA83g9MOJp14zU2vdLGc4k/f/jTYy+UVJ8
+ bTMztPnwCH35PZqf9mRaLwxmXLh56X9ol23VIH26zb4fgUykihcQROFw9Z7dY86Q7wB1
+ Z7SIN+WOFp27caRBgxbuEDThhbC74+fxvos0mq6gQYtR5NRjdqJy337kaD7KBJkUx2Pf
+ PYFtnDpzbgAFNe/2pXBlzfGKIaWejBcrxHOjBucfzhGUrGTtVfFQz6TV15F+GmJnOo+K dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361g9y0dte-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 12:55:59 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CHYw5M038995;
+        Tue, 12 Jan 2021 12:55:58 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361g9y0dsu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 12:55:58 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CHq942021951;
+        Tue, 12 Jan 2021 17:55:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdbjrh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 17:55:56 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CHtr4K42992000
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jan 2021 17:55:53 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BC334C040;
+        Tue, 12 Jan 2021 17:55:53 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ADBA44C04E;
+        Tue, 12 Jan 2021 17:55:52 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.60.135])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue, 12 Jan 2021 17:55:52 +0000 (GMT)
+Date:   Tue, 12 Jan 2021 18:55:50 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
+ resources using mdev device
+Message-ID: <20210112185550.1ac49768.pasic@linux.ibm.com>
+In-Reply-To: <20210112021251.0d989225.pasic@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-10-akrowiak@linux.ibm.com>
+        <20210112021251.0d989225.pasic@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <X/3ZSKDWoPcCsV/w@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-12_12:2021-01-12,2021-01-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 lowpriorityscore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2101120099
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 09:15:52AM -0800, Sean Christopherson wrote:
-> We want the boot_cpu_data.x86_capability memcpy() so that KVM doesn't advertise
-> support for features that are intentionally disabled in the kernel, e.g. via
-> kernel params.  Except for a few special cases, e.g. LA57, KVM doesn't enable
-> features in the guest if they're disabled in the host, even if the features are
-> supported in hardware.
-> 
-> For some features, e.g. SMEP and SMAP, honoring boot_cpu_data is mostly about
-> respecting the kernel's wishes, i.e. barring hardware bugs, enabling such
-> features in the guest won't break anything.  But for other features, e.g. XSAVE
-> based features, enabling them in the guest without proper support in the host
-> will corrupt guest and/or host state.
+On Tue, 12 Jan 2021 02:12:51 +0100
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Ah ok, that is an important point.
- 
-> So it's really the CPUID read that is (mostly) superfluous.
+> > @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+> >  	apqi = AP_QID_QUEUE(q->apqn);
+> >  	vfio_ap_mdev_reset_queue(apid, apqi, 1);
+> >  
+> > -	if (q->matrix_mdev)
+> > +	if (q->matrix_mdev) {
+> > +		matrix_mdev = q->matrix_mdev;
+> >  		vfio_ap_mdev_unlink_queue(q);
+> > +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
+> > +	}
+> >  
+> >  	kfree(q);
+> >  	mutex_unlock(&matrix_dev->lock);  
 
-Yeah, but that is cheap, as we established.
+Shouldn't we first remove the queue from the APCB and then
+reset? Sorry, I missed this one yesterday.
 
-Ok then, I don't see anything that might be a problem and I guess we can
-try that handling of scattered bits in kvm and see how far we'll get.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Regards,
+Halil
