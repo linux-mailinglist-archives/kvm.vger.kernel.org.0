@@ -2,129 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E68C52F26CF
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 04:50:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 00ED52F2742
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 05:46:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728128AbhALDu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 22:50:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727566AbhALDu2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 22:50:28 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 170C9C061786
-        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 19:49:47 -0800 (PST)
+        id S1731708AbhALEpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 23:45:54 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41799 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731369AbhALEpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 23:45:53 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DFGmS1c5Lz9sXV; Tue, 12 Jan 2021 14:49:44 +1100 (AEDT)
+        id 4DFJ0R0784z9sWC; Tue, 12 Jan 2021 15:45:10 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1610423384;
-        bh=Pu1uUI8cNnCK2d3m6U8+RaJ5aZcbiR7kyAyYwXtPDOM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ku44Fn78DbjaIJuAGpIfkU4xhTwyz2zi06RWXMpVl2F9BEDULeIBwF+2ZsEtGx9CT
-         TWK+jxKmW2qGK7TUCVF48Kz/uxH3cZM/rje1K4JfEN/PVHC50rjek0GjqF/Qo5oK9/
-         EGTXYBh6R6fqw2DbU5/GVMVRL5DkNt/3EOS9eZmI=
-Date:   Tue, 12 Jan 2021 14:49:35 +1100
+        d=gibson.dropbear.id.au; s=201602; t=1610426711;
+        bh=7hHllMpehAyZjZNsuKhkyTJVPh53/m3oZinqtAXXwig=;
+        h=From:To:Cc:Subject:Date:From;
+        b=jIoVRrqF9kp65OoqeHl3I+JcrR8Aao8xY6IDnC3P5tSNvuft/QMx4yw1G3taZ8Zrl
+         tpSYa9cPixT/DRMOeibFsRXkGWHOmTHvfmwRXhV9kh4Uvwhc/ZXbcO1JiSGMb61ESf
+         p6cYcCBEeSoVNl+l4Wg4GoOIANmq+61iwwMJYv6g=
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
-        brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
-        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
-        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+To:     pasic@linux.ibm.com, brijesh.singh@amd.com, pair@us.ibm.com,
+        dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc:     andi.kleen@intel.com, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Greg Kurz <groug@kaod.org>, frankja@linux.ibm.com,
+        thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>,
+        mdroth@linux.vnet.ibm.com, richard.henderson@linaro.org,
+        kvm@vger.kernel.org,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-        borntraeger@de.ibm.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
-        pasic@linux.ibm.com
-Subject: Re: [for-6.0 v5 03/13] securable guest memory: Handle memory
- encryption via interface
-Message-ID: <20210112034935.GL3051@yekko.fritz.box>
-References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-4-david@gibson.dropbear.id.au>
- <20201204141005.07bf61dd.cohuck@redhat.com>
+        Eduardo Habkost <ehabkost@redhat.com>, david@redhat.com,
+        Cornelia Huck <cohuck@redhat.com>, mst@redhat.com,
+        qemu-s390x@nongnu.org, pragyansri.pathi@intel.com,
+        jun.nakajima@intel.com
+Subject: [PATCH v6 00/13] Generalize memory encryption models
+Date:   Tue, 12 Jan 2021 15:44:55 +1100
+Message-Id: <20210112044508.427338-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="/ZYM6PqDyfNytx60"
-Content-Disposition: inline
-In-Reply-To: <20201204141005.07bf61dd.cohuck@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---/ZYM6PqDyfNytx60
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Dec 04, 2020 at 02:10:05PM +0100, Cornelia Huck wrote:
-> On Fri,  4 Dec 2020 16:44:05 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > At the moment AMD SEV sets a special function pointer, plus an opaque
-> > handle in KVMState to let things know how to encrypt guest memory.
-> >=20
-> > Now that we have a QOM interface for handling things related to securab=
-le
-> > guest memory, use a QOM method on that interface, rather than a bare
-> > function pointer for this.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  accel/kvm/kvm-all.c                   |  36 +++++---
-> >  accel/kvm/sev-stub.c                  |   9 +-
-> >  include/exec/securable-guest-memory.h |   2 +
-> >  include/sysemu/sev.h                  |   5 +-
-> >  target/i386/monitor.c                 |   1 -
-> >  target/i386/sev.c                     | 116 ++++++++++----------------
-> >  6 files changed, 77 insertions(+), 92 deletions(-)
-> >=20
->=20
-> > @@ -224,7 +224,7 @@ int kvm_get_max_memslots(void)
-> > =20
-> >  bool kvm_memcrypt_enabled(void)
-> >  {
-> > -    if (kvm_state && kvm_state->memcrypt_handle) {
-> > +    if (kvm_state && kvm_state->sgm) {
->=20
-> If we want to generalize the concept, maybe check for encrypt_data in
-> sgm here? There's probably room for different callbacks in the sgm
-> structure.
-
-Actually, I've realised this isn't even as general as it pretends to
-be now, so I've taken a different approach for the next spin.
-
->=20
-> >          return true;
-> >      }
-> > =20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---/ZYM6PqDyfNytx60
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/9HE0ACgkQbDjKyiDZ
-s5Js5A//Yd7jTZccBJbYr8fl6LwL5XR1I53MZzJBdb0mQjdbnkUlRxWOwGoIzTOh
-hMTP7/m3oKzOePEV76IwEhBIouuYuPALTpP1cOnZdg4kDzKsln+36tP1VA2pMAm3
-l2xL6WxqUjdMpXzH5oD3+0FdOLplr7bXGtMZW9vBhGDluLdR5uyfYLveJwswwwHo
-72mdv3zcDQ6BSChR8MijtPuKpLWfkuKuyGAtSy2ovQNZfHqEIq9XmstPqFAvCsA/
-aKXg2fA7qMm0507tAjdlKXBuSvnxy0O72Kyvl73L+Ipw+gyiZKSnKYpexPODFyLt
-oN3ZYYb8zphWnDlr/7DjTJDfMpyxxOFjLkE6WMa84eWSi1G8IXJ1CJcDd+0tHtlr
-5J26cpGXl/L3Z82bIctc2qJp5CGWNhahRr2ThdEnQebh+3wzW9O6CyF0w3+cY5QX
-19kqHodasjj+ige37V6LU0tfEn2jJ7bGyIHedJBnTryNlWK9+OIj5inUvvxpNNg+
-KTIsLiphN+6Zr7v5/uCoDmmK6LPOn+8yOf9m2tHfmmRqtUbXkXqiFKSw0Al1vKbZ
-o2E6yoWGNFI7Y9YKzoKtoge3qdU2BHgt71nnXo3+1WM9i16vTCjr8zH2UaIqoeXL
-wGPq0aoODgI8G2ZQmiEbc0ieQZcIvYPqh8TaSb+gdf47wy2dQ50=
-=M33/
------END PGP SIGNATURE-----
-
---/ZYM6PqDyfNytx60--
+A number of hardware platforms are implementing mechanisms whereby the=0D
+hypervisor does not have unfettered access to guest memory, in order=0D
+to mitigate the security impact of a compromised hypervisor.=0D
+=0D
+AMD's SEV implements this with in-cpu memory encryption, and Intel has=0D
+its own memory encryption mechanism.  POWER has an upcoming mechanism=0D
+to accomplish this in a different way, using a new memory protection=0D
+level plus a small trusted ultravisor.  s390 also has a protected=0D
+execution environment.=0D
+=0D
+The current code (committed or draft) for these features has each=0D
+platform's version configured entirely differently.  That doesn't seem=0D
+ideal for users, or particularly for management layers.=0D
+=0D
+AMD SEV introduces a notionally generic machine option=0D
+"machine-encryption", but it doesn't actually cover any cases other=0D
+than SEV.=0D
+=0D
+This series is a proposal to at least partially unify configuration=0D
+for these mechanisms, by renaming and generalizing AMD's=0D
+"memory-encryption" property.  It is replaced by a=0D
+"confidential-guest-support" property pointing to a platform specific=0D
+object which configures and manages the specific details.=0D
+=0D
+Note to Ram Pai: the documentation I've included for PEF is very=0D
+minimal.  If you could send a patch expanding on that, it would be=0D
+very helpful.=0D
+=0D
+Changes since v5:=0D
+ * Renamed from "securable guest memory" to "confidential guest=0D
+   support"=0D
+ * Simpler reworking of x86 boot time flash encryption=0D
+ * Added a bunch of documentation=0D
+ * Fixed some compile errors on POWER=0D
+Changes since v4:=0D
+ * Renamed from "host trust limitation" to "securable guest memory",=0D
+   which I think is marginally more descriptive=0D
+ * Re-organized initialization, because the previous model called at=0D
+   kvm_init didn't work for s390=0D
+ * Assorted fixes to the s390 implementation; rudimentary testing=0D
+   (gitlab CI) only=0D
+Changes since v3:=0D
+ * Rebased=0D
+ * Added first cut at handling of s390 protected virtualization=0D
+Changes since RFCv2:=0D
+ * Rebased=0D
+ * Removed preliminary SEV cleanups (they've been merged)=0D
+ * Changed name to "host trust limitation"=0D
+ * Added migration blocker to the PEF code (based on SEV's version)=0D
+Changes since RFCv1:=0D
+ * Rebased=0D
+ * Fixed some errors pointed out by Dave Gilbert=0D
+=0D
+David Gibson (12):=0D
+  confidential guest support: Introduce new confidential guest support=0D
+    class=0D
+  sev: Remove false abstraction of flash encryption=0D
+  confidential guest support: Move side effect out of=0D
+    machine_set_memory_encryption()=0D
+  confidential guest support: Rework the "memory-encryption" property=0D
+  sev: Add Error ** to sev_kvm_init()=0D
+  confidential guest support: Introduce cgs "ready" flag=0D
+  confidential guest support: Move SEV initialization into arch specific=0D
+    code=0D
+  confidential guest support: Update documentation=0D
+  spapr: Add PEF based confidential guest support=0D
+  spapr: PEF: prevent migration=0D
+  confidential guest support: Alter virtio default properties for=0D
+    protected guests=0D
+  s390: Recognize confidential-guest-support option=0D
+=0D
+Greg Kurz (1):=0D
+  qom: Allow optional sugar props=0D
+=0D
+ accel/kvm/kvm-all.c                       |  38 -------=0D
+ accel/kvm/sev-stub.c                      |  10 +-=0D
+ accel/stubs/kvm-stub.c                    |  10 --=0D
+ backends/confidential-guest-support.c     |  30 ++++++=0D
+ backends/meson.build                      |   1 +=0D
+ docs/amd-memory-encryption.txt            |   2 +-=0D
+ docs/confidential-guest-support.txt       |  48 +++++++++=0D
+ docs/papr-pef.txt                         |  30 ++++++=0D
+ docs/system/s390x/protvirt.rst            |  19 ++--=0D
+ hw/core/machine.c                         |  71 +++++++++++--=0D
+ hw/i386/pc_sysfw.c                        |  17 ++-=0D
+ hw/ppc/meson.build                        |   1 +=0D
+ hw/ppc/pef.c                              | 122 ++++++++++++++++++++++=0D
+ hw/ppc/spapr.c                            |  10 ++=0D
+ hw/s390x/pv.c                             |  58 ++++++++++=0D
+ include/exec/confidential-guest-support.h |  48 +++++++++=0D
+ include/hw/boards.h                       |   2 +-=0D
+ include/hw/ppc/pef.h                      |  26 +++++=0D
+ include/hw/s390x/pv.h                     |   1 +=0D
+ include/qemu/typedefs.h                   |   1 +=0D
+ include/qom/object.h                      |   3 +-=0D
+ include/sysemu/kvm.h                      |  16 ---=0D
+ include/sysemu/sev.h                      |   4 +-=0D
+ qom/object.c                              |   4 +-=0D
+ softmmu/rtc.c                             |   3 +-=0D
+ softmmu/vl.c                              |  17 +--=0D
+ target/i386/kvm/kvm.c                     |  12 +++=0D
+ target/i386/sev-stub.c                    |   5 +=0D
+ target/i386/sev.c                         |  93 +++++++----------=0D
+ target/ppc/kvm.c                          |  18 ----=0D
+ target/ppc/kvm_ppc.h                      |   6 --=0D
+ target/s390x/kvm.c                        |   3 +=0D
+ 32 files changed, 540 insertions(+), 189 deletions(-)=0D
+ create mode 100644 backends/confidential-guest-support.c=0D
+ create mode 100644 docs/confidential-guest-support.txt=0D
+ create mode 100644 docs/papr-pef.txt=0D
+ create mode 100644 hw/ppc/pef.c=0D
+ create mode 100644 include/exec/confidential-guest-support.h=0D
+ create mode 100644 include/hw/ppc/pef.h=0D
+=0D
+-- =0D
+2.29.2=0D
+=0D
