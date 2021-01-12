@@ -2,473 +2,428 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E52E92F252C
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 02:18:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAD222F2554
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 02:18:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728409AbhALA5k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 19:57:40 -0500
-Received: from mga04.intel.com ([192.55.52.120]:62294 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728166AbhALA5k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 19:57:40 -0500
-IronPort-SDR: UdFBU14S/Id60MVQx0ZIsIlw2g3x19LfUGvvJzBWc1TohDJlD6TeW2Stc9504WMMtyjZdKa3LR
- XQaIGG58Bb4Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="175381690"
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="175381690"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 16:56:59 -0800
-IronPort-SDR: e/xbPHUah56apRUwmVV7TT2nwgeQf+bu3ZE1WnFNtXd8zkyRXYq+gOGadHy0Vf14gGDz7oIQCv
- Bbh4L6YMedXw==
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="351726882"
-Received: from tpotnis-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.76.146])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 16:56:56 -0800
-Date:   Tue, 12 Jan 2021 13:56:54 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH 03/23] x86/sgx: Introduce virtual EPC for use by KVM
- guests
-Message-Id: <20210112135654.8fbefebd82fa6c57dc2d3bef@intel.com>
-In-Reply-To: <X/zhbyoWBnV1ESQx@kernel.org>
-References: <cover.1609890536.git.kai.huang@intel.com>
-        <ace9d4cb10318370f6145aaced0cfa73dda36477.1609890536.git.kai.huang@intel.com>
-        <X/zhbyoWBnV1ESQx@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
+        id S1731769AbhALBNo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 20:13:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35036 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727431AbhALBNo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 20:13:44 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10C12lUB168955;
+        Mon, 11 Jan 2021 20:13:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3LwHQ2a62to3Rpp1pJDf1ogYH/XXy1VhN0j1I1YUKwY=;
+ b=O0SDdpKhfBc9KjFl37rUd38MeGWb0E5eH+BNT6iaOGKF5W+tGIkRTXDCZJygfTmuUGqE
+ YEl2zKTg1CNYgG+V9qUkFrSffkc3t+iLrIQ6QmenNCgOvFBRbGKLM4G5tHwFsHYytwaK
+ Mtn1HUuPy/bGW1eZFVPrjv9GO16OTbnHO4tlCwUFKIcAWzqC//ewYF53GnpGcB9A5oxi
+ e21OqoLQifre/FtmcuRm5QVhD1CAmi618QAs0pfsmPGATRPYCZn9f1ARlanhapHg0ynP
+ XetkjXitQGpGJUOI4sr5YIto3+Uq0RScSnafk8ng72R6DZROKbbcybO6B953b90MJOAg /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3610vbhega-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 20:13:00 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10C12riW169191;
+        Mon, 11 Jan 2021 20:13:00 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3610vbhefb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 20:13:00 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10C0wbJk001792;
+        Tue, 12 Jan 2021 01:12:57 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdahnr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 01:12:57 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10C1CsvF43909576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jan 2021 01:12:54 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8D73452059;
+        Tue, 12 Jan 2021 01:12:54 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.92.32])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id CAC6052057;
+        Tue, 12 Jan 2021 01:12:53 +0000 (GMT)
+Date:   Tue, 12 Jan 2021 02:12:51 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
+ resources using mdev device
+Message-ID: <20210112021251.0d989225.pasic@linux.ibm.com>
+In-Reply-To: <20201223011606.5265-10-akrowiak@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-10-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-11_34:2021-01-11,2021-01-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ spamscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501
+ mlxlogscore=999 malwarescore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101120000
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Jan 2021 01:38:23 +0200 Jarkko Sakkinen wrote:
-> On Wed, Jan 06, 2021 at 02:55:20PM +1300, Kai Huang wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > Add a misc device /dev/sgx_virt_epc to allow userspace to allocate "raw"
-> > EPC without an associated enclave.  The intended and only known use case
-> > for raw EPC allocation is to expose EPC to a KVM guest, hence the
-> > virt_epc moniker, virt.{c,h} files and X86_SGX_VIRTUALIZATION Kconfig.
-> > 
-> > Modify sgx_init() to always try to initialize virtual EPC driver, even
-> > when SGX driver is disabled due to SGX Launch Control is in locked mode,
-> > or not present at all, since SGX virtualization allows to expose SGX to
-> > guests that support non-LC configurations.
-> > 
-> > Implement the "raw" EPC allocation in the x86 core-SGX subsystem via
-> > /dev/sgx_virt_epc rather than in KVM. Doing so has two major advantages:
-> > 
-> >   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
-> >     just another memory backend for guests.
-> > 
-> >   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
-> >     does not have to export any symbols, changes to reclaim flows don't
-> >     need to be routed through KVM, SGX's dirty laundry doesn't have to
-> >     get aired out for the world to see, and so on and so forth.
-> > 
-> > The virtual EPC allocated to guests is currently not reclaimable, due to
-> > oversubscription of EPC for KVM guests is not currently supported. Due
-> > to the complications of handling reclaim conflicts between guest and
-> > host, KVM EPC oversubscription is significantly more complex than basic
-> > support for SGX virtualization.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Co-developed-by: Kai Huang <kai.huang@intel.com>
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+On Tue, 22 Dec 2020 20:16:00 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> Let's allow adapters, domains and control domains to be hot plugged into
+> and hot unplugged from a KVM guest using a matrix mdev when:
 > 
-> The commit message does not describe the code changes. It should
-> have an understandable explanation of fops. There is nothing about
-> the implementation right now.
-
-Thanks for feedback. Does "understabdable explanation of fops" mean I
-should add one sentence to say, for instance: "userspace hypervisor should open
-the /dev/sgx_virt_epc, use mmap() to get a valid address range, and then use
-that address range to create KVM memory region"?
-
-Or should I include an example of how to use /dev/sgx_virt_epc in userspace, for
-instance, below?
-
-	fd = open("/dev/sgx_virt_epc", O_RDWR);
-	void *addr = mmap(NULL, size, ..., fd);
-	/* userspace hypervisor uses addr, size to create KVM memory slot */
-	...
-
-I dug the SGX driver side to understand what should I add, but in below commit I
-don't see description of fops either:
-
-	commit 3fe0778edac8628637e2fd23835996523b1a3372
-	Author: Jarkko Sakkinen <jarkko@kernel.org>
-	Date:   Fri Nov 13 00:01:22 2020 +0200
-
-    	    x86/sgx: Add an SGX misc driver interface
-
-
+> * The adapter, domain or control domain is assigned to or unassigned from
+>   the matrix mdev
 > 
-> /Jarkko
+> * A queue device with an APQN assigned to the matrix mdev is bound to or
+>   unbound from the vfio_ap device driver.
 > 
-> > ---
-> >  arch/x86/Kconfig                 |  12 ++
-> >  arch/x86/kernel/cpu/sgx/Makefile |   1 +
-> >  arch/x86/kernel/cpu/sgx/main.c   |   5 +-
-> >  arch/x86/kernel/cpu/sgx/virt.c   | 263 +++++++++++++++++++++++++++++++
-> >  arch/x86/kernel/cpu/sgx/virt.h   |  14 ++
-> >  5 files changed, 294 insertions(+), 1 deletion(-)
-> >  create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
-> >  create mode 100644 arch/x86/kernel/cpu/sgx/virt.h
-> > 
-> > diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> > index 618d1aabccb8..a7318175509b 100644
-> > --- a/arch/x86/Kconfig
-> > +++ b/arch/x86/Kconfig
-> > @@ -1947,6 +1947,18 @@ config X86_SGX
-> >  
-> >  	  If unsure, say N.
-> >  
-> > +config X86_SGX_VIRTUALIZATION
-> > +	bool "Software Guard eXtensions (SGX) Virtualization"
-> > +	depends on X86_SGX && KVM_INTEL
-> > +	help
-> > +
-> > +	  Enables KVM guests to create SGX enclaves.
-> > +
-> > +	  This includes support to expose "raw" unreclaimable enclave memory to
-> > +	  guests via a device node, e.g. /dev/sgx_virt_epc.
-> > +
-> > +	  If unsure, say N.
-> > +
-> >  config EFI
-> >  	bool "EFI runtime service support"
-> >  	depends on ACPI
-> > diff --git a/arch/x86/kernel/cpu/sgx/Makefile b/arch/x86/kernel/cpu/sgx/Makefile
-> > index 91d3dc784a29..7a25bf63adfb 100644
-> > --- a/arch/x86/kernel/cpu/sgx/Makefile
-> > +++ b/arch/x86/kernel/cpu/sgx/Makefile
-> > @@ -3,3 +3,4 @@ obj-y += \
-> >  	encl.o \
-> >  	ioctl.o \
-> >  	main.o
-> > +obj-$(CONFIG_X86_SGX_VIRTUALIZATION)	+= virt.o
-> > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> > index 95aad183bb65..02993a327a1f 100644
-> > --- a/arch/x86/kernel/cpu/sgx/main.c
-> > +++ b/arch/x86/kernel/cpu/sgx/main.c
-> > @@ -9,9 +9,11 @@
-> >  #include <linux/sched/mm.h>
-> >  #include <linux/sched/signal.h>
-> >  #include <linux/slab.h>
-> > +#include "arch.h"
-> >  #include "driver.h"
-> >  #include "encl.h"
-> >  #include "encls.h"
-> > +#include "virt.h"
-> >  
-> >  struct sgx_epc_section sgx_epc_sections[SGX_MAX_EPC_SECTIONS];
-> >  static int sgx_nr_epc_sections;
-> > @@ -726,7 +728,8 @@ static void __init sgx_init(void)
-> >  	if (!sgx_page_reclaimer_init())
-> >  		goto err_page_cache;
-> >  
-> > -	ret = sgx_drv_init();
-> > +	/* Success if the native *or* virtual EPC driver initialized cleanly. */
-> > +	ret = !!sgx_drv_init() & !!sgx_virt_epc_init();
-> >  	if (ret)
-> >  		goto err_kthread;
-> >  
-> > diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
-> > new file mode 100644
-> > index 000000000000..d625551ccf25
-> > --- /dev/null
-> > +++ b/arch/x86/kernel/cpu/sgx/virt.c
-> > @@ -0,0 +1,263 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*  Copyright(c) 2016-20 Intel Corporation. */
-> > +
-> > +#include <linux/miscdevice.h>
-> > +#include <linux/mm.h>
-> > +#include <linux/mman.h>
-> > +#include <linux/sched/mm.h>
-> > +#include <linux/sched/signal.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/xarray.h>
-> > +#include <asm/sgx.h>
-> > +#include <uapi/asm/sgx.h>
-> > +
-> > +#include "encls.h"
-> > +#include "sgx.h"
-> > +#include "virt.h"
-> > +
-> > +struct sgx_virt_epc {
-> > +	struct xarray page_array;
-> > +	struct mutex lock;
-> > +	struct mm_struct *mm;
-> > +};
-> > +
-> > +static struct mutex virt_epc_lock;
-> > +static struct list_head virt_epc_zombie_pages;
-> > +
-> > +static int __sgx_virt_epc_fault(struct sgx_virt_epc *epc,
-> > +				struct vm_area_struct *vma, unsigned long addr)
-> > +{
-> > +	struct sgx_epc_page *epc_page;
-> > +	unsigned long index, pfn;
-> > +	int ret;
-> > +
-> > +	/* epc->lock must already have been hold */
-> > +
-> > +	/* Calculate index of EPC page in virtual EPC's page_array */
-> > +	index = vma->vm_pgoff + PFN_DOWN(addr - vma->vm_start);
-> > +
-> > +	epc_page = xa_load(&epc->page_array, index);
-> > +	if (epc_page)
-> > +		return 0;
-> > +
-> > +	epc_page = sgx_alloc_epc_page(epc, false);
-> > +	if (IS_ERR(epc_page))
-> > +		return PTR_ERR(epc_page);
-> > +
-> > +	ret = xa_err(xa_store(&epc->page_array, index, epc_page, GFP_KERNEL));
-> > +	if (ret)
-> > +		goto err_free;
-> > +
-> > +	pfn = PFN_DOWN(sgx_get_epc_phys_addr(epc_page));
-> > +
-> > +	ret = vmf_insert_pfn(vma, addr, pfn);
-> > +	if (ret != VM_FAULT_NOPAGE) {
-> > +		ret = -EFAULT;
-> > +		goto err_delete;
-> > +	}
-> > +
-> > +	return 0;
-> > +
-> > +err_delete:
-> > +	xa_erase(&epc->page_array, index);
-> > +err_free:
-> > +	sgx_free_epc_page(epc_page);
-> > +	return ret;
-> > +}
-> > +
-> > +static vm_fault_t sgx_virt_epc_fault(struct vm_fault *vmf)
-> > +{
-> > +	struct vm_area_struct *vma = vmf->vma;
-> > +	struct sgx_virt_epc *epc = vma->vm_private_data;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&epc->lock);
-> > +	ret = __sgx_virt_epc_fault(epc, vma, vmf->address);
-> > +	mutex_unlock(&epc->lock);
-> > +
-> > +	if (!ret)
-> > +		return VM_FAULT_NOPAGE;
-> > +
-> > +	if (ret == -EBUSY && (vmf->flags & FAULT_FLAG_ALLOW_RETRY)) {
-> > +		mmap_read_unlock(vma->vm_mm);
-> > +		return VM_FAULT_RETRY;
-> > +	}
-> > +
-> > +	return VM_FAULT_SIGBUS;
-> > +}
-> > +
-> > +const struct vm_operations_struct sgx_virt_epc_vm_ops = {
-> > +	.fault = sgx_virt_epc_fault,
-> > +};
-> > +
-> > +static int sgx_virt_epc_mmap(struct file *file, struct vm_area_struct *vma)
-> > +{
-> > +	struct sgx_virt_epc *epc = file->private_data;
-> > +
-> > +	if (!(vma->vm_flags & VM_SHARED))
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * Don't allow mmap() from child after fork(), since child and parent
-> > +	 * cannot map to the same EPC.
-> > +	 */
-> > +	if (vma->vm_mm != epc->mm)
-> > +		return -EINVAL;
-> > +
-> > +	vma->vm_ops = &sgx_virt_epc_vm_ops;
-> > +	/* Don't copy VMA in fork() */
-> > +	vma->vm_flags |= VM_PFNMAP | VM_IO | VM_DONTDUMP | VM_DONTCOPY;
-> > +	vma->vm_private_data = file->private_data;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int sgx_virt_epc_free_page(struct sgx_epc_page *epc_page)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (!epc_page)
-> > +		return 0;
-> > +
-> > +	/*
-> > +	 * Explicitly EREMOVE virtual EPC page. Virtual EPC is only used by
-> > +	 * guest, and in normal condition guest should have done EREMOVE for
-> > +	 * all EPC pages before they are freed here. But it's possible guest
-> > +	 * is killed or crashed unnormally in which case EREMOVE has not been
-> > +	 * done. Do EREMOVE unconditionally here to cover both cases, because
-> > +	 * it's not possible to tell whether guest has done EREMOVE, since
-> > +	 * virtual EPC page status is not tracked. And it is fine to EREMOVE
-> > +	 * EPC page multiple times.
-> > +	 */
-> > +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-> > +	if (ret) {
-> > +		/*
-> > +		 * Only SGX_CHILD_PRESENT is expected, which is because of
-> > +		 * EREMOVE-ing an SECS still with child, in which case it can
-> > +		 * be handled by EREMOVE-ing the SECS again after all pages in
-> > +		 * virtual EPC have been EREMOVE-ed. See comments in below in
-> > +		 * sgx_virt_epc_release().
-> > +		 */
-> > +		WARN_ON_ONCE(ret != SGX_CHILD_PRESENT);
-> > +		return ret;
-> > +	}
-> > +
-> > +	__sgx_free_epc_page(epc_page);
-> > +	return 0;
-> > +}
-> > +
-> > +static int sgx_virt_epc_release(struct inode *inode, struct file *file)
-> > +{
-> > +	struct sgx_virt_epc *epc = file->private_data;
-> > +	struct sgx_epc_page *epc_page, *tmp, *entry;
-> > +	unsigned long index;
-> > +
-> > +	LIST_HEAD(secs_pages);
-> > +
-> > +	mmdrop(epc->mm);
-> > +
-> > +	xa_for_each(&epc->page_array, index, entry) {
-> > +		/*
-> > +		 * Virtual EPC pages are not tracked, so it's possible for
-> > +		 * EREMOVE to fail due to, e.g. a SECS page still has children
-> > +		 * if guest was shutdown unexpectedly. If it is the case, leave
-> > +		 * it in the xarray and retry EREMOVE below later.
-> > +		 */
-> > +		if (sgx_virt_epc_free_page(entry))
-> > +			continue;
-> > +
-> > +		xa_erase(&epc->page_array, index);
-> > +	}
-> > +
-> > +	/*
-> > +	 * Retry all failed pages after iterating through the entire tree, at
-> > +	 * which point all children should be removed and the SECS pages can be
-> > +	 * nuked as well...unless userspace has exposed multiple instance of
-> > +	 * virtual EPC to a single VM.
-> > +	 */
-> > +	xa_for_each(&epc->page_array, index, entry) {
-> > +		epc_page = entry;
-> > +		/*
-> > +		 * Error here means that EREMOVE failed due to a SECS page
-> > +		 * still has child on *another* EPC instance.  Put it to a
-> > +		 * temporary SECS list which will be spliced to 'zombie page
-> > +		 * list' and will be EREMOVE-ed again when freeing another
-> > +		 * virtual EPC instance.
-> > +		 */
-> > +		if (sgx_virt_epc_free_page(epc_page))
-> > +			list_add_tail(&epc_page->list, &secs_pages);
-> > +
-> > +		xa_erase(&epc->page_array, index);
-> > +	}
-> > +
-> > +	/*
-> > +	 * Third time's a charm.  Try to EREMOVE zombie SECS pages from virtual
-> > +	 * EPC instances that were previously released, i.e. free SECS pages
-> > +	 * that were in limbo due to having children in *this* EPC instance.
-> > +	 */
-> > +	mutex_lock(&virt_epc_lock);
-> > +	list_for_each_entry_safe(epc_page, tmp, &virt_epc_zombie_pages, list) {
-> > +		/*
-> > +		 * Speculatively remove the page from the list of zombies, if
-> > +		 * the page is successfully EREMOVE it will be added to the
-> > +		 * list of free pages.  If EREMOVE fails, throw the page on the
-> > +		 * local list, which will be spliced on at the end.
-> > +		 */
-> > +		list_del(&epc_page->list);
-> > +
-> > +		if (sgx_virt_epc_free_page(epc_page))
-> > +			list_add_tail(&epc_page->list, &secs_pages);
-> > +	}
-> > +
-> > +	if (!list_empty(&secs_pages))
-> > +		list_splice_tail(&secs_pages, &virt_epc_zombie_pages);
-> > +	mutex_unlock(&virt_epc_lock);
-> > +
-> > +	kfree(epc);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int sgx_virt_epc_open(struct inode *inode, struct file *file)
-> > +{
-> > +	struct sgx_virt_epc *epc;
-> > +
-> > +	epc = kzalloc(sizeof(struct sgx_virt_epc), GFP_KERNEL);
-> > +	if (!epc)
-> > +		return -ENOMEM;
-> > +	/*
-> > +	 * Keep the current->mm to virtual EPC. It will be checked in
-> > +	 * sgx_virt_epc_mmap() to prevent, in case of fork, child being
-> > +	 * able to mmap() to the same virtual EPC pages.
-> > +	 */
-> > +	mmgrab(current->mm);
-> > +	epc->mm = current->mm;
-> > +	mutex_init(&epc->lock);
-> > +	xa_init(&epc->page_array);
-> > +
-> > +	file->private_data = epc;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static const struct file_operations sgx_virt_epc_fops = {
-> > +	.owner			= THIS_MODULE,
-> > +	.open			= sgx_virt_epc_open,
-> > +	.release		= sgx_virt_epc_release,
-> > +	.mmap			= sgx_virt_epc_mmap,
-> > +};
-> > +
-> > +static struct miscdevice sgx_virt_epc_dev = {
-> > +	.minor = MISC_DYNAMIC_MINOR,
-> > +	.name = "sgx_virt_epc",
-> > +	.nodename = "sgx_virt_epc",
-> > +	.fops = &sgx_virt_epc_fops,
-> > +};
-> > +
-> > +int __init sgx_virt_epc_init(void)
-> > +{
-> > +	INIT_LIST_HEAD(&virt_epc_zombie_pages);
-> > +	mutex_init(&virt_epc_lock);
-> > +
-> > +	return misc_register(&sgx_virt_epc_dev);
-> > +}
-> > diff --git a/arch/x86/kernel/cpu/sgx/virt.h b/arch/x86/kernel/cpu/sgx/virt.h
-> > new file mode 100644
-> > index 000000000000..e5434541a122
-> > --- /dev/null
-> > +++ b/arch/x86/kernel/cpu/sgx/virt.h
-> > @@ -0,0 +1,14 @@
-> > +/* SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause) */
-> > +#ifndef _ASM_X86_SGX_VIRT_H
-> > +#define _ASM_X86_SGX_VIRT_H
-> > +
-> > +#ifdef CONFIG_X86_SGX_VIRTUALIZATION
-> > +int __init sgx_virt_epc_init(void);
-> > +#else
-> > +static inline int __init sgx_virt_epc_init(void)
-> > +{
-> > +	return -ENODEV;
-> > +}
-> > +#endif
-> > +
-> > +#endif /* _ASM_X86_SGX_VIRT_H */
-> > -- 
-> > 2.29.2
-> > 
-> > 
+> Whenever an assignment or unassignment of an adapter, domain or control
+> domain is performed as well as when a bind or unbind of a queue device
+> is executed, the AP control block (APCB) that supplies the AP configuration
+> to a guest is first refreshed. The APCB is refreshed by copying the AP
+> configuration from the mdev's matrix to the APCB, then filtering the
+> APCB according to the following rules:
+> 
+> * The APID of each adapter and the APQI of each domain that is not in the
+>   host's AP configuration is filtered out.
+> 
+> * The APID of each adapter comprising an APQN that does not reference a
+>   queue device bound to the vfio_ap device driver is filtered. The APQNs
+>   are derived from the Cartesian product of the APID of each adapter and
+>   APQI of each domain assigned to the mdev's matrix.
+> 
+> After refreshing the APCB, if the mdev is in use by a KVM guest, it is
+> hot plugged into the guest to provide access to dynamically provide
+> access to the adapters, domains and control domains provided via the
+> newly refreshed APCB.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 143 ++++++++++++++++++++++++------
+>  1 file changed, 118 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 1b1d5975ee0e..843862c88379 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -307,6 +307,88 @@ static void vfio_ap_mdev_commit_shadow_apcb(struct ap_matrix_mdev *matrix_mdev)
+>  					  matrix_mdev->shadow_apcb.adm);
+>  }
+>  
+> +static void vfio_ap_mdev_filter_apcb(struct ap_matrix_mdev *matrix_mdev,
+> +				     struct ap_matrix *shadow_apcb)
+> +{
+> +	int ret;
+> +	unsigned long apid, apqi, apqn;
+> +
+> +	ret = ap_qci(&matrix_dev->info);
+
+Here we do the qci ourselves, thus the view of vfio_ap and the view
+of the ap bus may be different.
+
+> +	if (ret)
+> +		return;
+> +
+> +	memcpy(shadow_apcb, &matrix_mdev->matrix, sizeof(struct ap_matrix));
+> +
+
+Why is this memcpy necessary...
+
+> +	/*
+> +	 * Copy the adapters, domains and control domains to the shadow_apcb
+> +	 * from the matrix mdev, but only those that are assigned to the host's
+> +	 * AP configuration.
+> +	 */
+> +	bitmap_and(shadow_apcb->apm, matrix_mdev->matrix.apm,
+> +		   (unsigned long *)matrix_dev->info.apm, AP_DEVICES);
+> +	bitmap_and(shadow_apcb->aqm, matrix_mdev->matrix.aqm,
+> +		   (unsigned long *)matrix_dev->info.aqm, AP_DOMAINS);
+> +	bitmap_and(shadow_apcb->adm, matrix_mdev->matrix.adm,
+> +		   (unsigned long *)matrix_dev->info.adm, AP_DOMAINS);
+
+... aren't you overwriting shadow_apcb here anyway?
+
+> +
+> +	/* If there are no APQNs assigned, then filtering them be unnecessary */
+> +	if (bitmap_empty(shadow_apcb->apm, AP_DEVICES)) {
+> +		if (!bitmap_empty(shadow_apcb->aqm, AP_DOMAINS))
+> +			bitmap_clear(shadow_apcb->aqm, 0, AP_DOMAINS);
+> +		return;
+> +	} else if (bitmap_empty(shadow_apcb->aqm, AP_DOMAINS)) {
+> +		if (!bitmap_empty(shadow_apcb->apm, AP_DEVICES))
+> +			bitmap_clear(shadow_apcb->apm, 0, AP_DEVICES);
+> +		return;
+> +	}
+> +
+
+I complained about this before. I still don't understand why do we need
+this, but I'm willing to accept it, unless it breaks something later.
+
+BTW I don't think you have to re examine shadow->a[pq]m to tell if empty,
+bitmap_and already told you that.
+
+> +	for_each_set_bit_inv(apid, shadow_apcb->apm, AP_DEVICES) {
+> +		for_each_set_bit_inv(apqi, shadow_apcb->aqm, AP_DOMAINS) {
+> +			/*
+> +			 * If the APQN is not bound to the vfio_ap device
+> +			 * driver, then we can't assign it to the guest's
+> +			 * AP configuration. The AP architecture won't
+> +			 * allow filtering of a single APQN, so if we're
+> +			 * filtering APIDs, then filter the APID; otherwise,
+> +			 * filter the APQI.
+> +			 */
+> +			apqn = AP_MKQID(apid, apqi);
+> +			if (!vfio_ap_mdev_get_queue(matrix_mdev, apqn)) {
+> +				clear_bit_inv(apid, shadow_apcb->apm);
+> +				break;
+> +			}
+> +		}
+> +	}
+> +}
+> +
+> +/**
+> + * vfio_ap_mdev_refresh_apcb
+> + *
+> + * Filter APQNs assigned to the matrix mdev that do not reference an AP queue
+> + * device bound to the vfio_ap device driver.
+> + *
+> + * @matrix_mdev:  the matrix mdev whose AP configuration is to be filtered
+> + * @shadow_apcb:  the shadow of the KVM guest's APCB (contains AP configuration
+> + *		  for guest)
+> + * @filter_apids: boolean value indicating whether the APQNs shall be filtered
+> + *		  by APID (true) or by APQI (false).
+> + *
+
+The signature in the doc comment and of the function do not match.
+
+Since none of the complains affects correctness, except maybe for the
+qci suff:
+
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+
+If it's good enough for you, it's good enough for me.
+
+> + * Returns the number of APQNs remaining after filtering is complete.
+> + */
+> +static void vfio_ap_mdev_refresh_apcb(struct ap_matrix_mdev *matrix_mdev)
+> +{
+> +	struct ap_matrix shadow_apcb;
+> +
+> +	vfio_ap_mdev_filter_apcb(matrix_mdev, &shadow_apcb);
+> +
+> +	if (memcmp(&shadow_apcb, &matrix_mdev->shadow_apcb,
+> +		   sizeof(struct ap_matrix)) != 0) {
+> +		memcpy(&matrix_mdev->shadow_apcb, &shadow_apcb,
+> +		       sizeof(struct ap_matrix));
+> +		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+> +	}
+> +}
+> +
+>  static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>  {
+>  	struct ap_matrix_mdev *matrix_mdev;
+> @@ -552,10 +634,6 @@ static ssize_t assign_adapter_store(struct device *dev,
+>  	struct mdev_device *mdev = mdev_from_dev(dev);
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+> -	/* If the guest is running, disallow assignment of adapter */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &apid);
+>  	if (ret)
+>  		return ret;
+> @@ -577,6 +655,7 @@ static ssize_t assign_adapter_store(struct device *dev,
+>  
+>  	set_bit_inv(apid, matrix_mdev->matrix.apm);
+>  	vfio_ap_mdev_link_adapter(matrix_mdev, apid);
+> +	vfio_ap_mdev_refresh_apcb(matrix_mdev);
+>  
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+> @@ -619,10 +698,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
+>  	struct mdev_device *mdev = mdev_from_dev(dev);
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+> -	/* If the guest is running, disallow un-assignment of adapter */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &apid);
+>  	if (ret)
+>  		return ret;
+> @@ -633,6 +708,8 @@ static ssize_t unassign_adapter_store(struct device *dev,
+>  	mutex_lock(&matrix_dev->lock);
+>  	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
+>  	vfio_ap_mdev_unlink_adapter(matrix_mdev, apid);
+> +	vfio_ap_mdev_refresh_apcb(matrix_mdev);
+> +
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return count;
+> @@ -691,10 +768,6 @@ static ssize_t assign_domain_store(struct device *dev,
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
+>  
+> -	/* If the guest is running, disallow assignment of domain */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &apqi);
+>  	if (ret)
+>  		return ret;
+> @@ -715,6 +788,7 @@ static ssize_t assign_domain_store(struct device *dev,
+>  
+>  	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
+>  	vfio_ap_mdev_link_domain(matrix_mdev, apqi);
+> +	vfio_ap_mdev_refresh_apcb(matrix_mdev);
+>  
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+> @@ -757,10 +831,6 @@ static ssize_t unassign_domain_store(struct device *dev,
+>  	struct mdev_device *mdev = mdev_from_dev(dev);
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+> -	/* If the guest is running, disallow un-assignment of domain */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &apqi);
+>  	if (ret)
+>  		return ret;
+> @@ -771,12 +841,24 @@ static ssize_t unassign_domain_store(struct device *dev,
+>  	mutex_lock(&matrix_dev->lock);
+>  	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
+>  	vfio_ap_mdev_unlink_domain(matrix_mdev, apqi);
+> +	vfio_ap_mdev_refresh_apcb(matrix_mdev);
+> +
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return count;
+>  }
+>  static DEVICE_ATTR_WO(unassign_domain);
+>  
+> +static void vfio_ap_mdev_hot_plug_cdom(struct ap_matrix_mdev *matrix_mdev,
+> +				       unsigned long domid)
+> +{
+> +	if (!test_bit_inv(domid, matrix_mdev->shadow_apcb.adm) &&
+> +	    test_bit_inv(domid, (unsigned long *) matrix_dev->info.adm)) {
+> +		set_bit_inv(domid, matrix_mdev->shadow_apcb.adm);
+> +		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+> +	}
+> +}
+> +
+>  /**
+>   * assign_control_domain_store
+>   *
+> @@ -802,10 +884,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
+>  	struct mdev_device *mdev = mdev_from_dev(dev);
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  
+> -	/* If the guest is running, disallow assignment of control domain */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &id);
+>  	if (ret)
+>  		return ret;
+> @@ -820,12 +898,22 @@ static ssize_t assign_control_domain_store(struct device *dev,
+>  	 */
+>  	mutex_lock(&matrix_dev->lock);
+>  	set_bit_inv(id, matrix_mdev->matrix.adm);
+> +	vfio_ap_mdev_hot_plug_cdom(matrix_mdev, id);
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return count;
+>  }
+>  static DEVICE_ATTR_WO(assign_control_domain);
+>  
+> +static void vfio_ap_mdev_hot_unplug_cdom(struct ap_matrix_mdev *matrix_mdev,
+> +					unsigned long domid)
+> +{
+> +	if (test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
+> +		clear_bit_inv(domid, matrix_mdev->shadow_apcb.adm);
+> +		vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+> +	}
+> +}
+> +
+>  /**
+>   * unassign_control_domain_store
+>   *
+> @@ -852,10 +940,6 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+>  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>  	unsigned long max_domid =  matrix_mdev->matrix.adm_max;
+>  
+> -	/* If the guest is running, disallow un-assignment of control domain */
+> -	if (matrix_mdev->kvm)
+> -		return -EBUSY;
+> -
+>  	ret = kstrtoul(buf, 0, &domid);
+>  	if (ret)
+>  		return ret;
+> @@ -864,6 +948,7 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+>  
+>  	mutex_lock(&matrix_dev->lock);
+>  	clear_bit_inv(domid, matrix_mdev->matrix.adm);
+> +	vfio_ap_mdev_hot_unplug_cdom(matrix_mdev, domid);
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return count;
+> @@ -1089,6 +1174,8 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>  				  matrix_mdev->matrix.aqm,
+>  				  matrix_mdev->matrix.adm);
+>  
+> +	vfio_ap_mdev_commit_shadow_apcb(matrix_mdev);
+> +
+>  notify_done:
+>  	mutex_unlock(&matrix_dev->lock);
+>  	return notify_rc;
+> @@ -1330,6 +1417,8 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
+>  	q->apqn = to_ap_queue(&apdev->device)->qid;
+>  	q->saved_isc = VFIO_AP_ISC_INVALID;
+>  	vfio_ap_queue_link_mdev(q);
+> +	if (q->matrix_mdev)
+> +		vfio_ap_mdev_refresh_apcb(q->matrix_mdev);
+>  	mutex_unlock(&matrix_dev->lock);
+>  
+>  	return 0;
+> @@ -1337,6 +1426,7 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
+>  
+>  void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>  {
+> +	struct ap_matrix_mdev *matrix_mdev;
+>  	struct vfio_ap_queue *q;
+>  	int apid, apqi;
+>  
+> @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
+>  	apqi = AP_QID_QUEUE(q->apqn);
+>  	vfio_ap_mdev_reset_queue(apid, apqi, 1);
+>  
+> -	if (q->matrix_mdev)
+> +	if (q->matrix_mdev) {
+> +		matrix_mdev = q->matrix_mdev;
+>  		vfio_ap_mdev_unlink_queue(q);
+> +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
+> +	}
+>  
+>  	kfree(q);
+>  	mutex_unlock(&matrix_dev->lock);
+
