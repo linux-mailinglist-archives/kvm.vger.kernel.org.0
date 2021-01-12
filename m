@@ -2,144 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 750D92F25EB
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 02:59:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 423F72F2600
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729546AbhALB71 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 20:59:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60280 "EHLO mail.kernel.org"
+        id S1730698AbhALCCO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 21:02:14 -0500
+Received: from mga05.intel.com ([192.55.52.43]:52876 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726076AbhALB70 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 20:59:26 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1450B23A58;
-        Tue, 12 Jan 2021 01:58:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610416725;
-        bh=XIx30JQJmLtaC373rjHbFS0FMoCsRCbu0pn0e/xQap8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PYbJTI+x99tEs7zPlQPbepSX6ENzfSeQyqa6EF+KfOPAT17Hh0lWwGqeODC9TRLVT
-         jirWjMR6V3Vvp8YtlcmogyL1cA2MxE/NI52HE1diE5JAiPOoGpMHTj+31Z4K+hT+Ra
-         flZXh21zCBRn25xiXaGi51NItIoMB3o13n9biCo66zcZHNVWygF6Ld/sugnTkRFktg
-         FR83spJTun16aWjh4WuCl4Cax+bawoJF3sjhkZzatU2SEQ1nIWoYI715iVjvMFfibs
-         xjptJ6sCnL7SQ5Dy6w9ALviRvCo4R9iDJPUiT2KWNupXX7XtvU6ekRMd9p8//TI6id
-         OgcLoQ0ojMmEA==
-Date:   Tue, 12 Jan 2021 03:58:38 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
+        id S1726151AbhALCCO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 21:02:14 -0500
+IronPort-SDR: t9D6lpQ6nUHTfyFTm+VxEprXkonhwn/PMKuQyxXKTCoBSj58zcQpAyHIEWD1oe2npEmv8xxv56
+ ekgQAHUVE3Mw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="262750343"
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="262750343"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:01:33 -0800
+IronPort-SDR: JYEz5bZOwdfofiKQ/gV99rASb25mWVcDiaV+6VR6exIikmnNwHMyZzECcuaQY7rPAFJZwdVUPn
+ YrnibN7Zhnwg==
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="423992984"
+Received: from tpotnis-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.76.146])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:01:30 -0800
+Date:   Tue, 12 Jan 2021 15:01:28 +1300
+From:   Kai Huang <kai.huang@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, mattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-Message-ID: <X/0CTuHCT8jeAoXl@kernel.org>
-References: <cover.1609890536.git.kai.huang@intel.com>
- <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
- <X/ya0XnsQn4xb/1L@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <X/ya0XnsQn4xb/1L@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2
+ sub-features
+Message-Id: <20210112150128.1e0d621e053bbbf210bcb946@intel.com>
+In-Reply-To: <X/yk6zcJTLXJwIrJ@google.com>
+References: <20210107120946.ef5bae4961d0be91eff56d6b@intel.com>
+        <20210107064125.GB14697@zn.tnic>
+        <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
+        <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
+        <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
+        <20210108071722.GA4042@zn.tnic>
+        <X/jxCOLG+HUO4QlZ@google.com>
+        <20210109011939.GL4042@zn.tnic>
+        <X/yQyUx4+veuSO0e@google.com>
+        <20210111190901.GG25645@zn.tnic>
+        <X/yk6zcJTLXJwIrJ@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021 at 10:37:05AM -0800, Sean Christopherson wrote:
-> On Mon, Jan 11, 2021, Jarkko Sakkinen wrote:
-> > On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
-> > >   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
-> > >     just another memory backend for guests.
+On Mon, 11 Jan 2021 11:20:11 -0800 Sean Christopherson wrote:
+> On Mon, Jan 11, 2021, Borislav Petkov wrote:
+> > On Mon, Jan 11, 2021 at 09:54:17AM -0800, Sean Christopherson wrote:
+> > > It would be possible for KVM to break the dependency on X86_FEATURE_* bit
+> > > offsets by defining a translation layer, but I strongly feel that adding manual
+> > > translations will do more harm than good as it increases the odds of us botching
+> > > a translation or using the wrong feature flag, creates potential namespace
+> > > conflicts, etc...
 > > 
-> > Why this an advantage? No objection, just a question.
-> 
-> There are zero KVM changes required to support exposing EPC to a guest.  KVM's
-> MMU is completely ignorant of what physical backing is used for any given host
-> virtual address.  KVM has to be aware of various VM_* flags, e.g. VM_PFNMAP and
-> VM_IO, but that code is arch agnostic and is quite isolated.
-
-Right, thanks for explanation.
-
-> > >   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
-> > >     does not have to export any symbols, changes to reclaim flows don't
-> > >     need to be routed through KVM, SGX's dirty laundry doesn't have to
-> > >     get aired out for the world to see, and so on and so forth.
+> > Ok, lemme see if we might encounter more issues down the road...
 > > 
-> > No comments to this before understanding code changes better.
+> > +enum kvm_only_cpuid_leafs {
+> > +       CPUID_12_EAX     = NCAPINTS,
+> > +       NR_KVM_CPU_CAPS,
+> > +
+> > +       NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> > +};
+> > +
 > > 
-> > > The virtual EPC allocated to guests is currently not reclaimable, due to
-> > > reclaiming EPC from KVM guests is not currently supported. Due to the
-> > > complications of handling reclaim conflicts between guest and host, KVM
-> > > EPC oversubscription, which allows total virtual EPC size greater than
-> > > physical EPC by being able to reclaiming guests' EPC, is significantly more
-> > > complex than basic support for SGX virtualization.
+> > What happens when we decide to allocate a separate leaf for CPUID_12_EAX
+> > down the road?
+> 
+> Well, mechanically, that would generate a build failure if the kernel does the
+> obvious things and names the 'enum cpuid_leafs' entry CPUID_12_EAX.  That would
+> be an obvious clue that KVM should be updated.
+> 
+> If the kernel named the enum entry something different, and we botched the code
+> review, KVM would continue to work, but would unnecessarily copy the bits it
+> cares about to its own word.   E.g. the boot_cpu_has() checks and translation to
+> __X86_FEATURE_* would still be valid.  As far as failure modes go, that's not
+> terrible.
+
+Should we add a dedicated, i.e. kvm_scattered_cpu_caps[], instead of using
+existing kvm_cpu_cap[NCAPINTS]? If so this issue can be avoided??
+
+> 
+> > You do it already here
 > > 
-> > I think it should be really in the center of the patch set description that
-> > this patch set implements segmentation of EPC, not oversubscription. It should
-> > be clear immediately. It's a core part of knowing "what I'm looking at".
-> 
-> Technically, it doesn't implement EPC segmentation of EPC.  It implements
-> non-reclaimable EPC allocation.  Even that is somewhat untrue as the EPC can be
-> forcefully reclaimed, but doing so will destroy the guest contents.
-
-In SGX case, that isn't actually as a bad as a policy in high stress
-situations as with "normal" applications.  Runtimes must expect
-dissappearance of the enclave at any point of time anyway...
-
-> Userspace can oversubscribe the EPC to KVM guests, but it would need to kill,
-> migrate, or pause one or more VMs if the pool of physical EPC were exhausted.
-
-Right.
-
-> 
-> > > - Support SGX virtualization without SGX Launch Control unlocked mode
-> > > 
-> > > Although SGX driver requires SGX Launch Control unlocked mode to work, SGX
-> > > virtualization doesn't, since how enclave is created is completely controlled
-> > > by guest SGX software, which is not necessarily linux. Therefore, this series
-> > > allows KVM to expose SGX to guest even SGX Launch Control is in locked mode,
-> > > or is not present at all. The reason is the goal of SGX virtualization, or
-> > > virtualization in general, is to expose hardware feature to guest, but not to
-> > > make assumption how guest will use it. Therefore, KVM should support SGX guest
-> > > as long as hardware is able to, to have chance to support more potential use
-> > > cases in cloud environment.
+> > Subject: [PATCH 04/13] x86/cpufeatures: Assign dedicated feature word for AMD mem encryption
 > > 
-> > AFAIK the convergence point with the FLC was, and is that Linux never enables
-> > SGX with locked MSRs.
+> > for the AMD leaf.
 > > 
-> > And I don't understand, if it is not fine to allow locked SGX for a *process*,
-> > why is it fine for a *virtual machine*? They have a lot same.
-> 
-> Because it's a completely different OS/kernel.  If the user has a kernel that
-> supports locked SGX, then so be it.  There's no novel circumvention of the
-> kernel policy, e.g. the user could simply boot the non-upstream kernel directly,
-> and running an upstream kernel in the guest will not cause the kernel to support
-> SGX.
-> 
-> There are any number of things that are allowed in a KVM guest that are not
-> allowed in a bare metal process.
-
-I buy this.
-
-> > I cannot remember out of top of my head, could the Intel SHA256 be read when
-> > booted with unlocked MSRs. If that is the case, then you can still support
-> > guests with that configuration.
-> 
-> No, it's not guaranteed to be readable as firmware could have already changed
-> the values in the MSRs.
-
-Right.
-
-> > Context-dependent guidelines tend to also trash code big time. Also, for the
-> > sake of a sane kernel code base, I would consider only supporting unlocked
-> > MSRs.
-> 
-> It's one line of a code to teach the kernel driver not to load if the MSRs are
-> locked.  And IMO, that one line of code is a net positive as it makes it clear
-> in the driver itself that it chooses not support locked MSRs, even if SGX itself
-> is fully enabled.
-
-Yup, I think this clears my concerns, thank you.
-
-/Jarkko
+> > I'm thinking this way around - from scattered to a hw one - should be ok
+> > because that should work easily. The other way around, taking a hw leaf
+> > and scattering it around x86_capability[] array elems would probably be
+> > nasty but with your change that should work too.
+> > 
+> > Yah, I'm just hypothesizing here - I don't think this "other way around"
+> > will ever happen...
+> > 
+> > Hmm, yap, I can cautiously say that with your change we should be ok...
+> > 
+> > Thx.
+> > 
+> > -- 
+> > Regards/Gruss,
+> >     Boris.
+> > 
+> > https://people.kernel.org/tglx/notes-about-netiquette
