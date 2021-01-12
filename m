@@ -2,115 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C89772F371C
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:29:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42B512F374F
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:39:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404757AbhALR3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 12:29:38 -0500
-Received: from foss.arm.com ([217.140.110.172]:50124 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388300AbhALR3h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 12:29:37 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E72FA101E;
-        Tue, 12 Jan 2021 09:28:51 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 655A13F719;
-        Tue, 12 Jan 2021 09:28:50 -0800 (PST)
-Subject: Re: [PATCH 8/9] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
- userspace
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
-Cc:     james.morse@arm.com, julien.thierry.kdev@gmail.com,
-        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
-References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-9-eric.auger@redhat.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <fe0a3415-0c7b-be13-6438-89e82fe4c281@arm.com>
-Date:   Tue, 12 Jan 2021 17:28:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2389638AbhALRgt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 12:36:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733158AbhALRgt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 12:36:49 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F587C061786
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:36:09 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id y12so2043311pji.1
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:36:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kBoeCrqN2k6hVDBNDBFoP9slGG3T38BN8I1wekGgzs8=;
+        b=IJk767It+WkeZlRni4t1QJT6YRO2W0GVVlNuXV5L3VtoFJdJ1V7YbFOINLcHmAX1/5
+         qW/ibvQZpy1IyiOqbK89qYW2OT1KM8G7IRF5XTzyfjEKQhlfYOq9yRSpN/iD4M7hBpNS
+         LesTKJ0bftCKfPOKD6lojIyze730MgROX19414sH9yuOIPOK3dVuzX2SMc3eVDa+7Eff
+         7XYJ35X0Ggqxqp44fWXM9hp60v/rhvLMPkBpJ65qAEZLU/TBR9SGV///ysv0W9sSWDgs
+         e57Cu84YuOOI5mC0V5cJXdvCNIFVT0kZHOqpQnFahYAzULSSWKoZR8V2YdUEFRwYHIcV
+         VPDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kBoeCrqN2k6hVDBNDBFoP9slGG3T38BN8I1wekGgzs8=;
+        b=TjX8E1mJah2ASyZw/0f9ePgqhNoaNT34e2Z6OHLxIOdeaPnH4dbC9JH5TDtJ+NGJV0
+         ujzQz8LcUdz+Yw17QEz3AdFgSlOp4xwzr9d5mUIS3QhM3kMHIk6wznhYU6SVr48KCw91
+         /SUG81hMZvYsNxJGejd1VLJvoNilNEnpEqT2/JJp9Q7O6ez7g1SiQ4168lUNM8icC0UC
+         vIQpfYifGYf1CAHNe2H1MCM34kXX2yz7sE2wkRQ+S1Mvf0l68+Nri2cATi4tyIzlxZ4S
+         Mv+y4U4S4mxzOeErHsVt/JqVTjJAM0XPkuI5Jzm6/tyGaFAA1BUIl7uz37ofbXuQrpma
+         YTbg==
+X-Gm-Message-State: AOAM530EMG9+v/OIH9WPMoT6IbwycOyspGOslmTbw6fmxy9NyIf5+NXk
+        vwqeVPh9tG3pEmrq0pwDgR1xng==
+X-Google-Smtp-Source: ABdhPJycyDGJ7mjxh6atJ3kxaqss3ug8XgjvQHIftL9wwPSdeemCp+9hFzYCBh03Etv8hBGv+BDTqA==
+X-Received: by 2002:a17:90a:5298:: with SMTP id w24mr199739pjh.182.1610472968667;
+        Tue, 12 Jan 2021 09:36:08 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id p9sm4032823pjb.3.2021.01.12.09.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 09:36:07 -0800 (PST)
+Date:   Tue, 12 Jan 2021 09:36:01 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Wei Huang <wei.huang2@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, vkuznets@redhat.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, mlevitsk@redhat.com
+Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
+ VM instructions
+Message-ID: <X/3eAX4ZyqwCmyFi@google.com>
+References: <20210112063703.539893-1-wei.huang2@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20201212185010.26579-9-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210112063703.539893-1-wei.huang2@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Tue, Jan 12, 2021, Wei Huang wrote:
+> From: Bandan Das <bsd@redhat.com>
+> 
+> While running VM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
+> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
+> before checking VMCB's instruction intercept.
 
-On 12/12/20 6:50 PM, Eric Auger wrote:
-> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
-> reporting of GICR_TYPER.Last for userspace") temporarily fixed
-> a bug identified when attempting to access the GICR_TYPER
-> register before the redistributor region setting but dropped
-> the support of the LAST bit. This patch restores its
-> support (if the redistributor region was set) while keeping the
-> code safe.
-
-If I understand your patch correctly, it is possible for the GICR_TYPER.Last bit
-to be transiently 1 if the register is accessed before all the redistributors
-regions have been configured.
-
-Arm IHI 0069F states that accesses to the GICR_TYPER register are RO. I haven't
-found exactly what RO means (please point me to the definition if you find it in
-the architecture!), but I assume it means read-only and I'm not sure how correct
-(from an architectural point of view) it is for two subsequent reads of this
-register to return different values. Maybe Marc can shed some light on this.
-
-Thanks,
-Alex
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
->  include/kvm/arm_vgic.h             | 1 +
->  2 files changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index 581f0f490000..2f9ef6058f6e 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -277,6 +277,8 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
->  						 gpa_t addr, unsigned int len)
->  {
->  	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +	struct vgic_redist_region *rdreg = vgic_cpu->rdreg;
->  	int target_vcpu_id = vcpu->vcpu_id;
->  	u64 value;
->  
-> @@ -286,7 +288,9 @@ static unsigned long vgic_uaccess_read_v3r_typer(struct kvm_vcpu *vcpu,
->  	if (vgic_has_its(vcpu->kvm))
->  		value |= GICR_TYPER_PLPIS;
->  
-> -	/* reporting of the Last bit is not supported for userspace */
-> +	if (rdreg && (vgic_cpu->rdreg_index == (rdreg->free_index - 1)))
-> +		value |= GICR_TYPER_LAST;
-> +
->  	return extract_bytes(value, addr & 7, len);
->  }
->  
-> @@ -714,6 +718,7 @@ int vgic_register_redist_iodev(struct kvm_vcpu *vcpu)
->  		return -EINVAL;
->  
->  	vgic_cpu->rdreg = rdreg;
-> +	vgic_cpu->rdreg_index = rdreg->free_index;
->  
->  	rd_base = rdreg->base + rdreg->free_index * KVM_VGIC_V3_REDIST_SIZE;
->  
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index a8d8fdcd3723..596c069263a7 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -322,6 +322,7 @@ struct vgic_cpu {
->  	 */
->  	struct vgic_io_device	rd_iodev;
->  	struct vgic_redist_region *rdreg;
-> +	u32 rdreg_index;
->  
->  	/* Contains the attributes and gpa of the LPI pending tables. */
->  	u64 pendbaser;
+It would be very helpful to list exactly which CPUs are/aren't affected, even if
+that just means stating something like "all CPUs before XYZ".  Given patch 2/2,
+I assume it's all CPUs without the new CPUID flag?
