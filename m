@@ -2,461 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73AFE2F2D9C
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:12:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7541F2F2DC0
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:19:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727626AbhALLLP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 06:11:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40416 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726149AbhALLLM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 06:11:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610449784;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kHla5Y18WcNXMDpJK4x4nqGCKuLzkoEQod1r3luey3A=;
-        b=ONoyS7+H/TYC2rrNjlJ3ihQzk3Ce0p+GiYMpCHZSw5pAZcIKCycdXQsBORB32S6fHhxyzT
-        2DIiYpxpASlP4KExNRIqnReS+FGBAaKzK8ZUvtnVPWPXpn4m1fdG9OIWcQhbrkcf1ZgXgO
-        tmjCvLy7fKEEUrjDPztE5Fd2rQqK/L4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-i56Q0a1GPGKP4EM-siPAyQ-1; Tue, 12 Jan 2021 06:09:40 -0500
-X-MC-Unique: i56Q0a1GPGKP4EM-siPAyQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57181014E79;
-        Tue, 12 Jan 2021 11:09:38 +0000 (UTC)
-Received: from starship (unknown [10.35.206.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B086779D6;
-        Tue, 12 Jan 2021 11:09:31 +0000 (UTC)
-Message-ID: <f95acfbbff46109092881874c8c78edcf58a72e8.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered
- by VM instructions
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com
-Date:   Tue, 12 Jan 2021 13:09:30 +0200
-In-Reply-To: <20210112063703.539893-1-wei.huang2@amd.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1725779AbhALLS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 06:18:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725859AbhALLS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 06:18:59 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0B5C061575
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:18:18 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id g24so1846485edw.9
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:18:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=6Xza6dUDyfeH/pPU30kEn/p3DdpBur5kEztG56hp89Y=;
+        b=CpvXhdydrJAp2wIZ93s4jbYbtrlCwpgfzZYFSLvS+aK9OCBOCjNzBUiUZ/2Mgkkxn/
+         IlUuS/E7AOKGzAUzI0sJ7aM4pJRHKzhbQJVzSVffua2UrF7Mp5H4hJUUkmY9WM8t/ABH
+         oWFYtPzP00yyhoBKvbPBJRFXJhvfNZTCEgYi9Iex4k3owe+yYAZDICw34Tv56cXLSwMs
+         ktG+eZ+v0dd3kbAfQXSuYKRVXGt4j64e6S4lTqQi8j3/CsqxQ8HHvp7+Gvf/qDzWHUYA
+         7fx3W79zcNVR2Y8hu8Zz6u7RsMZuTuC7M7z8Rb8WbUSaGdLV89ondf9jtnBwZsJdoDXb
+         RsUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=6Xza6dUDyfeH/pPU30kEn/p3DdpBur5kEztG56hp89Y=;
+        b=pOdwgJ96XpaiodrFSPc6cPCtP+MVWZyEtm2m5OXWJa3v/pWZ6dqzKB0ZQrwyWPxfeF
+         9m53a18DSsMcFZKL7Hmv89z8vNOz291qMw7dcfEfiGbW6wIumtgn8edLFO6h3GyW3eFT
+         y/zgHHX/rqLuevnKHvhWptsTR0heCRUpSiL3aNqT53jCiL8DKUB3rrWlFxogN8zfx0Sp
+         P7WeLisN1cnK/h1SlCIuZ+f443oueAAp53nVlCetwvbB/0TQF7dwQ0LE0SK0bLp3T+iX
+         okZETu4gEhXV+z+EtDrPfpFh57ZiiN6qZHLiqZvcvgIE964sQN6AOGeUAzzZAEAH0Wzr
+         0k6Q==
+X-Gm-Message-State: AOAM533+pGxFN/gce6Mmo8K2mKS27z+HjZGnErndM54JotOSn7yTkU+R
+        JnT1uz9Vag01DaXUHFX7D14=
+X-Google-Smtp-Source: ABdhPJwVhge/8MyznJ09B4fkPd9M8/E3VPT+PSewCAixhOEhYETVisqUk6+Qntb78UMZerV5qABBJQ==
+X-Received: by 2002:a05:6402:a52:: with SMTP id bt18mr3041911edb.228.1610450297451;
+        Tue, 12 Jan 2021 03:18:17 -0800 (PST)
+Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
+        by smtp.gmail.com with ESMTPSA id da9sm1250503edb.84.2021.01.12.03.18.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 03:18:17 -0800 (PST)
+Date:   Tue, 12 Jan 2021 12:18:11 +0100
+From:   Zdenek Kaspar <zkaspar82@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: Bad performance since 5.9-rc1
+Message-ID: <20210112121811.408e32fe.zkaspar82@gmail.com>
+In-Reply-To: <20201222222645.0d8e96b2.zkaspar82@gmail.com>
+References: <20201119040526.5263f557.zkaspar82@gmail.com>
+        <20201201073537.6749e2d7.zkaspar82@gmail.com>
+        <20201218203310.5025c17e.zkaspar82@gmail.com>
+        <X+D6eJn92Vt6v+U1@google.com>
+        <20201221221339.030684c4.zkaspar82@gmail.com>
+        <X+In2zIA40Ku19cM@google.com>
+        <20201222222645.0d8e96b2.zkaspar82@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-12 at 00:37 -0600, Wei Huang wrote:
-> From: Bandan Das <bsd@redhat.com>
+On Tue, 22 Dec 2020 22:26:45 +0100
+Zdenek Kaspar <zkaspar82@gmail.com> wrote:
+
+> On Tue, 22 Dec 2020 09:07:39 -0800
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
-> While running VM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
-> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
-> before checking VMCB's instruction intercept. If EAX falls into such
-> memory areas, #GP is triggered before VMEXIT. This causes problem under
-> nested virtualization. To solve this problem, KVM needs to trap #GP and
-> check the instructions triggering #GP. For VM execution instructions,
-> KVM emulates these instructions; otherwise it re-injects #GP back to
-> guest VMs.
+> > On Mon, Dec 21, 2020, Zdenek Kaspar wrote:
+> > > [  179.364305] WARNING: CPU: 0 PID: 369 at
+> > > kvm_mmu_zap_oldest_mmu_pages+0xd1/0xe0 [kvm] [  179.365415] Call
+> > > Trace: [  179.365443]  paging64_page_fault+0x244/0x8e0 [kvm]
+> > 
+> > This means the shadow page zapping is occuring because KVM is
+> > hitting the max number of allowed MMU shadow pages.  Can you
+> > provide your QEMU command line?  I can reproduce the performance
+> > degredation, but only by deliberately overriding the max number of
+> > MMU pages via `-machine kvm-shadow-mem` to be an absurdly low value.
+> > 
+> > > [  179.365596]  kvm_mmu_page_fault+0x376/0x550 [kvm]
+> > > [  179.365725]  kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm]
+> > > [  179.365772]  kvm_vcpu_ioctl+0x203/0x520 [kvm]
+> > > [  179.365938]  __x64_sys_ioctl+0x338/0x720
+> > > [  179.365992]  do_syscall_64+0x33/0x40
+> > > [  179.366013]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
 > 
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> Co-developed-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-
-This is the ultimate fix for this bug that I had in mind, 
-but I didn't dare to develop it, thinking it won't be accepted 
-due to the added complexity.
-
-From a cursory look this look all right, and I will review 
-and test this either today or tomorrow.
-
-Thank you very much for doing the right fix for this bug.
-
-Best regards,
-	Maxim Levitsky
-
-> ---
->  arch/x86/include/asm/kvm_host.h |   8 +-
->  arch/x86/kvm/mmu.h              |   1 +
->  arch/x86/kvm/mmu/mmu.c          |   7 ++
->  arch/x86/kvm/svm/svm.c          | 157 +++++++++++++++++++-------------
->  arch/x86/kvm/svm/svm.h          |   8 ++
->  arch/x86/kvm/vmx/vmx.c          |   2 +-
->  arch/x86/kvm/x86.c              |  37 +++++++-
->  7 files changed, 146 insertions(+), 74 deletions(-)
+> It's one long line, added "\" for mail readability:
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3d6616f6f6ef..0ddc309f5a14 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1450,10 +1450,12 @@ extern u64 kvm_mce_cap_supported;
->   *			     due to an intercepted #UD (see EMULTYPE_TRAP_UD).
->   *			     Used to test the full emulator from userspace.
->   *
-> - * EMULTYPE_VMWARE_GP - Set when emulating an intercepted #GP for VMware
-> + * EMULTYPE_PARAVIRT_GP - Set when emulating an intercepted #GP for VMware
->   *			backdoor emulation, which is opt in via module param.
->   *			VMware backoor emulation handles select instructions
-> - *			and reinjects the #GP for all other cases.
-> + *			and reinjects #GP for all other cases. This also
-> + *			handles other cases where #GP condition needs to be
-> + *			handled and emulated appropriately
->   *
->   * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
->   *		 case the CR2/GPA value pass on the stack is valid.
-> @@ -1463,7 +1465,7 @@ extern u64 kvm_mce_cap_supported;
->  #define EMULTYPE_SKIP		    (1 << 2)
->  #define EMULTYPE_ALLOW_RETRY_PF	    (1 << 3)
->  #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
-> -#define EMULTYPE_VMWARE_GP	    (1 << 5)
-> +#define EMULTYPE_PARAVIRT_GP	    (1 << 5)
->  #define EMULTYPE_PF		    (1 << 6)
->  
->  int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 581925e476d6..1a2fff4e7140 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -219,5 +219,6 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
->  
->  int kvm_mmu_post_init_vm(struct kvm *kvm);
->  void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
-> +bool kvm_is_host_reserved_region(u64 gpa);
->  
->  #endif
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6d16481aa29d..c5c4aaf01a1a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -50,6 +50,7 @@
->  #include <asm/io.h>
->  #include <asm/vmx.h>
->  #include <asm/kvm_page_track.h>
-> +#include <asm/e820/api.h>
->  #include "trace.h"
->  
->  extern bool itlb_multihit_kvm_mitigation;
-> @@ -5675,6 +5676,12 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
->  }
->  EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
->  
-> +bool kvm_is_host_reserved_region(u64 gpa)
-> +{
-> +	return e820__mapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_is_host_reserved_region);
-> +
->  void kvm_mmu_zap_all(struct kvm *kvm)
->  {
->  	struct kvm_mmu_page *sp, *node;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 7ef171790d02..74620d32aa82 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -288,6 +288,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  		if (!(efer & EFER_SVME)) {
->  			svm_leave_nested(svm);
->  			svm_set_gif(svm, true);
-> +			clr_exception_intercept(svm, GP_VECTOR);
->  
->  			/*
->  			 * Free the nested guest state, unless we are in SMM.
-> @@ -309,6 +310,10 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  
->  	svm->vmcb->save.efer = efer | EFER_SVME;
->  	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
-> +	/* Enable GP interception for SVM instructions if needed */
-> +	if (efer & EFER_SVME)
-> +		set_exception_intercept(svm, GP_VECTOR);
-> +
->  	return 0;
->  }
->  
-> @@ -1957,22 +1962,104 @@ static int ac_interception(struct vcpu_svm *svm)
->  	return 1;
->  }
->  
-> +static int vmload_interception(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *nested_vmcb;
-> +	struct kvm_host_map map;
-> +	int ret;
-> +
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> +	if (ret) {
-> +		if (ret == -EINVAL)
-> +			kvm_inject_gp(&svm->vcpu, 0);
-> +		return 1;
-> +	}
-> +
-> +	nested_vmcb = map.hva;
-> +
-> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> +
-> +	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
-> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vmsave_interception(struct vcpu_svm *svm)
-> +{
-> +	struct vmcb *nested_vmcb;
-> +	struct kvm_host_map map;
-> +	int ret;
-> +
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> +	if (ret) {
-> +		if (ret == -EINVAL)
-> +			kvm_inject_gp(&svm->vcpu, 0);
-> +		return 1;
-> +	}
-> +
-> +	nested_vmcb = map.hva;
-> +
-> +	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> +
-> +	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
-> +	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> +
-> +	return ret;
-> +}
-> +
-> +static int vmrun_interception(struct vcpu_svm *svm)
-> +{
-> +	if (nested_svm_check_permissions(svm))
-> +		return 1;
-> +
-> +	return nested_svm_vmrun(svm);
-> +}
-> +
-> +/* Emulate SVM VM execution instructions */
-> +static int svm_emulate_vm_instr(struct kvm_vcpu *vcpu, u8 modrm)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +
-> +	switch (modrm) {
-> +	case 0xd8: /* VMRUN */
-> +		return vmrun_interception(svm);
-> +	case 0xda: /* VMLOAD */
-> +		return vmload_interception(svm);
-> +	case 0xdb: /* VMSAVE */
-> +		return vmsave_interception(svm);
-> +	default:
-> +		/* inject a #GP for all other cases */
-> +		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +		return 1;
-> +	}
-> +}
-> +
->  static int gp_interception(struct vcpu_svm *svm)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
->  	u32 error_code = svm->vmcb->control.exit_info_1;
-> -
-> -	WARN_ON_ONCE(!enable_vmware_backdoor);
-> +	int rc;
->  
->  	/*
-> -	 * VMware backdoor emulation on #GP interception only handles IN{S},
-> -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
-> +	 * Only VMware backdoor and SVM VME errata are handled. Neither of
-> +	 * them has non-zero error codes.
->  	 */
->  	if (error_code) {
->  		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
->  		return 1;
->  	}
-> -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> +
-> +	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
-> +	if (rc > 1)
-> +		rc = svm_emulate_vm_instr(vcpu, rc);
-> +	return rc;
->  }
->  
->  static bool is_erratum_383(void)
-> @@ -2113,66 +2200,6 @@ static int vmmcall_interception(struct vcpu_svm *svm)
->  	return kvm_emulate_hypercall(&svm->vcpu);
->  }
->  
-> -static int vmload_interception(struct vcpu_svm *svm)
-> -{
-> -	struct vmcb *nested_vmcb;
-> -	struct kvm_host_map map;
-> -	int ret;
-> -
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> -	if (ret) {
-> -		if (ret == -EINVAL)
-> -			kvm_inject_gp(&svm->vcpu, 0);
-> -		return 1;
-> -	}
-> -
-> -	nested_vmcb = map.hva;
-> -
-> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> -
-> -	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
-> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> -
-> -	return ret;
-> -}
-> -
-> -static int vmsave_interception(struct vcpu_svm *svm)
-> -{
-> -	struct vmcb *nested_vmcb;
-> -	struct kvm_host_map map;
-> -	int ret;
-> -
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
-> -	if (ret) {
-> -		if (ret == -EINVAL)
-> -			kvm_inject_gp(&svm->vcpu, 0);
-> -		return 1;
-> -	}
-> -
-> -	nested_vmcb = map.hva;
-> -
-> -	ret = kvm_skip_emulated_instruction(&svm->vcpu);
-> -
-> -	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
-> -	kvm_vcpu_unmap(&svm->vcpu, &map, true);
-> -
-> -	return ret;
-> -}
-> -
-> -static int vmrun_interception(struct vcpu_svm *svm)
-> -{
-> -	if (nested_svm_check_permissions(svm))
-> -		return 1;
-> -
-> -	return nested_svm_vmrun(svm);
-> -}
-> -
->  void svm_set_gif(struct vcpu_svm *svm, bool value)
->  {
->  	if (value) {
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0fe874ae5498..d5dffcf59afa 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -350,6 +350,14 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
->  	recalc_intercepts(svm);
->  }
->  
-> +static inline bool is_exception_intercept(struct vcpu_svm *svm, u32 bit)
-> +{
-> +	struct vmcb *vmcb = get_host_vmcb(svm);
-> +
-> +	WARN_ON_ONCE(bit >= 32);
-> +	return vmcb_is_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
-> +}
-> +
->  static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
->  {
->  	struct vmcb *vmcb = get_host_vmcb(svm);
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2af05d3b0590..5fac2f7cba24 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -4774,7 +4774,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  			kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
->  			return 1;
->  		}
-> -		return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> +		return kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
->  	}
->  
->  	/*
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9a8969a6dd06..c3662fc3b1bc 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7014,7 +7014,7 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
->  	++vcpu->stat.insn_emulation_fail;
->  	trace_kvm_emulate_insn_failed(vcpu);
->  
-> -	if (emulation_type & EMULTYPE_VMWARE_GP) {
-> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
->  		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
->  		return 1;
->  	}
-> @@ -7267,6 +7267,28 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
->  	return false;
->  }
->  
-> +static int is_vm_instr_opcode(struct x86_emulate_ctxt *ctxt)
-> +{
-> +	unsigned long rax;
-> +
-> +	if (ctxt->b != 0x1)
-> +		return 0;
-> +
-> +	switch (ctxt->modrm) {
-> +	case 0xd8: /* VMRUN */
-> +	case 0xda: /* VMLOAD */
-> +	case 0xdb: /* VMSAVE */
-> +		rax = kvm_register_read(emul_to_vcpu(ctxt), VCPU_REGS_RAX);
-> +		if (!kvm_is_host_reserved_region(rax))
-> +			return 0;
-> +		break;
-> +	default:
-> +		return 0;
-> +	}
-> +
-> +	return ctxt->modrm;
-> +}
-> +
->  static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
->  {
->  	switch (ctxt->opcode_len) {
-> @@ -7305,6 +7327,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->  	bool writeback = true;
->  	bool write_fault_to_spt;
-> +	int vminstr;
->  
->  	if (unlikely(!kvm_x86_ops.can_emulate_instruction(vcpu, insn, insn_len)))
->  		return 1;
-> @@ -7367,10 +7390,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		}
->  	}
->  
-> -	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
-> -	    !is_vmware_backdoor_opcode(ctxt)) {
-> -		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> -		return 1;
-> +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
-> +		vminstr = is_vm_instr_opcode(ctxt);
-> +		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
-> +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> +			return 1;
-> +		}
-> +		if (vminstr)
-> +			return vminstr;
->  	}
->  
->  	/*
+> qemu-system-x86_64 -machine type=q35,accel=kvm            \
+> -cpu host,host-cache-info=on -smp cpus=2,cores=2          \
+> -m size=1024 -global virtio-pci.disable-legacy=on         \
+> -global virtio-pci.disable-modern=off                     \
+> -device virtio-balloon                                    \
+> -device virtio-net,netdev=tap-build,mac=DE:AD:BE:EF:00:80 \
+> -object rng-random,filename=/dev/urandom,id=rng0          \
+> -device virtio-rng,rng=rng0                               \
+> -name build,process=qemu-build                            \
+> -drive
+> file=/mnt/data/export/unix/kvm/build/openbsd-amd64.img,if=virtio,cache=none,format=raw,aio=native
+> \ -netdev type=tap,id=tap-build,vhost=on                    \ -serial
+> none                                              \ -parallel none
+>                                         \ -monitor
+> unix:/dev/shm/kvm-build.sock,server,nowait       \ -enable-kvm
+> -daemonize -runas qemu
+> 
+> Z.
 
+BTW, v5.11-rc3 with kvm-shadow-mem=1073741824 it seems OK.
 
+Just curious what v5.8 does, so by any chance is there command
+for kvm-shadow-mem value via qemu monitor?
+
+Z.
