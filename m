@@ -2,137 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 129842F2EA0
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 13:06:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A2802F2ECB
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 13:16:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731951AbhALMFc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 07:05:32 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10713 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727952AbhALMFb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 07:05:31 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DFTkD0LGDzl46q;
-        Tue, 12 Jan 2021 20:03:32 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 12 Jan 2021 20:04:39 +0800
-Subject: Re: [PATCH 4/5] vfio/iommu_type1: Carefully use unmap_unpin_all
- during dirty tracking
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20210107092901.19712-1-zhukeqian1@huawei.com>
- <20210107092901.19712-5-zhukeqian1@huawei.com>
- <20210111144913.3092b1b1@omen.home.shazbot.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <198f0afd-343a-9fbc-9556-95670ca76a2c@huawei.com>
-Date:   Tue, 12 Jan 2021 20:04:38 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S1732741AbhALMOr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 07:14:47 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:57542 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732455AbhALMOr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 07:14:47 -0500
+Received: from zn.tnic (p200300ec2f0e8c0026b5c8bc02f060b7.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:8c00:26b5:c8bc:2f0:60b7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A5F861EC0472;
+        Tue, 12 Jan 2021 13:14:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1610453645;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=4w8mzi966gYW3Xfnk2BjaCXIPZPykNO5//jfGuwn8bg=;
+        b=W4KSP/np+hFfozdVXNuZ9SJqfFYB6B93B4xH/8lum//CNETvhZ//YuQTDmyUw+aZG1mlYP
+        bR98Kx0uOrjGeIISnlIIX4oXNzdgDyQv0mjR5sxF5pmIccjM9R0fZMG5HfYTTqJRE5l4CA
+        G1+91h/fDHXRplrGgVHye/Tp1LrisUM=
+Date:   Tue, 12 Jan 2021 13:13:59 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Message-ID: <20210112121359.GC13086@zn.tnic>
+References: <20210107064125.GB14697@zn.tnic>
+ <20210108150018.7a8c2e2fb442c9c68b0aa624@intel.com>
+ <a0f75623-b0ce-bf19-4678-0f3e94a3a828@intel.com>
+ <20210108200350.7ba93b8cd19978fe27da74af@intel.com>
+ <20210108071722.GA4042@zn.tnic>
+ <X/jxCOLG+HUO4QlZ@google.com>
+ <20210109011939.GL4042@zn.tnic>
+ <X/yQyUx4+veuSO0e@google.com>
+ <20210111190901.GG25645@zn.tnic>
+ <X/yk6zcJTLXJwIrJ@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210111144913.3092b1b1@omen.home.shazbot.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <X/yk6zcJTLXJwIrJ@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jan 11, 2021 at 11:20:11AM -0800, Sean Christopherson wrote:
+> Well, mechanically, that would generate a build failure if the kernel does the
+> obvious things and names the 'enum cpuid_leafs' entry CPUID_12_EAX.  That would
+> be an obvious clue that KVM should be updated.
 
+Then we need to properly document that whenever someone does that
+change, someone needs to touch the proper places.
 
-On 2021/1/12 5:49, Alex Williamson wrote:
-> On Thu, 7 Jan 2021 17:29:00 +0800
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> 
->> If we detach group during dirty page tracking, we shouldn't remove
->> vfio_dma, because dirty log will lose.
->>
->> But we don't prevent unmap_unpin_all in vfio_iommu_release, because
->> under normal procedure, dirty tracking has been stopped.
-> 
-> This looks like it's creating a larger problem than it's fixing, it's
-> not our job to maintain the dirty bitmap regardless of what the user
-> does.  If the user detaches the last group in a container causing the
-> mappings within that container to be deconstructed before the user has
-> collected dirty pages, that sounds like a user error.  A container with
-> no groups is de-privileged and therefore loses all state.  Thanks,
-> 
-> Alex
+> If the kernel named the enum entry something different, and we botched the code
+> review, KVM would continue to work, but would unnecessarily copy the bits it
+> cares about to its own word.   E.g. the boot_cpu_has() checks and translation to
+> __X86_FEATURE_* would still be valid.  As far as failure modes go, that's not
+> terrible.
 
-Hi Alex,
+Right, which reminds me: with your prototype patch, we would have:
 
-This looks good to me ;-). That's a reasonable constraint for user behavior.
+static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
+{
+        const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
+        struct kvm_cpuid_entry2 entry;
 
-What about replacing this patch with an addition to the uapi document of
-VFIO_GROUP_UNSET_CONTAINER? User should pay attention to this when call this
-ioctl during dirty tracking.
+        reverse_cpuid_check(leaf);
 
-And any comments on other patches? thanks.
+        cpuid_count(cpuid.function, cpuid.index,
+                    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
 
-Thanks.
-Keqian
+        kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
+}
 
-> 
->> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 14 ++++++++++++--
->>  1 file changed, 12 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 26b7eb2a5cfc..9776a059904d 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2373,7 +2373,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->>  			if (list_empty(&iommu->external_domain->group_list)) {
->>  				vfio_sanity_check_pfn_list(iommu);
->>  
->> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
->> +				/*
->> +				 * During dirty page tracking, we can't remove
->> +				 * vfio_dma because dirty log will lose.
->> +				 */
->> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu) &&
->> +				    !iommu->dirty_page_tracking)
->>  					vfio_iommu_unmap_unpin_all(iommu);
->>  
->>  				kfree(iommu->external_domain);
->> @@ -2406,10 +2411,15 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->>  		 * iommu and external domain doesn't exist, then all the
->>  		 * mappings go away too. If it's the last domain with iommu and
->>  		 * external domain exist, update accounting
->> +		 *
->> +		 * Note: During dirty page tracking, we can't remove vfio_dma
->> +		 * because dirty log will lose. Just update accounting is a good
->> +		 * choice.
->>  		 */
->>  		if (list_empty(&domain->group_list)) {
->>  			if (list_is_singular(&iommu->domain_list)) {
->> -				if (!iommu->external_domain)
->> +				if (!iommu->external_domain &&
->> +				    !iommu->dirty_page_tracking)
->>  					vfio_iommu_unmap_unpin_all(iommu);
->>  				else
->>  					vfio_iommu_unmap_unpin_reaccount(iommu);
-> 
-> .
-> 
+which does read CPUID from the hw and kvm_cpu_caps[] has already the
+copied bits from boot_cpu_data.x86_capability.
+
+Now you said that reading the CPUID is mostly redundant but we're
+paranoid so we do it anyway, just in case, so how about we remove the
+copying of boot_cpu_data.x86_capability? That's one less dependency
+on the baremetal implementation.
+
+Practically, nothing changes for kvm because it will read CPUID which is
+the canonical thing anyway. And this should simplify the deal more and
+keep it simple(r).
+
+Hmmm.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
