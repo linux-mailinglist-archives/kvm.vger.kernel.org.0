@@ -2,163 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 096F92F3610
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:45:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 301A02F3625
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:51:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405133AbhALQoq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 11:44:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58575 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404757AbhALQop (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 11:44:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610469798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cUfX5tPPc+C3c7Lgk0v7v3G8sS4ZlOVoH2iXbMC54qA=;
-        b=IgvQ/RhDAx4nZ2U63nV6c4cpTk5M0WoF/f7OC4/ZxYSz5zEUnUjP8/A8pNyuABhPpmVPV6
-        17nJMO7sQmI1DrhNa4tOxQ/VctmhJzfK+qcXHp4lk5dgALyCnBN8+6WZ6+ug12BzW2ApHn
-        X2JITXVjhj/pVfL9+6Mm72q77n6DwY0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-ZZU7-pfrMxutDmJqzVfc-Q-1; Tue, 12 Jan 2021 11:43:17 -0500
-X-MC-Unique: ZZU7-pfrMxutDmJqzVfc-Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2374801AC3;
-        Tue, 12 Jan 2021 16:43:15 +0000 (UTC)
-Received: from virtlab710.virt.lab.eng.bos.redhat.com (virtlab710.virt.lab.eng.bos.redhat.com [10.19.152.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F2C95C1B4;
-        Tue, 12 Jan 2021 16:43:15 +0000 (UTC)
-From:   Cathy Avery <cavery@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Cc:     vkuznets@redhat.com, wei.huang2@amd.com,
-        sean.j.christopherson@intel.com
-Subject: [PATCH 2/2] KVM: nSVM: Track the ASID generation of the vmcb vmrun through the vmcb
-Date:   Tue, 12 Jan 2021 11:43:13 -0500
-Message-Id: <20210112164313.4204-3-cavery@redhat.com>
-In-Reply-To: <20210112164313.4204-1-cavery@redhat.com>
-References: <20210112164313.4204-1-cavery@redhat.com>
+        id S2390490AbhALQuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 11:50:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41420 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728583AbhALQuZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 11:50:25 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CGhYHD049845;
+        Tue, 12 Jan 2021 11:49:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CPMisSnatD+99YHPEmUR1gJHKPbc6b/P6VGnKEl2XEg=;
+ b=WIxRtdVJkgC2F1P0pAbAhstw5Fm4CSpnf+4WSbX0PmlNljQKYP62l2Q4kIX5xLduynUb
+ FRSqWGwEHWFOXAlWbGXPUGUGNyPdNypz8Q6BEbcQBPRYWuS3hUHGyDNBF5JzKBiv2aWO
+ JBou5WE3pNT/BqhYfJ47oaks4Z0XvFa1CeGXs+yujgMhdPypssRIVUQARh1dDBPXZhYS
+ mvXoLIVNUPtPT7L2dZF2sYpQhESrmM+c2p5C3sUoAwpzcZtP4W1DqKBstW/eBm2lsmnt
+ xFNKAnmp3iwwJp5DO0F3m36VfhVdbcl3uIq70gdpsw/JhLK1QhUsG1upaYFeY/1hmAzq ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361fhr85um-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 11:49:44 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CGiosU057090;
+        Tue, 12 Jan 2021 11:49:44 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 361fhr85tr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 11:49:43 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CGmwKT027605;
+        Tue, 12 Jan 2021 16:49:41 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma01fra.de.ibm.com with ESMTP id 35y44820qm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 16:49:41 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CGncTG40829412
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jan 2021 16:49:38 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 633EC5204E;
+        Tue, 12 Jan 2021 16:49:38 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.60.135])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id A848352050;
+        Tue, 12 Jan 2021 16:49:37 +0000 (GMT)
+Date:   Tue, 12 Jan 2021 17:49:35 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 11/15] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
+Message-ID: <20210112174935.41cbda87.pasic@linux.ibm.com>
+In-Reply-To: <d717a554-6d0c-6075-38fd-e725b9622437@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-12-akrowiak@linux.ibm.com>
+        <20210112022012.4bad464f.pasic@linux.ibm.com>
+        <d717a554-6d0c-6075-38fd-e725b9622437@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-12_12:2021-01-12,2021-01-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ priorityscore=1501 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 spamscore=0 suspectscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101120091
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch moves the asid_generation from the vcpu to the vmcb
-in order to track the ASID generation that was active the last
-time the vmcb was run. If sd->asid_generation changes between
-two runs, the old ASID is invalid and must be changed.
+On Tue, 12 Jan 2021 09:14:07 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Cathy Avery <cavery@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 21 +++++++--------------
- arch/x86/kvm/svm/svm.h |  2 +-
- 2 files changed, 8 insertions(+), 15 deletions(-)
+> On 1/11/21 8:20 PM, Halil Pasic wrote:
+> > On Tue, 22 Dec 2020 20:16:02 -0500
+> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >   
+> >> Let's implement the callback to indicate when an APQN
+> >> is in use by the vfio_ap device driver. The callback is
+> >> invoked whenever a change to the apmask or aqmask would
+> >> result in one or more queue devices being removed from the driver. The
+> >> vfio_ap device driver will indicate a resource is in use
+> >> if the APQN of any of the queue devices to be removed are assigned to
+> >> any of the matrix mdevs under the driver's control.
+> >>
+> >> There is potential for a deadlock condition between the matrix_dev->lock
+> >> used to lock the matrix device during assignment of adapters and domains
+> >> and the ap_perms_mutex locked by the AP bus when changes are made to the
+> >> sysfs apmask/aqmask attributes.
+> >>
+> >> Consider following scenario (courtesy of Halil Pasic):
+> >> 1) apmask_store() takes ap_perms_mutex
+> >> 2) assign_adapter_store() takes matrix_dev->lock
+> >> 3) apmask_store() calls vfio_ap_mdev_resource_in_use() which tries
+> >>     to take matrix_dev->lock
+> >> 4) assign_adapter_store() calls ap_apqn_in_matrix_owned_by_def_drv
+> >>     which tries to take ap_perms_mutex
+> >>
+> >> BANG!
+> >>
+> >> To resolve this issue, instead of using the mutex_lock(&matrix_dev->lock)
+> >> function to lock the matrix device during assignment of an adapter or
+> >> domain to a matrix_mdev as well as during the in_use callback, the
+> >> mutex_trylock(&matrix_dev->lock) function will be used. If the lock is not
+> >> obtained, then the assignment and in_use functions will terminate with
+> >> -EBUSY.
+> >>
+> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >> ---
+> >>   drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+> >>   drivers/s390/crypto/vfio_ap_ops.c     | 21 ++++++++++++++++++---
+> >>   drivers/s390/crypto/vfio_ap_private.h |  2 ++
+> >>   3 files changed, 21 insertions(+), 3 deletions(-)
+> >>  
+> > [..]  
+> >>   }
+> >> +
+> >> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+> >> +{
+> >> +	int ret;
+> >> +
+> >> +	if (!mutex_trylock(&matrix_dev->lock))
+> >> +		return -EBUSY;
+> >> +	ret = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);  
+> > 
+> > If we detect that resources are in use, then we spit warnings to the
+> > message log, right?
+> > 
+> > @Matt: Is your userspace tooling going to guarantee that this will never
+> > happen?  
+> 
+> Yes, but only when using the tooling to modify apmask/aqmask.  You would 
+> still be able to create such a scenario by bypassing the tooling and 
+> invoking the sysfs interfaces directly.
+> 
+> 
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 5b6998ff7aa1..73e63f7a0acf 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1214,7 +1214,7 @@ static void init_vmcb(struct vcpu_svm *svm)
- 		save->cr3 = 0;
- 		save->cr4 = 0;
- 	}
--	svm->asid_generation = 0;
-+	svm->current_vmcb->asid_generation = 0;
- 	svm->asid = 0;
- 
- 	svm->nested.vmcb12_gpa = 0;
-@@ -1296,13 +1296,6 @@ void svm_switch_vmcb(struct vcpu_svm *svm, struct kvm_vmcb_info *target_vmcb)
- 	svm->vmcb = target_vmcb->ptr;
- 	svm->vmcb_pa = target_vmcb->pa;
- 
--	/*
--	* Workaround: we don't yet track the ASID generation
--	* that was active the last time target_vmcb was run.
--	*/
--
--	svm->asid_generation = 0;
--
- 	/*
- 	* Track the physical CPU the target_vmcb is running on
- 	* in order to mark the VMCB dirty if the cpu changes at
-@@ -1347,7 +1340,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
- 
- 	svm_switch_vmcb(svm, &svm->vmcb01);
- 
--	svm->asid_generation = 0;
- 	init_vmcb(svm);
- 
- 	svm_init_osvw(vcpu);
-@@ -1784,7 +1776,7 @@ static void new_asid(struct vcpu_svm *svm, struct svm_cpu_data *sd)
- 		vmcb_mark_dirty(svm->vmcb, VMCB_ASID);
- 	}
- 
--	svm->asid_generation = sd->asid_generation;
-+	svm->current_vmcb->asid_generation = sd->asid_generation;
- 	svm->asid = sd->next_asid++;
- }
- 
-@@ -3179,11 +3171,12 @@ static void pre_svm_run(struct vcpu_svm *svm)
- 
- 	/*
- 	* If the previous vmrun of the vmcb occurred on
--	* a different physical cpu then we must mark the vmcb dirty.
-+	* a different physical cpu then we must mark the vmcb dirty,
-+	* update the asid_generation, and assign a new asid.
- 	*/
- 
-         if (unlikely(svm->current_vmcb->cpu != svm->vcpu.cpu)) {
--		svm->asid_generation = 0;
-+		svm->current_vmcb->asid_generation = 0;
- 		vmcb_mark_all_dirty(svm->vmcb);
- 		svm->current_vmcb->cpu = svm->vcpu.cpu;
-         }
-@@ -3192,7 +3185,7 @@ static void pre_svm_run(struct vcpu_svm *svm)
- 		return pre_sev_run(svm, svm->vcpu.cpu);
- 
- 	/* FIXME: handle wraparound of asid_generation */
--	if (svm->asid_generation != sd->asid_generation)
-+	if (svm->current_vmcb->asid_generation != sd->asid_generation)
- 		new_asid(svm, sd);
- }
- 
-@@ -3399,7 +3392,7 @@ void svm_flush_tlb(struct kvm_vcpu *vcpu)
- 	if (static_cpu_has(X86_FEATURE_FLUSHBYASID))
- 		svm->vmcb->control.tlb_ctl = TLB_CONTROL_FLUSH_ASID;
- 	else
--		svm->asid_generation--;
-+		svm->current_vmcb->asid_generation--;
- }
- 
- static void svm_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t gva)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 05baee934d03..edcfc2a4e77e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -86,6 +86,7 @@ struct kvm_vmcb_info {
- 	struct vmcb *ptr;
- 	unsigned long pa;
- 	int cpu;
-+	uint64_t asid_generation;
- };
- 
- struct svm_nested_state {
-@@ -115,7 +116,6 @@ struct vcpu_svm {
- 	struct kvm_vmcb_info *current_vmcb;
- 	struct svm_cpu_data *svm_data;
- 	u32 asid;
--	uint64_t asid_generation;
- 	uint64_t sysenter_esp;
- 	uint64_t sysenter_eip;
- 	uint64_t tsc_aux;
--- 
-2.20.1
+Since, I suppose, the tooling is going to catch this anyway, and produce
+much better feedback to the user, I believe we should be fine degrading
+the severity to info or debug. 
 
+I would prefer not producing a warning here, because I believe it is
+likely to do more harm, than good (by implying a kernel problem, as I
+don't think based on the message one will think that it is an userspace
+problem). But if everybody else agrees, that we want a warning here, then
+I can live with that as well.
+
+Regards,
+Halil
