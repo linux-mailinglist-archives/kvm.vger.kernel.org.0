@@ -2,135 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E62BD2F3D75
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CCC782F3D79
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393224AbhALVhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2437960AbhALVhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 12 Jan 2021 16:37:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437065AbhALU4A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 15:56:00 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF6CC061794
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:55:20 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id a109so3673031otc.1
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:55:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uD2LwoNsLHO2bQTapcwBrSqoHTZzd1YmNCw2S92ag9Q=;
-        b=Y43uZ7bLVKMqH9GbZ4BYcx2lvxcJ2i103HsmZiv7+g4ZppufN2r5P61wpRmKjQtDm+
-         6Iw5P4Q3jCWLRJntB2VAsKmOyFWepWSPdDNfMwp7rBHOArihxsXGpviAmbLDbLReNp5T
-         1GsQFLXpkPd3O8YBg1d9ys2pl+Y2iRrBcQPXibs/a8PG64RIBsakJm4UbXN4O3AmUBMB
-         LcWcVtFHbgPEspus3oJa8xqqPKE6R8KJiuW56r+SCcE5YMmlzY88EwbtWXVIvz2bjoYL
-         9avkyk50tPvH0NmYp6atvBDNCPwlyY5Wzt+QY/5vlJHqedpwjVB5eQYvs1hgfE8jwBFg
-         z4Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uD2LwoNsLHO2bQTapcwBrSqoHTZzd1YmNCw2S92ag9Q=;
-        b=ogQXywb6X5EaJvZrIRXQzhKjWe8ISLQvG04HWjhTQx1K3Q7gAMdHjl7KrFhNe8pN/f
-         bKSfCgMUK/Z8R50uVUFyi9pNmfuWKCQNc0iHsl8CfJgfp/0pk9P93SwiS03mTnIgbUWf
-         d+gTqxsKk0lqX10mvP+6gRwnw82jbZqrJIioc+h0cm90m9UDkWxK6WYdrgnR9SQjXAY7
-         GqW6K81p1GRj1nrxpczYub0AXBl9A9nrZkuMwwsG1cVJiySs6QTnZnMc8bXWrH+b0fUd
-         lYAtNKVd4dFg86vEZjXhIvLhIdWWqr30w6O6X0tIwvb3hHGmiiDikkhg+Xm1MLxbmpwO
-         9q7Q==
-X-Gm-Message-State: AOAM533aSe3GtfTz22Gro++a9Ti3WLU1tST4agMgN38ft1B3qTKU/PUS
-        g7AP6b3F5SZnfGnBB9mJK1kea9FI6HROUjeFLoL4vQ==
-X-Google-Smtp-Source: ABdhPJyg8eUeNmxDa4BkruWI0L3XjU5KjUa3gveljnrKGwGHBS2TJW6ZNkMgbXD0kYdCRDnkUgmQJ6NHb8T8kPmTb+c=
-X-Received: by 2002:a05:6830:572:: with SMTP id f18mr874911otc.109.1610484919603;
- Tue, 12 Jan 2021 12:55:19 -0800 (PST)
+Received: from ozlabs.org ([203.11.71.1]:58291 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2437081AbhALU6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 15:58:11 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DFjZJ1JDbz9sWk;
+        Wed, 13 Jan 2021 07:57:27 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1610485049;
+        bh=oOt9UC3bfgNLTO1XfajBqrAQGTUzyQ0gZrLFC6E3HKU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Hv1aowxpQ+GcGQfyulfIc1P1mB3L6lGbSlN5XXUsET7xYh1wkqDT0x80p8aZPvq1i
+         2HTwdUHTD2S43mwoK7jW08qs/SnxBF6H3u2cIboP5QIwNeyA/jtbs3U8cTknHK78dB
+         Z9OrIql/t1s8V1mzT7RdF+MWtnXevTBc50ONHqDBqstOjaVD+5Z0JHv0NMhr0OKMa2
+         8j4YRR8rOsbQawaCwbtT/qkPG1pWVAj7bBMDgnGP+ILpHLtPEteoU4nM0ZjXkLTgah
+         oyCYQXJCXVN20UCtTuetN/8DKj6mcc5RfIlk0OMEz4J3nOw/7eJWCUGnXDPY7F2gbp
+         olsd3EKG41vFw==
+Date:   Wed, 13 Jan 2021 07:57:26 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Daniel Vetter <daniel@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-samsung-soc@vger.kernel.org, kvm@vger.kernel.org,
+        Daniel Vetter <daniel.vetter@ffwll.ch>, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org
+Subject: Re: [PATCH v7 00/17] follow_pfn and other iomap races
+Message-ID: <20210113075726.2ffaef97@canb.auug.org.au>
+In-Reply-To: <X/2jC9kBBQCfbC3d@phenom.ffwll.local>
+References: <20201127164131.2244124-1-daniel.vetter@ffwll.ch>
+        <X/2jC9kBBQCfbC3d@phenom.ffwll.local>
 MIME-Version: 1.0
-References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
- <20210112194143.1494-4-yuri.benditovich@daynix.com> <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
-In-Reply-To: <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
-From:   Yuri Benditovich <yuri.benditovich@daynix.com>
-Date:   Tue, 12 Jan 2021 22:55:07 +0200
-Message-ID: <CAOEp5OevYR5FWVMfQ_esmWTKtz9_ddTupbe7FtBFQ=sv2kEt2w@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/7] tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
-To:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>, rdunlap@infradead.org,
-        willemb@google.com, gustavoars@kernel.org,
-        herbert@gondor.apana.org.au, steffen.klassert@secunet.com,
-        pablo@netfilter.org, decui@microsoft.com, cai@lca.pw,
-        jakub@cloudflare.com, elver@google.com, pabeni@redhat.com,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        bpf@vger.kernel.org
-Cc:     Yan Vugenfirer <yan@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/3kQvshNRwSzGT637_7v3ycs";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 10:40 PM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> On Tue, Jan 12, 2021 at 9:42 PM Yuri Benditovich
-> <yuri.benditovich@daynix.com> wrote:
-> >
-> > This program type can set skb hash value. It will be useful
-> > when the tun will support hash reporting feature if virtio-net.
-> >
-> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > ---
-> >  drivers/net/tun.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 7959b5c2d11f..455f7afc1f36 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
-> >                 prog = NULL;
-> >         } else {
-> >                 prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
-> > +               if (IS_ERR(prog))
-> > +                       prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
-> >                 if (IS_ERR(prog))
-> >                         return PTR_ERR(prog);
-> >         }
->
-> Comment from Alexei Starovoitov:
-> Patches 1 and 2 are missing for me, so I couldn't review properly,
-> but this diff looks odd.
-> It allows sched_cls prog type to attach to tun.
-> That means everything that sched_cls progs can do will be done from tun hook?
+--Sig_/3kQvshNRwSzGT637_7v3ycs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-We do not have an intention to modify the packet in this steering eBPF.
-There is just one function that unavailable for BPF_PROG_TYPE_SOCKET_FILTER
-that the eBPF needs to make possible to deliver the hash to the guest
-VM - it is 'bpf_set_hash'
+Hi Daniel,
 
-Does it mean that we need to define a new eBPF type for socket filter
-operations + set_hash?
+On Tue, 12 Jan 2021 14:24:27 +0100 Daniel Vetter <daniel@ffwll.ch> wrote:
+>=20
+> As Jason suggested, I've pulled the first 1 patches into a topic branch.
+>=20
+> Stephen, can you please add the below to linux-next for the 5.12 merge
+> window?
+>=20
+> git://anongit.freedesktop.org/drm/drm topic/iomem-mmap-vs-gup
 
-Our problem is that the eBPF calculates 32-bit hash, 16-bit queue
-index and 8-bit of hash type.
-But it is able to return only 32-bit integer, so in this set of
-patches the eBPF returns
-queue index and hash type and saves the hash in skb->hash using bpf_set_hash().
+Added from today.
 
-If this is unacceptable, can you please recommend a better solution?
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgement of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.=20
 
-> sched_cls assumes l2 and can modify the packet.
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+        Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and=20
+     * destined for the current or next Linux merge window.
 
-The steering eBPF in TUN module also assumes l2.
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
 
-> I think crashes are inevitable.
->
-> > --
-> > 2.17.1
-> >
+--=20
+Cheers,
+Stephen Rothwell=20
+sfr@canb.auug.org.au
+
+--Sig_/3kQvshNRwSzGT637_7v3ycs
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/+DTYACgkQAVBC80lX
+0GxNGgf9EtCDsHg2G5ATJxLMpj0++NlXWmIf8gLWRE7OQLpBu+7tP4EgP4BGf0B6
+XKm8FFDJGaYQ+dRRCMllLCFLfjZsxDDRqyQxAZ0TeZNIIW8gBLIHfC73jlqv9i5N
+q43QxSqU2CatsUkqt0P9G4JeE5mvDmgr6p4b4Webza6UBzqVvRNLxctL+OP7h+1f
+p9kM7E1sHfUofXAeBYGp0DBtEPDzxBjwyyQlcIknDJtNwPMUet2tPvL9Z8nUoODF
+z4upF0XEmm4ijYuHOfdxpKg2wHObICkSlbE1sMPs6jb6+DAaW7auRagOsyejlShO
+HQrjuzmMDQGxl5vGPO1+K8ZQFRxudg==
+=AR5e
+-----END PGP SIGNATURE-----
+
+--Sig_/3kQvshNRwSzGT637_7v3ycs--
