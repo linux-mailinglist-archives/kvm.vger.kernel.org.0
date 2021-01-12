@@ -2,107 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A22A2F376E
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:44:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D9912F379B
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:49:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390939AbhALRmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 12:42:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50466 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390844AbhALRmy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 12:42:54 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A4A5C061794
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:42:14 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id b3so1480936pft.3
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:42:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=s31IkhAz2nWDObQ5y1qk010QUglbb2JaCz6paHFbgKE=;
-        b=ua53268TZsH8TsHxFaEpE3Lg38Obz2bJP4oWXSdDQ3eDw2YOCRWhARGn0Rb1Rf0Auw
-         TtLaGqIvDQcsU6PinS85yVOCI23qw0qdoAeiNyFCeUupmIvS/D0EwslofU1OfJp+5Nr9
-         RdOfGVyn1o9B3rsJcU1JwJgn895dz+lxPubshGzX0GziRzBrnxat/6eNuHXzhumCQxfQ
-         MNEgc4DQT0+5MeEzMPrYC7Dd4HPwoDJi9tgkfW5RAE0qNXK106rmLg9fsOT+om26SptI
-         9wA1Gor3x2F4n27lSQ51xEL0motMhUf0C2EZi/42mJqUdH5myNu29lByLdWu6nZzqhKk
-         b7XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=s31IkhAz2nWDObQ5y1qk010QUglbb2JaCz6paHFbgKE=;
-        b=gEZQOen26NIt7XCC+nj9esVjQlDHAKf01rO63Ac0kEwOu5GwhJFTsgnHGaKjCfvsjO
-         2oNrW9UJxES+O6KkyWwi7wDeSj4l0fmeqho8bqenDt5w0Ewqptbkt1aBqjMSwW3y6HaC
-         pcC6nUuNVW7+cxMZBLngbdC0VcDb2zmKGzGEP5FZJTnMSkMA814xDRqxR7KHZeGu2imB
-         P6pd4exX/cURl0j5FVhQKuLLG0wOVqNyKJjngjRi0eb7UsCOohTXdl4GXUS1LgI/2qlx
-         +d5sLXccPXbPJqgiMl0SMiUS4zyFbB39tkbyBYU2nSmnbB+N/2LFE26/2YlL+vgP6gwu
-         SncA==
-X-Gm-Message-State: AOAM5305NH8//0JwTdezmIj4+23H0qPROI+2cHlcWaDUWC40kweGSER4
-        cf4mpDU7EHSgnGfWcpcD0qo05g==
-X-Google-Smtp-Source: ABdhPJzVO5KIL0Bbdp4cP/dveCjEiVGXuDYxY1LjLiCENCJSSZtyZGJ5CtUindfKmib6RkB3GMEZ8g==
-X-Received: by 2002:a62:1896:0:b029:197:491c:be38 with SMTP id 144-20020a6218960000b0290197491cbe38mr246893pfy.15.1610473333520;
-        Tue, 12 Jan 2021 09:42:13 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id a23sm4163925pju.31.2021.01.12.09.42.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 09:42:12 -0800 (PST)
-Date:   Tue, 12 Jan 2021 09:42:05 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com, joro@8bytes.org,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, mlevitsk@redhat.com
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
- VM instructions
-Message-ID: <X/3fbaO1ZarMdjft@google.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
- <090232a9-7a87-beb9-1402-726bb7cab7e6@redhat.com>
+        id S2404611AbhALRtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 12:49:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50310 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731303AbhALRtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 12:49:17 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 93C2D23107;
+        Tue, 12 Jan 2021 17:48:36 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1kzNmU-0072aN-89; Tue, 12 Jan 2021 17:48:34 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <090232a9-7a87-beb9-1402-726bb7cab7e6@redhat.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 12 Jan 2021 17:48:34 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+        james.morse@arm.com, julien.thierry.kdev@gmail.com,
+        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH 8/9] KVM: arm64: vgic-v3: Expose GICR_TYPER.Last for
+ userspace
+In-Reply-To: <fe0a3415-0c7b-be13-6438-89e82fe4c281@arm.com>
+References: <20201212185010.26579-1-eric.auger@redhat.com>
+ <20201212185010.26579-9-eric.auger@redhat.com>
+ <fe0a3415-0c7b-be13-6438-89e82fe4c281@arm.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <1a06be3153927f1051fcbc87f0e52e98@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, eric.auger@redhat.com, eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021, Paolo Bonzini wrote:
-> On 12/01/21 07:37, Wei Huang wrote:
-> >   static int gp_interception(struct vcpu_svm *svm)
-> >   {
-> >   	struct kvm_vcpu *vcpu = &svm->vcpu;
-> >   	u32 error_code = svm->vmcb->control.exit_info_1;
-> > -
-> > -	WARN_ON_ONCE(!enable_vmware_backdoor);
-> > +	int rc;
-> >   	/*
-> > -	 * VMware backdoor emulation on #GP interception only handles IN{S},
-> > -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
-> > +	 * Only VMware backdoor and SVM VME errata are handled. Neither of
-> > +	 * them has non-zero error codes.
-> >   	 */
-> >   	if (error_code) {
-> >   		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
-> >   		return 1;
-> >   	}
-> > -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
-> > +
-> > +	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
-> > +	if (rc > 1)
-> > +		rc = svm_emulate_vm_instr(vcpu, rc);
-> > +	return rc;
-> >   }
+On 2021-01-12 17:28, Alexandru Elisei wrote:
+> Hi Eric,
 > 
-> Passing back the third byte is quick hacky.  Instead of this change to
-> kvm_emulate_instruction, I'd rather check the instruction bytes in
-> gp_interception before calling kvm_emulate_instruction.
+> On 12/12/20 6:50 PM, Eric Auger wrote:
+>> Commit 23bde34771f1 ("KVM: arm64: vgic-v3: Drop the
+>> reporting of GICR_TYPER.Last for userspace") temporarily fixed
+>> a bug identified when attempting to access the GICR_TYPER
+>> register before the redistributor region setting but dropped
+>> the support of the LAST bit. This patch restores its
+>> support (if the redistributor region was set) while keeping the
+>> code safe.
+> 
+> If I understand your patch correctly, it is possible for the 
+> GICR_TYPER.Last bit
+> to be transiently 1 if the register is accessed before all the 
+> redistributors
+> regions have been configured.
+> 
+> Arm IHI 0069F states that accesses to the GICR_TYPER register are RO. I 
+> haven't
+> found exactly what RO means (please point me to the definition if you 
+> find it in
+> the architecture!), but I assume it means read-only and I'm not sure 
+> how correct
+> (from an architectural point of view) it is for two subsequent reads of 
+> this
+> register to return different values. Maybe Marc can shed some light on 
+> this.
 
-Agreed.  And I'd also prefer that any pure refactoring is done in separate
-patch(es) so that the actual functional change is better isolated.
+RO = Read-Only indeed. Not sure that's documented anywhere in the 
+architecture,
+but this is enough of a well known acronym that even the ARM ARM doesn't 
+feel
+the need to invent a new definition for it.
 
-On a related topic, it feels like nested should be disabled by default on SVM
-until it's truly ready for primetime, with the patch tagged for stable.  That
-way we don't have to worry about crafting non-trivial fixes (like this one) to
-make them backport-friendly.
+As for your concern, I don't think it is a problem to return different 
+values
+if the HW has changed in between. This may need to be documented though.
+
+Thanks,
+
+        M.
+-- 
+Jazz is not dead. It just smells funny...
