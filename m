@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A57CF2F3836
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:14:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DBDF2F3838
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406266AbhALSMj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 13:12:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56872 "EHLO
+        id S2406602AbhALSOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 13:14:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406171AbhALSMh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 13:12:37 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA7CC061342
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:19 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id t16so1819847pfh.22
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:19 -0800 (PST)
+        with ESMTP id S2406231AbhALSMi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 13:12:38 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C61C061344
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:21 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 33so2158562pgv.0
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:11:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=KUOgmZwIC4q3950YAhNBlDyIxwgFqBqj60bM3H+2xtM=;
-        b=Xz1vVSzHm5BnPtQ2DJVfdq/sJMiagonKCEkxyLa6fSeikTA91iBU6KGl4a5Xtf7ah8
-         3sq2YwGuVfsR+i1liuuLvLOlgRJAlf1IopQnYrTA9NSRCnpfl3hJ3WS16mA+5AJDqiVT
-         WK45OzJHZ+qe/zaxSFPGULbz2PNiiiI90NMzKjsvMJAxEd54bCVPFkK7GQ40Y6CZjsqW
-         9PJ+CEwciNpOA4xYgSlmg+xmtOyarBPr0S4jR6cTqB+SGWrFJp/BWv41ZK4VyRltnBgH
-         l746/djdGR0WI73HVQPo4RNp97EobJdYKnPBPj5NLjevBuTA9NROTtrd3LWAsF0pj8gk
-         G9tg==
+        bh=weYuAzHiKmuI5kx/0dPz0XMIF8zLAlYQHLKS7oXdpNI=;
+        b=LyiTsCYxm1PQhsdCDlJG0ixdReyEi3wVVCEj5VPqU5LFhcbiaVSyogHEmZi+JAzqAV
+         hqAI50dZ9VxGt8CbLZaz6CX9o9l60nqxHPp7bhDpjcd6qS3cvsz+IsiVvkYqGRXODRky
+         YoSFIPgh0IIZPipsc/Ml5qe1FjsOV9espjt4ZPq2VuIMOz+HtCj9fj/cOZ+iWeOifC8m
+         xk7Vq/U9kNG45GLKs6AebAu44lYkqpylwVfR/IXyC7pzimJcCwYqt6CKdwAn8owaOPqU
+         82VAdYAvM8Tmh5CIKSszhOsyh7LfWaLNayuh/82EkIkAbUZ6Xfea9P05Y7Z8rC5+lu6z
+         THIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=KUOgmZwIC4q3950YAhNBlDyIxwgFqBqj60bM3H+2xtM=;
-        b=GWExHeP5+ps/DlOfru8HQXUyTFrcdm2BrEwgMYLN54HvtKmuZA+veQ5RGWzDUF07+D
-         /Pqdvy2Xq3UqMmx0LoWI0JRh4wS77z11fzY/EmmaiHbs8zHF2W5L0MFqHB3WrdeRNoDv
-         tOdbv3zj2SHxX0E9Qv61Zjou9rU8shKhr/I/4AMFVKBeN83qtAnAnEjdaCZtJE4RYtvr
-         6MUmheTVvRZMwtagZEbqWQEe/aEDwBoeRg1YYXfXwEM3QSxk2mCtCteio9crwweS6Y/N
-         XhpI0HL1HbsWMfLJ5cOn+rwvwhksyTMge8H5LsBtbqPoir/Xclc3/yHvXlNmjdBlLecX
-         xrJw==
-X-Gm-Message-State: AOAM531ITlU8uYQ83hnf2nUD5QDxmc8E/jg5sSfcNiOXPLo1c7GGaeDo
-        mA2dJjXLBdDTQ20grxllp7DJglplm2hV
-X-Google-Smtp-Source: ABdhPJx7bl40gpvxBxKPrzmj9sNWpykE51nyXEQF+Lic8F/XxYhW4apaZpXou7KBKBZhY+O+oyGcv0lNMAiE
+        bh=weYuAzHiKmuI5kx/0dPz0XMIF8zLAlYQHLKS7oXdpNI=;
+        b=oR2BMia6ACJCX8iR0KI6/p9rj61lk/lobmwO/9TzknZ+TvbUowMhJ6JPiuTufPEKga
+         69Cvnb9vUrDLvFjdaSpDDgcZjatjtxROY1U8lj/0hrwrbUXtUdzCkcbMEdEJZEg/a8+s
+         J54uPWDO7V5xUWb4GC10HtxxWiX/Immpam84EKhOOW1bMYhfDrc3k+fE+1UFgQqh3gSJ
+         9EUwcDG2u6wzqkhVSksFbhOvPtJT/qv2MX1t5uZflMfbAy9MOCNzP1Q8K2r0kASzB3QS
+         ToFG403ReoXEX0nnNVAiAFqP8PkydjGw7M8Osd+S9CxO7SsGSIJnctNHL0TqZCXVTMvy
+         /YIw==
+X-Gm-Message-State: AOAM532+vkSk/EcDkJLzPGWa//t1pbQ++tj0IMIgsYG6aoj+cHPU4Dh2
+        OWTT7yWYHH/EHr2L1GP7ZzIwvfIBQV1c
+X-Google-Smtp-Source: ABdhPJzXcA/BDbM8k8s2YwSAeag6O4e2HhzU8tM/6UDUIcpNDCme8y8mPYUq+1bGJv+VCTffQZqlBYOrHYnL
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a63:1c1d:: with SMTP id
- c29mr301844pgc.94.1610475079388; Tue, 12 Jan 2021 10:11:19 -0800 (PST)
-Date:   Tue, 12 Jan 2021 10:10:36 -0800
+ (user=bgardon job=sendgmr) by 2002:aa7:9357:0:b029:1a5:43da:b90d with SMTP id
+ 23-20020aa793570000b02901a543dab90dmr484505pfn.54.1610475081090; Tue, 12 Jan
+ 2021 10:11:21 -0800 (PST)
+Date:   Tue, 12 Jan 2021 10:10:37 -0800
 In-Reply-To: <20210112181041.356734-1-bgardon@google.com>
-Message-Id: <20210112181041.356734-20-bgardon@google.com>
+Message-Id: <20210112181041.356734-21-bgardon@google.com>
 Mime-Version: 1.0
 References: <20210112181041.356734-1-bgardon@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
+Subject: [PATCH 20/24] kvm: x86/mmu: Add atomic option for setting SPTEs
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -70,152 +71,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a lock to protect the data structures that track the page table
-memory used by the TDP MMU. In order to handle multiple TDP MMU
-operations in parallel, pages of PT memory must be added and removed
-without the exclusive protection of the MMU lock. A new lock to protect
-the list(s) of in-use pages will cause some serialization, but only on
-non-leaf page table entries, so the lock is not expected to be very
-contended.
+In order to allow multiple TDP MMU operations to proceed in parallel,
+there must be an option to modify SPTEs atomically so that changes are
+not lost. Add that option to __tdp_mmu_set_spte and
+__handle_changed_spte.
 
 Reviewed-by: Peter Feiner <pfeiner@google.com>
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 15 ++++++++
- arch/x86/kvm/mmu/tdp_mmu.c      | 67 +++++++++++++++++++++++++++++----
- 2 files changed, 74 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 67 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 57 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 92d5340842c8..f8dccb27c722 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1034,6 +1034,21 @@ struct kvm_arch {
- 	 * tdp_mmu_page set and a root_count of 0.
- 	 */
- 	struct list_head tdp_mmu_pages;
-+
-+	/*
-+	 * Protects accesses to the following fields when the MMU lock is
-+	 * not held exclusively:
-+	 *  - tdp_mmu_pages (above)
-+	 *  - the link field of struct kvm_mmu_pages used by the TDP MMU
-+	 *    when they are part of tdp_mmu_pages (but not when they are part
-+	 *    of the tdp_mmu_free_list or tdp_mmu_disconnected_list)
-+	 *  - lpage_disallowed_mmu_pages
-+	 *  - the lpage_disallowed_link field of struct kvm_mmu_pages used
-+	 *    by the TDP MMU
-+	 *  May be acquired under the MMU lock in read mode or non-overlapping
-+	 *  with the MMU lock.
-+	 */
-+	spinlock_t tdp_mmu_pages_lock;
- };
- 
- struct kvm_vm_stat {
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 8b61bdb391a0..264594947c3b 100644
+index 264594947c3b..1380ed313476 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -33,6 +33,7 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
- 	kvm->arch.tdp_mmu_enabled = true;
+@@ -7,6 +7,7 @@
+ #include "tdp_mmu.h"
+ #include "spte.h"
  
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
-+	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
- 	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
++#include <asm/cmpxchg.h>
+ #include <trace/events/kvm.h>
+ 
+ #ifdef CONFIG_X86_64
+@@ -226,7 +227,8 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
  }
  
-@@ -262,6 +263,58 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
- 	}
- }
+ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+-				u64 old_spte, u64 new_spte, int level);
++				u64 old_spte, u64 new_spte, int level,
++				bool atomic);
  
-+/**
-+ * tdp_mmu_link_page - Add a new page to the list of pages used by the TDP MMU
-+ *
-+ * @kvm: kvm instance
-+ * @sp: the new page
-+ * @atomic: This operation is not running under the exclusive use of the MMU
-+ *	    lock and the operation must be atomic with respect to ther threads
-+ *	    that might be adding or removing pages.
-+ * @account_nx: This page replaces a NX large page and should be marked for
-+ *		eventual reclaim.
-+ */
-+static void tdp_mmu_link_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-+			      bool atomic, bool account_nx)
-+{
-+	if (atomic)
-+		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-+	else
-+		kvm_mmu_lock_assert_held_exclusive(kvm);
-+
-+	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
-+	if (account_nx)
-+		account_huge_nx_page(kvm, sp);
-+
-+	if (atomic)
-+		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-+}
-+
-+/**
-+ * tdp_mmu_unlink_page - Remove page from the list of pages used by the TDP MMU
-+ *
-+ * @kvm: kvm instance
-+ * @sp: the page to be removed
-+ * @atomic: This operation is not running under the exclusive use of the MMU
-+ *	    lock and the operation must be atomic with respect to ther threads
-+ *	    that might be adding or removing pages.
-+ */
-+static void tdp_mmu_unlink_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-+				bool atomic)
-+{
-+	if (atomic)
-+		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-+	else
-+		kvm_mmu_lock_assert_held_exclusive(kvm);
-+
-+	list_del(&sp->link);
-+	if (sp->lpage_disallowed)
-+		unaccount_huge_nx_page(kvm, sp);
-+
-+	if (atomic)
-+		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-+}
-+
- /**
-  * handle_disconnected_tdp_mmu_page - handle a pt removed from the TDP structure
+ static int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
+ {
+@@ -320,15 +322,19 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, struct kvm_mmu_page *sp,
   *
-@@ -285,10 +338,7 @@ static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt)
+  * @kvm: kvm instance
+  * @pt: the page removed from the paging structure
++ * @atomic: Use atomic operations to clear the SPTEs in any disconnected
++ *	    pages of memory.
+  *
+  * Given a page table that has been removed from the TDP paging structure,
+  * iterates through the page table to clear SPTEs and free child page tables.
+  */
+-static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt)
++static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt,
++					     bool atomic)
+ {
+ 	struct kvm_mmu_page *sp;
+ 	gfn_t gfn;
+ 	int level;
++	u64 *sptep;
+ 	u64 old_child_spte;
+ 	int i;
  
- 	trace_kvm_mmu_prepare_zap_page(sp);
- 
--	list_del(&sp->link);
--
--	if (sp->lpage_disallowed)
--		unaccount_huge_nx_page(kvm, sp);
-+	tdp_mmu_unlink_page(kvm, sp, atomic);
+@@ -341,11 +347,17 @@ static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt)
+ 	tdp_mmu_unlink_page(kvm, sp, atomic);
  
  	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
- 		old_child_spte = READ_ONCE(*(pt + i));
-@@ -719,15 +769,16 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 
- 		if (!is_shadow_present_pte(iter.old_spte)) {
- 			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level);
--			list_add(&sp->link, &vcpu->kvm->arch.tdp_mmu_pages);
- 			child_pt = sp->spt;
+-		old_child_spte = READ_ONCE(*(pt + i));
+-		WRITE_ONCE(*(pt + i), 0);
++		sptep = pt + i;
 +
-+			tdp_mmu_link_page(vcpu->kvm, sp, false,
-+					  huge_page_disallowed &&
-+					  req_level >= iter.level);
-+
- 			new_spte = make_nonleaf_spte(child_pt,
- 						     !shadow_accessed_mask);
- 
- 			trace_kvm_mmu_get_page(sp, true);
--			if (huge_page_disallowed && req_level >= iter.level)
--				account_huge_nx_page(vcpu->kvm, sp);
--
- 			tdp_mmu_set_spte(vcpu->kvm, &iter, new_spte);
- 		}
++		if (atomic) {
++			old_child_spte = xchg(sptep, 0);
++		} else {
++			old_child_spte = READ_ONCE(*sptep);
++			WRITE_ONCE(*sptep, 0);
++		}
+ 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp),
+ 			gfn + (i * KVM_PAGES_PER_HPAGE(level - 1)),
+-			old_child_spte, 0, level - 1);
++			old_child_spte, 0, level - 1, atomic);
  	}
+ 
+ 	kvm_flush_remote_tlbs_with_address(kvm, gfn,
+@@ -362,12 +374,15 @@ static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt)
+  * @old_spte: The value of the SPTE before the change
+  * @new_spte: The value of the SPTE after the change
+  * @level: the level of the PT the SPTE is part of in the paging structure
++ * @atomic: Use atomic operations to clear the SPTEs in any disconnected
++ *	    pages of memory.
+  *
+  * Handle bookkeeping that might result from the modification of a SPTE.
+  * This function must be called for all TDP SPTE modifications.
+  */
+ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+-				u64 old_spte, u64 new_spte, int level)
++				  u64 old_spte, u64 new_spte, int level,
++				  bool atomic)
+ {
+ 	bool was_present = is_shadow_present_pte(old_spte);
+ 	bool is_present = is_shadow_present_pte(new_spte);
+@@ -439,18 +454,50 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	 */
+ 	if (was_present && !was_leaf && (pfn_changed || !is_present))
+ 		handle_disconnected_tdp_mmu_page(kvm,
+-				spte_to_child_pt(old_spte, level));
++				spte_to_child_pt(old_spte, level), atomic);
+ }
+ 
+ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+-				u64 old_spte, u64 new_spte, int level)
++				u64 old_spte, u64 new_spte, int level,
++				bool atomic)
+ {
+-	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level);
++	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
++			      atomic);
+ 	handle_changed_spte_acc_track(old_spte, new_spte, level);
+ 	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
+ 				      new_spte, level);
+ }
+ 
++/*
++ * tdp_mmu_set_spte_atomic - Set a TDP MMU SPTE atomically and handle the
++ * associated bookkeeping
++ *
++ * @kvm: kvm instance
++ * @iter: a tdp_iter instance currently on the SPTE that should be set
++ * @new_spte: The value the SPTE should be set to
++ * Returns: true if the SPTE was set, false if it was not. If false is returned,
++ *	    this function will have no side-effects.
++ */
++static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
++					   struct tdp_iter *iter,
++					   u64 new_spte)
++{
++	u64 *root_pt = tdp_iter_root_pt(iter);
++	struct kvm_mmu_page *root = sptep_to_sp(root_pt);
++	int as_id = kvm_mmu_page_as_id(root);
++
++	kvm_mmu_lock_assert_held_shared(kvm);
++
++	if (cmpxchg64(iter->sptep, iter->old_spte, new_spte) != iter->old_spte)
++		return false;
++
++	handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
++			    iter->level, true);
++
++	return true;
++}
++
++
+ /*
+  * __tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+  * @kvm: kvm instance
+@@ -480,7 +527,7 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+ 	WRITE_ONCE(*iter->sptep, new_spte);
+ 
+ 	__handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
+-			      iter->level);
++			      iter->level, false);
+ 	if (record_acc_track)
+ 		handle_changed_spte_acc_track(iter->old_spte, new_spte,
+ 					      iter->level);
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
