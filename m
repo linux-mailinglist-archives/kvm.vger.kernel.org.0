@@ -2,204 +2,494 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4D12F280B
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 06:55:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 780692F2860
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 07:39:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732974AbhALFyI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 00:54:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47528 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727374AbhALFyH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 00:54:07 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9EE32222B3;
-        Tue, 12 Jan 2021 05:53:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610430806;
-        bh=dtfSkeNFQR81xLFGt/6fFARJC2aKS9nACVGf+RGjQWE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=n9soEk3EpCZg6Q2YWDTwATQdb4pdvIbETuFxB6pjHV5PNQof2vD3bfTHr8PITtaix
-         0eF5QzEcwWWtcYyjOz83yoMwpShGXacjAk9YezfeP6tQo64+T6T7VpAhKldYPZvBk1
-         bMgPAkkjPHKRQLM8H0eZsK4iFKM99Z9rpeyZjhSLQUO32YcmVxQWUYrOpacpVnO0KV
-         5Y0hkMPtFUvUyjUmPoyMGjae+WxLxjr2mMCgZmNCQLwRXR3J3h+6PBudGioCdGF7ER
-         sN5KhlVeqsnhHEUnDz15FvndEdI/h3w+asXREcNUfyZBPl5/6+WJqyQTSvJv6vo0ax
-         pkRWWEcSNwfMw==
-Date:   Tue, 12 Jan 2021 07:53:22 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "Jiang, Dave" <dave.jiang@intel.com>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "Hossain, Mona" <mona.hossain@intel.com>,
-        "netanelg@mellanox.com" <netanelg@mellanox.com>,
-        "parav@mellanox.com" <parav@mellanox.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
-        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
-        "shahafs@mellanox.com" <shahafs@mellanox.com>,
-        "Luck, Tony" <tony.luck@intel.com>,
-        "vkoul@kernel.org" <vkoul@kernel.org>,
-        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC PATCH v2 1/1] platform-msi: Add platform check for
- subdevice irq domain
-Message-ID: <20210112055322.GA4678@unreal>
-References: <20210106060613.GU31158@unreal>
- <3d2620f9-bbd4-3dd0-8e29-0cfe492a109f@linux.intel.com>
- <20210106104017.GV31158@unreal>
- <20210106152339.GA552508@nvidia.com>
- <20210106160158.GX31158@unreal>
- <MWHPR11MB18867EE2F4FA0382DCFEEE2B8CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210107060916.GY31158@unreal>
- <MWHPR11MB188629E36439F80AD60900788CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
- <20210107071616.GA31158@unreal>
- <dfda8933-566c-1ec7-4ed4-427f094cb7c9@linux.intel.com>
+        id S1733100AbhALGiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 01:38:07 -0500
+Received: from mail-bn8nam11on2050.outbound.protection.outlook.com ([40.107.236.50]:12071
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728761AbhALGiH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 01:38:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gtwyt3WxZv6DkbBP7eE6vHy8RFu2v/cjtTo2l0fzP5fm44ZOQeRvl//TeOpEAIq5ZKDXcUNumDC63LHetoI/mqE/YysQ0sDyiuj4a6cLqbqpr4lUmS2f/RlSeaHNuNoEoERAfzU5FRAjy+yT/K8DK0fr03IYQYy/dJ7Q8hj0tVGwLRbXtE4sG/f0TJeWarAEcUra46BUCiJbPkxcyA3coB8NZeRcdJeg08IdLOLtmSDlrldk5ULcodeLLw2Cp9mYa3YpKM7jHsF9RFlmsGN5InZFKDbro2zSvCR46ZII859nxSzVV5Hz2Vd8aSbYOo4gAeIx0/vUIaTWaiDG9REdhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YjM7bSN4PJGzswNu/kwmMEOxGXsI+pfEm/aZqFjgsXw=;
+ b=KB2ipRP6/YOq02rkhoEXpnRXW0txT8V8Ru+IHEYy5ezDR2EsJWQoBecXcKrjvwb4YQjpznU+WPTV6W4CK9kyV9wUze4OLxY5FlJ2Vj/MyWh0k2HaW+kY2OpqPH8LiO59YPwuTSClbezyO4QZBqowzjBeJBW6TWmxD0ehtZzP97HPnoMfwt4ckxwVagcu4BkEqb7CYi3JmUEEZZT4cNZSCa22xJ/ylrtb/cczkHnJjgJUfdKWhRz+XPyj6OCs8q2IO2wD70e/lJ47oYMmPWhzTlQJi+Woj6RysgcV85axCZMwEaCDYtH0gITib1046H8VjZhQXn8x8M9nSYXuQUum7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YjM7bSN4PJGzswNu/kwmMEOxGXsI+pfEm/aZqFjgsXw=;
+ b=zS3u6+Ud/07OKSRZO0PJw1/F1W6Y8BjFJ1oo8NqhkUNONN2LRgAFiSkcsoq4BMR4goyc5nl1GVvYmkAN888v4Strwbc4+OZwQGsE2rVkk4zH1pt6HbTGCAhZQv0LkzxwmVsbhjXMb8bM0UhBcVKxW2hluT+8bzJgloZ4jOC3ojY=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from MWHPR12MB1502.namprd12.prod.outlook.com (2603:10b6:301:10::20)
+ by MW2PR12MB2409.namprd12.prod.outlook.com (2603:10b6:907:9::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3742.6; Tue, 12 Jan
+ 2021 06:37:13 +0000
+Received: from MWHPR12MB1502.namprd12.prod.outlook.com
+ ([fe80::4d9d:16b8:3399:ce90]) by MWHPR12MB1502.namprd12.prod.outlook.com
+ ([fe80::4d9d:16b8:3399:ce90%5]) with mapi id 15.20.3742.012; Tue, 12 Jan 2021
+ 06:37:13 +0000
+From:   Wei Huang <wei.huang2@amd.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, wei.huang2@amd.com, mlevitsk@redhat.com
+Subject: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by VM instructions
+Date:   Tue, 12 Jan 2021 00:37:02 -0600
+Message-Id: <20210112063703.539893-1-wei.huang2@amd.com>
+X-Mailer: git-send-email 2.29.2
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [70.113.46.183]
+X-ClientProxiedBy: SN6PR05CA0007.namprd05.prod.outlook.com
+ (2603:10b6:805:de::20) To MWHPR12MB1502.namprd12.prod.outlook.com
+ (2603:10b6:301:10::20)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dfda8933-566c-1ec7-4ed4-427f094cb7c9@linux.intel.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from weilaptop.redhat.com (70.113.46.183) by SN6PR05CA0007.namprd05.prod.outlook.com (2603:10b6:805:de::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.2 via Frontend Transport; Tue, 12 Jan 2021 06:37:11 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 3b7ecfb6-90e7-4e52-22a4-08d8b6c47f06
+X-MS-TrafficTypeDiagnostic: MW2PR12MB2409:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <MW2PR12MB2409E0E41C5FB8126A35620BCFAA0@MW2PR12MB2409.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SKjhv7EqMhSRAA2mEC8IjxSoSkcZaLUZh+DT7jfTI2Pk1S1P1eJ5naAuoGg0eXEjswbutYPn2uBm1BQxJPLAvggYptkmKsblxjdIOeQBAG1VANtwy6B7q/J4zI4qTgLUKvFtzxmZxZk/lhzNupQGXrXWfU0Pu5jZapCk/RCZ9U47wWjFFMDxiyFySTKLsJ6vMGseWmrXY9+RC3la33oNQX/TVd5Atp7c5FquLJcPsEL1M0p+azRaKAd+c9qBiLT39taxtejfmyu+jZzH0kN8yqHfEyehkZ+wi/MiolBDT9E2bZkbCX0z1CoBJ1EQTyjtZjQrbElpkitibC0T2AwercISGmNF0PT6h739bSECLcJxLKphQ6XY92Q7WGLx4IELgxa1SVfphMYdhgJ0nOlX0A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR12MB1502.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(136003)(376002)(366004)(396003)(39860400002)(86362001)(30864003)(6486002)(1076003)(16526019)(478600001)(6666004)(6512007)(52116002)(2906002)(956004)(2616005)(7416002)(316002)(83380400001)(8676002)(66476007)(66556008)(6506007)(4326008)(6916009)(8936002)(36756003)(186003)(26005)(5660300002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?n4HOSI/J/mCBQyWY/8BT4lDUwoAzgNnF4py6R+vw1UowglDyx9ajZHm+ZkQC?=
+ =?us-ascii?Q?dJNftkCR0GDxP1dA1B7CUXRC41HEhrEXJJgv1TKkMa0FzhMU7mGHCsaQ54tM?=
+ =?us-ascii?Q?BEfuw4JS2U9+uqqYWcLwr2eBLkGuE3hnslRt6JEq1YfVMJrbRtomPSIAhvBS?=
+ =?us-ascii?Q?0mg5XpeB/eFQvg0/E1z3wUdfzFUNkE2ZL/CT7U4/Kn+5HDmmkHtgOJ9OBWNd?=
+ =?us-ascii?Q?usUxZ26ikxP6+Un/xm8/hhaMwUultfQ7z6Vioe+/GBUiv5u+yOxKq7E/IeFh?=
+ =?us-ascii?Q?F+yUpEVRKEGUIT+tJNYy6zJNrdlnBfbX6waptXoFvlz38iOk4PL8QI2IgKuF?=
+ =?us-ascii?Q?Yn68/oIF0YGRMGcXZ/PNBsJe7NXlMN/yfWb7G96ZTYNk55qHggQrRiRP9NoO?=
+ =?us-ascii?Q?8c6/fXt4F/hwCCitYWKIh8OYrt8/xMugdk3rEg9/uBx/B6tbLFFVZ2aIPlsa?=
+ =?us-ascii?Q?BXG12FC2fk5IahgG04RFgXCc6ToSttKZbDd9eC1kSMQg0UdcwO5yD/E1yZes?=
+ =?us-ascii?Q?W1tV2xnyoxDpsdy2WyYKOX0LdcvWebKiiU4TJ9fz3pETeKltqL4R7BMEGg2o?=
+ =?us-ascii?Q?hNUVmINu9CAwlkiMxEAAk6MaM1anlx8Aq+QiDi7W81yifhMVMClGBBgbimSE?=
+ =?us-ascii?Q?ysUcU6CFJQV0Fo53K54EwF/HsnprPpuXgMHQhUoA2pi5bNrVEognN7yd9YMD?=
+ =?us-ascii?Q?TrxfBPj8OQWn0bElOCkEOF2s1U0nJKA6R2mfJl2vBcTctaMOHJzkm4KTtDYb?=
+ =?us-ascii?Q?rss0XbVjNefXp4oAaGBGW1oPINGG6IwgGHU5SHDgZkU7Gl1URybYms/VgSZs?=
+ =?us-ascii?Q?EfKNfjuyx7EimuXRQ7IIcUa6UlwjLs8XScedNLf9KsiIh5X0/p4gUfeCAd/T?=
+ =?us-ascii?Q?jTJRtgamFbGkCVZW5fv09k851gSCPoRqLB1WdXfAngpsGr+PF+MT7z92PIqH?=
+ =?us-ascii?Q?eAlerjNGugaKaBUrX8MO0CYoHOqJxZQ3OqlP4jnnf8n5qo85mgmnPcVAH7Uq?=
+ =?us-ascii?Q?wC/h?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR12MB1502.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2021 06:37:13.2579
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b7ecfb6-90e7-4e52-22a4-08d8b6c47f06
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jWYJLpuM+V72CXeRI9/v9P65sbx26HpRos8ALDOR8v/NywNatU2DFSVYc3k/nvNu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR12MB2409
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 01:17:11PM +0800, Lu Baolu wrote:
-> Hi,
->
-> On 1/7/21 3:16 PM, Leon Romanovsky wrote:
-> > On Thu, Jan 07, 2021 at 06:55:16AM +0000, Tian, Kevin wrote:
-> > > > From: Leon Romanovsky <leon@kernel.org>
-> > > > Sent: Thursday, January 7, 2021 2:09 PM
-> > > >
-> > > > On Thu, Jan 07, 2021 at 02:04:29AM +0000, Tian, Kevin wrote:
-> > > > > > From: Leon Romanovsky <leon@kernel.org>
-> > > > > > Sent: Thursday, January 7, 2021 12:02 AM
-> > > > > >
-> > > > > > On Wed, Jan 06, 2021 at 11:23:39AM -0400, Jason Gunthorpe wrote:
-> > > > > > > On Wed, Jan 06, 2021 at 12:40:17PM +0200, Leon Romanovsky wrote:
-> > > > > > >
-> > > > > > > > I asked what will you do when QEMU will gain needed functionality?
-> > > > > > > > Will you remove QEMU from this list? If yes, how such "new" kernel
-> > > > will
-> > > > > > > > work on old QEMU versions?
-> > > > > > >
-> > > > > > > The needed functionality is some VMM hypercall, so presumably new
-> > > > > > > kernels that support calling this hypercall will be able to discover
-> > > > > > > if the VMM hypercall exists and if so superceed this entire check.
-> > > > > >
-> > > > > > Let's not speculate, do we have well-known path?
-> > > > > > Will such patch be taken to stable@/distros?
-> > > > > >
-> > > > >
-> > > > > There are two functions introduced in this patch. One is to detect whether
-> > > > > running on bare metal or in a virtual machine. The other is for deciding
-> > > > > whether the platform supports ims. Currently the two are identical because
-> > > > > ims is supported only on bare metal at current stage. In the future it will
-> > > > look
-> > > > > like below when ims can be enabled in a VM:
-> > > > >
-> > > > > bool arch_support_pci_device_ims(struct pci_dev *pdev)
-> > > > > {
-> > > > > 	return on_bare_metal() || hypercall_irq_domain_supported();
-> > > > > }
-> > > > >
-> > > > > The VMM vendor list is for on_bare_metal, and suppose a vendor will
-> > > > > never be removed once being added to the list since the fact of running
-> > > > > in a VM never changes, regardless of whether this hypervisor supports
-> > > > > extra VMM hypercalls.
-> > > >
-> > > > This is what I imagined, this list will be forever, and this worries me.
-> > > >
-> > > > I don't know if it is true or not, but guess that at least Oracle and
-> > > > Microsoft bare metal devices and VMs will have same DMI_SYS_VENDOR.
-> > >
-> > > It's true. David Woodhouse also said it's the case for Amazon EC2 instances.
-> > >
-> > > >
-> > > > It means that this on_bare_metal() function won't work reliably in many
-> > > > cases. Also being part of include/linux/msi.h, at some point of time,
-> > > > this function will be picked by the users outside for the non-IMS cases.
-> > > >
-> > > > I didn't even mention custom forks of QEMU which are prohibited to change
-> > > > DMI_SYS_VENDOR and private clouds with custom solutions.
-> > >
-> > > In this case the private QEMU forks are encouraged to set CPUID (X86_
-> > > FEATURE_HYPERVISOR) if they do plan to adopt a different vendor name.
-> >
-> > Does QEMU set this bit when it runs in host-passthrough CPU model?
-> >
-> > >
-> > > >
-> > > > The current array makes DMI_SYS_VENDOR interface as some sort of ABI. If
-> > > > in the future,
-> > > > the QEMU will decide to use more hipster name, for example "qEmU", this
-> > > > function
-> > > > won't work.
-> > > >
-> > > > I'm aware that DMI_SYS_VENDOR is used heavily in the kernel code and
-> > > > various names for the same company are good example how not reliable it.
-> > > >
-> > > > The most hilarious example is "Dell/Dell Inc./Dell Inc/Dell Computer
-> > > > Corporation/Dell Computer",
-> > > > but other companies are not far from them.
-> > > >
-> > > > Luckily enough, this identification is used for hardware product that
-> > > > was released to the market and their name will be stable for that
-> > > > specific model. It is not the case here where we need to ensure future
-> > > > compatibility too (old kernel on new VM emulator).
-> > > >
-> > > > I'm not in position to say yes or no to this patch and don't have plans to do it.
-> > > > Just expressing my feeling that this solution is too hacky for my taste.
-> > > >
-> > >
-> > > I agree with your worries and solely relying on DMI_SYS_VENDOR is
-> > > definitely too hacky. In previous discussions with Thomas there is no
-> > > elegant way to handle this situation. It has to be a heuristic approach.
-> > > First we hope the CPUID bit is set properly in most cases thus is checked
-> > > first. Then other heuristics can be made for the remaining cases. DMI_
-> > > SYS_VENDOR is the first hint and more can be added later. For example,
-> > > when IOMMU is present there is vendor specific way to detect whether
-> > > it's real or virtual. Dave also mentioned some BIOS flag to indicate a
-> > > virtual machine. Now probably the real question here is whether people
-> > > are OK with CPUID+DMI_SYS_VENDOR combo check for now (and grow
-> > > it later) or prefer to having all identified heuristics so far in-place together...
-> >
-> > IMHO, it should be as much as possible close to the end result.
->
-> Okay! This seems to be a right way to go.
->
-> The SMBIOS defines a 'virtual machine' bit in the BIOS characteristics
-> extension byte. It could be used as a possible way.
->
-> In order to support emulated IOMMU for fully virtualized guest, the
-> iommu vendors defined methods to distinguish between bare metal and VMM
-> (caching mode in VT-d for example).
->
-> I will go ahead with adding above two methods before checking the block
-> list.
+From: Bandan Das <bsd@redhat.com>
 
-I still curious to hear an answer on my question above:
-"Does QEMU set this bit when it runs in host-passthrough CPU model?"
+While running VM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
+CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
+before checking VMCB's instruction intercept. If EAX falls into such
+memory areas, #GP is triggered before VMEXIT. This causes problem under
+nested virtualization. To solve this problem, KVM needs to trap #GP and
+check the instructions triggering #GP. For VM execution instructions,
+KVM emulates these instructions; otherwise it re-injects #GP back to
+guest VMs.
 
-In this mode QEMU will use host CPU without modifications.
-Will it be marked as bare metal or VMM?
+Signed-off-by: Bandan Das <bsd@redhat.com>
+Co-developed-by: Wei Huang <wei.huang2@amd.com>
+Signed-off-by: Wei Huang <wei.huang2@amd.com>
+---
+ arch/x86/include/asm/kvm_host.h |   8 +-
+ arch/x86/kvm/mmu.h              |   1 +
+ arch/x86/kvm/mmu/mmu.c          |   7 ++
+ arch/x86/kvm/svm/svm.c          | 157 +++++++++++++++++++-------------
+ arch/x86/kvm/svm/svm.h          |   8 ++
+ arch/x86/kvm/vmx/vmx.c          |   2 +-
+ arch/x86/kvm/x86.c              |  37 +++++++-
+ 7 files changed, 146 insertions(+), 74 deletions(-)
 
-Thanks
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3d6616f6f6ef..0ddc309f5a14 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1450,10 +1450,12 @@ extern u64 kvm_mce_cap_supported;
+  *			     due to an intercepted #UD (see EMULTYPE_TRAP_UD).
+  *			     Used to test the full emulator from userspace.
+  *
+- * EMULTYPE_VMWARE_GP - Set when emulating an intercepted #GP for VMware
++ * EMULTYPE_PARAVIRT_GP - Set when emulating an intercepted #GP for VMware
+  *			backdoor emulation, which is opt in via module param.
+  *			VMware backoor emulation handles select instructions
+- *			and reinjects the #GP for all other cases.
++ *			and reinjects #GP for all other cases. This also
++ *			handles other cases where #GP condition needs to be
++ *			handled and emulated appropriately
+  *
+  * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
+  *		 case the CR2/GPA value pass on the stack is valid.
+@@ -1463,7 +1465,7 @@ extern u64 kvm_mce_cap_supported;
+ #define EMULTYPE_SKIP		    (1 << 2)
+ #define EMULTYPE_ALLOW_RETRY_PF	    (1 << 3)
+ #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
+-#define EMULTYPE_VMWARE_GP	    (1 << 5)
++#define EMULTYPE_PARAVIRT_GP	    (1 << 5)
+ #define EMULTYPE_PF		    (1 << 6)
+ 
+ int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 581925e476d6..1a2fff4e7140 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -219,5 +219,6 @@ int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
+ 
+ int kvm_mmu_post_init_vm(struct kvm *kvm);
+ void kvm_mmu_pre_destroy_vm(struct kvm *kvm);
++bool kvm_is_host_reserved_region(u64 gpa);
+ 
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481aa29d..c5c4aaf01a1a 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -50,6 +50,7 @@
+ #include <asm/io.h>
+ #include <asm/vmx.h>
+ #include <asm/kvm_page_track.h>
++#include <asm/e820/api.h>
+ #include "trace.h"
+ 
+ extern bool itlb_multihit_kvm_mitigation;
+@@ -5675,6 +5676,12 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
+ 
++bool kvm_is_host_reserved_region(u64 gpa)
++{
++	return e820__mapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED);
++}
++EXPORT_SYMBOL_GPL(kvm_is_host_reserved_region);
++
+ void kvm_mmu_zap_all(struct kvm *kvm)
+ {
+ 	struct kvm_mmu_page *sp, *node;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 7ef171790d02..74620d32aa82 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -288,6 +288,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+ 		if (!(efer & EFER_SVME)) {
+ 			svm_leave_nested(svm);
+ 			svm_set_gif(svm, true);
++			clr_exception_intercept(svm, GP_VECTOR);
+ 
+ 			/*
+ 			 * Free the nested guest state, unless we are in SMM.
+@@ -309,6 +310,10 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+ 
+ 	svm->vmcb->save.efer = efer | EFER_SVME;
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
++	/* Enable GP interception for SVM instructions if needed */
++	if (efer & EFER_SVME)
++		set_exception_intercept(svm, GP_VECTOR);
++
+ 	return 0;
+ }
+ 
+@@ -1957,22 +1962,104 @@ static int ac_interception(struct vcpu_svm *svm)
+ 	return 1;
+ }
+ 
++static int vmload_interception(struct vcpu_svm *svm)
++{
++	struct vmcb *nested_vmcb;
++	struct kvm_host_map map;
++	int ret;
++
++	if (nested_svm_check_permissions(svm))
++		return 1;
++
++	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
++	if (ret) {
++		if (ret == -EINVAL)
++			kvm_inject_gp(&svm->vcpu, 0);
++		return 1;
++	}
++
++	nested_vmcb = map.hva;
++
++	ret = kvm_skip_emulated_instruction(&svm->vcpu);
++
++	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
++	kvm_vcpu_unmap(&svm->vcpu, &map, true);
++
++	return ret;
++}
++
++static int vmsave_interception(struct vcpu_svm *svm)
++{
++	struct vmcb *nested_vmcb;
++	struct kvm_host_map map;
++	int ret;
++
++	if (nested_svm_check_permissions(svm))
++		return 1;
++
++	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
++	if (ret) {
++		if (ret == -EINVAL)
++			kvm_inject_gp(&svm->vcpu, 0);
++		return 1;
++	}
++
++	nested_vmcb = map.hva;
++
++	ret = kvm_skip_emulated_instruction(&svm->vcpu);
++
++	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
++	kvm_vcpu_unmap(&svm->vcpu, &map, true);
++
++	return ret;
++}
++
++static int vmrun_interception(struct vcpu_svm *svm)
++{
++	if (nested_svm_check_permissions(svm))
++		return 1;
++
++	return nested_svm_vmrun(svm);
++}
++
++/* Emulate SVM VM execution instructions */
++static int svm_emulate_vm_instr(struct kvm_vcpu *vcpu, u8 modrm)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	switch (modrm) {
++	case 0xd8: /* VMRUN */
++		return vmrun_interception(svm);
++	case 0xda: /* VMLOAD */
++		return vmload_interception(svm);
++	case 0xdb: /* VMSAVE */
++		return vmsave_interception(svm);
++	default:
++		/* inject a #GP for all other cases */
++		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
++		return 1;
++	}
++}
++
+ static int gp_interception(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 	u32 error_code = svm->vmcb->control.exit_info_1;
+-
+-	WARN_ON_ONCE(!enable_vmware_backdoor);
++	int rc;
+ 
+ 	/*
+-	 * VMware backdoor emulation on #GP interception only handles IN{S},
+-	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
++	 * Only VMware backdoor and SVM VME errata are handled. Neither of
++	 * them has non-zero error codes.
+ 	 */
+ 	if (error_code) {
+ 		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+ 		return 1;
+ 	}
+-	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
++
++	rc = kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
++	if (rc > 1)
++		rc = svm_emulate_vm_instr(vcpu, rc);
++	return rc;
+ }
+ 
+ static bool is_erratum_383(void)
+@@ -2113,66 +2200,6 @@ static int vmmcall_interception(struct vcpu_svm *svm)
+ 	return kvm_emulate_hypercall(&svm->vcpu);
+ }
+ 
+-static int vmload_interception(struct vcpu_svm *svm)
+-{
+-	struct vmcb *nested_vmcb;
+-	struct kvm_host_map map;
+-	int ret;
+-
+-	if (nested_svm_check_permissions(svm))
+-		return 1;
+-
+-	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+-	if (ret) {
+-		if (ret == -EINVAL)
+-			kvm_inject_gp(&svm->vcpu, 0);
+-		return 1;
+-	}
+-
+-	nested_vmcb = map.hva;
+-
+-	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+-
+-	nested_svm_vmloadsave(nested_vmcb, svm->vmcb);
+-	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+-
+-	return ret;
+-}
+-
+-static int vmsave_interception(struct vcpu_svm *svm)
+-{
+-	struct vmcb *nested_vmcb;
+-	struct kvm_host_map map;
+-	int ret;
+-
+-	if (nested_svm_check_permissions(svm))
+-		return 1;
+-
+-	ret = kvm_vcpu_map(&svm->vcpu, gpa_to_gfn(svm->vmcb->save.rax), &map);
+-	if (ret) {
+-		if (ret == -EINVAL)
+-			kvm_inject_gp(&svm->vcpu, 0);
+-		return 1;
+-	}
+-
+-	nested_vmcb = map.hva;
+-
+-	ret = kvm_skip_emulated_instruction(&svm->vcpu);
+-
+-	nested_svm_vmloadsave(svm->vmcb, nested_vmcb);
+-	kvm_vcpu_unmap(&svm->vcpu, &map, true);
+-
+-	return ret;
+-}
+-
+-static int vmrun_interception(struct vcpu_svm *svm)
+-{
+-	if (nested_svm_check_permissions(svm))
+-		return 1;
+-
+-	return nested_svm_vmrun(svm);
+-}
+-
+ void svm_set_gif(struct vcpu_svm *svm, bool value)
+ {
+ 	if (value) {
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0fe874ae5498..d5dffcf59afa 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -350,6 +350,14 @@ static inline void clr_exception_intercept(struct vcpu_svm *svm, u32 bit)
+ 	recalc_intercepts(svm);
+ }
+ 
++static inline bool is_exception_intercept(struct vcpu_svm *svm, u32 bit)
++{
++	struct vmcb *vmcb = get_host_vmcb(svm);
++
++	WARN_ON_ONCE(bit >= 32);
++	return vmcb_is_intercept(&vmcb->control, INTERCEPT_EXCEPTION_OFFSET + bit);
++}
++
+ static inline void svm_set_intercept(struct vcpu_svm *svm, int bit)
+ {
+ 	struct vmcb *vmcb = get_host_vmcb(svm);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2af05d3b0590..5fac2f7cba24 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4774,7 +4774,7 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+ 			kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+ 			return 1;
+ 		}
+-		return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
++		return kvm_emulate_instruction(vcpu, EMULTYPE_PARAVIRT_GP);
+ 	}
+ 
+ 	/*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9a8969a6dd06..c3662fc3b1bc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7014,7 +7014,7 @@ static int handle_emulation_failure(struct kvm_vcpu *vcpu, int emulation_type)
+ 	++vcpu->stat.insn_emulation_fail;
+ 	trace_kvm_emulate_insn_failed(vcpu);
+ 
+-	if (emulation_type & EMULTYPE_VMWARE_GP) {
++	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
+ 		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+ 		return 1;
+ 	}
+@@ -7267,6 +7267,28 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+ 	return false;
+ }
+ 
++static int is_vm_instr_opcode(struct x86_emulate_ctxt *ctxt)
++{
++	unsigned long rax;
++
++	if (ctxt->b != 0x1)
++		return 0;
++
++	switch (ctxt->modrm) {
++	case 0xd8: /* VMRUN */
++	case 0xda: /* VMLOAD */
++	case 0xdb: /* VMSAVE */
++		rax = kvm_register_read(emul_to_vcpu(ctxt), VCPU_REGS_RAX);
++		if (!kvm_is_host_reserved_region(rax))
++			return 0;
++		break;
++	default:
++		return 0;
++	}
++
++	return ctxt->modrm;
++}
++
+ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+ {
+ 	switch (ctxt->opcode_len) {
+@@ -7305,6 +7327,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+ 	bool writeback = true;
+ 	bool write_fault_to_spt;
++	int vminstr;
+ 
+ 	if (unlikely(!kvm_x86_ops.can_emulate_instruction(vcpu, insn, insn_len)))
+ 		return 1;
+@@ -7367,10 +7390,14 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		}
+ 	}
+ 
+-	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
+-	    !is_vmware_backdoor_opcode(ctxt)) {
+-		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+-		return 1;
++	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
++		vminstr = is_vm_instr_opcode(ctxt);
++		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
++			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
++			return 1;
++		}
++		if (vminstr)
++			return vminstr;
+ 	}
+ 
+ 	/*
+-- 
+2.27.0
 
->
-> Best regards,
-> baolu
