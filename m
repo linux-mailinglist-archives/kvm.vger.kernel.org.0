@@ -2,120 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7541F2F2DC0
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:19:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AB532F2E1C
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:38:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725779AbhALLS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 06:18:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52280 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbhALLS7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 06:18:59 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0B5C061575
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:18:18 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id g24so1846485edw.9
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:18:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6Xza6dUDyfeH/pPU30kEn/p3DdpBur5kEztG56hp89Y=;
-        b=CpvXhdydrJAp2wIZ93s4jbYbtrlCwpgfzZYFSLvS+aK9OCBOCjNzBUiUZ/2Mgkkxn/
-         IlUuS/E7AOKGzAUzI0sJ7aM4pJRHKzhbQJVzSVffua2UrF7Mp5H4hJUUkmY9WM8t/ABH
-         oWFYtPzP00yyhoBKvbPBJRFXJhvfNZTCEgYi9Iex4k3owe+yYAZDICw34Tv56cXLSwMs
-         ktG+eZ+v0dd3kbAfQXSuYKRVXGt4j64e6S4lTqQi8j3/CsqxQ8HHvp7+Gvf/qDzWHUYA
-         7fx3W79zcNVR2Y8hu8Zz6u7RsMZuTuC7M7z8Rb8WbUSaGdLV89ondf9jtnBwZsJdoDXb
-         RsUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6Xza6dUDyfeH/pPU30kEn/p3DdpBur5kEztG56hp89Y=;
-        b=pOdwgJ96XpaiodrFSPc6cPCtP+MVWZyEtm2m5OXWJa3v/pWZ6dqzKB0ZQrwyWPxfeF
-         9m53a18DSsMcFZKL7Hmv89z8vNOz291qMw7dcfEfiGbW6wIumtgn8edLFO6h3GyW3eFT
-         y/zgHHX/rqLuevnKHvhWptsTR0heCRUpSiL3aNqT53jCiL8DKUB3rrWlFxogN8zfx0Sp
-         P7WeLisN1cnK/h1SlCIuZ+f443oueAAp53nVlCetwvbB/0TQF7dwQ0LE0SK0bLp3T+iX
-         okZETu4gEhXV+z+EtDrPfpFh57ZiiN6qZHLiqZvcvgIE964sQN6AOGeUAzzZAEAH0Wzr
-         0k6Q==
-X-Gm-Message-State: AOAM533+pGxFN/gce6Mmo8K2mKS27z+HjZGnErndM54JotOSn7yTkU+R
-        JnT1uz9Vag01DaXUHFX7D14=
-X-Google-Smtp-Source: ABdhPJwVhge/8MyznJ09B4fkPd9M8/E3VPT+PSewCAixhOEhYETVisqUk6+Qntb78UMZerV5qABBJQ==
-X-Received: by 2002:a05:6402:a52:: with SMTP id bt18mr3041911edb.228.1610450297451;
-        Tue, 12 Jan 2021 03:18:17 -0800 (PST)
-Received: from vm1 (ip-86-49-65-192.net.upcbroadband.cz. [86.49.65.192])
-        by smtp.gmail.com with ESMTPSA id da9sm1250503edb.84.2021.01.12.03.18.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 03:18:17 -0800 (PST)
-Date:   Tue, 12 Jan 2021 12:18:11 +0100
-From:   Zdenek Kaspar <zkaspar82@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: Bad performance since 5.9-rc1
-Message-ID: <20210112121811.408e32fe.zkaspar82@gmail.com>
-In-Reply-To: <20201222222645.0d8e96b2.zkaspar82@gmail.com>
-References: <20201119040526.5263f557.zkaspar82@gmail.com>
-        <20201201073537.6749e2d7.zkaspar82@gmail.com>
-        <20201218203310.5025c17e.zkaspar82@gmail.com>
-        <X+D6eJn92Vt6v+U1@google.com>
-        <20201221221339.030684c4.zkaspar82@gmail.com>
-        <X+In2zIA40Ku19cM@google.com>
-        <20201222222645.0d8e96b2.zkaspar82@gmail.com>
+        id S1729306AbhALLhx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 06:37:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29375 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728547AbhALLhx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 06:37:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610451386;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2AOgxTLMTIdTZKNC7B3wsjgAb0AUyN6gAO1jJbajxeI=;
+        b=IbFdHFcxSWF7bnr7bQ2mJIP36I7lZP9Q0hXydR4j7JKxjF67g1z+DiWm0hAX54k0w6suc3
+        m1JC6AwQqZZ1RRlFKgIfnNWdlYgKEbE3RwG+KesPKHrPoqJdcnDih5VEybDzNmhPFEv0Ql
+        K5TJBAr0fyELkPrp83fBYxoH926Vv9w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-RAM-GMsoNzW6ODFs7TuxSA-1; Tue, 12 Jan 2021 06:36:24 -0500
+X-MC-Unique: RAM-GMsoNzW6ODFs7TuxSA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38FEEDF8CF;
+        Tue, 12 Jan 2021 11:36:22 +0000 (UTC)
+Received: from gondolin (ovpn-114-102.ams2.redhat.com [10.36.114.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 15A9D10016FB;
+        Tue, 12 Jan 2021 11:36:09 +0000 (UTC)
+Date:   Tue, 12 Jan 2021 12:36:07 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     David Gibson <david@gibson.dropbear.id.au>, pasic@linux.ibm.com,
+        brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
+        qemu-devel@nongnu.org, andi.kleen@intel.com, qemu-ppc@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Greg Kurz <groug@kaod.org>, frankja@linux.ibm.com,
+        thuth@redhat.com, mdroth@linux.vnet.ibm.com,
+        richard.henderson@linaro.org, kvm@vger.kernel.org,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, david@redhat.com,
+        mst@redhat.com, qemu-s390x@nongnu.org, pragyansri.pathi@intel.com,
+        jun.nakajima@intel.com
+Subject: Re: [PATCH v6 13/13] s390: Recognize confidential-guest-support
+ option
+Message-ID: <20210112123607.39597e3d.cohuck@redhat.com>
+In-Reply-To: <fcafba03-3701-93af-8eb7-17bd0d14d167@de.ibm.com>
+References: <20210112044508.427338-1-david@gibson.dropbear.id.au>
+        <20210112044508.427338-14-david@gibson.dropbear.id.au>
+        <fcafba03-3701-93af-8eb7-17bd0d14d167@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 22 Dec 2020 22:26:45 +0100
-Zdenek Kaspar <zkaspar82@gmail.com> wrote:
+On Tue, 12 Jan 2021 09:15:26 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On Tue, 22 Dec 2020 09:07:39 -0800
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > On Mon, Dec 21, 2020, Zdenek Kaspar wrote:
-> > > [  179.364305] WARNING: CPU: 0 PID: 369 at
-> > > kvm_mmu_zap_oldest_mmu_pages+0xd1/0xe0 [kvm] [  179.365415] Call
-> > > Trace: [  179.365443]  paging64_page_fault+0x244/0x8e0 [kvm]
+> On 12.01.21 05:45, David Gibson wrote:
+> > At least some s390 cpu models support "Protected Virtualization" (PV),
+> > a mechanism to protect guests from eavesdropping by a compromised
+> > hypervisor.
 > > 
-> > This means the shadow page zapping is occuring because KVM is
-> > hitting the max number of allowed MMU shadow pages.  Can you
-> > provide your QEMU command line?  I can reproduce the performance
-> > degredation, but only by deliberately overriding the max number of
-> > MMU pages via `-machine kvm-shadow-mem` to be an absurdly low value.
+> > This is similar in function to other mechanisms like AMD's SEV and
+> > POWER's PEF, which are controlled by the "confidential-guest-support"
+> > machine option.  s390 is a slightly special case, because we already
+> > supported PV, simply by using a CPU model with the required feature
+> > (S390_FEAT_UNPACK).
 > > 
-> > > [  179.365596]  kvm_mmu_page_fault+0x376/0x550 [kvm]
-> > > [  179.365725]  kvm_arch_vcpu_ioctl_run+0xbaf/0x18f0 [kvm]
-> > > [  179.365772]  kvm_vcpu_ioctl+0x203/0x520 [kvm]
-> > > [  179.365938]  __x64_sys_ioctl+0x338/0x720
-> > > [  179.365992]  do_syscall_64+0x33/0x40
-> > > [  179.366013]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > To integrate this with the option used by other platforms, we
+> > implement the following compromise:
+> > 
+> >  - When the confidential-guest-support option is set, s390 will
+> >    recognize it, verify that the CPU can support PV (failing if not)
+> >    and set virtio default options necessary for encrypted or protected
+> >    guests, as on other platforms.  i.e. if confidential-guest-support
+> >    is set, we will either create a guest capable of entering PV mode,
+> >    or fail outright.
+> > 
+> >  - If confidential-guest-support is not set, guests might still be
+> >    able to enter PV mode, if the CPU has the right model.  This may be
+> >    a little surprising, but shouldn't actually be harmful.
+> > 
+> > To start a guest supporting Protected Virtualization using the new
+> > option use the command line arguments:
+> >     -object s390-pv-guest,id=pv0 -machine confidential-guest-support=pv0  
 > 
-> It's one long line, added "\" for mail readability:
 > 
-> qemu-system-x86_64 -machine type=q35,accel=kvm            \
-> -cpu host,host-cache-info=on -smp cpus=2,cores=2          \
-> -m size=1024 -global virtio-pci.disable-legacy=on         \
-> -global virtio-pci.disable-modern=off                     \
-> -device virtio-balloon                                    \
-> -device virtio-net,netdev=tap-build,mac=DE:AD:BE:EF:00:80 \
-> -object rng-random,filename=/dev/urandom,id=rng0          \
-> -device virtio-rng,rng=rng0                               \
-> -name build,process=qemu-build                            \
-> -drive
-> file=/mnt/data/export/unix/kvm/build/openbsd-amd64.img,if=virtio,cache=none,format=raw,aio=native
-> \ -netdev type=tap,id=tap-build,vhost=on                    \ -serial
-> none                                              \ -parallel none
->                                         \ -monitor
-> unix:/dev/shm/kvm-build.sock,server,nowait       \ -enable-kvm
-> -daemonize -runas qemu
+> This results in
 > 
-> Z.
+> [cborntra@t35lp61 qemu]$ qemu-system-s390x -enable-kvm -nographic -m 2G -kernel ~/full.normal 
+> **
+> ERROR:../qom/object.c:317:type_initialize: assertion failed: (parent->instance_size <= ti->instance_size)
+> Bail out! ERROR:../qom/object.c:317:type_initialize: assertion failed: (parent->instance_size <= ti->instance_size)
+> Aborted (core dumped)
+> 
 
-BTW, v5.11-rc3 with kvm-shadow-mem=1073741824 it seems OK.
+> > +static const TypeInfo s390_pv_guest_info = {
+> > +    .parent = TYPE_CONFIDENTIAL_GUEST_SUPPORT,
+> > +    .name = TYPE_S390_PV_GUEST,
+> > +    .instance_size = sizeof(S390PVGuestState),
+> > +    .interfaces = (InterfaceInfo[]) {
+> > +        { TYPE_USER_CREATABLE },
+> > +        { }
+> > +    }
+> > +};
 
-Just curious what v5.8 does, so by any chance is there command
-for kvm-shadow-mem value via qemu monitor?
+I think this needs TYPE_OBJECT in .parent and
+TYPE_CONFIDENTIAL_GUEST_SUPPORT as an interface to fix the crash.
 
-Z.
