@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 048742F3AED
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC532F3AEB
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436867AbhALTnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 14:43:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
+        id S2436841AbhALTnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 14:43:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406828AbhALTna (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 14:43:30 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039B2C061381
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:12 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id n16so2347686wmc.0
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:11 -0800 (PST)
+        with ESMTP id S2406832AbhALTnb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 14:43:31 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A50C061385
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:15 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id c5so3749671wrp.6
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ZIRhmzhJTza1eg/duDC8aSWDJ8wELCNq6nzGwLtOGgE=;
-        b=d9NxmNZSQNFWQVyP7EOF6ws9upmBjMm7Uu4vcCvAagQcJvjqLbg5+r9m2RsQFFiJis
-         Phmfncl8NVLjetiCUd7//m3Bmb/XboSynU2+TTlz7fnQQrc7Jpxc4hbmaw8FZqV5TH7y
-         sRRNBzmxv6jAlGIonq5UpuL7dMdRW+ftT3cnGIa3N0L2U2c/1jaGnLRqD4+8bMh4rAPo
-         vOvc7I+Tm890KsTLrvzdfciGgT5p7v9XHa51iZ9aT1MwsRe8bYEEqZSNxG/W4qodptly
-         zpZ2A26Vz1arJqMbfke1ek2319CmQxsbEOY6yJmN8LiK+JJsd/aLYiWW1hD2hgKV/tZM
-         NhXw==
+        bh=vbacyc4brsO7fCWWmN34VX2kLRLEZOENYLDCsoU/LjI=;
+        b=frDPSNM1J/dOImSb6yTvFEc5DFfgGXbEaLLgKaM0mONN1LJTeaMDvsD7N43EhUuKwM
+         OzKSpdv9zyp8xkewtP83v/WGTWyMClGmamwcnslMUaaz1lav+C2aXiTjba4BdOhqxWXs
+         YOItPqRzhgs4NU2YffFSmcJDQxMpi6pdbU7itsTGkKpcxuOJWziSQooRJUBKdpBzUYxD
+         xIoivLmBPS3zxn3DPlnmaHb6St45vGGHON4Tw0XUnv4jTlfHbt6WSZPGEcTHqdLKQA8A
+         oh9+TRaqxpOgBEf5HrtBEHkkj3ACTaqZOa/BiIncvZJTrHDMblqXE+TF/HZ3Eh4T7R9X
+         TU4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ZIRhmzhJTza1eg/duDC8aSWDJ8wELCNq6nzGwLtOGgE=;
-        b=SDEIAaIRPME/Kd8izLIjJVtuRbpGr3RQxRn6oH4JZChfYhH6SCbkkCfss1JIisJRUY
-         bBisEfvXbVtoS9/OeRqT9ZGnz0C3pe0P7Q05LPzNBq0f2ci8onmLGNPLUdMMTIOFXzly
-         juTn2dmzRyvwY3UVScIFPqtFr/2jt+7k3RvZU2uQBvxeKC6oS1bO2oFjlJVdEKWJuK5o
-         /OZ9mhcqltDHNfvYl7/CqExr2RRpe81vaBn6gStk7VAFaEh4z8GzRyiYFPiXD2YoibH/
-         53C8wiFOWcCL9eLch9U6DC3HrDW2Rz+nmWpVjVGS4ZG/yRoA1OaUmwlompBAzxks4Kw+
-         cyaQ==
-X-Gm-Message-State: AOAM533ULBVYPK5G0MLjsV0W9qiM7dmkWRN8dwEENKidgbpShgrHf5cQ
-        pWDd3c+wRgkyrv8gxBRwCR8B3g==
-X-Google-Smtp-Source: ABdhPJxgkunWSUTHmZ71tMmXeTXU/QgKZnSQGKYYciKcgoVgRx0jy5oBLeyU4zrM4dUfJdLaLRdw1g==
-X-Received: by 2002:a7b:c45a:: with SMTP id l26mr755038wmi.91.1610480530694;
-        Tue, 12 Jan 2021 11:42:10 -0800 (PST)
+        bh=vbacyc4brsO7fCWWmN34VX2kLRLEZOENYLDCsoU/LjI=;
+        b=jbwzP+8Y5SvhKhLFJP+P4YNJfRSFNoBFtpO3QZg0CiG7mDOUOsR9ziRCNfPbY78CtV
+         9LfGrJevLAq3xqGtN6ycoWBkMHnd1fOaoq+N5gai2k/cJJ+mDxSU6XmZx3rfE4h4qSsm
+         nS4vUsbjZqqwp++7qQXwxQVXK4aamageReGzvQiL8n084s9PZ6UoEbiDi7B7mleZ1SoT
+         4XC528Dz6ixnHnkl1xpOajmR5N4Cdki1fCP9jaFf6QUyB5/b4k5iC1avLcFLqHjwkZTP
+         1KS22EDTzAKdr7sJEgiHEo2p00k8UflepvvM3dPqri+PgPnHkbn7TKSzAtCcbWesstrp
+         qylw==
+X-Gm-Message-State: AOAM530lAd2nXMjCrO0u0CoJhZ9f5QbR+nlBg6jNj0raDTzQIHyaW2yt
+        6478ccHYT/vQOOTbtHQyShSGmw==
+X-Google-Smtp-Source: ABdhPJzR2K4OZsCoyd0N4J9iZegxzvR23ddSEOzUWZ1flur5F4V7qRoMhDvf+/K03T/6v7gHKGCucw==
+X-Received: by 2002:adf:df08:: with SMTP id y8mr431800wrl.278.1610480533859;
+        Tue, 12 Jan 2021 11:42:13 -0800 (PST)
 Received: from f2.redhat.com (bzq-79-183-72-147.red.bezeqint.net. [79.183.72.147])
-        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.42.07
+        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.42.10
         (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Jan 2021 11:42:09 -0800 (PST)
+        Tue, 12 Jan 2021 11:42:13 -0800 (PST)
 From:   Yuri Benditovich <yuri.benditovich@daynix.com>
 To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         jasowang@redhat.com, ast@kernel.org, daniel@iogearbox.net,
@@ -59,9 +59,9 @@ To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
 Cc:     yan@daynix.com
-Subject: [RFC PATCH 5/7] tun: add ioctl code TUNSETHASHPOPULATION
-Date:   Tue, 12 Jan 2021 21:41:41 +0200
-Message-Id: <20210112194143.1494-6-yuri.benditovich@daynix.com>
+Subject: [RFC PATCH 6/7] tun: populate hash in virtio-net header when needed
+Date:   Tue, 12 Jan 2021 21:41:42 +0200
+Message-Id: <20210112194143.1494-7-yuri.benditovich@daynix.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210112194143.1494-1-yuri.benditovich@daynix.com>
 References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
@@ -69,74 +69,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-User mode program calls this ioctl before loading of
-BPF program to inform the tun that the BPF program has
-extended functionality, i.e. sets hash value and returns
-the virtqueue number in the lower 16 bits and the type
-of the hash report in the upper 16 bits.
+If the BPF program populated the hash in the skb the tun
+propagates the hash value and hash report type to the
+respective fields of virtio-net header.
 
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 ---
- drivers/net/tun.c           | 12 +++++++++++-
- include/uapi/linux/if_tun.h |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ drivers/net/tun.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 18c1baf1a6c1..45f4f04a4a3e 100644
+index 45f4f04a4a3e..214feb0b16fb 100644
 --- a/drivers/net/tun.c
 +++ b/drivers/net/tun.c
-@@ -197,6 +197,7 @@ struct tun_struct {
- 	struct sock_fprog	fprog;
- 	/* protected by rtnl lock */
- 	bool			filter_attached;
-+	bool                    bpf_populates_hash;
- 	u32			msg_enable;
- 	spinlock_t lock;
- 	struct hlist_head flows[TUN_NUM_FLOW_ENTRIES];
-@@ -2765,6 +2766,7 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+@@ -556,15 +556,20 @@ static u16 tun_ebpf_select_queue(struct tun_struct *tun, struct sk_buff *skb)
+ {
+ 	struct tun_prog *prog;
+ 	u32 numqueues;
+-	u16 ret = 0;
++	u32 ret = 0;
  
- 		tun->align = NET_SKB_PAD;
- 		tun->filter_attached = false;
-+		tun->bpf_populates_hash = false;
- 		tun->sndbuf = tfile->socket.sk->sk_sndbuf;
- 		tun->rx_batched = 0;
- 		RCU_INIT_POINTER(tun->steering_prog, NULL);
-@@ -2997,7 +2999,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 	struct net *net = sock_net(&tfile->sk);
- 	struct tun_struct *tun;
- 	void __user* argp = (void __user*)arg;
--	unsigned int ifindex, carrier;
-+	unsigned int ifindex, carrier, populate_hash;
- 	struct ifreq ifr;
- 	kuid_t owner;
- 	kgid_t group;
-@@ -3298,6 +3300,14 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 		ret = open_related_ns(&net->ns, get_net_ns);
- 		break;
+ 	numqueues = READ_ONCE(tun->numqueues);
+ 	if (!numqueues)
+ 		return 0;
  
-+	case TUNSETHASHPOPULATION:
-+		ret = -EFAULT;
-+		if (copy_from_user(&populate_hash, argp, sizeof(populate_hash)))
-+			goto unlock;
-+		tun->bpf_populates_hash = !!populate_hash;
-+		ret = 0;
-+		break;
+ 	prog = rcu_dereference(tun->steering_prog);
+-	if (prog)
++	if (prog) {
+ 		ret = bpf_prog_run_clear_cb(prog->prog, skb);
++		if (tun->bpf_populates_hash) {
++			*skb_hash_report_type(skb) = (__u8)(ret >> 16);
++			ret &= 0xffff;
++		}
++	}
+ 
+ 	return ret % numqueues;
+ }
+@@ -2062,6 +2067,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 
+ 	if (vnet_hdr_sz) {
+ 		struct virtio_net_hdr gso;
++		__u16 extra_copy = 0;
+ 
+ 		if (iov_iter_count(iter) < vnet_hdr_sz)
+ 			return -EINVAL;
+@@ -2085,7 +2091,20 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 		if (copy_to_iter(&gso, sizeof(gso), iter) != sizeof(gso))
+ 			return -EFAULT;
+ 
+-		iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso));
++		if (tun->bpf_populates_hash &&
++		    vnet_hdr_sz >= sizeof(struct virtio_net_hdr_v1_hash)) {
++			struct virtio_net_hdr_v1_hash hdr;
 +
- 	default:
- 		ret = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-index 454ae31b93c7..0fd43533da26 100644
---- a/include/uapi/linux/if_tun.h
-+++ b/include/uapi/linux/if_tun.h
-@@ -61,6 +61,7 @@
- #define TUNSETFILTEREBPF _IOR('T', 225, int)
- #define TUNSETCARRIER _IOW('T', 226, int)
- #define TUNGETDEVNETNS _IO('T', 227)
-+#define TUNSETHASHPOPULATION _IOR('T', 228, int)
++			hdr.hdr.num_buffers = 0;
++			hdr.hash_value = cpu_to_le32(skb_get_hash(skb));
++			hdr.hash_report = cpu_to_le16(*skb_hash_report_type(skb));
++			hdr.padding = 0;
++			extra_copy = sizeof(hdr) - sizeof(gso);
++			if (copy_to_iter(&hdr.hdr.num_buffers, extra_copy, iter) != extra_copy)
++				return -EFAULT;
++		}
++
++		iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso) - extra_copy);
+ 	}
  
- /* TUNSETIFF ifr flags */
- #define IFF_TUN		0x0001
+ 	if (vlan_hlen) {
 -- 
 2.17.1
 
