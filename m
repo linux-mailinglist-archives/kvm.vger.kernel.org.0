@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A2AE2F3ADE
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E8282F3AE9
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436650AbhALTnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 14:43:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48442 "EHLO
+        id S2436825AbhALTnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 14:43:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436620AbhALTnR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 14:43:17 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E3CC0617B0
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:05 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id w5so3726594wrm.11
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:05 -0800 (PST)
+        with ESMTP id S2436814AbhALTnl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 14:43:41 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6839DC0617BD
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:08 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id d13so3717610wrc.13
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:42:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=RENS1yiCoqDoLkKN/GRTnjThUIFO+qOBX6TnsDEXMJ4=;
-        b=M/GX6JJ7p2H2eTx80N54RrcrNovJmEJksJOoBQDaMLSzid6cmcZm7fhz67QqX1fL5P
-         IdT39n+3quPjJon55Yrm52XJi48JC4N264PIWrap0CYeK86yDZZ+zEJcTwiKudRaOcu3
-         wXoQ+xjsPaLtUxHrXSVu9o7ZzQRgJuokj+6KBtBcm0Zx+B7h8aZiYqFXJ3KjMQQyb1JP
-         VOmGW/qJxnsFSZUkpX//QYy9P3sHgwODGlbccFdfwVkGYWPx3MNPz+nieZ4tlIyY6yLl
-         osKVjKeNCMT8VtZGL5mmwM64fXLfHfr+b+cGMxg0fdz/BywiQ1W/2QgZOf6jp8KNqTTi
-         Chyw==
+        bh=u0kBDkZSof0LwbMWuYCOPhj4hHVMvwb36KmGU51ii7Y=;
+        b=qXPm6RRC85TTK9KaSiUv157OWNC4uLnK5R55zCcddSz/OH6u6hYx1S9F76b6fwU3/m
+         L5598+Ur8w96+Gg+RoiczvrXtQYRI8O+fGupwlj+IkNmOGSHUsW9Tf1BtX3kiNe71Rgx
+         WKTBblBdOSXaDLvovQo/HLN7qCMsRVlCKSDg9YBktWJQB59pnUT8dN+HdiYyVYBkhQuJ
+         CvKCRk6Kcw/A1SvK/Qud7BzT6mgq06tzFkvkVxffAFW66gfIBLQhmu6VrRnGc6K1j6UJ
+         Fl4DWwsqoJ4iK+vFlmlYQCh6SYdu4g5kQNpVx2IBQVS/3tq45sNhLUGPnbg8Ifcy6piT
+         l22A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=RENS1yiCoqDoLkKN/GRTnjThUIFO+qOBX6TnsDEXMJ4=;
-        b=uSAQonoZXBdXuYtQ1EnXe45TlKIE4qqLVpXvj3+EOCzmtHbb+HIpOUS8E+cA5bF7Wx
-         tt5fNpoCyvCc/CcOG26eWj3bS6R5GrRk53iSZkVu0bJs27v3zeGkXHE08mb1zSGfnLHk
-         b+kwMympPNyzhv19fYGAxv6nOqhO3kbg4U3McfY28NsrNZga7qvJc05Z0Q2ZqLAu2f5U
-         YlPLtHYQDc9jtODoMDKnXl3J9e5zXMVPbrn8Q4kdlMujdK1isYUPBNWexNOyg9INwBe/
-         3xDwIvvhqUEGuoxEtFad1vf0969+6/yaEA3n2xjKuUE1jpozvEV/4Rv0JsknSx4LljN3
-         G2Rw==
-X-Gm-Message-State: AOAM530HVIz9Hiwi6SOUjOiFunvxsUfxxdhAp281W4hcE5rTWhn2kNo1
-        2yOib5ps+HSOmC5clk1KZt+TdQ==
-X-Google-Smtp-Source: ABdhPJy88KkYeCfk/twqMv7qxLAVLrtcCRDSJ2F4RxIb3LJRD8cqoUZ55scrlMHcmG48qxh7J7CDhQ==
-X-Received: by 2002:a5d:604b:: with SMTP id j11mr437008wrt.406.1610480524252;
-        Tue, 12 Jan 2021 11:42:04 -0800 (PST)
+        bh=u0kBDkZSof0LwbMWuYCOPhj4hHVMvwb36KmGU51ii7Y=;
+        b=ftuk73exa5G31oEC0A9f9XuGzLVz94h+lKwGL/4nWIyekvetGXC8chWLa8B3A17ApB
+         VO1z753ffBnrqhTMf8jbyHltw658EYG9rAI8vpExfV0ZgswK1UP7NFiujyRowIwWChk8
+         hcJukAwsX/IyUSD5phmJk+K/u24vfxb6ZsGu87OKa4R3I3WFDVkJfYk+eUeYgciQQKF5
+         murZr8spYNJDP+5CuivyK/9QpWzNWV+yr51oet2Z1dWbKGbqOvL6xJwNFmgXHfrf0Jqz
+         kIVeVQiBHedsT/JnuFWQXIm2rJgJT787TvWFfXQhR+WkehpHo0QvPE3hYpTI9JZtskX+
+         KktQ==
+X-Gm-Message-State: AOAM531/Mo5IL0OiJUA8iLWmbgPIpb0ATsZlAmskDeOTGvRuIkG06K55
+        OJogjY6yZsfUo1r3fANmn0ItIA==
+X-Google-Smtp-Source: ABdhPJwQIJTkLLUDMFNxy3mBWVt2sZtp82KzceRnAi/2Dy2UB4frEHQodHJV577V0ALRuxgqVPsWHg==
+X-Received: by 2002:a5d:674b:: with SMTP id l11mr423783wrw.247.1610480527197;
+        Tue, 12 Jan 2021 11:42:07 -0800 (PST)
 Received: from f2.redhat.com (bzq-79-183-72-147.red.bezeqint.net. [79.183.72.147])
-        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.42.01
+        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.42.04
         (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Jan 2021 11:42:03 -0800 (PST)
+        Tue, 12 Jan 2021 11:42:06 -0800 (PST)
 From:   Yuri Benditovich <yuri.benditovich@daynix.com>
 To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         jasowang@redhat.com, ast@kernel.org, daniel@iogearbox.net,
@@ -59,9 +59,9 @@ To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
 Cc:     yan@daynix.com
-Subject: [RFC PATCH 3/7] tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
-Date:   Tue, 12 Jan 2021 21:41:39 +0200
-Message-Id: <20210112194143.1494-4-yuri.benditovich@daynix.com>
+Subject: [RFC PATCH 4/7] tun: free bpf_program by bpf_prog_put instead of bpf_prog_destroy
+Date:   Tue, 12 Jan 2021 21:41:40 +0200
+Message-Id: <20210112194143.1494-5-yuri.benditovich@daynix.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210112194143.1494-1-yuri.benditovich@daynix.com>
 References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
@@ -69,27 +69,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This program type can set skb hash value. It will be useful
-when the tun will support hash reporting feature if virtio-net.
+The module never creates the bpf program with bpf_prog_create
+so it shouldn't free it with bpf_prog_destroy.
+The program is obtained by bpf_prog_get and should be freed
+by bpf_prog_put. For BPF_PROG_TYPE_SOCKET_FILTER both
+methods do the same but for other program types they don't.
 
 Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
 ---
- drivers/net/tun.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/tun.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 7959b5c2d11f..455f7afc1f36 100644
+index 455f7afc1f36..18c1baf1a6c1 100644
 --- a/drivers/net/tun.c
 +++ b/drivers/net/tun.c
-@@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
- 		prog = NULL;
- 	} else {
- 		prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
-+		if (IS_ERR(prog))
-+			prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
- 		if (IS_ERR(prog))
- 			return PTR_ERR(prog);
- 	}
+@@ -2218,7 +2218,7 @@ static void tun_prog_free(struct rcu_head *rcu)
+ {
+ 	struct tun_prog *prog = container_of(rcu, struct tun_prog, rcu);
+ 
+-	bpf_prog_destroy(prog->prog);
++	bpf_prog_put(prog->prog);
+ 	kfree(prog);
+ }
+ 
 -- 
 2.17.1
 
