@@ -2,331 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62B462F3D9E
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3C372F3DA7
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387702AbhALVoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 16:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46394 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731389AbhALVoN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 16:44:13 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEA2C061389
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:08 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id o23so2455515pji.9
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 13:43:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:in-reply-to:message-id:mime-version:references:subject
-         :from:to:cc;
-        bh=UHsuR0nT6WMKQM9ik4lrOBWRDrvI9ZwQXAwKkOZ8kqc=;
-        b=BMYO4dcCRRU3SxaNie389dAXHwFZMZzJc/V1PZFvn3DdeB5RRUVrRXfTnE0KtKsnMw
-         KHVJBXK+GaDN+AkXKvYmBbzBm+nPIpDNyF50MB1nbN5J6IvAakiMimZYQti3qtsfhbLt
-         xCos/m9DFAZlaxd3vPnXYwQI88tGXzM6UCGyY58vOSQGw1Eaq1BWU5uV5BapJ84jdB9p
-         8PSuQvv+PLt1RruS1eTgUefWNpfbb+UvBovVB5zNfxqRb04JTX6vuaQ2x9XxFaG+p6Cz
-         TMtWtZv5TuoitvOeUkLEMcBmijEiCmffLNtPbLbFNvelxBwETuYq8NVT90w1p+SCVMDw
-         loQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=UHsuR0nT6WMKQM9ik4lrOBWRDrvI9ZwQXAwKkOZ8kqc=;
-        b=WKSdAodrgawbYaPQv6ZsRYGnY5jdSwcu6vlNvLw3zHgrjiQNyZSwOwKDUpJJU4Xy5p
-         NpgMHhHKSpUzoiI+eqf1Ddh6/Zh5MmDvWwfOOG0WJo7AYiVEeEais7QzJr/hQ5eYVftW
-         TJPF1Oqez9Auj04Wj2gs6Wbm6eAX+49TxvkNNRwGpB4AOgQNdTA5G7krnyXZLLXlR+Sr
-         J7iK3s94EZq8Ckc3AbRLe0pSfPF1OXJB0TRyUmgE2XbYZbMlYXU/YEMp0qA+oRodJAyD
-         VdFsGazMzqjRGIIAuXn/7LrEoV+75d9z+Hs44S7NFszxn2NyZcoG1KKO/O39gBjjR3qF
-         SZyg==
-X-Gm-Message-State: AOAM532bM2Brt9+hTbxclOszGnSUfZllro8y5z7elzBQr9Dr7nsGw9+u
-        kXDK55lHLao5JZ+wN5WqD2LtNoekLqAP
-X-Google-Smtp-Source: ABdhPJywxoluJaA07dfgiDeqhNcKe09bdzGRc1m/DJsxyWyap1Jl2Jmji+KUelZUFdVMmbXgh8xiY601jFYH
-Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
-X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a17:903:22c9:b029:dc:9b7f:bd13 with SMTP
- id y9-20020a17090322c9b02900dc9b7fbd13mr1337579plg.67.1610487788350; Tue, 12
- Jan 2021 13:43:08 -0800 (PST)
-Date:   Tue, 12 Jan 2021 13:42:53 -0800
-In-Reply-To: <20210112214253.463999-1-bgardon@google.com>
-Message-Id: <20210112214253.463999-7-bgardon@google.com>
-Mime-Version: 1.0
-References: <20210112214253.463999-1-bgardon@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 6/6] KVM: selftests: Add memslot modification stress test
-From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Thomas Huth <thuth@redhat.com>, Jacob Xu <jacobhxu@google.com>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S2393402AbhALVoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 16:44:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42181 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393408AbhALVoc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 16:44:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610487786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jHOTLuvOelFAWd5ADGi2rVRtP5HMnmatf+qZhnhdrxI=;
+        b=X+Lk15iJe7X2vLeey5ArsBQjees9wHHHcRMPVT5y9oJTJfXHEpZy9/Wbo6VJhO6V1PyWgb
+        XkVIpIlnqAFRLHUieOiMXSU+eIoYbOx7eetAnZlqZAYlRkIipn9r2rX96yqj3JPsUJcmT7
+        nTlcRoK2Lr7oboLzxzjx1X6M2P9F6fY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-bnbQ_frtMou42Tv-VP5RnA-1; Tue, 12 Jan 2021 16:43:04 -0500
+X-MC-Unique: bnbQ_frtMou42Tv-VP5RnA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B97ED1007463;
+        Tue, 12 Jan 2021 21:43:02 +0000 (UTC)
+Received: from [10.10.115.107] (ovpn-115-107.rdu2.redhat.com [10.10.115.107])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 083306F96B;
+        Tue, 12 Jan 2021 21:43:01 +0000 (UTC)
+Subject: Re: [PATCH] Revert "KVM: x86: Unconditionally enable irqs in guest
+ context"
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        w90p710@gmail.com, pbonzini@redhat.com,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <20210105192844.296277-1-nitesh@redhat.com>
+ <874kjuidgp.fsf@vitty.brq.redhat.com> <X/XvWG18aBWocvvf@google.com>
+ <87ble1gkgx.fsf@vitty.brq.redhat.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Organization: Red Hat Inc,
+Message-ID: <fb41e24f-a5e3-8319-d25b-e0fe6b902a2b@redhat.com>
+Date:   Tue, 12 Jan 2021 16:43:01 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
+MIME-Version: 1.0
+In-Reply-To: <87ble1gkgx.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a memslot modification stress test in which a memslot is repeatedly
-created and removed while vCPUs access memory in another memslot. Most
-userspaces do not create or remove memslots on running VMs which makes
-it hard to test races in adding and removing memslots without a
-dedicated test. Adding and removing a memslot also has the effect of
-tearing down the entire paging structure, which leads to more page
-faults and pressure on the page fault handling path than a one-and-done
-memory population test.
 
-Reviewed-by: Jacob Xu <jacobhxu@google.com>
+On 1/7/21 4:33 AM, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+>
+>> On Wed, Jan 06, 2021, Vitaly Kuznetsov wrote:
+>>> Looking back, I don't quite understand why we wanted to account ticks
+>>> between vmexit and exiting guest context as 'guest' in the first place;
+>>> to my understanging 'guest time' is time spent within VMX non-root
+>>> operation, the rest is KVM overhead (system).
+>> With tick-based accounting, if the tick IRQ is received after PF_VCPU is cleared
+>> then that tick will be accounted to the host/system.  The motivation for opening
+>> an IRQ window after VM-Exit is to handle the case where the guest is constantly
+>> exiting for a different reason _just_ before the tick arrives, e.g. if the guest
+>> has its tick configured such that the guest and host ticks get synchronized
+>> in a bad way.
+>>
+>> This is a non-issue when using CONFIG_VIRT_CPU_ACCOUNTING_GEN=y, at least with a
+>> stable TSC, as the accounting happens during guest_exit_irqoff() itself.
+>> Accounting might be less-than-stellar if TSC is unstable, but I don't think it
+>> would be as binary of a failure as tick-based accounting.
+>>
+> Oh, yea, I vaguely remember we had to deal with a very similar problem
+> but for userspace/kernel accounting. It was possible to observe e.g. a
+> userspace task going 100% kernel while in reality it was just perfectly
+> synchronized with the tick and doing a syscall just before it arrives
+> (or something like that, I may be misremembering the details).
+>
+> So depending on the frequency, it is probably possible to e.g observe
+> '100% host' with tick based accounting, the guest just has to
+> synchronize exiting to KVM in a way that the tick will always arrive
+> past guest_exit_irqoff().
+>
+> It seems to me this is a fundamental problem in case the frequency of
+> guest exits can match the frequency of the time accounting tick.
+>
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/memslot_modification_stress_test.c    | 211 ++++++++++++++++++
- 3 files changed, 213 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/memslot_modification_stress_test.c
+Just to make sure that I am understanding things correctly.
+There are two issues:
+1. The first issue is with the tick IRQs that arrive after PF_VCPU is
+   cleared as they are then accounted into the system context atleast on
+   the setup where CONFIG_VIRT_CPU_ACCOUNTING_GEN is not enabled. With the
+   patch "KVM: x86: Unconditionally enable irqs in guest context", we are
+   atleast taking care of the scenario where the guest context is exiting
+   constantly just before the arrival of the tick.
+ 
+2. The second issue that Sean mentioned was introduced because of moving
+   guest_exit_irqoff() closer to VM-exit. Due to this change, any ticks that
+   happen after IRQs are disabled are incorrectly accounted into the system
+   context. This is because we exit the guest context early without
+   ensuring if the required guest states to handle IRQs are restored.
+ 
+So, the increase in the system time (reported by cpuacct.stats) that I was
+observing is not entirely correct after all.
+Am I missing anything here?
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index ce8f4ad39684..5a9aebfd5e01 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -29,5 +29,6 @@
- /dirty_log_test
- /dirty_log_perf_test
- /kvm_create_max_vcpus
-+/memslot_modification_stress_test
- /set_memory_region_test
- /steal_time
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index fe41c6a0fa67..df208dc4f2ed 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -63,6 +63,7 @@ TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
-+TEST_GEN_PROGS_x86_64 += memslot_modification_stress_test
- TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- 
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-new file mode 100644
-index 000000000000..cae1b90cb63f
---- /dev/null
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -0,0 +1,211 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KVM memslot modification stress test
-+ * Adapted from demand_paging_test.c
-+ *
-+ * Copyright (C) 2018, Red Hat, Inc.
-+ * Copyright (C) 2020, Google, Inc.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_name */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <sys/syscall.h>
-+#include <unistd.h>
-+#include <asm/unistd.h>
-+#include <time.h>
-+#include <poll.h>
-+#include <pthread.h>
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
-+#include <linux/userfaultfd.h>
-+
-+#include "perf_test_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "guest_modes.h"
-+
-+#define DUMMY_MEMSLOT_INDEX 7
-+
-+#define DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS 10
-+
-+
-+static int nr_vcpus = 1;
-+static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
-+
-+static bool run_vcpus = true;
-+
-+static void *vcpu_worker(void *data)
-+{
-+	int ret;
-+	struct perf_test_vcpu_args *vcpu_args =
-+		(struct perf_test_vcpu_args *)data;
-+	int vcpu_id = vcpu_args->vcpu_id;
-+	struct kvm_vm *vm = perf_test_args.vm;
-+	struct kvm_run *run;
-+
-+	vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
-+	run = vcpu_state(vm, vcpu_id);
-+
-+	/* Let the guest access its memory until a stop signal is received */
-+	while (READ_ONCE(run_vcpus)) {
-+		ret = _vcpu_run(vm, vcpu_id);
-+		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+
-+		if (get_ucall(vm, vcpu_id, NULL) == UCALL_SYNC)
-+			continue;
-+
-+		TEST_ASSERT(false,
-+			    "Invalid guest sync status: exit_reason=%s\n",
-+			    exit_reason_str(run->exit_reason));
-+	}
-+
-+	return NULL;
-+}
-+
-+struct memslot_antagonist_args {
-+	struct kvm_vm *vm;
-+	useconds_t delay;
-+	uint64_t nr_modifications;
-+};
-+
-+static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
-+			      uint64_t nr_modifications, uint64_t gpa)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_modifications; i++) {
-+		usleep(delay);
-+		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, gpa,
-+					    DUMMY_MEMSLOT_INDEX, 1, 0);
-+
-+		vm_mem_region_delete(vm, DUMMY_MEMSLOT_INDEX);
-+	}
-+}
-+
-+struct test_params {
-+	useconds_t memslot_modification_delay;
-+	uint64_t nr_memslot_modifications;
-+	bool partition_vcpu_memory_access;
-+};
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *p = arg;
-+	pthread_t *vcpu_threads;
-+	struct kvm_vm *vm;
-+	int vcpu_id;
-+
-+	vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size);
-+
-+	perf_test_args.wr_fract = 1;
-+
-+	vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
-+	TEST_ASSERT(vcpu_threads, "Memory allocation failed");
-+
-+	perf_test_setup_vcpus(vm, nr_vcpus, guest_percpu_mem_size,
-+			      p->partition_vcpu_memory_access);
-+
-+	/* Export the shared variables to the guest */
-+	sync_global_to_guest(vm, perf_test_args);
-+
-+	pr_info("Finished creating vCPUs\n");
-+
-+	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
-+		pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
-+			       &perf_test_args.vcpu_args[vcpu_id]);
-+
-+	pr_info("Started all vCPUs\n");
-+
-+	add_remove_memslot(vm, p->memslot_modification_delay,
-+			   p->nr_memslot_modifications,
-+			   guest_test_phys_mem +
-+			   (guest_percpu_mem_size * nr_vcpus) +
-+			   perf_test_args.host_page_size +
-+			   perf_test_args.guest_page_size);
-+
-+	run_vcpus = false;
-+
-+	/* Wait for the vcpu threads to quit */
-+	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
-+		pthread_join(vcpu_threads[vcpu_id], NULL);
-+
-+	pr_info("All vCPU threads joined\n");
-+
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
-+
-+	free(vcpu_threads);
-+}
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-m mode] [-d delay_usec]\n"
-+	       "          [-b memory] [-v vcpus] [-o] [-i iterations]\n", name);
-+	guest_modes_help();
-+	printf(" -d: add a delay between each iteration of adding and\n"
-+	       "     deleting a memslot in usec.\n");
-+	printf(" -b: specify the size of the memory region which should be\n"
-+	       "     accessed by each vCPU. e.g. 10M or 3G.\n"
-+	       "     Default: 1G\n");
-+	printf(" -v: specify the number of vCPUs to run.\n");
-+	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
-+	       "     them into a separate region of memory for each vCPU.\n");
-+	printf(" -i: specify the number of iterations of adding and removing\n"
-+	       "     a memslot.\n"
-+	       "     Default: %d\n", DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS);
-+	puts("");
-+	exit(0);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
-+	int opt;
-+	struct test_params p = {
-+		.memslot_modification_delay = 0,
-+		.nr_memslot_modifications =
-+			DEFAULT_MEMSLOT_MODIFICATION_ITERATIONS,
-+		.partition_vcpu_memory_access = true
-+	};
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "hm:d:b:v:oi:")) != -1) {
-+		switch (opt) {
-+		case 'm':
-+			guest_modes_cmdline(optarg);
-+			break;
-+		case 'd':
-+			p.memslot_modification_delay = strtoul(optarg, NULL, 0);
-+			TEST_ASSERT(p.memslot_modification_delay >= 0,
-+				    "A negative delay is not supported.");
-+			break;
-+		case 'b':
-+			guest_percpu_mem_size = parse_size(optarg);
-+			break;
-+		case 'v':
-+			nr_vcpus = atoi(optarg);
-+			TEST_ASSERT(nr_vcpus > 0 && nr_vcpus <= max_vcpus,
-+				    "Invalid number of vcpus, must be between 1 and %d",
-+				    max_vcpus);
-+			break;
-+		case 'o':
-+			p.partition_vcpu_memory_access = false;
-+			break;
-+		case 'i':
-+			p.nr_memslot_modifications = atoi(optarg);
-+			break;
-+		case 'h':
-+		default:
-+			help(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	for_each_guest_mode(run_test, &p);
-+
-+	return 0;
-+}
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
+--
+Thanks
+Nitesh
 
