@@ -2,73 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F5352F2665
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:53:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 582B82F266F
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:58:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730914AbhALCsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 21:48:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27222 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726018AbhALCsX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 21:48:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610419617;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Nd9vrsLoQ4eNomWd4y4aPcW+GO4/2gg4PZxpPi0r3GU=;
-        b=U06+F5sJ+tXkb03krdulczKhOpuxD+zn1EiLapz++a2yn0mICbuJwKvnIhdzT8qOhLrORr
-        EJerUc8NQHH5/nsg6RsF+n6Vj3jm752cyXjMjQDqy15SZSUmuxk+DF8P79V612x/WveNEN
-        2WaMaR1AhT+syIDeQ1lM51gmNndNrwc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-FNMRMh49NGeqp52gcwiGEw-1; Mon, 11 Jan 2021 21:46:55 -0500
-X-MC-Unique: FNMRMh49NGeqp52gcwiGEw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B14F107ACF8;
-        Tue, 12 Jan 2021 02:46:54 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-12-95.pek2.redhat.com [10.72.12.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F71A5B693;
-        Tue, 12 Jan 2021 02:46:51 +0000 (UTC)
-From:   Cindy Lu <lulu@redhat.com>
-To:     lulu@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        lingshan.zhu@intel.com
-Subject: [PATCH v1] vhost_vdpa: fix the problem in vhost_vdpa_set_config_call
-Date:   Tue, 12 Jan 2021 10:46:48 +0800
-Message-Id: <20210112024648.31428-1-lulu@redhat.com>
+        id S1732488AbhALCyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 21:54:21 -0500
+Received: from mga04.intel.com ([192.55.52.120]:58725 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728830AbhALCyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 21:54:21 -0500
+IronPort-SDR: 4opLHpNOh0jRWf611QCsbm8aP1E0kBfwsFEzxolLqEi3WsgNjRl3jk8EOGdamQwPtbJTjO2luN
+ cqXLsE7EC9vQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="175392299"
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="175392299"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:52:35 -0800
+IronPort-SDR: AnDGpi7IZBTKrjNs84H2+rdVKVqrWnTGTGy9pIqS4NklnD9HFHM+3ExZLRM/YRbPEqoDxygMQi
+ 8RfV9BxQ4/GQ==
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="381250515"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.130.147]) ([10.238.130.147])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:52:31 -0800
+Subject: Re: [PATCH v3 10/21] x86/fpu/xstate: Update xstate save function to
+ support dynamic xstate
+To:     "Bae, Chang Seok" <chang.seok.bae@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>
+Cc:     "bp@suse.de" <bp@suse.de>, "luto@kernel.org" <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@kernel.org" <mingo@kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <20201223155717.19556-1-chang.seok.bae@intel.com>
+ <20201223155717.19556-11-chang.seok.bae@intel.com>
+ <BYAPR11MB3256BBBB24F9131D99CF7EF5A9AF0@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <29CB32F5-1E73-46D4-BF92-18AD05F53E8E@intel.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <0361132a-c088-331b-de1f-e0de23d729ab@linux.intel.com>
+Date:   Tue, 12 Jan 2021 10:52:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <29CB32F5-1E73-46D4-BF92-18AD05F53E8E@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-in vhost_vdpa_set_config_call, the cb.private should be vhost_vdpa.
-this cb.private will finally use in vhost_vdpa_config_cb as
-vhost_vdpa.Fix this issue
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/vhost/vdpa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 1/8/2021 2:40 AM, Bae, Chang Seok wrote:
+>> On Jan 7, 2021, at 17:41, Liu, Jing2 <jing2.liu@intel.com> wrote:
+>>
+>> static void kvm_save_current_fpu(struct fpu *fpu)  {
+>> +	struct fpu *src_fpu = &current->thread.fpu;
+>> +
+>> 	/*
+>> 	 * If the target FPU state is not resident in the CPU registers, just
+>> 	 * memcpy() from current, else save CPU state directly to the target.
+>> 	 */
+>> -	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+>> -		memcpy(&fpu->state, &current->thread.fpu.state,
+>> +	if (test_thread_flag(TIF_NEED_FPU_LOAD)) {
+>> +		memcpy(&fpu->state, &src_fpu->state,
+>> 		       fpu_kernel_xstate_min_size);
+>> For kvm, if we assume that it does not support dynamic features until this series,
+>> memcpy for only fpu->state is correct.
+>> I think this kind of assumption is reasonable and we only make original xstate work.
+>>
+>> -	else
+>> +	} else {
+>> +		if (fpu->state_mask != src_fpu->state_mask)
+>> +			fpu->state_mask = src_fpu->state_mask;
+>>
+>> Though dynamic feature is not supported in kvm now, this function still need
+>> consider more things for fpu->state_mask.
+> Can you elaborate this? Which path might be affected by fpu->state_mask
+> without dynamic state supported in KVM?
+>
+>> I suggest that we can set it before if...else (for both cases) and not change other.
+> I tried a minimum change here.  The fpu->state_mask value does not impact the
+> memcpy(). So, why do we need to change it for both?
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index ef688c8c0e0e..3fbb9c1f49da 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -319,7 +319,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
- 	struct eventfd_ctx *ctx;
- 
- 	cb.callback = vhost_vdpa_config_cb;
--	cb.private = v->vdpa;
-+	cb.private = v;
- 	if (copy_from_user(&fd, argp, sizeof(fd)))
- 		return  -EFAULT;
- 
--- 
-2.21.3
+Sure, what I'm considering is that "mask" is the first time introduced 
+into "fpu",
 
+representing the usage, so not only set it when needed, but also make it 
+as a
+
+representation, in case of anywhere using it (especially between the 
+interval
+
+of this series and kvm series in future).
+
+Thanks,
+
+Jing
+
+> Thanks,
+> Chang
