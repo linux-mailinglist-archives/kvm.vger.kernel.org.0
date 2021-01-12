@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2C002F3AD6
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA8A2F3AD7
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 20:47:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406787AbhALTnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 14:43:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
+        id S2436552AbhALTnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 14:43:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406619AbhALTnA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S2406776AbhALTnA (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 12 Jan 2021 14:43:00 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582D8C0617A2
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:56 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id y23so3237084wmi.1
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:56 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293B8C0617A3
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:59 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 3so3228658wmg.4
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 11:41:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=9oioH7fTimHXbwiOIluI6SOkD883+857JncYScStEP4=;
-        b=JmO6IQKgjQY+7ho4ih3Bdmj0eRPnup/UlujCGZhO4AJhanp3QH0J71/SQjiI8RlftE
-         LxVkn1U86G3tkyTL1V1ekzv7AG4aQUuBC1r0RvRBoERwudQRkTXIem4aavnr56WrANo8
-         gOtBpR9pRxwKu1xDJhfk/82GSYbgzv2ibgNt5w0f4THTbGm6h2zSgqNsqz15NEjpA55j
-         jhso19OBmu3jzIh6d8tb1TXJSzru4eS/fD3T3nWv1umUB8RNCOvvnnPdOKeCNLkCN3mh
-         BIGrXTEThybGX1OaJSNIbNpsSW/dNQUVwxByoyviBmYkIkBVcUXJ03lrcjitMvDn4T//
-         igkw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=+hdtHCSFxGXzmG9zcdLMtsA9CM+yy9a1rXrTwefd0k4=;
+        b=uDUgsIFWkCAbgZpUVsXjZnHVBtT5AU2g2Tu3bHmPpimoSMu5Pt0D9DUupyK66NiDmr
+         SFEsFzaU9DeZGgsQNEmiMdYaft+Prt2oiSZp3IwXkNZcxt/HhMRiefuYPbdbHk207Kqk
+         Ox0YHcUONluOucMlOfT29PUY08TWwE4IG1a6SaLfcUzRQriJ5ZteB9zJYi6UG87ywCfN
+         JJHQnkpHwdqQk0KZ4i9o+jUIFEziT+WLlSsXAP0tJN8Igphnx/Aqlr/nyFJ/mvZPN5MB
+         EXwGgSs6GpQKpUPrMqOtt2NwAzA19W1ixaml8FgEQbVfWvbklv/rk1W2DIbuFaxQ7f41
+         yRmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=9oioH7fTimHXbwiOIluI6SOkD883+857JncYScStEP4=;
-        b=rLxWvbhmCW6fzosECY/I3yKCnfPVHF7XdpPlMR/7I7Q5Z8zWUeEZcGjkRsTY+X3Zc9
-         a06QrTb3DAE6viIcu+jtYdkC00RMayqpsvICoKwv2kc7cFWN1aFa5oPqeumyJ0iqEpp5
-         ONYMiR30/jmaWXQ7DWMlYw/4q1/8eqdLNzwDTYoQp7JmROKF95fxn4sqQ3Scd2WobP4c
-         BpP3gmTtgKj1bOnJ0Yu4zJOIhx1QWnGw2OCb/YnggraHBOeiMwlU4ynaTfud4trxbhBs
-         PHQaXocJtweqYYrEXu0vrVnk00I6j/KO/De/catdnXKg1W8hiLyQUspJUsbAFX6cvqQe
-         7GLA==
-X-Gm-Message-State: AOAM533/NEvsQjeJZ82Ln6CzozEwrFCtLuLutmNw6fAlkvmDbSHiOkSg
-        Ov4sjMfF1ALndslgQUaumFpMIg==
-X-Google-Smtp-Source: ABdhPJxLSdWWpfIxaQGNHeFfQoIuyfHcKNbVYBL99mebz4m6+1+6/6514Is75EyggDSS6XrPJMXKGw==
-X-Received: by 2002:a1c:b742:: with SMTP id h63mr780567wmf.122.1610480514861;
-        Tue, 12 Jan 2021 11:41:54 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=+hdtHCSFxGXzmG9zcdLMtsA9CM+yy9a1rXrTwefd0k4=;
+        b=r6rh2FZCNzEb7hwqDri03t3zyt1Xmp0DYuylFMfqfYZhbz1FIvMPmBcAwNAIPANuXc
+         R7ceTErg/ObvEaFr0INqKE9wqwIGxf2W5Q0vLGuKtPiQCSzhGstO6Z3iH5HRX0NAEtq0
+         SqxHV6U1/TJR4TE9idpRqxzuHWPGVfm70wTjXyCmMOjWxHkylAr8IVyCXObER8gpUlAU
+         OyOsDi7o4oQgk5MsOAoYjx4xto3S2BXhx3ZKpusD+7Xw+En20lHnjvxF0IlezbgMVCOo
+         bHcFbzvZquWKFbf3v6/iz7apf4uofDGeztT/aT2a8xgtAu+CCrog8LetVg96T4tgotW2
+         xJCg==
+X-Gm-Message-State: AOAM532BGC3B0HW2XLxMLAg314maJeUdta9cjHMMEmemQZArF8RXlnVP
+        i1zpIEGxi09WjfWHbGtIgWzqAQ==
+X-Google-Smtp-Source: ABdhPJx/0woun/MhI7lJlAwq65ikInzHiKo9rw3lXUFvfj5s5Qs3xrAuB3tgEtBp9fISRu7oCo34FA==
+X-Received: by 2002:a05:600c:2255:: with SMTP id a21mr809749wmm.122.1610480517946;
+        Tue, 12 Jan 2021 11:41:57 -0800 (PST)
 Received: from f2.redhat.com (bzq-79-183-72-147.red.bezeqint.net. [79.183.72.147])
-        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.41.51
+        by smtp.gmail.com with ESMTPSA id z63sm4885315wme.8.2021.01.12.11.41.54
         (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 12 Jan 2021 11:41:54 -0800 (PST)
+        Tue, 12 Jan 2021 11:41:57 -0800 (PST)
 From:   Yuri Benditovich <yuri.benditovich@daynix.com>
 To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         jasowang@redhat.com, ast@kernel.org, daniel@iogearbox.net,
@@ -58,53 +59,48 @@ To:     davem@davemloft.net, kuba@kernel.org, mst@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
 Cc:     yan@daynix.com
-Subject: [RFC PATCH 0/7] Support for virtio-net hash reporting
-Date:   Tue, 12 Jan 2021 21:41:36 +0200
-Message-Id: <20210112194143.1494-1-yuri.benditovich@daynix.com>
+Subject: [RFC PATCH 1/7] skbuff: define field for hash report type
+Date:   Tue, 12 Jan 2021 21:41:37 +0200
+Message-Id: <20210112194143.1494-2-yuri.benditovich@daynix.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210112194143.1494-1-yuri.benditovich@daynix.com>
+References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Existing TUN module is able to use provided "steering eBPF" to
-calculate per-packet hash and derive the destination queue to
-place the packet to. The eBPF uses mapped configuration data
-containing a key for hash calculation and indirection table
-with array of queues' indices.
+Used by virtio-net receive side scaling
 
-This series of patches adds support for virtio-net hash reporting
-feature as defined in virtio specification. It extends the TUN module
-and the "steering eBPF" as follows:
+Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+---
+ include/linux/skbuff.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Extended steering eBPF calculates the hash value and hash type, keeps
-hash value in the skb->hash and returns index of destination virtqueue
-and the type of the hash. TUN module keeps returned hash type in
-(currently unused) field of the skb. 
-skb->__unused renamed to 'hash_report_type'.
-
-When TUN module is called later to allocate and fill the virtio-net
-header and push it to destination virtqueue it populates the hash
-and the hash type into virtio-net header.
-
-VHOST driver is made aware of respective virtio-net feature that
-extends the virtio-net header to report the hash value and hash report
-type.
-
-Yuri Benditovich (7):
-  skbuff: define field for hash report type
-  vhost: support for hash report virtio-net feature
-  tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
-  tun: free bpf_program by bpf_prog_put instead of bpf_prog_destroy
-  tun: add ioctl code TUNSETHASHPOPULATION
-  tun: populate hash in virtio-net header when needed
-  tun: report new tun feature IFF_HASH
-
- drivers/net/tun.c           | 43 +++++++++++++++++++++++++++++++------
- drivers/vhost/net.c         | 37 ++++++++++++++++++++++++-------
- include/linux/skbuff.h      |  7 +++++-
- include/uapi/linux/if_tun.h |  2 ++
- 4 files changed, 74 insertions(+), 15 deletions(-)
-
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 416bf95cd5f2..36cf40ec0259 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -510,7 +510,7 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
+  * the end of the header data, ie. at skb->end.
+  */
+ struct skb_shared_info {
+-	__u8		__unused;
++	__u8		hash_report_type; /* virtio-net rss */
+ 	__u8		meta_len;
+ 	__u8		nr_frags;
+ 	__u8		tx_flags;
+@@ -1430,6 +1430,11 @@ static inline struct skb_shared_hwtstamps *skb_hwtstamps(struct sk_buff *skb)
+ 	return &skb_shinfo(skb)->hwtstamps;
+ }
+ 
++static inline __u8 *skb_hash_report_type(struct sk_buff *skb)
++{
++	return &skb_shinfo(skb)->hash_report_type;
++}
++
+ static inline struct ubuf_info *skb_zcopy(struct sk_buff *skb)
+ {
+ 	bool is_zcopy = skb && skb_shinfo(skb)->tx_flags & SKBTX_DEV_ZEROCOPY;
 -- 
 2.17.1
 
