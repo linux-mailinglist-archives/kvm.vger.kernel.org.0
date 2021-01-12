@@ -2,109 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BA072F2642
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:27:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F5352F2665
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 03:53:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728521AbhALCZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 21:25:25 -0500
-Received: from mga07.intel.com ([134.134.136.100]:3978 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726645AbhALCZZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 21:25:25 -0500
-IronPort-SDR: HBvjqQw+qmT8B2VPezNAmfGXZJP8VMTFx3jayVp762W55HauBFPYis8GmzcJI+2t+03Fafthla
- RxhHwf+RlPhA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="242040056"
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="242040056"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 18:24:44 -0800
-IronPort-SDR: nL9ruWuxWD/nCSoKNLHntIVgvGs+7b30LkClJCvHR6ZkTXHJz13vYx27RQZ0c2k9D+YvWkrFH0
- DQVKUMA3cIXA==
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="381240943"
-Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.144.101])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 11 Jan 2021 18:24:40 -0800
-Date:   Tue, 12 Jan 2021 10:13:21 +0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, tony.luck@intel.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, kyung.min.park@intel.com, x86@kernel.org,
-        yang.zhong@intel.com
-Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
-Message-ID: <20210112021321.GA9922@yangzhon-Virtual>
-References: <20210105004909.42000-1-yang.zhong@intel.com>
- <20210105004909.42000-2-yang.zhong@intel.com>
- <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
- <20210105121456.GE28649@zn.tnic>
+        id S1730914AbhALCsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 21:48:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27222 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726018AbhALCsX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 21:48:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610419617;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Nd9vrsLoQ4eNomWd4y4aPcW+GO4/2gg4PZxpPi0r3GU=;
+        b=U06+F5sJ+tXkb03krdulczKhOpuxD+zn1EiLapz++a2yn0mICbuJwKvnIhdzT8qOhLrORr
+        EJerUc8NQHH5/nsg6RsF+n6Vj3jm752cyXjMjQDqy15SZSUmuxk+DF8P79V612x/WveNEN
+        2WaMaR1AhT+syIDeQ1lM51gmNndNrwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-360-FNMRMh49NGeqp52gcwiGEw-1; Mon, 11 Jan 2021 21:46:55 -0500
+X-MC-Unique: FNMRMh49NGeqp52gcwiGEw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B14F107ACF8;
+        Tue, 12 Jan 2021 02:46:54 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-12-95.pek2.redhat.com [10.72.12.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F71A5B693;
+        Tue, 12 Jan 2021 02:46:51 +0000 (UTC)
+From:   Cindy Lu <lulu@redhat.com>
+To:     lulu@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        lingshan.zhu@intel.com
+Subject: [PATCH v1] vhost_vdpa: fix the problem in vhost_vdpa_set_config_call
+Date:   Tue, 12 Jan 2021 10:46:48 +0800
+Message-Id: <20210112024648.31428-1-lulu@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210105121456.GE28649@zn.tnic>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 05, 2021 at 01:14:56PM +0100, Borislav Petkov wrote:
-> On Tue, Jan 05, 2021 at 12:47:23PM +0100, Paolo Bonzini wrote:
-> > On 05/01/21 01:49, Yang Zhong wrote:
-> > > From: Kyung Min Park <kyung.min.park@intel.com>
-> > > 
-> > > Add AVX version of the Vector Neural Network (VNNI) Instructions.
-> > > 
-> > > A processor supports AVX VNNI instructions if CPUID.0x07.0x1:EAX[4] is
-> > > present. The following instructions are available when this feature is
-> > > present.
-> > >    1. VPDPBUS: Multiply and Add Unsigned and Signed Bytes
-> > >    2. VPDPBUSDS: Multiply and Add Unsigned and Signed Bytes with Saturation
-> > >    3. VPDPWSSD: Multiply and Add Signed Word Integers
-> > >    4. VPDPWSSDS: Multiply and Add Signed Integers with Saturation
-> > > 
-> > > The only in-kernel usage of this is kvm passthrough. The CPU feature
-> > > flag is shown as "avx_vnni" in /proc/cpuinfo.
-> > > 
-> > > This instruction is currently documented in the latest "extensions"
-> > > manual (ISE). It will appear in the "main" manual (SDM) in the future.
-> > > 
-> > > Signed-off-by: Kyung Min Park <kyung.min.park@intel.com>
-> > > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > > Reviewed-by: Tony Luck <tony.luck@intel.com>
-> > > ---
-> > >   arch/x86/include/asm/cpufeatures.h | 1 +
-> > >   1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> > > index f5ef2d5b9231..d10d9962bd9b 100644
-> > > --- a/arch/x86/include/asm/cpufeatures.h
-> > > +++ b/arch/x86/include/asm/cpufeatures.h
-> > > @@ -293,6 +293,7 @@
-> > >   #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
-> > >   /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
-> > > +#define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
-> > >   #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
-> > >   /* AMD-defined CPU features, CPUID level 0x80000008 (EBX), word 13 */
-> > > 
-> > 
-> > Boris, is it possible to have a topic branch for this patch?
-> 
-> Just take it through your tree pls.
-> 
-> Acked-by: Borislav Petkov <bp@suse.de>
->
-  
-  Paolo, Boris has acked this kernel patch, and if i need send new patchset to add this 
-  acked-by info ? or kvm tree will directly pull this patchset? thanks.
+in vhost_vdpa_set_config_call, the cb.private should be vhost_vdpa.
+this cb.private will finally use in vhost_vdpa_config_cb as
+vhost_vdpa.Fix this issue
 
-  Yang  
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/vhost/vdpa.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-   
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index ef688c8c0e0e..3fbb9c1f49da 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -319,7 +319,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
+ 	struct eventfd_ctx *ctx;
+ 
+ 	cb.callback = vhost_vdpa_config_cb;
+-	cb.private = v->vdpa;
++	cb.private = v;
+ 	if (copy_from_user(&fd, argp, sizeof(fd)))
+ 		return  -EFAULT;
+ 
+-- 
+2.21.3
+
