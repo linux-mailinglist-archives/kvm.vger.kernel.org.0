@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E89702F380B
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:14:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E43642F37FC
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 19:11:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388490AbhALSL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2390897AbhALSL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 12 Jan 2021 13:11:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56648 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726091AbhALSL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 13:11:26 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15FCDC061786
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:10:46 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id 1so2138419pgu.17
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:10:46 -0800 (PST)
+        with ESMTP id S1728965AbhALSL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 13:11:28 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301E7C061795
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:10:48 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id a206so3309450ybg.0
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 10:10:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=fnzL0jDAo9xIfWQHPhjTRvzsU8/hpdoL+ymw2yPPaR8=;
-        b=bqh/tCOplimzhw8TJ/Fx5s21Ja85FXBo8arh+ndM+lpHS+EJqewnynGxBMBabsKe6Y
-         4EkJd/rR++NPUXHuDM8q6sVB7GoNERQ4XLPc90D/kLMCnqKPa6UNr5QFVPg8xMBDg/lt
-         ncSAj9qRn4ANhmZ9y2LyOcqxg1KY6Lg3ec3whFr9zuYwlOF7PgFcBkgcyF9Lh1qmi7Ph
-         dKcMrkVm5EdCA8oGV3WsDCaEgZ/SpUlH3We7Hc+/5qhQYpccgdkxuT42jInXXyaHLM5F
-         BWpHN1LQ4Fkbv63GwcnRzTMd1DBHTvIpoKUmZRu+NZIdLw7HDvghPTTkc6wSZh0EFEbp
-         yJxg==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=AT/HhadsSLkfqA9qLz1yJR5FuwQcmEn0C1RS62FkcL4=;
+        b=J6taq1Sz6FYVlN36xTqjFZYm8ABILYWAdx6QW+/38pCGCrYz20tUALul8pbOd9n36p
+         LAOV3mpAkpmjGyhiZig7aW8hNRawkHmK78ZQxEatXnkFkA59sK1ah8WRiI+dJ3P8va9y
+         LqRm6XmejkwIBKKJGlgFOAmnk1DqT/Dj73QmwBhl+XP0LiVRNBMs2pIX1hkhhi0Dxrpi
+         pY2hscWTsqiGjTw41xoT9pvLdA1r5hw8EgvHsr+CMiwA6qo1Z4hUivfPMtFF0qHyoUp3
+         tg+bdoqELmVaGx5N3TAgK7yTtBpTAd1SR1NMYn4jglYeSZtGRZ3ZkPTSMsGIzYdEUYK1
+         PnuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=fnzL0jDAo9xIfWQHPhjTRvzsU8/hpdoL+ymw2yPPaR8=;
-        b=J8tcScoM/dBYzjXK+LifG9XKOc3xi/hSQOSliyhK4LGgpEEU17AqcYWQiPNHvXEG61
-         +C5WS3LFkA/vycYM8EPAMBahodhht0COd0PW+q1sogRNvO04OiIiFto1ZZzGCCgdvFjV
-         hB0Oi/2F7aWW9cvMa/BdlqGWNozH9ey15aN2mUcY0SG639VJAPZrQNnt5JxChP91cbtI
-         l7JS+cxiZr0GrL/aFrY6/7vHjqWO91t/l4KqfuGh3C13lYK2NbGacpVmQ4R7zQWxaX9m
-         R2XTP1yIqGxtERPZ4ce8SobGr5Uqnyr5+tzPa4QXibUZqDBvukuV/N3wGmeTZNCBdIk0
-         ouqA==
-X-Gm-Message-State: AOAM532WjR7cpQlkfu9+AAuPvLRiRkhHRJDKjw0zGpjJlqfWOJvrX/Tf
-        l4zsw73LjF+2rrAj7aWEqY1g8AtCHnhE
-X-Google-Smtp-Source: ABdhPJwEwgh4q6rWDhbMv93t+vDodjDTTzM72nf4MGU5I/ay3h4PAvJKiXoGPcBhiCK05TLEdRtqvwbl4qkv
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=AT/HhadsSLkfqA9qLz1yJR5FuwQcmEn0C1RS62FkcL4=;
+        b=O2bx6RLNsuX6AwavRozUc4bycSqUUmLTXkFpq8NgBRB01Exqp6YLMlqGDpSXS53TDw
+         DWRA/wH8Y0PTqYzIsdMt47xpV7uM4LC2G2+3glmHcc9108pR+FoLRuyOZGpRA58Kp4jo
+         rdhIB/C2E/Fcow4c1XAeCXZ85lR7CDjdpQc1NGSWb8C2PJgcE6Eb5hCOZeLGkPW1slpe
+         +QcGm3fRhTGqw5npVSU+sqKGUQ6Ylcxm4kXw7HehZxe0ALv/J6l+g8K7hcXNAwyRFeLI
+         j3xqV55jf8KWwterHjaGy4z7bHCyTrZKHEXQjNqzzKiHlXX7OhuJsC3GNe+RR9hRF+Mg
+         nbFg==
+X-Gm-Message-State: AOAM532I2ZGm5MRpuIPmFheyNCSlMNt/wRdWZ8fLChuegUAYRkan6mde
+        L3BB1GiWRKbX2uLwN427B1FxTVzIbc4W
+X-Google-Smtp-Source: ABdhPJwMFpkINzZX1JNlNkc/5A26Ivvmi4jtVWoQuEvFqtIF5atE7j6vpif9VmeLtHE+4jKwza0j7nuxl9ua
 Sender: "bgardon via sendgmr" <bgardon@bgardon.sea.corp.google.com>
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:f693:9fff:fef4:a293])
- (user=bgardon job=sendgmr) by 2002:a17:902:ab97:b029:de:30a:5234 with SMTP id
- f23-20020a170902ab97b02900de030a5234mr301190plr.55.1610475045535; Tue, 12 Jan
- 2021 10:10:45 -0800 (PST)
-Date:   Tue, 12 Jan 2021 10:10:17 -0800
-Message-Id: <20210112181041.356734-1-bgardon@google.com>
+ (user=bgardon job=sendgmr) by 2002:a25:b28f:: with SMTP id
+ k15mr996789ybj.67.1610475047360; Tue, 12 Jan 2021 10:10:47 -0800 (PST)
+Date:   Tue, 12 Jan 2021 10:10:18 -0800
+In-Reply-To: <20210112181041.356734-1-bgardon@google.com>
+Message-Id: <20210112181041.356734-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20210112181041.356734-1-bgardon@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 00/24] Allow parallel page faults with TDP MMU
+Subject: [PATCH 01/24] locking/rwlocks: Add contention detection for rwlocks
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -62,242 +64,94 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ben Gardon <bgardon@google.com>
+        Ben Gardon <bgardon@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Davidlohr Bueso <dbueso@suse.de>,
+        Waiman Long <longman@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TDP MMU was implemented to simplify and improve the performance of
-KVM's memory management on modern hardware with TDP (EPT / NPT). To build
-on the existing performance improvements of the TDP MMU, add the ability
-to handle vCPU page faults in parallel. In the current implementation,
-vCPU page faults (actually EPT/NPT violations/misconfigurations) are the
-largest source of MMU lock contention on VMs with many vCPUs. This
-contention, and the resulting page fault latency, can soft-lock guests
-and degrade performance. Handling page faults in parallel is especially
-useful when booting VMs, enabling dirty logging, and handling demand
-paging. In all these cases vCPUs are constantly incurring  page faults on
-each new page accessed.
+rwlocks do not currently have any facility to detect contention
+like spinlocks do. In order to allow users of rwlocks to better manage
+latency, add contention detection for queued rwlocks.
 
-Broadly, the following changes were required to allow parallel page
-faults:
--- Contention detection and yielding added to rwlocks to bring them up to
-   feature parity with spin locks, at least as far as the use of the MMU
-   lock is concerned.
--- TDP MMU page table memory is protected with RCU and freed in RCU
-   callbacks to allow multiple threads to operate on that memory
-   concurrently.
--- When the TDP MMU is enabled, a rwlock is used instead of a spin lock on
-   x86. This allows the page fault handlers to acquire the MMU lock in read
-   mode and handle page faults in parallel while other operations maintain
-   exclusive use of the lock by acquiring it in write mode.
--- An additional lock is added to protect some data structures needed by
-   the page fault handlers, for relatively infrequent operations.
--- The page fault handler is modified to use atomic cmpxchgs to set SPTEs
-   and some page fault handler operations are modified slightly to work
-   concurrently with other threads.
+CC: Ingo Molnar <mingo@redhat.com>
+CC: Will Deacon <will@kernel.org>
+Acked-by: Peter Zijlstra <peterz@infradead.org>
+Acked-by: Davidlohr Bueso <dbueso@suse.de>
+Acked-by: Waiman Long <longman@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-This series also contains a few bug fixes and optimizations, related to
-the above, but not strictly part of enabling parallel page fault handling.
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ include/asm-generic/qrwlock.h | 24 ++++++++++++++++++------
+ include/linux/rwlock.h        |  7 +++++++
+ 2 files changed, 25 insertions(+), 6 deletions(-)
 
-Performance testing:
-The KVM selftests dirty_log_perf_test demonstrates the performance
-improvements associated with this patch series. The dirty_log_perf test
-was run on a two socket Indus Skylake, with a VM with 96 vCPUs.
-5 get-dirty-log iterations were run. Each test was run 3 times and the
-results averaged. The test was conducted with 3 different variables:
-Overlapping versus partitioned memory
-With overlapping memory vCPUs are more likely to incur retries handling
-parallel page faults, so the TDP MMU with parallel page faults is expected
-to fare the worst in this situation.
-Partitioned memory between vCPUs is a best case for parallel page faults
-with the TDP MMU as it should minimize contention and retries.
-When running with partitioned memory, 3G was allocated for each vCPU's
-data region. When running with overlapping memory accesses, a total of 6G
-was allocated for the VM's data region. This meant that the VM was much
-smaller overall, but each vCPU had more memory to access. Since the VMs
-were very different in size, the results cannot be reliably compared. The
-VM sizes were chosen to balance test runtime and repeatability of results.
-The option to overlap memory accesses will be added to dirty_log_perf_test
-in a (near-)future series.
-With this patch set applied versus without
-In these tests the series was applied on commit:
-9f1abbe97c08 Merge tag 'for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost
-That commit was also used as the baseline.
-TDP MMU enabled versus disabled
-This is primarily included to ensure that this series does not regress
-performance with the TDP MMU disabled.
-
-Does this series improve performance with the TDP MMU enabled?
-
-Baseline, TDP MMU enabled, partitioned accesses:
-Populate memory time (s)		110.193
-Enabling dirty logging time (s)		4.829
-Dirty memory time (s)			3.949
-Get dirty log time (s)			0.822
-Disabling dirty logging time (s)	2.995
-Parallel PFs series, TDP MMU enabled, partitioned accesses:
-Populate memory time (s)		16.112
-Enabling dirty logging time (s)		7.057
-Dirty memory time (s)			0.275
-Get dirty log time (s)			5.468
-Disabling dirty logging time (s)	3.088
-
-This scenario demonstrates the big win in this series: an 85% reduction in
-the time taken to populate memory! Note that the time taken to dirty memory
-is much shorter and the time to get the dirty log higher with this series.
-
-Baseline, TDP MMU enabled, overlapping accesses:
-Populate memory time (s)		117.31
-Enabling dirty logging time (s)		0.191
-Dirty memory time (s)			0.193
-Get dirty log time (s)			2.33
-Disabling dirty logging time (s)	0.059
-Parallel PFs series, TDP MMU enabled, overlapping accesses:
-Populate memory time (s)		141.155
-Enabling dirty logging time (s)		0.245
-Dirty memory time (s)			0.236
-Get dirty log time (s)			2.35
-Disabling dirty logging time (s)	0.075
-
-With overlapping accesses, we can see that this parallel page faults
-series actually reduces performance when populating memory. In profiling,
-it appeared that most of the time was spent in get_user_pages, so it's
-possible the extra concurrency hit the main MM subsystem harder, creating
-contention there.
-
-Does this series degrade performance with the TDP MMU disabled?
-
-Baseline, TDP MMU disabled, partitioned accesses:
-Populate memory time (s)		110.193
-Enabling dirty logging time (s)		4.829
-Dirty memory time (s)			3.949
-Get dirty log time (s)			0.822
-Disabling dirty logging time (s)	2.995
-Parallel PFs series, TDP MMU disabled, partitioned accesses:
-Populate memory time (s)		110.917
-Enabling dirty logging time (s)		5.196
-Dirty memory time (s)			4.559
-Get dirty log time (s)			0.879
-Disabling dirty logging time (s)	3.278
-
-Here we can see that the parallel PFs series appears to have made enabling
-and disabling dirty logging, and dirtying memory slightly slower. It's
-possible that this is a result of additional checks around MMU lock
-acquisition.
-
-Baseline, TDP MMU disabled, overlapping accesses:
-Populate memory time (s)		103.115
-Enabling dirty logging time (s)		0.222
-Dirty memory time (s)			0.189
-Get dirty log time (s)			2.341
-Disabling dirty logging time (s)	0.126
-Parallel PFs series, TDP MMU disabled, overlapping accesses:
-Populate memory time (s)		85.392
-Enabling dirty logging time (s)		0.224
-Dirty memory time (s)			0.201
-Get dirty log time (s)			2.363
-Disabling dirty logging time (s)	0.131
-
-From the above results we can see that the parallel PF series only had a
-significant effect on the population time, with overlapping accesses and
-the TDP MMU disabled. It is not currently known what in this series caused
-the improvement.
-
-Correctness testing:
-The following tests were performed with an SMP kernel and DBX kernel on an
-Intel Skylake machine. The tests were run both with and without the TDP
-MMU enabled.
--- This series introduces no new failures in kvm-unit-tests
-SMP + no TDP MMU no new failures
-SMP + TDP MMU no new failures
-DBX + no TDP MMU no new failures
-DBX + TDP MMU no new failures
--- All KVM selftests behave as expected
-SMP + no TDP MMU all pass except ./x86_64/vmx_preemption_timer_test
-SMP + TDP MMU all pass except ./x86_64/vmx_preemption_timer_test
-(./x86_64/vmx_preemption_timer_test also fails without this patch set,
-both with the TDP MMU on and off.)
-DBX + no TDP MMU all pass
-DBX + TDP MMU all pass
--- A VM can be booted running a Debian 9 and all memory accessed
-SMP + no TDP MMU works
-SMP + TDP MMU works
-DBX + no TDP MMU works
-DBX + TDP MMU works
-Cross-compilation was also checked for PowerPC and ARM64.
-
-This series can be viewed in Gerrit at:
-https://linux-review.googlesource.com/c/linux/kernel/git/torvalds/linux/+/7172
-
-Ben Gardon (24):
-  locking/rwlocks: Add contention detection for rwlocks
-  sched: Add needbreak for rwlocks
-  sched: Add cond_resched_rwlock
-  kvm: x86/mmu: change TDP MMU yield function returns to match
-    cond_resched
-  kvm: x86/mmu: Fix yielding in TDP MMU
-  kvm: x86/mmu: Skip no-op changes in TDP MMU functions
-  kvm: x86/mmu: Add comment on __tdp_mmu_set_spte
-  kvm: x86/mmu: Add lockdep when setting a TDP MMU SPTE
-  kvm: x86/mmu: Don't redundantly clear TDP MMU pt memory
-  kvm: x86/mmu: Factor out handle disconnected pt
-  kvm: x86/mmu: Put TDP MMU PT walks in RCU read-critical section
-  kvm: x86/kvm: RCU dereference tdp mmu page table links
-  kvm: x86/mmu: Only free tdp_mmu pages after a grace period
-  kvm: mmu: Wrap mmu_lock lock / unlock in a function
-  kvm: mmu: Wrap mmu_lock cond_resched and needbreak
-  kvm: mmu: Wrap mmu_lock assertions
-  kvm: mmu: Move mmu_lock to struct kvm_arch
-  kvm: x86/mmu: Use an rwlock for the x86 TDP MMU
-  kvm: x86/mmu: Protect tdp_mmu_pages with a lock
-  kvm: x86/mmu: Add atomic option for setting SPTEs
-  kvm: x86/mmu: Use atomic ops to set SPTEs in TDP MMU map
-  kvm: x86/mmu: Flush TLBs after zap in TDP MMU PF handler
-  kvm: x86/mmu: Freeze SPTEs in disconnected pages
-  kvm: x86/mmu: Allow parallel page faults for the TDP MMU
-
- Documentation/virt/kvm/locking.rst       |   2 +-
- arch/arm64/include/asm/kvm_host.h        |   2 +
- arch/arm64/kvm/arm.c                     |   2 +
- arch/arm64/kvm/mmu.c                     |  40 +-
- arch/mips/include/asm/kvm_host.h         |   2 +
- arch/mips/kvm/mips.c                     |  10 +-
- arch/mips/kvm/mmu.c                      |  20 +-
- arch/powerpc/include/asm/kvm_book3s_64.h |   7 +-
- arch/powerpc/include/asm/kvm_host.h      |   2 +
- arch/powerpc/kvm/book3s_64_mmu_host.c    |   4 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c      |  12 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c   |  32 +-
- arch/powerpc/kvm/book3s_64_vio_hv.c      |   4 +-
- arch/powerpc/kvm/book3s_hv.c             |   8 +-
- arch/powerpc/kvm/book3s_hv_nested.c      |  59 ++-
- arch/powerpc/kvm/book3s_hv_rm_mmu.c      |  14 +-
- arch/powerpc/kvm/book3s_mmu_hpte.c       |  10 +-
- arch/powerpc/kvm/e500_mmu_host.c         |   6 +-
- arch/powerpc/kvm/powerpc.c               |   2 +
- arch/s390/include/asm/kvm_host.h         |   2 +
- arch/s390/kvm/kvm-s390.c                 |   2 +
- arch/x86/include/asm/kvm_host.h          |  23 +
- arch/x86/kvm/mmu/mmu.c                   | 189 ++++++--
- arch/x86/kvm/mmu/mmu_internal.h          |  16 +-
- arch/x86/kvm/mmu/page_track.c            |   8 +-
- arch/x86/kvm/mmu/paging_tmpl.h           |   8 +-
- arch/x86/kvm/mmu/spte.h                  |  16 +-
- arch/x86/kvm/mmu/tdp_iter.c              |   6 +-
- arch/x86/kvm/mmu/tdp_mmu.c               | 540 +++++++++++++++++++----
- arch/x86/kvm/x86.c                       |   4 +-
- drivers/gpu/drm/i915/gvt/kvmgt.c         |  12 +-
- include/asm-generic/qrwlock.h            |  24 +-
- include/linux/kvm_host.h                 |   7 +-
- include/linux/rwlock.h                   |   7 +
- include/linux/sched.h                    |  29 ++
- kernel/sched/core.c                      |  40 ++
- virt/kvm/dirty_ring.c                    |   4 +-
- virt/kvm/kvm_main.c                      |  58 ++-
- 38 files changed, 938 insertions(+), 295 deletions(-)
-
+diff --git a/include/asm-generic/qrwlock.h b/include/asm-generic/qrwlock.h
+index 84ce841ce735..0020d3b820a7 100644
+--- a/include/asm-generic/qrwlock.h
++++ b/include/asm-generic/qrwlock.h
+@@ -14,6 +14,7 @@
+ #include <asm/processor.h>
+ 
+ #include <asm-generic/qrwlock_types.h>
++#include <asm-generic/qspinlock.h>
+ 
+ /*
+  * Writer states & reader shift and bias.
+@@ -116,15 +117,26 @@ static inline void queued_write_unlock(struct qrwlock *lock)
+ 	smp_store_release(&lock->wlocked, 0);
+ }
+ 
++/**
++ * queued_rwlock_is_contended - check if the lock is contended
++ * @lock : Pointer to queue rwlock structure
++ * Return: 1 if lock contended, 0 otherwise
++ */
++static inline int queued_rwlock_is_contended(struct qrwlock *lock)
++{
++	return arch_spin_is_locked(&lock->wait_lock);
++}
++
+ /*
+  * Remapping rwlock architecture specific functions to the corresponding
+  * queue rwlock functions.
+  */
+-#define arch_read_lock(l)	queued_read_lock(l)
+-#define arch_write_lock(l)	queued_write_lock(l)
+-#define arch_read_trylock(l)	queued_read_trylock(l)
+-#define arch_write_trylock(l)	queued_write_trylock(l)
+-#define arch_read_unlock(l)	queued_read_unlock(l)
+-#define arch_write_unlock(l)	queued_write_unlock(l)
++#define arch_read_lock(l)		queued_read_lock(l)
++#define arch_write_lock(l)		queued_write_lock(l)
++#define arch_read_trylock(l)		queued_read_trylock(l)
++#define arch_write_trylock(l)		queued_write_trylock(l)
++#define arch_read_unlock(l)		queued_read_unlock(l)
++#define arch_write_unlock(l)		queued_write_unlock(l)
++#define arch_rwlock_is_contended(l)	queued_rwlock_is_contended(l)
+ 
+ #endif /* __ASM_GENERIC_QRWLOCK_H */
+diff --git a/include/linux/rwlock.h b/include/linux/rwlock.h
+index 3dcd617e65ae..7ce9a51ae5c0 100644
+--- a/include/linux/rwlock.h
++++ b/include/linux/rwlock.h
+@@ -128,4 +128,11 @@ do {								\
+ 	1 : ({ local_irq_restore(flags); 0; }); \
+ })
+ 
++#ifdef arch_rwlock_is_contended
++#define rwlock_is_contended(lock) \
++	 arch_rwlock_is_contended(&(lock)->raw_lock)
++#else
++#define rwlock_is_contended(lock)	((void)(lock), 0)
++#endif /* arch_rwlock_is_contended */
++
+ #endif /* __LINUX_RWLOCK_H */
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
