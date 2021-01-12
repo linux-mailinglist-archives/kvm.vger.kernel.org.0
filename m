@@ -2,170 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 989A82F2CE4
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 11:32:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 804272F2D65
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 12:06:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389974AbhALKcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 05:32:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35977 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729786AbhALKcE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 05:32:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610447437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YtAVZx/m5M42/sCrHG4e0vHzuv3Z13YDXpEzXvGlnvs=;
-        b=jRiELDgzUPgx77ZvhaPrniVKa8CVAN7DAGJbL02XY7sEpJO5UxcRElk/Bva0rfwr6QMRoV
-        AU+Z+Yz5rw24j5EozOR7/CpH0mFSAVkQR8PcJj9oyPJPbkM4R+l3EqzI523lbuBUuEEVPh
-        X9ZaBGlx/BBrwSAlShCvZi6+a+/vPxE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-yZM83J6cMXCpTgcubcTk1A-1; Tue, 12 Jan 2021 05:30:33 -0500
-X-MC-Unique: yZM83J6cMXCpTgcubcTk1A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07D87AFA81;
-        Tue, 12 Jan 2021 10:30:29 +0000 (UTC)
-Received: from localhost (ovpn-115-99.ams2.redhat.com [10.36.115.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 978DF10023B5;
-        Tue, 12 Jan 2021 10:30:15 +0000 (UTC)
-Date:   Tue, 12 Jan 2021 10:30:14 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Huacai Chen <chenhuacai@kernel.org>,
-        Greg Kurz <groug@kaod.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
-        Amit Shah <amit@kernel.org>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>,
-        qemu-s390x@nongnu.org, Paul Durrant <paul@xen.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Max Reitz <mreitz@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        Halil Pasic <pasic@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
-        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Stefano Stabellini <sstabellini@kernel.org>,
-        xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: Re: [PATCH 0/2] sysemu: Let VMChangeStateHandler take boolean
- 'running' argument
-Message-ID: <20210112103014.GB194658@stefanha-x1.localdomain>
-References: <20210111152020.1422021-1-philmd@redhat.com>
+        id S1726295AbhALLGm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 06:06:42 -0500
+Received: from foss.arm.com ([217.140.110.172]:44106 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726119AbhALLGm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 06:06:42 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3B8C13D5
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
+Received: from mail-pl1-f182.google.com (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 911C63F73C
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id x12so1205014plr.10
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 03:05:56 -0800 (PST)
+X-Gm-Message-State: AOAM530d8ftSVaSEG9YQ5hdjBglN80F9rfXROKprAdMUliSpZnjJU4eD
+        DbfzsQ0LDTahyLBxjIvawlrw2afi7tfDNc8h3Dg=
+X-Google-Smtp-Source: ABdhPJzsg6zT++OpgkFhHve/i+0GEamVqvPpEfMSkAHJGOtMcZmOT2hTATjzTkckorSJ3yItCQexaSYbcqy/caLFHkw=
+X-Received: by 2002:a17:90a:f28f:: with SMTP id fs15mr4087906pjb.121.1610449555888;
+ Tue, 12 Jan 2021 03:05:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210111152020.1422021-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="b5gNqxB1S1yM7hjW"
-Content-Disposition: inline
+References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
+ <1599734733-6431-3-git-send-email-yi.l.liu@intel.com> <CAFp+6iFob_fy1cTgcEv0FOXBo70AEf3Z1UvXgPep62XXnLG9Gw@mail.gmail.com>
+ <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
+In-Reply-To: <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
+From:   Vivek Gautam <vivek.gautam@arm.com>
+Date:   Tue, 12 Jan 2021 16:35:45 +0530
+X-Gmail-Original-Message-ID: <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
+Message-ID: <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
+Subject: Re: [PATCH v7 02/16] iommu/smmu: Report empty domain nesting info
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "Sun, Yi Y" <yi.y.sun@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        "list@263.net:IOMMU DRIVERS <iommu@lists.linux-foundation.org>, Joerg
+        Roedel <joro@8bytes.org>," <iommu@lists.linux-foundation.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---b5gNqxB1S1yM7hjW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Yi,
 
-On Mon, Jan 11, 2021 at 04:20:18PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Trivial prototype change to clarify the use of the 'running'
-> argument of VMChangeStateHandler.
->=20
-> Green CI:
-> https://gitlab.com/philmd/qemu/-/pipelines/239497352
->=20
-> Philippe Mathieu-Daud=E9 (2):
->   sysemu/runstate: Let runstate_is_running() return bool
->   sysemu: Let VMChangeStateHandler take boolean 'running' argument
->=20
->  include/sysemu/runstate.h   | 12 +++++++++---
->  target/arm/kvm_arm.h        |  2 +-
->  target/ppc/cpu-qom.h        |  2 +-
->  accel/xen/xen-all.c         |  2 +-
->  audio/audio.c               |  2 +-
->  block/block-backend.c       |  2 +-
->  gdbstub.c                   |  2 +-
->  hw/block/pflash_cfi01.c     |  2 +-
->  hw/block/virtio-blk.c       |  2 +-
->  hw/display/qxl.c            |  2 +-
->  hw/i386/kvm/clock.c         |  2 +-
->  hw/i386/kvm/i8254.c         |  2 +-
->  hw/i386/kvmvapic.c          |  2 +-
->  hw/i386/xen/xen-hvm.c       |  2 +-
->  hw/ide/core.c               |  2 +-
->  hw/intc/arm_gicv3_its_kvm.c |  2 +-
->  hw/intc/arm_gicv3_kvm.c     |  2 +-
->  hw/intc/spapr_xive_kvm.c    |  2 +-
->  hw/misc/mac_via.c           |  2 +-
->  hw/net/e1000e_core.c        |  2 +-
->  hw/nvram/spapr_nvram.c      |  2 +-
->  hw/ppc/ppc.c                |  2 +-
->  hw/ppc/ppc_booke.c          |  2 +-
->  hw/s390x/tod-kvm.c          |  2 +-
->  hw/scsi/scsi-bus.c          |  2 +-
->  hw/usb/hcd-ehci.c           |  2 +-
->  hw/usb/host-libusb.c        |  2 +-
->  hw/usb/redirect.c           |  2 +-
->  hw/vfio/migration.c         |  2 +-
->  hw/virtio/virtio-rng.c      |  2 +-
->  hw/virtio/virtio.c          |  2 +-
->  net/net.c                   |  2 +-
->  softmmu/memory.c            |  2 +-
->  softmmu/runstate.c          |  4 ++--
->  target/arm/kvm.c            |  2 +-
->  target/i386/kvm/kvm.c       |  2 +-
->  target/i386/sev.c           |  2 +-
->  target/i386/whpx/whpx-all.c |  2 +-
->  target/mips/kvm.c           |  4 ++--
->  ui/gtk.c                    |  2 +-
->  ui/spice-core.c             |  2 +-
->  41 files changed, 51 insertions(+), 45 deletions(-)
->=20
-> --=20
-> 2.26.2
->=20
->=20
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Tue, Jan 12, 2021 at 2:51 PM Liu, Yi L <yi.l.liu@intel.com> wrote:
+>
+> Hi Vivek,
+>
+> > From: Vivek Gautam <vivek.gautam@arm.com>
+> > Sent: Tuesday, January 12, 2021 2:50 PM
+> >
+> > Hi Yi,
+> >
+> >
+> > On Thu, Sep 10, 2020 at 4:13 PM Liu Yi L <yi.l.liu@intel.com> wrote:
+> > >
+> > > This patch is added as instead of returning a boolean for
+> > DOMAIN_ATTR_NESTING,
+> > > iommu_domain_get_attr() should return an iommu_nesting_info handle.
+> > For
+> > > now, return an empty nesting info struct for now as true nesting is not
+> > > yet supported by the SMMUs.
+> > >
+> > > Cc: Will Deacon <will@kernel.org>
+> > > Cc: Robin Murphy <robin.murphy@arm.com>
+> > > Cc: Eric Auger <eric.auger@redhat.com>
+> > > Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > > Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > > Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> > > ---
+> > > v5 -> v6:
+> > > *) add review-by from Eric Auger.
+> > >
+> > > v4 -> v5:
+> > > *) address comments from Eric Auger.
+> > > ---
+> > >  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 29
+> > +++++++++++++++++++++++++++--
+> > >  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 29
+> > +++++++++++++++++++++++++++--
+> > >  2 files changed, 54 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > > index 7196207..016e2e5 100644
+> > > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> > > @@ -3019,6 +3019,32 @@ static struct iommu_group
+> > *arm_smmu_device_group(struct device *dev)
+> > >         return group;
+> > >  }
+> > >
+> > > +static int arm_smmu_domain_nesting_info(struct arm_smmu_domain
+> > *smmu_domain,
+> > > +                                       void *data)
+> > > +{
+> > > +       struct iommu_nesting_info *info = (struct iommu_nesting_info
+> > *)data;
+> > > +       unsigned int size;
+> > > +
+> > > +       if (!info || smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> > > +               return -ENODEV;
+> > > +
+> > > +       size = sizeof(struct iommu_nesting_info);
+> > > +
+> > > +       /*
+> > > +        * if provided buffer size is smaller than expected, should
+> > > +        * return 0 and also the expected buffer size to caller.
+> > > +        */
+> > > +       if (info->argsz < size) {
+> > > +               info->argsz = size;
+> > > +               return 0;
+> > > +       }
+> > > +
+> > > +       /* report an empty iommu_nesting_info for now */
+> > > +       memset(info, 0x0, size);
+> > > +       info->argsz = size;
+> > > +       return 0;
+> > > +}
+> > > +
+> > >  static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+> > >                                     enum iommu_attr attr, void *data)
+> > >  {
+> > > @@ -3028,8 +3054,7 @@ static int arm_smmu_domain_get_attr(struct
+> > iommu_domain *domain,
+> > >         case IOMMU_DOMAIN_UNMANAGED:
+> > >                 switch (attr) {
+> > >                 case DOMAIN_ATTR_NESTING:
+> > > -                       *(int *)data = (smmu_domain->stage ==
+> > ARM_SMMU_DOMAIN_NESTED);
+> > > -                       return 0;
+> > > +                       return arm_smmu_domain_nesting_info(smmu_domain,
+> > data);
+> >
+> > Thanks for the patch.
+> > This would unnecessarily overflow 'data' for any caller that's expecting only
+> > an int data. Dump from one such issue that I was seeing when testing
+> > this change along with local kvmtool changes is pasted below [1].
+> >
+> > I could get around with the issue by adding another (iommu_attr) -
+> > DOMAIN_ATTR_NESTING_INFO that returns (iommu_nesting_info).
+>
+> nice to hear from you. At first, we planned to have a separate iommu_attr
+> for getting nesting_info. However, we considered there is no existing user
+> which gets DOMAIN_ATTR_NESTING, so we decided to reuse it for iommu nesting
+> info. Could you share me the code base you are using? If the error you
+> encountered is due to this change, so there should be a place which gets
+> DOMAIN_ATTR_NESTING.
 
---b5gNqxB1S1yM7hjW
-Content-Type: application/pgp-signature; name="signature.asc"
+I am currently working on top of Eric's tree for nested stage support [1].
+My best guess was that the vfio_pci_dma_fault_init() method [2] that is
+requesting DOMAIN_ATTR_NESTING causes stack overflow, and corruption.
+That's when I added a new attribute.
 
------BEGIN PGP SIGNATURE-----
+I will soon publish my patches to the list for review. Let me know
+your thoughts.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl/9ejYACgkQnKSrs4Gr
-c8idIAf/Yau6DdIvJYo0z1xlPWikqBBVOuHPdp3bLO0cxM4ShsmyJBcHVcXht/F5
-2dJf4d3ieWtl1MiBHI7VlWPtxfZXjcKLN8TT6wS7IUQOKMUTj7U+kZeplVOeHdJ5
-FaBCr4SCux3oJdDYz0V0oYxyZotxXpgV6QcnecOQ8z+3syVSKdPf5ZIDIEEJm9g8
-1ZI/HkBoJ6k2glUM83ohVS2K8gQ/eJqANxgKCFqGX2AFcIuQfD2ESotgaq263A0m
-WvGwEXcLV6ALMAANVoYBDIPACb3dJFGK4Z9HZnUoV5Cqq14MmTjsIaDCRI7ekmtl
-iifLGCKlWmb5Y8rX5WFdfJfWQf/ufg==
-=R44D
------END PGP SIGNATURE-----
+[1] https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+[2] https://github.com/eauger/linux/blob/5.10-rc4-2stage-v13/drivers/vfio/pci/vfio_pci.c#L494
 
---b5gNqxB1S1yM7hjW--
+Thanks
+Vivek
 
+>
+> Regards,
+> Yi Liu
+
+[snip]
