@@ -2,166 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6495C2F3FE0
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:46:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91D052F402F
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:47:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389829AbhALXFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 18:05:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
+        id S1733132AbhALXSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 18:18:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387506AbhALXFR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 18:05:17 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA50AC061786
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:04:36 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id t6so2282583plq.1
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:04:36 -0800 (PST)
+        with ESMTP id S1728427AbhALXSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 18:18:03 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42437C061575
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:17:23 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id w1so2166994pjc.0
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:17:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=v1y2JVqCb741cmu9LZuZGtYl6ezSqlmS2NO+PbgJcrE=;
-        b=E1mXvxzk9lFQ60sBuZtwVcXftdzZaWEesX9atAHPf2+5V+fniOkt4xAElXTBKxQtn6
-         HpKmdECzhGBYVPLhCDndpKQBGUAjr1DAtYyMlNGzqONmf6zV73OtPjj8EgjlENpUtC/H
-         wmx1U/ZVdsd0daacq8f+697tjvK4h6H7D73R3zTtkukn0t/B+BPSmIHNxpoq/ivrJ3qY
-         gPyT8eYjT+8qZMUaOn81GvpdOHY5JQptlF/Y5XVWt6N3moV81hLIvJM9EbK04UGDaS99
-         3xskjlOQ2qY49IaNAn0mUP0m/zgJJTLDnpiEANCyL8LRDvxSrewx+MlgkApZXiWVYQtz
-         86Hw==
+        bh=Yi311W2mEPcoUeeXQ6K1FVZjGfDJ1DzLXppBk3GV5Ss=;
+        b=RuG09I9iqag6FBvfI3cDukXJCSjkxHc4/RpZXp3kCvFZdEE3wMzml3SKx4vNREH1Hv
+         VPFbCoOG8Sn7WTeX6ncDzSqu/Lb6ZWuA33CROIA51tQOKh10JfJy/Y6W3UXPY763wEKk
+         sgd28dr4GIDeTdBWhEK8c2e2WSmtzJxnJP2hlEt7LFNmcd9XlMBNZd50c2rfEPSxupV2
+         YLHwtjXcIhMLnC8G/QU3KyAxQJzbOlH6Og0p8sM5XBJacz4BA2g4GANxuM1MYHm34x0F
+         WtgFAMiFHlCK2A0wYooEmJvIH3fcSHg8X4OXX+UzYlVWMI+4+0aHyY3DpfDH7Gy2OKy1
+         acjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=v1y2JVqCb741cmu9LZuZGtYl6ezSqlmS2NO+PbgJcrE=;
-        b=LtjF0f39Mzj2lD5buF9DOKAO1np+gWMF/RzLIyb924RYeoFhFFmu4SBpCoBMTZ1pXW
-         oGB7uTFifNsFsyzNBMniD97YPx3PhB5LChOYaaL8o0jcy0JLf5/LrMsvPJmztiYOBzQZ
-         M183aF2X/yesInOmYVHPY6EXIA3EDhhCeOkLHpJuL0FtFa8kdTjC1dliPvBLc2ziiVJB
-         MHF2uXJFOyLua0smpYGl0CekvRX5rmqQuLzcUDtpEgBZbEcOxkCpo1e4lzI6lYgOqqWc
-         1blFRVujziwNiyj05s/Y1acdUw36Y+57Zk3ZwmtbEvTnHQGDMIeEXDQ2H1zwokURRC2g
-         wUQA==
-X-Gm-Message-State: AOAM533A9slfU3GSMQ+8RzY94BEbhFW2ZPO95CDtqLGSU49bqP5NovmP
-        /HZN/l2r2HM9gPWIIliVE3ahy4rJY5Tmrw==
-X-Google-Smtp-Source: ABdhPJz5cajbnHF3HFOFRmfElI/dBw7nMPNyK50lnlrRJKVbflmuxgiVizlUCvce59SzMFZJxAelMA==
-X-Received: by 2002:a17:90a:c087:: with SMTP id o7mr1422026pjs.205.1610492675976;
-        Tue, 12 Jan 2021 15:04:35 -0800 (PST)
+        bh=Yi311W2mEPcoUeeXQ6K1FVZjGfDJ1DzLXppBk3GV5Ss=;
+        b=HzQz1rXeaux5nL/sFiR8daqe7QQrC77366aR8o59IBoHpFlHlIB2OHceHwYdiu36hs
+         O+pc4cfTuEWkoJC+iQJKXFP0kPzjWtHIAGRDFaiyYogMzIddqeJlVW1fF6XPDwDU3C7C
+         a62Br76sZzoTnWfZnGmevT8kDVlR/gL81J0ACUi8uIg3e4q3aVc+I/IWgiFzSsHku2yb
+         Qy2ykKUbzoeL272U+Bu+eNoMeHfn1qOm5y57y6671TQYJtCe6+9+nzIcH6H0M2PbOEzS
+         kjgnDl5AhzKzm2jt24+oCM/Sh1ZRIAY7Aak+RGaPBIH2FTOvE/lz02tNyqieKpwDI4aK
+         AsEw==
+X-Gm-Message-State: AOAM531Ke6BpEL4y7/PGOmNUOXq9UboD1FT2HX8qvGc6blwpdKWLpKbW
+        dCL9veg8/I/feyn+eyZqWxA7vw==
+X-Google-Smtp-Source: ABdhPJwap99ShubOOWt2zGEZ0I85k5Xp/UWL4WuRCBPZj/Skqhv8Wf85O//1dP4RTFWZFU2e82bSqw==
+X-Received: by 2002:a17:902:9896:b029:dc:3306:8aa7 with SMTP id s22-20020a1709029896b02900dc33068aa7mr1478741plp.6.1610493442542;
+        Tue, 12 Jan 2021 15:17:22 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id x16sm167656pfp.62.2021.01.12.15.04.34
+        by smtp.gmail.com with ESMTPSA id f9sm190920pfa.41.2021.01.12.15.17.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 15:04:35 -0800 (PST)
-Date:   Tue, 12 Jan 2021 15:04:28 -0800
+        Tue, 12 Jan 2021 15:17:21 -0800 (PST)
+Date:   Tue, 12 Jan 2021 15:17:15 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jason Baron <jbaron@akamai.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, peterz@infradead.org,
-        aarcange@redhat.com, x86@kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: x86: introduce definitions to support static
- calls for kvm_x86_ops
-Message-ID: <X/4q/OKvW9RKQ+gk@google.com>
-References: <cover.1610379877.git.jbaron@akamai.com>
- <ce483ce4a1920a3c1c4e5deea11648d75f2a7b80.1610379877.git.jbaron@akamai.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
+        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+Message-ID: <X/4t+6JcyTGVEG2e@google.com>
+References: <20210108071722.GA4042@zn.tnic>
+ <X/jxCOLG+HUO4QlZ@google.com>
+ <20210109011939.GL4042@zn.tnic>
+ <X/yQyUx4+veuSO0e@google.com>
+ <20210111190901.GG25645@zn.tnic>
+ <X/yk6zcJTLXJwIrJ@google.com>
+ <20210112121359.GC13086@zn.tnic>
+ <X/3ZSKDWoPcCsV/w@google.com>
+ <20210112175102.GJ13086@zn.tnic>
+ <dea875ea60cdef68fa8fe5b8f8cf3e8ed6a5df2e.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ce483ce4a1920a3c1c4e5deea11648d75f2a7b80.1610379877.git.jbaron@akamai.com>
+In-Reply-To: <dea875ea60cdef68fa8fe5b8f8cf3e8ed6a5df2e.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021, Jason Baron wrote:
-> Use static calls to improve kvm_x86_ops performance. Introduce the
-> definitions that will be used by a subsequent patch to actualize the
-> savings.
+On Wed, Jan 13, 2021, Kai Huang wrote:
+> On Tue, 2021-01-12 at 18:51 +0100, Borislav Petkov wrote:
+> > On Tue, Jan 12, 2021 at 09:15:52AM -0800, Sean Christopherson wrote:
+> > > We want the boot_cpu_data.x86_capability memcpy() so that KVM doesn't advertise
+> > > support for features that are intentionally disabled in the kernel, e.g. via
+> > > kernel params.  Except for a few special cases, e.g. LA57, KVM doesn't enable
+> > > features in the guest if they're disabled in the host, even if the features are
+> > > supported in hardware.
+> > > 
+> > > For some features, e.g. SMEP and SMAP, honoring boot_cpu_data is mostly about
+> > > respecting the kernel's wishes, i.e. barring hardware bugs, enabling such
+> > > features in the guest won't break anything.  But for other features, e.g. XSAVE
+> > > based features, enabling them in the guest without proper support in the host
+> > > will corrupt guest and/or host state.
+> > 
+> > Ah ok, that is an important point.
+> > 
+> > > So it's really the CPUID read that is (mostly) superfluous.
+> > 
+> > Yeah, but that is cheap, as we established.
+> > 
+> > Ok then, I don't see anything that might be a problem and I guess we can
+> > try that handling of scattered bits in kvm and see how far we'll get.
 > 
-> Note that all kvm_x86_ops are covered here except for 'pmu_ops' and
-> 'nested ops'. I think they can be covered by static calls in a simlilar
-> manner, but were omitted from this series to reduce scope and because
-> I don't think they have as large of a performance impact.
+> Hi Sean, Boris,
 > 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Andrea Arcangeli <aarcange@redhat.com>
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 65 +++++++++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/x86.c              |  5 ++++
->  2 files changed, 70 insertions(+)
+> Thanks for all  your feedback.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 3ab7b46..e947522 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1087,6 +1087,65 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
->  	return dest_mode_logical ? APIC_DEST_LOGICAL : APIC_DEST_PHYSICAL;
->  }
->  
-> +/*
-> + * static calls cover all kvm_x86_ops except for functions under pmu_ops and
-> + * nested_ops.
-> + */
-> +#define FOREACH_KVM_X86_OPS(F) \
-> +	F(hardware_enable); F(hardware_disable); F(hardware_unsetup);	       \
-> +	F(cpu_has_accelerated_tpr); F(has_emulated_msr);		       \
-> +	F(vcpu_after_set_cpuid); F(vm_init); F(vm_destroy); F(vcpu_create);    \
-> +	F(vcpu_free); F(vcpu_reset); F(prepare_guest_switch); F(vcpu_load);    \
-> +	F(vcpu_put); F(update_exception_bitmap); F(get_msr); F(set_msr);       \
-> +	F(get_segment_base); F(get_segment); F(get_cpl); F(set_segment);       \
-> +	F(get_cs_db_l_bits); F(set_cr0); F(is_valid_cr4); F(set_cr4);	       \
-> +	F(set_efer); F(get_idt); F(set_idt); F(get_gdt); F(set_gdt);	       \
-> +	F(sync_dirty_debug_regs); F(set_dr7); F(cache_reg); F(get_rflags);     \
-> +	F(set_rflags); F(tlb_flush_all); F(tlb_flush_current);		       \
-> +	F(tlb_remote_flush); F(tlb_remote_flush_with_range); F(tlb_flush_gva); \
-> +	F(tlb_flush_guest); F(run); F(handle_exit);			       \
-> +	F(skip_emulated_instruction); F(update_emulated_instruction);	       \
-> +	F(set_interrupt_shadow); F(get_interrupt_shadow); F(patch_hypercall);  \
-> +	F(set_irq); F(set_nmi); F(queue_exception); F(cancel_injection);       \
-> +	F(interrupt_allowed); F(nmi_allowed); F(get_nmi_mask); F(set_nmi_mask);\
-> +	F(enable_nmi_window); F(enable_irq_window); F(update_cr8_intercept);   \
-> +	F(check_apicv_inhibit_reasons); F(pre_update_apicv_exec_ctrl);	       \
-> +	F(refresh_apicv_exec_ctrl); F(hwapic_irr_update); F(hwapic_isr_update);\
-> +	F(guest_apic_has_interrupt); F(load_eoi_exitmap);		       \
-> +	F(set_virtual_apic_mode); F(set_apic_access_page_addr);		       \
-> +	F(deliver_posted_interrupt); F(sync_pir_to_irr); F(set_tss_addr);      \
-> +	F(set_identity_map_addr); F(get_mt_mask); F(load_mmu_pgd);	       \
-> +	F(has_wbinvd_exit); F(write_l1_tsc_offset); F(get_exit_info);	       \
-> +	F(check_intercept); F(handle_exit_irqoff); F(request_immediate_exit);  \
-> +	F(sched_in); F(slot_enable_log_dirty); F(slot_disable_log_dirty);      \
-> +	F(flush_log_dirty); F(enable_log_dirty_pt_masked);		       \
-> +	F(cpu_dirty_log_size); F(pre_block); F(post_block); F(vcpu_blocking);  \
-> +	F(vcpu_unblocking); F(update_pi_irte); F(apicv_post_state_restore);    \
-> +	F(dy_apicv_has_pending_interrupt); F(set_hv_timer); F(cancel_hv_timer);\
-> +	F(setup_mce); F(smi_allowed); F(pre_enter_smm); F(pre_leave_smm);      \
-> +	F(enable_smi_window); F(mem_enc_op); F(mem_enc_reg_region);	       \
-> +	F(mem_enc_unreg_region); F(get_msr_feature);			       \
-> +	F(can_emulate_instruction); F(apic_init_signal_blocked);	       \
-> +	F(enable_direct_tlbflush); F(migrate_timers); F(msr_filter_changed);   \
-> +	F(complete_emulated_msr)
+> Sean,
+> 
+> Do you want to send me your patch (so that with your SoB), or do you want me to copy
+> & paste the code you posted in this series, plus Suggested-by you? Or how do you want
+> to proceed?
+> 
+> Also to me it is better to separate X86_FEATURE_SGX1/2 with rest of KVM changes?
 
-What about adding a dedicated .h file for this beast?  Then it won't be so
-painful to do one function per line.  As is, updates to kvm_x86_ops will be
-messy.
+Hmm, I'll split the changes into two proper patches and send them to you off list.
 
-And add yet another macro layer (or maybe just tweak this one?) so that the
-caller controls the line ending?  I suppose you could also just use a comma, but
-that's a bit dirty...
+> And do you think adding a dedicated, i.e. kvm_scattered_cpu_caps[], instead of using
+> existing kvm_cpu_cap[NCAPINTS] would be helpful to solve the problem caused by adding
+> new leaf to x86 core (see my another reply in this thread)?
 
-That would also allow using this to declare vmx_x86_ops and svm_x86_ops, which
-would need a comma insteat of a semi-colon.  There have a been a few attempts to
-add a bit of automation to {vmx,svm}_x86_ops, this seems like it would be good
-motivation to go in a different direction and declare/define all ops, e.g. the
-VMX/SVM code could simply do something like:
-
-#define DECLARE_VMX_X86_OP(func) \
-	.func = vmx_##func
-
-static struct kvm_x86_ops vmx_x86_ops __initdata = {
-	.vm_size = sizeof(struct kvm_vmx),
-	.vm_init = vmx_vm_init,
-
-	.pmu_ops = &intel_pmu_ops,
-	.nested_ops = &vmx_nested_ops,
-
-	FOREACH_KVM_X86_OPS(DECLARE_VMX_X86_OP)
-};
-
+Probably not, because then we'd have to add new helpers to deal with the new
+array, or change all the helpers to take the array as a pointer.  Blasting past
+NCAPINTS is a little evil, but it does slot in nicely to the existing code.
