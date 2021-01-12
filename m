@@ -2,110 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E26242F37C0
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA26A2F37C6
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 18:59:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389393AbhALR4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 12:56:45 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62268 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731029AbhALR4o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 12:56:44 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10CHYrMh038909;
-        Tue, 12 Jan 2021 12:55:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=MHWdrGw14uYtb4TGJ5A7+n2JEJmQ4jGo6SgmNA4cpFk=;
- b=SfzK4ajuPVM373mTedmtjd5b0ooqMqreOnkpGPfihUZie7VQh9tn57digjIYRr/oiu7S
- fn4KSzU+VMn3lCfDDXk6W+MglybbwafN5hAA83g9MOJp14zU2vdLGc4k/f/jTYy+UVJ8
- bTMztPnwCH35PZqf9mRaLwxmXLh56X9ol23VIH26zb4fgUykihcQROFw9Z7dY86Q7wB1
- Z7SIN+WOFp27caRBgxbuEDThhbC74+fxvos0mq6gQYtR5NRjdqJy337kaD7KBJkUx2Pf
- PYFtnDpzbgAFNe/2pXBlzfGKIaWejBcrxHOjBucfzhGUrGTtVfFQz6TV15F+GmJnOo+K dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361g9y0dte-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 12:55:59 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10CHYw5M038995;
-        Tue, 12 Jan 2021 12:55:58 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361g9y0dsu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 12:55:58 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10CHq942021951;
-        Tue, 12 Jan 2021 17:55:56 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdbjrh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Jan 2021 17:55:56 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10CHtr4K42992000
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Jan 2021 17:55:53 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6BC334C040;
-        Tue, 12 Jan 2021 17:55:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ADBA44C04E;
-        Tue, 12 Jan 2021 17:55:52 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.60.135])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue, 12 Jan 2021 17:55:52 +0000 (GMT)
-Date:   Tue, 12 Jan 2021 18:55:50 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-Message-ID: <20210112185550.1ac49768.pasic@linux.ibm.com>
-In-Reply-To: <20210112021251.0d989225.pasic@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-10-akrowiak@linux.ibm.com>
-        <20210112021251.0d989225.pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S2391743AbhALR5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 12:57:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53700 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390417AbhALR5l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 12:57:41 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D94C061786
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:57:01 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id j1so1811974pld.3
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 09:57:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=juupzti4DjJGDkZymRZ4Hc4aNwh9m6UznVRuz/k6aiY=;
+        b=D60dxrI8s7RNFc+y8vuVvZajug7r9YdHgFOUSCbNl3jQHnymRLHAQs8PA9hCQtCiJp
+         /a8zU0IqB1a5PFkVIO71nW8vOFQyfvmzrBa5e+y/bIkaSx8OAFqmV0Jvw7W/J3xfdTBG
+         mAvtHc1Quj9Bs6vf3J4NI+Fi2bdAh5GDrUnNoyhOl8f9v8bb5sOg425c1unqaXDj0kad
+         sJKHBudJqInEYt1KvW5/ptn6QaEcgxikAQVfItlwAxiZajIH/X3qK1WBCABeFeJF/sKC
+         viQOgBSkd77iH8Phoe4et2xOHWTmd2Y+721p9vVSTYAf80hsyFnHz5WZzw7YpqIcpWCT
+         hHXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=juupzti4DjJGDkZymRZ4Hc4aNwh9m6UznVRuz/k6aiY=;
+        b=UEU323NrY+uNH03USRGbJMKtBLT4g/obk+N2ie/dnlib+lJiFMZBkjLmo9a/Y23nJW
+         Ltri6C5+T8c/Dz1wafsJV6kNm6E3I+A/u4mUXEKAQhWzPndDFvbbkDtEWiNp8ycCmZlg
+         hsy4NKA9fbL/k8CyYuuVdpMIUL16cPMR54t3BeXMlZYhxaUF9cqVBjGZSz330ZiZicIT
+         WQfIrkZ5Wtc+3QVJZ0ALTd9K/h9DaLCtVRzRsgmR9yozoimeAo9j92faO+icWDwIzz41
+         vFDznu8K4aBlmsnLwIbZFmJ/T8gb9RjzUaxDzsbp2EC1tcoNGSKM1+OpQW18OjRedcOX
+         NGpw==
+X-Gm-Message-State: AOAM5313FHU2h6Q4EFtMQzk3ZjsfA3dhyhcThgvQZMS2f3Ol6V6EQMqz
+        SkntFiBUkBktOwkIElnBDvtDwA==
+X-Google-Smtp-Source: ABdhPJxHvo/hbTRzG6K/o9EJ08MZoMACr7cc3HKgSc8EzOuNUCLwlGY7c+sN4tTAPxiW2yu8tRFbNw==
+X-Received: by 2002:a17:90a:5513:: with SMTP id b19mr267855pji.99.1610474220588;
+        Tue, 12 Jan 2021 09:57:00 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 17sm3821852pfj.91.2021.01.12.09.56.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 09:56:59 -0800 (PST)
+Date:   Tue, 12 Jan 2021 09:56:52 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Bandan Das <bsd@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, dgilbert@redhat.com
+Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
+ VM instructions
+Message-ID: <X/3i5Pjg1gEwupJD@google.com>
+References: <jpgturmgnu6.fsf@linux.bootlegged.copy>
+ <8FAC639B-5EC6-42EE-B886-33AEF3CD5E26@amacapital.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-12_12:2021-01-12,2021-01-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 lowpriorityscore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101120099
+In-Reply-To: <8FAC639B-5EC6-42EE-B886-33AEF3CD5E26@amacapital.net>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Jan 2021 02:12:51 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Tue, Jan 12, 2021, Andy Lutomirski wrote:
+> 
+> > On Jan 12, 2021, at 7:46 AM, Bandan Das <bsd@redhat.com> wrote:
+> > 
+> > ﻿Andy Lutomirski <luto@amacapital.net> writes:
+> > ...
+> >>>>>> #endif diff --git a/arch/x86/kvm/mmu/mmu.c
+> >>>>>> b/arch/x86/kvm/mmu/mmu.c index 6d16481aa29d..c5c4aaf01a1a 100644
+> >>>>>> --- a/arch/x86/kvm/mmu/mmu.c +++ b/arch/x86/kvm/mmu/mmu.c @@
+> >>>>>> -50,6 +50,7 @@ #include <asm/io.h> #include <asm/vmx.h> #include
+> >>>>>> <asm/kvm_page_track.h> +#include <asm/e820/api.h> #include
+> >>>>>> "trace.h"
+> >>>>>> 
+> >>>>>> extern bool itlb_multihit_kvm_mitigation; @@ -5675,6 +5676,12 @@
+> >>>>>> void kvm_mmu_slot_set_dirty(struct kvm *kvm, }
+> >>>>>> EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
+> >>>>>> 
+> >>>>>> +bool kvm_is_host_reserved_region(u64 gpa) +{ + return
+> >>>>>> e820__mbapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED); +}
+> >>>>> While _e820__mapped_any()'s doc says '..  checks if any part of
+> >>>>> the range <start,end> is mapped ..' it seems to me that the real
+> >>>>> check is [start, end) so we should use 'gpa' instead of 'gpa-1',
+> >>>>> no?
+> >>>> Why do you need to check GPA at all?
+> >>>> 
+> >>> To reduce the scope of the workaround.
+> >>> 
+> >>> The errata only happens when you use one of SVM instructions in the
+> >>> guest with EAX that happens to be inside one of the host reserved
+> >>> memory regions (for example SMM).
+> >> 
+> >> This code reduces the scope of the workaround at the cost of
+> >> increasing the complexity of the workaround and adding a nonsensical
+> >> coupling between KVM and host details and adding an export that really
+> >> doesn’t deserve to be exported.
+> >> 
+> >> Is there an actual concrete benefit to this check?
+> > 
+> > Besides reducing the scope, my intention for the check was that we should
+> > know if such exceptions occur for any other undiscovered reasons with other
+> > memory types rather than hiding them under this workaround.
+> 
+> Ask AMD?
+> 
+> I would also believe that someone somewhere has a firmware that simply omits
+> the problematic region instead of listing it as reserved.
 
-> > @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
-> >  	apqi = AP_QID_QUEUE(q->apqn);
-> >  	vfio_ap_mdev_reset_queue(apid, apqi, 1);
-> >  
-> > -	if (q->matrix_mdev)
-> > +	if (q->matrix_mdev) {
-> > +		matrix_mdev = q->matrix_mdev;
-> >  		vfio_ap_mdev_unlink_queue(q);
-> > +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
-> > +	}
-> >  
-> >  	kfree(q);
-> >  	mutex_unlock(&matrix_dev->lock);  
+I agree with Andy, odds are very good that attempting to be precise will lead to
+pain due to false negatives.
 
-Shouldn't we first remove the queue from the APCB and then
-reset? Sorry, I missed this one yesterday.
-
-Regards,
-Halil
+And, KVM's SVM instruction emulation needs to be be rock solid regardless of
+this behavior since KVM unconditionally intercepts the instruction, i.e. there's
+basically zero risk to KVM.
