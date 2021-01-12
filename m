@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 018322F3D71
+	by mail.lfdr.de (Postfix) with ESMTP id E62BD2F3D75
 	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:44:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406646AbhALVgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 16:36:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32946 "EHLO
+        id S2393224AbhALVhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 16:37:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437013AbhALUmG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 15:42:06 -0500
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13393C0617A2
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:40:56 -0800 (PST)
-Received: by mail-oo1-xc34.google.com with SMTP id o5so900803oop.12
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:40:55 -0800 (PST)
+        with ESMTP id S2437065AbhALU4A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 15:56:00 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF6CC061794
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:55:20 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id a109so3673031otc.1
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 12:55:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=GOqyNTF7gtUKPVXIMkVFT3geI3snsFvpWMRi06NItYY=;
-        b=ZhmlJV62BeU9fJsGlfyvETF+LCKlVC2NajZUVYu+YTBpcA7oEZg+f+cRZvbeGR/wRn
-         OE8OA5J2WD9Pyviogsk4vAUx0oNQmVzR8vJjuNxc6R/JAdYYrMuliwJOKaeispULA4s3
-         Paz/kpI+jzpctNP+2Igp6sNge3FY1sSX/OxQO1Mm77d4BSdi0VixLEpB9NM9zsJDNE17
-         nTGyKfNHi0f22Ba4gFcYkm4igDeQKN59JTV5QfhwG9iHkwNEih7lMpfyyre20lo295AS
-         5hblNfZ5Rfz6/jFNkOzYEb9rWjcEeyiCbtE5JTqFWgE0Ik2pVEOWGwT+0JfXpFcHqAKJ
-         wqOA==
+        bh=uD2LwoNsLHO2bQTapcwBrSqoHTZzd1YmNCw2S92ag9Q=;
+        b=Y43uZ7bLVKMqH9GbZ4BYcx2lvxcJ2i103HsmZiv7+g4ZppufN2r5P61wpRmKjQtDm+
+         6Iw5P4Q3jCWLRJntB2VAsKmOyFWepWSPdDNfMwp7rBHOArihxsXGpviAmbLDbLReNp5T
+         1GsQFLXpkPd3O8YBg1d9ys2pl+Y2iRrBcQPXibs/a8PG64RIBsakJm4UbXN4O3AmUBMB
+         LcWcVtFHbgPEspus3oJa8xqqPKE6R8KJiuW56r+SCcE5YMmlzY88EwbtWXVIvz2bjoYL
+         9avkyk50tPvH0NmYp6atvBDNCPwlyY5Wzt+QY/5vlJHqedpwjVB5eQYvs1hgfE8jwBFg
+         z4Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=GOqyNTF7gtUKPVXIMkVFT3geI3snsFvpWMRi06NItYY=;
-        b=MDy3padRQGUE2w7bAA08GvtLpPq8e/pavdq+2agDSrWn7eM81J75pAmFMlHkyRAd+v
-         E4FpWdAFjKrZXsSYZYJ2oXAZbIX+i6iLGMb02b6zeDBrYzMuoS+7Vehndlcb9vG0pzBM
-         eOnT8a5Q4+mJj6gPxJ6uA8Sn7wO+uAoxFtdwGTWPZJHeJXlXut1e+dmkwwVamYqtip3Z
-         ri8NwV4HahG7UrFavPTquUlrTCcb9mAFKJzlaApAEonZPKRfybA2YZJLWI+pLZqs/Nea
-         OqYv4Z5TK1aGb0DSwpRo1ePR2DYkLRP9V/KxMpuTdedlcLMKBIN9/UHwlbDChXqEb+gP
-         +OUA==
-X-Gm-Message-State: AOAM530+WiDLKNFVq30BGmxCyprdpTBT1R0A3k4CPj5RajE+wgWd6a3L
-        qqWn2DiMqBz7gluE8JBFfRSdxg/mlf2DsXYFHDmjhQ==
-X-Google-Smtp-Source: ABdhPJz/+VG3D8S0Su6wBVIT9oU9vLMwvxqzB/oumqqIsu0lWVXQRoNiE9y/Wv8b1dAsLKpTLLAHvt9lQNMSp/UwXic=
-X-Received: by 2002:a4a:d396:: with SMTP id i22mr552498oos.55.1610484054385;
- Tue, 12 Jan 2021 12:40:54 -0800 (PST)
+        bh=uD2LwoNsLHO2bQTapcwBrSqoHTZzd1YmNCw2S92ag9Q=;
+        b=ogQXywb6X5EaJvZrIRXQzhKjWe8ISLQvG04HWjhTQx1K3Q7gAMdHjl7KrFhNe8pN/f
+         bKSfCgMUK/Z8R50uVUFyi9pNmfuWKCQNc0iHsl8CfJgfp/0pk9P93SwiS03mTnIgbUWf
+         d+gTqxsKk0lqX10mvP+6gRwnw82jbZqrJIioc+h0cm90m9UDkWxK6WYdrgnR9SQjXAY7
+         GqW6K81p1GRj1nrxpczYub0AXBl9A9nrZkuMwwsG1cVJiySs6QTnZnMc8bXWrH+b0fUd
+         lYAtNKVd4dFg86vEZjXhIvLhIdWWqr30w6O6X0tIwvb3hHGmiiDikkhg+Xm1MLxbmpwO
+         9q7Q==
+X-Gm-Message-State: AOAM533aSe3GtfTz22Gro++a9Ti3WLU1tST4agMgN38ft1B3qTKU/PUS
+        g7AP6b3F5SZnfGnBB9mJK1kea9FI6HROUjeFLoL4vQ==
+X-Google-Smtp-Source: ABdhPJyg8eUeNmxDa4BkruWI0L3XjU5KjUa3gveljnrKGwGHBS2TJW6ZNkMgbXD0kYdCRDnkUgmQJ6NHb8T8kPmTb+c=
+X-Received: by 2002:a05:6830:572:: with SMTP id f18mr874911otc.109.1610484919603;
+ Tue, 12 Jan 2021 12:55:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20210112194143.1494-1-yuri.benditovich@daynix.com> <20210112194143.1494-4-yuri.benditovich@daynix.com>
-In-Reply-To: <20210112194143.1494-4-yuri.benditovich@daynix.com>
+References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
+ <20210112194143.1494-4-yuri.benditovich@daynix.com> <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
+In-Reply-To: <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
 From:   Yuri Benditovich <yuri.benditovich@daynix.com>
-Date:   Tue, 12 Jan 2021 22:40:42 +0200
-Message-ID: <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
+Date:   Tue, 12 Jan 2021 22:55:07 +0200
+Message-ID: <CAOEp5OevYR5FWVMfQ_esmWTKtz9_ddTupbe7FtBFQ=sv2kEt2w@mail.gmail.com>
 Subject: Re: [RFC PATCH 3/7] tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -74,39 +75,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 9:42 PM Yuri Benditovich
+On Tue, Jan 12, 2021 at 10:40 PM Yuri Benditovich
 <yuri.benditovich@daynix.com> wrote:
 >
-> This program type can set skb hash value. It will be useful
-> when the tun will support hash reporting feature if virtio-net.
+> On Tue, Jan 12, 2021 at 9:42 PM Yuri Benditovich
+> <yuri.benditovich@daynix.com> wrote:
+> >
+> > This program type can set skb hash value. It will be useful
+> > when the tun will support hash reporting feature if virtio-net.
+> >
+> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > ---
+> >  drivers/net/tun.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> > index 7959b5c2d11f..455f7afc1f36 100644
+> > --- a/drivers/net/tun.c
+> > +++ b/drivers/net/tun.c
+> > @@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
+> >                 prog = NULL;
+> >         } else {
+> >                 prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
+> > +               if (IS_ERR(prog))
+> > +                       prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
+> >                 if (IS_ERR(prog))
+> >                         return PTR_ERR(prog);
+> >         }
 >
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> ---
->  drivers/net/tun.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 7959b5c2d11f..455f7afc1f36 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
->                 prog = NULL;
->         } else {
->                 prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
-> +               if (IS_ERR(prog))
-> +                       prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
->                 if (IS_ERR(prog))
->                         return PTR_ERR(prog);
->         }
+> Comment from Alexei Starovoitov:
+> Patches 1 and 2 are missing for me, so I couldn't review properly,
+> but this diff looks odd.
+> It allows sched_cls prog type to attach to tun.
+> That means everything that sched_cls progs can do will be done from tun hook?
 
-Comment from Alexei Starovoitov:
-Patches 1 and 2 are missing for me, so I couldn't review properly,
-but this diff looks odd.
-It allows sched_cls prog type to attach to tun.
-That means everything that sched_cls progs can do will be done from tun hook?
-sched_cls assumes l2 and can modify the packet.
-I think crashes are inevitable.
+We do not have an intention to modify the packet in this steering eBPF.
+There is just one function that unavailable for BPF_PROG_TYPE_SOCKET_FILTER
+that the eBPF needs to make possible to deliver the hash to the guest
+VM - it is 'bpf_set_hash'
 
-> --
-> 2.17.1
+Does it mean that we need to define a new eBPF type for socket filter
+operations + set_hash?
+
+Our problem is that the eBPF calculates 32-bit hash, 16-bit queue
+index and 8-bit of hash type.
+But it is able to return only 32-bit integer, so in this set of
+patches the eBPF returns
+queue index and hash type and saves the hash in skb->hash using bpf_set_hash().
+
+If this is unacceptable, can you please recommend a better solution?
+
+> sched_cls assumes l2 and can modify the packet.
+
+The steering eBPF in TUN module also assumes l2.
+
+> I think crashes are inevitable.
 >
+> > --
+> > 2.17.1
+> >
