@@ -2,112 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 795572F26CE
+	by mail.lfdr.de (Postfix) with ESMTP id E68C52F26CF
 	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 04:50:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727485AbhALDu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 22:50:27 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34369 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726343AbhALDu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 22:50:27 -0500
+        id S1728128AbhALDu3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 22:50:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727566AbhALDu2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 11 Jan 2021 22:50:28 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 170C9C061786
+        for <kvm@vger.kernel.org>; Mon, 11 Jan 2021 19:49:47 -0800 (PST)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DFGmR6wtWz9sWL; Tue, 12 Jan 2021 14:49:43 +1100 (AEDT)
+        id 4DFGmS1c5Lz9sXV; Tue, 12 Jan 2021 14:49:44 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1610423383;
-        bh=GOPARHl2Um0wlY8mSkWS1A+Okstbf4+CZEKk7OTEAuc=;
+        d=gibson.dropbear.id.au; s=201602; t=1610423384;
+        bh=Pu1uUI8cNnCK2d3m6U8+RaJ5aZcbiR7kyAyYwXtPDOM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GizeGJ8fT5fZp0PaNju9Vhw2AQ64lxlUzkkXtPdhEKC+G84KceTrjQE2zSBLbMVFX
-         abcyYNdjZWcEj0vYuJxZMcCq6ZKD0Wy3KBqKqi75iZaqVEKYnHLMf4UWixjC1X0FTd
-         GNDHtfV0Y1VUOgrA4PN2ljilC0YIulkGThPDnHrU=
-Date:   Tue, 12 Jan 2021 14:03:22 +1100
+        b=Ku44Fn78DbjaIJuAGpIfkU4xhTwyz2zi06RWXMpVl2F9BEDULeIBwF+2ZsEtGx9CT
+         TWK+jxKmW2qGK7TUCVF48Kz/uxH3cZM/rje1K4JfEN/PVHC50rjek0GjqF/Qo5oK9/
+         EGTXYBh6R6fqw2DbU5/GVMVRL5DkNt/3EOS9eZmI=
+Date:   Tue, 12 Jan 2021 14:49:35 +1100
 From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
 Cc:     pair@us.ibm.com, pbonzini@redhat.com, frankja@linux.ibm.com,
         brijesh.singh@amd.com, dgilbert@redhat.com, qemu-devel@nongnu.org,
-        thuth@redhat.com, cohuck@redhat.com, berrange@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-ppc@nongnu.org,
+        rth@twiddle.net, thuth@redhat.com, berrange@redhat.com,
+        mdroth@linux.vnet.ibm.com, Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>, david@redhat.com,
-        mdroth@linux.vnet.ibm.com, pasic@linux.ibm.com,
-        borntraeger@de.ibm.com, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org,
-        rth@twiddle.net
-Subject: Re: [for-6.0 v5 06/13] securable guest memory: Decouple
- kvm_memcrypt_*() helpers from KVM
-Message-ID: <20210112030322.GK3051@yekko.fritz.box>
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        david@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+        borntraeger@de.ibm.com, kvm@vger.kernel.org, qemu-s390x@nongnu.org,
+        pasic@linux.ibm.com
+Subject: Re: [for-6.0 v5 03/13] securable guest memory: Handle memory
+ encryption via interface
+Message-ID: <20210112034935.GL3051@yekko.fritz.box>
 References: <20201204054415.579042-1-david@gibson.dropbear.id.au>
- <20201204054415.579042-7-david@gibson.dropbear.id.au>
- <e8c1f2a7-e5b9-8181-2c7b-0287699ac9c9@redhat.com>
+ <20201204054415.579042-4-david@gibson.dropbear.id.au>
+ <20201204141005.07bf61dd.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="zYjDATHXTWnytHRU"
+        protocol="application/pgp-signature"; boundary="/ZYM6PqDyfNytx60"
 Content-Disposition: inline
-In-Reply-To: <e8c1f2a7-e5b9-8181-2c7b-0287699ac9c9@redhat.com>
+In-Reply-To: <20201204141005.07bf61dd.cohuck@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---zYjDATHXTWnytHRU
-Content-Type: text/plain; charset=iso-8859-1
+--/ZYM6PqDyfNytx60
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 11, 2021 at 07:13:27PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 12/4/20 6:44 AM, David Gibson wrote:
-> > The kvm_memcrypt_enabled() and kvm_memcrypt_encrypt_data() helper funct=
-ions
-> > don't conceptually have any connection to KVM (although it's not possib=
+On Fri, Dec 04, 2020 at 02:10:05PM +0100, Cornelia Huck wrote:
+> On Fri,  4 Dec 2020 16:44:05 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > At the moment AMD SEV sets a special function pointer, plus an opaque
+> > handle in KVMState to let things know how to encrypt guest memory.
+> >=20
+> > Now that we have a QOM interface for handling things related to securab=
 le
-> > in practice to use them without it).
-> >=20
-> > They also rely on looking at the global KVMState.  But the same informa=
-tion
-> > is available from the machine, and the only existing callers have natur=
-al
-> > access to the machine state.
-> >=20
-> > Therefore, move and rename them to helpers in securable-guest-memory.h,
-> > taking an explicit machine parameter.
+> > guest memory, use a QOM method on that interface, rather than a bare
+> > function pointer for this.
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 > > ---
-> >  accel/kvm/kvm-all.c                   | 27 --------------------
-> >  accel/stubs/kvm-stub.c                | 10 --------
-> >  hw/i386/pc_sysfw.c                    |  6 +++--
-> >  include/exec/securable-guest-memory.h | 36 +++++++++++++++++++++++++++
-> >  include/sysemu/kvm.h                  | 17 -------------
-> >  5 files changed, 40 insertions(+), 56 deletions(-)
-> ...
+> >  accel/kvm/kvm-all.c                   |  36 +++++---
+> >  accel/kvm/sev-stub.c                  |   9 +-
+> >  include/exec/securable-guest-memory.h |   2 +
+> >  include/sysemu/sev.h                  |   5 +-
+> >  target/i386/monitor.c                 |   1 -
+> >  target/i386/sev.c                     | 116 ++++++++++----------------
+> >  6 files changed, 77 insertions(+), 92 deletions(-)
+> >=20
 >=20
-> > +static inline int securable_guest_memory_encrypt(MachineState *machine,
-> > +                                              uint8_t *ptr, uint64_t l=
-en)
-> > +{
-> > +    SecurableGuestMemory *sgm =3D machine->sgm;
-> > +
-> > +    if (sgm) {
-> > +        SecurableGuestMemoryClass *sgmc =3D SECURABLE_GUEST_MEMORY_GET=
-_CLASS(sgm);
-> > +
-> > +        if (sgmc->encrypt_data) {
+> > @@ -224,7 +224,7 @@ int kvm_get_max_memslots(void)
+> > =20
+> >  bool kvm_memcrypt_enabled(void)
+> >  {
+> > -    if (kvm_state && kvm_state->memcrypt_handle) {
+> > +    if (kvm_state && kvm_state->sgm) {
 >=20
-> Can this ever happen? Maybe use assert(sgmc->encrypt_data) instead?
+> If we want to generalize the concept, maybe check for encrypt_data in
+> sgm here? There's probably room for different callbacks in the sgm
+> structure.
 
-It's made moot by changes in the next spin.
+Actually, I've realised this isn't even as general as it pretends to
+be now, so I've taken a different approach for the next spin.
 
 >=20
-> Otherwise:
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->=20
-> > +            return sgmc->encrypt_data(sgm, ptr, len);
-> > +        }
-> > +    }
-> > +
-> > +    return 1;
-> > +}
+> >          return true;
+> >      }
+> > =20
 >=20
 
 --=20
@@ -116,24 +107,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---zYjDATHXTWnytHRU
+--/ZYM6PqDyfNytx60
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/9EXoACgkQbDjKyiDZ
-s5KvzQ/9EugoRV/WIF4Cga4OBwqfG0O80793x36mlNZm4fotE3mrayRqFRAhQ5jF
-E4xbG69Bp5GPK+9YzDAOWrGlNBBw9z0LSGQlBytS9hEODtAOFJfRsUT4Tn5eohJr
-liADZgHG9cQtOCZTpX8zp5LDT2XSsiLhorfuHXG7QzOJmEzTJRXLccpmdbOyQnYO
-wsHHXy/ZEocPVSsHCJU015hoB67JJYnIRj/tEv9WbasWFf3QlQF/IvB3oetmemZ1
-uTPwUAfD58PAf6G7/JQ3Qkj1HqpRBou/n7rp3pBtj4t+zqL4shv2SH1sJBICRvJK
-l9CLHpkNfUhPERZMKTw76EyqZWttBKyhlaxSgRBvnZXsRBdW/LX02ytC35r4g1wc
-eMVpb/1HAJjOnhS97O+F0BivaOvz5t3/TSUuR0Nkdlhk8bOJyb7pXIW81YGuLcio
-OJa7O38z3nyOd8CNtfm0NHCpUYI/OYR5APkVTqmKNBsLttWRvGVv8NNM+7hs0kZh
-KUSg/x2JSm2MkgwIU4E1wkF8V38wDXPJsWOelzWLRZSfUELOWRjSveuNeH3PLjHx
-fFdwDEY4G19X4/IIegPoC2TWZDngKot5bD3qiOqUxLfnpaCe2jN5k8hmk9ImWYqe
-3SUuZXrWZyFsbBugLr/LLPUcDbZWuCxuV+4f1ntHeqlySS5Z/r4=
-=2yF9
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl/9HE0ACgkQbDjKyiDZ
+s5Js5A//Yd7jTZccBJbYr8fl6LwL5XR1I53MZzJBdb0mQjdbnkUlRxWOwGoIzTOh
+hMTP7/m3oKzOePEV76IwEhBIouuYuPALTpP1cOnZdg4kDzKsln+36tP1VA2pMAm3
+l2xL6WxqUjdMpXzH5oD3+0FdOLplr7bXGtMZW9vBhGDluLdR5uyfYLveJwswwwHo
+72mdv3zcDQ6BSChR8MijtPuKpLWfkuKuyGAtSy2ovQNZfHqEIq9XmstPqFAvCsA/
+aKXg2fA7qMm0507tAjdlKXBuSvnxy0O72Kyvl73L+Ipw+gyiZKSnKYpexPODFyLt
+oN3ZYYb8zphWnDlr/7DjTJDfMpyxxOFjLkE6WMa84eWSi1G8IXJ1CJcDd+0tHtlr
+5J26cpGXl/L3Z82bIctc2qJp5CGWNhahRr2ThdEnQebh+3wzW9O6CyF0w3+cY5QX
+19kqHodasjj+ige37V6LU0tfEn2jJ7bGyIHedJBnTryNlWK9+OIj5inUvvxpNNg+
+KTIsLiphN+6Zr7v5/uCoDmmK6LPOn+8yOf9m2tHfmmRqtUbXkXqiFKSw0Al1vKbZ
+o2E6yoWGNFI7Y9YKzoKtoge3qdU2BHgt71nnXo3+1WM9i16vTCjr8zH2UaIqoeXL
+wGPq0aoODgI8G2ZQmiEbc0ieQZcIvYPqh8TaSb+gdf47wy2dQ50=
+=M33/
 -----END PGP SIGNATURE-----
 
---zYjDATHXTWnytHRU--
+--/ZYM6PqDyfNytx60--
