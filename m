@@ -2,140 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF7362F3F61
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:46:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7DCB2F3F9B
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:46:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438320AbhALWS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 17:18:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54130 "EHLO
+        id S1729625AbhALW3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 17:29:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732872AbhALWSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 17:18:55 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0071C0617A2
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:18:14 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id h186so2288540pfe.0
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:18:14 -0800 (PST)
+        with ESMTP id S2394592AbhALW3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 17:29:06 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C49C061575
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:28:26 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id p18so115362pgm.11
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:28:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=D94bTQz9Dscjb4392yuJLnozu8co+6TjlHWNTrMYHUs=;
-        b=k2fC4CfRFE5cZ37SaYKA95nYdU+VpqUqDsjI5gAEa9XKBzDbJ1Z9d2qi0gbwvkGL4d
-         eSZD5/+O8UbjZWTzVdOS/0NjZWx/5tC4zN7cc321WLZ0Y9jAP47bqBR2CsY3MS9u0ApS
-         ior7i82v4r8gohZZMyAb42LLZw6tp3B11zMQVhL+cYYZ3BSdqopUuvb8XABFlF+jGRJU
-         2A7O0jlAm1Zd0Fd1KPMzRtFUBH3Lp3aDKVy0QfSTsrFxd/L35bIyO/7n5YtKx5OHZ2iI
-         jVTh4nXuh5oP2LEf+gp8ZxVqmzxsbT3CBsILk2/UM8THWUs50NCErnu/zs57rzPO1MhE
-         O/QA==
+        bh=jKIXNkDnv+LH0iozvbbc4c92HnvXaZ+MtD53RZRxsSQ=;
+        b=ELxDFPTYb2RNZavQkPRkQP/legx2gjv58wWggJzQ0ToW08+Gdv7JscmGQjrCtYedmY
+         2MdPdN2TfWOV3BaVT3aCcgPtz99pwB3iBHA18tCJ0xgU1+zlTgePl5yQ7XDWnYtEyvxq
+         0xYRmmwFx4iri0lVfTmJmea7nlAKz4pd28f3mP9rFktLQSgJurK/BUaT8Y6QYpzXmb0l
+         CjdOBO8EhnSU2r495WQ03K0ZuEczHb96aXXC7KNvpxmpjvB7u1QjrL2Kdm36N4hL8P+W
+         hz9EcVBLtjhFdx2OMCY3b3D5Su1JccZX7XSGyhXgnPX/xzVWP+1urI5QHl9R98ypP1nx
+         erIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=D94bTQz9Dscjb4392yuJLnozu8co+6TjlHWNTrMYHUs=;
-        b=sagNWLNR7/UvwKvEAik9NA2b0WANDXhr9Wh+ZD4wglm/MUpDCG7K64P7xyCqoc5vI5
-         UFS7zaOkT/qyOea5lsd5mcAhwhkggqmI+S4LcJv/1HK2jjtMVSXN9kLQziZ/g+ez4Hus
-         BhgvKOtMr7zKAMcA6SbWLssMmX9SVH51ENgsvqObztobFTTB8R5M5yD7RQcYdfOdp5ob
-         rMAxz4qh9+DgwQFPazEmtse2rOnFYUDS7ostoEZFZlQZd/F8QYIYx9Qgk/60fwlX1apy
-         AqASg+jqgqaQondVZiABnLK3DHsVf5gRu3gQcqVWm61jHQGMJRLPpjzNGIFaEo24BoKm
-         apIw==
-X-Gm-Message-State: AOAM533c1m8VHP4m5/eQ/6XIOvU4brQfLPZoWQVuAfm4VOva8lUsVIQh
-        v60lb20oYIBL2kAHWNybZYrL2g==
-X-Google-Smtp-Source: ABdhPJwWcpIo/snHBo4kb/9Uw+4uUANJIxOEc3Cus4Jg5b2/fhTbAYanYjbKe2gibQWUFHCx61E8+A==
-X-Received: by 2002:a63:4082:: with SMTP id n124mr1200591pga.340.1610489894074;
-        Tue, 12 Jan 2021 14:18:14 -0800 (PST)
+        bh=jKIXNkDnv+LH0iozvbbc4c92HnvXaZ+MtD53RZRxsSQ=;
+        b=CXkBTHnr1eDWQa+DfJ9DJuvwdzXDFoAQMppAURSh9icvBIKBQwz8tQeTi8o1Rwl0JA
+         oazAlzBJfGO3AO77/9p3UGXPSsoXhHWhOh3d6MpzGUkPG5PoY0PlLeCbJkHBsgb8gTpZ
+         svy9qfmVTexT51smrh3xQf2D5AWYiB970dqoml5vbN36yQJK3/LSR9F6lRSYJybGaFvi
+         G3pqhCHgCA9VKuPGFJF0SsLl5AzqXbbkPNvgYcmBi8rHajfnojubUeGWjRknt+ZaLpVW
+         /io0NVAhnsN5qJIoCAO/W8OtAsqwkHKAVq8tT3TlUG3L9lS9zFGUd7yQB00YGZMn4Wo8
+         pH6Q==
+X-Gm-Message-State: AOAM530zTu+SDWNXEjhqrfMLVUHV/4g0XgWiJ3SS7aqvoZS+jXof7hIi
+        h8mN+j3ZoYwWTVkdComrT2pFp2HRf6RF4g==
+X-Google-Smtp-Source: ABdhPJwksddjG6jFCvI6lDmW75hj6gKg+5UE54KeAKCtqMk1AA1NxpZdG5H7Jqe+h8RpBd4kRrA9VA==
+X-Received: by 2002:a62:528c:0:b029:19e:4a39:d9ea with SMTP id g134-20020a62528c0000b029019e4a39d9eamr1443668pfb.20.1610490505636;
+        Tue, 12 Jan 2021 14:28:25 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id 77sm122040pfv.16.2021.01.12.14.18.12
+        by smtp.gmail.com with ESMTPSA id q70sm37684pja.39.2021.01.12.14.28.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 14:18:13 -0800 (PST)
-Date:   Tue, 12 Jan 2021 14:18:06 -0800
+        Tue, 12 Jan 2021 14:28:24 -0800 (PST)
+Date:   Tue, 12 Jan 2021 14:28:18 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 03/13] KVM: SVM: Move SEV module params/variables to sev.c
-Message-ID: <X/4gHlZJvpem8SLd@google.com>
-References: <20210109004714.1341275-1-seanjc@google.com>
- <20210109004714.1341275-4-seanjc@google.com>
- <87sg7792l3.fsf@vitty.brq.redhat.com>
- <672e86f7-86c7-0377-c544-fe52c8d7c1b9@amd.com>
- <87k0sj8l77.fsf@vitty.brq.redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, mlevitsk@redhat.com
+Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
+Message-ID: <X/4igkJA1ZY5rCk7@google.com>
+References: <20201223010850.111882-1-pbonzini@redhat.com>
+ <X+pbZ061gTIbM2Ef@google.com>
+ <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87k0sj8l77.fsf@vitty.brq.redhat.com>
+In-Reply-To: <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 11, 2021, Vitaly Kuznetsov wrote:
-> Tom Lendacky <thomas.lendacky@amd.com> writes:
+On Sat, Jan 02, 2021, Paolo Bonzini wrote:
+> On 28/12/20 23:25, Sean Christopherson wrote:
+> > On Wed, Dec 23, 2020, Paolo Bonzini wrote:
+> > > This short series adds a generic stress test to KVM unit tests that runs a
+> > > series of
+> > 
+> > Unintentional cliffhanger?
 > 
-> > On 1/11/21 4:42 AM, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <seanjc@google.com> writes:
-> >> 
-> >>> Unconditionally invoke sev_hardware_setup() when configuring SVM and
-> >>> handle clearing the module params/variable 'sev' and 'sev_es' in
-> >>> sev_hardware_setup().  This allows making said variables static within
-> >>> sev.c and reduces the odds of a collision with guest code, e.g. the guest
-> >>> side of things has already laid claim to 'sev_enabled'.
-> >>>
-> >>> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> >>> ---
-> >>>   arch/x86/kvm/svm/sev.c | 11 +++++++++++
-> >>>   arch/x86/kvm/svm/svm.c | 15 +--------------
-> >>>   arch/x86/kvm/svm/svm.h |  2 --
-> >>>   3 files changed, 12 insertions(+), 16 deletions(-)
-> >>>
-> >>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> >>> index 0eeb6e1b803d..8ba93b8fa435 100644
-> >>> --- a/arch/x86/kvm/svm/sev.c
-> >>> +++ b/arch/x86/kvm/svm/sev.c
-> >>> @@ -27,6 +27,14 @@
-> >>>   
-> >>>   #define __ex(x) __kvm_handle_fault_on_reboot(x)
-> >>>   
-> >>> +/* enable/disable SEV support */
-> >>> +static int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> >>> +module_param(sev, int, 0444);
-> >>> +
-> >>> +/* enable/disable SEV-ES support */
-> >>> +static int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> >>> +module_param(sev_es, int, 0444);
-> >> 
-> >> Two stupid questions (and not really related to your patch) for
-> >> self-eduacation if I may:
-> >> 
-> >> 1) Why do we rely on CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT (which
-> >> sound like it control the guest side of things) to set defaults here?
-> >
-> > I thought it was a review comment, but I'm not able to find it now.
-> >
-> > Brijesh probably remembers better than me.
-> >
-> >> 
-> >> 2) It appears to be possible to do 'modprobe kvm_amd sev=0 sev_es=1' and
-> >> this looks like a bogus configuration, should we make an effort to
-> >> validate the correctness upon module load?
-> >
-> > This will still result in an overall sev=0 sev_es=0. Is the question just 
-> > about issuing a message based on the initial values specified?
-> >
+> ... event injections, timer cycles, memory updates and TLB invalidations.
 > 
-> Yes, as one may expect the result will be that SEV-ES guests work and
-> plain SEV don't.
+> > > The configuration of the test is set individually for each VCPU on
+> > > the command line, for example:
+> > > 
+> > >     ./x86/run x86/chaos.flat -smp 2 \
+> > >        -append 'invtlb=1,mem=12,hz=100  hz=250,edu=1,edu_hz=53,hlt' -device edu
+> > > 
+> > > runs a continuous INVLPG+write test on 1<<12 pages on CPU 0, interrupted
+> > > by a 100 Hz timer tick; and keeps CPU 1 mostly idle except for 250 timer
+> > > ticks and 53 edu device interrupts per second.
+> > 
+> > Maybe take the target cpu as part of the command line instead of implicitly
+> > defining it via group position?
+> 
+> Sure, the command line syntax can be adjusted.
+> 
+>   The "duplicate" hz=??? is confusing.  E.g.
+> > 
+> >      ./x86/run x86/chaos.flat -smp 2 \
+> >        -append 'cpu=0,invtlb=1,mem=12,hz=100 cpu=1,hz=250,edu=1,edu_hz=53,hlt' -device edu
+> > 
+> > > For now, the test runs for an infinite time so it's not included in
+> > > unittests.cfg.  Do you think this is worth including in kvm-unit-tests,
+> > 
+> > What's the motivation for this type of test?  What class of bugs can it find
+> > that won't be found by existing kvm-unit-tests or simple boot tests?
+> 
+> Mostly live migration tests.  For example, Maxim found a corner case in
+> KVM_GET_VCPU_EVENTS that affects both nVMX and nSVM live migration (patches
+> coming), and it is quite hard to turn it into a selftest because it requires
+> the ioctl to be invoked exactly when nested_run_pending==1.  Such a test
+> would allow stress-testing live migration without having to set up L1 and L2
+> virtual machine images.
 
-KVM doesn't issue messages when it overrides other module params due to
-disable requirements, e.g. ept=0 unrestricted_guest=1 is roughly equivalent.
-Not that what KVM currently does is right, but at least it's consistent. :-)
+Ah, so you run the stress test in L1 and then migrate L1?
 
-And on the other hand, I think it's reasonable to expect that specifying only
-sev=0 is sufficient to disable both SEV and SEV-ES, e.g. to turn them off when
-they're enabled by default.
+What's the biggest hurdle for doing this completely within the unit test
+framework?  Is teaching the framework to migrate a unit test the biggest pain?
+Writing a "unit test" that puts an L2 guest into a busy loop doesn't seem _that_
+bad.
