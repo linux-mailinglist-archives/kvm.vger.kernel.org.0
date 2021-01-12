@@ -2,142 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A42C52F2558
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 02:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DE862F257E
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 02:48:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728042AbhALBPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 20:15:16 -0500
-Received: from mga18.intel.com ([134.134.136.126]:22280 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727431AbhALBPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 20:15:16 -0500
-IronPort-SDR: VeaCzDZySdGri6bDiBoYwyu+Gq63u3HsHp6jQtZTTkXSNl80PFuq+tlgDar3OjsOx+I4AW9VZ+
- m2lwHTtAoSBQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="165643373"
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="165643373"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 17:14:35 -0800
-IronPort-SDR: gcTdPTAenSfBS4t+vy9UlozmWALYIvh6z2EK9947afF2LKcge31cgqrAmwj1r/LOBOglMrWDaE
- ziTlz4rgGcAg==
-X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
-   d="scan'208";a="397207362"
-Received: from tpotnis-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.76.146])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 17:14:30 -0800
-Date:   Tue, 12 Jan 2021 14:14:28 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, mattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-Message-Id: <20210112141428.038533b6cd5f674c906a3c43@intel.com>
-In-Reply-To: <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
-References: <cover.1609890536.git.kai.huang@intel.com>
-        <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
+        id S1729180AbhALBVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 11 Jan 2021 20:21:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28512 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727919AbhALBVD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 11 Jan 2021 20:21:03 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10C11m6r030847;
+        Mon, 11 Jan 2021 20:20:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=IY0FNg71Sd157RzPniY1lE+vTVNWXVrYaKLd5+dZUus=;
+ b=pl70X5Brw7oPjuMZR83X6VVo58j+9jtpC9Vsz7ePsqwG5kbgQfMRgJl/RYVP5eEuNmmD
+ EPdLY2lKNRAdvjOnRFCiwlfgHcNasP4WyfxIu0/eQhQMzjCRlnKkp6PA3WSE6qg7XfUL
+ 5/Xr2a56riF0g/4+B8zh8Mg0dOjQFrOoHHbaQroExTgEpPrXprJfdrIHnu71eT5ndxRn
+ EppxVJiMDAOxF09pq2ZEj9dxFRwNqDvdayLgGtkgJ1mWznYY4jWifUGmZj9paS7xjy2s
+ h71rXC7iVy6fLpP7ohNrnKS7T576WrCcwBqbTF75tLUMUoqHRX1WFC8qjV4ZvM+SZkNC sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 361114scr1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 20:20:20 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10C1BAG5071534;
+        Mon, 11 Jan 2021 20:20:20 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 361114scqk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 11 Jan 2021 20:20:20 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10C1Gv59007873;
+        Tue, 12 Jan 2021 01:20:18 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 35y447txp1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 Jan 2021 01:20:18 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10C1KFqo38142306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Jan 2021 01:20:15 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 94A0011C052;
+        Tue, 12 Jan 2021 01:20:15 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB16D11C054;
+        Tue, 12 Jan 2021 01:20:14 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.92.32])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Tue, 12 Jan 2021 01:20:14 +0000 (GMT)
+Date:   Tue, 12 Jan 2021 02:20:12 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, mjrosato@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
+        david@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com
+Subject: Re: [PATCH v13 11/15] s390/vfio-ap: implement in-use callback for
+ vfio_ap driver
+Message-ID: <20210112022012.4bad464f.pasic@linux.ibm.com>
+In-Reply-To: <20201223011606.5265-12-akrowiak@linux.ibm.com>
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+        <20201223011606.5265-12-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-11_34:2021-01-11,2021-01-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 spamscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=999 impostorscore=0 mlxscore=0 clxscore=1015
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101120000
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 11 Jan 2021 19:20:48 +0200 Jarkko Sakkinen wrote:
-> On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
-> > --- Disclaimer ---
-> > 
-> > These patches were originally written by Sean Christopherson while at Intel.
-> > Now that Sean has left Intel, I (Kai) have taken over getting them upstream.
-> > This series needs more review before it can be merged.  It is being posted
-> > publicly and under RFC so Sean and others can review it. Maintainers are safe
-> > ignoring it for now.
-> > 
-> > ------------------
-> > 
-> > Hi all,
-> > 
-> > This series adds KVM SGX virtualization support. The first 12 patches starting
-> > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
-> > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
-> > 
-> > Please help to review this series. Also I'd like to hear what is the proper
-> > way to merge this series, since it contains change to both x86/SGX and KVM
-> > subsystem. Any feedback is highly appreciated. And please let me know if I
-> > forgot to CC anyone, or anyone wants to be removed from CC. Thanks in advance!
-> > 
-> > This series is based against latest tip tree's x86/sgx branch. You can also get
-> > the code from tip branch of kvm-sgx repo on github:
-> > 
-> >         https://github.com/intel/kvm-sgx.git tip
-> > 
-> > It also requires Qemu changes to create VM with SGX support. You can find Qemu
-> > repo here:
-> > 
-> >         https://github.com/intel/qemu-sgx.git next
-> > 
-> > Please refer to README.md of above qemu-sgx repo for detail on how to create
-> > guest with SGX support. At meantime, for your quick reference you can use below
-> > command to create SGX guest:
-> > 
-> >         #qemu-system-x86_64 -smp 4 -m 2G -drive file=<your_vm_image>,if=virtio \
-> >                 -cpu host,+sgx_provisionkey \
-> >                 -sgx-epc id=epc1,memdev=mem1 \
-> >                 -object memory-backend-epc,id=mem1,size=64M,prealloc
-> > 
-> > Please note that the SGX relevant part is:
-> > 
-> >                 -cpu host,+sgx_provisionkey \
-> >                 -sgx-epc id=epc1,memdev=mem1 \
-> >                 -object memory-backend-epc,id=mem1,size=64M,prealloc
-> > 
-> > And you can change other parameters of your qemu command based on your needs.
-> 
-> Thanks a lot documenting these snippets to the cover letter. I dig these
-> up from lore once my environment is working.
-> 
-> I'm setting up Arch based test environment with the eye on this patch set
-> and generic Linux keyring patches:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/arch.git/
-> 
-> Still have some minor bits to adjust before I can start deploying it for SGX
-> testing. For this patch set I'll use two instances of it.
+On Tue, 22 Dec 2020 20:16:02 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Thanks. Please let me know if you need anything more.
+> Let's implement the callback to indicate when an APQN
+> is in use by the vfio_ap device driver. The callback is
+> invoked whenever a change to the apmask or aqmask would
+> result in one or more queue devices being removed from the driver. The
+> vfio_ap device driver will indicate a resource is in use
+> if the APQN of any of the queue devices to be removed are assigned to
+> any of the matrix mdevs under the driver's control.
+> 
+> There is potential for a deadlock condition between the matrix_dev->lock
+> used to lock the matrix device during assignment of adapters and domains
+> and the ap_perms_mutex locked by the AP bus when changes are made to the
+> sysfs apmask/aqmask attributes.
+> 
+> Consider following scenario (courtesy of Halil Pasic):
+> 1) apmask_store() takes ap_perms_mutex
+> 2) assign_adapter_store() takes matrix_dev->lock
+> 3) apmask_store() calls vfio_ap_mdev_resource_in_use() which tries
+>    to take matrix_dev->lock
+> 4) assign_adapter_store() calls ap_apqn_in_matrix_owned_by_def_drv
+>    which tries to take ap_perms_mutex
+> 
+> BANG!
+> 
+> To resolve this issue, instead of using the mutex_lock(&matrix_dev->lock)
+> function to lock the matrix device during assignment of an adapter or
+> domain to a matrix_mdev as well as during the in_use callback, the
+> mutex_trylock(&matrix_dev->lock) function will be used. If the lock is not
+> obtained, then the assignment and in_use functions will terminate with
+> -EBUSY.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_drv.c     |  1 +
+>  drivers/s390/crypto/vfio_ap_ops.c     | 21 ++++++++++++++++++---
+>  drivers/s390/crypto/vfio_ap_private.h |  2 ++
+>  3 files changed, 21 insertions(+), 3 deletions(-)
+> 
+[..]
+>  }
+> +
+> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm)
+> +{
+> +	int ret;
+> +
+> +	if (!mutex_trylock(&matrix_dev->lock))
+> +		return -EBUSY;
+> +	ret = vfio_ap_mdev_verify_no_sharing(NULL, apm, aqm);
 
-> 
-> > =========
-> > KVM SGX virtualization Overview
-> > 
-> > - Virtual EPC
-> > 
-> > "Virtual EPC" is the EPC section exposed by KVM to guest so SGX software in
-> > guest can discover it and use it to create SGX enclaves. KVM exposes SGX to 
-> 
-> Virtual EPC is a representation of an EPC section. And there is no "the".
-> 
-> > guest via CPUID, and exposes one or more "virtual EPC" sections for guest.
-> > The size of "virtual EPC" is passed as Qemu parameter when creating the
-> > guest, and the base address is calcualted internally according to guest's
-> > configuration.
-> > 
-> > To support virtual EPC, add a new misc device /dev/sgx_virt_epc to SGX
-> > core/driver to allow userspace (Qemu) to allocate "raw" EPC, and use it as
-> > "virtual EPC" for guest. Obviously, unlike EPC allocated for host SGX driver,
-> > virtual EPC allocated via /dev/sgx_virt_epc doesn't have enclave associated,
-> > and how virtual EPC is used by guest is compeletely controlled by guest's SGX
-> > software.
-> 
-> I think that /dev/sgx_vepc would be a clear enough name for the device. This
-> text has now a bit confusing "terminology" related to this.
+If we detect that resources are in use, then we spit warnings to the
+message log, right?
 
-/dev/sgx_virt_epc may be clearer from userspace's perspective, for instance,
-if people see /dev/sgx_vepc, they may have to think about what it is,
-while /dev/sgx_virt_epc they may not.
+@Matt: Is your userspace tooling going to guarantee that this will never
+happen?
 
-But I don't have strong objection here. Does anyone has anything to say here?
+> +	mutex_unlock(&matrix_dev->lock);
+> +
+> +	return ret;
+> +}
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index d2d26ba18602..15b7cd74843b 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -107,4 +107,6 @@ struct vfio_ap_queue {
+>  int vfio_ap_mdev_probe_queue(struct ap_device *queue);
+>  void vfio_ap_mdev_remove_queue(struct ap_device *queue);
+>  
+> +int vfio_ap_mdev_resource_in_use(unsigned long *apm, unsigned long *aqm);
+> +
+>  #endif /* _VFIO_AP_PRIVATE_H_ */
+
