@@ -2,236 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03ADB2F274B
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 05:46:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AFF092F27D9
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 06:27:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732259AbhALEqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 11 Jan 2021 23:46:02 -0500
-Received: from ozlabs.org ([203.11.71.1]:36949 "EHLO ozlabs.org"
+        id S2388758AbhALF1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 00:27:08 -0500
+Received: from mga18.intel.com ([134.134.136.126]:57448 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731559AbhALEqB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 11 Jan 2021 23:46:01 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DFJ0S6Qvcz9t1C; Tue, 12 Jan 2021 15:45:12 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1610426712;
-        bh=OcbftV4TaBeWLdIFmmCYtwJPLQ7qc1qO7U5/JY6NWog=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CcyVNJkraDAJlDemoreWu2R3se4bXAIU+S2GyMIRdexan+DOTpwFvVNwHaoICAmmu
-         Q+a0E/34JMyknq0ZsNmT08iheLBPcoX4iunBDGwj42Pw1FMZab3bGoZga7BX861uGG
-         ieNKU8zB40fIIk5jMaDZ7G2YYFndze2TmUALKTwU=
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     pasic@linux.ibm.com, brijesh.singh@amd.com, pair@us.ibm.com,
-        dgilbert@redhat.com, qemu-devel@nongnu.org
-Cc:     andi.kleen@intel.com, qemu-ppc@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Greg Kurz <groug@kaod.org>, frankja@linux.ibm.com,
-        thuth@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>,
-        mdroth@linux.vnet.ibm.com, richard.henderson@linaro.org,
-        kvm@vger.kernel.org,
-        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eduardo Habkost <ehabkost@redhat.com>, david@redhat.com,
-        Cornelia Huck <cohuck@redhat.com>, mst@redhat.com,
-        qemu-s390x@nongnu.org, pragyansri.pathi@intel.com,
-        jun.nakajima@intel.com
-Subject: [PATCH v6 13/13] s390: Recognize confidential-guest-support option
-Date:   Tue, 12 Jan 2021 15:45:08 +1100
-Message-Id: <20210112044508.427338-14-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210112044508.427338-1-david@gibson.dropbear.id.au>
-References: <20210112044508.427338-1-david@gibson.dropbear.id.au>
+        id S1732090AbhALF1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 00:27:08 -0500
+IronPort-SDR: 800DPH8MeGXzTE3pDEhYgCM63lWAVqUBLigHxaxnf8OBj3nwTJ+mDPZxSnNvrJ7Dy+RR7Cv0fl
+ mE2/zX8+wmbQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9861"; a="165665509"
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="165665509"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 21:25:22 -0800
+IronPort-SDR: K+Po9YhVEEvS3vIMEnPHNo6eOJJ0eHQkpCK/TheO9bgoFzo1w6F7RQ/G+viZ1QtF5egjChfGup
+ rnYl4bjJ+bdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.79,340,1602572400"; 
+   d="scan'208";a="464398320"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.28]) ([10.239.159.28])
+  by fmsmga001.fm.intel.com with ESMTP; 11 Jan 2021 21:25:15 -0800
+Cc:     baolu.lu@linux.intel.com, Jason Gunthorpe <jgg@nvidia.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "Hossain, Mona" <mona.hossain@intel.com>,
+        "netanelg@mellanox.com" <netanelg@mellanox.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "Ortiz, Samuel" <samuel.ortiz@intel.com>,
+        "Kumar, Sanjay K" <sanjay.k.kumar@intel.com>,
+        "shahafs@mellanox.com" <shahafs@mellanox.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "yan.y.zhao@linux.intel.com" <yan.y.zhao@linux.intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [RFC PATCH v2 1/1] platform-msi: Add platform check for subdevice
+ irq domain
+To:     Leon Romanovsky <leon@kernel.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+References: <20210106022749.2769057-1-baolu.lu@linux.intel.com>
+ <20210106060613.GU31158@unreal>
+ <3d2620f9-bbd4-3dd0-8e29-0cfe492a109f@linux.intel.com>
+ <20210106104017.GV31158@unreal> <20210106152339.GA552508@nvidia.com>
+ <20210106160158.GX31158@unreal>
+ <MWHPR11MB18867EE2F4FA0382DCFEEE2B8CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210107060916.GY31158@unreal>
+ <MWHPR11MB188629E36439F80AD60900788CAF0@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <20210107071616.GA31158@unreal>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <dfda8933-566c-1ec7-4ed4-427f094cb7c9@linux.intel.com>
+Date:   Tue, 12 Jan 2021 13:17:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210107071616.GA31158@unreal>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At least some s390 cpu models support "Protected Virtualization" (PV),
-a mechanism to protect guests from eavesdropping by a compromised
-hypervisor.
+Hi,
 
-This is similar in function to other mechanisms like AMD's SEV and
-POWER's PEF, which are controlled by the "confidential-guest-support"
-machine option.  s390 is a slightly special case, because we already
-supported PV, simply by using a CPU model with the required feature
-(S390_FEAT_UNPACK).
+On 1/7/21 3:16 PM, Leon Romanovsky wrote:
+> On Thu, Jan 07, 2021 at 06:55:16AM +0000, Tian, Kevin wrote:
+>>> From: Leon Romanovsky <leon@kernel.org>
+>>> Sent: Thursday, January 7, 2021 2:09 PM
+>>>
+>>> On Thu, Jan 07, 2021 at 02:04:29AM +0000, Tian, Kevin wrote:
+>>>>> From: Leon Romanovsky <leon@kernel.org>
+>>>>> Sent: Thursday, January 7, 2021 12:02 AM
+>>>>>
+>>>>> On Wed, Jan 06, 2021 at 11:23:39AM -0400, Jason Gunthorpe wrote:
+>>>>>> On Wed, Jan 06, 2021 at 12:40:17PM +0200, Leon Romanovsky wrote:
+>>>>>>
+>>>>>>> I asked what will you do when QEMU will gain needed functionality?
+>>>>>>> Will you remove QEMU from this list? If yes, how such "new" kernel
+>>> will
+>>>>>>> work on old QEMU versions?
+>>>>>>
+>>>>>> The needed functionality is some VMM hypercall, so presumably new
+>>>>>> kernels that support calling this hypercall will be able to discover
+>>>>>> if the VMM hypercall exists and if so superceed this entire check.
+>>>>>
+>>>>> Let's not speculate, do we have well-known path?
+>>>>> Will such patch be taken to stable@/distros?
+>>>>>
+>>>>
+>>>> There are two functions introduced in this patch. One is to detect whether
+>>>> running on bare metal or in a virtual machine. The other is for deciding
+>>>> whether the platform supports ims. Currently the two are identical because
+>>>> ims is supported only on bare metal at current stage. In the future it will
+>>> look
+>>>> like below when ims can be enabled in a VM:
+>>>>
+>>>> bool arch_support_pci_device_ims(struct pci_dev *pdev)
+>>>> {
+>>>> 	return on_bare_metal() || hypercall_irq_domain_supported();
+>>>> }
+>>>>
+>>>> The VMM vendor list is for on_bare_metal, and suppose a vendor will
+>>>> never be removed once being added to the list since the fact of running
+>>>> in a VM never changes, regardless of whether this hypervisor supports
+>>>> extra VMM hypercalls.
+>>>
+>>> This is what I imagined, this list will be forever, and this worries me.
+>>>
+>>> I don't know if it is true or not, but guess that at least Oracle and
+>>> Microsoft bare metal devices and VMs will have same DMI_SYS_VENDOR.
+>>
+>> It's true. David Woodhouse also said it's the case for Amazon EC2 instances.
+>>
+>>>
+>>> It means that this on_bare_metal() function won't work reliably in many
+>>> cases. Also being part of include/linux/msi.h, at some point of time,
+>>> this function will be picked by the users outside for the non-IMS cases.
+>>>
+>>> I didn't even mention custom forks of QEMU which are prohibited to change
+>>> DMI_SYS_VENDOR and private clouds with custom solutions.
+>>
+>> In this case the private QEMU forks are encouraged to set CPUID (X86_
+>> FEATURE_HYPERVISOR) if they do plan to adopt a different vendor name.
+> 
+> Does QEMU set this bit when it runs in host-passthrough CPU model?
+> 
+>>
+>>>
+>>> The current array makes DMI_SYS_VENDOR interface as some sort of ABI. If
+>>> in the future,
+>>> the QEMU will decide to use more hipster name, for example "qEmU", this
+>>> function
+>>> won't work.
+>>>
+>>> I'm aware that DMI_SYS_VENDOR is used heavily in the kernel code and
+>>> various names for the same company are good example how not reliable it.
+>>>
+>>> The most hilarious example is "Dell/Dell Inc./Dell Inc/Dell Computer
+>>> Corporation/Dell Computer",
+>>> but other companies are not far from them.
+>>>
+>>> Luckily enough, this identification is used for hardware product that
+>>> was released to the market and their name will be stable for that
+>>> specific model. It is not the case here where we need to ensure future
+>>> compatibility too (old kernel on new VM emulator).
+>>>
+>>> I'm not in position to say yes or no to this patch and don't have plans to do it.
+>>> Just expressing my feeling that this solution is too hacky for my taste.
+>>>
+>>
+>> I agree with your worries and solely relying on DMI_SYS_VENDOR is
+>> definitely too hacky. In previous discussions with Thomas there is no
+>> elegant way to handle this situation. It has to be a heuristic approach.
+>> First we hope the CPUID bit is set properly in most cases thus is checked
+>> first. Then other heuristics can be made for the remaining cases. DMI_
+>> SYS_VENDOR is the first hint and more can be added later. For example,
+>> when IOMMU is present there is vendor specific way to detect whether
+>> it's real or virtual. Dave also mentioned some BIOS flag to indicate a
+>> virtual machine. Now probably the real question here is whether people
+>> are OK with CPUID+DMI_SYS_VENDOR combo check for now (and grow
+>> it later) or prefer to having all identified heuristics so far in-place together...
+> 
+> IMHO, it should be as much as possible close to the end result.
 
-To integrate this with the option used by other platforms, we
-implement the following compromise:
+Okay! This seems to be a right way to go.
 
- - When the confidential-guest-support option is set, s390 will
-   recognize it, verify that the CPU can support PV (failing if not)
-   and set virtio default options necessary for encrypted or protected
-   guests, as on other platforms.  i.e. if confidential-guest-support
-   is set, we will either create a guest capable of entering PV mode,
-   or fail outright.
+The SMBIOS defines a 'virtual machine' bit in the BIOS characteristics
+extension byte. It could be used as a possible way.
 
- - If confidential-guest-support is not set, guests might still be
-   able to enter PV mode, if the CPU has the right model.  This may be
-   a little surprising, but shouldn't actually be harmful.
+In order to support emulated IOMMU for fully virtualized guest, the
+iommu vendors defined methods to distinguish between bare metal and VMM
+(caching mode in VT-d for example).
 
-To start a guest supporting Protected Virtualization using the new
-option use the command line arguments:
-    -object s390-pv-guest,id=pv0 -machine confidential-guest-support=pv0
+I will go ahead with adding above two methods before checking the block
+list.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- docs/confidential-guest-support.txt |  3 ++
- docs/system/s390x/protvirt.rst      | 19 +++++++---
- hw/s390x/pv.c                       | 58 +++++++++++++++++++++++++++++
- include/hw/s390x/pv.h               |  1 +
- target/s390x/kvm.c                  |  3 ++
- 5 files changed, 78 insertions(+), 6 deletions(-)
-
-diff --git a/docs/confidential-guest-support.txt b/docs/confidential-guest-support.txt
-index d466aa79d5..b4912f66c2 100644
---- a/docs/confidential-guest-support.txt
-+++ b/docs/confidential-guest-support.txt
-@@ -42,4 +42,7 @@ AMD Secure Encrypted Virtualization (SEV)
- 
- POWER Protected Execution Facility (PEF)
- 
-+s390x Protected Virtualization (PV)
-+    docs/system/s390x/protvirt.rst
-+
- Other mechanisms may be supported in future.
-diff --git a/docs/system/s390x/protvirt.rst b/docs/system/s390x/protvirt.rst
-index 712974ad87..0f481043d9 100644
---- a/docs/system/s390x/protvirt.rst
-+++ b/docs/system/s390x/protvirt.rst
-@@ -22,15 +22,22 @@ If those requirements are met, the capability `KVM_CAP_S390_PROTECTED`
- will indicate that KVM can support PVMs on that LPAR.
- 
- 
--QEMU Settings
---------------
-+Running a Protected Virtual Machine
-+-----------------------------------
- 
--To indicate to the VM that it can transition into protected mode, the
-+To run a PVM you will need to select a CPU model which includes the
- `Unpack facility` (stfle bit 161 represented by the feature
--`unpack`/`S390_FEAT_UNPACK`) needs to be part of the cpu model of
--the VM.
-+`unpack`/`S390_FEAT_UNPACK`), and add these options to the command line::
-+
-+    -object s390-pv-guest,id=pv0 \
-+    -machine confidential-guest-support=pv0
-+
-+Adding these options will:
-+
-+* Ensure the `unpack` facility is available
-+* Enable the IOMMU by default for all I/O devices
-+* Initialize the PV mechanism
- 
--All I/O devices need to use the IOMMU.
- Passthrough (vfio) devices are currently not supported.
- 
- Host huge page backings are not supported. However guests can use huge
-diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
-index ab3a2482aa..85592e100a 100644
---- a/hw/s390x/pv.c
-+++ b/hw/s390x/pv.c
-@@ -14,8 +14,11 @@
- #include <linux/kvm.h>
- 
- #include "cpu.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "qom/object_interfaces.h"
-+#include "exec/confidential-guest-support.h"
- #include "hw/s390x/ipl.h"
- #include "hw/s390x/pv.h"
- 
-@@ -111,3 +114,58 @@ void s390_pv_inject_reset_error(CPUState *cs)
-     /* Report that we are unable to enter protected mode */
-     env->regs[r1 + 1] = DIAG_308_RC_INVAL_FOR_PV;
- }
-+
-+#define TYPE_S390_PV_GUEST "s390-pv-guest"
-+#define S390_PV_GUEST(obj)                              \
-+    OBJECT_CHECK(S390PVGuestState, (obj), TYPE_S390_PV_GUEST)
-+
-+typedef struct S390PVGuestState S390PVGuestState;
-+
-+/**
-+ * S390PVGuestState:
-+ *
-+ * The S390PVGuestState object is basically a dummy used to tell the
-+ * confidential guest support system to use s390's PV mechanism.
-+ *
-+ * # $QEMU \
-+ *         -object s390-pv-guest,id=pv0 \
-+ *         -machine ...,confidential-guest-support=pv0
-+ */
-+struct S390PVGuestState {
-+    Object parent_obj;
-+};
-+
-+int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp)
-+{
-+    if (!object_dynamic_cast(OBJECT(cgs), TYPE_S390_PV_GUEST)) {
-+        return 0;
-+    }
-+
-+    if (!s390_has_feat(S390_FEAT_UNPACK)) {
-+        error_setg(errp,
-+                   "CPU model does not support Protected Virtualization");
-+        return -1;
-+    }
-+
-+    cgs->ready = true;
-+
-+    return 0;
-+}
-+
-+static const TypeInfo s390_pv_guest_info = {
-+    .parent = TYPE_CONFIDENTIAL_GUEST_SUPPORT,
-+    .name = TYPE_S390_PV_GUEST,
-+    .instance_size = sizeof(S390PVGuestState),
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void
-+s390_pv_register_types(void)
-+{
-+    type_register_static(&s390_pv_guest_info);
-+}
-+
-+type_init(s390_pv_register_types);
-diff --git a/include/hw/s390x/pv.h b/include/hw/s390x/pv.h
-index aee758bc2d..9bbf66f356 100644
---- a/include/hw/s390x/pv.h
-+++ b/include/hw/s390x/pv.h
-@@ -43,6 +43,7 @@ void s390_pv_prep_reset(void);
- int s390_pv_verify(void);
- void s390_pv_unshare(void);
- void s390_pv_inject_reset_error(CPUState *cs);
-+int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp);
- #else /* CONFIG_KVM */
- static inline bool s390_is_pv(void) { return false; }
- static inline int s390_pv_vm_enable(void) { return 0; }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index b8385e6b95..d2435664dc 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -387,6 +387,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
- 
-     kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
-+
-+    s390_pv_init(ms->cgs, &error_fatal);
-+
-     return 0;
- }
- 
--- 
-2.29.2
-
+Best regards,
+baolu
