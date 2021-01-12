@@ -2,120 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D384F2F356A
-	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:21:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A07492F360D
+	for <lists+kvm@lfdr.de>; Tue, 12 Jan 2021 17:45:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406351AbhALQRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 11:17:23 -0500
-Received: from foss.arm.com ([217.140.110.172]:49142 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406333AbhALQRW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 11:17:22 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 470681FB;
-        Tue, 12 Jan 2021 08:16:36 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0FA2D3F719;
-        Tue, 12 Jan 2021 08:16:34 -0800 (PST)
-Subject: Re: [PATCH 7/9] KVM: arm64: Simplify argument passing to
- vgic_uaccess_[read|write]
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, maz@kernel.org, drjones@redhat.com
-Cc:     shuah@kernel.org, pbonzini@redhat.com
-References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-8-eric.auger@redhat.com>
- <ee2ec95e-4262-a364-b037-c43f3d396760@arm.com>
-Message-ID: <e7af1e23-7b08-99d6-d78c-812d442b32ce@arm.com>
-Date:   Tue, 12 Jan 2021 16:16:40 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2404872AbhALQoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 11:44:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28931 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2404683AbhALQoo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 11:44:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610469798;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RUslB6q7RxjLtV6kH7HKHwCBZnZvPnq5E+zwqql6G8Y=;
+        b=Fhax8wXJ/mrrJrjwApexltD/hWx9PNVfaPdANoKmH4Gfw8ObSVvHvW9p+36v5Frcl22Yfe
+        9rqm1fzhVabJUwLn0l5rZpHnjV5QcnzESB5g/6M8UbE21hjvVrp1kkXx+UiuCvFhZSpCk+
+        zpGgwef09ZSgHGdn2nlVkHorEpJoYrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-565-mwIeKspGNryfQOsFEelNyw-1; Tue, 12 Jan 2021 11:43:15 -0500
+X-MC-Unique: mwIeKspGNryfQOsFEelNyw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A72B51F7;
+        Tue, 12 Jan 2021 16:43:14 +0000 (UTC)
+Received: from virtlab710.virt.lab.eng.bos.redhat.com (virtlab710.virt.lab.eng.bos.redhat.com [10.19.152.252])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BC9435C1B4;
+        Tue, 12 Jan 2021 16:43:13 +0000 (UTC)
+From:   Cathy Avery <cavery@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     vkuznets@redhat.com, wei.huang2@amd.com,
+        sean.j.christopherson@intel.com
+Subject: [PATCH 0/2] KVM: SVM: Track physical cpu and asid_generation via the vmcb
+Date:   Tue, 12 Jan 2021 11:43:11 -0500
+Message-Id: <20210112164313.4204-1-cavery@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ee2ec95e-4262-a364-b037-c43f3d396760@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+In the cases where vmcbs change processors from one vmrun to another updated
+information in the vmcb from a prior run can potentially be lost. By tracking
+the physical cpu and asid_generation per vmcb instead of svm->vcpu the following
+scenario illustrated by Paolo can be avoided.
 
-On 1/12/21 4:04 PM, Alexandru Elisei wrote:
-> Hi Eric,
->
-> On 12/12/20 6:50 PM, Eric Auger wrote:
->> Instead of converting the vgic_io_device handle to a kvm_io_device
->> handled and then do the oppositive, pass a vgic_io_device pointer all
->> along the call chain.
-> To me, it looks like the commit message describes what the patch does instead of
-> why it does it.
->
-> What are "vgic_io_device handle" and "kvm_io_device handled"?
+     ---------------------          ---------------------
+     pCPU 1                         pCPU 2
+     ---------------------          ---------------------
+     run VMCB02
+                                    run VMCB02 (*)
+                                    run VMCB01
+     run VMCB01 (**)
+     run VMCB02 (***)
+     ---------------------          ---------------------
 
-Sorry, I think I got it now. You were referring to the argument types struct
-vgic_io_device and struct kvm_io_device. The patch looks like a very good cleanup.
+     After the point marked (*), while L2 runs, some fields change in VMCB02.
+     When the processor vmexits back to L0, VMCB02 is marked clean.
 
-How changing to commit message to sound something like this (feel free to
-ignore/change it if you think of something else):
+     At the point marked (**), svm->vcpu.cpu becomes 1 again.
 
-vgic_uaccess() takes a struct vgic_io_device argument, converts it to a struct
-kvm_io_device and passes it to the read/write accessor functions, which convert it
-back to a struct vgic_io_device. Avoid the indirection by passing the struct
-vgic_io_device argument directly to vgic_uaccess_{read,write).
+     Therefore, at the point marked (***) you will get svm->vcpu.cpu == cpu
+     and the VMCB02 will not be marked dirty.  The processor can then incorrectly
+     use some data that is cached from before point (*).
 
-Thanks,
-Alex
->
-> Thanks,
-> Alex
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-mmio.c | 10 ++++------
->>  1 file changed, 4 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
->> index b2d73fc0d1ef..48c6067fc5ec 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
->> @@ -938,10 +938,9 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
->>  	return region;
->>  }
->>  
->> -static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
->> +static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
->>  			     gpa_t addr, u32 *val)
->>  {
->> -	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
->>  	const struct vgic_register_region *region;
->>  	struct kvm_vcpu *r_vcpu;
->>  
->> @@ -960,10 +959,9 @@ static int vgic_uaccess_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
->>  	return 0;
->>  }
->>  
->> -static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
->> +static int vgic_uaccess_write(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
->>  			      gpa_t addr, const u32 *val)
->>  {
->> -	struct vgic_io_device *iodev = kvm_to_vgic_iodev(dev);
->>  	const struct vgic_register_region *region;
->>  	struct kvm_vcpu *r_vcpu;
->>  
->> @@ -986,9 +984,9 @@ int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
->>  		 bool is_write, int offset, u32 *val)
->>  {
->>  	if (is_write)
->> -		return vgic_uaccess_write(vcpu, &dev->dev, offset, val);
->> +		return vgic_uaccess_write(vcpu, dev, offset, val);
->>  	else
->> -		return vgic_uaccess_read(vcpu, &dev->dev, offset, val);
->> +		return vgic_uaccess_read(vcpu, dev, offset, val);
->>  }
->>  
->>  static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Theses patches are intended for the kvm nested-svm branch.
+
+The patches have been tested on nested fedora VMs, kvm self tests, and kvm-unit-tests.
+They have not been tested on SEV.
+
+Cathy Avery (2):
+  KVM: nSVM: Track the physical cpu of the vmcb vmrun through the vmcb
+  KVM: nSVM: Track the ASID generation of the vmcb vmrun through the
+    vmcb
+
+ arch/x86/kvm/svm/svm.c | 45 +++++++++++++++++++++++-------------------
+ arch/x86/kvm/svm/svm.h |  3 ++-
+ 2 files changed, 27 insertions(+), 21 deletions(-)
+
+-- 
+2.20.1
+
