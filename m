@@ -2,383 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA3CF2F3EA7
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:45:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7362F3F61
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:46:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394464AbhALWKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 17:10:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52513 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2394259AbhALWKr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 17:10:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610489360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E2WBojmY8pqKyKVUy94D13kLS6PlktCEnBE6xJE049c=;
-        b=J3XiD5GGafo15DrOS+LB8VO7iUcXSUOxaS2OwW7vLgfYoMSpyOFIPNd/rpkkt1a55vfITx
-        yur/5G4PSVomZT6bO/g8SfP/imNwW0FjLrh2X0DjKJmt6+sruoUqrNGikc2kvLnuxFYP16
-        NMMWhyT7OeUNv0djV00lDbnP+Iqfnhs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-JqqihzviPPmED8fl-ymbbw-1; Tue, 12 Jan 2021 17:09:16 -0500
-X-MC-Unique: JqqihzviPPmED8fl-ymbbw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB68E1005E40;
-        Tue, 12 Jan 2021 22:09:14 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 830831F0;
-        Tue, 12 Jan 2021 22:09:14 +0000 (UTC)
-Date:   Tue, 12 Jan 2021 15:09:14 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Zeng <jason.zeng@intel.com>
-Cc:     Steven Sistare <steven.sistare@oracle.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V1 4/5] vfio: VA suspend interface
-Message-ID: <20210112150914.0a83059d@omen.home.shazbot.org>
-In-Reply-To: <20210112154735.GA206071@x48.bj.intel.com>
-References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
-        <1609861013-129801-5-git-send-email-steven.sistare@oracle.com>
-        <20210108141549.071608a4@omen.home>
-        <f40232ca-710f-1b65-1d21-564c3ecb62cc@oracle.com>
-        <20210112154735.GA206071@x48.bj.intel.com>
+        id S2438320AbhALWS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 17:18:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732872AbhALWSz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 17:18:55 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0071C0617A2
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:18:14 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id h186so2288540pfe.0
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 14:18:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=D94bTQz9Dscjb4392yuJLnozu8co+6TjlHWNTrMYHUs=;
+        b=k2fC4CfRFE5cZ37SaYKA95nYdU+VpqUqDsjI5gAEa9XKBzDbJ1Z9d2qi0gbwvkGL4d
+         eSZD5/+O8UbjZWTzVdOS/0NjZWx/5tC4zN7cc321WLZ0Y9jAP47bqBR2CsY3MS9u0ApS
+         ior7i82v4r8gohZZMyAb42LLZw6tp3B11zMQVhL+cYYZ3BSdqopUuvb8XABFlF+jGRJU
+         2A7O0jlAm1Zd0Fd1KPMzRtFUBH3Lp3aDKVy0QfSTsrFxd/L35bIyO/7n5YtKx5OHZ2iI
+         jVTh4nXuh5oP2LEf+gp8ZxVqmzxsbT3CBsILk2/UM8THWUs50NCErnu/zs57rzPO1MhE
+         O/QA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=D94bTQz9Dscjb4392yuJLnozu8co+6TjlHWNTrMYHUs=;
+        b=sagNWLNR7/UvwKvEAik9NA2b0WANDXhr9Wh+ZD4wglm/MUpDCG7K64P7xyCqoc5vI5
+         UFS7zaOkT/qyOea5lsd5mcAhwhkggqmI+S4LcJv/1HK2jjtMVSXN9kLQziZ/g+ez4Hus
+         BhgvKOtMr7zKAMcA6SbWLssMmX9SVH51ENgsvqObztobFTTB8R5M5yD7RQcYdfOdp5ob
+         rMAxz4qh9+DgwQFPazEmtse2rOnFYUDS7ostoEZFZlQZd/F8QYIYx9Qgk/60fwlX1apy
+         AqASg+jqgqaQondVZiABnLK3DHsVf5gRu3gQcqVWm61jHQGMJRLPpjzNGIFaEo24BoKm
+         apIw==
+X-Gm-Message-State: AOAM533c1m8VHP4m5/eQ/6XIOvU4brQfLPZoWQVuAfm4VOva8lUsVIQh
+        v60lb20oYIBL2kAHWNybZYrL2g==
+X-Google-Smtp-Source: ABdhPJwWcpIo/snHBo4kb/9Uw+4uUANJIxOEc3Cus4Jg5b2/fhTbAYanYjbKe2gibQWUFHCx61E8+A==
+X-Received: by 2002:a63:4082:: with SMTP id n124mr1200591pga.340.1610489894074;
+        Tue, 12 Jan 2021 14:18:14 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 77sm122040pfv.16.2021.01.12.14.18.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 14:18:13 -0800 (PST)
+Date:   Tue, 12 Jan 2021 14:18:06 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 03/13] KVM: SVM: Move SEV module params/variables to sev.c
+Message-ID: <X/4gHlZJvpem8SLd@google.com>
+References: <20210109004714.1341275-1-seanjc@google.com>
+ <20210109004714.1341275-4-seanjc@google.com>
+ <87sg7792l3.fsf@vitty.brq.redhat.com>
+ <672e86f7-86c7-0377-c544-fe52c8d7c1b9@amd.com>
+ <87k0sj8l77.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k0sj8l77.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Jan 2021 23:47:35 +0800
-Jason Zeng <jason.zeng@intel.com> wrote:
-
-> On Mon, Jan 11, 2021 at 04:15:02PM -0500, Steven Sistare wrote:
-> > On 1/8/2021 4:15 PM, Alex Williamson wrote:  
-> > > On Tue,  5 Jan 2021 07:36:52 -0800
-> > > Steve Sistare <steven.sistare@oracle.com> wrote:
-> > >   
-> > >> Add interfaces that allow the underlying memory object of an iova
-> > >> range to be mapped to a new host virtual address in the host process:
-> > >>
-> > >>   - VFIO_DMA_UNMAP_FLAG_SUSPEND for VFIO_IOMMU_UNMAP_DMA
-> > >>   - VFIO_DMA_MAP_FLAG_RESUME flag for VFIO_IOMMU_MAP_DMA
-> > >>   - VFIO_SUSPEND extension for VFIO_CHECK_EXTENSION  
-> > > 
-> > > Suspend and Resume can imply many things other than what's done here.
-> > > Should these be something more akin to INVALIDATE_VADDR and
-> > > REPLACE_VADDR?  
-> > 
-> > Agreed.  I suspected we would discuss the names.  Some possibilities:
-> > 
-> > INVALIDATE_VADDR  REPLACE_VADDR
-> > INV_VADDR         SET_VADDR
-> > CLEAR_VADDR       SET_VADDR
-> > SUSPEND_VADDR     RESUME_VADDR
-> >   
+On Mon, Jan 11, 2021, Vitaly Kuznetsov wrote:
+> Tom Lendacky <thomas.lendacky@amd.com> writes:
 > 
-> What about SET_KEEPALIVE/CLEAR_KEEPALIVE? Vaddr can be updated as part
-> of CLEAR_KEEPALIVE.
-
-I prefer names that describe what they do, not an arbitrary use case.
-
-> Actually we are keeping the DMA mappings alive, instead of suspending
-> them, when new Qemu are exec'ing, because the hardware can still do
-> DMA during this period.
-
-Why would they not stay alive when the vfio file descriptors remain
-open and nothing has been unmapped?
- 
-> This name will also be friendly to VMM Fast Restart [1], which aims to
-> kexec reboot host kernel while VMs are paused in memory and resumed
-> seamlessly after the new kernel is ready.
+> > On 1/11/21 4:42 AM, Vitaly Kuznetsov wrote:
+> >> Sean Christopherson <seanjc@google.com> writes:
+> >> 
+> >>> Unconditionally invoke sev_hardware_setup() when configuring SVM and
+> >>> handle clearing the module params/variable 'sev' and 'sev_es' in
+> >>> sev_hardware_setup().  This allows making said variables static within
+> >>> sev.c and reduces the odds of a collision with guest code, e.g. the guest
+> >>> side of things has already laid claim to 'sev_enabled'.
+> >>>
+> >>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> >>> ---
+> >>>   arch/x86/kvm/svm/sev.c | 11 +++++++++++
+> >>>   arch/x86/kvm/svm/svm.c | 15 +--------------
+> >>>   arch/x86/kvm/svm/svm.h |  2 --
+> >>>   3 files changed, 12 insertions(+), 16 deletions(-)
+> >>>
+> >>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> >>> index 0eeb6e1b803d..8ba93b8fa435 100644
+> >>> --- a/arch/x86/kvm/svm/sev.c
+> >>> +++ b/arch/x86/kvm/svm/sev.c
+> >>> @@ -27,6 +27,14 @@
+> >>>   
+> >>>   #define __ex(x) __kvm_handle_fault_on_reboot(x)
+> >>>   
+> >>> +/* enable/disable SEV support */
+> >>> +static int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+> >>> +module_param(sev, int, 0444);
+> >>> +
+> >>> +/* enable/disable SEV-ES support */
+> >>> +static int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+> >>> +module_param(sev_es, int, 0444);
+> >> 
+> >> Two stupid questions (and not really related to your patch) for
+> >> self-eduacation if I may:
+> >> 
+> >> 1) Why do we rely on CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT (which
+> >> sound like it control the guest side of things) to set defaults here?
+> >
+> > I thought it was a review comment, but I'm not able to find it now.
+> >
+> > Brijesh probably remembers better than me.
+> >
+> >> 
+> >> 2) It appears to be possible to do 'modprobe kvm_amd sev=0 sev_es=1' and
+> >> this looks like a bogus configuration, should we make an effort to
+> >> validate the correctness upon module load?
+> >
+> > This will still result in an overall sev=0 sev_es=0. Is the question just 
+> > about issuing a message based on the initial values specified?
+> >
 > 
-> The VMM Fast Restart scenario is as such: Before kexec-reboot,
-> SET_KEEPALIVE is issued to set keepalive flag for VFIO DMA mapping
-> entries, so that their underlying IOMMU DMA mappings will not be
-> destroyed when Qemu quits before kexec-reboot. After kexec-reboot,
-> the VFIO DMA mappings are restored together with its keepalive flag
-> in the new kernel so that new Qemu can do CLEAR_KEEPALIVE operation.
+> Yes, as one may expect the result will be that SEV-ES guests work and
+> plain SEV don't.
 
-That entails far more than simply invalidating vaddr.  We need to have
-a very specific uapi, it's difficult to expand the scope of a flag
-when/if such features are ever proposed upstream.  Thanks,
+KVM doesn't issue messages when it overrides other module params due to
+disable requirements, e.g. ept=0 unrestricted_guest=1 is roughly equivalent.
+Not that what KVM currently does is right, but at least it's consistent. :-)
 
-Alex
-
-> > >> The suspend interface blocks vfio translation of host virtual
-> > >> addresses in a range, but DMA to already-mapped pages continues.
-> > >> The resume interface records the new base VA and resumes translation.
-> > >> See comments in uapi/linux/vfio.h for more details.
-> > >>
-> > >> This is a partial implementation.  Blocking is added in the next patch.
-> > >>
-> > >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> > >> ---
-> > >>  drivers/vfio/vfio_iommu_type1.c | 47 +++++++++++++++++++++++++++++++++++------
-> > >>  include/uapi/linux/vfio.h       | 16 ++++++++++++++
-> > >>  2 files changed, 57 insertions(+), 6 deletions(-)
-> > >>
-> > >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > >> index 3dc501d..2c164a6 100644
-> > >> --- a/drivers/vfio/vfio_iommu_type1.c
-> > >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > >> @@ -92,6 +92,7 @@ struct vfio_dma {
-> > >>  	int			prot;		/* IOMMU_READ/WRITE */
-> > >>  	bool			iommu_mapped;
-> > >>  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> > >> +	bool			suspended;  
-> > > 
-> > > Is there a value we could use for vfio_dma.vaddr that would always be
-> > > considered invalid, ex. ULONG_MAX?    
-> > 
-> > Yes, that could replace the suspend flag.  That, plus changing the language from suspend
-> > to invalidate, will probably yield equally understandable code.  I'll try it.
-> >   
-> > > We'd need to decide if we want to
-> > > allow users to create mappings (mdev-only) using an initial invalid
-> > > vaddr.  
-> > 
-> > Maybe.  Not sure yet.
-> >   
-> > >>  	struct task_struct	*task;
-> > >>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> > >>  	unsigned long		*bitmap;
-> > >> @@ -1080,7 +1081,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >>  	int ret = 0, retries = 0;
-> > >>  	unsigned long pgshift;
-> > >>  	dma_addr_t iova;
-> > >> -	unsigned long size;
-> > >> +	unsigned long size, consumed;  
-> > > 
-> > > This could be scoped into the branch below.  
-> > 
-> > OK.
-> >   
-> > >>  	mutex_lock(&iommu->lock);
-> > >>  
-> > >> @@ -1169,6 +1170,21 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > >>  		if (dma->task->mm != current->mm)
-> > >>  			break;
-> > >>  
-> > >> +		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_SUSPEND) {
-> > >> +			if (dma->suspended) {
-> > >> +				ret = -EINVAL;
-> > >> +				goto unlock;
-> > >> +			}  
-> > > 
-> > > This leaves us in a state where we marked some entries but not others.
-> > > We should either unwind or... what's the actual harm in skipping these?  
-> > 
-> > We could skip them with no ill effect.  However, it likely means the app is confused
-> > and potentially broken, and it would be courteous to inform them so.  I found such bugs
-> > in qemu as I was developing this feature.
-> > 
-> > IMO unwinding does not help the app, and adds unnecessary code.  It can still leave some
-> > ranges suspended and some not.  The safest recovery is for the app to exit, and tell the 
-> > developer to fix the redundant suspend call.
-> >   
-> > >> +			dma->suspended = true;
-> > >> +			consumed = dma->iova + dma->size - iova;
-> > >> +			if (consumed >= size)
-> > >> +				break;
-> > >> +			iova += consumed;
-> > >> +			size -= consumed;
-> > >> +			unmapped += dma->size;
-> > >> +			continue;
-> > >> +		}  
-> > > 
-> > > This short-cuts the dirty bitmap flag, so we need to decide if it's
-> > > legal to call them together or we need to prevent it... Oh, I see
-> > > you've excluded them earlier below.
-> > >   
-> > >> +
-> > >>  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
-> > >>  			struct vfio_iommu_type1_dma_unmap nb_unmap;
-> > >>  
-> > >> @@ -1307,6 +1323,7 @@ static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
-> > >>  static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > >>  			   struct vfio_iommu_type1_dma_map *map)
-> > >>  {
-> > >> +	bool resume = map->flags & VFIO_DMA_MAP_FLAG_RESUME;
-> > >>  	dma_addr_t iova = map->iova;
-> > >>  	unsigned long vaddr = map->vaddr;
-> > >>  	size_t size = map->size;
-> > >> @@ -1324,13 +1341,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > >>  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
-> > >>  		prot |= IOMMU_READ;
-> > >>  
-> > >> +	if ((prot && resume) || (!prot && !resume))
-> > >> +		return -EINVAL;
-> > >> +
-> > >>  	mutex_lock(&iommu->lock);
-> > >>  
-> > >>  	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> > >>  
-> > >>  	WARN_ON((pgsize - 1) & PAGE_MASK);
-> > >>  
-> > >> -	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
-> > >> +	if (!size || (size | iova | vaddr) & (pgsize - 1)) {
-> > >>  		ret = -EINVAL;
-> > >>  		goto out_unlock;
-> > >>  	}
-> > >> @@ -1341,7 +1361,19 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > >>  		goto out_unlock;
-> > >>  	}
-> > >>  
-> > >> -	if (vfio_find_dma(iommu, iova, size)) {
-> > >> +	dma = vfio_find_dma(iommu, iova, size);
-> > >> +	if (resume) {
-> > >> +		if (!dma) {
-> > >> +			ret = -ENOENT;
-> > >> +		} else if (!dma->suspended || dma->iova != iova ||
-> > >> +			   dma->size != size) {  
-> > > 
-> > > Why is it necessary that the vfio_dma be suspended before being
-> > > resumed?  Couldn't a user simply use this to change the vaddr?  Does
-> > > that promote abusive use?  
-> > 
-> > This would almost always be incorrect.  If the vaddr changes, then the old vaddr was already
-> > invalidated, and there is a window where it is not OK for kernel code to use the old vaddr.
-> > This could only be safe if the memory object is mapped at both the old vaddr and the new
-> > vaddr concurrently, which is an unlikely use case.
-> >   
-> > >> +			ret = -EINVAL;
-> > >> +		} else {
-> > >> +			dma->vaddr = vaddr;  
-> > > 
-> > > Seems like there's a huge opportunity for a user to create coherency
-> > > issues here... it's their data though I guess.  
-> > 
-> > Yes.  That's what the language in the uapi about mapping the same memory object is about.
-> >   
-> > >> +			dma->suspended = false;
-> > >> +		}
-> > >> +		goto out_unlock;
-> > >> +	} else if (dma) {
-> > >>  		ret = -EEXIST;
-> > >>  		goto out_unlock;
-> > >>  	}
-> > >> @@ -2532,6 +2564,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
-> > >>  	case VFIO_TYPE1_IOMMU:
-> > >>  	case VFIO_TYPE1v2_IOMMU:
-> > >>  	case VFIO_TYPE1_NESTING_IOMMU:
-> > >> +	case VFIO_SUSPEND:
-> > >>  		return 1;
-> > >>  	case VFIO_DMA_CC_IOMMU:
-> > >>  		if (!iommu)
-> > >> @@ -2686,7 +2719,8 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
-> > >>  {
-> > >>  	struct vfio_iommu_type1_dma_map map;
-> > >>  	unsigned long minsz;
-> > >> -	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
-> > >> +	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
-> > >> +			VFIO_DMA_MAP_FLAG_RESUME;
-> > >>  
-> > >>  	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
-> > >>  
-> > >> @@ -2704,6 +2738,8 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
-> > >>  {
-> > >>  	struct vfio_iommu_type1_dma_unmap unmap;
-> > >>  	struct vfio_bitmap bitmap = { 0 };
-> > >> +	uint32_t mask = VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP |
-> > >> +			VFIO_DMA_UNMAP_FLAG_SUSPEND;
-> > >>  	unsigned long minsz;
-> > >>  	int ret;
-> > >>  
-> > >> @@ -2712,8 +2748,7 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
-> > >>  	if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> > >>  		return -EFAULT;
-> > >>  
-> > >> -	if (unmap.argsz < minsz ||
-> > >> -	    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
-> > >> +	if (unmap.argsz < minsz || unmap.flags & ~mask || unmap.flags == mask)  
-> > > 
-> > > Maybe a short comment here to note that dirty-bimap and
-> > > suspend/invalidate are mutually exclusive.  Probably should be
-> > > mentioned in the uapi too.  
-> > 
-> > Will do, for both.
-> >   
-> > >>  		return -EINVAL;
-> > >>  
-> > >>  	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> > >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > >> index 896e527..fcf7b56 100644
-> > >> --- a/include/uapi/linux/vfio.h
-> > >> +++ b/include/uapi/linux/vfio.h
-> > >> @@ -46,6 +46,9 @@
-> > >>   */
-> > >>  #define VFIO_NOIOMMU_IOMMU		8
-> > >>  
-> > >> +/* Supports VFIO DMA suspend and resume */
-> > >> +#define VFIO_SUSPEND			9
-> > >> +
-> > >>  /*
-> > >>   * The IOCTL interface is designed for extensibility by embedding the
-> > >>   * structure length (argsz) and flags into structures passed between
-> > >> @@ -1046,12 +1049,19 @@ struct vfio_iommu_type1_info_cap_migration {
-> > >>   *
-> > >>   * Map process virtual addresses to IO virtual addresses using the
-> > >>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
-> > >> + *
-> > >> + * If flags & VFIO_DMA_MAP_FLAG_RESUME, record the new base vaddr for iova, and
-> > >> + * resume translation of host virtual addresses in the iova range.  The new
-> > >> + * vaddr must point to the same memory object as the old vaddr, but this is not
-> > >> + * verified.  
-> > > 
-> > > It's hard to use "must" terminology here if we're not going to check.
-> > > Maybe the phrasing should be something more along the lines of "should
-> > > point to the same memory object or the user risks coherency issues
-> > > within their virtual address space".  
-> > 
-> > I used "must" because it is always incorrect if the object is not the same.  How about:
-> >   The new vaddr must point to the same memory object as the old vaddr, but this is not
-> >   verified.  Violation of this constraint may result in memory corruption within the
-> >   host process and/or guest.
-> >   
-> > >>  iova and size must match those in the original MAP_DMA call.
-> > >> + * Protection is not changed, and the READ & WRITE flags must be 0.  
-> > > 
-> > > This doesn't mention that the entry must be previously
-> > > suspended/invalidated (if we choose to keep those semantics).  Thanks,  
-> > 
-> > Will add, thanks.
-> > 
-> > - Steve   
-> > >>   */
-> > >>  struct vfio_iommu_type1_dma_map {
-> > >>  	__u32	argsz;
-> > >>  	__u32	flags;
-> > >>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
-> > >>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
-> > >> +#define VFIO_DMA_MAP_FLAG_RESUME (1 << 2)
-> > >>  	__u64	vaddr;				/* Process virtual address */
-> > >>  	__u64	iova;				/* IO virtual address */
-> > >>  	__u64	size;				/* Size of mapping (bytes) */
-> > >> @@ -1084,11 +1094,17 @@ struct vfio_bitmap {
-> > >>   * indicates that the page at that offset from iova is dirty. A Bitmap of the
-> > >>   * pages in the range of unmapped size is returned in the user-provided
-> > >>   * vfio_bitmap.data.
-> > >> + *
-> > >> + * If flags & VFIO_DMA_UNMAP_FLAG_SUSPEND, do not unmap, but suspend vfio
-> > >> + * translation of host virtual addresses in the iova range.  During suspension,
-> > >> + * kernel threads that attempt to translate will block.  DMA to already-mapped
-> > >> + * pages continues.
-> > >>   */
-> > >>  struct vfio_iommu_type1_dma_unmap {
-> > >>  	__u32	argsz;
-> > >>  	__u32	flags;
-> > >>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
-> > >> +#define VFIO_DMA_UNMAP_FLAG_SUSPEND	     (1 << 1)
-> > >>  	__u64	iova;				/* IO virtual address */
-> > >>  	__u64	size;				/* Size of mapping (bytes) */
-> > >>  	__u8    data[];  
-> > >   
-> 
-
+And on the other hand, I think it's reasonable to expect that specifying only
+sev=0 is sufficient to disable both SEV and SEV-ES, e.g. to turn them off when
+they're enabled by default.
