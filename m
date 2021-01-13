@@ -2,149 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3944E2F4BC1
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:57:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B85E72F4BD4
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:57:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbhAMMzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 07:55:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36091 "EHLO
+        id S1725911AbhAMM4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 07:56:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25485 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725774AbhAMMzM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:55:12 -0500
+        by vger.kernel.org with ESMTP id S1725809AbhAMM4Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:56:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610542426;
+        s=mimecast20190719; t=1610542497;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oaU4daw54x5G4bS61Zd9tUbzrhmAYFp/wRzh5x9E2lQ=;
-        b=VyN7wpYhFPVkPlGWc6jiCek2RcDwR8K7xHNuZETUwKxE0WuEe0y6ILMkZoUiNpGfxYb1RC
-        JtLTAuMnSOh98fTJWKglogwnvFRGdhjQ2I1lGc8ThKAsnVOaqGRGMQ8ofm7LcO6TsQOUSL
-        1gyQAlct3vORXdFhVDMOxdGtCLZVxBo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-oUT0lqkBNnyWTQ1JxG5llg-1; Wed, 13 Jan 2021 07:53:42 -0500
-X-MC-Unique: oUT0lqkBNnyWTQ1JxG5llg-1
-Received: by mail-ej1-f71.google.com with SMTP id j14so687466eja.15
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:53:42 -0800 (PST)
+        bh=0lgVRo6CQ9NzWlGI1TykX+pxELJPZRPvZtRz/475DZc=;
+        b=ZifFLbxN4hLm73fM9b5KFMOSWsLoybHmRk1RfnknBbez0i5bIupA9QAP9dQ+KKrpEbW4KR
+        v3JBno3WV2n/Q1XFtyUjDxWXv0ups4SWhcxdjtd5CFBBjQl09jS+54uQgygs4WqKSA0FfG
+        Bf1lCVazcpXz/0seIBUp9/P6//mw5WY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-488-hBrnjB94N0OQ-Gjd05s8OQ-1; Wed, 13 Jan 2021 07:54:56 -0500
+X-MC-Unique: hBrnjB94N0OQ-Gjd05s8OQ-1
+Received: by mail-ed1-f72.google.com with SMTP id f19so801123edq.20
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:54:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=oaU4daw54x5G4bS61Zd9tUbzrhmAYFp/wRzh5x9E2lQ=;
-        b=k6scWf7/F86uuD2lv6ACgCKZv3cZDZUM1ktALLUOH7HJpiFDX4Sj8qM9gCTm4ttoiH
-         lHxlLUehq43Gv24m+qJo6Bi/QD4/0AknH42lcOPocTmL/fdUyx3H2gmREy6+L6zf/irg
-         cdgNZUbUPY0i94RzbNBnVnhnsNi34aRE3871/Sdpyw//AavbDbcfWUPIi2HC0SPvfaUl
-         hNVYNSS+0uN+F/pB/bsC5dKaFLO7Y4nkPleE7hSsmkpqSPGRka41v5zbZBsv2lCNKisZ
-         P3hE8PiyiehW7z+TT4nCPWFqX5yo5a4iHnEp2rWx4cdUIsmImCnXpZbIyBOXs3rLJc7J
-         3pdA==
-X-Gm-Message-State: AOAM533SwVeFLTEZpMRoXXDMIjzUvf6vHZMyqWLbcbvDRvwvs9mE8vmx
-        Y2WRZbQfV3nY7DCbnW/U5D/UXTlflxaDuhsh/u4JFvvqdsgQotAMGwMzVhe2i2V5nw1PBHuPBRb
-        P8Mq+Ane+D3x+
-X-Received: by 2002:a17:906:b306:: with SMTP id n6mr1429991ejz.473.1610542421187;
-        Wed, 13 Jan 2021 04:53:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw1n2c/T7A+Kbcmmtp14/O2acnGP0lhqqlosHEujLypRdqAFWVfOo4RQ48P18lJBu+9jvfw+g==
-X-Received: by 2002:a17:906:b306:: with SMTP id n6mr1429982ejz.473.1610542421021;
-        Wed, 13 Jan 2021 04:53:41 -0800 (PST)
+        bh=0lgVRo6CQ9NzWlGI1TykX+pxELJPZRPvZtRz/475DZc=;
+        b=l0yeWcgGZFVl+rWRKDy3HhR0oMDSP8ZBKQk7WOfBdEjscmeTaAZvSxpIlDYGulH7GD
+         FXFcaOYUS1YvHVijy+0iiAsnyWd6S6F82/gcvb7ssYvMiR2VXpMDFHiGsbdXpUbotQUQ
+         Bpri0KHwp3djW7Z4PEOz7hBoqNYly+BHHJ6FyBYfVmq8DLztwweOMWuywRB4L7+Mromc
+         WFNv/K72oWQI2okevwJGI+FBxZVKVA/UNxjPSheP9sHIBeVSl0dsLZfXVdQN4+8Ip1N8
+         f0YveEBSKSwvqcK9TZrX9T3w6CZcCtQWtxPYe+wakUayI5NetXSbdc387ygqfKIRvP4y
+         Z2WA==
+X-Gm-Message-State: AOAM530u75LCEDi080nlm72T8LAoEgK5ZrF198/fJTxekeS2EaOpNMyO
+        Kv4t0O80F6FheDgco3DiA2AWibmvW7NwhsJYFCoFDL5rbcvvWZJbi/82/E9iw6LlPth05zj6SdE
+        yhZBUD4mhLdFl
+X-Received: by 2002:a17:906:8051:: with SMTP id x17mr1399603ejw.430.1610542494997;
+        Wed, 13 Jan 2021 04:54:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzBAbgplulFKo9eP75wGHcb584+trku5uwL0gCASCjo/ZigzcaALTL85slMCjEGciyLubpwAA==
+X-Received: by 2002:a17:906:8051:: with SMTP id x17mr1399592ejw.430.1610542494870;
+        Wed, 13 Jan 2021 04:54:54 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r16sm808674edp.43.2021.01.13.04.53.39
+        by smtp.gmail.com with ESMTPSA id k16sm677031ejd.78.2021.01.13.04.54.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jan 2021 04:53:40 -0800 (PST)
-To:     Jason Baron <jbaron@akamai.com>, kvm@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        peterz@infradead.org, aarcange@redhat.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1610379877.git.jbaron@akamai.com>
- <ce483ce4a1920a3c1c4e5deea11648d75f2a7b80.1610379877.git.jbaron@akamai.com>
+        Wed, 13 Jan 2021 04:54:53 -0800 (PST)
+Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
+To:     Yang Zhong <yang.zhong@intel.com>
+Cc:     Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, tony.luck@intel.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, kyung.min.park@intel.com, x86@kernel.org
+References: <20210105004909.42000-1-yang.zhong@intel.com>
+ <20210105004909.42000-2-yang.zhong@intel.com>
+ <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
+ <20210105121456.GE28649@zn.tnic> <20210112021321.GA9922@yangzhon-Virtual>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: introduce definitions to support static
- calls for kvm_x86_ops
-Message-ID: <ee071807-5ce5-60c1-c5df-b0b3e068b2ba@redhat.com>
-Date:   Wed, 13 Jan 2021 13:53:39 +0100
+Message-ID: <be47fd98-9d76-a35f-3ee2-7de2144dbdd6@redhat.com>
+Date:   Wed, 13 Jan 2021 13:54:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <ce483ce4a1920a3c1c4e5deea11648d75f2a7b80.1610379877.git.jbaron@akamai.com>
+In-Reply-To: <20210112021321.GA9922@yangzhon-Virtual>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/01/21 17:57, Jason Baron wrote:
-> +#define DEFINE_KVM_OPS_STATIC_CALL(func)	\
-> +	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,	\
-> +				*(((struct kvm_x86_ops *)0)->func))
-> +#define DEFINE_KVM_OPS_STATIC_CALLS() \
-> +	FOREACH_KVM_X86_OPS(DEFINE_KVM_OPS_STATIC_CALL)
+>>> Boris, is it possible to have a topic branch for this patch?
+>>
+>> Just take it through your tree pls.
+>>
+>> Acked-by: Borislav Petkov <bp@suse.de>
+>>
+>    
+>    Paolo, Boris has acked this kernel patch, and if i need send new patchset to add this
+>    acked-by info ? or kvm tree will directly pull this patchset? thanks.
 
-Something wrong here?
-
-> +#define DECLARE_KVM_OPS_STATIC_CALL(func)	\
-> +	DECLARE_STATIC_CALL(kvm_x86_##func,	\
-> +			    *(((struct kvm_x86_ops *)0)->func))
-> +#define DECLARE_KVM_OPS_STATIC_CALLS()		\
-> +	FOREACH_KVM_X86_OPS(DECLARE_KVM_OPS_STATIC_CALL)
-> +
-> +#define KVM_OPS_STATIC_CALL_UPDATE(func)	\
-> +	static_call_update(kvm_x86_##func, kvm_x86_ops.func)
-> +#define KVM_OPS_STATIC_CALL_UPDATES()		\
-> +	FOREACH_KVM_X86_OPS(KVM_OPS_STATIC_CALL_UPDATE)
-> +
->   struct kvm_x86_ops {
->   	int (*hardware_enable)(void);
->   	void (*hardware_disable)(void);
-> @@ -1326,6 +1385,12 @@ extern u64 __read_mostly host_efer;
->   extern bool __read_mostly allow_smaller_maxphyaddr;
->   extern struct kvm_x86_ops kvm_x86_ops;
->   
-> +DECLARE_KVM_OPS_STATIC_CALLS();
-> +static inline void kvm_ops_static_call_update(void)
-> +{
-> +	KVM_OPS_STATIC_CALL_UPDATES();
-> +}
-
-This would become
-
-#define KVM_X86_OP(func) \
-	DECLARE_STATIC_CALL(kvm_x86_##func,	\
-			    *(((struct kvm_x86_ops *)0)->func));
-
-#include <asm/kvm-x86-ops.h>
-
-static inline void kvm_ops_static_call_update(void)
-{
-#define KVM_X86_OP(func) \
-   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
-#include <asm/kvm-x86-ops.h>
-}
-
-If you need to choose between DECLARE_STATIC_CALL_NULL and 
-DECLARE_STATIC_CALL, you can have kvm-x86-ops.h use one of two macros 
-KVM_X86_OP_NULL and KVM_X86_OP.
-
-#define KVM_X86_OP(func) \
-	DECLARE_STATIC_CALL(kvm_x86_##func,	\
-			    *(((struct kvm_x86_ops *)0)->func));
-
-#define KVM_X86_OP_NULL(func) \
-	DECLARE_STATIC_CALL_NULL(kvm_x86_##func,	\
-			    *(((struct kvm_x86_ops *)0)->func));
-
-#include <asm/kvm-x86-ops.h>
-
-...
-
-#define KVM_X86_OP(func) \
-   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
-#define KVM_X86_OP_NULL(func) \
-   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
-#include <asm/kvm-x86-ops.h>
-
-In that case vmx.c and svm.c could define KVM_X86_OP_NULL to an empty 
-string and list the optional callbacks manually.
+I'll take care of it shortly.
 
 Paolo
 
