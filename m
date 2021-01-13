@@ -2,261 +2,413 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05CFE2F42D5
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 05:08:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A309E2F42E6
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 05:14:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726624AbhAMEIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 23:08:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43546 "EHLO
+        id S1725794AbhAMEMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 23:12:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42952 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726461AbhAMEIX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 23:08:23 -0500
+        by vger.kernel.org with ESMTP id S1725747AbhAMEMF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 12 Jan 2021 23:12:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610510815;
+        s=mimecast20190719; t=1610511038;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PxNJxfcBZCn+PYg3zFHkleQNGlx8msMEL+UpPYXTQP8=;
-        b=hJRWa2Pjwl60Wplqry1w7sm5a6bdGrwVLrVQojMak0yjnsyESkluD+Z9hLJXJylmaaK17x
-        WOjgCs9JL1htMOJo6WZzsYdcoZkqasBv85svWOfLILDd5BccoupamTxiwRGBnr2smdeLjZ
-        LqjK6EPButmCiJHxiJDXaAOommT3Wjc=
+        bh=jVKglMLN0Ulh+35kzVXuPKf4xsf5UAAu+jRalGhjhW8=;
+        b=dH8h3hhb4uQ2I6e5WYcB8SuDgYyP0BVlCWqugXt9WTjv+P/9C+hDOD1zAwJMs39YSRdohi
+        sTRpgV64qC52/wSfQXMOdC2fVjvh9/Ifb7TOhDRlnxTXoBIo8rvpldN6x8oUlyVKcBgulB
+        bqx8eJs9CRkI+WVsCs64FgWOFv6kkbQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-1sf6hBiPPdiBX3Q_hxFfQg-1; Tue, 12 Jan 2021 23:06:08 -0500
-X-MC-Unique: 1sf6hBiPPdiBX3Q_hxFfQg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-450-SUUVyc6kOO6l8u-bYXnGrg-1; Tue, 12 Jan 2021 23:10:35 -0500
+X-MC-Unique: SUUVyc6kOO6l8u-bYXnGrg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FAEC107ACFA;
-        Wed, 13 Jan 2021 04:06:04 +0000 (UTC)
-Received: from [10.72.12.205] (ovpn-12-205.pek2.redhat.com [10.72.12.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 430BA5D9D2;
-        Wed, 13 Jan 2021 04:05:48 +0000 (UTC)
-Subject: Re: [RFC PATCH 0/7] Support for virtio-net hash reporting
-To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>, rdunlap@infradead.org,
-        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>, decui@microsoft.com,
-        cai@lca.pw, Jakub Sitnicki <jakub@cloudflare.com>,
-        Marco Elver <elver@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        bpf <bpf@vger.kernel.org>, Yan Vugenfirer <yan@daynix.com>
-References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
- <CAOEp5OejaX4ZETThrj4-n8_yZoeTZs56CBPHbQqNsR2oni8dWw@mail.gmail.com>
- <CAOEp5Oc5qif_krU8oC6qhq6X0xRW-9GpWrBzWgPw0WevyhT8Mg@mail.gmail.com>
- <CA+FuTSfhBZfEf8+LKNUJQpSxt8c5h1wMpARupekqFKuei6YBsA@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <78bbc518-4b73-4629-68fb-2713250f8967@redhat.com>
-Date:   Wed, 13 Jan 2021 12:05:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B94551005D44;
+        Wed, 13 Jan 2021 04:10:34 +0000 (UTC)
+Received: from x1.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 551161975E;
+        Wed, 13 Jan 2021 04:10:34 +0000 (UTC)
+Date:   Tue, 12 Jan 2021 21:10:32 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH V1 4/5] vfio: VA suspend interface
+Message-ID: <20210112210949.348102bf@x1.home.shazbot.org>
+In-Reply-To: <20210112154756.5bfd31f1@omen.home.shazbot.org>
+References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
+        <1609861013-129801-5-git-send-email-steven.sistare@oracle.com>
+        <20210108141549.071608a4@omen.home>
+        <f40232ca-710f-1b65-1d21-564c3ecb62cc@oracle.com>
+        <20210112154756.5bfd31f1@omen.home.shazbot.org>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <CA+FuTSfhBZfEf8+LKNUJQpSxt8c5h1wMpARupekqFKuei6YBsA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 12 Jan 2021 15:47:56 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-On 2021/1/13 上午7:47, Willem de Bruijn wrote:
-> On Tue, Jan 12, 2021 at 3:29 PM Yuri Benditovich
-> <yuri.benditovich@daynix.com> wrote:
->> On Tue, Jan 12, 2021 at 9:49 PM Yuri Benditovich
->> <yuri.benditovich@daynix.com> wrote:
->>> On Tue, Jan 12, 2021 at 9:41 PM Yuri Benditovich
->>> <yuri.benditovich@daynix.com> wrote:
->>>> Existing TUN module is able to use provided "steering eBPF" to
->>>> calculate per-packet hash and derive the destination queue to
->>>> place the packet to. The eBPF uses mapped configuration data
->>>> containing a key for hash calculation and indirection table
->>>> with array of queues' indices.
->>>>
->>>> This series of patches adds support for virtio-net hash reporting
->>>> feature as defined in virtio specification. It extends the TUN module
->>>> and the "steering eBPF" as follows:
->>>>
->>>> Extended steering eBPF calculates the hash value and hash type, keeps
->>>> hash value in the skb->hash and returns index of destination virtqueue
->>>> and the type of the hash. TUN module keeps returned hash type in
->>>> (currently unused) field of the skb.
->>>> skb->__unused renamed to 'hash_report_type'.
->>>>
->>>> When TUN module is called later to allocate and fill the virtio-net
->>>> header and push it to destination virtqueue it populates the hash
->>>> and the hash type into virtio-net header.
->>>>
->>>> VHOST driver is made aware of respective virtio-net feature that
->>>> extends the virtio-net header to report the hash value and hash report
->>>> type.
->>> Comment from Willem de Bruijn:
->>>
->>> Skbuff fields are in short supply. I don't think we need to add one
->>> just for this narrow path entirely internal to the tun device.
->>>
->> We understand that and try to minimize the impact by using an already
->> existing unused field of skb.
-> Not anymore. It was repurposed as a flags field very recently.
->
-> This use case is also very narrow in scope. And a very short path from
-> data producer to consumer. So I don't think it needs to claim scarce
-> bits in the skb.
->
-> tun_ebpf_select_queue stores the field, tun_put_user reads it and
-> converts it to the virtio_net_hdr in the descriptor.
->
-> tun_ebpf_select_queue is called from .ndo_select_queue.  Storing the
-> field in skb->cb is fragile, as in theory some code could overwrite
-> that between field between ndo_select_queue and
-> ndo_start_xmit/tun_net_xmit, from which point it is fully under tun
-> control again. But in practice, I don't believe anything does.
->
-> Alternatively an existing skb field that is used only on disjoint
-> datapaths, such as ingress-only, could be viable.
+> On Mon, 11 Jan 2021 16:15:02 -0500
+> Steven Sistare <steven.sistare@oracle.com> wrote:
+> 
+> > On 1/8/2021 4:15 PM, Alex Williamson wrote:  
+> > > On Tue,  5 Jan 2021 07:36:52 -0800
+> > > Steve Sistare <steven.sistare@oracle.com> wrote:
+> > >     
+> > >> Add interfaces that allow the underlying memory object of an iova
+> > >> range to be mapped to a new host virtual address in the host process:
+> > >>
+> > >>   - VFIO_DMA_UNMAP_FLAG_SUSPEND for VFIO_IOMMU_UNMAP_DMA
+> > >>   - VFIO_DMA_MAP_FLAG_RESUME flag for VFIO_IOMMU_MAP_DMA
+> > >>   - VFIO_SUSPEND extension for VFIO_CHECK_EXTENSION    
+> > > 
+> > > Suspend and Resume can imply many things other than what's done here.
+> > > Should these be something more akin to INVALIDATE_VADDR and
+> > > REPLACE_VADDR?    
+> > 
+> > Agreed.  I suspected we would discuss the names.  Some possibilities:
+> > 
+> > INVALIDATE_VADDR  REPLACE_VADDR
+> > INV_VADDR         SET_VADDR
+> > CLEAR_VADDR       SET_VADDR
+> > SUSPEND_VADDR     RESUME_VADDR
+> >   
+> > >> The suspend interface blocks vfio translation of host virtual
+> > >> addresses in a range, but DMA to already-mapped pages continues.
+> > >> The resume interface records the new base VA and resumes translation.
+> > >> See comments in uapi/linux/vfio.h for more details.
+> > >>
+> > >> This is a partial implementation.  Blocking is added in the next patch.
+> > >>
+> > >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> > >> ---
+> > >>  drivers/vfio/vfio_iommu_type1.c | 47 +++++++++++++++++++++++++++++++++++------
+> > >>  include/uapi/linux/vfio.h       | 16 ++++++++++++++
+> > >>  2 files changed, 57 insertions(+), 6 deletions(-)
+> > >>
+> > >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > >> index 3dc501d..2c164a6 100644
+> > >> --- a/drivers/vfio/vfio_iommu_type1.c
+> > >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> > >> @@ -92,6 +92,7 @@ struct vfio_dma {
+> > >>  	int			prot;		/* IOMMU_READ/WRITE */
+> > >>  	bool			iommu_mapped;
+> > >>  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
+> > >> +	bool			suspended;    
+> > > 
+> > > Is there a value we could use for vfio_dma.vaddr that would always be
+> > > considered invalid, ex. ULONG_MAX?      
+> > 
+> > Yes, that could replace the suspend flag.  That, plus changing the language from suspend
+> > to invalidate, will probably yield equally understandable code.  I'll try it.  
+> 
+> Thinking about this further, if we defined a VFIO_IOMMU_TYPE1_INV_VADDR
+> as part of the uapi, could we implement this with only a single flag on
+> the DMA_MAP ioctl?  For example the user would call DMA_MAP with a flag
+> to set the vaddr, first to the invalid valid, then to a new value.  It's
+> always seemed a bit awkward to use DMA_UNMAP to invalidate the vaddr
+> when the mapping is not actually unmapped.  That might lean towards an
+> UPDATE or REPLACE flag.
 
+I realized you really want to make use of the DMA_UNMAP ioctl in order
+to use ranges, maybe we can make the mental model more coherent with an
+unmap flag like VFIO_DMA_UNMAP_FLAG_VADDR_ONLY, ie. we're only asking
+to unmap the vaddr.  The DMA_MAP side might take a similar VADDR_ONLY
+flag to reset the vaddr.  That also retains your desired semantics that
+we can't "resume" a vaddr that wasn't previously "suspended", we can't
+map a vaddr that wasn't previously unmapped.
 
-A question here. We had metadata support in XDP for cooperation between 
-eBPF programs. Do we have something similar in the skb?
+For the unmap-all problem, userspace already needs to work around this,
+see for instance QEMU:
 
-E.g in the RSS, if we want to pass some metadata information between 
-eBPF program and the logic that generates the vnet header (either hard 
-logic in the kernel or another eBPF program). Is there any way that can 
-avoid the possible conflicts of qdiscs?
+1b296c3def4b vfio: Don't issue full 2^64 unmap
 
+So I wonder really how critical it is and whether it really would be
+sufficient for userspace to track a high water mark for mappings.
+Otherwise, I think I'm leaning towards a DMA_UNMAP flag like
+VFIO_DMA_UNMAP_FLAG_UNMAP_ALL that would disregard the iova and size
+fields to apply to all mappings.  Designating special values for iova or
+size trigger extended behavior feels a bit hackish.  Thanks,
 
->
->>> Instead, you could just run the flow_dissector in tun_put_user if the
->>> feature is negotiated. Indeed, the flow dissector seems more apt to me
->>> than BPF here. Note that the flow dissector internally can be
->>> overridden by a BPF program if the admin so chooses.
->>>
->> When this set of patches is related to hash delivery in the virtio-net
->> packet in general,
->> it was prepared in context of RSS feature implementation as defined in
->> virtio spec [1]
->> In case of RSS it is not enough to run the flow_dissector in tun_put_user:
->> in tun_ebpf_select_queue the TUN calls eBPF to calculate the hash,
->> hash type and queue index
->> according to the (mapped) parameters (key, hash types, indirection
->> table) received from the guest.
-> TUNSETSTEERINGEBPF was added to support more diverse queue selection
-> than the default in case of multiqueue tun. Not sure what the exact
-> use cases are.
->
-> But RSS is exactly the purpose of the flow dissector. It is used for
-> that purpose in the software variant RPS. The flow dissector
-> implements a superset of the RSS spec, and certainly computes a
-> four-tuple for TCP/IPv6. In the case of RPS, it is skipped if the NIC
-> has already computed a 4-tuple hash.
->
-> What it does not give is a type indication, such as
-> VIRTIO_NET_HASH_TYPE_TCPv6. I don't understand how this would be used.
-> In datapaths where the NIC has already computed the four-tuple hash
-> and stored it in skb->hash --the common case for servers--, That type
-> field is the only reason to have to compute again.
-
-
-The problem is there's no guarantee that the packet comes from the NIC, 
-it could be a simple VM2VM or host2VM packet.
-
-And even if the packet is coming from the NIC that calculates the hash 
-there's no guarantee that it's the has that guest want (guest may use 
-different RSS keys).
-
-Thanks
-
-
->
->> Our intention is to keep the hash and hash type in the skb to populate them
->> into a virtio-net header later in tun_put_user.
->> Note that in this case the type of calculated hash is selected not
->> only from flow dissections
->> but also from limitations provided by the guest.
->>
->> This is already implemented in qemu (for case of vhost=off), see [2]
->> (virtio_net_process_rss)
->> For case of vhost=on there are WIP for qemu to load eBPF and attach it to TUN.
->> Note that exact way of selecting rx virtqueue depends on the guest,
->> it could be automatic steering (typical for Linux VM), RSS (typical
->> for Windows VM) or
->> any other steering mechanism implemented in loadable TUN steering BPF with
->> or without hash calculation.
->>
->> [1] https://github.com/oasis-tcs/virtio-spec/blob/master/content.tex#L3740
->> [2] https://github.com/qemu/qemu/blob/master/hw/net/virtio-net.c#L1591
->>
->>> This also hits on a deeper point with the choice of hash values, that
->>> I also noticed in my RFC patchset to implement the inverse [1][2]. It
->>> is much more detailed than skb->hash + skb->l4_hash currently offers,
->>> and that can be gotten for free from most hardware.
->> Unfortunately in the case of RSS we can't get this hash from the hardware as
->> this requires configuration of the NIC's hardware with key and hash types for
->> Toeplitz hash calculation.
-> I don't understand. Toeplitz hash calculation is enabled by default
-> for multiqueue devices, and many devices will pass the toeplitz hash
-> along for free to avoid software flow dissection.
->
->>> In most practical
->>> cases, that information suffices. I added less specific fields
->>> VIRTIO_NET_HASH_REPORT_L4, VIRTIO_NET_HASH_REPORT_OTHER that work
->>> without explicit flow dissection. I understand that the existing
->>> fields are part of the standard. Just curious, what is their purpose
->>> beyond 4-tuple based flow hashing?
->> The hash is used in combination with the indirection table to select
->> destination rx virtqueue.
->> The hash and hash type are to be reported in virtio-net header, if requested.
->> For Windows VM - in case the device does not report the hash (even if
->> it calculated it to
->> schedule the packet to a proper queue), the driver must do that for each packet
->> (this is a certification requirement).
-> I understand the basics of RSS. My question is what the hash-type is
-> intended to be used for by the guest. It is part of the virtio spec,
-> so this point is somewhat moot: it has to be passed along with the
-> hash value now.
->
-> But it is not entirely moot. If most users are satisfied with knowing
-> whether a hash is L4 or not, we could add two new types
-> VIRTIO_NET_HASH_TYPE_L4 and VIRTIO_NET_HASH_TYPE_OTHER. And then pass
-> the existing skb->hash as is, likely computed by the NIC.
->
-> [1] https://patchwork.kernel.org/project/netdevbpf/patch/20201228162233.2032571-2-willemdebruijn.kernel@gmail.com/
->
->>> [1] https://patchwork.kernel.org/project/netdevbpf/list/?series=406859&state=*
->>> [2] https://github.com/wdebruij/linux/commit/0f77febf22cd6ffc242a575807fa8382a26e511e
->>>> Yuri Benditovich (7):
->>>>    skbuff: define field for hash report type
->>>>    vhost: support for hash report virtio-net feature
->>>>    tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
->>>>    tun: free bpf_program by bpf_prog_put instead of bpf_prog_destroy
->>>>    tun: add ioctl code TUNSETHASHPOPULATION
->>>>    tun: populate hash in virtio-net header when needed
->>>>    tun: report new tun feature IFF_HASH
->>>>
->>>>   drivers/net/tun.c           | 43 +++++++++++++++++++++++++++++++------
->>>>   drivers/vhost/net.c         | 37 ++++++++++++++++++++++++-------
->>>>   include/linux/skbuff.h      |  7 +++++-
->>>>   include/uapi/linux/if_tun.h |  2 ++
->>>>   4 files changed, 74 insertions(+), 15 deletions(-)
->>>>
->>>> --
->>>> 2.17.1
->>>>
+Alex
+ 
+> > > We'd need to decide if we want to
+> > > allow users to create mappings (mdev-only) using an initial invalid
+> > > vaddr.    
+> > 
+> > Maybe.  Not sure yet.  
+> 
+> If we used the above, it almost seems strange not to allow it, but at
+> the same time we don't really want to have different rules for
+> different devices types.  An initially valid vaddr doesn't seem
+> unreasonable... though we don't test it until the vendor driver tries
+> to pin or rw pages w/o IOMMU backing.
+>  
+> > >>  	struct task_struct	*task;
+> > >>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+> > >>  	unsigned long		*bitmap;
+> > >> @@ -1080,7 +1081,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> > >>  	int ret = 0, retries = 0;
+> > >>  	unsigned long pgshift;
+> > >>  	dma_addr_t iova;
+> > >> -	unsigned long size;
+> > >> +	unsigned long size, consumed;    
+> > > 
+> > > This could be scoped into the branch below.    
+> > 
+> > OK.
+> >   
+> > >>  	mutex_lock(&iommu->lock);
+> > >>  
+> > >> @@ -1169,6 +1170,21 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> > >>  		if (dma->task->mm != current->mm)
+> > >>  			break;
+> > >>  
+> > >> +		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_SUSPEND) {
+> > >> +			if (dma->suspended) {
+> > >> +				ret = -EINVAL;
+> > >> +				goto unlock;
+> > >> +			}    
+> > > 
+> > > This leaves us in a state where we marked some entries but not others.
+> > > We should either unwind or... what's the actual harm in skipping these?    
+> > 
+> > We could skip them with no ill effect.  However, it likely means the app is confused
+> > and potentially broken, and it would be courteous to inform them so.  I found such bugs
+> > in qemu as I was developing this feature.
+> > 
+> > IMO unwinding does not help the app, and adds unnecessary code.  It can still leave some
+> > ranges suspended and some not.  The safest recovery is for the app to exit, and tell the 
+> > developer to fix the redundant suspend call.  
+> 
+> That sounds like an entirely practical rationalization, but our
+> standard practice is to maintain a consistent state.  If an ioctl fails
+> is should effectively be as if the ioctl was never called, where
+> possible.  Userspace can be broken, and potentially so broken that their
+> best choice is to abort, but we should maintain consistent, predictable
+> behavior.
+> 
+> > >> +			dma->suspended = true;
+> > >> +			consumed = dma->iova + dma->size - iova;
+> > >> +			if (consumed >= size)
+> > >> +				break;
+> > >> +			iova += consumed;
+> > >> +			size -= consumed;
+> > >> +			unmapped += dma->size;
+> > >> +			continue;
+> > >> +		}    
+> > > 
+> > > This short-cuts the dirty bitmap flag, so we need to decide if it's
+> > > legal to call them together or we need to prevent it... Oh, I see
+> > > you've excluded them earlier below.
+> > >     
+> > >> +
+> > >>  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+> > >>  			struct vfio_iommu_type1_dma_unmap nb_unmap;
+> > >>  
+> > >> @@ -1307,6 +1323,7 @@ static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
+> > >>  static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> > >>  			   struct vfio_iommu_type1_dma_map *map)
+> > >>  {
+> > >> +	bool resume = map->flags & VFIO_DMA_MAP_FLAG_RESUME;
+> > >>  	dma_addr_t iova = map->iova;
+> > >>  	unsigned long vaddr = map->vaddr;
+> > >>  	size_t size = map->size;
+> > >> @@ -1324,13 +1341,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> > >>  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
+> > >>  		prot |= IOMMU_READ;
+> > >>  
+> > >> +	if ((prot && resume) || (!prot && !resume))
+> > >> +		return -EINVAL;
+> > >> +
+> > >>  	mutex_lock(&iommu->lock);
+> > >>  
+> > >>  	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
+> > >>  
+> > >>  	WARN_ON((pgsize - 1) & PAGE_MASK);
+> > >>  
+> > >> -	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
+> > >> +	if (!size || (size | iova | vaddr) & (pgsize - 1)) {
+> > >>  		ret = -EINVAL;
+> > >>  		goto out_unlock;
+> > >>  	}
+> > >> @@ -1341,7 +1361,19 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+> > >>  		goto out_unlock;
+> > >>  	}
+> > >>  
+> > >> -	if (vfio_find_dma(iommu, iova, size)) {
+> > >> +	dma = vfio_find_dma(iommu, iova, size);
+> > >> +	if (resume) {
+> > >> +		if (!dma) {
+> > >> +			ret = -ENOENT;
+> > >> +		} else if (!dma->suspended || dma->iova != iova ||
+> > >> +			   dma->size != size) {    
+> > > 
+> > > Why is it necessary that the vfio_dma be suspended before being
+> > > resumed?  Couldn't a user simply use this to change the vaddr?  Does
+> > > that promote abusive use?    
+> > 
+> > This would almost always be incorrect.  If the vaddr changes, then the old vaddr was already
+> > invalidated, and there is a window where it is not OK for kernel code to use the old vaddr.
+> > This could only be safe if the memory object is mapped at both the old vaddr and the new
+> > vaddr concurrently, which is an unlikely use case.  
+> 
+> Ok, it's not like the use can't make it instantaneously invalid and then
+> replace it.
+> 
+> > >> +			ret = -EINVAL;
+> > >> +		} else {
+> > >> +			dma->vaddr = vaddr;    
+> > > 
+> > > Seems like there's a huge opportunity for a user to create coherency
+> > > issues here... it's their data though I guess.    
+> > 
+> > Yes.  That's what the language in the uapi about mapping the same memory object is about.
+> >   
+> > >> +			dma->suspended = false;
+> > >> +		}
+> > >> +		goto out_unlock;
+> > >> +	} else if (dma) {
+> > >>  		ret = -EEXIST;
+> > >>  		goto out_unlock;
+> > >>  	}
+> > >> @@ -2532,6 +2564,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+> > >>  	case VFIO_TYPE1_IOMMU:
+> > >>  	case VFIO_TYPE1v2_IOMMU:
+> > >>  	case VFIO_TYPE1_NESTING_IOMMU:
+> > >> +	case VFIO_SUSPEND:
+> > >>  		return 1;
+> > >>  	case VFIO_DMA_CC_IOMMU:
+> > >>  		if (!iommu)
+> > >> @@ -2686,7 +2719,8 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
+> > >>  {
+> > >>  	struct vfio_iommu_type1_dma_map map;
+> > >>  	unsigned long minsz;
+> > >> -	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
+> > >> +	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
+> > >> +			VFIO_DMA_MAP_FLAG_RESUME;
+> > >>  
+> > >>  	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+> > >>  
+> > >> @@ -2704,6 +2738,8 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
+> > >>  {
+> > >>  	struct vfio_iommu_type1_dma_unmap unmap;
+> > >>  	struct vfio_bitmap bitmap = { 0 };
+> > >> +	uint32_t mask = VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP |
+> > >> +			VFIO_DMA_UNMAP_FLAG_SUSPEND;
+> > >>  	unsigned long minsz;
+> > >>  	int ret;
+> > >>  
+> > >> @@ -2712,8 +2748,7 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
+> > >>  	if (copy_from_user(&unmap, (void __user *)arg, minsz))
+> > >>  		return -EFAULT;
+> > >>  
+> > >> -	if (unmap.argsz < minsz ||
+> > >> -	    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+> > >> +	if (unmap.argsz < minsz || unmap.flags & ~mask || unmap.flags == mask)    
+> > > 
+> > > Maybe a short comment here to note that dirty-bimap and
+> > > suspend/invalidate are mutually exclusive.  Probably should be
+> > > mentioned in the uapi too.    
+> > 
+> > Will do, for both.
+> >   
+> > >>  		return -EINVAL;
+> > >>  
+> > >>  	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+> > >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > >> index 896e527..fcf7b56 100644
+> > >> --- a/include/uapi/linux/vfio.h
+> > >> +++ b/include/uapi/linux/vfio.h
+> > >> @@ -46,6 +46,9 @@
+> > >>   */
+> > >>  #define VFIO_NOIOMMU_IOMMU		8
+> > >>  
+> > >> +/* Supports VFIO DMA suspend and resume */
+> > >> +#define VFIO_SUSPEND			9
+> > >> +
+> > >>  /*
+> > >>   * The IOCTL interface is designed for extensibility by embedding the
+> > >>   * structure length (argsz) and flags into structures passed between
+> > >> @@ -1046,12 +1049,19 @@ struct vfio_iommu_type1_info_cap_migration {
+> > >>   *
+> > >>   * Map process virtual addresses to IO virtual addresses using the
+> > >>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
+> > >> + *
+> > >> + * If flags & VFIO_DMA_MAP_FLAG_RESUME, record the new base vaddr for iova, and
+> > >> + * resume translation of host virtual addresses in the iova range.  The new
+> > >> + * vaddr must point to the same memory object as the old vaddr, but this is not
+> > >> + * verified.    
+> > > 
+> > > It's hard to use "must" terminology here if we're not going to check.
+> > > Maybe the phrasing should be something more along the lines of "should
+> > > point to the same memory object or the user risks coherency issues
+> > > within their virtual address space".    
+> > 
+> > I used "must" because it is always incorrect if the object is not the same.  How about:
+> >   The new vaddr must point to the same memory object as the old vaddr, but this is not
+> >   verified.  Violation of this constraint may result in memory corruption within the
+> >   host process and/or guest.  
+> 
+> Since the "must" is not relative to the API but to the resulting
+> behavior, perhaps something like:
+> 
+>   In order to maintain memory consistency within the user application,
+>   the updated vaddr must address the same memory object as originally
+>   mapped, failure to do so will result in user memory corruption and/or
+>   device misbehavior.
+> 
+> Thanks,
+> Alex
+> 
+> > >>  iova and size must match those in the original MAP_DMA call.
+> > >> + * Protection is not changed, and the READ & WRITE flags must be 0.    
+> > > 
+> > > This doesn't mention that the entry must be previously
+> > > suspended/invalidated (if we choose to keep those semantics).  Thanks,    
+> > 
+> > Will add, thanks.
+> > 
+> > - Steve   
+> > >>   */
+> > >>  struct vfio_iommu_type1_dma_map {
+> > >>  	__u32	argsz;
+> > >>  	__u32	flags;
+> > >>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+> > >>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
+> > >> +#define VFIO_DMA_MAP_FLAG_RESUME (1 << 2)
+> > >>  	__u64	vaddr;				/* Process virtual address */
+> > >>  	__u64	iova;				/* IO virtual address */
+> > >>  	__u64	size;				/* Size of mapping (bytes) */
+> > >> @@ -1084,11 +1094,17 @@ struct vfio_bitmap {
+> > >>   * indicates that the page at that offset from iova is dirty. A Bitmap of the
+> > >>   * pages in the range of unmapped size is returned in the user-provided
+> > >>   * vfio_bitmap.data.
+> > >> + *
+> > >> + * If flags & VFIO_DMA_UNMAP_FLAG_SUSPEND, do not unmap, but suspend vfio
+> > >> + * translation of host virtual addresses in the iova range.  During suspension,
+> > >> + * kernel threads that attempt to translate will block.  DMA to already-mapped
+> > >> + * pages continues.
+> > >>   */
+> > >>  struct vfio_iommu_type1_dma_unmap {
+> > >>  	__u32	argsz;
+> > >>  	__u32	flags;
+> > >>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> > >> +#define VFIO_DMA_UNMAP_FLAG_SUSPEND	     (1 << 1)
+> > >>  	__u64	iova;				/* IO virtual address */
+> > >>  	__u64	size;				/* Size of mapping (bytes) */
+> > >>  	__u8    data[];    
+> > >     
+> >   
+> 
 
