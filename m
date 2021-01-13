@@ -2,184 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1106B2F5383
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 20:43:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14B7E2F5398
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 20:47:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728618AbhAMTnL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 14:43:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22394 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728346AbhAMTnL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 14:43:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610566904;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WzW1F9PArFgMnEfYQjifi0/9Ym/6CdqHKhzABLZ3ntY=;
-        b=iCsS6P1iJRpyLV+GRsP0qJ3trtqPNhMo/qo+xUi+DoLdyLkIEl7ISwTjrH9eRs8w6wUGn+
-        LJk8r3p7tlvXpqz5xixDmrpMeJMcVFAR3wVrHqNA0+QnHnkUyFUKcAPwB7/zjMVn1MpBSK
-        HwLWMv309MHCQ0bhPdUnrTud+No2cgM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-dvBdJ8edMCKO_OlxMTbt1Q-1; Wed, 13 Jan 2021 14:41:39 -0500
-X-MC-Unique: dvBdJ8edMCKO_OlxMTbt1Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCD4510766C5;
-        Wed, 13 Jan 2021 19:41:21 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E7685D6A8;
-        Wed, 13 Jan 2021 19:41:21 +0000 (UTC)
-Date:   Wed, 13 Jan 2021 12:41:21 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
+        id S1728901AbhAMTpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 14:45:13 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:55168 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728673AbhAMTpN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 14:45:13 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10DJdfAO130320;
+        Wed, 13 Jan 2021 19:44:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=ghB12JomBMV0iBHWSulHKvTREP6VRMtewCovGvFCFik=;
+ b=AAI7CHJAqbqbBu+8DGzV1FXn++THjEbZi1fxxEGmPWCCboqALZmzN8GDGzv+DnPADhYz
+ WF1abjItbRsu+WzX7pLRsJ4pX25uX/aSg3SFFqpMHeqAhURDZ9eFECSutlkCG7oO1Ym1
+ XGMdXdhqx0gJcgP/wU3zbklNLcjfH31BIN+gKTiCUhtbtPeSPJIairxWzYmfGryzfXzi
+ Ec+hAK/SPGSW720XnmO6NQG2k7eIPCuUcSoLLYdp3MKc2C95pB62ss+6fZQEX1s2ui8w
+ YzRrXWtIQJCXnpMnfPi9M6YYaD0Mu4NZd5Gnt4q3GxPTYUjN+9+dfJ/YPxRLSKCw+mK0 Qw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 360kg1w8fh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Jan 2021 19:44:28 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10DJeZGv142465;
+        Wed, 13 Jan 2021 19:44:27 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 360kf87gdy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Jan 2021 19:44:27 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10DJiQCs027141;
+        Wed, 13 Jan 2021 19:44:26 GMT
+Received: from [10.39.255.41] (/10.39.255.41)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 13 Jan 2021 11:44:26 -0800
+Subject: Re: [PATCH V1 3/5] vfio: detect closed container
+To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V1 2/5] vfio: option to unmap all
-Message-ID: <20210113124121.061e90e8@omen.home.shazbot.org>
-In-Reply-To: <c5850c5d-52c4-1f21-30cc-34f9b2d7b7f3@oracle.com>
 References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
-        <1609861013-129801-3-git-send-email-steven.sistare@oracle.com>
-        <20210108123548.033377e7@omen.home>
-        <c5850c5d-52c4-1f21-30cc-34f9b2d7b7f3@oracle.com>
+ <1609861013-129801-4-git-send-email-steven.sistare@oracle.com>
+ <20210108123905.30d647d4@omen.home>
+ <b7b51ee2-b7f6-61c4-c00d-166d9f56cbe7@oracle.com>
+ <20210113122609.2bedad55@omen.home.shazbot.org>
+From:   Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <c6393c85-0aed-8235-7cda-c9376df189bf@oracle.com>
+Date:   Wed, 13 Jan 2021 14:44:26 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210113122609.2bedad55@omen.home.shazbot.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9863 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101130118
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9863 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ clxscore=1015 impostorscore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ phishscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101130118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 11 Jan 2021 16:09:18 -0500
-Steven Sistare <steven.sistare@oracle.com> wrote:
+On 1/13/2021 2:26 PM, Alex Williamson wrote:
+> On Mon, 11 Jan 2021 16:12:18 -0500
+> Steven Sistare <steven.sistare@oracle.com> wrote:
+> 
+>> On 1/8/2021 2:39 PM, Alex Williamson wrote:
+>>> On Tue,  5 Jan 2021 07:36:51 -0800
+>>> Steve Sistare <steven.sistare@oracle.com> wrote:
+>>>   
+>>>> Add a function that detects if an iommu_group has a valid container.
+>>>>
+>>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>>>> ---
+>>>>  drivers/vfio/vfio.c  | 12 ++++++++++++
+>>>>  include/linux/vfio.h |  1 +
+>>>>  2 files changed, 13 insertions(+)
+>>>>
+>>>> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+>>>> index 262ab0e..f89ab80 100644
+>>>> --- a/drivers/vfio/vfio.c
+>>>> +++ b/drivers/vfio/vfio.c
+>>>> @@ -61,6 +61,7 @@ struct vfio_container {
+>>>>  	struct vfio_iommu_driver	*iommu_driver;
+>>>>  	void				*iommu_data;
+>>>>  	bool				noiommu;
+>>>> +	bool				closed;
+>>>>  };
+>>>>  
+>>>>  struct vfio_unbound_dev {
+>>>> @@ -1223,6 +1224,7 @@ static int vfio_fops_release(struct inode *inode, struct file *filep)
+>>>>  
+>>>>  	filep->private_data = NULL;
+>>>>  
+>>>> +	container->closed = true;
+>>>>  	vfio_container_put(container);
+>>>>  
+>>>>  	return 0;
+>>>> @@ -2216,6 +2218,16 @@ void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm)
+>>>>  }
+>>>>  EXPORT_SYMBOL_GPL(vfio_group_set_kvm);
+>>>>  
+>>>> +bool vfio_iommu_group_contained(struct iommu_group *iommu_group)
+>>>> +{
+>>>> +	struct vfio_group *group = vfio_group_get_from_iommu(iommu_group);
+>>>> +	bool ret = group && group->container && !group->container->closed;
+>>>> +
+>>>> +	vfio_group_put(group);
+>>>> +	return ret;
+>>>> +}
+>>>> +EXPORT_SYMBOL_GPL(vfio_iommu_group_contained);  
+>>>
+>>> This seems like a pointless interface, the result is immediately stale.
+>>> Anything that relies on the container staying open needs to add itself
+>>> as a user.  We already have some interfaces for that, ex.
+>>> vfio_group_get_external_user().  Thanks,  
+>>
+>> The significant part here is container->closed, which is only set if userland closes the
+>> container fd, which is a one-way trip -- the fd for this instance can never be opened 
+>> again.  The container object may still have other references, and not be destroyed yet.
+>> In patch 5, kernel code that waits for the RESUME ioctl calls this accessor to test if 
+>> the ioctl will never arrive.
+> 
+> Ok, that makes sense, the "contained" naming notsomuch.  You mention on
+> 5/5 that you considered defining a new backend interface to call from
+> the core, but considered it overkill.  I'm not sure what you're
+> imagining that would be overkill.  We can pretty simply add an optional
+> callback to struct vfio_iommu_drivers_ops that would allow the iommu
+> driver to be notified when the container fd is released.  That seems
+> quite simple and avoids the inverted calling structure presented here.
+> Thanks,
 
-> On 1/8/2021 2:35 PM, Alex Williamson wrote:
-> > Hi Steve,
-> > 
-> > On Tue,  5 Jan 2021 07:36:50 -0800
-> > Steve Sistare <steven.sistare@oracle.com> wrote:
-> >   
-> >> For VFIO_IOMMU_UNMAP_DMA, delete all mappings if iova=0 and size=0.  
-> > 
-> > Only the latter is invalid, iova=0 is not special, so does it make
-> > sense to use this combination to invoke something special?  It seems
-> > like it opens the door that any size less than the minimum mapping
-> > granularity means something special.
-> > 
-> > Why not use a flag to trigger an unmap-all?  
-> 
-> Hi Alex, that would be fine.
-> 
-> > Does userspace have any means to know this is supported other than to
-> > test it before creating any mappings?  
-> 
-> Not currently.  We could overload VFIO_SUSPEND, or define a new extension code.
+OK.
 
-Either an extension or a capability on the IOMMU_INFO return data.
-If I interpret our trend on which to use, an extension seems
-appropriate here as were only indicating support for a feature with no
-additional data to return.
+Thanks very much for all your comments.  Off to write PATCH V2 ...
 
-> > What's the intended interaction with retrieving the dirty bitmap during
-> > an unmap-all?  
-> 
-> Undefined and broken if there are gaps between segments :(  Good catch, thanks.  
-> I will disallow the combination of unmap-all and get-dirty-bitmap.
-> 
-> >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >> ---
-> >>  drivers/vfio/vfio_iommu_type1.c | 11 ++++++++---
-> >>  include/uapi/linux/vfio.h       |  3 ++-
-> >>  2 files changed, 10 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 02228d0..3dc501d 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -1079,6 +1079,8 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>  	size_t unmapped = 0, pgsize;
-> >>  	int ret = 0, retries = 0;
-> >>  	unsigned long pgshift;
-> >> +	dma_addr_t iova;
-> >> +	unsigned long size;
-> >>  
-> >>  	mutex_lock(&iommu->lock);
-> >>  
-> >> @@ -1090,7 +1092,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>  		goto unlock;
-> >>  	}
-> >>  
-> >> -	if (!unmap->size || unmap->size & (pgsize - 1)) {
-> >> +	if ((!unmap->size && unmap->iova) || unmap->size & (pgsize - 1)) {
-> >>  		ret = -EINVAL;
-> >>  		goto unlock;
-> >>  	}
-> >> @@ -1154,8 +1156,11 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,  
-> > 
-> > It looks like the code just above this would have an issue if there are
-> > dma mappings at iova=0.  
-> 
-> Are you referring to this code?
-> 
->         if (iommu->v2) {
->                 dma = vfio_find_dma(iommu, unmap->iova, 1);
->                 if (dma && dma->iova != unmap->iova) {
->                         ret = -EINVAL;
-> 
-> Both unmap->iova and dma->iova would be 0, so I don't see the problem.
-
-Yeah, I think I was mistaken.  Thanks,
-
-Alex
-
-> >>  		}
-> >>  	}
-> >>  
-> >> -	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
-> >> -		if (!iommu->v2 && unmap->iova > dma->iova)
-> >> +	iova = unmap->iova;
-> >> +	size = unmap->size ? unmap->size : SIZE_MAX;  
-> > 
-> > AFAICT the only difference of this versus the user calling the unmap
-> > with iova=0 size=SIZE_MAX is that SIZE_MAX will throw an -EINVAL due to
-> > page size alignment.  If we assume there are no IOMMUs with 1 byte page
-> > size, the special combination could instead be {0, SIZE_MAX}.    
-> 
-> Fine, but we would still need to document it specifically so the user knows that 
-> the unaligned SIZE_MAX does not return EINVAL.
-> 
-> > Or the
-> > caller could just track a high water mark for their mappings and use
-> > the interface that exists.  Thanks,  
-> 
-> I am trying to avoid the need to modify existing code, for legacy qemu live update.
-> Either a new flag or {0, SIZE_MAX} is suitable.  Which do you prefer?
-> 
-> - Steve
->  
-> >> +
-> >> +	while ((dma = vfio_find_dma(iommu, iova, size))) {
-> >> +		if (!iommu->v2 && iova > dma->iova)
-> >>  			break;
-> >>  		/*
-> >>  		 * Task with same address space who mapped this iova range is
-> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >> index 9204705..896e527 100644
-> >> --- a/include/uapi/linux/vfio.h
-> >> +++ b/include/uapi/linux/vfio.h
-> >> @@ -1073,7 +1073,8 @@ struct vfio_bitmap {
-> >>   * Caller sets argsz.  The actual unmapped size is returned in the size
-> >>   * field.  No guarantee is made to the user that arbitrary unmaps of iova
-> >>   * or size different from those used in the original mapping call will
-> >> - * succeed.
-> >> + * succeed.  If iova=0 and size=0, all addresses are unmapped.
-> >> + *
-> >>   * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get the dirty bitmap
-> >>   * before unmapping IO virtual addresses. When this flag is set, the user must
-> >>   * provide a struct vfio_bitmap in data[]. User must provide zero-allocated  
-> >   
-> 
-
+- Steve
