@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5820B2F56D6
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0101B2F56D3
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727185AbhANBxt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 20:53:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47228 "EHLO
+        id S1728261AbhANBxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 20:53:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729628AbhAMX7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1729678AbhAMX7I (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 13 Jan 2021 18:59:08 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942DAC06179F
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B38C0617A3
         for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 15:58:20 -0800 (PST)
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DGPXQ1NRGz9sWL; Thu, 14 Jan 2021 10:58:13 +1100 (AEDT)
+        id 4DGPXQ0Kttz9sVy; Thu, 14 Jan 2021 10:58:13 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1610582294;
-        bh=h0Jz0KuZ8QIYAmCIyloUz2Sh5gXanXPh5LhTODIVJMA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Bik0qo1kJyZhlDCmIUoQ2eJgEuHr3HC4Dbmm/nI+EmnBqHp9GVas0MZbwrgMcXrQq
-         pSply4yKPSi4sbSf2QWcb6kvr0XizbnZUyhYQbkDBo2NF7wqUsFHm0DE0H/TiyBCZ/
-         asMYLxxfl53WsAJxEPyyPXb4JYgh9tNohmaw3juA=
+        bh=PMr7j5j8OSe0AP5kUuFMOJLePX4fph0iQtNNjr88kFA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WOU/Nolj6jlStIr4NRM6WXyowwAzxfu41mUBsAt2hjacUVyKfMzCuBeg3nnoRXdhH
+         hz2tPK9t7Dy95n4vvy1Ul/4WMa/beNDURAUo0XociRRNmbNIiWM7vgaXJPhjxnXS8J
+         E1NNnb87UwZo6RN48TQLEmCj5ir03CdkKQRyk5r4=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
         pasic@linux.ibm.com, qemu-devel@nongnu.org
@@ -38,135 +38,136 @@ Cc:     cohuck@redhat.com,
         qemu-ppc@nongnu.org, frankja@linux.ibm.com,
         Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
         David Gibson <david@gibson.dropbear.id.au>,
-        berrange@redhat.com, andi.kleen@intel.com
-Subject: [PATCH v7 00/13] Generalize memory encryption models
-Date:   Thu, 14 Jan 2021 10:57:58 +1100
-Message-Id: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+        berrange@redhat.com, andi.kleen@intel.com,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v7 01/13] qom: Allow optional sugar props
+Date:   Thu, 14 Jan 2021 10:57:59 +1100
+Message-Id: <20210113235811.1909610-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A number of hardware platforms are implementing mechanisms whereby the=0D
-hypervisor does not have unfettered access to guest memory, in order=0D
-to mitigate the security impact of a compromised hypervisor.=0D
-=0D
-AMD's SEV implements this with in-cpu memory encryption, and Intel has=0D
-its own memory encryption mechanism.  POWER has an upcoming mechanism=0D
-to accomplish this in a different way, using a new memory protection=0D
-level plus a small trusted ultravisor.  s390 also has a protected=0D
-execution environment.=0D
-=0D
-The current code (committed or draft) for these features has each=0D
-platform's version configured entirely differently.  That doesn't seem=0D
-ideal for users, or particularly for management layers.=0D
-=0D
-AMD SEV introduces a notionally generic machine option=0D
-"machine-encryption", but it doesn't actually cover any cases other=0D
-than SEV.=0D
-=0D
-This series is a proposal to at least partially unify configuration=0D
-for these mechanisms, by renaming and generalizing AMD's=0D
-"memory-encryption" property.  It is replaced by a=0D
-"confidential-guest-support" property pointing to a platform specific=0D
-object which configures and manages the specific details.=0D
-=0D
-Note to Ram Pai: the documentation I've included for PEF is very=0D
-minimal.  If you could send a patch expanding on that, it would be=0D
-very helpful.=0D
-=0D
-Changes since v6:=0D
- * Moved to using OBJECT_DECLARE_TYPE and OBJECT_DEFINE_TYPE macros=0D
- * Assorted minor fixes=0D
-Changes since v5:=0D
- * Renamed from "securable guest memory" to "confidential guest=0D
-   support"=0D
- * Simpler reworking of x86 boot time flash encryption=0D
- * Added a bunch of documentation=0D
- * Fixed some compile errors on POWER=0D
-Changes since v4:=0D
- * Renamed from "host trust limitation" to "securable guest memory",=0D
-   which I think is marginally more descriptive=0D
- * Re-organized initialization, because the previous model called at=0D
-   kvm_init didn't work for s390=0D
- * Assorted fixes to the s390 implementation; rudimentary testing=0D
-   (gitlab CI) only=0D
-Changes since v3:=0D
- * Rebased=0D
- * Added first cut at handling of s390 protected virtualization=0D
-Changes since RFCv2:=0D
- * Rebased=0D
- * Removed preliminary SEV cleanups (they've been merged)=0D
- * Changed name to "host trust limitation"=0D
- * Added migration blocker to the PEF code (based on SEV's version)=0D
-Changes since RFCv1:=0D
- * Rebased=0D
- * Fixed some errors pointed out by Dave Gilbert=0D
-=0D
-David Gibson (12):=0D
-  confidential guest support: Introduce new confidential guest support=0D
-    class=0D
-  sev: Remove false abstraction of flash encryption=0D
-  confidential guest support: Move side effect out of=0D
-    machine_set_memory_encryption()=0D
-  confidential guest support: Rework the "memory-encryption" property=0D
-  sev: Add Error ** to sev_kvm_init()=0D
-  confidential guest support: Introduce cgs "ready" flag=0D
-  confidential guest support: Move SEV initialization into arch specific=0D
-    code=0D
-  confidential guest support: Update documentation=0D
-  spapr: Add PEF based confidential guest support=0D
-  spapr: PEF: prevent migration=0D
-  confidential guest support: Alter virtio default properties for=0D
-    protected guests=0D
-  s390: Recognize confidential-guest-support option=0D
-=0D
-Greg Kurz (1):=0D
-  qom: Allow optional sugar props=0D
-=0D
- accel/kvm/kvm-all.c                       |  38 -------=0D
- accel/kvm/sev-stub.c                      |  10 +-=0D
- accel/stubs/kvm-stub.c                    |  10 --=0D
- backends/confidential-guest-support.c     |  33 ++++++=0D
- backends/meson.build                      |   1 +=0D
- docs/amd-memory-encryption.txt            |   2 +-=0D
- docs/confidential-guest-support.txt       |  49 +++++++++=0D
- docs/papr-pef.txt                         |  30 ++++++=0D
- docs/system/s390x/protvirt.rst            |  19 ++--=0D
- hw/core/machine.c                         |  71 ++++++++++--=0D
- hw/i386/pc_sysfw.c                        |  17 ++-=0D
- hw/ppc/meson.build                        |   1 +=0D
- hw/ppc/pef.c                              | 126 ++++++++++++++++++++++=0D
- hw/ppc/spapr.c                            |   6 ++=0D
- hw/s390x/pv.c                             |  62 +++++++++++=0D
- include/exec/confidential-guest-support.h |  40 +++++++=0D
- include/hw/boards.h                       |   2 +-=0D
- include/hw/ppc/pef.h                      |  25 +++++=0D
- include/hw/s390x/pv.h                     |   1 +=0D
- include/qemu/typedefs.h                   |   1 +=0D
- include/qom/object.h                      |   3 +-=0D
- include/sysemu/kvm.h                      |  16 ---=0D
- include/sysemu/sev.h                      |   4 +-=0D
- qom/object.c                              |   4 +-=0D
- softmmu/rtc.c                             |   3 +-=0D
- softmmu/vl.c                              |  17 +--=0D
- target/i386/kvm/kvm.c                     |  12 +++=0D
- target/i386/sev-stub.c                    |   5 +=0D
- target/i386/sev.c                         |  93 +++++++---------=0D
- target/ppc/kvm.c                          |  18 ----=0D
- target/ppc/kvm_ppc.h                      |   6 --=0D
- target/s390x/kvm.c                        |   3 +=0D
- 32 files changed, 539 insertions(+), 189 deletions(-)=0D
- create mode 100644 backends/confidential-guest-support.c=0D
- create mode 100644 docs/confidential-guest-support.txt=0D
- create mode 100644 docs/papr-pef.txt=0D
- create mode 100644 hw/ppc/pef.c=0D
- create mode 100644 include/exec/confidential-guest-support.h=0D
- create mode 100644 include/hw/ppc/pef.h=0D
-=0D
--- =0D
-2.29.2=0D
-=0D
+From: Greg Kurz <groug@kaod.org>
+
+Global properties have an @optional field, which allows to apply a given
+property to a given type even if one of its subclasses doesn't support
+it. This is especially used in the compat code when dealing with the
+"disable-modern" and "disable-legacy" properties and the "virtio-pci"
+type.
+
+Allow object_register_sugar_prop() to set this field as well.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <159738953558.377274.16617742952571083440.stgit@bahia.lan>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/qom/object.h |  3 ++-
+ qom/object.c         |  4 +++-
+ softmmu/rtc.c        |  3 ++-
+ softmmu/vl.c         | 17 +++++++++++------
+ 4 files changed, 18 insertions(+), 9 deletions(-)
+
+diff --git a/include/qom/object.h b/include/qom/object.h
+index d378f13a11..6721cd312e 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -638,7 +638,8 @@ bool object_apply_global_props(Object *obj, const GPtrArray *props,
+                                Error **errp);
+ void object_set_machine_compat_props(GPtrArray *compat_props);
+ void object_set_accelerator_compat_props(GPtrArray *compat_props);
+-void object_register_sugar_prop(const char *driver, const char *prop, const char *value);
++void object_register_sugar_prop(const char *driver, const char *prop,
++                                const char *value, bool optional);
+ void object_apply_compat_props(Object *obj);
+ 
+ /**
+diff --git a/qom/object.c b/qom/object.c
+index 2fa0119647..491823db4a 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -442,7 +442,8 @@ static GPtrArray *object_compat_props[3];
+  * other than "-global".  These are generally used for syntactic
+  * sugar and legacy command line options.
+  */
+-void object_register_sugar_prop(const char *driver, const char *prop, const char *value)
++void object_register_sugar_prop(const char *driver, const char *prop,
++                                const char *value, bool optional)
+ {
+     GlobalProperty *g;
+     if (!object_compat_props[2]) {
+@@ -452,6 +453,7 @@ void object_register_sugar_prop(const char *driver, const char *prop, const char
+     g->driver = g_strdup(driver);
+     g->property = g_strdup(prop);
+     g->value = g_strdup(value);
++    g->optional = optional;
+     g_ptr_array_add(object_compat_props[2], g);
+ }
+ 
+diff --git a/softmmu/rtc.c b/softmmu/rtc.c
+index e1e15ef613..5632684fc9 100644
+--- a/softmmu/rtc.c
++++ b/softmmu/rtc.c
+@@ -179,7 +179,8 @@ void configure_rtc(QemuOpts *opts)
+         if (!strcmp(value, "slew")) {
+             object_register_sugar_prop("mc146818rtc",
+                                        "lost_tick_policy",
+-                                       "slew");
++                                       "slew",
++                                       false);
+         } else if (!strcmp(value, "none")) {
+             /* discard is default */
+         } else {
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 7ddf405d76..3f7721b83e 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -1663,16 +1663,20 @@ static int machine_set_property(void *opaque,
+         return 0;
+     }
+     if (g_str_equal(qom_name, "igd-passthru")) {
+-        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
++        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value,
++                                   false);
+         return 0;
+     }
+     if (g_str_equal(qom_name, "kvm-shadow-mem")) {
+-        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value);
++        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value,
++                                   false);
+         return 0;
+     }
+     if (g_str_equal(qom_name, "kernel-irqchip")) {
+-        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value);
+-        object_register_sugar_prop(ACCEL_CLASS_NAME("whpx"), qom_name, value);
++        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value,
++                                   false);
++        object_register_sugar_prop(ACCEL_CLASS_NAME("whpx"), qom_name, value,
++                                   false);
+         return 0;
+     }
+ 
+@@ -2297,9 +2301,10 @@ static void qemu_process_sugar_options(void)
+ 
+         val = g_strdup_printf("%d",
+                  (uint32_t) qemu_opt_get_number(qemu_find_opts_singleton("smp-opts"), "cpus", 1));
+-        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
++        object_register_sugar_prop("memory-backend", "prealloc-threads", val,
++                                   false);
+         g_free(val);
+-        object_register_sugar_prop("memory-backend", "prealloc", "on");
++        object_register_sugar_prop("memory-backend", "prealloc", "on", false);
+     }
+ 
+     if (watchdog) {
+-- 
+2.29.2
+
