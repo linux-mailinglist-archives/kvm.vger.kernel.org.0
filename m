@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1F552F44D5
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 08:09:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55D582F44E2
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 08:11:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725811AbhAMHGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 02:06:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56213 "EHLO
+        id S1726514AbhAMHKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 02:10:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52070 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726493AbhAMHGu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 02:06:50 -0500
+        by vger.kernel.org with ESMTP id S1726215AbhAMHKT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 02:10:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610521524;
+        s=mimecast20190719; t=1610521732;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kY0zJaLLaAZfbU7u5cifFOLBnqgQbzx/khQ/RPfZ2U4=;
-        b=SceOld+XABU88UbMqhWKYWM8dhAeKy2YcukWjyydqH61wthMUVC7cCkT3TVkriQ3c7jD65
-        jE1MFnhwP2QYEIswBruMRihlXS2vkwxsck6SeNcRO43uIHwGq9DPM1EuEPO58KjRCqDJsQ
-        9mjNMK1C4xDLG7Jl4vm3k8o5yFhcHVs=
+        bh=8eAI57pJ3zxOCZ/AfaPs/PP4XVJRFb7Zj25N+2rObR0=;
+        b=HF4vvssKSCOQoJ3pAn99ELH0Chu+T5CIZoiZ6kDvifyn3kiyI9YDtqP8p1grnOFB4TET05
+        /Kk55uA0G+oxqTCvEFe8enXjIFY79tOKaDLMd1FD5zi4I9a198bnOVl1WXNEpmn56D4AWE
+        uO2DzToI8Jw+YZQzmSMZAgFlEUFGnHU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-i0jsS_qiMoi_ifAcjqZjJQ-1; Wed, 13 Jan 2021 02:05:21 -0500
-X-MC-Unique: i0jsS_qiMoi_ifAcjqZjJQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-504-9ffbBb3VNLiwHuorjnBhmQ-1; Wed, 13 Jan 2021 02:08:49 -0500
+X-MC-Unique: 9ffbBb3VNLiwHuorjnBhmQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BAAF8066E2;
-        Wed, 13 Jan 2021 07:05:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC9B7107ACF7;
+        Wed, 13 Jan 2021 07:08:47 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-122.ams2.redhat.com [10.36.112.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAA2B1C956;
-        Wed, 13 Jan 2021 07:05:11 +0000 (UTC)
-Subject: Re: [PATCH 3/9] configure/meson: Only check sys/signal.h on non-Linux
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A70E36F97C;
+        Wed, 13 Jan 2021 07:08:34 +0000 (UTC)
+Subject: Re: [PATCH 4/9] libvhost-user: Include poll.h instead of sys/poll.h
 To:     Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org,
         QEMU Trivial <qemu-trivial@nongnu.org>
 Cc:     Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
@@ -47,55 +47,55 @@ Cc:     Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
         Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
         =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        David Gibson <david@gibson.dropbear.id.au>
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
 References: <20201221005318.11866-1-jiaxun.yang@flygoat.com>
- <20201221005318.11866-4-jiaxun.yang@flygoat.com>
+ <20201221005318.11866-5-jiaxun.yang@flygoat.com>
 From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <fb676594-d25d-5f13-ef1e-0e4a7e77ca63@redhat.com>
-Date:   Wed, 13 Jan 2021 08:05:10 +0100
+Message-ID: <a7c9dee2-0f9d-283b-0c66-f34db51fe345@redhat.com>
+Date:   Wed, 13 Jan 2021 08:08:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201221005318.11866-4-jiaxun.yang@flygoat.com>
+In-Reply-To: <20201221005318.11866-5-jiaxun.yang@flygoat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 21/12/2020 01.53, Jiaxun Yang wrote:
-> signal.h is equlevant of sys/signal.h on Linux, musl would complain
-> wrong usage of sys/signal.h.
+> Musl libc complains about it's wrong usage.
 > 
-> In file included from /builds/FlyGoat/qemu/include/qemu/osdep.h:108,
->                   from ../tests/qemu-iotests/socket_scm_helper.c:13:
-> /usr/include/sys/signal.h:1:2: error: #warning redirecting incorrect #include <sys/signal.h> to <signal.h> [-Werror=cpp]
->      1 | #warning redirecting incorrect #include <sys/signal.h> to <signal.h>
+> In file included from ../subprojects/libvhost-user/libvhost-user.h:20,
+>                   from ../subprojects/libvhost-user/libvhost-user-glib.h:19,
+>                   from ../subprojects/libvhost-user/libvhost-user-glib.c:15:
+> /usr/include/sys/poll.h:1:2: error: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Werror=cpp]
+>      1 | #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
 >        |  ^~~~~~~
 > 
 > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 > ---
->   meson.build | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+>   subprojects/libvhost-user/libvhost-user.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/meson.build b/meson.build
-> index 372576f82c..1ef8722b3a 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -841,7 +841,10 @@ config_host_data.set('HAVE_DRM_H', cc.has_header('libdrm/drm.h'))
->   config_host_data.set('HAVE_PTY_H', cc.has_header('pty.h'))
->   config_host_data.set('HAVE_SYS_IOCCOM_H', cc.has_header('sys/ioccom.h'))
->   config_host_data.set('HAVE_SYS_KCOV_H', cc.has_header('sys/kcov.h'))
-> -config_host_data.set('HAVE_SYS_SIGNAL_H', cc.has_header('sys/signal.h'))
-> +if targetos != 'linux'
-> +  # signal.h is equlevant of sys/signal.h on Linux
-> +  config_host_data.set('HAVE_SYS_SIGNAL_H', cc.has_header('sys/signal.h'))
-> +endif
-
-Seems like it sys/signal.h was introduced for OpenBSD once (see commit 
-128ab2ff50a), so this new check should be fine.
+> diff --git a/subprojects/libvhost-user/libvhost-user.h b/subprojects/libvhost-user/libvhost-user.h
+> index 7d47f1364a..3d13dfadde 100644
+> --- a/subprojects/libvhost-user/libvhost-user.h
+> +++ b/subprojects/libvhost-user/libvhost-user.h
+> @@ -17,7 +17,7 @@
+>   #include <stdint.h>
+>   #include <stdbool.h>
+>   #include <stddef.h>
+> -#include <sys/poll.h>
+> +#include <poll.h>
+>   #include <linux/vhost.h>
+>   #include <pthread.h>
+>   #include "standard-headers/linux/virtio_ring.h"
+> 
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
