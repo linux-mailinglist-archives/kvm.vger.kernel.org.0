@@ -2,135 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A44FB2F4F42
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 16:55:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 913DC2F4FB0
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 17:18:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727069AbhAMPxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 10:53:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48244 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725773AbhAMPxn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 10:53:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610553136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=H8D1i0KVkxfWhGz/c4/dBK06vC5FnRwBZHGKt3I3xFU=;
-        b=S0hW6QPZqC5OPvoybzYRpLxXh54cjvrXMsBvFqJVnFsY4a72uOpphj04sAJbxOdVGl3PA5
-        R3tJWCA6WQ4B5LAva5bSpXUoQEXleFz7Ik9o4EmQN+scE3ch7hIk9Ylgl5R6kGF2f+8fYp
-        +lwUxo2Atl5jjobLYTITVVd+0O0MGTI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-7FHzBZV8NE678b9QBs73Xw-1; Wed, 13 Jan 2021 10:52:09 -0500
-X-MC-Unique: 7FHzBZV8NE678b9QBs73Xw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9AFC5192D78C;
-        Wed, 13 Jan 2021 15:52:08 +0000 (UTC)
-Received: from localhost (ovpn-115-141.ams2.redhat.com [10.36.115.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3041F6F984;
-        Wed, 13 Jan 2021 15:52:06 +0000 (UTC)
-Date:   Wed, 13 Jan 2021 15:52:05 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        jag.raman@oracle.com, elena.ufimtseva@oracle.com
-Subject: Re: [RFC 1/2] KVM: add initial support for KVM_SET_IOREGION
-Message-ID: <20210113155205.GA270353@stefanha-x1.localdomain>
-References: <0cc68c81d6fae042d8a84bf90dd77eecd4da7cc8.camel@gmail.com>
- <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
- <29955fdc90d2efab7b79c91b9a97183e95243cc1.camel@gmail.com>
- <47e8b7e8-d9b8-b2a2-c014-05942d99452a@redhat.com>
- <20210105102517.GA31084@stefanha-x1.localdomain>
- <f9cd33f6-c30d-4e5a-bc45-8f42109fe1ce@redhat.com>
- <20210106150525.GB130669@stefanha-x1.localdomain>
- <32b49857-4ac7-0646-929d-c9238b50bc49@redhat.com>
- <20210107175311.GA168426@stefanha-x1.localdomain>
- <e22eaf2b-15f6-5b41-75a8-0e9b24e84e16@redhat.com>
+        id S1727426AbhAMQRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 11:17:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60778 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727012AbhAMQRg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 11:17:36 -0500
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [IPv6:2620:100:9005:57f::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84EAEC061786;
+        Wed, 13 Jan 2021 08:16:56 -0800 (PST)
+Received: from pps.filterd (m0050096.ppops.net [127.0.0.1])
+        by m0050096.ppops.net-00190b01. (8.16.0.43/8.16.0.43) with SMTP id 10DG5Hun018438;
+        Wed, 13 Jan 2021 16:16:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=jan2016.eng;
+ bh=I5ZbEghhEnmMY+HcM11oYZy7YgEzZZOdPZP5u9HA9kk=;
+ b=VK1KmgqAs22na9/P3ldoP9aYZPErZtSKydCKeGTWgdJy0rxh6Zxdk4jSXSDuLx79z6is
+ NmZ46CnXxJco4b9mGsdvE+BMey+34DOVkxXAbi6H3YTWRTBu+PKc3ZpRlvAPY0Uc960V
+ sn7cuPMXUEoNX+sZMsXNlFboLBaMnNCOjDfxpmaxCTcZjR3t4oFPplR98b+ZoSI0DFP3
+ 0/8UtnK2Hgexms/WPVc2dQK1MZz49Popb/pYXMWvBH69fGzl+pLtGkSNyzVxKddgnbTi
+ PjdGLmyouOwqDpnSus/ZP8ArBN8RQnlNzGLeUscZf+imQ6HvfFQA3jNWHJ7C08ewgXK3 6A== 
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+        by m0050096.ppops.net-00190b01. with ESMTP id 35y5sg2ewd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 16:16:39 +0000
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+        by prod-mail-ppoint6.akamai.com (8.16.0.43/8.16.0.43) with SMTP id 10DG4nYR020608;
+        Wed, 13 Jan 2021 11:16:38 -0500
+Received: from prod-mail-relay11.akamai.com ([172.27.118.250])
+        by prod-mail-ppoint6.akamai.com with ESMTP id 35y8q40rm5-1;
+        Wed, 13 Jan 2021 11:16:38 -0500
+Received: from [0.0.0.0] (prod-ssh-gw01.bos01.corp.akamai.com [172.27.119.138])
+        by prod-mail-relay11.akamai.com (Postfix) with ESMTP id 53115249DC;
+        Wed, 13 Jan 2021 16:16:38 +0000 (GMT)
+Subject: Re: [PATCH 1/2] KVM: x86: introduce definitions to support static
+ calls for kvm_x86_ops
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        peterz@infradead.org, aarcange@redhat.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1610379877.git.jbaron@akamai.com>
+ <ce483ce4a1920a3c1c4e5deea11648d75f2a7b80.1610379877.git.jbaron@akamai.com>
+ <ee071807-5ce5-60c1-c5df-b0b3e068b2ba@redhat.com>
+From:   Jason Baron <jbaron@akamai.com>
+Message-ID: <6026c2a4-57bf-e045-b62d-30b2490ee331@akamai.com>
+Date:   Wed, 13 Jan 2021 11:16:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
-Content-Disposition: inline
-In-Reply-To: <e22eaf2b-15f6-5b41-75a8-0e9b24e84e16@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <ee071807-5ce5-60c1-c5df-b0b3e068b2ba@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-13_07:2021-01-13,2021-01-13 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 adultscore=0
+ phishscore=0 mlxlogscore=772 mlxscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101130097
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-13_07:2021-01-13,2021-01-13 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxlogscore=721 suspectscore=0 impostorscore=0 bulkscore=0
+ clxscore=1015 priorityscore=1501 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101130097
+X-Agari-Authentication-Results: mx.akamai.com; spf=${SPFResult} (sender IP is 184.51.33.61)
+ smtp.mailfrom=jbaron@akamai.com smtp.helo=prod-mail-ppoint6
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---nFreZHaLTZJo0R7j
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 13, 2021 at 10:38:29AM +0800, Jason Wang wrote:
->=20
-> On 2021/1/8 =E4=B8=8A=E5=8D=881:53, Stefan Hajnoczi wrote:
-> > On Thu, Jan 07, 2021 at 11:30:47AM +0800, Jason Wang wrote:
-> > > On 2021/1/6 =E4=B8=8B=E5=8D=8811:05, Stefan Hajnoczi wrote:
-> > > > On Wed, Jan 06, 2021 at 01:21:43PM +0800, Jason Wang wrote:
-> > > > > On 2021/1/5 =E4=B8=8B=E5=8D=886:25, Stefan Hajnoczi wrote:
-> > > > > > On Tue, Jan 05, 2021 at 11:53:01AM +0800, Jason Wang wrote:
-> > > > > > > On 2021/1/5 =E4=B8=8A=E5=8D=888:02, Elena Afanasova wrote:
-> > > > > > > > On Mon, 2021-01-04 at 13:34 +0800, Jason Wang wrote:
-> > > > > > > > > On 2021/1/4 =E4=B8=8A=E5=8D=884:32, Elena Afanasova wrote:
-> > > > > > > > > > On Thu, 2020-12-31 at 11:45 +0800, Jason Wang wrote:
-> > > > > > > > > > > On 2020/12/29 =E4=B8=8B=E5=8D=886:02, Elena Afanasova=
- wrote:
-> > 2. If separate userspace threads process the virtqueues, then set up the
-> >     virtio-pci capabilities so the virtqueues have separate notification
-> >     registers:
-> >     https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs0=
-1.html#x1-1150004
->=20
->=20
-> Right. But this works only when PCI transport is used and queue index cou=
-ld
-> be deduced from the register address (separated doorbell).
->=20
-> If we use MMIO or sharing the doorbell registers among all the virtqueues
-> (multiplexer is zero in the above case) , it can't work without datamatch.
+On 1/13/21 7:53 AM, Paolo Bonzini wrote:
+> On 11/01/21 17:57, Jason Baron wrote:
+>> +#define DEFINE_KVM_OPS_STATIC_CALL(func)    \
+>> +    DEFINE_STATIC_CALL_NULL(kvm_x86_##func,    \
+>> +                *(((struct kvm_x86_ops *)0)->func))
+>> +#define DEFINE_KVM_OPS_STATIC_CALLS() \
+>> +    FOREACH_KVM_X86_OPS(DEFINE_KVM_OPS_STATIC_CALL)
+> 
+> Something wrong here?
 
-True. Can you think of an application that needs to dispatch a shared
-doorbell register to several threads?
+Hmmm...not sure what you are getting at here.
 
-If this is a case that real-world applications need then we should
-tackle it. This is where eBPF would be appropriate. I guess the
-interface would be something like:
+> 
+>> +#define DECLARE_KVM_OPS_STATIC_CALL(func)    \
+>> +    DECLARE_STATIC_CALL(kvm_x86_##func,    \
+>> +                *(((struct kvm_x86_ops *)0)->func))
+>> +#define DECLARE_KVM_OPS_STATIC_CALLS()        \
+>> +    FOREACH_KVM_X86_OPS(DECLARE_KVM_OPS_STATIC_CALL)
+>> +
+>> +#define KVM_OPS_STATIC_CALL_UPDATE(func)    \
+>> +    static_call_update(kvm_x86_##func, kvm_x86_ops.func)
+>> +#define KVM_OPS_STATIC_CALL_UPDATES()        \
+>> +    FOREACH_KVM_X86_OPS(KVM_OPS_STATIC_CALL_UPDATE)
+>> +
+>>   struct kvm_x86_ops {
+>>       int (*hardware_enable)(void);
+>>       void (*hardware_disable)(void);
+>> @@ -1326,6 +1385,12 @@ extern u64 __read_mostly host_efer;
+>>   extern bool __read_mostly allow_smaller_maxphyaddr;
+>>   extern struct kvm_x86_ops kvm_x86_ops;
+>>   +DECLARE_KVM_OPS_STATIC_CALLS();
+>> +static inline void kvm_ops_static_call_update(void)
+>> +{
+>> +    KVM_OPS_STATIC_CALL_UPDATES();
+>> +}
+> 
+> This would become
+> 
+> #define KVM_X86_OP(func) \
+>     DECLARE_STATIC_CALL(kvm_x86_##func,    \
+>                 *(((struct kvm_x86_ops *)0)->func));
+> 
+> #include <asm/kvm-x86-ops.h>
+> 
+> static inline void kvm_ops_static_call_update(void)
+> {
+> #define KVM_X86_OP(func) \
+>   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
+> #include <asm/kvm-x86-ops.h>
+> }
+> 
+> If you need to choose between DECLARE_STATIC_CALL_NULL and DECLARE_STATIC_CALL, you can have kvm-x86-ops.h use one of two macros KVM_X86_OP_NULL and
+> KVM_X86_OP.
+> 
+> #define KVM_X86_OP(func) \
+>     DECLARE_STATIC_CALL(kvm_x86_##func,    \
+>                 *(((struct kvm_x86_ops *)0)->func));
+> 
+> #define KVM_X86_OP_NULL(func) \
+>     DECLARE_STATIC_CALL_NULL(kvm_x86_##func,    \
+>                 *(((struct kvm_x86_ops *)0)->func));
+> 
+> #include <asm/kvm-x86-ops.h>
+> 
+> ...
+> 
+> #define KVM_X86_OP(func) \
+>   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
+> #define KVM_X86_OP_NULL(func) \
+>   static_call_update(kvm_x86_##func, kvm_x86_ops.func)
+> #include <asm/kvm-x86-ops.h>
+> 
+> In that case vmx.c and svm.c could define KVM_X86_OP_NULL to an empty string and list the optional callbacks manually.
+> 
 
-  /*
-   * A custom demultiplexer function that returns the index of the <wfd,
-   * rfd> pair to use or -1 to produce a KVM_EXIT_IOREGION_FAILURE that
-   * userspace must handle.
-   */
-  int demux(const struct ioregionfd_cmd *cmd);
+Ok, yes, this all makes sense. So I looked at vmx/svm definitions
+and I see that there are 5 definitions that are common that
+don't use the vmx or svm prefix:
 
-Userspace can install an eBPF demux function as well as an array of
-<wfd, rfd> fd pairs. The demux function gets to look at the cmd in order
-to decide which fd pair it is sent to.
+.update_exception_bitmap = update_exception_bitmap,
+.enable_nmi_window = enable_nmi_window,
+.enable_irq_window = enable_irq_window,
+.update_cr8_intercept = update_cr8_intercept,
+.enable_smi_window = enable_smi_window,
 
-This is how I think eBPF datamatch could work. It's not as general as in
-our original discussion where we also talked about custom protocols
-(instead of struct ioregionfd_cmd/struct ioregionfd_resp).
+8 are specific to vmx that don't use the vmx prefix:
 
-Stefan
+.hardware_unsetup = hardware_unsetup,
+.hardware_enable = hardware_enable,
+.hardware_disable = hardware_disable,
+.cpu_has_accelerated_tpr = report_flexpriority,
+.dy_apicv_has_pending_interrupt = pi_has_pending_interrupt,
+.has_wbinvd_exit = cpu_has_vmx_wbinvd_exit,
+.update_pi_irte = pi_update_irte,
+.complete_emulated_msr = kvm_complete_insn_gp,
 
---nFreZHaLTZJo0R7j
-Content-Type: application/pgp-signature; name="signature.asc"
+and finally 7 specific to svm that don't use the svm prefix:
 
------BEGIN PGP SIGNATURE-----
+.get_cs_db_l_bits = kvm_get_cs_db_l_bits,
+.handle_exit = handle_exit,
+.skip_emulated_instruction = skip_emulated_instruction,
+.update_emulated_instruction = NULL,
+.sync_pir_to_irr = kvm_lapic_find_highest_irr,
+.apicv_post_state_restore = avic_post_state_restore,
+.request_immediate_exit = __kvm_request_immediate_exit,
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl//FyUACgkQnKSrs4Gr
-c8hEegf/a9ssrX4AD8VXXSxxbHuPAP4GxtbwHgBkxtuYWoJkj4GMk6yqVggi5jlD
-SdShIcLTA0oJeM3mOHr2O69hlq+IVh9HOQL8voNJjGCdrw+TSxWMlovWbzoV7o7B
-7x4Jup2LIxHIkRAJHjsNhogFDuBlmCGjTOOkM3UNTQ5RsJG86KNaudaSdjbU3gI5
-2kJsZU0WJIpKZSonKJSJ9qrhTsXkeHbroPj0SwNaz5HRU2lokuJmTyxY2MNSfsmZ
-d99HFWRcf50bDbo4NtYXnb7vhnsmFHPWYu+KfSCed7OLaLFguFAKrgq1lnpz+98L
-pWGTaF/gtndZ/+5DEm7Xz4n9kHtm5g==
-=P+I7
------END PGP SIGNATURE-----
 
---nFreZHaLTZJo0R7j--
+So we could set all of these to empty definitions and specifically
+add the callbacks manually as you suggested. Or we could have 4
+categories of macros:
+
+1) KVM_X86_OP()  - for the usual case where we have the 'svm' or
+'vmx' prefix.
+
+2) KVM_X86_OP_NULL() - for the case where both svm and vmx want
+to over-ride.
+
+For the remaining cases I was thinking of having the VMX code
+and svm code, add a define for 'VMX' or 'SVM' respectively and
+then we could mark the vmx specific ones by adding something like
+this to asm/kvm-x86-ops.h:
+
+#ifndef VMX
+ #define KVM_X86_OP_UNLESS_VMX(func) \
+	KVM_X86_OP(func)
+#else
+ #define KVM_X86_OP_UNLESS_VMX(func)
+#endif
+
+and similarly for the svm specific ones:
+
+#ifndef SVM
+ #define KVM_X86_OP_UNLESS_SVM(func) \
+	KVM_X86_OP(func)
+#else
+ #define KVM_X86_OP_UNLESS_SVM(func)
+#endif
+
+
+So in vmx.c you would have:
+
+#define X86_OP(func)     .func = vmx_##func,
+#define VMX 1
+#include "kvm-x86-ops.h"
+
+Or we could just use the KVM_X86_OP_NULL() macro for anything
+that doesn't have a 'svm' or 'vmx' prefix as I think you were
+suggesting? In that case I think there would then be 13 manual
+additions for vmx and 12 for svm.
+
+Thanks,
+
+-Jason
 
