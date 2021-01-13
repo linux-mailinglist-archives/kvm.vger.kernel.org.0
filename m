@@ -2,91 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B85E72F4BD4
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:57:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 400072F4C28
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 14:21:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725911AbhAMM4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 07:56:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25485 "EHLO
+        id S1725823AbhAMNST (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 08:18:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58335 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725809AbhAMM4Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:56:24 -0500
+        by vger.kernel.org with ESMTP id S1725801AbhAMNST (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 08:18:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610542497;
+        s=mimecast20190719; t=1610543812;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0lgVRo6CQ9NzWlGI1TykX+pxELJPZRPvZtRz/475DZc=;
-        b=ZifFLbxN4hLm73fM9b5KFMOSWsLoybHmRk1RfnknBbez0i5bIupA9QAP9dQ+KKrpEbW4KR
-        v3JBno3WV2n/Q1XFtyUjDxWXv0ups4SWhcxdjtd5CFBBjQl09jS+54uQgygs4WqKSA0FfG
-        Bf1lCVazcpXz/0seIBUp9/P6//mw5WY=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-hBrnjB94N0OQ-Gjd05s8OQ-1; Wed, 13 Jan 2021 07:54:56 -0500
-X-MC-Unique: hBrnjB94N0OQ-Gjd05s8OQ-1
-Received: by mail-ed1-f72.google.com with SMTP id f19so801123edq.20
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:54:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0lgVRo6CQ9NzWlGI1TykX+pxELJPZRPvZtRz/475DZc=;
-        b=l0yeWcgGZFVl+rWRKDy3HhR0oMDSP8ZBKQk7WOfBdEjscmeTaAZvSxpIlDYGulH7GD
-         FXFcaOYUS1YvHVijy+0iiAsnyWd6S6F82/gcvb7ssYvMiR2VXpMDFHiGsbdXpUbotQUQ
-         Bpri0KHwp3djW7Z4PEOz7hBoqNYly+BHHJ6FyBYfVmq8DLztwweOMWuywRB4L7+Mromc
-         WFNv/K72oWQI2okevwJGI+FBxZVKVA/UNxjPSheP9sHIBeVSl0dsLZfXVdQN4+8Ip1N8
-         f0YveEBSKSwvqcK9TZrX9T3w6CZcCtQWtxPYe+wakUayI5NetXSbdc387ygqfKIRvP4y
-         Z2WA==
-X-Gm-Message-State: AOAM530u75LCEDi080nlm72T8LAoEgK5ZrF198/fJTxekeS2EaOpNMyO
-        Kv4t0O80F6FheDgco3DiA2AWibmvW7NwhsJYFCoFDL5rbcvvWZJbi/82/E9iw6LlPth05zj6SdE
-        yhZBUD4mhLdFl
-X-Received: by 2002:a17:906:8051:: with SMTP id x17mr1399603ejw.430.1610542494997;
-        Wed, 13 Jan 2021 04:54:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzBAbgplulFKo9eP75wGHcb584+trku5uwL0gCASCjo/ZigzcaALTL85slMCjEGciyLubpwAA==
-X-Received: by 2002:a17:906:8051:: with SMTP id x17mr1399592ejw.430.1610542494870;
-        Wed, 13 Jan 2021 04:54:54 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k16sm677031ejd.78.2021.01.13.04.54.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jan 2021 04:54:53 -0800 (PST)
-Subject: Re: [PATCH 1/2] Enumerate AVX Vector Neural Network instructions
-To:     Yang Zhong <yang.zhong@intel.com>
-Cc:     Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, tony.luck@intel.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, kyung.min.park@intel.com, x86@kernel.org
-References: <20210105004909.42000-1-yang.zhong@intel.com>
- <20210105004909.42000-2-yang.zhong@intel.com>
- <8fa46290-28d8-5f61-1ce4-8e83bf911106@redhat.com>
- <20210105121456.GE28649@zn.tnic> <20210112021321.GA9922@yangzhon-Virtual>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be47fd98-9d76-a35f-3ee2-7de2144dbdd6@redhat.com>
-Date:   Wed, 13 Jan 2021 13:54:52 +0100
+        bh=3rGhWToIyZPL0OktEK6wCt3StrIOhYPirvwNLhTW5lw=;
+        b=QZCleen23nVQ/oKL6Ngvbg3SNZLGWq4eS1bvZhTV1i/1qPpJHQnDRrFRidWVOB6wm/LcGh
+        2VxgtTIN4yu2UZNipvE1xMyYgSbN4/xTIzRbZJ8nZyABQ9PWK4nwZYpQMtZyAa9oD45fPo
+        1vtA0CvZnxe9kpbv10wE+qwLq6jEL38=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-yfgsj-0HNYirYlcpheAqWg-1; Wed, 13 Jan 2021 08:16:48 -0500
+X-MC-Unique: yfgsj-0HNYirYlcpheAqWg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 934F3107ACF9;
+        Wed, 13 Jan 2021 13:16:47 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-122.ams2.redhat.com [10.36.112.122])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 717A65D9DC;
+        Wed, 13 Jan 2021 13:16:43 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 9/9] s390x: sclp: Add CPU entry offset
+ comment
+To:     David Hildenbrand <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, imbrenda@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org
+References: <20210112132054.49756-1-frankja@linux.ibm.com>
+ <20210112132054.49756-10-frankja@linux.ibm.com>
+ <6f93c964-9606-246c-7266-85044803e49b@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <b89e6d76-8b42-e36e-cf5c-7b05244993dc@redhat.com>
+Date:   Wed, 13 Jan 2021 14:16:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20210112021321.GA9922@yangzhon-Virtual>
+In-Reply-To: <6f93c964-9606-246c-7266-85044803e49b@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>> Boris, is it possible to have a topic branch for this patch?
+On 13/01/2021 11.25, David Hildenbrand wrote:
+> On 12.01.21 14:20, Janosch Frank wrote:
+>> Let's make it clear that there is something at the end of the
+>> struct. The exact offset is reported by the cpu_offset member.
 >>
->> Just take it through your tree pls.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   lib/s390x/sclp.h | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
 >>
->> Acked-by: Borislav Petkov <bp@suse.de>
->>
->    
->    Paolo, Boris has acked this kernel patch, and if i need send new patchset to add this
->    acked-by info ? or kvm tree will directly pull this patchset? thanks.
+>> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+>> index dccbaa8..395895f 100644
+>> --- a/lib/s390x/sclp.h
+>> +++ b/lib/s390x/sclp.h
+>> @@ -134,7 +134,10 @@ typedef struct ReadInfo {
+>>   	uint8_t reserved7[134 - 128];
+>>   	uint8_t byte_134_diag318 : 1;
+>>   	uint8_t : 7;
+>> -	struct CPUEntry entries[0];
+>> +	/*
+>> +	 * The cpu entries follow, they start at the offset specified
+>> +	 * in offset_cpu.
+>> +	 */
+> 
+> I mean, that's just best practice. At least when I spot "[0];" and the
+> end of a struct, I know what's happening.
+> 
+> No strong opinion about the comment, I wouldn't need it to understand it.
 
-I'll take care of it shortly.
+The problem is that the "CPUEntry" entries either might be at this location, 
+or later, so the entries[0] can be misleading. You always have to go via the 
+offset_cpu field to find the right location.
 
-Paolo
+  Thomas
 
