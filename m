@@ -2,127 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 856192F50FF
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 18:21:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 926C32F5152
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 18:45:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728321AbhAMRUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 12:20:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50656 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727893AbhAMRUS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 12:20:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610558332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=V0lROAkdY9acdw8Y4RAB+mGlGxEAhxNtbJbaRarkeyY=;
-        b=XVDF0QspBTzJ0FfxPXRSeqTY4ejoSd2D2SgLFA81Y+1qF0IsgH51wqKbMqDtkTdghOt9O8
-        1l2pALPsO7PGql/bXG73Q3BvIADxckQLXBTMY19TB6MgFLdWU9bVP9o9RwCbnfIRubsebo
-        oAlkOD+tocBINHar3Sk0b9rMIlnHdnE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-bSqzembON_KnranJUeX09A-1; Wed, 13 Jan 2021 12:18:48 -0500
-X-MC-Unique: bSqzembON_KnranJUeX09A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D70FD56BF4;
-        Wed, 13 Jan 2021 17:18:46 +0000 (UTC)
-Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 40AA95D9DD;
-        Wed, 13 Jan 2021 17:18:44 +0000 (UTC)
-Subject: Re: [PATCH 3/9] KVM: arm64: vgic-v3: Fix error handling in
- vgic_v3_set_redist_base()
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        drjones@redhat.com, alexandru.elisei@arm.com, james.morse@arm.com,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        shuah@kernel.org, pbonzini@redhat.com
-References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-4-eric.auger@redhat.com> <87a6tyoseo.wl-maz@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <3b073d69-dd4a-3f82-3a96-5361dabbce80@redhat.com>
-Date:   Wed, 13 Jan 2021 18:18:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1727738AbhAMRob (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 12:44:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726996AbhAMRob (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 12:44:31 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC11C061786
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 09:43:50 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id b5so1640666pjk.2
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 09:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=oaQsNjRhoAZl0RHvyLWlkaLr8NJpjR0ZxqlStJNcrdc=;
+        b=WqZWrb5UHj5b0aWUa9pk9U2Xj9H/NTDHJIfjzVcUdJygLURobZuic53cjYMAotxknz
+         S94TNSqBz8mdQh/tThZz0Eq+NHxWMQNHUdAt0ceo/XNopsnDnsJXiaosDQeNG9GFYvAR
+         OXSibBk3tqw1gwvAADA4qqzXxjRtmSbxbFCQ02dBqhXneKnzMsdU9eFuPdRT0E7LjnPd
+         X/no9ZEISTRdF5w2HVzD1XjCvXHpkxn36SFpO/r42sdQ5FTl2p9La07gZvvvrBTtVcFE
+         9Xz1cc+hKqRYluJj/96wkpMSWzAuWWPxXU32h9Vq+OA374EogJ6BtTmNIrrOoFcq0L9H
+         titw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=oaQsNjRhoAZl0RHvyLWlkaLr8NJpjR0ZxqlStJNcrdc=;
+        b=DA7XAc9c0WhhQnEHXVNH4g4vrpAkQh4uR5l7febZywFKcFQP+HLDSo2g9xeTlJKEgM
+         YRqmAraIKzBAjXsxNENKSwhfIpJp/lpM49r53vZLgbGen3tdawBbR4YnyLRXx32L1Wvm
+         RslwK5bJ1qS0Kol/IvzT45KPYUndob9k8cDjsOU1KE3x22lTCNvadpR9jdcHveWtChkp
+         KMOodXChRSCe80xmwmyk7s6YVUVo9BOXQSIT3UaR52C1g1CDMLqkxKDEbD9OeXfsqOsp
+         pad3qEAY6rRJPiK0tzzQA7/4hprWUSgJSZbiMtCXCuDf2HmCBdMUyo0mmjxwCWUIO4s6
+         gS5Q==
+X-Gm-Message-State: AOAM5328zcVhPrwVCActxu6ClrqMOX1DRi1x2WlFUlOSmmOIdywbcsuB
+        hG+Pi074WyTlRxyTubiHVYTnbA==
+X-Google-Smtp-Source: ABdhPJyAtaSBZByfyseG0SRnazL5WBot5iqKUru1F60RCWbTFIpk0Z4HhIJXrQHy00arCnnYaUia8A==
+X-Received: by 2002:a17:90b:1901:: with SMTP id mp1mr361420pjb.233.1610559829517;
+        Wed, 13 Jan 2021 09:43:49 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id d6sm3064181pfd.69.2021.01.13.09.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jan 2021 09:43:48 -0800 (PST)
+Date:   Wed, 13 Jan 2021 09:43:42 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 1/3] KVM: nSVM: Check addresses of MSR and IO bitmap
+Message-ID: <X/8xTqMVtznyB8sN@google.com>
+References: <20210113024633.8488-1-krish.sadhukhan@oracle.com>
+ <20210113024633.8488-2-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <87a6tyoseo.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210113024633.8488-2-krish.sadhukhan@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Wed, Jan 13, 2021, Krish Sadhukhan wrote:
+> According to section "Canonicalization and Consistency Checks" in APM vol 2,
+> the following guest state is illegal:
+> 
+>     "The MSR or IOIO intercept tables extend to a physical address that
+>      is greater than or equal to the maximum supported physical address."
+> 
+> Also check that these addresses are aligned on page boundary.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> ---
+>  arch/x86/kvm/svm/nested.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index cb4c6ee10029..389a8108ddb5 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -211,8 +211,11 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> -static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
+> +static bool nested_vmcb_check_controls(struct vcpu_svm *svm,
 
-On 12/28/20 4:35 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On Sat, 12 Dec 2020 18:50:04 +0000,
-> Eric Auger <eric.auger@redhat.com> wrote:
->>
->> vgic_register_all_redist_iodevs may succeed while
->> vgic_register_all_redist_iodevs fails. For example this can happen
-> 
-> The same function cannot both fail and succeed ;-) Can you shed some
-> light on what you had in mind?
+It's probably worth passing vcpu instead of svm.  svm_set_nested_state() already
+takes vcpu, and nested_vmcb_checks() could easily do the same (in a separate
+cleanup), especially if nested_svm_vmrun() were cleaned up to capture vcpu in a
+local variable instead of constantly doing &svm->vcpu.
 
-Damn, I meant vgic_v3_insert_redist_region() can be successful and then
-vgic_register_all_redist_iodevs() fails due to detection of overlap.
-> 
->> while adding a redistributor region overlapping a dist region. The
->> failure only is detected on vgic_register_all_redist_iodevs when
->> vgic_v3_check_base() gets called.
->>
->> In such a case, remove the newly added redistributor region and free
->> it.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 8 +++++++-
->>  1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 8e8a862def76..581f0f490000 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -866,8 +866,14 @@ int vgic_v3_set_redist_base(struct kvm *kvm, u32 index, u64 addr, u32 count)
->>  	 * afterwards will register the iodevs when needed.
->>  	 */
->>  	ret = vgic_register_all_redist_iodevs(kvm);
->> -	if (ret)
->> +	if (ret) {
->> +		struct vgic_redist_region *rdreg =
->> +			vgic_v3_rdist_region_from_index(kvm, index);
->> +
-> 
-> nit: consider splitting declaration and assignment so that we avoid
-> the line split if you insist on the 80 character limit.
-Sure
+> +				       struct vmcb_control_area *control)
+>  {
+> +	int maxphyaddr;
+> +
+>  	if ((vmcb_is_intercept(control, INTERCEPT_VMRUN)) == 0)
+>  		return false;
+>  
+> @@ -223,6 +226,14 @@ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
+>  	    !npt_enabled)
+>  		return false;
+>  
+> +	maxphyaddr = cpuid_maxphyaddr(&svm->vcpu);
+> +	if (!IS_ALIGNED(control->msrpm_base_pa, PAGE_SIZE) ||
+> +	    control->msrpm_base_pa >> maxphyaddr)
 
-Thanks
+These can use page_address_valid().
 
-Eric
-> 
->> +		list_del(&rdreg->list);
->> +		kfree(rdreg);
->>  		return ret;
->> +	}
->>  
->>  	return 0;
->>  }
->> -- 
->> 2.21.3
->>
->>
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Unrelated to this patch, we really should consolidate all the different flavors
+of open-coded variants of maxphyaddr checks to use kvm_vcpu_is_illegal_gpa(),
+and maybe add a helper to do an arbitrary alignment check.  VMX has a handful of
+checks that fit that pattern and aren't exactly intuitive at first glance.
 
+We could also add a kvm_vcpu_rsvd_gpa_bits() too.  Somehow even that has
+multiple open-coded variants.
+
+I'll add those cleanups to the todo list.
+
+> +		return false;
+> +	if (!IS_ALIGNED(control->iopm_base_pa, PAGE_SIZE) ||
+> +	    control->iopm_base_pa >> maxphyaddr)
+> +		return false;
+> +
+>  	return true;
+>  }
+>  
+> @@ -258,7 +269,7 @@ static bool nested_vmcb_checks(struct vcpu_svm *svm, struct vmcb *vmcb12)
+>  	if (!kvm_is_valid_cr4(&svm->vcpu, vmcb12->save.cr4))
+>  		return false;
+>  
+> -	return nested_vmcb_check_controls(&vmcb12->control);
+> +	return nested_vmcb_check_controls(svm, &vmcb12->control);
+>  }
+>  
+>  static void load_nested_vmcb_control(struct vcpu_svm *svm,
+> @@ -1173,7 +1184,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+>  		goto out_free;
+>  
+>  	ret = -EINVAL;
+> -	if (!nested_vmcb_check_controls(ctl))
+> +	if (!nested_vmcb_check_controls(svm, ctl))
+>  		goto out_free;
+>  
+>  	/*
+> -- 
+> 2.27.0
+> 
