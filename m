@@ -2,85 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEFD32F40B3
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:57:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D833C2F40B1
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 01:57:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436619AbhAMAnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2436759AbhAMAnD (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Tue, 12 Jan 2021 19:43:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391670AbhALXsj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 18:48:39 -0500
-Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37C0C061795
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:47:58 -0800 (PST)
-Received: by mail-oo1-xc35.google.com with SMTP id k7so82353ooa.0
-        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 15:47:58 -0800 (PST)
+        with ESMTP id S2392205AbhAMAGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 19:06:52 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D4CC061794
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 16:06:11 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id p18so263571pgm.11
+        for <kvm@vger.kernel.org>; Tue, 12 Jan 2021 16:06:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wU+Y/gAUBTmXheJG3ydpWv4eoAE0W44TF73lG0z05SY=;
-        b=YkfvYKli+lhzT6+DsrEo+FG2LHvMQO5ByLVQ3neEErPCprAe/LgJec5KXyxTvwnjFN
-         thuB0oL7Ja2wAmFyjKhylLNuMvOlh8CtVXpJ3bMOFBR/1nWxTi8p/O9jG6D0jszftGRw
-         VUbBApNb1NJGu1UmPq43bLj7F/Zm/UEI2Wbv/2suIkDOQyuAODXqd0Wm3IziUjR1pHYY
-         qt9TL4dTLkznLJL7NyswubcfwaEoyeCGtiqvN7cqcXYc7YikK22EPo9tXR8NAhQI1/FU
-         0i9nrRfteUzs0JwqxtWmV90/YMSBTK7Anb+Md/DwZLZtQTpgGj28ZDNvmb0vjcvGf6Sn
-         IpNg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Y2kGns4xF1pdZj5RFaOW+nUX0XbU5fb3TCmG0vbv2qE=;
+        b=beK2eEWcVF132j4Ly6FQuPSVtX61wQCbZw+HdzwPMHKTIsvZwSQcRH6xkvRX4j1uN7
+         TYEchjvGrvl89EfuS3m8hm1g0+bB6xya7NSeSp6tH/k8KD5d2D2O1Dr1cQF5iOIOylnT
+         9Vqb3rk2KmC8zxtEy6SzL3QoJPq3NushBvN7uNMQ0xajamQk4JsFRaoO4o09jvbSACAp
+         oPkZ4VBOKmSc7FZyXbE08jfVSmdXS9IG1d40AbqRpNiktbDhdzr+wq8rSa3XWGrwypMF
+         +yirW+8MgzMTeR2+FFCbAeWJ25JGIKkwgp5x4gNAsrYkp68l8DWmhTgXKRARRWh9JTXX
+         /K/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wU+Y/gAUBTmXheJG3ydpWv4eoAE0W44TF73lG0z05SY=;
-        b=Y5u7mw/93th+K45rKtXJGw59inckFAJjJ6bj1iZnr7Fgl7kubnMxnl0I9zm51G4bqr
-         CWh1anzpT6rGLl/UUFi2/Z3d/dnNoOJfpwvL/S1pBWAaYf4EHodeWE+Q4fFK5vTtaVDq
-         Xc8w0Kl+wBkuoOWgphxxsehDPVI4dFZpfJR1N+FnlZf021U8R37Z85WaXcLhUWFdD1bu
-         Xlk4BE+LqRXAcIzaaS7cH5LfKGubEsCuLk4UOs9W26iCfeP2KqvO4+n8pmfBTzcu9ial
-         OjBeQVuvqMJf35h0jtZkgvslC8emcXbX2hBVpOvf2yxvNOcC6/yKkyBZEx5i/EAe8YP/
-         07eg==
-X-Gm-Message-State: AOAM531XLgCJHaUaA/7yxUmw0LqjkI+zcZsd2zH6ChzLtYdVyKbHd2/x
-        glFtvCw9Tf0V05uYtO3IrzNO29wOV797o3X3zQopkw==
-X-Google-Smtp-Source: ABdhPJz39L3qom0ex/JRaSaofYUQQjf7qldbu8BRbz3uRE4CxDS29s3R6R8sVnJskGvctDVw1iJY74LivgWnz5GcVB4=
-X-Received: by 2002:a4a:d396:: with SMTP id i22mr932339oos.55.1610495277816;
- Tue, 12 Jan 2021 15:47:57 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Y2kGns4xF1pdZj5RFaOW+nUX0XbU5fb3TCmG0vbv2qE=;
+        b=p6t9YAKwwm9ILNJvNScd+n65rfAwS9WZ0sX0Lpt/hsdqUrJR7Qf6cqstNhYTzV5/u1
+         1ctzzkQ/cT8JRzu5bPfPxsEqiey2vro6pQiEuF2QxYOjZmLOQowHXeHDdDuSD3O2DhOe
+         ulqvVjJx43Gf1WPe4vnKSGIfE2KLxBaRCb6zitOlB2ZpiW/q9vrZ7nakwydWaWdNGm+A
+         HC3inJibywztue9ASnpkmBSsetzRvyXgzYqLCeu0jW7Tj2XBQjGiB6Th3WNOFIZPHWuX
+         SNKvDcXj8vS9x24Nx3MJ4u1JvbIoXDcT2tmrBEJf5tY7Oh9pukTwxyn8kMIuqQshZ7nA
+         mlnw==
+X-Gm-Message-State: AOAM533Yrj+3Fml4ZSNP1PAoilSmjgV8gbyCPWcMxoJNmxd3YJgs0NJ4
+        3X6iNOVQcNNAgq3S9fLToxpBAw==
+X-Google-Smtp-Source: ABdhPJyIttXMshDVY7FFxvSCrWWMpTDLWYWlRXclc1e8tyxRLosFTYlX9VzvSMBmCAWnjZwOPhfLBQ==
+X-Received: by 2002:a62:7b84:0:b029:19c:7146:4bbb with SMTP id w126-20020a627b840000b029019c71464bbbmr1460345pfc.52.1610496371207;
+        Tue, 12 Jan 2021 16:06:11 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id n15sm104711pgl.31.2021.01.12.16.06.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 16:06:10 -0800 (PST)
+Date:   Tue, 12 Jan 2021 16:06:03 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Souptick Joarder <jrdr.linux@gmail.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] kvm: x86: Mark __kvm_vcpu_halt() as static
+Message-ID: <X/45a2VXX7N5f/rJ@google.com>
+References: <1610161772-5144-1-git-send-email-jrdr.linux@gmail.com>
 MIME-Version: 1.0
-References: <20180401155444.7006-1-sf@sfritsch.de> <20180404171040.GW5438@char.us.oracle.com>
- <288c32e4-a1ec-7b43-0d6a-6a7c0e1a04b2@redhat.com> <1883982.uaQK4EgVKX@k> <321b36c9-d6fc-b562-5f87-3d3594e7ead9@redhat.com>
-In-Reply-To: <321b36c9-d6fc-b562-5f87-3d3594e7ead9@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 12 Jan 2021 15:47:46 -0800
-Message-ID: <CALMp9eR0OjUV7LsWQ_r4o20wSZ0dw0eGs=LJ0htLmwwvcuUP_A@mail.gmail.com>
-Subject: Re: [PATCH] kvm: Add emulation for movups/movupd
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Stefan Fritsch <sf@sfritsch.de>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1610161772-5144-1-git-send-email-jrdr.linux@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Apr 4, 2018 at 10:44 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 04/04/2018 19:35, Stefan Fritsch wrote:
-> > On Wednesday, 4 April 2018 19:24:20 CEST Paolo Bonzini wrote:
-> >> On 04/04/2018 19:10, Konrad Rzeszutek Wilk wrote:
-> >>> Should there be a corresponding test-case?
-> >>
-> >> Good point!  Stefan, could you write one?
-> >
-> > Is there infrastructure for such tests? If yes, can you give me a pointer to
-> > it?
->
-> Yes, check out x86/emulator.c in
-> https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git.  There is
-> already a movaps test.
+On Sat, Jan 09, 2021, Souptick Joarder wrote:
+> Kernel test robot throws below warning ->
+> 
+> >> arch/x86/kvm/x86.c:7979:5: warning: no previous prototype for
+> >> '__kvm_vcpu_halt' [-Wmissing-prototypes]
+>     7979 | int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int
+> reason)
+>          |     ^~~~~~~~~~~~~~~
+> 
+> Marking __kvm_vcpu_halt() as static as it is used inside this file.
 
-Whatever became of this unit test? I don't see it in the
-kvm-unit-tests repository.
+Paolo beat you to the punch, commit 872f36eb0b0f ("KVM: x86: __kvm_vcpu_halt
+can be static").
+
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Souptick Joarder <jrdr.linux@gmail.com>
+> ---
+>  arch/x86/kvm/x86.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 61499e1..c2fdf14 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -109,6 +109,7 @@
+>  static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+>  static void store_regs(struct kvm_vcpu *vcpu);
+>  static int sync_regs(struct kvm_vcpu *vcpu);
+> +static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason);
+
+FWIW, this forward declaration is unnecessary.
+
+>  struct kvm_x86_ops kvm_x86_ops __read_mostly;
+>  EXPORT_SYMBOL_GPL(kvm_x86_ops);
+> @@ -7976,7 +7977,7 @@ void kvm_arch_exit(void)
+>  	kmem_cache_destroy(x86_fpu_cache);
+>  }
+>  
+> -int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+> +static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+>  {
+>  	++vcpu->stat.halt_exits;
+>  	if (lapic_in_kernel(vcpu)) {
+> -- 
+> 1.9.1
+> 
