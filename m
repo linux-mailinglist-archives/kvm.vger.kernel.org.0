@@ -2,111 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA4532F4B24
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:20:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 415AB2F4B67
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:40:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727569AbhAMMQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 07:16:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9906 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726899AbhAMMQT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:16:19 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10DC2g9H018918;
-        Wed, 13 Jan 2021 07:15:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=c3hFSr7kNjDg/t8thbd+cscadmqcCQbJgECqTEKzvMg=;
- b=fs7+DvJ3DZCpkvWTsoBadpBPCxPBSBAgJU6LUHoML7WjrgW3+WAwcpnloCnLxgThznT/
- WkML1bT0VOefkYeFkIBqqbHAnxX0Q23ssIaIHixiJyYjJ9cxqJf6dkmgzNNyBGIGaafc
- l00yOZSxZylWj1Nv6AimyhvReNVVtE0De13mAWYt4zzix6pu7HIoK4J+4w/+/L4oMADa
- ID0iczfl1zs5xIjNy5MftUcAZ3AgfhMwOjj0uBXLm7fpg0cERnCEfNvjU+OKXlifOoVO
- 1orQqMXA2TijxqNXORPDg5U71XNlzVz77fUKZblR4shPxHTmwepYJmSMJ2zJWFLM86Ak 7A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3620d28n5m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 07:15:38 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10DC38tl021541;
-        Wed, 13 Jan 2021 07:15:38 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3620d28n4j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 07:15:38 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10DCDMda002510;
-        Wed, 13 Jan 2021 12:15:35 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04fra.de.ibm.com with ESMTP id 3604h99va5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 12:15:35 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10DCFSY633095998
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jan 2021 12:15:28 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E73B842042;
-        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79ECA42041;
-        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.171.171])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 4/9] s390x: Split assembly into multiple
- files
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20210112132054.49756-1-frankja@linux.ibm.com>
- <20210112132054.49756-5-frankja@linux.ibm.com>
- <c07280f6-f56c-ea6c-1255-28a36a2385c0@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <fce05f26-8cdb-009d-a88d-c799c3784506@linux.ibm.com>
-Date:   Wed, 13 Jan 2021 13:15:32 +0100
+        id S1726202AbhAMMgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 07:36:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29727 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725977AbhAMMgf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:36:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610541308;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sb3DhGUTWswdzJJT1rUP84akykAvIdzISi4rLTrKXp0=;
+        b=gw4muGEQVskk1K9tNmIZKUQuhKSOcpGOJJVMbWe6RpAY4RoTmUDa27mpjSM4pXeXDWqS6O
+        0PW8Xhs/8gCVG7L8VZtLDKXd9YszPAMmYP+VOe3/olSu91Isu7gTEm8IDaUSX3Y/dYmM7F
+        Y2lWz8xrERbW6TsvVtQwn4RkmMTJsVA=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267-lRmjpbTyPZuHZryGqHyN7w-1; Wed, 13 Jan 2021 07:35:07 -0500
+X-MC-Unique: lRmjpbTyPZuHZryGqHyN7w-1
+Received: by mail-ej1-f72.google.com with SMTP id y14so817247ejf.11
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:35:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Sb3DhGUTWswdzJJT1rUP84akykAvIdzISi4rLTrKXp0=;
+        b=pUhlBuhAo1Bl8jpLO5krTMWDRYCwUGUOxGXn2uLDisiFcv1qJqcjJAQ7ihpsicoUTN
+         j3IvtcfFSppwFFzMH9mUstxn/tvVYRslbajU22PXg7OFCpuvnDSS0rKXGdx4+eLbFrEn
+         8KkhzcojZNeNVALEzWJ3eoW5kCRRX6yO+ZhBvmm6TwUkdrO1TKdpK7GZkr/I0EjXDhwV
+         XpPFqpGbw5L91LGMYbaAj58IyHWsIJWZW5rSPeYWbZGSSmDCXphHupxJdoepWJIHL/us
+         ui7k6Ve4qURRk/A+sEjico7ZpbiLImYONS8GqPKpCznF4ZzaOlSBVntU/gXjNuVxoiJA
+         oNAg==
+X-Gm-Message-State: AOAM532EhRpj2mpuKOEY0girbWWX6zY2YCwI3Hk7Y7KVsXTr5lyrGbL5
+        m7F9Hxsj5PMnzlOKjBdmq1nDtcCUZ9hDVdEv+P3HKYmdQVeaQjQPXdUA0OpfwNcvqgm+mbnCtTD
+        /uZDrsyB8QYA4
+X-Received: by 2002:a17:906:5958:: with SMTP id g24mr527209ejr.217.1610541305722;
+        Wed, 13 Jan 2021 04:35:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwqjEXrFoS2059vufYe8LRIwHim/ck52P4+HruHVf2B/GsS0iM84gRMqM3r3Cm57WdEqO7j/Q==
+X-Received: by 2002:a17:906:5958:: with SMTP id g24mr527189ejr.217.1610541305571;
+        Wed, 13 Jan 2021 04:35:05 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l14sm787769edq.35.2021.01.13.04.35.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Jan 2021 04:35:04 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, vkuznets@redhat.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, mlevitsk@redhat.com
+References: <20210112063703.539893-1-wei.huang2@amd.com>
+ <090232a9-7a87-beb9-1402-726bb7cab7e6@redhat.com>
+ <X/3fbaO1ZarMdjft@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
+ VM instructions
+Message-ID: <51f96502-95d2-569c-2973-eb839f84019f@redhat.com>
+Date:   Wed, 13 Jan 2021 13:35:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <c07280f6-f56c-ea6c-1255-28a36a2385c0@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <X/3fbaO1ZarMdjft@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-13_07:2021-01-13,2021-01-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- malwarescore=0 impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101130074
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/13/21 1:04 PM, Thomas Huth wrote:
-> On 12/01/2021 14.20, Janosch Frank wrote:
->> I've added too much to cstart64.S which is not start related
->> already. Now that I want to add even more code it's time to split
->> cstart64.S. lib.S has functions that are used in tests. macros.S
->> contains macros which are used in cstart64.S and lib.S
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->> ---
->>   s390x/Makefile   |   6 +--
->>   s390x/cstart64.S | 119 ++---------------------------------------------
->>   s390x/lib.S      |  65 ++++++++++++++++++++++++++
-> 
-> lib.S is a very generic name ... maybe rather use cpuasm.S or something similar?
+On 12/01/21 18:42, Sean Christopherson wrote:
+> On a related topic, it feels like nested should be disabled by default on SVM
+> until it's truly ready for primetime, with the patch tagged for stable.  That
+> way we don't have to worry about crafting non-trivial fixes (like this one) to
+> make them backport-friendly.
 
-instr.S ?
-Or maybe entry.S to make it similar to the kernel?
+Well, that's historical; I wish it had been disabled by default back in 
+the day.
 
+However, after 10 years and after the shakedown last year, it's hard to 
+justify breaking backwards compatibility.  Nested SVM is not any less 
+ready than nested VMX---just a little less optimized for things such as 
+TLB flushes and ASID/VPID---even without this fix.  The erratum has 
+visible effects only on a minority of AMD systems (it depends on an 
+unlucky placement of TSEG on L0), and it is easy to work around it by 
+lowering the amount of <4G memory in L1.
 
-> 
-> Anway,
-> Acked-by: Thomas Huth <thuth@redhat.com>
-> 
+Paolo
 
-Thanks
