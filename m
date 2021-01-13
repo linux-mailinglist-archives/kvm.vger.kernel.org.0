@@ -2,100 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 58F722F4B1D
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA4532F4B24
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:20:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726938AbhAMMPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 07:15:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43621 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726935AbhAMMPX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:15:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610540036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pa6oTq1DWmWoY5iW6Ce52RcsvRqVINx2r3W/w5rpK8U=;
-        b=eIBOfxE7WwjQBIYm/LofczKvn8mIrGpxxb+vlD7lY46VGTM7z2nDLMhCELJibO41crnkBy
-        KQhs3x6WX4Oh2doSkMQDQ+8jgjQb0JGqFpHs6z5ZB6ZplAG7RjDhpcAXzUHEMKPyVPiwjB
-        2I60H2SqmEFcpqNprWxOM4WrklTKWj8=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-QeAjOxRcMH6LHjCdG8MBBg-1; Wed, 13 Jan 2021 07:13:54 -0500
-X-MC-Unique: QeAjOxRcMH6LHjCdG8MBBg-1
-Received: by mail-ej1-f72.google.com with SMTP id h4so801189eja.12
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:13:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pa6oTq1DWmWoY5iW6Ce52RcsvRqVINx2r3W/w5rpK8U=;
-        b=Tg/v3jSHlOOm0Tflwp99yLJ0/3GkHPBeU80fkcPrKlWiIgdAspQgPFoYPLM6p4zQqA
-         opI7319klhd744lcaBDFNnFAJtqosQ9f/5QQsLvVCZTsw1X5ugIrl3SojxRsNCgEsKrr
-         eB3wDWFT49F5YbbJ2Qzqv3/dRnvxx1x09iWqr3qfnF9ocLRtEU5fgpgB2p39DiBZqRl6
-         8czpu+1RXIQhGQepVPDt2Suqku87vcpFJX8aS8I6HYVghkTOw/g5xj9OaKXibKAuZjRi
-         1B6XOxanWLgvGZz9zOy8d1UatGO6wofUe2XaUt7XEfJNbgJmVG+pC5M7tyN83JOry1ue
-         uLkA==
-X-Gm-Message-State: AOAM533+EvvRgkVS8uKoR47uH+wiVo+qchyxWoqWV9fTvIDQYkWa/fD4
-        W+/DrPUB0m+fGdl9QfuFmHSNpkhEwUl+Ie7rLswEXc4RJdhQC4sxLcqm5/+9HlrF+R0lJxYabF5
-        otbJaVi6LfrrS
-X-Received: by 2002:a50:b746:: with SMTP id g64mr1552509ede.33.1610540033675;
-        Wed, 13 Jan 2021 04:13:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyxf/TAQFbbRBei+6F1Tplh7+VcxznLht/kvHUyJUvfntL3WN05iXPUN1vAVgAvXb7g0JnFDg==
-X-Received: by 2002:a50:b746:: with SMTP id g64mr1552497ede.33.1610540033518;
-        Wed, 13 Jan 2021 04:13:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m7sm657212eji.118.2021.01.13.04.13.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jan 2021 04:13:52 -0800 (PST)
-Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, mlevitsk@redhat.com
-References: <20201223010850.111882-1-pbonzini@redhat.com>
- <X+pbZ061gTIbM2Ef@google.com>
- <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
- <X/4igkJA1ZY5rCk7@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
-Date:   Wed, 13 Jan 2021 13:13:51 +0100
+        id S1727569AbhAMMQT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 07:16:19 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9906 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726899AbhAMMQT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:16:19 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10DC2g9H018918;
+        Wed, 13 Jan 2021 07:15:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=c3hFSr7kNjDg/t8thbd+cscadmqcCQbJgECqTEKzvMg=;
+ b=fs7+DvJ3DZCpkvWTsoBadpBPCxPBSBAgJU6LUHoML7WjrgW3+WAwcpnloCnLxgThznT/
+ WkML1bT0VOefkYeFkIBqqbHAnxX0Q23ssIaIHixiJyYjJ9cxqJf6dkmgzNNyBGIGaafc
+ l00yOZSxZylWj1Nv6AimyhvReNVVtE0De13mAWYt4zzix6pu7HIoK4J+4w/+/L4oMADa
+ ID0iczfl1zs5xIjNy5MftUcAZ3AgfhMwOjj0uBXLm7fpg0cERnCEfNvjU+OKXlifOoVO
+ 1orQqMXA2TijxqNXORPDg5U71XNlzVz77fUKZblR4shPxHTmwepYJmSMJ2zJWFLM86Ak 7A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3620d28n5m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 07:15:38 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10DC38tl021541;
+        Wed, 13 Jan 2021 07:15:38 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3620d28n4j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 07:15:38 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10DCDMda002510;
+        Wed, 13 Jan 2021 12:15:35 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3604h99va5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 12:15:35 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10DCFSY633095998
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Jan 2021 12:15:28 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E73B842042;
+        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 79ECA42041;
+        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.171.171])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Jan 2021 12:15:32 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v4 4/9] s390x: Split assembly into multiple
+ files
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+References: <20210112132054.49756-1-frankja@linux.ibm.com>
+ <20210112132054.49756-5-frankja@linux.ibm.com>
+ <c07280f6-f56c-ea6c-1255-28a36a2385c0@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <fce05f26-8cdb-009d-a88d-c799c3784506@linux.ibm.com>
+Date:   Wed, 13 Jan 2021 13:15:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <X/4igkJA1ZY5rCk7@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <c07280f6-f56c-ea6c-1255-28a36a2385c0@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-13_07:2021-01-13,2021-01-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 clxscore=1015 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101130074
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/01/21 23:28, Sean Christopherson wrote:
->>> What's the motivation for this type of test?  What class of bugs can it find
->>> that won't be found by existing kvm-unit-tests or simple boot tests?
+On 1/13/21 1:04 PM, Thomas Huth wrote:
+> On 12/01/2021 14.20, Janosch Frank wrote:
+>> I've added too much to cstart64.S which is not start related
+>> already. Now that I want to add even more code it's time to split
+>> cstart64.S. lib.S has functions that are used in tests. macros.S
+>> contains macros which are used in cstart64.S and lib.S
 >>
->> Mostly live migration tests.  For example, Maxim found a corner case in
->> KVM_GET_VCPU_EVENTS that affects both nVMX and nSVM live migration (patches
->> coming), and it is quite hard to turn it into a selftest because it requires
->> the ioctl to be invoked exactly when nested_run_pending==1.  Such a test
->> would allow stress-testing live migration without having to set up L1 and L2
->> virtual machine images.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> ---
+>>   s390x/Makefile   |   6 +--
+>>   s390x/cstart64.S | 119 ++---------------------------------------------
+>>   s390x/lib.S      |  65 ++++++++++++++++++++++++++
 > 
-> Ah, so you run the stress test in L1 and then migrate L1?
+> lib.S is a very generic name ... maybe rather use cpuasm.S or something similar?
 
-Yes.  I can't exclude that it would find bugs without migration, but I 
-hope we'd have stomped them by now.
+instr.S ?
+Or maybe entry.S to make it similar to the kernel?
 
-> What's the biggest hurdle for doing this completely within the unit test
-> framework?  Is teaching the framework to migrate a unit test the biggest pain?
 
-Yes, pretty much.  The shell script framework would show its limits.
+> 
+> Anway,
+> Acked-by: Thomas Huth <thuth@redhat.com>
+> 
 
-That said, I've always treated run_tests.sh as a utility more than an 
-integral part of kvm-unit-tests.  There's nothing that prevents a more 
-capable framework from parsing unittests.cfg.
-
-Paolo
-
+Thanks
