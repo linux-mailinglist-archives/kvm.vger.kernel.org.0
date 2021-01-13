@@ -2,105 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11DA52F40F5
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 02:05:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E21152F40FF
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 02:17:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726859AbhAMBFm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 20:05:42 -0500
-Received: from mga03.intel.com ([134.134.136.65]:36064 "EHLO mga03.intel.com"
+        id S1726186AbhAMBQn convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 12 Jan 2021 20:16:43 -0500
+Received: from mga11.intel.com ([192.55.52.93]:41221 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726468AbhAMBFm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 20:05:42 -0500
-IronPort-SDR: wISDsGJqmWUk5AVS3D2V6+AqID0k5w8t/+/61/CuGJayFYpLhrXfy5ZtCCju1qnLO1IBlj5E+X
- 0GgCmh5uOkvA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9862"; a="178223852"
+        id S1725536AbhAMBQn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 20:16:43 -0500
+IronPort-SDR: 5dA1V977T/EoUbIZ1+UuvPOdGKQVJM6f+dAmvLgstgy5fzqssFLBWBYIzUDDOZh7VFD9mIlg3H
+ NDB8ptZpPaMw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9862"; a="174624869"
 X-IronPort-AV: E=Sophos;i="5.79,343,1602572400"; 
-   d="scan'208";a="178223852"
+   d="scan'208";a="174624869"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 17:05:26 -0800
-IronPort-SDR: zlYFCBooSV5H33Fhkz+INxA6oIgtaTgN5ybMwE2yeOQ5Y/0e6J57yyTBO0r/HnOw5vbamYdn4Y
- pjSHTn3HwpjA==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 17:15:58 -0800
+IronPort-SDR: p48fnh44ysKcN358GzCcAtXmQZxWJHipkmlxpO7Hkc7nvb9o/QmxE+JQXS/ziJvJ34Z9dbp1DI
+ XMkKaR1arTZA==
 X-IronPort-AV: E=Sophos;i="5.79,343,1602572400"; 
-   d="scan'208";a="381647053"
-Received: from rjchin-mobl.amr.corp.intel.com ([10.251.18.242])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 17:05:23 -0800
-Message-ID: <728ebce2384e15e9a376bd9dd08648794e2a0d36.camel@intel.com>
-Subject: Re: [RFC PATCH 04/23] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
+   d="scan'208";a="381649432"
+Received: from rjchin-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.18.242])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 17:15:55 -0800
+Date:   Wed, 13 Jan 2021 14:15:54 +1300
 From:   Kai Huang <kai.huang@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Date:   Wed, 13 Jan 2021 14:05:21 +1300
-In-Reply-To: <X/4t+6JcyTGVEG2e@google.com>
-References: <20210108071722.GA4042@zn.tnic> <X/jxCOLG+HUO4QlZ@google.com>
-         <20210109011939.GL4042@zn.tnic> <X/yQyUx4+veuSO0e@google.com>
-         <20210111190901.GG25645@zn.tnic> <X/yk6zcJTLXJwIrJ@google.com>
-         <20210112121359.GC13086@zn.tnic> <X/3ZSKDWoPcCsV/w@google.com>
-         <20210112175102.GJ13086@zn.tnic>
-         <dea875ea60cdef68fa8fe5b8f8cf3e8ed6a5df2e.camel@intel.com>
-         <X/4t+6JcyTGVEG2e@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.2 (3.38.2-1.fc33) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH 01/23] x86/sgx: Split out adding EPC page to free
+ list to separate helper
+Message-Id: <20210113141554.52aa72520a056232459b4cba@intel.com>
+In-Reply-To: <X/4YdCN9LwZGompH@google.com>
+References: <cover.1609890536.git.kai.huang@intel.com>
+        <3d50c2614ff8a46b44062a398fd8644bcda92132.1609890536.git.kai.huang@intel.com>
+        <31681b840aac59a8d8dcb05f2356d25cf09e1f11.camel@kernel.org>
+        <20210112131944.9d69bb30cf4b94b6f6f25e7b@intel.com>
+        <X/4YdCN9LwZGompH@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-12 at 15:17 -0800, Sean Christopherson wrote:
-> On Wed, Jan 13, 2021, Kai Huang wrote:
-> > On Tue, 2021-01-12 at 18:51 +0100, Borislav Petkov wrote:
-> > > On Tue, Jan 12, 2021 at 09:15:52AM -0800, Sean Christopherson wrote:
-> > > > We want the boot_cpu_data.x86_capability memcpy() so that KVM doesn't advertise
-> > > > support for features that are intentionally disabled in the kernel, e.g. via
-> > > > kernel params.  Except for a few special cases, e.g. LA57, KVM doesn't enable
-> > > > features in the guest if they're disabled in the host, even if the features are
-> > > > supported in hardware.
+On Tue, 12 Jan 2021 13:45:24 -0800 Sean Christopherson wrote:
+> On Tue, Jan 12, 2021, Kai Huang wrote:
+> > On Tue, 12 Jan 2021 00:38:40 +0200 Jarkko Sakkinen wrote:
+> > > On Wed, 2021-01-06 at 14:55 +1300, Kai Huang wrote:
+> > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > > > > 
-> > > > For some features, e.g. SMEP and SMAP, honoring boot_cpu_data is mostly about
-> > > > respecting the kernel's wishes, i.e. barring hardware bugs, enabling such
-> > > > features in the guest won't break anything.  But for other features, e.g. XSAVE
-> > > > based features, enabling them in the guest without proper support in the host
-> > > > will corrupt guest and/or host state.
+> > > > SGX virtualization requires to allocate "raw" EPC and use it as virtual
+> > > > EPC for SGX guest.  Unlike EPC used by SGX driver, virtual EPC doesn't
+> > > > track how EPC pages are used in VM, e.g. (de)construction of enclaves,
+> > > > so it cannot guarantee EREMOVE success, e.g. it doesn't have a priori
+> > > > knowledge of which pages are SECS with non-zero child counts.
+> > > > 
+> > > > Split sgx_free_page() into two parts so that the "add to free list"
+> > > > part can be used by virtual EPC without having to modify the EREMOVE
+> > > > logic in sgx_free_page().
+> > > > 
+> > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
 > > > 
-> > > Ah ok, that is an important point.
+> > > I have a better idea with the same outcome for KVM.
 > > > 
-> > > > So it's really the CPUID read that is (mostly) superfluous.
-> > > 
-> > > Yeah, but that is cheap, as we established.
-> > > 
-> > > Ok then, I don't see anything that might be a problem and I guess we can
-> > > try that handling of scattered bits in kvm and see how far we'll get.
+> > > https://lore.kernel.org/linux-sgx/20210111223610.62261-1-jarkko@kernel.org/T/#t
 > > 
-> > Hi Sean, Boris,
+> > I agree with your patch this one can be replaced. I'll include your patch in
+> > next version, and once it is upstreamed, it can be removed in my series.
 > > 
-> > Thanks for all  your feedback.
-> > 
-> > Sean,
-> > 
-> > Do you want to send me your patch (so that with your SoB), or do you want me to copy
-> > & paste the code you posted in this series, plus Suggested-by you? Or how do you want
-> > to proceed?
-> > 
-> > Also to me it is better to separate X86_FEATURE_SGX1/2 with rest of KVM changes?
+> > Sean, please let me know if you have objection.
 > 
-> Hmm, I'll split the changes into two proper patches and send them to you off list.
-
-Thanks.
-
+> 6 of one, half dozen of the other.  I liked not having to modify the existing
+> call sites, but it's your code.
 > 
-> > And do you think adding a dedicated, i.e. kvm_scattered_cpu_caps[], instead of using
-> > existing kvm_cpu_cap[NCAPINTS] would be helpful to solve the problem caused by adding
-> > new leaf to x86 core (see my another reply in this thread)?
+> Though on that topic, this snippet is wrong:
 > 
-> Probably not, because then we'd have to add new helpers to deal with the new
-> array, or change all the helpers to take the array as a pointer.  Blasting past
-> NCAPINTS is a little evil, but it does slot in nicely to the existing code.
+> @@ -431,7 +443,8 @@ void sgx_encl_release(struct kref *ref)
+>  		va_page = list_first_entry(&encl->va_pages, struct sgx_va_page,
+>  					   list);
+>  		list_del(&va_page->list);
+> -		sgx_free_epc_page(va_page->epc_page);
+> +		sgx_reset_epc_page(entry->epc_page);
+> +		sgx_free_epc_page(entry->epc_page);
+> 
+> s/entry/va_page in the new code.
+> 
+> P.S. I apparently hadn't been subscribed linux-sgx and so didn't see those
+>      patches.  I'm now subscribed and can chime-in as needed.
 
-Sure. Thanks.
+Thanks. I also have replied to Jarkko's v2 patch, and I think you can see it
+now.
 
-
+I think if Jarkko's patch is eventually merged to upstream, we can drop
+this patch. So please help to comment if Jarkko's patch is reasonable, since I
+don't have history with SGX driver and cannot immediately tell if it is
+reasonable.
