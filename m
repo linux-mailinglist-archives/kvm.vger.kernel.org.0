@@ -2,132 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AFF12F473C
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 10:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E9C92F47CA
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 10:44:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727459AbhAMJIt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 04:08:49 -0500
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:41739 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727429AbhAMJIs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 04:08:48 -0500
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 41186580714;
-        Wed, 13 Jan 2021 04:08:01 -0500 (EST)
-Received: from imap1 ([10.202.2.51])
-  by compute6.internal (MEProxy); Wed, 13 Jan 2021 04:08:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-        mime-version:message-id:in-reply-to:references:date:from:to:cc
-        :subject:content-type; s=fm1; bh=8TUZAUR19+RgfF2LD2QbIbb4344h7xW
-        yLryfiiF4+Wg=; b=GjiV9JUKhozImXGRj2UStagLBEu7dB1vJ4SclmXDjY6KOG5
-        eWiaVIEWJm44NwnUPgu11ucYRaK9mRQoKF+KfKHeZbUv4G//4nL3Vj/jhkC0QumC
-        skfVb+jhBQaKX63UTAx1wjRL0cqQ9GS04Fi3GYTO7DZkTbvbTRskShQykM2mW330
-        X9wZOCp/rigWNNIadb9mBdq5tsQcAlYiE+ZrSNv7DD2temwGzRm3PEyi3Cc2Y3dF
-        QM7k/AIPfHTG0Q/EeJVKwXFfXjMSmdQ0w3Thi7L4Ifn0cmWizzkBd/kO5paEB4Es
-        q0DEl58q3KX4gCsKObojnehp1d5pmUQ+g9YRJDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=8TUZAU
-        R19+RgfF2LD2QbIbb4344h7xWyLryfiiF4+Wg=; b=OfxGTmZdwGJkXGiRdGcT18
-        f+tDpOIdG8CsbMUyxJklCoLmx6E6WGzEsCuONltJmvkp8QBYDQoR/ppH0PVW1ZZv
-        S/qRhthA7NlmffhzDtg1SpivIWKKPWGKkZdXoSkVyXeAZsIfwnmUTTYN7sW3DOX/
-        H/5mTWImBHfJxiFqdVF10eyp4gdMLZMDcCvkvjv8eUHGQhGXNWR6+xwrHTvLXkEY
-        heaQptcpqYTV9x1VcmmzCimAdypqdfSkRhczS7pgZFgvU6qQb7g4sCWZYTDuauHB
-        JMHDdCsSxm1ZgyIZlnHcB23la8q9lDDtG7jGO3m/J1KIvCKM1j8d+k+G1yLVu82g
-        ==
-X-ME-Sender: <xms:b7j-X_pefl-uVHg34MC_duOvhcegjYk1g2B2Hb7Sapnge-BNIbhtnQ>
-    <xme:b7j-X5ookdSP0Gc1yAQL2Uxo7Wx6pfNNsr44TYDs53djgxmpnf7WgrUWcIyJQYuBr
-    CPIPxARfFcWvVYTrGs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedukedrtdefucetufdoteggodetrfdotffvucfrrh
-    hofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdflihgrgihunhcu
-    jggrnhhgfdcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqeenucggtf
-    frrghtthgvrhhnpeefvdeiffetkeduleeiheegheeliedukedvgeelvdettdeuteeugfet
-    heejgeetgfenucffohhmrghinhepohhpvghnghhrohhuphdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjihgrgihunhdrhigrnhhg
-    sehflhihghhorghtrdgtohhm
-X-ME-Proxy: <xmx:b7j-X8P9oN2SWYL9H9NeGLbTVfi1nabE4rsEWfLs0TVFy5Jpxajwmw>
-    <xmx:b7j-Xy6qMFCPXcnt87gdXZ_cTkrtLaRNqUYbnAM-qamqcrgpIEXq_w>
-    <xmx:b7j-X-6NSeB5YQYmrTFEGpZfMazvfwjhCGY3nSDS-6LBdLoXuERyQQ>
-    <xmx:cLj-X9RacJ7nbQcDAgAj61RRqAQBqOEnuk4dbereF8DUoBie7-4EVD_B-_g>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 04BF3C204F9; Wed, 13 Jan 2021 04:07:59 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.5.0-alpha0-45-g4839256-fm-20210104.001-g48392560
-Mime-Version: 1.0
-Message-Id: <1ff91e13-3b0b-4a92-97bb-027efa5945c6@www.fastmail.com>
-In-Reply-To: <c108febd-1fce-c66d-2140-002d8feb0db9@redhat.com>
-References: <20201221005318.11866-1-jiaxun.yang@flygoat.com>
- <20201221005318.11866-8-jiaxun.yang@flygoat.com>
- <c108febd-1fce-c66d-2140-002d8feb0db9@redhat.com>
-Date:   Wed, 13 Jan 2021 17:07:36 +0800
-From:   "Jiaxun Yang" <jiaxun.yang@flygoat.com>
-To:     "Thomas Huth" <thuth@redhat.com>,
-        "BALATON Zoltan via" <qemu-devel@nongnu.org>
-Cc:     "Kevin Wolf" <kwolf@redhat.com>, "Fam Zheng" <fam@euphon.net>,
-        kvm@vger.kernel.org,
-        "Viktor Prutyanov" <viktor.prutyanov@phystech.edu>,
-        "Laurent Vivier" <lvivier@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        "Alistair Francis" <alistair@alistair23.me>,
-        "Greg Kurz" <groug@kaod.org>,
-        "Wainer dos Santos Moschetta" <wainersm@redhat.com>,
-        "Max Reitz" <mreitz@redhat.com>, qemu-ppc@nongnu.org,
-        "Paolo Bonzini" <pbonzini@redhat.com>, qemu-block@nongnu.org,
-        =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        "David Gibson" <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 7/9] accel/kvm: avoid using predefined PAGE_SIZE
-Content-Type: text/plain
+        id S1727369AbhAMJmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 04:42:23 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41308 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727031AbhAMJmW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 04:42:22 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10D9XJJG104537;
+        Wed, 13 Jan 2021 04:41:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=UTfW3PlUMvoIPLcnrnxvCiTxzoOlfX2GKTSBqN47GP0=;
+ b=fwnzJ1/L8V896/M+qNe5t2iUy86rMlTAWV6Geea4DLlsWZk5935J1JzNu3v7cjGLtJPY
+ +Y7ncsgBogJrFhoQag+qL74NpxcNMfuVB3roS91jkEDphf5r9+VTj0bFCpOsf1LiF03j
+ WjE+RbYQmu5IIwUDWw2c/n5dIKvCxN3Bo0dFrNHj1vmop5h5IOZAJyexztYV6NM0crxk
+ cAbmLvxuIIlkgK4vhLxE9THnwj+Y/zLxSgAbqTP9vHiU2srXJatIkIJS7fm5OeRL7c8w
+ JAMA6KpHUc1OdDsemYt7ypZrPjkExa1RvadNY9XRFWXQwPaqj8OQuMNCXkTFZe2G/Gdt Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 361wbnt2ac-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 04:41:41 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10D9cimc126906;
+        Wed, 13 Jan 2021 04:41:40 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 361wbnt2a0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 04:41:40 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10D9SL3a022707;
+        Wed, 13 Jan 2021 09:41:38 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 35y448ag56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Jan 2021 09:41:38 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10D9fZOV31654144
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Jan 2021 09:41:35 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FEA8A4040;
+        Wed, 13 Jan 2021 09:41:35 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1DEA1A404D;
+        Wed, 13 Jan 2021 09:41:35 +0000 (GMT)
+Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 13 Jan 2021 09:41:35 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [PATCH 00/14] KVM: s390: Add huge page VSIE support
+Date:   Wed, 13 Jan 2021 09:40:59 +0000
+Message-Id: <20210113094113.133668-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-13_03:2021-01-13,2021-01-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1011 mlxscore=0 spamscore=0 mlxlogscore=999 phishscore=0
+ impostorscore=0 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101130054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+As we finally want to get rid of the nested and hpage s390 KVM module
+parameters let's try again to integrate huge page VSIE support.
+
+The following patches have been rebased on 5.11-rc3 and enable us to
+start huge page and normal page VSIE guest 3s in a huge page guest 2.
+
+Branch:
+https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git/log/?h=hlp_vsie
 
 
-On Wed, Jan 13, 2021, at 3:19 PM, Thomas Huth wrote:
-> On 21/12/2020 01.53, Jiaxun Yang wrote:
-> > As per POSIX specification of limits.h [1], OS libc may define
-> > PAGE_SIZE in limits.h.
-> > 
-> > To prevent collosion of definition, we discard PAGE_SIZE from
-> > defined by libc and take QEMU's variable.
-> > 
-> > [1]: https://pubs.opengroup.org/onlinepubs/7908799/xsh/limits.h.html
-> > 
-> > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > ---
-> >   accel/kvm/kvm-all.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index 389eaace72..3feb17d965 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -58,6 +58,9 @@
-> >   /* KVM uses PAGE_SIZE in its definition of KVM_COALESCED_MMIO_MAX. We
-> >    * need to use the real host PAGE_SIZE, as that's what KVM will use.
-> >    */
-> > +#ifdef PAGE_SIZE
-> > +#undef PAGE_SIZE
-> > +#endif
-> >   #define PAGE_SIZE qemu_real_host_page_size
-> 
-> If I get that right, the PAGE_SIZE macro is only used one time in this 
-> file... so it's maybe easier to get rid of the macro completely and replace 
-> the single occurance with qemu_real_host_page_size directly?
+Problems that need to be solved:
+	* The VSIE guests crash on migration...
+	* I have lost most of my knowledge about this topic and I'm
+          currently paging back in
+	* Lots of testing
 
-It is also used in kernel headers included here.
 
-Thanks.
+Janosch Frank (14):
+  s390/mm: Code cleanups
+  s390/mm: Improve locking for huge page backings
+  s390/mm: Take locking out of gmap_protect_pte
+  s390/mm: split huge pages in GMAP when protecting
+  s390/mm: Split huge pages when migrating
+  s390/mm: Provide vmaddr to pmd notification
+  s390/mm: factor out idte global flush into gmap_idte_global
+  s390/mm: Make gmap_read_table EDAT1 compatible
+  s390/mm: Make gmap_protect_rmap EDAT1 compatible
+  s390/mm: Add simple ptep shadow function
+  s390/mm: Add gmap shadowing for large pmds
+  s390/mm: Add gmap lock classes
+  s390/mm: Pull pmd invalid check in gmap_pmd_op_walk
+  KVM: s390: Allow the VSIE to be used with huge pages
 
-- Jiaxun
-
-> 
->   Thomas
-> 
->
+ Documentation/virt/kvm/api.rst  |   9 +-
+ arch/s390/include/asm/gmap.h    |  31 +-
+ arch/s390/include/asm/pgtable.h |   5 +
+ arch/s390/kvm/gaccess.c         |  52 +-
+ arch/s390/kvm/kvm-s390.c        |  14 +-
+ arch/s390/mm/gmap.c             | 917 ++++++++++++++++++++++++--------
+ arch/s390/mm/pgtable.c          |  61 ++-
+ 7 files changed, 819 insertions(+), 270 deletions(-)
 
 -- 
-- Jiaxun
+2.27.0
+
