@@ -2,94 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98AF92F4B7D
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:45:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E50AC2F4B88
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 13:45:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbhAMMlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 07:41:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56455 "EHLO
+        id S1727191AbhAMMoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 07:44:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51450 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725773AbhAMMlw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:41:52 -0500
+        by vger.kernel.org with ESMTP id S1726733AbhAMMoK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 07:44:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610541625;
+        s=mimecast20190719; t=1610541763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fZ+YcApOL1FyWbUbySK29mXu2RIMEwNXmpAvze3hxpQ=;
-        b=MLsfJQOrkSvdYQCwOGs7x/PW+BxpN1teIrNDAJwRLr8kaVtS35PB3RdF/g0SEmrNH7f+W1
-        wKuejsGlH+9UrlSZ00OQYBl9FaaH4iNoOiafDKLW2ueX5Aabx/JipMOGArvkiOFego3gIX
-        7BTfPDIrf8ud67ZOy1se7MpJGkbyeOk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-FXrm_ooZOLG4Ostc9whKaw-1; Wed, 13 Jan 2021 07:40:23 -0500
-X-MC-Unique: FXrm_ooZOLG4Ostc9whKaw-1
-Received: by mail-ej1-f70.google.com with SMTP id s22so805850eju.21
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 04:40:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fZ+YcApOL1FyWbUbySK29mXu2RIMEwNXmpAvze3hxpQ=;
-        b=NpCBxHBCQ3Hfn9F2WIEg5jUWBlCld/W2kPB+PFjzpgrNnxt+I3KH9+/uLOLGbaReBD
-         UBr0FsMvR5E7s5QLMSbBexz+Gu3Da4ofYU2ZlY5EKe8NusQ+okGiz9S8TEHw2w2m2myS
-         BoUam0SS8OdgNAJDGWhdF2c/STC296LWojTUFBFNklpd0rgxbphUetHM2sSiXEH9+l7c
-         WB/4PwkRkDVEwZJcVMhfb2vQwg1Xe6Ak49Boagei22yJbRMdF2PgUQEkUL3a7HCtFGZ4
-         01EjnixIqlVTxjFa5+xWl3FOPQDPT732OIlTw9wDIo4/p4zbcRm3L9mckXRc1A8t4N6w
-         7hJQ==
-X-Gm-Message-State: AOAM530JUQJE7laQzF6P7kBAShvZuSvnN0X580ZO5ezyM/dWIAhap/dV
-        g0dkxz/GfszlzZmvkiESw9P3ouHrOQxLC+tFlRTfT1Dz9pkJBxP3rdDjvohitFeIevMG3SeV3NI
-        eZB3YJOyfWsdy
-X-Received: by 2002:a17:906:d19b:: with SMTP id c27mr1456546ejz.234.1610541622671;
-        Wed, 13 Jan 2021 04:40:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzBxb43X8rAHWK+3MIYiYYqUJPhoX/hIjXwpQROEnILuJ7vX2lEjEloOcqruZqwlFH5PoG5DQ==
-X-Received: by 2002:a17:906:d19b:: with SMTP id c27mr1456525ejz.234.1610541622538;
-        Wed, 13 Jan 2021 04:40:22 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u2sm669767ejb.65.2021.01.13.04.40.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jan 2021 04:40:21 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>,
-        Wei Huang <wei.huang2@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        vkuznets@redhat.com, joro@8bytes.org, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, mlevitsk@redhat.com
-References: <20210112063703.539893-1-wei.huang2@amd.com>
- <X/3eAX4ZyqwCmyFi@google.com> <X/3jap249oBJ/a6s@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
- VM instructions
-Message-ID: <61622212-4f7a-bf24-dab2-a40f2142835d@redhat.com>
-Date:   Wed, 13 Jan 2021 13:40:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        bh=noQ2RnJbyfA77PNOeg25mR4hnS8qT2ggMdMukleu3so=;
+        b=esrsCdd7NZPhwaeLQJOAzFcEIqRo4RyU3x4IgCwLkArsiD2MpsWuHeA2H2jDycpdZsLCKW
+        Y1Jlg57pK2e4mv/RowPL4EmcG3H1YBniepPwpbuXAouYb8F1F5kJOBO/Rz2rMGlr3o3djz
+        I94Uae/AWCg9SvPTVRgV1Z8sjCg3bos=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-AkD2W-bUMEqIykQ7qsjUgg-1; Wed, 13 Jan 2021 07:42:41 -0500
+X-MC-Unique: AkD2W-bUMEqIykQ7qsjUgg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A98388030A0;
+        Wed, 13 Jan 2021 12:42:38 +0000 (UTC)
+Received: from work-vm (ovpn-112-200.ams2.redhat.com [10.36.112.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DE8710074E1;
+        Wed, 13 Jan 2021 12:42:28 +0000 (UTC)
+Date:   Wed, 13 Jan 2021 12:42:26 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Ram Pai <linuxram@us.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Greg Kurz <groug@kaod.org>, pair@us.ibm.com,
+        brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        borntraeger@de.ibm.com, David Gibson <david@gibson.dropbear.id.au>,
+        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, rth@twiddle.net, berrange@redhat.com,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
+        pbonzini@redhat.com
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20210113124226.GH2938@work-vm>
+References: <20201217054736.GH310465@yekko.fritz.box>
+ <20201217123842.51063918.cohuck@redhat.com>
+ <20201217151530.54431f0e@bahia.lan>
+ <20201218124111.4957eb50.cohuck@redhat.com>
+ <20210104071550.GA22585@ram-ibm-com.ibm.com>
+ <20210104134629.49997b53.pasic@linux.ibm.com>
+ <20210104184026.GD4102@ram-ibm-com.ibm.com>
+ <20210105115614.7daaadd6.pasic@linux.ibm.com>
+ <20210105204125.GE4102@ram-ibm-com.ibm.com>
+ <20210111175914.13adfa2e.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <X/3jap249oBJ/a6s@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210111175914.13adfa2e.cohuck@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/01/21 18:59, Sean Christopherson wrote:
->> It would be very helpful to list exactly which CPUs are/aren't affected, even if
->> that just means stating something like "all CPUs before XYZ".  Given patch 2/2,
->> I assume it's all CPUs without the new CPUID flag?
-> Ah, despite calling this an 'errata', the bad behavior is explicitly documented
-> in the APM, i.e. it's an architecture bug, not a silicon bug.
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Tue, 5 Jan 2021 12:41:25 -0800
+> Ram Pai <linuxram@us.ibm.com> wrote:
+> 
+> > On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
+> > > On Mon, 4 Jan 2021 10:40:26 -0800
+> > > Ram Pai <linuxram@us.ibm.com> wrote:
+> 
+> > > > The main difference between my proposal and the other proposal is...
+> > > > 
+> > > >   In my proposal the guest makes the compatibility decision and acts
+> > > >   accordingly.  In the other proposal QEMU makes the compatibility
+> > > >   decision and acts accordingly. I argue that QEMU cannot make a good
+> > > >   compatibility decision, because it wont know in advance, if the guest
+> > > >   will or will-not switch-to-secure.
+> > > >   
+> > > 
+> > > You have a point there when you say that QEMU does not know in advance,
+> > > if the guest will or will-not switch-to-secure. I made that argument
+> > > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
+> > > was to flip that property on demand when the conversion occurs. David
+> > > explained to me that this is not possible for ppc, and that having the
+> > > "securable-guest-memory" property (or whatever the name will be)
+> > > specified is a strong indication, that the VM is intended to be used as
+> > > a secure VM (thus it is OK to hurt the case where the guest does not
+> > > try to transition). That argument applies here as well.  
+> > 
+> > As suggested by Cornelia Huck, what if QEMU disabled the
+> > "securable-guest-memory" property if 'must-support-migrate' is enabled?
+> > Offcourse; this has to be done with a big fat warning stating
+> > "secure-guest-memory" feature is disabled on the machine.
+> > Doing so, will continue to support guest that do not try to transition.
+> > Guest that try to transition will fail and terminate themselves.
+> 
+> Just to recap the s390x situation:
+> 
+> - We currently offer a cpu feature that indicates secure execution to
+>   be available to the guest if the host supports it.
+> - When we introduce the secure object, we still need to support
+>   previous configurations and continue to offer the cpu feature, even
+>   if the secure object is not specified.
+> - As migration is currently not supported for secured guests, we add a
+>   blocker once the guest actually transitions. That means that
+>   transition fails if --only-migratable was specified on the command
+>   line. (Guests not transitioning will obviously not notice anything.)
+> - With the secure object, we will already fail starting QEMU if
+>   --only-migratable was specified.
+> 
+> My suggestion is now that we don't even offer the cpu feature if
+> --only-migratable has been specified. For a guest that does not want to
+> transition to secure mode, nothing changes; a guest that wants to
+> transition to secure mode will notice that the feature is not available
+> and fail appropriately (or ultimately, when the ultravisor call fails).
+> We'd still fail starting QEMU for the secure object + --only-migratable
+> combination.
+> 
+> Does that make sense?
 
-I would still call it an errata for the case when virtualized 
-VMSAVE/VMLOAD is enabled (and therefore VMLOAD intercepts are disabled). 
-  In that case, the problem is that the GPA does not go through NPT 
-before it is checked against *host* reserved memory regions.
+It's a little unusual; I don't think we have any other cases where
+--only-migratable changes the behaviour; I think it normally only stops
+you doing something that would have made it unmigratable or causes
+an operation that would make it unmigratable to fail.
 
-In fact I hope that,  on processors that have the fix, VMSAVE/VMLOAD 
-from guest mode _does_ check the GPA after it's been translated!
+Dave
 
-Paolo
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
