@@ -2,98 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A8212F5445
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 21:46:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1D5E2F5451
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 21:51:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728923AbhAMUqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 15:46:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33994 "EHLO
+        id S1728860AbhAMUuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 15:50:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727554AbhAMUqA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jan 2021 15:46:00 -0500
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6CCC061575
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 12:45:19 -0800 (PST)
-Received: by mail-qt1-x849.google.com with SMTP id t7so2430591qtn.19
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 12:45:19 -0800 (PST)
+        with ESMTP id S1726808AbhAMUun (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 15:50:43 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3374C061575
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 12:50:03 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id i5so2272579pgo.1
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 12:50:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=dWjn342r4gchACatmFqBw1A1idiYczd8S0EYhHJ6cqk=;
-        b=LXS3/ITVuk/SnWCJkR/nTg4MXjPt/brCtDBIjSa268qeWXDMMq0bw98grRjb4gSo/D
-         Yr7m+C/5PGKWXusNkHcPVMhYTPJ2sVbVQxHIIrTd+Z8qhkUxwX4bVXE9fUD99RjF3+0N
-         wAkNVxSfRvaLMPlhGjhgL56WC+aE1m05Sx4eY9rCgPnxa0ugufDJcyRmcnuxX0uU+nSh
-         wCUVhh/upnrdv9BKmMtFxVLOBjtgz8R1wyGZv/+vk0lP5qNjhPV0PkyJFrM//U25ik6o
-         yORifaOQzbA2M4IcWMXJ9SI7lewXs0MqLMamPwpIiHKY1F8/hf1Jswt0LkM/KOk5qu7t
-         nkRA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yrtd6TLEvu+g1E4rNp60CS8fDKJGNUH8hQppm9rl21Y=;
+        b=wBB4c+w3wWJPP0bX5blGyGBLoz6cI0r9TY/iEBBHgWaWEhKcrLSOUqlxU5MFf3m7M9
+         fL+O2RhJddC2LUs9HfTx9b3edlj9p1zTjDQgFYkjMsAUOz7ZmN24ETMhsTqlFa+1pjqI
+         6sQ291SpCOdiJQ/QfUVYYrthVUEqnoQTZZETmNwJpe+EAAFN1zdaMizmxag7CCyjG2r8
+         JVxIbd8AHDjB5RGBtSLY8uLWAfpxgFWT1SDlpSJvt4hnVWjq3UqFfnVZOYA6qUCn89oF
+         fgPlVH9JmOrz68c2yZfTevuZDFQXfGPwlm1tsie5q0QJeVLt0rRLNBDFHylsp5XNYtzb
+         /UjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc;
-        bh=dWjn342r4gchACatmFqBw1A1idiYczd8S0EYhHJ6cqk=;
-        b=KY5c6NzRyP9PqHybdl2+kycffNnzgB9eXagLaL2OsS/V1HFf8MY0kQQ9qweJhGYLL1
-         lk9NiTT7gGLcuhUryW2MgaR08DSpt31mPQQE8PcHMj8rxVCSZggwX/zhy8zqtDH+NfkI
-         4gW97OtbwqHn2YI9TuqQLWYc6N5D3sem54Fw0v3HGi3dkzvDuIPlmks+WikXaWCaFNta
-         gW2dzrCMnHqZhum1cJBwDgwK5RcM8U1Ipbb7rz352LSe/PSy0sYUVffqJiOFOZx1/ncA
-         YQf7McS51zqHJFbw/JajiBmdLGWY+j4eLfwxCZ3xmowki9idbFFvLS2SvhvaZj0uTwxz
-         7xUQ==
-X-Gm-Message-State: AOAM5323xQT9eYHpAV9XMAFy1XUcbf3em7cbpuAcRVHFCRo4mIJL+sTD
-        jzf5xqN0FOq3I8Tewf6HrjhWqwGFS58=
-X-Google-Smtp-Source: ABdhPJyF7RbfCRZcwkggVCSN3NJKobLj0tCZ/19NtoaDlqZFS8agG3ajSJPtaiX0BegIC2cNmKIQYvYUP10=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:ca4f:: with SMTP id a76mr6085531ybg.140.1610570718745;
- Wed, 13 Jan 2021 12:45:18 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Jan 2021 12:45:15 -0800
-Message-Id: <20210113204515.3473079-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH] KVM: x86: Add more protection against undefined behavior in rsvd_bits()
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yrtd6TLEvu+g1E4rNp60CS8fDKJGNUH8hQppm9rl21Y=;
+        b=TOHcDok3SjdcGRoUWqvGno5oHs6zejZRULcIVUWXmvrd7BcvOSk/vwvancdD5JWICF
+         cZZ8v0bPx4azkRMKgJfBoL97UmzC18dwZAMG3s3YJXWOGmlBuNjDCyK/Zs4e0NCqtZ8p
+         V4mt4w5znFEEbUOf56nlBYEWhFqFdV8wK9tiMRkpYyRH0IdVXgooPEz8Flay44ekSukN
+         7b1gLz0dVFAxh6FvpS3j3Esuw/g/ryTYvpV3wgbHbXFxgch7T8I2DuINnlYdU/LollFp
+         0VRGA9AO1Y+6gpugcWGlyN8TzLq9enlupUeiCdEBdk9Ujq8yg4JBtQVVrjrfZYc0eREP
+         hRtQ==
+X-Gm-Message-State: AOAM530zTojXyiyqIOmxUhzbYuD4Jx/NARF7mYqtwmhvTkblbXhMuSrC
+        EIpaERLa1tJpTLxNLOtKo0eIhw==
+X-Google-Smtp-Source: ABdhPJxtPukIQ5OL8oGLq9C1Ydc/Psn3l3J+oxoxt8NGRNJE7dwjJvqZO2BDW3mcinRO7tGnA6HYgw==
+X-Received: by 2002:a63:d18:: with SMTP id c24mr3777539pgl.442.1610571003057;
+        Wed, 13 Jan 2021 12:50:03 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id z2sm3244698pgl.49.2021.01.13.12.50.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jan 2021 12:50:02 -0800 (PST)
+Date:   Wed, 13 Jan 2021 12:49:56 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 6/7] KVM: x86: hyper-v: Make Hyper-V emulation enablement
+ conditional
+Message-ID: <X/9c9PuAd4XJM4IR@google.com>
+References: <20210113143721.328594-1-vkuznets@redhat.com>
+ <20210113143721.328594-7-vkuznets@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210113143721.328594-7-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add compile-time asserts in rsvd_bits() to guard against KVM passing in
-garbage hardcoded values, and cap the upper bound at '63' for dynamic
-values to prevent generating a mask that would overflow a u64.
+On Wed, Jan 13, 2021, Vitaly Kuznetsov wrote:
+> Hyper-V emulation is enabled in KVM unconditionally. This is bad at least
+> from security standpoint as it is an extra attack surface. Ideally, there
+> should be a per-VM capability explicitly enabled by VMM but currently it
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Would adding a module param buy us anything (other than complexity)?
 
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 581925e476d6..261be1d2032b 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -44,8 +44,15 @@
- #define PT32_ROOT_LEVEL 2
- #define PT32E_ROOT_LEVEL 3
- 
--static inline u64 rsvd_bits(int s, int e)
-+static __always_inline u64 rsvd_bits(int s, int e)
- {
-+	BUILD_BUG_ON(__builtin_constant_p(e) && __builtin_constant_p(s) && e < s);
-+
-+	if (__builtin_constant_p(e))
-+		BUILD_BUG_ON(e > 63);
-+	else
-+		e &= 63;
-+
- 	if (e < s)
- 		return 0;
- 
--- 
-2.30.0.284.gd98b1dd5eaa7-goog
-
+> is not the case and we can't mandate one without breaking backwards
+> compatibility. We can, however, check guest visible CPUIDs and only enable
+> Hyper-V emulation when "Hv#1" interface was exposed in
+> HYPERV_CPUID_INTERFACE.
