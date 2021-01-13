@@ -2,174 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B96D82F47DC
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 10:44:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8A972F48A5
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 11:27:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727449AbhAMJme (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 04:42:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58382 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727396AbhAMJmZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 04:42:25 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10D9XaHq135299;
-        Wed, 13 Jan 2021 04:41:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=zlHOQngHFVsjECDW2gjWgEiinuJbJTG62H3oRSZDlZ0=;
- b=YI+0L0/V8jG2Mh9jT3FUQx9rMMk8XewkSpc0vOmByy1cOMFlfsK7TrQ0bab5+VsF62XR
- RLaKSorTafwFQccp/VKpH2DnmK6XpguqG9dUr3LFCMVa4iMcr3hY9+fgHgxLE6n77g0h
- Vp11p6zqUpymZvMzM4SWFOVJf0xfc9epdm3k6DznjCkiZ8EQVU1J1DcYbzBOPLvmLb79
- KoPCZYbGy7Ndq62955VLOSHGAh4PwfhI4/qPQ3ORm97OrMVDH8Cc9kru5oVR5tC4IJzx
- xeq5pz0dtDOVidmhvSWiRhtTZbuDq/bTuqnYMF7BThB+M3ux/TwPXpzw/BWtbF75zaPk RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361uq2vjas-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 04:41:44 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10D9Y0UN137579;
-        Wed, 13 Jan 2021 04:41:44 -0500
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 361uq2vj9s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 04:41:44 -0500
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10D9S18i030792;
-        Wed, 13 Jan 2021 09:41:42 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06fra.de.ibm.com with ESMTP id 361wgq814x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 09:41:41 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10D9fd3q28639546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jan 2021 09:41:39 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E0F4BA4055;
-        Wed, 13 Jan 2021 09:41:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B936FA4059;
-        Wed, 13 Jan 2021 09:41:38 +0000 (GMT)
-Received: from t46lp67.lnxne.boe (unknown [9.152.108.100])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Jan 2021 09:41:38 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
-Subject: [PATCH 14/14] KVM: s390: Allow the VSIE to be used with huge pages
-Date:   Wed, 13 Jan 2021 09:41:13 +0000
-Message-Id: <20210113094113.133668-15-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210113094113.133668-1-frankja@linux.ibm.com>
-References: <20210113094113.133668-1-frankja@linux.ibm.com>
+        id S1727014AbhAMK1S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 05:27:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29008 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726801AbhAMK1R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 05:27:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610533551;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=azGscBBQYVKOXzgWJG/nFi12TMFAxWjm2VlEU7rwy3c=;
+        b=GtaiWsi3ETujEHCVzsH1jq+WxNycmepObPTB/s1wO2Dr3gEIMrXPHClC4C94Gu12bO6FJZ
+        KDZ0t3cSGaX66vncYAuOh972XKhuf4DsDE0wiuvRckKq826weOeII2qwxzKt9vzDt1DCiL
+        fFANZ0QLgujvTHAK6C6b+PAvCl+Sp5k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-eshJVyaLMRajVIDHBzUVFQ-1; Wed, 13 Jan 2021 05:25:49 -0500
+X-MC-Unique: eshJVyaLMRajVIDHBzUVFQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39672100C602;
+        Wed, 13 Jan 2021 10:25:48 +0000 (UTC)
+Received: from [10.36.114.135] (ovpn-114-135.ams2.redhat.com [10.36.114.135])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6D371F0;
+        Wed, 13 Jan 2021 10:25:46 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 9/9] s390x: sclp: Add CPU entry offset
+ comment
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org
+References: <20210112132054.49756-1-frankja@linux.ibm.com>
+ <20210112132054.49756-10-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <6f93c964-9606-246c-7266-85044803e49b@redhat.com>
+Date:   Wed, 13 Jan 2021 11:25:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-13_03:2021-01-13,2021-01-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1015 bulkscore=0
- impostorscore=0 mlxlogscore=999 phishscore=0 adultscore=0 spamscore=0
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101130056
+In-Reply-To: <20210112132054.49756-10-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that we have VSIE support for VMs with huge memory backing, let's
-make both features usable at the same time.
+On 12.01.21 14:20, Janosch Frank wrote:
+> Let's make it clear that there is something at the end of the
+> struct. The exact offset is reported by the cpu_offset member.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  lib/s390x/sclp.h | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+> index dccbaa8..395895f 100644
+> --- a/lib/s390x/sclp.h
+> +++ b/lib/s390x/sclp.h
+> @@ -134,7 +134,10 @@ typedef struct ReadInfo {
+>  	uint8_t reserved7[134 - 128];
+>  	uint8_t byte_134_diag318 : 1;
+>  	uint8_t : 7;
+> -	struct CPUEntry entries[0];
+> +	/*
+> +	 * The cpu entries follow, they start at the offset specified
+> +	 * in offset_cpu.
+> +	 */
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst |  9 ++++-----
- arch/s390/kvm/kvm-s390.c       | 14 ++------------
- arch/s390/mm/gmap.c            |  1 -
- 3 files changed, 6 insertions(+), 18 deletions(-)
+I mean, that's just best practice. At least when I spot "[0];" and the
+end of a struct, I know what's happening.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c136e254b496..c7fa31bbaa78 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5876,15 +5876,14 @@ Do not enable KVM_FEATURE_PV_UNHALT if you disable HLT exits.
- 
- :Architectures: s390
- :Parameters: none
--:Returns: 0 on success, -EINVAL if hpage module parameter was not set
--	  or cmma is enabled, or the VM has the KVM_VM_S390_UCONTROL
--	  flag set
-+:Returns: 0 on success, -EINVAL if cmma is enabled, or the VM has the
-+	  KVM_VM_S390_UCONTROL flag set
- 
- With this capability the KVM support for memory backing with 1m pages
- through hugetlbfs can be enabled for a VM. After the capability is
- enabled, cmma can't be enabled anymore and pfmfi and the storage key
--interpretation are disabled. If cmma has already been enabled or the
--hpage module parameter is not set to 1, -EINVAL is returned.
-+interpretation are disabled. If cmma has already been enabled, -EINVAL
-+is returned.
- 
- While it is generally possible to create a huge page backed VM without
- this capability, the VM will not be able to run.
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index dbafd057ca6a..ad4fc84bb090 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -175,11 +175,6 @@ static int nested;
- module_param(nested, int, S_IRUGO);
- MODULE_PARM_DESC(nested, "Nested virtualization support");
- 
--/* allow 1m huge page guest backing, if !nested */
--static int hpage;
--module_param(hpage, int, 0444);
--MODULE_PARM_DESC(hpage, "1m huge page backing support");
--
- /* maximum percentage of steal time for polling.  >100 is treated like 100 */
- static u8 halt_poll_max_steal = 10;
- module_param(halt_poll_max_steal, byte, 0644);
-@@ -551,7 +546,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- 	case KVM_CAP_S390_HPAGE_1M:
- 		r = 0;
--		if (hpage && !kvm_is_ucontrol(kvm))
-+		if (!kvm_is_ucontrol(kvm))
- 			r = 1;
- 		break;
- 	case KVM_CAP_S390_MEM_OP:
-@@ -761,7 +756,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		mutex_lock(&kvm->lock);
- 		if (kvm->created_vcpus)
- 			r = -EBUSY;
--		else if (!hpage || kvm->arch.use_cmma || kvm_is_ucontrol(kvm))
-+		else if (kvm->arch.use_cmma || kvm_is_ucontrol(kvm))
- 			r = -EINVAL;
- 		else {
- 			r = 0;
-@@ -5042,11 +5037,6 @@ static int __init kvm_s390_init(void)
- 		return -ENODEV;
- 	}
- 
--	if (nested && hpage) {
--		pr_info("A KVM host that supports nesting cannot back its KVM guests with huge pages\n");
--		return -EINVAL;
--	}
--
- 	for (i = 0; i < 16; i++)
- 		kvm_s390_fac_base[i] |=
- 			S390_lowcore.stfle_fac_list[i] & nonhyp_mask(i);
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index c4778ded8450..994688946553 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -1844,7 +1844,6 @@ struct gmap *gmap_shadow(struct gmap *parent, unsigned long asce,
- 	unsigned long limit;
- 	int rc;
- 
--	BUG_ON(parent->mm->context.allow_gmap_hpage_1m);
- 	BUG_ON(gmap_is_shadow(parent));
- 	spin_lock(&parent->shadow_lock);
- 	sg = gmap_find_shadow(parent, asce, edat_level);
+No strong opinion about the comment, I wouldn't need it to understand it.
+
+>  } __attribute__((packed)) ReadInfo;
+>  
+>  typedef struct ReadCpuInfo {
+> 
+
+
 -- 
-2.27.0
+Thanks,
+
+David / dhildenb
 
