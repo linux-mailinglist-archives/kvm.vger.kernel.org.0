@@ -2,447 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05F9D2F51A2
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 19:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C7EA2F51B5
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 19:09:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728280AbhAMSCy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 13:02:54 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:43258 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727794AbhAMSCy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jan 2021 13:02:54 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10DHxu7M107798;
-        Wed, 13 Jan 2021 18:02:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=yl/xjBeTiKd4lXcsU3laWdHT9ZDhf1B9iCNnWVNKrPU=;
- b=HOyml55FmpUwvSk7qY7u3ctZ/gfleOUHT++HxKZsm1a0MldUrBnptW4K8SfGrEuC2uER
- miAAlwj+ZR8RGeavs9oicEQXtBiGghhG1HYI2zr9M/z1rDRUx6ThEJDqnK4eEp2NvWnC
- GqI23fptBo55M8i8P+O6zPTmYXLj9x/1W1hRgE3wMiib53eVq5mjo4JHHQUUkHFR8k0a
- 9KI349/vOYo4AgdiLLHhlK5m8yN9YIO5+s9uNpSS4M9ge5o/n32m9XwjCvCoqPZbezfQ
- PmoOaZGsj0Gxa97/ivXru4EiLNu3NMAF8+5EoziDYOZxD5FL8g7xyNPPNHsUB68b7cyy 4w== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 360kcyvsra-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jan 2021 18:02:07 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10DI0bGG038233;
-        Wed, 13 Jan 2021 18:02:06 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 360kf82d2h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Jan 2021 18:02:06 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10DI25fE028447;
-        Wed, 13 Jan 2021 18:02:05 GMT
-Received: from [10.39.255.41] (/10.39.255.41)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 13 Jan 2021 10:02:04 -0800
-Subject: Re: [PATCH V1 4/5] vfio: VA suspend interface
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
- <1609861013-129801-5-git-send-email-steven.sistare@oracle.com>
- <20210108141549.071608a4@omen.home>
- <f40232ca-710f-1b65-1d21-564c3ecb62cc@oracle.com>
- <20210112154756.5bfd31f1@omen.home.shazbot.org>
- <20210112210949.348102bf@x1.home.shazbot.org>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <9381ac21-6fdc-1da8-bfd8-4581a05f5aaf@oracle.com>
-Date:   Wed, 13 Jan 2021 13:02:04 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1728093AbhAMSJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 13:09:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56728 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728057AbhAMSJj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 13:09:39 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824D8C061795;
+        Wed, 13 Jan 2021 10:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jNibCvTx7q4DNq2LFCvJgnHxHkRHf0XgjGUF5aOVsQg=; b=nPh9SFDH0qvl6QN7IJFB0c5GI1
+        JqsCAQ2HZQVdv9513XN7ehbo/8oXe+FRG/YL9EY1MiYteYeztRRffMpXvXEfsqwDVpbF/a91kqN/G
+        qjbEzNcB7aagKoT530bItc0fY6LOGR3e43Q6QrNpJwLy59H//jebViet5n52pXhF5gjWctcVkORx/
+        i8GG7MJdR3Hg1RkQiOJieeEMcrc4CMfdoCeK3emAb4mg7GUYwkTXrNtkS9wlvNHleGxWTQZm6ZJhs
+        B3GZcJ6IGPIM/Alek4XlO4caXFXROifkRE2qDK2Ti0G8Hf8hjD1nUHL1izYjk/aJGhInqxPnuiwtY
+        5jtvzItQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1kzkXI-006Y9v-Th; Wed, 13 Jan 2021 18:06:51 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6AF1C3010C8;
+        Wed, 13 Jan 2021 19:06:20 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id ACB4620CC02C7; Wed, 13 Jan 2021 19:06:20 +0100 (CET)
+Date:   Wed, 13 Jan 2021 19:06:20 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 03/17] KVM: x86/pmu: Introduce the ctrl_mask value for
+ fixed counter
+Message-ID: <X/82nCHfFH0TVur2@hirez.programming.kicks-ass.net>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-4-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210112210949.348102bf@x1.home.shazbot.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9863 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 phishscore=0 bulkscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101130107
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9863 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0
- impostorscore=0 bulkscore=0 adultscore=0 suspectscore=0 malwarescore=0
- lowpriorityscore=0 clxscore=1015 mlxlogscore=999 mlxscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101130107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210104131542.495413-4-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/12/2021 11:10 PM, Alex Williamson wrote:
-> On Tue, 12 Jan 2021 15:47:56 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> On Mon, 11 Jan 2021 16:15:02 -0500
->> Steven Sistare <steven.sistare@oracle.com> wrote:
->>
->>> On 1/8/2021 4:15 PM, Alex Williamson wrote:  
->>>> On Tue,  5 Jan 2021 07:36:52 -0800
->>>> Steve Sistare <steven.sistare@oracle.com> wrote:
->>>>     
->>>>> Add interfaces that allow the underlying memory object of an iova
->>>>> range to be mapped to a new host virtual address in the host process:
->>>>>
->>>>>   - VFIO_DMA_UNMAP_FLAG_SUSPEND for VFIO_IOMMU_UNMAP_DMA
->>>>>   - VFIO_DMA_MAP_FLAG_RESUME flag for VFIO_IOMMU_MAP_DMA
->>>>>   - VFIO_SUSPEND extension for VFIO_CHECK_EXTENSION    
->>>>
->>>> Suspend and Resume can imply many things other than what's done here.
->>>> Should these be something more akin to INVALIDATE_VADDR and
->>>> REPLACE_VADDR?    
->>>
->>> Agreed.  I suspected we would discuss the names.  Some possibilities:
->>>
->>> INVALIDATE_VADDR  REPLACE_VADDR
->>> INV_VADDR         SET_VADDR
->>> CLEAR_VADDR       SET_VADDR
->>> SUSPEND_VADDR     RESUME_VADDR
->>>   
->>>>> The suspend interface blocks vfio translation of host virtual
->>>>> addresses in a range, but DMA to already-mapped pages continues.
->>>>> The resume interface records the new base VA and resumes translation.
->>>>> See comments in uapi/linux/vfio.h for more details.
->>>>>
->>>>> This is a partial implementation.  Blocking is added in the next patch.
->>>>>
->>>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->>>>> ---
->>>>>  drivers/vfio/vfio_iommu_type1.c | 47 +++++++++++++++++++++++++++++++++++------
->>>>>  include/uapi/linux/vfio.h       | 16 ++++++++++++++
->>>>>  2 files changed, 57 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>>>> index 3dc501d..2c164a6 100644
->>>>> --- a/drivers/vfio/vfio_iommu_type1.c
->>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>>>> @@ -92,6 +92,7 @@ struct vfio_dma {
->>>>>  	int			prot;		/* IOMMU_READ/WRITE */
->>>>>  	bool			iommu_mapped;
->>>>>  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
->>>>> +	bool			suspended;    
->>>>
->>>> Is there a value we could use for vfio_dma.vaddr that would always be
->>>> considered invalid, ex. ULONG_MAX?      
->>>
->>> Yes, that could replace the suspend flag.  That, plus changing the language from suspend
->>> to invalidate, will probably yield equally understandable code.  I'll try it.  
->>
->> Thinking about this further, if we defined a VFIO_IOMMU_TYPE1_INV_VADDR
->> as part of the uapi, could we implement this with only a single flag on
->> the DMA_MAP ioctl?  For example the user would call DMA_MAP with a flag
->> to set the vaddr, first to the invalid valid, then to a new value.  It's
->> always seemed a bit awkward to use DMA_UNMAP to invalidate the vaddr
->> when the mapping is not actually unmapped.  That might lean towards an
->> UPDATE or REPLACE flag.
-> 
-> I realized you really want to make use of the DMA_UNMAP ioctl in order
-> to use ranges, maybe we can make the mental model more coherent with an
-> unmap flag like VFIO_DMA_UNMAP_FLAG_VADDR_ONLY, ie. we're only asking
-> to unmap the vaddr.  The DMA_MAP side might take a similar VADDR_ONLY
-> flag to reset the vaddr.  That also retains your desired semantics that
-> we can't "resume" a vaddr that wasn't previously "suspended", we can't
-> map a vaddr that wasn't previously unmapped.
+On Mon, Jan 04, 2021 at 09:15:28PM +0800, Like Xu wrote:
+> @@ -327,6 +328,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
+>  	pmu->version = 0;
+>  	pmu->reserved_bits = 0xffffffff00200000ull;
+> +	pmu->fixed_ctr_ctrl_mask = ~0ull;
 
-I like this.
+All 1s
 
-> For the unmap-all problem, userspace already needs to work around this,
-> see for instance QEMU:
-> 
-> 1b296c3def4b vfio: Don't issue full 2^64 unmap
+>  
+>  	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
+>  	if (!entry)
+> @@ -358,6 +360,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  			((u64)1 << edx.split.bit_width_fixed) - 1;
+>  	}
+>  
+> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+> +		pmu->fixed_ctr_ctrl_mask |= (0xbull << (i * 4));
 
-Yes, I saw that.  And one cannot split the range in two at some arbitrary 
-mmu-page-size boundary, least you split a mapping, which V2 does not allow.
+With some extra 1s on top
 
-> So I wonder really how critical it is and whether it really would be
-> sufficient for userspace to track a high water mark for mappings.
+> +	pmu->fixed_ctr_ctrl_mask = ~pmu->fixed_ctr_ctrl_mask;
 
-If the high water mark is 2^64, then you also need a low water mark to 
-enable a single call, else one call cannot span the range.  And low water
-better not be 0.  And I would rather not add code to compute either one :)
+Inverted is all 0s, always.
 
-> Otherwise, I think I'm leaning towards a DMA_UNMAP flag like
-> VFIO_DMA_UNMAP_FLAG_UNMAP_ALL that would disregard the iova and size
-> fields to apply to all mappings.  Designating special values for iova or
-> size trigger extended behavior feels a bit hackish.  Thanks,
-
-The flag sounds best to me.
-
-- Steve
-
->>>> We'd need to decide if we want to
->>>> allow users to create mappings (mdev-only) using an initial invalid
->>>> vaddr.    
->>>
->>> Maybe.  Not sure yet.  
->>
->> If we used the above, it almost seems strange not to allow it, but at
->> the same time we don't really want to have different rules for
->> different devices types.  An initially valid vaddr doesn't seem
->> unreasonable... though we don't test it until the vendor driver tries
->> to pin or rw pages w/o IOMMU backing.
->>  
->>>>>  	struct task_struct	*task;
->>>>>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->>>>>  	unsigned long		*bitmap;
->>>>> @@ -1080,7 +1081,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>>>>  	int ret = 0, retries = 0;
->>>>>  	unsigned long pgshift;
->>>>>  	dma_addr_t iova;
->>>>> -	unsigned long size;
->>>>> +	unsigned long size, consumed;    
->>>>
->>>> This could be scoped into the branch below.    
->>>
->>> OK.
->>>   
->>>>>  	mutex_lock(&iommu->lock);
->>>>>  
->>>>> @@ -1169,6 +1170,21 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->>>>>  		if (dma->task->mm != current->mm)
->>>>>  			break;
->>>>>  
->>>>> +		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_SUSPEND) {
->>>>> +			if (dma->suspended) {
->>>>> +				ret = -EINVAL;
->>>>> +				goto unlock;
->>>>> +			}    
->>>>
->>>> This leaves us in a state where we marked some entries but not others.
->>>> We should either unwind or... what's the actual harm in skipping these?    
->>>
->>> We could skip them with no ill effect.  However, it likely means the app is confused
->>> and potentially broken, and it would be courteous to inform them so.  I found such bugs
->>> in qemu as I was developing this feature.
->>>
->>> IMO unwinding does not help the app, and adds unnecessary code.  It can still leave some
->>> ranges suspended and some not.  The safest recovery is for the app to exit, and tell the 
->>> developer to fix the redundant suspend call.  
->>
->> That sounds like an entirely practical rationalization, but our
->> standard practice is to maintain a consistent state.  If an ioctl fails
->> is should effectively be as if the ioctl was never called, where
->> possible.  Userspace can be broken, and potentially so broken that their
->> best choice is to abort, but we should maintain consistent, predictable
->> behavior.
->>
->>>>> +			dma->suspended = true;
->>>>> +			consumed = dma->iova + dma->size - iova;
->>>>> +			if (consumed >= size)
->>>>> +				break;
->>>>> +			iova += consumed;
->>>>> +			size -= consumed;
->>>>> +			unmapped += dma->size;
->>>>> +			continue;
->>>>> +		}    
->>>>
->>>> This short-cuts the dirty bitmap flag, so we need to decide if it's
->>>> legal to call them together or we need to prevent it... Oh, I see
->>>> you've excluded them earlier below.
->>>>     
->>>>> +
->>>>>  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
->>>>>  			struct vfio_iommu_type1_dma_unmap nb_unmap;
->>>>>  
->>>>> @@ -1307,6 +1323,7 @@ static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
->>>>>  static int vfio_dma_do_map(struct vfio_iommu *iommu,
->>>>>  			   struct vfio_iommu_type1_dma_map *map)
->>>>>  {
->>>>> +	bool resume = map->flags & VFIO_DMA_MAP_FLAG_RESUME;
->>>>>  	dma_addr_t iova = map->iova;
->>>>>  	unsigned long vaddr = map->vaddr;
->>>>>  	size_t size = map->size;
->>>>> @@ -1324,13 +1341,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->>>>>  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
->>>>>  		prot |= IOMMU_READ;
->>>>>  
->>>>> +	if ((prot && resume) || (!prot && !resume))
->>>>> +		return -EINVAL;
->>>>> +
->>>>>  	mutex_lock(&iommu->lock);
->>>>>  
->>>>>  	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
->>>>>  
->>>>>  	WARN_ON((pgsize - 1) & PAGE_MASK);
->>>>>  
->>>>> -	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
->>>>> +	if (!size || (size | iova | vaddr) & (pgsize - 1)) {
->>>>>  		ret = -EINVAL;
->>>>>  		goto out_unlock;
->>>>>  	}
->>>>> @@ -1341,7 +1361,19 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->>>>>  		goto out_unlock;
->>>>>  	}
->>>>>  
->>>>> -	if (vfio_find_dma(iommu, iova, size)) {
->>>>> +	dma = vfio_find_dma(iommu, iova, size);
->>>>> +	if (resume) {
->>>>> +		if (!dma) {
->>>>> +			ret = -ENOENT;
->>>>> +		} else if (!dma->suspended || dma->iova != iova ||
->>>>> +			   dma->size != size) {    
->>>>
->>>> Why is it necessary that the vfio_dma be suspended before being
->>>> resumed?  Couldn't a user simply use this to change the vaddr?  Does
->>>> that promote abusive use?    
->>>
->>> This would almost always be incorrect.  If the vaddr changes, then the old vaddr was already
->>> invalidated, and there is a window where it is not OK for kernel code to use the old vaddr.
->>> This could only be safe if the memory object is mapped at both the old vaddr and the new
->>> vaddr concurrently, which is an unlikely use case.  
->>
->> Ok, it's not like the use can't make it instantaneously invalid and then
->> replace it.
->>
->>>>> +			ret = -EINVAL;
->>>>> +		} else {
->>>>> +			dma->vaddr = vaddr;    
->>>>
->>>> Seems like there's a huge opportunity for a user to create coherency
->>>> issues here... it's their data though I guess.    
->>>
->>> Yes.  That's what the language in the uapi about mapping the same memory object is about.
->>>   
->>>>> +			dma->suspended = false;
->>>>> +		}
->>>>> +		goto out_unlock;
->>>>> +	} else if (dma) {
->>>>>  		ret = -EEXIST;
->>>>>  		goto out_unlock;
->>>>>  	}
->>>>> @@ -2532,6 +2564,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->>>>>  	case VFIO_TYPE1_IOMMU:
->>>>>  	case VFIO_TYPE1v2_IOMMU:
->>>>>  	case VFIO_TYPE1_NESTING_IOMMU:
->>>>> +	case VFIO_SUSPEND:
->>>>>  		return 1;
->>>>>  	case VFIO_DMA_CC_IOMMU:
->>>>>  		if (!iommu)
->>>>> @@ -2686,7 +2719,8 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
->>>>>  {
->>>>>  	struct vfio_iommu_type1_dma_map map;
->>>>>  	unsigned long minsz;
->>>>> -	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
->>>>> +	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
->>>>> +			VFIO_DMA_MAP_FLAG_RESUME;
->>>>>  
->>>>>  	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
->>>>>  
->>>>> @@ -2704,6 +2738,8 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->>>>>  {
->>>>>  	struct vfio_iommu_type1_dma_unmap unmap;
->>>>>  	struct vfio_bitmap bitmap = { 0 };
->>>>> +	uint32_t mask = VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP |
->>>>> +			VFIO_DMA_UNMAP_FLAG_SUSPEND;
->>>>>  	unsigned long minsz;
->>>>>  	int ret;
->>>>>  
->>>>> @@ -2712,8 +2748,7 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->>>>>  	if (copy_from_user(&unmap, (void __user *)arg, minsz))
->>>>>  		return -EFAULT;
->>>>>  
->>>>> -	if (unmap.argsz < minsz ||
->>>>> -	    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
->>>>> +	if (unmap.argsz < minsz || unmap.flags & ~mask || unmap.flags == mask)    
->>>>
->>>> Maybe a short comment here to note that dirty-bimap and
->>>> suspend/invalidate are mutually exclusive.  Probably should be
->>>> mentioned in the uapi too.    
->>>
->>> Will do, for both.
->>>   
->>>>>  		return -EINVAL;
->>>>>  
->>>>>  	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
->>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>>>> index 896e527..fcf7b56 100644
->>>>> --- a/include/uapi/linux/vfio.h
->>>>> +++ b/include/uapi/linux/vfio.h
->>>>> @@ -46,6 +46,9 @@
->>>>>   */
->>>>>  #define VFIO_NOIOMMU_IOMMU		8
->>>>>  
->>>>> +/* Supports VFIO DMA suspend and resume */
->>>>> +#define VFIO_SUSPEND			9
->>>>> +
->>>>>  /*
->>>>>   * The IOCTL interface is designed for extensibility by embedding the
->>>>>   * structure length (argsz) and flags into structures passed between
->>>>> @@ -1046,12 +1049,19 @@ struct vfio_iommu_type1_info_cap_migration {
->>>>>   *
->>>>>   * Map process virtual addresses to IO virtual addresses using the
->>>>>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
->>>>> + *
->>>>> + * If flags & VFIO_DMA_MAP_FLAG_RESUME, record the new base vaddr for iova, and
->>>>> + * resume translation of host virtual addresses in the iova range.  The new
->>>>> + * vaddr must point to the same memory object as the old vaddr, but this is not
->>>>> + * verified.    
->>>>
->>>> It's hard to use "must" terminology here if we're not going to check.
->>>> Maybe the phrasing should be something more along the lines of "should
->>>> point to the same memory object or the user risks coherency issues
->>>> within their virtual address space".    
->>>
->>> I used "must" because it is always incorrect if the object is not the same.  How about:
->>>   The new vaddr must point to the same memory object as the old vaddr, but this is not
->>>   verified.  Violation of this constraint may result in memory corruption within the
->>>   host process and/or guest.  
->>
->> Since the "must" is not relative to the API but to the resulting
->> behavior, perhaps something like:
->>
->>   In order to maintain memory consistency within the user application,
->>   the updated vaddr must address the same memory object as originally
->>   mapped, failure to do so will result in user memory corruption and/or
->>   device misbehavior.
->>
->> Thanks,
->> Alex
->>
->>>>>  iova and size must match those in the original MAP_DMA call.
->>>>> + * Protection is not changed, and the READ & WRITE flags must be 0.    
->>>>
->>>> This doesn't mention that the entry must be previously
->>>> suspended/invalidated (if we choose to keep those semantics).  Thanks,    
->>>
->>> Will add, thanks.
->>>
->>> - Steve   
->>>>>   */
->>>>>  struct vfio_iommu_type1_dma_map {
->>>>>  	__u32	argsz;
->>>>>  	__u32	flags;
->>>>>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
->>>>>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
->>>>> +#define VFIO_DMA_MAP_FLAG_RESUME (1 << 2)
->>>>>  	__u64	vaddr;				/* Process virtual address */
->>>>>  	__u64	iova;				/* IO virtual address */
->>>>>  	__u64	size;				/* Size of mapping (bytes) */
->>>>> @@ -1084,11 +1094,17 @@ struct vfio_bitmap {
->>>>>   * indicates that the page at that offset from iova is dirty. A Bitmap of the
->>>>>   * pages in the range of unmapped size is returned in the user-provided
->>>>>   * vfio_bitmap.data.
->>>>> + *
->>>>> + * If flags & VFIO_DMA_UNMAP_FLAG_SUSPEND, do not unmap, but suspend vfio
->>>>> + * translation of host virtual addresses in the iova range.  During suspension,
->>>>> + * kernel threads that attempt to translate will block.  DMA to already-mapped
->>>>> + * pages continues.
->>>>>   */
->>>>>  struct vfio_iommu_type1_dma_unmap {
->>>>>  	__u32	argsz;
->>>>>  	__u32	flags;
->>>>>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
->>>>> +#define VFIO_DMA_UNMAP_FLAG_SUSPEND	     (1 << 1)
->>>>>  	__u64	iova;				/* IO virtual address */
->>>>>  	__u64	size;				/* Size of mapping (bytes) */
->>>>>  	__u8    data[];    
->>>>     
->>>   
->>
+>  	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
+>  		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
+>  	pmu->global_ctrl_mask = ~pmu->global_ctrl;
+> -- 
+> 2.29.2
 > 
