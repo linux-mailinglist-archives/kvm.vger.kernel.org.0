@@ -2,389 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E7DD2F4331
-	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 05:34:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97DC82F436B
+	for <lists+kvm@lfdr.de>; Wed, 13 Jan 2021 05:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725860AbhAMEd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 12 Jan 2021 23:33:28 -0500
-Received: from mga06.intel.com ([134.134.136.31]:33861 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725811AbhAMEd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 12 Jan 2021 23:33:28 -0500
-IronPort-SDR: iIErzqvfLUFY+xGPS+gBQyaCBHC3YSTW17apbhrUGEjxF0uNivN14WQ4kLLsia2g4oKVHZRf71
- raDDl10dY8Ig==
-X-IronPort-AV: E=McAfee;i="6000,8403,9862"; a="239689794"
-X-IronPort-AV: E=Sophos;i="5.79,343,1602572400"; 
-   d="scan'208";a="239689794"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 20:32:47 -0800
-IronPort-SDR: 8ooNuMzLxv8YhHQi155EJ/JtqznQS12MuNM+gNuGZLRMbWO7436ElmZtjtSEmxddV7kZ/FCE2V
- b8ZLTmvTNC+g==
-X-IronPort-AV: E=Sophos;i="5.79,343,1602572400"; 
-   d="scan'208";a="353311880"
-Received: from x48.bj.intel.com ([10.238.156.6])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2021 20:32:45 -0800
-Date:   Wed, 13 Jan 2021 12:37:13 +0800
-From:   Jason Zeng <jason.zeng@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Steven Sistare <steven.sistare@oracle.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V1 4/5] vfio: VA suspend interface
-Message-ID: <20210113043713.GA210175@x48.bj.intel.com>
-References: <1609861013-129801-1-git-send-email-steven.sistare@oracle.com>
- <1609861013-129801-5-git-send-email-steven.sistare@oracle.com>
- <20210108141549.071608a4@omen.home>
- <f40232ca-710f-1b65-1d21-564c3ecb62cc@oracle.com>
- <20210112154735.GA206071@x48.bj.intel.com>
- <20210112150914.0a83059d@omen.home.shazbot.org>
+        id S1726390AbhAME4d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 12 Jan 2021 23:56:33 -0500
+Received: from mail-eopbgr690042.outbound.protection.outlook.com ([40.107.69.42]:12578
+        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726342AbhAME4c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 12 Jan 2021 23:56:32 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LyeAbEO+UsoNaWnE2xHCEV4pDzwkcGTiudKDKlQ52QeF6bTPadTzf7DgiWUdnWMNOW0UhJBsy0CJZsu0cMk6qQOx2EOX8lwZajU3u7wwXQsA9OlJ+GoOT4yod1zeSCHhArf4uHana/99Qom1T+voKrz4QNMOVlTeh8SNKmJ+PRwDxxFTMNc1GJ0Dq6COe37x1YS0jjrAAavWM6ldagET9avOh3fFOqOKl+B7b/7yC8WU0biU0njDM4j4LmvD+GRr16xJ6HHLXhMig1zJlkRvhJIdTXeAGR4XInmnvEPmWNQZ18DbAZfqp3QoBdv3dXOvx/orGyp3tqkqs89Gf4EDHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=El8SAMhbM+uzfbmXAc6qrXp3sVP5MSyxglbXJnm1UCE=;
+ b=Phme0EgXGRY6JctSYyvqBX4yzTjMm6vsSnJ0Y6N/tv3f5rlzUlvAD/nlih9q6aZFA/IcQdFCjYBvnZYysOMe2v8JSna2wbNipjJ4a19hndDveVGGgclBxiI9BmI6Bsn9S7qVH2Q6kvNYm/HNE5HtYCJS5hJImD0NDcK8lNT/gQbFoGXHvLi/Oj1mPosvydzKJQYvADKM2F01y+IujhbrxA+/5eulo6ydUyZDESLMdJBZRXUubIY7IkI7LGO+6enVsJO3rkLcFdALWy+PTaNSgw/V+PTm/xINAlQ6WgtgbymXrY3zDLwfqkRa6RU1gkvQAIUUmXpvg5grb31BBuwmlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=El8SAMhbM+uzfbmXAc6qrXp3sVP5MSyxglbXJnm1UCE=;
+ b=UHv2mIa1jSY/ACzAXILiotEUNJX42aFU/fA6pEfQg58tEoxhxPNVso8Qz/KzmSPQR4m5xI+CFvln1+ImXueMe3Os7cGGV0t4S+1hsVGJ2G8VpgDZEjz0SG1X9oBc2J4hrWy2PZVH4PWg6/NiPqOlXVFQUwmIpvg9ylp2XUBS0j8=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com (2603:10b6:910:f::22)
+ by CY4PR1201MB2487.namprd12.prod.outlook.com (2603:10b6:903:d0::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3742.11; Wed, 13 Jan
+ 2021 04:55:43 +0000
+Received: from CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::25d2:a078:e7b:a819]) by CY4PR12MB1494.namprd12.prod.outlook.com
+ ([fe80::25d2:a078:e7b:a819%11]) with mapi id 15.20.3763.010; Wed, 13 Jan 2021
+ 04:55:42 +0000
+Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
+ VM instructions
+To:     Sean Christopherson <seanjc@google.com>,
+        Andy Lutomirski <luto@amacapital.net>
+Cc:     Bandan Das <bsd@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, dgilbert@redhat.com
+References: <jpgturmgnu6.fsf@linux.bootlegged.copy>
+ <8FAC639B-5EC6-42EE-B886-33AEF3CD5E26@amacapital.net>
+ <X/3i5Pjg1gEwupJD@google.com>
+From:   Wei Huang <wei.huang2@amd.com>
+Message-ID: <551670d3-3a0b-1a70-c586-6ab41b83094f@amd.com>
+Date:   Tue, 12 Jan 2021 22:55:39 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+In-Reply-To: <X/3i5Pjg1gEwupJD@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [70.113.46.183]
+X-ClientProxiedBy: SN6PR2101CA0027.namprd21.prod.outlook.com
+ (2603:10b6:805:106::37) To CY4PR12MB1494.namprd12.prod.outlook.com
+ (2603:10b6:910:f::22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210112150914.0a83059d@omen.home.shazbot.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.38] (70.113.46.183) by SN6PR2101CA0027.namprd21.prod.outlook.com (2603:10b6:805:106::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.0 via Frontend Transport; Wed, 13 Jan 2021 04:55:41 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 9e04b7f8-55c0-4a60-555e-08d8b77f7b45
+X-MS-TrafficTypeDiagnostic: CY4PR1201MB2487:
+X-Microsoft-Antispam-PRVS: <CY4PR1201MB248770B699DC88E6A20B5426CFA90@CY4PR1201MB2487.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iMpO3gGB1uXDttcWOZYx2Rc/bZvyDVVSba9k54c5+dmeJziQUTwXnPCRrfzev1P1puff5BaRy6QvP5tcNNpQSLFd2YNFKC+lUyQG+N6xaBGBd5gPa4Fy0dtIPrYZm6+yS/rs+gHuhM/nVMUt06kZA1M+khubLKfxSI+JvFd20TKKjlMSMyjvz56/KNN0ZFarE5BIo7UQHib9yTcfAO2ICn/TYocjfY/1HWb3xnqc2KGUkuLzNajlrrBVNF+DjToiEJiG5sv5tKwn4CgFnvHtpwwZ4TNYd3FlroB1ykLhTNNzz63+xE0DVEsOjL5echIB4+6r074UFzrBgx4t4FeBdqfsLla8Y+rVo0Zx2YqkjI/AJhJRcfplqOrKvwwZeDU9JyxPRmFKizvrjvMTS6ztlrHR3r893tKEsHhGu807n/Nq2NbiBTbw57ADBG74RjPRV1bAqU2zMBxmrwmqjFan4GN7Yvh5sOEDsjfq9Z8HzzY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR12MB1494.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(376002)(39860400002)(136003)(366004)(26005)(16526019)(6486002)(53546011)(2906002)(86362001)(4326008)(186003)(316002)(52116002)(8676002)(2616005)(16576012)(110136005)(478600001)(83380400001)(31696002)(31686004)(36756003)(66946007)(5660300002)(8936002)(66556008)(7416002)(956004)(66476007)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dG5WVG0yVm9WQ3VxZUtJRFhLemR3YTdjYW9JMlZIZTBtVkpqSndvMHBBMUJi?=
+ =?utf-8?B?V1RQVy9rWm5kajZaTURGSVRRL3ZPQWdqVTFrVFdkMnBVMjZITFc1eVp4cDNQ?=
+ =?utf-8?B?UzV6c3NrUFFwNUt6cTdpamsyNjRLeXpHSUVVc3B6V0RJZ0Q0V3puRXYyZzFl?=
+ =?utf-8?B?NnZTenpILzdGSXROREdYSnJyQis2K2ZNSnpTVEhzQWhGWVBtdjh0dlBGNXVt?=
+ =?utf-8?B?VjdPRkxpd0czN01KcE9EYmZEVW1INjFVSi9kM2VqQWpGN1BGSGF4QW5pK20z?=
+ =?utf-8?B?VS91M3RCd0xCbGZXd2FCZjVGZ2lVcGwyemg4cEhKQnlod0pxeEVYdGtLU1N3?=
+ =?utf-8?B?WGptRHZ0WVlnNHljQ1h0WkdLN0RrQXdlbmNiakJuVHAzemRuTjUxZEhvTFlR?=
+ =?utf-8?B?VUJ5T1d0VkNuTHFkZ0ZOR1FrSHpReVM4eWVTc1BpSFlvTDdVREFEQVBkQzR0?=
+ =?utf-8?B?NHk3cUluRTU2NXBqM1BqSytNazVuRXltVGhtMHk2WnpWWlJCV1Y5dlFudkp5?=
+ =?utf-8?B?Q0VzRFNpWTJWS3N4SzY5NUxwTWdDM0xxUU94STUrb21zVjdmWGpST0NjL0FG?=
+ =?utf-8?B?K3hnWG1kb3g2WEVGU0lOUGlnN2xXWHV5WlFnZXd6ejFDVDFvRnpIRWRpWGxw?=
+ =?utf-8?B?T05Qc2dwT2p4cEExNXloRk1LYzcycHVaTHVVY3Bwb1hIbk1xRWFqMWlDUGxh?=
+ =?utf-8?B?Vkd6MzJqdi96bDU3Y2JtajVFNnNLWHFLQ2tTMXozdllrc2UwK1djaXdnL3Uz?=
+ =?utf-8?B?alZhSzFWdlVQTzRQWE4zRGpRS3Jmai8yVGFLUVcxNnR5VmJSbjhJUnljTUd2?=
+ =?utf-8?B?M1RSaWtsVmRkQS95Mm5jNy9DZnFqeTJzNzNXWEdEOGJuczE2TDZuT0tDTWM4?=
+ =?utf-8?B?UUVNcFl3V0xOQ0hNTTEvaHpQdDJkbDRHeGo4NUgrcTFINHBZaHhnazB0UTRr?=
+ =?utf-8?B?MHIwbitCWXRBaHRHNGlNeS9PRE1QK1g0VTZHOSs5Z2s1aU9Ia1RNY0JpbGxi?=
+ =?utf-8?B?MzVRNHg4MGxQYU9qYW9yM0R2TFBqVnBCSlU2cnQrcmdaVkl4eG9NVzFCNXhq?=
+ =?utf-8?B?eFM2K3Y0dEZJWFhMV1h6Z1Z0YkttdzJTTXVaTUVsbEVuK1ptOHhZNjlZWDdT?=
+ =?utf-8?B?MklKbjd3Vk9rNGt5U0FPZndOSW5EbnIxUmsrY3lOVW9PQVpYTTB3SmY3b0Vj?=
+ =?utf-8?B?VGpGeDg2ZXJIV01VSXdVRFpnUm84YVZIbVNqVzhFaWtHTDEwQzRKak82YTNs?=
+ =?utf-8?B?RmF3ZVJhRHFTeVNWN2NUQTNleVh6VGp1UUJLeG10TG1PbUFURkUrWTNxUUxj?=
+ =?utf-8?Q?j6Z0K11r1oc5yypXG3ELbWH69ICAIDo+Cz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR12MB1494.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2021 04:55:42.8746
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e04b7f8-55c0-4a60-555e-08d8b77f7b45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: G8AluK6OPh29JCiLOX5KYbnPQ/eYo6IUdU7cHUSfS4es4usFEs2Zz0pZK15C4a+W
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB2487
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 03:09:14PM -0700, Alex Williamson wrote:
-> On Tue, 12 Jan 2021 23:47:35 +0800
-> Jason Zeng <jason.zeng@intel.com> wrote:
+
+
+On 1/12/21 11:56 AM, Sean Christopherson wrote:
+> On Tue, Jan 12, 2021, Andy Lutomirski wrote:
+>>
+>>> On Jan 12, 2021, at 7:46 AM, Bandan Das <bsd@redhat.com> wrote:
+>>>
+>>> ﻿Andy Lutomirski <luto@amacapital.net> writes:
+>>> ...
+>>>>>>>> #endif diff --git a/arch/x86/kvm/mmu/mmu.c
+>>>>>>>> b/arch/x86/kvm/mmu/mmu.c index 6d16481aa29d..c5c4aaf01a1a 100644
+>>>>>>>> --- a/arch/x86/kvm/mmu/mmu.c +++ b/arch/x86/kvm/mmu/mmu.c @@
+>>>>>>>> -50,6 +50,7 @@ #include <asm/io.h> #include <asm/vmx.h> #include
+>>>>>>>> <asm/kvm_page_track.h> +#include <asm/e820/api.h> #include
+>>>>>>>> "trace.h"
+>>>>>>>>
+>>>>>>>> extern bool itlb_multihit_kvm_mitigation; @@ -5675,6 +5676,12 @@
+>>>>>>>> void kvm_mmu_slot_set_dirty(struct kvm *kvm, }
+>>>>>>>> EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
+>>>>>>>>
+>>>>>>>> +bool kvm_is_host_reserved_region(u64 gpa) +{ + return
+>>>>>>>> e820__mbapped_raw_any(gpa-1, gpa+1, E820_TYPE_RESERVED); +}
+>>>>>>> While _e820__mapped_any()'s doc says '..  checks if any part of
+>>>>>>> the range <start,end> is mapped ..' it seems to me that the real
+>>>>>>> check is [start, end) so we should use 'gpa' instead of 'gpa-1',
+>>>>>>> no?
+>>>>>> Why do you need to check GPA at all?
+>>>>>>
+>>>>> To reduce the scope of the workaround.
+>>>>>
+>>>>> The errata only happens when you use one of SVM instructions in the
+>>>>> guest with EAX that happens to be inside one of the host reserved
+>>>>> memory regions (for example SMM).
+>>>>
+>>>> This code reduces the scope of the workaround at the cost of
+>>>> increasing the complexity of the workaround and adding a nonsensical
+>>>> coupling between KVM and host details and adding an export that really
+>>>> doesn’t deserve to be exported.
+>>>>
+>>>> Is there an actual concrete benefit to this check?
+>>>
+>>> Besides reducing the scope, my intention for the check was that we should
+>>> know if such exceptions occur for any other undiscovered reasons with other
+>>> memory types rather than hiding them under this workaround.
+>>
+>> Ask AMD?
+
+There are several checking before VMRUN launch. The function, 
+e820__mapped_raw_any(), was definitely one of the easies way to figure 
+out the problematic regions we had.
+
+>>
+>> I would also believe that someone somewhere has a firmware that simply omits
+>> the problematic region instead of listing it as reserved.
 > 
-> > On Mon, Jan 11, 2021 at 04:15:02PM -0500, Steven Sistare wrote:
-> > > On 1/8/2021 4:15 PM, Alex Williamson wrote:  
-> > > > On Tue,  5 Jan 2021 07:36:52 -0800
-> > > > Steve Sistare <steven.sistare@oracle.com> wrote:
-> > > >   
-> > > >> Add interfaces that allow the underlying memory object of an iova
-> > > >> range to be mapped to a new host virtual address in the host process:
-> > > >>
-> > > >>   - VFIO_DMA_UNMAP_FLAG_SUSPEND for VFIO_IOMMU_UNMAP_DMA
-> > > >>   - VFIO_DMA_MAP_FLAG_RESUME flag for VFIO_IOMMU_MAP_DMA
-> > > >>   - VFIO_SUSPEND extension for VFIO_CHECK_EXTENSION  
-> > > > 
-> > > > Suspend and Resume can imply many things other than what's done here.
-> > > > Should these be something more akin to INVALIDATE_VADDR and
-> > > > REPLACE_VADDR?  
-> > > 
-> > > Agreed.  I suspected we would discuss the names.  Some possibilities:
-> > > 
-> > > INVALIDATE_VADDR  REPLACE_VADDR
-> > > INV_VADDR         SET_VADDR
-> > > CLEAR_VADDR       SET_VADDR
-> > > SUSPEND_VADDR     RESUME_VADDR
-> > >   
-> > 
-> > What about SET_KEEPALIVE/CLEAR_KEEPALIVE? Vaddr can be updated as part
-> > of CLEAR_KEEPALIVE.
+> I agree with Andy, odds are very good that attempting to be precise will lead to
+> pain due to false negatives.
 > 
-> I prefer names that describe what they do, not an arbitrary use case.
+> And, KVM's SVM instruction emulation needs to be be rock solid regardless of
+> this behavior since KVM unconditionally intercepts the instruction, i.e. there's
+> basically zero risk to KVM.
 > 
 
-Yes, agree.
+Are you saying that the instruction decode before 
+kvm_is_host_reserved_region() already guarantee the instructions #GP hit 
+are SVM execution instructions (see below)? If so, I think this argument 
+is fair.
 
-> > Actually we are keeping the DMA mappings alive, instead of suspending
-> > them, when new Qemu are exec'ing, because the hardware can still do
-> > DMA during this period.
-> 
-> Why would they not stay alive when the vfio file descriptors remain
-> open and nothing has been unmapped?
->  
++	switch (ctxt->modrm) {
++	case 0xd8: /* VMRUN */
++	case 0xda: /* VMLOAD */
++	case 0xdb: /* VMSAVE */
 
-I was thinking usually we teardown vfio fds in normal cases when we
-switch the device ownership from one qemu to another qemu, which means
-device is not alive during the switching period. Here we keep these
-fds remaining open so they can be called keepalive. :)
+Bandan: What is your thoughts about removing kvm_is_host_reserved_region()?
 
-> > This name will also be friendly to VMM Fast Restart [1], which aims to
-> > kexec reboot host kernel while VMs are paused in memory and resumed
-> > seamlessly after the new kernel is ready.
-> > 
-> > The VMM Fast Restart scenario is as such: Before kexec-reboot,
-> > SET_KEEPALIVE is issued to set keepalive flag for VFIO DMA mapping
-> > entries, so that their underlying IOMMU DMA mappings will not be
-> > destroyed when Qemu quits before kexec-reboot. After kexec-reboot,
-> > the VFIO DMA mappings are restored together with its keepalive flag
-> > in the new kernel so that new Qemu can do CLEAR_KEEPALIVE operation.
-> 
-> That entails far more than simply invalidating vaddr.  We need to have
-> a very specific uapi, it's difficult to expand the scope of a flag
-> when/if such features are ever proposed upstream.  Thanks,
-> 
-
-Agree, thanks!
-
-Jason
-
-> Alex
-> 
-> > > >> The suspend interface blocks vfio translation of host virtual
-> > > >> addresses in a range, but DMA to already-mapped pages continues.
-> > > >> The resume interface records the new base VA and resumes translation.
-> > > >> See comments in uapi/linux/vfio.h for more details.
-> > > >>
-> > > >> This is a partial implementation.  Blocking is added in the next patch.
-> > > >>
-> > > >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> > > >> ---
-> > > >>  drivers/vfio/vfio_iommu_type1.c | 47 +++++++++++++++++++++++++++++++++++------
-> > > >>  include/uapi/linux/vfio.h       | 16 ++++++++++++++
-> > > >>  2 files changed, 57 insertions(+), 6 deletions(-)
-> > > >>
-> > > >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > >> index 3dc501d..2c164a6 100644
-> > > >> --- a/drivers/vfio/vfio_iommu_type1.c
-> > > >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > >> @@ -92,6 +92,7 @@ struct vfio_dma {
-> > > >>  	int			prot;		/* IOMMU_READ/WRITE */
-> > > >>  	bool			iommu_mapped;
-> > > >>  	bool			lock_cap;	/* capable(CAP_IPC_LOCK) */
-> > > >> +	bool			suspended;  
-> > > > 
-> > > > Is there a value we could use for vfio_dma.vaddr that would always be
-> > > > considered invalid, ex. ULONG_MAX?    
-> > > 
-> > > Yes, that could replace the suspend flag.  That, plus changing the language from suspend
-> > > to invalidate, will probably yield equally understandable code.  I'll try it.
-> > >   
-> > > > We'd need to decide if we want to
-> > > > allow users to create mappings (mdev-only) using an initial invalid
-> > > > vaddr.  
-> > > 
-> > > Maybe.  Not sure yet.
-> > >   
-> > > >>  	struct task_struct	*task;
-> > > >>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
-> > > >>  	unsigned long		*bitmap;
-> > > >> @@ -1080,7 +1081,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > > >>  	int ret = 0, retries = 0;
-> > > >>  	unsigned long pgshift;
-> > > >>  	dma_addr_t iova;
-> > > >> -	unsigned long size;
-> > > >> +	unsigned long size, consumed;  
-> > > > 
-> > > > This could be scoped into the branch below.  
-> > > 
-> > > OK.
-> > >   
-> > > >>  	mutex_lock(&iommu->lock);
-> > > >>  
-> > > >> @@ -1169,6 +1170,21 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> > > >>  		if (dma->task->mm != current->mm)
-> > > >>  			break;
-> > > >>  
-> > > >> +		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_SUSPEND) {
-> > > >> +			if (dma->suspended) {
-> > > >> +				ret = -EINVAL;
-> > > >> +				goto unlock;
-> > > >> +			}  
-> > > > 
-> > > > This leaves us in a state where we marked some entries but not others.
-> > > > We should either unwind or... what's the actual harm in skipping these?  
-> > > 
-> > > We could skip them with no ill effect.  However, it likely means the app is confused
-> > > and potentially broken, and it would be courteous to inform them so.  I found such bugs
-> > > in qemu as I was developing this feature.
-> > > 
-> > > IMO unwinding does not help the app, and adds unnecessary code.  It can still leave some
-> > > ranges suspended and some not.  The safest recovery is for the app to exit, and tell the 
-> > > developer to fix the redundant suspend call.
-> > >   
-> > > >> +			dma->suspended = true;
-> > > >> +			consumed = dma->iova + dma->size - iova;
-> > > >> +			if (consumed >= size)
-> > > >> +				break;
-> > > >> +			iova += consumed;
-> > > >> +			size -= consumed;
-> > > >> +			unmapped += dma->size;
-> > > >> +			continue;
-> > > >> +		}  
-> > > > 
-> > > > This short-cuts the dirty bitmap flag, so we need to decide if it's
-> > > > legal to call them together or we need to prevent it... Oh, I see
-> > > > you've excluded them earlier below.
-> > > >   
-> > > >> +
-> > > >>  		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
-> > > >>  			struct vfio_iommu_type1_dma_unmap nb_unmap;
-> > > >>  
-> > > >> @@ -1307,6 +1323,7 @@ static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
-> > > >>  static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > > >>  			   struct vfio_iommu_type1_dma_map *map)
-> > > >>  {
-> > > >> +	bool resume = map->flags & VFIO_DMA_MAP_FLAG_RESUME;
-> > > >>  	dma_addr_t iova = map->iova;
-> > > >>  	unsigned long vaddr = map->vaddr;
-> > > >>  	size_t size = map->size;
-> > > >> @@ -1324,13 +1341,16 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > > >>  	if (map->flags & VFIO_DMA_MAP_FLAG_READ)
-> > > >>  		prot |= IOMMU_READ;
-> > > >>  
-> > > >> +	if ((prot && resume) || (!prot && !resume))
-> > > >> +		return -EINVAL;
-> > > >> +
-> > > >>  	mutex_lock(&iommu->lock);
-> > > >>  
-> > > >>  	pgsize = (size_t)1 << __ffs(iommu->pgsize_bitmap);
-> > > >>  
-> > > >>  	WARN_ON((pgsize - 1) & PAGE_MASK);
-> > > >>  
-> > > >> -	if (!prot || !size || (size | iova | vaddr) & (pgsize - 1)) {
-> > > >> +	if (!size || (size | iova | vaddr) & (pgsize - 1)) {
-> > > >>  		ret = -EINVAL;
-> > > >>  		goto out_unlock;
-> > > >>  	}
-> > > >> @@ -1341,7 +1361,19 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
-> > > >>  		goto out_unlock;
-> > > >>  	}
-> > > >>  
-> > > >> -	if (vfio_find_dma(iommu, iova, size)) {
-> > > >> +	dma = vfio_find_dma(iommu, iova, size);
-> > > >> +	if (resume) {
-> > > >> +		if (!dma) {
-> > > >> +			ret = -ENOENT;
-> > > >> +		} else if (!dma->suspended || dma->iova != iova ||
-> > > >> +			   dma->size != size) {  
-> > > > 
-> > > > Why is it necessary that the vfio_dma be suspended before being
-> > > > resumed?  Couldn't a user simply use this to change the vaddr?  Does
-> > > > that promote abusive use?  
-> > > 
-> > > This would almost always be incorrect.  If the vaddr changes, then the old vaddr was already
-> > > invalidated, and there is a window where it is not OK for kernel code to use the old vaddr.
-> > > This could only be safe if the memory object is mapped at both the old vaddr and the new
-> > > vaddr concurrently, which is an unlikely use case.
-> > >   
-> > > >> +			ret = -EINVAL;
-> > > >> +		} else {
-> > > >> +			dma->vaddr = vaddr;  
-> > > > 
-> > > > Seems like there's a huge opportunity for a user to create coherency
-> > > > issues here... it's their data though I guess.  
-> > > 
-> > > Yes.  That's what the language in the uapi about mapping the same memory object is about.
-> > >   
-> > > >> +			dma->suspended = false;
-> > > >> +		}
-> > > >> +		goto out_unlock;
-> > > >> +	} else if (dma) {
-> > > >>  		ret = -EEXIST;
-> > > >>  		goto out_unlock;
-> > > >>  	}
-> > > >> @@ -2532,6 +2564,7 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
-> > > >>  	case VFIO_TYPE1_IOMMU:
-> > > >>  	case VFIO_TYPE1v2_IOMMU:
-> > > >>  	case VFIO_TYPE1_NESTING_IOMMU:
-> > > >> +	case VFIO_SUSPEND:
-> > > >>  		return 1;
-> > > >>  	case VFIO_DMA_CC_IOMMU:
-> > > >>  		if (!iommu)
-> > > >> @@ -2686,7 +2719,8 @@ static int vfio_iommu_type1_map_dma(struct vfio_iommu *iommu,
-> > > >>  {
-> > > >>  	struct vfio_iommu_type1_dma_map map;
-> > > >>  	unsigned long minsz;
-> > > >> -	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE;
-> > > >> +	uint32_t mask = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE |
-> > > >> +			VFIO_DMA_MAP_FLAG_RESUME;
-> > > >>  
-> > > >>  	minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
-> > > >>  
-> > > >> @@ -2704,6 +2738,8 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
-> > > >>  {
-> > > >>  	struct vfio_iommu_type1_dma_unmap unmap;
-> > > >>  	struct vfio_bitmap bitmap = { 0 };
-> > > >> +	uint32_t mask = VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP |
-> > > >> +			VFIO_DMA_UNMAP_FLAG_SUSPEND;
-> > > >>  	unsigned long minsz;
-> > > >>  	int ret;
-> > > >>  
-> > > >> @@ -2712,8 +2748,7 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
-> > > >>  	if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> > > >>  		return -EFAULT;
-> > > >>  
-> > > >> -	if (unmap.argsz < minsz ||
-> > > >> -	    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
-> > > >> +	if (unmap.argsz < minsz || unmap.flags & ~mask || unmap.flags == mask)  
-> > > > 
-> > > > Maybe a short comment here to note that dirty-bimap and
-> > > > suspend/invalidate are mutually exclusive.  Probably should be
-> > > > mentioned in the uapi too.  
-> > > 
-> > > Will do, for both.
-> > >   
-> > > >>  		return -EINVAL;
-> > > >>  
-> > > >>  	if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
-> > > >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > >> index 896e527..fcf7b56 100644
-> > > >> --- a/include/uapi/linux/vfio.h
-> > > >> +++ b/include/uapi/linux/vfio.h
-> > > >> @@ -46,6 +46,9 @@
-> > > >>   */
-> > > >>  #define VFIO_NOIOMMU_IOMMU		8
-> > > >>  
-> > > >> +/* Supports VFIO DMA suspend and resume */
-> > > >> +#define VFIO_SUSPEND			9
-> > > >> +
-> > > >>  /*
-> > > >>   * The IOCTL interface is designed for extensibility by embedding the
-> > > >>   * structure length (argsz) and flags into structures passed between
-> > > >> @@ -1046,12 +1049,19 @@ struct vfio_iommu_type1_info_cap_migration {
-> > > >>   *
-> > > >>   * Map process virtual addresses to IO virtual addresses using the
-> > > >>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
-> > > >> + *
-> > > >> + * If flags & VFIO_DMA_MAP_FLAG_RESUME, record the new base vaddr for iova, and
-> > > >> + * resume translation of host virtual addresses in the iova range.  The new
-> > > >> + * vaddr must point to the same memory object as the old vaddr, but this is not
-> > > >> + * verified.  
-> > > > 
-> > > > It's hard to use "must" terminology here if we're not going to check.
-> > > > Maybe the phrasing should be something more along the lines of "should
-> > > > point to the same memory object or the user risks coherency issues
-> > > > within their virtual address space".  
-> > > 
-> > > I used "must" because it is always incorrect if the object is not the same.  How about:
-> > >   The new vaddr must point to the same memory object as the old vaddr, but this is not
-> > >   verified.  Violation of this constraint may result in memory corruption within the
-> > >   host process and/or guest.
-> > >   
-> > > >>  iova and size must match those in the original MAP_DMA call.
-> > > >> + * Protection is not changed, and the READ & WRITE flags must be 0.  
-> > > > 
-> > > > This doesn't mention that the entry must be previously
-> > > > suspended/invalidated (if we choose to keep those semantics).  Thanks,  
-> > > 
-> > > Will add, thanks.
-> > > 
-> > > - Steve   
-> > > >>   */
-> > > >>  struct vfio_iommu_type1_dma_map {
-> > > >>  	__u32	argsz;
-> > > >>  	__u32	flags;
-> > > >>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
-> > > >>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
-> > > >> +#define VFIO_DMA_MAP_FLAG_RESUME (1 << 2)
-> > > >>  	__u64	vaddr;				/* Process virtual address */
-> > > >>  	__u64	iova;				/* IO virtual address */
-> > > >>  	__u64	size;				/* Size of mapping (bytes) */
-> > > >> @@ -1084,11 +1094,17 @@ struct vfio_bitmap {
-> > > >>   * indicates that the page at that offset from iova is dirty. A Bitmap of the
-> > > >>   * pages in the range of unmapped size is returned in the user-provided
-> > > >>   * vfio_bitmap.data.
-> > > >> + *
-> > > >> + * If flags & VFIO_DMA_UNMAP_FLAG_SUSPEND, do not unmap, but suspend vfio
-> > > >> + * translation of host virtual addresses in the iova range.  During suspension,
-> > > >> + * kernel threads that attempt to translate will block.  DMA to already-mapped
-> > > >> + * pages continues.
-> > > >>   */
-> > > >>  struct vfio_iommu_type1_dma_unmap {
-> > > >>  	__u32	argsz;
-> > > >>  	__u32	flags;
-> > > >>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
-> > > >> +#define VFIO_DMA_UNMAP_FLAG_SUSPEND	     (1 << 1)
-> > > >>  	__u64	iova;				/* IO virtual address */
-> > > >>  	__u64	size;				/* Size of mapping (bytes) */
-> > > >>  	__u8    data[];  
-> > > >   
-> > 
-> 
