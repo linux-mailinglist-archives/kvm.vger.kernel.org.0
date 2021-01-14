@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 721362F5614
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:57:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC83F2F561E
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:57:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727788AbhANBln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 20:41:43 -0500
-Received: from mga05.intel.com ([192.55.52.43]:51491 "EHLO mga05.intel.com"
+        id S1727860AbhANBlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 20:41:49 -0500
+Received: from mga11.intel.com ([192.55.52.93]:41684 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727184AbhANBlm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jan 2021 20:41:42 -0500
-IronPort-SDR: mH9n4n3hcY8emYU04IYSsu3z9oSu6hiCVzgmjJKqZT+cQUnS4eIITShvvN7cbsvhfm0W8NRKLO
- Vwvo/pr3A3bg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9863"; a="263084524"
+        id S1727823AbhANBls (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 20:41:48 -0500
+IronPort-SDR: RaUoTjZiBmCHui8xFVLFb7sem/iA1FvA2IWD8DR+x7eeE+QFNzS8WyOXWMBp1L9G3KKj6Zhos9
+ eCCMVv1YBgtw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9863"; a="174786159"
 X-IronPort-AV: E=Sophos;i="5.79,345,1602572400"; 
-   d="scan'208";a="263084524"
+   d="scan'208";a="174786159"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2021 17:38:18 -0800
-IronPort-SDR: 70ByEuj6ZUTxoobpwmM7DnqLWj+gPglSHAzdk1Zcl51BXOPdoBO9ptYytiJ7aJ9FshTQjUNI11
- 332Cn7+I7AeA==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2021 17:38:24 -0800
+IronPort-SDR: pn1dl9IBHiG0ZLke/ddfHTH+J+J3s550xpbrnvKnzRL+7+3/XUH1L9nveDzCPWCvl1SxaA/1R9
+ Wyo+suoELB9A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.79,345,1602572400"; 
-   d="scan'208";a="569582482"
+   d="scan'208";a="569582521"
 Received: from allen-box.sh.intel.com ([10.239.159.28])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Jan 2021 17:38:11 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 13 Jan 2021 17:38:18 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     tglx@linutronix.de, ashok.raj@intel.com, kevin.tian@intel.com,
         dave.jiang@intel.com, megha.dey@intel.com, dwmw2@infradead.org
@@ -40,65 +40,99 @@ Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
         shahafs@mellanox.com, tony.luck@intel.com, vkoul@kernel.org,
         yan.y.zhao@linux.intel.com, yi.l.liu@intel.com, leon@kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [RFC PATCH v3 0/2] Add platform check for subdevice irq domain
-Date:   Thu, 14 Jan 2021 09:30:01 +0800
-Message-Id: <20210114013003.297050-1-baolu.lu@linux.intel.com>
+Subject: [RFC PATCH v3 1/2] iommu: Add capability IOMMU_CAP_VIOMMU
+Date:   Thu, 14 Jan 2021 09:30:02 +0800
+Message-Id: <20210114013003.297050-2-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210114013003.297050-1-baolu.lu@linux.intel.com>
+References: <20210114013003.297050-1-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Some vendor IOMMU drivers are able to declare that it is running in a VM
+context. This is very valuable for the features that only want to be
+supported on bare metal. Add a capability bit so that it could be used.
 
-Learnt from the discussions in this thread:
-
-https://lore.kernel.org/linux-pci/160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com/
-
-The device IMS (Interrupt Message Storage) should not be enabled in any
-virtualization environments unless there is a HYPERCALL domain which
-makes the changes in the message store monitored by the hypervisor.
-
-As the initial step, we allow the IMS to be enabled only if we are
-running on the bare metal. It's easy to enable IMS in the virtualization
-environments if above preconditions are met in the future.
-
-This series is only for comments purpose. We will include it in the Intel
-IMS implementation later once we reach a consensus.
-
-Change log:
-v2->v3:
- - v2:
-   https://lore.kernel.org/linux-pci/20210106022749.2769057-1-baolu.lu@linux.intel.com/
- - Add all identified heuristics so far.
-
-v1->v2:
- - v1:
-   https://lore.kernel.org/linux-pci/20201210004624.345282-1-baolu.lu@linux.intel.com/
- - Rename probably_on_bare_metal() with on_bare_metal();
- - Some vendors might use the same name for both bare metal and virtual
-   environment. Before we add vendor specific code to distinguish
-   between them, let's return false in on_bare_metal(). This won't
-   introduce any regression. The only impact is that the coming new
-   platform msi feature won't be supported until the vendor specific code
-   is provided.
-
-Best regards,
-baolu
-
-Lu Baolu (2):
-  iommu: Add capability IOMMU_CAP_VIOMMU
-  platform-msi: Add platform check for subdevice irq domain
-
- arch/x86/pci/common.c        | 71 ++++++++++++++++++++++++++++++++++++
- drivers/base/platform-msi.c  |  8 ++++
- drivers/iommu/intel/iommu.c  | 20 ++++++++++
- drivers/iommu/virtio-iommu.c |  9 +++++
+Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+ drivers/iommu/intel/iommu.c  | 20 ++++++++++++++++++++
+ drivers/iommu/virtio-iommu.c |  9 +++++++++
  include/linux/iommu.h        |  1 +
- include/linux/msi.h          |  1 +
- 6 files changed, 110 insertions(+)
+ 3 files changed, 30 insertions(+)
 
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index cb205a04fe4c..8eb022d0e8aa 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -5738,12 +5738,32 @@ static inline bool nested_mode_support(void)
+ 	return ret;
+ }
+ 
++static inline bool caching_mode_enabled(void)
++{
++	struct dmar_drhd_unit *drhd;
++	struct intel_iommu *iommu;
++	bool ret = false;
++
++	rcu_read_lock();
++	for_each_active_iommu(iommu, drhd) {
++		if (cap_caching_mode(iommu->cap)) {
++			ret = true;
++			break;
++		}
++	}
++	rcu_read_unlock();
++
++	return ret;
++}
++
+ static bool intel_iommu_capable(enum iommu_cap cap)
+ {
+ 	if (cap == IOMMU_CAP_CACHE_COHERENCY)
+ 		return domain_update_iommu_snooping(NULL) == 1;
+ 	if (cap == IOMMU_CAP_INTR_REMAP)
+ 		return irq_remapping_enabled == 1;
++	if (cap == IOMMU_CAP_VIOMMU)
++		return caching_mode_enabled();
+ 
+ 	return false;
+ }
+diff --git a/drivers/iommu/virtio-iommu.c b/drivers/iommu/virtio-iommu.c
+index 2bfdd5734844..719793e103db 100644
+--- a/drivers/iommu/virtio-iommu.c
++++ b/drivers/iommu/virtio-iommu.c
+@@ -931,7 +931,16 @@ static int viommu_of_xlate(struct device *dev, struct of_phandle_args *args)
+ 	return iommu_fwspec_add_ids(dev, args->args, 1);
+ }
+ 
++static bool viommu_capable(enum iommu_cap cap)
++{
++	if (cap == IOMMU_CAP_VIOMMU)
++		return true;
++
++	return false;
++}
++
+ static struct iommu_ops viommu_ops = {
++	.capable		= viommu_capable,
+ 	.domain_alloc		= viommu_domain_alloc,
+ 	.domain_free		= viommu_domain_free,
+ 	.attach_dev		= viommu_attach_dev,
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index b95a6f8db6ff..1d24be667a03 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -94,6 +94,7 @@ enum iommu_cap {
+ 					   transactions */
+ 	IOMMU_CAP_INTR_REMAP,		/* IOMMU supports interrupt isolation */
+ 	IOMMU_CAP_NOEXEC,		/* IOMMU_NOEXEC flag */
++	IOMMU_CAP_VIOMMU,		/* IOMMU can declar running in a VM */
+ };
+ 
+ /*
 -- 
 2.25.1
 
