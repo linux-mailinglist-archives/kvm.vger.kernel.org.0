@@ -2,85 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8BBC2F5F65
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 11:58:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F0E2F5F7B
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:07:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbhANK6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 05:58:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37420 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727897AbhANK6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 05:58:12 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726943AbhANLHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 06:07:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26814 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727035AbhANLHP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:07:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610622348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=w0t9KNBW719KqSBBRiKm1OOkRuT/H8cDJko5n3JxpRU=;
+        b=K5KAV0IDOeksq3ZdCarPGFcnThSVuDYnoS7SWSrYHrIZvaPgbj8zdb5KTNcDoU1cCSWbSw
+        6KT6Wrd5KvH+Jiwf959YYE3XZhnsc4mr13Hrr4skFnyIlidB/ZrGneVDbf94nc6P3eUyT6
+        reDGYj6fxByFMK5qC7yfpShRS7mQZ5U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-DB3O3zhCMqaZ032klP1_Ow-1; Thu, 14 Jan 2021 06:05:46 -0500
+X-MC-Unique: DB3O3zhCMqaZ032klP1_Ow-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EC44E23A56;
-        Thu, 14 Jan 2021 10:56:53 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l00JA-007Tvz-7m; Thu, 14 Jan 2021 10:56:52 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
-Date:   Thu, 14 Jan 2021 10:56:33 +0000
-Message-Id: <20210114105633.2558739-7-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210114105633.2558739-1-maz@kernel.org>
-References: <20210114105633.2558739-1-maz@kernel.org>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94702100F340;
+        Thu, 14 Jan 2021 11:05:44 +0000 (UTC)
+Received: from gondolin (ovpn-114-65.ams2.redhat.com [10.36.114.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 36ADA71D60;
+        Thu, 14 Jan 2021 11:05:34 +0000 (UTC)
+Date:   Thu, 14 Jan 2021 12:05:31 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
+        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, rth@twiddle.net, berrange@redhat.com,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
+        pbonzini@redhat.com
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20210114120531.3c7f350e.cohuck@redhat.com>
+In-Reply-To: <db2295ce-333f-2a3e-8219-bfa4853b256f@de.ibm.com>
+References: <20201217151530.54431f0e@bahia.lan>
+        <20201218124111.4957eb50.cohuck@redhat.com>
+        <20210104071550.GA22585@ram-ibm-com.ibm.com>
+        <20210104134629.49997b53.pasic@linux.ibm.com>
+        <20210104184026.GD4102@ram-ibm-com.ibm.com>
+        <20210105115614.7daaadd6.pasic@linux.ibm.com>
+        <20210105204125.GE4102@ram-ibm-com.ibm.com>
+        <20210111175914.13adfa2e.cohuck@redhat.com>
+        <20210113124226.GH2938@work-vm>
+        <6e02e8d5-af4b-624b-1a12-d03b9d554a41@de.ibm.com>
+        <20210114103643.GD2905@work-vm>
+        <db2295ce-333f-2a3e-8219-bfa4853b256f@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
-pretty easy. All that is required is support for PMMIR_EL1, which
-is read-only, and for which returning 0 is a valid option.
+On Thu, 14 Jan 2021 11:52:11 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Let's just do that and adjust what we return to the guest.
+> On 14.01.21 11:36, Dr. David Alan Gilbert wrote:
+> > * Christian Borntraeger (borntraeger@de.ibm.com) wrote:  
+> >>
+> >>
+> >> On 13.01.21 13:42, Dr. David Alan Gilbert wrote:  
+> >>> * Cornelia Huck (cohuck@redhat.com) wrote:  
+> >>>> On Tue, 5 Jan 2021 12:41:25 -0800
+> >>>> Ram Pai <linuxram@us.ibm.com> wrote:
+> >>>>  
+> >>>>> On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:  
+> >>>>>> On Mon, 4 Jan 2021 10:40:26 -0800
+> >>>>>> Ram Pai <linuxram@us.ibm.com> wrote:  
+> >>>>  
+> >>>>>>> The main difference between my proposal and the other proposal is...
+> >>>>>>>
+> >>>>>>>   In my proposal the guest makes the compatibility decision and acts
+> >>>>>>>   accordingly.  In the other proposal QEMU makes the compatibility
+> >>>>>>>   decision and acts accordingly. I argue that QEMU cannot make a good
+> >>>>>>>   compatibility decision, because it wont know in advance, if the guest
+> >>>>>>>   will or will-not switch-to-secure.
+> >>>>>>>     
+> >>>>>>
+> >>>>>> You have a point there when you say that QEMU does not know in advance,
+> >>>>>> if the guest will or will-not switch-to-secure. I made that argument
+> >>>>>> regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
+> >>>>>> was to flip that property on demand when the conversion occurs. David
+> >>>>>> explained to me that this is not possible for ppc, and that having the
+> >>>>>> "securable-guest-memory" property (or whatever the name will be)
+> >>>>>> specified is a strong indication, that the VM is intended to be used as
+> >>>>>> a secure VM (thus it is OK to hurt the case where the guest does not
+> >>>>>> try to transition). That argument applies here as well.    
+> >>>>>
+> >>>>> As suggested by Cornelia Huck, what if QEMU disabled the
+> >>>>> "securable-guest-memory" property if 'must-support-migrate' is enabled?
+> >>>>> Offcourse; this has to be done with a big fat warning stating
+> >>>>> "secure-guest-memory" feature is disabled on the machine.
+> >>>>> Doing so, will continue to support guest that do not try to transition.
+> >>>>> Guest that try to transition will fail and terminate themselves.  
+> >>>>
+> >>>> Just to recap the s390x situation:
+> >>>>
+> >>>> - We currently offer a cpu feature that indicates secure execution to
+> >>>>   be available to the guest if the host supports it.
+> >>>> - When we introduce the secure object, we still need to support
+> >>>>   previous configurations and continue to offer the cpu feature, even
+> >>>>   if the secure object is not specified.
+> >>>> - As migration is currently not supported for secured guests, we add a
+> >>>>   blocker once the guest actually transitions. That means that
+> >>>>   transition fails if --only-migratable was specified on the command
+> >>>>   line. (Guests not transitioning will obviously not notice anything.)
+> >>>> - With the secure object, we will already fail starting QEMU if
+> >>>>   --only-migratable was specified.
+> >>>>
+> >>>> My suggestion is now that we don't even offer the cpu feature if
+> >>>> --only-migratable has been specified. For a guest that does not want to
+> >>>> transition to secure mode, nothing changes; a guest that wants to
+> >>>> transition to secure mode will notice that the feature is not available
+> >>>> and fail appropriately (or ultimately, when the ultravisor call fails).
+> >>>> We'd still fail starting QEMU for the secure object + --only-migratable
+> >>>> combination.
+> >>>>
+> >>>> Does that make sense?  
+> >>>
+> >>> It's a little unusual; I don't think we have any other cases where
+> >>> --only-migratable changes the behaviour; I think it normally only stops
+> >>> you doing something that would have made it unmigratable or causes
+> >>> an operation that would make it unmigratable to fail.  
+> >>
+> >> I would like to NOT block this feature with --only-migrateable. A guest
+> >> can startup unprotected (and then is is migrateable). the migration blocker
+> >> is really a dynamic aspect during runtime.   
+> > 
+> > But the point of --only-migratable is to turn things that would have
+> > blocked migration into failures, so that a VM started with
+> > --only-migratable is *always* migratable.  
+> 
+> Hmmm, fair enough. How do we do this with host-model? The constructed model
+> would contain unpack, but then it will fail to startup? Or do we silently 
+> drop unpack in that case? Both variants do not feel completely right. 
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8f79ec1fffa7..2f4ecbd2abfb 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		/* Limit debug to ARMv8.0 */
- 		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
- 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
--		/* Limit guests to PMUv3 for ARMv8.1 */
-+		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
--						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
-+						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
- 		break;
- 	case SYS_ID_DFR0_EL1:
- 		/* Limit guests to PMUv3 for ARMv8.1 */
-@@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
- 	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-+	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
- 
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
--- 
-2.29.2
+Failing if you explicitly specified unpacked feels right, but failing
+if you just used the host model feels odd. Removing unpack also is a
+bit odd, but I think the better option if we want to do anything about
+it at all.
 
