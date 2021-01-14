@@ -2,287 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 794E02F69AF
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 19:39:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FED22F6A2D
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 19:57:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727705AbhANSgT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 13:36:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60768 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726066AbhANSgT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 13:36:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610649291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QY3IRl/nnM22IxYFUPumJu34lW3YhvOG72y6zzPx23s=;
-        b=bNFBXdgUZdwzLNm3fswapL1V/Ed0+O4dhbwTjATGSkYOCSIY/2AnlCs/7MdPkoVEUixGHk
-        +zfQlFxAuybk9wEVN25OewLx5xC/YHIlToqznklvmQJJ5O+xqsL6u8RjDO4bn7v/GELMjf
-        GIdMGghibCyycJelhUxq0/Hjqm8Pp18=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-3gO_IOXnPYe7ohbAGeMSRQ-1; Thu, 14 Jan 2021 13:34:48 -0500
-X-MC-Unique: 3gO_IOXnPYe7ohbAGeMSRQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE129190A7A1;
-        Thu, 14 Jan 2021 18:34:46 +0000 (UTC)
-Received: from work-vm (ovpn-115-29.ams2.redhat.com [10.36.115.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 07C9160C6B;
-        Thu, 14 Jan 2021 18:34:44 +0000 (UTC)
-Date:   Thu, 14 Jan 2021 18:34:42 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>, dgibson@redhat.com
-Cc:     qemu-devel@nongnu.org, Tom Lendacky <Thomas.Lendacky@amd.com>,
-        kvm@vger.kernel.org, James Bottomley <jejb@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] target/i386/sev: add the support to query the
- attestation report
-Message-ID: <20210114183442.GB2906@work-vm>
-References: <20201204213101.14552-1-brijesh.singh@amd.com>
+        id S1729344AbhANS4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 13:56:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37954 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727130AbhANS4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 13:56:14 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AA9C061757
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 10:55:34 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id b5so3743990pjl.0
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 10:55:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BZd5vz4hy8Xv+MkxlJJ7ylWIWD/7dL9BLPaHzk7fwBc=;
+        b=C2sF1sIAUAJVx9PwWWwp02Cw3l3B0u/TrqSSltHVQ9OjN7DXJYO7ZtFBcEH1AFHB1j
+         v/waeY6VTZlJJ9p/7QbkMFLAfNuHb/mwxy66ZX4QhI+QVjc5Jc/aMwQ1MfVYDw8kTuMz
+         8I3M8NnbcqDq27BkDm08ayDSChTXb4hBC9Wf6Yz5GqQj34UNP+ygcPvEbtwJO8Ok3kRX
+         Rc+aInAhPqOblsd4T+yD3tuM/lecpBfOM8kU921D8IDxh94HzIl87AioKSrP8Go/iFpe
+         CjdyFFzBGot82Nj5F98G76i46WLJsLBp1cxe/aACXumSfygwbsEmkOx+RE38m//2iAVP
+         wDfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BZd5vz4hy8Xv+MkxlJJ7ylWIWD/7dL9BLPaHzk7fwBc=;
+        b=P2YVBaYVnfoEVnh/0ouW2Nm8NQ49hofAVAN97lM718y/17JiE7CblwTqaAdOyBt4hf
+         sNAN6zpr1tZZsir6oAvGWJfEweD662rd205M1nQxLBZAZr0PCcP3QAKwB/4/TSFxiaHp
+         7b8bTYyH0YeqWW42CXArd3noQusjXWSfMm3dUhFKyRGkcfZGeXIZxDLYQwIneDXJTZFj
+         hyzL4N0Dbwgy7AVeMkUz3PuKct+x3sXFd1FdffqKinEnft7Mx/PNmIMz+8Q9ovX2okmV
+         4YlnWFkhmWUfteufV1AQO2djql9/xhUCNiwt5++w4QoNSKoV8lzzwQZWiNI/LPKKkLJH
+         Ywkw==
+X-Gm-Message-State: AOAM533K+4GIdVshMA4OSoTMkB7LRHq+DnzbHJnjW/eZxJq3adu04ESB
+        TWU5bq4i6ScdrCv46+qqGSj0y0QJUOxTcw==
+X-Google-Smtp-Source: ABdhPJybpMzaxPsT4F0zX42TRtgXkpt7IELZ8MQWQhB4kA8effHT+847pPFm3sA0tjsEsCdnKa78OA==
+X-Received: by 2002:a17:902:bf06:b029:dc:1f:ac61 with SMTP id bi6-20020a170902bf06b02900dc001fac61mr8924128plb.16.1610650534057;
+        Thu, 14 Jan 2021 10:55:34 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id p17sm5782386pfn.52.2021.01.14.10.55.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jan 2021 10:55:33 -0800 (PST)
+Date:   Thu, 14 Jan 2021 10:55:26 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/17] perf: x86/ds: Handle guest PEBS overflow PMI
+ and inject it to guest
+Message-ID: <YACTnkdi1rxfrRCg@google.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-5-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201204213101.14552-1-brijesh.singh@amd.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20210104131542.495413-5-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Brijesh Singh (brijesh.singh@amd.com) wrote:
-> The SEV FW >= 0.23 added a new command that can be used to query the
-> attestation report containing the SHA-256 digest of the guest memory
-> and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
-> 
-> Note, we already have a command (LAUNCH_MEASURE) that can be used to
-> query the SHA-256 digest of the guest memory encrypted through the
-> LAUNCH_UPDATE. The main difference between previous and this command
-> is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-> command the ATTESATION_REPORT command can be called while the guest
-> is running.
-> 
-> Add a QMP interface "query-sev-attestation-report" that can be used
-> to get the report encoded in base64.
-> 
-> Cc: James Bottomley <jejb@linux.ibm.com>
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Mon, Jan 04, 2021, Like Xu wrote:
 > ---
->  linux-headers/linux/kvm.h |  8 ++++++
->  qapi/misc-target.json     | 38 +++++++++++++++++++++++++++
->  target/i386/monitor.c     |  6 +++++
->  target/i386/sev-stub.c    |  7 +++++
->  target/i386/sev.c         | 54 +++++++++++++++++++++++++++++++++++++++
->  target/i386/sev_i386.h    |  2 ++
->  6 files changed, 115 insertions(+)
+>  arch/x86/events/intel/ds.c | 62 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 62 insertions(+)
 > 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index 56ce14ad20..6d0f8101ba 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1585,6 +1585,8 @@ enum sev_cmd_id {
->  	KVM_SEV_DBG_ENCRYPT,
->  	/* Guest certificates commands */
->  	KVM_SEV_CERT_EXPORT,
-> +	/* Attestation report */
-> +	KVM_SEV_GET_ATTESTATION_REPORT,
->  
->  	KVM_SEV_NR_MAX,
->  };
-> @@ -1637,6 +1639,12 @@ struct kvm_sev_dbg {
->  	__u32 len;
->  };
->  
-> +struct kvm_sev_attestation_report {
-> +	__u8 mnonce[16];
-> +	__u64 uaddr;
-> +	__u32 len;
-> +};
-> +
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> index 1e561fa97b..ec6565e6ef 100644
-> --- a/qapi/misc-target.json
-> +++ b/qapi/misc-target.json
-> @@ -267,3 +267,41 @@
->  ##
->  { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
->    'if': 'defined(TARGET_ARM)' }
-> +
-> +
-> +##
-> +# @SevAttestationReport:
-> +#
-> +# The struct describes attestation report for a Secure Encrypted Virtualization
-> +# feature.
-> +#
-> +# @data:  guest attestation report (base64 encoded)
-> +#
-> +#
-> +# Since: 5.2
-> +##
-> +{ 'struct': 'SevAttestationReport',
-> +  'data': { 'data': 'str'},
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @query-sev-attestation-report:
-> +#
-> +# This command is used to get the SEV attestation report, and is supported on AMD
-> +# X86 platforms only.
-> +#
-> +# @mnonce: a random 16 bytes of data (it will be included in report)
-> +#
-> +# Returns: SevAttestationReport objects.
-> +#
-> +# Since: 5.2
-> +#
-> +# Example:
-> +#
-> +# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
-> +# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
-> +#
-> +##
-
-Can you please make this more generic, I'm thinking of something like:
-
-  query-attestation-report
-that returns an AttstationReport, which has a number of optional
-components, of which you start off with one optional 'sev' component.
-
-That way we can get other vendors to add to that same command rather
-than inventing one extra command per vendor.
-
-Dave
-
-> +{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
-> +  'returns': 'SevAttestationReport',
-> +  'if': 'defined(TARGET_I386)' }
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-> index 9f9e1c42f4..a4b65f330c 100644
-> --- a/target/i386/monitor.c
-> +++ b/target/i386/monitor.c
-> @@ -729,3 +729,9 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
->  {
->      return sev_get_capabilities(errp);
->  }
-> +
-> +SevAttestationReport *
-> +qmp_query_sev_attestation_report(const char *mnonce, Error **errp)
-> +{
-> +    return sev_get_attestation_report(mnonce, errp);
-> +}
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> index 88e3f39a1e..66d16f53d8 100644
-> --- a/target/i386/sev-stub.c
-> +++ b/target/i386/sev-stub.c
-> @@ -49,3 +49,10 @@ SevCapability *sev_get_capabilities(Error **errp)
->      error_setg(errp, "SEV is not available in this QEMU");
->      return NULL;
->  }
-> +
-> +SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp)
-> +{
-> +    error_setg(errp, "SEV is not available in this QEMU");
-> +    return NULL;
-> +}
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 93c4d60b82..28958fb71b 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -68,6 +68,7 @@ struct SevGuestState {
->  
->  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
->  #define DEFAULT_SEV_DEVICE      "/dev/sev"
-> +#define DEFAULT_ATTESATION_REPORT_BUF_SIZE      4096
->  
->  static SevGuestState *sev_guest;
->  static Error *sev_mig_blocker;
-> @@ -490,6 +491,59 @@ out:
->      return cap;
+> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
+> index b47cc4226934..c499bdb58373 100644
+> --- a/arch/x86/events/intel/ds.c
+> +++ b/arch/x86/events/intel/ds.c
+> @@ -1721,6 +1721,65 @@ intel_pmu_save_and_restart_reload(struct perf_event *event, int count)
+>  	return 0;
 >  }
 >  
-> +SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp)
+> +/*
+> + * We may be running with guest PEBS events created by KVM, and the
+> + * PEBS records are logged into the guest's DS and invisible to host.
+> + *
+> + * In the case of guest PEBS overflow, we only trigger a fake event
+> + * to emulate the PEBS overflow PMI for guest PBES counters in KVM.
+> + * The guest will then vm-entry and check the guest DS area to read
+> + * the guest PEBS records.
+> + *
+> + * The guest PEBS overflow PMI may be dropped when both the guest and
+> + * the host use PEBS. Therefore, KVM will not enable guest PEBS once
+> + * the host PEBS is enabled since it may bring a confused unknown NMI.
+> + *
+> + * The contents and other behavior of the guest event do not matter.
+> + */
+> +static int intel_pmu_handle_guest_pebs(struct cpu_hw_events *cpuc,
+> +				       struct pt_regs *iregs,
+> +				       struct debug_store *ds)
 > +{
-> +    struct kvm_sev_attestation_report input = {};
-> +    SevGuestState *sev = sev_guest;
-> +    SevAttestationReport *report;
-> +    guchar *data;
-> +    int err = 0, ret;
+> +	struct perf_sample_data data;
+> +	struct perf_event *event = NULL;
+> +	u64 guest_pebs_idxs = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
+> +	int bit;
 > +
-> +    if (!sev_enabled()) {
-> +        error_setg(errp, "SEV is not enabled");
-> +        return NULL;
-> +    }
-> +
-> +    /* Verify that user provided random data length */
-> +    if (strlen(mnonce) != sizeof(input.mnonce)) {
-> +        error_setg(errp, "Expected mnonce data len %ld got %ld",
-> +                sizeof(input.mnonce), strlen(mnonce));
-> +        return NULL;
-> +    }
-> +
-> +    /* Query the report length */
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-> +            &input, &err);
-> +    if (ret < 0) {
-> +        if (err != SEV_RET_INVALID_LEN) {
-> +            error_setg(errp, "failed to query the attestation report length "
-> +                    "ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    data = g_malloc(input.len);
-> +    input.uaddr = (unsigned long)data;
-> +    memcpy(input.mnonce, mnonce, sizeof(input.mnonce));
-> +
-> +    /* Query the report */
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_GET_ATTESTATION_REPORT,
-> +            &input, &err);
-> +    if (ret) {
-> +        error_setg_errno(errp, errno, "Failed to get attestation report"
-> +                " ret=%d fw_err=%d (%s)", ret, err, fw_error_to_str(err));
-> +        goto e_free_data;
-> +    }
-> +
-> +    report = g_new0(SevAttestationReport, 1);
-> +    report->data = g_base64_encode(data, input.len);
-> +
-> +e_free_data:
-> +    g_free(data);
-> +    return report;
-> +}
-> +
->  static int
->  sev_read_file_base64(const char *filename, guchar **data, gsize *len)
->  {
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index 4db6960f60..e2d0774708 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -35,5 +35,7 @@ extern uint32_t sev_get_cbit_position(void);
->  extern uint32_t sev_get_reduced_phys_bits(void);
->  extern char *sev_get_launch_measurement(void);
->  extern SevCapability *sev_get_capabilities(Error **errp);
-> +extern SevAttestationReport *
-> +sev_get_attestation_report(const char *mnonce, Error **errp);
->  
->  #endif
-> -- 
-> 2.17.1
-> 
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +	/*
+> +	 * Ideally, we should check guest DS to understand if it's
+> +	 * a guest PEBS overflow PMI from guest PEBS counters.
+> +	 * However, it brings high overhead to retrieve guest DS in host.
+> +	 * So we check host DS instead for performance.
+> +	 *
+> +	 * If PEBS interrupt threshold on host is not exceeded in a NMI, there
+> +	 * must be a PEBS overflow PMI generated from the guest PEBS counters.
+> +	 * There is no ambiguity since the reported event in the PMI is guest
+> +	 * only. It gets handled correctly on a case by case base for each event.
+> +	 *
+> +	 * Note: KVM disables the co-existence of guest PEBS and host PEBS.
 
+By "KVM", do you mean KVM's loading of the MSRs provided by intel_guest_get_msrs()?
+Because the PMU should really be the entity that controls guest vs. host.  KVM
+should just be a dumb pipe that handles the mechanics of how values are context
+switch.
+
+For example, commit 7099e2e1f4d9 ("KVM: VMX: disable PEBS before a guest entry"),
+where KVM does an explicit WRMSR(PEBS_ENABLE) to (attempt to) force PEBS
+quiescence, is flawed in that the PMU can re-enable PEBS after the WRMSR if a
+PMI arrives between the WRMSR and VM-Enter (because VMX can't block NMIs).  The
+PMU really needs to be involved in the WRMSR workaround.
+
+> +	 */
+> +	if (!guest_pebs_idxs || !in_nmi() ||
+
+Are PEBS updates guaranteed to be isolated in both directions on relevant
+hardware?  By that I mean, will host updates be fully processed before VM-Enter
+compeletes, and guest updates before VM-Exit completes?  If that's the case,
+then this path could be optimized to change the KVM invocation of the NMI
+handler so that the "is this a guest PEBS PMI" check is done if and only if the
+PMI originated from with the guest.
+
+> +		ds->pebs_index >= ds->pebs_interrupt_threshold)
+> +		return 0;
+> +
+> +	for_each_set_bit(bit, (unsigned long *)&guest_pebs_idxs,
+> +			INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
+> +
+> +		event = cpuc->events[bit];
+> +		if (!event->attr.precise_ip)
+> +			continue;
+> +
+> +		perf_sample_data_init(&data, 0, event->hw.last_period);
+> +		if (perf_event_overflow(event, &data, iregs))
+> +			x86_pmu_stop(event, 0);
+> +
+> +		/* Inject one fake event is enough. */
+> +		return 1;
+> +	}
+> +
+> +	return 0;
+> +}
