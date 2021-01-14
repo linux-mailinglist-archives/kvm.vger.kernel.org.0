@@ -2,154 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 584BE2F624D
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 14:48:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 204EC2F62AC
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 15:06:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727156AbhANNqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 08:46:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47019 "EHLO
+        id S1726974AbhANOGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 09:06:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25304 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726609AbhANNqm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 08:46:42 -0500
+        by vger.kernel.org with ESMTP id S1725991AbhANOGH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 09:06:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610631915;
+        s=mimecast20190719; t=1610633080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0z/jAVbB9JGEFaFGRPRMJQOT3/r+X2ii1tNfXu3+OrY=;
-        b=PIKT363W5WXc9iK7cfoILu5pyc9/rhczMI3pWJRI6RiHEJid+JXc7SaYwE3VIXSiwS0yo+
-        l5tg1ueW9ZdhIiRO721P2J3VaPe2sAXv1145zjd63y8jgJr7tVAvfeWei4DtmQ80wYZ/+T
-        TZc8BhzEXEmfqTXrfegT+a7CS1nCn6U=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-k_3hlBUXNWKICdaOIjd1AQ-1; Thu, 14 Jan 2021 08:45:13 -0500
-X-MC-Unique: k_3hlBUXNWKICdaOIjd1AQ-1
-Received: by mail-ej1-f72.google.com with SMTP id gu19so2230610ejb.13
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 05:45:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=0z/jAVbB9JGEFaFGRPRMJQOT3/r+X2ii1tNfXu3+OrY=;
-        b=gOfyKQeVAhB4fuUQgcghmobuKi8yZEd7p3ufE6O1c947j8geOzWpp8Sn1xTZK2WOFE
-         kdMOzGAN6DBYaIFAl/62EdjnymDb2+fpdYj8FZuo01ADGI98wbCeeLaWG1g/fhuPmwDn
-         SJDI8yrt18vktNgmpPidM+UPaMAOJkB4woDQzkUKtQ509vAIZ8zxteKnhiaUoFDTRULB
-         CH9NhHnqEEMJjUt0dlkBiSukK26WTeIX2mum9vWs32sHTsy4PvP4W/UVgyQQI/Aa9uVE
-         HP1o5tFm1Az63ToLxk1mmK6FeqEl1ARPPSSpmD6ZlulKCaUNvRToi7/MRVnBsedH8nty
-         wAow==
-X-Gm-Message-State: AOAM531PCNexbUtbRZWSt0AAs4/A7hlLKTmcFHjZBbI+T/p946Tc5i8F
-        3eBUto6tln+DKnAYuR6WrWIVJ32A5j97vV6CGxJO6nAS04oSHUuR/1jFbYprgMFDpeoA/JiAHGq
-        yMxJfRufYxSX+ggNQfzgZsDCM1mMN5gdq10drITKiwLtwT38neWC96TL+WTFGmEVe
-X-Received: by 2002:a17:907:9716:: with SMTP id jg22mr4473391ejc.126.1610631912115;
-        Thu, 14 Jan 2021 05:45:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwNhOIxjWwR6BBP3/fyEyPlCd1LO1r844S80POT9obwh8IR194vV6mHgFe0thE4KCaDVEkv0A==
-X-Received: by 2002:a17:907:9716:: with SMTP id jg22mr4473374ejc.126.1610631911850;
-        Thu, 14 Jan 2021 05:45:11 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id h16sm69379eds.21.2021.01.14.05.45.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 05:45:11 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
-In-Reply-To: <1610623624-18697-1-git-send-email-wanpengli@tencent.com>
-References: <1610623624-18697-1-git-send-email-wanpengli@tencent.com>
-Date:   Thu, 14 Jan 2021 14:45:10 +0100
-Message-ID: <87pn277huh.fsf@vitty.brq.redhat.com>
+        bh=gTmzUx4XqAggyZApGiSYmY6PGlS/O4UhRM5c2tO4Ock=;
+        b=arwkMjLv/KwauZfx9t/YZq50HcXKMGLAlJLmrhenDsWgdeIBS47uoGSVt9IdaAujiFJ9X/
+        ePaQdX9130AL8u2yXJ+yLIp7AFperOjrGu1K9xei0UVrBGsZJJDzlkwvN7PALynEYzJknF
+        bs4uxUrsPXCVc44nvJY47m6qJhPOXVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-ZkcUa2JkOBabFPSGeDElSg-1; Thu, 14 Jan 2021 09:04:38 -0500
+X-MC-Unique: ZkcUa2JkOBabFPSGeDElSg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFA57C73B9;
+        Thu, 14 Jan 2021 14:04:35 +0000 (UTC)
+Received: from gondolin (ovpn-114-65.ams2.redhat.com [10.36.114.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A6FB16F985;
+        Thu, 14 Jan 2021 14:04:25 +0000 (UTC)
+Date:   Thu, 14 Jan 2021 15:04:22 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, pair@us.ibm.com,
+        Marcelo Tosatti <mtosatti@redhat.com>, brijesh.singh@amd.com,
+        frankja@linux.ibm.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        david@redhat.com, Ram Pai <linuxram@us.ibm.com>,
+        Greg Kurz <groug@kaod.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+        Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, pbonzini@redhat.com, thuth@redhat.com,
+        rth@twiddle.net, mdroth@linux.vnet.ibm.com,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20210114150422.5f74ca41.cohuck@redhat.com>
+In-Reply-To: <20210114122048.GG1643043@redhat.com>
+References: <20210105115614.7daaadd6.pasic@linux.ibm.com>
+        <20210105204125.GE4102@ram-ibm-com.ibm.com>
+        <20210111175914.13adfa2e.cohuck@redhat.com>
+        <20210113124226.GH2938@work-vm>
+        <6e02e8d5-af4b-624b-1a12-d03b9d554a41@de.ibm.com>
+        <20210114103643.GD2905@work-vm>
+        <db2295ce-333f-2a3e-8219-bfa4853b256f@de.ibm.com>
+        <20210114120531.3c7f350e.cohuck@redhat.com>
+        <20210114114533.GF2905@work-vm>
+        <b791406c-fde2-89db-4186-e1660f14418c@de.ibm.com>
+        <20210114122048.GG1643043@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng Li <kernellwp@gmail.com> writes:
+On Thu, 14 Jan 2021 12:20:48 +0000
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> The per-cpu vsyscall pvclock data pointer assigns either an element of the 
-> static array hv_clock_boot (#vCPU <= 64) or dynamically allocated memory 
-> hvclock_mem (vCPU > 64), the dynamically memory will not be allocated if 
-> kvmclock vsyscall is disabled, this can result in cpu hotpluged fails in 
-> kvmclock_setup_percpu() which returns -ENOMEM. This patch fixes it by not 
-> assigning vsyscall pvclock data pointer if kvmclock vdso_clock_mode is not 
-> VDSO_CLOCKMODE_PVCLOCK.
->
-> Fixes: 6a1cac56f4 ("x86/kvm: Use __bss_decrypted attribute in shared variables")
-> Reported-by: Zelin Deng <zelin.deng@linux.alibaba.com>
-> Tested-by: Haiwei Li <lihaiwei@tencent.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: stable@vger.kernel.org#v4.19-rc5+
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kernel/kvmclock.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index aa59374..0624290 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -296,7 +296,8 @@ static int kvmclock_setup_percpu(unsigned int cpu)
->  	 * pointers. So carefully check. CPU0 has been set up in init
->  	 * already.
->  	 */
-> -	if (!cpu || (p && p != per_cpu(hv_clock_per_cpu, 0)))
-> +	if (!cpu || (p && p != per_cpu(hv_clock_per_cpu, 0)) ||
-> +	    (kvm_clock.vdso_clock_mode != VDSO_CLOCKMODE_PVCLOCK))
->  		return 0;
+> On Thu, Jan 14, 2021 at 12:50:12PM +0100, Christian Borntraeger wrote:
+> >=20
+> >=20
+> > On 14.01.21 12:45, Dr. David Alan Gilbert wrote: =20
+> > > * Cornelia Huck (cohuck@redhat.com) wrote: =20
+> > >> On Thu, 14 Jan 2021 11:52:11 +0100
+> > >> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> > >> =20
+> > >>> On 14.01.21 11:36, Dr. David Alan Gilbert wrote: =20
+> > >>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:   =20
+> > >>>>>
+> > >>>>>
+> > >>>>> On 13.01.21 13:42, Dr. David Alan Gilbert wrote:   =20
+> > >>>>>> * Cornelia Huck (cohuck@redhat.com) wrote:   =20
+> > >>>>>>> On Tue, 5 Jan 2021 12:41:25 -0800
+> > >>>>>>> Ram Pai <linuxram@us.ibm.com> wrote:
+> > >>>>>>>   =20
+> > >>>>>>>> On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:  =
+ =20
+> > >>>>>>>>> On Mon, 4 Jan 2021 10:40:26 -0800
+> > >>>>>>>>> Ram Pai <linuxram@us.ibm.com> wrote:   =20
+> > >>>>>>>   =20
+> > >>>>>>>>>> The main difference between my proposal and the other propos=
+al is...
+> > >>>>>>>>>>
+> > >>>>>>>>>>   In my proposal the guest makes the compatibility decision =
+and acts
+> > >>>>>>>>>>   accordingly.  In the other proposal QEMU makes the compati=
+bility
+> > >>>>>>>>>>   decision and acts accordingly. I argue that QEMU cannot ma=
+ke a good
+> > >>>>>>>>>>   compatibility decision, because it wont know in advance, i=
+f the guest
+> > >>>>>>>>>>   will or will-not switch-to-secure.
+> > >>>>>>>>>>      =20
+> > >>>>>>>>>
+> > >>>>>>>>> You have a point there when you say that QEMU does not know i=
+n advance,
+> > >>>>>>>>> if the guest will or will-not switch-to-secure. I made that a=
+rgument
+> > >>>>>>>>> regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. M=
+y idea
+> > >>>>>>>>> was to flip that property on demand when the conversion occur=
+s. David
+> > >>>>>>>>> explained to me that this is not possible for ppc, and that h=
+aving the
+> > >>>>>>>>> "securable-guest-memory" property (or whatever the name will =
+be)
+> > >>>>>>>>> specified is a strong indication, that the VM is intended to =
+be used as
+> > >>>>>>>>> a secure VM (thus it is OK to hurt the case where the guest d=
+oes not
+> > >>>>>>>>> try to transition). That argument applies here as well.     =
+=20
+> > >>>>>>>>
+> > >>>>>>>> As suggested by Cornelia Huck, what if QEMU disabled the
+> > >>>>>>>> "securable-guest-memory" property if 'must-support-migrate' is=
+ enabled?
+> > >>>>>>>> Offcourse; this has to be done with a big fat warning stating
+> > >>>>>>>> "secure-guest-memory" feature is disabled on the machine.
+> > >>>>>>>> Doing so, will continue to support guest that do not try to tr=
+ansition.
+> > >>>>>>>> Guest that try to transition will fail and terminate themselve=
+s.   =20
+> > >>>>>>>
+> > >>>>>>> Just to recap the s390x situation:
+> > >>>>>>>
+> > >>>>>>> - We currently offer a cpu feature that indicates secure execut=
+ion to
+> > >>>>>>>   be available to the guest if the host supports it.
+> > >>>>>>> - When we introduce the secure object, we still need to support
+> > >>>>>>>   previous configurations and continue to offer the cpu feature=
+, even
+> > >>>>>>>   if the secure object is not specified.
+> > >>>>>>> - As migration is currently not supported for secured guests, w=
+e add a
+> > >>>>>>>   blocker once the guest actually transitions. That means that
+> > >>>>>>>   transition fails if --only-migratable was specified on the co=
+mmand
+> > >>>>>>>   line. (Guests not transitioning will obviously not notice any=
+thing.)
+> > >>>>>>> - With the secure object, we will already fail starting QEMU if
+> > >>>>>>>   --only-migratable was specified.
+> > >>>>>>>
+> > >>>>>>> My suggestion is now that we don't even offer the cpu feature if
+> > >>>>>>> --only-migratable has been specified. For a guest that does not=
+ want to
+> > >>>>>>> transition to secure mode, nothing changes; a guest that wants =
+to
+> > >>>>>>> transition to secure mode will notice that the feature is not a=
+vailable
+> > >>>>>>> and fail appropriately (or ultimately, when the ultravisor call=
+ fails).
+> > >>>>>>> We'd still fail starting QEMU for the secure object + --only-mi=
+gratable
+> > >>>>>>> combination.
+> > >>>>>>>
+> > >>>>>>> Does that make sense?   =20
+> > >>>>>>
+> > >>>>>> It's a little unusual; I don't think we have any other cases whe=
+re
+> > >>>>>> --only-migratable changes the behaviour; I think it normally onl=
+y stops
+> > >>>>>> you doing something that would have made it unmigratable or caus=
+es
+> > >>>>>> an operation that would make it unmigratable to fail.   =20
+> > >>>>>
+> > >>>>> I would like to NOT block this feature with --only-migrateable. A=
+ guest
+> > >>>>> can startup unprotected (and then is is migrateable). the migrati=
+on blocker
+> > >>>>> is really a dynamic aspect during runtime.    =20
+> > >>>>
+> > >>>> But the point of --only-migratable is to turn things that would ha=
+ve
+> > >>>> blocked migration into failures, so that a VM started with
+> > >>>> --only-migratable is *always* migratable.   =20
+> > >>>
+> > >>> Hmmm, fair enough. How do we do this with host-model? The construct=
+ed model
+> > >>> would contain unpack, but then it will fail to startup? Or do we si=
+lently=20
+> > >>> drop unpack in that case? Both variants do not feel completely righ=
+t.  =20
+> > >>
+> > >> Failing if you explicitly specified unpacked feels right, but failing
+> > >> if you just used the host model feels odd. Removing unpack also is a
+> > >> bit odd, but I think the better option if we want to do anything abo=
+ut
+> > >> it at all. =20
+> > >=20
+> > > 'host-model' feels a bit special; but breaking the rule that
+> > > only-migratable doesn't change behaviour is weird
+> > > Can you do host,-unpack   to make that work explicitly? =20
+> >=20
+> > I guess that should work. But it means that we need to add logic in lib=
+virt
+> > to disable unpack for host-passthru and host-model. Next problem is the=
+n,
+> > that a future version might implement migration of such guests, which m=
+eans
+> > that libvirt must then stop fencing unpack. =20
+>=20
+> The "host-model" is supposed to always be migratable, so we should
+> fence the feature there.
+>=20
+> host-passthrough is "undefined" whether it is migratable - it may or may
+> not work, no guarantees made by libvirt.
+>=20
+> Ultimately I think the problem is that there ought to be an explicit
+> config to enable the feature for s390, as there is for SEV, and will
+> also presumably be needed for ppc.=20
 
-The comment above should probably be updated as it is not clear why we
-check kvm_clock.vdso_clock_mode here. Actually, I would even suggest we
-introduce a 'kvmclock_tsc_stable' global instead to avoid this indirect
-check.
+Yes, an explicit config is what we want; unfortunately, we have to deal
+with existing setups as well...
 
->  
->  	/* Use the static page for the first CPUs, allocate otherwise */
+The options I see are
+- leave things for existing setups as they are now (i.e. might become
+  unmigratable when the guest transitions), and make sure we're doing
+  the right thing with the new object
+- always make the unpack feature conflict with migration requirements;
+  this is a guest-visible change
 
-Also, would it be better if we just avoid cpuhp_setup_state() call in
-this case? E.g. both these ideas combined (completely untested):
-
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index aa593743acf6..0827aef3ccb8 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -25,6 +25,7 @@
- 
- static int kvmclock __initdata = 1;
- static int kvmclock_vsyscall __initdata = 1;
-+static bool kvmclock_tsc_stable __ro_after_init = true;
- static int msr_kvm_system_time __ro_after_init = MSR_KVM_SYSTEM_TIME;
- static int msr_kvm_wall_clock __ro_after_init = MSR_KVM_WALL_CLOCK;
- static u64 kvm_sched_clock_offset __ro_after_init;
-@@ -275,8 +276,10 @@ static int __init kvm_setup_vsyscall_timeinfo(void)
-                return 0;
- 
-        flags = pvclock_read_flags(&hv_clock_boot[0].pvti);
--       if (!(flags & PVCLOCK_TSC_STABLE_BIT))
-+       if (!(flags & PVCLOCK_TSC_STABLE_BIT)) {
-+               kvmclock_tsc_stable = false;
-                return 0;
-+       }
- 
-        kvm_clock.vdso_clock_mode = VDSO_CLOCKMODE_PVCLOCK;
- #endif
-@@ -325,7 +328,8 @@ void __init kvmclock_init(void)
-                return;
-        }
- 
--       if (cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "kvmclock:setup_percpu",
-+       if (kvmclock_tsc_stable &&
-+           cpuhp_setup_state(CPUHP_BP_PREPARE_DYN, "kvmclock:setup_percpu",
-                              kvmclock_setup_percpu, NULL) < 0) {
-                return;
-        }
-
--- 
-Vitaly
+The first option might be less hairy, all considered?
 
