@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1DC32F566E
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85CE22F5670
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727681AbhANBsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 20:48:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55896 "EHLO
+        id S1728349AbhANBsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 20:48:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727973AbhANAlN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1727718AbhANAlN (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 13 Jan 2021 19:41:13 -0500
 Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCB9C0617BF
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:58 -0800 (PST)
-Received: by mail-qk1-x74a.google.com with SMTP id k126so3029201qkf.8
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E56B8C061381
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:38:00 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id e25so3043572qka.3
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:38:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=292fZgTlFSUh9sat6hWygwmIzdDrAIVyQe5fuEoV9fw=;
-        b=IcnYna8K4DS03EhbgmYafZnVxDj379RLm8bCjdpPDUE9RyoriLUT1HlUkpeB4Xnm+Y
-         uRsGRyTafPvmq9f+bxeNYJ8wTzt2p0huhmLkwIIudgJLxrKcJ0cwNAobv3oyBotjrtN+
-         DHQkb9OV94+iiGgGAZ2rvgE83CvCDySov1H1GoFCamGFuaPf6BQNYrZ7mdnnTrEYKxRP
-         kpbr6GlX5QWL8HmlXEQyw6w9kQjBTM9WWrnSyKI9fRJ/eN4zt1BjvEjmyyGxFbITjkzt
-         wMozgFrOvdqNTfksYrxC//KWRM1SVy5VQT+WQuYlZ8bXXYbUasKhvdt0zuE4pDXcwNti
-         JteA==
+        bh=7jIh1raiC9mO2UBk7zBiXhk5cwJa5TOTQds8hm2NQdk=;
+        b=qtwFb998ztfYpmQr3CIF3rvF2R+lxZy565kY7B2uTRHEhFfLPVFp9P89AVqEuRAQQj
+         q1OghinpAd8nAhvyY55P8ygwTwvn0obM4KGRZ6SrZTQgCNxXFc+0JAMFGilg2zC7hgpg
+         LeJe6DeHhg6XC2VBCRfFA5HYq+Vr7ItQGEBsKYZov6T3UX/hjNTPxdiQXKaslX/UB672
+         kqyFuZ3oN8m2xqMajhsk7M8hx6z94OnGC9ZR22b143v0UuSKTr0ohSGmpVe7/hnc/i+3
+         WRt8xWjT2T1owedVP0MSymp0i6bc1nwmlE0saysjLAMJwE2uXrxpo5IMZGkwUwg1hL23
+         EwNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=292fZgTlFSUh9sat6hWygwmIzdDrAIVyQe5fuEoV9fw=;
-        b=c1huSOH/YWk69TmEvKhlO2SwGImf7hSsWHMQMcSk61V64DnRmiNybO4+a13fnLX8Co
-         cSEu5qmSzU+b5yuSDyZByI6C7qLlSsvV603nF9AjI/iNZSIdv6aWCdj2UwPZduuNoWl6
-         cTycsgnc8Pz+C9+vw+XCsloikbKpi/k4m55tazbkYbpAiWoeZxG7/g9LOmQ4qId2K5Fk
-         sWqDxCmCIH6mNJcKwMK6Dtz4aRdar7TsWriv+NhKDYquad938zxWqgANT5gK9UK0cn3H
-         j2xjW/lQfhmreRp6nvMsq3rK6W38+CoKu9f+NCMx15Vcw/11EUYQDCqx+ydgcPOBPKOU
-         wrdA==
-X-Gm-Message-State: AOAM532emcjryFyiiEP603LXYBUNNfPbJFRz798WVQ/R7QHnUxtWLfik
-        EELr5Gt85U9W5Fy1U6xUBoHK0rqzPSs=
-X-Google-Smtp-Source: ABdhPJw8pliD7Fv+cR+neB6QIex3TgFqy4yftORPPzVF5RRo7A7OcaTceN4RXvu9BIfaKZhy9GpC6zHMRZg=
+        bh=7jIh1raiC9mO2UBk7zBiXhk5cwJa5TOTQds8hm2NQdk=;
+        b=AS00ytM3bOjpFiUxMKmlUKnLpeRb1kqxAEiHO3dWFKqjZLGUbxFLTcObKffyzEOWt/
+         qihTe3Tx5n3abv0k/yaSzctEiouDYsgQJ55qZCqeM/MRugSoUiG71Pzmns0Nn1TiNjfN
+         HOAc58za/KIBlZwMI/0cQTrAtwLDn2PL3Q7nFIY4ie2sdbrHWxWew01vMPgdQsHBQ5Kr
+         TdxkWr1DvTsFUOfayv0l8Ph+WRET6s3kkhUWadfUnJM/qjmE5OKwcbPvrs0YEebWAK4H
+         96ggr+GNsw1GyTtjx+litaPc6YCAwpuTrhCjw4v/3GDBymtEwjMY2PNh1vObEVNpU0fW
+         VT6Q==
+X-Gm-Message-State: AOAM5335B2Soedjtvuey0bYPhbGcXW3NWdsdMypkiYkh2RwNeT7wcTqj
+        xqWpEFNeM8byl71+5oaHGGOsjr8M5Kw=
+X-Google-Smtp-Source: ABdhPJwlFbgrnSd6hVheUa0zIrYw1CBlvVSvihz8a6WeLJjzSKyzg/jGZrY+FPB6rF4lUwZ62mF/pFYvNWg=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:2f91:: with SMTP id v139mr7283714ybv.491.1610584677671;
- Wed, 13 Jan 2021 16:37:57 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:ffa2:: with SMTP id d2mr4906288qvv.62.1610584680140;
+ Wed, 13 Jan 2021 16:38:00 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Jan 2021 16:37:03 -0800
+Date:   Wed, 13 Jan 2021 16:37:04 -0800
 In-Reply-To: <20210114003708.3798992-1-seanjc@google.com>
-Message-Id: <20210114003708.3798992-10-seanjc@google.com>
+Message-Id: <20210114003708.3798992-11-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210114003708.3798992-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH v2 09/14] KVM: SVM: Unconditionally invoke sev_hardware_teardown()
+Subject: [PATCH v2 10/14] KVM: SVM: Explicitly check max SEV ASID during sev_hardware_setup()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
@@ -71,32 +71,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the redundant svm_sev_enabled() check when calling
-sev_hardware_teardown(), the teardown helper itself does the check.
-Removing the check from svm.c will eventually allow dropping
-svm_sev_enabled() entirely.
+Query max_sev_asid directly after setting it instead of bouncing through
+its wrapper, svm_sev_enabled().  Using the wrapper is unnecessary
+obfuscation.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 3 +--
+ arch/x86/kvm/svm/sev.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f89f702b2a58..bb7b99743bea 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -887,8 +887,7 @@ static void svm_hardware_teardown(void)
- {
- 	int cpu;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 02a66008e9b9..1a143340103e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1278,8 +1278,7 @@ void __init sev_hardware_setup(void)
  
--	if (svm_sev_enabled())
--		sev_hardware_teardown();
-+	sev_hardware_teardown();
+ 	/* Maximum number of encrypted guests supported simultaneously */
+ 	max_sev_asid = ecx;
+-
+-	if (!svm_sev_enabled())
++	if (!max_sev_asid)
+ 		goto out;
  
- 	for_each_possible_cpu(cpu)
- 		svm_cpu_uninit(cpu);
+ 	/* Minimum ASID value that should be used for SEV guest */
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
