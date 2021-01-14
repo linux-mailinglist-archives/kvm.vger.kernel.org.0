@@ -2,148 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B93C72F5FCD
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:27:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F892F607A
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:47:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726770AbhANL1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 06:27:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41785 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726672AbhANL1E (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:27:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610623537;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=XqOfTnB39liRcHVwSunn3UeUAIK7R5nO1WAUm9BBMfY=;
-        b=HddOSACmGqDVCQVKB4J8tG7+hBfBCkHKNAkKFUAhipA+0XTDrMGUaQzBo1PDyvd645T1yE
-        P1yNktO+g6ft9tZ07z5u1NyssV1+21eBmX8SnKh6KTAOgaGEYEn3xQfJ+fU9MhdJdXGqaS
-        oboQWTgAhdYGvtUdNsIWU6RNAWvxr2U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-en6P0JmrP52Xg9Ljg_P9hg-1; Thu, 14 Jan 2021 06:25:34 -0500
-X-MC-Unique: en6P0JmrP52Xg9Ljg_P9hg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4E27806663;
-        Thu, 14 Jan 2021 11:25:31 +0000 (UTC)
-Received: from redhat.com (ovpn-115-77.ams2.redhat.com [10.36.115.77])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 062885B6AD;
-        Thu, 14 Jan 2021 11:25:20 +0000 (UTC)
-Date:   Thu, 14 Jan 2021 11:25:17 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Ram Pai <linuxram@us.ibm.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        Halil Pasic <pasic@linux.ibm.com>, borntraeger@de.ibm.com,
-        David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>,
+        id S1726713AbhANLrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 06:47:08 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51503 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726150AbhANLrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 06:47:08 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DGjFX3btbz9shx; Thu, 14 Jan 2021 22:46:23 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1610624784;
+        bh=MLcZN3Qo4B+3OIZBzY194QiYnraPxOj/vYFCJGbS0Sk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=b8GHyAWaSdJREVHjbYlzJj/c6rBJdcPylygKIQzuOrvX8CpTng2gMHsRqx+AtCZki
+         3wnnm+EGgnhkg8AFfCbYUno//IlvEixL5n5pVZgPV9qtkHO3S7el5Bs3EIKCl5Pl58
+         4j7QRZwvYEmADQiCONlWladmu0ACc0M0MmlAJd3A=
+Date:   Thu, 14 Jan 2021 21:42:07 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
+        pasic@linux.ibm.com, qemu-devel@nongnu.org, cohuck@redhat.com,
         Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org,
-        rth@twiddle.net, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20210114112517.GE1643043@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20201217123842.51063918.cohuck@redhat.com>
- <20201217151530.54431f0e@bahia.lan>
- <20201218124111.4957eb50.cohuck@redhat.com>
- <20210104071550.GA22585@ram-ibm-com.ibm.com>
- <20210104134629.49997b53.pasic@linux.ibm.com>
- <20210104184026.GD4102@ram-ibm-com.ibm.com>
- <20210105115614.7daaadd6.pasic@linux.ibm.com>
- <20210105204125.GE4102@ram-ibm-com.ibm.com>
- <20210111175914.13adfa2e.cohuck@redhat.com>
- <20210113124226.GH2938@work-vm>
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
+        jun.nakajima@intel.com, thuth@redhat.com,
+        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
+        andi.kleen@intel.com
+Subject: Re: [PATCH v7 02/13] confidential guest support: Introduce new
+ confidential guest support class
+Message-ID: <20210114104207.GM435587@yekko.fritz.box>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+ <20210113235811.1909610-3-david@gibson.dropbear.id.au>
+ <20210114093436.GB1643043@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="sWvRP97dwRHm9fX+"
 Content-Disposition: inline
-In-Reply-To: <20210113124226.GH2938@work-vm>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210114093436.GB1643043@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 13, 2021 at 12:42:26PM +0000, Dr. David Alan Gilbert wrote:
-> * Cornelia Huck (cohuck@redhat.com) wrote:
-> > On Tue, 5 Jan 2021 12:41:25 -0800
-> > Ram Pai <linuxram@us.ibm.com> wrote:
-> > 
-> > > On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
-> > > > On Mon, 4 Jan 2021 10:40:26 -0800
-> > > > Ram Pai <linuxram@us.ibm.com> wrote:
-> > 
-> > > > > The main difference between my proposal and the other proposal is...
-> > > > > 
-> > > > >   In my proposal the guest makes the compatibility decision and acts
-> > > > >   accordingly.  In the other proposal QEMU makes the compatibility
-> > > > >   decision and acts accordingly. I argue that QEMU cannot make a good
-> > > > >   compatibility decision, because it wont know in advance, if the guest
-> > > > >   will or will-not switch-to-secure.
-> > > > >   
-> > > > 
-> > > > You have a point there when you say that QEMU does not know in advance,
-> > > > if the guest will or will-not switch-to-secure. I made that argument
-> > > > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
-> > > > was to flip that property on demand when the conversion occurs. David
-> > > > explained to me that this is not possible for ppc, and that having the
-> > > > "securable-guest-memory" property (or whatever the name will be)
-> > > > specified is a strong indication, that the VM is intended to be used as
-> > > > a secure VM (thus it is OK to hurt the case where the guest does not
-> > > > try to transition). That argument applies here as well.  
-> > > 
-> > > As suggested by Cornelia Huck, what if QEMU disabled the
-> > > "securable-guest-memory" property if 'must-support-migrate' is enabled?
-> > > Offcourse; this has to be done with a big fat warning stating
-> > > "secure-guest-memory" feature is disabled on the machine.
-> > > Doing so, will continue to support guest that do not try to transition.
-> > > Guest that try to transition will fail and terminate themselves.
-> > 
-> > Just to recap the s390x situation:
-> > 
-> > - We currently offer a cpu feature that indicates secure execution to
-> >   be available to the guest if the host supports it.
-> > - When we introduce the secure object, we still need to support
-> >   previous configurations and continue to offer the cpu feature, even
-> >   if the secure object is not specified.
-> > - As migration is currently not supported for secured guests, we add a
-> >   blocker once the guest actually transitions. That means that
-> >   transition fails if --only-migratable was specified on the command
-> >   line. (Guests not transitioning will obviously not notice anything.)
-> > - With the secure object, we will already fail starting QEMU if
-> >   --only-migratable was specified.
-> > 
-> > My suggestion is now that we don't even offer the cpu feature if
-> > --only-migratable has been specified. For a guest that does not want to
-> > transition to secure mode, nothing changes; a guest that wants to
-> > transition to secure mode will notice that the feature is not available
-> > and fail appropriately (or ultimately, when the ultravisor call fails).
-> > We'd still fail starting QEMU for the secure object + --only-migratable
-> > combination.
-> > 
-> > Does that make sense?
-> 
-> It's a little unusual; I don't think we have any other cases where
-> --only-migratable changes the behaviour; I think it normally only stops
-> you doing something that would have made it unmigratable or causes
-> an operation that would make it unmigratable to fail.
 
-I agree,  --only-migratable is supposed to be a *behavioural* toggle
-for QEMU. It must /not/ have any impact on the guest ABI.
+--sWvRP97dwRHm9fX+
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-A management application needs to be able to add/remove --only-migratable
-at will without changing the exposing guest ABI.
+On Thu, Jan 14, 2021 at 09:34:36AM +0000, Daniel P. Berrang=E9 wrote:
+> On Thu, Jan 14, 2021 at 10:58:00AM +1100, David Gibson wrote:
+> > Several architectures have mechanisms which are designed to protect gue=
+st
+> > memory from interference or eavesdropping by a compromised hypervisor. =
+ AMD
+> > SEV does this with in-chip memory encryption and Intel's MKTME can do
+> > similar things.  POWER's Protected Execution Framework (PEF) accomplish=
+es a
+> > similar goal using an ultravisor and new memory protection features,
+> > instead of encryption.
+> >=20
+> > To (partially) unify handling for these, this introduces a new
+> > ConfidentialGuestSupport QOM base class.  "Confidential" is kind of vag=
+ue,
+> > but "confidential computing" seems to be the buzzword about these schem=
+es,
+> > and "secure" or "protected" are often used in connection to unrelated
+> > things (such as hypervisor-from-guest or guest-from-guest security).
+> >=20
+> > The "support" in the name is significant because in at least some of the
+> > cases it requires the guest to take specific actions in order to protect
+> > itself from hypervisor eavesdropping.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  backends/confidential-guest-support.c     | 33 ++++++++++++++++++++
+> >  backends/meson.build                      |  1 +
+> >  include/exec/confidential-guest-support.h | 38 +++++++++++++++++++++++
+> >  include/qemu/typedefs.h                   |  1 +
+> >  target/i386/sev.c                         |  3 +-
+> >  5 files changed, 75 insertions(+), 1 deletion(-)
+> >  create mode 100644 backends/confidential-guest-support.c
+> >  create mode 100644 include/exec/confidential-guest-support.h
+> >=20
+> > diff --git a/backends/confidential-guest-support.c b/backends/confident=
+ial-guest-support.c
+> > new file mode 100644
+> > index 0000000000..9b0ded0db4
+> > --- /dev/null
+> > +++ b/backends/confidential-guest-support.c
+> > @@ -0,0 +1,33 @@
+> > +/*
+> > + * QEMU Confidential Guest support
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "exec/confidential-guest-support.h"
+> > +
+> > +OBJECT_DEFINE_ABSTRACT_TYPE(ConfidentialGuestSupport,
+> > +                            confidential_guest_support,
+> > +                            CONFIDENTIAL_GUEST_SUPPORT,
+> > +                            OBJECT)
+> > +
+> > +static void confidential_guest_support_class_init(ObjectClass *oc, voi=
+d *data)
+> > +{
+> > +}
+> > +
+> > +static void confidential_guest_support_init(Object *obj)
+> > +{
+> > +}
+> > +
+> > +static void confidential_guest_support_finalize(Object *obj)
+> > +{
+> > +}
+> > diff --git a/backends/meson.build b/backends/meson.build
+> > index 484456ece7..d4221831fc 100644
+> > --- a/backends/meson.build
+> > +++ b/backends/meson.build
+> > @@ -6,6 +6,7 @@ softmmu_ss.add([files(
+> >    'rng-builtin.c',
+> >    'rng-egd.c',
+> >    'rng.c',
+> > +  'confidential-guest-support.c',
+> >  ), numa])
+> > =20
+> >  softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files('rng-random.c'))
+> > diff --git a/include/exec/confidential-guest-support.h b/include/exec/c=
+onfidential-guest-support.h
+> > new file mode 100644
+> > index 0000000000..5f131023ba
+> > --- /dev/null
+> > +++ b/include/exec/confidential-guest-support.h
+> > @@ -0,0 +1,38 @@
+> > +/*
+> > + * QEMU Confidential Guest support
+> > + *   This interface describes the common pieces between various
+> > + *   schemes for protecting guest memory or other state against a
+> > + *   compromised hypervisor.  This includes memory encryption (AMD's
+> > + *   SEV and Intel's MKTME) or special protection modes (PEF on POWER,
+> > + *   or PV on s390x).
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +#ifndef QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> > +#define QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> > +
+> > +#ifndef CONFIG_USER_ONLY
+> > +
+> > +#include "qom/object.h"
+> > +
+> > +#define TYPE_CONFIDENTIAL_GUEST_SUPPORT "confidential-guest-support"
+> > +OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUES=
+T_SUPPORT)
+> > +
+> > +struct ConfidentialGuestSupport {
+> > +    Object parent;
+> > +};
+> > +
+> > +typedef struct ConfidentialGuestSupportClass {
+> > +    ObjectClass parent;
+> > +} ConfidentialGuestSupportClass;
+> > +
+> > +#endif /* !CONFIG_USER_ONLY */
+> > +
+> > +#endif /* QEMU_CONFIDENTIAL_GUEST_SUPPORT_H */
+> > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> > index 976b529dfb..33685c79ed 100644
+> > --- a/include/qemu/typedefs.h
+> > +++ b/include/qemu/typedefs.h
+> > @@ -36,6 +36,7 @@ typedef struct BusState BusState;
+> >  typedef struct Chardev Chardev;
+> >  typedef struct CompatProperty CompatProperty;
+> >  typedef struct CoMutex CoMutex;
+> > +typedef struct ConfidentialGuestSupport ConfidentialGuestSupport;
+> >  typedef struct CPUAddressSpace CPUAddressSpace;
+> >  typedef struct CPUState CPUState;
+> >  typedef struct DeviceListener DeviceListener;
+> > diff --git a/target/i386/sev.c b/target/i386/sev.c
+> > index 1546606811..6b49925f51 100644
+> > --- a/target/i386/sev.c
+> > +++ b/target/i386/sev.c
+> > @@ -31,6 +31,7 @@
+> >  #include "qom/object.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "monitor/monitor.h"
+> > +#include "exec/confidential-guest-support.h"
+> > =20
+> >  #define TYPE_SEV_GUEST "sev-guest"
+> >  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+> > @@ -322,7 +323,7 @@ sev_guest_instance_init(Object *obj)
+> > =20
+> >  /* sev guest info */
+> >  static const TypeInfo sev_guest_info =3D {
+> > -    .parent =3D TYPE_OBJECT,
+> > +    .parent =3D TYPE_CONFIDENTIAL_GUEST_SUPPORT,
+>=20
+> If you're changing the parent QOM type, then you also need to change
+> the parent struct field type in SevguestState to match
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Oops, yes.  I checked the rest of the types as I made the
+OBJECT_DECLARE_TYPE conversions, but I forgot to go back and check
+SEV.
 
+> >      .name =3D TYPE_SEV_GUEST,
+> >      .instance_size =3D sizeof(SevGuestState),
+> >      .instance_finalize =3D sev_guest_finalize,
+>=20
+> Regards,
+> Daniel
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--sWvRP97dwRHm9fX+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAAH+AACgkQbDjKyiDZ
+s5JWchAAh9E9X3fG0nGhtlYc7Kp4oUctbgp6QyZoRBDoRS8yFOL9Obkj2TAZeHTb
+ZV8NF+P38daRaFawwPbTDiOrlrESlCgvFRXE5TaqUKena4mol4x4dGrbnzjSdjIo
+rDgi/10QkXfFUKhQcQxZvMF+TwKooWmGuAdXOtBGTbEqMLC1lqsJ5W3sejX6Eknj
+C5CqCOV/FtAjNhHb+FijwMEne/tuq7qWa3e3+B6NV2WlY/6kFhv8HicQgjfbpb6O
+ljVahhseGZkFl3ibzy4f1CODdlph8Ox9LIgukeCqmIv08jMT9DcfxR5uBmpFJH/P
+jNQY7GAz4JJDRjjPlvRH2dT3nIQCSrRQ6hKuOcpkc4s1Yy9BqBwXKIYOxhzuEmx+
+EdMxXUfQQITNO2ad0JHakdoyX60FcgO6ENqs9Yz3W+eQ6LruhpSFpyz3/BpRzNs8
+ytYwjRm+3/sTX2u6btmZxq/QjQRHbpJDYEXDjzAk4bF84otVn0xc+TeUuVcNAqV4
+OwAuJiwPAOxV5O/rDOvPPDzIh5B0Ulz5m2shgTLVVWTkO8PJe39oBZ2QWFYEOy7v
+PwsK4rQL4YsCfNVtJ8PqsXkUVvfg6B/3oE4Shi56STKQb0fNZld7yUpX0HcM6qdR
+EIgX+34g0s2RZNuDV3sBqNJGD5WJFzh9FOrRN9K+yVUJvRHoBs0=
+=fQd4
+-----END PGP SIGNATURE-----
+
+--sWvRP97dwRHm9fX+--
