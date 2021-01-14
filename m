@@ -2,102 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BF332F67C9
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 18:36:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 187882F67D2
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 18:36:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728501AbhANRdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 12:33:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48196 "EHLO
+        id S1727011AbhANRfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 12:35:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726162AbhANRdP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 12:33:15 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05E1C061757
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:32:34 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id hs11so7039025ejc.1
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:32:34 -0800 (PST)
+        with ESMTP id S1726266AbhANRfi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 12:35:38 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 746E5C061574
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:34:58 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id b5so3599900pjk.2
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:34:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=oaLk6K/ziP0JrSWjUd9yUznepJpKpHz8SodeDVZyc4g=;
-        b=GWCGEwBUT89R8ID7PJjuDrp5S3/2qLBz8lkSEggHBoncpJhuQX05ohgD3pibnBXJdi
-         W/wjaMWx6cX60jzbnFHzbnh6eCuUIEFyAJ6ZNJbjNBuZcpAFm30vEyoFX0OX7sLCfQ4H
-         VBGdlONQQCthSTN9lUkdHxVXmxa5Wwba+So89oDc3hDiAC9lD0o2w3oCuPt9V9T1dNVE
-         uS3KkqkupscVrlg43emIU6KBxshTWcjcSyN7OszKlUL3h/iedyxOlz6rn4DfD9f2hWu2
-         37xuugp76VAJh3BP8R1ZQyS4EExUjFJSmBGIyEyPgIeSizJ4dmyBRr0xzwBjbW8Z19+S
-         31VQ==
+        bh=7+wptAskGDjPCM/rtSd9GeVD54civZ0IhTr0BYervcE=;
+        b=h0Vzkd89olpKGDIiVF7JgUQgbc4qq8f54PO9VAiv0SLf1yToAF7HSVm+dfVS+xVSZS
+         WxtVjR2//GZX/ZlQ51FRTqE/QHI+r0wK3jmdp+3H2wphXOR+fcrAThHeW0vyNAB9VDQK
+         GbVu7xyxJqYpqNiokerPhHZOh88Y4ZI9HYPOZ314YtvsDzbvgaV/F3UDhJ7/0mVrPpKX
+         9Rm0H9zOnH62+L0x/Yf7kBuc4GUmrT5Wm5TYh55eWunlNuKkivQevoYLyp/UPzLO8mO5
+         eJVZP6nW7c5MWru5b+OvjRblx6sWfNJUsOI6LUvkTen+BJKAj7gvYnqOAhOQvzQuDDqm
+         j82A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=oaLk6K/ziP0JrSWjUd9yUznepJpKpHz8SodeDVZyc4g=;
-        b=qG4g1HPTXcg5hiJOdreq1dc488mDZvLpmI8NypUydgTsSxxRQFM23vEtkSWIdLHDDe
-         6KyzZOTgZGTHIiEbMhjc00EhE/xMVCnR+569UCf5P20FNFhENcGl2jZwmmDF7qdTv7qC
-         OU3riqoKo9L+L3PyY8UPEzJpLOuBPrJbY+eEDpOGy0SUoXYWEbKYnF7QCsb/oiiVrqyB
-         MMZNKgCJ6BgOfQY6Ms94Q91UEyEqd42mjL3iFZu1q2dkKs/tUW3SgOf97KuipfnKk1Qt
-         JeVmDMC01a2f/J2WOts/ZYElSeON9spQY0T6+SuzDnmrS0l1pbGjWYUrdsU62IKd9+ot
-         BlLg==
-X-Gm-Message-State: AOAM531g5DQpB3uDfgPNbHG/nMnmKVH0BUt1so4vd7Vf4a1ISk5I2MBU
-        o8Sekn9yZECzzx4QBQdEAKlzUQ==
-X-Google-Smtp-Source: ABdhPJyWGuNgbGnfn6qKQQM5KwVrs3KxAw/sQ5/Phdx+0TwP4Nqgd8PsrwlAs/HuCHWwhAWmPewspQ==
-X-Received: by 2002:a17:906:17c3:: with SMTP id u3mr5870629eje.304.1610645553317;
-        Thu, 14 Jan 2021 09:32:33 -0800 (PST)
-Received: from larix.localdomain ([2001:1715:4e26:a7e0:ed35:e18a:5e36:8c84])
-        by smtp.gmail.com with ESMTPSA id n2sm2235623ejj.24.2021.01.14.09.32.31
+        bh=7+wptAskGDjPCM/rtSd9GeVD54civZ0IhTr0BYervcE=;
+        b=saiIx2iQJ2ZTjbKMRpiC5Yfk3LI7R+fCJMPwWh2gax/As28Gepd6Oa1jURRcMXpJpR
+         dvMqoDW52KNeERJs2NbGhJIMTNxwQ4IGPXtdNsx2oCXpYzTrhVlQkVeAw6C5pH1gQJGg
+         R4XxbMy9FD5t3rooJpsPbNYpybxOSqkp0bJmLtWP0mC7CYtKGPWhtgZ3BscUPL4ZDMi/
+         zb+7rEoSypdOWcRC9KHOvqibh1Va2ANIST11Kdq4I8V7UrjuCGM+NrvTUc1olKHBQQJL
+         rY/YAVw6wtAjpRd2aI7YTop+YlqMPtcKgHlVUTm6b/af8iTtzckqc7sP56JmCZ0dUbGG
+         OO1w==
+X-Gm-Message-State: AOAM533tYnsbmWEMVgOKQ84GxfwtICgOzTHEpJ1fJCS4M8ez5b5nxIuq
+        rZlvyJdxV2Ga/rANK1Mc6Pa1XA==
+X-Google-Smtp-Source: ABdhPJyWu31+NHrAEdDgt75PYbXBAWB13kUeru9konpXj1/8XYbvlOH+vGoiZx5eczD5HHbL9dqtxA==
+X-Received: by 2002:a17:902:ee05:b029:dd:f952:db11 with SMTP id z5-20020a170902ee05b02900ddf952db11mr8409438plb.42.1610645697892;
+        Thu, 14 Jan 2021 09:34:57 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 84sm6194330pfy.9.2021.01.14.09.34.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 09:32:32 -0800 (PST)
-Date:   Thu, 14 Jan 2021 18:33:17 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Xieyingtai <xieyingtai@huawei.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        wangxingang <wangxingang5@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        qubingbing <qubingbing@hisilicon.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Subject: Re: [PATCH v13 07/15] iommu/smmuv3: Allow stage 1 invalidation with
- unmanaged ASIDs
-Message-ID: <YACAXaG+opCwDFTL@larix.localdomain>
-References: <20201118112151.25412-8-eric.auger@redhat.com>
- <1606829590-25924-1-git-send-email-wangxingang5@huawei.com>
- <2e69adf5-8207-64f7-fa8e-9f2bd3a3c4e3@redhat.com>
- <e10ad90dc5144c0d9df98a9a078091af@huawei.com>
- <20201204095338.GA1912466@myrica>
- <2de03a797517452cbfeab022e12612b7@huawei.com>
- <0bf50dd6-ef3c-7aba-cbc1-1c2e17088470@redhat.com>
- <d68b6269-ee99-9ed7-de30-867e4519d104@redhat.com>
+        Thu, 14 Jan 2021 09:34:57 -0800 (PST)
+Date:   Thu, 14 Jan 2021 09:34:50 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 6/7] KVM: x86: hyper-v: Make Hyper-V emulation enablement
+ conditional
+Message-ID: <YACAunykMZWrbMwm@google.com>
+References: <20210113143721.328594-1-vkuznets@redhat.com>
+ <20210113143721.328594-7-vkuznets@redhat.com>
+ <X/9c9PuAd4XJM4IR@google.com>
+ <87v9bz7sdk.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d68b6269-ee99-9ed7-de30-867e4519d104@redhat.com>
+In-Reply-To: <87v9bz7sdk.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Thu, Jan 14, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Wed, Jan 13, 2021, Vitaly Kuznetsov wrote:
+> >> Hyper-V emulation is enabled in KVM unconditionally. This is bad at least
+> >> from security standpoint as it is an extra attack surface. Ideally, there
+> >> should be a per-VM capability explicitly enabled by VMM but currently it
+> >
+> > Would adding a module param buy us anything (other than complexity)?
+> >
+> 
+> A tiny bit, yes. This series is aimed at protecting KVM from 'curious
+> guests' which can try to enable Hyper-V emulation features even when
+> they don't show up in CPUID. A module parameter would help to protect
+> against a malicious VMM which can still enable all these features. What
+> I'm not sure about is how common Linux-guests-only deployments (where
+> the parameter can actually get used) are as we'll have to keep it
+> 'enabled' by default to avoid breaking existing deployments.
 
-On Thu, Jan 14, 2021 at 05:58:27PM +0100, Auger Eric wrote:
-> >>  The uacce-devel branches from
-> >>> https://github.com/Linaro/linux-kernel-uadk do provide this at the moment
-> >>> (they track the latest sva/zip-devel branch
-> >>> https://jpbrucker.net/git/linux/ which is roughly based on mainline.)
-> As I plan to respin shortly, please could you confirm the best branch to
-> rebase on still is that one (uacce-devel from the linux-kernel-uadk git
-> repo). Is it up to date? Commits seem to be quite old there.
+I always forget that these "optional" features aren't so optional for Windows
+guests.  Given that, it does seem like a module param would be of dubious value.
 
-Right I meant the uacce-devel-X branches. The uacce-devel-5.11 branch
-currently has the latest patches
-
-Thanks,
-Jean
+What I really want for my own personal development is a Kconfig option to turn
+it off completely and shave a few cycles of build time, but I can't even justify
+that to myself :-)
