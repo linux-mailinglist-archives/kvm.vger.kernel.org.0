@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A88412F6365
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 15:46:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2D8B2F6363
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 15:46:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728420AbhANOq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 09:46:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4970 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726259AbhANOq2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 09:46:28 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10EEi3lG083160;
-        Thu, 14 Jan 2021 09:45:47 -0500
+        id S1727892AbhANOqZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 09:46:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24672 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726259AbhANOqZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 09:46:25 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10EEUmm4080749;
+        Thu, 14 Jan 2021 09:45:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=oE51Pj+8KhuMhuuU6Ct3mQ3fx9Amv8F1ucAqfiJVZbs=;
- b=riIa8iNgZKk/dTiMGE33qD1VP5zZUdsLLTb+lA+GG9QCx9L6jwnBTgD7ifi61ULBrqqF
- Dyvwrh9RqLZK1ZQwBHEHZ4pRGrbzvxPq5PTuKPmhhBoNUfnuF81jKyACIEcdxpyoPJgT
- 6nX0WDruEx0Xyv+wPrfKf5LHMfanTHrJPTJTO+ApapuFdKvX4GGX5JO0/TzZSRis2WwS
- iBDN6oWeT1v8t2qMUtqnsIofZudXvMoy7Tl8XnZ00izUYhL2p2urTnGAoqT17a1yia5q
- qhh3IKOJAMF2bOjWmSIAAs3dlWzD1Lfkym5FFNzBQcQeo1u+6LiUHm+FUqnka6pWifZc Hw== 
+ bh=bI9zEC/sNpkMifgPA+dpVL+YmmV9uHf6XFVl02HyY4E=;
+ b=jsjeiBDp1x/R4ZMM21HQcgnSoJSPKbR2EF80igR2tve0dW8Qe4aEqtvTn0pSrA9unobr
+ NFut6Hm/5eCIiMIm2zuoO1krWSD/vuL6xeVyLQVBXXbDe5cTh9BnyDHcj8GXasMrai+a
+ dc0RwiO+b8Dgrism5HFFMzry2M8x8fa5MB0fOBF4G389UKApB4cBuz9HeRgmA1l3IAM6
+ 8wTNND0jLTh5EFh6WIb7LLABxYna8ENbL8LY9gVj5l+ojKTSd9Wx3nmH40YmyQskU4zI
+ 73Nug3+R/1wQqoqZmVOutJ990sKdX8gBoK2YjPD2VIHuE2rVDFKqKYSV1ShPmd9tVMie tA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362qymg1c9-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362qsmgc5h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 09:45:47 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10EEjlpA090900;
-        Thu, 14 Jan 2021 09:45:47 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362qymg1ba-1
+        Thu, 14 Jan 2021 09:45:43 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10EEVMOc081923;
+        Thu, 14 Jan 2021 09:45:43 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362qsmgc50-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 09:45:47 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10EEPNqj021038;
-        Thu, 14 Jan 2021 14:45:44 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 35y4483cdr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 14:45:44 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10EEjf1c30671208
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jan 2021 09:45:43 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10EEMXMS004526;
         Thu, 14 Jan 2021 14:45:41 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 35y448ehuv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 14:45:41 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10EEjcOk35848648
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jan 2021 14:45:38 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B0EBDAE057;
-        Thu, 14 Jan 2021 14:45:41 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id A7523AE051;
+        Thu, 14 Jan 2021 14:45:38 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57ABBAE053;
-        Thu, 14 Jan 2021 14:45:41 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 4B73BAE04D;
+        Thu, 14 Jan 2021 14:45:38 +0000 (GMT)
 Received: from ibm-vm (unknown [9.145.11.88])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jan 2021 14:45:41 +0000 (GMT)
-Date:   Thu, 14 Jan 2021 14:47:33 +0100
+        Thu, 14 Jan 2021 14:45:38 +0000 (GMT)
+Date:   Thu, 14 Jan 2021 14:55:19 +0100
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Janosch Frank <frankja@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
         borntraeger@de.ibm.com, cohuck@redhat.com,
         linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v4 3/9] s390x: SCLP feature checking
-Message-ID: <20210114144733.3ec11445@ibm-vm>
-In-Reply-To: <20210112132054.49756-4-frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v4 1/9] s390x: Add test_bit to library
+Message-ID: <20210114145519.32a509c0@ibm-vm>
+In-Reply-To: <20210112132054.49756-2-frankja@linux.ibm.com>
 References: <20210112132054.49756-1-frankja@linux.ibm.com>
-        <20210112132054.49756-4-frankja@linux.ibm.com>
+        <20210112132054.49756-2-frankja@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
@@ -72,122 +72,117 @@ Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-14_05:2021-01-14,2021-01-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- phishscore=0 adultscore=0 suspectscore=0 mlxscore=0 mlxlogscore=999
- bulkscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101140085
+ definitions=2021-01-14_04:2021-01-14,2021-01-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 suspectscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999
+ priorityscore=1501 adultscore=0 clxscore=1015 spamscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101140083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 12 Jan 2021 08:20:48 -0500
+On Tue, 12 Jan 2021 08:20:46 -0500
 Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Availability of SIE is announced via a feature bit in a SCLP info CPU
-> entry. Let's add a framework that allows us to easily check for such
-> facilities.
+> Query/feature bits are commonly tested via MSB bit numbers on
+> s390. Let's add test bit functions, so we don't need to copy code to
+> test query bits.
+> 
+> The test_bit code has been taken from the kernel since most s390x KVM
+> unit test developers are used to them.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
 > ---
->  lib/s390x/io.c   |  1 +
->  lib/s390x/sclp.c | 25 +++++++++++++++++++++++++
->  lib/s390x/sclp.h | 13 ++++++++++++-
->  3 files changed, 38 insertions(+), 1 deletion(-)
+>  lib/s390x/asm/bitops.h   | 26 ++++++++++++++++++++++++++
+>  lib/s390x/asm/facility.h |  3 ++-
+>  s390x/uv-guest.c         |  6 +++---
+>  3 files changed, 31 insertions(+), 4 deletions(-)
 > 
-> diff --git a/lib/s390x/io.c b/lib/s390x/io.c
-> index 6a1da63..ef9f59e 100644
-> --- a/lib/s390x/io.c
-> +++ b/lib/s390x/io.c
-> @@ -35,6 +35,7 @@ void setup(void)
->  	setup_args_progname(ipl_args);
->  	setup_facilities();
->  	sclp_read_info();
-> +	sclp_facilities_setup();
->  	sclp_console_setup();
->  	sclp_memory_setup();
->  	smp_setup();
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 12916f5..06819a6 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -25,6 +25,7 @@ static uint64_t max_ram_size;
->  static uint64_t ram_size;
->  char _read_info[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
->  static ReadInfo *read_info;
-> +struct sclp_facilities sclp_facilities;
+> diff --git a/lib/s390x/asm/bitops.h b/lib/s390x/asm/bitops.h
+> index e7cdda9..792881e 100644
+> --- a/lib/s390x/asm/bitops.h
+> +++ b/lib/s390x/asm/bitops.h
+> @@ -1,3 +1,13 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + *    Bitops taken from the kernel as most developers are already
+> used
+> + *    to them.
+> + *
+> + *    Copyright IBM Corp. 1999,2013
+> + *
+> + *    Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>,
+> + *
+> + */
+>  #ifndef _ASMS390X_BITOPS_H_
+>  #define _ASMS390X_BITOPS_H_
 >  
->  char _sccb[PAGE_SIZE] __attribute__((__aligned__(4096)));
->  static volatile bool sclp_busy;
-> @@ -128,6 +129,30 @@ CPUEntry *sclp_get_cpu_entries(void)
->  	return (CPUEntry *)(_read_info + read_info->offset_cpu);
->  }
+> @@ -7,4 +17,20 @@
 >  
-> +void sclp_facilities_setup(void)
+>  #define BITS_PER_LONG	64
+>  
+> +static inline bool test_bit(unsigned long nr,
+> +			    const volatile unsigned long *ptr)
 > +{
-> +	unsigned short cpu0_addr = stap();
-> +	CPUEntry *cpu;
-> +	int i;
+> +	const volatile unsigned char *addr;
 > +
-> +	assert(read_info);
-> +
-> +	cpu = sclp_get_cpu_entries();
-> +	for (i = 0; i < read_info->entries_cpu; i++, cpu++) {
-> +		/*
-> +		 * The logic for only reading the facilities from the
-> +		 * boot cpu comes from the kernel. I haven't yet
-> found
-> +		 * documentation that explains why this is necessary
-> +		 * but I figure there's a reason behind doing it this
-> +		 * way.
-> +		 */
-> +		if (cpu->address == cpu0_addr) {
-> +			sclp_facilities.has_sief2 = cpu->feat_sief2;
-> +			break;
-> +		}
-> +	}
+> +	addr = ((const volatile unsigned char *)ptr);
+> +	addr += (nr ^ (BITS_PER_LONG - 8)) >> 3;
+> +	return (*addr >> (nr & 7)) & 1;
 > +}
 > +
->  /* Perform service call. Return 0 on success, non-zero otherwise. */
->  int sclp_service_call(unsigned int command, void *sccb)
->  {
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index acd86d5..6c86037 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -92,12 +92,22 @@ typedef struct SCCBHeader {
->  typedef struct CPUEntry {
->      uint8_t address;
->      uint8_t reserved0;
-> -    uint8_t features[SCCB_CPU_FEATURE_LEN];
-> +    uint8_t : 4;
-> +    uint8_t feat_sief2 : 1;
-> +    uint8_t : 3;
-> +    uint8_t features_res2 [SCCB_CPU_FEATURE_LEN - 1];
->      uint8_t reserved2[6];
->      uint8_t type;
->      uint8_t reserved1;
->  } __attribute__((packed)) CPUEntry;
+> +static inline bool test_bit_inv(unsigned long nr,
+> +				const volatile unsigned long *ptr)
+> +{
+> +	return test_bit(nr ^ (BITS_PER_LONG - 1), ptr);
+> +}
+> +
+>  #endif
+> diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+> index 7828cf8..95d4a15 100644
+> --- a/lib/s390x/asm/facility.h
+> +++ b/lib/s390x/asm/facility.h
+> @@ -11,13 +11,14 @@
+>  #include <libcflat.h>
+>  #include <asm/facility.h>
+>  #include <asm/arch_def.h>
+> +#include <bitops.h>
 >  
-> +extern struct sclp_facilities sclp_facilities;
-> +
-> +struct sclp_facilities {
-> +	uint64_t has_sief2 : 1;
-> +	uint64_t : 63;
-> +};
-> +
->  typedef struct ReadInfo {
->      SCCBHeader h;
->      uint16_t rnmax;
-> @@ -271,6 +281,7 @@ void sclp_print(const char *str);
->  void sclp_read_info(void);
->  int sclp_get_cpu_num(void);
->  CPUEntry *sclp_get_cpu_entries(void);
-> +void sclp_facilities_setup(void);
->  int sclp_service_call(unsigned int command, void *sccb);
->  void sclp_memory_setup(void);
->  uint64_t get_ram_size(void);
+>  #define NB_STFL_DOUBLEWORDS 32
+>  extern uint64_t stfl_doublewords[];
+>  
+>  static inline bool test_facility(int nr)
+>  {
+> -	return stfl_doublewords[nr / 64] & (0x8000000000000000UL >>
+> (nr % 64));
+> +	return test_bit_inv(nr, stfl_doublewords);
+>  }
+>  
+>  static inline void stfl(void)
+> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+> index bc947ab..e51b85e 100644
+> --- a/s390x/uv-guest.c
+> +++ b/s390x/uv-guest.c
+> @@ -75,11 +75,11 @@ static void test_query(void)
+>  	 * Ultravisor version and are expected to always be available
+>  	 * because they are basic building blocks.
+>  	 */
+> -	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> BIT_UVC_CMD_QUI)),
+> +	report(test_bit_inv(BIT_UVC_CMD_QUI,
+> &uvcb.inst_calls_list[0]), "query indicated");
+> -	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> BIT_UVC_CMD_SET_SHARED_ACCESS)),
+> +	report(test_bit_inv(BIT_UVC_CMD_SET_SHARED_ACCESS,
+> &uvcb.inst_calls_list[0]), "share indicated");
+> -	report(uvcb.inst_calls_list[0] & (1UL << (63 -
+> BIT_UVC_CMD_REMOVE_SHARED_ACCESS)),
+> +	report(test_bit_inv(BIT_UVC_CMD_REMOVE_SHARED_ACCESS,
+> &uvcb.inst_calls_list[0]), "unshare indicated");
+>  	report_prefix_pop();
+>  }
 
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
