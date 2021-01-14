@@ -2,135 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54D522F59C3
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 05:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58A0E2F5BA6
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 08:55:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbhANEGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 23:06:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38655 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726266AbhANEGk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 23:06:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610597113;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=F2SauyeBoNIAKM9KVkqWMQKUoIK3y6HHp4d6VTJUfbI=;
-        b=bpgTJNXj67KfKI0WSeSvAk+tRY3v8OwXH8gFuuaGncWpnfaBaRHDHhE3ozj9nGL41zP7Is
-        hzQlDrUixZ83dxfw4ik2hwO+64srN5dcYx22Ui0isV8bwSpGPxOslAgGprrxLKCaDZNcGY
-        NAPrxkSj+wPaBMJovsbQQzm8q58Pgsc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-rUm7tYEMNqKybAhDO-Ndug-1; Wed, 13 Jan 2021 23:05:09 -0500
-X-MC-Unique: rUm7tYEMNqKybAhDO-Ndug-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D59F2800050;
-        Thu, 14 Jan 2021 04:05:07 +0000 (UTC)
-Received: from [10.72.12.100] (ovpn-12-100.pek2.redhat.com [10.72.12.100])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7EDB360C17;
-        Thu, 14 Jan 2021 04:05:02 +0000 (UTC)
-Subject: Re: [RFC 1/2] KVM: add initial support for KVM_SET_IOREGION
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
-        jag.raman@oracle.com, elena.ufimtseva@oracle.com
-References: <0cc68c81d6fae042d8a84bf90dd77eecd4da7cc8.camel@gmail.com>
- <947ba980-f870-16fb-2ea5-07da617d6bb6@redhat.com>
- <29955fdc90d2efab7b79c91b9a97183e95243cc1.camel@gmail.com>
- <47e8b7e8-d9b8-b2a2-c014-05942d99452a@redhat.com>
- <20210105102517.GA31084@stefanha-x1.localdomain>
- <f9cd33f6-c30d-4e5a-bc45-8f42109fe1ce@redhat.com>
- <20210106150525.GB130669@stefanha-x1.localdomain>
- <32b49857-4ac7-0646-929d-c9238b50bc49@redhat.com>
- <20210107175311.GA168426@stefanha-x1.localdomain>
- <e22eaf2b-15f6-5b41-75a8-0e9b24e84e16@redhat.com>
- <20210113155205.GA270353@stefanha-x1.localdomain>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <7bdcf76d-9eba-428a-bf40-0434934f24a9@redhat.com>
-Date:   Thu, 14 Jan 2021 12:05:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727552AbhANHyc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 02:54:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726819AbhANHyb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 02:54:31 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D4C4C239EF;
+        Thu, 14 Jan 2021 07:53:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610610830;
+        bh=BXt2olIMSsLtD8I2dioNC1dF1gnxlCbQs+WN6FCb4nE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=s0XxntmYYJHZOMEV2ezXMlavrLQamHOON6XCuxktQJvVAECs99C5z/1aJ9vJhpL8u
+         ooeeAl2QTMZNzf+wMfEpKpWg40tk1M0qnksP48Wj5LotBytvL5l6d4s7r5DnGwrSaG
+         EH99zAztLa1B6MMeto4xMR8BJQ0ZLi5vAvwqfqQhhWEPmUUPibd3hUMclqtKjDn9OB
+         Utpv0Ju4+AOG0dmdSki7FZM9GtjIWxV8jruDU/sDouAY8GwvD2n2HBSlFqfv/WWpXP
+         DJr7Fq0cZK3daZV+WRhSNlCFNyWFUZ+j72ACR35krQCcJ9iaizMmnvIhYttJJ/HyQS
+         YKU4ctJMp8S5g==
+Received: by mail.kernel.org with local (Exim 4.94)
+        (envelope-from <mchehab@kernel.org>)
+        id 1kzxRz-00EPu1-2O; Thu, 14 Jan 2021 08:53:47 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Chao Yu <chao@kernel.org>, Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@linux.ie>,
+        Felipe Balbi <balbi@kernel.org>,
+        Harry Wei <harryxiyou@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Moritz Fischer <mdf@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Wu Hao <hao.wu@intel.com>, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-fpga@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: [PATCH 00/10] Fix documentation warnings at linux-next
+Date:   Thu, 14 Jan 2021 08:53:35 +0100
+Message-Id: <cover.1610610444.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20210113155205.GA270353@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series fixes the documentation warnings found at next-20210114.
 
-On 2021/1/13 下午11:52, Stefan Hajnoczi wrote:
-> On Wed, Jan 13, 2021 at 10:38:29AM +0800, Jason Wang wrote:
->> On 2021/1/8 上午1:53, Stefan Hajnoczi wrote:
->>> On Thu, Jan 07, 2021 at 11:30:47AM +0800, Jason Wang wrote:
->>>> On 2021/1/6 下午11:05, Stefan Hajnoczi wrote:
->>>>> On Wed, Jan 06, 2021 at 01:21:43PM +0800, Jason Wang wrote:
->>>>>> On 2021/1/5 下午6:25, Stefan Hajnoczi wrote:
->>>>>>> On Tue, Jan 05, 2021 at 11:53:01AM +0800, Jason Wang wrote:
->>>>>>>> On 2021/1/5 上午8:02, Elena Afanasova wrote:
->>>>>>>>> On Mon, 2021-01-04 at 13:34 +0800, Jason Wang wrote:
->>>>>>>>>> On 2021/1/4 上午4:32, Elena Afanasova wrote:
->>>>>>>>>>> On Thu, 2020-12-31 at 11:45 +0800, Jason Wang wrote:
->>>>>>>>>>>> On 2020/12/29 下午6:02, Elena Afanasova wrote:
->>> 2. If separate userspace threads process the virtqueues, then set up the
->>>      virtio-pci capabilities so the virtqueues have separate notification
->>>      registers:
->>>      https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-1150004
->>
->> Right. But this works only when PCI transport is used and queue index could
->> be deduced from the register address (separated doorbell).
->>
->> If we use MMIO or sharing the doorbell registers among all the virtqueues
->> (multiplexer is zero in the above case) , it can't work without datamatch.
-> True. Can you think of an application that needs to dispatch a shared
-> doorbell register to several threads?
+Most of the changes here are trivial. 
 
+While those patches could be merged via the docs tree during
+the next merge window, It sounds better to have those patches 
+merged directly via each maintainer's tree, where the new
+warnings were introduced.
 
-I think it depends on semantic of doorbell register. I guess one example 
-is the virito-mmio multiqueue device.
+Regards,
+Mauro
 
+Mauro Carvalho Chehab (10):
+  doc/zh_CN: fix Sphinx errors
+  ABI: sysfs-fs-f2fs: fix a table identation
+  KVM: x86: hyper-v: add a blank line to remove building warnings
+  ABI: sysfs-firmware-sgi_uv
+  docs: fpga: dfl.rst: Fix a couple building issues
+  drm: amd: amdgpu_dm.h: fix a wrong kernel-doc markup
+  dwc3: document gadget_max_speed
+  doc: zh_CN/mips: fix doc cross-references
+  media: v4l2-subdev.rst: fix a missing whitespace
+  seqlock: kernel-doc: fix a prototype
 
->
-> If this is a case that real-world applications need then we should
-> tackle it. This is where eBPF would be appropriate. I guess the
-> interface would be something like:
->
->    /*
->     * A custom demultiplexer function that returns the index of the <wfd,
->     * rfd> pair to use or -1 to produce a KVM_EXIT_IOREGION_FAILURE that
->     * userspace must handle.
->     */
->    int demux(const struct ioregionfd_cmd *cmd);
->
-> Userspace can install an eBPF demux function as well as an array of
-> <wfd, rfd> fd pairs. The demux function gets to look at the cmd in order
-> to decide which fd pair it is sent to.
->
-> This is how I think eBPF datamatch could work. It's not as general as in
-> our original discussion where we also talked about custom protocols
-> (instead of struct ioregionfd_cmd/struct ioregionfd_resp).
+ Documentation/ABI/testing/sysfs-firmware-sgi_uv       | 1 +
+ Documentation/ABI/testing/sysfs-fs-f2fs               | 3 ++-
+ Documentation/driver-api/media/v4l2-subdev.rst        | 2 +-
+ Documentation/fpga/dfl.rst                            | 4 ++--
+ Documentation/translations/zh_CN/mips/booting.rst     | 2 +-
+ Documentation/translations/zh_CN/mips/features.rst    | 2 +-
+ Documentation/translations/zh_CN/mips/index.rst       | 2 +-
+ Documentation/translations/zh_CN/mips/ingenic-tcu.rst | 6 +++---
+ Documentation/virt/kvm/api.rst                        | 1 +
+ drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.h     | 2 +-
+ drivers/usb/dwc3/core.h                               | 1 +
+ include/linux/seqlock.h                               | 2 +-
+ 12 files changed, 16 insertions(+), 12 deletions(-)
 
+-- 
+2.29.2
 
-Actually they are not conflict. We can make it a eBPF ioregion, then 
-it's the eBPF program that can decide:
-
-1) whether or not it need to do datamatch
-2) how many file descriptors it want to use (store the fd in a map)
-3) how will the protocol looks like
-
-But as discussed it could be an add-on on top of the hard logic of 
-ioregion since there could be case that eBPF may not be allowed not not 
-supported. So adding simple datamatch support as a start might be a good 
-choice.
-
-Thanks
-
-
->
-> Stefan
 
