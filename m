@@ -2,136 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A1612F5672
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 721362F5614
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:57:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728366AbhANBsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 20:48:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729698AbhANAlN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jan 2021 19:41:13 -0500
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450D1C061389
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:38:11 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id e14so2973877qtr.8
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:38:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=GWAuLMH7Ls1Ey0iR5g9WiKswv9AMybZldn+rr0xf6ac=;
-        b=EA5dGny0b2252/x6CNsCPKBTA7REUvSuQY/vkBnPivTVuhM8e9yuI+i12+7oOOBfFs
-         Odc8VO6oCuwkhgHeMO+Kxl6qhi2hPsfF3AMD/AelinGodE7PUAjSE2Hbn6mYPuzD+w4d
-         LW+nnVBmYuL7Q9TFywnfbudkkng1w4GhDAzXOBhadAtiu9hGgckJrjPvsivW2pFpifvX
-         h6E0oo6T0I6oQ0JDleuIMT5bTm+bToe6ZTjz8pFVJZzaiJJwRGcqDwuTYFwkyCcriWBq
-         RRUBgVnbMg3apSIZ/HOwOt7LW/AeIm7+/suFXahOMBLws5n4KwAcBrIv8PxRySYRViTF
-         k6Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=GWAuLMH7Ls1Ey0iR5g9WiKswv9AMybZldn+rr0xf6ac=;
-        b=HABQokuQez8XvMNdQoUIwfZjGNjpsdy6ROCqygbx+hUKOQ2fni19TZxL7gACn/4687
-         8fMh86hwssMZ7DVPqyKOM0Q6fFjnNJ0LHjMddlAYfVzYA4XGsuOGDCTdexFvSB0Q1ySu
-         fe7lTDV1XUGIg8k9DAY3BNrdGIxZF7Os/2brPqv8AI3OigSCs3hE8KdZj2jh8r5IF9BS
-         yCVKRYbtx66lNvTHgS36PXO2YQH+CJz3SDV7A88+2DgcuhyRD2smx+QduovoonC5m02C
-         O8VeX9jkfEoEIcYnVxnObIR4mKjQpPre+qVPyyrmUZDMIqfVtZSReZXva7djY+ouQmao
-         6w/A==
-X-Gm-Message-State: AOAM5306Nbf9MGOCgFMavMz56bSHHcYHA2MW4CcbJgjKXioMTPStkA+5
-        LUpUnQ1/h7ikbVqqNukYCJouNgKNTdE=
-X-Google-Smtp-Source: ABdhPJxd26knuMip8++7sqtHgt8IOL56+LllnVUDn9Zy+jMdU8upn1suW+wnmfnhT20jDRW580FRWd3GuJ0=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a25:cf08:: with SMTP id f8mr7105191ybg.210.1610584690440;
- Wed, 13 Jan 2021 16:38:10 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Jan 2021 16:37:08 -0800
-In-Reply-To: <20210114003708.3798992-1-seanjc@google.com>
-Message-Id: <20210114003708.3798992-15-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210114003708.3798992-1-seanjc@google.com>
-X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH v2 14/14] KVM: SVM: Skip SEV cache flush if no ASIDs have been used
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727788AbhANBln (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 20:41:43 -0500
+Received: from mga05.intel.com ([192.55.52.43]:51491 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727184AbhANBlm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 20:41:42 -0500
+IronPort-SDR: mH9n4n3hcY8emYU04IYSsu3z9oSu6hiCVzgmjJKqZT+cQUnS4eIITShvvN7cbsvhfm0W8NRKLO
+ Vwvo/pr3A3bg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9863"; a="263084524"
+X-IronPort-AV: E=Sophos;i="5.79,345,1602572400"; 
+   d="scan'208";a="263084524"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2021 17:38:18 -0800
+IronPort-SDR: 70ByEuj6ZUTxoobpwmM7DnqLWj+gPglSHAzdk1Zcl51BXOPdoBO9ptYytiJ7aJ9FshTQjUNI11
+ 332Cn7+I7AeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.79,345,1602572400"; 
+   d="scan'208";a="569582482"
+Received: from allen-box.sh.intel.com ([10.239.159.28])
+  by fmsmga006.fm.intel.com with ESMTP; 13 Jan 2021 17:38:11 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     tglx@linutronix.de, ashok.raj@intel.com, kevin.tian@intel.com,
+        dave.jiang@intel.com, megha.dey@intel.com, dwmw2@infradead.org
+Cc:     alex.williamson@redhat.com, bhelgaas@google.com,
+        dan.j.williams@intel.com, will@kernel.org, joro@8bytes.org,
+        dmaengine@vger.kernel.org, eric.auger@redhat.com,
+        jacob.jun.pan@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
+        kwankhede@nvidia.com, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, iommu@lists.linux-foundation.org,
+        maz@kernel.org, mona.hossain@intel.com, netanelg@mellanox.com,
+        parav@mellanox.com, pbonzini@redhat.com, rafael@kernel.org,
+        samuel.ortiz@intel.com, sanjay.k.kumar@intel.com,
+        shahafs@mellanox.com, tony.luck@intel.com, vkoul@kernel.org,
+        yan.y.zhao@linux.intel.com, yi.l.liu@intel.com, leon@kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [RFC PATCH v3 0/2] Add platform check for subdevice irq domain
+Date:   Thu, 14 Jan 2021 09:30:01 +0800
+Message-Id: <20210114013003.297050-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip SEV's expensive WBINVD and DF_FLUSH if there are no SEV ASIDs
-waiting to be reclaimed, e.g. if SEV was never used.  This "fixes" an
-issue where the DF_FLUSH fails during hardware teardown if the original
-SEV_INIT failed.  Ideally, SEV wouldn't be marked as enabled in KVM if
-SEV_INIT fails, but that's a problem for another day.
+Hi,
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/sev.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+Learnt from the discussions in this thread:
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 23a4bead4a82..e71bc742d8da 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -56,9 +56,14 @@ struct enc_region {
- 	unsigned long size;
- };
- 
--static int sev_flush_asids(void)
-+static int sev_flush_asids(int min_asid, int max_asid)
- {
--	int ret, error = 0;
-+	int ret, pos, error = 0;
-+
-+	/* Check if there are any ASIDs to reclaim before performing a flush */
-+	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
-+	if (pos >= max_asid)
-+		return -EBUSY;
- 
- 	/*
- 	 * DEACTIVATE will clear the WBINVD indicator causing DF_FLUSH to fail,
-@@ -80,14 +85,7 @@ static int sev_flush_asids(void)
- /* Must be called with the sev_bitmap_lock held */
- static bool __sev_recycle_asids(int min_asid, int max_asid)
- {
--	int pos;
--
--	/* Check if there are any ASIDs to reclaim before performing a flush */
--	pos = find_next_bit(sev_reclaim_asid_bitmap, max_sev_asid, min_asid);
--	if (pos >= max_asid)
--		return false;
--
--	if (sev_flush_asids())
-+	if (sev_flush_asids(min_asid, max_asid))
- 		return false;
- 
- 	/* The flush process will flush all reclaimable SEV and SEV-ES ASIDs */
-@@ -1323,10 +1321,10 @@ void sev_hardware_teardown(void)
- 	if (!sev_enabled)
- 		return;
- 
-+	sev_flush_asids(0, max_sev_asid);
-+
- 	bitmap_free(sev_asid_bitmap);
- 	bitmap_free(sev_reclaim_asid_bitmap);
--
--	sev_flush_asids();
- }
- 
- int sev_cpu_init(struct svm_cpu_data *sd)
+https://lore.kernel.org/linux-pci/160408357912.912050.17005584526266191420.stgit@djiang5-desk3.ch.intel.com/
+
+The device IMS (Interrupt Message Storage) should not be enabled in any
+virtualization environments unless there is a HYPERCALL domain which
+makes the changes in the message store monitored by the hypervisor.
+
+As the initial step, we allow the IMS to be enabled only if we are
+running on the bare metal. It's easy to enable IMS in the virtualization
+environments if above preconditions are met in the future.
+
+This series is only for comments purpose. We will include it in the Intel
+IMS implementation later once we reach a consensus.
+
+Change log:
+v2->v3:
+ - v2:
+   https://lore.kernel.org/linux-pci/20210106022749.2769057-1-baolu.lu@linux.intel.com/
+ - Add all identified heuristics so far.
+
+v1->v2:
+ - v1:
+   https://lore.kernel.org/linux-pci/20201210004624.345282-1-baolu.lu@linux.intel.com/
+ - Rename probably_on_bare_metal() with on_bare_metal();
+ - Some vendors might use the same name for both bare metal and virtual
+   environment. Before we add vendor specific code to distinguish
+   between them, let's return false in on_bare_metal(). This won't
+   introduce any regression. The only impact is that the coming new
+   platform msi feature won't be supported until the vendor specific code
+   is provided.
+
+Best regards,
+baolu
+
+Lu Baolu (2):
+  iommu: Add capability IOMMU_CAP_VIOMMU
+  platform-msi: Add platform check for subdevice irq domain
+
+ arch/x86/pci/common.c        | 71 ++++++++++++++++++++++++++++++++++++
+ drivers/base/platform-msi.c  |  8 ++++
+ drivers/iommu/intel/iommu.c  | 20 ++++++++++
+ drivers/iommu/virtio-iommu.c |  9 +++++
+ include/linux/iommu.h        |  1 +
+ include/linux/msi.h          |  1 +
+ 6 files changed, 110 insertions(+)
+
 -- 
-2.30.0.284.gd98b1dd5eaa7-goog
+2.25.1
 
