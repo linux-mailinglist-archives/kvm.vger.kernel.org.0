@@ -2,158 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B4A2F5E48
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 11:05:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59EA32F5E78
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 11:15:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728495AbhANKEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 05:04:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22387 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727906AbhANKEa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 05:04:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610618584;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xXjNcBX1zyUVY22wn0iABMXWOTnE52HCbnMakakpYNA=;
-        b=euxPsAD0CbMAGaGMbF5URSRSbLx8ugkPuHuxqOg4ISaGhriDuqwWc3AIXlfUBJMIwMpcza
-        F2A4hfvklSQAzQiE6o9KVHJVD95D8S3Z7PfTf09p1GaPXK+JfDFpDb1fYU95NHA5idfFaM
-        6SZi7nwLGR4VJK5gApuolbioPVvPt8g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-p58qiEhWMVmNF5ryZwfFhw-1; Thu, 14 Jan 2021 05:03:01 -0500
-X-MC-Unique: p58qiEhWMVmNF5ryZwfFhw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8338084A5E8;
-        Thu, 14 Jan 2021 10:02:59 +0000 (UTC)
-Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B7CBF71D60;
-        Thu, 14 Jan 2021 10:02:56 +0000 (UTC)
-Subject: Re: [PATCH 1/9] KVM: arm64: vgic-v3: Fix some error codes when
- setting RDIST base
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        eric.auger.pro@gmail.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
-        drjones@redhat.com
-Cc:     james.morse@arm.com, julien.thierry.kdev@gmail.com,
-        suzuki.poulose@arm.com, shuah@kernel.org, pbonzini@redhat.com
-References: <20201212185010.26579-1-eric.auger@redhat.com>
- <20201212185010.26579-2-eric.auger@redhat.com>
- <fa73780d-b72b-6810-460e-5ed1057df093@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <e37f1942-dcb7-3579-0aba-e131e4bd9217@redhat.com>
-Date:   Thu, 14 Jan 2021 11:02:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S1728357AbhANKOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 05:14:12 -0500
+Received: from 8.mo51.mail-out.ovh.net ([46.105.45.231]:46432 "EHLO
+        8.mo51.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725989AbhANKOM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 05:14:12 -0500
+X-Greylist: delayed 359 seconds by postgrey-1.27 at vger.kernel.org; Thu, 14 Jan 2021 05:14:10 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.114])
+        by mo51.mail-out.ovh.net (Postfix) with ESMTPS id AD25625A6C9;
+        Thu, 14 Jan 2021 11:07:28 +0100 (CET)
+Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 14 Jan
+ 2021 11:07:27 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-103G005a3ce3b89-2be7-4dd6-a28b-2751e61105ee,
+                    0A7C53367AF3A9CD096E542ECC3C8B2C2D100868) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 82.253.208.248
+Date:   Thu, 14 Jan 2021 11:07:26 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+CC:     <brijesh.singh@amd.com>, <pair@us.ibm.com>, <dgilbert@redhat.com>,
+        <pasic@linux.ibm.com>, <qemu-devel@nongnu.org>,
+        <cohuck@redhat.com>,
+        "Richard Henderson" <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>, <borntraeger@de.ibm.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, <mst@redhat.com>,
+        <jun.nakajima@intel.com>, <thuth@redhat.com>,
+        <pragyansri.pathi@intel.com>, <kvm@vger.kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, <qemu-s390x@nongnu.org>,
+        <qemu-ppc@nongnu.org>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>, <andi.kleen@intel.com>
+Subject: Re: [PATCH v7 09/13] confidential guest support: Update
+ documentation
+Message-ID: <20210114110726.189ee7fa@bahia.lan>
+In-Reply-To: <20210113235811.1909610-10-david@gibson.dropbear.id.au>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+        <20210113235811.1909610-10-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <fa73780d-b72b-6810-460e-5ed1057df093@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 482ab6a6-6e0e-4269-8191-07b76130d318
+X-Ovh-Tracer-Id: 1720375058512583068
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedukedrtdehgddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegrnhguihdrkhhlvggvnhesihhnthgvlhdrtghomh
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alexandru,
+On Thu, 14 Jan 2021 10:58:07 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 1/6/21 5:32 PM, Alexandru Elisei wrote:
-> Hi Eric,
+> Now that we've implemented a generic machine option for configuring various
+> confidential guest support mechanisms:
+>   1. Update docs/amd-memory-encryption.txt to reference this rather than
+>      the earlier SEV specific option
+>   2. Add a docs/confidential-guest-support.txt to cover the generalities of
+>      the confidential guest support scheme
 > 
-> On 12/12/20 6:50 PM, Eric Auger wrote:
->> KVM_DEV_ARM_VGIC_GRP_ADDR group doc says we should return
->> -EEXIST in case the base address of the redist is already set.
->> We currently return -EINVAL.
->>
->> However we need to return -EINVAL in case a legacy REDIST address
->> is attempted to be set while REDIST_REGIONS were set. This case
->> is discriminated by looking at the count field.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 9 +++++++--
->>  1 file changed, 7 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 15a6c98ee92f..8e8a862def76 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -792,8 +792,13 @@ static int vgic_v3_insert_redist_region(struct kvm *kvm, uint32_t index,
->>  	int ret;
->>  
->>  	/* single rdist region already set ?*/
->> -	if (!count && !list_empty(rd_regions))
->> -		return -EINVAL;
->> +	if (!count && !list_empty(rd_regions)) {
->> +		rdreg = list_last_entry(rd_regions,
->> +				       struct vgic_redist_region, list);
->> +		if (rdreg->count)
->> +			return -EINVAL; /* Mixing REDIST and REDIST_REGION API */
->> +		return -EEXIST;
->> +	}
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+LGTM
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  docs/amd-memory-encryption.txt      |  2 +-
+>  docs/confidential-guest-support.txt | 43 +++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+>  create mode 100644 docs/confidential-guest-support.txt
 > 
-> A few instructions below:
-> 
->     if (list_empty(rd_regions)) {
->         [..]
->     } else {
->         rdreg = list_last_entry(rd_regions,
->                     struct vgic_redist_region, list);
->         [..]
-> 
->         /* Cannot add an explicitly sized regions after legacy region */
->         if (!rdreg->count)
->             return -EINVAL;
->     }
-> 
-> Isn't this testing for the same thing, but using the opposite condition? Or am I
-> misunderstanding the code (quite likely)?
-the 1st test sequence handles the case where the legacy
-KVM_VGIC_V3_ADDR_TYPE_REDIST is used (!count) while the second handles
-the case where the REDIST_REGION is used. Nevertheless I think this can
-be simplified into:
-
-        if (list_empty(rd_regions)) {
-                if (index != 0)
-                        return -EINVAL;
-        } else {
-                rdreg = list_last_entry(rd_regions,
-                                        struct vgic_redist_region, list);
-
-                if ((!count) != (!rdreg->count))
-                        return -EINVAL; /* Mix REDIST and REDIST_REGION */
-
-                if (!count)
-                        return -EEXIST;
-
-                if (index != rdreg->index + 1)
-                        return -EINVAL;
-        }
-
-
-
-
-
-
-> 
-> Looks to me like KVM_DEV_ARM_VGIC_GRP_ADDR(KVM_VGIC_V3_ADDR_TYPE_REDIST{,_REGION})
-> used to return -EEXIST (from vgic_check_ioaddr()) before commit ccc27bf5be7b7
-> ("KVM: arm/arm64: Helper to register a new redistributor region") which added the
-> vgic_v3_insert_redist_region() function, so bringing back the -EEXIST return code
-> looks the right thing to me.
-
-OK thank you for the detailed study.
-
-Eric
-> 
-> Thanks,
-> Alex
->>  
->>  	/* cross the end of memory ? */
->>  	if (base + size < base)
-> 
+> diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
+> index 80b8eb00e9..145896aec7 100644
+> --- a/docs/amd-memory-encryption.txt
+> +++ b/docs/amd-memory-encryption.txt
+> @@ -73,7 +73,7 @@ complete flow chart.
+>  To launch a SEV guest
+>  
+>  # ${QEMU} \
+> -    -machine ...,memory-encryption=sev0 \
+> +    -machine ...,confidential-guest-support=sev0 \
+>      -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1
+>  
+>  Debugging
+> diff --git a/docs/confidential-guest-support.txt b/docs/confidential-guest-support.txt
+> new file mode 100644
+> index 0000000000..2790425b38
+> --- /dev/null
+> +++ b/docs/confidential-guest-support.txt
+> @@ -0,0 +1,43 @@
+> +Confidential Guest Support
+> +==========================
+> +
+> +Traditionally, hypervisors such as qemu have complete access to a
+> +guest's memory and other state, meaning that a compromised hypervisor
+> +can compromise any of its guests.  A number of platforms have added
+> +mechanisms in hardware and/or firmware which give guests at least some
+> +protection from a compromised hypervisor.  This is obviously
+> +especially desirable for public cloud environments.
+> +
+> +These mechanisms have different names and different modes of
+> +operation, but are often referred to as Secure Guests or Confidential
+> +Guests.  We use the term "Confidential Guest Support" to distinguish
+> +this from other aspects of guest security (such as security against
+> +attacks from other guests, or from network sources).
+> +
+> +Running a Confidential Guest
+> +----------------------------
+> +
+> +To run a confidential guest you need to add two command line parameters:
+> +
+> +1. Use "-object" to create a "confidential guest support" object.  The
+> +   type and parameters will vary with the specific mechanism to be
+> +   used
+> +2. Set the "confidential-guest-support" machine parameter to the ID of
+> +   the object from (1).
+> +
+> +Example (for AMD SEV)::
+> +
+> +    qemu-system-x86_64 \
+> +        <other parameters> \
+> +        -machine ...,confidential-guest-support=sev0 \
+> +        -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1
+> +
+> +Supported mechanisms
+> +--------------------
+> +
+> +Currently supported confidential guest mechanisms are:
+> +
+> +AMD Secure Encrypted Virtualization (SEV)
+> +    docs/amd-memory-encryption.txt
+> +
+> +Other mechanisms may be supported in future.
 
