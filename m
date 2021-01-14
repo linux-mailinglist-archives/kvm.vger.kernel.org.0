@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3316A2F5676
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E0AF2F5674
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 02:58:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728406AbhANBsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 20:48:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56034 "EHLO
+        id S1727677AbhANBsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 20:48:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727291AbhANAjv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 13 Jan 2021 19:39:51 -0500
+        with ESMTP id S1727558AbhANAjy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 13 Jan 2021 19:39:54 -0500
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6026C0617B0
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:47 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id t18so2950849qva.6
-        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AD2AC0617BA
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:53 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id v1so2955335qvb.2
+        for <kvm@vger.kernel.org>; Wed, 13 Jan 2021 16:37:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=6IjwYJ9nQQQ0VcUn254Dijwa+O3I16q70UCT60xMF6g=;
-        b=CO4UFIoLHaCRpVB2MjOZf8UkbKvNnAkg+a0HFbJqY/bV7n5GCIPVyL3/wiX4o6EsFB
-         UqlIyhryQEk16FL3egk36ZjVrvK02kg5Cg3+7NhDC6WdUUVNY2NtXQ7ZvK0hkrcwmImh
-         pb7tGFWUarWoyf6QgqhP/vpYkLm+a+/dkiJz6B1eDLdUPrFIkQEJw/+XtZboQcA3Me3v
-         ufXrBMtYm5C80Yk5OEaOSiVwx9UBzW6d+4MaQXQemOSVUWrbzPR31G3gFw8AIG96PPQ7
-         WfqUar0PVfuJUjUZ8bjP2BJvema0KPNvYaFWLi4EGlhy6Gdvl1vgYtkvFbQuBPbcWRGP
-         oLjw==
+        bh=8hi5Ghzd+1VrsTwQyXoSKnwtmn+Mg6zWlEamMMT6obA=;
+        b=Eq1H8fN0JB+G3ZiEqZS9aXQv0LLbUFqfJ8mzQwOWkpkYI9P5GtPZZOq/4tNnnCEBmh
+         gB4OeUFxH6cGxp14mEDplRZkCql3lYXQIYv4u+1cfOa3Mw9XVASyW7FzpI6EqysthIXd
+         UUQ/sSiPIjW7fhYfx3ILgu+5XwfWEmaj0MMWBCZG611PT6phOvedcZ4rhTpV0K6ov9Qd
+         n4pi51/TsHY2nz7s9/hR+19iOMOVp9O7GPO7ZwEzLw8X/dIDwTJwbcAeJIJgh6HLCNhx
+         xWYyExMoEZaJTHsYZyayNuuXAi/4fHAITl7adS+UbrgmzuAuPWKihGkzM0Wr5uSlCaB1
+         xm+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=6IjwYJ9nQQQ0VcUn254Dijwa+O3I16q70UCT60xMF6g=;
-        b=FYitcNxkowo+iMt+rGx+gdnduIlc/xRxdZ3WbUZyKrLxOOkji2BIgrF1p9gYhb1ovY
-         ezrJbvPtP8Li/7Zi0qzFZM2Cokyzs1qC1UH8m24u+XoKf9tUPliLOHgsUtEmrPfu4mOB
-         irGr1xQ8gcHBFM61pSDZvjoiVEqUK3YhnUVD40UBLlMTrunGDl/vH7RWzhsNNm7Sc1tP
-         2W5iXJAI3KtOSYa24A+nhPhLb1L9Mjc7uNRto+nmiHgWOs3/kbvxVvkjH2kBCdC6Me6c
-         9OlyqICMLmyr0d0dS+wMjcX9p8WzeRuzKHXi2kiwF6unFHeJsETXM0P7gxK2pXh6jMgS
-         AvfA==
-X-Gm-Message-State: AOAM532XTUXcMrchP7r7pIKxjDZdQr6WrFzf2bzuVXpkS6arcxUg97s4
-        l90XJqTM9LTfm6eJsUQH3QyDXa0LIGQ=
-X-Google-Smtp-Source: ABdhPJzmJiGQ2Jk2secJV5cIicU0Y2tSxcoH20LMR4/CzPqNn4te3nKLeCzKG255Qo5g47HTjNbiMwC2yDU=
+        bh=8hi5Ghzd+1VrsTwQyXoSKnwtmn+Mg6zWlEamMMT6obA=;
+        b=gj6LX/zcnZN/SDFiA/DpaxbETSIAS8vfFG+C96faiQjTKbEEfWt7daCoDuFGODX4DV
+         cIy8H+d1NLS/hamToOTOxxP3UzkE79jKb9gBFpitWGgAx3HgW42IPTdR/XNONzlfWjgN
+         22VAf/eVfuGpGEdRdvxh4l9MVLH7eqQc81/l0cSezzsT+yJOBXsL15C1m3OQ83HRnxOC
+         EsYJeoiANixtVTtJzRdd6sphWEBNZVR8teuSBwp3gpZfSMo67MQ8OLC8b/7paU4t7F23
+         AsxGAmaBHaGCOpKJjQQMNhTIYFiVbs3xBYAqsaSGm56uO5/vVGJptO7AdbxyL+QwdRCb
+         cxNg==
+X-Gm-Message-State: AOAM533M+p4igWrgRkVcP/Rde6c5Ztb5NbkdzIG7ImtIWi1P5GhfBfpH
+        5VjoD/AWuIjOMZF8g6FZESNTYPAC8hE=
+X-Google-Smtp-Source: ABdhPJxS6rh2CW7+DImyzzIl9MDcDr69k2UOIU/zNjlCPMX5snioRBw4oBxFDLObWsPqBbE15aAwisfiOI8=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a0c:bd9f:: with SMTP id n31mr4853531qvg.42.1610584667050;
- Wed, 13 Jan 2021 16:37:47 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:ca13:: with SMTP id c19mr4896807qvk.21.1610584672335;
+ Wed, 13 Jan 2021 16:37:52 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 13 Jan 2021 16:36:59 -0800
+Date:   Wed, 13 Jan 2021 16:37:01 -0800
 In-Reply-To: <20210114003708.3798992-1-seanjc@google.com>
-Message-Id: <20210114003708.3798992-6-seanjc@google.com>
+Message-Id: <20210114003708.3798992-8-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210114003708.3798992-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH v2 05/14] KVM: x86: Override reported SME/SEV feature flags
- with host mask
+Subject: [PATCH v2 07/14] KVM: SVM: Append "_enabled" to module-scoped
+ SEV/SEV-ES control variables
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
@@ -72,45 +72,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a reverse-CPUID entry for the memory encryption word, 0x8000001F.EAX,
-and use it to override the supported CPUID flags reported to userspace.
-Masking the reported CPUID flags avoids over-reporting KVM support, e.g.
-without the mask a SEV-SNP capable CPU may incorrectly advertise SNP
-support to userspace.
+Rename sev and sev_es to sev_enabled and sev_es_enabled respectively to
+better align with other KVM terminology, and to avoid pseudo-shadowing
+when the variables are moved to sev.c in a future patch ('sev' is often
+used for local struct kvm_sev_info pointers.
 
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
+No functional change intended.
+
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 2 ++
- arch/x86/kvm/cpuid.h | 1 +
- 2 files changed, 3 insertions(+)
+ arch/x86/kvm/svm/sev.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 13036cf0b912..b7618cdd06b5 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -855,6 +855,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 	case 0x8000001F:
- 		if (!boot_cpu_has(X86_FEATURE_SEV))
- 			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-+		else
-+			cpuid_entry_override(entry, CPUID_8000_001F_EAX);
- 		break;
- 	/*Add support for Centaur's CPUID instruction*/
- 	case 0xC0000000:
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index dc921d76e42e..8b6fc9bde248 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -63,6 +63,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
- 	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
- 	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
- 	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
-+	[CPUID_8000_001F_EAX] = {0x8000001f, 1, CPUID_EAX},
- };
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 8ba93b8fa435..a024edabaca5 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -28,12 +28,12 @@
+ #define __ex(x) __kvm_handle_fault_on_reboot(x)
  
- /*
+ /* enable/disable SEV support */
+-static int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+-module_param(sev, int, 0444);
++static bool sev_enabled = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
++module_param_named(sev, sev_enabled, bool, 0444);
+ 
+ /* enable/disable SEV-ES support */
+-static int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
+-module_param(sev_es, int, 0444);
++static bool sev_es_enabled = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
++module_param_named(sev_es, sev_es_enabled, bool, 0444);
+ 
+ static u8 sev_enc_bit;
+ static int sev_flush_asids(void);
+@@ -213,7 +213,7 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ static int sev_es_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ {
+-	if (!sev_es)
++	if (!sev_es_enabled)
+ 		return -ENOTTY;
+ 
+ 	to_kvm_svm(kvm)->sev_info.es_active = true;
+@@ -1052,7 +1052,7 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	struct kvm_sev_cmd sev_cmd;
+ 	int r;
+ 
+-	if (!svm_sev_enabled() || !sev)
++	if (!svm_sev_enabled() || !sev_enabled)
+ 		return -ENOTTY;
+ 
+ 	if (!argp)
+@@ -1257,7 +1257,7 @@ void __init sev_hardware_setup(void)
+ 	bool sev_es_supported = false;
+ 	bool sev_supported = false;
+ 
+-	if (!IS_ENABLED(CONFIG_KVM_AMD_SEV) || !sev)
++	if (!IS_ENABLED(CONFIG_KVM_AMD_SEV) || !sev_enabled)
+ 		goto out;
+ 
+ 	/* Does the CPU support SEV? */
+@@ -1294,7 +1294,7 @@ void __init sev_hardware_setup(void)
+ 	sev_supported = true;
+ 
+ 	/* SEV-ES support requested? */
+-	if (!sev_es)
++	if (!sev_es_enabled)
+ 		goto out;
+ 
+ 	/* Does the CPU support SEV-ES? */
+@@ -1309,8 +1309,8 @@ void __init sev_hardware_setup(void)
+ 	sev_es_supported = true;
+ 
+ out:
+-	sev = sev_supported;
+-	sev_es = sev_es_supported;
++	sev_enabled = sev_supported;
++	sev_es_enabled = sev_es_supported;
+ }
+ 
+ void sev_hardware_teardown(void)
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
