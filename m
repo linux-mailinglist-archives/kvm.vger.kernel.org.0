@@ -2,68 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C34CC2F5D56
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 10:29:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 76A352F5DD8
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 10:39:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727612AbhANJ0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 04:26:07 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37572 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727174AbhANJ0G (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 04:26:06 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10E93vqH040811;
-        Thu, 14 Jan 2021 04:25:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=aPMBM+XkQVCnTPiepVHmk0qTRFDy1OOcgjKfpH+1GSY=;
- b=VrK/GF7inTMWfHDVoJY3emGt/lVN8Ak57S3IBQhJhM1lRq0ljlD+aM98gP6NulWSI/ri
- iXdtjENQsyZr4p6b4jBPvmvxp59TKC3P75neuPDZjpSTVUHmUmMrIM2I0ySeyIsrn/1Q
- /FBhVR1ByjeniLvWzgCJQoI6obyx1WovGnajA1MBCO0VpIHjxlIg9N42SuzBZiAV8wv6
- AvsY/z8diFEgXOV/OD8IjXlJq4TvRssWIHSfAUskmy1hGDbTVNYLH/2/1RMFciJ0dLP1
- ZZphTQOelZ2+HBfwZ3+v9kf8UP3YtbK4pmlJRNbBRAsP+DOSYDkOIaKTvnHh0xkvb9uW 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362jr6rw7b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 04:25:11 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10E94Nk8041748;
-        Thu, 14 Jan 2021 04:25:08 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362jr6rw4h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 04:25:07 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10E9D9AH022830;
-        Thu, 14 Jan 2021 09:25:02 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma05fra.de.ibm.com with ESMTP id 35y448b75r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 09:25:01 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10E9Ox0o43909382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jan 2021 09:24:59 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F24304C04A;
-        Thu, 14 Jan 2021 09:24:58 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E53224C046;
-        Thu, 14 Jan 2021 09:24:57 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.19.194])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 14 Jan 2021 09:24:57 +0000 (GMT)
-Subject: Re: [PATCH v7 13/13] s390: Recognize confidential-guest-support
- option
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     David Gibson <david@gibson.dropbear.id.au>, brijesh.singh@amd.com,
-        pair@us.ibm.com, dgilbert@redhat.com, pasic@linux.ibm.com,
-        qemu-devel@nongnu.org
-Cc:     cohuck@redhat.com,
+        id S1728117AbhANJgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 04:36:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25009 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726822AbhANJgf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 04:36:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610616908;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=n6alxUJVO4HQG6wR5agsW6NkY2ZUnAv+dedVGMDRB4Q=;
+        b=Vyc+jc9PybkBMSYgGslE0ADQ5wBSd0/I5sB4sS/e8wyNJM5BdTESFpVdBptcTiB6g8LE9p
+        cXAPc1Y7o0lUb+OFkhMxEHWgTKHYsLGAFqfO43xpuj6vs+RBSzYNEDVeZhPtpuzY8v57iv
+        Nl0sDMCZ7ZcNbGFfDK7bVAUHt2tKlY0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-GhMVSrBdMqi424dF7Si8Nw-1; Thu, 14 Jan 2021 04:34:54 -0500
+X-MC-Unique: GhMVSrBdMqi424dF7Si8Nw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C991A190A7A0;
+        Thu, 14 Jan 2021 09:34:51 +0000 (UTC)
+Received: from redhat.com (ovpn-115-77.ams2.redhat.com [10.36.115.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C03C26A8F2;
+        Thu, 14 Jan 2021 09:34:38 +0000 (UTC)
+Date:   Thu, 14 Jan 2021 09:34:36 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
+        pasic@linux.ibm.com, qemu-devel@nongnu.org, cohuck@redhat.com,
         Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+        David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
         jun.nakajima@intel.com, thuth@redhat.com,
@@ -71,59 +47,189 @@ Cc:     cohuck@redhat.com,
         Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
         qemu-ppc@nongnu.org, frankja@linux.ibm.com,
         Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
-        berrange@redhat.com, andi.kleen@intel.com
+        andi.kleen@intel.com
+Subject: Re: [PATCH v7 02/13] confidential guest support: Introduce new
+ confidential guest support class
+Message-ID: <20210114093436.GB1643043@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
- <20210113235811.1909610-14-david@gibson.dropbear.id.au>
- <ba08f5da-e31f-7ae2-898d-a090c5c1b1cf@de.ibm.com>
- <aa72b499-1b84-54a3-fd06-2fec4402b699@de.ibm.com>
-Message-ID: <471babb9-9d5a-a2fa-7d90-f14a7d289b8d@de.ibm.com>
-Date:   Thu, 14 Jan 2021 10:24:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ <20210113235811.1909610-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <aa72b499-1b84-54a3-fd06-2fec4402b699@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-14_03:2021-01-13,2021-01-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 mlxscore=0 clxscore=1015
- spamscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101140052
+Content-Disposition: inline
+In-Reply-To: <20210113235811.1909610-3-david@gibson.dropbear.id.au>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 14.01.21 10:19, Christian Borntraeger wrote:
+On Thu, Jan 14, 2021 at 10:58:00AM +1100, David Gibson wrote:
+> Several architectures have mechanisms which are designed to protect guest
+> memory from interference or eavesdropping by a compromised hypervisor.  AMD
+> SEV does this with in-chip memory encryption and Intel's MKTME can do
+> similar things.  POWER's Protected Execution Framework (PEF) accomplishes a
+> similar goal using an ultravisor and new memory protection features,
+> instead of encryption.
 > 
+> To (partially) unify handling for these, this introduces a new
+> ConfidentialGuestSupport QOM base class.  "Confidential" is kind of vague,
+> but "confidential computing" seems to be the buzzword about these schemes,
+> and "secure" or "protected" are often used in connection to unrelated
+> things (such as hypervisor-from-guest or guest-from-guest security).
 > 
-> On 14.01.21 10:10, Christian Borntraeger wrote:
->>
->>
->> On 14.01.21 00:58, David Gibson wrote:
->> [...]
->>> +int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp)
->>> +{
->>> +    if (!object_dynamic_cast(OBJECT(cgs), TYPE_S390_PV_GUEST)) {
->>> +        return 0;
->>> +    }
->>> +
->>> +    if (!s390_has_feat(S390_FEAT_UNPACK)) {
->>> +        error_setg(errp,
->>> +                   "CPU model does not support Protected Virtualization");
->>> +        return -1;
->>> +    }
->>
->> I am triggering this and I guess this is because the cpu model is not yet initialized at
->> this point in time.
->>
-> When I remove the check, things seems to work though ( I can access virtio-blk devices without
-> specifying iommu for example)
+> The "support" in the name is significant because in at least some of the
+> cases it requires the guest to take specific actions in order to protect
+> itself from hypervisor eavesdropping.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  backends/confidential-guest-support.c     | 33 ++++++++++++++++++++
+>  backends/meson.build                      |  1 +
+>  include/exec/confidential-guest-support.h | 38 +++++++++++++++++++++++
+>  include/qemu/typedefs.h                   |  1 +
+>  target/i386/sev.c                         |  3 +-
+>  5 files changed, 75 insertions(+), 1 deletion(-)
+>  create mode 100644 backends/confidential-guest-support.c
+>  create mode 100644 include/exec/confidential-guest-support.h
+> 
+> diff --git a/backends/confidential-guest-support.c b/backends/confidential-guest-support.c
+> new file mode 100644
+> index 0000000000..9b0ded0db4
+> --- /dev/null
+> +++ b/backends/confidential-guest-support.c
+> @@ -0,0 +1,33 @@
+> +/*
+> + * QEMU Confidential Guest support
+> + *
+> + * Copyright: David Gibson, Red Hat Inc. 2020
+> + *
+> + * Authors:
+> + *  David Gibson <david@gibson.dropbear.id.au>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * later.  See the COPYING file in the top-level directory.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "exec/confidential-guest-support.h"
+> +
+> +OBJECT_DEFINE_ABSTRACT_TYPE(ConfidentialGuestSupport,
+> +                            confidential_guest_support,
+> +                            CONFIDENTIAL_GUEST_SUPPORT,
+> +                            OBJECT)
+> +
+> +static void confidential_guest_support_class_init(ObjectClass *oc, void *data)
+> +{
+> +}
+> +
+> +static void confidential_guest_support_init(Object *obj)
+> +{
+> +}
+> +
+> +static void confidential_guest_support_finalize(Object *obj)
+> +{
+> +}
+> diff --git a/backends/meson.build b/backends/meson.build
+> index 484456ece7..d4221831fc 100644
+> --- a/backends/meson.build
+> +++ b/backends/meson.build
+> @@ -6,6 +6,7 @@ softmmu_ss.add([files(
+>    'rng-builtin.c',
+>    'rng-egd.c',
+>    'rng.c',
+> +  'confidential-guest-support.c',
+>  ), numa])
+>  
+>  softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files('rng-random.c'))
+> diff --git a/include/exec/confidential-guest-support.h b/include/exec/confidential-guest-support.h
+> new file mode 100644
+> index 0000000000..5f131023ba
+> --- /dev/null
+> +++ b/include/exec/confidential-guest-support.h
+> @@ -0,0 +1,38 @@
+> +/*
+> + * QEMU Confidential Guest support
+> + *   This interface describes the common pieces between various
+> + *   schemes for protecting guest memory or other state against a
+> + *   compromised hypervisor.  This includes memory encryption (AMD's
+> + *   SEV and Intel's MKTME) or special protection modes (PEF on POWER,
+> + *   or PV on s390x).
+> + *
+> + * Copyright: David Gibson, Red Hat Inc. 2020
+> + *
+> + * Authors:
+> + *  David Gibson <david@gibson.dropbear.id.au>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or
+> + * later.  See the COPYING file in the top-level directory.
+> + *
+> + */
+> +#ifndef QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> +#define QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> +
+> +#ifndef CONFIG_USER_ONLY
+> +
+> +#include "qom/object.h"
+> +
+> +#define TYPE_CONFIDENTIAL_GUEST_SUPPORT "confidential-guest-support"
+> +OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUEST_SUPPORT)
+> +
+> +struct ConfidentialGuestSupport {
+> +    Object parent;
+> +};
+> +
+> +typedef struct ConfidentialGuestSupportClass {
+> +    ObjectClass parent;
+> +} ConfidentialGuestSupportClass;
+> +
+> +#endif /* !CONFIG_USER_ONLY */
+> +
+> +#endif /* QEMU_CONFIDENTIAL_GUEST_SUPPORT_H */
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 976b529dfb..33685c79ed 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -36,6 +36,7 @@ typedef struct BusState BusState;
+>  typedef struct Chardev Chardev;
+>  typedef struct CompatProperty CompatProperty;
+>  typedef struct CoMutex CoMutex;
+> +typedef struct ConfidentialGuestSupport ConfidentialGuestSupport;
+>  typedef struct CPUAddressSpace CPUAddressSpace;
+>  typedef struct CPUState CPUState;
+>  typedef struct DeviceListener DeviceListener;
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 1546606811..6b49925f51 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -31,6 +31,7 @@
+>  #include "qom/object.h"
+>  #include "exec/address-spaces.h"
+>  #include "monitor/monitor.h"
+> +#include "exec/confidential-guest-support.h"
+>  
+>  #define TYPE_SEV_GUEST "sev-guest"
+>  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+> @@ -322,7 +323,7 @@ sev_guest_instance_init(Object *obj)
+>  
+>  /* sev guest info */
+>  static const TypeInfo sev_guest_info = {
+> -    .parent = TYPE_OBJECT,
+> +    .parent = TYPE_CONFIDENTIAL_GUEST_SUPPORT,
 
-Maybe we can turn things around and check in apply_cpu_model if the object exists but
-unpack was not specified?
+If you're changing the parent QOM type, then you also need to change
+the parent struct field type in SevguestState to match
+
+>      .name = TYPE_SEV_GUEST,
+>      .instance_size = sizeof(SevGuestState),
+>      .instance_finalize = sev_guest_finalize,
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
