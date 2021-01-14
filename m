@@ -2,146 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32A5E2F5D0A
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 10:15:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8D602F5CF3
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 10:11:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727816AbhANJOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 04:14:54 -0500
-Received: from 2.mo52.mail-out.ovh.net ([178.33.105.233]:39584 "EHLO
-        2.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727956AbhANJOj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 04:14:39 -0500
-X-Greylist: delayed 163784 seconds by postgrey-1.27 at vger.kernel.org; Thu, 14 Jan 2021 04:14:37 EST
-Received: from mxplan5.mail.ovh.net (unknown [10.109.146.173])
-        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 3CA46230150;
-        Thu, 14 Jan 2021 09:55:10 +0100 (CET)
-Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 14 Jan
- 2021 09:55:09 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-100R00352f46628-57d0-46e2-9de7-07363bd0adac,
-                    0A7C53367AF3A9CD096E542ECC3C8B2C2D100868) smtp.auth=groug@kaod.org
-X-OVh-ClientIp: 82.253.208.248
-Date:   Thu, 14 Jan 2021 09:55:08 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     David Gibson <david@gibson.dropbear.id.au>
-CC:     <brijesh.singh@amd.com>, <pair@us.ibm.com>, <dgilbert@redhat.com>,
-        <pasic@linux.ibm.com>, <qemu-devel@nongnu.org>,
-        <cohuck@redhat.com>,
-        "Richard Henderson" <richard.henderson@linaro.org>,
+        id S1727672AbhANJLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 04:11:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46428 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727374AbhANJLK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 04:11:10 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10E93ufT058657;
+        Thu, 14 Jan 2021 04:10:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=s/NX2AL9vJ9/1qBZ7X6DQOUeEQWeGZ9b9R3mCaMWkbg=;
+ b=J6VKdREgx/61ewZNOmjZSW36yPZjmJufEXJ50bzE90NyzEbXyOYQeKDACbe8XjyXqJy/
+ +HGhPabnU8J0/WfRfE89TYa3Fg2TLj7oFS29QrF9KSDJ3FUPcMamNpmMu2yGvJdhf4ms
+ xxkKxWvDa03yq+5XIuv5iluLHZ5CfJ21vW9dgBJvUTzDvlm84J5kePoWfZtER2XBS86i
+ aJtVvKQNZN+XrbhegQYP6frBQp5rn6okM7+bNwbsVZZuycqGpEfrDvaiCmfe/ncgLW5/
+ uB2fp0UU65q0SD9X0a1mO8lS7gxiGziePLBHfCFresg6okSvUNHT8LZE2xbo5iRoEPUp nQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362jb5hcxq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 04:10:10 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10E94EhN060923;
+        Thu, 14 Jan 2021 04:10:10 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362jb5hcwq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 04:10:10 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10E927X4004249;
+        Thu, 14 Jan 2021 09:10:07 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 35ydrddtk6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 09:10:07 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10E9A4cl31195392
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jan 2021 09:10:04 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B30A64C040;
+        Thu, 14 Jan 2021 09:10:04 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B12D34C04A;
+        Thu, 14 Jan 2021 09:10:03 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.19.194])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jan 2021 09:10:03 +0000 (GMT)
+Subject: Re: [PATCH v7 13/13] s390: Recognize confidential-guest-support
+ option
+To:     David Gibson <david@gibson.dropbear.id.au>, brijesh.singh@amd.com,
+        pair@us.ibm.com, dgilbert@redhat.com, pasic@linux.ibm.com,
+        qemu-devel@nongnu.org
+Cc:     cohuck@redhat.com,
+        Richard Henderson <richard.henderson@linaro.org>,
         Marcelo Tosatti <mtosatti@redhat.com>,
-        David Hildenbrand <david@redhat.com>, <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, <mst@redhat.com>,
-        <jun.nakajima@intel.com>, <thuth@redhat.com>,
-        <pragyansri.pathi@intel.com>, <kvm@vger.kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>, <qemu-s390x@nongnu.org>,
-        <qemu-ppc@nongnu.org>, <frankja@linux.ibm.com>,
-        <berrange@redhat.com>, <andi.kleen@intel.com>
-Subject: Re: [PATCH v7 07/13] confidential guest support: Introduce cgs
- "ready" flag
-Message-ID: <20210114095508.3ef1db7e@bahia.lan>
-In-Reply-To: <20210113235811.1909610-8-david@gibson.dropbear.id.au>
+        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
+        jun.nakajima@intel.com, thuth@redhat.com,
+        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
+        berrange@redhat.com, andi.kleen@intel.com
 References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
-        <20210113235811.1909610-8-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ <20210113235811.1909610-14-david@gibson.dropbear.id.au>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <ba08f5da-e31f-7ae2-898d-a090c5c1b1cf@de.ibm.com>
+Date:   Thu, 14 Jan 2021 10:10:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+In-Reply-To: <20210113235811.1909610-14-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.100]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 1b4eaa1f-9249-4295-af14-40e7aee9315b
-X-Ovh-Tracer-Id: 499336611335149980
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedukedrtdeggdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheprghnughirdhklhgvvghnsehinhhtvghlrdgtohhm
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-14_03:2021-01-13,2021-01-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 spamscore=0 mlxscore=0 clxscore=1015 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101140052
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jan 2021 10:58:05 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> The platform specific details of mechanisms for implementing
-> confidential guest support may require setup at various points during
-> initialization.  Thus, it's not really feasible to have a single cgs
-> initialization hook, but instead each mechanism needs its own
-> initialization calls in arch or machine specific code.
-> 
-> However, to make it harder to have a bug where a mechanism isn't
-> properly initialized under some circumstances, we want to have a
-> common place, relatively late in boot, where we verify that cgs has
-> been initialized if it was requested.
-> 
-> This patch introduces a ready flag to the ConfidentialGuestSupport
-> base type to accomplish this, which we verify just before the machine
-> specific initialization function.
-> 
-
-Since this is a strong requirement for any new cgs implementation, I
-guess it could be advertised a bit more with some extra documentation
-in the confidential-guest-support.h header file as well.
-
-Anyway,
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
 
 
-Unrelated. I've just spotted mdroth@linux.vnet.ibm.com in the Cc list
-of this thread, but, as you know, Mike is now working on other topics
-at AMD :)
-
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/core/machine.c                         | 8 ++++++++
->  include/exec/confidential-guest-support.h | 2 ++
->  target/i386/sev.c                         | 2 ++
->  3 files changed, 12 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 94194ab82d..5a7433332b 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -1190,6 +1190,14 @@ void machine_run_board_init(MachineState *machine)
->      }
->  
->      if (machine->cgs) {
-> +        /*
-> +         * Where confidential guest support is initialized depends on
-> +         * the specific mechanism in use.  But, we need to make sure
-> +         * it's ready by now.  If it isn't, that's a bug in the
-> +         * implementation of that cgs mechanism.
-> +         */
-> +        assert(machine->cgs->ready);
+On 14.01.21 00:58, David Gibson wrote:
+[...]
+> +int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp)
+> +{
+> +    if (!object_dynamic_cast(OBJECT(cgs), TYPE_S390_PV_GUEST)) {
+> +        return 0;
+> +    }
 > +
->          /*
->           * With confidential guests, the host can't see the real
->           * contents of RAM, so there's no point in it trying to merge
-> diff --git a/include/exec/confidential-guest-support.h b/include/exec/confidential-guest-support.h
-> index 5f131023ba..bcaf6c9f49 100644
-> --- a/include/exec/confidential-guest-support.h
-> +++ b/include/exec/confidential-guest-support.h
-> @@ -27,6 +27,8 @@ OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUEST_SUPPORT)
->  
->  struct ConfidentialGuestSupport {
->      Object parent;
-> +
-> +    bool ready;
->  };
->  
->  typedef struct ConfidentialGuestSupportClass {
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index e2b41ef342..3d94635397 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -737,6 +737,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
->      qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
->  
-> +    cgs->ready = true;
-> +
->      return 0;
->  err:
->      sev_guest = NULL;
+> +    if (!s390_has_feat(S390_FEAT_UNPACK)) {
+> +        error_setg(errp,
+> +                   "CPU model does not support Protected Virtualization");
+> +        return -1;
+> +    }
+
+I am triggering this and I guess this is because the cpu model is not yet initialized at
+this point in time.
 
