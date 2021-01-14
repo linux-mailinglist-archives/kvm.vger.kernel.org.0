@@ -2,112 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E7452F60BA
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 13:06:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F4A92F60CD
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 13:12:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727996AbhANMGI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 07:06:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27093 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725982AbhANMGI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 07:06:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610625881;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=l3tJ36RqztAwI/4mUqJycCjvUbsiIODgTF0FZus4SkE=;
-        b=T7bfjLT96d5kLt9+hfG70cQTWFiSd9jmnCgbwqRPF/hRZcens9U9Y10KAo/xW1cj2dcdSt
-        CXM7Z9X9GLxcrFD8Jykc6U37XJkH6dt6N54whAMQpgVZ9bEzRdEYA7ftFxU1ZNku7EBdJe
-        6axVoKt4gwVq9+XBi1Vgv3rVS/fL3gs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-459-FHRl8kfFNzS0vchBb2NoGw-1; Thu, 14 Jan 2021 07:04:39 -0500
-X-MC-Unique: FHRl8kfFNzS0vchBb2NoGw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB4358042B1;
-        Thu, 14 Jan 2021 12:04:37 +0000 (UTC)
-Received: from starship (unknown [10.35.206.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 924B410016F4;
-        Thu, 14 Jan 2021 12:04:30 +0000 (UTC)
-Message-ID: <e3b48b0d753c9412e8bc163562059ab079984117.camel@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: Add support for VMCB address check change
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com
-Date:   Thu, 14 Jan 2021 14:04:29 +0200
-In-Reply-To: <20210112063703.539893-2-wei.huang2@amd.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-         <20210112063703.539893-2-wei.huang2@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1726749AbhANMMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 07:12:03 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11099 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726427AbhANMMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 07:12:03 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DGjmm3wbLzMKPF;
+        Thu, 14 Jan 2021 20:10:00 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 14 Jan 2021 20:11:09 +0800
+Subject: Re: [PATCH 4/5] vfio/iommu_type1: Carefully use unmap_unpin_all
+ during dirty tracking
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20210107092901.19712-1-zhukeqian1@huawei.com>
+ <20210107092901.19712-5-zhukeqian1@huawei.com>
+ <20210111144913.3092b1b1@omen.home.shazbot.org>
+ <198f0afd-343a-9fbc-9556-95670ca76a2c@huawei.com>
+ <20210112125331.789f47a5@omen.home.shazbot.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <14ee2346-ea9e-ab24-40d7-45a3bd16510d@huawei.com>
+Date:   Thu, 14 Jan 2021 20:11:00 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
+In-Reply-To: <20210112125331.789f47a5@omen.home.shazbot.org>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-12 at 00:37 -0600, Wei Huang wrote:
-> New AMD CPUs have a change that checks VMEXIT intercept on special SVM
-> instructions before checking their EAX against reserved memory region.
-> This change is indicated by CPUID_0x8000000A_EDX[28]. If it is 1, KVM
-> doesn't need to intercept and emulate #GP faults for such instructions
-> because #GP isn't supposed to be triggered.
+
+
+On 2021/1/13 3:53, Alex Williamson wrote:
+> On Tue, 12 Jan 2021 20:04:38 +0800
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> Co-developed-by: Bandan Das <bsd@redhat.com>
-> Signed-off-by: Bandan Das <bsd@redhat.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 1 +
->  arch/x86/kvm/svm/svm.c             | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>> On 2021/1/12 5:49, Alex Williamson wrote:
+>>> On Thu, 7 Jan 2021 17:29:00 +0800
+>>> Keqian Zhu <zhukeqian1@huawei.com> wrote:
+>>>   
+>>>> If we detach group during dirty page tracking, we shouldn't remove
+>>>> vfio_dma, because dirty log will lose.
+>>>>
+>>>> But we don't prevent unmap_unpin_all in vfio_iommu_release, because
+>>>> under normal procedure, dirty tracking has been stopped.  
+>>>
+>>> This looks like it's creating a larger problem than it's fixing, it's
+>>> not our job to maintain the dirty bitmap regardless of what the user
+>>> does.  If the user detaches the last group in a container causing the
+>>> mappings within that container to be deconstructed before the user has
+>>> collected dirty pages, that sounds like a user error.  A container with
+>>> no groups is de-privileged and therefore loses all state.  Thanks,
+>>>
+>>> Alex  
+>>
+>> Hi Alex,
+>>
+>> This looks good to me ;-). That's a reasonable constraint for user behavior.
+>>
+>> What about replacing this patch with an addition to the uapi document of
+>> VFIO_GROUP_UNSET_CONTAINER? User should pay attention to this when call this
+>> ioctl during dirty tracking.
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 84b887825f12..ea89d6fdd79a 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -337,6 +337,7 @@
->  #define X86_FEATURE_AVIC		(15*32+13) /* Virtual Interrupt Controller */
->  #define X86_FEATURE_V_VMSAVE_VMLOAD	(15*32+15) /* Virtual VMSAVE VMLOAD */
->  #define X86_FEATURE_VGIF		(15*32+16) /* Virtual GIF */
-> +#define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* "" SVME addr check */
-Why ""?
+> Here's the current uapi comment:
+> 
+> /**
+>  * VFIO_GROUP_UNSET_CONTAINER - _IO(VFIO_TYPE, VFIO_BASE + 5)
+>  *
+>  * Remove the group from the attached container.  This is the
+>  * opposite of the SET_CONTAINER call and returns the group to
+>  * an initial state.  All device file descriptors must be released
+>  * prior to calling this interface.  When removing the last group
+>  * from a container, the IOMMU will be disabled and all state lost,
+>  * effectively also returning the VFIO file descriptor to an initial
+>  * state.
+>  * Return: 0 on success, -errno on failure.
+>  * Availability: When attached to container
+>  */
+> 
+> So we already indicate that "all state" of the container is lost when
+> removing the last group, I don't see that it's necessarily to
+> explicitly include dirty bitmap state beyond that statement.  Without
+> mappings there can be no dirty bitmap to track.
+OK :-) .
 
->  
->  /* Intel-defined CPU features, CPUID level 0x00000007:0 (ECX), word 16 */
->  #define X86_FEATURE_AVX512VBMI		(16*32+ 1) /* AVX512 Vector Bit Manipulation instructions*/
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 74620d32aa82..451b82df2eab 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -311,7 +311,7 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
->  	svm->vmcb->save.efer = efer | EFER_SVME;
->  	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
->  	/* Enable GP interception for SVM instructions if needed */
-> -	if (efer & EFER_SVME)
-> +	if ((efer & EFER_SVME) && !boot_cpu_has(X86_FEATURE_SVME_ADDR_CHK))
->  		set_exception_intercept(svm, GP_VECTOR);
+> 
+>  > And any comments on other patches? thanks.
+> 
+> I had a difficult time mapping the commit log to the actual code
+> change, I'll likely have some wording suggestions.  Is patch 5/5 still
+> necessary if this patch is dropped?  Thanks,
+> 
+I think the 5th patch is still necessary. vfio_sanity_check_pfn_list() is used to check
+whether pfn_list of vfio_dma is empty. but we apply this check just for external domain.
+If the iommu backed domain also pin some pages, then this check fails. So I think we should
+use this check only when all domains are about to be removed.
 
-As mentioned in the review for the other patch I would add a flag that
-would enable the workaround for the errata, and I would force it disabled
-if X86_FEATURE_SVME_ADDR_CHK is set in CPUID somewhere early in the 
-kvm initialization.
+Besides, this patch should extract the "WARN_ON(iommu->notifier.head);" just for external domain.
 
-And finally that new flag can be used here to enable the #GP interception
-in the above code.
+Thanks,
+Keqian
 
->  
->  	return 0;
-
-
-Best regards,
-	Maxim Levitsky
-
+> Alex
+> 
+>>>> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+>>>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>>>> ---
+>>>>  drivers/vfio/vfio_iommu_type1.c | 14 ++++++++++++--
+>>>>  1 file changed, 12 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>> index 26b7eb2a5cfc..9776a059904d 100644
+>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>> @@ -2373,7 +2373,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>>>  			if (list_empty(&iommu->external_domain->group_list)) {
+>>>>  				vfio_sanity_check_pfn_list(iommu);
+>>>>  
+>>>> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+>>>> +				/*
+>>>> +				 * During dirty page tracking, we can't remove
+>>>> +				 * vfio_dma because dirty log will lose.
+>>>> +				 */
+>>>> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu) &&
+>>>> +				    !iommu->dirty_page_tracking)
+>>>>  					vfio_iommu_unmap_unpin_all(iommu);
+>>>>  
+>>>>  				kfree(iommu->external_domain);
+>>>> @@ -2406,10 +2411,15 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>>>  		 * iommu and external domain doesn't exist, then all the
+>>>>  		 * mappings go away too. If it's the last domain with iommu and
+>>>>  		 * external domain exist, update accounting
+>>>> +		 *
+>>>> +		 * Note: During dirty page tracking, we can't remove vfio_dma
+>>>> +		 * because dirty log will lose. Just update accounting is a good
+>>>> +		 * choice.
+>>>>  		 */
+>>>>  		if (list_empty(&domain->group_list)) {
+>>>>  			if (list_is_singular(&iommu->domain_list)) {
+>>>> -				if (!iommu->external_domain)
+>>>> +				if (!iommu->external_domain &&
+>>>> +				    !iommu->dirty_page_tracking)
+>>>>  					vfio_iommu_unmap_unpin_all(iommu);
+>>>>  				else
+>>>>  					vfio_iommu_unmap_unpin_reaccount(iommu);  
+>>>
+>>> .
+>>>   
+>>
+> 
+> .
+> 
