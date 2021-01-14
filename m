@@ -2,152 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A3B32F6082
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:49:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC22E2F6087
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:51:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727740AbhANLtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 06:49:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60575 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726919AbhANLtI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:49:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610624861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KJCiyPYZTNhq1kKkty7sXVGcoXJ6M0psKDMUOgP2lPE=;
-        b=Dun9pJN5a/2FavC97gb7kEAL4ttni50IOwuhHnXHi5zRVHcm0vwI7Jhpo3ovMUSo0aRQVc
-        W6Z2x8/XCGG9gHF4fnitPX0xJF/KrzNlom4oyi755vEKZpj9FROhClFT9o6dEYj+KB9CBB
-        hDdItp1gJIjjWN9rg/rCLjg1J1ZuiXU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-XaxpEonTP4O0k4dRUyyHdg-1; Thu, 14 Jan 2021 06:47:39 -0500
-X-MC-Unique: XaxpEonTP4O0k4dRUyyHdg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9693107ACF8;
-        Thu, 14 Jan 2021 11:47:37 +0000 (UTC)
-Received: from starship (unknown [10.35.206.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E77E45D6AD;
-        Thu, 14 Jan 2021 11:47:30 +0000 (UTC)
-Message-ID: <db574a30f50a2f556dc983f18f78f28c933fdac7.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered
- by VM instructions
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Bandan Das <bsd@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, joro@8bytes.org, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, dgilbert@redhat.com
-Date:   Thu, 14 Jan 2021 13:47:28 +0200
-In-Reply-To: <jpgsg76kjsm.fsf@linux.bootlegged.copy>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-         <X/37QBMHxH8otaMa@google.com> <jpgsg76kjsm.fsf@linux.bootlegged.copy>
-Content-Type: multipart/mixed; boundary="=-EPygeQZyFJqIITg/+qQu"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        id S1726672AbhANLvZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 06:51:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10276 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726259AbhANLvY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:51:24 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10EBW9IE164694;
+        Thu, 14 Jan 2021 06:50:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KYN5F8efuhhCSSNlpf1u5TwOx3r1E74QPz9z1lyZ0zE=;
+ b=p4d5znFltw6KxgTG7XoGt3x3IOqWOiu5rlJqvyhF5LWr+0DS9cQh0wBRXAIwH95fzAm6
+ M7FUEFA4dgpkbdKVUikYsc7TThF8j6sB4UjNR4LaMad5MsYhQFSdLLh9O//x3B8A+gBc
+ QQRpSnQrzmWUlYfyZXjGgSuEe4xEu2c4nSEvnF/x8sZLafrnmq6saTGxXLLhETPdH1h6
+ fdQ+bRr+RWNcA0K2ZqIlOlLmgVncHolVcr9vIF2bnNGYCyGUbge2S3fn2SopKRiTnYYI
+ kVSPOD2kBfpRf4CBJNVTf26974KL8FNTw3vFCtLbkd7EW28NiVZhWmUMreu2ZdaZM3Ct 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 362k92uwxx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 06:50:20 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10EBWx7M167569;
+        Thu, 14 Jan 2021 06:50:20 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 362k92uwxd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 06:50:20 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10EBgQ1B010374;
+        Thu, 14 Jan 2021 11:50:18 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 35y448ecrg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 11:50:18 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10EBoFD838732106
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jan 2021 11:50:15 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ACB8D4C04E;
+        Thu, 14 Jan 2021 11:50:15 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 24E8D4C052;
+        Thu, 14 Jan 2021 11:50:13 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.19.194])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jan 2021 11:50:13 +0000 (GMT)
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Ram Pai <linuxram@us.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Greg Kurz <groug@kaod.org>, pair@us.ibm.com,
+        brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, rth@twiddle.net, berrange@redhat.com,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
+        pbonzini@redhat.com
+References: <20210104134629.49997b53.pasic@linux.ibm.com>
+ <20210104184026.GD4102@ram-ibm-com.ibm.com>
+ <20210105115614.7daaadd6.pasic@linux.ibm.com>
+ <20210105204125.GE4102@ram-ibm-com.ibm.com>
+ <20210111175914.13adfa2e.cohuck@redhat.com> <20210113124226.GH2938@work-vm>
+ <6e02e8d5-af4b-624b-1a12-d03b9d554a41@de.ibm.com>
+ <20210114103643.GD2905@work-vm>
+ <db2295ce-333f-2a3e-8219-bfa4853b256f@de.ibm.com>
+ <20210114120531.3c7f350e.cohuck@redhat.com> <20210114114533.GF2905@work-vm>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <b791406c-fde2-89db-4186-e1660f14418c@de.ibm.com>
+Date:   Thu, 14 Jan 2021 12:50:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210114114533.GF2905@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-14_03:2021-01-13,2021-01-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 lowpriorityscore=0 phishscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101140064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-EPygeQZyFJqIITg/+qQu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
 
-On Tue, 2021-01-12 at 15:00 -0500, Bandan Das wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> ...
-> > > -	if ((emulation_type & EMULTYPE_VMWARE_GP) &&
-> > > -	    !is_vmware_backdoor_opcode(ctxt)) {
-> > > -		kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> > > -		return 1;
-> > > +	if (emulation_type & EMULTYPE_PARAVIRT_GP) {
-> > > +		vminstr = is_vm_instr_opcode(ctxt);
-> > > +		if (!vminstr && !is_vmware_backdoor_opcode(ctxt)) {
-> > > +			kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
-> > > +			return 1;
-> > > +		}
-> > > +		if (vminstr)
-> > > +			return vminstr;
-> > 
-> > I'm pretty sure this doesn't correctly handle a VM-instr in L2 that hits a bad
-> > L0 GPA and that L1 wants to intercept.  The intercept bitmap isn't checked until
-> > x86_emulate_insn(), and the vm*_interception() helpers expect nested VM-Exits to
-> > be handled further up the stack.
+On 14.01.21 12:45, Dr. David Alan Gilbert wrote:
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+>> On Thu, 14 Jan 2021 11:52:11 +0100
+>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>> On 14.01.21 11:36, Dr. David Alan Gilbert wrote:
+>>>> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:  
+>>>>>
+>>>>>
+>>>>> On 13.01.21 13:42, Dr. David Alan Gilbert wrote:  
+>>>>>> * Cornelia Huck (cohuck@redhat.com) wrote:  
+>>>>>>> On Tue, 5 Jan 2021 12:41:25 -0800
+>>>>>>> Ram Pai <linuxram@us.ibm.com> wrote:
+>>>>>>>  
+>>>>>>>> On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:  
+>>>>>>>>> On Mon, 4 Jan 2021 10:40:26 -0800
+>>>>>>>>> Ram Pai <linuxram@us.ibm.com> wrote:  
+>>>>>>>  
+>>>>>>>>>> The main difference between my proposal and the other proposal is...
+>>>>>>>>>>
+>>>>>>>>>>   In my proposal the guest makes the compatibility decision and acts
+>>>>>>>>>>   accordingly.  In the other proposal QEMU makes the compatibility
+>>>>>>>>>>   decision and acts accordingly. I argue that QEMU cannot make a good
+>>>>>>>>>>   compatibility decision, because it wont know in advance, if the guest
+>>>>>>>>>>   will or will-not switch-to-secure.
+>>>>>>>>>>     
+>>>>>>>>>
+>>>>>>>>> You have a point there when you say that QEMU does not know in advance,
+>>>>>>>>> if the guest will or will-not switch-to-secure. I made that argument
+>>>>>>>>> regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
+>>>>>>>>> was to flip that property on demand when the conversion occurs. David
+>>>>>>>>> explained to me that this is not possible for ppc, and that having the
+>>>>>>>>> "securable-guest-memory" property (or whatever the name will be)
+>>>>>>>>> specified is a strong indication, that the VM is intended to be used as
+>>>>>>>>> a secure VM (thus it is OK to hurt the case where the guest does not
+>>>>>>>>> try to transition). That argument applies here as well.    
+>>>>>>>>
+>>>>>>>> As suggested by Cornelia Huck, what if QEMU disabled the
+>>>>>>>> "securable-guest-memory" property if 'must-support-migrate' is enabled?
+>>>>>>>> Offcourse; this has to be done with a big fat warning stating
+>>>>>>>> "secure-guest-memory" feature is disabled on the machine.
+>>>>>>>> Doing so, will continue to support guest that do not try to transition.
+>>>>>>>> Guest that try to transition will fail and terminate themselves.  
+>>>>>>>
+>>>>>>> Just to recap the s390x situation:
+>>>>>>>
+>>>>>>> - We currently offer a cpu feature that indicates secure execution to
+>>>>>>>   be available to the guest if the host supports it.
+>>>>>>> - When we introduce the secure object, we still need to support
+>>>>>>>   previous configurations and continue to offer the cpu feature, even
+>>>>>>>   if the secure object is not specified.
+>>>>>>> - As migration is currently not supported for secured guests, we add a
+>>>>>>>   blocker once the guest actually transitions. That means that
+>>>>>>>   transition fails if --only-migratable was specified on the command
+>>>>>>>   line. (Guests not transitioning will obviously not notice anything.)
+>>>>>>> - With the secure object, we will already fail starting QEMU if
+>>>>>>>   --only-migratable was specified.
+>>>>>>>
+>>>>>>> My suggestion is now that we don't even offer the cpu feature if
+>>>>>>> --only-migratable has been specified. For a guest that does not want to
+>>>>>>> transition to secure mode, nothing changes; a guest that wants to
+>>>>>>> transition to secure mode will notice that the feature is not available
+>>>>>>> and fail appropriately (or ultimately, when the ultravisor call fails).
+>>>>>>> We'd still fail starting QEMU for the secure object + --only-migratable
+>>>>>>> combination.
+>>>>>>>
+>>>>>>> Does that make sense?  
+>>>>>>
+>>>>>> It's a little unusual; I don't think we have any other cases where
+>>>>>> --only-migratable changes the behaviour; I think it normally only stops
+>>>>>> you doing something that would have made it unmigratable or causes
+>>>>>> an operation that would make it unmigratable to fail.  
+>>>>>
+>>>>> I would like to NOT block this feature with --only-migrateable. A guest
+>>>>> can startup unprotected (and then is is migrateable). the migration blocker
+>>>>> is really a dynamic aspect during runtime.   
+>>>>
+>>>> But the point of --only-migratable is to turn things that would have
+>>>> blocked migration into failures, so that a VM started with
+>>>> --only-migratable is *always* migratable.  
+>>>
+>>> Hmmm, fair enough. How do we do this with host-model? The constructed model
+>>> would contain unpack, but then it will fail to startup? Or do we silently 
+>>> drop unpack in that case? Both variants do not feel completely right. 
+>>
+>> Failing if you explicitly specified unpacked feels right, but failing
+>> if you just used the host model feels odd. Removing unpack also is a
+>> bit odd, but I think the better option if we want to do anything about
+>> it at all.
+> 
+> 'host-model' feels a bit special; but breaking the rule that
+> only-migratable doesn't change behaviour is weird
+> Can you do host,-unpack   to make that work explicitly?
 
-Actually IMHO this exactly what we want. We want L0 to always intercept
-these #GPs, and hide them from the guest.
-
-What we do need to do (and I prepared and attached a patch for that, is that if we run
-a guest, we want to inject corresponding vmexit (like SVM_EXIT_VMRUN)
-instead of emulating the instruction.
-The attached patch does this, and it made my kvm unit test pass,
-even if the test was run in a VM (with an unpatched kernel).
-
-This together with setting that X86_FEATURE_SVME_ADDR_CHK bit for
-the guest will allow us to hide that errata completely from the guest
-which is a very good thing.
-(for example for guests that we can't modify)
-
-
-Best regards,
-	Maxim Levitsky
-
-
-
-> > 
-> So, the condition is that L2 executes a vmload and #GPs on a reserved address, jumps to L0 - L0 doesn't
-> check if L1 has asked for the instruction to be intercepted and goes on with emulating
-> vmload and returning back to L2 ?
-
-
+I guess that should work. But it means that we need to add logic in libvirt
+to disable unpack for host-passthru and host-model. Next problem is then,
+that a future version might implement migration of such guests, which means
+that libvirt must then stop fencing unpack.
 
 > 
-> > >  	}
-> > >  
-> > >  	/*
-> > > -- 
-> > > 2.27.0
-> > > 
+> But hang on; why is 'unpack' the name of a secure guest facility - is
+> it really a feature for secure guest or something else?
 
-
---=-EPygeQZyFJqIITg/+qQu
-Content-Disposition: attachment; filename="patch.diff"
-Content-Type: text/x-patch; name="patch.diff"; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-Y29tbWl0IDI4YWI4OWFhYTExMzgwMzA2YmFmYmY0OTI2NTIyMmYyYTJkYTcxZGEKQXV0aG9yOiBN
-YXhpbSBMZXZpdHNreSA8bWxldml0c2tAcmVkaGF0LmNvbT4KRGF0ZTogICBUaHUgSmFuIDE0IDEw
-OjUzOjI1IDIwMjEgKzAyMDAKCiAgICBrdm06IHg4NjogZml4IHRoYXQgZXJyYXRhIGZvciBuZXN0
-ZWQgZ3Vlc3RzCgpkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL3N2bS9zdm0uYyBiL2FyY2gveDg2
-L2t2bS9zdm0vc3ZtLmMKaW5kZXggYzMxZTAwNTI1MmQ2OS4uOWNmYTU5NDZmYWM2OSAxMDA2NDQK
-LS0tIGEvYXJjaC94ODYva3ZtL3N2bS9zdm0uYworKysgYi9hcmNoL3g4Ni9rdm0vc3ZtL3N2bS5j
-CkBAIC0yMDI3LDYgKzIwMjcsMjYgQEAgc3RhdGljIGludCBzdm1fZW11bGF0ZV92bV9pbnN0cihz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU4IG1vZHJtKQogewogCXN0cnVjdCB2Y3B1X3N2bSAqc3Zt
-ID0gdG9fc3ZtKHZjcHUpOwogCisJaWYgKGlzX2d1ZXN0X21vZGUodmNwdSkpIHsKKwkJc3dpdGNo
-IChtb2RybSkgeworCQljYXNlIDB4ZDg6IC8qIFZNUlVOICovCisJCQlzdm0tPnZtY2ItPmNvbnRy
-b2wuZXhpdF9jb2RlID0gU1ZNX0VYSVRfVk1SVU47CisJCQlicmVhazsKKwkJY2FzZSAweGRhOiAv
-KiBWTUxPQUQgKi8KKwkJCXN2bS0+dm1jYi0+Y29udHJvbC5leGl0X2NvZGUgPSBTVk1fRVhJVF9W
-TUxPQUQ7CisJCQlicmVhazsKKwkJY2FzZSAweGRiOiAvKiBWTVNBVkUgKi8KKwkJCXN2bS0+dm1j
-Yi0+Y29udHJvbC5leGl0X2NvZGUgPSBTVk1fRVhJVF9WTUxPQUQ7CisJCQlicmVhazsKKwkJZGVm
-YXVsdDoKKwkJCWdvdG8gaW5qZWN0X2V4Y2VwdGlvbjsKKwkJfQorCisJCXN2bS0+dm1jYi0+Y29u
-dHJvbC5leGl0X2luZm9fMSA9IDA7CisJCXN2bS0+dm1jYi0+Y29udHJvbC5leGl0X2luZm9fMiA9
-IDA7CisJCXJldHVybiBuZXN0ZWRfc3ZtX3ZtZXhpdChzdm0pOworCX0KKwogCXN3aXRjaCAobW9k
-cm0pIHsKIAljYXNlIDB4ZDg6IC8qIFZNUlVOICovCiAJCXJldHVybiB2bXJ1bl9pbnRlcmNlcHRp
-b24oc3ZtKTsKQEAgLTIwMzUsNiArMjA1NSw3IEBAIHN0YXRpYyBpbnQgc3ZtX2VtdWxhdGVfdm1f
-aW5zdHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB1OCBtb2RybSkKIAljYXNlIDB4ZGI6IC8qIFZN
-U0FWRSAqLwogCQlyZXR1cm4gdm1zYXZlX2ludGVyY2VwdGlvbihzdm0pOwogCWRlZmF1bHQ6Citp
-bmplY3RfZXhjZXB0aW9uOgogCQkvKiBpbmplY3QgYSAjR1AgZm9yIGFsbCBvdGhlciBjYXNlcyAq
-LwogCQlrdm1fcXVldWVfZXhjZXB0aW9uX2UodmNwdSwgR1BfVkVDVE9SLCAwKTsKIAkJcmV0dXJu
-IDE7Cg==
-
-
-
---=-EPygeQZyFJqIITg/+qQu--
-
+unpack is the name of the function that unpacks and decrypts the encrypted image.
+If if is there, then you can switch into the securable guest mode. 
