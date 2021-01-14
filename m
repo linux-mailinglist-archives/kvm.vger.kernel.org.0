@@ -2,396 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80BCA2F5910
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 04:32:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9D512F5980
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 04:42:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbhANDOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 13 Jan 2021 22:14:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52148 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725871AbhANDOw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 22:14:52 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10E38jeC194556;
-        Wed, 13 Jan 2021 22:14:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=AUdx+12ga3TEUXFPGIZu4do3NK2k8Qhq2jcM5SwG22Y=;
- b=Wvs5JbtVzEKVl/eOfp9qzxxdl68xzUdCMftLPVRbZLAwEQ7bLvb8TZURUHU2MjoyY+Dw
- Lv+eO3RdxBKlikA7qQiQ1dMGBuFL22nMK7IF1f8XBRW9nUZVfq+x871LOqd6B4T0kn+g
- Y/nPNGpjt2vqCAfuUZxXoKSwnHsnaqpmqWTlmB//ADRjBei0sraSEmqKPVAeSckjG3Ku
- uPWXc9nyovMmOMA8isqMZn22SEKzw5O+b2dkN+twZP5H1LFNI4Hk01Q6QTORF9zf0jOJ
- Hxfj/kf0WFDmB48+W9y2Ws1SUYpL9ZJSscnC7Jd2PHfSQfcO0ymoZ2QAZPvG41CXRUYw Dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362d70gq3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 22:14:07 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10E3966E194998;
-        Wed, 13 Jan 2021 22:14:07 -0500
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 362d70gq25-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 13 Jan 2021 22:14:07 -0500
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10E3DL2b005472;
-        Thu, 14 Jan 2021 03:14:03 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 361wgq8jwm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jan 2021 03:14:03 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10E3E02526345892
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 14 Jan 2021 03:14:00 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5A5A52051;
-        Thu, 14 Jan 2021 03:14:00 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.21.203])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with SMTP id EA84D5205A;
-        Thu, 14 Jan 2021 03:13:59 +0000 (GMT)
-Date:   Thu, 14 Jan 2021 04:13:57 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 02/15] s390/vfio-ap: No need to disable IRQ after
- queue reset
-Message-ID: <20210114041357.04ed5d78.pasic@linux.ibm.com>
-In-Reply-To: <520071f6-e5d1-25cf-e5eb-b6655adad404@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-3-akrowiak@linux.ibm.com>
-        <20210111173206.27808b79.pasic@linux.ibm.com>
-        <ed9eb852-5046-bcfc-be2c-3bb67323ec8a@linux.ibm.com>
-        <20210113222107.527693df.pasic@linux.ibm.com>
-        <520071f6-e5d1-25cf-e5eb-b6655adad404@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727823AbhANDlG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 13 Jan 2021 22:41:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31319 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725943AbhANDlF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 13 Jan 2021 22:41:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610595578;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qtF1idSqCy5ua8Az2XtZ/1G+SswhJSq5w0eZMMNKzU8=;
+        b=SUm+ziHtwuI8eNMaTmUPjlwmkZhtkVRAm4xV5+QVwfNcZZuPhmuRyjJ8le2KeuPyjqx8Kq
+        uwxFL5FfbwNpl9IKqUpzRKN2QIxxx7RQ+6hoLrMYuuJYPSpC7FwEn4FsxfCP4+QWEDbr/K
+        K4Hzh3iuKfqtntSIIzakWOXigb9RIZQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-542--aJiRCZ_NrCYrBKuyUt_sg-1; Wed, 13 Jan 2021 22:39:34 -0500
+X-MC-Unique: -aJiRCZ_NrCYrBKuyUt_sg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 638DB15720;
+        Thu, 14 Jan 2021 03:39:30 +0000 (UTC)
+Received: from [10.72.12.100] (ovpn-12-100.pek2.redhat.com [10.72.12.100])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1C48760C0F;
+        Thu, 14 Jan 2021 03:39:04 +0000 (UTC)
+Subject: Re: [RFC PATCH 0/7] Support for virtio-net hash reporting
+To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc:     Yuri Benditovich <yuri.benditovich@daynix.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, rdunlap@infradead.org,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>, decui@microsoft.com,
+        cai@lca.pw, Jakub Sitnicki <jakub@cloudflare.com>,
+        Marco Elver <elver@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        bpf <bpf@vger.kernel.org>, Yan Vugenfirer <yan@daynix.com>
+References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
+ <CAOEp5OejaX4ZETThrj4-n8_yZoeTZs56CBPHbQqNsR2oni8dWw@mail.gmail.com>
+ <CAOEp5Oc5qif_krU8oC6qhq6X0xRW-9GpWrBzWgPw0WevyhT8Mg@mail.gmail.com>
+ <CA+FuTSfhBZfEf8+LKNUJQpSxt8c5h1wMpARupekqFKuei6YBsA@mail.gmail.com>
+ <78bbc518-4b73-4629-68fb-2713250f8967@redhat.com>
+ <CA+FuTSfJJhEYr6gXmjpjjXzg6Xm5wWa-dL1SEV-Zt7RcPXGztg@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8ea218a8-a068-1ed9-929d-67ad30111c3c@redhat.com>
+Date:   Thu, 14 Jan 2021 11:38:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CA+FuTSfJJhEYr6gXmjpjjXzg6Xm5wWa-dL1SEV-Zt7RcPXGztg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-14_01:2021-01-13,2021-01-14 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- clxscore=1015 lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0
- phishscore=0 priorityscore=1501 adultscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101140014
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 13 Jan 2021 19:46:03 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> On 1/13/21 4:21 PM, Halil Pasic wrote:
-> > On Wed, 13 Jan 2021 12:06:28 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >  
-> >> On 1/11/21 11:32 AM, Halil Pasic wrote:  
-> >>> On Tue, 22 Dec 2020 20:15:53 -0500
-> >>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >>>     
-> >>>> The queues assigned to a matrix mediated device are currently reset when:
-> >>>>
-> >>>> * The VFIO_DEVICE_RESET ioctl is invoked
-> >>>> * The mdev fd is closed by userspace (QEMU)
-> >>>> * The mdev is removed from sysfs.
-> >>>>
-> >>>> Immediately after the reset of a queue, a call is made to disable
-> >>>> interrupts for the queue. This is entirely unnecessary because the reset of
-> >>>> a queue disables interrupts, so this will be removed.
-> >>>>
-> >>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >>>> ---
-> >>>>    drivers/s390/crypto/vfio_ap_drv.c     |  1 -
-> >>>>    drivers/s390/crypto/vfio_ap_ops.c     | 40 +++++++++++++++++----------
-> >>>>    drivers/s390/crypto/vfio_ap_private.h |  1 -
-> >>>>    3 files changed, 26 insertions(+), 16 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
-> >>>> index be2520cc010b..ca18c91afec9 100644
-> >>>> --- a/drivers/s390/crypto/vfio_ap_drv.c
-> >>>> +++ b/drivers/s390/crypto/vfio_ap_drv.c
-> >>>> @@ -79,7 +79,6 @@ static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
-> >>>>    	apid = AP_QID_CARD(q->apqn);
-> >>>>    	apqi = AP_QID_QUEUE(q->apqn);
-> >>>>    	vfio_ap_mdev_reset_queue(apid, apqi, 1);
-> >>>> -	vfio_ap_irq_disable(q);
-> >>>>    	kfree(q);
-> >>>>    	mutex_unlock(&matrix_dev->lock);
-> >>>>    }
-> >>>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> >>>> index 7339043906cf..052f61391ec7 100644
-> >>>> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> >>>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> >>>> @@ -25,6 +25,7 @@
-> >>>>    #define VFIO_AP_MDEV_NAME_HWVIRT "VFIO AP Passthrough Device"
-> >>>>    
-> >>>>    static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
-> >>>> +static struct vfio_ap_queue *vfio_ap_find_queue(int apqn);
-> >>>>    
-> >>>>    static int match_apqn(struct device *dev, const void *data)
-> >>>>    {
-> >>>> @@ -49,20 +50,15 @@ static struct vfio_ap_queue *(
-> >>>>    					int apqn)
-> >>>>    {
-> >>>>    	struct vfio_ap_queue *q;
-> >>>> -	struct device *dev;
-> >>>>    
-> >>>>    	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
-> >>>>    		return NULL;
-> >>>>    	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
-> >>>>    		return NULL;
-> >>>>    
-> >>>> -	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
-> >>>> -				 &apqn, match_apqn);
-> >>>> -	if (!dev)
-> >>>> -		return NULL;
-> >>>> -	q = dev_get_drvdata(dev);
-> >>>> -	q->matrix_mdev = matrix_mdev;
-> >>>> -	put_device(dev);
-> >>>> +	q = vfio_ap_find_queue(apqn);
-> >>>> +	if (q)
-> >>>> +		q->matrix_mdev = matrix_mdev;
-> >>>>    
-> >>>>    	return q;
-> >>>>    }
-> >>>> @@ -1126,24 +1122,27 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
-> >>>>    	return notify_rc;
-> >>>>    }
-> >>>>    
-> >>>> -static void (int apqn)
-> >>>> +static struct vfio_ap_queue *vfio_ap_find_queue(int apqn)
-> >>>>    {
-> >>>>    	struct device *dev;
-> >>>> -	struct vfio_ap_queue *q;
-> >>>> +	struct vfio_ap_queue *q = NULL;
-> >>>>    
-> >>>>    	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
-> >>>>    				 &apqn, match_apqn);
-> >>>>    	if (dev) {
-> >>>>    		q = dev_get_drvdata(dev);
-> >>>> -		vfio_ap_irq_disable(q);
-> >>>>    		put_device(dev);
-> >>>>    	}
-> >>>> +
-> >>>> +	return q;
-> >>>>    }  
-> >>> This hunk and the previous one are a rewrite of vfio_ap_get_queue() and
-> >>> have next to nothing to do with the patch's objective. If we were at an
-> >>> earlier stage, I would ask to split it up.  
-> >> The rewrite of vfio_ap_get_queue() definitely is related to this
-> >> patch's objective.  
-> > Definitively loosely related.  
-> 
-> A matter of opinion I suppose and I respect yours.
-> 
-> >  
-> >> Below, in the vfio_ap_mdev_reset_queue()
-> >> function, there is the label 'free_aqic_resources' which is where
-> >> the call to vfio_ap_free_aqic_resources() function is called.
-> >> That function takes a struct vfio_ap_queue as an argument,
-> >> so the object needs to be retrieved prior to calling the function.
-> >> We can't use the vfio_ap_get_queue() function for two reasons:
-> >> 1. The vfio_ap_get_queue() function takes a struct ap_matrix_mdev
-> >>       as a parameter and we do not have a pointer to such at the time.
-> >> 2. The vfio_ap_get_queue() function is used to link the mdev to the
-> >>       vfio_ap_queue object with the specified APQN.
-> >> So, we needed a way to retrieve the vfio_ap_queue object by its
-> >> APQN only, Rather than creating a function that retrieves the
-> >> vfio_ap_queue object which duplicates the retrieval code in
-> >> vfio_ap_get_queue(), I created the vfio_ap_find_queue()
-> >> function to do just that and modified the vfio_ap_get_queue()
-> >> function to call it (i.e., code reuse).  
-> > Please tell me what prevented you from doing a doing the splitting out
-> > vfio_ap_find_queue() from vfio_ap_get_queue() in a separate patch, that
-> > precedes this patch? It would have resulted in simpler diffs, because
-> > the split out wouldn't be intermingled with other stuff, i.e. getting
-> > rid of vfio_ap_irq_disable_apqn(). Don't you see that the two are
-> > intermingled in this diff?  
-> 
-> I included this here for the reasons I stated above.
-> If I was reviewing these patches and saw this in a separate
-> patch I would wonder why it was being done since it would
-> be an isolated change requiring examination of subsequent
-> patches to figure out why it was done.  Since you have
-> taken the time to bring this up again I'll go ahead and do it
-> since I have no major objections and it is a fairly simple change.
-> 
-
-As stated in my first comment, I don't insist. I made the comment
-with future patches in mind. Splitting out prep work isn't unusual
-at all, but you are right, the motivation should be stated in the
-commit message. 
-
-> >  
-> >>  
-> >>>     
-> >>>>    
-> >>>>    int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> >>>>    			     unsigned int retry)
-> >>>>    {
-> >>>>    	struct ap_queue_status status;
-> >>>> +	struct vfio_ap_queue *q;
-> >>>> +	int ret;
-> >>>>    	int retry2 = 2;
-> >>>>    	int apqn = AP_MKQID(apid, apqi);
-> >>>>    
-> >>>> @@ -1156,18 +1155,32 @@ int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> >>>>    				status = ap_tapq(apqn, NULL);
-> >>>>    			}
-> >>>>    			WARN_ON_ONCE(retry2 <= 0);
-> >>>> -			return 0;
-> >>>> +			ret = 0;
-> >>>> +			goto free_aqic_resources;
-> >>>>    		case AP_RESPONSE_RESET_IN_PROGRESS:
-> >>>>    		case AP_RESPONSE_BUSY:
-> >>>>    			msleep(20);
-> >>>>    			break;
-> >>>>    		default:
-> >>>>    			/* things are really broken, give up */
-> >>>> -			return -EIO;
-> >>>> +			ret = -EIO;
-> >>>> +			goto free_aqic_resources;  
-> >>> Do we really want the unpin here? I mean the reset did not work and
-> >>> we are giving up. So the irqs are potentially still enabled.
-> >>>
-> >>> Without this patch we try to disable the interrupts using AQIC, and
-> >>> do the cleanup after that.  
-> >> If the reset failure lands here, then a subsequent AQIC will
-> >> also fail, so I see no reason to expend processing time for
-> >> something that will ultimately fail anyways.
-> >>  
-> >>> I'm aware, the comment says we should not take the default branch,
-> >>> but if that's really the case we should IMHO log an error and leak the
-> >>> page.  
-> >> I do not see a good reason to leak the page, what purpose would
-> >> it serve?  
-> > Well, the thing is we don't have a case for AP_RESPONSE_CHECKSTOPPED,
-> > which is, AFAIK a valid outcome. I don't remember what is the exact
-> > deal with checkstopped regarding interrupts.  
-> 
-> The AP_RESPONSE_CHECKSTOPPED response code is set
-> when the AP function can not be performed due to a
-> machine failure resulting in loss of connectivity to the
-> queue. I find it hard to believe that interrupts would
-> continue to be signaled in that case. I will check with
-> the architecture folks for verification.
-> 
-> >
-> > If we take the default with something different
-> > than AP_RESPONSE_CHECKSTOPPED, that is AFAICT a bug of the underlying
-> > machine.  
-> 
-> I think AP_RESPONSE_CHECKSTOPPED indicates a problem with
-> the machine also.
-> 
-
-I think it indicates a problem with a queue, i.e. an IO device. It
-is not the same as the machine is doing stuff it should never do.
-
-> >  
-> >> I don't have a problem with logging an error, do you think
-> >> it should just be a log message or a WARN_ON type of thing?
-> >>  
-> > Seeing an outcome we don't expect to see, due to a bug in the underlying
-> > machine is in my book worth an error message. Furthermore we may not
-> > assume that the interrupts where shut down for the queue. So the only
-> > way we can protect the host is by leaking the page.  
-> 
-> I won't assume anything - although I seriously doubt interrupts
-> will continue with a broken device - so I will get input from the
-> architecture folks regarding interrupts after a non-zero response
-> code.
-> 
-
-I tend to agree, I just didn't re-read the stuff, and I don't remember
-all the details. But what I do seem to remember is that, if the
-checkstopped queue ever becomes operational again, it will come back
-clean (i.e. as if reset). So if we are sure, there won't be any surprise
-interrupts after some point (e.g. we observe the reason code for
-checkstopped), we could just say the reset was OK because there in
-no need to reset.
-
-So maybe on AP_RESPONSE_CHECKSTOPPED we should do thesame as on
-AP_RESPONSE_NORMAL, or?
+On 2021/1/13 下午10:33, Willem de Bruijn wrote:
+> On Tue, Jan 12, 2021 at 11:11 PM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On 2021/1/13 上午7:47, Willem de Bruijn wrote:
+>>> On Tue, Jan 12, 2021 at 3:29 PM Yuri Benditovich
+>>> <yuri.benditovich@daynix.com> wrote:
+>>>> On Tue, Jan 12, 2021 at 9:49 PM Yuri Benditovich
+>>>> <yuri.benditovich@daynix.com> wrote:
+>>>>> On Tue, Jan 12, 2021 at 9:41 PM Yuri Benditovich
+>>>>> <yuri.benditovich@daynix.com> wrote:
+>>>>>> Existing TUN module is able to use provided "steering eBPF" to
+>>>>>> calculate per-packet hash and derive the destination queue to
+>>>>>> place the packet to. The eBPF uses mapped configuration data
+>>>>>> containing a key for hash calculation and indirection table
+>>>>>> with array of queues' indices.
+>>>>>>
+>>>>>> This series of patches adds support for virtio-net hash reporting
+>>>>>> feature as defined in virtio specification. It extends the TUN module
+>>>>>> and the "steering eBPF" as follows:
+>>>>>>
+>>>>>> Extended steering eBPF calculates the hash value and hash type, keeps
+>>>>>> hash value in the skb->hash and returns index of destination virtqueue
+>>>>>> and the type of the hash. TUN module keeps returned hash type in
+>>>>>> (currently unused) field of the skb.
+>>>>>> skb->__unused renamed to 'hash_report_type'.
+>>>>>>
+>>>>>> When TUN module is called later to allocate and fill the virtio-net
+>>>>>> header and push it to destination virtqueue it populates the hash
+>>>>>> and the hash type into virtio-net header.
+>>>>>>
+>>>>>> VHOST driver is made aware of respective virtio-net feature that
+>>>>>> extends the virtio-net header to report the hash value and hash report
+>>>>>> type.
+>>>>> Comment from Willem de Bruijn:
+>>>>>
+>>>>> Skbuff fields are in short supply. I don't think we need to add one
+>>>>> just for this narrow path entirely internal to the tun device.
+>>>>>
+>>>> We understand that and try to minimize the impact by using an already
+>>>> existing unused field of skb.
+>>> Not anymore. It was repurposed as a flags field very recently.
+>>>
+>>> This use case is also very narrow in scope. And a very short path from
+>>> data producer to consumer. So I don't think it needs to claim scarce
+>>> bits in the skb.
+>>>
+>>> tun_ebpf_select_queue stores the field, tun_put_user reads it and
+>>> converts it to the virtio_net_hdr in the descriptor.
+>>>
+>>> tun_ebpf_select_queue is called from .ndo_select_queue.  Storing the
+>>> field in skb->cb is fragile, as in theory some code could overwrite
+>>> that between field between ndo_select_queue and
+>>> ndo_start_xmit/tun_net_xmit, from which point it is fully under tun
+>>> control again. But in practice, I don't believe anything does.
+>>>
+>>> Alternatively an existing skb field that is used only on disjoint
+>>> datapaths, such as ingress-only, could be viable.
+>>
+>> A question here. We had metadata support in XDP for cooperation between
+>> eBPF programs. Do we have something similar in the skb?
+>>
+>> E.g in the RSS, if we want to pass some metadata information between
+>> eBPF program and the logic that generates the vnet header (either hard
+>> logic in the kernel or another eBPF program). Is there any way that can
+>> avoid the possible conflicts of qdiscs?
+> Not that I am aware of. The closest thing is cb[].
+>
+> It'll have to aliase a field like that, that is known unused for the given path.
 
 
-> >  
-> >>> It's up to you if you want to change this. I don't want to delay the
-> >>> series any further than absolutely necessary.
-> >>>
-> >>> Acked-by: Halil Pasic <pasic@linux.ibm.com>
-> >>>     
-> >>>>    		}
-> >>>>    	} while (retry--);
-> >>>>    
-> >>>>    	return -EBUSY;
-> >>>> +
-> >>>> +free_aqic_resources:
-> >>>> +	/*
-> >>>> +	 * In order to free the aqic resources, the queue must be linked to
-> >>>> +	 * the matrix_mdev to which its APQN is assigned and the KVM pointer
-> >>>> +	 * must be available.
-> >>>> +	 */
-> >>>> +	q = vfio_ap_find_queue(apqn);
-> >>>> +	if (q && q->matrix_mdev && q->matrix_mdev->kvm)  
-> >>> Is this of the type "we know there are no aqic resources to be freed" if
-> >>> precondition is false?  
-> >> Yes
-> >>  
-> >>> vfio_ap_free_aqic_resources() checks the matrix_mdev pointer but not the
-> >>> kvm pointer. Could we just check the kvm pointer in
-> >>> vfio_ap_free_aqic_resources()?  
-> >> A while back I posted a patch that did just that and someone pushed back
-> >> because they could not see how the vfio_ap_free_aqic_resources()
-> >> function would ever be called with a NULL kvm pointer which is
-> >> why I implemented the above check. The reset is called
-> >> when the mdev is removed which can happen only when there
-> >> is no kvm pointer, so I agree it would be better to check the kvm
-> >> pointer in the vfio_ap_free_aqic_resources() function.
-> >>  
-> > I don't remember. Sorry if it was me.
-> >  
-> >>> At the end of the series, is seeing q! indicating a bug, or is it
-> >>> something we expect to see under certain circumstances?  
-> >> I'm not quite sure to what you are referring regarding "the
-> >> end of the series", but we can expect to see a NULL pointer
-> >> for q if a queue is manually unbound from the driver.  
-> > By at the end of the series, I mean with all 15 patches applied.
-> >
-> > Regarding the case where the queue is manually unbound form the
-> > driver, this is exactly one of the scenarios I was latently concerned
-> > about. Let me explain. The manually unbound queue was already reset
-> > in vfio_ap_mdev_remove_queue() if necessary, so we don't need to reset
-> > it again. And more importantly it is not bound to the vfio_ap driver,
-> > so vfio_ap is not allowed to reset it. (It could in theory belong to
-> > and be in use by another non-default driver).
-> >
-> > I've just checked out vfio_ap_mdev_reset_queues() and it resets all
-> > queues in the matrix. The in use mechanism does ensure that zcrypt
-> > can't use these queues (together with a[pq]mask), but resetting a
-> > queue that does not belong to us is going beyond our authority.  
-> 
-> I agree which is why in the next version I am only resetting a queue if
-> it is bound at the time of the reset.
-> 
+Right, we need to make sure cb is not used by other ones. I'm not sure 
+how hard to achieve that consider Qemu installs the eBPF program but it 
+doesn't deal with networking configurations.
 
 
-Sounds good. Please keep my ack unless, the changes turn out
-extensive. I will have a look at the new stuff again, and hopefully
-upgrade to r-b. But I'm also fine with merging this patch as is
-and addressing the stuff discussed later (hence the ack). It's up
-to you.
+>
+> One other approach that has been used within linear call stacks is out
+> of band. Like percpu variables softnet_data.xmit.more and
+> mirred_rec_level. But that is perhaps a bit overwrought for this use
+> case.
 
-Regards,
-Halil
 
-[..]
+Yes, and if we go that way then eBPF turns out to be a burden since we 
+need to invent helpers to access those auxiliary data structure. It 
+would be better then to hard-coded the RSS in the kernel.
+
+
+>
+>>>>> Instead, you could just run the flow_dissector in tun_put_user if the
+>>>>> feature is negotiated. Indeed, the flow dissector seems more apt to me
+>>>>> than BPF here. Note that the flow dissector internally can be
+>>>>> overridden by a BPF program if the admin so chooses.
+>>>>>
+>>>> When this set of patches is related to hash delivery in the virtio-net
+>>>> packet in general,
+>>>> it was prepared in context of RSS feature implementation as defined in
+>>>> virtio spec [1]
+>>>> In case of RSS it is not enough to run the flow_dissector in tun_put_user:
+>>>> in tun_ebpf_select_queue the TUN calls eBPF to calculate the hash,
+>>>> hash type and queue index
+>>>> according to the (mapped) parameters (key, hash types, indirection
+>>>> table) received from the guest.
+>>> TUNSETSTEERINGEBPF was added to support more diverse queue selection
+>>> than the default in case of multiqueue tun. Not sure what the exact
+>>> use cases are.
+>>>
+>>> But RSS is exactly the purpose of the flow dissector. It is used for
+>>> that purpose in the software variant RPS. The flow dissector
+>>> implements a superset of the RSS spec, and certainly computes a
+>>> four-tuple for TCP/IPv6. In the case of RPS, it is skipped if the NIC
+>>> has already computed a 4-tuple hash.
+>>>
+>>> What it does not give is a type indication, such as
+>>> VIRTIO_NET_HASH_TYPE_TCPv6. I don't understand how this would be used.
+>>> In datapaths where the NIC has already computed the four-tuple hash
+>>> and stored it in skb->hash --the common case for servers--, That type
+>>> field is the only reason to have to compute again.
+>>
+>> The problem is there's no guarantee that the packet comes from the NIC,
+>> it could be a simple VM2VM or host2VM packet.
+>>
+>> And even if the packet is coming from the NIC that calculates the hash
+>> there's no guarantee that it's the has that guest want (guest may use
+>> different RSS keys).
+> Ah yes, of course.
+>
+> I would still revisit the need to store a detailed hash_type along with
+> the hash, as as far I can tell that conveys no actionable information
+> to the guest.
+
+
+Yes, need to figure out its usage. According to [1], it only mention 
+that storing has type is a charge of driver. Maybe Yuri can answer this.
+
+Thanks
+
+[1] 
+https://docs.microsoft.com/en-us/windows-hardware/drivers/network/indicating-rss-receive-data
+
+
+>
+
