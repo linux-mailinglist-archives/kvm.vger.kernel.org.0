@@ -2,188 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BFCB2F6F5F
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:21:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E88D92F6F31
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:00:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731243AbhAOAUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 19:20:14 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45823 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731202AbhAOAUN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 19:20:13 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DH1yV5Pblz9sSs; Fri, 15 Jan 2021 11:19:30 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1610669970;
-        bh=wcy9LPpFUMZ9gzA/ytL/D68EWk8OlzQliGIpe+KcrvE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=L2zdbUE0G9bDudtydYhL64mVS+oPklq4KR7l0GUTv8rSKW4urpLoiYYA5wjnddvpM
-         Qpedk98R8mTt5UGfRy+nS6+R2DxyUvX0xAji7dKGB/rzmJm25IAzE6/TlvwaGahm6i
-         lQwiEzD4noPcNATzCUqtb2txCxG7c7MmIv5DNY+0=
-Date:   Fri, 15 Jan 2021 10:51:25 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Ram Pai <linuxram@us.ibm.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        Halil Pasic <pasic@linux.ibm.com>, borntraeger@de.ibm.com,
-        thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org,
-        rth@twiddle.net, Marcelo Tosatti <mtosatti@redhat.com>,
-        qemu-ppc@nongnu.org, pbonzini@redhat.com
-Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20210114235125.GO435587@yekko.fritz.box>
-References: <20201217151530.54431f0e@bahia.lan>
- <20201218124111.4957eb50.cohuck@redhat.com>
- <20210104071550.GA22585@ram-ibm-com.ibm.com>
- <20210104134629.49997b53.pasic@linux.ibm.com>
- <20210104184026.GD4102@ram-ibm-com.ibm.com>
- <20210105115614.7daaadd6.pasic@linux.ibm.com>
- <20210105204125.GE4102@ram-ibm-com.ibm.com>
- <20210111175914.13adfa2e.cohuck@redhat.com>
- <20210113124226.GH2938@work-vm>
- <20210114112517.GE1643043@redhat.com>
+        id S1731118AbhANX70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 18:59:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731063AbhANX70 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 18:59:26 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A261BC0613C1
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 15:58:45 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id w1so5335720pjc.0
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 15:58:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Nvc3IiVsp1txtwU1w62SIZO9MP6aDBCxGAMOxwFlnfU=;
+        b=H7nzFgoD0mmZjC3G98NJ258zxdOB4jQUx4WZeToA057UC7qaekindB4sM8jX+Y1oEl
+         QGti5hPv1oA8iNHAOK2sp8TMWpMHyEjXvJjyNtfxBnWu0wIPGlctClYj9kgCW1yZlldb
+         e+/Hs1Ji1KMtFSFo6t3FrGZVICol56ot6OE+zthMFkMElc13Ijd0dgMWhPDCSk2jCzVR
+         5EsunfSh6ZH0Txhw2m4PvHQwA0xIj2Ivg3HU6wAzPqnKH2v4YxIQglIWxriNsEuhoRSu
+         jTluatQOg7eYnkLfj3C2+wKHUqpTHKhRXCJ310FSG6QfH9FNr2Wbn+DzHDIgx/71ZYHl
+         petw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Nvc3IiVsp1txtwU1w62SIZO9MP6aDBCxGAMOxwFlnfU=;
+        b=Q0rlgrlNcFAXUnh7H4yw/tpNEpSTXsmGI/aO7+h/hABqzl8U7D8tPde3IfofdA3uIV
+         qxwZI9gMnb0f4LII/gyRBUK3AdWD8KaVVClUprwlceF3N3OQsyEEJEELFPQBv7vtIOrk
+         vLJbUAcY9BYIjKazKep/F4ze7p5OJciNDklJbh8+yDmmjBLREzg4CMQxT6+7yvycgz0P
+         kYHAWPOYS9M+DoU+m3c8Rzb+GSA17kXs2VcEvt6bh+DIiNJ6SQeIvnrJtR7Btr16r6ls
+         TBWB0JC5iEhudw9hbd1sHgjMn4/zk47yfYrpALM6b2kTfJ0ArMWZkwEX6JOjCaRFwcsx
+         UcsQ==
+X-Gm-Message-State: AOAM531O/Thx9zhMJUI9ctmHBdLIKFxOmVZxcrbRfiTT6dc5gPppgiO2
+        nSjMGz5k2e2dTlEda+Ob6pHc7Q==
+X-Google-Smtp-Source: ABdhPJzFHsi9Kv8DysKPjSpNxctiO1nz5yAe/V4FeI1lp/9eO+PQMeZV6DvVBkNf6U3Z5fBtrsJaMg==
+X-Received: by 2002:a17:902:6b89:b029:da:fc41:baec with SMTP id p9-20020a1709026b89b02900dafc41baecmr10011317plk.39.1610668724942;
+        Thu, 14 Jan 2021 15:58:44 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id z23sm5926576pfn.202.2021.01.14.15.58.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jan 2021 15:58:44 -0800 (PST)
+Date:   Thu, 14 Jan 2021 15:58:37 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: nVMX: Always call sync_vmcs02_to_vmcs12_rare
+ on migration
+Message-ID: <YADarUMsE9uDKxOe@google.com>
+References: <20210114205449.8715-1-mlevitsk@redhat.com>
+ <20210114205449.8715-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="MmQIYbZiCoQ2kDro"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210114112517.GE1643043@redhat.com>
+In-Reply-To: <20210114205449.8715-2-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Subject is confusing, and technically wrong.  Confusing because there is no call
+to sync_vmcs02_to_vmcs12_rare().  Technically wrong because sync_...() won't be
+called if need_sync_vmcs02_to_vmcs12_rare==false.
 
---MmQIYbZiCoQ2kDro
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Maybe something like?
 
-On Thu, Jan 14, 2021 at 11:25:17AM +0000, Daniel P. Berrang=E9 wrote:
-> On Wed, Jan 13, 2021 at 12:42:26PM +0000, Dr. David Alan Gilbert wrote:
-> > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > On Tue, 5 Jan 2021 12:41:25 -0800
-> > > Ram Pai <linuxram@us.ibm.com> wrote:
-> > >=20
-> > > > On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:
-> > > > > On Mon, 4 Jan 2021 10:40:26 -0800
-> > > > > Ram Pai <linuxram@us.ibm.com> wrote:
-> > >=20
-> > > > > > The main difference between my proposal and the other proposal =
-is...
-> > > > > >=20
-> > > > > >   In my proposal the guest makes the compatibility decision and=
- acts
-> > > > > >   accordingly.  In the other proposal QEMU makes the compatibil=
-ity
-> > > > > >   decision and acts accordingly. I argue that QEMU cannot make =
-a good
-> > > > > >   compatibility decision, because it wont know in advance, if t=
-he guest
-> > > > > >   will or will-not switch-to-secure.
-> > > > > >  =20
-> > > > >=20
-> > > > > You have a point there when you say that QEMU does not know in ad=
-vance,
-> > > > > if the guest will or will-not switch-to-secure. I made that argum=
-ent
-> > > > > regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My id=
-ea
-> > > > > was to flip that property on demand when the conversion occurs. D=
-avid
-> > > > > explained to me that this is not possible for ppc, and that havin=
-g the
-> > > > > "securable-guest-memory" property (or whatever the name will be)
-> > > > > specified is a strong indication, that the VM is intended to be u=
-sed as
-> > > > > a secure VM (thus it is OK to hurt the case where the guest does =
-not
-> > > > > try to transition). That argument applies here as well. =20
-> > > >=20
-> > > > As suggested by Cornelia Huck, what if QEMU disabled the
-> > > > "securable-guest-memory" property if 'must-support-migrate' is enab=
-led?
-> > > > Offcourse; this has to be done with a big fat warning stating
-> > > > "secure-guest-memory" feature is disabled on the machine.
-> > > > Doing so, will continue to support guest that do not try to transit=
-ion.
-> > > > Guest that try to transition will fail and terminate themselves.
-> > >=20
-> > > Just to recap the s390x situation:
-> > >=20
-> > > - We currently offer a cpu feature that indicates secure execution to
-> > >   be available to the guest if the host supports it.
-> > > - When we introduce the secure object, we still need to support
-> > >   previous configurations and continue to offer the cpu feature, even
-> > >   if the secure object is not specified.
-> > > - As migration is currently not supported for secured guests, we add a
-> > >   blocker once the guest actually transitions. That means that
-> > >   transition fails if --only-migratable was specified on the command
-> > >   line. (Guests not transitioning will obviously not notice anything.)
-> > > - With the secure object, we will already fail starting QEMU if
-> > >   --only-migratable was specified.
-> > >=20
-> > > My suggestion is now that we don't even offer the cpu feature if
-> > > --only-migratable has been specified. For a guest that does not want =
-to
-> > > transition to secure mode, nothing changes; a guest that wants to
-> > > transition to secure mode will notice that the feature is not availab=
-le
-> > > and fail appropriately (or ultimately, when the ultravisor call fails=
-).
-> > > We'd still fail starting QEMU for the secure object + --only-migratab=
-le
-> > > combination.
-> > >=20
-> > > Does that make sense?
-> >=20
-> > It's a little unusual; I don't think we have any other cases where
-> > --only-migratable changes the behaviour; I think it normally only stops
-> > you doing something that would have made it unmigratable or causes
-> > an operation that would make it unmigratable to fail.
->=20
-> I agree,  --only-migratable is supposed to be a *behavioural* toggle
-> for QEMU. It must /not/ have any impact on the guest ABI.
->=20
-> A management application needs to be able to add/remove --only-migratable
-> at will without changing the exposing guest ABI.
+KVM: nVMX: Sync unsync'd vmcs02 state to vmcs12 on migration
 
-At the qemu level, it sounds like the right thing to do is to fail
-outright if all of the below are true:
- 1. --only-migratable is specified
- 2. -cpu host is specified
- 3. unpack isn't explicitly disabled
- 4. the host CPU actually does have the unpack facility
+On Thu, Jan 14, 2021, Maxim Levitsky wrote:
+> Even when we are outside the nested guest, some vmcs02 fields
+> are not in sync vs vmcs12.
 
-That can be changed if & when migration support is added for PV.
+s/are not/may not be
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+It'd be helpful to provide more details in the changelog, e.g. for those not in
+the loop, it's not obvious that KVM intentionally keeps those fields unsync'd,
+even across nested VM-Exit.
 
---MmQIYbZiCoQ2kDro
-Content-Type: application/pgp-signature; name="signature.asc"
+> However during the migration, the vmcs12 has to be up to date
+> to be able to load it later after the migration.
+> 
+> To fix that, call that function.
 
------BEGIN PGP SIGNATURE-----
+s/that function/copy_vmcs02_to_vmcs12_rare().  Characters are cheap, and it's
+jarring to have to jump back all the way back to the subject.  And, as mentioned
+above, this doesn't actually call sync_ directly.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAA2PoACgkQbDjKyiDZ
-s5LPNQ//ZwtUgMLH6n2praK8ukCTBF7OmWisADC3WU+C4HDdA3uegtF/R+btR4RK
-eklRS2KUCYHBvXJ2r0W/3bBgz93em7FEgxQS5k9osOk9KX82t+dmruYAImaWrF/f
-mMlyS3dcoi41goe0k45rn9E4zAbaW+NWs3bVfyvupHjjiIZFgsZzCGBicnXeWJcW
-/rV/bbQpyxUmX6CY9Xv+GsOpENjSHP24K8k1EadZgoj1+MIskL4sSKs+uU7XQ2cE
-jq8CyCkPZo85UPQlubdhRwF9aOGAojidXxpO0Fs1eI6rmRaZ+8F9+A65Tn8w1Wsy
-YJze4aGyW4QH4L25M6dZXrBd7fnSYNwsEZtZnT0sIBYewZmGeBFx3l7IcKp5engY
-lCXTHJNFZM9wbH1Hcp119aZrF0/RBR5lsxB2K9OY5QxEW+a53HNXXBGaxf+avlqN
-TGE9rR4bbv10GhGI+TeUEjRu974Da270gPc2+0HSEbfXgIfrta5K8jMnLcuyJzNe
-rORil0ypdrh8/NtJDX/GOwkHui1fwrdDznjA/F8E1E9ejrFhgL/QE7+H6sObPEMZ
-OypJnP4tQArfXROzYsyJ8pQUdrsn+uL+w2OvNMjbidqnIffd03V7T0LazmS066BD
-D/K/WTEUfk29J3mGKgYes3GScVQHH74Kb0dADNtCNrQpMU5jfVk=
-=Rei0
------END PGP SIGNATURE-----
+For the code,
 
---MmQIYbZiCoQ2kDro--
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
+
+> 
+> Fixes: 7952d769c29ca ("KVM: nVMX: Sync rarely accessed guest fields only when needed")
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 0fbb46990dfce..776688f9d1017 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -6077,11 +6077,14 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+>  	if (is_guest_mode(vcpu)) {
+>  		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
+>  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
+> -	} else if (!vmx->nested.need_vmcs12_to_shadow_sync) {
+> -		if (vmx->nested.hv_evmcs)
+> -			copy_enlightened_to_vmcs12(vmx);
+> -		else if (enable_shadow_vmcs)
+> -			copy_shadow_to_vmcs12(vmx);
+> +	} else  {
+> +		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
+> +		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
+> +			if (vmx->nested.hv_evmcs)
+> +				copy_enlightened_to_vmcs12(vmx);
+> +			else if (enable_shadow_vmcs)
+> +				copy_shadow_to_vmcs12(vmx);
+> +		}
+>  	}
+>  
+>  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
+> -- 
+> 2.26.2
+> 
