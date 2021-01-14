@@ -2,94 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DD492F5CB6
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 09:58:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32A5E2F5D0A
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 10:15:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727304AbhANI6K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 03:58:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48972 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726742AbhANI6J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 03:58:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610614603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5mIiTKZ0bfdwT4qAJDHJUFiHYjyZoxrSZVhHEnOGK0k=;
-        b=RgMMlFB12rgTatAK+ZF2lL5yVKHCZvAKPQpx/QrZv080SuO+Y4eGG4I+YRK2VT0z/7Mz1d
-        jkusICgFRdfAceB1jSJ3S2V2wAIjrfizOfgCBmlo3d2OjO57otxbv2XkcHGswe5tMDL6FW
-        /GAAM3wt2e7qeUuVaDVKg5mfZQ6Nz8o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-ydnULg91ODGgpsJD_s2gLA-1; Thu, 14 Jan 2021 03:54:11 -0500
-X-MC-Unique: ydnULg91ODGgpsJD_s2gLA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB2571572A;
-        Thu, 14 Jan 2021 08:54:09 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-108.ams2.redhat.com [10.36.112.108])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E88A077715;
-        Thu, 14 Jan 2021 08:54:04 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v4 4/9] s390x: Split assembly into multiple
- files
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20210112132054.49756-1-frankja@linux.ibm.com>
- <20210112132054.49756-5-frankja@linux.ibm.com>
- <c07280f6-f56c-ea6c-1255-28a36a2385c0@redhat.com>
- <fce05f26-8cdb-009d-a88d-c799c3784506@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <46f771fa-f1a2-825e-8cd0-d9a81d1b1d73@redhat.com>
-Date:   Thu, 14 Jan 2021 09:54:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+        id S1727816AbhANJOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 04:14:54 -0500
+Received: from 2.mo52.mail-out.ovh.net ([178.33.105.233]:39584 "EHLO
+        2.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727956AbhANJOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 04:14:39 -0500
+X-Greylist: delayed 163784 seconds by postgrey-1.27 at vger.kernel.org; Thu, 14 Jan 2021 04:14:37 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.173])
+        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 3CA46230150;
+        Thu, 14 Jan 2021 09:55:10 +0100 (CET)
+Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 14 Jan
+ 2021 09:55:09 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-100R00352f46628-57d0-46e2-9de7-07363bd0adac,
+                    0A7C53367AF3A9CD096E542ECC3C8B2C2D100868) smtp.auth=groug@kaod.org
+X-OVh-ClientIp: 82.253.208.248
+Date:   Thu, 14 Jan 2021 09:55:08 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+CC:     <brijesh.singh@amd.com>, <pair@us.ibm.com>, <dgilbert@redhat.com>,
+        <pasic@linux.ibm.com>, <qemu-devel@nongnu.org>,
+        <cohuck@redhat.com>,
+        "Richard Henderson" <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>, <borntraeger@de.ibm.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, <mst@redhat.com>,
+        <jun.nakajima@intel.com>, <thuth@redhat.com>,
+        <pragyansri.pathi@intel.com>, <kvm@vger.kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>, <qemu-s390x@nongnu.org>,
+        <qemu-ppc@nongnu.org>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>, <andi.kleen@intel.com>
+Subject: Re: [PATCH v7 07/13] confidential guest support: Introduce cgs
+ "ready" flag
+Message-ID: <20210114095508.3ef1db7e@bahia.lan>
+In-Reply-To: <20210113235811.1909610-8-david@gibson.dropbear.id.au>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+        <20210113235811.1909610-8-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <fce05f26-8cdb-009d-a88d-c799c3784506@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 1b4eaa1f-9249-4295-af14-40e7aee9315b
+X-Ovh-Tracer-Id: 499336611335149980
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedukedrtdeggdduvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtoheprghnughirdhklhgvvghnsehinhhtvghlrdgtohhm
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/01/2021 13.15, Janosch Frank wrote:
-> On 1/13/21 1:04 PM, Thomas Huth wrote:
->> On 12/01/2021 14.20, Janosch Frank wrote:
->>> I've added too much to cstart64.S which is not start related
->>> already. Now that I want to add even more code it's time to split
->>> cstart64.S. lib.S has functions that are used in tests. macros.S
->>> contains macros which are used in cstart64.S and lib.S
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>> ---
->>>    s390x/Makefile   |   6 +--
->>>    s390x/cstart64.S | 119 ++---------------------------------------------
->>>    s390x/lib.S      |  65 ++++++++++++++++++++++++++
->>
->> lib.S is a very generic name ... maybe rather use cpuasm.S or something similar?
+On Thu, 14 Jan 2021 10:58:05 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> The platform specific details of mechanisms for implementing
+> confidential guest support may require setup at various points during
+> initialization.  Thus, it's not really feasible to have a single cgs
+> initialization hook, but instead each mechanism needs its own
+> initialization calls in arch or machine specific code.
 > 
-> instr.S ?
+> However, to make it harder to have a bug where a mechanism isn't
+> properly initialized under some circumstances, we want to have a
+> common place, relatively late in boot, where we verify that cgs has
+> been initialized if it was requested.
+> 
+> This patch introduces a ready flag to the ConfidentialGuestSupport
+> base type to accomplish this, which we verify just before the machine
+> specific initialization function.
+> 
 
-Hmm, no, if I read something like that, I'd expect wrapper functions for 
-single instructions, which is not what we have here.
+Since this is a strong requirement for any new cgs implementation, I
+guess it could be advertised a bit more with some extra documentation
+in the confidential-guest-support.h header file as well.
 
-Looking at the two functions, both are related to CPU stuff (reset and 
-state), so something with "cpu" in the name would be best, I think. Maybe 
-just cpu.S ?
+Anyway,
 
-Or if you intend to add non-CPU related stuff here later, maybe something 
-like misc.S ?
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> Or maybe entry.S to make it similar to the kernel?
 
-No, entry.S sounds like a startup code, which we already have in cstart64.S, 
-so I'd rather avoid that name.
+Unrelated. I've just spotted mdroth@linux.vnet.ibm.com in the Cc list
+of this thread, but, as you know, Mike is now working on other topics
+at AMD :)
 
-  Thomas
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/core/machine.c                         | 8 ++++++++
+>  include/exec/confidential-guest-support.h | 2 ++
+>  target/i386/sev.c                         | 2 ++
+>  3 files changed, 12 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 94194ab82d..5a7433332b 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -1190,6 +1190,14 @@ void machine_run_board_init(MachineState *machine)
+>      }
+>  
+>      if (machine->cgs) {
+> +        /*
+> +         * Where confidential guest support is initialized depends on
+> +         * the specific mechanism in use.  But, we need to make sure
+> +         * it's ready by now.  If it isn't, that's a bug in the
+> +         * implementation of that cgs mechanism.
+> +         */
+> +        assert(machine->cgs->ready);
+> +
+>          /*
+>           * With confidential guests, the host can't see the real
+>           * contents of RAM, so there's no point in it trying to merge
+> diff --git a/include/exec/confidential-guest-support.h b/include/exec/confidential-guest-support.h
+> index 5f131023ba..bcaf6c9f49 100644
+> --- a/include/exec/confidential-guest-support.h
+> +++ b/include/exec/confidential-guest-support.h
+> @@ -27,6 +27,8 @@ OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUEST_SUPPORT)
+>  
+>  struct ConfidentialGuestSupport {
+>      Object parent;
+> +
+> +    bool ready;
+>  };
+>  
+>  typedef struct ConfidentialGuestSupportClass {
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index e2b41ef342..3d94635397 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -737,6 +737,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+>      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
+>      qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
+>  
+> +    cgs->ready = true;
+> +
+>      return 0;
+>  err:
+>      sev_guest = NULL;
 
