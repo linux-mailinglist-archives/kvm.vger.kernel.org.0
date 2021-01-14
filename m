@@ -2,101 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BAA82F6AA0
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 20:14:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B72682F6ABE
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 20:19:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729701AbhANTLs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 14:11:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41364 "EHLO
+        id S1729832AbhANTSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 14:18:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729632AbhANTLr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 14:11:47 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54553C061575
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 11:11:07 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id b8so3416732plx.0
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 11:11:07 -0800 (PST)
+        with ESMTP id S1727228AbhANTSQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 14:18:16 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA0A1C061575
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 11:17:35 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id x126so3925823pfc.7
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 11:17:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=+ReVIElF0ug2hspVF8MhGrtt8tX4cPTcM7laaE3Mkn4=;
-        b=HyQPHZUme1aLutRzh4m+G49+4PStkg/ebEra578C6AXdOamIQY6q2Gz33JYYuZ5l49
-         0Ypd2OvzoUa7irmLZUn0hQGzjLtuWAft+Masj0n9nyLrIbqYQmpCW7ju11baWMs5KgDQ
-         hxXi7gnlNYT5gMuKStvhg2X3kxM8/M/IcImhtwix4r+C/g7dOgpOvlvtjHJNIaCncdQ3
-         qy//GtTrOYJyhWEOCqz1J2BGpjNh7u+wvfcbn5DGh9mbSBiT2U1i4VDayzGCW6YiR+Uc
-         0BQktkXhJCPl5UKR8QFs5VPLZKz3JElz4wvfXaHsGAFiGgtHLi75ZThoaEb1G9siTapK
-         HBlQ==
+        bh=BrtldUOeu+hnXE15tO0kF01exYGRde7kUMNnM3ud9F4=;
+        b=cd9onR3Brmte3kL09DzE0Cgh6BPn45EsyBihDJu6gX6usEh8TmbwtpKcBJSSUqFGNh
+         1voOWLtw2pBBaw9sHzfW21IQbhzAdAEiQW7heBui7ygrZaiTcMfMHx4UstNbpGh/l15f
+         l91UIVsYdHy9V2TOUwosP6u4nN6QhkYfNAztwb47PmA8LCzFTMCl7PXSLj+IYHeUY6Ws
+         MFMVUr684KSA7FxFYNSFqYcq/OnPkslp735XBmzvF+LSp8ZN2/sIKWpPseHTiSXg3QEA
+         osJ+5khHsGD8KPCz4IX6axFFId+vl/BqIVb59pKrekADB4YoUCibt6jidJ1DEd7nq29l
+         EAYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=+ReVIElF0ug2hspVF8MhGrtt8tX4cPTcM7laaE3Mkn4=;
-        b=Gl0HDClanBbhhxz1queR44rVJypZd6r8UdPj0iDA3Y7oEd/9Jc0vJQz6wpCfB6aJ9k
-         QysIum2nLlT69J5xwGLD8tdXvXmQuqb5WZ9Sl0lXB6jzHzHhOGTTABcj0pDXcOaBbRGO
-         LJJmio11YERawnHGgfAvBiVKz01P5b+MJjRRfDV3S3Bqfs7pFas5hlb6ZirBxJPp7+36
-         xpFCS28AHxC7G0hBQpr91lRJWm3sf5pnocirAqvri7X3spclj69ySrRRBcjiYSQll8XF
-         nSi+d7geS5iAOEhv1aiOUssULYnpDXNj3XN0PXRZoqEjE4NnymkTEUg4eq2QVvlWM4r8
-         vSFw==
-X-Gm-Message-State: AOAM532IdPV4TNawQDvmiWMC5GtUfC/38M59+9xGz8TeSnZaM39lUGYd
-        yx2kU171riUhrR8HSFh/SuugSjm7ECBZIw==
-X-Google-Smtp-Source: ABdhPJwuHmV2q+NvRIuZSsYI6CNiyUcx1ahBqTEkR7YR+cDX9VpwdeFEKU143CZ778FJ0S+i2Lsu+A==
-X-Received: by 2002:a17:90a:31c3:: with SMTP id j3mr6259951pjf.25.1610651466709;
-        Thu, 14 Jan 2021 11:11:06 -0800 (PST)
+        bh=BrtldUOeu+hnXE15tO0kF01exYGRde7kUMNnM3ud9F4=;
+        b=Tx1TxvxBHd9Hts6Tv3rDwC0fS+tGO6HxryHf5Bwnj+E7LK/HwJkKnhCmPx/Db+sKQy
+         M7uTXZRWvXxr6xYEitgQqCGUr/x7pKw05EOaRr3GDWxwdwYD8Bi36D56DBieZL7g1nRX
+         tnEh+mFS1ckQlxn7l8MjLyYBPMRe22IadzS0f0jQiMbDOUQWVQxrc80IKEkuapcJFXBy
+         HKwEEs72JGnaLJcsiMNaVgz01KhnXgavBRBPs60h8u8hpJqUbynfZt8THo+K7B6P1ust
+         j8HmKsuSQOnMWKoJrUD61u8hB5j60pXdVnPyUIZjOvElYDNDlsYZRNqmVusYk2PGPiHr
+         LeOQ==
+X-Gm-Message-State: AOAM532Iz1Kp5T1PrczgilpF5o8URr63vaf0+l5qek17+exislEwQZxw
+        9piIxfbWKC9zQo4bII2dW/tRzg==
+X-Google-Smtp-Source: ABdhPJzbwD0JrHREGhIIZoS98kiThcriePWQtFFWefgrpZhr93P+JXhUBVD+nQwpFcRyYddS+wBxNQ==
+X-Received: by 2002:aa7:979d:0:b029:1a4:3b76:a559 with SMTP id o29-20020aa7979d0000b02901a43b76a559mr8716680pfp.49.1610651855097;
+        Thu, 14 Jan 2021 11:17:35 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id c18sm5867353pfj.200.2021.01.14.11.11.04
+        by smtp.gmail.com with ESMTPSA id t23sm6015241pfc.0.2021.01.14.11.17.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 11:11:06 -0800 (PST)
-Date:   Thu, 14 Jan 2021 11:10:59 -0800
+        Thu, 14 Jan 2021 11:17:34 -0800 (PST)
+Date:   Thu, 14 Jan 2021 11:17:27 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu@linux.intel.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <andi@firstfloor.org>,
-        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
-        luwei.kang@intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
- via DS
-Message-ID: <YACXQwBPI8OFV1T+@google.com>
-References: <20210104131542.495413-1-like.xu@linux.intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2 02/14] KVM: SVM: Free sev_asid_bitmap during init if
+ SEV setup fails
+Message-ID: <YACYx68nBGOe2ROg@google.com>
+References: <20210114003708.3798992-1-seanjc@google.com>
+ <20210114003708.3798992-3-seanjc@google.com>
+ <b1a6403b-249d-9e98-3a2d-7117ed03f392@amd.com>
+ <YAB7ceKeOdfkDnoA@google.com>
+ <12cfd19a-7f6f-c422-5d6a-5317c1df72ae@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210104131542.495413-1-like.xu@linux.intel.com>
+In-Reply-To: <12cfd19a-7f6f-c422-5d6a-5317c1df72ae@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 04, 2021, Like Xu wrote:
-> 2) Slow path (part 3, patch 0012-0017)
+On Thu, Jan 14, 2021, Tom Lendacky wrote:
+> On 1/14/21 11:12 AM, Sean Christopherson wrote:
+> > On Thu, Jan 14, 2021, Tom Lendacky wrote:
+> > > On 1/13/21 6:36 PM, Sean Christopherson wrote:
+> > > > Free sev_asid_bitmap if the reclaim bitmap allocation fails, othwerise
+> > > > KVM will unnecessarily keep the bitmap when SEV is not fully enabled.
+> > > > 
+> > > > Freeing the page is also necessary to avoid introducing a bug when a
+> > > > future patch eliminates svm_sev_enabled() in favor of using the global
+> > > > 'sev' flag directly.  While sev_hardware_enabled() checks max_sev_asid,
+> > > > which is true even if KVM setup fails, 'sev' will be true if and only
+> > > > if KVM setup fully succeeds.
+> > > > 
+> > > > Fixes: 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations")
 > 
-> This is when the host assigned physical PMC has a different index
-> from the virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0)
-> In this case, KVM needs to rewrite the PEBS records to change the
-> applicable counter indexes to the virtual PMC indexes, which would
-> otherwise contain the physical counter index written by PEBS facility,
-> and switch the counter reset values to the offset corresponding to
-> the physical counter indexes in the DS data structure. 
-> 
-> Large PEBS needs to be disabled by KVM rewriting the
-> pebs_interrupt_threshold filed in DS to only one record in
-> the slow path.  This is because a guest may implicitly drain PEBS buffer,
-> e.g., context switch. KVM doesn't get a chance to update the PEBS buffer.
+> Oops, missed this last time... I don't think the Fixes: tag is needed
+> anymore unless you don't want the memory consumption of the first bitmap,
 
-Are the PEBS record write, PEBS index update, and subsequent PMI atomic with
-respect to instruction execution?  If not, doesn't this approach still leave a
-window where the guest could see the wrong counter?
+If Fixes is viewed as purely a "this needs to be backported", then yes, it
+should be dropped.  But, since KVM policy is to backport only patches that are
+explicitly tagged with stable@, I like to use to Fixes to create a paper trail
+for bug fixes even if the bug is essentially benign.
 
-The virtualization hole is also visible if the guest is reading the PEBS records
-from a different vCPU, though I assume no sane kernel does that?
+That being said, I have no objection to dropping it if anyone feels strongly
+about not playing fast and loose with Fixes.
 
-> The physical PMC index will confuse the guest. The difficulty comes
-> when multiple events get rescheduled inside the guest. Hence disabling
-> large PEBS in this case might be an easy and safe way to keep it corrects
-> as an initial step here. 
+> should the allocation of the second bitmap fail, until kvm_amd is rmmod'ed.
+> Up to you.
