@@ -2,213 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B64F42F6CC9
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 22:03:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 755282F6CE9
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 22:12:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728743AbhANVAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 16:00:16 -0500
-Received: from mail-eopbgr680074.outbound.protection.outlook.com ([40.107.68.74]:26405
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728202AbhANVAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 16:00:16 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bn6mM/3z8TCnSD3bg2JNyFVLzvkZOSW/7XQEqXE51GXMeRO3JnAVTrq7HjLUQdc8/7fpI/btMJ3vtrU4LVCjmaWX0fpiL16MLUMKmn3PyC8ps70yVC+9sodcdwWHJzFWRNBZ927ycSl+GYakN7zk8wEHszP5EXVSjReUjvHqOLKhKwLFRd227OdtTPDHJj0YarWMC3g3FA0Lbr8POLbmoTwHgAWOuUyaN2XRcwfa5BkYK89rK2G3gsPxxuZTyK9wxwQuc9yWEfDG+wVCmOtFVc5a/Blsh5IY2OzhrnRRdUMQhaLcSgiAf/G7ajbuPG0lVQ6V9+mgFpZQx4CllRr8Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YtP8ksAa3ckdPQG4KHBG2kq/bLfe36D6VQLZHXE/Ulw=;
- b=Whm67+vcfp/UZipC/uRH97KBnzdkjF4j7BVgsYQLagaGaEyhzA/w+OryYAcYY2EecvmSqJIv4gVOiSwpAxvxklH0ibib5Z2QRz3LVrxn6hbYIrg0fCT+B5++ElGeefr2+2QnEPTI2eGsR+IzZE8GizWh0velFow1bZ2gd3JQVLxQaM5jUbbg9GkYs+pxqgyxyJHWKbVfBAlRLPyMhTQ8UiY0e8aYj8Ws/HtDn+/IIGEwE0/BMqUN4LdYc+7pjFRduJh2/cjlTt4Ce6FFMQShAUqH5lJPsJtYrwvoEIUgOitYv7uoLQlIj6eFt1RqWo3AWlnLnRXfY5R9yGa5p7xSFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YtP8ksAa3ckdPQG4KHBG2kq/bLfe36D6VQLZHXE/Ulw=;
- b=PXQsolbkEcmmyDGx5NmxzanAXPI+ApPBZEXdzuWGLiG8Xl3U4dXz/WC76UGBbEszYgFVkTmCm9b9BvfWvTARZ0y2yV1kL6WN5FRc7V8lDuZQMGXO5XwtZX0pv40u5vRHK+aenqQ69ZbzTwRX9iXxZVipQ1j5ka5eO68ZriRcUHY=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB4750.namprd12.prod.outlook.com (2603:10b6:805:e3::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.10; Thu, 14 Jan
- 2021 20:59:24 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::18a2:699:70b3:2b8a]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::18a2:699:70b3:2b8a%6]) with mapi id 15.20.3742.012; Thu, 14 Jan 2021
- 20:59:24 +0000
-Cc:     brijesh.singh@amd.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v2 03/14] KVM: SVM: Move SEV module params/variables to
- sev.c
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <20210114003708.3798992-1-seanjc@google.com>
- <20210114003708.3798992-4-seanjc@google.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <c625e831-9127-2755-ff09-47b881780b5a@amd.com>
-Date:   Thu, 14 Jan 2021 14:59:22 -0600
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.1
-In-Reply-To: <20210114003708.3798992-4-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [70.112.153.56]
-X-ClientProxiedBy: SA9PR13CA0066.namprd13.prod.outlook.com
- (2603:10b6:806:23::11) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S1728596AbhANVL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 16:11:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35986 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726013AbhANVL0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 16:11:26 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10EL4VnO194445;
+        Thu, 14 Jan 2021 16:10:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bOsMR9tx45nr2qDWQWpV6+rlOd9c6TAuViKqBEcb0+I=;
+ b=oudJuLTaxL/bfOUUsKuzk4LFzrKByYvCrXEei1bTA63n9HDVYdopfmsEt+xHoaPPXsUD
+ k9PWkHNshw2Rm1kir6dC07nto438JnY5n6cEsxIUgwweHtAzRFqtjDYDv8DS/qbBwHcm
+ vx3fDXGB5RxP3a3h5ZowzP4h5X7Qn7a7nezdRcZ9twmkiNEaRK6KZ5W6zwVCPR7iA2M1
+ 8gY2aK7cT1gcl7q1DsuGd+Hp5pRDsJUY78byVwUuEko9sjHZaVem8+8QmjNtjjfwqYCA
+ IZ7zA8pNxqRKppTkv6LqBe4OOKHHpNjPEGqLmh+g5YkqatCZMNxzEcs/ObVQQXFP/vlT jQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362ucvm404-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 16:10:45 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10EL4jPJ195828;
+        Thu, 14 Jan 2021 16:10:45 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 362ucvm3yb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 16:10:45 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10EL2LGF019765;
+        Thu, 14 Jan 2021 21:10:43 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma05wdc.us.ibm.com with ESMTP id 362cwme0yk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jan 2021 21:10:43 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10ELAeVK7275216
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jan 2021 21:10:40 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A8DCC136053;
+        Thu, 14 Jan 2021 21:10:40 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C32A1136051;
+        Thu, 14 Jan 2021 21:10:38 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 14 Jan 2021 21:10:38 +0000 (GMT)
+Subject: Re: [PATCH v13 05/15] s390/vfio-ap: manage link between queue struct
+ and matrix mdev
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com
+References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
+ <20201223011606.5265-6-akrowiak@linux.ibm.com>
+ <20210111201752.21a41db4.pasic@linux.ibm.com>
+ <8c701a5c-39f8-0c22-c936-aebbc3c8f60e@linux.ibm.com>
+ <20210114035009.375c5496.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <e32ea832-8d4c-1069-9bd8-d92ae210a55a@linux.ibm.com>
+Date:   Thu, 14 Jan 2021 16:10:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Brijeshs-MacBook-Pro.local (70.112.153.56) by SA9PR13CA0066.namprd13.prod.outlook.com (2603:10b6:806:23::11) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.7 via Frontend Transport; Thu, 14 Jan 2021 20:59:23 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 01903975-f0a1-406c-8d7e-08d8b8cf462d
-X-MS-TrafficTypeDiagnostic: SN6PR12MB4750:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB475033B91A10AF7BC873FAA4E5A80@SN6PR12MB4750.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3383;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wy0mlofLfhI/PpQmLlmmB6LrmuHj1O6MIw4GrjPwoQV4bwj4eVu+V2S5rnyzQQ3NZy74awh87uzq/Mn06ox5ZPN8m6FntAzNsSQKKqm0SY/pdxBSL0DWe8qrywbtutNtUY1TDOqjVc+xo/BO+J3YfON2R9Q1HYWwlZvrBUHWzhHj+1R1dGVwPdKVC7OnwCqKrrXSdYn+3PDxTb3YPEAMhcYHgcAk/1higXCOktPnTL9Lb40lrbDQ429igWQhW6FKZb7crWCtxuR6DzILogJD1verZj2uT3bFgm2BdQ1aVLqEBgV8ZWapRe3imoTYBc86RNjIdFF5Gk0CTuNXkGgg4gvmB85l2xPcgEAofewU13qcienVF01U7kyxGWg3YtTXUxJkj5Cd+kZnZtCk7nLz5h1n0StL/s/nb3F67u0u2vaVFLel1ZlQUl8vC8l2SRFJEbmi/SqlABApWL+Y5kHFVib+v4LpZ4hLNyhMMGiP+Ds=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(396003)(346002)(136003)(366004)(376002)(2906002)(2616005)(956004)(44832011)(478600001)(6512007)(66556008)(316002)(8676002)(66476007)(6506007)(52116002)(83380400001)(7416002)(110136005)(6486002)(66946007)(186003)(16526019)(31696002)(5660300002)(8936002)(31686004)(54906003)(4326008)(26005)(53546011)(86362001)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?OWNDQ2lObC84WmdWVFVEaU9wN2psM1ozTjBrY1RlK3FHejhnQ0sxaWx5THdT?=
- =?utf-8?B?M2Q2OER3U3pVT2l0ajZmKzJFVXRSR1kvb3RDZzBWbGpZWUsxWHVVamQ5QUNW?=
- =?utf-8?B?NTZWUzMxNU5OR3dQU0NlUU1STmwvMDF3R29jU3N1OHhKNVRNd1ZnaFJxeGJt?=
- =?utf-8?B?V3RwRFc3RXp5VEZmSloxckVNYzZJU1Uvb2xKcm84VEVIQit5MWJTbTg1aUF5?=
- =?utf-8?B?ZlFjYVhObjErYm5Femsrb01tbUNkTlAzcmRFeU1tZlFTOUF1VjZYUjFIVXpK?=
- =?utf-8?B?M0ZYbWZReVp4Tmh4SWNKbk9oNE1VWHZtUXRDaDNNR3R5alJGNm1LaGNyV1gz?=
- =?utf-8?B?R09ESDRLdkxxdWNFM1BWSGVSaEFVMi8wRU4wZnFyc2c4amJGWXFsSy9NK2Np?=
- =?utf-8?B?VE92dVh6UUpjVTRtTStUR3dLMXVuRVhVOWhMSGVDY1JMWWp3aDdsTkx0anlE?=
- =?utf-8?B?cDcxTXZhUFR4MjczcmlhUHpvTDRNNUZTUnlyVWNsZXBvSUwxRjlIaTUxR0M2?=
- =?utf-8?B?cTNLejNPWGN5bDJWV1NIRWpydEdsR213Slc5ejVGT0orQzk0ak5vOEwrQzM4?=
- =?utf-8?B?YjVoWWxxYkxqRlg0bC9uT0xWQk1TL0RiVTIwY3dHT3NYeFc4UVB5L3dkQmFa?=
- =?utf-8?B?WWdieFk5K2RCdHd5L0JvZlJqQ2F6eG45STVrOWZva1lSR3JYQ0ZJbENsN1BI?=
- =?utf-8?B?aFN6dUtiVWE2ZGdzNXRUZmJQWXFiZTdUT0tPWS9nVzI3aWFmZDQvQytDcEZJ?=
- =?utf-8?B?OGtaZzFQUjd3YWNjOW5sdWN6dWs5M3Bld085eWt0ZldKMFFVbDRLa3k1RGhB?=
- =?utf-8?B?UkJBUkxNUkxIc3gxS1lna2tXWTc2ZEtUUGJTWnhaWDBxM3RzUEU0S3gwYVlQ?=
- =?utf-8?B?RVdFT0x6ZmRtTzlLYUc2V1V0MFNONGsvbWRzVVNvdU8xZUxyMmQraHVibWlR?=
- =?utf-8?B?TTB4a2tVZkt1TXhmUkVGcHQvQ2ZORHhoMTZBOGw4OVRNNFJBalpucGdHVVM0?=
- =?utf-8?B?OVE0RlJmVlErMWNsbERHSlc5R2llTS80NC9yaEFtRjFIM3l6S1RsdC9pYnlQ?=
- =?utf-8?B?MUhTbEFyeklKVHlYVnk2czhFZmxQV054bnd4Z0E4MzErR3ZRckpQLytXRVhh?=
- =?utf-8?B?NUEvOWFxRTZLeW1jazllRTdQVUt1MDlHVGt2T2pEOE9uZUtUSlliN0pVU2NH?=
- =?utf-8?B?VG41eGoyeENUeUNSdWFzUkkvMzJsR2NKVUkxeHB6NjVNbUNlOWFHa1BXL0ph?=
- =?utf-8?B?R05iRzNQeWp3UWlWNkluTnByZFIrNVFTT2x0L0lRUFJTUzNWa2NHZWVQeHhh?=
- =?utf-8?Q?bvdr+D4UVphzZ5SODQnnT9gBBKn4piSa+1?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2021 20:59:24.6457
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01903975-f0a1-406c-8d7e-08d8b8cf462d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SIrlXMAgCHLr9YN96TOp5rr6uHL0IMYyhMECM68sE+lYOcaVDegSN9C8LBowwdGSJrzyQkWdoQKOrPPqfkcZzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4750
+In-Reply-To: <20210114035009.375c5496.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-14_08:2021-01-14,2021-01-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 suspectscore=0 bulkscore=0 mlxscore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 phishscore=0 impostorscore=0
+ malwarescore=0 mlxlogscore=928 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2101140118
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 1/13/21 6:36 PM, Sean Christopherson wrote:
-> Unconditionally invoke sev_hardware_setup() when configuring SVM and
-> handle clearing the module params/variable 'sev' and 'sev_es' in
-> sev_hardware_setup().  This allows making said variables static within
-> sev.c and reduces the odds of a collision with guest code, e.g. the guest
-> side of things has already laid claim to 'sev_enabled'.
+
+On 1/13/21 9:50 PM, Halil Pasic wrote:
+> On Wed, 13 Jan 2021 16:41:27 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 11 +++++++++++
->  arch/x86/kvm/svm/svm.c | 15 +--------------
->  arch/x86/kvm/svm/svm.h |  2 --
->  3 files changed, 12 insertions(+), 16 deletions(-)
+>> On 1/11/21 2:17 PM, Halil Pasic wrote:
+>>> On Tue, 22 Dec 2020 20:15:56 -0500
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>   
+>>>> Let's create links between each queue device bound to the vfio_ap device
+>>>> driver and the matrix mdev to which the queue's APQN is assigned. The idea
+>>>> is to facilitate efficient retrieval of the objects representing the queue
+>>>> devices and matrix mdevs as well as to verify that a queue assigned to
+>>>> a matrix mdev is bound to the driver.
+>>>>
+>>>> The links will be created as follows:
+>>>>
+>>>>      * When the queue device is probed, if its APQN is assigned to a matrix
+>>>>        mdev, the structures representing the queue device and the matrix mdev
+>>>>        will be linked.
+>>>>
+>>>>      * When an adapter or domain is assigned to a matrix mdev, for each new
+>>>>        APQN assigned that references a queue device bound to the vfio_ap
+>>>>        device driver, the structures representing the queue device and the
+>>>>        matrix mdev will be linked.
+>>>>
+>>>> The links will be removed as follows:
+>>>>
+>>>>      * When the queue device is removed, if its APQN is assigned to a matrix
+>>>>        mdev, the structures representing the queue device and the matrix mdev
+>>>>        will be unlinked.
+>>>>
+>>>>      * When an adapter or domain is unassigned from a matrix mdev, for each
+>>>>        APQN unassigned that references a queue device bound to the vfio_ap
+>>>>        device driver, the structures representing the queue device and the
+>>>>        matrix mdev will be unlinked.
+>>>>
+>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+>>>   
+> [..]
+>
+>>>> +
+>>>>    int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
+>>>>    {
+>>>>    	struct vfio_ap_queue *q;
+>>>> @@ -1324,9 +1404,13 @@ int vfio_ap_mdev_probe_queue(struct ap_device *apdev)
+>>>>    	q = kzalloc(sizeof(*q), GFP_KERNEL);
+>>>>    	if (!q)
+>>>>    		return -ENOMEM;
+>>>> +	mutex_lock(&matrix_dev->lock);
+>>>>    	dev_set_drvdata(&apdev->device, q);
+>>>>    	q->apqn = to_ap_queue(&apdev->device)->qid;
+>>>>    	q->saved_isc = VFIO_AP_ISC_INVALID;
+>>>> +	vfio_ap_queue_link_mdev(q);
+>>>> +	mutex_unlock(&matrix_dev->lock);
+>>>> +
+>>> Does the critical section have to include more than just
+>>> vfio_ap_queue_link_mdev()? Did we need the critical section
+>>> before this patch?
+>> We did not need the critical section before this patch because
+>> the only function that retrieved the vfio_ap_queue via the queue
+>> device's drvdata was the remove callback. I included the initialization
+>> of the vfio_ap_queue object under lock because the
+>> vfio_ap_find_queue() function retrieves the vfio_ap_queue object from
+>> the queue device's drvdata so it might be advantageous to initialize
+>> it under the mdev lock. On the other hand, I can't come up with a good
+>> argument to change this.
+>>
+>>
+> I was asking out of curiosity, not because I want it changed. I was
+> also wondering if somebody could see a partially initialized device:
+> we even first call dev_set_drvdata() and only then finish the
+> initialization. Before 's390/vfio-ap: use new AP bus interface to search
+> for queue devices', which is the previous patch, we had the klist code
+> in between, which uses spinlocks, which I think ensure, that all
+> effects of probe are seen when we get the queue from
+> vfio_ap_find_queue(). But with patch 4 in place that is not the case any
+> more. Or am I wrong?
 
-
-Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
-
+You are correct insofar as patch 4 replaces the driver_find_device()
+function call with a call to AP bus's ap_get_qdev() function which
+does not use spinlocks. Without digging deeply into the probe call
+chain I do not know whether or not  the use of spinlocks by the klist
+code ensures all effects of the probe are seen when we get the
+queue from vfio_ap_find_queue(). What I'm sure about is that since
+both vfio_ap_find_queue() and the setting of the drvdata in the
+probe function are always done under the mdev lock, consistency
+should be maintained. What I did decide when thinking about your
+previous review comment is that we should probably initialize the
+vfio_ap_queue object before setting the drvdata, so I made that change.
 
 >
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 0eeb6e1b803d..8ba93b8fa435 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -27,6 +27,14 @@
->  
->  #define __ex(x) __kvm_handle_fault_on_reboot(x)
->  
-> +/* enable/disable SEV support */
-> +static int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> +module_param(sev, int, 0444);
-> +
-> +/* enable/disable SEV-ES support */
-> +static int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> +module_param(sev_es, int, 0444);
-> +
->  static u8 sev_enc_bit;
->  static int sev_flush_asids(void);
->  static DECLARE_RWSEM(sev_deactivate_lock);
-> @@ -1249,6 +1257,9 @@ void __init sev_hardware_setup(void)
->  	bool sev_es_supported = false;
->  	bool sev_supported = false;
->  
-> +	if (!IS_ENABLED(CONFIG_KVM_AMD_SEV) || !sev)
-> +		goto out;
-> +
->  	/* Does the CPU support SEV? */
->  	if (!boot_cpu_has(X86_FEATURE_SEV))
->  		goto out;
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index ccf52c5531fb..f89f702b2a58 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -189,14 +189,6 @@ module_param(vls, int, 0444);
->  static int vgif = true;
->  module_param(vgif, int, 0444);
->  
-> -/* enable/disable SEV support */
-> -int sev = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> -module_param(sev, int, 0444);
-> -
-> -/* enable/disable SEV-ES support */
-> -int sev_es = IS_ENABLED(CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT);
-> -module_param(sev_es, int, 0444);
-> -
->  bool __read_mostly dump_invalid_vmcb;
->  module_param(dump_invalid_vmcb, bool, 0644);
->  
-> @@ -976,12 +968,7 @@ static __init int svm_hardware_setup(void)
->  		kvm_enable_efer_bits(EFER_SVME | EFER_LMSLE);
->  	}
->  
-> -	if (IS_ENABLED(CONFIG_KVM_AMD_SEV) && sev) {
-> -		sev_hardware_setup();
-> -	} else {
-> -		sev = false;
-> -		sev_es = false;
-> -	}
-> +	sev_hardware_setup();
->  
->  	svm_adjust_mmio_mask();
->  
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0fe874ae5498..8e169835f52a 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -408,8 +408,6 @@ static inline bool gif_set(struct vcpu_svm *svm)
->  #define MSR_CR3_LONG_MBZ_MASK			0xfff0000000000000U
->  #define MSR_INVALID				0xffffffffU
->  
-> -extern int sev;
-> -extern int sev_es;
->  extern bool dump_invalid_vmcb;
->  
->  u32 svm_msrpm_offset(u32 msr);
+> Regards,
+> Halil
+
