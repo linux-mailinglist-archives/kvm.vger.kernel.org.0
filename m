@@ -2,81 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90BD42F6BE7
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 21:17:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFD012F6CAC
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 21:58:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726730AbhANUOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 15:14:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726578AbhANUOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 15:14:10 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08A3C0613C1
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 12:13:29 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id m6so4026417pfm.6
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 12:13:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NIpPOOtRRpl0PpqRX6GCsaQ17rovktomf8jeDFYIOIo=;
-        b=O+hZ5XgIA5CksQ7nO9FjUQg/ot0tlxVgTW72BKSa2qCQ7COqL2XMWB8avkmHI63pYp
-         dVVXd6RFaMHyFhok0qKYmyYrL6r+HD7fY5TGAwBQ9CGslnNJAxye/69SUhvnXgRfO/DA
-         rxIr3T8na7UtD/Xl0icV6M32+DUZB2Ubmsex+arRO0yOKU3CElZjY38LsfSOmnsyEU80
-         YhY2ferPsp/DyWvGeBj0T4edD15q8TByxK0ct3ISbg4+pvkX1o1SzDVeL3iLNTBRUyh8
-         FKHfogvonuyKQqBPvW/rYMqsyjd1oPRR2M7JDkUspT1ejwBpYZfGCEzWHZJ5t6bNUXNB
-         T3fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NIpPOOtRRpl0PpqRX6GCsaQ17rovktomf8jeDFYIOIo=;
-        b=O55z3Ss/MlTsx2g9ADu24Ddgg+WVFZavSaQGADQhaeqmaJ4kO5lEhylgPYEcEAibAF
-         j23YlkUbYYiAHkdyHuZdLt4dPWS7rr+VEYv8l04nYd7tb5XqtTuf4u61EzM86SkAXJ8u
-         +OcgLST3I9ttiNelvkTzlYbPEKnTKLGLL0HEvhFHxhANaSRoULUeCV+AgeZOilZy7z1n
-         Rinwc5FR3tQi/3YL/Ey0sLiQNbLtUxUkz+quuRsfXqH/zu7PsMQiNcpumeCdJrwNbA0o
-         pnF7mgr258h8xPDH1UOjwISuSK8VCzw2E5MJQmbNdF8y4QTbPi6TYnw12bEpKA5icU4r
-         KreQ==
-X-Gm-Message-State: AOAM533HNY8e4ESFGlPVAXG5/LcntmmwwXWnIUb/bS7ricbwsOsAQUEY
-        iVSnDHPYT4hbX30KnoWkmFI2TA==
-X-Google-Smtp-Source: ABdhPJwLJvbUJOChNiQVDLGlnGm2oEbj8HV6ia0UvI++wfQ2u4IMaBDJNiiRK7AcXOKAKgBo3siDDg==
-X-Received: by 2002:a63:752:: with SMTP id 79mr8994629pgh.272.1610655209190;
-        Thu, 14 Jan 2021 12:13:29 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id z3sm6008921pfq.89.2021.01.14.12.13.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 12:13:28 -0800 (PST)
-Date:   Thu, 14 Jan 2021 12:13:22 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, mlevitsk@redhat.com
-Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
-Message-ID: <YACl4jtDc1IGcxiQ@google.com>
-References: <20201223010850.111882-1-pbonzini@redhat.com>
- <X+pbZ061gTIbM2Ef@google.com>
- <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
- <X/4igkJA1ZY5rCk7@google.com>
- <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
+        id S1728041AbhANU41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 15:56:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49400 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726573AbhANU41 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 15:56:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610657701;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ZyDfgALqUiawzmubBa6Wwvj+Dzw/MHsKyDI805lQ07Y=;
+        b=i9XIuKNFJmaDeAYJuM57Nc2BjJnWoQDScF+nkulMW6D7VolNVUtzG16K6zyEUSrzjitOjI
+        8YiFOZ67Bz0A0AJJTsrqO0FcGTrXFdIdyebv9h32Y8rauVA+bymEJiAEYvEVWcVul9wGKk
+        3viDio1QEugPtjGbZqt0QLbv1Qiy78w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-D0uFwfSuOIeZyvrNomKfkg-1; Thu, 14 Jan 2021 15:54:57 -0500
+X-MC-Unique: D0uFwfSuOIeZyvrNomKfkg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83F358144E1;
+        Thu, 14 Jan 2021 20:54:55 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E1545C1C5;
+        Thu, 14 Jan 2021 20:54:50 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 0/3] VMX: more nested fixes
+Date:   Thu, 14 Jan 2021 22:54:46 +0200
+Message-Id: <20210114205449.8715-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 13, 2021, Paolo Bonzini wrote:
-> On 12/01/21 23:28, Sean Christopherson wrote:
-> > What's the biggest hurdle for doing this completely within the unit test
-> > framework?  Is teaching the framework to migrate a unit test the biggest pain?
-> 
-> Yes, pretty much.  The shell script framework would show its limits.
-> 
-> That said, I've always treated run_tests.sh as a utility more than an
-> integral part of kvm-unit-tests.  There's nothing that prevents a more
-> capable framework from parsing unittests.cfg.
+This is hopefully the last fix for VMX nested migration=0D
+that finally allows my stress test of migration with a nested guest to pass=
+.=0D
+=0D
+In a nutshell after an optimization that was done in commit 7952d769c29ca,=
+=0D
+some of vmcs02 fields which can be modified by the L2 freely while it runs=
+=0D
+(like GSBASE and such) were not copied back to vmcs12 unless:=0D
+=0D
+1. L1 tries to vmread them (update done on intercept)=0D
+2. vmclear or vmldptr on other vmcs are done.=0D
+3. nested state is read and nested guest is running.=0D
+=0D
+What wasn't done was to sync these 'rare' fields when L1 is running=0D
+but still has a loaded vmcs12 which might have some stale fields,=0D
+if that vmcs was used to enter a guest already due to that optimization.=0D
+=0D
+Plus I added two minor patches to improve VMX tracepoints=0D
+a bit. There is still a large room for improvement.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (3):=0D
+  KVM: nVMX: Always call sync_vmcs02_to_vmcs12_rare on migration=0D
+  KVM: nVMX: add kvm_nested_vmlaunch_resume tracepoint=0D
+  KVM: VMX: read idt_vectoring_info a bit earlier=0D
+=0D
+ arch/x86/kvm/trace.h      | 30 ++++++++++++++++++++++++++++++=0D
+ arch/x86/kvm/vmx/nested.c | 19 ++++++++++++++-----=0D
+ arch/x86/kvm/vmx/vmx.c    |  3 ++-=0D
+ arch/x86/kvm/x86.c        |  1 +=0D
+ 4 files changed, 47 insertions(+), 6 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-Heh, got anyone you can "volunteer" to create a new framework?  One-button
-migration testing would be very nice to have.  I suspect I'm not the only
-contributor that doesn't do migration testing as part of their standard workflow.
