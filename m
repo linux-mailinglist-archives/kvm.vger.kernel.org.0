@@ -2,84 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DA3B2F6070
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C41972F607B
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 12:47:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728210AbhANLnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 06:43:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56320 "EHLO
+        id S1726497AbhANLrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 06:47:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30979 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726259AbhANLnp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:43:45 -0500
+        by vger.kernel.org with ESMTP id S1726150AbhANLrT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 14 Jan 2021 06:47:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610624538;
+        s=mimecast20190719; t=1610624752;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ucp6GhejqK0urnC8MaE7X5oGb9T1JYi4z0u+DVIhuOM=;
-        b=Dna9UnZeydB4nVgbbgt1MNATkVvrw79IuQLfHMLlUh4Iob2dIWXkNoYz031/G73+Tcp9BS
-        HT30AFJPCspxtIpbTYpFlD2ql+XLLR7a9wKHv1OJPWvWkFdfQ/2V2H0XqgaoKUbioXbmsq
-        XzgTsU/+gvpvHkElRU7kLTcfwYyv/7E=
+        bh=/v3H4Y1dgMiWDMdKL4Cn+sCUriko+UGoLRQTZJENYkU=;
+        b=MLo9eJU4yubqa4yhqWu3k6kYL7zefyi3Xv0OMAWVyUU38NAPhQ0x7+Y3MctYrEt/AuFmZg
+        K/1J/QVukIPzB6gqiC45vYedr5YHFje2/xFIRrXgRp0hbevLqwW9i8V2Fuh5Yk+0lROPqD
+        dS9kjbThKz1o2/SR7eru3O+DxQcKXMQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-AQ1WT0QDMEeKcU2gJIPNaw-1; Thu, 14 Jan 2021 06:42:17 -0500
-X-MC-Unique: AQ1WT0QDMEeKcU2gJIPNaw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-15-FzKYKq9oPHK-pP_fkGxNxA-1; Thu, 14 Jan 2021 06:45:48 -0500
+X-MC-Unique: FzKYKq9oPHK-pP_fkGxNxA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32E9C5F9CA;
-        Thu, 14 Jan 2021 11:42:15 +0000 (UTC)
-Received: from starship (unknown [10.35.206.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F59560657;
-        Thu, 14 Jan 2021 11:42:07 +0000 (UTC)
-Message-ID: <0b55adffa276851ec2c68d1c185d1581d903f2a1.camel@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered
- by VM instructions
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Wei Huang <wei.huang2@amd.com>, Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, X86 ML <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Bandan Das <bsd@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Date:   Thu, 14 Jan 2021 13:42:06 +0200
-In-Reply-To: <0d324a3d-8c33-bb6c-13f3-e60310a54b13@amd.com>
-References: <20210112063703.539893-1-wei.huang2@amd.com>
-         <X/3eAX4ZyqwCmyFi@google.com> <X/3jap249oBJ/a6s@google.com>
-         <CALCETrXsNBmXg8C4Tmz4YgTSAykKoWFHgXHFFcK-C65LUQ0r4w@mail.gmail.com>
-         <0d324a3d-8c33-bb6c-13f3-e60310a54b13@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B489915722;
+        Thu, 14 Jan 2021 11:45:46 +0000 (UTC)
+Received: from work-vm (ovpn-115-29.ams2.redhat.com [10.36.115.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AEBB10016F4;
+        Thu, 14 Jan 2021 11:45:36 +0000 (UTC)
+Date:   Thu, 14 Jan 2021 11:45:33 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ram Pai <linuxram@us.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Greg Kurz <groug@kaod.org>,
+        pair@us.ibm.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
+        David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org, rth@twiddle.net, berrange@redhat.com,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
+        pbonzini@redhat.com
+Subject: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
+Message-ID: <20210114114533.GF2905@work-vm>
+References: <20210104134629.49997b53.pasic@linux.ibm.com>
+ <20210104184026.GD4102@ram-ibm-com.ibm.com>
+ <20210105115614.7daaadd6.pasic@linux.ibm.com>
+ <20210105204125.GE4102@ram-ibm-com.ibm.com>
+ <20210111175914.13adfa2e.cohuck@redhat.com>
+ <20210113124226.GH2938@work-vm>
+ <6e02e8d5-af4b-624b-1a12-d03b9d554a41@de.ibm.com>
+ <20210114103643.GD2905@work-vm>
+ <db2295ce-333f-2a3e-8219-bfa4853b256f@de.ibm.com>
+ <20210114120531.3c7f350e.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210114120531.3c7f350e.cohuck@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-12 at 23:15 -0600, Wei Huang wrote:
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Thu, 14 Jan 2021 11:52:11 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 > 
-> On 1/12/21 12:58 PM, Andy Lutomirski wrote:
-> > Andrew Cooper points out that there may be a nicer workaround.  Make
-> > sure that the SMRAM and HT region (FFFD00000000 - FFFFFFFFFFFF) are
-> > marked as reserved in the guest, too.
+> > On 14.01.21 11:36, Dr. David Alan Gilbert wrote:
+> > > * Christian Borntraeger (borntraeger@de.ibm.com) wrote:  
+> > >>
+> > >>
+> > >> On 13.01.21 13:42, Dr. David Alan Gilbert wrote:  
+> > >>> * Cornelia Huck (cohuck@redhat.com) wrote:  
+> > >>>> On Tue, 5 Jan 2021 12:41:25 -0800
+> > >>>> Ram Pai <linuxram@us.ibm.com> wrote:
+> > >>>>  
+> > >>>>> On Tue, Jan 05, 2021 at 11:56:14AM +0100, Halil Pasic wrote:  
+> > >>>>>> On Mon, 4 Jan 2021 10:40:26 -0800
+> > >>>>>> Ram Pai <linuxram@us.ibm.com> wrote:  
+> > >>>>  
+> > >>>>>>> The main difference between my proposal and the other proposal is...
+> > >>>>>>>
+> > >>>>>>>   In my proposal the guest makes the compatibility decision and acts
+> > >>>>>>>   accordingly.  In the other proposal QEMU makes the compatibility
+> > >>>>>>>   decision and acts accordingly. I argue that QEMU cannot make a good
+> > >>>>>>>   compatibility decision, because it wont know in advance, if the guest
+> > >>>>>>>   will or will-not switch-to-secure.
+> > >>>>>>>     
+> > >>>>>>
+> > >>>>>> You have a point there when you say that QEMU does not know in advance,
+> > >>>>>> if the guest will or will-not switch-to-secure. I made that argument
+> > >>>>>> regarding VIRTIO_F_ACCESS_PLATFORM (iommu_platform) myself. My idea
+> > >>>>>> was to flip that property on demand when the conversion occurs. David
+> > >>>>>> explained to me that this is not possible for ppc, and that having the
+> > >>>>>> "securable-guest-memory" property (or whatever the name will be)
+> > >>>>>> specified is a strong indication, that the VM is intended to be used as
+> > >>>>>> a secure VM (thus it is OK to hurt the case where the guest does not
+> > >>>>>> try to transition). That argument applies here as well.    
+> > >>>>>
+> > >>>>> As suggested by Cornelia Huck, what if QEMU disabled the
+> > >>>>> "securable-guest-memory" property if 'must-support-migrate' is enabled?
+> > >>>>> Offcourse; this has to be done with a big fat warning stating
+> > >>>>> "secure-guest-memory" feature is disabled on the machine.
+> > >>>>> Doing so, will continue to support guest that do not try to transition.
+> > >>>>> Guest that try to transition will fail and terminate themselves.  
+> > >>>>
+> > >>>> Just to recap the s390x situation:
+> > >>>>
+> > >>>> - We currently offer a cpu feature that indicates secure execution to
+> > >>>>   be available to the guest if the host supports it.
+> > >>>> - When we introduce the secure object, we still need to support
+> > >>>>   previous configurations and continue to offer the cpu feature, even
+> > >>>>   if the secure object is not specified.
+> > >>>> - As migration is currently not supported for secured guests, we add a
+> > >>>>   blocker once the guest actually transitions. That means that
+> > >>>>   transition fails if --only-migratable was specified on the command
+> > >>>>   line. (Guests not transitioning will obviously not notice anything.)
+> > >>>> - With the secure object, we will already fail starting QEMU if
+> > >>>>   --only-migratable was specified.
+> > >>>>
+> > >>>> My suggestion is now that we don't even offer the cpu feature if
+> > >>>> --only-migratable has been specified. For a guest that does not want to
+> > >>>> transition to secure mode, nothing changes; a guest that wants to
+> > >>>> transition to secure mode will notice that the feature is not available
+> > >>>> and fail appropriately (or ultimately, when the ultravisor call fails).
+> > >>>> We'd still fail starting QEMU for the secure object + --only-migratable
+> > >>>> combination.
+> > >>>>
+> > >>>> Does that make sense?  
+> > >>>
+> > >>> It's a little unusual; I don't think we have any other cases where
+> > >>> --only-migratable changes the behaviour; I think it normally only stops
+> > >>> you doing something that would have made it unmigratable or causes
+> > >>> an operation that would make it unmigratable to fail.  
+> > >>
+> > >> I would like to NOT block this feature with --only-migrateable. A guest
+> > >> can startup unprotected (and then is is migrateable). the migration blocker
+> > >> is really a dynamic aspect during runtime.   
+> > > 
+> > > But the point of --only-migratable is to turn things that would have
+> > > blocked migration into failures, so that a VM started with
+> > > --only-migratable is *always* migratable.  
+> > 
+> > Hmmm, fair enough. How do we do this with host-model? The constructed model
+> > would contain unpack, but then it will fail to startup? Or do we silently 
+> > drop unpack in that case? Both variants do not feel completely right. 
 > 
-> In theory this proposed solution can avoid intercepting #GP. But in 
-> reality SMRAM regions can be different on different machines. So this 
-> solution can break after VM migration.
-> 
-I should add to this, that on my 3970X,
-I just noticed that the problematic SMRAM region moved on
-its own (likely due to the fact that I moved some pcie cards around recently).
+> Failing if you explicitly specified unpacked feels right, but failing
+> if you just used the host model feels odd. Removing unpack also is a
+> bit odd, but I think the better option if we want to do anything about
+> it at all.
 
-Best regards,
-	Maxim Levitsky
+'host-model' feels a bit special; but breaking the rule that
+only-migratable doesn't change behaviour is weird.
+Can you do host,-unpack   to make that work explicitly?
+
+But hang on; why is 'unpack' the name of a secure guest facility - is
+it really a feature for secure guest or something else?
+
+Dave
+
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
