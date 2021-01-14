@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 584C42F670B
-	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 18:15:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 661A02F6718
+	for <lists+kvm@lfdr.de>; Thu, 14 Jan 2021 18:15:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728133AbhANRKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 12:10:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43206 "EHLO
+        id S1727163AbhANRNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 12:13:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728532AbhANRKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 12:10:16 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E31C061575
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:09:36 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id y8so3215681plp.8
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:09:36 -0800 (PST)
+        with ESMTP id S1726951AbhANRNF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 12:13:05 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62D3CC061757
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:12:25 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id y12so3441706pji.1
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 09:12:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=rulcIsdiEGHNoW8ESlRghH9XVhQcLihfLdJxeao6dAE=;
-        b=gPEudKMXiAnTUPllVqz5JHuXDPhrkPRyyDCP6TWhPkV2VLEFPJeo4+7QYRUuu47tJ4
-         GGOBJGFXB7VczYpqJbHYqVKgX8pHp1aisSoUyuAxYzDAHfQJxN75INWVjrE9Wis+WJct
-         HSyB/2vpVRGT2DeeUAon0m5LA087hcv2a2ewT32VsCMOVWRs5KAsCnozzkv9B0qczr9Q
-         BBq5qABuLvTJJ/Kxpg2a069K1TbUgRVT+igbE0GZ3x2q2aVKeWLPfgXiJTkKvZI5aaij
-         yx1HGaBNLh04MTMahsQ7Adotscw+8sVTFTv0ftXn8mB4KcPBPN72ZCmYoW2qiqjixsnx
-         gxcw==
+        bh=uF7+YDIJdbzPkf3mVtNcMBe+Aa517Jhrf7Cd5wgaCe0=;
+        b=NqHhgo99bwsPMEmgsLIdj1+1y5wrwJHQKS/Nz572eS/8EogbtHZ5LsTxFoDegquG+U
+         Fl4ohUIE0zUT330sDLzQOkQl9zYhbKZQWAW25uZn/VdCRIWWY+T7qPzXWztc0P//CicR
+         u2rH3g69n0U+BJvpYrwXGrxkx4v9OqyxmVRu2gE5zMIVkpGOfgR2jvFgVnn81r2nq3EU
+         w3lQzS+gqLViiHPoO9Qka9bS6Jlo8sdM5s87qizD9+0sIRyzljT31zFtrQ7BhguuGsdx
+         CCY0iS0aUontisTjXwZdWjqa36KboOmp5GykG6PH3jrGr3rc1Wk8FA65vCeWlXm6Eprg
+         izog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=rulcIsdiEGHNoW8ESlRghH9XVhQcLihfLdJxeao6dAE=;
-        b=PDamrjFUV8Sv3c+J7YpuKveEZWuzB/sivqo2GFaPd+qOk6pVNYWX3Y8rfyXzpfchPE
-         v9kluTjWZ5KFhfpjP+bTKEN0srqwiFlsYvnV4yBoTipBmNqhRbC1qIu3+CxelK4TBeXL
-         h2Bd9B3mwZHkNR8pVrhSx6p9yq33k8RVtCmenQrM/d2my2fnzLA2nqpEbC5HptZumWtG
-         Z8YQX6oTZiQM5gAgxtNx0BCuVGcLhAaNA961OebaT7e03w9ciXnZ+wEjPmLI7WpLEkci
-         HVrBz9g8lFH9aWuQkbKVnfs2iJSWAWwusDrcUJB9EcyG6c4QwpMKZfNMnDXcGLxSuhJi
-         Inhg==
-X-Gm-Message-State: AOAM530domZKcgU6ttT8akgaN8s5Iu8115dfI1i/HrcnIqyj/SFOejgs
-        dIwl+2aaos/2JVSoxckuDbVK7Q==
-X-Google-Smtp-Source: ABdhPJw9a7WfTeQn8qt/saCDAUnxMeN0A7NX4FlAbbluPW1chLkS17Vyeas5y/0R1QlD+3at+3w5VA==
-X-Received: by 2002:a17:902:b587:b029:de:23ed:88b1 with SMTP id a7-20020a170902b587b02900de23ed88b1mr8504338pls.61.1610644175995;
-        Thu, 14 Jan 2021 09:09:35 -0800 (PST)
+        bh=uF7+YDIJdbzPkf3mVtNcMBe+Aa517Jhrf7Cd5wgaCe0=;
+        b=F7rg53osFKJRP4yxy0s1yHsySh042g/0x4162iJzVPFAIob99449bia+h5E0Hdp+Nz
+         ns8hIU2qvr7TJwE0fW9ok4VvZGLaCzTy6q3tiq+pKZHJIN+VvF92kumHHqOLDRCSbvPU
+         +BHhuX8JKtC6sgCDCV9lDG4242e+eklHC7gKiqxhJ1CwQ4BoUnIoddtX2/mt+6MQgqR5
+         ZIYyo4J9hdDC24flZI0YMVevxf7F9fDuoOJiE/w9dJ6z4A/G3/7VcdQy4a9Mh8xgYCpg
+         raNS2xX1BTZMvl5B+SorLICCHi/HMtZI3u36cr4oSMNZ7UoaQUOJG6jvi70JAu41iQw2
+         PWHA==
+X-Gm-Message-State: AOAM533a7O5f22rxUX2exEAT+2GlEhNi5SVjBy7Q4hlMkH6c4crTzc61
+        BV64YJal28foReePDrpJxmq+6A==
+X-Google-Smtp-Source: ABdhPJwwzFrJ0+fkqtCvVI7xzPGOQ+/YVUvgQ3lMVbzIaGlq3Zm+IpK5hsuA1RtShkPZ3BQtswhe3Q==
+X-Received: by 2002:a17:902:59c7:b029:de:25e7:2426 with SMTP id d7-20020a17090259c7b02900de25e72426mr8218970plj.21.1610644344830;
+        Thu, 14 Jan 2021 09:12:24 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id d36sm5952404pgm.77.2021.01.14.09.09.33
+        by smtp.gmail.com with ESMTPSA id f92sm6463525pjk.54.2021.01.14.09.12.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 09:09:35 -0800 (PST)
-Date:   Thu, 14 Jan 2021 09:09:28 -0800
+        Thu, 14 Jan 2021 09:12:24 -0800 (PST)
+Date:   Thu, 14 Jan 2021 09:12:17 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@suse.de>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -58,48 +58,53 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
         Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2 04/14] x86/cpufeatures: Assign dedicated feature word
- for AMD mem encryption
-Message-ID: <YAB6yLXb4Es+pJ8G@google.com>
+Subject: Re: [PATCH v2 02/14] KVM: SVM: Free sev_asid_bitmap during init if
+ SEV setup fails
+Message-ID: <YAB7ceKeOdfkDnoA@google.com>
 References: <20210114003708.3798992-1-seanjc@google.com>
- <20210114003708.3798992-5-seanjc@google.com>
- <20210114113528.GC13213@zn.tnic>
+ <20210114003708.3798992-3-seanjc@google.com>
+ <b1a6403b-249d-9e98-3a2d-7117ed03f392@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210114113528.GC13213@zn.tnic>
+In-Reply-To: <b1a6403b-249d-9e98-3a2d-7117ed03f392@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 14, 2021, Borislav Petkov wrote:
-> On Wed, Jan 13, 2021 at 04:36:58PM -0800, Sean Christopherson wrote:
-> > Collect the scattered SME/SEV related feature flags into a dedicated
-> > word.  There are now five recognized features in CPUID.0x8000001F.EAX,
-> > with at least one more on the horizon (SEV-SNP).  Using a dedicated word
-> > allows KVM to use its automagic CPUID adjustment logic when reporting
-> > the set of supported features to userspace.
+On Thu, Jan 14, 2021, Tom Lendacky wrote:
+> On 1/13/21 6:36 PM, Sean Christopherson wrote:
+> > Free sev_asid_bitmap if the reclaim bitmap allocation fails, othwerise
+> > KVM will unnecessarily keep the bitmap when SEV is not fully enabled.
 > > 
-> > No functional change intended.
+> > Freeing the page is also necessary to avoid introducing a bug when a
+> > future patch eliminates svm_sev_enabled() in favor of using the global
+> > 'sev' flag directly.  While sev_hardware_enabled() checks max_sev_asid,
+> > which is true even if KVM setup fails, 'sev' will be true if and only
+> > if KVM setup fully succeeds.
 > > 
+> > Fixes: 33af3a7ef9e6 ("KVM: SVM: Reduce WBINVD/DF_FLUSH invocations")
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
 > > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > > ---
+> >   arch/x86/kvm/svm/sev.c | 4 +++-
+> >   1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index c8ffdbc81709..0eeb6e1b803d 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -1274,8 +1274,10 @@ void __init sev_hardware_setup(void)
+> >   		goto out;
+> >   	sev_reclaim_asid_bitmap = bitmap_zalloc(max_sev_asid, GFP_KERNEL);
+> > -	if (!sev_reclaim_asid_bitmap)
+> > +	if (!sev_reclaim_asid_bitmap) {
+> > +		bitmap_free(sev_asid_bitmap);
 > 
-> Subject should be:
-> 
-> x86/cpufeatures: Assign dedicated feature word for CPUID_0x8000001F[EAX]
-> 
-> but other than that, LGTM.
-> 
-> Anything against me taking it through tip now?
+> Until that future change, you probably need to do sev_asid_bitmap = NULL
+> here to avoid an issue in sev_hardware_teardown() when it tries to free it
+> again.
 
-Hmm, patch 05/14 depends on the existence of the new word.  That's a non-issue
-if you're planning on taking this for 5.11.  If it's destined for 5.12, maybe
-get an ack from Paolo on patch 05 and take both through tip?  I can drop them
-from this series when I send v3.  In hindsight, I should have split these two
-patches into a separate mini-series from the get-go.
-
-Thanks!
+Argh, you're right.  Thanks!
