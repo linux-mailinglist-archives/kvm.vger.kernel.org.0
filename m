@@ -2,82 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 689F52F7694
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 11:25:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 225592F77BF
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 12:37:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726852AbhAOKYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 05:24:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57894 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726091AbhAOKYW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 05:24:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 621BE235F9;
-        Fri, 15 Jan 2021 10:23:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610706221;
-        bh=c/+XqWLmQTEyndmY4XhHmEat6eBL2W+LzNHlJg1xGlc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GQwIacPmjs/aOm4bQ1rFpzSRDHy739OTYVDLZinf3vIbt7XaORjK14OSbDSdGh6Ij
-         7DOaM4QxtaG0JZsU18PjC4KvQa6bGICy8UpXQw29+cxhdYimqTY9stfbshm+JhT/cf
-         O821VSuzWQTvjgPq0kr+fXNYeQ1z207Ns8XMzOb7LQpsEu+vFr1+8V8TLI0u9i7PFs
-         Z5bY3BeoxFG57wfFcqto6uPrpKzc3NlFGlVWKMEO+wX9/J5iLo2exKI16IJ1DGDZdB
-         3c4P0oFfKYtWfyHSPqCxayXwV4nWDUlKHeBadwhZArU4E9Q7ZPhnmoyQNBaIjUW+aX
-         q5yeMNOO4fmBw==
-Date:   Fri, 15 Jan 2021 10:23:35 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        id S1726101AbhAOLgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 06:36:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54944 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726019AbhAOLgi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 06:36:38 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530B6C061757;
+        Fri, 15 Jan 2021 03:35:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=n7b0j6ZnpjR0uvwKHqBC1yHKTSPAWtivnsJi023r8K0=; b=qNRd6LPZfN2CdKG5QAOhJagyVF
+        cPLXOcZm47U6c3wfPxXh9E9m5YyF9zFOHBHQgyrKXY/wc7YovPAXM0gKwIm/PHBjvQY3E2TdYaeKS
+        Ep7ZBLzdqMIOZ+DbNOEceKeXj2A5cbL5fnxjtNCh9BWyQQSYyIiiI4aZ0KEEtKHk0zUbKycAYvNkw
+        UV37TFJa/Mr/JAe6eKekEmRALKpWkPg8Dpcwh1gzbbFsSqsl6Jwuiz44luGK7pUzUquPKB8Riu1EW
+        nTGKa8IgDVu3N/5xK9YgEsZe73OeIkiIRM6uUHb1GESY+AQorfEfm+TBtpRZEFBGCY1pD9Fbjshne
+        rNHMPRww==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l0NMZ-008qrT-49; Fri, 15 Jan 2021 11:34:17 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id E63A0301324;
+        Fri, 15 Jan 2021 12:33:46 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id CA6622C9CD1CD; Fri, 15 Jan 2021 12:33:46 +0100 (CET)
+Date:   Fri, 15 Jan 2021 12:33:46 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        wanghaibin.wang@huawei.com, jiangkunkun@huawei.com
-Subject: Re: [PATCH] kvm: arm64: Properly align the end address of table walk
-Message-ID: <20210115102334.GA14167@willie-the-truck>
-References: <20210115095307.12912-1-zhukeqian1@huawei.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 05/17] KVM: x86/pmu: Reprogram guest PEBS event to
+ emulate guest PEBS counter
+Message-ID: <YAF9mulfhGCIyNz+@hirez.programming.kicks-ass.net>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-6-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210115095307.12912-1-zhukeqian1@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210104131542.495413-6-like.xu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 15, 2021 at 05:53:07PM +0800, Keqian Zhu wrote:
-> When align the end address, ought to use its original value.
+On Mon, Jan 04, 2021 at 09:15:30PM +0800, Like Xu wrote:
+> When a guest counter is configured as a PEBS counter through
+> IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
+> configuring a non-zero precision level in the perf_event_attr.
 > 
-> Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The guest PEBS overflow PMI bit would be set in the guest
+> GLOBAL_STATUS MSR when PEBS facility generates a PEBS
+> overflow PMI based on guest IA32_DS_AREA MSR.
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index bdf8e55ed308..670b0ef12440 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -296,7 +296,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  	struct kvm_pgtable_walk_data walk_data = {
->  		.pgt	= pgt,
->  		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
-> -		.end	= PAGE_ALIGN(walk_data.addr + size),
-> +		.end	= PAGE_ALIGN(addr + size),
->  		.walker	= walker,
+> The attr.precise_ip would be adjusted to a special precision
+> level when the new PEBS-PDIR feature is supported later which
+> would affect the host counters scheduling.
 
-Hmm, this is a change in behaviour, no (consider the case where both 'addr'
-and 'size' are misaligned)? The current code is consistent with the
-kerneldoc in asm/kvm_pgtable.h, so I don't see the motivation to change it.
+This seems like a random collection of changes, all required, but
+loosely related.
 
-Did you hit a bug somewhere?
+> The guest PEBS event would not be reused for non-PEBS
+> guest event even with the same guest counter index.
 
-Will
+/me rolls eyes at the whole destroy+create nonsense...
