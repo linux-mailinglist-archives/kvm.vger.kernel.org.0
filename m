@@ -2,286 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0ECE62F6F8E
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:36:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E98A2F6FA2
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:43:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731328AbhAOAdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 19:33:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54030 "EHLO
+        id S1731390AbhAOAlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 19:41:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731209AbhAOAdQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 19:33:16 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E6EC061757
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:32:36 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id u17so15049571iow.1
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:32:36 -0800 (PST)
+        with ESMTP id S1726899AbhAOAlg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 19:41:36 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC95C061757
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:40:56 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id k126so6165917qkf.8
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:40:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VOQ/AhgJ3E0EhA15ZI14xotoZTAklFRTxP5RiI0pr4w=;
-        b=ZKqirSc1RXxGZk9m5C1Q/rMeYrWTjUtba1m3HeBthnH0Q+DkrD/47pIHau7E42QcG0
-         QlHkz/g7VIe6SAqB7J4f2opMv3QT5kSoqCxxCcWR/pv9KOyrtrqvotn63RsCS7DpyDkH
-         nbmJPf1tn6pkcO2yIqk4rvEX91Zp9+iBKf1uFwKuz+w6NFs5U0owMt4o9Rn2jfVpGVQ9
-         MMmfSi0SacqZMIU07He0glcF8l+in5ianV+FHe+F6kRz17NYwXcGFIAGvBWLQ6TxOb7s
-         Xpg2OT2vsqbXYIGXZzP1ZpUNxv6A6pkMhSf5cepMH0caIl7QocPIyQ+3Zu0tcz4r04ZD
-         T7qw==
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=t8c/Zi1/dJ4uhKjMSCSNdZwekdvteSeGdebcaDLlZ84=;
+        b=J08j0qDe02915zC2wJ7Mk1g1vjFzfb/8xM6Fz97phDYXlPIre1A1e3jYGEL3MnRRt1
+         cYAXkemNWK3RKolge13RoBcjyl22LWNXyXEi0/fffxt/0v4G7sn8sfoI5BD/s22LcQc9
+         DgnEFP9ey8SYkb/GkPHKoLiF0L+WnPLMPWfsMygtYdjuy8zvKsNk2UEa8kFOK8OMEqAC
+         MjGyk1/CLfjoZbu3LOTkGCYdNM2OsaOjdTrDeNC7XCU7riXkdWlOEc4yrywwFZEk1gpp
+         DFh5I5T86nO1ZRbj5z/YX2mIi/UqsGdmWbbWa/9GSYG2sZdkw4cHLFOF0EtI6YtazJZY
+         EUpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VOQ/AhgJ3E0EhA15ZI14xotoZTAklFRTxP5RiI0pr4w=;
-        b=Y8PDNi3SLcD13wVmLg52Ij16vi1YWkiS9btpk74tRYWKCMKL9gUVy/JL1Bj2XN6CjQ
-         GW9I1GwYBHD4bzQVoKAvTg5lFS3mucDCXR/4psN11uw94GXZDdYGXLSI96kP7t5tjVm4
-         0e0xYEyM8txpAwGKDje9gQX94dvWcou5mH59183/cVITcqdVekMOEPKN8h6galqFov+7
-         8iJ+oZMdAYL73ywkGBeOpTl9O7gh2kOeOqycEFXIkvXvHT4c/eeK0kOfProlpTq0IGGw
-         r2sJNqOVDWVA6jx/LcQlz0lla03Yh9uSHkcV75L8wW/UsA4a6AK4k4sC9ZeJdjPUv7y1
-         feoA==
-X-Gm-Message-State: AOAM5327HdnfWbBZGUzfOEfcXSp9JYj42s5A2XdlLXzNa3zNP/HOY/gz
-        QdgHImt2xAzr972khK3fwIL42Wx8YZqGno2CfG9sQQ==
-X-Google-Smtp-Source: ABdhPJxbNAzWVOVJfbEBY8T6GsiM6dkRxLPzdspE3E1+d0gUbNlqrmg6Px5WqEFTvbpRjjACRkEjKVw73nzyq7Vc/Yo=
-X-Received: by 2002:a02:4b42:: with SMTP id q63mr8126963jaa.77.1610670755423;
- Thu, 14 Jan 2021 16:32:35 -0800 (PST)
-MIME-Version: 1.0
-References: <cover.1607460588.git.ashish.kalra@amd.com>
-In-Reply-To: <cover.1607460588.git.ashish.kalra@amd.com>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Thu, 14 Jan 2021 16:31:59 -0800
-Message-ID: <CABayD+e+_ye9s-toCFwfaZkTbhM0=pMuyt5dtjmZJpmf3OT5mg@mail.gmail.com>
-Subject: Re: [PATCH v9 00/18] Add AMD SEV guest live migration support
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=t8c/Zi1/dJ4uhKjMSCSNdZwekdvteSeGdebcaDLlZ84=;
+        b=WweKKeO74dOUeSAbR/wgtSadyWuEw705YMkmwoPEefNAvSyJtyi9LYIVQ1Ga23WpMq
+         nArpVXYFy6RtcBSVrIlAtTt6OJPZ1Qg/HMqhYn8Yo5Warz4ipP6ZdxRhB9BRCjWQmRZ4
+         8krIsVZvs966rmpy+yuIi2pZIu0M9abKbGpEHdxEd2U5nojnR6fQSu5VqBa5FirHhtpi
+         wSepPNatxtvO4P7mnhUBoUIozqv6WD9z0pYH5KshY6+jzu3Qo1e1Dp6xg+Ls/diVQGR8
+         0OqlRGdEGjM6nrFM6z9pYuGOj02PRRb+/SCXIWuCJJHZZk+V5yrUZ79BWkI2M/MCvjr/
+         lXvQ==
+X-Gm-Message-State: AOAM532pgXinjYbphT0bGttPkvLIFkiCr55K+eier61OYPx32zeL5MJa
+        xoD6Aguuy2q1UP1Jv6sA8wnjilhZRY0=
+X-Google-Smtp-Source: ABdhPJzxCxZXjHhtcvLr1Kf9erN9OuaIBz0HqpYidtZRJoouWRl1ju7FoN0eK6DismJIkfKcznYgWNNK+Gk=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+ (user=seanjc job=sendgmr) by 2002:ad4:434e:: with SMTP id q14mr9828287qvs.15.1610671255318;
+ Thu, 14 Jan 2021 16:40:55 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 14 Jan 2021 16:40:51 -0800
+Message-Id: <20210115004051.4099250-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
+Subject: [PATCH] KVM: x86/mmu: Remove the defunct update_pte() paging hook
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yu Zhang <yu.c.zhang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Forgot to ask this: is there an intention to support SEND_CANCEL in a
-follow up patch?
+Remove the update_pte() shadow paging logic, which was obsoleted by
+commit 4731d4c7a077 ("KVM: MMU: out of sync shadow core"), but never
+removed.  As pointed out by Yu, KVM never write protects leaf page
+tables for the purposes of shadow paging, and instead marks their
+associated shadow page as unsync so that the guest can write PTEs at
+will.
 
+The update_pte() path, which predates the unsync logic, optimizes COW
+scenarios by refreshing leaf SPTEs when they are written, as opposed to
+zapping the SPTE, restarting the guest, and installing the new SPTE on
+the subsequent fault.  Since KVM no longer write-protects leaf page
+tables, update_pte() is unreachable and can be dropped.
 
-On Tue, Dec 8, 2020 at 2:03 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
->
-> From: Ashish Kalra <ashish.kalra@amd.com>
->
-> The series add support for AMD SEV guest live migration commands. To protect the
-> confidentiality of an SEV protected guest memory while in transit we need to
-> use the SEV commands defined in SEV API spec [1].
->
-> SEV guest VMs have the concept of private and shared memory. Private memory
-> is encrypted with the guest-specific key, while shared memory may be encrypted
-> with hypervisor key. The commands provided by the SEV FW are meant to be used
-> for the private memory only. The patch series introduces a new hypercall.
-> The guest OS can use this hypercall to notify the page encryption status.
-> If the page is encrypted with guest specific-key then we use SEV command during
-> the migration. If page is not encrypted then fallback to default.
->
-> The patch adds new ioctls KVM_{SET,GET}_PAGE_ENC_BITMAP. The ioctl can be used
-> by the qemu to get the page encrypted bitmap. Qemu can consult this bitmap
-> during the migration to know whether the page is encrypted.
->
-> This section descibes how the SEV live migration feature is negotiated
-> between the host and guest, the host indicates this feature support via
-> KVM_FEATURE_CPUID. The guest firmware (OVMF) detects this feature and
-> sets a UEFI enviroment variable indicating OVMF support for live
-> migration, the guest kernel also detects the host support for this
-> feature via cpuid and in case of an EFI boot verifies if OVMF also
-> supports this feature by getting the UEFI enviroment variable and if it
-> set then enables live migration feature on host by writing to a custom
-> MSR, if not booted under EFI, then it simply enables the feature by
-> again writing to the custom MSR. The host returns error as part of
-> SET_PAGE_ENC_BITMAP ioctl if guest has not enabled live migration.
->
-> A branch containing these patches is available here:
-> https://github.com/AMDESE/linux/tree/sev-migration-v9
->
-> [1] https://developer.amd.com/wp-content/resources/55766.PDF
->
-> Changes since v8:
-> - Rebasing to kvm next branch.
-> - Fixed and added comments as per review feedback on v8 patches.
-> - Removed implicitly enabling live migration for incoming VMs in
->   in KVM_SET_PAGE_ENC_BITMAP, it is now done via KVM_SET_MSR ioctl.
-> - Adds support for bypassing unencrypted guest memory regions for
->   DBG_DECRYPT API calls, guest memory region encryption status in
->   sev_dbg_decrypt() is referenced using the page encryption bitmap.
->
-> Changes since v7:
-> - Removed the hypervisor specific hypercall/paravirt callback for
->   SEV live migration and moved back to calling kvm_sev_hypercall3
->   directly.
-> - Fix build errors as
->   Reported-by: kbuild test robot <lkp@intel.com>, specifically fixed
->   build error when CONFIG_HYPERVISOR_GUEST=y and
->   CONFIG_AMD_MEM_ENCRYPT=n.
-> - Implicitly enabled live migration for incoming VM(s) to handle
->   A->B->C->... VM migrations.
-> - Fixed Documentation as per comments on v6 patches.
-> - Fixed error return path in sev_send_update_data() as per comments
->   on v6 patches.
->
-> Changes since v6:
-> - Rebasing to mainline and refactoring to the new split SVM
->   infrastructre.
-> - Move to static allocation of the unified Page Encryption bitmap
->   instead of the dynamic resizing of the bitmap, the static allocation
->   is done implicitly by extending kvm_arch_commit_memory_region() callack
->   to add svm specific x86_ops which can read the userspace provided memory
->   region/memslots and calculate the amount of guest RAM managed by the KVM
->   and grow the bitmap.
-> - Fixed KVM_SET_PAGE_ENC_BITMAP ioctl to set the whole bitmap instead
->   of simply clearing specific bits.
-> - Removed KVM_PAGE_ENC_BITMAP_RESET ioctl, which is now performed using
->   KVM_SET_PAGE_ENC_BITMAP.
-> - Extended guest support for enabling Live Migration feature by adding a
->   check for UEFI environment variable indicating OVMF support for Live
->   Migration feature and additionally checking for KVM capability for the
->   same feature. If not booted under EFI, then we simply check for KVM
->   capability.
-> - Add hypervisor specific hypercall for SEV live migration by adding
->   a new paravirt callback as part of x86_hyper_runtime.
->   (x86 hypervisor specific runtime callbacks)
-> - Moving MSR handling for MSR_KVM_SEV_LIVE_MIG_EN into svm/sev code
->   and adding check for SEV live migration enabled by guest in the
->   KVM_GET_PAGE_ENC_BITMAP ioctl.
-> - Instead of the complete __bss_decrypted section, only specific variables
->   such as hv_clock_boot and wall_clock are marked as decrypted in the
->   page encryption bitmap
->
-> Changes since v5:
-> - Fix build errors as
->   Reported-by: kbuild test robot <lkp@intel.com>
->
-> Changes since v4:
-> - Host support has been added to extend KVM capabilities/feature bits to
->   include a new KVM_FEATURE_SEV_LIVE_MIGRATION, which the guest can
->   query for host-side support for SEV live migration and a new custom MSR
->   MSR_KVM_SEV_LIVE_MIG_EN is added for guest to enable the SEV live
->   migration feature.
-> - Ensure that _bss_decrypted section is marked as decrypted in the
->   page encryption bitmap.
-> - Fixing KVM_GET_PAGE_ENC_BITMAP ioctl to return the correct bitmap
->   as per the number of pages being requested by the user. Ensure that
->   we only copy bmap->num_pages bytes in the userspace buffer, if
->   bmap->num_pages is not byte aligned we read the trailing bits
->   from the userspace and copy those bits as is. This fixes guest
->   page(s) corruption issues observed after migration completion.
-> - Add kexec support for SEV Live Migration to reset the host's
->   page encryption bitmap related to kernel specific page encryption
->   status settings before we load a new kernel by kexec. We cannot
->   reset the complete page encryption bitmap here as we need to
->   retain the UEFI/OVMF firmware specific settings.
->
-> Changes since v3:
-> - Rebasing to mainline and testing.
-> - Adding a new KVM_PAGE_ENC_BITMAP_RESET ioctl, which resets the
->   page encryption bitmap on a guest reboot event.
-> - Adding a more reliable sanity check for GPA range being passed to
->   the hypercall to ensure that guest MMIO ranges are also marked
->   in the page encryption bitmap.
->
-> Changes since v2:
->  - reset the page encryption bitmap on vcpu reboot
->
-> Changes since v1:
->  - Add support to share the page encryption between the source and target
->    machine.
->  - Fix review feedbacks from Tom Lendacky.
->  - Add check to limit the session blob length.
->  - Update KVM_GET_PAGE_ENC_BITMAP icotl to use the base_gfn instead of
->    the memory slot when querying the bitmap.
->
-> Ashish Kalra (7):
->   KVM: SVM: Add support for static allocation of unified Page Encryption
->     Bitmap.
->   KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature &
->     Custom MSR.
->   EFI: Introduce the new AMD Memory Encryption GUID.
->   KVM: x86: Add guest support for detecting and enabling SEV Live
->     Migration feature.
->   KVM: x86: Mark _bss_decrypted section variables as decrypted in page
->     encryption bitmap.
->   KVM: x86: Add kexec support for SEV Live Migration.
->   KVM: SVM: Enable SEV live migration feature implicitly on Incoming
->     VM(s).
->
-> Brijesh Singh (11):
->   KVM: SVM: Add KVM_SEV SEND_START command
->   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_SEND_FINISH command
->   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
->   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
->   KVM: x86: Add AMD SEV specific Hypercall3
->   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
->   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
->   mm: x86: Invoke hypercall when page encryption status is changed
->   KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
->
-> Ashish Kalra (7):
->   KVM: SVM: Add support for static allocation of unified Page Encryption
->     Bitmap.
->   KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature &
->     Custom MSR.
->   EFI: Introduce the new AMD Memory Encryption GUID.
->   KVM: x86: Add guest support for detecting and enabling SEV Live
->     Migration feature.
->   KVM: x86: Mark _bss_decrypted section variables as decrypted in page
->     encryption bitmap.
->   KVM: x86: Add kexec support for SEV Live Migration.
->   KVM: SVM: Bypass DBG_DECRYPT API calls for unecrypted guest memory.
->
-> Brijesh Singh (11):
->   KVM: SVM: Add KVM_SEV SEND_START command
->   KVM: SVM: Add KVM_SEND_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_SEND_FINISH command
->   KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
->   KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
->   KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
->   KVM: x86: Add AMD SEV specific Hypercall3
->   KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
->   KVM: x86: Introduce KVM_GET_PAGE_ENC_BITMAP ioctl
->   mm: x86: Invoke hypercall when page encryption status is changed
->   KVM: x86: Introduce KVM_SET_PAGE_ENC_BITMAP ioctl
->
->  .../virt/kvm/amd-memory-encryption.rst        | 120 +++
->  Documentation/virt/kvm/api.rst                |  71 ++
->  Documentation/virt/kvm/cpuid.rst              |   5 +
->  Documentation/virt/kvm/hypercalls.rst         |  15 +
->  Documentation/virt/kvm/msr.rst                |  16 +
->  arch/x86/include/asm/kvm_host.h               |   7 +
->  arch/x86/include/asm/kvm_para.h               |  12 +
->  arch/x86/include/asm/mem_encrypt.h            |  11 +
->  arch/x86/include/asm/paravirt.h               |  10 +
->  arch/x86/include/asm/paravirt_types.h         |   2 +
->  arch/x86/include/uapi/asm/kvm_para.h          |   5 +
->  arch/x86/kernel/kvm.c                         |  90 ++
->  arch/x86/kernel/kvmclock.c                    |  12 +
->  arch/x86/kernel/paravirt.c                    |   1 +
->  arch/x86/kvm/svm/sev.c                        | 790 ++++++++++++++++++
->  arch/x86/kvm/svm/svm.c                        |  21 +
->  arch/x86/kvm/svm/svm.h                        |   9 +
->  arch/x86/kvm/vmx/vmx.c                        |   1 +
->  arch/x86/kvm/x86.c                            |  35 +
->  arch/x86/mm/mem_encrypt.c                     |  68 +-
->  arch/x86/mm/pat/set_memory.c                  |   7 +
->  include/linux/efi.h                           |   1 +
->  include/linux/psp-sev.h                       |   8 +-
->  include/uapi/linux/kvm.h                      |  52 ++
->  include/uapi/linux/kvm_para.h                 |   1 +
->  25 files changed, 1365 insertions(+), 5 deletions(-)
->
-> --
-> 2.17.1
->
+Reported-by: Yu Zhang <yu.c.zhang@intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  3 --
+ arch/x86/kvm/mmu/mmu.c          | 49 ++-------------------------------
+ arch/x86/kvm/x86.c              |  1 -
+ 3 files changed, 2 insertions(+), 51 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3d6616f6f6ef..ed575c5655dd 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -358,8 +358,6 @@ struct kvm_mmu {
+ 	int (*sync_page)(struct kvm_vcpu *vcpu,
+ 			 struct kvm_mmu_page *sp);
+ 	void (*invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa);
+-	void (*update_pte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-			   u64 *spte, const void *pte);
+ 	hpa_t root_hpa;
+ 	gpa_t root_pgd;
+ 	union kvm_mmu_role mmu_role;
+@@ -1031,7 +1029,6 @@ struct kvm_arch {
+ struct kvm_vm_stat {
+ 	ulong mmu_shadow_zapped;
+ 	ulong mmu_pte_write;
+-	ulong mmu_pte_updated;
+ 	ulong mmu_pde_zapped;
+ 	ulong mmu_flooded;
+ 	ulong mmu_recycled;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481aa29d..3a2c25852b1f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1723,13 +1723,6 @@ static int nonpaging_sync_page(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-static void nonpaging_update_pte(struct kvm_vcpu *vcpu,
+-				 struct kvm_mmu_page *sp, u64 *spte,
+-				 const void *pte)
+-{
+-	WARN_ON(1);
+-}
+-
+ #define KVM_PAGE_ARRAY_NR 16
+ 
+ struct kvm_mmu_pages {
+@@ -3813,7 +3806,6 @@ static void nonpaging_init_context(struct kvm_vcpu *vcpu,
+ 	context->gva_to_gpa = nonpaging_gva_to_gpa;
+ 	context->sync_page = nonpaging_sync_page;
+ 	context->invlpg = NULL;
+-	context->update_pte = nonpaging_update_pte;
+ 	context->root_level = 0;
+ 	context->shadow_root_level = PT32E_ROOT_LEVEL;
+ 	context->direct_map = true;
+@@ -4395,7 +4387,6 @@ static void paging64_init_context_common(struct kvm_vcpu *vcpu,
+ 	context->gva_to_gpa = paging64_gva_to_gpa;
+ 	context->sync_page = paging64_sync_page;
+ 	context->invlpg = paging64_invlpg;
+-	context->update_pte = paging64_update_pte;
+ 	context->shadow_root_level = level;
+ 	context->direct_map = false;
+ }
+@@ -4424,7 +4415,6 @@ static void paging32_init_context(struct kvm_vcpu *vcpu,
+ 	context->gva_to_gpa = paging32_gva_to_gpa;
+ 	context->sync_page = paging32_sync_page;
+ 	context->invlpg = paging32_invlpg;
+-	context->update_pte = paging32_update_pte;
+ 	context->shadow_root_level = PT32E_ROOT_LEVEL;
+ 	context->direct_map = false;
+ }
+@@ -4506,7 +4496,6 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+ 	context->page_fault = kvm_tdp_page_fault;
+ 	context->sync_page = nonpaging_sync_page;
+ 	context->invlpg = NULL;
+-	context->update_pte = nonpaging_update_pte;
+ 	context->shadow_root_level = kvm_mmu_get_tdp_level(vcpu);
+ 	context->direct_map = true;
+ 	context->get_guest_pgd = get_cr3;
+@@ -4678,7 +4667,6 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 	context->gva_to_gpa = ept_gva_to_gpa;
+ 	context->sync_page = ept_sync_page;
+ 	context->invlpg = ept_invlpg;
+-	context->update_pte = ept_update_pte;
+ 	context->root_level = level;
+ 	context->direct_map = false;
+ 	context->mmu_role.as_u64 = new_role.as_u64;
+@@ -4826,19 +4814,6 @@ void kvm_mmu_unload(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_unload);
+ 
+-static void mmu_pte_write_new_pte(struct kvm_vcpu *vcpu,
+-				  struct kvm_mmu_page *sp, u64 *spte,
+-				  const void *new)
+-{
+-	if (sp->role.level != PG_LEVEL_4K) {
+-		++vcpu->kvm->stat.mmu_pde_zapped;
+-		return;
+-        }
+-
+-	++vcpu->kvm->stat.mmu_pte_updated;
+-	vcpu->arch.mmu->update_pte(vcpu, sp, spte, new);
+-}
+-
+ static bool need_remote_flush(u64 old, u64 new)
+ {
+ 	if (!is_shadow_present_pte(old))
+@@ -4954,22 +4929,6 @@ static u64 *get_written_sptes(struct kvm_mmu_page *sp, gpa_t gpa, int *nspte)
+ 	return spte;
+ }
+ 
+-/*
+- * Ignore various flags when determining if a SPTE can be immediately
+- * overwritten for the current MMU.
+- *  - level: explicitly checked in mmu_pte_write_new_pte(), and will never
+- *    match the current MMU role, as MMU's level tracks the root level.
+- *  - access: updated based on the new guest PTE
+- *  - quadrant: handled by get_written_sptes()
+- *  - invalid: always false (loop only walks valid shadow pages)
+- */
+-static const union kvm_mmu_page_role role_ign = {
+-	.level = 0xf,
+-	.access = 0x7,
+-	.quadrant = 0x3,
+-	.invalid = 0x1,
+-};
+-
+ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 			      const u8 *new, int bytes,
+ 			      struct kvm_page_track_notifier_node *node)
+@@ -5020,14 +4979,10 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 
+ 		local_flush = true;
+ 		while (npte--) {
+-			u32 base_role = vcpu->arch.mmu->mmu_role.base.word;
+-
+ 			entry = *spte;
+ 			mmu_page_zap_pte(vcpu->kvm, sp, spte, NULL);
+-			if (gentry &&
+-			    !((sp->role.word ^ base_role) & ~role_ign.word) &&
+-			    rmap_can_add(vcpu))
+-				mmu_pte_write_new_pte(vcpu, sp, spte, &gentry);
++			if (gentry && sp->role.level != PG_LEVEL_4K)
++				++vcpu->kvm->stat.mmu_pde_zapped;
+ 			if (need_remote_flush(entry, *spte))
+ 				remote_flush = true;
+ 			++spte;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a480804ae27a..d9f5d9acccc1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -233,7 +233,6 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+ 	VCPU_STAT("halt_poll_fail_ns", halt_poll_fail_ns),
+ 	VM_STAT("mmu_shadow_zapped", mmu_shadow_zapped),
+ 	VM_STAT("mmu_pte_write", mmu_pte_write),
+-	VM_STAT("mmu_pte_updated", mmu_pte_updated),
+ 	VM_STAT("mmu_pde_zapped", mmu_pde_zapped),
+ 	VM_STAT("mmu_flooded", mmu_flooded),
+ 	VM_STAT("mmu_recycled", mmu_recycled),
+-- 
+2.30.0.284.gd98b1dd5eaa7-goog
+
