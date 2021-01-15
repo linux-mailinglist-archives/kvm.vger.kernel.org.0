@@ -2,129 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC9292F6F60
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:21:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41CB62F6F55
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:15:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731249AbhAOAUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 19:20:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51220 "EHLO
+        id S1731244AbhAOAO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 19:14:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731202AbhAOAUP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 19:20:15 -0500
-Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54C4C0613C1
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:19:34 -0800 (PST)
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DH1yV6T8Gz9sRR; Fri, 15 Jan 2021 11:19:30 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1610669970;
-        bh=6rt0Brp3CktLo2ypYITM1g/ZFLRPD910BAU72R0cilE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FYDuAjxwhiUNKxS9D35s9dvZZmwu0f3se06n5K9yHIarBa8dXbQrzonT4pCCdOJ6s
-         dcBA0D0OmDA7npY1IrgnZY89HWSnX8tCaZ0Cpi2XGobOJ5xO8fOYooWZ+RabDG8mq0
-         yKQqoicd5A8fzMBzZ7RrVmpOxu1zcgt0osyxfpqI=
-Date:   Fri, 15 Jan 2021 11:13:27 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
-        pasic@linux.ibm.com, qemu-devel@nongnu.org, cohuck@redhat.com,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
-        jun.nakajima@intel.com, thuth@redhat.com,
-        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
-        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
-        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
-        berrange@redhat.com, andi.kleen@intel.com
-Subject: Re: [PATCH v7 13/13] s390: Recognize confidential-guest-support
- option
-Message-ID: <20210115001327.GP435587@yekko.fritz.box>
-References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
- <20210113235811.1909610-14-david@gibson.dropbear.id.au>
- <ba08f5da-e31f-7ae2-898d-a090c5c1b1cf@de.ibm.com>
- <aa72b499-1b84-54a3-fd06-2fec4402b699@de.ibm.com>
- <471babb9-9d5a-a2fa-7d90-f14a7d289b8d@de.ibm.com>
+        with ESMTP id S1731234AbhAOAO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 19:14:56 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9CC2C061757
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:14:15 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id ce17so1892515pjb.5
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:14:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=KjTgwkzBYZCLbovtrDF6F+LwwNKyLuyTRzFitWMOVgM=;
+        b=kmz19A6Q2anZ421GIf4Df+T/bqdUhKy2kjKUBzGJgsH/+MwUHlWSioY0qSBDOFC8kW
+         cGgZ6VFOxZsKIndEO8y6JS4njUbbMVw6OpOPW9F2jsWhaewrJXKRN9UYEzFJutIcR+eK
+         BT4dKftc63ByI3bqYcHWHnAjdXGgxOQmyCVme7rMFbdz0R/CV0HL4/9n2Vvwg0b03sSO
+         Ndk4+pkWd5OvfdZrbIY6PERF2+kVQCzBWcxBFf5Ia+W5fXi160lAfwLZIlJm4oTQuwvV
+         CvkuBAOo8cNTzZ0VfBKeFwbS12RzRhEdDByQot0xLrOslbA7QjPmfwddHwuDGcppiOWi
+         /XmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KjTgwkzBYZCLbovtrDF6F+LwwNKyLuyTRzFitWMOVgM=;
+        b=FZX/II0TAFIrLys8Kia8G94JkYhhP3e85KX5U2cLHTT4axQzRqDaVxflfQDzz/R3Nl
+         t9G4FoaWFtMVRdp0WZwOFoseoXBjS4VV3Nb8u2Vzm6HQT+dok81RR+Fy86qNaLUTjiNJ
+         So3j66PfrOu+x5vLIM6KN78N68iGPDEqMfURwOaRDXevatt8KIOwW7X4pU1z9W3pqP6Q
+         76ukT2dnVPBpsgeQCA8DskZagkRUN01HFil0zuJgMgSZmRvR6pR4g7XZTpMjHVdvO3jL
+         f2CAtVJD9L/vfosN/OH6hN98p9hdj3SsTMF3ukN57srNQUfe3vA0XGO7szvP1Ex7F8Ae
+         LuXg==
+X-Gm-Message-State: AOAM531UPxjrO6jJaq5fg85eilwudUoI/9WTmn9qMCG3otINy72vMohH
+        mAbFJIuK1+mqiN3jncHiYyrzTQ==
+X-Google-Smtp-Source: ABdhPJyXekExfB/xC+XO2x4zmoeOIqZGeJ7KQJUOGmd5mznVwinXbQxKa+BjzmbikCYFWIWU1uoJ7g==
+X-Received: by 2002:a17:902:eb53:b029:da:da92:c187 with SMTP id i19-20020a170902eb53b02900dada92c187mr9862639pli.34.1610669655265;
+        Thu, 14 Jan 2021 16:14:15 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id n7sm6299616pfn.141.2021.01.14.16.14.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jan 2021 16:14:14 -0800 (PST)
+Date:   Thu, 14 Jan 2021 16:14:07 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: nVMX: add kvm_nested_vmlaunch_resume
+ tracepoint
+Message-ID: <YADeT8+fssKw3SSi@google.com>
+References: <20210114205449.8715-1-mlevitsk@redhat.com>
+ <20210114205449.8715-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qSHHer9gQ0dtepKr"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <471babb9-9d5a-a2fa-7d90-f14a7d289b8d@de.ibm.com>
+In-Reply-To: <20210114205449.8715-3-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jan 14, 2021, Maxim Levitsky wrote:
+> This is very helpful for debugging nested VMX issues.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/trace.h      | 30 ++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/nested.c |  6 ++++++
+>  arch/x86/kvm/x86.c        |  1 +
+>  3 files changed, 37 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 2de30c20bc264..663d1b1d8bf64 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -554,6 +554,36 @@ TRACE_EVENT(kvm_nested_vmrun,
+>  		__entry->npt ? "on" : "off")
+>  );
+>  
+> +
+> +/*
+> + * Tracepoint for nested VMLAUNCH/VMRESUME
 
---qSHHer9gQ0dtepKr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+VM-Enter, as below.
 
-On Thu, Jan 14, 2021 at 10:24:57AM +0100, Christian Borntraeger wrote:
->=20
->=20
-> On 14.01.21 10:19, Christian Borntraeger wrote:
-> >=20
-> >=20
-> > On 14.01.21 10:10, Christian Borntraeger wrote:
-> >>
-> >>
-> >> On 14.01.21 00:58, David Gibson wrote:
-> >> [...]
-> >>> +int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp)
-> >>> +{
-> >>> +    if (!object_dynamic_cast(OBJECT(cgs), TYPE_S390_PV_GUEST)) {
-> >>> +        return 0;
-> >>> +    }
-> >>> +
-> >>> +    if (!s390_has_feat(S390_FEAT_UNPACK)) {
-> >>> +        error_setg(errp,
-> >>> +                   "CPU model does not support Protected Virtualizat=
-ion");
-> >>> +        return -1;
-> >>> +    }
-> >>
-> >> I am triggering this and I guess this is because the cpu model is not =
-yet initialized at
-> >> this point in time.
-> >>
-> > When I remove the check, things seems to work though ( I can access vir=
-tio-blk devices without
-> > specifying iommu for example)
->=20
-> Maybe we can turn things around and check in apply_cpu_model if the objec=
-t exists but
-> unpack was not specified?
+> + */
+> +TRACE_EVENT(kvm_nested_vmlaunch_resume,
 
-That might work.  If unpack *is* specified, you'd also need to set the
-ready flag there, of course.
+s/vmlaunc_resume/vmenter, both for consistency with other code and so that it
+can sanely be reused by SVM.  IMO, trace_kvm_entry is wrong :-).
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> +	    TP_PROTO(__u64 rip, __u64 vmcs, __u64 nested_rip,
+> +		     __u32 entry_intr_info),
+> +	    TP_ARGS(rip, vmcs, nested_rip, entry_intr_info),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(	__u64,		rip		)
+> +		__field(	__u64,		vmcs		)
+> +		__field(	__u64,		nested_rip	)
+> +		__field(	__u32,		entry_intr_info	)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->rip			= rip;
+> +		__entry->vmcs			= vmcs;
+> +		__entry->nested_rip		= nested_rip;
+> +		__entry->entry_intr_info	= entry_intr_info;
+> +	),
+> +
+> +	TP_printk("rip: 0x%016llx vmcs: 0x%016llx nrip: 0x%016llx "
+> +		  "entry_intr_info: 0x%08x",
+> +		__entry->rip, __entry->vmcs, __entry->nested_rip,
+> +		__entry->entry_intr_info)
+> +);
+> +
+> +
+>  TRACE_EVENT(kvm_nested_intercepts,
+>  	    TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions,
+>  		     __u32 intercept1, __u32 intercept2, __u32 intercept3),
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 776688f9d1017..cd51b66480d52 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3327,6 +3327,12 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+>  		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
+>  		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+>  
+> +	trace_kvm_nested_vmlaunch_resume(kvm_rip_read(vcpu),
 
---qSHHer9gQ0dtepKr
-Content-Type: application/pgp-signature; name="signature.asc"
+Hmm, won't this RIP be wrong for the migration case?  I.e. it'll be L2, not L1
+as is the case for the "true" nested VM-Enter path.
 
------BEGIN PGP SIGNATURE-----
+> +					 vmx->nested.current_vmptr,
+> +					 vmcs12->guest_rip,
+> +					 vmcs12->vm_entry_intr_info_field);
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAA3iUACgkQbDjKyiDZ
-s5JVOg//ZK/jqzfMra5QZC8J9RxUz3vcxD/TjIOg6c+ekzbJMveK1GpkYS7O25T1
-3R90+6T+/6ZQm419GJrsD/46MsH+DrXTx4y+eWdwWqHzxcrANHIA99dwEepJfj8m
-ZQqXtMx4uWi4hVtVyyIkYmosN8sinTHl0XbYr65dg7etNXvASyeDx8xGi+4niVm1
-mGJGHouxCsJzN0ov2eLzwr8hx4rlrUXobiIGOfpTtBNNlOvokz73ZF+zAb6VL/si
-QBV8fYuiDBcUqRNUTV5xHWjmbfS+qOC/Dw+S/ad07LUtPS/oQVB/dej86HGi6UeW
-FaPR/qXL/6vwEhtgychNj3a5TillBjTlbRLVDuYRVzbB5eJD9ORA7pcanS8RjEHa
-z9IUEt+SnzUfIZTpI4kjiwdwDYfoySs7tWxdJZUMmCiw1RQCaOQXqdlXqk4Kk7mr
-Pq4rIB/Prh4g59IX9ZDymFFYYNQo4urvLb3wJifJquk0NPNmYN1p3v2QdKGtVn41
-MRih1c/f51v5Q03k/UU0TAtPKKzyWfLlcAP6BfNz8lY8jrcmn2j1kyhd7vKZyyI/
-kf+2jdS2o0QkGb0A6uIWP+IHbXgBo8M6YoOWOcM+v2eDfNLJL8CyMCFjxZdEOXLJ
-DfyvIypwN/ASmS7N3s4PaBSKaA1CzcgQmdK8F0lSI5ySD0O0cKg=
-=ydH6
------END PGP SIGNATURE-----
+The placement is a bit funky.  I assume you put it here so that calls from
+vmx_set_nested_state() also get traced.  But, that also means
+vmx_pre_leave_smm() will get traced, and it also creates some weirdness where
+some nested VM-Enters that VM-Fail will get traced, but others will not.
 
---qSHHer9gQ0dtepKr--
+Tracing vmx_pre_leave_smm() isn't necessarily bad, but it could be confusing,
+especially if the debugger looks up the RIP and sees RSM.  Ditto for the
+migration case.
+
+Not sure what would be a good answer.
+
+> +
+> +
+>  	/*
+>  	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
+>  	 * nested early checks are disabled.  In the event of a "late" VM-Fail,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index a480804ae27a3..7c6e94e32100e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11562,6 +11562,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_msr);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_cr);
+> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmlaunch_resume);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmrun);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit_inject);
+> -- 
+> 2.26.2
+> 
