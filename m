@@ -2,83 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53C722F856C
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 20:29:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A962F85A2
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 20:40:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387852AbhAOT32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 14:29:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44484 "EHLO
+        id S2388323AbhAOTgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 14:36:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbhAOT32 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 14:29:28 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC10C061757
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:28:48 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id x18so5210169pln.6
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:28:48 -0800 (PST)
+        with ESMTP id S1728293AbhAOTgh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 14:36:37 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2985C061793
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:35:54 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id d8so9650634otq.6
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:35:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=o173Lqk2c5CIYKhQy47SbWBS4LsgYs9/wPlGKEJUhZQ=;
-        b=Uxl89bKbQ0EJR0bwVVwTY620vZrEk3wZRGOZUtb7fVjLryPulQ5OtdOqb+1ATwurxm
-         jaFVqeUUm7pucJzBnd01cP9RttMAcnikELQ2DYPIl6O1HzoqZbTk1xFfAKAftpvfKQ0f
-         LTRlvzC1Vk9G5OXXo5JeOM+CD9AiPFP+ZCAjkd+nmchQsRtrmAWrVG9UDvvdz2bLlgab
-         8326RLbVcbuBFJvj54++CN8KsAUK50CCfn5YqvMFNshYFtIj4y5+c4tYWXGCBaEvcd0X
-         JiR94/XOY/Ncxv7SEmmc958sKD+oZRx3v1FtXBzBHaxpOTaS3O3KNpOgnF4v71AN3+BS
-         N0lg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L6A2UzRCRt8w1pfam8I4qqQpYsRwRHB2ucWTZwYFSKQ=;
+        b=lctjjCHd0mRY2yIaitglAwYI2VLnEOj7PX0bK0OAUF2luT4iEjTsICtK2KkRrobrDz
+         +UMXUqT0SsGRUFWtMrnoRTv5kCN0WWPxzs5WEswE/gTHrQox0PquyzX9Ll31YnzImFzN
+         som/A3BEKakMzIl+N4OImMr9U7k0W1se4y2pfU9YRY86xFGZuyVIaQJx+2yBNdAJRH2o
+         8Um304ttLN0u2hpXrctJrKwoKC87rCJIj8TsmoBV/GdRxcldGOMTqLQj9f+yru66x3tS
+         fTxBbX9rLrEb9EqV+QfXErsh3Bl1qN4x8EMZAMh5zyRUhkZMr4Yucb833V4S/R9lFXun
+         SEJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=o173Lqk2c5CIYKhQy47SbWBS4LsgYs9/wPlGKEJUhZQ=;
-        b=WPabfeEyt5n2ywY82ZJ3YjwVya7XOTcYX/1SaNSigiulbghpo+ngWyYEmizDCYbIZ9
-         ePcvu2lYNMru/lTUFHrh5Dz3n+FzxJD+xDGap4y+7wwf3W/BW5hPSW2Oo7vcgmK3TQaV
-         PiXZPdMZIKn6HNqb1rEr4ur+gtkSFAiwtwjeTeAi3sFc7F1ugtryj9ilFKxDDoOrmDck
-         5np9LFLc5qLzgHcJKQb5V4XFBcOulkC1fjxHhqil5GeL2j2ujrqXKZegEtM73KBYZcAJ
-         Ngn/SHo3QQ4iAK1GXlWtCdyNn8r0QJjNKhNFB4HB3yIgLxP8IAq4IpCKNhffG72qHVPq
-         Z92g==
-X-Gm-Message-State: AOAM532AtKy6cKVs7WwKvAwLAtBhY3wtbSxzwwvIg38eFuqI6YDNSwrR
-        5e3Mlh69Uc4RHJB7r3UILzMp+A==
-X-Google-Smtp-Source: ABdhPJwfOsX4Wx5vyNX8XtAaos1vkW6wGTM5tGYWH1S5rzy+SMeefHNe8U0GzG04aTWa3jyis9E4uw==
-X-Received: by 2002:a17:90a:5581:: with SMTP id c1mr12238856pji.86.1610738927523;
-        Fri, 15 Jan 2021 11:28:47 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id b6sm8319056pfd.43.2021.01.15.11.28.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jan 2021 11:28:46 -0800 (PST)
-Date:   Fri, 15 Jan 2021 11:28:40 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L6A2UzRCRt8w1pfam8I4qqQpYsRwRHB2ucWTZwYFSKQ=;
+        b=ecvrur/BB4HCsoSaHgmGMWSc5KHUT2ysutXDVnKkw5S6wHjiGHxa/S6i9dO7VNgEGd
+         kZvRCS4d4dKmVVww0vP+63zgB+srrhvdzdmLvOkjYlaf5PHGERNGf4ahq0CXPp0p5PAB
+         LzI1ewqaFdPhVnNlpiXGyHgmjI/vPoFC4+VcwVPFhYeXvAvCBgKh2t4oHVIn4KJiHIqY
+         hel67Ps55nL8nU8PLm++HUzF0RnWWZLLtrFGw2gefKJrDO3emqKZGY1lKBXA6XIOPaoO
+         Dk3lVPljHd/HkBVahr72xljfl3Hc+ycC97F6fbuUIt2wkKM1gGSJZ9ZOAcRoVN42UUp9
+         w09Q==
+X-Gm-Message-State: AOAM531/dYkk4B3F/k4/xOfxLcGmbAIidmKYl7hFAC7z4j50wOCBJFfj
+        wcj8y3ga/SkMfi2WZ1tRE2JHWZpE8SumGQDucL/rvg==
+X-Google-Smtp-Source: ABdhPJz6/ji210QtYTzusmDKOUSnUYJNxbMjIE8TQfSbsP9cr+trdik/Pj8x6e+RFKb3K+ufVbrmYs2Nx2IqGa4wwjw=
+X-Received: by 2002:a9d:5f9a:: with SMTP id g26mr9622406oti.241.1610739354185;
+ Fri, 15 Jan 2021 11:35:54 -0800 (PST)
+MIME-Version: 1.0
+References: <20200710154811.418214-1-mgamal@redhat.com> <20200710154811.418214-8-mgamal@redhat.com>
+ <CALMp9eSbY6FjZAXt7ojQrX_SC_Lyg24dTGFZdKZK7fARGA=3hg@mail.gmail.com>
+ <CALMp9eTFzQMpsrGhN4uJxyUHMKd5=yFwxLoBy==2BTHwmv_UGQ@mail.gmail.com>
+ <20201023031433.GF23681@linux.intel.com> <498cfe12-f3e4-c4a2-f36b-159ccc10cdc4@redhat.com>
+ <CALMp9eQ8C0pp5yP4tLsckVWq=j3Xb=e4M7UVZz67+pngaXJJUw@mail.gmail.com>
+ <f40e5d23-88b6-01c0-60f9-5419dac703a2@redhat.com> <CALMp9eRGBiQDPr1wpAY34V=T6Jjij_iuHOX+_-QQPP=5SEw3GQ@mail.gmail.com>
+ <4463f391-0a25-017e-f913-69c297e13c5e@redhat.com>
+In-Reply-To: <4463f391-0a25-017e-f913-69c297e13c5e@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 15 Jan 2021 11:35:42 -0800
+Message-ID: <CALMp9eRnjdJtmU9bBosGNAxa2pvMzB8mHjtbYa-yb2uNoAkgdA@mail.gmail.com>
+Subject: Re: [PATCH v3 7/9] KVM: VMX: Add guest physical address check in EPT
+ violation and misconfig
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Mohammed Gamal <mgamal@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 3/3] KVM/VMX: Use try_cmpxchg64() in posted_intr.c
-Message-ID: <YAHs6KDoc+O50beV@google.com>
-References: <20201215182805.53913-1-ubizjak@gmail.com>
- <20201215182805.53913-4-ubizjak@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201215182805.53913-4-ubizjak@gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 15, 2020, Uros Bizjak wrote:
-> Use try_cmpxchg64() instead of cmpxchg64() to reuse flags from
-> cmpxchg/cmpxchg8b instruction. For 64 bit targets flags reuse
-> avoids a CMP instruction,
+On Fri, Oct 23, 2020 at 10:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 23/10/20 19:23, Jim Mattson wrote:
+> >> The information that we need is _not_ that provided by the advanced
+> >> VM-exit information (or by a page walk).  If a page is neither writable
+> >> nor executable, the advanced information doesn't say if the injected #PF
+> >> should be a W=1 or a F=1 fault.  We need the information in bits 0..2 of
+> >> the exit qualification for the final access, which however is not
+> >> available for the paging-structure access.
+> >>
+> > Are you planning to extend the emulator, then, to support all
+> > instructions? I'm not sure where you are going with this.
+>
+> I'm going to fix the bit 8=1 case, but for bit 8=0 there's not much that
+> you can do.  In all likelihood the guest is buggy anyway.
 
-It ends up doing way more (in a good way) than eliminate the CMP, at least with
-gcc-10.  There's a ripple effect and the compiler ends up generating the loop
-in-line, whereas without the "try" version the loop is put out-of-line.
+Did this drop off your radar? Are you still planning to fix the bit8=1
+case to use advanced EPT exit qualification information? Or did I just
+miss it?
 
-> while for 32 bit targets flags reuse avoids XOR/XOR/OR instruction sequence.
-> 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
+> It would be possible to only do the decode part of the emulator to get
+> the PFEC (matching the GVA from the vmexit to the memory operand, for
+> example, and retrying if the instruction is unexpected).  Then one would
+> only need enough VEX/EVEX parsing to process the decoding.
+>
+> Paolo
+>
