@@ -2,106 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F203A2F7D6C
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:59:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73C192F7D8B
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 15:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732672AbhAON6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 08:58:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48513 "EHLO
+        id S1732902AbhAOODA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 09:03:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58154 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732082AbhAON6N (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 08:58:13 -0500
+        by vger.kernel.org with ESMTP id S1732783AbhAOOC7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 09:02:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610719006;
+        s=mimecast20190719; t=1610719293;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oVQxHC5aDenqNcWvmG07Bn72UrucFZIJp0uxXWZdvVg=;
-        b=STFeHCjsTgXB5dWXiPqoIE2T5WzlXgmA7EStt6v8tXTdVB5vNIiKEWG6ps+p6QrVSuhmCf
-        +pb8fMfv89Z5yNAJrOgsryqzLtFJaSDsVo0kZ8U5UgfaykaJmnp2qMD2AloGoSPIJrQpDs
-        FxI2b6m9CnPfrGxREA83N85AHG4PCrs=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-U1lFFAw5Ofm5TwBtwfXFbg-1; Fri, 15 Jan 2021 08:56:45 -0500
-X-MC-Unique: U1lFFAw5Ofm5TwBtwfXFbg-1
-Received: by mail-ej1-f71.google.com with SMTP id jg11so2977650ejc.23
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 05:56:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oVQxHC5aDenqNcWvmG07Bn72UrucFZIJp0uxXWZdvVg=;
-        b=gwo4q+WaQfE4W2A/OXNEiYimbXehJRzHqMc/8nPTLy/3jf0s/qlpH3dnyT4bbxhnB4
-         ahFWErrHeK5fonQQKFDQYfpUiBO3FTmvLwxDXT59WeqgT60eNXDg2huLAHSMo9QREv1m
-         /+Za4XGEpBH+S7RnbJBuuFKrFglxrNsJuOLSygtRbWsdkWJskKdba2AAJclLiibadhqB
-         4Ey2193Gsd1CiyDUWXM60+45bWvjdNJe54N3Z0rewjp1EDb4cPNxJcfVRvW8aqYjsc6/
-         CgOumMm/qENoHyiLHVRIKhMLzlm3iTN63lr6bm5o8zLzS/KMpXLfTrYjVl1Kvl2LJR50
-         5r5w==
-X-Gm-Message-State: AOAM530rmymlOxG+14RBsJWC/MhLUxeQ8u/6tzvhaix3GDIhhR3b3G6R
-        TNR+3rJIh9SMsDi2o+57sF0PkquOCLAk0/KJasmpwhHvWcGTMleY9ByUA4q2mpH0wP/WYvU1kW9
-        aNqIdMT1uijwX
-X-Received: by 2002:a17:906:2648:: with SMTP id i8mr3523386ejc.262.1610719003675;
-        Fri, 15 Jan 2021 05:56:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzIIhl/T+nMWLDpTcbKOVPkHNGdwkNyQg86Kt82V1Ox5TAYsXX+C+MiQjW40aRyOm7KmSGPHA==
-X-Received: by 2002:a17:906:2648:: with SMTP id i8mr3523373ejc.262.1610719003537;
-        Fri, 15 Jan 2021 05:56:43 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h15sm1459370ejj.43.2021.01.15.05.56.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Jan 2021 05:56:42 -0800 (PST)
-Subject: Re: [PATCH v2 3/3] KVM: x86: use static calls to reduce kvm_x86_ops
- overhead
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Jason Baron <jbaron@akamai.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <cover.1610680941.git.jbaron@akamai.com>
- <e057bf1b8a7ad15652df6eeba3f907ae758d3399.1610680941.git.jbaron@akamai.com>
- <YAFkTSnSut1h/jWt@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e13aa15-2f64-8e54-03b1-c4843af96bc1@redhat.com>
-Date:   Fri, 15 Jan 2021 14:56:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        bh=8obwFRnUY2hSrjdvhpue+R7Q613/wQ2X9QDQ56e5dwU=;
+        b=J36ZYFRbfRVC0bXawc+D+/rfPco1B/6byF4FSRqT/Gp/f4kLaQlfXYJGaYhhi1VsnLBcCP
+        UI/P65m/OP3N5xz7ZZCa+S+1FJsxhHHUzuBY+yKigv79I0e5YLs0AE+1C8CIt7QEN6VDeK
+        lK3kZvkE/Cus2D197e6Wu/THSePvDwA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-238-vmZ04IPnNDislwUOuAIigA-1; Fri, 15 Jan 2021 09:01:31 -0500
+X-MC-Unique: vmZ04IPnNDislwUOuAIigA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A92F18C9F40;
+        Fri, 15 Jan 2021 14:01:29 +0000 (UTC)
+Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25E6E6F920;
+        Fri, 15 Jan 2021 14:01:26 +0000 (UTC)
+Subject: Re: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>, kernel-team@android.com,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+References: <20210114105633.2558739-1-maz@kernel.org>
+ <20210114105633.2558739-7-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
+Date:   Fri, 15 Jan 2021 15:01:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <YAFkTSnSut1h/jWt@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210114105633.2558739-7-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/01/21 10:45, Peter Zijlstra wrote:
-> On Thu, Jan 14, 2021 at 10:27:56PM -0500, Jason Baron wrote:
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 5060922..9d4492b 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1350,7 +1350,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
->>   static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
->>   {
->>   	if (kvm_x86_ops.tlb_remote_flush &&
->> -	    !kvm_x86_ops.tlb_remote_flush(kvm))
->> +	    !static_call(kvm_x86_tlb_remote_flush)(kvm))
->>   		return 0;
->>   	else
->>   		return -ENOTSUPP;
-> 
-> Would you be able to use something like this?
-> 
->    https://lkml.kernel.org/r/20201110101307.GO2651@hirez.programming.kicks-ass.net
-> 
-> we could also add __static_call_return1(), if that would help.
-> 
+Hi Marc,
 
-I think I'd rather make the default callee return -ENOTSUPP directly and 
-remove the "if" completely.  So __static_call_return1() is not 
-particularly useful here.
+On 1/14/21 11:56 AM, Marc Zyngier wrote:
+> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+> pretty easy. All that is required is support for PMMIR_EL1, which
+> is read-only, and for which returning 0 is a valid option.
+> 
+> Let's just do that and adjust what we return to the guest.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8f79ec1fffa7..2f4ecbd2abfb 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		/* Limit debug to ARMv8.0 */
+>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_AA64DFR0_PMUVER_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+>  		break;
+>  	case SYS_ID_DFR0_EL1:
+>  		/* Limit guests to PMUv3 for ARMv8.1 */
+what about the debug version in aarch32 state. Is it on purpose that you
+leave it as 8_1?
 
-Paolo
+Thanks
+
+Eric
+> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+>  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+>  
+>  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+>  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> 
 
