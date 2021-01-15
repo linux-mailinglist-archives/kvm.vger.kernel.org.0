@@ -2,72 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F411F2F7520
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:22:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EBF112F752D
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:25:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727116AbhAOJVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 04:21:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54178 "EHLO
+        id S1728638AbhAOJXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 04:23:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725880AbhAOJVo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 04:21:44 -0500
-X-Greylist: delayed 1444 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 15 Jan 2021 01:21:04 PST
-Received: from manul.sfritsch.de (manul.sfritsch.de [IPv6:2a01:4f8:172:195f:112::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43BB7C061757;
-        Fri, 15 Jan 2021 01:21:04 -0800 (PST)
-Subject: Re: [PATCH] kvm: Add emulation for movups/movupd
-To:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        with ESMTP id S1726435AbhAOJXo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 04:23:44 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3CDC061794;
+        Fri, 15 Jan 2021 01:23:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=LrJG/1orjdUo6w8aRSCvysSJq7gF6RZtVnTtika1jcc=; b=HSgSaSX+kvU7ktks1f+Hhm8KPv
+        KE8BhYgZNf+viYyHPk/hGi5zi4CF1f1BJ/1eqyU4vdbKskbjY22I8FomvDOQ3s6SOSryhnhlX4kj2
+        5m/lfTn6wf8l5Y6dR56RmgOK9z8J3o6MijEg6iTZu2UsOPkHmwFdiDkbKGviP5MIGrXINmRxZfzpD
+        Ib1Bp28gTjuovT8Y/u1pFjYm/KJFp0WXocgq1JBkK5IPxA9RfjffzCm2l/MusodBVqAH7sAxeYrSg
+        Z0DAMYhfUGlADVdPB9Kyrg76iEBt0hGNebejAvSrCQiDpTWhG+4iQJ4p/T3Zu5713W+UKshFRfRPt
+        f8JfMpFg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l0LJk-0001li-TU; Fri, 15 Jan 2021 09:22:53 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 36E37305815;
+        Fri, 15 Jan 2021 10:22:50 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0B385200E0BD2; Fri, 15 Jan 2021 10:22:50 +0100 (CET)
+Date:   Fri, 15 Jan 2021 10:22:49 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Jason Baron <jbaron@akamai.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20180401155444.7006-1-sf@sfritsch.de>
- <20180404171040.GW5438@char.us.oracle.com>
- <288c32e4-a1ec-7b43-0d6a-6a7c0e1a04b2@redhat.com> <1883982.uaQK4EgVKX@k>
- <321b36c9-d6fc-b562-5f87-3d3594e7ead9@redhat.com>
- <CALMp9eR0OjUV7LsWQ_r4o20wSZ0dw0eGs=LJ0htLmwwvcuUP_A@mail.gmail.com>
-From:   Stefan Fritsch <sf@sfritsch.de>
-Message-ID: <884f1474-3654-95c4-9a57-338d28e65b38@sfritsch.de>
-Date:   Fri, 15 Jan 2021 09:56:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: X86: append vmx/svm prefix to additional
+ kvm_x86_ops functions
+Message-ID: <YAFe6b/sSdDvXSM3@hirez.programming.kicks-ass.net>
+References: <cover.1610680941.git.jbaron@akamai.com>
+ <ed594696f8e2c2b2bfc747504cee9bbb2a269300.1610680941.git.jbaron@akamai.com>
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eR0OjUV7LsWQ_r4o20wSZ0dw0eGs=LJ0htLmwwvcuUP_A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed594696f8e2c2b2bfc747504cee9bbb2a269300.1610680941.git.jbaron@akamai.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 13.01.21 um 00:47 schrieb Jim Mattson:
-> On Wed, Apr 4, 2018 at 10:44 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 04/04/2018 19:35, Stefan Fritsch wrote:
->>> On Wednesday, 4 April 2018 19:24:20 CEST Paolo Bonzini wrote:
->>>> On 04/04/2018 19:10, Konrad Rzeszutek Wilk wrote:
->>>>> Should there be a corresponding test-case?
->>>>
->>>> Good point!  Stefan, could you write one?
->>>
->>> Is there infrastructure for such tests? If yes, can you give me a pointer to
->>> it?
->>
->> Yes, check out x86/emulator.c in
->> https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git.  There is
->> already a movaps test.
-> 
-> Whatever became of this unit test? I don't see it in the
-> kvm-unit-tests repository.
-> 
 
-Sorry, I did not get around to doing this. And it is unlikely that I 
-will have time to do it in the near future.
+On Thu, Jan 14, 2021 at 10:27:54PM -0500, Jason Baron wrote:
 
-Cheers,
-Stefan
+> -static void update_exception_bitmap(struct kvm_vcpu *vcpu)
+> +static void svm_update_exception_bitmap(struct kvm_vcpu *vcpu)
+
+Just to be a total pendant: s/append/Prepend/ on $Subject
