@@ -2,76 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2692F7D24
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:52:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4EB12F7D2B
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:52:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732907AbhAONuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 08:50:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729498AbhAONuc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 08:50:32 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A0FC0613D3
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 05:49:51 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id v15so5688179wrx.4
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 05:49:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MwCX+/EyTCSrIqzhCqb0Nu6BiuSsXwge34YVzpiECe0=;
-        b=VjcRitv3CMagFa+Y7oRVGMasNu01QTKQOEf0nTvP/3Gf7ptnuYGCzLsSwd4RgU49js
-         Hbayh4yJok2iWQK0tnOUUxD1sCExux557Y6uSOFgciPZT2WdibqllBlaw5Ozc/Gux4RY
-         0zK1YMhvvRHRuG7I5gh/9rOF5S1jL2u3SzCt9Guvcn4cNGRmKLLcp5y03BqiLej5joDJ
-         csyWpzfB2gbMbiSmuQy+tSiqIshEK2RoKzOKo6Qrl/n5bVn+GyOgPtDQvJqaRG3TI+ZA
-         RYGWC8y0itpOLoOLuBRTTo47SoYe2e3Vkg53qQHpN93jQM5SUom5gl/w0C3X+mvityFc
-         3row==
+        id S1731611AbhAONvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 08:51:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56847 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731264AbhAONvt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 08:51:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610718623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GClJQCWfDVIp8Abu+51pXYFvR3+SULW6nqe1Zw2Nhco=;
+        b=F+C/Hx6rDj6qxuWxoXF4UDZORvoqvomimmfQoOsHcoZKMBYGVHBSLExAifxSGlvAaOJJBl
+        9+lkUfyfYCNzsEn9TAbCqWGD+UhdB/3cSdgIoQMafk/NPnL9D8VPYFjPIgzaRRq34Bhjnb
+        4p+LlPZHWepEE14XN/D+inHv6mlglS0=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-iEYQ6LsKNcq697ZzCYafEA-1; Fri, 15 Jan 2021 08:50:21 -0500
+X-MC-Unique: iEYQ6LsKNcq697ZzCYafEA-1
+Received: by mail-ej1-f71.google.com with SMTP id p1so3601063ejo.4
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 05:50:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MwCX+/EyTCSrIqzhCqb0Nu6BiuSsXwge34YVzpiECe0=;
-        b=pMt6I911lSw47rjWo3c/0E9tFTcJd9zP/aNQgItu0aZKSedX2M43sEa9GQsXOQVICv
-         oO82dYFOH7VHJY+TC3TD3rSrGoPAS1V9rT5wDsDNod32ojTPDX27AqUD5UZN2tW2aFeE
-         OaZKOt47mNivDQuwUbn6960S3Cfjjps1+5evnl4zDpKh2/ntmXN/QPBFmY211+MNkUsg
-         BFRSDEicn7gd96W+b7Tnsp/qoVDJcasRkrIxVrTvz2DD5sfCi85Dpw3vc5a3azDZQhYD
-         matFnCS+YytMKZAFQdl0Gvt37uyXX2Xkyclm2jiwPzsiv7YjgJQQeWDCVSvaEl0s5oax
-         SnVg==
-X-Gm-Message-State: AOAM531f/wuEB8hxa2iYYEWVkzLhEzl36MtbdgPQ9jdLwyZfDZ1p9m6P
-        UwDrYfLDQIbu4Iy5EkcdWIek9vQ2QDiSA96D
-X-Google-Smtp-Source: ABdhPJx47DQQ53eBz7+PoVimJvsC9mL4EpotLvljQhU4GRwnkF9psc1KK7JJxJzzrvfpgYnJnct4xQ==
-X-Received: by 2002:adf:f707:: with SMTP id r7mr13767163wrp.113.1610718590179;
-        Fri, 15 Jan 2021 05:49:50 -0800 (PST)
-Received: from google.com (230.69.233.35.bc.googleusercontent.com. [35.233.69.230])
-        by smtp.gmail.com with ESMTPSA id g192sm12929770wme.48.2021.01.15.05.49.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jan 2021 05:49:49 -0800 (PST)
-Date:   Fri, 15 Jan 2021 13:49:46 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Cc:     android-kvm@google.com, kernel-team@android.com
-Subject: Re: [PATCH] KVM: Documentation: Fix spec for KVM_CAP_ENABLE_CAP_VM
-Message-ID: <YAGdek8Ns9nRU478@google.com>
-References: <20210108165349.747359-1-qperret@google.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GClJQCWfDVIp8Abu+51pXYFvR3+SULW6nqe1Zw2Nhco=;
+        b=Ro6dLC33RPrUrbLgXyKjSmazJbsW2yEJBt8V9hVEFQsa0GjB5F46O9PJiJBME/mSW/
+         stpPZsBhgN0/d8meBcKd9a0PGd1+XZqyKi6za0hvOXo1bTYuQEcOBaze5aRzJUQIPugD
+         qum6gp0L23c82+gfbrmgbf4ll7QlC8aO75CWq+k00k1Y8xTk22GxhlY1uiGysSpCm+/x
+         Dw6Q0RtpIY20BxzslQLS0nN71+8Hr0atVjcELCyJXDz3I0wpM0EECE+Hao6xqq55XYXt
+         4ltmWQAJtP54h6w5ergaKwaeeAkQ64u7AmwhezPjT/+O6Ovwl0WEl45JXiJRHvzOMUB+
+         b1cQ==
+X-Gm-Message-State: AOAM532ZIB0c1Rivr5mE2VVDxryYORcJuVKQEhrd1tjN+5epsOcuRtZe
+        1q4qbAPtjk9now0h7G+CRL+stPCKoyiJ8oWATyFivuQv3oKwkLokevRgjeSfkT28MKoJ/9bNV4O
+        DLAgxHL/9Ro1W
+X-Received: by 2002:a17:907:3f13:: with SMTP id hq19mr9060269ejc.142.1610718620211;
+        Fri, 15 Jan 2021 05:50:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxKpmIkaYyI1N+J5ZOU1XodqPeFuoNmwqs4aW3Sw/NgHl/VK+y6PQ/FPUfmzNJDpLKJ7aNWYg==
+X-Received: by 2002:a17:907:3f13:: with SMTP id hq19mr9060257ejc.142.1610718620074;
+        Fri, 15 Jan 2021 05:50:20 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id u2sm3461214ejb.65.2021.01.15.05.50.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Jan 2021 05:50:19 -0800 (PST)
+Subject: Re: [PATCH v2 2/3] KVM: x86: introduce definitions to support static
+ calls for kvm_x86_ops
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Jason Baron <jbaron@akamai.com>
+Cc:     seanjc@google.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andrea Arcangeli <aarcange@redhat.com>
+References: <cover.1610680941.git.jbaron@akamai.com>
+ <e5cc82ead7ab37b2dceb0837a514f3f8bea4f8d1.1610680941.git.jbaron@akamai.com>
+ <YAFf2+nvhvWjGImy@hirez.programming.kicks-ass.net>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <84b2f5ba-1a16-cb01-646c-37e25d659650@redhat.com>
+Date:   Fri, 15 Jan 2021 14:50:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210108165349.747359-1-qperret@google.com>
+In-Reply-To: <YAFf2+nvhvWjGImy@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday 08 Jan 2021 at 16:53:49 (+0000), Quentin Perret wrote:
-> The documentation classifies KVM_ENABLE_CAP with KVM_CAP_ENABLE_CAP_VM
-> as a vcpu ioctl, which is incorrect. Fix it by specifying it as a VM
-> ioctl.
+On 15/01/21 10:26, Peter Zijlstra wrote:
+>> +#define KVM_X86_OP(func)					     \
+>> +	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,			     \
+>> +				*(((struct kvm_x86_ops *)0)->func));
+>> +#define KVM_X86_OP_NULL KVM_X86_OP
+>> +#include <asm/kvm-x86-ops.h>
+>> +EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
+>> +EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
+>> +EXPORT_STATIC_CALL_GPL(kvm_x86_tlb_flush_current);
+> Would something like:
+> 
+>    https://lkml.kernel.org/r/20201110103909.GD2594@hirez.programming.kicks-ass.net
+> 
+> Be useful? That way modules can call the static_call() but not change
+> it.
+> 
 
-Anything I should do on this one?
+Maybe not in these cases, but in general there may be cases where we 
+later want to change the static_call (for example replacing jump labels 
+with static_calls).
 
-Thanks,
-Quentin
+Paolo
+
