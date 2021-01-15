@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC20A2F7555
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:28:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29CA72F7558
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:28:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730707AbhAOJ2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1730688AbhAOJ2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 04:28:08 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:10727 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730665AbhAOJ2C (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 15 Jan 2021 04:28:02 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11536 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730633AbhAOJ16 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 04:27:58 -0500
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DHG4z6Q6rzMKkp;
-        Fri, 15 Jan 2021 17:25:55 +0800 (CST)
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DHG503Vc1zl5Kp;
+        Fri, 15 Jan 2021 17:25:56 +0800 (CST)
 Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 15 Jan 2021 17:27:06 +0800
+ 14.3.498.0; Fri, 15 Jan 2021 17:27:07 +0800
 From:   Keqian Zhu <zhukeqian1@huawei.com>
 To:     <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
@@ -38,9 +38,9 @@ CC:     Mark Rutland <mark.rutland@arm.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Alexios Zavras <alexios.zavras@intel.com>,
         <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: [PATCH v2 1/2] vfio/iommu_type1: Populate full dirty when detach non-pinned group
-Date:   Fri, 15 Jan 2021 17:26:42 +0800
-Message-ID: <20210115092643.728-2-zhukeqian1@huawei.com>
+Subject: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when remove vfio_dma
+Date:   Fri, 15 Jan 2021 17:26:43 +0800
+Message-ID: <20210115092643.728-3-zhukeqian1@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
 In-Reply-To: <20210115092643.728-1-zhukeqian1@huawei.com>
 References: <20210115092643.728-1-zhukeqian1@huawei.com>
@@ -52,55 +52,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If a group with non-pinned-page dirty scope is detached with dirty
-logging enabled, we should fully populate the dirty bitmaps at the
-time it's removed since we don't know the extent of its previous DMA,
-nor will the group be present to trigger the full bitmap when the user
-retrieves the dirty bitmap.
+vfio_sanity_check_pfn_list() is used to check whether pfn_list of
+vfio_dma is empty when remove the external domain, so it makes a
+wrong assumption that only external domain will add pfn to dma pfn_list.
 
-Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Now we apply this check when remove a specific vfio_dma and extract
+the notifier check just for external domain.
+
+Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
 Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio_iommu_type1.c | 24 +++++-------------------
+ 1 file changed, 5 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4dedaa9128..4e82b9a3440f 100644
+index 4e82b9a3440f..a9bc15e84a4e 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -236,6 +236,19 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+@@ -958,6 +958,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 
+ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ {
++	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list);
+ 	vfio_unmap_unpin(iommu, dma, true);
+ 	vfio_unlink_dma(iommu, dma);
+ 	put_task_struct(dma->task);
+@@ -2251,23 +2252,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
  	}
  }
  
-+static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
-+{
-+	struct rb_node *n;
-+	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
-+
-+	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
-+		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-+
-+		if (dma->iommu_mapped)
-+			bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
-+	}
-+}
-+
- static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
- {
- 	struct rb_node *n;
-@@ -2415,8 +2428,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	 * Removal of a group without dirty tracking may allow the iommu scope
- 	 * to be promoted.
- 	 */
--	if (update_dirty_scope)
-+	if (update_dirty_scope) {
- 		update_pinned_page_dirty_scope(iommu);
-+		if (iommu->dirty_page_tracking)
-+			vfio_iommu_populate_bitmap_full(iommu);
-+	}
- 	mutex_unlock(&iommu->lock);
- }
+-static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
+-{
+-	struct rb_node *n;
+-
+-	n = rb_first(&iommu->dma_list);
+-	for (; n; n = rb_next(n)) {
+-		struct vfio_dma *dma;
+-
+-		dma = rb_entry(n, struct vfio_dma, node);
+-
+-		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
+-			break;
+-	}
+-	/* mdev vendor driver must unregister notifier */
+-	WARN_ON(iommu->notifier.head);
+-}
+-
+ /*
+  * Called when a domain is removed in detach. It is possible that
+  * the removed domain decided the iova aperture window. Modify the
+@@ -2367,7 +2351,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 			kfree(group);
+ 
+ 			if (list_empty(&iommu->external_domain->group_list)) {
+-				vfio_sanity_check_pfn_list(iommu);
++				/* mdev vendor driver must unregister notifier */
++				WARN_ON(iommu->notifier.head);
+ 
+ 				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+ 					vfio_iommu_unmap_unpin_all(iommu);
+@@ -2491,7 +2476,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
+ 
+ 	if (iommu->external_domain) {
+ 		vfio_release_domain(iommu->external_domain, true);
+-		vfio_sanity_check_pfn_list(iommu);
++		/* mdev vendor driver must unregister notifier */
++		WARN_ON(iommu->notifier.head);
+ 		kfree(iommu->external_domain);
+ 	}
  
 -- 
 2.19.1
