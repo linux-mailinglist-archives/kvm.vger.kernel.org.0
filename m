@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 229EA2F79EB
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 539812F7A01
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:45:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388170AbhAOMi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 07:38:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30348 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387511AbhAOMiZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 07:38:25 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FCVnn5143999;
-        Fri, 15 Jan 2021 07:37:40 -0500
+        id S1732977AbhAOMnl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 07:43:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47346 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388197AbhAOMie (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 07:38:34 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FCXI9p019867;
+        Fri, 15 Jan 2021 07:37:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=EOlOoWT2raHD1+EscM9RXvmuhF3b3l+vzFFX3f8lKzI=;
- b=lCq5MQxlJhV3Bp5E1JpDoId6XfaVx11kJlNQWCz8cMuNshzVefvYhdWipMGSV2tr/s1A
- Hma5R3Qx5EniJL4xY2PdgBVxwCq2PMUmV8qKlxJA4of+qtM0Eo7SW7x0tTfB3zZB8LdJ
- 0xLBKpEDrRyhIThIwwYAjpfsM8Ng2G3N9DIenD/FwbNr4TxOw+V2nw9jLhFrVqccKqqI
- raxZzvkom6emOLRwd3wZPIpVf2yebxmjz+HH3u1mFmHLyohngC5gUhDeRYV8RJqzMVMB
- MMVywbJVRc2/H1ji6yC8HOa6LHtADj6BxvMW7ELKUEaB3V8v5rNM6BzoENg0E2P/2Hd+ 4g== 
+ bh=cUnR5ChKYHPQMwBBkTykL0wWrqbLLjjZ/eDxY+avFM0=;
+ b=jDBhI7HmarTidBPcqOXPwKiP/fu6G454GSYBYn6wAJalCW42rewlDxdQzkWwhWHbIhHN
+ Q8Q3Y8Ui3BYExCp5VpXH4oZ0aQv8a3ZqTb/FSA9C7zLmbZ/bfKk4Fq5ZYK9iQzONtVRR
+ FZq4V6ryD/ElTHLrKh74bZktdjwBJTS2XgVy4e/p/xPbZjZmHO03FPi2Rbf5PhSwUyFn
+ Z1x7VlHqae0I9/22X4C33gHNW3fJJ+NURDlpItAD885OTyxG7esLQI786y4JpjhkzRS2
+ 1HmI19CcJXCXirxMZZ4qaJvoM5Bcq0l0yhoIrTaY+s9VrSPp8Q4dZRB1iHroQchnulhn Jg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 363a3qt3u5-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 363b1dga46-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 07:37:40 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FCVxKj144684;
-        Fri, 15 Jan 2021 07:37:40 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 363a3qt3td-1
+        Fri, 15 Jan 2021 07:37:49 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FCXJhU019965;
+        Fri, 15 Jan 2021 07:37:46 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 363b1dga1m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 07:37:40 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FCbcbk021963;
-        Fri, 15 Jan 2021 12:37:38 GMT
+        Fri, 15 Jan 2021 07:37:45 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FCb0ig025922;
+        Fri, 15 Jan 2021 12:37:39 GMT
 Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 35y448kyek-1
+        by ppma05fra.de.ibm.com with ESMTP id 35y448byvw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 15 Jan 2021 12:37:38 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FCbUiV20971936
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FCbVIJ20971940
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Jan 2021 12:37:30 GMT
+        Fri, 15 Jan 2021 12:37:31 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F1C71AE045;
-        Fri, 15 Jan 2021 12:37:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 7CD0AAE053;
+        Fri, 15 Jan 2021 12:37:36 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90763AE051;
-        Fri, 15 Jan 2021 12:37:35 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 1A593AE056;
+        Fri, 15 Jan 2021 12:37:36 +0000 (GMT)
 Received: from ibm-vm.ibmuc.com (unknown [9.145.4.167])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 Jan 2021 12:37:35 +0000 (GMT)
+        Fri, 15 Jan 2021 12:37:36 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         pbonzini@redhat.com, cohuck@redhat.com, lvivier@redhat.com,
         nadav.amit@gmail.com, krish.sadhukhan@oracle.com
-Subject: [kvm-unit-tests PATCH v2 08/11] lib/alloc_page: rework metadata format
-Date:   Fri, 15 Jan 2021 13:37:27 +0100
-Message-Id: <20210115123730.381612-9-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 09/11] lib/alloc: replace areas with more generic flags
+Date:   Fri, 15 Jan 2021 13:37:28 +0100
+Message-Id: <20210115123730.381612-10-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210115123730.381612-1-imbrenda@linux.ibm.com>
 References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
@@ -70,162 +70,189 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-15_07:2021-01-15,2021-01-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxscore=0 impostorscore=0 adultscore=0 suspectscore=0
- bulkscore=0 spamscore=0 priorityscore=1501 clxscore=1015 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101150075
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 priorityscore=1501 bulkscore=0 adultscore=0
+ mlxlogscore=999 mlxscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101150077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch changes the format of the metadata so that the metadata is
-now a 2-bit field instead of two separate flags.
+Replace the areas parameter with a more generic flags parameter. This
+allows for up to 16 allocation areas and 16 allocation flags.
 
-This allows to have 4 different states for memory:
+This patch introduces the flags and changes the names of the funcions,
+subsequent patches will actually wire up the flags to do something.
 
-STATUS_FRESH: the memory is free and has not been touched at all since
-              boot (not even read from!)
-STATUS_FREE: the memory is free, but it is probably not fresh any more
-STATUS_ALLOCATED: the memory has been allocated and is in use
-STATUS_SPECIAL: the memory has been removed from the pool of allocated
-                memory for some kind of special purpose according to
-                the needs of the caller
+The first two flags introduced are:
+- FLAG_DONTZERO to ask the allocated memory not to be zeroed
+- FLAG_FRESH to indicate that the allocated memory should have not been
+  touched (READ or written to) in any way since boot.
 
-Some macros are also introduced to test the status of a specific
-metadata item.
+This patch also fixes the order of arguments to consistently have alignment
+first and then size, thereby fixing a bug where the two values would get
+swapped.
+
+Fixes: 8131e91a4b61 ("lib/alloc_page: complete rewrite of the page allocator")
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 ---
- lib/alloc_page.c | 49 +++++++++++++++++++++++++++++-------------------
- 1 file changed, 30 insertions(+), 19 deletions(-)
+ lib/alloc_page.h | 39 ++++++++++++++++++++++-----------------
+ lib/alloc_page.c | 16 ++++++++--------
+ lib/s390x/smp.c  |  2 +-
+ 3 files changed, 31 insertions(+), 26 deletions(-)
 
+diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+index 6fd2ff0..1af1419 100644
+--- a/lib/alloc_page.h
++++ b/lib/alloc_page.h
+@@ -11,8 +11,13 @@
+ #include <stdbool.h>
+ #include <asm/memory_areas.h>
+ 
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#define AREA_ANY_NUMBER	0xff
++
++#define AREA_ANY	0x00000
++#define AREA_MASK	0x0ffff
++
++#define FLAG_DONTZERO	0x10000
++#define FLAG_FRESH	0x20000
+ 
+ /* Returns true if the page allocator has been initialized */
+ bool page_alloc_initialized(void);
+@@ -30,39 +35,39 @@ void page_alloc_init_area(u8 n, phys_addr_t base_pfn, phys_addr_t top_pfn);
+ void page_alloc_ops_enable(void);
+ 
+ /*
+- * Allocate aligned memory from the specified areas.
+- * areas is a bitmap of allowed areas
++ * Allocate aligned memory with the specified flags.
++ * flags is a bitmap of allowed areas and flags.
+  * alignment must be a power of 2
+  */
+-void *memalign_pages_area(unsigned int areas, size_t alignment, size_t size);
++void *memalign_pages_flags(size_t alignment, size_t size, unsigned int flags);
+ 
+ /*
+- * Allocate aligned memory from any area.
+- * Equivalent to memalign_pages_area(AREA_ANY, alignment, size).
++ * Allocate aligned memory from any area and with default flags.
++ * Equivalent to memalign_pages_flags(alignment, size, AREA_ANY).
+  */
+ static inline void *memalign_pages(size_t alignment, size_t size)
+ {
+-	return memalign_pages_area(AREA_ANY, alignment, size);
++	return memalign_pages_flags(alignment, size, AREA_ANY);
+ }
+ 
+ /*
+- * Allocate naturally aligned memory from the specified areas.
+- * Equivalent to memalign_pages_area(areas, 1ull << order, 1ull << order).
++ * Allocate 1ull << order naturally aligned pages with the specified flags.
++ * Equivalent to memalign_pages_flags(1ull << order, 1ull << order, flags).
+  */
+-void *alloc_pages_area(unsigned int areas, unsigned int order);
++void *alloc_pages_flags(unsigned int order, unsigned int flags);
+ 
+ /*
+- * Allocate naturally aligned pages from any area; the number of allocated
+- * pages is 1 << order.
+- * Equivalent to alloc_pages_area(AREA_ANY, order);
++ * Allocate 1ull << order naturally aligned pages from any area and with
++ * default flags.
++ * Equivalent to alloc_pages_flags(order, AREA_ANY);
+  */
+ static inline void *alloc_pages(unsigned int order)
+ {
+-	return alloc_pages_area(AREA_ANY, order);
++	return alloc_pages_flags(order, AREA_ANY);
+ }
+ 
+ /*
+- * Allocate one page from any area.
++ * Allocate one page from any area and with default flags.
+  * Equivalent to alloc_pages(0);
+  */
+ static inline void *alloc_page(void)
+@@ -83,7 +88,7 @@ void free_pages(void *mem);
+  */
+ static inline void free_page(void *mem)
+ {
+-	return free_pages(mem);
++	free_pages(mem);
+ }
+ 
+ /*
 diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-index 37f28ce..d8b2758 100644
+index d8b2758..47e2981 100644
 --- a/lib/alloc_page.c
 +++ b/lib/alloc_page.c
-@@ -18,9 +18,20 @@
- #define IS_ALIGNED_ORDER(x,order) IS_ALIGNED((x),BIT_ULL(order))
- #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
+@@ -361,16 +361,16 @@ void unreserve_pages(phys_addr_t addr, size_t n)
+ 	spin_unlock(&lock);
+ }
  
--#define ORDER_MASK	0x3f
--#define ALLOC_MASK	0x40
--#define SPECIAL_MASK	0x80
-+#define ORDER_MASK		0x3f
-+#define STATUS_MASK		0xc0
-+
-+#define STATUS_FRESH		0x00
-+#define STATUS_FREE		0x40
-+#define STATUS_ALLOCATED	0x80
-+#define STATUS_SPECIAL		0xc0
-+
-+#define IS_FRESH(x)	(((x) & STATUS_MASK) == STATUS_FRESH)
-+#define IS_FREE(x)	(((x) & STATUS_MASK) == STATUS_FREE)
-+#define IS_ALLOCATED(x)	(((x) & STATUS_MASK) == STATUS_ALLOCATED)
-+#define IS_SPECIAL(x)	(((x) & STATUS_MASK) == STATUS_SPECIAL)
-+
-+#define IS_USABLE(x)	(IS_FREE(x) || IS_FRESH(x))
- 
- typedef phys_addr_t pfn_t;
- 
-@@ -87,14 +98,14 @@ static inline bool usable_area_contains_pfn(struct mem_area *a, pfn_t pfn)
-  */
- static void split(struct mem_area *a, void *addr)
+-static void *page_memalign_order_area(unsigned area, u8 ord, u8 al)
++static void *page_memalign_order_flags(u8 al, u8 ord, u32 flags)
  {
--	pfn_t pfn = virt_to_pfn(addr);
--	pfn_t i, idx;
--	u8 order;
-+	pfn_t i, idx, pfn = virt_to_pfn(addr);
-+	u8 metadata, order;
+ 	void *res = NULL;
+-	int i;
++	int i, area;
  
- 	assert(a && usable_area_contains_pfn(a, pfn));
- 	idx = pfn - a->base;
--	order = a->page_states[idx];
--	assert(!(order & ~ORDER_MASK) && order && (order < NLISTS));
-+	metadata = a->page_states[idx];
-+	order = metadata & ORDER_MASK;
-+	assert(IS_USABLE(metadata) && order && (order < NLISTS));
- 	assert(IS_ALIGNED_ORDER(pfn, order));
- 	assert(usable_area_contains_pfn(a, pfn + BIT(order) - 1));
- 
-@@ -103,8 +114,8 @@ static void split(struct mem_area *a, void *addr)
- 
- 	/* update the block size for each page in the block */
- 	for (i = 0; i < BIT(order); i++) {
--		assert(a->page_states[idx + i] == order);
--		a->page_states[idx + i] = order - 1;
-+		assert(a->page_states[idx + i] == metadata);
-+		a->page_states[idx + i] = metadata - 1;
- 	}
- 	if ((order == a->max_order) && (is_list_empty(a->freelists + order)))
- 		a->max_order--;
-@@ -149,7 +160,7 @@ static void *page_memalign_order(struct mem_area *a, u8 al, u8 sz)
- 		split(a, p);
- 
- 	list_remove(p);
--	memset(a->page_states + (virt_to_pfn(p) - a->base), ALLOC_MASK | order, BIT(order));
-+	memset(a->page_states + (virt_to_pfn(p) - a->base), STATUS_ALLOCATED | order, BIT(order));
- 	return p;
+ 	spin_lock(&lock);
+-	area &= areas_mask;
++	area = (flags & AREA_MASK) ? flags & areas_mask : areas_mask;
+ 	for (i = 0; !res && (i < MAX_AREAS); i++)
+ 		if (area & BIT(i))
+-			res = page_memalign_order(areas + i, ord, al);
++			res = page_memalign_order(areas + i, al, ord);
+ 	spin_unlock(&lock);
+ 	return res;
+ }
+@@ -379,23 +379,23 @@ static void *page_memalign_order_area(unsigned area, u8 ord, u8 al)
+  * Allocates (1 << order) physically contiguous and naturally aligned pages.
+  * Returns NULL if the allocation was not possible.
+  */
+-void *alloc_pages_area(unsigned int area, unsigned int order)
++void *alloc_pages_flags(unsigned int order, unsigned int flags)
+ {
+-	return page_memalign_order_area(area, order, order);
++	return page_memalign_order_flags(order, order, flags);
  }
  
-@@ -243,7 +254,7 @@ static void _free_pages(void *mem)
- 	order = a->page_states[p] & ORDER_MASK;
- 
- 	/* ensure that the first page is allocated and not special */
--	assert(a->page_states[p] == (order | ALLOC_MASK));
-+	assert(IS_ALLOCATED(a->page_states[p]));
- 	/* ensure that the order has a sane value */
- 	assert(order < NLISTS);
- 	/* ensure that the block is aligned properly for its size */
-@@ -253,9 +264,9 @@ static void _free_pages(void *mem)
- 
- 	for (i = 0; i < BIT(order); i++) {
- 		/* check that all pages of the block have consistent metadata */
--		assert(a->page_states[p + i] == (ALLOC_MASK | order));
-+		assert(a->page_states[p + i] == (STATUS_ALLOCATED | order));
- 		/* set the page as free */
--		a->page_states[p + i] &= ~ALLOC_MASK;
-+		a->page_states[p + i] = STATUS_FREE | order;
- 	}
- 	/* provisionally add the block to the appropriate free list */
- 	list_add(a->freelists + order, mem);
-@@ -294,13 +305,13 @@ static int _reserve_one_page(pfn_t pfn)
- 	if (!a)
- 		return -1;
- 	i = pfn - a->base;
--	if (a->page_states[i] & (ALLOC_MASK | SPECIAL_MASK))
-+	if (!IS_USABLE(a->page_states[i]))
- 		return -1;
- 	while (a->page_states[i]) {
- 		mask = GENMASK_ULL(63, a->page_states[i]);
- 		split(a, pfn_to_virt(pfn & mask));
- 	}
--	a->page_states[i] = SPECIAL_MASK;
-+	a->page_states[i] = STATUS_SPECIAL;
- 	return 0;
+ /*
+  * Allocates (1 << order) physically contiguous aligned pages.
+  * Returns NULL if the allocation was not possible.
+  */
+-void *memalign_pages_area(unsigned int area, size_t alignment, size_t size)
++void *memalign_pages_flags(size_t alignment, size_t size, unsigned int flags)
+ {
+ 	assert(is_power_of_2(alignment));
+ 	alignment = get_order(PAGE_ALIGN(alignment) >> PAGE_SHIFT);
+ 	size = get_order(PAGE_ALIGN(size) >> PAGE_SHIFT);
+ 	assert(alignment < NLISTS);
+ 	assert(size < NLISTS);
+-	return page_memalign_order_area(area, size, alignment);
++	return page_memalign_order_flags(alignment, size, flags);
  }
  
-@@ -312,8 +323,8 @@ static void _unreserve_one_page(pfn_t pfn)
- 	a = get_area(pfn);
- 	assert(a);
- 	i = pfn - a->base;
--	assert(a->page_states[i] == SPECIAL_MASK);
--	a->page_states[i] = ALLOC_MASK;
-+	assert(a->page_states[i] == STATUS_SPECIAL);
-+	a->page_states[i] = STATUS_ALLOCATED;
- 	_free_pages(pfn_to_virt(pfn));
- }
  
-@@ -477,7 +488,7 @@ static void _page_alloc_init_area(u8 n, pfn_t start_pfn, pfn_t top_pfn)
- 			order++;
- 		assert(order < NLISTS);
- 		/* initialize the metadata and add to the freelist */
--		memset(a->page_states + (i - a->base), order, BIT(order));
-+		memset(a->page_states + (i - a->base), STATUS_FRESH | order, BIT(order));
- 		list_add(a->freelists + order, pfn_to_virt(i));
- 		if (order > a->max_order)
- 			a->max_order = order;
+diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+index 77d80ca..44b2eb4 100644
+--- a/lib/s390x/smp.c
++++ b/lib/s390x/smp.c
+@@ -190,7 +190,7 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+ 
+ 	sigp_retry(cpu->addr, SIGP_INITIAL_CPU_RESET, 0, NULL);
+ 
+-	lc = alloc_pages_area(AREA_DMA31, 1);
++	lc = alloc_pages_flags(1, AREA_DMA31);
+ 	cpu->lowcore = lc;
+ 	memset(lc, 0, PAGE_SIZE * 2);
+ 	sigp_retry(cpu->addr, SIGP_SET_PREFIX, (unsigned long )lc, NULL);
 -- 
 2.26.2
 
