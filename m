@@ -2,81 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D55A82F79D3
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:42:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2F232F7AF2
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:58:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387726AbhAOMl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 07:41:27 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57706 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732140AbhAOMl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 07:41:26 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 32570AC8F;
-        Fri, 15 Jan 2021 12:40:44 +0000 (UTC)
-Date:   Fri, 15 Jan 2021 13:40:38 +0100
-From:   Borislav Petkov <bp@suse.de>
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@kernel.org,
-        x86@kernel.org, len.brown@intel.com, dave.hansen@intel.com,
-        jing2.liu@intel.com, ravi.v.shankar@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 01/21] x86/fpu/xstate: Modify initialization helper to
- handle both static and dynamic buffers
-Message-ID: <20210115124038.GA11337@zn.tnic>
-References: <20201223155717.19556-1-chang.seok.bae@intel.com>
- <20201223155717.19556-2-chang.seok.bae@intel.com>
+        id S2387822AbhAOM4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 07:56:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22311 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2387552AbhAOM4L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 07:56:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610715284;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/3464aNY1pSNVMl9kXj2bqfBR/O9eQZd6QX4BTIBIyk=;
+        b=D86eI3LZEFTiLtg/8gLTPuaYfbiFyIOfSNT5OfeeARUAghg1FraN2t+zIUjU35xgcn+g9s
+        f4jTHw4kL69H/GrNKb5x+/bVmY7++DpU8StSw5QlS43KPnwWYYerOGEVFDMPvuVSJM56DL
+        Vp/rMMokVEuMEVN6zDEKjUHKhu95iGo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-vabXa1jcOJCjssgG9Fnheg-1; Fri, 15 Jan 2021 07:54:41 -0500
+X-MC-Unique: vabXa1jcOJCjssgG9Fnheg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FCD4DF8A4;
+        Fri, 15 Jan 2021 12:54:38 +0000 (UTC)
+Received: from gondolin (ovpn-114-124.ams2.redhat.com [10.36.114.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 40EAE60CCE;
+        Fri, 15 Jan 2021 12:54:27 +0000 (UTC)
+Date:   Fri, 15 Jan 2021 13:54:25 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
+        pasic@linux.ibm.com, qemu-devel@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
+        jun.nakajima@intel.com, thuth@redhat.com,
+        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
+        berrange@redhat.com, andi.kleen@intel.com
+Subject: Re: [PATCH v7 03/13] sev: Remove false abstraction of flash
+ encryption
+Message-ID: <20210115135425.7fd94aed.cohuck@redhat.com>
+In-Reply-To: <20210113235811.1909610-4-david@gibson.dropbear.id.au>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+        <20210113235811.1909610-4-david@gibson.dropbear.id.au>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201223155717.19556-2-chang.seok.bae@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 23, 2020 at 07:56:57AM -0800, Chang S. Bae wrote:
-> In preparation for dynamic xstate buffer expansion, update the buffer
-> initialization function parameters to equally handle static in-line xstate
-> buffer, as well as dynamically allocated xstate buffer.
+On Thu, 14 Jan 2021 10:58:01 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> When AMD's SEV memory encryption is in use, flash memory banks (which are
+> initialed by pc_system_flash_map()) need to be encrypted with the guest's
+> key, so that the guest can read them.
 > 
-> init_fpstate is a special case, which is indicated by a null pointer
-> parameter to fpstate_init().
+> That's abstracted via the kvm_memcrypt_encrypt_data() callback in the KVM
+> state.. except, that it doesn't really abstract much at all.
 > 
-> Also, fpstate_init_xstate() now accepts the state component bitmap to
-> configure XCOMP_BV for the compacted format.
+> For starters, the only called is in code specific to the 'pc' family of
+
+s/called/call site/
+
+> machine types, so it's obviously specific to those and to x86 to begin
+> with.  But it makes a bunch of further assumptions that need not be true
+> about an arbitrary confidential guest system based on memory encryption,
+> let alone one based on other mechanisms:
 > 
-> No functional change.
+>  * it assumes that the flash memory is defined to be encrypted with the
+>    guest key, rather than being shared with hypervisor
+>  * it assumes that that hypervisor has some mechanism to encrypt data into
+>    the guest, even though it can't decrypt it out, since that's the whole
+>    point
+>  * the interface assumes that this encrypt can be done in place, which
+>    implies that the hypervisor can write into a confidential guests's
+>    memory, even if what it writes isn't meaningful
+> 
+> So really, this "abstraction" is actually pretty specific to the way SEV
+> works.  So, this patch removes it and instead has the PC flash
+> initialization code call into a SEV specific callback.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  accel/kvm/kvm-all.c    | 31 ++-----------------------------
+>  accel/kvm/sev-stub.c   |  9 ++-------
+>  accel/stubs/kvm-stub.c | 10 ----------
+>  hw/i386/pc_sysfw.c     | 17 ++++++-----------
+>  include/sysemu/kvm.h   | 16 ----------------
+>  include/sysemu/sev.h   |  4 ++--
+>  target/i386/sev-stub.c |  5 +++++
+>  target/i386/sev.c      | 24 ++++++++++++++----------
+>  8 files changed, 31 insertions(+), 85 deletions(-)
 
-Much better, thanks!
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-> diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-> index eb86a2b831b1..f23e5ffbb307 100644
-> --- a/arch/x86/kernel/fpu/core.c
-> +++ b/arch/x86/kernel/fpu/core.c
-> @@ -191,8 +191,16 @@ static inline void fpstate_init_fstate(struct fregs_state *fp)
->  	fp->fos = 0xffff0000u;
->  }
->  
-> -void fpstate_init(union fpregs_state *state)
-> +/* A null pointer parameter indicates init_fpstate. */
-
-Use kernel-doc comment style instead:
-
-/**
- * ..
- *
- * @fpu: If NULL, use init_fpstate
- */
-
-> +void fpstate_init(struct fpu *fpu)
->  {
-
-...
-
--- 
-Regards/Gruss,
-    Boris.
-
-SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 36809, AG Nürnberg
