@@ -2,138 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 990B52F7C89
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:27:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 764412F7CC0
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:34:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728850AbhAON0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 08:26:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48454 "EHLO
+        id S1731558AbhAONde (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 08:33:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33453 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727357AbhAON0R (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 08:26:17 -0500
+        by vger.kernel.org with ESMTP id S1728593AbhAONde (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 08:33:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610717108;
+        s=mimecast20190719; t=1610717527;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OqVraxmBxo/QEMnN9aS1B5uOZPCcZuh8wG8HP5EzsXo=;
-        b=AIWBNR68l0EeMp6wvKGEVA/3OLnWaM90sun5551UvUXpC9c1aa5kfv/2fCSJyjJE41bhJc
-        ankk2arQc01XT1LvXUYf+pPtSK1vvzfgqEICVXhdYl+bUMVvf9OYcpwgVFauEcoxXUqEDI
-        oeCX/UdWkrrxcNSjO1PNlAyT5FQI2tQ=
+        bh=5HCnbtOR2YZKl8SmO/vRRs2V1v5j3Fbmpdg9s5YGS+w=;
+        b=XM9WG52i24ZDnjIK9p3pirdebGAdisoyijbvfiuRcV6bhi8g6vDVilUz2QRCHK74LtMjUD
+        3RQBU5CS7fd9y5JKECwBGGW8Pmbs7sbzDYLWCz7FamZUa0A6slsOxfxvpc3d1ch9VxtlZB
+        qn5mMwZwLejS2AOMex+817/GTjrgA6g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-ptmG1eohN56WS8l6Cr87RQ-1; Fri, 15 Jan 2021 08:25:04 -0500
-X-MC-Unique: ptmG1eohN56WS8l6Cr87RQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-267-2yivXdr3MJ-qMGIkSdE-3g-1; Fri, 15 Jan 2021 08:32:03 -0500
+X-MC-Unique: 2yivXdr3MJ-qMGIkSdE-3g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15EBACE665;
-        Fri, 15 Jan 2021 13:25:02 +0000 (UTC)
-Received: from gondolin (ovpn-114-124.ams2.redhat.com [10.36.114.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 22FF06F44C;
-        Fri, 15 Jan 2021 13:24:27 +0000 (UTC)
-Date:   Fri, 15 Jan 2021 14:24:25 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
-        pasic@linux.ibm.com, qemu-devel@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
-        jun.nakajima@intel.com, thuth@redhat.com,
-        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
-        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
-        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
-        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
-        berrange@redhat.com, andi.kleen@intel.com
-Subject: Re: [PATCH v7 08/13] confidential guest support: Move SEV
- initialization into arch specific code
-Message-ID: <20210115142425.540b6126.cohuck@redhat.com>
-In-Reply-To: <20210113235811.1909610-9-david@gibson.dropbear.id.au>
-References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
-        <20210113235811.1909610-9-david@gibson.dropbear.id.au>
-Organization: Red Hat GmbH
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 593BA195D560;
+        Fri, 15 Jan 2021 13:32:01 +0000 (UTC)
+Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 058D6608BA;
+        Fri, 15 Jan 2021 13:31:58 +0000 (UTC)
+Subject: Re: [PATCH 4/6] KVM: arm64: Refactor filtering of ID registers
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+References: <20210114105633.2558739-1-maz@kernel.org>
+ <20210114105633.2558739-5-maz@kernel.org>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <143efd5f-0641-8ed1-f055-df6e1d5216d8@redhat.com>
+Date:   Fri, 15 Jan 2021 14:31:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210114105633.2558739-5-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 14 Jan 2021 10:58:06 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Hi Marc,
 
-> While we've abstracted some (potential) differences between mechanisms for
-> securing guest memory, the initialization is still specific to SEV.  Given
-> that, move it into x86's kvm_arch_init() code, rather than the generic
-> kvm_init() code.
+On 1/14/21 11:56 AM, Marc Zyngier wrote:
+> Our current ID register filtering is starting to be a mess of if()
+> statements, and isn't going to get any saner.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Let's turn it into a switch(), which has a chance of being more
+> readable, and introduce a FEATURE() macro that allows easy generation
+> of feature masks.
+> 
+> No functionnal change intended.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+
 > ---
->  accel/kvm/kvm-all.c   | 14 --------------
->  accel/kvm/sev-stub.c  |  4 ++--
->  target/i386/kvm/kvm.c | 12 ++++++++++++
->  target/i386/sev.c     |  7 ++++++-
->  4 files changed, 20 insertions(+), 17 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 51 +++++++++++++++++++++------------------
+>  1 file changed, 28 insertions(+), 23 deletions(-)
 > 
-
-(...)
-
-> @@ -2135,6 +2136,17 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      uint64_t shadow_mem;
->      int ret;
->      struct utsname utsname;
-> +    Error *local_err = NULL;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2bea0494b81d..dda16d60197b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -9,6 +9,7 @@
+>   *          Christoffer Dall <c.dall@virtualopensystems.com>
+>   */
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/bsearch.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/mm.h>
+> @@ -1016,6 +1017,8 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
 > +
-> +    /*
-> +     * if memory encryption object is specified then initialize the
-> +     * memory encryption context (no-op otherwise)
-> +     */
-> +    ret = sev_kvm_init(ms->cgs, &local_err);
-
-Maybe still leave a comment here, as the code will still need to be
-modified to handle non-SEV x86 mechanisms?
-
-> +    if (ret < 0) {
-> +        error_report_err(local_err);
-> +        return ret;
-> +    }
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+>  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		struct sys_reg_desc const *r, bool raz)
+> @@ -1024,36 +1027,38 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+>  	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
 >  
->      if (!kvm_check_extension(s, KVM_CAP_IRQ_ROUTING)) {
->          error_report("kvm: KVM_CAP_IRQ_ROUTING not supported by KVM");
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 3d94635397..aa79cacabe 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -664,13 +664,18 @@ sev_vm_state_change(void *opaque, int running, RunState state)
+> -	if (id == SYS_ID_AA64PFR0_EL1) {
+> +	switch (id) {
+> +	case SYS_ID_AA64PFR0_EL1:
+>  		if (!vcpu_has_sve(vcpu))
+> -			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+> -		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+> -		val &= ~(0xfUL << ID_AA64PFR0_CSV2_SHIFT);
+> -		val |= ((u64)vcpu->kvm->arch.pfr0_csv2 << ID_AA64PFR0_CSV2_SHIFT);
+> -		val &= ~(0xfUL << ID_AA64PFR0_CSV3_SHIFT);
+> -		val |= ((u64)vcpu->kvm->arch.pfr0_csv3 << ID_AA64PFR0_CSV3_SHIFT);
+> -	} else if (id == SYS_ID_AA64PFR1_EL1) {
+> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+> -	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+> -		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+> -			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+> -			 (0xfUL << ID_AA64ISAR1_GPA_SHIFT) |
+> -			 (0xfUL << ID_AA64ISAR1_GPI_SHIFT));
+> -	} else if (id == SYS_ID_AA64DFR0_EL1) {
+> -		u64 cap = 0;
+> -
+> +			val &= ~FEATURE(ID_AA64PFR0_SVE);
+> +		val &= ~FEATURE(ID_AA64PFR0_AMU);
+> +		val &= ~FEATURE(ID_AA64PFR0_CSV2);
+> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+> +		val &= ~FEATURE(ID_AA64PFR0_CSV3);
+> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+> +		break;
+> +	case SYS_ID_AA64PFR1_EL1:
+> +		val &= ~FEATURE(ID_AA64PFR1_MTE);
+> +		break;
+> +	case SYS_ID_AA64ISAR1_EL1:
+> +		if (!vcpu_has_ptrauth(vcpu))
+> +			val &= ~(FEATURE(ID_AA64ISAR1_APA) |
+> +				 FEATURE(ID_AA64ISAR1_API) |
+> +				 FEATURE(ID_AA64ISAR1_GPA) |
+> +				 FEATURE(ID_AA64ISAR1_GPI));
+> +		break;
+> +	case SYS_ID_AA64DFR0_EL1:
+>  		/* Limit guests to PMUv3 for ARMv8.1 */
+> -		if (kvm_vcpu_has_pmu(vcpu))
+> -			cap = ID_AA64DFR0_PMUVER_8_1;
+> -
+>  		val = cpuid_feature_cap_perfmon_field(val,
+> -						ID_AA64DFR0_PMUVER_SHIFT,
+> -						cap);
+so you did the change evoked in my previous comment here.
+> -	} else if (id == SYS_ID_DFR0_EL1) {
+> +						      ID_AA64DFR0_PMUVER_SHIFT,
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+> +		break;
+> +	case SYS_ID_DFR0_EL1:
+>  		/* Limit guests to PMUv3 for ARMv8.1 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_DFR0_PERFMON_SHIFT,
+>  						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
+> +		break;
+>  	}
 >  
->  int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
->  {
-> -    SevGuestState *sev = SEV_GUEST(cgs);
-> +    SevGuestState *sev
-> +        = (SevGuestState *)object_dynamic_cast(OBJECT(cgs), TYPE_SEV_GUEST);
+>  	return val;
+> 
+Looks indeed more readable
 
-This looks a bit ugly; maybe we want the generic code to generate a
-separate version of the cast macro that doesn't assert? Just cosmetics,
-though.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
->      char *devname;
->      int ret, fw_error;
->      uint32_t ebx;
->      uint32_t host_cbitpos;
->      struct sev_user_data_status status = {};
->  
-> +    if (!sev) {
-> +        return 0;
-> +    }
-> +
->      ret = ram_block_discard_disable(true);
->      if (ret) {
->          error_report("%s: cannot disable RAM discard", __func__);
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Eric
 
