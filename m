@@ -2,76 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C16CC2F75C5
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:48:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52B2A2F75F5
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:54:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729332AbhAOJrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 04:47:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59856 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728828AbhAOJrr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 04:47:47 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3537C061757;
-        Fri, 15 Jan 2021 01:47:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=u+9qKbdLTbihydxXPBHhixLKpJmqcDJjB4iyY7fOB4E=; b=GsRJs85DDYl2xoYosCony1sBvg
-        kb6wMsVR6Wnti22lY65CdS7GCc3gOHJUlXhdeh0Zk3BgDlR5pk0cB9HckmpXt+pR/4DzETBuWJRq1
-        XwbZZktqPvjrNsdcm+FEBmB6ZNJqP24MA0DHUhYCOfgJJJw3JD00eEerWuTb6t6dfEzO+pNJsUFDt
-        ac46mYSLaGFxg2IHWHovmYsWBpxTQlKKBNC6Vsfl5ewh5+Xcs/W90AQeHlK6SoeNKizatklsZE0jU
-        HNlgR2cGqC+ZHCWqDoAamG7t/bMByGtD3u8cVrP0y3lajvdtg4OcT1fSfz6JJBULCtxmsWnPMD3FP
-        rGUTVR+w==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l0Lfy-008kAX-EL; Fri, 15 Jan 2021 09:46:04 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CF5E3305CC3;
-        Fri, 15 Jan 2021 10:45:49 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A9A0620B5D691; Fri, 15 Jan 2021 10:45:49 +0100 (CET)
-Date:   Fri, 15 Jan 2021 10:45:49 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Jason Baron <jbaron@akamai.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
+        id S1730380AbhAOJyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 04:54:10 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11539 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725917AbhAOJyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 04:54:09 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DHGgC2fHkzMKkq;
+        Fri, 15 Jan 2021 17:52:07 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 15 Jan 2021 17:53:16 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+CC:     Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [PATCH v2 3/3] KVM: x86: use static calls to reduce kvm_x86_ops
- overhead
-Message-ID: <YAFkTSnSut1h/jWt@hirez.programming.kicks-ass.net>
-References: <cover.1610680941.git.jbaron@akamai.com>
- <e057bf1b8a7ad15652df6eeba3f907ae758d3399.1610680941.git.jbaron@akamai.com>
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: [PATCH] kvm: arm64: Properly align the end address of table walk
+Date:   Fri, 15 Jan 2021 17:53:07 +0800
+Message-ID: <20210115095307.12912-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e057bf1b8a7ad15652df6eeba3f907ae758d3399.1610680941.git.jbaron@akamai.com>
+Content-Type: text/plain
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 10:27:56PM -0500, Jason Baron wrote:
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 5060922..9d4492b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1350,7 +1350,7 @@ void kvm_arch_free_vm(struct kvm *kvm);
->  static inline int kvm_arch_flush_remote_tlb(struct kvm *kvm)
->  {
->  	if (kvm_x86_ops.tlb_remote_flush &&
-> -	    !kvm_x86_ops.tlb_remote_flush(kvm))
-> +	    !static_call(kvm_x86_tlb_remote_flush)(kvm))
->  		return 0;
->  	else
->  		return -ENOTSUPP;
+When align the end address, ought to use its original value.
 
-Would you be able to use something like this?
+Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  https://lkml.kernel.org/r/20201110101307.GO2651@hirez.programming.kicks-ass.net
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..670b0ef12440 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -296,7 +296,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	struct kvm_pgtable_walk_data walk_data = {
+ 		.pgt	= pgt,
+ 		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
+-		.end	= PAGE_ALIGN(walk_data.addr + size),
++		.end	= PAGE_ALIGN(addr + size),
+ 		.walker	= walker,
+ 	};
+ 
+-- 
+2.19.1
 
-we could also add __static_call_return1(), if that would help.
