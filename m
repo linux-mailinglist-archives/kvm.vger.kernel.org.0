@@ -2,125 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29CA72F7558
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:28:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 414002F7568
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:30:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730688AbhAOJ2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 04:28:08 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:10727 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730665AbhAOJ2C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 04:28:02 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DHG503Vc1zl5Kp;
-        Fri, 15 Jan 2021 17:25:56 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 15 Jan 2021 17:27:07 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-CC:     Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+        id S1731127AbhAOJ2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 04:28:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729172AbhAOJ2y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 04:28:54 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3051C061757;
+        Fri, 15 Jan 2021 01:28:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=U+hG/mavMZpvfSPes2gpdEM/EjKu6huLCmLOLZQWXjA=; b=OJ7jgDXGo0Ik4ORSM8YvJSayxh
+        hFqdmOcTH6vmfY/l6woP1JAEx0bMJGdMXg+fU8tf+8ermNzXy0kw+9/WagVzwLdFmP3aOqRTwo+F9
+        Yyr+3Pendd/SpmTDpCcT7fEGG/nZd80l39UTleeZZgil0IXO41zchyqTrCAdQosrFtpe2L3JR3RUZ
+        UGQ+pY9SWRTQNoOyKEotY9O6g+GwiiP0knYIrIwUQXT4uZOXB6KvfuayEc8XoPHntWjcyuI2fsrix
+        nUIdixT9M3099O2QDmkrzelDk7+A5MPMksWOhUussvQ7+tUDUCDOo9bBP5vh4jnyb89alMt7Dg30s
+        cbnxFM8w==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l0LNc-008j2a-49; Fri, 15 Jan 2021 09:27:07 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C13C0301324;
+        Fri, 15 Jan 2021 10:26:51 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A5D83200E0BD2; Fri, 15 Jan 2021 10:26:51 +0100 (CET)
+Date:   Fri, 15 Jan 2021 10:26:51 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Jason Baron <jbaron@akamai.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when remove vfio_dma
-Date:   Fri, 15 Jan 2021 17:26:43 +0800
-Message-ID: <20210115092643.728-3-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210115092643.728-1-zhukeqian1@huawei.com>
-References: <20210115092643.728-1-zhukeqian1@huawei.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andrea Arcangeli <aarcange@redhat.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86: introduce definitions to support static
+ calls for kvm_x86_ops
+Message-ID: <YAFf2+nvhvWjGImy@hirez.programming.kicks-ass.net>
+References: <cover.1610680941.git.jbaron@akamai.com>
+ <e5cc82ead7ab37b2dceb0837a514f3f8bea4f8d1.1610680941.git.jbaron@akamai.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5cc82ead7ab37b2dceb0837a514f3f8bea4f8d1.1610680941.git.jbaron@akamai.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_sanity_check_pfn_list() is used to check whether pfn_list of
-vfio_dma is empty when remove the external domain, so it makes a
-wrong assumption that only external domain will add pfn to dma pfn_list.
+On Thu, Jan 14, 2021 at 10:27:55PM -0500, Jason Baron wrote:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 3f7c1fc..c21927f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -113,6 +113,15 @@ static int sync_regs(struct kvm_vcpu *vcpu);
+>  struct kvm_x86_ops kvm_x86_ops __read_mostly;
+>  EXPORT_SYMBOL_GPL(kvm_x86_ops);
+>  
+> +#define KVM_X86_OP(func)					     \
+> +	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,			     \
+> +				*(((struct kvm_x86_ops *)0)->func));
+> +#define KVM_X86_OP_NULL KVM_X86_OP
+> +#include <asm/kvm-x86-ops.h>
+> +EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
+> +EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
+> +EXPORT_STATIC_CALL_GPL(kvm_x86_tlb_flush_current);
 
-Now we apply this check when remove a specific vfio_dma and extract
-the notifier check just for external domain.
+Would something like:
 
-Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- drivers/vfio/vfio_iommu_type1.c | 24 +++++-------------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+  https://lkml.kernel.org/r/20201110103909.GD2594@hirez.programming.kicks-ass.net
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 4e82b9a3440f..a9bc15e84a4e 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -958,6 +958,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- {
-+	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list);
- 	vfio_unmap_unpin(iommu, dma, true);
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
-@@ -2251,23 +2252,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
- 	}
- }
- 
--static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
--{
--	struct rb_node *n;
--
--	n = rb_first(&iommu->dma_list);
--	for (; n; n = rb_next(n)) {
--		struct vfio_dma *dma;
--
--		dma = rb_entry(n, struct vfio_dma, node);
--
--		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
--			break;
--	}
--	/* mdev vendor driver must unregister notifier */
--	WARN_ON(iommu->notifier.head);
--}
--
- /*
-  * Called when a domain is removed in detach. It is possible that
-  * the removed domain decided the iova aperture window. Modify the
-@@ -2367,7 +2351,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 			kfree(group);
- 
- 			if (list_empty(&iommu->external_domain->group_list)) {
--				vfio_sanity_check_pfn_list(iommu);
-+				/* mdev vendor driver must unregister notifier */
-+				WARN_ON(iommu->notifier.head);
- 
- 				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
- 					vfio_iommu_unmap_unpin_all(iommu);
-@@ -2491,7 +2476,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
- 
- 	if (iommu->external_domain) {
- 		vfio_release_domain(iommu->external_domain, true);
--		vfio_sanity_check_pfn_list(iommu);
-+		/* mdev vendor driver must unregister notifier */
-+		WARN_ON(iommu->notifier.head);
- 		kfree(iommu->external_domain);
- 	}
- 
--- 
-2.19.1
-
+Be useful? That way modules can call the static_call() but not change
+it.
