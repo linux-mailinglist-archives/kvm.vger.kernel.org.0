@@ -2,100 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4EB12F7D2B
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:52:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F1962F7D3F
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 14:54:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731611AbhAONvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 08:51:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56847 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731264AbhAONvt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 08:51:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610718623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GClJQCWfDVIp8Abu+51pXYFvR3+SULW6nqe1Zw2Nhco=;
-        b=F+C/Hx6rDj6qxuWxoXF4UDZORvoqvomimmfQoOsHcoZKMBYGVHBSLExAifxSGlvAaOJJBl
-        9+lkUfyfYCNzsEn9TAbCqWGD+UhdB/3cSdgIoQMafk/NPnL9D8VPYFjPIgzaRRq34Bhjnb
-        4p+LlPZHWepEE14XN/D+inHv6mlglS0=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-iEYQ6LsKNcq697ZzCYafEA-1; Fri, 15 Jan 2021 08:50:21 -0500
-X-MC-Unique: iEYQ6LsKNcq697ZzCYafEA-1
-Received: by mail-ej1-f71.google.com with SMTP id p1so3601063ejo.4
-        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 05:50:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GClJQCWfDVIp8Abu+51pXYFvR3+SULW6nqe1Zw2Nhco=;
-        b=Ro6dLC33RPrUrbLgXyKjSmazJbsW2yEJBt8V9hVEFQsa0GjB5F46O9PJiJBME/mSW/
-         stpPZsBhgN0/d8meBcKd9a0PGd1+XZqyKi6za0hvOXo1bTYuQEcOBaze5aRzJUQIPugD
-         qum6gp0L23c82+gfbrmgbf4ll7QlC8aO75CWq+k00k1Y8xTk22GxhlY1uiGysSpCm+/x
-         Dw6Q0RtpIY20BxzslQLS0nN71+8Hr0atVjcELCyJXDz3I0wpM0EECE+Hao6xqq55XYXt
-         4ltmWQAJtP54h6w5ergaKwaeeAkQ64u7AmwhezPjT/+O6Ovwl0WEl45JXiJRHvzOMUB+
-         b1cQ==
-X-Gm-Message-State: AOAM532ZIB0c1Rivr5mE2VVDxryYORcJuVKQEhrd1tjN+5epsOcuRtZe
-        1q4qbAPtjk9now0h7G+CRL+stPCKoyiJ8oWATyFivuQv3oKwkLokevRgjeSfkT28MKoJ/9bNV4O
-        DLAgxHL/9Ro1W
-X-Received: by 2002:a17:907:3f13:: with SMTP id hq19mr9060269ejc.142.1610718620211;
-        Fri, 15 Jan 2021 05:50:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxKpmIkaYyI1N+J5ZOU1XodqPeFuoNmwqs4aW3Sw/NgHl/VK+y6PQ/FPUfmzNJDpLKJ7aNWYg==
-X-Received: by 2002:a17:907:3f13:: with SMTP id hq19mr9060257ejc.142.1610718620074;
-        Fri, 15 Jan 2021 05:50:20 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u2sm3461214ejb.65.2021.01.15.05.50.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Jan 2021 05:50:19 -0800 (PST)
-Subject: Re: [PATCH v2 2/3] KVM: x86: introduce definitions to support static
- calls for kvm_x86_ops
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Jason Baron <jbaron@akamai.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Andrea Arcangeli <aarcange@redhat.com>
-References: <cover.1610680941.git.jbaron@akamai.com>
- <e5cc82ead7ab37b2dceb0837a514f3f8bea4f8d1.1610680941.git.jbaron@akamai.com>
- <YAFf2+nvhvWjGImy@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <84b2f5ba-1a16-cb01-646c-37e25d659650@redhat.com>
-Date:   Fri, 15 Jan 2021 14:50:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S1731958AbhAONyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 08:54:10 -0500
+Received: from mga01.intel.com ([192.55.52.88]:33803 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731501AbhAONyJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 08:54:09 -0500
+IronPort-SDR: VVEEsqom9PzFjwPXiRcXBzExKnyyhYEt8PlRA3Lux599GOiOQO2+wc/U4P6KEVqmXHHP+wxocm
+ gaw9QZwCvghw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9864"; a="197215176"
+X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
+   d="scan'208";a="197215176"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 05:53:29 -0800
+IronPort-SDR: 7KrbAkabW0umhvJ5KcYGj4mrEiiUaIoGAfiJqcKFS1YLXOjUkCDJ9sxnL35dQ9hetMKs1Js35z
+ rrFlrbT5AiIA==
+X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
+   d="scan'208";a="382669625"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.174.174]) ([10.249.174.174])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 05:53:24 -0800
+Subject: Re: [PATCH v3 05/17] KVM: x86/pmu: Reprogram guest PEBS event to
+ emulate guest PEBS counter
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-6-like.xu@linux.intel.com>
+ <YAF9mulfhGCIyNz+@hirez.programming.kicks-ass.net>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <38e774f5-81d6-4853-cbb9-d4b7811e65db@intel.com>
+Date:   Fri, 15 Jan 2021 21:53:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <YAFf2+nvhvWjGImy@hirez.programming.kicks-ass.net>
+In-Reply-To: <YAF9mulfhGCIyNz+@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/01/21 10:26, Peter Zijlstra wrote:
->> +#define KVM_X86_OP(func)					     \
->> +	DEFINE_STATIC_CALL_NULL(kvm_x86_##func,			     \
->> +				*(((struct kvm_x86_ops *)0)->func));
->> +#define KVM_X86_OP_NULL KVM_X86_OP
->> +#include <asm/kvm-x86-ops.h>
->> +EXPORT_STATIC_CALL_GPL(kvm_x86_get_cs_db_l_bits);
->> +EXPORT_STATIC_CALL_GPL(kvm_x86_cache_reg);
->> +EXPORT_STATIC_CALL_GPL(kvm_x86_tlb_flush_current);
-> Would something like:
-> 
->    https://lkml.kernel.org/r/20201110103909.GD2594@hirez.programming.kicks-ass.net
-> 
-> Be useful? That way modules can call the static_call() but not change
-> it.
-> 
+On 2021/1/15 19:33, Peter Zijlstra wrote:
+> On Mon, Jan 04, 2021 at 09:15:30PM +0800, Like Xu wrote:
+>> When a guest counter is configured as a PEBS counter through
+>> IA32_PEBS_ENABLE, a guest PEBS event will be reprogrammed by
+>> configuring a non-zero precision level in the perf_event_attr.
+>>
+>> The guest PEBS overflow PMI bit would be set in the guest
+>> GLOBAL_STATUS MSR when PEBS facility generates a PEBS
+>> overflow PMI based on guest IA32_DS_AREA MSR.
+>>
+>> The attr.precise_ip would be adjusted to a special precision
+>> level when the new PEBS-PDIR feature is supported later which
+>> would affect the host counters scheduling.
+> This seems like a random collection of changes, all required, but
+> loosely related.
 
-Maybe not in these cases, but in general there may be cases where we 
-later want to change the static_call (for example replacing jump labels 
-with static_calls).
+Yes, these changes are made in the KVM context, and
+they are all necessary to emulate basic PEBS hw behavior.
 
-Paolo
+>
+>> The guest PEBS event would not be reused for non-PEBS
+>> guest event even with the same guest counter index.
+
+Let me add more KVM context here,
+
+we would create a perf_event for a normal non-PEBS counter
+and we reuse the same perf_event from time to time as much as possible
+instead of "create + destroy" new perf_event.
+
+So when a normal counter is configured for PEBS,
+the original perf_event would not be reused and
+a new PEBS perf_event is created, vice verse.
+
+> /me rolls eyes at the whole destroy+create nonsense...
+
+I absolutely agree that cross-domain development
+may make maintainers' eyes uncomfortable.
+
+My on-demand explanation is always online
+if you fire more questions on this patch set.
+
 
