@@ -2,64 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0848A2F843A
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 19:23:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E618F2F833B
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 19:04:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733084AbhAOSWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 13:22:11 -0500
-Received: from 88-98-93-30.dsl.in-addr.zen.co.uk ([88.98.93.30]:34960 "EHLO
-        sent" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733294AbhAOSWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 13:22:09 -0500
-X-Greylist: delayed 2553 seconds by postgrey-1.27 at vger.kernel.org; Fri, 15 Jan 2021 13:22:09 EST
-Received: from jlevon by sent with local (Exim 4.93)
-        (envelope-from <john.levon@nutanix.com>)
-        id 1l0T3g-00B1tx-IL; Fri, 15 Jan 2021 17:38:48 +0000
-From:   John Levon <john.levon@nutanix.com>
-To:     levon@movementarian.org, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, jasowang@redhat.com, mst@redhat.com
-Cc:     John Levon <john.levon@nutanix.com>
-Subject: [PATCH] use pr_warn_ratelimited() for vq_err()
-Date:   Fri, 15 Jan 2021 17:37:41 +0000
-Message-Id: <20210115173741.2628737-1-john.levon@nutanix.com>
-X-Mailer: git-send-email 2.25.1
+        id S1726657AbhAOSDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 13:03:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34864 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726519AbhAOSDV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 13:03:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610733714;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Gq10Kr5xse22ieR9b4aF/0j+yRbARGW5WK7gbGTTvCI=;
+        b=AACCP0VmzRAPiQcQ43ied0klwKAs4QBIgqTsiW81gqngo7pN+40H+8LGEWH+63exEV0WLq
+        gy1MHqrsd5FbUIA6Un02tVaW8LertZyhPHrtnpyAB9YPE3yISoL236MOdd0TNrsI42MDdo
+        srlZ9kb2Lt5KN7RuK+o6RfTcyyc6FyY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-gAhkavzzP3CD-QHWbBOljQ-1; Fri, 15 Jan 2021 13:01:50 -0500
+X-MC-Unique: gAhkavzzP3CD-QHWbBOljQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A11F6107ACF8;
+        Fri, 15 Jan 2021 18:01:47 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 90E4460BF3;
+        Fri, 15 Jan 2021 18:01:45 +0000 (UTC)
+Date:   Fri, 15 Jan 2021 11:01:44 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: Re: [PATCH v2 1/2] vfio/iommu_type1: Populate full dirty when
+ detach non-pinned group
+Message-ID: <20210115110144.61e3c843@omen.home.shazbot.org>
+In-Reply-To: <20210115092643.728-2-zhukeqian1@huawei.com>
+References: <20210115092643.728-1-zhukeqian1@huawei.com>
+        <20210115092643.728-2-zhukeqian1@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vq_err() is used to report various failure states in vhost code, but by
-default uses pr_debug(), and as a result doesn't record anything unless
-enabled via dynamic debug. We'll change this so we get something recorded
-in the log in these failure cases. Guest VMs (and userspace) can trigger
-some of these messages, so we want to use the pr_warn_ratelimited()
-variant.
+On Fri, 15 Jan 2021 17:26:42 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-Signed-off-by: John Levon <john.levon@nutanix.com>
----
- drivers/vhost/vhost.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> If a group with non-pinned-page dirty scope is detached with dirty
+> logging enabled, we should fully populate the dirty bitmaps at the
+> time it's removed since we don't know the extent of its previous DMA,
+> nor will the group be present to trigger the full bitmap when the user
+> retrieves the dirty bitmap.
+> 
+> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 0b4dedaa9128..4e82b9a3440f 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -236,6 +236,19 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+>  	}
+>  }
+>  
+> +static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
+> +{
+> +	struct rb_node *n;
+> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> +
+> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> +
+> +		if (dma->iommu_mapped)
+> +			bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
+> +	}
+> +}
+> +
+>  static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
+>  {
+>  	struct rb_node *n;
+> @@ -2415,8 +2428,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>  	 * Removal of a group without dirty tracking may allow the iommu scope
+>  	 * to be promoted.
+>  	 */
+> -	if (update_dirty_scope)
+> +	if (update_dirty_scope) {
+>  		update_pinned_page_dirty_scope(iommu);
+> +		if (iommu->dirty_page_tracking)
+> +			vfio_iommu_populate_bitmap_full(iommu);
+> +	}
+>  	mutex_unlock(&iommu->lock);
+>  }
+>  
 
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index b063324c7669..cb4ef78c84ba 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -228,10 +228,10 @@ int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
- void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
- 			  struct vhost_iotlb_map *map);
- 
--#define vq_err(vq, fmt, ...) do {                                  \
--		pr_debug(pr_fmt(fmt), ##__VA_ARGS__);       \
--		if ((vq)->error_ctx)                               \
--				eventfd_signal((vq)->error_ctx, 1);\
-+#define vq_err(vq, fmt, ...) do {                                \
-+		pr_warn_ratelimited(pr_fmt(fmt), ##__VA_ARGS__); \
-+		if ((vq)->error_ctx)                             \
-+			eventfd_signal((vq)->error_ctx, 1);      \
- 	} while (0)
- 
- enum {
--- 
-2.25.1
+This doesn't do the right thing.  This marks the bitmap dirty if:
+
+ * The detached group dirty scope was not limited to pinned pages
+
+ AND
+
+ * Dirty tracking is enabled
+
+ AND
+
+ * The vfio_dma is *currently* (ie. after the detach) iommu_mapped
+
+We need to mark the bitmap dirty based on whether the vfio_dma *was*
+iommu_mapped by the group that is now detached.  Thanks,
+
+Alex
 
