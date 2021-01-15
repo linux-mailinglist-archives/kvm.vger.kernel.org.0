@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD7D52F79FE
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A5202F79D0
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 13:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388311AbhAOMn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 07:43:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20794 "EHLO
+        id S1732923AbhAOMlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 07:41:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64060 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387632AbhAOMn0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 07:43:26 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FCXKtV020081;
-        Fri, 15 Jan 2021 07:37:44 -0500
+        by vger.kernel.org with ESMTP id S2387497AbhAOMkX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 07:40:23 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10FCXLxD064885;
+        Fri, 15 Jan 2021 07:37:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=tK5dFZ/FvkVDsAgZKBc3w31GaRdrflM4u6eauuUUR0A=;
- b=Q4uMwNBBvK/qvzP8jdiFPjypRxRA0LNiR8X3ElVwGp/gR6+duB1/VcIgeXk7WztY2KrL
- 48iTnuvD2q10YWC8bnkfrlEhF25syN1TSQ96tWxzCXyW6I0J6P3GcV2GmhNjgKAQPiWU
- zRChI/juVjE5ODoLkWmlny3BAKO3YgnASa+c86vIblCttHTXUuVsnAFYBimYNzscgyuT
- YWs9agG74xwsq1ed1K7qGcPQdH63p8XLNfx+3XJLpc5HwhtabXc4OO+0SJ5WkBVUpIE2
- pVyLTsicAA/bBWjonGgbKQ+eVEAI1EFhS4P2PkRPbPhXvFaO2Lnvwd2vvnaJVPVkpHjZ hg== 
+ bh=U+ku+qamBIPAaG7KR7o0+FylIBPOLGdubc5b6jJ22EM=;
+ b=MDQSHMixnVDdgQrUrnbI34ThsLlfnf9bO4zuKkfr8SQLRdpa+nDIUwxIMHPym9kVRpGR
+ AU/+cgsGaMITdV1/arQRdo/jiia+tLWqZB0nTrlZ3KpLitYt1Ev3FLSTKOCN6RQbBejQ
+ QbRCOT5/qlVd9AW+frQbt1mOK9BpxscqJ/DDpIEj7l5QGZAOCh56sPI/SwF/VkKX6YId
+ sVyqK7GWFtTb7Cr79NQtCTTjxjXFmuso3fFv9JOxpJ9ihQg3QLa5NJs39IsRdC4idNyX
+ LOrbnM1mjKNvw5HPt7JgAB5QqsagMJHBeQIaKzbEjuKEsIHctq69AsgVGCzx01Jpgp9/ +w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 363b1dga35-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 363akfh8g1-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 07:37:44 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FCXMM4020194;
-        Fri, 15 Jan 2021 07:37:43 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 363b1dga0a-1
+        Fri, 15 Jan 2021 07:37:39 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10FCXoUd066830;
+        Fri, 15 Jan 2021 07:37:38 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 363akfh8f4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 07:37:43 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FC8ZLF014115;
-        Fri, 15 Jan 2021 12:37:35 GMT
+        Fri, 15 Jan 2021 07:37:38 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10FCbaac026135;
+        Fri, 15 Jan 2021 12:37:36 GMT
 Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 35ydrdf9ng-1
+        by ppma05fra.de.ibm.com with ESMTP id 35y448byvv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Jan 2021 12:37:35 +0000
+        Fri, 15 Jan 2021 12:37:36 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FCbXv944499430
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10FCbX4142664270
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Jan 2021 12:37:33 GMT
+        Fri, 15 Jan 2021 12:37:34 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B6E8AE051;
+        by IMSVA (Postfix) with ESMTP id C83E6AE053;
         Fri, 15 Jan 2021 12:37:33 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9CF7AE055;
-        Fri, 15 Jan 2021 12:37:32 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 61B46AE045;
+        Fri, 15 Jan 2021 12:37:33 +0000 (GMT)
 Received: from ibm-vm.ibmuc.com (unknown [9.145.4.167])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 15 Jan 2021 12:37:32 +0000 (GMT)
+        Fri, 15 Jan 2021 12:37:33 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
         pbonzini@redhat.com, cohuck@redhat.com, lvivier@redhat.com,
         nadav.amit@gmail.com, krish.sadhukhan@oracle.com
-Subject: [kvm-unit-tests PATCH v2 03/11] lib/vmalloc: add some asserts and improvements
-Date:   Fri, 15 Jan 2021 13:37:22 +0100
-Message-Id: <20210115123730.381612-4-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 04/11] lib/asm: Fix definitions of memory areas
+Date:   Fri, 15 Jan 2021 13:37:23 +0100
+Message-Id: <20210115123730.381612-5-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210115123730.381612-1-imbrenda@linux.ibm.com>
 References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
@@ -70,73 +70,237 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-15_07:2021-01-15,2021-01-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 bulkscore=0 adultscore=0
- mlxlogscore=999 mlxscore=0 impostorscore=0 malwarescore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2101150077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some asserts to make sure the state is consistent.
+Fix the definitions of the memory areas.
 
-Simplify and improve the readability of vm_free.
+Bring the headers in line with the rest of the asm headers, by having the
+appropriate #ifdef _ASM$ARCH_ guarding the headers.
 
-If a NULL pointer is freed, no operation is performed.
-
-Fixes: 3f6fee0d4da4 ("lib/vmalloc: vmalloc support for handling allocation metadata")
+Fixes: d74708246bd9 ("lib/asm: Add definitions of memory areas")
 
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 ---
- lib/vmalloc.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+ lib/asm-generic/memory_areas.h |  9 ++++-----
+ lib/arm/asm/memory_areas.h     | 11 +++--------
+ lib/arm64/asm/memory_areas.h   | 11 +++--------
+ lib/powerpc/asm/memory_areas.h | 11 +++--------
+ lib/ppc64/asm/memory_areas.h   | 11 +++--------
+ lib/s390x/asm/memory_areas.h   | 13 ++++++-------
+ lib/x86/asm/memory_areas.h     | 27 ++++++++++++++++-----------
+ lib/alloc_page.h               |  3 +++
+ lib/alloc_page.c               |  4 +---
+ 9 files changed, 42 insertions(+), 58 deletions(-)
 
-diff --git a/lib/vmalloc.c b/lib/vmalloc.c
-index 986a34c..6b52790 100644
---- a/lib/vmalloc.c
-+++ b/lib/vmalloc.c
-@@ -162,13 +162,16 @@ static void *vm_memalign(size_t alignment, size_t size)
- static void vm_free(void *mem)
- {
- 	struct metadata *m;
--	uintptr_t ptr, end;
-+	uintptr_t ptr, page, i;
+diff --git a/lib/asm-generic/memory_areas.h b/lib/asm-generic/memory_areas.h
+index 927baa7..3074afe 100644
+--- a/lib/asm-generic/memory_areas.h
++++ b/lib/asm-generic/memory_areas.h
+@@ -1,11 +1,10 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef __ASM_GENERIC_MEMORY_AREAS_H__
++#define __ASM_GENERIC_MEMORY_AREAS_H__
  
-+	if (!mem)
-+		return;
- 	/* the pointer is not page-aligned, it was a single-page allocation */
- 	if (!IS_ALIGNED((uintptr_t)mem, PAGE_SIZE)) {
- 		assert(GET_MAGIC(mem) == VM_MAGIC);
--		ptr = virt_to_pte_phys(page_root, mem) & PAGE_MASK;
--		free_page(phys_to_virt(ptr));
-+		page = virt_to_pte_phys(page_root, mem) & PAGE_MASK;
-+		assert(page);
-+		free_page(phys_to_virt(page));
+ #define AREA_NORMAL_PFN 0
+ #define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
++#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+ 
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#define MAX_AREAS 1
+ 
+ #endif
+diff --git a/lib/arm/asm/memory_areas.h b/lib/arm/asm/memory_areas.h
+index 927baa7..c723310 100644
+--- a/lib/arm/asm/memory_areas.h
++++ b/lib/arm/asm/memory_areas.h
+@@ -1,11 +1,6 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASMARM_MEMORY_AREAS_H_
++#define _ASMARM_MEMORY_AREAS_H_
+ 
+-#define AREA_NORMAL_PFN 0
+-#define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
+-
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#include <asm-generic/memory_areas.h>
+ 
+ #endif
+diff --git a/lib/arm64/asm/memory_areas.h b/lib/arm64/asm/memory_areas.h
+index 927baa7..18e8ca8 100644
+--- a/lib/arm64/asm/memory_areas.h
++++ b/lib/arm64/asm/memory_areas.h
+@@ -1,11 +1,6 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASMARM64_MEMORY_AREAS_H_
++#define _ASMARM64_MEMORY_AREAS_H_
+ 
+-#define AREA_NORMAL_PFN 0
+-#define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
+-
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#include <asm-generic/memory_areas.h>
+ 
+ #endif
+diff --git a/lib/powerpc/asm/memory_areas.h b/lib/powerpc/asm/memory_areas.h
+index 927baa7..76d1738 100644
+--- a/lib/powerpc/asm/memory_areas.h
++++ b/lib/powerpc/asm/memory_areas.h
+@@ -1,11 +1,6 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASMPOWERPC_MEMORY_AREAS_H_
++#define _ASMPOWERPC_MEMORY_AREAS_H_
+ 
+-#define AREA_NORMAL_PFN 0
+-#define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
+-
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#include <asm-generic/memory_areas.h>
+ 
+ #endif
+diff --git a/lib/ppc64/asm/memory_areas.h b/lib/ppc64/asm/memory_areas.h
+index 927baa7..b9fd46b 100644
+--- a/lib/ppc64/asm/memory_areas.h
++++ b/lib/ppc64/asm/memory_areas.h
+@@ -1,11 +1,6 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASMPPC64_MEMORY_AREAS_H_
++#define _ASMPPC64_MEMORY_AREAS_H_
+ 
+-#define AREA_NORMAL_PFN 0
+-#define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
+-
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#include <asm-generic/memory_areas.h>
+ 
+ #endif
+diff --git a/lib/s390x/asm/memory_areas.h b/lib/s390x/asm/memory_areas.h
+index 4856a27..827bfb3 100644
+--- a/lib/s390x/asm/memory_areas.h
++++ b/lib/s390x/asm/memory_areas.h
+@@ -1,16 +1,15 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASMS390X_MEMORY_AREAS_H_
++#define _ASMS390X_MEMORY_AREAS_H_
+ 
+-#define AREA_NORMAL_PFN BIT(31-12)
++#define AREA_NORMAL_PFN (1 << 19)
+ #define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
++#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+ 
+ #define AREA_LOW_PFN 0
+ #define AREA_LOW_NUMBER 1
+-#define AREA_LOW 2
++#define AREA_LOW (1 << AREA_LOW_NUMBER)
+ 
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#define MAX_AREAS 2
+ 
+ #define AREA_DMA31 AREA_LOW
+ 
+diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
+index 952f5bd..e84016f 100644
+--- a/lib/x86/asm/memory_areas.h
++++ b/lib/x86/asm/memory_areas.h
+@@ -1,21 +1,26 @@
+-#ifndef MEMORY_AREAS_H
+-#define MEMORY_AREAS_H
++#ifndef _ASM_X86_MEMORY_AREAS_H_
++#define _ASM_X86_MEMORY_AREAS_H_
+ 
+ #define AREA_NORMAL_PFN BIT(36-12)
+ #define AREA_NORMAL_NUMBER 0
+-#define AREA_NORMAL 1
++#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+ 
+-#define AREA_PAE_HIGH_PFN BIT(32-12)
+-#define AREA_PAE_HIGH_NUMBER 1
+-#define AREA_PAE_HIGH 2
++#define AREA_HIGH_PFN BIT(32-12)
++#define AREA_HIGH_NUMBER 1
++#define AREA_HIGH (1 << AREA_HIGH_NUMBER)
+ 
+-#define AREA_LOW_PFN 0
++#define AREA_LOW_PFN BIT(24-12)
+ #define AREA_LOW_NUMBER 2
+-#define AREA_LOW 4
++#define AREA_LOW (1 << AREA_LOW_NUMBER)
+ 
+-#define AREA_PAE (AREA_PAE | AREA_LOW)
++#define AREA_LOWEST_PFN 0
++#define AREA_LOWEST_NUMBER 3
++#define AREA_LOWEST (1 << AREA_LOWEST_NUMBER)
+ 
+-#define AREA_ANY -1
+-#define AREA_ANY_NUMBER 0xff
++#define MAX_AREAS 4
++
++#define AREA_DMA24 AREA_LOWEST
++#define AREA_DMA32 (AREA_LOWEST | AREA_LOW)
++#define AREA_PAE36 (AREA_LOWEST | AREA_LOW | AREA_HIGH)
+ 
+ #endif
+diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+index 816ff5d..b6aace5 100644
+--- a/lib/alloc_page.h
++++ b/lib/alloc_page.h
+@@ -10,6 +10,9 @@
+ 
+ #include <asm/memory_areas.h>
+ 
++#define AREA_ANY -1
++#define AREA_ANY_NUMBER 0xff
++
+ /* Returns true if the page allocator has been initialized */
+ bool page_alloc_initialized(void);
+ 
+diff --git a/lib/alloc_page.c b/lib/alloc_page.c
+index 685ab1e..ed0ff02 100644
+--- a/lib/alloc_page.c
++++ b/lib/alloc_page.c
+@@ -19,8 +19,6 @@
+ #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
+ #define PFN(x) ((uintptr_t)(x) >> PAGE_SHIFT)
+ 
+-#define MAX_AREAS	6
+-
+ #define ORDER_MASK	0x3f
+ #define ALLOC_MASK	0x40
+ #define SPECIAL_MASK	0x80
+@@ -509,7 +507,7 @@ void page_alloc_init_area(u8 n, uintptr_t base_pfn, uintptr_t top_pfn)
  		return;
  	}
- 
-@@ -176,13 +179,14 @@ static void vm_free(void *mem)
- 	m = GET_METADATA(mem);
- 	assert(m->magic == VM_MAGIC);
- 	assert(m->npages > 0);
-+	assert(m->npages < BIT_ULL(BITS_PER_LONG - PAGE_SHIFT));
- 	/* free all the pages including the metadata page */
--	ptr = (uintptr_t)mem - PAGE_SIZE;
--	end = ptr + m->npages * PAGE_SIZE;
--	for ( ; ptr < end; ptr += PAGE_SIZE)
--		free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
--	/* free the last one separately to avoid overflow issues */
--	free_page(phys_to_virt(virt_to_pte_phys(page_root, (void *)ptr)));
-+	ptr = (uintptr_t)m & PAGE_MASK;
-+	for (i = 0 ; i < m->npages + 1; i++, ptr += PAGE_SIZE) {
-+		page = virt_to_pte_phys(page_root, (void *)ptr) & PAGE_MASK;
-+		assert(page);
-+		free_page(phys_to_virt(page));
-+	}
- }
- 
- static struct alloc_ops vmalloc_ops = {
+ #ifdef AREA_HIGH_PFN
+-	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN), base_pfn, &top_pfn);
++	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN, base_pfn, &top_pfn);
+ #endif
+ 	__page_alloc_init_area(AREA_NORMAL_NUMBER, AREA_NORMAL_PFN, base_pfn, &top_pfn);
+ #ifdef AREA_LOW_PFN
 -- 
 2.26.2
 
