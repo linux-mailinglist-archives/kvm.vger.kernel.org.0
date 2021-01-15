@@ -2,100 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92B372F810C
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 17:43:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 488F42F8110
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 17:46:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726475AbhAOQn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 11:43:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38508 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726151AbhAOQn0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 11:43:26 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9B538221FE;
-        Fri, 15 Jan 2021 16:42:45 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l0SBP-007o67-EU; Fri, 15 Jan 2021 16:42:43 +0000
+        id S1726046AbhAOQqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 11:46:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725910AbhAOQqb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 11:46:31 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1901DC061757
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 08:45:51 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id 30so6347742pgr.6
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 08:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TWuR3ZJ2UHICr0CiKVPTEVeDZF6pZ+WV9FNSFwhbdvQ=;
+        b=tWvplHkApxVZ6MP6t8FotDQ+IHmJJBEZQWdV4QVV3+cKi3iDm/rTftLgnt/Ui8bEQR
+         gym7ZJ/zjKICKBaXLKWxMtZSkZH+Hse7G9sYW2CRcQ3aDRPmRST+Jn4wfjpQ8bE6SOGV
+         /RIW5lUJC7S6LvIGaFxhubFGwtI3JUMtIqu06WAKBvXiC7M51OWFgxzayu4bNUl6gCct
+         zuaAImQPxpmkgSA3ckGCyCQwDozK8aemjLo2RVeyiXJG5yyOulAGuFs4Uap53ujlm20D
+         dL8ACsVf6hZKZTo0AuoHCyf1bKbeiruCuqHY+ULuzpBFT2/gqocyIU15cXxeEQpH98oI
+         4hQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=TWuR3ZJ2UHICr0CiKVPTEVeDZF6pZ+WV9FNSFwhbdvQ=;
+        b=klJQ0k179oQSC7NgI5yfup/cENMIUgbS889DFU0ETwSttQ/xmXreSsEEQUtMv0NR5z
+         jlc7TNx1DHdqViO/brtYlSEo5VB8rHzMACP7nnl9zzpbhw8WS8lXPnbxtuFPlvyXImU8
+         kmLDFHeDT6Poz65MkHrW1YorbPoTgK41ud9eWiAGtQLmaLsEIq3FKuwABG8lHFKftLWJ
+         zjMljvx0rILgPh1YilDaOP8N3ktusglQX6gevqGqqsHrU/BH2gn64QhDu5FfV1LYygZx
+         jC1t4N/aTVNsByJiCG4szZlH5dGXhPT2ARW64LlTbxReIYrrJNWWwERNbevcl/xP9JEj
+         gKyA==
+X-Gm-Message-State: AOAM5339rtXVPNSqleIXr9GGvDa6zO57D9u7ASa3OWD0HbzRwXXM3y1G
+        JWwbXio22zpvObdskJfNiySppTbNUYCybw==
+X-Google-Smtp-Source: ABdhPJx/joI/0iL7ov0niLl5D6IK5weqMVWW7wXnPSsxawzu9EjDeF4O5L36F6bX+KrMnIs12bNXpQ==
+X-Received: by 2002:a05:6a00:884:b029:1b4:440f:bce7 with SMTP id q4-20020a056a000884b02901b4440fbce7mr2209052pfj.20.1610729150481;
+        Fri, 15 Jan 2021 08:45:50 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 4sm9199887pjn.14.2021.01.15.08.45.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jan 2021 08:45:49 -0800 (PST)
+Date:   Fri, 15 Jan 2021 08:45:43 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 0/4] KVM: x86: Drastically raise KVM_USER_MEM_SLOTS
+ limit
+Message-ID: <YAHGt3zIUpNbJQm7@google.com>
+References: <20210115131844.468982-1-vkuznets@redhat.com>
+ <YAG8t9ww/dgFaFht@google.com>
+ <87zh1a5fuj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 15 Jan 2021 16:42:38 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Subject: Re: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
-In-Reply-To: <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
-References: <20210114105633.2558739-1-maz@kernel.org>
- <20210114105633.2558739-7-maz@kernel.org>
- <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, suzuki.poulose@arm.com, kernel-team@android.com, james.morse@arm.com, alexandru.elisei@arm.com, julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87zh1a5fuj.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On 2021-01-15 14:01, Auger Eric wrote:
-> Hi Marc,
+On Fri, Jan 15, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> On 1/14/21 11:56 AM, Marc Zyngier wrote:
->> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
->> pretty easy. All that is required is support for PMMIR_EL1, which
->> is read-only, and for which returning 0 is a valid option.
->> 
->> Let's just do that and adjust what we return to the guest.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 8f79ec1fffa7..2f4ecbd2abfb 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu 
->> *vcpu,
->>  		/* Limit debug to ARMv8.0 */
->>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
->>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
->> -		/* Limit guests to PMUv3 for ARMv8.1 */
->> +		/* Limit guests to PMUv3 for ARMv8.4 */
->>  		val = cpuid_feature_cap_perfmon_field(val,
->>  						      ID_AA64DFR0_PMUVER_SHIFT,
->> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
->> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
->>  		break;
->>  	case SYS_ID_DFR0_EL1:
->>  		/* Limit guests to PMUv3 for ARMv8.1 */
-> what about the debug version in aarch32 state. Is it on purpose that 
-> you
-> leave it as 8_1?
+> > On Fri, Jan 15, 2021, Vitaly Kuznetsov wrote:
+> >> Longer version:
+> >> 
+> >> Current KVM_USER_MEM_SLOTS limit (509) can be a limiting factor for some
+> >> configurations. In particular, when QEMU tries to start a Windows guest
+> >> with Hyper-V SynIC enabled and e.g. 256 vCPUs the limit is hit as SynIC
+> >> requires two pages per vCPU and the guest is free to pick any GFN for
+> >> each of them, this fragments memslots as QEMU wants to have a separate
+> >> memslot for each of these pages (which are supposed to act as 'overlay'
+> >> pages).
+> >
+> > What exactly does QEMU do on the backend?  I poked around the code a bit, but
+> > didn't see anything relevant.
+> >
+> 
+> In QEMU's terms it registers memory sub-regions for these two pages (see
+> synic_update() in hw/hyperv/hyperv.c). Memory for these page-sized
+> sub-regions is allocated separately so in KVM terms they become
+> page-sized slots and previously continuous 'system memory' slot breaks
+> into several slots.
 
-That's a good point. There is also the fact that we keep reporting
-STALL_SLOT as a valid event even in PMCEID0_EL1 despite PMMIR_EL1.SLOTS
-always reporting 0.
+Doh, I had a super stale version checked out (2.9.50), no wonder I couldn't find
+anything.
 
-I'll fix that and resend something next week.
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Isn't the memslot approach inherently flawed in that the SynIC is per-vCPU, but
+memslots are per-VM?  E.g. if vCPU1 accesses vCPU0's SynIC GPA, I would expect
+that to access real memory, not the overlay.  Or is there more QEMU magic going
+on that I'm missing?
