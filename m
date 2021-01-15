@@ -2,139 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E88D92F6F31
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:00:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC9292F6F60
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 01:21:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731118AbhANX70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 14 Jan 2021 18:59:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
+        id S1731249AbhAOAUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 14 Jan 2021 19:20:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731063AbhANX70 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 14 Jan 2021 18:59:26 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A261BC0613C1
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 15:58:45 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id w1so5335720pjc.0
-        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 15:58:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Nvc3IiVsp1txtwU1w62SIZO9MP6aDBCxGAMOxwFlnfU=;
-        b=H7nzFgoD0mmZjC3G98NJ258zxdOB4jQUx4WZeToA057UC7qaekindB4sM8jX+Y1oEl
-         QGti5hPv1oA8iNHAOK2sp8TMWpMHyEjXvJjyNtfxBnWu0wIPGlctClYj9kgCW1yZlldb
-         e+/Hs1Ji1KMtFSFo6t3FrGZVICol56ot6OE+zthMFkMElc13Ijd0dgMWhPDCSk2jCzVR
-         5EsunfSh6ZH0Txhw2m4PvHQwA0xIj2Ivg3HU6wAzPqnKH2v4YxIQglIWxriNsEuhoRSu
-         jTluatQOg7eYnkLfj3C2+wKHUqpTHKhRXCJ310FSG6QfH9FNr2Wbn+DzHDIgx/71ZYHl
-         petw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Nvc3IiVsp1txtwU1w62SIZO9MP6aDBCxGAMOxwFlnfU=;
-        b=Q0rlgrlNcFAXUnh7H4yw/tpNEpSTXsmGI/aO7+h/hABqzl8U7D8tPde3IfofdA3uIV
-         qxwZI9gMnb0f4LII/gyRBUK3AdWD8KaVVClUprwlceF3N3OQsyEEJEELFPQBv7vtIOrk
-         vLJbUAcY9BYIjKazKep/F4ze7p5OJciNDklJbh8+yDmmjBLREzg4CMQxT6+7yvycgz0P
-         kYHAWPOYS9M+DoU+m3c8Rzb+GSA17kXs2VcEvt6bh+DIiNJ6SQeIvnrJtR7Btr16r6ls
-         TBWB0JC5iEhudw9hbd1sHgjMn4/zk47yfYrpALM6b2kTfJ0ArMWZkwEX6JOjCaRFwcsx
-         UcsQ==
-X-Gm-Message-State: AOAM531O/Thx9zhMJUI9ctmHBdLIKFxOmVZxcrbRfiTT6dc5gPppgiO2
-        nSjMGz5k2e2dTlEda+Ob6pHc7Q==
-X-Google-Smtp-Source: ABdhPJzFHsi9Kv8DysKPjSpNxctiO1nz5yAe/V4FeI1lp/9eO+PQMeZV6DvVBkNf6U3Z5fBtrsJaMg==
-X-Received: by 2002:a17:902:6b89:b029:da:fc41:baec with SMTP id p9-20020a1709026b89b02900dafc41baecmr10011317plk.39.1610668724942;
-        Thu, 14 Jan 2021 15:58:44 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id z23sm5926576pfn.202.2021.01.14.15.58.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 15:58:44 -0800 (PST)
-Date:   Thu, 14 Jan 2021 15:58:37 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 1/3] KVM: nVMX: Always call sync_vmcs02_to_vmcs12_rare
- on migration
-Message-ID: <YADarUMsE9uDKxOe@google.com>
-References: <20210114205449.8715-1-mlevitsk@redhat.com>
- <20210114205449.8715-2-mlevitsk@redhat.com>
+        with ESMTP id S1731202AbhAOAUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 14 Jan 2021 19:20:15 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54C4C0613C1
+        for <kvm@vger.kernel.org>; Thu, 14 Jan 2021 16:19:34 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DH1yV6T8Gz9sRR; Fri, 15 Jan 2021 11:19:30 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1610669970;
+        bh=6rt0Brp3CktLo2ypYITM1g/ZFLRPD910BAU72R0cilE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FYDuAjxwhiUNKxS9D35s9dvZZmwu0f3se06n5K9yHIarBa8dXbQrzonT4pCCdOJ6s
+         dcBA0D0OmDA7npY1IrgnZY89HWSnX8tCaZ0Cpi2XGobOJ5xO8fOYooWZ+RabDG8mq0
+         yKQqoicd5A8fzMBzZ7RrVmpOxu1zcgt0osyxfpqI=
+Date:   Fri, 15 Jan 2021 11:13:27 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     brijesh.singh@amd.com, pair@us.ibm.com, dgilbert@redhat.com,
+        pasic@linux.ibm.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
+        jun.nakajima@intel.com, thuth@redhat.com,
+        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
+        berrange@redhat.com, andi.kleen@intel.com
+Subject: Re: [PATCH v7 13/13] s390: Recognize confidential-guest-support
+ option
+Message-ID: <20210115001327.GP435587@yekko.fritz.box>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+ <20210113235811.1909610-14-david@gibson.dropbear.id.au>
+ <ba08f5da-e31f-7ae2-898d-a090c5c1b1cf@de.ibm.com>
+ <aa72b499-1b84-54a3-fd06-2fec4402b699@de.ibm.com>
+ <471babb9-9d5a-a2fa-7d90-f14a7d289b8d@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qSHHer9gQ0dtepKr"
 Content-Disposition: inline
-In-Reply-To: <20210114205449.8715-2-mlevitsk@redhat.com>
+In-Reply-To: <471babb9-9d5a-a2fa-7d90-f14a7d289b8d@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Subject is confusing, and technically wrong.  Confusing because there is no call
-to sync_vmcs02_to_vmcs12_rare().  Technically wrong because sync_...() won't be
-called if need_sync_vmcs02_to_vmcs12_rare==false.
 
-Maybe something like?
+--qSHHer9gQ0dtepKr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-KVM: nVMX: Sync unsync'd vmcs02 state to vmcs12 on migration
+On Thu, Jan 14, 2021 at 10:24:57AM +0100, Christian Borntraeger wrote:
+>=20
+>=20
+> On 14.01.21 10:19, Christian Borntraeger wrote:
+> >=20
+> >=20
+> > On 14.01.21 10:10, Christian Borntraeger wrote:
+> >>
+> >>
+> >> On 14.01.21 00:58, David Gibson wrote:
+> >> [...]
+> >>> +int s390_pv_init(ConfidentialGuestSupport *cgs, Error **errp)
+> >>> +{
+> >>> +    if (!object_dynamic_cast(OBJECT(cgs), TYPE_S390_PV_GUEST)) {
+> >>> +        return 0;
+> >>> +    }
+> >>> +
+> >>> +    if (!s390_has_feat(S390_FEAT_UNPACK)) {
+> >>> +        error_setg(errp,
+> >>> +                   "CPU model does not support Protected Virtualizat=
+ion");
+> >>> +        return -1;
+> >>> +    }
+> >>
+> >> I am triggering this and I guess this is because the cpu model is not =
+yet initialized at
+> >> this point in time.
+> >>
+> > When I remove the check, things seems to work though ( I can access vir=
+tio-blk devices without
+> > specifying iommu for example)
+>=20
+> Maybe we can turn things around and check in apply_cpu_model if the objec=
+t exists but
+> unpack was not specified?
 
-On Thu, Jan 14, 2021, Maxim Levitsky wrote:
-> Even when we are outside the nested guest, some vmcs02 fields
-> are not in sync vs vmcs12.
+That might work.  If unpack *is* specified, you'd also need to set the
+ready flag there, of course.
 
-s/are not/may not be
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-It'd be helpful to provide more details in the changelog, e.g. for those not in
-the loop, it's not obvious that KVM intentionally keeps those fields unsync'd,
-even across nested VM-Exit.
+--qSHHer9gQ0dtepKr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> However during the migration, the vmcs12 has to be up to date
-> to be able to load it later after the migration.
-> 
-> To fix that, call that function.
+-----BEGIN PGP SIGNATURE-----
 
-s/that function/copy_vmcs02_to_vmcs12_rare().  Characters are cheap, and it's
-jarring to have to jump back all the way back to the subject.  And, as mentioned
-above, this doesn't actually call sync_ directly.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAA3iUACgkQbDjKyiDZ
+s5JVOg//ZK/jqzfMra5QZC8J9RxUz3vcxD/TjIOg6c+ekzbJMveK1GpkYS7O25T1
+3R90+6T+/6ZQm419GJrsD/46MsH+DrXTx4y+eWdwWqHzxcrANHIA99dwEepJfj8m
+ZQqXtMx4uWi4hVtVyyIkYmosN8sinTHl0XbYr65dg7etNXvASyeDx8xGi+4niVm1
+mGJGHouxCsJzN0ov2eLzwr8hx4rlrUXobiIGOfpTtBNNlOvokz73ZF+zAb6VL/si
+QBV8fYuiDBcUqRNUTV5xHWjmbfS+qOC/Dw+S/ad07LUtPS/oQVB/dej86HGi6UeW
+FaPR/qXL/6vwEhtgychNj3a5TillBjTlbRLVDuYRVzbB5eJD9ORA7pcanS8RjEHa
+z9IUEt+SnzUfIZTpI4kjiwdwDYfoySs7tWxdJZUMmCiw1RQCaOQXqdlXqk4Kk7mr
+Pq4rIB/Prh4g59IX9ZDymFFYYNQo4urvLb3wJifJquk0NPNmYN1p3v2QdKGtVn41
+MRih1c/f51v5Q03k/UU0TAtPKKzyWfLlcAP6BfNz8lY8jrcmn2j1kyhd7vKZyyI/
+kf+2jdS2o0QkGb0A6uIWP+IHbXgBo8M6YoOWOcM+v2eDfNLJL8CyMCFjxZdEOXLJ
+DfyvIypwN/ASmS7N3s4PaBSKaA1CzcgQmdK8F0lSI5ySD0O0cKg=
+=ydH6
+-----END PGP SIGNATURE-----
 
-For the code,
-
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
-
-> 
-> Fixes: 7952d769c29ca ("KVM: nVMX: Sync rarely accessed guest fields only when needed")
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0fbb46990dfce..776688f9d1017 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6077,11 +6077,14 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  	if (is_guest_mode(vcpu)) {
->  		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
->  		sync_vmcs02_to_vmcs12_rare(vcpu, vmcs12);
-> -	} else if (!vmx->nested.need_vmcs12_to_shadow_sync) {
-> -		if (vmx->nested.hv_evmcs)
-> -			copy_enlightened_to_vmcs12(vmx);
-> -		else if (enable_shadow_vmcs)
-> -			copy_shadow_to_vmcs12(vmx);
-> +	} else  {
-> +		copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
-> +		if (!vmx->nested.need_vmcs12_to_shadow_sync) {
-> +			if (vmx->nested.hv_evmcs)
-> +				copy_enlightened_to_vmcs12(vmx);
-> +			else if (enable_shadow_vmcs)
-> +				copy_shadow_to_vmcs12(vmx);
-> +		}
->  	}
->  
->  	BUILD_BUG_ON(sizeof(user_vmx_nested_state->vmcs12) < VMCS12_SIZE);
-> -- 
-> 2.26.2
-> 
+--qSHHer9gQ0dtepKr--
