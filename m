@@ -2,118 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C31052F8249
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 18:28:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 045E62F8268
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 18:31:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732189AbhAOR2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 12:28:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44426 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726809AbhAOR2I (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 12:28:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610731601;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VZBYusZAm1Is9olrKmtKLjdUp43A00Oaux7ATOrc+IQ=;
-        b=eQMYWhw37sAwALhBAcTn6nUTKevzWBmKg51d1VsBwQM0oey8fSMIlnlQjejTsOHtNZW0qe
-        LcMgl85WIUqtW17lgW/HV1uHsj7OXVLnGBx9a9v8wOLqyOa5a0LHHOwlsW+TGInf6ckJXy
-        WWklVTLQs4wEUiGV+t7vm7Cjb0zVS78=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-Ah3VMAcvN4SiSGyadioQJQ-1; Fri, 15 Jan 2021 12:26:39 -0500
-X-MC-Unique: Ah3VMAcvN4SiSGyadioQJQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC233107ACF9;
-        Fri, 15 Jan 2021 17:26:37 +0000 (UTC)
-Received: from [10.36.114.165] (ovpn-114-165.ams2.redhat.com [10.36.114.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 37E01100AE30;
-        Fri, 15 Jan 2021 17:26:34 +0000 (UTC)
-Subject: Re: [PATCH 6/6] KVM: arm64: Upgrade PMU support to ARMv8.4
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-References: <20210114105633.2558739-1-maz@kernel.org>
- <20210114105633.2558739-7-maz@kernel.org>
- <ec06055b-56ad-1589-7a5d-95d9f47466ce@redhat.com>
- <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <a0f7a8a7-81fc-282c-5b29-b037a425a8f7@redhat.com>
-Date:   Fri, 15 Jan 2021 18:26:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S2387579AbhAORbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 12:31:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47110 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387554AbhAORbN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 12:31:13 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A068C0613C1
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 09:30:33 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id v1so5447162pjr.2
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 09:30:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=e4iNbSaLQouSoi2ExpAGatGG16APB7XlfIPRSEq48z4=;
+        b=NjhRYse+Dv0G0pEtZJfNMACvCNU2k1bZFy3Aj4UihkW8tngtjB3w7xJUpChQd6VIbp
+         yKU98i/BHVE4aRuWcHp5hFmIfkTKiccF1bBg7a+lt2+J+TohKPg+qkJ/uzxJNmkwsgei
+         go6SsCMRap4Is5wxf0xvdhgUuLaigkJGULjWnBNIwDuR64EyOts1lDAGWpm0xDYvC36f
+         E96ozRAiLfo8k8xFGmhJempGffltRrdnKYnaeH+XOOYLAheQ2kvzzo3bQVNLgMjSIT56
+         MVa5AdwyBmMAeQH7RNU/7uQekaTPUx7l0w25UjgEZUgj8ofAznXFphJFhiBm/kyeyHwu
+         PCTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=e4iNbSaLQouSoi2ExpAGatGG16APB7XlfIPRSEq48z4=;
+        b=D/kfljuOFuB0btcBi4SiGZDaCvGLksbdf6gv5FYQhi7tilAVZ3q14c7tr+0jHfzG9S
+         uXmjJXOiNILfRsg6gtli+BAGw60y4j8My5r7viT5bLI3H20+FqbR9rkaQBgKSDSQ2Hq4
+         sxhAYBVvCUXFjEmqahk/G52Pt4Ecws9We+/V4wiPWRcVswTonBixB/hs4uhizaOgd42D
+         6OkCT1fSfsjK4OdPAGuhxTjSJxsngqo/ekWk6eDRwcSC6ZVCb6xh8kIduXknZGCSdWzw
+         A+c7ZGUlWPSv6u/eXuVEq6qJTF5fefPQt+DSB9brl6sW4dEvWJEESdRTr4Xx9sHBwcGa
+         Moug==
+X-Gm-Message-State: AOAM531AHpjVGA6tvG6oIqt1J3xryuyThAYdYqqoLFY56imjoBz+iUFU
+        Qg4VQygDCgG7MqeM8aaG+IjGYw==
+X-Google-Smtp-Source: ABdhPJyAPmp/B5kPb5BaLdZ0aPMrtnV+2PxsftX28KS94cBa4b4RQvAQacSbSNUKEA+DcC86f5jLSA==
+X-Received: by 2002:a17:90b:1894:: with SMTP id mn20mr11751354pjb.100.1610731832726;
+        Fri, 15 Jan 2021 09:30:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id l197sm8824100pfd.97.2021.01.15.09.30.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jan 2021 09:30:31 -0800 (PST)
+Date:   Fri, 15 Jan 2021 09:30:24 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Stephane Eranian <eranian@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86/pmu: Fix HW_REF_CPU_CYCLES event
+ pseudo-encoding in intel_arch_events[]
+Message-ID: <YAHRMK5SmrmMx8hg@google.com>
+References: <20201230081916.63417-1-like.xu@linux.intel.com>
+ <1ff5381c-3057-7ca2-6f62-bbdcefd8e427@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <28dab4367d6ced5a7d7cbc80ee77f68d@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ff5381c-3057-7ca2-6f62-bbdcefd8e427@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Fri, Jan 15, 2021, Like Xu wrote:
+> Ping ?
+> 
+> On 2020/12/30 16:19, Like Xu wrote:
+> > The HW_REF_CPU_CYCLES event on the fixed counter 2 is pseudo-encoded as
+> > 0x0300 in the intel_perfmon_event_map[]. Correct its usage.
+> > 
+> > Fixes: 62079d8a4312 ("KVM: PMU: add proper support for fixed counter 2")
+> > Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
-On 1/15/21 5:42 PM, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> On 2021-01-15 14:01, Auger Eric wrote:
->> Hi Marc,
->>
->> On 1/14/21 11:56 AM, Marc Zyngier wrote:
->>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
->>> pretty easy. All that is required is support for PMMIR_EL1, which
->>> is read-only, and for which returning 0 is a valid option.
->>>
->>> Let's just do that and adjust what we return to the guest.
->>>
->>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>> ---
->>>  arch/arm64/kvm/sys_regs.c | 5 +++--
->>>  1 file changed, 3 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 8f79ec1fffa7..2f4ecbd2abfb 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -1051,10 +1051,10 @@ static u64 read_id_reg(const struct kvm_vcpu
->>> *vcpu,
->>>          /* Limit debug to ARMv8.0 */
->>>          val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
->>>          val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
->>> -        /* Limit guests to PMUv3 for ARMv8.1 */
->>> +        /* Limit guests to PMUv3 for ARMv8.4 */
->>>          val = cpuid_feature_cap_perfmon_field(val,
->>>                                ID_AA64DFR0_PMUVER_SHIFT,
->>> -                              kvm_vcpu_has_pmu(vcpu) ?
->>> ID_AA64DFR0_PMUVER_8_1 : 0);
->>> +                              kvm_vcpu_has_pmu(vcpu) ?
->>> ID_AA64DFR0_PMUVER_8_4 : 0);
->>>          break;
->>>      case SYS_ID_DFR0_EL1:
->>>          /* Limit guests to PMUv3 for ARMv8.1 */
->> what about the debug version in aarch32 state. Is it on purpose that you
->> leave it as 8_1?
-> 
-> That's a good point. There is also the fact that we keep reporting
-> STALL_SLOT as a valid event even in PMCEID0_EL1 despite PMMIR_EL1.SLOTS
-> always reporting 0.
-Hum OK. I did not notice that ;-)
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
 
-Thanks
+> > ---
+> >   arch/x86/kvm/vmx/pmu_intel.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> > index a886a47daebd..013e8d253dfa 100644
+> > --- a/arch/x86/kvm/vmx/pmu_intel.c
+> > +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> > @@ -29,7 +29,7 @@ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
+> >   	[4] = { 0x2e, 0x41, PERF_COUNT_HW_CACHE_MISSES },
+> >   	[5] = { 0xc4, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+> >   	[6] = { 0xc5, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
+> > -	[7] = { 0x00, 0x30, PERF_COUNT_HW_REF_CPU_CYCLES },
+> > +	[7] = { 0x00, 0x03, PERF_COUNT_HW_REF_CPU_CYCLES },
 
-Eric
-> 
-> I'll fix that and resend something next week.
-> 
-> Thanks,
-> 
->         M.
+In a follow up patch, would it be sane/appropriate to define these magic numbers
+in asm/perf_event.h and share them between intel_perfmon_event_map and
+intel_arch_events?  Without this patch, it's not at all obvious that these are
+intended to align with the Core (arch?) event definitions.
 
+> >   };
+> >   /* mapping between fixed pmc index and intel_arch_events array */
+> 
