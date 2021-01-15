@@ -2,155 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAEC22F853A
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 20:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53C722F856C
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 20:29:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387921AbhAOTQX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 14:16:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56325 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726541AbhAOTQX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 15 Jan 2021 14:16:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610738096;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v4FwxeAEyXEI6CWznvqU5AtMWFcpWnT8O1IOjG3Vr1Y=;
-        b=NO6McH48ardHju9sMXHupcDuh6pwTCoRH5AgZxbKyA5QFzDmGZjdr64BNKjaTfYeEKkjCY
-        FdpJUeI2TuwKEG6ny/1kjluykJSZJC84Dqq6El6pHIjyCbqoKrYX2PEBOxqDlVOTT1sM5v
-        IqXBLXbSXoA8aoG0c+v3+Y8tvlDYehM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-QqrpG32lOIWZOPK7xYEGTg-1; Fri, 15 Jan 2021 14:14:52 -0500
-X-MC-Unique: QqrpG32lOIWZOPK7xYEGTg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93C32806662;
-        Fri, 15 Jan 2021 19:14:49 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D6AFB5D9C6;
-        Fri, 15 Jan 2021 19:14:47 +0000 (UTC)
-Date:   Fri, 15 Jan 2021 12:14:47 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: Re: [PATCH v2 2/2] vfio/iommu_type1: Sanity check pfn_list when
- remove vfio_dma
-Message-ID: <20210115121447.54c96857@omen.home.shazbot.org>
-In-Reply-To: <20210115092643.728-3-zhukeqian1@huawei.com>
-References: <20210115092643.728-1-zhukeqian1@huawei.com>
-        <20210115092643.728-3-zhukeqian1@huawei.com>
+        id S2387852AbhAOT32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 14:29:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44484 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbhAOT32 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 14:29:28 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC10C061757
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:28:48 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id x18so5210169pln.6
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 11:28:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=o173Lqk2c5CIYKhQy47SbWBS4LsgYs9/wPlGKEJUhZQ=;
+        b=Uxl89bKbQ0EJR0bwVVwTY620vZrEk3wZRGOZUtb7fVjLryPulQ5OtdOqb+1ATwurxm
+         jaFVqeUUm7pucJzBnd01cP9RttMAcnikELQ2DYPIl6O1HzoqZbTk1xFfAKAftpvfKQ0f
+         LTRlvzC1Vk9G5OXXo5JeOM+CD9AiPFP+ZCAjkd+nmchQsRtrmAWrVG9UDvvdz2bLlgab
+         8326RLbVcbuBFJvj54++CN8KsAUK50CCfn5YqvMFNshYFtIj4y5+c4tYWXGCBaEvcd0X
+         JiR94/XOY/Ncxv7SEmmc958sKD+oZRx3v1FtXBzBHaxpOTaS3O3KNpOgnF4v71AN3+BS
+         N0lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o173Lqk2c5CIYKhQy47SbWBS4LsgYs9/wPlGKEJUhZQ=;
+        b=WPabfeEyt5n2ywY82ZJ3YjwVya7XOTcYX/1SaNSigiulbghpo+ngWyYEmizDCYbIZ9
+         ePcvu2lYNMru/lTUFHrh5Dz3n+FzxJD+xDGap4y+7wwf3W/BW5hPSW2Oo7vcgmK3TQaV
+         PiXZPdMZIKn6HNqb1rEr4ur+gtkSFAiwtwjeTeAi3sFc7F1ugtryj9ilFKxDDoOrmDck
+         5np9LFLc5qLzgHcJKQb5V4XFBcOulkC1fjxHhqil5GeL2j2ujrqXKZegEtM73KBYZcAJ
+         Ngn/SHo3QQ4iAK1GXlWtCdyNn8r0QJjNKhNFB4HB3yIgLxP8IAq4IpCKNhffG72qHVPq
+         Z92g==
+X-Gm-Message-State: AOAM532AtKy6cKVs7WwKvAwLAtBhY3wtbSxzwwvIg38eFuqI6YDNSwrR
+        5e3Mlh69Uc4RHJB7r3UILzMp+A==
+X-Google-Smtp-Source: ABdhPJwfOsX4Wx5vyNX8XtAaos1vkW6wGTM5tGYWH1S5rzy+SMeefHNe8U0GzG04aTWa3jyis9E4uw==
+X-Received: by 2002:a17:90a:5581:: with SMTP id c1mr12238856pji.86.1610738927523;
+        Fri, 15 Jan 2021 11:28:47 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id b6sm8319056pfd.43.2021.01.15.11.28.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jan 2021 11:28:46 -0800 (PST)
+Date:   Fri, 15 Jan 2021 11:28:40 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 3/3] KVM/VMX: Use try_cmpxchg64() in posted_intr.c
+Message-ID: <YAHs6KDoc+O50beV@google.com>
+References: <20201215182805.53913-1-ubizjak@gmail.com>
+ <20201215182805.53913-4-ubizjak@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201215182805.53913-4-ubizjak@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 15 Jan 2021 17:26:43 +0800
-Keqian Zhu <zhukeqian1@huawei.com> wrote:
+On Tue, Dec 15, 2020, Uros Bizjak wrote:
+> Use try_cmpxchg64() instead of cmpxchg64() to reuse flags from
+> cmpxchg/cmpxchg8b instruction. For 64 bit targets flags reuse
+> avoids a CMP instruction,
 
-> vfio_sanity_check_pfn_list() is used to check whether pfn_list of
-> vfio_dma is empty when remove the external domain, so it makes a
-> wrong assumption that only external domain will add pfn to dma pfn_list.
+It ends up doing way more (in a good way) than eliminate the CMP, at least with
+gcc-10.  There's a ripple effect and the compiler ends up generating the loop
+in-line, whereas without the "try" version the loop is put out-of-line.
+
+> while for 32 bit targets flags reuse avoids XOR/XOR/OR instruction sequence.
 > 
-> Now we apply this check when remove a specific vfio_dma and extract
-> the notifier check just for external domain.
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 
-The page pinning interface is gated by having a notifier registered for
-unmaps, therefore non-external domains would also need to register a
-notifier.  There's currently no other way to add entries to the
-pfn_list.  So if we allow pinning for such domains, then it's wrong to
-WARN_ON() when the notifier list is not-empty when removing an external
-domain.  Long term we should probably extend page {un}pinning for the
-caller to pass their notifier to be validated against the notifier list
-rather than just allowing page pinning if *any* notifier is registered.
-Thanks,
-
-Alex
- 
-> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
-> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 24 +++++-------------------
->  1 file changed, 5 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 4e82b9a3440f..a9bc15e84a4e 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -958,6 +958,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->  
->  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->  {
-> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list);
->  	vfio_unmap_unpin(iommu, dma, true);
->  	vfio_unlink_dma(iommu, dma);
->  	put_task_struct(dma->task);
-> @@ -2251,23 +2252,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
->  	}
->  }
->  
-> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
-> -{
-> -	struct rb_node *n;
-> -
-> -	n = rb_first(&iommu->dma_list);
-> -	for (; n; n = rb_next(n)) {
-> -		struct vfio_dma *dma;
-> -
-> -		dma = rb_entry(n, struct vfio_dma, node);
-> -
-> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
-> -			break;
-> -	}
-> -	/* mdev vendor driver must unregister notifier */
-> -	WARN_ON(iommu->notifier.head);
-> -}
-> -
->  /*
->   * Called when a domain is removed in detach. It is possible that
->   * the removed domain decided the iova aperture window. Modify the
-> @@ -2367,7 +2351,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  			kfree(group);
->  
->  			if (list_empty(&iommu->external_domain->group_list)) {
-> -				vfio_sanity_check_pfn_list(iommu);
-> +				/* mdev vendor driver must unregister notifier */
-> +				WARN_ON(iommu->notifier.head);
->  
->  				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
->  					vfio_iommu_unmap_unpin_all(iommu);
-> @@ -2491,7 +2476,8 @@ static void vfio_iommu_type1_release(void *iommu_data)
->  
->  	if (iommu->external_domain) {
->  		vfio_release_domain(iommu->external_domain, true);
-> -		vfio_sanity_check_pfn_list(iommu);
-> +		/* mdev vendor driver must unregister notifier */
-> +		WARN_ON(iommu->notifier.head);
->  		kfree(iommu->external_domain);
->  	}
->  
-
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
