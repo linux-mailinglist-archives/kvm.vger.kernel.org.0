@@ -2,80 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 598682F749B
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 09:53:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F411F2F7520
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 10:22:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730201AbhAOIv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 03:51:58 -0500
-Received: from mga05.intel.com ([192.55.52.43]:25574 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726817AbhAOIv4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 03:51:56 -0500
-IronPort-SDR: c8+qbs1J7C5cUU6b+f2lmzXQl9ZIrYV8yIb6Ha+92DE6lxuvt45SP/MWG3i2wSiYKh5pOjPv07
- QnYJcYodB2LQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9864"; a="263313699"
-X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
-   d="scan'208";a="263313699"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 00:51:13 -0800
-IronPort-SDR: 2DWi2BuGZEuH8CvySrdMz0szSkdssIE/dCzkPYdMnYOeTdh2TLG3jRQ/JqTQrNBuGYwxPcJG7o
- bDFMkQxWbh0g==
-X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
-   d="scan'208";a="382591418"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 00:51:03 -0800
-Subject: Re: [RESEND v13 00/10] KVM: x86/pmu: Guest Last Branch Recording
- Enabling
-To:     Alex Shi <alex.shi@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Ingo Molnar <mingo@redhat.com>,
+        id S1727116AbhAOJVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 04:21:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54178 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725880AbhAOJVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 04:21:44 -0500
+X-Greylist: delayed 1444 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 15 Jan 2021 01:21:04 PST
+Received: from manul.sfritsch.de (manul.sfritsch.de [IPv6:2a01:4f8:172:195f:112::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43BB7C061757;
+        Fri, 15 Jan 2021 01:21:04 -0800 (PST)
+Subject: Re: [PATCH] kvm: Add emulation for movups/movupd
+To:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Like Xu <like.xu@linux.intel.com>
-References: <20210108013704.134985-1-like.xu@linux.intel.com>
- <3deac361-05fa-60a5-0d88-4f6b968f10bf@linux.alibaba.com>
-From:   "Xu, Like" <like.xu@intel.com>
-Message-ID: <307385ae-cd3e-8d06-ffa9-dcd297ec9a8a@intel.com>
-Date:   Fri, 15 Jan 2021 16:51:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20180401155444.7006-1-sf@sfritsch.de>
+ <20180404171040.GW5438@char.us.oracle.com>
+ <288c32e4-a1ec-7b43-0d6a-6a7c0e1a04b2@redhat.com> <1883982.uaQK4EgVKX@k>
+ <321b36c9-d6fc-b562-5f87-3d3594e7ead9@redhat.com>
+ <CALMp9eR0OjUV7LsWQ_r4o20wSZ0dw0eGs=LJ0htLmwwvcuUP_A@mail.gmail.com>
+From:   Stefan Fritsch <sf@sfritsch.de>
+Message-ID: <884f1474-3654-95c4-9a57-338d28e65b38@sfritsch.de>
+Date:   Fri, 15 Jan 2021 09:56:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <3deac361-05fa-60a5-0d88-4f6b968f10bf@linux.alibaba.com>
+In-Reply-To: <CALMp9eR0OjUV7LsWQ_r4o20wSZ0dw0eGs=LJ0htLmwwvcuUP_A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
-
-Thank you for trying this guest feature on multiple Intel platforms!
-If you have more specific comments or any concerns, just let me know.
-
----
-thx, likexu
-
-On 2021/1/15 16:19, Alex Shi wrote:
->
-> 在 2021/1/8 上午9:36, Like Xu 写道:
->> Because saving/restoring tens of LBR MSRs (e.g. 32 LBR stack entries) in
->> VMX transition brings too excessive overhead to frequent vmx transition
->> itself, the guest LBR event would help save/restore the LBR stack msrs
->> during the context switching with the help of native LBR event callstack
->> mechanism, including LBR_SELECT msr.
+Am 13.01.21 um 00:47 schrieb Jim Mattson:
+> On Wed, Apr 4, 2018 at 10:44 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >>
-> Sounds the feature is much helpful for VMM guest performance tunning.
-> Good job!
->
-> Thanks
-> Alex
+>> On 04/04/2018 19:35, Stefan Fritsch wrote:
+>>> On Wednesday, 4 April 2018 19:24:20 CEST Paolo Bonzini wrote:
+>>>> On 04/04/2018 19:10, Konrad Rzeszutek Wilk wrote:
+>>>>> Should there be a corresponding test-case?
+>>>>
+>>>> Good point!  Stefan, could you write one?
+>>>
+>>> Is there infrastructure for such tests? If yes, can you give me a pointer to
+>>> it?
+>>
+>> Yes, check out x86/emulator.c in
+>> https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git.  There is
+>> already a movaps test.
+> 
+> Whatever became of this unit test? I don't see it in the
+> kvm-unit-tests repository.
+> 
 
+Sorry, I did not get around to doing this. And it is unlikely that I 
+will have time to do it in the near future.
+
+Cheers,
+Stefan
