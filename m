@@ -2,95 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F355F2F7E71
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 15:44:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 373F82F7E7B
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 15:46:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731366AbhAOOoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 09:44:06 -0500
-Received: from mga01.intel.com ([192.55.52.88]:37443 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725910AbhAOOoG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 09:44:06 -0500
-IronPort-SDR: mnoeSRfLYLv5wvn1xXwNqE7pcPg4ae+o0bNrMhH2Fu/goX/7WPsPmxmvfT0SrmFfP6AD9AnW27
- 1vH1/4BrEJFA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9864"; a="197222870"
-X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
-   d="scan'208";a="197222870"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 06:43:25 -0800
-IronPort-SDR: eflR4KatMJrsfWwRaQOCwkoZCwYrX+93asKiciwWpSso1xfx+z3lRCaE8IB+4Ji1CBSw9cDgvi
- jX3ApRf5S63Q==
-X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
-   d="scan'208";a="499939478"
-Received: from sanjanar-mobl.amr.corp.intel.com ([10.251.19.188])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 06:43:21 -0800
-Message-ID: <a522e6bd7bc588775eab889896dadac5e52eb717.camel@intel.com>
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Date:   Sat, 16 Jan 2021 03:43:18 +1300
-In-Reply-To: <20210112150756.f3fb039ac1bb176262da5e52@intel.com>
-References: <cover.1609890536.git.kai.huang@intel.com>
-         <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
-         <20210112141428.038533b6cd5f674c906a3c43@intel.com>
-         <X/0DRMx7FC5ssg0p@kernel.org>
-         <20210112150756.f3fb039ac1bb176262da5e52@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+        id S1732023AbhAOOpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 09:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39496 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729056AbhAOOpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 09:45:46 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E11DC0613C1;
+        Fri, 15 Jan 2021 06:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HAt7yi8Bk1IOhi77FGzsXARD2yxrPISnLfMrCWR3Idw=; b=MpDbTwohxLvh/kyNgOG1M+x/LJ
+        Ef3ZQ+n5b+cpH09Z41tFCdpjWg4bjR8kXmQWV1hv7rMImabhl6xDSl2guNqm7s8K83DU+z+laeLWP
+        J6ubnIiaXhDGc4cishgMyEsrNBmuuOfwcnlwkyJq4CbASShypUHGiPnqznEylW1jZKbpefskw0hqt
+        rjCapFt2v1fbhsDpMH8WVAGTgFIeFxCctuuXFK8/o9mwsABzjh1kmuXq50QEWgUEuSll6D1mGOSZs
+        8AziIHvCvPqs/E+wyI6g0kAltcjUwMqgGqP9CvOutfoeo0UL11Rf7nN0ZlEiwozJ8BTbfs8XhjXEQ
+        0xlUG3dw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l0QLE-000884-JS; Fri, 15 Jan 2021 14:44:44 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 62FFD301324;
+        Fri, 15 Jan 2021 15:44:40 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 4F59E20B5D691; Fri, 15 Jan 2021 15:44:40 +0100 (CET)
+Date:   Fri, 15 Jan 2021 15:44:40 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Like Xu <like.xu@linux.intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/17] perf: x86/ds: Handle guest PEBS overflow PMI
+ and inject it to guest
+Message-ID: <YAGqWNl2FKxVussV@hirez.programming.kicks-ass.net>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-5-like.xu@linux.intel.com>
+ <X/86UWuV/9yt14hQ@hirez.programming.kicks-ass.net>
+ <9c343e40-bbdf-8af0-3307-5274070ee3d2@intel.com>
+ <YAGEFgqQv281jVHc@hirez.programming.kicks-ass.net>
+ <2c197d5a-09a8-968c-a942-c95d18983c9d@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2c197d5a-09a8-968c-a942-c95d18983c9d@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-12 at 15:07 +1300, Kai Huang wrote:
-> > > > > 
-> > > > > To support virtual EPC, add a new misc device /dev/sgx_virt_epc to SGX
-> > > > > core/driver to allow userspace (Qemu) to allocate "raw" EPC, and use it as
-> > > > > "virtual EPC" for guest. Obviously, unlike EPC allocated for host SGX
-> > > > > driver,
-> > > > > virtual EPC allocated via /dev/sgx_virt_epc doesn't have enclave
-> > > > > associated,
-> > > > > and how virtual EPC is used by guest is compeletely controlled by guest's
-> > > > > SGX
-> > > > > software.
-> > > > 
-> > > > I think that /dev/sgx_vepc would be a clear enough name for the device. This
-> > > > text has now a bit confusing "terminology" related to this.
-> > > 
-> > > /dev/sgx_virt_epc may be clearer from userspace's perspective, for instance,
-> > > if people see /dev/sgx_vepc, they may have to think about what it is,
-> > > while /dev/sgx_virt_epc they may not.
-> > > 
-> > > But I don't have strong objection here. Does anyone has anything to say here?
-> > 
-> > It's already an abberevation to start with, why leave it halfways?
-> > 
-> > Especially when three remaining words have been shrunk to single
-> > characters ('E', 'P' and 'C').
-> > 
+On Fri, Jan 15, 2021 at 10:30:13PM +0800, Xu, Like wrote:
+
+> > Are you sure? Spurious NMI/PMIs are known to happen anyway. We have far
+> > too much code to deal with them.
 > 
-> I have expressed my opinion above. And as I said I don't have strong objection
-> here. I'll change to /dev/sgx_vepc if no one opposes.
+> https://lore.kernel.org/lkml/20170628130748.GI5981@leverpostej/T/
+> 
+> In the rr workload, the commit change "the PMI interrupts in skid region
+> should be dropped"
+> is reverted since some users complain that:
+> 
+> > It seems to me that it might be reasonable to ignore the interrupt if
+> > the purpose of the interrupt is to trigger sampling of the CPUs
+> > register state.  But if the interrupt will trigger some other
+> > operation, such as a signal on an fd, then there's no reason to drop
+> > it.
+> 
+> I assume that if the PMI drop is unacceptable, either will spurious PMI
+> injection.
+> 
+> I'm pretty open if you insist that we really need to do this for guest PEBS
+> enabling.
 
-Hi Jarkko,
+That was an entirely different issue. We were dropping events on the
+floor because they'd passed priv boundaries. So there was an actual
+event, and we made it go away.
 
-I am reluctant to change to /dev/sgx_vepc now, because there are lots of
-'sgx_virt_epc' in the code.  For instance, 'struct sgx_virt_epc', and function names
-in sgx/virt.c are all sgx_virt_epc_xxx(), which has 'sgx_virt_epc' as prefix. I feel
-changing to /dev/sgx_vepc only is kinda incomplete, but I really don't want to change
-so many 'sgx_virt_epc' to 'sgx_vepc'. 
-
-(Plus I still think  'virt_epc' is more obvious than 'vepc' from userspace's
-perspective.)
-
-Does it make sense?
-
-
+What we're talking about here is raising an PMI with BUFFER_OVF set,
+even if the DS is empty. That should really be harmless. We'll take the
+PMI, find there's nothing there, and do nothing.
