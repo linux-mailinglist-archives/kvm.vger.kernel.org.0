@@ -2,111 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15F232F8CB9
-	for <lists+kvm@lfdr.de>; Sat, 16 Jan 2021 10:51:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 126D92F8DC9
+	for <lists+kvm@lfdr.de>; Sat, 16 Jan 2021 18:10:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726059AbhAPJvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Jan 2021 04:51:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39474 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725928AbhAPJvh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Jan 2021 04:51:37 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 27CB4206D5;
-        Sat, 16 Jan 2021 09:50:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610790656;
-        bh=fymB0S/JtJWUAJLdLaFMjTbgs2PWZvDpYZFOfxMdloU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=j1IXaaEL942XJJzPyw2ijBZdZ2qFC9F5ggnqSlrsJe6vsyBbquxOdwb8rWMRKOTuS
-         vjahNUJLkdDq+Qo8tlXXlK2Mffknz9my6zJCyAOP7JwO9dNgcCeiQKdVCLP9twzwS/
-         OO1LRytgaz9dgsQaG5JcpDJrUFtGg4uPtQAKgrcS9HIVMRKiW9pNep+Jx7w8T23yK8
-         4YKLBI4AgAW+iOf8CxLVrZFi/JwWk6PRc2JNOh3q6HzQJm2fkmboxhrITqjRKHc9Cx
-         6fhEj1hPd2H1q+k0pKhYQiyFGz/NFRPfuzhXKkgGcZ7nAPY98NQHkct5gWRlFFtSIg
-         xtvVSKqDsX0iQ==
-Date:   Sat, 16 Jan 2021 11:50:49 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH 00/23] KVM SGX virtualization support
-Message-ID: <YAK2+d0OFFbo9uJ0@kernel.org>
-References: <cover.1609890536.git.kai.huang@intel.com>
- <2422737f6b0cddf6ff1be9cf90e287dd00d6a6a3.camel@kernel.org>
- <20210112141428.038533b6cd5f674c906a3c43@intel.com>
- <X/0DRMx7FC5ssg0p@kernel.org>
- <20210112150756.f3fb039ac1bb176262da5e52@intel.com>
- <a522e6bd7bc588775eab889896dadac5e52eb717.camel@intel.com>
- <YAKyfrrl6AlWIQhw@kernel.org>
+        id S1728036AbhAPRJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 16 Jan 2021 12:09:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38910 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727944AbhAPRJe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 16 Jan 2021 12:09:34 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F6EC0617AB
+        for <kvm@vger.kernel.org>; Sat, 16 Jan 2021 06:17:05 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id k4so7970601ybp.6
+        for <kvm@vger.kernel.org>; Sat, 16 Jan 2021 06:17:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AhGK/6XQsnDXFD6m51WpGMESDPE8+NDGrsD4blt+WV4=;
+        b=FZn6u53vlElyMCljU2RqtTC0wqPJ0rL6XTJSshrojIR62xkNhz47HvANPnH2fP70iH
+         wz6uoiCou3crMOBI6SNOhsl2Z50AAW5kNM5gmPi3czthENwKrRbiNa65YKzDN29NY6Yf
+         HTWwYIRJkJjkq3/uFs/t5vHaPT1tvhdiE79MCCwVcG+3J6UVdBpNs3tUT7VmqxFkBmTq
+         gDWNN9O4h3cSC+yF9eCbkdVmcEaJSZgvW45e19iA4Snpz7iJDDZwm8jh+LElnBUI13tq
+         vwT4TrhoMIMhuAmlS12m3+bJj+lQBH2xttWqdmD4IWddoOEFli+JFm6uKqQs5+15OMad
+         oYUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AhGK/6XQsnDXFD6m51WpGMESDPE8+NDGrsD4blt+WV4=;
+        b=X1SpbKxffnWD52qtjWSqAMTFf5JS6x0qT0ToCoZ106Elq5KYHuMMZOdnkx/H5oaL48
+         QB2eTIzewrTjGBZOg9da8zExtGuBudo6AyaIuoypDaKVlEnvcALhcYG61jrV6PhrV8qB
+         eMnu0pkXy34yk+3hMQD7AgHblekANd9Y99Qf8NERqUTz6t8lEvvb9rtv18OJjd08ewCQ
+         n0D/oR7u+h0GwzJE2+PjDYPZVFj7wtGa2QOnXdIx2uglyIh01nc0goEOT22FeRUfX3kn
+         GCosMz+Qh66zRizVEoQs4vCW1Rlvq5hfk9mnxrJeB8fFNUrJClG5w49DIlmqVxRuo4hM
+         o6GQ==
+X-Gm-Message-State: AOAM5307ds1IhhVpT7eEI74rYaZ2EKnN7c+3SmPM3oR39aoEmpmdVdBE
+        R9nN3IZ5zrLaC8dTbGx9ZNQPnAx9QfUHvXy8kX+ouKzUxM4=
+X-Google-Smtp-Source: ABdhPJwUTfgLPskdO2ytBdIyorFheZbKeXJkZikB8msfdK3+x4ZMMf7jE6UOjEwAdHKOFLbgRiJrK0qBlMxdDQZ0tZ8=
+X-Received: by 2002:a25:3bc5:: with SMTP id i188mr24905481yba.332.1610806624728;
+ Sat, 16 Jan 2021 06:17:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YAKyfrrl6AlWIQhw@kernel.org>
+References: <1606206780-80123-1-git-send-email-bmeng.cn@gmail.com> <be7005bb-94f8-4a3f-8e51-de1e21499683@redhat.com>
+In-Reply-To: <be7005bb-94f8-4a3f-8e51-de1e21499683@redhat.com>
+From:   Bin Meng <bmeng.cn@gmail.com>
+Date:   Sat, 16 Jan 2021 22:16:51 +0800
+Message-ID: <CAEUhbmUVBCNh8DiPusqSm20vRsvMRBDj2Rqu+QOyg3shTSPAug@mail.gmail.com>
+Subject: Re: [kvm-unit-tests][RFC PATCH] x86: Add a new test case for ret/iret
+ with a nullified segment
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Bin Meng <bin.meng@windriver.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 16, 2021 at 11:31:49AM +0200, Jarkko Sakkinen wrote:
-> On Sat, Jan 16, 2021 at 03:43:18AM +1300, Kai Huang wrote:
-> > On Tue, 2021-01-12 at 15:07 +1300, Kai Huang wrote:
-> > > > > > > 
-> > > > > > > To support virtual EPC, add a new misc device /dev/sgx_virt_epc to SGX
-> > > > > > > core/driver to allow userspace (Qemu) to allocate "raw" EPC, and use it as
-> > > > > > > "virtual EPC" for guest. Obviously, unlike EPC allocated for host SGX
-> > > > > > > driver,
-> > > > > > > virtual EPC allocated via /dev/sgx_virt_epc doesn't have enclave
-> > > > > > > associated,
-> > > > > > > and how virtual EPC is used by guest is compeletely controlled by guest's
-> > > > > > > SGX
-> > > > > > > software.
-> > > > > > 
-> > > > > > I think that /dev/sgx_vepc would be a clear enough name for the device. This
-> > > > > > text has now a bit confusing "terminology" related to this.
-> > > > > 
-> > > > > /dev/sgx_virt_epc may be clearer from userspace's perspective, for instance,
-> > > > > if people see /dev/sgx_vepc, they may have to think about what it is,
-> > > > > while /dev/sgx_virt_epc they may not.
-> > > > > 
-> > > > > But I don't have strong objection here. Does anyone has anything to say here?
-> > > > 
-> > > > It's already an abberevation to start with, why leave it halfways?
-> > > > 
-> > > > Especially when three remaining words have been shrunk to single
-> > > > characters ('E', 'P' and 'C').
-> > > > 
-> > > 
-> > > I have expressed my opinion above. And as I said I don't have strong objection
-> > > here. I'll change to /dev/sgx_vepc if no one opposes.
-> > 
-> > Hi Jarkko,
-> > 
-> > I am reluctant to change to /dev/sgx_vepc now, because there are lots of
-> > 'sgx_virt_epc' in the code.  For instance, 'struct sgx_virt_epc', and function names
-> > in sgx/virt.c are all sgx_virt_epc_xxx(), which has 'sgx_virt_epc' as prefix. I feel
-> > changing to /dev/sgx_vepc only is kinda incomplete, but I really don't want to change
-> > so many 'sgx_virt_epc' to 'sgx_vepc'. 
-> > 
-> > (Plus I still think  'virt_epc' is more obvious than 'vepc' from userspace's
-> > perspective.)
-> > 
-> > Does it make sense?
-> 
-> We can reconsider naming later on for sure, and maybe it's better to do
-> so. It's probably too early to define the final name.
-> 
-> As far as naming goes, I'm actually wondering is this usable outside of
-> KVM by any means? If not, then probably the best name for this device
-> would be sgx_kvm_epc. Better to be always as explicit as possible.
+Hi Paolo,
 
-You can easily do such renames with git filter-branch over a patch set:
+On Tue, Nov 24, 2020 at 5:12 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 24/11/20 09:33, Bin Meng wrote:
+> > From: Bin Meng <bin.meng@windriver.com>
+> >
+> > This makes up the test case for the following QEMU patch:
+> > http://patchwork.ozlabs.org/project/qemu-devel/patch/1605261378-77971-1-git-send-email-bmeng.cn@gmail.com/
+> >
+> > Note the test case only fails on an unpatched QEMU with "accel=tcg".
+> >
+> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > ---
+> > Sending this as RFC since I am new to kvm-unit-tests
+> >
+> >   x86/emulator.c | 38 ++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 38 insertions(+)
+> >
+> > diff --git a/x86/emulator.c b/x86/emulator.c
+> > index e46d97e..6100b6d 100644
+> > --- a/x86/emulator.c
+> > +++ b/x86/emulator.c
+> > @@ -6,10 +6,14 @@
+> >   #include "processor.h"
+> >   #include "vmalloc.h"
+> >   #include "alloc_page.h"
+> > +#include "usermode.h"
+> >
+> >   #define memset __builtin_memset
+> >   #define TESTDEV_IO_PORT 0xe0
+> >
+> > +#define MAGIC_NUM 0xdeadbeefdeadbeefUL
+> > +#define GS_BASE 0x400000
+> > +
+> >   static int exceptions;
+> >
+> >   /* Forced emulation prefix, used to invoke the emulator unconditionally.  */
+> > @@ -925,6 +929,39 @@ static void test_sreg(volatile uint16_t *mem)
+> >       write_ss(ss);
+> >   }
+> >
+> > +static uint64_t usr_gs_mov(void)
+> > +{
+> > +    static uint64_t dummy = MAGIC_NUM;
+> > +    uint64_t dummy_ptr = (uint64_t)&dummy;
+> > +    uint64_t ret;
+> > +
+> > +    dummy_ptr -= GS_BASE;
+> > +    asm volatile("mov %%gs:(%%rcx), %%rax" : "=a"(ret): "c"(dummy_ptr) :);
+> > +
+> > +    return ret;
+> > +}
+> > +
+> > +static void test_iret(void)
+> > +{
+> > +    uint64_t val;
+> > +    bool raised_vector;
+> > +
+> > +    /* Update GS base to 4MiB */
+> > +    wrmsr(MSR_GS_BASE, GS_BASE);
+> > +
+> > +    /*
+> > +     * Per the SDM, jumping to user mode via `iret`, which is returning to
+> > +     * outer privilege level, for segment registers (ES, FS, GS, and DS)
+> > +     * if the check fails, the segment selector becomes null.
+> > +     *
+> > +     * In our test case, GS becomes null.
+> > +     */
+> > +    val = run_in_user((usermode_func)usr_gs_mov, GP_VECTOR,
+> > +                      0, 0, 0, 0, &raised_vector);
+> > +
+> > +    report(val == MAGIC_NUM, "Test ret/iret with a nullified segment");
+> > +}
+> > +
+> >   /* Broken emulation causes triple fault, which skips the other tests. */
+> >   #if 0
+> >   static void test_lldt(volatile uint16_t *mem)
+> > @@ -1074,6 +1111,7 @@ int main(void)
+> >       test_shld_shrd(mem);
+> >       //test_lgdt_lidt(mem);
+> >       test_sreg(mem);
+> > +     test_iret();
+> >       //test_lldt(mem);
+> >       test_ltr(mem);
+> >       test_cmov(mem);
+> >
+>
+> Thanks, the patch is good.
 
-https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
+Is this patch applied?
 
-Having to rename something in too many places is not an argument.
-Considering it too early is.
-
-/Jarkko
+Regards,
+Bin
