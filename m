@@ -2,91 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C9412F8AB5
-	for <lists+kvm@lfdr.de>; Sat, 16 Jan 2021 03:22:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A24732F8ABE
+	for <lists+kvm@lfdr.de>; Sat, 16 Jan 2021 03:34:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728754AbhAPCVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 21:21:37 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:46740 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728324AbhAPCVg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 21:21:36 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10G25nh2109880;
-        Sat, 16 Jan 2021 02:20:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=FCHR/kvHlyKbKvUjMwXY42SxTz0rqXup5nfnNHN3YTM=;
- b=kZp8Mho1o8Hiz1VvTHwtA4FE1xzljnx3j0VGEgkgviub4Oj7jKeWr/NTtsxgrk8GhlJi
- VvOxzj2mVvrhTk7K1b9o1rk5iXN+7dz+Cmlj6IdykKFLVlRynXCkraXJq/DxT4hizqs3
- Did2knFiLmSueI/ErKeozWh+rU7l2ExCefGsXXpI93PLOgA5Dhm9p8FqIys7K/AiZJgo
- 2iX9uRRKL5u/zJiJjpcx8vHj5tkwyPF55LqOokux4lNNp19VCooW4GmcQW1Xn0A9P3NW
- GqAXF0VXz53Qm09/ifyV6bHAMIuTVYp5FSeE3On2lTYAZOJQnwQZRQTS5RICUvKOLBCK HA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 360kvkf9gv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 16 Jan 2021 02:20:52 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10G26Ngb194960;
-        Sat, 16 Jan 2021 02:20:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 360kebux99-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 16 Jan 2021 02:20:51 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10G2KpGk014944;
-        Sat, 16 Jan 2021 02:20:51 GMT
-Received: from nsvm-sadhukhan.osdevelopmeniad.oraclevcn.com (/100.100.230.216)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 15 Jan 2021 18:20:51 -0800
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
-Subject: [PATCH 3/3 v2] Test: SVM: Use ALIGN macro when aligning 'io_bitmap_area'
-Date:   Sat, 16 Jan 2021 02:20:39 +0000
-Message-Id: <20210116022039.7316-4-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210116022039.7316-1-krish.sadhukhan@oracle.com>
-References: <20210116022039.7316-1-krish.sadhukhan@oracle.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9865 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0 spamscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101160010
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9865 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 malwarescore=0
- clxscore=1015 impostorscore=0 spamscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101160010
+        id S1728324AbhAPCdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 21:33:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbhAPCdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 21:33:00 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B098C0613D3
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 18:32:14 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id x74so9972789qkb.12
+        for <kvm@vger.kernel.org>; Fri, 15 Jan 2021 18:32:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=bK7/dTmSR86C29WgdGxGU8MYCwIuJFaDUK2eSVHNrX4=;
+        b=sxCHu/OuwVoHklKKuzYAF3YsaoWE9hexH3rykqnuF4Wa1pLx0+47yDulZFXTH0z6UR
+         lN1cYFqW2c25FiOwJmS3zmeJkpRkqtUGZdl8y6vtKIEBU8+r9EhEZ2rRX84KdZH/x8l1
+         sLMnYBccUlFvPDG/uqbFCIPzXC+bBTmbJHP3EZfwKpedZs1BPJJ0GqFSKc560A0bgH/T
+         7TiDfF625MkvdOAtu394qMmd1073/f9aGb+zxUt394QKEwpQy7hJYWYGBZy9k5J0ADkx
+         tSP8iSsMYb9yV/NoQbVJg/7K9WCO111I+F0VjQhCpQgiqf3lZwr9omaJnGgSme+njipm
+         xdnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=bK7/dTmSR86C29WgdGxGU8MYCwIuJFaDUK2eSVHNrX4=;
+        b=lWYhK6CRm1gH3qxCFhtqrv90+aHvEkfeO5smJ5DpVpm0mjjW4KSXWEmwLdE+FVLRCj
+         aapdnc3Y9Iz3VUKJ3RiuDCLAQMgEoankT4UKlKXYSylN/lFBWpnGqa/KCJg21QZA9G32
+         uamrEuQrW1q7520QTFc3ftzssy2RvNG9L29KPOmNxx4TlRCCCmz7176WTEXQLQZ1N+yS
+         AseUQayFwezErLhGVsR7HIAw2BQNyRNMWd2l5Z2OI/3/UfgUeKouVpU7VQ3HzIatr0oS
+         3J2S64uyEBPP+4v/IKdE80aXQP0sC1f2NAo/5J86HjF6FWogEBLfL0JBBqErirohMJ6s
+         EBwQ==
+X-Gm-Message-State: AOAM533gDHU3eA2dEy8nLOYOo3fGqJjehseDi1Vbn8EdvXDiiUmzPiLu
+        xxB+GFzX2iWjg+G+JO1HTQVjkgydQSFJ
+X-Google-Smtp-Source: ABdhPJx8zg6GHMhhgyZyzbY0pMKP05X/oObg4+gTaSfWzbBiuE54CPTESrNjdV7FtuFvVuyrM+3U2lobDBxW
+Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
+X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
+ (user=vipinsh job=sendgmr) by 2002:a0c:fe47:: with SMTP id
+ u7mr15197077qvs.4.1610764333565; Fri, 15 Jan 2021 18:32:13 -0800 (PST)
+Date:   Fri, 15 Jan 2021 18:32:02 -0800
+Message-Id: <20210116023204.670834-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
+Subject: [Patch v5 0/2] cgroup: KVM: New Encryption IDs cgroup controller
+From:   Vipin Sharma <vipinsh@google.com>
+To:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        tj@kernel.org, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net
+Cc:     joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since the macro is available and we already use it for MSR bitmap table, use
-it for aligning IO bitmap table also.
+Hello,
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- x86/svm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch adds a new cgroup controller, Encryption IDs, to track and
+limit the usage of encryption IDs on a host.
 
-diff --git a/x86/svm.c b/x86/svm.c
-index a1808c7..846cf2a 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -298,7 +298,7 @@ static void setup_svm(void)
- 	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_SVME);
- 	wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_NX);
- 
--	io_bitmap = (void *) (((ulong)io_bitmap_area + 4095) & ~4095);
-+	io_bitmap = (void *) ALIGN((ulong)io_bitmap_area, PAGE_SIZE);
- 
- 	msr_bitmap = (void *) ALIGN((ulong)msr_bitmap_area, PAGE_SIZE);
- 
+AMD provides Secure Encrypted Virtualization (SEV) and SEV with
+Encrypted State (SEV-ES) to encrypt the guest OS's memory using limited
+number of Address Space Identifiers (ASIDs).
+
+This limited number of ASIDs creates issues like SEV ASID starvation and
+unoptimized scheduling in the cloud infrastucture.
+
+In the RFC patch v1, I provided only SEV cgroup controller but based
+on the feedback and discussion it became clear that this cgroup
+controller can be extended to be used by Intel's Trusted Domain
+Extension (TDX) and s390's protected virtualization Secure Execution IDs
+(SEID)
+
+This patch series provides a generic Encryption IDs controller with
+tracking support of the SEV and SEV-ES ASIDs.
+
+Changes in v5:
+- Changed controller filenames from encryption_ids.*.* to encids.*.*
+- Documentation of cgroup v1 now points to cgroup v2.
+
+Changes in v4:
+- The max value can be set lower than the current.
+- Added SEV-ES support.
+
+Changes in v3:
+- Fixes a build error when CONFIG_CGROUP is disabled.
+
+Changes in v2:
+- Changed cgroup name from sev to encryption_ids.
+- Replaced SEV specific names in APIs and documentations with generic
+  encryption IDs.
+- Providing 3 cgroup files per encryption ID type. For example in SEV,
+  - encryption_ids.sev.stat (only in the root cgroup directory).
+  - encryption_ids.sev.max
+  - encryption_ids.sev.current
+
+[1] https://lore.kernel.org/lkml/20200922004024.3699923-1-vipinsh@google.com/
+[2] https://lore.kernel.org/lkml/20201208213531.2626955-1-vipinsh@google.com/
+[3] https://lore.kernel.org/lkml/20201209205413.3391139-1-vipinsh@google.com/
+[4] https://lore.kernel.org/lkml/20210108012846.4134815-1-vipinsh@google.com/
+
+Vipin Sharma (2):
+  cgroup: svm: Add Encryption ID controller
+  cgroup: svm: Encryption IDs cgroup documentation.
+
+ .../admin-guide/cgroup-v1/encryption_ids.rst  |   1 +
+ Documentation/admin-guide/cgroup-v2.rst       |  78 +++-
+ arch/x86/kvm/svm/sev.c                        |  52 ++-
+ include/linux/cgroup_subsys.h                 |   4 +
+ include/linux/encryption_ids_cgroup.h         |  72 +++
+ include/linux/kvm_host.h                      |   4 +
+ init/Kconfig                                  |  14 +
+ kernel/cgroup/Makefile                        |   1 +
+ kernel/cgroup/encryption_ids.c                | 421 ++++++++++++++++++
+ 9 files changed, 633 insertions(+), 14 deletions(-)
+ create mode 100644 Documentation/admin-guide/cgroup-v1/encryption_ids.rst
+ create mode 100644 include/linux/encryption_ids_cgroup.h
+ create mode 100644 kernel/cgroup/encryption_ids.c
+
 -- 
-2.27.0
+2.30.0.284.gd98b1dd5eaa7-goog
 
