@@ -2,74 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 709852F8131
-	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 17:51:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DDCB2F8106
+	for <lists+kvm@lfdr.de>; Fri, 15 Jan 2021 17:42:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727115AbhAOQuu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 15 Jan 2021 11:50:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41882 "EHLO mail.kernel.org"
+        id S1727162AbhAOQle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 15 Jan 2021 11:41:34 -0500
+Received: from mga01.intel.com ([192.55.52.88]:47243 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725910AbhAOQuu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 15 Jan 2021 11:50:50 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0966B222B3;
-        Fri, 15 Jan 2021 16:50:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610729409;
-        bh=4TPOAVSgQzirc/H2ZzkAHJamp1LB/G2EZTjrlQgOIPY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=W9I5fyXDifpCokLdlk55lMXiZZdA6FEdy7X+0rBPXD58WQeNxYQC9Vq50pglm27wo
-         I0IT03Fd4XAKRs7443r00rHe+8xTml2A3GjthT/FY1j00c4TC4g/Bgt6YQiFvDwtzK
-         HF13w1f6PHYHa2+xq2Up0PC5qmZz5wQcn55VscpByT9cQPY4izRGWfVaOvQYWF3Q7+
-         6zsIbAUnh4wmzNHO5YgnunKg9t8wXFKaiyBv8FkjMqdyliQy887QaBflM7zJOrO0gO
-         cRyjUjCdjLdf3pGdyB66FmjeEgzo1Wl9GCsU95c1C0KeUmDhVXqr39INQQ72dO0PbW
-         TFGs1/HdHXd0A==
-Date:   Fri, 15 Jan 2021 16:50:04 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Quentin Perret <qperret@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        android-kvm@google.com, kernel-team@android.com
-Subject: Re: [PATCH] KVM: Documentation: Fix spec for KVM_CAP_ENABLE_CAP_VM
-Message-ID: <20210115165004.GA14556@willie-the-truck>
-References: <20210108165349.747359-1-qperret@google.com>
+        id S1726560AbhAOQle (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 15 Jan 2021 11:41:34 -0500
+IronPort-SDR: X61q8rdyMaBJMgQGl8judovh7+fqShB3BxGyzrAn6o5dujqVj/CPg8fVHGFge5kW7uVOoeKOIc
+ Br3XY1gCx+KQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9864"; a="197242510"
+X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
+   d="scan'208";a="197242510"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2021 08:39:47 -0800
+IronPort-SDR: RrEB2VPQ6fmVivwsyoWos3bubN3OdgSMLVj/pIs2xh2DeSGw07aXxNksiS65+g4n7oEugX9lyP
+ uJmyM3VgL68w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.79,349,1602572400"; 
+   d="scan'208";a="354358704"
+Received: from zhangyu-optiplex-7040.bj.intel.com ([10.238.154.148])
+  by fmsmga008.fm.intel.com with ESMTP; 15 Jan 2021 08:39:45 -0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org
+Subject: [PATCH] KVM: x86/MMU: Do not check unsync status for root SP.
+Date:   Sat, 16 Jan 2021 08:21:00 +0800
+Message-Id: <20210116002100.17339-1-yu.c.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210108165349.747359-1-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 08, 2021 at 04:53:49PM +0000, Quentin Perret wrote:
-> The documentation classifies KVM_ENABLE_CAP with KVM_CAP_ENABLE_CAP_VM
-> as a vcpu ioctl, which is incorrect. Fix it by specifying it as a VM
-> ioctl.
-> 
-> Fixes: e5d83c74a580 ("kvm: make KVM_CAP_ENABLE_CAP_VM architecture agnostic")
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 70254eaa5229..68898b623d86 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1328,7 +1328,7 @@ documentation when it pops into existence).
->  
->  :Capability: KVM_CAP_ENABLE_CAP_VM
->  :Architectures: all
-> -:Type: vcpu ioctl
-> +:Type: vm ioctl
->  :Parameters: struct kvm_enable_cap (in)
->  :Returns: 0 on success; -1 on error
+In shadow page table, only leaf SPs may be marked as unsync.
+And for non-leaf SPs, we use unsync_children to keep the number
+of the unsynced children. In kvm_mmu_sync_root(), sp->unsync
+shall always be zero for the root SP, hence no need to check it.
 
-I tripped over this as well, so:
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Acked-by: Will Deacon <will@kernel.org>
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481a..1a6bb03 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3412,8 +3412,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+ 		 * mmu_need_write_protect() describe what could go wrong if this
+ 		 * requirement isn't satisfied.
+ 		 */
+-		if (!smp_load_acquire(&sp->unsync) &&
+-		    !smp_load_acquire(&sp->unsync_children))
++		if (!smp_load_acquire(&sp->unsync_children))
+ 			return;
+ 
+ 		spin_lock(&vcpu->kvm->mmu_lock);
+-- 
+1.9.1
 
-Will
