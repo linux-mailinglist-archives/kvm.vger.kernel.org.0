@@ -2,153 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 126D92F8DC9
-	for <lists+kvm@lfdr.de>; Sat, 16 Jan 2021 18:10:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B0EB2F90C2
+	for <lists+kvm@lfdr.de>; Sun, 17 Jan 2021 06:31:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728036AbhAPRJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 16 Jan 2021 12:09:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727944AbhAPRJe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 16 Jan 2021 12:09:34 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F6EC0617AB
-        for <kvm@vger.kernel.org>; Sat, 16 Jan 2021 06:17:05 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id k4so7970601ybp.6
-        for <kvm@vger.kernel.org>; Sat, 16 Jan 2021 06:17:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AhGK/6XQsnDXFD6m51WpGMESDPE8+NDGrsD4blt+WV4=;
-        b=FZn6u53vlElyMCljU2RqtTC0wqPJ0rL6XTJSshrojIR62xkNhz47HvANPnH2fP70iH
-         wz6uoiCou3crMOBI6SNOhsl2Z50AAW5kNM5gmPi3czthENwKrRbiNa65YKzDN29NY6Yf
-         HTWwYIRJkJjkq3/uFs/t5vHaPT1tvhdiE79MCCwVcG+3J6UVdBpNs3tUT7VmqxFkBmTq
-         gDWNN9O4h3cSC+yF9eCbkdVmcEaJSZgvW45e19iA4Snpz7iJDDZwm8jh+LElnBUI13tq
-         vwT4TrhoMIMhuAmlS12m3+bJj+lQBH2xttWqdmD4IWddoOEFli+JFm6uKqQs5+15OMad
-         oYUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AhGK/6XQsnDXFD6m51WpGMESDPE8+NDGrsD4blt+WV4=;
-        b=X1SpbKxffnWD52qtjWSqAMTFf5JS6x0qT0ToCoZ106Elq5KYHuMMZOdnkx/H5oaL48
-         QB2eTIzewrTjGBZOg9da8zExtGuBudo6AyaIuoypDaKVlEnvcALhcYG61jrV6PhrV8qB
-         eMnu0pkXy34yk+3hMQD7AgHblekANd9Y99Qf8NERqUTz6t8lEvvb9rtv18OJjd08ewCQ
-         n0D/oR7u+h0GwzJE2+PjDYPZVFj7wtGa2QOnXdIx2uglyIh01nc0goEOT22FeRUfX3kn
-         GCosMz+Qh66zRizVEoQs4vCW1Rlvq5hfk9mnxrJeB8fFNUrJClG5w49DIlmqVxRuo4hM
-         o6GQ==
-X-Gm-Message-State: AOAM5307ds1IhhVpT7eEI74rYaZ2EKnN7c+3SmPM3oR39aoEmpmdVdBE
-        R9nN3IZ5zrLaC8dTbGx9ZNQPnAx9QfUHvXy8kX+ouKzUxM4=
-X-Google-Smtp-Source: ABdhPJwUTfgLPskdO2ytBdIyorFheZbKeXJkZikB8msfdK3+x4ZMMf7jE6UOjEwAdHKOFLbgRiJrK0qBlMxdDQZ0tZ8=
-X-Received: by 2002:a25:3bc5:: with SMTP id i188mr24905481yba.332.1610806624728;
- Sat, 16 Jan 2021 06:17:04 -0800 (PST)
+        id S1727187AbhAQFb1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Jan 2021 00:31:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45676 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725815AbhAQFbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Jan 2021 00:31:25 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7E1E323107;
+        Sun, 17 Jan 2021 05:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1610861443;
+        bh=DpapfS8CloHhWIyfLsKQuj+NWk694+ddY9JT8yb4Z6U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oXNqSd+dokYfehm1UYjzF5ow+mxEZgK6nonOZmGu3AgNjswSp1q0eAeRyJFfxbmVO
+         n/n5xjUpZT1CtG/Z7KQkTqJr6VXJnUW7X5pfyyLtTT9tooiul5djn86uuY0vDSGlQT
+         j7Ta3UEIceNucHDMt4alQf5oHlK6kAwYg/966t2LgB5dHSf9aixzKYdtcCGSPpIxNO
+         NlXBWLtKnd2IbDinD6b3c/kX7CtXBw/5LxSwj3QGZG4RGRbzXkhJ5vn8J8dzi6D+vl
+         JkbPPvcsrtJAse0SrFXbC2afUrfdaLRaHmWMMGZuAsH15Sn1v7ILYeGew9ByfE7iwJ
+         cE3KQ/YK8hbAQ==
+Date:   Sun, 17 Jan 2021 07:30:39 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     tglx@linutronix.de, ashok.raj@intel.com, kevin.tian@intel.com,
+        dave.jiang@intel.com, megha.dey@intel.com, dwmw2@infradead.org,
+        alex.williamson@redhat.com, bhelgaas@google.com,
+        dan.j.williams@intel.com, will@kernel.org, joro@8bytes.org,
+        dmaengine@vger.kernel.org, eric.auger@redhat.com,
+        jacob.jun.pan@intel.com, jgg@mellanox.com, kvm@vger.kernel.org,
+        kwankhede@nvidia.com, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, iommu@lists.linux-foundation.org,
+        maz@kernel.org, mona.hossain@intel.com, netanelg@mellanox.com,
+        parav@mellanox.com, pbonzini@redhat.com, rafael@kernel.org,
+        samuel.ortiz@intel.com, sanjay.k.kumar@intel.com,
+        shahafs@mellanox.com, tony.luck@intel.com, vkoul@kernel.org,
+        yan.y.zhao@linux.intel.com, yi.l.liu@intel.com
+Subject: Re: [RFC PATCH v3 1/2] iommu: Add capability IOMMU_CAP_VIOMMU
+Message-ID: <20210117053039.GO944463@unreal>
+References: <20210114013003.297050-1-baolu.lu@linux.intel.com>
+ <20210114013003.297050-2-baolu.lu@linux.intel.com>
+ <20210114132627.GA944463@unreal>
+ <b0c8b260-8e23-a5bd-d2da-ca1d67cdfa8a@linux.intel.com>
+ <20210115063108.GI944463@unreal>
+ <c58adc13-306a-8df8-19e1-27f834b3a7c9@linux.intel.com>
+ <20210116083904.GN944463@unreal>
+ <eda6ae9f-76eb-3254-ce58-ea355418a4b1@linux.intel.com>
 MIME-Version: 1.0
-References: <1606206780-80123-1-git-send-email-bmeng.cn@gmail.com> <be7005bb-94f8-4a3f-8e51-de1e21499683@redhat.com>
-In-Reply-To: <be7005bb-94f8-4a3f-8e51-de1e21499683@redhat.com>
-From:   Bin Meng <bmeng.cn@gmail.com>
-Date:   Sat, 16 Jan 2021 22:16:51 +0800
-Message-ID: <CAEUhbmUVBCNh8DiPusqSm20vRsvMRBDj2Rqu+QOyg3shTSPAug@mail.gmail.com>
-Subject: Re: [kvm-unit-tests][RFC PATCH] x86: Add a new test case for ret/iret
- with a nullified segment
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Bin Meng <bin.meng@windriver.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eda6ae9f-76eb-3254-ce58-ea355418a4b1@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
-
-On Tue, Nov 24, 2020 at 5:12 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Sat, Jan 16, 2021 at 04:47:40PM +0800, Lu Baolu wrote:
+> Hi Leon,
 >
-> On 24/11/20 09:33, Bin Meng wrote:
-> > From: Bin Meng <bin.meng@windriver.com>
+> On 2021/1/16 16:39, Leon Romanovsky wrote:
+> > On Sat, Jan 16, 2021 at 09:20:16AM +0800, Lu Baolu wrote:
+> > > Hi,
+> > >
+> > > On 2021/1/15 14:31, Leon Romanovsky wrote:
+> > > > On Fri, Jan 15, 2021 at 07:49:47AM +0800, Lu Baolu wrote:
+> > > > > Hi Leon,
+> > > > >
+> > > > > On 1/14/21 9:26 PM, Leon Romanovsky wrote:
+> > > > > > On Thu, Jan 14, 2021 at 09:30:02AM +0800, Lu Baolu wrote:
+> > > > > > > Some vendor IOMMU drivers are able to declare that it is running in a VM
+> > > > > > > context. This is very valuable for the features that only want to be
+> > > > > > > supported on bare metal. Add a capability bit so that it could be used.
+> > > > > >
+> > > > > > And how is it used? Who and how will set it?
+> > > > >
+> > > > > Use the existing iommu_capable(). I should add more descriptions about
+> > > > > who and how to use it.
+> > > >
+> > > > I want to see the code that sets this capability.
+> > >
+> > > Currently we have Intel VT-d and the virt-iommu setting this capability.
+> > >
+> > >   static bool intel_iommu_capable(enum iommu_cap cap)
+> > >   {
+> > >   	if (cap == IOMMU_CAP_CACHE_COHERENCY)
+> > >   		return domain_update_iommu_snooping(NULL) == 1;
+> > >   	if (cap == IOMMU_CAP_INTR_REMAP)
+> > >   		return irq_remapping_enabled == 1;
+> > > +	if (cap == IOMMU_CAP_VIOMMU)
+> > > +		return caching_mode_enabled();
+> > >
+> > >   	return false;
+> > >   }
+> > >
+> > > And,
+> > >
+> > > +static bool viommu_capable(enum iommu_cap cap)
+> > > +{
+> > > +	if (cap == IOMMU_CAP_VIOMMU)
+> > > +		return true;
+> > > +
+> > > +	return false;
+> > > +}
 > >
-> > This makes up the test case for the following QEMU patch:
-> > http://patchwork.ozlabs.org/project/qemu-devel/patch/1605261378-77971-1-git-send-email-bmeng.cn@gmail.com/
-> >
-> > Note the test case only fails on an unpatched QEMU with "accel=tcg".
-> >
-> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > ---
-> > Sending this as RFC since I am new to kvm-unit-tests
-> >
-> >   x86/emulator.c | 38 ++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 38 insertions(+)
-> >
-> > diff --git a/x86/emulator.c b/x86/emulator.c
-> > index e46d97e..6100b6d 100644
-> > --- a/x86/emulator.c
-> > +++ b/x86/emulator.c
-> > @@ -6,10 +6,14 @@
-> >   #include "processor.h"
-> >   #include "vmalloc.h"
-> >   #include "alloc_page.h"
-> > +#include "usermode.h"
-> >
-> >   #define memset __builtin_memset
-> >   #define TESTDEV_IO_PORT 0xe0
-> >
-> > +#define MAGIC_NUM 0xdeadbeefdeadbeefUL
-> > +#define GS_BASE 0x400000
-> > +
-> >   static int exceptions;
-> >
-> >   /* Forced emulation prefix, used to invoke the emulator unconditionally.  */
-> > @@ -925,6 +929,39 @@ static void test_sreg(volatile uint16_t *mem)
-> >       write_ss(ss);
-> >   }
-> >
-> > +static uint64_t usr_gs_mov(void)
-> > +{
-> > +    static uint64_t dummy = MAGIC_NUM;
-> > +    uint64_t dummy_ptr = (uint64_t)&dummy;
-> > +    uint64_t ret;
-> > +
-> > +    dummy_ptr -= GS_BASE;
-> > +    asm volatile("mov %%gs:(%%rcx), %%rax" : "=a"(ret): "c"(dummy_ptr) :);
-> > +
-> > +    return ret;
-> > +}
-> > +
-> > +static void test_iret(void)
-> > +{
-> > +    uint64_t val;
-> > +    bool raised_vector;
-> > +
-> > +    /* Update GS base to 4MiB */
-> > +    wrmsr(MSR_GS_BASE, GS_BASE);
-> > +
-> > +    /*
-> > +     * Per the SDM, jumping to user mode via `iret`, which is returning to
-> > +     * outer privilege level, for segment registers (ES, FS, GS, and DS)
-> > +     * if the check fails, the segment selector becomes null.
-> > +     *
-> > +     * In our test case, GS becomes null.
-> > +     */
-> > +    val = run_in_user((usermode_func)usr_gs_mov, GP_VECTOR,
-> > +                      0, 0, 0, 0, &raised_vector);
-> > +
-> > +    report(val == MAGIC_NUM, "Test ret/iret with a nullified segment");
-> > +}
-> > +
-> >   /* Broken emulation causes triple fault, which skips the other tests. */
-> >   #if 0
-> >   static void test_lldt(volatile uint16_t *mem)
-> > @@ -1074,6 +1111,7 @@ int main(void)
-> >       test_shld_shrd(mem);
-> >       //test_lgdt_lidt(mem);
-> >       test_sreg(mem);
-> > +     test_iret();
-> >       //test_lldt(mem);
-> >       test_ltr(mem);
-> >       test_cmov(mem);
-> >
+> > These two functions are reading this cap and not setting.
+> > Where can I see code that does "cap = IOMMU_CAP_VIOMMU" and not "=="?
 >
-> Thanks, the patch is good.
+> The iommu_capable() is a generic IOMMU interface to query IOMMU
+> capabilities. It takes @bus and @cap as input, and calls the callback
+> of vendor iommu. If the vendor iommu driver supports the specific
+> capability, it returns true. Otherwise, it returns false.
+>
+> bool iommu_capable(struct bus_type *bus, enum iommu_cap cap)
+> {
+>         if (!bus->iommu_ops || !bus->iommu_ops->capable)
+>                 return false;
+>
+>         return bus->iommu_ops->capable(cap);
+> }
+> EXPORT_SYMBOL_GPL(iommu_capable);
+>
+> In the vendor iommu's callback, it checks the capability and returns a
+> value according to its capability, just as showed above.
 
-Is this patch applied?
+Ohh, sorry.
+I missed "iommu_capable(dev->bus, IOMMU_CAP_VIOMMU)" from second patch.
 
-Regards,
-Bin
+Thanks
+
+>
+> Best regards,
+> baolu
