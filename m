@@ -2,118 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A0DC2F9A59
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 08:08:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C19CE2F9AF2
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 09:04:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732115AbhARHIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 02:08:01 -0500
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21560 "EHLO
-        sender4-of-o55.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730789AbhARHH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jan 2021 02:07:59 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1610953607; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=b/8nZOxT44QvT6nQEWl2xpnBrAZaSGsNovepT+GrTFB/4flq2Um5aOb1xeF/bP+UU490BuQFnQNnXzm0AzCpIiIc0hptjfSbWEzpYRgd01GsYxI/5AU2QNncOpvdQ9KuJjXeg5XqoiuILFynvni//4j9RP9KNlVgTTFVXn1I1vk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1610953607; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
-        bh=lab28A5SUL2BhmyRutIQ7uMy/Yib0xfqUON0AhVXno8=; 
-        b=U9u2hOVMQDjDKpIeuTGl84a8gAg9Djuqhm7kBAOxyKmukUaB294VJDfj1S+5cwVL1/BfKlv+GNQwVV2Zc76MCi6+nnFLhh3u89UnjA6ipc+zIX+wF/E8bTouLwTrieaxApRYuxCDhYyNPBL5ihJrQdKvRfr8LQsUEn4GCNfqROw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=no-reply@patchew.org;
-        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
-        with SMTPS id 1610953606224283.50818109261525; Sun, 17 Jan 2021 23:06:46 -0800 (PST)
-In-Reply-To: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
-Reply-To: <qemu-devel@nongnu.org>
+        id S1733291AbhARIEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 03:04:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50328 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733222AbhARIEJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 03:04:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610956960;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jTgNdRDUMjp+NABm74DpOQpjeQcqsyUbCjmMQCacUck=;
+        b=iz/P/dwOj2FJtQ426HcEkfSB9b9gYs1g/dzGvGL1h7Oq6NwAQEnYw1UZgmaYLJwz9JtcYX
+        aqUNSSa/lpj4jpMX+eHd59Qr/I85xkYqSCbPKaGNnvMHl5W3CD+z+EVyxzpzghNmT1jgN+
+        YG6v5IB3f6C81uVPVesMM6a3bHei0iA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-4I_9-2YMOoCxpesbMZiLUw-1; Mon, 18 Jan 2021 03:02:36 -0500
+X-MC-Unique: 4I_9-2YMOoCxpesbMZiLUw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32FB7107ACFA;
+        Mon, 18 Jan 2021 08:02:34 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-189.ams2.redhat.com [10.36.112.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CDC3E6F986;
+        Mon, 18 Jan 2021 08:02:25 +0000 (UTC)
 Subject: Re: [PATCH v2 0/9] Alpine Linux build fix and CI pipeline
-Message-ID: <161095360381.12958.7588862202929299935@73fb1a5943b8>
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        kvm@vger.kernel.org,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        Alistair Francis <alistair@alistair23.me>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <a34add77-2b12-3c83-4362-1241e2aef034@redhat.com>
+Date:   Mon, 18 Jan 2021 09:02:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From:   no-reply@patchew.org
-To:     jiaxun.yang@flygoat.com
-Cc:     qemu-devel@nongnu.org, fam@euphon.net, lvivier@redhat.com,
-        thuth@redhat.com, viktor.prutyanov@phystech.edu,
-        kvm@vger.kernel.org, alex.bennee@linaro.org,
-        alistair@alistair23.me, groug@kaod.org, wainersm@redhat.com,
-        mreitz@redhat.com, qemu-ppc@nongnu.org, kwolf@redhat.com,
-        pbonzini@redhat.com, qemu-block@nongnu.org, philmd@redhat.com,
-        david@gibson.dropbear.id.au
-Date:   Sun, 17 Jan 2021 23:06:46 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIxMDExODA2MzgwOC4xMjQ3
-MS0xLWppYXh1bi55YW5nQGZseWdvYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
-IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
-cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMTAxMTgwNjM4MDgu
-MTI0NzEtMS1qaWF4dW4ueWFuZ0BmbHlnb2F0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjIgMC85XSBB
-bHBpbmUgTGludXggYnVpbGQgZml4IGFuZCBDSSBwaXBlbGluZQoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIxMDExODA2MzgwOC4xMjQ3MS0xLWppYXh1
-bi55YW5nQGZseWdvYXQuY29tIC0+IHBhdGNoZXcvMjAyMTAxMTgwNjM4MDguMTI0NzEtMS1qaWF4
-dW4ueWFuZ0BmbHlnb2F0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjEwMTE4
-MDY1NjI3Ljc5OTAzLTEtZ2FucWl4aW5AaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzIwMjEwMTE4MDY1
-NjI3Ljc5OTAzLTEtZ2FucWl4aW5AaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCmVlZWYzM2EgZ2l0bGFiLWNpOiBBZGQgYWxwaW5lIHRvIHBpcGVsaW5lCjg1ZWE1ODgg
-dGVzdHMvZG9ja2VyOiBBZGQgZG9ja2VyZmlsZSBmb3IgQWxwaW5lIExpbnV4CjlmNWUzY2EgYWNj
-ZWwva3ZtOiBhdm9pZCB1c2luZyBwcmVkZWZpbmVkIFBBR0VfU0laRQowMjkyZGI1IHRlc3RzOiBS
-ZW5hbWUgUEFHRV9TSVpFIGRlZmluaXRpb25zCmZkY2FjYjkgZWxmMmRtcDogUmVuYW1lIFBBR0Vf
-U0laRSB0byBFTEYyRE1QX1BBR0VfU0laRQo5ZmYzNmM1IGh3L2Jsb2NrL25hbmQ6IFJlbmFtZSBQ
-QUdFX1NJWkUgdG8gTkFORF9QQUdFX1NJWkUKYjA5NjYwNSBvc2RlcC5oOiBSZW1vdmUgPHN5cy9z
-aWduYWwuaD4gaW5jbHVkZQo5ZTVlNjdkIGxpYnZob3N0LXVzZXI6IEluY2x1ZGUgcG9sbC5oIGlu
-c3RlYWQgb2Ygc3lzL3BvbGwuaApjMjBiYzcyIGNvbmZpZ3VyZTogQWRkIHN5cy90aW1leC5oIHRv
-IHByb2JlIGNsb2NrX2FkanRpbWUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOSBDaGVja2luZyBj
-b21taXQgYzIwYmM3MjUzZjEwIChjb25maWd1cmU6IEFkZCBzeXMvdGltZXguaCB0byBwcm9iZSBj
-bG9ja19hZGp0aW1lKQoyLzkgQ2hlY2tpbmcgY29tbWl0IDllNWU2N2QwMWY5MSAobGlidmhvc3Qt
-dXNlcjogSW5jbHVkZSBwb2xsLmggaW5zdGVhZCBvZiBzeXMvcG9sbC5oKQozLzkgQ2hlY2tpbmcg
-Y29tbWl0IGIwOTY2MDU2ZDc3ZSAob3NkZXAuaDogUmVtb3ZlIDxzeXMvc2lnbmFsLmg+IGluY2x1
-ZGUpCjQvOSBDaGVja2luZyBjb21taXQgOWZmMzZjNTgwODFiIChody9ibG9jay9uYW5kOiBSZW5h
-bWUgUEFHRV9TSVpFIHRvIE5BTkRfUEFHRV9TSVpFKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMyNzogRklMRTogaHcvYmxvY2svbmFuZC5jOjExODoKKyMgZGVmaW5l
-IFBBR0VfU1RBUlQocGFnZSleSShQQUdFKHBhZ2UpICogKE5BTkRfUEFHRV9TSVpFICsgT09CX1NJ
-WkUpKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ3OiBGSUxF
-OiBody9ibG9jay9uYW5kLmM6MTM1OgorIyBkZWZpbmUgTkFORF9QQUdFX1NJWkVeSV5JMjA0OCQK
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2NjogRklMRTogaHcvYmxvY2svbmFu
-ZC5jOjY3NToKKyAgICAgICAgbWVtX2FuZChpb2J1ZiArIChzb2ZmIHwgb2ZmKSwgcy0+aW8sIE1J
-TihzLT5pb2xlbiwgTkFORF9QQUdFX1NJWkUgLSBvZmYpKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM3MTogRklMRTogaHcvYmxvY2svbmFuZC5jOjY3ODoKKyAgICAgICAgICAg
-IG1lbV9hbmQocy0+c3RvcmFnZSArIChwYWdlIDw8IE9PQl9TSElGVCksIHMtPmlvICsgTkFORF9Q
-QUdFX1NJWkUgLSBvZmYsCgp0b3RhbDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDEyMCBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvOSBDaGVja2lu
-ZyBjb21taXQgZmRjYWNiOTRlOTIxIChlbGYyZG1wOiBSZW5hbWUgUEFHRV9TSVpFIHRvIEVMRjJE
-TVBfUEFHRV9TSVpFKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzA6IEZJTEU6
-IGNvbnRyaWIvZWxmMmRtcC9tYWluLmM6Mjg0OgorICAgICAgICBoLlBoeXNpY2FsTWVtb3J5Qmxv
-Y2suTnVtYmVyT2ZQYWdlcyArPSBwcy0+YmxvY2tbaV0uc2l6ZSAvIEVMRjJETVBfUEFHRV9TSVpF
-OwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgwOiBGSUxFOiBjb250cmliL2Vs
-ZjJkbXAvbWFpbi5jOjI5MToKKyAgICBoLlJlcXVpcmVkRHVtcFNwYWNlICs9IGguUGh5c2ljYWxN
-ZW1vcnlCbG9jay5OdW1iZXJPZlBhZ2VzIDw8IEVMRjJETVBfUEFHRV9CSVRTOwoKdG90YWw6IDAg
-ZXJyb3JzLCAyIHdhcm5pbmdzLCA3MCBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzkgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KNi85IENoZWNraW5nIGNvbW1pdCAwMjkyZGI1YTU3MWEgKHRlc3Rz
-OiBSZW5hbWUgUEFHRV9TSVpFIGRlZmluaXRpb25zKQo3LzkgQ2hlY2tpbmcgY29tbWl0IDlmNWUz
-Y2E5Njk0MyAoYWNjZWwva3ZtOiBhdm9pZCB1c2luZyBwcmVkZWZpbmVkIFBBR0VfU0laRSkKOC85
-IENoZWNraW5nIGNvbW1pdCA4NWVhNTg4NGY3OGQgKHRlc3RzL2RvY2tlcjogQWRkIGRvY2tlcmZp
-bGUgZm9yIEFscGluZSBMaW51eCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2Rl
-IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NyBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCA4LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS85IENoZWNraW5nIGNvbW1pdCBl
-ZWVmMzNhNzdlZGYgKGdpdGxhYi1jaTogQWRkIGFscGluZSB0byBwaXBlbGluZSkKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMTAxMTgwNjM4MDgu
-MTI0NzEtMS1qaWF4dW4ueWFuZ0BmbHlnb2F0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9
-bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On 18/01/2021 07.37, Jiaxun Yang wrote:
+> Alpine Linux is a security-oriented, lightweight Linux distribution
+> based on musl libc and busybox.
+> 
+> It it popular among Docker guests and embedded applications.
+> 
+> Adding it to test against different libc.
+> 
+> Patches pending review at v2 are: 7, 8, 9
+> 
+> Tree avilable at: https://gitlab.com/FlyGoat/qemu/-/commits/alpine_linux_v2
+> CI All green: https://gitlab.com/FlyGoat/qemu/-/pipelines/242003288
+> 
+> It is known to have checkpatch complains about identation but they're
+> all pre-existing issues as I'm only doing string replacement.
+> 
+> v2:
+>   - Reoreder patches (Wainer)
+>   - Add shadow to dockerfile (Wainer)
+>   - Pickup proper signal.h fix (PMM)
+>   - Correct clock_adjtime title (Thomas Huth)
+>   - Collect review tags
+> 
+> Jiaxun Yang (8):
+>    configure: Add sys/timex.h to probe clock_adjtime
+>    libvhost-user: Include poll.h instead of sys/poll.h
+>    hw/block/nand: Rename PAGE_SIZE to NAND_PAGE_SIZE
+>    elf2dmp: Rename PAGE_SIZE to ELF2DMP_PAGE_SIZE
+>    tests: Rename PAGE_SIZE definitions
+>    accel/kvm: avoid using predefined PAGE_SIZE
+>    tests/docker: Add dockerfile for Alpine Linux
+>    gitlab-ci: Add alpine to pipeline
+> 
+> Michael Forney (1):
+>    osdep.h: Remove <sys/signal.h> include
+> 
+>   configure                                 |  1 +
+>   meson.build                               |  1 -
+>   contrib/elf2dmp/addrspace.h               |  6 +-
+>   include/qemu/osdep.h                      |  4 --
+>   subprojects/libvhost-user/libvhost-user.h |  2 +-
+>   accel/kvm/kvm-all.c                       |  3 +
+>   contrib/elf2dmp/addrspace.c               |  4 +-
+>   contrib/elf2dmp/main.c                    | 18 +++---
+>   hw/block/nand.c                           | 40 ++++++-------
+>   tests/migration/stress.c                  | 10 ++--
+>   tests/qtest/libqos/malloc-pc.c            |  4 +-
+>   tests/qtest/libqos/malloc-spapr.c         |  4 +-
+>   tests/qtest/m25p80-test.c                 | 54 ++++++++---------
+>   tests/tcg/multiarch/system/memory.c       |  6 +-
+>   tests/test-xbzrle.c                       | 70 +++++++++++------------
+>   .gitlab-ci.d/containers.yml               |  5 ++
+>   .gitlab-ci.yml                            | 23 ++++++++
+>   tests/docker/dockerfiles/alpine.docker    | 57 ++++++++++++++++++
+>   18 files changed, 198 insertions(+), 114 deletions(-)
+>   create mode 100644 tests/docker/dockerfiles/alpine.docker
+> 
+
+Thanks! I'll take this through my testing-next branch:
+
+  https://gitlab.com/huth/qemu/-/commits/testing-next/
+
+  Thomas
+
