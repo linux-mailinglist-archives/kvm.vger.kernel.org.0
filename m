@@ -2,113 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5380B2FA7FE
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 18:55:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85D712FA80C
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 18:55:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436584AbhARRgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 12:36:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25469 "EHLO
+        id S2407286AbhARRzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 12:55:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52162 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2436582AbhARRfw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 12:35:52 -0500
+        by vger.kernel.org with ESMTP id S2436615AbhARRgR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 12:36:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610991265;
+        s=mimecast20190719; t=1610991290;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tvg2z+rJE7oAboiLpvnNtZpTYMBCy/tGBkqn7W8lY0M=;
-        b=I8VxDArQ3sdbMIusaFOwEWsV0gIHc0iQpLTFOESefjwa8DXl3ZSD+LMwY7MrRQN/fGRsvm
-        xyj+MzUDptCeMKqr4C1QfvLD1Hxm0Bk6SFY3BBPk8JsV/I/gGVC+e4/KYOR7AgoreC8Hce
-        NDA68hQvHxke2Oh+A5UNcRFK/Ic7ITI=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-FyNT9KM_OSWCm3WFCoItVA-1; Mon, 18 Jan 2021 12:34:22 -0500
-X-MC-Unique: FyNT9KM_OSWCm3WFCoItVA-1
-Received: by mail-wr1-f72.google.com with SMTP id g17so8646054wrr.11
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 09:34:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tvg2z+rJE7oAboiLpvnNtZpTYMBCy/tGBkqn7W8lY0M=;
-        b=ndVjmUNu+71h2VoRPekC06JICddMxhtTSxReUOyDiCZXKsSjL7VEzO6BmGOaONFMwR
-         6Fdbb72yPbfmRL0n3w5WzvmmpfqJuZmjED1p8YWXF0xLqPMvIHz8qESSudy9OZVGwRDx
-         UKSGSdHle+seJbbyCeqN4tmLWpCXwipW7U0JKbkH+vgYjzKuGVrzX6AsepTg4aQFsjBD
-         Q+9d/rj62o6kLf7tL/ch1kiTBa+8X/608aIpRW+VcN02hm9Yfe4DZMi5fdswlLffWAQI
-         +Q32BHx4Hq07kI6z1qOUmaZBmUIBxa3a7Oo0XGE+r09Q6Y1L0NYgJTrm1L/ggMcJgtzQ
-         M7LQ==
-X-Gm-Message-State: AOAM532UH6/suBiLRrvEpFKkdNObEW4v5PnpDL9UvqPpZwXxmtqD8jFW
-        pyhrZGBlzAhoYjITa9ggM7mr6trBhuRt5tMHyKJSJD0p/5vMrlcd1sByM+v0uEBs+6EHJ+h/GMA
-        rjiEIO9Hmuohb
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr580675wro.292.1610991261135;
-        Mon, 18 Jan 2021 09:34:21 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwHdsDozji1Mbty0aRn53xFuOFArekZ/aSrjVwZRRRr7i/mb+3I5yS0zbfo3MHFnvOyhnhvZQ==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr580660wro.292.1610991261001;
-        Mon, 18 Jan 2021 09:34:21 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v4sm31428402wrw.42.2021.01.18.09.34.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Jan 2021 09:34:20 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: Add more protection against undefined behavior
- in rsvd_bits()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210113204515.3473079-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <947f0e1a-c8db-5c68-1e0c-abadd10d92fc@redhat.com>
-Date:   Mon, 18 Jan 2021 18:34:19 +0100
+        bh=eWK8quOaZneogEHvBG4bKxZP6nmi8RjG3iH4OALN36M=;
+        b=EEhbHC5hwMmjlgHCLiMayLy1BKrShwaQlFKhoS7PYhPgXIl8hhrtBauEIgPTavxYcR+9fC
+        qRDsI/4xvlrawn2iRrIGuPM3CzyVkNhUrIUXO+iYC+7COvREhX+cVSe0Qx2q3rCgGGCoWm
+        H9JIpuRdZXiG+W7mNH78IrtkF31xNdA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-BJ2vr762Ps6954n_Oxx7DA-1; Mon, 18 Jan 2021 12:34:49 -0500
+X-MC-Unique: BJ2vr762Ps6954n_Oxx7DA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 456BC107ACF6
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 17:34:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-189.ams2.redhat.com [10.36.112.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5240919C66;
+        Mon, 18 Jan 2021 17:34:47 +0000 (UTC)
+Subject: Re: [PATCH kvm-unit-tests 1/4] libcflat: add a few more runtime
+ functions
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com
+References: <20201223010850.111882-1-pbonzini@redhat.com>
+ <20201223010850.111882-2-pbonzini@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <3f80c41b-30e7-e5e6-e69f-d2fa844b4778@redhat.com>
+Date:   Mon, 18 Jan 2021 18:34:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210113204515.3473079-1-seanjc@google.com>
+In-Reply-To: <20201223010850.111882-2-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/01/21 21:45, Sean Christopherson wrote:
-> Add compile-time asserts in rsvd_bits() to guard against KVM passing in
-> garbage hardcoded values, and cap the upper bound at '63' for dynamic
-> values to prevent generating a mask that would overflow a u64.
+On 23/12/2020 02.08, Paolo Bonzini wrote:
+> These functions will be used to parse the chaos test's command line.
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   arch/x86/kvm/mmu.h | 9 ++++++++-
->   1 file changed, 8 insertions(+), 1 deletion(-)
+>   lib/alloc.c    |  9 +++++++-
+>   lib/alloc.h    |  1 +
+>   lib/libcflat.h |  4 +++-
+>   lib/string.c   | 59 +++++++++++++++++++++++++++++++++++++++++++++++---
+>   lib/string.h   |  3 +++
+>   5 files changed, 71 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 581925e476d6..261be1d2032b 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -44,8 +44,15 @@
->   #define PT32_ROOT_LEVEL 2
->   #define PT32E_ROOT_LEVEL 3
+> diff --git a/lib/alloc.c b/lib/alloc.c
+> index a46f464..a56f664 100644
+> --- a/lib/alloc.c
+> +++ b/lib/alloc.c
+> @@ -1,7 +1,7 @@
+>   #include "alloc.h"
+>   #include "bitops.h"
+>   #include "asm/page.h"
+> -#include "bitops.h"
+> +#include "string.h"
 >   
-> -static inline u64 rsvd_bits(int s, int e)
-> +static __always_inline u64 rsvd_bits(int s, int e)
+>   void *malloc(size_t size)
 >   {
-> +	BUILD_BUG_ON(__builtin_constant_p(e) && __builtin_constant_p(s) && e < s);
-> +
-> +	if (__builtin_constant_p(e))
-> +		BUILD_BUG_ON(e > 63);
-> +	else
-> +		e &= 63;
-> +
->   	if (e < s)
->   		return 0;
+> @@ -50,6 +50,13 @@ void *calloc(size_t nmemb, size_t size)
+>   	return ptr;
+>   }
 >   
-> 
+> +char *strdup(const char *s)
+> +{
+> +	size_t len = strlen(s) + 1;
+> +	char *d = malloc(len);
+> +	return strcpy(d, s);
+> +}
+> +
+>   void free(void *ptr)
+>   {
+>   	if (alloc_ops->free)
+> diff --git a/lib/alloc.h b/lib/alloc.h
+> index 9b4b634..4139465 100644
+> --- a/lib/alloc.h
+> +++ b/lib/alloc.h
+> @@ -34,5 +34,6 @@ void *malloc(size_t size);
+>   void *calloc(size_t nmemb, size_t size);
+>   void free(void *ptr);
+>   void *memalign(size_t alignment, size_t size);
+> +char *strdup(const char *s);
 
-Queued for 5.11, thanks.
+Why did you put the prototype in alloc.h and not in string.h?
 
-Paolo
+  Thomas
 
