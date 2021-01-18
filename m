@@ -2,152 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E510A2F9C92
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 11:35:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 605D52F9C9D
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 11:36:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388590AbhARJuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 04:50:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43356 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388559AbhARJRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jan 2021 04:17:34 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66153C0613C1
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 01:16:52 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id j21so3921766oou.11
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 01:16:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XSK+lvyQA4uXA5xPhZ/8h6A7IFG5qSuPlS2fMmSK9uE=;
-        b=g0OihKEQp3iql/CK/5EC0JwmqXVTR+AOVENIOuGMPFsGSeHvvkxftBiA9Mu5HHh+Dt
-         yvdAaWFsnRmu/efRdYIFkFNmcwDY8n4XbSXOGUbzF5HMyG2W6010KLYjXpnOvsskibZO
-         41hEyNwNAI1zV/ra54yz7iIQq6oPLY47r80NacYWAAwb5D3RUTBWZXYtnHP66WVTtG6g
-         9MLMjmxBLg1sV9mbRo4JoyerLfkcZl/BKB52D6wLSbFj5QWAETS8bW05NLyQ1eOxD3DM
-         RwBSlkQU9mbctTrNWvRgt1eLrUWZbgF/aXRyp0nsHBbGv+pc8JZJer9XJF9JbSxim1YM
-         0wEw==
+        id S2389421AbhARKBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 05:01:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30496 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389058AbhARJmv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 04:42:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610962884;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AS4KzKOJ0cVVXMB6IwF7klX32A2gREYdrqbMEnGdHOs=;
+        b=MfrEAzc2mKU7nWI3+G404u5oGOQipNxpuuc2xRJeXJ3vpYynKW+2H+uQWcuBnftBPgP9ZK
+        2ytu0ff0fNBNeY7tAZj0V6eRCM1lH4vtkDWjAWz9Oz7okViBrb9Ymhw9HvF4HK6nG5R/Xr
+        wm8pwm7vPLi29m9cSnvWVCYJv7w9QMw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-2cnFUOqJPtW0KvpMEnQ_Cg-1; Mon, 18 Jan 2021 04:41:22 -0500
+X-MC-Unique: 2cnFUOqJPtW0KvpMEnQ_Cg-1
+Received: by mail-wr1-f70.google.com with SMTP id v5so8029809wrr.0
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 01:41:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XSK+lvyQA4uXA5xPhZ/8h6A7IFG5qSuPlS2fMmSK9uE=;
-        b=t3fiUFq7qqUWLJl8DmcrTVSdVJgiYaSxywoz0cpHnsZeSiuMnSxk8s06ha2XyFZd/Q
-         J3AUfA5IBZ2rB7ryGabbqnCDogBHnakv19I9meLJWhP1X2T8AUdefLTNg1JWhzgrMBFF
-         uDVkO43NqlnYAsObLJu02SgltwjjMZJvhModxQ74Oe7V6oqoljhEQunF64E1Utxg59Q5
-         IeixYHYVwsyvh4LWj1s3Y91qJt/CB8ck6u93siOQbAvtgSyhxZ3VmrDfqyIlV0jd8ndV
-         YZ1r36RePfWk7Oq7BmEujt6jOu2z+WXs+YJxf5tB1hXcDno34wzdR6fSvPHgfG0IsjBc
-         S+gg==
-X-Gm-Message-State: AOAM531j/Agt3idxM0Ud9mPTaTWkGaowFW2gkscCh+ub2219heqE/chj
-        L+3gBoIyEfzIwgdBHXo0NXDKXF9sGoCCliUoEihKOA==
-X-Google-Smtp-Source: ABdhPJzqTOl3MqL0bVrAhDZtCS3mLYK4WgEB46OSUFecnlcwl11ttUt9pEepSbvh3bw3kfb4oCIECDbWZljHghrIAlk=
-X-Received: by 2002:a4a:d396:: with SMTP id i22mr16311455oos.55.1610961411680;
- Mon, 18 Jan 2021 01:16:51 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=AS4KzKOJ0cVVXMB6IwF7klX32A2gREYdrqbMEnGdHOs=;
+        b=afgwA2bQjFI1Vn3mYF5qRgZ4mWW5PB1Xyju8/VksHT+xnCLg10g93B0jRlCwDJCPtw
+         quU9k2J2Zrq9HP2xyvdWilhPAKFoxCxH5OhjWLohIcAX9zFhqhJnGpzLCIs8FxcQJOG3
+         2oZvcOQkLKfcMl215YS02FAoF7XPtFtDEhmQPAlgFQTuMupj+wJF9q9ISyQp1P6nbRL7
+         65H5rUG+oTQjp6UE5nNipkeLITr5pw1V57B9biJsqaK6qHnwylY5FZquTJe942n+s3QO
+         jRcmvXTVBH7iq3tn5STKuoqz+z2h0kWxNfbATz6DQgg91gXgrcuIXmeuogZdZpGy8eBK
+         61eA==
+X-Gm-Message-State: AOAM530ON5fN/yVKqghsallHQX3CLbReReeIyVVtDWqv18AOjvOKMrNI
+        YIK0jtC2U2BTOKLXEh35YduJ2M+2X249kxLMa20RVid0waS2Gq8/AMRf0RzznRa+mmncH1PYqTp
+        AKe/Qf/h0qzut
+X-Received: by 2002:adf:b781:: with SMTP id s1mr21050171wre.290.1610962881769;
+        Mon, 18 Jan 2021 01:41:21 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy2Oo2/AneHcPKIpu5/8J8qKp39igwQWmLm5ZZWFuFtdvlChiLOzc/BPuDuIGUfn1ZqbB+RSA==
+X-Received: by 2002:adf:b781:: with SMTP id s1mr21050157wre.290.1610962881664;
+        Mon, 18 Jan 2021 01:41:21 -0800 (PST)
+Received: from [192.168.1.36] (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
+        by smtp.gmail.com with ESMTPSA id 62sm5847482wmd.34.2021.01.18.01.41.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Jan 2021 01:41:21 -0800 (PST)
+Subject: Re: [PATCH v2 2/9] libvhost-user: Include poll.h instead of
+ sys/poll.h
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        kvm@vger.kernel.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        Alistair Francis <alistair@alistair23.me>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+ <20210118063808.12471-3-jiaxun.yang@flygoat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <eae88670-9f5b-09ef-dcfb-6e4f00d0011a@redhat.com>
+Date:   Mon, 18 Jan 2021 10:41:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
- <20210112194143.1494-4-yuri.benditovich@daynix.com> <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
- <CAOEp5OevYR5FWVMfQ_esmWTKtz9_ddTupbe7FtBFQ=sv2kEt2w@mail.gmail.com>
-In-Reply-To: <CAOEp5OevYR5FWVMfQ_esmWTKtz9_ddTupbe7FtBFQ=sv2kEt2w@mail.gmail.com>
-From:   Yuri Benditovich <yuri.benditovich@daynix.com>
-Date:   Mon, 18 Jan 2021 11:16:40 +0200
-Message-ID: <CAOEp5OeQscazq2bSkT7ocnHZ5q_+ffSUcBqbUZpSz+dVEDcLhg@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/7] tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
-To:     Alexei Starovoitov <ast@kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        bpf <bpf@vger.kernel.org>
-Cc:     Yan Vugenfirer <yan@daynix.com>, Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Song Liu <songliubraving@fb.com>,
-        Martin KaFai Lau <kafai@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Yonghong Song <yhs@fb.com>,
-        Willem de Bruijn <willemb@google.com>,
-        KP Singh <kpsingh@kernel.org>,
-        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Marco Elver <elver@google.com>, decui@microsoft.com,
-        cai@lca.pw, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jakub Sitnicki <jakub@cloudflare.com>,
-        Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210118063808.12471-3-jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Alexei,
+On 1/18/21 7:38 AM, Jiaxun Yang wrote:
+> Musl libc complains about it's wrong usage.
+> 
+> In file included from ../subprojects/libvhost-user/libvhost-user.h:20,
+>                  from ../subprojects/libvhost-user/libvhost-user-glib.h:19,
+>                  from ../subprojects/libvhost-user/libvhost-user-glib.c:15:
+> /usr/include/sys/poll.h:1:2: error: #warning redirecting incorrect #include <sys/poll.h> to <poll.h> [-Werror=cpp]
+>     1 | #warning redirecting incorrect #include <sys/poll.h> to <poll.h>
+>       |  ^~~~~~~
+> 
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  subprojects/libvhost-user/libvhost-user.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Can you please answer the questions in the last email of this thread?
-Your comment will be extremely helpful.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Thanks
-
-On Tue, Jan 12, 2021 at 10:55 PM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> On Tue, Jan 12, 2021 at 10:40 PM Yuri Benditovich
-> <yuri.benditovich@daynix.com> wrote:
-> >
-> > On Tue, Jan 12, 2021 at 9:42 PM Yuri Benditovich
-> > <yuri.benditovich@daynix.com> wrote:
-> > >
-> > > This program type can set skb hash value. It will be useful
-> > > when the tun will support hash reporting feature if virtio-net.
-> > >
-> > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > > ---
-> > >  drivers/net/tun.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > > index 7959b5c2d11f..455f7afc1f36 100644
-> > > --- a/drivers/net/tun.c
-> > > +++ b/drivers/net/tun.c
-> > > @@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
-> > >                 prog = NULL;
-> > >         } else {
-> > >                 prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
-> > > +               if (IS_ERR(prog))
-> > > +                       prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
-> > >                 if (IS_ERR(prog))
-> > >                         return PTR_ERR(prog);
-> > >         }
-> >
-> > Comment from Alexei Starovoitov:
-> > Patches 1 and 2 are missing for me, so I couldn't review properly,
-> > but this diff looks odd.
-> > It allows sched_cls prog type to attach to tun.
-> > That means everything that sched_cls progs can do will be done from tun hook?
->
-> We do not have an intention to modify the packet in this steering eBPF.
-> There is just one function that unavailable for BPF_PROG_TYPE_SOCKET_FILTER
-> that the eBPF needs to make possible to deliver the hash to the guest
-> VM - it is 'bpf_set_hash'
->
-> Does it mean that we need to define a new eBPF type for socket filter
-> operations + set_hash?
->
-> Our problem is that the eBPF calculates 32-bit hash, 16-bit queue
-> index and 8-bit of hash type.
-> But it is able to return only 32-bit integer, so in this set of
-> patches the eBPF returns
-> queue index and hash type and saves the hash in skb->hash using bpf_set_hash().
->
-> If this is unacceptable, can you please recommend a better solution?
->
-> > sched_cls assumes l2 and can modify the packet.
->
-> The steering eBPF in TUN module also assumes l2.
->
-> > I think crashes are inevitable.
-> >
-> > > --
-> > > 2.17.1
-> > >
