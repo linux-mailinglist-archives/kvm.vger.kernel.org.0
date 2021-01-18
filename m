@@ -2,85 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3D4F2F9DB4
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 12:12:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3DEB2F9F89
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 13:28:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388710AbhARLL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 06:11:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50956 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390051AbhARLLS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 06:11:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610968191;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mbmg+uJYPTfhUMaZzAVKCaqtDELncDrVhg7kfvU9aBU=;
-        b=hqGSaEF839Eg7B74mzj2jqT1T/uA6ouJFrdWLiwgNoIAzh8gakXgoo6t92O5f8SKwHE3Tl
-        oRiWweUQejRQ3ggwwfMeBDIVIVzLQcZZgYkqrtFyAW+p4S5fMw68Uc19GT7mV1Bp09O/hH
-        egqYdhPPQgIroEY7KECZolmZYkNH33M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-MnzDvEYKOaCRvXM6GiurpQ-1; Mon, 18 Jan 2021 06:09:49 -0500
-X-MC-Unique: MnzDvEYKOaCRvXM6GiurpQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF32F180A096;
-        Mon, 18 Jan 2021 11:09:48 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.195.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC2C010023AD;
-        Mon, 18 Jan 2021 11:09:47 +0000 (UTC)
-Date:   Mon, 18 Jan 2021 12:09:44 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mlevitsk@redhat.com
-Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
-Message-ID: <20210118110944.vsxw7urtbs7fmbhk@kamzik.brq.redhat.com>
-References: <20201223010850.111882-1-pbonzini@redhat.com>
- <X+pbZ061gTIbM2Ef@google.com>
- <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
- <X/4igkJA1ZY5rCk7@google.com>
- <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
- <YACl4jtDc1IGcxiQ@google.com>
+        id S2391513AbhARM07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 07:26:59 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11554 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391480AbhARM0H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jan 2021 07:26:07 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DK9v05GwMzMLhC;
+        Mon, 18 Jan 2021 20:23:56 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 18 Jan 2021 20:25:10 +0800
+Subject: Re: [PATCH v2 1/2] vfio/iommu_type1: Populate full dirty when detach
+ non-pinned group
+To:     Alex Williamson <alex.williamson@redhat.com>
+References: <20210115092643.728-1-zhukeqian1@huawei.com>
+ <20210115092643.728-2-zhukeqian1@huawei.com>
+ <20210115110144.61e3c843@omen.home.shazbot.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <f8de434c-1993-cfe8-c451-2235be1ceb85@huawei.com>
+Date:   Mon, 18 Jan 2021 20:25:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YACl4jtDc1IGcxiQ@google.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20210115110144.61e3c843@omen.home.shazbot.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 12:13:22PM -0800, Sean Christopherson wrote:
-> On Wed, Jan 13, 2021, Paolo Bonzini wrote:
-> > On 12/01/21 23:28, Sean Christopherson wrote:
-> > > What's the biggest hurdle for doing this completely within the unit test
-> > > framework?  Is teaching the framework to migrate a unit test the biggest pain?
-> > 
-> > Yes, pretty much.  The shell script framework would show its limits.
-> > 
-> > That said, I've always treated run_tests.sh as a utility more than an
-> > integral part of kvm-unit-tests.  There's nothing that prevents a more
-> > capable framework from parsing unittests.cfg.
+
+
+On 2021/1/16 2:01, Alex Williamson wrote:
+> On Fri, 15 Jan 2021 17:26:42 +0800
+> Keqian Zhu <zhukeqian1@huawei.com> wrote:
 > 
-> Heh, got anyone you can "volunteer" to create a new framework?  One-button
-> migration testing would be very nice to have.  I suspect I'm not the only
-> contributor that doesn't do migration testing as part of their standard workflow.
->
+>> If a group with non-pinned-page dirty scope is detached with dirty
+>> logging enabled, we should fully populate the dirty bitmaps at the
+>> time it's removed since we don't know the extent of its previous DMA,
+>> nor will the group be present to trigger the full bitmap when the user
+>> retrieves the dirty bitmap.
+>>
+>> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+>> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
+>>  1 file changed, 17 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index 0b4dedaa9128..4e82b9a3440f 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -236,6 +236,19 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+>>  	}
+>>  }
+>>  
+>> +static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
+>> +{
+>> +	struct rb_node *n;
+>> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+>> +
+>> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+>> +
+>> +		if (dma->iommu_mapped)
+>> +			bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
+>> +	}
+>> +}
+>> +
+>>  static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
+>>  {
+>>  	struct rb_node *n;
+>> @@ -2415,8 +2428,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+>>  	 * Removal of a group without dirty tracking may allow the iommu scope
+>>  	 * to be promoted.
+>>  	 */
+>> -	if (update_dirty_scope)
+>> +	if (update_dirty_scope) {
+>>  		update_pinned_page_dirty_scope(iommu);
+>> +		if (iommu->dirty_page_tracking)
+>> +			vfio_iommu_populate_bitmap_full(iommu);
+>> +	}
+>>  	mutex_unlock(&iommu->lock);
+>>  }
+>>  
+> 
+> This doesn't do the right thing.  This marks the bitmap dirty if:
+> 
+>  * The detached group dirty scope was not limited to pinned pages
+> 
+>  AND
+> 
+>  * Dirty tracking is enabled
+> 
+>  AND
+> 
+>  * The vfio_dma is *currently* (ie. after the detach) iommu_mapped
+> 
+> We need to mark the bitmap dirty based on whether the vfio_dma *was*
+> iommu_mapped by the group that is now detached.  Thanks,
+> 
+> Alex
+> 
+Hi Alex,
 
-We have one-button migration tests already with kvm-unit-tests. Just
-compile the tests that use the migration framework as standalone
-tests and then run them directly.
-
-I agree, though, that Bash is a pain for some of the stuff we're trying
-to do. However, we do have requests to keep the framework written in Bash,
-because KVM testing is regularly done with simulators and even in embedded
-environments. It's not desirable, or even possible, to have e.g. Python
-everywhere we want kvm-unit-tests.
+Yes, I missed this point again :-(. The update_dirty_scope means we detached
+an iommu backed group, and that means the vfio_dma *was* iommu_mapped by this
+group, so we can populate full bitmap unconditionally, right?
 
 Thanks,
-drew
+Keqian
 
+
+> .
+> 
