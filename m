@@ -2,187 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 540E72FA1D8
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 14:41:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E5EA2FA217
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 14:50:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404655AbhARNkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 08:40:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48328 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404646AbhARNjs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 08:39:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610977102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EtkFBl/7MYlLUgK6CFeLL0ah9coJlc3mVDOuf3UyCOQ=;
-        b=HIswR2JhjO1ePmFgJucm6Q07bg5u0Hmm0pb5C9yxdOZQph/1/MBQcDI0X/nSTHwSBGaHWT
-        XF0yx18oX7/d7mKSJ84KfNP5e0DodN21pqSIJ/TxtKTk+0xXAvGWmL+0orvWcuNDjGngvd
-        j1jXMXAeYYqiH+Jmzmtt4pzcmucjDUo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589--0MlpRRNMICLm8RNvp8Rvg-1; Mon, 18 Jan 2021 08:38:18 -0500
-X-MC-Unique: -0MlpRRNMICLm8RNvp8Rvg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CAE8806670;
-        Mon, 18 Jan 2021 13:38:16 +0000 (UTC)
-Received: from gondolin (ovpn-114-2.ams2.redhat.com [10.36.114.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FB751962F;
-        Mon, 18 Jan 2021 13:38:09 +0000 (UTC)
-Date:   Mon, 18 Jan 2021 14:38:06 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     <alex.williamson@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <jgg@nvidia.com>,
-        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>
-Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210118143806.036c8dbc.cohuck@redhat.com>
-In-Reply-To: <20210117181534.65724-1-mgurtovoy@nvidia.com>
-References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
-Organization: Red Hat GmbH
+        id S2392151AbhARNtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 08:49:53 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49424 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392417AbhARNq2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 08:46:28 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10IDVjXH118987;
+        Mon, 18 Jan 2021 08:45:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4Ldc+7OLBW8qG1T0v6PWkporL/9Y+EOj/D4yFjmRNlU=;
+ b=jr2YeftQ70NKPopPlAS9pbL42PC5am36IWN/V8uu4hYpmaSVwImuhWqUWelalnfLnGPy
+ Xc226YqrmMc4OOQ3fpzJmD9pxB27xKkS9Vl4vvNRt5zpBqbSlmt8qPMMF2W1V2vMYkZY
+ vKsCgPBKVB9BPcQdPrRi+I1Duu2Zva4xO1kY5+GZhMIS2EkVO7+ZfXZWVecu0Tr2a1wK
+ op6LzB2z7f8tuOfuJuXnKSlQ1nST1+pH/9Dlz7CiAi1y5e+Mvt57ZjXoMIjmA+0xviaX
+ jmkV47cftE/xdROpjoZBrcXTL/Dup0Dsapn1jBAIr4jE8XuZMTUJ599wNvsELSE6E7G1 dQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365at7s8n3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 08:45:47 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10IDVnoc119305;
+        Mon, 18 Jan 2021 08:45:46 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365at7s8m3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 08:45:46 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10IDbSxR019309;
+        Mon, 18 Jan 2021 13:45:44 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 36454vrtep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 13:45:44 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10IDjf2n28377588
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Jan 2021 13:45:41 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 153EFAE057;
+        Mon, 18 Jan 2021 13:45:41 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F7B1AE04D;
+        Mon, 18 Jan 2021 13:45:40 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.77.2])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 18 Jan 2021 13:45:40 +0000 (GMT)
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20210118131739.7272-1-borntraeger@de.ibm.com>
+ <20210118131739.7272-2-borntraeger@de.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/1] KVM: s390: diag9c forwarding
+Message-ID: <db1d2a6e-1947-321b-bdc2-019eee5780f4@linux.ibm.com>
+Date:   Mon, 18 Jan 2021 14:45:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210118131739.7272-2-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-18_11:2021-01-18,2021-01-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101180077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 17 Jan 2021 18:15:31 +0000
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+On 1/18/21 2:17 PM, Christian Borntraeger wrote:
+> From: Pierre Morel <pmorel@linux.ibm.com>
+> 
+> When we receive intercept a DIAG_9C from the guest we verify
+> that the target real CPU associated with the virtual CPU
+> designated by the guest is running and if not we forward the
+> DIAG_9C to the target real CPU.
+> 
+> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
+> 
+> The rate is calculated as a count per second defined as a
+> new parameter of the s390 kvm module: diag9c_forwarding_hz .
+> 
+> The default value is to not forward diag9c.
 
-> Hi Alex and Cornelia,
+Before Conny starts yelling I'll do it myself:
+Documentation
+
 > 
-> This series split the vfio_pci driver into 2 parts: pci driver and a
-> subsystem driver that will also be library of code. The pci driver,
-> vfio_pci.ko will be used as before and it will bind to the subsystem
-> driver vfio_pci_core.ko to register to the VFIO subsystem. This patchset
-> if fully backward compatible. This is a typical Linux subsystem
-> framework behaviour. This framework can be also adopted by vfio_mdev
-> devices as we'll see in the below sketch.
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |  1 +
+>  arch/s390/include/asm/smp.h      |  1 +
+>  arch/s390/kernel/smp.c           |  1 +
+>  arch/s390/kvm/diag.c             | 31 ++++++++++++++++++++++++++++---
+>  arch/s390/kvm/kvm-s390.c         |  6 ++++++
+>  arch/s390/kvm/kvm-s390.h         |  8 ++++++++
+>  6 files changed, 45 insertions(+), 3 deletions(-)
 > 
-> This series is coming to solve the issues that were raised in the
-> previous attempt for extending vfio-pci for vendor specific
-> functionality: https://lkml.org/lkml/2020/5/17/376 by Yan Zhao.
-> 
-> This solution is also deterministic in a sense that when a user will
-> bind to a vendor specific vfio-pci driver, it will get all the special
-> goodies of the HW.
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 74f9a036bab2..98ae55f79620 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -455,6 +455,7 @@ struct kvm_vcpu_stat {
+>  	u64 diagnose_44;
+>  	u64 diagnose_9c;
+>  	u64 diagnose_9c_ignored;
+> +	u64 diagnose_9c_forward;
+>  	u64 diagnose_258;
+>  	u64 diagnose_308;
+>  	u64 diagnose_500;
+> diff --git a/arch/s390/include/asm/smp.h b/arch/s390/include/asm/smp.h
+> index 01e360004481..e317fd4866c1 100644
+> --- a/arch/s390/include/asm/smp.h
+> +++ b/arch/s390/include/asm/smp.h
+> @@ -63,5 +63,6 @@ extern void __noreturn cpu_die(void);
+>  extern void __cpu_die(unsigned int cpu);
+>  extern int __cpu_disable(void);
+>  extern void schedule_mcck_handler(void);
+> +void notrace smp_yield_cpu(int cpu);
 >  
-> This subsystem framework will also ease on adding vendor specific
-> functionality to VFIO devices in the future by allowing another module
-> to provide the pci_driver that can setup number of details before
-> registering to VFIO subsystem (such as inject its own operations).
-> 
-> Below we can see the proposed changes (this patchset only deals with
-> VFIO_PCI subsystem but it can easily be extended to VFIO_MDEV subsystem
-> as well):
-> 
-> +----------------------------------------------------------------------+
-> |                                                                      |
-> |                                VFIO                                  |
-> |                                                                      |
-> +----------------------------------------------------------------------+
-> 
-> +--------------------------------+    +--------------------------------+
-> |                                |    |                                |
-> |          VFIO_PCI_CORE         |    |          VFIO_MDEV_CORE        |
-> |                                |    |                                |
-> +--------------------------------+    +--------------------------------+
-> 
-> +---------------+ +--------------+    +---------------+ +--------------+
-> |               | |              |    |               | |              |
-> |               | |              |    |               | |              |
-> | VFIO_PCI      | | MLX5_VFIO_PCI|    | VFIO_MDEV     | |MLX5_VFIO_MDEV|
-> |               | |              |    |               | |              |
-> |               | |              |    |               | |              |
-> +---------------+ +--------------+    +---------------+ +--------------+
-> 
-> First 2 patches introduce the above changes for vfio_pci and
-> vfio_pci_core.
-> 
-> Patch (3/3) introduces a new mlx5 vfio-pci module that registers to VFIO
-> subsystem using vfio_pci_core. It also registers to Auxiliary bus for
-> binding to mlx5_core that is the parent of mlx5-vfio-pci devices. This
-> will allow extending mlx5-vfio-pci devices with HW specific features
-> such as Live Migration (mlx5_core patches are not part of this series
-> that comes for proposing the changes need for the vfio pci subsystem).
-> 
-> These devices will be seen on the Auxiliary bus as:
-> mlx5_core.vfio_pci.2048 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05:00.0/0000:06:00.0/0000:07:00.0/mlx5_core.vfio_pci.2048
-> mlx5_core.vfio_pci.2304 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05:00.0/0000:06:00.0/0000:07:00.1/mlx5_core.vfio_pci.2304
-> 
-> 2048 represents BDF 08:00.0 and 2304 represents BDF 09:00.0 in decimal
-> view. In this manner, the administrator will be able to locate the
-> correct vfio-pci module it should bind the desired BDF to (by finding
-> the pointer to the module according to the Auxiliary driver of that
-> BDF).
+>  #endif /* __ASM_SMP_H */
+> diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
+> index c5abbb94ac6e..32622e9c15f0 100644
+> --- a/arch/s390/kernel/smp.c
+> +++ b/arch/s390/kernel/smp.c
+> @@ -422,6 +422,7 @@ void notrace smp_yield_cpu(int cpu)
+>  	asm volatile("diag %0,0,0x9c"
+>  		     : : "d" (pcpu_devices[cpu].address));
+>  }
+> +EXPORT_SYMBOL(smp_yield_cpu);
+>  
+>  /*
+>   * Send cpus emergency shutdown signal. This gives the cpus the
+> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
+> index 5b8ec1c447e1..fc1ec4aa81ed 100644
+> --- a/arch/s390/kvm/diag.c
+> +++ b/arch/s390/kvm/diag.c
+> @@ -150,6 +150,19 @@ static int __diag_time_slice_end(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static unsigned int forward_cnt;
 
-I'm not familiar with that auxiliary framework (it seems to be fairly
-new?); but can you maybe create an auxiliary device unconditionally and
-contain all hardware-specific things inside a driver for it? Or is that
-not flexible enough?
+This is not per CPU, so we could have one CPU making forwards impossible
+for all others, right? Would this be a possible improvement or doesn't
+that happen in real world workloads?
 
-> 
-> In this way, we'll use the HW vendor driver core to manage the lifecycle
-> of these devices. This is reasonable since only the vendor driver knows
-> exactly about the status on its internal state and the capabilities of
-> its acceleratots, for example.
-> 
-> TODOs:
-> 1. For this RFC we still haven't cleaned all vendor specific stuff that
->    were merged in the past into vfio_pci (such as VFIO_PCI_IG and
->    VFIO_PCI_NVLINK2).
-> 2. Create subsystem module for VFIO_MDEV. This can be used for vendor
->    specific scalable functions for example (SFs).
-> 3. Add Live migration functionality for mlx5 SNAP devices
->    (NVMe/Virtio-BLK).
-> 4. Add Live migration functionality for mlx5 VFs
-> 5. Add the needed functionality for mlx5_core
-> 
-> I would like to thank the great team that was involved in this
-> development, design and internal review:
-> Oren, Liran, Jason, Leon, Aviad, Shahaf, Gary, Artem, Kirti, Neo, Andy
-> and others.
-> 
-> This series applies cleanly on top of kernel 5.11-rc2+ commit 2ff90100ace8:
-> "Merge tag 'hwmon-for-v5.11-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging"
-> from Linus.
-> 
-> Note: Live migration for MLX5 SNAP devices is WIP and will be the first
->       example for adding vendor extension to vfio-pci devices. As the
->       changes to the subsystem must be defined as a pre-condition for
->       this work, we've decided to split the submission for now.
-> 
-> Max Gurtovoy (3):
->   vfio-pci: rename vfio_pci.c to vfio_pci_core.c
->   vfio-pci: introduce vfio_pci_core subsystem driver
->   mlx5-vfio-pci: add new vfio_pci driver for mlx5 devices
-> 
->  drivers/vfio/pci/Kconfig            |   22 +-
->  drivers/vfio/pci/Makefile           |   16 +-
->  drivers/vfio/pci/mlx5_vfio_pci.c    |  253 +++
->  drivers/vfio/pci/vfio_pci.c         | 2386 +--------------------------
->  drivers/vfio/pci/vfio_pci_core.c    | 2311 ++++++++++++++++++++++++++
+The code looks ok to me but smp is absolutely not my field of expertise.
 
-Especially regarding this diffstat... from a quick glance at patch 3,
-it mostly forwards to vfio_pci_core anyway. Do you expect a huge amount
-of device-specific callback invocations?
+> +static unsigned long cur_slice;
+> +
+> +static int diag9c_forwarding_overrun(void)
+> +{
+> +	/* Reset the count on a new slice */
+> +	if (time_after(jiffies, cur_slice)) {
+> +		cur_slice = jiffies;
+> +		forward_cnt = diag9c_forwarding_hz / HZ;
+> +	}
+> +	return forward_cnt-- ? 1 : 0;
+> +}
+> +
+>  static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_vcpu *tcpu;
+> @@ -167,9 +180,21 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
+>  	if (!tcpu)
+>  		goto no_yield;
+>  
+> -	/* target already running */
+> -	if (READ_ONCE(tcpu->cpu) >= 0)
+> -		goto no_yield;
+> +	/* target VCPU already running */
+> +	if (READ_ONCE(tcpu->cpu) >= 0) {
+> +		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
+> +			goto no_yield;
+> +
+> +		/* target CPU already running */
+> +		if (!vcpu_is_preempted(tcpu->cpu))
+> +			goto no_yield;
+> +		smp_yield_cpu(tcpu->cpu);
 
-[I have not looked at this in detail yet.]
+This is a pure cpu yield while before we yielded to the process of the
+vcpu. Do we also want to prod the task of the VCPU we want to yield to
+before waking up the host cpu? Or do we expect the VCPU task to be the
+first thing that's picked up by the host cpu?
 
->  drivers/vfio/pci/vfio_pci_private.h |   21 +
->  include/linux/mlx5/vfio_pci.h       |   36 +
->  7 files changed, 2734 insertions(+), 2311 deletions(-)
->  create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
->  create mode 100644 drivers/vfio/pci/vfio_pci_core.c
->  create mode 100644 include/linux/mlx5/vfio_pci.h
+
+> +		VCPU_EVENT(vcpu, 5,
+> +			   "diag time slice end directed to %d: yield forwarded",
+> +			   tid);
+> +		vcpu->stat.diagnose_9c_forward++;
+> +		return 0;
+> +	}
+>  
+>  	if (kvm_vcpu_yield_to(tcpu) <= 0)
+>  		goto no_yield;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 759bbc012b6c..9b98db81db31 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -158,6 +158,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
+>  	VCPU_STAT("instruction_diag_44", diagnose_44),
+>  	VCPU_STAT("instruction_diag_9c", diagnose_9c),
+>  	VCPU_STAT("diag_9c_ignored", diagnose_9c_ignored),
+> +	VCPU_STAT("diag_9c_forward", diagnose_9c_forward),
+>  	VCPU_STAT("instruction_diag_258", diagnose_258),
+>  	VCPU_STAT("instruction_diag_308", diagnose_308),
+>  	VCPU_STAT("instruction_diag_500", diagnose_500),
+> @@ -191,6 +192,11 @@ static bool use_gisa  = true;
+>  module_param(use_gisa, bool, 0644);
+>  MODULE_PARM_DESC(use_gisa, "Use the GISA if the host supports it.");
+>  
+> +/* maximum diag9c forwarding per second */
+> +unsigned int diag9c_forwarding_hz;
+> +module_param(diag9c_forwarding_hz, uint, 0644);
+> +MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second");
+> +
+>  /*
+>   * For now we handle at most 16 double words as this is what the s390 base
+>   * kernel handles and stores in the prefix page. If we ever need to go beyond
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 79dcd647b378..9fad25109b0d 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -471,4 +471,12 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
+>   * @kvm: the KVM guest
+>   */
+>  void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
+> +
+> +/**
+> + * diag9c_forwarding_hz
+> + *
+> + * Set the maximum number of diag9c forwarding per second
+> + */
+> +extern unsigned int diag9c_forwarding_hz;
+> +
+>  #endif
 > 
 
