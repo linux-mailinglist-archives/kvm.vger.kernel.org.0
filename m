@@ -2,127 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33ABE2F9487
-	for <lists+kvm@lfdr.de>; Sun, 17 Jan 2021 19:22:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 146392F974D
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 02:20:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729542AbhAQSWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Jan 2021 13:22:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40074 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728895AbhAQSWB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 17 Jan 2021 13:22:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610907635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uJIoOhvCGZIzme7GO6g9mBo0n7uG93HV8b3Dtunyfrg=;
-        b=Gnn8XMWOw7XyFC/K/54fPpRnyqJY2lmFZpaggIHtpsmOqnN9k8hZyJLP7l6geq5TquByE1
-        PXFlFZgLcUscHzIM6y84z1WFEREyLSMxXZx2OJOfKWOTg286kwGYd0KsrX0jEk1I8tEo69
-        mC5MDE/8KEQ6xWbJPzg+15SFv7LmYdc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-lXtN1d3rN--N42qcw3Hypw-1; Sun, 17 Jan 2021 13:20:33 -0500
-X-MC-Unique: lXtN1d3rN--N42qcw3Hypw-1
-Received: by mail-ed1-f71.google.com with SMTP id n8so4765459edo.19
-        for <kvm@vger.kernel.org>; Sun, 17 Jan 2021 10:20:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uJIoOhvCGZIzme7GO6g9mBo0n7uG93HV8b3Dtunyfrg=;
-        b=Y3ywwED0uEKlERAQWiv2TULSS1SFjM8TGXMGC0OKPrAHTmYrz9CRcbrPjDNK/2Huqk
-         2hxCZMfSvAwhPO0BGzofpydVlRqYKg9CsOxAZ474psEMnhqzSw+z3MjSyNs+FnQaX1sS
-         bzEolpNMIFW8916L8qxvSdU31XUt1Zxlus/69YYhOvwEcZKYJmBRp9wydA2p/wnIxpNO
-         7AiHSbhRKBk9C7gqQ072WESZRXrotwQufn9Z1lANOoWfXmFvCgsvwrnMLWNsqm/O66wS
-         9zxF8JBi+5E8pnSb3A0QX5y2Yy1IzelTmREgAuAh5krXTZ+Lu3QdlYF0guw9RSk4ZuLK
-         XRgw==
-X-Gm-Message-State: AOAM530NrsGIN7awB+WymubjUD4AwcUPGwDwlpBX2WDkRnymPGEUv06K
-        A5g2EnM0cOwKIZHGZN3DMq5Nnl0O8BcJZsBQT+MWemXeCM5ijULifnSMQVup24kNSkeYDKy4Q6y
-        oaniKdsb2RDwl
-X-Received: by 2002:a17:906:44a:: with SMTP id e10mr10232559eja.265.1610907632174;
-        Sun, 17 Jan 2021 10:20:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxFsUFM3peO0LryV+GLQp/07YHvRk9lCVbQSK1TBRwPv7+UzJlbfaFJ8w6pkDzpCproASUr3w==
-X-Received: by 2002:a17:906:44a:: with SMTP id e10mr10232541eja.265.1610907632001;
-        Sun, 17 Jan 2021 10:20:32 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d18sm9608042edz.14.2021.01.17.10.20.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Jan 2021 10:20:31 -0800 (PST)
-To:     Wei Huang <whuang2@amd.com>, Wei Huang <wei.huang2@amd.com>,
-        kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        seanjc@google.com, joro@8bytes.org, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, mlevitsk@redhat.com
-References: <20210112063703.539893-1-wei.huang2@amd.com>
- <090232a9-7a87-beb9-1402-726bb7cab7e6@redhat.com>
- <ed93c796-1750-7cb8-ed4d-dc9c4b68b5a3@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: x86: Add emulation support for #GP triggered by
- VM instructions
-Message-ID: <7ea9f2d8-6688-612c-21a8-f3f3517da122@redhat.com>
-Date:   Sun, 17 Jan 2021 19:20:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1730776AbhARBTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Jan 2021 20:19:46 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11032 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729570AbhARBTo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Jan 2021 20:19:44 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DJv6X6JWVzj3w7;
+        Mon, 18 Jan 2021 09:17:56 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 18 Jan 2021 09:18:52 +0800
+Subject: Re: [PATCH] kvm: arm64: Properly align the end address of table walk
+To:     Will Deacon <will@kernel.org>
+References: <20210115095307.12912-1-zhukeqian1@huawei.com>
+ <20210115102334.GA14167@willie-the-truck>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <a184c21f-2b1f-bd00-5ca9-be7649b33ccd@huawei.com>
+Date:   Mon, 18 Jan 2021 09:18:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <ed93c796-1750-7cb8-ed4d-dc9c4b68b5a3@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210115102334.GA14167@willie-the-truck>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/01/21 08:00, Wei Huang wrote:
-> If the whole body inside if-statement is moved out, do you expect the
-> interface of x86_emulate_decoded_instruction to be something like:
+
+
+On 2021/1/15 18:23, Will Deacon wrote:
+> On Fri, Jan 15, 2021 at 05:53:07PM +0800, Keqian Zhu wrote:
+>> When align the end address, ought to use its original value.
+>>
+>> Fixes: b1e57de62cfb ("KVM: arm64: Add stand-alone page-table walker infrastructure")
+>> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> ---
+>>  arch/arm64/kvm/hyp/pgtable.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+>> index bdf8e55ed308..670b0ef12440 100644
+>> --- a/arch/arm64/kvm/hyp/pgtable.c
+>> +++ b/arch/arm64/kvm/hyp/pgtable.c
+>> @@ -296,7 +296,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>>  	struct kvm_pgtable_walk_data walk_data = {
+>>  		.pgt	= pgt,
+>>  		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
+>> -		.end	= PAGE_ALIGN(walk_data.addr + size),
+>> +		.end	= PAGE_ALIGN(addr + size),
+>>  		.walker	= walker,
 > 
-> int x86_emulate_decoded_instruction(struct kvm_vcpu *vcpu,
->                                      gpa_t cr2_or_gpa,
->                                      int emulation_type, void *insn,
->                                      int insn_len,
->                                      bool write_fault_to_spt)
+> Hmm, this is a change in behaviour, no (consider the case where both 'addr'
+> and 'size' are misaligned)? The current code is consistent with the
+> kerneldoc in asm/kvm_pgtable.h, so I don't see the motivation to change it.
+> 
+> Did you hit a bug somewhere?
+> 
+> Will
+> .
+>
+Not hit a bug, I just read the code to implement a new idea of stage2 DBM
+support [1]. Yes, according to doc, this is not an issue ("The offset of
+@addr within a page is ignored."). Sorry to disturb ;-).
 
-An idea is to making the body of the new function just
+[1] https://lore.kernel.org/kvmarm/fd26654b-8258-061c-2a69-90b961c1c71b@huawei.com/
 
-         init_emulate_ctxt(vcpu);
+Thanks,
+Keqian
 
-         /*
-          * We will reenter on the same instruction since
-          * we do not set complete_userspace_io.  This does not
-          * handle watchpoints yet, those would be handled in
-          * the emulate_ops.
-          */
-         if (!(emulation_type & EMULTYPE_SKIP) &&
-             kvm_vcpu_check_breakpoint(vcpu, &r))
-                 return r;
 
-         ctxt->interruptibility = 0;
-         ctxt->have_exception = false;
-         ctxt->exception.vector = -1;
-         ctxt->exception.error_code_valid = false;
 
-         ctxt->perm_ok = false;
 
-         ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-
-         r = x86_decode_insn(ctxt, insn, insn_len);
-
-         trace_kvm_emulate_insn_start(vcpu);
-         ++vcpu->stat.insn_emulation;
-         return r;
-
-because for the new caller, on EMULATION_FAILED you can just re-enter 
-the guest.
-
-> And if so, what is the emulation type to use when calling this function
-> from svm.c? EMULTYPE_VMWARE_GP?
-
-Just 0 I think.
-
-Paolo
 
