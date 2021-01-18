@@ -2,168 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 768872FA3ED
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 16:02:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1F5A2FA44D
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 16:15:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405034AbhARPBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 10:01:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50710 "EHLO
+        id S2393324AbhARPOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 10:14:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23984 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405289AbhAROxd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 09:53:33 -0500
+        by vger.kernel.org with ESMTP id S2393304AbhARPOT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 10:14:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610981525;
+        s=mimecast20190719; t=1610982773;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bvHYXveaY1fYHKCh/4G0s4Eb72E980+xC2zhbE72Tuc=;
-        b=Eo7xIaWrpBf4arroqUcI24j4LTPNU470Qtd4KJcelOMnpIpOa6vApPlpjayRStsnNw9SZ6
-        bxc1etsJ5UBFW0+dRG11z6Zo9zTL7Sbdhu5hLTOkpjU3vIJK/TU94VRED+Mj6/XyDp2pmx
-        TbqFE/j8MuWUt7V19iGaqALXTZqvLR0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-KreL4aGPO4qwlnMdq1AuQQ-1; Mon, 18 Jan 2021 09:52:04 -0500
-X-MC-Unique: KreL4aGPO4qwlnMdq1AuQQ-1
-Received: by mail-wr1-f69.google.com with SMTP id m20so8393773wrh.2
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 06:52:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=bvHYXveaY1fYHKCh/4G0s4Eb72E980+xC2zhbE72Tuc=;
-        b=tvjpJ+Ejc+DjfV4cbiQy4fnsaPR/PDH1q63+kc2774Vu1imXEF0/1I3WGyFBXxb6jN
-         rP/lrHaSiOmaB5xTvCvV8uheaaNNPQqcbMD249vvFvgftXNTAdP0fWuMyoB4A8WF5sg+
-         7zabQOs7trvQJOqfCpJdOuT+5ONvASVcfzEpqlbHtynnNQCCiS86TcaZlNkem7eF59dk
-         WzHmLwpFF8BuuSjfJRnVhYPxAcZYWsMLaoTqaVs5BFU+ibZw/lbWU9d+p1lg/hHMGEqy
-         LN0ErvXca4xq9Wp6i8xuZtmj6zynTfSMRJkHrz9ms+/0lSvmGDhRx5D5kZZgtn1bGSZW
-         Yylw==
-X-Gm-Message-State: AOAM532DMRD3L8tIux3gPXQ2N/hOpEUGts0XmMEnr8QZRQBbCPZhuXcH
-        uKYQS/gV+PU6cB9QOcy03NuB2LVdc0MynX7mx4DyB0h7QyzCtpqSWKTUMZFabpw1QhX8ulmMTdU
-        xGKlT9HquS1Mw
-X-Received: by 2002:a5d:42d0:: with SMTP id t16mr26110650wrr.230.1610981522394;
-        Mon, 18 Jan 2021 06:52:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyLYqyNMVyFEoAlbSpKAd9WKw+ODMCj85rmyuhMgWAf133vbbFpPK94WXLLheaXzynpxdDRUg==
-X-Received: by 2002:a5d:42d0:: with SMTP id t16mr26110629wrr.230.1610981522214;
-        Mon, 18 Jan 2021 06:52:02 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id x25sm1728972wmk.20.2021.01.18.06.52.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jan 2021 06:52:01 -0800 (PST)
-Date:   Mon, 18 Jan 2021 15:51:58 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 01/13] af_vsock: implement 'vsock_wait_data()'.
-Message-ID: <20210118145158.ufakay5mbezjex4v@steredhat>
-References: <20210115053553.1454517-1-arseny.krasnov@kaspersky.com>
- <20210115054028.1455574-1-arseny.krasnov@kaspersky.com>
+        bh=OjettLIT0srMQXm6M8vqujMH7mAhY+HWU2AczcxjVhs=;
+        b=Y3FEXTbCDY7xADfskwER86svBJuBOMKfYfhp4kwV/BZ/Y9Zy6W+jYspD+RaKuGrSEjk1vl
+        QG9h1JIvVSpuGXhaKqalypZjdEfLhKCsl7xQGeVak+GSFqqlDKCtxQMuhoxD4QYeNWSzX+
+        8mqUhkdFoRiaYT2TYmZ8HDGt0JScCtI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-457-LT9BCj9vPFKexSP63dSzXw-1; Mon, 18 Jan 2021 10:12:51 -0500
+X-MC-Unique: LT9BCj9vPFKexSP63dSzXw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17C758066E5;
+        Mon, 18 Jan 2021 15:12:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-189.ams2.redhat.com [10.36.112.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BCB410016FA;
+        Mon, 18 Jan 2021 15:12:43 +0000 (UTC)
+Subject: Re: [PATCH v2 9/9] gitlab-ci: Add alpine to pipeline
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+        qemu-block@nongnu.org,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        kvm@vger.kernel.org,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        BALATON Zoltan via <qemu-devel@nongnu.org>,
+        Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+ <20210118063808.12471-10-jiaxun.yang@flygoat.com>
+ <20210118101159.GC1789637@redhat.com>
+ <fb7308f2-ecc7-48b8-9388-91fd30691767@www.fastmail.com>
+ <307dea8e-148e-6666-c6f1-5cc66a54a7af@redhat.com>
+ <20210118145016.GC1799018@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <a9d9fb1d-f356-adb4-3763-a015e0d13320@redhat.com>
+Date:   Mon, 18 Jan 2021 16:12:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210115054028.1455574-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210118145016.GC1799018@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 15, 2021 at 08:40:25AM +0300, Arseny Krasnov wrote:
->This adds 'vsock_wait_data()' function which is called from user's read
->syscall and waits until new socket data is arrived. It was based on code
->from stream dequeue logic and moved to separate function because it will
->be called both from SOCK_STREAM and SOCK_SEQPACKET receive loops.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 47 ++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 47 insertions(+)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index b12d3a322242..af716f5a93a4 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1822,6 +1822,53 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	return err;
-> }
->
->+static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
->+			   long timeout,
->+			   struct vsock_transport_recv_notify_data *recv_data,
->+			   size_t target)
->+{
->+	int err = 0;
->+	struct vsock_sock *vsk;
->+	const struct vsock_transport *transport;
+On 18/01/2021 15.50, Daniel P. Berrangé wrote:
+> On Mon, Jan 18, 2021 at 03:44:49PM +0100, Thomas Huth wrote:
+>> On 18/01/2021 14.37, Jiaxun Yang wrote:
+>>>
+>>>
+>>> On Mon, Jan 18, 2021, at 6:11 PM, Daniel P. Berrangé wrote:
+>>>> On Mon, Jan 18, 2021 at 02:38:08PM +0800, Jiaxun Yang wrote:
+>>>>> We only run build test and check-acceptance as their are too many
+>>>>> failures in checks due to minor string mismatch.
+>>>>
+>>>> Can you give real examples of what's broken here, as that sounds
+>>>> rather suspicious, and I'm not convinced it should be ignored.
+>>>
+>>> Mostly Input/Output error vs I/O Error.
+>>
+>> Right, out of curiosity, I also gave it a try:
+>>
+>>   https://gitlab.com/huth/qemu/-/jobs/969225330
+>>
+>> Apart from the "I/O Error" vs. "Input/Output Error" difference, there also
+>> seems to be a problem with "sed" in some of the tests.
+> 
+> The "sed" thing sounds like something that ought to be investigated
+> from a portability POV rather than ignored.
 
-Please be sure that here and in all of the next patches, you follow the 
-"Reverse Christmas tree" rule followed in net/ for the local variable 
-declarations (order variable declaration lines longest to shortest).
+The weird thing is that we explicitly test for GNU sed in 
+tests/check-block.sh and skip the iotests if it's not available... so I'm a 
+little bit surprised that the iotests are run here with an apparently 
+different version of sed...?
 
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+
->+	if (sk->sk_err != 0 ||
->+	    (sk->sk_shutdown & RCV_SHUTDOWN) ||
->+	    (vsk->peer_shutdown & SEND_SHUTDOWN)) {
->+		finish_wait(sk_sleep(sk), wait);
->+		return -1;
->+	}
->+	/* Don't wait for non-blocking sockets. */
->+	if (timeout == 0) {
->+		err = -EAGAIN;
->+		finish_wait(sk_sleep(sk), wait);
->+		return err;
->+	}
->+
->+	if (recv_data) {
->+		err = transport->notify_recv_pre_block(vsk, target, recv_data);
->+		if (err < 0) {
->+			finish_wait(sk_sleep(sk), wait);
->+			return err;
->+		}
->+	}
->+
->+	release_sock(sk);
->+	timeout = schedule_timeout(timeout);
->+	lock_sock(sk);
->+
->+	if (signal_pending(current)) {
->+		err = sock_intr_errno(timeout);
->+		finish_wait(sk_sleep(sk), wait);
->+	} else if (timeout == 0) {
->+		err = -EAGAIN;
->+		finish_wait(sk_sleep(sk), wait);
->+	}
->+
-
-Since we are calling finish_wait() before return in all path, why not 
-doing somethig like this:
-
-out:
-	finish_wait(sk_sleep(sk), wait);
->+	return err;
->+}
-
-Then in the error paths you can do:
-
-	err = XXX;
-	goto out;
-
-Thanks,
-Stefano
-
->
-> static int
-> vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-- 
->2.25.1
->
+  Thomas
 
