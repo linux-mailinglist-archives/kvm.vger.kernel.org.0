@@ -2,38 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AC6E2F984C
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 04:31:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 604522F984A
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 04:31:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731771AbhARDbj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Jan 2021 22:31:39 -0500
-Received: from mga12.intel.com ([192.55.52.136]:16942 "EHLO mga12.intel.com"
+        id S1731713AbhARDbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Jan 2021 22:31:11 -0500
+Received: from mga06.intel.com ([134.134.136.31]:32175 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731860AbhARDaw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Jan 2021 22:30:52 -0500
-IronPort-SDR: 4fD5SejSbIqayUl4ffilhEvwjl8VwJvDuR6yW7QXImS9hOsPxCR4n0lxwN+kYtH9ngFw/Q26NB
- m2hnqkET9RFg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9867"; a="157933951"
+        id S1731684AbhARDaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Jan 2021 22:30:39 -0500
+IronPort-SDR: 0ztt5x5C0VYbzcyKfv9xgFSL9eav7U6nxjxExjf30BMgFEPJ0ae/vbud48RY3DGVFBXEnef9hg
+ Y6QgyaPX9VsQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9867"; a="240296018"
 X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="157933951"
+   d="scan'208";a="240296018"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:34 -0800
-IronPort-SDR: BkLnCfXXNWQ2WpNP1e62mQfqn4atPAs75zspH/N9qBc+/mbf03uCIj+6DAFV87Vw2uAB0xxM6i
- vBgnDZ9LB4DQ==
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:46 -0800
+IronPort-SDR: eZDC2/tBbSV1eEWujzwEu2OaQ2Mbu6RQekVjsjCrWDm9qzu5tTTqC3TCwM1ZmEfN/kyB1skkuO
+ yV8kNrbnvlEA==
 X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="573151225"
+   d="scan'208";a="573151251"
 Received: from amrahman-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.142.253])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:30 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:42 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
         bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v2 25/26] KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
-Date:   Mon, 18 Jan 2021 16:28:36 +1300
-Message-Id: <4c0b15f2f43dd39ba768374d295bdd0e5d5c84c6.1610935432.git.kai.huang@intel.com>
+        wanpengli@tencent.com, corbet@lwn.net,
+        Andy Lutomirski <luto@amacapital.net>,
+        Kai Huang <kai.huang@intel.com>
+Subject: [RFC PATCH v2 26/26] KVM: x86: Add capability to grant VM access to privileged SGX attribute
+Date:   Mon, 18 Jan 2021 16:29:35 +1300
+Message-Id: <94ac3c0bfbb5b7fe59a3cf3a30699c2f6dce8869.1610935432.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1610935432.git.kai.huang@intel.com>
 References: <cover.1610935432.git.kai.huang@intel.com>
@@ -45,475 +47,134 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Enable SGX virtualization now that KVM has the VM-Exit handlers needed
-to trap-and-execute ENCLS to ensure correctness and/or enforce the CPU
-model exposed to the guest.  Add a KVM module param, "sgx", to allow an
-admin to disable SGX virtualization independent of the kernel.
+Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
+to grant a VM access to a priveleged attribute, with args[0] holding a
+file handle to a valid SGX attribute file.
 
-When supported in hardware and the kernel, advertise SGX1, SGX2 and SGX
-LC to userspace via CPUID and wire up the ENCLS_EXITING bitmap based on
-the guest's SGX capabilities, i.e. to allow ENCLS to be executed in an
-SGX-enabled guest.  With the exception of the provision key, all SGX
-attribute bits may be exposed to the guest.  Guest access to the
-provision key, which is controlled via securityfs, will be added in a
-future patch.
+The SGX subsystem restricts access to a subset of enclave attributes to
+provide additional security for an uncompromised kernel, e.g. to prevent
+malware from using the PROVISIONKEY to ensure its nodes are running
+inside a geniune SGX enclave and/or to obtain a stable fingerprint.
 
-Note, KVM does not yet support exposing ENCLS_C leafs or ENCLV leafs.
+To prevent userspace from circumventing such restrictions by running an
+enclave in a VM, KVM restricts guest access to privileged attributes by
+default.
 
+Cc: Andy Lutomirski <luto@amacapital.net>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
-v1->v2:
+ Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
+ arch/x86/kvm/cpuid.c           |  2 +-
+ arch/x86/kvm/x86.c             | 22 ++++++++++++++++++++++
+ include/uapi/linux/kvm.h       |  1 +
+ 4 files changed, 47 insertions(+), 1 deletion(-)
 
- - Changed to use kvm_cpu_cap_init() instead of kvm_cpu_cap_mask() to expose
-   SGX1 and SGX2 due to they are scattered in X86_FEATURE_SGX1/SGX2. 
----
- arch/x86/kvm/cpuid.c      | 57 +++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/nested.c | 26 +++++++++++--
- arch/x86/kvm/vmx/nested.h |  5 +++
- arch/x86/kvm/vmx/sgx.c    | 80 ++++++++++++++++++++++++++++++++++++++-
- arch/x86/kvm/vmx/sgx.h    | 13 +++++++
- arch/x86/kvm/vmx/vmcs12.c |  1 +
- arch/x86/kvm/vmx/vmcs12.h |  4 +-
- arch/x86/kvm/vmx/vmx.c    | 38 ++++++++++++++++++-
- 8 files changed, 215 insertions(+), 9 deletions(-)
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index c136e254b496..47c7c7c33025 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6037,6 +6037,29 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
+ can then handle to implement model specific MSR handling and/or user notifications
+ to inform a user that an MSR was not handled.
+ 
++7.22 KVM_CAP_SGX_ATTRIBUTE
++----------------------
++
++:Architectures: x86
++:Target: VM
++:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
++:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
++          attribute is not supported by KVM.
++
++KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
++more priveleged enclave attributes.  args[0] must hold a file handle to a valid
++SGX attribute file corresponding to an attribute that is supported/restricted
++by KVM (currently only PROVISIONKEY).
++
++The SGX subsystem restricts access to a subset of enclave attributes to provide
++additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
++is restricted to deter malware from using the PROVISIONKEY to obtain a stable
++system fingerprint.  To prevent userspace from circumventing such restrictions
++by running an enclave in a VM, KVM prevents access to privileged attributes by
++default.
++
++See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
++
+ 8. Other capabilities.
+ ======================
+ 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index f8037fab8950..04b2f5de2d7b 100644
+index 04b2f5de2d7b..ad00a1af1545 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -18,6 +18,7 @@
- #include <asm/processor.h>
- #include <asm/user.h>
- #include <asm/fpu/xstate.h>
+@@ -833,7 +833,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 		 * expected to derive it from supported XCR0.
+ 		 */
+ 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
+-			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
++			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
+ 			      SGX_ATTR_KSS;
+ 		entry->ebx &= 0;
+ 		break;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5ca7b181a3ae..b4409b0edecc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -74,6 +74,8 @@
+ #include <asm/tlbflush.h>
+ #include <asm/intel_pt.h>
+ #include <asm/emulate_prefix.h>
++#include <asm/sgx.h>
 +#include <asm/sgx_arch.h>
- #include "cpuid.h"
- #include "lapic.h"
- #include "mmu.h"
-@@ -171,6 +172,21 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		vcpu->arch.guest_supported_xcr0 =
- 			(best->eax | ((u64)best->edx << 32)) & supported_xcr0;
+ #include <clocksource/hyperv_timer.h>
  
-+	/*
-+	 * Bits 127:0 of the allowed SECS.ATTRIBUTES (CPUID.0x12.0x1) enumerate
-+	 * the supported XSAVE Feature Request Mask (XFRM), i.e. the enclave's
-+	 * requested XCR0 value.  The enclave's XFRM must be a subset of XCRO
-+	 * at the time of EENTER, thus adjust the allowed XFRM by the guest's
-+	 * supported XCR0.  Similar to XCR0 handling, FP and SSE are forced to
-+	 * '1' even on CPUs that don't support XSAVE.
-+	 */
-+	best = kvm_find_cpuid_entry(vcpu, 0x12, 0x1);
-+	if (best) {
-+		best->ecx &= vcpu->arch.guest_supported_xcr0 & 0xffffffff;
-+		best->edx &= vcpu->arch.guest_supported_xcr0 >> 32;
-+		best->ecx |= XFEATURE_MASK_FPSSE;
-+	}
-+
- 	kvm_update_pv_runtime(vcpu);
- 
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
-@@ -413,7 +429,7 @@ void kvm_set_cpu_caps(void)
- 	);
- 
- 	kvm_cpu_cap_mask(CPUID_7_0_EBX,
--		F(FSGSBASE) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
-+		F(FSGSBASE) | F(SGX) | F(BMI1) | F(HLE) | F(AVX2) | F(SMEP) |
- 		F(BMI2) | F(ERMS) | 0 /*INVPCID*/ | F(RTM) | 0 /*MPX*/ | F(RDSEED) |
- 		F(ADX) | F(SMAP) | F(AVX512IFMA) | F(AVX512F) | F(AVX512PF) |
- 		F(AVX512ER) | F(AVX512CD) | F(CLFLUSHOPT) | F(CLWB) | F(AVX512DQ) |
-@@ -424,7 +440,8 @@ void kvm_set_cpu_caps(void)
- 		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
- 		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
- 		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
--		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/
-+		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
-+		F(SGX_LC)
- 	);
- 	/* Set LA57 based on hardware capability. */
- 	if (cpuid_ecx(7) & F(LA57))
-@@ -463,6 +480,10 @@ void kvm_set_cpu_caps(void)
- 		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES)
- 	);
- 
-+	kvm_cpu_cap_init(CPUID_12_EAX,
-+		SF(SGX1) | SF(SGX2)
-+	);
-+
- 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
- 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
- 		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
-@@ -784,6 +805,38 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 			entry->edx = 0;
- 		}
+ #define CREATE_TRACE_POINTS
+@@ -3767,6 +3769,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_X86_USER_SPACE_MSR:
+ 	case KVM_CAP_X86_MSR_FILTER:
+ 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
++#ifdef CONFIG_X86_SGX_VIRTUALIZATION
++	case KVM_CAP_SGX_ATTRIBUTE:
++#endif
+ 		r = 1;
  		break;
-+	case 0x12:
-+		/* Intel SGX */
-+		if (!kvm_cpu_cap_has(X86_FEATURE_SGX)) {
-+			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+ 	case KVM_CAP_SYNC_REGS:
+@@ -5295,6 +5300,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		kvm->arch.user_space_msr_mask = cap->args[0];
+ 		r = 0;
+ 		break;
++#ifdef CONFIG_X86_SGX_VIRTUALIZATION
++	case KVM_CAP_SGX_ATTRIBUTE: {
++		unsigned long allowed_attributes = 0;
++
++		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
++		if (r)
 +			break;
-+		}
 +
-+		/*
-+		 * Index 0: Sub-features, MISCSELECT (a.k.a extended features)
-+		 * and max enclave sizes.   The SGX sub-features and MISCSELECT
-+		 * are restricted by kernel and KVM capabilities (like most
-+		 * feature flags), while enclave size is unrestricted.
-+		 */
-+		cpuid_entry_override(entry, CPUID_12_EAX);
-+		entry->ebx &= SGX_MISC_EXINFO;
-+
-+		entry = do_host_cpuid(array, function, 1);
-+		if (!entry)
-+			goto out;
-+
-+		/*
-+		 * Index 1: SECS.ATTRIBUTES.  ATTRIBUTES are restricted a la
-+		 * feature flags.  Advertise all supported flags, including
-+		 * privileged attributes that require explicit opt-in from
-+		 * userspace.  ATTRIBUTES.XFRM is not adjusted as userspace is
-+		 * expected to derive it from supported XCR0.
-+		 */
-+		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
-+			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_KSS;
-+		entry->ebx &= 0;
-+		break;
- 	/* Intel PT */
- 	case 0x14:
- 		if (!kvm_cpu_cap_has(X86_FEATURE_INTEL_PT)) {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 562eab7b0a51..fca1f4c8cc5b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -11,6 +11,7 @@
- #include "mmu.h"
- #include "nested.h"
- #include "pmu.h"
-+#include "sgx.h"
- #include "trace.h"
- #include "x86.h"
- 
-@@ -2318,6 +2319,9 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 		if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_UNRESTRICTED_GUEST))
- 		    exec_control &= ~SECONDARY_EXEC_UNRESTRICTED_GUEST;
- 
-+		if (exec_control & SECONDARY_EXEC_ENCLS_EXITING)
-+			vmx_write_encls_bitmap(&vmx->vcpu, vmcs12);
-+
- 		secondary_exec_controls_set(vmx, exec_control);
- 	}
- 
-@@ -5726,6 +5730,20 @@ static bool nested_vmx_exit_handled_cr(struct kvm_vcpu *vcpu,
- 	return false;
- }
- 
-+static bool nested_vmx_exit_handled_encls(struct kvm_vcpu *vcpu,
-+					  struct vmcs12 *vmcs12)
-+{
-+	u32 encls_leaf;
-+
-+	if (!nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING))
-+		return false;
-+
-+	encls_leaf = kvm_rax_read(vcpu);
-+	if (encls_leaf > 62)
-+		encls_leaf = 63;
-+	return vmcs12->encls_exiting_bitmap & BIT_ULL(encls_leaf);
-+}
-+
- static bool nested_vmx_exit_handled_vmcs_access(struct kvm_vcpu *vcpu,
- 	struct vmcs12 *vmcs12, gpa_t bitmap)
- {
-@@ -5819,9 +5837,6 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
- 	case EXIT_REASON_VMFUNC:
- 		/* VM functions are emulated through L2->L0 vmexits. */
- 		return true;
--	case EXIT_REASON_ENCLS:
--		/* SGX is never exposed to L1 */
--		return true;
- 	default:
- 		break;
- 	}
-@@ -5945,6 +5960,8 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu,
- 	case EXIT_REASON_TPAUSE:
- 		return nested_cpu_has2(vmcs12,
- 			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE);
-+	case EXIT_REASON_ENCLS:
-+		return nested_vmx_exit_handled_encls(vcpu, vmcs12);
- 	default:
- 		return true;
- 	}
-@@ -6517,6 +6534,9 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		msrs->secondary_ctls_high |=
- 			SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
- 
-+	if (enable_sgx)
-+		msrs->secondary_ctls_high |= SECONDARY_EXEC_ENCLS_EXITING;
-+
- 	/* miscellaneous data */
- 	rdmsr(MSR_IA32_VMX_MISC,
- 		msrs->misc_low,
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 197148d76b8f..184418baeb3c 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -244,6 +244,11 @@ static inline bool nested_exit_on_intr(struct kvm_vcpu *vcpu)
- 		PIN_BASED_EXT_INTR_MASK;
- }
- 
-+static inline bool nested_cpu_has_encls_exit(struct vmcs12 *vmcs12)
-+{
-+	return nested_cpu_has2(vmcs12, SECONDARY_EXEC_ENCLS_EXITING);
-+}
-+
- /*
-  * if fixed0[i] == 1: val[i] must be 1
-  * if fixed1[i] == 0: val[i] must be 0
-diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-index 979d0597e4ac..62c3f3ec960b 100644
---- a/arch/x86/kvm/vmx/sgx.c
-+++ b/arch/x86/kvm/vmx/sgx.c
-@@ -6,11 +6,13 @@
- 
- #include "cpuid.h"
- #include "kvm_cache_regs.h"
-+#include "nested.h"
- #include "sgx.h"
- #include "vmx.h"
- #include "x86.h"
- 
--bool __read_mostly enable_sgx;
-+bool __read_mostly enable_sgx = 1;
-+module_param_named(sgx, enable_sgx, bool, 0444);
- 
- /* Initial value of guest's virtual SGX_LEPUBKEYHASHn MSRs */
- static u64 sgx_pubkey_hash[4] __ro_after_init;
-@@ -382,3 +384,79 @@ void vcpu_setup_sgx_lepubkeyhash(struct kvm_vcpu *vcpu)
- 	memcpy(vmx->msr_ia32_sgxlepubkeyhash, sgx_pubkey_hash,
- 	       sizeof(sgx_pubkey_hash));
- }
-+
-+/*
-+ * ECREATE must be intercepted to enforce MISCSELECT, ATTRIBUTES and XFRM
-+ * restrictions if the guest's allowed-1 settings diverge from hardware.
-+ */
-+static bool sgx_intercept_encls_ecreate(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *guest_cpuid;
-+	u32 eax, ebx, ecx, edx;
-+
-+	if (!vcpu->kvm->arch.sgx_provisioning_allowed)
-+		return true;
-+
-+	guest_cpuid = kvm_find_cpuid_entry(vcpu, 0x12, 0);
-+	if (!guest_cpuid)
-+		return true;
-+
-+	cpuid_count(0x12, 0, &eax, &ebx, &ecx, &edx);
-+	if (guest_cpuid->ebx != ebx || guest_cpuid->edx != edx)
-+		return true;
-+
-+	guest_cpuid = kvm_find_cpuid_entry(vcpu, 0x12, 1);
-+	if (!guest_cpuid)
-+		return true;
-+
-+	cpuid_count(0x12, 1, &eax, &ebx, &ecx, &edx);
-+	if (guest_cpuid->eax != eax || guest_cpuid->ebx != ebx ||
-+	    guest_cpuid->ecx != ecx || guest_cpuid->edx != edx)
-+		return true;
-+
-+	return false;
-+}
-+
-+void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
-+{
-+	/*
-+	 * There is no software enable bit for SGX that is virtualized by
-+	 * hardware, e.g. there's no CR4.SGXE, so when SGX is disabled in the
-+	 * guest (either by the host or by the guest's BIOS) but enabled in the
-+	 * host, trap all ENCLS leafs and inject #UD/#GP as needed to emulate
-+	 * the expected system behavior for ENCLS.
-+	 */
-+	u64 bitmap = -1ull;
-+
-+	/* Nothing to do if hardware doesn't support SGX */
-+	if (!cpu_has_vmx_encls_vmexit())
-+		return;
-+
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX) &&
-+	    sgx_enabled_in_guest_bios(vcpu)) {
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX1)) {
-+			bitmap &= ~GENMASK_ULL(ETRACK, ECREATE);
-+			if (sgx_intercept_encls_ecreate(vcpu))
-+				bitmap |= (1 << ECREATE);
-+		}
-+
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX2))
-+			bitmap &= ~GENMASK_ULL(EMODT, EAUG);
-+
-+		/*
-+		 * Trap and execute EINIT if launch control is enabled in the
-+		 * host using the guest's values for launch control MSRs, even
-+		 * if the guest's values are fixed to hardware default values.
-+		 * The MSRs are not loaded/saved on VM-Enter/VM-Exit as writing
-+		 * the MSRs is extraordinarily expensive.
-+		 */
-+		if (boot_cpu_has(X86_FEATURE_SGX_LC))
-+			bitmap |= (1 << EINIT);
-+
-+		if (!vmcs12 && is_guest_mode(vcpu))
-+			vmcs12 = get_vmcs12(vcpu);
-+		if (vmcs12 && nested_cpu_has_encls_exit(vmcs12))
-+			bitmap |= vmcs12->encls_exiting_bitmap;
-+	}
-+	vmcs_write64(ENCLS_EXITING_BITMAP, bitmap);
-+}
-diff --git a/arch/x86/kvm/vmx/sgx.h b/arch/x86/kvm/vmx/sgx.h
-index 05d774f62b7f..da570dc8e519 100644
---- a/arch/x86/kvm/vmx/sgx.h
-+++ b/arch/x86/kvm/vmx/sgx.h
-@@ -4,6 +4,9 @@
- 
- #include <linux/kvm_host.h>
- 
-+#include "capabilities.h"
-+#include "vmx_ops.h"
-+
- #ifdef CONFIG_X86_SGX_VIRTUALIZATION
- extern bool __read_mostly enable_sgx;
- 
-@@ -11,11 +14,21 @@ int handle_encls(struct kvm_vcpu *vcpu);
- 
- void setup_default_sgx_lepubkeyhash(void);
- void vcpu_setup_sgx_lepubkeyhash(struct kvm_vcpu *vcpu);
-+
-+void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12);
- #else
- #define enable_sgx 0
- 
- static inline void setup_default_sgx_lepubkeyhash(void) { }
- static inline void vcpu_setup_sgx_lepubkeyhash(struct kvm_vcpu *vcpu) { }
-+
-+static inline void vmx_write_encls_bitmap(struct kvm_vcpu *vcpu,
-+					  struct vmcs12 *vmcs12)
-+{
-+	/* Nothing to do if hardware doesn't support SGX */
-+	if (cpu_has_vmx_encls_vmexit())
-+		vmcs_write64(ENCLS_EXITING_BITMAP, -1ull);
-+}
- #endif
- 
- #endif /* __KVM_X86_SGX_H */
-diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
-index c8e51c004f78..034adb6404dc 100644
---- a/arch/x86/kvm/vmx/vmcs12.c
-+++ b/arch/x86/kvm/vmx/vmcs12.c
-@@ -50,6 +50,7 @@ const unsigned short vmcs_field_to_offset_table[] = {
- 	FIELD64(VMREAD_BITMAP, vmread_bitmap),
- 	FIELD64(VMWRITE_BITMAP, vmwrite_bitmap),
- 	FIELD64(XSS_EXIT_BITMAP, xss_exit_bitmap),
-+	FIELD64(ENCLS_EXITING_BITMAP, encls_exiting_bitmap),
- 	FIELD64(GUEST_PHYSICAL_ADDRESS, guest_physical_address),
- 	FIELD64(VMCS_LINK_POINTER, vmcs_link_pointer),
- 	FIELD64(GUEST_IA32_DEBUGCTL, guest_ia32_debugctl),
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 80232daf00ff..13494956d0e9 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -69,7 +69,8 @@ struct __packed vmcs12 {
- 	u64 vm_function_control;
- 	u64 eptp_list_address;
- 	u64 pml_address;
--	u64 padding64[3]; /* room for future expansion */
-+	u64 encls_exiting_bitmap;
-+	u64 padding64[2]; /* room for future expansion */
- 	/*
- 	 * To allow migration of L1 (complete with its L2 guests) between
- 	 * machines of different natural widths (32 or 64 bit), we cannot have
-@@ -256,6 +257,7 @@ static inline void vmx_check_vmcs12_offsets(void)
- 	CHECK_OFFSET(vm_function_control, 296);
- 	CHECK_OFFSET(eptp_list_address, 304);
- 	CHECK_OFFSET(pml_address, 312);
-+	CHECK_OFFSET(encls_exiting_bitmap, 320);
- 	CHECK_OFFSET(cr0_guest_host_mask, 344);
- 	CHECK_OFFSET(cr4_guest_host_mask, 352);
- 	CHECK_OFFSET(cr0_read_shadow, 360);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a3372f6c557d..2b096d6ff896 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2160,6 +2160,9 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vmx->msr_ia32_feature_control = data;
- 		if (msr_info->host_initiated && data == 0)
- 			vmx_leave_nested(vcpu);
-+
-+		/* SGX may be enabled/disabled by guest's firmware */
-+		vmx_write_encls_bitmap(vcpu, NULL);
- 		break;
- 	case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
- 		if (!msr_info->host_initiated &&
-@@ -4317,6 +4320,15 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
- 	vmx_adjust_sec_exec_control(vmx, &exec_control, waitpkg, WAITPKG,
- 				    ENABLE_USR_WAIT_PAUSE, false);
- 
-+	if (cpu_has_vmx_encls_vmexit() && nested) {
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_SGX))
-+			vmx->nested.msrs.secondary_ctls_high |=
-+				SECONDARY_EXEC_ENCLS_EXITING;
++		/* KVM only supports the PROVISIONKEY privileged attribute. */
++		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
++		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
++			kvm->arch.sgx_provisioning_allowed = true;
 +		else
-+			vmx->nested.msrs.secondary_ctls_high &=
-+				~SECONDARY_EXEC_ENCLS_EXITING;
++			r = -EINVAL;
++		break;
 +	}
-+
- 	vmx->secondary_exec_control = exec_control;
- }
++#endif
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 374c67875cdb..e17bda18a9b4 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+ #define KVM_CAP_SYS_HYPERV_CPUID 191
+ #define KVM_CAP_DIRTY_LOG_RING 192
++#define KVM_CAP_SGX_ATTRIBUTE 200
  
-@@ -4416,8 +4428,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 		vmcs_write16(GUEST_PML_INDEX, PML_ENTITY_NUM - 1);
- 	}
- 
--	if (cpu_has_vmx_encls_vmexit())
--		vmcs_write64(ENCLS_EXITING_BITMAP, -1ull);
-+	vmx_write_encls_bitmap(&vmx->vcpu, NULL);
- 
- 	if (vmx_pt_mode_is_host_guest()) {
- 		memset(&vmx->pt_desc, 0, sizeof(vmx->pt_desc));
-@@ -7301,6 +7312,22 @@ static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
- 	set_cr4_guest_host_mask(vmx);
- 
-+	vmx_write_encls_bitmap(vcpu, NULL);
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX))
-+		vmx->msr_ia32_feature_control_valid_bits |= FEAT_CTL_SGX_ENABLED;
-+	else
-+		vmx->msr_ia32_feature_control_valid_bits &= ~FEAT_CTL_SGX_ENABLED;
-+	/*
-+	 * Only allow guest to write its virtual SGX_LEPUBKEYHASHn MSRs when
-+	 * host is writable, otherwise it is meaningless.
-+	 */
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_SGX_LC))
-+		vmx->msr_ia32_feature_control_valid_bits |=
-+			FEAT_CTL_SGX_LC_ENABLED;
-+	else
-+		vmx->msr_ia32_feature_control_valid_bits &=
-+			~FEAT_CTL_SGX_LC_ENABLED;
-+
- 	/* Refresh #PF interception to account for MAXPHYADDR changes. */
- 	update_exception_bitmap(vcpu);
- }
-@@ -7321,6 +7348,13 @@ static __init void vmx_set_cpu_caps(void)
- 	if (vmx_pt_mode_is_host_guest())
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
- 
-+	if (!enable_sgx) {
-+		kvm_cpu_cap_clear(X86_FEATURE_SGX);
-+		kvm_cpu_cap_clear(X86_FEATURE_SGX_LC);
-+		kvm_cpu_cap_clear(X86_FEATURE_SGX1);
-+		kvm_cpu_cap_clear(X86_FEATURE_SGX2);
-+	}
-+
- 	if (vmx_umip_emulated())
- 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
+ #ifdef KVM_CAP_IRQ_ROUTING
  
 -- 
 2.29.2
