@@ -2,143 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14E702F98D7
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 05:46:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 055962F9A02
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 07:41:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731452AbhAREqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Jan 2021 23:46:39 -0500
-Received: from mga01.intel.com ([192.55.52.88]:8149 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730255AbhAREqf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Jan 2021 23:46:35 -0500
-IronPort-SDR: vk1rKmgDxCkOYownFZrjwh7/wwpU9gLaJItegkdz2dH6FGAVlRhdxqFceR7GItJ0Cfc2uqTAuC
- bA9Km5mZ7i6Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9867"; a="197450259"
-X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="197450259"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 20:45:54 -0800
-IronPort-SDR: 2U6qZl/cfuHUmxeg0XNanDjty97TPf77gX62Si/NIw7L3m7bXMLOlA4qi9EzeySvB5Te39cN2U
- S9r2TyMXE5jg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="355056230"
-Received: from cfl-host.sh.intel.com ([10.239.158.59])
-  by fmsmga008.fm.intel.com with ESMTP; 17 Jan 2021 20:45:52 -0800
-From:   Fred Gao <fred.gao@intel.com>
-To:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org
-Cc:     Fred Gao <fred.gao@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Swee Yee Fonn <swee.yee.fonn@intel.com>
-Subject: [PATCH v2] vfio/pci: Add support for opregion v2.0+
-Date:   Mon, 18 Jan 2021 20:38:34 +0800
-Message-Id: <20210118123834.5991-1-fred.gao@intel.com>
-X-Mailer: git-send-email 2.24.1.1.gb6d4d82bd5
-In-Reply-To: <20201202171249.17083-1-fred.gao@intel.com>
-References: <20201202171249.17083-1-fred.gao@intel.com>
+        id S1732621AbhARGjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 01:39:37 -0500
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:54163 "EHLO
+        wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729956AbhARGj3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 01:39:29 -0500
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
+        by mailnew.west.internal (Postfix) with ESMTP id 36CDF16A5;
+        Mon, 18 Jan 2021 01:38:22 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Mon, 18 Jan 2021 01:38:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
+        from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm1; bh=DgEncLxHOwju3s3qsQovwzM5MS
+        urO/+K7pT6AH/ZnM4=; b=ccWMOF063Ku6MMNGUrlAMjPF9KPsClnCmWNEv2gxFJ
+        LHXYvLUKN/6/lyxJbxnhB8vkYgHY6hlFiuLDt8hVJbz0U5Y+ElqsXBXuvyiOfld+
+        gzw2H3KEYEorw9Px/yJw6MZzS7xLsyGv3N/dgIq1bVCwo86/EtOuKvyJ0aoEBo0y
+        hMSREwiHo9J3JRkF7H7W7uhqCxAeggDwJAL2gMfPWkBDf2ma88Nw4VQzRY9A64LG
+        r0m7IrAscxNo9P4821yweTzSAG/Z7JSxju8Siwwjz/2P1zW8MIzcJVWpSXswMFSq
+        QIvdVdYFncngMS7tvWYZpTCKUZwvEZs+VRZ6qe2BdwEQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=DgEncLxHOwju3s3qs
+        QovwzM5MSurO/+K7pT6AH/ZnM4=; b=PlOoDjisa4rhkTAeEfJ3RsmKiRi1CJp/j
+        QBz6jvD79OAzrVn+kO2p38KMV0cJtt1fzw2xvkA3DrK0EcEA9UmGKVmBTT3P99ia
+        SAKBpcXmpSvHJxta9BFMyk7G5h+XkteSIBf7lCI/Y90Vluq9crgHMf931GN4Hm3V
+        a+/ib6owhucEoRsSqVmnZQAIqdAPKHFHwLOu6QaruBJoFU9shd6cgzdMamkNnQt+
+        gO1a2Yp0C6SpWeZwqsEhV5YRDEPYZIvEN9ReQKWkDMMrFnM5zs50iOd9NEOVQh2p
+        1OlK3OjyshSvqQCeg4nmL1Fgp5mzRvwFbmNzodR1IPrgeWMFjlslg==
+X-ME-Sender: <xms:3CwFYPZnlIm_u1iAn_-aPsgdP0k7feH3gYh01eT1ePDpoVddwVcqIg>
+    <xme:3CwFYOZjVVwEQAHZKZidXGCj53XOgBWvXU07BM_kGOEQMo_tY7PamVALyrdjWGI3q
+    Hox2Aht5XmzNII2RMY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrtdejgdeliecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomheplfhirgiguhhnucgj
+    rghnghcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqeenucggtffrrg
+    htthgvrhhnpeehgfdtkefggfetgeffgfeuuedtjeejudekveevfeevjeefgeettdefleet
+    gfdvudenucffohhmrghinhepghhithhlrggsrdgtohhmnecukfhppeduudeirddvvdekrd
+    ekgedrvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
+    pehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhm
+X-ME-Proxy: <xmx:3CwFYB-FhIvTYl22E5U7prntTbIAkVigIumpzLl1HjSL0jtlcrxk0Q>
+    <xmx:3CwFYFr0fVb4rO2ztQKeuDlf9XSO8wtNSVGE0e3ErVGG_4Gc1AChIg>
+    <xmx:3CwFYKqqZYhwv1Prk61mmqPA5O307gjgeFNXe6eVATbxmK9boI-DVw>
+    <xmx:3SwFYObR50qMvbcydSoD8bUFcrqPLgOFZp2BrXBguJZBls6qd9lbZbW_talotIup>
+Received: from strike.U-LINK.com (unknown [116.228.84.2])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 4F4BD24005B;
+        Mon, 18 Jan 2021 01:38:14 -0500 (EST)
+From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
+To:     qemu-devel@nongnu.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        kvm@vger.kernel.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        Alistair Francis <alistair@alistair23.me>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>
+Subject: [PATCH v2 0/9] Alpine Linux build fix and CI pipeline
+Date:   Mon, 18 Jan 2021 14:37:59 +0800
+Message-Id: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before opregion version 2.0 VBT data is stored in opregion mailbox #4,
-However, When VBT data exceeds 6KB size and cannot be within mailbox #4
-starting from opregion v2.0+, Extended VBT region, next to opregion, is
-used to hold the VBT data, so the total size will be opregion size plus
-extended VBT region size.
+Alpine Linux is a security-oriented, lightweight Linux distribution
+based on musl libc and busybox.
 
-Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-Signed-off-by: Swee Yee Fonn <swee.yee.fonn@intel.com>
-Signed-off-by: Fred Gao <fred.gao@intel.com>
----
- drivers/vfio/pci/vfio_pci_igd.c | 59 +++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+It it popular among Docker guests and embedded applications.
 
-diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-index 53d97f459252..fc470278a492 100644
---- a/drivers/vfio/pci/vfio_pci_igd.c
-+++ b/drivers/vfio/pci/vfio_pci_igd.c
-@@ -21,6 +21,10 @@
- #define OPREGION_SIZE		(8 * 1024)
- #define OPREGION_PCI_ADDR	0xfc
- 
-+#define OPREGION_RVDA		0x3ba
-+#define OPREGION_RVDS		0x3c2
-+#define OPREGION_VERSION	0x16
-+
- static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
- 			      size_t count, loff_t *ppos, bool iswrite)
- {
-@@ -58,6 +62,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
- 	u32 addr, size;
- 	void *base;
- 	int ret;
-+	u16 version;
- 
- 	ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
- 	if (ret)
-@@ -83,6 +88,60 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
- 
- 	size *= 1024; /* In KB */
- 
-+	/*
-+	 * Support opregion v2.0+
-+	 * When VBT data exceeds 6KB size and cannot be within mailbox #4
-+	 * Extended VBT region, next to opregion, is used to hold the VBT data.
-+	 * RVDA (Relative Address of VBT Data from Opregion Base) and RVDS
-+	 * (VBT Data Size) from opregion structure member are used to hold the
-+	 * address from region base and size of VBT data while RVDA/RVDS
-+	 * are not defined before opregion 2.0.
-+	 *
-+	 * opregion 2.0: rvda is the physical VBT address.
-+	 *
-+	 * opregion 2.1+: rvda is unsigned, relative offset from
-+	 * opregion base, and should never point within opregion.
-+	 */
-+	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
-+	if (version >= 0x0200) {
-+		u64 rvda;
-+		u32 rvds;
-+
-+		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RVDA));
-+		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RVDS));
-+		if (rvda && rvds) {
-+			u32 offset;
-+
-+			if (version == 0x0200)
-+				offset = rvda - (u64)addr;
-+			else
-+				offset = rvda;
-+
-+			if (offset != size) {
-+				pci_err(vdev->pdev,
-+				"Extended VBT does not follow opregion !\n"
-+				"opregion version 0x%x:offset 0x%x\n", version, offset);
-+				return -EINVAL;
-+			}
-+
-+			/*
-+			 * the only difference between opregion 2.0 and 2.1 is
-+			 * rvda addressing mode. since rvda is physical host
-+			 * VBT address and cannot be directly used in guest,
-+			 * faked into opregion 2.1's relative offset.
-+			 */
-+			if (version == 0x0200) {
-+				*(__le16 *)(base + OPREGION_VERSION) =
-+					cpu_to_le16(0x0201);
-+				(*(__le64 *)(base + OPREGION_RVDA)) =
-+					cpu_to_le64((rvda - (u64)addr));
-+			}
-+
-+			/* region size for opregion v2.0+: opregion and VBT size */
-+			size = offset + rvds;
-+		}
-+	}
-+
- 	if (size != OPREGION_SIZE) {
- 		memunmap(base);
- 		base = memremap(addr, size, MEMREMAP_WB);
+Adding it to test against different libc.
+
+Patches pending review at v2 are: 7, 8, 9
+
+Tree avilable at: https://gitlab.com/FlyGoat/qemu/-/commits/alpine_linux_v2
+CI All green: https://gitlab.com/FlyGoat/qemu/-/pipelines/242003288
+
+It is known to have checkpatch complains about identation but they're
+all pre-existing issues as I'm only doing string replacement. 
+
+v2:
+ - Reoreder patches (Wainer)
+ - Add shadow to dockerfile (Wainer)
+ - Pickup proper signal.h fix (PMM)
+ - Correct clock_adjtime title (Thomas Huth)
+ - Collect review tags
+
+Jiaxun Yang (8):
+  configure: Add sys/timex.h to probe clock_adjtime
+  libvhost-user: Include poll.h instead of sys/poll.h
+  hw/block/nand: Rename PAGE_SIZE to NAND_PAGE_SIZE
+  elf2dmp: Rename PAGE_SIZE to ELF2DMP_PAGE_SIZE
+  tests: Rename PAGE_SIZE definitions
+  accel/kvm: avoid using predefined PAGE_SIZE
+  tests/docker: Add dockerfile for Alpine Linux
+  gitlab-ci: Add alpine to pipeline
+
+Michael Forney (1):
+  osdep.h: Remove <sys/signal.h> include
+
+ configure                                 |  1 +
+ meson.build                               |  1 -
+ contrib/elf2dmp/addrspace.h               |  6 +-
+ include/qemu/osdep.h                      |  4 --
+ subprojects/libvhost-user/libvhost-user.h |  2 +-
+ accel/kvm/kvm-all.c                       |  3 +
+ contrib/elf2dmp/addrspace.c               |  4 +-
+ contrib/elf2dmp/main.c                    | 18 +++---
+ hw/block/nand.c                           | 40 ++++++-------
+ tests/migration/stress.c                  | 10 ++--
+ tests/qtest/libqos/malloc-pc.c            |  4 +-
+ tests/qtest/libqos/malloc-spapr.c         |  4 +-
+ tests/qtest/m25p80-test.c                 | 54 ++++++++---------
+ tests/tcg/multiarch/system/memory.c       |  6 +-
+ tests/test-xbzrle.c                       | 70 +++++++++++------------
+ .gitlab-ci.d/containers.yml               |  5 ++
+ .gitlab-ci.yml                            | 23 ++++++++
+ tests/docker/dockerfiles/alpine.docker    | 57 ++++++++++++++++++
+ 18 files changed, 198 insertions(+), 114 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/alpine.docker
+
 -- 
-2.24.1.1.gb6d4d82bd5
+2.30.0
 
