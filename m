@@ -2,180 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 604522F984A
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 04:31:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 548BC2F98BA
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 05:42:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731713AbhARDbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 17 Jan 2021 22:31:11 -0500
-Received: from mga06.intel.com ([134.134.136.31]:32175 "EHLO mga06.intel.com"
+        id S1729588AbhAREl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 17 Jan 2021 23:41:26 -0500
+Received: from mga06.intel.com ([134.134.136.31]:31561 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731684AbhARDaj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 17 Jan 2021 22:30:39 -0500
-IronPort-SDR: 0ztt5x5C0VYbzcyKfv9xgFSL9eav7U6nxjxExjf30BMgFEPJ0ae/vbud48RY3DGVFBXEnef9hg
- Y6QgyaPX9VsQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9867"; a="240296018"
+        id S1726186AbhARElZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 17 Jan 2021 23:41:25 -0500
+IronPort-SDR: G7g3NllnhW27/xK2IRZWNlBQhJAWuYmfyCSff1Ws8r0+FcEjmnp4XWDmjPVcotQZNPh1UUI3Vt
+ O7zRo03T2bhQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9867"; a="240300002"
 X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="240296018"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:46 -0800
-IronPort-SDR: eZDC2/tBbSV1eEWujzwEu2OaQ2Mbu6RQekVjsjCrWDm9qzu5tTTqC3TCwM1ZmEfN/kyB1skkuO
- yV8kNrbnvlEA==
+   d="scan'208";a="240300002"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 20:40:44 -0800
+IronPort-SDR: eEvw7leSaaJN9eymLLgynxNsOGJeSV55yCiBp97NG8dJkQ0Ik5jtq/b2whwL85LQOqaO9CSC4d
+ 2hq4jBbHNtUQ==
 X-IronPort-AV: E=Sophos;i="5.79,355,1602572400"; 
-   d="scan'208";a="573151251"
-Received: from amrahman-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.142.253])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 19:29:42 -0800
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, corbet@lwn.net,
-        Andy Lutomirski <luto@amacapital.net>,
-        Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v2 26/26] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Mon, 18 Jan 2021 16:29:35 +1300
-Message-Id: <94ac3c0bfbb5b7fe59a3cf3a30699c2f6dce8869.1610935432.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.1610935432.git.kai.huang@intel.com>
-References: <cover.1610935432.git.kai.huang@intel.com>
+   d="scan'208";a="383426844"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2021 20:40:41 -0800
+Subject: Re: [PATCH] KVM: x86/pmu: Fix HW_REF_CPU_CYCLES event pseudo-encoding
+ in intel_arch_events[]
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Stephane Eranian <eranian@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
+References: <20201230081916.63417-1-like.xu@linux.intel.com>
+ <1ff5381c-3057-7ca2-6f62-bbdcefd8e427@linux.intel.com>
+ <YAHRMK5SmrmMx8hg@google.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <b3623ea4-b2a1-e825-68f9-d97a6e7a07f4@intel.com>
+Date:   Mon, 18 Jan 2021 12:40:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YAHRMK5SmrmMx8hg@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+On 2021/1/16 1:30, Sean Christopherson wrote:
+> On Fri, Jan 15, 2021, Like Xu wrote:
+>> Ping ?
+>>
+>> On 2020/12/30 16:19, Like Xu wrote:
+>>> The HW_REF_CPU_CYCLES event on the fixed counter 2 is pseudo-encoded as
+>>> 0x0300 in the intel_perfmon_event_map[]. Correct its usage.
+>>>
+>>> Fixes: 62079d8a4312 ("KVM: PMU: add proper support for fixed counter 2")
+>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+thx.
+>
+>>> ---
+>>>    arch/x86/kvm/vmx/pmu_intel.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>>> index a886a47daebd..013e8d253dfa 100644
+>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>> @@ -29,7 +29,7 @@ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
+>>>    	[4] = { 0x2e, 0x41, PERF_COUNT_HW_CACHE_MISSES },
+>>>    	[5] = { 0xc4, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
+>>>    	[6] = { 0xc5, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
+>>> -	[7] = { 0x00, 0x30, PERF_COUNT_HW_REF_CPU_CYCLES },
+>>> +	[7] = { 0x00, 0x03, PERF_COUNT_HW_REF_CPU_CYCLES },
+> In a follow up patch, would it be sane/appropriate to define these magic numbers
+> in asm/perf_event.h and share them between intel_perfmon_event_map and
+> intel_arch_events?  Without this patch, it's not at all obvious that these are
+> intended to align with the Core (arch?) event definitions.
 
-Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
-to grant a VM access to a priveleged attribute, with args[0] holding a
-file handle to a valid SGX attribute file.
+The asm/perf_event.h is x86 generic and svm has a amd_perfmon_event_map.
 
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
+How about adding an interface similar to perf_get_x86_pmu_capability()
+so that we can use magic numbers directly from the host perf ?
+(it looks we may have a performance drop, compared to static array)
 
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.
-
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
- arch/x86/kvm/cpuid.c           |  2 +-
- arch/x86/kvm/x86.c             | 22 ++++++++++++++++++++++
- include/uapi/linux/kvm.h       |  1 +
- 4 files changed, 47 insertions(+), 1 deletion(-)
+thx, likexu
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c136e254b496..47c7c7c33025 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6037,6 +6037,29 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+7.22 KVM_CAP_SGX_ATTRIBUTE
-+----------------------
-+
-+:Architectures: x86
-+:Target: VM
-+:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+          attribute is not supported by KVM.
-+
-+KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
-+more priveleged enclave attributes.  args[0] must hold a file handle to a valid
-+SGX attribute file corresponding to an attribute that is supported/restricted
-+by KVM (currently only PROVISIONKEY).
-+
-+The SGX subsystem restricts access to a subset of enclave attributes to provide
-+additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
-+is restricted to deter malware from using the PROVISIONKEY to obtain a stable
-+system fingerprint.  To prevent userspace from circumventing such restrictions
-+by running an enclave in a VM, KVM prevents access to privileged attributes by
-+default.
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 04b2f5de2d7b..ad00a1af1545 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -833,7 +833,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * expected to derive it from supported XCR0.
- 		 */
- 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
--			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
- 			      SGX_ATTR_KSS;
- 		entry->ebx &= 0;
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5ca7b181a3ae..b4409b0edecc 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -74,6 +74,8 @@
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
-+#include <asm/sgx.h>
-+#include <asm/sgx_arch.h>
- #include <clocksource/hyperv_timer.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -3767,6 +3769,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_USER_SPACE_MSR:
- 	case KVM_CAP_X86_MSR_FILTER:
- 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-+#ifdef CONFIG_X86_SGX_VIRTUALIZATION
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -5295,6 +5300,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.user_space_msr_mask = cap->args[0];
- 		r = 0;
- 		break;
-+#ifdef CONFIG_X86_SGX_VIRTUALIZATION
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		unsigned long allowed_attributes = 0;
-+
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
-+
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 374c67875cdb..e17bda18a9b4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
- #define KVM_CAP_SYS_HYPERV_CPUID 191
- #define KVM_CAP_DIRTY_LOG_RING 192
-+#define KVM_CAP_SGX_ATTRIBUTE 200
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.29.2
+>
+>>>    };
+>>>    /* mapping between fixed pmc index and intel_arch_events array */
 
