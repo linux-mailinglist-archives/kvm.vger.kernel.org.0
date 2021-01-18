@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 055962F9A02
+	by mail.lfdr.de (Postfix) with ESMTP id 72D292F9A03
 	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 07:41:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732621AbhARGjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 01:39:37 -0500
-Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:54163 "EHLO
+        id S1732630AbhARGjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 01:39:39 -0500
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:57479 "EHLO
         wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729956AbhARGj3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 01:39:29 -0500
+        by vger.kernel.org with ESMTP id S1730636AbhARGjf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 01:39:35 -0500
 Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.west.internal (Postfix) with ESMTP id 36CDF16A5;
-        Mon, 18 Jan 2021 01:38:22 -0500 (EST)
+        by mailnew.west.internal (Postfix) with ESMTP id 53B0E167A;
+        Mon, 18 Jan 2021 01:38:27 -0500 (EST)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Mon, 18 Jan 2021 01:38:23 -0500
+  by compute6.internal (MEProxy); Mon, 18 Jan 2021 01:38:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm1; bh=DgEncLxHOwju3s3qsQovwzM5MS
-        urO/+K7pT6AH/ZnM4=; b=ccWMOF063Ku6MMNGUrlAMjPF9KPsClnCmWNEv2gxFJ
-        LHXYvLUKN/6/lyxJbxnhB8vkYgHY6hlFiuLDt8hVJbz0U5Y+ElqsXBXuvyiOfld+
-        gzw2H3KEYEorw9Px/yJw6MZzS7xLsyGv3N/dgIq1bVCwo86/EtOuKvyJ0aoEBo0y
-        hMSREwiHo9J3JRkF7H7W7uhqCxAeggDwJAL2gMfPWkBDf2ma88Nw4VQzRY9A64LG
-        r0m7IrAscxNo9P4821yweTzSAG/Z7JSxju8Siwwjz/2P1zW8MIzcJVWpSXswMFSq
-        QIvdVdYFncngMS7tvWYZpTCKUZwvEZs+VRZ6qe2BdwEQ==
+        from:to:cc:subject:date:message-id:in-reply-to:references
+        :mime-version:content-transfer-encoding; s=fm1; bh=JkDA4Wi2GI0B3
+        bcDDU6/HuHDUW1caUijozfHO0X7odA=; b=Q2f63C4OvLf+Cic/HcnyLKb3GIU6n
+        6JkVvAbnISPFBLJmqTJdPsntzLxIAIRu7tnVX661Ee9aUJ7tEYF0yYScMpHPuuT3
+        gWpf+/VrJtKDFqPj459Rffq067mbK5/MDc5NYosp0sYlTHn21QqKnlnBgAeT9f6p
+        g0NwnO2+b5Vu7xRWItwSG8+5gueF0xALnMdTbnngFDdJGznY0SvEu3GKnQLYRwQA
+        TqtBsTB5Rws0rwFArRbt9XBqYozNr8RHPrmXublRcYfl2Rfx10v5Qlmd9DTQ9zrt
+        YAVbUlq9v5KKn6/2+vdZ6FXMQiP0EMOA49V+jsIeRSsC/pbTEoksi0bow==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=DgEncLxHOwju3s3qs
-        QovwzM5MSurO/+K7pT6AH/ZnM4=; b=PlOoDjisa4rhkTAeEfJ3RsmKiRi1CJp/j
-        QBz6jvD79OAzrVn+kO2p38KMV0cJtt1fzw2xvkA3DrK0EcEA9UmGKVmBTT3P99ia
-        SAKBpcXmpSvHJxta9BFMyk7G5h+XkteSIBf7lCI/Y90Vluq9crgHMf931GN4Hm3V
-        a+/ib6owhucEoRsSqVmnZQAIqdAPKHFHwLOu6QaruBJoFU9shd6cgzdMamkNnQt+
-        gO1a2Yp0C6SpWeZwqsEhV5YRDEPYZIvEN9ReQKWkDMMrFnM5zs50iOd9NEOVQh2p
-        1OlK3OjyshSvqQCeg4nmL1Fgp5mzRvwFbmNzodR1IPrgeWMFjlslg==
-X-ME-Sender: <xms:3CwFYPZnlIm_u1iAn_-aPsgdP0k7feH3gYh01eT1ePDpoVddwVcqIg>
-    <xme:3CwFYOZjVVwEQAHZKZidXGCj53XOgBWvXU07BM_kGOEQMo_tY7PamVALyrdjWGI3q
-    Hox2Aht5XmzNII2RMY>
+        :in-reply-to:message-id:mime-version:references:subject:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; bh=JkDA4Wi2GI0B3bcDDU6/HuHDUW1caUijozfHO0X7odA=; b=PsIhX8CC
+        RKPW5WVS7OnLCtCD1JoI026OW7rEzsL+F2E6QHadrxlUBunyW387gYeAw6Olrxx1
+        FemT9C6kWu8FaxEL5eAOQth89mEiv9bF0XmvPSYgIqoXas4JbJt0iwXli3Jg9Ipm
+        05FlyQRIYdXf/yDl61PsSqHYarQwdeugt76OEuFnCM8sIofYFr0R5+DQNki0ec0a
+        lXnYabCnDbzMrQnnwgU07GQdmFhW+6ZjDyIGd9QSyLJvHWcXuHV01NNhg5WDr5TS
+        dx1tAe5yhTWXwPEUIolfEOCNbR7mW5nVbKSkg232MWzTlKZ73xMXxvgOa2dTdExr
+        gWJ4/lwaNAaNwQ==
+X-ME-Sender: <xms:4iwFYDQpTlWEeiJgIe9hTFeiJ5cDoMSakyBOdRBDwQKMeMLmyCuGwQ>
+    <xme:4iwFYExfMudvoI-3dFmx9hDlkAN_7hTMjvFKawqBoJlHNqfxttHk0PRQUxozntgaU
+    nOkLwY--S7XwviKVG8>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrtdejgdeliecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
     uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomheplfhirgiguhhnucgj
-    rghnghcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeehgfdtkefggfetgeffgfeuuedtjeejudekveevfeevjeefgeettdefleet
-    gfdvudenucffohhmrghinhepghhithhlrggsrdgtohhmnecukfhppeduudeirddvvdekrd
-    ekgedrvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
-    pehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhm
-X-ME-Proxy: <xmx:3CwFYB-FhIvTYl22E5U7prntTbIAkVigIumpzLl1HjSL0jtlcrxk0Q>
-    <xmx:3CwFYFr0fVb4rO2ztQKeuDlf9XSO8wtNSVGE0e3ErVGG_4Gc1AChIg>
-    <xmx:3CwFYKqqZYhwv1Prk61mmqPA5O307gjgeFNXe6eVATbxmK9boI-DVw>
-    <xmx:3SwFYObR50qMvbcydSoD8bUFcrqPLgOFZp2BrXBguJZBls6qd9lbZbW_talotIup>
+    fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomheplfhirgiguhhn
+    ucgjrghnghcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqeenucggtf
+    frrghtthgvrhhnpeejiefhgfetleekleffudektdehvedujedvgeekkeejfefhhffhtedu
+    tefgtdffueenucfkphepudduiedrvddvkedrkeegrddvnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihg
+    ohgrthdrtghomh
+X-ME-Proxy: <xmx:4iwFYI0zgWu2O_l4Y7dcl-I3w48Yem2suJCZIB2qR4LYE1E1Z9pauQ>
+    <xmx:4iwFYDANM-uBbpiR4KsbV4Om1xovQjBTQs1VBA8-thlIA5-gNbFyOQ>
+    <xmx:4iwFYMiBGQcq69O9tnHOXLp1gt_8qNUJpTc8B_SjKhgXHKppv0JH5g>
+    <xmx:4iwFYIxps6-GK580Z8dKBTLw3OfR4Ce4SJwhVLbqk2Wh16mPRTl2ZEe9UA4brLFj>
 Received: from strike.U-LINK.com (unknown [116.228.84.2])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 4F4BD24005B;
-        Mon, 18 Jan 2021 01:38:14 -0500 (EST)
+        by mail.messagingengine.com (Postfix) with ESMTPA id A3E5424005C;
+        Mon, 18 Jan 2021 01:38:20 -0500 (EST)
 From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
 To:     qemu-devel@nongnu.org
 Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
@@ -70,72 +71,39 @@ Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
         Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: [PATCH v2 0/9] Alpine Linux build fix and CI pipeline
-Date:   Mon, 18 Jan 2021 14:37:59 +0800
-Message-Id: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+Subject: [PATCH v2 1/9] configure: Add sys/timex.h to probe clock_adjtime
+Date:   Mon, 18 Jan 2021 14:38:00 +0800
+Message-Id: <20210118063808.12471-2-jiaxun.yang@flygoat.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alpine Linux is a security-oriented, lightweight Linux distribution
-based on musl libc and busybox.
+It is not a part of standard time.h. Glibc put it under
+time.h however musl treat it as a sys timex extension.
 
-It it popular among Docker guests and embedded applications.
+Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-Adding it to test against different libc.
-
-Patches pending review at v2 are: 7, 8, 9
-
-Tree avilable at: https://gitlab.com/FlyGoat/qemu/-/commits/alpine_linux_v2
-CI All green: https://gitlab.com/FlyGoat/qemu/-/pipelines/242003288
-
-It is known to have checkpatch complains about identation but they're
-all pre-existing issues as I'm only doing string replacement. 
-
-v2:
- - Reoreder patches (Wainer)
- - Add shadow to dockerfile (Wainer)
- - Pickup proper signal.h fix (PMM)
- - Correct clock_adjtime title (Thomas Huth)
- - Collect review tags
-
-Jiaxun Yang (8):
-  configure: Add sys/timex.h to probe clock_adjtime
-  libvhost-user: Include poll.h instead of sys/poll.h
-  hw/block/nand: Rename PAGE_SIZE to NAND_PAGE_SIZE
-  elf2dmp: Rename PAGE_SIZE to ELF2DMP_PAGE_SIZE
-  tests: Rename PAGE_SIZE definitions
-  accel/kvm: avoid using predefined PAGE_SIZE
-  tests/docker: Add dockerfile for Alpine Linux
-  gitlab-ci: Add alpine to pipeline
-
-Michael Forney (1):
-  osdep.h: Remove <sys/signal.h> include
-
- configure                                 |  1 +
- meson.build                               |  1 -
- contrib/elf2dmp/addrspace.h               |  6 +-
- include/qemu/osdep.h                      |  4 --
- subprojects/libvhost-user/libvhost-user.h |  2 +-
- accel/kvm/kvm-all.c                       |  3 +
- contrib/elf2dmp/addrspace.c               |  4 +-
- contrib/elf2dmp/main.c                    | 18 +++---
- hw/block/nand.c                           | 40 ++++++-------
- tests/migration/stress.c                  | 10 ++--
- tests/qtest/libqos/malloc-pc.c            |  4 +-
- tests/qtest/libqos/malloc-spapr.c         |  4 +-
- tests/qtest/m25p80-test.c                 | 54 ++++++++---------
- tests/tcg/multiarch/system/memory.c       |  6 +-
- tests/test-xbzrle.c                       | 70 +++++++++++------------
- .gitlab-ci.d/containers.yml               |  5 ++
- .gitlab-ci.yml                            | 23 ++++++++
- tests/docker/dockerfiles/alpine.docker    | 57 ++++++++++++++++++
- 18 files changed, 198 insertions(+), 114 deletions(-)
- create mode 100644 tests/docker/dockerfiles/alpine.docker
-
+diff --git a/configure b/configure
+index 155dda124c..1a9e1afa39 100755
+--- a/configure
++++ b/configure
+@@ -4039,6 +4039,7 @@ fi
+ clock_adjtime=no
+ cat > $TMPC <<EOF
+ #include <time.h>
++#include <sys/timex.h>
+ 
+ int main(void)
+ {
 -- 
 2.30.0
 
