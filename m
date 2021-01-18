@@ -2,106 +2,337 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E01C2FA823
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 19:00:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA0D2FA8AE
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 19:26:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407358AbhARR7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 12:59:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25788 "EHLO
+        id S2405369AbhARPGl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 10:06:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39583 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2406224AbhARR6c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 12:58:32 -0500
+        by vger.kernel.org with ESMTP id S2405443AbhARPGI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 10:06:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610992625;
+        s=mimecast20190719; t=1610982280;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NlQXtC0mzOszNv+aplUwR6g3eZHcO9aB3QV50suaILc=;
-        b=hZzXWOKzMjTCwf/+tZCXLadIGqXIiy2OSwVD3ZfwG8SJjLzInJVbGQAtQXPLoVAndLrXrS
-        F8QLC7GcyWnpRQdd7pCiSkT0EFCI7c5KpXD+NOqrhWkC4Ipbs7IVhHsFXdoaD2wQ6JaHtS
-        gEWs1TC8CR+GQUrV7WPg4MvDeF0A8Eg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-olYHufcNOqe8bLdKD3tzRg-1; Mon, 18 Jan 2021 12:57:04 -0500
-X-MC-Unique: olYHufcNOqe8bLdKD3tzRg-1
-Received: by mail-ed1-f69.google.com with SMTP id x13so8188247edi.7
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 09:57:03 -0800 (PST)
+        bh=SLOedUuUAetYBtp0/6k8K8pT2ynnPsFK+R3zYe7flUQ=;
+        b=Bt/82uFNI1bhSVeHx5PPuXiFgpd2IzHga3zFSlR5p6rtUc78sVEdX05/cIiIMQeJlLmkPs
+        ehYzVX33MeRcPk62uaGhzEJJArjDx47XWsb+jc2IHb8/BsfwvAjQZLluGwH0dNbGYepa+E
+        FIA77+G/NeMdOw8gd6vlotrlQOhE2kk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-nsEkyEEGNz-fg02FRVR14g-1; Mon, 18 Jan 2021 10:04:39 -0500
+X-MC-Unique: nsEkyEEGNz-fg02FRVR14g-1
+Received: by mail-wr1-f69.google.com with SMTP id q2so8417107wrp.4
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 07:04:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NlQXtC0mzOszNv+aplUwR6g3eZHcO9aB3QV50suaILc=;
-        b=nLQAH6siwB+vmZoG6Xxa3pln+n1hno48E/AN5WPKBLEsO/f+doiywvsmzLdOCy2LvN
-         vcQHQR4N7eZb/IzITpSCLQrhGynX7gmkFlPE7wNGQUojlhG7X4ujlHCTBYzK62yJo8dv
-         QRtwwdFRTusX3YLp/dsX3C6bC5KfEOfVtKsMUiclHfJAlIpojdebFBnnJOKMTPmvoTRx
-         GCa1371Z/wNSSTcWYquJKqHvt9tue6a+gFiKSoJhZJ9ipelVjirYFyXldnCCwptsFmhp
-         aXj+ZlgyZCOkzLHEvr9uaaqBZNuCUUDP5TD6QiZ7ukAssqx3nE2w50DmPhDRSz6A+UIR
-         FxHQ==
-X-Gm-Message-State: AOAM5332gKv0OtOVaOHhJ2V3XwS2XCQnMAflOBYBCJZyJAfOdjykoZlJ
-        s0NUjbTP3IWMJjse2n0z0ZObWxZ6xZW7QTye2QPlaqcuh84zoFs5TYih0X3IHEbJOASjzLY9p7R
-        7sa/+3WRjb3O4
-X-Received: by 2002:a17:906:29d4:: with SMTP id y20mr555806eje.294.1610992622935;
-        Mon, 18 Jan 2021 09:57:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyEoFbQc+ttDUuazF7d1C0cmNHto/uojPB7s4MxeJxEcNPW5tKhPP/wQuCZGYmmWPaS7jATyQ==
-X-Received: by 2002:a17:906:29d4:: with SMTP id y20mr555796eje.294.1610992622784;
-        Mon, 18 Jan 2021 09:57:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id z24sm11040996edr.9.2021.01.18.09.57.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Jan 2021 09:57:02 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86/pmu: Fix HW_REF_CPU_CYCLES event pseudo-encoding
- in intel_arch_events[]
-To:     Like Xu <like.xu@linux.intel.com>,
-        Stephane Eranian <eranian@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201230081916.63417-1-like.xu@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <166bdae7-529a-cd17-a164-6e86ef7f6124@redhat.com>
-Date:   Mon, 18 Jan 2021 18:57:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SLOedUuUAetYBtp0/6k8K8pT2ynnPsFK+R3zYe7flUQ=;
+        b=D9LFlKAzyagMQIzrZfLualHVZEQxtVe3PV91jP8kwYcAZL44lBEs3JQ8I6S/M6+R35
+         kT3fXHC8S4mFD7y03YbhPMJG3kSuEAY4dmPHbZMagXvo9dEFc8pmgmA+LYgrPzlQaotY
+         Mf+Tb5lP/cfqZ4a/o2UBySTqUpQ0JOZ7InRqfLEDMu+lVXhi5sxnHursvsKNnGLT4S07
+         Ofj+JrDNFSocHZMhFh1WOIKDZ50SIjqmOwSjtRwTauN+BePWUCAKy0NPvdDTAOYR/9tM
+         vx9f/lXNA36pO3q6suEvhe5IWJeiixveOC64Ntg+qhv7jH996//Vg8KR0ZoFnYcMAHyi
+         p5yw==
+X-Gm-Message-State: AOAM531BHOHXVbGSECfNThtffCMZuOFRsMSdRbdzfmYW/Ht60sBHIzn+
+        IG7uemKcsn3gdflcGs2esAXNKXUJUKUK2LYkHfjZx31tG8UR0COD7uy+Gv8wIhYnBEgOLgKeQ6C
+        ApiiDKpXoUj0C
+X-Received: by 2002:a1c:68c5:: with SMTP id d188mr21765368wmc.64.1610982277937;
+        Mon, 18 Jan 2021 07:04:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzAocm4YOtLjCr5k37DjhAHDbUBhVkU09C7Q2qMpBxBR3X3zOVzn936ICMee7QrKjcDbvR50g==
+X-Received: by 2002:a1c:68c5:: with SMTP id d188mr21765236wmc.64.1610982276528;
+        Mon, 18 Jan 2021 07:04:36 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id u205sm26786291wme.42.2021.01.18.07.04.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jan 2021 07:04:35 -0800 (PST)
+Date:   Mon, 18 Jan 2021 16:04:33 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 02/13] af_vsock: separate rx loops for
+ STREAM/SEQPACKET.
+Message-ID: <20210118150433.kj4wuoecddyng632@steredhat>
+References: <20210115053553.1454517-1-arseny.krasnov@kaspersky.com>
+ <20210115054054.1455729-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20201230081916.63417-1-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210115054054.1455729-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/12/20 09:19, Like Xu wrote:
-> The HW_REF_CPU_CYCLES event on the fixed counter 2 is pseudo-encoded as
-> 0x0300 in the intel_perfmon_event_map[]. Correct its usage.
-> 
-> Fixes: 62079d8a4312 ("KVM: PMU: add proper support for fixed counter 2")
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> ---
->   arch/x86/kvm/vmx/pmu_intel.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index a886a47daebd..013e8d253dfa 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -29,7 +29,7 @@ static struct kvm_event_hw_type_mapping intel_arch_events[] = {
->   	[4] = { 0x2e, 0x41, PERF_COUNT_HW_CACHE_MISSES },
->   	[5] = { 0xc4, 0x00, PERF_COUNT_HW_BRANCH_INSTRUCTIONS },
->   	[6] = { 0xc5, 0x00, PERF_COUNT_HW_BRANCH_MISSES },
-> -	[7] = { 0x00, 0x30, PERF_COUNT_HW_REF_CPU_CYCLES },
-> +	[7] = { 0x00, 0x03, PERF_COUNT_HW_REF_CPU_CYCLES },
->   };
->   
->   /* mapping between fixed pmc index and intel_arch_events array */
-> 
+On Fri, Jan 15, 2021 at 08:40:50AM +0300, Arseny Krasnov wrote:
+>This adds two receive loops: for SOCK_STREAM and SOCK_SEQPACKET. Both are
+>look like twins, but SEQPACKET is a little bit different from STREAM:
+>1) It doesn't call notify callbacks.
+>2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
+>   there is no sense for these values in SEQPACKET case.
+>3) It waits until whole record is received or error is found during
+>   receiving.
+>4) It processes and sets 'MSG_TRUNC' flag.
+>
+>So to avoid extra conditions for two types of socket inside on loop, two
+>independent functions were created.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> include/net/af_vsock.h   |   5 +
+> net/vmw_vsock/af_vsock.c | 202 +++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 207 insertions(+)
+>
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index b1c717286993..46073842d489 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -135,6 +135,11 @@ struct vsock_transport {
+> 	bool (*stream_is_active)(struct vsock_sock *);
+> 	bool (*stream_allow)(u32 cid, u32 port);
+>
+>+	/* SEQ_PACKET. */
+>+	size_t (*seqpacket_seq_get_len)(struct vsock_sock *);
+>+	ssize_t (*seqpacket_dequeue)(struct vsock_sock *, struct msghdr *,
+>+				     size_t len, int flags);
+>+
+> 	/* Notification. */
+> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
+> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index af716f5a93a4..afacbe9f4231 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1870,6 +1870,208 @@ static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
+> 	return err;
+> }
+>
+>+static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
+>+				     size_t len, int flags)
+>+{
+>+	int err = 0;
+>+	size_t record_len;
+>+	struct vsock_sock *vsk;
+>+	const struct vsock_transport *transport;
+>+	long timeout;
+>+	ssize_t dequeued_total = 0;
+>+	unsigned long orig_nr_segs;
+>+	const struct iovec *orig_iov;
+>+	DEFINE_WAIT(wait);
+>+
+>+	vsk = vsock_sk(sk);
+>+	transport = vsk->transport;
+>+
+>+	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+>+	msg->msg_flags &= ~MSG_EOR;
+>+	orig_nr_segs = msg->msg_iter.nr_segs;
+>+	orig_iov = msg->msg_iter.iov;
+>+
+>+	while (1) {
+>+		s64 ready;
+>+
+>+		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
+>+		ready = vsock_stream_has_data(vsk);
+>+
+>+		if (ready == 0) {
+>+			if (vsock_wait_data(sk, &wait, timeout, NULL, 0)) {
+>+				/* In case of any loop break(timeout, signal
+>+				 * interrupt or shutdown), we report user that
+>+				 * nothing was copied.
+>+				 */
+>+				dequeued_total = 0;
+>+				break;
+>+			}
 
-Queued, thanks.
+Maybe here we can do 'continue', remove the next line, and reduce the 
+indentation on the next block.
 
-Paolo
+>+		} else {
+>+			ssize_t dequeued;
+>+
+>+			finish_wait(sk_sleep(sk), &wait);
+>+
+>+			if (ready < 0) {
+>+				err = -ENOMEM;
+>+				goto out;
+>+			}
+>+
+>+			if (dequeued_total == 0) {
+>+				record_len =
+>+					transport->seqpacket_seq_get_len(vsk);
+>+
+>+				if (record_len == 0)
+>+					continue;
+>+			}
+>+
+>+			/* 'msg_iter.count' is number of unused bytes in iov.
+>+			 * On every copy to iov iterator it is decremented at
+>+			 * size of data.
+>+			 */
+>+			dequeued = transport->seqpacket_dequeue(vsk, msg,
+>+						msg->msg_iter.count, flags);
+>+
+>+			if (dequeued < 0) {
+>+				dequeued_total = 0;
+>+
+>+				if (dequeued == -EAGAIN) {
+>+					iov_iter_init(&msg->msg_iter, READ,
+>+						      orig_iov, orig_nr_segs,
+>+						      len);
+>+					msg->msg_flags &= ~MSG_EOR;
+>+					continue;
+>+				}
+>+
+>+				err = -ENOMEM;
+>+				break;
+>+			}
+>+
+>+			dequeued_total += dequeued;
+>+
+>+			if (dequeued_total >= record_len)
+>+				break;
+>+		}
+>+	}
+>+	if (sk->sk_err)
+>+		err = -sk->sk_err;
+>+	else if (sk->sk_shutdown & RCV_SHUTDOWN)
+>+		err = 0;
+>+
+>+	if (dequeued_total > 0) {
+>+		/* User sets MSG_TRUNC, so return real length of
+>+		 * packet.
+>+		 */
+>+		if (flags & MSG_TRUNC)
+>+			err = record_len;
+>+		else
+>+			err = len - msg->msg_iter.count;
+>+
+>+		/* Always set MSG_TRUNC if real length of packet is
+>+		 * bigger that user buffer.
+>+		 */
+>+		if (record_len > len)
+>+			msg->msg_flags |= MSG_TRUNC;
+>+	}
+>+out:
+>+	return err;
+>+}
+>+
+>+static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
+>+				  size_t len, int flags)
+>+{
+>+	int err;
+>+	const struct vsock_transport *transport;
+>+	struct vsock_sock *vsk;
+>+	size_t target;
+>+	struct vsock_transport_recv_notify_data recv_data;
+>+	long timeout;
+>+	ssize_t copied;
+>+
+>+	DEFINE_WAIT(wait);
+>+
+>+	vsk = vsock_sk(sk);
+>+	transport = vsk->transport;
+>+
+>+	/* We must not copy less than target bytes into the user's buffer
+>+	 * before returning successfully, so we wait for the consume queue to
+>+	 * have that much data to consume before dequeueing.  Note that this
+>+	 * makes it impossible to handle cases where target is greater than the
+>+	 * queue size.
+>+	 */
+>+	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
+>+	if (target >= transport->stream_rcvhiwat(vsk)) {
+>+		err = -ENOMEM;
+>+		goto out;
+>+	}
+>+	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+>+	copied = 0;
+>+
+>+	err = transport->notify_recv_init(vsk, target, &recv_data);
+>+	if (err < 0)
+>+		goto out;
+>+
+>+	while (1) {
+>+		s64 ready;
+>+
+>+		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
+>+		ready = vsock_stream_has_data(vsk);
+>+
+>+		if (ready == 0) {
+>+			if (vsock_wait_data(sk, &wait, timeout, 
+>&recv_data, target))
+>+				break;
+
+The same also here.
+
+>+		} else {
+>+			ssize_t read;
+>+
+>+			finish_wait(sk_sleep(sk), &wait);
+>+
+>+			if (ready < 0) {
+>+				/* Invalid queue pair content. XXX This should
+>+				 * be changed to a connection reset in a later
+>+				 * change.
+>+				 */
+>+
+>+				err = -ENOMEM;
+>+				goto out;
+>+			}
+>+
+>+			err = transport->notify_recv_pre_dequeue(vsk,
+>+						target, &recv_data);
+>+			if (err < 0)
+>+				break;
+>+			read = transport->stream_dequeue(vsk, msg, len - copied, flags);
+>+
+>+			if (read < 0) {
+>+				err = -ENOMEM;
+>+				break;
+>+			}
+>+
+>+			copied += read;
+>+
+>+			err = transport->notify_recv_post_dequeue(vsk,
+>+						target, read,
+>+						!(flags & MSG_PEEK), &recv_data);
+>+			if (err < 0)
+>+				goto out;
+>+
+>+			if (read >= target || flags & MSG_PEEK)
+>+				break;
+>+
+>+			target -= read;
+>+		}
+>+	}
+>+
+>+	if (sk->sk_err)
+>+		err = -sk->sk_err;
+>+	else if (sk->sk_shutdown & RCV_SHUTDOWN)
+>+		err = 0;
+>+	if (copied > 0)
+>+		err = copied;
+>+
+>+out:
+>+	release_sock(sk);
+>+	return err;
+>+}
+>+
+> static int
+> vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 		     int flags)
+>-- 
+>2.25.1
+>
 
