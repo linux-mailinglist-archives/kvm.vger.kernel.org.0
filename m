@@ -2,149 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F28B22FA460
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 16:19:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ACF322FA467
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 16:19:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390423AbhARPR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 10:17:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32998 "EHLO
+        id S2405399AbhARPSi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 10:18:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60467 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405636AbhARPRS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 10:17:18 -0500
+        by vger.kernel.org with ESMTP id S2405161AbhARPS3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 10:18:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610982952;
+        s=mimecast20190719; t=1610983022;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qw4bLrauxaYv+NU5WthB52Dg6DmZkhc0QbWly8U7Svs=;
-        b=Gpjs+Mn3CbugE+tjmfrUCQyCh6s+0vsaOj9xEzf9td9ywcP11SvhBbMW5ndSHcSN8/LKYn
-        86WFGA+PH0OaIGmq2AvVZu8LGqjSu8c3nsNpPm1X/+fwiijx+gfsPOj+oL6UDDWqvrW12h
-        +jIiBxk/Wg/uG4PokLjzSSGj+suHPFY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-ixxU3zWyOc-HvZ9eBQiEBA-1; Mon, 18 Jan 2021 10:15:50 -0500
-X-MC-Unique: ixxU3zWyOc-HvZ9eBQiEBA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1778D806664;
-        Mon, 18 Jan 2021 15:15:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-189.ams2.redhat.com [10.36.112.189])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B667C60622;
-        Mon, 18 Jan 2021 15:15:44 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2] s390x: Fix uv_call() exception behavior
-To:     Janosch Frank <frankja@linux.ibm.com>, KVM <kvm@vger.kernel.org>
-Cc:     david@redhat.com, borntraeger@de.ibm.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org
-References: <20210118140344.3074-1-frankja@linux.ibm.com>
- <20210118150922.5229-1-frankja@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <d876410c-fd7b-5fb8-1f9e-d3a13e9f44c3@redhat.com>
-Date:   Mon, 18 Jan 2021 16:15:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=psrfvoG3s6Q5vxt3L2I9TwaBLHc6rZJ8JZ9ILZMQQLQ=;
+        b=JuvWhx5oP7Yc3rdL+gESQ/2QsljbZPwx/i7widicX6kLayT2feEe/9tOo1bnUdhnYcfYHF
+        lO20Fd17husvOABD7+sQ3GETKJlBbMXfIupM64Lfn2PgOVzzXOaBWUlhfycv/hnMGRbfc0
+        /uxhX7Bq4pu11JUfpJJd1ZG/H9NzoNg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-69-v-sUbFVyP9iMdrjO7pYWNA-1; Mon, 18 Jan 2021 10:17:00 -0500
+X-MC-Unique: v-sUbFVyP9iMdrjO7pYWNA-1
+Received: by mail-wr1-f72.google.com with SMTP id b8so8429751wrv.14
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 07:17:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=psrfvoG3s6Q5vxt3L2I9TwaBLHc6rZJ8JZ9ILZMQQLQ=;
+        b=gkqrYPt1oI7KG5r98Xa/XuvSDkswkZ7ULGYO1iiFRfiMbK/tA0wTw7FOFlmRZ8Fm0a
+         JFVQzMvwqO51CiYdH8zJwGkOsbG/4Hx3U2+4aOpyIXjzAXoWpgAddrJsymla557kzsG6
+         Jhekc8XRBBcGBMTrC1T/bUmeUSiJMookZ0e3vDD/z3N+1FnTZWoKi3ZuYPdldB6IKsSE
+         z7MuS17IPfbEn0CCJivx4G5J+DWTETOvBHkOmFQJBIIdopgCl/reYoNRyagWdFFv/5f0
+         6nKi6cRQxaaEopUffetFuEoYPa+ZsSPAcOJ3vWnFCS2xlm7F/rpCLDQY4nsKT798blQk
+         JVOQ==
+X-Gm-Message-State: AOAM53081nuvKZmzrFxE+HzwgmTy8Zczr1xO/j4Ng6qkSriX2w+rDzJo
+        pIuxTfuwoXljkX6MasGIeeNmmHFKaAa0j9piBnHXcx98+buqf7Xg3O5ePIg7sKQrMFhKSEbG4Dl
+        hNYTcGLWRlW7O
+X-Received: by 2002:adf:e54a:: with SMTP id z10mr26882327wrm.1.1610983019797;
+        Mon, 18 Jan 2021 07:16:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxXG3dAk6icAdSs8xnG72+nZUruxeveo9BolCI0f5eiHmFFp/RlmpfjavbAYMBXV+ShJ7Tvbw==
+X-Received: by 2002:adf:e54a:: with SMTP id z10mr26882310wrm.1.1610983019631;
+        Mon, 18 Jan 2021 07:16:59 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id z130sm28028318wmb.33.2021.01.18.07.16.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jan 2021 07:16:58 -0800 (PST)
+Date:   Mon, 18 Jan 2021 16:16:56 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        stsp <stsp2@yandex.ru>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        kvm <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        Krasnov Arseniy <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v2 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support.
+Message-ID: <CAGxU2F4v9_a9frgM61fh7UYTcWeGpNaAEXTUgnj8hvdU81PW5Q@mail.gmail.com>
+References: <20210115053553.1454517-1-arseny.krasnov@kaspersky.com>
+ <2fd6fc75-c534-7f70-c116-50b1c804b594@yandex.ru>
 MIME-Version: 1.0
-In-Reply-To: <20210118150922.5229-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2fd6fc75-c534-7f70-c116-50b1c804b594@yandex.ru>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/01/2021 16.09, Janosch Frank wrote:
-> On a program exception we usually skip the instruction that caused the
-> exception and continue. That won't work for UV calls since a "brc
-> 3,0b" will retry the instruction if the CC is > 1. Let's forgo the brc
-> when checking for privilege exceptions and use a uv_call_once().
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> 
-> ---
->   lib/s390x/asm/uv.h | 24 ++++++++++++++++--------
->   s390x/uv-guest.c   |  6 +++---
->   2 files changed, 19 insertions(+), 11 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-> index 4c2fc48..39d2dc0 100644
-> --- a/lib/s390x/asm/uv.h
-> +++ b/lib/s390x/asm/uv.h
-> @@ -50,19 +50,12 @@ struct uv_cb_share {
->   	u64 reserved28;
->   } __attribute__((packed))  __attribute__((aligned(8)));
->   
-> -static inline int uv_call(unsigned long r1, unsigned long r2)
-> +static inline int uv_call_once(unsigned long r1, unsigned long r2)
->   {
->   	int cc;
->   
-> -	/*
-> -	 * The brc instruction will take care of the cc 2/3 case where
-> -	 * we need to continue the execution because we were
-> -	 * interrupted. The inline assembly will only return on
-> -	 * success/error i.e. cc 0/1.
-> -	*/
->   	asm volatile(
->   		"0:	.insn rrf,0xB9A40000,%[r1],%[r2],0,0\n"
-> -		"		brc	3,0b\n"
->   		"		ipm	%[cc]\n"
->   		"		srl	%[cc],28\n"
->   		: [cc] "=d" (cc)
-> @@ -71,4 +64,19 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
->   	return cc;
->   }
->   
-> +static inline int uv_call(unsigned long r1, unsigned long r2)
-> +{
-> +	int cc;
-> +
-> +	/*
-> +	 * CC 2 and 3 tell us to re-execute because the instruction
-> +	 * hasn't yet finished.
-> +	 */
-> +	do {
-> +		cc = uv_call_once(r1, r2);
-> +	} while (cc > 1);
-> +
-> +	return cc;
-> +}
-> +
->   #endif
-> diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-> index d47333e..091a19b 100644
-> --- a/s390x/uv-guest.c
-> +++ b/s390x/uv-guest.c
-> @@ -31,7 +31,7 @@ static void test_priv(void)
->   	uvcb.len = sizeof(struct uv_cb_qui);
->   	expect_pgm_int();
->   	enter_pstate();
-> -	uv_call(0, (u64)&uvcb);
-> +	uv_call_once(0, (u64)&uvcb);
->   	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
->   	report_prefix_pop();
->   
-> @@ -40,7 +40,7 @@ static void test_priv(void)
->   	uvcb.len = sizeof(struct uv_cb_share);
->   	expect_pgm_int();
->   	enter_pstate();
-> -	uv_call(0, (u64)&uvcb);
-> +	uv_call_once(0, (u64)&uvcb);
->   	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
->   	report_prefix_pop();
->   
-> @@ -49,7 +49,7 @@ static void test_priv(void)
->   	uvcb.len = sizeof(struct uv_cb_share);
->   	expect_pgm_int();
->   	enter_pstate();
-> -	uv_call(0, (u64)&uvcb);
-> +	uv_call_once(0, (u64)&uvcb);
->   	check_pgm_int_code(PGM_INT_CODE_PRIVILEGED_OPERATION);
->   	report_prefix_pop();
+On Fri, Jan 15, 2021 at 12:59:30PM +0300, stsp wrote:
+>15.01.2021 08:35, Arseny Krasnov пишет:
+>>      This patchset impelements support of SOCK_SEQPACKET for virtio
+>>transport.
+>>      As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>>do it, new packet operation was added: it marks start of record (with
+>>record length in header), such packet doesn't carry any data.  To send
+>>record, packet with start marker is sent first, then all data is sent
+>>as usual 'RW' packets. On receiver's side, length of record is known
+>>from packet with start record marker. Now as  packets of one socket
+>>are not reordered neither on vsock nor on vhost transport layers, such
+>>marker allows to restore original record on receiver's side. If user's
+>>buffer is smaller that
+>
+>than
+>
+>
+>>  record length, when
+>
+>then
+>
+>
+>>  v1 -> v2:
+>>  - patches reordered: af_vsock.c changes now before virtio vsock
+>>  - patches reorganized: more small patches, where +/- are not mixed
+>
+>If you did this because I asked, then this
+>is not what I asked. :)
+>You can't just add some static func in a
+>separate patch, as it will just produce the
+>compilation warning of an unused function.
+>I only asked to separate the refactoring from
+>the new code. I.e. if you move some code
+>block to a separate function, you shouldn't
+>split that into 2 patches, one that adds a
+>code block and another one that removes it.
+>It should be in one patch, so that it is clear
+>what was moved, and no new warnings are
+>introduced.
+>What I asked to separate, is the old code
+>moves with the new code additions. Such
+>things can definitely go in a separate patches.
 
-That looks nicer, indeed.
+Arseny, thanks for the v2.
+I appreciated that you moved the af_vsock changes before the transport
+and also the test, but I agree with stsp about split patches.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+As stsp suggested, you can have some "preparation" patches that touch
+the already existing code (e.g. rename vsock_stream_sendmsg in
+vsock_connectible_sendmsg() and call it inside the new
+vsock_stream_sendmsg, etc.), then a patch that adds seqpacket stuff in
+af_vsock.
+
+Also for virtio/vhost transports, you can have some patches that add
+support in virtio_transport_common, then a patch that enable it in
+virtio_transport and a patch for vhost_vsock, as you rightly did in
+patch 12.
+
+So, I'd suggest moving out the code that touches virtio_transport.c
+from patch 11.
+
+These changes should simplify the review.
+
+In addition, you can also remove the . from the commit titles.
+
+
+I left other comments in the single patches.
+
+Thanks,
+Stefano
 
