@@ -2,160 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E770A2F9C9C
+	by mail.lfdr.de (Postfix) with ESMTP id 0DA342F9C9A
 	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 11:36:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388758AbhARKA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 05:00:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48766 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389168AbhARJom (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 04:44:42 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10I94Z7q066679;
-        Mon, 18 Jan 2021 04:43:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=g5bTtGK4YsiH4lgIBhWyxvLyKLrqrfOq5ojp65ETm+A=;
- b=sN4tlDaADIvsD4RVoT+4r+K+UlJt5wssGOjL116Yxb1hepv+DpwCFuXIYaWpHePA0vLg
- RvzJdJdbDrs4WtzehuE9Z/F4uL7/vWwM3+0X8ITD9hHHWHepNVMcxOxaeHUrRuC7iSWk
- 7xyllHCV3waPnmQHUNPpKhS+j1UJwYdp2kVpMSBrfbY7vIA9pr/hCNmFKPc2Si8BQ2pR
- nGPgRlt1J/gN5mRDzh33zMvgux1NhrnFa+CiQq8ry7axuBjqBT2WSc66nhJ3zNDgfZum
- K1e6JLu/uFGHfkBduZBX8W+9gJg/xNJITmYlqwrCvrpQb1RXciar6p8Uexy62KNRqIWf oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3657a697rq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Jan 2021 04:43:59 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10I9H79P113936;
-        Mon, 18 Jan 2021 04:43:59 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3657a697qy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Jan 2021 04:43:59 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10I9Qtw4000832;
-        Mon, 18 Jan 2021 09:43:56 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 363qs88ydh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Jan 2021 09:43:56 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10I9hr7323724490
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Jan 2021 09:43:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C47D7AE053;
-        Mon, 18 Jan 2021 09:43:53 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56446AE045;
-        Mon, 18 Jan 2021 09:43:53 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.77.2])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 18 Jan 2021 09:43:53 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 0/9] s390x: Add SIE library and simple
- tests
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
-        imbrenda@linux.ibm.com, cohuck@redhat.com,
-        linux-s390@vger.kernel.org
-References: <20210112132054.49756-1-frankja@linux.ibm.com>
-Message-ID: <45420c5f-cf5f-a3bc-d555-6093d88a0c59@linux.ibm.com>
-Date:   Mon, 18 Jan 2021 10:43:52 +0100
+        id S2388722AbhARJ7j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 04:59:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48642 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389204AbhARJpj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 04:45:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610963052;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=juo0Knj0PHakqWhUiaclcX3+DfYXH1XU/VqsFKd99hE=;
+        b=WAhIyCwDpeMRkvyIJzaYyyEKUVZ96OTUEcpcP42edMvPPfFXkRYijsjOeUCxa9CbS7GgH4
+        vSK+HwQP7cVINSKgLZqLvLU00hGoGCCxGrXkGlksYojDr4FSl8nh49gwnILztj9KIvh/Fc
+        7ZdrUuOizWK4ZhW1fzmeOD3ygxTvBGM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-ABehqz_KPsOmk5usms5W5g-1; Mon, 18 Jan 2021 04:44:07 -0500
+X-MC-Unique: ABehqz_KPsOmk5usms5W5g-1
+Received: by mail-wr1-f69.google.com with SMTP id o17so8024519wra.8
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 01:44:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=juo0Knj0PHakqWhUiaclcX3+DfYXH1XU/VqsFKd99hE=;
+        b=BRXOzO1VcbzX8HnwGiWiajonskjJA9NaQAxOP6TnJ5/6YzdmgZITsmn0Mk+eHbbIez
+         WWUn5qvQoAQtT47vVBkPD0Kvn1grgC7lsXXiRf4WKev7xe+btzYuJRACqVDpIbLp6SG4
+         K4uj2Eu2LRtXKOFKt97pOmO64nWpmwKezud9EzDBwn1KkKGxA29o4HF+tstNRHG9t798
+         DALU6FlnZ/mCiW02DWvJnRNGG7varvA4CZKlmivX1ZI7Ibaqbtk5D6mLKFYZZ8JG7Gd8
+         LQMkkelqK3rClohZCdqJ73k4+77X6xA8Y9DM0lUlyjPcXzP8X07pMiULCc4zAeqQK4zh
+         kitQ==
+X-Gm-Message-State: AOAM531dC5+qvhfziVAcPy8+Tv5r0Us2n+XrFw147xHKt2oyWW5cOuwR
+        9EZ7sNTB/pMiHVBf2/JYHFb8fcrnpNWoY8kgz1DLhifhKSsquun0pMPvkmPR1xgMDdr8XEgMdUc
+        1OeiqyJQTjZmE
+X-Received: by 2002:adf:9427:: with SMTP id 36mr15289179wrq.271.1610963046450;
+        Mon, 18 Jan 2021 01:44:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyc0jqY2v+rKGRN12C2mn5NX35ITrXn7MgCfzcumIjwfhKN5BoFzagIIQOvkpADuYMLfr67wA==
+X-Received: by 2002:adf:9427:: with SMTP id 36mr15289172wrq.271.1610963046339;
+        Mon, 18 Jan 2021 01:44:06 -0800 (PST)
+Received: from [192.168.1.36] (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
+        by smtp.gmail.com with ESMTPSA id c78sm25377725wme.42.2021.01.18.01.44.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Jan 2021 01:44:05 -0800 (PST)
+Subject: Re: [PATCH v2 4/9] hw/block/nand: Rename PAGE_SIZE to NAND_PAGE_SIZE
+To:     Jiaxun Yang <jiaxun.yang@flygoat.com>, qemu-devel@nongnu.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        kvm@vger.kernel.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        Alistair Francis <alistair@alistair23.me>,
+        Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+ <20210118063808.12471-5-jiaxun.yang@flygoat.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <537e90d4-8c14-0338-0b4c-ee26caced113@redhat.com>
+Date:   Mon, 18 Jan 2021 10:44:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210112132054.49756-1-frankja@linux.ibm.com>
+In-Reply-To: <20210118063808.12471-5-jiaxun.yang@flygoat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-18_07:2021-01-15,2021-01-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- clxscore=1015 spamscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101180053
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/12/21 2:20 PM, Janosch Frank wrote:
-> This is the absolute minimum needed to run VMs inside the KVM Unit
-> Tests. It's more of a base for other tests that I can't (yet) publish
-> than an addition of tests that check KVM functionality. However, I
-> wanted to decrease the number of WIP patches in my private
-> branch. Once the library is available maybe others will come and
-> extend the SIE test itself.
+On 1/18/21 7:38 AM, Jiaxun Yang wrote:
+> As per POSIX specification of limits.h [1], OS libc may define
+> PAGE_SIZE in limits.h.
 > 
-> Yes, I have added VM management functionality like VM create/destroy,
-> etc but as it is not needed right now, I'd like to exclude it from
-> this patch set for now.
+> To prevent collosion of definition, we rename PAGE_SIZE here.
+> 
+> [1]: https://pubs.opengroup.org/onlinepubs/7908799/xsh/limits.h.html
+> 
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/block/nand.c | 40 ++++++++++++++++++++--------------------
+>  1 file changed, 20 insertions(+), 20 deletions(-)
+...
 
-I've picked patches 1-8.
-Patch 9 is dropped for now, it's only a comment anyway.
+> -# define PAGE_SIZE		256
+> +# define NAND_PAGE_SIZE     256
+>  # define PAGE_SHIFT		8
+>  # define PAGE_SECTORS		1
+>  # define ADDR_SHIFT		8
+>  # include "nand.c"
 
-Thanks for all of your review comments!
-
-> 
-> v4:
-> 	* Removed asm directory and moved all asm files into s390x/ (I changed my view)
-> 	* Review fixes
-> 	* Removed a stray newline in the asm offsets file
-> 
-> v3:
-> 	* Rebased on re-license patches
-> 	* Split assembly
-> 	* Now using ICPT_* constants
-> 	* Added read_info asserts
-> 	* Fixed missing spin_lock() in smp.c lib
-> 	* Replaced duplicated code in sie test with generic intercept test
-> 	* Replaced uv-guest.x bit testing with test_bit_inv()
-> 	* Some other minor cleanups
-> 
-> Gitlab:
-> https://gitlab.com/frankja/kvm-unit-tests/-/tree/sie
-> 
-> CI:
-> https://gitlab.com/frankja/kvm-unit-tests/-/pipelines/240506525
-> 
-> 
-> Janosch Frank (9):
->   s390x: Add test_bit to library
->   s390x: Consolidate sclp read info
->   s390x: SCLP feature checking
->   s390x: Split assembly into multiple files
->   s390x: sie: Add SIE to lib
->   s390x: sie: Add first SIE test
->   s390x: Add diag318 intercept test
->   s390x: Fix sclp.h style issues
->   s390x: sclp: Add CPU entry offset comment
-> 
->  lib/s390x/asm-offsets.c  |  11 +++
->  lib/s390x/asm/arch_def.h |   9 ++
->  lib/s390x/asm/bitops.h   |  26 ++++++
->  lib/s390x/asm/facility.h |   3 +-
->  lib/s390x/interrupt.c    |   7 ++
->  lib/s390x/io.c           |   2 +
->  lib/s390x/sclp.c         |  57 +++++++++--
->  lib/s390x/sclp.h         | 181 +++++++++++++++++++----------------
->  lib/s390x/sie.h          | 197 +++++++++++++++++++++++++++++++++++++++
->  lib/s390x/smp.c          |  27 +++---
->  s390x/Makefile           |   7 +-
->  s390x/cstart64.S         | 119 +----------------------
->  s390x/intercept.c        |  19 ++++
->  s390x/lib.S              | 121 ++++++++++++++++++++++++
->  s390x/macros.S           |  77 +++++++++++++++
->  s390x/sie.c              | 113 ++++++++++++++++++++++
->  s390x/unittests.cfg      |   3 +
->  s390x/uv-guest.c         |   6 +-
->  18 files changed, 761 insertions(+), 224 deletions(-)
->  create mode 100644 lib/s390x/sie.h
->  create mode 100644 s390x/lib.S
->  create mode 100644 s390x/macros.S
->  create mode 100644 s390x/sie.c
-> 
+Why not rename all SIZE/SHIFT/SECTORS at once, to avoid
+having half NAND and half generic names?
 
