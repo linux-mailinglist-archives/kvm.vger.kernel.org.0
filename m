@@ -2,77 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 573552FA90A
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 19:41:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25DA92FA908
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 19:41:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405520AbhARS1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 13:27:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27344 "EHLO
+        id S2436737AbhARSkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 13:40:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22503 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2393683AbhARS1o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 13:27:44 -0500
+        by vger.kernel.org with ESMTP id S2407564AbhARS22 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 13:28:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610994373;
+        s=mimecast20190719; t=1610994423;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z5tNgVARNvQCB0SJouIAYqEN8m6OYsaWxW5vbk1y2k0=;
-        b=EH2vK0Fbaf7bWnYR919g8PTvBpqEzrZbaCIkE5RQuwp/H7nrnKVNj8SnPw9IWrZeIFO50o
-        J+qrMZl5WJqjb2csBF7qiz9GEkum274+mXgliTgwVaA6iCq5Kp3Y7BcTG/BMyG3y2/5EbP
-        kcTRG+vxumZSSb5i/rukRddzLlKvrqw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-hkE01USVNumhKuk3y34QWA-1; Mon, 18 Jan 2021 13:26:12 -0500
-X-MC-Unique: hkE01USVNumhKuk3y34QWA-1
-Received: by mail-wr1-f72.google.com with SMTP id r8so8692101wro.22
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 10:26:12 -0800 (PST)
+        bh=SR1znhrtBE/8TBlcbJN+jUcCvjG/B/RC2d1W3pykhC8=;
+        b=ilYS6IlTQID5zULyPJRs3KFfU8VqrcuIfVT+vXZFcScBJRetl71MxVwRz2pJDdUtCuUaty
+        73+jAzX6QJkpE7/kszkB0paZaJyK1bNKUdCib3k+S3R8yA052LihLjxjrqDmGm0C0ja+sX
+        db7xycqyupGxDzW61a2Xj5ZSIvWTRww=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-gyqQxgcQMEGfXJwQhB0dlQ-1; Mon, 18 Jan 2021 13:27:01 -0500
+X-MC-Unique: gyqQxgcQMEGfXJwQhB0dlQ-1
+Received: by mail-wr1-f71.google.com with SMTP id u3so8639947wri.19
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 10:27:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=z5tNgVARNvQCB0SJouIAYqEN8m6OYsaWxW5vbk1y2k0=;
-        b=lMYJKlq3IbLVYNtiQXtzvSpF0hOpszbyuBN4jFKDB9btTd7VRnE4watd5uZEvdXOI2
-         bleAuCqyc1Xz/jfFBivJnz9QWIVlkj5+YwMx9yAQnwkox7ciPVyztGjDVtwFokvvGWBZ
-         zvYHzkYf0ZTAU/ICuKydG7H88h/3l4P5x+2TXsiGO2OtIvwo267f5AAE+H6fKFT2huHK
-         QYVhoE6wiOgB+6g72SlXCwwsDlspgNE86cxxPSsOABF1XLVLhQ/Q+scLfP81CwubmcM7
-         S6QmYByYwvt3VXreCSuHvwS/B7qqG3SHNRuebwmdQg258CqnX8ct6H2R6v+pp39G6vJw
-         QCzA==
-X-Gm-Message-State: AOAM533fm11Cd61WNzk/wXWeMRI/i6iUThDRmBjFbu9J9SKBsATjQjTm
-        gbi0h5Uit6ZwDbSyXs1RPtiwpmL4Mj7ZwaEhgIazrPVwawVM8rt1PGzQBYTDtAc4SYnsNkOV/9N
-        jrjs2qbQnHc6x
-X-Received: by 2002:adf:fccb:: with SMTP id f11mr746717wrs.3.1610994371127;
-        Mon, 18 Jan 2021 10:26:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw+GkRlOpn8qdAgG+r1ePLj7djM6dNvjijlBFLTRGUtIq1pAUqz9pcNXC44g/iM+5qMvdIrDA==
-X-Received: by 2002:adf:fccb:: with SMTP id f11mr746695wrs.3.1610994370933;
-        Mon, 18 Jan 2021 10:26:10 -0800 (PST)
+        bh=SR1znhrtBE/8TBlcbJN+jUcCvjG/B/RC2d1W3pykhC8=;
+        b=bM2++BlypXb3fLtZqVsDZORXeS/SVowZBQe6wRt8M07Q9c/5tLAj8Uga+GVB4uo0tm
+         MvolmngRe/pxR97PYTqAPN6C5Dc2b/PT3JiMUs4NiLKnXA/fJF8S+w4ZhY5JKyR467Iz
+         nwcsHPdbXbPuC5klRWKWnfsmODYEBy0xNq9Y3YFxPQmy2aYqznw9pwqAPY1FomXCHjnf
+         qzH8hfVUfiZNE3iqU8yZNKWn6rhAYYxwM4fLEbTcs9aTtJ4RU5Sc7dlUHNPrQcinn0Xv
+         GIe02qrS8dPOacfEQODInaD/lKGQf8TxVVco6VjkgmRU4xcY8IqoZLl0ulr9TMPX+W2K
+         TWWg==
+X-Gm-Message-State: AOAM531IIa/D7IOeA3b0Ill4Q0V4dbGH16Y+LNBpEn30PsPHFZ2RXwrQ
+        ym2+GUWmsY312aGPQvwAzqBIjT1QACLHEH+SbEyIys4VpkskmsiWrg3Qey1A0wKqJKmWceDiiQf
+        ebHnYls/8uId+9ZWQpWEKOed2dNE0ScZZ5rpIxFDt/mCc8BuRwmcLyS6vfLJUmtlT
+X-Received: by 2002:adf:e590:: with SMTP id l16mr766938wrm.294.1610994420077;
+        Mon, 18 Jan 2021 10:27:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwhmYapYaKFujvmiwwxElIFxlvpL42SB4ZxG2fojeadfOVzKP7/K7YRdhDUUElrQNd1cKeS4g==
+X-Received: by 2002:adf:e590:: with SMTP id l16mr766918wrm.294.1610994419853;
+        Mon, 18 Jan 2021 10:26:59 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c6sm34500990wrh.7.2021.01.18.10.26.09
+        by smtp.gmail.com with ESMTPSA id c18sm1234571wmk.0.2021.01.18.10.26.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Jan 2021 10:26:10 -0800 (PST)
-Subject: Re: [PATCH 0/3] x86/KVM/VMX: Introduce and use try_cmpxchg64()
-To:     Uros Bizjak <ubizjak@gmail.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Mon, 18 Jan 2021 10:26:59 -0800 (PST)
+Subject: Re: [PATCH] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-References: <20201215182805.53913-1-ubizjak@gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+References: <1610623624-18697-1-git-send-email-wanpengli@tencent.com>
+ <87pn277huh.fsf@vitty.brq.redhat.com>
+ <CANRm+Cz01Xva0_OjTpq3Wbyppa=FZzxBwZJCWJNicV3eCrzpdQ@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <05bc4cc2-1c1b-ebb8-39e3-9eaef7f0df4f@redhat.com>
-Date:   Mon, 18 Jan 2021 19:26:09 +0100
+Message-ID: <67171a65-f87d-8b60-22c6-449ed727f6e0@redhat.com>
+Date:   Mon, 18 Jan 2021 19:26:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201215182805.53913-1-ubizjak@gmail.com>
+In-Reply-To: <CANRm+Cz01Xva0_OjTpq3Wbyppa=FZzxBwZJCWJNicV3eCrzpdQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,45 +77,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/12/20 19:28, Uros Bizjak wrote:
-> This patch series introduces try_cmpxchg64() atomic locking function.
-> 
-> try_cmpxchg64() provides the same interface for 64 bit and 32 bit targets,
-> emits CMPXCHGQ for 64 bit targets and CMPXCHG8B for 32 bit targets,
-> and provides appropriate fallbacks when CMPXCHG8B is unavailable.
-> 
-> try_cmpxchg64() reuses flags from CMPXCHGQ/CMPXCHG8B instructions and
-> avoids unneeded CMP for 64 bit targets or XOR/XOR/OR sequence for
-> 32 bit targets.
-> 
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Boqun Feng <boqun.feng@gmail.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Cc: Wanpeng Li <wanpengli@tencent.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> 
-> Uros Bizjak (3):
->    asm-generic/atomic: Add try_cmpxchg64() instrumentation
->    locking/atomic/x86: Introduce arch_try_cmpxchg64()
->    KVM/VMX: Use try_cmpxchg64() in posted_intr.c
-> 
->   arch/x86/include/asm/cmpxchg_32.h         | 62 +++++++++++++++++++----
->   arch/x86/include/asm/cmpxchg_64.h         |  6 +++
->   arch/x86/kvm/vmx/posted_intr.c            |  9 ++--
->   include/asm-generic/atomic-instrumented.h | 46 ++++++++++++++++-
->   scripts/atomic/gen-atomic-instrumented.sh |  2 +-
->   5 files changed, 108 insertions(+), 17 deletions(-)
-> 
+On 15/01/21 02:15, Wanpeng Li wrote:
+>> The comment above should probably be updated as it is not clear why we
+>> check kvm_clock.vdso_clock_mode here. Actually, I would even suggest we
+>> introduce a 'kvmclock_tsc_stable' global instead to avoid this indirect
+>> check.
+> I prefer to update the comment above, assign vsyscall pvclock data
+> pointer iff kvmclock vsyscall is enabled.
 
-Queued, thanks.
+Are you going to send v2?
 
 Paolo
 
