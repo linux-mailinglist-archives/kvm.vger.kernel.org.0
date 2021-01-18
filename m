@@ -2,146 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3ECE2F9A0E
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 07:41:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A0DC2F9A59
+	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 08:08:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732765AbhARGlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 01:41:17 -0500
-Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:34197 "EHLO
-        wnew4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732718AbhARGkq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 18 Jan 2021 01:40:46 -0500
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.46])
-        by mailnew.west.internal (Postfix) with ESMTP id 460DE16B6;
-        Mon, 18 Jan 2021 01:39:19 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Mon, 18 Jan 2021 01:39:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-        from:to:cc:subject:date:message-id:in-reply-to:references
-        :mime-version:content-transfer-encoding; s=fm1; bh=xp8rMS5fYi67I
-        zBTztXoRRHYHPvcz6CsxRtqujbiTX8=; b=XRkZhcuwfbvDW9WPlzqGCkZpgCxXo
-        Ya7cEM0p3uGKSWcWUe+lpfY7E4j+t/Ip4ts+Vih9+Ym7V8pJqU98FfCIFgjwa9xw
-        /kQkhEbnpjj8tZ1wEyDmMAUzee3T0T6YdySmQssumueg5MBII6fH5SmW9tRNRda/
-        h3wVxdVY695O7rP7RH6pOu6ap+GFtgOX5HzIfzJKFD5T1H3s+XeAVMRK6EWlgaT3
-        nA5rGqLC2Kjg7K9Gn7j0sGzTpJOzBP0mFoXsrFfa0J/23I2eUliBRFa+NmbdThdj
-        IYyH5VijUXyYrSauFE3v1Taw3XegnyZFKOGStJRBK/kuOKxhYxGfvgGQQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :in-reply-to:message-id:mime-version:references:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; bh=xp8rMS5fYi67IzBTztXoRRHYHPvcz6CsxRtqujbiTX8=; b=GJpW6OMA
-        OhUqFDRpb15U6GX0ZPNwReD2/b3m4gaptaPIBWUCXpVoAEAMAFtgcsDt7qK7VAIV
-        96IC7lAbGXh7ZcXAhxHKMvCH+EBJuTbV4CUvPj/4EshTdh5zYWx+F1yxqk18bIUQ
-        nFj2mYcGEAfsi6FUriEhRw2WtqM/chpKmrFGM6/3NcZM2LOcDKB0jYd1+nJaFash
-        cgvVC50ZDUcWHCRYm0oEVlPEUU/TSgyCvywHJkEqVaQcJqk193QnlVCl47Jrbd6q
-        Gb369STdGyYzopKxavO1oWh9BXGh4rbro6sebIX/2vj0qABh7hyxyr9wcItTmiUh
-        wLDoWim57UP5tg==
-X-ME-Sender: <xms:Fi0FYK79gFPV_Y-8OLeI4LB_mcQRAjI3uNTBVm1Kmq6pcSsPRoremQ>
-    <xme:Fi0FYD5zNHo8oAuacHYEtimpGnrFYKcuomvbRGBrCtwKVIUZhXcuZ93rnPsJqzieT
-    23DP3gKXrdvW4jdFqM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrtdejgdeliecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomheplfhirgiguhhn
-    ucgjrghnghcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqeenucggtf
-    frrghtthgvrhhnpeejiefhgfetleekleffudektdehvedujedvgeekkeejfefhhffhtedu
-    tefgtdffueenucfkphepudduiedrvddvkedrkeegrddvnecuvehluhhsthgvrhfuihiivg
-    epfeenucfrrghrrghmpehmrghilhhfrhhomhepjhhirgiguhhnrdihrghnghesfhhlhihg
-    ohgrthdrtghomh
-X-ME-Proxy: <xmx:Fi0FYJcdZyCEaydEtjSY3UhyuZY6ZBagLJ6Gz9A4TpYjeAZoYVrt-A>
-    <xmx:Fi0FYHKvlO5Ac5pdlI7kgZfcdNmZokVr4cAYlv2yBLntqurgb0I6EQ>
-    <xmx:Fi0FYOLjSgBNXJM1ArpoH4VhuBugq81wAHryRyCbA0tPbmICtenGfQ>
-    <xmx:Fi0FYD66NSDWoMTHgOES0DwHlT44gIuHwL_d5y5t3oVo4cTMZu5YxaUcAGtdgu8w>
-Received: from strike.U-LINK.com (unknown [116.228.84.2])
-        by mail.messagingengine.com (Postfix) with ESMTPA id EE8D9240062;
-        Mon, 18 Jan 2021 01:39:11 -0500 (EST)
-From:   Jiaxun Yang <jiaxun.yang@flygoat.com>
-To:     qemu-devel@nongnu.org
-Cc:     David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
-        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
-        kvm@vger.kernel.org,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Fam Zheng <fam@euphon.net>,
-        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
-        Alistair Francis <alistair@alistair23.me>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Subject: [PATCH v2 9/9] gitlab-ci: Add alpine to pipeline
-Date:   Mon, 18 Jan 2021 14:38:08 +0800
-Message-Id: <20210118063808.12471-10-jiaxun.yang@flygoat.com>
-X-Mailer: git-send-email 2.30.0
+        id S1732115AbhARHIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 02:08:01 -0500
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21560 "EHLO
+        sender4-of-o55.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730789AbhARHH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jan 2021 02:07:59 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1610953607; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=b/8nZOxT44QvT6nQEWl2xpnBrAZaSGsNovepT+GrTFB/4flq2Um5aOb1xeF/bP+UU490BuQFnQNnXzm0AzCpIiIc0hptjfSbWEzpYRgd01GsYxI/5AU2QNncOpvdQ9KuJjXeg5XqoiuILFynvni//4j9RP9KNlVgTTFVXn1I1vk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1610953607; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To; 
+        bh=lab28A5SUL2BhmyRutIQ7uMy/Yib0xfqUON0AhVXno8=; 
+        b=U9u2hOVMQDjDKpIeuTGl84a8gAg9Djuqhm7kBAOxyKmukUaB294VJDfj1S+5cwVL1/BfKlv+GNQwVV2Zc76MCi6+nnFLhh3u89UnjA6ipc+zIX+wF/E8bTouLwTrieaxApRYuxCDhYyNPBL5ihJrQdKvRfr8LQsUEn4GCNfqROw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1610953606224283.50818109261525; Sun, 17 Jan 2021 23:06:46 -0800 (PST)
 In-Reply-To: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
-References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v2 0/9] Alpine Linux build fix and CI pipeline
+Message-ID: <161095360381.12958.7588862202929299935@73fb1a5943b8>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     jiaxun.yang@flygoat.com
+Cc:     qemu-devel@nongnu.org, fam@euphon.net, lvivier@redhat.com,
+        thuth@redhat.com, viktor.prutyanov@phystech.edu,
+        kvm@vger.kernel.org, alex.bennee@linaro.org,
+        alistair@alistair23.me, groug@kaod.org, wainersm@redhat.com,
+        mreitz@redhat.com, qemu-ppc@nongnu.org, kwolf@redhat.com,
+        pbonzini@redhat.com, qemu-block@nongnu.org, philmd@redhat.com,
+        david@gibson.dropbear.id.au
+Date:   Sun, 17 Jan 2021 23:06:46 -0800 (PST)
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We only run build test and check-acceptance as their are too many
-failures in checks due to minor string mismatch.
-
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- .gitlab-ci.d/containers.yml |  5 +++++
- .gitlab-ci.yml              | 23 +++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
-
-diff --git a/.gitlab-ci.d/containers.yml b/.gitlab-ci.d/containers.yml
-index 910754a699..90fac85ce4 100644
---- a/.gitlab-ci.d/containers.yml
-+++ b/.gitlab-ci.d/containers.yml
-@@ -28,6 +28,11 @@
-     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
-     - if: '$CI_COMMIT_REF_NAME == "testing/next"'
- 
-+amd64-alpine-container:
-+  <<: *container_job_definition
-+  variables:
-+    NAME: alpine
-+
- amd64-centos7-container:
-   <<: *container_job_definition
-   variables:
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 4532f1718a..6cc922aedb 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -72,6 +72,29 @@ include:
-     - cd build
-     - du -chs ${CI_PROJECT_DIR}/avocado-cache
- 
-+build-system-alpine:
-+  <<: *native_build_job_definition
-+  variables:
-+    IMAGE: alpine
-+    TARGETS: aarch64-softmmu alpha-softmmu cris-softmmu hppa-softmmu
-+      moxie-softmmu microblazeel-softmmu mips64el-softmmu
-+    MAKE_CHECK_ARGS: check-build
-+    CONFIGURE_ARGS: --enable-docs
-+  artifacts:
-+    expire_in: 2 days
-+    paths:
-+      - build
-+
-+acceptance-system-alpine:
-+  <<: *native_test_job_definition
-+  needs:
-+    - job: build-system-alpine
-+      artifacts: true
-+  variables:
-+    IMAGE: alpine
-+    MAKE_CHECK_ARGS: check-acceptance
-+  <<: *acceptance_definition
-+
- build-system-ubuntu:
-   <<: *native_build_job_definition
-   variables:
--- 
-2.30.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIxMDExODA2MzgwOC4xMjQ3
+MS0xLWppYXh1bi55YW5nQGZseWdvYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMTAxMTgwNjM4MDgu
+MTI0NzEtMS1qaWF4dW4ueWFuZ0BmbHlnb2F0LmNvbQpTdWJqZWN0OiBbUEFUQ0ggdjIgMC85XSBB
+bHBpbmUgTGludXggYnVpbGQgZml4IGFuZCBDSSBwaXBlbGluZQoKPT09IFRFU1QgU0NSSVBUIEJF
+R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIxMDExODA2MzgwOC4xMjQ3MS0xLWppYXh1
+bi55YW5nQGZseWdvYXQuY29tIC0+IHBhdGNoZXcvMjAyMTAxMTgwNjM4MDguMTI0NzEtMS1qaWF4
+dW4ueWFuZ0BmbHlnb2F0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjEwMTE4
+MDY1NjI3Ljc5OTAzLTEtZ2FucWl4aW5AaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzIwMjEwMTE4MDY1
+NjI3Ljc5OTAzLTEtZ2FucWl4aW5AaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCmVlZWYzM2EgZ2l0bGFiLWNpOiBBZGQgYWxwaW5lIHRvIHBpcGVsaW5lCjg1ZWE1ODgg
+dGVzdHMvZG9ja2VyOiBBZGQgZG9ja2VyZmlsZSBmb3IgQWxwaW5lIExpbnV4CjlmNWUzY2EgYWNj
+ZWwva3ZtOiBhdm9pZCB1c2luZyBwcmVkZWZpbmVkIFBBR0VfU0laRQowMjkyZGI1IHRlc3RzOiBS
+ZW5hbWUgUEFHRV9TSVpFIGRlZmluaXRpb25zCmZkY2FjYjkgZWxmMmRtcDogUmVuYW1lIFBBR0Vf
+U0laRSB0byBFTEYyRE1QX1BBR0VfU0laRQo5ZmYzNmM1IGh3L2Jsb2NrL25hbmQ6IFJlbmFtZSBQ
+QUdFX1NJWkUgdG8gTkFORF9QQUdFX1NJWkUKYjA5NjYwNSBvc2RlcC5oOiBSZW1vdmUgPHN5cy9z
+aWduYWwuaD4gaW5jbHVkZQo5ZTVlNjdkIGxpYnZob3N0LXVzZXI6IEluY2x1ZGUgcG9sbC5oIGlu
+c3RlYWQgb2Ygc3lzL3BvbGwuaApjMjBiYzcyIGNvbmZpZ3VyZTogQWRkIHN5cy90aW1leC5oIHRv
+IHByb2JlIGNsb2NrX2FkanRpbWUKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvOSBDaGVja2luZyBj
+b21taXQgYzIwYmM3MjUzZjEwIChjb25maWd1cmU6IEFkZCBzeXMvdGltZXguaCB0byBwcm9iZSBj
+bG9ja19hZGp0aW1lKQoyLzkgQ2hlY2tpbmcgY29tbWl0IDllNWU2N2QwMWY5MSAobGlidmhvc3Qt
+dXNlcjogSW5jbHVkZSBwb2xsLmggaW5zdGVhZCBvZiBzeXMvcG9sbC5oKQozLzkgQ2hlY2tpbmcg
+Y29tbWl0IGIwOTY2MDU2ZDc3ZSAob3NkZXAuaDogUmVtb3ZlIDxzeXMvc2lnbmFsLmg+IGluY2x1
+ZGUpCjQvOSBDaGVja2luZyBjb21taXQgOWZmMzZjNTgwODFiIChody9ibG9jay9uYW5kOiBSZW5h
+bWUgUEFHRV9TSVpFIHRvIE5BTkRfUEFHRV9TSVpFKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiMyNzogRklMRTogaHcvYmxvY2svbmFuZC5jOjExODoKKyMgZGVmaW5l
+IFBBR0VfU1RBUlQocGFnZSleSShQQUdFKHBhZ2UpICogKE5BTkRfUEFHRV9TSVpFICsgT09CX1NJ
+WkUpKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ3OiBGSUxF
+OiBody9ibG9jay9uYW5kLmM6MTM1OgorIyBkZWZpbmUgTkFORF9QQUdFX1NJWkVeSV5JMjA0OCQK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2NjogRklMRTogaHcvYmxvY2svbmFu
+ZC5jOjY3NToKKyAgICAgICAgbWVtX2FuZChpb2J1ZiArIChzb2ZmIHwgb2ZmKSwgcy0+aW8sIE1J
+TihzLT5pb2xlbiwgTkFORF9QQUdFX1NJWkUgLSBvZmYpKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3MTogRklMRTogaHcvYmxvY2svbmFuZC5jOjY3ODoKKyAgICAgICAgICAg
+IG1lbV9hbmQocy0+c3RvcmFnZSArIChwYWdlIDw8IE9PQl9TSElGVCksIHMtPmlvICsgTkFORF9Q
+QUdFX1NJWkUgLSBvZmYsCgp0b3RhbDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDEyMCBsaW5lcyBj
+aGVja2VkCgpQYXRjaCA0LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvOSBDaGVja2lu
+ZyBjb21taXQgZmRjYWNiOTRlOTIxIChlbGYyZG1wOiBSZW5hbWUgUEFHRV9TSVpFIHRvIEVMRjJE
+TVBfUEFHRV9TSVpFKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzA6IEZJTEU6
+IGNvbnRyaWIvZWxmMmRtcC9tYWluLmM6Mjg0OgorICAgICAgICBoLlBoeXNpY2FsTWVtb3J5Qmxv
+Y2suTnVtYmVyT2ZQYWdlcyArPSBwcy0+YmxvY2tbaV0uc2l6ZSAvIEVMRjJETVBfUEFHRV9TSVpF
+OwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgwOiBGSUxFOiBjb250cmliL2Vs
+ZjJkbXAvbWFpbi5jOjI5MToKKyAgICBoLlJlcXVpcmVkRHVtcFNwYWNlICs9IGguUGh5c2ljYWxN
+ZW1vcnlCbG9jay5OdW1iZXJPZlBhZ2VzIDw8IEVMRjJETVBfUEFHRV9CSVRTOwoKdG90YWw6IDAg
+ZXJyb3JzLCAyIHdhcm5pbmdzLCA3MCBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzkgaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KNi85IENoZWNraW5nIGNvbW1pdCAwMjkyZGI1YTU3MWEgKHRlc3Rz
+OiBSZW5hbWUgUEFHRV9TSVpFIGRlZmluaXRpb25zKQo3LzkgQ2hlY2tpbmcgY29tbWl0IDlmNWUz
+Y2E5Njk0MyAoYWNjZWwva3ZtOiBhdm9pZCB1c2luZyBwcmVkZWZpbmVkIFBBR0VfU0laRSkKOC85
+IENoZWNraW5nIGNvbW1pdCA4NWVhNTg4NGY3OGQgKHRlc3RzL2RvY2tlcjogQWRkIGRvY2tlcmZp
+bGUgZm9yIEFscGluZSBMaW51eCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
+ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjA6IApuZXcgZmlsZSBtb2Rl
+IDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1NyBsaW5lcyBjaGVja2VkCgpQ
+YXRjaCA4LzkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS85IENoZWNraW5nIGNvbW1pdCBl
+ZWVmMzNhNzdlZGYgKGdpdGxhYi1jaTogQWRkIGFscGluZSB0byBwaXBlbGluZSkKPT09IE9VVFBV
+VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMTAxMTgwNjM4MDgu
+MTI0NzEtMS1qaWF4dW4ueWFuZ0BmbHlnb2F0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
