@@ -2,79 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1FBA2FBC4B
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:23:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C3FB2FBC6E
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:30:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729306AbhASQV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 11:21:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21963 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729319AbhASQUv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 11:20:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611073165;
+        id S1730728AbhASQVn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 11:21:43 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:41090 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729250AbhASQUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 11:20:39 -0500
+Received: from zn.tnic (p200300ec2f0bca005ed5ab9a356b3c50.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:ca00:5ed5:ab9a:356b:3c50])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8449E1EC0616;
+        Tue, 19 Jan 2021 17:19:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1611073171;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BH8ph4x6tbslCUU39Kg1nnfczx3x5anbI8SBaxkZVBo=;
-        b=SWT/2v8M7UxjHcv2RxGhGz75jK1+kJUxLPLi3hlserwHOSMqYHL0dX5m/u1tZw+lHGOeH9
-        hpGR8x5wBMfY/mak/Rz/qqLdSmxBH0ZOck9QBlcEY+eXHm8Dm8sbnifOaWnHkpO6yWsxLg
-        ehKFireewN6z+/wEZ5KEzbb5DdY2gAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-l5EMvfv2MhK1e8-RZb0Ofw-1; Tue, 19 Jan 2021 11:19:22 -0500
-X-MC-Unique: l5EMvfv2MhK1e8-RZb0Ofw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 047851800D41;
-        Tue, 19 Jan 2021 16:19:21 +0000 (UTC)
-Received: from gondolin (ovpn-113-246.ams2.redhat.com [10.36.113.246])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 05FD519CB0;
-        Tue, 19 Jan 2021 16:19:15 +0000 (UTC)
-Date:   Tue, 19 Jan 2021 17:19:13 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
-        imbrenda@linux.ibm.com, linux-s390@vger.kernel.org,
-        gor@linux.ibm.com, mihajlov@linux.ibm.com
-Subject: Re: [PATCH 1/2] s390: uv: Fix sysfs max number of VCPUs reporting
-Message-ID: <20210119171913.29cc4a0d.cohuck@redhat.com>
-In-Reply-To: <20210119100402.84734-2-frankja@linux.ibm.com>
-References: <20210119100402.84734-1-frankja@linux.ibm.com>
-        <20210119100402.84734-2-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=g91v3AormRjgNHaLNy5s628V6v7OFuRy7Wn9OU4Id3Y=;
+        b=nIwueg5gv38y6ks4MXfhLuqmbaCsZ5EsS0CIkWP8uy8WL5citig5d+R8ORjFZ1K3PfCAIM
+        3sKutPylJKUjQMih++LYZoqEpK84gMzKDju3HBGWSTMk7NAf2JmmoI7OcyADYph0BKu40E
+        DKhyTYdX0+rbtFne0RuTAt3KajTWBf0=
+Date:   Tue, 19 Jan 2021 17:19:25 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v2 01/26] x86/cpufeatures: Add SGX1 and SGX2
+ sub-features
+Message-ID: <20210119161925.GN27433@zn.tnic>
+References: <cover.1610935432.git.kai.huang@intel.com>
+ <87385f646120a3b5b34dc20480dbce77b8005acd.1610935432.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87385f646120a3b5b34dc20480dbce77b8005acd.1610935432.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Jan 2021 05:04:01 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Mon, Jan 18, 2021 at 04:26:49PM +1300, Kai Huang wrote:
+> diff --git a/arch/x86/kernel/cpu/feat_ctl.c b/arch/x86/kernel/cpu/feat_ctl.c
+> index 3b1b01f2b248..7937a315f8cf 100644
+> --- a/arch/x86/kernel/cpu/feat_ctl.c
+> +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> @@ -96,7 +96,6 @@ static void init_vmx_capabilities(struct cpuinfo_x86 *c)
+>  static void clear_sgx_caps(void)
+>  {
+>  	setup_clear_cpu_cap(X86_FEATURE_SGX);
+> -	setup_clear_cpu_cap(X86_FEATURE_SGX_LC);
 
-> The number reported by the query is N-1 and I think people reading the
-> sysfs file would expect N instead. For users creating VMs there's no
-> actual difference because KVM's limit is currently below the UV's
-> limit.
-> 
-> The naming of the field is a bit misleading. Number in this context is
-> used like ID and starts at 0. The query field denotes the maximum
-> number that can be put into the VCPU number field in the "create
-> secure CPU" UV call.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Fixes: a0f60f8431999 ("s390/protvirt: Add sysfs firmware interface for Ultravisor information")
-> Cc: stable@vger.kernel.org
-> ---
->  arch/s390/boot/uv.c        | 2 +-
->  arch/s390/include/asm/uv.h | 4 ++--
->  arch/s390/kernel/uv.c      | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+Why is that line being removed here?
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Shouldn't this add SGX1 and SGX2 here instead as this function is
+supposed to, well, *clear* sgx caps on feat_ctl setup failures or
+"nosgx" cmdline?
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
