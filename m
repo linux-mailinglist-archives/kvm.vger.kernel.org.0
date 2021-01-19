@@ -2,103 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80B922FBC58
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C29572FBC5E
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:28:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729319AbhASQYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 11:24:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732161AbhASQYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 11:24:09 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51853C061575
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 08:23:29 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id my11so1645269pjb.1
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 08:23:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0aw/dETMyxgWmjUTx9neVtUqH4K4+9hFjmLcYtwpTlI=;
-        b=r6uBjXQvcvyRmHqbrxzkyljpZ0UV1wRqHtetO09wL9bUkHwsRpMBrvAJBuhjn3bMN3
-         CK704Gq4qEDSkx6qEHFLql2vJa4yCo+BJnB1icdl1vvHD4nKZIczcF+KXMUCMMBHlbPh
-         +Ibs0/U9p3sB4dD0k788fjTw1qEQCmlUUAg4RBmyPNP06E1bwlyDy8QJ4TwwB6vLDFnF
-         cDQDTHiRz25/UYFM5Y8WrrXoiQhTfjI0oAu1Yw+mzMWKiAJRfkcAq4GjSuTlAMKjSm0S
-         Nf1mkIyQGjx7Cu4cAqNMXITF42n2vJyNbnA3gqCA2VxwP8aswR47e/f/RW7gTVDJq1qr
-         GCbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0aw/dETMyxgWmjUTx9neVtUqH4K4+9hFjmLcYtwpTlI=;
-        b=Z40ukDp+U7pfI0Ehl95AJHvZ/X2ttq0Qgzt50IGK3R/TVD1l1WlbucHhtcvvLxt2X0
-         p2ocALRBUBzdHLAyJ62RTqkJrsRW+mPJUynL3jXEahnmhWEL/i+1y4prY84GaTXdTu96
-         DodGJl8YjGNVT4AsQjia0CN/gbzOYKo9zcMmbDkvI8pnIzYGM1AaNVxsAgBBfbSCOqUv
-         AzcuOKhfBYYpPUQfVdcipqad0GHLk8Jn1FEMsLz5RCTu7AyXtBRGN/ZuHV2bCeLTEzlT
-         Ti8GyA4BaRkA06/BQEeYBEXexc5zB8lsGvFKISUfgbAjG/2SHbhfCgmmAzwxcCxbDHz3
-         yq2g==
-X-Gm-Message-State: AOAM533UcXDAMjI6RkRegTV16ltdvkWZtoPFhWw2Klvf5sDbydYwnUqP
-        olNnepcQN8xDSiHM+YeKEkctAQ==
-X-Google-Smtp-Source: ABdhPJzkbBTMkzVaU2ainTlxiwnqT4XcchF3oQOixMC4RLrfx24qmbl9157+OmRmbNU6roe5reBn8w==
-X-Received: by 2002:a17:90a:eacf:: with SMTP id ev15mr431309pjb.209.1611073408624;
-        Tue, 19 Jan 2021 08:23:28 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id a188sm12854460pfb.108.2021.01.19.08.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jan 2021 08:23:27 -0800 (PST)
-Date:   Tue, 19 Jan 2021 08:23:20 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] x86/sev: Add AMD_SEV_ES_GUEST Kconfig for including
- SEV-ES support
-Message-ID: <YAcHeOyluQY9C6HK@google.com>
-References: <20210116002517.548769-1-seanjc@google.com>
- <20210118202931.GI30090@zn.tnic>
- <5f7bbd70-35c3-24ca-7ec5-047c71b16b1f@redhat.com>
- <20210118204701.GJ30090@zn.tnic>
+        id S1730834AbhASQ0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 11:26:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59012 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729404AbhASQ0j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 11:26:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611073513;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wl/5nIBwEay43kL1RbyW7Gc1aMFOi0iRK9un5o4y7wg=;
+        b=DHe63LFGwzBdig8Z/O4VOuGfSLid/XiUBQ3FGJVjOlysWl7PCbsxhd2l8dAooaLtGo4jm2
+        wUDmxGa0GmsVMuqzdjA9ZZR2XmZed7faGafVNUaeHp8b2n4ZKPlOOxnjKREMqrFKvI99zn
+        +adMNIXGnf9DVqVgYP66W5iiMg5Y9wg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-usAWjBxGNAOp6uC2ckuKSw-1; Tue, 19 Jan 2021 11:25:08 -0500
+X-MC-Unique: usAWjBxGNAOp6uC2ckuKSw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 173AF800D55;
+        Tue, 19 Jan 2021 16:25:07 +0000 (UTC)
+Received: from gondolin (ovpn-113-246.ams2.redhat.com [10.36.113.246])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0FB9B60C69;
+        Tue, 19 Jan 2021 16:24:59 +0000 (UTC)
+Date:   Tue, 19 Jan 2021 17:24:48 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thuth@redhat.com, david@redhat.com, imbrenda@linux.ibm.com,
+        linux-s390@vger.kernel.org, gor@linux.ibm.com,
+        mihajlov@linux.ibm.com
+Subject: Re: [PATCH 2/2] s390: mm: Fix secure storage access exception
+ handling
+Message-ID: <20210119172448.7fb3d7df.cohuck@redhat.com>
+In-Reply-To: <4de19c74-65dc-5a29-76c7-99c600012fdf@linux.ibm.com>
+References: <20210119100402.84734-1-frankja@linux.ibm.com>
+        <20210119100402.84734-3-frankja@linux.ibm.com>
+        <3e1978c6-4462-1de6-e1aa-e664ffa633c1@de.ibm.com>
+        <4de19c74-65dc-5a29-76c7-99c600012fdf@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210118204701.GJ30090@zn.tnic>
+Content-Type: multipart/signed; boundary="Sig_/_Ei7KtOMbvWaVZIUWbFuXiz";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 18, 2021, Borislav Petkov wrote:
-> On Mon, Jan 18, 2021 at 09:32:07PM +0100, Paolo Bonzini wrote:
-> > I think it makes sense because AMD_SEV_ES_GUEST's #VC handling is quite a
-> > bit of code that you may not want or need.
-> 
-> Quite a bit of code which ends up practically enabled on the majority of
-> distros.
-> 
-> And it ain't about savings of whopping KiBs. And yet another Kconfig symbol
-> in our gazillion Kconfig symbols space means ugly ifdeffery and paying
-> attention to randconfig builds.
-> 
-> For tailored configs you simply disable AMD_MEM_ENCRYPT on !AMD hw and
-> all done.
+--Sig_/_Ei7KtOMbvWaVZIUWbFuXiz
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-It was the AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT dependency that tripped me up.  To
-get KVM to enable SEV/SEV-ES by default, that needs to be enabled, which in turn
-requires AMD_MEM_ENCRYPT=y.  I didn't realize that there isn't actually a
-dependency on AMD_MEM_ENCRYPT=y
+On Tue, 19 Jan 2021 11:38:10 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> So I don't see the point for this.
+> On 1/19/21 11:25 AM, Christian Borntraeger wrote:
+> >=20
+> >=20
+> > On 19.01.21 11:04, Janosch Frank wrote: =20
+> >> Turns out that the bit 61 in the TEID is not always 1 and if that's
+> >> the case the address space ID and the address are
+> >> unpredictable. Without an address and it's address space ID we can't
+> >> export memory and hence we can only send a SIGSEGV to the process or
+> >> panic the kernel depending on who caused the exception.
+> >>
+> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> >> Fixes: 084ea4d611a3d ("s390/mm: add (non)secure page access exceptions=
+ handlers")
+> >> Cc: stable@vger.kernel.org =20
+> >=20
+> > Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com> =20
+>=20
+> Thanks!
+>=20
+> >=20
+> > some small things to consider (or to reject)
+> >  =20
+> >> ---
+> >>  arch/s390/mm/fault.c | 14 ++++++++++++++
+> >>  1 file changed, 14 insertions(+)
+> >>
+> >> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> >> index e30c7c781172..5442937e5b4b 100644
+> >> --- a/arch/s390/mm/fault.c
+> >> +++ b/arch/s390/mm/fault.c
+> >> @@ -791,6 +791,20 @@ void do_secure_storage_access(struct pt_regs *reg=
+s)
+> >>  	struct page *page;
+> >>  	int rc;
+> >> =20
+> >> +	/* There are cases where we don't have a TEID. */
+> >> +	if (!(regs->int_parm_long & 0x4)) {
+> >> +		/*
+> >> +		 * Userspace could for example try to execute secure
+> >> +		 * storage and trigger this. We should tell it that it
+> >> +		 * shouldn't do that. =20
+> >=20
+> > Maybe something like
+> > 		/*
+> > 		 * when this happens, userspace did something that it
 
-Agreed, I'll send a KVM patch to remove the AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
-dependency.
+s/when/When/ :)
+
+> > 		 * was not supposed to do, e.g. branching into secure
+> > 		 * secure memory. Trigger a segmentation fault. =20
+> >> +		 */ =20
+>=20
+> Sounds good
+>=20
+> >> +		if (user_mode(regs)) {
+> >> +			send_sig(SIGSEGV, current, 0);
+> >> +			return;
+> >> +		} else
+> >> +			panic("Unexpected PGM 0x3d with TEID bit 61=3D0"); =20
+> >=20
+> > use BUG instead of panic? That would kill this process, but it allows
+> > people to maybe save unaffected data. =20
+>=20
+> That would make sense, will do
+
+With BUG():
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+--Sig_/_Ei7KtOMbvWaVZIUWbFuXiz
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAmAHB9AACgkQ3s9rk8bw
+L68FCQ/8C2reWoIDpqXLM65QwexvAh5qXVMDRCQ4duWhFhOcs71p12CKiG4clZ3N
+FFlcEgpcg69EwX44+EId2jVN7n+RE/HSiJiwisrR4U4ykH/xOGPaverhwZu0PVAv
+byYX1ifefBWrYIzyiHMbhBSv91mrTg/hlioednAOSGag6ifekvwhloKsgm6vo6Ff
+yvicIBjU64NSKBaOaS+g9gQv4RZ/4OlK8kieqh03iD431iC7fI8zZjDr4TTiukTZ
+TCGRYm6S9xKvgU25gWpRS2fjtdqtVsLTscBnlvALucw5qunrCpENND/UogKccUfS
+YrU8nzh1t5DXSGUiGR6AssnH4jiFjYkrVMFMz3JHdWGTt+28ZAx2PvshLfm4Rl7v
+UO2xcpZLzlfBd5Ua6LLWSEqeYKiK62NH6tmnK/NJQyX56wjmkhpObIY7uLr06I89
+UzBLuXIYy4PQCRRxm3ItAgtDMmSqhQjtLJDx3tdv+lwoIm4TFT8DJKWSG0L+Hyiw
+zdx4a/VtipN1iVF//Juyp9D4NMm+vEl3qELEulgISVkFrENCL7ZjwxrpF5B3HUyJ
+cpw+ngdVlR7Q53rNKGzS8wKLB8hTmwPkyAtOItJcCagGsfiwJ8uMx4WaLv/ouh7z
+nMQDhzk0JpZcZBY1zLYEi+UgKm75st5SKStsbzKkNDKW1btFyuc=
+=4MJ8
+-----END PGP SIGNATURE-----
+
+--Sig_/_Ei7KtOMbvWaVZIUWbFuXiz--
+
