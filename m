@@ -2,311 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 100092FBB4F
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 16:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 75ACF2FBBCB
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 16:59:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390135AbhASPfO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 10:35:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22898 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2391508AbhASPef (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 10:34:35 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JFWvIH114199;
-        Tue, 19 Jan 2021 10:33:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=v+PYTXQ7lGkTWrVW1gIufTBuzFxF8bd1fmSYdBAWDS4=;
- b=le2W2bPLdzMdTd+GJuaGPALAnr5kToBhNqQNkYQsCv6QoBEDhSdXlsZIi15kpsMkT10+
- yiaUDlqxPOhhHiGP7T6pAt9L7d2CaGUL8g90coIVScCANcYrapP6tBA4w8XWtGUut9kR
- KSRNfbA1x9y96SpcQIhzOkULebwCZ4aFunf+54aa6pNmYBXCCTU3+VlQw5oO61gVScyJ
- BeSJnKMG8hn4JAiNyKh2l/Wm7iiUTHxf+M253BP3+YtwZmto8Az4FHrsX6wLOvAC/1A8
- GQkziGyn41QmuwOxgj/8PAa9v8amSZtdJPqcP0pY+3i9Y4CqplRiN3dFex/aUsXM12YD aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36603ycepu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 10:33:35 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JFXYdY117820;
-        Tue, 19 Jan 2021 10:33:34 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36603ycent-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 10:33:34 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JFHM1E015039;
-        Tue, 19 Jan 2021 15:33:32 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 363qs89nme-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 15:33:32 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JFXOqO21168580
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jan 2021 15:33:24 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 800145204E;
-        Tue, 19 Jan 2021 15:33:30 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.160.34])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D615352059;
-        Tue, 19 Jan 2021 15:33:29 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 04/11] lib/asm: Fix definitions of
- memory areas
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, pbonzini@redhat.com,
-        cohuck@redhat.com, lvivier@redhat.com, nadav.amit@gmail.com,
-        krish.sadhukhan@oracle.com
-References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
- <20210115123730.381612-5-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <f482372d-1bc3-48bf-d1e0-01f1167f4a04@linux.ibm.com>
-Date:   Tue, 19 Jan 2021 16:33:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2391716AbhASP4O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 10:56:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42366 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390750AbhASPww (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 10:52:52 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E98CC061575;
+        Tue, 19 Jan 2021 07:52:11 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id et9so9318405qvb.10;
+        Tue, 19 Jan 2021 07:52:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QcyMDDVr7CULOAn4Y79GHadhfUa6Q0T6oHNJlZ8GjWw=;
+        b=Yer91Bx8c4Zuf1jc7YE1BhjV1iCXJqwpcbRE/LVgACcNIm3xYd/qExI++Vi5WEHKWn
+         h4Q3B9iNjHGBstOD7f7waSofR3i2l0oNGDU9laQHLyX+/zYYktlFoV0ZTe7fjLqqo7fd
+         sIiq82ij96CVIZIpR+mIPzExMbuBALZCMme1Nrmb0DboFYLMIBQLK05OPJO+ZyqTc05a
+         daKfvHLmry82KJR9/iqFcLQOQFZLGjLOmSspQyJ7tY0LKKjX5aiZ107DAR/NlIGF3PiX
+         XfTgFPaVwKS6MVwb49o+BNhXvKTxY4pd+TrVD35ssENsLzTINILsfmIxnI6Y8se5xAeu
+         vmQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=QcyMDDVr7CULOAn4Y79GHadhfUa6Q0T6oHNJlZ8GjWw=;
+        b=VDj7R91xJZSC8nABJ+VsSQYOEKILcSxhnMVbnOxk3xudlRnIRVzqkHdtC98td7Vx9l
+         08Qx2WaCQM2yHAs8kxCYA25ZDPCrZLNBnrJYMVbYAcrGSDcM7zVx6ow2jvua02ICF+fe
+         /h4cPZfmwxxGebpzQYpD2poWrsFp+sCC49cOGJkI52aH6YHl4afL1wCAu1TNhLFqJbVe
+         E5EDVTShxrvNF2EGnZdnV8wsKZJEEuET95GLAFCOS/FNU27YYeJaoMsvB1DbS7PmRXVs
+         EpianYAGXnTUU7uQyhLpnAdwTh60VyIndblOwWG/9Z/AKT83bi1OgVilrljYLANfFMzh
+         cRRA==
+X-Gm-Message-State: AOAM531iViPnMHGwtXdjBnzzwQwetzkH/CKYHhth4vRZB7JwY1aZFY8M
+        U3KEMjcMoiE+d7v/vbZLSNU=
+X-Google-Smtp-Source: ABdhPJz4PPSSVhf5I0deb91RGl3FbA/YHzb6yFRs2tv9zKL0ZEo+6Q0S21fXAdtf2SgRXv1OWNTsMg==
+X-Received: by 2002:ad4:5901:: with SMTP id ez1mr4795454qvb.6.1611071530224;
+        Tue, 19 Jan 2021 07:52:10 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:4cbf])
+        by smtp.gmail.com with ESMTPSA id e7sm5571073qto.46.2021.01.19.07.52.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jan 2021 07:52:09 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 19 Jan 2021 10:51:24 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        lizefan@huawei.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 1/2] cgroup: svm: Add Encryption ID controller
+Message-ID: <YAb//EYCkZ7wnl6D@mtj.duckdns.org>
+References: <20210108012846.4134815-1-vipinsh@google.com>
+ <20210108012846.4134815-2-vipinsh@google.com>
+ <YAICLR8PBXxAcOMz@mtj.duckdns.org>
+ <YAIUwGUPDmYfUm/a@google.com>
+ <YAJg5MB/Qn5dRqmu@mtj.duckdns.org>
+ <YAJsUyH2zspZxF2S@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210115123730.381612-5-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-19_05:2021-01-18,2021-01-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- spamscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 suspectscore=0
- bulkscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101190092
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YAJsUyH2zspZxF2S@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/15/21 1:37 PM, Claudio Imbrenda wrote:
-> Fix the definitions of the memory areas.
-> 
-> Bring the headers in line with the rest of the asm headers, by having the
-> appropriate #ifdef _ASM$ARCH_ guarding the headers.
-> 
-> Fixes: d74708246bd9 ("lib/asm: Add definitions of memory areas")
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> ---
->  lib/asm-generic/memory_areas.h |  9 ++++-----
->  lib/arm/asm/memory_areas.h     | 11 +++--------
->  lib/arm64/asm/memory_areas.h   | 11 +++--------
->  lib/powerpc/asm/memory_areas.h | 11 +++--------
->  lib/ppc64/asm/memory_areas.h   | 11 +++--------
->  lib/s390x/asm/memory_areas.h   | 13 ++++++-------
->  lib/x86/asm/memory_areas.h     | 27 ++++++++++++++++-----------
->  lib/alloc_page.h               |  3 +++
->  lib/alloc_page.c               |  4 +---
->  9 files changed, 42 insertions(+), 58 deletions(-)
-> 
-> diff --git a/lib/asm-generic/memory_areas.h b/lib/asm-generic/memory_areas.h
-> index 927baa7..3074afe 100644
-> --- a/lib/asm-generic/memory_areas.h
-> +++ b/lib/asm-generic/memory_areas.h
-> @@ -1,11 +1,10 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef __ASM_GENERIC_MEMORY_AREAS_H__
-> +#define __ASM_GENERIC_MEMORY_AREAS_H__
->  
->  #define AREA_NORMAL_PFN 0
->  #define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
->  
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#define MAX_AREAS 1
->  
->  #endif
-> diff --git a/lib/arm/asm/memory_areas.h b/lib/arm/asm/memory_areas.h
-> index 927baa7..c723310 100644
-> --- a/lib/arm/asm/memory_areas.h
-> +++ b/lib/arm/asm/memory_areas.h
-> @@ -1,11 +1,6 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASMARM_MEMORY_AREAS_H_
-> +#define _ASMARM_MEMORY_AREAS_H_
->  
-> -#define AREA_NORMAL_PFN 0
-> -#define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> -
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#include <asm-generic/memory_areas.h>
->  
->  #endif
-> diff --git a/lib/arm64/asm/memory_areas.h b/lib/arm64/asm/memory_areas.h
-> index 927baa7..18e8ca8 100644
-> --- a/lib/arm64/asm/memory_areas.h
-> +++ b/lib/arm64/asm/memory_areas.h
-> @@ -1,11 +1,6 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASMARM64_MEMORY_AREAS_H_
-> +#define _ASMARM64_MEMORY_AREAS_H_
->  
-> -#define AREA_NORMAL_PFN 0
-> -#define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> -
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#include <asm-generic/memory_areas.h>
->  
->  #endif
-> diff --git a/lib/powerpc/asm/memory_areas.h b/lib/powerpc/asm/memory_areas.h
-> index 927baa7..76d1738 100644
-> --- a/lib/powerpc/asm/memory_areas.h
-> +++ b/lib/powerpc/asm/memory_areas.h
-> @@ -1,11 +1,6 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASMPOWERPC_MEMORY_AREAS_H_
-> +#define _ASMPOWERPC_MEMORY_AREAS_H_
->  
-> -#define AREA_NORMAL_PFN 0
-> -#define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> -
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#include <asm-generic/memory_areas.h>
->  
->  #endif
-> diff --git a/lib/ppc64/asm/memory_areas.h b/lib/ppc64/asm/memory_areas.h
-> index 927baa7..b9fd46b 100644
-> --- a/lib/ppc64/asm/memory_areas.h
-> +++ b/lib/ppc64/asm/memory_areas.h
-> @@ -1,11 +1,6 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASMPPC64_MEMORY_AREAS_H_
-> +#define _ASMPPC64_MEMORY_AREAS_H_
->  
-> -#define AREA_NORMAL_PFN 0
-> -#define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> -
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#include <asm-generic/memory_areas.h>
->  
->  #endif
-> diff --git a/lib/s390x/asm/memory_areas.h b/lib/s390x/asm/memory_areas.h
-> index 4856a27..827bfb3 100644
-> --- a/lib/s390x/asm/memory_areas.h
-> +++ b/lib/s390x/asm/memory_areas.h
-> @@ -1,16 +1,15 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASMS390X_MEMORY_AREAS_H_
-> +#define _ASMS390X_MEMORY_AREAS_H_
->  
-> -#define AREA_NORMAL_PFN BIT(31-12)
-> +#define AREA_NORMAL_PFN (1 << 19)
->  #define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
->  
->  #define AREA_LOW_PFN 0
->  #define AREA_LOW_NUMBER 1
-> -#define AREA_LOW 2
-> +#define AREA_LOW (1 << AREA_LOW_NUMBER)
->  
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#define MAX_AREAS 2
->  
->  #define AREA_DMA31 AREA_LOW
->  
-> diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
-> index 952f5bd..e84016f 100644
-> --- a/lib/x86/asm/memory_areas.h
-> +++ b/lib/x86/asm/memory_areas.h
-> @@ -1,21 +1,26 @@
-> -#ifndef MEMORY_AREAS_H
-> -#define MEMORY_AREAS_H
-> +#ifndef _ASM_X86_MEMORY_AREAS_H_
-> +#define _ASM_X86_MEMORY_AREAS_H_
->  
->  #define AREA_NORMAL_PFN BIT(36-12)
->  #define AREA_NORMAL_NUMBER 0
-> -#define AREA_NORMAL 1
-> +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
->  
-> -#define AREA_PAE_HIGH_PFN BIT(32-12)
-> -#define AREA_PAE_HIGH_NUMBER 1
-> -#define AREA_PAE_HIGH 2
-> +#define AREA_HIGH_PFN BIT(32-12)
-> +#define AREA_HIGH_NUMBER 1
-> +#define AREA_HIGH (1 << AREA_HIGH_NUMBER)
->  
-> -#define AREA_LOW_PFN 0
-> +#define AREA_LOW_PFN BIT(24-12)
->  #define AREA_LOW_NUMBER 2
-> -#define AREA_LOW 4
-> +#define AREA_LOW (1 << AREA_LOW_NUMBER)
->  
-> -#define AREA_PAE (AREA_PAE | AREA_LOW)
-> +#define AREA_LOWEST_PFN 0
-> +#define AREA_LOWEST_NUMBER 3
-> +#define AREA_LOWEST (1 << AREA_LOWEST_NUMBER)
->  
-> -#define AREA_ANY -1
-> -#define AREA_ANY_NUMBER 0xff
-> +#define MAX_AREAS 4
-> +
-> +#define AREA_DMA24 AREA_LOWEST
-> +#define AREA_DMA32 (AREA_LOWEST | AREA_LOW)
-> +#define AREA_PAE36 (AREA_LOWEST | AREA_LOW | AREA_HIGH)
+Hello,
 
-This confuses the heck out of me.
-The other things look ok to me though.
-
->  
->  #endif
-> diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-> index 816ff5d..b6aace5 100644
-> --- a/lib/alloc_page.h
-> +++ b/lib/alloc_page.h
-> @@ -10,6 +10,9 @@
->  
->  #include <asm/memory_areas.h>
->  
-> +#define AREA_ANY -1
-> +#define AREA_ANY_NUMBER 0xff
-> +
->  /* Returns true if the page allocator has been initialized */
->  bool page_alloc_initialized(void);
->  
-> diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> index 685ab1e..ed0ff02 100644
-> --- a/lib/alloc_page.c
-> +++ b/lib/alloc_page.c
-> @@ -19,8 +19,6 @@
->  #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
->  #define PFN(x) ((uintptr_t)(x) >> PAGE_SHIFT)
->  
-> -#define MAX_AREAS	6
-> -
->  #define ORDER_MASK	0x3f
->  #define ALLOC_MASK	0x40
->  #define SPECIAL_MASK	0x80
-> @@ -509,7 +507,7 @@ void page_alloc_init_area(u8 n, uintptr_t base_pfn, uintptr_t top_pfn)
->  		return;
->  	}
->  #ifdef AREA_HIGH_PFN
-> -	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN), base_pfn, &top_pfn);
-> +	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN, base_pfn, &top_pfn);
->  #endif
->  	__page_alloc_init_area(AREA_NORMAL_NUMBER, AREA_NORMAL_PFN, base_pfn, &top_pfn);
->  #ifdef AREA_LOW_PFN
+On Fri, Jan 15, 2021 at 08:32:19PM -0800, Vipin Sharma wrote:
+> SEV-ES has stronger memory encryption gurantees compared to SEV, apart
+> from encrypting the application memory it also encrypts register state
+> among other things. In a single host ASIDs can be distributed between
+> these two types by BIOS settings.
 > 
+> Currently, Google Cloud has Confidential VM machines offering using SEV.
+> ASIDs are not compatible between SEV and SEV-ES, so a VM running on SEV
+> cannot run on SEV-ES and vice versa
+> 
+> There are use cases for both types of VMs getting used in future.
 
+Can you please elaborate? I skimmed through the amd manual and it seemed to
+say that SEV-ES ASIDs are superset of SEV but !SEV-ES ASIDs. What's the use
+case for mixing those two?
+
+> > > > > Other ID types can be easily added in the controller in the same way.
+> > > > 
+> > > > I'm not sure this is necessarily a good thing.
+> > > 
+> > > This is to just say that when Intel and PowerPC changes are ready it
+> > > won't be difficult for them to add their controller.
+> > 
+> > I'm not really enthused about having per-hardware-type control knobs. None
+> > of other controllers behave that way. Unless it can be abstracted into
+> > something common, I'm likely to object.
+> 
+> There was a discussion in Patch v1 and consensus was to have individual
+> files because it makes kernel implementation extremely simple.
+> 
+> https://lore.kernel.org/lkml/alpine.DEB.2.23.453.2011131615510.333518@chino.kir.corp.google.com/#t
+
+I'm very reluctant to ack vendor specific interfaces for a few reasons but
+most importantly because they usually indicate abstraction and/or the
+underlying feature not being sufficiently developed and they tend to become
+baggages after a while. So, here are my suggestions:
+
+* If there can be a shared abstraction which hopefully makes intuitive
+  sense, that'd be ideal. It doesn't have to be one knob but it shouldn't be
+  something arbitrary to specific vendors.
+
+* If we aren't there yet and vendor-specific interface is a must, attach
+  that part to an interface which is already vendor-aware.
+
+> This information is not available anywhere else in the system. Only
+> other way to get this value is to use CPUID instruction (0x8000001F) of
+> the processor. Which also has disdvantage if sev module in kernel
+> doesn't use all of the available ASIDs for its work (right now it uses
+> all) then there will be a mismatch between what user get through their
+> code and what is actually getting used in the kernel by sev.
+> 
+> In cgroup v2, I didn't see current files for other cgroups in root
+> folder that is why I didn't show that file in root folder.
+> 
+> Will you be fine if I show two files in the root, something like:
+> 
+> encids.sev.capacity
+> encids.sev.current
+> 
+> In non root folder, it will be:
+> encids.sev.max
+> encids.sev.current
+> 
+> I still prefer encids.sev.stat, as it won't repeat same information in
+> each cgroup but let me know what you think.
+
+Yeah, this will be a first and I was mostly wondering about the same number
+appearing under different files / names on root and !root cgroups. I'm
+leaning more towards capacity/current but let me think about it a bit more.
+
+Thank you.
+
+-- 
+tejun
