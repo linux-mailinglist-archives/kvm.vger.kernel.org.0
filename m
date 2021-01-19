@@ -2,247 +2,376 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F0592FC37C
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 23:31:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 417EA2FC3A7
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 23:40:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729320AbhASWak (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 17:30:40 -0500
-Received: from mail-co1nam11on2050.outbound.protection.outlook.com ([40.107.220.50]:52385
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728977AbhASWab (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 17:30:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a5g8hga+OfJiAmrDYGjx3A9SSmFFo+dT0B8LRDLRLO4y5I5e9KrKHzTxYBzbsTcUtVCDB0vWUcXk8T/qo4plDyxwjyRUudyX9WJwL88snAHnhqCryu+mmFp2jZW46RdMwImwGfa5B0ZeD8ncTFPr/5gs9Jo7+lQWeaE8VLrOpXi6Fd0mtTCBf5SxbRF5MAfYobvrMkVU7eyxoMY+IuUHHQuVwC16hc6Hc/gZIke9j5ZnGi+oUwegOIfmNanhhue2hSAAhh4d0OgcCYPrCJDsTBsNeW0aMtBlBMMRRWEYbxEYrbtsEFk1eiGo/60PbFzkUxajmB/gcIUer8BMwKsV7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kRfDC/GuRGi+rkZ4h294Bt+yxRogy/8aCWje634oqNE=;
- b=gxLDPnzUiagATxi9QKnLsRaYnhPQU9DPmgqo/mPKyq4O66AkJuQg4ldBmkQUDa83uxvpY4aDHjFwBY70pva5iHktpI7aUsfT75+Xdgj8CVQKPP28GGo+DXoKTFqKQHhhxMqDfG1AZe36A0I7Cy055/z1et5FUNufLWWEDUfNvbf9vLsXuSxhBLirFfWmfZxVvgfK1kfvS6VYQ50jLrof66q+zamDWNYVRHG7s7V06qmDcT0yQFXNBbUvj19a3iEYisyiYoMJkiolsVuhY0ZDbwAXQx1KsWMgqrJU5Jzw7fP7X7i0KLPEoJInhPn5q+WgfPcFHfX3B+VbuREyLSpHgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kRfDC/GuRGi+rkZ4h294Bt+yxRogy/8aCWje634oqNE=;
- b=uQsYFOV43SoR8Rmyex9tdt2zcMbxKvVB2JXipJG7oT8WFfZqbZjwDqxdRktdGn6gfauY34qDtcovY/56OnDQiCTv57kErYhrL9hGwEUs4LVpyCg70lM4J9ysAH0juXeSZ603Fhz+p2npwP3WoiYuuCm73JNpvk/Eq3ZDzLYZivE=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2591.namprd12.prod.outlook.com (2603:10b6:802:30::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.12; Tue, 19 Jan
- 2021 22:29:36 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3763.014; Tue, 19 Jan 2021
- 22:29:36 +0000
-From:   Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v3 2/2] KVM: SVM: Add support for Virtual SPEC_CTRL
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, fenghua.yu@intel.com, tony.luck@intel.com,
-        wanpengli@tencent.com, kvm@vger.kernel.org,
-        thomas.lendacky@amd.com, peterz@infradead.org, joro@8bytes.org,
-        x86@kernel.org, kyung.min.park@intel.com,
-        linux-kernel@vger.kernel.org, krish.sadhukhan@oracle.com,
-        hpa@zytor.com, mgross@linux.intel.com, vkuznets@redhat.com,
-        kim.phillips@amd.com, wei.huang2@amd.com, jmattson@google.com
-References: <161073115461.13848.18035972823733547803.stgit@bmoger-ubuntu>
- <161073130040.13848.4508590528993822806.stgit@bmoger-ubuntu>
- <YAclaWCL20at/0n+@google.com>
-Message-ID: <c3a81da0-4b6a-1854-1b67-31df5fbf30f6@amd.com>
-Date:   Tue, 19 Jan 2021 16:29:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <YAclaWCL20at/0n+@google.com>
+        id S1728401AbhASWgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 17:36:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45046 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727200AbhASWgK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 17:36:10 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036C4C061573;
+        Tue, 19 Jan 2021 14:35:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=OtL4sdAGsJ08z7fCxeCmMVsJDaQwBot6LG44qZyyGSk=; b=DXq12zrUsz5JbfiOkM3/P+/8RC
+        RVJssaknA/7T+p+K1KP2P7Sc4lQOv1swnQ+FwXP4oSwuCDe5IOLaHX2Ajp6t/wJbb6hzSJC01rsuX
+        MsegCFIS23WG4OTrofNGyE1GuKF6m4qq9rU/ObWUy1s5/taEm7+hlJHxrltuO/LgxeYAAcSU4wZnF
+        A7VGnrMdtgpDsxEbHE2gHVm+oogiA0eiKzPk3I+pxtKTmlN3wUySac8uDXl3G4h3VibiZHmo6sdcQ
+        ktwmyM50mI9O6KIwfVx7I02IwEs/kmZA6Wt0IaTHTExSlyJzLDwJIT8DR/+pLQCCByDxwzqDhTFqf
+        oTk/e/sA==;
+Received: from [2601:1c0:6280:3f0::9abc]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l1za7-0002Cl-CZ; Tue, 19 Jan 2021 22:34:36 +0000
+Subject: Re: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id
+ driver
+To:     Adrian Catangiu <acatan@amazon.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Cc:     gregkh@linuxfoundation.org, graf@amazon.com, arnd@arndb.de,
+        ebiederm@xmission.com, rppt@kernel.org, 0x7f454c46@gmail.com,
+        borntraeger@de.ibm.com, Jason@zx2c4.com, jannh@google.com,
+        w@1wt.eu, colmmacc@amazon.com, luto@kernel.org, tytso@mit.edu,
+        ebiggers@kernel.org, dwmw@amazon.co.uk, bonzini@gnu.org,
+        sblbir@amazon.com, raduweis@amazon.com, corbet@lwn.net,
+        mst@redhat.com, mhocko@kernel.org, rafael@kernel.org, pavel@ucw.cz,
+        mpe@ellerman.id.au, areber@redhat.com, ovzxemul@gmail.com,
+        avagin@gmail.com, ptikhomirov@virtuozzo.com, gil@azul.com,
+        asmehra@redhat.com, dgunigun@redhat.com, vijaysun@ca.ibm.com,
+        oridgar@gmail.com, ghammer@redhat.com
+References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
+ <1610453760-13812-2-git-send-email-acatan@amazon.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <2764a194-934c-5426-728a-cd755a6e395f@infradead.org>
+Date:   Tue, 19 Jan 2021 14:34:17 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+MIME-Version: 1.0
+In-Reply-To: <1610453760-13812-2-git-send-email-acatan@amazon.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR08CA0021.namprd08.prod.outlook.com
- (2603:10b6:610:5a::31) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.136] (165.204.77.1) by CH2PR08CA0021.namprd08.prod.outlook.com (2603:10b6:610:5a::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.11 via Frontend Transport; Tue, 19 Jan 2021 22:29:33 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: a7f4e893-c881-4dd6-e0a4-08d8bcc9b378
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2591:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2591802D305E146BD57E871E95A30@SN1PR12MB2591.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PLBwC7fwv12JIJJb4EZXKeFhkS21tq2lXeKKQL/4u6xePOLzDQoIGksKqcgbpI/LxnH94o+DB+KsoPUonT6+URzCiAmCW54v+cVYtHygC2VahMw+xki0Ovm1swG59Vp0cGu7HX+cY0GS/PwIFdsiL+6GQjfaD3bSw29brEf6onu0ALjNviMTkPAfOjNfy+pFuu7QopvTxXcE/OXtczss5CWIjGpXX0QlW/rIIWzQUnLuDaKXRY6JIrpsaOiU/sd4+nfMlwSyvo/1RxFS7ijAu8XpEauKehaqUM+LINQF3d0AteJ+zGgq611erV+H2OOP38nejWR02zJ0YwdD9emwcsvlH2ZSzgKBP+uOlu4W71jUFQ87fGAkB0gOKklHY6bFiaiEKhSTi6hGkXDrRINXHKhQqZKV8jeK77+HtRpMOrU9W/CvW7I1Yvuy5B2rZhZjEoALAYWH2O8VB/aOdR+C7nfrXFWdDapDLWCoFxu6joc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39850400004)(376002)(396003)(136003)(346002)(7416002)(16526019)(53546011)(31686004)(36756003)(66476007)(6916009)(66556008)(66946007)(2906002)(2616005)(956004)(6486002)(186003)(26005)(52116002)(83380400001)(8676002)(44832011)(86362001)(478600001)(31696002)(4326008)(8936002)(316002)(16576012)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?RUU1azRhK3I4SHZLV2IxTm1wZlp1b24vdlJFMzF6M0g3TXNJcTFhR3hscklJ?=
- =?utf-8?B?dHMrQ3pvdzBDZVhtOW1lOXJZb01Rc2dMS3hVMWNpNmlnNDlyc01GTGhNVElX?=
- =?utf-8?B?RlVLbDdHUmJNb09Na05wYmJhSkhQYjRxNzlCdmlFR0RaSDNzd0o0SW5ZWjAx?=
- =?utf-8?B?Y3VrWXk1VDNNMFBDbUs3bEF6clVkVWErb0RUWDBSWEYyZXZ1YlVUT2ZsQWFU?=
- =?utf-8?B?RGM2WFpBV2JaY0xWM0FaNWhEckFDcGgvYVk2LzFObEpCSkZmdmVFWlVHbDkw?=
- =?utf-8?B?NUpGK29ncWNiM0VYc0FCTThOMWRBMWtxbkd3TnNtbWREQ3ZteTJYWHk5NHVU?=
- =?utf-8?B?NDlWZTRkWkFuaGZNOVdlVUdjekZROGNTQUc4eGFrZ2R5cmFiRU04NC94ZmRX?=
- =?utf-8?B?emk5SWJFUFI1TGRIQlJiTFB4R1YzZncrQUc1T1A2Yk14am1MWkNiRHJoUFgr?=
- =?utf-8?B?eWliOUtOTUlNK3JQN0tmZG9VUm1VQ2EyVllJOGVlWmhPcGdYRGRQL3ZKWVUw?=
- =?utf-8?B?WDJJci9ialI4T3NJSDNRbFEraEZZajFTSC81dlR3cmZjM0hRU1lBeUJoczZ2?=
- =?utf-8?B?MmpsTWZJb1ZFekNqdU9hTXA2SGwvejIwbWJPVVFiRUYxNmwzV3pnM2k0Z3RR?=
- =?utf-8?B?Y015bit3RkdkMUhBVUx5S2xUWlJjUmEyaW9lUFdBbXEvR0JJbzhxbGlmRVU3?=
- =?utf-8?B?U0JCbkJIcWxWaDFlbkZNMElQQ2NPTDNNK0RwUkxnRVJQcy9TNWhhNldXdjMw?=
- =?utf-8?B?WHVhZzM5bXo4cmJCYkVKTzBXQ3VSczVuczY5bTdycXk3WHJubVBGL0Y1R2hL?=
- =?utf-8?B?MDBLeHZrNHN5REdhYjZlUGZSWW5td3R6eWJQRUVXSGFOSzVDZXZPbVFQeVJR?=
- =?utf-8?B?RElMeGt0TUc5WE1tQWdNMGxaU1ZhampGSkpIcDA2dmF5OTVRL0gzMWxWM0do?=
- =?utf-8?B?RzUzaG5QTXk3TmdLaFBBVHVubXVIZXEzcllQKzJEZEQ4VVFaSXQrT3Z6RW10?=
- =?utf-8?B?R0VuYTZPajNXN3dRd0lwWjFIc1JLbDNodWpySW1NUXBsV1htTTQ5ZE9yWm5H?=
- =?utf-8?B?MVVoN3VVOU5nWjE3RmlWcjNUeUloZWpHdm03NVBQaGdhekdmTHVsY2tYb21v?=
- =?utf-8?B?LzRLaVd2eVVBMmw5SWxvNEpLaUxIeW12bTVxcFEwMDRQaU9oR0llSE11OElu?=
- =?utf-8?B?RzNvTXRxcTN6WTFrOHFBQmhERkxpbzJrSG0yOU5ENURSQWY1SEc3Tm1acExj?=
- =?utf-8?B?ZHpQRVViSWw5d3VVTG9wbFZPU2xOWVREMnpzRkgxaXQ1YW9JOFlON3FxcU51?=
- =?utf-8?Q?JlOZPHMdq2Bag=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7f4e893-c881-4dd6-e0a4-08d8bcc9b378
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2021 22:29:36.1475
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2VIuCGNjygYuqPikX/zmfnMnyNCWtd2WhTpa/2ueSn9vyQHLJEtKEEobAOqsU3YS
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2591
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi--
 
-
-On 1/19/21 12:31 PM, Sean Christopherson wrote:
-> On Fri, Jan 15, 2021, Babu Moger wrote:
->> ---
->>  arch/x86/include/asm/svm.h |    4 +++-
->>  arch/x86/kvm/svm/sev.c     |    4 ++++
->>  arch/x86/kvm/svm/svm.c     |   19 +++++++++++++++----
->>  3 files changed, 22 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
->> index 1c561945b426..772e60efe243 100644
->> --- a/arch/x86/include/asm/svm.h
->> +++ b/arch/x86/include/asm/svm.h
->> @@ -269,7 +269,9 @@ struct vmcb_save_area {
->>  	 * SEV-ES guests when referenced through the GHCB or for
->>  	 * saving to the host save area.
->>  	 */
->> -	u8 reserved_7[80];
->> +	u8 reserved_7[72];
->> +	u32 spec_ctrl;		/* Guest version of SPEC_CTRL at 0x2E0 */
->> +	u8 reserved_7b[4];
+On 1/12/21 4:15 AM, Adrian Catangiu wrote:
+> - Background and problem
 > 
-> Don't nested_prepare_vmcb_save() and nested_vmcb_checks() need to be updated to
-> handle the new field, too?
 
-Ok. Sure. I will check and test few combinations to make sure of these
-changes.
+> ---
+>  Documentation/misc-devices/sysgenid.rst | 240 +++++++++++++++++++++++++
+>  drivers/misc/Kconfig                    |  16 ++
+>  drivers/misc/Makefile                   |   1 +
+>  drivers/misc/sysgenid.c                 | 298 ++++++++++++++++++++++++++++++++
+>  include/uapi/linux/sysgenid.h           |  18 ++
+>  5 files changed, 573 insertions(+)
+>  create mode 100644 Documentation/misc-devices/sysgenid.rst
+>  create mode 100644 drivers/misc/sysgenid.c
+>  create mode 100644 include/uapi/linux/sysgenid.h
+> 
+> diff --git a/Documentation/misc-devices/sysgenid.rst b/Documentation/misc-devices/sysgenid.rst
+> new file mode 100644
+> index 0000000..0b31ccf
+> --- /dev/null
+> +++ b/Documentation/misc-devices/sysgenid.rst
+> @@ -0,0 +1,240 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +========
+> +SYSGENID
+> +========
+> +
+> +The System Generation ID feature is required in virtualized or
+> +containerized environments by applications that work with local copies
+> +or caches of world-unique data such as random values, UUIDs,
+> +monotonically increasing counters, etc.
+> +Such applications can be negatively affected by VM or container
+> +snapshotting when the VM or container is either cloned or returned to
+> +an earlier point in time.
+> +
+> +The System Generation ID is a simple concept meant to alleviate the
+> +issue by providing a monotonically increasing counter that changes
+> +each time the VM or container is restored from a snapshot.
+> +The driver for it lives at ``drivers/misc/sysgenid.c``.
+> +
+> +The ``sysgenid`` driver exposes a monotonic incremental System
+> +Generation u32 counter via a char-dev FS interface accessible through
+> +``/dev/sysgenid`` that provides sync and async SysGen counter updates
 
-> 
->>  	u32 pkru;
->>  	u8 reserved_7a[20];
->>  	u64 reserved_8;		/* rax already available at 0x01f8 */
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index c8ffdbc81709..959d6e47bd84 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -546,6 +546,10 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->>  	save->pkru = svm->vcpu.arch.pkru;
->>  	save->xss  = svm->vcpu.arch.ia32_xss;
->>  
->> +	/* Update the guest SPEC_CTRL value in the save area */
->> +	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->> +		save->spec_ctrl = svm->spec_ctrl;
-> 
-> I think this can be dropped if svm->spec_ctrl is unused when V_SPEC_CTRL is
-> supported (see below).  IIUC, the memcpy() that's just out of sight would do
-> the propgation to the VMSA.
+                                                                 update
 
-Yes, That is right. I will remove this.
+> +notifications. It also provides SysGen counter retrieval and
+> +confirmation mechanisms.
+> +
+> +The counter starts from zero when the driver is initialized and
+> +monotonically increments every time the system generation changes.
+> +
+> +The ``sysgenid`` driver exports the ``void sysgenid_bump_generation()``
+> +symbol which can be used by backend drivers to drive system generation
+> +changes based on hardware events.
+> +System generation changes can also be driven by userspace software
+> +through a dedicated driver ioctl.
+> +
+> +Userspace applications or libraries can (a)synchronously consume the
+> +system generation counter through the provided FS interface, to make
+> +any necessary internal adjustments following a system generation update.
+> +
+> +Driver FS interface:
+> +
+> +``open()``:
+> +  When the device is opened, a copy of the current Sys-Gen-Id (counter)
+> +  is associated with the open file descriptor. The driver now tracks
+> +  this file as an independent *watcher*. The driver tracks how many
+> +  watchers are aware of the latest Sys-Gen-Id counter and how many of
+> +  them are *outdated*; outdated being those that have lived through
+> +  a Sys-Gen-Id change but not yet confirmed the new generation counter.
+> +
+> +``read()``:
+> +  Read is meant to provide the *new* system generation counter when a
+> +  generation change takes place. The read operation blocks until the
+> +  associated counter is no longer up to date, at which point the new
+> +  counter is provided/returned.
+> +  Nonblocking ``read()`` uses ``EAGAIN`` to signal that there is no
+> +  *new* counter value available. The generation counter is considered
+> +  *new* for each open file descriptor that hasn't confirmed the new
+> +  value following a generation change. Therefore, once a generation
+> +  change takes place, all ``read()`` calls will immediately return the
+> +  new generation counter and will continue to do so until the
+> +  new value is confirmed back to the driver through ``write()``.
+> +  Partial reads are not allowed - read buffer needs to be at least
+> +  ``sizeof(unsigned)`` in size.
 
-> 
->> +
->>  	/*
->>  	 * SEV-ES will use a VMSA that is pointed to by the VMCB, not
->>  	 * the traditional VMSA that is part of the VMCB. Copy the
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 7ef171790d02..a0cb01a5c8c5 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -1244,6 +1244,9 @@ static void init_vmcb(struct vcpu_svm *svm)
->>  
->>  	svm_check_invpcid(svm);
->>  
->> +	if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->> +		save->spec_ctrl = svm->spec_ctrl;
->> +
->>  	if (kvm_vcpu_apicv_active(&svm->vcpu))
->>  		avic_init_vmcb(svm);
->>  
->> @@ -3789,7 +3792,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->>  	 * is no need to worry about the conditional branch over the wrmsr
->>  	 * being speculatively taken.
->>  	 */
->> -	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
->> +	if (static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->> +		svm->vmcb->save.spec_ctrl = svm->spec_ctrl;
->> +	else
->> +		x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-> 
-> Can't we avoid functional code in svm_vcpu_run() entirely when V_SPEC_CTRL is
-> supported?  Make this code a nop, disable interception from time zero, and
+Please use (unsigned int), not just (unsigned).
+(Linux style)
 
-Sean, I thought you mentioned earlier about not changing the interception
-mechanism. Do you think we should disable the interception right away if
-V_SPEC_CTRL is supported?
+> +
+> +``write()``:
+> +  Write is used to confirm the up-to-date Sys Gen counter back to the
+> +  driver.
+> +  Following a VM generation change, all existing watchers are marked
+> +  as *outdated*. Each file descriptor will maintain the *outdated*
+> +  status until a ``write()`` confirms the up-to-date counter back to
+> +  the driver.
+> +  Partial writes are not allowed - write buffer should be exactly
+> +  ``sizeof(unsigned)`` in size.
 
-> read/write the VMBC field in svm_{get,set}_msr().  I.e. don't touch
-> svm->spec_ctrl if V_SPEC_CTRL is supported.  
-> 
-> 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
-> 		x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-> 
-> 	svm_vcpu_enter_exit(vcpu, svm);
-> 
-> 	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL) &&
-> 	    unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
-> 		svm->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
+ditto.
 
-Ok. It appears the above code might work fine with changes in
-svm_{get,set}_msr() to update save spec_ctlr. I will retest few
-combinations to make sure it works.
-Thanks
-Babu
+> +
+> +``poll()``:
+> +  Poll is implemented to allow polling for generation counter updates.
+> +  Such updates result in ``EPOLLIN`` polling status until the new
+> +  up-to-date counter is confirmed back to the driver through a
+> +  ``write()``.
+> +
+> +``ioctl()``:
+> +  The driver also adds support for tracking count of open file
+> +  descriptors that haven't acknowledged a generation counter update,
+> +  as well as a mechanism for userspace to *force* a generation update:
+> +
+> +  - SYSGENID_GET_OUTDATED_WATCHERS: immediately returns the number of
+> +    *outdated* watchers - number of file descriptors that were open
+> +    during a system generation change, and which have not yet confirmed
+> +    the new generation counter.
+> +  - SYSGENID_WAIT_WATCHERS: blocks until there are no more *outdated*
+> +    watchers, or if a ``timeout`` argument is provided, until the
+> +    timeout expires.
+> +    If the current caller is *outdated* or a generation change happens
+> +    while waiting (thus making current caller *outdated*), the ioctl
+> +    returns ``-EINTR`` to signal the user to handle event and retry.
+> +  - SYSGENID_FORCE_GEN_UPDATE: forces a generation counter increment.
+> +    It takes a ``minimum-generation`` argument which represents the
+> +    minimum value the generation counter will be incremented to. For
+> +    example if current generation is ``5`` and ``SYSGENID_FORCE_GEN_UPDATE(8)``
+> +    is called, the generation counter will increment to ``8``.
+> +    This IOCTL can only be used by processes with CAP_CHECKPOINT_RESTORE
+> +    or CAP_SYS_ADMIN capabilities.
+> +
+> +``mmap()``:
+> +  The driver supports ``PROT_READ, MAP_SHARED`` mmaps of a single page
+> +  in size. The first 4 bytes of the mapped page will contain an
+> +  up-to-date u32 copy of the system generation counter.
+> +  The mapped memory can be used as a low-latency generation counter
+> +  probe mechanism in critical sections - see examples.
+> +
+> +``close()``:
+> +  Removes the file descriptor as a system generation counter *watcher*.
+> +
+> +Example application workflows
+> +-----------------------------
+> +
+> +1) Watchdog thread simplified example::
+> +
+> +	void watchdog_thread_handler(int *thread_active)
+> +	{
+> +		unsigned genid;
 
-> 
->>  	svm_vcpu_enter_exit(vcpu, svm);
->>  
->> @@ -3808,13 +3814,18 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->>  	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
->>  	 * save it.
->>  	 */
->> -	if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
->> -		svm->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
->> +	if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL))) {
->> +		if (static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->> +			svm->spec_ctrl = svm->vmcb->save.spec_ctrl;
->> +		else
->> +			svm->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
->> +	}
->>  
->>  	if (!sev_es_guest(svm->vcpu.kvm))
->>  		reload_tss(vcpu);
->>  
->> -	x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
->> +	if (!static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
->> +		x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
->>  
->>  	if (!sev_es_guest(svm->vcpu.kvm)) {
->>  		vcpu->arch.cr2 = svm->vmcb->save.cr2;
->>
+		unsigned int genid;
+
+> +		int fd = open("/dev/sysgenid", O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR);
+> +
+> +		do {
+> +			// read new gen ID - blocks until VM generation changes
+> +			read(fd, &genid, sizeof(genid));
+> +
+> +			// because of VM generation change, we need to rebuild world
+> +			reseed_app_env();
+> +
+> +			// confirm we're done handling gen ID update
+> +			write(fd, &genid, sizeof(genid));
+> +		} while (atomic_read(thread_active));
+> +
+> +		close(fd);
+> +	}
+> +
+> +2) ASYNC simplified example::
+> +
+> +	void handle_io_on_sysgenfd(int sysgenfd)
+> +	{
+> +		unsigned genid;
+
+		unsigned int genid;
+
+> +
+> +		// read new gen ID - we need it to confirm we've handled update
+> +		read(fd, &genid, sizeof(genid));
+> +
+> +		// because of VM generation change, we need to rebuild world
+> +		reseed_app_env();
+> +
+> +		// confirm we're done handling the gen ID update
+> +		write(fd, &genid, sizeof(genid));
+> +	}
+> +
+> +	int main() {
+> +		int epfd, sysgenfd;
+> +		struct epoll_event ev;
+> +
+> +		epfd = epoll_create(EPOLL_QUEUE_LEN);
+> +
+> +		sysgenfd = open("/dev/sysgenid",
+> +		               O_RDWR | O_CLOEXEC | O_NONBLOCK,
+> +		               S_IRUSR | S_IWUSR);
+> +
+> +		// register sysgenid for polling
+> +		ev.events = EPOLLIN;
+> +		ev.data.fd = sysgenfd;
+> +		epoll_ctl(epfd, EPOLL_CTL_ADD, sysgenfd, &ev);
+> +
+> +		// register other parts of your app for polling
+> +		// ...
+> +
+> +		while (1) {
+> +			// wait for something to do...
+> +			int nfds = epoll_wait(epfd, events,
+> +				MAX_EPOLL_EVENTS_PER_RUN,
+> +				EPOLL_RUN_TIMEOUT);
+> +			if (nfds < 0) die("Error in epoll_wait!");
+> +
+> +			// for each ready fd
+> +			for(int i = 0; i < nfds; i++) {
+> +				int fd = events[i].data.fd;
+> +
+> +				if (fd == sysgenfd)
+> +					handle_io_on_sysgenfd(sysgenfd);
+> +				else
+> +					handle_some_other_part_of_the_app(fd);
+> +			}
+> +		}
+> +
+> +		return 0;
+> +	}
+> +
+> +3) Mapped memory polling simplified example::
+> +
+> +	/*
+> +	 * app/library function that provides cached secrets
+> +	 */
+> +	char * safe_cached_secret(app_data_t *app)
+> +	{
+> +		char *secret;
+> +		volatile unsigned *const genid_ptr = get_sysgenid_mapping(app);
+
+		         unsigned int
+
+> +	again:
+> +		secret = __cached_secret(app);
+> +
+> +		if (unlikely(*genid_ptr != app->cached_genid)) {
+> +			app->cached_genid = *genid_ptr;
+> +			barrier();
+> +
+> +			// rebuild world then confirm the genid update (thru write)
+> +			rebuild_caches(app);
+> +
+> +			ack_sysgenid_update(app);
+> +
+> +			goto again;
+> +		}
+> +
+> +		return secret;
+> +	}
+> +
+> +4) Orchestrator simplified example::
+> +
+> +	/*
+> +	 * orchestrator - manages multiple applications and libraries used by
+> +	 * a service and tries to make sure all sensitive components gracefully
+> +	 * handle VM generation changes.
+> +	 * Following function is called on detection of a VM generation change.
+> +	 */
+> +	int handle_sysgen_update(int sysgen_fd, unsigned new_gen_id)
+
+	                                        unsigned int
+
+> +	{
+> +		// pause until all components have handled event
+> +		pause_service();
+> +
+> +		// confirm *this* watcher as up-to-date
+> +		write(sysgen_fd, &new_gen_id, sizeof(unsigned));
+
+		                                     unsigned int
+
+> +
+> +		// wait for all *others* for at most 5 seconds.
+> +		ioctl(sysgen_fd, VMGENID_WAIT_WATCHERS, 5000);
+> +
+> +		// all applications on the system have rebuilt worlds
+> +		resume_service();
+> +	}
+
+
+> diff --git a/include/uapi/linux/sysgenid.h b/include/uapi/linux/sysgenid.h
+> new file mode 100644
+> index 0000000..ea38fd3
+> --- /dev/null
+> +++ b/include/uapi/linux/sysgenid.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+> +
+> +#ifndef _UAPI_LINUX_SYSGENID_H
+> +#define _UAPI_LINUX_SYSGENID_H
+> +
+> +#include <linux/ioctl.h>
+> +
+> +#define SYSGENID_IOCTL 0x2d
+
+Please document new IOCTL major/magic values in
+Documentation/userspace-api/ioctl/ioctl-number.rst.
+
+
+
+thanks.
+-- 
+~Randy
+"He closes his eyes and drops the goggles.  You can't get hurt
+by looking at a bitmap.  Or can you?"
+(Neal Stephenson: Snow Crash)
