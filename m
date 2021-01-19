@@ -2,82 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 530D42FABCC
-	for <lists+kvm@lfdr.de>; Mon, 18 Jan 2021 21:48:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 801422FAE08
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 01:29:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388420AbhARUsL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 18 Jan 2021 15:48:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
+        id S1732040AbhASA3I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 18 Jan 2021 19:29:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388413AbhARUrt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 18 Jan 2021 15:47:49 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2720AC061574;
-        Mon, 18 Jan 2021 12:47:09 -0800 (PST)
-Received: from zn.tnic (p200300ec2f069f0062c4736095b963a8.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:9f00:62c4:7360:95b9:63a8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9D02A1EC0373;
-        Mon, 18 Jan 2021 21:47:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1611002827;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=zSfxBvZu+voIRyjSVXiWpFkBZRJAFAAXPfJCciOg19M=;
-        b=hiY2qU/APzcIBZApRkche1UxRBS28TJrmBEdDf2NVp6/NqWiU3dVbofvPq0OTZZppL9zi2
-        d9ZgJ72LP50CKWb8bA/r6QVoi8hbX30WE9JQY1D6mv1BVLZR1ndfXwgmZgZ0YMkv3OQciQ
-        TmdigeKKk2aGck97mNi9okeE/lfAoUY=
-Date:   Mon, 18 Jan 2021 21:47:01 +0100
-From:   Borislav Petkov <bp@alien8.de>
+        with ESMTP id S1730466AbhASA3G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 18 Jan 2021 19:29:06 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3026CC061574;
+        Mon, 18 Jan 2021 16:28:26 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id e70so2710023ote.11;
+        Mon, 18 Jan 2021 16:28:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3wJjJQpv3zQqcv3uCU8536qf6Iw47RHtSffUOvoVprw=;
+        b=XWpGnsaOojqGEyi+7+wWAeM+3rE7JCj0Ahc+EMas1/fVPIRTMSP3u5Qq34o5L5ek+J
+         AzgBltYF9/pOWQqjWKKs2VA9dAmaiI6fxyUP9piwZ9qasgiJzWE582agKsEhMN9f60ir
+         z+ZU9WI3FKLi+I9jY65mi3mgqqphK9tiuwpnfGfUQSTOmsVOM54dBC74bcPXGBbmWw1U
+         O6jKB/ztHAhkwIW1faqT8yczrNjewFnoaH3gTyYaGmSDYZ9qQ+B/m82aPk9UTQAoucNJ
+         S0qM+FjwM9CdSIXv77OZX9rzPOF504EDbTvfeEf0Z1g0354A0nV1mGzjuGTS8lHWODG3
+         dXyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3wJjJQpv3zQqcv3uCU8536qf6Iw47RHtSffUOvoVprw=;
+        b=QP+ct3IEX3Rv1LGtsHKECwuoyxz5/jfdQyEL9mFM4xfwEHho9zNEKs7pBMmGrVCGWn
+         PKfg2DGMCKcKTaktDlBCyGC1QtfgsD4Jp/rRzQtvsF52+nGMAP2de/Nwo+y7nVBoNxe4
+         wek0mKQS/q8/x/L9d6LZYJejVLHk53Tj7JoDC2QIFAMVRFCOvEBL8JfgPbqoFO0zd0CC
+         cyXHwthHwNXzAXWg6CM/KpHLdKhfzVN09jlnvX0BuNWlBzAtceBoNmaDn9ZoyYguK5tD
+         Fbjhi/E0siaDx2utFvTrRtjVhxawhzDAxb/LzsMfKjTveriQjtTE67miTMQKpQSBIK30
+         LHqA==
+X-Gm-Message-State: AOAM530I8O7a6zERJLd3IISG7rFTEXAN3px8yQHxJFB6Pmbst+B2oeMF
+        F0kPZrxzIDVIS33smJpxQ4T9nBvU5+I44qLrGeA=
+X-Google-Smtp-Source: ABdhPJzf2Mb3bZJqnNfYiSxy/MgzylI2hblgvSlVksHTBsCwNBn4XrOwd5vQxuATI8qdqAKXWx3uV3zWSxaFkLa4ReQ=
+X-Received: by 2002:a05:6830:15c5:: with SMTP id j5mr806012otr.185.1611016105677;
+ Mon, 18 Jan 2021 16:28:25 -0800 (PST)
+MIME-Version: 1.0
+References: <1610623624-18697-1-git-send-email-wanpengli@tencent.com>
+ <87pn277huh.fsf@vitty.brq.redhat.com> <CANRm+Cz01Xva0_OjTpq3Wbyppa=FZzxBwZJCWJNicV3eCrzpdQ@mail.gmail.com>
+ <67171a65-f87d-8b60-22c6-449ed727f6e0@redhat.com>
+In-Reply-To: <67171a65-f87d-8b60-22c6-449ed727f6e0@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 19 Jan 2021 08:28:14 +0800
+Message-ID: <CANRm+CxTOP3m+7LFjNgVUqSSXuvAtBANX_a0tqA-wY+8fMfndQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] x86/sev: Add AMD_SEV_ES_GUEST Kconfig for including
- SEV-ES support
-Message-ID: <20210118204701.GJ30090@zn.tnic>
-References: <20210116002517.548769-1-seanjc@google.com>
- <20210118202931.GI30090@zn.tnic>
- <5f7bbd70-35c3-24ca-7ec5-047c71b16b1f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5f7bbd70-35c3-24ca-7ec5-047c71b16b1f@redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 18, 2021 at 09:32:07PM +0100, Paolo Bonzini wrote:
-> I think it makes sense because AMD_SEV_ES_GUEST's #VC handling is quite a
-> bit of code that you may not want or need.
+On Tue, 19 Jan 2021 at 02:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 15/01/21 02:15, Wanpeng Li wrote:
+> >> The comment above should probably be updated as it is not clear why we
+> >> check kvm_clock.vdso_clock_mode here. Actually, I would even suggest we
+> >> introduce a 'kvmclock_tsc_stable' global instead to avoid this indirect
+> >> check.
+> > I prefer to update the comment above, assign vsyscall pvclock data
+> > pointer iff kvmclock vsyscall is enabled.
+>
+> Are you going to send v2?
 
-Quite a bit of code which ends up practically enabled on the majority of
-distros.
+Yes. :) https://lore.kernel.org/kvm/1610960877-3110-1-git-send-email-wanpengli@tencent.com/
 
-And it ain't about savings of whopping KiBs. And yet another Kconfig symbol
-in our gazillion Kconfig symbols space means ugly ifdeffery and paying
-attention to randconfig builds.
-
-For tailored configs you simply disable AMD_MEM_ENCRYPT on !AMD hw and
-all done.
-
-So I don't see the point for this.
-
-Thx. 
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+    Wanpeng
