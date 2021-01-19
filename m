@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 669642FB045
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 06:25:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C3752FB04B
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 06:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732211AbhASFUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 00:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44138 "EHLO
+        id S2388568AbhASFWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 00:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726716AbhASFFP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 00:05:15 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0356CC061575
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 21:04:34 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id w18so228822pfu.9
-        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 21:04:34 -0800 (PST)
+        with ESMTP id S2389108AbhASFGj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 00:06:39 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D339AC061794
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 21:04:45 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id lw17so899548pjb.0
+        for <kvm@vger.kernel.org>; Mon, 18 Jan 2021 21:04:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8jWaaLZ6u+//lYSPDVEE3dbvuuSNRm/3gTqtS9kbnx0=;
-        b=ji14BKRL8km3ujzp9UXDrCdLxYqio1bJdNPB8i24chKWjS842AG68AXO7EXyNe4GOy
-         tN7mQEJa6LUIT8EwlVa84DC9oYeQTUFIjbRBN+VgJ6RWzfhdp3ykNONliiDnxzkhDppT
-         4Zr9/ylh3jUWmyUJiSC+s8pxZcrSkDNUmVGCtMq0N9o7yfnw8KKfL4eHBPLKScP7vOyl
-         OT9Rd6r6vHjAhX9YeMznm0doniZwc6cnT+2mdrKp7IL0QoAtQIUQq4lRetEogSRL5Ua4
-         Xvd5N8keEi8DwbTw5+y0Ai3RWeC2+Ua7Omu4/KSKGnp+HRBRXJMBEFxnryorxyaf+0lw
-         yiEw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=rk3Zr0O5adDtcKDEPjgvkHO0z8gks3DD0R510gfQviI=;
+        b=znqS6hnVz6dahC+EHSdB87OaGtNUKXPEDPbv9BRfgHji1a4LjR1Je/PDQuHlonctZF
+         BP3HHtdI7HAmXp2j9UIXS71yX5sjsnmx3oWoNSBurhnSzFh3+uNgFfSimf5NJppJkcBE
+         lffuKp+ndrCAqjbI1YojLoCRIRhYAi2iNTIoZhhAWPGuJHRAd4u4+V3Z4hADLjaCZAUp
+         KBNTvPpMIAhbPnbyCy1TUIwX9PhLzsLsbSG8I7cDhr7s+6FB3q+5AAr26cU+sPyWpScL
+         Ks+Cl6Ua+C+cHunJTJzSGIJRu0qpdaRLAnOFPWvP0p1uIY81jddpKM3iBbLcHN5FMt/T
+         1XWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8jWaaLZ6u+//lYSPDVEE3dbvuuSNRm/3gTqtS9kbnx0=;
-        b=PWI54XHNm85VKVl9QtUakmuX+GcAUjQDGX+QWI69GNOJ7w/Bu+d/NUnUS3zjpd8mb/
-         zpXFko+GJx6socaqIaU9gtET9N6a4j5+zOOb3vFmZ2Sxa529/hRceO+NLbyyf6wre9Ue
-         sbc88CrxdCHJC+U9eH5cLGF5WDxDFaJGUhONuX++i0A0OnlfzloaFTfnXL3nSUwLSEcu
-         P5l4lUfX66tHwUyN0q4C/zUwlu3JdiUbYawh+5XE/gWRsKKhVfrr4l8gjgByKlUNuTKi
-         vn/wrXhVo+WkFYTM4FCNMrfarX2O8pwtG7E0JFFpRhHt9A50pGG7t5CB6z4tFNrtYJ8l
-         vwBQ==
-X-Gm-Message-State: AOAM532gewxhttdkA2/xENHXr8kZA0mummtWVyMPUgcZ4/24R/PTojrv
-        BtijhIS+gdPM5vD6pB2EAlYZ
-X-Google-Smtp-Source: ABdhPJyFpBRTz/MrkTBJo4nBAwtDEt9Gy16vrdty4l78WVcz2wkkIZh+z2RUkx80eIw41g+lZuUNbg==
-X-Received: by 2002:a62:8fca:0:b029:1a9:39bc:ed37 with SMTP id n193-20020a628fca0000b02901a939bced37mr2632663pfd.61.1611032674277;
-        Mon, 18 Jan 2021 21:04:34 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=rk3Zr0O5adDtcKDEPjgvkHO0z8gks3DD0R510gfQviI=;
+        b=qlsJUSGuMRREEVT1ccOdMwlD7Zc+N5lkaWWpvuZuMzF+Rx03TqyCpQIA3wxj4DCG1V
+         ex7xGHQ+58lPiPeYOHAKZncFVgy5NOq/wo/QMpkT8M4xsgQjT/M3MoKq+jhpIxJVY5WK
+         39pyu3iT4hNJrI7/hNPdyNpytfrX4I51bIsGPEzP3/qgJZ+T26ucAxzT2aRbaFZtxf3q
+         k/6Ra2tkqZqoNcjREM14U3GV/OTJB73SZY7BCgWcTYGIFp7nJ9bgrP/liRAn3b7+Abj7
+         zYN3WKfeD7AXUhB/kPiCVYabFMIVcfEkJHeV0HCsnX0P3aHNXCvBN7m9BSTzOzoUWe0Y
+         sF5Q==
+X-Gm-Message-State: AOAM532KVtBuOFLQ2qDw7YxZ++gjYtuLrMME6TyRRyFaQqLumCytFBUd
+        r06g+aYXxATTcFLbY9se30BN
+X-Google-Smtp-Source: ABdhPJwaZBIZPAe2wVJ2M5FYpu2+mBkdly7m6W4Agcx3j+WJGeyF0X6mqSRoroO3c0uR8pMGJhBAcw==
+X-Received: by 2002:a17:902:e885:b029:de:abac:f9c4 with SMTP id w5-20020a170902e885b02900deabacf9c4mr2753168plg.30.1611032685396;
+        Mon, 18 Jan 2021 21:04:45 -0800 (PST)
 Received: from localhost ([139.177.225.243])
-        by smtp.gmail.com with ESMTPSA id m27sm641344pgn.62.2021.01.18.21.04.32
+        by smtp.gmail.com with ESMTPSA id d2sm1089669pjd.29.2021.01.18.21.04.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jan 2021 21:04:33 -0800 (PST)
+        Mon, 18 Jan 2021 21:04:44 -0800 (PST)
 From:   Xie Yongji <xieyongji@bytedance.com>
 To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         sgarzare@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
@@ -56,155 +56,93 @@ To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
 Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-aio@kvack.org,
         linux-fsdevel@vger.kernel.org
-Subject: [RFC v3 00/11] Introduce VDUSE - vDPA Device in Userspace
-Date:   Tue, 19 Jan 2021 12:59:09 +0800
-Message-Id: <20210119045920.447-1-xieyongji@bytedance.com>
+Subject: [RFC v3 03/11] vdpa: Remove the restriction that only supports virtio-net devices
+Date:   Tue, 19 Jan 2021 12:59:12 +0800
+Message-Id: <20210119045920.447-4-xieyongji@bytedance.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210119045920.447-1-xieyongji@bytedance.com>
+References: <20210119045920.447-1-xieyongji@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series introduces a framework, which can be used to implement
-vDPA Devices in a userspace program. The work consist of two parts:
-control path forwarding and data path offloading.
+With VDUSE, we should be able to support all kinds of virtio devices.
 
-In the control path, the VDUSE driver will make use of message
-mechnism to forward the config operation from vdpa bus driver
-to userspace. Userspace can use read()/write() to receive/reply
-those control messages.
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/vhost/vdpa.c | 29 +++--------------------------
+ 1 file changed, 3 insertions(+), 26 deletions(-)
 
-In the data path, the core is mapping dma buffer into VDUSE
-daemon's address space, which can be implemented in different ways
-depending on the vdpa bus to which the vDPA device is attached.
-
-In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
-bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
-buffer is reside in a userspace memory region which can be shared to the
-VDUSE userspace processs via transferring the shmfd.
-
-The details and our user case is shown below:
-
-------------------------    -------------------------   ----------------------------------------------
-|            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
-|       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
-|       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
-------------+-----------     -----------+------------   -------------+----------------------+---------
-            |                           |                            |                      |
-            |                           |                            |                      |
-------------+---------------------------+----------------------------+----------------------+---------
-|    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
-|    -------+--------           --------+--------            -------+--------          -----+----    |
-|           |                           |                           |                       |        |
-| ----------+----------       ----------+-----------         -------+-------                |        |
-| | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
-| ----------+----------       ----------+-----------         -------+-------                |        |
-|           |      virtio bus           |                           |                       |        |
-|   --------+----+-----------           |                           |                       |        |
-|                |                      |                           |                       |        |
-|      ----------+----------            |                           |                       |        |
-|      | virtio-blk device |            |                           |                       |        |
-|      ----------+----------            |                           |                       |        |
-|                |                      |                           |                       |        |
-|     -----------+-----------           |                           |                       |        |
-|     |  virtio-vdpa driver |           |                           |                       |        |
-|     -----------+-----------           |                           |                       |        |
-|                |                      |                           |    vdpa bus           |        |
-|     -----------+----------------------+---------------------------+------------           |        |
-|                                                                                        ---+---     |
------------------------------------------------------------------------------------------| NIC |------
-                                                                                         ---+---
-                                                                                            |
-                                                                                   ---------+---------
-                                                                                   | Remote Storages |
-                                                                                   -------------------
-
-We make use of it to implement a block device connecting to
-our distributed storage, which can be used both in containers and
-VMs. Thus, we can have an unified technology stack in this two cases.
-
-To test it with null-blk:
-
-  $ qemu-storage-daemon \
-      --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
-      --monitor chardev=charmonitor \
-      --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
-      --export vduse-blk,id=test,node-name=disk0,writable=on,vduse-id=1,num-queues=16,queue-size=128
-
-The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
-
-Future work:
-  - Improve performance (e.g. zero copy implementation in datapath)
-  - Config interrupt support
-  - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
-
-This is now based on below series:
-https://lore.kernel.org/netdev/20201112064005.349268-1-parav@nvidia.com/
-
-V2 to V3:
-- Rework the MMU-based IOMMU driver
-- Use the iova domain as iova allocator instead of genpool
-- Support transferring vma->vm_file in vhost-vdpa
-- Add SVA support in vhost-vdpa
-- Remove the patches on bounce pages reclaim
-
-V1 to V2:
-- Add vhost-vdpa support
-- Add some documents
-- Based on the vdpa management tool
-- Introduce a workqueue for irq injection
-- Replace interval tree with array map to store the iova_map
-
-Xie Yongji (11):
-  eventfd: track eventfd_signal() recursion depth separately in different cases
-  eventfd: Increase the recursion depth of eventfd_signal()
-  vdpa: Remove the restriction that only supports virtio-net devices
-  vhost-vdpa: protect concurrent access to vhost device iotlb
-  vdpa: shared virtual addressing support
-  vhost-vdpa: Add an opaque pointer for vhost IOTLB
-  vdpa: Pass the netlink attributes to ops.dev_add()
-  vduse: Introduce VDUSE - vDPA Device in Userspace
-  vduse: Add VDUSE_GET_DEV ioctl
-  vduse: grab the module's references until there is no vduse device
-  vduse: Introduce a workqueue for irq injection
-
- Documentation/driver-api/vduse.rst                 |   85 ++
- Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
- drivers/vdpa/Kconfig                               |    7 +
- drivers/vdpa/Makefile                              |    1 +
- drivers/vdpa/ifcvf/ifcvf_main.c                    |    2 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c                  |    2 +-
- drivers/vdpa/vdpa.c                                |    7 +-
- drivers/vdpa/vdpa_sim/vdpa_sim.c                   |   17 +-
- drivers/vdpa/vdpa_user/Makefile                    |    5 +
- drivers/vdpa/vdpa_user/eventfd.c                   |  229 ++++
- drivers/vdpa/vdpa_user/eventfd.h                   |   48 +
- drivers/vdpa/vdpa_user/iova_domain.c               |  426 +++++++
- drivers/vdpa/vdpa_user/iova_domain.h               |   68 ++
- drivers/vdpa/vdpa_user/vduse.h                     |   62 +
- drivers/vdpa/vdpa_user/vduse_dev.c                 | 1249 ++++++++++++++++++++
- drivers/vhost/iotlb.c                              |    5 +-
- drivers/vhost/vdpa.c                               |  130 +-
- drivers/vhost/vhost.c                              |    4 +-
- fs/aio.c                                           |    3 +-
- fs/eventfd.c                                       |   20 +-
- include/linux/eventfd.h                            |    5 +-
- include/linux/vdpa.h                               |   17 +-
- include/linux/vhost_iotlb.h                        |    8 +-
- include/uapi/linux/vdpa.h                          |    1 +
- include/uapi/linux/vduse.h                         |  126 ++
- 25 files changed, 2458 insertions(+), 70 deletions(-)
- create mode 100644 Documentation/driver-api/vduse.rst
- create mode 100644 drivers/vdpa/vdpa_user/Makefile
- create mode 100644 drivers/vdpa/vdpa_user/eventfd.c
- create mode 100644 drivers/vdpa/vdpa_user/eventfd.h
- create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
- create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
- create mode 100644 drivers/vdpa/vdpa_user/vduse.h
- create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
- create mode 100644 include/uapi/linux/vduse.h
-
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 29ed4173f04e..448be7875b6d 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -22,6 +22,7 @@
+ #include <linux/nospec.h>
+ #include <linux/vhost.h>
+ #include <linux/virtio_net.h>
++#include <linux/virtio_blk.h>
+ 
+ #include "vhost.h"
+ 
+@@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+ 	return 0;
+ }
+ 
+-static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
+-				      struct vhost_vdpa_config *c)
+-{
+-	long size = 0;
+-
+-	switch (v->virtio_id) {
+-	case VIRTIO_ID_NET:
+-		size = sizeof(struct virtio_net_config);
+-		break;
+-	}
+-
+-	if (c->len == 0)
+-		return -EINVAL;
+-
+-	if (c->len > size - c->off)
+-		return -E2BIG;
+-
+-	return 0;
+-}
+-
+ static long vhost_vdpa_get_config(struct vhost_vdpa *v,
+ 				  struct vhost_vdpa_config __user *c)
+ {
+@@ -215,7 +196,7 @@ static long vhost_vdpa_get_config(struct vhost_vdpa *v,
+ 
+ 	if (copy_from_user(&config, c, size))
+ 		return -EFAULT;
+-	if (vhost_vdpa_config_validate(v, &config))
++	if (config.len == 0)
+ 		return -EINVAL;
+ 	buf = kvzalloc(config.len, GFP_KERNEL);
+ 	if (!buf)
+@@ -243,7 +224,7 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
+ 
+ 	if (copy_from_user(&config, c, size))
+ 		return -EFAULT;
+-	if (vhost_vdpa_config_validate(v, &config))
++	if (config.len == 0)
+ 		return -EINVAL;
+ 	buf = kvzalloc(config.len, GFP_KERNEL);
+ 	if (!buf)
+@@ -1025,10 +1006,6 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+ 	int minor;
+ 	int r;
+ 
+-	/* Currently, we only accept the network devices. */
+-	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET)
+-		return -ENOTSUPP;
+-
+ 	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
+ 	if (!v)
+ 		return -ENOMEM;
 -- 
 2.11.0
 
