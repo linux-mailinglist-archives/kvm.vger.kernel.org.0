@@ -2,121 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8E42FBF99
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 19:59:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C7A72FC060
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 20:54:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726539AbhASS6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 13:58:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49387 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731769AbhASS6C (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 13:58:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611082586;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=USIJV7ocAqDOCberXRvY/8K18emSXxgvsqV2iaD7hJA=;
-        b=d6GgJSw/5UJ9hsAvdUvOtOLgLvfbmjo3PPNnDImL4W4sLPNe2S+wwNiBov/WbTK+B0EMGw
-        L/k3gs2MbpyeoklZcGn+uh4O5/7qexsw6c1m0d22j3WzrvUv2g2N/6zDu85x+RB/DU44pn
-        QGiH2oi+G8qXF950JWg+twoh6vvKWAA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-oSXhdUFTOCWgwZgH13Pj2w-1; Tue, 19 Jan 2021 13:56:22 -0500
-X-MC-Unique: oSXhdUFTOCWgwZgH13Pj2w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FBA0800D62;
-        Tue, 19 Jan 2021 18:56:19 +0000 (UTC)
-Received: from gondolin (ovpn-113-246.ams2.redhat.com [10.36.113.246])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 53AD218796;
-        Tue, 19 Jan 2021 18:56:13 +0000 (UTC)
-Date:   Tue, 19 Jan 2021 19:56:10 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, <alex.williamson@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>
-Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210119195610.18da1e78.cohuck@redhat.com>
-In-Reply-To: <20210118181626.GL4147@nvidia.com>
-References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
-        <20210118143806.036c8dbc.cohuck@redhat.com>
-        <20210118151020.GJ4147@nvidia.com>
-        <20210118170009.058c8c52.cohuck@redhat.com>
-        <20210118181626.GL4147@nvidia.com>
-Organization: Red Hat GmbH
+        id S1728801AbhASTwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 14:52:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21630 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389772AbhASTwH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 14:52:07 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JJck0L168511;
+        Tue, 19 Jan 2021 14:51:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=BxXBIXJnvfZTrNbxlXhUYC8NRl1+h8yacc27BDHmeCw=;
+ b=PbLXzJdFWLXtZNDMfv0yS0goCt0g2gJ7SGfFFfCuwfT4X95arjPBttxMvv+igx1Ho+mU
+ HpKS6JRClaFF5plKYqd+fjS6aLOaYno+ExpCJN2rOVB0JpPHOm9Z/2sKoXc4jsN2yBME
+ kCLZke21EknNfIDPPt8orQhz7YrIj/dfPEgO4VEizOLuj9qT2KeskhnKW1MKtmblBd/z
+ Vi5QUUIm3a4ogDYoyR6WAgOr3LiWFAEnnfuQUx0hXwMiiyNW6DA3I9P3hgI7ezpKp12o
+ st11kpceUg7nQ+Pwi6bWW4eekB5H+EjC1XdIFDzKgT13wZ2hfIbl4gw1A4iTnjYvjgel 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36656us0cc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 14:51:26 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JJcmBs168627;
+        Tue, 19 Jan 2021 14:51:26 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36656us08t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 14:51:26 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JJkxgx025163;
+        Tue, 19 Jan 2021 19:51:20 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 363qs8bdq6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 19:51:20 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JJpBRb18678218
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 19:51:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E8866A4040;
+        Tue, 19 Jan 2021 19:51:17 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8C52FA404D;
+        Tue, 19 Jan 2021 19:51:17 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.38.46])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Jan 2021 19:51:17 +0000 (GMT)
+Subject: Re: [PATCH 1/1] KVM: s390: diag9c forwarding
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>
+References: <20210118131739.7272-1-borntraeger@de.ibm.com>
+ <20210118131739.7272-2-borntraeger@de.ibm.com>
+ <20210119175359.1a5ea5be.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <ee6fef19-78b5-c897-0210-fedc52984369@linux.ibm.com>
+Date:   Tue, 19 Jan 2021 20:51:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210119175359.1a5ea5be.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-19_07:2021-01-18,2021-01-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 clxscore=1015 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190104
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Jan 2021 14:16:26 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On Mon, Jan 18, 2021 at 05:00:09PM +0100, Cornelia Huck wrote:
-> 
-> > > You can say that all the HW specific things are in the mlx5_vfio_pci
-> > > driver. It is an unusual driver because it must bind to both the PCI
-> > > VF with a pci_driver and to the mlx5_core PF using an
-> > > auxiliary_driver. This is needed for the object lifetimes to be
-> > > correct.  
-> > 
-> > Hm... I might be confused about the usage of the term 'driver' here.
-> > IIUC, there are two drivers, one on the pci bus and one on the
-> > auxiliary bus. Is the 'driver' you're talking about here more the
-> > module you load (and not a driver in the driver core sense?)  
-> 
-> Here "driver" would be the common term meaning the code that realizes
-> a subsytem for HW - so mlx5_vfio_pci is a VFIO driver because it
-> ultimately creates a /dev/vfio* through the vfio subsystem.
-> 
-> The same way we usually call something like mlx5_en an "ethernet
-> driver" not just a "pci driver"
-> 
-> > Yes, sure. But it also shows that mlx5_vfio_pci aka the device-specific
-> > code is rather small in comparison to the common vfio-pci code.
-> > Therefore my question whether it will gain more specific changes (that
-> > cannot be covered via the auxiliary driver.)  
-> 
-> I'm not sure what you mean "via the auxiliary driver" - there is only
-> one mlx5_vfio_pci, and the non-RFC version with all the migration code
-> is fairly big.
-> 
-> The pci_driver contributes a 'struct pci_device *' and the
-> auxiliary_driver contributes a 'struct mlx5_core_dev *'. mlx5_vfio_pci
-> fuses them together into a VFIO device. Depending on the VFIO
-> callback, it may use an API from the pci_device or from the
-> mlx5_core_dev device, or both.
 
-Let's rephrase my question a bit:
+On 1/19/21 5:53 PM, Cornelia Huck wrote:
+> On Mon, 18 Jan 2021 14:17:39 +0100
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> From: Pierre Morel <pmorel@linux.ibm.com>
+>>
+>> When we receive intercept a DIAG_9C from the guest we verify
+>> that the target real CPU associated with the virtual CPU
+>> designated by the guest is running and if not we forward the
+>> DIAG_9C to the target real CPU.
+>>
+>> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
+>>
+>> The rate is calculated as a count per second defined as a
+>> new parameter of the s390 kvm module: diag9c_forwarding_hz .
+>>
+>> The default value is to not forward diag9c.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>   arch/s390/include/asm/kvm_host.h |  1 +
+>>   arch/s390/include/asm/smp.h      |  1 +
+>>   arch/s390/kernel/smp.c           |  1 +
+>>   arch/s390/kvm/diag.c             | 31 ++++++++++++++++++++++++++++---
+>>   arch/s390/kvm/kvm-s390.c         |  6 ++++++
+>>   arch/s390/kvm/kvm-s390.h         |  8 ++++++++
+>>   6 files changed, 45 insertions(+), 3 deletions(-)
+>>
+> 
+> (...)
+> 
+>> @@ -167,9 +180,21 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
+>>   	if (!tcpu)
+>>   		goto no_yield;
+>>   
+>> -	/* target already running */
+>> -	if (READ_ONCE(tcpu->cpu) >= 0)
+>> -		goto no_yield;
+>> +	/* target VCPU already running */
+> 
+> Maybe make this /* target guest VPCU already running */...
+> 
+>> +	if (READ_ONCE(tcpu->cpu) >= 0) {
+>> +		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
+>> +			goto no_yield;
+>> +
+>> +		/* target CPU already running */
+> 
+> ...and this /* target host CPU already running */? I just read this
+> several times and was confused before I spotted the difference :)
 
-This proposal splits the existing vfio-pci driver into a "core"
-component and code actually implementing the "driver" part. For mlx5,
-an alternative "driver" is introduced that reuses the "core" component
-and also hooks into mlx5-specific code parts via the auxiliary device
-framework. (IIUC, the plan is to make existing special cases for
-devices follow mlx5's lead later.)
+I can only agree then :) .
 
-I've been thinking of an alternative split: Keep vfio-pci as it is now,
-but add an auxiliary device. For mlx5, an auxiliary device_driver can
-match to that device and implement mlx5-specific things. From the code
-in this RFC, it is not clear to me whether this would be feasible: most
-callbacks seem to simply forward to the core component, and that might
-be possible to be done by a purely auxiliary device_driver; but this
-may or may not work well for additional functionality.
+...
 
-I guess my question is: into which callbacks will the additional
-functionality hook? If there's no good way to do what they need to do
-without manipulating the vfio-pci calls, my proposal will not work, and
-this proposal looks like the better way. But it's hard to tell without
-seeing the code, which is why I'm asking :)
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
