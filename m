@@ -2,230 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 813E62FBE54
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 18:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9057A2FBDDB
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 18:39:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391816AbhASRxB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 12:53:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34112 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730808AbhASPAZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 10:00:25 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JEWUtt163022;
-        Tue, 19 Jan 2021 09:59:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AxHGVEPbia8yy0WFL1tcBjG7R8W4oGnANc74ir4U2O0=;
- b=cTs9wV9+LcJseOJ93/lUM05QTkXJA1niv6OQtGms9dQbDutLcH/2PJ7aawQ5c0qLLrgV
- dtew4MzbSBlxLrGY041qD8wdtCyH1vxgCUzldD/Zd88LR+swFR2t8RSe7weUIsxlTSNK
- H6iJ5aRgI+iJ0tlYQKNBhLh0RmcD3vpqqfQAkCDjpWu/LV+SZsKzrK3nwzLH/nfs3W6L
- 0OQXxOpHbVr1q3RxbVWiLLGd0/UAU1E0AQHVQHU02hS7b1qknUJyxOtiVZaxK5qICPfo
- AKuISr8ebTNMlIz1IFg5vAbLB4QkT4BtfLQeMrY+ukW+8Xj1AkkXBv9m2/5uUQjhwrta qg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 366065b4m5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 09:59:42 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JEX6mB165582;
-        Tue, 19 Jan 2021 09:59:41 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 366065b4kq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 09:59:41 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JEveQw004487;
-        Tue, 19 Jan 2021 14:59:40 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 363qs7k68a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 14:59:40 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JExbHP24183178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jan 2021 14:59:37 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4602B52054;
-        Tue, 19 Jan 2021 14:59:37 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.160.34])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id D155B5204E;
-        Tue, 19 Jan 2021 14:59:36 +0000 (GMT)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, david@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, stable@vger.kernel.org
-References: <20201218141811.310267-1-imbrenda@linux.ibm.com>
- <20201218141811.310267-3-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v1 2/4] s390/kvm: extend guest_translate for MVPG
- interpretation
-Message-ID: <66d0da8a-a43d-1f04-8fa0-dec5e49b56b7@linux.ibm.com>
-Date:   Tue, 19 Jan 2021 15:59:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2390426AbhASRiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 12:38:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731123AbhASRiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 12:38:09 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E22C061573
+        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 09:37:29 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id x20so335749pjh.3
+        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 09:37:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=MdqFOwVOrDv/uHtp7zhA7eRG5q/biM80PO2TPXjvwKo=;
+        b=pPFA+iKzu/L+bavWAJcMVzsHHZflOSQq4KTrLUQGclf2Dbg/GVhRODHVq++nqtQBCa
+         vGU++txXX0DZAT6DuUrhppZqQ5NEgK528hyWpBpetd2/fCFXBZ/XLzQbvlivqYDqP0Ym
+         bsL8AoZSFTytLialJnzhsI8kr0WXmxMdz11dmvg1g2KkBbzCR56QQeSgBEXYvT8yF6FB
+         CC4C+mTGK0lCfUVrHOcGStp4qTFecTfIrXfa7wrO6IiQMpswJJMwTzw7Ru01RYZMOjxb
+         B2s9FK398qB1qKtgpOXRwqIs2WT88iiutEwe1NGitKhPXp5ylpcZ0LUKGQHLO03yxnRl
+         OVOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MdqFOwVOrDv/uHtp7zhA7eRG5q/biM80PO2TPXjvwKo=;
+        b=t7gfUdmq4qO2mk5kKO6SBHjV0UdxJY1gQhpVKP0KZCEqvWakt75HKoRO/DIhPHg2JE
+         AD5k/LYiBsdr93XbJ37hIAAthdExIXn0SdOidg+KV5eXh6Acf6D5RrkjNMJwSNNbV5s8
+         FAXIAcA/sT3Cs7MRbu3+mFM9w2zimh4bKMZkvk/sRGglcB4/TkLFB4xDbYJIwX9Q/8RQ
+         seUVJnYpx31xibhGRx69WKsUpFYV+DnwXT4KcsOHG7336Fwtk1GGEEWJQDNf72/iiPdL
+         SW1Nl5bmoz24Tb2R3KGB2cXikgNGz0HZ+DmVKNdgiMFox2m8f/pOS0EqtChWluxz623R
+         Y/Tg==
+X-Gm-Message-State: AOAM5336iwz4FHkevSk3+fXpOex6FvGfq8wZPUKEA8TBK4gURD6wyovu
+        Qew5VCsLCWdCsZwXxASBNmZ/OA==
+X-Google-Smtp-Source: ABdhPJweqnR4okQhtyD4rMeuhLq1nWF87H03P3+0KTSPq6NaIFgceeFGmFiK1hq7HNKwvLxnHbv4qw==
+X-Received: by 2002:a17:90a:e38a:: with SMTP id b10mr874146pjz.12.1611077846917;
+        Tue, 19 Jan 2021 09:37:26 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id p13sm3926797pju.20.2021.01.19.09.37.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jan 2021 09:37:26 -0800 (PST)
+Date:   Tue, 19 Jan 2021 09:37:19 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        mlevitsk@redhat.com
+Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
+Message-ID: <YAcYz4nxVXHKfkXu@google.com>
+References: <20201223010850.111882-1-pbonzini@redhat.com>
+ <X+pbZ061gTIbM2Ef@google.com>
+ <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
+ <X/4igkJA1ZY5rCk7@google.com>
+ <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
+ <YACl4jtDc1IGcxiQ@google.com>
+ <20210118110944.vsxw7urtbs7fmbhk@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201218141811.310267-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-19_04:2021-01-18,2021-01-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=999 suspectscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 spamscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101190085
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210118110944.vsxw7urtbs7fmbhk@kamzik.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/18/20 3:18 PM, Claudio Imbrenda wrote:
-> Extend guest_translate to optionally return the address of the guest
-> DAT table which caused the exception, and change the return value to int.
+On Mon, Jan 18, 2021, Andrew Jones wrote:
+> On Thu, Jan 14, 2021 at 12:13:22PM -0800, Sean Christopherson wrote:
+> > On Wed, Jan 13, 2021, Paolo Bonzini wrote:
+> > > On 12/01/21 23:28, Sean Christopherson wrote:
+> > > > What's the biggest hurdle for doing this completely within the unit test
+> > > > framework?  Is teaching the framework to migrate a unit test the biggest pain?
+> > > 
+> > > Yes, pretty much.  The shell script framework would show its limits.
+> > > 
+> > > That said, I've always treated run_tests.sh as a utility more than an
+> > > integral part of kvm-unit-tests.  There's nothing that prevents a more
+> > > capable framework from parsing unittests.cfg.
+> > 
+> > Heh, got anyone you can "volunteer" to create a new framework?  One-button
+> > migration testing would be very nice to have.  I suspect I'm not the only
+> > contributor that doesn't do migration testing as part of their standard workflow.
+> >
 > 
-> Also return the appropriate values in the low order bits of the address
-> indicating protection or EDAT.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->  arch/s390/kvm/gaccess.c | 33 ++++++++++++++++++++++++++++-----
->  1 file changed, 28 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index 6d6b57059493..8e256a233583 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -598,6 +598,10 @@ static int deref_table(struct kvm *kvm, unsigned long gpa, unsigned long *val)
->   * @asce: effective asce
->   * @mode: indicates the access mode to be used
->   * @prot: returns the type for protection exceptions
-> + * @entryptr: returns the physical address of the last DAT table entry
-> + *            processed, additionally setting a few flags in the lower bits
-> + *            to indicate whether a translation exception or a protection
-> + *            exception were encountered during the address translation.
+> We have one-button migration tests already with kvm-unit-tests. Just
+> compile the tests that use the migration framework as standalone
+> tests and then run them directly.
 
-I'd much rather have another argument pointer than fusing the address
-and the status bits. Or we could make prot a struct and add your status
-bits in.
+Do those exist/work for x86?  I see migration stuff for Arm and PPC, but nothing
+for x86.
 
->   *
->   * Translate a guest virtual address into a guest absolute address by means
->   * of dynamic address translation as specified by the architecture.
-> @@ -611,9 +615,10 @@ static int deref_table(struct kvm *kvm, unsigned long gpa, unsigned long *val)
->   *	      the returned value is the program interruption code as defined
->   *	      by the architecture
->   */
-> -static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
-> -				     unsigned long *gpa, const union asce asce,
-> -				     enum gacc_mode mode, enum prot_type *prot)
-> +static int guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
-> +			   unsigned long *gpa, const union asce asce,
-> +			   enum gacc_mode mode, enum prot_type *prot,
-> +			   unsigned long *entryptr)
->  {
->  	union vaddress vaddr = {.addr = gva};
->  	union raddress raddr = {.addr = gva};
-> @@ -628,6 +633,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  	edat1 = ctlreg0.edat && test_kvm_facility(vcpu->kvm, 8);
->  	edat2 = edat1 && test_kvm_facility(vcpu->kvm, 78);
->  	iep = ctlreg0.iep && test_kvm_facility(vcpu->kvm, 130);
-> +	if (entryptr)
-> +		*entryptr = 0;
->  	if (asce.r)
->  		goto real_address;
->  	ptr = asce.origin * PAGE_SIZE;
-> @@ -667,6 +674,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			return PGM_ADDRESSING;
->  		if (deref_table(vcpu->kvm, ptr, &rfte.val))
->  			return -EFAULT;
-> +		if (entryptr)
-> +			*entryptr = ptr;
->  		if (rfte.i)
->  			return PGM_REGION_FIRST_TRANS;
->  		if (rfte.tt != TABLE_TYPE_REGION1)
-> @@ -685,6 +694,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			return PGM_ADDRESSING;
->  		if (deref_table(vcpu->kvm, ptr, &rste.val))
->  			return -EFAULT;
-> +		if (entryptr)
-> +			*entryptr = ptr;
->  		if (rste.i)
->  			return PGM_REGION_SECOND_TRANS;
->  		if (rste.tt != TABLE_TYPE_REGION2)
-> @@ -703,6 +714,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			return PGM_ADDRESSING;
->  		if (deref_table(vcpu->kvm, ptr, &rtte.val))
->  			return -EFAULT;
-> +		if (entryptr)
-> +			*entryptr = ptr;
->  		if (rtte.i)
->  			return PGM_REGION_THIRD_TRANS;
->  		if (rtte.tt != TABLE_TYPE_REGION3)
-> @@ -713,6 +726,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			dat_protection |= rtte.fc1.p;
->  			iep_protection = rtte.fc1.iep;
->  			raddr.rfaa = rtte.fc1.rfaa;
-> +			if (entryptr)
-> +				*entryptr |= dat_protection ? 6 : 4;
+> I agree, though, that Bash is a pain for some of the stuff we're trying
+> to do. However, we do have requests to keep the framework written in Bash,
+> because KVM testing is regularly done with simulators and even in embedded
+> environments. It's not desirable, or even possible, to have e.g. Python
+> everywhere we want kvm-unit-tests.
 
-Magic constants are magic
-
->  			goto absolute_address;
->  		}
->  		if (vaddr.sx01 < rtte.fc0.tf)
-> @@ -731,6 +746,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			return PGM_ADDRESSING;
->  		if (deref_table(vcpu->kvm, ptr, &ste.val))
->  			return -EFAULT;
-> +		if (entryptr)
-> +			*entryptr = ptr;
->  		if (ste.i)
->  			return PGM_SEGMENT_TRANSLATION;
->  		if (ste.tt != TABLE_TYPE_SEGMENT)
-> @@ -741,6 +758,8 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  			dat_protection |= ste.fc1.p;
->  			iep_protection = ste.fc1.iep;
->  			raddr.sfaa = ste.fc1.sfaa;
-> +			if (entryptr)
-> +				*entryptr |= dat_protection ? 6 : 4;
->  			goto absolute_address;
->  		}
->  		dat_protection |= ste.fc0.p;
-> @@ -751,10 +770,14 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
->  		return PGM_ADDRESSING;
->  	if (deref_table(vcpu->kvm, ptr, &pte.val))
->  		return -EFAULT;
-> +	if (entryptr)
-> +		*entryptr = ptr;
->  	if (pte.i)
->  		return PGM_PAGE_TRANSLATION;
->  	if (pte.z)
->  		return PGM_TRANSLATION_SPEC;
-> +	if (entryptr && dat_protection)
-> +		*entryptr |= 2;
->  	dat_protection |= pte.p;
->  	iep_protection = pte.iep;
->  	raddr.pfra = pte.pfra;
-> @@ -810,7 +833,7 @@ static int guest_page_range(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->  					 PROT_TYPE_LA);
->  		ga &= PAGE_MASK;
->  		if (psw_bits(*psw).dat) {
-> -			rc = guest_translate(vcpu, ga, pages, asce, mode, &prot);
-> +			rc = guest_translate(vcpu, ga, pages, asce, mode, &prot, NULL);
->  			if (rc < 0)
->  				return rc;
->  		} else {
-> @@ -920,7 +943,7 @@ int guest_translate_address(struct kvm_vcpu *vcpu, unsigned long gva, u8 ar,
->  	}
->  
->  	if (psw_bits(*psw).dat && !asce.r) {	/* Use DAT? */
-> -		rc = guest_translate(vcpu, gva, gpa, asce, mode, &prot);
-> +		rc = guest_translate(vcpu, gva, gpa, asce, mode, &prot, NULL);
->  		if (rc > 0)
->  			return trans_exc(vcpu, rc, gva, 0, mode, prot);
->  	} else {
-> 
-
+True, I would probably be one of the people complaining if the tests started
+requiring some newfangled language :-)
