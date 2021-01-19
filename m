@@ -2,122 +2,324 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 835252FBD0A
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:58:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD6402FBD2D
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 18:08:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389504AbhASQ5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 11:57:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32516 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390680AbhASQzf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 11:55:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611075249;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=atKdoWTs/5WSIAH1EWyl3o9F/p/2dp+BRd7oUt8pH/A=;
-        b=aLh0KItI71yyZuTEs0ayNiIbdPQglJ/y0qdU60RZM72F0AQttjyLfTpjOH5yfwj9E0004K
-        jZse6axFXRRLCKWuvAww67UzFTrdkPwdYSGGdiflFPx0VpA+GhSK3qGVlPyVbq4W2GA2h4
-        ih1I0WEUsRtXjfuXGxeY7aeqhkD/NVk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-0rYlN_9OOfSUvEm-obQGyQ-1; Tue, 19 Jan 2021 11:54:05 -0500
-X-MC-Unique: 0rYlN_9OOfSUvEm-obQGyQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AB648066F0;
-        Tue, 19 Jan 2021 16:54:04 +0000 (UTC)
-Received: from gondolin (ovpn-113-246.ams2.redhat.com [10.36.113.246])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 77A8010190AA;
-        Tue, 19 Jan 2021 16:54:02 +0000 (UTC)
-Date:   Tue, 19 Jan 2021 17:53:59 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
-        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 1/1] KVM: s390: diag9c forwarding
-Message-ID: <20210119175359.1a5ea5be.cohuck@redhat.com>
-In-Reply-To: <20210118131739.7272-2-borntraeger@de.ibm.com>
-References: <20210118131739.7272-1-borntraeger@de.ibm.com>
-        <20210118131739.7272-2-borntraeger@de.ibm.com>
-Organization: Red Hat GmbH
+        id S1731777AbhASRHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 12:07:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30098 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390680AbhASRGU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 12:06:20 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JH2auX067042;
+        Tue, 19 Jan 2021 12:05:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=x1k5G6fnXmXExWmHSf3oFuukBGWONsJugGkbXGnc3yY=;
+ b=DDriZ9rAKAGJsIMDYZSm/6UijQO01kEp0Rxk31UJwn1hLhpY35XmHxZiiin96hhpUGtS
+ /h8wjz9v07ZQfv8ow//qeMflH8NKVbt2CpG04fvJd3FjEVyJPMDimAmxXCPk/AEXskqS
+ AqckO7tVHSoBkDi3I3XioAHtaG9VyXqF/utBXiXSmGnVPVME2Ox4yMuj0IlLHKCmU6zh
+ se1c19vnVjxG/LPqB9jbYPKCs8hna6Y93mAi+EJb94WsMXRl87l+v1u6ntfZ0wgGKgKI
+ egOkk/ESy/yHFRk7BrCdz6oZUN9DxnWsSiLU7sm1EzUc69L5NEqjxJllEPAam1viq3n4 jA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3663f303ax-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 12:05:08 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JH58rs076502;
+        Tue, 19 Jan 2021 12:05:08 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3663f303ad-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 12:05:08 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JH4sBB019591;
+        Tue, 19 Jan 2021 17:05:05 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 363qs8b9gq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 17:05:05 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JH53Ho22938022
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 17:05:03 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7DD9E4C059;
+        Tue, 19 Jan 2021 17:05:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 040A64C050;
+        Tue, 19 Jan 2021 17:05:03 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.4.167])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Jan 2021 17:05:02 +0000 (GMT)
+Date:   Tue, 19 Jan 2021 18:05:01 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        pbonzini@redhat.com, cohuck@redhat.com, lvivier@redhat.com,
+        nadav.amit@gmail.com, krish.sadhukhan@oracle.com
+Subject: Re: [kvm-unit-tests PATCH v2 04/11] lib/asm: Fix definitions of
+ memory areas
+Message-ID: <20210119180501.679c2614@ibm-vm>
+In-Reply-To: <f482372d-1bc3-48bf-d1e0-01f1167f4a04@linux.ibm.com>
+References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
+        <20210115123730.381612-5-imbrenda@linux.ibm.com>
+        <f482372d-1bc3-48bf-d1e0-01f1167f4a04@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-19_05:2021-01-18,2021-01-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 phishscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ malwarescore=0 impostorscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Jan 2021 14:17:39 +0100
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On Tue, 19 Jan 2021 16:33:29 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> From: Pierre Morel <pmorel@linux.ibm.com>
+> On 1/15/21 1:37 PM, Claudio Imbrenda wrote:
+> > Fix the definitions of the memory areas.
+> > 
+> > Bring the headers in line with the rest of the asm headers, by
+> > having the appropriate #ifdef _ASM$ARCH_ guarding the headers.
+> > 
+> > Fixes: d74708246bd9 ("lib/asm: Add definitions of memory areas")
+> > 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> > ---
+> >  lib/asm-generic/memory_areas.h |  9 ++++-----
+> >  lib/arm/asm/memory_areas.h     | 11 +++--------
+> >  lib/arm64/asm/memory_areas.h   | 11 +++--------
+> >  lib/powerpc/asm/memory_areas.h | 11 +++--------
+> >  lib/ppc64/asm/memory_areas.h   | 11 +++--------
+> >  lib/s390x/asm/memory_areas.h   | 13 ++++++-------
+> >  lib/x86/asm/memory_areas.h     | 27 ++++++++++++++++-----------
+> >  lib/alloc_page.h               |  3 +++
+> >  lib/alloc_page.c               |  4 +---
+> >  9 files changed, 42 insertions(+), 58 deletions(-)
+> > 
+> > diff --git a/lib/asm-generic/memory_areas.h
+> > b/lib/asm-generic/memory_areas.h index 927baa7..3074afe 100644
+> > --- a/lib/asm-generic/memory_areas.h
+> > +++ b/lib/asm-generic/memory_areas.h
+> > @@ -1,11 +1,10 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef __ASM_GENERIC_MEMORY_AREAS_H__
+> > +#define __ASM_GENERIC_MEMORY_AREAS_H__
+> >  
+> >  #define AREA_NORMAL_PFN 0
+> >  #define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+> >  
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#define MAX_AREAS 1
+> >  
+> >  #endif
+> > diff --git a/lib/arm/asm/memory_areas.h b/lib/arm/asm/memory_areas.h
+> > index 927baa7..c723310 100644
+> > --- a/lib/arm/asm/memory_areas.h
+> > +++ b/lib/arm/asm/memory_areas.h
+> > @@ -1,11 +1,6 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASMARM_MEMORY_AREAS_H_
+> > +#define _ASMARM_MEMORY_AREAS_H_
+> >  
+> > -#define AREA_NORMAL_PFN 0
+> > -#define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > -
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#include <asm-generic/memory_areas.h>
+> >  
+> >  #endif
+> > diff --git a/lib/arm64/asm/memory_areas.h
+> > b/lib/arm64/asm/memory_areas.h index 927baa7..18e8ca8 100644
+> > --- a/lib/arm64/asm/memory_areas.h
+> > +++ b/lib/arm64/asm/memory_areas.h
+> > @@ -1,11 +1,6 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASMARM64_MEMORY_AREAS_H_
+> > +#define _ASMARM64_MEMORY_AREAS_H_
+> >  
+> > -#define AREA_NORMAL_PFN 0
+> > -#define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > -
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#include <asm-generic/memory_areas.h>
+> >  
+> >  #endif
+> > diff --git a/lib/powerpc/asm/memory_areas.h
+> > b/lib/powerpc/asm/memory_areas.h index 927baa7..76d1738 100644
+> > --- a/lib/powerpc/asm/memory_areas.h
+> > +++ b/lib/powerpc/asm/memory_areas.h
+> > @@ -1,11 +1,6 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASMPOWERPC_MEMORY_AREAS_H_
+> > +#define _ASMPOWERPC_MEMORY_AREAS_H_
+> >  
+> > -#define AREA_NORMAL_PFN 0
+> > -#define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > -
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#include <asm-generic/memory_areas.h>
+> >  
+> >  #endif
+> > diff --git a/lib/ppc64/asm/memory_areas.h
+> > b/lib/ppc64/asm/memory_areas.h index 927baa7..b9fd46b 100644
+> > --- a/lib/ppc64/asm/memory_areas.h
+> > +++ b/lib/ppc64/asm/memory_areas.h
+> > @@ -1,11 +1,6 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASMPPC64_MEMORY_AREAS_H_
+> > +#define _ASMPPC64_MEMORY_AREAS_H_
+> >  
+> > -#define AREA_NORMAL_PFN 0
+> > -#define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > -
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#include <asm-generic/memory_areas.h>
+> >  
+> >  #endif
+> > diff --git a/lib/s390x/asm/memory_areas.h
+> > b/lib/s390x/asm/memory_areas.h index 4856a27..827bfb3 100644
+> > --- a/lib/s390x/asm/memory_areas.h
+> > +++ b/lib/s390x/asm/memory_areas.h
+> > @@ -1,16 +1,15 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASMS390X_MEMORY_AREAS_H_
+> > +#define _ASMS390X_MEMORY_AREAS_H_
+> >  
+> > -#define AREA_NORMAL_PFN BIT(31-12)
+> > +#define AREA_NORMAL_PFN (1 << 19)
+> >  #define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+> >  
+> >  #define AREA_LOW_PFN 0
+> >  #define AREA_LOW_NUMBER 1
+> > -#define AREA_LOW 2
+> > +#define AREA_LOW (1 << AREA_LOW_NUMBER)
+> >  
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#define MAX_AREAS 2
+> >  
+> >  #define AREA_DMA31 AREA_LOW
+> >  
+> > diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
+> > index 952f5bd..e84016f 100644
+> > --- a/lib/x86/asm/memory_areas.h
+> > +++ b/lib/x86/asm/memory_areas.h
+> > @@ -1,21 +1,26 @@
+> > -#ifndef MEMORY_AREAS_H
+> > -#define MEMORY_AREAS_H
+> > +#ifndef _ASM_X86_MEMORY_AREAS_H_
+> > +#define _ASM_X86_MEMORY_AREAS_H_
+> >  
+> >  #define AREA_NORMAL_PFN BIT(36-12)
+> >  #define AREA_NORMAL_NUMBER 0
+> > -#define AREA_NORMAL 1
+> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
+> >  
+> > -#define AREA_PAE_HIGH_PFN BIT(32-12)
+> > -#define AREA_PAE_HIGH_NUMBER 1
+> > -#define AREA_PAE_HIGH 2
+> > +#define AREA_HIGH_PFN BIT(32-12)
+> > +#define AREA_HIGH_NUMBER 1
+> > +#define AREA_HIGH (1 << AREA_HIGH_NUMBER)
+> >  
+> > -#define AREA_LOW_PFN 0
+> > +#define AREA_LOW_PFN BIT(24-12)
+> >  #define AREA_LOW_NUMBER 2
+> > -#define AREA_LOW 4
+> > +#define AREA_LOW (1 << AREA_LOW_NUMBER)
+> >  
+> > -#define AREA_PAE (AREA_PAE | AREA_LOW)
+> > +#define AREA_LOWEST_PFN 0
+> > +#define AREA_LOWEST_NUMBER 3
+> > +#define AREA_LOWEST (1 << AREA_LOWEST_NUMBER)
+> >  
+> > -#define AREA_ANY -1
+> > -#define AREA_ANY_NUMBER 0xff
+> > +#define MAX_AREAS 4
+> > +
+> > +#define AREA_DMA24 AREA_LOWEST
+> > +#define AREA_DMA32 (AREA_LOWEST | AREA_LOW)
+> > +#define AREA_PAE36 (AREA_LOWEST | AREA_LOW | AREA_HIGH)  
 > 
-> When we receive intercept a DIAG_9C from the guest we verify
-> that the target real CPU associated with the virtual CPU
-> designated by the guest is running and if not we forward the
-> DIAG_9C to the target real CPU.
+> This confuses the heck out of me.
+> The other things look ok to me though.
+
+if you want a page below 4G, then you don't want to restrict yourself
+to the area between 16M and 32G; the area below 16M is good too.
+
+same for 64G.
+
+> >  
+> >  #endif
+> > diff --git a/lib/alloc_page.h b/lib/alloc_page.h
+> > index 816ff5d..b6aace5 100644
+> > --- a/lib/alloc_page.h
+> > +++ b/lib/alloc_page.h
+> > @@ -10,6 +10,9 @@
+> >  
+> >  #include <asm/memory_areas.h>
+> >  
+> > +#define AREA_ANY -1
+> > +#define AREA_ANY_NUMBER 0xff
+> > +
+> >  /* Returns true if the page allocator has been initialized */
+> >  bool page_alloc_initialized(void);
+> >  
+> > diff --git a/lib/alloc_page.c b/lib/alloc_page.c
+> > index 685ab1e..ed0ff02 100644
+> > --- a/lib/alloc_page.c
+> > +++ b/lib/alloc_page.c
+> > @@ -19,8 +19,6 @@
+> >  #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
+> >  #define PFN(x) ((uintptr_t)(x) >> PAGE_SHIFT)
+> >  
+> > -#define MAX_AREAS	6
+> > -
+> >  #define ORDER_MASK	0x3f
+> >  #define ALLOC_MASK	0x40
+> >  #define SPECIAL_MASK	0x80
+> > @@ -509,7 +507,7 @@ void page_alloc_init_area(u8 n, uintptr_t
+> > base_pfn, uintptr_t top_pfn) return;
+> >  	}
+> >  #ifdef AREA_HIGH_PFN
+> > -	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN),
+> > base_pfn, &top_pfn);
+> > +	__page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN,
+> > base_pfn, &top_pfn); #endif
+> >  	__page_alloc_init_area(AREA_NORMAL_NUMBER,
+> > AREA_NORMAL_PFN, base_pfn, &top_pfn); #ifdef AREA_LOW_PFN
+> >   
 > 
-> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
-> 
-> The rate is calculated as a count per second defined as a
-> new parameter of the s390 kvm module: diag9c_forwarding_hz .
-> 
-> The default value is to not forward diag9c.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  1 +
->  arch/s390/include/asm/smp.h      |  1 +
->  arch/s390/kernel/smp.c           |  1 +
->  arch/s390/kvm/diag.c             | 31 ++++++++++++++++++++++++++++---
->  arch/s390/kvm/kvm-s390.c         |  6 ++++++
->  arch/s390/kvm/kvm-s390.h         |  8 ++++++++
->  6 files changed, 45 insertions(+), 3 deletions(-)
-> 
-
-(...)
-
-> @@ -167,9 +180,21 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
->  	if (!tcpu)
->  		goto no_yield;
->  
-> -	/* target already running */
-> -	if (READ_ONCE(tcpu->cpu) >= 0)
-> -		goto no_yield;
-> +	/* target VCPU already running */
-
-Maybe make this /* target guest VPCU already running */...
-
-> +	if (READ_ONCE(tcpu->cpu) >= 0) {
-> +		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
-> +			goto no_yield;
-> +
-> +		/* target CPU already running */
-
-...and this /* target host CPU already running */? I just read this
-several times and was confused before I spotted the difference :)
-
-> +		if (!vcpu_is_preempted(tcpu->cpu))
-> +			goto no_yield;
-> +		smp_yield_cpu(tcpu->cpu);
-> +		VCPU_EVENT(vcpu, 5,
-> +			   "diag time slice end directed to %d: yield forwarded",
-> +			   tid);
-> +		vcpu->stat.diagnose_9c_forward++;
-> +		return 0;
-> +	}
->  
->  	if (kvm_vcpu_yield_to(tcpu) <= 0)
->  		goto no_yield;
-
-(...)
 
