@@ -2,235 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 580CF2FC503
+	by mail.lfdr.de (Postfix) with ESMTP id C46142FC504
 	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 00:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729771AbhASXqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 18:46:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730760AbhASXqT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 18:46:19 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2933DC061573
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 15:45:39 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id g15so967718pjd.2
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 15:45:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=dV/5VOT7tyIqPDG6JNcIPQ9CGyn+MA2Lx+QvsRY3jAU=;
-        b=FrYR48URBI/1jNNfAzj8C8qVNfgeg51O8r9wkp+5nDBYR1FAxyOwmZnsWemLTOzj4A
-         mHUpqvetCMRjgJ5chG8IZosODMUoDDyaRiRk6sRXg+ohIbk4EH/RGccFZHxGogm3Mo1+
-         ds7bktBM1SUW9y0rStdW1uHgJxHGRtUWehHb3j+HjRRPuWYNC4u5naAKmM9UN5fS3DQ8
-         E9FiajeOn1Ij5qn2v64LrcjCzzCIRppz9oJJnmIpU1LEMLk/vlVV4tjjXOJG/kOoOwRb
-         Zt8/Z0MQEhzLdvuCn5AAZinKksIf9QIK3M7Q3dgaLMDSYhW7+tENz0cOwaKJsehIwPGO
-         ORfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=dV/5VOT7tyIqPDG6JNcIPQ9CGyn+MA2Lx+QvsRY3jAU=;
-        b=TCMouvNEeCuAtySHy9WAhFOpJeCFdf9yI0tVpCGtCzVUmkNgNL41OoYDrzOPsnqJp4
-         XmOWHkep1gSNVrZ2YhPwV/UfI4AumG8/aUs6POm3Q3rCtirxyqS4dlf9mmGpEL1fvfjb
-         JlCDaw1norlplxqOBlXp/wpbw7/yEBcXTb7hAti/6sLjuct2LAi80N6XBsUL7Qe56KNM
-         X2XTh7DchszVh/Fsc/NB4XZAdyAHDA764TtKrju37Xmd541IuWbAenCxWVC/KmwKqoHd
-         OcFLSdqbfTxlmEhywp7GEYDxj6c/M4iZQCVm1nk2xEsJTu5EZSwsp/7Z2f/BN+mT1Zde
-         5+vg==
-X-Gm-Message-State: AOAM533I2JIYzOg2AdH9u9Hhd9EwoZNCUx9kDob//DgY3GTbrr/6yssR
-        m5baYJyZF3Tbevp5kOvh5wt1cg==
-X-Google-Smtp-Source: ABdhPJxCaGRsnlKFaHYeNlT9jQJVFg4OxLA4bp3oL3oX0QowYLBtbFUTs9aaTXnICJaF92ZcUZJi5Q==
-X-Received: by 2002:a17:90a:5802:: with SMTP id h2mr2430282pji.68.1611099938467;
-        Tue, 19 Jan 2021 15:45:38 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id m62sm196779pfm.135.2021.01.19.15.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jan 2021 15:45:37 -0800 (PST)
-Date:   Tue, 19 Jan 2021 15:45:30 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Babu Moger <babu.moger@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, fenghua.yu@intel.com, tony.luck@intel.com,
-        wanpengli@tencent.com, kvm@vger.kernel.org,
-        thomas.lendacky@amd.com, peterz@infradead.org, joro@8bytes.org,
-        x86@kernel.org, kyung.min.park@intel.com,
-        linux-kernel@vger.kernel.org, krish.sadhukhan@oracle.com,
-        hpa@zytor.com, mgross@linux.intel.com, vkuznets@redhat.com,
-        kim.phillips@amd.com, wei.huang2@amd.com, jmattson@google.com
-Subject: Re: [PATCH v3 2/2] KVM: SVM: Add support for Virtual SPEC_CTRL
-Message-ID: <YAdvGkwtJf3CDxo6@google.com>
-References: <161073115461.13848.18035972823733547803.stgit@bmoger-ubuntu>
- <161073130040.13848.4508590528993822806.stgit@bmoger-ubuntu>
- <YAclaWCL20at/0n+@google.com>
- <c3a81da0-4b6a-1854-1b67-31df5fbf30f6@amd.com>
+        id S1729890AbhASXqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 18:46:52 -0500
+Received: from mail-eopbgr770049.outbound.protection.outlook.com ([40.107.77.49]:45638
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731022AbhASXqa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 18:46:30 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kR0Qw0v9ln3rhc7kp0aEq/q8sa2N09lJ8padbLtbIEvWZ3+2mUb73Zt+YtDVOlQdpdBMYBo9289ijs1MQVkcLqVguLY3Br+sn1qNgKhZKhrkV37MbYfKdzG4hSpigo2t6nIZkOWJgxKYLV317S5Wsl3YS0of+3l5Q5fsHOnUXcvjR/9DknHFolSeWh/TMVaJzvt0NaB2fXdhA2R9dDHtE6R5P9i8xB8z4q5eKR2YwZE4rUEySJI1WcEjOPYXFAEgDH9qqvDEb9hcJLJQP5/qLa/m9EnhSiHZD8NqWNKnsGcGsqI+4k3ot5Rqefrwa349MTlxJjJm53N8brnfith8/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=94pgvnFH6snZe4YYEFLBPbPjfRA5MYj/GeXe5lqYWBY=;
+ b=IieJSL7l45tSqgljEcUrZx/4GST2Vnr9KpW64A3UoHjmlLaFeSZn8nnt7azj+uRFWZoA6CtKCI697ckYb2OfdOSdHQcJAvArQxxwHSigXwp9tSg+d1M1h1eGBJaOSSOpc2ydT3a3asshZm5h4GcGhNApUW5I4guXd9SUwhNzu7Cd6mv6ptT+ER1ePcyvwg4XuwnhbOjRD7tuUwca2yT6XFHx5W6sTQWXOJaDiM9jV7RwNt3dB5rRO+nnqbVDUHlTi1ya3P/a0v6Zf/kFABKB4+Qx56nit4LwXGVD3ePa/5DX81B42v5lfp6YYXTR6JwFXF/BxpKhE1V6JWYnNRxFkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=94pgvnFH6snZe4YYEFLBPbPjfRA5MYj/GeXe5lqYWBY=;
+ b=lib6cifSmLZG/HTiqjC5bhikU/sn2VIu32a6872Z0XXmwI9hZx+ulIH78wJKZUQPke4VI88Ofe8Mnq/h12SwbpptUVtYP54+z0MnfYKIJTiYh1q2Urn86diYH0vrVOSDbkBdQ+xBgRQ09lCXabtNLkr3TZur2mfDmXL5k/3JQ28=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SA0PR12MB4528.namprd12.prod.outlook.com (2603:10b6:806:9e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11; Tue, 19 Jan
+ 2021 23:45:42 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3763.014; Tue, 19 Jan 2021
+ 23:45:42 +0000
+Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Makarand Sonare <makarandsonare@google.com>
+References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
+ <83a96ca9-0810-6c07-2e45-5aa2da9b1ab0@redhat.com>
+ <5df9b517-448f-d631-2222-6e78d6395ed9@amd.com>
+ <CALMp9eRDSW66+XvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com>
+From:   Babu Moger <babu.moger@amd.com>
+Message-ID: <bb2315e3-1c24-c5ae-3947-27c5169a9d47@amd.com>
+Date:   Tue, 19 Jan 2021 17:45:38 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <CALMp9eRDSW66+XvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: CH2PR11CA0026.namprd11.prod.outlook.com
+ (2603:10b6:610:54::36) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c3a81da0-4b6a-1854-1b67-31df5fbf30f6@amd.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.136] (165.204.77.1) by CH2PR11CA0026.namprd11.prod.outlook.com (2603:10b6:610:54::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.9 via Frontend Transport; Tue, 19 Jan 2021 23:45:40 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: b9038c2a-c049-4dd0-22fe-08d8bcd4550d
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4528:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4528517F61F8717BDCD09B2C95A39@SA0PR12MB4528.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: c46r0s23+58nAfVnX6Fy/VvQXYQLZlqijumzVNhQtJuGIoXLqg4BVWRmgNWr+goCTjmDigNwEERqyoeujCGW2WEwtPimy9x9VifwFhnlaIPsFYkDYgzjbrKGMYQ8OeV2/fzZwf+5BLD/WhzKJPDRjaexhW+hyK8uTmYKQmPvbpMvPVIWoPswrZxr0HVKe5o+O04ywvbX6KGlTASzuupFwA8MlsZppJutNUtvmBpxq4CX1KrL7sM9UoIVOCI3X4Hs6WjROPIzJ7Dym0oxeQnYtDJ6LQtTotcGzUtMqlfeZb0JFuZ6aNiqu737RAgy9ZfpoWW/ijpdlu7DkmFKVdOBcLq2uJ8R67yhNjaHfuV0xKQbR9UYf3w48ERm6xvE4V4uWV2aoV/JMv1GGe5Udw/7Tlii1VYD5BxTyB9csp7GmwlQU7KjRzGGmtBA98jBbwer8fSnXPi7BI3+NkaV7UPFTD1XjFMpSKN/BlOr6Gm5VGzcyB26lwvBzwYNOTKay0Xv2wE7amyEBfe48rFd+KX8B+Z8PVyihlW7FHAFVL9ePyF345fM1y4ue8cIeB9Ofidh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39850400004)(376002)(136003)(346002)(396003)(26005)(66946007)(66556008)(956004)(2616005)(83380400001)(16526019)(66476007)(53546011)(36756003)(186003)(8936002)(86362001)(16576012)(44832011)(7416002)(54906003)(316002)(4744005)(2906002)(6916009)(52116002)(6486002)(31696002)(966005)(4326008)(8676002)(31686004)(5660300002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NzM2QzFaWXB3UDdlK2Zzc1B3VDRMdExOZGdhbVpvaGZ3R2pneWxjYVVodTRp?=
+ =?utf-8?B?YitWSmR6dUlWdDJuZ1ZVdnk5S1VDNE9MSUNsMGhKRXpwSDZOUHNGWHBjeW9J?=
+ =?utf-8?B?REFtcXpFT2xoUk1wQzVLdVZKVGhYalBXZXVnZUQ3S3lJVyswVUNUNzhFTHQv?=
+ =?utf-8?B?cXRsZjh2ZWN2OEZoc0pzd1F2Uko2YTZTK1JMdDdDR1NuaDJJRFF0SnFGdHZq?=
+ =?utf-8?B?VXpRK0I1bS9KQWVkczZTR2toUVV4NjVqYjJZMSt4ZnRmU09oei8vcVo4MUdh?=
+ =?utf-8?B?blJoek5lQThCd0xuWlN2U0YwK2VPVGFSdThXdGdTem9QRHRTUFJCQVZnTVZE?=
+ =?utf-8?B?NlhmWVNKYzgweTVBMEIrS0ZPN3IwVHpOMlVBbzJMSUNRTXlRbW1GQ3Q4V2Rt?=
+ =?utf-8?B?eFpLdkRFclJ1VDB4N2JWZm96ZDN2dlZKcUw1cFVTZkxYcTJrdzh5QUFyaDUy?=
+ =?utf-8?B?YTh5MUhXL29rQ1RvcThhUVFjRWFCYjQvOEZjanBVWWFlbzdsZjFCbHN4RXJ5?=
+ =?utf-8?B?eXBBWWJ0Y2hsR0pVYnNTVWl0MHRjZXNBZjIvZ1ZvWk53T212aUdKOWdXZzR5?=
+ =?utf-8?B?NXFkVExvNzd4NlN6c0FLbWxUN0t1UDB2OTNMNE43V010ZzdCUUIvbFdEOUZj?=
+ =?utf-8?B?eWVHNFpReGJyRER6ZDc0aXRZYmZXdXNxWW9EMnpVU3FxdWxrWjFVYzV6VEFX?=
+ =?utf-8?B?TDhZNmxkSTRmVFlyTU9BWVh2RDJQWkpHek1uRDFtMzJjcSszZzc1R08rQlBq?=
+ =?utf-8?B?TXptQm96V2dZYk1XWVdITXU4L3F5YTNSUTZTOThIYS94YSsyTVhYeWJhdkZW?=
+ =?utf-8?B?RkJwVUZRRVg2ZDJXbGQwcjAxeEFpdDgxdnJDOFVicFBFTFBuWjZlekkrT3c0?=
+ =?utf-8?B?Q1dQZWZIVnNaVDYrS05PT1c5cU9ZeDVoYmd2UUdnRXZSeG1vaER1VXZMVU9w?=
+ =?utf-8?B?cEVuampZMW1yYWVTUlhsVUN4QnA4NTlKTW04S3BEUkFRR0NWRkNFanJLbjFp?=
+ =?utf-8?B?Zno3bHlpZmp3U0w1elJ6T2NuVFFYNDRISU5FcnRra0ZZTDd5TlAzQ2t3VkVF?=
+ =?utf-8?B?cmdDVGJrTC9adm8xUnRsaTdGbjFBZ3FHNUx1ZmVzUkpQTVFUSUJDLzRqTExu?=
+ =?utf-8?B?SnRBNEsyVzE3SWR1MjR4dWQzSzdJUnBTTGFNZkZPVEpiU2NoSFVjakhuNkFv?=
+ =?utf-8?B?dThZKzlBdmhnY1o3VU1sSnRubkR4cjkyRllEdE5SbmZ5REdGR2R3ekhrZlh6?=
+ =?utf-8?B?Tm93Nis4R2N1c2VrMHFka0plZXFTR3JGeDBCN29MSWZjWWVsZkRLNDJ6R0Ny?=
+ =?utf-8?Q?RVBMNWuofIaWqrQLx7StJzo4Iro99Iv99W?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b9038c2a-c049-4dd0-22fe-08d8bcd4550d
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2021 23:45:42.0906
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lX9Y+LsdBDGSD94Dj4Z7L50Q5qrJHyYW+2/5pHRNR6HA5nNMZOwfrVq+X22RP0+4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4528
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 19, 2021, Babu Moger wrote:
+
+
+On 1/19/21 5:01 PM, Jim Mattson wrote:
+> On Mon, Sep 14, 2020 at 11:33 AM Babu Moger <babu.moger@amd.com> wrote:
 > 
-> On 1/19/21 12:31 PM, Sean Christopherson wrote:
-> > On Fri, Jan 15, 2021, Babu Moger wrote:
-> >> @@ -3789,7 +3792,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
-> >>  	 * is no need to worry about the conditional branch over the wrmsr
-> >>  	 * being speculatively taken.
-> >>  	 */
-> >> -	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-> >> +	if (static_cpu_has(X86_FEATURE_V_SPEC_CTRL))
-> >> +		svm->vmcb->save.spec_ctrl = svm->spec_ctrl;
-> >> +	else
-> >> +		x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-> > 
-> > Can't we avoid functional code in svm_vcpu_run() entirely when V_SPEC_CTRL is
-> > supported?  Make this code a nop, disable interception from time zero, and
+>> Thanks Paolo. Tested Guest/nested guest/kvm units tests. Everything works
+>> as expected.
 > 
-> Sean, I thought you mentioned earlier about not changing the interception
-> mechanism.
+> Debian 9 does not like this patch set. As a kvm guest, it panics on a
+> Milan CPU unless booted with 'nopcid'. Gmail mangles long lines, so
+> please see the attached kernel log snippet. Debian 10 is fine, so I
+> assume this is a guest bug.
+> 
 
-I assume you're referring to this comment?
-
-  On Mon, Dec 7, 2020 at 3:13 PM Sean Christopherson <seanjc@google.com> wrote:
-  >
-  > On Mon, Dec 07, 2020, Babu Moger wrote:
-  > > When this feature is enabled, the hypervisor no longer has to
-  > > intercept the usage of the SPEC_CTRL MSR and no longer is required to
-  > > save and restore the guest SPEC_CTRL setting when switching
-  > > hypervisor/guest modes.
-  >
-  > Well, it's still required if the hypervisor wanted to allow the guest to turn
-  > off mitigations that are enabled in the host.  I'd omit this entirely and focus
-  > on what hardware does and how Linux/KVM utilize the new feature.
-
-I wasn't suggesting that KVM should intercept SPEC_CTRL, I was pointing out that
-there exists a scenario where a hypervisor would need/want to intercept
-SPEC_CTRL, and that stating that a hypervisor is/isn't required to do something
-isn't helpful in a KVM/Linux changelog because it doesn't describe the actual
-change, nor does it help understand _why_ the change is correct.
-
-> Do you think we should disable the interception right away if V_SPEC_CTRL is
-> supported?
-
-Yes, unless I'm missing an interaction somewhere, that will simplify the get/set
-flows as they won't need to handle the case where the MSR is intercepted when
-V_SPEC_CTRL is supported.  If the MSR is conditionally passed through, the get
-flow would need to check if the MSR is intercepted to determine whether
-svm->spec_ctrl or svm->vmcb->save.spec_ctrl holds the guest's value.
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cce0143a6f80..40f1bd449cfa 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2678,7 +2678,10 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                    !guest_has_spec_ctrl_msr(vcpu))
-                        return 1;
- 
--               msr_info->data = svm->spec_ctrl;
-+               if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL))
-+                       msr_info->data = svm->vmcb->save.spec_ctrl;
-+               else
-+                       msr_info->data = svm->spec_ctrl;
-                break;
-        case MSR_AMD64_VIRT_SPEC_CTRL:
-                if (!msr_info->host_initiated &&
-@@ -2779,6 +2782,11 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
-                if (kvm_spec_ctrl_test_value(data))
-                        return 1;
- 
-+               if (boot_cpu_has(X86_FEATURE_V_SPEC_CTRL)) {
-+                       svm->vmcb->save.spec_ctrl = data;
-+                       break;
-+               }
-+
-                svm->spec_ctrl = data;
-                if (!data)
-                        break;
-
-> > read/write the VMBC field in svm_{get,set}_msr().  I.e. don't touch
-> > svm->spec_ctrl if V_SPEC_CTRL is supported.  
-
-Potentially harebrained alternative...
-
-From an architectural SVM perspective, what are the rules for VMCB fields that
-don't exist (on the current hardware)?  E.g. are they reserved MBZ?  If not,
-does the SVM architecture guarantee that reserved fields will not be modified?
-I couldn't (quickly) find anything in the APM that explicitly states what
-happens with defined-but-not-existent fields.
-
-Specifically in the context of this change, ignoring nested correctness, what
-would happen if KVM used the VMCB field even on CPUs without V_SPEC_CTRL?  Would
-this explode on VMRUN?  Risk silent corruption?  Just Work (TM)?
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index cce0143a6f80..22a6a7c35d0a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1285,7 +1285,6 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-        u32 dummy;
-        u32 eax = 1;
-
--       svm->spec_ctrl = 0;
-        svm->virt_spec_ctrl = 0;
-
-        if (!init_event) {
-@@ -2678,7 +2677,7 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                    !guest_has_spec_ctrl_msr(vcpu))
-                        return 1;
-
--               msr_info->data = svm->spec_ctrl;
-+               msr_info->data = svm->vmcb->save.spec_ctrl;
-                break;
-        case MSR_AMD64_VIRT_SPEC_CTRL:
-                if (!msr_info->host_initiated &&
-@@ -2779,7 +2778,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
-                if (kvm_spec_ctrl_test_value(data))
-                        return 1;
-
--               svm->spec_ctrl = data;
-+               svm->vmcb->save.spec_ctrl = data;
-                if (!data)
-                        break;
-
-@@ -3791,7 +3790,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
-         * is no need to worry about the conditional branch over the wrmsr
-         * being speculatively taken.
-         */
--       x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-+       x86_spec_ctrl_set_guest(svm->vmcb->save.spec_ctrl, svm->virt_spec_ctrl);
-
-        svm_vcpu_enter_exit(vcpu, svm);
-
-@@ -3811,12 +3810,12 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
-         * save it.
-         */
-        if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
--               svm->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
-+               svm->vmcb->save.spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
-
-        if (!sev_es_guest(svm->vcpu.kvm))
-                reload_tss(vcpu);
-
--       x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
-+       x86_spec_ctrl_restore_host(svm->vmcb->save.spec_ctrl, svm->virt_spec_ctrl);
-
-        if (!sev_es_guest(svm->vcpu.kvm)) {
-                vcpu->arch.cr2 = svm->vmcb->save.cr2;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 5431e6335e2e..a4f9417e3b7e 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -137,7 +137,6 @@ struct vcpu_svm {
-                u64 gs_base;
-        } host;
-
--       u64 spec_ctrl;
-        /*
-         * Contains guest-controlled bits of VIRT_SPEC_CTRL, which will be
-         * translated into the appropriate L2_CFG bits on the host to
+We had an issue with PCID feature earlier. This was showing only with SEV
+guests. It is resolved recently. Do you think it is not related that?
+Here are the patch set.
+https://lore.kernel.org/kvm/160521930597.32054.4906933314022910996.stgit@bmoger-ubuntu/
 
