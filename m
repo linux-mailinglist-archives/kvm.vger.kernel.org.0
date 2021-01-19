@@ -2,138 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C46142FC504
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 00:47:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDC6A2FC588
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 01:19:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729890AbhASXqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 18:46:52 -0500
-Received: from mail-eopbgr770049.outbound.protection.outlook.com ([40.107.77.49]:45638
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731022AbhASXqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 18:46:30 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kR0Qw0v9ln3rhc7kp0aEq/q8sa2N09lJ8padbLtbIEvWZ3+2mUb73Zt+YtDVOlQdpdBMYBo9289ijs1MQVkcLqVguLY3Br+sn1qNgKhZKhrkV37MbYfKdzG4hSpigo2t6nIZkOWJgxKYLV317S5Wsl3YS0of+3l5Q5fsHOnUXcvjR/9DknHFolSeWh/TMVaJzvt0NaB2fXdhA2R9dDHtE6R5P9i8xB8z4q5eKR2YwZE4rUEySJI1WcEjOPYXFAEgDH9qqvDEb9hcJLJQP5/qLa/m9EnhSiHZD8NqWNKnsGcGsqI+4k3ot5Rqefrwa349MTlxJjJm53N8brnfith8/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=94pgvnFH6snZe4YYEFLBPbPjfRA5MYj/GeXe5lqYWBY=;
- b=IieJSL7l45tSqgljEcUrZx/4GST2Vnr9KpW64A3UoHjmlLaFeSZn8nnt7azj+uRFWZoA6CtKCI697ckYb2OfdOSdHQcJAvArQxxwHSigXwp9tSg+d1M1h1eGBJaOSSOpc2ydT3a3asshZm5h4GcGhNApUW5I4guXd9SUwhNzu7Cd6mv6ptT+ER1ePcyvwg4XuwnhbOjRD7tuUwca2yT6XFHx5W6sTQWXOJaDiM9jV7RwNt3dB5rRO+nnqbVDUHlTi1ya3P/a0v6Zf/kFABKB4+Qx56nit4LwXGVD3ePa/5DX81B42v5lfp6YYXTR6JwFXF/BxpKhE1V6JWYnNRxFkA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=94pgvnFH6snZe4YYEFLBPbPjfRA5MYj/GeXe5lqYWBY=;
- b=lib6cifSmLZG/HTiqjC5bhikU/sn2VIu32a6872Z0XXmwI9hZx+ulIH78wJKZUQPke4VI88Ofe8Mnq/h12SwbpptUVtYP54+z0MnfYKIJTiYh1q2Urn86diYH0vrVOSDbkBdQ+xBgRQ09lCXabtNLkr3TZur2mfDmXL5k/3JQ28=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SA0PR12MB4528.namprd12.prod.outlook.com (2603:10b6:806:9e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11; Tue, 19 Jan
- 2021 23:45:42 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3763.014; Tue, 19 Jan 2021
- 23:45:42 +0000
-Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Makarand Sonare <makarandsonare@google.com>
-References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
- <83a96ca9-0810-6c07-2e45-5aa2da9b1ab0@redhat.com>
- <5df9b517-448f-d631-2222-6e78d6395ed9@amd.com>
- <CALMp9eRDSW66+XvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com>
-From:   Babu Moger <babu.moger@amd.com>
-Message-ID: <bb2315e3-1c24-c5ae-3947-27c5169a9d47@amd.com>
-Date:   Tue, 19 Jan 2021 17:45:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <CALMp9eRDSW66+XvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: CH2PR11CA0026.namprd11.prod.outlook.com
- (2603:10b6:610:54::36) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+        id S1728438AbhATASP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 19:18:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3164 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392172AbhASNqq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 08:46:46 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JDA3jh056532;
+        Tue, 19 Jan 2021 08:12:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ET6sLnP+eJhqvkmcsRzmxETAVCUxIheSvgW3gOmrth4=;
+ b=g1NZg/akGdKOW3552smjVc/TaElmonUL+GWJbUf3xTnyi0HT7cLsWpReL0QyiP0TPws6
+ O3hHji/pWuvCapaoYGeucFpbyH88+jLb8hLoz5OxyAGICxNvM1zs9mLYNIQ4LKSOVV2E
+ GO382NHnAinSDNPvVSPOB7uBRy+vIedP8IrDzU6cG/Wy0jDJsFZPuAFiAt9QJ2Zb9ed2
+ gAwDprUVbmpQtPM+X5Lz5f5ZpUg3bIdp72schIbVeVacj35L8ZfQndTQU6pm0hwQPaP4
+ OeR/YrN+EzlpEIq65KNo8aT1ubGnfqS6G89B+icbL2JHyMUsL0tVNIavgViR/AC8dv0N 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365ypcrm2j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 08:12:13 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JDBtfd068086;
+        Tue, 19 Jan 2021 08:12:12 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365ypcrm1q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 08:12:12 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JCv16X002704;
+        Tue, 19 Jan 2021 13:12:09 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 363qs89ke8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 13:12:09 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JDC6UQ39321954
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 13:12:07 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D562AA404D;
+        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5080CA4053;
+        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.4.167])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
+Date:   Tue, 19 Jan 2021 14:11:33 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org, gor@linux.ibm.com,
+        mihajlov@linux.ibm.com
+Subject: Re: [PATCH 1/2] s390: uv: Fix sysfs max number of VCPUs reporting
+Message-ID: <20210119141133.186273c1@ibm-vm>
+In-Reply-To: <20210119100402.84734-2-frankja@linux.ibm.com>
+References: <20210119100402.84734-1-frankja@linux.ibm.com>
+        <20210119100402.84734-2-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.136] (165.204.77.1) by CH2PR11CA0026.namprd11.prod.outlook.com (2603:10b6:610:54::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.9 via Frontend Transport; Tue, 19 Jan 2021 23:45:40 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b9038c2a-c049-4dd0-22fe-08d8bcd4550d
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4528:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4528517F61F8717BDCD09B2C95A39@SA0PR12MB4528.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: c46r0s23+58nAfVnX6Fy/VvQXYQLZlqijumzVNhQtJuGIoXLqg4BVWRmgNWr+goCTjmDigNwEERqyoeujCGW2WEwtPimy9x9VifwFhnlaIPsFYkDYgzjbrKGMYQ8OeV2/fzZwf+5BLD/WhzKJPDRjaexhW+hyK8uTmYKQmPvbpMvPVIWoPswrZxr0HVKe5o+O04ywvbX6KGlTASzuupFwA8MlsZppJutNUtvmBpxq4CX1KrL7sM9UoIVOCI3X4Hs6WjROPIzJ7Dym0oxeQnYtDJ6LQtTotcGzUtMqlfeZb0JFuZ6aNiqu737RAgy9ZfpoWW/ijpdlu7DkmFKVdOBcLq2uJ8R67yhNjaHfuV0xKQbR9UYf3w48ERm6xvE4V4uWV2aoV/JMv1GGe5Udw/7Tlii1VYD5BxTyB9csp7GmwlQU7KjRzGGmtBA98jBbwer8fSnXPi7BI3+NkaV7UPFTD1XjFMpSKN/BlOr6Gm5VGzcyB26lwvBzwYNOTKay0Xv2wE7amyEBfe48rFd+KX8B+Z8PVyihlW7FHAFVL9ePyF345fM1y4ue8cIeB9Ofidh
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39850400004)(376002)(136003)(346002)(396003)(26005)(66946007)(66556008)(956004)(2616005)(83380400001)(16526019)(66476007)(53546011)(36756003)(186003)(8936002)(86362001)(16576012)(44832011)(7416002)(54906003)(316002)(4744005)(2906002)(6916009)(52116002)(6486002)(31696002)(966005)(4326008)(8676002)(31686004)(5660300002)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NzM2QzFaWXB3UDdlK2Zzc1B3VDRMdExOZGdhbVpvaGZ3R2pneWxjYVVodTRp?=
- =?utf-8?B?YitWSmR6dUlWdDJuZ1ZVdnk5S1VDNE9MSUNsMGhKRXpwSDZOUHNGWHBjeW9J?=
- =?utf-8?B?REFtcXpFT2xoUk1wQzVLdVZKVGhYalBXZXVnZUQ3S3lJVyswVUNUNzhFTHQv?=
- =?utf-8?B?cXRsZjh2ZWN2OEZoc0pzd1F2Uko2YTZTK1JMdDdDR1NuaDJJRFF0SnFGdHZq?=
- =?utf-8?B?VXpRK0I1bS9KQWVkczZTR2toUVV4NjVqYjJZMSt4ZnRmU09oei8vcVo4MUdh?=
- =?utf-8?B?blJoek5lQThCd0xuWlN2U0YwK2VPVGFSdThXdGdTem9QRHRTUFJCQVZnTVZE?=
- =?utf-8?B?NlhmWVNKYzgweTVBMEIrS0ZPN3IwVHpOMlVBbzJMSUNRTXlRbW1GQ3Q4V2Rt?=
- =?utf-8?B?eFpLdkRFclJ1VDB4N2JWZm96ZDN2dlZKcUw1cFVTZkxYcTJrdzh5QUFyaDUy?=
- =?utf-8?B?YTh5MUhXL29rQ1RvcThhUVFjRWFCYjQvOEZjanBVWWFlbzdsZjFCbHN4RXJ5?=
- =?utf-8?B?eXBBWWJ0Y2hsR0pVYnNTVWl0MHRjZXNBZjIvZ1ZvWk53T212aUdKOWdXZzR5?=
- =?utf-8?B?NXFkVExvNzd4NlN6c0FLbWxUN0t1UDB2OTNMNE43V010ZzdCUUIvbFdEOUZj?=
- =?utf-8?B?eWVHNFpReGJyRER6ZDc0aXRZYmZXdXNxWW9EMnpVU3FxdWxrWjFVYzV6VEFX?=
- =?utf-8?B?TDhZNmxkSTRmVFlyTU9BWVh2RDJQWkpHek1uRDFtMzJjcSszZzc1R08rQlBq?=
- =?utf-8?B?TXptQm96V2dZYk1XWVdITXU4L3F5YTNSUTZTOThIYS94YSsyTVhYeWJhdkZW?=
- =?utf-8?B?RkJwVUZRRVg2ZDJXbGQwcjAxeEFpdDgxdnJDOFVicFBFTFBuWjZlekkrT3c0?=
- =?utf-8?B?Q1dQZWZIVnNaVDYrS05PT1c5cU9ZeDVoYmd2UUdnRXZSeG1vaER1VXZMVU9w?=
- =?utf-8?B?cEVuampZMW1yYWVTUlhsVUN4QnA4NTlKTW04S3BEUkFRR0NWRkNFanJLbjFp?=
- =?utf-8?B?Zno3bHlpZmp3U0w1elJ6T2NuVFFYNDRISU5FcnRra0ZZTDd5TlAzQ2t3VkVF?=
- =?utf-8?B?cmdDVGJrTC9adm8xUnRsaTdGbjFBZ3FHNUx1ZmVzUkpQTVFUSUJDLzRqTExu?=
- =?utf-8?B?SnRBNEsyVzE3SWR1MjR4dWQzSzdJUnBTTGFNZkZPVEpiU2NoSFVjakhuNkFv?=
- =?utf-8?B?dThZKzlBdmhnY1o3VU1sSnRubkR4cjkyRllEdE5SbmZ5REdGR2R3ekhrZlh6?=
- =?utf-8?B?Tm93Nis4R2N1c2VrMHFka0plZXFTR3JGeDBCN29MSWZjWWVsZkRLNDJ6R0Ny?=
- =?utf-8?Q?RVBMNWuofIaWqrQLx7StJzo4Iro99Iv99W?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9038c2a-c049-4dd0-22fe-08d8bcd4550d
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2021 23:45:42.0906
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lX9Y+LsdBDGSD94Dj4Z7L50Q5qrJHyYW+2/5pHRNR6HA5nNMZOwfrVq+X22RP0+4
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4528
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-19_04:2021-01-18,2021-01-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2101190077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 19 Jan 2021 05:04:01 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
+> The number reported by the query is N-1 and I think people reading the
+> sysfs file would expect N instead. For users creating VMs there's no
+> actual difference because KVM's limit is currently below the UV's
+> limit.
+> 
+> The naming of the field is a bit misleading. Number in this context is
+> used like ID and starts at 0. The query field denotes the maximum
+> number that can be put into the VCPU number field in the "create
+> secure CPU" UV call.
 
-On 1/19/21 5:01 PM, Jim Mattson wrote:
-> On Mon, Sep 14, 2020 at 11:33 AM Babu Moger <babu.moger@amd.com> wrote:
-> 
->> Thanks Paolo. Tested Guest/nested guest/kvm units tests. Everything works
->> as expected.
-> 
-> Debian 9 does not like this patch set. As a kvm guest, it panics on a
-> Milan CPU unless booted with 'nopcid'. Gmail mangles long lines, so
-> please see the attached kernel log snippet. Debian 10 is fine, so I
-> assume this is a guest bug.
-> 
+once you address Christian's comments:
 
-We had an issue with PCID feature earlier. This was showing only with SEV
-guests. It is resolved recently. Do you think it is not related that?
-Here are the patch set.
-https://lore.kernel.org/kvm/160521930597.32054.4906933314022910996.stgit@bmoger-ubuntu/
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Fixes: a0f60f8431999 ("s390/protvirt: Add sysfs firmware interface
+> for Ultravisor information") Cc: stable@vger.kernel.org
+> ---
+>  arch/s390/boot/uv.c        | 2 +-
+>  arch/s390/include/asm/uv.h | 4 ++--
+>  arch/s390/kernel/uv.c      | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
+> index a15c033f53ca..afb721082989 100644
+> --- a/arch/s390/boot/uv.c
+> +++ b/arch/s390/boot/uv.c
+> @@ -35,7 +35,7 @@ void uv_query_info(void)
+>  		uv_info.guest_cpu_stor_len = uvcb.cpu_stor_len;
+>  		uv_info.max_sec_stor_addr =
+> ALIGN(uvcb.max_guest_stor_addr, PAGE_SIZE); uv_info.max_num_sec_conf
+> = uvcb.max_num_sec_conf;
+> -		uv_info.max_guest_cpus = uvcb.max_guest_cpus;
+> +		uv_info.max_guest_cpu_id = uvcb.max_guest_cpu_num;
+>  	}
+>  
+>  #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 0325fc0469b7..c484c95ea142 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -96,7 +96,7 @@ struct uv_cb_qui {
+>  	u32 max_num_sec_conf;
+>  	u64 max_guest_stor_addr;
+>  	u8  reserved88[158 - 136];
+> -	u16 max_guest_cpus;
+> +	u16 max_guest_cpu_num;
+>  	u8  reserveda0[200 - 160];
+>  } __packed __aligned(8);
+>  
+> @@ -273,7 +273,7 @@ struct uv_info {
+>  	unsigned long guest_cpu_stor_len;
+>  	unsigned long max_sec_stor_addr;
+>  	unsigned int max_num_sec_conf;
+> -	unsigned short max_guest_cpus;
+> +	unsigned short max_guest_cpu_id;
+>  };
+>  
+>  extern struct uv_info uv_info;
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index 883bfed9f5c2..b2d2ad153067 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -368,7 +368,7 @@ static ssize_t uv_query_max_guest_cpus(struct
+> kobject *kobj, struct kobj_attribute *attr, char *page)
+>  {
+>  	return scnprintf(page, PAGE_SIZE, "%d\n",
+> -			uv_info.max_guest_cpus);
+> +			uv_info.max_guest_cpu_id + 1);
+>  }
+>  
+>  static struct kobj_attribute uv_query_max_guest_cpus_attr =
 
