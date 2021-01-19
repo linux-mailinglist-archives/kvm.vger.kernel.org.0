@@ -2,103 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9057A2FBDDB
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 18:39:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C832FBEDF
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 19:26:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390426AbhASRiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 12:38:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731123AbhASRiJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 12:38:09 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E22C061573
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 09:37:29 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id x20so335749pjh.3
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 09:37:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MdqFOwVOrDv/uHtp7zhA7eRG5q/biM80PO2TPXjvwKo=;
-        b=pPFA+iKzu/L+bavWAJcMVzsHHZflOSQq4KTrLUQGclf2Dbg/GVhRODHVq++nqtQBCa
-         vGU++txXX0DZAT6DuUrhppZqQ5NEgK528hyWpBpetd2/fCFXBZ/XLzQbvlivqYDqP0Ym
-         bsL8AoZSFTytLialJnzhsI8kr0WXmxMdz11dmvg1g2KkBbzCR56QQeSgBEXYvT8yF6FB
-         CC4C+mTGK0lCfUVrHOcGStp4qTFecTfIrXfa7wrO6IiQMpswJJMwTzw7Ru01RYZMOjxb
-         B2s9FK398qB1qKtgpOXRwqIs2WT88iiutEwe1NGitKhPXp5ylpcZ0LUKGQHLO03yxnRl
-         OVOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MdqFOwVOrDv/uHtp7zhA7eRG5q/biM80PO2TPXjvwKo=;
-        b=t7gfUdmq4qO2mk5kKO6SBHjV0UdxJY1gQhpVKP0KZCEqvWakt75HKoRO/DIhPHg2JE
-         AD5k/LYiBsdr93XbJ37hIAAthdExIXn0SdOidg+KV5eXh6Acf6D5RrkjNMJwSNNbV5s8
-         FAXIAcA/sT3Cs7MRbu3+mFM9w2zimh4bKMZkvk/sRGglcB4/TkLFB4xDbYJIwX9Q/8RQ
-         seUVJnYpx31xibhGRx69WKsUpFYV+DnwXT4KcsOHG7336Fwtk1GGEEWJQDNf72/iiPdL
-         SW1Nl5bmoz24Tb2R3KGB2cXikgNGz0HZ+DmVKNdgiMFox2m8f/pOS0EqtChWluxz623R
-         Y/Tg==
-X-Gm-Message-State: AOAM5336iwz4FHkevSk3+fXpOex6FvGfq8wZPUKEA8TBK4gURD6wyovu
-        Qew5VCsLCWdCsZwXxASBNmZ/OA==
-X-Google-Smtp-Source: ABdhPJweqnR4okQhtyD4rMeuhLq1nWF87H03P3+0KTSPq6NaIFgceeFGmFiK1hq7HNKwvLxnHbv4qw==
-X-Received: by 2002:a17:90a:e38a:: with SMTP id b10mr874146pjz.12.1611077846917;
-        Tue, 19 Jan 2021 09:37:26 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id p13sm3926797pju.20.2021.01.19.09.37.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jan 2021 09:37:26 -0800 (PST)
-Date:   Tue, 19 Jan 2021 09:37:19 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        mlevitsk@redhat.com
-Subject: Re: [RFC PATCH kvm-unit-tests 0/4] add generic stress test
-Message-ID: <YAcYz4nxVXHKfkXu@google.com>
-References: <20201223010850.111882-1-pbonzini@redhat.com>
- <X+pbZ061gTIbM2Ef@google.com>
- <d9a81441-9f15-45c2-69c5-6295f2891874@redhat.com>
- <X/4igkJA1ZY5rCk7@google.com>
- <e94c0b18-6067-a62b-44a2-c1eef9c7b3ff@redhat.com>
- <YACl4jtDc1IGcxiQ@google.com>
- <20210118110944.vsxw7urtbs7fmbhk@kamzik.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210118110944.vsxw7urtbs7fmbhk@kamzik.brq.redhat.com>
+        id S2392593AbhASSZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 13:25:50 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:41650 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731808AbhASSQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 13:16:47 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10JIADZs064407;
+        Tue, 19 Jan 2021 18:16:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2020-01-29;
+ bh=vgp9jsVnFm/gP6aJyenQcGYZM+2qBozeWW8dnlKiEEo=;
+ b=qHU0go1B6VsVYjzpALx9Y1o/w7OLso2lPAuiV/zNipaUWqQAXRDNvPYqkR39chtleZm2
+ PhRkgAWRo7NEtl+nWUuJH0qbKM8YP4BRvuFXn/bQojA68XtdUW4FwVqADevDB6M7Mzf7
+ X6XPJgjy1ROWC+0fzfwAi3EXynyMo05vv/R/oyQBSqulHhULO+0+Y2kR2qg+G25tvrPp
+ G70eyHiphjEr8Umk08E8KDLeGOMkokCh8dHzjS0UaVVfUJRbW/qJv4euGpAFStFFnolS
+ mA91/jvmsyIY3/oQX2I0NdORwo3M41tJhS5ERsgAjAdxiF1iW0TtCqCYeTBWlPVjwDJ+ dQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 363r3ktcpb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 18:16:02 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10JIAdkQ051066;
+        Tue, 19 Jan 2021 18:16:00 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 3661khmfr8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 18:16:00 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10JIFxPc027489;
+        Tue, 19 Jan 2021 18:15:59 GMT
+Received: from ca-dev63.us.oracle.com (/10.211.8.221)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 Jan 2021 10:15:59 -0800
+From:   Steve Sistare <steven.sistare@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Steve Sistare <steven.sistare@oracle.com>
+Subject: [PATCH V2 0/9] vfio virtual address update
+Date:   Tue, 19 Jan 2021 09:48:20 -0800
+Message-Id: <1611078509-181959-1-git-send-email-steven.sistare@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9869 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 mlxscore=0 adultscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190102
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9869 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ malwarescore=0 phishscore=0 suspectscore=0 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101190102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 18, 2021, Andrew Jones wrote:
-> On Thu, Jan 14, 2021 at 12:13:22PM -0800, Sean Christopherson wrote:
-> > On Wed, Jan 13, 2021, Paolo Bonzini wrote:
-> > > On 12/01/21 23:28, Sean Christopherson wrote:
-> > > > What's the biggest hurdle for doing this completely within the unit test
-> > > > framework?  Is teaching the framework to migrate a unit test the biggest pain?
-> > > 
-> > > Yes, pretty much.  The shell script framework would show its limits.
-> > > 
-> > > That said, I've always treated run_tests.sh as a utility more than an
-> > > integral part of kvm-unit-tests.  There's nothing that prevents a more
-> > > capable framework from parsing unittests.cfg.
-> > 
-> > Heh, got anyone you can "volunteer" to create a new framework?  One-button
-> > migration testing would be very nice to have.  I suspect I'm not the only
-> > contributor that doesn't do migration testing as part of their standard workflow.
-> >
-> 
-> We have one-button migration tests already with kvm-unit-tests. Just
-> compile the tests that use the migration framework as standalone
-> tests and then run them directly.
+Add interfaces that allow the underlying memory object of an iova range
+to be mapped to a new virtual address in the host process:
 
-Do those exist/work for x86?  I see migration stuff for Arm and PPC, but nothing
-for x86.
+  - VFIO_DMA_UNMAP_FLAG_VADDR for VFIO_IOMMU_UNMAP_DMA
+  - VFIO_DMA_MAP_FLAG_VADDR flag for VFIO_IOMMU_MAP_DMA
+  - VFIO_UPDATE_VADDR for VFIO_CHECK_EXTENSION
+  - VFIO_DMA_UNMAP_FLAG_ALL for VFIO_IOMMU_UNMAP_DMA
+  - VFIO_UNMAP_ALL for VFIO_CHECK_EXTENSION
 
-> I agree, though, that Bash is a pain for some of the stuff we're trying
-> to do. However, we do have requests to keep the framework written in Bash,
-> because KVM testing is regularly done with simulators and even in embedded
-> environments. It's not desirable, or even possible, to have e.g. Python
-> everywhere we want kvm-unit-tests.
+Unmap-vaddr invalidates the host virtual address in an iova range and blocks
+vfio translation of host virtual addresses, but DMA to already-mapped pages
+continues.  Map-vaddr updates the base VA and resumes translation.  The
+implementation supports iommu type1 and mediated devices.  Unmap-all allows
+all ranges to be unmapped or invalidated in a single ioctl, which simplifies
+userland code.
 
-True, I would probably be one of the people complaining if the tests started
-requiring some newfangled language :-)
+This functionality is necessary for live update, in which a host process
+such as qemu exec's an updated version of itself, while preserving its
+guest and vfio devices.  The process blocks vfio VA translation, exec's
+its new self, mmap's the memory object(s) underlying vfio object, updates
+the VA, and unblocks translation.  For a working example that uses these
+new interfaces, see the QEMU patch series "[PATCH V2] Live Update" at
+https://lore.kernel.org/qemu-devel/1609861330-129855-1-git-send-email-steven.sistare@oracle.com
+
+Patches 1-4 define and implement the flag to unmap all ranges.
+Patches 5-6 define and implement the flags to update vaddr.
+Patches 7-9 add blocking to complete the implementation.
+
+Changes from V1:
+ - define a flag for unmap all instead of special range values
+ - define the VFIO_UNMAP_ALL extension
+ - forbid the combination of unmap-all and get-dirty-bitmap
+ - unwind in unmap on vaddr error
+ - add a new function to find first dma in a range instead of modifying
+   an existing function
+ - change names of update flags
+ - fix concurrency bugs due to iommu lock being dropped
+ - call down from from vfio to a new backend interface instead of up from
+   driver to detect container close
+ - use wait/wake instead of sleep and polling
+ - refine the uapi specification
+ - split patches into vfio vs type1
+
+Steve Sistare (9):
+  vfio: option to unmap all
+  vfio/type1: find first dma
+  vfio/type1: unmap cleanup
+  vfio/type1: implement unmap all
+  vfio: interfaces to update vaddr
+  vfio/type1: implement interfaces to update vaddr
+  vfio: iommu driver notify callback
+  vfio/type1: implement notify callback
+  vfio/type1: block on invalid vaddr
+
+ drivers/vfio/vfio.c             |   5 +
+ drivers/vfio/vfio_iommu_type1.c | 229 ++++++++++++++++++++++++++++++++++------
+ include/linux/vfio.h            |   5 +
+ include/uapi/linux/vfio.h       |  27 +++++
+ 4 files changed, 231 insertions(+), 35 deletions(-)
+
+-- 
+1.8.3.1
+
