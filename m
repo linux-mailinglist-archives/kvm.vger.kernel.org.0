@@ -2,244 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2F262FBA54
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBDAB2FBA55
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405052AbhASOwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 09:52:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48526 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391440AbhASLeJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 06:34:09 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1611056002; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        id S2405119AbhASOwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 09:52:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52375 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389309AbhASLvu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 06:51:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611057005;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1Oa/NkrV49PPS+h6OD6dbPZXSlWnjE/uKD/EMJ1afk4=;
-        b=VCqLoREXekPKeCpTOq8vJEpFoxD1jNAufirBeB5qjm5WM7JywEcniSnht/sjfqbjaOXFXx
-        5LciXVq/HnHEzP6qVwAJi8a3d7MUwz7TmfeoXV+57JgRyfyXnX/qCs6nsUjW15Rg5CyNrh
-        ywV2LQedzIgLfbh9X5sgWtBaFjWaMXc=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 0D390ADA2;
-        Tue, 19 Jan 2021 11:33:22 +0000 (UTC)
-Subject: Re: [PATCH v3 06/15] x86/paravirt: switch time pvops functions to use
- static_call()
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     xen-devel@lists.xenproject.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Deep Shah <sdeep@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
+        bh=U+631dB54hObrupYubPtQkJyLL4fsiVTiIHAwNM3YpQ=;
+        b=a5gBGH7rblHfU3/9o15hrxyC7nOEIHvPacNzLUKBIyPNwK4TLY0TCvPC+8ePD1qJQqUHp6
+        CtrYfJBmy61pVQgCsYTT8ubHMum8Yk5oys0054dWvyRZFDiGj4kQ4+iAnZhmF6gQ2kye8j
+        2/yVGDd09hLDq4KQzYTiBL3IXhooxEQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-81-RHs7KWtXOpezIaSNoGA_3Q-1; Tue, 19 Jan 2021 06:50:02 -0500
+X-MC-Unique: RHs7KWtXOpezIaSNoGA_3Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C51A1005513;
+        Tue, 19 Jan 2021 11:50:00 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-157.ams2.redhat.com [10.36.112.157])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 60C5F189A4;
+        Tue, 19 Jan 2021 11:49:49 +0000 (UTC)
+Subject: Re: [PATCH v2 9/9] gitlab-ci: Add alpine to pipeline
+From:   Thomas Huth <thuth@redhat.com>
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+        qemu-block@nongnu.org,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Alistair Francis <alistair@alistair23.me>,
+        BALATON Zoltan via <qemu-devel@nongnu.org>,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira <bristot@redhat.com>
-References: <20201217093133.1507-1-jgross@suse.com>
- <20201217093133.1507-7-jgross@suse.com> <20210106100313.GB5729@zn.tnic>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <091fb630-c635-26cb-b049-aba45b1c055c@suse.com>
-Date:   Tue, 19 Jan 2021 12:33:20 +0100
+        Kevin Wolf <kwolf@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+ <20210118063808.12471-10-jiaxun.yang@flygoat.com>
+ <20210118101159.GC1789637@redhat.com>
+ <fb7308f2-ecc7-48b8-9388-91fd30691767@www.fastmail.com>
+ <307dea8e-148e-6666-c6f1-5cc66a54a7af@redhat.com>
+ <20210118145016.GC1799018@redhat.com>
+ <a9d9fb1d-f356-adb4-3763-a015e0d13320@redhat.com>
+Message-ID: <a5b6e842-6a9d-c702-d369-d97b03f79e19@redhat.com>
+Date:   Tue, 19 Jan 2021 12:49:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210106100313.GB5729@zn.tnic>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qyFFBfHEJpDopUqsfMCbXGBAvuJWNdZSB"
+In-Reply-To: <a9d9fb1d-f356-adb4-3763-a015e0d13320@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qyFFBfHEJpDopUqsfMCbXGBAvuJWNdZSB
-Content-Type: multipart/mixed; boundary="nnzuzOZhPZcEDgKlwlPCivJcNIrZ5QO9h";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Borislav Petkov <bp@alien8.de>
-Cc: xen-devel@lists.xenproject.org, x86@kernel.org,
- linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
- virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- "H. Peter Anvin" <hpa@zytor.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>,
- Stephen Hemminger <sthemmin@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Deep Shah <sdeep@vmware.com>, "VMware, Inc." <pv-drivers@vmware.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>,
- Joerg Roedel <joro@8bytes.org>, Boris Ostrovsky
- <boris.ostrovsky@oracle.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
- Mel Gorman <mgorman@suse.de>, Daniel Bristot de Oliveira <bristot@redhat.com>
-Message-ID: <091fb630-c635-26cb-b049-aba45b1c055c@suse.com>
-Subject: Re: [PATCH v3 06/15] x86/paravirt: switch time pvops functions to use
- static_call()
-References: <20201217093133.1507-1-jgross@suse.com>
- <20201217093133.1507-7-jgross@suse.com> <20210106100313.GB5729@zn.tnic>
-In-Reply-To: <20210106100313.GB5729@zn.tnic>
-
---nnzuzOZhPZcEDgKlwlPCivJcNIrZ5QO9h
-Content-Type: multipart/mixed;
- boundary="------------2CBACA40A58C5368F7284A1F"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------2CBACA40A58C5368F7284A1F
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 06.01.21 11:03, Borislav Petkov wrote:
-> On Thu, Dec 17, 2020 at 10:31:24AM +0100, Juergen Gross wrote:
->> The time pvops functions are the only ones left which might be
->> used in 32-bit mode and which return a 64-bit value.
+On 18/01/2021 16.12, Thomas Huth wrote:
+> On 18/01/2021 15.50, Daniel P. Berrangé wrote:
+>> On Mon, Jan 18, 2021 at 03:44:49PM +0100, Thomas Huth wrote:
+>>> On 18/01/2021 14.37, Jiaxun Yang wrote:
+>>>>
+>>>>
+>>>> On Mon, Jan 18, 2021, at 6:11 PM, Daniel P. Berrangé wrote:
+>>>>> On Mon, Jan 18, 2021 at 02:38:08PM +0800, Jiaxun Yang wrote:
+>>>>>> We only run build test and check-acceptance as their are too many
+>>>>>> failures in checks due to minor string mismatch.
+>>>>>
+>>>>> Can you give real examples of what's broken here, as that sounds
+>>>>> rather suspicious, and I'm not convinced it should be ignored.
+>>>>
+>>>> Mostly Input/Output error vs I/O Error.
+>>>
+>>> Right, out of curiosity, I also gave it a try:
+>>>
+>>>   https://gitlab.com/huth/qemu/-/jobs/969225330
+>>>
+>>> Apart from the "I/O Error" vs. "Input/Output Error" difference, there also
+>>> seems to be a problem with "sed" in some of the tests.
 >>
->> Switch them to use the static_call() mechanism instead of pvops, as
->> this allows quite some simplification of the pvops implementation.
->>
->> Due to include hell this requires to split out the time interfaces
->> into a new header file.
->=20
-> I guess you can add Peter's patch to your set, no?
->=20
-> https://lkml.kernel.org/r/20201110005609.40989-3-frederic@kernel.org
+>> The "sed" thing sounds like something that ought to be investigated
+>> from a portability POV rather than ignored.
+> 
+> The weird thing is that we explicitly test for GNU sed in 
+> tests/check-block.sh and skip the iotests if it's not available... so I'm a 
+> little bit surprised that the iotests are run here with an apparently 
+> different version of sed...?
 
-With a slight modification, yes. :-)
+Oh, well, I've fired up a bootable ISO image of Alpine, and ran "sed 
+--version" and it says:
 
+  This is not GNU sed version 4.0
 
-Juergen
+Ouch. But I guess we could add a check for that to our tests/check-block.sh 
+script, too...
 
---------------2CBACA40A58C5368F7284A1F
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+  Thomas
 
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------2CBACA40A58C5368F7284A1F--
-
---nnzuzOZhPZcEDgKlwlPCivJcNIrZ5QO9h--
-
---qyFFBfHEJpDopUqsfMCbXGBAvuJWNdZSB
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmAGw4AFAwAAAAAACgkQsN6d1ii/Ey8/
-hAf/YRa6e21lXqP3PtecH5kCtQ7S0VH4NshLwqEGP/JkgNRGLXk5+uAW/W0Pd3omZ0YKGA5BP7Lc
-h1GR8k27emtXXyE0p/3d1W8KH6Aj2jpZ8z+yUPolbj+UDpi3nkGyeKr+agtQpWDCV6jugx7w+Cpr
-zyR4+mYZw7GgEYI0jEcommSCaxp/xgcdJPWdzfcbdLv9nWXGxujTq68WtftqqmjSSKooRgU0lUj2
-pIQVWPNSYr3HJFrd9uMnNiCojvvJ63+bzNA/69KdxYPVDmvb6pC6IycJLTkgDcleG/P2onfp9fLu
-vlGol30o2TwcX0FRYVnGuglKQOXZVVO5SxMhknhUsw==
-=l4RO
------END PGP SIGNATURE-----
-
---qyFFBfHEJpDopUqsfMCbXGBAvuJWNdZSB--
