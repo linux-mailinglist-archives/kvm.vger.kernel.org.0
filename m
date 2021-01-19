@@ -2,376 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 417EA2FC3A7
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 23:40:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E9A42FC3FE
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 23:48:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728401AbhASWgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 17:36:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45046 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727200AbhASWgK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 17:36:10 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036C4C061573;
-        Tue, 19 Jan 2021 14:35:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=OtL4sdAGsJ08z7fCxeCmMVsJDaQwBot6LG44qZyyGSk=; b=DXq12zrUsz5JbfiOkM3/P+/8RC
-        RVJssaknA/7T+p+K1KP2P7Sc4lQOv1swnQ+FwXP4oSwuCDe5IOLaHX2Ajp6t/wJbb6hzSJC01rsuX
-        MsegCFIS23WG4OTrofNGyE1GuKF6m4qq9rU/ObWUy1s5/taEm7+hlJHxrltuO/LgxeYAAcSU4wZnF
-        A7VGnrMdtgpDsxEbHE2gHVm+oogiA0eiKzPk3I+pxtKTmlN3wUySac8uDXl3G4h3VibiZHmo6sdcQ
-        ktwmyM50mI9O6KIwfVx7I02IwEs/kmZA6Wt0IaTHTExSlyJzLDwJIT8DR/+pLQCCByDxwzqDhTFqf
-        oTk/e/sA==;
-Received: from [2601:1c0:6280:3f0::9abc]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l1za7-0002Cl-CZ; Tue, 19 Jan 2021 22:34:36 +0000
-Subject: Re: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id
- driver
-To:     Adrian Catangiu <acatan@amazon.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, graf@amazon.com, arnd@arndb.de,
-        ebiederm@xmission.com, rppt@kernel.org, 0x7f454c46@gmail.com,
-        borntraeger@de.ibm.com, Jason@zx2c4.com, jannh@google.com,
-        w@1wt.eu, colmmacc@amazon.com, luto@kernel.org, tytso@mit.edu,
-        ebiggers@kernel.org, dwmw@amazon.co.uk, bonzini@gnu.org,
-        sblbir@amazon.com, raduweis@amazon.com, corbet@lwn.net,
-        mst@redhat.com, mhocko@kernel.org, rafael@kernel.org, pavel@ucw.cz,
-        mpe@ellerman.id.au, areber@redhat.com, ovzxemul@gmail.com,
-        avagin@gmail.com, ptikhomirov@virtuozzo.com, gil@azul.com,
-        asmehra@redhat.com, dgunigun@redhat.com, vijaysun@ca.ibm.com,
-        oridgar@gmail.com, ghammer@redhat.com
-References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
- <1610453760-13812-2-git-send-email-acatan@amazon.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <2764a194-934c-5426-728a-cd755a6e395f@infradead.org>
-Date:   Tue, 19 Jan 2021 14:34:17 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1728027AbhASWrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 17:47:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42449 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727387AbhASWrF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 17:47:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611096333;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dafNPlVCS4S2LXLJSuTR7hrwH8lsnXzQyIQZkxPQOvY=;
+        b=BDjCaHNUYKIeC4Sl3rQotEPLNrDmg6T0ixM8YXFXv0y49kBDHFiQWJwoCe2KO1ypeJEPJ4
+        B1QfVbWxYhzogoFNlsImYnIyoXF+RkyQRb7FFLchLp0oAamIC35ThzdLlqLrMfvzexMzEF
+        lAfJuPz+GxshHvkAATBElrRtc8etlAo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-516--ZdqYRckNFGsd70TsH0HUg-1; Tue, 19 Jan 2021 17:45:29 -0500
+X-MC-Unique: -ZdqYRckNFGsd70TsH0HUg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B21A918C89CF;
+        Tue, 19 Jan 2021 22:45:27 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C6AA5D9DD;
+        Tue, 19 Jan 2021 22:45:24 +0000 (UTC)
+Date:   Tue, 19 Jan 2021 15:45:23 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     Vikas Gupta <vikas.gupta@broadcom.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vikram Prakash <vikram.prakash@broadcom.com>,
+        Srinath Mannam <srinath.mannam@broadcom.com>,
+        Ashwin Kamath <ashwin.kamath@broadcom.com>,
+        Zac Schroff <zachary.schroff@broadcom.com>,
+        Manish Kurup <manish.kurup@broadcom.com>
+Subject: Re: [RFC v3 2/2] vfio/platform: msi: add Broadcom platform devices
+Message-ID: <20210119154523.00179254@omen.home.shazbot.org>
+In-Reply-To: <25199e7e-4a42-c69a-0d16-4bf1764ee87b@redhat.com>
+References: <20201124161646.41191-1-vikas.gupta@broadcom.com>
+        <20201214174514.22006-1-vikas.gupta@broadcom.com>
+        <20201214174514.22006-3-vikas.gupta@broadcom.com>
+        <b3dcbca3-c85a-d327-e64e-5830286dfbba@redhat.com>
+        <CAHLZf_u860kCfpExucwOxWmTDzH_QXnR_O=X8Yq3NAtXesmZ0w@mail.gmail.com>
+        <25199e7e-4a42-c69a-0d16-4bf1764ee87b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1610453760-13812-2-git-send-email-acatan@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi--
+On Fri, 15 Jan 2021 10:24:33 +0100
+Auger Eric <eric.auger@redhat.com> wrote:
 
-On 1/12/21 4:15 AM, Adrian Catangiu wrote:
-> - Background and problem
+> Hi Vikas,
+> On 1/15/21 7:35 AM, Vikas Gupta wrote:
+> > Hi Eric,
+> > 
+> > On Tue, Jan 12, 2021 at 2:52 PM Auger Eric <eric.auger@redhat.com> wrote:  
+> >>
+> >> Hi Vikas,
+> >>
+> >> On 12/14/20 6:45 PM, Vikas Gupta wrote:  
+> >>> Add msi support for Broadcom platform devices
+> >>>
+> >>> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+> >>> ---
+> >>>  drivers/vfio/platform/Kconfig                 |  1 +
+> >>>  drivers/vfio/platform/Makefile                |  1 +
+> >>>  drivers/vfio/platform/msi/Kconfig             |  9 ++++
+> >>>  drivers/vfio/platform/msi/Makefile            |  2 +
+> >>>  .../vfio/platform/msi/vfio_platform_bcmplt.c  | 49 +++++++++++++++++++
+> >>>  5 files changed, 62 insertions(+)
+> >>>  create mode 100644 drivers/vfio/platform/msi/Kconfig
+> >>>  create mode 100644 drivers/vfio/platform/msi/Makefile
+> >>>  create mode 100644 drivers/vfio/platform/msi/vfio_platform_bcmplt.c  
+> >> what does plt mean?  
+> > This(plt) is a generic name for Broadcom platform devices, which we`ll
+> >  plan to add in this file. Currently we have only one in this file.
+> > Do you think this name does not sound good here?  
 > 
-
-> ---
->  Documentation/misc-devices/sysgenid.rst | 240 +++++++++++++++++++++++++
->  drivers/misc/Kconfig                    |  16 ++
->  drivers/misc/Makefile                   |   1 +
->  drivers/misc/sysgenid.c                 | 298 ++++++++++++++++++++++++++++++++
->  include/uapi/linux/sysgenid.h           |  18 ++
->  5 files changed, 573 insertions(+)
->  create mode 100644 Documentation/misc-devices/sysgenid.rst
->  create mode 100644 drivers/misc/sysgenid.c
->  create mode 100644 include/uapi/linux/sysgenid.h
+> we have VFIO_PLATFORM_BCMFLEXRM_RESET config which also applied to vfio
+> flex-rm platform device.
 > 
-> diff --git a/Documentation/misc-devices/sysgenid.rst b/Documentation/misc-devices/sysgenid.rst
-> new file mode 100644
-> index 0000000..0b31ccf
-> --- /dev/null
-> +++ b/Documentation/misc-devices/sysgenid.rst
-> @@ -0,0 +1,240 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +========
-> +SYSGENID
-> +========
-> +
-> +The System Generation ID feature is required in virtualized or
-> +containerized environments by applications that work with local copies
-> +or caches of world-unique data such as random values, UUIDs,
-> +monotonically increasing counters, etc.
-> +Such applications can be negatively affected by VM or container
-> +snapshotting when the VM or container is either cloned or returned to
-> +an earlier point in time.
-> +
-> +The System Generation ID is a simple concept meant to alleviate the
-> +issue by providing a monotonically increasing counter that changes
-> +each time the VM or container is restored from a snapshot.
-> +The driver for it lives at ``drivers/misc/sysgenid.c``.
-> +
-> +The ``sysgenid`` driver exposes a monotonic incremental System
-> +Generation u32 counter via a char-dev FS interface accessible through
-> +``/dev/sysgenid`` that provides sync and async SysGen counter updates
+> I think it would be more homegenous to have VFIO_PLATFORM_BCMFLEXRM_MSI
+> in case we keep a separate msi module.
+> 
+> also in reset dir we have vfio_platform_bcmflexrm.c
+> 
+> 
+> >>>
+> >>> diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+> >>> index dc1a3c44f2c6..7b8696febe61 100644
+> >>> --- a/drivers/vfio/platform/Kconfig
+> >>> +++ b/drivers/vfio/platform/Kconfig
+> >>> @@ -21,3 +21,4 @@ config VFIO_AMBA
+> >>>         If you don't know what to do here, say N.
+> >>>
+> >>>  source "drivers/vfio/platform/reset/Kconfig"
+> >>> +source "drivers/vfio/platform/msi/Kconfig"
+> >>> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+> >>> index 3f3a24e7c4ef..9ccdcdbf0e7e 100644
+> >>> --- a/drivers/vfio/platform/Makefile
+> >>> +++ b/drivers/vfio/platform/Makefile
+> >>> @@ -5,6 +5,7 @@ vfio-platform-y := vfio_platform.o
+> >>>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
+> >>>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform-base.o
+> >>>  obj-$(CONFIG_VFIO_PLATFORM) += reset/
+> >>> +obj-$(CONFIG_VFIO_PLATFORM) += msi/
+> >>>
+> >>>  vfio-amba-y := vfio_amba.o
+> >>>
+> >>> diff --git a/drivers/vfio/platform/msi/Kconfig b/drivers/vfio/platform/msi/Kconfig
+> >>> new file mode 100644
+> >>> index 000000000000..54d6b70e1e32
+> >>> --- /dev/null
+> >>> +++ b/drivers/vfio/platform/msi/Kconfig
+> >>> @@ -0,0 +1,9 @@
+> >>> +# SPDX-License-Identifier: GPL-2.0-only
+> >>> +config VFIO_PLATFORM_BCMPLT_MSI
+> >>> +     tristate "MSI support for Broadcom platform devices"
+> >>> +     depends on VFIO_PLATFORM && (ARCH_BCM_IPROC || COMPILE_TEST)
+> >>> +     default ARCH_BCM_IPROC
+> >>> +     help
+> >>> +       Enables the VFIO platform driver to handle msi for Broadcom devices
+> >>> +
+> >>> +       If you don't know what to do here, say N.
+> >>> diff --git a/drivers/vfio/platform/msi/Makefile b/drivers/vfio/platform/msi/Makefile
+> >>> new file mode 100644
+> >>> index 000000000000..27422d45cecb
+> >>> --- /dev/null
+> >>> +++ b/drivers/vfio/platform/msi/Makefile
+> >>> @@ -0,0 +1,2 @@
+> >>> +# SPDX-License-Identifier: GPL-2.0
+> >>> +obj-$(CONFIG_VFIO_PLATFORM_BCMPLT_MSI) += vfio_platform_bcmplt.o
+> >>> diff --git a/drivers/vfio/platform/msi/vfio_platform_bcmplt.c b/drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+> >>> new file mode 100644
+> >>> index 000000000000..a074b5e92d77
+> >>> --- /dev/null
+> >>> +++ b/drivers/vfio/platform/msi/vfio_platform_bcmplt.c
+> >>> @@ -0,0 +1,49 @@
+> >>> +// SPDX-License-Identifier: GPL-2.0
+> >>> +/*
+> >>> + * Copyright 2020 Broadcom.
+> >>> + */
+> >>> +
+> >>> +#include <linux/module.h>
+> >>> +#include <linux/device.h>
+> >>> +#include <linux/interrupt.h>
+> >>> +#include <linux/msi.h>
+> >>> +#include <linux/vfio.h>
+> >>> +
+> >>> +#include "../vfio_platform_private.h"
+> >>> +
+> >>> +#define RING_SIZE            (64 << 10)
+> >>> +
+> >>> +#define RING_MSI_ADDR_LS     0x03c
+> >>> +#define RING_MSI_ADDR_MS     0x040
+> >>> +#define RING_MSI_DATA_VALUE  0x064  
+> >> Those 3 defines would not be needed anymore with that implementation option.  
+> >>> +
+> >>> +static u32 bcm_num_msi(struct vfio_platform_device *vdev)
+> >>> +{
+> >>> +     struct vfio_platform_region *reg = &vdev->regions[0];
+> >>> +
+> >>> +     return (reg->size / RING_SIZE);
+> >>> +}
+> >>> +
+> >>> +static struct vfio_platform_msi_node vfio_platform_bcmflexrm_msi_node = {
+> >>> +     .owner = THIS_MODULE,
+> >>> +     .compat = "brcm,iproc-flexrm-mbox",
+> >>> +     .of_get_msi = bcm_num_msi,
+> >>> +};
+> >>> +
+> >>> +static int __init vfio_platform_bcmflexrm_msi_module_init(void)
+> >>> +{
+> >>> +     __vfio_platform_register_msi(&vfio_platform_bcmflexrm_msi_node);
+> >>> +
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>> +static void __exit vfio_platform_bcmflexrm_msi_module_exit(void)
+> >>> +{
+> >>> +     vfio_platform_unregister_msi("brcm,iproc-flexrm-mbox");
+> >>> +}
+> >>> +
+> >>> +module_init(vfio_platform_bcmflexrm_msi_module_init);
+> >>> +module_exit(vfio_platform_bcmflexrm_msi_module_exit);  
+> >> One thing I would like to discuss with Alex.
+> >>
+> >> As the reset module is mandated (except if reset_required is forced to
+> >> 0), I am wondering if we shouldn't try to turn the reset module into a
+> >> "specialization" module and put the msi hooks there. I am afraid we may
+> >> end up having modules for each and every vfio platform feature
+> >> specialization. At the moment that's fully bearable but I can't predict
+> >> what's next.
+> >>
+> >> As the mandated feature is the reset capability maybe we could just keep
+> >> the config/module name terminology, tune the kconfig help message to
+> >> mention the msi support in case of flex-rm?
+> >>  
+> > As I understand, your proposal is that we should not have a separate
+> > module for MSI, rather we add in the existing reset module for
+> > flex-rm. Thus, this way reset modules do not seem to be specialized
+> > just for reset functionality only but for MSI as well. Apart from this
+> > we need not to load the proposed msi module in this patch series. Is
+> > my understanding correct?  
+> 
+> yes it is.
+> > For me it looks OK to consolidate MSI in the existing 'reset' module.
+> > Let me know your views so that I can work for the next patch set accordingly.  
+> 
+> Before you launch into the rewriting I would like to get the
+> confirmation Alex is OK or if he prefers to keep separate modules.
 
-                                                                 update
+If I understand correctly, the proposal here creates an entirely
+parallel vfio-msi request module interface like we have for vfio-reset,
+so the question is whether we should simplify vfio-platform-core to do
+a single module request per compat string and the device specific
+module would register multiple features rather than one per module.  Is
+that right?
 
-> +notifications. It also provides SysGen counter retrieval and
-> +confirmation mechanisms.
-> +
-> +The counter starts from zero when the driver is initialized and
-> +monotonically increments every time the system generation changes.
-> +
-> +The ``sysgenid`` driver exports the ``void sysgenid_bump_generation()``
-> +symbol which can be used by backend drivers to drive system generation
-> +changes based on hardware events.
-> +System generation changes can also be driven by userspace software
-> +through a dedicated driver ioctl.
-> +
-> +Userspace applications or libraries can (a)synchronously consume the
-> +system generation counter through the provided FS interface, to make
-> +any necessary internal adjustments following a system generation update.
-> +
-> +Driver FS interface:
-> +
-> +``open()``:
-> +  When the device is opened, a copy of the current Sys-Gen-Id (counter)
-> +  is associated with the open file descriptor. The driver now tracks
-> +  this file as an independent *watcher*. The driver tracks how many
-> +  watchers are aware of the latest Sys-Gen-Id counter and how many of
-> +  them are *outdated*; outdated being those that have lived through
-> +  a Sys-Gen-Id change but not yet confirmed the new generation counter.
-> +
-> +``read()``:
-> +  Read is meant to provide the *new* system generation counter when a
-> +  generation change takes place. The read operation blocks until the
-> +  associated counter is no longer up to date, at which point the new
-> +  counter is provided/returned.
-> +  Nonblocking ``read()`` uses ``EAGAIN`` to signal that there is no
-> +  *new* counter value available. The generation counter is considered
-> +  *new* for each open file descriptor that hasn't confirmed the new
-> +  value following a generation change. Therefore, once a generation
-> +  change takes place, all ``read()`` calls will immediately return the
-> +  new generation counter and will continue to do so until the
-> +  new value is confirmed back to the driver through ``write()``.
-> +  Partial reads are not allowed - read buffer needs to be at least
-> +  ``sizeof(unsigned)`` in size.
+It seems the submodules are pretty simple, there's not a lot to be
+gained from duplicate boilerplate code in the modules themselves.  The
+core code would clearly be simplified slightly to avoid multiple module
+requests, but for a more grand benefit is seems the registration
+interfaces would also need to be consolidated, perhaps providing a
+feature "ops" structure.  As you indicate, having only two features at
+this point with a fairly small number of modules each, it's not yet too
+burdensome, but I could imagine it being a useful project.
 
-Please use (unsigned int), not just (unsigned).
-(Linux style)
+More importantly in the short term, I'd expect modules handling the
+same compat string to be named similarly and enabled by a common
+Kconfig option.  Thanks,
 
-> +
-> +``write()``:
-> +  Write is used to confirm the up-to-date Sys Gen counter back to the
-> +  driver.
-> +  Following a VM generation change, all existing watchers are marked
-> +  as *outdated*. Each file descriptor will maintain the *outdated*
-> +  status until a ``write()`` confirms the up-to-date counter back to
-> +  the driver.
-> +  Partial writes are not allowed - write buffer should be exactly
-> +  ``sizeof(unsigned)`` in size.
+Alex
 
-ditto.
-
-> +
-> +``poll()``:
-> +  Poll is implemented to allow polling for generation counter updates.
-> +  Such updates result in ``EPOLLIN`` polling status until the new
-> +  up-to-date counter is confirmed back to the driver through a
-> +  ``write()``.
-> +
-> +``ioctl()``:
-> +  The driver also adds support for tracking count of open file
-> +  descriptors that haven't acknowledged a generation counter update,
-> +  as well as a mechanism for userspace to *force* a generation update:
-> +
-> +  - SYSGENID_GET_OUTDATED_WATCHERS: immediately returns the number of
-> +    *outdated* watchers - number of file descriptors that were open
-> +    during a system generation change, and which have not yet confirmed
-> +    the new generation counter.
-> +  - SYSGENID_WAIT_WATCHERS: blocks until there are no more *outdated*
-> +    watchers, or if a ``timeout`` argument is provided, until the
-> +    timeout expires.
-> +    If the current caller is *outdated* or a generation change happens
-> +    while waiting (thus making current caller *outdated*), the ioctl
-> +    returns ``-EINTR`` to signal the user to handle event and retry.
-> +  - SYSGENID_FORCE_GEN_UPDATE: forces a generation counter increment.
-> +    It takes a ``minimum-generation`` argument which represents the
-> +    minimum value the generation counter will be incremented to. For
-> +    example if current generation is ``5`` and ``SYSGENID_FORCE_GEN_UPDATE(8)``
-> +    is called, the generation counter will increment to ``8``.
-> +    This IOCTL can only be used by processes with CAP_CHECKPOINT_RESTORE
-> +    or CAP_SYS_ADMIN capabilities.
-> +
-> +``mmap()``:
-> +  The driver supports ``PROT_READ, MAP_SHARED`` mmaps of a single page
-> +  in size. The first 4 bytes of the mapped page will contain an
-> +  up-to-date u32 copy of the system generation counter.
-> +  The mapped memory can be used as a low-latency generation counter
-> +  probe mechanism in critical sections - see examples.
-> +
-> +``close()``:
-> +  Removes the file descriptor as a system generation counter *watcher*.
-> +
-> +Example application workflows
-> +-----------------------------
-> +
-> +1) Watchdog thread simplified example::
-> +
-> +	void watchdog_thread_handler(int *thread_active)
-> +	{
-> +		unsigned genid;
-
-		unsigned int genid;
-
-> +		int fd = open("/dev/sysgenid", O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR);
-> +
-> +		do {
-> +			// read new gen ID - blocks until VM generation changes
-> +			read(fd, &genid, sizeof(genid));
-> +
-> +			// because of VM generation change, we need to rebuild world
-> +			reseed_app_env();
-> +
-> +			// confirm we're done handling gen ID update
-> +			write(fd, &genid, sizeof(genid));
-> +		} while (atomic_read(thread_active));
-> +
-> +		close(fd);
-> +	}
-> +
-> +2) ASYNC simplified example::
-> +
-> +	void handle_io_on_sysgenfd(int sysgenfd)
-> +	{
-> +		unsigned genid;
-
-		unsigned int genid;
-
-> +
-> +		// read new gen ID - we need it to confirm we've handled update
-> +		read(fd, &genid, sizeof(genid));
-> +
-> +		// because of VM generation change, we need to rebuild world
-> +		reseed_app_env();
-> +
-> +		// confirm we're done handling the gen ID update
-> +		write(fd, &genid, sizeof(genid));
-> +	}
-> +
-> +	int main() {
-> +		int epfd, sysgenfd;
-> +		struct epoll_event ev;
-> +
-> +		epfd = epoll_create(EPOLL_QUEUE_LEN);
-> +
-> +		sysgenfd = open("/dev/sysgenid",
-> +		               O_RDWR | O_CLOEXEC | O_NONBLOCK,
-> +		               S_IRUSR | S_IWUSR);
-> +
-> +		// register sysgenid for polling
-> +		ev.events = EPOLLIN;
-> +		ev.data.fd = sysgenfd;
-> +		epoll_ctl(epfd, EPOLL_CTL_ADD, sysgenfd, &ev);
-> +
-> +		// register other parts of your app for polling
-> +		// ...
-> +
-> +		while (1) {
-> +			// wait for something to do...
-> +			int nfds = epoll_wait(epfd, events,
-> +				MAX_EPOLL_EVENTS_PER_RUN,
-> +				EPOLL_RUN_TIMEOUT);
-> +			if (nfds < 0) die("Error in epoll_wait!");
-> +
-> +			// for each ready fd
-> +			for(int i = 0; i < nfds; i++) {
-> +				int fd = events[i].data.fd;
-> +
-> +				if (fd == sysgenfd)
-> +					handle_io_on_sysgenfd(sysgenfd);
-> +				else
-> +					handle_some_other_part_of_the_app(fd);
-> +			}
-> +		}
-> +
-> +		return 0;
-> +	}
-> +
-> +3) Mapped memory polling simplified example::
-> +
-> +	/*
-> +	 * app/library function that provides cached secrets
-> +	 */
-> +	char * safe_cached_secret(app_data_t *app)
-> +	{
-> +		char *secret;
-> +		volatile unsigned *const genid_ptr = get_sysgenid_mapping(app);
-
-		         unsigned int
-
-> +	again:
-> +		secret = __cached_secret(app);
-> +
-> +		if (unlikely(*genid_ptr != app->cached_genid)) {
-> +			app->cached_genid = *genid_ptr;
-> +			barrier();
-> +
-> +			// rebuild world then confirm the genid update (thru write)
-> +			rebuild_caches(app);
-> +
-> +			ack_sysgenid_update(app);
-> +
-> +			goto again;
-> +		}
-> +
-> +		return secret;
-> +	}
-> +
-> +4) Orchestrator simplified example::
-> +
-> +	/*
-> +	 * orchestrator - manages multiple applications and libraries used by
-> +	 * a service and tries to make sure all sensitive components gracefully
-> +	 * handle VM generation changes.
-> +	 * Following function is called on detection of a VM generation change.
-> +	 */
-> +	int handle_sysgen_update(int sysgen_fd, unsigned new_gen_id)
-
-	                                        unsigned int
-
-> +	{
-> +		// pause until all components have handled event
-> +		pause_service();
-> +
-> +		// confirm *this* watcher as up-to-date
-> +		write(sysgen_fd, &new_gen_id, sizeof(unsigned));
-
-		                                     unsigned int
-
-> +
-> +		// wait for all *others* for at most 5 seconds.
-> +		ioctl(sysgen_fd, VMGENID_WAIT_WATCHERS, 5000);
-> +
-> +		// all applications on the system have rebuilt worlds
-> +		resume_service();
-> +	}
-
-
-> diff --git a/include/uapi/linux/sysgenid.h b/include/uapi/linux/sysgenid.h
-> new file mode 100644
-> index 0000000..ea38fd3
-> --- /dev/null
-> +++ b/include/uapi/linux/sysgenid.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-> +
-> +#ifndef _UAPI_LINUX_SYSGENID_H
-> +#define _UAPI_LINUX_SYSGENID_H
-> +
-> +#include <linux/ioctl.h>
-> +
-> +#define SYSGENID_IOCTL 0x2d
-
-Please document new IOCTL major/magic values in
-Documentation/userspace-api/ioctl/ioctl-number.rst.
-
-
-
-thanks.
--- 
-~Randy
-"He closes his eyes and drops the goggles.  You can't get hurt
-by looking at a bitmap.  Or can you?"
-(Neal Stephenson: Snow Crash)
