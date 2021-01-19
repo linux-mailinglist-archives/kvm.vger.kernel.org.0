@@ -2,158 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32EEF2FBA56
+	by mail.lfdr.de (Postfix) with ESMTP id 9E30B2FBA57
 	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405177AbhASOwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 09:52:19 -0500
-Received: from lb3-smtp-cloud7.xs4all.net ([194.109.24.31]:45107 "EHLO
-        lb3-smtp-cloud7.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2393094AbhASMck (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 07:32:40 -0500
-X-Greylist: delayed 459 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 Jan 2021 07:32:37 EST
-Received: from cust-b5b5937f ([IPv6:fc0c:c16d:66b8:757f:c639:739b:9d66:799d])
-        by smtp-cloud7.xs4all.net with ESMTPA
-        id 1q3JlOl5LyutM1q3MlbVVy; Tue, 19 Jan 2021 13:24:13 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xs4all.nl; s=s2;
-        t=1611059053; bh=+fygwg8H7qkyKanjBFzInEqDikPrCtVia5ztmXeuT8o=;
-        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type:From:
-         Subject;
-        b=esWbI+Lh9FRvuG9LpVYDuouJ84+y5SVFATzQP7ZpAkWlKhxpMQNv10g7tZk+Q+4GR
-         P8w0iKSjARrqozBk9TMk4qupccz3HMw/pPa5j+Fl4C2W0pgaEOFIATNA5dfqmNbXpF
-         WY3dgySHr2MM3+6svDtBqw3Cm53j9ZKlcznqjLsgYdpTtvUnDnYFt00lTZiImdL2fY
-         qY1XJPsfQLCx3vnp/zkfosk3P0gx6P0mVbHxoub0/O3N+aYXqUBlwVZ01FyUjwj1I0
-         OZ20uGwGN94AfvQR5wgjFi/ySkQn4HCvdPm/riMHsIyPvQ/Hw151NoHZMXG5h6/u3B
-         ZllT5HuMu4+8A==
-Subject: Re: [PATCH v7 14/17] media/videobuf1|2: Mark follow_pfn usage as
- unsafe
-To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
-        Tomasz Figa <tfiga@chromium.org>,
-        Daniel Vetter <daniel.vetter@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Kees Cook <keescook@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Laurent Dufour <ldufour@linux.ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Michel Lespinasse <walken@google.com>
-References: <20201127164131.2244124-1-daniel.vetter@ffwll.ch>
- <20201127164131.2244124-15-daniel.vetter@ffwll.ch>
-From:   Hans Verkuil <hverkuil@xs4all.nl>
-Message-ID: <f15ba4c6-211c-f93e-919e-e18adfe6c75e@xs4all.nl>
-Date:   Tue, 19 Jan 2021 13:24:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2405204AbhASOw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 09:52:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22864 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2391436AbhASNOz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 08:14:55 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JD41Du008842;
+        Tue, 19 Jan 2021 08:12:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=pI8DH5iddocIjC9tQlGBxX2liT4Q6zyunDLbb5JOrMw=;
+ b=UtEPhdczmSzWrxFSF6SaKEquXTGGVuNUGNYvZQoPWqov6ndoskRUrT+vtd/1kz+nHnvB
+ OpHiMc8lKN/0nmhNLgOXwaNbfL4e5y8H5Yti1y3Y22RPrqEIXX04hdHolfG++aiRPtH0
+ inyeOTpNtK7RvdShvU0yIFv8CM3QCanoZ4TAzcrADvx2uhDulhityASGVWGpNPp/7+U4
+ nwz65+kyBY1LeZHhH9CbcIh6CTwu6JYvTlV6d3Zs+egD9yf/SSRKUF7bjuygym2eH+3L
+ TNtPC+1XdmqDxtdURFL2AAMQUvpIiJvXfd/Ke5aWT1zMaR1Xraqp8LmF+iA/UZ5HN0Eh 8A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365xseahnc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 08:12:14 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JD4O9n010292;
+        Tue, 19 Jan 2021 08:12:14 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365xseahmb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 08:12:14 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JCvPq1023175;
+        Tue, 19 Jan 2021 13:12:11 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 363qs89k53-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 19 Jan 2021 13:12:11 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JDC8HG33161546
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Jan 2021 13:12:08 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 62CDFA4059;
+        Tue, 19 Jan 2021 13:12:08 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E1AE6A4051;
+        Tue, 19 Jan 2021 13:12:07 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.4.167])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 19 Jan 2021 13:12:07 +0000 (GMT)
+Date:   Tue, 19 Jan 2021 14:09:50 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org, gor@linux.ibm.com,
+        mihajlov@linux.ibm.com
+Subject: Re: [PATCH 2/2] s390: mm: Fix secure storage access exception
+ handling
+Message-ID: <20210119140950.2e41f1bf@ibm-vm>
+In-Reply-To: <20210119100402.84734-3-frankja@linux.ibm.com>
+References: <20210119100402.84734-1-frankja@linux.ibm.com>
+        <20210119100402.84734-3-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201127164131.2244124-15-daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfA1H6w7Z451hXz5uBfC+T4CILwukWC7IM/06HM55r5dwzXzD5s4d8wprZRF6kMCTJKToPwR+OFR57hUr5TUeAa3J/b4Bano5cXG5JJs7aDyySvyBQ7iT
- AF6NJi1hvvqh1FElksqvzLVa/QmOEEejZBgjFwsoa8P3BlX71aUZg55UgN1CoKfvJigaVMx8OmJVZTP1TBgBzYBEZA+0dH6f1b1DMDgA9kXqoDqQfIJqtbCX
- qHojNYKAiISwBmDYuSZMkSH7KYRNIIB59C3sKlux+Osh+dIvr5KeKL/UVyQNN5t4C8bA3xzI7WdxGoWOTrcrh6osz7j5RinbLE8qyeEUJUyvvWjXKkpd7dqS
- HMIEDbWiUVhRUKJ1yDeGKCpWevlCpEVMVzY1pNK0/aVSSfNEBvtodYg6CYCokOhjJHvuA+Ep4e+YV4DPrzHET+/xc+NX8AyQiHwb8/yP2YmEZJ49rfgQR9BP
- dr/7nk6Q/Zh1zkv3OibjwZY9c+4YhA+0B7uhgqimrkbKOf8Rigw2QOU+Ca/UadrwBpoSe8JeVoEhBEL9Z1DvGPDVJmztfvzZh/WKgR3U/UdzLA58H6XYG2Wi
- kRopGvfHjGH7BGq7rfl3p2JRUv4RPzrY67wfHIz7CJCMySBHEhQmO0DqCexzJwuN7qVDQQUew+dVW+zy8VfPtcLvnQ/ulL2+sYo0AsauVMOoEKmJsD13zo8F
- BwOGLGocDuv11A3T9etYvQWCfQotxHdMIivYlD9K45bjGngn5VQTZJEBfHREoydJ8pRl5Zubmv1dwvrtHzJ5cUaN75JDMp0+rY6t7CQSF6ElQBaS/BkwGvqT
- E/8oCoh/4PmJ0q6wWIfjNWnYVoGo3VhXp1URyLLFriMg9vsz5Zk8hKxx6nVgqUGGVM+9vX7XOQ6WrUu2nFalkCfyREoU2d7TZo3kbyVR1cFUVs4KSoSVdkYX
- 9CdJyh8ZOIugxyoIdE14LTtUXncHFwG8YxkQ+bn6EZL1uWAR
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-19_04:2021-01-18,2021-01-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ impostorscore=0 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101190077
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/11/2020 17:41, Daniel Vetter wrote:
-> The media model assumes that buffers are all preallocated, so that
-> when a media pipeline is running we never miss a deadline because the
-> buffers aren't allocated or available.
+On Tue, 19 Jan 2021 05:04:02 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> Turns out that the bit 61 in the TEID is not always 1 and if that's
+> the case the address space ID and the address are
+> unpredictable. Without an address and it's address space ID we can't
+
+*its
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> export memory and hence we can only send a SIGSEGV to the process or
+> panic the kernel depending on who caused the exception.
 > 
-> This means we cannot fix the v4l follow_pfn usage through
-> mmu_notifier, without breaking how this all works. The only real fix
-> is to deprecate userptr support for VM_IO | VM_PFNMAP mappings and
-> tell everyone to cut over to dma-buf memory sharing for zerocopy.
-> 
-> userptr for normal memory will keep working as-is, this only affects
-> the zerocopy userptr usage enabled in 50ac952d2263 ("[media]
-> videobuf2-dma-sg: Support io userptr operations on io memory").
-> 
-> Acked-by: Tomasz Figa <tfiga@chromium.org>
-
-Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
-
-Regards,
-
-	Hans
-
-> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: John Hubbard <jhubbard@nvidia.com>
-> Cc: Jérôme Glisse <jglisse@redhat.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: Pawel Osciak <pawel@osciak.com>
-> Cc: Marek Szyprowski <m.szyprowski@samsung.com>
-> Cc: Kyungmin Park <kyungmin.park@samsung.com>
-> Cc: Tomasz Figa <tfiga@chromium.org>
-> Cc: Laurent Dufour <ldufour@linux.ibm.com>
-> Cc: Vlastimil Babka <vbabka@suse.cz>
-> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Cc: Michel Lespinasse <walken@google.com>
-> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
-> --
-> v3:
-> - Reference the commit that enabled the zerocopy userptr use case to
->   make it abundandtly clear that this patch only affects that, and not
->   normal memory userptr. The old commit message already explained that
->   normal memory userptr is unaffected, but I guess that was not clear
->   enough.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Fixes: 084ea4d611a3d ("s390/mm: add (non)secure page access
+> exceptions handlers") Cc: stable@vger.kernel.org
 > ---
->  drivers/media/common/videobuf2/frame_vector.c | 2 +-
->  drivers/media/v4l2-core/videobuf-dma-contig.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  arch/s390/mm/fault.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 > 
-> diff --git a/drivers/media/common/videobuf2/frame_vector.c b/drivers/media/common/videobuf2/frame_vector.c
-> index a0e65481a201..1a82ec13ea00 100644
-> --- a/drivers/media/common/videobuf2/frame_vector.c
-> +++ b/drivers/media/common/videobuf2/frame_vector.c
-> @@ -70,7 +70,7 @@ int get_vaddr_frames(unsigned long start, unsigned int nr_frames,
->  			break;
+> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
+> index e30c7c781172..5442937e5b4b 100644
+> --- a/arch/s390/mm/fault.c
+> +++ b/arch/s390/mm/fault.c
+> @@ -791,6 +791,20 @@ void do_secure_storage_access(struct pt_regs
+> *regs) struct page *page;
+>  	int rc;
 >  
->  		while (ret < nr_frames && start + PAGE_SIZE <= vma->vm_end) {
-> -			err = follow_pfn(vma, start, &nums[ret]);
-> +			err = unsafe_follow_pfn(vma, start, &nums[ret]);
->  			if (err) {
->  				if (ret == 0)
->  					ret = err;
-> diff --git a/drivers/media/v4l2-core/videobuf-dma-contig.c b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> index 52312ce2ba05..821c4a76ab96 100644
-> --- a/drivers/media/v4l2-core/videobuf-dma-contig.c
-> +++ b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> @@ -183,7 +183,7 @@ static int videobuf_dma_contig_user_get(struct videobuf_dma_contig_memory *mem,
->  	user_address = untagged_baddr;
->  
->  	while (pages_done < (mem->size >> PAGE_SHIFT)) {
-> -		ret = follow_pfn(vma, user_address, &this_pfn);
-> +		ret = unsafe_follow_pfn(vma, user_address, &this_pfn);
->  		if (ret)
->  			break;
->  
-> 
+> +	/* There are cases where we don't have a TEID. */
+> +	if (!(regs->int_parm_long & 0x4)) {
+> +		/*
+> +		 * Userspace could for example try to execute secure
+> +		 * storage and trigger this. We should tell it that
+> it
+> +		 * shouldn't do that.
+> +		 */
+> +		if (user_mode(regs)) {
+> +			send_sig(SIGSEGV, current, 0);
+> +			return;
+> +		} else
+> +			panic("Unexpected PGM 0x3d with TEID bit
+> 61=0");
+> +	}
+> +
+>  	switch (get_fault_type(regs)) {
+>  	case USER_FAULT:
+>  		mm = current->mm;
 
