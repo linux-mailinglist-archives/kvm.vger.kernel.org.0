@@ -2,136 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAC962FBCD7
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:48:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 835252FBD0A
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 17:58:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389344AbhASQre (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 11:47:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44063 "EHLO
+        id S2389504AbhASQ5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 11:57:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32516 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389101AbhASQrT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 11:47:19 -0500
+        by vger.kernel.org with ESMTP id S2390680AbhASQzf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 11:55:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611074752;
+        s=mimecast20190719; t=1611075249;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0J++Mr9m0Mfy8jyUQHfcyaXEz43NfNlMC2385CCzrfI=;
-        b=Xr4b6c0dkd08ryjJVdc+NeIWyMsLWLp6PuSitM5G3+QKHfzA9ktzw1AG5qAm/wmSuJ0/HN
-        pJWcmnfJydzpAMlnq/IulGpbV2I1nDIPUu686NkzBuxH3B2N3uNz/PAHTBKKZWvx6gIYvJ
-        HMAqT3utJY+e3azbrO5fcQUwGrhV9AI=
+        bh=atKdoWTs/5WSIAH1EWyl3o9F/p/2dp+BRd7oUt8pH/A=;
+        b=aLh0KItI71yyZuTEs0ayNiIbdPQglJ/y0qdU60RZM72F0AQttjyLfTpjOH5yfwj9E0004K
+        jZse6axFXRRLCKWuvAww67UzFTrdkPwdYSGGdiflFPx0VpA+GhSK3qGVlPyVbq4W2GA2h4
+        ih1I0WEUsRtXjfuXGxeY7aeqhkD/NVk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-547-ihAcHFwCNRCAq0kJWO6gMw-1; Tue, 19 Jan 2021 11:45:48 -0500
-X-MC-Unique: ihAcHFwCNRCAq0kJWO6gMw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-474-0rYlN_9OOfSUvEm-obQGyQ-1; Tue, 19 Jan 2021 11:54:05 -0500
+X-MC-Unique: 0rYlN_9OOfSUvEm-obQGyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9512E835DF2;
-        Tue, 19 Jan 2021 16:45:47 +0000 (UTC)
-Received: from [10.3.113.116] (ovpn-113-116.phx2.redhat.com [10.3.113.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 04FC06EF43;
-        Tue, 19 Jan 2021 16:45:46 +0000 (UTC)
-Subject: Re: [PATCH] target/i386/sev: add the support to query the attestation
- report
-To:     Brijesh Singh <brijesh.singh@amd.com>, qemu-devel@nongnu.org
-Cc:     James Bottomley <jejb@linux.ibm.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20201204213101.14552-1-brijesh.singh@amd.com>
-From:   Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <15a7472f-5ec2-adc1-cda6-61d9ca58a5e0@redhat.com>
-Date:   Tue, 19 Jan 2021 10:45:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AB648066F0;
+        Tue, 19 Jan 2021 16:54:04 +0000 (UTC)
+Received: from gondolin (ovpn-113-246.ams2.redhat.com [10.36.113.246])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 77A8010190AA;
+        Tue, 19 Jan 2021 16:54:02 +0000 (UTC)
+Date:   Tue, 19 Jan 2021 17:53:59 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Janosch Frank <frankja@linux.vnet.ibm.com>,
+        KVM <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/1] KVM: s390: diag9c forwarding
+Message-ID: <20210119175359.1a5ea5be.cohuck@redhat.com>
+In-Reply-To: <20210118131739.7272-2-borntraeger@de.ibm.com>
+References: <20210118131739.7272-1-borntraeger@de.ibm.com>
+        <20210118131739.7272-2-borntraeger@de.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20201204213101.14552-1-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/4/20 3:31 PM, Brijesh Singh wrote:
-> The SEV FW >= 0.23 added a new command that can be used to query the
-> attestation report containing the SHA-256 digest of the guest memory
-> and VMSA encrypted with the LAUNCH_UPDATE and sign it with the PEK.
+On Mon, 18 Jan 2021 14:17:39 +0100
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> From: Pierre Morel <pmorel@linux.ibm.com>
 > 
-> Note, we already have a command (LAUNCH_MEASURE) that can be used to
-> query the SHA-256 digest of the guest memory encrypted through the
-> LAUNCH_UPDATE. The main difference between previous and this command
-> is that the report is signed with the PEK and unlike the LAUNCH_MEASURE
-> command the ATTESATION_REPORT command can be called while the guest
-> is running.
+> When we receive intercept a DIAG_9C from the guest we verify
+> that the target real CPU associated with the virtual CPU
+> designated by the guest is running and if not we forward the
+> DIAG_9C to the target real CPU.
 > 
-> Add a QMP interface "query-sev-attestation-report" that can be used
-> to get the report encoded in base64.
+> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
+> 
+> The rate is calculated as a count per second defined as a
+> new parameter of the s390 kvm module: diag9c_forwarding_hz .
+> 
+> The default value is to not forward diag9c.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  arch/s390/include/asm/kvm_host.h |  1 +
+>  arch/s390/include/asm/smp.h      |  1 +
+>  arch/s390/kernel/smp.c           |  1 +
+>  arch/s390/kvm/diag.c             | 31 ++++++++++++++++++++++++++++---
+>  arch/s390/kvm/kvm-s390.c         |  6 ++++++
+>  arch/s390/kvm/kvm-s390.h         |  8 ++++++++
+>  6 files changed, 45 insertions(+), 3 deletions(-)
 > 
 
-> +++ b/qapi/misc-target.json
-> @@ -267,3 +267,41 @@
->  ##
->  { 'command': 'query-gic-capabilities', 'returns': ['GICCapability'],
->    'if': 'defined(TARGET_ARM)' }
+(...)
+
+> @@ -167,9 +180,21 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
+>  	if (!tcpu)
+>  		goto no_yield;
+>  
+> -	/* target already running */
+> -	if (READ_ONCE(tcpu->cpu) >= 0)
+> -		goto no_yield;
+> +	/* target VCPU already running */
+
+Maybe make this /* target guest VPCU already running */...
+
+> +	if (READ_ONCE(tcpu->cpu) >= 0) {
+> +		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
+> +			goto no_yield;
 > +
-> +
-> +##
-> +# @SevAttestationReport:
-> +#
-> +# The struct describes attestation report for a Secure Encrypted Virtualization
-> +# feature.
-> +#
-> +# @data:  guest attestation report (base64 encoded)
-> +#
-> +#
-> +# Since: 5.2
+> +		/* target CPU already running */
 
-You've missed the 5.2 release; this should be since 6.0.
+...and this /* target host CPU already running */? I just read this
+several times and was confused before I spotted the difference :)
 
-> +##
-> +{ 'struct': 'SevAttestationReport',
-> +  'data': { 'data': 'str'},
-> +  'if': 'defined(TARGET_I386)' }
-> +
-> +##
-> +# @query-sev-attestation-report:
-> +#
-> +# This command is used to get the SEV attestation report, and is supported on AMD
-> +# X86 platforms only.
-> +#
-> +# @mnonce: a random 16 bytes of data (it will be included in report)
+> +		if (!vcpu_is_preempted(tcpu->cpu))
+> +			goto no_yield;
+> +		smp_yield_cpu(tcpu->cpu);
+> +		VCPU_EVENT(vcpu, 5,
+> +			   "diag time slice end directed to %d: yield forwarded",
+> +			   tid);
+> +		vcpu->stat.diagnose_9c_forward++;
+> +		return 0;
+> +	}
+>  
+>  	if (kvm_vcpu_yield_to(tcpu) <= 0)
+>  		goto no_yield;
 
-This says 16 bytes,...
-
-> +#
-> +# Returns: SevAttestationReport objects.
-> +#
-> +# Since: 5.2
-
-Likewise.
-
-> +#
-> +# Example:
-> +#
-> +# -> { "execute" : "query-sev-attestation-report", "arguments": { "mnonce": "aaaaaaa" } }
-
-...but this example does not use 16 bytes.  That's confusing.
-
-> +# <- { "return" : { "data": "aaaaaaaabbbddddd"} }
-> +#
-> +##
-> +{ 'command': 'query-sev-attestation-report', 'data': { 'mnonce': 'str' },
-> +  'returns': 'SevAttestationReport',
-> +  'if': 'defined(TARGET_I386)' }
-> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+(...)
 
