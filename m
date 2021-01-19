@@ -2,114 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35B7E2FBAF1
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 16:20:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F87D2FBAFD
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 16:22:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728699AbhASPT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 10:19:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58658 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391181AbhASPTV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 10:19:21 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JFEK05113214;
-        Tue, 19 Jan 2021 10:18:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7w6NADPRijopnAoi60maFCcOkIgyFaIJ/XQxNhYWGEU=;
- b=B8/1mL9IjctuCW663noAlmJA7xHUxPAMqv+69tpZQhm28PK4eSlcjXE6jSxnGSAZklkv
- rvI/fUZHe2WbKnRxH9kL6/XNR+jWkgUPC7BZdFm6vhGT6WTtT2+c0kqmbDOyXrBWyczc
- VdhdZgXTNSpJoAXAG1m/nkAypX9cqA7zJDb+TilyWblPE738v0eptFAsqq0CQ/vmM8C8
- e6W+fQ0il+spkO+XAdvQttf06tTPeQ7fZjGDuJa7H+k5FOgxhzzLcBf33QlnQoC+VzEJ
- soLE24Q01Oxc+3sD3wp4YnX7mCh1l2/dP/eQCr/txBQMOtDP/xxr7DFh9aSFyUOcqV5O Ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3661vqr4ec-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 10:18:38 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JFFZx9120134;
-        Tue, 19 Jan 2021 10:18:37 -0500
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3661vqr4d9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 10:18:37 -0500
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JFHVwp023725;
-        Tue, 19 Jan 2021 15:18:35 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06fra.de.ibm.com with ESMTP id 363qdh9nmk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 15:18:35 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JFIXiX34013618
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jan 2021 15:18:33 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 057EA52052;
-        Tue, 19 Jan 2021 15:18:33 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.160.34])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6F3855204F;
-        Tue, 19 Jan 2021 15:18:32 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 02/11] lib/list.h: add list_add_tail
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     david@redhat.com, thuth@redhat.com, pbonzini@redhat.com,
-        cohuck@redhat.com, lvivier@redhat.com, nadav.amit@gmail.com,
-        krish.sadhukhan@oracle.com
-References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
- <20210115123730.381612-3-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <1ad3668c-5719-4693-0489-de2d1876b987@linux.ibm.com>
-Date:   Tue, 19 Jan 2021 16:18:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2390503AbhASPVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 10:21:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50540 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389193AbhASPV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 10:21:27 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 01D6B23110;
+        Tue, 19 Jan 2021 15:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1611069643;
+        bh=yf0s5Hnc71ZDmBnzFPUIWJfODcCah0cMw3TOXpxitO8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OPWVYTJT0MTCcxZuwblNq7+3b1gj+nFAHJTjvYu2HvxCc6I0hXTJ1f99Hx6kObw9S
+         3T2zTE+1KLE5UAjzDJOua6M3j09lPQu2AAaG1L6v07ro43OEJU5gr+mMkZZEm9L8xP
+         K02wA0GlOA5PZ2VRAsLSociEkRhvBkyr0kwkafUk=
+Date:   Tue, 19 Jan 2021 16:20:40 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Linux PCI <linux-pci@vger.kernel.org>
+Subject: Re: [PATCH v7 12/17] PCI: Revoke mappings like devmem
+Message-ID: <YAb4yD4IbpQ3qhJG@kroah.com>
+References: <20201127164131.2244124-1-daniel.vetter@ffwll.ch>
+ <20201127164131.2244124-13-daniel.vetter@ffwll.ch>
+ <CAKMK7uGrdDrbtj0OyzqQc0CGrQwc2F3tFJU9vLfm2jjufAZ5YQ@mail.gmail.com>
+ <YAbtZBU5PMr68q9E@kroah.com>
+ <CAKMK7uGHSgetm7mDso6_vj+aGrR4u+ChwHb3k0QvgG0K6X2fPg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210115123730.381612-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-19_05:2021-01-18,2021-01-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 impostorscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101190091
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKMK7uGHSgetm7mDso6_vj+aGrR4u+ChwHb3k0QvgG0K6X2fPg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/15/21 1:37 PM, Claudio Imbrenda wrote:
-> Add a list_add_tail wrapper function to allow adding elements to the end
-> of a list.
+On Tue, Jan 19, 2021 at 03:34:47PM +0100, Daniel Vetter wrote:
+> On Tue, Jan 19, 2021 at 3:32 PM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Tue, Jan 19, 2021 at 09:17:55AM +0100, Daniel Vetter wrote:
+> > > On Fri, Nov 27, 2020 at 5:42 PM Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
+> > > >
+> > > > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver claims
+> > > > the region") /dev/kmem zaps ptes when the kernel requests exclusive
+> > > > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, this is
+> > > > the default for all driver uses.
+> > > >
+> > > > Except there's two more ways to access PCI BARs: sysfs and proc mmap
+> > > > support. Let's plug that hole.
+> > > >
+> > > > For revoke_devmem() to work we need to link our vma into the same
+> > > > address_space, with consistent vma->vm_pgoff. ->pgoff is already
+> > > > adjusted, because that's how (io_)remap_pfn_range works, but for the
+> > > > mapping we need to adjust vma->vm_file->f_mapping. The cleanest way is
+> > > > to adjust this at at ->open time:
+> > > >
+> > > > - for sysfs this is easy, now that binary attributes support this. We
+> > > >   just set bin_attr->mapping when mmap is supported
+> > > > - for procfs it's a bit more tricky, since procfs pci access has only
+> > > >   one file per device, and access to a specific resources first needs
+> > > >   to be set up with some ioctl calls. But mmap is only supported for
+> > > >   the same resources as sysfs exposes with mmap support, and otherwise
+> > > >   rejected, so we can set the mapping unconditionally at open time
+> > > >   without harm.
+> > > >
+> > > > A special consideration is for arch_can_pci_mmap_io() - we need to
+> > > > make sure that the ->f_mapping doesn't alias between ioport and iomem
+> > > > space. There's only 2 ways in-tree to support mmap of ioports: generic
+> > > > pci mmap (ARCH_GENERIC_PCI_MMAP_RESOURCE), and sparc as the single
+> > > > architecture hand-rolling. Both approach support ioport mmap through a
+> > > > special pfn range and not through magic pte attributes. Aliasing is
+> > > > therefore not a problem.
+> > > >
+> > > > The only difference in access checks left is that sysfs PCI mmap does
+> > > > not check for CAP_RAWIO. I'm not really sure whether that should be
+> > > > added or not.
+> > > >
+> > > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> > > > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > > > Cc: Kees Cook <keescook@chromium.org>
+> > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > > > Cc: John Hubbard <jhubbard@nvidia.com>
+> > > > Cc: Jérôme Glisse <jglisse@redhat.com>
+> > > > Cc: Jan Kara <jack@suse.cz>
+> > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > > > Cc: linux-mm@kvack.org
+> > > > Cc: linux-arm-kernel@lists.infradead.org
+> > > > Cc: linux-samsung-soc@vger.kernel.org
+> > > > Cc: linux-media@vger.kernel.org
+> > > > Cc: Bjorn Helgaas <bhelgaas@google.com>
+> > > > Cc: linux-pci@vger.kernel.org
+> > > > Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > > > --
+> > > > v2:
+> > > > - Totally new approach: Adjust filp->f_mapping at open time. Note that
+> > > >   this now works on all architectures, not just those support
+> > > >   ARCH_GENERIC_PCI_MMAP_RESOURCE
+> > > > ---
+> > > >  drivers/pci/pci-sysfs.c | 4 ++++
+> > > >  drivers/pci/proc.c      | 1 +
+> > > >  2 files changed, 5 insertions(+)
+> > > >
+> > > > diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+> > > > index d15c881e2e7e..3f1c31bc0b7c 100644
+> > > > --- a/drivers/pci/pci-sysfs.c
+> > > > +++ b/drivers/pci/pci-sysfs.c
+> > > > @@ -929,6 +929,7 @@ void pci_create_legacy_files(struct pci_bus *b)
+> > > >         b->legacy_io->read = pci_read_legacy_io;
+> > > >         b->legacy_io->write = pci_write_legacy_io;
+> > > >         b->legacy_io->mmap = pci_mmap_legacy_io;
+> > > > +       b->legacy_io->mapping = iomem_get_mapping();
+> > > >         pci_adjust_legacy_attr(b, pci_mmap_io);
+> > > >         error = device_create_bin_file(&b->dev, b->legacy_io);
+> > > >         if (error)
+> > > > @@ -941,6 +942,7 @@ void pci_create_legacy_files(struct pci_bus *b)
+> > > >         b->legacy_mem->size = 1024*1024;
+> > > >         b->legacy_mem->attr.mode = 0600;
+> > > >         b->legacy_mem->mmap = pci_mmap_legacy_mem;
+> > > > +       b->legacy_io->mapping = iomem_get_mapping();
+> > >
+> > > Unlike the normal pci stuff below, the legacy files here go boom
+> > > because they're set up much earlier in the boot sequence. This only
+> > > affects HAVE_PCI_LEGACY architectures, which aren't that many. So what
+> > > should we do here now:
+> > > - drop the devmem revoke for these
+> > > - rework the init sequence somehow to set up these files a lot later
+> > > - redo the sysfs patch so that it doesn't take an address_space
+> > > pointer, but instead a callback to get at that (since at open time
+> > > everything is set up). Imo rather ugly
+> > > - ditch this part of the series (since there's not really any takers
+> > > for the latter parts it might just not make sense to push for this)
+> > > - something else?
+> > >
+> > > Bjorn, Greg, thoughts?
+> >
+> > What sysfs patch are you referring to here?
 > 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-
-Reviewed-by: Janosch Frank <frankja@de.ibm.com>
-
-> ---
->  lib/list.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> Currently in linux-next:
 > 
-> diff --git a/lib/list.h b/lib/list.h
-> index 18d9516..7f9717e 100644
-> --- a/lib/list.h
-> +++ b/lib/list.h
-> @@ -50,4 +50,13 @@ static inline void list_add(struct linked_list *head, struct linked_list *li)
->  	head->next = li;
->  }
->  
-> +/*
-> + * Add the given element before the given list head.
-> + */
-> +static inline void list_add_tail(struct linked_list *head, struct linked_list *li)
-> +{
-> +	assert(head);
-> +	list_add(head->prev, li);
-> +}
-> +
->  #endif
+> commit 74b30195395c406c787280a77ae55aed82dbbfc7 (HEAD ->
+> topic/iomem-mmap-vs-gup, drm/topic/iomem-mmap-vs-gup)
+> Author: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Date:   Fri Nov 27 17:41:25 2020 +0100
 > 
+>    sysfs: Support zapping of binary attr mmaps
+> 
+> Or the patch right before this one in this submission here:
+> 
+> https://lore.kernel.org/dri-devel/20201127164131.2244124-12-daniel.vetter@ffwll.ch/
 
+Ah.  Hm, a callback in the sysfs file logic seems really hairy, so I
+would prefer that not happen.  If no one really needs this stuff, why
+not just drop it like you mention?
+
+thanks,
+
+greg k-h
