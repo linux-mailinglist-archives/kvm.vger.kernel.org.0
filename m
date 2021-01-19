@@ -2,112 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BBDAB2FBA55
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32EEF2FBA56
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405119AbhASOwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 09:52:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52375 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389309AbhASLvu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 06:51:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611057005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U+631dB54hObrupYubPtQkJyLL4fsiVTiIHAwNM3YpQ=;
-        b=a5gBGH7rblHfU3/9o15hrxyC7nOEIHvPacNzLUKBIyPNwK4TLY0TCvPC+8ePD1qJQqUHp6
-        CtrYfJBmy61pVQgCsYTT8ubHMum8Yk5oys0054dWvyRZFDiGj4kQ4+iAnZhmF6gQ2kye8j
-        2/yVGDd09hLDq4KQzYTiBL3IXhooxEQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-RHs7KWtXOpezIaSNoGA_3Q-1; Tue, 19 Jan 2021 06:50:02 -0500
-X-MC-Unique: RHs7KWtXOpezIaSNoGA_3Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C51A1005513;
-        Tue, 19 Jan 2021 11:50:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-157.ams2.redhat.com [10.36.112.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 60C5F189A4;
-        Tue, 19 Jan 2021 11:49:49 +0000 (UTC)
-Subject: Re: [PATCH v2 9/9] gitlab-ci: Add alpine to pipeline
-From:   Thomas Huth <thuth@redhat.com>
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
-        qemu-block@nongnu.org,
-        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Alistair Francis <alistair@alistair23.me>,
-        BALATON Zoltan via <qemu-devel@nongnu.org>,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
- <20210118063808.12471-10-jiaxun.yang@flygoat.com>
- <20210118101159.GC1789637@redhat.com>
- <fb7308f2-ecc7-48b8-9388-91fd30691767@www.fastmail.com>
- <307dea8e-148e-6666-c6f1-5cc66a54a7af@redhat.com>
- <20210118145016.GC1799018@redhat.com>
- <a9d9fb1d-f356-adb4-3763-a015e0d13320@redhat.com>
-Message-ID: <a5b6e842-6a9d-c702-d369-d97b03f79e19@redhat.com>
-Date:   Tue, 19 Jan 2021 12:49:48 +0100
+        id S2405177AbhASOwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 09:52:19 -0500
+Received: from lb3-smtp-cloud7.xs4all.net ([194.109.24.31]:45107 "EHLO
+        lb3-smtp-cloud7.xs4all.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393094AbhASMck (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 07:32:40 -0500
+X-Greylist: delayed 459 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 Jan 2021 07:32:37 EST
+Received: from cust-b5b5937f ([IPv6:fc0c:c16d:66b8:757f:c639:739b:9d66:799d])
+        by smtp-cloud7.xs4all.net with ESMTPA
+        id 1q3JlOl5LyutM1q3MlbVVy; Tue, 19 Jan 2021 13:24:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xs4all.nl; s=s2;
+        t=1611059053; bh=+fygwg8H7qkyKanjBFzInEqDikPrCtVia5ztmXeuT8o=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type:From:
+         Subject;
+        b=esWbI+Lh9FRvuG9LpVYDuouJ84+y5SVFATzQP7ZpAkWlKhxpMQNv10g7tZk+Q+4GR
+         P8w0iKSjARrqozBk9TMk4qupccz3HMw/pPa5j+Fl4C2W0pgaEOFIATNA5dfqmNbXpF
+         WY3dgySHr2MM3+6svDtBqw3Cm53j9ZKlcznqjLsgYdpTtvUnDnYFt00lTZiImdL2fY
+         qY1XJPsfQLCx3vnp/zkfosk3P0gx6P0mVbHxoub0/O3N+aYXqUBlwVZ01FyUjwj1I0
+         OZ20uGwGN94AfvQR5wgjFi/ySkQn4HCvdPm/riMHsIyPvQ/Hw151NoHZMXG5h6/u3B
+         ZllT5HuMu4+8A==
+Subject: Re: [PATCH v7 14/17] media/videobuf1|2: Mark follow_pfn usage as
+ unsafe
+To:     Daniel Vetter <daniel.vetter@ffwll.ch>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mm@kvack.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-media@vger.kernel.org,
+        Tomasz Figa <tfiga@chromium.org>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Pawel Osciak <pawel@osciak.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kyungmin Park <kyungmin.park@samsung.com>,
+        Laurent Dufour <ldufour@linux.ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Michel Lespinasse <walken@google.com>
+References: <20201127164131.2244124-1-daniel.vetter@ffwll.ch>
+ <20201127164131.2244124-15-daniel.vetter@ffwll.ch>
+From:   Hans Verkuil <hverkuil@xs4all.nl>
+Message-ID: <f15ba4c6-211c-f93e-919e-e18adfe6c75e@xs4all.nl>
+Date:   Tue, 19 Jan 2021 13:24:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <a9d9fb1d-f356-adb4-3763-a015e0d13320@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20201127164131.2244124-15-daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-CMAE-Envelope: MS4xfA1H6w7Z451hXz5uBfC+T4CILwukWC7IM/06HM55r5dwzXzD5s4d8wprZRF6kMCTJKToPwR+OFR57hUr5TUeAa3J/b4Bano5cXG5JJs7aDyySvyBQ7iT
+ AF6NJi1hvvqh1FElksqvzLVa/QmOEEejZBgjFwsoa8P3BlX71aUZg55UgN1CoKfvJigaVMx8OmJVZTP1TBgBzYBEZA+0dH6f1b1DMDgA9kXqoDqQfIJqtbCX
+ qHojNYKAiISwBmDYuSZMkSH7KYRNIIB59C3sKlux+Osh+dIvr5KeKL/UVyQNN5t4C8bA3xzI7WdxGoWOTrcrh6osz7j5RinbLE8qyeEUJUyvvWjXKkpd7dqS
+ HMIEDbWiUVhRUKJ1yDeGKCpWevlCpEVMVzY1pNK0/aVSSfNEBvtodYg6CYCokOhjJHvuA+Ep4e+YV4DPrzHET+/xc+NX8AyQiHwb8/yP2YmEZJ49rfgQR9BP
+ dr/7nk6Q/Zh1zkv3OibjwZY9c+4YhA+0B7uhgqimrkbKOf8Rigw2QOU+Ca/UadrwBpoSe8JeVoEhBEL9Z1DvGPDVJmztfvzZh/WKgR3U/UdzLA58H6XYG2Wi
+ kRopGvfHjGH7BGq7rfl3p2JRUv4RPzrY67wfHIz7CJCMySBHEhQmO0DqCexzJwuN7qVDQQUew+dVW+zy8VfPtcLvnQ/ulL2+sYo0AsauVMOoEKmJsD13zo8F
+ BwOGLGocDuv11A3T9etYvQWCfQotxHdMIivYlD9K45bjGngn5VQTZJEBfHREoydJ8pRl5Zubmv1dwvrtHzJ5cUaN75JDMp0+rY6t7CQSF6ElQBaS/BkwGvqT
+ E/8oCoh/4PmJ0q6wWIfjNWnYVoGo3VhXp1URyLLFriMg9vsz5Zk8hKxx6nVgqUGGVM+9vX7XOQ6WrUu2nFalkCfyREoU2d7TZo3kbyVR1cFUVs4KSoSVdkYX
+ 9CdJyh8ZOIugxyoIdE14LTtUXncHFwG8YxkQ+bn6EZL1uWAR
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/01/2021 16.12, Thomas Huth wrote:
-> On 18/01/2021 15.50, Daniel P. Berrangé wrote:
->> On Mon, Jan 18, 2021 at 03:44:49PM +0100, Thomas Huth wrote:
->>> On 18/01/2021 14.37, Jiaxun Yang wrote:
->>>>
->>>>
->>>> On Mon, Jan 18, 2021, at 6:11 PM, Daniel P. Berrangé wrote:
->>>>> On Mon, Jan 18, 2021 at 02:38:08PM +0800, Jiaxun Yang wrote:
->>>>>> We only run build test and check-acceptance as their are too many
->>>>>> failures in checks due to minor string mismatch.
->>>>>
->>>>> Can you give real examples of what's broken here, as that sounds
->>>>> rather suspicious, and I'm not convinced it should be ignored.
->>>>
->>>> Mostly Input/Output error vs I/O Error.
->>>
->>> Right, out of curiosity, I also gave it a try:
->>>
->>>   https://gitlab.com/huth/qemu/-/jobs/969225330
->>>
->>> Apart from the "I/O Error" vs. "Input/Output Error" difference, there also
->>> seems to be a problem with "sed" in some of the tests.
->>
->> The "sed" thing sounds like something that ought to be investigated
->> from a portability POV rather than ignored.
+On 27/11/2020 17:41, Daniel Vetter wrote:
+> The media model assumes that buffers are all preallocated, so that
+> when a media pipeline is running we never miss a deadline because the
+> buffers aren't allocated or available.
 > 
-> The weird thing is that we explicitly test for GNU sed in 
-> tests/check-block.sh and skip the iotests if it's not available... so I'm a 
-> little bit surprised that the iotests are run here with an apparently 
-> different version of sed...?
+> This means we cannot fix the v4l follow_pfn usage through
+> mmu_notifier, without breaking how this all works. The only real fix
+> is to deprecate userptr support for VM_IO | VM_PFNMAP mappings and
+> tell everyone to cut over to dma-buf memory sharing for zerocopy.
+> 
+> userptr for normal memory will keep working as-is, this only affects
+> the zerocopy userptr usage enabled in 50ac952d2263 ("[media]
+> videobuf2-dma-sg: Support io userptr operations on io memory").
+> 
+> Acked-by: Tomasz Figa <tfiga@chromium.org>
 
-Oh, well, I've fired up a bootable ISO image of Alpine, and ran "sed 
---version" and it says:
+Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
 
-  This is not GNU sed version 4.0
+Regards,
 
-Ouch. But I guess we could add a check for that to our tests/check-block.sh 
-script, too...
+	Hans
 
-  Thomas
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: John Hubbard <jhubbard@nvidia.com>
+> Cc: Jérôme Glisse <jglisse@redhat.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: linux-mm@kvack.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-samsung-soc@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: Pawel Osciak <pawel@osciak.com>
+> Cc: Marek Szyprowski <m.szyprowski@samsung.com>
+> Cc: Kyungmin Park <kyungmin.park@samsung.com>
+> Cc: Tomasz Figa <tfiga@chromium.org>
+> Cc: Laurent Dufour <ldufour@linux.ibm.com>
+> Cc: Vlastimil Babka <vbabka@suse.cz>
+> Cc: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: Michel Lespinasse <walken@google.com>
+> Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> --
+> v3:
+> - Reference the commit that enabled the zerocopy userptr use case to
+>   make it abundandtly clear that this patch only affects that, and not
+>   normal memory userptr. The old commit message already explained that
+>   normal memory userptr is unaffected, but I guess that was not clear
+>   enough.
+> ---
+>  drivers/media/common/videobuf2/frame_vector.c | 2 +-
+>  drivers/media/v4l2-core/videobuf-dma-contig.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/media/common/videobuf2/frame_vector.c b/drivers/media/common/videobuf2/frame_vector.c
+> index a0e65481a201..1a82ec13ea00 100644
+> --- a/drivers/media/common/videobuf2/frame_vector.c
+> +++ b/drivers/media/common/videobuf2/frame_vector.c
+> @@ -70,7 +70,7 @@ int get_vaddr_frames(unsigned long start, unsigned int nr_frames,
+>  			break;
+>  
+>  		while (ret < nr_frames && start + PAGE_SIZE <= vma->vm_end) {
+> -			err = follow_pfn(vma, start, &nums[ret]);
+> +			err = unsafe_follow_pfn(vma, start, &nums[ret]);
+>  			if (err) {
+>  				if (ret == 0)
+>  					ret = err;
+> diff --git a/drivers/media/v4l2-core/videobuf-dma-contig.c b/drivers/media/v4l2-core/videobuf-dma-contig.c
+> index 52312ce2ba05..821c4a76ab96 100644
+> --- a/drivers/media/v4l2-core/videobuf-dma-contig.c
+> +++ b/drivers/media/v4l2-core/videobuf-dma-contig.c
+> @@ -183,7 +183,7 @@ static int videobuf_dma_contig_user_get(struct videobuf_dma_contig_memory *mem,
+>  	user_address = untagged_baddr;
+>  
+>  	while (pages_done < (mem->size >> PAGE_SHIFT)) {
+> -		ret = follow_pfn(vma, user_address, &this_pfn);
+> +		ret = unsafe_follow_pfn(vma, user_address, &this_pfn);
+>  		if (ret)
+>  			break;
+>  
+> 
 
