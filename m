@@ -2,112 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C6622FBA2B
-	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:55:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BB8B2FBA3C
+	for <lists+kvm@lfdr.de>; Tue, 19 Jan 2021 15:56:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390571AbhASOp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 09:45:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20797 "EHLO
+        id S2389266AbhASOsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 09:48:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27868 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389466AbhASKEp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 05:04:45 -0500
+        by vger.kernel.org with ESMTP id S2389487AbhASKFV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 05:05:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611050599;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=uJE0F33cZMQfWxlJld0rtbaTxrpyNj2SkPYOONCRxug=;
-        b=Rg5tKtyed1UIKDoqnR9aVSt2Kfgpa6I2hYSG3vHChl8X62r6PHHFehZOsr89jg3FwtwZun
-        DPGLWfp2XpU2kbHJoIrwmOyZrjOrGtJEd6C7KekloQokMm+xMIjrO8LB1O6IABol1mDCc+
-        cPwKmqvzwr6XaPkSlOehPE577ru/Wls=
+        s=mimecast20190719; t=1611050614;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I/9Q+F90NAKj/f83iclQUQZ5P8dwgMK4bLugHzNFnF0=;
+        b=Iz10g9z7rUR+q01jTfl1MBwH50r/GwBgj+962rE+d9Dpd1BFm8+4sgIXCafsnyh8Gr43VR
+        wSvQ2N2kUeGAgiMQA2V7/039GhhmMokFwRSsrN27XRHFXHq9WN/9xxX/6tMCHCDXLD+6hs
+        tuVTGF/AqcuxqwV00Ey6/aXD7rP2fjA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-39-r1dRp5oVNaOO9PjcuK64uA-1; Tue, 19 Jan 2021 04:59:47 -0500
-X-MC-Unique: r1dRp5oVNaOO9PjcuK64uA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-309-JRJTFJ6mPZmwqk35DQVIIA-1; Tue, 19 Jan 2021 05:03:30 -0500
+X-MC-Unique: JRJTFJ6mPZmwqk35DQVIIA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EC581842140;
-        Tue, 19 Jan 2021 09:59:45 +0000 (UTC)
-Received: from redhat.com (ovpn-112-84.ams2.redhat.com [10.36.112.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80B556A90C;
-        Tue, 19 Jan 2021 09:59:30 +0000 (UTC)
-Date:   Tue, 19 Jan 2021 09:59:27 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Ram Pai <linuxram@us.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, pair@us.ibm.com,
-        brijesh.singh@amd.com, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-        frankja@linux.ibm.com, david@redhat.com, mdroth@linux.vnet.ibm.com,
-        Halil Pasic <pasic@linux.ibm.com>, borntraeger@de.ibm.com,
-        David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>, dgilbert@redhat.com,
-        qemu-s390x@nongnu.org, rth@twiddle.net,
-        Marcelo Tosatti <mtosatti@redhat.com>, qemu-ppc@nongnu.org,
-        pbonzini@redhat.com
-Subject: Re: Re: [for-6.0 v5 11/13] spapr: PEF: prevent migration
-Message-ID: <20210119095927.GB1830870@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20210104134629.49997b53.pasic@linux.ibm.com>
- <20210104184026.GD4102@ram-ibm-com.ibm.com>
- <20210105115614.7daaadd6.pasic@linux.ibm.com>
- <20210105204125.GE4102@ram-ibm-com.ibm.com>
- <20210111175914.13adfa2e.cohuck@redhat.com>
- <20210111195830.GA23898@ram-ibm-com.ibm.com>
- <20210112091943.095c3b29.cohuck@redhat.com>
- <20210112185511.GB23898@ram-ibm-com.ibm.com>
- <20210113090629.2f41a9d3.cohuck@redhat.com>
- <20210115185514.GB24076@ram-ibm-com.ibm.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D424A612A3;
+        Tue, 19 Jan 2021 10:03:28 +0000 (UTC)
+Received: from [10.36.112.67] (ovpn-112-67.ams2.redhat.com [10.36.112.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DE626062F;
+        Tue, 19 Jan 2021 10:03:21 +0000 (UTC)
+Subject: Re: [PATCH v7 02/16] iommu/smmu: Report empty domain nesting info
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        Vivek Gautam <vivek.gautam@arm.com>
+Cc:     "Sun, Yi Y" <yi.y.sun@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        "list@263.net:IOMMU DRIVERS" <iommu@lists.linux-foundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        iommu@lists.linux-foundation.org,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Wu, Hao" <hao.wu@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>
+References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
+ <1599734733-6431-3-git-send-email-yi.l.liu@intel.com>
+ <CAFp+6iFob_fy1cTgcEv0FOXBo70AEf3Z1UvXgPep62XXnLG9Gw@mail.gmail.com>
+ <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
+ <DM5PR11MB1435D9ED79B2BE9C8F235428C3A90@DM5PR11MB1435.namprd11.prod.outlook.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <6bcd5229-9cd3-a78c-ccb2-be92f2add373@redhat.com>
+Date:   Tue, 19 Jan 2021 11:03:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
+In-Reply-To: <DM5PR11MB1435D9ED79B2BE9C8F235428C3A90@DM5PR11MB1435.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210115185514.GB24076@ram-ibm-com.ibm.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 15, 2021 at 10:55:14AM -0800, Ram Pai wrote:
-> On Wed, Jan 13, 2021 at 09:06:29AM +0100, Cornelia Huck wrote:
-> > On Tue, 12 Jan 2021 10:55:11 -0800
-> > Ram Pai <linuxram@us.ibm.com> wrote:
-> > 
-> > > On Tue, Jan 12, 2021 at 09:19:43AM +0100, Cornelia Huck wrote:
-> > > Actually the two options are inherently NOT incompatible.  Halil also
-> > > mentioned this in one of his replies.
-> > > 
-> > > Its just that the current implementation is lacking, which will be fixed
-> > > in the near future. 
-> > > 
-> > > We can design it upfront, with the assumption that they both are compatible.
-> > > In the short term  disable one; preferrably the secure-object, if both 
-> > > options are specified. In the long term, remove the restriction, when
-> > > the implemetation is complete.
-> > 
-> > Can't we simply mark the object as non-migratable now, and then remove
-> > that later? I don't see what is so special about it.
+Hi Yi, Vivek,
+
+On 1/13/21 6:56 AM, Liu, Yi L wrote:
+> Hi Vivek,
 > 
-> This is fine too. 
+>> From: Vivek Gautam <vivek.gautam@arm.com>
+>> Sent: Tuesday, January 12, 2021 7:06 PM
+>>
+>> Hi Yi,
+>>
+>>
+>> On Tue, Jan 12, 2021 at 2:51 PM Liu, Yi L <yi.l.liu@intel.com> wrote:
+>>>
+>>> Hi Vivek,
+>>>
+>>>> From: Vivek Gautam <vivek.gautam@arm.com>
+>>>> Sent: Tuesday, January 12, 2021 2:50 PM
+>>>>
+>>>> Hi Yi,
+>>>>
+>>>>
+>>>> On Thu, Sep 10, 2020 at 4:13 PM Liu Yi L <yi.l.liu@intel.com> wrote:
+>>>>>
+>>>>> This patch is added as instead of returning a boolean for
+>>>> DOMAIN_ATTR_NESTING,
+>>>>> iommu_domain_get_attr() should return an iommu_nesting_info
+>> handle.
+>>>> For
+>>>>> now, return an empty nesting info struct for now as true nesting is not
+>>>>> yet supported by the SMMUs.
+>>>>>
+>>>>> Cc: Will Deacon <will@kernel.org>
+>>>>> Cc: Robin Murphy <robin.murphy@arm.com>
+>>>>> Cc: Eric Auger <eric.auger@redhat.com>
+>>>>> Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>>> Suggested-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>>>> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+>>>>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>>>>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>>>>> ---
+>>>>> v5 -> v6:
+>>>>> *) add review-by from Eric Auger.
+>>>>>
+>>>>> v4 -> v5:
+>>>>> *) address comments from Eric Auger.
+>>>>> ---
+>>>>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 29
+>>>> +++++++++++++++++++++++++++--
+>>>>>  drivers/iommu/arm/arm-smmu/arm-smmu.c       | 29
+>>>> +++++++++++++++++++++++++++--
+>>>>>  2 files changed, 54 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> index 7196207..016e2e5 100644
+>>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>>>>> @@ -3019,6 +3019,32 @@ static struct iommu_group
+>>>> *arm_smmu_device_group(struct device *dev)
+>>>>>         return group;
+>>>>>  }
+>>>>>
+>>>>> +static int arm_smmu_domain_nesting_info(struct
+>> arm_smmu_domain
+>>>> *smmu_domain,
+>>>>> +                                       void *data)
+>>>>> +{
+>>>>> +       struct iommu_nesting_info *info = (struct iommu_nesting_info
+>>>> *)data;
+>>>>> +       unsigned int size;
+>>>>> +
+>>>>> +       if (!info || smmu_domain->stage !=
+>> ARM_SMMU_DOMAIN_NESTED)
+>>>>> +               return -ENODEV;
+>>>>> +
+>>>>> +       size = sizeof(struct iommu_nesting_info);
+>>>>> +
+>>>>> +       /*
+>>>>> +        * if provided buffer size is smaller than expected, should
+>>>>> +        * return 0 and also the expected buffer size to caller.
+>>>>> +        */
+>>>>> +       if (info->argsz < size) {
+>>>>> +               info->argsz = size;
+>>>>> +               return 0;
+>>>>> +       }
+>>>>> +
+>>>>> +       /* report an empty iommu_nesting_info for now */
+>>>>> +       memset(info, 0x0, size);
+>>>>> +       info->argsz = size;
+>>>>> +       return 0;
+>>>>> +}
+>>>>> +
+>>>>>  static int arm_smmu_domain_get_attr(struct iommu_domain
+>> *domain,
+>>>>>                                     enum iommu_attr attr, void *data)
+>>>>>  {
+>>>>> @@ -3028,8 +3054,7 @@ static int
+>> arm_smmu_domain_get_attr(struct
+>>>> iommu_domain *domain,
+>>>>>         case IOMMU_DOMAIN_UNMANAGED:
+>>>>>                 switch (attr) {
+>>>>>                 case DOMAIN_ATTR_NESTING:
+>>>>> -                       *(int *)data = (smmu_domain->stage ==
+>>>> ARM_SMMU_DOMAIN_NESTED);
+>>>>> -                       return 0;
+>>>>> +                       return
+>> arm_smmu_domain_nesting_info(smmu_domain,
+>>>> data);
+>>>>
+>>>> Thanks for the patch.
+>>>> This would unnecessarily overflow 'data' for any caller that's expecting
+>> only
+>>>> an int data. Dump from one such issue that I was seeing when testing
+>>>> this change along with local kvmtool changes is pasted below [1].
+>>>>
+>>>> I could get around with the issue by adding another (iommu_attr) -
+>>>> DOMAIN_ATTR_NESTING_INFO that returns (iommu_nesting_info).
+>>>
+>>> nice to hear from you. At first, we planned to have a separate iommu_attr
+>>> for getting nesting_info. However, we considered there is no existing user
+>>> which gets DOMAIN_ATTR_NESTING, so we decided to reuse it for iommu
+>> nesting
+>>> info. Could you share me the code base you are using? If the error you
+>>> encountered is due to this change, so there should be a place which gets
+>>> DOMAIN_ATTR_NESTING.
+>>
+>> I am currently working on top of Eric's tree for nested stage support [1].
+>> My best guess was that the vfio_pci_dma_fault_init() method [2] that is
+>> requesting DOMAIN_ATTR_NESTING causes stack overflow, and corruption.
+>> That's when I added a new attribute.
 > 
-> However I am told that libvirt has some assumptions, where it assumes
-> that the VM is guaranteed to be migratable if '--only-migratable' is
-> specified. Silently turning off that option can be bad.
+> I see. I think there needs a change in the code there. Should also expect
+> a nesting_info returned instead of an int anymore. @Eric, how about your
+> opinion?
+> 
+> 	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
+> 	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &info);
+> 	if (ret || !(info.features & IOMMU_NESTING_FEAT_PAGE_RESP)) {
+> 		/*
+> 		 * No need go futher as no page request service support.
+> 		 */
+> 		return 0;
+> 	}
+Sure I think it is "just" a matter of synchro between the 2 series. Yi,
+do you have plans to respin part of
+[PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing to VMs
+or would you allow me to embed this patch in my series.
 
-TO be clear libvirt does *not* currently use --only-migratable.
+Thanks
 
-What you're describing here is QEMU's own definition of this flag
-
- $ qemu-system-x86_64 | grep migratable
- -only-migratable     allow only migratable devices
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eric
+> 
+> https://github.com/luxis1999/linux-vsva/blob/vsva-linux-5.9-rc6-v8%2BPRQ/drivers/vfio/pci/vfio_pci.c
+> 
+> Regards,
+> Yi Liu
+> 
+>> I will soon publish my patches to the list for review. Let me know
+>> your thoughts.
+>>
+>> [1] https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+>> [2] https://github.com/eauger/linux/blob/5.10-rc4-2stage-
+>> v13/drivers/vfio/pci/vfio_pci.c#L494
+>>
+>> Thanks
+>> Vivek
+>>
+>>>
+>>> Regards,
+>>> Yi Liu
+>>
+>> [snip]
 
