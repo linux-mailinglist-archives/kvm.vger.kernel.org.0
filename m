@@ -2,144 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 641542FD720
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 18:34:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2517B2FD76B
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 18:48:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390623AbhATRdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 12:33:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34588 "EHLO
+        id S1727408AbhATRn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 12:43:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728916AbhATR0E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 12:26:04 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836BBC061575
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 09:25:21 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id j12so7759360pfj.12
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 09:25:21 -0800 (PST)
+        with ESMTP id S2391873AbhATRll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 12:41:41 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C882DC061575
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 09:41:00 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id x18so12899321pln.6
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 09:41:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=KEV7urkYywFz30FuSgPUexQkm0SddOC5wU2ZuJdovsU=;
-        b=sr57Q262PncLhufam68Q0mV8eOPQ7ExS79JYjI+ZHriGoUATbSv/9nDq90xpK18aNf
-         pCxA/BpoIyTFMKEMgeMaqxfykjcIfhDhyU+Lqq1rB9oHYW6hrQ3YgQsCGntE736yOoHJ
-         aFV4CqtHbOUYY9WlD8psu6AqRHWQpMwEQbSFaXU2E5Z5OOyh1LXkp6tX8Fod3j7dJ8bg
-         CFXSO6AiWTHqBAVuvXdpaZ3gv51iLaz1EtHGKdrGeHojP/Ca7LTJjAp4EGT0MtubT489
-         crLCZiynhhULSVZyhmZsOIVF4vFtpNYrjnicg8Ywm4PPV/Uk6g1WQEn7h1rfeXQt7XuW
-         WlMQ==
+        bh=44p4p4mBoJ1BqaBQWr/4sYOTaVs1685ki412vSElgKI=;
+        b=D0DQdBtaWuVFdUScCSd1WEmfGIkTPR+7mH8KNM8AakSBOpUOA/WivF0+YEIfEy/BRS
+         yTSGnQTC09rpQ4tRW5M6xRl0nnhSmIEZ/UQz70N/UiI3lpNdfnc7geRDpdXfvDZFj/n+
+         2ANU3HmfDuCzHFKCmw0Na8oj8d9zxe8dm4nxnnhTw+3gxZzf00XIoYai8j4lOTnhIP3O
+         W6rx/9bNciDlcXgDSH26YYrxjvB62ba2ktul5IYRv6m4MmQbsT37/kBiOdfsJaW47AAU
+         quBSn8wSe+wYYYli08fKVvfznVuaPSqr/S52NTDqFi3RWzlmaeT7pX5aDY9aH+rthRya
+         i2Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=KEV7urkYywFz30FuSgPUexQkm0SddOC5wU2ZuJdovsU=;
-        b=GqbR/AsJJtirtk3jeefc1ee/QVLJsRPzHHpAVuahOLAL+CeknVDdm7Km85uW249Afm
-         L2mMeW4TOYkqhEmdAhCkHXriYwVlMftvqX8r6rYs3R9pPG8b4rGveKsuJlh3QqOx9EtZ
-         MLLTM83EH4LZOaCmo0B8r50GjHJxjKwHH65BOEJ6yu23w55HIHuLR8xU1uvJfvk0WQFl
-         1CGzC9FvB5oIfD5QzvhHTTemEDjZiui8WMltpggzWL5wjQEvCY/v2UEifQSCjHbKmC8A
-         HXfxvMTnAZtXfz9o2Y8WW6qYub6cUp3TTrFX36ObKpgp5rGEKt7dVwc/2tdfhfFOmM6c
-         rOGA==
-X-Gm-Message-State: AOAM531ltJuUp9dnMTPGGjWE/d8bNFUZ1WbhkQRLi9WRsr2Y+NiSxnBE
-        f8nrIC792wu77nrB3SD5DNAqSd/5vav9MQ==
-X-Google-Smtp-Source: ABdhPJyaLaEMz2h2kWJp0ZmiSxK3MBhqFbwJH1F8FXwtvkqOtwIB3I4cS5CAg+2WK3VRtFsr4QZJvA==
-X-Received: by 2002:a63:3088:: with SMTP id w130mr10411646pgw.210.1611163520746;
-        Wed, 20 Jan 2021 09:25:20 -0800 (PST)
+        bh=44p4p4mBoJ1BqaBQWr/4sYOTaVs1685ki412vSElgKI=;
+        b=H4IDs1p8baNlYBJJkf7UGcWZTygQoy/QILnaleTBnL4w37EoOWZvbpXp+dVlr0HZnD
+         QiC//kXHIjzzHCfqzEdXP1BH6rOBKpZyDcIGQFaWjnxBFjIByPfPb7EeiM/doHMTi6uS
+         rulWRgbG+oKjgT5iEmwKR4oDrT63ED7TiYavHi7HEbY97g6J8cAk8PgSTGqqyk5zxrdY
+         TQAjEqSoZtEwoy6NZjWUzxhDjcfPI+iTB2jW/OG9spibTBzz4C00GXRQMmrw1W3iAIPS
+         b3vRU72BM0ZTHpCDUz8U3iAWbA/C/HaFH8MgQC9ytbdj3Mxm7RG51Wt1w588zR7aTyWu
+         3sxA==
+X-Gm-Message-State: AOAM533HbBPyvkDS/tRssn0TWUli+AwQRNiXVmMNLDSZTCuFkUoGtJDh
+        CrX/oDiS2d7OYz4E1APHYwENhA==
+X-Google-Smtp-Source: ABdhPJzyj6WO0l/FZJouz1SeZB7xHgGkBekZYvLYRCILt0QUXwW5WAgpILDsa9VZpnoUrw/WiZtTaQ==
+X-Received: by 2002:a17:90a:de95:: with SMTP id n21mr6748517pjv.7.1611164460102;
+        Wed, 20 Jan 2021 09:41:00 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id u4sm3010029pjv.22.2021.01.20.09.25.19
+        by smtp.gmail.com with ESMTPSA id l197sm3089062pfd.97.2021.01.20.09.40.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 09:25:19 -0800 (PST)
-Date:   Wed, 20 Jan 2021 09:25:13 -0800
+        Wed, 20 Jan 2021 09:40:59 -0800 (PST)
+Date:   Wed, 20 Jan 2021 09:40:52 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH RFC 3/4] KVM: Define KVM_USER_MEM_SLOTS in arch-neutral
- include/linux/kvm_host.h
-Message-ID: <YAhnebWjQCOfLtJ0@google.com>
-References: <20210115131844.468982-1-vkuznets@redhat.com>
- <20210115131844.468982-4-vkuznets@redhat.com>
- <YAHLRVhevn7adhAz@google.com>
- <87wnwa608c.fsf@vitty.brq.redhat.com>
- <YAcU6swvNkpPffE7@google.com>
- <20210120123400.7936e526@redhat.com>
- <87czxz6cl9.fsf@vitty.brq.redhat.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v2 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+Message-ID: <YAhrJNvg9KfEr/b7@google.com>
+References: <cover.1610935432.git.kai.huang@intel.com>
+ <4597db567351468c360fc810fff5a8232cb96c4c.1610935432.git.kai.huang@intel.com>
+ <YAgZ8lGaafoTXcYF@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87czxz6cl9.fsf@vitty.brq.redhat.com>
+In-Reply-To: <YAgZ8lGaafoTXcYF@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 20, 2021, Vitaly Kuznetsov wrote:
-> Igor Mammedov <imammedo@redhat.com> writes:
+On Wed, Jan 20, 2021, Jarkko Sakkinen wrote:
+> On Mon, Jan 18, 2021 at 04:26:53PM +1300, Kai Huang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Add a misc device /dev/sgx_virt_epc to allow userspace to allocate "raw"
+> > EPC without an associated enclave.  The intended and only known use case
+> > for raw EPC allocation is to expose EPC to a KVM guest, hence the
+> > virt_epc moniker, virt.{c,h} files and X86_SGX_VIRTUALIZATION Kconfig.
 > 
-> > On Tue, 19 Jan 2021 09:20:42 -0800
-> > Sean Christopherson <seanjc@google.com> wrote:
-> >
-> >> 
-> >> Were you planning on adding a capability to check for the new and improved
-> >> memslots limit, e.g. to know whether or not KVM might die on a large VM?
-> >> If so, requiring the VMM to call an ioctl() to set a higher (or lower?) limit
-> >> would be another option.  That wouldn't have the same permission requirements as
-> >> a module param, but it would likely be a more effective safeguard in practice,
-> >> e.g. use cases with a fixed number of memslots or a well-defined upper bound
-> >> could use the capability to limit themselves.
-> > Currently QEMU uses KVM_CAP_NR_MEMSLOTS to get limit, and depending on place the
-> > limit is reached it either fails gracefully (i.e. it checks if free slot is
-> > available before slot allocation) or aborts (in case where it tries to allocate
-> > slot without check).
-> 
-> FWIW, 'synic problem' causes it to abort.
-> 
-> > New ioctl() seems redundant as we already have upper limit check
-> > (unless it would allow go over that limit, which in its turn defeats purpose of
-> > the limit).
+> Is /dev/sgx_virt_epc something only usable for KVM, or is there
+> any thinkable use outside of the KVM context?
 
-Gah, and I even looked for an ioctl().  No idea how I didn't find NR_MEMSLOTS.
-
-> Right, I didn't plan to add any new CAP as what we already have should
-> be enough to query the limits. Having an ioctl to set the upper limit
-> seems complicated: with device and CPU hotplug it may not be easy to
-> guess what it should be upfront so VMMs will likely just add a call to
-> raise the limit in memslot modification code so it won't be providing
-> any new protection.
-
-True.  Maybe the best approach, if we want to make the limit configurable, would
-be to make a lower limit opt-in.  I.e. default=KVM_CAP_NR_MEMSLOTS=SHRT_MAX,
-with an ioctl() to set a lower limit.  That would also allow us to defer adding
-a new ioctl() until someone actually plans on using it.
-
-> >> Thoughts?  An ioctl() feels a little over-engineered, but I suspect that adding
-> >> a module param that defaults to N*KVM_MAX_VPCUS will be a waste, e.g. no one
-> >> will ever touch the param and we'll end up with dead, rarely-tested code.
-> 
-> Alternatively, we can hard-code KVM_USER_MEM_SLOTS to N*KVM_MAX_VPCUS so
-> no new parameter is needed but personally, I'd prefer to have it
-> configurable (in case we decide to set it to something lower than
-> SHRT_MAX of course) even if it won't be altered very often (which is a
-> good thing for 'general purpose' usage, right?).
->
-> First, it will allow tightening the limit for some very specific deployments
-> (e.g. FaaS/ Firecracker-style) to say '20' which should be enough.
-
-A module param likely isn't usable for many such deployments though, as it would
-require a completely isolated pool of systems.  That's why an ioctl() is
-appealing; the expected number of memslots is a property of the VM, not of the
-platform.
-
-> Second, we may be overlooking some configurations where the number of
-> memslots is actually dependent on the number of vCPUs but nobody complained
-> so far just because these configutrarions use a farly small number and the
-> ceiling wasn't hit yet.
-> 
-> One more spare thought. Per-vCPU memslots may come handy if someone
-> decides to move some of the KVM PV features to userspace. E.g. I can
-> imagine an attempt to move async_pf out of kernel.
-
-Memslots aren't per-vCPU though, any userspace feature that tries to treat them
-as such will be flawed in some way.  Practically speaking, per-vCPU memslots
-just aren't feasible, at least not without KVM changes that are likely
-unpalatable, e.g. KVM would need to incorporate the existence of a vCPU specific
-memslot into the MMU role.
+I can't think of a sane use case without KVM (or an out-of-tree hypervisor).
+Doing anything useful with EPC requires ENCLS, which means being able to run
+CPL0 code.
