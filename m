@@ -2,267 +2,342 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C1402FE230
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 07:01:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1115D2FE30F
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 07:40:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbhAUGAl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 01:00:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46020 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729567AbhAUDFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 22:05:12 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E85C0613D3
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 19:03:39 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id p72so1178326iod.12
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 19:03:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=49fv5m5ZCfOtjJ909fahXhO6rbzTEITVE7JNaqYcExI=;
-        b=zIqWpdUtONjv+iNl4fal4rvG9gS1yfJYVTDldkNTGAdK0sIygi7Nk7f9haTYVWO4io
-         +EYnnNjU40IbQ04rvSPZZfP/sjfV5TjamNie6oy52OEEWg2jUFZm+W5UlHfeXMYkHEbR
-         soUbXu0w3SAnADuhC5TOgMka3kdnQCM5ftr7wd2PifcqTOaKiFWgZnNS8HWgwuIhg/3y
-         JiyXnHtjIApoMAvMPIFKND2grRQDavB6DvBwurk4RBmZadX6ctv1XqL8R6U3jf9VpslB
-         EfjugaBC9fEcVTncubyYFIP8Kw2XJPiw/KKTmw/TfGrc99QGTL5FasRSDZefuFV3+rL3
-         76IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=49fv5m5ZCfOtjJ909fahXhO6rbzTEITVE7JNaqYcExI=;
-        b=dQ9QL4BnfWc2v1uxAmt88H+bbIZYiw2aKNRMgbN8D5fBUE4rauRDchv6IsyYV0mg4Z
-         eT2MWqcb3XrNT6KO9PEPMlUT7kldzmsgP3b0ClLYVF108kJIRRdYItgko313A/CHJA7t
-         MsmOaH+5DTa8pWYhbxODAvblQ4yCjT8ipM2tYzLqn/XZN8qTNacUkqmhkULvVyCug6k+
-         VWuZTaWorhPvFamFqaJAtZzo3KqtP8QqcCRb1CeKD1fZIo4KW/vyaISm9M708pFGczEK
-         HGOy2mP0PsaNUBO6ZAk1Z63pGZ55+GMysFqCVHjaHdXGA4aW9xSL/CWDhFriUL2dUKXY
-         s+iw==
-X-Gm-Message-State: AOAM530QsqG47NUazB4yuscXUdYO3bNdGyxtDNYW5aaPj8fFF3CioSni
-        XinWJlXD2biRwqOs/tZ4UvR2c6RyOzaQJu3rgWPk6XNHuqFH
-X-Google-Smtp-Source: ABdhPJzr+rB8p5Mk3VaN7I2CVpYfNidIq1sphVuO90aZFtW9AZBDNDYgzFMdc8+oMGfbfetZhRcEVisO5+1ETZSjMUg=
-X-Received: by 2002:a5e:9612:: with SMTP id a18mr8856785ioq.13.1611198218728;
- Wed, 20 Jan 2021 19:03:38 -0800 (PST)
+        id S1726224AbhAUGkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 01:40:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49250 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732631AbhATXou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 18:44:50 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D90062360D;
+        Wed, 20 Jan 2021 23:43:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611186228;
+        bh=8RwFhJFQCRkdKBSNUBARIDjIclQ04X17q2T6pIHDZzc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=r1yrljGpmUc7Ked3l4MFrjYWb2UdVouwYvZHSj8aWgQ9oQugitTuubTCYU21AtBzb
+         UjOXC069O5p7a12Txx/JSFaVS2XaLOz+FHHVZf7I0Jv25cV1aVB65C4JIuETOK3GDi
+         mHmBnFkjVj+za//KAX3RC/BeVcUS1rKpAd+72AIiTSHsIwwFbWy5Zqn+uGuYhwAR1c
+         BYYLBtsuY/x1tL94yj3Rb5YvBEkAK2gNDHO45KKwP1jm6fYqdORX++SjrX1lJ4/6AI
+         FYa7SJrB9DrfBOUWhJH4V4V9z12kIIrKXJp3ZpfLKBzqRhRwPLn0LRP1zK5h7udDRl
+         X9KLBY7SpZSNw==
+Date:   Thu, 21 Jan 2021 01:43:41 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
+        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        corbet@lwn.net
+Subject: Re: [RFC PATCH v2 00/26] KVM SGX virtualization support
+Message-ID: <YAjALTpv/aDzOalD@kernel.org>
+References: <cover.1610935432.git.kai.huang@intel.com>
+ <YAaW5FIkRrLGncT5@kernel.org>
+ <0adf45fae5207ed3d788bbb7260425f8da7aff43.camel@intel.com>
 MIME-Version: 1.0
-References: <20201210160002.1407373-1-maz@kernel.org>
-In-Reply-To: <20201210160002.1407373-1-maz@kernel.org>
-From:   Haibo Xu <haibo.xu@linaro.org>
-Date:   Thu, 21 Jan 2021 11:03:27 +0800
-Message-ID: <CAJc+Z1FQmUFS=5xEG8mPkJCUZ+ecBt4G=YbxGJTO4YFbfGMg3w@mail.gmail.com>
-Subject: Re: [PATCH v3 00/66] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     arm-mail-list <linux-arm-kernel@lists.infradead.org>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
-        kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0adf45fae5207ed3d788bbb7260425f8da7aff43.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Re-send in case the previous email was blocked for the inlined hyper-link.
+On Wed, Jan 20, 2021 at 01:52:32PM +1300, Kai Huang wrote:
+> On Tue, 2021-01-19 at 10:23 +0200, Jarkko Sakkinen wrote:
+> > Can you send a new version that applies:
+> > 
+> > $ git pw series apply 416463
+> > Applying: x86/cpufeatures: Add SGX1 and SGX2 sub-features
+> > Applying: x86/sgx: Remove a warn from sgx_free_epc_page()
+> > Applying: x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
+> > Applying: x86/sgx: Add SGX_CHILD_PRESENT hardware error code
+> > Applying: x86/sgx: Introduce virtual EPC for use by KVM guests
+> > Applying: x86/cpu/intel: Allow SGX virtualization without Launch Control support
+> > Applying: x86/sgx: Initialize virtual EPC driver even when SGX driver is disabled
+> > error: sha1 information is lacking or useless (arch/x86/kernel/cpu/sgx/main.c).
+> > error: could not build fake ancestor
+> > hint: Use 'git am --show-current-patch=diff' to see the failed patch
+> > Patch failed at 0007 x86/sgx: Initialize virtual EPC driver even when SGX driver is disabled
+> > When you have resolved this problem, run "git am --continue".
+> > If you prefer to skip this patch, run "git am --skip" instead.
+> > To restore the original branch and stop patching, run "git am --abort".
+> 
+> Could you let me know which branch should I rebase to? It appears your linux-sgx tree
+> next branch?
 
-Hi Marc,
+I tried my tree first, which was actually out-of-sync, so I rebase it.
+You can find it from MAINTAINERS failed.
 
-I have tried to enable the NV support in Qemu, and now I can
-successfully boot a L2 guest
-in Qemu KVM mode.
+After sending this email I rebased it to tip/x86/sgx, which also failed.
+That tree failed with a merge conflict.
 
-This patch series looks good from the Qemu side except for two minor
-requirements:
-(1) Qemu will check whether a feature was supported by the KVM cap
-when the user tries
-     to enable it in the command line, so a new capability was
-prefered for the NV(KVM_CAP_ARM_NV?).
-(2) According to the Documentation/virt/kvm/api.rst, userspace can
-call KVM_ARM_VCPU_INIT
-     multiple times for a given vcpu, but the kvm_vcpu_init_nested()
-do have some issue when
-     called multiple times(please refer to the detailed comments in patch 63)
+/Jarkko
 
-Regards,
-Haibo
-
-On Fri, 11 Dec 2020 at 00:00, Marc Zyngier <maz@kernel.org> wrote:
->
-> This is a rework of the NV series that I posted 10 months ago[1], as a
-> lot of the KVM code has changed since, and the series apply anymore
-> (not that anybody really cares as the the HW is, as usual, made of
-> unobtainium...).
->
-> From the previous version:
->
-> - Integration with the new page-table code
-> - New exception injection code
-> - No more messing with the nVHE code
-> - No AArch32!!!!
-> - Rebased on v5.10-rc4 + kvmarm/next for 5.11
->
-> From a functionality perspective, you can expect a L2 guest to work,
-> but don't even think of L3, as we only partially emulate the
-> ARMv8.{3,4}-NV extensions themselves. Same thing for vgic, debug, PMU,
-> as well as anything that would require a Stage-1 PTW. What we want to
-> achieve is that with NV disabled, there is no performance overhead and
-> no regression.
->
-> The series is roughly divided in 5 parts: exception handling, memory
-> virtualization, interrupts and timers for ARMv8.3, followed by the
-> ARMv8.4 support. There are of course some dependencies, but you'll
-> hopefully get the gist of it.
->
-> For the most courageous of you, I've put out a branch[2]. Of course,
-> you'll need some userspace. Andre maintains a hacked version of
-> kvmtool[3] that takes a --nested option, allowing the guest to be
-> started at EL2. You can run the whole stack in the Foundation
-> model. Don't be in a hurry ;-).
->
-> And to be clear: although Jintack and Christoffer have written tons of
-> the stuff originaly, I'm the one responsible for breaking it!
->
-> [1] https://lore.kernel.org/r/20200211174938.27809-1-maz@kernel.org
-> [2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-5.11.-WIP
-> [3] git://linux-arm.org/kvmtool.git nv/nv-wip-5.2-rc5
->
-> Andre Przywara (1):
->   KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
->
-> Christoffer Dall (15):
->   KVM: arm64: nv: Introduce nested virtualization VCPU feature
->   KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
->   KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
->   KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
->   KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
->   KVM: arm64: nv: Handle trapped ERET from virtual EL2
->   KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
->   KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
->   KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
->     changes
->   KVM: arm64: nv: Implement nested Stage-2 page table walk logic
->   KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
->   KVM: arm64: nv: arch_timer: Support hyp timer emulation
->   KVM: arm64: nv: vgic: Emulate the HW bit in software
->   KVM: arm64: nv: Add nested GICv3 tracepoints
->   KVM: arm64: nv: Sync nested timer state with ARMv8.4
->
-> Jintack Lim (19):
->   arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
->   KVM: arm64: nv: Handle HCR_EL2.NV system register traps
->   KVM: arm64: nv: Support virtual EL2 exceptions
->   KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
->   KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
->   KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
->   KVM: arm64: nv: Handle PSCI call via smc from the guest
->   KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
->   KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
->   KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
->   KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
->   KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
->   KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
->   KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
->   KVM: arm64: nv: Introduce sys_reg_desc.forward_trap
->   KVM: arm64: nv: Set a handler for the system instruction traps
->   KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
->   KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
->   KVM: arm64: nv: Nested GICv3 Support
->
-> Marc Zyngier (31):
->   KVM: arm64: nv: Add EL2 system registers to vcpu context
->   KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
->   KVM: arm64: nv: Handle virtual EL2 registers in
->     vcpu_read/write_sys_reg()
->   KVM: arm64: nv: Handle SPSR_EL2 specially
->   KVM: arm64: nv: Handle HCR_EL2.E2H specially
->   KVM: arm64: nv: Save/Restore vEL2 sysregs
->   KVM: arm64: nv: Forward debug traps to the nested guest
->   KVM: arm64: nv: Filter out unsupported features from ID regs
->   KVM: arm64: nv: Hide RAS from nested guests
->   KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
->   KVM: arm64: nv: Handle shadow stage 2 page faults
->   KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
->   KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
->   KVM: arm64: nv: Add handling of EL2-specific timer registers
->   KVM: arm64: nv: Load timer before the GIC
->   KVM: arm64: nv: Don't load the GICv4 context on entering a nested
->     guest
->   KVM: arm64: nv: Implement maintenance interrupt forwarding
->   KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
->   KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB invalidation
->   KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
->     information
->   KVM: arm64: Allow populating S2 SW bits
->   KVM: arm64: nv: Tag shadow S2 entries with nested level
->   KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
->   KVM: arm64: Map VNCR-capable registers to a separate page
->   KVM: arm64: nv: Move nested vgic state into the sysreg file
->   KVM: arm64: Add ARMv8.4 Enhanced Nested Virt cpufeature
->   KVM: arm64: nv: Synchronize PSTATE early on exit
->   KVM: arm64: nv: Allocate VNCR page when required
->   KVM: arm64: nv: Enable ARMv8.4-NV support
->   KVM: arm64: nv: Fast-track 'InHost' exception returns
->   KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
->
->  .../admin-guide/kernel-parameters.txt         |    4 +
->  .../virt/kvm/devices/arm-vgic-v3.rst          |   12 +-
->  arch/arm64/include/asm/cpucaps.h              |    2 +
->  arch/arm64/include/asm/esr.h                  |    6 +
->  arch/arm64/include/asm/kvm_arm.h              |   28 +-
->  arch/arm64/include/asm/kvm_asm.h              |    4 +
->  arch/arm64/include/asm/kvm_emulate.h          |  145 +-
->  arch/arm64/include/asm/kvm_host.h             |  175 ++-
->  arch/arm64/include/asm/kvm_hyp.h              |    2 +
->  arch/arm64/include/asm/kvm_mmu.h              |   17 +-
->  arch/arm64/include/asm/kvm_nested.h           |  152 ++
->  arch/arm64/include/asm/kvm_pgtable.h          |   10 +
->  arch/arm64/include/asm/sysreg.h               |  104 +-
->  arch/arm64/include/asm/vncr_mapping.h         |   73 +
->  arch/arm64/include/uapi/asm/kvm.h             |    2 +
->  arch/arm64/kernel/cpufeature.c                |   35 +
->  arch/arm64/kvm/Makefile                       |    4 +-
->  arch/arm64/kvm/arch_timer.c                   |  189 ++-
->  arch/arm64/kvm/arm.c                          |   34 +-
->  arch/arm64/kvm/at.c                           |  231 ++++
->  arch/arm64/kvm/emulate-nested.c               |  186 +++
->  arch/arm64/kvm/guest.c                        |    6 +
->  arch/arm64/kvm/handle_exit.c                  |   81 +-
->  arch/arm64/kvm/hyp/exception.c                |   44 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h       |   31 +-
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   28 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c              |   10 +-
->  arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |    2 +-
->  arch/arm64/kvm/hyp/pgtable.c                  |    6 +
->  arch/arm64/kvm/hyp/vgic-v3-sr.c               |    2 +-
->  arch/arm64/kvm/hyp/vhe/switch.c               |  207 ++-
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |  125 +-
->  arch/arm64/kvm/hyp/vhe/tlb.c                  |   83 ++
->  arch/arm64/kvm/inject_fault.c                 |   62 +-
->  arch/arm64/kvm/mmu.c                          |  183 ++-
->  arch/arm64/kvm/nested.c                       |  908 ++++++++++++
->  arch/arm64/kvm/reset.c                        |   14 +-
->  arch/arm64/kvm/sys_regs.c                     | 1226 ++++++++++++++++-
->  arch/arm64/kvm/sys_regs.h                     |    6 +
->  arch/arm64/kvm/trace_arm.h                    |   65 +-
->  arch/arm64/kvm/vgic/vgic-init.c               |   30 +
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         |   22 +
->  arch/arm64/kvm/vgic/vgic-nested-trace.h       |  137 ++
->  arch/arm64/kvm/vgic/vgic-v3-nested.c          |  240 ++++
->  arch/arm64/kvm/vgic/vgic-v3.c                 |   39 +-
->  arch/arm64/kvm/vgic/vgic.c                    |   44 +
->  arch/arm64/kvm/vgic/vgic.h                    |   10 +
->  include/kvm/arm_arch_timer.h                  |    7 +
->  include/kvm/arm_vgic.h                        |   16 +
->  tools/arch/arm/include/uapi/asm/kvm.h         |    1 +
->  50 files changed, 4890 insertions(+), 160 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_nested.h
->  create mode 100644 arch/arm64/include/asm/vncr_mapping.h
->  create mode 100644 arch/arm64/kvm/at.c
->  create mode 100644 arch/arm64/kvm/emulate-nested.c
->  create mode 100644 arch/arm64/kvm/nested.c
->  create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
->  create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
->
-> --
-> 2.29.2
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> And I don't think it is good to resend for this series at this moment, due to: 1)
+> people have already started to comment; 2) The two patches from you don't have your
+> name on your SoB, so has to fix anyway. It would be more appropriate to rebase to
+> your tree in next version, if required. And I can prepare a separate branch for you
+> (after resolving the merge conflict with sgx_init() in your tree) at the same time.
+> 
+> And Boris, Paolo, Sean, Jarkko, and other maintainers,
+> 
+> I'd like to take this chance to ask: when this series is ready to be merged, what is
+> the properly way to merge? This series has x86 non-sgx (cpufeature, feat_ctl) and sgx
+> changes, and it obviously has KVM changes too. So instance, who should be the one to
+> take this series? And which tree and branch should I rebase to in next version?
+> 
+> Thanks for all your feedback.
+> 
+> > 
+> > Thanks.
+> > 
+> > /Jarkko
+> > 
+> > On Mon, Jan 18, 2021 at 04:26:21PM +1300, Kai Huang wrote:
+> > > --- Disclaimer ---
+> > > 
+> > > These patches were originally written by Sean Christopherson while at Intel.
+> > > Now that Sean has left Intel, I (Kai) have taken over getting them upstream.
+> > > This series needs more review before it can be merged.  It is being posted
+> > > publicly and under RFC so Sean and others can review it. Maintainers are safe
+> > > ignoring it for now.
+> > > 
+> > > ------------------
+> > > 
+> > > Hi all,
+> > > 
+> > > This series adds KVM SGX virtualization support. The first 14 patches starting
+> > > with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX core/driver to
+> > > support KVM SGX virtualization, while the rest are patches to KVM subsystem.
+> > > 
+> > > Please help to review this series. Also I'd like to hear what is the proper
+> > > way to merge this series, since it contains change to both x86/SGX and KVM
+> > > subsystem. Any feedback is highly appreciated. And please let me know if I
+> > > forgot to CC anyone, or anyone wants to be removed from CC. Thanks in advance!
+> > > 
+> > > This series is based against upstream v5.11-rc3. You can also get the code from
+> > > upstream branch of kvm-sgx repo on github:
+> > > 
+> > >         https://github.com/intel/kvm-sgx.git upstream
+> > > 
+> > > It also requires Qemu changes to create VM with SGX support. You can find Qemu
+> > > repo here:
+> > > 
+> > > 	https://github.com/intel/qemu-sgx.git next
+> > > 
+> > > Please refer to README.md of above qemu-sgx repo for detail on how to create
+> > > guest with SGX support. At meantime, for your quick reference you can use below
+> > > command to create SGX guest:
+> > > 
+> > > 	#qemu-system-x86_64 -smp 4 -m 2G -drive file=<your_vm_image>,if=virtio \
+> > > 		-cpu host,+sgx_provisionkey \
+> > > 		-sgx-epc id=epc1,memdev=mem1 \
+> > > 		-object memory-backend-epc,id=mem1,size=64M,prealloc
+> > > 
+> > > Please note that the SGX relevant part is:
+> > > 
+> > > 		-cpu host,+sgx_provisionkey \
+> > > 		-sgx-epc id=epc1,memdev=mem1 \
+> > > 		-object memory-backend-epc,id=mem1,size=64M,prealloc
+> > > 
+> > > And you can change other parameters of your qemu command based on your needs.
+> > > 
+> > > =========
+> > > Changelog:
+> > > 
+> > > (Changelog here is for global changes. Please see each patch's changelog for
+> > >  changes made to specific patch.)
+> > > 
+> > > v1->v2:
+> > > 
+> > >  - Refined this cover letter by addressing comments from Dave and Jarkko.
+> > >  - The original patch which introduced new X86_FEATURE_SGX1/SGX2 were replaced
+> > >    by 3 new patches from Sean, following Boris and Sean's discussion.
+> > >        [RFC PATCH v2 01/26] x86/cpufeatures: Add SGX1 and SGX2 sub-features
+> > >        [RFC PATCH v2 18/26] KVM: x86: Add support for reverse CPUID lookup of scattered features
+> > >        [RFC PATCH v2 19/26] KVM: x86: Add reverse-CPUID lookup support for scattered SGX features
+> > >  - The original patch 1
+> > >        x86/sgx: Split out adding EPC page to free list to separate helper
+> > >    was replaced with 2 new patches from Jarkko
+> > >        [RFC PATCH v2 02/26] x86/sgx: Remove a warn from sgx_free_epc_page()
+> > >        [RFC PATCH v2 03/26] x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
+> > >    addressing Jarkko's comments.
+> > >  - Moved modifying sgx_init() to always initialize sgx_virt_epc_init() out of
+> > >    patch
+> > >        x86/sgx: Introduce virtual EPC for use by KVM guests
+> > >    to a separate patch:
+> > >        [RFC PATCH v2 07/26] x86/sgx: Initialize virtual EPC driver even when SGX driver is disabled
+> > >    to address Dave's comment that patch ordering can be improved due to before
+> > >    patch "Allow SGX virtualization without Launch Control support", all SGX,
+> > >    including SGX virtualization, is actually disabled when SGX LC is not
+> > >    present.
+> > > 
+> > > KVM part patches are not changed comparing to v1 (except changes due to
+> > > X86_FEATURE_SGX1/2 patches). For changes to each x86 patch, please see changelog
+> > > in each indudival patch. If no changelog, then no change was made to it.
+> > > 
+> > > =========
+> > > KVM SGX virtualization Overview
+> > > 
+> > > - Virtual EPC
+> > > 
+> > > SGX enclave memory is special and is reserved specifically for enclave use.
+> > > In bare-metal SGX enclaves, the kernel allocates enclave pages, copies data
+> > > into the pages with privileged instructions, then allows the enclave to start.
+> > > In this scenario, only initialized pages already assigned to an enclave are
+> > > mapped to userspace.
+> > > 
+> > > In virtualized environments, the hypervisor still needs to do the physical
+> > > enclave page allocation.  The guest kernel is responsible for the data copying
+> > > (among other things).  This means that the job of starting an enclave is now
+> > > split between hypervisor and guest.
+> > > 
+> > > This series introduces a new misc device: /dev/sgx_virt_epc.  This device
+> > > allows the host to map *uninitialized* enclave memory into userspace, which
+> > > can then be passed into a guest.
+> > > 
+> > > While it might be *possible* to start a host-side enclave with /dev/sgx_enclave
+> > > and pass its memory into a guest, it would be wasteful and convoluted.
+> > > 
+> > > Implement the *raw* EPC allocation in the x86 core-SGX subsystem via
+> > > /dev/sgx_virt_epc rather than in KVM.  Doing so has two major advantages:
+> > > 
+> > >   - Does not require changes to KVM's uAPI, e.g. EPC gets handled as
+> > >     just another memory backend for guests.
+> > > 
+> > >   - EPC management is wholly contained in the SGX subsystem, e.g. SGX
+> > >     does not have to export any symbols, changes to reclaim flows don't
+> > >     need to be routed through KVM, SGX's dirty laundry doesn't have to
+> > >     get aired out for the world to see, and so on and so forth.
+> > > 
+> > > The virtual EPC pages allocated to guests are currently not reclaimable.
+> > > Reclaiming EPC page used by enclave requires a special reclaim mechanism
+> > > separate from normal page reclaim, and that mechanism is not supported
+> > > for virutal EPC pages.  Due to the complications of handling reclaim
+> > > conflicts between guest and host, reclaiming virtual EPC pages is 
+> > > significantly more complex than basic support for SGX virtualization.
+> > > 
+> > > - Support SGX virtualization without SGX Flexible Launch Control
+> > > 
+> > > SGX hardware supports two "launch control" modes to limit which enclaves can
+> > > run.  In the "locked" mode, the hardware prevents enclaves from running unless
+> > > they are blessed by a third party.  In the unlocked mode, the kernel is in
+> > > full control of which enclaves can run.  The bare-metal SGX code refuses to
+> > > launch enclaves unless it is in the unlocked mode.
+> > > 
+> > > This sgx_virt_epc driver does not have such a restriction.  This allows guests
+> > > which are OK with the locked mode to use SGX, even if the host kernel refuses
+> > > to.
+> > > 
+> > > - Support exposing SGX2
+> > > 
+> > > Due to the same reason above, SGX2 feature detection is added to core SGX code
+> > > to allow KVM to expose SGX2 to guest, even currently SGX driver doesn't support
+> > > SGX2, because SGX2 can work just fine in guest w/o any interaction to host SGX
+> > > driver.
+> > > 
+> > > - Restricit SGX guest access to provisioning key
+> > > 
+> > > To grant guest being able to fully use SGX, guest needs to be able to access
+> > > provisioning key.  The provisioning key is sensitive, and accessing to it should
+> > > be restricted. In bare-metal driver, allowing enclave to access provisioning key
+> > > is restricted by being able to open /dev/sgx_provision.
+> > > 
+> > > Add a new KVM_CAP_SGX_ATTRIBUTE to KVM uAPI to extend above mechanism to KVM
+> > > guests as well.  When userspace hypervisor creates a new VM, the new cap is only
+> > > added to VM when userspace hypervisior is able to open /dev/sgx_provision,
+> > > following the same role as in bare-metal driver.  KVM then traps ECREATE from
+> > > guest, and only allows ECREATE with provisioning key bit to run when guest
+> > > supports KVM_CAP_SGX_ATTRIBUTE.
+> > > 
+> > > 
+> > > 
+> > > Kai Huang (2):
+> > >   x86/sgx: Initialize virtual EPC driver even when SGX driver is
+> > >     disabled
+> > >   x86/sgx: Add helper to update SGX_LEPUBKEYHASHn MSRs
+> > > 
+> > > Sean Christopherson (22):
+> > >   x86/cpufeatures: Add SGX1 and SGX2 sub-features
+> > >   x86/sgx: Add SGX_CHILD_PRESENT hardware error code
+> > >   x86/sgx: Introduce virtual EPC for use by KVM guests
+> > >   x86/cpu/intel: Allow SGX virtualization without Launch Control support
+> > >   x86/sgx: Expose SGX architectural definitions to the kernel
+> > >   x86/sgx: Move ENCLS leaf definitions to sgx_arch.h
+> > >   x86/sgx: Add SGX2 ENCLS leaf definitions (EAUG, EMODPR and EMODT)
+> > >   x86/sgx: Add encls_faulted() helper
+> > >   x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
+> > >   x86/sgx: Move provisioning device creation out of SGX driver
+> > >   KVM: VMX: Convert vcpu_vmx.exit_reason to a union
+> > >   KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
+> > >   KVM: x86: Define new #PF SGX error code bit
+> > >   KVM: x86: Add support for reverse CPUID lookup of scattered features
+> > >   KVM: x86: Add reverse-CPUID lookup support for scattered SGX features
+> > >   KVM: VMX: Add basic handling of VM-Exit from SGX enclave
+> > >   KVM: VMX: Frame in ENCLS handler for SGX virtualization
+> > >   KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions
+> > >   KVM: VMX: Add emulation of SGX Launch Control LE hash MSRs
+> > >   KVM: VMX: Add ENCLS[EINIT] handler to support SGX Launch Control (LC)
+> > >   KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC
+> > >   KVM: x86: Add capability to grant VM access to privileged SGX
+> > >     attribute
+> > > 
+> > > jarkko@kernel.org (2):
+> > >   x86/sgx: Remove a warn from sgx_free_epc_page()
+> > >   x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
+> > > 
+> > >  Documentation/virt/kvm/api.rst                |  23 +
+> > >  arch/x86/Kconfig                              |  12 +
+> > >  arch/x86/include/asm/cpufeatures.h            |   2 +
+> > >  arch/x86/include/asm/kvm_host.h               |   5 +
+> > >  arch/x86/include/asm/sgx.h                    |  19 +
+> > >  .../cpu/sgx/arch.h => include/asm/sgx_arch.h} |  20 +
+> > >  arch/x86/include/asm/vmx.h                    |   1 +
+> > >  arch/x86/include/uapi/asm/vmx.h               |   1 +
+> > >  arch/x86/kernel/cpu/cpuid-deps.c              |   3 +
+> > >  arch/x86/kernel/cpu/feat_ctl.c                |  63 ++-
+> > >  arch/x86/kernel/cpu/scattered.c               |   2 +
+> > >  arch/x86/kernel/cpu/sgx/Makefile              |   1 +
+> > >  arch/x86/kernel/cpu/sgx/driver.c              |  17 -
+> > >  arch/x86/kernel/cpu/sgx/encl.c                |  15 +-
+> > >  arch/x86/kernel/cpu/sgx/encls.h               |  29 +-
+> > >  arch/x86/kernel/cpu/sgx/ioctl.c               |  23 +-
+> > >  arch/x86/kernel/cpu/sgx/main.c                |  67 ++-
+> > >  arch/x86/kernel/cpu/sgx/sgx.h                 |   4 +-
+> > >  arch/x86/kernel/cpu/sgx/virt.c                | 316 ++++++++++++
+> > >  arch/x86/kernel/cpu/sgx/virt.h                |  14 +
+> > >  arch/x86/kvm/Makefile                         |   2 +
+> > >  arch/x86/kvm/cpuid.c                          |  89 +++-
+> > >  arch/x86/kvm/cpuid.h                          |  50 +-
+> > >  arch/x86/kvm/vmx/nested.c                     |  70 ++-
+> > >  arch/x86/kvm/vmx/nested.h                     |   5 +
+> > >  arch/x86/kvm/vmx/sgx.c                        | 462 ++++++++++++++++++
+> > >  arch/x86/kvm/vmx/sgx.h                        |  34 ++
+> > >  arch/x86/kvm/vmx/vmcs12.c                     |   1 +
+> > >  arch/x86/kvm/vmx/vmcs12.h                     |   4 +-
+> > >  arch/x86/kvm/vmx/vmx.c                        | 171 +++++--
+> > >  arch/x86/kvm/vmx/vmx.h                        |  27 +-
+> > >  arch/x86/kvm/x86.c                            |  24 +
+> > >  include/uapi/linux/kvm.h                      |   1 +
+> > >  tools/testing/selftests/sgx/defines.h         |   2 +-
+> > >  34 files changed, 1432 insertions(+), 147 deletions(-)
+> > >  create mode 100644 arch/x86/include/asm/sgx.h
+> > >  rename arch/x86/{kernel/cpu/sgx/arch.h => include/asm/sgx_arch.h} (96%)
+> > >  create mode 100644 arch/x86/kernel/cpu/sgx/virt.c
+> > >  create mode 100644 arch/x86/kernel/cpu/sgx/virt.h
+> > >  create mode 100644 arch/x86/kvm/vmx/sgx.c
+> > >  create mode 100644 arch/x86/kvm/vmx/sgx.h
+> > > 
+> > > -- 
+> > > 2.29.2
+> > > 
+> > > 
+> 
+> 
+> 
