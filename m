@@ -2,127 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF8612FD0AA
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF6002FD0AE
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728907AbhATMsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 07:48:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50895 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729582AbhATLfe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:35:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611142447;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RwYNo9IWwhys7vzm7QOjLE4bc02/uzxG8yBwDPjWddA=;
-        b=dOhTU4n/nfzrOl9rXjxY94n1MYQ3HIhuKjCQvk5xDFcUBsqMuuvcyx3r8NIYTZC/zzMjZ5
-        NzwNKJJG3wviM9jaNh96r0ji7MwK6C3InyIzXUp99Cdpfecxy1vCdMKIvNpj0rN878ylBN
-        q8TRETYrsuwan1lsFQ7gCMwJijpAmUY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-517-5GqPwyl0Mu6EELqPjIFWWg-1; Wed, 20 Jan 2021 06:34:05 -0500
-X-MC-Unique: 5GqPwyl0Mu6EELqPjIFWWg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E14A107ACE3;
-        Wed, 20 Jan 2021 11:34:04 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23D7971CA1;
-        Wed, 20 Jan 2021 11:34:01 +0000 (UTC)
-Date:   Wed, 20 Jan 2021 12:34:00 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH RFC 3/4] KVM: Define KVM_USER_MEM_SLOTS in arch-neutral
- include/linux/kvm_host.h
-Message-ID: <20210120123400.7936e526@redhat.com>
-In-Reply-To: <YAcU6swvNkpPffE7@google.com>
-References: <20210115131844.468982-1-vkuznets@redhat.com>
-        <20210115131844.468982-4-vkuznets@redhat.com>
-        <YAHLRVhevn7adhAz@google.com>
-        <87wnwa608c.fsf@vitty.brq.redhat.com>
-        <YAcU6swvNkpPffE7@google.com>
+        id S1728970AbhATMtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 07:49:00 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13228 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388385AbhATLoQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:44:16 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KBaeqe022584;
+        Wed, 20 Jan 2021 06:43:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=mWfXdUSwEOyiqniHeylHVpIJoi0TTJz2NAGWPnowU7A=;
+ b=WjKhHEW6z3F35yqYHOC+AIRE9yjLydqP/9kZ/bjTW0icieI5v4E0K/HdlZkQXm6KuU3l
+ m9ee2Ksy5/c5lh8OB+HkG0EkEFlFEDrTrvn5cehxyyplgSo7E0X+/KX06Us3LjVVZH4l
+ 9cNrQJ0cnc9yoNbwH1h+5sP4YYXsEORShQge5qrPHKT60QMxfEICyPz9seHo+dWe0M47
+ FSzAWRCk72L/MTVkV2g3g+Busmfz7AGlebSYaX+1rC7iRrskdrT0/fmcA7tPI17GnUY+
+ Rd3BGz6Y9c4qqxZwKWHUEuUha4iLsRNNehzgg0xzu7JZ2Tj3moy+JSgj0zJSB0nburYd 7g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 366jnb24rx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 06:43:34 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KBd8v8036323;
+        Wed, 20 Jan 2021 06:43:33 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 366jnb24qc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 06:43:33 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KBfPqx013629;
+        Wed, 20 Jan 2021 11:43:31 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3668parhcd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 11:43:31 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KBhLbU21365148
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jan 2021 11:43:22 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 04A24AE04D;
+        Wed, 20 Jan 2021 11:43:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BAF6AE059;
+        Wed, 20 Jan 2021 11:43:27 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Jan 2021 11:43:27 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL 00/11] s390x update
+Date:   Wed, 20 Jan 2021 06:41:47 -0500
+Message-Id: <20210120114158.104559-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-20_02:2021-01-18,2021-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ mlxlogscore=999 priorityscore=1501 mlxscore=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101200064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Jan 2021 09:20:42 -0800
-Sean Christopherson <seanjc@google.com> wrote:
+Dear Paolo,
 
-> On Mon, Jan 18, 2021, Vitaly Kuznetsov wrote:
-> > Sean Christopherson <seanjc@google.com> writes:
-> >   
-> > > On Fri, Jan 15, 2021, Vitaly Kuznetsov wrote:  
-> > >> Memory slots are allocated dynamically when added so the only real
-> > >> limitation in KVM is 'id_to_index' array which is 'short'. Define
-> > >> KVM_USER_MEM_SLOTS to the maximum possible value in the arch-neutral
-> > >> include/linux/kvm_host.h, architectures can still overtide the setting
-> > >> if needed.  
-> > >
-> > > Leaving the max number of slots nearly unbounded is probably a bad idea.  If my
-> > > math is not completely wrong, this would let userspace allocate 6mb of kernel
-> > > memory per VM.  Actually, worst case scenario would be 12mb since modifying
-> > > memslots temporarily has two allocations.  
-> > 
-> > Yea I had thought too but on the other hand, if your VMM went rogue and
-> > and is trying to eat all your memory, how is allocating 32k memslots
-> > different from e.g. creating 64 VMs with 512 slots each? We use
-> > GFP_KERNEL_ACCOUNT to allocate memslots (and other per-VM stuff) so
-> > e.g. cgroup limits should work ...  
-> 
-> I see it as an easy way to mitigate the damage.  E.g. if a containers use case
-> is spinning up hundreds of VMs and something goes awry in the config, it would
-> be the difference between consuming tens of MBs and hundreds of MBs.  Cgroup
-> limits should also be in play, but defense in depth and all that. 
-> 
-> > > If we remove the arbitrary limit, maybe replace it with a module param with a
-> > > sane default?  
-> > 
-> > This can be a good solution indeed. The only question then is what should
-> > we pick as the default? It seems to me this can be KVM_MAX_VCPUS
-> > dependent, e.g. 4 x KVM_MAX_VCPUS would suffice.  
-> 
-> Hrm, I don't love tying it to KVM_MAX_VPUCS.  Other than SynIC, are there any
-> other features/modes/configuration that cause the number of memslots to grop
+please pull the following changes or merge them on gitlab:
 
-(NV)DIMMs in QEMU also consume slot/device but do not depend on vCPUs number.
-Due current slot limit only 256 DIMMs are allowed. But if vCPUs start consuming
-extra memslots, they will contend over possible slots.
-
-> with the number of vCPUs?  But, limiting via a module param does effectively
-> require using KVM_MAX_VCPUS, otherwise everyone that might run Windows guests
-> would have to override the default and thereby defeat the purpose of limiting by
-> default.
-> 
-> Were you planning on adding a capability to check for the new and improved
-> memslots limit, e.g. to know whether or not KVM might die on a large VM?
-> If so, requiring the VMM to call an ioctl() to set a higher (or lower?) limit
-> would be another option.  That wouldn't have the same permission requirements as
-> a module param, but it would likely be a more effective safeguard in practice,
-> e.g. use cases with a fixed number of memslots or a well-defined upper bound
-> could use the capability to limit themselves.
-Currently QEMU uses KVM_CAP_NR_MEMSLOTS to get limit, and depending on place the
-limit is reached it either fails gracefully (i.e. it checks if free slot is
-available before slot allocation) or aborts (in case where it tries to allocate
-slot without check).
-New ioctl() seems redundant as we already have upper limit check
-(unless it would allow go over that limit, which in its turn defeats purpose of
-the limit).
+* Moved to SPDX license identifiers and cleaning up licenses
+* Added test_bit(_inv)() & SCLP feature bit checking
+* Added first SIE lib and test for nesting tests
+* Added diag318 emulation test
+* Small UV fix
 
 
-> Thoughts?  An ioctl() feels a little over-engineered, but I suspect that adding
-> a module param that defaults to N*KVM_MAX_VPCUS will be a waste, e.g. no one
-> will ever touch the param and we'll end up with dead, rarely-tested code.
-> 
+Gitlab merge request:
+https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/4
+
+
+The following changes since commit 4a54e8a3a88be171814e31dd6ab9b7a766644e32:
+
+  lib/alloc_page: Properly handle requests for fresh blocks (2021-01-19 13:18:54 -0500)
+
+are available in the Git repository at:
+
+  https://gitlab.com/frankja/kvm-unit-tests.git tags/s390x-2021-20-01
+
+for you to fetch changes up to 88fb0e5d52be357d3aab854c5c16303fe1608335:
+
+  s390x: Fix uv_call() exception behavior (2021-01-20 04:15:21 -0500)
+
+
+Janosch Frank (11):
+  s390x: Move to GPL 2 and SPDX license identifiers
+  s390x: lib: Move to GPL 2 and SPDX license identifiers
+  s390x: Add test_bit to library
+  s390x: Consolidate sclp read info
+  s390x: SCLP feature checking
+  s390x: Split assembly into multiple files
+  s390x: sie: Add SIE to lib
+  s390x: sie: Add first SIE test
+  s390x: Add diag318 intercept test
+  s390x: Fix sclp.h style issues
+  s390x: Fix uv_call() exception behavior
+
+ lib/s390x/asm-offsets.c     |  15 ++-
+ lib/s390x/asm/arch_def.h    |  13 ++-
+ lib/s390x/asm/asm-offsets.h |   4 +-
+ lib/s390x/asm/barrier.h     |   4 +-
+ lib/s390x/asm/bitops.h      |  26 +++++
+ lib/s390x/asm/cpacf.h       |   1 +
+ lib/s390x/asm/facility.h    |   7 +-
+ lib/s390x/asm/float.h       |   4 +-
+ lib/s390x/asm/interrupt.h   |   4 +-
+ lib/s390x/asm/io.h          |   4 +-
+ lib/s390x/asm/mem.h         |   4 +-
+ lib/s390x/asm/page.h        |   4 +-
+ lib/s390x/asm/pgtable.h     |   4 +-
+ lib/s390x/asm/sigp.h        |   4 +-
+ lib/s390x/asm/spinlock.h    |   4 +-
+ lib/s390x/asm/stack.h       |   4 +-
+ lib/s390x/asm/time.h        |   4 +-
+ lib/s390x/asm/uv.h          |  24 +++--
+ lib/s390x/css.h             |   4 +-
+ lib/s390x/css_dump.c        |   4 +-
+ lib/s390x/css_lib.c         |   4 +-
+ lib/s390x/interrupt.c       |  11 +-
+ lib/s390x/io.c              |   6 +-
+ lib/s390x/mmu.c             |   4 +-
+ lib/s390x/mmu.h             |   4 +-
+ lib/s390x/sclp-console.c    |   5 +-
+ lib/s390x/sclp.c            |  61 +++++++++--
+ lib/s390x/sclp.h            | 183 ++++++++++++++++++---------------
+ lib/s390x/sie.h             | 198 ++++++++++++++++++++++++++++++++++++
+ lib/s390x/smp.c             |  31 +++---
+ lib/s390x/smp.h             |   4 +-
+ lib/s390x/stack.c           |   4 +-
+ lib/s390x/vm.c              |   3 +-
+ lib/s390x/vm.h              |   3 +-
+ s390x/Makefile              |   7 +-
+ s390x/cmm.c                 |   4 +-
+ s390x/cpu.S                 | 121 ++++++++++++++++++++++
+ s390x/cpumodel.c            |   4 +-
+ s390x/css.c                 |   4 +-
+ s390x/cstart64.S            | 123 +---------------------
+ s390x/diag10.c              |   4 +-
+ s390x/diag288.c             |   4 +-
+ s390x/diag308.c             |   5 +-
+ s390x/emulator.c            |   4 +-
+ s390x/gs.c                  |   4 +-
+ s390x/iep.c                 |   4 +-
+ s390x/intercept.c           |  23 ++++-
+ s390x/macros.S              |  77 ++++++++++++++
+ s390x/pfmf.c                |   4 +-
+ s390x/sclp.c                |   4 +-
+ s390x/selftest.c            |   4 +-
+ s390x/sie.c                 | 113 ++++++++++++++++++++
+ s390x/skey.c                |   4 +-
+ s390x/skrf.c                |   4 +-
+ s390x/smp.c                 |   4 +-
+ s390x/sthyi.c               |   4 +-
+ s390x/sthyi.h               |   4 +-
+ s390x/stsi.c                |   4 +-
+ s390x/unittests.cfg         |   3 +
+ s390x/uv-guest.c            |  16 ++-
+ s390x/vector.c              |   4 +-
+ 61 files changed, 831 insertions(+), 392 deletions(-)
+ create mode 100644 lib/s390x/sie.h
+ create mode 100644 s390x/cpu.S
+ create mode 100644 s390x/macros.S
+ create mode 100644 s390x/sie.c
+
+-- 
+2.25.1
 
