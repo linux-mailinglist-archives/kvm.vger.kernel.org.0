@@ -2,98 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 043BC2FDC0F
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 22:50:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E76172FDC1C
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 22:53:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbhATVpP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 16:45:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46034 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731658AbhATNnb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 08:43:31 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KDWm22007041;
-        Wed, 20 Jan 2021 08:42:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=dqxosd4g7zKlZH1v7XCpXwwjC2AU8t7alZYxMUwmWMA=;
- b=Oj3O7horl4OTYOpzQa9es3FugrJ1/y8YEuFWH9PP29O7frX2m4yccSDjjL7PON9RcQj8
- NUokeW0eIrTjlQ1IG6sOB0Hc1rHrFrM79lSRPkfMOiuGLUVJR5I06ITYLQzdMpltzEqI
- Ob1UAst2IvLYL6jyB4zEq+md4awjD6uU64CgAs0/4aYf2DSqDvuGU5gaXczKGFbkebpy
- KbNtNZpF35rhWw4aityN9Qq9HqlYacqQlUMVLIXTtR4muXCYMb4nOPXknsDhY84G8f7v
- C4tSmeKJ2qzd2Nyhw429ONd1/YGyQN21qiTyUwE7WDP+Ops8bXeUANsxjHv+mxSBMwvV Pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366n78rurt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 08:42:16 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KDZL2C018617;
-        Wed, 20 Jan 2021 08:42:15 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366n78rur3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 08:42:15 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KDWjS0005681;
-        Wed, 20 Jan 2021 13:42:13 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3668ny0b7f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 13:42:13 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KDgAiI41484674
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jan 2021 13:42:10 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3521BA4040;
-        Wed, 20 Jan 2021 13:42:10 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AFEBEA4053;
-        Wed, 20 Jan 2021 13:42:09 +0000 (GMT)
-Received: from osiris (unknown [9.171.38.241])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 20 Jan 2021 13:42:09 +0000 (GMT)
-Date:   Wed, 20 Jan 2021 14:42:08 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        thuth@redhat.com, david@redhat.com, imbrenda@linux.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org, gor@linux.ibm.com,
-        mihajlov@linux.ibm.com
-Subject: Re: [PATCH 2/2] s390: mm: Fix secure storage access exception
- handling
-Message-ID: <20210120134208.GC8202@osiris>
-References: <20210119100402.84734-1-frankja@linux.ibm.com>
- <20210119100402.84734-3-frankja@linux.ibm.com>
- <3e1978c6-4462-1de6-e1aa-e664ffa633c1@de.ibm.com>
+        id S1731220AbhATVvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 16:51:08 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56345 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2436695AbhATVC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 16:02:58 -0500
+IronPort-SDR: bYPowWkbbVjyAJ6I71CQIM9w2b7TRqgo4oS0/RE+S+beJksseHrZVwetsXGbXKJPEcG/cP+NA+
+ 9V7J7RtvLGwA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="263990055"
+X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
+   d="scan'208";a="263990055"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 13:02:17 -0800
+IronPort-SDR: H+4uyy08i0Wsv5OSi+x0Ru3l4yHO4E+L8tD0igxvdMfXZbDZcO40SadJNmqZeWcAsLvr3AtQ0T
+ zIt5UWP/KO7w==
+X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
+   d="scan'208";a="351208171"
+Received: from raavalos-mobl2.amr.corp.intel.com (HELO [10.212.38.24]) ([10.212.38.24])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 13:02:16 -0800
+Subject: Re: [RFC PATCH v2 06/26] x86/cpu/intel: Allow SGX virtualization
+ without Launch Control support
+To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jethro@fortanix.com, b.thiel@posteo.de
+References: <cover.1610935432.git.kai.huang@intel.com>
+ <a6c0b0d2632a6c603e68d9bdc81f564290ff04ad.1610935432.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <bc73adaf-fae6-2088-c8d4-6f53057a4eac@intel.com>
+Date:   Wed, 20 Jan 2021 13:02:15 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e1978c6-4462-1de6-e1aa-e664ffa633c1@de.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-20_05:2021-01-20,2021-01-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- mlxscore=0 mlxlogscore=798 impostorscore=0 lowpriorityscore=0
- clxscore=1011 malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101200079
+In-Reply-To: <a6c0b0d2632a6c603e68d9bdc81f564290ff04ad.1610935432.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 19, 2021 at 11:25:01AM +0100, Christian Borntraeger wrote:
-> > +		if (user_mode(regs)) {
-> > +			send_sig(SIGSEGV, current, 0);
-> > +			return;
-> > +		} else
-> > +			panic("Unexpected PGM 0x3d with TEID bit 61=0");
-> 
-> use BUG instead of panic? That would kill this process, but it allows
-> people to maybe save unaffected data.
+On 1/17/21 7:27 PM, Kai Huang wrote:
+> -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
+> -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
+> -		     IS_ENABLED(CONFIG_X86_SGX);
+> +	enable_sgx_driver = cpu_has(c, X86_FEATURE_SGX) &&
+> +			    cpu_has(c, X86_FEATURE_SGX1) &&
+> +			    IS_ENABLED(CONFIG_X86_SGX) &&
+> +			    cpu_has(c, X86_FEATURE_SGX_LC);
+> +	enable_sgx_virt = cpu_has(c, X86_FEATURE_SGX) &&
+> +			  cpu_has(c, X86_FEATURE_SGX1) &&
+> +			  IS_ENABLED(CONFIG_X86_SGX) &&
+> +			  IS_ENABLED(CONFIG_X86_SGX_VIRTUALIZATION) &&
+> +			  enable_vmx;
 
-It would kill the process, and most likely lead to deadlock'ed
-system. But with all the "good" debug information being lost, which
-wouldn't be the case with panic().
-I really don't think this is a good idea.
+Would it be too much to ask that the SGX/SGX1 checks not be duplicated?
+ Perhaps:
+
+	enable_sgx_any = cpu_feature_enabled(CONFIG_X86_SGX) &&
+			 cpu_feature_enabled(CONFIG_X86_SGX1);
+
+	enable_sgx_driver = enable_sgx_any &&
+			    cpu_has(c, X86_FEATURE_SGX_LC);
+
+	enable_sgx_virt = enable_sgx_any &&
+			  enable_vmx &&
+		     IS_ENABLED(CONFIG_X86_SGX_VIRTUALIZATION)
+
+BTW, CONFIG_X86_SGX_VIRTUALIZATION is a pretty porky name.  Maybe just
+CONFIG_X86_SGX_VIRT?
