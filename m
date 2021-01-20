@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E72F22FC996
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 04:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C032B2FC9F9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 05:28:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728273AbhATDtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 22:49:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26486 "EHLO
+        id S1729674AbhATE04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 23:26:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48774 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730733AbhATDsb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 22:48:31 -0500
+        by vger.kernel.org with ESMTP id S1731669AbhATEZw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 23:25:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611114424;
+        s=mimecast20190719; t=1611116665;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=61kBWcJtmQFIvGjS1IKO0RhJ1LrkMQqyt5uWZQ6fQwI=;
-        b=P4NHjfcSD8KOO5BQ95x1Yc1YI2hgOvjWQzpXnZ2f1SCvTFlgRW6xHkJa0GXsFetw2pshxB
-        pjAZ3JdLhTqSf5zgeSV3YysFZZFPlZUI6MLWs9jxkYyMHK6KfDuGjp6ebfi9Pt/IsAiVmE
-        dtWDKK6f2Uzh508m1VLwRXSF25sKZ2I=
+        bh=jIuh7SxU93BuybyBivroDVvSIaVYcMTbwm+jPxQBIoI=;
+        b=AlacIp37xqliptgyseY8BKg0L15OCJaxynKnnbwHKxn++fVW8EPyPP9xCaP9tXvdcjcdes
+        eO15TWgING2oZby03Thxh3VRXWpnsn3sxV3vEukFBu7VYdq6+HdOufWoYQBSGcrpuSMoIh
+        YTkR+xs2qtg/DDjjJDlh0Zkc/jAapEI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-pTfqDSdGP9CR1YEzofLBAw-1; Tue, 19 Jan 2021 22:47:02 -0500
-X-MC-Unique: pTfqDSdGP9CR1YEzofLBAw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-544-lp2UjuhQMDGbIaW0q_X0HA-1; Tue, 19 Jan 2021 23:24:22 -0500
+X-MC-Unique: lp2UjuhQMDGbIaW0q_X0HA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD934800D53;
-        Wed, 20 Jan 2021 03:47:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78A1F800D53;
+        Wed, 20 Jan 2021 04:24:20 +0000 (UTC)
 Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0DB3E9CA0;
-        Wed, 20 Jan 2021 03:46:39 +0000 (UTC)
-Subject: Re: [RFC v3 03/11] vdpa: Remove the restriction that only supports
- virtio-net devices
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 43D835D74B;
+        Wed, 20 Jan 2021 04:24:08 +0000 (UTC)
+Subject: Re: [RFC v3 01/11] eventfd: track eventfd_signal() recursion depth
+ separately in different cases
 To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
         stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
         bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
@@ -44,104 +44,147 @@ Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-aio@kvack.org,
         linux-fsdevel@vger.kernel.org
 References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119045920.447-4-xieyongji@bytedance.com>
+ <20210119045920.447-2-xieyongji@bytedance.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
-Date:   Wed, 20 Jan 2021 11:46:38 +0800
+Message-ID: <e8a2cc15-80f5-01e0-75ec-ea6281fda0eb@redhat.com>
+Date:   Wed, 20 Jan 2021 12:24:06 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210119045920.447-4-xieyongji@bytedance.com>
+In-Reply-To: <20210119045920.447-2-xieyongji@bytedance.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 On 2021/1/19 下午12:59, Xie Yongji wrote:
-> With VDUSE, we should be able to support all kinds of virtio devices.
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->   drivers/vhost/vdpa.c | 29 +++--------------------------
->   1 file changed, 3 insertions(+), 26 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 29ed4173f04e..448be7875b6d 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -22,6 +22,7 @@
->   #include <linux/nospec.h>
->   #include <linux/vhost.h>
->   #include <linux/virtio_net.h>
-> +#include <linux/virtio_blk.h>
->   
->   #include "vhost.h"
->   
-> @@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
->   	return 0;
->   }
->   
-> -static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
-> -				      struct vhost_vdpa_config *c)
-> -{
-> -	long size = 0;
-> -
-> -	switch (v->virtio_id) {
-> -	case VIRTIO_ID_NET:
-> -		size = sizeof(struct virtio_net_config);
-> -		break;
-> -	}
-> -
-> -	if (c->len == 0)
-> -		return -EINVAL;
-> -
-> -	if (c->len > size - c->off)
-> -		return -E2BIG;
-> -
-> -	return 0;
-> -}
+> Now we have a global percpu counter to limit the recursion depth
+> of eventfd_signal(). This can avoid deadlock or stack overflow.
+> But in stack overflow case, it should be OK to increase the
+> recursion depth if needed. So we add a percpu counter in eventfd_ctx
+> to limit the recursion depth for deadlock case. Then it could be
+> fine to increase the global percpu counter later.
 
 
-I think we should use a separate patch for this.
+I wonder whether or not it's worth to introduce percpu for each eventfd.
+
+How about simply check if eventfd_signal_count() is greater than 2?
 
 Thanks
 
 
-> -
->   static long vhost_vdpa_get_config(struct vhost_vdpa *v,
->   				  struct vhost_vdpa_config __user *c)
+>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   fs/aio.c                |  3 ++-
+>   fs/eventfd.c            | 20 +++++++++++++++++++-
+>   include/linux/eventfd.h |  5 +----
+>   3 files changed, 22 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/aio.c b/fs/aio.c
+> index 1f32da13d39e..5d82903161f5 100644
+> --- a/fs/aio.c
+> +++ b/fs/aio.c
+> @@ -1698,7 +1698,8 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
+>   		list_del(&iocb->ki_list);
+>   		iocb->ki_res.res = mangle_poll(mask);
+>   		req->done = true;
+> -		if (iocb->ki_eventfd && eventfd_signal_count()) {
+> +		if (iocb->ki_eventfd &&
+> +			eventfd_signal_count(iocb->ki_eventfd)) {
+>   			iocb = NULL;
+>   			INIT_WORK(&req->work, aio_poll_put_work);
+>   			schedule_work(&req->work);
+> diff --git a/fs/eventfd.c b/fs/eventfd.c
+> index e265b6dd4f34..2df24f9bada3 100644
+> --- a/fs/eventfd.c
+> +++ b/fs/eventfd.c
+> @@ -25,6 +25,8 @@
+>   #include <linux/idr.h>
+>   #include <linux/uio.h>
+>   
+> +#define EVENTFD_WAKE_DEPTH 0
+> +
+>   DEFINE_PER_CPU(int, eventfd_wake_count);
+>   
+>   static DEFINE_IDA(eventfd_ida);
+> @@ -42,9 +44,17 @@ struct eventfd_ctx {
+>   	 */
+>   	__u64 count;
+>   	unsigned int flags;
+> +	int __percpu *wake_count;
+>   	int id;
+>   };
+>   
+> +bool eventfd_signal_count(struct eventfd_ctx *ctx)
+> +{
+> +	return (this_cpu_read(*ctx->wake_count) ||
+> +		this_cpu_read(eventfd_wake_count) > EVENTFD_WAKE_DEPTH);
+> +}
+> +EXPORT_SYMBOL_GPL(eventfd_signal_count);
+> +
+>   /**
+>    * eventfd_signal - Adds @n to the eventfd counter.
+>    * @ctx: [in] Pointer to the eventfd context.
+> @@ -71,17 +81,19 @@ __u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
+>   	 * it returns true, the eventfd_signal() call should be deferred to a
+>   	 * safe context.
+>   	 */
+> -	if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
+> +	if (WARN_ON_ONCE(eventfd_signal_count(ctx)))
+>   		return 0;
+>   
+>   	spin_lock_irqsave(&ctx->wqh.lock, flags);
+>   	this_cpu_inc(eventfd_wake_count);
+> +	this_cpu_inc(*ctx->wake_count);
+>   	if (ULLONG_MAX - ctx->count < n)
+>   		n = ULLONG_MAX - ctx->count;
+>   	ctx->count += n;
+>   	if (waitqueue_active(&ctx->wqh))
+>   		wake_up_locked_poll(&ctx->wqh, EPOLLIN);
+>   	this_cpu_dec(eventfd_wake_count);
+> +	this_cpu_dec(*ctx->wake_count);
+>   	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
+>   
+>   	return n;
+> @@ -92,6 +104,7 @@ static void eventfd_free_ctx(struct eventfd_ctx *ctx)
 >   {
-> @@ -215,7 +196,7 @@ static long vhost_vdpa_get_config(struct vhost_vdpa *v,
+>   	if (ctx->id >= 0)
+>   		ida_simple_remove(&eventfd_ida, ctx->id);
+> +	free_percpu(ctx->wake_count);
+>   	kfree(ctx);
+>   }
 >   
->   	if (copy_from_user(&config, c, size))
->   		return -EFAULT;
-> -	if (vhost_vdpa_config_validate(v, &config))
-> +	if (config.len == 0)
->   		return -EINVAL;
->   	buf = kvzalloc(config.len, GFP_KERNEL);
->   	if (!buf)
-> @@ -243,7 +224,7 @@ static long vhost_vdpa_set_config(struct vhost_vdpa *v,
+> @@ -423,6 +436,11 @@ static int do_eventfd(unsigned int count, int flags)
 >   
->   	if (copy_from_user(&config, c, size))
->   		return -EFAULT;
-> -	if (vhost_vdpa_config_validate(v, &config))
-> +	if (config.len == 0)
->   		return -EINVAL;
->   	buf = kvzalloc(config.len, GFP_KERNEL);
->   	if (!buf)
-> @@ -1025,10 +1006,6 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
->   	int minor;
->   	int r;
+>   	kref_init(&ctx->kref);
+>   	init_waitqueue_head(&ctx->wqh);
+> +	ctx->wake_count = alloc_percpu(int);
+> +	if (!ctx->wake_count) {
+> +		kfree(ctx);
+> +		return -ENOMEM;
+> +	}
+>   	ctx->count = count;
+>   	ctx->flags = flags;
+>   	ctx->id = ida_simple_get(&eventfd_ida, 0, 0, GFP_KERNEL);
+> diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
+> index fa0a524baed0..1a11ebbd74a9 100644
+> --- a/include/linux/eventfd.h
+> +++ b/include/linux/eventfd.h
+> @@ -45,10 +45,7 @@ void eventfd_ctx_do_read(struct eventfd_ctx *ctx, __u64 *cnt);
 >   
-> -	/* Currently, we only accept the network devices. */
-> -	if (ops->get_device_id(vdpa) != VIRTIO_ID_NET)
-> -		return -ENOTSUPP;
-> -
->   	v = kzalloc(sizeof(*v), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
->   	if (!v)
->   		return -ENOMEM;
+>   DECLARE_PER_CPU(int, eventfd_wake_count);
+>   
+> -static inline bool eventfd_signal_count(void)
+> -{
+> -	return this_cpu_read(eventfd_wake_count);
+> -}
+> +bool eventfd_signal_count(struct eventfd_ctx *ctx);
+>   
+>   #else /* CONFIG_EVENTFD */
+>   
 
