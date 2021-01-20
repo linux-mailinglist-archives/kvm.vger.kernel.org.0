@@ -2,163 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B41FC2FDAE3
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 21:33:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 669362FDB62
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 22:25:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732352AbhATUbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 15:31:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46144 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388665AbhATUay (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 15:30:54 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76405C061575
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 12:30:14 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id f63so7426666pfa.13
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 12:30:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gr515p7whZ5sUsBYIJNDK/8ZzsxitGG6Eq0FfYKpj40=;
-        b=Y7pAD06fRL9InUV2wYLEj9LoZOZnJjNiwmSwUP/FAy5/BCMpNNXtM3wXv0lXu1RlMh
-         KpXF9FIMZ2uqmRIAOdVzYeeEApLXdGpiygfXYxYEkvAMxKYOmAyhtao55lkyrE29n0Cf
-         rCzUln/y6IcPjaB9/B7oY+nJkPBXFzYheTK+lBErLAGhG2CwAJC+DQ4FixuiyVxE9CtR
-         YVwsSnfv8LsvHu0xLT5P3Vt7gun4McqtYsrk0iKoAEyQIgwq5DUbKwovtpkB5fG+qtJr
-         RaNBJh5RFYld9oj6M4c7elUGcCFfQgSZ5BzcuzWGsBOAEdEgwiMwcXJfkr/XOsx8LYCk
-         9x7w==
+        id S1729373AbhATNoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 08:44:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29902 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727037AbhATMsK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:48:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611146804;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k+BpkyaexVwIjrPU5KJtj1aN8DF4ysQcoxRYEH3ORP4=;
+        b=IzZGxz3Xew8YVRsBbi7GB+rRH+hKCmCrW0X2OOaZzTbfDWalgopYclBa2++zsMedh1SOZC
+        Pvvp8HjeltNakS3D3lAxD8rOEQDjOGYtQfqv/PlBVAUesejv1UWMRLrE+Lz2CZIY/+R9IV
+        MYQeCRjXsapxllePFH+Kx6S4MD/ES6o=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-INi-VBH4OZKyLKn8Qo41Hw-1; Wed, 20 Jan 2021 07:46:42 -0500
+X-MC-Unique: INi-VBH4OZKyLKn8Qo41Hw-1
+Received: by mail-ej1-f69.google.com with SMTP id le12so4356617ejb.13
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 04:46:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gr515p7whZ5sUsBYIJNDK/8ZzsxitGG6Eq0FfYKpj40=;
-        b=ZVQRMSt6R0/REGcchjorus0pIPKV2YA3XlCmg5ivn9V3FErxk4hkN/Wkvm3cMNYDyf
-         SsyfKIopKwwJOgkvAgtu7ShMmJV9suup4lm8P97pIsYHkP45dy+wlMLM1AVbghnQKXfj
-         xewRpf1wk3PvRBVDbVTv5DFqpl+aVlsavu0nMZPQQupIlC7+7o6lvNWVojBWnwIvfroB
-         nqqk92s69iUqlT8DnzncZzp7gN32hk0racZRHHAVzwMysQRJ1xPqCSqO/fMiFfnzUb3h
-         fj2aYFgYImdehwq4EZiW45UKXy5PY3x51ap+9ji2mGX3FKjnZYIXLvqyt3tLGubqcY+i
-         cfnQ==
-X-Gm-Message-State: AOAM532pfKH6Bo2NdIZEQxnqiNCo3oNzWAW6PDbZgAkGC4zP71XTIYgn
-        7OEqpoCpWsITzVaVS27Pi//YzA==
-X-Google-Smtp-Source: ABdhPJybjJhsxcagQOFPo/CRHj4yzT0w9X8ebHU0g5PuQ+CDZ52Ug5E3v+VmklqZJM2/+FGn9SHCAA==
-X-Received: by 2002:a63:1152:: with SMTP id 18mr11168017pgr.268.1611174613803;
-        Wed, 20 Jan 2021 12:30:13 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id r30sm3275012pfq.12.2021.01.20.12.30.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 12:30:13 -0800 (PST)
-Date:   Wed, 20 Jan 2021 12:30:06 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 10/24] kvm: x86/mmu: Factor out handle disconnected pt
-Message-ID: <YAiSzoLRybcaeZWa@google.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-11-bgardon@google.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=k+BpkyaexVwIjrPU5KJtj1aN8DF4ysQcoxRYEH3ORP4=;
+        b=Dc6SU2SFYhXLg05WyDfIl/X5x6j3bJAezpPEJqvTPUV2dpZecsH0dg0LCr+g4tHek0
+         B8kVB5TDMQCxVYKlPOvEucwEiGRNp9wJcjMlE4oWgP/2pqxPqt2XnWVIKzEawLIWPXYD
+         qa+8M4Amc+ucWze5lX5kWU+v6yg3qe3MbuMDIS9cXKJXc8aL9bxnf4sY9f5TwYZ2+QLk
+         jVl8e77HgDljrkLyZKFq5wGMH84JLiVTqErLououbsai0DNHfYz6hefg7GQYNjA2CaYa
+         Gx/siKNjQFd8gbmCxiKXKeqxMWxACSkyAic7DltrY9dOJnZPO0AU3wxQq8dZYJQRqwqD
+         c6Dg==
+X-Gm-Message-State: AOAM533gK/5E+0uHHMqKYPglKwwadMFr/1mFasbWMFlagQdJaf0XEsgO
+        B5AaeC15KoU8wTueIKK0JVC36KtHwP248jh+zoUr/AumLzdenHOLt8Cq2W+vGqKo8IfPbj9bkkg
+        nsuwq7yKeUI2T
+X-Received: by 2002:a05:6402:4c1:: with SMTP id n1mr7211727edw.66.1611146801382;
+        Wed, 20 Jan 2021 04:46:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxkPjX3RI3ZL5PKU22ojPETwG7C2LrsncmQBlG68XGpAbggp2j5SnJeHKiIFIcUBxpyf7yXXA==
+X-Received: by 2002:a05:6402:4c1:: with SMTP id n1mr7211712edw.66.1611146801268;
+        Wed, 20 Jan 2021 04:46:41 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id b101sm1059835edf.49.2021.01.20.04.46.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Jan 2021 04:46:39 -0800 (PST)
+Subject: Re: [kvm-unit-tests GIT PULL 00/11] s390x update
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org,
+        imbrenda@linux.ibm.com
+References: <20210120114158.104559-1-frankja@linux.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c78d5a9-338a-3a72-e49b-225d1d0883d0@redhat.com>
+Date:   Wed, 20 Jan 2021 13:46:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210112181041.356734-11-bgardon@google.com>
+In-Reply-To: <20210120114158.104559-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Spell out "page tables"?  Not short on chars.  The grammar is also a bit funky.
+On 20/01/21 12:41, Janosch Frank wrote:
+>    https://gitlab.com/frankja/kvm-unit-tests.git  tags/s390x-2021-20-01
 
-  KVM: x86/mmu: Factor out handling of disconnected page tables
+Pulled, thanks.
 
-On Tue, Jan 12, 2021, Ben Gardon wrote:
-> Factor out the code to handle a disconnected subtree of the TDP paging
-> structure from the code to handle the change to an individual SPTE.
-> Future commits will build on this to allow asynchronous page freeing.
-> 
-> No functional change intended.
-> 
-> Reviewed-by: Peter Feiner <pfeiner@google.com>
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 75 +++++++++++++++++++++++---------------
->  1 file changed, 46 insertions(+), 29 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 55df596696c7..e8f35cd46b4c 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -234,6 +234,49 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
->  	}
->  }
->  
-> +/**
-> + * handle_disconnected_tdp_mmu_page - handle a pt removed from the TDP structure
+Paolo
 
-Maybe s/disconnected/removed?
-
-I completely understand why you used "disconnected", and to a large extent I
-agree it's a good descriptor, but all of the surrounding comments talk about the
-page tables being "removed".  And for me, "disconnected" implies that that it
-could be reconnected in the future, whereas "removed" is a more firm "this page,
-in its current form, is gone for good".
-
-> + *
-> + * @kvm: kvm instance
-> + * @pt: the page removed from the paging structure
-> + *
-> + * Given a page table that has been removed from the TDP paging structure,
-> + * iterates through the page table to clear SPTEs and free child page tables.
-> + */
-> +static void handle_disconnected_tdp_mmu_page(struct kvm *kvm, u64 *pt)
-> +{
-> +	struct kvm_mmu_page *sp;
-> +	gfn_t gfn;
-> +	int level;
-> +	u64 old_child_spte;
-> +	int i;
-
-Nit: use reverse fir tree?  I don't think KVM needs to be as strict as tip for
-that rule/guideline, but I do think it's usually a net positive for readability.
-
-> +	sp = sptep_to_sp(pt);
-> +	gfn = sp->gfn;
-> +	level = sp->role.level;
-
-Initialize these from the get-go?  That would held the reader understand these
-are local snapshots to shorten lines, as opposed to scratch variables.
-
-	struct kvm_mmu_page *sp = sptep_to_sp(pt);
-	int level = sp->role.level;
-	gfn_t gfn = sp->gfn;
-	u64 old_child_spte;
-	int i;
-
-> +
-> +	trace_kvm_mmu_prepare_zap_page(sp);
-> +
-> +	list_del(&sp->link);
-> +
-> +	if (sp->lpage_disallowed)
-> +		unaccount_huge_nx_page(kvm, sp);
-> +
-> +	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
-> +		old_child_spte = READ_ONCE(*(pt + i));
-> +		WRITE_ONCE(*(pt + i), 0);
-> +		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp),
-> +			gfn + (i * KVM_PAGES_PER_HPAGE(level - 1)),
-> +			old_child_spte, 0, level - 1);
-> +	}
-> +
-> +	kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> +					   KVM_PAGES_PER_HPAGE(level));
-> +
-> +	free_page((unsigned long)pt);
-> +	kmem_cache_free(mmu_page_header_cache, sp);
-> +}
