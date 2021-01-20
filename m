@@ -2,133 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 682842FCEEF
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 12:20:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF8612FD0AA
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731554AbhATLOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 06:14:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36104 "EHLO
+        id S1728907AbhATMsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 07:48:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50895 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730907AbhATLKI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:10:08 -0500
+        by vger.kernel.org with ESMTP id S1729582AbhATLfe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:35:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611140919;
+        s=mimecast20190719; t=1611142447;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yTm6KgxVEtqRp5BOUW1oggSfQz0/KqIRI5Ikpu2SIkI=;
-        b=ThFdwWwUyVpvL24nEeSIZRAaihOygzoAolYK3hZ2J9WBSL/wZ5k9ztLvMHXxf6CJx8zoHa
-        AQNe94T0JQUhQVsRvgGP9yNX8+Vuf78U9viGYY0HngSWo6EFFEJ60NWfX5xcrFV5enr/Nf
-        IXZT9ajkDPMUgKpgaVd68iRBLwS39Bg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-9kg1WBBAPYGlLzQiK75T6w-1; Wed, 20 Jan 2021 06:08:38 -0500
-X-MC-Unique: 9kg1WBBAPYGlLzQiK75T6w-1
-Received: by mail-wr1-f70.google.com with SMTP id y4so802226wrt.18
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 03:08:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=yTm6KgxVEtqRp5BOUW1oggSfQz0/KqIRI5Ikpu2SIkI=;
-        b=BtOHh/39F2wsNV9eFaWMi8yOuPaYryZP0+MTY0tvK73JZ59v41T7ky/PpDIXohiLYS
-         ePsk3CkSEt/r/oL1xotXn2l8/0/EfoaMXGjhyIOjJFdUbfrjWwmg9A1mJaXpmkOt3VfA
-         eOZK97Z73QLdPhxZ9ehM16kf9suHkQGa5WvVq1m4Nu2MNBoV9FeQfjZB86M62CRWJaQ1
-         +wAJWa2nTJz6LvHcaIB0O8+Wpcy3+DUSj2DAouOz5+dRNfzrMYO5Z60Q+84G63exToXG
-         EQTlSJw6lporh8Gmz2CwbkMeGbVXvQWs7GKigc890xPW1p44/d2rytxZUDsJ37Ka1rbU
-         Y7tA==
-X-Gm-Message-State: AOAM533tNUiX3FalQzhHf2fEmQgOYUIyW5T/0isBiq5OJqQ/BEBAUo6h
-        yZnqluL1EWt9W3qJud6mx2FdsrwsJrOQHYyh641MIE+lkwtbVNVW7Pu4qXAWCVb1Lqw7NVSlsXt
-        5pplbrBtowbKW
-X-Received: by 2002:a05:600c:4e8e:: with SMTP id f14mr3838207wmq.139.1611140916748;
-        Wed, 20 Jan 2021 03:08:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwzq+LHVW7iOIInxldWRs5h39ePpUe0nK/vVbhibAJ1v8IIbA+WZfiKJq98JGzyhbZvEFHziw==
-X-Received: by 2002:a05:600c:4e8e:: with SMTP id f14mr3838181wmq.139.1611140916380;
-        Wed, 20 Jan 2021 03:08:36 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id p9sm1619051wrj.11.2021.01.20.03.08.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 03:08:35 -0800 (PST)
-Date:   Wed, 20 Jan 2021 12:08:32 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, stefanha@redhat.com, parav@nvidia.com,
-        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC v3 03/11] vdpa: Remove the restriction that only supports
- virtio-net devices
-Message-ID: <20210120110832.oijcmywq7pf7psg3@steredhat>
-References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119045920.447-4-xieyongji@bytedance.com>
- <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
+        bh=RwYNo9IWwhys7vzm7QOjLE4bc02/uzxG8yBwDPjWddA=;
+        b=dOhTU4n/nfzrOl9rXjxY94n1MYQ3HIhuKjCQvk5xDFcUBsqMuuvcyx3r8NIYTZC/zzMjZ5
+        NzwNKJJG3wviM9jaNh96r0ji7MwK6C3InyIzXUp99Cdpfecxy1vCdMKIvNpj0rN878ylBN
+        q8TRETYrsuwan1lsFQ7gCMwJijpAmUY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-517-5GqPwyl0Mu6EELqPjIFWWg-1; Wed, 20 Jan 2021 06:34:05 -0500
+X-MC-Unique: 5GqPwyl0Mu6EELqPjIFWWg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E14A107ACE3;
+        Wed, 20 Jan 2021 11:34:04 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 23D7971CA1;
+        Wed, 20 Jan 2021 11:34:01 +0000 (UTC)
+Date:   Wed, 20 Jan 2021 12:34:00 +0100
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH RFC 3/4] KVM: Define KVM_USER_MEM_SLOTS in arch-neutral
+ include/linux/kvm_host.h
+Message-ID: <20210120123400.7936e526@redhat.com>
+In-Reply-To: <YAcU6swvNkpPffE7@google.com>
+References: <20210115131844.468982-1-vkuznets@redhat.com>
+        <20210115131844.468982-4-vkuznets@redhat.com>
+        <YAHLRVhevn7adhAz@google.com>
+        <87wnwa608c.fsf@vitty.brq.redhat.com>
+        <YAcU6swvNkpPffE7@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 20, 2021 at 11:46:38AM +0800, Jason Wang wrote:
->
->On 2021/1/19 下午12:59, Xie Yongji wrote:
->>With VDUSE, we should be able to support all kinds of virtio devices.
->>
->>Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->>---
->>  drivers/vhost/vdpa.c | 29 +++--------------------------
->>  1 file changed, 3 insertions(+), 26 deletions(-)
->>
->>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>index 29ed4173f04e..448be7875b6d 100644
->>--- a/drivers/vhost/vdpa.c
->>+++ b/drivers/vhost/vdpa.c
->>@@ -22,6 +22,7 @@
->>  #include <linux/nospec.h>
->>  #include <linux/vhost.h>
->>  #include <linux/virtio_net.h>
->>+#include <linux/virtio_blk.h>
->>  #include "vhost.h"
->>@@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
->>  	return 0;
->>  }
->>-static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
->>-				      struct vhost_vdpa_config *c)
->>-{
->>-	long size = 0;
->>-
->>-	switch (v->virtio_id) {
->>-	case VIRTIO_ID_NET:
->>-		size = sizeof(struct virtio_net_config);
->>-		break;
->>-	}
->>-
->>-	if (c->len == 0)
->>-		return -EINVAL;
->>-
->>-	if (c->len > size - c->off)
->>-		return -E2BIG;
->>-
->>-	return 0;
->>-}
->
->
->I think we should use a separate patch for this.
+On Tue, 19 Jan 2021 09:20:42 -0800
+Sean Christopherson <seanjc@google.com> wrote:
 
-For the vdpa-blk simulator I had the same issues and I'm adding a 
-.get_config_size() callback to vdpa devices.
+> On Mon, Jan 18, 2021, Vitaly Kuznetsov wrote:
+> > Sean Christopherson <seanjc@google.com> writes:
+> >   
+> > > On Fri, Jan 15, 2021, Vitaly Kuznetsov wrote:  
+> > >> Memory slots are allocated dynamically when added so the only real
+> > >> limitation in KVM is 'id_to_index' array which is 'short'. Define
+> > >> KVM_USER_MEM_SLOTS to the maximum possible value in the arch-neutral
+> > >> include/linux/kvm_host.h, architectures can still overtide the setting
+> > >> if needed.  
+> > >
+> > > Leaving the max number of slots nearly unbounded is probably a bad idea.  If my
+> > > math is not completely wrong, this would let userspace allocate 6mb of kernel
+> > > memory per VM.  Actually, worst case scenario would be 12mb since modifying
+> > > memslots temporarily has two allocations.  
+> > 
+> > Yea I had thought too but on the other hand, if your VMM went rogue and
+> > and is trying to eat all your memory, how is allocating 32k memslots
+> > different from e.g. creating 64 VMs with 512 slots each? We use
+> > GFP_KERNEL_ACCOUNT to allocate memslots (and other per-VM stuff) so
+> > e.g. cgroup limits should work ...  
+> 
+> I see it as an easy way to mitigate the damage.  E.g. if a containers use case
+> is spinning up hundreds of VMs and something goes awry in the config, it would
+> be the difference between consuming tens of MBs and hundreds of MBs.  Cgroup
+> limits should also be in play, but defense in depth and all that. 
+> 
+> > > If we remove the arbitrary limit, maybe replace it with a module param with a
+> > > sane default?  
+> > 
+> > This can be a good solution indeed. The only question then is what should
+> > we pick as the default? It seems to me this can be KVM_MAX_VCPUS
+> > dependent, e.g. 4 x KVM_MAX_VCPUS would suffice.  
+> 
+> Hrm, I don't love tying it to KVM_MAX_VPUCS.  Other than SynIC, are there any
+> other features/modes/configuration that cause the number of memslots to grop
 
-Do you think make sense or is better to remove this check in vhost/vdpa, 
-delegating the boundaries checks to get_config/set_config callbacks.
+(NV)DIMMs in QEMU also consume slot/device but do not depend on vCPUs number.
+Due current slot limit only 256 DIMMs are allowed. But if vCPUs start consuming
+extra memslots, they will contend over possible slots.
 
-Thanks,
-Stefano
+> with the number of vCPUs?  But, limiting via a module param does effectively
+> require using KVM_MAX_VCPUS, otherwise everyone that might run Windows guests
+> would have to override the default and thereby defeat the purpose of limiting by
+> default.
+> 
+> Were you planning on adding a capability to check for the new and improved
+> memslots limit, e.g. to know whether or not KVM might die on a large VM?
+> If so, requiring the VMM to call an ioctl() to set a higher (or lower?) limit
+> would be another option.  That wouldn't have the same permission requirements as
+> a module param, but it would likely be a more effective safeguard in practice,
+> e.g. use cases with a fixed number of memslots or a well-defined upper bound
+> could use the capability to limit themselves.
+Currently QEMU uses KVM_CAP_NR_MEMSLOTS to get limit, and depending on place the
+limit is reached it either fails gracefully (i.e. it checks if free slot is
+available before slot allocation) or aborts (in case where it tries to allocate
+slot without check).
+New ioctl() seems redundant as we already have upper limit check
+(unless it would allow go over that limit, which in its turn defeats purpose of
+the limit).
+
+
+> Thoughts?  An ioctl() feels a little over-engineered, but I suspect that adding
+> a module param that defaults to N*KVM_MAX_VPCUS will be a waste, e.g. no one
+> will ever touch the param and we'll end up with dead, rarely-tested code.
+> 
 
