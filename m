@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C032B2FC9F9
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 05:28:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 384EC2FCAE4
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 07:04:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729674AbhATE04 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 23:26:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48774 "EHLO
+        id S1728209AbhATF5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 00:57:49 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41663 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731669AbhATEZw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 23:25:52 -0500
+        by vger.kernel.org with ESMTP id S1727703AbhATF50 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 00:57:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611116665;
+        s=mimecast20190719; t=1611122158;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jIuh7SxU93BuybyBivroDVvSIaVYcMTbwm+jPxQBIoI=;
-        b=AlacIp37xqliptgyseY8BKg0L15OCJaxynKnnbwHKxn++fVW8EPyPP9xCaP9tXvdcjcdes
-        eO15TWgING2oZby03Thxh3VRXWpnsn3sxV3vEukFBu7VYdq6+HdOufWoYQBSGcrpuSMoIh
-        YTkR+xs2qtg/DDjjJDlh0Zkc/jAapEI=
+        bh=q8SbE5PdHAcpmt+ukP9VF3z2TekafV+3DGaZfD9WNrk=;
+        b=fVdpwYirtKmS41wJPS8r5or5Pqb7h29ESFQJJ94vhhuw+VFq6oi5JVQMZ/86sDVX+tEttG
+        YMQiWch6LbcdzR/yxXE1Ld2sOqRJmAYTRvQYOniH/sts2JwmoVnkfN6SHqcDdUBHZlwI7Y
+        5D+imnxQ2WiWu0nOGK7sdrK36z3jNWY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-lp2UjuhQMDGbIaW0q_X0HA-1; Tue, 19 Jan 2021 23:24:22 -0500
-X-MC-Unique: lp2UjuhQMDGbIaW0q_X0HA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-266-IKneJktcMtWVGUomDOwycg-1; Wed, 20 Jan 2021 00:55:54 -0500
+X-MC-Unique: IKneJktcMtWVGUomDOwycg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78A1F800D53;
-        Wed, 20 Jan 2021 04:24:20 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A40711005504;
+        Wed, 20 Jan 2021 05:55:51 +0000 (UTC)
 Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 43D835D74B;
-        Wed, 20 Jan 2021 04:24:08 +0000 (UTC)
-Subject: Re: [RFC v3 01/11] eventfd: track eventfd_signal() recursion depth
- separately in different cases
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9489960C0F;
+        Wed, 20 Jan 2021 05:55:37 +0000 (UTC)
+Subject: Re: [RFC v3 05/11] vdpa: shared virtual addressing support
 To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
         stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
         bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
@@ -44,147 +43,239 @@ Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-aio@kvack.org,
         linux-fsdevel@vger.kernel.org
 References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119045920.447-2-xieyongji@bytedance.com>
+ <20210119045920.447-6-xieyongji@bytedance.com>
 From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <e8a2cc15-80f5-01e0-75ec-ea6281fda0eb@redhat.com>
-Date:   Wed, 20 Jan 2021 12:24:06 +0800
+Message-ID: <3d58d50c-935a-a827-e261-59282f4c8577@redhat.com>
+Date:   Wed, 20 Jan 2021 13:55:35 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210119045920.447-2-xieyongji@bytedance.com>
+In-Reply-To: <20210119045920.447-6-xieyongji@bytedance.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 On 2021/1/19 下午12:59, Xie Yongji wrote:
-> Now we have a global percpu counter to limit the recursion depth
-> of eventfd_signal(). This can avoid deadlock or stack overflow.
-> But in stack overflow case, it should be OK to increase the
-> recursion depth if needed. So we add a percpu counter in eventfd_ctx
-> to limit the recursion depth for deadlock case. Then it could be
-> fine to increase the global percpu counter later.
+> This patches introduces SVA (Shared Virtual Addressing)
+> support for vDPA device. During vDPA device allocation,
+> vDPA device driver needs to indicate whether SVA is
+> supported by the device. Then vhost-vdpa bus driver
+> will not pin user page and transfer userspace virtual
+> address instead of physical address during DMA mapping.
+>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   drivers/vdpa/ifcvf/ifcvf_main.c   |  2 +-
+>   drivers/vdpa/mlx5/net/mlx5_vnet.c |  2 +-
+>   drivers/vdpa/vdpa.c               |  5 ++++-
+>   drivers/vdpa/vdpa_sim/vdpa_sim.c  |  3 ++-
+>   drivers/vhost/vdpa.c              | 35 +++++++++++++++++++++++------------
+>   include/linux/vdpa.h              | 10 +++++++---
+>   6 files changed, 38 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+> index 23474af7da40..95c4601f82f5 100644
+> --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+> +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+> @@ -439,7 +439,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>   
+>   	adapter = vdpa_alloc_device(struct ifcvf_adapter, vdpa,
+>   				    dev, &ifc_vdpa_ops,
+> -				    IFCVF_MAX_QUEUE_PAIRS * 2, NULL);
+> +				    IFCVF_MAX_QUEUE_PAIRS * 2, NULL, false);
+>   	if (adapter == NULL) {
+>   		IFCVF_ERR(pdev, "Failed to allocate vDPA structure");
+>   		return -ENOMEM;
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 77595c81488d..05988d6907f2 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -1959,7 +1959,7 @@ static int mlx5v_probe(struct auxiliary_device *adev,
+>   	max_vqs = min_t(u32, max_vqs, MLX5_MAX_SUPPORTED_VQS);
+>   
+>   	ndev = vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev->device, &mlx5_vdpa_ops,
+> -				 2 * mlx5_vdpa_max_qps(max_vqs), NULL);
+> +				 2 * mlx5_vdpa_max_qps(max_vqs), NULL, false);
+>   	if (IS_ERR(ndev))
+>   		return PTR_ERR(ndev);
+>   
+> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> index 32bd48baffab..50cab930b2e5 100644
+> --- a/drivers/vdpa/vdpa.c
+> +++ b/drivers/vdpa/vdpa.c
+> @@ -72,6 +72,7 @@ static void vdpa_release_dev(struct device *d)
+>    * @nvqs: number of virtqueues supported by this device
+>    * @size: size of the parent structure that contains private data
+>    * @name: name of the vdpa device; optional.
+> + * @sva: indicate whether SVA (Shared Virtual Addressing) is supported
+>    *
+>    * Driver should use vdpa_alloc_device() wrapper macro instead of
+>    * using this directly.
+> @@ -81,7 +82,8 @@ static void vdpa_release_dev(struct device *d)
+>    */
+>   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>   					const struct vdpa_config_ops *config,
+> -					int nvqs, size_t size, const char *name)
+> +					int nvqs, size_t size, const char *name,
+> +					bool sva)
+>   {
+>   	struct vdpa_device *vdev;
+>   	int err = -EINVAL;
+> @@ -108,6 +110,7 @@ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>   	vdev->config = config;
+>   	vdev->features_valid = false;
+>   	vdev->nvqs = nvqs;
+> +	vdev->sva = sva;
+>   
+>   	if (name)
+>   		err = dev_set_name(&vdev->dev, "%s", name);
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index 85776e4e6749..03c796873a6b 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -367,7 +367,8 @@ static struct vdpasim *vdpasim_create(const char *name)
+>   	else
+>   		ops = &vdpasim_net_config_ops;
+>   
+> -	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops, VDPASIM_VQ_NUM, name);
+> +	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
+> +				VDPASIM_VQ_NUM, name, false);
+>   	if (!vdpasim)
+>   		goto err_alloc;
+>   
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 4a241d380c40..36b6950ba37f 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -486,21 +486,25 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+>   static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v, u64 start, u64 last)
+>   {
+>   	struct vhost_dev *dev = &v->vdev;
+> +	struct vdpa_device *vdpa = v->vdpa;
+>   	struct vhost_iotlb *iotlb = dev->iotlb;
+>   	struct vhost_iotlb_map *map;
+>   	struct page *page;
+>   	unsigned long pfn, pinned;
+>   
+>   	while ((map = vhost_iotlb_itree_first(iotlb, start, last)) != NULL) {
+> -		pinned = map->size >> PAGE_SHIFT;
+> -		for (pfn = map->addr >> PAGE_SHIFT;
+> -		     pinned > 0; pfn++, pinned--) {
+> -			page = pfn_to_page(pfn);
+> -			if (map->perm & VHOST_ACCESS_WO)
+> -				set_page_dirty_lock(page);
+> -			unpin_user_page(page);
+> +		if (!vdpa->sva) {
+> +			pinned = map->size >> PAGE_SHIFT;
+> +			for (pfn = map->addr >> PAGE_SHIFT;
+> +			     pinned > 0; pfn++, pinned--) {
+> +				page = pfn_to_page(pfn);
+> +				if (map->perm & VHOST_ACCESS_WO)
+> +					set_page_dirty_lock(page);
+> +				unpin_user_page(page);
+> +			}
+> +			atomic64_sub(map->size >> PAGE_SHIFT,
+> +					&dev->mm->pinned_vm);
+>   		}
+> -		atomic64_sub(map->size >> PAGE_SHIFT, &dev->mm->pinned_vm);
+>   		vhost_iotlb_map_free(iotlb, map);
+>   	}
+>   }
+> @@ -558,13 +562,15 @@ static int vhost_vdpa_map(struct vhost_vdpa *v,
+>   		r = iommu_map(v->domain, iova, pa, size,
+>   			      perm_to_iommu_flags(perm));
+>   	}
+> -
+> -	if (r)
+> +	if (r) {
+>   		vhost_iotlb_del_range(dev->iotlb, iova, iova + size - 1);
+> -	else
+> +		return r;
+> +	}
+> +
+> +	if (!vdpa->sva)
+>   		atomic64_add(size >> PAGE_SHIFT, &dev->mm->pinned_vm);
+>   
+> -	return r;
+> +	return 0;
+>   }
+>   
+>   static void vhost_vdpa_unmap(struct vhost_vdpa *v, u64 iova, u64 size)
+> @@ -589,6 +595,7 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>   					   struct vhost_iotlb_msg *msg)
+>   {
+>   	struct vhost_dev *dev = &v->vdev;
+> +	struct vdpa_device *vdpa = v->vdpa;
+>   	struct vhost_iotlb *iotlb = dev->iotlb;
+>   	struct page **page_list;
+>   	unsigned long list_size = PAGE_SIZE / sizeof(struct page *);
+> @@ -607,6 +614,10 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+>   				    msg->iova + msg->size - 1))
+>   		return -EEXIST;
+>   
+> +	if (vdpa->sva)
+> +		return vhost_vdpa_map(v, msg->iova, msg->size,
+> +				      msg->uaddr, msg->perm);
+> +
+>   	/* Limit the use of memory for bookkeeping */
+>   	page_list = (struct page **) __get_free_page(GFP_KERNEL);
+>   	if (!page_list)
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index cb5a3d847af3..f86869651614 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -44,6 +44,7 @@ struct vdpa_parent_dev;
+>    * @config: the configuration ops for this device.
+>    * @index: device index
+>    * @features_valid: were features initialized? for legacy guests
+> + * @sva: indicate whether SVA (Shared Virtual Addressing) is supported
 
 
-I wonder whether or not it's worth to introduce percpu for each eventfd.
+Rethink about this. I think we probably need a better name other than 
+"sva" since kernel already use that for shared virtual address space. 
+But actually we don't the whole virtual address space.
 
-How about simply check if eventfd_signal_count() is greater than 2?
+And I guess this can not work for the device that use platform IOMMU, so 
+we should check and fail if sva && !(dma_map || set_map).
 
 Thanks
 
 
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-> ---
->   fs/aio.c                |  3 ++-
->   fs/eventfd.c            | 20 +++++++++++++++++++-
->   include/linux/eventfd.h |  5 +----
->   3 files changed, 22 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/aio.c b/fs/aio.c
-> index 1f32da13d39e..5d82903161f5 100644
-> --- a/fs/aio.c
-> +++ b/fs/aio.c
-> @@ -1698,7 +1698,8 @@ static int aio_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
->   		list_del(&iocb->ki_list);
->   		iocb->ki_res.res = mangle_poll(mask);
->   		req->done = true;
-> -		if (iocb->ki_eventfd && eventfd_signal_count()) {
-> +		if (iocb->ki_eventfd &&
-> +			eventfd_signal_count(iocb->ki_eventfd)) {
->   			iocb = NULL;
->   			INIT_WORK(&req->work, aio_poll_put_work);
->   			schedule_work(&req->work);
-> diff --git a/fs/eventfd.c b/fs/eventfd.c
-> index e265b6dd4f34..2df24f9bada3 100644
-> --- a/fs/eventfd.c
-> +++ b/fs/eventfd.c
-> @@ -25,6 +25,8 @@
->   #include <linux/idr.h>
->   #include <linux/uio.h>
->   
-> +#define EVENTFD_WAKE_DEPTH 0
-> +
->   DEFINE_PER_CPU(int, eventfd_wake_count);
->   
->   static DEFINE_IDA(eventfd_ida);
-> @@ -42,9 +44,17 @@ struct eventfd_ctx {
->   	 */
->   	__u64 count;
->   	unsigned int flags;
-> +	int __percpu *wake_count;
->   	int id;
+>    * @nvqs: maximum number of supported virtqueues
+>    * @pdev: parent device pointer; caller must setup when registering device as part
+>    *	  of dev_add() parentdev ops callback before invoking _vdpa_register_device().
+> @@ -54,6 +55,7 @@ struct vdpa_device {
+>   	const struct vdpa_config_ops *config;
+>   	unsigned int index;
+>   	bool features_valid;
+> +	bool sva;
+>   	int nvqs;
+>   	struct vdpa_parent_dev *pdev;
 >   };
+> @@ -250,14 +252,16 @@ struct vdpa_config_ops {
 >   
-> +bool eventfd_signal_count(struct eventfd_ctx *ctx)
-> +{
-> +	return (this_cpu_read(*ctx->wake_count) ||
-> +		this_cpu_read(eventfd_wake_count) > EVENTFD_WAKE_DEPTH);
-> +}
-> +EXPORT_SYMBOL_GPL(eventfd_signal_count);
-> +
->   /**
->    * eventfd_signal - Adds @n to the eventfd counter.
->    * @ctx: [in] Pointer to the eventfd context.
-> @@ -71,17 +81,19 @@ __u64 eventfd_signal(struct eventfd_ctx *ctx, __u64 n)
->   	 * it returns true, the eventfd_signal() call should be deferred to a
->   	 * safe context.
->   	 */
-> -	if (WARN_ON_ONCE(this_cpu_read(eventfd_wake_count)))
-> +	if (WARN_ON_ONCE(eventfd_signal_count(ctx)))
->   		return 0;
+>   struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+>   					const struct vdpa_config_ops *config,
+> -					int nvqs, size_t size, const char *name);
+> +					int nvqs, size_t size,
+> +					const char *name, bool sva);
 >   
->   	spin_lock_irqsave(&ctx->wqh.lock, flags);
->   	this_cpu_inc(eventfd_wake_count);
-> +	this_cpu_inc(*ctx->wake_count);
->   	if (ULLONG_MAX - ctx->count < n)
->   		n = ULLONG_MAX - ctx->count;
->   	ctx->count += n;
->   	if (waitqueue_active(&ctx->wqh))
->   		wake_up_locked_poll(&ctx->wqh, EPOLLIN);
->   	this_cpu_dec(eventfd_wake_count);
-> +	this_cpu_dec(*ctx->wake_count);
->   	spin_unlock_irqrestore(&ctx->wqh.lock, flags);
+> -#define vdpa_alloc_device(dev_struct, member, parent, config, nvqs, name)   \
+> +#define vdpa_alloc_device(dev_struct, member, parent, config, \
+> +			  nvqs, name, sva) \
+>   			  container_of(__vdpa_alloc_device( \
+>   				       parent, config, nvqs, \
+>   				       sizeof(dev_struct) + \
+>   				       BUILD_BUG_ON_ZERO(offsetof( \
+> -				       dev_struct, member)), name), \
+> +				       dev_struct, member)), name, sva), \
+>   				       dev_struct, member)
 >   
->   	return n;
-> @@ -92,6 +104,7 @@ static void eventfd_free_ctx(struct eventfd_ctx *ctx)
->   {
->   	if (ctx->id >= 0)
->   		ida_simple_remove(&eventfd_ida, ctx->id);
-> +	free_percpu(ctx->wake_count);
->   	kfree(ctx);
->   }
->   
-> @@ -423,6 +436,11 @@ static int do_eventfd(unsigned int count, int flags)
->   
->   	kref_init(&ctx->kref);
->   	init_waitqueue_head(&ctx->wqh);
-> +	ctx->wake_count = alloc_percpu(int);
-> +	if (!ctx->wake_count) {
-> +		kfree(ctx);
-> +		return -ENOMEM;
-> +	}
->   	ctx->count = count;
->   	ctx->flags = flags;
->   	ctx->id = ida_simple_get(&eventfd_ida, 0, 0, GFP_KERNEL);
-> diff --git a/include/linux/eventfd.h b/include/linux/eventfd.h
-> index fa0a524baed0..1a11ebbd74a9 100644
-> --- a/include/linux/eventfd.h
-> +++ b/include/linux/eventfd.h
-> @@ -45,10 +45,7 @@ void eventfd_ctx_do_read(struct eventfd_ctx *ctx, __u64 *cnt);
->   
->   DECLARE_PER_CPU(int, eventfd_wake_count);
->   
-> -static inline bool eventfd_signal_count(void)
-> -{
-> -	return this_cpu_read(eventfd_wake_count);
-> -}
-> +bool eventfd_signal_count(struct eventfd_ctx *ctx);
->   
->   #else /* CONFIG_EVENTFD */
->   
+>   int vdpa_register_device(struct vdpa_device *vdev);
 
