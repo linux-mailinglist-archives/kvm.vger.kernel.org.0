@@ -2,159 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38E1D2FD0C9
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20AD72FD0CB
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731731AbhATMwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 07:52:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2880 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389909AbhATMmi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:42:38 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KCWB9W143136;
-        Wed, 20 Jan 2021 07:41:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3GgH8ECm6TfRD0oUuT53c1k+/uYapvUY4+hBWZMSd54=;
- b=rxYHE+scGPPzDSxzxWJsEb0Zia33TB4im4IhOIXPAlfDwivmihOhsFGeohqHfeTBX97e
- 14KWP28FmfCbSekWyDzufVRTToDxH2LLDDkIMUpD5r+NTtaKxCKHwdEOHF87xbzcpNhc
- Gr+A3PJWMYccklMDaJe6BiqXmxbWy6IGxDB/R2EHQNMKVF4AYkUQ06YDrFy35ozQXKWe
- //jTqcv0RALmYYknzO5hAGz5bJ+eP82qtBQWwbkotjj7U8eyF0/Y8aB4MXpBoWzTcEgD
- yzG1ssYiY+kb5dkPNBMTrZlNKzneemf3HHCOgl73AqcduJP7RZcT5yFYCyQI/sgkLGnu dQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366kepa4yw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 07:41:54 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KCWaG9145401;
-        Wed, 20 Jan 2021 07:41:52 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366kepa4wg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 07:41:52 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KCch9r001146;
-        Wed, 20 Jan 2021 12:41:48 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3668nwrk6f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 12:41:48 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KCfjnd18088404
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jan 2021 12:41:45 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 66B754C059;
-        Wed, 20 Jan 2021 12:41:45 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05FE44C05E;
-        Wed, 20 Jan 2021 12:41:45 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.39.155])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Jan 2021 12:41:44 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x: define UV compatible I/O
- allocation
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, drjones@redhat.com, pbonzini@redhat.com
-References: <1611085944-21609-1-git-send-email-pmorel@linux.ibm.com>
- <1611085944-21609-3-git-send-email-pmorel@linux.ibm.com>
- <20210120132539.236dd224@ibm-vm>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <a3ecb6af-d4b9-0f28-c574-bfaf8354b50a@linux.ibm.com>
-Date:   Wed, 20 Jan 2021 13:41:44 +0100
+        id S1731933AbhATMwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 07:52:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56263 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390014AbhATMnW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:43:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611146515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R+enVPPXnD3JV2eqAnDU93EX7gphRdJeeaNmJzhhKeA=;
+        b=JbJHZEeEw/fjFhvObbvW8uUZ35ZZT47/D8d7Bc0LSh2fhVl70ieaj3eXRNLBAbbNHNRLcV
+        dKEx810uazxtjt/YYLYmQF8CPTM+apvhynuJihhkrys6jFxg7170rY91QoJixRK7fsiw26
+        bFl6HtQleV9iJa6jqeGU8BgGPfJWRgc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-NH3gbsjmNviH-grGsiMXvQ-1; Wed, 20 Jan 2021 07:41:54 -0500
+X-MC-Unique: NH3gbsjmNviH-grGsiMXvQ-1
+Received: by mail-ed1-f69.google.com with SMTP id u17so11060682edi.18
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 04:41:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=R+enVPPXnD3JV2eqAnDU93EX7gphRdJeeaNmJzhhKeA=;
+        b=K96Q74Ag/RRjS+ulISDGokfWVS4RPeIhRrGTBOxiWCwxB7Muny8y99beU+hJioKbI1
+         BEa1yyBVr1zOfreroccPvF4v4qjRmmR1/9dTjtyPROlgGwPQzVWYWmggrQcUy/A1jcFM
+         xgE+VcPp6UbeK7oOROUsTVuCf5nkUEQ+kJ89JNnoL8XIA0LkQR5uWRM2k2tcrx8nJeuo
+         up+P2HtcmrttEkEenh0zK7dkUBFRGoFTqXnzvM1Jk12JNXgF2AGrhaj+oU49EZitruKi
+         /WCR5x+HdEbS4wWaGyHBTFBngcZ/MBKeh/Miu4tHGBXwYPKWD+JbAL/VRWAaxuiJylMP
+         aQnw==
+X-Gm-Message-State: AOAM533B+wGm4myRmQJUWrZl7TIFHEXW4BR55r6Xv5gWEXAs8HsrAeTO
+        3BgxGSIYIvcyBDlcq1aIdCeKD96qZ2cpjg2g+QoR9SiQW0iB07zTKWfIcTbKEO4p9zREnmbvvVi
+        ULARXZdfkq0R4p0IWY4ik8KyjatzBEeAduyqtPMu364luIP1XfA/bLu/6iGkljAbG
+X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr7147978edd.378.1611146512461;
+        Wed, 20 Jan 2021 04:41:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx1es0n+uTBVNNQ4O2XoP63Ntb4ev2oqumkzHrQgEqDpUQM2xcK4+U30pqT1kKkYEM0HgVa+Q==
+X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr7147963edd.378.1611146512224;
+        Wed, 20 Jan 2021 04:41:52 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id l16sm1062977edw.10.2021.01.20.04.41.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Jan 2021 04:41:51 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] travis.yml: Remove the CI file for Travis,
+ it's of no use anymore
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+References: <20210120093525.463974-1-thuth@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4bda4d97-cfd7-07a9-68b6-eeed30273819@redhat.com>
+Date:   Wed, 20 Jan 2021 13:41:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210120132539.236dd224@ibm-vm>
+In-Reply-To: <20210120093525.463974-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-20_05:2021-01-18,2021-01-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
- impostorscore=0 phishscore=0 suspectscore=0 mlxscore=0 adultscore=0
- spamscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101200072
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/20/21 1:25 PM, Claudio Imbrenda wrote:
-> On Tue, 19 Jan 2021 20:52:23 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 20/01/21 10:35, Thomas Huth wrote:
+> With its new policy, Travis-CI has become completely useless for
+> OSS projects like kvm-unit-tests. Thus remove the YML file now.
 > 
->> To centralize the memory allocation for I/O we define
->> the alloc_io_page/free_io_page functions which share the I/O
->> memory with the host in case the guest runs with
->> protected virtualization.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/malloc_io.c | 50
->> +++++++++++++++++++++++++++++++++++++++++++ lib/s390x/malloc_io.h |
->> 18 ++++++++++++++++ s390x/Makefile        |  1 +
->>   3 files changed, 69 insertions(+)
->>   create mode 100644 lib/s390x/malloc_io.c
->>   create mode 100644 lib/s390x/malloc_io.h
->>
->> diff --git a/lib/s390x/malloc_io.c b/lib/s390x/malloc_io.c
->> new file mode 100644
->> index 0000000..2a946e0
->> --- /dev/null
->> +++ b/lib/s390x/malloc_io.c
->> @@ -0,0 +1,50 @@
->> +/*
->> + * I/O page allocation
->> + *
->> + * Copyright (c) 2021 IBM Corp
->> + *
->> + * Authors:
->> + *  Pierre Morel <pmorel@linux.ibm.com>
->> + *
->> + * This code is free software; you can redistribute it and/or modify
->> it
->> + * under the terms of the GNU General Public License version 2.
->> + *
->> + * Using this interface provide host access to the allocated pages in
->> + * case the guest is a secure guest.
->> + * This is needed for I/O buffers.
->> + *
->> + */
->> +#include <libcflat.h>
->> +#include <asm/page.h>
->> +#include <asm/uv.h>
->> +#include <malloc_io.h>
->> +#include <alloc_page.h>
->> +#include <asm/facility.h>
->> +
->> +void *alloc_io_page(int size)
->> +{
->> +	void *p;
->> +
->> +	assert(size <= PAGE_SIZE);
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   .travis.yml | 180 ----------------------------------------------------
+>   1 file changed, 180 deletions(-)
+>   delete mode 100644 .travis.yml
 > 
-> I agree with Thomas here, remove size, or use it as a page count or
-> page order.
+> diff --git a/.travis.yml b/.travis.yml
+> deleted file mode 100644
+> index 5af7344..0000000
+> --- a/.travis.yml
+> +++ /dev/null
+> @@ -1,180 +0,0 @@
+> -dist: focal
+> -language: c
+> -cache: ccache
+> -git:
+> -  submodules: false
+> -
+> -jobs:
+> -  include:
+> -
+> -    - addons:
+> -        apt_packages: gcc qemu-system-x86
+> -      env:
+> -      - CONFIG=""
+> -      - BUILD_DIR="."
+> -      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
+> -          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
+> -          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
+> -          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
+> -          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
+> -          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
+> -          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+> -          vmexit_vmcall vmx_apic_passthrough_thread xsave"
+> -      - ACCEL="kvm"
+> -
+> -    - addons:
+> -        apt_packages: clang-10 qemu-system-x86
+> -      compiler: clang
+> -      env:
+> -      - CONFIG="--cc=clang-10"
+> -      - BUILD_DIR="x86-builddir"
+> -      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
+> -          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
+> -          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
+> -          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
+> -          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
+> -          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
+> -          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+> -          vmexit_vmcall vmx_apic_passthrough_thread xsave"
+> -      - ACCEL="kvm"
+> -
+> -    - addons:
+> -        apt_packages: gcc gcc-multilib qemu-system-x86
+> -      env:
+> -      - CONFIG="--arch=i386"
+> -      - BUILD_DIR="."
+> -      - TESTS="asyncpf kvmclock_test msr pmu realmode s3 setjmp sieve smap
+> -          smptest smptest3 taskswitch taskswitch2 tsc tsc_adjust tsx-ctrl umip"
+> -      - ACCEL="kvm"
+> -
+> -    - addons:
+> -        apt_packages: gcc gcc-multilib qemu-system-x86
+> -      env:
+> -      - CONFIG="--arch=i386"
+> -      - BUILD_DIR="i386-builddir"
+> -      - TESTS="cmpxchg8b vmexit_vmcall vmexit_cpuid vmexit_ipi vmexit_ipi_halt
+> -          vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ple_round_robin
+> -          vmexit_inl_pmtimer vmexit_tscdeadline vmexit_tscdeadline_immed"
+> -      - ACCEL="kvm"
+> -
+> -    - addons:
+> -        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+> -      env:
+> -      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+> -      - BUILD_DIR="."
+> -      - TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+> -
+> -    - addons:
+> -        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+> -      env:
+> -      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+> -      - BUILD_DIR="arm-buildir"
+> -      - TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
+> -
+> -    - addons:
+> -        apt_packages: gcc-aarch64-linux-gnu qemu-system-aarch64
+> -      env:
+> -      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+> -      - BUILD_DIR="."
+> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
+> -          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr psci
+> -          selftest-setup selftest-smp selftest-vectors-kernel
+> -          selftest-vectors-user timer"
+> -
+> -    - arch: arm64
+> -      addons:
+> -        apt_packages: clang-10 qemu-system-aarch64
+> -      compiler: clang
+> -      env:
+> -      - CONFIG="--arch=arm64 --cc=clang-10"
+> -      - BUILD_DIR="arm64-buildir"
+> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
+> -          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr selftest-setup
+> -          selftest-smp selftest-vectors-kernel selftest-vectors-user timer"
+> -
+> -    - addons:
+> -        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
+> -      env:
+> -      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+> -      - BUILD_DIR="."
+> -      - TESTS="selftest-setup spapr_hcall emulator rtas-set-time-of-day"
+> -      - ACCEL="tcg,cap-htm=off"
+> -
+> -    - addons:
+> -        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
+> -      env:
+> -      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+> -      - BUILD_DIR="ppc64le-buildir"
+> -      - TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
+> -      - ACCEL="tcg,cap-htm=off"
+> -
+> -    - addons:
+> -        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
+> -      env:
+> -      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+> -      - BUILD_DIR="."
+> -      - TESTS="cpumodel css diag10 diag288 diag308 emulator intercept sclp-1g
+> -          sclp-3g selftest-setup"
+> -      - ACCEL="tcg,firmware=s390x/run"
+> -
+> -    - addons:
+> -        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
+> -      env:
+> -      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+> -      - BUILD_DIR="s390x-builddir"
+> -      - TESTS="sieve skey stsi vector"
+> -      - ACCEL="tcg,firmware=s390x/run"
+> -
+> -    - os: osx
+> -      osx_image: xcode11.6
+> -      addons:
+> -        homebrew:
+> -          packages:
+> -            - bash
+> -            - coreutils
+> -            - gnu-getopt
+> -            - qemu
+> -            - x86_64-elf-gcc
+> -      env:
+> -      - CONFIG="--cross-prefix=x86_64-elf-"
+> -      - BUILD_DIR="build"
+> -      - TESTS="ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
+> -               vmexit_mov_to_cr8 vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
+> -               vmexit_ple_round_robin vmexit_tscdeadline
+> -               vmexit_tscdeadline_immed eventinj msr port80 setjmp
+> -               syscall tsc rmap_chain umip intel_iommu"
+> -      - ACCEL="tcg"
+> -      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+> -
+> -    - os: osx
+> -      osx_image: xcode11.6
+> -      addons:
+> -        homebrew:
+> -          packages:
+> -            - bash
+> -            - coreutils
+> -            - gnu-getopt
+> -            - qemu
+> -            - i686-elf-gcc
+> -      env:
+> -      - CONFIG="--arch=i386 --cross-prefix=i686-elf-"
+> -      - BUILD_DIR="build"
+> -      - TESTS="cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
+> -               vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
+> -               vmexit_ple_round_robin vmexit_tscdeadline
+> -               vmexit_tscdeadline_immed eventinj port80 setjmp tsc
+> -               taskswitch umip"
+> -      - ACCEL="tcg"
+> -      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+> -
+> -before_script:
+> -  - if [ "$ACCEL" = "kvm" ]; then
+> -      sudo chgrp kvm /usr/bin/qemu-system-* ;
+> -      sudo chmod g+s /usr/bin/qemu-system-* ;
+> -    fi
+> -  - mkdir -p $BUILD_DIR && cd $BUILD_DIR
+> -  - $TRAVIS_BUILD_DIR/configure $CONFIG
+> -script:
+> -  - make -j3
+> -  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
+> -  - grep -q PASS results.txt && ! grep -q FAIL results.txt
 > 
->> +	p = alloc_pages_flags(1, AREA_DMA31);
-> 
-> you are allocating 2 pages here...
 
-humm, yes, forgot to change this as I changed to your interface.
+Applied, thanks.
 
-Thanks for the reviewing,
-Pierre
+Paolo
 
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
