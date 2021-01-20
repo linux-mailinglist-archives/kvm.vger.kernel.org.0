@@ -2,122 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B04A2FCD1C
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 10:05:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B4C5C2FCED5
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 12:12:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728120AbhATJEh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 04:04:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:15456 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727427AbhATJDo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 04:03:44 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10K91kRv070532;
-        Wed, 20 Jan 2021 04:03:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=WTDZ9aYsWOWABpjc4bX1QkrE9uWJbUYyZ6lhbsp3NbM=;
- b=UXwmT+kNQHqdA2kllHP7p1VOhnhXBbQ9/qOSm8xpjG0hplwAlbArPGLAJFdfax4wHf05
- Vj06ithKjHqeVbIf+KTmswjupgvfLY6hAUm72nTec36+5GEl3ooYTJTZlymFImgv2J1c
- GO5CrR8gpjUooqreEfaF5GoEj7JYGFLlYRme873NyGnnPZ1oqIAq0iaVwYjcwZOkENGf
- fdVEMv2W587TPerlR4Zj39va90sDVdCTUaI1S1ul5EGaWbRRhm6UVbIzSLrahgg4F2fq
- lV3qRrABXP4LMe+hRDUuBlMxtAEMENRotw4t/TiGsNuVtnPI/DSOujHDa9XG3MOxZjAn YA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366ff73bgb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 04:03:02 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10K92jkh073694;
-        Wed, 20 Jan 2021 04:02:45 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 366ff73awh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 04:02:44 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10K8qfr7009557;
-        Wed, 20 Jan 2021 09:02:12 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3668nwrctt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 20 Jan 2021 09:02:12 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10K929Xe40567204
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Jan 2021 09:02:09 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 314914C05A;
-        Wed, 20 Jan 2021 09:02:09 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A49314C046;
-        Wed, 20 Jan 2021 09:02:08 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.39.155])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 20 Jan 2021 09:02:08 +0000 (GMT)
-Subject: Re: [PATCH 0/4] vfio-pci/zdev: Fixing s390 vfio-pci ISM support
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com
-Cc:     borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <d44a5da8-1cb9-8b1c-ef48-caea4bda2fa8@linux.ibm.com>
-Date:   Wed, 20 Jan 2021 10:02:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1728883AbhATLJG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 06:09:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27109 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731491AbhATJhA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 04:37:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611135331;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=z772Qt9JiJWD0EmElx1f24c9GfndbwsLkJfCmUU+Pe0=;
+        b=S/jnafcYfqcZssJ2VTqzkGi5RqM8LNMmDVe5UjmCdv/NYHjnRswXBfcZ/k2/XWxVFBdQB+
+        /Y+8H6OpSVxomAUrniV84qiMh1ZFzxoCuDO6Y1+h8DEvtX05za96tY8LN8VpZ7sBdUl3pb
+        kdGbYSWA8Tq3vGCJMRRq/XdrzT4n+FM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-338-EPgEeZn6OJ-74YRC-5IiBw-1; Wed, 20 Jan 2021 04:35:29 -0500
+X-MC-Unique: EPgEeZn6OJ-74YRC-5IiBw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68E08E743
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 09:35:28 +0000 (UTC)
+Received: from thuth.com (ovpn-114-135.ams2.redhat.com [10.36.114.135])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 821285D755;
+        Wed, 20 Jan 2021 09:35:27 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: [kvm-unit-tests PATCH] travis.yml: Remove the CI file for Travis, it's of no use anymore
+Date:   Wed, 20 Jan 2021 10:35:25 +0100
+Message-Id: <20210120093525.463974-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-20_02:2021-01-18,2021-01-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 adultscore=0 lowpriorityscore=0 mlxlogscore=999
- clxscore=1011 mlxscore=0 suspectscore=0 phishscore=0 spamscore=0
- impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101200049
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+With its new policy, Travis-CI has become completely useless for
+OSS projects like kvm-unit-tests. Thus remove the YML file now.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .travis.yml | 180 ----------------------------------------------------
+ 1 file changed, 180 deletions(-)
+ delete mode 100644 .travis.yml
 
-On 1/19/21 9:02 PM, Matthew Rosato wrote:
-> Today, ISM devices are completely disallowed for vfio-pci passthrough as
-> QEMU will reject the device due to an (inappropriate) MSI-X check.
-> However, in an effort to enable ISM device passthrough, I realized that the
-> manner in which ISM performs block write operations is highly incompatible
-> with the way that QEMU s390 PCI instruction interception and
-> vfio_pci_bar_rw break up I/O operations into 8B and 4B operations -- ISM
-> devices have particular requirements in regards to the alignment, size and
-> order of writes performed.  Furthermore, they require that legacy/non-MIO
-> s390 PCI instructions are used, which is also not guaranteed when the I/O
-> is passed through the typical userspace channels.
-> 
-> As a result, this patchset proposes a new VFIO region to allow a guest to
-> pass certain PCI instruction intercepts directly to the s390 host kernel
-> PCI layer for execution, pinning the guest buffer in memory briefly in
-> order to execute the requested PCI instruction.
-> 
-> Changes from RFC -> v1:
-> - No functional changes, just minor commentary changes -- Re-posting along
-> with updated QEMU set.
-> 
-
-Hi,
-
-there are is a concerns about this patch series:
-As the title says it is strongly related to ISM hardware.
-
-Why being so specific?
-
-Regards,
-Pierre
-
+diff --git a/.travis.yml b/.travis.yml
+deleted file mode 100644
+index 5af7344..0000000
+--- a/.travis.yml
++++ /dev/null
+@@ -1,180 +0,0 @@
+-dist: focal
+-language: c
+-cache: ccache
+-git:
+-  submodules: false
+-
+-jobs:
+-  include:
+-
+-    - addons:
+-        apt_packages: gcc qemu-system-x86
+-      env:
+-      - CONFIG=""
+-      - BUILD_DIR="."
+-      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
+-          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
+-          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
+-          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
+-          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
+-          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
+-          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+-          vmexit_vmcall vmx_apic_passthrough_thread xsave"
+-      - ACCEL="kvm"
+-
+-    - addons:
+-        apt_packages: clang-10 qemu-system-x86
+-      compiler: clang
+-      env:
+-      - CONFIG="--cc=clang-10"
+-      - BUILD_DIR="x86-builddir"
+-      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
+-          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
+-          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
+-          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
+-          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
+-          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
+-          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+-          vmexit_vmcall vmx_apic_passthrough_thread xsave"
+-      - ACCEL="kvm"
+-
+-    - addons:
+-        apt_packages: gcc gcc-multilib qemu-system-x86
+-      env:
+-      - CONFIG="--arch=i386"
+-      - BUILD_DIR="."
+-      - TESTS="asyncpf kvmclock_test msr pmu realmode s3 setjmp sieve smap
+-          smptest smptest3 taskswitch taskswitch2 tsc tsc_adjust tsx-ctrl umip"
+-      - ACCEL="kvm"
+-
+-    - addons:
+-        apt_packages: gcc gcc-multilib qemu-system-x86
+-      env:
+-      - CONFIG="--arch=i386"
+-      - BUILD_DIR="i386-builddir"
+-      - TESTS="cmpxchg8b vmexit_vmcall vmexit_cpuid vmexit_ipi vmexit_ipi_halt
+-          vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ple_round_robin
+-          vmexit_inl_pmtimer vmexit_tscdeadline vmexit_tscdeadline_immed"
+-      - ACCEL="kvm"
+-
+-    - addons:
+-        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+-      env:
+-      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+-      - BUILD_DIR="."
+-      - TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
+-
+-    - addons:
+-        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
+-      env:
+-      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
+-      - BUILD_DIR="arm-buildir"
+-      - TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
+-
+-    - addons:
+-        apt_packages: gcc-aarch64-linux-gnu qemu-system-aarch64
+-      env:
+-      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
+-      - BUILD_DIR="."
+-      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
+-          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr psci
+-          selftest-setup selftest-smp selftest-vectors-kernel
+-          selftest-vectors-user timer"
+-
+-    - arch: arm64
+-      addons:
+-        apt_packages: clang-10 qemu-system-aarch64
+-      compiler: clang
+-      env:
+-      - CONFIG="--arch=arm64 --cc=clang-10"
+-      - BUILD_DIR="arm64-buildir"
+-      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
+-          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr selftest-setup
+-          selftest-smp selftest-vectors-kernel selftest-vectors-user timer"
+-
+-    - addons:
+-        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
+-      env:
+-      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+-      - BUILD_DIR="."
+-      - TESTS="selftest-setup spapr_hcall emulator rtas-set-time-of-day"
+-      - ACCEL="tcg,cap-htm=off"
+-
+-    - addons:
+-        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
+-      env:
+-      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
+-      - BUILD_DIR="ppc64le-buildir"
+-      - TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
+-      - ACCEL="tcg,cap-htm=off"
+-
+-    - addons:
+-        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
+-      env:
+-      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+-      - BUILD_DIR="."
+-      - TESTS="cpumodel css diag10 diag288 diag308 emulator intercept sclp-1g
+-          sclp-3g selftest-setup"
+-      - ACCEL="tcg,firmware=s390x/run"
+-
+-    - addons:
+-        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
+-      env:
+-      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
+-      - BUILD_DIR="s390x-builddir"
+-      - TESTS="sieve skey stsi vector"
+-      - ACCEL="tcg,firmware=s390x/run"
+-
+-    - os: osx
+-      osx_image: xcode11.6
+-      addons:
+-        homebrew:
+-          packages:
+-            - bash
+-            - coreutils
+-            - gnu-getopt
+-            - qemu
+-            - x86_64-elf-gcc
+-      env:
+-      - CONFIG="--cross-prefix=x86_64-elf-"
+-      - BUILD_DIR="build"
+-      - TESTS="ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
+-               vmexit_mov_to_cr8 vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
+-               vmexit_ple_round_robin vmexit_tscdeadline
+-               vmexit_tscdeadline_immed eventinj msr port80 setjmp
+-               syscall tsc rmap_chain umip intel_iommu"
+-      - ACCEL="tcg"
+-      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+-
+-    - os: osx
+-      osx_image: xcode11.6
+-      addons:
+-        homebrew:
+-          packages:
+-            - bash
+-            - coreutils
+-            - gnu-getopt
+-            - qemu
+-            - i686-elf-gcc
+-      env:
+-      - CONFIG="--arch=i386 --cross-prefix=i686-elf-"
+-      - BUILD_DIR="build"
+-      - TESTS="cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
+-               vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
+-               vmexit_ple_round_robin vmexit_tscdeadline
+-               vmexit_tscdeadline_immed eventinj port80 setjmp tsc
+-               taskswitch umip"
+-      - ACCEL="tcg"
+-      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+-
+-before_script:
+-  - if [ "$ACCEL" = "kvm" ]; then
+-      sudo chgrp kvm /usr/bin/qemu-system-* ;
+-      sudo chmod g+s /usr/bin/qemu-system-* ;
+-    fi
+-  - mkdir -p $BUILD_DIR && cd $BUILD_DIR
+-  - $TRAVIS_BUILD_DIR/configure $CONFIG
+-script:
+-  - make -j3
+-  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
+-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.27.0
+
