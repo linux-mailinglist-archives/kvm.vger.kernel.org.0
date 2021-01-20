@@ -2,134 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C14C72FD5E9
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 17:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9AD2FD5EE
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 17:47:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732628AbhATQnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 11:43:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
+        id S2391621AbhATQnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 11:43:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391611AbhATQkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 11:40:16 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940C6C061575
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 08:39:34 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id x18so12804491pln.6
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 08:39:34 -0800 (PST)
+        with ESMTP id S2391659AbhATQlr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 11:41:47 -0500
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13596C061575;
+        Wed, 20 Jan 2021 08:41:06 -0800 (PST)
+Received: by mail-qk1-x72c.google.com with SMTP id 143so25855756qke.10;
+        Wed, 20 Jan 2021 08:41:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=nuK0zgKpAn8bzQ1mtmeXEwK3kY3X8JH630/Yem/GinQ=;
-        b=gIXzr+069d/0fSiLThZbkPQeXmsQRTA6DjfqW/10j2gExSlk9huiiDDtiCOiN/Tu5M
-         rns0U/Wr07wrfCqvQZOFkv/zvBv93JdbzykMYcYj+pGumuLDlMG1Q0/lWcdEMCS9f2Q2
-         uotpqsKxh+CgYeYzZbcM3pugbyYc3Yl/RERF71wHJziT0kzZFIr4zKzjEGrR0srj2hTW
-         mWjIxXPdSACvzeroplr2kVvNz0m7+btstdaOKt8VT78blNBNQNl3+RaCyYAuK5PXzCqW
-         P66oyaxTK8OVJrDEeUQtWv9p3V1sIXxxtiI35cOZWF6o87ParWHAVYwYct6on+Dt3qhR
-         nSmQ==
+        bh=6cgRNQyvwqoOzrnPDmHwEwehw3UJ3BnFoyNANdWEhcs=;
+        b=A+DQWxSy/SvL7lr93IkBN+cn6fxDJbsm0KZN1mKcBCanmMbc1jJXX9aKLE3r+hSIL/
+         APH3ovJ5ozPOv+XO96yoJBgwXxehA98sdUl1WND+h+93MkW4HhuS+BCOP3BcFccOtTOi
+         hBRghF0tAkk2KRD4qcoYp1iOjqg+UJw9yvgxqduUrpfkyj6mJJefjSgTjF6glRkXTwYD
+         K5KITRPviTggIspBtJKBa3q4XMfF5VXdchZ5RNmN/ahWqdW9cVGU1x06fSAp4UPbQeAa
+         CQ+0bQiCnO6mZpYpaIbr6+EynJhVJAMeeaA/rdL5RgFqTjqnkUxcbrtw3WJ+6oVXgiGK
+         SEYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nuK0zgKpAn8bzQ1mtmeXEwK3kY3X8JH630/Yem/GinQ=;
-        b=LBcVY3PptpygOLO64nGf3yyeQl6MbzCO983kUPA1TaPAfvIV52foIR1SPSeIoJW5ay
-         8mtkE2cF2uVeiWnuuKB1OWYAA1LI6xlw+CrugNUPPsQX0iHZUx2Bm1OzyACgMjz3aogl
-         cD/BwvD2o36lFnLdpmsjYs4Ljq3+uSo7XlkhEjbV838H1qCbWW/EoV8qhuRh6dpHe7zK
-         FkkeftVGRh3hDTFc4rAfcqAHErVCJMFNo1PTJW/N0Ofh3CrkNwSRcibTgtc3BjTOGcNu
-         eVp1ifxgWBFvLDRVKYB7OERCELD+zpWWRJa3b2JPCoPfr8uJUKWURT55dKdCvgHq7gY8
-         c4Hw==
-X-Gm-Message-State: AOAM531e4sj7IUwp4qZyiNOXzGCLhlSkiDsfIn+4bweN314rqpNZfyRM
-        +oVantTO76hVzd5oNJd8Hq0Ddg==
-X-Google-Smtp-Source: ABdhPJxDnTAJfxEaIlpQNTYS5GtZPsaetfRE5nmAw+H2XkASTdS3RyZDqs+FHwbl9QlVipCd8xoYEw==
-X-Received: by 2002:a17:902:9a03:b029:dc:31af:8dc2 with SMTP id v3-20020a1709029a03b02900dc31af8dc2mr10774139plp.39.1611160773822;
-        Wed, 20 Jan 2021 08:39:33 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id fv19sm2926134pjb.20.2021.01.20.08.39.31
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=6cgRNQyvwqoOzrnPDmHwEwehw3UJ3BnFoyNANdWEhcs=;
+        b=k7w/Kn9AqOREpKhySjvGfup8CZXBMOSUXoBkbFDgT5QAC9HLzwRs7idLYQSDbhfy85
+         ecBr6YhFzlW4jc3ltldfxalW6nf82zouyqKEst6K4xDWtGT0gnELOTgXWO3MkDL9wxSf
+         S9f0dis8bpEdl1CGZhdRivmKMtyNo6VEiqK/NbEwqP6cPiQMdsBYx+OvMHUBqWIA2i8S
+         lT+lk+U/ok2D/bAOq7VSCTngod+Y30uZDlnag5nSx4PewAEToEr0csZUgTElwGQ/Og8o
+         ps0toATJ/vhBYmkK8hXq05eyP3KPMeJaUrhI1K1QGkv5omCP9MS8H+LRZz2tFxqxvNdT
+         j2eQ==
+X-Gm-Message-State: AOAM533vEq/egD3iEO6EKzv9RWtUL9cCw5k8mjM5gXUTVaZ/6UONXvS7
+        opCaTef+QpezzWTdGm7wrx8=
+X-Google-Smtp-Source: ABdhPJwdZRSRaK/1/ILzVUERzSOKAJqO2pvmpgMqgS8PDN6Io+7tOh/2k6BQMYml55X2jnkHqyY9cg==
+X-Received: by 2002:a05:620a:21cd:: with SMTP id h13mr4789637qka.204.1611160865147;
+        Wed, 20 Jan 2021 08:41:05 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:1b8f])
+        by smtp.gmail.com with ESMTPSA id x49sm1550543qtx.6.2021.01.20.08.41.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 08:39:33 -0800 (PST)
-Date:   Wed, 20 Jan 2021 08:39:26 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com
-Subject: Re: [RFC PATCH v2 15/26] KVM: VMX: Convert vcpu_vmx.exit_reason to a
- union
-Message-ID: <YAhcvqXNxq0ALCyO@google.com>
-References: <cover.1610935432.git.kai.huang@intel.com>
- <72e2f0e0fb28af55cb11f259eb5bc9e034fb705c.1610935432.git.kai.huang@intel.com>
- <YAg7vzevfw5iL9kN@kernel.org>
+        Wed, 20 Jan 2021 08:41:04 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 20 Jan 2021 11:40:18 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        lizefan@huawei.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 1/2] cgroup: svm: Add Encryption ID controller
+Message-ID: <YAhc8khTUc2AFDcd@mtj.duckdns.org>
+References: <20210108012846.4134815-1-vipinsh@google.com>
+ <20210108012846.4134815-2-vipinsh@google.com>
+ <YAICLR8PBXxAcOMz@mtj.duckdns.org>
+ <YAIUwGUPDmYfUm/a@google.com>
+ <YAJg5MB/Qn5dRqmu@mtj.duckdns.org>
+ <YAJsUyH2zspZxF2S@google.com>
+ <YAb//EYCkZ7wnl6D@mtj.duckdns.org>
+ <YAfYL7V6E4/P83Mg@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YAg7vzevfw5iL9kN@kernel.org>
+In-Reply-To: <YAfYL7V6E4/P83Mg@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 20, 2021, Jarkko Sakkinen wrote:
-> On Mon, Jan 18, 2021 at 04:28:26PM +1300, Kai Huang wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > 
-> > Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
-> > full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
-> > bits 15:0, and single-bit modifiers in bits 31:16.
-> > 
-> > Historically, KVM has only had to worry about handling the "failed
-> > VM-Entry" modifier, which could only be set in very specific flows and
-> > required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
-> > bit was a somewhat viable approach.  But even with only a single bit to
-> > worry about, KVM has had several bugs related to comparing a basic exit
-> > reason against the full exit reason store in vcpu_vmx.
-> > 
-> > Upcoming Intel features, e.g. SGX, will add new modifier bits that can
-> > be set on more or less any VM-Exit, as opposed to the significantly more
-> > restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
-> > flows isn't scalable.  Tracking exit reason in a union forces code to
-> > explicitly choose between consuming the full exit reason and the basic
-> > exit, and is a convenient way to document and access the modifiers.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 42 +++++++++++++++---------
-> >  arch/x86/kvm/vmx/vmx.c    | 68 ++++++++++++++++++++-------------------
-> >  arch/x86/kvm/vmx/vmx.h    | 25 +++++++++++++-
-> >  3 files changed, 86 insertions(+), 49 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 0fbb46990dfc..f112c2482887 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3311,7 +3311,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
-> >  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-> >  	enum vm_entry_failure_code entry_failure_code;
-> >  	bool evaluate_pending_interrupts;
-> > -	u32 exit_reason, failed_index;
-> > +	u32 failed_index;
-> > +	union vmx_exit_reason exit_reason = {
-> > +		.basic = -1,
-> > +		.failed_vmentry = 1,
-> > +	};
-> 
-> Instead, put this declaration to the correct place, following the
-> reverse christmas tree ordering:
-> 
->         union vmx_exit_reason exit_reason = {};
-> 
-> And after declarations:
-> 
->         exit_reason.basic = -1;
->         exit_reason.failed_vmentry = 1;
-> 
-> More pleasing for the eye.
+Hello,
 
-I disagree (obviously, since I wrote the patch).  Initializing the fields to
-their respective values is a critical, but subtle, aspect of this code.  Making
-the code stand out via explicit initialization is a good thing, and we really
-don't want any possibility of code touching exit_reason before it is initialized.
+On Tue, Jan 19, 2021 at 11:13:51PM -0800, Vipin Sharma wrote:
+> > Can you please elaborate? I skimmed through the amd manual and it seemed to
+> > say that SEV-ES ASIDs are superset of SEV but !SEV-ES ASIDs. What's the use
+> > case for mixing those two?
+> 
+> For example, customers can be given options for which kind of protection they
+> want to choose for their workloads based on factors like data protection
+> requirement, cost, speed, etc.
+
+So, I'm looking for is a bit more in-depth analysis than that. ie. What's
+the downside of SEV && !SEV-ES and is the disticntion something inherently
+useful?
+
+> In terms of features SEV-ES is superset of SEV but that doesn't mean SEV
+> ASIDs are superset of SEV ASIDs. SEV ASIDs cannot be used for SEV-ES VMs
+> and similarly SEV-ES ASIDs cannot be used for SEV VMs. Once a system is
+> booted, based on the BIOS settings each type will have their own
+> capacity and that number cannot be changed until the next boot and BIOS
+> changes.
+
+Here's an excerpt from the AMD's system programming manual, section 15.35.2:
+
+  On some systems, there is a limitation on which ASID values can be used on
+  SEV guests that are run with SEV-ES disabled. While SEV-ES may be enabled
+  on any valid SEV ASID (as defined by CPUID Fn8000_001F[ECX]), there are
+  restrictions on which ASIDs may be used for SEV guests with SEV- ES
+  disabled. CPUID Fn8000_001F[EDX] indicates the minimum ASID value that
+  must be used for an SEV-enabled, SEV-ES-disabled guest. For example, if
+  CPUID Fn8000_001F[EDX] returns the value 5, then any VMs which use ASIDs
+  1-4 and which enable SEV must also enable SEV-ES.
+
+> We are not mixing the two types of ASIDs, they are separate and used
+> separately.
+
+Maybe in practice, the key management on the BIOS side is implemented in a
+more restricted way but at least the processor manual says differently.
+
+> > I'm very reluctant to ack vendor specific interfaces for a few reasons but
+> > most importantly because they usually indicate abstraction and/or the
+> > underlying feature not being sufficiently developed and they tend to become
+> > baggages after a while. So, here are my suggestions:
+> 
+> My first patch was only for SEV, but soon we got comments that this can
+> be abstracted and used by TDX and SEID for their use cases.
+> 
+> I see this patch as providing an abstraction for simple accounting of
+> resources used for creating secure execution contexts. Here, secure
+> execution is achieved through different means. SEID, TDX, and SEV
+> provide security using different features and capabilities. I am not
+> sure if we will reach a point where all three and other vendors will use
+> the same approach and technology for this purpose.
+> 
+> Instead of each one coming up with their own resource tracking for their
+> features, this patch is providing a common framework and cgroup for
+> tracking these resources.
+
+What's implemented is a shared place where similar things can be thrown in
+bu from user's perspective the underlying hardware feature isn't really
+abstracted. It's just exposing whatever hardware knobs there are. If you
+look at any other cgroup controllers, nothing is exposing this level of
+hardware dependent details and I'd really like to keep it that way.
+
+So, what I'm asking for is more in-depth analysis of the landscape and
+inherent differences among different vendor implementations to see whether
+there can be better approaches or we should just wait and see.
+
+> > * If there can be a shared abstraction which hopefully makes intuitive
+> >   sense, that'd be ideal. It doesn't have to be one knob but it shouldn't be
+> >   something arbitrary to specific vendors.
+> 
+> I think we should see these as features provided on a host. Tasks can
+> be executed securely on a host with the guarantees provided by the
+> specific feature (SEV, SEV-ES, TDX, SEID) used by the task.
+> 
+> I don't think each H/W vendor can agree to a common set of security
+> guarantees and approach.
+
+Do TDX and SEID have multiple key types tho?
+
+> > * If we aren't there yet and vendor-specific interface is a must, attach
+> >   that part to an interface which is already vendor-aware.
+> Sorry, I don't understand this approach. Can you please give more
+> details about it?
+
+Attaching the interface to kvm side, most likely, instead of exposing the
+feature through cgroup.
+
+Thanks.
+
+-- 
+tejun
