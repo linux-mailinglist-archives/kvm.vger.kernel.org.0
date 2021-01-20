@@ -2,99 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E61C2FD325
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 15:53:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E52882FD327
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 15:53:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732699AbhATOu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 09:50:57 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38240 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730706AbhATOUF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 09:20:05 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 645F02080D;
-        Wed, 20 Jan 2021 14:19:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611152364;
-        bh=9TPjieyQlLFEySF60ma2VnmvODCssS7zoUtLVRHv/no=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WHm5iTa0ow9eeommwyY6Lfafy2G9VMmJEl8rlyfKbDqG7FIsYUpb/MtLmoMqeBZF3
-         sxxcsjX5VugmEAJF9Mkpnm/c5myNWuzIw2LQoa+9RclATYQbhGqDK7hyJkOVs7Qdpt
-         vEupWsY6n49Ze+u8JXdZfZkCl81cKqh3ISKX9RWmc9QmcgagxXMXa2KnwUW/3sFOSz
-         hrveggvZVxKjPNXtB9qVlsWjDwwP/MN9QiF2I8dE8wIQkCerX9WuMdhrAR2p4fIxlS
-         tF18UcemcOUVWWO3yAEhR1Rde/aBoCFYPRNEy0lt11BzAyAJMrWSfNnzbUBEiFuIzL
-         UXuVm5NIBxflg==
-Date:   Wed, 20 Jan 2021 16:19:18 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com
-Subject: Re: [RFC PATCH v2 16/26] KVM: x86: Export
- kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
-Message-ID: <YAg75hHsWm0j/pnJ@kernel.org>
-References: <cover.1610935432.git.kai.huang@intel.com>
- <347d84df280cc326ebdb097ab3a30aed2818ae8c.1610935432.git.kai.huang@intel.com>
+        id S1732792AbhATOvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 09:51:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7744 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390678AbhATOkC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 09:40:02 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KEX1n3089220;
+        Wed, 20 Jan 2021 09:39:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=OUbEvXc1Tx8V9pnilr/S7a1PK0RDaqnlUhgdCe/oUr0=;
+ b=jRHpL/B6KvDQMtbY0fKBB5OpusbtGnyKqH0Ja5OC4kA6SbdTswYftqYLqeQElm31Q02i
+ BErLePsaTqZ4gVQ1vouCpoN/SsqbFVDnkWaYDYApiifkJsT537ICeyzn+mds4AMD3sRe
+ B0Z9mD5jwhy1NiIklQTYAyU8qHaULPnkas7sNiZPqrI2tmsgk/jAtTAh8Aj6CO4ui7iR
+ r+DAxLIWmn7NdzlsTa+WzqQI2KEaooZahOYPhYGxw9IlIpOdcgFStrVc87BnZ/szAc+u
+ K5Ls86hkmFAi+dRLuItjKVMKkNDtaKc6Js9SCPlzXNc4Y4i6hwtZSO6KEbuBG7boI9p5 Aw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366p870dmc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 09:39:21 -0500
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KEXDtf090499;
+        Wed, 20 Jan 2021 09:39:21 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366p870dk8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 09:39:21 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KEbF1t017315;
+        Wed, 20 Jan 2021 14:39:19 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3668p4gcfy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 14:39:18 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KEd9Oe30671232
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jan 2021 14:39:09 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20F2D5204E;
+        Wed, 20 Jan 2021 14:39:16 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.171.13.250])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 21B3652050;
+        Wed, 20 Jan 2021 14:39:15 +0000 (GMT)
+Subject: Re: [PATCH 2/2] s390: mm: Fix secure storage access exception
+ handling
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        thuth@redhat.com, david@redhat.com, imbrenda@linux.ibm.com,
+        cohuck@redhat.com, linux-s390@vger.kernel.org, gor@linux.ibm.com,
+        mihajlov@linux.ibm.com
+References: <20210119100402.84734-1-frankja@linux.ibm.com>
+ <20210119100402.84734-3-frankja@linux.ibm.com>
+ <3e1978c6-4462-1de6-e1aa-e664ffa633c1@de.ibm.com>
+ <20210120134208.GC8202@osiris>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <221ce6ab-4630-473d-a49f-150ac8c573d6@de.ibm.com>
+Date:   Wed, 20 Jan 2021 15:39:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <347d84df280cc326ebdb097ab3a30aed2818ae8c.1610935432.git.kai.huang@intel.com>
+In-Reply-To: <20210120134208.GC8202@osiris>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-20_05:2021-01-20,2021-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 impostorscore=0 phishscore=0 mlxlogscore=899
+ clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101200083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 18, 2021 at 04:28:27PM +1300, Kai Huang wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Export the gva_to_gpa() helpers for use by SGX virtualization when
-> executing ENCLS[ECREATE] and ENCLS[EINIT] on behalf of the guest.
-> To execute ECREATE and EINIT, KVM must obtain the GPA of the target
-> Secure Enclave Control Structure (SECS) in order to get its
-> corresponding HVA.
-> 
-> Because the SECS must reside in the Enclave Page Cache (EPC), copying
-> the SECS's data to a host-controlled buffer via existing exported
-> helpers is not a viable option as the EPC is not readable or writable
-> by the kernel.
-> 
-> SGX virtualization will also use gva_to_gpa() to obtain HVAs for
-> non-EPC pages in order to pass user pointers directly to ECREATE and
-> EINIT, which avoids having to copy pages worth of data into the kernel.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-/Jarkko
+On 20.01.21 14:42, Heiko Carstens wrote:
+> On Tue, Jan 19, 2021 at 11:25:01AM +0100, Christian Borntraeger wrote:
+>>> +		if (user_mode(regs)) {
+>>> +			send_sig(SIGSEGV, current, 0);
+>>> +			return;
+>>> +		} else
+>>> +			panic("Unexpected PGM 0x3d with TEID bit 61=0");
+>>
+>> use BUG instead of panic? That would kill this process, but it allows
+>> people to maybe save unaffected data.
+> 
+> It would kill the process, and most likely lead to deadlock'ed
+> system. But with all the "good" debug information being lost, which
+> wouldn't be the case with panic().
+> I really don't think this is a good idea.
+> 
 
-> ---
->  arch/x86/kvm/x86.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9a8969a6dd06..5ca7b181a3ae 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5891,6 +5891,7 @@ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
->  	u32 access = (kvm_x86_ops.get_cpl(vcpu) == 3) ? PFERR_USER_MASK : 0;
->  	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_read);
->  
->   gpa_t kvm_mmu_gva_to_gpa_fetch(struct kvm_vcpu *vcpu, gva_t gva,
->  				struct x86_exception *exception)
-> @@ -5907,6 +5908,7 @@ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
->  	access |= PFERR_WRITE_MASK;
->  	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_write);
->  
->  /* uses this to access any guest's mapped memory without checking CPL */
->  gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
-> -- 
-> 2.29.2
-> 
-> 
+My understanding is that Linus hates panic for anything that might be able
+to continue to run. With BUG the admin can decide via panic_on_oops if
+debugging data or runtime data is more important. But mm is more on your
+side, so if you insist on panic we can keep it.
