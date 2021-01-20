@@ -2,272 +2,678 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20AD72FD0CB
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 13:59:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10E902FD17D
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 14:54:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731933AbhATMwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 07:52:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56263 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390014AbhATMnW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:43:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611146515;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R+enVPPXnD3JV2eqAnDU93EX7gphRdJeeaNmJzhhKeA=;
-        b=JbJHZEeEw/fjFhvObbvW8uUZ35ZZT47/D8d7Bc0LSh2fhVl70ieaj3eXRNLBAbbNHNRLcV
-        dKEx810uazxtjt/YYLYmQF8CPTM+apvhynuJihhkrys6jFxg7170rY91QoJixRK7fsiw26
-        bFl6HtQleV9iJa6jqeGU8BgGPfJWRgc=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-NH3gbsjmNviH-grGsiMXvQ-1; Wed, 20 Jan 2021 07:41:54 -0500
-X-MC-Unique: NH3gbsjmNviH-grGsiMXvQ-1
-Received: by mail-ed1-f69.google.com with SMTP id u17so11060682edi.18
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 04:41:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=R+enVPPXnD3JV2eqAnDU93EX7gphRdJeeaNmJzhhKeA=;
-        b=K96Q74Ag/RRjS+ulISDGokfWVS4RPeIhRrGTBOxiWCwxB7Muny8y99beU+hJioKbI1
-         BEa1yyBVr1zOfreroccPvF4v4qjRmmR1/9dTjtyPROlgGwPQzVWYWmggrQcUy/A1jcFM
-         xgE+VcPp6UbeK7oOROUsTVuCf5nkUEQ+kJ89JNnoL8XIA0LkQR5uWRM2k2tcrx8nJeuo
-         up+P2HtcmrttEkEenh0zK7dkUBFRGoFTqXnzvM1Jk12JNXgF2AGrhaj+oU49EZitruKi
-         /WCR5x+HdEbS4wWaGyHBTFBngcZ/MBKeh/Miu4tHGBXwYPKWD+JbAL/VRWAaxuiJylMP
-         aQnw==
-X-Gm-Message-State: AOAM533B+wGm4myRmQJUWrZl7TIFHEXW4BR55r6Xv5gWEXAs8HsrAeTO
-        3BgxGSIYIvcyBDlcq1aIdCeKD96qZ2cpjg2g+QoR9SiQW0iB07zTKWfIcTbKEO4p9zREnmbvvVi
-        ULARXZdfkq0R4p0IWY4ik8KyjatzBEeAduyqtPMu364luIP1XfA/bLu/6iGkljAbG
-X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr7147978edd.378.1611146512461;
-        Wed, 20 Jan 2021 04:41:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx1es0n+uTBVNNQ4O2XoP63Ntb4ev2oqumkzHrQgEqDpUQM2xcK4+U30pqT1kKkYEM0HgVa+Q==
-X-Received: by 2002:a05:6402:2683:: with SMTP id w3mr7147963edd.378.1611146512224;
-        Wed, 20 Jan 2021 04:41:52 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id l16sm1062977edw.10.2021.01.20.04.41.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Jan 2021 04:41:51 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Remove the CI file for Travis,
- it's of no use anymore
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-References: <20210120093525.463974-1-thuth@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4bda4d97-cfd7-07a9-68b6-eeed30273819@redhat.com>
-Date:   Wed, 20 Jan 2021 13:41:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726116AbhATMuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 07:50:40 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1912 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388461AbhATLoW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:44:22 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KBVgxN173916;
+        Wed, 20 Jan 2021 06:43:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=VuLNCOB0btkndfd+GRohuC4BF2DYdliefL4750zlnXY=;
+ b=hMjkDMk6RKcWo2/PscXOS9b5fHurCVk8oyBilu2dEJCJZT+hpf3bg+rxFw4aPBQltI/g
+ RZl1gf+u4xNZ4CzhBJPqGiguI9EVPz+XQx0VwK1aNqfB5xA2avLkv5GkDbs/lJmUlISJ
+ hJT8RZuTN4MrzhRPK9rQyRiAL2hA9+7TADhK+YlJtcKtF6HAScZbnOQwpsV+Bly/djLz
+ 7hMsAxuJhxuxg4WHe5dZi4NnjeoYskVExs/51n/DJmCA0AGQtSAvJhZLMO3IPdy7KlUb
+ 3NaoESmf8ZRRBpoxikdS/szzGJMvH11putf4DVaXBQ1rXegxylEw9WNF8KRlbzQ2dRmo KQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366jtphnhb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 06:43:40 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KBVkbZ174095;
+        Wed, 20 Jan 2021 06:43:36 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366jtphngf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 06:43:35 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KBfNgq001723;
+        Wed, 20 Jan 2021 11:43:33 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3668p90910-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 11:43:32 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KBhUMY48103846
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jan 2021 11:43:30 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ECF85AE065;
+        Wed, 20 Jan 2021 11:43:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A2B4AE04D;
+        Wed, 20 Jan 2021 11:43:29 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Jan 2021 11:43:29 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL 02/11] s390x: lib: Move to GPL 2 and SPDX license identifiers
+Date:   Wed, 20 Jan 2021 06:41:49 -0500
+Message-Id: <20210120114158.104559-3-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210120114158.104559-1-frankja@linux.ibm.com>
+References: <20210120114158.104559-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210120093525.463974-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-20_02:2021-01-18,2021-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ phishscore=0 mlxscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
+ adultscore=0 mlxlogscore=999 suspectscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101200064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/01/21 10:35, Thomas Huth wrote:
-> With its new policy, Travis-CI has become completely useless for
-> OSS projects like kvm-unit-tests. Thus remove the YML file now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   .travis.yml | 180 ----------------------------------------------------
->   1 file changed, 180 deletions(-)
->   delete mode 100644 .travis.yml
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> deleted file mode 100644
-> index 5af7344..0000000
-> --- a/.travis.yml
-> +++ /dev/null
-> @@ -1,180 +0,0 @@
-> -dist: focal
-> -language: c
-> -cache: ccache
-> -git:
-> -  submodules: false
-> -
-> -jobs:
-> -  include:
-> -
-> -    - addons:
-> -        apt_packages: gcc qemu-system-x86
-> -      env:
-> -      - CONFIG=""
-> -      - BUILD_DIR="."
-> -      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
-> -          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
-> -          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
-> -          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
-> -          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
-> -          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
-> -          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
-> -          vmexit_vmcall vmx_apic_passthrough_thread xsave"
-> -      - ACCEL="kvm"
-> -
-> -    - addons:
-> -        apt_packages: clang-10 qemu-system-x86
-> -      compiler: clang
-> -      env:
-> -      - CONFIG="--cc=clang-10"
-> -      - BUILD_DIR="x86-builddir"
-> -      - TESTS="access asyncpf debug emulator ept hypercall hyperv_clock
-> -          hyperv_connections hyperv_stimer hyperv_synic idt_test intel_iommu
-> -          ioapic ioapic-split kvmclock_test memory msr pcid pcid-disabled
-> -          rdpru realmode rmap_chain s3 setjmp sieve smap smptest smptest3
-> -          syscall tsc tsc_adjust tsx-ctrl umip vmexit_cpuid vmexit_inl_pmtimer
-> -          vmexit_ipi vmexit_ipi_halt vmexit_mov_from_cr8 vmexit_mov_to_cr8
-> -          vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
-> -          vmexit_vmcall vmx_apic_passthrough_thread xsave"
-> -      - ACCEL="kvm"
-> -
-> -    - addons:
-> -        apt_packages: gcc gcc-multilib qemu-system-x86
-> -      env:
-> -      - CONFIG="--arch=i386"
-> -      - BUILD_DIR="."
-> -      - TESTS="asyncpf kvmclock_test msr pmu realmode s3 setjmp sieve smap
-> -          smptest smptest3 taskswitch taskswitch2 tsc tsc_adjust tsx-ctrl umip"
-> -      - ACCEL="kvm"
-> -
-> -    - addons:
-> -        apt_packages: gcc gcc-multilib qemu-system-x86
-> -      env:
-> -      - CONFIG="--arch=i386"
-> -      - BUILD_DIR="i386-builddir"
-> -      - TESTS="cmpxchg8b vmexit_vmcall vmexit_cpuid vmexit_ipi vmexit_ipi_halt
-> -          vmexit_mov_from_cr8 vmexit_mov_to_cr8 vmexit_ple_round_robin
-> -          vmexit_inl_pmtimer vmexit_tscdeadline vmexit_tscdeadline_immed"
-> -      - ACCEL="kvm"
-> -
-> -    - addons:
-> -        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
-> -      env:
-> -      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
-> -      - BUILD_DIR="."
-> -      - TESTS="selftest-vectors-kernel selftest-vectors-user selftest-smp"
-> -
-> -    - addons:
-> -        apt_packages: gcc-arm-linux-gnueabihf qemu-system-arm
-> -      env:
-> -      - CONFIG="--arch=arm --cross-prefix=arm-linux-gnueabihf-"
-> -      - BUILD_DIR="arm-buildir"
-> -      - TESTS="pci-test pmu gicv2-active gicv3-active psci selftest-setup"
-> -
-> -    - addons:
-> -        apt_packages: gcc-aarch64-linux-gnu qemu-system-aarch64
-> -      env:
-> -      - CONFIG="--arch=arm64 --cross-prefix=aarch64-linux-gnu-"
-> -      - BUILD_DIR="."
-> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
-> -          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr psci
-> -          selftest-setup selftest-smp selftest-vectors-kernel
-> -          selftest-vectors-user timer"
-> -
-> -    - arch: arm64
-> -      addons:
-> -        apt_packages: clang-10 qemu-system-aarch64
-> -      compiler: clang
-> -      env:
-> -      - CONFIG="--arch=arm64 --cc=clang-10"
-> -      - BUILD_DIR="arm64-buildir"
-> -      - TESTS="cache gicv2-active gicv2-ipi gicv3-active gicv3-ipi pci-test
-> -          pmu-cycle-counter pmu-event-counter-config pmu-sw-incr selftest-setup
-> -          selftest-smp selftest-vectors-kernel selftest-vectors-user timer"
-> -
-> -    - addons:
-> -        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
-> -      env:
-> -      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
-> -      - BUILD_DIR="."
-> -      - TESTS="selftest-setup spapr_hcall emulator rtas-set-time-of-day"
-> -      - ACCEL="tcg,cap-htm=off"
-> -
-> -    - addons:
-> -        apt_packages: gcc-powerpc64le-linux-gnu qemu-system-ppc
-> -      env:
-> -      - CONFIG="--arch=ppc64 --endian=little --cross-prefix=powerpc64le-linux-gnu-"
-> -      - BUILD_DIR="ppc64le-buildir"
-> -      - TESTS="rtas-get-time-of-day rtas-get-time-of-day-base"
-> -      - ACCEL="tcg,cap-htm=off"
-> -
-> -    - addons:
-> -        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
-> -      env:
-> -      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
-> -      - BUILD_DIR="."
-> -      - TESTS="cpumodel css diag10 diag288 diag308 emulator intercept sclp-1g
-> -          sclp-3g selftest-setup"
-> -      - ACCEL="tcg,firmware=s390x/run"
-> -
-> -    - addons:
-> -        apt_packages: gcc-s390x-linux-gnu qemu-system-s390x
-> -      env:
-> -      - CONFIG="--arch=s390x --cross-prefix=s390x-linux-gnu-"
-> -      - BUILD_DIR="s390x-builddir"
-> -      - TESTS="sieve skey stsi vector"
-> -      - ACCEL="tcg,firmware=s390x/run"
-> -
-> -    - os: osx
-> -      osx_image: xcode11.6
-> -      addons:
-> -        homebrew:
-> -          packages:
-> -            - bash
-> -            - coreutils
-> -            - gnu-getopt
-> -            - qemu
-> -            - x86_64-elf-gcc
-> -      env:
-> -      - CONFIG="--cross-prefix=x86_64-elf-"
-> -      - BUILD_DIR="build"
-> -      - TESTS="ioapic-split smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
-> -               vmexit_mov_to_cr8 vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
-> -               vmexit_ple_round_robin vmexit_tscdeadline
-> -               vmexit_tscdeadline_immed eventinj msr port80 setjmp
-> -               syscall tsc rmap_chain umip intel_iommu"
-> -      - ACCEL="tcg"
-> -      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
-> -
-> -    - os: osx
-> -      osx_image: xcode11.6
-> -      addons:
-> -        homebrew:
-> -          packages:
-> -            - bash
-> -            - coreutils
-> -            - gnu-getopt
-> -            - qemu
-> -            - i686-elf-gcc
-> -      env:
-> -      - CONFIG="--arch=i386 --cross-prefix=i686-elf-"
-> -      - BUILD_DIR="build"
-> -      - TESTS="cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
-> -               vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt
-> -               vmexit_ple_round_robin vmexit_tscdeadline
-> -               vmexit_tscdeadline_immed eventinj port80 setjmp tsc
-> -               taskswitch umip"
-> -      - ACCEL="tcg"
-> -      - PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
-> -
-> -before_script:
-> -  - if [ "$ACCEL" = "kvm" ]; then
-> -      sudo chgrp kvm /usr/bin/qemu-system-* ;
-> -      sudo chmod g+s /usr/bin/qemu-system-* ;
-> -    fi
-> -  - mkdir -p $BUILD_DIR && cd $BUILD_DIR
-> -  - $TRAVIS_BUILD_DIR/configure $CONFIG
-> -script:
-> -  - make -j3
-> -  - ACCEL="${ACCEL:-tcg}" ./run_tests.sh -v $TESTS | tee results.txt
-> -  - grep -q PASS results.txt && ! grep -q FAIL results.txt
-> 
+In the past we had some issues when developers wanted to use code
+snippets or constants from the kernel in a test or in the library. To
+remedy that the s390x maintainers decided to move all files to GPL 2
+(if possible).
 
-Applied, thanks.
+At the same time let's move to SPDX identifiers as they are much nicer
+to read.
 
-Paolo
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
+Acked-by: Pierre Morel <pmorel@linux.ibm.com>
+---
+ lib/s390x/asm-offsets.c     | 4 +---
+ lib/s390x/asm/arch_def.h    | 4 +---
+ lib/s390x/asm/asm-offsets.h | 4 +---
+ lib/s390x/asm/barrier.h     | 4 +---
+ lib/s390x/asm/cpacf.h       | 1 +
+ lib/s390x/asm/facility.h    | 4 +---
+ lib/s390x/asm/float.h       | 4 +---
+ lib/s390x/asm/interrupt.h   | 4 +---
+ lib/s390x/asm/io.h          | 4 +---
+ lib/s390x/asm/mem.h         | 4 +---
+ lib/s390x/asm/page.h        | 4 +---
+ lib/s390x/asm/pgtable.h     | 4 +---
+ lib/s390x/asm/sigp.h        | 4 +---
+ lib/s390x/asm/spinlock.h    | 4 +---
+ lib/s390x/asm/stack.h       | 4 +---
+ lib/s390x/asm/time.h        | 4 +---
+ lib/s390x/css.h             | 4 +---
+ lib/s390x/css_dump.c        | 4 +---
+ lib/s390x/css_lib.c         | 4 +---
+ lib/s390x/interrupt.c       | 4 +---
+ lib/s390x/io.c              | 4 +---
+ lib/s390x/mmu.c             | 4 +---
+ lib/s390x/mmu.h             | 4 +---
+ lib/s390x/sclp-console.c    | 5 +----
+ lib/s390x/sclp.c            | 4 +---
+ lib/s390x/sclp.h            | 5 +----
+ lib/s390x/smp.c             | 4 +---
+ lib/s390x/smp.h             | 4 +---
+ lib/s390x/stack.c           | 4 +---
+ lib/s390x/vm.c              | 3 +--
+ lib/s390x/vm.h              | 3 +--
+ 31 files changed, 31 insertions(+), 90 deletions(-)
+
+diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
+index 61d2658..ee94ed3 100644
+--- a/lib/s390x/asm-offsets.c
++++ b/lib/s390x/asm-offsets.c
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <kbuild.h>
+diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+index edc06ef..f3ab830 100644
+--- a/lib/s390x/asm/arch_def.h
++++ b/lib/s390x/asm/arch_def.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASM_S390X_ARCH_DEF_H_
+ #define _ASM_S390X_ARCH_DEF_H_
+diff --git a/lib/s390x/asm/asm-offsets.h b/lib/s390x/asm/asm-offsets.h
+index a6d7af8..bed7f8e 100644
+--- a/lib/s390x/asm/asm-offsets.h
++++ b/lib/s390x/asm/asm-offsets.h
+@@ -1,10 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #include <generated/asm-offsets.h>
+diff --git a/lib/s390x/asm/barrier.h b/lib/s390x/asm/barrier.h
+index d862e78..8e2fd6d 100644
+--- a/lib/s390x/asm/barrier.h
++++ b/lib/s390x/asm/barrier.h
+@@ -1,12 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASM_S390X_BARRIER_H_
+ #define _ASM_S390X_BARRIER_H_
+diff --git a/lib/s390x/asm/cpacf.h b/lib/s390x/asm/cpacf.h
+index 2146a01..805fcf1 100644
+--- a/lib/s390x/asm/cpacf.h
++++ b/lib/s390x/asm/cpacf.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * CP Assist for Cryptographic Functions (CPACF)
+  *
+diff --git a/lib/s390x/asm/facility.h b/lib/s390x/asm/facility.h
+index def2705..7828cf8 100644
+--- a/lib/s390x/asm/facility.h
++++ b/lib/s390x/asm/facility.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASM_S390X_FACILITY_H_
+ #define _ASM_S390X_FACILITY_H_
+diff --git a/lib/s390x/asm/float.h b/lib/s390x/asm/float.h
+index f61fa62..1367944 100644
+--- a/lib/s390x/asm/float.h
++++ b/lib/s390x/asm/float.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2018 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASM_S390X_FLOAT_H_
+ #define _ASM_S390X_FLOAT_H_
+diff --git a/lib/s390x/asm/interrupt.h b/lib/s390x/asm/interrupt.h
+index 2772e6b..1a2e2cd 100644
+--- a/lib/s390x/asm/interrupt.h
++++ b/lib/s390x/asm/interrupt.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_IRQ_H_
+ #define _ASMS390X_IRQ_H_
+diff --git a/lib/s390x/asm/io.h b/lib/s390x/asm/io.h
+index 094dace..1dc6283 100644
+--- a/lib/s390x/asm/io.h
++++ b/lib/s390x/asm/io.h
+@@ -1,12 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_IO_H_
+ #define _ASMS390X_IO_H_
+diff --git a/lib/s390x/asm/mem.h b/lib/s390x/asm/mem.h
+index c78bfa2..281390e 100644
+--- a/lib/s390x/asm/mem.h
++++ b/lib/s390x/asm/mem.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Physical memory management related functions and definitions.
+  *
+  * Copyright IBM Corp. 2018
+  * Author(s): Janosch Frank <frankja@de.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASM_S390_MEM_H
+ #define _ASM_S390_MEM_H
+diff --git a/lib/s390x/asm/page.h b/lib/s390x/asm/page.h
+index bc19154..f130f93 100644
+--- a/lib/s390x/asm/page.h
++++ b/lib/s390x/asm/page.h
+@@ -1,12 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_PAGE_H_
+ #define _ASMS390X_PAGE_H_
+diff --git a/lib/s390x/asm/pgtable.h b/lib/s390x/asm/pgtable.h
+index e15bee9..277f348 100644
+--- a/lib/s390x/asm/pgtable.h
++++ b/lib/s390x/asm/pgtable.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x page table definitions and functions
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_PGTABLE_H_
+ #define _ASMS390X_PGTABLE_H_
+diff --git a/lib/s390x/asm/sigp.h b/lib/s390x/asm/sigp.h
+index 2d52313..00844d2 100644
+--- a/lib/s390x/asm/sigp.h
++++ b/lib/s390x/asm/sigp.h
+@@ -1,10 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * SIGP related definitions.
+  *
+  * Copied from the Linux kernel file arch/s390/include/asm/sigp.h
+- *
+- * This work is licensed under the terms of the GNU GPL, version
+- * 2.
+  */
+ 
+ #ifndef ASM_S390X_SIGP_H
+diff --git a/lib/s390x/asm/spinlock.h b/lib/s390x/asm/spinlock.h
+index f7d3982..677d2cd 100644
+--- a/lib/s390x/asm/spinlock.h
++++ b/lib/s390x/asm/spinlock.h
+@@ -1,12 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef __ASMS390X_SPINLOCK_H
+ #define __ASMS390X_SPINLOCK_H
+diff --git a/lib/s390x/asm/stack.h b/lib/s390x/asm/stack.h
+index e36d975..909da36 100644
+--- a/lib/s390x/asm/stack.h
++++ b/lib/s390x/asm/stack.h
+@@ -1,12 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Copyright (c) 2017 Red Hat Inc
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_STACK_H_
+ #define _ASMS390X_STACK_H_
+diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+index 7375aa2..0d67f72 100644
+--- a/lib/s390x/asm/time.h
++++ b/lib/s390x/asm/time.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Clock utilities for s390
+  *
+@@ -6,9 +7,6 @@
+  *
+  * Copied from the s390/intercept test by:
+  *  Pierre Morel <pmorel@linux.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+  */
+ #ifndef ASM_S390X_TIME_H
+ #define ASM_S390X_TIME_H
+diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+index 221b67c..d10d265 100644
+--- a/lib/s390x/css.h
++++ b/lib/s390x/css.h
+@@ -1,11 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * CSS definitions
+  *
+  * Copyright IBM, Corp. 2020
+  * Author: Pierre Morel <pmorel@linux.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+  */
+ 
+ #ifndef CSS_H
+diff --git a/lib/s390x/css_dump.c b/lib/s390x/css_dump.c
+index 1266f04..2268086 100644
+--- a/lib/s390x/css_dump.c
++++ b/lib/s390x/css_dump.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Channel subsystem structures dumping
+  *
+@@ -6,9 +7,6 @@
+  * Authors:
+  *  Pierre Morel <pmorel@linux.ibm.com>
+  *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+- *
+  * Description:
+  * Provides the dumping functions for various structures used by subchannels:
+  * - ORB  : Operation request block, describes the I/O operation and points to
+diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+index 8e02371..5af6f77 100644
+--- a/lib/s390x/css_lib.c
++++ b/lib/s390x/css_lib.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * Channel Subsystem tests library
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  Pierre Morel <pmorel@linux.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <alloc_phys.h>
+diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+index a074505..bac8862 100644
+--- a/lib/s390x/interrupt.c
++++ b/lib/s390x/interrupt.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x interrupt handling
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <asm/barrier.h>
+diff --git a/lib/s390x/io.c b/lib/s390x/io.c
+index c0f0bf7..1ff0589 100644
+--- a/lib/s390x/io.c
++++ b/lib/s390x/io.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x io implementation
+  *
+@@ -6,9 +7,6 @@
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <argv.h>
+diff --git a/lib/s390x/mmu.c b/lib/s390x/mmu.c
+index 912236c..5c51736 100644
+--- a/lib/s390x/mmu.c
++++ b/lib/s390x/mmu.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x MMU
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ 
+ #include <libcflat.h>
+diff --git a/lib/s390x/mmu.h b/lib/s390x/mmu.h
+index f5095fa..603f289 100644
+--- a/lib/s390x/mmu.h
++++ b/lib/s390x/mmu.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x mmu functions
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *	Janosch Frank <frankja@de.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #ifndef _ASMS390X_MMU_H_
+ #define _ASMS390X_MMU_H_
+diff --git a/lib/s390x/sclp-console.c b/lib/s390x/sclp-console.c
+index 6067a1a..fa36a6a 100644
+--- a/lib/s390x/sclp-console.c
++++ b/lib/s390x/sclp-console.c
+@@ -1,11 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  * SCLP ASCII access driver
+  *
+  * Copyright (c) 2013 Alexander Graf <agraf@suse.de>
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or (at
+- * your option) any later version. See the COPYING file in the top-level
+- * directory.
+  */
+ 
+ #include <libcflat.h>
+diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
+index 4e2ac18..08a4813 100644
+--- a/lib/s390x/sclp.c
++++ b/lib/s390x/sclp.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x SCLP driver
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ 
+ #include <libcflat.h>
+diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
+index 675f07e..a8f58f5 100644
+--- a/lib/s390x/sclp.h
++++ b/lib/s390x/sclp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  * SCLP definitions
+  *
+@@ -7,10 +8,6 @@
+  * and based on the file include/hw/s390x/sclp.h from QEMU
+  * Copyright IBM, Corp. 2012
+  * Author: Christian Borntraeger <borntraeger@de.ibm.com>
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or (at
+- * your option) any later version. See the COPYING file in the top-level
+- * directory.
+  */
+ 
+ #ifndef SCLP_H
+diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+index 44b2eb4..423970b 100644
+--- a/lib/s390x/smp.c
++++ b/lib/s390x/smp.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x smp
+  * Based on Linux's arch/s390/kernel/smp.c and
+@@ -7,9 +8,6 @@
+  *
+  * Authors:
+  *  Janosch Frank <frankja@linux.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <asm/arch_def.h>
+diff --git a/lib/s390x/smp.h b/lib/s390x/smp.h
+index d66e39a..67ff16c 100644
+--- a/lib/s390x/smp.h
++++ b/lib/s390x/smp.h
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x smp
+  *
+@@ -5,9 +6,6 @@
+  *
+  * Authors:
+  *  Janosch Frank <frankja@linux.ibm.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2.
+  */
+ #ifndef SMP_H
+ #define SMP_H
+diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
+index cd34b20..0fcd1af 100644
+--- a/lib/s390x/stack.c
++++ b/lib/s390x/stack.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+  * s390x stack implementation
+  *
+@@ -6,9 +7,6 @@
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
+- *
+- * This code is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU Library General Public License version 2.
+  */
+ #include <libcflat.h>
+ #include <stack.h>
+diff --git a/lib/s390x/vm.c b/lib/s390x/vm.c
+index c852713..a5b9286 100644
+--- a/lib/s390x/vm.c
++++ b/lib/s390x/vm.c
+@@ -1,3 +1,4 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  * Functions to retrieve VM-specific information
+  *
+@@ -5,8 +6,6 @@
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+- *
+- * SPDX-License-Identifier: LGPL-2.1-or-later
+  */
+ 
+ #include <libcflat.h>
+diff --git a/lib/s390x/vm.h b/lib/s390x/vm.h
+index 33008d8..1672276 100644
+--- a/lib/s390x/vm.h
++++ b/lib/s390x/vm.h
+@@ -1,9 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
+ /*
+  * Functions to retrieve VM-specific information
+  *
+  * Copyright (c) 2020 Red Hat Inc
+- *
+- * SPDX-License-Identifier: LGPL-2.1-or-later
+  */
+ 
+ #ifndef S390X_VM_H
+-- 
+2.25.1
 
