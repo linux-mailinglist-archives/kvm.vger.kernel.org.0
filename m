@@ -2,127 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77DAC2FD187
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 14:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF2362FD18A
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 14:54:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730455AbhATMwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 07:52:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56359 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388830AbhATMIH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:08:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611144361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5jvxuRn0YU0JO8tuZ8pE07JWOeovxrqrENgeb7cNLSg=;
-        b=FE4VOBLaFApxc7P1WOI3y/InxDaXVHBPT8UiqGDniWwyWgZ9Z1E+PTsJXkFFsNNl9LeuoI
-        rE9/WBnvMFgai1XtnTB34RLHLGJyDEvNriziG4DhYIMFycDxc+V/V1wC6t6yH8mFWb+3lG
-        xn2lPV9X+rJpSESiephvZGlRrES9C80=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-l2jDMnz7OzCHwTo75B_tUw-1; Wed, 20 Jan 2021 07:02:12 -0500
-X-MC-Unique: l2jDMnz7OzCHwTo75B_tUw-1
-Received: by mail-ed1-f72.google.com with SMTP id x13so10996494edi.7
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 04:02:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=5jvxuRn0YU0JO8tuZ8pE07JWOeovxrqrENgeb7cNLSg=;
-        b=MDB23RIteyu5GDYZE/jvPptFYbyh6oMQRf3CzFokqIbbd7v6wCh/fw7vT3V05rIBlD
-         wd3mGrW79judE1V0SePNKXHJVGAG+dnJIDQ8OdZZ4m0xz6LiBt+sMncHUt3lWX3K4VE7
-         I0CeGlVhiwW4P/thi0yppkG90sgQJdpmOTWpPYCq9BAeI08h7fYgb2nuCmZUv9Ey0wBM
-         BApSxtVYjwyMuS8ypBupvRRvmhsUzN+c6fMOotNWIxnWMz+etM+XTaOyZSyN93cV3y8z
-         wpdRaAhMkfZQCJ8mvQlfLV8G3xK+5zgdTW9KZT3/FG5ir5/SyYRsZdGANkCEBjP9mvts
-         ED5g==
-X-Gm-Message-State: AOAM531U5f/K7c9CFrUNBPksNkinu+ENcBuyGo39osc6iNGBO9VWLO+R
-        Nfo11Ki+uCg8wkKep97ofoCyS8Y6ybe3dYrT77KxCLnTVR1UfOmjfqadNZXG91EPOP/APOlTgcP
-        +kJ19mmIZzhmg
-X-Received: by 2002:a50:8741:: with SMTP id 1mr7136778edv.349.1611144131695;
-        Wed, 20 Jan 2021 04:02:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwetmZPv/Yzf+l32kyHUa0LwOF173Aj0pARmd5lEX7ZZJ+tmpDG4EYiotb/PrgSYTg9sg5O6A==
-X-Received: by 2002:a50:8741:: with SMTP id 1mr7136765edv.349.1611144131488;
-        Wed, 20 Jan 2021 04:02:11 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m10sm976865edi.54.2021.01.20.04.02.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 04:02:10 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Igor Mammedov <imammedo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH RFC 3/4] KVM: Define KVM_USER_MEM_SLOTS in arch-neutral
- include/linux/kvm_host.h
-In-Reply-To: <20210120123400.7936e526@redhat.com>
-References: <20210115131844.468982-1-vkuznets@redhat.com>
- <20210115131844.468982-4-vkuznets@redhat.com>
- <YAHLRVhevn7adhAz@google.com> <87wnwa608c.fsf@vitty.brq.redhat.com>
- <YAcU6swvNkpPffE7@google.com> <20210120123400.7936e526@redhat.com>
-Date:   Wed, 20 Jan 2021 13:02:10 +0100
-Message-ID: <87czxz6cl9.fsf@vitty.brq.redhat.com>
+        id S1730853AbhATMwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 07:52:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41714 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1733032AbhATMMT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 07:12:19 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B5796206FA;
+        Wed, 20 Jan 2021 12:03:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611144194;
+        bh=sC2PxQvUDtcs5J/v19cP7uzTYaXO57aX4kf6Gys29xs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ERcW3ZBid0oBHUaXk+9PWhpGdRFtMdJsuAOu6PuIv95/s3KR9ssa35UpUGYlqvbor
+         3VQMmJVkbN1tm7tssfwShQ7NXISRD+AMAv3WkvM5SBut2rcVf8sVZ0N0o4ObH3UnKP
+         IwGWWm3LDyeMNQznYvSmmEpdX5NMsCfc5I7ZinxQeYqUgFZv5hRqGivHaU6ggG9qyM
+         WTnKN49JV6c4cfX+uSc7IKt6FNsU8srBTcmnwZd3yZvViP7W1DTcvrcfrFa9KSstym
+         dXj287tbNJB3tadq6AdyD7YyOAa5OL3KQWuhbEeDXe6dxCk8lJMASdPiRQTzxtEoGQ
+         EGKC0Tfko/ddw==
+Date:   Wed, 20 Jan 2021 14:03:08 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v2 11/26] x86/sgx: Add encls_faulted() helper
+Message-ID: <YAgb/MhaNLVwBS8K@kernel.org>
+References: <cover.1610935432.git.kai.huang@intel.com>
+ <e36ac729b227d728e2b0d1a48cfbbeca4523f1a5.1610935432.git.kai.huang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e36ac729b227d728e2b0d1a48cfbbeca4523f1a5.1610935432.git.kai.huang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Igor Mammedov <imammedo@redhat.com> writes:
+On Mon, Jan 18, 2021 at 04:28:04PM +1300, Kai Huang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> Add a helper to extract the fault indicator from an encoded ENCLS return
+> value.  SGX virtualization will also need to detect ENCLS faults.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/kernel/cpu/sgx/encls.h | 14 +++++++++++++-
+>  arch/x86/kernel/cpu/sgx/ioctl.c |  2 +-
+>  2 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kernel/cpu/sgx/encls.h b/arch/x86/kernel/cpu/sgx/encls.h
+> index be5c49689980..55919a2b01b0 100644
+> --- a/arch/x86/kernel/cpu/sgx/encls.h
+> +++ b/arch/x86/kernel/cpu/sgx/encls.h
+> @@ -40,6 +40,18 @@
+>  	} while (0);							  \
+>  }
+>  
+> +/*
+> + * encls_faulted() - Check if an ENCLS leaf faulted given an error code
+> + * @ret		the return value of an ENCLS leaf function call
+> + *
+> + * Return:
+> + *	%true if @ret indicates a fault, %false otherwise
 
-> On Tue, 19 Jan 2021 09:20:42 -0800
-> Sean Christopherson <seanjc@google.com> wrote:
->
->> 
->> Were you planning on adding a capability to check for the new and improved
->> memslots limit, e.g. to know whether or not KVM might die on a large VM?
->> If so, requiring the VMM to call an ioctl() to set a higher (or lower?) limit
->> would be another option.  That wouldn't have the same permission requirements as
->> a module param, but it would likely be a more effective safeguard in practice,
->> e.g. use cases with a fixed number of memslots or a well-defined upper bound
->> could use the capability to limit themselves.
-> Currently QEMU uses KVM_CAP_NR_MEMSLOTS to get limit, and depending on place the
-> limit is reached it either fails gracefully (i.e. it checks if free slot is
-> available before slot allocation) or aborts (in case where it tries to allocate
-> slot without check).
+Follow here the style of commenting as in ioctl.c, for the return value.
+It has optimal readability both as text, and also when converted to HTML.
+See sgx_ioc_enclave_add_pages() for an example.
 
-FWIW, 'synic problem' causes it to abort.
+> + */
+> +static inline bool encls_faulted(int ret)
+> +{
+> +	return ret & ENCLS_FAULT_FLAG;
+> +}
+> +
+>  /**
+>   * encls_failed() - Check if an ENCLS function failed
+>   * @ret:	the return value of an ENCLS function call
+> @@ -50,7 +62,7 @@
+>   */
+>  static inline bool encls_failed(int ret)
+>  {
+> -	if (ret & ENCLS_FAULT_FLAG)
+> +	if (encls_faulted(ret))
+>  		return ENCLS_TRAPNR(ret) != X86_TRAP_PF;
+>  
+>  	return !!ret;
+> diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
+> index 90a5caf76939..e5977752c7be 100644
+> --- a/arch/x86/kernel/cpu/sgx/ioctl.c
+> +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
+> @@ -568,7 +568,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
+>  		}
+>  	}
+>  
+> -	if (ret & ENCLS_FAULT_FLAG) {
+> +	if (encls_faulted(ret)) {
+>  		if (encls_failed(ret))
+>  			ENCLS_WARN(ret, "EINIT");
+>  
+> -- 
+> 2.29.2
+> 
+> 
 
-> New ioctl() seems redundant as we already have upper limit check
-> (unless it would allow go over that limit, which in its turn defeats purpose of
-> the limit).
->
-
-Right, I didn't plan to add any new CAP as what we already have should
-be enough to query the limits. Having an ioctl to set the upper limit
-seems complicated: with device and CPU hotplug it may not be easy to
-guess what it should be upfront so VMMs will likely just add a call to
-raise the limit in memslot modification code so it won't be providing
-any new protection.
-
-
->> Thoughts?  An ioctl() feels a little over-engineered, but I suspect that adding
->> a module param that defaults to N*KVM_MAX_VPCUS will be a waste, e.g. no one
->> will ever touch the param and we'll end up with dead, rarely-tested code.
-
-Alternatively, we can hard-code KVM_USER_MEM_SLOTS to N*KVM_MAX_VPCUS so
-no new parameter is needed but personally, I'd prefer to have it
-configurable (in case we decide to set it to something lower than
-SHRT_MAX of course) even if it won't be altered very often (which is a
-good thing for 'general purpose' usage, right?). First, it will allow
-tightening the limit for some very specific deployments (e.g. FaaS/
-Firecracker-style) to say '20' which should be enough. Second, we may be
-overlooking some configurations where the number of memslots is actually
-dependent on the number of vCPUs but nobody complained so far just
-because these configutrarions use a farly small number and the ceiling
-wasn't hit yet.
-
-One more spare thought. Per-vCPU memslots may come handy if someone
-decides to move some of the KVM PV features to userspace. E.g. I can
-imagine an attempt to move async_pf out of kernel.
-
--- 
-Vitaly
-
+/Jarkko
