@@ -2,96 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40A202FD5F1
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 17:47:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C14C72FD5E9
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 17:43:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387649AbhATQoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 11:44:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54382 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391219AbhATQlA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 11:41:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611160759;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oQZfi4/Ce6D+3G99X+rNeEgrjpz/uKCb6ET5YSMJWLw=;
-        b=IyDq4yvFsn7Vu0ecNzL8tdTCZ4BlQawsdZfIe7OPNNjjFEVffU6Unna3muqPz0+d8KSpZO
-        APr0TKVPul7dgQ2HKD4/i9Sw45PmJysgAhab6QrJpL0Iajn3Y0pTT7+UiBwZwR7YOMR+4q
-        nx350NFpOEWfpN38U0sBbDmHLkdFGpg=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-wnjL74PrN8ar0Mm72euXTw-1; Wed, 20 Jan 2021 11:39:17 -0500
-X-MC-Unique: wnjL74PrN8ar0Mm72euXTw-1
-Received: by mail-ed1-f71.google.com with SMTP id o19so4668950edq.9
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 08:39:16 -0800 (PST)
+        id S1732628AbhATQnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 11:43:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391611AbhATQkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 11:40:16 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940C6C061575
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 08:39:34 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id x18so12804491pln.6
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 08:39:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=nuK0zgKpAn8bzQ1mtmeXEwK3kY3X8JH630/Yem/GinQ=;
+        b=gIXzr+069d/0fSiLThZbkPQeXmsQRTA6DjfqW/10j2gExSlk9huiiDDtiCOiN/Tu5M
+         rns0U/Wr07wrfCqvQZOFkv/zvBv93JdbzykMYcYj+pGumuLDlMG1Q0/lWcdEMCS9f2Q2
+         uotpqsKxh+CgYeYzZbcM3pugbyYc3Yl/RERF71wHJziT0kzZFIr4zKzjEGrR0srj2hTW
+         mWjIxXPdSACvzeroplr2kVvNz0m7+btstdaOKt8VT78blNBNQNl3+RaCyYAuK5PXzCqW
+         P66oyaxTK8OVJrDEeUQtWv9p3V1sIXxxtiI35cOZWF6o87ParWHAVYwYct6on+Dt3qhR
+         nSmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oQZfi4/Ce6D+3G99X+rNeEgrjpz/uKCb6ET5YSMJWLw=;
-        b=PRKwHX5OHg2qYcKoLjhG/d+r+fSfPKML1D93wORJoKaspC6VqUawtDNJdQUO5mkB69
-         ywwjQ+lSw58shGYRkD1osCVSHIWr+ld3h5E0AE4PUnKWTRuh5gvcQCYzV28eZICBfmg/
-         pEw+p9QcbPRDTIOVCu1ygdBUDEyKmLtlWcOkXpYmpGQHtgURXVvGn03QoWlHEm2+yN4s
-         uLkpr4A3hWzRCDM8x7BhjAQYPyCiygb2gRDN4oOCqIkLy4AgPZsy4uj4eRWCpxvh/vKG
-         Q4KsXwA1lPe2wG73IcqCSHZbADNfCyQinKhu6d6eVCQTJZ6Lef1mmwIsebv03VzTTDvA
-         CjrA==
-X-Gm-Message-State: AOAM532Ii7HyxDQ83U3VcQxfBf4VDMH12CYorNd97cPXfNpopgOqCRrp
-        BBMv5CLlqBkFS91nw8LxwrQGgnTKvPWPGMx1MUfERAYvazYQ8eJdhQ+nwL1EOsM/KcNk0f5QLy0
-        ksc+jJbKe64HM
-X-Received: by 2002:a17:906:4151:: with SMTP id l17mr6963885ejk.54.1611160755920;
-        Wed, 20 Jan 2021 08:39:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJykBNkBj13lbMYLDJqbA4i/REeVCtiqYGD3w8w8hrVK4Ws+SkWQUFGojSHBZDpgHglL9Woc1Q==
-X-Received: by 2002:a17:906:4151:: with SMTP id l17mr6963862ejk.54.1611160755782;
-        Wed, 20 Jan 2021 08:39:15 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g2sm1105143ejk.108.2021.01.20.08.39.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Jan 2021 08:39:15 -0800 (PST)
-Subject: Re: [RFC PATCH v2 00/26] KVM SGX virtualization support
-To:     Sean Christopherson <seanjc@google.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, linux-sgx@vger.kernel.org,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=nuK0zgKpAn8bzQ1mtmeXEwK3kY3X8JH630/Yem/GinQ=;
+        b=LBcVY3PptpygOLO64nGf3yyeQl6MbzCO983kUPA1TaPAfvIV52foIR1SPSeIoJW5ay
+         8mtkE2cF2uVeiWnuuKB1OWYAA1LI6xlw+CrugNUPPsQX0iHZUx2Bm1OzyACgMjz3aogl
+         cD/BwvD2o36lFnLdpmsjYs4Ljq3+uSo7XlkhEjbV838H1qCbWW/EoV8qhuRh6dpHe7zK
+         FkkeftVGRh3hDTFc4rAfcqAHErVCJMFNo1PTJW/N0Ofh3CrkNwSRcibTgtc3BjTOGcNu
+         eVp1ifxgWBFvLDRVKYB7OERCELD+zpWWRJa3b2JPCoPfr8uJUKWURT55dKdCvgHq7gY8
+         c4Hw==
+X-Gm-Message-State: AOAM531e4sj7IUwp4qZyiNOXzGCLhlSkiDsfIn+4bweN314rqpNZfyRM
+        +oVantTO76hVzd5oNJd8Hq0Ddg==
+X-Google-Smtp-Source: ABdhPJxDnTAJfxEaIlpQNTYS5GtZPsaetfRE5nmAw+H2XkASTdS3RyZDqs+FHwbl9QlVipCd8xoYEw==
+X-Received: by 2002:a17:902:9a03:b029:dc:31af:8dc2 with SMTP id v3-20020a1709029a03b02900dc31af8dc2mr10774139plp.39.1611160773822;
+        Wed, 20 Jan 2021 08:39:33 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id fv19sm2926134pjb.20.2021.01.20.08.39.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jan 2021 08:39:33 -0800 (PST)
+Date:   Wed, 20 Jan 2021 08:39:26 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com
+Subject: Re: [RFC PATCH v2 15/26] KVM: VMX: Convert vcpu_vmx.exit_reason to a
+ union
+Message-ID: <YAhcvqXNxq0ALCyO@google.com>
 References: <cover.1610935432.git.kai.huang@intel.com>
- <YAaW5FIkRrLGncT5@kernel.org>
- <0adf45fae5207ed3d788bbb7260425f8da7aff43.camel@intel.com>
- <YAhb1mYB3ajc2/n9@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7cd130cc-cda5-97d5-7c25-99fe813de824@redhat.com>
-Date:   Wed, 20 Jan 2021 17:39:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ <72e2f0e0fb28af55cb11f259eb5bc9e034fb705c.1610935432.git.kai.huang@intel.com>
+ <YAg7vzevfw5iL9kN@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <YAhb1mYB3ajc2/n9@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YAg7vzevfw5iL9kN@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/01/21 17:35, Sean Christopherson wrote:
-> On Wed, Jan 20, 2021, Kai Huang wrote:
->> I'd like to take this chance to ask: when this series is ready to be merged, what is
->> the properly way to merge? This series has x86 non-sgx (cpufeature, feat_ctl) and sgx
->> changes, and it obviously has KVM changes too. So instance, who should be the one to
->> take this series? And which tree and branch should I rebase to in next version?
-> The path of least resistance is likely to get acks for the x86 and sgx changes,
-> and let Paolo take it through the KVM tree.  The KVM changes are much more
-> likely to have non-trivial conflicts, e.g. making exit_reason a union touches a
-> ton of code; getting and carrying acked-by for those will be tough sledding.
+On Wed, Jan 20, 2021, Jarkko Sakkinen wrote:
+> On Mon, Jan 18, 2021 at 04:28:26PM +1300, Kai Huang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
+> > full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
+> > bits 15:0, and single-bit modifiers in bits 31:16.
+> > 
+> > Historically, KVM has only had to worry about handling the "failed
+> > VM-Entry" modifier, which could only be set in very specific flows and
+> > required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
+> > bit was a somewhat viable approach.  But even with only a single bit to
+> > worry about, KVM has had several bugs related to comparing a basic exit
+> > reason against the full exit reason store in vcpu_vmx.
+> > 
+> > Upcoming Intel features, e.g. SGX, will add new modifier bits that can
+> > be set on more or less any VM-Exit, as opposed to the significantly more
+> > restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
+> > flows isn't scalable.  Tracking exit reason in a union forces code to
+> > explicitly choose between consuming the full exit reason and the basic
+> > exit, and is a convenient way to document and access the modifiers.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/nested.c | 42 +++++++++++++++---------
+> >  arch/x86/kvm/vmx/vmx.c    | 68 ++++++++++++++++++++-------------------
+> >  arch/x86/kvm/vmx/vmx.h    | 25 +++++++++++++-
+> >  3 files changed, 86 insertions(+), 49 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 0fbb46990dfc..f112c2482887 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -3311,7 +3311,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+> >  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+> >  	enum vm_entry_failure_code entry_failure_code;
+> >  	bool evaluate_pending_interrupts;
+> > -	u32 exit_reason, failed_index;
+> > +	u32 failed_index;
+> > +	union vmx_exit_reason exit_reason = {
+> > +		.basic = -1,
+> > +		.failed_vmentry = 1,
+> > +	};
 > 
+> Instead, put this declaration to the correct place, following the
+> reverse christmas tree ordering:
+> 
+>         union vmx_exit_reason exit_reason = {};
+> 
+> And after declarations:
+> 
+>         exit_reason.basic = -1;
+>         exit_reason.failed_vmentry = 1;
+> 
+> More pleasing for the eye.
 
-Yes, the best way is to get a topic branch from Thomas or Borislav.
-
-Paolo
-
+I disagree (obviously, since I wrote the patch).  Initializing the fields to
+their respective values is a critical, but subtle, aspect of this code.  Making
+the code stand out via explicit initialization is a good thing, and we really
+don't want any possibility of code touching exit_reason before it is initialized.
