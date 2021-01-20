@@ -2,99 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C11562FC8DF
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 04:30:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 40A2D2FC969
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 04:49:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732117AbhATCaW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 21:30:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731384AbhATC0u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 19 Jan 2021 21:26:50 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF597C061575
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 18:26:08 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id g12so31396475ejf.8
-        for <kvm@vger.kernel.org>; Tue, 19 Jan 2021 18:26:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DBePnOAwZBQb0dFg0gQ+d7YGVLbKQhuKKUpxdihg8xw=;
-        b=LB6kDMOtqkpE7gTzQl38DEPBvXbLSTBlsbJxXoOYf8YjfF5k3es63847L/iApG8tyu
-         GU79SOybW0byS1xGi1kEI42XZfpf5a4JhXNwXYGsmvehOvqkt2M9KFWzQm/uSqrVJhAj
-         CaHl8G12wqKvSw5Ox8KrDo5kFWFoFzZ6TYbSCth/TKonjHa0KVF6wdLBdwnINl87uExX
-         d6VMJOWD1vrRgAkrABgI/Oatatd6mW+xjawoN0FSYtgjVllaRBZCRApdd0CN+A8rqUaZ
-         a2F50mlbMVLmPyeG7goZTEvELwU9kDZOzBR9f9D3VFpRZuBktM+Cm4UDvgUEU8CFnmH6
-         BGlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DBePnOAwZBQb0dFg0gQ+d7YGVLbKQhuKKUpxdihg8xw=;
-        b=OoXL0o9XfWNaKRVd4uyM4MW25AwyWUWXLpWfHexN2Vdb3xp/wmbNT38H+TFxyjn+97
-         /9wg1ySENw5lDAuGwMkOW99kZnpW4T9FHXn0R1/q/QDpHY3gCODNdxLoPSizXnSjBm3v
-         hW3b5HCCRHgjvO4YzQoVfkADVGmWkZQhSA2KxTwV957x4b7CSjyZGhB1/Cp2RsmN/cve
-         8XI1roshhn+OC5pkhb/B+ZJk8h6dvMYS7Pn/h0aUnMAg/IdOxVchS6MLpN0BaWxYZhjp
-         6OuLhJ5vkdPPmCunxggihMOQ6edxf2PBBgjGgB3GrDIxabbbNxW2NaxV82fLmqw0SjX9
-         bD8w==
-X-Gm-Message-State: AOAM531EnbsGB0an72T/Y9bzezbFCuOLVPEUyby2JhXcQNruZeD4x83b
-        wADk3MHqo04P4NG0p2yei1snV9xW1SpQxPmffWHa
-X-Google-Smtp-Source: ABdhPJzbiYr+nq4JjIVaAfFEWXYt26uUaLS8YnaaZ4H3bL6ASL47qMuMWg0GdgC4s7ZNiHZxzUxSwnHbPEPhV9hKXNw=
-X-Received: by 2002:a17:906:5254:: with SMTP id y20mr4656020ejm.174.1611109567772;
- Tue, 19 Jan 2021 18:26:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20210119045920.447-1-xieyongji@bytedance.com> <20210119050756.600-1-xieyongji@bytedance.com>
- <20210119050756.600-2-xieyongji@bytedance.com> <20210119075359.00204ca6@lwn.net>
-In-Reply-To: <20210119075359.00204ca6@lwn.net>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 20 Jan 2021 10:25:57 +0800
-Message-ID: <CACycT3uN+CJ8x_9mqA9oNzXBB+XojkMVibk_sP-ug3QGJP7yUw@mail.gmail.com>
-Subject: Re: Re: [RFC v3 08/11] vduse: Introduce VDUSE - vDPA Device in Userspace
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
-        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
-        axboe@kernel.dk, bcrl@kvack.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        id S1728340AbhATDrv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 22:47:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32984 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731507AbhATDqB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 22:46:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611114274;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BHJzsbGQ3zxMDMbJJfdomjMvNc/E1eGKV+czPVXzYNc=;
+        b=cU2LU63/dKTtn2SfSQjtJYrVfutH/Pj8vm7EbsjUw1QyGpA9UoDGbpZe5LD9wmvXV0gFW8
+        403TTatXPPhBHXkiJl9ZaYgSR+pCjashSEMgUod4jSJnP5nFnSVXBcWMR0WkPBSK9r0I4V
+        +r2gUNe94UQxv60f6fL7dnJBBE/i6rI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-MChJ_65cNhSYzTRY33kfEQ-1; Tue, 19 Jan 2021 22:44:33 -0500
+X-MC-Unique: MChJ_65cNhSYzTRY33kfEQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1D3A800D53;
+        Wed, 20 Jan 2021 03:44:30 +0000 (UTC)
+Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FDF760C9C;
+        Wed, 20 Jan 2021 03:44:19 +0000 (UTC)
+Subject: Re: [RFC v3 04/11] vhost-vdpa: protect concurrent access to vhost
+ device iotlb
+To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
+        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
+        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         kvm@vger.kernel.org, linux-aio@kvack.org,
         linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20210119045920.447-1-xieyongji@bytedance.com>
+ <20210119045920.447-5-xieyongji@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <8fbcb4c3-a09a-a00a-97e2-dde0a03be5a9@redhat.com>
+Date:   Wed, 20 Jan 2021 11:44:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210119045920.447-5-xieyongji@bytedance.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 19, 2021 at 10:54 PM Jonathan Corbet <corbet@lwn.net> wrote:
->
-> X-Gm-Spam: 0
-> X-Gm-Phishy: 0
->
-> On Tue, 19 Jan 2021 13:07:53 +0800
-> Xie Yongji <xieyongji@bytedance.com> wrote:
->
-> > diff --git a/Documentation/driver-api/vduse.rst b/Documentation/driver-api/vduse.rst
-> > new file mode 100644
-> > index 000000000000..9418a7f6646b
-> > --- /dev/null
-> > +++ b/Documentation/driver-api/vduse.rst
-> > @@ -0,0 +1,85 @@
-> > +==================================
-> > +VDUSE - "vDPA Device in Userspace"
-> > +==================================
->
-> Thanks for documenting this feature!  You will, though, need to add this
-> new document to Documentation/driver-api/index.rst for it to be included
-> in the docs build.
->
-> That said, this would appear to be documentation for user space, right?
-> So the userspace-api manual is probably a more appropriate place for it.
->
 
-Will do it. Thanks for the reminder!
+On 2021/1/19 下午12:59, Xie Yongji wrote:
+> Introduce a mutex to protect vhost device iotlb from
+> concurrent access.
+>
+> Fixes: 4c8cf318("vhost: introduce vDPA-based backend")
+> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+> ---
+>   drivers/vhost/vdpa.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 448be7875b6d..4a241d380c40 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -49,6 +49,7 @@ struct vhost_vdpa {
+>   	struct eventfd_ctx *config_ctx;
+>   	int in_batch;
+>   	struct vdpa_iova_range range;
+> +	struct mutex mutex;
 
-Thanks,
-Yongji
+
+Let's use the device mutex like what vhost_process_iotlb_msg() did.
+
+Thanks
+
+
+>   };
+>   
+>   static DEFINE_IDA(vhost_vdpa_ida);
+> @@ -728,6 +729,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>   	if (r)
+>   		return r;
+>   
+> +	mutex_lock(&v->mutex);
+>   	switch (msg->type) {
+>   	case VHOST_IOTLB_UPDATE:
+>   		r = vhost_vdpa_process_iotlb_update(v, msg);
+> @@ -747,6 +749,7 @@ static int vhost_vdpa_process_iotlb_msg(struct vhost_dev *dev,
+>   		r = -EINVAL;
+>   		break;
+>   	}
+> +	mutex_unlock(&v->mutex);
+>   
+>   	return r;
+>   }
+> @@ -1017,6 +1020,7 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+>   		return minor;
+>   	}
+>   
+> +	mutex_init(&v->mutex);
+>   	atomic_set(&v->opened, 0);
+>   	v->minor = minor;
+>   	v->vdpa = vdpa;
+
