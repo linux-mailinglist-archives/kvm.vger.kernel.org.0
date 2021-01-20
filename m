@@ -2,266 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 434BF2FD18F
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 14:54:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AC7F2FD1E5
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 14:55:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731176AbhATMwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 07:52:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25980 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388581AbhATMRk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 07:17:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611144958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=adpiIAj4FZBD1b7jrxhLV9luEhxbVjXaDkjpdCcAiMc=;
-        b=F+6+UuLMHDI6fAxpWG09oh8+eTrc5MTkT/f3ubNCvmK//2RuV/6yyWIbqpoK3FUhORYNgx
-        el2/Nx2kBHm6NkxxkixQgmt74TEGyTqdJHvakIXX614J5mGn/idrQaUOfNYiUnKT3Z9Ns7
-        TXBFC734A6OJo/b2zcIGyt21amXwKQk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-IICxESguP9CO7am006MwFw-1; Wed, 20 Jan 2021 07:15:56 -0500
-X-MC-Unique: IICxESguP9CO7am006MwFw-1
-Received: by mail-ed1-f71.google.com with SMTP id n18so10957373eds.2
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 04:15:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=adpiIAj4FZBD1b7jrxhLV9luEhxbVjXaDkjpdCcAiMc=;
-        b=BNgKMEoBTBst4IMV1dxjxvdaap1ELNW4rEtxFE341POYP75nhFiM8n59Uej1uPoA8J
-         1h1S9O1g86Ay8yHmqssrH6++86nDsA9jSYXk5QG6ZrussdFkNHlrz7SvBb5xT+jeyT2z
-         oBqTwbs+ff+oReeCTzfp6HJOrb8+209bz58MN/F4szTZE0VpfCBXXuSGui24PxLgmMkb
-         BKX3XQXktWz45qwOHeAyBxa5odRnR84o6t5MjpuPjIlOkL6HAfxg4et5hzY6CRdUHt1C
-         Bpq0pDA1Q67nkBbi1i6UYKsvIumqvlD/4W38b8dOrEm8tUIoUHPAgcCVictsV4FSI+oT
-         gXuA==
-X-Gm-Message-State: AOAM533QH0Mcp6YzDFG0VEy+Noa5zaW1w1X6SDJJqQsXkjHPu8E9atha
-        wn2Yz4iw/MWl9PZ6XK7tlY/aCcCPjwTfhmw7+k4MIJJelrSR23nwcmOcsteox79K3EJ6C6OkulL
-        QiQUsbGlAXkIq
-X-Received: by 2002:a17:906:eca7:: with SMTP id qh7mr6054501ejb.437.1611144954782;
-        Wed, 20 Jan 2021 04:15:54 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx6O2C4+5izC5c6Lv/XRFt4exMNaBCb5Plh3SHvvpBV1yU49oVGo94/HkA54ztBBIeuLqY4ZQ==
-X-Received: by 2002:a17:906:eca7:: with SMTP id qh7mr6054486ejb.437.1611144954559;
-        Wed, 20 Jan 2021 04:15:54 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r26sm1082311edc.95.2021.01.20.04.15.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 04:15:53 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 3/7] KVM: x86: hyper-v: Always use vcpu_to_hv_vcpu()
- accessor to get to 'struct kvm_vcpu_hv'
-In-Reply-To: <YAdlxE1LYz9NSdq8@google.com>
-References: <20210113143721.328594-1-vkuznets@redhat.com>
- <20210113143721.328594-4-vkuznets@redhat.com>
- <YAdlxE1LYz9NSdq8@google.com>
-Date:   Wed, 20 Jan 2021 13:15:53 +0100
-Message-ID: <87a6t36bye.fsf@vitty.brq.redhat.com>
+        id S1728336AbhATNpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 08:45:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49536 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726460AbhATNWx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 08:22:53 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10KD3q4O158386;
+        Wed, 20 Jan 2021 08:22:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=mrP/i3lLvF9f4dBNoBS/OQ/KEDxkM4IRXlIj/t8rbR4=;
+ b=YMlBDRA5/+bfkZurmbyQwtD4D37oF2nUOE8UfFwskgTot+4zHLv4picCOFSqjUa2kIzq
+ 3yihV/qEesCKo6l0FRtFg6l5qunDPWAAPNM0X5yZYleQqXakGMp9ACiNljPVB4pOrf/N
+ jkrytkpG0F+aF4YkxIgkeOexwYLL/Be+KTHOEMtZrwi4NIRHw+6h7hJ5rTHoa1yXVgs1
+ 3cqLiq/Vfb8QLaJ/XHSr9G3odACWZE42a6mKAwI80q2i7qZ5orbehH7O4Ed8ucROJ5MT
+ d6uuApK2jm746ZBNru4HmY4iC/BwBvrc+RDJ33JXNaAwvN+W0Feuld8y5yQf/HUP4+FX 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366muv8yqq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 08:22:05 -0500
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10KD5AGT166247;
+        Wed, 20 Jan 2021 08:22:05 -0500
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 366muv8ypp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 08:22:05 -0500
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10KDHiRl026332;
+        Wed, 20 Jan 2021 13:22:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 3668p4gb1c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jan 2021 13:22:03 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10KDM0eU25362874
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jan 2021 13:22:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5ED35A4055;
+        Wed, 20 Jan 2021 13:22:00 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D408BA4040;
+        Wed, 20 Jan 2021 13:21:59 +0000 (GMT)
+Received: from [9.145.95.250] (unknown [9.145.95.250])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Jan 2021 13:21:59 +0000 (GMT)
+Subject: Re: [PATCH 4/4] vfio-pci/zdev: Introduce the zPCI I/O vfio region
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        alex.williamson@redhat.com, cohuck@redhat.com
+Cc:     pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
+ <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+Message-ID: <90d99da8-02cf-e051-314b-2ab192f8fd57@linux.ibm.com>
+Date:   Wed, 20 Jan 2021 14:21:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-20_05:2021-01-20,2021-01-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1015 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101200073
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Wed, Jan 13, 2021, Vitaly Kuznetsov wrote:
->> As a preparation to allocating Hyper-V context dynamically, make it clear
->> who's the user of the said context.
->> 
->> No functional change intended.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/hyperv.c  | 14 ++++++++------
->>  arch/x86/kvm/hyperv.h  |  4 +++-
->>  arch/x86/kvm/lapic.h   |  6 +++++-
->>  arch/x86/kvm/vmx/vmx.c |  9 ++++++---
->>  arch/x86/kvm/x86.c     |  4 +++-
->>  5 files changed, 25 insertions(+), 12 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->> index 922c69dcca4d..82f51346118f 100644
->> --- a/arch/x86/kvm/hyperv.c
->> +++ b/arch/x86/kvm/hyperv.c
->> @@ -190,7 +190,7 @@ static void kvm_hv_notify_acked_sint(struct kvm_vcpu *vcpu, u32 sint)
->>  static void synic_exit(struct kvm_vcpu_hv_synic *synic, u32 msr)
->>  {
->>  	struct kvm_vcpu *vcpu = synic_to_vcpu(synic);
->> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->
-> Tangentially related...
->
-> What say you about aligning Hyper-V to VMX and SVM terminology?  E.g. I like
-> that VMX and VXM omit the "vcpu_" part and just call it "to_vmx/svm()", and the
-> VM-scoped variables have a "kvm_" prefix but the vCPU-scoped variables do not.
-> I'd probably even vote to do s/vcpu_to_pi_desc/to_pi_desc, but for whatever
-> reason that one doesn't annoy as much, probably because it's less pervasive than
-> the Hyper-V code.
 
-Gererally I have nothing against the idea, will try to prepare a series.
+On 1/19/21 9:02 PM, Matthew Rosato wrote:
+> Some s390 PCI devices (e.g. ISM) perform I/O operations that have very
+.. snip ...
+> +
+> +static size_t vfio_pci_zdev_io_rw(struct vfio_pci_device *vdev,
+> +				  char __user *buf, size_t count,
+> +				  loff_t *ppos, bool iswrite)
+> +{
+... snip ...
+> +	/*
+> +	 * For now, the largest allowed block I/O is advertised as PAGE_SIZE,
+> +	 * and cannot exceed a page boundary - so a single page is enough.  The
+> +	 * guest should have validated this but let's double-check that the
+> +	 * request will not cross a page boundary.
+> +	 */
+> +	if (((region->req.gaddr & ~PAGE_MASK)
+> +			+ region->req.len - 1) & PAGE_MASK) {
+> +		return -EIO;
+> +	}
+> +
+> +	mutex_lock(&zdev->lock);
 
->
-> It would also help if the code were more consistent with itself.  It's all a bit
-> haphazard when it comes to variable names, using helpers (or not), etc...
->
-> Long term, it might also be worthwhile to refactor the various flows to always
-> pass @vcpu instead of constantly converting to/from various objects.  Some of
-> the conversions appear to be necessary, e.g. for timer callbacks, but AFAICT a
-> lot of the shenanigans are entirely self-inflicted.
->
-> E.g. stimer_set_count() has one caller, which already has @vcpu, but
-> stimer_set_count() takes @stimer instead of @vcpu and then does several
-> conversions in as many lines.  None of the conversions are super expensive, but
-> it seems like every little helper in Hyper-V is doing multiple conversions to
-> and from kvm_vcpu, and half the generated code is getting the right pointer. :-)
+I plan on using the zdev->lock for preventing concurrent zPCI devices
+removal/configuration state changes between zPCI availability/error
+events and enable_slot()/disable_slot() and /sys/bus/pci/devices/<dev>/recover.
 
-I *think* the idea was that everything synic-related takes a 'synic',
-everything stimer-related takes an 'stimer' and so on. While this looks
-cleaner from 'api' perspective, it indeed makes the code longer in some
-cases so I'd also agree with 'optimization'.
+With that use in place using it here causes a deadlock when doing 
+"echo 0 > /sys/bus/pci/slots/<fid>/power from the host for an ISM device
+attached to a guest.
 
->
->>  	hv_vcpu->exit.type = KVM_EXIT_HYPERV_SYNIC;
->>  	hv_vcpu->exit.u.synic.msr = msr;
->> @@ -294,7 +294,7 @@ static int kvm_hv_syndbg_complete_userspace(struct kvm_vcpu *vcpu)
->>  static void syndbg_exit(struct kvm_vcpu *vcpu, u32 msr)
->>  {
->>  	struct kvm_hv_syndbg *syndbg = vcpu_to_hv_syndbg(vcpu);
->> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->>  
->>  	hv_vcpu->exit.type = KVM_EXIT_HYPERV_SYNDBG;
->>  	hv_vcpu->exit.u.syndbg.msr = msr;
->> @@ -840,7 +840,9 @@ void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu)
->>  
->>  bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu)
->>  {
->> -	if (!(vcpu->arch.hyperv.hv_vapic & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE))
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->> +
->> +	if (!(hv_vcpu->hv_vapic & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE))
->>  		return false;
->>  	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
->>  }
->> @@ -1216,7 +1218,7 @@ static u64 current_task_runtime_100ns(void)
->>  
->>  static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
->>  {
->> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->>  
->>  	switch (msr) {
->>  	case HV_X64_MSR_VP_INDEX: {
->> @@ -1379,7 +1381,7 @@ static int kvm_hv_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata,
->>  			  bool host)
->>  {
->>  	u64 data = 0;
->> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->>  
->>  	switch (msr) {
->>  	case HV_X64_MSR_VP_INDEX:
->> @@ -1494,7 +1496,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
->>  			    u16 rep_cnt, bool ex)
->>  {
->>  	struct kvm *kvm = current_vcpu->kvm;
->
-> Ugh, "current_vcpu".  That's really, really nasty, as it's silently shadowing a
-> global per-cpu variable.  E.g. this compiles without so much as a warning:
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 922c69dcca4d..142fe9c12957 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1490,7 +1490,7 @@ static __always_inline unsigned long *sparse_set_to_vcpu_mask(
->         return vcpu_bitmap;
->  }
->
-> -static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
-> +static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, u64 ingpa,
->                             u16 rep_cnt, bool ex)
->  {
->         struct kvm *kvm = current_vcpu->kvm;
-> @@ -1592,7 +1592,7 @@ static void kvm_send_ipi_to_many(struct kvm *kvm, u32 vector,
->         }
->  }
->
-> -static u64 kvm_hv_send_ipi(struct kvm_vcpu *current_vcpu, u64 ingpa, u64 outgpa,
-> +static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, u64 ingpa, u64 outgpa,
->                            bool ex, bool fast)
->  {
->         struct kvm *kvm = current_vcpu->kvm;
->
+This is because the (soft) hot unplug will cause vfio to notify QEMU, which
+sends a deconfiguration request to the guest, which then tries to
+gracefully shutdown the device. During that shutdown the device will
+be accessed, running into this code path which then blocks on
+the lock held by the disable_slot() code which waits on vfio
+releasing the device.
 
-My memory tells me both these functions had local 'vcpu' variable to
-iterate over all vCPUs but it's not there now, I'll send a patch to drop
-'current_vcpu'.
+Alex may correct me if I'm wrong but I think instead vfio should
+be holding the PCI device lock via pci_device_lock(pdev).
 
->> -	struct kvm_vcpu_hv *hv_vcpu = &current_vcpu->arch.hyperv;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(current_vcpu);
->>  	struct hv_tlb_flush_ex flush_ex;
->>  	struct hv_tlb_flush flush;
->>  	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
->> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
->> index 6d7def2b0aad..6300038e7a52 100644
->> --- a/arch/x86/kvm/hyperv.h
->> +++ b/arch/x86/kvm/hyperv.h
->> @@ -114,7 +114,9 @@ static inline struct kvm_vcpu *stimer_to_vcpu(struct kvm_vcpu_hv_stimer *stimer)
->>  
->>  static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu)
->>  {
->> -	return !bitmap_empty(vcpu->arch.hyperv.stimer_pending_bitmap,
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->> +
->> +	return !bitmap_empty(hv_vcpu->stimer_pending_bitmap,
->>  			     HV_SYNIC_STIMER_COUNT);
->>  }
->>  
->> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
->> index 4fb86e3a9dd3..dec7356f2fcd 100644
->> --- a/arch/x86/kvm/lapic.h
->> +++ b/arch/x86/kvm/lapic.h
->> @@ -6,6 +6,8 @@
->>  
->>  #include <linux/kvm_host.h>
->>  
->> +#include "hyperv.h"
->> +
->>  #define KVM_APIC_INIT		0
->>  #define KVM_APIC_SIPI		1
->>  #define KVM_APIC_LVT_NUM	6
->> @@ -127,7 +129,9 @@ int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
->>  
->>  static inline bool kvm_hv_vapic_assist_page_enabled(struct kvm_vcpu *vcpu)
->>  {
->> -	return vcpu->arch.hyperv.hv_vapic & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE;
->> +	struct kvm_vcpu_hv *hv_vcpu = vcpu_to_hv_vcpu(vcpu);
->> +
->> +	return hv_vcpu->hv_vapic & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE;
->
-> A short to_hyperv() would be nice here, e.g.
->
-> 	return to_hyperv(vcpu)->hv_vapic & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE;
->
->
-> LOL, actually, kvm_hv_vapic_assist_page_enabled() doesn't have any callers and
-> can be dropped.  Looks likes it's supplanted by kvm_hv_assist_page_enabled().
->
+The annotated trace with my test code looks as follows:
 
-:-)
+[  618.025091] Call Trace:
+[  618.025093]  [<00000007c1a139e0>] __schedule+0x360/0x960
+[  618.025104]  [<00000007c1a14760>] schedule_preempt_disabled+0x60/0x100
+[  618.025107]  [<00000007c1a16b48>] __mutex_lock+0x358/0x880
+[  618.025110]  [<00000007c1a170a2>] mutex_lock_nested+0x32/0x40
+[  618.025112]  [<000003ff805a3948>] vfio_pci_zdev_io_rw+0x168/0x310 [vfio_pci]
+[  618.025120]  [<000003ff8059b2b0>] vfio_pci_write+0xd0/0xe0 [vfio_pci]
+[  618.025124]  [<00000007c0fa5392>] __s390x_sys_pwrite64+0x112/0x360
+[  618.025129]  [<00000007c1a0aaf6>] __do_syscall+0x116/0x190
+[  618.025132]  [<00000007c1a1deda>] system_call+0x72/0x98
+[  618.025137] 1 lock held by qemu-system-s39/1315:
+[  618.025139]  #0: 000000008524b4e8 (&zdev->lock){....}-{3:3}, at: vfio_pci_zdev_io_rw+0x168/0x310 [vfio_pci]
+[  618.025151]
+               Showing all locks held in the system:
+[  618.025166] 1 lock held by khungtaskd/99:
+[  618.025168]  #0: 00000007c1ed4748 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire.constprop.0+0x0/0x210
+[  618.025194] 6 locks held by zsh/1190:
+[  618.025196]  #0: 0000000095fc0488 (sb_writers#3){....}-{0:0}, at: __do_syscall+0x116/0x190
+[  618.025226]  #1: 00000000975bf090 (&of->mutex){....}-{3:3}, at: kernfs_fop_write+0x9a/0x240
+[  618.025236]  #2: 000000008584be78 (kn->active#245){....}-{0:0}, at: kernfs_fop_write+0xa6/0x240
+[  618.025243]  #3: 000000008524b4e8 (&zdev->lock){....}-{3:3}, at: disable_slot+0x32/0x130 <-------------------------------------|
+[  618.025252]  #4: 00000007c1f53468 (pci_rescan_remove_lock){....}-{3:3}, at: pci_stop_and_remove_bus_device_locked+0x26/0x240   |
+[  618.025260]  #5: 0000000085d8a1a0 (&dev->mutex){....}-{3:3}, at: device_release_driver+0x32/0x1d0                              |
+[  618.025271] 1 lock held by qemu-system-s39/1312:                                                                               D
+[  618.025273] 1 lock held by qemu-system-s39/1313:                                                                               E
+[  618.025275]  #0: 00000000d47e80d0 (&vcpu->mutex){....}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x780 [kvm]                              A
+[  618.025322] 1 lock held by qemu-system-s39/1314:                                                                               D
+[  618.025324]  #0: 00000000d34700d0 (&vcpu->mutex){....}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x780 [kvm]                              |
+[  618.025345] 1 lock held by qemu-system-s39/1315:                                                                               |
+[  618.025347]  #0: 000000008524b4e8 (&zdev->lock){....}-{3:3}, at: vfio_pci_zdev_io_rw+0x168/0x310 [vfio_pci] <------------------|
+[  618.025355] 1 lock held by qemu-system-s39/1317:
+[  618.025357]  #0: 00000000d34480d0 (&vcpu->mutex){....}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x780 [kvm]
+[  618.025378] 1 lock held by qemu-system-s39/1318:
+[  618.025380]  #0: 00000000d34380d0 (&vcpu->mutex){....}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x780 [kvm]
+[  618.025400] 1 lock held by qemu-system-s39/1319:
+[  618.025403]  #0: 00000000d47e8a90 (&vcpu->mutex){....}-{3:3}, at: kvm_vcpu_ioctl+0x90/0x780 [kvm]
+[  618.025424] 2 locks held by zsh/1391:
+[  618.025426]  #0: 00000000d4a708a0 (&tty->ldisc_sem){....}-{0:0}, at: tty_ldisc_ref_wait+0x34/0x70
+[  618.025435]  #1: 0000038002fc72f0 (&ldata->atomic_read_lock){....}-{3:3}, at: n_tty_read+0xc8/0xa50
 
->>  }
->>  
->>  int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len);
->
 
--- 
-Vitaly
-
+> +
+> +	ret = get_user_pages_fast(region->req.gaddr & PAGE_MASK, 1, 0, &gpage);
+> +	if (ret <= 0) {
+> +		count = -EIO;
+... snip ...
