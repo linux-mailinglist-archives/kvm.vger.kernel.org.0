@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 570502FDA54
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 21:02:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BD872FDA6B
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 21:10:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392728AbhATUBv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 15:01:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39322 "EHLO
+        id S2392836AbhATUIT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 15:08:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728509AbhATT7M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 14:59:12 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3900C0613D3
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 11:58:25 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id m5so2878518pjv.5
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 11:58:25 -0800 (PST)
+        with ESMTP id S2392798AbhATUHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 15:07:16 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84C1BC061757
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 12:06:35 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id c132so15970384pga.3
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 12:06:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=oJo4M6632K9snaVFDSf1XhUlP1UsmMayuk5fe53umD4=;
-        b=G36BNaYtJB6cOJoO+cpkrFo5Rz9jEBz7sRhWIAY/mH8XN+L1MplSuDdMu05dGss2+a
-         FWnFgtSL2g9zo8K2f0ne0cvRGXQXJ5zNq437oiHkqdLkiXzN2VbNYR+2tER3XvQk+ji1
-         G7PoqF8r6rJniXOnWROmGVzbbgW6CBWPg9Zyg39tcc52LpcCmYsYhSNhrlnqJheOnZgK
-         SZueUzaRCQeFBcKVKXWTjrHNqcbsYv5mJr1lH7nI5IUoDLvyloOSVtDgrmqLp1vHgwwK
-         lIjv7zT4Jl+/gktHmyPUi6+y/tb+WgX6zJH2p5iqyNAG4fqQnVyQGXVPBhzMTZm9c2FE
-         mzBA==
+        bh=lQbchGQKY82wl+o4TbL309jkEN0qre7XquQdqrcnNpI=;
+        b=t2WzXAXK+d5diH6v6Tf6zXB6OePNdD9FnHGfiUxFtMgNyA6M4Xrmx+jkO3oroMeOhN
+         yYQLs3MNmjIW2lWg6oaiZPSa1t6wWiZpok8Vf7PmlIb1CEd4iBRUO2b2PM3fPpwGDc/g
+         xa6HXupPoG6OK6eMkLW4z3JC+Cr3OCvFYx7BXghViIrlipr/aEaHswAx3fsnXwYsKgB4
+         l2WKPFR849OaILDuv2bkKdyFiibD9XR60vbS2ta/v4waXomAZLk97QXiOAJZw+T7KoQc
+         Pcx0KLGcrReVSeu/N632kpcbhnM6ND/aHIOsnx0SlgbVQ1iFh1tm9LMa2Pc/zBF19nEa
+         SP4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=oJo4M6632K9snaVFDSf1XhUlP1UsmMayuk5fe53umD4=;
-        b=VX8QCsF+KXHg10oscWMfgmgUYqr+PGWDPl9yF8bos9RyLkenw1K5550QzPUzT1+l0R
-         qkgvjgZxxHKJ5G2DM9Odno+wmsKDfWKJr6PJRJFN32wpKrBUsykVxtrtPWRAFvjHd64a
-         m2fWo8D6R/ncVsNyw2hTBFJtyJyGYNj6L31xTw0fd23+oHKXO36GW2VMFGrLPONLXw6I
-         niF9KsJxEZ2mzmEuvv3UawneU7Glq/HXt7fC7FyTyYsOTHeXx9CpT3Xm6wXVY3QknrU8
-         5UL1zx48hlhyAgSFlCGCTbVVozrUYOQFOMCexio9zIrjgiXjDABRavYIKl/I/2eOWieE
-         0rCw==
-X-Gm-Message-State: AOAM533TWF22Pu4c9DzHFH3t74dknJamyUubB75zXqnrwORNI09OELI9
-        +yH1WVEGdATASdERjUsFhXPLGxclbzCRgg==
-X-Google-Smtp-Source: ABdhPJwCwKNfimf1xsCwD1k7DYvvlx0rSdT1gRA6HWHsXoJ1WS7/+jmqt8GZoVPe6rGidhNonVQPBg==
-X-Received: by 2002:a17:90a:f692:: with SMTP id cl18mr1789209pjb.124.1611172705222;
-        Wed, 20 Jan 2021 11:58:25 -0800 (PST)
+        bh=lQbchGQKY82wl+o4TbL309jkEN0qre7XquQdqrcnNpI=;
+        b=HeI5oxKSFV16uSSC0MxsFvqkc9NBySFbKMxhVdq8jijBoU0AOcslDtjtQBSeqqSz2s
+         CFe4bBb7mswm3rx3rNaNrxPAiWAmvSaz8/Vfvx79CLXOjucylaon5jHnT26SlBb4Ln7Y
+         +01SKfGxtnp4ibHd37+leVvg9B4OfrBa+xT171Q98HGmLehvcdN7JT69b7Qhhlw/y5A/
+         8opahyuPRMY3TRjAqG70Ljwu0P5GJXDQum94oQSDggqQmrNBGcynqjRhto+/W/uc3T1l
+         oNeDUqUdQPw0jOriPpoHaNLNkC5REDH7/gN/gtF2pcqWTV/Iz7K82ec/Uk4ciSE2i/pr
+         AkPA==
+X-Gm-Message-State: AOAM530OinAh1fsu7SWyodRQt9jrgNgIQhsxOr/Aicpx3EJcdwxb/8Ke
+        GXsyIHddfn9+d8q0rdwX68k2uw==
+X-Google-Smtp-Source: ABdhPJzLZhyZH91lMH6g/S9TFPhw2SKyEeH5hRTVqmU/4tOHhIuZEFfwCGZWC/wQ0RURsY4LFROCOw==
+X-Received: by 2002:a63:520e:: with SMTP id g14mr10767120pgb.378.1611173194845;
+        Wed, 20 Jan 2021 12:06:34 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id w7sm3087741pfb.62.2021.01.20.11.58.23
+        by smtp.gmail.com with ESMTPSA id b1sm3150314pjh.54.2021.01.20.12.06.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 11:58:24 -0800 (PST)
-Date:   Wed, 20 Jan 2021 11:58:17 -0800
+        Wed, 20 Jan 2021 12:06:34 -0800 (PST)
+Date:   Wed, 20 Jan 2021 12:06:27 -0800
 From:   Sean Christopherson <seanjc@google.com>
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -60,28 +60,24 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 08/24] kvm: x86/mmu: Add lockdep when setting a TDP MMU
- SPTE
-Message-ID: <YAiLWTc1nJv7KSZj@google.com>
+Subject: Re: [PATCH 09/24] kvm: x86/mmu: Don't redundantly clear TDP MMU pt
+ memory
+Message-ID: <YAiNQ/SgVqg+h6WG@google.com>
 References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-9-bgardon@google.com>
+ <20210112181041.356734-10-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210112181041.356734-9-bgardon@google.com>
+In-Reply-To: <20210112181041.356734-10-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Jan 12, 2021, Ben Gardon wrote:
-> Add lockdep to __tdp_mmu_set_spte to ensure that SPTEs are only modified
-> under the MMU lock. This lockdep will be updated in future commits to
-> reflect and validate changes to the TDP MMU's synchronization strategy.
-
-I'd omit the "updated in future commits" justification.  IMO this is a good
-change even if we never build on it, and the extra justification would be
-confusing if this is merged separately from the parallelization patches.
-
+> The KVM MMU caches already guarantee that shadow page table memory will
+> be zeroed, so there is no reason to re-zero the page in the TDP MMU page
+> fault handler.
+> 
 > No functional change intended.
 > 
 > Reviewed-by: Peter Feiner <pfeiner@google.com>
