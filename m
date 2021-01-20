@@ -2,160 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDC6A2FC588
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 01:19:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C7592FC600
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 01:44:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728438AbhATASP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 19 Jan 2021 19:18:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3164 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392172AbhASNqq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 19 Jan 2021 08:46:46 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10JDA3jh056532;
-        Tue, 19 Jan 2021 08:12:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ET6sLnP+eJhqvkmcsRzmxETAVCUxIheSvgW3gOmrth4=;
- b=g1NZg/akGdKOW3552smjVc/TaElmonUL+GWJbUf3xTnyi0HT7cLsWpReL0QyiP0TPws6
- O3hHji/pWuvCapaoYGeucFpbyH88+jLb8hLoz5OxyAGICxNvM1zs9mLYNIQ4LKSOVV2E
- GO382NHnAinSDNPvVSPOB7uBRy+vIedP8IrDzU6cG/Wy0jDJsFZPuAFiAt9QJ2Zb9ed2
- gAwDprUVbmpQtPM+X5Lz5f5ZpUg3bIdp72schIbVeVacj35L8ZfQndTQU6pm0hwQPaP4
- OeR/YrN+EzlpEIq65KNo8aT1ubGnfqS6G89B+icbL2JHyMUsL0tVNIavgViR/AC8dv0N 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 365ypcrm2j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 08:12:13 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10JDBtfd068086;
-        Tue, 19 Jan 2021 08:12:12 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 365ypcrm1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 08:12:12 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10JCv16X002704;
-        Tue, 19 Jan 2021 13:12:09 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 363qs89ke8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 Jan 2021 13:12:09 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10JDC6UQ39321954
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Jan 2021 13:12:07 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D562AA404D;
-        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5080CA4053;
-        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.4.167])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 19 Jan 2021 13:12:06 +0000 (GMT)
-Date:   Tue, 19 Jan 2021 14:11:33 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        thuth@redhat.com, david@redhat.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org, gor@linux.ibm.com,
-        mihajlov@linux.ibm.com
-Subject: Re: [PATCH 1/2] s390: uv: Fix sysfs max number of VCPUs reporting
-Message-ID: <20210119141133.186273c1@ibm-vm>
-In-Reply-To: <20210119100402.84734-2-frankja@linux.ibm.com>
-References: <20210119100402.84734-1-frankja@linux.ibm.com>
-        <20210119100402.84734-2-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726943AbhATAnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 19 Jan 2021 19:43:02 -0500
+Received: from mga02.intel.com ([134.134.136.20]:60845 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726594AbhATAm6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 19 Jan 2021 19:42:58 -0500
+IronPort-SDR: 3LwUqUeGBBvSrfKCE9bHGzWuWMaZXbk0/HgFZeYMhnWh5YCYHK2fz7QQA3qlUvErB5hPD7BFF3
+ JtTtangYrRCA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9869"; a="166114562"
+X-IronPort-AV: E=Sophos;i="5.79,359,1602572400"; 
+   d="scan'208";a="166114562"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2021 16:42:15 -0800
+IronPort-SDR: +jV1jCLkHO6vYTcEz8qLu1kTqf974GR/oEO7Y11RPAcC5nuV/PESPHKHMbQBQ9LS/2uQYbRA47
+ YgMwpM8xnEFw==
+X-IronPort-AV: E=Sophos;i="5.79,359,1602572400"; 
+   d="scan'208";a="384151957"
+Received: from hzhan36-mobl.amr.corp.intel.com ([10.251.22.237])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2021 16:42:11 -0800
+Message-ID: <04624eb0a4cb0ea091ad9f2c0ba8ac3ad5411c89.camel@intel.com>
+Subject: Re: [RFC PATCH v2 02/26] x86/sgx: Remove a warn from
+ sgx_free_epc_page()
+From:   Kai Huang <kai.huang@intel.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 20 Jan 2021 13:42:09 +1300
+In-Reply-To: <YAaZIdxQFHA1XdW4@kernel.org>
+References: <cover.1610935432.git.kai.huang@intel.com>
+         <85da2c1ce068b77ee9f31f6de9f3a34c36c410eb.1610935432.git.kai.huang@intel.com>
+         <YAaZIdxQFHA1XdW4@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-19_04:2021-01-18,2021-01-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- suspectscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 bulkscore=0 priorityscore=1501
- impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101190077
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 19 Jan 2021 05:04:01 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> The number reported by the query is N-1 and I think people reading the
-> sysfs file would expect N instead. For users creating VMs there's no
-> actual difference because KVM's limit is currently below the UV's
-> limit.
+On Tue, 2021-01-19 at 10:32 +0200, Jarkko Sakkinen wrote:
+> On Mon, Jan 18, 2021 at 04:26:50PM +1300, Kai Huang wrote:
+> > From: "jarkko@kernel.org" <jarkko@kernel.org>
+>         ~~~~~~~~~~~~~~~~~~~
+>         Jarkko Sakkinen
 > 
-> The naming of the field is a bit misleading. Number in this context is
-> used like ID and starts at 0. The query field denotes the maximum
-> number that can be put into the VCPU number field in the "create
-> secure CPU" UV call.
-
-once you address Christian's comments:
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Fixes: a0f60f8431999 ("s390/protvirt: Add sysfs firmware interface
-> for Ultravisor information") Cc: stable@vger.kernel.org
-> ---
->  arch/s390/boot/uv.c        | 2 +-
->  arch/s390/include/asm/uv.h | 4 ++--
->  arch/s390/kernel/uv.c      | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+> > Remove SGX_EPC_PAGE_RECLAIMER_TRACKED check and warning.  This cannot
+> > happen, as enclave pages are freed only at the time when encl->refcount
+> > triggers, i.e. when both VFS and the page reclaimer have given up on
+> > their references.
+> > 
+> > Signed-off-by: jarkko@kernel.org <jarkko@kernel.org>
+>                  ~~~~~~~~~~~~~~~~~
+>                  Jarkko Sakkinen
 > 
-> diff --git a/arch/s390/boot/uv.c b/arch/s390/boot/uv.c
-> index a15c033f53ca..afb721082989 100644
-> --- a/arch/s390/boot/uv.c
-> +++ b/arch/s390/boot/uv.c
-> @@ -35,7 +35,7 @@ void uv_query_info(void)
->  		uv_info.guest_cpu_stor_len = uvcb.cpu_stor_len;
->  		uv_info.max_sec_stor_addr =
-> ALIGN(uvcb.max_guest_stor_addr, PAGE_SIZE); uv_info.max_num_sec_conf
-> = uvcb.max_num_sec_conf;
-> -		uv_info.max_guest_cpus = uvcb.max_guest_cpus;
-> +		uv_info.max_guest_cpu_id = uvcb.max_guest_cpu_num;
->  	}
->  
->  #ifdef CONFIG_PROTECTED_VIRTUALIZATION_GUEST
-> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
-> index 0325fc0469b7..c484c95ea142 100644
-> --- a/arch/s390/include/asm/uv.h
-> +++ b/arch/s390/include/asm/uv.h
-> @@ -96,7 +96,7 @@ struct uv_cb_qui {
->  	u32 max_num_sec_conf;
->  	u64 max_guest_stor_addr;
->  	u8  reserved88[158 - 136];
-> -	u16 max_guest_cpus;
-> +	u16 max_guest_cpu_num;
->  	u8  reserveda0[200 - 160];
->  } __packed __aligned(8);
->  
-> @@ -273,7 +273,7 @@ struct uv_info {
->  	unsigned long guest_cpu_stor_len;
->  	unsigned long max_sec_stor_addr;
->  	unsigned int max_num_sec_conf;
-> -	unsigned short max_guest_cpus;
-> +	unsigned short max_guest_cpu_id;
->  };
->  
->  extern struct uv_info uv_info;
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index 883bfed9f5c2..b2d2ad153067 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -368,7 +368,7 @@ static ssize_t uv_query_max_guest_cpus(struct
-> kobject *kobj, struct kobj_attribute *attr, char *page)
->  {
->  	return scnprintf(page, PAGE_SIZE, "%d\n",
-> -			uv_info.max_guest_cpus);
-> +			uv_info.max_guest_cpu_id + 1);
->  }
->  
->  static struct kobj_attribute uv_query_max_guest_cpus_attr =
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> 
+> Sorry about this. I was reconfiguring my environment (or actually was
+> moving it to another machine), and forgot to set user.name. I'll send you
+> in private replacements with a legit name.
+
+Sure. No problem. Thanks.
+
+
+
 
