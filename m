@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E21172FDD90
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 01:02:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 430D92FDD8E
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 01:02:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbhATX67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 18:58:59 -0500
-Received: from mga04.intel.com ([192.55.52.120]:64353 "EHLO mga04.intel.com"
+        id S1726115AbhATX7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 18:59:22 -0500
+Received: from mga03.intel.com ([134.134.136.65]:43800 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404055AbhATXX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 18:23:58 -0500
-IronPort-SDR: ifgVO9Ic9E6IqS1mATzLF/aym3n35qrVyMV1ZlhWLXmpz5hSLX8XjlgPOwGgoD19H7DX6eBSyZ
- hnCiPt+mv0UQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="176619738"
+        id S2404119AbhATXZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 18:25:43 -0500
+IronPort-SDR: gFY2GkVHnxs/ZRnbH1dKyEAUX4V2AtZEsYbzf3Zy03g92/OIV3EOWLD6fmknXsgB8wkpevlDsf
+ OumnKIxa+eYg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="179275217"
 X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="176619738"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 15:23:14 -0800
-IronPort-SDR: t34X6Og3oAmwrF1m/oEYbcdZQdrj4DDZUxEHOTb5bV7EnY5btKb0r1/slD57DyPDNwBPWYBooT
- ubDfab+FGLJw==
+   d="scan'208";a="179275217"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 15:24:58 -0800
+IronPort-SDR: j4uQzzNZ7oqsq4Q5dSwpCAACXOolxIMD8bMx+jH+pjD7zxRJytLD2ELicS7P+tWambE9Nls6tu
+ +gBgRlshCU7Q==
 X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="391720531"
+   d="scan'208";a="354476752"
 Received: from gapoveda-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.79.186])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 15:23:11 -0800
-Date:   Thu, 21 Jan 2021 12:23:08 +1300
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 15:24:54 -0800
+Date:   Thu, 21 Jan 2021 12:24:53 +1300
 From:   Kai Huang <kai.huang@intel.com>
 To:     Jarkko Sakkinen <jarkko@kernel.org>
 Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
         seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v2 01/26] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
-Message-Id: <20210121122308.8d920c9d652f58824fe87f3e@intel.com>
-In-Reply-To: <YAgY9OfYaGj7og/b@kernel.org>
+Subject: Re: [RFC PATCH v2 14/26] x86/sgx: Move provisioning device creation
+ out of SGX driver
+Message-Id: <20210121122453.4481ba33c9af309362d7ba79@intel.com>
+In-Reply-To: <YAg5qU5KMGLuPdjy@kernel.org>
 References: <cover.1610935432.git.kai.huang@intel.com>
-        <87385f646120a3b5b34dc20480dbce77b8005acd.1610935432.git.kai.huang@intel.com>
-        <YAgY9OfYaGj7og/b@kernel.org>
+        <4aeb65be69701a4a6e7d479ad3563bf7a9f052d5.1610935432.git.kai.huang@intel.com>
+        <YAg5qU5KMGLuPdjy@kernel.org>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -46,25 +46,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Jan 2021 13:50:12 +0200 Jarkko Sakkinen wrote:
-> On Mon, Jan 18, 2021 at 04:26:49PM +1300, Kai Huang wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > 
-> > Add SGX1 and SGX2 feature flags, via CPUID.0x12.0x0.EAX, as scattered
-> > features.  As part of virtualizing SGX, KVM will expose the SGX CPUID
-> > leafs to its guest, and to do so correctly needs to query hardware and
-> > kernel support for SGX1 and SGX2.
+
+> >  
+> > +const struct file_operations sgx_provision_fops = {
+> > +	.owner			= THIS_MODULE,
+> > +};
+> > +
+> > +static struct miscdevice sgx_dev_provision = {
+> > +	.minor = MISC_DYNAMIC_MINOR,
+> > +	.name = "sgx_provision",
+> > +	.nodename = "sgx_provision",
+> > +	.fops = &sgx_provision_fops,
+> > +};
+> > +
+> > +int sgx_set_attribute(unsigned long *allowed_attributes,
+> > +		      unsigned int attribute_fd)
 > 
-> This commit message is missing reasoning behind scattered vs. own word.
-> 
-> Please just document the reasoning, that's all.
+> kdoc
 
-OK. Will do. How about:
-
-"Add SGX1 and SGX2 feature flags, via CPUID.0x12.0x0.EAX, as scattered
-features, since adding a new leaf for only two bits would be wasteful."
-
-?
+Will do.
 
 > 
-> /Jarkko
+> > +{
+> > +	struct file *file;
+> > +
+> > +	file = fget(attribute_fd);
+> > +	if (!file)
+> > +		return -EINVAL;
+> > +
+> > +	if (file->f_op != &sgx_provision_fops) {
+> > +		fput(file);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	*allowed_attributes |= SGX_ATTR_PROVISIONKEY;
+> > +
+> > +	fput(file);
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(sgx_set_attribute);
+> > +
