@@ -2,161 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEF752FCEEE
-	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 12:20:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 682842FCEEF
+	for <lists+kvm@lfdr.de>; Wed, 20 Jan 2021 12:20:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388947AbhATLOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 06:14:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45901 "EHLO
+        id S1731554AbhATLOZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 06:14:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36104 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732260AbhATLDV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:03:21 -0500
+        by vger.kernel.org with ESMTP id S1730907AbhATLKI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 20 Jan 2021 06:10:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611140512;
+        s=mimecast20190719; t=1611140919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+z2tcwO7de5N4TVau2AL14xxCOhlqfPxup9LRCqTy94=;
-        b=jWfTe1L0EPN/OoFwHZg2DppnlIZeidOINpUm03B+LBN83CzyxY+/cEP0gnQAQBkNzXgwwz
-        zJnjvdyIdhRvnY9XNA0oSDNcCz86A+EYdxUZOltTQawMq1SlS3uKX0d8nCCz6At6zIbBUS
-        49+mfrTwA51cE+805DkXnSBY5zCRr54=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-5bVKMRbcNqO1rsUPK-hbrA-1; Wed, 20 Jan 2021 06:01:50 -0500
-X-MC-Unique: 5bVKMRbcNqO1rsUPK-hbrA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B296559;
-        Wed, 20 Jan 2021 11:01:48 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-135.ams2.redhat.com [10.36.114.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 101445C8AB;
-        Wed, 20 Jan 2021 11:01:43 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] s390x: define UV compatible I/O
- allocation
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
-        drjones@redhat.com, pbonzini@redhat.com
-References: <1611085944-21609-1-git-send-email-pmorel@linux.ibm.com>
- <1611085944-21609-3-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <2558695f-4ab7-d6e9-c857-0e8473ada775@redhat.com>
-Date:   Wed, 20 Jan 2021 12:01:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=yTm6KgxVEtqRp5BOUW1oggSfQz0/KqIRI5Ikpu2SIkI=;
+        b=ThFdwWwUyVpvL24nEeSIZRAaihOygzoAolYK3hZ2J9WBSL/wZ5k9ztLvMHXxf6CJx8zoHa
+        AQNe94T0JQUhQVsRvgGP9yNX8+Vuf78U9viGYY0HngSWo6EFFEJ60NWfX5xcrFV5enr/Nf
+        IXZT9ajkDPMUgKpgaVd68iRBLwS39Bg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-16-9kg1WBBAPYGlLzQiK75T6w-1; Wed, 20 Jan 2021 06:08:38 -0500
+X-MC-Unique: 9kg1WBBAPYGlLzQiK75T6w-1
+Received: by mail-wr1-f70.google.com with SMTP id y4so802226wrt.18
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 03:08:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=yTm6KgxVEtqRp5BOUW1oggSfQz0/KqIRI5Ikpu2SIkI=;
+        b=BtOHh/39F2wsNV9eFaWMi8yOuPaYryZP0+MTY0tvK73JZ59v41T7ky/PpDIXohiLYS
+         ePsk3CkSEt/r/oL1xotXn2l8/0/EfoaMXGjhyIOjJFdUbfrjWwmg9A1mJaXpmkOt3VfA
+         eOZK97Z73QLdPhxZ9ehM16kf9suHkQGa5WvVq1m4Nu2MNBoV9FeQfjZB86M62CRWJaQ1
+         +wAJWa2nTJz6LvHcaIB0O8+Wpcy3+DUSj2DAouOz5+dRNfzrMYO5Z60Q+84G63exToXG
+         EQTlSJw6lporh8Gmz2CwbkMeGbVXvQWs7GKigc890xPW1p44/d2rytxZUDsJ37Ka1rbU
+         Y7tA==
+X-Gm-Message-State: AOAM533tNUiX3FalQzhHf2fEmQgOYUIyW5T/0isBiq5OJqQ/BEBAUo6h
+        yZnqluL1EWt9W3qJud6mx2FdsrwsJrOQHYyh641MIE+lkwtbVNVW7Pu4qXAWCVb1Lqw7NVSlsXt
+        5pplbrBtowbKW
+X-Received: by 2002:a05:600c:4e8e:: with SMTP id f14mr3838207wmq.139.1611140916748;
+        Wed, 20 Jan 2021 03:08:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwzq+LHVW7iOIInxldWRs5h39ePpUe0nK/vVbhibAJ1v8IIbA+WZfiKJq98JGzyhbZvEFHziw==
+X-Received: by 2002:a05:600c:4e8e:: with SMTP id f14mr3838181wmq.139.1611140916380;
+        Wed, 20 Jan 2021 03:08:36 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id p9sm1619051wrj.11.2021.01.20.03.08.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jan 2021 03:08:35 -0800 (PST)
+Date:   Wed, 20 Jan 2021 12:08:32 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst@redhat.com, stefanha@redhat.com, parav@nvidia.com,
+        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
+        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        bcrl@kvack.org, corbet@lwn.net,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC v3 03/11] vdpa: Remove the restriction that only supports
+ virtio-net devices
+Message-ID: <20210120110832.oijcmywq7pf7psg3@steredhat>
+References: <20210119045920.447-1-xieyongji@bytedance.com>
+ <20210119045920.447-4-xieyongji@bytedance.com>
+ <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1611085944-21609-3-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/01/2021 20.52, Pierre Morel wrote:
-> To centralize the memory allocation for I/O we define
-> the alloc_io_page/free_io_page functions which share the I/O
-> memory with the host in case the guest runs with
-> protected virtualization.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   lib/s390x/malloc_io.c | 50 +++++++++++++++++++++++++++++++++++++++++++
->   lib/s390x/malloc_io.h | 18 ++++++++++++++++
->   s390x/Makefile        |  1 +
->   3 files changed, 69 insertions(+)
->   create mode 100644 lib/s390x/malloc_io.c
->   create mode 100644 lib/s390x/malloc_io.h
-> 
-> diff --git a/lib/s390x/malloc_io.c b/lib/s390x/malloc_io.c
-> new file mode 100644
-> index 0000000..2a946e0
-> --- /dev/null
-> +++ b/lib/s390x/malloc_io.c
-> @@ -0,0 +1,50 @@
-> +/*
-> + * I/O page allocation
-> + *
-> + * Copyright (c) 2021 IBM Corp
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
+On Wed, Jan 20, 2021 at 11:46:38AM +0800, Jason Wang wrote:
+>
+>On 2021/1/19 下午12:59, Xie Yongji wrote:
+>>With VDUSE, we should be able to support all kinds of virtio devices.
+>>
+>>Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+>>---
+>>  drivers/vhost/vdpa.c | 29 +++--------------------------
+>>  1 file changed, 3 insertions(+), 26 deletions(-)
+>>
+>>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>>index 29ed4173f04e..448be7875b6d 100644
+>>--- a/drivers/vhost/vdpa.c
+>>+++ b/drivers/vhost/vdpa.c
+>>@@ -22,6 +22,7 @@
+>>  #include <linux/nospec.h>
+>>  #include <linux/vhost.h>
+>>  #include <linux/virtio_net.h>
+>>+#include <linux/virtio_blk.h>
+>>  #include "vhost.h"
+>>@@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+>>  	return 0;
+>>  }
+>>-static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
+>>-				      struct vhost_vdpa_config *c)
+>>-{
+>>-	long size = 0;
+>>-
+>>-	switch (v->virtio_id) {
+>>-	case VIRTIO_ID_NET:
+>>-		size = sizeof(struct virtio_net_config);
+>>-		break;
+>>-	}
+>>-
+>>-	if (c->len == 0)
+>>-		return -EINVAL;
+>>-
+>>-	if (c->len > size - c->off)
+>>-		return -E2BIG;
+>>-
+>>-	return 0;
+>>-}
+>
+>
+>I think we should use a separate patch for this.
 
-Janosch recently started to introduce SPDX identifieres to the s390x code, 
-so I think it would be good to use them here, too.
+For the vdpa-blk simulator I had the same issues and I'm adding a 
+.get_config_size() callback to vdpa devices.
 
-> + * Using this interface provide host access to the allocated pages in
-> + * case the guest is a secure guest.
-> + * This is needed for I/O buffers.
-> + *
-> + */
-> +#include <libcflat.h>
-> +#include <asm/page.h>
-> +#include <asm/uv.h>
-> +#include <malloc_io.h>
-> +#include <alloc_page.h>
-> +#include <asm/facility.h>
-> +
-> +void *alloc_io_page(int size)
-> +{
-> +	void *p;
-> +
-> +	assert(size <= PAGE_SIZE);
+Do you think make sense or is better to remove this check in vhost/vdpa, 
+delegating the boundaries checks to get_config/set_config callbacks.
 
-Apart from the assert() statement, the size parameter seems to be completely 
-unused. It's also weird to have the function named alloc_something_page() 
-and then have a parameter that takes bytes. Thus I'd suggest to either drop 
-the size parameter completely, or to rename the function to alloc_io_mem and 
-then to alloc multiple pages below in case the size is bigger than 
-PAGE_SIZE. Or maybe even to name the function alloc_io_pages and then use 
-"int num_pages" as a parameter, allowing to allocate multiple pages at once?
-
-> +
-> +	p = alloc_pages_flags(1, AREA_DMA31);
-> +	if (!p)
-> +		return NULL;
-> +	memset(p, 0, PAGE_SIZE);
-> +
-> +	if (!test_facility(158))
-> +		return p;
-> +
-> +	if (uv_set_shared((unsigned long)p) == 0)
-> +		return p;
-> +
-> +	free_pages(p);
-> +	return NULL;
-> +}
-> +
-> +void free_io_page(void *p)
-> +{
-> +	if (test_facility(158))
-> +		uv_remove_shared((unsigned long)p);
-> +	free_pages(p);
-> +}
-> diff --git a/lib/s390x/malloc_io.h b/lib/s390x/malloc_io.h
-> new file mode 100644
-> index 0000000..f780191
-> --- /dev/null
-> +++ b/lib/s390x/malloc_io.h
-> @@ -0,0 +1,18 @@
-> +/*
-> + * I/O allocations
-> + *
-> + * Copyright (c) 2021 IBM Corp
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *
-> + * This code is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU General Public License version 2.
-> + */
-Please also add SPDX license information here.
-
-  Thomas
+Thanks,
+Stefano
 
