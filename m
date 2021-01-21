@@ -2,145 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A59892FE52D
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 09:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEA572FE597
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 09:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727228AbhAUIYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 03:24:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36187 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726753AbhAUIWb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 03:22:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611217264;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0gba4+t4e2AipgLr57aF/TlL6LFHCc9J8pUh2gVcris=;
-        b=BcpzMVeXNkj07EDc1NvNPrD3UGpnPj81WtvN2iBHpA19n4MdLpJI/OVw7ui7dDu6z1DtiO
-        PoL5f7PudjaFgrOe7B8Bz7gaFfASpfxO73CPY0n255ghgFZiPKKoU2XofmyxedY2Rrm3Wo
-        ZnIio3scO5iB+X/vY2O0ZnXWo7vaMew=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-RYrER6NZN9yxIYxlQV358g-1; Thu, 21 Jan 2021 03:20:59 -0500
-X-MC-Unique: RYrER6NZN9yxIYxlQV358g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DEF310054FF;
-        Thu, 21 Jan 2021 08:20:57 +0000 (UTC)
-Received: from gondolin (ovpn-113-94.ams2.redhat.com [10.36.113.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 546B871C9A;
-        Thu, 21 Jan 2021 08:20:47 +0000 (UTC)
-Date:   Thu, 21 Jan 2021 09:20:44 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com
-Subject: Re: [PATCH 1/1] s390/vfio-ap: No need to disable IRQ after queue
- reset
-Message-ID: <20210121092044.628b77c7.cohuck@redhat.com>
-In-Reply-To: <20210121072008.76523-1-pasic@linux.ibm.com>
-References: <20210121072008.76523-1-pasic@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1728176AbhAUIwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 03:52:44 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:43527 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728179AbhAUIt0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 03:49:26 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R261e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0UMPTpeq_1611218908;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UMPTpeq_1611218908)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 21 Jan 2021 16:48:32 +0800
+From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+Subject: [PATCH] KVM: vmx: Assign boolean values to a bool variable
+Date:   Thu, 21 Jan 2021 16:48:26 +0800
+Message-Id: <1611218906-71903-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Jan 2021 08:20:08 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Fix the following coccicheck warnings:
 
-> From: Tony Krowiak <akrowiak@linux.ibm.com>
-> 
-> The queues assigned to a matrix mediated device are currently reset when:
-> 
-> * The VFIO_DEVICE_RESET ioctl is invoked
-> * The mdev fd is closed by userspace (QEMU)
-> * The mdev is removed from sysfs.
-> 
-> Immediately after the reset of a queue, a call is made to disable
-> interrupts for the queue. This is entirely unnecessary because the reset of
-> a queue disables interrupts, so this will be removed.
-> 
-> Furthermore, vfio_ap_irq_disable() does an unconditional PQAP/AQIC which
-> can result in a specification exception (when the corresponding facility
-> is not available), so this is actually a bugfix.
-> 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> [pasic@linux.ibm.com: minor rework before merging]
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Fixes: ec89b55e3bce ("s390: ap: implement PAPQ AQIC interception in kernel")
-> Cc: <stable@vger.kernel.org>
-> 
-> ---
-> 
-> Since it turned out disabling the interrupts via PQAP/AQIC is not only
-> unnecesary but also buggy, we decided to put this patch, which
-> used to be apart of the series https://lkml.org/lkml/2020/12/22/757 on the fast
-> lane.
-> 
-> If the backports turn out to be a bother, which I hope won't be the case
-> not, I am happy to help with those.
-> 
-> ---
->  drivers/s390/crypto/vfio_ap_drv.c     |   6 +-
->  drivers/s390/crypto/vfio_ap_ops.c     | 100 ++++++++++++++++----------
->  drivers/s390/crypto/vfio_ap_private.h |  12 ++--
->  3 files changed, 69 insertions(+), 49 deletions(-)
-> 
+./arch/x86/kvm/vmx/vmx.c:6798:1-27: WARNING: Assignment of 0/1
+to bool variable.
 
-(...)
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index f46dde56b464..28e9d9989768 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -88,11 +88,6 @@ struct ap_matrix_mdev {
->  	struct mdev_device *mdev;
->  };
->  
-> -extern int vfio_ap_mdev_register(void);
-> -extern void vfio_ap_mdev_unregister(void);
-> -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> -			     unsigned int retry);
-> -
->  struct vfio_ap_queue {
->  	struct ap_matrix_mdev *matrix_mdev;
->  	unsigned long saved_pfn;
-> @@ -100,5 +95,10 @@ struct vfio_ap_queue {
->  #define VFIO_AP_ISC_INVALID 0xff
->  	unsigned char saved_isc;
->  };
-> -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
-> +
-> +int vfio_ap_mdev_register(void);
-> +void vfio_ap_mdev_unregister(void);
-
-Nit: was moving these two necessary?
-
-> +int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q,
-> +			     unsigned int retry);
-> +
->  #endif /* _VFIO_AP_PRIVATE_H_ */
-> 
-> base-commit: 9791581c049c10929e97098374dd1716a81fefcc
-
-Anyway, if I didn't entangle myself in the various branches, this seems
-sane.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 2af05d3..8d51135 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -743,7 +743,7 @@ static void __loaded_vmcs_clear(void *arg)
+ 	smp_wmb();
+ 
+ 	loaded_vmcs->cpu = -1;
+-	loaded_vmcs->launched = 0;
++	loaded_vmcs->launched = false;
+ }
+ 
+ void loaded_vmcs_clear(struct loaded_vmcs *loaded_vmcs)
+@@ -2621,7 +2621,7 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
+ 	loaded_vmcs->shadow_vmcs = NULL;
+ 	loaded_vmcs->hv_timer_soft_disabled = false;
+ 	loaded_vmcs->cpu = -1;
+-	loaded_vmcs->launched = 0;
++	loaded_vmcs->launched = false;
+ 
+ 	if (cpu_has_vmx_msr_bitmap()) {
+ 		loaded_vmcs->msr_bitmap = (unsigned long *)
+@@ -4211,7 +4211,7 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_VPID;
+ 	if (!enable_ept) {
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_EPT;
+-		enable_unrestricted_guest = 0;
++		enable_unrestricted_guest = false;
+ 	}
+ 	if (!enable_unrestricted_guest)
+ 		exec_control &= ~SECONDARY_EXEC_UNRESTRICTED_GUEST;
+@@ -6762,7 +6762,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_load_host_xsave_state(vcpu);
+ 
+-	vmx->nested.nested_run_pending = 0;
++	vmx->nested.nested_run_pending = false;
+ 	vmx->idt_vectoring_info = 0;
+ 
+ 	if (unlikely(vmx->fail)) {
+@@ -6779,7 +6779,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	if (unlikely(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+ 		return EXIT_FASTPATH_NONE;
+ 
+-	vmx->loaded_vmcs->launched = 1;
++	vmx->loaded_vmcs->launched = true;
+ 	vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
+ 
+ 	vmx_recover_nmi_blocking(vmx);
+@@ -7740,25 +7740,25 @@ static __init int hardware_setup(void)
+ 
+ 	if (!cpu_has_vmx_vpid() || !cpu_has_vmx_invvpid() ||
+ 	    !(cpu_has_vmx_invvpid_single() || cpu_has_vmx_invvpid_global()))
+-		enable_vpid = 0;
++		enable_vpid = false;
+ 
+ 	if (!cpu_has_vmx_ept() ||
+ 	    !cpu_has_vmx_ept_4levels() ||
+ 	    !cpu_has_vmx_ept_mt_wb() ||
+ 	    !cpu_has_vmx_invept_global())
+-		enable_ept = 0;
++		enable_ept = false;
+ 
+ 	if (!cpu_has_vmx_ept_ad_bits() || !enable_ept)
+-		enable_ept_ad_bits = 0;
++		enable_ept_ad_bits = false;
+ 
+ 	if (!cpu_has_vmx_unrestricted_guest() || !enable_ept)
+-		enable_unrestricted_guest = 0;
++		enable_unrestricted_guest = false;
+ 
+ 	if (!cpu_has_vmx_flexpriority())
+-		flexpriority_enabled = 0;
++		flexpriority_enabled = false;
+ 
+ 	if (!cpu_has_virtual_nmis())
+-		enable_vnmi = 0;
++		enable_vnmi = false;
+ 
+ 	/*
+ 	 * set_apic_access_page_addr() is used to reload apic access
+@@ -7789,7 +7789,7 @@ static __init int hardware_setup(void)
+ 	}
+ 
+ 	if (!cpu_has_vmx_apicv()) {
+-		enable_apicv = 0;
++		enable_apicv = false;
+ 		vmx_x86_ops.sync_pir_to_irr = NULL;
+ 	}
+ 
+@@ -7819,7 +7819,7 @@ static __init int hardware_setup(void)
+ 	 * and EPT A/D bit features are enabled -- PML depends on them to work.
+ 	 */
+ 	if (!enable_ept || !enable_ept_ad_bits || !cpu_has_vmx_pml())
+-		enable_pml = 0;
++		enable_pml = false;
+ 
+ 	if (!enable_pml) {
+ 		vmx_x86_ops.slot_enable_log_dirty = NULL;
+-- 
+1.8.3.1
 
