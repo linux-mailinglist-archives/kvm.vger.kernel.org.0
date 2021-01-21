@@ -2,212 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2189F2FF44A
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 20:24:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 143F12FF50B
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 20:48:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbhAUTXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 14:23:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59684 "EHLO
+        id S1726197AbhAUSrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 13:47:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727020AbhAUTXf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jan 2021 14:23:35 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF5EEC061756
-        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 11:22:52 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id r4so1821195pls.11
-        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 11:22:52 -0800 (PST)
+        with ESMTP id S1725868AbhAUS0A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jan 2021 13:26:00 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53ABDC06174A
+        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 10:24:18 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id m22so3881360lfg.5
+        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 10:24:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zKsHotGXgvprTlpljGXGLKdBrcmy/Fn0NltUb7fu5lk=;
-        b=SR2Vs6lWfpe+LZrVSZg2Qh6+dPYcXM7skWkPE19rhLYayubSvW2MJBuuOAi+3nEP0u
-         8ddD1sSNbCmHC/v64EYVwWyZ1AQj4CnB7HgiKfDoGmwzUs0qv4t4xvL9SdEzQZSs8Xv2
-         RF+zP+x+IUuKB5/cWknemRDVXgDGr7Y52YtUT49a3GLr/6sMlBye/Nmltb1CG4Oxuwe0
-         DMc1U0Aag7z7o2P29pdis2xXWSvoB2Nu2sWcJrU33BdnO/cKRH5zmsO/BskWDjwvXgMk
-         6Vlf0m9cP7yTs4S3YGbO+glVFdYoSEc1Bd5MCqXh5CIOHnQSaXUJwVYzGkvEUHmbldpw
-         hQSg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kT/jExCrQmlhS85/qwzQJgbWzMqvqpcCTkvXgEptUG4=;
+        b=bH0VznfIsQ+53sOEpPItnkMslaFtto7zkJqYtSK8dEnE1P5oyzOwX+quCBIi5V/l/a
+         /Zxna95v/etRMMJDlQPQ1lI0XfLCtHu6slW10ESbCfE4WZ9ll9NMIVhj2ulYiabv5v6N
+         VdI89cJuNFVhlqWIQurxruiimqk6+ENKuvncXTPxCqKw13E6uDi6pAXLSme72QupHrre
+         gaGE10dzbnEVIPzqC16Xz9MO9wMJD4CNfW/oc1JjGF6kZoxyzdiRwn4/L5XFzSj4+g62
+         TG3NbJaFntj8O22F14tuvI+pYHVXOp29ZVWcSnICs+AiO8MEA6LHcYkoKIh81XnlPHN4
+         wGwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zKsHotGXgvprTlpljGXGLKdBrcmy/Fn0NltUb7fu5lk=;
-        b=WArjDYLqtrr2djTzKerclRtZnLewEAF0ogsNTP/4nBDL6ac98H1KM0qVTfsIyrA2LI
-         FYabbyUBzIQHlohoe4qoSZd4iRlZCIEzYBc/KpDzgtoHU16YBUZ9eskQv8jhbGvNI9qz
-         XjgL+86X2X5rwj2IMrPCnjYJ+bKKmUB8soOq+PXnTPM+AyyTWKx5WdUpl0evEU0CmpBI
-         Wv7b7ZuspQie6wA7HkpC9pWsjshRYOKpbDjqU+DdIinoVGQSoj01/7SvCJfXPH9/MWHl
-         F2krC8olI5rww+opBDYm3WY9V/fSM2VBzGrgra8HD5SBZX+G+5S0ltHNQWf07uqstJvz
-         LsOg==
-X-Gm-Message-State: AOAM533asaARUd9Y8ehRXM0uPrWzs22thM55egP/PQs9dSurKhkiYD5F
-        7KGDIHLbXWw9gXNh5GN+t2LfN7sw9LMd9Q==
-X-Google-Smtp-Source: ABdhPJz10HdM3ZLqhQf++MXK/auC7Itc6QN3487igCFrBclxhRG0eOX6nOYMQ8tGJd/GDL3UDPaODw==
-X-Received: by 2002:a17:90a:6643:: with SMTP id f3mr999802pjm.33.1611256972123;
-        Thu, 21 Jan 2021 11:22:52 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id x8sm3218020pjf.55.2021.01.21.11.22.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jan 2021 11:22:51 -0800 (PST)
-Date:   Thu, 21 Jan 2021 11:22:44 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
-Message-ID: <YAnUhCocizx97FWL@google.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-20-bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kT/jExCrQmlhS85/qwzQJgbWzMqvqpcCTkvXgEptUG4=;
+        b=REvaCeSs9nSq6OGtkM6BUJpGADvM0jjKmJ0hAtFMfQUpOaIsPYdyxnkUDtgaMJoIlZ
+         RVURw4TyCBYmvbmDs2kXotDrrIFCr1wxdXuLyIqXvFbvAPZHvflA+hm0TpmwpD9EYMQS
+         8+tHZuEr5zPYVdrcNXpylQ8usg5fcCgyBbbjSQMICWlk6gxnTvhOoWpDeDdgsHfPEN4m
+         R5aREgEQ9Jpr1pcVYy8P4XxT/MP4BKMXLUZhTzTWDh/zTmQI41J8s97McQU4xz39Ldcu
+         proWnCrrYL3CsFaynO41qTHFu+TiqrZ34byuFIFCrAcI4vUoU9Q9kpNwhbNE+jVN/lgf
+         H6Hw==
+X-Gm-Message-State: AOAM530ODJbK/h0rRZzTk2kyqz8PJtEo2uWy3yE2j29o4pCWwmsaov+m
+        XlpO2CN8hAqD2+dh0sa58csJl11ed0AgEonE/QxFfCoxzOZAtg==
+X-Google-Smtp-Source: ABdhPJzaN8Vfr0eonmzuRkTZF95ajcdlbTxd+/xM47v4Dma4GXzA1E7zphsUaKnEmZ0P4ra4I1I2tC36gBXwhj6zhi8=
+X-Received: by 2002:a19:c309:: with SMTP id t9mr252946lff.46.1611253456657;
+ Thu, 21 Jan 2021 10:24:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210112181041.356734-20-bgardon@google.com>
+References: <20210121111808.619347-1-imbrenda@linux.ibm.com>
+In-Reply-To: <20210121111808.619347-1-imbrenda@linux.ibm.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 21 Jan 2021 10:23:50 -0800
+Message-ID: <CALzav=cDeL++8qdY2dJsbTmh+2z0hiAOeYk=NUqttEmKiPMvKw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 0/2] Fix smap and pku tests for new allocator
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, frankja@linux.ibm.com,
+        cohuck@redhat.com, Laurent Vivier <lvivier@redhat.com>,
+        nadav.amit@gmail.com, krish.sadhukhan@oracle.com,
+        seanjc@google.com, chenyi.qiang@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021, Ben Gardon wrote:
-> Add a lock to protect the data structures that track the page table
-> memory used by the TDP MMU. In order to handle multiple TDP MMU
-> operations in parallel, pages of PT memory must be added and removed
-> without the exclusive protection of the MMU lock. A new lock to protect
-> the list(s) of in-use pages will cause some serialization, but only on
-> non-leaf page table entries, so the lock is not expected to be very
-> contended.
-> 
-> Reviewed-by: Peter Feiner <pfeiner@google.com>
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 15 ++++++++
->  arch/x86/kvm/mmu/tdp_mmu.c      | 67 +++++++++++++++++++++++++++++----
->  2 files changed, 74 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 92d5340842c8..f8dccb27c722 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1034,6 +1034,21 @@ struct kvm_arch {
->  	 * tdp_mmu_page set and a root_count of 0.
->  	 */
->  	struct list_head tdp_mmu_pages;
-> +
-> +	/*
-> +	 * Protects accesses to the following fields when the MMU lock is
-> +	 * not held exclusively:
-> +	 *  - tdp_mmu_pages (above)
-> +	 *  - the link field of struct kvm_mmu_pages used by the TDP MMU
-> +	 *    when they are part of tdp_mmu_pages (but not when they are part
-> +	 *    of the tdp_mmu_free_list or tdp_mmu_disconnected_list)
+On Thu, Jan 21, 2021 at 3:18 AM Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+>
+> The recent fixes to the page allocator broke the SMAP test.
+>
+> The reason is that the test blindly took a chunk of memory and used it,
+> hoping that the page allocator would not touch it.
+>
+> Unfortunately the memory area affected is exactly where the new
+> allocator puts the metadata information for the 16M-4G memory area.
+>
+> This causes the SMAP test to fail.
+>
+> The solution is to reserve the memory properly using the reserve_pages
+> function. To make things simpler, the memory area reserved is now
+> 8M-16M instead of 16M-32M.
+>
+> This issue was not found immediately, because the SMAP test needs
+> non-default qemu parameters in order not to be skipped.
+>
+> I tested the patch and it seems to work.
+>
+> While fixing the SMAP test, I also noticed that the PKU test was doing
+> the same thing, so I went ahead and fixed that test too in the same
+> way. Unfortunately I do not have the right hardware and therefore I
+> cannot test it.
+>
+>
+>
+> I would really appreciate if someone who has the right hardware could
+> test the PKU test and see if it works.
 
-Neither tdp_mmu_free_list nor tdp_mmu_disconnected_list exists.
+Thanks for identifying the PKU test as well. I can confirm it is also failing.
 
-> +	 *  - lpage_disallowed_mmu_pages
-> +	 *  - the lpage_disallowed_link field of struct kvm_mmu_pages used
-> +	 *    by the TDP MMU
-> +	 *  May be acquired under the MMU lock in read mode or non-overlapping
-> +	 *  with the MMU lock.
-> +	 */
-> +	spinlock_t tdp_mmu_pages_lock;
->  };
->  
->  struct kvm_vm_stat {
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 8b61bdb391a0..264594947c3b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -33,6 +33,7 @@ void kvm_mmu_init_tdp_mmu(struct kvm *kvm)
->  	kvm->arch.tdp_mmu_enabled = true;
->  
->  	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
-> +	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
->  	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
->  }
->  
-> @@ -262,6 +263,58 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
->  	}
->  }
->  
-> +/**
-> + * tdp_mmu_link_page - Add a new page to the list of pages used by the TDP MMU
-> + *
-> + * @kvm: kvm instance
-> + * @sp: the new page
-> + * @atomic: This operation is not running under the exclusive use of the MMU
-> + *	    lock and the operation must be atomic with respect to ther threads
-> + *	    that might be adding or removing pages.
-> + * @account_nx: This page replaces a NX large page and should be marked for
-> + *		eventual reclaim.
-> + */
-> +static void tdp_mmu_link_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-> +			      bool atomic, bool account_nx)
-> +{
-> +	if (atomic)
+I tested out your patches on supported hardware and both the smap and
+pku tests passed.
 
-This is unnecessary, there is exactly one caller and it is always "atomic".
+chenyi.qiang@intel.com: FYI your in-progress PKS test looks like it
+will need the same fix.
 
-Assuming some of this code lives on (see below), I'd prefer a different name
-than "atomic".  Writing the SPTE is atomic (though even that is a bit of a lie,
-e.g. tdp_mmu_zap_spte_atomic() is very much not atomic), but all the other
-operations are the exact opposite of atomic.
 
-Maybe change it from a bool to an enum with READ/WRITE_LOCKED or something?
 
-> +		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +	else
-> +		kvm_mmu_lock_assert_held_exclusive(kvm);
-> +
-> +	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
-> +	if (account_nx)
-> +		account_huge_nx_page(kvm, sp);
-> +
-> +	if (atomic)
-> +		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> +}
-> +
-> +/**
-> + * tdp_mmu_unlink_page - Remove page from the list of pages used by the TDP MMU
-> + *
-> + * @kvm: kvm instance
-> + * @sp: the page to be removed
-> + * @atomic: This operation is not running under the exclusive use of the MMU
-> + *	    lock and the operation must be atomic with respect to ther threads
-> + *	    that might be adding or removing pages.
-> + */
-> +static void tdp_mmu_unlink_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-> +				bool atomic)
-> +{
-> +	if (atomic)
-
-Summarizing an off-list discussion with Ben:
-
-This path isn't reachable in this series, which means all the RCU stuff is more
-or less untestable.  Only the page fault path modifies the MMU while hold a read
-lock, and it can't zap non-leaf shadow pages (only zaps large SPTEs and installs
-new SPs).
-
-The intent is to convert other zap-happy paths to a read lock, notably
-kvm_mmu_zap_collapsible_sptes() and kvm_recover_nx_lpages().  Ben will include
-patches to convert at least one of those in the next version of this series so
-that there is justification and coverage for the RCU-deferred freeing.
-
-> +		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +	else
-> +		kvm_mmu_lock_assert_held_exclusive(kvm);
-> +	list_del(&sp->link);
-> +	if (sp->lpage_disallowed)
-> +		unaccount_huge_nx_page(kvm, sp);
-> +
-> +	if (atomic)
-> +		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> +}
-> +
->  /**
->   * handle_disconnected_tdp_mmu_page - handle a pt removed from the TDP structure
->   *
+>
+>
+>
+>
+> Claudio Imbrenda (2):
+>   x86: smap: fix the test to work with new allocator
+>   x86: pku: fix the test to work with new allocator
+>
+>  x86/pku.c  | 5 ++++-
+>  x86/smap.c | 9 ++++++---
+>  2 files changed, 10 insertions(+), 4 deletions(-)
+>
+> --
+> 2.26.2
+>
