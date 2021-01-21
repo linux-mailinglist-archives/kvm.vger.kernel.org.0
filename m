@@ -2,80 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0E792FE35E
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 08:05:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C10D72FE3D2
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 08:22:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727096AbhAUHEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 02:04:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31731 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726477AbhAUHDj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 02:03:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611212533;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=k4womrgZC1t12zXUnXkUHJc1RDUUJ4HKh78lY5FVqYE=;
-        b=gSKJYHqJm5MtrdesLSRQzmKhLJUFvxFn0xCAbUsIigGnb/zQMhblIusNgy6mtA1RZ+uK0j
-        SeZZcIyelv7al3efygr8cl6IuhsJPM80XJ4QzNNsZfbwQcuRzVsDzrocSBaHrNE1nTG6u3
-        CNTf8kgVFmoZHXHdOsUIveIOjsHtZSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-q6Gp6TnFMlOIFURspEDrQQ-1; Thu, 21 Jan 2021 01:57:11 -0500
-X-MC-Unique: q6Gp6TnFMlOIFURspEDrQQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1ACA9107ACE3;
-        Thu, 21 Jan 2021 06:57:10 +0000 (UTC)
-Received: from thuth.com (ovpn-112-82.ams2.redhat.com [10.36.112.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A9A9F9CA0;
-        Thu, 21 Jan 2021 06:57:05 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, cohuck@redhat.com
-Subject: [kvm-unit-tests PATCH] lib/s390x/sclp: Clarify that the CPUEntry array could be at a different spot
-Date:   Thu, 21 Jan 2021 07:57:03 +0100
-Message-Id: <20210121065703.561444-1-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1727377AbhAUHWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 02:22:14 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:43804 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727303AbhAUHVE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 02:21:04 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0UMOzPSM_1611213609;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UMOzPSM_1611213609)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 21 Jan 2021 15:20:13 +0800
+From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+Subject: [PATCH] kvm: x86/mmu: Assign boolean values to a bool variable
+Date:   Thu, 21 Jan 2021 15:20:07 +0800
+Message-Id: <1611213607-4062-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The "struct CPUEntry entries[0]" in the ReadInfo structure is misleading
-since the entries could be add a completely different spot. Replace it
-by a proper comment instead.
+Fix the following coccicheck warnings:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+./arch/x86/kvm/mmu/mmu.c:5829:2-9: WARNING: Assignment of 0/1
+to bool variable.
+
+./arch/x86/kvm/mmu/mmu.c:2505:1-11: WARNING: Assignment of 0/1
+to bool variable.
+
+./arch/x86/kvm/mmu/mmu.c:1814:1-11: WARNING: Assignment of 0/1
+to bool variable.
+
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
 ---
- lib/s390x/sclp.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 9f81c0f..8523133 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -131,10 +131,15 @@ typedef struct ReadInfo {
- 	uint16_t highest_cpu;
- 	uint8_t  _reserved5[124 - 122];     /* 122-123 */
- 	uint32_t hmfai;
--	uint8_t reserved7[134 - 128];
-+	uint8_t reserved7[134 - 128];       /* 128-133 */
- 	uint8_t byte_134_diag318 : 1;
- 	uint8_t : 7;
--	struct CPUEntry entries[0];
-+	/*
-+	 * At the end of the ReadInfo, there are also the CPU entries (see
-+	 * struct CPUEntry). When the Extended-Length SCCB (ELS) feature is
-+	 * enabled, the start of the CPU entries array begins at an offset
-+	 * denoted by the offset_cpu field, otherwise it's at offset 128.
-+	 */
- } __attribute__((packed)) ReadInfo;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481..ced0bd5 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1819,7 +1819,7 @@ static void kvm_unlink_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	WARN_ON(!sp->unsync);
+ 	trace_kvm_mmu_sync_page(sp);
+-	sp->unsync = 0;
++	sp->unsync = false;
+ 	--kvm->stat.mmu_unsync;
+ }
  
- typedef struct ReadCpuInfo {
+@@ -2510,7 +2510,7 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ {
+ 	trace_kvm_mmu_unsync_page(sp);
+ 	++vcpu->kvm->stat.mmu_unsync;
+-	sp->unsync = 1;
++	sp->unsync = true;
+ 
+ 	kvm_mmu_mark_parents_unsync(sp);
+ }
+@@ -5839,9 +5839,9 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
+ 
+ 	/* In "auto" mode deploy workaround only if CPU has the bug. */
+ 	if (sysfs_streq(val, "off"))
+-		new_val = 0;
++		new_val = false;
+ 	else if (sysfs_streq(val, "force"))
+-		new_val = 1;
++		new_val = true;
+ 	else if (sysfs_streq(val, "auto"))
+ 		new_val = get_nx_auto_mode();
+ 	else if (strtobool(val, &new_val) < 0)
 -- 
-2.27.0
+1.8.3.1
 
