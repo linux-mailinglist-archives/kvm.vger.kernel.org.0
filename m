@@ -2,84 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A2762FE037
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 04:54:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D4362FE03A
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 04:54:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732094AbhAUDxY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 22:53:24 -0500
-Received: from mga11.intel.com ([192.55.52.93]:25788 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392977AbhAUByL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 20:54:11 -0500
-IronPort-SDR: IpbVMVmTta/bS/MJJ6WXIGaYobBnvyAwuCQ60t0ZdPSK/iuhKFzp/2NgxIpALuUjQIfVjlDUcL
- GWmoH7CyMx/Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="175698492"
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="175698492"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 17:53:29 -0800
-IronPort-SDR: YTuSdqf7JTVPfMOaHl07geipP4qj462+JdHXha35om2ISImZS/FHUNMcsP+MenbKAZO2FEHk51
- H9KjtxXa/FvQ==
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="427115555"
-Received: from gapoveda-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.79.186])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 17:53:25 -0800
-Date:   Thu, 21 Jan 2021 14:53:23 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>, <jarkko@kernel.org>, <luto@kernel.org>,
-        <haitao.huang@intel.com>, <pbonzini@redhat.com>, <bp@alien8.de>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <hpa@zytor.com>,
-        <jethro@fortanix.com>, <b.thiel@posteo.de>
-Subject: Re: [RFC PATCH v2 06/26] x86/cpu/intel: Allow SGX virtualization
- without Launch Control support
-Message-Id: <20210121145323.0caad8f1d1970214bba905b1@intel.com>
-In-Reply-To: <626d0157-c0a0-60fd-813f-af3207ad91df@intel.com>
-References: <cover.1610935432.git.kai.huang@intel.com>
-        <a6c0b0d2632a6c603e68d9bdc81f564290ff04ad.1610935432.git.kai.huang@intel.com>
-        <bc73adaf-fae6-2088-c8d4-6f53057a4eac@intel.com>
-        <YAiwhdcOknqTJihk@google.com>
-        <666e0995-cf08-1ed9-20b2-f64d1ce64c20@intel.com>
-        <20210121124830.3cb323c5ead91800645c912a@intel.com>
-        <626d0157-c0a0-60fd-813f-af3207ad91df@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1732321AbhAUDxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 22:53:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45024 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729241AbhAUDAQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 22:00:16 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AB34C061757
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 18:47:58 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id h11so1146069ioh.11
+        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 18:47:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZuZwVwOsZXIOujfnIrxLKTPXUJWWrKVtgOfGA4Pmxcc=;
+        b=rAvotTwBl5KLgiR4US39m4jfoz7lvXHt1NdGI+44pOxnkBet0V8jxd9ArSwnceucNr
+         Qks1HI2P4AskGsXEhdYai6qGHIJcaTkSCvg9GLRdu1FwQZDQhAyrvbr7uazHMniZVqtt
+         sz2EksMDBRt6r1KUJJWCXC4EHKIIjuidKXJhTvziyzWrSkzUWZSTOUthD0gwfyjHIrrR
+         wv4o8rF75/1FpTLYmm20vHPDFQJWnimgp0u6yqaZP9OO/M37nzG35egW4kccik8O+oUA
+         J4IxHjVw/h7u5sCy0CVAbSo6Q04nj6oud2Y3IoddcOzDd9uq9uI6FyCPJc70ze52W2Yl
+         LErA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZuZwVwOsZXIOujfnIrxLKTPXUJWWrKVtgOfGA4Pmxcc=;
+        b=UBiDHg/WUIY41x8RFgr0c0FeF69jxnsvZsBeBE/CTD5gLoPQk7CS04XCDWDmdYz52W
+         /ICY59fi7T7gXCRaesV8bdr9f2yNCavwnyJ0JzearZ65GO9UKWgyPeEbpVKrPAHjh71C
+         X2Bys36HCCQ+EyumMSH3QpIV4aNHTx/Qna6VmX2OX7KyaaKbapCyiZeA6Q+hc8QImGtR
+         P4r/BR3saqo8bCntvgngil6XglMHISgNknFvACZdBMfhy4BThHsMJ55Fz1Bx7bPt/Pvy
+         UGGGqxPWh75KKGuQzJcJ8u5GWNUhymvv82NXxtepNXcpdjnnaqY8nhlSVToGM/NMLzo8
+         wrqQ==
+X-Gm-Message-State: AOAM530UMIAXfPdZlKwpwRvmjXpcnhtUi55ogKvONlc+Jas+Uh1N6oWa
+        C0SU6+L61wsNXn7KisAOf/aKb94nmeM6Q28OL3BYIqL6bACf
+X-Google-Smtp-Source: ABdhPJw6Z9tFUIfjoZ5sNIubIzD9q8AVypNcofze1omMchFdn7eRSu9jaXQcWVZL91Lj16mcXw41odGzzDTSy7u44A4=
+X-Received: by 2002:a5d:9a8e:: with SMTP id c14mr9273183iom.178.1611197277522;
+ Wed, 20 Jan 2021 18:47:57 -0800 (PST)
+MIME-Version: 1.0
+References: <20201210160002.1407373-1-maz@kernel.org> <20201210160002.1407373-64-maz@kernel.org>
+In-Reply-To: <20201210160002.1407373-64-maz@kernel.org>
+From:   Haibo Xu <haibo.xu@linaro.org>
+Date:   Thu, 21 Jan 2021 10:47:45 +0800
+Message-ID: <CAJc+Z1G6QEEiUh=KLdS6Xut7q63zZ6zQxfpGCkCtY5tTSXPeZw@mail.gmail.com>
+Subject: Re: [PATCH v3 63/66] KVM: arm64: nv: Allocate VNCR page when required
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
+        kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Jan 2021 15:51:44 -0800 Dave Hansen wrote:
-> On 1/20/21 3:48 PM, Kai Huang wrote:
-> >> Not a big deal either way.  I agree that "virt" can be confusing.
-> >>
-> >> Considering that:
-> >>
-> >> +config X86_SGX_VIRTUALIZATION
-> >> +	depends on ... KVM_INTEL
-> > It is already in patch 3: Introduce virtual EPC for use by KVM guests:
-> > 
-> > +config X86_SGX_VIRTUALIZATION
-> > +	bool "Software Guard eXtensions (SGX) Virtualization"
-> > +	depends on X86_SGX && KVM_INTEL
-> 
-> Right, I'm suggesting that patch 3 should call it:
-> 
-> 	X86_SGX_KVM
-> 
-> instead of:
-> 
-> 	X86_SGX_VIRTUALIZATION
+On Fri, 11 Dec 2020 at 00:04, Marc Zyngier <maz@kernel.org> wrote:
+>
+> If running a NV guest on an ARMv8.4-NV capable system, let's
+> allocate an additional page that will be used by the hypervisor
+> to fulfill system register accesses.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 ++-
+>  arch/arm64/kvm/nested.c           | 8 ++++++++
+>  arch/arm64/kvm/reset.c            | 1 +
+>  3 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 78630bd5124d..dada0678c28e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -523,7 +523,8 @@ struct kvm_vcpu_arch {
+>   */
+>  static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+>  {
+> -       if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
+> +       if (unlikely(cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
+> +                    r >= __VNCR_START__ && ctxt->vncr_array))
+>                 return &ctxt->vncr_array[r - __VNCR_START__];
+>
+>         return (u64 *)&ctxt->sys_regs[r];
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index eef8f9873814..88147ec99755 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -47,6 +47,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>         if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+>                 return -EINVAL;
+>
+> +       if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
+> +               vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+> +               if (!vcpu->arch.ctxt.vncr_array)
+> +                       return -ENOMEM;
+> +       }
+> +
 
-In case we want to change to X86_SGX_KVM, is it more reasonable to put it to
-arch/x86/kvm/Kconfig (maybe change to X86_KVM_SGX)?
+If KVM_ARM_VCPU_INIT was called multiple times, the above codes would
+try to allocate a new page
+without free-ing the previous one. Besides that, the following
+kvm_free_stage2_pgd() call would fail in the
+second call with the error message "kvm_arch already initialized?".
+I think a possible fix is to add a new flag to indicate whether the NV
+related meta data have been initialized,
+and only initialize them for the first call.
 
-Jarkko also mentioned X86_SGX_VEPC, in which case still putting it to
-arch/x86/Kconfig looks a better fit.
-
-Sean, Paolo,
-
-Do you have comment here?
+>         mutex_lock(&kvm->lock);
+>
+>         /*
+> @@ -64,6 +70,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>                     kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+>                         kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+>                         kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
+> +                       free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+> +                       vcpu->arch.ctxt.vncr_array = NULL;
+>                 } else {
+>                         kvm->arch.nested_mmus_size = num_mmus;
+>                         ret = 0;
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 2d2c780e6c69..d281eb39036f 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -150,6 +150,7 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+>  void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+>         kfree(vcpu->arch.sve_state);
+> +       free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+>  }
+>
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> --
+> 2.29.2
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
