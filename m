@@ -2,64 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAD742FF12D
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 17:57:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 446FC2FF0EC
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 17:50:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731809AbhAUPu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 10:50:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
+        id S2387479AbhAUQtZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 11:49:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387576AbhAUPss (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jan 2021 10:48:48 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D75C06174A;
-        Thu, 21 Jan 2021 07:48:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BFnJgdsd/PRHlQDrSzf4Zz4cuDl+ehMHQo/Dg2SAZhs=; b=vmKiOWKT7FScXEh2kIQGBSn4+m
-        CLWRqsGRf/3WRIRhJU9OtsGocypOnPDhp29PFP0AeLVtuVCrGqIGddfPAu197lvmxca3XPwY+2M1a
-        +/++AKRS/psoriko+9CbEINmghQ8bPT4O2W8OEJICidzb8C2KqQeolPVfdUFHX6BbL1PRt6hY/Sdy
-        Aia0GsZKhfzkqx+Ik+NBEy9Gc02gWB8yv06pz7Bu+VLkL5ENDXblSL6VWvEMgXnIucA9kDv7GQRR7
-        LzMUZxqMQfF89hCLPC7zbW+P9R20OsFbY+5n+k8fgUCnumZZD/x8w8Q8nYJFTk3REJPbj16IiFmwY
-        xDIw0/aw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l2cBS-0002IH-Sg; Thu, 21 Jan 2021 15:47:43 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 169513007CD;
-        Thu, 21 Jan 2021 16:47:40 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id F2E31200D6EE0; Thu, 21 Jan 2021 16:47:39 +0100 (CET)
-Date:   Thu, 21 Jan 2021 16:47:39 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: vmx: Assign boolean values to a bool variable
-Message-ID: <YAmiG3FLMYKwF0jV@hirez.programming.kicks-ass.net>
-References: <1611218906-71903-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+        with ESMTP id S1732333AbhAUP6e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jan 2021 10:58:34 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D0B1C06121F;
+        Thu, 21 Jan 2021 07:56:02 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id e17so1855233qto.3;
+        Thu, 21 Jan 2021 07:56:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RgFdesqiZMPXxw2+lHkC+nOIxN2Hdy7A8pPSFD9aimI=;
+        b=vNyp82p47jqoLdij4TrB0pGsaHQMJ9ZtfFxJ3k/gjlPax2v0NfLp+MONyCPUjLEDR/
+         o8W7yrQU1d2o+rmTbByYaJrI/Gy8Et+KryvlEKvcjQIXeyZkBaufFhQW5LmnQhssI7aJ
+         /17MlJnHVYhq9JZUG8p83rGj4gC0Lx3T9zF0l7vm73Az1z8Rw9kbsB7O5nehtIZ8ywCr
+         l1EDbfGpQMaVGAlbZb39lFnaj3JKXxQf8zvITV7EFxPFOo1D0gbTbF1EER+qpHjLGh1n
+         5knJr4nJ6JQA1pDUbogmPleaktdT4HIREjqfogvE5YqYMUwLyxi0MO8ffxMxzJt92OG7
+         p0FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=RgFdesqiZMPXxw2+lHkC+nOIxN2Hdy7A8pPSFD9aimI=;
+        b=V6pLCoAQGJOf4thevys7gebQZS0XogtpTGZBerdzTLo4Mq5ZuncvgY4gJCT9EAI1CS
+         edmxSEgAdqnlHz1Jr2VKE/D4N1/tCKnVKRs277EYnSHOQHnL+UjMV/ip7yQbhYFGA1BE
+         zgm9pIJgpq1a3e1vuy6FoPq/XN8YwQ3xMQ3Zvt3D1vnRAJf7ogo3hRsTxV8uCQl0KJIw
+         C2vR666oq7W+GMF2lebcLd8dd/4YspVpOR2hEPUXeZlQu6t4w39tmRFdVr7NV7Py1NTC
+         mkgQCbVw2HdXzLQopmXlrON3h5yYWTb7TtbvaTZzGljPyqAyeRqgeiCNcTNQVI8KSEr/
+         LI4Q==
+X-Gm-Message-State: AOAM532j6B6wI8+wUx70AlkhqzLXnsYa42EugJqzJaXh1uRR3rL163vD
+        Soax7x9fa6QUVgeToGmygMY=
+X-Google-Smtp-Source: ABdhPJz3bv4Sx6a3QAdc23npXr+czyCvAz3QTroWX0XotZEPOoMQoRfUqriMdvA8T2IxXy/3vTvn5A==
+X-Received: by 2002:aed:3306:: with SMTP id u6mr234827qtd.386.1611244561576;
+        Thu, 21 Jan 2021 07:56:01 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:1f82])
+        by smtp.gmail.com with ESMTPSA id o56sm3856440qtb.0.2021.01.21.07.56.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Jan 2021 07:56:00 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 21 Jan 2021 10:55:13 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Vipin Sharma <vipinsh@google.com>, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, pbonzini@redhat.com,
+        seanjc@google.com, lizefan@huawei.com, hannes@cmpxchg.org,
+        frankja@linux.ibm.com, borntraeger@de.ibm.com, corbet@lwn.net,
+        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 1/2] cgroup: svm: Add Encryption ID controller
+Message-ID: <YAmj4Q2J9htW2Fe8@mtj.duckdns.org>
+References: <20210108012846.4134815-1-vipinsh@google.com>
+ <20210108012846.4134815-2-vipinsh@google.com>
+ <YAICLR8PBXxAcOMz@mtj.duckdns.org>
+ <YAIUwGUPDmYfUm/a@google.com>
+ <YAJg5MB/Qn5dRqmu@mtj.duckdns.org>
+ <YAJsUyH2zspZxF2S@google.com>
+ <YAb//EYCkZ7wnl6D@mtj.duckdns.org>
+ <YAfYL7V6E4/P83Mg@google.com>
+ <YAhc8khTUc2AFDcd@mtj.duckdns.org>
+ <be699d89-1bd8-25ae-fc6f-1e356b768c75@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1611218906-71903-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+In-Reply-To: <be699d89-1bd8-25ae-fc6f-1e356b768c75@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 21, 2021 at 04:48:26PM +0800, Jiapeng Zhong wrote:
-> Fix the following coccicheck warnings:
-> 
-> ./arch/x86/kvm/vmx/vmx.c:6798:1-27: WARNING: Assignment of 0/1
-> to bool variable.
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Hello,
 
-Your robot is running old scripts; please see commit:
+On Thu, Jan 21, 2021 at 08:55:07AM -0600, Tom Lendacky wrote:
+> The hardware will allow any SEV capable ASID to be run as SEV-ES, however,
+> the SEV firmware will not allow the activation of an SEV-ES VM to be
+> assigned to an ASID greater than or equal to the SEV minimum ASID value. The
+> reason for the latter is to prevent an !SEV-ES ASID starting out as an
+> SEV-ES guest and then disabling the SEV-ES VMCB bit that is used by VMRUN.
+> This would result in the downgrading of the security of the VM without the
+> VM realizing it.
+> 
+> As a result, you have a range of ASIDs that can only run SEV-ES VMs and a
+> range of ASIDs that can only run SEV VMs.
 
-  2b076054e524 ("remove boolinit.cocci")
+I see. That makes sense. What's the downside of SEV-ES compared to SEV w/o
+ES? Are there noticeable performance / feature penalties or is the split
+mostly for backward compatibility?
+
+Thanks.
+
+-- 
+tejun
