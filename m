@@ -2,120 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48E2F2FECA1
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 15:06:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CCD32FECA6
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 15:08:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729886AbhAUOGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 09:06:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46004 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732475AbhAUNf1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 08:35:27 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10LDVobo013764
-        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 08:34:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9kmPu2CtBWScVzoI16TmICuoSEldq76KPDy9nzgDmFs=;
- b=DPF9rvGOsQfJkFprr3TWke59sCUDKma8ebFQRKi8DbFGXNDfqjO8MbfqoYSv6zQHzM71
- DK593Nr+/fcKkWwiMZa70+RpBUb++8KU5kyHWELVlAmuzICFPOC7W66cnSqIbScCyIvC
- z5GhVU9bqw3j800/ImHaVukOKhRttw8IdOMBi82U3YU7v+xGzUH7CrSgxviZ/dGZThDs
- O60njL2Q7Jz0Mq3at/08hxeFqT5Bz8+3DbH5cV0P3Jb5aWx2kQleNI3eG7S2j+pyqT89
- DWOsyl5EkDusGY9ItD5xc656pPhsNmzzAWO6OvYZ02R6bz4wgudT6dFsKiMHvlQ8L7GD FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3679y1958b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 08:34:43 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10LDWNmZ015728
-        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 08:34:12 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3679y194qs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 08:34:12 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10LDVZuA021426;
-        Thu, 21 Jan 2021 13:33:37 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3668paspja-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 13:33:37 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10LDXSbq34603344
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 13:33:28 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DBDAF11C04A;
-        Thu, 21 Jan 2021 13:33:34 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9690D11C05B;
-        Thu, 21 Jan 2021 13:33:34 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.165.35])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jan 2021 13:33:34 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH] lib/s390x/sclp: Clarify that the CPUEntry
- array could be at a different spot
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>, cohuck@redhat.com
-References: <20210121065703.561444-1-thuth@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <7b7a7dd6-c21e-95dd-b251-277316caafd8@linux.ibm.com>
-Date:   Thu, 21 Jan 2021 14:33:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1730799AbhAUOIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 09:08:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29662 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730020AbhAUOFp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 09:05:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611237858;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sp6rLbwiHZzd3veiVsN2ORKZEPLAFluLK58UL3HjX8M=;
+        b=ACVJJSRzPsoeczcAnW2IEBtY1yTK92AFLELaBTlPh1CtDQaFHWP0qLn5odzh/0fgLbsFUZ
+        H/2jnEWCqtLr8PedN3bJLLcrfKDMCw+ajFUI896k1s/vkp+SAATXb+0ma4/WkXCXZjTvXG
+        ITSCI/EkXFPBrzBBKJLGoX3Z4l1Wv+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-I18_8X0iPTWVDQFiq42UuA-1; Thu, 21 Jan 2021 09:04:16 -0500
+X-MC-Unique: I18_8X0iPTWVDQFiq42UuA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7983E767;
+        Thu, 21 Jan 2021 14:04:05 +0000 (UTC)
+Received: from starship (unknown [10.35.206.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 52F8D1971A;
+        Thu, 21 Jan 2021 14:04:01 +0000 (UTC)
+Message-ID: <82a82abaab276fd75f0cb47f1a32d5a44fa3bec5.camel@redhat.com>
+Subject: Re: [PATCH v2 1/4] KVM: x86: Factor out x86 instruction emulation
+ with decoding
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, luto@amacapital.net
+Date:   Thu, 21 Jan 2021 16:04:00 +0200
+In-Reply-To: <20210121065508.1169585-2-wei.huang2@amd.com>
+References: <20210121065508.1169585-1-wei.huang2@amd.com>
+         <20210121065508.1169585-2-wei.huang2@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <20210121065703.561444-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_06:2021-01-21,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 phishscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 spamscore=0 adultscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101210070
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/21/21 7:57 AM, Thomas Huth wrote:
-> The "struct CPUEntry entries[0]" in the ReadInfo structure is misleading
-> since the entries could be add a completely different spot. Replace it
-> by a proper comment instead.
+On Thu, 2021-01-21 at 01:55 -0500, Wei Huang wrote:
+> Move the instruction decode part out of x86_emulate_instruction() for it
+> to be used in other places. Also kvm_clear_exception_queue() is moved
+> inside the if-statement as it doesn't apply when KVM are coming back from
+> userspace.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Thanks, picked.
-I'll fix up Conny's comment.
-
+> Co-developed-by: Bandan Das <bsd@redhat.com>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
 > ---
->  lib/s390x/sclp.h | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/x86.c | 63 +++++++++++++++++++++++++++++-----------------
+>  arch/x86/kvm/x86.h |  2 ++
+>  2 files changed, 42 insertions(+), 23 deletions(-)
 > 
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 9f81c0f..8523133 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -131,10 +131,15 @@ typedef struct ReadInfo {
->  	uint16_t highest_cpu;
->  	uint8_t  _reserved5[124 - 122];     /* 122-123 */
->  	uint32_t hmfai;
-> -	uint8_t reserved7[134 - 128];
-> +	uint8_t reserved7[134 - 128];       /* 128-133 */
->  	uint8_t byte_134_diag318 : 1;
->  	uint8_t : 7;
-> -	struct CPUEntry entries[0];
-> +	/*
-> +	 * At the end of the ReadInfo, there are also the CPU entries (see
-> +	 * struct CPUEntry). When the Extended-Length SCCB (ELS) feature is
-> +	 * enabled, the start of the CPU entries array begins at an offset
-> +	 * denoted by the offset_cpu field, otherwise it's at offset 128.
-> +	 */
->  } __attribute__((packed)) ReadInfo;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 9a8969a6dd06..580883cee493 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7298,6 +7298,43 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
+>  	return false;
+>  }
 >  
->  typedef struct ReadCpuInfo {
-> 
+> +/*
+> + * Decode and emulate instruction. Return EMULATION_OK if success.
+> + */
+> +int x86_emulate_decoded_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+> +				    void *insn, int insn_len)
+
+Isn't the name of this function wrong? This function decodes the instruction.
+So I would expect something like x86_decode_instruction.
+
+> +{
+> +	int r = EMULATION_OK;
+> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
+> +
+> +	init_emulate_ctxt(vcpu);
+> +
+> +	/*
+> +	 * We will reenter on the same instruction since
+> +	 * we do not set complete_userspace_io.  This does not
+> +	 * handle watchpoints yet, those would be handled in
+> +	 * the emulate_ops.
+> +	 */
+> +	if (!(emulation_type & EMULTYPE_SKIP) &&
+> +	    kvm_vcpu_check_breakpoint(vcpu, &r))
+> +		return r;
+> +
+> +	ctxt->interruptibility = 0;
+> +	ctxt->have_exception = false;
+> +	ctxt->exception.vector = -1;
+> +	ctxt->perm_ok = false;
+> +
+> +	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+> +
+> +	r = x86_decode_insn(ctxt, insn, insn_len);
+> +
+> +	trace_kvm_emulate_insn_start(vcpu);
+> +	++vcpu->stat.insn_emulation;
+> +
+> +	return r;
+> +}
+> +EXPORT_SYMBOL_GPL(x86_emulate_decoded_instruction);
+> +
+>  int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  			    int emulation_type, void *insn, int insn_len)
+>  {
+> @@ -7317,32 +7354,12 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  	 */
+>  	write_fault_to_spt = vcpu->arch.write_fault_to_shadow_pgtable;
+>  	vcpu->arch.write_fault_to_shadow_pgtable = false;
+> -	kvm_clear_exception_queue(vcpu);
+
+I think that this change is OK, but I can't be 100% sure about this.
+
+Best regards,
+	Maxim Levitsky
+
+
+>  
+>  	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
+> -		init_emulate_ctxt(vcpu);
+> -
+> -		/*
+> -		 * We will reenter on the same instruction since
+> -		 * we do not set complete_userspace_io.  This does not
+> -		 * handle watchpoints yet, those would be handled in
+> -		 * the emulate_ops.
+> -		 */
+> -		if (!(emulation_type & EMULTYPE_SKIP) &&
+> -		    kvm_vcpu_check_breakpoint(vcpu, &r))
+> -			return r;
+> -
+> -		ctxt->interruptibility = 0;
+> -		ctxt->have_exception = false;
+> -		ctxt->exception.vector = -1;
+> -		ctxt->perm_ok = false;
+> -
+> -		ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
+> -
+> -		r = x86_decode_insn(ctxt, insn, insn_len);
+> +		kvm_clear_exception_queue(vcpu);
+>  
+> -		trace_kvm_emulate_insn_start(vcpu);
+> -		++vcpu->stat.insn_emulation;
+> +		r = x86_emulate_decoded_instruction(vcpu, emulation_type,
+> +						    insn, insn_len);
+>  		if (r != EMULATION_OK)  {
+>  			if ((emulation_type & EMULTYPE_TRAP_UD) ||
+>  			    (emulation_type & EMULTYPE_TRAP_UD_FORCED)) {
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index c5ee0f5ce0f1..fc42454a4c27 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -273,6 +273,8 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
+>  					  int page_num);
+>  bool kvm_vector_hashing_enabled(void);
+>  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
+> +int x86_emulate_decoded_instruction(struct kvm_vcpu *vcpu, int emulation_type,
+> +				    void *insn, int insn_len);
+>  int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  			    int emulation_type, void *insn, int insn_len);
+>  fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
+
+
+
+
 
