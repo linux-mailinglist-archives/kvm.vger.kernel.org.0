@@ -2,152 +2,264 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49DEA2FDEFE
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 02:47:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65C662FDEF2
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 02:45:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729332AbhAUBoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 20:44:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728665AbhAUA4x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 19:56:53 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2FFC061793
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 16:56:00 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id i63so394378pfg.7
-        for <kvm@vger.kernel.org>; Wed, 20 Jan 2021 16:56:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=q+sTlfHUdpFVsp7Fzw5vyE8GQzeyLMw9GCNbrTB8/LI=;
-        b=j++IUpn6j1YjY0jaRYpasY0t7mWxbprI/uufZaqvRpzXY7SfRQBXrkesPaHK5LfAje
-         9eZTc7RJS4BrgtC8qKKBMdjihNBmzgkJ3GayOGCBhSnczTDdxc0jR+/LAP7T69F9bPV5
-         +JlNEqdzDeKkhE5qtCSH2XFrXQ/9EARog181f10bDQsfuJPHiRYvQ9ed6fzniodqkQOx
-         kQGPu3ybQtoUCafVUY4bKv6O+VZvHGLcIa+zAbUHNJf8gCNYWHaPHcXc0pKAjpPdotG6
-         j4e78F3hql0oeS2t3MqJKF6eVA7xItM57hmKMaAcrkMV5ruvXqhdDltnv3STtpucnLW/
-         idDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=q+sTlfHUdpFVsp7Fzw5vyE8GQzeyLMw9GCNbrTB8/LI=;
-        b=byYuFcBKaxOvM3LIn8isAGxxxJJZSh20VCF4kPx6XmhUytpQffkeAqDva9ZNPnggNx
-         Ay4/LVOu3YIctmMCxivDmRrrGpmu4bJwCB42K2A667EjCFDVj4YaRXDP7JVEuVbhxrKm
-         thxIu3Y6BW43Xt/wN327Om7BdRocOW+DNA/870DpjoYJC8iLSOopn9l4Wg/yBt/tY/e1
-         gQnB2IaquCawCoxvjYPxdnwgtopetoG9dGlJcGcfhGrJYqfVt5NnxMN+jotE3xEhU0i3
-         ayUgzirXB2Nng7hvx+wSH9UmzRLY576+kukEWqiRE08jdTnyPpWsWzrkythwDEWYrQFe
-         c6aQ==
-X-Gm-Message-State: AOAM531rPfpF3ySjI2mEM2mnQB5adGVDdvHAf6aj0LDQHN38X2FjV29j
-        FWfTbSGQ+C5kyg5UN+sWgBMAsQ==
-X-Google-Smtp-Source: ABdhPJxq2YQ42sEdEfikrjIe/ByaxfW6cpKWSBURUQhCc3OJthAG57W63TewMsqRe6hAoWPI0TpIRw==
-X-Received: by 2002:a62:1b95:0:b029:19b:178f:84d7 with SMTP id b143-20020a621b950000b029019b178f84d7mr11918516pfb.70.1611190559429;
-        Wed, 20 Jan 2021 16:55:59 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id z11sm3714996pjn.5.2021.01.20.16.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jan 2021 16:55:58 -0800 (PST)
-Date:   Wed, 20 Jan 2021 16:55:52 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 24/24] kvm: x86/mmu: Allow parallel page faults for the
- TDP MMU
-Message-ID: <YAjRGBu5tAEt9xpv@google.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-25-bgardon@google.com>
+        id S1732739AbhAUBmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 20:42:23 -0500
+Received: from ozlabs.org ([203.11.71.1]:41739 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728478AbhAUBWN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 20:22:13 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DLl366JMHz9sWX; Thu, 21 Jan 2021 12:21:22 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1611192082;
+        bh=vCW/h9Js7xgLo8fl1XONbMPHFoEKd4u4Njdjh+h5cls=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kDA4OzfrVHp1us0H7wfIwv8oPvFUa0yTbwNVv3xwYTrcNtjCBVb9dR/YbBCWMxsux
+         hoO/BhxIo2MrRGscsmdSbjoXB7EPBK+uPY6r6uy9/1oeVPzFNXdiBAjXwDoQa14/6U
+         IuDTgZYW6Xa+TYaYfYGpzrUaTalP1M0GTez3iku4=
+Date:   Thu, 21 Jan 2021 12:06:43 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     brijesh.singh@amd.com, pair@us.ibm.com, pasic@linux.ibm.com,
+        qemu-devel@nongnu.org, cohuck@redhat.com,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        David Hildenbrand <david@redhat.com>, borntraeger@de.ibm.com,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com,
+        jun.nakajima@intel.com, thuth@redhat.com,
+        pragyansri.pathi@intel.com, kvm@vger.kernel.org,
+        Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
+        qemu-ppc@nongnu.org, frankja@linux.ibm.com,
+        Greg Kurz <groug@kaod.org>, mdroth@linux.vnet.ibm.com,
+        berrange@redhat.com, andi.kleen@intel.com
+Subject: Re: [PATCH v7 02/13] confidential guest support: Introduce new
+ confidential guest support class
+Message-ID: <20210121010643.GG5174@yekko.fritz.box>
+References: <20210113235811.1909610-1-david@gibson.dropbear.id.au>
+ <20210113235811.1909610-3-david@gibson.dropbear.id.au>
+ <20210118185124.GG9899@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="JkW1gnuWHDypiMFO"
 Content-Disposition: inline
-In-Reply-To: <20210112181041.356734-25-bgardon@google.com>
+In-Reply-To: <20210118185124.GG9899@work-vm>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021, Ben Gardon wrote:
-> Make the last few changes necessary to enable the TDP MMU to handle page
-> faults in parallel while holding the mmu_lock in read mode.
-> 
-> Reviewed-by: Peter Feiner <pfeiner@google.com>
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 280d7cd6f94b..fa111ceb67d4 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3724,7 +3724,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  		return r;
->  
->  	r = RET_PF_RETRY;
-> -	kvm_mmu_lock(vcpu->kvm);
-> +
-> +	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
 
-Off topic, what do you think about rewriting is_tdp_mmu_root() to be both more
-performant and self-documenting as to when is_tdp_mmu_root() !=
-kvm->arch.tdp_mmu_enabled?  E.g. key off is_guest_mode() and then do a thorough
-audit/check when CONFIG_KVM_MMU_AUDIT=y?
+--JkW1gnuWHDypiMFO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-#ifdef CONFIG_KVM_MMU_AUDIT
-bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
-{
-	struct kvm_mmu_page *sp;
+On Mon, Jan 18, 2021 at 06:51:24PM +0000, Dr. David Alan Gilbert wrote:
+> * David Gibson (david@gibson.dropbear.id.au) wrote:
+> > Several architectures have mechanisms which are designed to protect gue=
+st
+> > memory from interference or eavesdropping by a compromised hypervisor. =
+ AMD
+> > SEV does this with in-chip memory encryption and Intel's MKTME can do
+>                                                            ^^^^^
+> (and below) My understanding is that it's Intel TDX that's the VM
+> equivalent.
 
-	if (!kvm->arch.tdp_mmu_enabled)
-		return false;
-	if (WARN_ON(!VALID_PAGE(hpa)))
-		return false;
+I thought MKTME could already do memory encryption and TDX extended
+that to... more?  I'll adjust the comment to say TDX anyway, since
+that seems to be the newer name.
 
-	sp = to_shadow_page(hpa);
-	if (WARN_ON(!sp))
-		return false;
+>=20
+> Dave
+>=20
+> > similar things.  POWER's Protected Execution Framework (PEF) accomplish=
+es a
+> > similar goal using an ultravisor and new memory protection features,
+> > instead of encryption.
+> >=20
+> > To (partially) unify handling for these, this introduces a new
+> > ConfidentialGuestSupport QOM base class.  "Confidential" is kind of vag=
+ue,
+> > but "confidential computing" seems to be the buzzword about these schem=
+es,
+> > and "secure" or "protected" are often used in connection to unrelated
+> > things (such as hypervisor-from-guest or guest-from-guest security).
+> >=20
+> > The "support" in the name is significant because in at least some of the
+> > cases it requires the guest to take specific actions in order to protect
+> > itself from hypervisor eavesdropping.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  backends/confidential-guest-support.c     | 33 ++++++++++++++++++++
+> >  backends/meson.build                      |  1 +
+> >  include/exec/confidential-guest-support.h | 38 +++++++++++++++++++++++
+> >  include/qemu/typedefs.h                   |  1 +
+> >  target/i386/sev.c                         |  3 +-
+> >  5 files changed, 75 insertions(+), 1 deletion(-)
+> >  create mode 100644 backends/confidential-guest-support.c
+> >  create mode 100644 include/exec/confidential-guest-support.h
+> >=20
+> > diff --git a/backends/confidential-guest-support.c b/backends/confident=
+ial-guest-support.c
+> > new file mode 100644
+> > index 0000000000..9b0ded0db4
+> > --- /dev/null
+> > +++ b/backends/confidential-guest-support.c
+> > @@ -0,0 +1,33 @@
+> > +/*
+> > + * QEMU Confidential Guest support
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "exec/confidential-guest-support.h"
+> > +
+> > +OBJECT_DEFINE_ABSTRACT_TYPE(ConfidentialGuestSupport,
+> > +                            confidential_guest_support,
+> > +                            CONFIDENTIAL_GUEST_SUPPORT,
+> > +                            OBJECT)
+> > +
+> > +static void confidential_guest_support_class_init(ObjectClass *oc, voi=
+d *data)
+> > +{
+> > +}
+> > +
+> > +static void confidential_guest_support_init(Object *obj)
+> > +{
+> > +}
+> > +
+> > +static void confidential_guest_support_finalize(Object *obj)
+> > +{
+> > +}
+> > diff --git a/backends/meson.build b/backends/meson.build
+> > index 484456ece7..d4221831fc 100644
+> > --- a/backends/meson.build
+> > +++ b/backends/meson.build
+> > @@ -6,6 +6,7 @@ softmmu_ss.add([files(
+> >    'rng-builtin.c',
+> >    'rng-egd.c',
+> >    'rng.c',
+> > +  'confidential-guest-support.c',
+> >  ), numa])
+> > =20
+> >  softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files('rng-random.c'))
+> > diff --git a/include/exec/confidential-guest-support.h b/include/exec/c=
+onfidential-guest-support.h
+> > new file mode 100644
+> > index 0000000000..5f131023ba
+> > --- /dev/null
+> > +++ b/include/exec/confidential-guest-support.h
+> > @@ -0,0 +1,38 @@
+> > +/*
+> > + * QEMU Confidential Guest support
+> > + *   This interface describes the common pieces between various
+> > + *   schemes for protecting guest memory or other state against a
+> > + *   compromised hypervisor.  This includes memory encryption (AMD's
+> > + *   SEV and Intel's MKTME) or special protection modes (PEF on POWER,
+> > + *   or PV on s390x).
+> > + *
+> > + * Copyright: David Gibson, Red Hat Inc. 2020
+> > + *
+> > + * Authors:
+> > + *  David Gibson <david@gibson.dropbear.id.au>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > + * later.  See the COPYING file in the top-level directory.
+> > + *
+> > + */
+> > +#ifndef QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> > +#define QEMU_CONFIDENTIAL_GUEST_SUPPORT_H
+> > +
+> > +#ifndef CONFIG_USER_ONLY
+> > +
+> > +#include "qom/object.h"
+> > +
+> > +#define TYPE_CONFIDENTIAL_GUEST_SUPPORT "confidential-guest-support"
+> > +OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUES=
+T_SUPPORT)
+> > +
+> > +struct ConfidentialGuestSupport {
+> > +    Object parent;
+> > +};
+> > +
+> > +typedef struct ConfidentialGuestSupportClass {
+> > +    ObjectClass parent;
+> > +} ConfidentialGuestSupportClass;
+> > +
+> > +#endif /* !CONFIG_USER_ONLY */
+> > +
+> > +#endif /* QEMU_CONFIDENTIAL_GUEST_SUPPORT_H */
+> > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> > index 976b529dfb..33685c79ed 100644
+> > --- a/include/qemu/typedefs.h
+> > +++ b/include/qemu/typedefs.h
+> > @@ -36,6 +36,7 @@ typedef struct BusState BusState;
+> >  typedef struct Chardev Chardev;
+> >  typedef struct CompatProperty CompatProperty;
+> >  typedef struct CoMutex CoMutex;
+> > +typedef struct ConfidentialGuestSupport ConfidentialGuestSupport;
+> >  typedef struct CPUAddressSpace CPUAddressSpace;
+> >  typedef struct CPUState CPUState;
+> >  typedef struct DeviceListener DeviceListener;
+> > diff --git a/target/i386/sev.c b/target/i386/sev.c
+> > index 1546606811..6b49925f51 100644
+> > --- a/target/i386/sev.c
+> > +++ b/target/i386/sev.c
+> > @@ -31,6 +31,7 @@
+> >  #include "qom/object.h"
+> >  #include "exec/address-spaces.h"
+> >  #include "monitor/monitor.h"
+> > +#include "exec/confidential-guest-support.h"
+> > =20
+> >  #define TYPE_SEV_GUEST "sev-guest"
+> >  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+> > @@ -322,7 +323,7 @@ sev_guest_instance_init(Object *obj)
+> > =20
+> >  /* sev guest info */
+> >  static const TypeInfo sev_guest_info =3D {
+> > -    .parent =3D TYPE_OBJECT,
+> > +    .parent =3D TYPE_CONFIDENTIAL_GUEST_SUPPORT,
+> >      .name =3D TYPE_SEV_GUEST,
+> >      .instance_size =3D sizeof(SevGuestState),
+> >      .instance_finalize =3D sev_guest_finalize,
 
-	return sp->tdp_mmu_page && sp->root_count;
-}
-#endif
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-bool is_tdp_mmu(struct kvm_vcpu *vcpu)
-{
-	bool is_tdp_mmu = kvm->arch.tdp_mmu_enabled && !is_guest_mode(vcpu);
+--JkW1gnuWHDypiMFO
+Content-Type: application/pgp-signature; name="signature.asc"
 
-#ifdef CONFIG_KVM_MMU_AUDIT
-	WARN_ON(is_tdp_mmu != is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa));
-#endif
-	return is_tdp_mmu;
-}
+-----BEGIN PGP SIGNATURE-----
 
-> +		kvm_mmu_lock_shared(vcpu->kvm);
-> +	else
-> +		kvm_mmu_lock(vcpu->kvm);
-> +
->  	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
->  		goto out_unlock;
->  	r = make_mmu_pages_available(vcpu);
-> @@ -3739,7 +3744,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
->  				 prefault, is_tdp);
->  
->  out_unlock:
-> -	kvm_mmu_unlock(vcpu->kvm);
-> +	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
-> +		kvm_mmu_unlock_shared(vcpu->kvm);
-> +	else
-> +		kvm_mmu_unlock(vcpu->kvm);
->  	kvm_release_pfn_clean(pfn);
->  	return r;
->  }
-> -- 
-> 2.30.0.284.gd98b1dd5eaa7-goog
-> 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAI06EACgkQbDjKyiDZ
+s5Lz0A//aAMRlbB+KxasmsRWe9lEiszg3aseOraJVo+8dDsLUUM0KGZDOQNBWose
+8RFcHq6dKd6e0pbGoUbMf76mQ6SOoHsPzMweU8O2lH+wW/R/tLnDifd5BbcYtxkS
+7Y8zSXukSAEIy5+G76Cisvv9k4x0AFdyk7u3AvZ76zVrspxPB37JccCfJOleSRWF
+OI0XUMaPxS9933U7hgf9N8ISD3oMCtjzgc/b6JSaJ89OWEvEX4Vr3kOZAMeYCi/Z
+jDU8AfxtQCl991Q0vPLd4numw7SjcHAMaQL8VjRRKmAavgKUt6s5UPXWENiF01Z1
+VpXXLVxLzLjFSWyWBZiXOvUxyhzoAeyjTEtGm4sKT62Iw2MwSIPxTHwMqp8e0RGc
+usGpnb4eIHHnqZUBPMRMqNhD8fxgzlEe7deCslFBiTBFoH6wGm+1hrL08Kbj/FXQ
+zUhLDO5gvY50AQYu8kp0Bj1iFYntGg9X4s8vc56PGuoLNVBdcBnqW66nLNFDeUIv
+cq53835XD13bdo+salP/2X5S4mwubcFzdbpxV0PXj0vxzxSSRsVuZ/LpXl1QvZxV
+ejkqpoPR9EeutD6lNglqdMJ51WDTqT0PVmikvNE+CYyetphdsgDyboQnj3tBuKJs
+O7qgTxU4CyfXJncEo1OxoD9qGmiVqIhPHtsFFid2Q9AdI7cRxvA=
+=YpKR
+-----END PGP SIGNATURE-----
+
+--JkW1gnuWHDypiMFO--
