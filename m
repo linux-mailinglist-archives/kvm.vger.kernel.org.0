@@ -2,119 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 719102FDEBA
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 02:22:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0D4B2FDEFF
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 02:48:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732195AbhAUBWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 20 Jan 2021 20:22:12 -0500
-Received: from mga01.intel.com ([192.55.52.88]:56786 "EHLO mga01.intel.com"
+        id S1728150AbhAUBqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 20 Jan 2021 20:46:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42460 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390044AbhAUBUW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 20 Jan 2021 20:20:22 -0500
-IronPort-SDR: ddEcqarN/qGa0JgqHvDjppDou0lU8CLR94DxoCpicVS/o0+Xz0C2bzLlMuYPbJpjCjZ5Fskjuy
- 16xZaNv1lx2w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9870"; a="197935155"
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="197935155"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 17:18:34 -0800
-IronPort-SDR: hZQ6lgdMS3fywlKq4zLo5t05x5vHmAWtry+qhou/vCLrfAzBSFviIksFHwt3BO3Phzl4mc7TyE
- HWTIxMdEEG5Q==
-X-IronPort-AV: E=Sophos;i="5.79,362,1602572400"; 
-   d="scan'208";a="356262190"
-Received: from gapoveda-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.79.186])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2021 17:18:30 -0800
-Date:   Thu, 21 Jan 2021 14:18:28 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>, <seanjc@google.com>, <luto@kernel.org>,
-        <haitao.huang@intel.com>, <pbonzini@redhat.com>, <bp@alien8.de>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <hpa@zytor.com>
-Subject: Re: [RFC PATCH v2 12/26] x86/sgx: Add helper to update
- SGX_LEPUBKEYHASHn MSRs
-Message-Id: <20210121141828.2fea35156f0e62a6b611ef83@intel.com>
-In-Reply-To: <20210121140638.b9bac5af44fc0f33996a2853@intel.com>
+        id S1732107AbhAUAzx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 20 Jan 2021 19:55:53 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4DD7E23602;
+        Thu, 21 Jan 2021 00:54:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611190462;
+        bh=BWNHxEUGRr6oGRrnxjIDJYAZvB4Oa/aDpfmBM3CeeR0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=reGQ/sYvbemOkQ+JFVbVSa6ZNXtxB6a9mY1dsol6grcpH72fW+7+goKDmE84Cmr5s
+         gN8bDTSb2CMWtJFQwb6rmbCd1gllE7Jz06p9/2ZYl6VtRFa+2UrnK3dm3sy3Ko9nxp
+         VWcQUEWsLujuiEcq3CCg/Jg4fPO3UW04cZGajfIW/Luwpr9694tfFBEMOck3GuGOQ5
+         0JPirO8N7TyuioTQe5G+H8Xuk9xgINyDFK4z86eF21bWOGVidQuVnccFZwmwW6McAO
+         sCxv4EKGTeBtZRJGoAR/8+mGks4+t0sxYhWMYjJfEAP3BdcSog4Ssbz5qWS6RX36SN
+         /tkIzNUeDEnUg==
+Date:   Thu, 21 Jan 2021 02:54:16 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v2 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+Message-ID: <YAjQuCxYH9V7JsN2@kernel.org>
 References: <cover.1610935432.git.kai.huang@intel.com>
-        <5116fdc732e8e14b3378c44e3b461a43f330ed0c.1610935432.git.kai.huang@intel.com>
-        <YAgcIhkmw0lllD3G@kernel.org>
-        <8613b3f1-c4f6-3e5d-4406-9476727666a7@intel.com>
-        <20210121123625.c45deeccc690138f2417bd41@intel.com>
-        <982ddc27-27ec-2d03-54a4-1c0b07e8a3c9@intel.com>
-        <20210121140638.b9bac5af44fc0f33996a2853@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <4597db567351468c360fc810fff5a8232cb96c4c.1610935432.git.kai.huang@intel.com>
+ <YAgZ8lGaafoTXcYF@kernel.org>
+ <YAhrJNvg9KfEr/b7@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YAhrJNvg9KfEr/b7@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Jan 2021 14:06:38 +1300 Kai Huang wrote:
-> On Wed, 20 Jan 2021 15:50:31 -0800 Dave Hansen wrote:
-> > On 1/20/21 3:36 PM, Kai Huang wrote:
-> > > I actually feel the function name already explains what the function does
-> > > clearly, therefore I don't think even comment is needed. To be honest I
-> > > don't know how to rephrase here. Perhaps:
+On Wed, Jan 20, 2021 at 09:40:52AM -0800, Sean Christopherson wrote:
+> On Wed, Jan 20, 2021, Jarkko Sakkinen wrote:
+> > On Mon, Jan 18, 2021 at 04:26:53PM +1300, Kai Huang wrote:
+> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
 > > > 
-> > > /* Update SGX LEPUBKEYHASH MSRs of the platform. */
+> > > Add a misc device /dev/sgx_virt_epc to allow userspace to allocate "raw"
+> > > EPC without an associated enclave.  The intended and only known use case
+> > > for raw EPC allocation is to expose EPC to a KVM guest, hence the
+> > > virt_epc moniker, virt.{c,h} files and X86_SGX_VIRTUALIZATION Kconfig.
 > > 
-> > Whee!  I'm gonna write me a function comment!
-> > 
-> > /*
-> >  * A Launch Enclave (LE) must be signed with a public key
-> >  * that matches this SHA256 hash.  Usually overwrites Intel's
-> >  * default signing key.
-> >  */
-> > 
-> > So, this isn't a one-liner.  *But*, it tells us what "le" means, what
-> > "pubkey" means and implies that there need to be 4x64-bits worth of MSR
-> > writes to get to a SHA256 hash.  
+> > Is /dev/sgx_virt_epc something only usable for KVM, or is there
+> > any thinkable use outside of the KVM context?
 > 
-> In current linux driver implementation, LE is effectively abandoned, because
-> the initialization of any enclave doesn't take a valid TOKEN, making
-> initializing enclave requires hash of enclave's signer equal to the hash in
-> SGX_LEPUBKEYHASH MSRs. 
-> 
-> I written the function name based on SDM's description, to reflect the fact
-> that we are updating the SGX_LEPUBKEYHASH MSRs, but nothing more.
-> 
-> So perhaps below?
-> 
-> /*
->  * Update the SGX_LEPUBKEYHASH MSRs to the values specified by caller.
->  *
->  * EINITTOKEN is not used in enclave initialization, which requires
->  * hash of enclave's signer must match values in SGX_LEPUBKEYHASH MSRs
->  * to make EINIT be successful.
->  */
-> 
+> I can't think of a sane use case without KVM (or an out-of-tree hypervisor).
+> Doing anything useful with EPC requires ENCLS, which means being able to run
+> CPL0 code.
 
-Actually I take it back. This is only valid for bare-metal driver. For KVM
-guest, it should be: 
+OK, thanks for elaboration.
 
-  /*
-   * Update the SGX_LEPUBKEYHASH MSRs according to guest's *virtual*
-   * SGX_LEPUBKEYHASH MSRs values, to make EINIT from guest consistent
-   * with hardware behavior.
-   */
+To bring more context to my thinking to call this to sgx_vepc is that it's
+kind of "standard" in other device names I've such as:
 
-So like I said below, the comment is actually more reasonable for the logic of
-caller of this function.
+- vhost_net
+- vhci
+- vtpm
+- vcs*
+- The list goes on..
 
-Makes sense?
+Since "virtual something" is always abbreviated just with a 'v', wouldn't it
+make sense to just follow along?
 
-> 
-> It also tells what it's usually doing
-> > here: overwriting Intel's blasted hash.
-> 
-> Technically, only initial value is intel's pubkey hash. This function
-> overwrites whatever pubkey hash that used to sign previous enclave.
-> 
-> > 
-> > It sure beats the entirely uncommented for loop that we've got today.
-> 
-> Agreed, although to me it seems the comment is a little bit out of the scope
-> of this function itself, but is more about the logic of the caller.
+/Jarkko
