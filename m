@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CCD32FECA6
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 15:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A8032FECB0
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 15:14:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730799AbhAUOIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 09:08:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29662 "EHLO
+        id S1729636AbhAUOLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 09:11:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46731 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730020AbhAUOFp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 09:05:45 -0500
+        by vger.kernel.org with ESMTP id S1730001AbhAUOKG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 09:10:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611237858;
+        s=mimecast20190719; t=1611238086;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Sp6rLbwiHZzd3veiVsN2ORKZEPLAFluLK58UL3HjX8M=;
-        b=ACVJJSRzPsoeczcAnW2IEBtY1yTK92AFLELaBTlPh1CtDQaFHWP0qLn5odzh/0fgLbsFUZ
-        H/2jnEWCqtLr8PedN3bJLLcrfKDMCw+ajFUI896k1s/vkp+SAATXb+0ma4/WkXCXZjTvXG
-        ITSCI/EkXFPBrzBBKJLGoX3Z4l1Wv+s=
+        bh=uxr536Xve0Lj402CwtprUdiUrHwMqkPLKwcjfcm4Ufw=;
+        b=hw7XbbcRXxV0WrPiOLfF0Bith8nO0A9FNyPdmpWEGsRSIGbwH2Tim2HciAo16aWOrJjGpb
+        OiJIbeQAE9OirXWbgsHE4f7E5XX2kw04s/BhwglQ8uJrxusxKaTQ43NQhCTerOjpLAswKu
+        Z3mhn+9RKGxvj1fewMSKkrmxSjm04DM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-I18_8X0iPTWVDQFiq42UuA-1; Thu, 21 Jan 2021 09:04:16 -0500
-X-MC-Unique: I18_8X0iPTWVDQFiq42UuA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-513-1bwO4Cb_NCCwYqLSX3o5gw-1; Thu, 21 Jan 2021 09:08:02 -0500
+X-MC-Unique: 1bwO4Cb_NCCwYqLSX3o5gw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7983E767;
-        Thu, 21 Jan 2021 14:04:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BB44180A0A9;
+        Thu, 21 Jan 2021 14:07:50 +0000 (UTC)
 Received: from starship (unknown [10.35.206.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 52F8D1971A;
-        Thu, 21 Jan 2021 14:04:01 +0000 (UTC)
-Message-ID: <82a82abaab276fd75f0cb47f1a32d5a44fa3bec5.camel@redhat.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: Factor out x86 instruction emulation
- with decoding
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44DE02CFB1;
+        Thu, 21 Jan 2021 14:07:46 +0000 (UTC)
+Message-ID: <cc55536e913e79d7ca99cbeb853586ca5187c5a9.camel@redhat.com>
+Subject: Re: [PATCH v2 2/4] KVM: SVM: Add emulation support for #GP
+ triggered by SVM instructions
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
@@ -43,141 +43,210 @@ Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
         bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
         jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
         dgilbert@redhat.com, luto@amacapital.net
-Date:   Thu, 21 Jan 2021 16:04:00 +0200
-In-Reply-To: <20210121065508.1169585-2-wei.huang2@amd.com>
+Date:   Thu, 21 Jan 2021 16:07:45 +0200
+In-Reply-To: <20210121065508.1169585-3-wei.huang2@amd.com>
 References: <20210121065508.1169585-1-wei.huang2@amd.com>
-         <20210121065508.1169585-2-wei.huang2@amd.com>
+         <20210121065508.1169585-3-wei.huang2@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, 2021-01-21 at 01:55 -0500, Wei Huang wrote:
-> Move the instruction decode part out of x86_emulate_instruction() for it
-> to be used in other places. Also kvm_clear_exception_queue() is moved
-> inside the if-statement as it doesn't apply when KVM are coming back from
-> userspace.
+> From: Bandan Das <bsd@redhat.com>
 > 
-> Co-developed-by: Bandan Das <bsd@redhat.com>
-> Signed-off-by: Bandan Das <bsd@redhat.com>
+> While running SVM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
+> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
+> before checking VMCB's instruction intercept. If EAX falls into such
+> memory areas, #GP is triggered before VMEXIT. This causes problem under
+> nested virtualization. To solve this problem, KVM needs to trap #GP and
+> check the instructions triggering #GP. For VM execution instructions,
+> KVM emulates these instructions.
+> 
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
 > Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
 > ---
->  arch/x86/kvm/x86.c | 63 +++++++++++++++++++++++++++++-----------------
->  arch/x86/kvm/x86.h |  2 ++
->  2 files changed, 42 insertions(+), 23 deletions(-)
+>  arch/x86/kvm/svm/svm.c | 99 ++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 81 insertions(+), 18 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 9a8969a6dd06..580883cee493 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7298,6 +7298,43 @@ static bool is_vmware_backdoor_opcode(struct x86_emulate_ctxt *ctxt)
->  	return false;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 7ef171790d02..6ed523cab068 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -288,6 +288,9 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>  		if (!(efer & EFER_SVME)) {
+>  			svm_leave_nested(svm);
+>  			svm_set_gif(svm, true);
+> +			/* #GP intercept is still needed in vmware_backdoor */
+> +			if (!enable_vmware_backdoor)
+> +				clr_exception_intercept(svm, GP_VECTOR);
+Again I would prefer a flag for the errata workaround, but this is still
+better.
+
+>  
+>  			/*
+>  			 * Free the nested guest state, unless we are in SMM.
+> @@ -309,6 +312,9 @@ int svm_set_efer(struct kvm_vcpu *vcpu, u64 efer)
+>  
+>  	svm->vmcb->save.efer = efer | EFER_SVME;
+>  	vmcb_mark_dirty(svm->vmcb, VMCB_CR);
+> +	/* Enable #GP interception for SVM instructions */
+> +	set_exception_intercept(svm, GP_VECTOR);
+> +
+>  	return 0;
 >  }
 >  
-> +/*
-> + * Decode and emulate instruction. Return EMULATION_OK if success.
-> + */
-> +int x86_emulate_decoded_instruction(struct kvm_vcpu *vcpu, int emulation_type,
-> +				    void *insn, int insn_len)
-
-Isn't the name of this function wrong? This function decodes the instruction.
-So I would expect something like x86_decode_instruction.
-
+> @@ -1957,24 +1963,6 @@ static int ac_interception(struct vcpu_svm *svm)
+>  	return 1;
+>  }
+>  
+> -static int gp_interception(struct vcpu_svm *svm)
+> -{
+> -	struct kvm_vcpu *vcpu = &svm->vcpu;
+> -	u32 error_code = svm->vmcb->control.exit_info_1;
+> -
+> -	WARN_ON_ONCE(!enable_vmware_backdoor);
+> -
+> -	/*
+> -	 * VMware backdoor emulation on #GP interception only handles IN{S},
+> -	 * OUT{S}, and RDPMC, none of which generate a non-zero error code.
+> -	 */
+> -	if (error_code) {
+> -		kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+> -		return 1;
+> -	}
+> -	return kvm_emulate_instruction(vcpu, EMULTYPE_VMWARE_GP);
+> -}
+> -
+>  static bool is_erratum_383(void)
+>  {
+>  	int err, i;
+> @@ -2173,6 +2161,81 @@ static int vmrun_interception(struct vcpu_svm *svm)
+>  	return nested_svm_vmrun(svm);
+>  }
+>  
+> +enum {
+> +	NOT_SVM_INSTR,
+> +	SVM_INSTR_VMRUN,
+> +	SVM_INSTR_VMLOAD,
+> +	SVM_INSTR_VMSAVE,
+> +};
+> +
+> +/* Return NOT_SVM_INSTR if not SVM instrs, otherwise return decode result */
+> +static int svm_instr_opcode(struct kvm_vcpu *vcpu)
 > +{
-> +	int r = EMULATION_OK;
 > +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
 > +
-> +	init_emulate_ctxt(vcpu);
+> +	if (ctxt->b != 0x1 || ctxt->opcode_len != 2)
+> +		return NOT_SVM_INSTR;
 > +
-> +	/*
-> +	 * We will reenter on the same instruction since
-> +	 * we do not set complete_userspace_io.  This does not
-> +	 * handle watchpoints yet, those would be handled in
-> +	 * the emulate_ops.
-> +	 */
-> +	if (!(emulation_type & EMULTYPE_SKIP) &&
-> +	    kvm_vcpu_check_breakpoint(vcpu, &r))
-> +		return r;
+> +	switch (ctxt->modrm) {
+> +	case 0xd8: /* VMRUN */
+> +		return SVM_INSTR_VMRUN;
+> +	case 0xda: /* VMLOAD */
+> +		return SVM_INSTR_VMLOAD;
+> +	case 0xdb: /* VMSAVE */
+> +		return SVM_INSTR_VMSAVE;
+> +	default:
+> +		break;
+> +	}
 > +
-> +	ctxt->interruptibility = 0;
-> +	ctxt->have_exception = false;
-> +	ctxt->exception.vector = -1;
-> +	ctxt->perm_ok = false;
-> +
-> +	ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-> +
-> +	r = x86_decode_insn(ctxt, insn, insn_len);
-> +
-> +	trace_kvm_emulate_insn_start(vcpu);
-> +	++vcpu->stat.insn_emulation;
-> +
-> +	return r;
+> +	return NOT_SVM_INSTR;
 > +}
-> +EXPORT_SYMBOL_GPL(x86_emulate_decoded_instruction);
 > +
->  int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  			    int emulation_type, void *insn, int insn_len)
->  {
-> @@ -7317,32 +7354,12 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  	 */
->  	write_fault_to_spt = vcpu->arch.write_fault_to_shadow_pgtable;
->  	vcpu->arch.write_fault_to_shadow_pgtable = false;
-> -	kvm_clear_exception_queue(vcpu);
+> +static int emulate_svm_instr(struct kvm_vcpu *vcpu, int opcode)
+> +{
+> +	int (*const svm_instr_handlers[])(struct vcpu_svm *svm) = {
+> +		[SVM_INSTR_VMRUN] = vmrun_interception,
+> +		[SVM_INSTR_VMLOAD] = vmload_interception,
+> +		[SVM_INSTR_VMSAVE] = vmsave_interception,
+> +	};
+> +	struct vcpu_svm *svm = to_svm(vcpu);
+> +
+> +	return svm_instr_handlers[opcode](svm);
+> +}
+> +
+> +/*
+> + * #GP handling code. Note that #GP can be triggered under the following two
+> + * cases:
+> + *   1) SVM VM-related instructions (VMRUN/VMSAVE/VMLOAD) that trigger #GP on
+> + *      some AMD CPUs when EAX of these instructions are in the reserved memory
+> + *      regions (e.g. SMM memory on host).
+> + *   2) VMware backdoor
+> + */
+> +static int gp_interception(struct vcpu_svm *svm)
+> +{
+> +	struct kvm_vcpu *vcpu = &svm->vcpu;
+> +	u32 error_code = svm->vmcb->control.exit_info_1;
+> +	int opcode;
+> +
+> +	/* Both #GP cases have zero error_code */
 
-I think that this change is OK, but I can't be 100% sure about this.
+I would have kept the original description of possible #GP reasons
+for the VMWARE backdoor and that WARN_ON_ONCE that was removed.
+
+
+> +	if (error_code)
+> +		goto reinject;
+> +
+> +	/* Decode the instruction for usage later */
+> +	if (x86_emulate_decoded_instruction(vcpu, 0, NULL, 0) != EMULATION_OK)
+> +		goto reinject;
+> +
+> +	opcode = svm_instr_opcode(vcpu);
+> +	if (opcode)
+
+I prefer opcode != NOT_SVM_INSTR.
+
+> +		return emulate_svm_instr(vcpu, opcode);
+> +	else
+
+'WARN_ON_ONCE(!enable_vmware_backdoor)' I think can be placed here.
+
+
+> +		return kvm_emulate_instruction(vcpu,
+> +				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
+
+I tested the vmware backdoor a bit (using the kvm unit tests) and I found out a tiny pre-existing bug
+there:
+
+We shouldn't emulate the vmware backdoor for a nested guest, but rather let it do it.
+
+The below patch (on top of your patches) works for me and allows the vmware backdoor 
+test to pass when kvm unit tests run in a guest.
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index fe97b0e41824a..4557fdc9c3e1b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2243,7 +2243,7 @@ static int gp_interception(struct vcpu_svm *svm)
+ 	opcode = svm_instr_opcode(vcpu);
+ 	if (opcode)
+ 		return emulate_svm_instr(vcpu, opcode);
+-	else
++	else if (!is_guest_mode(vcpu))
+ 		return kvm_emulate_instruction(vcpu,
+ 				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
+ 
+
 
 Best regards,
 	Maxim Levitsky
 
-
->  
->  	if (!(emulation_type & EMULTYPE_NO_DECODE)) {
-> -		init_emulate_ctxt(vcpu);
-> -
-> -		/*
-> -		 * We will reenter on the same instruction since
-> -		 * we do not set complete_userspace_io.  This does not
-> -		 * handle watchpoints yet, those would be handled in
-> -		 * the emulate_ops.
-> -		 */
-> -		if (!(emulation_type & EMULTYPE_SKIP) &&
-> -		    kvm_vcpu_check_breakpoint(vcpu, &r))
-> -			return r;
-> -
-> -		ctxt->interruptibility = 0;
-> -		ctxt->have_exception = false;
-> -		ctxt->exception.vector = -1;
-> -		ctxt->perm_ok = false;
-> -
-> -		ctxt->ud = emulation_type & EMULTYPE_TRAP_UD;
-> -
-> -		r = x86_decode_insn(ctxt, insn, insn_len);
-> +		kvm_clear_exception_queue(vcpu);
->  
-> -		trace_kvm_emulate_insn_start(vcpu);
-> -		++vcpu->stat.insn_emulation;
-> +		r = x86_emulate_decoded_instruction(vcpu, emulation_type,
-> +						    insn, insn_len);
->  		if (r != EMULATION_OK)  {
->  			if ((emulation_type & EMULTYPE_TRAP_UD) ||
->  			    (emulation_type & EMULTYPE_TRAP_UD_FORCED)) {
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index c5ee0f5ce0f1..fc42454a4c27 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -273,6 +273,8 @@ bool kvm_mtrr_check_gfn_range_consistency(struct kvm_vcpu *vcpu, gfn_t gfn,
->  					  int page_num);
->  bool kvm_vector_hashing_enabled(void);
->  void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_code);
-> +int x86_emulate_decoded_instruction(struct kvm_vcpu *vcpu, int emulation_type,
-> +				    void *insn, int insn_len);
->  int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  			    int emulation_type, void *insn, int insn_len);
->  fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
+> +
+> +reinject:
+> +	kvm_queue_exception_e(vcpu, GP_VECTOR, error_code);
+> +	return 1;
+> +}
+> +
+>  void svm_set_gif(struct vcpu_svm *svm, bool value)
+>  {
+>  	if (value) {
 
 
 
