@@ -2,148 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 353772FEE30
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 16:14:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D1B02FEE4A
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 16:19:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732629AbhAUPMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 10:12:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53110 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732600AbhAUPMC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 10:12:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611241836;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T98PE8PVwoJEyZJ1pOX8lx3mBxjHJ+tI2w+WLOV5UJA=;
-        b=Oyi0upxKLuR88DFlfcPlM8VDXxQzUZmJ9RT1ag5Tc+12zxWF2r4RVVBB5CDT5M6l7K2CaX
-        LIjK/Fc6rOJnBk71yU5nBmdyBPVoXoOq8VV0ycu+2nGAWy7WpyoVSR1aGVpBeXQty2HpzK
-        Mx90NWXjaKoeN7fjSmdBsJpEwOaQxiI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-Fd2dCq-7MvC50yFWLcBBKw-1; Thu, 21 Jan 2021 10:10:34 -0500
-X-MC-Unique: Fd2dCq-7MvC50yFWLcBBKw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20E85100C60D;
-        Thu, 21 Jan 2021 15:10:32 +0000 (UTC)
-Received: from starship (unknown [10.35.206.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB1C55F9C8;
-        Thu, 21 Jan 2021 15:10:22 +0000 (UTC)
-Message-ID: <61a41255d089171e7dc828fac74dd3efe11bd34a.camel@redhat.com>
-Subject: Re: [PATCH v2 4/4] KVM: SVM: Support #GP handling for the case of
- nested on nested
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Wei Huang <wei.huang2@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, seanjc@google.com,
-        joro@8bytes.org, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, x86@kernel.org, jmattson@google.com,
-        wanpengli@tencent.com, bsd@redhat.com, luto@amacapital.net
-Date:   Thu, 21 Jan 2021 17:10:21 +0200
-In-Reply-To: <20210121145622.GH3072@work-vm>
-References: <20210121065508.1169585-1-wei.huang2@amd.com>
-         <20210121065508.1169585-5-wei.huang2@amd.com>
-         <20210121145622.GH3072@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S1732764AbhAUPSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 10:18:10 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21334 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732666AbhAUPPr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 10:15:47 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10LFBfZX172422;
+        Thu, 21 Jan 2021 10:15:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ODDEjf45lSiu/+GG5Htm9GDO/8ZGKF2Y5B09yaOS7KY=;
+ b=d2uRWzOJRIfI+5I6y1qFg+PyF1E3CxBis3XzXNIZhQiFW1nI4jwNXnImk5sPExFhCL3L
+ 1qqwz7jkspmLmErn1ClNrAnoaBqftpxZbW2S4zLiSjbRniRc3038XHZeTj3ivRHRU9d3
+ jRnne1lYBoCtWMxGrC3fi6Wz3QsBm5GkTQ9qkpz263FFDOlT/UHf7ytOItMPXtP6JJ7Q
+ g56XE1lyqN78iG+7FIoMTuaB9c86zf3DhIkaH9kgToEkOtdPpahfPVlivMBDrzGqP/U3
+ UYJ1O0Hil9qkpLZul5O7MNwBB1l2d4VB+yEg4OKld8YlmVwsrYb3YtSEi1vdRxhgyFJT KA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 367c1pr4h3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jan 2021 10:15:03 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10LFBp3Q173000;
+        Thu, 21 Jan 2021 10:15:03 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 367c1pr4g7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jan 2021 10:15:03 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10LFDVOp002522;
+        Thu, 21 Jan 2021 15:15:01 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3668pass62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Jan 2021 15:15:01 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10LFEwdG47710466
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Jan 2021 15:14:58 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A90F311C058;
+        Thu, 21 Jan 2021 15:14:58 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8DBF411C050;
+        Thu, 21 Jan 2021 15:14:57 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Jan 2021 15:14:57 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, thuth@redhat.com, david@redhat.com,
+        borntraeger@de.ibm.com, imbrenda@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, gor@linux.ibm.com, hca@linux.ibm.com,
+        mihajlov@linux.ibm.com
+Subject: [PATCH v2 0/2] s390: uv: small UV fixes
+Date:   Thu, 21 Jan 2021 10:14:33 -0500
+Message-Id: <20210121151436.417240-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-21_08:2021-01-21,2021-01-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 phishscore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=860 suspectscore=0 priorityscore=1501 spamscore=0 bulkscore=0
+ mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101210081
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-01-21 at 14:56 +0000, Dr. David Alan Gilbert wrote:
-> * Wei Huang (wei.huang2@amd.com) wrote:
-> > Under the case of nested on nested (e.g. L0->L1->L2->L3), #GP triggered
-> > by SVM instructions can be hided from L1. Instead the hypervisor can
-> > inject the proper #VMEXIT to inform L1 of what is happening. Thus L1
-> > can avoid invoking the #GP workaround. For this reason we turns on
-> > guest VM's X86_FEATURE_SVME_ADDR_CHK bit for KVM running inside VM to
-> > receive the notification and change behavior.
-> 
-> Doesn't this mean a VM migrated between levels (hmm L2 to L1???) would
-> see different behaviour?
-> (I've never tried such a migration, but I thought in principal it should
-> work).
+Two small fixes:
+    * Handle 3d PGMs where the address space id is not known
+    * Clean up the UV query VCPU number field naming (it's N-1 not N as number in this context means ID)
 
-This is not an issue. The VM will always see the X86_FEATURE_SVME_ADDR_CHK set,
-(regardless if host has it, or if KVM emulates it).
-This is not different from what KVM does for guest's x2apic.
-KVM also always emulates it regardless of the host support.
+v2:
+	* Renamed the struct member from max_guest_cpu to max_guest_cpu_id
+	* Improved a comment text
 
-The hypervisor on the other hand can indeed either see or not that bit set,
-but it is prepared to handle both cases, so it will support migrating VMs
-between hosts that have and don't have that bit.
+Janosch Frank (2):
+  s390: uv: Fix sysfs max number of VCPUs reporting
+  s390: mm: Fix secure storage access exception handling
 
-I hope that I understand this correctly.
+ arch/s390/boot/uv.c        |  2 +-
+ arch/s390/include/asm/uv.h |  4 ++--
+ arch/s390/kernel/uv.c      |  2 +-
+ arch/s390/mm/fault.c       | 14 ++++++++++++++
+ 4 files changed, 18 insertions(+), 4 deletions(-)
 
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> Dave
-> 
-> 
-> > Co-developed-by: Bandan Das <bsd@redhat.com>
-> > Signed-off-by: Bandan Das <bsd@redhat.com>
-> > Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> > ---
-> >  arch/x86/kvm/svm/svm.c | 19 ++++++++++++++++++-
-> >  1 file changed, 18 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index 2a12870ac71a..89512c0e7663 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -2196,6 +2196,11 @@ static int svm_instr_opcode(struct kvm_vcpu *vcpu)
-> >  
-> >  static int emulate_svm_instr(struct kvm_vcpu *vcpu, int opcode)
-> >  {
-> > +	const int guest_mode_exit_codes[] = {
-> > +		[SVM_INSTR_VMRUN] = SVM_EXIT_VMRUN,
-> > +		[SVM_INSTR_VMLOAD] = SVM_EXIT_VMLOAD,
-> > +		[SVM_INSTR_VMSAVE] = SVM_EXIT_VMSAVE,
-> > +	};
-> >  	int (*const svm_instr_handlers[])(struct vcpu_svm *svm) = {
-> >  		[SVM_INSTR_VMRUN] = vmrun_interception,
-> >  		[SVM_INSTR_VMLOAD] = vmload_interception,
-> > @@ -2203,7 +2208,14 @@ static int emulate_svm_instr(struct kvm_vcpu *vcpu, int opcode)
-> >  	};
-> >  	struct vcpu_svm *svm = to_svm(vcpu);
-> >  
-> > -	return svm_instr_handlers[opcode](svm);
-> > +	if (is_guest_mode(vcpu)) {
-> > +		svm->vmcb->control.exit_code = guest_mode_exit_codes[opcode];
-> > +		svm->vmcb->control.exit_info_1 = 0;
-> > +		svm->vmcb->control.exit_info_2 = 0;
-> > +
-> > +		return nested_svm_vmexit(svm);
-> > +	} else
-> > +		return svm_instr_handlers[opcode](svm);
-> >  }
-> >  
-> >  /*
-> > @@ -4034,6 +4046,11 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  	/* Check again if INVPCID interception if required */
-> >  	svm_check_invpcid(svm);
-> >  
-> > +	if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM)) {
-> > +		best = kvm_find_cpuid_entry(vcpu, 0x8000000A, 0);
-> > +		best->edx |= (1 << 28);
-> > +	}
-> > +
-> >  	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
-> >  	if (sev_guest(vcpu->kvm)) {
-> >  		best = kvm_find_cpuid_entry(vcpu, 0x8000001F, 0);
-> > -- 
-> > 2.27.0
-> > 
-
+-- 
+2.25.1
 
