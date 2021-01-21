@@ -2,146 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 109A42FF18B
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 18:15:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FC542FF2DE
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 19:09:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388526AbhAUROk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 12:14:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31524 "EHLO
+        id S2389426AbhAUSHf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 13:07:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50931 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732664AbhAURMt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 12:12:49 -0500
+        by vger.kernel.org with ESMTP id S2389381AbhAUSH0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 13:07:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611249072;
+        s=mimecast20190719; t=1611252359;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=INSBEkpO+6muX4mYFBYj8xxbV1vd/rbXbWz9Y91SPtc=;
-        b=CKETkTM3xuKUEpXuB166eDR6PXgRX25o6GeRuwGoliPSUwhRqKf/1Y/jNWqf5WfEW6BgEe
-        sfrS8LWUXrnMQFMXIBzc99Tw/FRjItFNJKcs2KlAv19EGAutbAKqWHfZMBu1Zaya18RHg3
-        QDnmr1TDZz5QvcAWScdOu5+rcxyAQXA=
+        bh=D0BzXy7E7RCQ8XomVqvpDGY8133NeYJFV0xqq8nPS+0=;
+        b=ZQniOnXe3w/1+6o7JUioJ/rWXLe+6HMFQV9NXhyyPBTu21u0l8fmzYQiVWvNIHLurupDUt
+        AMRXISacvOzrCv0RSTrEIALDXAmRd2OThcQvis2kj6koA1fMYqejhvYJpTgwqpBVdMHeHe
+        8/xYKvhrqGQSY7DN5j93jIFUGOHuhWA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-a55jlSKANseJkSuw1HgZxg-1; Thu, 21 Jan 2021 12:11:08 -0500
-X-MC-Unique: a55jlSKANseJkSuw1HgZxg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-267-mlXu5cnsPNOhiPC0mfKlzQ-1; Thu, 21 Jan 2021 13:05:54 -0500
+X-MC-Unique: mlXu5cnsPNOhiPC0mfKlzQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71FA0802B42;
-        Thu, 21 Jan 2021 17:11:06 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E7796E41C;
-        Thu, 21 Jan 2021 17:10:56 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Jim Mattson <jmattson@google.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CE1D15725;
+        Thu, 21 Jan 2021 18:05:51 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1871360BF3;
+        Thu, 21 Jan 2021 18:05:49 +0000 (UTC)
+Date:   Thu, 21 Jan 2021 11:05:48 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <iommu@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        "Mark Rutland" <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Robin Murphy" <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 2/2] KVM: nVMX: trace nested vm entry
-Date:   Thu, 21 Jan 2021 19:10:43 +0200
-Message-Id: <20210121171043.946761-3-mlevitsk@redhat.com>
-In-Reply-To: <20210121171043.946761-1-mlevitsk@redhat.com>
-References: <20210121171043.946761-1-mlevitsk@redhat.com>
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: Re: [PATCH v2 1/2] vfio/iommu_type1: Populate full dirty when
+ detach non-pinned group
+Message-ID: <20210121110548.33f37048@omen.home.shazbot.org>
+In-Reply-To: <f8de434c-1993-cfe8-c451-2235be1ceb85@huawei.com>
+References: <20210115092643.728-1-zhukeqian1@huawei.com>
+        <20210115092643.728-2-zhukeqian1@huawei.com>
+        <20210115110144.61e3c843@omen.home.shazbot.org>
+        <f8de434c-1993-cfe8-c451-2235be1ceb85@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is very helpful to debug nested VMX issues.
+On Mon, 18 Jan 2021 20:25:09 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/trace.h      | 30 ++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/nested.c |  5 +++++
- arch/x86/kvm/x86.c        |  3 ++-
- 3 files changed, 37 insertions(+), 1 deletion(-)
+> On 2021/1/16 2:01, Alex Williamson wrote:
+> > On Fri, 15 Jan 2021 17:26:42 +0800
+> > Keqian Zhu <zhukeqian1@huawei.com> wrote:
+> >   
+> >> If a group with non-pinned-page dirty scope is detached with dirty
+> >> logging enabled, we should fully populate the dirty bitmaps at the
+> >> time it's removed since we don't know the extent of its previous DMA,
+> >> nor will the group be present to trigger the full bitmap when the user
+> >> retrieves the dirty bitmap.
+> >>
+> >> Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+> >> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> >> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+> >> ---
+> >>  drivers/vfio/vfio_iommu_type1.c | 18 +++++++++++++++++-
+> >>  1 file changed, 17 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 0b4dedaa9128..4e82b9a3440f 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -236,6 +236,19 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+> >>  	}
+> >>  }
+> >>  
+> >> +static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
+> >> +{
+> >> +	struct rb_node *n;
+> >> +	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
+> >> +
+> >> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+> >> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> >> +
+> >> +		if (dma->iommu_mapped)
+> >> +			bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
+> >> +	}
+> >> +}
+> >> +
+> >>  static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
+> >>  {
+> >>  	struct rb_node *n;
+> >> @@ -2415,8 +2428,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+> >>  	 * Removal of a group without dirty tracking may allow the iommu scope
+> >>  	 * to be promoted.
+> >>  	 */
+> >> -	if (update_dirty_scope)
+> >> +	if (update_dirty_scope) {
+> >>  		update_pinned_page_dirty_scope(iommu);
+> >> +		if (iommu->dirty_page_tracking)
+> >> +			vfio_iommu_populate_bitmap_full(iommu);
+> >> +	}
+> >>  	mutex_unlock(&iommu->lock);
+> >>  }
+> >>    
+> > 
+> > This doesn't do the right thing.  This marks the bitmap dirty if:
+> > 
+> >  * The detached group dirty scope was not limited to pinned pages
+> > 
+> >  AND
+> > 
+> >  * Dirty tracking is enabled
+> > 
+> >  AND
+> > 
+> >  * The vfio_dma is *currently* (ie. after the detach) iommu_mapped
+> > 
+> > We need to mark the bitmap dirty based on whether the vfio_dma *was*
+> > iommu_mapped by the group that is now detached.  Thanks,
+> > 
+> > Alex
+> >   
+> Hi Alex,
+> 
+> Yes, I missed this point again :-(. The update_dirty_scope means we
+> detached an iommu backed group, and that means the vfio_dma *was*
+> iommu_mapped by this group, so we can populate full bitmap
+> unconditionally, right?
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 2de30c20bc264..ec75efdac3560 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -554,6 +554,36 @@ TRACE_EVENT(kvm_nested_vmrun,
- 		__entry->npt ? "on" : "off")
- );
- 
-+
-+/*
-+ * Tracepoint for nested VMLAUNCH/VMRESUME
-+ */
-+TRACE_EVENT(kvm_nested_vmenter,
-+	    TP_PROTO(__u64 rip, __u64 vmcs, __u64 nested_rip,
-+		     __u32 entry_intr_info),
-+	    TP_ARGS(rip, vmcs, nested_rip, entry_intr_info),
-+
-+	TP_STRUCT__entry(
-+		__field(	__u64,		rip		)
-+		__field(	__u64,		vmcs		)
-+		__field(	__u64,		nested_rip	)
-+		__field(	__u32,		entry_intr_info	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->rip			= rip;
-+		__entry->vmcs			= vmcs;
-+		__entry->nested_rip		= nested_rip;
-+		__entry->entry_intr_info	= entry_intr_info;
-+	),
-+
-+	TP_printk("rip: 0x%016llx vmcs: 0x%016llx nrip: 0x%016llx "
-+		  "entry_intr_info: 0x%08x",
-+		__entry->rip, __entry->vmcs, __entry->nested_rip,
-+		__entry->entry_intr_info)
-+);
-+
-+
- TRACE_EVENT(kvm_nested_intercepts,
- 	    TP_PROTO(__u16 cr_read, __u16 cr_write, __u32 exceptions,
- 		     __u32 intercept1, __u32 intercept2, __u32 intercept3),
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0fbb46990dfce..20b0954f31bda 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3327,6 +3327,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
- 		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
- 
-+	trace_kvm_nested_vmenter(kvm_rip_read(vcpu),
-+				 vmx->nested.current_vmptr,
-+				 vmcs12->guest_rip,
-+				 vmcs12->vm_entry_intr_info_field);
-+
- 	/*
- 	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
- 	 * nested early checks are disabled.  In the event of a "late" VM-Fail,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a480804ae27a3..757f4f88072af 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11562,11 +11562,12 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_msr);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_cr);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmenter);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmenter_failed);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmrun);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmexit_inject);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_intr_vmexit);
--EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_vmenter_failed);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_invlpga);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_skinit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_nested_intercepts);
--- 
-2.26.2
+To do it unconditionally, the assumption would be that all current
+vfio_dmas are iommu_mapped.  It seems like it's deterministic that a
+non-pinned-page scope group implies all vfio_dmas are iommu_mapped.  I
+can't currently think of an exception.  Thanks,
+
+Alex
 
