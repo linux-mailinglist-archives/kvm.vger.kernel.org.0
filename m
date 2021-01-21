@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0AE72FE630
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:21:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 040D72FE615
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:17:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728533AbhAUJUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 04:20:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30696 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728502AbhAUJOO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:14:14 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10L91lM9055296;
+        id S1726123AbhAUJPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 04:15:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63084 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728508AbhAUJOP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:14:15 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10L92htO156301;
         Thu, 21 Jan 2021 04:13:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id; s=pp1;
- bh=FT6aVVT/EIDQ2qhbr6PLGxD5HMtkOfxnITx0veMWTeo=;
- b=dKJg0o79XyIdT4+MWY8oY6P4uulwkNK4f6xL61lJHAUIZZLORV4MRkCAbklUliLVMNJB
- wrjb4xhl1QFHnpLxcP7ij9P7SR3W/W9yd7XCEqGpsHxIeAtgCdfdXp0RpKalZB6jURNs
- rNstMyfpFM/W2qSrXPHy9Pbv0KUetiCvK/3D34YWfrXyiFeiPUCtKJuLVOEEUereirbP
- ZrhgUu2ptvMdCZKTWRWeqQiEXFDNAhuhXtoBpy2djpCTlXCoblXQVuihwq1zu+cxUnwH
- bOdQsWoJHElVjMRpLXvtGDXsexD8p5gUX1Du6pJvSzEUVJtU/h4LfZ8yxjCaLQOEwUEw Gw== 
+ : date : message-id : in-reply-to : references; s=pp1;
+ bh=1Jr/kjfOuL08Kj6328CD+2X9hiMaH/zoXULnI9YHL7o=;
+ b=kf6gt8jmwa4gDfjJjej09fpqWvXkQA+wPWnv59UJibS9uYKBQGPAR5CVISRSmRza0i3D
+ Ien4RgueoJpmz7VpHjWF6t6QO7nnYVSiPjvXs8C/U4UKY9/PnyOmWQSwL0tHugjNQakC
+ okD/88FuIhLETUFpYoza1C7hleAWHJTUQgs/kECPm5PjYMt/fUckw3Bk45EVsjZSiw/O
+ YKo97mqOwsRV2w6MpWDDwzE1tiWNHSsbS/bn0kucwMo7b/7Ufn5YK5Iei8GZMCtpRmaU
+ if2y7lGMgfwQG4ZnTQk3VosmscT2NFxd3jcmAxhYBz0h69FB53+iPNDrQIgzjqo/qwPf 5A== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3675ychcbb-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3674v13yma-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 21 Jan 2021 04:13:20 -0500
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10L91q4r055554;
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10L92p2j156938;
         Thu, 21 Jan 2021 04:13:20 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3675ychca9-1
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3674v13yjj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:13:19 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10L984bG031640;
-        Thu, 21 Jan 2021 09:13:17 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3668pasfu9-1
+        Thu, 21 Jan 2021 04:13:20 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10L96vGf022150;
+        Thu, 21 Jan 2021 09:13:18 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3668p0sfvg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 09:13:17 +0000
+        Thu, 21 Jan 2021 09:13:18 +0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10L9DEO750528732
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10L9DFTn37290432
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 09:13:14 GMT
+        Thu, 21 Jan 2021 09:13:15 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9FE984203F;
-        Thu, 21 Jan 2021 09:13:14 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 36D4E42049;
+        Thu, 21 Jan 2021 09:13:15 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 299A842047;
+        by IMSVA (Postfix) with ESMTP id B4BA242047;
         Thu, 21 Jan 2021 09:13:14 +0000 (GMT)
 Received: from oc3016276355.ibm.com (unknown [9.145.36.14])
         by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -58,96 +58,84 @@ To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
         david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
         imbrenda@linux.ibm.com, drjones@redhat.com, pbonzini@redhat.com
-Subject: [kvm-unit-tests PATCH v4 0/3] s390x: css: pv: css test adaptation for PV
-Date:   Thu, 21 Jan 2021 10:13:09 +0100
-Message-Id: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v4 1/3] s390x: pv: implement routine to share/unshare memory
+Date:   Thu, 21 Jan 2021 10:13:10 +0100
+Message-Id: <1611220392-22628-2-git-send-email-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
+References: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
  definitions=2021-01-21_03:2021-01-20,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
- adultscore=0 priorityscore=1501 bulkscore=0 impostorscore=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101210045
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ suspectscore=0 phishscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0 adultscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101210045
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+When communicating with the host we need to share part of
+the memory.
 
-To adapt the CSS I/O tests to protected virtualisation we need
-utilities to:
+Let's implement the ultravisor calls for this.
 
-1- allocate the I/O buffers in a private page using (patch 2)
-   It must be in a dedicated page to avoid exporting code or
-   guest private data to the host.
-   We accept a size in byte and flags and allocate page integral
-   memory to handle the Protected Virtualization.
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+Suggested-by: Janosch Frank <frankja@linux.ibm.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+---
+ lib/s390x/asm/uv.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-2- share the I/O buffers with the host (patch 1)
-   This patch uses the page allocator reworked by Claudio.
-
-The 2 first patches are the implementation of the tools,
-patch 3 is the modification of the css.c test for PV.
-
-The checkpatch always asked me to modify MAINTAINERS,
-so I added me as reviewer to be in copy for CSS at least.
-May be we could create a finer grain MAINTAINERS in the
-future.
-
-regards,
-Pierre
-
-Pierre Morel (3):
-  s390x: pv: implement routine to share/unshare memory
-  s390x: define UV compatible I/O allocation
-  s390x: css: pv: css test adaptation for PV
-
- MAINTAINERS           |  1 +
- lib/s390x/asm/uv.h    | 38 +++++++++++++++++++++++
- lib/s390x/css.h       |  3 +-
- lib/s390x/css_lib.c   | 28 +++++------------
- lib/s390x/malloc_io.c | 70 +++++++++++++++++++++++++++++++++++++++++++
- lib/s390x/malloc_io.h | 45 ++++++++++++++++++++++++++++
- s390x/Makefile        |  1 +
- s390x/css.c           | 43 ++++++++++++++++++--------
- 8 files changed, 195 insertions(+), 34 deletions(-)
- create mode 100644 lib/s390x/malloc_io.c
- create mode 100644 lib/s390x/malloc_io.h
-
+diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+index 4c2fc48..8400026 100644
+--- a/lib/s390x/asm/uv.h
++++ b/lib/s390x/asm/uv.h
+@@ -71,4 +71,42 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
+ 	return cc;
+ }
+ 
++static inline int share(unsigned long addr, u16 cmd)
++{
++	struct uv_cb_share uvcb = {
++		.header.cmd = cmd,
++		.header.len = sizeof(uvcb),
++		.paddr = addr
++	};
++	int cc;
++
++	cc = uv_call(0, (u64)&uvcb);
++	if (!cc && uvcb.header.rc == 0x0001)
++		return 0;
++
++	report_info("cc %d response code: %04x", cc, uvcb.header.rc);
++	return -1;
++}
++
++/*
++ * Guest 2 request to the Ultravisor to make a page shared with the
++ * hypervisor for IO.
++ *
++ * @addr: Real or absolute address of the page to be shared
++ */
++static inline int uv_set_shared(unsigned long addr)
++{
++	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
++}
++
++/*
++ * Guest 2 request to the Ultravisor to make a page unshared.
++ *
++ * @addr: Real or absolute address of the page to be unshared
++ */
++static inline int uv_remove_shared(unsigned long addr)
++{
++	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
++}
++
+ #endif
 -- 
 2.17.1
-
-changelog:
-
-from v3:
-- add failure report to the new allocations in css.c
-  (Thomas)
-
-- rework alloc_io_page and free_io_page
-  (Thomas, Claudio)
-
-- add SPDX licenses
-  (Thomas)
-
-- add comment for the functions declaration.
-
-- add me as reviewer for the CSS
-
-from v2:
-
-- use the page allocator reworked by Claudio
-
-from v1:
-
-- add the kvm-unit-test header
-
-- correct checks for errors on Set/Remove Shared Access
-
-- Add report for uv Set/Remove Shared Access
-
-- zero the allocated I/O page before use
-
-- free the page on error.
 
