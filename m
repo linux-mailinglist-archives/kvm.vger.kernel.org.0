@@ -2,379 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 951D52FE682
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:40:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDB232FE670
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:36:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728650AbhAUJaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 04:30:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59594 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728771AbhAUJ27 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:28:59 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10L92Ddj009960;
-        Thu, 21 Jan 2021 04:28:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=AICbmeDtImDcJb74RYcVQZWpZ5ZU8HwuTidsggWY9LM=;
- b=nQZ9N/DsNKCBrPW+Mp+uHNGch80kq5TexAdIT7JyxkzSWcHboXLbFhvnpGcQSAmdDlaq
- TDBnvnK3TmZmbkAVbN2e1vrYW6fCu+mVHUmyJN5dTqBXpkhxM8Ie32XUTDRso/zl3E6N
- jcEqbJl+qm1DaCsW4CkZRkN7hlJg6OLSDlErdTI2D8a0bD7fT5eeYZvIk4SJ11kweQuE
- TsT0e+v95tveG+1pMac+RHGgmYlnPQE3orlngq4Qgc7VwJqfcmau+nxsPKmV7rh92x0S
- DUGnKOf2BJyGdfIOmsrkbll7gSyTyxFDqtlU3uc1MxDEyTfGTABD3X3YoTUkZB3KdZE9 pg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3676g510r3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:28:15 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10L92epC011716;
-        Thu, 21 Jan 2021 04:28:15 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3676g510pw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:28:14 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10L9GccN022465;
-        Thu, 21 Jan 2021 09:28:12 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3668nwsgd5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 09:28:12 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10L9SAKP50332112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 09:28:10 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72AB3A405B;
-        Thu, 21 Jan 2021 09:28:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDFEFA4054;
-        Thu, 21 Jan 2021 09:28:09 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.4.167])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jan 2021 09:28:09 +0000 (GMT)
-Date:   Thu, 21 Jan 2021 10:28:08 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, frankja@linux.ibm.com,
-        David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, cohuck@redhat.com,
-        Laurent Vivier <lvivier@redhat.com>, nadav.amit@gmail.com,
-        krish.sadhukhan@oracle.com
-Subject: Re: [kvm-unit-tests PATCH v2 04/11] lib/asm: Fix definitions of
- memory areas
-Message-ID: <20210121102808.21046c18@ibm-vm>
-In-Reply-To: <CALzav=ehg9zWe2POxKg0FDciyfT7QsWRDDNqZ7_WRqtdWMEtaA@mail.gmail.com>
-References: <20210115123730.381612-1-imbrenda@linux.ibm.com>
-        <20210115123730.381612-5-imbrenda@linux.ibm.com>
-        <CALzav=ehg9zWe2POxKg0FDciyfT7QsWRDDNqZ7_WRqtdWMEtaA@mail.gmail.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728721AbhAUJfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 04:35:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57376 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728672AbhAUJeX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:34:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611221559;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=h15i3oRqbPajIDp3Hf4t0yJtps2/rlNf2y9isim5H+0=;
+        b=TmmimLGlujGuuUspnizl7vs9nw6y4Br7CZt3W1pmAvIY0u4/4YXswVCB+zyg8sJTTdHs8h
+        wfrAgRYMyl5jQp+EGbBa7kw6x13+jMNPlc+TRxxMhg/v6Ky34vWiXZ1YUIffdcKGrAiTC6
+        5i82y+suk7tnCMuZvhutGruEM0pEJHI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-526-J9IydxwYO1SOp692lnU3xw-1; Thu, 21 Jan 2021 04:32:37 -0500
+X-MC-Unique: J9IydxwYO1SOp692lnU3xw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFA9F8030B0;
+        Thu, 21 Jan 2021 09:32:35 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-82.ams2.redhat.com [10.36.112.82])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5022169320;
+        Thu, 21 Jan 2021 09:32:30 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v4 2/3] s390x: define UV compatible I/O
+ allocation
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
+        drjones@redhat.com, pbonzini@redhat.com
+References: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
+ <1611220392-22628-3-git-send-email-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <a50c9d35-4a67-4adc-4647-98df14300ada@redhat.com>
+Date:   Thu, 21 Jan 2021 10:32:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1611220392-22628-3-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_03:2021-01-20,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=999 suspectscore=0 clxscore=1015
- priorityscore=1501 impostorscore=0 bulkscore=0 lowpriorityscore=0
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101210045
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 20 Jan 2021 17:23:33 -0800
-David Matlack <dmatlack@google.com> wrote:
-
-> Hi Claudio,
+On 21/01/2021 10.13, Pierre Morel wrote:
+> To centralize the memory allocation for I/O we define
+> the alloc_io_page/free_io_page functions which share the I/O
+> memory with the host in case the guest runs with
+> protected virtualization.
 > 
-> On Fri, Jan 15, 2021 at 8:07 AM Claudio Imbrenda
-> <imbrenda@linux.ibm.com> wrote:
-> >
-> > Fix the definitions of the memory areas.  
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   MAINTAINERS           |  1 +
+>   lib/s390x/malloc_io.c | 70 +++++++++++++++++++++++++++++++++++++++++++
+>   lib/s390x/malloc_io.h | 45 ++++++++++++++++++++++++++++
+>   s390x/Makefile        |  1 +
+>   4 files changed, 117 insertions(+)
+>   create mode 100644 lib/s390x/malloc_io.c
+>   create mode 100644 lib/s390x/malloc_io.h
 > 
-> The test x86/smat.flat started falling for me at this commit. I'm
-> testing on Linux 5.7.17.
-> 
-> Here are the logs:
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 54124f6..89cb01e 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -82,6 +82,7 @@ M: Thomas Huth <thuth@redhat.com>
+>   M: David Hildenbrand <david@redhat.com>
+>   M: Janosch Frank <frankja@linux.ibm.com>
+>   R: Cornelia Huck <cohuck@redhat.com>
+> +R: Pierre Morel <pmorel@linux.ibm.com>
+>   L: kvm@vger.kernel.org
+>   L: linux-s390@vger.kernel.org
+>   F: s390x/*
+> diff --git a/lib/s390x/malloc_io.c b/lib/s390x/malloc_io.c
+> new file mode 100644
+> index 0000000..bfe8c6a
+> --- /dev/null
+> +++ b/lib/s390x/malloc_io.c
+> @@ -0,0 +1,70 @@
+> +// SPDX-License-Identifier: GPL-2.0
 
-the test does not fail with the default configuration, maybe the
-default configuration should be changed?
+"GPL-2.0" is deprecated according to https://spdx.org/licenses/ ... please 
+use "GPL-2.0-only" instead.
 
-I would have noticed the issue otherwise.
+> +/*
+> + * I/O page allocation
+> + *
+> + * Copyright (c) 2021 IBM Corp
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * Using this interface provide host access to the allocated pages in
+> + * case the guest is a secure guest.
+> + * This is needed for I/O buffers.
+> + *
+> + */
+> +#include <libcflat.h>
+> +#include <asm/page.h>
+> +#include <asm/uv.h>
+> +#include <malloc_io.h>
+> +#include <alloc_page.h>
+> +#include <asm/facility.h>
+> +
+> +static int share_pages(void *p, int count)
+> +{
+> +	int i = 0;
+> +
+> +	for (i = 0; i < count; i++, p += PAGE_SIZE)
+> +		if (uv_set_shared((unsigned long)p))
+> +			return i;
 
+Just a matter of taste, but you could replace the "return i" here also with 
+a "break" since you're returning i below anyway.
 
-after a quick look at the testcase itself, it's quite obvious to me
-that it is broken, since it completely relied on the fact that the page
-allocator would not touch memory above 16M.
+> +	return i;
+> +}
+> +
+> +static void unshare_pages(void *p, int count)
+> +{
+> +	int i;
+> +
+> +	for (i = count; i > 0; i--, p += PAGE_SIZE)
+> +		uv_remove_shared((unsigned long)p);
+> +}
+> +
+> +void *alloc_io_pages(int size, int flags)
 
-this is not the case any more.
+I still think the naming or size parameter is confusing here. If I read 
+something like alloc_io_pages(), I'd expect a "num_pages" parameter. So if 
+you want to keep the "size" in bytes, I'd suggest to rename the function to 
+"alloc_io_mem" instead.
 
-I have fixed the testcase, I'll post a patch
+> +{
+> +	int order = (size >> PAGE_SHIFT);
 
+I think this is wrong. According to the description of alloc_pages_flag, it 
+allocates "1ull << order" pages.
+So you likely want to do this instead here:
 
-> timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot
-> -nodefaults -device pc-testdev -device
-> isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device
-> pci-testdev -machine accel=kvm -kernel x86/smap.flat -smp 1 -cpu host
-> # -initrd /tmp/tmp.s4WKgsHkOh
-> enabling apic
-> paging enabled
-> cr0 = 80010011
-> cr3 = 1007000
-> cr4 = 20
-> testing without INVLPG
-> PASS: write to supervisor page
-> PASS: read from user page with AC=1
-> PASS: read from user page with AC=0
-> FAIL: write to user page with AC=1
-> FAIL: read from user page with AC=0
-> FAIL: write to user stack with AC=1
-> FAIL: write to user stack with AC=0
-> Unhandled exception 6 #UD at ip 0000000001800003
-> error_code=0000      rflags=00010082      cs=00000008
-> rax=000000000000000a rcx=00000000000003fd rdx=00000000000003f8
-> rbx=0000000000000000
-> rbp=0000000000517700 rsi=0000000000416422 rdi=0000000000000000
->  r8=0000000000416422  r9=00000000000003f8 r10=000000000000000d
-> r11=000ffffffffff000
-> r12=0000000000000000 r13=0000000001418700 r14=0000000000000000
-> r15=0000000000000000
-> cr0=0000000080010011 cr2=00000000015176d8 cr3=0000000001007000
-> cr4=0000000000200020
-> cr8=0000000000000000
-> STACK: @1800003 400368
-> b'0x0000000001800003: ?? ??:0'
-> 
-> 
-> 
-> >
-> > Bring the headers in line with the rest of the asm headers, by
-> > having the appropriate #ifdef _ASM$ARCH_ guarding the headers.
-> >
-> > Fixes: d74708246bd9 ("lib/asm: Add definitions of memory areas")
-> >
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> > ---
-> >  lib/asm-generic/memory_areas.h |  9 ++++-----
-> >  lib/arm/asm/memory_areas.h     | 11 +++--------
-> >  lib/arm64/asm/memory_areas.h   | 11 +++--------
-> >  lib/powerpc/asm/memory_areas.h | 11 +++--------
-> >  lib/ppc64/asm/memory_areas.h   | 11 +++--------
-> >  lib/s390x/asm/memory_areas.h   | 13 ++++++-------
-> >  lib/x86/asm/memory_areas.h     | 27 ++++++++++++++++-----------
-> >  lib/alloc_page.h               |  3 +++
-> >  lib/alloc_page.c               |  4 +---
-> >  9 files changed, 42 insertions(+), 58 deletions(-)
-> >
-> > diff --git a/lib/asm-generic/memory_areas.h
-> > b/lib/asm-generic/memory_areas.h index 927baa7..3074afe 100644
-> > --- a/lib/asm-generic/memory_areas.h
-> > +++ b/lib/asm-generic/memory_areas.h
-> > @@ -1,11 +1,10 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef __ASM_GENERIC_MEMORY_AREAS_H__
-> > +#define __ASM_GENERIC_MEMORY_AREAS_H__
-> >
-> >  #define AREA_NORMAL_PFN 0
-> >  #define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
-> >
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#define MAX_AREAS 1
-> >
-> >  #endif
-> > diff --git a/lib/arm/asm/memory_areas.h b/lib/arm/asm/memory_areas.h
-> > index 927baa7..c723310 100644
-> > --- a/lib/arm/asm/memory_areas.h
-> > +++ b/lib/arm/asm/memory_areas.h
-> > @@ -1,11 +1,6 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASMARM_MEMORY_AREAS_H_
-> > +#define _ASMARM_MEMORY_AREAS_H_
-> >
-> > -#define AREA_NORMAL_PFN 0
-> > -#define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > -
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#include <asm-generic/memory_areas.h>
-> >
-> >  #endif
-> > diff --git a/lib/arm64/asm/memory_areas.h
-> > b/lib/arm64/asm/memory_areas.h index 927baa7..18e8ca8 100644
-> > --- a/lib/arm64/asm/memory_areas.h
-> > +++ b/lib/arm64/asm/memory_areas.h
-> > @@ -1,11 +1,6 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASMARM64_MEMORY_AREAS_H_
-> > +#define _ASMARM64_MEMORY_AREAS_H_
-> >
-> > -#define AREA_NORMAL_PFN 0
-> > -#define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > -
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#include <asm-generic/memory_areas.h>
-> >
-> >  #endif
-> > diff --git a/lib/powerpc/asm/memory_areas.h
-> > b/lib/powerpc/asm/memory_areas.h index 927baa7..76d1738 100644
-> > --- a/lib/powerpc/asm/memory_areas.h
-> > +++ b/lib/powerpc/asm/memory_areas.h
-> > @@ -1,11 +1,6 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASMPOWERPC_MEMORY_AREAS_H_
-> > +#define _ASMPOWERPC_MEMORY_AREAS_H_
-> >
-> > -#define AREA_NORMAL_PFN 0
-> > -#define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > -
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#include <asm-generic/memory_areas.h>
-> >
-> >  #endif
-> > diff --git a/lib/ppc64/asm/memory_areas.h
-> > b/lib/ppc64/asm/memory_areas.h index 927baa7..b9fd46b 100644
-> > --- a/lib/ppc64/asm/memory_areas.h
-> > +++ b/lib/ppc64/asm/memory_areas.h
-> > @@ -1,11 +1,6 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASMPPC64_MEMORY_AREAS_H_
-> > +#define _ASMPPC64_MEMORY_AREAS_H_
-> >
-> > -#define AREA_NORMAL_PFN 0
-> > -#define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > -
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#include <asm-generic/memory_areas.h>
-> >
-> >  #endif
-> > diff --git a/lib/s390x/asm/memory_areas.h
-> > b/lib/s390x/asm/memory_areas.h index 4856a27..827bfb3 100644
-> > --- a/lib/s390x/asm/memory_areas.h
-> > +++ b/lib/s390x/asm/memory_areas.h
-> > @@ -1,16 +1,15 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASMS390X_MEMORY_AREAS_H_
-> > +#define _ASMS390X_MEMORY_AREAS_H_
-> >
-> > -#define AREA_NORMAL_PFN BIT(31-12)
-> > +#define AREA_NORMAL_PFN (1 << 19)
-> >  #define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
-> >
-> >  #define AREA_LOW_PFN 0
-> >  #define AREA_LOW_NUMBER 1
-> > -#define AREA_LOW 2
-> > +#define AREA_LOW (1 << AREA_LOW_NUMBER)
-> >
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#define MAX_AREAS 2
-> >
-> >  #define AREA_DMA31 AREA_LOW
-> >
-> > diff --git a/lib/x86/asm/memory_areas.h b/lib/x86/asm/memory_areas.h
-> > index 952f5bd..e84016f 100644
-> > --- a/lib/x86/asm/memory_areas.h
-> > +++ b/lib/x86/asm/memory_areas.h
-> > @@ -1,21 +1,26 @@
-> > -#ifndef MEMORY_AREAS_H
-> > -#define MEMORY_AREAS_H
-> > +#ifndef _ASM_X86_MEMORY_AREAS_H_
-> > +#define _ASM_X86_MEMORY_AREAS_H_
-> >
-> >  #define AREA_NORMAL_PFN BIT(36-12)
-> >  #define AREA_NORMAL_NUMBER 0
-> > -#define AREA_NORMAL 1
-> > +#define AREA_NORMAL (1 << AREA_NORMAL_NUMBER)
-> >
-> > -#define AREA_PAE_HIGH_PFN BIT(32-12)
-> > -#define AREA_PAE_HIGH_NUMBER 1
-> > -#define AREA_PAE_HIGH 2
-> > +#define AREA_HIGH_PFN BIT(32-12)
-> > +#define AREA_HIGH_NUMBER 1
-> > +#define AREA_HIGH (1 << AREA_HIGH_NUMBER)
-> >
-> > -#define AREA_LOW_PFN 0
-> > +#define AREA_LOW_PFN BIT(24-12)
-> >  #define AREA_LOW_NUMBER 2
-> > -#define AREA_LOW 4
-> > +#define AREA_LOW (1 << AREA_LOW_NUMBER)
-> >
-> > -#define AREA_PAE (AREA_PAE | AREA_LOW)
-> > +#define AREA_LOWEST_PFN 0
-> > +#define AREA_LOWEST_NUMBER 3
-> > +#define AREA_LOWEST (1 << AREA_LOWEST_NUMBER)
-> >
-> > -#define AREA_ANY -1
-> > -#define AREA_ANY_NUMBER 0xff
-> > +#define MAX_AREAS 4
-> > +
-> > +#define AREA_DMA24 AREA_LOWEST
-> > +#define AREA_DMA32 (AREA_LOWEST | AREA_LOW)
-> > +#define AREA_PAE36 (AREA_LOWEST | AREA_LOW | AREA_HIGH)
-> >
-> >  #endif
-> > diff --git a/lib/alloc_page.h b/lib/alloc_page.h
-> > index 816ff5d..b6aace5 100644
-> > --- a/lib/alloc_page.h
-> > +++ b/lib/alloc_page.h
-> > @@ -10,6 +10,9 @@
-> >
-> >  #include <asm/memory_areas.h>
-> >
-> > +#define AREA_ANY -1
-> > +#define AREA_ANY_NUMBER 0xff
-> > +
-> >  /* Returns true if the page allocator has been initialized */
-> >  bool page_alloc_initialized(void);
-> >
-> > diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> > index 685ab1e..ed0ff02 100644
-> > --- a/lib/alloc_page.c
-> > +++ b/lib/alloc_page.c
-> > @@ -19,8 +19,6 @@
-> >  #define NLISTS ((BITS_PER_LONG) - (PAGE_SHIFT))
-> >  #define PFN(x) ((uintptr_t)(x) >> PAGE_SHIFT)
-> >
-> > -#define MAX_AREAS      6
-> > -
-> >  #define ORDER_MASK     0x3f
-> >  #define ALLOC_MASK     0x40
-> >  #define SPECIAL_MASK   0x80
-> > @@ -509,7 +507,7 @@ void page_alloc_init_area(u8 n, uintptr_t
-> > base_pfn, uintptr_t top_pfn) return;
-> >         }
-> >  #ifdef AREA_HIGH_PFN
-> > -       __page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN),
-> > base_pfn, &top_pfn);
-> > +       __page_alloc_init_area(AREA_HIGH_NUMBER, AREA_HIGH_PFN,
-> > base_pfn, &top_pfn); #endif
-> >         __page_alloc_init_area(AREA_NORMAL_NUMBER, AREA_NORMAL_PFN,
-> > base_pfn, &top_pfn); #ifdef AREA_LOW_PFN
-> > --
-> > 2.26.2
-> >  
+         int order = get_order(size >> PAGE_SHIFT);
+
+> +	void *p;
+> +	int n;
+> +
+> +	assert(size);
+> +
+> +	p = alloc_pages_flags(order, AREA_DMA31 | flags);
+> +	if (!p || !test_facility(158))
+> +		return p;
+> +
+> +	n = share_pages(p, 1 << order);
+> +	if (n == 1 << order)
+> +		return p;
+> +
+> +	unshare_pages(p, n);
+> +	free_pages(p);
+> +	return NULL;
+> +}
+> +
+> +void free_io_pages(void *p, int size)
+> +{
+> +	int order = size >> PAGE_SHIFT;
+
+dito?
+
+> +	assert(IS_ALIGNED((uintptr_t)p, PAGE_SIZE));
+> +
+> +	if (test_facility(158))
+> +		unshare_pages(p, 1 << order);
+> +	free_pages(p);
+> +}
+> diff --git a/lib/s390x/malloc_io.h b/lib/s390x/malloc_io.h
+> new file mode 100644
+> index 0000000..494dfe9
+> --- /dev/null
+> +++ b/lib/s390x/malloc_io.h
+> @@ -0,0 +1,45 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+
+GPL-2.0-only please.
+
+> +/*
+> + * I/O allocations
+> + *
+> + * Copyright (c) 2021 IBM Corp
+> + *
+> + * Authors:
+> + *  Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + */
+> +#ifndef _S390X_MALLOC_IO_H_
+> +#define _S390X_MALLOC_IO_H_
+> +
+> +/*
+> + * Allocates a page aligned page bound range of contiguous real or
+> + * absolute memory in the DMA31 region large enough to contain size
+> + * bytes.
+> + * If Protected Virtualization facility is present, shares the pages
+> + * with the host.
+> + * If all the pages for the specified size cannot be reserved,
+> + * the function rewinds the partial allocation and a NULL pointer
+> + * is returned.
+> + *
+> + * @size: the minimal size allocated in byte.
+> + * @flags: the flags used for the underlying page allocator.
+> + *
+> + * Errors:
+> + *   The allocation will assert the size parameter, will fail if the
+> + *   underlying page allocator fail or in the case of protected
+> + *   virtualisation if the sharing of the pages fails.
+
+I think "virtualization" (with an z) is more common than "virtualisation".
+
+> + *
+> + * Returns a pointer to the first page in case of success, NULL otherwise.
+> + */
+> +void *alloc_io_pages(int size, int flags);
+> +
+> +/*
+> + * Frees a previously memory space allocated by alloc_io_pages.
+> + * If Protected Virtualization facility is present, unshares the pages
+> + * with the host.
+> + * The address must be aligned on a page boundary otherwise an assertion
+> + * breaks the program.
+> + */
+> +void free_io_pages(void *p, int size);
+> +
+> +#endif /* _S390X_MALLOC_IO_H_ */
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index b079a26..4b6301c 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -63,6 +63,7 @@ cflatobjs += lib/s390x/smp.o
+>   cflatobjs += lib/s390x/vm.o
+>   cflatobjs += lib/s390x/css_dump.o
+>   cflatobjs += lib/s390x/css_lib.o
+> +cflatobjs += lib/s390x/malloc_io.o
+>   
+>   OBJDIRS += lib/s390x
+
+  Thomas
+
 
