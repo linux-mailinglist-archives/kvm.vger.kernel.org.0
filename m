@@ -2,166 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 326E62FF5FC
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 21:36:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68BCD2FF659
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 21:52:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbhAUUfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 15:35:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41538 "EHLO
+        id S1726817AbhAUUv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 15:51:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38804 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725842AbhAUUfI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 15:35:08 -0500
+        by vger.kernel.org with ESMTP id S1726411AbhAUUvy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 15:51:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611261203;
+        s=mimecast20190719; t=1611262228;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pmArDKlP8XROGh7SSuqalHmLY6449V7ifWHPpsdrgcQ=;
-        b=cY18VlBNXe+7vt6aFE81oa+xii7bx7PIZYiiU6EuIWzYOlr9NuOHhOiFrxDhEncVRb9KSM
-        0DKG8wY1s4WKnsh7W5dZB4qvbEg3FsORS9nGrjpQqO6Y+gMsab0cYfdQNC0HegTeuI0yLC
-        BTAM1rlhXs6BzjzQ/jDTRfpDWsbYCcA=
+        bh=MtA/rotM7LM+Bn3G3T+jNqr3eNcqPFdB3Dx8FJkKl8I=;
+        b=ZmUcDO6WWj78/H70tAz4c0iARLcqBySJSZEluYr1NGFmpaBX3Tw01he38+jdg7qZl/TLE/
+        0LFdu1ihO+JzldG9fp4WpKOMY8dxhAIjaOcLA/8v2nbqttNu7kZ54HRjVa7xNWtZUl2A80
+        /ZVLlVcDc80U2SaEw9kZ/8vPBAeBvTE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-r-gj-hvoO0aukqMVw7Mi4A-1; Thu, 21 Jan 2021 15:33:21 -0500
-X-MC-Unique: r-gj-hvoO0aukqMVw7Mi4A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-7-Sl9xzLQdMp-zP7fumoqVkA-1; Thu, 21 Jan 2021 15:50:24 -0500
+X-MC-Unique: Sl9xzLQdMp-zP7fumoqVkA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73931800D55;
-        Thu, 21 Jan 2021 20:33:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B5C6800D55;
+        Thu, 21 Jan 2021 20:50:22 +0000 (UTC)
 Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E50316EF49;
-        Thu, 21 Jan 2021 20:33:18 +0000 (UTC)
-Date:   Thu, 21 Jan 2021 13:33:18 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A2CEF61F55;
+        Thu, 21 Jan 2021 20:50:21 +0000 (UTC)
+Date:   Thu, 21 Jan 2021 13:50:21 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Fred Gao <fred.gao@intel.com>
-Cc:     kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Swee Yee Fonn <swee.yee.fonn@intel.com>
-Subject: Re: [PATCH v2] vfio/pci: Add support for opregion v2.0+
-Message-ID: <20210121133318.3f0824e8@omen.home.shazbot.org>
-In-Reply-To: <20210118123834.5991-1-fred.gao@intel.com>
-References: <20201202171249.17083-1-fred.gao@intel.com>
-        <20210118123834.5991-1-fred.gao@intel.com>
+To:     Niklas Schnelle <schnelle@linux.ibm.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>, cohuck@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] vfio-pci/zdev: Introduce the zPCI I/O vfio region
+Message-ID: <20210121135021.0eb7e873@omen.home.shazbot.org>
+In-Reply-To: <90d99da8-02cf-e051-314b-2ab192f8fd57@linux.ibm.com>
+References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
+        <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+        <90d99da8-02cf-e051-314b-2ab192f8fd57@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Jan 2021 20:38:34 +0800
-Fred Gao <fred.gao@intel.com> wrote:
+On Wed, 20 Jan 2021 14:21:59 +0100
+Niklas Schnelle <schnelle@linux.ibm.com> wrote:
 
-> Before opregion version 2.0 VBT data is stored in opregion mailbox #4,
-> However, When VBT data exceeds 6KB size and cannot be within mailbox #4
-> starting from opregion v2.0+, Extended VBT region, next to opregion, is
-> used to hold the VBT data, so the total size will be opregion size plus
-> extended VBT region size.
+> On 1/19/21 9:02 PM, Matthew Rosato wrote:
+> > Some s390 PCI devices (e.g. ISM) perform I/O operations that have very  
+> .. snip ...
+> > +
+> > +static size_t vfio_pci_zdev_io_rw(struct vfio_pci_device *vdev,
+> > +				  char __user *buf, size_t count,
+> > +				  loff_t *ppos, bool iswrite)
+> > +{  
+> ... snip ...
+> > +	/*
+> > +	 * For now, the largest allowed block I/O is advertised as PAGE_SIZE,
+> > +	 * and cannot exceed a page boundary - so a single page is enough.  The
+> > +	 * guest should have validated this but let's double-check that the
+> > +	 * request will not cross a page boundary.
+> > +	 */
+> > +	if (((region->req.gaddr & ~PAGE_MASK)
+> > +			+ region->req.len - 1) & PAGE_MASK) {
+> > +		return -EIO;
+> > +	}
+> > +
+> > +	mutex_lock(&zdev->lock);  
 > 
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Signed-off-by: Swee Yee Fonn <swee.yee.fonn@intel.com>
-> Signed-off-by: Fred Gao <fred.gao@intel.com>
-> ---
->  drivers/vfio/pci/vfio_pci_igd.c | 59 +++++++++++++++++++++++++++++++++
->  1 file changed, 59 insertions(+)
+> I plan on using the zdev->lock for preventing concurrent zPCI devices
+> removal/configuration state changes between zPCI availability/error
+> events and enable_slot()/disable_slot() and /sys/bus/pci/devices/<dev>/recover.
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
-> index 53d97f459252..fc470278a492 100644
-> --- a/drivers/vfio/pci/vfio_pci_igd.c
-> +++ b/drivers/vfio/pci/vfio_pci_igd.c
-> @@ -21,6 +21,10 @@
->  #define OPREGION_SIZE		(8 * 1024)
->  #define OPREGION_PCI_ADDR	0xfc
->  
-> +#define OPREGION_RVDA		0x3ba
-> +#define OPREGION_RVDS		0x3c2
-> +#define OPREGION_VERSION	0x16
-> +
->  static size_t vfio_pci_igd_rw(struct vfio_pci_device *vdev, char __user *buf,
->  			      size_t count, loff_t *ppos, bool iswrite)
->  {
-> @@ -58,6 +62,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
->  	u32 addr, size;
->  	void *base;
->  	int ret;
-> +	u16 version;
->  
->  	ret = pci_read_config_dword(vdev->pdev, OPREGION_PCI_ADDR, &addr);
->  	if (ret)
-> @@ -83,6 +88,60 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_device *vdev)
->  
->  	size *= 1024; /* In KB */
->  
-> +	/*
-> +	 * Support opregion v2.0+
-> +	 * When VBT data exceeds 6KB size and cannot be within mailbox #4
-> +	 * Extended VBT region, next to opregion, is used to hold the VBT data.
-> +	 * RVDA (Relative Address of VBT Data from Opregion Base) and RVDS
-> +	 * (VBT Data Size) from opregion structure member are used to hold the
-> +	 * address from region base and size of VBT data while RVDA/RVDS
-> +	 * are not defined before opregion 2.0.
-> +	 *
-> +	 * opregion 2.0: rvda is the physical VBT address.
-> +	 *
-> +	 * opregion 2.1+: rvda is unsigned, relative offset from
-> +	 * opregion base, and should never point within opregion.
-> +	 */
-> +	version = le16_to_cpu(*(__le16 *)(base + OPREGION_VERSION));
-> +	if (version >= 0x0200) {
-> +		u64 rvda;
-> +		u32 rvds;
-> +
-> +		rvda = le64_to_cpu(*(__le64 *)(base + OPREGION_RVDA));
-> +		rvds = le32_to_cpu(*(__le32 *)(base + OPREGION_RVDS));
-> +		if (rvda && rvds) {
-> +			u32 offset;
-> +
-> +			if (version == 0x0200)
-> +				offset = rvda - (u64)addr;
-> +			else
-> +				offset = rvda;
-> +
-> +			if (offset != size) {
-> +				pci_err(vdev->pdev,
-> +				"Extended VBT does not follow opregion !\n"
-> +				"opregion version 0x%x:offset 0x%x\n", version, offset);
-> +				return -EINVAL;
-> +			}
-> +
-> +			/*
-> +			 * the only difference between opregion 2.0 and 2.1 is
-> +			 * rvda addressing mode. since rvda is physical host
-> +			 * VBT address and cannot be directly used in guest,
-> +			 * faked into opregion 2.1's relative offset.
-> +			 */
-> +			if (version == 0x0200) {
-> +				*(__le16 *)(base + OPREGION_VERSION) =
-> +					cpu_to_le16(0x0201);
-> +				(*(__le64 *)(base + OPREGION_RVDA)) =
-> +					cpu_to_le64((rvda - (u64)addr));
-> +			}
+> With that use in place using it here causes a deadlock when doing 
+> "echo 0 > /sys/bus/pci/slots/<fid>/power from the host for an ISM device
+> attached to a guest.
+> 
+> This is because the (soft) hot unplug will cause vfio to notify QEMU, which
+> sends a deconfiguration request to the guest, which then tries to
+> gracefully shutdown the device. During that shutdown the device will
+> be accessed, running into this code path which then blocks on
+> the lock held by the disable_slot() code which waits on vfio
+> releasing the device.
+> 
+> Alex may correct me if I'm wrong but I think instead vfio should
+> be holding the PCI device lock via pci_device_lock(pdev).
 
-There's a much better description of the fields and logic here, thanks
-for that.  I also see we've closed the gap to require the extended
-region to immediately follow the opregion table.  The code
-immediately above still makes me nervous as even if this is the only
-difference between the specs, code might make some differentiation
-based on the spec version, which we're changing in host memory for all
-subsequent drivers until the host is rebooted.  Could we use a pci_dbg()
-in this branch to flag that event in dmesg for debugging?  Thanks,
+There be dragons in device_lock, which is why we have all the crude
+try-lock semantics in reset paths.  Don't use it trivially.  Device
+lock is not necessary here otherwise, the device is bound to a driver
+and has an open userspace file descriptor through which the user is
+performing this access.  The device can't be removed without unbinding
+the driver, which can't happen while the user still has open files to
+it.  Thanks,
 
 Alex
-
-> +
-> +			/* region size for opregion v2.0+: opregion and VBT size */
-> +			size = offset + rvds;
-> +		}
-> +	}
-> +
->  	if (size != OPREGION_SIZE) {
->  		memunmap(base);
->  		base = memremap(addr, size, MEMREMAP_WB);
 
