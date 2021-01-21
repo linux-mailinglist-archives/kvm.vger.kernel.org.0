@@ -2,151 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0F442FE6C8
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:53:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A48E02FE6DF
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:57:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728592AbhAUJxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 04:53:07 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60446 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728483AbhAUJwt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:52:49 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10L9Vahm031273;
-        Thu, 21 Jan 2021 04:52:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=USeiuk13pu2ozLN7lSAIwh3zzXATv/EH8tJPO0i7SwA=;
- b=lUTfacRckCrzDLoTsRTyHk7EjL3BhHAxfvNYHg/HrG4T1ruflDeXSRl6fQ4N2Kk4Pvz0
- EH8wN412Irs1W9zuUykJ6TnVhvBGSrlA5YB0FNBW7CiRbPzFhXuOQnOBvmq0gzdstNS/
- BHBJcPbT382Q0rZ90dhCG3+hg8GGBfGjhS3mnPW+tJ9BxQNcX+zimih1w/amp9IFvbse
- wjseaOVNapRcQ9wWoYFz8LAq2beK9xy1Jf/yhKuYPhRrlp6wDSpznerIoWsWrXGu5OMe
- MMwPFpJlh04TQO/nBvvoC3+kw3xvHAjaOr/o9Zw0HcouUybqC8jc2U4yiNnzffo7FohW BQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3676h322er-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:52:05 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10L9Vh4o032123;
-        Thu, 21 Jan 2021 04:52:05 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3676h322e7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:52:05 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10L9bTVA006339;
-        Thu, 21 Jan 2021 09:52:03 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3668nwsgxs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 09:52:03 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10L9psC420644178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 09:51:54 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B95E9A4053;
-        Thu, 21 Jan 2021 09:52:00 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5461CA4040;
-        Thu, 21 Jan 2021 09:52:00 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.36.14])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jan 2021 09:52:00 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 1/3] s390x: pv: implement routine to
- share/unshare memory
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, drjones@redhat.com,
-        pbonzini@redhat.com
-References: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
- <1611220392-22628-2-git-send-email-pmorel@linux.ibm.com>
- <a4ad5c0f-2e77-4ea9-9efd-f4d000f17b72@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <27a07988-ab93-a482-3d60-cf76bf460b20@linux.ibm.com>
-Date:   Thu, 21 Jan 2021 10:52:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1728705AbhAUJ5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 04:57:07 -0500
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:52573 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728456AbhAUJ4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jan 2021 04:56:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1611222964; x=1642758964;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:mime-version:content-transfer-encoding:subject;
+  bh=tikY/ymWGHG7OvzSMWQNvUsnxukhLkfx1pylHsOnXHM=;
+  b=oH7NzyUYqX8s/yOzRqT08+gUGL+RdiMqEjXO+0aAZ6RwzaT2LpcLxv1T
+   TPtGII3IUIpy0fapAjbu0dD2q1UYal6lZx3KhFOOobAB02tSUV2LU+im9
+   YcJ/fhXOxv4mDAsWHW8WVWfxoLUdjZXwdBXu1uj1xELdYOPNpD5+fIMyW
+   o=;
+X-IronPort-AV: E=Sophos;i="5.79,363,1602547200"; 
+   d="scan'208";a="112521061"
+Subject: Re: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id driver
+Thread-Topic: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id driver
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-715bee71.us-east-1.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 21 Jan 2021 09:55:14 +0000
+Received: from EX13MTAUEE001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1a-715bee71.us-east-1.amazon.com (Postfix) with ESMTPS id CA814A25BB;
+        Thu, 21 Jan 2021 09:55:03 +0000 (UTC)
+Received: from EX13D08UEE004.ant.amazon.com (10.43.62.182) by
+ EX13MTAUEE001.ant.amazon.com (10.43.62.226) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 21 Jan 2021 09:54:28 +0000
+Received: from EX13D08EUB004.ant.amazon.com (10.43.166.158) by
+ EX13D08UEE004.ant.amazon.com (10.43.62.182) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 21 Jan 2021 09:54:27 +0000
+Received: from EX13D08EUB004.ant.amazon.com ([10.43.166.158]) by
+ EX13D08EUB004.ant.amazon.com ([10.43.166.158]) with mapi id 15.00.1497.010;
+ Thu, 21 Jan 2021 09:54:27 +0000
+From:   "Catangiu, Adrian Costin" <acatan@amazon.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "ebiederm@xmission.com" <ebiederm@xmission.com>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "Jason@zx2c4.com" <Jason@zx2c4.com>,
+        "jannh@google.com" <jannh@google.com>, "w@1wt.eu" <w@1wt.eu>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "mhocko@kernel.org" <mhocko@kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "areber@redhat.com" <areber@redhat.com>,
+        "ovzxemul@gmail.com" <ovzxemul@gmail.com>,
+        "avagin@gmail.com" <avagin@gmail.com>,
+        "ptikhomirov@virtuozzo.com" <ptikhomirov@virtuozzo.com>,
+        "gil@azul.com" <gil@azul.com>,
+        "asmehra@redhat.com" <asmehra@redhat.com>,
+        "dgunigun@redhat.com" <dgunigun@redhat.com>,
+        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>,
+        "oridgar@gmail.com" <oridgar@gmail.com>,
+        "ghammer@redhat.com" <ghammer@redhat.com>
+Thread-Index: AQHW6NzJ6Ner/CpAZ0GLGgCheKaWxKoj9j+AgA4QXAA=
+Date:   Thu, 21 Jan 2021 09:54:27 +0000
+Message-ID: <0EFE3365-1698-4BFB-B2F2-BEF1A2634E45@amazon.com>
+References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
+ <1610453760-13812-2-git-send-email-acatan@amazon.com>
+ <X/2fP9LNWXvp7up9@kroah.com>
+In-Reply-To: <X/2fP9LNWXvp7up9@kroah.com>
+Accept-Language: en-US
+Content-Language: en-GB
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.164.195]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AC44F688DB044F439484826026445BBE@amazon.com>
 MIME-Version: 1.0
-In-Reply-To: <a4ad5c0f-2e77-4ea9-9efd-f4d000f17b72@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_04:2021-01-20,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- impostorscore=0 lowpriorityscore=0 mlxlogscore=999 malwarescore=0
- suspectscore=0 phishscore=0 spamscore=0 mlxscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101210049
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+T24gMTIvMDEvMjAyMSwgMTU6MDcsICJHcmVnIEtIIiA8Z3JlZ2toQGxpbnV4Zm91bmRhdGlvbi5v
+cmc+IHdyb3RlOg0KDQogICAgT24gVHVlLCBKYW4gMTIsIDIwMjEgYXQgMDI6MTU6NTlQTSArMDIw
+MCwgQWRyaWFuIENhdGFuZ2l1IHdyb3RlOg0KICAgID4gKyAgUGFydGlhbCByZWFkcyBhcmUgbm90
+IGFsbG93ZWQgLSByZWFkIGJ1ZmZlciBuZWVkcyB0byBiZSBhdCBsZWFzdA0KICAgID4gKyAgYGBz
+aXplb2YodW5zaWduZWQpYGAgaW4gc2l6ZS4NCg0KICAgICJzaXplb2YodW5zaWduZWQpIj8gIEhv
+dyBhYm91dCBiZWluZyBzcGVjaWZpYyBhbmQgbWFraW5nIHRoaXMgYSByZWFsICJYDQogICAgYml0
+cyBiaWciIHZhbHVlIHBsZWFzZS4NCg0KICAgICJ1bnNpZ25lZCIgZG9lcyBub3Qgd29yayB3ZWxs
+IGFjcm9zcyB1c2VyL2tlcm5lbCBib3VuZHJpZXMuICBPaywgdGhhdCdzDQogICAgb24gdW5kZXJz
+dGF0ZW1lbnQsIHRoZSBjb3JyZWN0IHRoaW5nIGlzICJkb2VzIG5vdCB3b3JrIGF0IGFsbCIuDQoN
+CiAgICBQbGVhc2UgYmUgc3BlY2lmaWMgaW4geW91ciBhcGlzLg0KDQogICAgVGhpcyBpcyBsaXN0
+ZWQgZWxzZXdoZXJlIGFsc28uDQoNClJpZ2h0LCB3aWxsIGRvIQ0KDQogICAgPiArICAtIFNZU0dF
+TklEX0dFVF9PVVREQVRFRF9XQVRDSEVSUzogaW1tZWRpYXRlbHkgcmV0dXJucyB0aGUgbnVtYmVy
+IG9mDQogICAgPiArICAgICpvdXRkYXRlZCogd2F0Y2hlcnMgLSBudW1iZXIgb2YgZmlsZSBkZXNj
+cmlwdG9ycyB0aGF0IHdlcmUgb3Blbg0KICAgID4gKyAgICBkdXJpbmcgYSBzeXN0ZW0gZ2VuZXJh
+dGlvbiBjaGFuZ2UsIGFuZCB3aGljaCBoYXZlIG5vdCB5ZXQgY29uZmlybWVkDQogICAgPiArICAg
+IHRoZSBuZXcgZ2VuZXJhdGlvbiBjb3VudGVyLg0KDQogICAgQnV0IHRoaXMgbnVtYmVyIGNhbiBp
+bnN0YW50bHkgY2hhbmdlIGFmdGVyIGl0IGlzIHJlYWQsIHdoYXQgZ29vZCBpcyBpdD8NCiAgICBJ
+dCBzaG91bGQgbmV2ZXIgYmUgcmVsaWVkIG9uLCBzbyB3aHkgaXMgdGhpcyBuZWVkZWQgYXQgYWxs
+Pw0KDQogICAgV2hhdCBjYW4gdXNlcnNwYWNlIGRvIHdpdGggdGhpcyBpbmZvcm1hdGlvbj8NCg0K
+VGhhdCBpcyB0cnVlLCBhIHVzZXJzcGFjZSBwcm9jZXNzIGVpdGhlciBoYXMgdG8gd2FpdCBmb3Ig
+YWxsIHRvIGFkanVzdCB0byB0aGUgbmV3IGdlbmVyYXRpb24NCm9yIG5vdCBjYXJlIGFib3V0IG90
+aGVyIHByb2Nlc3Nlcy4gSW50ZXJtZWRpYXRlIHByb2JpbmcgZG9lc24ndCBicmluZyByZWFsIHZh
+bHVlLiBXaWxsIHJlbW92ZS4NCg0KICAgIHRoYW5rcywNCg0KICAgIGdyZWcgay1oDQoNClRoYW5r
+cyBmb3IgdGhlIGZlZWRiYWNrIQ0KQWRyaWFuLg0KDQoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2Vu
+dGVyIChSb21hbmlhKSBTLlIuTC4gcmVnaXN0ZXJlZCBvZmZpY2U6IDI3QSBTZi4gTGF6YXIgU3Ry
+ZWV0LCBVQkM1LCBmbG9vciAyLCBJYXNpLCBJYXNpIENvdW50eSwgNzAwMDQ1LCBSb21hbmlhLiBS
+ZWdpc3RlcmVkIGluIFJvbWFuaWEuIFJlZ2lzdHJhdGlvbiBudW1iZXIgSjIyLzI2MjEvMjAwNS4K
 
-
-On 1/21/21 10:20 AM, Janosch Frank wrote:
-> On 1/21/21 10:13 AM, Pierre Morel wrote:
->> When communicating with the host we need to share part of
->> the memory.
->>
->> Let's implement the ultravisor calls for this.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
->> Acked-by: Cornelia Huck <cohuck@redhat.com>
->> Acked-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   lib/s390x/asm/uv.h | 38 ++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 38 insertions(+)
->>
->> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
->> index 4c2fc48..8400026 100644
->> --- a/lib/s390x/asm/uv.h
->> +++ b/lib/s390x/asm/uv.h
->> @@ -71,4 +71,42 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
->>   	return cc;
->>   }
->>   
->> +static inline int share(unsigned long addr, u16 cmd)
->> +{
->> +	struct uv_cb_share uvcb = {
->> +		.header.cmd = cmd,
->> +		.header.len = sizeof(uvcb),
->> +		.paddr = addr
->> +	};
->> +	int cc;
->> +
->> +	cc = uv_call(0, (u64)&uvcb);
->> +	if (!cc && uvcb.header.rc == 0x0001)
-> 
-> s/0x0001/UVC_RC_EXECUTED/
-
-OK
-
-> 
-> 
->> +		return 0;
->> +
->> +	report_info("cc %d response code: %04x", cc, uvcb.header.rc);
-> 
-> Will the print have the string UV in it or will I need to guess that a
-> UV call failed?
-
-I will change for a more explicit
-
-> 
-> I'm wondering if an assert would make more sense, if callers are
-> interested in the uv rc they will need to write an own share function
-> anyway.
-
-No need (reported OOB by Janosch)
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
