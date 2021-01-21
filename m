@@ -2,144 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF3482FEAC9
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 13:56:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83C462FEAA1
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 13:50:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730017AbhAUMzy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 07:55:54 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26298 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729576AbhAUKfm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 05:35:42 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10LAV31q089813;
-        Thu, 21 Jan 2021 05:34:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=TZ7aDjxUa13IAdCxCu1hlw5UfGIcj/AfDRbgbyilYM8=;
- b=PPR2MO5r6H5ImQpoFITPMlC83ox/raYI16KO5XUspLypGm9qlOCWbhWOAez1+nVLwpTZ
- KLVmWeD9wXG+BkWIPgAcnWHy1j5UZ3XOBmahUE9UiLKOZfZQq/vXv6gtww35veTBLZrY
- m8InR1zWGWoI+M3fnMzNQ82HaYIdJWzXZnPUBPdhmm2FcCCdg5jB4ftFtoQxLfs9BGi6
- AzTEuR4HIQIwPWcVKBfjOVoJX300zmmFPi00+eVOhzlNCTFDj2v3DPzZ8TbXsuefDbVQ
- RMzZH07bswy0amIe4tm1RvxPSlPtEkMs2dRvU+j6190G/agTrTJspLs9yiBJwkfxY5pV xA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3677uhr976-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 05:34:47 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10LAVn1F092961;
-        Thu, 21 Jan 2021 05:34:47 -0500
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3677uhr953-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 05:34:46 -0500
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10LAXgwY027447;
-        Thu, 21 Jan 2021 10:34:45 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3668pj8tdg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 10:34:44 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10LAYfpK30802236
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 10:34:41 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BFC2B11C064;
-        Thu, 21 Jan 2021 10:34:41 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E471811C054;
-        Thu, 21 Jan 2021 10:34:40 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.12.187])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 21 Jan 2021 10:34:40 +0000 (GMT)
-Date:   Thu, 21 Jan 2021 11:34:38 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, Pierre Morel <pmorel@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        mjrosato@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com, frankja@linux.ibm.com,
-        david@redhat.com
-Subject: Re: [PATCH 1/1] s390/vfio-ap: No need to disable IRQ after queue
- reset
-Message-ID: <20210121113438.2e40c5f9.pasic@linux.ibm.com>
-In-Reply-To: <20210121092044.628b77c7.cohuck@redhat.com>
-References: <20210121072008.76523-1-pasic@linux.ibm.com>
-        <20210121092044.628b77c7.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1730412AbhAUMtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 07:49:46 -0500
+Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:50040 "EHLO
+        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731075AbhAUMtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jan 2021 07:49:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1611233359; x=1642769359;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:mime-version:content-transfer-encoding:subject;
+  bh=YGqUQ1UUFyxHwrMSqEqyzgCapYq/vp03G99HlwzxUsM=;
+  b=HjQ+yxF+qyFGznz1qXfog473E7pF5ZthjHgD90JGnT05f7Hv4aGvSx9y
+   aCbxpz5ooc8/Usd/WWZUJplYBesxcHV+K5sQ6Ap3ORGqGjwpWw2fAyPuY
+   w6UjCFazW4C4Nh+16xB5nwtejJ1Y10CsEfjXiugfsseTL3O2bLt6cVlJ3
+   Q=;
+X-IronPort-AV: E=Sophos;i="5.79,363,1602547200"; 
+   d="scan'208";a="912380983"
+Subject: Re: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id driver
+Thread-Topic: [PATCH v4 1/2] drivers/misc: sysgenid: add system generation id driver
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-2c-cc689b93.us-west-2.amazon.com) ([10.47.23.38])
+  by smtp-border-fw-out-9103.sea19.amazon.com with ESMTP; 21 Jan 2021 12:48:27 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2c-cc689b93.us-west-2.amazon.com (Postfix) with ESMTPS id BB3C5120DDC;
+        Thu, 21 Jan 2021 12:48:25 +0000 (UTC)
+Received: from EX13D01UWA004.ant.amazon.com (10.43.160.99) by
+ EX13MTAUWA001.ant.amazon.com (10.43.160.118) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 21 Jan 2021 12:48:25 +0000
+Received: from EX13D08EUB004.ant.amazon.com (10.43.166.158) by
+ EX13d01UWA004.ant.amazon.com (10.43.160.99) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 21 Jan 2021 12:48:24 +0000
+Received: from EX13D08EUB004.ant.amazon.com ([10.43.166.158]) by
+ EX13D08EUB004.ant.amazon.com ([10.43.166.158]) with mapi id 15.00.1497.010;
+ Thu, 21 Jan 2021 12:48:23 +0000
+From:   "Catangiu, Adrian Costin" <acatan@amazon.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "Graf (AWS), Alexander" <graf@amazon.de>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "ebiederm@xmission.com" <ebiederm@xmission.com>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "Jason@zx2c4.com" <Jason@zx2c4.com>,
+        "jannh@google.com" <jannh@google.com>, "w@1wt.eu" <w@1wt.eu>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "mhocko@kernel.org" <mhocko@kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "areber@redhat.com" <areber@redhat.com>,
+        "ovzxemul@gmail.com" <ovzxemul@gmail.com>,
+        "avagin@gmail.com" <avagin@gmail.com>,
+        "ptikhomirov@virtuozzo.com" <ptikhomirov@virtuozzo.com>,
+        "gil@azul.com" <gil@azul.com>,
+        "asmehra@redhat.com" <asmehra@redhat.com>,
+        "dgunigun@redhat.com" <dgunigun@redhat.com>,
+        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>,
+        "oridgar@gmail.com" <oridgar@gmail.com>,
+        "ghammer@redhat.com" <ghammer@redhat.com>
+Thread-Index: AQHW6NzJ6Ner/CpAZ0GLGgCheKaWxKoj9m4AgA5AxgA=
+Date:   Thu, 21 Jan 2021 12:48:23 +0000
+Message-ID: <3159F7DB-C72B-4727-9C83-7E7619FC7D98@amazon.com>
+References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
+ <1610453760-13812-2-git-send-email-acatan@amazon.com>
+ <20210112080427-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20210112080427-mutt-send-email-mst@kernel.org>
+Accept-Language: en-US
+Content-Language: en-GB
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.192]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4E59309106369F468D00E8FFBB8BA324@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_04:2021-01-21,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 impostorscore=0
- suspectscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 spamscore=0
- mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101210052
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 21 Jan 2021 09:20:44 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+T24gMTIvMDEvMjAyMSwgMTU6MDksICJNaWNoYWVsIFMuIFRzaXJraW4iIDxtc3RAcmVkaGF0LmNv
+bT4gd3JvdGU6DQoNCiAgICBPbiBUdWUsIEphbiAxMiwgMjAyMSBhdCAwMjoxNTo1OVBNICswMjAw
+LCBBZHJpYW4gQ2F0YW5naXUgd3JvdGU6DQogICAgDQogICAgPiArMykgTWFwcGVkIG1lbW9yeSBw
+b2xsaW5nIHNpbXBsaWZpZWQgZXhhbXBsZTo6DQogICAgPiArDQogICAgPiArICAgICAvKg0KICAg
+ID4gKyAgICAgICogYXBwL2xpYnJhcnkgZnVuY3Rpb24gdGhhdCBwcm92aWRlcyBjYWNoZWQgc2Vj
+cmV0cw0KICAgID4gKyAgICAgICovDQogICAgPiArICAgICBjaGFyICogc2FmZV9jYWNoZWRfc2Vj
+cmV0KGFwcF9kYXRhX3QgKmFwcCkNCiAgICA+ICsgICAgIHsNCiAgICA+ICsgICAgICAgICAgICAg
+Y2hhciAqc2VjcmV0Ow0KICAgID4gKyAgICAgICAgICAgICB2b2xhdGlsZSB1bnNpZ25lZCAqY29u
+c3QgZ2VuaWRfcHRyID0gZ2V0X3N5c2dlbmlkX21hcHBpbmcoYXBwKTsNCiAgICA+ICsgICAgIGFn
+YWluOg0KICAgID4gKyAgICAgICAgICAgICBzZWNyZXQgPSBfX2NhY2hlZF9zZWNyZXQoYXBwKTsN
+CiAgICA+ICsNCiAgICA+ICsgICAgICAgICAgICAgaWYgKHVubGlrZWx5KCpnZW5pZF9wdHIgIT0g
+YXBwLT5jYWNoZWRfZ2VuaWQpKSB7DQogICAgPiArICAgICAgICAgICAgICAgICAgICAgYXBwLT5j
+YWNoZWRfZ2VuaWQgPSAqZ2VuaWRfcHRyOw0KICAgID4gKyAgICAgICAgICAgICAgICAgICAgIGJh
+cnJpZXIoKTsNCiAgICA+ICsNCiAgICA+ICsgICAgICAgICAgICAgICAgICAgICAvLyByZWJ1aWxk
+IHdvcmxkIHRoZW4gY29uZmlybSB0aGUgZ2VuaWQgdXBkYXRlICh0aHJ1IHdyaXRlKQ0KICAgID4g
+KyAgICAgICAgICAgICAgICAgICAgIHJlYnVpbGRfY2FjaGVzKGFwcCk7DQogICAgPiArDQogICAg
+PiArICAgICAgICAgICAgICAgICAgICAgYWNrX3N5c2dlbmlkX3VwZGF0ZShhcHApOw0KICAgID4g
+Kw0KICAgID4gKyAgICAgICAgICAgICAgICAgICAgIGdvdG8gYWdhaW47DQogICAgPiArICAgICAg
+ICAgICAgIH0NCiAgICA+ICsNCiAgICA+ICsgICAgICAgICAgICAgcmV0dXJuIHNlY3JldDsNCg0K
+DQoNCiAgICBIbW0uIFRoaXMgc2VlbXMgdG8gcmVseSBvbiB0aGUgYXNzdW1wdGlvbiB0aGF0IGlm
+IHlvdSBoYXZlDQogICAgcmVhZCB0aGUgSUQgYW5kIGl0IGRpZCBub3QgY2hhbmdlLCB0aGVuIGFs
+bCBpcyB3ZWxsLg0KDQogICAgUHJvYmxlbSBpcywgaW4gdGhlIGludGVycnVwdCBkcml2ZW4gaW1w
+bGVtZW50YXRpb24NCiAgICB0aGlzIGlzIG5vdCBhIHNhZmUgYXNzdW1wdGlvbiB0byBtYWtlOiBJ
+RA0KICAgIGZyb20gaHlwZXJ2aXNvciBtaWdodCBoYXZlIGNoYW5nZWQgYnV0IGludGVycnVwdA0K
+ICAgIGNvdWxkIGJlIGRlbGF5ZWQuDQoNCg0KICAgIElmIHdlIG1hcCB0aGUgaHlwZXJ2aXNvciBJ
+RCB0byB1c2Vyc3BhY2UgdGhlbiB3ZSB3b24ndA0KICAgIGhhdmUgdGhpcyByYWNlIC4uLiB3b3J0
+aCB3b3JyeSBhYm91dD8gd2h5IG5vdD8NCg0KVGhpcyBpcyBhIHZlcnkgZ29vZCBwb2ludCEgVW5m
+b3J0dW5hdGVseSwgdGhlcmUgaXMgbm8gaW1tZWRpYXRlIHNvbHV0aW9uIGhlcmUuDQpUaGUgY3Vy
+cmVudCBwYXRjaC1zZXQgbWFrZXMgdGhpcyB0cmFkZS1vZmYgaW4gb3JkZXIgdG8gZ2FpbiB0aGUg
+Z2VuZXJpY2l0eSBvZg0KYSBzeXN0ZW0tbGV2ZWwgZ2VuZXJhdGlvbiBJRCB3aGljaCBpcyBub3Qg
+bGltaXRlZCB0byBWTXMgdXNlY2FzZXMsIGJ1dCBjYW4gYWxzbw0KYmUgdXNlZCB3aXRoIHRoaW5n
+cyBsaWtlIENSSVUuDQoNCkRpcmVjdGx5IG1hcHBpbmcgdGhlIHZtZ2VuaWQgVVVJRCB0byB1c2Vy
+c3BhY2Ugd2FzIHRoZSBpbml0aWFsIGRlc2lnbiBvZiB0aGlzDQpwYXRjaC1zZXQgKHNlZSB2MSks
+IGJ1dCBpdCB3YXMgYXJndWVkIGFnYWluc3QgYW5kIGV2b2x2ZWQgaW50byBjdXJyZW50IHN0YXRl
+Lg0KDQpJIHdvdWxkIHBlcnNvbmFsbHkgcmF0aGVyIGVuaGFuY2UgdGhlIEhXIHN1cHBvcnQgKHZt
+Z2VuaWQgZGV2aWNlIGZvciBleGFtcGxlKQ0KdG8gYWxzbyBleHBvc2UgYSBjb25maWd1cmFibGUg
+dTMyIFZtIEdlbiBDb3VudGVyIGFsb25nc2lkZSB0aGUgMTI4LWJpdCBVVUlEOw0KYW5kIGFkZCBz
+dXBwb3J0IGluIFN5c0dlbklEIHRvIG9mZmxvYWQgdGhlIGNvdW50ZXIgdG8gSFcgd2hlbiBhcHBs
+aWNhYmxlLg0KDQoNClRoZSBicm9hZGVyIHZpZXcgaXMgd2UgbmVlZCB0byBzdHJpa2UgdGhlIHJp
+Z2h0IGJhbGFuY2UgYmV0d2VlbiBhIGZ1bmN0aW9uYWwsDQpzYWZlIG1lY2hhbmlzbSB3aXRoIHRv
+ZGF5J3MgdGVjaG5vbG9neSwgYnV0IGFsc28gZGVzaWduIGEgZnV0dXJlLXByb29mIGdlbmVyaWMN
+Cm1lY2hhbmlzbS4NCg0KRml4aW5nIHRoZSByYWNlIHlvdSBtZW50aW9uZWQgaW4gU3lzR2VuSUQg
+b25seSBtb3ZlcyB0aGUgcmFjZSBhIGJpdCBmdXJ0aGVyIHVwDQp0aGUgc3RhY2sgLSB5b3UgZ2Vu
+ZXJhdGUgdGhlIHNlY3JldCByYWNlLWZyZWUgYnV0IHRoZSBzZWNyZXQgY2FuIHN0aWxsIGJlIGR1
+cGxpY2F0ZWQNCmluIHRoZSBuZXh0IGxheWVyLiBUbyBtYWtlIGFueSBtZWNoYW5pc20gY29tcGxl
+dGVseSBzYWZlIHdlIG5lZWQgdG8gY29uY2VwdHVhbGx5DQpkaXNjb25uZWN0IG91cnNlbHZlcyBm
+cm9tIGJlbGlldmluZyB0aGF0IGEgcmVzdG9yZWQgc25hcHNob3QgaXMgaW1tZWRpYXRlbHkgYXZh
+aWxhYmxlLg0KVGhlcmUgbmVlZHMgdG8gYmUgc29tZSBlbnRpdHkgdGhhdCBtb3ZlcyB0aGUgcmVz
+dG9yZWQgVk0vY29udGFpbmVyL3N5c3RlbQ0KZnJvbSBhIHRyYW5zaWVudCBzdGF0ZSB0byAiYXZh
+aWxhYmxlIi4gVGhhdCBlbnRpdHkgY2FuIGJlIGEgcHJvY2VzcyBpbnNpZGUgdGhlIFZNLA0KYnV0
+IGl0IGNhbiBhbHNvIGJlIHNvbWV0aGluZyBvdXRzaWRlIHRoZSBWTSwgaW4gdGhlIGh5cGVydmlz
+b3Igb3IgaW4gdGhlIHN0YWNrDQpzdXJyb3VuZGluZyBpdC4gVGhhdCBlbnRpdHkgaXMgcmVzcG9u
+c2libGUgZm9yIG1hbmFnaW5nIHRoZSB0cmFuc2l0aW9uIG9mIHRoZSBWTQ0Kb3IgY29udGFpbmVy
+IGZyb20gdHJhbnNpZW50IC0+IGF2YWlsYWJsZS4gSXQgaXMgcmVzcG9uc2libGUgZm9yIG5vdCBh
+bGxvd2luZyB0aGUgVk0vDQpjb250YWluZXIgdG8gYmUgdXNlZCBvciB1c2FibGUgdW50aWwgdGhh
+dCB0cmFuc2l0aW9uIGlzIGNvbXBsZXRlLg0KDQpJbiB0aGUgZmlyc3QgZ2VuZXJhdGlvbnMgb2Yg
+Vk0gY2xvbmVzIGFuZCBDUklVIHByb2R1Y3Rpb24gZGVwbG95bWVudHMsIEkgZXhwZWN0DQp0aGlz
+IGVudGl0eSB0byBiZSBhIHN0YWNrLXNwZWNpZmljIGNvbXBvbmVudCB3aXRoIGludGltYXRlIGtu
+b3dsZWRnZSBvZiB0aGUgc3lzdGVtDQpjb21wb25lbnRzLCB0cmFuc2llbnQgc3RhdGVzLCBsaWZl
+Y3ljbGUsIGV0Yy4gV2hpY2ggdGhpcyBwYXRjaC1zZXQgZW5hYmxlcy4NCg0KDQpUaGFua3MsDQpB
+ZHJpYW4uDQoNCg0KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciAoUm9tYW5pYSkgUy5SLkwu
+IHJlZ2lzdGVyZWQgb2ZmaWNlOiAyN0EgU2YuIExhemFyIFN0cmVldCwgVUJDNSwgZmxvb3IgMiwg
+SWFzaSwgSWFzaSBDb3VudHksIDcwMDA0NSwgUm9tYW5pYS4gUmVnaXN0ZXJlZCBpbiBSb21hbmlh
+LiBSZWdpc3RyYXRpb24gbnVtYmVyIEoyMi8yNjIxLzIwMDUuCg==
 
-> On Thu, 21 Jan 2021 08:20:08 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-[..]
-> > --- a/drivers/s390/crypto/vfio_ap_private.h
-> > +++ b/drivers/s390/crypto/vfio_ap_private.h
-> > @@ -88,11 +88,6 @@ struct ap_matrix_mdev {
-> >  	struct mdev_device *mdev;
-> >  };
-> >  
-> > -extern int vfio_ap_mdev_register(void);
-> > -extern void vfio_ap_mdev_unregister(void);
-> > -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> > -			     unsigned int retry);
-> > -
-> >  struct vfio_ap_queue {
-> >  	struct ap_matrix_mdev *matrix_mdev;
-> >  	unsigned long saved_pfn;
-> > @@ -100,5 +95,10 @@ struct vfio_ap_queue {
-> >  #define VFIO_AP_ISC_INVALID 0xff
-> >  	unsigned char saved_isc;
-> >  };
-> > -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
-> > +
-> > +int vfio_ap_mdev_register(void);
-> > +void vfio_ap_mdev_unregister(void);  
-> 
-> Nit: was moving these two necessary?
-> 
-
-No not strictly necessary. I decided that having the data types
-first and the function prototypes in one place after the former
-is nicer.
-
-> > +int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q,
-> > +			     unsigned int retry);
-> > +
-> >  #endif /* _VFIO_AP_PRIVATE_H_ */
-> > 
-> > base-commit: 9791581c049c10929e97098374dd1716a81fefcc  
-> 
-> Anyway, if I didn't entangle myself in the various branches, this seems
-> sane.
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
-
-Thank you very much!
-
-Regards,
-Halil
