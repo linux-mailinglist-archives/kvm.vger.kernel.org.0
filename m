@@ -2,160 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8988A2FE655
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:27:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F8672FE67E
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 10:39:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728677AbhAUJ0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 04:26:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50678 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728320AbhAUJU4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:20:56 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10L92Tri140419;
-        Thu, 21 Jan 2021 04:20:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zmiHxZF+KdKsdkIAlIVz+JM5U9W387S6gaHJi1yZNxI=;
- b=GRQLxEHqCocr6KT8+bg9VTuD8xzXsSLvja6saG9OQSOyG1leAxE1Z7FUkPXZn7NqAXMn
- pqitkM3peBiw4loum6n6Ps8oeynK5SrhI0NFDpQBJWfD11GRODuRnmS339I80OnRejgR
- 0gw3DJneIXPA+snWV5WsfmT7uLBqNEnhl2DI4US9CVZN7Gk85VNrKWu2asjJbQZLV1hd
- +FHK1uLP90/2t98jflbqOdeUL6R13MDY2vW2xz5wxNnPz+WdsvHqkvf5tEuTmfyUlm6x
- h7FP+Pqt/Hv1ZdeXvxJCoPWgneOWIKIlgxwjsWbhpNixm7uyznQeBUOHX/OblYyl2koo bA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3675ra2ar3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:20:10 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10L93DkG143376;
-        Thu, 21 Jan 2021 04:20:10 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3675ra2apy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 04:20:10 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10L9Gcc6022465;
-        Thu, 21 Jan 2021 09:20:08 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3668nwsg7h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 09:20:07 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10L9K58w46006696
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 09:20:05 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 25B9211C04C;
-        Thu, 21 Jan 2021 09:20:05 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9983211C04A;
-        Thu, 21 Jan 2021 09:20:04 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.165.35])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jan 2021 09:20:04 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 1/3] s390x: pv: implement routine to
- share/unshare memory
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, drjones@redhat.com,
-        pbonzini@redhat.com
-References: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
- <1611220392-22628-2-git-send-email-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <a4ad5c0f-2e77-4ea9-9efd-f4d000f17b72@linux.ibm.com>
-Date:   Thu, 21 Jan 2021 10:20:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1728524AbhAUJ3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 04:29:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37994 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728268AbhAUJCJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 04:02:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611219643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1+1P7b60HaR2MAzWv8XFsDjrssAyoeWJipGT+zaJVmE=;
+        b=WIgCLIc98D/mVtehfsc0KhUW2TVB4bNP1B4YGP3unlLimQbP0t/WSjljHtBKQiFKH1LMuP
+        UAw1kNgPgnTFHPmiSy7jgBN5WuxUsUAXSzr0ygkDxmcF9o+51YQ+6Pca7EYgkTOFgr46jW
+        v77o+rjs2Tp41JMHREN1kyPV4eb6UWQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-jDmMz9WnOKKAMlu3hfLq8w-1; Thu, 21 Jan 2021 04:00:39 -0500
+X-MC-Unique: jDmMz9WnOKKAMlu3hfLq8w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA241005D4E;
+        Thu, 21 Jan 2021 09:00:38 +0000 (UTC)
+Received: from [10.72.13.67] (ovpn-13-67.pek2.redhat.com [10.72.13.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C7D0819C46;
+        Thu, 21 Jan 2021 09:00:26 +0000 (UTC)
+Subject: Re: [PATCH 1/1] vhost scsi: allocate vhost_scsi with GFP_NOWAIT to
+ avoid delay
+To:     Dongli Zhang <dongli.zhang@oracle.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, mst@redhat.com, pbonzini@redhat.com,
+        stefanha@redhat.com, joe.jin@oracle.com,
+        aruna.ramakrishna@oracle.com
+References: <20210121050328.7891-1-dongli.zhang@oracle.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <3aa5c6ca-abd3-13c4-b6a6-504f3a52bae7@redhat.com>
+Date:   Thu, 21 Jan 2021 17:00:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <1611220392-22628-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20210121050328.7891-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_03:2021-01-20,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0
- impostorscore=0 malwarescore=0 phishscore=0 adultscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101210045
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/21/21 10:13 AM, Pierre Morel wrote:
-> When communicating with the host we need to share part of
-> the memory.
-> 
-> Let's implement the ultravisor calls for this.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-> Acked-by: Thomas Huth <thuth@redhat.com>
+
+On 2021/1/21 13:03, Dongli Zhang wrote:
+> The size of 'struct vhost_scsi' is order-10 (~2.3MB). It may take long time
+> delay by kzalloc() to compact memory pages when there is a lack of
+> high-order pages. As a result, there is latency to create a VM (with
+> vhost-scsi) or to hotadd vhost-scsi-based storage.
+>
+> The prior commit 595cb754983d ("vhost/scsi: use vmalloc for order-10
+> allocation") prefers to fallback only when really needed, while this patch
+> changes allocation to GFP_NOWAIT in order to avoid the delay caused by
+> memory page compact.
+>
+> Cc: Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
+> Cc: Joe Jin <joe.jin@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > ---
->  lib/s390x/asm/uv.h | 38 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 38 insertions(+)
-> 
-> diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-> index 4c2fc48..8400026 100644
-> --- a/lib/s390x/asm/uv.h
-> +++ b/lib/s390x/asm/uv.h
-> @@ -71,4 +71,42 @@ static inline int uv_call(unsigned long r1, unsigned long r2)
->  	return cc;
->  }
->  
-> +static inline int share(unsigned long addr, u16 cmd)
-> +{
-> +	struct uv_cb_share uvcb = {
-> +		.header.cmd = cmd,
-> +		.header.len = sizeof(uvcb),
-> +		.paddr = addr
-> +	};
-> +	int cc;
-> +
-> +	cc = uv_call(0, (u64)&uvcb);
-> +	if (!cc && uvcb.header.rc == 0x0001)
-
-s/0x0001/UVC_RC_EXECUTED/
+> Another option is to rework by reducing the size of 'struct vhost_scsi',
+> e.g., by replacing inline vhost_scsi.vqs with just memory pointers while
+> each vhost_scsi.vqs[i] should be allocated separately. Please let me
+> know if that option is better.
+>
+>   drivers/vhost/scsi.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 4ce9f00ae10e..85eaa4e883f4 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -1814,7 +1814,7 @@ static int vhost_scsi_open(struct inode *inode, struct file *f)
+>   	struct vhost_virtqueue **vqs;
+>   	int r = -ENOMEM, i;
+>   
+> -	vs = kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
+> +	vs = kzalloc(sizeof(*vs), GFP_NOWAIT | __GFP_NOWARN);
+>   	if (!vs) {
+>   		vs = vzalloc(sizeof(*vs));
+>   		if (!vs)
 
 
-> +		return 0;
-> +
-> +	report_info("cc %d response code: %04x", cc, uvcb.header.rc);
+Can we use kvzalloc?
 
-Will the print have the string UV in it or will I need to guess that a
-UV call failed?
+Thanks
 
-I'm wondering if an assert would make more sense, if callers are
-interested in the uv rc they will need to write an own share function
-anyway.
-
-> +	return -1;
-> +}
-> +
-> +/*
-> + * Guest 2 request to the Ultravisor to make a page shared with the
-> + * hypervisor for IO.
-> + *
-> + * @addr: Real or absolute address of the page to be shared
-> + */
-> +static inline int uv_set_shared(unsigned long addr)
-> +{
-> +	return share(addr, UVC_CMD_SET_SHARED_ACCESS);
-> +}
-> +
-> +/*
-> + * Guest 2 request to the Ultravisor to make a page unshared.
-> + *
-> + * @addr: Real or absolute address of the page to be unshared
-> + */
-> +static inline int uv_remove_shared(unsigned long addr)
-> +{
-> +	return share(addr, UVC_CMD_REMOVE_SHARED_ACCESS);
-> +}
-> +
->  #endif
-> 
 
