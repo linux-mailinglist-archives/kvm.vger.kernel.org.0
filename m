@@ -2,113 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC0DA2FEDF7
-	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 16:05:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 843AC2FEDDA
+	for <lists+kvm@lfdr.de>; Thu, 21 Jan 2021 16:01:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732512AbhAUPEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 10:04:20 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28596 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731975AbhAUN03 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 08:26:29 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10LDCfGZ149123;
-        Thu, 21 Jan 2021 08:25:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=lOKWevt9on+hGR6/Rj1EXdMkTa0I4LDirTwGBP87EzQ=;
- b=i+/PTJfyO4jEVOS60eb/IAyB7CX1Me01/BeKwKHObs+mHL8rVGzthz6RQNvXusPk0ArO
- HD0H0b3nro6FxaGQa+6hSiUy1K/ggA7FBZf3FjwtMnzuU35E/HNeDVNSvv4gKJHDeZPk
- LIwYkUgugTQUgHUgTlqcwefbsYXzvOOBHhikMO6FeZsrZk/+HjaqgmbGK4UuaqnFG7t0
- vdLBVRU9MR/wseb6RY0LTUkBhKAlMtR4Ptj437OoImu4ODEW2T1FptV0HXs4h3WCIaV2
- At5nxsAeVyC4UzGbeTI+nTAitTP1rGZABGKTScU1YIY7pqkTFcwVxtMIV0N7S6OpXXg4 rQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 367a9x0bj7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 08:25:48 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10LDDn3P151283;
-        Thu, 21 Jan 2021 08:25:47 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 367a9x0bhk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 08:25:47 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10LDPjhx017633;
-        Thu, 21 Jan 2021 13:25:45 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3668p4gv8a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Jan 2021 13:25:45 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10LDPgT036307262
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Jan 2021 13:25:42 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A34B7A4055;
-        Thu, 21 Jan 2021 13:25:42 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D5F5A4040;
-        Thu, 21 Jan 2021 13:25:42 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.36.14])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Jan 2021 13:25:42 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v4 3/3] s390x: css: pv: css test adaptation
- for PV
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
-        drjones@redhat.com, pbonzini@redhat.com
-References: <1611220392-22628-1-git-send-email-pmorel@linux.ibm.com>
- <1611220392-22628-4-git-send-email-pmorel@linux.ibm.com>
- <15b91686-97a0-5811-914c-a805dda58f57@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <cc0e5de8-f860-c333-690d-452731e871e7@linux.ibm.com>
-Date:   Thu, 21 Jan 2021 14:25:42 +0100
+        id S1732261AbhAUPB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 10:01:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25654 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729582AbhAUPBO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 21 Jan 2021 10:01:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611241188;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VWveDnvQfP+PsL4unltCL6r/BDFmk40wyGsyzqSzMPQ=;
+        b=CCV4+O9MlTuQUe1mf3BRsmYSXkTVJrwXD28BL5o9jiwF6t3iIpV1y7/zALZWczYkxwuFgD
+        RK6tZsrdufBfmUxoULpOfDM9gYLu7RYXHkoIVLlifH6LeB026wvR5Vke2gP+ychj61Jz7E
+        h2tza4R+lEwi04XSsH0vqq7QtcT5/r0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-WYUQ2L4xNx-dE-smL_vhBA-1; Thu, 21 Jan 2021 09:59:46 -0500
+X-MC-Unique: WYUQ2L4xNx-dE-smL_vhBA-1
+Received: by mail-ej1-f69.google.com with SMTP id f26so860660ejy.9
+        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 06:59:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VWveDnvQfP+PsL4unltCL6r/BDFmk40wyGsyzqSzMPQ=;
+        b=MP5pBpceT2DVXSvDtsD9pkByQXebVLx+dBbjKiTcJvbuI49TqlfbQltf41lV+aGXgQ
+         nNsK6Wdi+6yBJMVdJnsfWrl+k8cDIPn7qE3SsTZt8ee7I7VBoZwIKOGiF+wHWdLMNDje
+         vVWH0bYWBlsIDlwkkCXKgzhI+S355vt3TtcFgvDDjvRhBmP3dG4r7SFXsikKNO74sU1j
+         41NRFWIgSQxP4mEUgf59qazH6bKndfzZ4va9ksY7eF7UCNrN7SBovc+rjlZ0LrmUSXSk
+         ScJQSLCRiM5VvE//OWzjT1spWuD40zHwATphsM1hkVMbOdKCERJnUPpUj1zFtL8vNvqh
+         fpCg==
+X-Gm-Message-State: AOAM532B7Ap9tsI/i6ergUKnGHScHGUA7Ocx6GGrdoz5lFCL1KYgbcO6
+        hFhpT3PlqbQSwJgwKR5MvdjHfg7RrHMZpMx63CjWdCanLKeZeKbjbS2a6gIXEcfI4WAXAuQxVP3
+        +P3uTvUyoKCDk
+X-Received: by 2002:a50:fa86:: with SMTP id w6mr8174047edr.98.1611241184841;
+        Thu, 21 Jan 2021 06:59:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzShcRHvjWlak25wOw0kLg65aNYi5H/RRWjjGEc3kLqFCIKI8oid0c0yjtkv6UmnKvGy/pGGg==
+X-Received: by 2002:a50:fa86:: with SMTP id w6mr8174036edr.98.1611241184707;
+        Thu, 21 Jan 2021 06:59:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id f9sm2905661edm.6.2021.01.21.06.59.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Jan 2021 06:59:43 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: nVMX: Always call sync_vmcs02_to_vmcs12_rare
+ on migration
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>
+References: <20210114205449.8715-1-mlevitsk@redhat.com>
+ <20210114205449.8715-2-mlevitsk@redhat.com> <YADarUMsE9uDKxOe@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1aadff70-afed-ba8f-411f-c8aac1518098@redhat.com>
+Date:   Thu, 21 Jan 2021 15:59:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <15b91686-97a0-5811-914c-a805dda58f57@redhat.com>
+In-Reply-To: <YADarUMsE9uDKxOe@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-21_06:2021-01-21,2021-01-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
- priorityscore=1501 bulkscore=0 adultscore=0 malwarescore=0 mlxlogscore=999
- spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101210069
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 15/01/21 00:58, Sean Christopherson wrote:
+> Reviewed-by: Sean Christopherson<seanjc@google.com>  
 
+New commit message:
 
-On 1/21/21 10:35 AM, Thomas Huth wrote:
-> On 21/01/2021 10.13, Pierre Morel wrote:
->> We want the tests to automatically work with or without protected
->> virtualisation.
->> To do this we need to share the I/O memory with the host.
->>
->> Let's replace all static allocations with dynamic allocations
->> to clearly separate shared and private memory.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     |  3 +--
->>   lib/s390x/css_lib.c | 28 ++++++++--------------------
->>   s390x/css.c         | 43 +++++++++++++++++++++++++++++++------------
->>   3 files changed, 40 insertions(+), 34 deletions(-)
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+KVM: nVMX: Sync unsync'd vmcs02 state to vmcs12 on migration
 
-Thanks,
-Pierre
+Even when we are outside the nested guest, some vmcs02 fields
+may not be in sync vs vmcs12.  This is intentional, even across
+nested VM-exit, because the sync can be delayed until the nested
+hypervisor performs a VMCLEAR or a VMREAD/VMWRITE that affects those
+rarely accessed fields.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+However, during KVM_GET_NESTED_STATE, the vmcs12 has to be up to date to
+be able to restore it.  To fix that, call copy_vmcs02_to_vmcs12_rare()
+before the vmcs12 contents are copied to userspace.
+
+Paolo
+
