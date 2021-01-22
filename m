@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41292300032
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 11:26:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C08E30005C
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 11:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727211AbhAVKZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 05:25:37 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11129 "EHLO
+        id S1727432AbhAVK0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 05:26:11 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11128 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727777AbhAVKOv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 05:14:51 -0500
+        with ESMTP id S1727776AbhAVKOw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 05:14:52 -0500
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMZp50tyzz15xFK;
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMZp50VG5z15x19;
         Fri, 22 Jan 2021 18:13:01 +0800 (CST)
 Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
  DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 22 Jan 2021 18:14:02 +0800
+ 14.3.498.0; Fri, 22 Jan 2021 18:14:03 +0800
 From:   Yanan Wang <wangyanan55@huawei.com>
 To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
         "Catalin Marinas" <catalin.marinas@arm.com>,
@@ -30,10 +30,12 @@ CC:     James Morse <james.morse@arm.com>,
         Quentin Perret <qperret@google.com>,
         <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
         <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
-Subject: [RFC PATCH v4 0/2] Some optimization for stage-2 translation
-Date:   Fri, 22 Jan 2021 18:13:56 +0800
-Message-ID: <20210122101358.379956-1-wangyanan55@huawei.com>
+Subject: [RFC PATCH v4 1/2] KVM: arm64: Adjust partial code of hyp stage-1 map and guest stage-2 map
+Date:   Fri, 22 Jan 2021 18:13:57 +0800
+Message-ID: <20210122101358.379956-2-wangyanan55@huawei.com>
 X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210122101358.379956-1-wangyanan55@huawei.com>
+References: <20210122101358.379956-1-wangyanan55@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.174.187.128]
@@ -42,97 +44,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Will, Marc,
-Is there any further comment on the v3 series I post previously?
-If they are not fine to you, then I think maybe we should just turn
-back to the original solution in v1, where I suggestted to filter out
-the case of only updating access permissions in the map handler and
-handle it right there.
-
-Here are the reasons for my current opinion:
-With an errno returned from the map handler for this single case, there
-will be one more vcpu exit from guest and we also have to consider the
-spurious dirty pages. Besides, it seems that the EAGAIN errno has been
-chosen specially for this case and can not be used elsewhere for other
-reasons, as we will change this errno to zero at the end of the function.
-
-The v1 solution looks like more concise at last, so I refine the diff
-and post the v4 with two patches here, just for a contrast.
-
-Which solution will you prefer now? Could you please let me know.
-
-Thanks,
-Yanan.
-
-Links:
-v1: https://lore.kernel.org/lkml/20201211080115.21460-1-wangyanan55@huawei.com
-v2: https://lore.kernel.org/lkml/20201216122844.25092-1-wangyanan55@huawei.com
-v3: https://lore.kernel.org/lkml/20210114121350.123684-1-wangyanan55@huawei.com
-
----
-
-About patch-1:
 Procedures of hyp stage-1 map and guest stage-2 map are quite different,
-but they are now tied closely by function kvm_set_valid_leaf_pte().
+but they are tied closely by function kvm_set_valid_leaf_pte().
 So adjust the relative code for ease of code maintenance in the future.
 
-About patch-2:
-(1) During running time of a a VM with numbers of vCPUs, if some vCPUs
-access the same GPA almost at the same time and the stage-2 mapping of
-the GPA has not been built yet, as a result they will all cause
-translation faults. The first vCPU builds the mapping, and the followed
-ones end up updating the valid leaf PTE. Note that these vCPUs might
-want different access permissions (RO, RW, RX, RWX, etc.).
-
-(2) It's inevitable that we sometimes will update an existing valid leaf
-PTE in the map path, and we all perform break-before-make in this case.
-Then more unnecessary translation faults could be caused if the
-*break stage* of BBM is just catched by other vCPUs.
-
-With (1) and (2), something unsatisfactory could happen: vCPU A causes
-a translation fault and builds the mapping with RW permissions, vCPU B
-then update the valid leaf PTE with break-before-make and permissions
-are updated back to RO. Besides, *break stage* of BBM may trigger more
-translation faults. Finally, some useless small loops could occur.
-
-We can make some optimization to solve above problems: When we need to
-update a valid leaf PTE in the translation fault handler, let's filter
-out the case where this update only change access permissions that don't
-require break-before-make. If there have already been the permissions
-we want, don't bother to update. If still more permissions need to be
-added, then update the PTE directly without break-before-make.
-
+Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
 ---
+ arch/arm64/kvm/hyp/pgtable.c | 54 ++++++++++++++++++------------------
+ 1 file changed, 27 insertions(+), 27 deletions(-)
 
-Changelogs
-
-v4->v3:
-- Turn back to the original solution in v1 and refine the diff
-- Rebased on top of v5.11-rc4
-
-v2->v3:
-- Rebased on top of v5.11-rc3
-- Refine the commit messages
-- Make some adjustment about return value in patch-2 and patch-3
-
-v1->v2:
-- Make part of the diff a seperate patch (patch-1)
-- Add Will's Signed-off-by for patch-1
-- Return an errno when meeting changing permissions case in map path
-- Add a new patch (patch-3)
-
----
-
-Yanan Wang (2):
-  KVM: arm64: Adjust partial code of hyp stage-1 map and guest stage-2
-    map
-  KVM: arm64: Filter out the case of only changing permissions from
-    stage-2 map path
-
- arch/arm64/include/asm/kvm_pgtable.h |  4 ++
- arch/arm64/kvm/hyp/pgtable.c         | 88 +++++++++++++++++++---------
- 2 files changed, 63 insertions(+), 29 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..2878aaf53b3c 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -170,10 +170,9 @@ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp)
+ 	smp_store_release(ptep, pte);
+ }
+ 
+-static bool kvm_set_valid_leaf_pte(kvm_pte_t *ptep, u64 pa, kvm_pte_t attr,
+-				   u32 level)
++static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+ {
+-	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(pa);
++	kvm_pte_t pte = kvm_phys_to_pte(pa);
+ 	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
+ 							   KVM_PTE_TYPE_BLOCK;
+ 
+@@ -181,12 +180,7 @@ static bool kvm_set_valid_leaf_pte(kvm_pte_t *ptep, u64 pa, kvm_pte_t attr,
+ 	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
+ 	pte |= KVM_PTE_VALID;
+ 
+-	/* Tolerate KVM recreating the exact same mapping. */
+-	if (kvm_pte_valid(old))
+-		return old == pte;
+-
+-	smp_store_release(ptep, pte);
+-	return true;
++	return pte;
+ }
+ 
+ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+@@ -341,12 +335,17 @@ static int hyp_map_set_prot_attr(enum kvm_pgtable_prot prot,
+ static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 				    kvm_pte_t *ptep, struct hyp_map_data *data)
+ {
++	kvm_pte_t new, old = *ptep;
+ 	u64 granule = kvm_granule_size(level), phys = data->phys;
+ 
+ 	if (!kvm_block_mapping_supported(addr, end, phys, level))
+ 		return false;
+ 
+-	WARN_ON(!kvm_set_valid_leaf_pte(ptep, phys, data->attr, level));
++	/* Tolerate KVM recreating the exact same mapping */
++	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
++	if (old != new && !WARN_ON(kvm_pte_valid(old)))
++		smp_store_release(ptep, new);
++
+ 	data->phys += granule;
+ 	return true;
+ }
+@@ -465,27 +464,29 @@ static bool stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 				       kvm_pte_t *ptep,
+ 				       struct stage2_map_data *data)
+ {
++	kvm_pte_t new, old = *ptep;
+ 	u64 granule = kvm_granule_size(level), phys = data->phys;
+ 
+ 	if (!kvm_block_mapping_supported(addr, end, phys, level))
+ 		return false;
+ 
+-	/*
+-	 * If the PTE was already valid, drop the refcount on the table
+-	 * early, as it will be bumped-up again in stage2_map_walk_leaf().
+-	 * This ensures that the refcount stays constant across a valid to
+-	 * valid PTE update.
+-	 */
+-	if (kvm_pte_valid(*ptep))
+-		put_page(virt_to_page(ptep));
++	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
++	if (kvm_pte_valid(old)) {
++		/* Tolerate KVM recreating the exact same mapping */
++		if (old == new)
++			goto out;
+ 
+-	if (kvm_set_valid_leaf_pte(ptep, phys, data->attr, level))
+-		goto out;
++		/*
++		 * There's an existing different valid leaf entry, so perform
++		 * break-before-make.
++		 */
++		kvm_set_invalid_pte(ptep);
++		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
++		put_page(virt_to_page(ptep));
++	}
+ 
+-	/* There's an existing valid leaf entry, so perform break-before-make */
+-	kvm_set_invalid_pte(ptep);
+-	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
+-	kvm_set_valid_leaf_pte(ptep, phys, data->attr, level);
++	smp_store_release(ptep, new);
++	get_page(virt_to_page(ptep));
+ out:
+ 	data->phys += granule;
+ 	return true;
+@@ -527,7 +528,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	}
+ 
+ 	if (stage2_map_walker_try_leaf(addr, end, level, ptep, data))
+-		goto out_get_page;
++		return 0;
+ 
+ 	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+ 		return -EINVAL;
+@@ -551,9 +552,8 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	}
+ 
+ 	kvm_set_table_pte(ptep, childp);
+-
+-out_get_page:
+ 	get_page(page);
++
+ 	return 0;
+ }
+ 
 -- 
 2.19.1
 
