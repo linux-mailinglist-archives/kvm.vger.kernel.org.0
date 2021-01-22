@@ -2,146 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 029ED30011B
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 12:03:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B38630015C
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 12:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727470AbhAVLCE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 06:02:04 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:11849 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727216AbhAVJ1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 04:27:47 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DMYlf1DZdz7YCF;
-        Fri, 22 Jan 2021 17:25:50 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 22 Jan 2021 17:26:49 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Cornelia Huck" <cohuck@redhat.com>
-CC:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "James Morse" <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: [PATCH v3 2/2] vfio/iommu_type1: Fix some sanity checks in detach group
-Date:   Fri, 22 Jan 2021 17:26:35 +0800
-Message-ID: <20210122092635.19900-3-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210122092635.19900-1-zhukeqian1@huawei.com>
-References: <20210122092635.19900-1-zhukeqian1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+        id S1728025AbhAVLV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 06:21:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727932AbhAVLUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 06:20:02 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73634C06174A;
+        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id n25so3507577pgb.0;
+        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=JGKZWLmZIaXZ0doM/i8zUq2DXA6jM2XCESou+2RqdlA=;
+        b=U9yV8Yulx/4LOhdsH7ynYOJKlnHwgwg2gMNl2QmmOTdT2tXgaaTXyhz8Tsml3tOEI5
+         NqIdEY5+dNecnL9gupHRda8nYiv+OW4nvNKnLT6Dq+X3ZkLGC8/E+0VZYGhY1dbkhYEN
+         VOsxBgysdG2KezeTn7tT6XkKT0lIR7UGv+iJaLJUzp0ndVsuKPFtp/5rucVWHFJIqMBG
+         lCJZhDO2/4aGnckrimgPqZqRgz4+ApEwe+G0Pc/n+0YXPtsinnrnRi9iiummaI1pV/s1
+         AUT0pvOzYe7nCUBVWVV9nBoPqpWoxqK0oZN3V53Nba+h/xg4a9H0inJ1LY1LNddb1SlQ
+         HU7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=JGKZWLmZIaXZ0doM/i8zUq2DXA6jM2XCESou+2RqdlA=;
+        b=Uy+OiqCguEqGGA6OmoSPB8by08QGMss3ylT5bAEmJYUj5+5PT+WO6B/PUG8CYhaLtq
+         //mtkyef0vAgCvd1Zh4798EYdIhGM2CjLu2iza0XxVpx221YGhw4oBftRRYp6YdPX/I7
+         8kcUDNNPkkosKukmUEWG8bPssiF94GN2oX95eH2217E0RSc+nxJvZ7uTVTnlepPyMmZ5
+         Z5MyEe7K+zLoV50PSh5JCDER6lC35wd9qEgaG+Xy2t6pNJ+8ZZRET8ZJGATbM1/5iSNb
+         IH+0eq8ftEOKX5mWon6KMrg+Wt0YI15fY50f+HB4+5zerdoS8l+ZlrW4jB3RWCeEbFE1
+         F0Pg==
+X-Gm-Message-State: AOAM5320ebavQrORY7BrGU43Ohcat2DPslHBvV3GZXxWBL5E2StEoMbK
+        +HRWPvDDAAY1J1Z6S1zIGaM=
+X-Google-Smtp-Source: ABdhPJxt5WMLt8cj+0AiYX17C2BZ/R9+T6CBaCic2Kf+mk6e10AqboFT0NLkQr2VDIJKC+o4k9vfog==
+X-Received: by 2002:a63:794a:: with SMTP id u71mr4170608pgc.91.1611314340094;
+        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
+Received: from localhost.localdomain ([125.227.22.95])
+        by smtp.gmail.com with ESMTPSA id b11sm9521965pjg.27.2021.01.22.03.18.55
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Jan 2021 03:18:59 -0800 (PST)
+From:   Stephen Zhang <stephenzhangzsd@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stephen Zhang <stephenzhangzsd@gmail.com>
+Subject: [PATCH] KVM: x86/mmu: improve robustness of some functions
+Date:   Fri, 22 Jan 2021 19:18:43 +0800
+Message-Id: <1611314323-2770-1-git-send-email-stephenzhangzsd@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vfio_sanity_check_pfn_list() is used to check whether pfn_list and
-notifier are empty when remove the external domain, so it makes a
-wrong assumption that only external domain will use the pinning
-interface.
+If the name of this function changes, you can easily
+forget to modify the code in the corresponding place.
+In fact, such errors already exist in spte_write_protect
+ and spte_clear_dirty.
 
-Now we apply the pfn_list check when a vfio_dma is removed and apply
-the notifier check when all domains are removed.
-
-Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+Signed-off-by: Stephen Zhang <stephenzhangzsd@gmail.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++-----------------------
- 1 file changed, 10 insertions(+), 23 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 161725395f2f..d8c10f508321 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -957,6 +957,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481..09462c3d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -844,17 +844,17 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 	int i, count = 0;
  
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ 	if (!rmap_head->val) {
+-		rmap_printk("pte_list_add: %p %llx 0->1\n", spte, *spte);
++		rmap_printk("%s: %p %llx 0->1\n", __func__, spte, *spte);
+ 		rmap_head->val = (unsigned long)spte;
+ 	} else if (!(rmap_head->val & 1)) {
+-		rmap_printk("pte_list_add: %p %llx 1->many\n", spte, *spte);
++		rmap_printk("%s: %p %llx 1->many\n", __func__, spte, *spte);
+ 		desc = mmu_alloc_pte_list_desc(vcpu);
+ 		desc->sptes[0] = (u64 *)rmap_head->val;
+ 		desc->sptes[1] = spte;
+ 		rmap_head->val = (unsigned long)desc | 1;
+ 		++count;
+ 	} else {
+-		rmap_printk("pte_list_add: %p %llx many->many\n", spte, *spte);
++		rmap_printk("%s: %p %llx many->many\n",	__func__, spte, *spte);
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+ 		while (desc->sptes[PTE_LIST_EXT-1]) {
+ 			count += PTE_LIST_EXT;
+@@ -1115,7 +1115,7 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
+ 	      !(pt_protect && spte_can_locklessly_be_made_writable(spte)))
+ 		return false;
+ 
+-	rmap_printk("rmap_write_protect: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
+ 
+ 	if (pt_protect)
+ 		spte &= ~SPTE_MMU_WRITEABLE;
+@@ -1142,7 +1142,7 @@ static bool spte_clear_dirty(u64 *sptep)
  {
-+	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
- 	vfio_unmap_unpin(iommu, dma, true);
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
-@@ -2250,23 +2251,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
- 	}
- }
+ 	u64 spte = *sptep;
  
--static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
--{
--	struct rb_node *n;
--
--	n = rb_first(&iommu->dma_list);
--	for (; n; n = rb_next(n)) {
--		struct vfio_dma *dma;
--
--		dma = rb_entry(n, struct vfio_dma, node);
--
--		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
--			break;
--	}
--	/* mdev vendor driver must unregister notifier */
--	WARN_ON(iommu->notifier.head);
--}
--
- /*
-  * Called when a domain is removed in detach. It is possible that
-  * the removed domain decided the iova aperture window. Modify the
-@@ -2366,10 +2350,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 			kfree(group);
+-	rmap_printk("rmap_clear_dirty: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
  
- 			if (list_empty(&iommu->external_domain->group_list)) {
--				vfio_sanity_check_pfn_list(iommu);
--
--				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
-+				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
-+					WARN_ON(iommu->notifier.head);
- 					vfio_iommu_unmap_unpin_all(iommu);
-+				}
+ 	MMU_WARN_ON(!spte_ad_enabled(spte));
+ 	spte &= ~shadow_dirty_mask;
+@@ -1184,7 +1184,7 @@ static bool spte_set_dirty(u64 *sptep)
+ {
+ 	u64 spte = *sptep;
  
- 				kfree(iommu->external_domain);
- 				iommu->external_domain = NULL;
-@@ -2403,10 +2387,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		 */
- 		if (list_empty(&domain->group_list)) {
- 			if (list_is_singular(&iommu->domain_list)) {
--				if (!iommu->external_domain)
-+				if (!iommu->external_domain) {
-+					WARN_ON(iommu->notifier.head);
- 					vfio_iommu_unmap_unpin_all(iommu);
--				else
-+				} else {
- 					vfio_iommu_unmap_unpin_reaccount(iommu);
-+				}
- 			}
- 			iommu_domain_free(domain->domain);
- 			list_del(&domain->next);
-@@ -2488,9 +2474,10 @@ static void vfio_iommu_type1_release(void *iommu_data)
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain, *domain_tmp;
+-	rmap_printk("rmap_set_dirty: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
  
-+	WARN_ON(iommu->notifier.head);
-+
- 	if (iommu->external_domain) {
- 		vfio_release_domain(iommu->external_domain, true);
--		vfio_sanity_check_pfn_list(iommu);
- 		kfree(iommu->external_domain);
- 	}
+ 	/*
+ 	 * Similar to the !kvm_x86_ops.slot_disable_log_dirty case,
+@@ -1363,8 +1363,8 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 
+ restart:
+ 	for_each_rmap_spte(rmap_head, &iter, sptep) {
+-		rmap_printk("kvm_set_pte_rmapp: spte %p %llx gfn %llx (%d)\n",
+-			    sptep, *sptep, gfn, level);
++		rmap_printk("%s: spte %p %llx gfn %llx (%d)\n",
++			      __func__, sptep, *sptep, gfn, level);
+ 
+ 		need_flush = 1;
  
 -- 
-2.19.1
+1.8.3.1
 
