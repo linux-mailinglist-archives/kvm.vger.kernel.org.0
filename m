@@ -2,117 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14F7A301009
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 23:34:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 431C3301029
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 23:41:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730206AbhAVTws (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 14:52:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730704AbhAVTbn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 14:31:43 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7EBBC061797
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 11:30:11 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id 30so4483390pgr.6
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 11:30:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Utt5iy2TzAUJ/756XPWC+D3jaxir23eilVEX8ks83/0=;
-        b=BrtPgIquyOW8LybrzVpeRvOnH8V9jJrMvM7XdFJlSoeVfToMWjUdBZyxYdkaqd6kPo
-         6dqv+z6nUtDKbJZVkoQ4ig/Lm2kh+tZuUgkQs7Nmm9wbVlQwa8uF1AITyEeChd21blr9
-         KferVuY882YisHGoQIcLxqcUDYmDt+MODm/KM0y43rZB+KWcnl6+FdefB/gfeFkozZaN
-         NOWVjecmz7N8fjwrQyVmFnF8JZSfiGYGJQXYYASQ3TiQF1X5g0kp3XvnkxCn04Gu0cip
-         pWWvf3CKCPBr3UuNFe21nAWJ+Tn8KjO8ACytCsuwJ1ATizlo/JMXyw68N2B0hISD/OFh
-         3dCA==
+        id S1728290AbhAVWkS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 17:40:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24022 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729801AbhAVTpm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Jan 2021 14:45:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611344654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3uNDwmhw+dypTTbDZcFNMsEkHC7AyteHqMNOLnBYuX8=;
+        b=OKX9SCGK/1soTaarb1Dmg2hAGL951g6wn5LhqrBHz06CVScHEbpSoEYpiEKBrNDhYHVmNm
+        rcD4PavaO9xeOwcW1ghy4LqWCv9xITs8NYmzuW49oa6FT94V5o+gtNmeDewevsGirVm1Ch
+        p/BDcgoNcKcek7Zc20CzC0Z4xxivEBg=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-4vApMaq6MXGsCq7TAZ02ew-1; Fri, 22 Jan 2021 14:44:12 -0500
+X-MC-Unique: 4vApMaq6MXGsCq7TAZ02ew-1
+Received: by mail-qk1-f200.google.com with SMTP id 205so2734403qkf.4
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 11:44:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Utt5iy2TzAUJ/756XPWC+D3jaxir23eilVEX8ks83/0=;
-        b=clu8WkwRrXaRwmmt1iu4YSMxI8XPjTMbmmA1h38lUy2ZDkjGTBGfO1RVEUizzLOzAB
-         /v0vxzPoCRn1aRMnx15Ire/Vehfo2xn/1XyvLQSfToMEV4nGNlqLrgeiqzURzCfv52rb
-         eYhFdLaRVouKIbprtN8ZRgNryGc8YYxhGQnUL7yCDbhsuOvjspIGcAqWbU6zmqQ39ycx
-         0UNLZre4yXuMz5WGpyI6fIvbwhgKXIarmGc5XNcmGaq7NrDwhmDfIPgYGvlGb5SbyW2x
-         qtYmyNyBQ5/lkvk0dNcwaXrjx0TnCsM2A7FukmemPQs5TEzh3X2jB+XlUJMpQlc3yptu
-         Yf4g==
-X-Gm-Message-State: AOAM531NIjTI7qrzY53n9/hm4eOwRs/zUPDUWdpjKDNqK0Jd1UmrfDiT
-        URfJGwwaL+re8bf3rjGVUt+BPg==
-X-Google-Smtp-Source: ABdhPJwn9+1DI6LEvfbdjtI1i5qr0yavW53mXGU2t6h6IJ3mnYOVHlO12ZIzEntdHsfEY5M8B0zXQQ==
-X-Received: by 2002:aa7:8815:0:b029:1bc:93cc:d6fa with SMTP id c21-20020aa788150000b02901bc93ccd6famr6535574pfo.26.1611343811249;
-        Fri, 22 Jan 2021 11:30:11 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id ga4sm10108831pjb.53.2021.01.22.11.30.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jan 2021 11:30:10 -0800 (PST)
-Date:   Fri, 22 Jan 2021 11:30:04 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alex Shi <alex.shi@linux.alibaba.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, yj226063@alibaba-inc.com
-Subject: Re: 3 preempted variables in kvm
-Message-ID: <YAsnvA1Q5AlXLd1W@google.com>
-References: <b6398228-31b9-ca84-873b-4febbd37c87d@linux.alibaba.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=3uNDwmhw+dypTTbDZcFNMsEkHC7AyteHqMNOLnBYuX8=;
+        b=TlUM+rZwYLOSv6jMIgG4IKlyKf8EUWsb1F8pElyq1vSP/l2/oP2vMQ0vNOHHs72i7J
+         6vshJwuz8DmNvfpzS4zuNbJxFvsSaJd7KOvk7NBfP0su6g1Fhh/3wIpdptQaLZW+0OB5
+         UOaHhQSniI+MRQdRAZRsda+l+5jKVUalsVDWGe9wrAH7cQ1Y1bUh0KxzYO2/iVdf8Tok
+         RyFbcx6rMk9n/RAS8s8+gjUtTCsk+eKaHb21liSzu5N7AMqO9p/IF6PFY/Kvs+vG4/OX
+         e0sxuQKSSy4ehxRu1OXRfXDnwBZZi6iKl13fEe4KstVoCrsdvr8gsUbPOw64ToYVqBG9
+         YNKQ==
+X-Gm-Message-State: AOAM530h+2tBozG61/8PU6PAx26rhZH73llbLsqBCJqT3k3exO+jWvfZ
+        aDkNBkEV2cq9kexzJr/W1EiHZZG5oUcLF+7LoH2SqY/l/emnPGpuIaAO1ZbEoe14Oc22wCa/w2V
+        PKKIcSoR8drjXPVJ0bjW3JoBPPman
+X-Received: by 2002:a05:620a:12d5:: with SMTP id e21mr3438614qkl.131.1611344651589;
+        Fri, 22 Jan 2021 11:44:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw6cFebtmiIS8knjYgLudy4UeqwjmnsOMneaVMKnv2KT/lJTSR4ttPMGlPsJYpw37S7QqTD713vRrO6GSoAsz8=
+X-Received: by 2002:a05:620a:12d5:: with SMTP id e21mr3438585qkl.131.1611344651277;
+ Fri, 22 Jan 2021 11:44:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6398228-31b9-ca84-873b-4febbd37c87d@linux.alibaba.com>
+References: <20201216064818.48239-1-jasowang@redhat.com> <20201216064818.48239-22-jasowang@redhat.com>
+ <20210111122601.GA172492@mtl-vdi-166.wap.labs.mlnx> <da50981b-6bbc-ee61-b5b1-a57a09da8e93@redhat.com>
+In-Reply-To: <da50981b-6bbc-ee61-b5b1-a57a09da8e93@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Fri, 22 Jan 2021 20:43:34 +0100
+Message-ID: <CAJaqyWcRirQgz+n63rU2nYVH2RKqjQfwHGFLzOG=H46qRWuTog@mail.gmail.com>
+Subject: Re: [PATCH 21/21] vdpasim: control virtqueue support
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Eli Cohen <elic@nvidia.com>, Michael Tsirkin <mst@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Cindy Lu <lulu@redhat.com>,
+        Eli Cohen <eli@mellanox.com>, lingshan.zhu@intel.com,
+        Rob Miller <rob.miller@broadcom.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 22, 2021, Alex Shi wrote:
-> Hi All,
-> 
-> I am newbie on KVM side, so probably I am wrong on the following.
-> Please correct me if it is.
-> 
-> There are 3 preempted variables in kvm:
->      1, kvm_vcpu.preempted  in include/linux/kvm_host.h
->      2, kvm_steal_time.preempted
->      3, kvm_vcpu_arch.st.preempted in arch/x86
-> Seems all of them are set or cleared at the same time. Like,
+On Tue, Jan 12, 2021 at 4:12 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2021/1/11 =E4=B8=8B=E5=8D=888:26, Eli Cohen wrote:
+> > On Wed, Dec 16, 2020 at 02:48:18PM +0800, Jason Wang wrote:
+> >> This patch introduces the control virtqueue support for vDPA
+> >> simulator. This is a requirement for supporting advanced features like
+> >> multiqueue.
+> >>
+> >> A requirement for control virtqueue is to isolate its memory access
+> >> from the rx/tx virtqueues. This is because when using vDPA device
+> >> for VM, the control virqueue is not directly assigned to VM. Userspace
+> >> (Qemu) will present a shadow control virtqueue to control for
+> >> recording the device states.
+> >>
+> >> The isolation is done via the virtqueue groups and ASID support in
+> >> vDPA through vhost-vdpa. The simulator is extended to have:
+> >>
+> >> 1) three virtqueues: RXVQ, TXVQ and CVQ (control virtqueue)
+> >> 2) two virtqueue groups: group 0 contains RXVQ and TXVQ; group 1
+> >>     contains CVQ
+> >> 3) two address spaces and the simulator simply implements the address
+> >>     spaces by mapping it 1:1 to IOTLB.
+> >>
+> >> For the VM use cases, userspace(Qemu) may set AS 0 to group 0 and AS 1
+> >> to group 1. So we have:
+> >>
+> >> 1) The IOTLB for virtqueue group 0 contains the mappings of guest, so
+> >>     RX and TX can be assigned to guest directly.
+> >> 2) The IOTLB for virtqueue group 1 contains the mappings of CVQ which
+> >>     is the buffers that allocated and managed by VMM only. So CVQ of
+> >>     vhost-vdpa is visible to VMM only. And Guest can not access the CV=
+Q
+> >>     of vhost-vdpa.
+> >>
+> >> For the other use cases, since AS 0 is associated to all virtqueue
+> >> groups by default. All virtqueues share the same mapping by default.
+> >>
+> >> To demonstrate the function, VIRITO_NET_F_CTRL_MACADDR is
+> >> implemented in the simulator for the driver to set mac address.
+> >>
+> > Hi Jason,
+> >
+> > is there any version of qemu/libvirt available that I can see the
+> > control virtqueue working in action?
+>
+>
+> Not yet, the qemu part depends on the shadow virtqueue work of Eugenio.
+> But it will work as:
+>
+> 1) qemu will use a separated address space for the control virtqueue
+> (shadow) exposed through vhost-vDPA
+> 2) the commands sent through control virtqueue by guest driver will
+> intercept by qemu
+> 3) Qemu will send those commands to the shadow control virtqueue
+>
+> Eugenio, any ETA for the new version of shadow virtqueue support in Qemu?
+>
 
-Not quite.  kvm_vcpu.preempted is set only in kvm_sched_out(), i.e. when the
-vCPU was running and preempted by the host scheduler.  This is used by KVM when
-KVM detects that a guest task appears to be waiting on a lock, in which case KVM
-will bump the priority of preempted guest kernel threads in the hope that
-scheduling in the preempted vCPU will release the lock.
+Hi Jason. Sorry for the late response.
 
-kvm_steal_time.preempted is a paravirt struct that is shared with the guest.  It
-is set on any call to kvm_arch_vcpu_put(), which covers kvm_sched_out() and adds
-the case where the vCPU exits to userspace, e.g. for IO.  KVM itself hasn't been
-preempted, but from the guest's perspective the CPU has been "preempted" in the
-sense that CPU (from the guest's perspective) is not executing guest code.
-Similar to KVM's vCPU scheduling heuristics, the guest kernel uses this info to
-inform its scheduling, e.g. to avoid waiting on a lock owner to drop the lock
-since the lock owner is not actively running.
+For the notification part I have addressed all the issues of the RFC
+[1], except the potential race conditions Stefan pointed, and tested
+with vdpa devices. You can find at
+https://github.com/eugpermar/qemu/tree/vdpa_sw_live_migration.d/notificatio=
+ns.rfc
+. Since the shadow path is activated only through QMP and does not
+interfere with regular operation, I could post to the qemu list if you
+prefer. The series will be smaller if merged in steps.
 
-kvm_vcpu_arch.st.preempted is effectively a host-side cache of
-kvm_steal_time.preempted that's used to optimize kvm_arch_vcpu_put() by avoiding
-the moderately costly mapping of guest.  It could be dropped, but it's a single
-byte per vCPU so worth keeping even if the performance benefits are modest.
+Adding the buffer forwarding on top should not take long.
 
-> vcpu_put:
->         kvm_sched_out()-> set 3 preempted
->                 kvm_arch_vcpu_put():
->                         kvm_steal_time_set_preempted
-> 
-> vcpu_load:
->         kvm_sched_in() : clear above 3 preempted
->                 kvm_arch_vcpu_load() -> kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
->                 request dealed in vcpu_enter_guest() -> record_steal_time
-> 
-> Except the 2nd one reuse with KVM_FEATURE_PV_TLB_FLUSH bit which could be used
-> separately, Could we combine them into one, like just bool kvm_vcpu.preempted? and 
-> move out the KVM_FEATURE_PV_TLB_FLUSH. Believe all arch need this for a vcpu overcommit.
+[1] https://lkml.org/lkml/2020/9/23/1243
 
-Moving KVM_VCPU_FLUSH_TLB out of kvm_steal_time.preempted isn't viable. The
-guest kernel is only allowed to rely on the host to flush the vCPU's TLB if it
-knows the vCPU is preempted (from its perspective), as that's the only way it
-can guarantee that KVM will observe the TLB flush request before enterring the
-vCPU.  KVM_VCPU_FLUSH_TLB and KVM_VCPU_PREEMPTED need to be in the same word so
-KVM can read and clear them atomically, otherwise there would be a window where
-KVM would miss the flush request.
+Thanks!
+
