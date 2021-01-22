@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8019F30113A
-	for <lists+kvm@lfdr.de>; Sat, 23 Jan 2021 00:56:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 101D0301138
+	for <lists+kvm@lfdr.de>; Sat, 23 Jan 2021 00:54:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726693AbhAVXyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 18:54:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60820 "EHLO
+        id S1726687AbhAVXya (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 18:54:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbhAVXwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 18:52:32 -0500
+        with ESMTP id S1726439AbhAVXwd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 18:52:33 -0500
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75362C061793
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 15:51:01 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id m8so5001304qvt.14
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 15:51:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EA9C061797
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 15:51:03 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id j24so5025618qvg.8
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 15:51:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=9HbYgD5kKLF76E9UKDJgPHiC7w7cXDOH2uRR80TQ++M=;
-        b=AE7iUuGS1m8Sp+o5DCp0RddSP+E0iHcSBOlAHoenw9iBHFl8iMuY+9NPpYdHZRB100
-         Uy3FMD4EuqVzghsnPSLz7K0HgtS9LjPBrYYjHQPylwS3IF35Sfxeb6rUCKvrMUxlyRw6
-         MALKKDKzIn0eJOpZ1RdvJacxv0iM9t7PA+ysLohcflK+2tsByabpmdZoUJ5eQ158KHgN
-         Y9StW2WOQT/IUs4eDwtafQGVjYdcUp68vC45HVLRJkh8KTOjOOxUdVtSBwLI3MVkTVP8
-         KXZkFvfWlA/p0ju9IpmrS5YDMQ1kzY/qGmwS+gGmPH8crom4zF6bMw/HAZ5OQbnu4MVP
-         KxMw==
+        bh=vis1EBkMtVJzC1inZD1OMmTzA1+2z+PuDDfmwsUE9QI=;
+        b=gDr4O4h28mPFdd+ZZdK1XAb3VtFI+oGGvNONZW582anW+VjJLm42e5NuH5SNAM45xb
+         Pj9GLYb/xlP/Vj9f2Jw2ONUaJ+4JQERAh/7T5+vz2zNiqxY/sALKVM5CusVcxFyDT3/y
+         LJqUEbg/n90iEGiuD4cUAkLqG8fOTCMWnb4Nx7XcJeoETZNF1ccdqT20ry6bo0sfAyFa
+         ElKDo1nIx3dOtuq5aoATXw7LhDKeDTz99ZtBAfBk/vkkzvWcv9qiT2Gyo9uqkehBZ/ek
+         SxYt0lbmaFMdPNVN8UlOKNfhL3e2sIy1dqSR/vuX8D1fh0Gsa4yUItxzKpNhJrDJEP3R
+         0SMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=9HbYgD5kKLF76E9UKDJgPHiC7w7cXDOH2uRR80TQ++M=;
-        b=ale3WuN7KqGpaTWL3SDXNypDF4R0e9BdLxpZL+PVJZtnrg48gf67S83J4boDOXx9d8
-         9l+oGnWphHPz7Gvri1/O11XR1PnnN3wKnA+mU2SXzL5sNagUDKiofA12Fjev442C0B2I
-         gJ3gasPupJiJz7QwNJXGvK13/N9Nsjjvupk3iVePL/5Q6erYUXkap7bX2+etOTxowFr9
-         O9VC9qudE7PGlUx3kI5Cz8gbMUdh//Uwckp9BFrLUX+v1ym1rbz3dgImZ89nyo7W012N
-         9wSIohfcpanUoYaAPmipUuz67AmCKrn9qO0xgw4hFhQ3n+1h9P/22NnRWwk6owlDGnmZ
-         RIIQ==
-X-Gm-Message-State: AOAM533YiycBbNEH1KtonmFJLKUZMJ8h1e77Cc+5rmwMrkuyJR7Irauk
-        QJci13i/TA7zj8VrDOT02lOEQd9rvgA=
-X-Google-Smtp-Source: ABdhPJw45xfbWk0/F1Ioz6RnLEPQgDuhUe6NW4Te0ZVGomPG8tHNq57wsrgLqjRa0ChnDaPM5CiLy3LL50o=
+        bh=vis1EBkMtVJzC1inZD1OMmTzA1+2z+PuDDfmwsUE9QI=;
+        b=AvUYWJKihryrQNj7DdHzuHHqkcF/HhU3uCK82BY5mZDSNXJ4wsgAeQwnSvoCZE/SVS
+         ZWS7nFyP3cTgWqtz1jAA7KYlL8TllNnJ0a9l3S93jNKR6Ek1kxeQS7trcKVBf0APirVy
+         frjljhgLkyh1Ejdg3gP+O9vu1gidKVnbDtrO4t9Fja3n8+F1tUV9vt47si5ULTnKEovG
+         fhVFAochOvAkYmVxJsydyrqvZYa6ZR7Gs6mFRzT1M7THm+2TpkJzf3fuORpvHlsSBQIG
+         nya8PvWWnMpB6N8ihbi1yJSxAxPV//HMmRE/BGDYhj4SEq8QxSuCl7ccv8qVqarcg0FD
+         Z6Ng==
+X-Gm-Message-State: AOAM532Rs/pAQaNkf+r0Mc75fNkpuvec9irYGHJVX/G4oHcfcUOvXEpS
+        x9JksAM4CsZkYCTBc8dtpjv/EuBJGao=
+X-Google-Smtp-Source: ABdhPJzBBbroBZ04dz4g477SZCi+wa0A1PU9Lb5Y7vFKnW6C2/fcCrXdQgs559dhJ2QuE1HbvLewaiGMCPI=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
- (user=seanjc job=sendgmr) by 2002:a0c:e5d1:: with SMTP id u17mr3253789qvm.34.1611359460666;
- Fri, 22 Jan 2021 15:51:00 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:ad4:4ae2:: with SMTP id cp2mr7070738qvb.50.1611359462829;
+ Fri, 22 Jan 2021 15:51:02 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 22 Jan 2021 15:50:47 -0800
+Date:   Fri, 22 Jan 2021 15:50:48 -0800
 In-Reply-To: <20210122235049.3107620-1-seanjc@google.com>
-Message-Id: <20210122235049.3107620-2-seanjc@google.com>
+Message-Id: <20210122235049.3107620-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210122235049.3107620-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
-Subject: [PATCH 1/3] KVM: SVM: Unconditionally sync GPRs to GHCB on VMRUN of
- SEV-ES guest
+Subject: [PATCH 2/3] KVM: x86: Revert "KVM: x86: Mark GPRs dirty when written"
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -69,56 +68,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the per-GPR dirty checks when synchronizing GPRs to the GHCB, the
-GRPs' dirty bits are set from time zero and never cleared, i.e. will
-always be seen as dirty.  The obvious alternative would be to clear
-the dirty bits when appropriate, but removing the dirty checks is
-desirable as it allows reverting GPR dirty+available tracking, which
-adds overhead to all flavors of x86 VMs.
+Revert the dirty/available tracking of GPRs now that KVM copies the GPRs
+to the GHCB on any post-VMGEXIT VMRUN, even if a GPR is not dirty.  Per
+commit de3cd117ed2f ("KVM: x86: Omit caching logic for always-available
+GPRs"), tracking for GPRs noticeably impacts KVM's code footprint.
 
-Note, unconditionally writing the GPRs in the GHCB is tacitly allowed
-by the GHCB spec, which allows the hypervisor (or guest) to provide
-unnecessary info; it's the guest's responsibility to consume only what
-it needs (the hypervisor is untrusted after all).
+This reverts commit 1c04d8c986567c27c56c05205dceadc92efb14ff.
 
-  The guest and hypervisor can supply additional state if desired but
-  must not rely on that additional state being provided.
-
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Fixes: 291bd20d5d88 ("KVM: SVM: Add initial support for a VMGEXIT VMEXIT")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ arch/x86/kvm/kvm_cache_regs.h | 51 +++++++++++++++++------------------
+ 1 file changed, 25 insertions(+), 26 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c8ffdbc81709..ac652bc476ae 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -1415,16 +1415,13 @@ static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
- 	 * to be returned:
- 	 *   GPRs RAX, RBX, RCX, RDX
- 	 *
--	 * Copy their values to the GHCB if they are dirty.
-+	 * Copy their values, even if they may not have been written during the
-+	 * VM-Exit.  It's the guest's responsibility to not consume random data.
- 	 */
--	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RAX))
--		ghcb_set_rax(ghcb, vcpu->arch.regs[VCPU_REGS_RAX]);
--	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RBX))
--		ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
--	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RCX))
--		ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
--	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RDX))
--		ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
-+	ghcb_set_rax(ghcb, vcpu->arch.regs[VCPU_REGS_RAX]);
-+	ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
-+	ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
-+	ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
- }
+diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+index f15bc16de07c..a889563ad02d 100644
+--- a/arch/x86/kvm/kvm_cache_regs.h
++++ b/arch/x86/kvm/kvm_cache_regs.h
+@@ -9,31 +9,6 @@
+ 	(X86_CR4_PVI | X86_CR4_DE | X86_CR4_PCE | X86_CR4_OSFXSR  \
+ 	 | X86_CR4_OSXMMEXCPT | X86_CR4_PGE | X86_CR4_TSD | X86_CR4_FSGSBASE)
  
- static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+-static inline bool kvm_register_is_available(struct kvm_vcpu *vcpu,
+-					     enum kvm_reg reg)
+-{
+-	return test_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+-}
+-
+-static inline bool kvm_register_is_dirty(struct kvm_vcpu *vcpu,
+-					 enum kvm_reg reg)
+-{
+-	return test_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
+-}
+-
+-static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
+-					       enum kvm_reg reg)
+-{
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+-}
+-
+-static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
+-					   enum kvm_reg reg)
+-{
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
+-	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
+-}
+-
+ #define BUILD_KVM_GPR_ACCESSORS(lname, uname)				      \
+ static __always_inline unsigned long kvm_##lname##_read(struct kvm_vcpu *vcpu)\
+ {									      \
+@@ -43,7 +18,6 @@ static __always_inline void kvm_##lname##_write(struct kvm_vcpu *vcpu,	      \
+ 						unsigned long val)	      \
+ {									      \
+ 	vcpu->arch.regs[VCPU_REGS_##uname] = val;			      \
+-	kvm_register_mark_dirty(vcpu, VCPU_REGS_##uname);		      \
+ }
+ BUILD_KVM_GPR_ACCESSORS(rax, RAX)
+ BUILD_KVM_GPR_ACCESSORS(rbx, RBX)
+@@ -63,6 +37,31 @@ BUILD_KVM_GPR_ACCESSORS(r14, R14)
+ BUILD_KVM_GPR_ACCESSORS(r15, R15)
+ #endif
+ 
++static inline bool kvm_register_is_available(struct kvm_vcpu *vcpu,
++					     enum kvm_reg reg)
++{
++	return test_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
++}
++
++static inline bool kvm_register_is_dirty(struct kvm_vcpu *vcpu,
++					 enum kvm_reg reg)
++{
++	return test_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
++}
++
++static inline void kvm_register_mark_available(struct kvm_vcpu *vcpu,
++					       enum kvm_reg reg)
++{
++	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
++}
++
++static inline void kvm_register_mark_dirty(struct kvm_vcpu *vcpu,
++					   enum kvm_reg reg)
++{
++	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_avail);
++	__set_bit(reg, (unsigned long *)&vcpu->arch.regs_dirty);
++}
++
+ static inline unsigned long kvm_register_read(struct kvm_vcpu *vcpu, int reg)
+ {
+ 	if (WARN_ON_ONCE((unsigned int)reg >= NR_VCPU_REGS))
 -- 
 2.30.0.280.ga3ce27912f-goog
 
