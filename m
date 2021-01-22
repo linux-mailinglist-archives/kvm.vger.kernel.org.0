@@ -2,160 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AA88C300D55
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 21:07:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06607300D9F
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 21:24:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730586AbhAVUG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 15:06:28 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13316 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728779AbhAVUFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 15:05:16 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B600b2fca0002>; Fri, 22 Jan 2021 12:04:26 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 22 Jan
- 2021 20:04:26 +0000
-Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.56) by
- HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Fri, 22 Jan 2021 20:04:26 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fUaxEc96NFK6UR+1A9Lh9DLz5tBl8McaKudugngxAe1/I8PwaNkdMNIn9frnHqbyRCWj6MEgqgVb7A/r6O+a1ijL+6GNv3ZPRa3lDWI+WIo9tg4BfTZscbPkDBwvmKcjqwEIWw+3kcJAKpT3LUzeYZOVN0Hn9vjAlOZtINUz1EFv9iG0lrjg4epK7TtCnUxQWtO55yucePUddalyDaDE1E2jQsx3Uq1wtXgSXyXmSCiAmaJbgXlE01jF8SUOowcGXHGcY+ALaZ4DCL9jiSMwIO/LKwwgc5t6neX4cfIAFOXFwjjyNCaesUkHCY0ETN4jDOe1kgwGVOPapam7TwXvLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vwae+nAkyaitQ5r/JDyXnK+1DFTHWiCNVWiQuy9YHOg=;
- b=hOz1J09YQ1yk2Q0qOXf1lTW5qJ6JglkauFOW4z81dhB8geVUR5CqARAwSoCWEOyL8Z1o80mwupN+zHvQPcD7b1UYOglNL5RwfCafSMSmwlikhM75nSzEhVua3H5XnvUss/UHbuwS46X+szlpLPXT52++ZMzLhbvWFjM/A35B8+9PC0kCfWd3WO/Tk2CUeQXh/XsyBkq53lluHfiNSXRBMiSLe04Ks1wqzwgT+1a4A2Hhmp+a2oD01xJ/0qgPr8iO/smIpmoagcFEblI0PSO7in2u2GMITaj9E32sSBnm8g67ADkykrbdZAK0/lzRvbtgkstQvlvIeSE9I/gPL/dJYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1548.namprd12.prod.outlook.com (2603:10b6:4:a::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3763.13; Fri, 22 Jan 2021 20:04:25 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::546d:512c:72fa:4727]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::546d:512c:72fa:4727%7]) with mapi id 15.20.3784.011; Fri, 22 Jan 2021
- 20:04:23 +0000
-Date:   Fri, 22 Jan 2021 16:04:21 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Max Gurtovoy <mgurtovoy@nvidia.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>
-Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210122200421.GH4147@nvidia.com>
-References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
- <20210122122503.4e492b96@omen.home.shazbot.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210122122503.4e492b96@omen.home.shazbot.org>
-X-ClientProxiedBy: MN2PR19CA0006.namprd19.prod.outlook.com
- (2603:10b6:208:178::19) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR19CA0006.namprd19.prod.outlook.com (2603:10b6:208:178::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11 via Frontend Transport; Fri, 22 Jan 2021 20:04:22 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l32fN-005clx-HC; Fri, 22 Jan 2021 16:04:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1611345866; bh=vwae+nAkyaitQ5r/JDyXnK+1DFTHWiCNVWiQuy9YHOg=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType;
-        b=YvNzyBCzr2zuqD3nvxCRT3ycZznulK3wV7OWJQhvPTz8xd0zSvJ7BMTcuURxoNswv
-         coAZWwrKAdII3fzI1JWhnSpHwsv/gW/Krr5vuanIbETxzcyk5+HhxpQ8uWw7T8n0Bm
-         ypMQe9ubOd6MT66mijCpSL+70n+1e6B2CWmd106IuTy2S11xWokh0MayOIFbsZk7UK
-         CZXzRWc+nhKSaeBVS7w4qes90I0jt3PvJG12ElzF9ZqhWcHX2TUEAAiU7dlraK2O5a
-         X6F2JpO6Rvhf9RwakEQfj05vc/53/+IjpLdFlRiULXjp1m9kFoE1vYxjNOokxePMNM
-         2R+iqJEeODXPA==
+        id S1728327AbhAVUXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 15:23:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43512 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729823AbhAVUWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 15:22:32 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2E9C06174A
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 12:21:52 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id c9so6563484ybs.8
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 12:21:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=7RwhFYrcnoJXpobXbjPYpOWtvrgfjh0dgKM1o8v6SyQ=;
+        b=k0MOtVqkrh587ap4u1TL5jVh9BDawHezCrrcAPdLUOfvQrD7yVpvrHnLcjIrkDKLDD
+         u/BK0AYcLMIVZPDmGODEvPHpzZFKWVCQFfIGSvK6sWFS0/eHFOX9EaaPIHS0tYn/3ty0
+         ZCUTO0P2vcm5JaV1yrsy7AfkhE9ZG88eick69Yc/WtIoPkwy+Sg9vZNe118M9qJ7Q2bf
+         5tumrVEz0bJjWuj8xM1+BGwcOezUqZyqqGvI2Lcb+Ejun+SbrtNY9zxgrx8z1SX/Wt0Y
+         Z4F42J6Jt4ZlGpGp0kAG3RblCAwGm+9BUDugBQ8xEDOGvVb0mT0f1WuE6cf/moAztY0x
+         xaUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=7RwhFYrcnoJXpobXbjPYpOWtvrgfjh0dgKM1o8v6SyQ=;
+        b=J7VbwFRAesYB6fBckNuk5VhREo24tgt3bmvNX3qhwPXbK8RKHQUCxqXm/3Z7uvRKJB
+         bzrx/a/SiaXIQtofvjO6puLrgk3DBkPwMIgJKPP4YhcUXqyGwf06o3bkPR7B/DJ+x259
+         EwRLwZ9rdznlZP1ASTz3whkSpwpU8ZRTKXn9T4XrOr+vxnIslL+KnAG4Z+gJC9/KKfbx
+         MoYa7bwYOABof31YW/yH+oBg38iFGK02pR+SoxuX1Tiu99Y5a2Ygc2ToT+uPVqmUEjM0
+         vjKiXjyADMleL3ZRZToGxx3wR4zNn41vty5Wx3kc2zbLm0tsDF068UHERzb/tb+Exmm0
+         CuTw==
+X-Gm-Message-State: AOAM5330mU5f3q9S6UrE6E+g9RUflr485hAvLy+Ky0inbG15iIYovNHW
+        jSIwaqBs8aSzjE+XcFvpnzioNw6xjsE=
+X-Google-Smtp-Source: ABdhPJwcgryrk4tZExGjyr0534evimoJtjIFiSLe5u1LnX0hMunee/z+PGQjJP3z0dF1B9wvxTPVgd7CI0s=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+ (user=seanjc job=sendgmr) by 2002:a25:e90e:: with SMTP id n14mr8872967ybd.185.1611346911657;
+ Fri, 22 Jan 2021 12:21:51 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 22 Jan 2021 12:21:31 -0800
+Message-Id: <20210122202144.2756381-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+Subject: [PATCH v3 00/13] KVM: SVM: Misc SEV cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 22, 2021 at 12:25:03PM -0700, Alex Williamson wrote:
+Minor bug fixes and refactorings of SEV related code, mainly to clean up
+the KVM code for tracking whether or not SEV and SEV-ES are enabled.  E.g.
+KVM has both sev_es and svm_sev_enabled(), and a global 'sev' flag while
+also using 'sev' as a local variable in several places.
 
-> Is the only significant difference here the fact that function
-> declarations remain in a private header?  Otherwise it seems to
-> have all the risks of previous attempts, ie. exported symbols with a
-> lot of implicit behavior shared between them.
+Based on v5.11-rc3.
 
-If you want to use substantial amounts of vfio-pci for multiple
-drivers then what other choice is there? You and I previously talked
-about shrinking vfio-pci by moving things to common code, outside
-VFIO, and you didn't like that direction either. 
+v3:
+ - Drop two patches: add a dedicated feature word for CPUID_0x8000001F,
+   and use the new word to mask host CPUID in KVM.  I'll send these as a
+   separate mini-series so that Boris can take them through tip.
+ - Add a patch to remove dependency on
+   CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT. [Boris / Paolo]
+ - Use kcalloc() instead of an open-coded equivalent. [Tom]
+ - Nullify sev_asid_bitmap when freeing it during setup. [Tom]
+ - Add a comment in sev_hardware_teardown() to document why it's safe to
+   query the ASID bitmap without taking the lock. [Tom]
+ - Collect reviews. [Tom and Brijesh]
+v2:
+ - Remove the kernel's sev_enabled instead of renaming it to sev_guest.
+ - Fix various build issues. [Tom]
+ - Remove stable tag from the patch to free sev_asid_bitmap.  Keeping the
+   bitmap on failure is truly only a leak once svm_sev_enabled() is
+   dropped later in the series.  It's still arguably a fix since KVM will
+   unnecessarily keep memory, but it's not stable material. [Tom]
+ - Collect one Ack. [Tom]
 
-So if this shared code lives in vfio-pci, vfio-pci must become a
-library, because this code must be shared.
+v1:
+ - https://lkml.kernel.org/r/20210109004714.1341275-1-seanjc@google.com
 
-The big difference between the May patch series and this one, is to
-actually starts down the path of turning vfio-pci into a proper
-library.
 
-The general long term goal is to make the interface exposed from the
-vfio_pci_core.ko library well defined and sensible. Obviously the
-first patches to make this split are not going to get eveything
-polished, but set a direction for future work. 
+Sean Christopherson (13):
+  KVM: SVM: Zero out the VMCB array used to track SEV ASID association
+  KVM: SVM: Free sev_asid_bitmap during init if SEV setup fails
+  KVM: SVM: Move SEV module params/variables to sev.c
+  x86/sev: Drop redundant and potentially misleading 'sev_enabled'
+  KVM: SVM: Append "_enabled" to module-scoped SEV/SEV-ES control
+    variables
+  KVM: SVM: Condition sev_enabled and sev_es_enabled on
+    CONFIG_KVM_AMD_SEV=y
+  KVM: SVM: Enable SEV/SEV-ES functionality by default (when supported)
+  KVM: SVM: Unconditionally invoke sev_hardware_teardown()
+  KVM: SVM: Explicitly check max SEV ASID during sev_hardware_setup()
+  KVM: SVM: Move SEV VMCB tracking allocation to sev.c
+  KVM: SVM: Drop redundant svm_sev_enabled() helper
+  KVM: SVM: Remove an unnecessary prototype declaration of
+    sev_flush_asids()
+  KVM: SVM: Skip SEV cache flush if no ASIDs have been used
 
-This approach is actually pretty clean because only the ops are
-exported and the ops API is already well defined by VFIO. The internal
-bits of vfio-pci-core can remain hidden behind a defined/restricted
-API.
+ arch/x86/include/asm/mem_encrypt.h |  1 -
+ arch/x86/kvm/svm/sev.c             | 72 +++++++++++++++++++++---------
+ arch/x86/kvm/svm/svm.c             | 35 +++++----------
+ arch/x86/kvm/svm/svm.h             |  8 +---
+ arch/x86/mm/mem_encrypt.c          | 12 +++--
+ arch/x86/mm/mem_encrypt_identity.c |  1 -
+ 6 files changed, 67 insertions(+), 62 deletions(-)
 
-The May series lacks a clear demark for where the library begins/ends
-and vfio_pci.ko start, and doesn't really present a clean way to get
-anywhere better.
+-- 
+2.30.0.280.ga3ce27912f-goog
 
-Also the May series developed its own internalized copy of the driver
-core, which is big no-no. Don't duplicate driver core functionality in
-subsystems. This uses the driver core much closer to how it was
-intended - only the dual binding is a bit odd, but necessary.
-
-> noted in 2/3, IGD support could be a separate module, but that's a
-> direct assignment driver, so then the user must decide to use vfio-pci
-> or igd-vfio-pci, depending on which features they want.
-
-Which I think actually makes sense. Having vfio-pci transparently do
-more than just the basic PCI-sig defined stuff is a very confusing
-path.
-
-Trying to make vfio_pci do everything for everyone will just be a huge
-incomprehensible mess.
-
-> > This subsystem framework will also ease on adding vendor specific
-> > functionality to VFIO devices in the future by allowing another module
-> > to provide the pci_driver that can setup number of details before
-> > registering to VFIO subsystem (such as inject its own operations).
-> 
-> Which leads us directly back to the problem that we then have numerous
-> drivers that a user might choose for a given device.
-
-Sure, but that is a problem that can be tackled in several different
-ways from userspace. Max here mused about some general algorithm to
-process aux device names, you could have userspace look in the module
-data to find VFIO drivers and auto load them like everything else in
-Linux, you could have some VFIO netlink thing, many options worth
-exploring.
-
-Solving the proliferation of VFIO drivers feels like a tangent - lets
-first agree having multiple VFIO drivers is the right technical
-direction within the Linux driver core model before we try to figure
-out what to do for userspace.
-
-> > In this way, we'll use the HW vendor driver core to manage the lifecycle
-> > of these devices. This is reasonable since only the vendor driver knows
-> > exactly about the status on its internal state and the capabilities of
-> > its acceleratots, for example.
-> 
-> But mdev provides that too, or the vendor could write their own vfio
-
-Not really, mdev has a completely different lifecycle model that is
-not very compatible with what is required here.
-
-And writing a VFIO driver is basically what this does, just a large
-portion of the driver is reusing code from the normal vfio-pci cases.
-
-Jason
