@@ -2,178 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 286E52FF91D
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 00:53:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B66412FF93E
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 01:10:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726198AbhAUXwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 21 Jan 2021 18:52:02 -0500
-Received: from mail-eopbgr770080.outbound.protection.outlook.com ([40.107.77.80]:15619
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726101AbhAUXwA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 21 Jan 2021 18:52:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j9D5WJD7lrzwcJ3nsG8l5VIbsRvhG6QuvEf9JikoHMtKA991ebTzVtOL//TS3ZXz7RGFhlJ7iku+mSAWAwf8jrX4RBaGcyvc4iRq8mI87Wk9DDenx++Ygl6ExN8VEX5PX7vIMxQ+sEVZ4lSrnDVCibXhR0vXOzD9spMCz4itkDpbV0Ez9tpQarmNzm+SXFdriuCRX8umTTCRQ6q6vdAuf7yoLpq3QfzM/vBVY3xShlOyuqu9Rn64bW/UJxxt6jr6TYIDqqgPW22fbnI8dl+I88Ejd9EU/sehqe4DrS9pynF4RIKPHK4Tj14HXLt6WrP64+u8z2RsRhFeyME9rIY+Nw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YmA9YpvtupZtkEPZd2rBFOuvIyWskg0ueNR0jUVca/k=;
- b=cVgrxWDogD+UuyuxJv5bJT3je8afvIucKLPCs3HdOYCbhwF7uHs1f1sYhaBOWIPejvX/6PnBYmZyZDBsn2kYzPp+jR4dfnjzWsYlLY9qHH3kpLtc/vdb4+lF+jm6FfAeEWf1zjOJkGw/+Um6EplZA12Ej+7FsORYwpNz9oU2wvel3zhMUMAaaP+j1tARTRQDMNJQahlcqRs4SWZSUBCikrs8duaX7lfbVs8Xfc1C+TlU7sWWeetVWgodnRa0MevlycKYTCIHvDO2KksQAr6yOasE0VobX//UwO2Y5lrSMovFaUXQba9k3mc/50iN5OXoK/UzhekEnUsy7fke1RFidw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YmA9YpvtupZtkEPZd2rBFOuvIyWskg0ueNR0jUVca/k=;
- b=xbMiRgTaivmTAdWPbvxcU+hWr3sh6t7wcHlGwnAKPyby0M2gpjNUeBoDpePw3qNYGeyyLHZMWF8dQC/9wQg2G6slE6R46s8wx+daIxD5HX/m771JImGf+18JUA2rKAfzDekuQbebSb87gtsxNQ0rnpQ/7o4rLejikMTObucZT8k=
-Authentication-Results: google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SA0PR12MB4480.namprd12.prod.outlook.com (2603:10b6:806:99::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.13; Thu, 21 Jan
- 2021 23:51:12 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3784.012; Thu, 21 Jan 2021
- 23:51:12 +0000
-Subject: Re: [PATCH v6 00/12] SVM cleanup and INVPCID feature support
-From:   Babu Moger <babu.moger@amd.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        kvm list <kvm@vger.kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Makarand Sonare <makarandsonare@google.com>,
-        Sean Christopherson <seanjc@google.com>
-References: <159985237526.11252.1516487214307300610.stgit@bmoger-ubuntu>
- <83a96ca9-0810-6c07-2e45-5aa2da9b1ab0@redhat.com>
- <5df9b517-448f-d631-2222-6e78d6395ed9@amd.com>
- <CALMp9eRDSW66+XvbHVF4ohL7XhThoPoT0BrB0TcS0cgk=dkcBg@mail.gmail.com>
- <bb2315e3-1c24-c5ae-3947-27c5169a9d47@amd.com>
- <CALMp9eQBY50kZT6WdM-D2gmUgDZmCYTn+kxcxk8EQTg=SygLKA@mail.gmail.com>
- <21ee28c6-f693-e7c0-6d83-92daa9a46880@amd.com>
- <01cf2fd7-626e-c084-5a6a-1a53d111d9fa@amd.com>
-Message-ID: <84f42bad-9fb0-8a76-7f9b-580898b634b9@amd.com>
-Date:   Thu, 21 Jan 2021 17:51:11 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <01cf2fd7-626e-c084-5a6a-1a53d111d9fa@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SA9PR13CA0166.namprd13.prod.outlook.com
- (2603:10b6:806:28::21) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+        id S1725845AbhAVAKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 21 Jan 2021 19:10:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36650 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725823AbhAVAKI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 21 Jan 2021 19:10:08 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3730C06174A
+        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 16:09:27 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id b5so2744685pjl.0
+        for <kvm@vger.kernel.org>; Thu, 21 Jan 2021 16:09:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5B43/qTnJag/KIuHZ95pu4xZZ/OP+ZGwvSqErVBVefQ=;
+        b=QPjyDabZlAqIUgik+G/LpiVQmoi31M4CpAZoE2IA6GPPirbHjXtU7aKqvxbLBidRmA
+         X8uNXVrpHa3HmQZyYcFrK/DCD4va75v9VXF8Z+iakiKkBkW8utaus/QNohUtlnoB7CqM
+         X9y9wErEa6Krei2ahz3jgJ2I4KZtueLITUWcE62XKDK6rQ72GLHzIXgfAsXbrBJx6jdC
+         4RBtQtvMVXM07Ax+1Cq0xOT7+ijzCi1PiQF9Z/FeLuACVRh1MjEfm513NELriKgFLIzh
+         i0sz16Pn/3b18CZk+oBe+VBpdTGKsS5dUzWtJUldptfuB1fPjchyCfRwm2o2r+s7fOHo
+         KZxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5B43/qTnJag/KIuHZ95pu4xZZ/OP+ZGwvSqErVBVefQ=;
+        b=ohebqjSr/dVLWMxz5QPijI8hQgidInsFBDEbAr7UToF4sxlPgmYrQDk+/0Orr2p2t6
+         ht/fMQ/3HIuqy6Khc0B7/REAbqa3ZqmdE+wQarUgF0wl/TwHZawCQot1SKvi0OhM73SH
+         kWnZpc9+6xVa5cP44A4qGssMiiMWXmRHzragBBt05rf9d+L5SJj/UFWyTv9lEnNl5adK
+         mgbvtMwh+gzoglol+Fto4uMhk4Oris0VEazfg6j6j5+wJQ5DB9XkL4kFqr9uN/DcBix8
+         Fi8oMoJLBQoMSwwbWXaqwsH5XLzJAkwVnRlMXcsDyj2nslVmUA2g4m064BnseK328F5A
+         OC6g==
+X-Gm-Message-State: AOAM532C5HaLkkfKXWiI8XgjsaeSAa4SrarqNH+dHvZa6ukFDOJRTRFA
+        JPgdpfb7QFSkY6xFLlNAQnOFoA==
+X-Google-Smtp-Source: ABdhPJydRKLqTCDaLvIm8kGXTNIwe4IM9ORH+KwOrymEZBE3GpK9Hup8VDhosOp/Npme++92MRbpow==
+X-Received: by 2002:a17:902:6903:b029:da:f458:798c with SMTP id j3-20020a1709026903b02900daf458798cmr2274211plk.68.1611274167248;
+        Thu, 21 Jan 2021 16:09:27 -0800 (PST)
+Received: from google.com ([2620:0:1008:10:1ea0:b8ff:fe75:b885])
+        by smtp.gmail.com with ESMTPSA id y11sm4796323pfo.121.2021.01.21.16.09.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Jan 2021 16:09:26 -0800 (PST)
+Date:   Thu, 21 Jan 2021 16:09:22 -0800
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     thomas.lendacky@amd.com, brijesh.singh@amd.com, jon.grimm@amd.com,
+        eric.vantassell@amd.com, pbonzini@redhat.com, seanjc@google.com,
+        hannes@cmpxchg.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
+        corbet@lwn.net, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, gingell@google.com,
+        rientjes@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 1/2] cgroup: svm: Add Encryption ID controller
+Message-ID: <YAoXsluM+J9ICy99@google.com>
+References: <20210108012846.4134815-2-vipinsh@google.com>
+ <YAICLR8PBXxAcOMz@mtj.duckdns.org>
+ <YAIUwGUPDmYfUm/a@google.com>
+ <YAJg5MB/Qn5dRqmu@mtj.duckdns.org>
+ <YAJsUyH2zspZxF2S@google.com>
+ <YAb//EYCkZ7wnl6D@mtj.duckdns.org>
+ <YAfYL7V6E4/P83Mg@google.com>
+ <YAhc8khTUc2AFDcd@mtj.duckdns.org>
+ <YAi6RcbxTSMmNssw@google.com>
+ <YAi9qNqiBjGvXMoI@mtj.duckdns.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.31.136] (165.204.77.1) by SA9PR13CA0166.namprd13.prod.outlook.com (2603:10b6:806:28::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.6 via Frontend Transport; Thu, 21 Jan 2021 23:51:11 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e34d9bdb-cd94-4182-ece5-08d8be676ec9
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4480:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB44800EA1ECDAC2091F13E67B95A19@SA0PR12MB4480.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wUit9FSvsCslGSUW8/KThApcaWuCHpYmLdd6Yy6gqqcgC08wy5qbupYYEGrWIzoMkxpCsHOskH5G7GyLnKZmhb9w75VJNTxqfjoeUwVI1gPeHDBtZHX8fPm1yJMXPXpHZQ0/glKijBQgqG03cZn+6G9vj3QQC+5FFmGbKdM8SKM65698t7XPoseLtfhU/79RPfSemKcfi5WS9d4tws/BnYHxHlKms9rTGiNEptaDa8sgcNvElnDR2rGiZwM2nk0aEtIbRBkIgWLPIvRZCETHO1Gk5JlxkWAMQH76eafV32xWa3W03iwjT9deuDN7qufYom5EcY4katXQLmUydtMGVlhRUSdRBENZVH4r3TtbSqX5f3reHt03/AwPEsscW/mpCEHhHcLLBSI509bSOhQMh4sjlRaP9Ex5wx20OttSbaMCFXIOdnyko3VDx7gf2Y+te6QmbsuCVVr09Pt3cZMPBVpCseW5/6v7rSsWG9/uQsKPkG9TpVjE2IV5oM+T+KxjZRHH1vcRWnBSuEJDwKi3NB9oqYfEtOlKy6XPF1hA8synNsFm31iRGe21fVKhwdNL49q01vOa/x3aaBMG8Nilgs5VZbcPqc8c71EGEbTRMKnGrVzLYs2YPfkPOysLXK2AnYiFn5U5mBaEw9kZiLi8O2Yyoro8Lfd69sBgEM0mB4IqSg1mxE3E2uZGgrNp6Hsd
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(396003)(366004)(39860400002)(136003)(36756003)(6486002)(6916009)(31696002)(8936002)(4326008)(83380400001)(44832011)(956004)(86362001)(45080400002)(2616005)(478600001)(966005)(66946007)(2906002)(8676002)(31686004)(66476007)(5660300002)(26005)(52116002)(16526019)(316002)(7416002)(16576012)(66556008)(54906003)(186003)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?dm8zSnd0aDRSalRYcGNXbzBsbzA2aVlKTnlDMDdSaWR3V0U1Y1dzM2lWeHVY?=
- =?utf-8?B?NDBYZkl2aGZUKzlPQWJna2NkMThPRjZHS1FsTUtWUjRwZXJwRWlNOTgwR0tw?=
- =?utf-8?B?R1lWeXpmTkhjM0JyeVQ3Zk5ORXhka1BEUnJaM0FBdTBWRGdOcFNoSVNtVkNY?=
- =?utf-8?B?dmJFcXpaN3ByNytNandRQkpSY041empPaittZHFXVVFlVGFiVlEvMjM1SnQz?=
- =?utf-8?B?aFhMOU43c2MzSFIxckI1NFZxc3hES3IzL3FFTnRVeHZzRzJ2d0tPdms0NGoz?=
- =?utf-8?B?UE96RHJnMGxaWUhhMTFGUTZSOWhhUkRyTHBVYTB0TVpUT21SQStoTThtT0E3?=
- =?utf-8?B?S3pkeWFPUnZ6Qkk2dGVnaFJRcHNXLzJiOE0xRUxsY05PMjhOT1FNcHJVY0xh?=
- =?utf-8?B?MmZia3NPNFhBYjBjQURqRjRiK1NzVTZlTUFZZzZJM0M5ekt1bjZPTFM1ekZy?=
- =?utf-8?B?ZDB2MkdqazBwZktZb2JSclF3SFlwQ0FDTWI3ZWsyYUU4bitWZ2dxTGxxamFU?=
- =?utf-8?B?NlNEYSt5ZldwWEtyZTBkRmkybS9mTkRNTEdGd0tKb09sK0pXWFVRYXp5Qkpt?=
- =?utf-8?B?Ym9ITW8xWUhRaERRK1J0M05rQUxQcC9PWUVxbXZrckUxZ3NucGNtVDY3TW1T?=
- =?utf-8?B?TmNBbWs4NmlxSUNINkhNbFFMbWRDdUFQNG5LcXlrMWE4RUxHQ3RUSDlpRHVh?=
- =?utf-8?B?S1lDVjBUamw0UWg2MHJnQ3BBdGVrUFRmLzhWRUZpTWE2UWFSaHFBZ0lTVFd0?=
- =?utf-8?B?T2NaWkRUblFRNVVBV0tlMVpjYkg3b2FKSStISmFQLzV0ZTdlZEZ3UXFJTDNY?=
- =?utf-8?B?dUhrMHdDT3FEUytKTWdERU1XWHZXKzEyN3l3TGxBeGhiVVZiK3NpZjVwUnFJ?=
- =?utf-8?B?Tmp5QzZiM3NEYWYybk5aMU1ZZmxxUVhRR1l0ZHZnbXN6bnRJUmliZkZoT3Rh?=
- =?utf-8?B?UWdBZFAxMmsvbnVWWUJVekJlWnQzK2JGd1c0dTlFS2haNFZsc21XMzV2eWR1?=
- =?utf-8?B?QThZaVNuRU9TN1I2dURkUjY5ZWpCeC95UDBGRTJ1Y2UrRk1SMlc5M1RnazVo?=
- =?utf-8?B?VDZpV2hiL1RWbXlFbldpR1p5QU1nekRoTUNxVk9YYkZpeXFtT05JRXcxNjJF?=
- =?utf-8?B?UnBOVXpFNXcwTGdPK3A5QUVQOHpyaVlLNGpsVVdVMDEvb1BVU1J6dE5rOXRT?=
- =?utf-8?B?K283Rkp3S2VOQjVhQTFxM2k4a3pqai9mMnNlWk8yczhaMUN3MUNnZ2hhaXVY?=
- =?utf-8?B?d3lEVFcyVUhyTWFsS3RzTWsvaXFvemdJc0ZNelZueXVhUXhiNExyZ3Y3UUpY?=
- =?utf-8?Q?TpiK3oWMAGkBBUqWmFFRDjP2pg/eFAXhbW?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e34d9bdb-cd94-4182-ece5-08d8be676ec9
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2021 23:51:12.4919
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: u39lX6SH9HjQXttnUS1tYMDPpia/Q280x1ANvYCQTeske+ausMe/uz/xdlGl22Ko
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4480
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YAi9qNqiBjGvXMoI@mtj.duckdns.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jan 20, 2021 at 06:32:56PM -0500, Tejun Heo wrote:
+> I don't know how many times I have to repeat the same point to get it
+> across. For any question about actual abstraction, you haven't provided any
+> kind of actual research or analysis and just keep pushing the same thing
+> over and over again. Maybe the situation is such that it makes sense to
+> change the rule but that needs substantial justifications. I've been asking
+> to see whether there are such justifications but all I've been getting are
+> empty answers. Until such discussions take place, please consider the series
+> nacked and please excuse if I don't respond promptly in this thread.
 
+I am sorry Tejun that you felt your feedback and questions are being ignored
+or not answered properly by me. It was not my intent. Let me try again.
 
-On 1/20/21 9:10 PM, Babu Moger wrote:
-> 
-> 
-> On 1/20/21 3:45 PM, Babu Moger wrote:
->>
->>
->> On 1/20/21 3:14 PM, Jim Mattson wrote:
->>> On Tue, Jan 19, 2021 at 3:45 PM Babu Moger <babu.moger@amd.com> wrote:
->>>>
->>>>
->>>>
->>>> On 1/19/21 5:01 PM, Jim Mattson wrote:
->>>>> On Mon, Sep 14, 2020 at 11:33 AM Babu Moger <babu.moger@amd.com> wrote:
->>>>>
->>>>>> Thanks Paolo. Tested Guest/nested guest/kvm units tests. Everything works
->>>>>> as expected.
->>>>>
->>>>> Debian 9 does not like this patch set. As a kvm guest, it panics on a
->>>>> Milan CPU unless booted with 'nopcid'. Gmail mangles long lines, so
->>>>> please see the attached kernel log snippet. Debian 10 is fine, so I
->>>>> assume this is a guest bug.
->>>>>
->>>>
->>>> We had an issue with PCID feature earlier. This was showing only with SEV
->>>> guests. It is resolved recently. Do you think it is not related that?
->>>> Here are the patch set.
->>>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fkvm%2F160521930597.32054.4906933314022910996.stgit%40bmoger-ubuntu%2F&amp;data=04%7C01%7CBabu.Moger%40amd.com%7C3009e5f7f32b4dbd4aee08d8bdc045c9%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637467980841376327%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=%2Bva7em372XD7uaCrSy3UBH6a9n8xaTTXWCAlA3gJX78%3D&amp;reserved=0
->>>
->>> The Debian 9 release we tested is not an SEV guest.
->> ok. I have not tested Debian 9 before. I will try now. Will let you know
->> how it goes. thanks
->>
-> 
-> I have reproduced the issue locally. Will investigate. thanks
-> 
-Few updates.
-1. Like Jim mentioned earlier, this appears to be guest kernel issue.
-Debian 9 runs the base kernel 4.9.0-14. Problem can be seen consistently
-with this kernel.
+I am not able to come up with an abstraction for underlying the hardware
+like we have for memory, cpu, and io with their respective cgroup
+controllers, because each vendor is solving VM security issue in
+different ways. For example:
 
-2. This guest kernel(4.9.0-14) does not like the new feature INVPCID.
+s390 is using Ultravisor (UV) to disable access to the VMs memory from
+the host.  All KVM interaction with their Protected Virtual Machines
+(PVM) are handled through UV APIs. Here an encrypted guest image is
+loaded first which is decrypted by UV and then UV disallows access to
+PVMs memory and register state from KVM or other PVMs. PVMs are assigned
+IDs known as secure execution IDs (SEID).  These IDs are not scarce
+resource on the host.
 
-3. System comes up fine when invpcid feature is disabled with the boot
-parameter "noinvpcid" and also with "nopcid". nopcid disables both pcid
-and invpcid.
+AMD is encrypting runtime memory of a VM using an hardware AES engine in
+the memory controller and keys are managed by an Arm based coprocessor
+inside the CPU, for encryption and decryption of the data flow between
+CPU and memory.  Their offering is known as Secure Encrypted
+Virtualization (SEV). There are also two more enhanced offerings SEV-ES,
+(memory + guest register state encryption), SEV-SNP (SEV-ES + memory
+integrity protection + TCB rollback) in later generation of CPUs. At any
+time only a limited number of IDs can be used simultaneously in the
+processor. Initially only SEV IDs we available on the CPUs but in the
+later generations of CPUs with the addition of SEV-ES, IDs were divided
+in two groups SEV ASIDs for SEV guests, and SEV-ES ASIDs for SEV-ES and
+SEV-SNP VMs. SEV firmware doesn't allow SEV ASIDs to launch SEV-ES and
+SEV-SNP VMs. Ideally, I think its better to use SEV-SNP as it provides
+highest protection but support in vmm and guest kernels are not there
+yet. Also, old HW will not be able to run SEV-ES or SEV-SNP as they can
+only run SEV ASIDs. I dont have data in terms of drawbacks running VM on
+SEV-SNP in terms of speed and cost but I think it will be dependent on
+workloads.
 
-4. Upgraded the guest kernel to v5.0 and system comes up fine.
+Intel has come up with Trusted Domain Extension (TDX) for their secure
+VMs offering. They allow a VM to use multiple keys for private pages and
+for pages shared with other VMs. Overall, this is called as Multi-Key
+Total Memory Encryption (MKTME). A fixed number of encryption keys are
+supported in MKTME engine. During execution these keys are identified
+using KeyIDs which are present in upper bits of platform physical
+addresses.
 
-5. Also system comes up fine with latest guest kernel 5.11.0-rc4.
+Only limited form of abstraction present here is that all are providing
+a way to have secure VMs and processes, either through single key
+encryption, multiple key encryptions or access denial.
 
-I did not bisect further yet.
-Babu
-Thanks
+A common abstraction of different underlying security behavior/approach
+can mislead users in giving impression that all secure VMs/processes are
+same. In my opinion, this kind of thing can work when we talk about
+memory, cpu, etc, but for security related stuff will do more harm to
+the end user than the benefit of simplicity of abstraction. The name of
+the underlying feature also tells what kind of security guarantees a
+user can expect on the platform for a VM and what kind is used.
+
+Taking a step back, in the current scenario, we have some global shared
+resources which are limited for SEV, SEV-ES, and TDX. There is also a
+need for tracking and controlling on all 4 features for now. This is a
+case for some kind of cgroup behavior to limit and control an aggregate
+of processes using these system resources. After all, "cgroup is a
+mechanism to organize processes hierarchically and distribute system
+resources along the hierarchy in a controlled and configurable manner."
+
+We are using SEV in KVM and outside KVM also for other products on
+horizon. As cgroups are commonly used in many infrastructures for
+resource control, scheduling, and tracking, this patch is helping us in
+allocating jobs in the infrastructure along with memory, cpu and other
+constraints in a coherent way.
+
+If you feel encryption id cgroup is not good for long term or a
+too specific use case then may be there should be a common cgroup which
+can be a home for this kind and other kind of future resources where
+there is need to limit a global resource allocation but are not abstract
+or cannot be abstracted as the other existing cgroups. My current patch
+is very generic and with few modifications, it can provide subsystems,
+having valid requirements, a capability to use their own simple cgroup
+interfaces with minimal code duplication and get robustness of generic
+cgroup for free. Here, SEV will be the first user of this generic
+cgroup. Need for this is clearly there.
+
+Thanks Vipin
