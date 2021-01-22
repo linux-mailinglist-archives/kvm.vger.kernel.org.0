@@ -2,112 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF1AA2FFE26
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 09:30:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF7462FFF03
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 10:24:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726294AbhAVI1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 03:27:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52764 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726247AbhAVI0y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Jan 2021 03:26:54 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10M8CRbB128393;
-        Fri, 22 Jan 2021 03:26:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=mw4V63uEuhF15jfLZx5263/9Tfcis6S2XeJ6PjdZCk8=;
- b=nng7M2CnBTGNSXaITZDAwVUx+HwDBtm2EiOs8ckI+Od24wRDL3f/BUcL8PuV6yGni6Cu
- gdiAUdVnLgR9KI7Z1jiV1/1neFtq6GnHE8Ol2JLCbbbArrlVCN2uCpBEPw3vBKY8fl+W
- cpbA+iIRADpbOOTlkDTzvVzUzsYyhZM3D7bOH+veD3wH11lS7VUts38V0FVT4lqAysNm
- eeZnVjuMJPu8RdBwtFjG8sTJUyG16O641GjQvRG8+zT0Fpk64KTlX91LL1TVms/fks9Y
- B7w2Qrj97lfm/HsKqmSKBrHq7KEGhuVNKOvUdSOuX4j0SgBDL5guvnUmb+dMRI7cyB/w eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 367u05g9wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jan 2021 03:26:12 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10M8Dn3T131567;
-        Fri, 22 Jan 2021 03:26:11 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 367u05g9vp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jan 2021 03:26:11 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10M8HY7s015508;
-        Fri, 22 Jan 2021 08:26:10 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 367k0v06aq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 22 Jan 2021 08:26:09 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10M8Q61m33030512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Jan 2021 08:26:07 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CBECFA4064;
-        Fri, 22 Jan 2021 08:26:06 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 585A9A405F;
-        Fri, 22 Jan 2021 08:26:06 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.171.82.42])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 22 Jan 2021 08:26:06 +0000 (GMT)
-Subject: Re: [PATCH v5] s390/vfio-ap: clean up vfio_ap resources when KVM
- pointer invalidated
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com, Halil Pasic <pasic@linux.ibm.com>
-References: <20201223012013.5418-1-akrowiak@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Message-ID: <0649ba1e-ecd3-890a-72b5-a8ff54417faf@de.ibm.com>
-Date:   Fri, 22 Jan 2021 09:26:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1727098AbhAVIjx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 03:39:53 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11179 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727125AbhAVIiC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 03:38:02 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMXdn4gT6zl8Rv;
+        Fri, 22 Jan 2021 16:35:41 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 22 Jan 2021 16:37:01 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+CC:     Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Daniel Lezcano" <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: [RFC PATCH] kvm: arm64: Try stage2 block mapping for host device MMIO
+Date:   Fri, 22 Jan 2021 16:36:50 +0800
+Message-ID: <20210122083650.21812-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <20201223012013.5418-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-22_03:2021-01-21,2021-01-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 priorityscore=1501 impostorscore=0
- phishscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101220038
+Content-Type: text/plain
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.12.20 02:20, Tony Krowiak wrote:
-> The vfio_ap device driver registers a group notifier with VFIO when the
-> file descriptor for a VFIO mediated device for a KVM guest is opened to
-> receive notification that the KVM pointer is set (VFIO_GROUP_NOTIFY_SET_KVM
-> event). When the KVM pointer is set, the vfio_ap driver takes the
-> following actions:
-> 1. Stashes the KVM pointer in the vfio_ap_mdev struct that holds the state
->    of the mediated device.
-> 2. Calls the kvm_get_kvm() function to increment its reference counter.
-> 3. Sets the function pointer to the function that handles interception of
->    the instruction that enables/disables interrupt processing.
-> 4. Sets the masks in the KVM guest's CRYCB to pass AP resources through to
->    the guest.
-> 
-> In order to avoid memory leaks, when the notifier is called to receive
-> notification that the KVM pointer has been set to NULL, the vfio_ap device
-> driver should reverse the actions taken when the KVM pointer was set.
-> 
-> Fixes: 258287c994de ("s390: vfio-ap: implement mediated device open callback")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+The MMIO region of a device maybe huge (GB level), try to use block
+mapping in stage2 to speedup both map and unmap.
 
+Especially for unmap, it performs TLBI right after each invalidation
+of PTE. If all mapping is of PAGE_SIZE, it takes much time to handle
+GB level range.
 
-Just to keep you up2date why this patch is still waiting in our queue. This triggered
-a lockdep splat in the CI which we want to fix first.
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 15 +++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 12 ++++++++----
+ 3 files changed, 34 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 52ab38db04c7..2266ac45f10c 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -82,6 +82,17 @@ struct kvm_pgtable_walker {
+ 	const enum kvm_pgtable_walk_flags	flags;
+ };
+ 
++/**
++ * kvm_supported_pgsize() - Get the max supported page size of a mapping.
++ * @pgt:	Initialised page-table structure.
++ * @addr:	Virtual address at which to place the mapping.
++ * @end:	End virtual address of the mapping.
++ * @phys:	Physical address of the memory to map.
++ *
++ * The smallest return value is PAGE_SIZE.
++ */
++u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys);
++
+ /**
+  * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
+  * @pgt:	Uninitialised page-table structure to initialise.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index bdf8e55ed308..ab11609b9b13 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -81,6 +81,21 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+ 	return IS_ALIGNED(addr, granule) && IS_ALIGNED(phys, granule);
+ }
+ 
++u64 kvm_supported_pgsize(struct kvm_pgtable *pgt, u64 addr, u64 end, u64 phys)
++{
++	u32 lvl;
++	u64 pgsize = PAGE_SIZE;
++
++	for (lvl = pgt->start_level; lvl < KVM_PGTABLE_MAX_LEVELS; lvl++) {
++		if (kvm_block_mapping_supported(addr, end, phys, lvl)) {
++			pgsize = kvm_granule_size(lvl);
++			break;
++		}
++	}
++
++	return pgsize;
++}
++
+ static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+ {
+ 	u64 shift = kvm_granule_shift(level);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7d2257cc5438..80b403fc8e64 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -499,7 +499,8 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable)
+ {
+-	phys_addr_t addr;
++	phys_addr_t addr, end;
++	unsigned long pgsize;
+ 	int ret = 0;
+ 	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+@@ -509,21 +510,24 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 
+ 	size += offset_in_page(guest_ipa);
+ 	guest_ipa &= PAGE_MASK;
++	end = guest_ipa + size;
+ 
+-	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
++	for (addr = guest_ipa; addr < end; addr += pgsize) {
+ 		ret = kvm_mmu_topup_memory_cache(&cache,
+ 						 kvm_mmu_cache_min_pages(kvm));
+ 		if (ret)
+ 			break;
+ 
++		pgsize = kvm_supported_pgsize(pgt, addr, end, pa);
++
+ 		spin_lock(&kvm->mmu_lock);
+-		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
++		ret = kvm_pgtable_stage2_map(pgt, addr, pgsize, pa, prot,
+ 					     &cache);
+ 		spin_unlock(&kvm->mmu_lock);
+ 		if (ret)
+ 			break;
+ 
+-		pa += PAGE_SIZE;
++		pa += pgsize;
+ 	}
+ 
+ 	kvm_mmu_free_memory_cache(&cache);
+-- 
+2.19.1
+
