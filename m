@@ -2,146 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 431C3301029
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 23:41:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D48AC30108F
+	for <lists+kvm@lfdr.de>; Sat, 23 Jan 2021 00:04:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728290AbhAVWkS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 17:40:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24022 "EHLO
+        id S1729251AbhAVXCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 18:02:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54200 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729801AbhAVTpm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Jan 2021 14:45:42 -0500
+        by vger.kernel.org with ESMTP id S1729019AbhAVXBV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 22 Jan 2021 18:01:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611344654;
+        s=mimecast20190719; t=1611356390;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3uNDwmhw+dypTTbDZcFNMsEkHC7AyteHqMNOLnBYuX8=;
-        b=OKX9SCGK/1soTaarb1Dmg2hAGL951g6wn5LhqrBHz06CVScHEbpSoEYpiEKBrNDhYHVmNm
-        rcD4PavaO9xeOwcW1ghy4LqWCv9xITs8NYmzuW49oa6FT94V5o+gtNmeDewevsGirVm1Ch
-        p/BDcgoNcKcek7Zc20CzC0Z4xxivEBg=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-4vApMaq6MXGsCq7TAZ02ew-1; Fri, 22 Jan 2021 14:44:12 -0500
-X-MC-Unique: 4vApMaq6MXGsCq7TAZ02ew-1
-Received: by mail-qk1-f200.google.com with SMTP id 205so2734403qkf.4
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 11:44:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3uNDwmhw+dypTTbDZcFNMsEkHC7AyteHqMNOLnBYuX8=;
-        b=TlUM+rZwYLOSv6jMIgG4IKlyKf8EUWsb1F8pElyq1vSP/l2/oP2vMQ0vNOHHs72i7J
-         6vshJwuz8DmNvfpzS4zuNbJxFvsSaJd7KOvk7NBfP0su6g1Fhh/3wIpdptQaLZW+0OB5
-         UOaHhQSniI+MRQdRAZRsda+l+5jKVUalsVDWGe9wrAH7cQ1Y1bUh0KxzYO2/iVdf8Tok
-         RyFbcx6rMk9n/RAS8s8+gjUtTCsk+eKaHb21liSzu5N7AMqO9p/IF6PFY/Kvs+vG4/OX
-         e0sxuQKSSy4ehxRu1OXRfXDnwBZZi6iKl13fEe4KstVoCrsdvr8gsUbPOw64ToYVqBG9
-         YNKQ==
-X-Gm-Message-State: AOAM530h+2tBozG61/8PU6PAx26rhZH73llbLsqBCJqT3k3exO+jWvfZ
-        aDkNBkEV2cq9kexzJr/W1EiHZZG5oUcLF+7LoH2SqY/l/emnPGpuIaAO1ZbEoe14Oc22wCa/w2V
-        PKKIcSoR8drjXPVJ0bjW3JoBPPman
-X-Received: by 2002:a05:620a:12d5:: with SMTP id e21mr3438614qkl.131.1611344651589;
-        Fri, 22 Jan 2021 11:44:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw6cFebtmiIS8knjYgLudy4UeqwjmnsOMneaVMKnv2KT/lJTSR4ttPMGlPsJYpw37S7QqTD713vRrO6GSoAsz8=
-X-Received: by 2002:a05:620a:12d5:: with SMTP id e21mr3438585qkl.131.1611344651277;
- Fri, 22 Jan 2021 11:44:11 -0800 (PST)
+        bh=mbzmyHu5WBYgXnqIwORCLP8ohuBfwekPMeaSA9ikw1w=;
+        b=erh5hftOibVpcjjznqytaJcrMkCku+B8j33d/Kq2WBMLUV5Rsfvjag+gIQVePQVQj9U3in
+        KK/sLg8cld08FS9cAFc5bh6OaeDRCnTlsyenDFL2o1l156sjLXhUzK/F6toDRrLv5eK7Mr
+        hhgfnb/nsL8xr1++ac6aBVNDrDYcgIY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-ADxk3OV-OROhcYp5dBcM0A-1; Fri, 22 Jan 2021 17:59:49 -0500
+X-MC-Unique: ADxk3OV-OROhcYp5dBcM0A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B8CE3938D;
+        Fri, 22 Jan 2021 22:59:48 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BD4B75C232;
+        Fri, 22 Jan 2021 22:59:47 +0000 (UTC)
+Date:   Fri, 22 Jan 2021 15:59:46 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steve Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH V2 9/9] vfio/type1: block on invalid vaddr
+Message-ID: <20210122155946.3f42dfc9@omen.home.shazbot.org>
+In-Reply-To: <1611078509-181959-10-git-send-email-steven.sistare@oracle.com>
+References: <1611078509-181959-1-git-send-email-steven.sistare@oracle.com>
+        <1611078509-181959-10-git-send-email-steven.sistare@oracle.com>
 MIME-Version: 1.0
-References: <20201216064818.48239-1-jasowang@redhat.com> <20201216064818.48239-22-jasowang@redhat.com>
- <20210111122601.GA172492@mtl-vdi-166.wap.labs.mlnx> <da50981b-6bbc-ee61-b5b1-a57a09da8e93@redhat.com>
-In-Reply-To: <da50981b-6bbc-ee61-b5b1-a57a09da8e93@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Fri, 22 Jan 2021 20:43:34 +0100
-Message-ID: <CAJaqyWcRirQgz+n63rU2nYVH2RKqjQfwHGFLzOG=H46qRWuTog@mail.gmail.com>
-Subject: Re: [PATCH 21/21] vdpasim: control virtqueue support
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Eli Cohen <elic@nvidia.com>, Michael Tsirkin <mst@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Cindy Lu <lulu@redhat.com>,
-        Eli Cohen <eli@mellanox.com>, lingshan.zhu@intel.com,
-        Rob Miller <rob.miller@broadcom.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 12, 2021 at 4:12 AM Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2021/1/11 =E4=B8=8B=E5=8D=888:26, Eli Cohen wrote:
-> > On Wed, Dec 16, 2020 at 02:48:18PM +0800, Jason Wang wrote:
-> >> This patch introduces the control virtqueue support for vDPA
-> >> simulator. This is a requirement for supporting advanced features like
-> >> multiqueue.
-> >>
-> >> A requirement for control virtqueue is to isolate its memory access
-> >> from the rx/tx virtqueues. This is because when using vDPA device
-> >> for VM, the control virqueue is not directly assigned to VM. Userspace
-> >> (Qemu) will present a shadow control virtqueue to control for
-> >> recording the device states.
-> >>
-> >> The isolation is done via the virtqueue groups and ASID support in
-> >> vDPA through vhost-vdpa. The simulator is extended to have:
-> >>
-> >> 1) three virtqueues: RXVQ, TXVQ and CVQ (control virtqueue)
-> >> 2) two virtqueue groups: group 0 contains RXVQ and TXVQ; group 1
-> >>     contains CVQ
-> >> 3) two address spaces and the simulator simply implements the address
-> >>     spaces by mapping it 1:1 to IOTLB.
-> >>
-> >> For the VM use cases, userspace(Qemu) may set AS 0 to group 0 and AS 1
-> >> to group 1. So we have:
-> >>
-> >> 1) The IOTLB for virtqueue group 0 contains the mappings of guest, so
-> >>     RX and TX can be assigned to guest directly.
-> >> 2) The IOTLB for virtqueue group 1 contains the mappings of CVQ which
-> >>     is the buffers that allocated and managed by VMM only. So CVQ of
-> >>     vhost-vdpa is visible to VMM only. And Guest can not access the CV=
-Q
-> >>     of vhost-vdpa.
-> >>
-> >> For the other use cases, since AS 0 is associated to all virtqueue
-> >> groups by default. All virtqueues share the same mapping by default.
-> >>
-> >> To demonstrate the function, VIRITO_NET_F_CTRL_MACADDR is
-> >> implemented in the simulator for the driver to set mac address.
-> >>
-> > Hi Jason,
-> >
-> > is there any version of qemu/libvirt available that I can see the
-> > control virtqueue working in action?
->
->
-> Not yet, the qemu part depends on the shadow virtqueue work of Eugenio.
-> But it will work as:
->
-> 1) qemu will use a separated address space for the control virtqueue
-> (shadow) exposed through vhost-vDPA
-> 2) the commands sent through control virtqueue by guest driver will
-> intercept by qemu
-> 3) Qemu will send those commands to the shadow control virtqueue
->
-> Eugenio, any ETA for the new version of shadow virtqueue support in Qemu?
->
+On Tue, 19 Jan 2021 09:48:29 -0800
+Steve Sistare <steven.sistare@oracle.com> wrote:
 
-Hi Jason. Sorry for the late response.
+> Block translation of host virtual address while an iova range has an
+> invalid vaddr.
+> 
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 83 +++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 76 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 0167996..c97573a 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -31,6 +31,7 @@
+>  #include <linux/rbtree.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/sched/mm.h>
+> +#include <linux/kthread.h>
+>  #include <linux/slab.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/vfio.h>
+> @@ -75,6 +76,7 @@ struct vfio_iommu {
+>  	bool			dirty_page_tracking;
+>  	bool			pinned_page_dirty_scope;
+>  	bool			controlled;
+> +	wait_queue_head_t	vaddr_wait;
+>  };
+>  
+>  struct vfio_domain {
+> @@ -145,6 +147,8 @@ struct vfio_regions {
+>  #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+>  #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
+>  
+> +#define WAITED 1
+> +
+>  static int put_pfn(unsigned long pfn, int prot);
+>  
+>  static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+> @@ -505,6 +509,52 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+>  }
+>  
+>  /*
+> + * Wait for vaddr of *dma_p to become valid.  iommu lock is dropped if the task
+> + * waits, but is re-locked on return.  If the task waits, then return an updated
+> + * dma struct in *dma_p.  Return 0 on success with no waiting, 1 on success if
 
-For the notification part I have addressed all the issues of the RFC
-[1], except the potential race conditions Stefan pointed, and tested
-with vdpa devices. You can find at
-https://github.com/eugpermar/qemu/tree/vdpa_sw_live_migration.d/notificatio=
-ns.rfc
-. Since the shadow path is activated only through QMP and does not
-interfere with regular operation, I could post to the qemu list if you
-prefer. The series will be smaller if merged in steps.
+s/1/WAITED/
 
-Adding the buffer forwarding on top should not take long.
+> + * waited, and -errno on error.
+> + */
+> +static int vfio_vaddr_wait(struct vfio_iommu *iommu, struct vfio_dma **dma_p)
+> +{
+> +	struct vfio_dma *dma = *dma_p;
+> +	unsigned long iova = dma->iova;
+> +	size_t size = dma->size;
+> +	int ret = 0;
+> +	DEFINE_WAIT(wait);
+> +
+> +	while (!dma->vaddr_valid) {
+> +		ret = WAITED;
+> +		prepare_to_wait(&iommu->vaddr_wait, &wait, TASK_KILLABLE);
+> +		mutex_unlock(&iommu->lock);
+> +		schedule();
+> +		mutex_lock(&iommu->lock);
+> +		finish_wait(&iommu->vaddr_wait, &wait);
+> +		if (kthread_should_stop() || !iommu->controlled ||
+> +		    fatal_signal_pending(current)) {
+> +			return -EFAULT;
+> +		}
+> +		*dma_p = dma = vfio_find_dma(iommu, iova, size);
+> +		if (!dma)
+> +			return -EINVAL;
+> +	}
+> +	return ret;
+> +}
+> +
+> +/*
+> + * Find dma struct and wait for its vaddr to be valid.  iommu lock is dropped
+> + * if the task waits, but is re-locked on return.  Return result in *dma_p.
+> + * Return 0 on success, 1 on success if waited,  and -errno on error.
+> + */
+> +static int vfio_find_vaddr(struct vfio_iommu *iommu, dma_addr_t start,
+> +			   size_t size, struct vfio_dma **dma_p)
 
-[1] https://lkml.org/lkml/2020/9/23/1243
+more of a vfio_find_dma_valid()
 
-Thanks!
+> +{
+> +	*dma_p = vfio_find_dma(iommu, start, size);
+> +	if (!*dma_p)
+> +		return -EINVAL;
+> +	return vfio_vaddr_wait(iommu, dma_p);
+> +}
+> +
+> +/*
+>   * Attempt to pin pages.  We really don't want to track all the pfns and
+>   * the iommu can only map chunks of consecutive pfns anyway, so get the
+>   * first page and all consecutive pages with the same locking.
+> @@ -693,11 +743,11 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  		struct vfio_pfn *vpfn;
+>  
+>  		iova = user_pfn[i] << PAGE_SHIFT;
+> -		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> -		if (!dma) {
+> -			ret = -EINVAL;
+> +		ret = vfio_find_vaddr(iommu, iova, PAGE_SIZE, &dma);
+> +		if (ret < 0)
+>  			goto pin_unwind;
+> -		}
+> +		else if (ret == WAITED)
+> +			do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);
+
+We're iterating through an array of pfns to provide translations, once
+we've released the lock it's not just the current one that could be
+invalid.  I'm afraid we need to unwind and try again, but I think it's
+actually worse than that because if we've marked pages within a
+vfio_dma's pfn_list as pinned, then during the locking gap it gets
+unmapped, the unmap path will call the unmap notifier chain to release
+the page that the vendor driver doesn't have yet.  Yikes!
+
+>  
+>  		if ((dma->prot & prot) != prot) {
+>  			ret = -EPERM;
+> @@ -1496,6 +1546,22 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+>  	unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+>  	int ret;
+>  
+> +	/*
+> +	 * Wait for all vaddr to be valid so they can be used in the main loop.
+> +	 * If we do wait, the lock was dropped and re-taken, so start over to
+> +	 * ensure the dma list is consistent.
+> +	 */
+> +again:
+> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
+> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> +
+> +		ret = vfio_vaddr_wait(iommu, &dma);
+> +		if (ret < 0)
+> +			return ret;
+> +		else if (ret == WAITED)
+> +			goto again;
+> +	}
+
+This "do nothing until all the vaddrs are valid" approach could work
+above too, but gosh is that a lot of cache unfriendly work for a rare
+invalidation.  Thanks,
+
+Alex
+
+> +
+>  	/* Arbitrarily pick the first domain in the list for lookups */
+>  	if (!list_empty(&iommu->domain_list))
+>  		d = list_first_entry(&iommu->domain_list,
+> @@ -2522,6 +2588,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
+>  	iommu->controlled = true;
+>  	mutex_init(&iommu->lock);
+>  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
+> +	init_waitqueue_head(&iommu->vaddr_wait);
+>  
+>  	return iommu;
+>  }
+> @@ -2972,12 +3039,13 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+>  	struct vfio_dma *dma;
+>  	bool kthread = current->mm == NULL;
+>  	size_t offset;
+> +	int ret;
+>  
+>  	*copied = 0;
+>  
+> -	dma = vfio_find_dma(iommu, user_iova, 1);
+> -	if (!dma)
+> -		return -EINVAL;
+> +	ret = vfio_find_vaddr(iommu, user_iova, 1, &dma);
+> +	if (ret < 0)
+> +		return ret;
+>  
+>  	if ((write && !(dma->prot & IOMMU_WRITE)) ||
+>  			!(dma->prot & IOMMU_READ))
+> @@ -3055,6 +3123,7 @@ static void vfio_iommu_type1_notify(void *iommu_data, unsigned int event,
+>  	mutex_lock(&iommu->lock);
+>  	iommu->controlled = false;
+>  	mutex_unlock(&iommu->lock);
+> +	wake_up_all(&iommu->vaddr_wait);
+>  }
+>  
+>  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
 
