@@ -2,137 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B38630015C
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 12:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9118300207
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 12:55:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728025AbhAVLV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 06:21:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39420 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727932AbhAVLUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 06:20:02 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73634C06174A;
-        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id n25so3507577pgb.0;
-        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=JGKZWLmZIaXZ0doM/i8zUq2DXA6jM2XCESou+2RqdlA=;
-        b=U9yV8Yulx/4LOhdsH7ynYOJKlnHwgwg2gMNl2QmmOTdT2tXgaaTXyhz8Tsml3tOEI5
-         NqIdEY5+dNecnL9gupHRda8nYiv+OW4nvNKnLT6Dq+X3ZkLGC8/E+0VZYGhY1dbkhYEN
-         VOsxBgysdG2KezeTn7tT6XkKT0lIR7UGv+iJaLJUzp0ndVsuKPFtp/5rucVWHFJIqMBG
-         lCJZhDO2/4aGnckrimgPqZqRgz4+ApEwe+G0Pc/n+0YXPtsinnrnRi9iiummaI1pV/s1
-         AUT0pvOzYe7nCUBVWVV9nBoPqpWoxqK0oZN3V53Nba+h/xg4a9H0inJ1LY1LNddb1SlQ
-         HU7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=JGKZWLmZIaXZ0doM/i8zUq2DXA6jM2XCESou+2RqdlA=;
-        b=Uy+OiqCguEqGGA6OmoSPB8by08QGMss3ylT5bAEmJYUj5+5PT+WO6B/PUG8CYhaLtq
-         //mtkyef0vAgCvd1Zh4798EYdIhGM2CjLu2iza0XxVpx221YGhw4oBftRRYp6YdPX/I7
-         8kcUDNNPkkosKukmUEWG8bPssiF94GN2oX95eH2217E0RSc+nxJvZ7uTVTnlepPyMmZ5
-         Z5MyEe7K+zLoV50PSh5JCDER6lC35wd9qEgaG+Xy2t6pNJ+8ZZRET8ZJGATbM1/5iSNb
-         IH+0eq8ftEOKX5mWon6KMrg+Wt0YI15fY50f+HB4+5zerdoS8l+ZlrW4jB3RWCeEbFE1
-         F0Pg==
-X-Gm-Message-State: AOAM5320ebavQrORY7BrGU43Ohcat2DPslHBvV3GZXxWBL5E2StEoMbK
-        +HRWPvDDAAY1J1Z6S1zIGaM=
-X-Google-Smtp-Source: ABdhPJxt5WMLt8cj+0AiYX17C2BZ/R9+T6CBaCic2Kf+mk6e10AqboFT0NLkQr2VDIJKC+o4k9vfog==
-X-Received: by 2002:a63:794a:: with SMTP id u71mr4170608pgc.91.1611314340094;
-        Fri, 22 Jan 2021 03:19:00 -0800 (PST)
-Received: from localhost.localdomain ([125.227.22.95])
-        by smtp.gmail.com with ESMTPSA id b11sm9521965pjg.27.2021.01.22.03.18.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Jan 2021 03:18:59 -0800 (PST)
-From:   Stephen Zhang <stephenzhangzsd@gmail.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
-        hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stephen Zhang <stephenzhangzsd@gmail.com>
-Subject: [PATCH] KVM: x86/mmu: improve robustness of some functions
-Date:   Fri, 22 Jan 2021 19:18:43 +0800
-Message-Id: <1611314323-2770-1-git-send-email-stephenzhangzsd@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727184AbhAVLB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 06:01:29 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11125 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727215AbhAVJ1o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 04:27:44 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMYld4qd8z15vnr;
+        Fri, 22 Jan 2021 17:25:49 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 22 Jan 2021 17:26:48 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Cornelia Huck" <cohuck@redhat.com>
+CC:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "James Morse" <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: [PATCH v3 1/2] vfio/iommu_type1: Populate full dirty when detach non-pinned group
+Date:   Fri, 22 Jan 2021 17:26:34 +0800
+Message-ID: <20210122092635.19900-2-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210122092635.19900-1-zhukeqian1@huawei.com>
+References: <20210122092635.19900-1-zhukeqian1@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the name of this function changes, you can easily
-forget to modify the code in the corresponding place.
-In fact, such errors already exist in spte_write_protect
- and spte_clear_dirty.
+If a group with non-pinned-page dirty scope is detached with dirty
+logging enabled, we should fully populate the dirty bitmaps at the
+time it's removed since we don't know the extent of its previous DMA,
+nor will the group be present to trigger the full bitmap when the user
+retrieves the dirty bitmap.
 
-Signed-off-by: Stephen Zhang <stephenzhangzsd@gmail.com>
+Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481..09462c3d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -844,17 +844,17 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
- 	int i, count = 0;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 0b4dedaa9128..161725395f2f 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -236,6 +236,18 @@ static void vfio_dma_populate_bitmap(struct vfio_dma *dma, size_t pgsize)
+ 	}
+ }
  
- 	if (!rmap_head->val) {
--		rmap_printk("pte_list_add: %p %llx 0->1\n", spte, *spte);
-+		rmap_printk("%s: %p %llx 0->1\n", __func__, spte, *spte);
- 		rmap_head->val = (unsigned long)spte;
- 	} else if (!(rmap_head->val & 1)) {
--		rmap_printk("pte_list_add: %p %llx 1->many\n", spte, *spte);
-+		rmap_printk("%s: %p %llx 1->many\n", __func__, spte, *spte);
- 		desc = mmu_alloc_pte_list_desc(vcpu);
- 		desc->sptes[0] = (u64 *)rmap_head->val;
- 		desc->sptes[1] = spte;
- 		rmap_head->val = (unsigned long)desc | 1;
- 		++count;
- 	} else {
--		rmap_printk("pte_list_add: %p %llx many->many\n", spte, *spte);
-+		rmap_printk("%s: %p %llx many->many\n",	__func__, spte, *spte);
- 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
- 		while (desc->sptes[PTE_LIST_EXT-1]) {
- 			count += PTE_LIST_EXT;
-@@ -1115,7 +1115,7 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
- 	      !(pt_protect && spte_can_locklessly_be_made_writable(spte)))
- 		return false;
- 
--	rmap_printk("rmap_write_protect: spte %p %llx\n", sptep, *sptep);
-+	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
- 
- 	if (pt_protect)
- 		spte &= ~SPTE_MMU_WRITEABLE;
-@@ -1142,7 +1142,7 @@ static bool spte_clear_dirty(u64 *sptep)
++static void vfio_iommu_populate_bitmap_full(struct vfio_iommu *iommu)
++{
++	struct rb_node *n;
++	unsigned long pgshift = __ffs(iommu->pgsize_bitmap);
++
++	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
++		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
++
++		bitmap_set(dma->bitmap, 0, dma->size >> pgshift);
++	}
++}
++
+ static int vfio_dma_bitmap_alloc_all(struct vfio_iommu *iommu, size_t pgsize)
  {
- 	u64 spte = *sptep;
- 
--	rmap_printk("rmap_clear_dirty: spte %p %llx\n", sptep, *sptep);
-+	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
- 
- 	MMU_WARN_ON(!spte_ad_enabled(spte));
- 	spte &= ~shadow_dirty_mask;
-@@ -1184,7 +1184,7 @@ static bool spte_set_dirty(u64 *sptep)
- {
- 	u64 spte = *sptep;
- 
--	rmap_printk("rmap_set_dirty: spte %p %llx\n", sptep, *sptep);
-+	rmap_printk("%s: spte %p %llx\n", __func__, sptep, *sptep);
- 
- 	/*
- 	 * Similar to the !kvm_x86_ops.slot_disable_log_dirty case,
-@@ -1363,8 +1363,8 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- restart:
- 	for_each_rmap_spte(rmap_head, &iter, sptep) {
--		rmap_printk("kvm_set_pte_rmapp: spte %p %llx gfn %llx (%d)\n",
--			    sptep, *sptep, gfn, level);
-+		rmap_printk("%s: spte %p %llx gfn %llx (%d)\n",
-+			      __func__, sptep, *sptep, gfn, level);
- 
- 		need_flush = 1;
+ 	struct rb_node *n;
+@@ -2415,8 +2427,11 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 	 * Removal of a group without dirty tracking may allow the iommu scope
+ 	 * to be promoted.
+ 	 */
+-	if (update_dirty_scope)
++	if (update_dirty_scope) {
+ 		update_pinned_page_dirty_scope(iommu);
++		if (iommu->dirty_page_tracking)
++			vfio_iommu_populate_bitmap_full(iommu);
++	}
+ 	mutex_unlock(&iommu->lock);
+ }
  
 -- 
-1.8.3.1
+2.19.1
 
