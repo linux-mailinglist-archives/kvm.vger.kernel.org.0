@@ -2,208 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDB7300CF1
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 20:57:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA88C300D55
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 21:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730165AbhAVTv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 14:51:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51412 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730619AbhAVT0n (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 22 Jan 2021 14:26:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611343515;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4t6fl3YyvtaW5Q6QVtUYAUfL/EREDZcuyCxL7CtIlEE=;
-        b=PmHUShNPdgsh92U0DSJooKIffv/7xYfX4AyCN+LOF1PtkIkzryMxZhMKMcEjOyOuqTor3q
-        2/4wyUtvLSNz91c42ROHjQ6SoatK4f2xSRkcT4YVKLGfFXN2QbNmMBDrTU6vHhGlVonyz6
-        08dhr58TuxGh3UgKlz/nZmw103rk2bs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-_Rbew4IYNOOxyLYMTYM1UA-1; Fri, 22 Jan 2021 14:25:08 -0500
-X-MC-Unique: _Rbew4IYNOOxyLYMTYM1UA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 071EA107ACE6;
-        Fri, 22 Jan 2021 19:25:06 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 049055D746;
-        Fri, 22 Jan 2021 19:25:04 +0000 (UTC)
-Date:   Fri, 22 Jan 2021 12:25:03 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <jgg@nvidia.com>,
+        id S1730586AbhAVUG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 15:06:28 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13316 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728779AbhAVUFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 15:05:16 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B600b2fca0002>; Fri, 22 Jan 2021 12:04:26 -0800
+Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 22 Jan
+ 2021 20:04:26 +0000
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.56) by
+ HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Fri, 22 Jan 2021 20:04:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fUaxEc96NFK6UR+1A9Lh9DLz5tBl8McaKudugngxAe1/I8PwaNkdMNIn9frnHqbyRCWj6MEgqgVb7A/r6O+a1ijL+6GNv3ZPRa3lDWI+WIo9tg4BfTZscbPkDBwvmKcjqwEIWw+3kcJAKpT3LUzeYZOVN0Hn9vjAlOZtINUz1EFv9iG0lrjg4epK7TtCnUxQWtO55yucePUddalyDaDE1E2jQsx3Uq1wtXgSXyXmSCiAmaJbgXlE01jF8SUOowcGXHGcY+ALaZ4DCL9jiSMwIO/LKwwgc5t6neX4cfIAFOXFwjjyNCaesUkHCY0ETN4jDOe1kgwGVOPapam7TwXvLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vwae+nAkyaitQ5r/JDyXnK+1DFTHWiCNVWiQuy9YHOg=;
+ b=hOz1J09YQ1yk2Q0qOXf1lTW5qJ6JglkauFOW4z81dhB8geVUR5CqARAwSoCWEOyL8Z1o80mwupN+zHvQPcD7b1UYOglNL5RwfCafSMSmwlikhM75nSzEhVua3H5XnvUss/UHbuwS46X+szlpLPXT52++ZMzLhbvWFjM/A35B8+9PC0kCfWd3WO/Tk2CUeQXh/XsyBkq53lluHfiNSXRBMiSLe04Ks1wqzwgT+1a4A2Hhmp+a2oD01xJ/0qgPr8iO/smIpmoagcFEblI0PSO7in2u2GMITaj9E32sSBnm8g67ADkykrbdZAK0/lzRvbtgkstQvlvIeSE9I/gPL/dJYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR12MB1548.namprd12.prod.outlook.com (2603:10b6:4:a::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3763.13; Fri, 22 Jan 2021 20:04:25 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727%7]) with mapi id 15.20.3784.011; Fri, 22 Jan 2021
+ 20:04:23 +0000
+Date:   Fri, 22 Jan 2021 16:04:21 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>, <cohuck@redhat.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
         <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
         <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
         <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>
 Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210122122503.4e492b96@omen.home.shazbot.org>
-In-Reply-To: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+Message-ID: <20210122200421.GH4147@nvidia.com>
 References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+ <20210122122503.4e492b96@omen.home.shazbot.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210122122503.4e492b96@omen.home.shazbot.org>
+X-ClientProxiedBy: MN2PR19CA0006.namprd19.prod.outlook.com
+ (2603:10b6:208:178::19) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR19CA0006.namprd19.prod.outlook.com (2603:10b6:208:178::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11 via Frontend Transport; Fri, 22 Jan 2021 20:04:22 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l32fN-005clx-HC; Fri, 22 Jan 2021 16:04:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1611345866; bh=vwae+nAkyaitQ5r/JDyXnK+1DFTHWiCNVWiQuy9YHOg=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=YvNzyBCzr2zuqD3nvxCRT3ycZznulK3wV7OWJQhvPTz8xd0zSvJ7BMTcuURxoNswv
+         coAZWwrKAdII3fzI1JWhnSpHwsv/gW/Krr5vuanIbETxzcyk5+HhxpQ8uWw7T8n0Bm
+         ypMQe9ubOd6MT66mijCpSL+70n+1e6B2CWmd106IuTy2S11xWokh0MayOIFbsZk7UK
+         CZXzRWc+nhKSaeBVS7w4qes90I0jt3PvJG12ElzF9ZqhWcHX2TUEAAiU7dlraK2O5a
+         X6F2JpO6Rvhf9RwakEQfj05vc/53/+IjpLdFlRiULXjp1m9kFoE1vYxjNOokxePMNM
+         2R+iqJEeODXPA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 17 Jan 2021 18:15:31 +0000
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+On Fri, Jan 22, 2021 at 12:25:03PM -0700, Alex Williamson wrote:
 
-> Hi Alex and Cornelia,
-> 
-> This series split the vfio_pci driver into 2 parts: pci driver and a
-> subsystem driver that will also be library of code. The pci driver,
-> vfio_pci.ko will be used as before and it will bind to the subsystem
-> driver vfio_pci_core.ko to register to the VFIO subsystem. This patchset
-> if fully backward compatible. This is a typical Linux subsystem
-> framework behaviour. This framework can be also adopted by vfio_mdev
-> devices as we'll see in the below sketch.
-> 
-> This series is coming to solve the issues that were raised in the
-> previous attempt for extending vfio-pci for vendor specific
-> functionality: https://lkml.org/lkml/2020/5/17/376 by Yan Zhao.
+> Is the only significant difference here the fact that function
+> declarations remain in a private header?  Otherwise it seems to
+> have all the risks of previous attempts, ie. exported symbols with a
+> lot of implicit behavior shared between them.
 
-Is the only significant difference here the fact that function
-declarations remain in a private header?  Otherwise it seems to
-have all the risks of previous attempts, ie. exported symbols with a
-lot of implicit behavior shared between them.
+If you want to use substantial amounts of vfio-pci for multiple
+drivers then what other choice is there? You and I previously talked
+about shrinking vfio-pci by moving things to common code, outside
+VFIO, and you didn't like that direction either. 
 
-> This solution is also deterministic in a sense that when a user will
-> bind to a vendor specific vfio-pci driver, it will get all the special
-> goodies of the HW.
+So if this shared code lives in vfio-pci, vfio-pci must become a
+library, because this code must be shared.
 
-That determinism really comes after the point where we were concerned
-about deterministic behavior, ie. how does a user know which driver to
-use for which device.  It seems with the aux bus approach we're letting
-the default host driver expose sub-functions for assignment, similar to
-mdev, but nothing about this code split requires such an approach.  As
-noted in 2/3, IGD support could be a separate module, but that's a
-direct assignment driver, so then the user must decide to use vfio-pci
-or igd-vfio-pci, depending on which features they want.
+The big difference between the May patch series and this one, is to
+actually starts down the path of turning vfio-pci into a proper
+library.
 
-> This subsystem framework will also ease on adding vendor specific
-> functionality to VFIO devices in the future by allowing another module
-> to provide the pci_driver that can setup number of details before
-> registering to VFIO subsystem (such as inject its own operations).
+The general long term goal is to make the interface exposed from the
+vfio_pci_core.ko library well defined and sensible. Obviously the
+first patches to make this split are not going to get eveything
+polished, but set a direction for future work. 
 
-Which leads us directly back to the problem that we then have numerous
-drivers that a user might choose for a given device.
- 
-> Below we can see the proposed changes (this patchset only deals with
-> VFIO_PCI subsystem but it can easily be extended to VFIO_MDEV subsystem
-> as well):
-> 
-> +----------------------------------------------------------------------+
-> |                                                                      |
-> |                                VFIO                                  |
-> |                                                                      |
-> +----------------------------------------------------------------------+
-> 
-> +--------------------------------+    +--------------------------------+
-> |                                |    |                                |
-> |          VFIO_PCI_CORE         |    |          VFIO_MDEV_CORE        |
-> |                                |    |                                |
-> +--------------------------------+    +--------------------------------+
-> 
-> +---------------+ +--------------+    +---------------+ +--------------+
-> |               | |              |    |               | |              |
-> |               | |              |    |               | |              |
-> | VFIO_PCI      | | MLX5_VFIO_PCI|    | VFIO_MDEV     | |MLX5_VFIO_MDEV|
-> |               | |              |    |               | |              |
-> |               | |              |    |               | |              |
-> +---------------+ +--------------+    +---------------+ +--------------+
-> 
-> First 2 patches introduce the above changes for vfio_pci and
-> vfio_pci_core.
-> 
-> Patch (3/3) introduces a new mlx5 vfio-pci module that registers to VFIO
-> subsystem using vfio_pci_core. It also registers to Auxiliary bus for
-> binding to mlx5_core that is the parent of mlx5-vfio-pci devices. This
-> will allow extending mlx5-vfio-pci devices with HW specific features
-> such as Live Migration (mlx5_core patches are not part of this series
-> that comes for proposing the changes need for the vfio pci subsystem).
-> 
-> These devices will be seen on the Auxiliary bus as:
-> mlx5_core.vfio_pci.2048 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05:00.0/0000:06:00.0/0000:07:00.0/mlx5_core.vfio_pci.2048
-> mlx5_core.vfio_pci.2304 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05:00.0/0000:06:00.0/0000:07:00.1/mlx5_core.vfio_pci.2304
-> 
-> 2048 represents BDF 08:00.0 and 2304 represents BDF 09:00.0 in decimal
+This approach is actually pretty clean because only the ops are
+exported and the ops API is already well defined by VFIO. The internal
+bits of vfio-pci-core can remain hidden behind a defined/restricted
+API.
 
-And what are devices 08:00.0 and 09:00.0 on the host?  We can only see
-from above that they're children of a PCI device.
+The May series lacks a clear demark for where the library begins/ends
+and vfio_pci.ko start, and doesn't really present a clean way to get
+anywhere better.
 
-> view. In this manner, the administrator will be able to locate the
-> correct vfio-pci module it should bind the desired BDF to (by finding
-> the pointer to the module according to the Auxiliary driver of that
-> BDF).
+Also the May series developed its own internalized copy of the driver
+core, which is big no-no. Don't duplicate driver core functionality in
+subsystems. This uses the driver core much closer to how it was
+intended - only the dual binding is a bit odd, but necessary.
 
-Sorry, clear as mud.  Are we really expecting users to decode a decimal
-aux bus ID to a PCI BDF and how is the ID standardized among aux bus
-devices?
- 
-> In this way, we'll use the HW vendor driver core to manage the lifecycle
-> of these devices. This is reasonable since only the vendor driver knows
-> exactly about the status on its internal state and the capabilities of
-> its acceleratots, for example.
+> noted in 2/3, IGD support could be a separate module, but that's a
+> direct assignment driver, so then the user must decide to use vfio-pci
+> or igd-vfio-pci, depending on which features they want.
 
-But mdev provides that too, or the vendor could write their own vfio
-bus driver for the device, this doesn't really justify or delve deep
-enough to show examples beyond "TODO" remarks for a vendor driver
-actually interacting with vfio-pci-core in an extensible way.  One of
-the concerns of previous efforts was that it's trying to directly
-expose vfio-pci's implementation as an API for vendor drivers, I don't
-really see that anything has changed in that respect here.  Thanks,
+Which I think actually makes sense. Having vfio-pci transparently do
+more than just the basic PCI-sig defined stuff is a very confusing
+path.
 
-Alex
+Trying to make vfio_pci do everything for everyone will just be a huge
+incomprehensible mess.
 
-> TODOs:
-> 1. For this RFC we still haven't cleaned all vendor specific stuff that
->    were merged in the past into vfio_pci (such as VFIO_PCI_IG and
->    VFIO_PCI_NVLINK2).
-> 2. Create subsystem module for VFIO_MDEV. This can be used for vendor
->    specific scalable functions for example (SFs).
-> 3. Add Live migration functionality for mlx5 SNAP devices
->    (NVMe/Virtio-BLK).
-> 4. Add Live migration functionality for mlx5 VFs
-> 5. Add the needed functionality for mlx5_core
+> > This subsystem framework will also ease on adding vendor specific
+> > functionality to VFIO devices in the future by allowing another module
+> > to provide the pci_driver that can setup number of details before
+> > registering to VFIO subsystem (such as inject its own operations).
 > 
-> I would like to thank the great team that was involved in this
-> development, design and internal review:
-> Oren, Liran, Jason, Leon, Aviad, Shahaf, Gary, Artem, Kirti, Neo, Andy
-> and others.
-> 
-> This series applies cleanly on top of kernel 5.11-rc2+ commit 2ff90100ace8:
-> "Merge tag 'hwmon-for-v5.11-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging"
-> from Linus.
-> 
-> Note: Live migration for MLX5 SNAP devices is WIP and will be the first
->       example for adding vendor extension to vfio-pci devices. As the
->       changes to the subsystem must be defined as a pre-condition for
->       this work, we've decided to split the submission for now.
-> 
-> Max Gurtovoy (3):
->   vfio-pci: rename vfio_pci.c to vfio_pci_core.c
->   vfio-pci: introduce vfio_pci_core subsystem driver
->   mlx5-vfio-pci: add new vfio_pci driver for mlx5 devices
-> 
->  drivers/vfio/pci/Kconfig            |   22 +-
->  drivers/vfio/pci/Makefile           |   16 +-
->  drivers/vfio/pci/mlx5_vfio_pci.c    |  253 +++
->  drivers/vfio/pci/vfio_pci.c         | 2386 +--------------------------
->  drivers/vfio/pci/vfio_pci_core.c    | 2311 ++++++++++++++++++++++++++
->  drivers/vfio/pci/vfio_pci_private.h |   21 +
->  include/linux/mlx5/vfio_pci.h       |   36 +
->  7 files changed, 2734 insertions(+), 2311 deletions(-)
->  create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
->  create mode 100644 drivers/vfio/pci/vfio_pci_core.c
->  create mode 100644 include/linux/mlx5/vfio_pci.h
-> 
+> Which leads us directly back to the problem that we then have numerous
+> drivers that a user might choose for a given device.
 
+Sure, but that is a problem that can be tackled in several different
+ways from userspace. Max here mused about some general algorithm to
+process aux device names, you could have userspace look in the module
+data to find VFIO drivers and auto load them like everything else in
+Linux, you could have some VFIO netlink thing, many options worth
+exploring.
+
+Solving the proliferation of VFIO drivers feels like a tangent - lets
+first agree having multiple VFIO drivers is the right technical
+direction within the Linux driver core model before we try to figure
+out what to do for userspace.
+
+> > In this way, we'll use the HW vendor driver core to manage the lifecycle
+> > of these devices. This is reasonable since only the vendor driver knows
+> > exactly about the status on its internal state and the capabilities of
+> > its acceleratots, for example.
+> 
+> But mdev provides that too, or the vendor could write their own vfio
+
+Not really, mdev has a completely different lifecycle model that is
+not very compatible with what is required here.
+
+And writing a VFIO driver is basically what this does, just a large
+portion of the driver is reusing code from the normal vfio-pci cases.
+
+Jason
