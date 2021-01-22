@@ -2,80 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05D152FFFA4
-	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 10:59:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41292300032
+	for <lists+kvm@lfdr.de>; Fri, 22 Jan 2021 11:26:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbhAVJ7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 04:59:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49920 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727375AbhAVJ5W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 04:57:22 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8828DC061788;
-        Fri, 22 Jan 2021 01:56:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=LOIQHL9x2mAeYTMhoeeG2U9wpg3O8N1h/6OElLbRyUs=; b=cDW7vsNYC6CaxNQm8EZ6I6PCqh
-        PVHJZ5S7oX7zfBuRkRmkBqR2UrAGlFmmx8Xf9/Z75eVE2UguP7ZRKKWGyfkIy6sHjqviJocax8e3g
-        +1L9fqITPfJOPAhFQGAyrjAsSF0Uvbg9RbWYsX5Q0H9m5uWv8V4ADJ7FgZNxBiM1dId9cPYc0f1/T
-        a+uiDrZoSeO0I60c3XuHL0i7de1jE9lBZJdscw2Lcet0erlx5cqwW6tFaY6wgm18hwEGgR14ifzFI
-        pZ8RJ+gFwKxWpBD58djPLTdjm5yP3rw9x0AEu5lrh76vb7I0gm9IFFmSwc7Ox48ux+deykcHtT14B
-        kLqWu/3g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l2tAx-0008Sb-1V; Fri, 22 Jan 2021 09:56:19 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id C12ED3003E1;
-        Fri, 22 Jan 2021 10:56:12 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 8D8BD200D6EE4; Fri, 22 Jan 2021 10:56:12 +0100 (CET)
-Date:   Fri, 22 Jan 2021 10:56:12 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Andi Kleen <andi@firstfloor.org>, "Xu, Like" <like.xu@intel.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
-        luwei.kang@intel.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
- via DS
-Message-ID: <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
-References: <20210104131542.495413-1-like.xu@linux.intel.com>
- <YACXQwBPI8OFV1T+@google.com>
- <f8a8e4e2-e0b1-8e68-81d4-044fb62045d5@intel.com>
- <YAHXlWmeR9p6JZm2@google.com>
- <20210115182700.byczztx3vjhsq3p3@two.firstfloor.org>
- <YAHkOiQsxMfOMYvp@google.com>
+        id S1727211AbhAVKZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 05:25:37 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11129 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727777AbhAVKOv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 05:14:51 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DMZp50tyzz15xFK;
+        Fri, 22 Jan 2021 18:13:01 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 22 Jan 2021 18:14:02 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
+        <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
+Subject: [RFC PATCH v4 0/2] Some optimization for stage-2 translation
+Date:   Fri, 22 Jan 2021 18:13:56 +0800
+Message-ID: <20210122101358.379956-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YAHkOiQsxMfOMYvp@google.com>
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 15, 2021 at 10:51:38AM -0800, Sean Christopherson wrote:
-> On Fri, Jan 15, 2021, Andi Kleen wrote:
-> > > I'm asking about ucode/hardare.  Is the "guest pebs buffer write -> PEBS PMI"
-> > > guaranteed to be atomic?
-> > 
-> > Of course not.
-> 
-> So there's still a window where the guest could observe the bad counter index,
-> correct?
+Hi, Will, Marc,
+Is there any further comment on the v3 series I post previously?
+If they are not fine to you, then I think maybe we should just turn
+back to the original solution in v1, where I suggestted to filter out
+the case of only updating access permissions in the map handler and
+handle it right there.
 
-Guest could do a hypercall to fix up the DS area before it tries to read
-it I suppose. Or the HV could expose the index mapping and have the
-guest fix up it.
+Here are the reasons for my current opinion:
+With an errno returned from the map handler for this single case, there
+will be one more vcpu exit from guest and we also have to consider the
+spurious dirty pages. Besides, it seems that the EAGAIN errno has been
+chosen specially for this case and can not be used elsewhere for other
+reasons, as we will change this errno to zero at the end of the function.
 
-Adding a little virt crud on top shouldn't be too hard.
+The v1 solution looks like more concise at last, so I refine the diff
+and post the v4 with two patches here, just for a contrast.
+
+Which solution will you prefer now? Could you please let me know.
+
+Thanks,
+Yanan.
+
+Links:
+v1: https://lore.kernel.org/lkml/20201211080115.21460-1-wangyanan55@huawei.com
+v2: https://lore.kernel.org/lkml/20201216122844.25092-1-wangyanan55@huawei.com
+v3: https://lore.kernel.org/lkml/20210114121350.123684-1-wangyanan55@huawei.com
+
+---
+
+About patch-1:
+Procedures of hyp stage-1 map and guest stage-2 map are quite different,
+but they are now tied closely by function kvm_set_valid_leaf_pte().
+So adjust the relative code for ease of code maintenance in the future.
+
+About patch-2:
+(1) During running time of a a VM with numbers of vCPUs, if some vCPUs
+access the same GPA almost at the same time and the stage-2 mapping of
+the GPA has not been built yet, as a result they will all cause
+translation faults. The first vCPU builds the mapping, and the followed
+ones end up updating the valid leaf PTE. Note that these vCPUs might
+want different access permissions (RO, RW, RX, RWX, etc.).
+
+(2) It's inevitable that we sometimes will update an existing valid leaf
+PTE in the map path, and we all perform break-before-make in this case.
+Then more unnecessary translation faults could be caused if the
+*break stage* of BBM is just catched by other vCPUs.
+
+With (1) and (2), something unsatisfactory could happen: vCPU A causes
+a translation fault and builds the mapping with RW permissions, vCPU B
+then update the valid leaf PTE with break-before-make and permissions
+are updated back to RO. Besides, *break stage* of BBM may trigger more
+translation faults. Finally, some useless small loops could occur.
+
+We can make some optimization to solve above problems: When we need to
+update a valid leaf PTE in the translation fault handler, let's filter
+out the case where this update only change access permissions that don't
+require break-before-make. If there have already been the permissions
+we want, don't bother to update. If still more permissions need to be
+added, then update the PTE directly without break-before-make.
+
+---
+
+Changelogs
+
+v4->v3:
+- Turn back to the original solution in v1 and refine the diff
+- Rebased on top of v5.11-rc4
+
+v2->v3:
+- Rebased on top of v5.11-rc3
+- Refine the commit messages
+- Make some adjustment about return value in patch-2 and patch-3
+
+v1->v2:
+- Make part of the diff a seperate patch (patch-1)
+- Add Will's Signed-off-by for patch-1
+- Return an errno when meeting changing permissions case in map path
+- Add a new patch (patch-3)
+
+---
+
+Yanan Wang (2):
+  KVM: arm64: Adjust partial code of hyp stage-1 map and guest stage-2
+    map
+  KVM: arm64: Filter out the case of only changing permissions from
+    stage-2 map path
+
+ arch/arm64/include/asm/kvm_pgtable.h |  4 ++
+ arch/arm64/kvm/hyp/pgtable.c         | 88 +++++++++++++++++++---------
+ 2 files changed, 63 insertions(+), 29 deletions(-)
+
+-- 
+2.19.1
+
