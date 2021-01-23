@@ -2,83 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B70A3011B8
-	for <lists+kvm@lfdr.de>; Sat, 23 Jan 2021 01:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 158873011BA
+	for <lists+kvm@lfdr.de>; Sat, 23 Jan 2021 01:32:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726442AbhAWAaQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 22 Jan 2021 19:30:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40772 "EHLO
+        id S1726470AbhAWAa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 22 Jan 2021 19:30:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbhAWAaH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 22 Jan 2021 19:30:07 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA66C0613D6
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 16:29:27 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id x20so4915216pjh.3
-        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 16:29:27 -0800 (PST)
+        with ESMTP id S1726123AbhAWAay (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 22 Jan 2021 19:30:54 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B582DC061793
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 16:30:07 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id k7so7172061ybm.13
+        for <kvm@vger.kernel.org>; Fri, 22 Jan 2021 16:30:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JYV4rqk7TIJOls4aIYOUfgRgv+FJ3Bybe0z5zvt0O7Q=;
-        b=El3nUfopMydRnCl9GOyvd5cxCak0al5FXcbT6BiVzxoyts5vmsuAa4eUFOTzbUIlp6
-         GVZzkro3xnR49VaHW3drFk4t+/eTDBPxIjl2nOT+xZuAUlCe/B3SHZcdpSaqwXDL6ykg
-         7mG55vp4pb0wuZPlFnuhZswUdQMi/EAN2WTlOT52gAcWuhs18ENKphCjt8ZjDAR92x23
-         pkT/xCeFIoZKW074PTlX7eKG4SfBVFwwAFKg7sgZRJa/Q3rtMD6P3FbVGkvlrD2iC3Pf
-         ZEkBHjaSvF+Ql1/7LKzJAkGxyd6jjZNx4EYGtkRUs9dRdm8Kk70rZ8oHGX5INX0JbOLb
-         PsyQ==
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=GW5YgzmGZ90upPWUw8yjcOOBzEGRL5zFdW5P2QKbWu4=;
+        b=tVUg5jswvPuQC6WLS2bahbJifQc0hGtBAb1LmgRccRV33457farwPSINVvib3TUjNi
+         LlJ0bpNcj8sohxrwtMs/cbdj6Mk1c4u3rMNn5Uxj6QNUF2Hu0Ug6ucuBWJ8BUSh7ike0
+         o2Lhp6eaLCYULh6qJFr7vxuGZcjGzmrVgs0Ku3kNZVqs9JIyJkJt9jzuQZYwxnFOgZDR
+         tmYC6NYkH3RV7g+ipQOzlKuRs9Sqenj3hKd7pHRQFdNrB+L4uaqRoA3g3lwwO2lGe3Mj
+         SIYjRngC2F/h20GcR1NuJhS3enFn95NrjPUsYheaLAeDKuetdk4y/cGdZjEeqQWQMl/A
+         0hMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JYV4rqk7TIJOls4aIYOUfgRgv+FJ3Bybe0z5zvt0O7Q=;
-        b=A21W72qqYJgTF/vw92LiOzPln6oVs5TlMFi+w7ZP9bL5zT0g28Oz7gcwK+HvAc+jo6
-         RKUVY8doV0BrVL61nSIcZSAkXl1M6k4Kqa5CfUsLPKyh/us/2xw4ivU77IE9W1w4yJ75
-         B65BvL6qcVRQDhvkBOhGw/ofki7GxTARhPC9KZ2UplBtwjjwQdzAfT2Jmn3eBgq7smdu
-         8B3lI4GAc6tW1w7hgduXGRWbVOd2dQokAmiw5yNNlcxHV4NqdqFPiEJ5boka3v6OPF+6
-         ImZn3FapOsrQlY2Bm+H8yxWVc3oH+Eh1IG4qOm5bnwTZlYeGLekE1cV5cZo+UxHouYRI
-         iXMA==
-X-Gm-Message-State: AOAM530ca7/nhQ0GXOv9MLUTcBvEIl1ouJUIymXoP5A1v0J12ckoDNLk
-        v1YRpg1/M4OKZzKISADyDpUOzA==
-X-Google-Smtp-Source: ABdhPJyoONkEm2J9ITe4V6jvZN8X3b2s30ELlnoOthsB+837AdhIk2k9C1PL1ntyue/tv/K7/zZibA==
-X-Received: by 2002:a17:90b:313:: with SMTP id ay19mr2089571pjb.184.1611361766735;
-        Fri, 22 Jan 2021 16:29:26 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id x125sm9323072pgb.35.2021.01.22.16.29.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jan 2021 16:29:26 -0800 (PST)
-Date:   Fri, 22 Jan 2021 16:29:19 -0800
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=GW5YgzmGZ90upPWUw8yjcOOBzEGRL5zFdW5P2QKbWu4=;
+        b=siz+iGW91TsHqTaYB4VN7vhLPbfTfeNTuHODIMy+VHWgCzSAWQxu7iF86m+cyN+Mcs
+         up/FsVH/EvkZr+iIWMooCieewTNsrZBQPpD8uCwtYn7EUCuxe6MksTm72NrAPTCraK2G
+         e137391nBsBddABCvqOCfmdU6oDurbgDXLhcTHxoTZuXh1MGs6XcHa9wzrwDuNYEeJZC
+         cJJzN1RQVI/mxX+9MmGpzH0A5N+T2s4o+X8iKgKEm/bPLfl4/b2i5jGV/9dtCg5K3iO+
+         jnWR/ACN9Pb2kPYIGcCk0pvFr6lDxvKFDb7fDVUQE0FCSDyEE2/dky4ZwOUmYI+4qEGO
+         Zz5w==
+X-Gm-Message-State: AOAM532JY72cgAQHKeDpkHfXucots4sGrYvH7R9fGfAw5+/N+W/MU6JP
+        qfqRlkSbjIXZZ+MwdYQz6chO17sA2Yk=
+X-Google-Smtp-Source: ABdhPJyHyggUdYU/8G77pM1XxhCYkioicj73SgejqjhelE57ftM7XlgvkXTSZukL22UjRALAuYESbIsbyDc=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+ (user=seanjc job=sendgmr) by 2002:a25:5054:: with SMTP id e81mr10442630ybb.131.1611361806991;
+ Fri, 22 Jan 2021 16:30:06 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 22 Jan 2021 16:30:03 -0800
+Message-Id: <20210123003003.3137525-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+Subject: [PATCH] KVM: x86/mmu: Use boolean returns for (S)PTE accessors
 From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH 3/3] KVM: SVM: Sync GPRs to the GHCB only after VMGEXIT
-Message-ID: <YAtt38s4GLG9cviK@google.com>
-References: <20210122235049.3107620-1-seanjc@google.com>
- <20210122235049.3107620-4-seanjc@google.com>
- <0d8e9d63-1fe9-af08-dae9-edd80083e940@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d8e9d63-1fe9-af08-dae9-edd80083e940@amd.com>
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 22, 2021, Tom Lendacky wrote:
-> On 1/22/21 5:50 PM, Sean Christopherson wrote:
-> > Sync GPRs to the GHCB on VMRUN only if a sync is needed, i.e. if the
-> > previous exit was a VMGEXIT and the guest is expecting some data back.
-> > 
-> 
-> The start of sev_es_sync_to_ghcb() checks if the GHCB has been mapped, which
-> only occurs on VMGEXIT, and exits early if not. And sev_es_sync_from_ghcb()
-> is only called if the GHCB has been successfully mapped. The only thing in
-> between is sev_es_validate_vmgexit(), which will terminate the VM on error.
-> So I don't think this patch is needed.
+Return a 'bool' instead of an 'int' for various PTE accessors that are
+boolean in nature, e.g. is_shadow_present_pte().  Returning an int is
+goofy and potentially dangerous, e.g. if a flag being checked is moved
+into the upper 32 bits of a SPTE, then the compiler may silently squash
+the entire check since casting to an int is guaranteed to yield a
+return value of '0'.
 
-Ah, nice!  Yep, this can be dropped.  Thanks!
+Opportunistically refactor is_last_spte() so that it naturally returns
+a bool value instead of letting it implicitly cast 0/1 to false/true.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu.h      |  2 +-
+ arch/x86/kvm/mmu/spte.h | 12 ++++--------
+ 2 files changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 581925e476d6..f61e18dad2f3 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -145,7 +145,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+  *
+  * TODO: introduce APIs to split these two cases.
+  */
+-static inline int is_writable_pte(unsigned long pte)
++static inline bool is_writable_pte(unsigned long pte)
+ {
+ 	return pte & PT_WRITABLE_MASK;
+ }
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 2b3a30bd38b0..398fd1bb13a7 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -185,23 +185,19 @@ static inline bool is_access_track_spte(u64 spte)
+ 	return !spte_ad_enabled(spte) && (spte & shadow_acc_track_mask) == 0;
+ }
+ 
+-static inline int is_shadow_present_pte(u64 pte)
++static inline bool is_shadow_present_pte(u64 pte)
+ {
+ 	return (pte != 0) && !is_mmio_spte(pte);
+ }
+ 
+-static inline int is_large_pte(u64 pte)
++static inline bool is_large_pte(u64 pte)
+ {
+ 	return pte & PT_PAGE_SIZE_MASK;
+ }
+ 
+-static inline int is_last_spte(u64 pte, int level)
++static inline bool is_last_spte(u64 pte, int level)
+ {
+-	if (level == PG_LEVEL_4K)
+-		return 1;
+-	if (is_large_pte(pte))
+-		return 1;
+-	return 0;
++	return (level == PG_LEVEL_4K) || is_large_pte(pte);
+ }
+ 
+ static inline bool is_executable_pte(u64 spte)
+-- 
+2.30.0.280.ga3ce27912f-goog
+
