@@ -2,158 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96E83301B9C
-	for <lists+kvm@lfdr.de>; Sun, 24 Jan 2021 12:54:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A0E301C9D
+	for <lists+kvm@lfdr.de>; Sun, 24 Jan 2021 15:12:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbhAXLyF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Jan 2021 06:54:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
+        id S1726208AbhAXOMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Jan 2021 09:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbhAXLxW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Jan 2021 06:53:22 -0500
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA4AAC061574
-        for <kvm@vger.kernel.org>; Sun, 24 Jan 2021 03:52:41 -0800 (PST)
-Received: by mail-oo1-xc2c.google.com with SMTP id x23so2607288oop.1
-        for <kvm@vger.kernel.org>; Sun, 24 Jan 2021 03:52:41 -0800 (PST)
+        with ESMTP id S1725794AbhAXOMG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Jan 2021 09:12:06 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E84C061573;
+        Sun, 24 Jan 2021 06:11:26 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id x21so21172047iog.10;
+        Sun, 24 Jan 2021 06:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=pu6Zr2Jo68blbhpXwzl9uRs7KbDV3skHPD8u3gz3sVI=;
-        b=hLK0CiEKpK6Efjx+XUatItsaWE/mRmo/IWq/x6fk1BFPF2i7i2bt6e2DFk6OygAPzE
-         skDu0spVWAOL2kvuzdgaIX2Qzsskv8asVzkubHi6iX0Ny6xxFzxJjd3ejJAIKNpcdQmB
-         l2s+Xraztpfd/HTF6ODoGotgqxTnd9XN8vvHZVJfZ2UjfoOC1hS7U8dgydDpnwXWPG3Z
-         KVKPhLqebfmRllhbj66PsU7MRJ0MA6C01kJ1uNo0VpBNMHDFWjksnk6joesUdAeLg94o
-         8DWm9RaNOF0kKvdzaOGdAbgJGAVRkvQey/hZo8Xq3kMC+AYT1hayxKGLfKPk03C3pgXo
-         G36w==
+        bh=0Ao/yarVyR+Aon04nX87tyRiOiK8ZlEZS4G8Yy79d54=;
+        b=TBkJ6nomCk8/2cv7rEzXhkIJHSRYlN/B20umDI5FBypSXY4LiVPvMYkZ78nB0graug
+         gySN6qtT5tUkrEvc6+TXZP+uf8C6cziH+LvxTvGjYKvAJ5T/3X7OkFwMVs4dxtFZ/z5K
+         OgXcxITHmq15P9yHxa8MBf8MAT8zpKYkt+Aw//x97N6VRwmDjJElxZ+jYmCinRwCsEup
+         chv3TFU2MILu2qa3ld8TSXvqHYeZ75983Br0qd0yD64NSLXkt0ShGnq0/dx9VFfGxEJR
+         zgAVgvSAeNvbJrbbZZ0lZrsALbx10cfXv/YqMvWBQbX4V5+h5oGxhe5G2jiv+eJGRzN8
+         j0lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=pu6Zr2Jo68blbhpXwzl9uRs7KbDV3skHPD8u3gz3sVI=;
-        b=h6ROZnejssaqo+5ogCNIsrZkLLxScRRzIOBGT9s87ue5G12C3seRWiYpeXLt6f8ffV
-         8bNhDsP6HPZ0VGv2efLcWJP6xcJ60JDwLIs73S2e6xirOiF78gifUHqPhlFONyLSFh7v
-         yBUykc/LTF35U/kqTTMazAhZ/wLSul39euzDLbMTcY+uJIpnvr+X39BUGdA5d1WgsI0K
-         vNEmICDrgWGYC9VZv5Gma4n0DlTAc6L/922lv7fV/VfxAJ4lLyzGxeiaMv6UnTSQVhY7
-         8s9FaFaytOtuMnA6jx11i132+8dROjMJtRmLj7ULf8OKlpH4p8pO+diGLKlJJJGHiP5q
-         OvCA==
-X-Gm-Message-State: AOAM5324Nah9qZUyA2ZsJorLNArqic0JfQgYYqzMWj+YWDFrCJ5wOxfH
-        Qd4pZjp/M8m0h/AMcOf02CEMKwiWbXGprBYHm+HXWg==
-X-Google-Smtp-Source: ABdhPJwt8xWKLlXxiJG8fjcBaxoKGZnK9ey4WRGE+AXDo7swV/wzVlPEyFF7MT2HJelv6cWoDDRUCoFqXQlbsX91d4E=
-X-Received: by 2002:a4a:7353:: with SMTP id e19mr9268056oof.55.1611489161343;
- Sun, 24 Jan 2021 03:52:41 -0800 (PST)
+        bh=0Ao/yarVyR+Aon04nX87tyRiOiK8ZlEZS4G8Yy79d54=;
+        b=BtLavFlaMx5D5zwNCoaCsOuDPLtI9FUVSvqnbv66LNGGzAW/ELC/lS6wI1uZBsZV5e
+         L+GH1cqUOPgIAO7Hg3bHc0utMgC49X7KY1zFgpM6q1k/W4GAlDdB6yHtGp2bpOI+dWUp
+         gSDvq5oq99RYMf8qwGVIfXp2f9HtHOKL6p/cu4fAnuAGEUMu+5AxVN2+G4NPvpICi+lB
+         YR/wf3AEcfCoyvHMSn+sNtoKfJAoyvI+CYe9yKIj8IMcWAtfI67VAHm5VJ7prqUlW7eN
+         HNtzMfbot6T1+HRiiw4i8xrm1pRy/IuFvTRKYWcpvjHnsAT6GacLK8E6yExYmLyE8WjU
+         m0iw==
+X-Gm-Message-State: AOAM5311b8ZUlaYzfzIVMCP+rVQk2Fv90GiA0HugCdTohbyWkruV5YlG
+        x2FFvgHfgj5cTi7yJ0oYcF3NRnQbtXKPqR6GpCA=
+X-Google-Smtp-Source: ABdhPJznuyJvRo9LDknc7bU5INTQtX0KgDxkRL8UdxQK31cnGO7u+mTblUQvNbV7yrqjpB4rl6bFUja0JrQyw/1zljo=
+X-Received: by 2002:a6b:8d0f:: with SMTP id p15mr4436364iod.56.1611497485689;
+ Sun, 24 Jan 2021 06:11:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20210112194143.1494-1-yuri.benditovich@daynix.com>
- <20210112194143.1494-4-yuri.benditovich@daynix.com> <CAOEp5Ocz-xGq5=e=WY0aipEYHEhN-wxekNaAiqAS+HsOF8TcDQ@mail.gmail.com>
- <CAOEp5OevYR5FWVMfQ_esmWTKtz9_ddTupbe7FtBFQ=sv2kEt2w@mail.gmail.com> <CAADnVQJLN0sFyKdAmc6Pikv8Ww9OocnK_VXMG=ZLSMONHkqe4Q@mail.gmail.com>
-In-Reply-To: <CAADnVQJLN0sFyKdAmc6Pikv8Ww9OocnK_VXMG=ZLSMONHkqe4Q@mail.gmail.com>
-From:   Yuri Benditovich <yuri.benditovich@daynix.com>
-Date:   Sun, 24 Jan 2021 13:52:29 +0200
-Message-ID: <CAOEp5OeV0y5-vw3Kufe_=rszOu8QPsHPrFjtn-fAM_TJtBTuhA@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/7] tun: allow use of BPF_PROG_TYPE_SCHED_CLS program type
-To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Willem de Bruijn <willemb@google.com>,
-        "Gustavo A . R . Silva" <gustavoars@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>, decui@microsoft.com,
-        cai@lca.pw, Jakub Sitnicki <jakub@cloudflare.com>,
-        Marco Elver <elver@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
+References: <20200907131613.12703-1-joro@8bytes.org> <20200907131613.12703-46-joro@8bytes.org>
+In-Reply-To: <20200907131613.12703-46-joro@8bytes.org>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Sun, 24 Jan 2021 22:11:14 +0800
+Message-ID: <CAJhGHyCMMCY9bZauzrSeQr_62SpJgZQEQy9P7Rh28HXJtF5O5A@mail.gmail.com>
+Subject: Re: [PATCH v7 45/72] x86/entry/64: Add entry code for #VC handler
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     X86 ML <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
         LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        bpf <bpf@vger.kernel.org>, Yan Vugenfirer <yan@daynix.com>
+        virtualization@lists.linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 20, 2021 at 8:45 PM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+> +
+> +       /*
+> +        * No need to switch back to the IST stack. The current stack is either
+> +        * identical to the stack in the IRET frame or the VC fall-back stack,
+> +        * so it is definitly mapped even with PTI enabled.
+> +        */
+> +       jmp     paranoid_exit
+> +
 >
-> On Tue, Jan 12, 2021 at 12:55 PM Yuri Benditovich
-> <yuri.benditovich@daynix.com> wrote:
-> >
-> > On Tue, Jan 12, 2021 at 10:40 PM Yuri Benditovich
-> > <yuri.benditovich@daynix.com> wrote:
-> > >
-> > > On Tue, Jan 12, 2021 at 9:42 PM Yuri Benditovich
-> > > <yuri.benditovich@daynix.com> wrote:
-> > > >
-> > > > This program type can set skb hash value. It will be useful
-> > > > when the tun will support hash reporting feature if virtio-net.
-> > > >
-> > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> > > > ---
-> > > >  drivers/net/tun.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > > > index 7959b5c2d11f..455f7afc1f36 100644
-> > > > --- a/drivers/net/tun.c
-> > > > +++ b/drivers/net/tun.c
-> > > > @@ -2981,6 +2981,8 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
-> > > >                 prog = NULL;
-> > > >         } else {
-> > > >                 prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
-> > > > +               if (IS_ERR(prog))
-> > > > +                       prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SCHED_CLS);
-> > > >                 if (IS_ERR(prog))
-> > > >                         return PTR_ERR(prog);
-> > > >         }
-> > >
-> > > Comment from Alexei Starovoitov:
-> > > Patches 1 and 2 are missing for me, so I couldn't review properly,
-> > > but this diff looks odd.
-> > > It allows sched_cls prog type to attach to tun.
-> > > That means everything that sched_cls progs can do will be done from tun hook?
-> >
-> > We do not have an intention to modify the packet in this steering eBPF.
->
-> The intent is irrelevant. Using SCHED_CLS here will let users modify the packet
-> and some users will do so. Hence the tun code has to support it.
->
-> > There is just one function that unavailable for BPF_PROG_TYPE_SOCKET_FILTER
-> > that the eBPF needs to make possible to deliver the hash to the guest
-> > VM - it is 'bpf_set_hash'
-> >
-> > Does it mean that we need to define a new eBPF type for socket filter
-> > operations + set_hash?
-> >
-> > Our problem is that the eBPF calculates 32-bit hash, 16-bit queue
-> > index and 8-bit of hash type.
-> > But it is able to return only 32-bit integer, so in this set of
-> > patches the eBPF returns
-> > queue index and hash type and saves the hash in skb->hash using bpf_set_hash().
->
-> bpf prog can only return a 32-bit integer. That's true.
-> But the prog can use helpers to set any number of bits and variables.
-> bpf_set_hash_v2() with hash, queue and index arguments could fit this purpose,
-> but if you allow it for SCHED_CLS type,
 
-Do I understand correctly that this means:
-1. Creation of new helper like
-https://lists.linuxfoundation.org/pipermail/bridge/2020-July/013036.html
-2. Validation on tun side that the BPF uses only limited subset of
-helpers available for SCHED_CLS
+Hello
 
-> tc side of the code should be ready to deal with that too and this extended
-> helper should be meaningful for both tc and tun.
->
-> In general if the purpose of the prog is to compute three values they better be
-> grouped together. Returned two of them via ORed 32-bit integer and
-> returning 32-bit via bpf_set_hash is an awkward api.
+I know we don't enable PTI on AMD, but the above comment doesn't align to the
+next code.
+
+We assume PTI is enabled as the comments said "even with PTI enabled".
+
+When #VC happens after entry_SYSCALL_64 but before it switches to the
+kernel CR3.  vc_switch_off_ist() will switch the stack to the kernel stack
+and paranoid_exit can't work when it switches to user CR3 on the kernel stack.
+
+The comment above lost information that the current stack is possible to be
+the kernel stack which is mapped not user CR3.
+
+Maybe I missed something.
+
+Thanks
+Lai
+
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +asmlinkage __visible noinstr struct pt_regs *vc_switch_off_ist(struct pt_regs *regs)
+> +{
+> +       unsigned long sp, *stack;
+> +       struct stack_info info;
+> +       struct pt_regs *regs_ret;
+> +
+> +       /*
+> +        * In the SYSCALL entry path the RSP value comes from user-space - don't
+> +        * trust it and switch to the current kernel stack
+> +        */
+> +       if (regs->ip >= (unsigned long)entry_SYSCALL_64 &&
+> +           regs->ip <  (unsigned long)entry_SYSCALL_64_safe_stack) {
+> +               sp = this_cpu_read(cpu_current_top_of_stack);
+> +               goto sync;
+> +       }
