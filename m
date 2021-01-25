@@ -2,95 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C29693027B6
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 17:24:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0917302852
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 17:59:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730659AbhAYQWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 11:22:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53673 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730674AbhAYQW0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 11:22:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611591658;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d8rYmfLQ4//SMhY+Gkg+k76r3SnhHe3zISj6ZiBrG4Y=;
-        b=ihy6sFZp92x2XiIjRt3iskniFukXNZZJDGd2ntX9Q0jdadiEs6Xwcg83GFrSkxy/3pxM+k
-        +yrha1Y0lnH3Im/7yb0jCuctZHhyvEkXq0I0QcLfK3ReddhvKi9b5Esu02iNVE66p03jSD
-        uB9B3KY1J/n4Cf5Twm+CLbZwUPYSAPU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-CK0MpY7VNdCvcI1ywKLZEw-1; Mon, 25 Jan 2021 11:20:54 -0500
-X-MC-Unique: CK0MpY7VNdCvcI1ywKLZEw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0183107ACE4;
-        Mon, 25 Jan 2021 16:20:51 +0000 (UTC)
-Received: from gondolin (ovpn-113-161.ams2.redhat.com [10.36.113.161])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F2F566ACE5;
-        Mon, 25 Jan 2021 16:20:37 +0000 (UTC)
-Date:   Mon, 25 Jan 2021 17:20:35 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>
-Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210125172035.3b61b91b.cohuck@redhat.com>
-In-Reply-To: <20210122200421.GH4147@nvidia.com>
-References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
-        <20210122122503.4e492b96@omen.home.shazbot.org>
-        <20210122200421.GH4147@nvidia.com>
-Organization: Red Hat GmbH
+        id S1729007AbhAYQ7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 11:59:20 -0500
+Received: from foss.arm.com ([217.140.110.172]:51818 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729624AbhAYQ5r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 11:57:47 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFA5511FB;
+        Mon, 25 Jan 2021 08:57:01 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAB733F68F;
+        Mon, 25 Jan 2021 08:57:00 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 10/12] arm64: gic: its-trigger: Don't
+ trigger the LPI while it is pending
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
+References: <20201217141400.106137-1-alexandru.elisei@arm.com>
+ <20201217141400.106137-11-alexandru.elisei@arm.com>
+ <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <3bc9e5ce-345b-505a-ffd3-a96b531124d6@arm.com>
+Date:   Mon, 25 Jan 2021 16:57:03 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 22 Jan 2021 16:04:21 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Hi Andre,
 
-> On Fri, Jan 22, 2021 at 12:25:03PM -0700, Alex Williamson wrote:
+On 12/18/20 6:15 PM, André Przywara wrote:
+> On 17/12/2020 14:13, Alexandru Elisei wrote:
+>> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
+>> it is disabled at the ITS level. After that it is re-enabled and the test
+>> checks that the interrupt is properly asserted. After it's re-enabled and
+>> before the stats are examined, the test triggers the interrupt again, which
+>> can lead to the same interrupt being delivered twice: once after the
+>> configuration invalidation and before the INT command, and once after the
+>> INT command.
+>>
+>> Get rid of the INT command after the interrupt is re-enabled to prevent the
+> This is confusing to read, since you don't remove anything in the patch.
+> Can you reword this? Something like "Before explicitly triggering the
+> interrupt, check that the unmasking worked, ..."
 
-> > > In this way, we'll use the HW vendor driver core to manage the lifecycle
-> > > of these devices. This is reasonable since only the vendor driver knows
-> > > exactly about the status on its internal state and the capabilities of
-> > > its acceleratots, for example.  
-> > 
-> > But mdev provides that too, or the vendor could write their own vfio  
-> 
-> Not really, mdev has a completely different lifecycle model that is
-> not very compatible with what is required here.
-> 
-> And writing a VFIO driver is basically what this does, just a large
-> portion of the driver is reusing code from the normal vfio-pci cases.
+That's a good point, I'll reword it.
 
-I think you cut out an important part of Alex' comment, so let me
-repost it here:
+>
+>> LPI from being asserted twice and add a separate check to test that the INT
+>> command still works for the now re-enabled LPI 8195.
+>>
+>> CC: Auger Eric <eric.auger@redhat.com>
+>> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> Otherwise this looks fine, but I think there is another flaw: There is
+> no requirement that an INV(ALL) is *needed* to update the status, it
+> could also update anytime (think: "cache invalidate").
+>
+> The KVM ITS emulation *only* bothers to read the memory on an INV(ALL)
+> command, so that matches the test. But that's not how unit-tests should
+> work ;-)
+>
+> But that's a separate issue, just mentioning this to not forget about it.
 
-"But mdev provides that too, or the vendor could write their own vfio
-bus driver for the device, this doesn't really justify or delve deep
-enough to show examples beyond "TODO" remarks for a vendor driver
-actually interacting with vfio-pci-core in an extensible way.  One of
-the concerns of previous efforts was that it's trying to directly
-expose vfio-pci's implementation as an API for vendor drivers, I don't
-really see that anything has changed in that respect here."
+That's a good point, I must admit that I didn't check how caching is defined by
+the architecture. I would prefer creating a patch independent of this series to
+change what test_its_trigger() checks for, to get input from Eric just for that
+particular change.
 
-I'm missing the bigger picture of how this api is supposed to work out,
-a driver with a lot of TODOs does not help much to figure out whether
-this split makes sense and is potentially useful for a number of use
-cases, or whether mdev (even with its different lifecycle model) or a
-different vfio bus driver might be a better fit for the more involved
-cases. (For example, can s390 ISM fit here?)
-
+Thanks,
+Alex
+>
+> For this patch, with the message fixed:
+>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+>
+> Cheers,
+> Andre
+>
+>> ---
+>>  arm/gic.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index fb91861900b7..aa3aa1763984 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -805,6 +805,9 @@ static void test_its_trigger(void)
+>>  
+>>  	/* Now call the invall and check the LPI hits */
+>>  	its_send_invall(col3);
+>> +	lpi_stats_expect(3, 8195);
+>> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
+>> +
+>>  	lpi_stats_expect(3, 8195);
+>>  	its_send_int(dev2, 20);
+>>  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
+>>
