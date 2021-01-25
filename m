@@ -2,162 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F67530208F
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 03:48:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82D8D3020B1
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 04:15:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726700AbhAYCrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Jan 2021 21:47:36 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:11435 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726601AbhAYCre (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Jan 2021 21:47:34 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DPDkp1PRwzjBfN;
-        Mon, 25 Jan 2021 10:45:54 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 25 Jan 2021 10:46:45 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Cornelia Huck" <cohuck@redhat.com>
-CC:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "James Morse" <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        "Joerg Roedel" <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-Subject: [PATCH] vfio/iommu_type1: Mantainance a counter for non_pinned_groups
-Date:   Mon, 25 Jan 2021 10:46:42 +0800
-Message-ID: <20210125024642.14604-1-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
+        id S1726841AbhAYDN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Jan 2021 22:13:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26343 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726666AbhAYDNt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 24 Jan 2021 22:13:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611544343;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wyqsE2ie42MN4KyFAEL6ikQv7mdclBjRKNwb4r3BNqA=;
+        b=bspd4hqhiCQlgnyXJKdaSsuPXLc/qTcXGPtoT2MUsFd2daY+qhDX/B2xJDWJ7gNEXFkgmG
+        j6b8FE6rjJFGizcK2SkWZeigk/lka4RImB6Sp7OedYSoZCeC42lx5z4nhq+L0Yptt3KKic
+        +wO0XpLZpFtWHvvpvAqanseZUTN9GSQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-335-HswSJKU1PvukQT_eyiencA-1; Sun, 24 Jan 2021 22:12:19 -0500
+X-MC-Unique: HswSJKU1PvukQT_eyiencA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDF3E803623;
+        Mon, 25 Jan 2021 03:12:17 +0000 (UTC)
+Received: from [10.72.12.105] (ovpn-12-105.pek2.redhat.com [10.72.12.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B7AD86F984;
+        Mon, 25 Jan 2021 03:12:08 +0000 (UTC)
+Subject: Re: [PATCH v2 1/1] vhost scsi: alloc vhost_scsi with kvzalloc() to
+ avoid delay
+To:     Dongli Zhang <dongli.zhang@oracle.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, mst@redhat.com, pbonzini@redhat.com,
+        stefanha@redhat.com, joe.jin@oracle.com,
+        aruna.ramakrishna@oracle.com
+References: <20210123080853.4214-1-dongli.zhang@oracle.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <61ed58d6-052b-9065-361d-dc6010fc91ef@redhat.com>
+Date:   Mon, 25 Jan 2021 11:12:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210123080853.4214-1-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With this counter, we never need to traverse all groups to update
-pinned_scope of vfio_iommu.
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- drivers/vfio/vfio_iommu_type1.c | 40 +++++----------------------------
- 1 file changed, 5 insertions(+), 35 deletions(-)
+On 2021/1/23 下午4:08, Dongli Zhang wrote:
+> The size of 'struct vhost_scsi' is order-10 (~2.3MB). It may take long time
+> delay by kzalloc() to compact memory pages by retrying multiple times when
+> there is a lack of high-order pages. As a result, there is latency to
+> create a VM (with vhost-scsi) or to hotadd vhost-scsi-based storage.
+>
+> The prior commit 595cb754983d ("vhost/scsi: use vmalloc for order-10
+> allocation") prefers to fallback only when really needed, while this patch
+> allocates with kvzalloc() with __GFP_NORETRY implicitly set to avoid
+> retrying memory pages compact for multiple times.
+>
+> The __GFP_NORETRY is implicitly set if the size to allocate is more than
+> PAGE_SZIE and when __GFP_RETRY_MAYFAIL is not explicitly set.
+>
+> Cc: Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
+> Cc: Joe Jin <joe.jin@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+> Changed since v1:
+>    - To combine kzalloc() and vzalloc() as kvzalloc()
+>      (suggested by Jason Wang)
+>
+>   drivers/vhost/scsi.c | 9 +++------
+>   1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 4ce9f00ae10e..5de21ad4bd05 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -1814,12 +1814,9 @@ static int vhost_scsi_open(struct inode *inode, struct file *f)
+>   	struct vhost_virtqueue **vqs;
+>   	int r = -ENOMEM, i;
+>   
+> -	vs = kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
+> -	if (!vs) {
+> -		vs = vzalloc(sizeof(*vs));
+> -		if (!vs)
+> -			goto err_vs;
+> -	}
+> +	vs = kvzalloc(sizeof(*vs), GFP_KERNEL);
+> +	if (!vs)
+> +		goto err_vs;
+>   
+>   	vqs = kmalloc_array(VHOST_SCSI_MAX_VQ, sizeof(*vqs), GFP_KERNEL);
+>   	if (!vqs)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4dedaa9128..bb4bbcc79101 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -73,7 +73,7 @@ struct vfio_iommu {
- 	bool			v2;
- 	bool			nesting;
- 	bool			dirty_page_tracking;
--	bool			pinned_page_dirty_scope;
-+	uint64_t		num_non_pinned_groups;
- };
- 
- struct vfio_domain {
-@@ -148,7 +148,6 @@ static int put_pfn(unsigned long pfn, int prot);
- static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
- 					       struct iommu_group *iommu_group);
- 
--static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
- /*
-  * This code handles mapping and unmapping of user data buffers
-  * into DMA'ble space using the IOMMU
-@@ -714,7 +713,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
- 	if (!group->pinned_page_dirty_scope) {
- 		group->pinned_page_dirty_scope = true;
--		update_pinned_page_dirty_scope(iommu);
-+		iommu->num_non_pinned_groups--;
- 	}
- 
- 	goto pin_done;
-@@ -991,7 +990,7 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
- 	 * mark all pages dirty if any IOMMU capable device is not able
- 	 * to report dirty pages and all pages are pinned and mapped.
- 	 */
--	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
-+	if (iommu->num_non_pinned_groups && dma->iommu_mapped)
- 		bitmap_set(dma->bitmap, 0, nbits);
- 
- 	if (shift) {
-@@ -1622,33 +1621,6 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
- 	return group;
- }
- 
--static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
--{
--	struct vfio_domain *domain;
--	struct vfio_group *group;
--
--	list_for_each_entry(domain, &iommu->domain_list, next) {
--		list_for_each_entry(group, &domain->group_list, next) {
--			if (!group->pinned_page_dirty_scope) {
--				iommu->pinned_page_dirty_scope = false;
--				return;
--			}
--		}
--	}
--
--	if (iommu->external_domain) {
--		domain = iommu->external_domain;
--		list_for_each_entry(group, &domain->group_list, next) {
--			if (!group->pinned_page_dirty_scope) {
--				iommu->pinned_page_dirty_scope = false;
--				return;
--			}
--		}
--	}
--
--	iommu->pinned_page_dirty_scope = true;
--}
--
- static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
- 				  phys_addr_t *base)
- {
-@@ -2057,8 +2029,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 			 * addition of a dirty tracking group.
- 			 */
- 			group->pinned_page_dirty_scope = true;
--			if (!iommu->pinned_page_dirty_scope)
--				update_pinned_page_dirty_scope(iommu);
- 			mutex_unlock(&iommu->lock);
- 
- 			return 0;
-@@ -2188,7 +2158,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	 * demotes the iommu scope until it declares itself dirty tracking
- 	 * capable via the page pinning interface.
- 	 */
--	iommu->pinned_page_dirty_scope = false;
-+	iommu->num_non_pinned_groups++;
- 	mutex_unlock(&iommu->lock);
- 	vfio_iommu_resv_free(&group_resv_regions);
- 
-@@ -2416,7 +2386,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 	 * to be promoted.
- 	 */
- 	if (update_dirty_scope)
--		update_pinned_page_dirty_scope(iommu);
-+		iommu->num_non_pinned_groups--;
- 	mutex_unlock(&iommu->lock);
- }
- 
--- 
-2.19.1
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
 
