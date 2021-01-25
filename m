@@ -2,302 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56FF5302A57
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 19:35:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ABF7302A5A
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 19:36:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727086AbhAYSdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 13:33:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
+        id S1726959AbhAYSfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 13:35:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727009AbhAYSdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 13:33:24 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E7AC061573
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 10:32:43 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id ox12so19533786ejb.2
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 10:32:42 -0800 (PST)
+        with ESMTP id S1726589AbhAYSeU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 13:34:20 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38A8C061574;
+        Mon, 25 Jan 2021 10:33:39 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id bx12so16670064edb.8;
+        Mon, 25 Jan 2021 10:33:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=UqAM8CKRSKauUrtRThvwl2H1uj4ztc9PzlV0jjaHrK4=;
-        b=TxF/3QTYD6lw/wmr0JkR621tv/UJgDgdO3zPa7dQpByHyO4NLuGVY3nnKEN7E/Kspb
-         2wfVjXrU46cNxShOABQBH5A3iSIjZ5SXHMXd1OJkr0aX1LrY2Ke1lVCM4kE5m8oJo9Kt
-         JQRV3exMlLGCSU0tCCq+pUAWeT3ndt4XHlCTQ=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VMRVhIQIXZxzucvozlD6kGt114/L0couPU+fNeFrnDQ=;
+        b=B/RNvjvh+qiB40NO59Ij5acibSeJucACNTddOI5YBI8wjrLQZCGM/n6hgYcU5ZoMIc
+         7el4jsKtS3gTsDSsJodd7O6v+pVrEY2qQP7g4eDvKqFVqVzQPmJ9ki4qnqYZ0Y/AuySn
+         KHW49MzPLDQZXV2BHQT/lLAsDHgQN5CnfKxD6vKy8zy6mDCSXe7IS+isMaR23ExsXdEh
+         CaL9wxe38Vap6EY4cP9j1pr6fUJeLVrJKQAGnhZq7M3SrXQMx3CDXcjUMfnj+rCWX7vS
+         zlpZl4WtEMVhrvjaKj83VXuZpzFOE68uikLW1v51/c81VwAO9DZ3AoOvB8Sqo+bCIELe
+         mbLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UqAM8CKRSKauUrtRThvwl2H1uj4ztc9PzlV0jjaHrK4=;
-        b=R24wLhy+rFqgHYFgAd/kSzZnQJlddGsodP9vrumSURuLwMCGG3Zmf3ATnjsQ5y1HGP
-         DCvkHD4yUkk38ezcdTEVzPhkiC8Bg9vkn2spvcZsvQDutUfm0Bp4dTo4OIpOorUQ4fo+
-         p54Bvfo61PKgyn6Wb+zu/v+jJPM8GPixsZyqB9Lg4M0fd96u4B7QHfc5PNCYVcvOP3XS
-         hvfTmIeUxGsL4VcXJaofE8nWJnxB7LUfZKbwB2Ds2Bv4Jh3555joSB2zlO45dfeeoRnt
-         BZuKLtElgBMER4QhNwvTh06BWjY7IzztrHmmRJLMyiuj3lF1dgo/AUvzklAwEv436s0K
-         /Nyw==
-X-Gm-Message-State: AOAM532MyteLM5D1oFntKxgIhn6I4NbzRwFwGNw0ee/3pqEwMfuqqPwX
-        HdgX+cxup46LHiwXC+nxHdA8vX9TKO+lPwLK1Trvyg==
-X-Google-Smtp-Source: ABdhPJxOqkCNxZBU179StDOlywKHlXbXWpZHlqSfLNUNulYmoSH8kEJ8b88gZaMAXyNXFtmccxCUlmOsX6eGIzEvzOM=
-X-Received: by 2002:a17:906:76d6:: with SMTP id q22mr1151104ejn.221.1611599561603;
- Mon, 25 Jan 2021 10:32:41 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VMRVhIQIXZxzucvozlD6kGt114/L0couPU+fNeFrnDQ=;
+        b=TXbI15oNUEzL8QF9zBttiWRt24F+yyVo8wu+6wtqK6uKgHbjC+QzdefnoUXAgqCbYA
+         scgOC5sXTFDeSpj4Mptn7i12UtvNHvdDb66YhSO9KoVV9tpRtyXWxNLUn7KVoyx2HIBl
+         HFtfD6Pmq+gwEQWrMt9FiO20cXFTC+MrCghWrGuhNQBpmOTKlYtHL0c6TfKNkmFIGdt+
+         bNNzd8LhD138O/xd5BtfL+ooopjnU/L9LQjOzKfUT39pJBOtcxUTYxAXpuYCrv/Hdzx6
+         rSknL71Ma0F0R8nSFxacx0rlG4jZyqd6xzo9ESY+0QPHN5xSuF/kHukUUJSbfzZ6bDZA
+         JEnw==
+X-Gm-Message-State: AOAM530QZ5Rfwa74mykzzRXQjaEYticQCbOxyBDH88zW6vq7UobDALB+
+        YwkBEiQjV/spjtgJTnEtHEmOJrUa2EMU0xZT
+X-Google-Smtp-Source: ABdhPJxUJhjHWZALtw4qPBu4yxZgE6PlX7Q+SepxYV+BseqPdze5m+o668iKAr7LDljmuCzZrtec+Q==
+X-Received: by 2002:aa7:d4d7:: with SMTP id t23mr1529021edr.321.1611599618531;
+        Mon, 25 Jan 2021 10:33:38 -0800 (PST)
+Received: from martin (p578aa711.dip0.t-ipconnect.de. [87.138.167.17])
+        by smtp.gmail.com with ESMTPSA id ce7sm8584140ejb.100.2021.01.25.10.33.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jan 2021 10:33:37 -0800 (PST)
+Date:   Mon, 25 Jan 2021 19:33:35 +0100
+From:   Martin Radev <martin.b.radev@gmail.com>
+To:     Konrad Rzeszutek Wilk <konrad@darnok.org>
+Cc:     Christoph Hellwig <hch@lst.de>, thomas.lendacky@amd.com,
+        file@sect.tu-berlin.de, robert.buhren@sect.tu-berlin.de,
+        kvm@vger.kernel.org, konrad.wilk@oracle.com,
+        mathias.morbitzer@aisec.fraunhofer.de,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, robin.murphy@arm.com,
+        kirill.shutemov@linux.intel.com
+Subject: Re: [PATCH] swiotlb: Validate bounce size in the sync/unmap path
+Message-ID: <YA8O/2qBBzZo5hi7@martin>
+References: <X/27MSbfDGCY9WZu@martin>
+ <20210113113017.GA28106@lst.de>
+ <YAV0uhfkimXn1izW@martin>
+ <20210118151428.GA72213@fedora>
 MIME-Version: 1.0
-References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
- <184709d7-03f6-c03d-9afa-c780c4867c18@redhat.com>
-In-Reply-To: <184709d7-03f6-c03d-9afa-c780c4867c18@redhat.com>
-From:   Micah Morton <mortonm@chromium.org>
-Date:   Mon, 25 Jan 2021 13:32:30 -0500
-Message-ID: <CAJ-EccOXPAvNmjjqSaraJS1pdi2PuJAbR2=jie6kR6guziVmAA@mail.gmail.com>
-Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210118151428.GA72213@fedora>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 12:31 PM Auger Eric <eric.auger@redhat.com> wrote:
->
-> Hi Micah,
->
-> On 1/25/21 4:46 PM, Micah Morton wrote:
-> > Hi Eric,
-> >
-> > I was recently looking into some vfio-platform passthrough stuff and
-> > came across a device I wanted to assign to a guest that uses a ONESHOT
-> > type interrupt (these type of interrupts seem to be quite common, on
-> > ARM at least). The semantics for ONESHOT interrupts are a bit
-> > different from regular level triggered interrupts as I'll describe
-> > here:
-> >
-> > The normal generic code flow for level-triggered interrupts is as follo=
-ws:
-> >
-> > - regular type[1]: mask[2] the irq, then run the handler, then
-> > unmask[3] the irq and done
->
-> VFIO level sensitive interrupts are "automasked". See slide 10 of
-> https://www.linux-kvm.org/images/a/a8/01x04-ARMdevice.pdf if this can hel=
-p.
+On Mon, Jan 18, 2021 at 10:14:28AM -0500, Konrad Rzeszutek Wilk wrote:
+> On Mon, Jan 18, 2021 at 12:44:58PM +0100, Martin Radev wrote:
+> > On Wed, Jan 13, 2021 at 12:30:17PM +0100, Christoph Hellwig wrote:
+> > > On Tue, Jan 12, 2021 at 04:07:29PM +0100, Martin Radev wrote:
+> > > > The size of the buffer being bounced is not checked if it happens
+> > > > to be larger than the size of the mapped buffer. Because the size
+> > > > can be controlled by a device, as it's the case with virtio devices,
+> > > > this can lead to memory corruption.
+> > > > 
+> > > 
+> > > I'm really worried about all these hodge podge hacks for not trusted
+> > > hypervisors in the I/O stack.  Instead of trying to harden protocols
+> > > that are fundamentally not designed for this, how about instead coming
+> > > up with a new paravirtualized I/O interface that is specifically
+> > > designed for use with an untrusted hypervisor from the start?
+> > 
+> > Your comment makes sense but then that would require the cooperation
+> > of these vendors and the cloud providers to agree on something meaningful.
+> > I am also not sure whether the end result would be better than hardening
+> > this interface to catch corruption. There is already some validation in
+> > unmap path anyway.
+> > 
+> > Another possibility is to move this hardening to the common virtio code,
+> > but I think the code may become more complicated there since it would
+> > require tracking both the dma_addr and length for each descriptor.
+> 
+> Christoph,
+> 
+> I've been wrestling with the same thing - this is specific to busted
+> drivers. And in reality you could do the same thing with a hardware
+> virtio device (see example in http://thunderclap.io/) - where the
+> mitigation is 'enable the IOMMU to do its job.'.
+> 
+> AMD SEV documents speak about utilizing IOMMU to do this (AMD SEV-SNP)..
+> and while that is great in the future, SEV without IOMMU is now here.
+> 
+> Doing a full circle here, this issue can be exploited with virtio
+> but you could say do that with real hardware too if you hacked the
+> firmware, so if you say used Intel SR-IOV NIC that was compromised
+> on an AMD SEV machine, and plumbed in the guest - the IOMMU inside
+> of the guest would be SWIOTLB code. Last line of defense against
+> bad firmware to say.
+> 
+> As such I am leaning towards taking this code, but I am worried
+> about the performance hit .. but perhaps I shouldn't as if you
+> are using SWIOTLB=force already you are kind of taking a
+> performance hit?
+> 
 
-When you say "automasked" / "mask and deactivate" are you referring to
-the disable_irq_nosync() call in vfio_platform
-(https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio=
-_platform_irq.c#L154)?
+I have not measured the performance degradation. This will hit all AMD SEV,
+Intel TDX, IBM Protected Virtualization VMs. I don't expect the hit to
+be large since there are only few added operations per hundreads of copied
+bytes. I could try to measure the performance hit by running some benchmark
+with virtio-net/virtio-blk/virtio-rng.
 
->
-> When the guest deactivates the virtual IRQ, this causes a maintenance
-> interrupt on host. This occurence causes kvm_notify_acked_irq() to be
-> called and this latter unmasks the physical IRQ.
+Earlier I said:
+> > Another possibility is to move this hardening to the common virtio code,
+> > but I think the code may become more complicated there since it would
+> > require tracking both the dma_addr and length for each descriptor.
 
-Are you saying kvm_notify_acked_irq() causes
-vfio_platform_unmask_handler()
-(https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio=
-_platform_irq.c#L94)
-to be called? Makes sense if so.
+Unfortunately, this doesn't make sense. Even if there's validation for
+the size in the common virtio layer, there will be some other device
+which controls a dma_addr and length passed to dma_unmap* in the
+corresponding driver. The device can target a specific dma-mapped private
+buffer by changing the dma_addr and set a good length to overwrite buffers
+following it.
 
-> >
-> > - fasteoi type[4]: run the handler, then eoi[5] the irq and done
-> >
-> > Note: IIUC the fasteoi type doesn't do any irq masking/unmasking
-> > because that is assumed to be handled transparently by "modern forms
-> > of interrupt handlers, which handle the flow details in hardware"
-> >
-> > ONESHOT type interrupts are a special case of the fasteoi type
-> > described above. They rely on the driver registering a threaded
-> > handler for the interrupt and assume the irq line will remain masked
-> > until the threaded handler completes, at which time the line will be
-> > unmasked. TL;DR:
-> >
-> > - mask[6] the irq, run the handler, and potentially eoi[7] the irq,
-> > then unmask[8] later when the threaded handler has finished running.
->
-> could you point me to the exact linux handler (is it
-> handle_fasteoi_irq?)  or Why do you say "potentially". Given the details
-> above, the guest EOI would unmask the IRQ at physical level. We do not
-> have any hook KVM/VFIO on the guest unmap.
+So, instead of doing the check in every driver and hitting a performance
+cost even when swiotlb is not used, it's probably better to fix it in
+swiotlb.
 
-Yep. handle_fasteoi_irq(). By "potentially" I just meant the eoi is
-only called for ONESHOT irqs if this check passes: !(chip->flags &
-IRQCHIP_EOI_THREADED). Not actually sure what this check is about
-since I didn't look into it.
+@Tom Lendacky, do you think that it makes sense to harden swiotlb or
+some other approach may be better for the SEV features?
 
-So far I was just talking about irq operations that happen in the
-host. Not sure I quite understand your last two sentences about guest
-EOI and guest unmap.
-
-> >
-> > For vfio-platform irq forwarding, there is no existing function in
-> > drivers/vfio/platform/vfio_platform_irq.c[9] that is a good candidate
-> > for registering as the threaded handler for a ONESHOT interrupt in the
-> > case we want to request the ONESHOT irq with
-> > request_threaded_irq()[10]. Moreover, we can't just register a
-> > threaded function that simply immediately returns IRQ_HANDLED (as is
-> > done in vfio_irq_handler()[11] and vfio_automasked_irq_handler()[12]),
-> > since that would cause the IRQ to be unmasked[13] immediately, before
-> sorry I know you reworked that several times for style issue but [13]
-> does not match unmask().
-
-That's actually the link I intended, irq_finalize_oneshot() will be
-called after the threaded interrupt handler returns, and that's when
-the IRQ will be unmasked.
-
-> > the userspace/guest driver has had any chance to service the
-> > interrupt.
-> >
-> > The most obvious way I see to handle this is to add a threaded handler
-> > to vfio_platform_irq.c that waits until the userspace/guest driver has
-> > serviced the interrupt and the unmask_handler[14] has been called, at
-> > which point it returns IRQ_HANDLED so the generic IRQ code in the host
-> > can finally unmask the interrupt.
-> this is done on guest EOI at the moment.
-
-By "this", I think you mean enable_irq() in vfio_platform_irq.c?
-
-> >
-> > Does this sound like a reasonable approach and something you would be
-> > fine with adding to vfio-platform?
-> Well I think it is interesting to do a pre-study and make sure we agree
-> on the terminology, IRQ flow and problems that would need to be solved.
-> Then we need to determine if it is worth the candle, if this support
-> would speed up the vfio-platform usage (I am not sure at this point as I
-> think there are more important drags like the lack of specification/dt
-> integration for instance).
->
-> Besides we need to make sure we are not launching into a huge effort for
-> attempting to assign a device that does not fit well into the vfio
-> platform scope (dma capable, reset, device tree).
-
-Yes, agreed.
-
->
->  If so I could get started looking
-> > at the implementation for how to sleep in the threaded handler in
-> > vfio-platform until the unmask_handler is called. The most tricky/ugly
-> > part of this is that DT has no knowledge of irq ONESHOT-ness, as it
-> > only contains info regarding active-low vs active-high and edge vs
-> > level trigger. That means that vfio-platform can't figure out that a
-> > device uses a ONESHOT irq in a similar way to how it queries[15] the
-> > trigger type, and by extension QEMU can't learn this information
-> > through the VFIO_DEVICE_GET_IRQ_INFO ioctl, but must have another way
-> > of knowing (i.e. command line option to QEMU).
-> Indeed that's not really appealing.
-> >
-> > I guess potentially another option would be to treat ONESHOT
-> > interrupts like regular level triggered interrupts from the
-> > perspective of vfio-platform, but somehow ensure the interrupt stays
-> > masked during injection to the guest, rather than just disabled.
-> I need this to be clarified actually. I am confused by the automasked
-> terminology now.
-
-My note below tries to explain a bit but AFAICT there's some confusion
-in the VFIO code (both platform and PCI) mixing the IRQ terms
-mask/unmask with disable/enable, which I think are not quite
-interchangeable concepts. IIUC irq enable/disable is a high(er) level
-concept that means that even if the irqchip HW sees interrupts coming
-in, the kernel refrains from calling the interrupt handler for the IRQ
--- but the kernel keeps track of interrupts that come in while an IRQ
-is disabled, in order to know (once the IRQ gets enabled again by the
-driver) that there are pending interrupts from the HW. On the other
-hand, IRQ masking is a lower level irqchip operation that truly masks
-the IRQs at the hardware level, so the kernel doesn't even know or
-care if the line is being activated/deactivated while the IRQ is
-masked.
-
-I don't have a great explanation for why ONESHOT interrupts are even a
-thing in the first place, maybe the HW design means you're going to
-get a bunch of garbage/meaningless ups and downs on the interrupt line
-while the interrupt is being serviced and they should never be taken
-into consideration in any way by the kernel until the IRQ is unmasked
-again?
-
->
-> Thanks
->
-> Eric
->
->  I'm
-> > not sure whether this could cause legitimate interrupts coming from
-> > devices to be missed while the injection for an existing interrupt is
-> > underway, but maybe this is a rare enough scenario that we wouldn't
-> > care. The main issue with this approach is that handle_level_irq()[16]
-> > will try to unmask the irq out from under us after we start the
-> > injection (as it is already masked before
-> > vfio_automasked_irq_handler[17] runs anyway). Not sure if masking at
-> > the irqchip level supports nesting or not.
-> >
-> > Let me know if you think either of these are viable options for adding
-> > ONESHOT interrupt forwarding support to vfio-platform?
-> >
-> > Thanks,
-> > Micah
-> >
-> >
-> >
-> >
-> > Additional note about level triggered vs ONESHOT irq forwarding:
-> > For the regular type of level triggered interrupt described above, the
-> > vfio handler will call disable_irq_nosync()[18] before the
-> > handle_level_irq() function unmasks the irq and returns. This ensures
-> > if new interrupts come in on the line while the existing one is being
-> > handled by the guest (and the irq is therefore disabled), that the
-> > vfio_automasked_irq_handler() isn=E2=80=99t triggered again until the
-> > vfio_platform_unmask_handler() function has been triggered by the
-> > guest (causing the irq to be re-enabled[19]). In other words, the
-> > purpose of the irq enable/disable that already exists in vfio-platform
-> > is a higher level concept that delays handling of additional
-> > level-triggered interrupts in the host until the current one has been
-> > handled in the guest.
-> >
-> > This means that the existing level triggered interrupt forwarding
-> > logic in vfio/vfio-platform is not sufficient for handling ONESHOT
-> > interrupts (i.e. we can=E2=80=99t just treat a ONESHOT interrupt like a
-> > regular level triggered interrupt in the host and use the existing
-> > vfio forwarding code). The masking that needs to happen for ONESHOT
-> > interrupts is at the lower level of the irqchip mask/unmask in that
-> > the ONESHOT irq needs to remain masked (not just disabled) until the
-> > driver=E2=80=99s threaded handler has completed.
-> >
-> >
-> >
-> >
-> > [1] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-642
-> > [2] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-414
-> > [3] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-619
-> > [4] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-702
-> > [5] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-688
-> > [6] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-724
-> > [7] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L=
-688
-> > [8] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c=
-#L1028
-> > [9] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platfo=
-rm/vfio_platform_irq.c
-> > [10] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.=
-c#L2038
-> > [11] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L167
-> > [12] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L142
-> > [13] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.=
-c#L1028
-> > [14] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L94
-> > [15] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L310
-> > [16] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#=
-L642
-> > [17] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L142
-> > [18] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L154
-> > [19] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platf=
-orm/vfio_platform_irq.c#L87
-> >
->
