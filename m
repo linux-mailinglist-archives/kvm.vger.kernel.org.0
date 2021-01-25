@@ -2,139 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 273CA302D2B
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 22:03:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 006A9302E97
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 23:02:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732432AbhAYVCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 16:02:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732426AbhAYVCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 16:02:13 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E820CC061574
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 13:01:32 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id b21so2945483pgk.7
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 13:01:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XrFM/8QZQpJqubUYMWbsYAtcpteTwR0TS9zSLkjNBQ0=;
-        b=A9Krd7YKB/E6MJjbPlEaeRBR5DGxp7BWQNcVvc6RB5bUkzucc5BJSEYWTwxmycUtcI
-         +ppahFQsF5HjOR1pzA2sdTQclWgudUW5IfowMUQcf14n+tohg4unKWaLm2bfhQFfnlBb
-         LS7HFxtziTXHTqOeA/NQ41o9ezLSykqtw14i0KhEGzDzXyv9g49M19EuCrooXVsd8e/k
-         xoSBbOdDQmXY25Un5WSHsMrFr0a5Reh6XV2QZ5zVYLbiSZl07R3ahJpmmzoALXoWAGVc
-         deCcqPMdBebuv3YBA43fLYvJXh4kwVvEgQcd3ZwjGyzsSmQ/VRL0WjwfWDnp4OkzgSmU
-         Sgtw==
+        id S1733102AbhAYWBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 17:01:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21661 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733094AbhAYWBY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 17:01:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611611993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lTaS+FJ+pDjg42gXdYSeQXvC2ANYuAqrw02JSEW1Iro=;
+        b=WsEloqmdVveSVnX3eRyfSivhA5X8F6ihjftLx1FoHtLjJkp0w5mD9STTN8FSNwg2E1d37a
+        LjPqEHq0FD0QVF6Qa8fAlcV/dalZ9KAh8H3AczhPbXRE2aWkOL4AXDyG9mqUsraMXmSrHX
+        L+imaj7JE2cV4seAbqhHaG6eraoVxFc=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-c7EZ5uh9NXSkCJx23dZj5w-1; Mon, 25 Jan 2021 16:59:52 -0500
+X-MC-Unique: c7EZ5uh9NXSkCJx23dZj5w-1
+Received: by mail-ej1-f70.google.com with SMTP id n18so4333708ejc.11
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 13:59:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XrFM/8QZQpJqubUYMWbsYAtcpteTwR0TS9zSLkjNBQ0=;
-        b=dc890fWOwIsAFVK3cfCDBxQfzUm5LzaYKs8yPqCDOsu3GCK35QV2PcPKSc03/urc14
-         79cfIUV4mRG0+Z3qITz0ZQxt3iYTsKgn8yrI5BTuTXlClIHxOo/KmtmUnKAxWHTWnjkf
-         ABM8ei6HZ2kMwRPVdh7QiV42lWUyaswMawDTMtbxa9oJrUHcmhn/CW9oRQ3HVUbeJS/r
-         JHbQ9ZxOvZT14H1ApAlhh9nWP1dGChiDkZlDjJZ3sEZsPHoBCUIqEKTfc/A6Bk0rCVHz
-         u7Oj12TsJEGvON3Qb8Fc8tW9/LvFzW1vud3F92xm02wBaBkcafMtPFB6yUpY/oq9uADw
-         MP4w==
-X-Gm-Message-State: AOAM531ndGCpm+XCGIy45zamLkqug9kph/ReQ+zu0MNrb1DBjTlPHSuN
-        kARpQJquwZcGmkLbY7jJYtJYNw==
-X-Google-Smtp-Source: ABdhPJy8FdSJ4e529ngWMTyYGKzqJd7StrPl9DiNqWCiJaOOzNjTWj+MteOGrXa8Pe+YjNhvTWafzQ==
-X-Received: by 2002:aa7:8a8b:0:b029:1ae:8c71:9915 with SMTP id a11-20020aa78a8b0000b02901ae8c719915mr2010264pfc.79.1611608492236;
-        Mon, 25 Jan 2021 13:01:32 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id m1sm250048pjz.16.2021.01.25.13.01.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 13:01:31 -0800 (PST)
-Date:   Mon, 25 Jan 2021 13:01:25 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>
-Subject: Re: Thoughts on sharing KVM tracepoints [was:Re: [PATCH 2/2] KVM:
- nVMX: trace nested vm entry]
-Message-ID: <YA8xpfPtonJdxU2D@google.com>
-References: <20210121171043.946761-1-mlevitsk@redhat.com>
- <20210121171043.946761-3-mlevitsk@redhat.com>
- <YAn/t7TWP0xmVEHs@google.com>
- <f1c90d8a44795bbdef549a5fcf375bcf1d52af93.camel@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lTaS+FJ+pDjg42gXdYSeQXvC2ANYuAqrw02JSEW1Iro=;
+        b=O5vgFIp7EDFRvIYPZYigfxgoNa0T4zINqcbV7soCtiuZm7FNQmMGbOe42oIiOEoin4
+         OOrqoBuC783B4XMyM0E9RPR3VZS15Vs8UdxRqUF/As2en8Hl75rdCRBYH8UPMR28atpA
+         rpj1yEQhsE1gV+jFcxXdOkfFHlXT/i7nmBN/ilyGqi993CC7aVzCw/fUcaTytkpRvdfH
+         DTY3oI4NZNSx0tUoN1u+ZSYflzkjXgsh6vY6S5CwfskjOvMnPFhypgWgQNDvdggS9NIH
+         tcYNUcfgSIgI6g0sJ2GZ23CbNpyzdUxc9PfNSudHm67b+LnOvnb5lvuOegoXL3B/mMQ0
+         E1OQ==
+X-Gm-Message-State: AOAM531rt8dXTYIWXlm2lB6NJODgK+3jrmAXjjefqmmQ37SRa+N7JeJi
+        whYb2RX7VBMIoESpSVlj+iurXsfoEEQ5Pu9/RetR17ROh6RrxldF1C2bpO+FKqsfV8NbAJw7hSI
+        bCsMC8ZPoOQwN
+X-Received: by 2002:a17:906:653:: with SMTP id t19mr1628475ejb.44.1611611990731;
+        Mon, 25 Jan 2021 13:59:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwFicYGI8UZfLBuXqK/9ExrQkJcwoegaqfEX0vXIxsXsElafNGgvf039NuqutCFQCTGnV9zJA==
+X-Received: by 2002:a17:906:653:: with SMTP id t19mr1628467ejb.44.1611611990543;
+        Mon, 25 Jan 2021 13:59:50 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d9sm8882754ejy.123.2021.01.25.13.59.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jan 2021 13:59:49 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside
+ guest mode for VMX
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20210125172044.1360661-1-pbonzini@redhat.com>
+ <YA8ZHrh9ca0lPJgk@google.com>
+ <0b90c11b-0dce-60f3-c98d-3441b418e771@redhat.com>
+ <YA8hwsL8SWzWEA0h@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0a1e025a-ff66-8a68-1eae-8797a0a34419@redhat.com>
+Date:   Mon, 25 Jan 2021 22:59:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f1c90d8a44795bbdef549a5fcf375bcf1d52af93.camel@redhat.com>
+In-Reply-To: <YA8hwsL8SWzWEA0h@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021, Maxim Levitsky wrote:
-> On Thu, 2021-01-21 at 14:27 -0800, Sean Christopherson wrote:
-> > I still don't see why VMX can't share this with SVM.  "npt' can easily be "tdp",
-> > differentiating between VMCB and VMCS can be down with ISA, and VMX can give 0
-> > for int_ctl (or throw in something else interesting/relevant).
+On 25/01/21 20:53, Sean Christopherson wrote:
+> Eh, I would argue that it is more common to do KVM_REQ_GET_NESTED_STATE_PAGES
+> with is_guest_mode() than it is with !is_guest_mode(), as the latter is valid if
+> and only if eVMCS is in use.  But, I think we're only vying for internet points.:-)
 > 
-> I understand very well your point, and I don't strongly disagree with you.
-> However let me voice my own thoughts on this:
->  
-> I think that sharing tracepoints between SVM and VMX isn't necessarily a good idea.
-> It does make sense in some cases but not in all of them.
->  
-> The trace points are primarily intended for developers, thus they should capture as
-> much as possible relevant info but not everything because traces can get huge.
->  
-> Also despite the fact that a developer will look at the traces, some usability is welcome
-> as well (e.g for new developers), and looking at things like info1/info2/intr_info/error_code
-> isn't very usable
-
-I'm not opposed to printing different names on VMX, e.g. exit_qual and
-idt_vec_info, but I 100% think that VMX and SVM should share the bulk of the
-code.  Improvements to VMX almost always apply in some way to SVM, and vice
-versa.  It's all but guaranteed that splitting flows will eventually cause
-divergence in a bad way.  Divergence in tracepoints is likely to be minor at
-worst, but I don't think that's a good reason to intentionally split the code
-when it's quite easy to share.
-
-> (btw the error_code should at least be called intr_info_error_code, and
-
-Heh, I disagree even on this.  IMO, after debugging a few times, associating
-error_code with the event being injected is second nature.  Prepending
-intr_info_ would just add extra characters and slow down mental processing.
-
-> of course both it and intr_info are VMX specific).
-
-Not really, SVM has the exact same fields with slightly different names.
-
-> So I don't even like the fact that kvm_entry/kvm_exit are shared, and neither I want
-> to add even more shared trace points.
+>> however the idea was to remove the call to nested_get_evmcs_page from
+>> nested_get_vmcs12_pages, since that one is only needed after
+>> KVM_GET_NESTED_STATE and not during VMLAUNCH/VMRESUME.
 >
-> I understand that there are some benefits of sharing, namely a userspace tool can use
-> the same event to *profile* kvm, but I am not sure that this is worth it.
+> I'm confused, this patch explicitly adds a call to nested_get_evmcs_page() in
+> nested_get_vmcs12_pages().
 
-Why is it not worth it?  It's a small amount of one-time kernel pain that allows
-all users/developers to reuse scripts and tools across VMX and SVM.  Even manual
-usage benefits, e.g. I don't have to remember that a tracepoint is 'x' on VMX
-but 'y' on SVM.
+What I really meant is that the patch was wrong. :/
 
-> What we could have done is to have ISA (and maybe even x86) agnostic kvm_exit/kvm_entry
-> tracepoints that would have no data attached to them, or have very little (like maybe RIP),
-> and then have ISA specific tracepoints with the reset of the info.
+I'll send my pull request to Linus without this one, and include it 
+later this week.
 
-That would probably end up as the least user friendly combination.  Usually I
-enable a tracepoint to get more info, rarely am I interested in _just_ the
-logging of the tracepoint itself.  The generic tracepoint would either be
-useless and never enabled, or even worse would cause people to overlook the
-vendor-specific variant.
+Paolo
 
-> Same could be applied to kvm_nested_vmenter, although for this one I don't think that we
-> need an ISA agnostic tracepoint.
->  
-> Having said all that, I am not hell bent on this. If you really want it to be this way,
-> I won't argue that much.
->  
-> Thoughts?
