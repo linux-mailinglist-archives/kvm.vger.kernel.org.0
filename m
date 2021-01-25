@@ -2,147 +2,377 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ABF7302A5A
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 19:36:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2335F302A61
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 19:36:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726959AbhAYSfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 13:35:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41670 "EHLO
+        id S1727369AbhAYSgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 13:36:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbhAYSeU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 13:34:20 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38A8C061574;
-        Mon, 25 Jan 2021 10:33:39 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id bx12so16670064edb.8;
-        Mon, 25 Jan 2021 10:33:39 -0800 (PST)
+        with ESMTP id S1727232AbhAYSf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 13:35:57 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E000C061574
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 10:35:16 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id t6so8217174plq.1
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 10:35:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=VMRVhIQIXZxzucvozlD6kGt114/L0couPU+fNeFrnDQ=;
-        b=B/RNvjvh+qiB40NO59Ij5acibSeJucACNTddOI5YBI8wjrLQZCGM/n6hgYcU5ZoMIc
-         7el4jsKtS3gTsDSsJodd7O6v+pVrEY2qQP7g4eDvKqFVqVzQPmJ9ki4qnqYZ0Y/AuySn
-         KHW49MzPLDQZXV2BHQT/lLAsDHgQN5CnfKxD6vKy8zy6mDCSXe7IS+isMaR23ExsXdEh
-         CaL9wxe38Vap6EY4cP9j1pr6fUJeLVrJKQAGnhZq7M3SrXQMx3CDXcjUMfnj+rCWX7vS
-         zlpZl4WtEMVhrvjaKj83VXuZpzFOE68uikLW1v51/c81VwAO9DZ3AoOvB8Sqo+bCIELe
-         mbLw==
+        bh=5li4BVEipLZX5zx8rH4Z99dY7w+ascZy4Y8R2o+aUH8=;
+        b=ntnqgqJh8GrmgSLeIUVSOeq5ocf777yPSTQ/ma0WIPO30h+DKcbkCeMBXaDyu+II4o
+         UMpCUfTJekTMY3vCJYPmquE6msvyiqLQUxnv+Qa3r6AZbHT7+VpLvX6r5Q+OjazjvunH
+         NLPdZTZMV6N7ne6Bxo+VqIYyDyy37rGuL2RgVYOhrRNmdtspPcsGocvHDflOGXXNcL3S
+         m0VpqdXFHPlf1Rbm1QxZIvYNZoPDXUlGf3MUk88oOAMT/kUr0DXhL6pFdWc9nb/CDbjA
+         eukcfxn0wDeFNZPSqccJmj4nhOmZ8T+LYGGk8Gq334rQrt7MJTlhmWa0vzSCOkusKDUq
+         5qfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=VMRVhIQIXZxzucvozlD6kGt114/L0couPU+fNeFrnDQ=;
-        b=TXbI15oNUEzL8QF9zBttiWRt24F+yyVo8wu+6wtqK6uKgHbjC+QzdefnoUXAgqCbYA
-         scgOC5sXTFDeSpj4Mptn7i12UtvNHvdDb66YhSO9KoVV9tpRtyXWxNLUn7KVoyx2HIBl
-         HFtfD6Pmq+gwEQWrMt9FiO20cXFTC+MrCghWrGuhNQBpmOTKlYtHL0c6TfKNkmFIGdt+
-         bNNzd8LhD138O/xd5BtfL+ooopjnU/L9LQjOzKfUT39pJBOtcxUTYxAXpuYCrv/Hdzx6
-         rSknL71Ma0F0R8nSFxacx0rlG4jZyqd6xzo9ESY+0QPHN5xSuF/kHukUUJSbfzZ6bDZA
-         JEnw==
-X-Gm-Message-State: AOAM530QZ5Rfwa74mykzzRXQjaEYticQCbOxyBDH88zW6vq7UobDALB+
-        YwkBEiQjV/spjtgJTnEtHEmOJrUa2EMU0xZT
-X-Google-Smtp-Source: ABdhPJxUJhjHWZALtw4qPBu4yxZgE6PlX7Q+SepxYV+BseqPdze5m+o668iKAr7LDljmuCzZrtec+Q==
-X-Received: by 2002:aa7:d4d7:: with SMTP id t23mr1529021edr.321.1611599618531;
-        Mon, 25 Jan 2021 10:33:38 -0800 (PST)
-Received: from martin (p578aa711.dip0.t-ipconnect.de. [87.138.167.17])
-        by smtp.gmail.com with ESMTPSA id ce7sm8584140ejb.100.2021.01.25.10.33.37
+        bh=5li4BVEipLZX5zx8rH4Z99dY7w+ascZy4Y8R2o+aUH8=;
+        b=SWpQSH1w22ZjHwUw480281H+0Y5jo10pRG1mXaGxONm0KUBIYjaR4AeJP9H2uRTe4S
+         slPEH1ZEpIqnAT/ofqm8N4iRXK5p5BFmehlUM0At6nvUErPgwOH1RhCrxKhhIUP+aGMR
+         URFOSguRb/h9ENyl1fgB8B4XBKzlNi5pWOFHV4FYL1l0kAj6BeAmP9K6c4f1gdLJv3JE
+         XHPWxsVRUus53chrtYrdNEyHsgbzaFZl2FgDcQ2Ud7NEQ5cNNoKUsbWy0Q+e2TU3Uxgb
+         xegh1D86p7rba0QVXlqY2KNrMZ1fy9HF9aq2GAmodGjFauyifKZFJ7Fc8jzzYUVA682l
+         tzQg==
+X-Gm-Message-State: AOAM532rs0/CXSqorenuoe1tKCgUMAQbls4YB8uSWj6bwL5hnskLIegm
+        tN0e23ioBwupmY7jp5zr/rCwTQ==
+X-Google-Smtp-Source: ABdhPJxgVscQHSmbku17rqN6Nk67IT0OKp5oZGNz41Gx1gtHDQegyJuNc0/nvJi9Q+6qG60UzNty/w==
+X-Received: by 2002:a17:90a:d305:: with SMTP id p5mr1634140pju.33.1611599715885;
+        Mon, 25 Jan 2021 10:35:15 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id n128sm18157528pga.55.2021.01.25.10.35.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 10:33:37 -0800 (PST)
-Date:   Mon, 25 Jan 2021 19:33:35 +0100
-From:   Martin Radev <martin.b.radev@gmail.com>
-To:     Konrad Rzeszutek Wilk <konrad@darnok.org>
-Cc:     Christoph Hellwig <hch@lst.de>, thomas.lendacky@amd.com,
-        file@sect.tu-berlin.de, robert.buhren@sect.tu-berlin.de,
-        kvm@vger.kernel.org, konrad.wilk@oracle.com,
-        mathias.morbitzer@aisec.fraunhofer.de,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        iommu@lists.linux-foundation.org, robin.murphy@arm.com,
-        kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH] swiotlb: Validate bounce size in the sync/unmap path
-Message-ID: <YA8O/2qBBzZo5hi7@martin>
-References: <X/27MSbfDGCY9WZu@martin>
- <20210113113017.GA28106@lst.de>
- <YAV0uhfkimXn1izW@martin>
- <20210118151428.GA72213@fedora>
+        Mon, 25 Jan 2021 10:35:15 -0800 (PST)
+Date:   Mon, 25 Jan 2021 10:35:08 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH] KVM: x86/mmu: consider the hva in mmu_notifer retry
+Message-ID: <YA8PXCEVukW0UzC5@google.com>
+References: <20210125064234.2078146-1-stevensd@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210118151428.GA72213@fedora>
+In-Reply-To: <20210125064234.2078146-1-stevensd@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 18, 2021 at 10:14:28AM -0500, Konrad Rzeszutek Wilk wrote:
-> On Mon, Jan 18, 2021 at 12:44:58PM +0100, Martin Radev wrote:
-> > On Wed, Jan 13, 2021 at 12:30:17PM +0100, Christoph Hellwig wrote:
-> > > On Tue, Jan 12, 2021 at 04:07:29PM +0100, Martin Radev wrote:
-> > > > The size of the buffer being bounced is not checked if it happens
-> > > > to be larger than the size of the mapped buffer. Because the size
-> > > > can be controlled by a device, as it's the case with virtio devices,
-> > > > this can lead to memory corruption.
-> > > > 
-> > > 
-> > > I'm really worried about all these hodge podge hacks for not trusted
-> > > hypervisors in the I/O stack.  Instead of trying to harden protocols
-> > > that are fundamentally not designed for this, how about instead coming
-> > > up with a new paravirtualized I/O interface that is specifically
-> > > designed for use with an untrusted hypervisor from the start?
-> > 
-> > Your comment makes sense but then that would require the cooperation
-> > of these vendors and the cloud providers to agree on something meaningful.
-> > I am also not sure whether the end result would be better than hardening
-> > this interface to catch corruption. There is already some validation in
-> > unmap path anyway.
-> > 
-> > Another possibility is to move this hardening to the common virtio code,
-> > but I think the code may become more complicated there since it would
-> > require tracking both the dma_addr and length for each descriptor.
-> 
-> Christoph,
-> 
-> I've been wrestling with the same thing - this is specific to busted
-> drivers. And in reality you could do the same thing with a hardware
-> virtio device (see example in http://thunderclap.io/) - where the
-> mitigation is 'enable the IOMMU to do its job.'.
-> 
-> AMD SEV documents speak about utilizing IOMMU to do this (AMD SEV-SNP)..
-> and while that is great in the future, SEV without IOMMU is now here.
-> 
-> Doing a full circle here, this issue can be exploited with virtio
-> but you could say do that with real hardware too if you hacked the
-> firmware, so if you say used Intel SR-IOV NIC that was compromised
-> on an AMD SEV machine, and plumbed in the guest - the IOMMU inside
-> of the guest would be SWIOTLB code. Last line of defense against
-> bad firmware to say.
-> 
-> As such I am leaning towards taking this code, but I am worried
-> about the performance hit .. but perhaps I shouldn't as if you
-> are using SWIOTLB=force already you are kind of taking a
-> performance hit?
-> 
++Cc the other architectures, I'm guessing this would be a helpful optimization
+for all archs.
 
-I have not measured the performance degradation. This will hit all AMD SEV,
-Intel TDX, IBM Protected Virtualization VMs. I don't expect the hit to
-be large since there are only few added operations per hundreads of copied
-bytes. I could try to measure the performance hit by running some benchmark
-with virtio-net/virtio-blk/virtio-rng.
+Quite a few comments, but they're all little more than nits.  Nice!
 
-Earlier I said:
-> > Another possibility is to move this hardening to the common virtio code,
-> > but I think the code may become more complicated there since it would
-> > require tracking both the dma_addr and length for each descriptor.
+On Mon, Jan 25, 2021, David Stevens wrote:
+> From: David Stevens <stevensd@chromium.org>
+> 
+> Use the range passed to mmu_notifer's invalidate_range_start to prevent
 
-Unfortunately, this doesn't make sense. Even if there's validation for
-the size in the common virtio layer, there will be some other device
-which controls a dma_addr and length passed to dma_unmap* in the
-corresponding driver. The device can target a specific dma-mapped private
-buffer by changing the dma_addr and set a good length to overwrite buffers
-following it.
+s/mmu_notifer/mmu_notifier.  
 
-So, instead of doing the check in every driver and hitting a performance
-cost even when swiotlb is not used, it's probably better to fix it in
-swiotlb.
+And maybe avoid calling out invalidate_range_start() by name?  It took me a few
+reads to understand it's referring to the function, i.e. the start of the
+invalidation, not the start of the range.
 
-@Tom Lendacky, do you think that it makes sense to harden swiotlb or
-some other approach may be better for the SEV features?
+> spurious page fault retries due to changes in unrelated host virtual
+> addresses.
 
+This needs to elaborate on the exact scenario this is handling, as is it sounds
+like KVM is tracking the history of invalidations or something.  Understanding
+this patch requires a priori knowledge of mmu_notifier_count.  Something like:
+
+  Track the range being invalidated by mmu_notifier and skip page fault
+  retries if the fault address is not affected by the in-progress
+  invalidation.  Disable the optimization if multiple invalidations are
+  in-progress to keep things simple, as tracking multiple ranges has
+  diminishing returns.
+
+> This has the secondary effect of greatly reducing the likelihood of extreme
+
+Out of curiosity, is this really the _secondary_ effect?  I would expect this
+change to primarily benefit scenarios where the invalidation has gotten
+waylaid for whatever reason.
+
+> latency when handing a page fault due to another thread having been preempted
+> while modifying host virtual addresses.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+
+...
+
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 6d16481aa29d..79166288ed03 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3658,8 +3658,8 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  }
+>  
+>  static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> -			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, bool write,
+> -			 bool *writable)
+> +			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
+> +			 bool write, bool *writable)
+
+Side topic, I'm all for creating a 'struct kvm_page_fault' or whatever to hold
+all these variables.  The helper functions stacks are getting unwieldy.
+Definitely doesn't need to be addressed here, this just reminded of how ugly
+these stacks are.
+
+>  {
+>  	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+>  	bool async;
+> @@ -3672,7 +3672,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>  	}
+>  
+>  	async = false;
+> -	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
+> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async,
+> +				    write, writable, hva);
+>  	if (!async)
+>  		return false; /* *pfn has correct page already */
+>  
+> @@ -3686,7 +3687,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>  			return true;
+>  	}
+>  
+> -	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
+> +	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
+> +				    write, writable, hva);
+>  	return false;
+>  }
+>  
+> @@ -3699,6 +3701,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	gfn_t gfn = gpa >> PAGE_SHIFT;
+>  	unsigned long mmu_seq;
+>  	kvm_pfn_t pfn;
+> +	hva_t hva;
+>  	int r;
+>  
+>  	if (page_fault_handle_page_track(vcpu, error_code, gfn))
+> @@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
+> +	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
+> +			 write, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
+> @@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  
+>  	r = RET_PF_RETRY;
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
+> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
+>  		goto out_unlock;
+>  	r = make_mmu_pages_available(vcpu);
+>  	if (r)
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 50e268eb8e1a..3171784139a4 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -790,6 +790,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	struct guest_walker walker;
+>  	int r;
+>  	kvm_pfn_t pfn;
+> +	hva_t hva;
+>  	unsigned long mmu_seq;
+>  	bool map_writable, is_self_change_mapping;
+>  	int max_level;
+> @@ -840,8 +841,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+>  	smp_rmb();
+>  
+> -	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, write_fault,
+> -			 &map_writable))
+> +	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
+> +			 write_fault, &map_writable))
+>  		return RET_PF_RETRY;
+>  
+>  	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
+> @@ -869,7 +870,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
+>  
+>  	r = RET_PF_RETRY;
+>  	spin_lock(&vcpu->kvm->mmu_lock);
+> -	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
+> +	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
+>  		goto out_unlock;
+>  
+>  	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f3b1013fb22c..b70097685249 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -502,6 +502,8 @@ struct kvm {
+>  	struct mmu_notifier mmu_notifier;
+>  	unsigned long mmu_notifier_seq;
+>  	long mmu_notifier_count;
+> +	unsigned long mmu_notifier_range_start;
+> +	unsigned long mmu_notifier_range_end;
+>  #endif
+>  	long tlbs_dirty;
+>  	struct list_head devices;
+> @@ -729,7 +731,7 @@ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn);
+>  kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn);
+>  kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+>  			       bool atomic, bool *async, bool write_fault,
+> -			       bool *writable);
+> +			       bool *writable, hva_t *hva);
+>  
+>  void kvm_release_pfn_clean(kvm_pfn_t pfn);
+>  void kvm_release_pfn_dirty(kvm_pfn_t pfn);
+> @@ -1203,6 +1205,24 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  		return 1;
+>  	return 0;
+>  }
+> +
+> +static inline int mmu_notifier_retry_hva(struct kvm *kvm,
+> +					 unsigned long mmu_seq,
+> +					 unsigned long hva)
+> +{
+> +	/*
+> +	 * Unlike mmu_notifier_retry, this function relies on
+> +	 * kvm->mmu_lock for consistency.
+
+mmu_notifier_retry is the outlier due to PPC behavior.  Maybe just add a lockdep
+annonation and call it good?
+
+> +	 */
+
+This needs a comment to explicitly state that 'count > 1' cannot be done at
+this time.  My initial thought is that it would be more intuitive to check for
+'count > 1' here, but that would potentially check the wrong wrange when count
+goes from 2->1.  The comment about persistence in invalidate_range_start() is a
+good hint, but I think it's worth being explicit to avoid bad "cleanup" in the
+future.
+
+> +	if (unlikely(kvm->mmu_notifier_count)) {
+> +		if (kvm->mmu_notifier_range_start <= hva &&
+> +		    hva < kvm->mmu_notifier_range_end)
+
+Combine these into a single statement?  I think the result is easier to read?
+
+	if (unlikely(kvm->mmu_notifier_count) &&
+	    kvm->mmu_notifier_range_start <= hva &&
+	    hva < kvm->mmu_notifier_range_end)
+
+> +			return 1;
+> +	}
+> +	if (kvm->mmu_notifier_seq != mmu_seq)
+> +		return 1;
+> +	return 0;
+> +}
+>  #endif
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fa9e3614d30e..d6e1ef5cb184 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -483,6 +483,18 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	 * count is also read inside the mmu_lock critical section.
+>  	 */
+>  	kvm->mmu_notifier_count++;
+> +	if (likely(kvm->mmu_notifier_count == 1)) {
+> +		kvm->mmu_notifier_range_start = range->start;
+> +		kvm->mmu_notifier_range_end = range->end;
+> +	} else {
+> +		/**
+> +		 * Tracking multiple concurrent ranges has diminishing returns,
+> +		 * so just use the maximum range. This persists until after all
+> +		 * outstanding invalidation operations complete.
+> +		 */
+> +		kvm->mmu_notifier_range_start = 0;
+> +		kvm->mmu_notifier_range_end = ULONG_MAX;
+
+Hrm, I don't think there's a corner case in practice, but ULONG_MAX is a legal
+virtual address and range_end is exclusive.  E.g. passing hva=-1ul would get a
+false negative in mmu_notifier_retry_hva().  It's not an issue as written
+because hva is generated from the gfn, and hva can't be a kernel address.  I'm
+guessing mmu_notifier also doesn't fire on kernel addresses.  I assume that all
+holds true for other architectures, and adding checks in mmu_notifier_retry_hva()
+feels like a waste of cycles, but it still bugs me. :-)
+
+Maybe zero out range_end and explicitly check for that, just to be paranoid?
+
+	if (unlikely(kvm->mmu_notifier_count) &&
+	    (!kvm->mmu_notifier_range_end ||
+            (kvm->mmu_notifier_range_start <= hva &&
+             hva < kvm->mmu_notifier_range_end))
+
+> +	}
+>  	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
+>  					     range->flags);
+>  	/* we've to flush the tlb before the pages can be freed */
+> @@ -2010,9 +2022,11 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+>  
+>  kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
+>  			       bool atomic, bool *async, bool write_fault,
+> -			       bool *writable)
+> +			       bool *writable, hva_t *hva)
+
+Hrm, it feels like we should really split gfn->hva and hva->pfn into separate
+operations, but pretty much every arch needs the hva error handling.  Splitting
+it would probably do more harm than good, at least not without a lot of
+additional refactoring.  Bummer.
+
+>  {
+>  	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
+
+Newline here.
+
+> +	if (hva)
+> +		*hva = addr;
+>  
+>  	if (addr == KVM_HVA_ERR_RO_BAD) {
+>  		if (writable)
+> @@ -2041,19 +2055,19 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
+>  		      bool *writable)
+>  {
+>  	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
+> -				    write_fault, writable);
+> +				    write_fault, writable, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL);
+> +	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
+>  
+>  kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn)
+>  {
+> -	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL);
+> +	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
+>  
+> -- 
+> 2.30.0.280.ga3ce27912f-goog
+> 
