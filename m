@@ -2,160 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE4A1302086
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 03:44:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F67530208F
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 03:48:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbhAYCnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Jan 2021 21:43:20 -0500
-Received: from mga01.intel.com ([192.55.52.88]:8483 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726821AbhAYCnM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Jan 2021 21:43:12 -0500
-IronPort-SDR: L9e98l/WCdsGEpP6sPdij86GvGfP/EKvHS//65ne+58ONOvACUpIYn9KHq7qIXn9to0Bt7prwB
- MQKtVERw/Q3A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="198427923"
-X-IronPort-AV: E=Sophos;i="5.79,372,1602572400"; 
-   d="scan'208";a="198427923"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2021 18:41:10 -0800
-IronPort-SDR: TR20KBR/8CvLXHWV/Xpyr7sXuW2iA7heH/n3hUOXi7M/lGpqwTvMMPFuA52qa60fCjrqe9zq5H
- zlx+ghhtJqIg==
-X-IronPort-AV: E=Sophos;i="5.79,372,1602572400"; 
-   d="scan'208";a="471752637"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2021 18:41:08 -0800
-Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
- via DS
-To:     "Liuxiangdong (Aven, Cloud Infrastructure Service Product Dept.)" 
-        <liuxiangdong5@huawei.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Xiexiangyou <xiexiangyou@huawei.com>,
-        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
-        kvm <kvm@vger.kernel.org>, Wei Wang <wei.w.wang@intel.com>
-References: <EEC2A80E7137D84ABF791B01D40FA9A601EC200E@DGGEMM506-MBX.china.huawei.com>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <584b4e9a-37e7-1f2a-0a67-42034329a9dc@linux.intel.com>
-Date:   Mon, 25 Jan 2021 10:41:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S1726700AbhAYCrg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 24 Jan 2021 21:47:36 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:11435 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbhAYCre (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 24 Jan 2021 21:47:34 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DPDkp1PRwzjBfN;
+        Mon, 25 Jan 2021 10:45:54 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 25 Jan 2021 10:46:45 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Cornelia Huck" <cohuck@redhat.com>
+CC:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "James Morse" <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: [PATCH] vfio/iommu_type1: Mantainance a counter for non_pinned_groups
+Date:   Mon, 25 Jan 2021 10:46:42 +0800
+Message-ID: <20210125024642.14604-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <EEC2A80E7137D84ABF791B01D40FA9A601EC200E@DGGEMM506-MBX.china.huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ kvm@vger.kernel.org
+With this counter, we never need to traverse all groups to update
+pinned_scope of vfio_iommu.
 
-Hi Liuxiangdong,
-
-On 2021/1/22 18:02, Liuxiangdong (Aven, Cloud Infrastructure Service 
-Product Dept.) wrote:
-> Hi Like,
-> 
-> Some questions about 
-> https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/ <https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/>
-
-Thanks for trying the PEBS feature in the guest,
-and I assume you have correctly applied the QEMU patches for guest PEBS.
-
-> 
-> 1)Test in IceLake
-
-In the [PATCH v3 10/17] KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, 
-DTES64, we only support Ice Lake with the following x86_model(s):
-
-#define INTEL_FAM6_ICELAKE_X		0x6A
-#define INTEL_FAM6_ICELAKE_D		0x6C
-
-you can check the eax output of "cpuid -l 1 -1 -r",
-for example "0x000606a4" meets this requirement.
-
-> 
-> HOST:
-> 
-> CPU family:                      6
-> 
-> Model:                           106
-> 
-> Model name:                      Intel(R) Xeon(R) Platinum 8378A CPU $@ $@
-> 
-> microcode: sig=0x606a6, pf=0x1, revision=0xd000122
-
-As long as you get the latest BIOS from the provider,
-you may check 'cat /proc/cpuinfo | grep code | uniq' with the latest one.
-
-> 
-> Guest:  linux kernel 5.11.0-rc2
-
-I assume it's the "upstream tag v5.11-rc2" which is fine.
-
-> 
-> We can find pebs/intel_pt flag in guest cpuinfo, but there still exists 
-> error when we use perf
-
-Just a note, intel_pt and pebs are two features and we can write
-pebs records to intel_pt buffer with extra hardware support.
-(by default, pebs records are written to the pebs buffer)
-
-You may check the output of "dmesg | grep PEBS" in the guest
-to see if the guest PEBS cpuinfo is exposed and use "perf record
-–e cycles:pp" to see if PEBS feature actually  works in the guest.
-
-> 
-> # perf record –e cycles:pp
-> 
-> Error:
-> 
-> cycles:pp: PMU Hardware doesn’t support sampling/overflow-interrupts. Try 
-> ‘perf stat’
-> 
-> Could you give some advice?
-
-If you have more specific comments or any concerns, just let me know.
-
-> 
-> 2)Test in Skylake
-> 
-> HOST:
-> 
-> CPU family:                      6
-> 
-> Model:                           85
-> 
-> Model name:                      Intel(R) Xeon(R) Gold 6146 CPU @
-> 
->                                    3.20GHz
-> 
-> microcode        : 0x2000064
-> 
-> Guest: linux 4.18
-> 
-> we cannot find intel_pt flag in guest cpuinfo because 
-> cpu_has_vmx_intel_pt() return false.
-
-You may check vmx_pebs_supported().
-
-> 
-> SECONDARY_EXEC_PT_USE_GPA/VM_EXIT_CLEAR_IA32_RTIT_CTL/VM_ENTRY_LOAD_IA32_RTIT_CTL 
-> are both disable.
-> 
-> Is it because microcode is not supported?
-> 
-> And, isthere a new macrocode which can support these bits? How can we get this?
-
-Currently, this patch set doesn't support guest PEBS on the Skylake
-platforms, and if we choose to support it, we will let you know.
-
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
 ---
-thx,likexu
+ drivers/vfio/vfio_iommu_type1.c | 40 +++++----------------------------
+ 1 file changed, 5 insertions(+), 35 deletions(-)
 
-> 
-> Thanks,
-> 
-> Liuxiangdong
-> 
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 0b4dedaa9128..bb4bbcc79101 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -73,7 +73,7 @@ struct vfio_iommu {
+ 	bool			v2;
+ 	bool			nesting;
+ 	bool			dirty_page_tracking;
+-	bool			pinned_page_dirty_scope;
++	uint64_t		num_non_pinned_groups;
+ };
+ 
+ struct vfio_domain {
+@@ -148,7 +148,6 @@ static int put_pfn(unsigned long pfn, int prot);
+ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+ 					       struct iommu_group *iommu_group);
+ 
+-static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu);
+ /*
+  * This code handles mapping and unmapping of user data buffers
+  * into DMA'ble space using the IOMMU
+@@ -714,7 +713,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+ 	group = vfio_iommu_find_iommu_group(iommu, iommu_group);
+ 	if (!group->pinned_page_dirty_scope) {
+ 		group->pinned_page_dirty_scope = true;
+-		update_pinned_page_dirty_scope(iommu);
++		iommu->num_non_pinned_groups--;
+ 	}
+ 
+ 	goto pin_done;
+@@ -991,7 +990,7 @@ static int update_user_bitmap(u64 __user *bitmap, struct vfio_iommu *iommu,
+ 	 * mark all pages dirty if any IOMMU capable device is not able
+ 	 * to report dirty pages and all pages are pinned and mapped.
+ 	 */
+-	if (!iommu->pinned_page_dirty_scope && dma->iommu_mapped)
++	if (iommu->num_non_pinned_groups && dma->iommu_mapped)
+ 		bitmap_set(dma->bitmap, 0, nbits);
+ 
+ 	if (shift) {
+@@ -1622,33 +1621,6 @@ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+ 	return group;
+ }
+ 
+-static void update_pinned_page_dirty_scope(struct vfio_iommu *iommu)
+-{
+-	struct vfio_domain *domain;
+-	struct vfio_group *group;
+-
+-	list_for_each_entry(domain, &iommu->domain_list, next) {
+-		list_for_each_entry(group, &domain->group_list, next) {
+-			if (!group->pinned_page_dirty_scope) {
+-				iommu->pinned_page_dirty_scope = false;
+-				return;
+-			}
+-		}
+-	}
+-
+-	if (iommu->external_domain) {
+-		domain = iommu->external_domain;
+-		list_for_each_entry(group, &domain->group_list, next) {
+-			if (!group->pinned_page_dirty_scope) {
+-				iommu->pinned_page_dirty_scope = false;
+-				return;
+-			}
+-		}
+-	}
+-
+-	iommu->pinned_page_dirty_scope = true;
+-}
+-
+ static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
+ 				  phys_addr_t *base)
+ {
+@@ -2057,8 +2029,6 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 			 * addition of a dirty tracking group.
+ 			 */
+ 			group->pinned_page_dirty_scope = true;
+-			if (!iommu->pinned_page_dirty_scope)
+-				update_pinned_page_dirty_scope(iommu);
+ 			mutex_unlock(&iommu->lock);
+ 
+ 			return 0;
+@@ -2188,7 +2158,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	 * demotes the iommu scope until it declares itself dirty tracking
+ 	 * capable via the page pinning interface.
+ 	 */
+-	iommu->pinned_page_dirty_scope = false;
++	iommu->num_non_pinned_groups++;
+ 	mutex_unlock(&iommu->lock);
+ 	vfio_iommu_resv_free(&group_resv_regions);
+ 
+@@ -2416,7 +2386,7 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
+ 	 * to be promoted.
+ 	 */
+ 	if (update_dirty_scope)
+-		update_pinned_page_dirty_scope(iommu);
++		iommu->num_non_pinned_groups--;
+ 	mutex_unlock(&iommu->lock);
+ }
+ 
+-- 
+2.19.1
 
