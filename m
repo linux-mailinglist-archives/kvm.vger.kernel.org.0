@@ -2,94 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FEB3303414
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:16:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E241F30342E
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:21:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729996AbhAZFOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:14:34 -0500
-Received: from mga14.intel.com ([192.55.52.115]:22894 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726408AbhAYJVt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:21:49 -0500
-IronPort-SDR: kLpixzCbEWLgAImB9tzgTfik2BmW/2rKFmwjKUgesarkoVEWDBO5REJVXrWL2c7E7YGE8i274k
- LXF5gjuBAXEQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915833"
-X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="178915833"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:27 -0800
-IronPort-SDR: oZ3N02yOEcNYPhP41ed+7VkTEQYhBl3kxoe2rpWApfndI9MQKzlKG3YPlLG6AfEzb4YkKu5s69
- nOt5TTkK+D7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="402223980"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:07:25 -0800
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
-Cc:     chang.seok.bae@intel.com, kvm@vger.kernel.org, robert.hu@intel.com,
-        Robert Hoo <robert.hu@linux.intel.com>
-Subject: [RFC PATCH 12/12] kvm/vmx/nested: Enable nested LOADIWKey VM-exit
-Date:   Mon, 25 Jan 2021 17:06:20 +0800
-Message-Id: <1611565580-47718-13-git-send-email-robert.hu@linux.intel.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
-References: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
+        id S1731743AbhAZFSn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:18:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728427AbhAYMwF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 07:52:05 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B75C0613D6;
+        Mon, 25 Jan 2021 03:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=IZD+dGpJMuaKiBFySlf5qc6OjXdYWk5ceY7IXIWaNrA=; b=mu5dcukKGytbgmut4RSw7dYW5p
+        jcb5tnp16OjtgRykfyfz5gM6Dcvxvfy0l8Ql2XjjHmacq88H1SRBUDZzA49ulM4kutjU+0VK5jQ5t
+        nS723mOgAWmB0I0wvGGuVnT9tuEgrTxGokhUpEpSSYtThg6mCJ0/Fdo1N9TF32vKLai9XtwyZmu4/
+        rUTHV7jKaxH5JlUbT+TV0sn/gaIddu4ScySHHYGa92fn+GEcyP3P585VchE6U0i4hG4OR38Rr18f0
+        B2ZwNZH5TE4p88Ve/9VJhdKASrdNHY/4OhvapqGRj97q34yGtlHXAElDKADMLIXYX/FkDSn28LE6+
+        xLtPT5ew==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l3zo1-0047fH-T7; Mon, 25 Jan 2021 11:13:23 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 76CE43003D8;
+        Mon, 25 Jan 2021 12:13:10 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 401F82B0615F7; Mon, 25 Jan 2021 12:13:10 +0100 (CET)
+Date:   Mon, 25 Jan 2021 12:13:10 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Andi Kleen <andi@firstfloor.org>,
+        "Xu, Like" <like.xu@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
+ via DS
+Message-ID: <YA6nxuM5Stlolk5x@hirez.programming.kicks-ass.net>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <YACXQwBPI8OFV1T+@google.com>
+ <f8a8e4e2-e0b1-8e68-81d4-044fb62045d5@intel.com>
+ <YAHXlWmeR9p6JZm2@google.com>
+ <20210115182700.byczztx3vjhsq3p3@two.firstfloor.org>
+ <YAHkOiQsxMfOMYvp@google.com>
+ <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
+ <eb30d86f-6492-d6e3-3a24-f58c724f68fd@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eb30d86f-6492-d6e3-3a24-f58c724f68fd@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the LOADIWkey VM-exit bit in nested vmx ctrl MSR, and
-let L1 intercept L2's LOADIWKEY VM-Exit.
+On Mon, Jan 25, 2021 at 04:08:22PM +0800, Like Xu wrote:
+> Hi Peter,
+> 
+> On 2021/1/22 17:56, Peter Zijlstra wrote:
+> > On Fri, Jan 15, 2021 at 10:51:38AM -0800, Sean Christopherson wrote:
+> > > On Fri, Jan 15, 2021, Andi Kleen wrote:
+> > > > > I'm asking about ucode/hardare.  Is the "guest pebs buffer write -> PEBS PMI"
+> > > > > guaranteed to be atomic?
+> > > > 
+> > > > Of course not.
+> > > 
+> > > So there's still a window where the guest could observe the bad counter index,
+> > > correct?
+> > 
+> > Guest could do a hypercall to fix up the DS area before it tries to read
+> > it I suppose. Or the HV could expose the index mapping and have the
+> > guest fix up it.
+> 
+> A weird (malicious) guest would read unmodified PEBS records in the
+> guest PEBS buffer from other vCPUs without the need for hypercall or
+> index mapping from HV.
+> 
+> Do you see any security issues on this host index leak window?
+> 
+> > 
+> > Adding a little virt crud on top shouldn't be too hard.
+> > 
+> 
+> The patches 13-17 in this version has modified the guest PEBS buffer
+> to correct the index mapping information in the guest PEBS records.
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- arch/x86/kvm/vmx/nested.c | 5 ++++-
- arch/x86/kvm/vmx/nested.h | 7 +++++++
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index de36129..5a6b04d 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5927,6 +5927,9 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
- 	case EXIT_REASON_TPAUSE:
- 		return nested_cpu_has2(vmcs12,
- 			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE);
-+	case EXIT_REASON_LOADIWKEY:
-+		return nested_cpu_has3(vmcs12,
-+			TERTIARY_EXEC_LOADIWKEY_EXITING);
- 	default:
- 		return true;
- 	}
-@@ -6441,7 +6444,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 	if (msrs->procbased_ctls_high & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
- 		rdmsrl(MSR_IA32_VMX_PROCBASED_CTLS3,
- 		      msrs->tertiary_ctls);
--	msrs->tertiary_ctls &= ~TERTIARY_EXEC_LOADIWKEY_EXITING;
-+	msrs->tertiary_ctls &= TERTIARY_EXEC_LOADIWKEY_EXITING;
- 	/*
- 	 * We can emulate "VMCS shadowing," even if the hardware
- 	 * doesn't support it.
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 197148d..3dda114 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -145,6 +145,13 @@ static inline bool nested_cpu_has2(struct vmcs12 *vmcs12, u32 bit)
- 		(vmcs12->secondary_vm_exec_control & bit);
- }
- 
-+static inline bool nested_cpu_has3(struct vmcs12 *vmcs12, u32 bit)
-+{
-+	return (vmcs12->cpu_based_vm_exec_control &
-+			CPU_BASED_ACTIVATE_TERTIARY_CONTROLS) &&
-+		(vmcs12->tertiary_vm_exec_control & bit);
-+}
-+
- static inline bool nested_cpu_has_preemption_timer(struct vmcs12 *vmcs12)
- {
- 	return vmcs12->pin_based_vm_exec_control &
--- 
-1.8.3.1
+Right, but given there is no atomicity between writing the DS area and
+triggering the PMI (as already established earlier in this thread), a
+malicious guest can already access this information, no?
 
