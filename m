@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 337BD304A1D
+	by mail.lfdr.de (Postfix) with ESMTP id A7160304A1E
 	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 21:31:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730368AbhAZFPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:15:01 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:11860 "EHLO
+        id S1730431AbhAZFPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:15:04 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:11861 "EHLO
         szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbhAYJ3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1726678AbhAYJ3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 25 Jan 2021 04:29:24 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DPP6m5ltjz7Zgy;
-        Mon, 25 Jan 2021 17:03:44 +0800 (CST)
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DPP6s6QTJz7Zny;
+        Mon, 25 Jan 2021 17:03:49 +0800 (CST)
 Received: from DESKTOP-7FEPK9S.china.huawei.com (10.174.186.182) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 25 Jan 2021 17:04:46 +0800
+ 14.3.498.0; Mon, 25 Jan 2021 17:04:50 +0800
 From:   Shenming Lu <lushenming@huawei.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
@@ -27,9 +27,9 @@ CC:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
         Kevin Tian <kevin.tian@intel.com>,
         <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
         <lushenming@huawei.com>
-Subject: [RFC PATCH v1 2/4] vfio: Add a page fault handler
-Date:   Mon, 25 Jan 2021 17:04:00 +0800
-Message-ID: <20210125090402.1429-3-lushenming@huawei.com>
+Subject: [RFC PATCH v1 4/4] vfio: Allow to pin and map dynamically
+Date:   Mon, 25 Jan 2021 17:04:02 +0800
+Message-ID: <20210125090402.1429-5-lushenming@huawei.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20210125090402.1429-1-lushenming@huawei.com>
 References: <20210125090402.1429-1-lushenming@huawei.com>
@@ -42,169 +42,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VFIO manages the passthrough DMA mapping itself. In order to support
-IOPF for VFIO devices, we need to add a VFIO page fault handler to
-serve the reported page faults from the IOMMU driver.
+If IOPF enabled for the whole VFIO container, there is no need to
+statically pin and map the entire DMA range, we can do it on demand.
+And unmap and unpin according to the IOPF mapped bitmap when removing
+the DMA mapping.
 
 Signed-off-by: Shenming Lu <lushenming@huawei.com>
 ---
- drivers/vfio/vfio.c             | 35 ++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c | 58 +++++++++++++++++++++++++++++++++
- include/linux/vfio.h            |  5 +++
- 3 files changed, 98 insertions(+)
+ drivers/vfio/vfio.c             | 20 +++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 61 ++++++++++++++++++++++++++++++++-
+ include/linux/vfio.h            |  1 +
+ 3 files changed, 81 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 4ad8a35667a7..ff7797260d0f 100644
+index fd885d99ee0f..466959f4d661 100644
 --- a/drivers/vfio/vfio.c
 +++ b/drivers/vfio/vfio.c
-@@ -2349,6 +2349,41 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
+@@ -2404,6 +2404,26 @@ int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
  }
- EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
+ EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler);
  
-+int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data)
++/*
++ * Return 0 if enabled.
++ */
++int vfio_device_iopf_enabled(struct device *dev, void *data)
 +{
-+	struct device *dev = (struct device *)data;
-+	struct vfio_container *container;
-+	struct vfio_group *group;
-+	struct vfio_iommu_driver *driver;
-+	int ret;
++	struct vfio_device *device;
++	int ret = 0;
 +
-+	if (!dev)
-+		return -EINVAL;
-+
-+	group = vfio_group_get_from_dev(dev);
-+	if (!group)
++	device = vfio_device_get_from_dev(dev);
++	if (!device)
 +		return -ENODEV;
 +
-+	ret = vfio_group_add_container_user(group);
-+	if (ret)
-+		goto out;
++	if (!device->iopf_enabled)
++		ret = 1;
 +
-+	container = group->container;
-+	driver = container->iommu_driver;
-+	if (likely(driver && driver->ops->dynamic_dma_map))
-+		ret = driver->ops->dynamic_dma_map(container->iommu_data,
-+						   fault, dev);
-+	else
-+		ret = -ENOTTY;
-+
-+	vfio_group_try_dissolve_container(group);
-+
-+out:
-+	vfio_group_put(group);
++	vfio_device_put(device);
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler);
++EXPORT_SYMBOL_GPL(vfio_device_iopf_enabled);
 +
  /**
   * Module/class support
   */
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f1d4de5ab094..ac6f00c97897 100644
+index ac6f00c97897..da84155513e4 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -145,6 +145,8 @@ struct vfio_regions {
- #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
- 
- #define IOMMU_MAPPED_BITMAP_BYTES(n) DIRTY_BITMAP_BYTES(n)
-+#define IOMMU_MAPPED_BITMAP_GET(dma, i)	((dma->iommu_mapped_bitmap[i / BITS_PER_LONG]	\
-+					 >> (i % BITS_PER_LONG)) & 0x1)
- 
- static int put_pfn(unsigned long pfn, int prot);
- 
-@@ -2992,6 +2994,61 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
- 	return ret;
+@@ -864,6 +864,43 @@ static size_t unmap_unpin_slow(struct vfio_domain *domain,
+ 	return unmapped;
  }
  
-+static int vfio_iommu_type1_dynamic_dma_map(void *iommu_data,
-+					    struct iommu_fault *fault,
-+					    struct device *dev)
++static long vfio_clear_iommu_mapped_bitmap(struct vfio_iommu *iommu,
++					   struct vfio_dma *dma,
++					   bool do_accounting)
 +{
-+	struct vfio_iommu *iommu = iommu_data;
-+	dma_addr_t iova = ALIGN_DOWN(fault->prm.addr, PAGE_SIZE);
-+	struct vfio_dma *dma;
-+	int access_flags = 0;
-+	unsigned long bit_offset, vaddr, pfn;
-+	enum iommu_page_response_code status = IOMMU_PAGE_RESP_INVALID;
-+	struct iommu_page_response resp = {0};
++	dma_addr_t iova = dma->iova;
++	size_t size = dma->size;
++	uint64_t i, npages = size / PAGE_SIZE;
++	long unlocked = 0;
 +
-+	if (fault->type != IOMMU_FAULT_PAGE_REQ)
-+		return -EOPNOTSUPP;
++	for (i = 0; i < npages; i++, iova += PAGE_SIZE) {
++		if (IOMMU_MAPPED_BITMAP_GET(dma, i)) {
++			struct vfio_domain *d;
++			phys_addr_t phys;
 +
-+	mutex_lock(&iommu->lock);
++			d = list_first_entry(&iommu->domain_list,
++					     struct vfio_domain, next);
++			phys = iommu_iova_to_phys(d->domain, iova);
++			if (WARN_ON(!phys))
++				continue;
 +
-+	dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-+	if (!dma)
-+		goto out_invalid;
++			list_for_each_entry(d, &iommu->domain_list, next) {
++				iommu_unmap(d->domain, iova, PAGE_SIZE);
++				cond_resched();
++			}
++			vfio_unpin_pages_remote(dma, iova, phys >> PAGE_SHIFT,
++						1, do_accounting);
 +
-+	if (fault->prm.perm & IOMMU_FAULT_PERM_READ)
-+		access_flags |= IOMMU_READ;
-+	if (fault->prm.perm & IOMMU_FAULT_PERM_WRITE)
-+		access_flags |= IOMMU_WRITE;
-+	if ((dma->prot & access_flags) != access_flags)
-+		goto out_invalid;
-+
-+	bit_offset = (iova - dma->iova) >> PAGE_SHIFT;
-+	if (IOMMU_MAPPED_BITMAP_GET(dma, bit_offset))
-+		goto out_success;
-+
-+	vaddr = iova - dma->iova + dma->vaddr;
-+	if (vfio_pin_page_external(dma, vaddr, &pfn, true))
-+		goto out_invalid;
-+
-+	if (vfio_iommu_map(iommu, iova, pfn, 1, dma->prot)) {
-+		vfio_unpin_page_external(dma, iova, true);
-+		goto out_invalid;
++			bitmap_clear(dma->iommu_mapped_bitmap, i, 1);
++			unlocked++;
++		}
 +	}
 +
-+	bitmap_set(dma->iommu_mapped_bitmap, bit_offset, 1);
-+
-+out_success:
-+	status = IOMMU_PAGE_RESP_SUCCESS;
-+
-+out_invalid:
-+	mutex_unlock(&iommu->lock);
-+	resp.version		= IOMMU_PAGE_RESP_VERSION_1;
-+	resp.grpid		= fault->prm.grpid;
-+	resp.code		= status;
-+	iommu_page_response(dev, &resp);
-+	return 0;
++	if (do_accounting)
++		return 0;
++	return unlocked;
 +}
 +
- static struct iommu_domain *
- vfio_iommu_type1_group_iommu_domain(void *iommu_data,
- 				    struct iommu_group *iommu_group)
-@@ -3028,6 +3085,7 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.register_notifier	= vfio_iommu_type1_register_notifier,
- 	.unregister_notifier	= vfio_iommu_type1_unregister_notifier,
- 	.dma_rw			= vfio_iommu_type1_dma_rw,
-+	.dynamic_dma_map	= vfio_iommu_type1_dynamic_dma_map,
- 	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
- };
+ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 			     bool do_accounting)
+ {
+@@ -880,6 +917,10 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
+ 		return 0;
  
++	if (!dma->iommu_mapped)
++		return vfio_clear_iommu_mapped_bitmap(iommu, dma,
++						      do_accounting);
++
+ 	/*
+ 	 * We use the IOMMU to track the physical addresses, otherwise we'd
+ 	 * need a much more complicated tracking system.  Unfortunately that
+@@ -1302,6 +1343,23 @@ static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
+ 	return list_empty(iova);
+ }
+ 
++static bool vfio_iommu_iopf_enabled(struct vfio_iommu *iommu)
++{
++	struct vfio_domain *d;
++
++	list_for_each_entry(d, &iommu->domain_list, next) {
++		struct vfio_group *g;
++
++		list_for_each_entry(g, &d->group_list, next) {
++			if (iommu_group_for_each_dev(g->iommu_group, NULL,
++						     vfio_device_iopf_enabled))
++				return false;
++		}
++	}
++
++	return true;
++}
++
+ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 			   struct vfio_iommu_type1_dma_map *map)
+ {
+@@ -1408,7 +1466,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	vfio_link_dma(iommu, dma);
+ 
+ 	/* Don't pin and map if container doesn't contain IOMMU capable domain*/
+-	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
++	if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu) ||
++	    vfio_iommu_iopf_enabled(iommu))
+ 		dma->size = size;
+ 	else
+ 		ret = vfio_pin_map_dma(iommu, dma, size);
 diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index f45940b38a02..6d535f029f21 100644
+index 6d535f029f21..cea1e9fd4bb4 100644
 --- a/include/linux/vfio.h
 +++ b/include/linux/vfio.h
-@@ -90,6 +90,9 @@ struct vfio_iommu_driver_ops {
- 					       struct notifier_block *nb);
- 	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
- 				  void *data, size_t count, bool write);
-+	int		(*dynamic_dma_map)(void *iommu_data,
-+					   struct iommu_fault *fault,
-+					   struct device *dev);
- 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
- 						   struct iommu_group *group);
- };
-@@ -153,6 +156,8 @@ extern int vfio_unregister_notifier(struct device *dev,
- struct kvm;
+@@ -157,6 +157,7 @@ struct kvm;
  extern void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
  
-+extern int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data);
-+
+ extern int vfio_iommu_dev_fault_handler(struct iommu_fault *fault, void *data);
++extern int vfio_device_iopf_enabled(struct device *dev, void *data);
+ 
  /*
   * Sub-module helpers
-  */
 -- 
 2.19.1
 
