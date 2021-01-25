@@ -2,311 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F15302235
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 07:46:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97F9030230C
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 09:59:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbhAYGpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 01:45:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57320 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726854AbhAYGnc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 01:43:32 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3696C0613D6
-        for <kvm@vger.kernel.org>; Sun, 24 Jan 2021 22:42:45 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id u4so8007301pjn.4
-        for <kvm@vger.kernel.org>; Sun, 24 Jan 2021 22:42:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=14Bj46XsmXbx8plhZIOf6y+coaN/fUKX0SPBaGuWf7g=;
-        b=K+fEZGRQSbFrMb6wpHc6SmH0r9YjxxbhSOFrGK58eer8lhC15uhhxYdXkoFfOnIokM
-         ShizDBmMZx2ZoD5i7bGeHdmqBpHgAIxp9Lla9dEPI1+s266i+9fAKebNZ4SpZlulRt+5
-         ta0T+HzD4ymvq7xdjdAyz/vUWgEe76ciMAIH8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=14Bj46XsmXbx8plhZIOf6y+coaN/fUKX0SPBaGuWf7g=;
-        b=kBOyTjFAXlLAaOUTnS1MOUyx6B1MYdfbmPdW4H40s26Sdu9G/icPksUk9aOb4FvG6G
-         4FUkbmBW1LVle+jgmOp2kOd+kbxLekeJHnHSxmz28vQkb/hBevleSN0YifRE38IGx2mi
-         5FJqTxRzF9pP6bIEmr+iMFqushOsFDRMG1999nmAcmHs7pWgMp0+wW+UW/xImwBT6inb
-         FfEvbfChbnK0+/ayWVFeL9nA+Tz48a0NxIdhPRCUY5RzYH48PXOxdWCohyrSE7Ivs8r0
-         Wk3EsSRX7SG3NghmQ90aLTDnoH8eLSqi32tW3JcKaFwDyBIGxoHNsLAxDRf9p0OXfu2P
-         RKIQ==
-X-Gm-Message-State: AOAM530pofz97MyK/llI12gx5Tq50Hb40/6Mqp3XgKStAnwAMbQ63RoZ
-        n8/4axq/NVb6CqIzudvRrxFG/wtySAb6/Q==
-X-Google-Smtp-Source: ABdhPJw2Koj77z3eEz0N0rMl8RJZzwBQ86hcwevAAQ4aIZlPMfH8PvMZ5rre+Io8LdeOagBw+lsCUw==
-X-Received: by 2002:a17:90a:a44:: with SMTP id o62mr20286765pjo.209.1611556965293;
-        Sun, 24 Jan 2021 22:42:45 -0800 (PST)
-Received: from localhost ([2401:fa00:8f:203:f693:9fff:fef4:a930])
-        by smtp.gmail.com with ESMTPSA id n8sm17935062pjo.18.2021.01.24.22.42.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jan 2021 22:42:44 -0800 (PST)
-From:   David Stevens <stevensd@chromium.org>
-X-Google-Original-From: David Stevens <stevensd@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S1725868AbhAYI6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 03:58:41 -0500
+Received: from mga18.intel.com ([134.134.136.126]:6125 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725994AbhAYIl5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 03:41:57 -0500
+IronPort-SDR: Nkcf3k0VB3i9oL8GLtTcasCPxzZvIqI28JAjnyptGYc83wKlpjajBLGIrdxvMmTLXeLCbd3xr9
+ QKqXF/iwbtDw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="167358140"
+X-IronPort-AV: E=Sophos;i="5.79,372,1602572400"; 
+   d="scan'208";a="167358140"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:08:30 -0800
+IronPort-SDR: +yed1xN/jKxYgQSYnlV82Hldq/lmX9jM0EfNi8kT917T/sfidv4AAiqvN61YAqMDp2sAgl/AF+
+ ucNkTjPGuIeg==
+X-IronPort-AV: E=Sophos;i="5.79,372,1602572400"; 
+   d="scan'208";a="387230072"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:08:26 -0800
+Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
+ via DS
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Andi Kleen <andi@firstfloor.org>
+Cc:     "Xu, Like" <like.xu@intel.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Stevens <stevensd@chromium.org>
-Subject: [PATCH] KVM: x86/mmu: consider the hva in mmu_notifer retry
-Date:   Mon, 25 Jan 2021 15:42:34 +0900
-Message-Id: <20210125064234.2078146-1-stevensd@google.com>
-X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <YACXQwBPI8OFV1T+@google.com>
+ <f8a8e4e2-e0b1-8e68-81d4-044fb62045d5@intel.com>
+ <YAHXlWmeR9p6JZm2@google.com>
+ <20210115182700.byczztx3vjhsq3p3@two.firstfloor.org>
+ <YAHkOiQsxMfOMYvp@google.com>
+ <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <eb30d86f-6492-d6e3-3a24-f58c724f68fd@linux.intel.com>
+Date:   Mon, 25 Jan 2021 16:08:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Stevens <stevensd@chromium.org>
+Hi Peter,
 
-Use the range passed to mmu_notifer's invalidate_range_start to prevent
-spurious page fault retries due to changes in unrelated host virtual
-addresses. This has the secondary effect of greatly reducing the
-likelihood of extreme latency when handing a page fault due to another
-thread having been preempted while modifying host virtual addresses.
+On 2021/1/22 17:56, Peter Zijlstra wrote:
+> On Fri, Jan 15, 2021 at 10:51:38AM -0800, Sean Christopherson wrote:
+>> On Fri, Jan 15, 2021, Andi Kleen wrote:
+>>>> I'm asking about ucode/hardare.  Is the "guest pebs buffer write -> PEBS PMI"
+>>>> guaranteed to be atomic?
+>>>
+>>> Of course not.
+>>
+>> So there's still a window where the guest could observe the bad counter index,
+>> correct?
+> 
+> Guest could do a hypercall to fix up the DS area before it tries to read
+> it I suppose. Or the HV could expose the index mapping and have the
+> guest fix up it.
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
+A weird (malicious) guest would read unmodified PEBS records in the
+guest PEBS buffer from other vCPUs without the need for hypercall or
+index mapping from HV.
+
+Do you see any security issues on this host index leak window?
+
+> 
+> Adding a little virt crud on top shouldn't be too hard.
+> 
+
+The patches 13-17 in this version has modified the guest PEBS buffer
+to correct the index mapping information in the guest PEBS records.
+
 ---
- arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
- arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
- arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++++------
- arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
- include/linux/kvm_host.h               | 22 +++++++++++++++++++++-
- virt/kvm/kvm_main.c                    | 22 ++++++++++++++++++----
- 6 files changed, 55 insertions(+), 16 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-index 38ea396a23d6..8e06cd3f759c 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
-@@ -590,7 +590,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_vcpu *vcpu,
- 	} else {
- 		/* Call KVM generic code to do the slow-path check */
- 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
--					   writing, &write_ok);
-+					   writing, &write_ok, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
- 		page = NULL;
-diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-index bb35490400e9..e603de7ade52 100644
---- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
-+++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
-@@ -822,7 +822,7 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
- 
- 		/* Call KVM generic code to do the slow-path check */
- 		pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
--					   writing, upgrade_p);
-+					   writing, upgrade_p, NULL);
- 		if (is_error_noslot_pfn(pfn))
- 			return -EFAULT;
- 		page = NULL;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481aa29d..79166288ed03 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3658,8 +3658,8 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- }
- 
- static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
--			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, bool write,
--			 bool *writable)
-+			 gpa_t cr2_or_gpa, kvm_pfn_t *pfn, hva_t *hva,
-+			 bool write, bool *writable)
- {
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	bool async;
-@@ -3672,7 +3672,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	}
- 
- 	async = false;
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async, write, writable);
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, &async,
-+				    write, writable, hva);
- 	if (!async)
- 		return false; /* *pfn has correct page already */
- 
-@@ -3686,7 +3687,8 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 			return true;
- 	}
- 
--	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL, write, writable);
-+	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
-+				    write, writable, hva);
- 	return false;
- }
- 
-@@ -3699,6 +3701,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	unsigned long mmu_seq;
- 	kvm_pfn_t pfn;
-+	hva_t hva;
- 	int r;
- 
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
-@@ -3717,7 +3720,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
- 
--	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, write, &map_writable))
-+	if (try_async_pf(vcpu, prefault, gfn, gpa, &pfn, &hva,
-+			 write, &map_writable))
- 		return RET_PF_RETRY;
- 
- 	if (handle_abnormal_pfn(vcpu, is_tdp ? 0 : gpa, gfn, pfn, ACC_ALL, &r))
-@@ -3725,7 +3729,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 
- 	r = RET_PF_RETRY;
- 	spin_lock(&vcpu->kvm->mmu_lock);
--	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
- 		goto out_unlock;
- 	r = make_mmu_pages_available(vcpu);
- 	if (r)
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 50e268eb8e1a..3171784139a4 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -790,6 +790,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	struct guest_walker walker;
- 	int r;
- 	kvm_pfn_t pfn;
-+	hva_t hva;
- 	unsigned long mmu_seq;
- 	bool map_writable, is_self_change_mapping;
- 	int max_level;
-@@ -840,8 +841,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
- 	smp_rmb();
- 
--	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, write_fault,
--			 &map_writable))
-+	if (try_async_pf(vcpu, prefault, walker.gfn, addr, &pfn, &hva,
-+			 write_fault, &map_writable))
- 		return RET_PF_RETRY;
- 
- 	if (handle_abnormal_pfn(vcpu, addr, walker.gfn, pfn, walker.pte_access, &r))
-@@ -869,7 +870,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gpa_t addr, u32 error_code,
- 
- 	r = RET_PF_RETRY;
- 	spin_lock(&vcpu->kvm->mmu_lock);
--	if (mmu_notifier_retry(vcpu->kvm, mmu_seq))
-+	if (mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, hva))
- 		goto out_unlock;
- 
- 	kvm_mmu_audit(vcpu, AUDIT_PRE_PAGE_FAULT);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f3b1013fb22c..b70097685249 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -502,6 +502,8 @@ struct kvm {
- 	struct mmu_notifier mmu_notifier;
- 	unsigned long mmu_notifier_seq;
- 	long mmu_notifier_count;
-+	unsigned long mmu_notifier_range_start;
-+	unsigned long mmu_notifier_range_end;
- #endif
- 	long tlbs_dirty;
- 	struct list_head devices;
-@@ -729,7 +731,7 @@ kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn);
- kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
- 			       bool atomic, bool *async, bool write_fault,
--			       bool *writable);
-+			       bool *writable, hva_t *hva);
- 
- void kvm_release_pfn_clean(kvm_pfn_t pfn);
- void kvm_release_pfn_dirty(kvm_pfn_t pfn);
-@@ -1203,6 +1205,24 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
- 		return 1;
- 	return 0;
- }
-+
-+static inline int mmu_notifier_retry_hva(struct kvm *kvm,
-+					 unsigned long mmu_seq,
-+					 unsigned long hva)
-+{
-+	/*
-+	 * Unlike mmu_notifier_retry, this function relies on
-+	 * kvm->mmu_lock for consistency.
-+	 */
-+	if (unlikely(kvm->mmu_notifier_count)) {
-+		if (kvm->mmu_notifier_range_start <= hva &&
-+		    hva < kvm->mmu_notifier_range_end)
-+			return 1;
-+	}
-+	if (kvm->mmu_notifier_seq != mmu_seq)
-+		return 1;
-+	return 0;
-+}
- #endif
- 
- #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index fa9e3614d30e..d6e1ef5cb184 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -483,6 +483,18 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
- 	 * count is also read inside the mmu_lock critical section.
- 	 */
- 	kvm->mmu_notifier_count++;
-+	if (likely(kvm->mmu_notifier_count == 1)) {
-+		kvm->mmu_notifier_range_start = range->start;
-+		kvm->mmu_notifier_range_end = range->end;
-+	} else {
-+		/**
-+		 * Tracking multiple concurrent ranges has diminishing returns,
-+		 * so just use the maximum range. This persists until after all
-+		 * outstanding invalidation operations complete.
-+		 */
-+		kvm->mmu_notifier_range_start = 0;
-+		kvm->mmu_notifier_range_end = ULONG_MAX;
-+	}
- 	need_tlb_flush = kvm_unmap_hva_range(kvm, range->start, range->end,
- 					     range->flags);
- 	/* we've to flush the tlb before the pages can be freed */
-@@ -2010,9 +2022,11 @@ static kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
- 
- kvm_pfn_t __gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn,
- 			       bool atomic, bool *async, bool write_fault,
--			       bool *writable)
-+			       bool *writable, hva_t *hva)
- {
- 	unsigned long addr = __gfn_to_hva_many(slot, gfn, NULL, write_fault);
-+	if (hva)
-+		*hva = addr;
- 
- 	if (addr == KVM_HVA_ERR_RO_BAD) {
- 		if (writable)
-@@ -2041,19 +2055,19 @@ kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
- 		      bool *writable)
- {
- 	return __gfn_to_pfn_memslot(gfn_to_memslot(kvm, gfn), gfn, false, NULL,
--				    write_fault, writable);
-+				    write_fault, writable, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_prot);
- 
- kvm_pfn_t gfn_to_pfn_memslot(struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, false, NULL, true, NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot);
- 
- kvm_pfn_t gfn_to_pfn_memslot_atomic(struct kvm_memory_slot *slot, gfn_t gfn)
- {
--	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL);
-+	return __gfn_to_pfn_memslot(slot, gfn, true, NULL, true, NULL, NULL);
- }
- EXPORT_SYMBOL_GPL(gfn_to_pfn_memslot_atomic);
- 
--- 
-2.30.0.280.ga3ce27912f-goog
-
+thx,likexu
