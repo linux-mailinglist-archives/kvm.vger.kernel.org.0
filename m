@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FEA530340A
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:13:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A9F30340D
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:15:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729300AbhAZFM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:12:58 -0500
+        id S1729334AbhAZFND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:13:03 -0500
 Received: from mga14.intel.com ([192.55.52.115]:22894 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726213AbhAYJRV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:17:21 -0500
-IronPort-SDR: YTCaMAUxY4k+oL3ZbIr4by0PIN4KBz9eoXJpCv/SOL6t3pCaMaJT8x+N7WeUjdR1T0NGJ1U/Mq
- Xifw6UG5UdRA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915811"
+        id S1726315AbhAYJUK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 04:20:10 -0500
+IronPort-SDR: hvAWilIEWUXJrtgqVe9991IPgTymmrZDe/faJjoc0CJPlE/GL6maAD/HwhoyleNT5x5aAHlxG7
+ w0ALUeTExXtg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915819"
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="178915811"
+   d="scan'208";a="178915819"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:18 -0800
-IronPort-SDR: Ch7Z9tUe5CjN5UUCUdZ44gYHUa+DzmsLXDUPGZAVk7EH7soqotHzydoggakX5HWAU7Iin/V9dd
- 8pQzompdyGgA==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:20 -0800
+IronPort-SDR: 71/nGqXYa/II0UoekRPQTUlBfPR0KL3wyY9IjmrPn2148ytJQclvVQg4cSKqFDKYVDOcLFaD2k
+ eVX/bbnKL77w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="402223907"
+   d="scan'208";a="402223925"
 Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:07:16 -0800
+  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:07:18 -0800
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
 Cc:     chang.seok.bae@intel.com, kvm@vger.kernel.org, robert.hu@intel.com,
         Robert Hoo <robert.hu@linux.intel.com>
-Subject: [RFC PATCH 08/12] kvm/vmx: Refactor vmx_compute_tertiary_exec_control()
-Date:   Mon, 25 Jan 2021 17:06:16 +0800
-Message-Id: <1611565580-47718-9-git-send-email-robert.hu@linux.intel.com>
+Subject: [RFC PATCH 09/12] kvm/vmx/vmcs12: Add Tertiary Exec-Control field in vmcs12
+Date:   Mon, 25 Jan 2021 17:06:17 +0800
+Message-Id: <1611565580-47718-10-git-send-email-robert.hu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
 References: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
@@ -40,68 +40,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Like vmx_compute_tertiary_exec_control(), before L1 set VMCS, compute its
-nested VMX feature control MSR's value according to guest CPUID setting.
-
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.h |  1 +
- 2 files changed, 18 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmcs12.c | 1 +
+ arch/x86/kvm/vmx/vmcs12.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f29a91c..cf8ab95 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4377,10 +4377,20 @@ u32 vmx_exec_control(struct vcpu_vmx *vmx)
- #define vmx_adjust_sec_exec_exiting(vmx, exec_control, lname, uname) \
- 	vmx_adjust_sec_exec_control(vmx, exec_control, lname, uname, uname##_EXITING, true)
- 
--static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
-+static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
- {
--	/* Though currently, no special adjustment. There might be in the future*/
--	return vmcs_config.cpu_based_3rd_exec_ctrl;
-+	struct kvm_vcpu *vcpu = &vmx->vcpu;
-+	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
-+
-+	if (nested) {
-+		if (guest_cpuid_has(vcpu, X86_FEATURE_KEYLOCKER))
-+			vmx->nested.msrs.tertiary_ctls |=
-+				TERTIARY_EXEC_LOADIWKEY_EXITING;
-+		else
-+			vmx->nested.msrs.tertiary_ctls &=
-+				~TERTIARY_EXEC_LOADIWKEY_EXITING;
-+	}
-+	vmx->tertiary_exec_control = exec_control;
- }
- 
- static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
-@@ -4493,8 +4503,10 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 		secondary_exec_controls_set(vmx, vmx->secondary_exec_control);
- 	}
- 
--	if (cpu_has_tertiary_exec_ctrls())
--		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
-+	if (cpu_has_tertiary_exec_ctrls()) {
-+		vmx_compute_tertiary_exec_control(vmx);
-+		tertiary_exec_controls_set(vmx, vmx->tertiary_exec_control);
-+	}
- 
- 	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
- 		vmcs_write64(EOI_EXIT_BITMAP0, 0);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 94f1c27..0915fad 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -209,6 +209,7 @@ struct vcpu_vmx {
- 	u32		      msr_ia32_umwait_control;
- 
- 	u32 secondary_exec_control;
-+	u64 tertiary_exec_control;
- 
+diff --git a/arch/x86/kvm/vmx/vmcs12.c b/arch/x86/kvm/vmx/vmcs12.c
+index c8e51c0..603c785 100644
+--- a/arch/x86/kvm/vmx/vmcs12.c
++++ b/arch/x86/kvm/vmx/vmcs12.c
+@@ -50,6 +50,7 @@
+ 	FIELD64(VMREAD_BITMAP, vmread_bitmap),
+ 	FIELD64(VMWRITE_BITMAP, vmwrite_bitmap),
+ 	FIELD64(XSS_EXIT_BITMAP, xss_exit_bitmap),
++	FIELD64(TERTIARY_VM_EXEC_CONTROL, tertiary_vm_exec_control),
+ 	FIELD64(GUEST_PHYSICAL_ADDRESS, guest_physical_address),
+ 	FIELD64(VMCS_LINK_POINTER, vmcs_link_pointer),
+ 	FIELD64(GUEST_IA32_DEBUGCTL, guest_ia32_debugctl),
+diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+index 80232da..489c29d 100644
+--- a/arch/x86/kvm/vmx/vmcs12.h
++++ b/arch/x86/kvm/vmx/vmcs12.h
+@@ -69,7 +69,8 @@ struct __packed vmcs12 {
+ 	u64 vm_function_control;
+ 	u64 eptp_list_address;
+ 	u64 pml_address;
+-	u64 padding64[3]; /* room for future expansion */
++	u64 tertiary_vm_exec_control;
++	u64 padding64[2]; /* room for future expansion */
  	/*
- 	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
+ 	 * To allow migration of L1 (complete with its L2 guests) between
+ 	 * machines of different natural widths (32 or 64 bit), we cannot have
 -- 
 1.8.3.1
 
