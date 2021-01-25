@@ -2,144 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 576563028CA
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 18:26:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A19543028DD
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 18:30:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731025AbhAYRZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 12:25:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35064 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731022AbhAYRZg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 12:25:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611595446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hABPZ/hSthf9YuEr1NMmkQT9Sp/nFeQHAsdXUsqC/dY=;
-        b=DEdSoE/EnZ5UNbir5KgaUBQfZzt8It8dnMWdFWXaOjKhlNPiGtkOeSB4xUDnu8JSl+WBt6
-        WoEuWQhW0nu3o+FOZPIkNLMjnr9ZAmCKB9kKhT9I0JaOm+Ywn2DTSL9OuRDQgG14RqlNDH
-        71u7FpoTzCHgWX1/3DmWUfeM45ncw9c=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-EzeaS0s0MkuaPfs9V3pjNw-1; Mon, 25 Jan 2021 12:24:04 -0500
-X-MC-Unique: EzeaS0s0MkuaPfs9V3pjNw-1
-Received: by mail-ej1-f69.google.com with SMTP id le12so4084090ejb.13
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 09:24:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hABPZ/hSthf9YuEr1NMmkQT9Sp/nFeQHAsdXUsqC/dY=;
-        b=MloQJ0DBq61kce8mIxZEg+IDPZF8YF+yk6v+5bEC+udE57EfDY11gFgVyEU50ZJInu
-         pPoBI2xa1wG6PZ0RxK150pEUrhTb8SOZpkLP+y01q66lP/109eQx59R5jqQZLBJvxcNh
-         AqK8qLjBwortpF6GkZW0eqvzSjqOn9HKDMEle1iYFObJo8OJFsRkKrPGuCtCMnWMGdpU
-         Vk2niSHM6pii7zhGNZMxVgrFHN+MbCwJ4B4NrXFMAP48iKAYmuDV0bVlPlk78LVpEB4U
-         J/NhaWBHEyBbmvINOPFXiRmqO43r5jqblbtqIljQHv1QyhEyp/jTr01YLR94lFxkJ/4O
-         6OEQ==
-X-Gm-Message-State: AOAM530FYrxGImpro8Bc+ZSlKyRoiDX5wmH9CTIEDSH6Zqjl0sYXFwm7
-        87rQ8iCqewyPv84N7++Y8OJqFrJpGq1PnIGPPJL0UhGBrz+NS9IiQGyWNvFH6DOPVYvll/izHk1
-        L8C57kfvejOFI
-X-Received: by 2002:a17:906:95cf:: with SMTP id n15mr1071623ejy.178.1611595443705;
-        Mon, 25 Jan 2021 09:24:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy8rDEIkzVuwuIY9gHBDSMn8Bg4MrPxxaoj6eGZai/HanTxGtGKHWbtGf5J7TnI5+MPNOiEPQ==
-X-Received: by 2002:a17:906:95cf:: with SMTP id n15mr1071572ejy.178.1611595442615;
-        Mon, 25 Jan 2021 09:24:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id n5sm9249509edw.7.2021.01.25.09.24.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Jan 2021 09:24:01 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86/mmu: Use boolean returns for (S)PTE accessors
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210123003003.3137525-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <723c5a63-1847-a377-e62e-806b06b0bf17@redhat.com>
-Date:   Mon, 25 Jan 2021 18:24:01 +0100
+        id S1731025AbhAYR2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 12:28:36 -0500
+Received: from foss.arm.com ([217.140.110.172]:52966 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731088AbhAYR21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 12:28:27 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3C2371063;
+        Mon, 25 Jan 2021 09:27:38 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D4193F68F;
+        Mon, 25 Jan 2021 09:27:37 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH v2 08/12] arm/arm64: gic: Split
+ check_acked() into two functions
+To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
+        drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
+References: <20201217141400.106137-1-alexandru.elisei@arm.com>
+ <20201217141400.106137-9-alexandru.elisei@arm.com>
+ <3539c229-fd05-2e1c-2159-995e51e2dcc4@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <857a3c2d-772b-0d29-536c-41a829ab8954@arm.com>
+Date:   Mon, 25 Jan 2021 17:27:35 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210123003003.3137525-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <3539c229-fd05-2e1c-2159-995e51e2dcc4@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/01/21 01:30, Sean Christopherson wrote:
-> Return a 'bool' instead of an 'int' for various PTE accessors that are
-> boolean in nature, e.g. is_shadow_present_pte().  Returning an int is
-> goofy and potentially dangerous, e.g. if a flag being checked is moved
-> into the upper 32 bits of a SPTE, then the compiler may silently squash
-> the entire check since casting to an int is guaranteed to yield a
-> return value of '0'.
-> 
-> Opportunistically refactor is_last_spte() so that it naturally returns
-> a bool value instead of letting it implicitly cast 0/1 to false/true.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu.h      |  2 +-
->   arch/x86/kvm/mmu/spte.h | 12 ++++--------
->   2 files changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 581925e476d6..f61e18dad2f3 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -145,7 +145,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->    *
->    * TODO: introduce APIs to split these two cases.
->    */
-> -static inline int is_writable_pte(unsigned long pte)
-> +static inline bool is_writable_pte(unsigned long pte)
->   {
->   	return pte & PT_WRITABLE_MASK;
->   }
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index 2b3a30bd38b0..398fd1bb13a7 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -185,23 +185,19 @@ static inline bool is_access_track_spte(u64 spte)
->   	return !spte_ad_enabled(spte) && (spte & shadow_acc_track_mask) == 0;
->   }
->   
-> -static inline int is_shadow_present_pte(u64 pte)
-> +static inline bool is_shadow_present_pte(u64 pte)
->   {
->   	return (pte != 0) && !is_mmio_spte(pte);
->   }
->   
-> -static inline int is_large_pte(u64 pte)
-> +static inline bool is_large_pte(u64 pte)
->   {
->   	return pte & PT_PAGE_SIZE_MASK;
->   }
->   
-> -static inline int is_last_spte(u64 pte, int level)
-> +static inline bool is_last_spte(u64 pte, int level)
->   {
-> -	if (level == PG_LEVEL_4K)
-> -		return 1;
-> -	if (is_large_pte(pte))
-> -		return 1;
-> -	return 0;
-> +	return (level == PG_LEVEL_4K) || is_large_pte(pte);
->   }
->   
->   static inline bool is_executable_pte(u64 spte)
-> 
+Hi Andre,
 
-Queued, thanks.
+On 12/18/20 3:52 PM, André Przywara wrote:
+> On 17/12/2020 14:13, Alexandru Elisei wrote:
+>> check_acked() has several peculiarities: is the only function among the
+>> check_* functions which calls report() directly, it does two things
+>> (waits for interrupts and checks for misfired interrupts) and it also
+>> mixes printf, report_info and report calls.
+>>
+>> check_acked() also reports a pass and returns as soon all the target CPUs
+>> have received interrupts, However, a CPU not having received an interrupt
+>> *now* does not guarantee not receiving an erroneous interrupt if we wait
+>> long enough.
+>>
+>> Rework the function by splitting it into two separate functions, each with
+>> a single responsibility: wait_for_interrupts(), which waits for the
+>> expected interrupts to fire, and check_acked() which checks that interrupts
+>> have been received as expected.
+>>
+>> wait_for_interrupts() also waits an extra 100 milliseconds after the
+>> expected interrupts have been received in an effort to make sure we don't
+>> miss misfiring interrupts.
+>>
+>> Splitting check_acked() into two functions will also allow us to
+>> customize the behavior of each function in the future more easily
+>> without using an unnecessarily long list of arguments for check_acked().
+> Yes, splitting this up looks much better, in general this is a nice
+> cleanup, thank you!
+>
+> Some comments below:
+>
+>> CC: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>> ---
+>>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+>>  1 file changed, 47 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/arm/gic.c b/arm/gic.c
+>> index ec733719c776..a9ef1a5def56 100644
+>> --- a/arm/gic.c
+>> +++ b/arm/gic.c
+>> @@ -62,41 +62,42 @@ static void stats_reset(void)
+>>  	}
+>>  }
+>>  
+>> -static void check_acked(const char *testname, cpumask_t *mask)
+>> +static void wait_for_interrupts(cpumask_t *mask)
+>>  {
+>> -	int missing = 0, extra = 0, unexpected = 0;
+>>  	int nr_pass, cpu, i;
+>> -	bool bad = false;
+>>  
+>>  	/* Wait up to 5s for all interrupts to be delivered */
+>> -	for (i = 0; i < 50; ++i) {
+>> +	for (i = 0; i < 50; i++) {
+>>  		mdelay(100);
+>>  		nr_pass = 0;
+>>  		for_each_present_cpu(cpu) {
+>> +			/*
+>> +			 * A CPU having received more than one interrupts will
+>> +			 * show up in check_acked(), and no matter how long we
+>> +			 * wait it cannot un-receive it. Consider at least one
+>> +			 * interrupt as a pass.
+>> +			 */
+>>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+>> -				acked[cpu] == 1 : acked[cpu] == 0;
+>> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> -
+>> -			if (bad_sender[cpu] != -1) {
+>> -				printf("cpu%d received IPI from wrong sender %d\n",
+>> -					cpu, bad_sender[cpu]);
+>> -				bad = true;
+>> -			}
+>> -
+>> -			if (bad_irq[cpu] != -1) {
+>> -				printf("cpu%d received wrong irq %d\n",
+>> -					cpu, bad_irq[cpu]);
+>> -				bad = true;
+>> -			}
+>> +				acked[cpu] >= 1 : acked[cpu] == 0;
+>
+> I wonder if this logic was already flawed to begin with: For interrupts
+> we expect to fire, we wait for up to 5 seconds (really that long?), but
+> for interrupts we expect *not* to fire we are OK if they don't show up
+> in the first 100 ms. That does not sound consistent.
 
-Paolo
+There are two ways that I see to fix this:
 
+- Have the caller wait for however long it sees fit, and *after* that waiting
+period call wait_for_interrupts().
+
+- Pass a flag to wait_for_interrupts() to specify that the behaviour should be to
+wait for the entire duration instead of until the expected interrupts have been
+received.
+
+Neither sounds appealing to me for inclusion in this patch set, since I want to
+concentrate on reworking check_acked() while keeping much of the current behaviour
+intact.
+
+>
+> I am wondering if we should *not* have the initial 100ms wait at all,
+> since most interrupts will fire immediately (especially in KVM). And
+> then have *one* extra wait for, say 100ms, to cover latecomers and
+> spurious interrupts.
+
+I don't think it really matters where the 100 millisecond delay is in the loop. If
+we call wait_for_interrupts() to actually check that interrupts have fired (as
+opposed to checking that they haven't been asserted), then at most we save 100ms
+when they are asserted before the start of the loop. I don't think the GIC spec
+guarantees that interrupts written to the LR registers will be presented to the
+CPU after the guest resumes, so it is conceivable that there might be a delay,
+thus ending up in waiting the extra 100ms even if the delay is at the end of the loop.
+
+There are two reasons I chose the approach of having the delay at the start of the
+loop:
+
+1. To preserve the current behaviour.
+
+2. To match what the timer test those (see gic_timer_check_state()). I am also
+thinking that maybe at some point we could unify these test-independent functions
+in the gic driver.
+
+As for the 5 seconds delay, I think we can come up with a patch to pass the delay
+as a parameter to the function if needed (if I remember correctly, you needed a
+shorter waiting period for your GIC tests).
+
+>
+> But this might be a topic for some extra work/patch?
+
+Yes, I would rather make this changes when we have an actual test that needs them.
+
+>
+>>  		}
+>> +
+>>  		if (nr_pass == nr_cpus) {
+>> -			report(!bad, "%s", testname);
+>>  			if (i)
+>> -				report_info("took more than %d ms", i * 100);
+>> +				report_info("interrupts took more than %d ms", i * 100);
+>> +			mdelay(100);
+> So this is the extra 100ms you mention in the commit message? I am not
+> convinced this is the right way (see above) or even the right place
+> (rather at the call site?) to wait. But at least it deserves a comment,
+> I believe.
+
+I'm not sure moving it into the caller is the right thing to do. This is something
+that has to do with how interrupts are asserted, not something that is specific to
+one test.
+
+You are right about the comment, I'll add one.
+
+Thanks,
+Alex
+>>  			return;
+>>  		}
+>>  	}
+>>  
+>> +	report_info("interrupts timed-out (5s)");
+>> +}
+>> +
+>> +static bool check_acked(cpumask_t *mask)
+>> +{
+>> +	int missing = 0, extra = 0, unexpected = 0;
+>> +	bool pass = true;
+>> +	int cpu;
+>> +
+>>  	for_each_present_cpu(cpu) {
+>>  		if (cpumask_test_cpu(cpu, mask)) {
+>>  			if (!acked[cpu])
+>> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+>>  			if (acked[cpu])
+>>  				++unexpected;
+>>  		}
+>> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+>> +
+>> +		if (bad_sender[cpu] != -1) {
+>> +			report_info("cpu%d received IPI from wrong sender %d",
+>> +					cpu, bad_sender[cpu]);
+>> +			pass = false;
+>> +		}
+>> +
+>> +		if (bad_irq[cpu] != -1) {
+>> +			report_info("cpu%d received wrong irq %d",
+>> +					cpu, bad_irq[cpu]);
+>> +			pass = false;
+>> +		}
+>> +	}
+>> +
+>> +	if (missing || extra || unexpected) {
+>> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+>> +				missing, extra, unexpected);
+>> +		pass = false;
+> Thanks, that so much easier to read now.
+>
+> Cheers,
+> Andre
+>
+>>  	}
+>>  
+>> -	report(false, "%s", testname);
+>> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+>> -		    missing, extra, unexpected);
+>> +	return pass;
+>>  }
+>>  
+>>  static void check_spurious(void)
+>> @@ -303,7 +321,8 @@ static void ipi_test_self(void)
+>>  	cpumask_clear(&mask);
+>>  	cpumask_set_cpu(smp_processor_id(), &mask);
+>>  	gic->ipi.send_self();
+>> -	check_acked("IPI: self", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+>>  	report_prefix_pop();
+>>  }
+>>  
+>> @@ -318,7 +337,8 @@ static void ipi_test_smp(void)
+>>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+>>  		cpumask_clear_cpu(i, &mask);
+>>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+>> -	check_acked("IPI: directed", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+>>  	report_prefix_pop();
+>>  
+>>  	report_prefix_push("broadcast");
+>> @@ -326,7 +346,8 @@ static void ipi_test_smp(void)
+>>  	cpumask_copy(&mask, &cpu_present_mask);
+>>  	cpumask_clear_cpu(smp_processor_id(), &mask);
+>>  	gic->ipi.send_broadcast();
+>> -	check_acked("IPI: broadcast", &mask);
+>> +	wait_for_interrupts(&mask);
+>> +	report(check_acked(&mask), "Interrupts received");
+>>  	report_prefix_pop();
+>>  }
+>>  
+>>
