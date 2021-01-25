@@ -2,106 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B10A0303265
+	by mail.lfdr.de (Postfix) with ESMTP id 32E67303264
 	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 04:05:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727983AbhAYM4E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 07:56:04 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40496 "EHLO mail.kernel.org"
+        id S1728530AbhAYM5h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 07:57:37 -0500
+Received: from mga04.intel.com ([192.55.52.120]:5384 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728466AbhAYMxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:53:50 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9BF5D22DFB;
-        Mon, 25 Jan 2021 12:26:44 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l40x8-009sBu-UM; Mon, 25 Jan 2021 12:26:43 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH v2 3/7] KVM: arm64: Add handling of AArch32 PCMEID{2,3} PMUv3 registers
-Date:   Mon, 25 Jan 2021 12:26:34 +0000
-Message-Id: <20210125122638.2947058-4-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
-References: <20210125122638.2947058-1-maz@kernel.org>
+        id S1728489AbhAYMyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 07:54:16 -0500
+IronPort-SDR: EzCSf1UTVaoAg66S8X5xdI4mPotAfAT+XruT49cMsrZo9qGiB2GWPaKPqA/fdssAAJyDd4JXSI
+ jqTyOzXASRQw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="177147235"
+X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
+   d="scan'208";a="177147235"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 04:53:33 -0800
+IronPort-SDR: tWqBdNMhV3hcViy9JOaGmcT+5DWyuLq+FZG/MIYJlpqeviRwZ4SeY/JqdPCEH9QophG81Wz/RK
+ 16TbnkbIEhyg==
+X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
+   d="scan'208";a="387359615"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.249.168.247]) ([10.249.168.247])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 04:53:29 -0800
+Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
+ via DS
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Andi Kleen <andi@firstfloor.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu@linux.intel.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <YACXQwBPI8OFV1T+@google.com>
+ <f8a8e4e2-e0b1-8e68-81d4-044fb62045d5@intel.com>
+ <YAHXlWmeR9p6JZm2@google.com>
+ <20210115182700.byczztx3vjhsq3p3@two.firstfloor.org>
+ <YAHkOiQsxMfOMYvp@google.com>
+ <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
+ <eb30d86f-6492-d6e3-3a24-f58c724f68fd@linux.intel.com>
+ <YA6nxuM5Stlolk5x@hirez.programming.kicks-ass.net>
+ <076a5c7b-de2e-daf9-e6c0-5a42fb38aaa3@intel.com>
+ <YA62/DV7reRvVyYk@hirez.programming.kicks-ass.net>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <e78cee6c-5d05-753e-1265-0b0e06c201a7@intel.com>
+Date:   Mon, 25 Jan 2021 20:53:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <YA62/DV7reRvVyYk@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Despite advertising support for AArch32 PMUv3p1, we fail to handle
-the PMCEID{2,3} registers, which conveniently alias with the top
-bits of PMCEID{0,1}_EL1.
+On 2021/1/25 20:18, Peter Zijlstra wrote:
+> On Mon, Jan 25, 2021 at 08:07:06PM +0800, Xu, Like wrote:
+>
+>> So under the premise that counter cross-mapping is allowed,
+>> how can hypercall help fix it ?
+> Hypercall or otherwise exposing the mapping, will let the guest fix it
+> up when it already touches the data. Which avoids the host from having
+> to access the guest memory and is faster, no?
+- as you may know, the mapping table is changing rapidly from
+the time records to be rewritten to the time records to be read;
 
-Implement these registers with the usual AA32(HI/LO) aliasing
-mechanism.
+- the patches will modify the records before it is notified via PMI
+which means it's transparent to normal guests (including Windows);
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+- a malicious guest would ignore the exposed mapping and the
+hypercall and I don't think it can solve the leakage issue at all;
+
+- make the guest aware of that hypercall or mapping requires more code changes
+in the guest side; but now we can make it on the KVM side and we also know that
+cross-mapping case rarely happens, and the overhead is acceptable based on 
+our tests;
+
+Please let me know if you or Sean are not going to
+buy in the PEBS records rewrite proposal in the patch 13 - 17.
+
 ---
- arch/arm64/kvm/sys_regs.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ce08d28ab15c..2bea0494b81d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -685,14 +685,18 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 pmceid;
-+	u64 pmceid, mask, shift;
- 
- 	BUG_ON(p->is_write);
- 
- 	if (pmu_access_el0_disabled(vcpu))
- 		return false;
- 
-+	get_access_mask(r, &mask, &shift);
-+
- 	pmceid = kvm_pmu_get_pmceid(vcpu, (p->Op2 & 1));
-+	pmceid &= mask;
-+	pmceid >>= shift;
- 
- 	p->regval = pmceid;
- 
-@@ -1895,8 +1899,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-+	{ AA32(LO), Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
-@@ -1904,6 +1908,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
-+	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
- 
- 	/* PRRR/MAIR0 */
- 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
--- 
-2.29.2
-
+thx,likexu
