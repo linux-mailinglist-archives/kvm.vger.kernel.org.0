@@ -2,72 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23B9F302536
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 14:01:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83F4C30266E
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 15:46:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728519AbhAYM4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 07:56:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40494 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728465AbhAYMxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:53:50 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9066723103;
-        Mon, 25 Jan 2021 12:26:45 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l40x9-009sBu-QS; Mon, 25 Jan 2021 12:26:43 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH v2 5/7] KVM: arm64: Limit the debug architecture to ARMv8.0
-Date:   Mon, 25 Jan 2021 12:26:36 +0000
-Message-Id: <20210125122638.2947058-6-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
-References: <20210125122638.2947058-1-maz@kernel.org>
+        id S1729757AbhAYOpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 09:45:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48144 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729713AbhAYOpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 09:45:09 -0500
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F226FC061574
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 06:44:27 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id c6so15668091ede.0
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 06:44:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=ydwYzkg1SI6vb9CHUOO3mpS6IpOCn90GS5Tyy7dxL8g=;
+        b=mYkK+TH63TMx0hrNr0Gr/zVITMX/TX67bSQGOLii5GCNQ5fx+AN5gYJpUGoD5SFSYV
+         UEJTGR6TzDXW0FtptnE0bWy/EwG/KSirdekCOlmRJZZ1h3DEYt3F5v83AQ+YJlzr+B8t
+         m5p435v1aBpnRkUai0WDavgVDJzOcztgN7KzdQd3gCeLS+OaYropThnp1bEb29F3PV+T
+         /P4AkSzRN86tidGQXn7UpxOwk4RVzP7+lCS3ICRnB9eyYG+hNHMUj2rTyDIIGNlFaFqm
+         cp/ykjsSLuIKQKOj9iFNEPEcd3J2MAh2pxS1sHJGgNfKMXg7d12Q+sjjjc502q3SCERV
+         20Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=ydwYzkg1SI6vb9CHUOO3mpS6IpOCn90GS5Tyy7dxL8g=;
+        b=SUvw0ytgSrrTvGnVvT17QRhc08e7jHM6G1g+JxJM1CQMCx0iJBeLkQnpmg3NbRjAFD
+         YJXgPm51xWHcnTf+xSkLmAijMROHydouZVjzUFswKsIx9Q323RNK0FyssM8G8b3Hd17W
+         bcHQOsafzMwfkwvP4FQ+o3ngkiIBAUA9zz9Klmv8YaIXSV2QkTuxKk3KVg7eeDaY2rKN
+         WruT2+Pp1ZsLmitkjLtWMH7Z35uY1MWNAV7cMYNF/6/H+NKJOGwP34HnFiS0/NApCu7v
+         8795kFO/82SLbZy5spG+UdbiQibGW5dlBa17jiALcowSFPJ+OkGdWVpCi5iqJLGsigt+
+         FikQ==
+X-Gm-Message-State: AOAM530Rt72NUGsOrWV1Lsum3M3Cu+wu+TlXRFLg1NCacvMz3tiXmuJD
+        C3P9mZjeNAgHyiqZF/m/ZJl2i2c6/Qpu2wxqdtg=
+X-Google-Smtp-Source: ABdhPJwDDMVk1FvpXDXNCuEbv7/kFfwD4S+ehaBGFd+WdNdFf1oOwVwcyfWnBL0pfrllo6OwNzJS9fTW7R38Agd1n5U=
+X-Received: by 2002:aa7:d905:: with SMTP id a5mr790521edr.78.1611585866330;
+ Mon, 25 Jan 2021 06:44:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Received: by 2002:a17:906:951a:0:0:0:0 with HTTP; Mon, 25 Jan 2021 06:44:25
+ -0800 (PST)
+From:   Johnson Laylor <johnson.laylor03@gmail.com>
+Date:   Mon, 25 Jan 2021 15:44:25 +0100
+Message-ID: <CAPMN5NFThXasUn7rZT75=bnunjcRB87qGqOGysmgNeGgcy-yzg@mail.gmail.com>
+Subject: RE: SOLAR ENERGY / BUSSINESS ENQUIRY
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's not pretend we support anything but ARMv8.0 as far as the
-debug architecture is concerned.
+Hope you are keeping safe and well out there!
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+I'm writing this letter with due respect and honor, believing that you
+will give my request proper attention.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index dda16d60197b..8f79ec1fffa7 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1048,6 +1048,9 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 				 FEATURE(ID_AA64ISAR1_GPI));
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
-+		/* Limit debug to ARMv8.0 */
-+		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-+		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
- 		/* Limit guests to PMUv3 for ARMv8.1 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
--- 
-2.29.2
+I represent the interests of top government officials and expatriates
+mainly from Southern and Eastern African, who want to legitimately
+diversify their investments in a more stable economy, seeking fund
+managers & corporate bodies that have viable projects and existing
+business that requires expansion whatsoever, that can guarantee good
+Annual Return on Investments (ROI), which will be under your control
+and management.
 
+More details shall be available once I have your interest confirmed in
+your return mail indicating interest to handle the investment on the
+terms of partnership agreement. I will provide you with necessary
+information and the specific amount of fund that would be made
+available for the partnership investments.
+
+Respectfully,
+Johnson L. Mbabazi
+Consultants
+5th Floor, DFCU House, Plot 26, Kyadondo Road,
+Kampala-Uganda
+Telephone: (+256)-750-512636 (WhatsApp enabled)
