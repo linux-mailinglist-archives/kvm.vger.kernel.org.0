@@ -2,111 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0917302852
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 17:59:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 854AB3028B7
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 18:22:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729007AbhAYQ7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 11:59:20 -0500
-Received: from foss.arm.com ([217.140.110.172]:51818 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729624AbhAYQ5r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 11:57:47 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BFA5511FB;
-        Mon, 25 Jan 2021 08:57:01 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAB733F68F;
-        Mon, 25 Jan 2021 08:57:00 -0800 (PST)
-Subject: Re: [kvm-unit-tests PATCH v2 10/12] arm64: gic: its-trigger: Don't
- trigger the LPI while it is pending
-To:     =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>,
-        drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     eric.auger@redhat.com, yuzenghui@huawei.com
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
- <20201217141400.106137-11-alexandru.elisei@arm.com>
- <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3bc9e5ce-345b-505a-ffd3-a96b531124d6@arm.com>
-Date:   Mon, 25 Jan 2021 16:57:03 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S1730998AbhAYRW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 12:22:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58507 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730983AbhAYRWW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 12:22:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611595248;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=fLkc6jBByIwZj+y5K87dwsdh1F4jKYYT1Ucr0DYgAHo=;
+        b=JSz+kWrF7JdTWLywWEoC79i2KB12gfE3CMN+enJHjDY5LHqCzSLk81BKSd5PI0/cZfAMAl
+        3xt2pYk8oW2Ok/D7b3NXL+5QBBmErIj6g/X4U1qdBBlLnc3HsBT6zZd4rTlvhd90CGiXKd
+        F7n5zDZeBomaP1tvTop59M41iEsGh4g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-BsjjSMAxOdS1oRXxbwGosw-1; Mon, 25 Jan 2021 12:20:46 -0500
+X-MC-Unique: BsjjSMAxOdS1oRXxbwGosw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B643559;
+        Mon, 25 Jan 2021 17:20:45 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 663E55D9DB;
+        Mon, 25 Jan 2021 17:20:45 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org
+Subject: [PATCH] KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside guest mode for VMX
+Date:   Mon, 25 Jan 2021 12:20:44 -0500
+Message-Id: <20210125172044.1360661-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d24f7bf4-2a38-22f8-68e6-98940c61c65a@arm.com>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+VMX also uses KVM_REQ_GET_NESTED_STATE_PAGES for the Hyper-V eVMCS,
+which may need to be loaded outside guest mode.  Therefore we cannot
+WARN in that case.
 
-On 12/18/20 6:15 PM, André Przywara wrote:
-> On 17/12/2020 14:13, Alexandru Elisei wrote:
->> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
->> it is disabled at the ITS level. After that it is re-enabled and the test
->> checks that the interrupt is properly asserted. After it's re-enabled and
->> before the stats are examined, the test triggers the interrupt again, which
->> can lead to the same interrupt being delivered twice: once after the
->> configuration invalidation and before the INT command, and once after the
->> INT command.
->>
->> Get rid of the INT command after the interrupt is re-enabled to prevent the
-> This is confusing to read, since you don't remove anything in the patch.
-> Can you reword this? Something like "Before explicitly triggering the
-> interrupt, check that the unmasking worked, ..."
+However, that part of nested_get_vmcs12_pages is _not_ needed at
+vmentry time.  Split it out of KVM_REQ_GET_NESTED_STATE_PAGES handling,
+so that both vmentry and migration (and in the latter case, independent
+of is_guest_mode) do the parts that are needed.
 
-That's a good point, I'll reword it.
+Cc: <stable@vger.kernel.org> # 5.10.x: f2c7ef3ba: KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES
+Cc: <stable@vger.kernel.org> # 5.10.x
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c |  3 +++
+ arch/x86/kvm/vmx/nested.c | 32 ++++++++++++++++++++++++++------
+ arch/x86/kvm/x86.c        |  4 +---
+ 3 files changed, 30 insertions(+), 9 deletions(-)
 
->
->> LPI from being asserted twice and add a separate check to test that the INT
->> command still works for the now re-enabled LPI 8195.
->>
->> CC: Auger Eric <eric.auger@redhat.com>
->> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Otherwise this looks fine, but I think there is another flaw: There is
-> no requirement that an INV(ALL) is *needed* to update the status, it
-> could also update anytime (think: "cache invalidate").
->
-> The KVM ITS emulation *only* bothers to read the memory on an INV(ALL)
-> command, so that matches the test. But that's not how unit-tests should
-> work ;-)
->
-> But that's a separate issue, just mentioning this to not forget about it.
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index cb4c6ee10029..7a605ad8254d 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -200,6 +200,9 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
++	if (WARN_ON(!is_guest_mode(vcpu)))
++		return true;
++
+ 	if (!nested_svm_vmrun_msrpm(svm)) {
+ 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+ 		vcpu->run->internal.suberror =
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 0fbb46990dfc..20ab40a2ac34 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3124,13 +3124,9 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
++static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ {
+-	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	struct kvm_host_map *map;
+-	struct page *page;
+-	u64 hpa;
+ 
+ 	/*
+ 	 * hv_evmcs may end up being not mapped after migration (when
+@@ -3152,6 +3148,19 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 			return false;
+ 		}
+ 	}
++	return true;
++}
++
++static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
++{
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct kvm_host_map *map;
++	struct page *page;
++	u64 hpa;
++
++	if (!nested_get_evmcs_page(vcpu))
++		return false;
+ 
+ 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+ 		/*
+@@ -3224,6 +3233,17 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
++static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
++{
++	if (!nested_get_evmcs_page(vcpu))
++		return false;
++
++	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
++		return false;
++
++	return true;
++}
++
+ static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
+ {
+ 	struct vmcs12 *vmcs12;
+@@ -6602,7 +6622,7 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+ 	.hv_timer_pending = nested_vmx_preemption_timer_pending,
+ 	.get_state = vmx_get_nested_state,
+ 	.set_state = vmx_set_nested_state,
+-	.get_nested_state_pages = nested_get_vmcs12_pages,
++	.get_nested_state_pages = vmx_get_nested_state_pages,
+ 	.write_log_dirty = nested_vmx_write_pml_buffer,
+ 	.enable_evmcs = nested_enable_evmcs,
+ 	.get_evmcs_version = nested_get_evmcs_version,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 9a8969a6dd06..b910aa74ee05 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8802,9 +8802,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+-			if (WARN_ON_ONCE(!is_guest_mode(vcpu)))
+-				;
+-			else if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
++			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+ 				r = 0;
+ 				goto out;
+ 			}
+-- 
+2.26.2
 
-That's a good point, I must admit that I didn't check how caching is defined by
-the architecture. I would prefer creating a patch independent of this series to
-change what test_its_trigger() checks for, to get input from Eric just for that
-particular change.
-
-Thanks,
-Alex
->
-> For this patch, with the message fixed:
->
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
->
-> Cheers,
-> Andre
->
->> ---
->>  arm/gic.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/arm/gic.c b/arm/gic.c
->> index fb91861900b7..aa3aa1763984 100644
->> --- a/arm/gic.c
->> +++ b/arm/gic.c
->> @@ -805,6 +805,9 @@ static void test_its_trigger(void)
->>  
->>  	/* Now call the invall and check the LPI hits */
->>  	its_send_invall(col3);
->> +	lpi_stats_expect(3, 8195);
->> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
->> +
->>  	lpi_stats_expect(3, 8195);
->>  	its_send_int(dev2, 20);
->>  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
->>
