@@ -2,62 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E48053020E3
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 04:59:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F38C33021EF
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 06:51:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726894AbhAYD6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 24 Jan 2021 22:58:30 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:11855 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726677AbhAYD63 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 24 Jan 2021 22:58:29 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DPGJK3ZDJz7Z5S;
-        Mon, 25 Jan 2021 11:56:33 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 25 Jan 2021 11:57:41 +0800
-From:   Tian Tao <tiantao6@hisilicon.com>
-To:     <pbonzini@redhat.com>
-CC:     <kvm@vger.kernel.org>
-Subject: [PATCH] KVM: X86: use vzalloc() instead of vmalloc/memset
-Date:   Mon, 25 Jan 2021 11:57:25 +0800
-Message-ID: <1611547045-13669-1-git-send-email-tiantao6@hisilicon.com>
-X-Mailer: git-send-email 2.7.4
+        id S1727025AbhAYFvC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 00:51:02 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:37157 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725821AbhAYFt5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 00:49:57 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=alex.shi@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UMkx0Sj_1611553746;
+Received: from IT-FVFX43SYHV2H.local(mailfrom:alex.shi@linux.alibaba.com fp:SMTPD_---0UMkx0Sj_1611553746)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 25 Jan 2021 13:49:07 +0800
+Subject: Re: 3 preempted variables in kvm
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, yj226063@alibaba-inc.com
+References: <b6398228-31b9-ca84-873b-4febbd37c87d@linux.alibaba.com>
+ <YAsnvA1Q5AlXLd1W@google.com>
+From:   Alex Shi <alex.shi@linux.alibaba.com>
+Message-ID: <c14cac63-6a4c-1b5d-6a32-e16117141e94@linux.alibaba.com>
+Date:   Mon, 25 Jan 2021 13:49:04 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.0; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <YAsnvA1Q5AlXLd1W@google.com>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-fixed the following warningï¼š
-/virt/kvm/dirty_ring.c:70:20-27: WARNING: vzalloc should be used for
-ring -> dirty_gfns, instead of vmalloc/memset.
+Hi Sean,
 
-Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
----
- virt/kvm/dirty_ring.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Thanks a lot for the detailed explanations.
+Yes, they are all meaningful variables on x86. But for more archs, guess the lock
+issue on different arch's guest are similar. Maybe a abstraction on the point would
+be very helpful. Any comments?
 
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index 9d01299..790f173 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -67,10 +67,9 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
- 
- int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size)
- {
--	ring->dirty_gfns = vmalloc(size);
-+	ring->dirty_gfns = vzalloc(size);
- 	if (!ring->dirty_gfns)
- 		return -ENOMEM;
--	memset(ring->dirty_gfns, 0, size);
- 
- 	ring->size = size / sizeof(struct kvm_dirty_gfn);
- 	ring->soft_limit = ring->size - kvm_dirty_ring_get_rsvd_entries();
--- 
-2.7.4
+Thanks
+Alex
 
+ÔÚ 2021/1/23 ÉÏÎç3:30, Sean Christopherson Ð´µÀ:
+> On Fri, Jan 22, 2021, Alex Shi wrote:
+>> Hi All,
+>>
+>> I am newbie on KVM side, so probably I am wrong on the following.
+>> Please correct me if it is.
+>>
+>> There are 3 preempted variables in kvm:
+>>      1, kvm_vcpu.preempted  in include/linux/kvm_host.h
+>>      2, kvm_steal_time.preempted
+>>      3, kvm_vcpu_arch.st.preempted in arch/x86
+>> Seems all of them are set or cleared at the same time. Like,
+> 
+> Not quite.  kvm_vcpu.preempted is set only in kvm_sched_out(), i.e. when the
+> vCPU was running and preempted by the host scheduler.  This is used by KVM when
+> KVM detects that a guest task appears to be waiting on a lock, in which case KVM
+> will bump the priority of preempted guest kernel threads in the hope that
+> scheduling in the preempted vCPU will release the lock.
+> 
+> kvm_steal_time.preempted is a paravirt struct that is shared with the guest.  It
+> is set on any call to kvm_arch_vcpu_put(), which covers kvm_sched_out() and adds
+> the case where the vCPU exits to userspace, e.g. for IO.  KVM itself hasn't been
+> preempted, but from the guest's perspective the CPU has been "preempted" in the
+> sense that CPU (from the guest's perspective) is not executing guest code.
+> Similar to KVM's vCPU scheduling heuristics, the guest kernel uses this info to
+> inform its scheduling, e.g. to avoid waiting on a lock owner to drop the lock
+> since the lock owner is not actively running.
+> 
+> kvm_vcpu_arch.st.preempted is effectively a host-side cache of
+> kvm_steal_time.preempted that's used to optimize kvm_arch_vcpu_put() by avoiding
+> the moderately costly mapping of guest.  It could be dropped, but it's a single
+> byte per vCPU so worth keeping even if the performance benefits are modest.
+> 
+>> vcpu_put:
+>>         kvm_sched_out()-> set 3 preempted
+>>                 kvm_arch_vcpu_put():
+>>                         kvm_steal_time_set_preempted
+>>
+>> vcpu_load:
+>>         kvm_sched_in() : clear above 3 preempted
+>>                 kvm_arch_vcpu_load() -> kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
+>>                 request dealed in vcpu_enter_guest() -> record_steal_time
+>>
+>> Except the 2nd one reuse with KVM_FEATURE_PV_TLB_FLUSH bit which could be used
+>> separately, Could we combine them into one, like just bool kvm_vcpu.preempted? and 
+>> move out the KVM_FEATURE_PV_TLB_FLUSH. Believe all arch need this for a vcpu overcommit.
+> 
+> Moving KVM_VCPU_FLUSH_TLB out of kvm_steal_time.preempted isn't viable. The
+> guest kernel is only allowed to rely on the host to flush the vCPU's TLB if it
+> knows the vCPU is preempted (from its perspective), as that's the only way it
+> can guarantee that KVM will observe the TLB flush request before enterring the
+> vCPU.  KVM_VCPU_FLUSH_TLB and KVM_VCPU_PREEMPTED need to be in the same word so
+> KVM can read and clear them atomically, otherwise there would be a window where
+> KVM would miss the flush request.
+> 
