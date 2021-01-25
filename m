@@ -2,220 +2,316 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CD4193028FC
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 18:35:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0530830295B
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 18:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730813AbhAYReF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 12:34:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20398 "EHLO
+        id S1731197AbhAYRxv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 12:53:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34402 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731044AbhAYRdP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 12:33:15 -0500
+        by vger.kernel.org with ESMTP id S1731231AbhAYRxI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 12:53:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611595908;
+        s=mimecast20190719; t=1611597100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+IuZvOqZZWNri4uNKAy+xMBSeTywacBmC+/WqSDrAf0=;
-        b=G/W+glVm/9AZ2hBWw1ITpxYbmuUnkRciibyREAeYNECBEnEWC6SomfXMUEhY3R7yy/sNS7
-        SkarKB1hw+4wZ/a0pnu6MknPMOKvBajClmfTZY5FDWxLzkiXU2vBc36rvNSgn55dfeEN8X
-        JFqq/oTFVIzP++IFw94WkfCP4/n4jNg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-5-ml1_94Mn-xSBuh4py7dA-1; Mon, 25 Jan 2021 12:31:42 -0500
-X-MC-Unique: 5-ml1_94Mn-xSBuh4py7dA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0DF0107ACE8;
-        Mon, 25 Jan 2021 17:31:41 +0000 (UTC)
-Received: from [10.36.113.217] (ovpn-113-217.ams2.redhat.com [10.36.113.217])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC5D75D9DB;
-        Mon, 25 Jan 2021 17:31:37 +0000 (UTC)
-Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
-To:     Micah Morton <mortonm@chromium.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <184709d7-03f6-c03d-9afa-c780c4867c18@redhat.com>
-Date:   Mon, 25 Jan 2021 18:31:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=xODWl/rovJkT4NW0P+V0xEqTdFWADSeZHn3xURKPRRA=;
+        b=ExRy+eKgpXOuiqI3C84btHRjMuVpjReBpRPpPl1SgU3BiWO/n+t2tqcY3KDU9XOjR0uojX
+        OwRyiJz/SOLNBZDFmHidPBHnScdooeCI9nQUs/k4gpf5t/IlyZ24KlLsAKpanKfecpGr8X
+        YWsrlKzWc7sbrtGBdm+JKsjOhCmYgPQ=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-6RmtafEPNFaW8FOK730WnA-1; Mon, 25 Jan 2021 12:40:40 -0500
+X-MC-Unique: 6RmtafEPNFaW8FOK730WnA-1
+Received: by mail-ej1-f70.google.com with SMTP id f26so4109195ejy.9
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 09:40:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=xODWl/rovJkT4NW0P+V0xEqTdFWADSeZHn3xURKPRRA=;
+        b=i3swuWFcud1luyWqRzJE45FUozFwlaQz3Z4aI2DpLaQtoMRbX1nvNa4fqtAXvpEJMC
+         pL7S1+NVF14UxsNqkPh+hgwN3LMFLTi3W1fRFlotMvUf34XEFc/kwyggbiUJ7RXG7G2H
+         8b76a4kVa+EJO779PEqgSB5m2jQPrtuvROkRs55sUV1nUchlRmuhpJ9fls61wJffPWX0
+         zhgMvvrzPzneVYNH42Izs+JheVuEZME+csTDcGW5F3bllCv5ruDeE0ziPJmjQAP/7l1d
+         JaDNkXZhv2kzJDyx5GOauxw3ZzEOtIlqbdXU1H+gnnqVs0ufO6t9+kB2tJBYW0etdap8
+         JFZw==
+X-Gm-Message-State: AOAM5328uCiWgDGIpeMWTIGNNUUE3f3jMXeFFDFNSpznXYP5dErHPs32
+        i2fluaHuAnqDi9jkzaCNSlCw5KXgdhbouyGfjOs/7T/W/FR0DrE5bC4dRHC2hGaiHPjRGj8bqfy
+        bClXfWhF4lKev
+X-Received: by 2002:a17:906:2743:: with SMTP id a3mr1107504ejd.378.1611596438944;
+        Mon, 25 Jan 2021 09:40:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJybbFIE0LZRQI9HeTMwIUBbVlJMu6onaNrnfZNHd1jFsNkphoNLfXXCuSzJ4agnaOQhuTxCNA==
+X-Received: by 2002:a17:906:2743:: with SMTP id a3mr1107489ejd.378.1611596438719;
+        Mon, 25 Jan 2021 09:40:38 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id v9sm8552063ejd.92.2021.01.25.09.40.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jan 2021 09:40:37 -0800 (PST)
+Subject: Re: [PATCH v2] KVM/SVM: add support for SEV attestation command
+To:     Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        John Allen <john.allen@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+References: <20210104151749.30248-1-brijesh.singh@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <87dacde9-5b4e-71fb-e4cf-22d5504b830b@redhat.com>
+Date:   Mon, 25 Jan 2021 18:40:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210104151749.30248-1-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Micah,
+On 04/01/21 16:17, Brijesh Singh wrote:
+> The SEV FW version >= 0.23 added a new command that can be used to query
+> the attestation report containing the SHA-256 digest of the guest memory
+> encrypted through the KVM_SEV_LAUNCH_UPDATE_{DATA, VMSA} commands and
+> sign the report with the Platform Endorsement Key (PEK).
+> 
+> See the SEV FW API spec section 6.8 for more details.
+> 
+> Note there already exist a command (KVM_SEV_LAUNCH_MEASURE) that can be
+> used to get the SHA-256 digest. The main difference between the
+> KVM_SEV_LAUNCH_MEASURE and KVM_SEV_ATTESTATION_REPORT is that the latter
+> can be called while the guest is running and the measurement value is
+> signed with PEK.
+> 
+> Cc: James Bottomley <jejb@linux.ibm.com>
+> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: John Allen <john.allen@amd.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Acked-by: David Rientjes <rientjes@google.com>
+> Tested-by: James Bottomley <jejb@linux.ibm.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+> v2:
+>    * Fix documentation typo
+> 
+>   .../virt/kvm/amd-memory-encryption.rst        | 21 ++++++
+>   arch/x86/kvm/svm/sev.c                        | 71 +++++++++++++++++++
+>   drivers/crypto/ccp/sev-dev.c                  |  1 +
+>   include/linux/psp-sev.h                       | 17 +++++
+>   include/uapi/linux/kvm.h                      |  8 +++
+>   5 files changed, 118 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+> index 09a8f2a34e39..469a6308765b 100644
+> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+> @@ -263,6 +263,27 @@ Returns: 0 on success, -negative on error
+>                   __u32 trans_len;
+>           };
+>   
+> +10. KVM_SEV_GET_ATTESTATION_REPORT
+> +----------------------------------
+> +
+> +The KVM_SEV_GET_ATTESTATION_REPORT command can be used by the hypervisor to query the attestation
+> +report containing the SHA-256 digest of the guest memory and VMSA passed through the KVM_SEV_LAUNCH
+> +commands and signed with the PEK. The digest returned by the command should match the digest
+> +used by the guest owner with the KVM_SEV_LAUNCH_MEASURE.
+> +
+> +Parameters (in): struct kvm_sev_attestation
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_attestation_report {
+> +                __u8 mnonce[16];        /* A random mnonce that will be placed in the report */
+> +
+> +                __u64 uaddr;            /* userspace address where the report should be copied */
+> +                __u32 len;
+> +        };
+> +
+>   References
+>   ==========
+>   
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 566f4d18185b..c4d3ee6be362 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -927,6 +927,74 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   	return ret;
+>   }
+>   
+> +static int sev_get_attestation_report(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +	void __user *report = (void __user *)(uintptr_t)argp->data;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct sev_data_attestation_report *data;
+> +	struct kvm_sev_attestation_report params;
+> +	void __user *p;
+> +	void *blob = NULL;
+> +	int ret;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +	if (!data)
+> +		return -ENOMEM;
+> +
+> +	/* User wants to query the blob length */
+> +	if (!params.len)
+> +		goto cmd;
+> +
+> +	p = (void __user *)(uintptr_t)params.uaddr;
+> +	if (p) {
+> +		if (params.len > SEV_FW_BLOB_MAX_SIZE) {
+> +			ret = -EINVAL;
+> +			goto e_free;
+> +		}
+> +
+> +		ret = -ENOMEM;
+> +		blob = kmalloc(params.len, GFP_KERNEL);
+> +		if (!blob)
+> +			goto e_free;
+> +
+> +		data->address = __psp_pa(blob);
+> +		data->len = params.len;
+> +		memcpy(data->mnonce, params.mnonce, sizeof(params.mnonce));
+> +	}
+> +cmd:
+> +	data->handle = sev->handle;
+> +	ret = sev_issue_cmd(kvm, SEV_CMD_ATTESTATION_REPORT, data, &argp->error);
+> +	/*
+> +	 * If we query the session length, FW responded with expected data.
+> +	 */
+> +	if (!params.len)
+> +		goto done;
+> +
+> +	if (ret)
+> +		goto e_free_blob;
+> +
+> +	if (blob) {
+> +		if (copy_to_user(p, blob, params.len))
+> +			ret = -EFAULT;
+> +	}
+> +
+> +done:
+> +	params.len = data->len;
+> +	if (copy_to_user(report, &params, sizeof(params)))
+> +		ret = -EFAULT;
+> +e_free_blob:
+> +	kfree(blob);
+> +e_free:
+> +	kfree(data);
+> +	return ret;
+> +}
+> +
+>   int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   {
+>   	struct kvm_sev_cmd sev_cmd;
+> @@ -971,6 +1039,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>   	case KVM_SEV_LAUNCH_SECRET:
+>   		r = sev_launch_secret(kvm, &sev_cmd);
+>   		break;
+> +	case KVM_SEV_GET_ATTESTATION_REPORT:
+> +		r = sev_get_attestation_report(kvm, &sev_cmd);
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		goto out;
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 476113e12489..cb9b4c4e371e 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -128,6 +128,7 @@ static int sev_cmd_buffer_len(int cmd)
+>   	case SEV_CMD_LAUNCH_UPDATE_SECRET:	return sizeof(struct sev_data_launch_secret);
+>   	case SEV_CMD_DOWNLOAD_FIRMWARE:		return sizeof(struct sev_data_download_firmware);
+>   	case SEV_CMD_GET_ID:			return sizeof(struct sev_data_get_id);
+> +	case SEV_CMD_ATTESTATION_REPORT:	return sizeof(struct sev_data_attestation_report);
+>   	default:				return 0;
+>   	}
+>   
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 49d155cd2dfe..b801ead1e2bb 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -66,6 +66,7 @@ enum sev_cmd {
+>   	SEV_CMD_LAUNCH_MEASURE		= 0x033,
+>   	SEV_CMD_LAUNCH_UPDATE_SECRET	= 0x034,
+>   	SEV_CMD_LAUNCH_FINISH		= 0x035,
+> +	SEV_CMD_ATTESTATION_REPORT	= 0x036,
+>   
+>   	/* Guest migration commands (outgoing) */
+>   	SEV_CMD_SEND_START		= 0x040,
+> @@ -483,6 +484,22 @@ struct sev_data_dbg {
+>   	u32 len;				/* In */
+>   } __packed;
+>   
+> +/**
+> + * struct sev_data_attestation_report - SEV_ATTESTATION_REPORT command parameters
+> + *
+> + * @handle: handle of the VM
+> + * @mnonce: a random nonce that will be included in the report.
+> + * @address: physical address where the report will be copied.
+> + * @len: length of the physical buffer.
+> + */
+> +struct sev_data_attestation_report {
+> +	u32 handle;				/* In */
+> +	u32 reserved;
+> +	u64 address;				/* In */
+> +	u8 mnonce[16];				/* In */
+> +	u32 len;				/* In/Out */
+> +} __packed;
+> +
+>   #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+>   
+>   /**
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ca41220b40b8..d3385f7f08a2 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1585,6 +1585,8 @@ enum sev_cmd_id {
+>   	KVM_SEV_DBG_ENCRYPT,
+>   	/* Guest certificates commands */
+>   	KVM_SEV_CERT_EXPORT,
+> +	/* Attestation report */
+> +	KVM_SEV_GET_ATTESTATION_REPORT,
+>   
+>   	KVM_SEV_NR_MAX,
+>   };
+> @@ -1637,6 +1639,12 @@ struct kvm_sev_dbg {
+>   	__u32 len;
+>   };
+>   
+> +struct kvm_sev_attestation_report {
+> +	__u8 mnonce[16];
+> +	__u64 uaddr;
+> +	__u32 len;
+> +};
+> +
+>   #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>   #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>   #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+> 
 
-On 1/25/21 4:46 PM, Micah Morton wrote:
-> Hi Eric,
-> 
-> I was recently looking into some vfio-platform passthrough stuff and
-> came across a device I wanted to assign to a guest that uses a ONESHOT
-> type interrupt (these type of interrupts seem to be quite common, on
-> ARM at least). The semantics for ONESHOT interrupts are a bit
-> different from regular level triggered interrupts as I'll describe
-> here:
-> 
-> The normal generic code flow for level-triggered interrupts is as follows:
-> 
-> - regular type[1]: mask[2] the irq, then run the handler, then
-> unmask[3] the irq and done
+Queued, thanks.
 
-VFIO level sensitive interrupts are "automasked". See slide 10 of
-https://www.linux-kvm.org/images/a/a8/01x04-ARMdevice.pdf if this can help.
-
-When the guest deactivates the virtual IRQ, this causes a maintenance
-interrupt on host. This occurence causes kvm_notify_acked_irq() to be
-called and this latter unmasks the physical IRQ.
-> 
-> - fasteoi type[4]: run the handler, then eoi[5] the irq and done
-> 
-> Note: IIUC the fasteoi type doesn't do any irq masking/unmasking
-> because that is assumed to be handled transparently by "modern forms
-> of interrupt handlers, which handle the flow details in hardware"
-> 
-> ONESHOT type interrupts are a special case of the fasteoi type
-> described above. They rely on the driver registering a threaded
-> handler for the interrupt and assume the irq line will remain masked
-> until the threaded handler completes, at which time the line will be
-> unmasked. TL;DR:
-> 
-> - mask[6] the irq, run the handler, and potentially eoi[7] the irq,
-> then unmask[8] later when the threaded handler has finished running.
-
-could you point me to the exact linux handler (is it
-handle_fasteoi_irq?)  or Why do you say "potentially". Given the details
-above, the guest EOI would unmask the IRQ at physical level. We do not
-have any hook KVM/VFIO on the guest unmap.
-> 
-> For vfio-platform irq forwarding, there is no existing function in
-> drivers/vfio/platform/vfio_platform_irq.c[9] that is a good candidate
-> for registering as the threaded handler for a ONESHOT interrupt in the
-> case we want to request the ONESHOT irq with
-> request_threaded_irq()[10]. Moreover, we can't just register a
-> threaded function that simply immediately returns IRQ_HANDLED (as is
-> done in vfio_irq_handler()[11] and vfio_automasked_irq_handler()[12]),
-> since that would cause the IRQ to be unmasked[13] immediately, before
-sorry I know you reworked that several times for style issue but [13]
-does not match unmask().
-> the userspace/guest driver has had any chance to service the
-> interrupt.
-> 
-> The most obvious way I see to handle this is to add a threaded handler
-> to vfio_platform_irq.c that waits until the userspace/guest driver has
-> serviced the interrupt and the unmask_handler[14] has been called, at
-> which point it returns IRQ_HANDLED so the generic IRQ code in the host
-> can finally unmask the interrupt.
-this is done on guest EOI at the moment.
-> 
-> Does this sound like a reasonable approach and something you would be
-> fine with adding to vfio-platform?
-Well I think it is interesting to do a pre-study and make sure we agree
-on the terminology, IRQ flow and problems that would need to be solved.
-Then we need to determine if it is worth the candle, if this support
-would speed up the vfio-platform usage (I am not sure at this point as I
-think there are more important drags like the lack of specification/dt
-integration for instance).
-
-Besides we need to make sure we are not launching into a huge effort for
-attempting to assign a device that does not fit well into the vfio
-platform scope (dma capable, reset, device tree).
-
- If so I could get started looking
-> at the implementation for how to sleep in the threaded handler in
-> vfio-platform until the unmask_handler is called. The most tricky/ugly
-> part of this is that DT has no knowledge of irq ONESHOT-ness, as it
-> only contains info regarding active-low vs active-high and edge vs
-> level trigger. That means that vfio-platform can't figure out that a
-> device uses a ONESHOT irq in a similar way to how it queries[15] the
-> trigger type, and by extension QEMU can't learn this information
-> through the VFIO_DEVICE_GET_IRQ_INFO ioctl, but must have another way
-> of knowing (i.e. command line option to QEMU).
-Indeed that's not really appealing.
-> 
-> I guess potentially another option would be to treat ONESHOT
-> interrupts like regular level triggered interrupts from the
-> perspective of vfio-platform, but somehow ensure the interrupt stays
-> masked during injection to the guest, rather than just disabled.
-I need this to be clarified actually. I am confused by the automasked
-terminology now.
-
-Thanks
-
-Eric
-
- I'm
-> not sure whether this could cause legitimate interrupts coming from
-> devices to be missed while the injection for an existing interrupt is
-> underway, but maybe this is a rare enough scenario that we wouldn't
-> care. The main issue with this approach is that handle_level_irq()[16]
-> will try to unmask the irq out from under us after we start the
-> injection (as it is already masked before
-> vfio_automasked_irq_handler[17] runs anyway). Not sure if masking at
-> the irqchip level supports nesting or not.
-> 
-> Let me know if you think either of these are viable options for adding
-> ONESHOT interrupt forwarding support to vfio-platform?
-> 
-> Thanks,
-> Micah
-> 
-> 
-> 
-> 
-> Additional note about level triggered vs ONESHOT irq forwarding:
-> For the regular type of level triggered interrupt described above, the
-> vfio handler will call disable_irq_nosync()[18] before the
-> handle_level_irq() function unmasks the irq and returns. This ensures
-> if new interrupts come in on the line while the existing one is being
-> handled by the guest (and the irq is therefore disabled), that the
-> vfio_automasked_irq_handler() isn’t triggered again until the
-> vfio_platform_unmask_handler() function has been triggered by the
-> guest (causing the irq to be re-enabled[19]). In other words, the
-> purpose of the irq enable/disable that already exists in vfio-platform
-> is a higher level concept that delays handling of additional
-> level-triggered interrupts in the host until the current one has been
-> handled in the guest.
-> 
-> This means that the existing level triggered interrupt forwarding
-> logic in vfio/vfio-platform is not sufficient for handling ONESHOT
-> interrupts (i.e. we can’t just treat a ONESHOT interrupt like a
-> regular level triggered interrupt in the host and use the existing
-> vfio forwarding code). The masking that needs to happen for ONESHOT
-> interrupts is at the lower level of the irqchip mask/unmask in that
-> the ONESHOT irq needs to remain masked (not just disabled) until the
-> driver’s threaded handler has completed.
-> 
-> 
-> 
-> 
-> [1] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L642
-> [2] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L414
-> [3] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L619
-> [4] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L702
-> [5] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L688
-> [6] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L724
-> [7] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L688
-> [8] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L1028
-> [9] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c
-> [10] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L2038
-> [11] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L167
-> [12] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L142
-> [13] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L1028
-> [14] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L94
-> [15] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L310
-> [16] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L642
-> [17] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L142
-> [18] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L154
-> [19] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/vfio_platform_irq.c#L87
-> 
+Paolo
 
