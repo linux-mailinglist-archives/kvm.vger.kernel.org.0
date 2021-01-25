@@ -2,79 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92F2630341D
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:17:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC2DB303433
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:21:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729405AbhAZFQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:16:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727942AbhAYMT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:19:29 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B417DC061788;
-        Mon, 25 Jan 2021 04:18:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=W1U508PbLkgwTccNSwME/R6sQRgPyIR7/FJo2A8YTu8=; b=ajM4lt9pcZxmzaCaNYOQ5tgX52
-        nUbHhja1AXzBoo5MXH9nHEEE+EG15rpAKQIUw5iYjfCYXN9+fYcI9x41Ak645sUE0npOUrwInm3VM
-        /Z047ws1ViAH8/08pF9hTVOOEVztOEGInatExkFLUqfw2iJqoUzriwkQmooewCffLV7rRcLE+b/qn
-        1EbKy8ItUKDTMEVqjNNDmU+lvBaQNrUDwpn4TxyKNnoJdthDIdW6O8o3UOkASatebnVxqd5/EdTeW
-        OKxVkMzZn8GPn6LXQTXUhD8z3QANFXIUl+ddG5cgN0nKvIFVMTM0e8EV4Qv/DUc8ifcYrUgMzVnPX
-        2yJi1z8g==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l40oq-0006P0-RS; Mon, 25 Jan 2021 12:18:09 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        id S1731798AbhAZFTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:19:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40498 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728467AbhAYMxu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 07:53:50 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 36ABE3010C8;
-        Mon, 25 Jan 2021 13:18:04 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 1FD962B069EF9; Mon, 25 Jan 2021 13:18:04 +0100 (CET)
-Date:   Mon, 25 Jan 2021 13:18:04 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Andi Kleen <andi@firstfloor.org>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, wei.w.wang@intel.com,
-        luwei.kang@intel.com, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu@linux.intel.com>
-Subject: Re: [PATCH v3 00/17] KVM: x86/pmu: Add support to enable Guest PEBS
- via DS
-Message-ID: <YA62/DV7reRvVyYk@hirez.programming.kicks-ass.net>
-References: <20210104131542.495413-1-like.xu@linux.intel.com>
- <YACXQwBPI8OFV1T+@google.com>
- <f8a8e4e2-e0b1-8e68-81d4-044fb62045d5@intel.com>
- <YAHXlWmeR9p6JZm2@google.com>
- <20210115182700.byczztx3vjhsq3p3@two.firstfloor.org>
- <YAHkOiQsxMfOMYvp@google.com>
- <YAqhPPkexq+dQ5KD@hirez.programming.kicks-ass.net>
- <eb30d86f-6492-d6e3-3a24-f58c724f68fd@linux.intel.com>
- <YA6nxuM5Stlolk5x@hirez.programming.kicks-ass.net>
- <076a5c7b-de2e-daf9-e6c0-5a42fb38aaa3@intel.com>
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1873F23105;
+        Mon, 25 Jan 2021 12:26:46 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l40xA-009sBu-A8; Mon, 25 Jan 2021 12:26:44 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+Subject: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+Date:   Mon, 25 Jan 2021 12:26:37 +0000
+Message-Id: <20210125122638.2947058-7-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
+References: <20210125122638.2947058-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <076a5c7b-de2e-daf9-e6c0-5a42fb38aaa3@intel.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 08:07:06PM +0800, Xu, Like wrote:
+Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+pretty easy. All that is required is support for PMMIR_EL1, which
+is read-only, and for which returning 0 is a valid option as long
+as we don't advertise STALL_SLOT as an implemented event.
 
-> So under the premise that counter cross-mapping is allowed,
-> how can hypercall help fix it ?
+Let's just do that and adjust what we return to the guest.
 
-Hypercall or otherwise exposing the mapping, will let the guest fix it
-up when it already touches the data. Which avoids the host from having
-to access the guest memory and is faster, no?
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h |  3 +++
+ arch/arm64/kvm/pmu-emul.c       |  6 ++++++
+ arch/arm64/kvm/sys_regs.c       | 11 +++++++----
+ 3 files changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 8b5e7e5c3cc8..2fb3f386588c 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -846,7 +846,10 @@
+ 
+ #define ID_DFR0_PERFMON_SHIFT		24
+ 
++#define ID_DFR0_PERFMON_8_0		0x3
+ #define ID_DFR0_PERFMON_8_1		0x4
++#define ID_DFR0_PERFMON_8_4		0x5
++#define ID_DFR0_PERFMON_8_5		0x6
+ 
+ #define ID_ISAR4_SWP_FRAC_SHIFT		28
+ #define ID_ISAR4_PSR_M_SHIFT		24
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 398f6df1bbe4..72cd704a8368 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ 		base = 0;
+ 	} else {
+ 		val = read_sysreg(pmceid1_el0);
++		/*
++		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
++		 * as RAZ
++		 */
++		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
++			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+ 		base = 32;
+ 	}
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8f79ec1fffa7..5da536ab738d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		/* Limit debug to ARMv8.0 */
+ 		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+ 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+-		/* Limit guests to PMUv3 for ARMv8.1 */
++		/* Limit guests to PMUv3 for ARMv8.4 */
+ 		val = cpuid_feature_cap_perfmon_field(val,
+ 						      ID_AA64DFR0_PMUVER_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
++						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+ 		break;
+ 	case SYS_ID_DFR0_EL1:
+-		/* Limit guests to PMUv3 for ARMv8.1 */
++		/* Limit guests to PMUv3 for ARMv8.4 */
+ 		val = cpuid_feature_cap_perfmon_field(val,
+ 						      ID_DFR0_PERFMON_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
++						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+ 		break;
+ 	}
+ 
+@@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+ 	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
++	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+ 
+ 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+ 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+@@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
+ 	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
+ 	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
++	/* PMMIR */
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
+ 
+ 	/* PRRR/MAIR0 */
+ 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+-- 
+2.29.2
+
