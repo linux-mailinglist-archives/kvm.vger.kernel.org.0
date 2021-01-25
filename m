@@ -2,137 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC2DB303433
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:21:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39621303438
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:21:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731798AbhAZFTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:19:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40498 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728467AbhAYMxu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:53:50 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1873F23105;
-        Mon, 25 Jan 2021 12:26:46 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l40xA-009sBu-A8; Mon, 25 Jan 2021 12:26:44 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        id S1731899AbhAZFTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:19:44 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11494 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729304AbhAYOLy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 09:11:54 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DPWvr3VkzzjD03;
+        Mon, 25 Jan 2021 22:09:44 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 25 Jan 2021 22:10:46 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
-Date:   Mon, 25 Jan 2021 12:26:37 +0000
-Message-Id: <20210125122638.2947058-7-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
-References: <20210125122638.2947058-1-maz@kernel.org>
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
+        Yanan Wang <wangyanan55@huawei.com>
+Subject: [PATCH 0/2] Performance improvement about cache flush
+Date:   Mon, 25 Jan 2021 22:10:42 +0800
+Message-ID: <20210125141044.380156-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
-pretty easy. All that is required is support for PMMIR_EL1, which
-is read-only, and for which returning 0 is a valid option as long
-as we don't advertise STALL_SLOT as an implemented event.
+Hi,
+This two patches are posted to introduce a new method that can distinguish cases
+of allocating memcache more precisely, and to elide some unnecessary cache flush.
 
-Let's just do that and adjust what we return to the guest.
+For patch-1:
+With a guest translation fault, we don't really need the memcache pages when
+only installing a new entry to the existing page table or replacing the table
+entry with a block entry. And with a guest permission fault, we also don't need
+the memcache pages for a write_fault in dirty-logging time if VMs are not
+configured with huge mappings. So a new method is introduced to distinguish cases
+of allocating memcache more precisely.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/sysreg.h |  3 +++
- arch/arm64/kvm/pmu-emul.c       |  6 ++++++
- arch/arm64/kvm/sys_regs.c       | 11 +++++++----
- 3 files changed, 16 insertions(+), 4 deletions(-)
+For patch-2:
+If migration of a VM with hugepages is canceled midway, KVM will adjust the
+stage-2 table mappings back to block mappings. With multiple vCPUs accessing
+guest pages within the same 1G range, there could be numbers of translation
+faults to handle, and KVM will uniformly flush data cache for 1G range before
+handling the faults. As it will cost a long time to flush the data cache for
+1G range of memory(130ms on Kunpeng 920 servers, for example), the consequent
+cache flush for each translation fault will finally lead to vCPU stuck for
+seconds or even a soft lockup. I have met both the stuck and soft lockup on
+Kunpeng servers with FWB not supported.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 8b5e7e5c3cc8..2fb3f386588c 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -846,7 +846,10 @@
- 
- #define ID_DFR0_PERFMON_SHIFT		24
- 
-+#define ID_DFR0_PERFMON_8_0		0x3
- #define ID_DFR0_PERFMON_8_1		0x4
-+#define ID_DFR0_PERFMON_8_4		0x5
-+#define ID_DFR0_PERFMON_8_5		0x6
- 
- #define ID_ISAR4_SWP_FRAC_SHIFT		28
- #define ID_ISAR4_PSR_M_SHIFT		24
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 398f6df1bbe4..72cd704a8368 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- 		base = 0;
- 	} else {
- 		val = read_sysreg(pmceid1_el0);
-+		/*
-+		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
-+		 * as RAZ
-+		 */
-+		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
-+			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
- 		base = 32;
- 	}
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8f79ec1fffa7..5da536ab738d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		/* Limit debug to ARMv8.0 */
- 		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
- 		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
--		/* Limit guests to PMUv3 for ARMv8.1 */
-+		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
--						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
-+						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
- 		break;
- 	case SYS_ID_DFR0_EL1:
--		/* Limit guests to PMUv3 for ARMv8.1 */
-+		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_DFR0_PERFMON_SHIFT,
--						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
-+						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
- 		break;
- 	}
- 
-@@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
- 	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-+	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
- 
- 	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
- 	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-@@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
- 	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
- 	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
-+	/* PMMIR */
-+	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
- 
- 	/* PRRR/MAIR0 */
- 	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+When KVM need to recover the table mappings back to block mappings, as we only
+replace the existing page tables with a block entry and the cacheability has not
+been changed, the cache maintenance opreations can be skipped.
+
+Yanan Wang (2):
+  KVM: arm64: Distinguish cases of allocating memcache more precisely
+  KVM: arm64: Skip the cache flush when coalescing tables into a block
+
+ arch/arm64/kvm/mmu.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
+
 -- 
-2.29.2
+2.19.1
 
