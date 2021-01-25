@@ -2,99 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E35CC302C0D
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 20:55:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AE8A302C3A
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 21:09:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732238AbhAYTym (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 14:54:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59286 "EHLO
+        id S1731803AbhAYUHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 15:07:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732126AbhAYTy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 14:54:26 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256D4C061756
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 11:53:46 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id lw17so282925pjb.0
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 11:53:46 -0800 (PST)
+        with ESMTP id S1726308AbhAYUGt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 15:06:49 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A751C061573
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 12:06:08 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id y187so690108wmd.3
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 12:06:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UthBW/7aTeKJLkQ2gI2ILuvzKbz0dGSFoA74H4DgD7Y=;
-        b=GZzwzP8DUYjfTXLWP/nUmiRbzFuoYgCUUa7CEV0bHsQnZ6fo3XVNbKEiqz74xF/RI2
-         78oL5/yrKXKUetF3IaCfiyzdbySyPdbHJdUm1jnfjiiBhL8P4ATBORLSqwpBS70OttGE
-         fExOoES24GlJeWAAed6RnLnN7gi7chTaxqvn0ckIf3y2SbrLDJW+OCLeEbynTCYxvc/w
-         bNhpLLUzjldHOxitllIGRAR+4gxED3PfD48QnEHemekcceQ7Z3wKxgrJGQVugejPNdX1
-         ci3O+CWL9IlDLbu4EpJLd1KmyPOVWzds2a3RkNsorfioivrZAr4Z7hbldhHR4dqW8k/D
-         NdKQ==
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=DSO+jSXnFCkYOVOHIbcm1gc95lAyaYUYSWQBIoSrkCg=;
+        b=blnU0e42NbZ83ireS0YzhUW3EoHpL8dZNCN1SG9xi2/QblHvIyQBNQ4FXyK30ZGmTQ
+         Vj4hiS5X/PmJcS/z7dwVF5eU6RRxsmjLObZOm3EsVmyqPPyZtvih3Ko16wMytmRRoQ6v
+         XqsnkVSobDQWh0F7kBvbmgXl439JKgGqqmUHLu2whNAoK0/P0O+cgwuwP8VMo8AVPg9Z
+         0wlALSGPsRJKAwcUlLJ666s9FuKMDA+8qW9b44FsgF6cqwieIZQ+zIxuJZpweqLAC9/n
+         LPMYbnzsNcobGRomeXmYaK6CofMFeDAVqYvxCugT3nFuVOHQMAM5881Sw10qP3oklyrJ
+         Pc0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UthBW/7aTeKJLkQ2gI2ILuvzKbz0dGSFoA74H4DgD7Y=;
-        b=tKWr5Nd9l41TG3WxqehwRJoXygT3rKq4JeX1nbBLQym0L4NWdbba/F8rfsEEQcH9Yl
-         DDzVKyGE4N2Rn4H0mSthX/THq5BUjCaT7QtVuhFKbuZ1LOEUflGC24uL2aUGIbTBz1+a
-         U7ez4N7ci9OYhwAK4ZOlfVyoRy61Rpxil3cYTVoDqAK9vX1NBAY+iFTEEB8gBdL5yxid
-         PrQP8dZmVvnA8HXvMViQMFr2Mya+z9rNHC+5y3Wkv9LwgZmU7Q5MbrNGJEIJ5mEAWpih
-         5N908yWKUUtlDLRY3wfG35D3igxODutEga2YO3MORWHnbj0DrPiBqUWa48uLKuQkKBK+
-         hbkg==
-X-Gm-Message-State: AOAM533U3N+6/rn2N3obd96c7bRE75R3dJIilZjSUUdp8jn54c9x8MsO
-        6eMapKcdu8ZDOJziaqDkcJvZnA==
-X-Google-Smtp-Source: ABdhPJyDSLN/cq1I5pWOjFeRUOmc6e+1xThysV13+nq1I4sH4C2tZ4DvvdmGgxaME8f6BqeBE63udw==
-X-Received: by 2002:a17:90a:e16:: with SMTP id v22mr1852642pje.73.1611604425437;
-        Mon, 25 Jan 2021 11:53:45 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id j16sm181905pjj.18.2021.01.25.11.53.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 11:53:44 -0800 (PST)
-Date:   Mon, 25 Jan 2021 11:53:38 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside
- guest mode for VMX
-Message-ID: <YA8hwsL8SWzWEA0h@google.com>
-References: <20210125172044.1360661-1-pbonzini@redhat.com>
- <YA8ZHrh9ca0lPJgk@google.com>
- <0b90c11b-0dce-60f3-c98d-3441b418e771@redhat.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DSO+jSXnFCkYOVOHIbcm1gc95lAyaYUYSWQBIoSrkCg=;
+        b=hCvluKBtcSzflvKs53a2cNFCocZhA+eGD5QZPLlrOpezRfbm6qPybyiX+BEwMLhOah
+         JI9idOI0evp5DfOO76iNEXoTrQhIDlRigUsY4zqWUm4kP+Un+x6Qpxn4dArCP7PTrzhX
+         9JDZNk7Avx3QOqhvK0GsXwzE6IanPYYRG7QXR19qf5ReuLRDi3JcwPpJ+x4uWGslvzlJ
+         mOlMxH72TVnUOkb65c3HnTrzBVhGggWfmS1ERpR8Lg9Q7uMmEycaW4U1tIT6YSHKl2eK
+         55+QX69hnybEKfajm+m2pbqRhXgT8mf/DlZydWO217EoRDl1nOxV33YApQzrnRuo1/WB
+         rFlQ==
+X-Gm-Message-State: AOAM530FJiS90uv/7Snw7I9eJYzgdWNtk4yE87kGVPVT4fXa4YEAgGHV
+        XWs8E+Kdlv7eY/i7tusPp2+3zubCbsI=
+X-Google-Smtp-Source: ABdhPJw+EhxPZiu39faIob4cXmopR0VGkSf7Hufv3J+8bjyp7sAnvu1ILITvkL1nWeAGNe2g4TbDeg==
+X-Received: by 2002:a1c:2783:: with SMTP id n125mr1623587wmn.74.1611605167058;
+        Mon, 25 Jan 2021 12:06:07 -0800 (PST)
+Received: from ?IPv6:2003:ea:8f06:5500:20b9:2450:6471:c6e0? (p200300ea8f06550020b924506471c6e0.dip0.t-ipconnect.de. [2003:ea:8f06:5500:20b9:2450:6471:c6e0])
+        by smtp.googlemail.com with ESMTPSA id v126sm396523wma.22.2021.01.25.12.06.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jan 2021 12:06:06 -0800 (PST)
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org
+References: <3d14987b-278c-be28-be7b-8f3c733fc4e9@gmail.com>
+ <20210125191147.5f876923.cohuck@redhat.com>
+From:   Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH] vfio/pci: Fix handling of pci use accessor return codes
+Message-ID: <1b4b36a2-edfd-bde1-a265-cb9b0272bd55@gmail.com>
+Date:   Mon, 25 Jan 2021 21:06:03 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b90c11b-0dce-60f3-c98d-3441b418e771@redhat.com>
+In-Reply-To: <20210125191147.5f876923.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021, Paolo Bonzini wrote:
-> On 25/01/21 20:16, Sean Christopherson wrote:
-> > >   }
-> > > +static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	if (!nested_get_evmcs_page(vcpu))
-> > > +		return false;
-> > > +
-> > > +	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
-> > > +		return false;
-> > nested_get_evmcs_page() will get called twice in the common case of
-> > is_guest_mode() == true.  I can't tell if that will ever be fatal, but it's
-> > definitely weird.  Maybe this?
-> > 
-> > 	if (!is_guest_mode(vcpu))
-> > 		return nested_get_evmcs_page(vcpu);
-> > 
-> > 	return nested_get_vmcs12_pages(vcpu);
-> > 
+On 25.01.2021 19:11, Cornelia Huck wrote:
+> On Sun, 24 Jan 2021 16:35:41 +0100
+> Heiner Kallweit <hkallweit1@gmail.com> wrote:
 > 
-> I wouldn't say there is a common case;
+>> The pci user accessors return negative errno's on error.
+>>
+>> Fixes: f572a960a15e ("vfio/pci: Intel IGD host and LCP bridge config space access")
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci_igd.c | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+>> index 53d97f459..e66dfb017 100644
+>> --- a/drivers/vfio/pci/vfio_pci_igd.c
+>> +++ b/drivers/vfio/pci/vfio_pci_igd.c
+>> @@ -127,7 +127,7 @@ static size_t vfio_pci_igd_cfg_rw(struct vfio_pci_device *vdev,
+>>  
+>>  		ret = pci_user_read_config_byte(pdev, pos, &val);
+>>  		if (ret)
+>> -			return pcibios_err_to_errno(ret);
+>> +			return ret;
+> 
+> This is actually not strictly needed, as pcibios_err_to_errno() already
+> keeps errors <= 0 unchanged, so more a cleanup than a fix?
+> 
+I agree. Although I'd argue that the author of the original commit missed
+the fact the the user accessors return errno's, and the code just works
+by chance, because of the "good will" of pcibios_err_to_errno().
+So up to you whether it's worth it to apply this change also to stable.
 
-Eh, I would argue that it is more common to do KVM_REQ_GET_NESTED_STATE_PAGES
-with is_guest_mode() than it is with !is_guest_mode(), as the latter is valid if
-and only if eVMCS is in use.  But, I think we're only vying for internet points. :-)
+> Anyway,
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+>>  
+>>  		if (copy_to_user(buf + count - size, &val, 1))
+>>  			return -EFAULT;
+> 
 
-> however the idea was to remove the call to nested_get_evmcs_page from
-> nested_get_vmcs12_pages, since that one is only needed after
-> KVM_GET_NESTED_STATE and not during VMLAUNCH/VMRESUME.
-
-I'm confused, this patch explicitly adds a call to nested_get_evmcs_page() in
-nested_get_vmcs12_pages().
