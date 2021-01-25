@@ -2,197 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B5B6302CAC
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 21:38:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 273CA302D2B
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 22:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731989AbhAYUh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 15:37:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24743 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732199AbhAYUhs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 15:37:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611606980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T99cffXFqt1y8p0ZEUCrfvsnlUJpdUvt2TUG8S4I2vM=;
-        b=jWLl+EXFzUuYSc3OHrqzamaN3ZawdW2QmZPqUHaGKg9ZWPTGYGkFKzSBUinMTg1UGbi/f5
-        7wNYB7X0DpNp2GtAbvL8tKg3EBunPWHGTWCSfBo1H2auK76W7YHtkmqY2jQB8cqcNiYh1d
-        /J6aPXTaAvaCg+omYD7SvFmSAi2gTHw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-257-2Lf8B757M1OXe5MBztYLWA-1; Mon, 25 Jan 2021 15:36:18 -0500
-X-MC-Unique: 2Lf8B757M1OXe5MBztYLWA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BEF69CDA0;
-        Mon, 25 Jan 2021 20:36:17 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7361B5D9DB;
-        Mon, 25 Jan 2021 20:36:11 +0000 (UTC)
-Date:   Mon, 25 Jan 2021 13:36:11 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Micah Morton <mortonm@chromium.org>
-Cc:     Auger Eric <eric.auger@redhat.com>, kvm@vger.kernel.org
-Subject: Re: Add vfio-platform support for ONESHOT irq forwarding?
-Message-ID: <20210125133611.703c4b90@omen.home.shazbot.org>
-In-Reply-To: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
-References: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
+        id S1732432AbhAYVCa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 16:02:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732426AbhAYVCN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 16:02:13 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E820CC061574
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 13:01:32 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id b21so2945483pgk.7
+        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 13:01:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=XrFM/8QZQpJqubUYMWbsYAtcpteTwR0TS9zSLkjNBQ0=;
+        b=A9Krd7YKB/E6MJjbPlEaeRBR5DGxp7BWQNcVvc6RB5bUkzucc5BJSEYWTwxmycUtcI
+         +ppahFQsF5HjOR1pzA2sdTQclWgudUW5IfowMUQcf14n+tohg4unKWaLm2bfhQFfnlBb
+         LS7HFxtziTXHTqOeA/NQ41o9ezLSykqtw14i0KhEGzDzXyv9g49M19EuCrooXVsd8e/k
+         xoSBbOdDQmXY25Un5WSHsMrFr0a5Reh6XV2QZ5zVYLbiSZl07R3ahJpmmzoALXoWAGVc
+         deCcqPMdBebuv3YBA43fLYvJXh4kwVvEgQcd3ZwjGyzsSmQ/VRL0WjwfWDnp4OkzgSmU
+         Sgtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XrFM/8QZQpJqubUYMWbsYAtcpteTwR0TS9zSLkjNBQ0=;
+        b=dc890fWOwIsAFVK3cfCDBxQfzUm5LzaYKs8yPqCDOsu3GCK35QV2PcPKSc03/urc14
+         79cfIUV4mRG0+Z3qITz0ZQxt3iYTsKgn8yrI5BTuTXlClIHxOo/KmtmUnKAxWHTWnjkf
+         ABM8ei6HZ2kMwRPVdh7QiV42lWUyaswMawDTMtbxa9oJrUHcmhn/CW9oRQ3HVUbeJS/r
+         JHbQ9ZxOvZT14H1ApAlhh9nWP1dGChiDkZlDjJZ3sEZsPHoBCUIqEKTfc/A6Bk0rCVHz
+         u7Oj12TsJEGvON3Qb8Fc8tW9/LvFzW1vud3F92xm02wBaBkcafMtPFB6yUpY/oq9uADw
+         MP4w==
+X-Gm-Message-State: AOAM531ndGCpm+XCGIy45zamLkqug9kph/ReQ+zu0MNrb1DBjTlPHSuN
+        kARpQJquwZcGmkLbY7jJYtJYNw==
+X-Google-Smtp-Source: ABdhPJy8FdSJ4e529ngWMTyYGKzqJd7StrPl9DiNqWCiJaOOzNjTWj+MteOGrXa8Pe+YjNhvTWafzQ==
+X-Received: by 2002:aa7:8a8b:0:b029:1ae:8c71:9915 with SMTP id a11-20020aa78a8b0000b02901ae8c719915mr2010264pfc.79.1611608492236;
+        Mon, 25 Jan 2021 13:01:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id m1sm250048pjz.16.2021.01.25.13.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jan 2021 13:01:31 -0800 (PST)
+Date:   Mon, 25 Jan 2021 13:01:25 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>
+Subject: Re: Thoughts on sharing KVM tracepoints [was:Re: [PATCH 2/2] KVM:
+ nVMX: trace nested vm entry]
+Message-ID: <YA8xpfPtonJdxU2D@google.com>
+References: <20210121171043.946761-1-mlevitsk@redhat.com>
+ <20210121171043.946761-3-mlevitsk@redhat.com>
+ <YAn/t7TWP0xmVEHs@google.com>
+ <f1c90d8a44795bbdef549a5fcf375bcf1d52af93.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f1c90d8a44795bbdef549a5fcf375bcf1d52af93.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Jan 2021 10:46:47 -0500
-Micah Morton <mortonm@chromium.org> wrote:
+On Mon, Jan 25, 2021, Maxim Levitsky wrote:
+> On Thu, 2021-01-21 at 14:27 -0800, Sean Christopherson wrote:
+> > I still don't see why VMX can't share this with SVM.  "npt' can easily be "tdp",
+> > differentiating between VMCB and VMCS can be down with ISA, and VMX can give 0
+> > for int_ctl (or throw in something else interesting/relevant).
+> 
+> I understand very well your point, and I don't strongly disagree with you.
+> However let me voice my own thoughts on this:
+>  
+> I think that sharing tracepoints between SVM and VMX isn't necessarily a good idea.
+> It does make sense in some cases but not in all of them.
+>  
+> The trace points are primarily intended for developers, thus they should capture as
+> much as possible relevant info but not everything because traces can get huge.
+>  
+> Also despite the fact that a developer will look at the traces, some usability is welcome
+> as well (e.g for new developers), and looking at things like info1/info2/intr_info/error_code
+> isn't very usable
 
-> Hi Eric,
->=20
-> I was recently looking into some vfio-platform passthrough stuff and
-> came across a device I wanted to assign to a guest that uses a ONESHOT
-> type interrupt (these type of interrupts seem to be quite common, on
-> ARM at least). The semantics for ONESHOT interrupts are a bit
-> different from regular level triggered interrupts as I'll describe
-> here:
->=20
-> The normal generic code flow for level-triggered interrupts is as follows:
->=20
-> - regular type[1]: mask[2] the irq, then run the handler, then
-> unmask[3] the irq and done
->=20
-> - fasteoi type[4]: run the handler, then eoi[5] the irq and done
->=20
-> Note: IIUC the fasteoi type doesn't do any irq masking/unmasking
-> because that is assumed to be handled transparently by "modern forms
-> of interrupt handlers, which handle the flow details in hardware"
->=20
-> ONESHOT type interrupts are a special case of the fasteoi type
-> described above. They rely on the driver registering a threaded
-> handler for the interrupt and assume the irq line will remain masked
-> until the threaded handler completes, at which time the line will be
-> unmasked. TL;DR:
->=20
-> - mask[6] the irq, run the handler, and potentially eoi[7] the irq,
-> then unmask[8] later when the threaded handler has finished running.
+I'm not opposed to printing different names on VMX, e.g. exit_qual and
+idt_vec_info, but I 100% think that VMX and SVM should share the bulk of the
+code.  Improvements to VMX almost always apply in some way to SVM, and vice
+versa.  It's all but guaranteed that splitting flows will eventually cause
+divergence in a bad way.  Divergence in tracepoints is likely to be minor at
+worst, but I don't think that's a good reason to intentionally split the code
+when it's quite easy to share.
 
-This doesn't seem quite correct to me, it skips the discussion of the
-hard vs threaded handler, where the "regular" type would expect the
-device interrupt to be masked in the hard handler, such that the
-controller line can be unmasked during execution of the threaded handler
-(if it exists).  It seems fasteoi is more transactional, ie. rather
-than masking around quiescing the device interrupt, we only need to
-send an eoi once we're ready for a new interrupt.  ONESHOT, OTOH, is a
-means of deferring all device handling to the threaded interrupt,
-specifically for cases such as an i2c device where the bus interaction
-necessitates non-IRQ-context handling.  Sound right?
+> (btw the error_code should at least be called intr_info_error_code, and
 
->=20
-> For vfio-platform irq forwarding, there is no existing function in
-> drivers/vfio/platform/vfio_platform_irq.c[9] that is a good candidate
-> for registering as the threaded handler for a ONESHOT interrupt in the
-> case we want to request the ONESHOT irq with
-> request_threaded_irq()[10]. Moreover, we can't just register a
-> threaded function that simply immediately returns IRQ_HANDLED (as is
-> done in vfio_irq_handler()[11] and vfio_automasked_irq_handler()[12]),
-> since that would cause the IRQ to be unmasked[13] immediately, before
-> the userspace/guest driver has had any chance to service the
-> interrupt.
+Heh, I disagree even on this.  IMO, after debugging a few times, associating
+error_code with the event being injected is second nature.  Prepending
+intr_info_ would just add extra characters and slow down mental processing.
 
-Are you proposing servicing the device interrupt before it's sent to
-userspace?  A ONESHOT irq is going to eoi the interrupt when the thread
-exits, before userspace services the interrupt, so this seems like a
-case where we'd need to mask the irq regardless of fasteoi handling so
-that it cannot re-assert before userspace manages the device.  Our
-existing autmasked for level triggered interrupts should handle this.
+> of course both it and intr_info are VMX specific).
 
-> The most obvious way I see to handle this is to add a threaded handler
-> to vfio_platform_irq.c that waits until the userspace/guest driver has
-> serviced the interrupt and the unmask_handler[14] has been called, at
-> which point it returns IRQ_HANDLED so the generic IRQ code in the host
-> can finally unmask the interrupt.
+Not really, SVM has the exact same fields with slightly different names.
 
-An interrupt thread with an indeterminate, user controlled runtime
-seems bad.  The fact that fasteoi will send an eoi doesn't also mean
-that it can't be masked.
+> So I don't even like the fact that kvm_entry/kvm_exit are shared, and neither I want
+> to add even more shared trace points.
+>
+> I understand that there are some benefits of sharing, namely a userspace tool can use
+> the same event to *profile* kvm, but I am not sure that this is worth it.
 
-> Does this sound like a reasonable approach and something you would be
-> fine with adding to vfio-platform? If so I could get started looking
-> at the implementation for how to sleep in the threaded handler in
-> vfio-platform until the unmask_handler is called. The most tricky/ugly
-> part of this is that DT has no knowledge of irq ONESHOT-ness, as it
-> only contains info regarding active-low vs active-high and edge vs
-> level trigger. That means that vfio-platform can't figure out that a
-> device uses a ONESHOT irq in a similar way to how it queries[15] the
-> trigger type, and by extension QEMU can't learn this information
-> through the VFIO_DEVICE_GET_IRQ_INFO ioctl, but must have another way
-> of knowing (i.e. command line option to QEMU).
+Why is it not worth it?  It's a small amount of one-time kernel pain that allows
+all users/developers to reuse scripts and tools across VMX and SVM.  Even manual
+usage benefits, e.g. I don't have to remember that a tracepoint is 'x' on VMX
+but 'y' on SVM.
 
-Seems like existing level handling w/ masking should handle this, imo.
+> What we could have done is to have ISA (and maybe even x86) agnostic kvm_exit/kvm_entry
+> tracepoints that would have no data attached to them, or have very little (like maybe RIP),
+> and then have ISA specific tracepoints with the reset of the info.
 
-> I guess potentially another option would be to treat ONESHOT
-> interrupts like regular level triggered interrupts from the
-> perspective of vfio-platform, but somehow ensure the interrupt stays
-> masked during injection to the guest, rather than just disabled. I'm
-> not sure whether this could cause legitimate interrupts coming from
-> devices to be missed while the injection for an existing interrupt is
-> underway, but maybe this is a rare enough scenario that we wouldn't
-> care. The main issue with this approach is that handle_level_irq()[16]
-> will try to unmask the irq out from under us after we start the
-> injection (as it is already masked before
-> vfio_automasked_irq_handler[17] runs anyway). Not sure if masking at
-> the irqchip level supports nesting or not.
+That would probably end up as the least user friendly combination.  Usually I
+enable a tracepoint to get more info, rarely am I interested in _just_ the
+logging of the tracepoint itself.  The generic tracepoint would either be
+useless and never enabled, or even worse would cause people to overlook the
+vendor-specific variant.
 
-I'd expect either an unmask at the controller or eoi to re-evaluate the
-interrupt condition and re-assert as needed.  The interrupt will need to
-be exclusive to the device so as not to starve other devices.
-
-> Let me know if you think either of these are viable options for adding
-> ONESHOT interrupt forwarding support to vfio-platform?
->=20
-> Thanks,
-> Micah
->=20
->=20
->=20
->=20
-> Additional note about level triggered vs ONESHOT irq forwarding:
-> For the regular type of level triggered interrupt described above, the
-> vfio handler will call disable_irq_nosync()[18] before the
-> handle_level_irq() function unmasks the irq and returns. This ensures
-> if new interrupts come in on the line while the existing one is being
-> handled by the guest (and the irq is therefore disabled), that the
-> vfio_automasked_irq_handler() isn=E2=80=99t triggered again until the
-> vfio_platform_unmask_handler() function has been triggered by the
-> guest (causing the irq to be re-enabled[19]). In other words, the
-> purpose of the irq enable/disable that already exists in vfio-platform
-> is a higher level concept that delays handling of additional
-> level-triggered interrupts in the host until the current one has been
-> handled in the guest.
-
-I wouldn't say "delays", the interrupt condition is not re-evaluated
-until the interrupt is unmasked, by which point the user has had an
-opportunity to service the device, which could de-assert the interrupt
-such that there is no pending interrupt on unmask.  It therefore blocks
-further interrupts until user serviced and unmasked.
-=20
-> This means that the existing level triggered interrupt forwarding
-> logic in vfio/vfio-platform is not sufficient for handling ONESHOT
-> interrupts (i.e. we can=E2=80=99t just treat a ONESHOT interrupt like a
-> regular level triggered interrupt in the host and use the existing
-> vfio forwarding code). The masking that needs to happen for ONESHOT
-> interrupts is at the lower level of the irqchip mask/unmask in that
-> the ONESHOT irq needs to remain masked (not just disabled) until the
-> driver=E2=80=99s threaded handler has completed.
-
-I don't see that this is true, unmasking the irq should cause the
-controller to re-evaluate the irq condition on the device end and issue
-a new interrupt as necessary.  Right?  Thanks,
-
-Alex
-
+> Same could be applied to kvm_nested_vmenter, although for this one I don't think that we
+> need an ISA agnostic tracepoint.
+>  
+> Having said all that, I am not hell bent on this. If you really want it to be this way,
+> I won't argue that much.
+>  
+> Thoughts?
