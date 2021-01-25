@@ -2,78 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB12F304A09
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 21:24:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE7843049FA
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 21:21:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731670AbhAZFSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:18:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38420 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728180AbhAYMkh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:40:37 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8D04923108;
-        Mon, 25 Jan 2021 12:26:46 +0000 (UTC)
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l40xA-009sBu-Oy; Mon, 25 Jan 2021 12:26:44 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-Subject: [PATCH v2 7/7] KVM: arm64: Use symbolic names for the PMU versions
-Date:   Mon, 25 Jan 2021 12:26:38 +0000
-Message-Id: <20210125122638.2947058-8-maz@kernel.org>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210125122638.2947058-1-maz@kernel.org>
-References: <20210125122638.2947058-1-maz@kernel.org>
+        id S1731840AbhAZFTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:19:32 -0500
+Received: from forward101p.mail.yandex.net ([77.88.28.101]:35958 "EHLO
+        forward101p.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728926AbhAYNdf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 08:33:35 -0500
+Received: from myt2-0bcf81a4c8f9.qloud-c.yandex.net (myt2-0bcf81a4c8f9.qloud-c.yandex.net [IPv6:2a02:6b8:c00:3b24:0:640:bcf:81a4])
+        by forward101p.mail.yandex.net (Yandex) with ESMTP id 30ADD3280AEB;
+        Mon, 25 Jan 2021 16:32:22 +0300 (MSK)
+Received: from myt3-5a0d70690205.qloud-c.yandex.net (myt3-5a0d70690205.qloud-c.yandex.net [2a02:6b8:c12:4f2b:0:640:5a0d:7069])
+        by myt2-0bcf81a4c8f9.qloud-c.yandex.net (mxback/Yandex) with ESMTP id T6IozmAtdQ-WLH8nZPn;
+        Mon, 25 Jan 2021 16:32:22 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1611581542;
+        bh=7ngRG6nrQB3McavML2flSJugM2lIRtBmprXfxP0B64w=;
+        h=In-Reply-To:From:Date:References:To:Subject:Message-ID:Cc;
+        b=H/bVPIORQBfFXqXnEavEvdE3dw5oXaButNeMgmfIi7mvugJ0wyYX5b1JImRZ6LavQ
+         O0l7GDgL2VuOt2RB6Uxv4j2wLEUF0gwgwXXujedOtrQTjAHfuESeOJ4rgHBLdLwv1z
+         M0YO2fRN9fTk7j0lhh5FMDm2sa7eyxe0nn78qHI8=
+Authentication-Results: myt2-0bcf81a4c8f9.qloud-c.yandex.net; dkim=pass header.i=@yandex.ru
+Received: by myt3-5a0d70690205.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id 9fRHntulNw-WKI0NkLI;
+        Mon, 25 Jan 2021 16:32:20 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+Subject: Re: [RFC PATCH v3 03/13] af_vsock: implement SEQPACKET rx loop
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jeff Vander Stoep <jeffv@google.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        oxffffaa@gmail.com
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+ <20210125111239.598377-1-arseny.krasnov@kaspersky.com>
+From:   stsp <stsp2@yandex.ru>
+Message-ID: <6a92dc1a-d4ef-37e9-c67b-e8789cf144e3@yandex.ru>
+Date:   Mon, 25 Jan 2021 16:32:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <20210125111239.598377-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of using a bunch of magic numbers, use the existing definitions
-that have been added since 8673e02e58410 ("arm64: perf: Add support
-for ARMv8.5-PMU 64-bit counters")
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/pmu-emul.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 72cd704a8368..cb16ca2eee92 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -23,11 +23,11 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
- static u32 kvm_pmu_event_mask(struct kvm *kvm)
- {
- 	switch (kvm->arch.pmuver) {
--	case 1:			/* ARMv8.0 */
-+	case ID_AA64DFR0_PMUVER_8_0:
- 		return GENMASK(9, 0);
--	case 4:			/* ARMv8.1 */
--	case 5:			/* ARMv8.4 */
--	case 6:			/* ARMv8.5 */
-+	case ID_AA64DFR0_PMUVER_8_1:
-+	case ID_AA64DFR0_PMUVER_8_4:
-+	case ID_AA64DFR0_PMUVER_8_5:
- 		return GENMASK(15, 0);
- 	default:		/* Shouldn't be here, just for sanity */
- 		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
--- 
-2.29.2
-
+25.01.2021 14:12, Arseny Krasnov пишет:
+> This adds receive loop for SEQPACKET. It looks like receive loop for
+> SEQPACKET,
+     ^^^
+You meant "STREAM"?
