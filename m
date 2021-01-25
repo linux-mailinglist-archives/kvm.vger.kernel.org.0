@@ -2,191 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E74DD302731
-	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 16:50:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAA2F302757
+	for <lists+kvm@lfdr.de>; Mon, 25 Jan 2021 16:58:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730452AbhAYPsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 10:48:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33542 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730449AbhAYPrj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 10:47:39 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B44AC06178C
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 07:46:59 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id r12so18655323ejb.9
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 07:46:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=TBR2K4bVvs2paM8ICSn5HiZVL7k6Bw67nshWobZ6CUo=;
-        b=navmzKi6X2+53RHrTwLrOl6lJm2XzYmtCpQsPgkao1JvhALfwlHyBiZIB2TZUUhrzy
-         ClvJF1fyL1c4hOalwqduNwJs3sgO0FrG0oF3O12MX0Br1CRSue1bNGNHzSGvAVMkaGOV
-         0T0dX+aX8vziZwyy7gmXAzkeXvyZhH8X2dYLs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=TBR2K4bVvs2paM8ICSn5HiZVL7k6Bw67nshWobZ6CUo=;
-        b=ABeIMTdOr/mGDlHvfrepjQG3haY5rgL03OMt6Mj4aEejbBlXE9RNqWv4e13l8699vS
-         oiUtctqxR1EJiKYfTN+p3AgLWe7Ok7xkvcsdrMrSID9RUqTzeZSERDeJ0yhermoOWgJS
-         SiOlpUHKT61Tat1oOkIDyBlO881uC6YtAlpe/BoHPy9PyH0FISNp3P3cWEeoXsO3HSam
-         Cf3uggbi1HZ9AIan3fNuwN5qssErm2RncGQ5pydjRzRbUbBVkdasl/GW30h0azqp1SNO
-         0wtmtsOJLqdjHXNG3mu0ujMHtXpSIIgdUnE186nPhvgB2foFyoGgWadEzlcN9wxU6q0k
-         NvHw==
-X-Gm-Message-State: AOAM5338WN0RqeUISQVW7WSnSdYSAfbimq6e1f+RLiqClxLEepiWkn/J
-        KDelz8YvuzlhovaEQVb5Eyng9BxLJgLXqDLaewhDyQ==
-X-Google-Smtp-Source: ABdhPJwGdFXwBNLpcOziYKv1Iw4b+o1qQUyA8WtEFiTfpyTdNhzeKjhKmHtsSI+VYVd+iXITfvwO8hiCSZSBK7Qnbz4=
-X-Received: by 2002:a17:906:1302:: with SMTP id w2mr786639ejb.413.1611589617851;
- Mon, 25 Jan 2021 07:46:57 -0800 (PST)
+        id S1728875AbhAYPzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 10:55:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17554 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728134AbhAYPw7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 10:52:59 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10PF4dK7180046;
+        Mon, 25 Jan 2021 10:52:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EKWPaDjPRkWw1Z3+/SrXg0fHgf06efCZ8z4aHSr4gU4=;
+ b=tH4mMDSKX7mkVgL2JrOGmSBu4SnN5R37DqBJOvv3Sbv+tr04W77UZqOs3IKmjVw0oYZ7
+ KnVCu1TuQdBJIBiWiW71lI/vBx6tQMDkyFyShB6waeiraAw7crtt2xRZJMSfXUJQ+ozo
+ it8My/iIDrxgUDc/s8/0nI5Qt8lfA9jNDI/MKvpwHOkygb0/9cbLqAVKtqAUws9EWxNk
+ rx9Ix8mk93NPFZWAhRd1nyU3g2CuUTEBz63nBpr8QkENOSRvVZZzhh06w3RovGjxi9X5
+ 7NCncajanHaE/LTD86Hak3Uw5xM94EtURICT1V5Ba8Xm0UsKAT4qTsneUsTOqgd1zJco pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36a00x2ka8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Jan 2021 10:52:11 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10PF5MVe184462;
+        Mon, 25 Jan 2021 10:52:10 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36a00x2k9k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Jan 2021 10:52:10 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10PFcYxu017763;
+        Mon, 25 Jan 2021 15:52:10 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma03dal.us.ibm.com with ESMTP id 368be8upkw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Jan 2021 15:52:09 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10PFq6Fa23855414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Jan 2021 15:52:06 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6F6076A04F;
+        Mon, 25 Jan 2021 15:52:06 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31F5A6A051;
+        Mon, 25 Jan 2021 15:52:05 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.211.138.51])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Jan 2021 15:52:04 +0000 (GMT)
+Subject: Re: [PATCH 4/4] vfio-pci/zdev: Introduce the zPCI I/O vfio region
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
+ <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+ <20210122164843.269f806c@omen.home.shazbot.org>
+ <9c363ff5-b76c-d697-98e2-cf091a404d15@linux.ibm.com>
+ <20210125164252.1d1af6cd.cohuck@redhat.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <b9499b13-980b-8fa6-07c8-c74ed2cb90bd@linux.ibm.com>
+Date:   Mon, 25 Jan 2021 10:52:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-From:   Micah Morton <mortonm@chromium.org>
-Date:   Mon, 25 Jan 2021 10:46:47 -0500
-Message-ID: <CAJ-EccMWBJAzwECcJtFh9kXwtVVezWv_Zd0vcqPMPwKk=XFqYQ@mail.gmail.com>
-Subject: Add vfio-platform support for ONESHOT irq forwarding?
-To:     Auger Eric <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20210125164252.1d1af6cd.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-25_05:2021-01-25,2021-01-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 phishscore=0 mlxlogscore=917 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 spamscore=0 clxscore=1015
+ malwarescore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2101250088
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 1/25/21 10:42 AM, Cornelia Huck wrote:
+> On Mon, 25 Jan 2021 09:40:38 -0500
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+>> On 1/22/21 6:48 PM, Alex Williamson wrote:
+>>> On Tue, 19 Jan 2021 15:02:30 -0500
+>>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>>    
+>>>> Some s390 PCI devices (e.g. ISM) perform I/O operations that have very
+>>>> specific requirements in terms of alignment as well as the patterns in
+>>>> which the data is read/written. Allowing these to proceed through the
+>>>> typical vfio_pci_bar_rw path will cause them to be broken in up in such a
+>>>> way that these requirements can't be guaranteed. In addition, ISM devices
+>>>> do not support the MIO codepaths that might be triggered on vfio I/O coming
+>>>> from userspace; we must be able to ensure that these devices use the
+>>>> non-MIO instructions.  To facilitate this, provide a new vfio region by
+>>>> which non-MIO instructions can be passed directly to the host kernel s390
+>>>> PCI layer, to be reliably issued as non-MIO instructions.
+>>>>
+>>>> This patch introduces the new vfio VFIO_REGION_SUBTYPE_IBM_ZPCI_IO region
+>>>> and implements the ability to pass PCISTB and PCILG instructions over it,
+>>>> as these are what is required for ISM devices.
+>>>
+>>> There have been various discussions about splitting vfio-pci to allow
+>>> more device specific drivers rather adding duct tape and bailing wire
+>>> for various device specific features to extend vfio-pci.  The latest
+>>> iteration is here[1].  Is it possible that such a solution could simply
+>>> provide the standard BAR region indexes, but with an implementation that
+>>> works on s390, rather than creating new device specific regions to
+>>> perform the same task?  Thanks,
+>>>
+>>> Alex
+>>>
+>>> [1]https://lore.kernel.org/lkml/20210117181534.65724-1-mgurtovoy@nvidia.com/
+>>>    
+>>
+>> Thanks for the pointer, I'll have to keep an eye on this.  An approach
+>> like this could solve some issues, but I think a main issue that still
+>> remains with relying on the standard BAR region indexes (whether using
+>> the current vfio-pci driver or a device-specific driver) is that QEMU
+>> writes to said BAR memory region are happening in, at most, 8B chunks
+>> (which then, in the current general-purpose vfio-pci code get further
+>> split up into 4B iowrite operations).  The alternate approach I'm
+>> proposing here is allowing for the whole payload (4K) in a single
+>> operation, which is significantly faster.  So, I suspect even with a
+>> device specific driver we'd want this sort of a region anyhow..
+> 
+> I'm also wondering about device specific vs architecture/platform
+> specific handling.
+> 
+> If we're trying to support ISM devices, that's device specific
+> handling; but if we're trying to add more generic things like the large
+> payload support, that's not necessarily tied to a device, is it? For
+> example, could a device support large payload if plugged into a z, but
+> not if plugged into another machine? >
 
-I was recently looking into some vfio-platform passthrough stuff and
-came across a device I wanted to assign to a guest that uses a ONESHOT
-type interrupt (these type of interrupts seem to be quite common, on
-ARM at least). The semantics for ONESHOT interrupts are a bit
-different from regular level triggered interrupts as I'll describe
-here:
+Yes, that's correct -- While ISM is providing the impetus and has a hard 
+requirement for some of this due to the MIO instruction quirk, the 
+mechanism being implemented here is definitely not ISM-specific -- it's 
+more like an s390-wide quirk that could really benefit any device that 
+wants to do large payloads (PCISTB).
 
-The normal generic code flow for level-triggered interrupts is as follows:
-
-- regular type[1]: mask[2] the irq, then run the handler, then
-unmask[3] the irq and done
-
-- fasteoi type[4]: run the handler, then eoi[5] the irq and done
-
-Note: IIUC the fasteoi type doesn't do any irq masking/unmasking
-because that is assumed to be handled transparently by "modern forms
-of interrupt handlers, which handle the flow details in hardware"
-
-ONESHOT type interrupts are a special case of the fasteoi type
-described above. They rely on the driver registering a threaded
-handler for the interrupt and assume the irq line will remain masked
-until the threaded handler completes, at which time the line will be
-unmasked. TL;DR:
-
-- mask[6] the irq, run the handler, and potentially eoi[7] the irq,
-then unmask[8] later when the threaded handler has finished running.
-
-For vfio-platform irq forwarding, there is no existing function in
-drivers/vfio/platform/vfio_platform_irq.c[9] that is a good candidate
-for registering as the threaded handler for a ONESHOT interrupt in the
-case we want to request the ONESHOT irq with
-request_threaded_irq()[10]. Moreover, we can't just register a
-threaded function that simply immediately returns IRQ_HANDLED (as is
-done in vfio_irq_handler()[11] and vfio_automasked_irq_handler()[12]),
-since that would cause the IRQ to be unmasked[13] immediately, before
-the userspace/guest driver has had any chance to service the
-interrupt.
-
-The most obvious way I see to handle this is to add a threaded handler
-to vfio_platform_irq.c that waits until the userspace/guest driver has
-serviced the interrupt and the unmask_handler[14] has been called, at
-which point it returns IRQ_HANDLED so the generic IRQ code in the host
-can finally unmask the interrupt.
-
-Does this sound like a reasonable approach and something you would be
-fine with adding to vfio-platform? If so I could get started looking
-at the implementation for how to sleep in the threaded handler in
-vfio-platform until the unmask_handler is called. The most tricky/ugly
-part of this is that DT has no knowledge of irq ONESHOT-ness, as it
-only contains info regarding active-low vs active-high and edge vs
-level trigger. That means that vfio-platform can't figure out that a
-device uses a ONESHOT irq in a similar way to how it queries[15] the
-trigger type, and by extension QEMU can't learn this information
-through the VFIO_DEVICE_GET_IRQ_INFO ioctl, but must have another way
-of knowing (i.e. command line option to QEMU).
-
-I guess potentially another option would be to treat ONESHOT
-interrupts like regular level triggered interrupts from the
-perspective of vfio-platform, but somehow ensure the interrupt stays
-masked during injection to the guest, rather than just disabled. I'm
-not sure whether this could cause legitimate interrupts coming from
-devices to be missed while the injection for an existing interrupt is
-underway, but maybe this is a rare enough scenario that we wouldn't
-care. The main issue with this approach is that handle_level_irq()[16]
-will try to unmask the irq out from under us after we start the
-injection (as it is already masked before
-vfio_automasked_irq_handler[17] runs anyway). Not sure if masking at
-the irqchip level supports nesting or not.
-
-Let me know if you think either of these are viable options for adding
-ONESHOT interrupt forwarding support to vfio-platform?
-
-Thanks,
-Micah
-
-
-
-
-Additional note about level triggered vs ONESHOT irq forwarding:
-For the regular type of level triggered interrupt described above, the
-vfio handler will call disable_irq_nosync()[18] before the
-handle_level_irq() function unmasks the irq and returns. This ensures
-if new interrupts come in on the line while the existing one is being
-handled by the guest (and the irq is therefore disabled), that the
-vfio_automasked_irq_handler() isn=E2=80=99t triggered again until the
-vfio_platform_unmask_handler() function has been triggered by the
-guest (causing the irq to be re-enabled[19]). In other words, the
-purpose of the irq enable/disable that already exists in vfio-platform
-is a higher level concept that delays handling of additional
-level-triggered interrupts in the host until the current one has been
-handled in the guest.
-
-This means that the existing level triggered interrupt forwarding
-logic in vfio/vfio-platform is not sufficient for handling ONESHOT
-interrupts (i.e. we can=E2=80=99t just treat a ONESHOT interrupt like a
-regular level triggered interrupt in the host and use the existing
-vfio forwarding code). The masking that needs to happen for ONESHOT
-interrupts is at the lower level of the irqchip mask/unmask in that
-the ONESHOT irq needs to remain masked (not just disabled) until the
-driver=E2=80=99s threaded handler has completed.
-
-
-
-
-[1] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L642
-[2] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L414
-[3] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L619
-[4] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L702
-[5] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L688
-[6] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L724
-[7] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L688
-[8] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L10=
-28
-[9] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/v=
-fio_platform_irq.c
-[10] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L2=
-038
-[11] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L167
-[12] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L142
-[13] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/manage.c#L1=
-028
-[14] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L94
-[15] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L310
-[16] https://elixir.bootlin.com/linux/v5.10.7/source/kernel/irq/chip.c#L642
-[17] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L142
-[18] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L154
-[19] https://elixir.bootlin.com/linux/v5.10.7/source/drivers/vfio/platform/=
-vfio_platform_irq.c#L87
+And I think that ultimately goes back to why Pierre wanted to have QEMU 
+be as permissive as possible in using the region vs limiting it only to 
+ISM.
