@@ -2,113 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36E7E30340F
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:15:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21766303415
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:16:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729400AbhAZFNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:13:15 -0500
-Received: from mga01.intel.com ([192.55.52.88]:21973 "EHLO mga01.intel.com"
+        id S1730125AbhAZFOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:14:46 -0500
+Received: from mga14.intel.com ([192.55.52.115]:22891 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726304AbhAYJUP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:20:15 -0500
-IronPort-SDR: 6Z8pwwGR9ZByhUNj53GCp7mwzjsISPKnjUXAb171icLZhlZXZJuJbb/UK4rhfbCiAoS+WnZoRw
- GDZ+/bmwPMIw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="198459800"
+        id S1726484AbhAYJYs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 04:24:48 -0500
+IronPort-SDR: yg+XNjqOOVMuo4R62xwcHYJhJB0D9vtSI7j6LYF1pzVZ0vyHB4nE3We3S8kgYcFUjtjt8/xe2y
+ TcZDyNo8lZjQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915772"
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="198459800"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:26:36 -0800
-IronPort-SDR: krmTHTvV9H1Em7YztLgy8AHyHyDUYxQkj03g7g4NA78ph4D8nEIi8ocAQEiHfrfeZEd2vGIV6W
- s89XGV2WwhSQ==
+   d="scan'208";a="178915772"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:00 -0800
+IronPort-SDR: kzLEPq1A2kRrDIeWOy9sfD1Ak86o2cn+9L0otfA1S1iHlvpPUVsPNbZvbjWayFrWOeFi87+qVJ
+ N0tfmh4dMzJA==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="387239873"
-Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:26:24 -0800
-Subject: Re: [PATCH v3 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and
- inject it to guest
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Kan Liang <kan.liang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
-        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Andi Kleen <andi@firstfloor.org>, wei.w.wang@intel.com,
-        luwei.kang@intel.com, linux-kernel@vger.kernel.org,
-        "Xu, Like" <like.xu@intel.com>
-References: <20210104131542.495413-1-like.xu@linux.intel.com>
- <20210104131542.495413-5-like.xu@linux.intel.com>
- <X/86UWuV/9yt14hQ@hirez.programming.kicks-ass.net>
- <9c343e40-bbdf-8af0-3307-5274070ee3d2@intel.com>
- <YAGEFgqQv281jVHc@hirez.programming.kicks-ass.net>
- <2c197d5a-09a8-968c-a942-c95d18983c9d@intel.com>
- <YAGqWNl2FKxVussV@hirez.programming.kicks-ass.net>
-From:   Like Xu <like.xu@linux.intel.com>
-Organization: Intel OTC
-Message-ID: <ed5b16cb-30c7-dab7-92c3-b70ba8483d1e@linux.intel.com>
-Date:   Mon, 25 Jan 2021 16:26:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+   d="scan'208";a="402223784"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:06:57 -0800
+From:   Robert Hoo <robert.hu@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
+Cc:     chang.seok.bae@intel.com, kvm@vger.kernel.org, robert.hu@intel.com,
+        Robert Hoo <robert.hu@linux.intel.com>
+Subject: [RFC PATCH 00/12] KVM: Support Intel KeyLocker
+Date:   Mon, 25 Jan 2021 17:06:08 +0800
+Message-Id: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <YAGqWNl2FKxVussV@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter,
+This patch set is to enable KVM virtualization of Key Locker feature [1][2].
 
-On 2021/1/15 22:44, Peter Zijlstra wrote:
-> On Fri, Jan 15, 2021 at 10:30:13PM +0800, Xu, Like wrote:
-> 
->>> Are you sure? Spurious NMI/PMIs are known to happen anyway. We have far
->>> too much code to deal with them.
->>
->> https://lore.kernel.org/lkml/20170628130748.GI5981@leverpostej/T/
->>
->> In the rr workload, the commit change "the PMI interrupts in skid region
->> should be dropped"
->> is reverted since some users complain that:
->>
->>> It seems to me that it might be reasonable to ignore the interrupt if
->>> the purpose of the interrupt is to trigger sampling of the CPUs
->>> register state.  But if the interrupt will trigger some other
->>> operation, such as a signal on an fd, then there's no reason to drop
->>> it.
->>
->> I assume that if the PMI drop is unacceptable, either will spurious PMI
->> injection.
->>
->> I'm pretty open if you insist that we really need to do this for guest PEBS
->> enabling.
-> 
-> That was an entirely different issue. We were dropping events on the
-> floor because they'd passed priv boundaries. So there was an actual
-> event, and we made it go away.
-> 
-> What we're talking about here is raising an PMI with BUFFER_OVF set,
-> even if the DS is empty. That should really be harmless. We'll take the
-> PMI, find there's nothing there, and do nothing.
-> 
+Key Locker provides a mechanism to encrypt and decrypt data with an AES key
+without having access to the raw key value by converting AES keys into
+"handles".
+Handles are essentially an encrypted form of those underlying real AES
+keys. "IWKey (Internal Wrapping Key)", loaded inside CPU, inaccessible from
+SW, is the key used to seal real AES Keys into handles.
+Thus, a real AES Key exists in memory for only a short period of time, when
+user is requesting a 'handle' from it. After that, the real AES Key can be
+erased, user then uses handle, with new Key Locker instructions, to perform
+AES encryption/decryption. By OS policy, usually, handles will be revoked
+after reboot, then any handles that may have been stolen should no longer
+be useful to the attacker after the reboot.
 
-In the host and guest PEBS both enabled case,
-we'll get a crazy dmesg *bombing* about spurious PMI warning
-if we pass the host PEBS PMI "harmlessly" to the guest:
+IWKey, is the core of this framework. It is loaded into CPU by LOADIWKEY
+instruction, then inaccessible from (CPU) outside anymore. LOADIWKEY is the
+only Key Locker instruction that will cause VM-exit (if we set so in VM
+Execution Control). When load IWKey into CPU, we can ask CPU further
+randomize it, if HW supports this.
+The IWKey can also be distributed among CPUs, rather than LOADIWKEY on each
+CPU, by: first backup IWKey to platform specific storage, then copy it on
+target CPU. The backup process is triggered by writing to MSR
+IA32_COPY_LOCAL_TO_PLATFORM. The restore process is triggered by writing to
+MSR IA32_COPY_PLATFORM_LOCAL.
+ 
+Virtualization Design
+Key Locker Spec [2] indicates virtualization limitations by current HW
+implementation.
+1) IWKey cannot be read from CPU after it's loaded (this is the nature of
+this feature) and only 1 copy of IWKey inside 1 CPU.
+2) Initial implementations may take a significant amount of time to perform
+a copy of IWKeyBackup to IWKey (via a write to MSR
+IA32_COPY_PLATFORM_LOCAL) so it may cause a significant performance impact
+to reload IWKey after each VM exit.
+ 
+Due to above reasons, virtualization design makes below decisions
+1) don't expose HW randomize IWKey capability (CPUID.0x19.ECX[1]) to guest. 
+   As such, guest IWKey cannot be preserved by VMM across VM-{Exit, Entry}.
+   (VMM cannot know what exact IWKey were set by CPU)
+2) guests and host can only use Key Locker feature exclusively. [4] 
 
-[11261.502536] Uhhuh. NMI received for unknown reason 2c on CPU 36.
-[11261.502539] Do you have a strange power saving mode enabled?
-[11261.502541] Dazed and confused, but trying to continue
+The virtualization implementation is generally straight forward
+1) On VM-Exit of guest 'LOADIWKEY', VMM stores the IWKey in vCPU scope
+        area (kvm_vcpu_arch)
+2) Right before VM-Entry, VMM load that vCPU's IWKey in to pCPU, by
+LOADIWKEY instruction.
+3) On guest backup local to platform operation, VMM traps the write
+   to MSR, and simulate the IWKey store process by store it in a KVM
+   scope area (kvm_arch), mark the success status in the shadow
+   msr_ia32_iwkey_backup_status and msr_ia32_copy_status.
+4) On guest copy from platform to local operation, VMM traps the write
+   to MSR and simulate the process by load kvm_arch.iwkey_backup to
+   vCPU.iwkey; and simulate the success status in the
+   shadow msr_ia32_copy_status.
+5) Guest read the 2 status MSRs will also be trapped and return the shadow
+   value.
+6) Other Key Locker instructions can run without VM-Exit in non-root mode.
 
-Legacy guest users may be very confused and dissatisfied with that.
+At the end, we don't suggest this feature to be migratable, as if so, IWKey
+would have to be exposed to user space, which would weaken this feature's
+security significance.
 
-I'm double checking with you if it's acceptable to take the proposal
-"disables the co-existence of guest PEBS and host PEBS" as the first
-step to upstream, and enable both host and guest PEBS in the near future.
+BTW, this patch set is based on Kernel v5.10 (2c85ebc) + Kernel Key Locker
+enabling patches [3].
 
----
-thx,likexu
+
+[1] Intel Architecture Instruction Set Extensions Programming Reference:
+https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
+
+[2] Intel Key Locker Specification:
+https://software.intel.com/content/www/us/en/develop/download/intel-key-locker-specification.html 
+
+[3] Kernel enablement patch:
+https://lore.kernel.org/lkml/20201216174146.10446-1-chang.seok.bae@intel.com/
+ 
+[4] It's possible to use Key Locker by both the guest and host, albeit with
+reduced security benefits. I.e., store host IWKey in VMM scoped place
+(memory/register), VMM switches host-IWKey and guest-IWKey between
+VM-{Exit/Entry} by LOADIWKEY instruction.
+But in this case, an adversary that can observe arbitrary VMM memory may be
+able to steal both the handles and IWKey. And this case also require the
+VMM to be running before the first IWKey load.
+
+
+Robert Hoo (12):
+  x86/keylocker: Move LOADIWKEY opcode definition from keylocker.c to
+    keylocker.h
+  x86/cpufeature: Add CPUID.19H:{EBX,ECX} cpuid leaves
+  kvm/vmx: Introduce the new tertiary processor-based VM-execution
+    controls
+  kvm/vmx: enable LOADIWKEY vm-exit support in tertiary processor-based
+    VM-execution controls
+  kvm/vmx: Add KVM support on KeyLocker operations
+  kvm/cpuid: Enumerate KeyLocker feature in KVM
+  kvm/vmx/nested: Support new IA32_VMX_PROCBASED_CTLS3 vmx feature
+    control MSR
+  kvm/vmx: Refactor vmx_compute_tertiary_exec_control()
+  kvm/vmx/vmcs12: Add Tertiary Exec-Control field in vmcs12
+  kvm/vmx/nested: Support tertiary VM-Exec control in vmcs02
+  kvm/vmx/nested: Support CR4.KL in nested
+  kvm/vmx/nested: Enable nested LOADIWKey VM-exit
+
+ arch/x86/include/asm/cpufeature.h        |   6 +-
+ arch/x86/include/asm/cpufeatures.h       |  11 +-
+ arch/x86/include/asm/disabled-features.h |   2 +-
+ arch/x86/include/asm/keylocker.h         |   2 +
+ arch/x86/include/asm/kvm_host.h          |  24 ++-
+ arch/x86/include/asm/msr-index.h         |   1 +
+ arch/x86/include/asm/required-features.h |   2 +-
+ arch/x86/include/asm/vmx.h               |   9 ++
+ arch/x86/include/asm/vmxfeatures.h       |   6 +-
+ arch/x86/include/uapi/asm/vmx.h          |   5 +-
+ arch/x86/kernel/cpu/common.c             |   7 +
+ arch/x86/kernel/cpu/feat_ctl.c           |   9 ++
+ arch/x86/kernel/keylocker.c              |   1 -
+ arch/x86/kvm/cpuid.c                     |  26 +++-
+ arch/x86/kvm/cpuid.h                     |   2 +
+ arch/x86/kvm/vmx/capabilities.h          |   9 ++
+ arch/x86/kvm/vmx/nested.c                |  34 +++-
+ arch/x86/kvm/vmx/nested.h                |   7 +
+ arch/x86/kvm/vmx/vmcs.h                  |   1 +
+ arch/x86/kvm/vmx/vmcs12.c                |   1 +
+ arch/x86/kvm/vmx/vmcs12.h                |   3 +-
+ arch/x86/kvm/vmx/vmx.c                   | 258 ++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.h                   |   9 ++
+ arch/x86/kvm/x86.c                       |   6 +-
+ arch/x86/kvm/x86.h                       |   2 +
+ 25 files changed, 422 insertions(+), 21 deletions(-)
+
+-- 
+1.8.3.1
+
