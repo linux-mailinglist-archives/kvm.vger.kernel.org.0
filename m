@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13C51303409
+	by mail.lfdr.de (Postfix) with ESMTP id 7FEA530340A
 	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:13:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729206AbhAZFMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:12:48 -0500
-Received: from mga14.intel.com ([192.55.52.115]:22891 "EHLO mga14.intel.com"
+        id S1729300AbhAZFM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:12:58 -0500
+Received: from mga14.intel.com ([192.55.52.115]:22894 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726205AbhAYJRV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726213AbhAYJRV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 25 Jan 2021 04:17:21 -0500
-IronPort-SDR: C3/TwMfYo9FRN5ds5iEwhCYyEigez+d5Fp247BTIgXHXjaDGl7H0JLdupN8tOt2zMzdM+Z24Lx
- UVp5e67f4pCw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915803"
+IronPort-SDR: YTCaMAUxY4k+oL3ZbIr4by0PIN4KBz9eoXJpCv/SOL6t3pCaMaJT8x+N7WeUjdR1T0NGJ1U/Mq
+ Xifw6UG5UdRA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="178915811"
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="178915803"
+   d="scan'208";a="178915811"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:15 -0800
-IronPort-SDR: auUtUaqroYPsrUBB/18m0dISPt3GX+kzly+G3Hx9di3PUWL5ffaduo8X4XzrHnvnuNwOYVJhEH
- NZJAkFFWB10Q==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 01:07:18 -0800
+IronPort-SDR: Ch7Z9tUe5CjN5UUCUdZ44gYHUa+DzmsLXDUPGZAVk7EH7soqotHzydoggakX5HWAU7Iin/V9dd
+ 8pQzompdyGgA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
-   d="scan'208";a="402223891"
+   d="scan'208";a="402223907"
 Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:07:13 -0800
+  by fmsmga004.fm.intel.com with ESMTP; 25 Jan 2021 01:07:16 -0800
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
         wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
 Cc:     chang.seok.bae@intel.com, kvm@vger.kernel.org, robert.hu@intel.com,
         Robert Hoo <robert.hu@linux.intel.com>
-Subject: [RFC PATCH 07/12] kvm/vmx/nested: Support new IA32_VMX_PROCBASED_CTLS3 vmx feature control MSR
-Date:   Mon, 25 Jan 2021 17:06:15 +0800
-Message-Id: <1611565580-47718-8-git-send-email-robert.hu@linux.intel.com>
+Subject: [RFC PATCH 08/12] kvm/vmx: Refactor vmx_compute_tertiary_exec_control()
+Date:   Mon, 25 Jan 2021 17:06:16 +0800
+Message-Id: <1611565580-47718-9-git-send-email-robert.hu@linux.intel.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
 References: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
@@ -40,141 +40,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add this new VMX feature MSR in nested_vmx_msrs, for the Tertiary
-Proc-based Exec-Control nested support.
-
-Don't set its LOADIWKEY VM-Exit bit at present. It will be enabled in last
-patch when everything's prepared.
+Like vmx_compute_tertiary_exec_control(), before L1 set VMCS, compute its
+nested VMX feature control MSR's value according to guest CPUID setting.
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
 ---
- arch/x86/kvm/vmx/capabilities.h |  2 ++
- arch/x86/kvm/vmx/nested.c       | 18 +++++++++++++++++-
- arch/x86/kvm/vmx/vmx.c          |  6 +++---
- arch/x86/kvm/x86.c              |  2 ++
- 4 files changed, 24 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 22 +++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.h |  1 +
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index d8bbde4..2a694c9 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -30,6 +30,8 @@ struct nested_vmx_msrs {
- 	u32 procbased_ctls_high;
- 	u32 secondary_ctls_low;
- 	u32 secondary_ctls_high;
-+	/* Tertiary Controls is 64bit allow-1 semantics */
-+	u64 tertiary_ctls;
- 	u32 pinbased_ctls_low;
- 	u32 pinbased_ctls_high;
- 	u32 exit_ctls_low;
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 89af692..9eb1c0b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1285,6 +1285,13 @@ static int vmx_restore_vmx_basic(struct vcpu_vmx *vmx, u64 data)
- 		lowp = &vmx->nested.msrs.secondary_ctls_low;
- 		highp = &vmx->nested.msrs.secondary_ctls_high;
- 		break;
-+	/*
-+	 * MSR_IA32_VMX_PROCBASED_CTLS3 is 64bit, all allow-1.
-+	 * No need to check. Just return.
-+	 */
-+	case MSR_IA32_VMX_PROCBASED_CTLS3:
-+		vmx->nested.msrs.tertiary_ctls = data;
-+		return 0;
- 	default:
- 		BUG();
- 	}
-@@ -1421,6 +1428,7 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
- 	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
- 	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
- 	case MSR_IA32_VMX_PROCBASED_CTLS2:
-+	case MSR_IA32_VMX_PROCBASED_CTLS3:
- 		return vmx_restore_control_msr(vmx, msr_index, data);
- 	case MSR_IA32_VMX_MISC:
- 		return vmx_restore_vmx_misc(vmx, data);
-@@ -1516,6 +1524,9 @@ int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata)
- 			msrs->secondary_ctls_low,
- 			msrs->secondary_ctls_high);
- 		break;
-+	case MSR_IA32_VMX_PROCBASED_CTLS3:
-+		*pdata = msrs->tertiary_ctls;
-+		break;
- 	case MSR_IA32_VMX_EPT_VPID_CAP:
- 		*pdata = msrs->ept_caps |
- 			((u64)msrs->vpid_caps << 32);
-@@ -6375,7 +6386,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		CPU_BASED_USE_IO_BITMAPS | CPU_BASED_MONITOR_TRAP_FLAG |
- 		CPU_BASED_MONITOR_EXITING | CPU_BASED_RDPMC_EXITING |
- 		CPU_BASED_RDTSC_EXITING | CPU_BASED_PAUSE_EXITING |
--		CPU_BASED_TPR_SHADOW | CPU_BASED_ACTIVATE_SECONDARY_CONTROLS;
-+		CPU_BASED_TPR_SHADOW | CPU_BASED_ACTIVATE_SECONDARY_CONTROLS |
-+		CPU_BASED_ACTIVATE_TERTIARY_CONTROLS;
- 	/*
- 	 * We can allow some features even when not supported by the
- 	 * hardware. For example, L1 can specify an MSR bitmap - and we
-@@ -6413,6 +6425,10 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps)
- 		SECONDARY_EXEC_RDSEED_EXITING |
- 		SECONDARY_EXEC_XSAVES;
- 
-+	if (msrs->procbased_ctls_high & CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
-+		rdmsrl(MSR_IA32_VMX_PROCBASED_CTLS3,
-+		      msrs->tertiary_ctls);
-+	msrs->tertiary_ctls &= ~TERTIARY_EXEC_LOADIWKEY_EXITING;
- 	/*
- 	 * We can emulate "VMCS shadowing," even if the hardware
- 	 * doesn't support it.
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6be6d87..f29a91c 100644
+index f29a91c..cf8ab95 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1880,7 +1880,7 @@ static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
- static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+@@ -4377,10 +4377,20 @@ u32 vmx_exec_control(struct vcpu_vmx *vmx)
+ #define vmx_adjust_sec_exec_exiting(vmx, exec_control, lname, uname) \
+ 	vmx_adjust_sec_exec_control(vmx, exec_control, lname, uname, uname##_EXITING, true)
+ 
+-static u64 vmx_tertiary_exec_control(struct vcpu_vmx *vmx)
++static void vmx_compute_tertiary_exec_control(struct vcpu_vmx *vmx)
  {
- 	switch (msr->index) {
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
- 		if (!nested)
- 			return 1;
- 		return vmx_get_vmx_msr(&vmcs_config.nested, msr->index, &msr->data);
-@@ -1961,7 +1961,7 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_FEAT_CTL:
- 		msr_info->data = vmx->msr_ia32_feature_control;
- 		break;
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
- 		if (!nested_vmx_allowed(vcpu))
- 			return 1;
- 		if (vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
-@@ -2240,7 +2240,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (msr_info->host_initiated && data == 0)
- 			vmx_leave_nested(vcpu);
- 		break;
--	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
-+	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_PROCBASED_CTLS3:
- 		if (!msr_info->host_initiated)
- 			return 1; /* they are read-only */
- 		if (!nested_vmx_allowed(vcpu))
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fbc839a..d428022 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1300,6 +1300,7 @@ bool kvm_rdpmc(struct kvm_vcpu *vcpu)
- 	MSR_IA32_VMX_PROCBASED_CTLS2,
- 	MSR_IA32_VMX_EPT_VPID_CAP,
- 	MSR_IA32_VMX_VMFUNC,
-+	MSR_IA32_VMX_PROCBASED_CTLS3,
+-	/* Though currently, no special adjustment. There might be in the future*/
+-	return vmcs_config.cpu_based_3rd_exec_ctrl;
++	struct kvm_vcpu *vcpu = &vmx->vcpu;
++	u32 exec_control = vmcs_config.cpu_based_3rd_exec_ctrl;
++
++	if (nested) {
++		if (guest_cpuid_has(vcpu, X86_FEATURE_KEYLOCKER))
++			vmx->nested.msrs.tertiary_ctls |=
++				TERTIARY_EXEC_LOADIWKEY_EXITING;
++		else
++			vmx->nested.msrs.tertiary_ctls &=
++				~TERTIARY_EXEC_LOADIWKEY_EXITING;
++	}
++	vmx->tertiary_exec_control = exec_control;
+ }
  
- 	MSR_K7_HWCR,
- 	MSR_KVM_POLL_CONTROL,
-@@ -1331,6 +1332,7 @@ bool kvm_rdpmc(struct kvm_vcpu *vcpu)
- 	MSR_IA32_VMX_PROCBASED_CTLS2,
- 	MSR_IA32_VMX_EPT_VPID_CAP,
- 	MSR_IA32_VMX_VMFUNC,
-+	MSR_IA32_VMX_PROCBASED_CTLS3,
+ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+@@ -4493,8 +4503,10 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 		secondary_exec_controls_set(vmx, vmx->secondary_exec_control);
+ 	}
  
- 	MSR_F10H_DECFG,
- 	MSR_IA32_UCODE_REV,
+-	if (cpu_has_tertiary_exec_ctrls())
+-		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
++	if (cpu_has_tertiary_exec_ctrls()) {
++		vmx_compute_tertiary_exec_control(vmx);
++		tertiary_exec_controls_set(vmx, vmx->tertiary_exec_control);
++	}
+ 
+ 	if (kvm_vcpu_apicv_active(&vmx->vcpu)) {
+ 		vmcs_write64(EOI_EXIT_BITMAP0, 0);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 94f1c27..0915fad 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -209,6 +209,7 @@ struct vcpu_vmx {
+ 	u32		      msr_ia32_umwait_control;
+ 
+ 	u32 secondary_exec_control;
++	u64 tertiary_exec_control;
+ 
+ 	/*
+ 	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
 -- 
 1.8.3.1
 
