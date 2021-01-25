@@ -2,116 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39AC130314B
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 02:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7728630323A
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 03:54:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725900AbhAZBbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 20:31:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46580 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731933AbhAZB3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 20:29:16 -0500
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B56C0698D1;
-        Mon, 25 Jan 2021 17:28:30 -0800 (PST)
-Received: by mail-oo1-xc32.google.com with SMTP id x23so3767383oop.1;
-        Mon, 25 Jan 2021 17:28:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6paGRqZC+Saiy/OdOWQy9bDY2PXfN0YJkrt0vyVzmXI=;
-        b=K8X6g49rPyw3kREv1Dn/1hTN6EaW4ZmiqeMy6udTvVa98GSl/D5Bt0XdI/lgNGTfFa
-         hBLDiUayFfthZAQPdRjdsWL+GoF/k5MJ4XrtkG4r3ETy7E2HWwLt0z7SJvKdJVcmwQtW
-         ON3dN+WZbnpPGuztW44h97cX/Y/HwPQdtHBphjc3ODW57/GDuFFAicTKS2xybAeTKiuv
-         GrX0gUnTYE+YDAdlC+CpyHbKNbs/bbF6MBbI9DKNGZ0jKc0dmhxHT7D3E/hGHlgVgO4X
-         Etz5ERO6XeksR1k22n3uFvC0EFQjqof1V/RO/Qr4UsgAlKJVvdb4/3UjYAOlXmKIK0fy
-         o6WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6paGRqZC+Saiy/OdOWQy9bDY2PXfN0YJkrt0vyVzmXI=;
-        b=dElTSJZLxxmBk+DLdv009Ke92hEFCnjV/yz1zNmruggDzQ+6h79RS+bLPmxLchWWXX
-         5zesqR8olUYCeFm0QOEdVOJ/6OU/BW8vu3JHERUBLgz0lVY1gy+yjdNjA8cXrwC26iwl
-         ZNu+3Zkd5TbdvVh6A8hbpDfxpoYOtJap06tiqDIm3RK4SiWfuf4T6co6LwQufbnC3Igu
-         ihZQw4HOsE9qwxqrF68onLRQPLQnlRkwzaa3npnq/DkBJ9cxyXoCr0lbPERtzJRs90Qv
-         vMckJXitwBJfnKJJC753dX1BZ3gw9JJ/oAd10FRw72FrlxMpHVYSM+MW6Pk1KNFua6kb
-         /PvA==
-X-Gm-Message-State: AOAM530/L2mprmz2+owQIHdAXQIk0Uuf/2sAk+ggPKpGiK/qX4fmZPA7
-        mX/SC5+VtPOac8vPbsYzIaiwh4s9nMpEG/AEq7sJr+tDKD8=
-X-Google-Smtp-Source: ABdhPJzmkLV3iU8HhDDGcz85czAKO3NR4Cy9fFZK4aEWZplK3Mt2PZiGDbjZepscdMttmj0AiCMkoNL/st7iuznOHdE=
-X-Received: by 2002:a4a:946d:: with SMTP id j42mr2261363ooi.39.1611624509049;
- Mon, 25 Jan 2021 17:28:29 -0800 (PST)
+        id S1729319AbhAYOND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 09:13:03 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:11875 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729302AbhAYOLz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 09:11:55 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DPWvr4PrPz7Zrr;
+        Mon, 25 Jan 2021 22:09:44 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 25 Jan 2021 22:10:47 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>,
+        Yanan Wang <wangyanan55@huawei.com>
+Subject: [PATCH 1/2] KVM: arm64: Distinguish cases of allocating memcache more precisely
+Date:   Mon, 25 Jan 2021 22:10:43 +0800
+Message-ID: <20210125141044.380156-2-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
+In-Reply-To: <20210125141044.380156-1-wangyanan55@huawei.com>
+References: <20210125141044.380156-1-wangyanan55@huawei.com>
 MIME-Version: 1.0
-References: <1610960877-3110-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1610960877-3110-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 26 Jan 2021 09:28:17 +0800
-Message-ID: <CANRm+Cx65UHSJA+S4qRR1wdZ=dhyM=U=KwZnbNUSN4XdM1nyQA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ping=EF=BC=8C
-On Mon, 18 Jan 2021 at 17:08, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> From: Wanpeng Li <wanpengli@tencent.com>
->
-> The per-cpu vsyscall pvclock data pointer assigns either an element of th=
-e
-> static array hv_clock_boot (#vCPU <=3D 64) or dynamically allocated memor=
-y
-> hvclock_mem (vCPU > 64), the dynamically memory will not be allocated if
-> kvmclock vsyscall is disabled, this can result in cpu hotpluged fails in
-> kvmclock_setup_percpu() which returns -ENOMEM. This patch fixes it by not
-> assigning vsyscall pvclock data pointer if kvmclock vdso_clock_mode is no=
-t
-> VDSO_CLOCKMODE_PVCLOCK.
->
-> Fixes: 6a1cac56f4 ("x86/kvm: Use __bss_decrypted attribute in shared vari=
-ables")
-> Reported-by: Zelin Deng <zelin.deng@linux.alibaba.com>
-> Tested-by: Haiwei Li <lihaiwei@tencent.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: stable@vger.kernel.org#v4.19-rc5+
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
-> v1 -> v2:
->  * add code comments
->
->  arch/x86/kernel/kvmclock.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-> index aa59374..01d4e55c 100644
-> --- a/arch/x86/kernel/kvmclock.c
-> +++ b/arch/x86/kernel/kvmclock.c
-> @@ -294,9 +294,11 @@ static int kvmclock_setup_percpu(unsigned int cpu)
->         /*
->          * The per cpu area setup replicates CPU0 data to all cpu
->          * pointers. So carefully check. CPU0 has been set up in init
-> -        * already.
-> +        * already. Assign vsyscall pvclock data pointer iff kvmclock
-> +        * vsyscall is enabled.
->          */
-> -       if (!cpu || (p && p !=3D per_cpu(hv_clock_per_cpu, 0)))
-> +       if (!cpu || (p && p !=3D per_cpu(hv_clock_per_cpu, 0)) ||
-> +           (kvm_clock.vdso_clock_mode !=3D VDSO_CLOCKMODE_PVCLOCK))
->                 return 0;
->
->         /* Use the static page for the first CPUs, allocate otherwise */
-> --
-> 2.7.4
->
+With a guest translation fault, we don't really need the memcache pages
+when only installing a new entry to the existing page table or replacing
+the table entry with a block entry. And with a guest permission fault,
+we also don't need the memcache pages for a write_fault in dirty-logging
+time if VMs are not configured with huge mappings.
+
+The cases where allocations from memcache are required can be much more
+precisely distinguished by comparing fault_granule and vma_pagesize.
+
+Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+---
+ arch/arm64/kvm/mmu.c | 25 ++++++++++++-------------
+ 1 file changed, 12 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7d2257cc5438..8e8549ea1d70 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -820,19 +820,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	gfn = fault_ipa >> PAGE_SHIFT;
+ 	mmap_read_unlock(current->mm);
+ 
+-	/*
+-	 * Permission faults just need to update the existing leaf entry,
+-	 * and so normally don't require allocations from the memcache. The
+-	 * only exception to this is when dirty logging is enabled at runtime
+-	 * and a write fault needs to collapse a block entry into a table.
+-	 */
+-	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
+-		ret = kvm_mmu_topup_memory_cache(memcache,
+-						 kvm_mmu_cache_min_pages(kvm));
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	mmu_seq = vcpu->kvm->mmu_notifier_seq;
+ 	/*
+ 	 * Ensure the read of mmu_notifier_seq happens before we call
+@@ -898,6 +885,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
++	/*
++	 * Allocations from the memcache are required only when granule of the
++	 * lookup level where a guest fault happened exceeds the vma_pagesize,
++	 * which means new page tables will be created in the fault handlers.
++	 */
++	if (fault_granule > vma_pagesize) {
++		ret = kvm_mmu_topup_memory_cache(memcache,
++						 kvm_mmu_cache_min_pages(kvm));
++		if (ret)
++			return ret;
++	}
++
+ 	/*
+ 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+ 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+-- 
+2.19.1
+
