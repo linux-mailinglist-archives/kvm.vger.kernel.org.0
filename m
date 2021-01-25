@@ -2,80 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAA1030325C
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 04:02:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36E7E30340F
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:15:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728819AbhAYNZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 08:25:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46517 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728780AbhAYNYY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 08:24:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611580977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0HGRoOq6BrrbzjHTsXqbOX8EfSf6zyIl/yxyGyvENJM=;
-        b=hKg9wC3fJ8UJSDDalt+dcqIuZsR781KqVnRZlLAscFnBIlqMJj5BmW8XTh9aOFp3WKHPVj
-        rLGKMOXdTBT5p6DHE98HvkqgzC4DGfu/NGaAMDUaInzB+XOolSKOgd4ekBW3Mc4ZzBsQBU
-        povqt745LleleWuusMmPkejHCPmTY7Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-zDQWX4KjMwav68AebMd7pQ-1; Mon, 25 Jan 2021 08:22:56 -0500
-X-MC-Unique: zDQWX4KjMwav68AebMd7pQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49B6E107ACE8;
-        Mon, 25 Jan 2021 13:22:54 +0000 (UTC)
-Received: from starship (unknown [10.35.206.204])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1901D60936;
-        Mon, 25 Jan 2021 13:22:46 +0000 (UTC)
-Message-ID: <c13849a741793d2f177447efb93f1719f73bf669.camel@redhat.com>
-Subject: Re: [PATCH v2 2/4] KVM: SVM: Add emulation support for #GP
- triggered by SVM instructions
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wei Huang <whuang2@amd.com>, Wei Huang <wei.huang2@amd.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, vkuznets@redhat.com, joro@8bytes.org,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
-        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
-        dgilbert@redhat.com, luto@amacapital.net
-Date:   Mon, 25 Jan 2021 15:22:46 +0200
-In-Reply-To: <YAoCy5C0Zj97iSjN@google.com>
-References: <20210121065508.1169585-1-wei.huang2@amd.com>
-         <20210121065508.1169585-3-wei.huang2@amd.com>
-         <cc55536e913e79d7ca99cbeb853586ca5187c5a9.camel@redhat.com>
-         <c77f4f42-657a-6643-8432-a07ccf3b221e@amd.com>
-         <cd4e3b9a5d5e4b47fa78bfb0ce447e856b18f8c8.camel@redhat.com>
-         <YAoCy5C0Zj97iSjN@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S1729400AbhAZFNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:13:15 -0500
+Received: from mga01.intel.com ([192.55.52.88]:21973 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726304AbhAYJUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 04:20:15 -0500
+IronPort-SDR: 6Z8pwwGR9ZByhUNj53GCp7mwzjsISPKnjUXAb171icLZhlZXZJuJbb/UK4rhfbCiAoS+WnZoRw
+ GDZ+/bmwPMIw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9874"; a="198459800"
+X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
+   d="scan'208";a="198459800"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:26:36 -0800
+IronPort-SDR: krmTHTvV9H1Em7YztLgy8AHyHyDUYxQkj03g7g4NA78ph4D8nEIi8ocAQEiHfrfeZEd2vGIV6W
+ s89XGV2WwhSQ==
+X-IronPort-AV: E=Sophos;i="5.79,373,1602572400"; 
+   d="scan'208";a="387239873"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 00:26:24 -0800
+Subject: Re: [PATCH v3 04/17] perf: x86/ds: Handle guest PEBS overflow PMI and
+ inject it to guest
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Kan Liang <kan.liang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, eranian@google.com,
+        kvm@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Andi Kleen <andi@firstfloor.org>, wei.w.wang@intel.com,
+        luwei.kang@intel.com, linux-kernel@vger.kernel.org,
+        "Xu, Like" <like.xu@intel.com>
+References: <20210104131542.495413-1-like.xu@linux.intel.com>
+ <20210104131542.495413-5-like.xu@linux.intel.com>
+ <X/86UWuV/9yt14hQ@hirez.programming.kicks-ass.net>
+ <9c343e40-bbdf-8af0-3307-5274070ee3d2@intel.com>
+ <YAGEFgqQv281jVHc@hirez.programming.kicks-ass.net>
+ <2c197d5a-09a8-968c-a942-c95d18983c9d@intel.com>
+ <YAGqWNl2FKxVussV@hirez.programming.kicks-ass.net>
+From:   Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <ed5b16cb-30c7-dab7-92c3-b70ba8483d1e@linux.intel.com>
+Date:   Mon, 25 Jan 2021 16:26:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
+In-Reply-To: <YAGqWNl2FKxVussV@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-01-21 at 14:40 -0800, Sean Christopherson wrote:
-> On Thu, Jan 21, 2021, Maxim Levitsky wrote:
-> > BTW, on unrelated note, currently the smap test is broken in kvm-unit tests.
-> > I bisected it to commit 322cdd6405250a2a3e48db199f97a45ef519e226
-> > 
-> > It seems that the following hack (I have no idea why it works,
-> > since I haven't dug deep into the area 'fixes', the smap test for me)
-> > 
-> > -#define USER_BASE      (1 << 24)
-> > +#define USER_BASE      (1 << 25)
-> 
-> https://lkml.kernel.org/r/20210121111808.619347-2-imbrenda@linux.ibm.com
-> 
-Thanks!
+Hi Peter,
 
-Best regards,
-	Maxim Levitsky
+On 2021/1/15 22:44, Peter Zijlstra wrote:
+> On Fri, Jan 15, 2021 at 10:30:13PM +0800, Xu, Like wrote:
+> 
+>>> Are you sure? Spurious NMI/PMIs are known to happen anyway. We have far
+>>> too much code to deal with them.
+>>
+>> https://lore.kernel.org/lkml/20170628130748.GI5981@leverpostej/T/
+>>
+>> In the rr workload, the commit change "the PMI interrupts in skid region
+>> should be dropped"
+>> is reverted since some users complain that:
+>>
+>>> It seems to me that it might be reasonable to ignore the interrupt if
+>>> the purpose of the interrupt is to trigger sampling of the CPUs
+>>> register state.  But if the interrupt will trigger some other
+>>> operation, such as a signal on an fd, then there's no reason to drop
+>>> it.
+>>
+>> I assume that if the PMI drop is unacceptable, either will spurious PMI
+>> injection.
+>>
+>> I'm pretty open if you insist that we really need to do this for guest PEBS
+>> enabling.
+> 
+> That was an entirely different issue. We were dropping events on the
+> floor because they'd passed priv boundaries. So there was an actual
+> event, and we made it go away.
+> 
+> What we're talking about here is raising an PMI with BUFFER_OVF set,
+> even if the DS is empty. That should really be harmless. We'll take the
+> PMI, find there's nothing there, and do nothing.
+> 
 
+In the host and guest PEBS both enabled case,
+we'll get a crazy dmesg *bombing* about spurious PMI warning
+if we pass the host PEBS PMI "harmlessly" to the guest:
+
+[11261.502536] Uhhuh. NMI received for unknown reason 2c on CPU 36.
+[11261.502539] Do you have a strange power saving mode enabled?
+[11261.502541] Dazed and confused, but trying to continue
+
+Legacy guest users may be very confused and dissatisfied with that.
+
+I'm double checking with you if it's acceptable to take the proposal
+"disables the co-existence of guest PEBS and host PEBS" as the first
+step to upstream, and enable both host and guest PEBS in the near future.
+
+---
+thx,likexu
