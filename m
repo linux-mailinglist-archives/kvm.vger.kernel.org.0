@@ -2,119 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EB53304C32
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 23:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D91A304C49
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 23:38:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727252AbhAZWdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:33:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57556 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729634AbhAZRDv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 12:03:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611680539;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I4ZKb8bFlXRVvfL07LOhyv8cAdRu+Z/S+GDSbvfqb1Y=;
-        b=Quyr2BbYcbKL2yiRH2J+TQAj7dwQCXprDhtVQ3k1LYcgNweqBohiMbZdmZxIckNtm1cjxB
-        yPuryyojPhEx4D3Kg+SQcix7geEHv8dXKioXiV9dK28BqWz5ffs3eZkrGPYuTSGa107Ht5
-        ABhQ03+BHZA/PhfKFd8idqfnuBswdtU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-vz9LJ8zWMUGzk8Wbb3Da4Q-1; Tue, 26 Jan 2021 11:47:03 -0500
-X-MC-Unique: vz9LJ8zWMUGzk8Wbb3Da4Q-1
-Received: by mail-ej1-f72.google.com with SMTP id by20so5164481ejc.1
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 08:47:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=I4ZKb8bFlXRVvfL07LOhyv8cAdRu+Z/S+GDSbvfqb1Y=;
-        b=mn0WLJqCgBQTp+Sc0v7yh8KGZgzzS4/sqzteb72jS79N3N0IsUyZugKRgj1REk27CZ
-         3sYX43T98PTTPJrDixtqh0L5hM7mW0oDzjaxcIhY2tnErmpeSv+JWdz8wzyyLl0TCx0e
-         zZpBJBoERYQVoIwVKt+DbXi5w5lX7QshEaqE2z0JGKbyJEbphJhp78ilHXWQQVuVhAD1
-         +XkJcF52pKIdlKPmXY2spqarqPDprzSnG06bXFG0jAD6U4/VIAneazTY6Oxa84RWp6I6
-         0fCkw8JlHfGx0NLEp/qDZ0HI1PW2Psv/ZmnZB2aQXxH7giCfMJ3Z8zlM/KTncWSz9GZ2
-         UiXQ==
-X-Gm-Message-State: AOAM530f12F/gGC9ZYIm7PMbBnUICO+PFAa5uYCJPYmvEA1asYFORXUA
-        cBmFucEPT31aNw1whPhOIRDLqUHcDCtL6L2mEXD6+RD1QxD4dDLh8BQP8K20Tk/lq3N154qmuFY
-        ckNm41VH2mr6K
-X-Received: by 2002:a50:ee94:: with SMTP id f20mr5409155edr.222.1611679622183;
-        Tue, 26 Jan 2021 08:47:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwWAWMTdXHRABB/i4tSZ9e4vzIsNpvFRyrBXtBgagESBXWm++q9yOphXqQ8dkTSGP0xwomHmQ==
-X-Received: by 2002:a50:ee94:: with SMTP id f20mr5409148edr.222.1611679622048;
-        Tue, 26 Jan 2021 08:47:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dj25sm12571694edb.5.2021.01.26.08.47.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 08:47:01 -0800 (PST)
-Subject: Re: [PATCH v2 0/3] Use static_call for kvm_x86_ops
-To:     Jason Baron <jbaron@akamai.com>, seanjc@google.com
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1610680941.git.jbaron@akamai.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7efb7e51-611c-e4eb-be32-fefafb664309@redhat.com>
-Date:   Tue, 26 Jan 2021 17:47:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1729117AbhAZWgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:36:11 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13628 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729577AbhAZRYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 12:24:45 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B601050340000>; Tue, 26 Jan 2021 09:24:04 -0800
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 Jan
+ 2021 17:24:01 +0000
+Received: from HKMAIL101.nvidia.com (10.18.16.10) by HKMAIL102.nvidia.com
+ (10.18.16.11) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 Jan
+ 2021 17:23:58 +0000
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
+ by HKMAIL101.nvidia.com (10.18.16.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 26 Jan 2021 17:23:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EzZyqCDfIplx6QvVY9cyqCbu9NIiue3ushXQt9sdxMyvqDKr8pDMv8D0vRVCj7PVZ7SxCGvuHViFll49zGI9b7XwuzK1pVkJSzHf85v/dFpcPgCXLNo/JGwjEFRZAXRPiRXXpd3yrOgLU+nxG0kbTt6YXaBYXF85Or7cqwT0ZAsY/GSyyuJiimO72QsI6AckwK0CdIFss++aD02DcnisGHERvNfd56fXZ7zrD/Iepy7HlwYfwzPNPe9GFf0Q9BPpvY6LjhqNMVJPo5wPyLbJvt5sTcm6fxM/H2WsHG+gMx5OtzVlCiy8Wo/cK9sIAQAPFJjCIp7ZNfjOsIawSdfniQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5g0pegqcpdUlRveGMYLQQ2W+tvGG8hi7r9v0xewWA0U=;
+ b=Ez4cLjM+zWPynQ1dZlGwwoej6ltmGuUd6nyOmgDFAXFQUzQHfD/uZYO7nyt3eqfID8Q/+qG8rHHHl6Jb3frRLHVunGNebMvUsRL4mAQJu9WNe6QKzLbD3TThVrWoC+c8c4riU5QJjY+OdK2OmbhRXQkeFyfPxLz86y6wtUsTJgBOr7Yds5Weqi0b9dKKAPQlE4DcMTqF9U26zjukqsD6lodbn84haUeROcaAvWA4IXuUcpnrsl3s/a7CqNVaVCSW7Y6Qs7DRRVK0yHT5ZCMVIse19DShfqzRNr/p0OKQE27ets6l705EdqtALyv+DRIHAzXFQgu39tjs4n7Gem6wDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11; Tue, 26 Jan
+ 2021 17:23:56 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727%7]) with mapi id 15.20.3784.019; Tue, 26 Jan 2021
+ 17:23:56 +0000
+Date:   Tue, 26 Jan 2021 13:23:54 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>
+Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
+Message-ID: <20210126172354.GH4147@nvidia.com>
+References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+ <20210122122503.4e492b96@omen.home.shazbot.org>
+ <20210122200421.GH4147@nvidia.com>
+ <20210125172035.3b61b91b.cohuck@redhat.com>
+ <20210125180440.GR4147@nvidia.com>
+ <20210125163151.5e0aeecb@omen.home.shazbot.org>
+ <20210126004522.GD4147@nvidia.com>
+ <20210125203429.587c20fd@x1.home.shazbot.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210125203429.587c20fd@x1.home.shazbot.org>
+X-ClientProxiedBy: MN2PR17CA0036.namprd17.prod.outlook.com
+ (2603:10b6:208:15e::49) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <cover.1610680941.git.jbaron@akamai.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR17CA0036.namprd17.prod.outlook.com (2603:10b6:208:15e::49) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Tue, 26 Jan 2021 17:23:55 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l4S4I-0077tE-Oe; Tue, 26 Jan 2021 13:23:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1611681844; bh=5g0pegqcpdUlRveGMYLQQ2W+tvGG8hi7r9v0xewWA0U=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=NHRmAGj4QRzRPBhVOHN63QqHjsX/v30i2XaU2XgnJU4qZRbxGkEuAzA3itOq6nKCe
+         823oTeaPiNiD7Y3XSeUVvAQX23Pzs9rb1+AbGNvV6j1hCQlFJS8uZ+EOQ8VMigpC2I
+         FHF6kLf3F2BjEOBsuu3QaUleg08BUnQZ8+mXq0+WyQ45IsVldZP63nB+S5oVWmasQi
+         fvZZtuBTjK9FneDTAyo2FHVX8L7ycE5QF9qL9MdBVTlAQK/SITv8bXBek4Pf6mT0ri
+         INJCDNBpor8eVIw5wqrovxSHHUrdWoigIPUEhNJ+43jggDvteBCrgIe4Rw4UxMuzB4
+         DnAuOzQCS08Lg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/01/21 04:27, Jason Baron wrote:
-> Hi,
-> 
-> Convert kvm_x86_ops to use static_call. Shows good performance
-> gains for cpuid loop micro-benchmark (results in patch 3/3).
+On Mon, Jan 25, 2021 at 08:34:29PM -0700, Alex Williamson wrote:
 
-Queued, thanks.
+> > someting like this was already tried in May and didn't go anywhere -
+> > are you surprised that we are reluctant to commit alot of resources
+> > doing a complete job just to have it go nowhere again?
+> 
+> That's not really what I'm getting from your feedback, indicating
+> vfio-pci is essentially done, the mlx stub driver should be enough to
+> see the direction, and additional concerns can be handled with TODO
+> comments. 
 
-Paolo
+I think we are looking at this RFC in different ways. I see it as
+largely "done" showing the general design of few big ideas:
 
-> Thanks,
-> 
-> -Jason
-> 
-> 
-> Changes from v1:
-> -Introduce kvm-x86-ops header with eye towards using this to define
->   svm_x86_ops and vmx_x86_ops in follow on patches (Paolo, Sean)
-> -add new patch (1/3), that adds a vmx/svm prefix to help facilitate
->   svm_x86_ops and vmx_x86_ops future conversions.
-> -added amd perf numbres to description of patch 3/3
-> 
-> Jason Baron (3):
->    KVM: X86: append vmx/svm prefix to additional kvm_x86_ops functions
->    KVM: x86: introduce definitions to support static calls for kvm_x86_ops
->    KVM: x86: use static calls to reduce kvm_x86_ops overhead
-> 
->   arch/x86/include/asm/kvm-x86-ops.h | 127 +++++++++++++++
->   arch/x86/include/asm/kvm_host.h    |  21 ++-
->   arch/x86/kvm/cpuid.c               |   2 +-
->   arch/x86/kvm/hyperv.c              |   4 +-
->   arch/x86/kvm/irq.c                 |   3 +-
->   arch/x86/kvm/kvm_cache_regs.h      |  10 +-
->   arch/x86/kvm/lapic.c               |  30 ++--
->   arch/x86/kvm/mmu.h                 |   6 +-
->   arch/x86/kvm/mmu/mmu.c             |  15 +-
->   arch/x86/kvm/mmu/spte.c            |   2 +-
->   arch/x86/kvm/pmu.c                 |   2 +-
->   arch/x86/kvm/svm/svm.c             |  20 +--
->   arch/x86/kvm/trace.h               |   4 +-
->   arch/x86/kvm/vmx/nested.c          |   2 +-
->   arch/x86/kvm/vmx/vmx.c             |  30 ++--
->   arch/x86/kvm/vmx/vmx.h             |   2 +-
->   arch/x86/kvm/x86.c                 | 307 +++++++++++++++++++------------------
->   arch/x86/kvm/x86.h                 |   6 +-
->   18 files changed, 369 insertions(+), 224 deletions(-)
->   create mode 100644 arch/x86/include/asm/kvm-x86-ops.h
-> 
+ - new vfio drivers will be creating treating VFIO PCI as a "VFIO bus
+   driver" library
+ - These new drivers are PCI devices bound via driver core as peers to
+   vfio-pci, vs sub drivers of vfio-pci
+ - It uses the subsystem -> driver -> library pattern for composing drivers
+   instead of the subsystem -> midlayer -> driver pattern mdev/platform use
+ - It will have some driver facing API from vfio-pci-core that is
+   close to what is shown in the RFC
+ - The drivers can "double bind" in the driver core to access the PF
+   resources via aux devices from the VF VFIO driver.
 
+The point of a RFC discussion is to try to come to some community
+understanding on a general high level direction.
+
+It is not a perfectly polished illustration of things that shouldn't
+be contentious or technically hard. There are alot of things that can
+be polished here, this illustration has lots of stuff in vfio-pci-core
+that really should be in vfio-pci - it will take time and effort to
+properly split things up and do a great job here.
+
+> Sorry if this is not construed as actual feedback, I think both
+> Connie and I are making an effort to understand this and being
+> hampered by lack of a clear api or a vendor driver that's anything
+> more than vfio-pci plus an aux bus interface.  Thanks,
+
+I appreciate the effort, and there is a lot to understand here. Most
+of this stuff is very new technology and not backed by industry
+standards bodies.
+
+I really do think this simplified RFC will help the process - I've
+seen the internal prototype and it is a mass of opaque device specific
+code. Max's V2 should flesh things out more.
+
+Thanks,
+Jason
