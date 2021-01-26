@@ -2,91 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E563E305C79
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:08:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4D62305C69
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:05:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313790AbhAZWqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:46:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26069 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730581AbhAZSYn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 13:24:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611685397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mTz7Xoz/xvXYECYSVr5bsWFWwC4zp+4NtN2NN+NvbGo=;
-        b=ZWFW8MMLx3OVDdnmV16otIcGQqgpy1RrC5Tt1VnW8uBI+FJwMSX+ZnZsZ8bcoeVkBN/TbD
-        6WLa14A2GNVIVZmD5s32MmmysSwtXgKKmyjE/FeZ+VH5xMCcTr0N162AaMerz0SOjKR6vz
-        gDdfYnI3jnI2odGZZJvRj3jIvNnpFWc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-k6iah8YAOsqS9e6gFb3HLg-1; Tue, 26 Jan 2021 13:23:15 -0500
-X-MC-Unique: k6iah8YAOsqS9e6gFb3HLg-1
-Received: by mail-ej1-f70.google.com with SMTP id q11so5278719ejd.0
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 10:23:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mTz7Xoz/xvXYECYSVr5bsWFWwC4zp+4NtN2NN+NvbGo=;
-        b=qEVsOtcRoLojn7pO09e1dnsqVB5B0hrO3/yvmhV5RsbDTL9YPOZYwtbJe0s/ja2UE4
-         PhpaHDhlJri6LtFi/WgJvk3vA21hXSvGCKmDeC/4TOBg88X+xzmGhNuixVo1KZayrRJt
-         ElZo5ccMjalBMt3iJZqs+kfiVj/6w6DUQxac6D71agWHaDPLIjMr1it+0q5cvGqPIybF
-         Xe4vT5sPhoHO3hKEURXKs6YMf8EeHDRyHn+Aipo/4v+EmXPF8zrpnrb2nX2rZYxOnLby
-         Y3mA2uWVD4HUTFNkykwCaqaFu7oM6jeDjS/yv6JF9oWcMEEMnYLj/CEYwsVYS2bq3ChE
-         nKDQ==
-X-Gm-Message-State: AOAM532hl9QJx/qIfyJUZV2osrf42bpexwqz3fl1IKkRAdHxWtW7OUaB
-        LMQddySFONm2agTQnyF2+GcyTwcB1OIaER5ApaR/woM2O3B18lnkR8Cs51kfQuPhgseZy/6wN2G
-        lOuUH21yoNHw6
-X-Received: by 2002:a05:6402:304e:: with SMTP id bu14mr5340156edb.60.1611685394064;
-        Tue, 26 Jan 2021 10:23:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzr51I20o6O5R03Qzlo4pmpOKwtbS3ynzLph+LxnPczeJmRRvNM0dj1mdVqb/N74vT5qUFbNQ==
-X-Received: by 2002:a05:6402:304e:: with SMTP id bu14mr5340145edb.60.1611685393882;
-        Tue, 26 Jan 2021 10:23:13 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id y2sm1522942ejd.27.2021.01.26.10.23.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 10:23:13 -0800 (PST)
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-6-chenyi.qiang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC 5/7] KVM: MMU: Add support for PKS emulation
-Message-ID: <0689bda9-e91a-2b06-3dd6-f78572879296@redhat.com>
-Date:   Tue, 26 Jan 2021 19:23:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S313819AbhAZWqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:46:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388455AbhAZTHB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 14:07:01 -0500
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88298C061574;
+        Tue, 26 Jan 2021 11:06:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=zUcP2Ekow40wDr8LQu56g1JOWBLSxsWCwNUDwttWnJY=; b=ad84LgFWJ8FgdoRvBSNVnAdb+
+        0I6Sw5zFHnURG6DddKEQ8HbimmJVGhfZNBE+p4AhrkuGcqgL8wXJS/82Ulh3PCv17KG3N45R7A4lo
+        nmAWv3AnHF/mSc9xZD1jBN9qCv/KUXD01csQwhWLG+rkGDTkxKX1bLlQ1gn5TyX5Nq4qryobh41F5
+        DB4HHmb9nD2Xu3mV8TLNo+8B+nWoKTBy48lo4Q1JucKdB4IQ7QCREGM7mwYt646OKNjClWNUO1E6M
+        j60U9ebf7BAEOHy7IwgCDiy4Xjl4pjGwcbLID7o2kdNIzvVrdpvSEcEUXs6vOb5LBBAMtPHo30HE4
+        oAMpwR9Vw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53070)
+        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1l4TeW-0004lN-0N; Tue, 26 Jan 2021 19:05:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
+        (envelope-from <linux@shell.armlinux.org.uk>)
+        id 1l4TeJ-00042E-C4; Tue, 26 Jan 2021 19:05:11 +0000
+Date:   Tue, 26 Jan 2021 19:05:11 +0000
+From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-rtc@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-serial@vger.kernel.org, coresight@lists.linaro.org,
+        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-spi@vger.kernel.org, linux-i2c@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de, Leo Yan <leo.yan@linaro.org>,
+        dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        Mike Leach <mike.leach@linaro.org>
+Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
+Message-ID: <20210126190511.GK1551@shell.armlinux.org.uk>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
+ <3e42b2ea-c713-31b2-9c86-c49a70d8e1f4@arm.com>
+ <20210126175652.3caoqfnsky2es42f@pengutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20200807084841.7112-6-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210126175652.3caoqfnsky2es42f@pengutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Sender: Russell King - ARM Linux admin <linux@armlinux.org.uk>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/08/20 10:48, Chenyi Qiang wrote:
-> 
->  		if (pte_access & PT_USER_MASK)
->  			pkr_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
-> +		else if (!kvm_get_msr(vcpu, MSR_IA32_PKRS, &pkrs))
-> +			pkr_bits = (pkrs >> (pte_pkey * 2)) & 3;
+On Tue, Jan 26, 2021 at 06:56:52PM +0100, Uwe Kleine-König wrote:
+> I'm surprised to see that the remove callback introduced in 2952ecf5df33
+> ("coresight: etm4x: Refactor probing routine") has an __exit annotation.
 
-You should be able to always use vcpu->arch.pkrs here.  So
+In general, remove callbacks should not have an __exit annotation.
+__exit _can_ be discarded at link time for built-in stuff.
 
-pkr = pte_access & PT_USER_MASK ? vcpu->arch.pkru : vcpu->arch.pkrs;
-pkr_bits = (pkr >> pte_pkey * 2) & 3;
-
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
