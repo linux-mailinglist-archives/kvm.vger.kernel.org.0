@@ -2,106 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EC46303C5F
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 13:02:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3480303C68
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 13:03:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405577AbhAZMBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 07:01:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30594 "EHLO
+        id S2405481AbhAZMBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 07:01:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28083 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391345AbhAZMAs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 07:00:48 -0500
+        by vger.kernel.org with ESMTP id S2405206AbhAZMBb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 07:01:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611662352;
+        s=mimecast20190719; t=1611662399;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PGWpLftuQjuNLzaye3U4GXzH5jHxTUQ43zYa3q7xdcE=;
-        b=hKIGYgMUljJgZRUHU9TGFzWh2YZ0fZIdJg54m4FdWSQQcOxJXB9d98ULx/NE+9y9X24drI
-        d2hV/yKXhx4N/gwwSRyDmSkSuiqo01i8sX7yBylqd1Kl5g2dyLt9pqO8cMWFjDwxob79Cj
-        Fw6LL5qZbQscQSVvnEBT8TZvzCHU0bU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-oTmVKqaWNvSu76-UInbsmQ-1; Tue, 26 Jan 2021 06:59:10 -0500
-X-MC-Unique: oTmVKqaWNvSu76-UInbsmQ-1
-Received: by mail-ej1-f69.google.com with SMTP id h18so4844883ejx.17
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 03:59:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PGWpLftuQjuNLzaye3U4GXzH5jHxTUQ43zYa3q7xdcE=;
-        b=e/SPuji2iDWBnYh1XUu+KxZPOCPKpnFcvA9HaX8aW9ejgeCe7riDal7KZhfTfPmQVo
-         fsbqMXczDkXr8FA/xzfXiA/aVzZlkKDzIp3KIqJcfPqVRgAzZRTRx1v7NeCzZzzRklZh
-         c9g+6p5ll0EEUyWVC6V0/JPNLzH5zlqRZAOuRHdgGNRLDE4hP/ixM6lGecXVLDj/iLT4
-         m8/AHOZyU0jzabuOJpPimCVrA7TbN5gAFAZjMdJ4gdjpCBr5/v3knmvm8w0pNbWNrXKw
-         AAb+y7XIuNTYwNSQDo/ZWny+0AYPvSPlrA2BOKitBP/hXShpjOrELDqlE/9RgTAa1M66
-         UHmg==
-X-Gm-Message-State: AOAM532OAXyZQX1ZfrqvgP6zidpTuTNnDVeayzog4gYVG4EJOqcC+vak
-        iJv9vku2wMJc+R0+fWL0Dt20MKKk22jYWb1NxiTidfmsqPpvqJeVDwb5Ur0vOrl2kCcT6GyQLSY
-        RHS6YXquFEifp
-X-Received: by 2002:aa7:d489:: with SMTP id b9mr4351200edr.374.1611662349166;
-        Tue, 26 Jan 2021 03:59:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzIyFPHtxFmVQ3d8XTjk6mdNMKe92Qtm419gPqr857txoSLgGP0zBfu8z/i+vQBWTylyc4YNQ==
-X-Received: by 2002:aa7:d489:: with SMTP id b9mr4351186edr.374.1611662348992;
-        Tue, 26 Jan 2021 03:59:08 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id a11sm12275795edt.26.2021.01.26.03.59.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 03:59:08 -0800 (PST)
-Subject: Re: [PATCH] perf/intel: Remove Perfmon-v4 counter_freezing support
-To:     "Xu, Like" <like.xu@intel.com>
-Cc:     Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephane Eranian <eranian@google.com>
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201110151257.GP2611@hirez.programming.kicks-ass.net>
- <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
- <CABPqkBS+-g0qbsruAMfOJf-Zfac8nz9v2LCWfrrvVd+ptoLxZg@mail.gmail.com>
- <2ce24056-0711-26b3-a62c-3bedc88d7aa7@intel.com>
- <9a85e154-d552-3478-6e99-3f693b3da7ed@redhat.com>
- <0d26d8fc-5192-afbc-abab-88dd3d428eca@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d8cb6532-ee76-0bb4-3fc9-e14483a17517@redhat.com>
-Date:   Tue, 26 Jan 2021 12:59:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=0K+uxPNJ6B3Dq1KRGq+oPPt+0m7OL0bJ7iaA9EZ6ZgM=;
+        b=bi8m2JZ+8GoT33FjE+ojG//yGmkbosWHa1KiEU4f4d+89uAjrQjZVQbaxjaVddxJhFY9JD
+        EBEX+GbLAKVz+YRT91J/5ZtpyewE6aEiStU20PfAm14l6xuJs/Dnx0RH5Y5TsRSApBuZ3b
+        DJVxe12AQbCaHu1oGHQ2dL7vH6TrfcE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-544-w5tS4UMfMiCqw4OIpTAjVw-1; Tue, 26 Jan 2021 06:59:58 -0500
+X-MC-Unique: w5tS4UMfMiCqw4OIpTAjVw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AACF180A086;
+        Tue, 26 Jan 2021 11:59:56 +0000 (UTC)
+Received: from starship (unknown [10.35.206.204])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 71B6460C62;
+        Tue, 26 Jan 2021 11:59:49 +0000 (UTC)
+Message-ID: <b636e2d15ab17302265ef932575f26647b7a959f.camel@redhat.com>
+Subject: Re: [PATCH v3 4/4] KVM: SVM: Support #GP handling for the case of
+ nested on nested
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Wei Huang <wei.huang2@amd.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, seanjc@google.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, luto@amacapital.net
+Date:   Tue, 26 Jan 2021 13:59:48 +0200
+In-Reply-To: <20210126081831.570253-5-wei.huang2@amd.com>
+References: <20210126081831.570253-1-wei.huang2@amd.com>
+         <20210126081831.570253-5-wei.huang2@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-In-Reply-To: <0d26d8fc-5192-afbc-abab-88dd3d428eca@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/01/21 12:35, Xu, Like wrote:
->>
+On Tue, 2021-01-26 at 03:18 -0500, Wei Huang wrote:
+> Under the case of nested on nested (L0->L1->L2->L3), #GP triggered by
+> SVM instructions can be hided from L1. Instead the hypervisor can
+> inject the proper #VMEXIT to inform L1 of what is happening. Thus L1
+> can avoid invoking the #GP workaround. For this reason we turns on
+> guest VM's X86_FEATURE_SVME_ADDR_CHK bit for KVM running inside VM to
+> receive the notification and change behavior.
 > 
-> Ah, now we have the v3 version on guest PEBS feature.
-> It does not rely on counter_freezing, but disables the co-existence of 
-> guest PEBS and host PEBS.
-> I am not clear about your attitude towards this co-existence.
+> Similarly we check if vcpu is under guest mode before emulating the
+> vmware-backdoor instructions. For the case of nested on nested, we
+> let the guest handle it.
 > 
-> There are also more interesting topics for you to review and comment.
-> Please check 
-> https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/ 
+> Co-developed-by: Bandan Das <bsd@redhat.com>
+> Signed-off-by: Bandan Das <bsd@redhat.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Tested-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index f9233c79265b..83c401d2709f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -929,6 +929,9 @@ static __init void svm_set_cpu_caps(void)
+>  
+>  		if (npt_enabled)
+>  			kvm_cpu_cap_set(X86_FEATURE_NPT);
+> +
+> +		/* Nested VM can receive #VMEXIT instead of triggering #GP */
+> +		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
+>  	}
+>  
+>  	/* CPUID 0x80000008 */
+> @@ -2198,6 +2201,11 @@ static int svm_instr_opcode(struct kvm_vcpu *vcpu)
+>  
+>  static int emulate_svm_instr(struct kvm_vcpu *vcpu, int opcode)
+>  {
+> +	const int guest_mode_exit_codes[] = {
+> +		[SVM_INSTR_VMRUN] = SVM_EXIT_VMRUN,
+> +		[SVM_INSTR_VMLOAD] = SVM_EXIT_VMLOAD,
+> +		[SVM_INSTR_VMSAVE] = SVM_EXIT_VMSAVE,
+> +	};
+>  	int (*const svm_instr_handlers[])(struct vcpu_svm *svm) = {
+>  		[SVM_INSTR_VMRUN] = vmrun_interception,
+>  		[SVM_INSTR_VMLOAD] = vmload_interception,
+> @@ -2205,7 +2213,14 @@ static int emulate_svm_instr(struct kvm_vcpu *vcpu, int opcode)
+>  	};
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> -	return svm_instr_handlers[opcode](svm);
+> +	if (is_guest_mode(vcpu)) {
+> +		svm->vmcb->control.exit_code = guest_mode_exit_codes[opcode];
+> +		svm->vmcb->control.exit_info_1 = 0;
+> +		svm->vmcb->control.exit_info_2 = 0;
+> +
+> +		return nested_svm_vmexit(svm);
+> +	} else
+> +		return svm_instr_handlers[opcode](svm);
+>  }
+>  
+>  /*
+> @@ -2239,7 +2254,8 @@ static int gp_interception(struct vcpu_svm *svm)
+>  		 * VMware backdoor emulation on #GP interception only handles
+>  		 * IN{S}, OUT{S}, and RDPMC.
+>  		 */
+> -		return kvm_emulate_instruction(vcpu,
+> +		if (!is_guest_mode(vcpu))
+> +			return kvm_emulate_instruction(vcpu,
+>  				EMULTYPE_VMWARE_GP | EMULTYPE_NO_DECODE);
+>  	} else
+>  		return emulate_svm_instr(vcpu, opcode);
 
-Thanks Like, I'll review that one.
+To be honest I expected the vmware backdoor fix to be in a separate patch,
+but I see that Paulo already took these patches so I guess it is too late.
 
-Paolo
+Anyway I am very happy to see this workaround merged, and see that bug
+disappear forever.
+
+Best regards,
+	Maxim Levitsky
 
