@@ -2,170 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BBB0305C61
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7739305C65
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:04:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313825AbhAZWqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:46:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50982 "EHLO
+        id S313838AbhAZWrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:47:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395340AbhAZTPq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 14:15:46 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0CCC061788
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:15:06 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id r38so6164644pgk.13
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:15:06 -0800 (PST)
+        with ESMTP id S2404868AbhAZT7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 14:59:40 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A06C061573
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:56:57 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id a20so2640995pjs.1
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:56:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=7PjVCLjYFXyjmxqV/lyzID0J0aEXBM2goYbT8N0cVdM=;
-        b=N4qij7ElZXoW1edUjouKX7sa4B7PcH7S1ydi7zNInVxG98fDfQBwvWzAsPMCiXfAIi
-         SwHvVjKK5tkLgarR+fR9Gr/pyisr1XQUoa32306zwNGoFGGjXd+a1wwkTsed9uIkigvU
-         JheRiZjqYzetJS+Y60ZD6kh92Ot6U2lumGY28k1RZgy07h4/3lLjxckmNwnDprtZe5Td
-         rjK75ljLmnhqu/oUJ5o4l4db8W6r2oRtZWSs+HHdKAVjLD0CadqLdY6D6X+rT3PnN4zj
-         BxndHPd0RluJldv52zCGzT9lBalqFCFNWBB9pZW+YCYOqvaXK4mn+ScGpLrday1Oz8Dn
-         obtQ==
+        bh=hervW6EmeE0bUtuRL9vcYVnY7YSYLWn8MveytrZ0nZQ=;
+        b=qrFAe65qFyZ/Jm3VFlx3HN6JJ5W2QGezVf/WAkrBTJt8+W0rW5mCG4WHo1TtBk76yl
+         TPbyD86vbPHpohAbsIdxIdRdszyok8O0lfUzno/BLLHEnpZwlYg+b0Pb/uLFTdDhERbE
+         e7uVM1jzFOJeKptrEvcXBCDU/eh6C8ErSgxVUiQ+Vk1lqoTsz5A0WVe5v6krnsvAeN9S
+         4t2axDcO7gsj4wvEi7mQfupo86UVPvG3EZDn7QshQicPzvlAUY5ozEvZFKX1kjSQfGDB
+         sCDj5H6bwYW7WLmTFacf5JDR0TxtAY/RqhxfVdc/oNKv9YQhgFyAhRKQmVxnmUR0cYAh
+         xyiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=7PjVCLjYFXyjmxqV/lyzID0J0aEXBM2goYbT8N0cVdM=;
-        b=NRHOCY6lRNmRkaIep+LUJ7bKRHZ8FqWNCw3FGfHp3Lo3lHgsQCxl42tDCi2sTmn5hv
-         NavZx6ufPENGWjG7io1quuhC54WVFihaKdBLpgoBRexevR9ygG4+LAM6ecq1vLseYz5m
-         CH8qxzykgOqZLf2MWsCGT8kxiWlwjZwdIdvZBAmHKh8InGHtd/1aI4usR4ByhyE2nQpB
-         aUxkUZZKxyourVP3yFy/4XPz13vt+gHDY8QPimy0vRcL8JE4IWALETWbl36vgw5AqJDY
-         +8nGK+RBSmw2CM42bb4bezyQOehCnJcixm1Nf5gWzqvTFBQMsrnfr225QkcBBBuqrenE
-         g3Aw==
-X-Gm-Message-State: AOAM531d2oVrJcmbN0sREIaR+iX6cVpRwwe4gknAvoMCylPSQ+7qSmCr
-        qF3At428cUZZcMVSKim8SmrIZmDgU7lNtQ==
-X-Google-Smtp-Source: ABdhPJywTF+70hdYYm6QZYKpIt1JIx4lGygSfSPQrTqWQ+lxlJJDsLxSag8n7PPPKhewpWJCupqstg==
-X-Received: by 2002:a05:6a00:16c7:b029:1b6:68a6:985a with SMTP id l7-20020a056a0016c7b02901b668a6985amr6557419pfc.44.1611688505551;
-        Tue, 26 Jan 2021 11:15:05 -0800 (PST)
+        bh=hervW6EmeE0bUtuRL9vcYVnY7YSYLWn8MveytrZ0nZQ=;
+        b=V+OguungeDr4kU6cZNOLPvIPVktAyhldLk/fFTS7r5Yk/xQ8h/kGwEi2iBiAyMcB/s
+         d5u4fYe6kujXI27RX8q82helR45hBtvfu0bULoWb0yVNHQdu1ri1BS2ugKHBkPhxdN7Y
+         r9WrlR+Fy6ZeqUEKplvIJ72GVEZocLr5h37NHVgdQhsVj7oc12XN/iSyD7bvt3CQiv8P
+         HTVGX/Jsa52BOFxFxknDU2VPwoZe5YE0Qd4YU/iL3s7aBdvF3QQNHbD1EwAfeocD1Tdd
+         D+Ud0+hbeDYKRZfKxn9SUs7Qm7fBSIB5eoKmhuRjTx9cBnYybftOLCsNTQE/pjTDMGkQ
+         IFiQ==
+X-Gm-Message-State: AOAM531G39+WR6pQuaBAXmbeY6LB5S03TcQnsJDILHBJwSxcgERnGaBP
+        KdWa5jDmhyDALvalDKj8AcgwzQ==
+X-Google-Smtp-Source: ABdhPJylmT3DEwnXCHQM9+FpzEzTz+Bt4NTcqMlNMvIbyUolctm2eugoRfQz7CbKlKcq8ip9OQepSw==
+X-Received: by 2002:a17:902:c195:b029:de:30af:7d84 with SMTP id d21-20020a170902c195b02900de30af7d84mr7859787pld.15.1611691016989;
+        Tue, 26 Jan 2021 11:56:56 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id b65sm21356534pga.54.2021.01.26.11.15.04
+        by smtp.gmail.com with ESMTPSA id d22sm2900575pjv.11.2021.01.26.11.56.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 11:15:04 -0800 (PST)
-Date:   Tue, 26 Jan 2021 11:14:58 -0800
+        Tue, 26 Jan 2021 11:56:56 -0800 (PST)
+Date:   Tue, 26 Jan 2021 11:56:49 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Fix unsynchronized access to sev members through
- svm_register_enc_region
-Message-ID: <YBBqMkd7zGkNqnaL@google.com>
-References: <20210126185431.1824530-1-pgonda@google.com>
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC 6/7] KVM: X86: Expose PKS to guest and userspace
+Message-ID: <YBB0AT6xfObR7A5l@google.com>
+References: <20200807084841.7112-1-chenyi.qiang@intel.com>
+ <20200807084841.7112-7-chenyi.qiang@intel.com>
+ <CALMp9eQ=QUZ04_26eXBGHqvQYnsN6JEgiV=ZSSrE395KLX-atA@mail.gmail.com>
+ <20200930043634.GA29319@linux.intel.com>
+ <c8f39e4e-75e1-8089-f8ef-9931ce14339f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210126185431.1824530-1-pgonda@google.com>
+In-Reply-To: <c8f39e4e-75e1-8089-f8ef-9931ce14339f@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021, Peter Gonda wrote:
-> sev_pin_memory assumes that callers hold the kvm->lock. This was true for
-> all callers except svm_register_enc_region since it does not originate
-
-This doesn't actually state what change it being made, is only describes the
-problem. I'd also reword these sentences to avoid talking about assumptions, and
-instead use stronger language.
- 
-> from svm_mem_enc_op. Also added lockdep annotation to help prevent
-
-s/Also added/Add, i.e. describe what the patch is doing, not what you did in the
-past.
-
-E.g.
-
-  Grab kvm->lock before pinning memory when registering an encrypted
-  region; sev_pin_memory() relies on kvm->lock being held to ensure
-  correctness when checking and updating the number of pinned pages.
-
-  Add a lockdep assertion to help prevent future regressions.
-
-> future regressions.
+On Tue, Jan 26, 2021, Paolo Bonzini wrote:
+> On 30/09/20 06:36, Sean Christopherson wrote:
+> > > CR4.PKS is not in the list of CR4 bits that result in a PDPTE load.
+> > > Since it has no effect on PAE paging, I would be surprised if it did
+> > > result in a PDPTE load.
+> > It does belong in the mmu_role_bits though;-)
+> > 
 > 
-> Tested: Booted SEV enabled VM on host.
+> Does it?  We don't support PKU/PKS for shadow paging, and it's always zero
+> for EPT.  We only support enough PKU/PKS for emulation.
 
-Personally I'd just leave this out.  Unless stated otherwise, it's implied that
-you've tested the patch.
+As proposed, yes.  The PKU/PKS mask is tracked on a per-mmu basis, e.g. computed
+in update_pkr_bitmask() and consumed in permission_fault() during emulation.
+Omitting CR4.PKS from the extended role could let KVM reuse an MMU with the
+wrong pkr_mask.
 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Fixes: 116a2214c5173 (KVM: SVM: Pin guest memory when SEV is active)
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> 
-> ---
->  arch/x86/kvm/svm.c | 16 +++++++++-------
->  1 file changed, 9 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index afdc5b44fe9f..9884e57f3d0f 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -1699,6 +1699,8 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
->  	struct page **pages;
->  	unsigned long first, last;
->  
-> +	lockdep_assert_held(&kvm->lock);
-> +
->  	if (ulen == 0 || uaddr + ulen < uaddr)
->  		return NULL;
->  
-> @@ -7228,12 +7230,19 @@ static int svm_register_enc_region(struct kvm *kvm,
->  	if (!region)
->  		return -ENOMEM;
->  
-> +	mutex_lock(&kvm->lock);
->  	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
->  	if (!region->pages) {
->  		ret = -ENOMEM;
->  		goto e_free;
+That being said, I don't think it needs a dedicated bit.  IIUC, the logic is
+PKU|PKS, with pkr_mask generation being PKU vs. PKS agnostic.  The role could do
+the same and smush the bits together, e.g.
 
-This error path needs to do mutex_unlock().
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3d6616f6f6ef..3bfca34f6ea2 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -293,7 +293,7 @@ union kvm_mmu_extended_role {
+                unsigned int cr0_pg:1;
+                unsigned int cr4_pae:1;
+                unsigned int cr4_pse:1;
+-               unsigned int cr4_pke:1;
++               unsigned int cr4_pkr:1;
+                unsigned int cr4_smap:1;
+                unsigned int cr4_smep:1;
+                unsigned int maxphyaddr:6;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 79166288ed03..2774b85a36d5 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4448,7 +4448,8 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
+        ext.cr4_smep = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMEP);
+        ext.cr4_smap = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
+        ext.cr4_pse = !!is_pse(vcpu);
+-       ext.cr4_pke = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE);
++       ext.cr4_pkr = !!kvm_read_cr4_bits(vcpu, X86_CR4_PKE) ||
++                     !!kvm_read_cr4_bits(vcpu, X86_CR4_PKS);
+        ext.maxphyaddr = cpuid_maxphyaddr(vcpu);
 
->  	}
->  
-> +	region->uaddr = range->addr;
-> +	region->size = range->size;
-> +
-> +	list_add_tail(&region->list, &sev->regions_list);
-> +	mutex_unlock(&kvm->lock);
-> +
->  	/*
->  	 * The guest may change the memory encryption attribute from C=0 -> C=1
->  	 * or vice versa for this memory range. Lets make sure caches are
-> @@ -7242,13 +7251,6 @@ static int svm_register_enc_region(struct kvm *kvm,
->  	 */
->  	sev_clflush_pages(region->pages, region->npages);
->  
-> -	region->uaddr = range->addr;
-> -	region->size = range->size;
-> -
-> -	mutex_lock(&kvm->lock);
-> -	list_add_tail(&region->list, &sev->regions_list);
-> -	mutex_unlock(&kvm->lock);
-> -
->  	return ret;
->  
->  e_free:
-> -- 
-> 2.30.0.280.ga3ce27912f-goog
+        ext.valid = 1;
+
+
+Another option would be to move the tracking out of the MMU, e.g. make pkr_mask
+per-vCPU and recalculate when CR4 changes.  I think that would "just work", even
+when nested VMs are in play?
