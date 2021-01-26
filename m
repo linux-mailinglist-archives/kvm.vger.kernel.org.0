@@ -2,174 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2A83054B0
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 08:32:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79A2F30552C
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:02:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234051AbhA0Han (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 02:30:43 -0500
-Received: from mga01.intel.com ([192.55.52.88]:22053 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S317634AbhA0A2g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 19:28:36 -0500
-IronPort-SDR: Yq/2NHrir+6usoHunWTLp5kZ7Jnq1O3PHbax5cRnRds+LP/aQ6PAi5t1f5sYA+M7tyx/7Bp3DY
- t1QLXe301H8A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="198790176"
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="198790176"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:27:26 -0800
-IronPort-SDR: 93zSoQRhoTr+FJAOHXwz5Kxax+qQhTnUxPUvUfEDUlBhg/lm4+/RZg3bxir3BXNHf6GpWOprm/
- jH3UtsEgo/CA==
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="410341207"
-Received: from kalinapo-mobl.amr.corp.intel.com (HELO [10.209.85.22]) ([10.209.85.22])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:27:25 -0800
-Subject: Re: [RFC PATCH v3 06/27] x86/sgx: Introduce virtual EPC for use by
- KVM guests
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1611634586.git.kai.huang@intel.com>
- <8492ee41e947aa8151007e5ecbd9ef8914dd8827.1611634586.git.kai.huang@intel.com>
- <c9da1c45-d4be-e0af-2b67-5408217deb34@intel.com>
- <20210127131655.d560b6be8b897471d770f54c@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <7fbdb7f9-c7b0-d4f1-6e36-d99c6a116b82@intel.com>
-Date:   Tue, 26 Jan 2021 16:27:25 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232297AbhA0ICE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 03:02:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31045 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S316819AbhAZXUX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 18:20:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611703104;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4OdvhWfvpqKJBMkO76bzbcesHusgnA0tJfh2KQFq/HA=;
+        b=jQHIGDYZA8AekEZCNQLOzjDf8IlXoZea4lYlxp1zjtLt0pQbMrrd0Xe1zujDfBPs9s/XXB
+        bY+835q3bncXhwZU28VLG36emJ/rMbzuJneygGTdYH1V9AeLBi04ZqjvC64kg+QveNSHvB
+        PmoDF3WyJurpz3RKWPjvlE79Lsw+NMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-FgtfIRLvNNC0y9WWvwFm2w-1; Tue, 26 Jan 2021 18:18:20 -0500
+X-MC-Unique: FgtfIRLvNNC0y9WWvwFm2w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB496107ACE3;
+        Tue, 26 Jan 2021 23:18:18 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1338A5D766;
+        Tue, 26 Jan 2021 23:18:18 +0000 (UTC)
+Date:   Tue, 26 Jan 2021 16:18:17 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] vfio-pci/zdev: Introduce the zPCI I/O vfio region
+Message-ID: <20210126161817.683485e0@omen.home.shazbot.org>
+In-Reply-To: <9c363ff5-b76c-d697-98e2-cf091a404d15@linux.ibm.com>
+References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
+        <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+        <20210122164843.269f806c@omen.home.shazbot.org>
+        <9c363ff5-b76c-d697-98e2-cf091a404d15@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210127131655.d560b6be8b897471d770f54c@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/21 4:16 PM, Kai Huang wrote:
-> On Tue, 26 Jan 2021 08:19:25 -0800 Dave Hansen wrote:
->> Also, a one-line summary about what's in here would be nice next to the
->> copyright (which needs to be updated).
->>
->> /*
->>  * Device driver to expose SGX enclave memory to KVM guests.
->>  *
->>  * Copyright(c) 2016-20 Intel Corporation.
->>  */
-> 
-> Will do. However the year should not be 2016-20, but should be 2021, right?
-> 
-> I think it has been ignored since the day Sean wrote the file.
+On Mon, 25 Jan 2021 09:40:38 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Yes, should be 2021.  Also, there shouldn't be *ANY* parts of these
-files which you, the submitter and newly-minted effective maintainer,
-have ignored.
-
-It sounds like you owe us some homework to give every line of these a
-once-over.
-
-...
->>> +struct sgx_vepc {
->>> +	struct xarray page_array;
->>> +	struct mutex lock;
->>> +};
->>> +
->>> +static struct mutex zombie_secs_pages_lock;
->>> +static struct list_head zombie_secs_pages;
->>
->> Comments would be nice for this random lock and list.
->>
->> The main core functions (fault, etc...) are looking OK to me.
+> On 1/22/21 6:48 PM, Alex Williamson wrote:
+> > On Tue, 19 Jan 2021 15:02:30 -0500
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >   
+> >> Some s390 PCI devices (e.g. ISM) perform I/O operations that have very
+> >> specific requirements in terms of alignment as well as the patterns in
+> >> which the data is read/written. Allowing these to proceed through the
+> >> typical vfio_pci_bar_rw path will cause them to be broken in up in such a
+> >> way that these requirements can't be guaranteed. In addition, ISM devices
+> >> do not support the MIO codepaths that might be triggered on vfio I/O coming
+> >> from userspace; we must be able to ensure that these devices use the
+> >> non-MIO instructions.  To facilitate this, provide a new vfio region by
+> >> which non-MIO instructions can be passed directly to the host kernel s390
+> >> PCI layer, to be reliably issued as non-MIO instructions.
+> >>
+> >> This patch introduces the new vfio VFIO_REGION_SUBTYPE_IBM_ZPCI_IO region
+> >> and implements the ability to pass PCISTB and PCILG instructions over it,
+> >> as these are what is required for ISM devices.  
+> > 
+> > There have been various discussions about splitting vfio-pci to allow
+> > more device specific drivers rather adding duct tape and bailing wire
+> > for various device specific features to extend vfio-pci.  The latest
+> > iteration is here[1].  Is it possible that such a solution could simply
+> > provide the standard BAR region indexes, but with an implementation that
+> > works on s390, rather than creating new device specific regions to
+> > perform the same task?  Thanks,
+> > 
+> > Alex
+> > 
+> > [1]https://lore.kernel.org/lkml/20210117181534.65724-1-mgurtovoy@nvidia.com/
+> >   
 > 
-> Thanks. How about below comment?
-> 
-> /*
->  * List to temporarily hold SECS pages that cannot be EREMOVE'd due to
->  * having child in other virtual EPC instances, and the lock to protect it.
->  */
+> Thanks for the pointer, I'll have to keep an eye on this.  An approach 
+> like this could solve some issues, but I think a main issue that still 
+> remains with relying on the standard BAR region indexes (whether using 
+> the current vfio-pci driver or a device-specific driver) is that QEMU 
+> writes to said BAR memory region are happening in, at most, 8B chunks 
+> (which then, in the current general-purpose vfio-pci code get further 
+> split up into 4B iowrite operations).  The alternate approach I'm 
+> proposing here is allowing for the whole payload (4K) in a single 
+> operation, which is significantly faster.  So, I suspect even with a 
+> device specific driver we'd want this sort of a region anyhow..
 
-Fine.  It's just a bit silly to say that it's a list.  It's also not so
-temporary.  Pages can live on here forever.
+Why is this device specific behavior?  It would be a fair argument that
+acceptable device access widths for MMIO are always device specific, so
+we should never break them down.  Looking at the PCI spec, a TLP
+requires a dword (4-byte) aligned address with a 10-bit length field
+indicating the number of dwords, so up to 4K data as you suggest is the
+whole payload.  It's quite possible that the reason we don't have more
+access width problems is that MMIO is typically mmap'd on other
+platforms.  We get away with using the x-no-mmap=on flag for debugging,
+but it's not unheard of that the device also doesn't work quite
+correctly with that flag, which could be due to access width or timing
+difference.
 
->>> +	INIT_LIST_HEAD(&zombie_secs_pages);
->>> +	mutex_init(&zombie_secs_pages_lock);
->>> +
->>> +	return misc_register(&sgx_vepc_dev);
->>> +}
->>> diff --git a/arch/x86/kernel/cpu/sgx/virt.h b/arch/x86/kernel/cpu/sgx/virt.h
->>> new file mode 100644
->>> index 000000000000..44d872380ca1
->>> --- /dev/null
->>> +++ b/arch/x86/kernel/cpu/sgx/virt.h
->>> @@ -0,0 +1,14 @@
->>> +/* SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause) */
->>> +#ifndef _ASM_X86_SGX_VIRT_H
->>> +#define _ASM_X86_SGX_VIRT_H
->>> +
->>> +#ifdef CONFIG_X86_SGX_KVM
->>> +int __init sgx_vepc_init(void);
->>> +#else
->>> +static inline int __init sgx_vepc_init(void)
->>> +{
->>> +	return -ENODEV;
->>> +}
->>> +#endif
->>> +
->>> +#endif /* _ASM_X86_SGX_VIRT_H */
->>
->> Is more going to go in this header?  It's a little sparse as-is.
-> 
-> No there's no more. The sgx_vepc_init() function declaration needs to be here
-> since sgx/main.c needs to use it.
-> 
-> May I know your suggestion?
+So really, I don't see why we wouldn't want to maintain the guest
+access width through QEMU and the kernel interface for all devices.  It
+seems like that should be our default vfio-pci implementation.  I think
+we chose the current width based on the QEMU implementation that was
+already splitting accesses, and it (mostly) worked.  Thanks,
 
-I'd toss it in some other existing header that has more meat in it.  I'm
-lazy.
+Alex
 
