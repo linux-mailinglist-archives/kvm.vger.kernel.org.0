@@ -2,107 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 844A130439B
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 17:19:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F1BB3043C0
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 17:25:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392387AbhAZQSj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 11:18:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20119 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391045AbhAZQSW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 11:18:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611677816;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K2XqO2IE9er0Vnt1upnepDYuDbwSqa6/W7rjIB2a0Ho=;
-        b=U6wrDmjD60c72056rjTZ34AT+uroUMcvPBBlFKENDHGNn72birBTJGcBJ9IdBCjETEvHwT
-        fB4U1jgnQj2CAlxia3rKOAgLn/QKxf5HQTlArVC0Xw6uDQN9NGdlEMcQHaL9uaWO+GUeNm
-        33ABN34QZqc1JoL0xeAx3JJKqnZNSKI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-ZZp3Ul2mNh6TYZmURosNMg-1; Tue, 26 Jan 2021 11:16:54 -0500
-X-MC-Unique: ZZp3Ul2mNh6TYZmURosNMg-1
-Received: by mail-ed1-f69.google.com with SMTP id f21so9666417edx.23
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 08:16:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K2XqO2IE9er0Vnt1upnepDYuDbwSqa6/W7rjIB2a0Ho=;
-        b=Vi15tkPLGVZIwfi6pt9fGNMtmPzGvPyVIebirp6r4XSfHKRjmI0SJwzb+P4CHOUIGb
-         SdowLf1oY+q5j0+3cJvlYWUoYLl98rWhe/+Q8JlxBtsC8V8mbk5R2Y+ghUj2Zx5gvaPQ
-         LsQbuHnxJoPBSHqZoJbtCA5vvsSVwpKghsZ776DeDbFb4nSgAv8sIA9esRviFccU00KU
-         Vs2EAZyxFHIgkCquMjwDZrtHGVLIJL4fKvjvgk+isnUNB7FQxF/KOqPyBzGRPQJ5mBTw
-         JvXLZFkK+546lmwPNZrfRbJj4eQA9F/NmSrSorCX4+/WGM5/4wsFn9tGW03ZEVO+SxU3
-         9MAA==
-X-Gm-Message-State: AOAM532Ge3vLCgxIYYlTD0Fs7zoiubK+quuSWIcR6depRBhY1RYN7g0D
-        SnQuDAMWIwflT5PX/8z1LBeiP2m8a0a8sn1cQ3VLt76XcOyRkhMsp6R9keKaIkxulkuMVS2aEJU
-        WFK5nK9nzvYRi
-X-Received: by 2002:aa7:c0cd:: with SMTP id j13mr5088183edp.217.1611677813162;
-        Tue, 26 Jan 2021 08:16:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzwUVsa1+h9mV52lborPQq/Yk6OPqXNM0aFL8OSySGRwHH9vH27Wb1FYyZrYpGpuWxXNKwoPw==
-X-Received: by 2002:aa7:c0cd:: with SMTP id j13mr5088176edp.217.1611677813034;
-        Tue, 26 Jan 2021 08:16:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k22sm12960851edv.33.2021.01.26.08.16.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 08:16:51 -0800 (PST)
-Subject: Re: [PATCH v4 4/6] sev/i386: Don't allow a system reset under an
- SEV-ES guest
-To:     Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        David Hildenbrand <david@redhat.com>
-References: <cover.1601060620.git.thomas.lendacky@amd.com>
- <c40de4c1bf4d14d60942fba86b2827543c19374a.1601060620.git.thomas.lendacky@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <66a57543-a98a-d62e-5213-e203efda5dce@redhat.com>
-Date:   Tue, 26 Jan 2021 17:16:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2392840AbhAZQYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 11:24:43 -0500
+Received: from mga12.intel.com ([192.55.52.136]:11143 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392833AbhAZQUL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 11:20:11 -0500
+IronPort-SDR: Svs+UayE6nTHvCa1jMuaL313MripE8O2yY0+y0myMMD8OK/vEpBU1kheQHc23e9yOxW6D7dQms
+ 9SZMjmWUXYFQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="159103220"
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="159103220"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 08:19:28 -0800
+IronPort-SDR: XQaf9syrw8ta8wzGMBajh0AfIpm/bAkuxgeSOaYMV9yBa40+IF3/t67CFn6FA0mmrXK7moQ3/O
+ gqGaj8BxJGzA==
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="369152507"
+Received: from ekfraser-mobl1.amr.corp.intel.com (HELO [10.209.173.94]) ([10.209.173.94])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 08:19:25 -0800
+Subject: Re: [RFC PATCH v3 06/27] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+References: <cover.1611634586.git.kai.huang@intel.com>
+ <8492ee41e947aa8151007e5ecbd9ef8914dd8827.1611634586.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <c9da1c45-d4be-e0af-2b67-5408217deb34@intel.com>
+Date:   Tue, 26 Jan 2021 08:19:25 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <c40de4c1bf4d14d60942fba86b2827543c19374a.1601060620.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <8492ee41e947aa8151007e5ecbd9ef8914dd8827.1611634586.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/09/20 21:03, Tom Lendacky wrote:
-> 
->  {
-> -    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
-> +    if (!cpus_are_resettable()) {
-> +        error_report("cpus are not resettable, terminating");
-> +        shutdown_requested = reason;
-> +    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
+I'd also like to see some comments about code sharing between this and
+the main driver.  For instance, this *could* try to share 99% of the
+->fault function.  Why doesn't it?  I'm sure there's a good reason.
 
-The error should not be emitted if "no_reboot && reason != 
-SHUTDOWN_CAUSE_SUBSYSTEM_RESET" (the condition has changed a bit in 
-latest QEMU but the idea is the same).
+> diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+> new file mode 100644
+> index 000000000000..e1ad7856d878
+> --- /dev/null
+> +++ b/arch/x86/kernel/cpu/sgx/virt.c
+> @@ -0,0 +1,254 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*  Copyright(c) 2016-20 Intel Corporation. */
+> +
+> +#define pr_fmt(fmt)	"SGX virtual EPC: " fmt
 
-This is because whoever invoked QEMU could already know about this 
-SEV-ES limitation, and use -no-reboot (aka -action reset=shutdown in 
-6.0) in order to change the forbidden warm reset into a shutdown+restart 
-cold reset.
+Does this actually get used anywhere?  Also, isn't this a bit long?  Maybe:
 
-Paolo
+#define pr_fmt(fmt)	"sgx/virt: " fmt
 
+Also, a one-line summary about what's in here would be nice next to the
+copyright (which needs to be updated).
+
+/*
+ * Device driver to expose SGX enclave memory to KVM guests.
+ *
+ * Copyright(c) 2016-20 Intel Corporation.
+ */
+
+
+> +#include <linux/miscdevice.h>
+> +#include <linux/mm.h>
+> +#include <linux/mman.h>
+> +#include <linux/sched/mm.h>
+> +#include <linux/sched/signal.h>
+> +#include <linux/slab.h>
+> +#include <linux/xarray.h>
+> +#include <asm/sgx.h>
+> +#include <uapi/asm/sgx.h>
+> +
+> +#include "encls.h"
+> +#include "sgx.h"
+> +#include "virt.h"
+> +
+> +struct sgx_vepc {
+> +	struct xarray page_array;
+> +	struct mutex lock;
+> +};
+> +
+> +static struct mutex zombie_secs_pages_lock;
+> +static struct list_head zombie_secs_pages;
+
+Comments would be nice for this random lock and list.
+
+The main core functions (fault, etc...) are looking OK to me.
+
+...
+> +int __init sgx_vepc_init(void)
+> +{
+> +	/* SGX virtualization requires KVM to work */
+> +	if (!boot_cpu_has(X86_FEATURE_VMX) || !IS_ENABLED(CONFIG_KVM_INTEL))
+> +		return -ENODEV;
+
+Can this even be built without IS_ENABLED(CONFIG_KVM_INTEL)?
+
+> +	INIT_LIST_HEAD(&zombie_secs_pages);
+> +	mutex_init(&zombie_secs_pages_lock);
+> +
+> +	return misc_register(&sgx_vepc_dev);
+> +}
+> diff --git a/arch/x86/kernel/cpu/sgx/virt.h b/arch/x86/kernel/cpu/sgx/virt.h
+> new file mode 100644
+> index 000000000000..44d872380ca1
+> --- /dev/null
+> +++ b/arch/x86/kernel/cpu/sgx/virt.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause) */
+> +#ifndef _ASM_X86_SGX_VIRT_H
+> +#define _ASM_X86_SGX_VIRT_H
+> +
+> +#ifdef CONFIG_X86_SGX_KVM
+> +int __init sgx_vepc_init(void);
+> +#else
+> +static inline int __init sgx_vepc_init(void)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif
+> +
+> +#endif /* _ASM_X86_SGX_VIRT_H */
+
+Is more going to go in this header?  It's a little sparse as-is.
