@@ -2,184 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9054304742
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 19:58:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F7E530473D
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 19:57:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389845AbhAZRH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 12:07:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43804 "EHLO
+        id S2389892AbhAZRHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 12:07:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57004 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388426AbhAZJ1D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 04:27:03 -0500
+        by vger.kernel.org with ESMTP id S2405781AbhAZQdE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 11:33:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611653123;
+        s=mimecast20190719; t=1611678697;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=psqoQb8M1ZbviHk/oEAqOvlNRFhfySafJPPh42D8Lw4=;
-        b=ay3NRozza3vwriETa+Q9bIiGvOmgLHqxpJGOjFSvtisUfQZ83C5omw+XiGbv0H66qY4XPW
-        dkTSMAo4EjVRZhlXY+rNtWgV4SOefKoTjGWDk4wyseui65Hnay5rVRYBpsYns/MrEINtsM
-        A/X+gg/Y9YpvgLVbjroPUU6BboRsnHE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-mIcOVE8GP9eo2QUNwwWZ3A-1; Tue, 26 Jan 2021 04:25:22 -0500
-X-MC-Unique: mIcOVE8GP9eo2QUNwwWZ3A-1
-Received: by mail-ed1-f72.google.com with SMTP id u17so9125709edi.18
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 01:25:21 -0800 (PST)
+        bh=l2Y2CW5pjrTFlbr8X4jblLq+HUbom2Mq//dMTHDECc4=;
+        b=G1kElh2ViZR4Go6CInLb1NKXE/tlBwekhKQcySHCqbEw+Z6GBapxJXELZFiqgK8eQgoHAL
+        nG7ghaQ3ZHjIgnpPgkg+uuqfSsAWunojFz8fHkXPAr+01nYSYDOec92xKcDSSZquojCCLK
+        SPw7oe6Qz0c39Gd95DkVvjpdxI2yuyU=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-SoRhWuqOP_-uy63K7UM9Lw-1; Tue, 26 Jan 2021 11:31:35 -0500
+X-MC-Unique: SoRhWuqOP_-uy63K7UM9Lw-1
+Received: by mail-ej1-f72.google.com with SMTP id dc21so5140047ejb.19
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 08:31:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=psqoQb8M1ZbviHk/oEAqOvlNRFhfySafJPPh42D8Lw4=;
-        b=oMrITW8fwJy3dOsKIEe2ddt4ycJJ8wM1yGOV5yUCldb3BUFRlCnHENxG3h9IDfQFIh
-         0X0m/pKNVY7OhJ5kE1sV0jt1e16YKH9rT5DqI/pbAkFNkjE0SuUMDwNGGfo34aIXkoN6
-         6efyKZWv8E+eByBIKkTBv1M3apTtm3krvdS434mUOlafxNHDMC5XruIzPfZoYN/cjDpA
-         9dszeWu23w4G0lGCDvmO1c6FlO0SzE7na+jzNBjPfwv6Hf6PZlGtvElCG0qeuy/cowba
-         Nn0FpNArXOaOvT1u4CK9XpvZHTsSsnLRFSU3JdWlvD13Eg+gxaYEto/WFcF5G7jjRgcu
-         nzxQ==
-X-Gm-Message-State: AOAM531bbL7nnKs3naGMCQfMpwJTNPIj0XfjjkGcBEmp31Vo7gLPLKr5
-        5I85AVE+RPkwzkESQKXDWfZN/8DsEjwbNpO4QzlbO2fKXAorqetIUMnk1wZ4eY9a6hSCuCGeITB
-        Mb5isn3XJNUgW
-X-Received: by 2002:a05:6402:22db:: with SMTP id dm27mr3928101edb.379.1611653120905;
-        Tue, 26 Jan 2021 01:25:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzu8Mz662tDQlLDu7zmLZYNOETmSPQR4ZpjatODnRxEFNL9lQpsbL3OLGnygCaYP90+CIh/Ew==
-X-Received: by 2002:a05:6402:22db:: with SMTP id dm27mr3928090edb.379.1611653120709;
-        Tue, 26 Jan 2021 01:25:20 -0800 (PST)
+        bh=l2Y2CW5pjrTFlbr8X4jblLq+HUbom2Mq//dMTHDECc4=;
+        b=bxWwHMnXxl1EUD+IPlNZCINKpYj8NSZXP+cd/nfMvZ3LCom/EXdzIIXSFOhZnYF2jO
+         FBNANIAMbSLvnZ5EmjtODIQoXgN7HNFd5N+K71TBaOx6VN/lxQMKy8oo74KDpsF5H44y
+         YC2TAsr3aJLndfo7BGbKTm543WzogSNwMZS2JS2FsEnh83R7QiikKVZqyxrdZdc3SSt5
+         lhWFUT1Edzui4q/utouMNwPImayFDUpC5crgVJMTbE2NznTrW4J0o5VMjAzuq+oBMRf9
+         Vqby+6rlEhnyQrabqcAR+7CTJHjkwsR4i1C6MlXG7iura1QVEm2/A/c05DBGcFimRpo8
+         rYfw==
+X-Gm-Message-State: AOAM5302fLDXrNSErT1ISKmRBJNg68mHYvL6dStuU1fAoy7+QiVWVP1k
+        bT26HDb52/C5lzHHfwlhof2/GU8N3L0Ar6ac8z0SkVAQihgUnua0Dwc/ZQghO2qPzpcIJE5MSUY
+        SzxgMrYwu/D2b
+X-Received: by 2002:a05:6402:18f:: with SMTP id r15mr5431819edv.53.1611678694420;
+        Tue, 26 Jan 2021 08:31:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzDEiGhXDOZ0je0P9Euzn3jEWrj0fTIiNEG/VxaB9/orPDlLcBP1w6rnV42V12/9yYMlN4/YA==
+X-Received: by 2002:a05:6402:18f:: with SMTP id r15mr5431795edv.53.1611678694193;
+        Tue, 26 Jan 2021 08:31:34 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id v25sm9550672ejw.21.2021.01.26.01.25.18
+        by smtp.gmail.com with ESMTPSA id m26sm9947142ejr.54.2021.01.26.08.31.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 01:25:19 -0800 (PST)
-Subject: Re: [RESEND v13 01/10] KVM: x86: Move common set/get handler of
- MSR_IA32_DEBUGCTLMSR to VMX
-To:     Like Xu <like.xu@linux.intel.com>,
+        Tue, 26 Jan 2021 08:31:33 -0800 (PST)
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210108013704.134985-1-like.xu@linux.intel.com>
- <20210108013704.134985-2-like.xu@linux.intel.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210108064924.1677-1-chenyi.qiang@intel.com>
+ <20210108064924.1677-2-chenyi.qiang@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a77477a2-cc64-ec8d-1258-f3222b6a358a@redhat.com>
-Date:   Tue, 26 Jan 2021 10:25:18 +0100
+Subject: Re: [RESEND PATCH 1/2] KVM: X86: Add support for the emulation of
+ DR6_BUS_LOCK bit
+Message-ID: <fc29c63f-7820-078a-7d92-4a7adf828067@redhat.com>
+Date:   Tue, 26 Jan 2021 17:31:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210108013704.134985-2-like.xu@linux.intel.com>
+In-Reply-To: <20210108064924.1677-2-chenyi.qiang@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/01/21 02:36, Like Xu wrote:
-> SVM already has specific handlers of MSR_IA32_DEBUGCTLMSR in the
-> svm_get/set_msr, so the x86 common part can be safely moved to VMX.
+On 08/01/21 07:49, Chenyi Qiang wrote:
+> To avoid breaking the CPUs without bus lock detection, activate the
+> DR6_BUS_LOCK bit (bit 11) conditionally in DR6_FIXED_1 bits.
 > 
-> Add vmx_supported_debugctl() to refactor the throwing logic of #GP.
+> The set/clear of DR6_BUS_LOCK is similar to the DR6_RTM in DR6
+> register. The processor clears DR6_BUS_LOCK when bus lock debug
+> exception is generated. (For all other #DB the processor sets this bit
+> to 1.) Software #DB handler should set this bit before returning to the
+> interrupted task.
 > 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Reviewed-by: Andi Kleen <ak@linux.intel.com>
-> ---
->   arch/x86/kvm/vmx/capabilities.h |  5 +++++
->   arch/x86/kvm/vmx/vmx.c          | 19 ++++++++++++++++---
->   arch/x86/kvm/x86.c              | 13 -------------
->   3 files changed, 21 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 3a1861403d73..a58cf3655351 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -378,4 +378,9 @@ static inline u64 vmx_get_perf_capabilities(void)
->   	return PMU_CAP_FW_WRITES;
->   }
+> For VM exit caused by debug exception, bit 11 of the exit qualification
+> is set to indicate that a bus lock debug exception condition was
+> detected. The VMM should emulate the exception by clearing bit 11 of the
+> guest DR6.
+
+Please rename DR6_INIT to DR6_ACTIVE_LOW, and then a lot of changes 
+become simpler:
+
+> -		dr6 |= DR6_BD | DR6_RTM;
+> +		dr6 |= DR6_BD | DR6_RTM | DR6_BUS_LOCK;
+
+dr6 |= DR6_BD | DR6_ACTIVE_LOW;
+
+>   		ctxt->ops->set_dr(ctxt, 6, dr6);
+>   		return emulate_db(ctxt);
+>   	}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index cce0143a6f80..3d8a0e30314f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1860,7 +1860,7 @@ static void svm_sync_dirty_debug_regs(struct kvm_vcpu *vcpu)
+>   	get_debugreg(vcpu->arch.db[2], 2);
+>   	get_debugreg(vcpu->arch.db[3], 3);
+>   	/*
+> -	 * We cannot reset svm->vmcb->save.dr6 to DR6_FIXED_1|DR6_RTM here,
+> +	 * We cannot reset svm->vmcb->save.dr6 to DR6_FIXED_1|DR6_RTM|DR6_BUS_LOCK here,
+
+We cannot reset svm->vmcb->save.dr6 to DR6_ACTIVE_LOW
+
+>   	 * because db_interception might need it.  We can do it before vmentry.
+>   	 */
+>   	vcpu->arch.dr6 = svm->vmcb->save.dr6;
+> @@ -1911,7 +1911,7 @@ static int db_interception(struct vcpu_svm *svm)
+>   	if (!(svm->vcpu.guest_debug &
+>   	      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP)) &&
+>   		!svm->nmi_singlestep) {
+> -		u32 payload = (svm->vmcb->save.dr6 ^ DR6_RTM) & ~DR6_FIXED_1;
+> +		u32 payload = (svm->vmcb->save.dr6 ^ (DR6_RTM|DR6_BUS_LOCK)) & ~DR6_FIXED_1;
+
+u32 payload = svm->vmcb->save.dr6 ^ DR6_ACTIVE_LOW;
+
+>   		kvm_queue_exception_p(&svm->vcpu, DB_VECTOR, payload);
+>   		return 1;
+>   	}
+> @@ -3778,7 +3778,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+>   	if (unlikely(svm->vcpu.arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT))
+>   		svm_set_dr6(svm, vcpu->arch.dr6);
+>   	else
+> -		svm_set_dr6(svm, DR6_FIXED_1 | DR6_RTM);
+> +		svm_set_dr6(svm, DR6_FIXED_1 | DR6_RTM | DR6_BUS_LOCK);
+
+svm_set_dr6(svm, DR6_ACTIVE_LOW);
+
 >   
-> +static inline u64 vmx_supported_debugctl(void)
-> +{
-> +	return DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF;
-> +}
-> +
->   #endif /* __KVM_X86_VMX_CAPS_H */
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2af05d3b0590..23b46327527e 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1924,6 +1924,9 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
->   			return 1;
->   		goto find_uret_msr;
-> +	case MSR_IA32_DEBUGCTLMSR:
-> +		msr_info->data = 0;
-> +		break;
->   	default:
->   	find_uret_msr:
->   		msr = vmx_find_uret_msr(vmx, msr_info->index);
-> @@ -2002,9 +2005,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   						VM_EXIT_SAVE_DEBUG_CONTROLS)
->   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
->   
-> -		ret = kvm_set_msr_common(vcpu, msr_info);
-> -		break;
-> -
-> +		if (!data) {
-> +			/* We support the non-activated case already */
-> +			return 0;
-> +		} else if (data & ~vmx_supported_debugctl()) {
-> +			/*
-> +			 * Values other than LBR and BTF are vendor-specific,
-> +			 * thus reserved and should throw a #GP.
-> +			 */
-> +			return 1;
-> +		}
-> +		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
-> +			    __func__, data);
-> +		return 0;
->   	case MSR_IA32_BNDCFGS:
->   		if (!kvm_mpx_supported() ||
->   		    (!msr_info->host_initiated &&
+>   	clgi();
+>   	kvm_load_guest_xsave_state(vcpu);
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index e2f26564a12d..c5d71a9b3729 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -412,7 +412,7 @@ static int nested_vmx_check_exception(struct kvm_vcpu *vcpu, unsigned long *exit
+>   			if (!has_payload) {
+>   				payload = vcpu->arch.dr6;
+>   				payload &= ~(DR6_FIXED_1 | DR6_BT);
+> -				payload ^= DR6_RTM;
+> +				payload ^= DR6_RTM | DR6_BUS_LOCK;
+
+payload &= ~DR6_BT;
+payload ^= DR6_ACTIVE_LOW;
+
+>   			}
+>   			*exit_qual = payload;
+>   		} else
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0287840b93e0..c765fd72a66c 100644
+> index 3f7c1fc7a3ce..06de2b9e57f3 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -3063,18 +3063,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			return 1;
->   		}
->   		break;
-> -	case MSR_IA32_DEBUGCTLMSR:
-> -		if (!data) {
-> -			/* We support the non-activated case already */
-> -			break;
-> -		} else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
-> -			/* Values other than LBR and BTF are vendor-specific,
-> -			   thus reserved and should throw a #GP */
-> -			return 1;
-> -		} else if (report_ignored_msrs)
-> -			vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
-> -				    __func__, data);
-> -		break;
->   	case 0x200 ... 0x2ff:
->   		return kvm_mtrr_set_msr(vcpu, msr, data);
->   	case MSR_IA32_APICBASE:
-> @@ -3347,7 +3335,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	switch (msr_info->index) {
->   	case MSR_IA32_PLATFORM_ID:
->   	case MSR_IA32_EBL_CR_POWERON:
-> -	case MSR_IA32_DEBUGCTLMSR:
->   	case MSR_IA32_LASTBRANCHFROMIP:
->   	case MSR_IA32_LASTBRANCHTOIP:
->   	case MSR_IA32_LASTINTFROMIP:
-> 
+> @@ -483,19 +483,20 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu)
+>   		 */
+>   		vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+>   		/*
+> -		 * DR6.RTM is set by all #DB exceptions that don't clear it.
+> +		 * DR6.RTM and DR6.BUS_LOCK are set by all #DB exceptions
+> +		 * that don't clear it.
+>   		 */
+> -		vcpu->arch.dr6 |= DR6_RTM;
+> +		vcpu->arch.dr6 |= DR6_RTM | DR6_BUS_LOCK;
+>   		vcpu->arch.dr6 |= payload;
+>   		/*
+> -		 * Bit 16 should be set in the payload whenever the #DB
+> -		 * exception should clear DR6.RTM. This makes the payload
+> -		 * compatible with the pending debug exceptions under VMX.
+> -		 * Though not currently documented in the SDM, this also
+> -		 * makes the payload compatible with the exit qualification
+> -		 * for #DB exceptions under VMX.
+> +		 * Bit 16/Bit 11 should be set in the payload whenever
+> +		 * the #DB exception should clear DR6.RTM/DR6.BUS_LOCK.
+> +		 * This makes the payload compatible with the pending debug
+> +		 * exceptions under VMX. Though not currently documented in
+> +		 * the SDM, this also makes the payload compatible with the
+> +		 * exit qualification for #DB exceptions under VMX.
+>   		 */
+> -		vcpu->arch.dr6 ^= payload & DR6_RTM;
+> +		vcpu->arch.dr6 ^= payload & (DR6_RTM | DR6_BUS_LOCK);
 
-Queued, thanks.
+vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+vcpu->arch.dr6 |= DR6_ACTIVE_LOW;
+vcpu->arch.dr6 |= payload;
+vcpu->arch.dr6 ^= payload & DR6_ACTIVE_LOW;
+
+(with comments :))
+
+and so on.
+
+Thanks!
 
 Paolo
+
+>   
+>   		/*
+>   		 * The #DB payload is defined as compatible with the 'pending
+> @@ -1126,6 +1127,9 @@ static u64 kvm_dr6_fixed(struct kvm_vcpu *vcpu)
+>   
+>   	if (!guest_cpuid_has(vcpu, X86_FEATURE_RTM))
+>   		fixed |= DR6_RTM;
+> +
+> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
+> +		fixed |= DR6_BUS_LOCK;
+>   	return fixed;
+>   }
+>   
+> @@ -7197,7 +7201,8 @@ static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu)
+>   	struct kvm_run *kvm_run = vcpu->run;
+>   
+>   	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> -		kvm_run->debug.arch.dr6 = DR6_BS | DR6_FIXED_1 | DR6_RTM;
+> +		kvm_run->debug.arch.dr6 = DR6_BS | DR6_FIXED_1 | DR6_RTM |
+> +					  DR6_BUS_LOCK;
+>   		kvm_run->debug.arch.pc = kvm_get_linear_rip(vcpu);
+>   		kvm_run->debug.arch.exception = DB_VECTOR;
+>   		kvm_run->exit_reason = KVM_EXIT_DEBUG;
+> @@ -7241,7 +7246,8 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+>   					   vcpu->arch.eff_db);
+>   
+>   		if (dr6 != 0) {
+> -			kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1 | DR6_RTM;
+> +			kvm_run->debug.arch.dr6 = dr6 | DR6_FIXED_1 | DR6_RTM |
+> +						  DR6_BUS_LOCK;
+>   			kvm_run->debug.arch.pc = eip;
+>   			kvm_run->debug.arch.exception = DB_VECTOR;
+>   			kvm_run->exit_reason = KVM_EXIT_DEBUG;
+> 
 
