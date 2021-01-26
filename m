@@ -2,202 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31DF7305C34
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 13:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D0E2305C32
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 13:56:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313928AbhAZWuL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:50:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51484 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727388AbhAZVki (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 16:40:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611697151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sxqv5yUwQFbVFgh+iPBiF0//0KbZRTwceB6ZVlVRKSA=;
-        b=AW7JEShcWPu+ifBZ88niDa4QeIcjhJvctHfpzQ2L9LE8ibruF2DtTrGHr9fDnzGx3gw1h/
-        PRz3olYh12G4uzBqlpWP/AiYSS8ZQaTiwvSLmtCrVs+kDrcJuOrMkfO55kDhZuim65Snum
-        RPTQ2TMX6i2m/VzwdLf29SgtHV1zBaI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-sMtPW2MROReVkyT0Erv8lQ-1; Tue, 26 Jan 2021 16:39:08 -0500
-X-MC-Unique: sMtPW2MROReVkyT0Erv8lQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E55CB8017FB;
-        Tue, 26 Jan 2021 21:39:05 +0000 (UTC)
-Received: from [10.10.112.247] (ovpn-112-247.rdu2.redhat.com [10.10.112.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E300863746;
-        Tue, 26 Jan 2021 21:38:57 +0000 (UTC)
-Subject: Re: [PATCH v2 8/9] tests/docker: Add dockerfile for Alpine Linux
-To:     Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
-        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
-        qemu-block@nongnu.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-devel@nongnu.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
- <20210118063808.12471-9-jiaxun.yang@flygoat.com>
- <20210118103345.GE1789637@redhat.com>
- <929c3ec1-9419-908a-6b5e-ce3ae78f6011@redhat.com>
-From:   John Snow <jsnow@redhat.com>
-Message-ID: <551e153e-34da-28bd-c67f-d2a688ad987b@redhat.com>
-Date:   Tue, 26 Jan 2021 16:38:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S313937AbhAZWu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:50:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727164AbhAZVsd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 16:48:33 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9AD6C061574
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 13:47:48 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id u8so23702206ior.13
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 13:47:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sSSrXGvO8Z5hv7xtQeYdUiuVK+ZbsiIIMn3oXAULpI4=;
+        b=vwcxZkQYFgpHES10yvP73GnKhcwtFR+wZHdjDBADyCrRSu+XPzZ2hXQ5Bb/exEYlWR
+         MIOoJbX8ezhURWPB3j2ROFiyvufhanogg6Ypc+5udiiIdaJjNPCDX7/QfiQVELWSUXoQ
+         MiKeez34nkY+8w5kJzfNv0ndQZx4z97LqBPJKmw9jpR1CwNwlIncvmYCDrXb6c4rYP5h
+         m2Yxxeq/rozHeOAw8Mvg/KAWsCr81e7kCmhgLsoSfHAV2zEIvS4CRjuywWdJz61aVMY1
+         m+4JiZDzErOeCtUzlgWksuWSDz9Q13FB+T3ywpIrsXcbsKajgCRyda1FRXZ6c8ONHQ51
+         6V1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sSSrXGvO8Z5hv7xtQeYdUiuVK+ZbsiIIMn3oXAULpI4=;
+        b=dcRG2RyJgTtc+oXpzHG2wPcL7XpXbA+88N/MSF0Odc2rWpOpVoCH0hqP9ovrgheaB8
+         yogyl490Zpxn6gXYpKJIF8IvsR8Ji9lWdW7HoRAj1PLNmAv8z+RwTst1AnB5/mmPkBb6
+         CUI5n4bjw8z+ww2E7CKIlex5woNQufGn/wSL7ggkvFawCXkgop5pEuySZCzaIASRu+Jq
+         MZAqxegBSVVKLYI2MC7vIM/e+g5L01zT/UWXe1bohMB9iZw2a3ZUTbur0gSTMIouB4A4
+         sOC87DNBK2/HmS4+sivAzkSE7IewFIbFh+Xb2QmL6bNJcGn7/VOOcKZhTKziNYvBRzIR
+         yJNg==
+X-Gm-Message-State: AOAM532DLy9pUUuEUiV74b1iR3cMNyMszkhEtbBKPiP2GBfIbLgGrNna
+        JYFVjALgfTkdh3oJpdIN9Jhk1xiFk5Qjq3Hju/dIYA==
+X-Google-Smtp-Source: ABdhPJym1IbTbCJL80K6b5KLebAuPvM9zalpis45wQ2maBqJ/OyDGaiq1pi5bBF6WekfQBxjPg68vjrxAw5MMWK1cag=
+X-Received: by 2002:a92:60f:: with SMTP id x15mr3804039ilg.203.1611697667926;
+ Tue, 26 Jan 2021 13:47:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <929c3ec1-9419-908a-6b5e-ce3ae78f6011@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20210112181041.356734-1-bgardon@google.com> <20210112181041.356734-20-bgardon@google.com>
+ <YAnUhCocizx97FWL@google.com> <YAnzB3Uwn3AVTXGN@google.com> <335d27f7-0849-de37-f380-a5018c5c5535@redhat.com>
+In-Reply-To: <335d27f7-0849-de37-f380-a5018c5c5535@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 26 Jan 2021 13:47:36 -0800
+Message-ID: <CANgfPd_Lh-aLJ5fXP_GfqD0bB=0dvqxjKrCLmB5=VVFMT70NZw@mail.gmail.com>
+Subject: Re: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/19/21 8:41 AM, Thomas Huth wrote:
-> On 18/01/2021 11.33, Daniel P. Berrangé wrote:
->> On Mon, Jan 18, 2021 at 02:38:07PM +0800, Jiaxun Yang wrote:
->>> Alpine Linux[1] is a security-oriented, lightweight Linux distribution
->>> based on musl libc and busybox.
->>>
->>> It it popular among Docker guests and embedded applications.
->>>
->>> Adding it to test against different libc.
->>>
->>> [1]: https://alpinelinux.org/
->>>
->>> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
->>> ---
->>>   tests/docker/dockerfiles/alpine.docker | 57 ++++++++++++++++++++++++++
->>>   1 file changed, 57 insertions(+)
->>>   create mode 100644 tests/docker/dockerfiles/alpine.docker
->>>
->>> diff --git a/tests/docker/dockerfiles/alpine.docker 
->>> b/tests/docker/dockerfiles/alpine.docker
->>> new file mode 100644
->>> index 0000000000..5be5198d00
->>> --- /dev/null
->>> +++ b/tests/docker/dockerfiles/alpine.docker
->>> @@ -0,0 +1,57 @@
->>> +
->>> +FROM alpine:edge
->>> +
->>> +RUN apk update
->>> +RUN apk upgrade
->>> +
->>> +# Please keep this list sorted alphabetically
->>> +ENV PACKAGES \
->>> +    alsa-lib-dev \
->>> +    bash \
->>> +    bison \
->>
->> This shouldn't be required.
-> 
-> bison and flex were required to avoid some warnings in the past while 
-> compiling the dtc submodule ... but I thought we got rid of the problem 
-> at one point in time, so this can be removed now, indeed.
-> 
->>> +    build-base \
->>
->> This seems to be a meta packae that pulls in other
->> misc toolchain packages. Please list the pieces we
->> need explicitly instead.
-> 
-> Looking at the "Depends" list on 
-> https://pkgs.alpinelinux.org/package/v3.3/main/x86/build-base there are 
-> only 6 dependencies and we need most of those for QEMU anyway, so I 
-> think it is ok to keep build-base here.
-> 
->>> +    coreutils \
->>> +    curl-dev \
->>> +    flex \
->>
->> This shouldn't be needed.
->>
->>> +    git \
->>> +    glib-dev \
->>> +    glib-static \
->>> +    gnutls-dev \
->>> +    gtk+3.0-dev \
->>> +    libaio-dev \
->>> +    libcap-dev \
->>
->> Should not be required, as we use cap-ng.
-> 
-> Right.
-> 
->>> +    libcap-ng-dev \
->>> +    libjpeg-turbo-dev \
->>> +    libnfs-dev \
->>> +    libpng-dev \
->>> +    libseccomp-dev \
->>> +    libssh-dev \
->>> +    libusb-dev \
->>> +    libxml2-dev \
->>> +    linux-headers \
->>
->> Is this really needed ? We don't install kernel-headers on other
->> distros AFAICT.
-> 
-> I tried a build without this package, and it works fine indeed.
-> 
->>> +    lzo-dev \
->>> +    mesa-dev \
->>> +    mesa-egl \
->>> +    mesa-gbm \
->>> +    meson \
->>> +    ncurses-dev \
->>> +    ninja \
->>> +    paxmark \
->>
->> What is this needed for ?
-> 
-> Seems like it also can be dropped.
-> 
->>> +    perl \
->>> +    pulseaudio-dev \
->>> +    python3 \
->>> +    py3-sphinx \
->>> +    shadow \
->>
->> Is this really needed ?
-> 
-> See:
-> https://www.spinics.net/lists/kvm/msg231556.html
-> 
-> I can remove the superfluous packages when picking up the patch, no need 
-> to respin just because of this.
-> 
->   Thomas
-> 
-> 
+On Tue, Jan 26, 2021 at 6:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 21/01/21 22:32, Sean Christopherson wrote:
+> > Coming back to this series, I wonder if the RCU approach is truly necessary to
+> > get the desired scalability.  If both zap_collapsible_sptes() and NX huge page
+> > recovery zap_only_  leaf SPTEs, then the only path that can actually unlink a
+> > shadow page while holding the lock for read is the page fault path that installs
+> > a huge page over an existing shadow page.
+> >
+> > Assuming the above analysis is correct, I think it's worth exploring alternatives
+> > to using RCU to defer freeing the SP memory, e.g. promoting to a write lock in
+> > the specific case of overwriting a SP (though that may not exist for rwlocks),
+> > or maybe something entirely different?
+>
+> You can do the deferred freeing with a short write-side critical section
+> to ensure all readers have terminated.
+>
+> If the bool argument to handle_disconnected_tdp_mmu_page is true(*), the
+> pages would be added to an llist, instead of being freed immediately.
+> At the end of a shared critical section you would do
+>
+>         if (!llist_empty(&kvm->arch.tdp_mmu_disconnected_pages)) {
+>                 struct llist_node *first;
+>                 kvm_mmu_lock(kvm);
+>                 first = __list_del_all(&kvm->arch.tdp_mmu_disconnected_pages);
+>                 kvm_mmu_unlock(kvm);
+>
+>                 /*
+>                  * All vCPUs have already stopped using the pages when
+>                  * their TLBs were flushed.  The exclusive critical
+>                  * section above means that there can be no readers
+>                  * either.
+>                  */
+>                 tdp_mmu_free_disconnected_pages(first);
+>         }
+>
+> So this is still deferred reclamation, but it's done by one of the vCPUs
+> rather than a worker RCU thread.  This would replace patches 11/12/13
+> and probably would be implemented after patch 18.
 
-You can refer to my post earlier this January for a "minimal" Alpine 
-Linux build, if you wish.
+While I agree that this would work, it could be a major performance
+bottleneck as it could result in the MMU lock being acquired in read
+mode by a VCPU thread handling a page fault. Even though the critical
+section is very short it still has to serialize with the potentially
+many overlapping page fault handlers which want the MMU read lock. In
+order to perform well with hundreds of vCPUs, the vCPU threads really
+cannot be acquiring the MMU lock in write mode. The MMU lock above
+could be replaced with the TDP MMU pages lock, but that still adds
+serialization where it's not really necessary.
+The use of RCU also provides a nice separation of concerns, freeing
+the various functions which need to remove pages from the paging
+structure from having to follow up on freeing them later.
 
-My goal was to find the smallest set of packages possible without 
-passing any explicit configure flags.
-
-I wonder if it's worth having layered "core build" and "test build" 
-images so that we can smoke test the minimalistic build from time to 
-time -- I seem to recall Dan posting information about a dependency 
-management tool for Dockerfiles, but I admit I didn't look too closely 
-at what problem that solves, exactly.
-
---js
-
+>
+> Paolo
+>
+> (*) this idea is what prompted the comment about s/atomic/shared/
+>
