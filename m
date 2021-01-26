@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8417F3042B3
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:35:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 640B63042B7
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:37:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406299AbhAZPfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 10:35:18 -0500
-Received: from mga02.intel.com ([134.134.136.20]:17317 "EHLO mga02.intel.com"
+        id S2392820AbhAZPga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 10:36:30 -0500
+Received: from mga03.intel.com ([134.134.136.65]:61737 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392778AbhAZPfP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 10:35:15 -0500
-IronPort-SDR: 7n3fh0Yo4kyIh9Zj3wB9hjPjhITLPHE7+xunB8phl61HDrY1SzMnSQmegpyy1eq2PVgWVCpo4j
- ACfYxDfWyNpA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="167018166"
+        id S2391328AbhAZPfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 10:35:52 -0500
+IronPort-SDR: PuqE3nbjvYzRg++Qi5txvcUjqJ0ht5F2BJh+Vxrt8F/N+emTEP9EcOqSx7nUV6ykcn2mIO7WVe
+ ToEIF0mMI8xA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="179997998"
 X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="167018166"
+   d="scan'208";a="179997998"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:34:35 -0800
-IronPort-SDR: 5Y67a1lGtnM/GGlijPMYZ33ctSO2F5/dR1x05PVxDmwyj+tVtMiu98DHOtmpIOPN0/Rv4XPCVn
- +geS5Ew3kHJg==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:35:11 -0800
+IronPort-SDR: 1VBHt18OhjldsiDruJD9nya9QsUgOciXi2zsnzEd7wb+mUJkFnNmMlBgPYglGI34peAa1q/K1t
+ FUzjXFV1OTUQ==
 X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="369137935"
+   d="scan'208";a="369138048"
 Received: from ekfraser-mobl1.amr.corp.intel.com (HELO [10.209.173.94]) ([10.209.173.94])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:34:33 -0800
-Subject: Re: [RFC PATCH v3 01/27] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:35:10 -0800
+Subject: Re: [RFC PATCH v3 02/27] x86/cpufeatures: Make SGX_LC feature bit
+ depend on SGX bit
 To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 References: <cover.1611634586.git.kai.huang@intel.com>
- <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
+ <bdca25f260a895fcc39b2fb59e1155102a210aa0.1611634586.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -77,42 +77,28 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
-Date:   Tue, 26 Jan 2021 07:34:33 -0800
+Message-ID: <81778afc-60aa-2766-d17c-b7b5f6464477@intel.com>
+Date:   Tue, 26 Jan 2021 07:35:11 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
+In-Reply-To: <bdca25f260a895fcc39b2fb59e1155102a210aa0.1611634586.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 1/26/21 1:30 AM, Kai Huang wrote:
-> From: Sean Christopherson <seanjc@google.com>
+> Move SGX_LC feature bit to CPUID dependency table as well, along with
+> new added SGX1 and SGX2 bit, to make clearing all SGX feature bits
+> easier. Also remove clear_sgx_caps() since it is just a wrapper of
+> setup_clear_cpu_cap(X86_FEATURE_SGX) now.
 > 
-> Add SGX1 and SGX2 feature flags, via CPUID.0x12.0x0.EAX, as scattered
-> features, since adding a new leaf for only two bits would be wasteful.
-> As part of virtualizing SGX, KVM will expose the SGX CPUID leafs to its
-> guest, and to do so correctly needs to query hardware and kernel support
-> for SGX1 and SGX2.
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 
-It's also not _just_ exposing the CPUID leaves.  There are some checks
-here when KVM is emulating some SGX instructions too, right?
+Looks good:
 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 84b887825f12..18b2d0c8bbbe 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -292,6 +292,8 @@
->  #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
->  #define X86_FEATURE_SPLIT_LOCK_DETECT	(11*32+ 6) /* #AC for split lock */
->  #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
-> +#define X86_FEATURE_SGX1		(11*32+ 8) /* Software Guard Extensions sub-feature SGX1 */
-> +#define X86_FEATURE_SGX2        	(11*32+ 9) /* Software Guard Extensions sub-feature SGX2 */
-
-FWIW, I'm not sure how valuable it is to spell the SGX acronym out three
-times.  Can't we use those bytes to put something more useful in that
-comment?
+Acked-by: Dave Hansen <dave.hansen@intel.com>
