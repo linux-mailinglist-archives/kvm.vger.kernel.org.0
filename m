@@ -2,180 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA12304251
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 393FE30418C
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:08:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391747AbhAZPX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 10:23:29 -0500
-Received: from mga03.intel.com ([134.134.136.65]:12914 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389107AbhAZJdk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 04:33:40 -0500
-IronPort-SDR: oDoNACMtwh34GLxH7zjnE3tbJnHffgnLxV5a6pg3mPfaFnZADBDFHofT0MNTrNpIZW7OUOiUAj
- F4NUnwACIGyQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9875"; a="179955074"
-X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="179955074"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:32:56 -0800
-IronPort-SDR: HOvNgMUz6K8dqTavI8DlWWL7/xxsAkbLjYJqVsMrSLcRaoalyWIsnUJTrGyYhhavO84+bvx6jK
- wDu+15PpHmkQ==
-X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="577748034"
-Received: from ravivisw-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.124.51])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:32:51 -0800
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, corbet@lwn.net,
-        Andy Lutomirski <luto@amacapital.net>,
-        Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v3 27/27] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Tue, 26 Jan 2021 22:32:45 +1300
-Message-Id: <14d540efe5cdbd4dd5df1ea17b999b6089654d11.1611634586.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.1611634586.git.kai.huang@intel.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
+        id S2406058AbhAZPHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 10:07:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54374 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2406113AbhAZPGz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 10:06:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611673528;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xs14Pz1Mq5FTHwPzuFvyU/rHvTdWdEjaMGXPw3VcyzI=;
+        b=fhG3+E2auH56bXTf0tWNx8b5Lnkq4ob+fx51ba/sOwHkUiMiW719/kiElyhFiGbNvsKcOI
+        1GhCUeQaThAMOAEiRrgQvisYR750NLK/WZgm15ZdTuHpn3+L/DSJgy8MjgjsqWLpQpMMmv
+        j3S9X1KKuHsUgxSEDFA1FlCDCVPKNbA=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-551-gXhaxydqNCKD3x9-Orr8OQ-1; Tue, 26 Jan 2021 10:05:26 -0500
+X-MC-Unique: gXhaxydqNCKD3x9-Orr8OQ-1
+Received: by mail-oi1-f199.google.com with SMTP id b124so4104598oif.15
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 07:05:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xs14Pz1Mq5FTHwPzuFvyU/rHvTdWdEjaMGXPw3VcyzI=;
+        b=dtX8Sp+kSAoYouU50GJ6vxeSkIdwGhswMKvRPk1isAsdh8e8Qrb54rr43JURq8SoNV
+         TZ59yCxqu1WqA+54ZU0GJ/pWtp/pQ/hn21PaR5KriNMguG19BbEwMera151RQNX9MAlC
+         e3uijXlUkxKp4hGfHNiiKlqAgJW2QKnzAtDdbeqcZjSFMt27EIeV3AEsc6duU9iiVHuC
+         hI4GyMx8c5xNbvKUH9V8LDh12YUw5YNS0goRXALsQD6c/AVH2bUqe+NRQ8xall+qHZJ/
+         H7XqkItv2yezHZbZ1icvOohUZU8K+vK7o/oU9SrtNxks0QwkK7THcryf1ePkFiFEVMVZ
+         U4Yg==
+X-Gm-Message-State: AOAM533oRIQ6DadZE2VNOK1NiqmGUoRsQPQmQoDgN0b/r+kYXmJ9YESM
+        cRnY9+gef81xzfpAYs8c0zi84ueHRKTCyrleac1onKaxqvRfWEOHaBtqjfmXuKaKMiONaU68Vuc
+        xU8on/GSm/quQ
+X-Received: by 2002:a05:6808:a09:: with SMTP id n9mr75648oij.26.1611673525915;
+        Tue, 26 Jan 2021 07:05:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyamxSOGkosVTZAPozfdk59s0vMHPoPqsvHNSyOUyLqzfFV2cKUPpAWmmkZ2dYRfOBx0JV2Og==
+X-Received: by 2002:a05:6808:a09:: with SMTP id n9mr75621oij.26.1611673525705;
+        Tue, 26 Jan 2021 07:05:25 -0800 (PST)
+Received: from [192.168.1.38] (cpe-70-113-46-183.austin.res.rr.com. [70.113.46.183])
+        by smtp.gmail.com with ESMTPSA id f6sm691379ote.28.2021.01.26.07.05.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 07:05:24 -0800 (PST)
+From:   Wei Huang <wehuang@redhat.com>
+X-Google-Original-From: Wei Huang <wei.huang2@amd.com>
+Subject: Re: [PATCH v3 0/4] Handle #GP for SVM execution instructions
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, vkuznets@redhat.com,
+        mlevitsk@redhat.com, seanjc@google.com, joro@8bytes.org,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org,
+        jmattson@google.com, wanpengli@tencent.com, bsd@redhat.com,
+        dgilbert@redhat.com, luto@amacapital.net
+References: <20210126081831.570253-1-wei.huang2@amd.com>
+ <3349e153-83ae-3c55-ee88-2036b2ce38d8@redhat.com>
+Message-ID: <4b72ebd1-ace8-f03c-2e53-1c4ece0b17d8@amd.com>
+Date:   Tue, 26 Jan 2021 09:05:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <3349e153-83ae-3c55-ee88-2036b2ce38d8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
-to grant a VM access to a priveleged attribute, with args[0] holding a
-file handle to a valid SGX attribute file.
 
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
+On 1/26/21 5:39 AM, Paolo Bonzini wrote:
+> On 26/01/21 09:18, Wei Huang wrote:
+>> While running SVM related instructions (VMRUN/VMSAVE/VMLOAD), some AMD
+>> CPUs check EAX against reserved memory regions (e.g. SMM memory on host)
+>> before checking VMCB's instruction intercept. If EAX falls into such
+>> memory areas, #GP is triggered before #VMEXIT. This causes unexpected #GP
+>> under nested virtualization. To solve this problem, this patchset makes
+>> KVM trap #GP and emulate these SVM instuctions accordingly.
+>>
+>> Also newer AMD CPUs will change this behavior by triggering #VMEXIT
+>> before #GP. This change is indicated by CPUID_0x8000000A_EDX[28]. Under
+>> this circumstance, #GP interception is not required. This patchset 
+>> supports
+>> the new feature.
+>>
+>> This patchset has been verified with vmrun_errata_test and 
+>> vmware_backdoor
+>> tests of kvm_unit_test on the following configs. Also it was verified 
+>> that
+>> vmware_backdoor can be turned on under nested on nested.
+>>    * Current CPU: nested, nested on nested
+>>    * New CPU with X86_FEATURE_SVME_ADDR_CHK: nested, nested on nested
+>>
+>> v2->v3:
+>>    * Change the decode function name to x86_decode_emulated_instruction()
+>>    * Add a new variable, svm_gp_erratum_intercept, to control 
+>> interception
+>>    * Turn on VM's X86_FEATURE_SVME_ADDR_CHK feature in svm_set_cpu_caps()
+>>    * Fix instruction emulation for vmware_backdoor under nested-on-nested
+>>    * Minor comment fixes
+>>
+>> v1->v2:
+>>    * Factor out instruction decode for sharing
+>>    * Re-org gp_interception() handling for both #GP and vmware_backdoor
+>>    * Use kvm_cpu_cap for X86_FEATURE_SVME_ADDR_CHK feature support
+>>    * Add nested on nested support
+>>
+>> Thanks,
+>> -Wei
+>>
+>> Wei Huang (4):
+>>    KVM: x86: Factor out x86 instruction emulation with decoding
+>>    KVM: SVM: Add emulation support for #GP triggered by SVM instructions
+>>    KVM: SVM: Add support for SVM instruction address check change
+>>    KVM: SVM: Support #GP handling for the case of nested on nested
+>>
+>>   arch/x86/include/asm/cpufeatures.h |   1 +
+>>   arch/x86/kvm/svm/svm.c             | 128 +++++++++++++++++++++++++----
+>>   arch/x86/kvm/x86.c                 |  62 ++++++++------
+>>   arch/x86/kvm/x86.h                 |   2 +
+>>   4 files changed, 152 insertions(+), 41 deletions(-)
+>>
+> 
+> Queued, thanks.
 
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.
+Thanks. BTW because we use kvm_cpu_cap_set() in svm_set_cpu_caps(). This 
+will be reflected into the CPUID received by QEMU. QEMU needs a one-line 
+patch to declare the new feature. I will send it out this morning.
 
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
- arch/x86/kvm/cpuid.c           |  2 +-
- arch/x86/kvm/x86.c             | 22 ++++++++++++++++++++++
- include/uapi/linux/kvm.h       |  1 +
- 4 files changed, 47 insertions(+), 1 deletion(-)
+-Wei
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c136e254b496..47c7c7c33025 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6037,6 +6037,29 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+7.22 KVM_CAP_SGX_ATTRIBUTE
-+----------------------
-+
-+:Architectures: x86
-+:Target: VM
-+:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+          attribute is not supported by KVM.
-+
-+KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
-+more priveleged enclave attributes.  args[0] must hold a file handle to a valid
-+SGX attribute file corresponding to an attribute that is supported/restricted
-+by KVM (currently only PROVISIONKEY).
-+
-+The SGX subsystem restricts access to a subset of enclave attributes to provide
-+additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
-+is restricted to deter malware from using the PROVISIONKEY to obtain a stable
-+system fingerprint.  To prevent userspace from circumventing such restrictions
-+by running an enclave in a VM, KVM prevents access to privileged attributes by
-+default.
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 04b2f5de2d7b..ad00a1af1545 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -833,7 +833,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * expected to derive it from supported XCR0.
- 		 */
- 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
--			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
- 			      SGX_ATTR_KSS;
- 		entry->ebx &= 0;
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5ca7b181a3ae..3d1b4113a57b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -74,6 +74,8 @@
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
-+#include <asm/sgx.h>
-+#include <asm/sgx_arch.h>
- #include <clocksource/hyperv_timer.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -3767,6 +3769,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_USER_SPACE_MSR:
- 	case KVM_CAP_X86_MSR_FILTER:
- 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -5295,6 +5300,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.user_space_msr_mask = cap->args[0];
- 		r = 0;
- 		break;
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		unsigned long allowed_attributes = 0;
-+
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
-+
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 374c67875cdb..e17bda18a9b4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
- #define KVM_CAP_SYS_HYPERV_CPUID 191
- #define KVM_CAP_DIRTY_LOG_RING 192
-+#define KVM_CAP_SGX_ATTRIBUTE 200
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.29.2
+> 
+> Paolo
+> 
 
