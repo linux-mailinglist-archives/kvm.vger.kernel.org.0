@@ -2,101 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF4F63055CC
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69479305603
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:44:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232218AbhA0I3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 03:29:43 -0500
-Received: from mleia.com ([178.79.152.223]:33394 "EHLO mail.mleia.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232643AbhA0IZI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 03:25:08 -0500
-Received: from mail.mleia.com (localhost [127.0.0.1])
-        by mail.mleia.com (Postfix) with ESMTP id 9227042EB56;
-        Wed, 27 Jan 2021 08:12:58 +0000 (UTC)
-Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
-Cc:     Russell King <linux@armlinux.org.uk>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
-        kernel@pengutronix.de, Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-From:   Vladimir Zapolskiy <vz@mleia.com>
-Message-ID: <b9bfa80b-ed5f-50f9-de50-76090007556c@mleia.com>
-Date:   Wed, 27 Jan 2021 10:12:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S232157AbhA0In1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 03:43:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S316834AbhAZXK4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 18:10:56 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6745BC0613D6
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 15:10:16 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id g15so142148pjd.2
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 15:10:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=HQObKKSE5vuDsoooUB32J7Kk+tA9rn8yWjz82H0MqC8=;
+        b=IsXZ6AVsbd6O9Z0cFT3PBS/RJNtNM2XJtyaaO0UwmfubfXJoIdSncE7qf0pmXEDit3
+         H8dX/ubGwBjS6aA4Q2sSM7Onoa3N3i3/V6LcwH/ryOrbDmmjVqTeti6AUbYZJ8c9HdQi
+         D1TfpWnzciIxEy4DkfQyf9U5EeyWpFDmgFPHCaIWJkWzjQwa7BljNsU3peKEfCY4zLgk
+         UVoYirmVQrL/GbuA7oEohpSHUtmla6fTZ6y1IYsp5WIgRFEujTU+QlKNadINq5yKzpWl
+         rsrnYI2DT8IFm1XFhtMRCeQGHR1+Nn25595y0VuVGvxpbOfrbzDHxTioqvFYA6jgC2PB
+         s8Ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HQObKKSE5vuDsoooUB32J7Kk+tA9rn8yWjz82H0MqC8=;
+        b=KlVBUK59zYSEEUZdZm8CUh2s2CWn7FTUHRFaNn9aCaD8IFVO13Hb/tNP5OUxxcPzVR
+         tVZThOTWWjau0IdHhyMtRh42133a5yfuXU5BEgo3nbhFLvhKeVw6FHf/+lEgNa69iikk
+         4eeqgt20NgahfQV8peZm/Et51qzwaCCviJSU+S5x0RvSxB+BBObymiVXPdWZMXzY8Yn/
+         T5kZAnxwdlXWIIOyYj0rz5Qyq9nQ4u3PsyVunX7GJWTJkmrzhySheCH/oyOIMc4gy+Lz
+         4Ipw80jOBF66Ec7jVBkMXS6goY6EWhC0YTOBNiA0BhdI1Z1HuJzJIEMKg1HSFH+rK3iL
+         yj8w==
+X-Gm-Message-State: AOAM531VHStB3NMtV1FoD4nyOaXEWXe4IxcloFbFfPr1rUx+PoYI5qnI
+        /hGlDEpbiw4jPPwYHH22zebsfw==
+X-Google-Smtp-Source: ABdhPJxl7q69Ha3Jh0Ps46T3ONL6qVzI+3HdbBTFQIcdgZ5tsJeSGhBc8xHENLjPewRZWZT0KTYgqQ==
+X-Received: by 2002:a17:90a:7e82:: with SMTP id j2mr2147173pjl.217.1611702615801;
+        Tue, 26 Jan 2021 15:10:15 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id m77sm155892pfd.82.2021.01.26.15.10.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 15:10:15 -0800 (PST)
+Date:   Tue, 26 Jan 2021 15:10:08 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Fix unsynchronized access to sev members through
+ svm_register_enc_region
+Message-ID: <YBChUOc1iKZv8TJ1@google.com>
+References: <20210126185431.1824530-1-pgonda@google.com>
+ <6407cdf6-5dc7-96c0-343b-d2c0e1d7aaa4@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-49551924 
-X-CRM114-CacheID: sfid-20210127_081258_639999_D23EB9E2 
-X-CRM114-Status: GOOD (  14.44  )
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6407cdf6-5dc7-96c0-343b-d2c0e1d7aaa4@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/21 6:58 PM, Uwe Kleine-König wrote:
-> All amba drivers return 0 in their remove callback. Together with the
-> driver core ignoring the return value anyhow, it doesn't make sense to
-> return a value here.
+On Tue, Jan 26, 2021, Tom Lendacky wrote:
+> On 1/26/21 12:54 PM, Peter Gonda wrote:
+> > sev_pin_memory assumes that callers hold the kvm->lock. This was true for
+> > all callers except svm_register_enc_region since it does not originate
+> > from svm_mem_enc_op. Also added lockdep annotation to help prevent
+> > future regressions.
 > 
-> Change the remove prototype to return void, which makes it explicit that
-> returning an error value doesn't work as expected. This simplifies changing
-> the core remove callback to return void, too.
-> 
-> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
-> Acked-by: Mark Brown <broonie@kernel.org>
-> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> I'm not exactly sure what the problem is that your fixing? What is the
+> symptom that you're seeing?
 
-For drivers/memory/pl172.c:
-
-Acked-by: Vladimir Zapolskiy <vz@mleia.com>
-
---
-Best wishes,
-Vladimir
+svm_register_enc_region() calls sev_pin_memory() without holding kvm->lock.  If
+userspace does multiple KVM_MEMORY_ENCRYPT_REG_REGION in parallel, it could
+circumvent the rlimit(RLIMIT_MEMLOCK) check.
