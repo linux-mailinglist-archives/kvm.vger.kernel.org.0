@@ -2,277 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15249303E5F
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50CF3303EB9
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:31:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403964AbhAZNQB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 08:16:01 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11507 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391845AbhAZMrN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 07:47:13 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yX1G7wzjDdr;
-        Tue, 26 Jan 2021 20:44:04 +0800 (CST)
-Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 26 Jan 2021 20:45:07 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <xiexiangyou@huawei.com>, <zhengchuan@huawei.com>,
-        <yubihong@huawei.com>
-Subject: [RFC PATCH 7/7] kvm: arm64: Start up SW/HW combined dirty log
-Date:   Tue, 26 Jan 2021 20:44:44 +0800
-Message-ID: <20210126124444.27136-8-zhukeqian1@huawei.com>
-X-Mailer: git-send-email 2.8.4.windows.1
-In-Reply-To: <20210126124444.27136-1-zhukeqian1@huawei.com>
-References: <20210126124444.27136-1-zhukeqian1@huawei.com>
+        id S1731252AbhAZNax (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 08:30:53 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:9154 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391687AbhAZNaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 08:30:35 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B601018e10000>; Tue, 26 Jan 2021 05:28:01 -0800
+Received: from [172.27.11.125] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 Jan
+ 2021 13:27:56 +0000
+Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>
+References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+ <20210122122503.4e492b96@omen.home.shazbot.org>
+ <20210122200421.GH4147@nvidia.com>
+ <20210125172035.3b61b91b.cohuck@redhat.com>
+ <20210125180440.GR4147@nvidia.com>
+ <20210125163151.5e0aeecb@omen.home.shazbot.org>
+ <20210126004522.GD4147@nvidia.com>
+ <20210125203429.587c20fd@x1.home.shazbot.org>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
+Date:   Tue, 26 Jan 2021 15:27:43 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210125203429.587c20fd@x1.home.shazbot.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1611667681; bh=juhWC5dTGQeAy1Fhbof3EZbmu4mUUHMkzS2wBTTXEYI=;
+        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
+         MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+         Content-Language:X-Originating-IP:X-ClientProxiedBy;
+        b=LsA8l6OwVauHt1RRkPed3EC4aL3T9+zoJXvgDT6Rr1IMH/hWMO/N8ImZj0V2MyU2t
+         xvDYEK0MkltncWKY4+C/DejCe0QG6wkNUZGqcsFqW+6RGjsXeYulT1/0UKthd2GSCY
+         0HGHQqLWjQYwJSdza9lno9bU6NwBZpjfcqo026ENlksRoe77feW6POqzQDzJHEX5IN
+         ORwoNWCpxocbWD3E/8a/q0ptWrJ+RIJVo7oViU5a5kwzkuKU8aDoTcqsjtzl5Q3+vh
+         Ke3kzSGzSb1s1k3z0uOhs2Fp9FULq/V3fKLtzVwiWGc6+dai6togTQ6tLWI7EtbKXO
+         x7xlOWc0Hc9TA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We do not enable hardware dirty at start (do not add DBM bit). When
-an arbitrary PT occurs fault, we execute soft tracking for this PT
-and enable hardware tracking for its nearby PTs (Add DBM bit for
-nearby 64PTs). Then when sync dirty log, we have known all PTs with
-hardware dirty enabled, so we do not need to scan all PTs.
+Hi Alex, Cornelia and Jason,
 
-Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
----
- arch/arm64/include/asm/kvm_host.h |   6 ++
- arch/arm64/kvm/arm.c              | 125 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/mmu.c              |   7 +-
- arch/arm64/kvm/reset.c            |   8 +-
- 4 files changed, 141 insertions(+), 5 deletions(-)
+thanks for the reviewing this.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8fcfab0c2567..e9ea5b546326 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -99,6 +99,8 @@ struct kvm_s2_mmu {
- };
- 
- struct kvm_arch_memory_slot {
-+	#define HWDBM_GRANULE_SHIFT 6  /* 64 pages per bit */
-+	unsigned long *hwdbm_bitmap;
- };
- 
- struct kvm_arch {
-@@ -565,6 +567,10 @@ struct kvm_vcpu_stat {
- 	u64 exits;
- };
- 
-+int kvm_arm_init_hwdbm_bitmap(struct kvm_memory_slot *memslot);
-+void kvm_arm_destroy_hwdbm_bitmap(struct kvm_memory_slot *memslot);
-+void kvm_arm_enable_nearby_hwdbm(struct kvm *kvm, gfn_t gfn);
-+
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
- unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 04c44853b103..9e05d45fa6be 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1257,9 +1257,134 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 	return r;
- }
- 
-+static unsigned long kvm_hwdbm_bitmap_bytes(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long nbits = DIV_ROUND_UP(memslot->npages, 1 << HWDBM_GRANULE_SHIFT);
-+
-+	return ALIGN(nbits, BITS_PER_LONG) / 8;
-+}
-+
-+static unsigned long *kvm_second_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long len = kvm_hwdbm_bitmap_bytes(memslot);
-+
-+	return (void *)memslot->arch.hwdbm_bitmap + len;
-+}
-+
-+/*
-+ * Allocate twice space. Refer kvm_arch_sync_dirty_log() to see why the
-+ * second space is needed.
-+ */
-+int kvm_arm_init_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	unsigned long bytes = 2 * kvm_hwdbm_bitmap_bytes(memslot);
-+
-+	if (!system_supports_hw_dbm())
-+		return 0;
-+
-+	if (memslot->arch.hwdbm_bitmap) {
-+		/* Inherited from old memslot */
-+		bitmap_clear(memslot->arch.hwdbm_bitmap, 0, bytes * 8);
-+	} else {
-+		memslot->arch.hwdbm_bitmap = kvzalloc(bytes, GFP_KERNEL_ACCOUNT);
-+		if (!memslot->arch.hwdbm_bitmap)
-+			return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+void kvm_arm_destroy_hwdbm_bitmap(struct kvm_memory_slot *memslot)
-+{
-+	if (!memslot->arch.hwdbm_bitmap)
-+		return;
-+
-+	kvfree(memslot->arch.hwdbm_bitmap);
-+	memslot->arch.hwdbm_bitmap = NULL;
-+}
-+
-+/* Add DBM for nearby pagetables but do not across memslot */
-+void kvm_arm_enable_nearby_hwdbm(struct kvm *kvm, gfn_t gfn)
-+{
-+	struct kvm_memory_slot *memslot;
-+
-+	memslot = gfn_to_memslot(kvm, gfn);
-+	if (memslot && kvm_slot_dirty_track_enabled(memslot) &&
-+	    memslot->arch.hwdbm_bitmap) {
-+		unsigned long rel_gfn = gfn - memslot->base_gfn;
-+		unsigned long dbm_idx = rel_gfn >> HWDBM_GRANULE_SHIFT;
-+		unsigned long start_page, npages;
-+
-+		if (!test_and_set_bit(dbm_idx, memslot->arch.hwdbm_bitmap)) {
-+			start_page = dbm_idx << HWDBM_GRANULE_SHIFT;
-+			npages = 1 << HWDBM_GRANULE_SHIFT;
-+			npages = min(memslot->npages - start_page, npages);
-+			kvm_stage2_set_dbm(kvm, memslot, start_page, npages);
-+		}
-+	}
-+}
-+
-+/*
-+ * We have to find a place to clear hwdbm_bitmap, and clear hwdbm_bitmap means
-+ * to clear DBM bit of all related pgtables. Note that between we clear DBM bit
-+ * and flush TLB, HW dirty log may occur, so we must scan all related pgtables
-+ * after flush TLB. Giving above, it's best choice to clear hwdbm_bitmap before
-+ * sync HW dirty log.
-+ */
- void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
- {
-+	unsigned long *second_bitmap = kvm_second_hwdbm_bitmap(memslot);
-+	unsigned long start_page, npages;
-+	unsigned int end, rs, re;
-+	bool has_hwdbm = false;
-+
-+	if (!memslot->arch.hwdbm_bitmap)
-+		return;
- 
-+	end = kvm_hwdbm_bitmap_bytes(memslot) * 8;
-+	bitmap_clear(second_bitmap, 0, end);
-+
-+	spin_lock(&kvm->mmu_lock);
-+	bitmap_for_each_set_region(memslot->arch.hwdbm_bitmap, rs, re, 0, end) {
-+		has_hwdbm = true;
-+
-+		/*
-+		 * Must clear bitmap before clear DBM bit. During we clear DBM
-+		 * (it releases the mmu spinlock periodly), SW dirty tracking
-+		 * has chance to add DBM which overlaps what we are clearing. So
-+		 * if we clear bitmap after clear DBM, we will face a situation
-+		 * that bitmap is cleared but DBM are lefted, then we may have
-+		 * no chance to scan these lefted pgtables anymore.
-+		 */
-+		bitmap_clear(memslot->arch.hwdbm_bitmap, rs, re - rs);
-+
-+		/* Record the bitmap cleared */
-+		bitmap_set(second_bitmap, rs, re - rs);
-+
-+		start_page = rs << HWDBM_GRANULE_SHIFT;
-+		npages = (re - rs) << HWDBM_GRANULE_SHIFT;
-+		npages = min(memslot->npages - start_page, npages);
-+		kvm_stage2_clear_dbm(kvm, memslot, start_page, npages);
-+	}
-+	spin_unlock(&kvm->mmu_lock);
-+
-+	if (!has_hwdbm)
-+		return;
-+
-+	/*
-+	 * Ensure vcpu write-actions that occur after we clear hwdbm_bitmap can
-+	 * be catched by guest memory abort handler.
-+	 */
-+	kvm_flush_remote_tlbs(kvm);
-+
-+	spin_lock(&kvm->mmu_lock);
-+	bitmap_for_each_set_region(second_bitmap, rs, re, 0, end) {
-+		start_page = rs << HWDBM_GRANULE_SHIFT;
-+		npages = (re - rs) << HWDBM_GRANULE_SHIFT;
-+		npages = min(memslot->npages - start_page, npages);
-+		kvm_stage2_sync_dirty(kvm, memslot, start_page, npages);
-+	}
-+	spin_unlock(&kvm->mmu_lock);
- }
- 
- void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2f8c6770a4dc..1a8702035ddd 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -939,6 +939,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
-+
-+		/* Put here with high probability that nearby PTEs are valid */
-+		if (!ret && vma_pagesize == PAGE_SIZE && writable)
-+			kvm_arm_enable_nearby_hwdbm(kvm, gfn);
- 	} else {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
-@@ -1407,11 +1411,12 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	spin_unlock(&kvm->mmu_lock);
- out:
- 	mmap_read_unlock(current->mm);
--	return ret;
-+	return ret ? : kvm_arm_init_hwdbm_bitmap(memslot);
- }
- 
- void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- {
-+	kvm_arm_destroy_hwdbm_bitmap(slot);
- }
- 
- void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 47f3f035f3ea..231d11009db7 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -376,11 +376,11 @@ int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
- 
- 	/*
--	 * Enable the Hardware Access Flag management, unconditionally
--	 * on all CPUs. The features is RES0 on CPUs without the support
--	 * and must be ignored by the CPUs.
-+	 * Enable the Hardware Access Flag and Dirty State management
-+	 * unconditionally on all CPUs. The features are RES0 on CPUs
-+	 * without the support and must be ignored by the CPUs.
- 	 */
--	vtcr |= VTCR_EL2_HA;
-+	vtcr |= VTCR_EL2_HA | VTCR_EL2_HD;
- 
- 	/* Set the vmid bits */
- 	vtcr |= (kvm_get_vmid_bits() == 16) ?
--- 
-2.19.1
+On 1/26/2021 5:34 AM, Alex Williamson wrote:
+> On Mon, 25 Jan 2021 20:45:22 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+>> On Mon, Jan 25, 2021 at 04:31:51PM -0700, Alex Williamson wrote:
+>>
+>>> We're supposed to be enlightened by a vendor driver that does nothing
+>>> more than pass the opaque device_data through to the core functions,
+>>> but in reality this is exactly the point of concern above.  At a
+>>> minimum that vendor driver needs to look at the vdev to get the
+>>> pdev,
+>> The end driver already havs the pdev, the RFC doesn't go enough into
+>> those bits, it is a good comment.
+>>
+>> The dd_data pased to the vfio_create_pci_device() will be retrieved
+>> from the ops to get back to the end drivers data. This can cleanly
+>> include everything: the VF pci_device, PF pci_device, mlx5_core
+>> pointer, vfio_device and vfio_pci_device.
+>>
+>> This is why the example passes in the mvadev:
+>>
+>> +	vdev = vfio_create_pci_device(pdev, &mlx5_vfio_pci_ops, mvadev);
+>>
+>> The mvadev has the PF, VF, and mlx5 core driver pointer.
+>>
+>> Getting that back out during the ops is enough to do what the mlx5
+>> driver needs to do, which is relay migration related IOCTLs to the PF
+>> function via the mlx5_core driver so the device can execute them on
+>> behalf of the VF.
+>>
+>>> but then what else does it look at, consume, or modify.  Now we have
+>>> vendor drivers misusing the core because it's not clear which fields
+>>> are private and how public fields can be used safely,
+>> The kernel has never followed rigid rules for data isolation, it is
+>> normal to have whole private structs exposed in headers so that
+>> container_of can be used to properly compose data structures.
+> I reject this assertion, there are plenty of structs that clearly
+> indicate private vs public data or, as we've done in mdev, clearly
+> marking the private data in a "private" header and provide access
+> functions for public fields.  Including a "private" header to make use
+> of a "library" is just wrong.  In the example above, there's no way for
+> the mlx vendor driver to get back dd_data without extracting it from
+> struct vfio_pci_device itself.
 
+I'll create a better separation between private/public fields according 
+to my understanding for the V2.
+
+I'll just mention that beyond this separation, future improvements will 
+be needed and can be done incrementally.
+
+I don't think that we should do so many changes at one shut. The 
+incremental process is safer from subsystem point of view.
+
+I also think that upstreaming mlx5_vfio_pci.ko and upstreaming vfio-pci 
+separation into 2 modules doesn't have to happen in one-shut.
+
+But again, to make our point in this RFC, I'll improve it for V2.
+
+>
+>> Look at struct device, for instance. Most of that is private to the
+>> driver core.
+>>
+>> A few 'private to vfio-pci-core' comments would help, it is good
+>> feedback to make that more clear.
+>>
+>>> extensions potentially break vendor drivers, etc.  We're only even hand
+>>> waving that existing device specific support could be farmed out to new
+>>> device specific drivers without even going to the effort to prove that.
+>> This is a RFC, not a complete patch series. The RFC is to get feedback
+>> on the general design before everyone comits alot of resources and
+>> positions get dug in.
+>>
+>> Do you really think the existing device specific support would be a
+>> problem to lift? It already looks pretty clean with the
+>> vfio_pci_regops, looks easy enough to lift to the parent.
+>>
+>>> So far the TODOs rather mask the dirty little secrets of the
+>>> extension rather than showing how a vendor derived driver needs to
+>>> root around in struct vfio_pci_device to do something useful, so
+>>> probably porting actual device specific support rather than further
+>>> hand waving would be more helpful.
+>> It would be helpful to get actual feedback on the high level design -
+>> someting like this was already tried in May and didn't go anywhere -
+>> are you surprised that we are reluctant to commit alot of resources
+>> doing a complete job just to have it go nowhere again?
+> That's not really what I'm getting from your feedback, indicating
+> vfio-pci is essentially done, the mlx stub driver should be enough to
+> see the direction, and additional concerns can be handled with TODO
+> comments.  Sorry if this is not construed as actual feedback, I think
+> both Connie and I are making an effort to understand this and being
+> hampered by lack of a clear api or a vendor driver that's anything more
+> than vfio-pci plus an aux bus interface.  Thanks,
+
+I think I got the main idea and I'll try to summarize it:
+
+The separation to vfio-pci.ko and vfio-pci-core.ko is acceptable, and we 
+do need it to be able to create vendor-vfio-pci.ko driver in the future 
+to include vendor special souse inside.
+
+The separation implementation and the question of what is private and 
+what is public, and the core APIs to the various drivers should be 
+improved or better demonstrated in the V2.
+
+I'll work on improving it and I'll send the V2.
+
+
+If you have some feedback of the things/fields/structs you think should 
+remain private to vfio-pci-core please let us know.
+
+Thanks for the effort in the review,
+
+-Max.
+
+> Alex
+>
