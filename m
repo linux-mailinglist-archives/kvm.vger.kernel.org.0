@@ -2,88 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAAF6304747
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 19:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9054304742
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 19:58:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389701AbhAZRHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 12:07:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30861 "EHLO
+        id S2389845AbhAZRH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 12:07:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43804 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390144AbhAZIaO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 03:30:14 -0500
+        by vger.kernel.org with ESMTP id S2388426AbhAZJ1D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 04:27:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611649728;
+        s=mimecast20190719; t=1611653123;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bhV4Mq5/sBWiSQk3XJm+QtpJxWDhek1THdWB8YUzVxE=;
-        b=gS/m9471EbvRBZyAUCCPUVXUxK5gCojKY/vsj8/h+vbQ0HlQYrBUbMML4OK1NySGK2xnYz
-        hYjRHj2HFNj3PWzXridt4BnTDIcD8DV1XfgaKhuWLyz6shG4byiqIzHEViFyT2s96xIdDI
-        I3UBSV94NMWvYqgF3/lu+JPGv2wT7hM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83--4Inxhf7N6asR7JiI5xpBw-1; Tue, 26 Jan 2021 03:28:44 -0500
-X-MC-Unique: -4Inxhf7N6asR7JiI5xpBw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFFA310054FF;
-        Tue, 26 Jan 2021 08:28:42 +0000 (UTC)
-Received: from [10.72.12.70] (ovpn-12-70.pek2.redhat.com [10.72.12.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B76672168;
-        Tue, 26 Jan 2021 08:28:35 +0000 (UTC)
-Subject: Re: [PATCH v3] vhost_vdpa: fix the problem in
- vhost_vdpa_set_config_call
-To:     Cindy Lu <lulu@redhat.com>, mst@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc:     stable@vger.kernel.org
-References: <20210126071607.31487-1-lulu@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <757a05d2-c82e-e957-1b7c-55eb64495f1b@redhat.com>
-Date:   Tue, 26 Jan 2021 16:28:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=psqoQb8M1ZbviHk/oEAqOvlNRFhfySafJPPh42D8Lw4=;
+        b=ay3NRozza3vwriETa+Q9bIiGvOmgLHqxpJGOjFSvtisUfQZ83C5omw+XiGbv0H66qY4XPW
+        dkTSMAo4EjVRZhlXY+rNtWgV4SOefKoTjGWDk4wyseui65Hnay5rVRYBpsYns/MrEINtsM
+        A/X+gg/Y9YpvgLVbjroPUU6BboRsnHE=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-mIcOVE8GP9eo2QUNwwWZ3A-1; Tue, 26 Jan 2021 04:25:22 -0500
+X-MC-Unique: mIcOVE8GP9eo2QUNwwWZ3A-1
+Received: by mail-ed1-f72.google.com with SMTP id u17so9125709edi.18
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 01:25:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=psqoQb8M1ZbviHk/oEAqOvlNRFhfySafJPPh42D8Lw4=;
+        b=oMrITW8fwJy3dOsKIEe2ddt4ycJJ8wM1yGOV5yUCldb3BUFRlCnHENxG3h9IDfQFIh
+         0X0m/pKNVY7OhJ5kE1sV0jt1e16YKH9rT5DqI/pbAkFNkjE0SuUMDwNGGfo34aIXkoN6
+         6efyKZWv8E+eByBIKkTBv1M3apTtm3krvdS434mUOlafxNHDMC5XruIzPfZoYN/cjDpA
+         9dszeWu23w4G0lGCDvmO1c6FlO0SzE7na+jzNBjPfwv6Hf6PZlGtvElCG0qeuy/cowba
+         Nn0FpNArXOaOvT1u4CK9XpvZHTsSsnLRFSU3JdWlvD13Eg+gxaYEto/WFcF5G7jjRgcu
+         nzxQ==
+X-Gm-Message-State: AOAM531bbL7nnKs3naGMCQfMpwJTNPIj0XfjjkGcBEmp31Vo7gLPLKr5
+        5I85AVE+RPkwzkESQKXDWfZN/8DsEjwbNpO4QzlbO2fKXAorqetIUMnk1wZ4eY9a6hSCuCGeITB
+        Mb5isn3XJNUgW
+X-Received: by 2002:a05:6402:22db:: with SMTP id dm27mr3928101edb.379.1611653120905;
+        Tue, 26 Jan 2021 01:25:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzu8Mz662tDQlLDu7zmLZYNOETmSPQR4ZpjatODnRxEFNL9lQpsbL3OLGnygCaYP90+CIh/Ew==
+X-Received: by 2002:a05:6402:22db:: with SMTP id dm27mr3928090edb.379.1611653120709;
+        Tue, 26 Jan 2021 01:25:20 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id v25sm9550672ejw.21.2021.01.26.01.25.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 01:25:19 -0800 (PST)
+Subject: Re: [RESEND v13 01/10] KVM: x86: Move common set/get handler of
+ MSR_IA32_DEBUGCTLMSR to VMX
+To:     Like Xu <like.xu@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210108013704.134985-1-like.xu@linux.intel.com>
+ <20210108013704.134985-2-like.xu@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a77477a2-cc64-ec8d-1258-f3222b6a358a@redhat.com>
+Date:   Tue, 26 Jan 2021 10:25:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210126071607.31487-1-lulu@redhat.com>
+In-Reply-To: <20210108013704.134985-2-like.xu@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/1/26 下午3:16, Cindy Lu wrote:
-> In vhost_vdpa_set_config_call, the cb.private should be vhost_vdpa.
-> this cb.private will finally use in vhost_vdpa_config_cb as
-> vhost_vdpa. Fix this issue.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 776f395004d82 ("vhost_vdpa: Support config interrupt in vdpa")
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-
+On 08/01/21 02:36, Like Xu wrote:
+> SVM already has specific handlers of MSR_IA32_DEBUGCTLMSR in the
+> svm_get/set_msr, so the x86 common part can be safely moved to VMX.
+> 
+> Add vmx_supported_debugctl() to refactor the throwing logic of #GP.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> Reviewed-by: Andi Kleen <ak@linux.intel.com>
 > ---
->   drivers/vhost/vdpa.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index ef688c8c0e0e..3fbb9c1f49da 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -319,7 +319,7 @@ static long vhost_vdpa_set_config_call(struct vhost_vdpa *v, u32 __user *argp)
->   	struct eventfd_ctx *ctx;
+>   arch/x86/kvm/vmx/capabilities.h |  5 +++++
+>   arch/x86/kvm/vmx/vmx.c          | 19 ++++++++++++++++---
+>   arch/x86/kvm/x86.c              | 13 -------------
+>   3 files changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index 3a1861403d73..a58cf3655351 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -378,4 +378,9 @@ static inline u64 vmx_get_perf_capabilities(void)
+>   	return PMU_CAP_FW_WRITES;
+>   }
 >   
->   	cb.callback = vhost_vdpa_config_cb;
-> -	cb.private = v->vdpa;
-> +	cb.private = v;
->   	if (copy_from_user(&fd, argp, sizeof(fd)))
->   		return  -EFAULT;
+> +static inline u64 vmx_supported_debugctl(void)
+> +{
+> +	return DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF;
+> +}
+> +
+>   #endif /* __KVM_X86_VMX_CAPS_H */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 2af05d3b0590..23b46327527e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1924,6 +1924,9 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
+>   			return 1;
+>   		goto find_uret_msr;
+> +	case MSR_IA32_DEBUGCTLMSR:
+> +		msr_info->data = 0;
+> +		break;
+>   	default:
+>   	find_uret_msr:
+>   		msr = vmx_find_uret_msr(vmx, msr_info->index);
+> @@ -2002,9 +2005,19 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   						VM_EXIT_SAVE_DEBUG_CONTROLS)
+>   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
 >   
+> -		ret = kvm_set_msr_common(vcpu, msr_info);
+> -		break;
+> -
+> +		if (!data) {
+> +			/* We support the non-activated case already */
+> +			return 0;
+> +		} else if (data & ~vmx_supported_debugctl()) {
+> +			/*
+> +			 * Values other than LBR and BTF are vendor-specific,
+> +			 * thus reserved and should throw a #GP.
+> +			 */
+> +			return 1;
+> +		}
+> +		vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> +			    __func__, data);
+> +		return 0;
+>   	case MSR_IA32_BNDCFGS:
+>   		if (!kvm_mpx_supported() ||
+>   		    (!msr_info->host_initiated &&
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0287840b93e0..c765fd72a66c 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3063,18 +3063,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
+>   		}
+>   		break;
+> -	case MSR_IA32_DEBUGCTLMSR:
+> -		if (!data) {
+> -			/* We support the non-activated case already */
+> -			break;
+> -		} else if (data & ~(DEBUGCTLMSR_LBR | DEBUGCTLMSR_BTF)) {
+> -			/* Values other than LBR and BTF are vendor-specific,
+> -			   thus reserved and should throw a #GP */
+> -			return 1;
+> -		} else if (report_ignored_msrs)
+> -			vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> -				    __func__, data);
+> -		break;
+>   	case 0x200 ... 0x2ff:
+>   		return kvm_mtrr_set_msr(vcpu, msr, data);
+>   	case MSR_IA32_APICBASE:
+> @@ -3347,7 +3335,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	switch (msr_info->index) {
+>   	case MSR_IA32_PLATFORM_ID:
+>   	case MSR_IA32_EBL_CR_POWERON:
+> -	case MSR_IA32_DEBUGCTLMSR:
+>   	case MSR_IA32_LASTBRANCHFROMIP:
+>   	case MSR_IA32_LASTBRANCHTOIP:
+>   	case MSR_IA32_LASTINTFROMIP:
+> 
+
+Queued, thanks.
+
+Paolo
 
