@@ -2,94 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8974303EEC
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:40:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 480CC303F44
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404749AbhAZNkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 08:40:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35859 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392005AbhAZNjK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 08:39:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611668264;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5j8pQllFKQxPrqWZ1anCyJsDg/+zpfGgGPYxYabCaU8=;
-        b=VksebxE3q0WtHGsRmLNQ89MXTSCaA9C/+etCj9dQtwfXpENOc5Zhkh1YEitGC+jImbNa5Y
-        SjA0odRfYatgQ005Um3Hb9Pqt60nMXF8YnI3B+nU0dAzu3kYVPMvLFDFMhW55u/tBROGGU
-        aL8ZRloCT5EZJA7eq0Akizl1zyRMAR0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-OngGLZ2aPtyDubPMCgw2xQ-1; Tue, 26 Jan 2021 08:37:43 -0500
-X-MC-Unique: OngGLZ2aPtyDubPMCgw2xQ-1
-Received: by mail-ej1-f70.google.com with SMTP id p1so4924085ejo.4
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 05:37:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5j8pQllFKQxPrqWZ1anCyJsDg/+zpfGgGPYxYabCaU8=;
-        b=NPQ3MQEcLyaZcWhz/Zv0IUZf9g4BV+dg7jNuZOsoPLP4fJF8CE0m2Blc8SDuXvZDB2
-         5K95pxDKCvAouS9GsRxO2CVX49DFq5bfeEOJxzg8PsTWBELr1x4BJYupNiYUVz/e4nnh
-         heztuZaeJGw0pWQ8jTDh3BnIw2iaA9irdPButnhM6EIrl1+Hbk/HaT+JxTI6cs5fDTlG
-         ANDz4AUlJTpL5R68gVWQ7+D/d8SeVgp3miw/urJtximqJsdN2n3q2PtuTcRtxMv93Mou
-         T+kib2RTYAVseOrlf1k5HTPe648ESYg6z6FQLzvVv1onEnqJS39t9ZWpErE2RffR4plC
-         hNJg==
-X-Gm-Message-State: AOAM532YGynyX8f2UbIMzlCtnR/hlYi2aJiMoaBWwgPs7hBrQNgbxX/l
-        Tj0YyzZrw18zyKeYq3BGxbrNM1IWxspGW6AyCj+Ij2B1NiJu7VWzpMS2rt9bVhQ7mQ8x61dSUsk
-        u4pfqzJcfgF4Q
-X-Received: by 2002:a17:906:dbf2:: with SMTP id yd18mr3405952ejb.45.1611668261802;
-        Tue, 26 Jan 2021 05:37:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzgOSwhx7PScb9UCOX6vbEBbq/P7OBx6h3Jx7iIjwk1PADyZsfXUMbn6cWGh/XzSO50XoWU7w==
-X-Received: by 2002:a17:906:dbf2:: with SMTP id yd18mr3405938ejb.45.1611668261677;
-        Tue, 26 Jan 2021 05:37:41 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id q22sm9747892ejx.3.2021.01.26.05.37.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 05:37:40 -0800 (PST)
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-25-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 24/24] kvm: x86/mmu: Allow parallel page faults for the
- TDP MMU
-Message-ID: <8079ca49-d9fe-94ae-9e6c-ebe6e8e1035d@redhat.com>
-Date:   Tue, 26 Jan 2021 14:37:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2404890AbhAZNto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 08:49:44 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:11445 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404850AbhAZNmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 08:42:54 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DQ7DT5ZtPzjCXP;
+        Tue, 26 Jan 2021 21:41:13 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 26 Jan 2021 21:42:04 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+CC:     Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <wanghaibin.wang@huawei.com>, <yezengruan@huawei.com>,
+        <zhukeqian1@huawei.com>, <yuzenghui@huawei.com>,
+        Yanan Wang <wangyanan55@huawei.com>
+Subject: [RFC PATCH v1 0/5] Enable CPU TTRem feature for stage-2
+Date:   Tue, 26 Jan 2021 21:41:57 +0800
+Message-ID: <20210126134202.381996-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <20210112181041.356734-25-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/01/21 19:10, Ben Gardon wrote:
-> +	if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
-> +		kvm_mmu_lock_shared(vcpu->kvm);
-> +	else
-> +		kvm_mmu_lock(vcpu->kvm);
+Hi all,
+This series enable CPU TTRem feature for stage-2 page table and a RFC is sent
+for some comments, thanks.
 
-Perhaps the better API would be kvm_mmu_lock/unlock_root; not exposing 
-kvm_mmu_lock/unlock_shared and kvm_mmu_lock/unlock_exclusive at all, 
-just like you use rwlock_needbreak directly in kvm_mmu_lock_needbreak.
+The ARMv8.4 TTRem feature offers 3 levels of support when changing block
+size without changing any other parameters that are listed as requiring use
+of break-before-make. And I found that maybe we can use this feature to make
+some improvement for stage-2 page table and the following explains what
+TTRem exactly does for the improvement.
 
-Paolo
+If migration of a VM with hugepages is canceled midway, KVM will adjust the
+stage-2 table mappings back to block mappings. We currently use BBM to replace
+the table entry with a block entry. Take adjustment of 1G block mapping as an
+example, with BBM procedures, we have to invalidate the old table entry first,
+flush TLB and unmap the old table mappings, right before installing the new
+block entry.
+
+So there will be a bit long period when the old table entry is invalid before
+installation of the new block entry, if other vCPUs access any guest page within
+the 1G range during this period and find the table entry invalid, they will all
+exit from guest with a translation fault. Actually, these translation faults
+are not necessary, because the block mapping will be built later. Besides, KVM
+will still try to build 1G block mappings for these spurious translation faults,
+and will perform cache maintenance operations, page table walk, etc.
+
+In summary, the spurious faults are caused by invalidation in BBM procedures.
+Approaches of TTRem level 1,2 ensure that there will not be a moment when the
+old table entry is invalid before installation of the new block entry. However,
+level-2 method will possibly lead to a TLB conflict which is bothering, so we
+use nT both at level-1 and level-2 case to avoid handling TLB conflict aborts.
+
+For an implementation which meets level 1 or level 2, the CPU has two responses
+to choose when accessing a block table entry with nT bit set: Firstly, CPU will
+generate a translation fault, the effect of this response is simier to BBM.
+Secondly, CPU can use the block entry for translation. So with the second kind
+of implementation, the above described spurious translations can be prevented.
+
+Yanan Wang (5):
+  KVM: arm64: Detect the ARMv8.4 TTRem feature
+  KVM: arm64: Add an API to get level of TTRem supported by hardware
+  KVM: arm64: Support usage of TTRem in guest stage-2 translation
+  KVM: arm64: Add handling of coalescing tables into a block mapping
+  KVM: arm64: Adapt page-table code to new handling of coalescing tables
+
+ arch/arm64/include/asm/cpucaps.h    |  3 +-
+ arch/arm64/include/asm/cpufeature.h | 13 ++++++
+ arch/arm64/kernel/cpufeature.c      | 10 +++++
+ arch/arm64/kvm/hyp/pgtable.c        | 62 +++++++++++++++++++++++------
+ 4 files changed, 74 insertions(+), 14 deletions(-)
+
+-- 
+2.19.1
 
