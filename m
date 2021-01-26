@@ -2,105 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 265F5305CCA
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A9EA305C86
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:09:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313738AbhAZWoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:44:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56995 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2393977AbhAZSDa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 13:03:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611684121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MdWP0uQnXXkXJZHH0rQndsx8DUDi4/ani+vrBbllukg=;
-        b=KFnglcPjKf+yj0GIvQedVixzdiDt12I2bqNEk1HqnQl4V9xf6KuK78y7CY2SrTkrkr9Q2X
-        O3Whl2VcNLvHSwQD2P+b+BflPVJnOXJ1s5x8qlLVQwiG2KaRvcIht9xTvN9KDEYYeepoVC
-        7qjK50x9jMKrLnXqiLEoDO3tqVWssgM=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-n6ue6I4ZN7Ow0kJc7YzQrw-1; Tue, 26 Jan 2021 13:01:59 -0500
-X-MC-Unique: n6ue6I4ZN7Ow0kJc7YzQrw-1
-Received: by mail-ed1-f72.google.com with SMTP id u19so9269599edr.1
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 10:01:58 -0800 (PST)
+        id S313758AbhAZWpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391588AbhAZSKt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 13:10:49 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FADCC061573
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 10:10:09 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 30so11951353pgr.6
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 10:10:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=9qXjNZouu+T2bptO4V2q/fEYj1NRhCbZOJSzY37VnAM=;
+        b=kxAv0xKVGG7BwnWPjOQDwlrxfGCTuOtEvgV365hIsKf5iiADFSVyEhvSGIvKkoMLm5
+         GDybLvjtHpDbuPduKHzEf+JyVancUCfRvTXgfF9QES6GhG6l+VXi75cfwnWQB4zZUqoL
+         jwMAuAqRnbhLXuH1CzwE+uFP0hl9ikaC5h10PPCWzziLnmQ2i71NlILSUb+3v1EYoE29
+         fVwnfLMS8launbZjAvVagJoeHiYpatzCKOsb7ahueSeiWX0VtdZdQ7/3A3cuiF6Xx/F5
+         yRLgUCL7LOlOkdIj0cMBKDyl0wdkNsrlS5C3zzZ6v+MNZxBw6Q1LnPImv67phZGG3nWS
+         lPkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=MdWP0uQnXXkXJZHH0rQndsx8DUDi4/ani+vrBbllukg=;
-        b=AYTMXuKUP3C04V5im7Figxij5wvhxlUv3gZxZ3xcy6oZjw5qxsA9UW3MYEJ+lQyKrn
-         jre4jbqHdVyXWa1pTFqBlbRSWdjwAWPjg614clGZSiV0s/nKfNWZKbuHKhheHeLtgNOJ
-         hLZboJc2ge9/Pd+StR0bqYNcZm4FgsbK95SARThilMSdMHj0g0+vbMNc7rkLg6faYEHU
-         p4VYUkalohiirKkOpBr9/JdWayxR5ff2d8/CZRYxxt87iz4bs/27BpBgYuiZKaxBvnGe
-         vMjZiqU4Drh+xKfTTjye95yxUz5lJ+9WaM5UuHVMXRCTB1I7CchLAyCSHoKjDyE7j129
-         JRbg==
-X-Gm-Message-State: AOAM530r5AMLeUg4H5QVaZTYurAVT7f78wrRkWut4OyBANvoneFxvESZ
-        fQuQXCnLhnJPZzBtDpIylNJlaxQTKL4Pi/fPEkZvZc77Gv/wf/NJMsycxNNvDBAiOAqI2jlbzOz
-        yXyt5udCO1vgS
-X-Received: by 2002:a05:6402:254b:: with SMTP id l11mr5464491edb.202.1611684117669;
-        Tue, 26 Jan 2021 10:01:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxXWyX23eVRTCZ+Y/PAA8KWE+r6Um2ibPctwkRx8m/pqFP0kMwUTGC9QapLSa6it6dg7Deczg==
-X-Received: by 2002:a05:6402:254b:: with SMTP id l11mr5464468edb.202.1611684117441;
-        Tue, 26 Jan 2021 10:01:57 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s2sm8187970edx.77.2021.01.26.10.01.55
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=9qXjNZouu+T2bptO4V2q/fEYj1NRhCbZOJSzY37VnAM=;
+        b=dnFSVzFZUaSq9sxj+Vbl/ROMYDqB4n6kSg/+qsSSJpn6DQee6Y8AkDeZOyF+hIw543
+         IDDkcGH5g1JhclvqeAN+BldAk1cRkJWom4rsdZfjyAq/VTLSnCe3pDQ11WXHWYeci11h
+         Mxdrivt2osxPJM3T3HthRFUloYwzdLEQ+6iEiPpTHgUmmBbCnxOBIhqcwpuIycWZ4D6j
+         RdmZuL/TLb8TsdQBWsmWApvNQ3HjlyVcWmsuCzkoAtq0yYjGsSNbMDTbnw86nmTQCIQc
+         NDxFAp1IlxkMSw+SrHSVjRF1eqJD7ng+9qCgoDX/ICgbYJu5lx1Nt+DvL/++7jgWQZCM
+         K3Ng==
+X-Gm-Message-State: AOAM532rsGzVTAn89CdSofWWb56BoMMwHBR4dIHjGQHaMcnZ626KemjJ
+        f/3zMRwtPPkjioa13ORGAK/Bew==
+X-Google-Smtp-Source: ABdhPJw+Pyn/Lj1faj/rBJ50SuyQjLi9aPa/q0qBCO5rOApwmQkuP5S9N1Di3OSJZYoyx3kR9F+YDA==
+X-Received: by 2002:a63:d42:: with SMTP id 2mr7048995pgn.236.1611684608859;
+        Tue, 26 Jan 2021 10:10:08 -0800 (PST)
+Received: from ?IPv6:2601:646:c200:1ef2:4034:b7d6:a311:ffcc? ([2601:646:c200:1ef2:4034:b7d6:a311:ffcc])
+        by smtp.gmail.com with ESMTPSA id p64sm19433188pfb.201.2021.01.26.10.10.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 10:01:56 -0800 (PST)
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-3-chenyi.qiang@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <62f5f5ba-cbe9-231d-365a-80a656208e37@redhat.com>
-Date:   Tue, 26 Jan 2021 19:01:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200807084841.7112-3-chenyi.qiang@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 26 Jan 2021 10:10:07 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even when SGX driver is disabled
+Date:   Tue, 26 Jan 2021 10:10:06 -0800
+Message-Id: <7379D257-B504-4142-9FA3-F83DE5ABAEB4@amacapital.net>
+References: <24778167-cbd4-1dc5-5b81-e8a49266d1f8@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        jarkko@kernel.org, luto@kernel.org, haitao.huang@intel.com,
+        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+In-Reply-To: <24778167-cbd4-1dc5-5b81-e8a49266d1f8@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
+X-Mailer: iPhone Mail (18C66)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/08/20 10:48, Chenyi Qiang wrote:
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
-> +	bool pks_supported = guest_cpuid_has(vcpu, X86_FEATURE_PKS);
-> +
-> +	/*
-> +	 * set intercept for PKRS when the guest doesn't support pks
-> +	 */
-> +	vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PKRS, MSR_TYPE_RW, !pks_supported);
-> +
-> +	if (pks_supported) {
-> +		vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
-> +		vm_exit_controls_setbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
-> +	} else {
-> +		vm_entry_controls_clearbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
-> +		vm_exit_controls_clearbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
-> +	}
 
-Is the guest expected to do a lot of reads/writes to the MSR (e.g. at 
-every context switch)?
 
-Even if this is the case, the MSR intercepts and the entry/exit controls 
-should only be done if CR4.PKS=1.  If the guest does not use PKS, KVM 
-should behave as if these patches did not exist.
+> On Jan 26, 2021, at 9:03 AM, Dave Hansen <dave.hansen@intel.com> wrote:
+>=20
+> =EF=BB=BFOn 1/26/21 1:31 AM, Kai Huang wrote:
+>> Modify sgx_init() to always try to initialize the virtual EPC driver,
+>> even if the bare-metal SGX driver is disabled.  The bare-metal driver
+>> might be disabled if SGX Launch Control is in locked mode, or not
+>> supported in the hardware at all.  This allows (non-Linux) guests that
+>> support non-LC configurations to use SGX.
+>=20
+> One thing worth calling out *somewhere* (which is entirely my fault):
+> "bare-metal" in the context of this patch set refers to true bare-metal,
+> but *ALSO* covers the plain SGX driver running inside a guest.
+>=20
+> So, perhaps "bare-metal" isn't the best term to use.  Again, my bad.
+> Better nomenclature suggestions are welcome.
 
-Paolo
 
+How about just SGX?  We can have an SGX driver and a virtual EPC driver.=
