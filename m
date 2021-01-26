@@ -2,175 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69FAF303092
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 00:53:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39AC130314B
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 02:32:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732543AbhAYXxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Jan 2021 18:53:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54138 "EHLO
+        id S1725900AbhAZBbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Jan 2021 20:31:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732439AbhAYXwB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 18:52:01 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4750C061574
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 15:51:20 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id z22so30218807ioh.9
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 15:51:20 -0800 (PST)
+        with ESMTP id S1731933AbhAZB3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 20:29:16 -0500
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04B56C0698D1;
+        Mon, 25 Jan 2021 17:28:30 -0800 (PST)
+Received: by mail-oo1-xc32.google.com with SMTP id x23so3767383oop.1;
+        Mon, 25 Jan 2021 17:28:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nd0bjEbAER/9POSPmPu9O4k2jMAolkMKfCYZRpEWzyk=;
-        b=bGs1hw9F0elvPz+BbFoS7xe/EM2an3AAe4zIcqD0BGcx5igessQoOsC/DD/P52xc/5
-         hBt+ZqlM/vjuMD2h3imyosWbTCkNMNk7Pltf8g6/b7OE3vxO8nQI8N5Wul9COHEAqG0S
-         yzayNaJBcjg0LXu+PIvTebsjETAzNtd4VvKmEIKkQNW6mrrmO1IQLwh9m0A4ITf1FIKW
-         s9OFmSfvAAixtM9LGkFpHAkeIaBQ+kVgtVEEuxhq0PZsMJLpJv58Me9UKt0JB5GMmj6K
-         k8AK4+j9CO44r6FZMOg+K9L/P9iFpPhJJ93Ap9mFGWZQiHNPgBaYmJWN98ljc4zw/Q5J
-         wvpQ==
+         :cc:content-transfer-encoding;
+        bh=6paGRqZC+Saiy/OdOWQy9bDY2PXfN0YJkrt0vyVzmXI=;
+        b=K8X6g49rPyw3kREv1Dn/1hTN6EaW4ZmiqeMy6udTvVa98GSl/D5Bt0XdI/lgNGTfFa
+         hBLDiUayFfthZAQPdRjdsWL+GoF/k5MJ4XrtkG4r3ETy7E2HWwLt0z7SJvKdJVcmwQtW
+         ON3dN+WZbnpPGuztW44h97cX/Y/HwPQdtHBphjc3ODW57/GDuFFAicTKS2xybAeTKiuv
+         GrX0gUnTYE+YDAdlC+CpyHbKNbs/bbF6MBbI9DKNGZ0jKc0dmhxHT7D3E/hGHlgVgO4X
+         Etz5ERO6XeksR1k22n3uFvC0EFQjqof1V/RO/Qr4UsgAlKJVvdb4/3UjYAOlXmKIK0fy
+         o6WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nd0bjEbAER/9POSPmPu9O4k2jMAolkMKfCYZRpEWzyk=;
-        b=pV9MDos6mz/f/xyoAuPg+dbmBoNa+lYeOmfedkDXGs+br0iCOOkap9N2HSUS3rwSMe
-         kQdTC08EWXBF3WZfZEBmV07TUYKdJlznONq7J0eP1OXaAzy2B5zVq/jyIuFUL2x2nqJP
-         +t9qn1hmfFLpMrd6vBNojTUWzYQG8VIcUQM3D8dj7q3Q3si5m8IVp8ZevlE0FTEgFbTm
-         dhjcmWD4zSbO95Vdo9PnXj7hB0rwJn6Z+33oc0Khu1LyivS8qcvzsJPp6D1SUSrWbn4e
-         jiz/RrhhmQeo9QWtGI6RKYBZ4fUoOLD0nRA4pyK7YHGLCSLuRTJvO6X8YXWugKZOkO4+
-         mLLw==
-X-Gm-Message-State: AOAM533erPK+0DEvosrtWCxUYsDVnN9LRg+7Jssl/WNjPDWk7kJRdH5l
-        NihMkjH1oQnRrY9isEwk9SfjwvWFxGyB9wstp6Mhrg==
-X-Google-Smtp-Source: ABdhPJxf+qIzKF7XhAxLeHKncjRgkuZNOfh8DP6LjU66+3S+g62Ik7vptGQ+k/H+PJtulr0uEApYV7CWp6qfJPNoEHo=
-X-Received: by 2002:a02:ca17:: with SMTP id i23mr2640812jak.25.1611618680005;
- Mon, 25 Jan 2021 15:51:20 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=6paGRqZC+Saiy/OdOWQy9bDY2PXfN0YJkrt0vyVzmXI=;
+        b=dElTSJZLxxmBk+DLdv009Ke92hEFCnjV/yz1zNmruggDzQ+6h79RS+bLPmxLchWWXX
+         5zesqR8olUYCeFm0QOEdVOJ/6OU/BW8vu3JHERUBLgz0lVY1gy+yjdNjA8cXrwC26iwl
+         ZNu+3Zkd5TbdvVh6A8hbpDfxpoYOtJap06tiqDIm3RK4SiWfuf4T6co6LwQufbnC3Igu
+         ihZQw4HOsE9qwxqrF68onLRQPLQnlRkwzaa3npnq/DkBJ9cxyXoCr0lbPERtzJRs90Qv
+         vMckJXitwBJfnKJJC753dX1BZ3gw9JJ/oAd10FRw72FrlxMpHVYSM+MW6Pk1KNFua6kb
+         /PvA==
+X-Gm-Message-State: AOAM530/L2mprmz2+owQIHdAXQIk0Uuf/2sAk+ggPKpGiK/qX4fmZPA7
+        mX/SC5+VtPOac8vPbsYzIaiwh4s9nMpEG/AEq7sJr+tDKD8=
+X-Google-Smtp-Source: ABdhPJzmkLV3iU8HhDDGcz85czAKO3NR4Cy9fFZK4aEWZplK3Mt2PZiGDbjZepscdMttmj0AiCMkoNL/st7iuznOHdE=
+X-Received: by 2002:a4a:946d:: with SMTP id j42mr2261363ooi.39.1611624509049;
+ Mon, 25 Jan 2021 17:28:29 -0800 (PST)
 MIME-Version: 1.0
-References: <20210112181041.356734-1-bgardon@google.com> <20210112181041.356734-7-bgardon@google.com>
- <YAiJrsyC1KSTKycg@google.com>
-In-Reply-To: <YAiJrsyC1KSTKycg@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 25 Jan 2021 15:51:08 -0800
-Message-ID: <CANgfPd9Ef=GfcpbB118=h4ksHJ+nOB=YxyJ+6t6GWFKAP4yt8w@mail.gmail.com>
-Subject: Re: [PATCH 06/24] kvm: x86/mmu: Skip no-op changes in TDP MMU functions
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
+References: <1610960877-3110-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1610960877-3110-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 26 Jan 2021 09:28:17 +0800
+Message-ID: <CANRm+Cx65UHSJA+S4qRR1wdZ=dhyM=U=KwZnbNUSN4XdM1nyQA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 20, 2021 at 11:51 AM Sean Christopherson <seanjc@google.com> wrote:
+ping=EF=BC=8C
+On Mon, 18 Jan 2021 at 17:08, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
-> On Tue, Jan 12, 2021, Ben Gardon wrote:
-> > Skip setting SPTEs if no change is expected.
-> >
-> > Reviewed-by: Peter Feiner <pfeiner@google.com>
-> >
-> Nit on all of these, can you remove the extra newline between the Reviewed-by
-> and SOB?
-
-Yeah, that line is annoying. I'll make sure it's not there on future patches.
-
+> From: Wanpeng Li <wanpengli@tencent.com>
 >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 1987da0da66e..2650fa9fe066 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -882,6 +882,9 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> >                   !is_last_spte(iter.old_spte, iter.level))
-> >                       continue;
-> >
-> > +             if (!(iter.old_spte & PT_WRITABLE_MASK))
+> The per-cpu vsyscall pvclock data pointer assigns either an element of th=
+e
+> static array hv_clock_boot (#vCPU <=3D 64) or dynamically allocated memor=
+y
+> hvclock_mem (vCPU > 64), the dynamically memory will not be allocated if
+> kvmclock vsyscall is disabled, this can result in cpu hotpluged fails in
+> kvmclock_setup_percpu() which returns -ENOMEM. This patch fixes it by not
+> assigning vsyscall pvclock data pointer if kvmclock vdso_clock_mode is no=
+t
+> VDSO_CLOCKMODE_PVCLOCK.
 >
-> Include the new check with the existing if statement?  I think it makes sense to
-> group all the checks on old_spte.
-
-I agree that' s cleaner. I'll group the checks in the next patch set version.
-
+> Fixes: 6a1cac56f4 ("x86/kvm: Use __bss_decrypted attribute in shared vari=
+ables")
+> Reported-by: Zelin Deng <zelin.deng@linux.alibaba.com>
+> Tested-by: Haiwei Li <lihaiwei@tencent.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: stable@vger.kernel.org#v4.19-rc5+
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+> v1 -> v2:
+>  * add code comments
 >
-> > +                     continue;
-> > +
-> >               new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
-> >
-> >               tdp_mmu_set_spte_no_dirty_log(kvm, &iter, new_spte);
-> > @@ -1079,6 +1082,9 @@ static bool set_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> >               if (!is_shadow_present_pte(iter.old_spte))
-> >                       continue;
-> >
-> > +             if (iter.old_spte & shadow_dirty_mask)
+>  arch/x86/kernel/kvmclock.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> Same comment here.
+> diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
+> index aa59374..01d4e55c 100644
+> --- a/arch/x86/kernel/kvmclock.c
+> +++ b/arch/x86/kernel/kvmclock.c
+> @@ -294,9 +294,11 @@ static int kvmclock_setup_percpu(unsigned int cpu)
+>         /*
+>          * The per cpu area setup replicates CPU0 data to all cpu
+>          * pointers. So carefully check. CPU0 has been set up in init
+> -        * already.
+> +        * already. Assign vsyscall pvclock data pointer iff kvmclock
+> +        * vsyscall is enabled.
+>          */
+> -       if (!cpu || (p && p !=3D per_cpu(hv_clock_per_cpu, 0)))
+> +       if (!cpu || (p && p !=3D per_cpu(hv_clock_per_cpu, 0)) ||
+> +           (kvm_clock.vdso_clock_mode !=3D VDSO_CLOCKMODE_PVCLOCK))
+>                 return 0;
 >
-> > +                     continue;
-> > +
+>         /* Use the static page for the first CPUs, allocate otherwise */
+> --
+> 2.7.4
 >
-> Unrelated to this patch, but it got me looking at the code: shouldn't
-> clear_dirty_pt_masked() clear the bit in @mask before checking whether or not
-> the spte needs to be modified?  That way the early break kicks in after sptes
-> are checked, not necessarily written.  E.g.
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 2650fa9fe066..d8eeae910cbf 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1010,21 +1010,21 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
->                     !(mask & (1UL << (iter.gfn - gfn))))
->                         continue;
->
-> -               if (wrprot || spte_ad_need_write_protect(iter.old_spte)) {
-> -                       if (is_writable_pte(iter.old_spte))
-> -                               new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
-> -                       else
-> -                               continue;
-> -               } else {
-> -                       if (iter.old_spte & shadow_dirty_mask)
-> -                               new_spte = iter.old_spte & ~shadow_dirty_mask;
-> -                       else
-> -                               continue;
-> -               }
-> -
-> -               tdp_mmu_set_spte_no_dirty_log(kvm, &iter, new_spte);
-> -
->                 mask &= ~(1UL << (iter.gfn - gfn));
-> +
-> +               if (wrprot || spte_ad_need_write_protect(iter.old_spte)) {
-> +                       if (is_writable_pte(iter.old_spte))
-> +                               new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
-> +                       else
-> +                               continue;
-> +               } else {
-> +                       if (iter.old_spte & shadow_dirty_mask)
-> +                               new_spte = iter.old_spte & ~shadow_dirty_mask;
-> +                       else
-> +                               continue;
-> +               }
-> +
-> +               tdp_mmu_set_spte_no_dirty_log(kvm, &iter, new_spte);
->         }
->  }
->
-
-Great point, that doesn't work as intended at all. I'll adopt your
-proposed fix and include it in a patch after this one in the next
-version of the series.
-
->
-> >               new_spte = iter.old_spte | shadow_dirty_mask;
-> >
-> >               tdp_mmu_set_spte(kvm, &iter, new_spte);
-> > --
-> > 2.30.0.284.gd98b1dd5eaa7-goog
-> >
