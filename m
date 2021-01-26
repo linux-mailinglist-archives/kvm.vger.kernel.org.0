@@ -2,87 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF9F53053EE
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 08:07:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9EE6305525
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:00:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232903AbhA0HGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 02:06:14 -0500
-Received: from mga14.intel.com ([192.55.52.115]:20500 "EHLO mga14.intel.com"
+        id S231733AbhA0H7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 02:59:44 -0500
+Received: from mga18.intel.com ([134.134.136.126]:39764 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S317827AbhA0Awz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 19:52:55 -0500
-IronPort-SDR: SgMBw2oDT1ppSVfU+Bms1MeFzMIVebcJ2FFVst49iyYP+Aph3cb2SIF3NpZ1P/62iYQo8Lv9C7
- aMF60rkVupaA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="179215356"
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="179215356"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:52:14 -0800
-IronPort-SDR: oklwDcgXGh7NO5d+3lKV16cp46aV47E3E8a87rwomkiMUofkH9qdA29Rqo5V84eCtQZCFLwOpu
- 69G8XFsS+h7Q==
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="353629954"
-Received: from rsperry-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.7.187])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:52:11 -0800
-Date:   Wed, 27 Jan 2021 13:52:09 +1300
+        id S317151AbhAZX1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 18:27:01 -0500
+IronPort-SDR: JvmO3xkerYDDchiNpWdw2qjSCBELtolQWlvGtUNRGZBJxwP2jrtNe1P5O1tdnCrnoLfL7x5INO
+ mN6mA+FU8woA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="167658942"
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="167658942"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 15:25:43 -0800
+IronPort-SDR: VFBEAJaeFNzIoU6MLuX0/sE3ZHn5O654+Ko1FQNTRd4RVGgpXeAsS1K+Vtd0xc6GwZ5HH5mXrf
+ 3m2XjoKPLyJg==
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="574197960"
+Received: from rsperry-desk.amr.corp.intel.com ([10.251.7.187])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 15:25:38 -0800
+Message-ID: <6d91b8e1c45b304ee671c1d359094b9c1b1e5730.camel@intel.com>
+Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver
+ even when SGX driver is disabled
 From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>, <seanjc@google.com>, <jarkko@kernel.org>,
-        <luto@kernel.org>, <haitao.huang@intel.com>, <pbonzini@redhat.com>,
-        <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <hpa@zytor.com>
-Subject: Re: [RFC PATCH v3 05/27] x86/sgx: Add SGX_CHILD_PRESENT hardware
- error code
-Message-Id: <20210127135209.b7f35d507bbdf96af40646af@intel.com>
-In-Reply-To: <83fc6b6b-0ced-ca75-5c31-9c275778351f@intel.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
-        <5a7c7715147f089d97ae4c033b74b0eafb8f3f89.1611634586.git.kai.huang@intel.com>
-        <3bdda0ea-3935-1a8a-8d11-b898371d6168@intel.com>
-        <a7877d1d9624873d25da175a02d0840f7b5e91dc.camel@intel.com>
-        <83fc6b6b-0ced-ca75-5c31-9c275778351f@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+To:     Andy Lutomirski <luto@amacapital.net>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 27 Jan 2021 12:25:36 +1300
+In-Reply-To: <7379D257-B504-4142-9FA3-F83DE5ABAEB4@amacapital.net>
+References: <24778167-cbd4-1dc5-5b81-e8a49266d1f8@intel.com>
+         <7379D257-B504-4142-9FA3-F83DE5ABAEB4@amacapital.net>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Jan 2021 16:21:36 -0800 Dave Hansen wrote:
-> On 1/26/21 4:00 PM, Kai Huang wrote:
-> > On Tue, 2021-01-26 at 07:49 -0800, Dave Hansen wrote:
-> >> On 1/26/21 1:30 AM, Kai Huang wrote:
-> >>> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> >>>
-> >>> SGX virtualization requires to allocate "raw" EPC and use it as "virtual
-> >>> EPC" for SGX guest.  Unlike EPC used by SGX driver, virtual EPC doesn't
-> >>> track how EPC pages are used in VM, e.g. (de)construction of enclaves,
-> >>> so it cannot guarantee EREMOVE success, e.g. it doesn't have a priori
-> >>> knowledge of which pages are SECS with non-zero child counts.
-> >>
-> >> The grammar there is a bit questionable in spots.  Here's a rewrite:
-> >>
-> >> SGX can accurately track how bare-metal enclave pages are used.  This
-> >> enables SECS to be specifically targeted and EREMOVE'd only after all
-> >> child pages have been EREMOVE'd.  This ensures that bare-metal SGX will
-> >> never encounter SGX_CHILD_PRESENT in normal operation.
+On Tue, 2021-01-26 at 10:10 -0800, Andy Lutomirski wrote:
+> 
+> > On Jan 26, 2021, at 9:03 AM, Dave Hansen <dave.hansen@intel.com> wrote:
 > > 
-> > How about:
+> > ﻿On 1/26/21 1:31 AM, Kai Huang wrote:
+> > > Modify sgx_init() to always try to initialize the virtual EPC driver,
+> > > even if the bare-metal SGX driver is disabled.  The bare-metal driver
+> > > might be disabled if SGX Launch Control is in locked mode, or not
+> > > supported in the hardware at all.  This allows (non-Linux) guests that
+> > > support non-LC configurations to use SGX.
 > > 
-> > "SGX driver can accurate track how enclave pages are used. This enables..."
+> > One thing worth calling out *somewhere* (which is entirely my fault):
+> > "bare-metal" in the context of this patch set refers to true bare-metal,
+> > but *ALSO* covers the plain SGX driver running inside a guest.
 > > 
-> > Since in another email, you mentioned that we should get rid of bare-metal driver,
-> > and Andy suggested we can just use SGX driver?
+> > So, perhaps "bare-metal" isn't the best term to use.  Again, my bad.
+> > Better nomenclature suggestions are welcome.
 > 
-> <sigh>
 > 
-> Sure, but with correct grammar, please.
-> 
-> "SGX driver can accurately track how enclave pages are used. This
-> enables..."
-> 
-> Seriously, if you just paste the sentences into Word, it will highlight
-> this and tell you.
+> How about just SGX?  We can have an SGX driver and a virtual EPC driver.
 
-Thanks. My fault.
+Thanks. If no one has better idea, I'll change 'bare-metal' driver to SGX driver, in
+the whole series.
+
+
