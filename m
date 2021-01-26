@@ -2,75 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F5B9303A85
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 11:40:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8663F303B8E
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 12:25:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404249AbhAZKjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 05:39:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404186AbhAZKje (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 05:39:34 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A098FC06174A;
-        Tue, 26 Jan 2021 02:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Pxo8uZRUhENPW3XIRCXJ8iQA/Z1MSNpaDogrCKSFXlU=; b=nZ8BLIiuTqNMm7dM+EeDAmkWHE
-        +llp6DlJXADF0aQXp2gSslLaAHK5VGfegLyT8qy8MjpqkAhUVoLbR3SwxM7rgeGME8CDJ+SBXa8tz
-        KkXYO9bjdaHDVUSGBBzWLJAA37eyawbJaToXgRh2TWQx8+LK9qk97afTxANeYU0IPMLxyS3ZdGdin
-        EKW+2wQQm38mw+GCh68EvLxIEUauM1wrOQj+vj82zdakEo5sI0KLq+f5j+skM0Op6tGcf+/jdOB5F
-        O3OmbicpjZkUB1E6Tr95rA63CFV254b+tDtJ9YsBDDAGVQJrwRBxMPwgkGE05XgTYt/8XeWkqnwcY
-        G4ovpHag==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l4Li6-005RqZ-Dm; Tue, 26 Jan 2021 10:36:50 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 834793059C6;
-        Tue, 26 Jan 2021 11:36:33 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7465E20F042C2; Tue, 26 Jan 2021 11:36:33 +0100 (CET)
-Date:   Tue, 26 Jan 2021 11:36:33 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Xu, Like" <like.xu@intel.com>,
-        Stephane Eranian <eranian@google.com>,
-        Like Xu <like.xu@linux.intel.com>, kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kan Liang <kan.liang@linux.intel.com>, luwei.kang@intel.com,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] perf/intel: Remove Perfmon-v4 counter_freezing support
-Message-ID: <YA/wsQQqbGD1pCDR@hirez.programming.kicks-ass.net>
-References: <20201109021254.79755-1-like.xu@linux.intel.com>
- <20201110151257.GP2611@hirez.programming.kicks-ass.net>
- <20201110153721.GQ2651@hirez.programming.kicks-ass.net>
- <CABPqkBS+-g0qbsruAMfOJf-Zfac8nz9v2LCWfrrvVd+ptoLxZg@mail.gmail.com>
- <2ce24056-0711-26b3-a62c-3bedc88d7aa7@intel.com>
- <9a85e154-d552-3478-6e99-3f693b3da7ed@redhat.com>
+        id S2392398AbhAZLZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 06:25:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55573 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2392260AbhAZLZW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 06:25:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611660218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JTt2fKtk93GppUvATa0pV3yHgt515EpEGR8mjlKiGYA=;
+        b=VSnJZTk5M1/GEEnUBMNtfaCYhFXJ4wRStZIsEm0Jthn90ArDzupO1CnaQdg2F/SYD90Yrx
+        SukZiLA93awC0TzL8/vWB0j8LqDOZl8YWx3fGyuj36WGuoK7TsGoNJNMjtTjP9Rr2EmIG5
+        oqd/OECL/zS11RNXsriwRKDHITg7nBk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-133-GN9ZvHaBO7qDJCYOvl5ruQ-1; Tue, 26 Jan 2021 06:23:37 -0500
+X-MC-Unique: GN9ZvHaBO7qDJCYOvl5ruQ-1
+Received: by mail-ej1-f70.google.com with SMTP id h4so4847109eja.12
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 03:23:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=JTt2fKtk93GppUvATa0pV3yHgt515EpEGR8mjlKiGYA=;
+        b=ekXII9bv4/YwhMe7el5bDNPWAZgfQShX9+n9X9rCI/DBbnuwa4baax26zmDzoMSSFP
+         cjpmIWr342KXuXCZmWGHmOm4UdvkxG/D5xrMFVa8loErBI/oLg7d1CF8TcLGpSVea134
+         9BAk8TU4JpM6x5wJl/NpzrOOzMdIjWvC+X1fyL0FGz3iP68fOj8g4KFxcFsv7BqdEciX
+         7hBWbuxTWB6InYKobB2WNET1B6qUNaRyHITHJ2onTPjzGWnplU9bXVJSfw945g+DeWCj
+         KS3kMLPbHa5x4YtmhBU9GRBNCr8TqTvUdYzObtjEVqwOUG4frk7cXANy1FzH59XEyfj4
+         dgWg==
+X-Gm-Message-State: AOAM5322qPHPQNgpsbfPaWefKCt9+pKLolHPcbtCkZ3BdAyy6Sveim7Y
+        lFBsxAwItVkMt2Fmx4OCxZPx86t414o/63YmrPmYr4PJB18xyoh/9esQMHLyAW8ZUavYBwUNjFA
+        5HYBD1S2VnkIr
+X-Received: by 2002:a17:906:ae42:: with SMTP id lf2mr2986697ejb.487.1611660215814;
+        Tue, 26 Jan 2021 03:23:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxaADKffvaOLAwo/NSoh7H/haFhO7LTo/Xzq1n4nH+wZ/VXL/AKBofvf7/ECClCE+fB2NwxOg==
+X-Received: by 2002:a17:906:ae42:: with SMTP id lf2mr2986681ejb.487.1611660215554;
+        Tue, 26 Jan 2021 03:23:35 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id da26sm12273587edb.36.2021.01.26.03.23.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 03:23:34 -0800 (PST)
+Date:   Tue, 26 Jan 2021 12:23:32 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+Message-ID: <20210126112332.bykmpexzcri7xi2j@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <9a85e154-d552-3478-6e99-3f693b3da7ed@redhat.com>
+In-Reply-To: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 10:51:39AM +0100, Paolo Bonzini wrote:
-> What is the state of this work?  I was expecting a new version that doesn't
-> use counter_freezing.  However, I see that counter_freezing is still in
-> there, so this patch from Peter has never been applied.
+Hi Arseny,
+thanks for this new series!
+I'm a bit busy but I hope to review it tomorrow or on Thursday.
 
-Bah, I forgot about it. Lemme go find it.
+Stefano
+
+On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
+>	This patchset impelements support of SOCK_SEQPACKET for virtio
+>transport.
+>	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>do it, new packet operation was added: it marks start of record (with
+>record length in header), such packet doesn't carry any data.  To send
+>record, packet with start marker is sent first, then all data is sent
+>as usual 'RW' packets. On receiver's side, length of record is known
+>from packet with start record marker. Now as  packets of one socket
+>are not reordered neither on vsock nor on vhost transport layers, such
+>marker allows to restore original record on receiver's side. If user's
+>buffer is smaller that record length, when all out of size data is
+>dropped.
+>	Maximum length of datagram is not limited as in stream socket,
+>because same credit logic is used. Difference with stream socket is
+>that user is not woken up until whole record is received or error
+>occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>	Tests also implemented.
+>
+> Arseny Krasnov (13):
+>  af_vsock: prepare for SOCK_SEQPACKET support
+>  af_vsock: prepare 'vsock_connectible_recvmsg()'
+>  af_vsock: implement SEQPACKET rx loop
+>  af_vsock: implement send logic for SOCK_SEQPACKET
+>  af_vsock: rest of SEQPACKET support
+>  af_vsock: update comments for stream sockets
+>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>  virtio/vsock: fetch length for SEQPACKET record
+>  virtio/vsock: add SEQPACKET receive logic
+>  virtio/vsock: rest of SOCK_SEQPACKET support
+>  virtio/vsock: setup SEQPACKET ops for transport
+>  vhost/vsock: setup SEQPACKET ops for transport
+>  vsock_test: add SOCK_SEQPACKET tests
+>
+> drivers/vhost/vsock.c                   |   7 +-
+> include/linux/virtio_vsock.h            |  12 +
+> include/net/af_vsock.h                  |   6 +
+> include/uapi/linux/virtio_vsock.h       |   9 +
+> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
+> net/vmw_vsock/virtio_transport.c        |   4 +
+> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
+> tools/testing/vsock/util.c              |  32 +-
+> tools/testing/vsock/util.h              |   3 +
+> tools/testing/vsock/vsock_test.c        | 126 +++++
+> 10 files changed, 862 insertions(+), 175 deletions(-)
+>
+> TODO:
+> - Support for record integrity control. As transport could drop some
+>   packets, something like "record-id" and record end marker need to
+>   be implemented. Idea is that SEQ_BEGIN packet carries both record
+>   length and record id, end marker(let it be SEQ_END) carries only
+>   record id. To be sure that no one packet was lost, receiver checks
+>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
+>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
+>   means that both markers were not dropped. I think that easiest way
+>   to implement record id for SEQ_BEGIN is to reuse another field of
+>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
+>   SEQ_END record id could be stored in 'flags'.
+>     Another way to implement it, is to move metadata of both SEQ_END
+>   and SEQ_BEGIN to payload. But this approach has problem, because
+>   if we move something to payload, such payload is accounted by
+>   credit logic, which fragments payload, while payload with record
+>   length and id couldn't be fragmented. One way to overcome it is to
+>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
+>   is to update 'stream_has_space()' function: current implementation
+>   return non-zero when at least 1 byte is allowed to use,but updated
+>   version will have extra argument, which is needed length. For 'RW'
+>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
+>   record id) and for SEQ_END it is sizeof(record id).
+>
+> - What to do, when server doesn't support SOCK_SEQPACKET. In current
+>   implementation RST is replied in the same way when listening port
+>   is not found. I think that current RST is enough,because case when
+>   server doesn't support SEQ_PACKET is same when listener missed(e.g.
+>   no listener in both cases).
+>
+> v2 -> v3:
+> - patches reorganized: split for prepare and implementation patches
+> - local variables are declared in "Reverse Christmas tree" manner
+> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>   fields access
+> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>   between stream and seqpacket sockets.
+> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+> - af_vsock.c: 'vsock_wait_data()' refactored.
+>
+> v1 -> v2:
+> - patches reordered: af_vsock.c related changes now before virtio vsock
+> - patches reorganized: more small patches, where +/- are not mixed
+> - tests for SOCK_SEQPACKET added
+> - all commit messages updated
+> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>   'vsock_connectible_recvmsg()'
+> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>   was not found
+> - virtio_transport_common.c: transport callback for seqpacket dequeue
+> - virtio_transport_common.c: simplified
+>   'virtio_transport_recv_connected()'
+> - virtio_transport_common.c: send reset on socket and packet type
+>			      mismatch.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>
+>-- 
+>2.25.1
+>
+
