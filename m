@@ -2,105 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4D62305C69
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:05:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BBB0305C61
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:04:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313819AbhAZWqr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:46:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
+        id S313825AbhAZWqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:46:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388455AbhAZTHB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 14:07:01 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88298C061574;
-        Tue, 26 Jan 2021 11:06:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=zUcP2Ekow40wDr8LQu56g1JOWBLSxsWCwNUDwttWnJY=; b=ad84LgFWJ8FgdoRvBSNVnAdb+
-        0I6Sw5zFHnURG6DddKEQ8HbimmJVGhfZNBE+p4AhrkuGcqgL8wXJS/82Ulh3PCv17KG3N45R7A4lo
-        nmAWv3AnHF/mSc9xZD1jBN9qCv/KUXD01csQwhWLG+rkGDTkxKX1bLlQ1gn5TyX5Nq4qryobh41F5
-        DB4HHmb9nD2Xu3mV8TLNo+8B+nWoKTBy48lo4Q1JucKdB4IQ7QCREGM7mwYt646OKNjClWNUO1E6M
-        j60U9ebf7BAEOHy7IwgCDiy4Xjl4pjGwcbLID7o2kdNIzvVrdpvSEcEUXs6vOb5LBBAMtPHo30HE4
-        oAMpwR9Vw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53070)
-        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1l4TeW-0004lN-0N; Tue, 26 Jan 2021 19:05:24 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1l4TeJ-00042E-C4; Tue, 26 Jan 2021 19:05:11 +0000
-Date:   Tue, 26 Jan 2021 19:05:11 +0000
-From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-rtc@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-serial@vger.kernel.org, coresight@lists.linaro.org,
-        linux-input@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-spi@vger.kernel.org, linux-i2c@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-crypto@vger.kernel.org,
-        kernel@pengutronix.de, Leo Yan <leo.yan@linaro.org>,
-        dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org,
-        Mike Leach <mike.leach@linaro.org>
-Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
-Message-ID: <20210126190511.GK1551@shell.armlinux.org.uk>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
- <3e42b2ea-c713-31b2-9c86-c49a70d8e1f4@arm.com>
- <20210126175652.3caoqfnsky2es42f@pengutronix.de>
+        with ESMTP id S2395340AbhAZTPq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 14:15:46 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0CCC061788
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:15:06 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id r38so6164644pgk.13
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 11:15:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7PjVCLjYFXyjmxqV/lyzID0J0aEXBM2goYbT8N0cVdM=;
+        b=N4qij7ElZXoW1edUjouKX7sa4B7PcH7S1ydi7zNInVxG98fDfQBwvWzAsPMCiXfAIi
+         SwHvVjKK5tkLgarR+fR9Gr/pyisr1XQUoa32306zwNGoFGGjXd+a1wwkTsed9uIkigvU
+         JheRiZjqYzetJS+Y60ZD6kh92Ot6U2lumGY28k1RZgy07h4/3lLjxckmNwnDprtZe5Td
+         rjK75ljLmnhqu/oUJ5o4l4db8W6r2oRtZWSs+HHdKAVjLD0CadqLdY6D6X+rT3PnN4zj
+         BxndHPd0RluJldv52zCGzT9lBalqFCFNWBB9pZW+YCYOqvaXK4mn+ScGpLrday1Oz8Dn
+         obtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7PjVCLjYFXyjmxqV/lyzID0J0aEXBM2goYbT8N0cVdM=;
+        b=NRHOCY6lRNmRkaIep+LUJ7bKRHZ8FqWNCw3FGfHp3Lo3lHgsQCxl42tDCi2sTmn5hv
+         NavZx6ufPENGWjG7io1quuhC54WVFihaKdBLpgoBRexevR9ygG4+LAM6ecq1vLseYz5m
+         CH8qxzykgOqZLf2MWsCGT8kxiWlwjZwdIdvZBAmHKh8InGHtd/1aI4usR4ByhyE2nQpB
+         aUxkUZZKxyourVP3yFy/4XPz13vt+gHDY8QPimy0vRcL8JE4IWALETWbl36vgw5AqJDY
+         +8nGK+RBSmw2CM42bb4bezyQOehCnJcixm1Nf5gWzqvTFBQMsrnfr225QkcBBBuqrenE
+         g3Aw==
+X-Gm-Message-State: AOAM531d2oVrJcmbN0sREIaR+iX6cVpRwwe4gknAvoMCylPSQ+7qSmCr
+        qF3At428cUZZcMVSKim8SmrIZmDgU7lNtQ==
+X-Google-Smtp-Source: ABdhPJywTF+70hdYYm6QZYKpIt1JIx4lGygSfSPQrTqWQ+lxlJJDsLxSag8n7PPPKhewpWJCupqstg==
+X-Received: by 2002:a05:6a00:16c7:b029:1b6:68a6:985a with SMTP id l7-20020a056a0016c7b02901b668a6985amr6557419pfc.44.1611688505551;
+        Tue, 26 Jan 2021 11:15:05 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id b65sm21356534pga.54.2021.01.26.11.15.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 11:15:04 -0800 (PST)
+Date:   Tue, 26 Jan 2021 11:14:58 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Fix unsynchronized access to sev members through
+ svm_register_enc_region
+Message-ID: <YBBqMkd7zGkNqnaL@google.com>
+References: <20210126185431.1824530-1-pgonda@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210126175652.3caoqfnsky2es42f@pengutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Sender: Russell King - ARM Linux admin <linux@armlinux.org.uk>
+In-Reply-To: <20210126185431.1824530-1-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 06:56:52PM +0100, Uwe Kleine-König wrote:
-> I'm surprised to see that the remove callback introduced in 2952ecf5df33
-> ("coresight: etm4x: Refactor probing routine") has an __exit annotation.
+On Tue, Jan 26, 2021, Peter Gonda wrote:
+> sev_pin_memory assumes that callers hold the kvm->lock. This was true for
+> all callers except svm_register_enc_region since it does not originate
 
-In general, remove callbacks should not have an __exit annotation.
-__exit _can_ be discarded at link time for built-in stuff.
+This doesn't actually state what change it being made, is only describes the
+problem. I'd also reword these sentences to avoid talking about assumptions, and
+instead use stronger language.
+ 
+> from svm_mem_enc_op. Also added lockdep annotation to help prevent
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+s/Also added/Add, i.e. describe what the patch is doing, not what you did in the
+past.
+
+E.g.
+
+  Grab kvm->lock before pinning memory when registering an encrypted
+  region; sev_pin_memory() relies on kvm->lock being held to ensure
+  correctness when checking and updating the number of pinned pages.
+
+  Add a lockdep assertion to help prevent future regressions.
+
+> future regressions.
+> 
+> Tested: Booted SEV enabled VM on host.
+
+Personally I'd just leave this out.  Unless stated otherwise, it's implied that
+you've tested the patch.
+
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Fixes: 116a2214c5173 (KVM: SVM: Pin guest memory when SEV is active)
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> 
+> ---
+>  arch/x86/kvm/svm.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index afdc5b44fe9f..9884e57f3d0f 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1699,6 +1699,8 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  	struct page **pages;
+>  	unsigned long first, last;
+>  
+> +	lockdep_assert_held(&kvm->lock);
+> +
+>  	if (ulen == 0 || uaddr + ulen < uaddr)
+>  		return NULL;
+>  
+> @@ -7228,12 +7230,19 @@ static int svm_register_enc_region(struct kvm *kvm,
+>  	if (!region)
+>  		return -ENOMEM;
+>  
+> +	mutex_lock(&kvm->lock);
+>  	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
+>  	if (!region->pages) {
+>  		ret = -ENOMEM;
+>  		goto e_free;
+
+This error path needs to do mutex_unlock().
+
+>  	}
+>  
+> +	region->uaddr = range->addr;
+> +	region->size = range->size;
+> +
+> +	list_add_tail(&region->list, &sev->regions_list);
+> +	mutex_unlock(&kvm->lock);
+> +
+>  	/*
+>  	 * The guest may change the memory encryption attribute from C=0 -> C=1
+>  	 * or vice versa for this memory range. Lets make sure caches are
+> @@ -7242,13 +7251,6 @@ static int svm_register_enc_region(struct kvm *kvm,
+>  	 */
+>  	sev_clflush_pages(region->pages, region->npages);
+>  
+> -	region->uaddr = range->addr;
+> -	region->size = range->size;
+> -
+> -	mutex_lock(&kvm->lock);
+> -	list_add_tail(&region->list, &sev->regions_list);
+> -	mutex_unlock(&kvm->lock);
+> -
+>  	return ret;
+>  
+>  e_free:
+> -- 
+> 2.30.0.280.ga3ce27912f-goog
