@@ -2,138 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46EEF304285
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E484E304295
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:30:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731036AbhAZJdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 04:33:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25666 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391161AbhAZJbe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 04:31:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611653408;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=h+ZpZHpOkIPnIutZEYCghjpUFXEecoOLDsLy71i5vGQ=;
-        b=hR4pW+LWomkdON9SViap7LahQOgEMGyng20K4Fs+wXkh3aC9iqhRImreKN73gpfVvdA/30
-        880423Pt/NL6e6lNtsDo+ZqMEY3KP8Qnoen8fo5fd9MU1k3U0El2dlJTeh9+WJG4zNtGfd
-        14aKiZGy5r8Itdgvmf2EyNXwkJmL1qY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-PZFi_ACMMLuOlvHYvBdv7g-1; Tue, 26 Jan 2021 04:30:06 -0500
-X-MC-Unique: PZFi_ACMMLuOlvHYvBdv7g-1
-Received: by mail-wr1-f72.google.com with SMTP id u3so10815178wri.19
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 01:30:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=h+ZpZHpOkIPnIutZEYCghjpUFXEecoOLDsLy71i5vGQ=;
-        b=U+8PGrHoMwDHFufcFLRp1rnB77hB2s8p6q1R3wkb1ROdo6eEvbs4EliUXpQf7pqEMu
-         mEl9bLfQVuJOZxyrMjPnpmNaOQfxRicdm0zVrwhc4MUaTlaJYxxnk1Y5ASXKhFicwcUi
-         tPQyUO++7IoSHAJnuWfv0N7a0t/ZWDeBhNpAByIahMUO0iN+17ZkdHXn0pMK96CS+gYm
-         J0GL6FVMQki6TRR7pxjPDphPPCdV0q02ot61NdaeaUVc7ahiNm0gZbnGVLFBBez7jtOt
-         Mw1MP1sDx9IvO+n/5JbphrT6iGgcfb4MLpsvo5IgGVPo4cc4VLKRlUSE7zezTSTFfKzL
-         Kj7w==
-X-Gm-Message-State: AOAM5332jR9zLD7w6N2DOv0t5QaZnaG1vvy2Das+YhjH83xoC5w8Y9HT
-        QRrGowSx5eIhsa49XrHY6Q0s8mJ7NCvAtW6V4ZlS0z1LGel/aSGVugz/yBIkhj4IhFvA0WV/3RI
-        5rdJya6x5UJr0
-X-Received: by 2002:a05:6000:1142:: with SMTP id d2mr5142096wrx.307.1611653405216;
-        Tue, 26 Jan 2021 01:30:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzWAoc/h4SZNsmz+mkEnH2HYCgpbjliy09pP/DmoI918Oq2WzaI7/Z4F+HSwDBlb9skYXBc3w==
-X-Received: by 2002:a05:6000:1142:: with SMTP id d2mr5142070wrx.307.1611653405005;
-        Tue, 26 Jan 2021 01:30:05 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k131sm2540210wmb.37.2021.01.26.01.30.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 01:30:04 -0800 (PST)
-Subject: Re: [RESEND v13 09/10] KVM: vmx/pmu: Expose LBR_FMT in the
- MSR_IA32_PERF_CAPABILITIES
-To:     Like Xu <like.xu@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210108013704.134985-1-like.xu@linux.intel.com>
- <20210108013704.134985-10-like.xu@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2ff8ca5a-32ec-ca5d-50c3-d1690e933f6d@redhat.com>
-Date:   Tue, 26 Jan 2021 10:30:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2406048AbhAZP3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 10:29:42 -0500
+Received: from mga03.intel.com ([134.134.136.65]:12823 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727430AbhAZJdW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 04:33:22 -0500
+IronPort-SDR: FluIt0koWGRaW2TgsJfC/reKmHtkWkl9tDZF6dhSZUuyo8b9HUZn21GNIAW0IEEUSZx0gNriDb
+ sXgSYE2QPh3A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9875"; a="179954933"
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="179954933"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:31:43 -0800
+IronPort-SDR: 0/fIr8Rq8J4cWleJ2/+rvJdTyqMUrpxXdCwCJUJbcWZuf9tbW4bXDblo8TgbL/0gaFslx6ztP/
+ RNjC+D85kxAg==
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="577747757"
+Received: from ravivisw-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.124.51])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:31:40 -0800
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        Kai Huang <kai.huang@intel.com>
+Subject: [RFC PATCH v3 14/27] x86/sgx: Add helpers to expose ECREATE and EINIT to KVM
+Date:   Tue, 26 Jan 2021 22:31:06 +1300
+Message-Id: <e807033e3d56ede1177d7a1af34477678bfbfff9.1611634586.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <cover.1611634586.git.kai.huang@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210108013704.134985-10-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/01/21 02:37, Like Xu wrote:
-> Userspace could enable guest LBR feature when the exactly supported
-> LBR format value is initialized to the MSR_IA32_PERF_CAPABILITIES
-> and the LBR is also compatible with vPMU version and host cpu model.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Reviewed-by: Andi Kleen <ak@linux.intel.com>
-> ---
->   arch/x86/kvm/vmx/capabilities.h | 9 ++++++++-
->   arch/x86/kvm/vmx/vmx.c          | 7 +++++++
->   2 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-> index 57b940c613ab..a9a7c4d1b634 100644
-> --- a/arch/x86/kvm/vmx/capabilities.h
-> +++ b/arch/x86/kvm/vmx/capabilities.h
-> @@ -378,7 +378,14 @@ static inline u64 vmx_get_perf_capabilities(void)
->   	 * Since counters are virtualized, KVM would support full
->   	 * width counting unconditionally, even if the host lacks it.
->   	 */
-> -	return PMU_CAP_FW_WRITES;
-> +	u64 perf_cap = PMU_CAP_FW_WRITES;
-> +
-> +	if (boot_cpu_has(X86_FEATURE_PDCM))
-> +		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
-> +
-> +	perf_cap |= perf_cap & PMU_CAP_LBR_FMT;
-> +
-> +	return perf_cap;
->   }
->   
->   static inline u64 vmx_supported_debugctl(void)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index ad3b079f6700..9cb5b1e4fc27 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2229,6 +2229,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	case MSR_IA32_PERF_CAPABILITIES:
->   		if (data && !vcpu_to_pmu(vcpu)->version)
->   			return 1;
-> +		if (data & PMU_CAP_LBR_FMT) {
-> +			if ((data & PMU_CAP_LBR_FMT) !=
-> +			    (vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT))
-> +				return 1;
-> +			if (!intel_pmu_lbr_is_compatible(vcpu))
-> +				return 1;
-> +		}
->   		ret = kvm_set_msr_common(vcpu, msr_info);
->   		break;
->   
-> 
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Please move this hunk to patch 4.
+The bare-metal kernel must intercept ECREATE to be able to impose policies
+on guests.  When it does this, the bare-metal kernel runs ECREATE against
+the userspace mapping of the virtualized EPC.
 
-Paolo
+Provide wrappers around __ecreate() and __einit() to hide the ugliness
+of overloading the ENCLS return value to encode multiple error formats
+in a single int.  KVM will trap-and-execute ECREATE and EINIT as part
+of SGX virtualization, and on an exception, KVM needs the trapnr so that
+it can inject the correct fault into the guest.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+v2->v3:
+
+ - Added kdoc for sgx_virt_ecreate() and sgx_virt_einit(), per Jarkko.
+ - Changed to use CONFIG_X86_SGX_KVM.
+
+---
+ arch/x86/include/asm/sgx.h     | 16 ++++++
+ arch/x86/kernel/cpu/sgx/virt.c | 93 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 109 insertions(+)
+ create mode 100644 arch/x86/include/asm/sgx.h
+
+diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
+new file mode 100644
+index 000000000000..8a3ea3e1efbe
+--- /dev/null
++++ b/arch/x86/include/asm/sgx.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_X86_SGX_H
++#define _ASM_X86_SGX_H
++
++#include <linux/types.h>
++
++#ifdef CONFIG_X86_SGX_KVM
++struct sgx_pageinfo;
++
++int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
++		     int *trapnr);
++int sgx_virt_einit(void __user *sigstruct, void __user *token,
++		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
++#endif
++
++#endif /* _ASM_X86_SGX_H */
+diff --git a/arch/x86/kernel/cpu/sgx/virt.c b/arch/x86/kernel/cpu/sgx/virt.c
+index e1ad7856d878..0f5b0e4e33dd 100644
+--- a/arch/x86/kernel/cpu/sgx/virt.c
++++ b/arch/x86/kernel/cpu/sgx/virt.c
+@@ -252,3 +252,96 @@ int __init sgx_vepc_init(void)
+ 
+ 	return misc_register(&sgx_vepc_dev);
+ }
++
++/**
++ * sgx_virt_ecreate() - Run ECREATE on behalf of guest
++ * @pageinfo:	Pointer to PAGEINFO structure
++ * @secs:	Userspace pointer to SECS page
++ * @trapnr:	trap number injected to guest in case of ECREATE error
++ *
++ * Run ECREATE on behalf of guest after KVM traps ECREATE for the purpose
++ * of enforcing policies of guest's enclaves, and return the trap number
++ * which should be injected to guest in case of any ECREATE error.
++ *
++ * Return:
++ * - 0: 	ECREATE was successful.
++ * - -EFAULT:	ECREATE returned error.
++ */
++int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
++		     int *trapnr)
++{
++	int ret;
++
++	/*
++	 * @secs is userspace address, and it's not guaranteed @secs points at
++	 * an actual EPC page. It's also possible to generate a kernel mapping
++	 * to physical EPC page by resolving PFN but using __uaccess_xx() is
++	 * simpler.
++	 */
++	__uaccess_begin();
++	ret = __ecreate(pageinfo, (void *)secs);
++	__uaccess_end();
++
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
++	}
++
++	/* ECREATE doesn't return an error code, it faults or succeeds. */
++	WARN_ON_ONCE(ret);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(sgx_virt_ecreate);
++
++static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
++			    void __user *secs)
++{
++	int ret;
++
++	__uaccess_begin();
++	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
++	__uaccess_end();
++	return ret;
++}
++
++/**
++ * sgx_virt_ecreate() - Run EINIT on behalf of guest
++ * @sigstruct:		Userspace pointer to SIGSTRUCT structure
++ * @token:		Userspace pointer to EINITTOKEN structure
++ * @secs:		Userspace pointer to SECS page
++ * @lepubkeyhash:	Pointer to guest's *virtual* SGX_LEPUBKEYHASH MSR
++ * 			values
++ * @trapnr:		trap number injected to guest in case of EINIT error
++ *
++ * Run EINIT on behalf of guest after KVM traps EINIT. If SGX_LC is available
++ * in host, bare-metal driver may rewrite the hardware values, therefore KVM
++ * needs to update hardware values to guest's virtual MSR values in order to
++ * ensure EINIT is executed with expected hardware values.
++ *
++ * Return:
++ * - 0: 	EINIT was successful.
++ * - -EFAULT:	EINIT returned error.
++ */
++int sgx_virt_einit(void __user *sigstruct, void __user *token,
++		   void __user *secs, u64 *lepubkeyhash, int *trapnr)
++{
++	int ret;
++
++	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
++		ret = __sgx_virt_einit(sigstruct, token, secs);
++	} else {
++		preempt_disable();
++
++		sgx_update_lepubkeyhash(lepubkeyhash);
++
++		ret = __sgx_virt_einit(sigstruct, token, secs);
++		preempt_enable();
++	}
++
++	if (encls_faulted(ret)) {
++		*trapnr = ENCLS_TRAPNR(ret);
++		return -EFAULT;
++	}
++	return ret;
++}
++EXPORT_SYMBOL_GPL(sgx_virt_einit);
+-- 
+2.29.2
 
