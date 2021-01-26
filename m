@@ -2,116 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 697DC30343C
+	by mail.lfdr.de (Postfix) with ESMTP id D6AA130343D
 	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 06:21:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732111AbhAZFUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:20:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728690AbhAYQyu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Jan 2021 11:54:50 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB402C061786
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 08:54:10 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id i7so9296916pgc.8
-        for <kvm@vger.kernel.org>; Mon, 25 Jan 2021 08:54:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=98KsfeJcSNeAq7D2e2LH4xgYP6akBDNIEzkaVdZ+rkw=;
-        b=Oo5uK1YsHdQRSpOXYXzGBJe7lmxs/p9bDTq7nTmzYXI9uNvfHic+t5VRutNPjN++q2
-         U8ZR3mhcRILkM0mwPhAulKTYGYWvlGwFLc3F+xJ21Mv17yZpr//tLixrwZatM+SytvDq
-         dPaXSFXeju/kawr/26rmzasqgx8/8szaIVHwTE0qe6T+yoowpSbYBgTqN7zucSkz/AJG
-         U5wCXO8ejI5WlYZKAm6QvX59xg8yvcmLF+BYG5XgdmJC6bVZ2+vgoNdB+fTesFsR+h/i
-         TiFEPgH/fzLAennBnxoFTvJmRIm/4zMCRn35kfGkLa4l/EKeqtg80piU6RAQIE+1Cbhp
-         Fxvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=98KsfeJcSNeAq7D2e2LH4xgYP6akBDNIEzkaVdZ+rkw=;
-        b=NssM1+9kNh92HLpRoACRMBp4vxKC+jnEUXeEjgCAkjoDGdo6X880q+CT3uypu9I6cM
-         nPoGJ3nHzCWXU3/Nm0flcQq5j8SC1XBlTalpKwf5dIG1ZtJVEjEG6PDpfSruKN74Bn9/
-         8i53PCJrR3cmSQED7TzypZ2pT18wqp+3I5CWLqpgbn76hjj3nVyx/yDMhn828pMxFgrd
-         3OJozk0Tmjhzt8TMS01jRa+8j/iaLpiZPl+fCAPhF2njRZznQQRrKtWE+kA0EC2RAiUL
-         toTW0MT3N8AUNo/bdCar/qooMeijLKtuG9BF6zsV8uaEfmBzwS+d878bIBHVMJkK6p5o
-         fLqg==
-X-Gm-Message-State: AOAM532nK4zgsAoviK+IcNsngjISi4nVP5GDxwKDwrtmSAiepj0QnvIA
-        r+kQ0jTWXUmzZNefZScxK+Bw9Q==
-X-Google-Smtp-Source: ABdhPJww3ALlC+Iz60JCj51ZcFCuikckWRJvHg478hZXeCENQgqzuZS7QTUpTXKDAJCTuOpGwe1/XQ==
-X-Received: by 2002:a63:ef14:: with SMTP id u20mr1438952pgh.93.1611593650110;
-        Mon, 25 Jan 2021 08:54:10 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id 130sm17428435pfb.92.2021.01.25.08.54.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 08:54:09 -0800 (PST)
-Date:   Mon, 25 Jan 2021 08:54:02 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Stephen Zhang <stephenzhangzsd@gmail.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com
-Subject: Re: [PATCH] KVM: x86/mmu: improve robustness of some functions
-Message-ID: <YA73qq1tTLxTEGKV@google.com>
-References: <1611314323-2770-1-git-send-email-stephenzhangzsd@gmail.com>
- <87a6sx4a0l.fsf@vitty.brq.redhat.com>
- <99258705-ff9e-aa0c-ba58-da87df760655@redhat.com>
+        id S1732164AbhAZFUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:20:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41282 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732273AbhAZBfb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 20:35:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611624841;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aoPNVJItjntzvSmEbIkhipMW6l3+xUofRDwTaAUWaf0=;
+        b=OOksBQERAjwdUvvS5mzM911L7TrglQOagwJHUMcd/sqKc2I3vQQADWtoLs5wD5YQgAO5yY
+        UwaHQRbpN0E/nlC16KxF22Fsnw9vm0dsCsrTY+1Lc0YOHXTj+PTcPHpA4omr0rpa9ObaFc
+        V8UAXJ1feNr70dTi7V5hIRf29BCIy8A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-2R8Fn7WwMwG4HhUGCCL5yA-1; Mon, 25 Jan 2021 19:43:08 -0500
+X-MC-Unique: 2R8Fn7WwMwG4HhUGCCL5yA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E498C28A;
+        Tue, 26 Jan 2021 00:43:07 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 246E35D9DB;
+        Tue, 26 Jan 2021 00:43:07 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, stable@vger.kernel.org
+Subject: [PATCH v2] KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside guest mode for VMX
+Date:   Mon, 25 Jan 2021 19:43:06 -0500
+Message-Id: <20210126004306.1442975-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99258705-ff9e-aa0c-ba58-da87df760655@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021, Paolo Bonzini wrote:
-> On 25/01/21 10:54, Vitaly Kuznetsov wrote:
-> > 
-> > What if we do something like (completely untested):
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index bfc6389edc28..5ec15e4160b1 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -12,7 +12,7 @@
-> >  extern bool dbg;
-> >  #define pgprintk(x...) do { if (dbg) printk(x); } while (0)
-> > -#define rmap_printk(x...) do { if (dbg) printk(x); } while (0)
-> > +#define rmap_printk(fmt, args...) do { if (dbg) printk("%s: " fmt, __func__, ## args); } while (0)
-> >  #define MMU_WARN_ON(x) WARN_ON(x)
-> >  #else
-> >  #define pgprintk(x...) do { } while (0)
-> > 
-> > and eliminate the need to pass '__func__,' explicitly? We can probably
-> > do the same to pgprintk().
-> 
-> Nice indeed.  Though I wonder if anybody has ever used these.
+VMX also uses KVM_REQ_GET_NESTED_STATE_PAGES for the Hyper-V eVMCS,
+which may need to be loaded outside guest mode.  Therefore we cannot
+WARN in that case.
 
-I've used the ones in pte_list_add() and __pte_list_remove().  I had to add more
-info to track down the bug I introduced, but their initial existence was helpful.
+However, that part of nested_get_vmcs12_pages is _not_ needed at
+vmentry time.  Split it out of KVM_REQ_GET_NESTED_STATE_PAGES handling,
+so that both vmentry and migration (and in the latter case, independent
+of is_guest_mode) do the parts that are needed.
 
-That being said, I definitely did not build with MMU_DEBUG defined, I simply
-changed a handful of rmap_printks to pr_warn.  Blindly enabling MMU_DEBUG
-activates far too much output to be useful.  That may not have been the case
-when the core parts of the MMU were under heavy development, but it does feel
-like the time has come to excise the bulk of the pgprintk and rmap_printk hooks.
-Ditto for mmu_audit.c.
+Cc: <stable@vger.kernel.org> # 5.10.x: f2c7ef3ba: KVM: nSVM: cancel KVM_REQ_GET_NESTED_STATE_PAGES
+Cc: <stable@vger.kernel.org> # 5.10.x
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c |  3 +++
+ arch/x86/kvm/vmx/nested.c | 31 +++++++++++++++++++++++++------
+ arch/x86/kvm/x86.c        |  4 +---
+ 3 files changed, 29 insertions(+), 9 deletions(-)
 
-> For those that I actually needed in the past I created tracepoints instead.
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index cb4c6ee10029..7a605ad8254d 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -200,6 +200,9 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
++	if (WARN_ON(!is_guest_mode(vcpu)))
++		return true;
++
+ 	if (!nested_svm_vmrun_msrpm(svm)) {
+ 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+ 		vcpu->run->internal.suberror =
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 776688f9d101..f2b9bfb58206 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -3124,13 +3124,9 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
+-static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
++static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ {
+-	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	struct kvm_host_map *map;
+-	struct page *page;
+-	u64 hpa;
+ 
+ 	/*
+ 	 * hv_evmcs may end up being not mapped after migration (when
+@@ -3153,6 +3149,17 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
++	return true;
++}
++
++static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
++{
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct kvm_host_map *map;
++	struct page *page;
++	u64 hpa;
++
+ 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+ 		/*
+ 		 * Translate L1 physical address to host physical
+@@ -3221,6 +3228,18 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 		exec_controls_setbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
+ 	else
+ 		exec_controls_clearbit(vmx, CPU_BASED_USE_MSR_BITMAPS);
++
++	return true;
++}
++
++static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
++{
++	if (!nested_get_evmcs_page(vcpu))
++		return false;
++
++	if (is_guest_mode(vcpu) && !nested_get_vmcs12_pages(vcpu))
++		return false;
++
+ 	return true;
+ }
+ 
+@@ -6605,7 +6624,7 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+ 	.hv_timer_pending = nested_vmx_preemption_timer_pending,
+ 	.get_state = vmx_get_nested_state,
+ 	.set_state = vmx_set_nested_state,
+-	.get_nested_state_pages = nested_get_vmcs12_pages,
++	.get_nested_state_pages = vmx_get_nested_state_pages,
+ 	.write_log_dirty = nested_vmx_write_pml_buffer,
+ 	.enable_evmcs = nested_enable_evmcs,
+ 	.get_evmcs_version = nested_get_evmcs_version,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1f64e8b97605..76bce832cade 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8806,9 +8806,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm_request_pending(vcpu)) {
+ 		if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
+-			if (WARN_ON_ONCE(!is_guest_mode(vcpu)))
+-				;
+-			else if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
++			if (unlikely(!kvm_x86_ops.nested_ops->get_nested_state_pages(vcpu))) {
+ 				r = 0;
+ 				goto out;
+ 			}
+-- 
+2.26.2
 
-Ya.  There are times where I prefer using the kernel log over tracepoints, but
-it's easy enough to copy-paste the tracepoint into a pr_* when desired.
-
-I'd be ok with converting a few select rmap_printks to tracepoints, but I vote
-to completely remove the bulk of the existing code.  Tracepoints always make me
-a bit wary, it's easy to forget/overlook that the inputs to the tracepoint are
-still generated even if the tracepoint itself is disabled.  E.g. being too
-liberal with tracepoints could theoretically degrade performance.
-
-If we do yank them, I think it makes sense to git rid of mmu_audit.c in the same
-commit.  In theory, that would make it easier for someone to restore the hooks
-if they need the hooks to debug something in the future.
