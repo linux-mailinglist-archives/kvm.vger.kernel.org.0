@@ -2,132 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E240303E89
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:24:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DF429303E5A
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 14:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391541AbhAZMpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 07:45:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39374 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731317AbhAZKBe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 05:01:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611655205;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kElVC+jkHLstLVhvoAPiIFDGEp54B3rvncUWM43dOQw=;
-        b=DdR/2vq2nEet8tbYkQNIlMz5/Huhmk2JXM5+1LGNEvf2u0nbq50PsdjBSFhVDv6FgzlfpZ
-        prgSlB6YGV53fAQIvenmKaHXAki/EuchZefgt+beGPuKhx4LYjQKIVk7/VbXAtFW0qDijU
-        pGlSq2O5xyukpq/FgouyDyNpnoVxUhQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-kXrSMgh9PS6y4-sMWhagKQ-1; Tue, 26 Jan 2021 03:17:43 -0500
-X-MC-Unique: kXrSMgh9PS6y4-sMWhagKQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07CAD107ACF6;
-        Tue, 26 Jan 2021 08:17:41 +0000 (UTC)
-Received: from [10.72.12.70] (ovpn-12-70.pek2.redhat.com [10.72.12.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E668E1A839;
-        Tue, 26 Jan 2021 08:17:29 +0000 (UTC)
-Subject: Re: [RFC v3 11/11] vduse: Introduce a workqueue for irq injection
-To:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, sgarzare@redhat.com, parav@nvidia.com,
-        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119050756.600-1-xieyongji@bytedance.com>
- <20210119050756.600-5-xieyongji@bytedance.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <9cacd59d-1063-7a1f-9831-8728eb1d1c15@redhat.com>
-Date:   Tue, 26 Jan 2021 16:17:28 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S2391777AbhAZNP2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 08:15:28 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11502 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391790AbhAZMp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 07:45:58 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DQ5yR2C4WzjDdv;
+        Tue, 26 Jan 2021 20:43:59 +0800 (CST)
+Received: from DESKTOP-5IS4806.china.huawei.com (10.174.184.42) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 26 Jan 2021 20:45:01 +0800
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+To:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
+        <xiexiangyou@huawei.com>, <zhengchuan@huawei.com>,
+        <yubihong@huawei.com>
+Subject: [RFC PATCH 0/7] kvm: arm64: Implement SW/HW combined dirty log
+Date:   Tue, 26 Jan 2021 20:44:37 +0800
+Message-ID: <20210126124444.27136-1-zhukeqian1@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-In-Reply-To: <20210119050756.600-5-xieyongji@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The intention:
 
-On 2021/1/19 下午1:07, Xie Yongji wrote:
-> This patch introduces a dedicated workqueue for irq injection
-> so that we are able to do some performance tuning for it.
->
-> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+On arm64 platform, we tracking dirty log of vCPU through guest memory abort.
+KVM occupys some vCPU time of guest to change stage2 mapping and mark dirty.
+This leads to heavy side effect on VM, especially when multi vCPU race and
+some of them block on kvm mmu_lock.
 
+DBM is a HW auxiliary approach to log dirty. MMU chages PTE to be writable if
+its DBM bit is set. Then KVM doesn't occupy vCPU time to log dirty.
 
-If we want the split like this.
+About this patch series:
 
-It might be better to:
+The biggest problem of apply DBM for stage2 is that software must scan PTs to
+collect dirty state, which may cost much time and affect downtime of migration.
 
-1) implement a simple irq injection on the ioctl context in patch 8
-2) add the dedicated workqueue injection in this patch
+This series realize a SW/HW combined dirty log that can effectively solve this
+problem (The smmu side can also use this approach to solve dma dirty log tracking).
 
-Since my understanding is that
+The core idea is that we do not enable hardware dirty at start (do not add DBM bit).
+When a arbitrary PT occurs fault, we execute soft tracking for this PT and enable
+hardware tracking for its *nearby* PTs (e.g. Add DBM bit for nearby 16PTs). Then when
+sync dirty log, we have known all PTs with hardware dirty enabled, so we do not need
+to scan all PTs.
 
-1) the function looks more isolated for readers
-2) the difference between sysctl vs workqueue should be more obvious 
-than system wq vs dedicated wq
-3) a chance to describe why workqueue is needed in the commit log in 
-this patch
+        mem abort point             mem abort point
+              ↓                            ↓
+---------------------------------------------------------------
+        |********|        |        |********|        |        |
+---------------------------------------------------------------
+             ↑                            ↑
+        set DBM bit of               set DBM bit of
+     this PT section (64PTEs)      this PT section (64PTEs)
 
-Thanks
+We may worry that when dirty rate is over-high we still need to scan too much PTs.
+We mainly concern the VM stop time. With Qemu dirty rate throttling, the dirty memory
+is closing to the VM stop threshold, so there is a little PTs to scan after VM stop.
 
+It has the advantages of hardware tracking that minimizes side effect on vCPU,
+and also has the advantages of software tracking that controls vCPU dirty rate.
+Moreover, software tracking helps us to scan PTs at some fixed points, which
+greatly reduces scanning time. And the biggest benefit is that we can apply this
+solution for dma dirty tracking.
 
-> ---
->   drivers/vdpa/vdpa_user/eventfd.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vdpa/vdpa_user/eventfd.c b/drivers/vdpa/vdpa_user/eventfd.c
-> index dbffddb08908..caf7d8d68ac0 100644
-> --- a/drivers/vdpa/vdpa_user/eventfd.c
-> +++ b/drivers/vdpa/vdpa_user/eventfd.c
-> @@ -18,6 +18,7 @@
->   #include "eventfd.h"
->   
->   static struct workqueue_struct *vduse_irqfd_cleanup_wq;
-> +static struct workqueue_struct *vduse_irq_wq;
->   
->   static void vduse_virqfd_shutdown(struct work_struct *work)
->   {
-> @@ -57,7 +58,7 @@ static int vduse_virqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode,
->   	__poll_t flags = key_to_poll(key);
->   
->   	if (flags & EPOLLIN)
-> -		schedule_work(&virqfd->inject);
-> +		queue_work(vduse_irq_wq, &virqfd->inject);
->   
->   	if (flags & EPOLLHUP) {
->   		spin_lock(&vq->irq_lock);
-> @@ -165,11 +166,18 @@ int vduse_virqfd_init(void)
->   	if (!vduse_irqfd_cleanup_wq)
->   		return -ENOMEM;
->   
-> +	vduse_irq_wq = alloc_workqueue("vduse-irq", WQ_SYSFS | WQ_UNBOUND, 0);
-> +	if (!vduse_irq_wq) {
-> +		destroy_workqueue(vduse_irqfd_cleanup_wq);
-> +		return -ENOMEM;
-> +	}
-> +
->   	return 0;
->   }
->   
->   void vduse_virqfd_exit(void)
->   {
-> +	destroy_workqueue(vduse_irq_wq);
->   	destroy_workqueue(vduse_irqfd_cleanup_wq);
->   }
->   
+Test:
+
+Host: Kunpeng 920 with 128 CPU 512G RAM. Disable Transparent Hugepage (Ensure test result
+      is not effected by dissolve of block page table at the early stage of migration).
+VM:   16 CPU 16GB RAM. Run 4 pair of (redis_benchmark+redis_server).
+
+Each run 5 times for software dirty log and SW/HW conbined dirty log. 
+
+Test result:
+
+Gain 5%~7% improvement of redis QPS during VM migration.
+VM downtime is not affected fundamentally.
+About 56.7% of DBM is effectively used.
+
+Keqian Zhu (7):
+  arm64: cpufeature: Add API to report system support of HWDBM
+  kvm: arm64: Use atomic operation when update PTE
+  kvm: arm64: Add level_apply parameter for stage2_attr_walker
+  kvm: arm64: Add some HW_DBM related pgtable interfaces
+  kvm: arm64: Add some HW_DBM related mmu interfaces
+  kvm: arm64: Only write protect selected PTE
+  kvm: arm64: Start up SW/HW combined dirty log
+
+ arch/arm64/include/asm/cpufeature.h  |  12 +++
+ arch/arm64/include/asm/kvm_host.h    |   6 ++
+ arch/arm64/include/asm/kvm_mmu.h     |   7 ++
+ arch/arm64/include/asm/kvm_pgtable.h |  45 ++++++++++
+ arch/arm64/kvm/arm.c                 | 125 ++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         | 130 ++++++++++++++++++++++-----
+ arch/arm64/kvm/mmu.c                 |  47 +++++++++-
+ arch/arm64/kvm/reset.c               |   8 +-
+ 8 files changed, 351 insertions(+), 29 deletions(-)
+
+-- 
+2.19.1
 
