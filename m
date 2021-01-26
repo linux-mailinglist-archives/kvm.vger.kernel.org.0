@@ -2,138 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AEA26305D40
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:32:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95AEC305D46
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:33:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313349AbhAZWf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:35:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50252 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730154AbhAZRFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:05:12 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02833C061573
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:00:54 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id w14so10775285pfi.2
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:00:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ENlLmc+JejdwJwWT2OL+d2JHDx3OTLzS/BlF7JGq2nA=;
-        b=aZ/ShnW8eg0eJ5zhC4gY7+YObNwS5lRBPfbAGJ4ULjVLsF55wBXe9n8giN7CT2SM/S
-         /DhG85ScJiXlL0JBakWStEdk5M3H2FD/nemAq/AIG+jo2/oEzN/nFlhqJHdRvGmX5ckg
-         f//nXQd0qCvuQymR64nsDY27lBtZBNl1KEQ5mE47uORe6pr9IRdvs6ewoYwBbiEzzzB5
-         I4t9ku9OHD8eAp6XM9e87sB3533UzU8oa+xG5YS+i0xD3Wp2LPVifKg73pICaNyKzMma
-         OE+Ps9wJU+TuEfyzftqI/wrZ6KVCmQihFVoNg8oo3Ng6DqQCbCpdLgADSyKcrgU5TlRS
-         66CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ENlLmc+JejdwJwWT2OL+d2JHDx3OTLzS/BlF7JGq2nA=;
-        b=b1WMEliPutdA3ckTpFKGwBYqw1RAmDOxefKKk511+a2BRMySYXRQsWnY/Tqge1paKy
-         HnRoQxdDlUwfpozQ8ACeVghxcZoIq4A3Qn0ZF4kAguF/NcGUc+w0w58b6ZUBN5zp/syZ
-         CwBl1ZvZGcPLyYk6CHk35p3ofWh5uBaug/DFMW0Ul+b2Luk+W1+Gfvuubg0LVhN2ZgsE
-         27hyVK026opubFtZPc4dUGJdNwu3y8khuDjVxwRWUMAf/ZcJsLVNnHxcFm6PqQ1y0toq
-         dhyzx21nXz83xTkUR+pNP3IQAuTXgAOg6QlGUrYu55pB0+wRiJCRkNu+g4LIZ1B/UzrX
-         09sA==
-X-Gm-Message-State: AOAM530syyRyKCZVSb5W+gyis9d3dO1scQZZlHgTUoPu6vTwTMjP6K3F
-        T/57GGnwF9Wva3qvFsnYcmd9EA==
-X-Google-Smtp-Source: ABdhPJyWOBKzyzUyfMtkAbOdRuR4zb43p89ImjgpolqyL65mgDafFCN9gIbSLho2Ez7hZxhmbwoDxQ==
-X-Received: by 2002:a65:5283:: with SMTP id y3mr6502558pgp.174.1611680453424;
-        Tue, 26 Jan 2021 09:00:53 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id a2sm5382885pgq.94.2021.01.26.09.00.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 09:00:52 -0800 (PST)
-Date:   Tue, 26 Jan 2021 09:00:45 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de
-Subject: Re: [RFC PATCH v3 07/27] x86/cpu/intel: Allow SGX virtualization
- without Launch Control support
-Message-ID: <YBBKvecRXYclMnpH@google.com>
+        id S313040AbhAZWep (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:34:45 -0500
+Received: from mga05.intel.com ([192.55.52.43]:26548 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729686AbhAZREy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 12:04:54 -0500
+IronPort-SDR: yXWIS0fpg/ull7Tuiy5KHnxvdHdrk899Yw29l0p96mtu7fGzOXX6dS8vhfg2fBXjpDJH+li5Q7
+ oRhH2hzO6wAA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="264758277"
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="264758277"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 09:03:25 -0800
+IronPort-SDR: LAkPkzsUHe/EHQWwNtYjCTG7NiK7ch0BYgkP+6XfO9LWj3BDb4u5r1f+y+E5BBf35Hrb5XyonL
+ 2zuAKGui4Sdg==
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="369168525"
+Received: from ekfraser-mobl1.amr.corp.intel.com (HELO [10.209.173.94]) ([10.209.173.94])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 09:03:22 -0800
+Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
+To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 References: <cover.1611634586.git.kai.huang@intel.com>
- <ae05882235e61fd8e7a56e37b0d9c044781bd767.1611634586.git.kai.huang@intel.com>
- <f23b9893-015b-a9cb-de93-1a4978981e83@intel.com>
+ <5076ed2c486ac33bfd87dc0e17047a1673692b53.1611634586.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <24778167-cbd4-1dc5-5b81-e8a49266d1f8@intel.com>
+Date:   Tue, 26 Jan 2021 09:03:23 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f23b9893-015b-a9cb-de93-1a4978981e83@intel.com>
+In-Reply-To: <5076ed2c486ac33bfd87dc0e17047a1673692b53.1611634586.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021, Dave Hansen wrote:
-> > -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
-> > -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
-> > -		     IS_ENABLED(CONFIG_X86_SGX);
-> > +	enable_sgx_any = cpu_has(c, X86_FEATURE_SGX) &&
-> > +			 cpu_has(c, X86_FEATURE_SGX1) &&
-> > +			 IS_ENABLED(CONFIG_X86_SGX);
-> 
-> The X86_FEATURE_SGX1 check seems to have snuck in here.  Why?
+On 1/26/21 1:31 AM, Kai Huang wrote:
+> Modify sgx_init() to always try to initialize the virtual EPC driver,
+> even if the bare-metal SGX driver is disabled.  The bare-metal driver
+> might be disabled if SGX Launch Control is in locked mode, or not
+> supported in the hardware at all.  This allows (non-Linux) guests that
+> support non-LC configurations to use SGX.
 
-It's a best effort check to handle the scenario where SGX is enabled by BIOS,
-but was disabled by hardware in response to a machine check bank being disabled.
-Adding a check on SGX1 should be in a different patch.  I thought we had a
-dicscussion about why the check was omitted in the merge of bare metal support,
-but I can't find any such thread.
+One thing worth calling out *somewhere* (which is entirely my fault):
+"bare-metal" in the context of this patch set refers to true bare-metal,
+but *ALSO* covers the plain SGX driver running inside a guest.
 
-> > +	enable_sgx_driver = enable_sgx_any &&
-> > +			    cpu_has(c, X86_FEATURE_SGX_LC);
-> > +	enable_sgx_kvm = enable_sgx_any && enable_vmx &&
-> > +			  IS_ENABLED(CONFIG_X86_SGX_KVM);
-> >  
-> >  	if (msr & FEAT_CTL_LOCKED)
-> >  		goto update_caps;
-> > @@ -136,15 +146,18 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
-> >  	 * i.e. KVM is enabled, to avoid unnecessarily adding an attack vector
-> >  	 * for the kernel, e.g. using VMX to hide malicious code.
-> >  	 */
-> > -	if (cpu_has(c, X86_FEATURE_VMX) && IS_ENABLED(CONFIG_KVM_INTEL)) {
-> > +	if (enable_vmx) {
-> >  		msr |= FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
-> >  
-> >  		if (tboot)
-> >  			msr |= FEAT_CTL_VMX_ENABLED_INSIDE_SMX;
-> >  	}
-> >  
-> > -	if (enable_sgx)
-> > -		msr |= FEAT_CTL_SGX_ENABLED | FEAT_CTL_SGX_LC_ENABLED;
-> > +	if (enable_sgx_kvm || enable_sgx_driver) {
-> > +		msr |= FEAT_CTL_SGX_ENABLED;
-> > +		if (enable_sgx_driver)
-> > +			msr |= FEAT_CTL_SGX_LC_ENABLED;
-> > +	}
-> >  
-> >  	wrmsrl(MSR_IA32_FEAT_CTL, msr);
-> >  
-> > @@ -167,10 +180,29 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
-> >  	}
-> >  
-> >  update_sgx:
-> > -	if (!(msr & FEAT_CTL_SGX_ENABLED) ||
-> > -	    !(msr & FEAT_CTL_SGX_LC_ENABLED) || !enable_sgx) {
-> > -		if (enable_sgx)
-> > -			pr_err_once("SGX disabled by BIOS\n");
-> > +	if (!(msr & FEAT_CTL_SGX_ENABLED)) {
-> > +		if (enable_sgx_kvm || enable_sgx_driver)
-> > +			pr_err_once("SGX disabled by BIOS.\n");
-> >  		clear_cpu_cap(c, X86_FEATURE_SGX);
-> > +		return;
-> > +	}
-> 
-> 
-> Isn't there a pr_fmt here already?  Won't these just look like:
-> 
-> 	sgx: SGX disabled by BIOS.
-> 
-> That seems a bit silly.
-
-Eh, I like the explicit "SGX" to clarify that the hardware feature was disabled.
+So, perhaps "bare-metal" isn't the best term to use.  Again, my bad.
+Better nomenclature suggestions are welcome.
