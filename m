@@ -2,123 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7776304050
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 15:30:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AC4530410B
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 15:56:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391759AbhAZO37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 09:29:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26996 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2405911AbhAZO31 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 09:29:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611671279;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S2rkCrBfD5bDyHEtmODfflBbzJI4arxA1fFAqYtnYDM=;
-        b=jSv7tTVizSLIaAJIf00Z1c8xTmZ2jl0i0azTuCnNQR1jGXP9j3ZmdZvqXNvnhVs6KtNpXb
-        UPweVla/kcawclvogkz0Jnc/h0nJHJl6GWyjTxrFUWQLdr59Itc3QDRQRKmJ227Fkp/L1S
-        yslkXf1CUWVU75EELRBTWVcQRWnlkXI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-SZtDwqXUNWWOj3gjy6hjrQ-1; Tue, 26 Jan 2021 09:27:58 -0500
-X-MC-Unique: SZtDwqXUNWWOj3gjy6hjrQ-1
-Received: by mail-ed1-f71.google.com with SMTP id v19so1418547edx.22
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 06:27:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=S2rkCrBfD5bDyHEtmODfflBbzJI4arxA1fFAqYtnYDM=;
-        b=nbWQucyE3VvooQKkcCxzZ0JsfZGIuciedhbWm5bRRTDIAPnmV+oZV1e6BDGykdTnpO
-         H5cOQOnp5GuKdniOSXssiFr7GBJFMbZHBuCKOHvgaEzc/mvds5MfHyMusRKqVwpsQYWa
-         lSJauTKdhv+zBCmrVuU6izzQywCEIIzPuer0DZXq8fiibpo6G7StIvoG3wgcBZjHEmYM
-         3UfXRuURU7nDOm8hjeGnVNPgl9c7JEq/2mi5HA80gqNP5nbU2CjYAGNOR+ku1W+1mFM1
-         R+qqLiszPdAMEOfDYgS9y04DbVc2pSU9e8Qu5VyLMMWlUcCtNFD4sc9XnlToLpdraCFS
-         Nr5w==
-X-Gm-Message-State: AOAM530fGSTHdjSKnCyegTbpmNmh8zTubSV6Zu/Y8aZVKCPj6yPqKjf7
-        667756Hi153pyqmu4PyulX171AxjnP8XX13GWfK9GhnfHRGJEw0ccj/63AyOkRIex86k8uzv71N
-        wmBrwOqZE0gQp
-X-Received: by 2002:a05:6402:11d3:: with SMTP id j19mr4765440edw.314.1611671276829;
-        Tue, 26 Jan 2021 06:27:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJymiLts94MhJprL7ggs26FXkQnjVmTw7hH1In4bWJNPScrukS4CJH/wOJ+P5zaNXELDyYRxBg==
-X-Received: by 2002:a05:6402:11d3:: with SMTP id j19mr4765416edw.314.1611671276648;
-        Tue, 26 Jan 2021 06:27:56 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dj25sm12362694edb.5.2021.01.26.06.27.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 06:27:55 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-20-bgardon@google.com> <YAnUhCocizx97FWL@google.com>
- <YAnzB3Uwn3AVTXGN@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
-Message-ID: <335d27f7-0849-de37-f380-a5018c5c5535@redhat.com>
-Date:   Tue, 26 Jan 2021 15:27:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S2391214AbhAZO4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 09:56:02 -0500
+Received: from mga05.intel.com ([192.55.52.43]:12992 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391060AbhAZJes (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 04:34:48 -0500
+IronPort-SDR: IdokXjxQGRoUVybDNpO+cvK5K5CtMRB4gQbYLn0mUR+3lMCT1rNX0nkDhnPDlt3dWRtPnZ6tWj
+ A2Yup4TALosg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9875"; a="264698072"
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="264698072"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:32:27 -0800
+IronPort-SDR: CCRVZ6QjiOqqzBidCv7gw8QDKzI2BREd9atcQ+vh/VFF2UB+qKHlo/CmMVyCP+31qQjXRVLF3i
+ XOTqwKubqQ5A==
+X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
+   d="scan'208";a="577747936"
+Received: from ravivisw-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.124.51])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 01:32:23 -0800
+From:   Kai Huang <kai.huang@intel.com>
+To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
+Subject: [RFC PATCH v3 22/27] KVM: VMX: Frame in ENCLS handler for SGX virtualization
+Date:   Tue, 26 Jan 2021 22:31:43 +1300
+Message-Id: <d2ddc82cbc40bd30ab605db399184ec28178fddf.1611634586.git.kai.huang@intel.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <cover.1611634586.git.kai.huang@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <YAnzB3Uwn3AVTXGN@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/01/21 22:32, Sean Christopherson wrote:
-> Coming back to this series, I wonder if the RCU approach is truly necessary to
-> get the desired scalability.  If both zap_collapsible_sptes() and NX huge page
-> recovery zap_only_  leaf SPTEs, then the only path that can actually unlink a
-> shadow page while holding the lock for read is the page fault path that installs
-> a huge page over an existing shadow page.
-> 
-> Assuming the above analysis is correct, I think it's worth exploring alternatives
-> to using RCU to defer freeing the SP memory, e.g. promoting to a write lock in
-> the specific case of overwriting a SP (though that may not exist for rwlocks),
-> or maybe something entirely different?
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-You can do the deferred freeing with a short write-side critical section 
-to ensure all readers have terminated.
+Introduce sgx.c and sgx.h, along with the framework for handling ENCLS
+VM-Exits.  Add a bool, enable_sgx, that will eventually be wired up to a
+module param to control whether or not SGX virtualization is enabled at
+runtime.
 
-If the bool argument to handle_disconnected_tdp_mmu_page is true(*), the 
-pages would be added to an llist, instead of being freed immediately. 
-At the end of a shared critical section you would do
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Kai Huang <kai.huang@intel.com>
+---
+ arch/x86/kvm/Makefile  |  2 ++
+ arch/x86/kvm/vmx/sgx.c | 51 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/sgx.h | 15 +++++++++++++
+ arch/x86/kvm/vmx/vmx.c |  9 +++++---
+ 4 files changed, 74 insertions(+), 3 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/sgx.c
+ create mode 100644 arch/x86/kvm/vmx/sgx.h
 
-	if (!llist_empty(&kvm->arch.tdp_mmu_disconnected_pages)) {
-		struct llist_node *first;
-		kvm_mmu_lock(kvm);
-		first = __list_del_all(&kvm->arch.tdp_mmu_disconnected_pages);
-		kvm_mmu_unlock(kvm);
-
-		/*
-		 * All vCPUs have already stopped using the pages when
-		 * their TLBs were flushed.  The exclusive critical
-		 * section above means that there can be no readers
-		 * either.
-		 */
-		tdp_mmu_free_disconnected_pages(first);
-	}
-
-So this is still deferred reclamation, but it's done by one of the vCPUs 
-rather than a worker RCU thread.  This would replace patches 11/12/13 
-and probably would be implemented after patch 18.
-
-Paolo
-
-(*) this idea is what prompted the comment about s/atomic/shared/
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index 4bd14ab01323..5c86edc73b72 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -21,6 +21,8 @@ kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+ 
+ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+ 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
++kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
++
+ kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
+ 
+ obj-$(CONFIG_KVM)	+= kvm.o
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+new file mode 100644
+index 000000000000..693bf7735308
+--- /dev/null
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -0,0 +1,51 @@
++// SPDX-License-Identifier: GPL-2.0
++/*  Copyright(c) 2016-20 Intel Corporation. */
++
++#include <asm/sgx.h>
++#include <asm/sgx_arch.h>
++
++#include "cpuid.h"
++#include "kvm_cache_regs.h"
++#include "sgx.h"
++#include "vmx.h"
++#include "x86.h"
++
++bool __read_mostly enable_sgx;
++
++static inline bool encls_leaf_enabled_in_guest(struct kvm_vcpu *vcpu, u32 leaf)
++{
++	if (!enable_sgx || !guest_cpuid_has(vcpu, X86_FEATURE_SGX))
++		return false;
++
++	if (leaf >= ECREATE && leaf <= ETRACK)
++		return guest_cpuid_has(vcpu, X86_FEATURE_SGX1);
++
++	if (leaf >= EAUG && leaf <= EMODT)
++		return guest_cpuid_has(vcpu, X86_FEATURE_SGX2);
++
++	return false;
++}
++
++static inline bool sgx_enabled_in_guest_bios(struct kvm_vcpu *vcpu)
++{
++	const u64 bits = FEAT_CTL_SGX_ENABLED | FEAT_CTL_LOCKED;
++
++	return (to_vmx(vcpu)->msr_ia32_feature_control & bits) == bits;
++}
++
++int handle_encls(struct kvm_vcpu *vcpu)
++{
++	u32 leaf = (u32)vcpu->arch.regs[VCPU_REGS_RAX];
++
++	if (!encls_leaf_enabled_in_guest(vcpu, leaf)) {
++		kvm_queue_exception(vcpu, UD_VECTOR);
++	} else if (!sgx_enabled_in_guest_bios(vcpu)) {
++		kvm_inject_gp(vcpu, 0);
++	} else {
++		WARN(1, "KVM: unexpected exit on ENCLS[%u]", leaf);
++		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
++		vcpu->run->hw.hardware_exit_reason = EXIT_REASON_ENCLS;
++		return 0;
++	}
++	return 1;
++}
+diff --git a/arch/x86/kvm/vmx/sgx.h b/arch/x86/kvm/vmx/sgx.h
+new file mode 100644
+index 000000000000..6e17ecd4aca3
+--- /dev/null
++++ b/arch/x86/kvm/vmx/sgx.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __KVM_X86_SGX_H
++#define __KVM_X86_SGX_H
++
++#include <linux/kvm_host.h>
++
++#ifdef CONFIG_X86_SGX_KVM
++extern bool __read_mostly enable_sgx;
++
++int handle_encls(struct kvm_vcpu *vcpu);
++#else
++#define enable_sgx 0
++#endif
++
++#endif /* __KVM_X86_SGX_H */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 4cb8a3f1374c..dbe585329842 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -56,6 +56,7 @@
+ #include "mmu.h"
+ #include "nested.h"
+ #include "pmu.h"
++#include "sgx.h"
+ #include "trace.h"
+ #include "vmcs.h"
+ #include "vmcs12.h"
+@@ -5623,16 +5624,18 @@ static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++#ifndef CONFIG_X86_SGX_KVM
+ static int handle_encls(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+-	 * SGX virtualization is not yet supported.  There is no software
+-	 * enable bit for SGX, so we have to trap ENCLS and inject a #UD
+-	 * to prevent the guest from executing ENCLS.
++	 * SGX virtualization is disabled.  There is no software enable bit for
++	 * SGX, so KVM intercepts all ENCLS leafs and injects a #UD to prevent
++	 * the guest from executing ENCLS (when SGX is supported by hardware).
+ 	 */
+ 	kvm_queue_exception(vcpu, UD_VECTOR);
+ 	return 1;
+ }
++#endif /* CONFIG_X86_SGX_KVM */
+ 
+ /*
+  * The exit handlers return 1 if the exit was handled fully and guest execution
+-- 
+2.29.2
 
