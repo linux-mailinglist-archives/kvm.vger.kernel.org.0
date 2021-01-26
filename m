@@ -2,97 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DED77305CD3
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:19:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7C05305CDB
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:19:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313708AbhAZWlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:41:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391379AbhAZRsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:48:11 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F7BC061756
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:47:31 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id n2so35318257iom.7
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:47:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3Jb9X0v8oDi5jLxmgmGC2E5NlSIbY7TNgKuxfpCf/uc=;
-        b=OhJAMRhycmvWsvv9Di2tFzT/cyfx9Gh/4DIgaeknl37vIAYVpII2mnv98Di93RqHR9
-         5gg8o7LU6qVUyDJ3eqZzRbEuk3EWoaAMjjrDTVPfc4BODlINgVG5eLjmpatxGUQmmEfZ
-         bsw6ZVvhRTrqecIDI6k4tJ2vlM56DwErt7FOAIV5PSn2wk4K8ncccos2nqCOqUeV3uBp
-         TjGm3xisSvoLxP0djDj0d3GwJmNrIBZq1v86uz8mMiW1e6nuTPukaWdMdeHFE1fR4D5b
-         ev7/KbfWQVIF9TJ3I5YZ6ky9b6wd0Jmt4Kt6GMkTjtDnJKw6sCIBZmJub4nxoTTU3TYW
-         5skg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3Jb9X0v8oDi5jLxmgmGC2E5NlSIbY7TNgKuxfpCf/uc=;
-        b=SRd9wdI3AM1ZLRjnx9gzXpOJnihvnvipIRL2ATaQGfhykNVeJTTzl10VpsuQibBQrl
-         XTU2ZF8IokKLLo3QM9Bsc62fQY8Papyp/rcoR0g8iAhi40DKhkSubJbh4UqOVl28ibSd
-         i66NhKbP1lvFWjUAEGqihcm1q3bIsl0N7exGfWUkRaBdCmv048VvIs6S/6V1ITy35Bf0
-         uK7/2SajUpUFXHTfVxHpPQKtic+r8+2irpzTHwGSTs77EXrYwlt9RvhIprwPYIqmjTzT
-         q4MDwogn7CktmH0cY0KqRHMDVrFbi3blzgA34TTUSoqhBtqq1xfZNuos/jK2W/uic7BF
-         2O6g==
-X-Gm-Message-State: AOAM532xpP93Oh4+qYIrdIqoz4R/Tv3GN5Q8yEY1kG9vsnEpzrWZBmBG
-        IxrWYmMhzm85LX4QTkLlCOP1K+g66cW//wtYeBiu1A==
-X-Google-Smtp-Source: ABdhPJz8kAyEdI+ULZJUiM3kcZbSU41YHoWAd12KengC2L6zKHuBdKF5ZaD5DLVbsmvNJqSfung1Rsd+s83OM2Fkx2k=
-X-Received: by 2002:a92:cbce:: with SMTP id s14mr450259ilq.306.1611683250954;
- Tue, 26 Jan 2021 09:47:30 -0800 (PST)
+        id S313729AbhAZWl7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:41:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47191 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390726AbhAZR5p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 12:57:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611683778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=cjcRuMlXWMX2jcWSUD4WW4Hh5bqDrTG5xDVGalMcWRw=;
+        b=Yv6kQKq5qrHBclSbN/cytZ8ipPVtmfWe0HY65/e+pZm/N/pJ7BcLMi5BOrZjPT70daa6j6
+        CbxAFX0RkROD6C2otKx69am0dLV7R1L1DEWEISx2CEumEHRKgEUb+OrJXJgPXreEakaAQx
+        /IxnB/BP85mjTTG5Sa9FYPos0RcS/SI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-501-BbtHlCX8NPCzdHK19d6gLA-1; Tue, 26 Jan 2021 12:56:14 -0500
+X-MC-Unique: BbtHlCX8NPCzdHK19d6gLA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39718107ACF9;
+        Tue, 26 Jan 2021 17:56:13 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DD6D05D6AD;
+        Tue, 26 Jan 2021 17:56:12 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.11-rc5
+Date:   Tue, 26 Jan 2021 12:56:12 -0500
+Message-Id: <20210126175612.1533411-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20210112181041.356734-1-bgardon@google.com> <20210112181041.356734-16-bgardon@google.com>
- <YAjIddUuw/SZ+7ut@google.com> <460d38b9-d920-9339-1293-5900d242db37@redhat.com>
-In-Reply-To: <460d38b9-d920-9339-1293-5900d242db37@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 26 Jan 2021 09:47:19 -0800
-Message-ID: <CANgfPd_WvXP=mOnxFR8BY=WnbR5Gn8RpK7aR_mOrdDiCh4VEeQ@mail.gmail.com>
-Subject: Re: [PATCH 15/24] kvm: mmu: Wrap mmu_lock cond_resched and needbreak
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 6:38 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 21/01/21 01:19, Sean Christopherson wrote:
-> > What if we simply make the common mmu_lock a union? The rwlock_t is
-> > probably a bit bigger, but that's a few bytes for an entire VM. And
-> > maybe this would entice/inspire other architectures to move to a similar
-> > MMU model.
->
-> Looking more at this, there is a problem in that MMU notifier functions
-> take the MMU lock.
->
-> Yes, qrwlock the size is a bit larger than qspinlock.  However, the fast
-> path of qrwlocks is small, and if the slow paths are tiny compared to
-> the mmu_lock critical sections that are so big as to require
-> cond_resched.  So I would consider just changing all architectures to an
-> rwlock.
+Linus,
 
-I like the idea of putting the MMU lock union directly in struct KVM
-and will make that change in the next version of this series. In my
-testing, I found that wholesale replacing the spin lock with an rwlock
-had a noticeable negative performance impact on the legacy / shadow
-MMU. Enough that it motivated me to implement this more complex union
-scheme. While the difference was pronounced in the dirty log perf test
-microbenchmark, it's an open question as to whether it would matter in
-practice.
+The following changes since commit 7c53f6b671f4aba70ff15e1b05148b10d58c2837:
 
->
-> Paolo
->
+  Linux 5.11-rc3 (2021-01-10 14:34:50 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 9a78e15802a87de2b08dfd1bd88e855201d2c8fa:
+
+  KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside guest mode for VMX (2021-01-25 18:54:09 -0500)
+
+----------------------------------------------------------------
+* x86 bugfixes
+* Documentation fixes
+* Avoid performance regression due to SEV-ES patches
+
+ARM:
+- Don't allow tagged pointers to point to memslots
+- Filter out ARMv8.1+ PMU events on v8.0 hardware
+- Hide PMU registers from userspace when no PMU is configured
+- More PMU cleanups
+- Don't try to handle broken PSCI firmware
+- More sys_reg() to reg_to_encoding() conversions
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: Use the reg_to_encoding() macro instead of sys_reg()
+
+David Brazdil (1):
+      KVM: arm64: Allow PSCI SYSTEM_OFF/RESET to return
+
+Jay Zhou (1):
+      KVM: x86: get smi pending status correctly
+
+Like Xu (2):
+      KVM: x86/pmu: Fix UBSAN shift-out-of-bounds warning in intel_pmu_refresh()
+      KVM: x86/pmu: Fix HW_REF_CPU_CYCLES event pseudo-encoding in intel_arch_events[]
+
+Lorenzo Brescia (1):
+      kvm: tracing: Fix unmatched kvm_entry and kvm_exit events
+
+Marc Zyngier (4):
+      KVM: arm64: Hide PMU registers from userspace when not available
+      KVM: arm64: Simplify handling of absent PMU system registers
+      KVM: arm64: Filter out v8.1+ events on v8.0 HW
+      KVM: Forbid the use of tagged userspace addresses for memslots
+
+Maxim Levitsky (1):
+      KVM: nVMX: Sync unsync'd vmcs02 state to vmcs12 on migration
+
+Paolo Bonzini (2):
+      Merge tag 'kvmarm-fixes-5.11-2' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
+      KVM: x86: allow KVM_REQ_GET_NESTED_STATE_PAGES outside guest mode for VMX
+
+Quentin Perret (1):
+      KVM: Documentation: Fix spec for KVM_CAP_ENABLE_CAP_VM
+
+Sean Christopherson (3):
+      KVM: x86: Add more protection against undefined behavior in rsvd_bits()
+      KVM: SVM: Unconditionally sync GPRs to GHCB on VMRUN of SEV-ES guest
+      KVM: x86: Revert "KVM: x86: Mark GPRs dirty when written"
+
+Steven Price (1):
+      KVM: arm64: Compute TPIDR_EL2 ignoring MTE tag
+
+Zenghui Yu (1):
+      KVM: Documentation: Update description of KVM_{GET,CLEAR}_DIRTY_LOG
+
+ Documentation/virt/kvm/api.rst       | 21 ++++----
+ arch/arm64/kvm/arm.c                 |  3 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c | 13 ++---
+ arch/arm64/kvm/pmu-emul.c            | 10 ++--
+ arch/arm64/kvm/sys_regs.c            | 93 ++++++++++++++++++++++--------------
+ arch/x86/kvm/kvm_cache_regs.h        | 51 ++++++++++----------
+ arch/x86/kvm/mmu.h                   |  9 +++-
+ arch/x86/kvm/svm/nested.c            |  3 ++
+ arch/x86/kvm/svm/sev.c               | 15 +++---
+ arch/x86/kvm/svm/svm.c               |  2 +
+ arch/x86/kvm/vmx/nested.c            | 44 ++++++++++++-----
+ arch/x86/kvm/vmx/pmu_intel.c         |  6 ++-
+ arch/x86/kvm/vmx/vmx.c               |  2 +
+ arch/x86/kvm/x86.c                   | 11 +++--
+ virt/kvm/kvm_main.c                  |  1 +
+ 15 files changed, 172 insertions(+), 112 deletions(-)
+
