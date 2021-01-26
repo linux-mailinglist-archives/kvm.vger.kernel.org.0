@@ -2,109 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F757304CA6
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 23:52:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4664D3050B3
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:23:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730603AbhAZWvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:51:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728187AbhAZWKc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 17:10:32 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66059C061574
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 14:09:17 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id u11so10521566plg.13
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 14:09:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DgOOJIyrAOuxKdxDbP3b0J4w0iC1eThFFRxXm6cvjxI=;
-        b=CvYDmm1zk+RbauYp2TZpO4RuyHkMi4wG1dsuBQ/xWsV54jtSA/nrsS6AhIRTlVkkNl
-         oIaY9/Rw9m3nG+tMnJbuLXjpgpcSUIdSxMLM36caHJP4cCWQ9zeDmq3iugY2q7ydm4C7
-         eOZuxF58jcMyMFoOJx4D3wkh+8oF5OLqRDjynEcXWpB8IY/xytryiQKl2HrNzn1Hyt+e
-         J8x2K9IDK+0+rbWcmSGr7cKSNuxmuv/rTvbiEJIzEo4e2fRcIcrq5DZWXw0VAVBptoIv
-         eHPJDIUlf/eojUvjZHAyomohaSlAL1Qs7q85F4BEhFB9Ax+guZekffwDPn3RHhGgyhH9
-         t0pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DgOOJIyrAOuxKdxDbP3b0J4w0iC1eThFFRxXm6cvjxI=;
-        b=adjTRYwfPG8N+uyEjc/UP2Aw6C5uhoDOaZgLhRR0T1OVcX77Ri+Yp6KkO5kcSdE7E9
-         OPIqcW2vX4V2u4I/1mbSF7k0YgH9onA2GDP+868ULQajnN6a+5m6iy9qPeq8BhgdIkCg
-         PJoMkJmp4/j8L2k7ArVOilEfV+viY330KsLSUMQvBXpnsluFQ5QVdVKpugtZiTMVuTK8
-         vsd03gPlR1ZnrUdCsPEHu9WA5r/8qdnnvQdvMi1QEuN5hnAYOs35HDNanFPWdHxXfRbS
-         vmLS0VtrgJmlbTkoCKnVQvUwpbkmtjZB/MMD1UlqcxGEbqpRpscTBNvlfU3jE0OSd1JZ
-         S+2g==
-X-Gm-Message-State: AOAM53102iuYwyDEn84y1667HIStFSpslYSKtMOeVP+nNgTrb3TQJw8E
-        xFrktIvwF6kpMhMsfcxLsX15Lw==
-X-Google-Smtp-Source: ABdhPJybnmUC10oi234Kov3s2eFe5NF1KW540CcpuQHQBb+AF8FvAEuefidt3+eCxyDGfmGm+EZGwg==
-X-Received: by 2002:a17:902:9349:b029:df:fab3:64b8 with SMTP id g9-20020a1709029349b02900dffab364b8mr7892559plp.72.1611698956642;
-        Tue, 26 Jan 2021 14:09:16 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id n1sm2886909pjv.47.2021.01.26.14.09.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 14:09:15 -0800 (PST)
-Date:   Tue, 26 Jan 2021 14:09:09 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
-Message-ID: <YBCTBQ4lfJQ51Imn@google.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-20-bgardon@google.com>
- <YAnUhCocizx97FWL@google.com>
- <YAnzB3Uwn3AVTXGN@google.com>
- <335d27f7-0849-de37-f380-a5018c5c5535@redhat.com>
- <YBCRcalZJwAlkO9F@google.com>
+        id S238434AbhA0EWz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 23:22:55 -0500
+Received: from mga11.intel.com ([192.55.52.93]:37060 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731222AbhAZXUc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 18:20:32 -0500
+IronPort-SDR: FvSb8HqeuE7rULHCiHbHIY6HiDMn27xiXvdKn/Cu2PdsyrWvQKvAMNYHuh5sBSC24nf+ycBMNx
+ 5kKrUNmL9rJQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="176478212"
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="176478212"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 15:18:37 -0800
+IronPort-SDR: TB0ILoE4neBV5jpHdaXohUbBOuzfJmaZ8dPlKgnyb/UBhFWYhJd2zIaahMJExqSqxxJGvHfwQh
+ An5bBX40KOKQ==
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="574196941"
+Received: from rsperry-desk.amr.corp.intel.com ([10.251.7.187])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 15:18:34 -0800
+Message-ID: <3a82563d5a25b52f0b5f01560d70c50a2323f7e5.camel@intel.com>
+Subject: Re: [RFC PATCH v3 01/27] x86/cpufeatures: Add SGX1 and SGX2
+ sub-features
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 27 Jan 2021 12:18:32 +1300
+In-Reply-To: <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+         <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
+         <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YBCRcalZJwAlkO9F@google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021, Sean Christopherson wrote:
-> On Tue, Jan 26, 2021, Paolo Bonzini wrote:
-> > On 21/01/21 22:32, Sean Christopherson wrote:
-> > > Coming back to this series, I wonder if the RCU approach is truly necessary to
-> > > get the desired scalability.  If both zap_collapsible_sptes() and NX huge page
-> > > recovery zap_only_  leaf SPTEs, then the only path that can actually unlink a
-> > > shadow page while holding the lock for read is the page fault path that installs
-> > > a huge page over an existing shadow page.
-> > > 
-> > > Assuming the above analysis is correct, I think it's worth exploring alternatives
-> > > to using RCU to defer freeing the SP memory, e.g. promoting to a write lock in
-> > > the specific case of overwriting a SP (though that may not exist for rwlocks),
-> > > or maybe something entirely different?
+On Tue, 2021-01-26 at 07:34 -0800, Dave Hansen wrote:
+> On 1/26/21 1:30 AM, Kai Huang wrote:
+> > From: Sean Christopherson <seanjc@google.com>
 > > 
-> > You can do the deferred freeing with a short write-side critical section to
-> > ensure all readers have terminated.
+> > Add SGX1 and SGX2 feature flags, via CPUID.0x12.0x0.EAX, as scattered
+> > features, since adding a new leaf for only two bits would be wasteful.
+> > As part of virtualizing SGX, KVM will expose the SGX CPUID leafs to its
+> > guest, and to do so correctly needs to query hardware and kernel support
+> > for SGX1 and SGX2.
 > 
-> Hmm, the most obvious downside I see is that the zap_collapsible_sptes() case
-> will not scale as well as the RCU approach.  E.g. the lock may be heavily
-> contested when refaulting all of guest memory to (re)install huge pages after a
-> failed migration.
-> 
-> Though I wonder, could we do something even more clever for that particular
-> case?  And I suppose it would apply to NX huge pages as well.  Instead of
-> zapping the leaf PTEs and letting the fault handler install the huge page, do an
-> in-place promotion when dirty logging is disabled.  That could all be done under
-> the read lock, and with Paolo's method for deferred free on the back end.  That
-> way only the thread doing the memslot update would take mmu_lock for write, and
-> only once per memslot update.
+> It's also not _just_ exposing the CPUID leaves.  There are some checks
+> here when KVM is emulating some SGX instructions too, right?
 
-Oh, and we could even skip the remote TLB flush in that case since the GPA->HPA
-translation is unchanged.
+I would say trapping instead of emulating, but yes KVM will do more. However those
+are quite details, and I don't think we should put lots of details here. Or perhaps
+we can use 'for instance' as brief description:
+
+As part of virtualizing SGX, KVM will need to use the two flags, for instance, to
+expose them to guest.
+
+?
+
+> 
+> > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> > index 84b887825f12..18b2d0c8bbbe 100644
+> > --- a/arch/x86/include/asm/cpufeatures.h
+> > +++ b/arch/x86/include/asm/cpufeatures.h
+> > @@ -292,6 +292,8 @@
+> >  #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
+> >  #define X86_FEATURE_SPLIT_LOCK_DETECT	(11*32+ 6) /* #AC for split lock */
+> >  #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
+> > +#define X86_FEATURE_SGX1		(11*32+ 8) /* Software Guard Extensions sub-feature SGX1 */
+> > +#define X86_FEATURE_SGX2        	(11*32+ 9) /* Software Guard Extensions sub-feature SGX2 */
+> 
+> FWIW, I'm not sure how valuable it is to spell the SGX acronym out three
+> times.  Can't we use those bytes to put something more useful in that
+> comment?
+
+I think we can remove comment for SGX1, since it is basically SGX.
+
+For SGX2, how about below?
+
+/* SGX Enclave Dynamic Memory Management */
+
+
