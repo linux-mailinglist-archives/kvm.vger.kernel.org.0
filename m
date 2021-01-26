@@ -2,188 +2,403 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8663F303B8E
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 12:25:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 590E9303BB2
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 12:33:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392398AbhAZLZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 06:25:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55573 "EHLO
+        id S2405047AbhAZLcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 06:32:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59296 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392260AbhAZLZW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 06:25:22 -0500
+        by vger.kernel.org with ESMTP id S2392514AbhAZLbm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 06:31:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611660218;
+        s=mimecast20190719; t=1611660614;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=JTt2fKtk93GppUvATa0pV3yHgt515EpEGR8mjlKiGYA=;
-        b=VSnJZTk5M1/GEEnUBMNtfaCYhFXJ4wRStZIsEm0Jthn90ArDzupO1CnaQdg2F/SYD90Yrx
-        SukZiLA93awC0TzL8/vWB0j8LqDOZl8YWx3fGyuj36WGuoK7TsGoNJNMjtTjP9Rr2EmIG5
-        oqd/OECL/zS11RNXsriwRKDHITg7nBk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-GN9ZvHaBO7qDJCYOvl5ruQ-1; Tue, 26 Jan 2021 06:23:37 -0500
-X-MC-Unique: GN9ZvHaBO7qDJCYOvl5ruQ-1
-Received: by mail-ej1-f70.google.com with SMTP id h4so4847109eja.12
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 03:23:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JTt2fKtk93GppUvATa0pV3yHgt515EpEGR8mjlKiGYA=;
-        b=ekXII9bv4/YwhMe7el5bDNPWAZgfQShX9+n9X9rCI/DBbnuwa4baax26zmDzoMSSFP
-         cjpmIWr342KXuXCZmWGHmOm4UdvkxG/D5xrMFVa8loErBI/oLg7d1CF8TcLGpSVea134
-         9BAk8TU4JpM6x5wJl/NpzrOOzMdIjWvC+X1fyL0FGz3iP68fOj8g4KFxcFsv7BqdEciX
-         7hBWbuxTWB6InYKobB2WNET1B6qUNaRyHITHJ2onTPjzGWnplU9bXVJSfw945g+DeWCj
-         KS3kMLPbHa5x4YtmhBU9GRBNCr8TqTvUdYzObtjEVqwOUG4frk7cXANy1FzH59XEyfj4
-         dgWg==
-X-Gm-Message-State: AOAM5322qPHPQNgpsbfPaWefKCt9+pKLolHPcbtCkZ3BdAyy6Sveim7Y
-        lFBsxAwItVkMt2Fmx4OCxZPx86t414o/63YmrPmYr4PJB18xyoh/9esQMHLyAW8ZUavYBwUNjFA
-        5HYBD1S2VnkIr
-X-Received: by 2002:a17:906:ae42:: with SMTP id lf2mr2986697ejb.487.1611660215814;
-        Tue, 26 Jan 2021 03:23:35 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxaADKffvaOLAwo/NSoh7H/haFhO7LTo/Xzq1n4nH+wZ/VXL/AKBofvf7/ECClCE+fB2NwxOg==
-X-Received: by 2002:a17:906:ae42:: with SMTP id lf2mr2986681ejb.487.1611660215554;
-        Tue, 26 Jan 2021 03:23:35 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id da26sm12273587edb.36.2021.01.26.03.23.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 03:23:34 -0800 (PST)
-Date:   Tue, 26 Jan 2021 12:23:32 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        bh=AfdP3sAaStJ9lO9lzz5W2YdJt+dw3GMAfKZO10X6Jjs=;
+        b=glWvr9mU7O+SwQBjU+8iBEU8LcnNy2HlEqg7WjxIj5JjTlphI2PMz6yrsqDLLhbe3ODYiR
+        Bj6RU8JFFp1zIxkjti5iTnbJ78otxVOq7+e2t/iFsyyT5GGYN5o1H4LtXLoGy1FlOXcdhd
+        rxEOc5a9/KHZ+8oKuT07VA/5++iOz4s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-U-o7GoSlND-1DxLrI1Q6Uw-1; Tue, 26 Jan 2021 06:30:10 -0500
+X-MC-Unique: U-o7GoSlND-1DxLrI1Q6Uw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88FCBBBEE3;
+        Tue, 26 Jan 2021 11:30:08 +0000 (UTC)
+Received: from work-vm (ovpn-115-24.ams2.redhat.com [10.36.115.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8735D60C5F;
+        Tue, 26 Jan 2021 11:29:46 +0000 (UTC)
+Date:   Tue, 26 Jan 2021 11:29:43 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210126112332.bykmpexzcri7xi2j@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+        Sean Christopherson <seanjc@google.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v5 3/6] sev/i386: Allow AP booting under SEV-ES
+Message-ID: <20210126112943.GD2978@work-vm>
+References: <cover.1610665956.git.thomas.lendacky@amd.com>
+ <d3c455185bffe37da738746015db553cf903c53b.1610665956.git.thomas.lendacky@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <d3c455185bffe37da738746015db553cf903c53b.1610665956.git.thomas.lendacky@amd.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseny,
-thanks for this new series!
-I'm a bit busy but I hope to review it tomorrow or on Thursday.
+* Tom Lendacky (thomas.lendacky@amd.com) wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> When SEV-ES is enabled, it is not possible modify the guests register
+> state after it has been initially created, encrypted and measured.
+> 
+> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
+> hypervisor cannot emulate this because it cannot update the AP register
+> state. For the very first boot by an AP, the reset vector CS segment
+> value and the EIP value must be programmed before the register has been
+> encrypted and measured. Search the guest firmware for the guest for a
+> specific GUID that tells Qemu the value of the reset vector to use.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+> ---
+>  accel/kvm/kvm-all.c    | 64 ++++++++++++++++++++++++++++++++++++
+>  accel/stubs/kvm-stub.c |  5 +++
+>  hw/i386/pc_sysfw.c     | 10 +++++-
+>  include/sysemu/kvm.h   | 16 +++++++++
+>  include/sysemu/sev.h   |  3 ++
+>  target/i386/kvm/kvm.c  |  2 ++
+>  target/i386/sev.c      | 74 ++++++++++++++++++++++++++++++++++++++++++
+>  7 files changed, 173 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 389eaace72..9db74b465e 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -39,6 +39,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "trace.h"
+>  #include "hw/irq.h"
+> +#include "sysemu/kvm.h"
+>  #include "sysemu/sev.h"
+>  #include "qapi/visitor.h"
+>  #include "qapi/qapi-types-common.h"
+> @@ -123,6 +124,12 @@ struct KVMState
+>      /* memory encryption */
+>      void *memcrypt_handle;
+>      int (*memcrypt_encrypt_data)(void *handle, uint8_t *ptr, uint64_t len);
+> +    int (*memcrypt_save_reset_vector)(void *handle, void *flash_ptr,
+> +                                      uint64_t flash_size, uint32_t *addr);
+> +
+> +    uint32_t reset_cs;
+> +    uint32_t reset_ip;
+> +    bool reset_data_valid;
+>  
+>      /* For "info mtree -f" to tell if an MR is registered in KVM */
+>      int nr_as;
+> @@ -242,6 +249,62 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+>      return 1;
+>  }
+>  
+> +void kvm_memcrypt_set_reset_vector(CPUState *cpu)
+> +{
+> +    X86CPU *x86;
+> +    CPUX86State *env;
+> +
+> +    /* Only update if we have valid reset information */
+> +    if (!kvm_state->reset_data_valid) {
+> +        return;
+> +    }
+> +
+> +    /* Do not update the BSP reset state */
+> +    if (cpu->cpu_index == 0) {
+> +        return;
+> +    }
+> +
+> +    x86 = X86_CPU(cpu);
+> +    env = &x86->env;
+> +
+> +    cpu_x86_load_seg_cache(env, R_CS, 0xf000, kvm_state->reset_cs, 0xffff,
+> +                           DESC_P_MASK | DESC_S_MASK | DESC_CS_MASK |
+> +                           DESC_R_MASK | DESC_A_MASK);
+> +
+> +    env->eip = kvm_state->reset_ip;
+> +}
+> +
+> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
+> +{
+> +    CPUState *cpu;
+> +    uint32_t addr;
+> +    int ret;
+> +
+> +    if (kvm_memcrypt_enabled() &&
+> +        kvm_state->memcrypt_save_reset_vector) {
+> +
+> +        addr = 0;
+> +        ret = kvm_state->memcrypt_save_reset_vector(kvm_state->memcrypt_handle,
+> +                                                    flash_ptr, flash_size,
+> +                                                    &addr);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +
+> +        if (addr) {
+> +            kvm_state->reset_cs = addr & 0xffff0000;
+> +            kvm_state->reset_ip = addr & 0x0000ffff;
+> +            kvm_state->reset_data_valid = true;
+> +
+> +            CPU_FOREACH(cpu) {
+> +                kvm_memcrypt_set_reset_vector(cpu);
+> +            }
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  /* Called with KVMMemoryListener.slots_lock held */
+>  static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
+>  {
+> @@ -2213,6 +2276,7 @@ static int kvm_init(MachineState *ms)
+>          }
+>  
+>          kvm_state->memcrypt_encrypt_data = sev_encrypt_data;
+> +        kvm_state->memcrypt_save_reset_vector = sev_es_save_reset_vector;
+>      }
+>  
+>      ret = kvm_arch_init(ms, s);
+> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+> index 680e099463..162c28429e 100644
+> --- a/accel/stubs/kvm-stub.c
+> +++ b/accel/stubs/kvm-stub.c
+> @@ -91,6 +91,11 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+>    return 1;
+>  }
+>  
+> +int kvm_memcrypt_save_reset_vector(void *flash_ptr, uint64_t flash_size)
+> +{
+> +    return -ENOSYS;
+> +}
+> +
+>  #ifndef CONFIG_USER_ONLY
+>  int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+>  {
+> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> index 436b78c587..edec28842d 100644
+> --- a/hw/i386/pc_sysfw.c
+> +++ b/hw/i386/pc_sysfw.c
+> @@ -248,7 +248,8 @@ static void pc_system_flash_map(PCMachineState *pcms,
+>      PFlashCFI01 *system_flash;
+>      MemoryRegion *flash_mem;
+>      void *flash_ptr;
+> -    int ret, flash_size;
+> +    uint64_t flash_size;
+> +    int ret;
+>  
+>      assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
+>  
+> @@ -301,6 +302,13 @@ static void pc_system_flash_map(PCMachineState *pcms,
+>                   * search for them
+>                   */
+>                  pc_system_parse_ovmf_flash(flash_ptr, flash_size);
+> +
+> +                ret = kvm_memcrypt_save_reset_vector(flash_ptr, flash_size);
+> +                if (ret) {
+> +                    error_report("failed to locate and/or save reset vector");
+> +                    exit(1);
+> +                }
+> +
+>                  ret = kvm_memcrypt_encrypt_data(flash_ptr, flash_size);
+>                  if (ret) {
+>                      error_report("failed to encrypt pflash rom");
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index bb5d5cf497..875ca101e3 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -249,6 +249,22 @@ bool kvm_memcrypt_enabled(void);
+>   */
+>  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len);
+>  
+> +/**
+> + * kvm_memcrypt_set_reset_vector - sets the CS/IP value for the AP if SEV-ES
+> + *                                 is active.
+> + */
+> +void kvm_memcrypt_set_reset_vector(CPUState *cpu);
+> +
+> +/**
+> + * kvm_memcrypt_save_reset_vector - locates and saves the reset vector to be
+> + *                                  used as the initial CS/IP value for APs
+> + *                                  if SEV-ES is active.
+> + *
+> + * Return: 1 SEV-ES is active and failed to locate a valid reset vector
+> + *         0 SEV-ES is not active or successfully located and saved the
+> + *           reset vector address
+> + */
+> +int kvm_memcrypt_save_reset_vector(void *flash_prt, uint64_t flash_size);
+>  
+>  #ifdef NEED_CPU_H
+>  #include "cpu.h"
+> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+> index 7ab6e3e31d..6f5ad3fd03 100644
+> --- a/include/sysemu/sev.h
+> +++ b/include/sysemu/sev.h
+> @@ -20,4 +20,7 @@ void *sev_guest_init(const char *id);
+>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
+>  int sev_inject_launch_secret(const char *hdr, const char *secret,
+>                               uint64_t gpa, Error **errp);
+> +int sev_es_save_reset_vector(void *handle, void *flash_ptr,
+> +                             uint64_t flash_size, uint32_t *addr);
+> +
+>  #endif
+> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> index 6dc1ee052d..aaae79557d 100644
+> --- a/target/i386/kvm/kvm.c
+> +++ b/target/i386/kvm/kvm.c
+> @@ -1920,6 +1920,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+>      }
+>      /* enabled by default */
+>      env->poll_control_msr = 1;
+> +
+> +    kvm_memcrypt_set_reset_vector(CPU(cpu));
+>  }
+>  
+>  void kvm_arch_do_init_vcpu(X86CPU *cpu)
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index ddec7ebaa7..badc141554 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -22,6 +22,7 @@
+>  #include "qom/object_interfaces.h"
+>  #include "qemu/base64.h"
+>  #include "qemu/module.h"
+> +#include "qemu/uuid.h"
+>  #include "sysemu/kvm.h"
+>  #include "sev_i386.h"
+>  #include "sysemu/sysemu.h"
+> @@ -31,6 +32,7 @@
+>  #include "qom/object.h"
+>  #include "exec/address-spaces.h"
+>  #include "monitor/monitor.h"
+> +#include "hw/i386/pc.h"
+>  
+>  #define TYPE_SEV_GUEST "sev-guest"
+>  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+> @@ -71,6 +73,12 @@ struct SevGuestState {
+>  #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
+>  #define DEFAULT_SEV_DEVICE      "/dev/sev"
+>  
+> +#define SEV_INFO_BLOCK_GUID     "00f771de-1a7e-4fcb-890e-68c77e2fb44e"
+> +typedef struct __attribute__((__packed__)) SevInfoBlock {
+> +    /* SEV-ES Reset Vector Address */
+> +    uint32_t reset_addr;
+> +} SevInfoBlock;
+> +
+>  static SevGuestState *sev_guest;
+>  static Error *sev_mig_blocker;
+>  
+> @@ -896,6 +904,72 @@ int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
+>      return 0;
+>  }
+>  
+> +static int
+> +sev_es_parse_reset_block(SevInfoBlock *info, uint32_t *addr)
+> +{
+> +    if (!info->reset_addr) {
+> +        error_report("SEV-ES reset address is zero");
+> +        return 1;
+> +    }
+> +
+> +    *addr = info->reset_addr;
+> +
+> +    return 0;
+> +}
+> +
+> +int
+> +sev_es_save_reset_vector(void *handle, void *flash_ptr, uint64_t flash_size,
+> +                         uint32_t *addr)
+> +{
+> +    QemuUUID info_guid, *guid;
+> +    SevInfoBlock *info;
+> +    uint8_t *data;
+> +    uint16_t *len;
+> +
+> +    assert(handle);
+> +
+> +    /*
+> +     * Initialize the address to zero. An address of zero with a successful
+> +     * return code indicates that SEV-ES is not active.
+> +     */
+> +    *addr = 0;
+> +    if (!sev_es_enabled()) {
+> +        return 0;
+> +    }
+> +
+> +    /*
+> +     * Extract the AP reset vector for SEV-ES guests by locating the SEV GUID.
+> +     * The SEV GUID is located on its own (original implementation) or within
+> +     * the Firmware GUID Table (new implementation), either of which are
+> +     * located 32 bytes from the end of the flash.
+> +     *
+> +     * Check the Firmware GUID Table first.
+> +     */
+> +    if (pc_system_ovmf_table_find(SEV_INFO_BLOCK_GUID, &data, NULL)) {
 
-Stefano
+OK, so that's the bit that requires James's series before we can merge
+this one.
+(That GUID seems to match what I see in ovmf)
 
-On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
->	This patchset impelements support of SOCK_SEQPACKET for virtio
->transport.
->	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->do it, new packet operation was added: it marks start of record (with
->record length in header), such packet doesn't carry any data.  To send
->record, packet with start marker is sent first, then all data is sent
->as usual 'RW' packets. On receiver's side, length of record is known
->from packet with start record marker. Now as  packets of one socket
->are not reordered neither on vsock nor on vhost transport layers, such
->marker allows to restore original record on receiver's side. If user's
->buffer is smaller that record length, when all out of size data is
->dropped.
->	Maximum length of datagram is not limited as in stream socket,
->because same credit logic is used. Difference with stream socket is
->that user is not woken up until whole record is received or error
->occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
->	Tests also implemented.
->
-> Arseny Krasnov (13):
->  af_vsock: prepare for SOCK_SEQPACKET support
->  af_vsock: prepare 'vsock_connectible_recvmsg()'
->  af_vsock: implement SEQPACKET rx loop
->  af_vsock: implement send logic for SOCK_SEQPACKET
->  af_vsock: rest of SEQPACKET support
->  af_vsock: update comments for stream sockets
->  virtio/vsock: dequeue callback for SOCK_SEQPACKET
->  virtio/vsock: fetch length for SEQPACKET record
->  virtio/vsock: add SEQPACKET receive logic
->  virtio/vsock: rest of SOCK_SEQPACKET support
->  virtio/vsock: setup SEQPACKET ops for transport
->  vhost/vsock: setup SEQPACKET ops for transport
->  vsock_test: add SOCK_SEQPACKET tests
->
-> drivers/vhost/vsock.c                   |   7 +-
-> include/linux/virtio_vsock.h            |  12 +
-> include/net/af_vsock.h                  |   6 +
-> include/uapi/linux/virtio_vsock.h       |   9 +
-> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
-> net/vmw_vsock/virtio_transport.c        |   4 +
-> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
-> tools/testing/vsock/util.c              |  32 +-
-> tools/testing/vsock/util.h              |   3 +
-> tools/testing/vsock/vsock_test.c        | 126 +++++
-> 10 files changed, 862 insertions(+), 175 deletions(-)
->
-> TODO:
-> - Support for record integrity control. As transport could drop some
->   packets, something like "record-id" and record end marker need to
->   be implemented. Idea is that SEQ_BEGIN packet carries both record
->   length and record id, end marker(let it be SEQ_END) carries only
->   record id. To be sure that no one packet was lost, receiver checks
->   length of data between SEQ_BEGIN and SEQ_END(it must be same with
->   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
->   means that both markers were not dropped. I think that easiest way
->   to implement record id for SEQ_BEGIN is to reuse another field of
->   packet header(SEQ_BEGIN already uses 'flags' as record length).For
->   SEQ_END record id could be stored in 'flags'.
->     Another way to implement it, is to move metadata of both SEQ_END
->   and SEQ_BEGIN to payload. But this approach has problem, because
->   if we move something to payload, such payload is accounted by
->   credit logic, which fragments payload, while payload with record
->   length and id couldn't be fragmented. One way to overcome it is to
->   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
->   is to update 'stream_has_space()' function: current implementation
->   return non-zero when at least 1 byte is allowed to use,but updated
->   version will have extra argument, which is needed length. For 'RW'
->   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
->   record id) and for SEQ_END it is sizeof(record id).
->
-> - What to do, when server doesn't support SOCK_SEQPACKET. In current
->   implementation RST is replied in the same way when listening port
->   is not found. I think that current RST is enough,because case when
->   server doesn't support SEQ_PACKET is same when listener missed(e.g.
->   no listener in both cases).
->
-> v2 -> v3:
-> - patches reorganized: split for prepare and implementation patches
-> - local variables are declared in "Reverse Christmas tree" manner
-> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
->   fields access
-> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
->   between stream and seqpacket sockets.
-> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
-> - af_vsock.c: 'vsock_wait_data()' refactored.
->
-> v1 -> v2:
-> - patches reordered: af_vsock.c related changes now before virtio vsock
-> - patches reorganized: more small patches, where +/- are not mixed
-> - tests for SOCK_SEQPACKET added
-> - all commit messages updated
-> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
->   'vsock_connectible_recvmsg()'
-> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
->   was not found
-> - virtio_transport_common.c: transport callback for seqpacket dequeue
-> - virtio_transport_common.c: simplified
->   'virtio_transport_recv_connected()'
-> - virtio_transport_common.c: send reset on socket and packet type
->			      mismatch.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->
->-- 
->2.25.1
->
+Dave
+
+> +        return sev_es_parse_reset_block((SevInfoBlock *)data, addr);
+> +    }
+> +
+> +    /*
+> +     * SEV info block not found in the Firmware GUID Table (or there isn't
+> +     * a Firmware GUID Table), fall back to the original implementation.
+> +     */
+> +    data = flash_ptr + flash_size - 0x20;
+> +
+> +    qemu_uuid_parse(SEV_INFO_BLOCK_GUID, &info_guid);
+> +    info_guid = qemu_uuid_bswap(info_guid); /* GUIDs are LE */
+> +
+> +    guid = (QemuUUID *)(data - sizeof(info_guid));
+> +    if (!qemu_uuid_is_equal(guid, &info_guid)) {
+> +        error_report("SEV information block/Firmware GUID Table block not found in pflash rom");
+> +        return 1;
+> +    }
+> +
+> +    len = (uint16_t *)((uint8_t *)guid - sizeof(*len));
+> +    info = (SevInfoBlock *)(data - le16_to_cpu(*len));
+> +
+> +    return sev_es_parse_reset_block(info, addr);
+> +}
+> +
+>  static void
+>  sev_register_types(void)
+>  {
+> -- 
+> 2.30.0
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
