@@ -2,758 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 78C95305CD1
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:19:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AA47305D24
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 14:29:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313698AbhAZWkz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 17:40:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393066AbhAZRpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:45:10 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4993C061573
-        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:44:29 -0800 (PST)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l4RgD-00045t-EA; Tue, 26 Jan 2021 17:59:01 +0100
-Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l4Rg5-0003hk-IW; Tue, 26 Jan 2021 17:58:53 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Russell King <linux@armlinux.org.uk>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc:     linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-        Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: [PATCH v3 4/5] amba: Make the remove callback return void
-Date:   Tue, 26 Jan 2021 17:58:34 +0100
-Message-Id: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+        id S313531AbhAZWgF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 17:36:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46903 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390654AbhAZRUA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 12:20:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611681501;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nof8IdLrTxVaL/tx6R5htDiAQ8WfOqafWYYKwtoUQQk=;
+        b=bZKIg+I8eBVWQXBtjMyuHy/sSF/X4uesALkfza3MyBjiHPAXXUDPfxpaR/ipW91edieckp
+        ANZdUjSI60Gthg0F/dGzIA5Qat34KT6avY6U4Nmaskd842/KoaaP7vEjuJeAHg7bbE2BKp
+        hsOo/GrA9aHYzdhe6SViX9A3mHXDQ98=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-l_yoZIHqOC-WVChzy03g9g-1; Tue, 26 Jan 2021 12:18:18 -0500
+X-MC-Unique: l_yoZIHqOC-WVChzy03g9g-1
+Received: by mail-ej1-f71.google.com with SMTP id ox17so5204298ejb.2
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 09:18:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nof8IdLrTxVaL/tx6R5htDiAQ8WfOqafWYYKwtoUQQk=;
+        b=fC2K5x+J3I+ozzPwhv7H3NFp1Nq5wylI0VwbaRgFNGzRGlsQqlYoljsm+YFc3a3zFr
+         n5kthn8Z458NoMnA6cfqD6HKURLLO5fFwQLKwDan+DBKr0vTMTIy/ogf6TAj180oXeh+
+         DbMvIi9AWj5Zd0oyMZm8RS71Ca7MRyYEx85bFGCitB23YDo9XCnA8F91DXw/w/N50Vke
+         yBlTscAlXM/tJn56MyNLYzMUuVxFzMv7kYWMPOh2s5XGIxWlQF7p6kQdouKzpn+LgDaJ
+         iB5zoHMh5AfK+KlhRnCUfhZ7bFGC/mxkUdk0eE66sv8y6iblfVEUh6UzqpUo6vMQ6BU4
+         Aulw==
+X-Gm-Message-State: AOAM532tKN6fhlHqSWZ2f08PY6doPQX8VWavr/GDkpKONpfXY3ZaoIUZ
+        cAlWuYQxLD7kW1OgCmOppJN3PY5kVUNUrMHmzl5FFMxYwIsCi2hUsVik15Cxw1kIRgaeevYr+KU
+        lZrrs5TTcwLBX
+X-Received: by 2002:a17:906:99c5:: with SMTP id s5mr4173023ejn.236.1611681497261;
+        Tue, 26 Jan 2021 09:18:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxsIt0ePa151I+zh8Rc0nKVJkyzzkW03zZ9EAgjxV6dKtJcTYrF5+uTQAXpFuZFMCPy9hY9zg==
+X-Received: by 2002:a17:906:99c5:: with SMTP id s5mr4173007ejn.236.1611681497082;
+        Tue, 26 Jan 2021 09:18:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id z20sm12790614edx.15.2021.01.26.09.18.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 09:18:16 -0800 (PST)
+Subject: Re: [PATCH v4 0/6] Qemu SEV-ES guest support
+To:     Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+References: <cover.1601060620.git.thomas.lendacky@amd.com>
+ <30164d98-3d8c-64bf-500b-f98a7f12d3c3@redhat.com>
+ <b0c14997-22c2-2bfc-c570-a1c39280696b@amd.com>
+ <946ac9e2-a363-6460-87a0-9575429d3b49@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <137ad1f2-8411-c0cd-4621-611d7f5d72d2@redhat.com>
+Date:   Tue, 26 Jan 2021 18:18:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+In-Reply-To: <946ac9e2-a363-6460-87a0-9575429d3b49@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All amba drivers return 0 in their remove callback. Together with the
-driver core ignoring the return value anyhow, it doesn't make sense to
-return a value here.
+On 26/01/21 18:13, Tom Lendacky wrote:
+> Also, the new version will have a prereq against another patch series that
+> has not been accepted yet:
+> 
+>    [PATCH v2 0/2] sev: enable secret injection to a self described area in OVMF
+> 
+>    https://lore.kernel.org/qemu-devel/20201214154429.11023-1-jejb@linux.ibm.com/
 
-Change the remove prototype to return void, which makes it explicit that
-returning an error value doesn't work as expected. This simplifies changing
-the core remove callback to return void, too.
+David reviewed it today, so even if a v3 will be needed that shouldn't 
+be a problem for SEV-ES itself.
 
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
-Acked-by: Mark Brown <broonie@kernel.org>
-Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/amba/bus.c                                 | 5 ++---
- drivers/char/hw_random/nomadik-rng.c               | 3 +--
- drivers/dma/pl330.c                                | 3 +--
- drivers/gpu/drm/pl111/pl111_drv.c                  | 4 +---
- drivers/hwtracing/coresight/coresight-catu.c       | 3 +--
- drivers/hwtracing/coresight/coresight-cpu-debug.c  | 4 +---
- drivers/hwtracing/coresight/coresight-cti-core.c   | 4 +---
- drivers/hwtracing/coresight/coresight-etb10.c      | 4 +---
- drivers/hwtracing/coresight/coresight-etm3x-core.c | 4 +---
- drivers/hwtracing/coresight/coresight-etm4x-core.c | 4 +---
- drivers/hwtracing/coresight/coresight-funnel.c     | 4 ++--
- drivers/hwtracing/coresight/coresight-replicator.c | 4 ++--
- drivers/hwtracing/coresight/coresight-stm.c        | 4 +---
- drivers/hwtracing/coresight/coresight-tmc-core.c   | 4 +---
- drivers/hwtracing/coresight/coresight-tpiu.c       | 4 +---
- drivers/i2c/busses/i2c-nomadik.c                   | 4 +---
- drivers/input/serio/ambakmi.c                      | 3 +--
- drivers/memory/pl172.c                             | 4 +---
- drivers/memory/pl353-smc.c                         | 4 +---
- drivers/mmc/host/mmci.c                            | 4 +---
- drivers/rtc/rtc-pl030.c                            | 4 +---
- drivers/rtc/rtc-pl031.c                            | 4 +---
- drivers/spi/spi-pl022.c                            | 5 ++---
- drivers/tty/serial/amba-pl010.c                    | 4 +---
- drivers/tty/serial/amba-pl011.c                    | 3 +--
- drivers/vfio/platform/vfio_amba.c                  | 3 +--
- drivers/video/fbdev/amba-clcd.c                    | 4 +---
- drivers/watchdog/sp805_wdt.c                       | 4 +---
- include/linux/amba/bus.h                           | 2 +-
- sound/arm/aaci.c                                   | 4 +---
- 30 files changed, 34 insertions(+), 80 deletions(-)
-
-diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
-index 8c4a42df47c6..48b5d4b4e889 100644
---- a/drivers/amba/bus.c
-+++ b/drivers/amba/bus.c
-@@ -300,11 +300,10 @@ static int amba_remove(struct device *dev)
- {
- 	struct amba_device *pcdev = to_amba_device(dev);
- 	struct amba_driver *drv = to_amba_driver(dev->driver);
--	int ret = 0;
- 
- 	pm_runtime_get_sync(dev);
- 	if (drv->remove)
--		ret = drv->remove(pcdev);
-+		drv->remove(pcdev);
- 	pm_runtime_put_noidle(dev);
- 
- 	/* Undo the runtime PM settings in amba_probe() */
-@@ -315,7 +314,7 @@ static int amba_remove(struct device *dev)
- 	amba_put_disable_pclk(pcdev);
- 	dev_pm_domain_detach(dev, true);
- 
--	return ret;
-+	return 0;
- }
- 
- static void amba_shutdown(struct device *dev)
-diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
-index b0ded41eb865..67947a19aa22 100644
---- a/drivers/char/hw_random/nomadik-rng.c
-+++ b/drivers/char/hw_random/nomadik-rng.c
-@@ -69,11 +69,10 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int nmk_rng_remove(struct amba_device *dev)
-+static void nmk_rng_remove(struct amba_device *dev)
- {
- 	amba_release_regions(dev);
- 	clk_disable(rng_clk);
--	return 0;
- }
- 
- static const struct amba_id nmk_rng_ids[] = {
-diff --git a/drivers/dma/pl330.c b/drivers/dma/pl330.c
-index bc0f66af0f11..fd8d2bc3be9f 100644
---- a/drivers/dma/pl330.c
-+++ b/drivers/dma/pl330.c
-@@ -3195,7 +3195,7 @@ pl330_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int pl330_remove(struct amba_device *adev)
-+static void pl330_remove(struct amba_device *adev)
- {
- 	struct pl330_dmac *pl330 = amba_get_drvdata(adev);
- 	struct dma_pl330_chan *pch, *_p;
-@@ -3235,7 +3235,6 @@ static int pl330_remove(struct amba_device *adev)
- 
- 	if (pl330->rstc)
- 		reset_control_assert(pl330->rstc);
--	return 0;
- }
- 
- static const struct amba_id pl330_ids[] = {
-diff --git a/drivers/gpu/drm/pl111/pl111_drv.c b/drivers/gpu/drm/pl111/pl111_drv.c
-index 40e6708fbbe2..1fb5eacefd2d 100644
---- a/drivers/gpu/drm/pl111/pl111_drv.c
-+++ b/drivers/gpu/drm/pl111/pl111_drv.c
-@@ -320,7 +320,7 @@ static int pl111_amba_probe(struct amba_device *amba_dev,
- 	return ret;
- }
- 
--static int pl111_amba_remove(struct amba_device *amba_dev)
-+static void pl111_amba_remove(struct amba_device *amba_dev)
- {
- 	struct device *dev = &amba_dev->dev;
- 	struct drm_device *drm = amba_get_drvdata(amba_dev);
-@@ -331,8 +331,6 @@ static int pl111_amba_remove(struct amba_device *amba_dev)
- 		drm_panel_bridge_remove(priv->bridge);
- 	drm_dev_put(drm);
- 	of_reserved_mem_device_release(dev);
--
--	return 0;
- }
- 
- /*
-diff --git a/drivers/hwtracing/coresight/coresight-catu.c b/drivers/hwtracing/coresight/coresight-catu.c
-index a61313f320bd..8e19e8cdcce5 100644
---- a/drivers/hwtracing/coresight/coresight-catu.c
-+++ b/drivers/hwtracing/coresight/coresight-catu.c
-@@ -567,12 +567,11 @@ static int catu_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int catu_remove(struct amba_device *adev)
-+static void catu_remove(struct amba_device *adev)
- {
- 	struct catu_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
- 	coresight_unregister(drvdata->csdev);
--	return 0;
- }
- 
- static struct amba_id catu_ids[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-cpu-debug.c b/drivers/hwtracing/coresight/coresight-cpu-debug.c
-index e1d232411d8d..2dcf13de751f 100644
---- a/drivers/hwtracing/coresight/coresight-cpu-debug.c
-+++ b/drivers/hwtracing/coresight/coresight-cpu-debug.c
-@@ -627,7 +627,7 @@ static int debug_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int debug_remove(struct amba_device *adev)
-+static void debug_remove(struct amba_device *adev)
- {
- 	struct device *dev = &adev->dev;
- 	struct debug_drvdata *drvdata = amba_get_drvdata(adev);
-@@ -642,8 +642,6 @@ static int debug_remove(struct amba_device *adev)
- 
- 	if (!--debug_count)
- 		debug_func_exit();
--
--	return 0;
- }
- 
- static const struct amba_cs_uci_id uci_id_debug[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-cti-core.c b/drivers/hwtracing/coresight/coresight-cti-core.c
-index 61dbc1afd8da..30e48809ba00 100644
---- a/drivers/hwtracing/coresight/coresight-cti-core.c
-+++ b/drivers/hwtracing/coresight/coresight-cti-core.c
-@@ -836,7 +836,7 @@ static void cti_device_release(struct device *dev)
- 	if (drvdata->csdev_release)
- 		drvdata->csdev_release(dev);
- }
--static int cti_remove(struct amba_device *adev)
-+static void cti_remove(struct amba_device *adev)
- {
- 	struct cti_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
-@@ -845,8 +845,6 @@ static int cti_remove(struct amba_device *adev)
- 	mutex_unlock(&ect_mutex);
- 
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- static int cti_probe(struct amba_device *adev, const struct amba_id *id)
-diff --git a/drivers/hwtracing/coresight/coresight-etb10.c b/drivers/hwtracing/coresight/coresight-etb10.c
-index 0cf6f0b947b6..51c801c05e5c 100644
---- a/drivers/hwtracing/coresight/coresight-etb10.c
-+++ b/drivers/hwtracing/coresight/coresight-etb10.c
-@@ -803,7 +803,7 @@ static int etb_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int etb_remove(struct amba_device *adev)
-+static void etb_remove(struct amba_device *adev)
- {
- 	struct etb_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
-@@ -814,8 +814,6 @@ static int etb_remove(struct amba_device *adev)
- 	 */
- 	misc_deregister(&drvdata->miscdev);
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM
-diff --git a/drivers/hwtracing/coresight/coresight-etm3x-core.c b/drivers/hwtracing/coresight/coresight-etm3x-core.c
-index 5bf5a5a4ce6d..683a69e88efd 100644
---- a/drivers/hwtracing/coresight/coresight-etm3x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm3x-core.c
-@@ -909,7 +909,7 @@ static void clear_etmdrvdata(void *info)
- 	etmdrvdata[cpu] = NULL;
- }
- 
--static int etm_remove(struct amba_device *adev)
-+static void etm_remove(struct amba_device *adev)
- {
- 	struct etm_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
-@@ -932,8 +932,6 @@ static int etm_remove(struct amba_device *adev)
- 	cpus_read_unlock();
- 
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM
-diff --git a/drivers/hwtracing/coresight/coresight-etm4x-core.c b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-index b20b6ff17cf6..82787cba537d 100644
---- a/drivers/hwtracing/coresight/coresight-etm4x-core.c
-+++ b/drivers/hwtracing/coresight/coresight-etm4x-core.c
-@@ -1680,7 +1680,7 @@ static void clear_etmdrvdata(void *info)
- 	etmdrvdata[cpu] = NULL;
- }
- 
--static int etm4_remove(struct amba_device *adev)
-+static void etm4_remove(struct amba_device *adev)
- {
- 	struct etmv4_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
-@@ -1703,8 +1703,6 @@ static int etm4_remove(struct amba_device *adev)
- 	cpus_read_unlock();
- 
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- static const struct amba_id etm4_ids[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-funnel.c b/drivers/hwtracing/coresight/coresight-funnel.c
-index 071c723227db..01f8f9285168 100644
---- a/drivers/hwtracing/coresight/coresight-funnel.c
-+++ b/drivers/hwtracing/coresight/coresight-funnel.c
-@@ -370,9 +370,9 @@ static int dynamic_funnel_probe(struct amba_device *adev,
- 	return funnel_probe(&adev->dev, &adev->res);
- }
- 
--static int dynamic_funnel_remove(struct amba_device *adev)
-+static void dynamic_funnel_remove(struct amba_device *adev)
- {
--	return funnel_remove(&adev->dev);
-+	funnel_remove(&adev->dev);
- }
- 
- static const struct amba_id dynamic_funnel_ids[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-replicator.c b/drivers/hwtracing/coresight/coresight-replicator.c
-index 7e2a2b7f503f..34fc2f6f3ea9 100644
---- a/drivers/hwtracing/coresight/coresight-replicator.c
-+++ b/drivers/hwtracing/coresight/coresight-replicator.c
-@@ -388,9 +388,9 @@ static int dynamic_replicator_probe(struct amba_device *adev,
- 	return replicator_probe(&adev->dev, &adev->res);
- }
- 
--static int dynamic_replicator_remove(struct amba_device *adev)
-+static void dynamic_replicator_remove(struct amba_device *adev)
- {
--	return replicator_remove(&adev->dev);
-+	replicator_remove(&adev->dev);
- }
- 
- static const struct amba_id dynamic_replicator_ids[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-stm.c b/drivers/hwtracing/coresight/coresight-stm.c
-index 99791773f682..423df0d30d9c 100644
---- a/drivers/hwtracing/coresight/coresight-stm.c
-+++ b/drivers/hwtracing/coresight/coresight-stm.c
-@@ -951,15 +951,13 @@ static int stm_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int stm_remove(struct amba_device *adev)
-+static void stm_remove(struct amba_device *adev)
- {
- 	struct stm_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
- 	coresight_unregister(drvdata->csdev);
- 
- 	stm_unregister_device(&drvdata->stm);
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM
-diff --git a/drivers/hwtracing/coresight/coresight-tmc-core.c b/drivers/hwtracing/coresight/coresight-tmc-core.c
-index 8169dff5a9f6..e29b3914fc0f 100644
---- a/drivers/hwtracing/coresight/coresight-tmc-core.c
-+++ b/drivers/hwtracing/coresight/coresight-tmc-core.c
-@@ -559,7 +559,7 @@ static void tmc_shutdown(struct amba_device *adev)
- 	spin_unlock_irqrestore(&drvdata->spinlock, flags);
- }
- 
--static int tmc_remove(struct amba_device *adev)
-+static void tmc_remove(struct amba_device *adev)
- {
- 	struct tmc_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
-@@ -570,8 +570,6 @@ static int tmc_remove(struct amba_device *adev)
- 	 */
- 	misc_deregister(&drvdata->miscdev);
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- static const struct amba_id tmc_ids[] = {
-diff --git a/drivers/hwtracing/coresight/coresight-tpiu.c b/drivers/hwtracing/coresight/coresight-tpiu.c
-index d5dfee9ee556..f77c4b0ea4aa 100644
---- a/drivers/hwtracing/coresight/coresight-tpiu.c
-+++ b/drivers/hwtracing/coresight/coresight-tpiu.c
-@@ -173,13 +173,11 @@ static int tpiu_probe(struct amba_device *adev, const struct amba_id *id)
- 	return PTR_ERR(drvdata->csdev);
- }
- 
--static int tpiu_remove(struct amba_device *adev)
-+static void tpiu_remove(struct amba_device *adev)
- {
- 	struct tpiu_drvdata *drvdata = dev_get_drvdata(&adev->dev);
- 
- 	coresight_unregister(drvdata->csdev);
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM
-diff --git a/drivers/i2c/busses/i2c-nomadik.c b/drivers/i2c/busses/i2c-nomadik.c
-index d4b1b0865f67..a3363b20f168 100644
---- a/drivers/i2c/busses/i2c-nomadik.c
-+++ b/drivers/i2c/busses/i2c-nomadik.c
-@@ -1055,7 +1055,7 @@ static int nmk_i2c_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int nmk_i2c_remove(struct amba_device *adev)
-+static void nmk_i2c_remove(struct amba_device *adev)
- {
- 	struct resource *res = &adev->res;
- 	struct nmk_i2c_dev *dev = amba_get_drvdata(adev);
-@@ -1068,8 +1068,6 @@ static int nmk_i2c_remove(struct amba_device *adev)
- 	i2c_clr_bit(dev->virtbase + I2C_CR, I2C_CR_PE);
- 	clk_disable_unprepare(dev->clk);
- 	release_mem_region(res->start, resource_size(res));
--
--	return 0;
- }
- 
- static struct i2c_vendor_data vendor_stn8815 = {
-diff --git a/drivers/input/serio/ambakmi.c b/drivers/input/serio/ambakmi.c
-index ecdeca147ed7..4408245b61d2 100644
---- a/drivers/input/serio/ambakmi.c
-+++ b/drivers/input/serio/ambakmi.c
-@@ -159,7 +159,7 @@ static int amba_kmi_probe(struct amba_device *dev,
- 	return ret;
- }
- 
--static int amba_kmi_remove(struct amba_device *dev)
-+static void amba_kmi_remove(struct amba_device *dev)
- {
- 	struct amba_kmi_port *kmi = amba_get_drvdata(dev);
- 
-@@ -168,7 +168,6 @@ static int amba_kmi_remove(struct amba_device *dev)
- 	iounmap(kmi->base);
- 	kfree(kmi);
- 	amba_release_regions(dev);
--	return 0;
- }
- 
- static int __maybe_unused amba_kmi_resume(struct device *dev)
-diff --git a/drivers/memory/pl172.c b/drivers/memory/pl172.c
-index 575fadbffa30..9eb8cc7de494 100644
---- a/drivers/memory/pl172.c
-+++ b/drivers/memory/pl172.c
-@@ -273,14 +273,12 @@ static int pl172_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int pl172_remove(struct amba_device *adev)
-+static void pl172_remove(struct amba_device *adev)
- {
- 	struct pl172_data *pl172 = amba_get_drvdata(adev);
- 
- 	clk_disable_unprepare(pl172->clk);
- 	amba_release_regions(adev);
--
--	return 0;
- }
- 
- static const struct amba_id pl172_ids[] = {
-diff --git a/drivers/memory/pl353-smc.c b/drivers/memory/pl353-smc.c
-index 73bd3023202f..3b5b1045edd9 100644
---- a/drivers/memory/pl353-smc.c
-+++ b/drivers/memory/pl353-smc.c
-@@ -426,14 +426,12 @@ static int pl353_smc_probe(struct amba_device *adev, const struct amba_id *id)
- 	return err;
- }
- 
--static int pl353_smc_remove(struct amba_device *adev)
-+static void pl353_smc_remove(struct amba_device *adev)
- {
- 	struct pl353_smc_data *pl353_smc = amba_get_drvdata(adev);
- 
- 	clk_disable_unprepare(pl353_smc->memclk);
- 	clk_disable_unprepare(pl353_smc->aclk);
--
--	return 0;
- }
- 
- static const struct amba_id pl353_ids[] = {
-diff --git a/drivers/mmc/host/mmci.c b/drivers/mmc/host/mmci.c
-index b5a41a7ce165..32f52d070bbd 100644
---- a/drivers/mmc/host/mmci.c
-+++ b/drivers/mmc/host/mmci.c
-@@ -2195,7 +2195,7 @@ static int mmci_probe(struct amba_device *dev,
- 	return ret;
- }
- 
--static int mmci_remove(struct amba_device *dev)
-+static void mmci_remove(struct amba_device *dev)
- {
- 	struct mmc_host *mmc = amba_get_drvdata(dev);
- 
-@@ -2223,8 +2223,6 @@ static int mmci_remove(struct amba_device *dev)
- 		clk_disable_unprepare(host->clk);
- 		mmc_free_host(mmc);
- 	}
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM
-diff --git a/drivers/rtc/rtc-pl030.c b/drivers/rtc/rtc-pl030.c
-index 5a880516f3e8..39038c0754ee 100644
---- a/drivers/rtc/rtc-pl030.c
-+++ b/drivers/rtc/rtc-pl030.c
-@@ -137,7 +137,7 @@ static int pl030_probe(struct amba_device *dev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int pl030_remove(struct amba_device *dev)
-+static void pl030_remove(struct amba_device *dev)
- {
- 	struct pl030_rtc *rtc = amba_get_drvdata(dev);
- 
-@@ -146,8 +146,6 @@ static int pl030_remove(struct amba_device *dev)
- 	free_irq(dev->irq[0], rtc);
- 	iounmap(rtc->base);
- 	amba_release_regions(dev);
--
--	return 0;
- }
- 
- static struct amba_id pl030_ids[] = {
-diff --git a/drivers/rtc/rtc-pl031.c b/drivers/rtc/rtc-pl031.c
-index 224bbf096262..620c8dc33647 100644
---- a/drivers/rtc/rtc-pl031.c
-+++ b/drivers/rtc/rtc-pl031.c
-@@ -280,7 +280,7 @@ static int pl031_set_alarm(struct device *dev, struct rtc_wkalrm *alarm)
- 	return 0;
- }
- 
--static int pl031_remove(struct amba_device *adev)
-+static void pl031_remove(struct amba_device *adev)
- {
- 	struct pl031_local *ldata = dev_get_drvdata(&adev->dev);
- 
-@@ -289,8 +289,6 @@ static int pl031_remove(struct amba_device *adev)
- 	if (adev->irq[0])
- 		free_irq(adev->irq[0], ldata);
- 	amba_release_regions(adev);
--
--	return 0;
- }
- 
- static int pl031_probe(struct amba_device *adev, const struct amba_id *id)
-diff --git a/drivers/spi/spi-pl022.c b/drivers/spi/spi-pl022.c
-index d1776fea287e..fd74ddfbb686 100644
---- a/drivers/spi/spi-pl022.c
-+++ b/drivers/spi/spi-pl022.c
-@@ -2314,13 +2314,13 @@ static int pl022_probe(struct amba_device *adev, const struct amba_id *id)
- 	return status;
- }
- 
--static int
-+static void
- pl022_remove(struct amba_device *adev)
- {
- 	struct pl022 *pl022 = amba_get_drvdata(adev);
- 
- 	if (!pl022)
--		return 0;
-+		return;
- 
- 	/*
- 	 * undo pm_runtime_put() in probe.  I assume that we're not
-@@ -2335,7 +2335,6 @@ pl022_remove(struct amba_device *adev)
- 	clk_disable_unprepare(pl022->clk);
- 	amba_release_regions(adev);
- 	tasklet_disable(&pl022->pump_transfers);
--	return 0;
- }
- 
- #ifdef CONFIG_PM_SLEEP
-diff --git a/drivers/tty/serial/amba-pl010.c b/drivers/tty/serial/amba-pl010.c
-index 3284f34e9dfe..3f96edfe569c 100644
---- a/drivers/tty/serial/amba-pl010.c
-+++ b/drivers/tty/serial/amba-pl010.c
-@@ -754,7 +754,7 @@ static int pl010_probe(struct amba_device *dev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int pl010_remove(struct amba_device *dev)
-+static void pl010_remove(struct amba_device *dev)
- {
- 	struct uart_amba_port *uap = amba_get_drvdata(dev);
- 	int i;
-@@ -770,8 +770,6 @@ static int pl010_remove(struct amba_device *dev)
- 
- 	if (!busy)
- 		uart_unregister_driver(&amba_reg);
--
--	return 0;
- }
- 
- #ifdef CONFIG_PM_SLEEP
-diff --git a/drivers/tty/serial/amba-pl011.c b/drivers/tty/serial/amba-pl011.c
-index c255476cce28..4ead0c9048a8 100644
---- a/drivers/tty/serial/amba-pl011.c
-+++ b/drivers/tty/serial/amba-pl011.c
-@@ -2679,13 +2679,12 @@ static int pl011_probe(struct amba_device *dev, const struct amba_id *id)
- 	return pl011_register_port(uap);
- }
- 
--static int pl011_remove(struct amba_device *dev)
-+static void pl011_remove(struct amba_device *dev)
- {
- 	struct uart_amba_port *uap = amba_get_drvdata(dev);
- 
- 	uart_remove_one_port(&amba_reg, &uap->port);
- 	pl011_unregister_port(uap);
--	return 0;
- }
- 
- #ifdef CONFIG_PM_SLEEP
-diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-index 7b3ebf1558e1..3626c2150101 100644
---- a/drivers/vfio/platform/vfio_amba.c
-+++ b/drivers/vfio/platform/vfio_amba.c
-@@ -71,14 +71,13 @@ static int vfio_amba_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int vfio_amba_remove(struct amba_device *adev)
-+static void vfio_amba_remove(struct amba_device *adev)
- {
- 	struct vfio_platform_device *vdev =
- 		vfio_platform_remove_common(&adev->dev);
- 
- 	kfree(vdev->name);
- 	kfree(vdev);
--	return 0;
- }
- 
- static const struct amba_id pl330_ids[] = {
-diff --git a/drivers/video/fbdev/amba-clcd.c b/drivers/video/fbdev/amba-clcd.c
-index b7682de412d8..33595cc4778e 100644
---- a/drivers/video/fbdev/amba-clcd.c
-+++ b/drivers/video/fbdev/amba-clcd.c
-@@ -925,7 +925,7 @@ static int clcdfb_probe(struct amba_device *dev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int clcdfb_remove(struct amba_device *dev)
-+static void clcdfb_remove(struct amba_device *dev)
- {
- 	struct clcd_fb *fb = amba_get_drvdata(dev);
- 
-@@ -942,8 +942,6 @@ static int clcdfb_remove(struct amba_device *dev)
- 	kfree(fb);
- 
- 	amba_release_regions(dev);
--
--	return 0;
- }
- 
- static const struct amba_id clcdfb_id_table[] = {
-diff --git a/drivers/watchdog/sp805_wdt.c b/drivers/watchdog/sp805_wdt.c
-index 958dc32a708f..58a00e1ab23b 100644
---- a/drivers/watchdog/sp805_wdt.c
-+++ b/drivers/watchdog/sp805_wdt.c
-@@ -305,14 +305,12 @@ sp805_wdt_probe(struct amba_device *adev, const struct amba_id *id)
- 	return ret;
- }
- 
--static int sp805_wdt_remove(struct amba_device *adev)
-+static void sp805_wdt_remove(struct amba_device *adev)
- {
- 	struct sp805_wdt *wdt = amba_get_drvdata(adev);
- 
- 	watchdog_unregister_device(&wdt->wdd);
- 	watchdog_set_drvdata(&wdt->wdd, NULL);
--
--	return 0;
- }
- 
- static int __maybe_unused sp805_wdt_suspend(struct device *dev)
-diff --git a/include/linux/amba/bus.h b/include/linux/amba/bus.h
-index 0bbfd647f5c6..6cc93ab5b809 100644
---- a/include/linux/amba/bus.h
-+++ b/include/linux/amba/bus.h
-@@ -76,7 +76,7 @@ struct amba_device {
- struct amba_driver {
- 	struct device_driver	drv;
- 	int			(*probe)(struct amba_device *, const struct amba_id *);
--	int			(*remove)(struct amba_device *);
-+	void			(*remove)(struct amba_device *);
- 	void			(*shutdown)(struct amba_device *);
- 	const struct amba_id	*id_table;
- };
-diff --git a/sound/arm/aaci.c b/sound/arm/aaci.c
-index a0996c47e58f..b326a5f5f0d5 100644
---- a/sound/arm/aaci.c
-+++ b/sound/arm/aaci.c
-@@ -1055,7 +1055,7 @@ static int aaci_probe(struct amba_device *dev,
- 	return ret;
- }
- 
--static int aaci_remove(struct amba_device *dev)
-+static void aaci_remove(struct amba_device *dev)
- {
- 	struct snd_card *card = amba_get_drvdata(dev);
- 
-@@ -1066,8 +1066,6 @@ static int aaci_remove(struct amba_device *dev)
- 		snd_card_free(card);
- 		amba_release_regions(dev);
- 	}
--
--	return 0;
- }
- 
- static struct amba_id aaci_ids[] = {
--- 
-2.29.2
+Paolo
 
