@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 068E8304312
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:55:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B14C7304308
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 16:53:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391142AbhAZPlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 10:41:46 -0500
-Received: from mga06.intel.com ([134.134.136.31]:59486 "EHLO mga06.intel.com"
+        id S2391524AbhAZPuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 10:50:35 -0500
+Received: from mga09.intel.com ([134.134.136.24]:32864 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392365AbhAZPkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 10:40:12 -0500
-IronPort-SDR: /wZY3hO8ruwtY9mp2k8U4GvUfiUgZsV6bAwpfRQ8nga9ZWspsZshutu6D4gBJkmhb3JAMMHBob
- ZQ3yiqNC7eMA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="241448361"
+        id S2391373AbhAZPuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 10:50:02 -0500
+IronPort-SDR: uvVkO7KbtFnAC4h40vAEvO39bRUSGU1jDksh5RailyKqNkiT6BBc+J4ij7aFadcnwO7dSyVsH9
+ OFSaJJ5is8GQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="180065816"
 X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="241448361"
+   d="scan'208";a="180065816"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:39:31 -0800
-IronPort-SDR: 7bM+3D0caAg+WzEbRwkav4Sm8LT7rWTeerVcjpdt0m1aBORg+6RjJSSW/FUO8oCK9+8PGtc8zi
- vXRK+isJlTng==
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:49:11 -0800
+IronPort-SDR: Y7qUeC2OstJ2WnAIVTpWZ+YY9tVz0gJ4/4nVMQ2QIVIlYAxknPlTqbgdzf577/+0eUqPUdmnqQ
+ l/vNgl81ndAQ==
 X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="369138873"
+   d="scan'208";a="369141431"
 Received: from ekfraser-mobl1.amr.corp.intel.com (HELO [10.209.173.94]) ([10.209.173.94])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:39:30 -0800
-Subject: Re: [RFC PATCH v3 03/27] x86/sgx: Remove a warn from
- sgx_free_epc_page()
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 07:49:09 -0800
+Subject: Re: [RFC PATCH v3 05/27] x86/sgx: Add SGX_CHILD_PRESENT hardware
+ error code
 To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 References: <cover.1611634586.git.kai.huang@intel.com>
- <36e999dce8a1a4efb8ca69c9a6fbe3fa63305e08.1611634586.git.kai.huang@intel.com>
+ <5a7c7715147f089d97ae4c033b74b0eafb8f3f89.1611634586.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -77,12 +77,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <d09b8b34-6e8c-5323-e155-f45da5abb48b@intel.com>
-Date:   Tue, 26 Jan 2021 07:39:30 -0800
+Message-ID: <3bdda0ea-3935-1a8a-8d11-b898371d6168@intel.com>
+Date:   Tue, 26 Jan 2021 07:49:09 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <36e999dce8a1a4efb8ca69c9a6fbe3fa63305e08.1611634586.git.kai.huang@intel.com>
+In-Reply-To: <5a7c7715147f089d97ae4c033b74b0eafb8f3f89.1611634586.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -91,33 +91,36 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 1/26/21 1:30 AM, Kai Huang wrote:
-> Remove SGX_EPC_PAGE_RECLAIMER_TRACKED check and warning.  This cannot
-> happen, as enclave pages are freed only at the time when encl->refcount
-> triggers, i.e. when both VFS and the page reclaimer have given up on
-> their references.
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
 > 
-> Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> SGX virtualization requires to allocate "raw" EPC and use it as "virtual
+> EPC" for SGX guest.  Unlike EPC used by SGX driver, virtual EPC doesn't
+> track how EPC pages are used in VM, e.g. (de)construction of enclaves,
+> so it cannot guarantee EREMOVE success, e.g. it doesn't have a priori
+> knowledge of which pages are SECS with non-zero child counts.
+
+The grammar there is a bit questionable in spots.  Here's a rewrite:
+
+SGX can accurately track how bare-metal enclave pages are used.  This
+enables SECS to be specifically targeted and EREMOVE'd only after all
+child pages have been EREMOVE'd.  This ensures that bare-metal SGX will
+never encounter SGX_CHILD_PRESENT in normal operation.
+
+Virtual EPC is different.  The host does not track how EPC pages are
+used by the guest, so it cannot guarantee EREMOVE success.  It might,
+for instance, encounter a SECS with a non-zero child count.
+
+Aside: Would it be *possible* for the host to figure out where the SECS
+pages are?  If not, we can say "host can not track" versus what I said:
+"host does not track".
+
+> Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+> failures are expected, but only due to SGX_CHILD_PRESENT.
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/kernel/cpu/sgx/main.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> index 8df81a3ed945..f330abdb5bb1 100644
-> --- a/arch/x86/kernel/cpu/sgx/main.c
-> +++ b/arch/x86/kernel/cpu/sgx/main.c
-> @@ -605,8 +605,6 @@ void sgx_free_epc_page(struct sgx_epc_page *page)
->  	struct sgx_epc_section *section = &sgx_epc_sections[page->section];
->  	int ret;
->  
-> -	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
 
-I'm all for cleaning up silly, useless warnings.  But, don't we usually
-put warnings in for things that we don't expect to be able to happen?
+With the improved changelog:
 
-In other words, I'm fine with removing this if it hasn't been a valuable
-warning and we don't expect it to become a valuable warning.  But, the
-changelog doesn't say that.  It also doesn't explain what this patch is
-doing in this series.
-
-Why is this her?
+Acked-by: Dave Hansen <dave.hansen@intel.com>
