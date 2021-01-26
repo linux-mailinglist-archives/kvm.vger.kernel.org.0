@@ -2,225 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0433C3049F1
-	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 21:20:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02FBB3049E5
+	for <lists+kvm@lfdr.de>; Tue, 26 Jan 2021 21:18:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732147AbhAZFUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 00:20:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34408 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726402AbhAYSfw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Jan 2021 13:35:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611599665;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pprfZIYi/+TC4FwgG2h9TXq3Oe98lmoX25vF+6Tewc0=;
-        b=CiQuUdrOuwaAs6LtgtJ6sE+5rtts7bKJTb5bYyhjH3m1qGstP5vXIMRHmdB3inu5IsozTl
-        9c8tUEvkVHvDKyuJ92ylMKXGyG7eOSpr3maXj2jHxwuApE/zJ1kYNcrW6CzRa1ctM7t/MD
-        D6/OrWmhXAlCincaIGsvp0ktKmpPOdc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-e5n-av-NNMucyRD1_ptUrQ-1; Mon, 25 Jan 2021 13:34:21 -0500
-X-MC-Unique: e5n-av-NNMucyRD1_ptUrQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D424C8144E2;
-        Mon, 25 Jan 2021 18:34:18 +0000 (UTC)
-Received: from work-vm (ovpn-114-3.ams2.redhat.com [10.36.114.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CD2E5C737;
-        Mon, 25 Jan 2021 18:34:13 +0000 (UTC)
-Date:   Mon, 25 Jan 2021 18:34:10 +0000
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v5 1/6] sev/i386: Add initial support for SEV-ES
-Message-ID: <20210125183410.GO2925@work-vm>
-References: <cover.1610665956.git.thomas.lendacky@amd.com>
- <6403cdc0040bc07355b35fe56e26fb9cd11eb172.1610665956.git.thomas.lendacky@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        id S1732210AbhAZFUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 00:20:41 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14513 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731076AbhAZCPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Jan 2021 21:15:16 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B600f66290001>; Mon, 25 Jan 2021 16:45:29 -0800
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 Jan
+ 2021 00:45:28 +0000
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 26 Jan
+ 2021 00:45:26 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by HKMAIL104.nvidia.com (10.18.16.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 26 Jan 2021 00:45:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AY+amw+kPz/gXpM6Tn461MWjmzeR9nLE3qZp4uE3szwpiE2XBWIHZg/4hZeS6VL6DW+v11Rve8ENrGmobYvg803GRM2msAOcpdBAA99PAJMa+oBnWrweJflP3hrLA+hgLI8hRVhOr/gjXR6dGIE42Kbhx6g0XuC9HZgf/ldGRhJYQRb+eGTuFANFJoEjKCqyEwNijUIzVdhWX/O/w76lCAVQNaACn3HrcHO4Eqax7BVWAPMUERdb5HkXTt9jZKm5Rq1Mc7ohMMz8VUnqaWrty0DMOZJH00AQDHTkaiFTZl5wV9tqySzNe34ixqi7ek0GdksZjAfjUOYV50SNtgjEGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QhmjS2MZUZWBzoJ7bCYYMkTO08YBu4ofgJSaiEitzq8=;
+ b=PMnrmN32n5WaeEAXRBp6DEUtoLPdbpc+L7ViVgCtinHTascAkJP97nqdwZZuKJZcxrk5NZ3BT7Z7QJMmubAbYsGJ0ODfecL3umB9K0Cch5/z7tQR/Pno0s4ydaQ0xqsPzZUka28hB6LlPfSbMuSkLmszXAz7XrJ53uhRtW620HQbq3GF49E9Cp/uRj2u4Db1KxqPlVlMujtiH+H4/DxXaN4En6pyANHSXbRMemM2NcMnfk/FCzoxz0WUbpialJwhF/92ZovZIJRc6q20yaUv082p84X8QqborTv9fVWb9YuSMmclerA0qjyGEO1Cu1yrHuAqlyz0w1vKp5m8rNquOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR1201MB0204.namprd12.prod.outlook.com (2603:10b6:4:51::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11; Tue, 26 Jan
+ 2021 00:45:24 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::546d:512c:72fa:4727%7]) with mapi id 15.20.3784.019; Tue, 26 Jan 2021
+ 00:45:24 +0000
+Date:   Mon, 25 Jan 2021 20:45:22 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>
+Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
+Message-ID: <20210126004522.GD4147@nvidia.com>
+References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+ <20210122122503.4e492b96@omen.home.shazbot.org>
+ <20210122200421.GH4147@nvidia.com>
+ <20210125172035.3b61b91b.cohuck@redhat.com>
+ <20210125180440.GR4147@nvidia.com>
+ <20210125163151.5e0aeecb@omen.home.shazbot.org>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <6403cdc0040bc07355b35fe56e26fb9cd11eb172.1610665956.git.thomas.lendacky@amd.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210125163151.5e0aeecb@omen.home.shazbot.org>
+X-ClientProxiedBy: BL1PR13CA0151.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::6) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0151.namprd13.prod.outlook.com (2603:10b6:208:2bd::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.7 via Frontend Transport; Tue, 26 Jan 2021 00:45:23 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l4CTy-006syy-CG; Mon, 25 Jan 2021 20:45:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1611621929; bh=QhmjS2MZUZWBzoJ7bCYYMkTO08YBu4ofgJSaiEitzq8=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType;
+        b=MR6BCwPR3+9b4q7M4t+gFdcglgAKx5CBtdskh53Mr/N1bXovIsNBH2RhWAwSqV4Nv
+         a/2dfrQ2D9c7+5ctYCjjf6FpOCeDoBodq1FFLCyhGS6MU7XAm1jkn3Rnvn9BS8qHWI
+         0bg+AAeOQacmEb+zu6KsJWmVXTVMC+6cey1PcghM1iRcyrYds3GnA1cSfWRjC596x3
+         hODiwIRuDnoRfx9K0iWXK02Mr8U7Yv7T5L8+edT4fE92Szey4bhKSTQNYLVBuG5YM3
+         cv99tPFiQjy96uZhsluY0Dl92jPSTELONewdtGo+dCRAJyOi5eDQ3TY5phlKwpIyff
+         A2/042Azro33g==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Tom Lendacky (thomas.lendacky@amd.com) wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Provide initial support for SEV-ES. This includes creating a function to
-> indicate the guest is an SEV-ES guest (which will return false until all
-> support is in place), performing the proper SEV initialization and
-> ensuring that the guest CPU state is measured as part of the launch.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  target/i386/cpu.c      |  1 +
->  target/i386/sev-stub.c |  6 ++++++
->  target/i386/sev.c      | 44 ++++++++++++++++++++++++++++++++++++++++--
->  target/i386/sev_i386.h |  1 +
->  4 files changed, 50 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 35459a38bb..9adb34c091 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5986,6 +5986,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          break;
->      case 0x8000001F:
->          *eax = sev_enabled() ? 0x2 : 0;
-> +        *eax |= sev_es_enabled() ? 0x8 : 0;
+On Mon, Jan 25, 2021 at 04:31:51PM -0700, Alex Williamson wrote:
 
-Yep, matches your docs - it would be great if these magic constants
-could become enums or #defines somewhere.
+> We're supposed to be enlightened by a vendor driver that does nothing
+> more than pass the opaque device_data through to the core functions,
+> but in reality this is exactly the point of concern above.  At a
+> minimum that vendor driver needs to look at the vdev to get the
+> pdev,
 
-anyway,
+The end driver already havs the pdev, the RFC doesn't go enough into
+those bits, it is a good comment.
 
+The dd_data pased to the vfio_create_pci_device() will be retrieved
+from the ops to get back to the end drivers data. This can cleanly
+include everything: the VF pci_device, PF pci_device, mlx5_core
+pointer, vfio_device and vfio_pci_device.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This is why the example passes in the mvadev:
 
->          *ebx = sev_get_cbit_position();
->          *ebx |= sev_get_reduced_phys_bits() << 6;
->          *ecx = 0;
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> index c1fecc2101..229a2ee77b 100644
-> --- a/target/i386/sev-stub.c
-> +++ b/target/i386/sev-stub.c
-> @@ -49,8 +49,14 @@ SevCapability *sev_get_capabilities(Error **errp)
->      error_setg(errp, "SEV is not available in this QEMU");
->      return NULL;
->  }
-> +
->  int sev_inject_launch_secret(const char *hdr, const char *secret,
->                               uint64_t gpa, Error **errp)
->  {
->      return 1;
->  }
-> +
-> +bool sev_es_enabled(void)
-> +{
-> +    return false;
-> +}
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 1546606811..fce2128c07 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -360,6 +360,12 @@ sev_enabled(void)
->      return !!sev_guest;
->  }
->  
-> +bool
-> +sev_es_enabled(void)
-> +{
-> +    return false;
-> +}
-> +
->  uint64_t
->  sev_get_me_mask(void)
->  {
-> @@ -580,6 +586,20 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
->      return ret;
->  }
->  
-> +static int
-> +sev_launch_update_vmsa(SevGuestState *sev)
-> +{
-> +    int ret, fw_error;
-> +
-> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
-> +    if (ret) {
-> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
-> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static void
->  sev_launch_get_measure(Notifier *notifier, void *unused)
->  {
-> @@ -592,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
->          return;
->      }
->  
-> +    if (sev_es_enabled()) {
-> +        /* measure all the VM save areas before getting launch_measure */
-> +        ret = sev_launch_update_vmsa(sev);
-> +        if (ret) {
-> +            exit(1);
-> +        }
-> +    }
-> +
->      measurement = g_new0(struct kvm_sev_launch_measure, 1);
->  
->      /* query the measurement blob length */
-> @@ -686,7 +714,7 @@ sev_guest_init(const char *id)
->  {
->      SevGuestState *sev;
->      char *devname;
-> -    int ret, fw_error;
-> +    int ret, fw_error, cmd;
->      uint32_t ebx;
->      uint32_t host_cbitpos;
->      struct sev_user_data_status status = {};
-> @@ -747,8 +775,20 @@ sev_guest_init(const char *id)
->      sev->api_major = status.api_major;
->      sev->api_minor = status.api_minor;
->  
-> +    if (sev_es_enabled()) {
-> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-> +            error_report("%s: guest policy requires SEV-ES, but "
-> +                         "host SEV-ES support unavailable",
-> +                         __func__);
-> +            goto err;
-> +        }
-> +        cmd = KVM_SEV_ES_INIT;
-> +    } else {
-> +        cmd = KVM_SEV_INIT;
-> +    }
-> +
->      trace_kvm_sev_init();
-> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
->      if (ret) {
->          error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
->                       __func__, ret, fw_error, fw_error_to_str(fw_error));
-> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-> index 4db6960f60..4f9a5e9b21 100644
-> --- a/target/i386/sev_i386.h
-> +++ b/target/i386/sev_i386.h
-> @@ -29,6 +29,7 @@
->  #define SEV_POLICY_SEV          0x20
->  
->  extern bool sev_enabled(void);
-> +extern bool sev_es_enabled(void);
->  extern uint64_t sev_get_me_mask(void);
->  extern SevInfo *sev_get_info(void);
->  extern uint32_t sev_get_cbit_position(void);
-> -- 
-> 2.30.0
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
++	vdev = vfio_create_pci_device(pdev, &mlx5_vfio_pci_ops, mvadev);
 
+The mvadev has the PF, VF, and mlx5 core driver pointer.
+
+Getting that back out during the ops is enough to do what the mlx5
+driver needs to do, which is relay migration related IOCTLs to the PF
+function via the mlx5_core driver so the device can execute them on
+behalf of the VF.
+
+> but then what else does it look at, consume, or modify.  Now we have
+> vendor drivers misusing the core because it's not clear which fields
+> are private and how public fields can be used safely,
+
+The kernel has never followed rigid rules for data isolation, it is
+normal to have whole private structs exposed in headers so that
+container_of can be used to properly compose data structures.
+
+Look at struct device, for instance. Most of that is private to the
+driver core.
+
+A few 'private to vfio-pci-core' comments would help, it is good
+feedback to make that more clear.
+
+> extensions potentially break vendor drivers, etc.  We're only even hand
+> waving that existing device specific support could be farmed out to new
+> device specific drivers without even going to the effort to prove that.
+
+This is a RFC, not a complete patch series. The RFC is to get feedback
+on the general design before everyone comits alot of resources and
+positions get dug in.
+
+Do you really think the existing device specific support would be a
+problem to lift? It already looks pretty clean with the
+vfio_pci_regops, looks easy enough to lift to the parent.
+
+> So far the TODOs rather mask the dirty little secrets of the
+> extension rather than showing how a vendor derived driver needs to
+> root around in struct vfio_pci_device to do something useful, so
+> probably porting actual device specific support rather than further
+> hand waving would be more helpful. 
+
+It would be helpful to get actual feedback on the high level design -
+someting like this was already tried in May and didn't go anywhere -
+are you surprised that we are reluctant to commit alot of resources
+doing a complete job just to have it go nowhere again?
+
+Thanks,
+Jason
