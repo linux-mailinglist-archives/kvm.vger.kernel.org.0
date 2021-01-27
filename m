@@ -2,100 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 971AA305BD9
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 13:45:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 223A6305BCD
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 13:43:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237920AbhA0Moy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 07:44:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59802 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237387AbhA0Mly (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 07:41:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611751228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QUziTB7yjFCtXkFHnLPvHhuspDqt9BvMkArF+T1jL44=;
-        b=c6+OHF3eaPYH7lGGo8ZDJn622l3vmB8jLsNIDQCotczYF/jHVQi3ZDuLwUSLwUB4uwgKmj
-        MlH6xwDNbofn4ad6BrVT8xvj3QS39IGQWSOZYD0WzgdhtARtkOdHJ+SGvP/3j+jkO079HX
-        8rlcqCFSD/aQGNeL85B26vnoJ76Bho4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-YbEm37ucOHSLrczz_InnWw-1; Wed, 27 Jan 2021 07:40:26 -0500
-X-MC-Unique: YbEm37ucOHSLrczz_InnWw-1
-Received: by mail-ed1-f69.google.com with SMTP id u26so348484edv.18
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 04:40:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QUziTB7yjFCtXkFHnLPvHhuspDqt9BvMkArF+T1jL44=;
-        b=lsBu9Q5HVZxPsSuo43R7NZxzwPhEEixq7tby/Qpyfvxs2s+1tuiC9tdXAYC+c3V9gS
-         qT2XilzXOM2uHAjf1Lgs21kNJykxy42GZH7GPSRR19NCann1VNgWHVRWCxUe1nFOv3Wb
-         3/HumEzPcuoQRoAFut4SHmWq0wSq6khpdcRZ1xgbJO9Sh7/nQi4A643DCZY/xRBrOZrO
-         kiCO7fL3RfvAWe5Bl+Yaorox46Ocx5LwWUFVO6qDo/Fih71XymMQph8fY1Yo41Vq446P
-         IX0weARRyHd9ss/mFbU9qtoaZLOTvYLyAOGAcpgjOLSnWeVehehE5xRMmPfItdcAyH5M
-         i3Yg==
-X-Gm-Message-State: AOAM530HGaiH1nxL7qxDTjPSYU2utywvykcmly4w5TSlogYhoxxbyDjo
-        BfgplkYh8HapXZzPo234R/ZtPpnXLtp8asS8ib0mUh/i0oHN/J0EyjzGcDFw8NWkbbUiSk3lxuE
-        P2qEhHNak/UaY
-X-Received: by 2002:a17:907:20aa:: with SMTP id pw10mr6561867ejb.314.1611751225510;
-        Wed, 27 Jan 2021 04:40:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzuit+bGcgdhTrzCjhYmAEkv/7WLRGt5ic9fu4MFMY/cWcP+ETzolxbU4HANZFGkHEb8dAalQ==
-X-Received: by 2002:a17:907:20aa:: with SMTP id pw10mr6561858ejb.314.1611751225382;
-        Wed, 27 Jan 2021 04:40:25 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w18sm767764ejq.59.2021.01.27.04.40.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 04:40:24 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-20-bgardon@google.com> <YAnUhCocizx97FWL@google.com>
- <YAnzB3Uwn3AVTXGN@google.com>
- <335d27f7-0849-de37-f380-a5018c5c5535@redhat.com>
- <YBCRcalZJwAlkO9F@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 19/24] kvm: x86/mmu: Protect tdp_mmu_pages with a lock
-Message-ID: <bb1fcf44-09ca-73b1-5bbc-49f8bc51c8c1@redhat.com>
-Date:   Wed, 27 Jan 2021 13:40:22 +0100
+        id S231962AbhA0Mn3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 07:43:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52328 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237143AbhA0Ml0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 07:41:26 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10RC4tAR049520;
+        Wed, 27 Jan 2021 07:40:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=2cSXyj4fDwzmy6RsBcc8uulqfiOIY/ec/6zq2NYUAGI=;
+ b=G3F7xCXNRxqfVFp70FAwE91MV+dopeJ07lfgtEh+SB6HyvXkfQMbpFzpzXfnIUDZCOpn
+ F5ZB6/LThX96JaB13nwQuBiDKERAJXOM3HpEJ1ZvdOf17A26b/bDvToz6Zs/5xpTFHAT
+ yA5zf9WsxLg2SNODYp6xOSSReF4YsIJo/B5TQ09jQ/y0/CyPpG9gEaD7s5ELgcv+NA66
+ 8Jt73yiQ6OQxtmNKgeymNRfRYPSXoVkjefqdOizTLEcj+Dioji/o+A14VTi2z8KVW7Hq
+ mak33hY3qdOTfMZmcX17DlmtTwOydoSapptBzDgz3lA7sYpFz2ziIZ8nYwvkaoSrhJ9d 5Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36b5tcvg7h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jan 2021 07:40:46 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10RC5cPg053736;
+        Wed, 27 Jan 2021 07:40:45 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36b5tcvg6s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jan 2021 07:40:45 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10RCW6Ls012855;
+        Wed, 27 Jan 2021 12:40:43 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 368be7ut89-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Jan 2021 12:40:43 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10RCeeFE36962756
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Jan 2021 12:40:40 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6D369A4057;
+        Wed, 27 Jan 2021 12:40:40 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0D49A404D;
+        Wed, 27 Jan 2021 12:40:39 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.51.19])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Jan 2021 12:40:39 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v5 0/3] s390x: css: pv: css test adaptation
+ for PV
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, drjones@redhat.com,
+        pbonzini@redhat.com
+References: <1611322060-1972-1-git-send-email-pmorel@linux.ibm.com>
+ <6c141deb-819a-ef03-f44c-bd61561a2087@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <6e253468-160c-fc5b-65fc-56e8a8c67758@linux.ibm.com>
+Date:   Wed, 27 Jan 2021 13:40:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <YBCRcalZJwAlkO9F@google.com>
+In-Reply-To: <6c141deb-819a-ef03-f44c-bd61561a2087@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-27_05:2021-01-27,2021-01-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 clxscore=1015 mlxscore=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 spamscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101270067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/01/21 23:02, Sean Christopherson wrote:
->> You can do the deferred freeing with a short write-side critical section to
->> ensure all readers have terminated.
->
-> Hmm, the most obvious downside I see is that the zap_collapsible_sptes() case
-> will not scale as well as the RCU approach.  E.g. the lock may be heavily
-> contested when refaulting all of guest memory to (re)install huge pages after a
-> failed migration.
 
-The simplest solution is to use a write_trylock on the read_unlock() 
-path; if it fails, schedule a delayed work item 1 second in the future 
-so that it's possible to do some batching.
 
-(The work item would also have to re-check the llist after each iteration.)
+On 1/27/21 1:37 PM, Janosch Frank wrote:
+> On 1/22/21 2:27 PM, Pierre Morel wrote:
+>> Hi all,
+>>    
+>> To adapt the CSS I/O tests to protected virtualisation we need
+>> utilities to:
+>>
+>> 1- allocate the I/O buffers in a private page using (patch 2)
+>>     It must be in a dedicated page to avoid exporting code or
+>>     guest private data to the host.
+>>     We accept a size in byte and flags and allocate page integral
+>>     memory to handle the Protected Virtualization.
+>>   
+>> 2- share the I/O buffers with the host (patch 1)
+>>     This patch uses the page allocator reworked by Claudio.
+>>   
+>> The 2 first patches are the implementation of the tools,
+>> patch 3 is the modification of the css.c test for PV.
+>>
+>> The checkpatch always asked me to modify MAINTAINERS,
+>> so I added me as reviewer to be in copy for CSS at least.
+>> May be we could create a finer grain MAINTAINERS in the
+>> future.
+>>
+>> regards,
+>> Pierre
+> 
+> Thanks, picked.
 
-Paolo
+Thanks,
+Pierre
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
