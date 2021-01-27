@@ -2,59 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D893050C2
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:26:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63D853050C6
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:27:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238569AbhA0EZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 23:25:44 -0500
-Received: from mga06.intel.com ([134.134.136.31]:24583 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392099AbhA0B1j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 20:27:39 -0500
-IronPort-SDR: L9ztlzhSm0GCY6A4hkLIWwsV7lHmu+k7WahuuC+4Yw9tsZ1eycZ0kSlQkfKNYuqxd8XH7sEsvn
- M3ajbmHc/FXg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="241528892"
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="241528892"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 17:26:58 -0800
-IronPort-SDR: 2lxFsebB69rfL0VoECsy/l58SmJ27smHpB+kWfYuQBIxDz58LKPpz5BMlMEBV80seamygTbueZ
- mD5mDAylFd4g==
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="353637758"
-Received: from rsperry-desk.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.7.187])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 17:26:54 -0800
-Date:   Wed, 27 Jan 2021 14:26:52 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>, <seanjc@google.com>, <jarkko@kernel.org>,
-        <luto@kernel.org>, <haitao.huang@intel.com>, <pbonzini@redhat.com>,
-        <bp@alien8.de>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <hpa@zytor.com>
-Subject: Re: [RFC PATCH v3 03/27] x86/sgx: Remove a warn from
- sgx_free_epc_page()
-Message-Id: <20210127142652.b9d181813b10f8660d0df664@intel.com>
-In-Reply-To: <15dda40e-5875-aaa9-acbb-7d868a13f982@intel.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
-        <36e999dce8a1a4efb8ca69c9a6fbe3fa63305e08.1611634586.git.kai.huang@intel.com>
-        <d09b8b34-6e8c-5323-e155-f45da5abb48b@intel.com>
-        <6e859dc6610d317f09663a4ce76b7e13fc0c0f8e.camel@intel.com>
-        <15dda40e-5875-aaa9-acbb-7d868a13f982@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S238615AbhA0E0o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 23:26:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37166 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232155AbhA0DC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 22:02:57 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000ACC061756;
+        Tue, 26 Jan 2021 18:08:53 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id o20so208449pfu.0;
+        Tue, 26 Jan 2021 18:08:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=YpCzMfgjbd9EhyR5dL1N/GmWwAHrDvmZHlxmEq38Oio=;
+        b=PquFxkORYMlu8/+sBKicjDpcfQEvqgovRJSipjrhZakbngIK1WnjR8VN7Hyf2KgRe5
+         OlU8GPQdEqzr3x8dUH6zTNIcAwM1l7ek70K2amHW056j/xRJXgzfxXzfCPxbuht36MEZ
+         1D5SaNnm3bpoL//sMa6+fG73hqFw0587W5sBAqSQPVtYWg0jIgB28oFh+4gaoWKcvEBG
+         bQgVeKnRF3NqxdEWR0h0kHTtRlUfLyZZYAoItvki6VH9rulVIRJMh1t0IHzunbrg3zE6
+         7cSzBH8DV6u8Rc/J0RvwnpLnlaVusd5UpUW25NI8AM9VkoBrejEZbjaHdsVo/9pqzCKS
+         mpzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YpCzMfgjbd9EhyR5dL1N/GmWwAHrDvmZHlxmEq38Oio=;
+        b=EgsU9XBIfc02P4xSgiirZlWnd+ODZaPPoKpN52nK1q9DHVjQ9p4osfFc//4oxLPnBC
+         z1za0VAW3v74oAMbpaqDEMk0brkYr8nMSpEyT06+zutuGIX4NtR4K2NuGW/9vXHSTYpk
+         mgFvMb+3eK3emwRhQ7oy8c4C4PUBoLS5QGne5ksGI8K0dOwvBcppf8pxqfASKybG2+nb
+         +vJsur8RBfgUAiLeLTCQ8LTBvWa2nW75m5k+Tb6Zume4MoGFVFbfveSUeqz7PZHINTxV
+         jyiYuYLID0WolTPvZI2ytyiBbyIdXhEkw3jmMoX9KL0K1DdubHctJJLM72ijjXLwPCc2
+         U3VQ==
+X-Gm-Message-State: AOAM532zKTRP1OMTM2THqMQXEdwyzRw/liqNkK0whTuw6NadEX0GoNSl
+        TapSY067eLvmaxNljum/APk=
+X-Google-Smtp-Source: ABdhPJzZMbtBgsFuAqjEZrQ1KhRA+9m+cvy32JRIBPLkHUaC/9Q5HVWJNHTI0FfvCeG2BKmEP/vtBA==
+X-Received: by 2002:a62:1ec1:0:b029:1a8:2c01:13c0 with SMTP id e184-20020a621ec10000b02901a82c0113c0mr8093132pfe.8.1611713333595;
+        Tue, 26 Jan 2021 18:08:53 -0800 (PST)
+Received: from localhost.localdomain ([125.227.22.95])
+        by smtp.gmail.com with ESMTPSA id j6sm327359pfg.159.2021.01.26.18.08.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 26 Jan 2021 18:08:53 -0800 (PST)
+From:   Stephen Zhang <stephenzhangzsd@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Stephen Zhang <stephenzhangzsd@gmail.com>
+Subject: [PATCH] KVM: x86/mmu: Add '__func__' in rmap_printk()
+Date:   Wed, 27 Jan 2021 10:08:45 +0800
+Message-Id: <1611713325-3591-1-git-send-email-stephenzhangzsd@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Jan 2021 17:12:12 -0800 Dave Hansen wrote:
-> On 1/26/21 5:08 PM, Kai Huang wrote:
-> > I don't have deep understanding of SGX driver. Would you help to answer?
-> 
-> Kai, as the patch submitter, you are expected to be able to at least
-> minimally explain what the patch is doing.  Please endeavor to obtain
-> this understanding before sending patches in the future.
+Given the common pattern:
 
-I see. Thanks.
+rmap_printk("%s:"..., __func__,...)
+
+we could improve this by adding '__func__' in rmap_printk().
+
+Signed-off-by: Stephen Zhang <stephenzhangzsd@gmail.com>
+---
+ arch/x86/kvm/mmu/mmu.c          | 20 ++++++++++----------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481..1460705 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -844,17 +844,17 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 	int i, count = 0;
+ 
+ 	if (!rmap_head->val) {
+-		rmap_printk("pte_list_add: %p %llx 0->1\n", spte, *spte);
++		rmap_printk("%p %llx 0->1\n", spte, *spte);
+ 		rmap_head->val = (unsigned long)spte;
+ 	} else if (!(rmap_head->val & 1)) {
+-		rmap_printk("pte_list_add: %p %llx 1->many\n", spte, *spte);
++		rmap_printk("%p %llx 1->many\n", spte, *spte);
+ 		desc = mmu_alloc_pte_list_desc(vcpu);
+ 		desc->sptes[0] = (u64 *)rmap_head->val;
+ 		desc->sptes[1] = spte;
+ 		rmap_head->val = (unsigned long)desc | 1;
+ 		++count;
+ 	} else {
+-		rmap_printk("pte_list_add: %p %llx many->many\n", spte, *spte);
++		rmap_printk("%p %llx many->many\n", spte, *spte);
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+ 		while (desc->sptes[PTE_LIST_EXT-1]) {
+ 			count += PTE_LIST_EXT;
+@@ -906,14 +906,14 @@ static void __pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
+ 		pr_err("%s: %p 0->BUG\n", __func__, spte);
+ 		BUG();
+ 	} else if (!(rmap_head->val & 1)) {
+-		rmap_printk("%s:  %p 1->0\n", __func__, spte);
++		rmap_printk("%p 1->0\n", spte);
+ 		if ((u64 *)rmap_head->val != spte) {
+ 			pr_err("%s:  %p 1->BUG\n", __func__, spte);
+ 			BUG();
+ 		}
+ 		rmap_head->val = 0;
+ 	} else {
+-		rmap_printk("%s:  %p many->many\n", __func__, spte);
++		rmap_printk("%p many->many\n", spte);
+ 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
+ 		prev_desc = NULL;
+ 		while (desc) {
+@@ -1115,7 +1115,7 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
+ 	      !(pt_protect && spte_can_locklessly_be_made_writable(spte)))
+ 		return false;
+ 
+-	rmap_printk("rmap_write_protect: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("spte %p %llx\n", sptep, *sptep);
+ 
+ 	if (pt_protect)
+ 		spte &= ~SPTE_MMU_WRITEABLE;
+@@ -1142,7 +1142,7 @@ static bool spte_clear_dirty(u64 *sptep)
+ {
+ 	u64 spte = *sptep;
+ 
+-	rmap_printk("rmap_clear_dirty: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("spte %p %llx\n", sptep, *sptep);
+ 
+ 	MMU_WARN_ON(!spte_ad_enabled(spte));
+ 	spte &= ~shadow_dirty_mask;
+@@ -1184,7 +1184,7 @@ static bool spte_set_dirty(u64 *sptep)
+ {
+ 	u64 spte = *sptep;
+ 
+-	rmap_printk("rmap_set_dirty: spte %p %llx\n", sptep, *sptep);
++	rmap_printk("spte %p %llx\n", sptep, *sptep);
+ 
+ 	/*
+ 	 * Similar to the !kvm_x86_ops.slot_disable_log_dirty case,
+@@ -1331,7 +1331,7 @@ static bool kvm_zap_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head)
+ 	bool flush = false;
+ 
+ 	while ((sptep = rmap_get_first(rmap_head, &iter))) {
+-		rmap_printk("%s: spte %p %llx.\n", __func__, sptep, *sptep);
++		rmap_printk("spte %p %llx.\n", sptep, *sptep);
+ 
+ 		pte_list_remove(rmap_head, sptep);
+ 		flush = true;
+@@ -1363,7 +1363,7 @@ static int kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 
+ restart:
+ 	for_each_rmap_spte(rmap_head, &iter, sptep) {
+-		rmap_printk("kvm_set_pte_rmapp: spte %p %llx gfn %llx (%d)\n",
++		rmap_printk("spte %p %llx gfn %llx (%d)\n",
+ 			    sptep, *sptep, gfn, level);
+ 
+ 		need_flush = 1;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index bfc6389..5ec15e4 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -12,7 +12,7 @@
+ extern bool dbg;
+ 
+ #define pgprintk(x...) do { if (dbg) printk(x); } while (0)
+-#define rmap_printk(x...) do { if (dbg) printk(x); } while (0)
++#define rmap_printk(fmt, args...) do { if (dbg) printk("%s: " fmt, __func__, ## args); } while (0)
+ #define MMU_WARN_ON(x) WARN_ON(x)
+ #else
+ #define pgprintk(x...) do { } while (0)
+-- 
+1.8.3.1
+
