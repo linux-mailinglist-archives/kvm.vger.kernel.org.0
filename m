@@ -2,115 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59D23305721
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:41:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1E7D30575E
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:52:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234832AbhA0Jkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 04:40:31 -0500
-Received: from mx2.suse.de ([195.135.220.15]:46536 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234249AbhA0Ji5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 04:38:57 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 4D04AAD78;
-        Wed, 27 Jan 2021 09:38:16 +0000 (UTC)
-Date:   Wed, 27 Jan 2021 10:38:10 +0100
-From:   Borislav Petkov <bp@suse.de>
-To:     "Bae, Chang Seok" <chang.seok.bae@intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "mingo@kernel.org" <mingo@kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v3 06/21] x86/fpu/xstate: Calculate and remember dynamic
- xstate buffer sizes
-Message-ID: <20210127093810.GA8115@zn.tnic>
-References: <20201223155717.19556-1-chang.seok.bae@intel.com>
- <20201223155717.19556-7-chang.seok.bae@intel.com>
- <20210122114430.GB5123@zn.tnic>
- <6811FA0A-21A6-4519-82B8-C128C30127E0@intel.com>
+        id S233985AbhA0JvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 04:51:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29224 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235181AbhA0JsY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 04:48:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611740818;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=p2ZgdeE8emMvrTo+qZdhtSbV4TLt//BKUXr6Nkuxz8M=;
+        b=PmdguyM2/pMShwqQkKUzs1pNeKizei7kZNKfVl9g2uszD/WFIN8r8Sb6d2ykBWm38oei88
+        8U++DqIrJkcp2d52Uvr0RaV2P9cKXjY6UEYxHlXO/1TB2VpAQAF/uvWKwyMNsyKpgSymiv
+        PU7bxGAIHu9j9MJ7q2hK++35BLWLf7M=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215-RM1SRHECOwSKcFs8S2-YAQ-1; Wed, 27 Jan 2021 04:46:57 -0500
+X-MC-Unique: RM1SRHECOwSKcFs8S2-YAQ-1
+Received: by mail-ed1-f72.google.com with SMTP id dg17so1048497edb.11
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:46:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=p2ZgdeE8emMvrTo+qZdhtSbV4TLt//BKUXr6Nkuxz8M=;
+        b=bA0ArT/wdXy4kYzttzoizqINRDnQNToSDFp22yGl/oqyD4Z3hOQ5IBs2W73kWdUb54
+         vVB55I2aJzRfd8MdTqmIdWY6XfMFXlhLl0ElQfiG7TwxTpSUoWpJB6vlM/h1MdnYVfL+
+         Vv8mRZUeDhw5Y5gzZy9YOzlrqvaY/uE2yDWLCk+D5ne4qGc8TMgXlx7UrpWdW3wgvQJ7
+         zzw2Ko5bfAPHVc066WG1aBBwdJRN71RdwWHUdfYVxHV9/dLywQCuNMbjL6koJG8inWyM
+         WrLAQ0Bpq8tT7tYyG0mfm7XFwfmxOg01MIPHBYIP6bnxwlUtZNYlrnQrNqGqUng6P7Mq
+         1Iww==
+X-Gm-Message-State: AOAM532xMNlfIgF0ryKulVu1aF8cWB1BerIWZ1kKwHN3slLDrxRpoWXn
+        E5URJmWFqn1QbNtUwnVbmBTT69hhLGqQWWYx1HbvB4qyauFGsZH8Uz4WwVMPrag1dbrzMW1JPCl
+        t+KNYrzXwrNsd
+X-Received: by 2002:a17:906:9342:: with SMTP id p2mr6328413ejw.300.1611740815580;
+        Wed, 27 Jan 2021 01:46:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzqxTjCXlGq65ZXJizGzN/1wJ3EKGImAEp1e+xOhoLzSLVqiLN4lEgiB1lVZKT0JTaXxWmqzw==
+X-Received: by 2002:a17:906:9342:: with SMTP id p2mr6328403ejw.300.1611740815349;
+        Wed, 27 Jan 2021 01:46:55 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id lh26sm554051ejb.119.2021.01.27.01.46.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jan 2021 01:46:54 -0800 (PST)
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20201105081805.5674-1-chenyi.qiang@intel.com>
+ <20201105081805.5674-9-chenyi.qiang@intel.com>
+ <6174185b-25e0-f2a2-3f71-d8bbe6ca889d@redhat.com>
+ <7aa67008-a72f-f6e3-2de4-4b9b9e62cd86@redhat.com>
+ <e1ba2803-877c-e7d5-0a16-f356d5c2b571@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Add tests for PKS
+Message-ID: <ce0fad10-ddca-2102-0331-86ddcba9e808@redhat.com>
+Date:   Wed, 27 Jan 2021 10:46:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <e1ba2803-877c-e7d5-0a16-f356d5c2b571@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6811FA0A-21A6-4519-82B8-C128C30127E0@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 01:23:35AM +0000, Bae, Chang Seok wrote:
-> How about ‘embedded’?,
->     “The xstate buffer is currently embedded into struct fpu with static size."
-
-Better.
-
-> Okay. I will prepare a separate cleanup patch that can be applied at the end
-> of the series. Will post the change in this thread at first.
-
-No, this is not how this works. Imagine you pile up a patch at the end
-for each review feedback you've gotten. No, this will be an insane churn
-and an unreviewable mess.
-
-What you do is you rework your patches like everyone else.
-
-Also, thinking about this more, I'm wondering if all those
-xstate-related attributes shouldn't be part of struct fpu instead of
-being scattered around like that.
-
-That thing - struct fpu * - gets passed in everywhere anyway so all that
-min_size, max_size, ->xstate_ptr and whatever, looks like it wants to be
-part of struct fpu. Then maybe you won't need the accessors...
-
-> One of my drafts had some internal helper to be called in there. No reason
-> prior to applying the get_xstate_buffer_attr() helper. But with it, better to
-> move this out of this header file I think.
-
-See above.
-
+On 19/01/21 08:41, Chenyi Qiang wrote:
+>>
 > 
-> >> @@ -627,13 +627,18 @@ static void check_xstate_against_struct(int nr)
-> >>  */
-> > 
-> > <-- There's a comment over this function that might need adjustment.
+> Hi Paolo,
 > 
-> Do you mean an empty line? (Just want to clarify.)
+> Thank you for your time. I was just thinking about resending this patch 
+> series to ping you although no changes will be added. I really hope to 
+> get the comments from you.
+> 
+> Do you want me to resend a new non-RFC version as well as the QEMU 
+> implementation? or you review this RFC series first?
+> 
+> Thanks
+> Chenyi
 
-No, I mean this comment:
+Hi,
 
- * Dynamic XSAVE features allocate their own buffers and are not
- * covered by these checks. Only the size of the buffer for task->fpu
- * is checked here.
+I have reviewed the KVM implementation and actually I have also 
+implemented PKRS in QEMU's binary translation.  I'll send a patch and 
+commit this one too, since it can be tested.
 
-That probably needs adjusting as you do set min and max size here now
-for the dynamic buffer.
+For QEMU you'll still have to post the KVM parts (getting/setting the 
+PKRS MSR) since I don't have a way to test those.
 
-> Agreed. I will prepare a patch. At least will post the diff here.
+Paolo
 
-You can send it separately from this patchset, ontop of current
-tip/master, so that I can take it now.
-
-> How about:
->     “Ensure the size fits in the statically-allocated buffer:"
-
-Yep.
-
-> No excuse, just pointing out the upstream code has “we” there [1].
-
-Yeah, I know. :-\
-
-But considering how many parties develop the kernel now, "we" becomes
-really ambiguous.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-SUSE Software Solutions Germany GmbH, GF: Felix Imendörffer, HRB 36809, AG Nürnberg
