@@ -2,140 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33CF23061C1
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:19:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95CC93061E6
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:25:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232310AbhA0RS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:18:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234993AbhA0RPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 12:15:45 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7765C0613D6
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:15:04 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id i63so1603179pfg.7
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:15:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=MQopOgKi9I0dqqHp3bWWcA7RiGYJUqWcMoI+s76k8qI=;
-        b=UxqTGJl8PhWaswBfpUw2xI2ClpcgdAiFxFuesEfI5mq96QTfyBWHXICqsvkyHlPToa
-         E2/Xh6e4A9ElefIaReP8Ye67OL3sLcbea25PycjgHUfQDPLozqVRCrxipVgdmQT3ABe0
-         C2WpVRaJ9Vcjg+IU/Hj5wDR0GV9DUA85GDPlyaDye3CQXoEHa4MVf1YrSD9Xd3uKpdEl
-         6RBId/c8g7HR0fxVG+k1uYsaoDAMjujQLbAFe1TCKIGsDyv6U3dXjmht54sfPk8PudOy
-         skVFJQz/byVhMdBFrU8GjLrpkPp1OrOU/cxpcbAKzVhU/p8SKMZSUe5aKvK1U4b3w1MC
-         ErbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=MQopOgKi9I0dqqHp3bWWcA7RiGYJUqWcMoI+s76k8qI=;
-        b=AaDpnjZTQH3lPfaF/LAN6DYTbZlxVpEMinyn9Og/3rSka1zSzl+qIUdzILfiwQD8h8
-         8gcS66XaKGui6ZjET+j11Y2dKbjTUHuET1+L0g3EdMGefdjTbotsZeHVhMCjqN8wRWkI
-         C5zwSUnLrsChiCo75Ij9yCncLu8RO6xYXR4DkJWKUs/0CqvRw/iOXH1VO2nDDtH5MJz2
-         T91Ot1WIN86Xj2qFX3yMtdVcavsABnifWAZGe4I73ptPKFEdazpUa4yjvD8auKA3Vk/V
-         Y/hv361Trbuura4g5Ck5jdFRLRDh6SMX495PF9OM+0WGdoIVhpRd65jmLUuA4shUCQXF
-         8s6A==
-X-Gm-Message-State: AOAM533CstRdqH4mcrcpbVeSQswGvDAdaPD2lL2dNfEZg4Jx7MACpIye
-        NWwIN/4vEy6jyPk2R2C28sq4jQ==
-X-Google-Smtp-Source: ABdhPJxQ1RaIGVpFBFnucbCFfVhkpr4+n8JC97Q9uWl9YvrbtUevZebjHZPzm178deKEAjmPNhpjRA==
-X-Received: by 2002:a62:1897:0:b029:1bd:ad37:3061 with SMTP id 145-20020a6218970000b02901bdad373061mr11606004pfy.6.1611767704259;
-        Wed, 27 Jan 2021 09:15:04 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id r194sm3053529pfr.168.2021.01.27.09.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 09:15:03 -0800 (PST)
-Date:   Wed, 27 Jan 2021 09:14:57 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH 24/24] kvm: x86/mmu: Allow parallel page faults for the
- TDP MMU
-Message-ID: <YBGfka+E/+nYGm4P@google.com>
-References: <20210112181041.356734-1-bgardon@google.com>
- <20210112181041.356734-25-bgardon@google.com>
- <YAjRGBu5tAEt9xpv@google.com>
- <CANgfPd_dCNQHWMtWDJiC5prVC9R4gtNO6v5L3=QioNZLDDXVMw@mail.gmail.com>
+        id S233678AbhA0RYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:24:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41400 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232218AbhA0RYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 12:24:35 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 62CD064DA0;
+        Wed, 27 Jan 2021 17:23:53 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l4oXn-00AQmI-8F; Wed, 27 Jan 2021 17:23:51 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_dCNQHWMtWDJiC5prVC9R4gtNO6v5L3=QioNZLDDXVMw@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 27 Jan 2021 17:23:50 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+In-Reply-To: <cd3d33ff-6217-6a7f-3110-fe728d6c11be@arm.com>
+References: <20210125122638.2947058-1-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
+ <59700102-5340-b5ec-28e2-d95ee3e59c6b@arm.com>
+ <1b594e7b1f47e372ea84f759507db0b9@kernel.org>
+ <cd3d33ff-6217-6a7f-3110-fe728d6c11be@arm.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <54926337c1779a492f94f57ee63e5c69@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, eric.auger@redhat.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021, Ben Gardon wrote:
-> On Wed, Jan 20, 2021 at 4:56 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Tue, Jan 12, 2021, Ben Gardon wrote:
-> > > Make the last few changes necessary to enable the TDP MMU to handle page
-> > > faults in parallel while holding the mmu_lock in read mode.
-> > >
-> > > Reviewed-by: Peter Feiner <pfeiner@google.com>
-> > >
-> > > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > > ---
-> > >  arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
-> > >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 280d7cd6f94b..fa111ceb67d4 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -3724,7 +3724,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-> > >               return r;
-> > >
-> > >       r = RET_PF_RETRY;
-> > > -     kvm_mmu_lock(vcpu->kvm);
-> > > +
-> > > +     if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
-> >
-> > Off topic, what do you think about rewriting is_tdp_mmu_root() to be both more
-> > performant and self-documenting as to when is_tdp_mmu_root() !=
-> > kvm->arch.tdp_mmu_enabled?  E.g. key off is_guest_mode() and then do a thorough
-> > audit/check when CONFIG_KVM_MMU_AUDIT=y?
-> >
-> > #ifdef CONFIG_KVM_MMU_AUDIT
-> > bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
-> > {
-> >         struct kvm_mmu_page *sp;
-> >
-> >         if (!kvm->arch.tdp_mmu_enabled)
-> >                 return false;
-> >         if (WARN_ON(!VALID_PAGE(hpa)))
-> >                 return false;
-> >
-> >         sp = to_shadow_page(hpa);
-> >         if (WARN_ON(!sp))
-> >                 return false;
-> >
-> >         return sp->tdp_mmu_page && sp->root_count;
-> > }
-> > #endif
-> >
-> > bool is_tdp_mmu(struct kvm_vcpu *vcpu)
-> > {
-> >         bool is_tdp_mmu = kvm->arch.tdp_mmu_enabled && !is_guest_mode(vcpu);
-> >
-> > #ifdef CONFIG_KVM_MMU_AUDIT
-> >         WARN_ON(is_tdp_mmu != is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa));
-> > #endif
-> >         return is_tdp_mmu;
-> > }
+On 2021-01-27 17:00, Alexandru Elisei wrote:
+> Hi Marc,
 > 
-> Great suggestions. In the interest of keeping this (already enormous)
-> series small, I'm inclined to make those changes in a future series if
-> that's alright with you.
+> On 1/27/21 2:35 PM, Marc Zyngier wrote:
+>> Hi Alex,
+>> 
+>> On 2021-01-27 14:09, Alexandru Elisei wrote:
+>>> Hi Marc,
+>>> 
+>>> On 1/25/21 12:26 PM, Marc Zyngier wrote:
+>>>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+>>>> pretty easy. All that is required is support for PMMIR_EL1, which
+>>>> is read-only, and for which returning 0 is a valid option as long
+>>>> as we don't advertise STALL_SLOT as an implemented event.
+>>> 
+>>> According to ARM DDI 0487F.b, page D7-2743:
+>>> 
+>>> "If ARMv8.4-PMU is implemented:
+>>> - If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED
+>>> whether the PMMIR
+>>> System registers are implemented.
+>>> - If STALL_SLOT is implemented, then the PMMIR System registers are
+>>> implemented."
+>>> 
+>>> I tried to come up with a reason why PMMIR is emulated instead of 
+>>> being left
+>>> undefined, but I couldn't figure it out. Would you mind adding a 
+>>> comment or
+>>> changing the commit message to explain that?
+>> 
+>> The main reason is that PMMIR gets new fields down the line,
+>> and doing the bare minimum in term of implementation allows
+>> us to gently ease into it.
+> I think I understand what you are saying - add a bare minimum emulation 
+> of the
+> PMMIR register now so it's less work when we do decide to support the 
+> STALL_SLOT
+> event for a guest.
+>> 
+>> We could also go for the full PMMIR reporting on homogeneous
+>> systems too, as a further improvement.
+>> 
+>> What do you think?
+> 
+> I don't have an opinion either way. But if you do decide to add full
+> emulation for
+> STALL_SLOT, I would like to help with reviewing the patches (I'm 
+> curious to see
+> how KVM will detect that it's running on a homogeneous system).
 
-Yep, definitely a different series.
+I'm not sure we can *detect* it. We'd need some more information
+from the core arch code and firmware. To be honest, PMU emulation
+is a joke on BL, so maybe we shouldn't really care and expose
+what we have.
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
