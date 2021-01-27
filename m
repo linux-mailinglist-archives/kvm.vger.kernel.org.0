@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64E353062DC
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 19:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9265A3062E0
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 19:00:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344372AbhA0R70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:59:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50718 "EHLO
+        id S234670AbhA0R7y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:59:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42278 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344345AbhA0R7K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 12:59:10 -0500
+        by vger.kernel.org with ESMTP id S1344092AbhA0R7O (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 12:59:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611770262;
+        s=mimecast20190719; t=1611770268;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bFzc083SDCVVQmZ3TEE32kOyxiqZz+UgdILDBdrPWO0=;
-        b=LXeKf1+vv3y6rkApVVEYY5uUeYq1H8APwKq6v7X1OmIQG+H08PdmrcMWPEAWT8NAClAw3k
-        fJC9i5TNm0Rha+1pGvWoOJUnqAIQT29q7/Mdg4LxeAWfhBCb7qttW1TGZ/PZanjGxRNR8W
-        XIschmE7GqS/Xs/VQr6EE4JnHOM5faI=
+        bh=yjWhEYxtdtW/nAud/lMESXboNCqr4x4MvFiUIVGZ9TE=;
+        b=UGhieZCrCsrCH6X6d/d1YvquDpNFMy384fc+/uA1x45fjU4LKvPOR6IKMu4VILd2/kwMX0
+        bzI9LEo80881lQIVP6K8ndxaiq6SiXNmN2bbpWfxxOJr9rwAndhzPvJCx85QnA9NFlaHGt
+        LIQNZ4Qsgd+bA2g9mCzgY5DqhOY+yek=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-_Z2AUTP_M0O_vX18-8mUUQ-1; Wed, 27 Jan 2021 12:57:41 -0500
-X-MC-Unique: _Z2AUTP_M0O_vX18-8mUUQ-1
+ us-mta-293-JwirBN4YMDG8fU2ANKeOgQ-1; Wed, 27 Jan 2021 12:57:43 -0500
+X-MC-Unique: JwirBN4YMDG8fU2ANKeOgQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB5AD8066EA;
-        Wed, 27 Jan 2021 17:57:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A027107AD37;
+        Wed, 27 Jan 2021 17:57:42 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.195.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8DEB460864;
-        Wed, 27 Jan 2021 17:57:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 159D260854;
+        Wed, 27 Jan 2021 17:57:39 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Igor Mammedov <imammedo@redhat.com>,
         "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: [PATCH 1/5] KVM: Make the maximum number of user memslots a per-VM thing
-Date:   Wed, 27 Jan 2021 18:57:27 +0100
-Message-Id: <20210127175731.2020089-2-vkuznets@redhat.com>
+Subject: [PATCH 2/5] KVM: Raise the maximum number of user memslots
+Date:   Wed, 27 Jan 2021 18:57:28 +0100
+Message-Id: <20210127175731.2020089-3-vkuznets@redhat.com>
 In-Reply-To: <20210127175731.2020089-1-vkuznets@redhat.com>
 References: <20210127175731.2020089-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -52,135 +52,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Limiting the maximum number of user memslots globally can be undesirable as
-different VMs may have different needs. Generally, a relatively small
-number should suffice and a VMM may want to enforce the limitation so a VM
-won't accidentally eat too much memory. On the other hand, the number of
-required memslots can depend on the number of assigned vCPUs, e.g. each
-Hyper-V SynIC may require up to two additional slots per vCPU.
+Current KVM_USER_MEM_SLOTS limits are arch specific (512 on Power, 509 on x86,
+32 on s390, 16 on MIPS) but they don't really need to be. Memory slots are
+allocated dynamically in KVM when added so the only real limitation is
+'id_to_index' array which is 'short'. We don't have any other
+KVM_MEM_SLOTS_NUM/KVM_USER_MEM_SLOTS-sized statically defined structures.
 
-Prepare to limit the maximum number of user memslots per-VM. No real
-functional change in this patch as the limit is still hard-coded to
-KVM_USER_MEM_SLOTS.
+Low KVM_USER_MEM_SLOTS can be a limiting factor for some configurations.
+In particular, when QEMU tries to start a Windows guest with Hyper-V SynIC
+enabled and e.g. 256 vCPUs the limit is hit as SynIC requires two pages per
+vCPU and the guest is free to pick any GFN for each of them, this fragments
+memslots as QEMU wants to have a separate memslot for each of these pages
+(which are supposed to act as 'overlay' pages).
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/powerpc/kvm/book3s_hv.c |  2 +-
- arch/s390/kvm/kvm-s390.c     |  2 +-
- include/linux/kvm_host.h     |  1 +
- virt/kvm/dirty_ring.c        |  2 +-
- virt/kvm/kvm_main.c          | 11 ++++++-----
- 5 files changed, 10 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_host.h   | 1 -
+ arch/mips/include/asm/kvm_host.h    | 1 -
+ arch/powerpc/include/asm/kvm_host.h | 1 -
+ arch/s390/include/asm/kvm_host.h    | 1 -
+ arch/x86/include/asm/kvm_host.h     | 2 --
+ include/linux/kvm_host.h            | 5 ++---
+ virt/kvm/kvm_main.c                 | 1 +
+ 7 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 6f612d240392..bea2f34e3662 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4472,7 +4472,7 @@ static int kvm_vm_ioctl_get_dirty_log_hv(struct kvm *kvm,
- 	mutex_lock(&kvm->slots_lock);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8fcfab0c2567..1b8a3d825276 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -30,7 +30,6 @@
  
- 	r = -EINVAL;
--	if (log->slot >= KVM_USER_MEM_SLOTS)
-+	if (log->slot >= kvm->memslots_max)
- 		goto out;
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
- 	slots = kvm_memslots(kvm);
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index dbafd057ca6a..b8c49105f40c 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -640,7 +640,7 @@ int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
- 	mutex_lock(&kvm->slots_lock);
+-#define KVM_USER_MEM_SLOTS 512
+ #define KVM_HALT_POLL_NS_DEFAULT 500000
  
- 	r = -EINVAL;
--	if (log->slot >= KVM_USER_MEM_SLOTS)
-+	if (log->slot >= kvm->memslots_max)
- 		goto out;
+ #include <kvm/arm_vgic.h>
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index 24f3d0f9996b..3a5612e7304c 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -83,7 +83,6 @@
  
- 	r = kvm_get_dirty_log(kvm, log, &is_dirty, &memslot);
+ 
+ #define KVM_MAX_VCPUS		16
+-#define KVM_USER_MEM_SLOTS	16
+ /* memory slots that does not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS	0
+ 
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index d67a470e95a3..2b9b6855ec86 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -28,7 +28,6 @@
+ 
+ #define KVM_MAX_VCPUS		NR_CPUS
+ #define KVM_MAX_VCORES		NR_CPUS
+-#define KVM_USER_MEM_SLOTS	512
+ 
+ #include <asm/cputhreads.h>
+ 
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 74f9a036bab2..6bcfc5614bbc 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -28,7 +28,6 @@
+ #define KVM_S390_BSCA_CPU_SLOTS 64
+ #define KVM_S390_ESCA_CPU_SLOTS 248
+ #define KVM_MAX_VCPUS 255
+-#define KVM_USER_MEM_SLOTS 32
+ 
+ /*
+  * These seem to be used for allocating ->chip in the routing table, which we
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 3d6616f6f6ef..a6547dc9191a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -40,10 +40,8 @@
+ #define KVM_MAX_VCPUS 288
+ #define KVM_SOFT_MAX_VCPUS 240
+ #define KVM_MAX_VCPU_ID 1023
+-#define KVM_USER_MEM_SLOTS 509
+ /* memory slots that are not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS 3
+-#define KVM_MEM_SLOTS_NUM (KVM_USER_MEM_SLOTS + KVM_PRIVATE_MEM_SLOTS)
+ 
+ #define KVM_HALT_POLL_NS_DEFAULT 200000
+ 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f3b1013fb22c..0033ccffe617 100644
+index 0033ccffe617..754020140f37 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -513,6 +513,7 @@ struct kvm {
- 	pid_t userspace_pid;
- 	unsigned int max_halt_poll_ns;
- 	u32 dirty_ring_size;
-+	short int memslots_max;
- };
+@@ -425,9 +425,8 @@ struct kvm_irq_routing_table {
+ #define KVM_PRIVATE_MEM_SLOTS 0
+ #endif
  
- #define kvm_err(fmt, ...) \
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index 9d01299563ee..40d0a749a55d 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -52,7 +52,7 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
- 	as_id = slot >> 16;
- 	id = (u16)slot;
+-#ifndef KVM_MEM_SLOTS_NUM
+-#define KVM_MEM_SLOTS_NUM (KVM_USER_MEM_SLOTS + KVM_PRIVATE_MEM_SLOTS)
+-#endif
++#define KVM_MEM_SLOTS_NUM SHRT_MAX
++#define KVM_USER_MEM_SLOTS (KVM_MEM_SLOTS_NUM - KVM_PRIVATE_MEM_SLOTS)
  
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-+	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= kvm->memslots_max)
- 		return;
- 
- 	memslot = id_to_memslot(__kvm_memslots(kvm, as_id), id);
+ #ifndef __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+ static inline int kvm_arch_vcpu_memslots_id(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8367d88ce39b..a78e982e7107 100644
+index a78e982e7107..5adb1b694304 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
 @@ -755,6 +755,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
  	INIT_LIST_HEAD(&kvm->devices);
  
  	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
-+	kvm->memslots_max = KVM_USER_MEM_SLOTS;
++	BUILD_BUG_ON(KVM_PRIVATE_MEM_SLOTS >= KVM_MEM_SLOTS_NUM);
+ 	kvm->memslots_max = KVM_USER_MEM_SLOTS;
  
  	if (init_srcu_struct(&kvm->srcu))
- 		goto out_err_no_srcu;
-@@ -1404,7 +1405,7 @@ EXPORT_SYMBOL_GPL(kvm_set_memory_region);
- static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
- 					  struct kvm_userspace_memory_region *mem)
- {
--	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
-+	if ((u16)mem->slot >= kvm->memslots_max)
- 		return -EINVAL;
- 
- 	return kvm_set_memory_region(kvm, mem);
-@@ -1435,7 +1436,7 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
- 
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-+	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= kvm->memslots_max)
- 		return -EINVAL;
- 
- 	slots = __kvm_memslots(kvm, as_id);
-@@ -1497,7 +1498,7 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
- 
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-+	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= kvm->memslots_max)
- 		return -EINVAL;
- 
- 	slots = __kvm_memslots(kvm, as_id);
-@@ -1609,7 +1610,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
- 
- 	as_id = log->slot >> 16;
- 	id = (u16)log->slot;
--	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_USER_MEM_SLOTS)
-+	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= kvm->memslots_max)
- 		return -EINVAL;
- 
- 	if (log->first_page & 63)
-@@ -3682,7 +3683,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- 		return KVM_ADDRESS_SPACE_NUM;
- #endif
- 	case KVM_CAP_NR_MEMSLOTS:
--		return KVM_USER_MEM_SLOTS;
-+		return kvm ? kvm->memslots_max : KVM_USER_MEM_SLOTS;
- 	case KVM_CAP_DIRTY_LOG_RING:
- #if KVM_DIRTY_LOG_PAGE_OFFSET > 0
- 		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
 -- 
 2.29.2
 
