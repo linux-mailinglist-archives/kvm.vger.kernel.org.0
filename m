@@ -2,218 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30C813057AF
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 11:03:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDABE3057D7
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 11:08:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234816AbhA0KCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 05:02:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47247 "EHLO
+        id S235502AbhA0KID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 05:08:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26496 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235676AbhA0KAm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 05:00:42 -0500
+        by vger.kernel.org with ESMTP id S235544AbhA0KFw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 05:05:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611741555;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1611741865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IE9lfqBYRWAXVyxhCxtNnr3w1/VHDFaexCDYTNcRvzg=;
-        b=IgLf2nINvLKRqUuznH55x7CebFv9gjNIGnYe8QRBIXX3wtpn+uoWzDbZ4RgInzXd4+LbRn
-        rcVxX1EibHY74+L8Ki+FeO4QawKpeihdnWeSbEBqAo56pad9zZ20lsveel5C72X3SJbRf4
-        e4KkqXZeRWM+LhQ45W0oTGtsoVBIGdU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-L1RunsaFNKmpbeLOhJxudA-1; Wed, 27 Jan 2021 04:59:01 -0500
-X-MC-Unique: L1RunsaFNKmpbeLOhJxudA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72628801AA3;
-        Wed, 27 Jan 2021 09:58:59 +0000 (UTC)
-Received: from redhat.com (ovpn-115-120.ams2.redhat.com [10.36.115.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BA76F60938;
-        Wed, 27 Jan 2021 09:58:48 +0000 (UTC)
-Date:   Wed, 27 Jan 2021 09:58:46 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     John Snow <jsnow@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Fam Zheng <fam@euphon.net>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
-        qemu-block@nongnu.org,
-        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Alistair Francis <alistair@alistair23.me>,
-        qemu-devel@nongnu.org,
-        Wainer dos Santos Moschetta <wainersm@redhat.com>,
-        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 8/9] tests/docker: Add dockerfile for Alpine Linux
-Message-ID: <20210127095846.GC3653144@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
- <20210118063808.12471-9-jiaxun.yang@flygoat.com>
- <20210118103345.GE1789637@redhat.com>
- <929c3ec1-9419-908a-6b5e-ce3ae78f6011@redhat.com>
- <551e153e-34da-28bd-c67f-d2a688ad987b@redhat.com>
+        bh=rSBKskt+WQ4zYWYqyXQXePGFlrIIWEpfaYGgeOFkbk0=;
+        b=VaP2zxjdSvGp9sOyMbdK4HBV3qFC1Kh7KP8XBIF1BZkJhcEGom/1INDcAj6XacPJPf32Rp
+        VTcGgeCYV6rbCTo2IAghd5qALn5D/NvZFU3bxb4DtwaddP8XHAEZxMTUxc6z+PgfNOzXOy
+        wWz1p7LZ+u5+dGzj9vSepZHaDk8bJYA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-377-ihbKx673M6qzTIaKn0QbFA-1; Wed, 27 Jan 2021 05:04:24 -0500
+X-MC-Unique: ihbKx673M6qzTIaKn0QbFA-1
+Received: by mail-ej1-f71.google.com with SMTP id n25so457100ejd.5
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 02:04:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rSBKskt+WQ4zYWYqyXQXePGFlrIIWEpfaYGgeOFkbk0=;
+        b=IPf+LCHAdSge2P84FwVxSdOgLk1lneiS8sBF37Sdk7Sm6v57LLo0N6qVU9lFxfthC6
+         sEr6SdLm9tq76G6K0mwteTMm/PPuGu3Y+1w0ZgrtiNEFf+rC1nlDfPeMIIgFsmiLuT8B
+         iDaxDnqMMfIkc7z142rS9dqLV/7NAjhbz3JQg857QhO3lAUZjja+8Usnb92yk3FkklL3
+         4eeccusuT8QOcq0tzIbdwjbv6nN5yp+uWHKoa5BI1G1/rec674w5o8eHg2dw6kMpqau7
+         qgBQeiCFcPHFebyqAerL1egDYycuQ7RSRul+5ADZNggbJbXOEHEucmbc1LKlYJGqqM97
+         N2fg==
+X-Gm-Message-State: AOAM532Cca4WCAuKPRX5qPLqnk46Txcj73ikHTdiLPFu4I2EroBSIUa2
+        jtArSHkzdHGUnX8DqdhzaR4m8fCFQs5XvbFQ8BY4sNEWCNJFIl9kbTqCX57C6pFXwvWC5Nc6Rf+
+        EXeYq8KCl1RBi
+X-Received: by 2002:a17:907:20b9:: with SMTP id pw25mr6044126ejb.262.1611741862820;
+        Wed, 27 Jan 2021 02:04:22 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyHKzXG6sD3LHVACXcNLb3uTij9dZavO0HXzoqzanjNZbuIjiIAyut5K/eZqVI2THoEtNsTXw==
+X-Received: by 2002:a17:907:20b9:: with SMTP id pw25mr6044113ejb.262.1611741862684;
+        Wed, 27 Jan 2021 02:04:22 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x5sm991191edi.35.2021.01.27.02.04.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jan 2021 02:04:21 -0800 (PST)
+Subject: Re: [RESEND PATCH 1/2] KVM: X86: Add support for the emulation of
+ DR6_BUS_LOCK bit
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210108064924.1677-1-chenyi.qiang@intel.com>
+ <20210108064924.1677-2-chenyi.qiang@intel.com>
+ <fc29c63f-7820-078a-7d92-4a7adf828067@redhat.com>
+ <5f3089a2-5a5c-a839-9ed9-471c404738a3@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6bf8fc0d-ad7d-0282-9dcc-695f16af0715@redhat.com>
+Date:   Wed, 27 Jan 2021 11:04:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <5f3089a2-5a5c-a839-9ed9-471c404738a3@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <551e153e-34da-28bd-c67f-d2a688ad987b@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 04:38:57PM -0500, John Snow wrote:
-> On 1/19/21 8:41 AM, Thomas Huth wrote:
-> > On 18/01/2021 11.33, Daniel P. Berrangé wrote:
-> > > On Mon, Jan 18, 2021 at 02:38:07PM +0800, Jiaxun Yang wrote:
-> > > > Alpine Linux[1] is a security-oriented, lightweight Linux distribution
-> > > > based on musl libc and busybox.
-> > > > 
-> > > > It it popular among Docker guests and embedded applications.
-> > > > 
-> > > > Adding it to test against different libc.
-> > > > 
-> > > > [1]: https://alpinelinux.org/
-> > > > 
-> > > > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > > > ---
-> > > >   tests/docker/dockerfiles/alpine.docker | 57 ++++++++++++++++++++++++++
-> > > >   1 file changed, 57 insertions(+)
-> > > >   create mode 100644 tests/docker/dockerfiles/alpine.docker
-> > > > 
-> > > > diff --git a/tests/docker/dockerfiles/alpine.docker
-> > > > b/tests/docker/dockerfiles/alpine.docker
-> > > > new file mode 100644
-> > > > index 0000000000..5be5198d00
-> > > > --- /dev/null
-> > > > +++ b/tests/docker/dockerfiles/alpine.docker
-> > > > @@ -0,0 +1,57 @@
-> > > > +
-> > > > +FROM alpine:edge
-> > > > +
-> > > > +RUN apk update
-> > > > +RUN apk upgrade
-> > > > +
-> > > > +# Please keep this list sorted alphabetically
-> > > > +ENV PACKAGES \
-> > > > +    alsa-lib-dev \
-> > > > +    bash \
-> > > > +    bison \
-> > > 
-> > > This shouldn't be required.
-> > 
-> > bison and flex were required to avoid some warnings in the past while
-> > compiling the dtc submodule ... but I thought we got rid of the problem
-> > at one point in time, so this can be removed now, indeed.
-> > 
-> > > > +    build-base \
-> > > 
-> > > This seems to be a meta packae that pulls in other
-> > > misc toolchain packages. Please list the pieces we
-> > > need explicitly instead.
-> > 
-> > Looking at the "Depends" list on
-> > https://pkgs.alpinelinux.org/package/v3.3/main/x86/build-base there are
-> > only 6 dependencies and we need most of those for QEMU anyway, so I
-> > think it is ok to keep build-base here.
-> > 
-> > > > +    coreutils \
-> > > > +    curl-dev \
-> > > > +    flex \
-> > > 
-> > > This shouldn't be needed.
-> > > 
-> > > > +    git \
-> > > > +    glib-dev \
-> > > > +    glib-static \
-> > > > +    gnutls-dev \
-> > > > +    gtk+3.0-dev \
-> > > > +    libaio-dev \
-> > > > +    libcap-dev \
-> > > 
-> > > Should not be required, as we use cap-ng.
-> > 
-> > Right.
-> > 
-> > > > +    libcap-ng-dev \
-> > > > +    libjpeg-turbo-dev \
-> > > > +    libnfs-dev \
-> > > > +    libpng-dev \
-> > > > +    libseccomp-dev \
-> > > > +    libssh-dev \
-> > > > +    libusb-dev \
-> > > > +    libxml2-dev \
-> > > > +    linux-headers \
-> > > 
-> > > Is this really needed ? We don't install kernel-headers on other
-> > > distros AFAICT.
-> > 
-> > I tried a build without this package, and it works fine indeed.
-> > 
-> > > > +    lzo-dev \
-> > > > +    mesa-dev \
-> > > > +    mesa-egl \
-> > > > +    mesa-gbm \
-> > > > +    meson \
-> > > > +    ncurses-dev \
-> > > > +    ninja \
-> > > > +    paxmark \
-> > > 
-> > > What is this needed for ?
-> > 
-> > Seems like it also can be dropped.
-> > 
-> > > > +    perl \
-> > > > +    pulseaudio-dev \
-> > > > +    python3 \
-> > > > +    py3-sphinx \
-> > > > +    shadow \
-> > > 
-> > > Is this really needed ?
-> > 
-> > See:
-> > https://www.spinics.net/lists/kvm/msg231556.html
-> > 
-> > I can remove the superfluous packages when picking up the patch, no need
-> > to respin just because of this.
-> > 
-> >   Thomas
-> > 
-> > 
+On 27/01/21 04:41, Xiaoyao Li wrote:
+> On 1/27/2021 12:31 AM, Paolo Bonzini wrote:
+>> On 08/01/21 07:49, Chenyi Qiang wrote:
+>>> To avoid breaking the CPUs without bus lock detection, activate the
+>>> DR6_BUS_LOCK bit (bit 11) conditionally in DR6_FIXED_1 bits.
+>>>
+>>> The set/clear of DR6_BUS_LOCK is similar to the DR6_RTM in DR6
+>>> register. The processor clears DR6_BUS_LOCK when bus lock debug
+>>> exception is generated. (For all other #DB the processor sets this bit
+>>> to 1.) Software #DB handler should set this bit before returning to the
+>>> interrupted task.
+>>>
+>>> For VM exit caused by debug exception, bit 11 of the exit qualification
+>>> is set to indicate that a bus lock debug exception condition was
+>>> detected. The VMM should emulate the exception by clearing bit 11 of the
+>>> guest DR6.
+>>
+>> Please rename DR6_INIT to DR6_ACTIVE_LOW, and then a lot of changes 
+>> become simpler:
 > 
-> You can refer to my post earlier this January for a "minimal" Alpine Linux
-> build, if you wish.
+> Paolo,
 > 
-> My goal was to find the smallest set of packages possible without passing
-> any explicit configure flags.
+> What do you want to convey with the new name DR6_ACTIVE_LOW? To be 
+> honest, the new name is confusing to me.
+
+"Active low" means that the bit is usually 1 and goes to 0 when the 
+condition (such as RTM or bus lock) happens.  For almost all those DR6 
+bits the value is in fact always 1, but if they are defined in the 
+future it will require no code change.
+
+Paolo
+
+>>> -        dr6 |= DR6_BD | DR6_RTM;
+>>> +        dr6 |= DR6_BD | DR6_RTM | DR6_BUS_LOCK;
+>>
+>> dr6 |= DR6_BD | DR6_ACTIVE_LOW;
+>>
 > 
-> I wonder if it's worth having layered "core build" and "test build" images
-> so that we can smoke test the minimalistic build from time to time -- I seem
-> to recall Dan posting information about a dependency management tool for
-> Dockerfiles, but I admit I didn't look too closely at what problem that
-> solves, exactly.
-
-I'd rather we avoid layered images entirely as it creates extra stages
-in the gitlab pipeline, and also makes it more complex to auto-generate.
-
-Once this initial alpine image is merged, then I intend to add it to the
-set which are auto-generated from my other patch series.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> 
 
