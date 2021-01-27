@@ -2,77 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BCB73062A2
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E09CC30621F
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:34:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344193AbhA0Rvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:51:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40022 "EHLO
+        id S1343951AbhA0Ree (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:34:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45130 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343752AbhA0R1t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 12:27:49 -0500
+        by vger.kernel.org with ESMTP id S235779AbhA0RcU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 12:32:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611768378;
+        s=mimecast20190719; t=1611768652;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WsGoAY8pVGqoZZBbJ/C6seN6vjaWljQXnMBoXIykYjQ=;
-        b=jRnASFcZDbSC2tvnV/yi2HWrqgdUZ38R5Kl5cBNuUd9dRRQvJfTcC0pocz4vvdeQH4zd5h
-        0YgF8ayMDk1Ot5CjbPwI2CQL6E5dWCSeq2eVIYem2ch7OleYjUfUrz8CEdaBk6Vu7YX1eg
-        DgYlb82SRf0gNVaNVFbhct1TP2QSFUI=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-jd5rBVD4NxaSXfFtM8O2HQ-1; Wed, 27 Jan 2021 12:26:16 -0500
-X-MC-Unique: jd5rBVD4NxaSXfFtM8O2HQ-1
-Received: by mail-ej1-f69.google.com with SMTP id h4so978631eja.12
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:26:15 -0800 (PST)
+        bh=XkzfQ7JLhuJiuzMMsy2O4iFme8poGbCus8N/6ZyaesA=;
+        b=WM3MrgNQLktt/2bGfQ+XmcqtFMcKb6KPr+N+1cVhy/ZxdjWpBmVlAMN7UXJ53fsJ1zipuM
+        kbXOpha5E2WURNWoMaEK52y8nQDOdYjrw1V56GRauNM7AVZV0GGnpnOHZKBLnI+S865VNM
+        niAukIcOq6+lG3O76lvYyyj/nmUWuFo=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-0E75UQaNP7qv1yq4DWJwcA-1; Wed, 27 Jan 2021 12:30:50 -0500
+X-MC-Unique: 0E75UQaNP7qv1yq4DWJwcA-1
+Received: by mail-ej1-f71.google.com with SMTP id f26so978528ejy.9
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:30:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=WsGoAY8pVGqoZZBbJ/C6seN6vjaWljQXnMBoXIykYjQ=;
-        b=MmM7ZjQ3MMun9bNBGQwYYbFuU9TkQSMU4/DIZmRy6V9c1qGHN8UAOblqQGgeeVoMRJ
-         tfvMtpauQ7+4LVD5tkQMn0wwdL3i0QWNKJBBZHI5WKIegwbXbNazWbXOvHWuJhKjr9fs
-         2xv1viVkgbs8Iek7GyooGB7blPiQ03eTTs1keceCMCFYvcKWU5SgDpQqErHUDShANTry
-         2gh3NWTDBgYHm9anSknL8h2QTzgRgHx5LJwS4Vq9WFyJ4eCaGTAefyQBEODo+Sr+cFZ1
-         hB9/bko6R15beSCP1f5zG4/KVr0QgmK859/d48zlfMbLJQT8ZlX4o8AU5PYUWs6qzK3y
-         PSSg==
-X-Gm-Message-State: AOAM532Xrb5DUrIDnSeFfgE6eQWEzsc7cZoN7aYN+FkFufU13GYS86mZ
-        dVn+tTDK0BwuIbu/rDUyBlExbXR+6k/g4jMeWN83Osq3TH+0IQGmbkg0uz6+qzMbiCGAAJ44p+I
-        DX9kRWQ9Tc/48
-X-Received: by 2002:a17:906:380c:: with SMTP id v12mr2017716ejc.65.1611768374862;
-        Wed, 27 Jan 2021 09:26:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz2T/f/5/DAjBZR2Gan/w1d/Od/Ic6hzZanyHpw1hGWI56YFXumEXsPba1fF57WAmEHBXM1VA==
-X-Received: by 2002:a17:906:380c:: with SMTP id v12mr2017694ejc.65.1611768374611;
-        Wed, 27 Jan 2021 09:26:14 -0800 (PST)
+        bh=XkzfQ7JLhuJiuzMMsy2O4iFme8poGbCus8N/6ZyaesA=;
+        b=CnGzOkoKaK5P6FuMg95OinahvXQi6KdPXHN/vxEj0f5tUAeMPB/PM7edVN19VXa3CW
+         XkhCyhPqWjMWPKLDL+MKrwt5FyxShR+AAfbZSmCSHDECFJSjmMak5NobrsXrJT+0EooU
+         ZU4RgaawZuTL+1PRoSQpcWGTurtwov0oxelaiSeHImZp/6WmRygEhz98JkTgrAaZYdig
+         P5Qrks0knhHHiXBU3VcnymqsVM0Oy9MzuisUivKLqnRPgo+yZtRuzfmy3tnimDaeSy+n
+         u3zxLqYJGV4nOQcQds03TGAMuWkdqDhOBMGIy+k4pGe2KD/yGpK/pHbN5ugfo6n9pmR6
+         YsRg==
+X-Gm-Message-State: AOAM530cXa6k0EOFlzoIaVRvP5wo0LEkZrc8xrCJs8OlD7+6ynrsODTa
+        ao/5PJwD1vJhb9Pw1ZDEEbbhYVJ3Z2WkJq8tTCV09XNNUO7IH58DHXkkMUV1hMzWUJmodHJ98zS
+        6V5bm6S+4YfGH
+X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr7688491ejr.177.1611768649473;
+        Wed, 27 Jan 2021 09:30:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwMmG2yA1LAIObXA6TKj+pk8FnGymREzDd1DtQq6L/KnoQ2xvOyjL1grH7QVqQIMxLWVgnaPQ==
+X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr7688476ejr.177.1611768649261;
+        Wed, 27 Jan 2021 09:30:49 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k9sm1140356ejp.83.2021.01.27.09.26.12
+        by smtp.gmail.com with ESMTPSA id f20sm1687594edd.47.2021.01.27.09.30.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 09:26:13 -0800 (PST)
-Subject: Re: [PATCH 0/9] x86/virt: KVM: x86: Exception handling fixes/cleanups
-To:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org
+        Wed, 27 Jan 2021 09:30:48 -0800 (PST)
+Subject: Re: [PATCH v3 01/11] KVM: x86: Get active PCID only when writing a
+ CR3 value
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "David P . Reed" <dpreed@deepplum.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Uros Bizjak <ubizjak@gmail.com>
-References: <20201231002702.2223707-1-seanjc@google.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20201027212346.23409-1-sean.j.christopherson@intel.com>
+ <20201027212346.23409-2-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8880fedc-14aa-1f14-b87b-118ebe0932a2@redhat.com>
-Date:   Wed, 27 Jan 2021 18:26:11 +0100
+Message-ID: <e56d38bf-bc07-ebfb-5bec-60c60d664447@redhat.com>
+Date:   Wed, 27 Jan 2021 18:30:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201231002702.2223707-1-seanjc@google.com>
+In-Reply-To: <20201027212346.23409-2-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,74 +75,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/12/20 01:26, Sean Christopherson wrote:
-> This series is a conglomeration of three previous series/patches and a bit
-> of new code.  None of the previous series are directly related, but they
-> are all needed to achieve the overarching goal of nuking
-> __kvm_handle_fault_on_reboot(), which is a rather ugly inline asm macro
-> that has the unfortunate side effect of inserting in-line JMP+CALL
-> sequences.
+On 27/10/20 22:23, Sean Christopherson wrote:
 > 
-> Patches 1-3 are resurrected from a series by David Reed[1] to fix VMXOFF
-> bugs in the reboot flows.
-> 
-> Patch 4 is a patch from Uros Bizjak to get rid of custom inline asm in
-> nested VMX.  This already received Paolo's "Queued, thanks." blessing,
-> but has not been pushed to kvm.git.  It's included here as there is an
-> indirect dependency in patch 8.
-> 
-> Patches 5-6 are minor tweaks to KVM's VMX{ON/OFF} paths to use the
-> kernel's now-fault-tolerant VMXOFF instead of KVM's custom asm.
-> 
-> Patch 7 replaces SVM's __ex()/__kvm_handle_fault_on_reboot() with more
-> tailored asm goto macros, similar to the existing VMX asm_vmx*() macros.
-> This is largely an excuse to get rid of __kvm_handle_fault_on_reboot();
-> the actual benefits of removing JMP+CALL are likely negligible as SVM only
-> has a few uses of the macro (versus VMX's bajillion VMREADs/VMWRITEs).
-> 
-> Patch 8 removes __ex()/__kvm_handle_fault_on_reboot().
-> 
-> Patch 9 is a very trimmed down version of a different patch from Uros[3],
-> which cleaned up the __ex()/__kvm_handle_fault_on_reboot() code, as
-> opposed to zapping them entirely.
-> 
-> [1] https://lkml.kernel.org/r/20200704203809.76391-1-dpreed@deepplum.com
-> [2] https://lkml.kernel.org/r/20201029134145.107560-1-ubizjak@gmail.com
-> [3] https://lkml.kernel.org/r/20201221194800.46962-1-ubizjak@gmail.com
-> 
-> David P. Reed (1):
->    x86/virt: Mark flags and memory as clobbered by VMXOFF
-> 
-> Sean Christopherson (6):
->    x86/virt: Eat faults on VMXOFF in reboot flows
->    x86/reboot: Force all cpus to exit VMX root if VMX is supported
->    KVM: VMX: Move Intel PT shenanigans out of VMXON/VMXOFF flows
->    KVM: VMX: Use the kernel's version of VMXOFF
->    KVM: SVM: Use asm goto to handle unexpected #UD on SVM instructions
->    KVM: x86: Kill off __ex() and __kvm_handle_fault_on_reboot()
-> 
-> Uros Bizjak (2):
->    KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
->    KVM: x86: Move declaration of kvm_spurious_fault() to x86.h
-> 
->   arch/x86/include/asm/kvm_host.h | 25 --------------
->   arch/x86/include/asm/virtext.h  | 25 ++++++++++----
->   arch/x86/kernel/reboot.c        | 30 ++++++-----------
->   arch/x86/kvm/svm/sev.c          |  5 ++-
->   arch/x86/kvm/svm/svm.c          | 18 +---------
->   arch/x86/kvm/svm/svm_ops.h      | 59 +++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/nested.c       | 32 ++----------------
->   arch/x86/kvm/vmx/vmenter.S      |  2 +-
->   arch/x86/kvm/vmx/vmx.c          | 28 ++++++----------
->   arch/x86/kvm/vmx/vmx.h          |  1 +
->   arch/x86/kvm/vmx/vmx_ops.h      |  4 +--
->   arch/x86/kvm/x86.c              |  9 ++++-
->   arch/x86/kvm/x86.h              |  2 ++
->   13 files changed, 117 insertions(+), 123 deletions(-)
->   create mode 100644 arch/x86/kvm/svm/svm_ops.h
-> 
+> +static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+>  			     int root_level)
+>  {
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  	unsigned long cr3;
+>  
+> -	cr3 = __sme_set(root);
+> +	cr3 = __sme_set(root_hpa) | kvm_get_active_pcid(vcpu);
+>  	if (npt_enabled) {
+>  		svm->vmcb->control.nested_cr3 = cr3;
 
-Queued, thanks.
+SVM uses the name "nested CR3" so this variable actually could represent 
+an NPT value that does not need the PCID.
+
+Therefore, this change must be done in an else branch, which I've done 
+on applying the patch.
 
 Paolo
 
