@@ -2,115 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A41C3050B6
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:24:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 95ACB3050B9
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:24:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238446AbhA0EX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 23:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388715AbhAZXZg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 18:25:36 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5FC5C06174A;
-        Tue, 26 Jan 2021 15:24:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=wDHy+8X30ygCpbgc3idpX3FV4wc82BEW0tUmbN+bNfs=; b=bLyb5OhEC7WPbuT+2w07OQUe9+
-        qtYW2jP4Q0m9H/SC9O0xdjysDEUXpeWrnucrpQpWWyaUDDKr39/H73G3W/2DDX5lDMTNjNsMJ4JMn
-        BLKVy2LyscLN4AIL5wPWKxVEA94VPtrQI+618DoS6vFt0aLGzhVYQq+NMC52sXSttleuiYEESWMJR
-        TeKnRAl3QZ6SwJBF9PnbiTdaGnlB8fstf0kC8aJxVesY+Ri94HESw7ZWclKKqvB2Hrh7zssQ1fYnB
-        GzN4rN9UrTRvGGea0g+IdIkLzwkKNEJ8iv7Xx9ot0WSTtUYZCN99RKHhzn1g53U0k4PgmxNs0j/YK
-        mXVzZb3w==;
-Received: from [2601:1c0:6280:3f0::7650] (helo=merlin.infradead.org)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l4Xhb-0000kY-6L; Tue, 26 Jan 2021 23:24:51 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        linux1394-devel@lists.sourceforge.net,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        linux-input@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        kvm@vger.kernel.org, Oleg Nesterov <oleg@redhat.com>
-Subject: [PATCH RESEND v2] include/linux: remove repeated words
-Date:   Tue, 26 Jan 2021 15:24:44 -0800
-Message-Id: <20210126232444.22861-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.26.2
+        id S238457AbhA0EXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 23:23:45 -0500
+Received: from mga06.intel.com ([134.134.136.31]:18876 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389526AbhA0AF4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 19:05:56 -0500
+IronPort-SDR: gQ5INyTeTkFDLdcfwpaBuFIFqNVx8zX4DRdOitgLbS3s26ww7hF/KGMaiYq4wlVodznptJ5byD
+ 8xe1AwE/Q/gg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="241520118"
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="241520118"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:00:30 -0800
+IronPort-SDR: LyDtHRIRhbRzfMaAD3eTyQWnx6VzE7ilwzaDwwPQOA1IhG27JX1JvP8MVWcSs5YwWBQteLydHz
+ hRyZjP+aMIFA==
+X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
+   d="scan'208";a="472934086"
+Received: from rsperry-desk.amr.corp.intel.com ([10.251.7.187])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:00:26 -0800
+Message-ID: <a7877d1d9624873d25da175a02d0840f7b5e91dc.camel@intel.com>
+Subject: Re: [RFC PATCH v3 05/27] x86/sgx: Add SGX_CHILD_PRESENT hardware
+ error code
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 27 Jan 2021 13:00:23 +1300
+In-Reply-To: <3bdda0ea-3935-1a8a-8d11-b898371d6168@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+         <5a7c7715147f089d97ae4c033b74b0eafb8f3f89.1611634586.git.kai.huang@intel.com>
+         <3bdda0ea-3935-1a8a-8d11-b898371d6168@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the doubled word "for" in a comment. {firewire-cdev.h}
-Drop the doubled word "in" in a comment. {input.h}
-Drop the doubled word "a" in a comment. {mdev.h}
-Drop the doubled word "the" in a comment. {ptrace.h}
+On Tue, 2021-01-26 at 07:49 -0800, Dave Hansen wrote:
+> On 1/26/21 1:30 AM, Kai Huang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > SGX virtualization requires to allocate "raw" EPC and use it as "virtual
+> > EPC" for SGX guest.  Unlike EPC used by SGX driver, virtual EPC doesn't
+> > track how EPC pages are used in VM, e.g. (de)construction of enclaves,
+> > so it cannot guarantee EREMOVE success, e.g. it doesn't have a priori
+> > knowledge of which pages are SECS with non-zero child counts.
+> 
+> The grammar there is a bit questionable in spots.  Here's a rewrite:
+> 
+> SGX can accurately track how bare-metal enclave pages are used.  This
+> enables SECS to be specifically targeted and EREMOVE'd only after all
+> child pages have been EREMOVE'd.  This ensures that bare-metal SGX will
+> never encounter SGX_CHILD_PRESENT in normal operation.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Stefan Richter <stefanr@s5r6.in-berlin.de>
-Cc: linux1394-devel@lists.sourceforge.net
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: linux-input@vger.kernel.org
-Cc: Kirti Wankhede <kwankhede@nvidia.com>
-Cc: kvm@vger.kernel.org
-Cc: Oleg Nesterov <oleg@redhat.com>
----
-v2: combine 4 patches into one patch and resend.
-Andrew, please merge.
+How about:
 
- include/linux/mdev.h               |    2 +-
- include/linux/ptrace.h             |    2 +-
- include/uapi/linux/firewire-cdev.h |    2 +-
- include/uapi/linux/input.h         |    2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+"SGX driver can accurate track how enclave pages are used. This enables..."
 
---- linux-next-20210125.orig/include/uapi/linux/firewire-cdev.h
-+++ linux-next-20210125/include/uapi/linux/firewire-cdev.h
-@@ -844,7 +844,7 @@ struct fw_cdev_queue_iso {
-  * struct fw_cdev_start_iso - Start an isochronous transmission or reception
-  * @cycle:	Cycle in which to start I/O.  If @cycle is greater than or
-  *		equal to 0, the I/O will start on that cycle.
-- * @sync:	Determines the value to wait for for receive packets that have
-+ * @sync:	Determines the value to wait for receive packets that have
-  *		the %FW_CDEV_ISO_SYNC bit set
-  * @tags:	Tag filter bit mask.  Only valid for isochronous reception.
-  *		Determines the tag values for which packets will be accepted.
---- linux-next-20210125.orig/include/uapi/linux/input.h
-+++ linux-next-20210125/include/uapi/linux/input.h
-@@ -84,7 +84,7 @@ struct input_id {
-  * in units per radian.
-  * When INPUT_PROP_ACCELEROMETER is set the resolution changes.
-  * The main axes (ABS_X, ABS_Y, ABS_Z) are then reported in
-- * in units per g (units/g) and in units per degree per second
-+ * units per g (units/g) and in units per degree per second
-  * (units/deg/s) for rotational axes (ABS_RX, ABS_RY, ABS_RZ).
-  */
- struct input_absinfo {
---- linux-next-20210125.orig/include/linux/mdev.h
-+++ linux-next-20210125/include/linux/mdev.h
-@@ -42,7 +42,7 @@ struct device *mdev_get_iommu_device(str
-  *			@mdev: mdev_device structure on of mediated device
-  *			      that is being created
-  *			Returns integer: success (0) or error (< 0)
-- * @remove:		Called to free resources in parent device's driver for a
-+ * @remove:		Called to free resources in parent device's driver for
-  *			a mediated device. It is mandatory to provide 'remove'
-  *			ops.
-  *			@mdev: mdev_device device structure which is being
---- linux-next-20210125.orig/include/linux/ptrace.h
-+++ linux-next-20210125/include/linux/ptrace.h
-@@ -171,7 +171,7 @@ static inline void ptrace_event(int even
-  *
-  * Check whether @event is enabled and, if so, report @event and @pid
-  * to the ptrace parent.  @pid is reported as the pid_t seen from the
-- * the ptrace parent's pid namespace.
-+ * ptrace parent's pid namespace.
-  *
-  * Called without locks.
-  */
+Since in another email, you mentioned that we should get rid of bare-metal driver,
+and Andy suggested we can just use SGX driver?
+
+> 
+> Virtual EPC is different.  The host does not track how EPC pages are
+> used by the guest, so it cannot guarantee EREMOVE success.  It might,
+> for instance, encounter a SECS with a non-zero child count.
+> 
+> Aside: Would it be *possible* for the host to figure out where the SECS
+> pages are?  If not, we can say "host can not track" versus what I said:
+> "host does not track".
+
+Technically it is possible, so "host does not track" is more reasonable.
+
+> 
+> > Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+> > failures are expected, but only due to SGX_CHILD_PRESENT.
+> > 
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> 
+> With the improved changelog:
+> 
+> Acked-by: Dave Hansen <dave.hansen@intel.com>
+
+Thanks.
+
