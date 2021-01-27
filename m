@@ -2,316 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 455B1305F31
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 16:13:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBB4630604F
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 16:56:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343618AbhA0PMt convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 27 Jan 2021 10:12:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:50550 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234840AbhA0PMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 10:12:25 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EAA031B;
-        Wed, 27 Jan 2021 07:11:37 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5D3ED3F66B;
-        Wed, 27 Jan 2021 07:11:36 -0800 (PST)
-Date:   Wed, 27 Jan 2021 15:10:51 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     drjones@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com,
-        yuzenghui@huawei.com
-Subject: Re: [kvm-unit-tests PATCH v2 08/12] arm/arm64: gic: Split
- check_acked() into two functions
-Message-ID: <20210127151051.3e4298f9@slackpad.fritz.box>
-In-Reply-To: <857a3c2d-772b-0d29-536c-41a829ab8954@arm.com>
-References: <20201217141400.106137-1-alexandru.elisei@arm.com>
-        <20201217141400.106137-9-alexandru.elisei@arm.com>
-        <3539c229-fd05-2e1c-2159-995e51e2dcc4@arm.com>
-        <857a3c2d-772b-0d29-536c-41a829ab8954@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S236756AbhA0Pzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 10:55:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47736 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235961AbhA0Pyj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 10:54:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611762792;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PXYtX1skbuLwvPsvbYxJ0NQhgAlgq6m7r/w0lmFC0hE=;
+        b=id12GhprtFREZcFLG8zNQJsVOCimvlkSfr9b7zNUBnLtY2VZFxJVVgaJNBDVXa/tZGmTnN
+        SOp+Z4QyKlwEye+G+utztUlEhN4lNyd74GpIloFEtPJwysNdgj09cXjDcmDTpXcQutZLjc
+        sF3E0/4pDLJKPA38SrwpCAlXjwKU6D8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-Qgk7fIELOpKnIcyiNNqqJQ-1; Wed, 27 Jan 2021 10:53:08 -0500
+X-MC-Unique: Qgk7fIELOpKnIcyiNNqqJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F0FC1800D42;
+        Wed, 27 Jan 2021 15:53:07 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6880360C62;
+        Wed, 27 Jan 2021 15:53:06 +0000 (UTC)
+Date:   Wed, 27 Jan 2021 08:53:05 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@de.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/4] vfio-pci/zdev: Introduce the zPCI I/O vfio region
+Message-ID: <20210127085305.153e01e4@omen.home.shazbot.org>
+In-Reply-To: <b2d4e3bf-1c73-79fa-9f31-76286d394116@linux.ibm.com>
+References: <1611086550-32765-1-git-send-email-mjrosato@linux.ibm.com>
+        <1611086550-32765-5-git-send-email-mjrosato@linux.ibm.com>
+        <20210122164843.269f806c@omen.home.shazbot.org>
+        <9c363ff5-b76c-d697-98e2-cf091a404d15@linux.ibm.com>
+        <20210126161817.683485e0@omen.home.shazbot.org>
+        <b2d4e3bf-1c73-79fa-9f31-76286d394116@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Jan 2021 17:27:35 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Wed, 27 Jan 2021 09:23:04 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Hi Alex,
+> On 1/26/21 6:18 PM, Alex Williamson wrote:
+> > On Mon, 25 Jan 2021 09:40:38 -0500
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >   
+> >> On 1/22/21 6:48 PM, Alex Williamson wrote:  
+> >>> On Tue, 19 Jan 2021 15:02:30 -0500
+> >>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >>>      
+> >>>> Some s390 PCI devices (e.g. ISM) perform I/O operations that have very
+> >>>> specific requirements in terms of alignment as well as the patterns in
+> >>>> which the data is read/written. Allowing these to proceed through the
+> >>>> typical vfio_pci_bar_rw path will cause them to be broken in up in such a
+> >>>> way that these requirements can't be guaranteed. In addition, ISM devices
+> >>>> do not support the MIO codepaths that might be triggered on vfio I/O coming
+> >>>> from userspace; we must be able to ensure that these devices use the
+> >>>> non-MIO instructions.  To facilitate this, provide a new vfio region by
+> >>>> which non-MIO instructions can be passed directly to the host kernel s390
+> >>>> PCI layer, to be reliably issued as non-MIO instructions.
+> >>>>
+> >>>> This patch introduces the new vfio VFIO_REGION_SUBTYPE_IBM_ZPCI_IO region
+> >>>> and implements the ability to pass PCISTB and PCILG instructions over it,
+> >>>> as these are what is required for ISM devices.  
+> >>>
+> >>> There have been various discussions about splitting vfio-pci to allow
+> >>> more device specific drivers rather adding duct tape and bailing wire
+> >>> for various device specific features to extend vfio-pci.  The latest
+> >>> iteration is here[1].  Is it possible that such a solution could simply
+> >>> provide the standard BAR region indexes, but with an implementation that
+> >>> works on s390, rather than creating new device specific regions to
+> >>> perform the same task?  Thanks,
+> >>>
+> >>> Alex
+> >>>
+> >>> [1]https://lore.kernel.org/lkml/20210117181534.65724-1-mgurtovoy@nvidia.com/
+> >>>      
+> >>
+> >> Thanks for the pointer, I'll have to keep an eye on this.  An approach
+> >> like this could solve some issues, but I think a main issue that still
+> >> remains with relying on the standard BAR region indexes (whether using
+> >> the current vfio-pci driver or a device-specific driver) is that QEMU
+> >> writes to said BAR memory region are happening in, at most, 8B chunks
+> >> (which then, in the current general-purpose vfio-pci code get further
+> >> split up into 4B iowrite operations).  The alternate approach I'm
+> >> proposing here is allowing for the whole payload (4K) in a single
+> >> operation, which is significantly faster.  So, I suspect even with a
+> >> device specific driver we'd want this sort of a region anyhow..  
+> > 
+> > Why is this device specific behavior?  It would be a fair argument that
+> > acceptable device access widths for MMIO are always device specific, so
+> > we should never break them down.  Looking at the PCI spec, a TLP
+> > requires a dword (4-byte) aligned address with a 10-bit length field > indicating the number of dwords, so up to 4K data as you suggest is the  
+> 
+> Well, as I mentioned in a different thread, it's not really device 
 
-> On 12/18/20 3:52 PM, André Przywara wrote:
-> > On 17/12/2020 14:13, Alexandru Elisei wrote:  
-> >> check_acked() has several peculiarities: is the only function among the
-> >> check_* functions which calls report() directly, it does two things
-> >> (waits for interrupts and checks for misfired interrupts) and it also
-> >> mixes printf, report_info and report calls.
-> >>
-> >> check_acked() also reports a pass and returns as soon all the target CPUs
-> >> have received interrupts, However, a CPU not having received an interrupt
-> >> *now* does not guarantee not receiving an erroneous interrupt if we wait
-> >> long enough.
-> >>
-> >> Rework the function by splitting it into two separate functions, each with
-> >> a single responsibility: wait_for_interrupts(), which waits for the
-> >> expected interrupts to fire, and check_acked() which checks that interrupts
-> >> have been received as expected.
-> >>
-> >> wait_for_interrupts() also waits an extra 100 milliseconds after the
-> >> expected interrupts have been received in an effort to make sure we don't
-> >> miss misfiring interrupts.
-> >>
-> >> Splitting check_acked() into two functions will also allow us to
-> >> customize the behavior of each function in the future more easily
-> >> without using an unnecessarily long list of arguments for check_acked().  
-> > Yes, splitting this up looks much better, in general this is a nice
-> > cleanup, thank you!
-> >
-> > Some comments below:
-> >  
-> >> CC: Andre Przywara <andre.przywara@arm.com>
-> >> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> >> ---
-> >>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
-> >>  1 file changed, 47 insertions(+), 26 deletions(-)
-> >>
-> >> diff --git a/arm/gic.c b/arm/gic.c
-> >> index ec733719c776..a9ef1a5def56 100644
-> >> --- a/arm/gic.c
-> >> +++ b/arm/gic.c
-> >> @@ -62,41 +62,42 @@ static void stats_reset(void)
-> >>  	}
-> >>  }
-> >>  
-> >> -static void check_acked(const char *testname, cpumask_t *mask)
-> >> +static void wait_for_interrupts(cpumask_t *mask)
-> >>  {
-> >> -	int missing = 0, extra = 0, unexpected = 0;
-> >>  	int nr_pass, cpu, i;
-> >> -	bool bad = false;
-> >>  
-> >>  	/* Wait up to 5s for all interrupts to be delivered */
-> >> -	for (i = 0; i < 50; ++i) {
-> >> +	for (i = 0; i < 50; i++) {
-> >>  		mdelay(100);
-> >>  		nr_pass = 0;
-> >>  		for_each_present_cpu(cpu) {
-> >> +			/*
-> >> +			 * A CPU having received more than one interrupts will
-> >> +			 * show up in check_acked(), and no matter how long we
-> >> +			 * wait it cannot un-receive it. Consider at least one
-> >> +			 * interrupt as a pass.
-> >> +			 */
-> >>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
-> >> -				acked[cpu] == 1 : acked[cpu] == 0;
-> >> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
-> >> -
-> >> -			if (bad_sender[cpu] != -1) {
-> >> -				printf("cpu%d received IPI from wrong sender %d\n",
-> >> -					cpu, bad_sender[cpu]);
-> >> -				bad = true;
-> >> -			}
-> >> -
-> >> -			if (bad_irq[cpu] != -1) {
-> >> -				printf("cpu%d received wrong irq %d\n",
-> >> -					cpu, bad_irq[cpu]);
-> >> -				bad = true;
-> >> -			}
-> >> +				acked[cpu] >= 1 : acked[cpu] == 0;  
-> >
-> > I wonder if this logic was already flawed to begin with: For interrupts
-> > we expect to fire, we wait for up to 5 seconds (really that long?), but
-> > for interrupts we expect *not* to fire we are OK if they don't show up
-> > in the first 100 ms. That does not sound consistent.  
-> 
-> There are two ways that I see to fix this:
-> 
-> - Have the caller wait for however long it sees fit, and *after* that waiting
-> period call wait_for_interrupts().
-> 
-> - Pass a flag to wait_for_interrupts() to specify that the behaviour should be to
-> wait for the entire duration instead of until the expected interrupts have been
-> received.
-> 
-> Neither sounds appealing to me for inclusion in this patch set, since I want to
-> concentrate on reworking check_acked() while keeping much of the current behaviour
-> intact.
-> 
-> >
-> > I am wondering if we should *not* have the initial 100ms wait at all,
-> > since most interrupts will fire immediately (especially in KVM). And
-> > then have *one* extra wait for, say 100ms, to cover latecomers and
-> > spurious interrupts.  
-> 
-> I don't think it really matters where the 100 millisecond delay is in the loop.
+Sorry, I tried to follow the thread, not sure it's possible w/o lots of
+preexisting s390 knowledge.
 
-I think it does. I ran tests with 256 vCPUs, I think we support even
-more, and running k-u-t on those setups is one of the cases where it
-really matters and we can find real bugs.
-So 100ms on their own does not sound much, but it means we wait at least
-25.6 seconds, even if everything is fine. I found this scary, confusing
-and annoying (in that order), so was wondering if we can avoid that.
+> specific behavior but rather architecture/s390x specific behavior; 
+> PCISTB is an interface available to all PCI devices on s390x, it just so 
+> happens that ISM is the first device type that is running into the 
+> nuance.  The architecture is designed in such a way that other devices 
+> can use the same interface in the same manner.
+
+As a platform access mechanism, this leans towards a platform specific
+implementation of the PCI BAR regions.
  
-> If
-> we call wait_for_interrupts() to actually check that interrupts have fired (as
-> opposed to checking that they haven't been asserted), then at most we save 100ms
-> when they are asserted before the start of the loop. I don't think the GIC spec
-> guarantees that interrupts written to the LR registers will be presented to the
-> CPU after the guest resumes,
+> To drill down a bit, the PCISTB payload can either be 'strict' or 
+> 'relaxed', which via the s390x architecture 'relaxed' means it's not 
+> dword-aligned but rather byte-aligned up to 4K.  We find out at init 
+> time which interface a device supports --  So, for a device that 
+> supports 'relaxed' PCISTB like ISM, an example would be a PCISTB of 11 
+> bytes coming from a non-dword-aligned address is permissible, which 
+> doesn't match the TLP from the spec as you described...  I believe this 
+> 'relaxed' operation that steps outside of the spec is unique to s390x. 
+> (Conversely, devices that use 'strict' PCISTB conform to the typical TLP 
+> definition)
+> 
+> This deviation from spec is to my mind is another argument to treat 
+> these particular PCISTB separately.
 
-I don't know if the spec says anything about it, I guess it would be
-out of scope to do so there anyway, but AFAIK this is exactly how it's
-implemented: when we drop to EL1 with the VGIC armed, the GIC jumps in
-before the guest executes the first instruction (that ELR_EL2 points
-to), and raises the IRQ exception in EL1.
+I think that's just an accessor abstraction, we're not asking users to
+generate TLPs.  If we expose a byte granularity interface, some
+platforms might pass that directly to the PCISTB command, otherwise
+might align the address, perform a dword access, and return the
+requested byte.  AFAICT, both conventional and express PCI use dword
+alignement on the bus, so this should be valid and at best questions
+whether ISM is really PCI or not.
 
-> so it is conceivable that there might be a delay,
+> > whole payload.  It's quite possible that the reason we don't have more
+> > access width problems is that MMIO is typically mmap'd on other
+> > platforms.  We get away with using the x-no-mmap=on flag for debugging,
+> > but it's not unheard of that the device also doesn't work quite
+> > correctly with that flag, which could be due to access width or timing
+> > difference.
+> > 
+> > So really, I don't see why we wouldn't want to maintain the guest
+> > access width through QEMU and the kernel interface for all devices.  It
+> > seems like that should be our default vfio-pci implementation.  I think
+> > we chose the current width based on the QEMU implementation that was
+> > already splitting accesses, and it (mostly) worked.  Thanks,
+> >   
+> 
+> But unless you think that allowing more flexibility than the PCI spec 
+> dictates (byte-aligned up to 4K rather than dword-aligned up to 4K, see 
+> above) this still wouldn't allow me to solve the issue I'm trying to 
+> with this patch set.
 
-The only practical reason for a delay would be PSTATE.I being set, or
-the GICV being disabled, I think.
+As above, it still seems like an improvement to honor user access width
+to the ability of the platform or bus/device interface.  If ISM is
+really that different from PCI in this respect, it only strengthens the
+argument to make a separate bus driver derived from vfio-pci(-core) imo.
 
-I would say one would expect interrupts to fire *immediately*, and
-allowing them 100ms slack does not sound like the right thing. If there
-is some delay, I would at least like to know about it. And I would
-grant them a few instructions delay, at best.
+> If you DO think allowing byte-aligned access up to 4K is OK, then I'm 
+> still left with a further issue (@Niklas):  I'm also using this 
+> region-based approach to ensure that the host uses a matching interface 
+> when talking to the host device (basically, s390x has two different 
+> versions of access to PCI devices, and for ISM at least we need to 
+> ensure that the same operation intercepted from the guest is being used 
+> on the host vs attempting to 'upgrade', which always happens via the 
+> standard s390s kernel PCI interfaces).
 
-If you still think you need that delay, because everything else would
-be too complicated (at least for this iteration), then please make it
-*much* smaller (< 1us).
+In the proposed vfio-pci-core library model, devices would be attached
+to the most appropriate vfio bus driver, an ISM device might be bound
+to a vfio-zpci-ism (heh, "-ism") driver on the host, standard device
+might simply be attached to vfio-pci.  Thanks,
 
-Cheers,
-Andre
-
-
-> thus ending up in waiting the extra 100ms even if the delay is at the end of the loop.
-> 
-> There are two reasons I chose the approach of having the delay at the start of the
-> loop:
-> 
-> 1. To preserve the current behaviour.
-> 
-> 2. To match what the timer test those (see gic_timer_check_state()). I am also
-> thinking that maybe at some point we could unify these test-independent functions
-> in the gic driver.
-> 
-> As for the 5 seconds delay, I think we can come up with a patch to pass the delay
-> as a parameter to the function if needed (if I remember correctly, you needed a
-> shorter waiting period for your GIC tests).
-> 
-> >
-> > But this might be a topic for some extra work/patch?  
-> 
-> Yes, I would rather make this changes when we have an actual test that needs them.
-> 
-> >  
-> >>  		}
-> >> +
-> >>  		if (nr_pass == nr_cpus) {
-> >> -			report(!bad, "%s", testname);
-> >>  			if (i)
-> >> -				report_info("took more than %d ms", i * 100);
-> >> +				report_info("interrupts took more than %d ms", i * 100);
-> >> +			mdelay(100);  
-> > So this is the extra 100ms you mention in the commit message? I am not
-> > convinced this is the right way (see above) or even the right place
-> > (rather at the call site?) to wait. But at least it deserves a comment,
-> > I believe.  
-> 
-> I'm not sure moving it into the caller is the right thing to do. This is something
-> that has to do with how interrupts are asserted, not something that is specific to
-> one test.
-> 
-> You are right about the comment, I'll add one.
-> 
-> Thanks,
-> Alex
-> >>  			return;
-> >>  		}
-> >>  	}
-> >>  
-> >> +	report_info("interrupts timed-out (5s)");
-> >> +}
-> >> +
-> >> +static bool check_acked(cpumask_t *mask)
-> >> +{
-> >> +	int missing = 0, extra = 0, unexpected = 0;
-> >> +	bool pass = true;
-> >> +	int cpu;
-> >> +
-> >>  	for_each_present_cpu(cpu) {
-> >>  		if (cpumask_test_cpu(cpu, mask)) {
-> >>  			if (!acked[cpu])
-> >> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
-> >>  			if (acked[cpu])
-> >>  				++unexpected;
-> >>  		}
-> >> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
-> >> +
-> >> +		if (bad_sender[cpu] != -1) {
-> >> +			report_info("cpu%d received IPI from wrong sender %d",
-> >> +					cpu, bad_sender[cpu]);
-> >> +			pass = false;
-> >> +		}
-> >> +
-> >> +		if (bad_irq[cpu] != -1) {
-> >> +			report_info("cpu%d received wrong irq %d",
-> >> +					cpu, bad_irq[cpu]);
-> >> +			pass = false;
-> >> +		}
-> >> +	}
-> >> +
-> >> +	if (missing || extra || unexpected) {
-> >> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
-> >> +				missing, extra, unexpected);
-> >> +		pass = false;  
-> > Thanks, that so much easier to read now.
-> >
-> > Cheers,
-> > Andre
-> >  
-> >>  	}
-> >>  
-> >> -	report(false, "%s", testname);
-> >> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
-> >> -		    missing, extra, unexpected);
-> >> +	return pass;
-> >>  }
-> >>  
-> >>  static void check_spurious(void)
-> >> @@ -303,7 +321,8 @@ static void ipi_test_self(void)
-> >>  	cpumask_clear(&mask);
-> >>  	cpumask_set_cpu(smp_processor_id(), &mask);
-> >>  	gic->ipi.send_self();
-> >> -	check_acked("IPI: self", &mask);
-> >> +	wait_for_interrupts(&mask);
-> >> +	report(check_acked(&mask), "Interrupts received");
-> >>  	report_prefix_pop();
-> >>  }
-> >>  
-> >> @@ -318,7 +337,8 @@ static void ipi_test_smp(void)
-> >>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
-> >>  		cpumask_clear_cpu(i, &mask);
-> >>  	gic_ipi_send_mask(IPI_IRQ, &mask);
-> >> -	check_acked("IPI: directed", &mask);
-> >> +	wait_for_interrupts(&mask);
-> >> +	report(check_acked(&mask), "Interrupts received");
-> >>  	report_prefix_pop();
-> >>  
-> >>  	report_prefix_push("broadcast");
-> >> @@ -326,7 +346,8 @@ static void ipi_test_smp(void)
-> >>  	cpumask_copy(&mask, &cpu_present_mask);
-> >>  	cpumask_clear_cpu(smp_processor_id(), &mask);
-> >>  	gic->ipi.send_broadcast();
-> >> -	check_acked("IPI: broadcast", &mask);
-> >> +	wait_for_interrupts(&mask);
-> >> +	report(check_acked(&mask), "Interrupts received");
-> >>  	report_prefix_pop();
-> >>  }
-> >>  
-> >>  
+Alex
 
