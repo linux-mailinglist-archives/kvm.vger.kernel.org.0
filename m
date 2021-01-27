@@ -2,136 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 426553061A8
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:15:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33CF23061C1
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:19:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233847AbhA0RPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:15:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51920 "EHLO
+        id S232310AbhA0RS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:18:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233642AbhA0ROS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 12:14:18 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24812C06178A
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:13:19 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id y205so1601902pfc.5
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:13:19 -0800 (PST)
+        with ESMTP id S234993AbhA0RPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 12:15:45 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7765C0613D6
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:15:04 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id i63so1603179pfg.7
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:15:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=efbAr3xGl0vNWQhrAPFMIOemgSWTahbx/gfwbK/fDiY=;
-        b=Tw/qSamoFoZYdipTMlu/3PFqpRP4OxRQFRy4pcWwzpWQO5OFh1XZpiXZMAgWcDaA7s
-         CnNU8VGnU+6XWJTQ/py+LzX8zFkfspuFic6zgnWu6qJFix/7UfAnIklobeIfDTx1YyNO
-         mcBHaplBZsTErNufK5Fl6ZDNJNaml1peHMg/Gocbx6szfp4YCfBJcdm0YIbYlED3FGeW
-         X6w8bEgULTMWRz9lqmKdJOi+KEQdo47PzSLncUjGQ6Y2JMGYw63jdC22FgVycpY6GN8b
-         wSizWxnR00hNzFjESp1wngH7CNCK4zT3X/UGXg82OixkGWq7rEI7fOqj1nEqQ6mg1pEo
-         /MXg==
+        bh=MQopOgKi9I0dqqHp3bWWcA7RiGYJUqWcMoI+s76k8qI=;
+        b=UxqTGJl8PhWaswBfpUw2xI2ClpcgdAiFxFuesEfI5mq96QTfyBWHXICqsvkyHlPToa
+         E2/Xh6e4A9ElefIaReP8Ye67OL3sLcbea25PycjgHUfQDPLozqVRCrxipVgdmQT3ABe0
+         C2WpVRaJ9Vcjg+IU/Hj5wDR0GV9DUA85GDPlyaDye3CQXoEHa4MVf1YrSD9Xd3uKpdEl
+         6RBId/c8g7HR0fxVG+k1uYsaoDAMjujQLbAFe1TCKIGsDyv6U3dXjmht54sfPk8PudOy
+         skVFJQz/byVhMdBFrU8GjLrpkPp1OrOU/cxpcbAKzVhU/p8SKMZSUe5aKvK1U4b3w1MC
+         ErbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=efbAr3xGl0vNWQhrAPFMIOemgSWTahbx/gfwbK/fDiY=;
-        b=X5Q5AjpW7BxiRdt3VKyCHemiyWHH7W35YzH+AJTJ3tWDcd3ETH+5HlK4XLYRfqeOyP
-         QHJLphmaNsWXXDMTg3ux5gsEYvGImqQZCGR+ufu6fKt0VHwJItJDqgrw9clvxpNWPcWm
-         5kpNck3g1jwFt8K+tP8F7sO5CCNdaclQ9AgdePBDkGHIWFgm0yWgep9K7CxPdFwfPQ/8
-         jquXtX2JkhuO0P0aTj6qPi4uFIpeLu2YBCS1LCYbJCUpyhbxwaMd3BgRzsd+eXYE1P89
-         T+b2fum8XID92GDjRdCciW82GpBU7kkeQWgoT5x+LoHRe4yqu9YChQS7q7VDpbtaCm9J
-         a2lg==
-X-Gm-Message-State: AOAM533xe4nXAmresAA1x66aH6m5+6NPX4she8yA/fh7obn6wHVS3pMc
-        UalWmMAKI65tCz8e5qxyn8Vkgg==
-X-Google-Smtp-Source: ABdhPJzjyvPn/UEyvPBc4oXcCgOgS5sVVPp/odbp3aUzApd+183VqPmkKatDQbc3k8W/7nxo3mHuLg==
-X-Received: by 2002:a05:6a00:2296:b029:1b6:6972:2f2a with SMTP id f22-20020a056a002296b02901b669722f2amr11499462pfe.69.1611767598435;
-        Wed, 27 Jan 2021 09:13:18 -0800 (PST)
+        bh=MQopOgKi9I0dqqHp3bWWcA7RiGYJUqWcMoI+s76k8qI=;
+        b=AaDpnjZTQH3lPfaF/LAN6DYTbZlxVpEMinyn9Og/3rSka1zSzl+qIUdzILfiwQD8h8
+         8gcS66XaKGui6ZjET+j11Y2dKbjTUHuET1+L0g3EdMGefdjTbotsZeHVhMCjqN8wRWkI
+         C5zwSUnLrsChiCo75Ij9yCncLu8RO6xYXR4DkJWKUs/0CqvRw/iOXH1VO2nDDtH5MJz2
+         T91Ot1WIN86Xj2qFX3yMtdVcavsABnifWAZGe4I73ptPKFEdazpUa4yjvD8auKA3Vk/V
+         Y/hv361Trbuura4g5Ck5jdFRLRDh6SMX495PF9OM+0WGdoIVhpRd65jmLUuA4shUCQXF
+         8s6A==
+X-Gm-Message-State: AOAM533CstRdqH4mcrcpbVeSQswGvDAdaPD2lL2dNfEZg4Jx7MACpIye
+        NWwIN/4vEy6jyPk2R2C28sq4jQ==
+X-Google-Smtp-Source: ABdhPJxQ1RaIGVpFBFnucbCFfVhkpr4+n8JC97Q9uWl9YvrbtUevZebjHZPzm178deKEAjmPNhpjRA==
+X-Received: by 2002:a62:1897:0:b029:1bd:ad37:3061 with SMTP id 145-20020a6218970000b02901bdad373061mr11606004pfy.6.1611767704259;
+        Wed, 27 Jan 2021 09:15:04 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id v9sm2502871pju.33.2021.01.27.09.13.16
+        by smtp.gmail.com with ESMTPSA id r194sm3053529pfr.168.2021.01.27.09.15.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 09:13:17 -0800 (PST)
-Date:   Wed, 27 Jan 2021 09:13:10 -0800
+        Wed, 27 Jan 2021 09:15:03 -0800 (PST)
+Date:   Wed, 27 Jan 2021 09:14:57 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de
-Subject: Re: [RFC PATCH v3 07/27] x86/cpu/intel: Allow SGX virtualization
- without Launch Control support
-Message-ID: <YBGfJn4smCd6JvWV@google.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <ae05882235e61fd8e7a56e37b0d9c044781bd767.1611634586.git.kai.huang@intel.com>
- <f23b9893-015b-a9cb-de93-1a4978981e83@intel.com>
- <20210127125607.52795a882ace894b19f41d68@intel.com>
- <ecb0595b-76e9-9298-438d-80de28156371@intel.com>
- <20210127150224.5d7de004fb6b3fb72a969f07@intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Subject: Re: [PATCH 24/24] kvm: x86/mmu: Allow parallel page faults for the
+ TDP MMU
+Message-ID: <YBGfka+E/+nYGm4P@google.com>
+References: <20210112181041.356734-1-bgardon@google.com>
+ <20210112181041.356734-25-bgardon@google.com>
+ <YAjRGBu5tAEt9xpv@google.com>
+ <CANgfPd_dCNQHWMtWDJiC5prVC9R4gtNO6v5L3=QioNZLDDXVMw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210127150224.5d7de004fb6b3fb72a969f07@intel.com>
+In-Reply-To: <CANgfPd_dCNQHWMtWDJiC5prVC9R4gtNO6v5L3=QioNZLDDXVMw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 27, 2021, Kai Huang wrote:
-> On Tue, 26 Jan 2021 16:18:31 -0800 Dave Hansen wrote:
-> > On 1/26/21 3:56 PM, Kai Huang wrote:
-> > > On Tue, 26 Jan 2021 08:26:21 -0800 Dave Hansen wrote:
-> > >> On 1/26/21 1:30 AM, Kai Huang wrote:
-> > >>> --- a/arch/x86/kernel/cpu/feat_ctl.c
-> > >>> +++ b/arch/x86/kernel/cpu/feat_ctl.c
-> > >>> @@ -105,7 +105,8 @@ early_param("nosgx", nosgx);
-> > >>>  void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
-> > >>>  {
-> > >>>  	bool tboot = tboot_enabled();
-> > >>> -	bool enable_sgx;
-> > >>> +	bool enable_vmx;
-> > >>> +	bool enable_sgx_any, enable_sgx_kvm, enable_sgx_driver;
-> > >>>  	u64 msr;
-> > >>>  
-> > >>>  	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) {
-> > >>> @@ -114,13 +115,22 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
-> > >>>  		return;
-> > >>>  	}
-> > >>>  
-> > >>> +	enable_vmx = cpu_has(c, X86_FEATURE_VMX) &&
-> > >>> +		     IS_ENABLED(CONFIG_KVM_INTEL);
-> > >>
-> > >> The reason it's called 'enable_sgx' below is because this code is
-> > >> actually going to "enable sgx".  This code does not "enable vmx".  That
-> > >> makes this a badly-named variable.  "vmx_enabled" or "vmx_available"
-> > >> would be better.
-> > > 
-> > > It will also try to enable VMX if feature control MSR is not locked by BIOS.
-> > > Please see below code:
-> > 
-> > Ahh, I forgot this is non-SGX code.  It's mucking with all kinds of
-> > other stuff in the same MSR.  Oh, well, I guess that's what you get for
-> > dumping a bunch of refactoring in the same patch as the new code.
-> > 
-> > 
-> > >>> -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
-> > >>> -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
-> > >>> -		     IS_ENABLED(CONFIG_X86_SGX);
-> > >>> +	enable_sgx_any = cpu_has(c, X86_FEATURE_SGX) &&
-> > >>> +			 cpu_has(c, X86_FEATURE_SGX1) &&
-> > >>> +			 IS_ENABLED(CONFIG_X86_SGX);
-> > >>
-> > >> The X86_FEATURE_SGX1 check seems to have snuck in here.  Why?
-> > > 
-> > > Please see my reply to Sean's reply.
-> > 
-> > ... yes, so you're breaking out the fix into a separate patch,.
+On Tue, Jan 26, 2021, Ben Gardon wrote:
+> On Wed, Jan 20, 2021 at 4:56 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Jan 12, 2021, Ben Gardon wrote:
+> > > Make the last few changes necessary to enable the TDP MMU to handle page
+> > > faults in parallel while holding the mmu_lock in read mode.
+> > >
+> > > Reviewed-by: Peter Feiner <pfeiner@google.com>
+> > >
+> > > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 12 ++++++++++--
+> > >  1 file changed, 10 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 280d7cd6f94b..fa111ceb67d4 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -3724,7 +3724,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > >               return r;
+> > >
+> > >       r = RET_PF_RETRY;
+> > > -     kvm_mmu_lock(vcpu->kvm);
+> > > +
+> > > +     if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> >
+> > Off topic, what do you think about rewriting is_tdp_mmu_root() to be both more
+> > performant and self-documenting as to when is_tdp_mmu_root() !=
+> > kvm->arch.tdp_mmu_enabled?  E.g. key off is_guest_mode() and then do a thorough
+> > audit/check when CONFIG_KVM_MMU_AUDIT=y?
+> >
+> > #ifdef CONFIG_KVM_MMU_AUDIT
+> > bool is_tdp_mmu_root(struct kvm *kvm, hpa_t hpa)
+> > {
+> >         struct kvm_mmu_page *sp;
+> >
+> >         if (!kvm->arch.tdp_mmu_enabled)
+> >                 return false;
+> >         if (WARN_ON(!VALID_PAGE(hpa)))
+> >                 return false;
+> >
+> >         sp = to_shadow_page(hpa);
+> >         if (WARN_ON(!sp))
+> >                 return false;
+> >
+> >         return sp->tdp_mmu_page && sp->root_count;
+> > }
+> > #endif
+> >
+> > bool is_tdp_mmu(struct kvm_vcpu *vcpu)
+> > {
+> >         bool is_tdp_mmu = kvm->arch.tdp_mmu_enabled && !is_guest_mode(vcpu);
+> >
+> > #ifdef CONFIG_KVM_MMU_AUDIT
+> >         WARN_ON(is_tdp_mmu != is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa));
+> > #endif
+> >         return is_tdp_mmu;
+> > }
 > 
-> For the separate patch to fix SGX1 check, if I understand correctly, SGX driver
-> should be changed too. I feel I am not the best person to do it. Jarkko or Sean
-> is. 
+> Great suggestions. In the interest of keeping this (already enormous)
+> series small, I'm inclined to make those changes in a future series if
+> that's alright with you.
 
-SGX driver doesn't need to be changed, just this core feat_ctl.c code.
-
-> So I'll remove SGX1 here in the next version, but I won't include another
-> patch to fix the SGX1 logic. If Jarkko or Sean sent out that patch, and it is
-> merged quickly, I can rebase on top of that.
-> 
-> Does this make sense?
-
-Yep, adding a check on SGX1 is definitely not mandatory for this series.
+Yep, definitely a different series.
