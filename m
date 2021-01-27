@@ -2,40 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 580403054BD
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 08:34:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF2A83054B0
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 08:32:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233979AbhA0HdZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 02:33:25 -0500
-Received: from mga05.intel.com ([192.55.52.43]:60070 "EHLO mga05.intel.com"
+        id S234051AbhA0Han (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 02:30:43 -0500
+Received: from mga01.intel.com ([192.55.52.88]:22053 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S317811AbhA0ATP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Jan 2021 19:19:15 -0500
-IronPort-SDR: vDgZIY5oWJj7LY9VxUIKjgfglKRvFjWJxnlhPnh6H+AGXpGckU7/XbImrcwiys6rCz/4U+2HEn
- GUlW5ESKC4zA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="264816014"
+        id S317634AbhA0A2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 19:28:36 -0500
+IronPort-SDR: Yq/2NHrir+6usoHunWTLp5kZ7Jnq1O3PHbax5cRnRds+LP/aQ6PAi5t1f5sYA+M7tyx/7Bp3DY
+ t1QLXe301H8A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="198790176"
 X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="264816014"
+   d="scan'208";a="198790176"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:18:33 -0800
-IronPort-SDR: qcf6kcogC5RsUNtGMUh3yfbVWKsLjrljILXNnGddLw69ryk/TYIXEBBZWz39qoCBEORmQei5kC
- fW6U4Ira10SA==
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:27:26 -0800
+IronPort-SDR: 93zSoQRhoTr+FJAOHXwz5Kxax+qQhTnUxPUvUfEDUlBhg/lm4+/RZg3bxir3BXNHf6GpWOprm/
+ jH3UtsEgo/CA==
 X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="410338734"
+   d="scan'208";a="410341207"
 Received: from kalinapo-mobl.amr.corp.intel.com (HELO [10.209.85.22]) ([10.209.85.22])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:18:33 -0800
-Subject: Re: [RFC PATCH v3 07/27] x86/cpu/intel: Allow SGX virtualization
- without Launch Control support
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:27:25 -0800
+Subject: Re: [RFC PATCH v3 06/27] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
 To:     Kai Huang <kai.huang@intel.com>
 Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
         seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 References: <cover.1611634586.git.kai.huang@intel.com>
- <ae05882235e61fd8e7a56e37b0d9c044781bd767.1611634586.git.kai.huang@intel.com>
- <f23b9893-015b-a9cb-de93-1a4978981e83@intel.com>
- <20210127125607.52795a882ace894b19f41d68@intel.com>
+ <8492ee41e947aa8151007e5ecbd9ef8914dd8827.1611634586.git.kai.huang@intel.com>
+ <c9da1c45-d4be-e0af-2b67-5408217deb34@intel.com>
+ <20210127131655.d560b6be8b897471d770f54c@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -80,12 +79,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <ecb0595b-76e9-9298-438d-80de28156371@intel.com>
-Date:   Tue, 26 Jan 2021 16:18:31 -0800
+Message-ID: <7fbdb7f9-c7b0-d4f1-6e36-d99c6a116b82@intel.com>
+Date:   Tue, 26 Jan 2021 16:27:25 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210127125607.52795a882ace894b19f41d68@intel.com>
+In-Reply-To: <20210127131655.d560b6be8b897471d770f54c@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -93,74 +92,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/21 3:56 PM, Kai Huang wrote:
-> On Tue, 26 Jan 2021 08:26:21 -0800 Dave Hansen wrote:
->> On 1/26/21 1:30 AM, Kai Huang wrote:
->>> --- a/arch/x86/kernel/cpu/feat_ctl.c
->>> +++ b/arch/x86/kernel/cpu/feat_ctl.c
->>> @@ -105,7 +105,8 @@ early_param("nosgx", nosgx);
->>>  void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
->>>  {
->>>  	bool tboot = tboot_enabled();
->>> -	bool enable_sgx;
->>> +	bool enable_vmx;
->>> +	bool enable_sgx_any, enable_sgx_kvm, enable_sgx_driver;
->>>  	u64 msr;
->>>  
->>>  	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) {
->>> @@ -114,13 +115,22 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
->>>  		return;
->>>  	}
->>>  
->>> +	enable_vmx = cpu_has(c, X86_FEATURE_VMX) &&
->>> +		     IS_ENABLED(CONFIG_KVM_INTEL);
+On 1/26/21 4:16 PM, Kai Huang wrote:
+> On Tue, 26 Jan 2021 08:19:25 -0800 Dave Hansen wrote:
+>> Also, a one-line summary about what's in here would be nice next to the
+>> copyright (which needs to be updated).
 >>
->> The reason it's called 'enable_sgx' below is because this code is
->> actually going to "enable sgx".  This code does not "enable vmx".  That
->> makes this a badly-named variable.  "vmx_enabled" or "vmx_available"
->> would be better.
+>> /*
+>>  * Device driver to expose SGX enclave memory to KVM guests.
+>>  *
+>>  * Copyright(c) 2016-20 Intel Corporation.
+>>  */
 > 
-> It will also try to enable VMX if feature control MSR is not locked by BIOS.
-> Please see below code:
-
-Ahh, I forgot this is non-SGX code.  It's mucking with all kinds of
-other stuff in the same MSR.  Oh, well, I guess that's what you get for
-dumping a bunch of refactoring in the same patch as the new code.
-
-
->>> -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
->>> -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
->>> -		     IS_ENABLED(CONFIG_X86_SGX);
->>> +	enable_sgx_any = cpu_has(c, X86_FEATURE_SGX) &&
->>> +			 cpu_has(c, X86_FEATURE_SGX1) &&
->>> +			 IS_ENABLED(CONFIG_X86_SGX);
->>
->> The X86_FEATURE_SGX1 check seems to have snuck in here.  Why?
+> Will do. However the year should not be 2016-20, but should be 2021, right?
 > 
-> Please see my reply to Sean's reply.
+> I think it has been ignored since the day Sean wrote the file.
 
-... yes, so you're breaking out the fix into a separate patch,.
+Yes, should be 2021.  Also, there shouldn't be *ANY* parts of these
+files which you, the submitter and newly-minted effective maintainer,
+have ignored.
 
->>>  update_sgx:
->>> -	if (!(msr & FEAT_CTL_SGX_ENABLED) ||
->>> -	    !(msr & FEAT_CTL_SGX_LC_ENABLED) || !enable_sgx) {
->>> -		if (enable_sgx)
->>> -			pr_err_once("SGX disabled by BIOS\n");
->>> +	if (!(msr & FEAT_CTL_SGX_ENABLED)) {
->>> +		if (enable_sgx_kvm || enable_sgx_driver)
->>> +			pr_err_once("SGX disabled by BIOS.\n");
->>>  		clear_cpu_cap(c, X86_FEATURE_SGX);
->>> +		return;
->>> +	}
+It sounds like you owe us some homework to give every line of these a
+once-over.
+
+...
+>>> +struct sgx_vepc {
+>>> +	struct xarray page_array;
+>>> +	struct mutex lock;
+>>> +};
+>>> +
+>>> +static struct mutex zombie_secs_pages_lock;
+>>> +static struct list_head zombie_secs_pages;
 >>
+>> Comments would be nice for this random lock and list.
 >>
->> Isn't there a pr_fmt here already?  Won't these just look like:
->>
->> 	sgx: SGX disabled by BIOS.
->>
->> That seems a bit silly.
+>> The main core functions (fault, etc...) are looking OK to me.
 > 
-> Please see my reply to Sean's reply.
+> Thanks. How about below comment?
+> 
+> /*
+>  * List to temporarily hold SECS pages that cannot be EREMOVE'd due to
+>  * having child in other virtual EPC instances, and the lock to protect it.
+>  */
 
-Got it.  I was thinking this was in the SGX code, not in the generic CPU
-setup code.
+Fine.  It's just a bit silly to say that it's a list.  It's also not so
+temporary.  Pages can live on here forever.
+
+>>> +	INIT_LIST_HEAD(&zombie_secs_pages);
+>>> +	mutex_init(&zombie_secs_pages_lock);
+>>> +
+>>> +	return misc_register(&sgx_vepc_dev);
+>>> +}
+>>> diff --git a/arch/x86/kernel/cpu/sgx/virt.h b/arch/x86/kernel/cpu/sgx/virt.h
+>>> new file mode 100644
+>>> index 000000000000..44d872380ca1
+>>> --- /dev/null
+>>> +++ b/arch/x86/kernel/cpu/sgx/virt.h
+>>> @@ -0,0 +1,14 @@
+>>> +/* SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause) */
+>>> +#ifndef _ASM_X86_SGX_VIRT_H
+>>> +#define _ASM_X86_SGX_VIRT_H
+>>> +
+>>> +#ifdef CONFIG_X86_SGX_KVM
+>>> +int __init sgx_vepc_init(void);
+>>> +#else
+>>> +static inline int __init sgx_vepc_init(void)
+>>> +{
+>>> +	return -ENODEV;
+>>> +}
+>>> +#endif
+>>> +
+>>> +#endif /* _ASM_X86_SGX_VIRT_H */
+>>
+>> Is more going to go in this header?  It's a little sparse as-is.
+> 
+> No there's no more. The sgx_vepc_init() function declaration needs to be here
+> since sgx/main.c needs to use it.
+> 
+> May I know your suggestion?
+
+I'd toss it in some other existing header that has more meat in it.  I'm
+lazy.
+
