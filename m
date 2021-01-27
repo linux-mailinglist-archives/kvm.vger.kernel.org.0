@@ -2,82 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 960AE306353
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 19:30:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAE013063D2
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 20:10:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236594AbhA0S3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 13:29:14 -0500
-Received: from smtprelay0049.hostedemail.com ([216.40.44.49]:49964 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S236548AbhA0S3M (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 13:29:12 -0500
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay07.hostedemail.com (Postfix) with ESMTP id 6E10F181D303A;
-        Wed, 27 Jan 2021 18:28:30 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Spam-Summary: 2,0,0,,d41d8cd98f00b204,joe@perches.com,,RULES_HIT:41:355:379:599:988:989:1260:1261:1277:1311:1313:1314:1345:1359:1437:1515:1516:1518:1534:1541:1593:1594:1711:1730:1747:1777:1792:2393:2559:2562:2828:3138:3139:3140:3141:3142:3352:3622:3868:3871:3872:4250:4321:5007:6119:6737:7652:7903:10004:10400:10848:11026:11232:11473:11658:11914:12043:12048:12296:12297:12438:12740:12895:13069:13161:13229:13311:13357:13439:13894:14659:14721:21080:21433:21451:21627:30054:30070:30091,0,RBL:none,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:,MSBL:0,DNSBL:none,Custom_rules:0:0:0,LFtime:1,LUA_SUMMARY:none
-X-HE-Tag: ocean53_4812ee027599
-X-Filterd-Recvd-Size: 2375
-Received: from [192.168.1.159] (unknown [47.151.137.21])
-        (Authenticated sender: joe@perches.com)
-        by omf07.hostedemail.com (Postfix) with ESMTPA;
-        Wed, 27 Jan 2021 18:28:27 +0000 (UTC)
-Message-ID: <10805faed4d19ce842cef277b74479a883514afe.camel@perches.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Add '__func__' in rmap_printk()
-From:   Joe Perches <joe@perches.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Stephen Zhang <stephenzhangzsd@gmail.com>, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, x86@kernel.org, hpa@zytor.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 27 Jan 2021 10:28:26 -0800
-In-Reply-To: <854ee6dc-2299-3897-c4af-3f7058f195af@redhat.com>
-References: <1611713325-3591-1-git-send-email-stephenzhangzsd@gmail.com>
-         <244f1c7f-d6ca-bd7c-da5e-8da3bf8b5aee@redhat.com>
-         <cfb3699fc03cff1e4c4ffe3c552dba7b7727fa09.camel@perches.com>
-         <854ee6dc-2299-3897-c4af-3f7058f195af@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.38.1-1 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1344379AbhA0TKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 14:10:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34484 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1344212AbhA0TJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 14:09:48 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 5576764DC1;
+        Wed, 27 Jan 2021 19:08:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611774518;
+        bh=0F9hwVXsEx5Aglg2zYpQsWXv1inmLCapUAoJXBye5Dk=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=W3V1c+ZomAZBfhLETp8M6uDGVia+3Ptit1Vk8naYpTzNF5HwB17RTzEQBmn0+ekn2
+         UIHkMXEa4WvyVR4+F/pyS7nvHwd8XFtj8pgtwoxx9sQjDPrDuD7Ec/qp7r1nOX3MOx
+         cZdPDegGS42ifYnz3tlLBegb0UWb/1zyEeLTkZfA1r8sQvY1iGSKyqjUv8TmtuxDCy
+         E+4D7fmCdk3LyueNTHl8cx2i/Ya9FR85/jVhaXbV3a3kAvNbm4ZhL/DeM0vDWmyAyS
+         w5I517eBo6v7ySgFRIMnozNZUOCO0x+Ae1/W+xt+NGeq+ga3j8CkYQ1gZty2UtNm7d
+         vc0JPVcnkD42g==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 3F55E652DA;
+        Wed, 27 Jan 2021 19:08:38 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM fixes for Linux 5.11-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20210127102246.1599444-1-pbonzini@redhat.com>
+References: <20210127102246.1599444-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20210127102246.1599444-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 9a78e15802a87de2b08dfd1bd88e855201d2c8fa
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4992eb41ab1b5d08479193afdc94f9678e5ded13
+Message-Id: <161177451817.15019.12373579485166090231.pr-tracker-bot@kernel.org>
+Date:   Wed, 27 Jan 2021 19:08:38 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-01-27 at 19:23 +0100, Paolo Bonzini wrote:
-> On 27/01/21 18:25, Joe Perches wrote:
-> > 
-> > -#ifdef MMU_DEBUG
-> > -bool dbg = 0;
-> > -module_param(dbg, bool, 0644);
-> > -#endif
-> > -
-> >  #define PTE_PREFETCH_NUM		8
-> >  
-> > 
-> >  #define PT32_LEVEL_BITS 10
-> > @@ -844,17 +839,17 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
-> >  	int i, count = 0;
-> >  
-> > 
-> >  	if (!rmap_head->val) {
-> > -		rmap_printk("pte_list_add: %p %llx 0->1\n", spte, *spte);
-> > +		pr_debug("%p %llx 0->1\n", spte, *spte);
-> >  		rmap_head->val = (unsigned long)spte;
-> >  	} else if (!(rmap_head->val & 1)) {
-> > -		rmap_printk("pte_list_add: %p %llx 1->many\n", spte, *spte);
-> > +		pr_debug("%p %llx 1->many\n", spte, *spte);
-> >  		desc = mmu_alloc_pte_list_desc(vcpu);
-> 
-> This would be extremely slow.  These messages are even too verbose for 
-> tracepoints.
+The pull request you sent on Wed, 27 Jan 2021 05:22:46 -0500:
 
-There's no real object change.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-It's not enabled unless DEBUG is defined (and it's not enabled by default)
-or CONFIG_DYNAMIC_DEBUG is enabled and then dynamic_debug jump points are
-used when not enabled so I think any slowdown, even when dynamic_debug is
-enabled is trivial. 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4992eb41ab1b5d08479193afdc94f9678e5ded13
 
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
