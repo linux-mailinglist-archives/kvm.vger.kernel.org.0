@@ -2,96 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F07553065E0
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 22:22:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EACEF3066DD
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 22:58:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbhA0VVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 16:21:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48480 "EHLO
+        id S234982AbhA0VzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 16:55:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbhA0VVb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 16:21:31 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5DC4C061574
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 13:20:51 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id d81so3407255iof.3
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 13:20:51 -0800 (PST)
+        with ESMTP id S231511AbhA0VzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 16:55:20 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B940EC061574
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 13:54:39 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id e9so1872475plh.3
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 13:54:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wQExotaT8kbEKgow6n+XjSX7Qtx44wh+aWeRBfCx438=;
-        b=etyD3xNqgzOyLU1iYt1n6lFGISMJGZ3g7VnbQ8ldeg0n5LqaCSCcMjrwep9C8QBYRX
-         CPz/CDuT+zQYPo+dNQIjTkAT6gt1b0tDGAudMnn1W3FUdaa0vnIwX0Z7wJiHdx3DHNcH
-         hZ7ffnU+2sojKfwwHJAXjO9dKSqS/qdcCh0YXYjBTLmppyrypO7mR5cM0ZC+ZmwftbKJ
-         LvslqputCu5aWQWOtOdXtMdApyhflTR+y9tBryCBdABucJPZ8qqhG2z1Pinhh6+79/jW
-         ecdybUGfeR/5FX2ZTLxg01HCQxyyJH5XtY9/3tIWDRX29HOS4qKJFEd/NehNykcRR2jD
-         CRnw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QhoJaXcBLO+tF0usfswt07f3dqsQi5Fzviu82scMC4E=;
+        b=Rc37eSOr2aNYJTUX0COdY4fMePBOXDX6j5spA7p2EF6kxytSBvfl53Ev63GQsuD9jy
+         l3mo3Qtn9Ir8tAB6rHXWh3MXYO10/wVHmekmCjF5oarpaPqwoI/LkcSqZlpJEZZR929e
+         TZatZqjvzDmDQmcpatwCwmZ5dyA/jhL8vREJBKV3VE0v7jeoAtt2Ufz4d5vzyKxEU/pX
+         NKMQKXA25b6WVsk7oI4+UVt4ijkTSiLR7oo6U/3cvnE6TzYaCoePXLKcCjiJLe+8e5kz
+         kc0MLqp/f6ZgCPB+VdPZQA0gQRGJM+F08hKL77eYoqvhuQrn4MH3xR0oSBs2GWoIX+On
+         HVrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wQExotaT8kbEKgow6n+XjSX7Qtx44wh+aWeRBfCx438=;
-        b=RWnDPyE/t+/aKsNDk1wJz+myX9shePCqfPjVWOUZxAL9MZfRohina4defMYTgaQPVN
-         RpmllyNMa42zhZ8HHuAxWEF8xdzMWyuiVchPnxvgrZL4xOFM+VRpqw7hG8jmWVgzNztU
-         cqSompSNIVQSMzVhc0irooF1dd1FbqdcWSsUCf2qnK8wPQbXA5VhPdobv+9PYQx9R1C7
-         mlaYvWyasRIyRc0GMUYTQePzkq5It+9Yq/B/4yzVw0ta6SpC95UaQZBL4ofuJY5qJ39e
-         Z+eJ2wtKDIaj+I5INXQ7R7tWUvRxw0UvKQCreuwEevAQUajLr/wx0Kak3fmyViEfaFuu
-         Lwhw==
-X-Gm-Message-State: AOAM531RbDy0jR7g1ccg7ajpS6ZrHJRsgG3aappNjV5QP8zl37SthGfY
-        Pcbm4vvAWK0uCZcBrX2md6sYSu2Nt2sDbfFasdB4fA==
-X-Google-Smtp-Source: ABdhPJx8ShodjHeKW72tIIjARjJmmEZaqdHZL90OYpJ3Hwk5EVpiMJ7jycEksnhje3fnDAtBkBwRAMD5jW2uathQeW0=
-X-Received: by 2002:a02:ca17:: with SMTP id i23mr10394051jak.25.1611782451087;
- Wed, 27 Jan 2021 13:20:51 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QhoJaXcBLO+tF0usfswt07f3dqsQi5Fzviu82scMC4E=;
+        b=olnurTCj2Biz3LJ3rR0KQb6f6A77saRq/q+Pccwr2o2sUuh9XSHAkpTZHtp0/y8cON
+         Tx3vzN3nk0l/LM/uImE7kilrS0JAULPpsBp2YJN0GIIOrL7bW9T43Flgz6ZPdIqu6uFU
+         D/eApTXkqPXI9ZVWOz7mFDXu4XQ3zQTMcX8UCkDElE5Ay60R2buBg2VEJR4phLKwYiKx
+         N/wiPSnYH121RKoWIn9qjSX9NP6cT28HUNe3loXPGmu8tFbeEzZQEVLCe3+lzpo3yVOZ
+         HYGWtGkhucrh/NAR+dOf3rd6/asMWukdrNa+oAywSKcMrDiQstIyqn7cpOiKtKYFWWzX
+         TAGQ==
+X-Gm-Message-State: AOAM533X0bOdABkkl0xH04lkSegPhP++wDwSYVIb8dxv7rkxH3ZD6nS0
+        OaGqu+5dBcQ+uqJJ4xyA44Lw/A==
+X-Google-Smtp-Source: ABdhPJwLgzAVkx35Svk8ZRpuTj/a+g+Xoe2lGgzYVsUXm+iPuGDqiM9lglEoZGceFzE9yUs285TPzA==
+X-Received: by 2002:a17:90a:a483:: with SMTP id z3mr8085808pjp.140.1611784479079;
+        Wed, 27 Jan 2021 13:54:39 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id q12sm3431952pgj.24.2021.01.27.13.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Jan 2021 13:54:38 -0800 (PST)
+Date:   Wed, 27 Jan 2021 13:54:31 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2] Fix unsynchronized access to sev members through
+ svm_register_enc_region
+Message-ID: <YBHhF8ktuMfivQEP@google.com>
+References: <20210127161524.2832400-1-pgonda@google.com>
 MIME-Version: 1.0
-References: <20210112181041.356734-1-bgardon@google.com> <20210112181041.356734-16-bgardon@google.com>
- <YAjIddUuw/SZ+7ut@google.com> <460d38b9-d920-9339-1293-5900d242db37@redhat.com>
- <CANgfPd_WvXP=mOnxFR8BY=WnbR5Gn8RpK7aR_mOrdDiCh4VEeQ@mail.gmail.com>
- <fae0e326-cfd4-bf5d-97b5-ae632fb2de34@redhat.com> <CANgfPd_TOpc_cinPwAyH-0WajRM1nZvn9q6s70jno5LFf2vsdQ@mail.gmail.com>
- <f1ef3118-2a8e-4bf2-b3b0-60ac4947e106@redhat.com> <CANgfPd9FaPhQiEkJ=VHKiVWZ_5S3k2uWHU+ViCi4nEF=GU4qsw@mail.gmail.com>
- <4c0d4c30-a95b-7954-d344-fb991270f79a@redhat.com>
-In-Reply-To: <4c0d4c30-a95b-7954-d344-fb991270f79a@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 27 Jan 2021 13:20:39 -0800
-Message-ID: <CANgfPd9torZ_ta7eoB6OwZa3M-LCqU+8802wfWiWDFLio2-Ysg@mail.gmail.com>
-Subject: Re: [PATCH 15/24] kvm: mmu: Wrap mmu_lock cond_resched and needbreak
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210127161524.2832400-1-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 12:55 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 27/01/21 21:08, Ben Gardon wrote:
-> > I'm not entirely sure I understand this suggestion. Are you suggesting
-> > we'd have the spinlock and rwlock in a union in struct kvm but then
-> > use a static define to choose which one is used by other functions? It
-> > seems like if we're using static defines the union doesn't add value.
->
-> Of course you're right.  You'd just place the #ifdef in the struct kvm
-> definition.
+On Wed, Jan 27, 2021, Peter Gonda wrote:
+> Grab kvm->lock before pinning memory when registering an encrypted
+> region; sev_pin_memory() relies on kvm->lock being held to ensure
+> correctness when checking and updating the number of pinned pages.
+> 
+> Add a lockdep assertion to help prevent future regressions.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Fixes: 1e80fdc09d12 ("KVM: SVM: Pin guest memory when SEV is active")
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> 
+> V2
+>  - Fix up patch description
+>  - Correct file paths svm.c -> sev.c
+>  - Add unlock of kvm->lock on sev_pin_memory error
+> 
+> V1
+>  - https://lore.kernel.org/kvm/20210126185431.1824530-1-pgonda@google.com/
 
-Ah okay, thanks for clarifying.
+Put version info, and anything else that shouldn't be in the final commit, below
+the three dashes.  AFAIK that requires manually editing the patch file before
+sending it.
 
->
-> You can place static inline functions for lock/unlock in
-> virt/kvm/mmu_lock.h, in order to avoid a proliferation of #ifdefs.
+> 
+> ---
 
-Would you prefer to make that change in this series or at a later
-date? I'm assuming this would replace all the wrapper functions and
-mean that x86 is rwlock only.
+Version info goes here.
 
->
-> Paolo
->
+>  arch/x86/kvm/svm/sev.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index c8ffdbc81709..b80e9bf0a31b 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -342,6 +342,8 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  	unsigned long first, last;
+>  	int ret;
+>  
+> +	lockdep_assert_held(&kvm->lock);
+> +
+>  	if (ulen == 0 || uaddr + ulen < uaddr)
+>  		return ERR_PTR(-EINVAL);
+>  
+> @@ -1119,12 +1121,20 @@ int svm_register_enc_region(struct kvm *kvm,
+>  	if (!region)
+>  		return -ENOMEM;
+>  
+> +	mutex_lock(&kvm->lock);
+>  	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
+>  	if (IS_ERR(region->pages)) {
+>  		ret = PTR_ERR(region->pages);
+> +		mutex_unlock(&kvm->lock);
+>  		goto e_free;
+>  	}
+>  
+> +	region->uaddr = range->addr;
+> +	region->size = range->size;
+> +
+> +	list_add_tail(&region->list, &sev->regions_list);
+> +	mutex_unlock(&kvm->lock);
+> +
+>  	/*
+>  	 * The guest may change the memory encryption attribute from C=0 -> C=1
+>  	 * or vice versa for this memory range. Lets make sure caches are
+> @@ -1133,13 +1143,6 @@ int svm_register_enc_region(struct kvm *kvm,
+>  	 */
+>  	sev_clflush_pages(region->pages, region->npages);
+
+I don't think it actually matters, but it feels like the flush should be done
+before adding the region to the list.  That would also make this sequence
+consistent with the other flows.
+
+Tom, any thoughts?
+
+>  
+> -	region->uaddr = range->addr;
+> -	region->size = range->size;
+> -
+> -	mutex_lock(&kvm->lock);
+> -	list_add_tail(&region->list, &sev->regions_list);
+> -	mutex_unlock(&kvm->lock);
+> -
+>  	return ret;
+>  
+>  e_free:
+> -- 
+> 2.30.0.280.ga3ce27912f-goog
+> 
