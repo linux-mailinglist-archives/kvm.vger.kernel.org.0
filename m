@@ -2,152 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73D4E30625E
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 614BC306261
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:44:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343847AbhA0RnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:43:20 -0500
-Received: from foss.arm.com ([217.140.110.172]:57738 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236392AbhA0RnG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 12:43:06 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBBE11FB;
-        Wed, 27 Jan 2021 09:42:19 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA2D63F66E;
-        Wed, 27 Jan 2021 09:42:18 -0800 (PST)
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-References: <20210125122638.2947058-1-maz@kernel.org>
- <20210125122638.2947058-7-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <680c2e4f-cc9f-10c1-1158-7de32057fb0d@arm.com>
-Date:   Wed, 27 Jan 2021 17:41:59 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S1344046AbhA0Rny (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:43:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58214 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344091AbhA0Rn2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 12:43:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CF6C06174A;
+        Wed, 27 Jan 2021 09:42:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=xd+uIcB9boMDv2AI+keRyfyXEtS7DSKuNnB+UiVIp6E=; b=wYIx+FrtwtEd9dbfWzT3RY+FCV
+        x6CfTpNoKT+FirsTDPbw8V6iuNR9G+bUTYrJ1cIO4EaB84E+wu+/1SzSeGtuVBb+8qxPx+HjjUMT/
+        Bqbt79SQrlIulDCBLow9jY1kzc5LyVgv44chulcZVPnSM9xDSTnVgiaLfx9WgUcNalAlPnoVsUp7d
+        dGR4pcZEqv9MDSt9mAGcL5ipW91I/1W+8kJG/T5VwRmxGdC/vua+gtPw0dXpDNyZw9zM3WT8wyjGJ
+        /ghuacrfs9tqhEAapZAXuxLrqcazqXG8Nidek+P+mvcAReVOXBdb0wjo0KhQMc/IyMplCVgnDi3xE
+        vcVhk/wQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1l4opj-007Iqm-36; Wed, 27 Jan 2021 17:42:27 +0000
+Date:   Wed, 27 Jan 2021 17:42:23 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Shenming Lu <lushenming@huawei.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>, wanghaibin.wang@huawei.com,
+        yuzenghui@huawei.com
+Subject: Re: [RFC PATCH v1 2/4] vfio: Add a page fault handler
+Message-ID: <20210127174223.GB1738577@infradead.org>
+References: <20210125090402.1429-1-lushenming@huawei.com>
+ <20210125090402.1429-3-lushenming@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210125090402.1429-3-lushenming@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, Jan 25, 2021 at 05:04:00PM +0800, Shenming Lu wrote:
+> +EXPORT_SYMBOL_GPL(vfio_iommu_dev_fault_handler);
 
-Had another look at the patch, comments below.
-
-On 1/25/21 12:26 PM, Marc Zyngier wrote:
-> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
-> pretty easy. All that is required is support for PMMIR_EL1, which
-> is read-only, and for which returning 0 is a valid option as long
-> as we don't advertise STALL_SLOT as an implemented event.
->
-> Let's just do that and adjust what we return to the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/sysreg.h |  3 +++
->  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
->  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
->  3 files changed, 16 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 8b5e7e5c3cc8..2fb3f386588c 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -846,7 +846,10 @@
->  
->  #define ID_DFR0_PERFMON_SHIFT		24
->  
-> +#define ID_DFR0_PERFMON_8_0		0x3
->  #define ID_DFR0_PERFMON_8_1		0x4
-> +#define ID_DFR0_PERFMON_8_4		0x5
-> +#define ID_DFR0_PERFMON_8_5		0x6
->  
->  #define ID_ISAR4_SWP_FRAC_SHIFT		28
->  #define ID_ISAR4_PSR_M_SHIFT		24
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 398f6df1bbe4..72cd704a8368 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  		base = 0;
->  	} else {
->  		val = read_sysreg(pmceid1_el0);
-> +		/*
-> +		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
-> +		 * as RAZ
-> +		 */
-> +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
-> +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
-
-This is confusing the me. We have kvm->arch.pmuver set to the hardware PMU version
-(as set by __armv8pmu_probe_pmu()), but we ignore it when reporting the PMU
-version to the guest. Why do we do that? We limit the event number in
-kvm_pmu_event_mask() based on the hardware PMU version, so even if we advertise
-Armv8.4 PMU, support for all those extra events added by Arm8.1 PMU is missing (I
-hope I understood the code correctly).
-
-I looked at commit c854188ea010 ("KVM: arm64: limit PMU version to PMUv3 for
-ARMv8.1") which changed read_id_reg() to report PMUv3 for Armv8.1 unconditionally,
-and there's no explanation why PMUv3 for Armv8.1 was chosen instead of plain PMUv3
-(PMUVer = 0b0100).
-
-Thanks,
-
-Alex
-
->  		base = 32;
->  	}
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 8f79ec1fffa7..5da536ab738d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		/* Limit debug to ARMv8.0 */
->  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
->  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
-> -		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		/* Limit guests to PMUv3 for ARMv8.4 */
->  		val = cpuid_feature_cap_perfmon_field(val,
->  						      ID_AA64DFR0_PMUVER_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
-> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
->  		break;
->  	case SYS_ID_DFR0_EL1:
-> -		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		/* Limit guests to PMUv3 for ARMv8.4 */
->  		val = cpuid_feature_cap_perfmon_field(val,
->  						      ID_DFR0_PERFMON_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
-> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
->  		break;
->  	}
->  
-> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
->  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
->  
->  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
->  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-> @@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
->  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
->  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
-> +	/* PMMIR */
-> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
->  
->  	/* PRRR/MAIR0 */
->  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+This function is only used in vfio.c itself, so it should not be
+exported, but rather marked static.
