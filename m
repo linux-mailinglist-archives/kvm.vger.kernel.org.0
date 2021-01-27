@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A370A305663
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:03:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2995A30566C
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:06:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234803AbhA0JCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 04:02:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58448 "EHLO
+        id S231470AbhA0JEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 04:04:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234293AbhA0JAc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 04:00:32 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50B2C061756
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 00:59:51 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id a14so1468412edu.7
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 00:59:51 -0800 (PST)
+        with ESMTP id S234692AbhA0JBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 04:01:50 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D0D3C06178A
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:01:04 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id l9so1574844ejx.3
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:01:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=Rw8yUZegb4yxEqGgwbp3Nqb3zTKD2qO65+bJx8qvjDQ=;
-        b=rxoSgpUALgCJbFIFKiPhxXAPyX8odUJ6YF7W7K1OO80Lqa2/eyBBguWA1Cmx2+9qIi
-         eDM4GyvWFQh8BJv9awijipeIMNCIzJoavvmrAu1KgXpoN0nZMbhTYPuQfSK6Yn0OJ5HD
-         YX9GTbpMFtzEZx+vVNCedpruNziRt2sNYtmU2nolnVylIuF15e5FX0mg1LHYVAJCUY1A
-         ZQD0ydpwb8flTReZClu2d5oNuj8bQrC6yJSUYgycf6iDIfSuVOqmqWNFauWpcV+qjbuu
-         xaHa6DmRFnrnrommb8x9U7p/NRCX6JnzK+IQFIYqJxmC8mLicgfXrj23FFCT0OmewJjk
-         VxxA==
+        bh=CvhPrcroD4ScESfvgvRctMUe8FBLv514keyLyHRZDbY=;
+        b=jdd6IZ5rNNH7ay5CWnkO4rDIvKDpbbSemE10InrR25X1zlvICut5ZM0P9AbImglQiu
+         xuwnsi4fd/5NATT4++iicCnxpDnXAYMZ3n4hortkfkhH8uaDRveeYhTgh0Dxh6ZXYyKp
+         fpki+IDTkloZipAXjHXNiStWUny+GS/Jyy53A1+9mZtGouG4E/C5kTsbj126oyg4uK+7
+         9E47fzC+HywTrBk0RdBZU7zBS449AZPU546g1r7tqu8UDekk3hv9ZHnHREtHYjMSasGs
+         GRs4IMz/ofdHv4Hy2BsDA1HDyTuQdpbMwqLi0aPiLazFjKvvEk7yH01Tx+WUcQJJ2nzS
+         Pwiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Rw8yUZegb4yxEqGgwbp3Nqb3zTKD2qO65+bJx8qvjDQ=;
-        b=UF5iDsPo7VnQK/uaL++4pbzdGLc6fxqE9/UUTns6gvrYDQI3bE7M9byBSn45CXWB/T
-         lCKLA+fphSrpLFHT5WXhWHMZo+mgPS7yoGScBnn5w4+46m0IFlpEL0P7+Juns2Gk1hcN
-         L5Yz5RJqwKwPurCBVju/S6B06yjAsbOTe6gYSgu49KeRhtxdPbTGWh0smzYWH5sfsOeK
-         AB675K2quOFTtIzddDtMmwkkkvwE63WpZIsdhscLGB9DA0pB9MkRYSfSe0+dvu5M8xbu
-         Co57peIVQYgNuy+elkkFvINntUmdsy+zPf6himuvnjs4cudl3ragB6hsw6e1U8zlLbsJ
-         6i8w==
-X-Gm-Message-State: AOAM530NaqdVab24ZhVe+J9pPsQsREptftfeazt3VHjagzY+zs1wvG0S
-        giYeDs+8hAXSrgLzNGVn6+bUrR4O6F+bMYhsvjTA
-X-Google-Smtp-Source: ABdhPJx51mihWsWUedzTQ87/wxlPosUbhcgbkadydrgOhjI8COenRfD2+yCv8E4CENKpyt9SeWNbKozPfxnYbMhHWss=
-X-Received: by 2002:a05:6402:228a:: with SMTP id cw10mr7789120edb.195.1611737990371;
- Wed, 27 Jan 2021 00:59:50 -0800 (PST)
+        bh=CvhPrcroD4ScESfvgvRctMUe8FBLv514keyLyHRZDbY=;
+        b=UwaJo4RYa78wZVWqzS7Q6J6Fl3fjytGug/xig4pHIX2CTbyB2DsLopHrz+FBWQXWSk
+         DDYjumMysZeMr/AvxIvzdc+M8ahjXvZTXo7rIWZ/DHIL5EwpYD/LSXHEGiX/Vyxt+xx8
+         JVQDqE3zqvxCu8VoP0qDWZG2VQ8tzEZylomYtAgqDqPAtINatZh+vx9Gsg1RbLkqchke
+         UpFhEpUI3SaF0QNU/vs/0kO7h+I8lOXNdZM37nWvrciQmxiRsXBi23Xy9xNE3LdlDzva
+         1OVFOAm9USbqj2I2NWYYDB7khJKzvt1zY+gEMYxjCAzjsyXgfiFDbTakER1bwsP0YTDR
+         IF0w==
+X-Gm-Message-State: AOAM532oQoX30g6i4pM3XyeXKtP7yrmnKPiv+lcYyQYaZl3IBBWP9jrk
+        qfzl03shBRgaFAnI8YkpOUBNuoHZQqIE5NZDPXte
+X-Google-Smtp-Source: ABdhPJxtxlsv/zG/t8Q8ZtEe1vLrLr5egbs6sFwRGutMTUs8mWfam54iv13Bg8Ina5lqMbBMMCqZUnnSbBmDjY8Tn1E=
+X-Received: by 2002:a17:906:128e:: with SMTP id k14mr5892133ejb.427.1611738063009;
+ Wed, 27 Jan 2021 01:01:03 -0800 (PST)
 MIME-Version: 1.0
 References: <20210119045920.447-1-xieyongji@bytedance.com> <20210119050756.600-1-xieyongji@bytedance.com>
- <20210119050756.600-2-xieyongji@bytedance.com> <1f419a24-cd53-bd73-5b8a-8ab5d976a490@redhat.com>
-In-Reply-To: <1f419a24-cd53-bd73-5b8a-8ab5d976a490@redhat.com>
+ <20210119050756.600-5-xieyongji@bytedance.com> <9cacd59d-1063-7a1f-9831-8728eb1d1c15@redhat.com>
+In-Reply-To: <9cacd59d-1063-7a1f-9831-8728eb1d1c15@redhat.com>
 From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 27 Jan 2021 16:59:39 +0800
-Message-ID: <CACycT3uOpYd37F7ZAE0cQxbKvpbsWszmDY_jh4RFKyeJFKQdsg@mail.gmail.com>
-Subject: Re: Re: [RFC v3 08/11] vduse: Introduce VDUSE - vDPA Device in Userspace
+Date:   Wed, 27 Jan 2021 17:00:52 +0800
+Message-ID: <CACycT3vrN0qZp=KzFuzsbDvPvMeXYPYiHBF0ZWBf3m=e2BCvfw@mail.gmail.com>
+Subject: Re: Re: [RFC v3 11/11] vduse: Introduce a workqueue for irq injection
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>, sgarzare@redhat.com,
@@ -68,63 +68,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 4:19 PM Jason Wang <jasowang@redhat.com> wrote:
+On Tue, Jan 26, 2021 at 4:17 PM Jason Wang <jasowang@redhat.com> wrote:
 >
 >
 > On 2021/1/19 =E4=B8=8B=E5=8D=881:07, Xie Yongji wrote:
-> > This VDUSE driver enables implementing vDPA devices in userspace.
-> > Both control path and data path of vDPA devices will be able to
-> > be handled in userspace.
+> > This patch introduces a dedicated workqueue for irq injection
+> > so that we are able to do some performance tuning for it.
 > >
-> > In the control path, the VDUSE driver will make use of message
-> > mechnism to forward the config operation from vdpa bus driver
-> > to userspace. Userspace can use read()/write() to receive/reply
-> > those control messages.
-> >
-> > In the data path, VDUSE_IOTLB_GET_FD ioctl will be used to get
-> > the file descriptors referring to vDPA device's iova regions. Then
-> > userspace can use mmap() to access those iova regions. Besides,
-> > the eventfd mechanism is used to trigger interrupt callbacks and
-> > receive virtqueue kicks in userspace.
-> >
-> > Signed-off-by: Xie Yongji<xieyongji@bytedance.com>
-> > ---
-> >   Documentation/driver-api/vduse.rst                 |   85 ++
-> >   Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
-> >   drivers/vdpa/Kconfig                               |    7 +
-> >   drivers/vdpa/Makefile                              |    1 +
-> >   drivers/vdpa/vdpa_user/Makefile                    |    5 +
-> >   drivers/vdpa/vdpa_user/eventfd.c                   |  221 ++++
-> >   drivers/vdpa/vdpa_user/eventfd.h                   |   48 +
-> >   drivers/vdpa/vdpa_user/iova_domain.c               |  426 +++++++
-> >   drivers/vdpa/vdpa_user/iova_domain.h               |   68 ++
-> >   drivers/vdpa/vdpa_user/vduse.h                     |   62 +
-> >   drivers/vdpa/vdpa_user/vduse_dev.c                 | 1217 +++++++++++=
-+++++++++
-> >   include/uapi/linux/vdpa.h                          |    1 +
-> >   include/uapi/linux/vduse.h                         |  125 ++
-> >   13 files changed, 2267 insertions(+)
-> >   create mode 100644 Documentation/driver-api/vduse.rst
-> >   create mode 100644 drivers/vdpa/vdpa_user/Makefile
-> >   create mode 100644 drivers/vdpa/vdpa_user/eventfd.c
-> >   create mode 100644 drivers/vdpa/vdpa_user/eventfd.h
-> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
-> >   create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
-> >   create mode 100644 drivers/vdpa/vdpa_user/vduse.h
-> >   create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
-> >   create mode 100644 include/uapi/linux/vduse.h
+> > Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
 >
 >
-> Btw, if you could split this into three parts:
+> If we want the split like this.
 >
-> 1) iova domain
-> 2) vduse device
-> 3) doc
+> It might be better to:
 >
-> It would be more easier for the reviewers.
+> 1) implement a simple irq injection on the ioctl context in patch 8
+> 2) add the dedicated workqueue injection in this patch
+>
+> Since my understanding is that
+>
+> 1) the function looks more isolated for readers
+> 2) the difference between sysctl vs workqueue should be more obvious
+> than system wq vs dedicated wq
+> 3) a chance to describe why workqueue is needed in the commit log in
+> this patch
 >
 
-Make sense to me. Will do it in v4.
+OK, I will try to do it in v4.
 
 Thanks,
 Yongji
