@@ -2,132 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DC99305182
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 05:56:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2950D3051A2
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 06:02:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238639AbhA0E1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Jan 2021 23:27:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49102 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236479AbhA0Dev (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Jan 2021 22:34:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611718401;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mP/fMR1bI+k0zNRDvvWBuMv6uUuCjAv3+TKblysN3yY=;
-        b=Q4Csjt4IPtQlbXnMgTftqAe1d2qybQ/7zm3HP6TIHa/8Wg8aXnAjOU+d+UiTYOkfBcmK/Q
-        OZ0gabLhuOZkPvJZ6f+o7gcOjPQaTb+P94uHRZ3AKzfImRGxgLMQtbMMhu7ZfcisQrcx1S
-        u/QPoqqhUeV2EzH0+4p/hoz1VUWLshk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-481-h0jZK0l6NYKMj4AJ1_KZWg-1; Tue, 26 Jan 2021 22:33:19 -0500
-X-MC-Unique: h0jZK0l6NYKMj4AJ1_KZWg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36E2E10054FF;
-        Wed, 27 Jan 2021 03:33:17 +0000 (UTC)
-Received: from [10.72.13.33] (ovpn-13-33.pek2.redhat.com [10.72.13.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9F0C26F92A;
-        Wed, 27 Jan 2021 03:33:04 +0000 (UTC)
-Subject: Re: [RFC v3 03/11] vdpa: Remove the restriction that only supports
- virtio-net devices
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>
-Cc:     mst@redhat.com, stefanha@redhat.com, parav@nvidia.com,
-        bob.liu@oracle.com, hch@infradead.org, rdunlap@infradead.org,
-        willy@infradead.org, viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        bcrl@kvack.org, corbet@lwn.net,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119045920.447-4-xieyongji@bytedance.com>
- <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
- <20210120110832.oijcmywq7pf7psg3@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <1979cffc-240e-a9f9-b0ab-84a1f82ac81e@redhat.com>
-Date:   Wed, 27 Jan 2021 11:33:03 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S238468AbhA0EX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Jan 2021 23:23:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389663AbhA0AGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Jan 2021 19:06:51 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5DA7C0617A7
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 16:04:41 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id u15so48082plf.1
+        for <kvm@vger.kernel.org>; Tue, 26 Jan 2021 16:04:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ehN8g8luuF2BKLiZYDz35HTGbUgrzlwEK0VyDMRc1bE=;
+        b=u+tGmLtats3b8HsEfxKVQgMK0GXcYfxMRPArDpxJoYSxVOHzNMkczWTT9UKc+iuL5c
+         1i80Ybhtd+JjjT+hrlRpf+r1Oti1xkqj1SSUkApAb7iuqNc0hAkpN+PYw76+kF30zXuT
+         xKNeJ0v6+/QBYk7eVYWEZTsCW8IasRNlBF9OpHVGxlio9+VdQohz9RpJPqPxKapSecTH
+         XpaQaL94Nfi9thSv44/gpO6nt2eB1Ocr0Vtnc3sPmSduLvYB3U07MvoJrdF3T7Y1+n08
+         NfLW9PKtYmJe5bubHPO75UGFwYTmQBwPme6NriQsLx5/PJNyd+X6U36wepGK/wdj+iNS
+         wuJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ehN8g8luuF2BKLiZYDz35HTGbUgrzlwEK0VyDMRc1bE=;
+        b=A1A9PWwbwJrdGWnL3NU+cJowXiGe+TKAZ7z3ORSlOb2ZJMvwd/lZ9LMe3hLDpC9hqL
+         PKjo+uedq8J9RrLgRHwb/q3pQ2rs/0y1mmb9vyrJULZ2Vc6fkUU6ISoGX0GwaEfMm3mw
+         GX74AoTeBMS0a5EW7X0IcN6VkfPthVE+So0dJBRnpw/aTyD2MsMXYmZA/XyU1S8iMJmn
+         n391RiH2lA8OYrVKSJnmHCvrNxy0pvRGL/tV1DUI+12I/IeUgZJHjas3xA7L46qZefkC
+         fSTrOljN2MjoWmC/0tBGOTL1sS0u4t3eP9c6ql5SVmna43TelXHeV+YtJjMOjdawy+K/
+         DajA==
+X-Gm-Message-State: AOAM5333a+pnv3F+xOWHNjfrYmNX9/EsjiGg6gSUPCER0hEEJs7JjIAW
+        o5TYOO/YeEdoOIvzRA0b3VFYkw==
+X-Google-Smtp-Source: ABdhPJzzbvfi/5tp5Y0OvbgmuXAJ+a6Aqpa1MNl1ySc5Qa2syXhxmjS34UST5dEuL1LWwufhbGgubw==
+X-Received: by 2002:a17:90b:4a09:: with SMTP id kk9mr2478013pjb.15.1611705881203;
+        Tue, 26 Jan 2021 16:04:41 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id y4sm75088pji.34.2021.01.26.16.04.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 16:04:40 -0800 (PST)
+Date:   Tue, 26 Jan 2021 16:04:33 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH] KVM: x86/mmu: consider the hva in mmu_notifer retry
+Message-ID: <YBCuEaxZu0MuD3MW@google.com>
+References: <20210125064234.2078146-1-stevensd@google.com>
+ <YA8PXCEVukW0UzC5@google.com>
+ <CAD=HUj5YMtSJY6ZO9TRXHDEfWRM1o3Lrm7nkz=G2VJ_oZ-c5mw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210120110832.oijcmywq7pf7psg3@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=HUj5YMtSJY6ZO9TRXHDEfWRM1o3Lrm7nkz=G2VJ_oZ-c5mw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jan 26, 2021, David Stevens wrote:
+> > This needs a comment to explicitly state that 'count > 1' cannot be done at
+> > this time.  My initial thought is that it would be more intuitive to check for
+> > 'count > 1' here, but that would potentially check the wrong wrange when count
+> > goes from 2->1.  The comment about persistence in invalidate_range_start() is a
+> > good hint, but I think it's worth being explicit to avoid bad "cleanup" in the
+> > future.
+> >
+> > > +     if (unlikely(kvm->mmu_notifier_count)) {
+> > > +             if (kvm->mmu_notifier_range_start <= hva &&
+> > > +                 hva < kvm->mmu_notifier_range_end)
+> 
+> I'm not sure I understand what you're suggesting here. How exactly
+> would 'count > 1' be used incorrectly here? I'm fine with adding a
+> comment, but I'm not sure what the comment needs to clarify.
 
-On 2021/1/20 下午7:08, Stefano Garzarella wrote:
-> On Wed, Jan 20, 2021 at 11:46:38AM +0800, Jason Wang wrote:
->>
->> On 2021/1/19 下午12:59, Xie Yongji wrote:
->>> With VDUSE, we should be able to support all kinds of virtio devices.
->>>
->>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->>> ---
->>>  drivers/vhost/vdpa.c | 29 +++--------------------------
->>>  1 file changed, 3 insertions(+), 26 deletions(-)
->>>
->>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>> index 29ed4173f04e..448be7875b6d 100644
->>> --- a/drivers/vhost/vdpa.c
->>> +++ b/drivers/vhost/vdpa.c
->>> @@ -22,6 +22,7 @@
->>>  #include <linux/nospec.h>
->>>  #include <linux/vhost.h>
->>>  #include <linux/virtio_net.h>
->>> +#include <linux/virtio_blk.h>
->>>  #include "vhost.h"
->>> @@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct 
->>> vhost_vdpa *v, u8 __user *statusp)
->>>      return 0;
->>>  }
->>> -static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
->>> -                      struct vhost_vdpa_config *c)
->>> -{
->>> -    long size = 0;
->>> -
->>> -    switch (v->virtio_id) {
->>> -    case VIRTIO_ID_NET:
->>> -        size = sizeof(struct virtio_net_config);
->>> -        break;
->>> -    }
->>> -
->>> -    if (c->len == 0)
->>> -        return -EINVAL;
->>> -
->>> -    if (c->len > size - c->off)
->>> -        return -E2BIG;
->>> -
->>> -    return 0;
->>> -}
->>
->>
->> I think we should use a separate patch for this.
->
-> For the vdpa-blk simulator I had the same issues and I'm adding a 
-> .get_config_size() callback to vdpa devices.
->
-> Do you think make sense or is better to remove this check in 
-> vhost/vdpa, delegating the boundaries checks to get_config/set_config 
-> callbacks.
+There's no guarantee that the remaining in-progress invalidation when the count
+goes from 2->1 is the same invalidation call that set range_start/range_end.
 
+E.g. given two invalidations, A and B, the order of calls could be:
 
-A question here. How much value could we gain from get_config_size() 
-consider we can let vDPA parent to validate the length in its get_config().
+  kvm_mmu_notifier_invalidate_range_start(A)
+  kvm_mmu_notifier_invalidate_range_start(B)
+  kvm_mmu_notifier_invalidate_range_end(A)
+  kvm_mmu_notifier_invalidate_range_end(B) <-- ???
 
-Thanks
+or
 
+  kvm_mmu_notifier_invalidate_range_start(A)
+  kvm_mmu_notifier_invalidate_range_start(B)
+  kvm_mmu_notifier_invalidate_range_end(B)
+  kvm_mmu_notifier_invalidate_range_end(A) <-- ???
 
->
-> Thanks,
-> Stefano
->
-
+In the first case, "A" is in-progress when the count goes 2->1, in the second
+case "B" is still in-progress.  Checking for "count > 1" in the consumer instead
+of handling it in the producer (as you did) would lead to the consumer checking
+against the wrong range.  I don't see a way to solve that without adding some
+amount of history, which I agree is unnecessary.
