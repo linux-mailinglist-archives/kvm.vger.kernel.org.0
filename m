@@ -2,94 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86F5030557C
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:19:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF4F63055CC
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 09:30:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232403AbhA0ITC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 03:19:02 -0500
-Received: from mga12.intel.com ([192.55.52.136]:28009 "EHLO mga12.intel.com"
+        id S232218AbhA0I3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 03:29:43 -0500
+Received: from mleia.com ([178.79.152.223]:33394 "EHLO mail.mleia.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233433AbhA0IB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 03:01:57 -0500
-IronPort-SDR: GKchp/Z0CdiRUue+jAS9glrbTB4H3HqgPrcjMi9omGCIpNrJdd+PtZ6hgSktnKGW8OpYjRByry
- d1gBeUA4ZDTA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="159205375"
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="159205375"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 23:56:02 -0800
-IronPort-SDR: YzrXAU9p2ySptudqCtzH9ZZeMVaeIugJCS4jLIXJFSFvXghfopsQbswjup9H1WFQYr0E+nEfIO
- IOQX1uyqXPdg==
-X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
-   d="scan'208";a="388211654"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.1.32]) ([10.238.1.32])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 23:56:00 -0800
-Subject: Re: [RFC 2/7] KVM: VMX: Expose IA32_PKRS MSR
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20200807084841.7112-1-chenyi.qiang@intel.com>
- <20200807084841.7112-3-chenyi.qiang@intel.com>
- <62f5f5ba-cbe9-231d-365a-80a656208e37@redhat.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-Message-ID: <24789af6-e85f-6485-50a0-98c0c4195112@intel.com>
-Date:   Wed, 27 Jan 2021 15:55:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S232643AbhA0IZI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 03:25:08 -0500
+Received: from mail.mleia.com (localhost [127.0.0.1])
+        by mail.mleia.com (Postfix) with ESMTP id 9227042EB56;
+        Wed, 27 Jan 2021 08:12:58 +0000 (UTC)
+Subject: Re: [PATCH v3 4/5] amba: Make the remove callback return void
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
+Cc:     Russell King <linux@armlinux.org.uk>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vinod Koul <vkoul@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        kernel@pengutronix.de, Mike Leach <mike.leach@linaro.org>,
+        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
+From:   Vladimir Zapolskiy <vz@mleia.com>
+Message-ID: <b9bfa80b-ed5f-50f9-de50-76090007556c@mleia.com>
+Date:   Wed, 27 Jan 2021 10:12:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <62f5f5ba-cbe9-231d-365a-80a656208e37@redhat.com>
+In-Reply-To: <20210126165835.687514-5-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-49551924 
+X-CRM114-CacheID: sfid-20210127_081258_639999_D23EB9E2 
+X-CRM114-Status: GOOD (  14.44  )
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/27/2021 2:01 AM, Paolo Bonzini wrote:
-> On 07/08/20 10:48, Chenyi Qiang wrote:
->> +{
->> +    struct vcpu_vmx *vmx = to_vmx(vcpu);
->> +    unsigned long *msr_bitmap = vmx->vmcs01.msr_bitmap;
->> +    bool pks_supported = guest_cpuid_has(vcpu, X86_FEATURE_PKS);
->> +
->> +    /*
->> +     * set intercept for PKRS when the guest doesn't support pks
->> +     */
->> +    vmx_set_intercept_for_msr(msr_bitmap, MSR_IA32_PKRS, MSR_TYPE_RW, 
->> !pks_supported);
->> +
->> +    if (pks_supported) {
->> +        vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +        vm_exit_controls_setbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +    } else {
->> +        vm_entry_controls_clearbit(vmx, VM_ENTRY_LOAD_IA32_PKRS);
->> +        vm_exit_controls_clearbit(vmx, VM_EXIT_LOAD_IA32_PKRS);
->> +    }
+On 1/26/21 6:58 PM, Uwe Kleine-König wrote:
+> All amba drivers return 0 in their remove callback. Together with the
+> driver core ignoring the return value anyhow, it doesn't make sense to
+> return a value here.
 > 
-> Is the guest expected to do a lot of reads/writes to the MSR (e.g. at 
-> every context switch)?
+> Change the remove prototype to return void, which makes it explicit that
+> returning an error value doesn't work as expected. This simplifies changing
+> the core remove callback to return void, too.
 > 
+> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+> Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+> Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Krzysztof Kozlowski <krzk@kernel.org> # for drivers/memory
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Acked-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> Acked-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-In current design for PKS, the PMEM stray write protection is the only 
-implemented use case, and PKRS is only temporarily changed during 
-specific code paths. Thus reads/writes to MSR is not so frequent, I think.
+For drivers/memory/pl172.c:
 
-> Even if this is the case, the MSR intercepts and the entry/exit controls 
-> should only be done if CR4.PKS=1.  If the guest does not use PKS, KVM 
-> should behave as if these patches did not exist.
-> 
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
-
-I pass through the PKRS and enable the entry/exit controls when PKS is 
-supported, and just want to narrow down the window of MSR switch during 
-the VMX transition. But yeah, I should also consider the enabling status 
-of guest PKS according to CR4.PKS, will fix it in next version.
-
-> Paolo
-> 
+--
+Best wishes,
+Vladimir
