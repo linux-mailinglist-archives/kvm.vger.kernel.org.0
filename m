@@ -2,97 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E09CC30621F
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:34:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73D4E30625E
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 18:44:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343951AbhA0Ree (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 12:34:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45130 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235779AbhA0RcU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 12:32:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611768652;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XkzfQ7JLhuJiuzMMsy2O4iFme8poGbCus8N/6ZyaesA=;
-        b=WM3MrgNQLktt/2bGfQ+XmcqtFMcKb6KPr+N+1cVhy/ZxdjWpBmVlAMN7UXJ53fsJ1zipuM
-        kbXOpha5E2WURNWoMaEK52y8nQDOdYjrw1V56GRauNM7AVZV0GGnpnOHZKBLnI+S865VNM
-        niAukIcOq6+lG3O76lvYyyj/nmUWuFo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-0E75UQaNP7qv1yq4DWJwcA-1; Wed, 27 Jan 2021 12:30:50 -0500
-X-MC-Unique: 0E75UQaNP7qv1yq4DWJwcA-1
-Received: by mail-ej1-f71.google.com with SMTP id f26so978528ejy.9
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 09:30:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XkzfQ7JLhuJiuzMMsy2O4iFme8poGbCus8N/6ZyaesA=;
-        b=CnGzOkoKaK5P6FuMg95OinahvXQi6KdPXHN/vxEj0f5tUAeMPB/PM7edVN19VXa3CW
-         XkhCyhPqWjMWPKLDL+MKrwt5FyxShR+AAfbZSmCSHDECFJSjmMak5NobrsXrJT+0EooU
-         ZU4RgaawZuTL+1PRoSQpcWGTurtwov0oxelaiSeHImZp/6WmRygEhz98JkTgrAaZYdig
-         P5Qrks0knhHHiXBU3VcnymqsVM0Oy9MzuisUivKLqnRPgo+yZtRuzfmy3tnimDaeSy+n
-         u3zxLqYJGV4nOQcQds03TGAMuWkdqDhOBMGIy+k4pGe2KD/yGpK/pHbN5ugfo6n9pmR6
-         YsRg==
-X-Gm-Message-State: AOAM530cXa6k0EOFlzoIaVRvP5wo0LEkZrc8xrCJs8OlD7+6ynrsODTa
-        ao/5PJwD1vJhb9Pw1ZDEEbbhYVJ3Z2WkJq8tTCV09XNNUO7IH58DHXkkMUV1hMzWUJmodHJ98zS
-        6V5bm6S+4YfGH
-X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr7688491ejr.177.1611768649473;
-        Wed, 27 Jan 2021 09:30:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwMmG2yA1LAIObXA6TKj+pk8FnGymREzDd1DtQq6L/KnoQ2xvOyjL1grH7QVqQIMxLWVgnaPQ==
-X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr7688476ejr.177.1611768649261;
-        Wed, 27 Jan 2021 09:30:49 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f20sm1687594edd.47.2021.01.27.09.30.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 09:30:48 -0800 (PST)
-Subject: Re: [PATCH v3 01/11] KVM: x86: Get active PCID only when writing a
- CR3 value
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20201027212346.23409-1-sean.j.christopherson@intel.com>
- <20201027212346.23409-2-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e56d38bf-bc07-ebfb-5bec-60c60d664447@redhat.com>
-Date:   Wed, 27 Jan 2021 18:30:47 +0100
+        id S1343847AbhA0RnU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 12:43:20 -0500
+Received: from foss.arm.com ([217.140.110.172]:57738 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236392AbhA0RnG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 12:43:06 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EBBE11FB;
+        Wed, 27 Jan 2021 09:42:19 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA2D63F66E;
+        Wed, 27 Jan 2021 09:42:18 -0800 (PST)
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+To:     Marc Zyngier <maz@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+References: <20210125122638.2947058-1-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <680c2e4f-cc9f-10c1-1158-7de32057fb0d@arm.com>
+Date:   Wed, 27 Jan 2021 17:41:59 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20201027212346.23409-2-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/10/20 22:23, Sean Christopherson wrote:
-> 
-> +static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
->  			     int root_level)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	unsigned long cr3;
+Hi Marc,
+
+Had another look at the patch, comments below.
+
+On 1/25/21 12:26 PM, Marc Zyngier wrote:
+> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+> pretty easy. All that is required is support for PMMIR_EL1, which
+> is read-only, and for which returning 0 is a valid option as long
+> as we don't advertise STALL_SLOT as an implemented event.
+>
+> Let's just do that and adjust what we return to the guest.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  3 +++
+>  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
+>  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
+>  3 files changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 8b5e7e5c3cc8..2fb3f386588c 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -846,7 +846,10 @@
 >  
-> -	cr3 = __sme_set(root);
-> +	cr3 = __sme_set(root_hpa) | kvm_get_active_pcid(vcpu);
->  	if (npt_enabled) {
->  		svm->vmcb->control.nested_cr3 = cr3;
+>  #define ID_DFR0_PERFMON_SHIFT		24
+>  
+> +#define ID_DFR0_PERFMON_8_0		0x3
+>  #define ID_DFR0_PERFMON_8_1		0x4
+> +#define ID_DFR0_PERFMON_8_4		0x5
+> +#define ID_DFR0_PERFMON_8_5		0x6
+>  
+>  #define ID_ISAR4_SWP_FRAC_SHIFT		28
+>  #define ID_ISAR4_PSR_M_SHIFT		24
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 398f6df1bbe4..72cd704a8368 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  		base = 0;
+>  	} else {
+>  		val = read_sysreg(pmceid1_el0);
+> +		/*
+> +		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+> +		 * as RAZ
+> +		 */
+> +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
+> +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
 
-SVM uses the name "nested CR3" so this variable actually could represent 
-an NPT value that does not need the PCID.
+This is confusing the me. We have kvm->arch.pmuver set to the hardware PMU version
+(as set by __armv8pmu_probe_pmu()), but we ignore it when reporting the PMU
+version to the guest. Why do we do that? We limit the event number in
+kvm_pmu_event_mask() based on the hardware PMU version, so even if we advertise
+Armv8.4 PMU, support for all those extra events added by Arm8.1 PMU is missing (I
+hope I understood the code correctly).
 
-Therefore, this change must be done in an else branch, which I've done 
-on applying the patch.
+I looked at commit c854188ea010 ("KVM: arm64: limit PMU version to PMUv3 for
+ARMv8.1") which changed read_id_reg() to report PMUv3 for Armv8.1 unconditionally,
+and there's no explanation why PMUv3 for Armv8.1 was chosen instead of plain PMUv3
+(PMUVer = 0b0100).
 
-Paolo
+Thanks,
 
+Alex
+
+>  		base = 32;
+>  	}
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8f79ec1fffa7..5da536ab738d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  		/* Limit debug to ARMv8.0 */
+>  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
+>  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_AA64DFR0_PMUVER_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+>  		break;
+>  	case SYS_ID_DFR0_EL1:
+> -		/* Limit guests to PMUv3 for ARMv8.1 */
+> +		/* Limit guests to PMUv3 for ARMv8.4 */
+>  		val = cpuid_feature_cap_perfmon_field(val,
+>  						      ID_DFR0_PERFMON_SHIFT,
+> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
+> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+>  		break;
+>  	}
+>  
+> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+>  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
+> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
+>  
+>  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
+>  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
+> @@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
+>  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
+> +	/* PMMIR */
+> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
+>  
+>  	/* PRRR/MAIR0 */
+>  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
