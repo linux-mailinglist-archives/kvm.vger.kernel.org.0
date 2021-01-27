@@ -2,146 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B10BB305DF2
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 15:13:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8419305DFE
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 15:14:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233392AbhA0OLS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 09:11:18 -0500
-Received: from foss.arm.com ([217.140.110.172]:48270 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231191AbhA0OKL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 09:10:11 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A97DA1FB;
-        Wed, 27 Jan 2021 06:09:25 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 739653F68F;
-        Wed, 27 Jan 2021 06:09:24 -0800 (PST)
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
-To:     Marc Zyngier <maz@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
-References: <20210125122638.2947058-1-maz@kernel.org>
- <20210125122638.2947058-7-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <59700102-5340-b5ec-28e2-d95ee3e59c6b@arm.com>
-Date:   Wed, 27 Jan 2021 14:09:23 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S233642AbhA0OOV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 09:14:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40472 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233450AbhA0OLi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 09:11:38 -0500
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BBEC061573;
+        Wed, 27 Jan 2021 06:10:58 -0800 (PST)
+Received: by mail-qv1-xf2c.google.com with SMTP id n3so1062387qvf.11;
+        Wed, 27 Jan 2021 06:10:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qR1ztsc0XnYzxWr2oOHJz7bbHSJoFk9Vyu/8scCawyE=;
+        b=jJY9ENK+bqbfjVnSzWlZYt78e2AyQ93qnHJUAsPedn8NjOaifnpgzSqbPEFAAgDegm
+         aVwn49VJjAb+XAg8nPBuvsacqBPpwmWLPQfOzCfdZ9aquybZ6GfsPMJpYK736rTeGfle
+         EVSwSoDjQRYEB1CfMDDkQvZaF0iCMrL9aitm0aRi3JhYBbhSWVbLC+kXlkcubgpv8WrQ
+         3ZnOYzC599R5uzlNpyf73COKLQ1ER6apTI9LmMlS9m+boODRHewKIXTiOZtoc7Z7OESH
+         elr9ZJh3/xbXKiSoiZYURJzOR/zeq9jANT3nATxDJNm+8Q5EOCtS7lldhhmQT1uQuKW7
+         SsbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=qR1ztsc0XnYzxWr2oOHJz7bbHSJoFk9Vyu/8scCawyE=;
+        b=OhACjsBJaGU5Y2M1/AOkdZdszab51d+Z1TaH2vTU8GGcziQ14tuiH7b74nmKxdB/hh
+         rMd5tbpyzmDKcidkh89NmKq9rYErG2qFdYJz1RR6bTs4gUflXtdOekh+0CfZN/Qwa5wY
+         ksMyZtl+nDi1Nsg2NVs2xVGuF18nsAb7ejTC1yBsZ6X4n1UYJku8iZk13B0A6kf5N2cx
+         BHVAA7T99uK62RQKWYDaUeDDMbHdAUTyffGx4s2W1yz/7JuVf37e+icm9eYEpJNsxCgf
+         F7gLw/NHaYqH5SeBGkjLocbKmBUvH6CFMbHhX1Z/cL9PpYTO0uQKwOh0WAh+VXXX32iW
+         2dwg==
+X-Gm-Message-State: AOAM530DrUkWD9Ha8UmOySdA/r+Lzi23jrsE9w7HbDe//pO4fptsdwuF
+        oXyg5EQTCIniFNTNIT1PkcM=
+X-Google-Smtp-Source: ABdhPJx3gHolqCE6LTrL5K3np2KUdMEtHCKJ7u90oHH05uS7Mib+fXYu7McdvhYIQIIRqZM+8zYt/A==
+X-Received: by 2002:a0c:b59a:: with SMTP id g26mr10350664qve.26.1611756657277;
+        Wed, 27 Jan 2021 06:10:57 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id t27sm1342291qtb.20.2021.01.27.06.10.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Jan 2021 06:10:54 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 27 Jan 2021 09:10:53 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Grimm, Jon" <jon.grimm@amd.com>,
+        "Van Tassell, Eric" <eric.vantassell@amd.com>, pbonzini@redhat.com,
+        lizefan@huawei.com, hannes@cmpxchg.org, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, corbet@lwn.net, joro@8bytes.org,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+        x86@kernel.org, cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v4 1/2] cgroup: svm: Add Encryption ID controller
+Message-ID: <YBF0bb7gGkF01VCR@slm.duckdns.org>
+References: <YAb//EYCkZ7wnl6D@mtj.duckdns.org>
+ <YAfYL7V6E4/P83Mg@google.com>
+ <YAhc8khTUc2AFDcd@mtj.duckdns.org>
+ <be699d89-1bd8-25ae-fc6f-1e356b768c75@amd.com>
+ <YAmj4Q2J9htW2Fe8@mtj.duckdns.org>
+ <d11e58ec-4a8f-5b31-063a-b6b45d4ccdc5@amd.com>
+ <YAopkDN85GtWAj3a@google.com>
+ <1744f6c-551b-8de8-263e-5dac291b7ef@google.com>
+ <YBCRIPcJyB2J85XS@slm.duckdns.org>
+ <YBC937MFGEEiI63o@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210125122638.2947058-7-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YBC937MFGEEiI63o@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hello,
 
-On 1/25/21 12:26 PM, Marc Zyngier wrote:
-> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
-> pretty easy. All that is required is support for PMMIR_EL1, which
-> is read-only, and for which returning 0 is a valid option as long
-> as we don't advertise STALL_SLOT as an implemented event.
+On Tue, Jan 26, 2021 at 05:11:59PM -0800, Vipin Sharma wrote:
+> Sounds good, we can have a single top level stat file
+> 
+> misc.stat
+>   Shows how many are supported on the host:
+>   $ cat misc.stat
+>   sev 500
+>   sev_es 10
+> 
+> If total value of some resource is 0 then it will be considered inactive and
+> won't show in misc.{stat, current, max}
+> 
+> We discussed earlier, instead of having "stat" file we should show
+> "current" and "capacity" files in the root but I think we can just have stat
+> at top showing total resources to keep it consistent with other cgroup
+> files.
 
-According to ARM DDI 0487F.b, page D7-2743:
+Let's do misc.capacity and show only the entries which have their resources
+initialized.
 
-"If ARMv8.4-PMU is implemented:
-- If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED whether the PMMIR
-System registers are implemented.
-- If STALL_SLOT is implemented, then the PMMIR System registers are implemented."
+Thanks.
 
-I tried to come up with a reason why PMMIR is emulated instead of being left
-undefined, but I couldn't figure it out. Would you mind adding a comment or
-changing the commit message to explain that?
-
-Thanks,
-Alex
-> Let's just do that and adjust what we return to the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/sysreg.h |  3 +++
->  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
->  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
->  3 files changed, 16 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 8b5e7e5c3cc8..2fb3f386588c 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -846,7 +846,10 @@
->  
->  #define ID_DFR0_PERFMON_SHIFT		24
->  
-> +#define ID_DFR0_PERFMON_8_0		0x3
->  #define ID_DFR0_PERFMON_8_1		0x4
-> +#define ID_DFR0_PERFMON_8_4		0x5
-> +#define ID_DFR0_PERFMON_8_5		0x6
->  
->  #define ID_ISAR4_SWP_FRAC_SHIFT		28
->  #define ID_ISAR4_PSR_M_SHIFT		24
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 398f6df1bbe4..72cd704a8368 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  		base = 0;
->  	} else {
->  		val = read_sysreg(pmceid1_el0);
-> +		/*
-> +		 * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
-> +		 * as RAZ
-> +		 */
-> +		if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
-> +			val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
->  		base = 32;
->  	}
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 8f79ec1fffa7..5da536ab738d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1051,16 +1051,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		/* Limit debug to ARMv8.0 */
->  		val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
->  		val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 6);
-> -		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		/* Limit guests to PMUv3 for ARMv8.4 */
->  		val = cpuid_feature_cap_perfmon_field(val,
->  						      ID_AA64DFR0_PMUVER_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_1 : 0);
-> +						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
->  		break;
->  	case SYS_ID_DFR0_EL1:
-> -		/* Limit guests to PMUv3 for ARMv8.1 */
-> +		/* Limit guests to PMUv3 for ARMv8.4 */
->  		val = cpuid_feature_cap_perfmon_field(val,
->  						      ID_DFR0_PERFMON_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_1 : 0);
-> +						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
->  		break;
->  	}
->  
-> @@ -1496,6 +1496,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_PMINTENSET_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
->  	{ SYS_DESC(SYS_PMINTENCLR_EL1), access_pminten, reset_unknown, PMINTENSET_EL1 },
-> +	{ SYS_DESC(SYS_PMMIR_EL1), trap_raz_wi },
->  
->  	{ SYS_DESC(SYS_MAIR_EL1), access_vm_reg, reset_unknown, MAIR_EL1 },
->  	{ SYS_DESC(SYS_AMAIR_EL1), access_vm_reg, reset_amair_el1, AMAIR_EL1 },
-> @@ -1918,6 +1919,8 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
->  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 4), access_pmceid },
->  	{ AA32(HI), Op1( 0), CRn( 9), CRm(14), Op2( 5), access_pmceid },
-> +	/* PMMIR */
-> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 6), trap_raz_wi },
->  
->  	/* PRRR/MAIR0 */
->  	{ AA32(LO), Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, MAIR_EL1 },
+-- 
+tejun
