@@ -2,76 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1E7D30575E
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:52:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD8AC30576D
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:54:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233985AbhA0JvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 04:51:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29224 "EHLO
+        id S234840AbhA0JxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 04:53:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49724 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235181AbhA0JsY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 04:48:24 -0500
+        by vger.kernel.org with ESMTP id S234863AbhA0Juo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 04:50:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611740818;
+        s=mimecast20190719; t=1611740939;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p2ZgdeE8emMvrTo+qZdhtSbV4TLt//BKUXr6Nkuxz8M=;
-        b=PmdguyM2/pMShwqQkKUzs1pNeKizei7kZNKfVl9g2uszD/WFIN8r8Sb6d2ykBWm38oei88
-        8U++DqIrJkcp2d52Uvr0RaV2P9cKXjY6UEYxHlXO/1TB2VpAQAF/uvWKwyMNsyKpgSymiv
-        PU7bxGAIHu9j9MJ7q2hK++35BLWLf7M=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-RM1SRHECOwSKcFs8S2-YAQ-1; Wed, 27 Jan 2021 04:46:57 -0500
-X-MC-Unique: RM1SRHECOwSKcFs8S2-YAQ-1
-Received: by mail-ed1-f72.google.com with SMTP id dg17so1048497edb.11
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:46:56 -0800 (PST)
+        bh=ydaRB29RJtt52FSXiTlXaP4Ln7O0VcYefbrxc6K6p2E=;
+        b=P+4BalZeuziajyen+vQ2RVkEp8t5QKnQ3kH2fIq6sAFLQQNyw57MzwD4OSg2ojWBjpfQH8
+        ERFrr+dsr80enMZnxEWgdOe3GzMl2ENGm1p0hSYyATSAId51IsD8TSNtGIIntMMOYkXBuv
+        nHA673qduP4Z/mes25B5BHjbFUQz33I=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-527-AkXzOoulMCu9HcLlHIgHlw-1; Wed, 27 Jan 2021 04:48:55 -0500
+X-MC-Unique: AkXzOoulMCu9HcLlHIgHlw-1
+Received: by mail-ed1-f71.google.com with SMTP id w4so1061106edu.0
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:48:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=p2ZgdeE8emMvrTo+qZdhtSbV4TLt//BKUXr6Nkuxz8M=;
-        b=bA0ArT/wdXy4kYzttzoizqINRDnQNToSDFp22yGl/oqyD4Z3hOQ5IBs2W73kWdUb54
-         vVB55I2aJzRfd8MdTqmIdWY6XfMFXlhLl0ElQfiG7TwxTpSUoWpJB6vlM/h1MdnYVfL+
-         Vv8mRZUeDhw5Y5gzZy9YOzlrqvaY/uE2yDWLCk+D5ne4qGc8TMgXlx7UrpWdW3wgvQJ7
-         zzw2Ko5bfAPHVc066WG1aBBwdJRN71RdwWHUdfYVxHV9/dLywQCuNMbjL6koJG8inWyM
-         WrLAQ0Bpq8tT7tYyG0mfm7XFwfmxOg01MIPHBYIP6bnxwlUtZNYlrnQrNqGqUng6P7Mq
-         1Iww==
-X-Gm-Message-State: AOAM532xMNlfIgF0ryKulVu1aF8cWB1BerIWZ1kKwHN3slLDrxRpoWXn
-        E5URJmWFqn1QbNtUwnVbmBTT69hhLGqQWWYx1HbvB4qyauFGsZH8Uz4WwVMPrag1dbrzMW1JPCl
-        t+KNYrzXwrNsd
-X-Received: by 2002:a17:906:9342:: with SMTP id p2mr6328413ejw.300.1611740815580;
-        Wed, 27 Jan 2021 01:46:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzqxTjCXlGq65ZXJizGzN/1wJ3EKGImAEp1e+xOhoLzSLVqiLN4lEgiB1lVZKT0JTaXxWmqzw==
-X-Received: by 2002:a17:906:9342:: with SMTP id p2mr6328403ejw.300.1611740815349;
-        Wed, 27 Jan 2021 01:46:55 -0800 (PST)
+        bh=ydaRB29RJtt52FSXiTlXaP4Ln7O0VcYefbrxc6K6p2E=;
+        b=O9FrquYbt9UyldT8MO9lIxD2fBLjQFUb1y+xloxWI80XdXQARtLvvISl0Lir9rtiNo
+         jp/TpB3XsCxgHdS8UW7MLYmPwRxhGrPfT4ty1/42wbxZUA5lFpyO6Qm0eLtt2xaO0wlg
+         hvcmvl2PRjQO4vVTJCOqsO9QXYsnLtSsNytwShkHQQe1k5XYCNZ8gcqLkWQABjyzaHqU
+         SgUOGEi6eve66nGK2mdTbukewgv0Ru8y5CW+5/hhi01BqK7HmMToCEGihrHdPSmqEimc
+         n9mKJw3MUMTnJPJIB3OtaGuj+7kvosHQb4gtFhRqvyGKDjYIY6X+q5KZwOrVMAcZk9SJ
+         XhBw==
+X-Gm-Message-State: AOAM531Ia5O87IlRswJiUQbolPqneVf2riltT0zC1or3nsjdp6khZl2f
+        SZ30a4kSaPeFt71R7HL1KhnRzudNHvBpxsfjLR7APd4hnx5IiRZYHk+LPF3tDuanNTiWtcmUKJj
+        kVIaQPtIV6bV9
+X-Received: by 2002:a05:6402:2346:: with SMTP id r6mr8473472eda.8.1611740934252;
+        Wed, 27 Jan 2021 01:48:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyn9gmSbJo4Pspyx7dyn5uVWMly+9aJphrjnuOIsbl99TlsvDoBHK3bJxZqVVn5PPuW+wqiXQ==
+X-Received: by 2002:a05:6402:2346:: with SMTP id r6mr8473459eda.8.1611740934102;
+        Wed, 27 Jan 2021 01:48:54 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id lh26sm554051ejb.119.2021.01.27.01.46.53
+        by smtp.gmail.com with ESMTPSA id q4sm570488ejx.8.2021.01.27.01.48.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 01:46:54 -0800 (PST)
-To:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        Wed, 27 Jan 2021 01:48:52 -0800 (PST)
+Subject: Re: [RESEND v13 03/10] KVM: x86/pmu: Use IA32_PERF_CAPABILITIES to
+ adjust features visibility
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
+        wei.w.wang@intel.com, kan.liang@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20201105081805.5674-1-chenyi.qiang@intel.com>
- <20201105081805.5674-9-chenyi.qiang@intel.com>
- <6174185b-25e0-f2a2-3f71-d8bbe6ca889d@redhat.com>
- <7aa67008-a72f-f6e3-2de4-4b9b9e62cd86@redhat.com>
- <e1ba2803-877c-e7d5-0a16-f356d5c2b571@intel.com>
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+References: <20210108013704.134985-1-like.xu@linux.intel.com>
+ <20210108013704.134985-4-like.xu@linux.intel.com>
+ <a1291d0b-297c-9146-9689-f4a4129de3c6@redhat.com>
+ <fd7df596-9715-e6a8-0040-18aecedb0fae@linux.intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: Add tests for PKS
-Message-ID: <ce0fad10-ddca-2102-0331-86ddcba9e808@redhat.com>
-Date:   Wed, 27 Jan 2021 10:46:53 +0100
+Message-ID: <5da57047-db15-adb6-f3bc-6152753d0b49@redhat.com>
+Date:   Wed, 27 Jan 2021 10:48:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <e1ba2803-877c-e7d5-0a16-f356d5c2b571@intel.com>
+In-Reply-To: <fd7df596-9715-e6a8-0040-18aecedb0fae@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -79,29 +83,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/01/21 08:41, Chenyi Qiang wrote:
+On 27/01/21 07:04, Like Xu wrote:
+> On 2021/1/26 17:42, Paolo Bonzini wrote:
+>> On 08/01/21 02:36, Like Xu wrote:
+>>>
+>>> @@ -401,6 +398,9 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
+>>>          pmu->fixed_counters[i].idx = i + INTEL_PMC_IDX_FIXED;
+>>>          pmu->fixed_counters[i].current_config = 0;
+>>>      }
+>>> +
+>>> +    vcpu->arch.perf_capabilities = guest_cpuid_has(vcpu, 
+>>> X86_FEATURE_PDCM) ?
+>>> +        vmx_get_perf_capabilities() : 0;
 >>
+>> There is one thing I don't understand with this patch: intel_pmu_init 
+>> is not called when CPUID is changed.  So I would have thought that 
+>> anything that uses guest_cpuid_has must stay in intel_pmu_refresh.  As 
+>> I understand it vcpu->arch.perf_capabilities is always set to 0 
+>> (vmx_get_perf_capabilities is never called), and kvm_set_msr_common 
+>> would fail to set any bit in the MSR.  What am I missing?
+>>
+>> In addition, the code of patch 4:
+>>
+>> +    if (!intel_pmu_lbr_is_enabled(vcpu)) {
+>> +        vcpu->arch.perf_capabilities &= ~PMU_CAP_LBR_FMT;
+>> +        lbr_desc->records.nr = 0;
+>> +    }
+>>
+>> is not okay after MSR changes.  The value written by the host must be 
+>> either rejected (with "return 1") or applied unchanged.
+>>
+>> Fortunately I think this code is dead if you move the check in 
+>> kvm_set_msr from patch 9 to patch 4.  However, in patch 9 
+>> vmx_get_perf_capabilities() must only set the LBR format bits if 
+>> intel_pmu_lbr_is_compatible(vcpu).
 > 
-> Hi Paolo,
+> Thanks for the guidance. How about handling it in this way:
 > 
-> Thank you for your time. I was just thinking about resending this patch 
-> series to ping you although no changes will be added. I really hope to 
-> get the comments from you.
+> In the intel_pmu_init():
 > 
-> Do you want me to resend a new non-RFC version as well as the QEMU 
-> implementation? or you review this RFC series first?
+>      vcpu->arch.perf_capabilities = 0;
+>      lbr_desc->records.nr = 0;
 > 
-> Thanks
-> Chenyi
+> In the intel_pmu_refresh():
+> 
+>      if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM)) {
+>          vcpu->arch.perf_capabilities = vmx_get_perf_capabilities();
+>          if (!lbr_desc->records.nr)
+>              vcpu->arch.perf_capabilities &= ~PMU_CAP_LBR_FMT;
+>      }
+> 
+> In the vmx_set_msr():
+> 
+>      case MSR_IA32_PERF_CAPABILITIES:
+>          // set up lbr_desc->records.nr
+>          if (!intel_pmu_lbr_is_compatible(vcpu))
 
-Hi,
-
-I have reviewed the KVM implementation and actually I have also 
-implemented PKRS in QEMU's binary translation.  I'll send a patch and 
-commit this one too, since it can be tested.
-
-For QEMU you'll still have to post the KVM parts (getting/setting the 
-PKRS MSR) since I don't have a way to test those.
+Maybe pass msr_info.data to intel_pmu_lbr_is_compatible?  Otherwise 
+seems okay, thanks Like.
 
 Paolo
 
