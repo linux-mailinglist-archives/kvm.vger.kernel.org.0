@@ -2,268 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 61BA7305790
-	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 10:58:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30C813057AF
+	for <lists+kvm@lfdr.de>; Wed, 27 Jan 2021 11:03:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234830AbhA0J5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 04:57:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41548 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235488AbhA0JxR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 04:53:17 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81DADC06178A
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:52:37 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id j13so1678235edp.2
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 01:52:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=BKiGeCY30LxdXtXYtI8PHHaDHc9dLjGHHBqPPsCS+f0=;
-        b=KPEtaCgfMgXZz0v/ms9wLhVOVP8cpev0WGYEBZIG2PZy+wyV57jCz4pDu0AyXhYIKS
-         AznVBThkXIOnhfZtXsL8+gaWaPIGQ4kHOQrUzTa3EZGkkApXnt5irnJWGLhVjp8WpGix
-         lHg+oPT9zG4KRyuI3WZ2+uN9nM5FVfgcJtwqlzhlduMIyqLqPLZm2sa1jQmecDc7WSma
-         G3MXLQHf2cKMVC4SY0CQmEP+vEsfKGm0zt8SKxEn7JLci0kAC20d14a95TXN5RwBhgWF
-         dUw1dC7vhSG7NRP+KCxSROifWFGGKYOV3ClXRG8joQ/NshfYCLwZ9kI/ZbUgo5Tr3dlD
-         EBtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=BKiGeCY30LxdXtXYtI8PHHaDHc9dLjGHHBqPPsCS+f0=;
-        b=OI3ay2Qiz05komjIptgl5qOvB6Nrn2sUwARZALh5LJnrnmrnzxAOBoL1u5gCs+fvOV
-         YcHbj5F4bOscQzZH3+oR8nln1Vai2H4OyyqKsTl8V+s6hpzefCmBIWuOiXX0029Znl+3
-         X4M5DcuTveAQQtfH774QfxxFcP+qHiGZ8fg93/jf42J5hJ6eQlUnA2rpdjqRZ9dWa81h
-         iXjR4KxouiEAcig4SjvQRfc0OXtqlEvwyBwnWJYdqPUiIdI3kQu+SXkDNaufwCZVNESd
-         jj7uspkuGwLerKliHJjiKmK4pEVv0fD0Ah2bY57IBmFchCP5zUhHi0MoDkg3l+e5A4e0
-         eSVQ==
-X-Gm-Message-State: AOAM530qW6a+WQf1OR9rv5bmxbjyZLqYEBVMp1y3ijJmkLMmY+NXr5g4
-        pqjTzO67HmGEondA5mLEusR/Xn0RYYw7oA==
-X-Google-Smtp-Source: ABdhPJxYEgpBZHhMNggQoP1dw8Flw/KobqdraSONmXuE91pWqJV45/ZYJX1JTJbiv9XCrvWfdV5toQ==
-X-Received: by 2002:a05:6402:1682:: with SMTP id a2mr8458434edv.30.1611741156269;
-        Wed, 27 Jan 2021 01:52:36 -0800 (PST)
-Received: from avogadro.lan ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x25sm926265edv.65.2021.01.27.01.52.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 01:52:35 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     thuth@redhat.com
-Subject: [PATCH kvm-unit-tests] x86: use -cpu max instead of -cpu host
-Date:   Wed, 27 Jan 2021 10:52:34 +0100
-Message-Id: <20210127095234.476291-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.29.2
+        id S234816AbhA0KCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 05:02:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47247 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235676AbhA0KAm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 05:00:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611741555;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IE9lfqBYRWAXVyxhCxtNnr3w1/VHDFaexCDYTNcRvzg=;
+        b=IgLf2nINvLKRqUuznH55x7CebFv9gjNIGnYe8QRBIXX3wtpn+uoWzDbZ4RgInzXd4+LbRn
+        rcVxX1EibHY74+L8Ki+FeO4QawKpeihdnWeSbEBqAo56pad9zZ20lsveel5C72X3SJbRf4
+        e4KkqXZeRWM+LhQ45W0oTGtsoVBIGdU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-L1RunsaFNKmpbeLOhJxudA-1; Wed, 27 Jan 2021 04:59:01 -0500
+X-MC-Unique: L1RunsaFNKmpbeLOhJxudA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72628801AA3;
+        Wed, 27 Jan 2021 09:58:59 +0000 (UTC)
+Received: from redhat.com (ovpn-115-120.ams2.redhat.com [10.36.115.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BA76F60938;
+        Wed, 27 Jan 2021 09:58:48 +0000 (UTC)
+Date:   Wed, 27 Jan 2021 09:58:46 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     John Snow <jsnow@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Fam Zheng <fam@euphon.net>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Viktor Prutyanov <viktor.prutyanov@phystech.edu>,
+        qemu-block@nongnu.org,
+        Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Alistair Francis <alistair@alistair23.me>,
+        qemu-devel@nongnu.org,
+        Wainer dos Santos Moschetta <wainersm@redhat.com>,
+        Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
+        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 8/9] tests/docker: Add dockerfile for Alpine Linux
+Message-ID: <20210127095846.GC3653144@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20210118063808.12471-1-jiaxun.yang@flygoat.com>
+ <20210118063808.12471-9-jiaxun.yang@flygoat.com>
+ <20210118103345.GE1789637@redhat.com>
+ <929c3ec1-9419-908a-6b5e-ce3ae78f6011@redhat.com>
+ <551e153e-34da-28bd-c67f-d2a688ad987b@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <551e153e-34da-28bd-c67f-d2a688ad987b@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows the tests to run under TCG as well.  "-cpu max" is not available on
-CentOS 7, however that doesn't change much for our CI since we weren't testing
-the CentOS 7 + KVM combination anyway.
+On Tue, Jan 26, 2021 at 04:38:57PM -0500, John Snow wrote:
+> On 1/19/21 8:41 AM, Thomas Huth wrote:
+> > On 18/01/2021 11.33, Daniel P. Berrangé wrote:
+> > > On Mon, Jan 18, 2021 at 02:38:07PM +0800, Jiaxun Yang wrote:
+> > > > Alpine Linux[1] is a security-oriented, lightweight Linux distribution
+> > > > based on musl libc and busybox.
+> > > > 
+> > > > It it popular among Docker guests and embedded applications.
+> > > > 
+> > > > Adding it to test against different libc.
+> > > > 
+> > > > [1]: https://alpinelinux.org/
+> > > > 
+> > > > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > > > ---
+> > > >   tests/docker/dockerfiles/alpine.docker | 57 ++++++++++++++++++++++++++
+> > > >   1 file changed, 57 insertions(+)
+> > > >   create mode 100644 tests/docker/dockerfiles/alpine.docker
+> > > > 
+> > > > diff --git a/tests/docker/dockerfiles/alpine.docker
+> > > > b/tests/docker/dockerfiles/alpine.docker
+> > > > new file mode 100644
+> > > > index 0000000000..5be5198d00
+> > > > --- /dev/null
+> > > > +++ b/tests/docker/dockerfiles/alpine.docker
+> > > > @@ -0,0 +1,57 @@
+> > > > +
+> > > > +FROM alpine:edge
+> > > > +
+> > > > +RUN apk update
+> > > > +RUN apk upgrade
+> > > > +
+> > > > +# Please keep this list sorted alphabetically
+> > > > +ENV PACKAGES \
+> > > > +    alsa-lib-dev \
+> > > > +    bash \
+> > > > +    bison \
+> > > 
+> > > This shouldn't be required.
+> > 
+> > bison and flex were required to avoid some warnings in the past while
+> > compiling the dtc submodule ... but I thought we got rid of the problem
+> > at one point in time, so this can be removed now, indeed.
+> > 
+> > > > +    build-base \
+> > > 
+> > > This seems to be a meta packae that pulls in other
+> > > misc toolchain packages. Please list the pieces we
+> > > need explicitly instead.
+> > 
+> > Looking at the "Depends" list on
+> > https://pkgs.alpinelinux.org/package/v3.3/main/x86/build-base there are
+> > only 6 dependencies and we need most of those for QEMU anyway, so I
+> > think it is ok to keep build-base here.
+> > 
+> > > > +    coreutils \
+> > > > +    curl-dev \
+> > > > +    flex \
+> > > 
+> > > This shouldn't be needed.
+> > > 
+> > > > +    git \
+> > > > +    glib-dev \
+> > > > +    glib-static \
+> > > > +    gnutls-dev \
+> > > > +    gtk+3.0-dev \
+> > > > +    libaio-dev \
+> > > > +    libcap-dev \
+> > > 
+> > > Should not be required, as we use cap-ng.
+> > 
+> > Right.
+> > 
+> > > > +    libcap-ng-dev \
+> > > > +    libjpeg-turbo-dev \
+> > > > +    libnfs-dev \
+> > > > +    libpng-dev \
+> > > > +    libseccomp-dev \
+> > > > +    libssh-dev \
+> > > > +    libusb-dev \
+> > > > +    libxml2-dev \
+> > > > +    linux-headers \
+> > > 
+> > > Is this really needed ? We don't install kernel-headers on other
+> > > distros AFAICT.
+> > 
+> > I tried a build without this package, and it works fine indeed.
+> > 
+> > > > +    lzo-dev \
+> > > > +    mesa-dev \
+> > > > +    mesa-egl \
+> > > > +    mesa-gbm \
+> > > > +    meson \
+> > > > +    ncurses-dev \
+> > > > +    ninja \
+> > > > +    paxmark \
+> > > 
+> > > What is this needed for ?
+> > 
+> > Seems like it also can be dropped.
+> > 
+> > > > +    perl \
+> > > > +    pulseaudio-dev \
+> > > > +    python3 \
+> > > > +    py3-sphinx \
+> > > > +    shadow \
+> > > 
+> > > Is this really needed ?
+> > 
+> > See:
+> > https://www.spinics.net/lists/kvm/msg231556.html
+> > 
+> > I can remove the superfluous packages when picking up the patch, no need
+> > to respin just because of this.
+> > 
+> >   Thomas
+> > 
+> > 
+> 
+> You can refer to my post earlier this January for a "minimal" Alpine Linux
+> build, if you wish.
+> 
+> My goal was to find the smallest set of packages possible without passing
+> any explicit configure flags.
+> 
+> I wonder if it's worth having layered "core build" and "test build" images
+> so that we can smoke test the minimalistic build from time to time -- I seem
+> to recall Dan posting information about a dependency management tool for
+> Dockerfiles, but I admit I didn't look too closely at what problem that
+> solves, exactly.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .gitlab-ci.yml    |  4 +++-
- x86/unittests.cfg | 40 ++++++++++++++++++++--------------------
- 2 files changed, 23 insertions(+), 21 deletions(-)
+I'd rather we avoid layered images entirely as it creates extra stages
+in the gitlab pipeline, and also makes it more complex to auto-generate.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 8834e59..d97e27e 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -75,6 +75,7 @@ build-x86_64:
-      vmexit_mov_to_cr8 vmexit_inl_pmtimer  vmexit_ipi vmexit_ipi_halt
-      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
-      eventinj msr port80 setjmp sieve syscall tsc rmap_chain umip intel_iommu
-+     rdpru pku pks smap tsc_adjust xsave
-      | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
-@@ -89,7 +90,7 @@ build-i386:
-      cmpxchg8b vmexit_cpuid vmexit_mov_from_cr8 vmexit_mov_to_cr8
-      vmexit_inl_pmtimer vmexit_ipi vmexit_ipi_halt vmexit_ple_round_robin
-      vmexit_tscdeadline vmexit_tscdeadline_immed eventinj port80 setjmp sieve
--     tsc taskswitch umip
-+     tsc taskswitch umip rdpru smap tsc_adjust xsave
-      | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
-@@ -103,6 +104,7 @@ build-clang:
-      vmexit_mov_to_cr8 vmexit_inl_pmtimer  vmexit_ipi vmexit_ipi_halt
-      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
-      eventinj msr port80 setjmp syscall tsc rmap_chain umip intel_iommu
-+     rdpru pku pks smap tsc_adjust xsave
-      | tee results.txt
-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 8c39630..90e370f 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -128,12 +128,12 @@ check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
- 
- [smap]
- file = smap.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- 
- [pku]
- file = pku.flat
- arch = x86_64
--extra_params = -cpu host
-+extra_params = -cpu max
- 
- [pks]
- file = pks.flat
-@@ -163,7 +163,7 @@ arch = x86_64
- 
- [memory]
- file = memory.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- arch = x86_64
- 
- [msr]
-@@ -171,12 +171,12 @@ file = msr.flat
- 
- [pmu]
- file = pmu.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- check = /proc/sys/kernel/nmi_watchdog=0
- 
- [vmware_backdoors]
- file = vmware_backdoors.flat
--extra_params = -machine vmport=on -cpu host
-+extra_params = -machine vmport=on -cpu max
- check = /sys/module/kvm/parameters/enable_vmware_backdoor=Y
- arch = x86_64
- 
-@@ -204,12 +204,12 @@ extra_params = -cpu kvm64,+rdtscp
- 
- [tsc_adjust]
- file = tsc_adjust.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- 
- [xsave]
- file = xsave.flat
- arch = x86_64
--extra_params = -cpu host
-+extra_params = -cpu max
- 
- [rmap_chain]
- file = rmap_chain.flat
-@@ -218,7 +218,7 @@ arch = x86_64
- [svm]
- file = svm.flat
- smp = 2
--extra_params = -cpu host,+svm -m 4g
-+extra_params = -cpu max,+svm -m 4g
- arch = x86_64
- 
- [taskswitch]
-@@ -248,7 +248,7 @@ arch = x86_64
- 
- [rdpru]
- file = rdpru.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- arch = x86_64
- 
- [umip]
-@@ -261,33 +261,33 @@ arch = i386
- 
- [vmx]
- file = vmx.flat
--extra_params = -cpu host,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
-+extra_params = -cpu max,+vmx -append "-exit_monitor_from_l2_test -ept_access* -vmx_smp* -vmx_vmcs_shadow_test -atomic_switch_overflow_msrs_test -vmx_init_signal_test -vmx_apic_passthrough_tpr_threshold_test"
- arch = x86_64
- groups = vmx
- 
- [ept]
- file = vmx.flat
--extra_params = -cpu host,host-phys-bits,+vmx -m 2560 -append "ept_access*"
-+extra_params = -cpu max,host-phys-bits,+vmx -m 2560 -append "ept_access*"
- arch = x86_64
- groups = vmx
- 
- [vmx_eoi_bitmap_ioapic_scan]
- file = vmx.flat
- smp = 2
--extra_params = -cpu host,+vmx -m 2048 -append vmx_eoi_bitmap_ioapic_scan_test
-+extra_params = -cpu max,+vmx -m 2048 -append vmx_eoi_bitmap_ioapic_scan_test
- arch = x86_64
- groups = vmx
- 
- [vmx_hlt_with_rvi_test]
- file = vmx.flat
--extra_params = -cpu host,+vmx -append vmx_hlt_with_rvi_test
-+extra_params = -cpu max,+vmx -append vmx_hlt_with_rvi_test
- arch = x86_64
- groups = vmx
- timeout = 10
- 
- [vmx_apicv_test]
- file = vmx.flat
--extra_params = -cpu host,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test"
-+extra_params = -cpu max,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test"
- arch = x86_64
- groups = vmx
- timeout = 10
-@@ -295,14 +295,14 @@ timeout = 10
- [vmx_apic_passthrough_thread]
- file = vmx.flat
- smp = 2
--extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_thread_test
-+extra_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_thread_test
- arch = x86_64
- groups = vmx
- 
- [vmx_init_signal_test]
- file = vmx.flat
- smp = 2
--extra_params = -cpu host,+vmx -m 2048 -append vmx_init_signal_test
-+extra_params = -cpu max,+vmx -m 2048 -append vmx_init_signal_test
- arch = x86_64
- groups = vmx
- timeout = 10
-@@ -310,21 +310,21 @@ timeout = 10
- [vmx_sipi_signal_test]
- file = vmx.flat
- smp = 2
--extra_params = -cpu host,+vmx -m 2048 -append vmx_sipi_signal_test
-+extra_params = -cpu max,+vmx -m 2048 -append vmx_sipi_signal_test
- arch = x86_64
- groups = vmx
- timeout = 10
- 
- [vmx_apic_passthrough_tpr_threshold_test]
- file = vmx.flat
--extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
-+extra_params = -cpu max,+vmx -m 2048 -append vmx_apic_passthrough_tpr_threshold_test
- arch = x86_64
- groups = vmx
- timeout = 10
- 
- [vmx_vmcs_shadow_test]
- file = vmx.flat
--extra_params = -cpu host,+vmx -append vmx_vmcs_shadow_test
-+extra_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
- arch = x86_64
- groups = vmx
- 
-@@ -367,5 +367,5 @@ extra_params = -M q35,kernel-irqchip=split -device intel-iommu,intremap=on,eim=o
- 
- [tsx-ctrl]
- file = tsx-ctrl.flat
--extra_params = -cpu host
-+extra_params = -cpu max
- groups = tsx-ctrl
+Once this initial alpine image is merged, then I intend to add it to the
+set which are auto-generated from my other patch series.
+
+
+Regards,
+Daniel
 -- 
-2.29.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
