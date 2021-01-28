@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 060CA30764E
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 13:47:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B6DB30765D
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 13:50:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231284AbhA1MpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 07:45:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27639 "EHLO
+        id S231704AbhA1MrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 07:47:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55012 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231153AbhA1MpQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 07:45:16 -0500
+        by vger.kernel.org with ESMTP id S229852AbhA1MrL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 07:47:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611837829;
+        s=mimecast20190719; t=1611837943;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6DZ4ZGB2K4gNRDZAoppW1Ow33ypz6eIahutEvlIJxKQ=;
-        b=T32p6CYkz6V0rJQd3/1rBHRW+fetzSw9ybLCXisi3KZr0O+uxOXt472J6iMAUjffcEzA2P
-        GwxR9d9847OXvpzMPNOcBjTsRC8IPS0E6aKE45CMijEtk6mQBriHc4YIEvNOIO3i2Uc/wx
-        pQZkq0nNj3SyAhWKNHo2IiYLUTEXcPI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-Z1FNZieoO0m6wHe1QFAyLA-1; Thu, 28 Jan 2021 07:43:47 -0500
-X-MC-Unique: Z1FNZieoO0m6wHe1QFAyLA-1
-Received: by mail-ed1-f72.google.com with SMTP id j11so3098771edy.20
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 04:43:46 -0800 (PST)
+        bh=PbKeF6zGYsqZjc/gyq24s09E3kJcDXhLLxYC70Xe7EE=;
+        b=QyEbD8Sk5fgM3Amn5PRCAYFmdg9V+3IIhJT2XrjHtQN2brYHvz/7is9X/fgfYBZVCBSkT/
+        o6m/veFTBnQ7pxjtoRibDf4BgIScBhLnzgyZwrh3fvD6PiLE9hfOzuQGbGt6oO/dJG80Vo
+        QxA5SyftoUCQRLL2WBWv4mNUWfuSBh4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-IlS0yPD7NEOXhTMR40uX2A-1; Thu, 28 Jan 2021 07:45:42 -0500
+X-MC-Unique: IlS0yPD7NEOXhTMR40uX2A-1
+Received: by mail-ej1-f72.google.com with SMTP id ar27so989950ejc.22
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 04:45:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6DZ4ZGB2K4gNRDZAoppW1Ow33ypz6eIahutEvlIJxKQ=;
-        b=tju3Nei2gQV+a/SfouM4P95itHuaXfQG50d6E5dE7iaB5PzPw7nrJthfCu8CGcnnpD
-         WrcdCosyvoV+0cCUl3a7X7q3qrcbACgiEGfV2LBmTcm5fTVStW6ZaEz/CP5IFV7qk8Eq
-         WfHJinIc70VUgtHBH/R/QqeFySnELleTveTjbU8MK54LIbuFFZnEXLzjfapHY9jZqRKl
-         7qetBPNJQmdRDD75z5LDWtTfitWfazjlzBVrzTGqKUESZi3kdDBoZWIQx+g0xal827Ub
-         Mh9fm2shkYWZ7+pmssqSytvQnzeKpIhJRU7UFT1sKSoCSqo+Wd3cImMU/pc8oBHoU2I6
-         Cbww==
-X-Gm-Message-State: AOAM532r8e1vOi9zc1Ib+ulOqpFhUmkyxLDTLUZWeGwv1k/D0bJwLm96
-        UfsTVSrCTzuhIykSVn3u1DvB3gndUlTg2DvaWmbMooUp5tPXprCu7FwSjFLOc5J4fIm8Es0/6DW
-        gkvx6BptBUXop
-X-Received: by 2002:a17:906:86d7:: with SMTP id j23mr2899526ejy.5.1611837825739;
-        Thu, 28 Jan 2021 04:43:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy+7/aR0IkMr58q3tYOY3lcSzuiW99RFZBU+INUV4hn06MVyWygwy1ypwPKJpZZ361fX9OJhQ==
-X-Received: by 2002:a17:906:86d7:: with SMTP id j23mr2899508ejy.5.1611837825503;
-        Thu, 28 Jan 2021 04:43:45 -0800 (PST)
+        bh=PbKeF6zGYsqZjc/gyq24s09E3kJcDXhLLxYC70Xe7EE=;
+        b=fpsjzgEaU3qAaQmUKfrSxD5FK+ZHCP7ImTNpiIRgTGVeYN0hJgGxzD7+6GpSz4eaeE
+         /OW5CyTio3e2HqIl992CcD2hRQkxy+JQx7M/PaGc5YpLOhU1X5FFdru8PwL+6E77+E5G
+         p4Fm5H4RFzOIUlT+jk37/GcZkeoWhDabrD1nQuFuwr5bpvR3PEcfBgLyQ3Xu1ZqSn0fz
+         uVP7HctYhoMsbsfCazO2wNkDVxWdYOZbYNzpqe9jejUDHaJqYi+oue2GD0BQhfvEjAcF
+         x7DtbvfKMwPRSfaiTYIjeTKclXmFVes/N+xxfpYyLhBm3eSwWnaMAnt84BkpCWRGAuES
+         A4qw==
+X-Gm-Message-State: AOAM530wjqkc3lnXecoasPENluyWx+quiw7eiTjgXciVXkvVsMpENHDr
+        f/wDIdVbZMY1IObfDswBuH+zFmc0NlEAbQc0ifZpiRvNV0Qf4y5C0vbPzwSlII/9I0M/VFBWkiI
+        KLIY4aVqSbzu4
+X-Received: by 2002:a17:907:971b:: with SMTP id jg27mr10743346ejc.14.1611837940948;
+        Thu, 28 Jan 2021 04:45:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyWRFPnDlvnu+OSs2St8Qk+7eUVfgbNE4ATrRsAAGrYhGhEOaziS3EY5tfXTNfS/4q/5YMsfQ==
+X-Received: by 2002:a17:907:971b:: with SMTP id jg27mr10743322ejc.14.1611837940761;
+        Thu, 28 Jan 2021 04:45:40 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id m8sm2971028eds.70.2021.01.28.04.43.43
+        by smtp.gmail.com with ESMTPSA id h12sm2853819edb.16.2021.01.28.04.45.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 04:43:44 -0800 (PST)
+        Thu, 28 Jan 2021 04:45:39 -0800 (PST)
+Subject: Re: [PATCH v5 00/16] KVM: Add minimal support for Xen HVM guests
 To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
 Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
         Joao Martins <joao.m.martins@oracle.com>,
@@ -59,16 +60,13 @@ Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
 References: <20210111195725.4601-1-dwmw2@infradead.org>
- <20210111195725.4601-17-dwmw2@infradead.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5 16/16] KVM: x86/xen: Add event channel interrupt vector
- upcall
-Message-ID: <3b66ee62-bf12-c6ab-a954-a66e5f31f109@redhat.com>
-Date:   Thu, 28 Jan 2021 13:43:43 +0100
+Message-ID: <98732694-7e57-2457-2519-4f5d6dcc724c@redhat.com>
+Date:   Thu, 28 Jan 2021 13:45:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210111195725.4601-17-dwmw2@infradead.org>
+In-Reply-To: <20210111195725.4601-1-dwmw2@infradead.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -77,78 +75,58 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 11/01/21 20:57, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+> This patch set provides enough kernel support to allow hosting Xen HVM
+> guests in KVM. It allows hypercalls to be trapped to userspace for
+> handling, uses the existing KVM functions for writing system clock and
+> pvclock information to Xen shared pages, and adds Xen runstate info and
+> event channel upcall vector delivery.
 > 
-> It turns out that we can't handle event channels *entirely* in userspace
-> by delivering them as ExtINT, because KVM is a bit picky about when it
-> accepts ExtINT interrupts from a legacy PIC. The in-kernel local APIC
-> has to have LVT0 configured in APIC_MODE_EXTINT and unmasked, which
-> isn't necessarily the case for Xen guests especially on secondary CPUs.
+> It's based on the first section of a patch set that Joao posted as
+> RFC last year^W^W in 2019:
 > 
-> To cope with this, add kvm_xen_get_interrupt() which checks the
-> evtchn_pending_upcall field in the Xen vcpu_info, and delivers the Xen
-> upcall vector (configured by KVM_XEN_ATTR_TYPE_UPCALL_VECTOR) if it's
-> set regardless of LAPIC LVT0 configuration. This gives us the minimum
-> support we need for completely userspace-based implementation of event
-> channels.
+> https://lore.kernel.org/kvm/20190220201609.28290-1-joao.m.martins@oracle.com/
 > 
-> This does mean that vcpu_enter_guest() needs to check for the
-> evtchn_pending_upcall flag being set, because it can't rely on someone
-> having set KVM_REQ_EVENT unless we were to add some way for userspace to
-> do so manually.
+> I've updated and reworked the original a bit, including (in my v1):
+>   • Support for 32-bit guests
+>   • 64-bit second support in wallclock
+>   • Time counters for runnable/blocked states in runstate support
+>   • Self-tests
+>   • Fixed Viridian coexistence
+>   • No new KVM_CAP_XEN_xxx, just more bits returned by KVM_CAP_XEN_HVM
 > 
-> But actually, I don't quite see how that works reliably for interrupts
-> injected with KVM_INTERRUPT either. In kvm_vcpu_ioctl_interrupt() the
-> KVM_REQ_EVENT request is set once, but that'll get cleared the first time
-> through vcpu_enter_guest(). So if the first exit is for something *else*
-> without interrupts being enabled yet, won't the KVM_REQ_EVENT request
-> have been consumed already and just be lost?
+> v2:
+>   • Remember the RCU read-critical sections on using the shared info pages
+>   • Fix 32-bit build of compat structures (which we use there too)
+>   • Use RUNSTATE_blocked as initial state not RUNSTATE_runnable
+>   • Include documentation, add cosmetic KVM_XEN_HVM_CONFIG_HYPERCALL_MSR
+> 
+> v3:
+>   • Stop mapping the shared pages; use kvm_guest_write_cached() instead.
+>   • Use kvm_setup_pvclock_page() for Xen pvclock writes too.
+>   • Fix CPU numbering confusion and update documentation accordingly.
+>   • Support HVMIRQ_callback_vector delivery based on evtchn_upcall_pending.
+> 
+> v4:
+>   • Rebase on top of the KVM changes merged into 5.11-rc1.
+>   • Drop the kvm_{un,}map_gfn() cleanup as it isn't used since v2 anyway.
+>   • Trivial cosmetic cleanup (superfluous parens, remove declaration of a
+>     function removed in v3, etc.)
+> 
+> v5:
+>   • Rebased onto kvm/next as of 2021-01-08 (commit 872f36eb0b0f4).
+>   • Fix error handling for XEN_HVM_GET_ATTR.
+>   • Stop moving struct kvm_host_map definition; it's not used any more.
+>   • Add explicit padding to struct kvm_xen_hvm_attr to make it have
+>     identical layout on 32-bit vs. 64-bit machines.
 
-If the call is for something else and there is an interrupt, 
-inject_pending_event sets *req_immediate_exit to true.  This causes an 
-immediate vmexit after vmentry, and also schedules another KVM_REQ_EVENT 
-processing.
+Sorry for the delay, this already looks pretty good though.  The only 
+substantial issues are:
 
-If the call is for an interrupt but you cannot process it yet (IF=0, 
-STI/MOVSS window, etc.), inject_pending_event calls 
-kvm_x86_ops.enable_irq_window and this will cause KVM_REQ_EVENT to be 
-sent again.
+- the userspace get/set API
 
-How do you inject the interrupt from userspace?  IIRC 
-evtchn_upcall_pending is written by the hypervisor upon receiving a 
-hypercall, so wouldn't you need the "dom0" to invoke a KVM_INTERRUPT 
-ioctl (e.g. with irq == 256)?  That KVM_INTERRUPT will set KVM_REQ_EVENT.
+- the kvm_xen_has_interrupt() in the last patch.
 
-If you want to write a testcase without having to write all the 
-interrupt stuff in the selftests framework, you could set an IDT that 
-has room only for 128 vectors and use interrupt 128 as the upcall 
-vector.  Then successful delivery of the vector will cause a triple fault.
-
-Independent of the answer to the above, this is really the only place 
-where you're adding Xen code to a hot path.  Can you please use a 
-STATIC_KEY_FALSE kvm_has_xen_vcpu (and a static inline function) to 
-quickly return from kvm_xen_has_interrupt() if no vCPU has a shared info 
-set up?
-
-That is, something like
-
-- when first setting vcpu_info_set to true, 
-static_key_slow_inc(&kvm_has_xen_vcpu.key)
-
-- when destroying a vCPU with vcpu_info_set to true, 
-static_key_slow_dec_deferred(&kvm_has_xen_vcpu)
-
-- rename kvm_xen_has_interrupt to __kvm__xen_has_interrupt
-
-- add a wrapper that usese the static key to avoid the function call
-
-static int kvm_xen_has_interrupt(struct kvm_vcpu *v)
-{
-	if (static_branch_unlikely(&kvm_has_xen_vcpu.key))
-		return __kvm_xen_has_interrupt(v);
-
-	return false;
-}
+I would be happy to get this in 5.12 if you can fix those two.
 
 Paolo
 
