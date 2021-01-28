@@ -2,113 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 943E43079FD
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 16:44:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D675B307A66
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:13:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231245AbhA1Pnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 10:43:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58928 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbhA1Pni (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 10:43:38 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A598C061756
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 07:42:58 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id u14so4947036wmq.4
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 07:42:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=12mnrR8ms+5WwSs+PQVzHOmb66VScSLabLuV3gix8ak=;
-        b=kuTguAq0PIxh75dPU2EoEK+kClZITPzeJAUWVxlLI4qXRRy0EHl5JbOERJ2BxGOyRM
-         yT9Tn2JPqLmUg1A3k8U6kD+EsS/KfoJGq9MFVYh1n8kwm6jXSeAX2yYYRA7aC9a1Tz6n
-         0GCdFo8Jl+PO5frszxrgjaOu4QaG1xRcSPJ8EJY2gfZN8GPFN+cNDPBLf9r43uEjFP1y
-         cNa99zIFL8b2J2DfkG7gudABYoDzAsb7EoAiXxTgM9xjF4L79iif28PCWFM98gV85lYI
-         mF4/w+be+bo5oU8WNNF4yL9GPmFxOZgI2MR7EO0+zvwHSE+o8VkEvGppO+YJPgKIMJB2
-         deLg==
+        id S232076AbhA1QMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 11:12:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32695 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232394AbhA1QMH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:12:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611850236;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=q3+GaWOJcVoS280BO4ZTgt8MtsvmJpeZvLy5xokg2jk=;
+        b=JBw5L0xXG9RBsXezOTHG+wOovsXYyedlCSVYBVx/bqYyOI9uDgg/5vvLnPMTadQ7mOkICR
+        b0oaVxBTjXHLgQQFciKP5/ccXs1yPxsFV4OKJPDt1tQctPv9xRPI6XqUNblYk4dWV4gRdi
+        xTMLP6rXI+EPLf+6xxPKEneUjYGWHwY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-xi8DPPHPNseJMm5KQVg0Dw-1; Thu, 28 Jan 2021 11:10:34 -0500
+X-MC-Unique: xi8DPPHPNseJMm5KQVg0Dw-1
+Received: by mail-wr1-f71.google.com with SMTP id p16so2981404wrx.10
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:10:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=12mnrR8ms+5WwSs+PQVzHOmb66VScSLabLuV3gix8ak=;
-        b=YVv0VHoiqIIjDPViYGf2uqqhF2xU8t7hZdHgHRSlCBrmVRLzAQQnJX/8CmATKxVNkw
-         /zmlUBQmR1nph3tGDKzIQnAPMhU8iuTDOZtHFMoRzVm0UiJ7wAr5rIdDbZ9M1qPMvv5C
-         CLZwU2dFKgr0GiC66eCOF0XxEjH4BkX9Oq5M/tLQi0eOMto9dhlHyN5uTmvrk88j6YXB
-         xxO7pxqfwYM/q5qmIMhWmqhjb28xCveKyPxhBxFNajsrZcAFLzch7EOy1nt0+gOpBOP9
-         KGnvOE012GD6VWfzzajIflxoXuFIBfrjRUA2WGCjrV9lol0UYeDGIlsn1LuwCN7blKfT
-         IOXg==
-X-Gm-Message-State: AOAM5312syJnsUSc6oyeWxC5q+Hjl0rowWvxA9ovNEHyWb5ryLZj6sKq
-        zai544VHuSbYlhWXK89GYwjSjvvij4Njjf71
-X-Google-Smtp-Source: ABdhPJyuRinAeKRNz0U8QY7HX488Da2kP0mO3x8wMmScPfiPSOxC3b+qIw/y4ga4d/V9tTSnOTvOrQ==
-X-Received: by 2002:a1c:ed0b:: with SMTP id l11mr9248340wmh.47.1611848576851;
-        Thu, 28 Jan 2021 07:42:56 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id y14sm7258669wro.58.2021.01.28.07.42.55
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q3+GaWOJcVoS280BO4ZTgt8MtsvmJpeZvLy5xokg2jk=;
+        b=n+ZwsqcbYqSRxrFlYdZzrsMrgO+Ei5n6TTaGRKHBX2jbq42YYncN2fyl2wJ++ikyQe
+         PWiD1vu3+Au6s8TaXL6OxlwlYawwJsSn4nYYH2qHTrQUwcPLfdp9JaT7/ABY2Lz1wU63
+         NADVipqKtmZuUfdcT9jKbVrHZJFIxTKbIAqGbnOKC53IvJxwXZM1o0cDJfcs4xzm0fkN
+         AeHavUB7Q0VEdBA61HSdo4lRmSC3DoP1P9VVZej0H12hQakGtGYSnsacuJtOMjV3hUZ8
+         GLjXP8ldk9n6TG6lw0+125fylfSLZBwDeXyB+h4P6W/oMttSit5ah1zgc7KW9rdm/eC3
+         dCXg==
+X-Gm-Message-State: AOAM533XYHdoczJynknLXI5xhM13uo3e0Zcf81MFfqk2SU3OvFLKdHfh
+        aRi0gpv3zdoDsI/efu/3plMmdbQomknmIOrZ5Qb7DgNN8grO71/ABUDQyk9jya3d+oJ9k75KQ3x
+        2hspYfAeLKiv3
+X-Received: by 2002:a5d:5910:: with SMTP id v16mr17858688wrd.29.1611850233400;
+        Thu, 28 Jan 2021 08:10:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwCJxet7P/Zrk9KZEMXq8X1p9C2h5zi7JFYpLswRvkfkQWra6ZTD64HKpdUGYoJqTRtuXS7kQ==
+X-Received: by 2002:a5d:5910:: with SMTP id v16mr17858644wrd.29.1611850233122;
+        Thu, 28 Jan 2021 08:10:33 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id l10sm7495512wro.4.2021.01.28.08.10.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 07:42:55 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id A63981FF7E;
-        Thu, 28 Jan 2021 15:42:54 +0000 (GMT)
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <87r1m5x56h.fsf@linaro.org>
- <98f06a0a-efe6-c630-8e68-0e4559f04d58@redhat.com>
-User-agent: mu4e 1.5.7; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v4 00/12] Support disabling TCG on ARM (part 2)
-Date:   Thu, 28 Jan 2021 15:42:38 +0000
-In-reply-to: <98f06a0a-efe6-c630-8e68-0e4559f04d58@redhat.com>
-Message-ID: <87bld9ukxt.fsf@linaro.org>
+        Thu, 28 Jan 2021 08:10:32 -0800 (PST)
+Date:   Thu, 28 Jan 2021 17:10:29 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 01/13] af_vsock: prepare for SOCK_SEQPACKET support
+Message-ID: <20210128161029.a53la6e3dv5bzazn@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+ <20210125111131.597930-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210125111131.597930-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+I think the patch title should be more explicit, so something like
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+vsock: generalize function to manage connectible sockets
 
-> Hi Alex,
+On Mon, Jan 25, 2021 at 02:11:28PM +0300, Arseny Krasnov wrote:
+>This prepares af_vsock.c for SEQPACKET support:
+>1) As both stream and seqpacket sockets are connection oriented, add
+>   check for SOCK_SEQPACKET to conditions where SOCK_STREAM is checked.
+>2) Some functions such as setsockopt(), getsockopt(), connect(),
+>   recvmsg(), sendmsg() are shared between both types of sockets, so
+>   rename them in general manner and create entry points for each type
+>   of socket to call these functions(for stream in this patch, for
+>   seqpacket in further patches).
 >
-> On 1/28/21 1:41 AM, Alex Benn=C3=A9e wrote:
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->>=20
->>> Cover from Samuel Ortiz from (part 1) [1]:
->>>
->>>   This patchset allows for building and running ARM targets with TCG
->>>   disabled. [...]
->>>
->>>   The rationale behind this work comes from the NEMU project where we're
->>>   trying to only support x86 and ARM 64-bit architectures, without
->>>   including the TCG code base. We can only do so if we can build and run
->>>   ARM binaries with TCG disabled.
->>>
->>> v4 almost 2 years later... [2]:
->>> - Rebased on Meson
->>> - Addressed Richard review comments
->>> - Addressed Claudio review comments
->>=20
->> Have you re-based recently because I was having a look but ran into
->> merge conflicts. I'd like to get the merged at some point because I ran
->> into similar issues with the Xen only build without TCG.
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> net/vmw_vsock/af_vsock.c | 91 +++++++++++++++++++++++++++++-----------
+> 1 file changed, 67 insertions(+), 24 deletions(-)
 >
-> I addressed most of this review comments locally. Since Claudio's
-> accelerator series was getting more attention (and is bigger) I was
-> waiting it gets merged first. He just respun v14:
-> https://lists.gnu.org/archive/html/qemu-devel/2021-01/msg07171.html
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index b12d3a322242..c9ce57db9554 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -604,8 +604,8 @@ static void vsock_pending_work(struct work_struct *work)
+>
+> /**** SOCKET OPERATIONS ****/
+>
+>-static int __vsock_bind_stream(struct vsock_sock *vsk,
+>-			       struct sockaddr_vm *addr)
+>+static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>+				    struct sockaddr_vm *addr)
+> {
+> 	static u32 port;
+> 	struct sockaddr_vm new_addr;
+>@@ -685,7 +685,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
+> 	switch (sk->sk_socket->type) {
+> 	case SOCK_STREAM:
+> 		spin_lock_bh(&vsock_table_lock);
+>-		retval = __vsock_bind_stream(vsk, addr);
+>+		retval = __vsock_bind_connectible(vsk, addr);
+> 		spin_unlock_bh(&vsock_table_lock);
+> 		break;
+>
+>@@ -767,6 +767,11 @@ static struct sock *__vsock_create(struct net *net,
+> 	return sk;
+> }
+>
+>+static bool sock_type_connectible(u16 type)
+>+{
+>+	return (type == SOCK_STREAM || type == SOCK_SEQPACKET);
+>+}
+>+
 
-OK I'll have a look at Claudio's first ;-)
+I think it's okay to add this function in this patch, but until 
+SOCK_SEQPACKET is not supported, I would check only SOCK_STREAM and add 
+SOCK_SEQPACKET only when you add 'vsock_seqpacket_ops' later.
 
+> static void __vsock_release(struct sock *sk, int level)
+> {
+> 	if (sk) {
+>@@ -785,7 +790,7 @@ static void __vsock_release(struct sock *sk, int level)
+>
+> 		if (vsk->transport)
+> 			vsk->transport->release(vsk);
+>-		else if (sk->sk_type == SOCK_STREAM)
+>+		else if (sock_type_connectible(sk->sk_type))
+> 			vsock_remove_sock(vsk);
+>
+> 		sock_orphan(sk);
+>@@ -945,7 +950,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
+> 	sk = sock->sk;
+> 	if (sock->state == SS_UNCONNECTED) {
+> 		err = -ENOTCONN;
+>-		if (sk->sk_type == SOCK_STREAM)
+>+		if (sock_type_connectible(sk->sk_type))
+> 			return err;
+> 	} else {
+> 		sock->state = SS_DISCONNECTING;
+>@@ -960,7 +965,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
+> 		sk->sk_state_change(sk);
+> 		release_sock(sk);
+>
+>-		if (sk->sk_type == SOCK_STREAM) {
+>+		if (sock_type_connectible(sk->sk_type)) {
+> 			sock_reset_flag(sk, SOCK_DONE);
+> 			vsock_send_shutdown(sk, mode);
+> 		}
+>@@ -1013,7 +1018,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
+> 		if (!(sk->sk_shutdown & SEND_SHUTDOWN))
+> 			mask |= EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
+>
+>-	} else if (sock->type == SOCK_STREAM) {
+>+	} else if (sock_type_connectible(sk->sk_type)) {
+> 		const struct vsock_transport *transport = vsk->transport;
+> 		lock_sock(sk);
+>
+>@@ -1259,8 +1264,8 @@ static void vsock_connect_timeout(struct work_struct *work)
+> 	sock_put(sk);
+> }
+>
+>-static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
+>-				int addr_len, int flags)
+>+static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>+			 int addr_len, int flags)
+> {
+> 	int err;
+> 	struct sock *sk;
+>@@ -1395,6 +1400,12 @@ static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
+> 	return err;
+> }
+>
+>+static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
+>+				int addr_len, int flags)
+>+{
+>+	return vsock_connect(sock, addr, addr_len, flags);
+>+}
+>+
 
+I think you can directly use vsock_connect in 'vsock_stream_ops'.
 
---=20
-Alex Benn=C3=A9e
+> static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
+> 			bool kern)
+> {
+>@@ -1410,7 +1421,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
+>
+> 	lock_sock(listener);
+>
+>-	if (sock->type != SOCK_STREAM) {
+>+	if (!sock_type_connectible(sock->type)) {
+> 		err = -EOPNOTSUPP;
+> 		goto out;
+> 	}
+>@@ -1487,7 +1498,7 @@ static int vsock_listen(struct socket *sock, int 
+>backlog)
+>
+> 	lock_sock(sk);
+>
+>-	if (sock->type != SOCK_STREAM) {
+>+	if (!sock_type_connectible(sk->sk_type)) {
+> 		err = -EOPNOTSUPP;
+> 		goto out;
+> 	}
+>@@ -1531,11 +1542,11 @@ static void vsock_update_buffer_size(struct vsock_sock *vsk,
+> 	vsk->buffer_size = val;
+> }
+>
+>-static int vsock_stream_setsockopt(struct socket *sock,
+>-				   int level,
+>-				   int optname,
+>-				   sockptr_t optval,
+>-				   unsigned int optlen)
+>+static int vsock_connectible_setsockopt(struct socket *sock,
+>+					int level,
+>+					int optname,
+>+					sockptr_t optval,
+>+					unsigned int optlen)
+> {
+> 	int err;
+> 	struct sock *sk;
+>@@ -1612,10 +1623,20 @@ static int vsock_stream_setsockopt(struct socket *sock,
+> 	return err;
+> }
+>
+>-static int vsock_stream_getsockopt(struct socket *sock,
+>-				   int level, int optname,
+>-				   char __user *optval,
+>-				   int __user *optlen)
+>+static int vsock_stream_setsockopt(struct socket *sock,
+>+				   int level,
+>+				   int optname,
+>+				   sockptr_t optval,
+>+				   unsigned int optlen)
+>+{
+>+	return vsock_connectible_setsockopt(sock, level, optname, optval,
+>+					    optlen);
+>+}
+
+As before, I think you can directly use vsock_connectible_setsockopt in 
+'vsock_stream_ops'.
+
+>+
+>+static int vsock_connectible_getsockopt(struct socket *sock,
+>+					int level, int optname,
+>+					char __user *optval,
+>+					int __user *optlen)
+> {
+> 	int err;
+> 	int len;
+>@@ -1683,8 +1704,17 @@ static int vsock_stream_getsockopt(struct socket *sock,
+> 	return 0;
+> }
+>
+>-static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+>-				size_t len)
+>+static int vsock_stream_getsockopt(struct socket *sock,
+>+				   int level, int optname,
+>+				   char __user *optval,
+>+				   int __user *optlen)
+>+{
+>+	return vsock_connectible_getsockopt(sock, level, optname, optval,
+>+					    optlen);
+>+}
+>+
+
+Ditto.
+
+>+static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+>+				     size_t len)
+> {
+> 	struct sock *sk;
+> 	struct vsock_sock *vsk;
+>@@ -1822,10 +1852,16 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+> 	return err;
+> }
+>
+>+static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+>+				size_t len)
+>+{
+>+	return vsock_connectible_sendmsg(sock, msg, len);
+>+}
+>+
+
+Ditto.
+
+>
+> static int
+>-vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>-		     int flags)
+>+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>+			  int flags)
+> {
+> 	struct sock *sk;
+> 	struct vsock_sock *vsk;
+>@@ -1995,6 +2031,13 @@ vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 	return err;
+> }
+>
+>+static int
+>+vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>+		     int flags)
+>+{
+>+	return vsock_connectible_recvmsg(sock, msg, len, flags);
+>+}
+>+
+
+Ditto.
+
+> static const struct proto_ops vsock_stream_ops = {
+> 	.family = PF_VSOCK,
+> 	.owner = THIS_MODULE,
+>-- 
+>2.25.1
+>
+
