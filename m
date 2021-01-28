@@ -2,210 +2,407 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 853AB307AFB
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:31:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93A67307B0C
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:36:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232350AbhA1QbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 11:31:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49291 "EHLO
+        id S232395AbhA1Qei (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 11:34:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56984 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231860AbhA1QbM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:31:12 -0500
+        by vger.kernel.org with ESMTP id S231649AbhA1Qee (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:34:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611851384;
+        s=mimecast20190719; t=1611851586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CBXJAn42N0v5gv2TukYAt13ncT1ZsjqXKLJyUwUjq/4=;
-        b=haWQvUz4GNiLlujtaWsXJDsGrkYVx85ysSoHJvt4Cds8JXUjeYwgWSDeNQDJnXysdJQdN6
-        yEIvuIUiKh/YUw+WqzHXPo1xl6UprZamizZP02MeAsVpIrEjiTI6/c6ng6tcIHVELJSOTb
-        iFVDKboN2tx+w0C1lnUsMkvE0iOqRss=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-BpwLIS-DNPGPtnH22Sl98w-1; Thu, 28 Jan 2021 11:29:43 -0500
-X-MC-Unique: BpwLIS-DNPGPtnH22Sl98w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67434100C605;
-        Thu, 28 Jan 2021 16:29:40 +0000 (UTC)
-Received: from gondolin (ovpn-112-12.ams2.redhat.com [10.36.112.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E1E311971B;
-        Thu, 28 Jan 2021 16:29:33 +0000 (UTC)
-Date:   Thu, 28 Jan 2021 17:29:30 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
-Message-ID: <20210128172930.74baff41.cohuck@redhat.com>
-In-Reply-To: <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
-References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
-        <20210122122503.4e492b96@omen.home.shazbot.org>
-        <20210122200421.GH4147@nvidia.com>
-        <20210125172035.3b61b91b.cohuck@redhat.com>
-        <20210125180440.GR4147@nvidia.com>
-        <20210125163151.5e0aeecb@omen.home.shazbot.org>
-        <20210126004522.GD4147@nvidia.com>
-        <20210125203429.587c20fd@x1.home.shazbot.org>
-        <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
-Organization: Red Hat GmbH
+        bh=FdUYV04vZro17uutaKWrqsCYU3iMGEHyKXk4ksXfiJ4=;
+        b=e/iRoAudk4azzwbw7HbMuk1wyrXbil8BjdAJ/2cmPsmzaz4bxm7DVQo+djQ1kOcHLVDyyB
+        M40BjDZSkf2SA/hTS0O82BWhT5QMJkf0KLQG/kUCpxewLQRX3A+7cbZ6vjvIt6f60jc8dl
+        sDn9dpWAVyjT+MR+2u4cZwvdkR8Xe5o=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-119-9OGyL0cPMGObpq-Tdmjm9Q-1; Thu, 28 Jan 2021 11:33:04 -0500
+X-MC-Unique: 9OGyL0cPMGObpq-Tdmjm9Q-1
+Received: by mail-wr1-f72.google.com with SMTP id b14so3388750wrw.12
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:33:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FdUYV04vZro17uutaKWrqsCYU3iMGEHyKXk4ksXfiJ4=;
+        b=hsVrHaxslq5tpkXPvxruQ259crxFbXig8olZ0PDLEjwNN8Zra4aEiek+FaSS7wRFw5
+         LHTIH3GkE/7xCbGJhpO56geQhP72bZBSwXThR7zDIvZsGT3FLH8KMtGzRacii/MTGm70
+         JCTIy+BDhGSHyi/m86CrXM3IMO9aWseqH2s3dgudGqfDXKAkB6K0uBcR3eSAn9gE+gcS
+         7Z7R26B0mRdswAIN1QsVqFexc7BlkaWBDfQqRk4MBK1hzza4xtdhAE3f5wLTtO+jr6jw
+         JhCeDpmx+jhSBwtKPT3OBMXidotnnlV4CKLJQ8iChF9owTQkRvHd5H+N+Sv+TUioOG5v
+         JnRg==
+X-Gm-Message-State: AOAM5301+EX0jYczJSJMojAT8YsmDRmjGLk+Swrm641YDNn2p1MiGbvX
+        tmD7hK4EgHdn5siuQTFLFPjS7qpnAqFZRhwYf3ZDAQ2nFj5L0t3/YaCKIoBSms1q58HyLv4bmL8
+        lEgruMsQnlUaR
+X-Received: by 2002:adf:f849:: with SMTP id d9mr17491598wrq.349.1611851582943;
+        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxF+ScPOLAhB6bXIWSvwvFKyZ7WpX/FQO/3pX5dZXvg16LtuNb18msqzMvprBKdi2kv2PiLwg==
+X-Received: by 2002:adf:f849:: with SMTP id d9mr17491573wrq.349.1611851582752;
+        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id w25sm6657568wmc.42.2021.01.28.08.33.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
+Date:   Thu, 28 Jan 2021 17:32:59 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 02/13] af_vsock: prepare
+ 'vsock_connectible_recvmsg()'
+Message-ID: <20210128163259.3lhcy43tm4t6ejys@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+ <20210125111200.598103-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210125111200.598103-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Jan 2021 15:27:43 +0200
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+On Mon, Jan 25, 2021 at 02:11:57PM +0300, Arseny Krasnov wrote:
+>This prepares 'vsock_connectible_recvmg()' to call SEQPACKET receive
+>loop:
+>1) Some shared check left in this function, then socket type
+>   specific receive loop is called.
+>2) Stream receive loop is moved to separate function.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> net/vmw_vsock/af_vsock.c | 242 ++++++++++++++++++++++-----------------
+> 1 file changed, 138 insertions(+), 104 deletions(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index c9ce57db9554..524df8fc84cd 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1858,65 +1858,69 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+> 	return vsock_connectible_sendmsg(sock, msg, len);
+> }
+>
+>-
+>-static int
+>-vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>-			  int flags)
+>+static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
+>+			   long timeout,
+>+			   struct vsock_transport_recv_notify_data *recv_data,
+>+			   size_t target)
+> {
+>-	struct sock *sk;
+>+	int err = 0;
+> 	struct vsock_sock *vsk;
+> 	const struct vsock_transport *transport;
+>-	int err;
+>-	size_t target;
+>-	ssize_t copied;
+>-	long timeout;
+>-	struct vsock_transport_recv_notify_data recv_data;
+>-
+>-	DEFINE_WAIT(wait);
+>
+>-	sk = sock->sk;
+> 	vsk = vsock_sk(sk);
+> 	transport = vsk->transport;
+>-	err = 0;
+>-
+>-	lock_sock(sk);
+>-
+>-	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
+>-		/* Recvmsg is supposed to return 0 if a peer performs an
+>-		 * orderly shutdown. Differentiate between that case and when a
+>-		 * peer has not connected or a local shutdown occured with the
+>-		 * SOCK_DONE flag.
+>-		 */
+>-		if (sock_flag(sk, SOCK_DONE))
+>-			err = 0;
+>-		else
+>-			err = -ENOTCONN;
+>
+>+	if (sk->sk_err != 0 ||
+>+	    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+>+	    (vsk->peer_shutdown & SEND_SHUTDOWN)) {
+>+		err = -1;
+> 		goto out;
+> 	}
+>-
+>-	if (flags & MSG_OOB) {
+>-		err = -EOPNOTSUPP;
+>+	/* Don't wait for non-blocking sockets. */
+>+	if (timeout == 0) {
+>+		err = -EAGAIN;
+> 		goto out;
+> 	}
+>
+>-	/* We don't check peer_shutdown flag here since peer may actually shut
+>-	 * down, but there can be data in the queue that a local socket can
+>-	 * receive.
+>-	 */
+>-	if (sk->sk_shutdown & RCV_SHUTDOWN) {
+>-		err = 0;
+>-		goto out;
+>+	if (recv_data) {
+>+		err = transport->notify_recv_pre_block(vsk, target, recv_data);
+>+		if (err < 0)
+>+			goto out;
+> 	}
+>
+>-	/* It is valid on Linux to pass in a zero-length receive buffer.  This
+>-	 * is not an error.  We may as well bail out now.
+>-	 */
+>-	if (!len) {
+>-		err = 0;
+>+	release_sock(sk);
+>+	timeout = schedule_timeout(timeout);
+>+	lock_sock(sk);
+>+
+>+	if (signal_pending(current)) {
+>+		err = sock_intr_errno(timeout);
+>+		goto out;
+>+	} else if (timeout == 0) {
+>+		err = -EAGAIN;
+> 		goto out;
+> 	}
+>
+>+out:
+>+	finish_wait(sk_sleep(sk), wait);
+>+	return err;
+>+}
+>+
+>+static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
+>+				  size_t len, int flags)
+>+{
+>+	struct vsock_transport_recv_notify_data recv_data;
+>+	const struct vsock_transport *transport;
+>+	struct vsock_sock *vsk;
+>+	ssize_t copied;
+>+	size_t target;
+>+	long timeout;
+>+	int err;
+>+
+>+	DEFINE_WAIT(wait);
+>+
+>+	vsk = vsock_sk(sk);
+>+	transport = vsk->transport;
+>+
+> 	/* We must not copy less than target bytes into the user's buffer
+> 	 * before returning successfully, so we wait for the consume queue to
+> 	 * have that much data to consume before dequeueing.  Note that this
+>@@ -1937,85 +1941,53 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>
+>
+> 	while (1) {
+>+		ssize_t read;
+> 		s64 ready;
+>
+> 		prepare_to_wait(sk_sleep(sk), &wait, 
+> 		TASK_INTERRUPTIBLE);
+> 		ready = vsock_stream_has_data(vsk);
 
-> Hi Alex, Cornelia and Jason,
-> 
-> thanks for the reviewing this.
-> 
-> On 1/26/2021 5:34 AM, Alex Williamson wrote:
-> > On Mon, 25 Jan 2021 20:45:22 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >  
-> >> On Mon, Jan 25, 2021 at 04:31:51PM -0700, Alex Williamson wrote:
-> >>  
-> >>> We're supposed to be enlightened by a vendor driver that does nothing
-> >>> more than pass the opaque device_data through to the core functions,
-> >>> but in reality this is exactly the point of concern above.  At a
-> >>> minimum that vendor driver needs to look at the vdev to get the
-> >>> pdev,  
-> >> The end driver already havs the pdev, the RFC doesn't go enough into
-> >> those bits, it is a good comment.
-> >>
-> >> The dd_data pased to the vfio_create_pci_device() will be retrieved
-> >> from the ops to get back to the end drivers data. This can cleanly
-> >> include everything: the VF pci_device, PF pci_device, mlx5_core
-> >> pointer, vfio_device and vfio_pci_device.
-> >>
-> >> This is why the example passes in the mvadev:
-> >>
-> >> +	vdev = vfio_create_pci_device(pdev, &mlx5_vfio_pci_ops, mvadev);
-> >>
-> >> The mvadev has the PF, VF, and mlx5 core driver pointer.
-> >>
-> >> Getting that back out during the ops is enough to do what the mlx5
-> >> driver needs to do, which is relay migration related IOCTLs to the PF
-> >> function via the mlx5_core driver so the device can execute them on
-> >> behalf of the VF.
-> >>  
-> >>> but then what else does it look at, consume, or modify.  Now we have
-> >>> vendor drivers misusing the core because it's not clear which fields
-> >>> are private and how public fields can be used safely,  
-> >> The kernel has never followed rigid rules for data isolation, it is
-> >> normal to have whole private structs exposed in headers so that
-> >> container_of can be used to properly compose data structures.  
-> > I reject this assertion, there are plenty of structs that clearly
-> > indicate private vs public data or, as we've done in mdev, clearly
-> > marking the private data in a "private" header and provide access
-> > functions for public fields.  Including a "private" header to make use
-> > of a "library" is just wrong.  In the example above, there's no way for
-> > the mlx vendor driver to get back dd_data without extracting it from
-> > struct vfio_pci_device itself.  
-> 
-> I'll create a better separation between private/public fields according 
-> to my understanding for the V2.
-> 
-> I'll just mention that beyond this separation, future improvements will 
-> be needed and can be done incrementally.
-> 
-> I don't think that we should do so many changes at one shut. The 
-> incremental process is safer from subsystem point of view.
-> 
-> I also think that upstreaming mlx5_vfio_pci.ko and upstreaming vfio-pci 
-> separation into 2 modules doesn't have to happen in one-shut.
+Maybe we can move also these lines in vsock_wait_data() that can return 
+'ready' or an error.
 
-The design can probably benefit from tossing a non-mlx5 driver into the
-mix.
+>
+> 		if (ready == 0) {
+>-			if (sk->sk_err != 0 ||
+>-			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
+>-			    (vsk->peer_shutdown & SEND_SHUTDOWN)) {
+>-				finish_wait(sk_sleep(sk), &wait);
+>-				break;
+>-			}
+>-			/* Don't wait for non-blocking sockets. */
+>-			if (timeout == 0) {
+>-				err = -EAGAIN;
+>-				finish_wait(sk_sleep(sk), &wait);
+>-				break;
+>-			}
+>-
+>-			err = transport->notify_recv_pre_block(
+>-					vsk, target, &recv_data);
+>-			if (err < 0) {
+>-				finish_wait(sk_sleep(sk), &wait);
+>-				break;
+>-			}
+>-			release_sock(sk);
+>-			timeout = schedule_timeout(timeout);
+>-			lock_sock(sk);
+>-
+>-			if (signal_pending(current)) {
+>-				err = sock_intr_errno(timeout);
+>-				finish_wait(sk_sleep(sk), &wait);
+>-				break;
+>-			} else if (timeout == 0) {
+>-				err = -EAGAIN;
+>-				finish_wait(sk_sleep(sk), &wait);
+>+			if (vsock_wait_data(sk, &wait, timeout, &recv_data, target))
+> 				break;
+>-			}
+>-		} else {
+>-			ssize_t read;
+>+			continue;
+>+		}
+>
+>-			finish_wait(sk_sleep(sk), &wait);
+>+		finish_wait(sk_sleep(sk), &wait);
 
-So, let me suggest the zdev support for that experiment (see
-e6b817d4b8217a9528fcfd59719b924ab8a5ff23 and friends.) It is quite
-straightforward: it injects some capabilities into the info ioctl. A
-specialized driver would basically only need to provide special
-handling for the ioctl callback and just forward anything else. It also
-would not need any matching for device ids etc., as it would only make
-sense on s390x, but regardless of the device. It could, however, help
-us to get an idea what a good split would look like.
+And also this one can be moved in vsock_wait_data().
+>
+>-			if (ready < 0) {
+>-				/* Invalid queue pair content. XXX This should
+>-				* be changed to a connection reset in a later
+>-				* change.
+>-				*/
+>+		if (ready < 0) {
+>+			/* Invalid queue pair content. XXX This should
+>+			 * be changed to a connection reset in a later
+>+			 * change.
+>+			 */
+>
+>-				err = -ENOMEM;
+>-				goto out;
+>-			}
+>+			err = -ENOMEM;
+>+			goto out;
+>+		}
+>
+>-			err = transport->notify_recv_pre_dequeue(
+>-					vsk, target, &recv_data);
+>-			if (err < 0)
+>-				break;
+>+		err = transport->notify_recv_pre_dequeue(vsk,
+>+					target, &recv_data);
+>+		if (err < 0)
+>+			break;
+>+		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
+>
+>-			read = transport->stream_dequeue(
+>-					vsk, msg,
+>-					len - copied, flags);
+>-			if (read < 0) {
+>-				err = -ENOMEM;
+>-				break;
+>-			}
+>+		if (read < 0) {
+>+			err = -ENOMEM;
+>+			break;
+>+		}
+>
+>-			copied += read;
+>+		copied += read;
+>
+>-			err = transport->notify_recv_post_dequeue(
+>-					vsk, target, read,
+>+		err = transport->notify_recv_post_dequeue(vsk,
+>+					target, read,
+> 					!(flags & MSG_PEEK), &recv_data);
+>-			if (err < 0)
+>-				goto out;
+>+		if (err < 0)
+>+			goto out;
+>
+>-			if (read >= target || flags & MSG_PEEK)
+>-				break;
+>+		if (read >= target || flags & MSG_PEEK)
+>+			break;
+>
+>-			target -= read;
+>-		}
+>+		target -= read;
+> 	}
+>
+> 	if (sk->sk_err)
+>@@ -2031,6 +2003,68 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 	return err;
+> }
+>
+>+static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
+>+				     size_t len, int flags)
+>+{
+>+	return -1;
+>+}
+>+
 
-> 
-> But again, to make our point in this RFC, I'll improve it for V2.
-> 
-> >  
-> >> Look at struct device, for instance. Most of that is private to the
-> >> driver core.
-> >>
-> >> A few 'private to vfio-pci-core' comments would help, it is good
-> >> feedback to make that more clear.
-> >>  
-> >>> extensions potentially break vendor drivers, etc.  We're only even hand
-> >>> waving that existing device specific support could be farmed out to new
-> >>> device specific drivers without even going to the effort to prove that.  
-> >> This is a RFC, not a complete patch series. The RFC is to get feedback
-> >> on the general design before everyone comits alot of resources and
-> >> positions get dug in.
-> >>
-> >> Do you really think the existing device specific support would be a
-> >> problem to lift? It already looks pretty clean with the
-> >> vfio_pci_regops, looks easy enough to lift to the parent.
-> >>  
-> >>> So far the TODOs rather mask the dirty little secrets of the
-> >>> extension rather than showing how a vendor derived driver needs to
-> >>> root around in struct vfio_pci_device to do something useful, so
-> >>> probably porting actual device specific support rather than further
-> >>> hand waving would be more helpful.  
-> >> It would be helpful to get actual feedback on the high level design -
-> >> someting like this was already tried in May and didn't go anywhere -
-> >> are you surprised that we are reluctant to commit alot of resources
-> >> doing a complete job just to have it go nowhere again?  
-> > That's not really what I'm getting from your feedback, indicating
-> > vfio-pci is essentially done, the mlx stub driver should be enough to
-> > see the direction, and additional concerns can be handled with TODO
-> > comments.  Sorry if this is not construed as actual feedback, I think
-> > both Connie and I are making an effort to understand this and being
-> > hampered by lack of a clear api or a vendor driver that's anything more
-> > than vfio-pci plus an aux bus interface.  Thanks,  
-> 
-> I think I got the main idea and I'll try to summarize it:
-> 
-> The separation to vfio-pci.ko and vfio-pci-core.ko is acceptable, and we 
-> do need it to be able to create vendor-vfio-pci.ko driver in the future 
-> to include vendor special souse inside.
+You can add this function later, when you implement it...
 
-One other thing I'd like to bring up: What needs to be done in
-userspace? Does a userspace driver like QEMU need changes to actually
-exploit this? Does management software like libvirt need to be involved
-in decision making, or does it just need to provide the knobs to make
-the driver configurable?
+>+static int
+>+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>+			  int flags)
+>+{
+>+	const struct vsock_transport *transport;
+>+	struct vsock_sock *vsk;
+>+	struct sock *sk;
+>+	int err = 0;
+>+
+>+	sk = sock->sk;
+>+
+>+	lock_sock(sk);
+>+
+>+	vsk = vsock_sk(sk);
+>+	transport = vsk->transport;
+>+
+>+	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
+>+		/* Recvmsg is supposed to return 0 if a peer performs an
+>+		 * orderly shutdown. Differentiate between that case and when a
+>+		 * peer has not connected or a local shutdown occurred 
+>with the
+>+		 * SOCK_DONE flag.
+>+		 */
+>+		if (!sock_flag(sk, SOCK_DONE))
+>+			err = -ENOTCONN;
+>+
+>+		goto out;
+>+	}
+>+
+>+	if (flags & MSG_OOB) {
+>+		err = -EOPNOTSUPP;
+>+		goto out;
+>+	}
+>+
+>+	/* We don't check peer_shutdown flag here since peer may actually shut
+>+	 * down, but there can be data in the queue that a local socket can
+>+	 * receive.
+>+	 */
+>+	if (sk->sk_shutdown & RCV_SHUTDOWN)
+>+		goto out;
+>+
+>+	/* It is valid on Linux to pass in a zero-length receive buffer.  This
+>+	 * is not an error.  We may as well bail out now.
+>+	 */
+>+	if (!len)
+>+		goto out;
+>+
+>+	if (sk->sk_type == SOCK_STREAM)
+>+		err = __vsock_stream_recvmsg(sk, msg, len, flags);
+>+	else
+>+		err = __vsock_seqpacket_recvmsg(sk, msg, len, flags);
 
-> 
-> The separation implementation and the question of what is private and 
-> what is public, and the core APIs to the various drivers should be 
-> improved or better demonstrated in the V2.
-> 
-> I'll work on improving it and I'll send the V2.
-> 
-> 
-> If you have some feedback of the things/fields/structs you think should 
-> remain private to vfio-pci-core please let us know.
-> 
-> Thanks for the effort in the review,
-> 
-> -Max.
-> 
-> > Alex
-> >  
-> 
+...and also this 'else' branch.
+
+>+
+>+out:
+>+	release_sock(sk);
+>+	return err;
+>+}
+>+
+> static int
+> vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+> 		     int flags)
+>-- 
+>2.25.1
+>
 
