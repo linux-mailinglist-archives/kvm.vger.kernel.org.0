@@ -2,407 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 93A67307B0C
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:36:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CDE62307B58
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:52:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232395AbhA1Qei (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 11:34:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56984 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231649AbhA1Qee (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:34:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611851586;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FdUYV04vZro17uutaKWrqsCYU3iMGEHyKXk4ksXfiJ4=;
-        b=e/iRoAudk4azzwbw7HbMuk1wyrXbil8BjdAJ/2cmPsmzaz4bxm7DVQo+djQ1kOcHLVDyyB
-        M40BjDZSkf2SA/hTS0O82BWhT5QMJkf0KLQG/kUCpxewLQRX3A+7cbZ6vjvIt6f60jc8dl
-        sDn9dpWAVyjT+MR+2u4cZwvdkR8Xe5o=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-9OGyL0cPMGObpq-Tdmjm9Q-1; Thu, 28 Jan 2021 11:33:04 -0500
-X-MC-Unique: 9OGyL0cPMGObpq-Tdmjm9Q-1
-Received: by mail-wr1-f72.google.com with SMTP id b14so3388750wrw.12
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:33:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FdUYV04vZro17uutaKWrqsCYU3iMGEHyKXk4ksXfiJ4=;
-        b=hsVrHaxslq5tpkXPvxruQ259crxFbXig8olZ0PDLEjwNN8Zra4aEiek+FaSS7wRFw5
-         LHTIH3GkE/7xCbGJhpO56geQhP72bZBSwXThR7zDIvZsGT3FLH8KMtGzRacii/MTGm70
-         JCTIy+BDhGSHyi/m86CrXM3IMO9aWseqH2s3dgudGqfDXKAkB6K0uBcR3eSAn9gE+gcS
-         7Z7R26B0mRdswAIN1QsVqFexc7BlkaWBDfQqRk4MBK1hzza4xtdhAE3f5wLTtO+jr6jw
-         JhCeDpmx+jhSBwtKPT3OBMXidotnnlV4CKLJQ8iChF9owTQkRvHd5H+N+Sv+TUioOG5v
-         JnRg==
-X-Gm-Message-State: AOAM5301+EX0jYczJSJMojAT8YsmDRmjGLk+Swrm641YDNn2p1MiGbvX
-        tmD7hK4EgHdn5siuQTFLFPjS7qpnAqFZRhwYf3ZDAQ2nFj5L0t3/YaCKIoBSms1q58HyLv4bmL8
-        lEgruMsQnlUaR
-X-Received: by 2002:adf:f849:: with SMTP id d9mr17491598wrq.349.1611851582943;
-        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxF+ScPOLAhB6bXIWSvwvFKyZ7WpX/FQO/3pX5dZXvg16LtuNb18msqzMvprBKdi2kv2PiLwg==
-X-Received: by 2002:adf:f849:: with SMTP id d9mr17491573wrq.349.1611851582752;
-        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id w25sm6657568wmc.42.2021.01.28.08.33.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 08:33:02 -0800 (PST)
-Date:   Thu, 28 Jan 2021 17:32:59 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 02/13] af_vsock: prepare
- 'vsock_connectible_recvmsg()'
-Message-ID: <20210128163259.3lhcy43tm4t6ejys@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210125111200.598103-1-arseny.krasnov@kaspersky.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210125111200.598103-1-arseny.krasnov@kaspersky.com>
+        id S232490AbhA1Quf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 11:50:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232606AbhA1Qtv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 11:49:51 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D85C061573
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:49:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ei01PC0KXVkmlkz2J1SpHtwpb2od0AMC9DXG5wIgSYc=; b=QGh6COjOAmv6c6xZVwBMAD4YyO
+        hp+w1tpe6Rz4xSi3ka+pg/S8OtpYy/edd4ZgOtaN3xMa7EXq5zl9b6Elk3817ia9JFh4wN6ukGbzl
+        5bA2YAYSy2b6RVFXSY21SA2IAczL6mzVNoL35noLUGYvAQ6OaVk5yFxwKuD8NHBiUnd1RxZR/dwtP
+        w2w+8U7GwN5rm0/2ei5lAomcFlZNQWZlaqFlxTcuX43iyQQ2bBvSCm1xImuvVERvrrfMPtH0JXUD7
+        pquJa5xdck2ByUSb27FNO3DJQHYKekdxIhEtNvvna24wmWbd3ai6++9eOHvARw3jgvwcqSRi5lhcv
+        5odggkBQ==;
+Received: from 54-240-197-224.amazon.com ([54.240.197.224] helo=u3832b3a9db3152.ant.amazon.com)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l5ATg-0006xh-JF; Thu, 28 Jan 2021 16:49:05 +0000
+Message-ID: <dd496053b8d51a400b66622cd25c10f4540ac4d9.camel@infradead.org>
+Subject: Re: [PATCH v5 15/16] KVM: Add documentation for Xen hypercall and
+ shared_info updates
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+Date:   Thu, 28 Jan 2021 16:49:02 +0000
+In-Reply-To: <e79d508e-454f-f34e-018b-e6b63fe3d825@redhat.com>
+References: <20210111195725.4601-1-dwmw2@infradead.org>
+         <20210111195725.4601-16-dwmw2@infradead.org>
+         <e79d508e-454f-f34e-018b-e6b63fe3d825@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256";
+        protocol="application/x-pkcs7-signature";
+        boundary="=-lx2w3B1o2JDNkccPNe04"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+Mime-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 02:11:57PM +0300, Arseny Krasnov wrote:
->This prepares 'vsock_connectible_recvmg()' to call SEQPACKET receive
->loop:
->1) Some shared check left in this function, then socket type
->   specific receive loop is called.
->2) Stream receive loop is moved to separate function.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 242 ++++++++++++++++++++++-----------------
-> 1 file changed, 138 insertions(+), 104 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index c9ce57db9554..524df8fc84cd 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1858,65 +1858,69 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	return vsock_connectible_sendmsg(sock, msg, len);
-> }
->
->-
->-static int
->-vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-			  int flags)
->+static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
->+			   long timeout,
->+			   struct vsock_transport_recv_notify_data *recv_data,
->+			   size_t target)
-> {
->-	struct sock *sk;
->+	int err = 0;
-> 	struct vsock_sock *vsk;
-> 	const struct vsock_transport *transport;
->-	int err;
->-	size_t target;
->-	ssize_t copied;
->-	long timeout;
->-	struct vsock_transport_recv_notify_data recv_data;
->-
->-	DEFINE_WAIT(wait);
->
->-	sk = sock->sk;
-> 	vsk = vsock_sk(sk);
-> 	transport = vsk->transport;
->-	err = 0;
->-
->-	lock_sock(sk);
->-
->-	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
->-		/* Recvmsg is supposed to return 0 if a peer performs an
->-		 * orderly shutdown. Differentiate between that case and when a
->-		 * peer has not connected or a local shutdown occured with the
->-		 * SOCK_DONE flag.
->-		 */
->-		if (sock_flag(sk, SOCK_DONE))
->-			err = 0;
->-		else
->-			err = -ENOTCONN;
->
->+	if (sk->sk_err != 0 ||
->+	    (sk->sk_shutdown & RCV_SHUTDOWN) ||
->+	    (vsk->peer_shutdown & SEND_SHUTDOWN)) {
->+		err = -1;
-> 		goto out;
-> 	}
->-
->-	if (flags & MSG_OOB) {
->-		err = -EOPNOTSUPP;
->+	/* Don't wait for non-blocking sockets. */
->+	if (timeout == 0) {
->+		err = -EAGAIN;
-> 		goto out;
-> 	}
->
->-	/* We don't check peer_shutdown flag here since peer may actually shut
->-	 * down, but there can be data in the queue that a local socket can
->-	 * receive.
->-	 */
->-	if (sk->sk_shutdown & RCV_SHUTDOWN) {
->-		err = 0;
->-		goto out;
->+	if (recv_data) {
->+		err = transport->notify_recv_pre_block(vsk, target, recv_data);
->+		if (err < 0)
->+			goto out;
-> 	}
->
->-	/* It is valid on Linux to pass in a zero-length receive buffer.  This
->-	 * is not an error.  We may as well bail out now.
->-	 */
->-	if (!len) {
->-		err = 0;
->+	release_sock(sk);
->+	timeout = schedule_timeout(timeout);
->+	lock_sock(sk);
->+
->+	if (signal_pending(current)) {
->+		err = sock_intr_errno(timeout);
->+		goto out;
->+	} else if (timeout == 0) {
->+		err = -EAGAIN;
-> 		goto out;
-> 	}
->
->+out:
->+	finish_wait(sk_sleep(sk), wait);
->+	return err;
->+}
->+
->+static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->+				  size_t len, int flags)
->+{
->+	struct vsock_transport_recv_notify_data recv_data;
->+	const struct vsock_transport *transport;
->+	struct vsock_sock *vsk;
->+	ssize_t copied;
->+	size_t target;
->+	long timeout;
->+	int err;
->+
->+	DEFINE_WAIT(wait);
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+
-> 	/* We must not copy less than target bytes into the user's buffer
-> 	 * before returning successfully, so we wait for the consume queue to
-> 	 * have that much data to consume before dequeueing.  Note that this
->@@ -1937,85 +1941,53 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->
->
-> 	while (1) {
->+		ssize_t read;
-> 		s64 ready;
->
-> 		prepare_to_wait(sk_sleep(sk), &wait, 
-> 		TASK_INTERRUPTIBLE);
-> 		ready = vsock_stream_has_data(vsk);
 
-Maybe we can move also these lines in vsock_wait_data() that can return 
-'ready' or an error.
+--=-lx2w3B1o2JDNkccPNe04
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->
-> 		if (ready == 0) {
->-			if (sk->sk_err != 0 ||
->-			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
->-			    (vsk->peer_shutdown & SEND_SHUTDOWN)) {
->-				finish_wait(sk_sleep(sk), &wait);
->-				break;
->-			}
->-			/* Don't wait for non-blocking sockets. */
->-			if (timeout == 0) {
->-				err = -EAGAIN;
->-				finish_wait(sk_sleep(sk), &wait);
->-				break;
->-			}
->-
->-			err = transport->notify_recv_pre_block(
->-					vsk, target, &recv_data);
->-			if (err < 0) {
->-				finish_wait(sk_sleep(sk), &wait);
->-				break;
->-			}
->-			release_sock(sk);
->-			timeout = schedule_timeout(timeout);
->-			lock_sock(sk);
->-
->-			if (signal_pending(current)) {
->-				err = sock_intr_errno(timeout);
->-				finish_wait(sk_sleep(sk), &wait);
->-				break;
->-			} else if (timeout == 0) {
->-				err = -EAGAIN;
->-				finish_wait(sk_sleep(sk), &wait);
->+			if (vsock_wait_data(sk, &wait, timeout, &recv_data, target))
-> 				break;
->-			}
->-		} else {
->-			ssize_t read;
->+			continue;
->+		}
->
->-			finish_wait(sk_sleep(sk), &wait);
->+		finish_wait(sk_sleep(sk), &wait);
+On Thu, 2021-01-28 at 13:18 +0100, Paolo Bonzini wrote:
+> My only qualm is really that the userspace API is really ugly.
+>=20
+> Can you just have both a VM and a VCPU ioctl (so no vcpu_id to pass!),=
+=20
 
-And also this one can be moved in vsock_wait_data().
->
->-			if (ready < 0) {
->-				/* Invalid queue pair content. XXX This should
->-				* be changed to a connection reset in a later
->-				* change.
->-				*/
->+		if (ready < 0) {
->+			/* Invalid queue pair content. XXX This should
->+			 * be changed to a connection reset in a later
->+			 * change.
->+			 */
->
->-				err = -ENOMEM;
->-				goto out;
->-			}
->+			err = -ENOMEM;
->+			goto out;
->+		}
->
->-			err = transport->notify_recv_pre_dequeue(
->-					vsk, target, &recv_data);
->-			if (err < 0)
->-				break;
->+		err = transport->notify_recv_pre_dequeue(vsk,
->+					target, &recv_data);
->+		if (err < 0)
->+			break;
->+		read = transport->stream_dequeue(vsk, msg, len - copied, flags);
->
->-			read = transport->stream_dequeue(
->-					vsk, msg,
->-					len - copied, flags);
->-			if (read < 0) {
->-				err = -ENOMEM;
->-				break;
->-			}
->+		if (read < 0) {
->+			err = -ENOMEM;
->+			break;
->+		}
->
->-			copied += read;
->+		copied += read;
->
->-			err = transport->notify_recv_post_dequeue(
->-					vsk, target, read,
->+		err = transport->notify_recv_post_dequeue(vsk,
->+					target, read,
-> 					!(flags & MSG_PEEK), &recv_data);
->-			if (err < 0)
->-				goto out;
->+		if (err < 0)
->+			goto out;
->
->-			if (read >= target || flags & MSG_PEEK)
->-				break;
->+		if (read >= target || flags & MSG_PEEK)
->+			break;
->
->-			target -= read;
->-		}
->+		target -= read;
-> 	}
->
-> 	if (sk->sk_err)
->@@ -2031,6 +2003,68 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	return err;
-> }
->
->+static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->+				     size_t len, int flags)
->+{
->+	return -1;
->+}
->+
+Sure, that seems like a sensible thing to do.
 
-You can add this function later, when you implement it...
+> add a generous padding to the struct,
 
->+static int
->+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			  int flags)
->+{
->+	const struct vsock_transport *transport;
->+	struct vsock_sock *vsk;
->+	struct sock *sk;
->+	int err = 0;
->+
->+	sk = sock->sk;
->+
->+	lock_sock(sk);
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+
->+	if (!transport || sk->sk_state != TCP_ESTABLISHED) {
->+		/* Recvmsg is supposed to return 0 if a peer performs an
->+		 * orderly shutdown. Differentiate between that case and when a
->+		 * peer has not connected or a local shutdown occurred 
->with the
->+		 * SOCK_DONE flag.
->+		 */
->+		if (!sock_flag(sk, SOCK_DONE))
->+			err = -ENOTCONN;
->+
->+		goto out;
->+	}
->+
->+	if (flags & MSG_OOB) {
->+		err = -EOPNOTSUPP;
->+		goto out;
->+	}
->+
->+	/* We don't check peer_shutdown flag here since peer may actually shut
->+	 * down, but there can be data in the queue that a local socket can
->+	 * receive.
->+	 */
->+	if (sk->sk_shutdown & RCV_SHUTDOWN)
->+		goto out;
->+
->+	/* It is valid on Linux to pass in a zero-length receive buffer.  This
->+	 * is not an error.  We may as well bail out now.
->+	 */
->+	if (!len)
->+		goto out;
->+
->+	if (sk->sk_type == SOCK_STREAM)
->+		err = __vsock_stream_recvmsg(sk, msg, len, flags);
->+	else
->+		err = __vsock_seqpacket_recvmsg(sk, msg, len, flags);
+I think I added *some* padding to the struct kvm_xen_hvm_attr which
+wasn't there in Joao's original. I can add more, certainly.
 
-...and also this 'else' branch.
+>  and just get everything out with a=20
+> single ioctl without having to pass in a type?
 
->+
->+out:
->+	release_sock(sk);
->+	return err;
->+}
->+
-> static int
-> vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 		     int flags)
->-- 
->2.25.1
->
+Honestly, I don't even care about reading it out except for long_mode
+which the kernel *does* infer for itself when the MSR is used to fill
+in the hypercall page.
+
+I quite like keeping them separate; they *do* get set separately, in
+response to different hypercalls from the guest. And the capabilities
+translate naturally to a given field existing or not existing; having
+another mapping of that to fields in a binary structure would be
+additional complexity.
+
+--=-lx2w3B1o2JDNkccPNe04
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEw
+MTI4MTY0OTAyWjAvBgkqhkiG9w0BCQQxIgQg/FSk3baQIF7ztKJyLUoyHKlRDWUqVSZWAoyn1bSe
+jVYwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAAy/HpzU1/advb+f6Dpf3mxd4KhnmVyl8vUxs0ENBz2UpbaXidh+oZZZsMvfVazi
+xi7tU/3ivydk/Be4kiVK+8EOX9gjF1tDROuuhQiqM7gQKY1ww3bfR9shkhGgz8KRkuqHoSO36Vlp
+nR/K210Ig279LtdTzFaL9wJFdR8dev2x4XQKv+r5sK4iB6WZXC6xxLczLghJOMVx7dnZuXY3iWgN
+yZkx3EQniVZvjYgBcLLSvSGsh71cDgSiv/ZwABpsvMlCMf7CMjiVC1dhnqrJ7kHU6bJRrQf+O65B
+mI2l3VFo3dh2lTtzSBn5QJj3+JwkKWD23PgCqShrGc4ul36ARwsAAAAAAAA=
+
+
+--=-lx2w3B1o2JDNkccPNe04--
 
