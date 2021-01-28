@@ -2,83 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B28F307D6C
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 19:09:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 97686307D92
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 19:15:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231739AbhA1SHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 13:07:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20884 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231461AbhA1SE0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 13:04:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611856980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LWWNoe1Kl8O/5xgq3+qKNWzE/mKzopSaV6Z4yzkSMwk=;
-        b=GHoxULF17MV/x8Oy2AqosqfazJE79tLgFPmL4/U3V9wsfK2F4DmHTWLLtZ0vplL3Ywuovj
-        4sMimJS4r+b2w2xSKnBjmjBSv/rmjIbYus3K9xengkHNV8bKbPGGqKgJWTxdRrt2sm90nF
-        7OxgHoNgLxfAzto2PWAb55ltqCMPmv0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35--Z2xudwpOOGbM4TGtsPkaA-1; Thu, 28 Jan 2021 13:02:58 -0500
-X-MC-Unique: -Z2xudwpOOGbM4TGtsPkaA-1
-Received: by mail-ed1-f69.google.com with SMTP id ck25so3539612edb.16
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 10:02:58 -0800 (PST)
+        id S231360AbhA1SOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 13:14:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231458AbhA1SH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 13:07:26 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60D2C06178C;
+        Thu, 28 Jan 2021 10:04:08 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id gx5so9120559ejb.7;
+        Thu, 28 Jan 2021 10:04:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=JYIcKDp3tq6KjFCoe7KRgOLFg5+oBqHlOawfom5+j9o=;
+        b=VOn2MpLrXKaxK1WPLYqt26nt+g2L5eKbET1kCRHZkmbeuKo7RJRol4B9rWNCkYkZPy
+         VZbzBtP+f9rdp7jS3WiGU/YqQBC9jLmsZRlHmpxdBpIr6+rlDo6LHkUAD/6F5B6fHLg3
+         U1TMiU7XsVaDwwWF1ihGF/LjZoiZpgP5mkddf7D988kUeUwE06vUuzlH2JHTy3UXLexd
+         FIS0O8pRssAGdqa1iCsKMt+jtIyNVifkmPx521d6h/2mjctswTszxVFH/FM2i4DEACvV
+         9yBtf2ZfCtdxUOimfwwYiiZ22rkNpW+NisZEVAtZmPtRoDUPhoGcCQI3SLcheyep+sVF
+         JKgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=LWWNoe1Kl8O/5xgq3+qKNWzE/mKzopSaV6Z4yzkSMwk=;
-        b=plhSoD9wiXbR4mTLSVhT3/diq1BC44W91eswnw8LBZ6xAeqKzOPf4C/Q+w6FQVFDNn
-         LSCUKnOAyZ0BixxGH+kD4xMZC+AJFSiNvfNAeAeADgpBJd0dvZ0Hbf2YdWEpEXuJ+tGN
-         BU4mMd/dWwit9iOSByNjtNrbi2WOVelNPcX2QOXjUxcqjkOjRxwfhjNopj6n81J3GQbq
-         QhC+3I4OMnUfrcJ3JbMiOcLOUYUSZFrvW4+Dv0ZUOl6Vp/ECgPTeAyn+z8gPT9pna4GV
-         i680q4JcuNHCdP8ZSA++acjgnis40G5tm6g5qy0Ncos84MPmuPq7orAHO/jBF7DqWuOH
-         NAeQ==
-X-Gm-Message-State: AOAM532ZFrTH0GrHe8oUhxLVPwdSzo+kwuADJzvs4G5ZMPIknEz+ZEko
-        UlxOnO/elSJs0LNoajWKYR3k3ojg18sI8TStDC+1kOgWoGUJKbINFjGRzScqFjuBncfhuO5yOPL
-        QKxDKZ2HLL8uG
-X-Received: by 2002:a17:906:447:: with SMTP id e7mr635633eja.172.1611856977124;
-        Thu, 28 Jan 2021 10:02:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJynZACnAFdmDQ6RsE2ukS8Kfxeu82Y0UYa5PGs5IJ3GI2SC/eCgyP4bYCf+CPUcppXGumVtiw==
-X-Received: by 2002:a17:906:447:: with SMTP id e7mr635616eja.172.1611856976990;
-        Thu, 28 Jan 2021 10:02:56 -0800 (PST)
+        bh=JYIcKDp3tq6KjFCoe7KRgOLFg5+oBqHlOawfom5+j9o=;
+        b=POCdvNOiQ3xk7pF2JPbpIe9UGgKT4DE23DzcunlAuTVYNdQd84vivo51ZDZEtIWkuC
+         zUCK/lhCwBblCuV65FUXc8fyLg84i6I4aAZYuJz3mkWfeVqMNpv5iWK/Wr0s3G3MT/+W
+         b+3d/Lh4V7O8M3XiDn97H8QhE97b5lDLonh+EvrG/EWUk44GZrTUTI4KAPH34E1owxHF
+         Hkx1/qbJtx9WGN28lyuudBsyTsbl/wvhxflsbQRL0lDYdnL63UXef3FgjLvwkPeUEdqR
+         8yodVhsOLOSGhTSdf4jBEQ+xw6eZLVJXm/FvBiNOppEw5PMX+kTId1AkSBqBKzQoPusX
+         /6QA==
+X-Gm-Message-State: AOAM5335ycGpgKFZTVcnOiA20k4CC8SaKbu6aKKDb16LEgbJNI7X+yVA
+        fnHHhWGF8ErphQY3m6MjBtY=
+X-Google-Smtp-Source: ABdhPJyMiDTAlloSahlJa1ZSKuwy4dEWHmgmekCvFGhbYz4eNpmvkTs0i0b71XQdwWpOudjXSWWGVw==
+X-Received: by 2002:a17:906:9499:: with SMTP id t25mr576105ejx.339.1611857047723;
+        Thu, 28 Jan 2021 10:04:07 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dm1sm3322486edb.72.2021.01.28.10.02.55
+        by smtp.googlemail.com with ESMTPSA id pw28sm2623456ejb.115.2021.01.28.10.04.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 10:02:56 -0800 (PST)
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.11, take #3
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Scull <ascull@google.com>,
-        David Brazdil <dbrazdil@google.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kernel-team@android.com
-References: <20210128175830.3035035-1-maz@kernel.org>
+        Thu, 28 Jan 2021 10:04:07 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Subject: Re: [PATCH v14 11/13] KVM: VMX: Pass through CET MSRs to the guest
+ when supported
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <32fac3c7-0141-d303-7412-cd8c3a8ae039@redhat.com>
-Date:   Thu, 28 Jan 2021 19:02:55 +0100
+To:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
+        jmattson@google.com
+Cc:     yu.c.zhang@linux.intel.com
+References: <20201106011637.14289-1-weijiang.yang@intel.com>
+ <20201106011637.14289-12-weijiang.yang@intel.com>
+ <78948a28-2b6c-fccb-971a-550ea7e4da2c@redhat.com>
+Message-ID: <e383a377-ee64-342d-b1dd-0f99186714e3@redhat.com>
+Date:   Thu, 28 Jan 2021 19:04:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210128175830.3035035-1-maz@kernel.org>
+In-Reply-To: <78948a28-2b6c-fccb-971a-550ea7e4da2c@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 18:58, Marc Zyngier wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.11-3
+On 28/01/21 18:54, Paolo Bonzini wrote:
+> On 06/11/20 02:16, Yang Weijiang wrote:
+>> Pass through all CET MSRs when the associated CET component (kernel vs.
+>> user) is enabled to improve guest performance.  All CET MSRs are context
+>> switched, either via dedicated VMCS fields or XSAVES.
+>>
+>> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+>> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+>> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+>> ---
+>>   arch/x86/kvm/vmx/vmx.c | 29 +++++++++++++++++++++++++++++
+>>   1 file changed, 29 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index c88a6e1721b1..6ba2027a3d44 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -7366,6 +7366,32 @@ static void update_intel_pt_cfg(struct kvm_vcpu 
+>> *vcpu)
+>>           vmx->pt_desc.ctl_bitmask &= ~(0xfULL << (32 + i * 4));
+>>   }
+>> +static bool is_cet_state_supported(struct kvm_vcpu *vcpu, u32 xss_state)
+>> +{
+>> +    return (vcpu->arch.guest_supported_xss & xss_state) &&
+>> +           (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+>> +        guest_cpuid_has(vcpu, X86_FEATURE_IBT));
+>> +}
+>> +
+>> +static void vmx_update_intercept_for_cet_msr(struct kvm_vcpu *vcpu)
+>> +{
+>> +    bool incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_USER);
+>> +
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_U_CET, MSR_TYPE_RW, incpt);
+>> +
+>> +    incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL3_SSP, MSR_TYPE_RW, 
+>> incpt);
+>> +
+>> +    incpt = !is_cet_state_supported(vcpu, XFEATURE_MASK_CET_KERNEL);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_S_CET, MSR_TYPE_RW, incpt);
+>> +
+>> +    incpt |= !guest_cpuid_has(vcpu, X86_FEATURE_SHSTK);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_INT_SSP_TAB, 
+>> MSR_TYPE_RW, incpt);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL0_SSP, MSR_TYPE_RW, 
+>> incpt);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL1_SSP, MSR_TYPE_RW, 
+>> incpt);
+>> +    vmx_set_intercept_for_msr(vcpu, MSR_IA32_PL2_SSP, MSR_TYPE_RW, 
+>> incpt);
+>> +}
+>> +
+>>   static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>   {
+>>       struct vcpu_vmx *vmx = to_vmx(vcpu);
+>> @@ -7409,6 +7435,9 @@ static void vmx_vcpu_after_set_cpuid(struct 
+>> kvm_vcpu *vcpu)
+>>       /* Refresh #PF interception to account for MAXPHYADDR changes. */
+>>       update_exception_bitmap(vcpu);
+>> +
+>> +    if (kvm_cet_supported())
+>> +        vmx_update_intercept_for_cet_msr(vcpu);
+>>   }
+>>   static __init void vmx_set_cpu_caps(void)
+>>
+> 
+> Can you do this only if CR4.CET=1?
 
-Pulled, thanks.
+Actually, considering this is XSAVES and not RDMSR/WRMSR state, this is 
+okay as is.
 
 Paolo
-
