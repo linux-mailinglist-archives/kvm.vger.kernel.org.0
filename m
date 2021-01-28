@@ -2,112 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E571307BDA
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:11:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BA8B307BE4
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:14:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232789AbhA1RKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 12:10:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42971 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232805AbhA1RJc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:09:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611853686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=56oQ7o7FTqNZj3MPWTOvHCfMyHXwWD8QK/wEL2B1WRw=;
-        b=MmjlWuw+xjdVtnfad9N6+tdGllMpQbB3Am+Opq+3hRLIh0wnZgX6Kub8P0IvnlCf1wjKXh
-        /+LKQMBx89EzmtIxZV3K48BnGoWnyeAB+PXWqhMXZLrlWeQYVoSKWi6c+l0TyolOXRftNd
-        STiYIz24b95K3nTNhEIni2ZU28PXlZ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-6MfMRXZwO1GQNqcfnJwJPQ-1; Thu, 28 Jan 2021 12:08:02 -0500
-X-MC-Unique: 6MfMRXZwO1GQNqcfnJwJPQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 536FC84A5E7;
-        Thu, 28 Jan 2021 17:08:01 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E9CA75D9EF;
-        Thu, 28 Jan 2021 17:08:00 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jmattson@google.com, stable@vger.kernel.org
-Subject: [PATCH] KVM: x86: Allow guests to see MSR_IA32_TSX_CTRL even if tsx=off
-Date:   Thu, 28 Jan 2021 12:08:00 -0500
-Message-Id: <20210128170800.1783502-1-pbonzini@redhat.com>
+        id S232859AbhA1RL6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 12:11:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232783AbhA1RKF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 12:10:05 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34044C0613D6
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:09:25 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id n10so4671062pgl.10
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:09:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PJ8vhRlRVNsnNigVA3H+x3MLmJHygV2g8jXvg7Vnj4Y=;
+        b=kLroCc1xOeYMVKQR0s/ZTRX42tJ/fVbTONzC/+Y7nlPAB9ANbAatBAgie7gpPCjzXW
+         Y2BvBl2+i9f+Ziz4nBFIcLoBoBAlJm1hWLFTbiJ1Si2k7PwvQNhflJGVbZio6DiwXiDX
+         3QhggykFuj+J36w0q3sqHyHPH4DPP4/wsxBOmWqTCSBkL88ESZibZQoOLkGkjS861gGd
+         OTEXpz4vrcYffjOCI01VN1Ovv6MbJOUfP/ZESb2JAqLw78rNUD2nvDogSsN8Cg95Hhg5
+         4rrL0x9ERcull8gxyr/f4Z27WaXxnxeeoSDGXcdv5W0J+IfUFOVsEFNFEzdIsbQEk7I7
+         CK5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PJ8vhRlRVNsnNigVA3H+x3MLmJHygV2g8jXvg7Vnj4Y=;
+        b=S0wzrEwbYoQShE4C6TQj+JZm21Jkk1OWVC5ege83bJsVbgcVSG/CSpn1bgLTSfBMRQ
+         WzQe4R0sPnvNVKTHE84Ecxi22tIgI21Bgfjvb4Y3WSQeSNEz9GiHluTIZjGbo3iGZzga
+         lm+gxAHsLdu1CYF10njmccZcP+VeHKBLh1Q4/4jDd6nDwYkVQ0nMzSekQd6j62rCm6+r
+         wOO9LmQWihoDHTfxTwxJxrf6C6P2tqKmzdZzlOioq6VVLi1fV3uxsDnI0LdJmsV1LRNA
+         zBhmyeH3jI8uIy7YLHoL5CAlGaS4r6qhFDvl44nuUzmA6lq7l06PHbGqR4FSQS+lwKq/
+         ZFOA==
+X-Gm-Message-State: AOAM531H/uvMTYQ2Qu4/jPxWs73mT/9YJSbp+05S+C4XQkOAVUK5SEod
+        RUe5/HEqFsx+SnlTAGk+hwt+pg==
+X-Google-Smtp-Source: ABdhPJxnMcoxMMfmamEou+2TlotHDWW8f0QfrKGSgKlCV6FqqyFfUIJe76KcBU9KACT92xkL360dbg==
+X-Received: by 2002:a65:6453:: with SMTP id s19mr481327pgv.280.1611853764502;
+        Thu, 28 Jan 2021 09:09:24 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id 5sm5389515pjz.23.2021.01.28.09.09.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jan 2021 09:09:23 -0800 (PST)
+Date:   Thu, 28 Jan 2021 09:09:18 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2 05/14] KVM: x86: Override reported SME/SEV feature
+ flags with host mask
+Message-ID: <YBLvvpeEORjVd2IP@google.com>
+References: <20210114003708.3798992-1-seanjc@google.com>
+ <20210114003708.3798992-6-seanjc@google.com>
+ <74642db3-14dc-4e13-3130-dc8abe1a2b6e@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <74642db3-14dc-4e13-3130-dc8abe1a2b6e@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Userspace that does not know about KVM_GET_MSR_FEATURE_INDEX_LIST will
-generally use the default value for MSR_IA32_ARCH_CAPABILITIES.
-When this happens and the host has tsx=on, it is possible to end up
-with virtual machines that have HLE and RTM disabled, but TSX_CTRL
-disabled.
+On Thu, Jan 28, 2021, Paolo Bonzini wrote:
+> On 14/01/21 01:36, Sean Christopherson wrote:
+> > Add a reverse-CPUID entry for the memory encryption word, 0x8000001F.EAX,
+> > and use it to override the supported CPUID flags reported to userspace.
+> > Masking the reported CPUID flags avoids over-reporting KVM support, e.g.
+> > without the mask a SEV-SNP capable CPU may incorrectly advertise SNP
+> > support to userspace.
+> > 
+> > Cc: Brijesh Singh <brijesh.singh@amd.com>
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/cpuid.c | 2 ++
+> >   arch/x86/kvm/cpuid.h | 1 +
+> >   2 files changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index 13036cf0b912..b7618cdd06b5 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -855,6 +855,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+> >   	case 0x8000001F:
+> >   		if (!boot_cpu_has(X86_FEATURE_SEV))
+> >   			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> > +		else
+> > +			cpuid_entry_override(entry, CPUID_8000_001F_EAX);
+> >   		break;
+> >   	/*Add support for Centaur's CPUID instruction*/
+> >   	case 0xC0000000:
+> > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> > index dc921d76e42e..8b6fc9bde248 100644
+> > --- a/arch/x86/kvm/cpuid.h
+> > +++ b/arch/x86/kvm/cpuid.h
+> > @@ -63,6 +63,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+> >   	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
+> >   	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
+> >   	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
+> > +	[CPUID_8000_001F_EAX] = {0x8000001f, 1, CPUID_EAX},
+> >   };
+> >   /*
+> > 
+> 
+> I don't understand, wouldn't this also need a kvm_cpu_cap_mask call
+> somewhere else?  As it is, it doesn't do anything.
 
-If the fleet is then switched to tsx=off, kvm_get_arch_capabilities()
-will clear the ARCH_CAP_TSX_CTRL_MSR bit and it will not be possible
-to use the tsx=off as migration destinations, even though the guests
-indeed do not have TSX enabled.
+Ugh, yes, apparently I thought the kernel would magically clear bits it doesn't
+care about.
 
-When tsx=off is used, however, we know that guests will not have
-HLE and RTM (or if userspace sets bogus CPUID data, we do not
-expect HLE and RTM to work in guests).  Therefore we can keep
-TSX_CTRL_RTM_DISABLE set for the entire life of the guests and
-save MSR reads and writes on KVM_RUN and in the user return
-notifiers.
+Looking at this again, I think the kvm_cpu_cap_mask() invocation should always
+mask off X86_FEATURE_SME.  SME cannot be virtualized, and AFAIK it's not
+emulated by KVM.  This would fix an oddity where SME would be advertised if SEV
+is also supported.
 
-Cc: stable@vger.kernel.org
-Fixes: cbbaa2727aa3 ("KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES")
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 12 +++++++++++-
- arch/x86/kvm/x86.c     |  2 +-
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cc60b1fc3ee7..80491a729408 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6863,8 +6863,18 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
- 			 * No need to pass TSX_CTRL_CPUID_CLEAR through, so
- 			 * let's avoid changing CPUID bits under the host
- 			 * kernel's feet.
-+			 *
-+			 * If the host disabled RTM, we may still need TSX_CTRL
-+			 * to be supported in the guest; for example the guest
-+			 * could have been created on a tsx=on host with hle=0,
-+			 * rtm=0, tsx_ctrl=1 and later migrate to a tsx=off host.
-+			 * In that case however do not change the value on the host,
-+			 * so that TSX remains always disabled.
- 			 */
--			vmx->guest_uret_msrs[j].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
-+			if (boot_cpu_has(X86_FEATURE_RTM))
-+				vmx->guest_uret_msrs[j].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
-+			else
-+				vmx->guest_uret_msrs[j].mask = 0;
- 			break;
- 		default:
- 			vmx->guest_uret_msrs[j].mask = -1ull;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 76bce832cade..15733013b266 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1401,7 +1401,7 @@ static u64 kvm_get_arch_capabilities(void)
- 	 *	  This lets the guest use VERW to clear CPU buffers.
- 	 */
- 	if (!boot_cpu_has(X86_FEATURE_RTM))
--		data &= ~(ARCH_CAP_TAA_NO | ARCH_CAP_TSX_CTRL_MSR);
-+		data &= ~ARCH_CAP_TAA_NO;
- 	else if (!boot_cpu_has_bug(X86_BUG_TAA))
- 		data |= ARCH_CAP_TAA_NO;
- 
--- 
-2.26.2
-
+Boris has queue the kernel change to tip/x86/cpu, I'll spin v4 against that.
