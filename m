@@ -2,329 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D675B307A66
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:13:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CF4F307AF9
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:31:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232076AbhA1QMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 11:12:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32695 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232394AbhA1QMH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:12:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611850236;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=q3+GaWOJcVoS280BO4ZTgt8MtsvmJpeZvLy5xokg2jk=;
-        b=JBw5L0xXG9RBsXezOTHG+wOovsXYyedlCSVYBVx/bqYyOI9uDgg/5vvLnPMTadQ7mOkICR
-        b0oaVxBTjXHLgQQFciKP5/ccXs1yPxsFV4OKJPDt1tQctPv9xRPI6XqUNblYk4dWV4gRdi
-        xTMLP6rXI+EPLf+6xxPKEneUjYGWHwY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-xi8DPPHPNseJMm5KQVg0Dw-1; Thu, 28 Jan 2021 11:10:34 -0500
-X-MC-Unique: xi8DPPHPNseJMm5KQVg0Dw-1
-Received: by mail-wr1-f71.google.com with SMTP id p16so2981404wrx.10
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:10:34 -0800 (PST)
+        id S231532AbhA1QaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 11:30:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231148AbhA1QaS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 11:30:18 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA901C061574
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:29:37 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id h15so3608570pli.8
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:29:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QnW3q9QyfBy23IUUBbxB1+tEoGYrf3OEFE1JiHhnYNI=;
+        b=DRwK5JqFq7BywQ4Vm9vUysjNAG9F3h2O5beySmJlaCPbrr+5Qu46bjg5kRmaLQF4gf
+         rPPssfHJt7fgEoZDu6udCsswj+BWZFIdQRn57cd7N8+7UIOz/LIafNaYOefbmSjq3pwx
+         GT5AMtIWl5+3ImH1zsy9mVUQcCJdoriQROM97OO0uKwdfs2AZWsUZJjbTmtjn+lnA7VF
+         qmUByziV2yfYrznILz+NhPwbHvs7YM42HnyD2GVZ4zi5kqW5XjlaWPoGBkZ1ggSLx29B
+         UKvKOpgtQ3pheXwXvXT/67HP2avtCsaaqf4F1x0LtzarAEwcm6nwu8eAm2No2RRpHfnG
+         F5hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=q3+GaWOJcVoS280BO4ZTgt8MtsvmJpeZvLy5xokg2jk=;
-        b=n+ZwsqcbYqSRxrFlYdZzrsMrgO+Ei5n6TTaGRKHBX2jbq42YYncN2fyl2wJ++ikyQe
-         PWiD1vu3+Au6s8TaXL6OxlwlYawwJsSn4nYYH2qHTrQUwcPLfdp9JaT7/ABY2Lz1wU63
-         NADVipqKtmZuUfdcT9jKbVrHZJFIxTKbIAqGbnOKC53IvJxwXZM1o0cDJfcs4xzm0fkN
-         AeHavUB7Q0VEdBA61HSdo4lRmSC3DoP1P9VVZej0H12hQakGtGYSnsacuJtOMjV3hUZ8
-         GLjXP8ldk9n6TG6lw0+125fylfSLZBwDeXyB+h4P6W/oMttSit5ah1zgc7KW9rdm/eC3
-         dCXg==
-X-Gm-Message-State: AOAM533XYHdoczJynknLXI5xhM13uo3e0Zcf81MFfqk2SU3OvFLKdHfh
-        aRi0gpv3zdoDsI/efu/3plMmdbQomknmIOrZ5Qb7DgNN8grO71/ABUDQyk9jya3d+oJ9k75KQ3x
-        2hspYfAeLKiv3
-X-Received: by 2002:a5d:5910:: with SMTP id v16mr17858688wrd.29.1611850233400;
-        Thu, 28 Jan 2021 08:10:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwCJxet7P/Zrk9KZEMXq8X1p9C2h5zi7JFYpLswRvkfkQWra6ZTD64HKpdUGYoJqTRtuXS7kQ==
-X-Received: by 2002:a5d:5910:: with SMTP id v16mr17858644wrd.29.1611850233122;
-        Thu, 28 Jan 2021 08:10:33 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id l10sm7495512wro.4.2021.01.28.08.10.31
+        bh=QnW3q9QyfBy23IUUBbxB1+tEoGYrf3OEFE1JiHhnYNI=;
+        b=m0n2xQuchsFppv+CPl8oO03S/EAyxlTbQ70xQ8dWHTzIIZvFSD2y9eKW3sTVt892Yh
+         7EbfOpStMaG84a4mfBQwtSeUkFY/clfOKBE7IsclHwqNkTW+0N2i1muUmjBTd72lDgxB
+         v/6zVCcTwIS1PKNQzu0LQG/Wf451f00Iv8slbfBxES2CqmexZ6DYLyxrkiuALldLyLMo
+         9dsbrV2rxc2IzBGLmBlBi7UUDu0OtUlA/zp+UnXWT1T5KJ85C0glp7hn3oCgX2FQSSjS
+         ydHD1x2NYbS+KGs3hgfdRlA5V6a+pePYENvpaBU3qvtccGhF6nvrk+dgPVFfJGP9bB2/
+         0ZbA==
+X-Gm-Message-State: AOAM532unMIh4SD8aPSlEiv01wSLlAuQBXXGv+kzsyz9Doh3YdVwXRek
+        z7q4LJhacGz54M37qlZJuTSjng==
+X-Google-Smtp-Source: ABdhPJwS2mNBw4warJqPOhYSugBs698YhL8w0kJ0zbQCzWy46eJPFTumY+EVRNujxC7cFEkpJvvHbQ==
+X-Received: by 2002:a17:902:b212:b029:df:ec2e:6a1f with SMTP id t18-20020a170902b212b02900dfec2e6a1fmr185717plr.24.1611851377109;
+        Thu, 28 Jan 2021 08:29:37 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
+        by smtp.gmail.com with ESMTPSA id n8sm5715265pjo.18.2021.01.28.08.29.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 08:10:32 -0800 (PST)
-Date:   Thu, 28 Jan 2021 17:10:29 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 01/13] af_vsock: prepare for SOCK_SEQPACKET support
-Message-ID: <20210128161029.a53la6e3dv5bzazn@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210125111131.597930-1-arseny.krasnov@kaspersky.com>
+        Thu, 28 Jan 2021 08:29:36 -0800 (PST)
+Date:   Thu, 28 Jan 2021 08:29:30 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v2 14/14] KVM: SVM: Skip SEV cache flush if no ASIDs have
+ been used
+Message-ID: <YBLmareW9CB0Kcta@google.com>
+References: <20210114003708.3798992-1-seanjc@google.com>
+ <20210114003708.3798992-15-seanjc@google.com>
+ <55a63dfb-94a4-6ba2-31d1-c9b6830ff791@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210125111131.597930-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <55a63dfb-94a4-6ba2-31d1-c9b6830ff791@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I think the patch title should be more explicit, so something like
+On Thu, Jan 28, 2021, Paolo Bonzini wrote:
+> I can't find 00/14 in my inbox, so: queued 1-3 and 6-14, thanks.
 
-vsock: generalize function to manage connectible sockets
+If it's not too late, v3 has a few tweaks that would be nice to have, as well as
+a new patch to remove the CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT dependency.
 
-On Mon, Jan 25, 2021 at 02:11:28PM +0300, Arseny Krasnov wrote:
->This prepares af_vsock.c for SEQPACKET support:
->1) As both stream and seqpacket sockets are connection oriented, add
->   check for SOCK_SEQPACKET to conditions where SOCK_STREAM is checked.
->2) Some functions such as setsockopt(), getsockopt(), connect(),
->   recvmsg(), sendmsg() are shared between both types of sockets, so
->   rename them in general manner and create entry points for each type
->   of socket to call these functions(for stream in this patch, for
->   seqpacket in further patches).
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 91 +++++++++++++++++++++++++++++-----------
-> 1 file changed, 67 insertions(+), 24 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index b12d3a322242..c9ce57db9554 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -604,8 +604,8 @@ static void vsock_pending_work(struct work_struct *work)
->
-> /**** SOCKET OPERATIONS ****/
->
->-static int __vsock_bind_stream(struct vsock_sock *vsk,
->-			       struct sockaddr_vm *addr)
->+static int __vsock_bind_connectible(struct vsock_sock *vsk,
->+				    struct sockaddr_vm *addr)
-> {
-> 	static u32 port;
-> 	struct sockaddr_vm new_addr;
->@@ -685,7 +685,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
-> 	switch (sk->sk_socket->type) {
-> 	case SOCK_STREAM:
-> 		spin_lock_bh(&vsock_table_lock);
->-		retval = __vsock_bind_stream(vsk, addr);
->+		retval = __vsock_bind_connectible(vsk, addr);
-> 		spin_unlock_bh(&vsock_table_lock);
-> 		break;
->
->@@ -767,6 +767,11 @@ static struct sock *__vsock_create(struct net *net,
-> 	return sk;
-> }
->
->+static bool sock_type_connectible(u16 type)
->+{
->+	return (type == SOCK_STREAM || type == SOCK_SEQPACKET);
->+}
->+
-
-I think it's okay to add this function in this patch, but until 
-SOCK_SEQPACKET is not supported, I would check only SOCK_STREAM and add 
-SOCK_SEQPACKET only when you add 'vsock_seqpacket_ops' later.
-
-> static void __vsock_release(struct sock *sk, int level)
-> {
-> 	if (sk) {
->@@ -785,7 +790,7 @@ static void __vsock_release(struct sock *sk, int level)
->
-> 		if (vsk->transport)
-> 			vsk->transport->release(vsk);
->-		else if (sk->sk_type == SOCK_STREAM)
->+		else if (sock_type_connectible(sk->sk_type))
-> 			vsock_remove_sock(vsk);
->
-> 		sock_orphan(sk);
->@@ -945,7 +950,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
-> 	sk = sock->sk;
-> 	if (sock->state == SS_UNCONNECTED) {
-> 		err = -ENOTCONN;
->-		if (sk->sk_type == SOCK_STREAM)
->+		if (sock_type_connectible(sk->sk_type))
-> 			return err;
-> 	} else {
-> 		sock->state = SS_DISCONNECTING;
->@@ -960,7 +965,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
-> 		sk->sk_state_change(sk);
-> 		release_sock(sk);
->
->-		if (sk->sk_type == SOCK_STREAM) {
->+		if (sock_type_connectible(sk->sk_type)) {
-> 			sock_reset_flag(sk, SOCK_DONE);
-> 			vsock_send_shutdown(sk, mode);
-> 		}
->@@ -1013,7 +1018,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> 		if (!(sk->sk_shutdown & SEND_SHUTDOWN))
-> 			mask |= EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
->
->-	} else if (sock->type == SOCK_STREAM) {
->+	} else if (sock_type_connectible(sk->sk_type)) {
-> 		const struct vsock_transport *transport = vsk->transport;
-> 		lock_sock(sk);
->
->@@ -1259,8 +1264,8 @@ static void vsock_connect_timeout(struct work_struct *work)
-> 	sock_put(sk);
-> }
->
->-static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
->-				int addr_len, int flags)
->+static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->+			 int addr_len, int flags)
-> {
-> 	int err;
-> 	struct sock *sk;
->@@ -1395,6 +1400,12 @@ static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
-> 	return err;
-> }
->
->+static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
->+				int addr_len, int flags)
->+{
->+	return vsock_connect(sock, addr, addr_len, flags);
->+}
->+
-
-I think you can directly use vsock_connect in 'vsock_stream_ops'.
-
-> static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
-> 			bool kern)
-> {
->@@ -1410,7 +1421,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
->
-> 	lock_sock(listener);
->
->-	if (sock->type != SOCK_STREAM) {
->+	if (!sock_type_connectible(sock->type)) {
-> 		err = -EOPNOTSUPP;
-> 		goto out;
-> 	}
->@@ -1487,7 +1498,7 @@ static int vsock_listen(struct socket *sock, int 
->backlog)
->
-> 	lock_sock(sk);
->
->-	if (sock->type != SOCK_STREAM) {
->+	if (!sock_type_connectible(sk->sk_type)) {
-> 		err = -EOPNOTSUPP;
-> 		goto out;
-> 	}
->@@ -1531,11 +1542,11 @@ static void vsock_update_buffer_size(struct vsock_sock *vsk,
-> 	vsk->buffer_size = val;
-> }
->
->-static int vsock_stream_setsockopt(struct socket *sock,
->-				   int level,
->-				   int optname,
->-				   sockptr_t optval,
->-				   unsigned int optlen)
->+static int vsock_connectible_setsockopt(struct socket *sock,
->+					int level,
->+					int optname,
->+					sockptr_t optval,
->+					unsigned int optlen)
-> {
-> 	int err;
-> 	struct sock *sk;
->@@ -1612,10 +1623,20 @@ static int vsock_stream_setsockopt(struct socket *sock,
-> 	return err;
-> }
->
->-static int vsock_stream_getsockopt(struct socket *sock,
->-				   int level, int optname,
->-				   char __user *optval,
->-				   int __user *optlen)
->+static int vsock_stream_setsockopt(struct socket *sock,
->+				   int level,
->+				   int optname,
->+				   sockptr_t optval,
->+				   unsigned int optlen)
->+{
->+	return vsock_connectible_setsockopt(sock, level, optname, optval,
->+					    optlen);
->+}
-
-As before, I think you can directly use vsock_connectible_setsockopt in 
-'vsock_stream_ops'.
-
->+
->+static int vsock_connectible_getsockopt(struct socket *sock,
->+					int level, int optname,
->+					char __user *optval,
->+					int __user *optlen)
-> {
-> 	int err;
-> 	int len;
->@@ -1683,8 +1704,17 @@ static int vsock_stream_getsockopt(struct socket *sock,
-> 	return 0;
-> }
->
->-static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
->-				size_t len)
->+static int vsock_stream_getsockopt(struct socket *sock,
->+				   int level, int optname,
->+				   char __user *optval,
->+				   int __user *optlen)
->+{
->+	return vsock_connectible_getsockopt(sock, level, optname, optval,
->+					    optlen);
->+}
->+
-
-Ditto.
-
->+static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->+				     size_t len)
-> {
-> 	struct sock *sk;
-> 	struct vsock_sock *vsk;
->@@ -1822,10 +1852,16 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	return err;
-> }
->
->+static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
->+				size_t len)
->+{
->+	return vsock_connectible_sendmsg(sock, msg, len);
->+}
->+
-
-Ditto.
-
->
-> static int
->-vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-		     int flags)
->+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			  int flags)
-> {
-> 	struct sock *sk;
-> 	struct vsock_sock *vsk;
->@@ -1995,6 +2031,13 @@ vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	return err;
-> }
->
->+static int
->+vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+		     int flags)
->+{
->+	return vsock_connectible_recvmsg(sock, msg, len, flags);
->+}
->+
-
-Ditto.
-
-> static const struct proto_ops vsock_stream_ops = {
-> 	.family = PF_VSOCK,
-> 	.owner = THIS_MODULE,
->-- 
->2.25.1
->
-
+https://lkml.kernel.org/r/20210122202144.2756381-1-seanjc@google.com
