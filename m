@@ -2,67 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 237F8307149
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 09:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B21430714B
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 09:20:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231985AbhA1ISy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 03:18:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50069 "EHLO
+        id S231448AbhA1ITu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 03:19:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50706 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231583AbhA1ISE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 03:18:04 -0500
+        by vger.kernel.org with ESMTP id S231335AbhA1ITn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 03:19:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611821798;
+        s=mimecast20190719; t=1611821889;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pQjhFF8PA9KgrrHABCtOSMHOQHZwwUG/J8Os5OD+Pxg=;
-        b=hNcbxcUxX6UMc1RuVwuTBm6Fx6fB2ZIl+9Bz58KJC9zDVbpdVrseG8j/DoBPAIBsqch1qc
-        Tank4ZxQ71nr6egOMpj6wxGM7PMCJcS58Nz7ThCbQYofpiSSpN2y4rNpTu9UxKKtR+HCvR
-        KDwalIJFAcfJyL+TgPb61HyKUTH/FYw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-N79tUcdvPdyxmdBYp0zDcA-1; Thu, 28 Jan 2021 03:16:35 -0500
-X-MC-Unique: N79tUcdvPdyxmdBYp0zDcA-1
-Received: by mail-ed1-f71.google.com with SMTP id y6so2815204edc.17
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 00:16:35 -0800 (PST)
+        bh=9C3yiPfFKb5aW+Bgfuw5xS6YHiwj8cVR/h8E0NIrX2U=;
+        b=QGQG9Dcwk73c0msOeNGC5YboYQsHLu0pc3TY91bw5yOdlFINHEept1H30sDk4dsioMvkO+
+        OzgMSvdzR3coflGk/AuHjUIRlccCJ84R0BBHkxSMSOWvpCiW8M3RbZ4SEBsGNwvc+iV29/
+        b1sVpiV/ZdcoYPVarBtF11lh5ce2Zmo=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-baYiU9SRNnW_70c2gB2tbg-1; Thu, 28 Jan 2021 03:18:06 -0500
+X-MC-Unique: baYiU9SRNnW_70c2gB2tbg-1
+Received: by mail-ed1-f69.google.com with SMTP id j11so2807507edy.20
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 00:18:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pQjhFF8PA9KgrrHABCtOSMHOQHZwwUG/J8Os5OD+Pxg=;
-        b=os4NoY5p8XCQATM6M62735LEtgVmxMx/70FTUAEsquNpTaVJ8EzI3JUo7RZVZ4QfM3
-         DCsW4UMMXEYte1t4kw2OC5tqimWK6aN5QnHJPnTSSKWigEKmu0iEUacI6LGe19OyTMWl
-         IzxIEIMxhdHcXLdeZEw5L5nJdnkwEpQiqrwsibg+EbNkpLwk0eLKTX2mD/W7PXiCb8dU
-         q8P9xo9OSZFaAocDT7Kwpz46amSlPI/VfZoeZ+ePLs78cnVW1eBKLeWQEjue5xIEV57b
-         hch8IGLOGHj3wK6W7KfgEG8d5i5NA8bg2Nx1Z1rJN8DnGX5M8g8o4nvs9GN0lgmUMIrX
-         HShQ==
-X-Gm-Message-State: AOAM5327QoZ7uZwYJzSfPw6lWpDv6xgqSozjR7Emug5mi7Sc7c2Y2gEg
-        zpGd6xpj5Gv1rkaW3ea3owOcWNudjnfR6Fxgx/zD/eldNcpGsAC0LOMT3MubH7O2IeK9Ti1p+Z1
-        SjAafnL1fzIFd
-X-Received: by 2002:a17:906:e106:: with SMTP id gj6mr9622382ejb.337.1611821794826;
-        Thu, 28 Jan 2021 00:16:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwLuNIFyC7TLo0nrn4d8vGNT4D7BktAvk9O6gTR9IZCzuzI9c/ieVRS9b86mNYO///7R1HwVw==
-X-Received: by 2002:a17:906:e106:: with SMTP id gj6mr9622375ejb.337.1611821794649;
-        Thu, 28 Jan 2021 00:16:34 -0800 (PST)
+        bh=9C3yiPfFKb5aW+Bgfuw5xS6YHiwj8cVR/h8E0NIrX2U=;
+        b=XYCp1VeGzzw9QYSoCZM8QAokpM1AJARmy3QftoNr+ygqtkvIAXclgi9tHZichayyRV
+         WPt8BpFM8UQxNbf5QZ3cZ7ShYN4N1PQLwLDrpdriPVC7EXtPL7PrztVSKAtj3joR+Uny
+         nsKxR6O+KOhXJftuufwfVk8tuH17dg+q8vhWNX3aJVIOPBuR3RKAHvt3YrL8WJiPq51z
+         TEhP8f4oxss7ecU/Ld+frBYNHrXAp0B58z38ZIZg4WPCGMYYEHVRUyrr2pm1zoQN/OQQ
+         Qy3fWeoUx6JsruCdg0FsAsJjrAwsvAKLAHe7YC3kF7YUOUlt0WsltJQZpMj/AcDZFU8B
+         XVfQ==
+X-Gm-Message-State: AOAM5330kXLmwmTDiwUp/6nlRu/1v9D/kZkRXosMhpYE9LIJAhLUNLtz
+        3SEX36jLP2rFWbG4eEasRgWN+fbTkc9TcRvX+AEGAydCZh0EqH5Wb+sP3g0khSZ6APDqp1gP8SG
+        G/GyzJXEyy3Fi
+X-Received: by 2002:aa7:d0d4:: with SMTP id u20mr12312765edo.203.1611821885483;
+        Thu, 28 Jan 2021 00:18:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyJKqbOLa1ltAkb+2RvgjlMFRSmUiSGsTYcB1FyvSUbCwutAznr+10kD6tqpqX55az450Jegg==
+X-Received: by 2002:aa7:d0d4:: with SMTP id u20mr12312749edo.203.1611821885259;
+        Thu, 28 Jan 2021 00:18:05 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h16sm2722046edw.34.2021.01.28.00.16.33
+        by smtp.gmail.com with ESMTPSA id gj9sm1935372ejb.107.2021.01.28.00.18.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 00:16:33 -0800 (PST)
-Subject: Re: [PATCH] KVM: Documentation: Fix documentation for nested.
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>, kvm@vger.kernel.org
-Cc:     corbet@lwn.net, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210128154747.4242-1-yu.c.zhang@linux.intel.com>
+        Thu, 28 Jan 2021 00:18:04 -0800 (PST)
+Subject: Re: [PATCH 15/24] kvm: mmu: Wrap mmu_lock cond_resched and needbreak
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210112181041.356734-1-bgardon@google.com>
+ <20210112181041.356734-16-bgardon@google.com> <YAjIddUuw/SZ+7ut@google.com>
+ <460d38b9-d920-9339-1293-5900d242db37@redhat.com>
+ <CANgfPd_WvXP=mOnxFR8BY=WnbR5Gn8RpK7aR_mOrdDiCh4VEeQ@mail.gmail.com>
+ <fae0e326-cfd4-bf5d-97b5-ae632fb2de34@redhat.com>
+ <CANgfPd_TOpc_cinPwAyH-0WajRM1nZvn9q6s70jno5LFf2vsdQ@mail.gmail.com>
+ <f1ef3118-2a8e-4bf2-b3b0-60ac4947e106@redhat.com>
+ <CANgfPd9FaPhQiEkJ=VHKiVWZ_5S3k2uWHU+ViCi4nEF=GU4qsw@mail.gmail.com>
+ <4c0d4c30-a95b-7954-d344-fb991270f79a@redhat.com>
+ <CANgfPd9torZ_ta7eoB6OwZa3M-LCqU+8802wfWiWDFLio2-Ysg@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b5cf1ea-0ae9-acc2-d92f-c2f2da75f82f@redhat.com>
-Date:   Thu, 28 Jan 2021 09:16:32 +0100
+Message-ID: <816d3c6a-2418-8091-96fb-6a4e6bbf0a95@redhat.com>
+Date:   Thu, 28 Jan 2021 09:18:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210128154747.4242-1-yu.c.zhang@linux.intel.com>
+In-Reply-To: <CANgfPd9torZ_ta7eoB6OwZa3M-LCqU+8802wfWiWDFLio2-Ysg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -70,50 +87,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 16:47, Yu Zhang wrote:
-> Nested VMX was enabled by default in commit <1e58e5e59148> ("KVM:
-> VMX: enable nested virtualization by default"), which was merged
-> in Linux 4.20. This patch is to fix the documentation accordingly.
+On 27/01/21 22:20, Ben Gardon wrote:
+> On Wed, Jan 27, 2021 at 12:55 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 27/01/21 21:08, Ben Gardon wrote:
+>>> I'm not entirely sure I understand this suggestion. Are you suggesting
+>>> we'd have the spinlock and rwlock in a union in struct kvm but then
+>>> use a static define to choose which one is used by other functions? It
+>>> seems like if we're using static defines the union doesn't add value.
+>>
+>> Of course you're right.  You'd just place the #ifdef in the struct kvm
+>> definition.
 > 
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> ---
->   Documentation/virt/kvm/nested-vmx.rst            | 6 ++++--
->   Documentation/virt/kvm/running-nested-guests.rst | 2 +-
->   2 files changed, 5 insertions(+), 3 deletions(-)
+> Ah okay, thanks for clarifying.
 > 
-> diff --git a/Documentation/virt/kvm/nested-vmx.rst b/Documentation/virt/kvm/nested-vmx.rst
-> index 6ab4e35..ac2095d 100644
-> --- a/Documentation/virt/kvm/nested-vmx.rst
-> +++ b/Documentation/virt/kvm/nested-vmx.rst
-> @@ -37,8 +37,10 @@ call L2.
->   Running nested VMX
->   ------------------
->   
-> -The nested VMX feature is disabled by default. It can be enabled by giving
-> -the "nested=1" option to the kvm-intel module.
-> +The nested VMX feature is enabled by default since Linux kernel v4.20. For
-> +older Linux kernel, it can be enabled by giving the "nested=1" option to the
-> +kvm-intel module.
-> +
->   
->   No modifications are required to user space (qemu). However, qemu's default
->   emulated CPU type (qemu64) does not list the "VMX" CPU feature, so it must be
-> diff --git a/Documentation/virt/kvm/running-nested-guests.rst b/Documentation/virt/kvm/running-nested-guests.rst
-> index d0a1fc7..bd70c69 100644
-> --- a/Documentation/virt/kvm/running-nested-guests.rst
-> +++ b/Documentation/virt/kvm/running-nested-guests.rst
-> @@ -74,7 +74,7 @@ few:
->   Enabling "nested" (x86)
->   -----------------------
->   
-> -From Linux kernel v4.19 onwards, the ``nested`` KVM parameter is enabled
-> +From Linux kernel v4.20 onwards, the ``nested`` KVM parameter is enabled
->   by default for Intel and AMD.  (Though your Linux distribution might
->   override this default.)
->   
+>>
+>> You can place static inline functions for lock/unlock in
+>> virt/kvm/mmu_lock.h, in order to avoid a proliferation of #ifdefs.
 > 
+> Would you prefer to make that change in this series or at a later
+> date? I'm assuming this would replace all the wrapper functions and
+> mean that x86 is rwlock only.
 
-Queued, thanks.
+Yes, exactly.  I would like to make tdp_mmu=1 the default as soon as 
+parallel page faults are in (and thus scalability should be on par with 
+the shadow MMU).
 
 Paolo
 
