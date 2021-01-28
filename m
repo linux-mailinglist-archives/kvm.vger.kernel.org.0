@@ -2,79 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD7F3307BAF
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:02:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE69F307BC0
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:08:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232836AbhA1RCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 12:02:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24631 "EHLO
+        id S231951AbhA1RGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 12:06:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27370 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232741AbhA1RB2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:01:28 -0500
+        by vger.kernel.org with ESMTP id S232850AbhA1RD0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:03:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611853201;
+        s=mimecast20190719; t=1611853319;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UH9HnxwYQlcxwQzC5ROXxf5EX99BRvbyCUr9+YZW4as=;
-        b=gvnefLh4bupiJTosBGXR08lE4iV+TiLRc11zMh4WTgg2KzeuQMnt0wj+0zbLMiXL0tcwF1
-        95oDnALnwoDyont3OUu4al2j1O2M957t0PqWEVdihG4rWR3WSL+cSZUVuelizV+7T/QsgV
-        lGzoQ5/p+CEy+T8scUrd8py955HJRxg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-209-MP2_X1xoOImB6kKkfSYcsA-1; Thu, 28 Jan 2021 11:59:59 -0500
-X-MC-Unique: MP2_X1xoOImB6kKkfSYcsA-1
-Received: by mail-ed1-f69.google.com with SMTP id u26so2563199edv.18
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:59:58 -0800 (PST)
+        bh=dNqpVKrruT0OYPB8AFxCtPqgE/f8WBY7RjXAPaCWLGo=;
+        b=MXBzhLdkfrUqCf4qqSr/JwkpYUmMSgJ0mLPJP321QcWxeYc+z9ERUjmyl4teDsiSbIZqJE
+        PbOByCzaw9GV43DrSameFzyr4t0N/OYiReNUeAgzHpBuiP6Ry5+fB4TBNdwZex/tSs/u4l
+        7asvOhEA1L5fnCKvXmk+R/SZoVqQqlo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-rjJbkrFPPiOLqvt6yB_bHw-1; Thu, 28 Jan 2021 12:01:57 -0500
+X-MC-Unique: rjJbkrFPPiOLqvt6yB_bHw-1
+Received: by mail-ej1-f69.google.com with SMTP id ox17so2468802ejb.2
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:01:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UH9HnxwYQlcxwQzC5ROXxf5EX99BRvbyCUr9+YZW4as=;
-        b=f2w3hpfngs0o4Z+O5TgTBVZpb8EdwnCCXgZl00NxcbMS6WR2NYNrluHo0xeUMwg7/5
-         0zQTdONDt0PDe7IJUk/guYCUCSmvlKMz//6+qvoha9ZN8yRMFt8HqKbZRWov0tyzw4rF
-         PHFXM7mgZUBTF4uopDVJtTx2yAdJwKJt48QsNTqLqJ7XJJukJnkBJJpgseRobfzj4rsw
-         QcrZ2drJW2fYGe8ua2vFrW0Gifz5AapgXW3c1a4YlD4dBAukB447yhIu1NEhmRUHxekz
-         nqg8pRw7yvd4CyLAVZdcnd9QDVqasj+UilANIw55dNCrMyU1LQ/7LjhaIfFvI1cXm6PA
-         yXHA==
-X-Gm-Message-State: AOAM532Dmm1NmFKy88DcjZuz8SzmpjZuFOqGodde03ZzwWCUP8LNuqdA
-        jr5znK3lBhzoxaHFrC6j0/jXAv119drDyikBbNfAy16jvv0jGqaOut2dSnViA9dmjwbasPfXXE2
-        SobJPkuR5omwN
-X-Received: by 2002:a50:da8b:: with SMTP id q11mr523671edj.352.1611853197914;
-        Thu, 28 Jan 2021 08:59:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzCYYO4KxHvkD1ek7VplCvdhayWK50wgiLkiCy7nAAszHbgwT/+0cTT4+tdbopcJmj3Hq5WZg==
-X-Received: by 2002:a50:da8b:: with SMTP id q11mr523655edj.352.1611853197771;
-        Thu, 28 Jan 2021 08:59:57 -0800 (PST)
+        bh=dNqpVKrruT0OYPB8AFxCtPqgE/f8WBY7RjXAPaCWLGo=;
+        b=lr+BMsZVxr3FLcY3zwTF5pphXugKr+x93HNaHN1a85JyvH/ImuZG2JDG2rHwF+rY/1
+         p6Uv95vq8vELYzAivWwnHnM6Cf9Q9MKcl+yVUpanlyMSKIthcmwdglHoVE9oJstJvv+y
+         sPcs66L8Cauo81GYDnHLI9AJllp6MCJi0obXmnN+Nhf6mPGEDlnoiolxUiA9WkcaRG4Y
+         8ZPNl4QE3SMoFclLGovz14+5h7ViBED1V5joqa4DHwvA/nSJ6mhEoAPZx74zzYKXKhxm
+         BoOxAPA/sx8/iMei6kcjxmd6w6u3UkfwyQNujovDyNYjA6GaoncSERWE/KrskXEifgfK
+         oY0Q==
+X-Gm-Message-State: AOAM530ruzzVB5JOHTYmu3mspFeF87/L7y0kGnPp5wE2f4V0vucQ2vSB
+        qJ0VkEMmiuUH+K1wgZ3BkrDzGzJ8+jSmOOADlETy2GJ5olkOqaD1DTt8q8enXCyjpuVf3qBSrxR
+        Af7glTjPmt4mv
+X-Received: by 2002:a17:906:8057:: with SMTP id x23mr314876ejw.179.1611853316654;
+        Thu, 28 Jan 2021 09:01:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxujK/eaJ0fC/FD3LRg0rWCLiz0wykO6Jm1x6t4ZzQzFsnaTWCYrVGTOqNvGylJCvMZbW2tPw==
+X-Received: by 2002:a17:906:8057:: with SMTP id x23mr314856ejw.179.1611853316414;
+        Thu, 28 Jan 2021 09:01:56 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id fi12sm2576705ejb.49.2021.01.28.08.59.56
+        by smtp.gmail.com with ESMTPSA id qq11sm2593217ejb.74.2021.01.28.09.01.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 08:59:56 -0800 (PST)
-Subject: Re: [PATCH v2 14/14] KVM: SVM: Skip SEV cache flush if no ASIDs have
- been used
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-References: <20210114003708.3798992-1-seanjc@google.com>
- <20210114003708.3798992-15-seanjc@google.com>
- <55a63dfb-94a4-6ba2-31d1-c9b6830ff791@redhat.com>
- <YBLmareW9CB0Kcta@google.com>
+        Thu, 28 Jan 2021 09:01:55 -0800 (PST)
+Subject: Re: [PATCH v5 16/16] KVM: x86/xen: Add event channel interrupt vector
+ upcall
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+References: <20210111195725.4601-1-dwmw2@infradead.org>
+ <20210111195725.4601-17-dwmw2@infradead.org>
+ <3b66ee62-bf12-c6ab-a954-a66e5f31f109@redhat.com>
+ <0f210bea8a8d800f5a36c8ac8abbcc4b0dd6c02c.camel@infradead.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47871650-ed98-4258-69c0-75d8a1a7f4e5@redhat.com>
-Date:   Thu, 28 Jan 2021 17:59:55 +0100
+Message-ID: <2be48efc-4832-86ee-053a-b9858f7065c0@redhat.com>
+Date:   Thu, 28 Jan 2021 18:01:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <YBLmareW9CB0Kcta@google.com>
+In-Reply-To: <0f210bea8a8d800f5a36c8ac8abbcc4b0dd6c02c.camel@infradead.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -82,17 +78,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 17:29, Sean Christopherson wrote:
-> On Thu, Jan 28, 2021, Paolo Bonzini wrote:
->> I can't find 00/14 in my inbox, so: queued 1-3 and 6-14, thanks.
+On 28/01/21 16:35, David Woodhouse wrote:
+> Well, right now that would return -EINVAL, so you're suggesting we add
+> a special case code path to kvm_vcpu_ioctl_interrupt which just sets
+> KVM_REQ_EVENT without calling kvm_queue_interrupt(), in the case where
+> irq->irq == KVM_NR_INTERRUPTS?
 > 
-> If it's not too late, v3 has a few tweaks that would be nice to have, as well as
-> a new patch to remove the CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT dependency.
-> 
-> https://lkml.kernel.org/r/20210122202144.2756381-1-seanjc@google.com
+> Then we require that the userspace VMM make that ioctl not only when
+> it's set ->evtchn_upcall_pending for itself, but *also*  poll for the
+> guest having done so?
 
-Yes, will do (I had done all of them myself except the comment in 
-sev_hardware_teardown() but it's better to match what was sent to LKML).
+Hmm, right I forgot that the guest can do it for itself.  So the static 
+key would be enough.
 
 Paolo
+
+> In fact, not only the VMM would have to do that polling, but we'd
+> probably also have to do it on any hypercalls we accelerate in the
+> kernel (as we're planning to do for IPIs, etc.)
+> 
+> So it has to live in the kernel anyway in*some*  form.
 
