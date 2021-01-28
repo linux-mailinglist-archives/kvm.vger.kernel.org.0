@@ -2,165 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5561B307381
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 11:19:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D7C1307432
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 11:55:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbhA1KQo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 05:16:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36833 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231779AbhA1KQm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 05:16:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611828914;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=264k/ES24/5FzBGHM2fYr7IzBwxBwCNGsVT8SMTVVPM=;
-        b=ApM+nrpf7PV7A+Grhv8G2ZVY2I9Gtx6KXf19qlq4Tsr7/J+WaCMQb7cWXIl6/lxF43HAXC
-        l87TI4BIaQchiYCZ6jZmQ37edDDv6ftjX4vLNCq4Ryar+/x4Dcg9LExCgHSY9GNdni8LJk
-        hi4L1KouO7/nCn1AhUJjdUVcjatkRiQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-1f7wbxl2MsGHbWxCJ0Nfhw-1; Thu, 28 Jan 2021 05:15:12 -0500
-X-MC-Unique: 1f7wbxl2MsGHbWxCJ0Nfhw-1
-Received: by mail-ej1-f71.google.com with SMTP id md20so1968292ejb.7
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 02:15:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=264k/ES24/5FzBGHM2fYr7IzBwxBwCNGsVT8SMTVVPM=;
-        b=fqcct0qBdPRVHfPg8abwKRf/b3N5X+wRME90WwD0AP5TUgxskazIKUqaTa/FmB2LGT
-         LDlSccN3igExNFN6TgI1+ox5IyLfQGZlxn9THl1+w/0YibwXL5ZsuW1CbBmhoDSaa1/R
-         mzkuLc5J5mTP6FsnH6yyWivq9lzeFey7ev+RysfBUpeax5M0CTMhJsjVeiiOJfUbERyo
-         5Z8822/MZ7ATN8U/IVGT0iEvcBx3pFdPHjQ/+JWQghPCaBozEJIQBB3CiCY+bqhQldK0
-         vTUdg492b/7OBPsZCy31Oy/zKFBmKlzvRjsu9y1t3ca12KsWHy7BgviOp9wmrFNKh5Pw
-         fMOw==
-X-Gm-Message-State: AOAM530EKvyNMaPKQ2Azf8g6CphQ+mxzq67A38b6Y+rfUrme7BHeMyK8
-        lXw4U25oi4Ny0ykzq71Xmy96kOeu+SXnDVWAMsDboVEKSnAJT+8I/bqLHwg+I8NKiiR4ZZ0kGMG
-        0k3F8kP6g29j0
-X-Received: by 2002:a05:6402:556:: with SMTP id i22mr12971199edx.56.1611828911360;
-        Thu, 28 Jan 2021 02:15:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy4SAH7IU0R5i26466TR/gOXJqVjt6mKq2oIXhXos1oK+4OFr5vXHw1ve0htUjPFzXJN36T8Q==
-X-Received: by 2002:a05:6402:556:: with SMTP id i22mr12971163edx.56.1611828911092;
-        Thu, 28 Jan 2021 02:15:11 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id f22sm2080999eje.34.2021.01.28.02.15.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 02:15:10 -0800 (PST)
-Subject: Re: [PATCH V2] Fix unsynchronized access to sev members through
- svm_register_enc_region
-To:     Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
-        stable@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210127161524.2832400-1-pgonda@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bfb1205a-5442-536e-931c-206f4904e188@redhat.com>
-Date:   Thu, 28 Jan 2021 11:15:08 +0100
+        id S231555AbhA1Kw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 05:52:58 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:50974 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231208AbhA1Kw5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 05:52:57 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10SAmlnJ050101;
+        Thu, 28 Jan 2021 10:51:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
+ cc : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=BuluHwMd9NSzqvDt1SRfZihs9bpXUQcjEOj8pAKtjR4=;
+ b=hrBqPD9mK0YU52moBTip1VITk5Lay0/G3S365Famc+CPkQUAHZiUMeGPj8XktrXaDiYl
+ R75Yzuym40JZD5+cdQVYIWzZpuPZUf54vsFn+6oTWgZZyy9QSULM8FygXR0XL7cyKoqF
+ Alcpz2KwuVBn9hPM5kN/gVWJOYNfZVhgu+T+9/cvFA+z9IC3vUknBoBlxm8IX733VYRp
+ FE6pD3qOcB8Eeia8n+qOqD3x7TSSviFM3ktuGXTtfYDQI1J035eM6PuphSnrGGm30sG3
+ QRyY887MJjmtq5/6mQGfrUxyQ0aADBzNjwFzTPinPFtFRratHPttN2cKxwpKp8moqnXB EA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 368brkufkn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Jan 2021 10:51:15 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10SAjAdq079505;
+        Thu, 28 Jan 2021 10:49:15 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 368wcqhkqx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 28 Jan 2021 10:49:15 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10SAnBcQ022723;
+        Thu, 28 Jan 2021 10:49:11 GMT
+Received: from [10.175.203.223] (/10.175.203.223)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 28 Jan 2021 02:49:11 -0800
+From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH 1/5] KVM: Make the maximum number of user memslots a
+ per-VM thing
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>
+References: <20210127175731.2020089-1-vkuznets@redhat.com>
+ <20210127175731.2020089-2-vkuznets@redhat.com>
+ <09f96415-b32d-1073-0b4f-9c6e30d23b3a@oracle.com>
+ <877dnx30vv.fsf@vitty.brq.redhat.com>
+Message-ID: <5b6ac6b4-3cc8-2dc3-cd8c-a4e322379409@oracle.com>
+Date:   Thu, 28 Jan 2021 11:48:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210127161524.2832400-1-pgonda@google.com>
+In-Reply-To: <877dnx30vv.fsf@vitty.brq.redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9877 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101280053
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9877 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 impostorscore=0
+ phishscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101280053
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/01/21 17:15, Peter Gonda wrote:
-> Grab kvm->lock before pinning memory when registering an encrypted
-> region; sev_pin_memory() relies on kvm->lock being held to ensure
-> correctness when checking and updating the number of pinned pages.
+On 28.01.2021 09:45, Vitaly Kuznetsov wrote:
+> "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com> writes:
 > 
-> Add a lockdep assertion to help prevent future regressions.
+>> On 27.01.2021 18:57, Vitaly Kuznetsov wrote:
+>>> Limiting the maximum number of user memslots globally can be undesirable as
+>>> different VMs may have different needs. Generally, a relatively small
+>>> number should suffice and a VMM may want to enforce the limitation so a VM
+>>> won't accidentally eat too much memory. On the other hand, the number of
+>>> required memslots can depend on the number of assigned vCPUs, e.g. each
+>>> Hyper-V SynIC may require up to two additional slots per vCPU.
+>>>
+>>> Prepare to limit the maximum number of user memslots per-VM. No real
+>>> functional change in this patch as the limit is still hard-coded to
+>>> KVM_USER_MEM_SLOTS.
+>>>
+>>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>> ---
+>>
+>> Perhaps I didn't understand the idea clearly but I thought it was
+>> to protect the kernel from a rogue userspace VMM allocating many
+>> memslots and so consuming a lot of memory in kernel?
+>>
+>> But then what's the difference between allocating 32k memslots for
+>> one VM and allocating 509 slots for 64 VMs?
+>>
 > 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: stable@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Fixes: 1e80fdc09d12 ("KVM: SVM: Pin guest memory when SEV is active")
-> Signed-off-by: Peter Gonda <pgonda@google.com>
+> It was Sean's idea :-) Initially, I had the exact same thoughts but now
+> I agree with
 > 
-> V2
->   - Fix up patch description
->   - Correct file paths svm.c -> sev.c
->   - Add unlock of kvm->lock on sev_pin_memory error
+> "I see it as an easy way to mitigate the damage.  E.g. if a containers use case
+> is spinning up hundreds of VMs and something goes awry in the config, it would
+> be the difference between consuming tens of MBs and hundreds of MBs.  Cgroup
+> limits should also be in play, but defense in depth and all that. "
 > 
-> V1
->   - https://lore.kernel.org/kvm/20210126185431.1824530-1-pgonda@google.com/
+> https://urldefense.com/v3/__https://lore.kernel.org/kvm/YAcU6swvNkpPffE7@google.com/__;!!GqivPVa7Brio!MEvJAWTpdPwU7jynHog2X5g4AHX7YCbRlNvTC9x4xdmk3aiSMjwT_rMpvZM6g8TkoJfvcw$
 > 
-> ---
->   arch/x86/kvm/svm/sev.c | 17 ++++++++++-------
->   1 file changed, 10 insertions(+), 7 deletions(-)
+> That said it is not really a security feature, VMM still stays in
+> control.
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index c8ffdbc81709..b80e9bf0a31b 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -342,6 +342,8 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
->   	unsigned long first, last;
->   	int ret;
->   
-> +	lockdep_assert_held(&kvm->lock);
-> +
->   	if (ulen == 0 || uaddr + ulen < uaddr)
->   		return ERR_PTR(-EINVAL);
->   
-> @@ -1119,12 +1121,20 @@ int svm_register_enc_region(struct kvm *kvm,
->   	if (!region)
->   		return -ENOMEM;
->   
-> +	mutex_lock(&kvm->lock);
->   	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
->   	if (IS_ERR(region->pages)) {
->   		ret = PTR_ERR(region->pages);
-> +		mutex_unlock(&kvm->lock);
->   		goto e_free;
->   	}
->   
-> +	region->uaddr = range->addr;
-> +	region->size = range->size;
-> +
-> +	list_add_tail(&region->list, &sev->regions_list);
-> +	mutex_unlock(&kvm->lock);
-> +
->   	/*
->   	 * The guest may change the memory encryption attribute from C=0 -> C=1
->   	 * or vice versa for this memory range. Lets make sure caches are
-> @@ -1133,13 +1143,6 @@ int svm_register_enc_region(struct kvm *kvm,
->   	 */
->   	sev_clflush_pages(region->pages, region->npages);
->   
-> -	region->uaddr = range->addr;
-> -	region->size = range->size;
-> -
-> -	mutex_lock(&kvm->lock);
-> -	list_add_tail(&region->list, &sev->regions_list);
-> -	mutex_unlock(&kvm->lock);
-> -
->   	return ret;
->   
->   e_free:
+>> A guest can't add a memslot on its own, only the host software
+>> (like QEMU) can, right?
+>>
+> 
+> VMMs (especially big ones like QEMU) are complex and e.g. each driver
+> can cause memory regions (-> memslots in KVM) to change. With this
+> feature it becomes possible to set a limit upfront (based on VM
+> configuration) so it'll be more obvious when it's hit.
 > 
 
-Queued, thanks.
+I see: it's a kind of a "big switch", so every VMM doesn't have to be
+modified or audited.
+Thanks for the explanation.
 
-Paolo
-
+Maciej
