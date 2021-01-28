@@ -2,100 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 63E0E30721B
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 09:56:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B208E3071EA
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 09:49:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232295AbhA1Iyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 03:54:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20993 "EHLO
+        id S231759AbhA1Ira (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 03:47:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55374 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232269AbhA1Ip3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 03:45:29 -0500
+        by vger.kernel.org with ESMTP id S231791AbhA1Iqo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 03:46:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611823391;
+        s=mimecast20190719; t=1611823561;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hvtYOjdDfkZyk+lFGoUR0j8cdav/9WreRA8ZjtvAe/E=;
-        b=aq11F+aKjJmltl/6mE+VbDfzDj0YYzA+eJOjBDpZMx5gy/9/aLBRg2h+c96/b26AZB8K23
-        CAxDRw9WnW33CQbTSBi0M1d1ZeulxCYyxq5kGWtGMnJu7Vg1/tXJCoqgdklB28SWCvcFZ9
-        sw7HyTkd0w8ASTOWTkOSXoKoxuPKkeg=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-miG_sVzzOTqT_KuwPS3I_g-1; Thu, 28 Jan 2021 03:43:09 -0500
-X-MC-Unique: miG_sVzzOTqT_KuwPS3I_g-1
-Received: by mail-ed1-f72.google.com with SMTP id a24so2834480eda.14
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 00:43:09 -0800 (PST)
+        bh=mVOlWn6fClC1aj9sXl6eMnMf2fKSPMW6jC1fk0abkpo=;
+        b=VPsgdUi/PJcUHP4v8K7yB5w21eeB+ZhwaRhcA3yp9PnRU+Hb+OhBvMBGt7KiZ0cBUZ2xQF
+        zaBj0FEpVE7wfFr8vebqFrdVqK/eg7+dCriVkPGxBvBWH9Ax9SO8c8O1JWv0jNY4qStXaW
+        zTwp4833OCghvXrcnJxi+ocvguMHL4w=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-RkU2M2-AOZGAzTs1aJItfw-1; Thu, 28 Jan 2021 03:45:58 -0500
+X-MC-Unique: RkU2M2-AOZGAzTs1aJItfw-1
+Received: by mail-ed1-f70.google.com with SMTP id u26so1935405edv.18
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 00:45:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hvtYOjdDfkZyk+lFGoUR0j8cdav/9WreRA8ZjtvAe/E=;
-        b=rePh36VyL8vKKKOr615HTuftdl+9J6BJrUqypRllos4fLAUY4fNegNooTeQ8DUfhYT
-         1ABXccHU42P0cq8WLlGba84jIo78uoXeDtccbaI9q/P/yBNDOxh/uUrYESMDPSzQVuNh
-         RG6hYIdK4NeyjbO4AqJtXYZ3Ph3i0D0W5Kd/KMY5Jq19lg4kIlvJssDodGrzjbHxjeLI
-         QmVIxt+xm5v5z/ttN6QsT8PFbCiq5o86JDTejW0rTpmFWr5LtNNkNQXLB5GoS/I0E8/Z
-         6n3lkyMtg8N52UNPOq3FkHEDwpNhYTYBHRb+E48P4Scfi3L5mmXs/H4utens8HyTNKlo
-         dPyw==
-X-Gm-Message-State: AOAM531k1Qz0XAHbiPRhd8DKvqdl3kU7dYZrCCdgEZxWkecGffZjztrv
-        zUnbdTKx8k7OpqKR2OJJ52dv9iKHtUR9IAg08ScgzzviBroNNvEZt+zJF1xTBmaMcUbcjZCuMm4
-        ZaxkuMopfRvkm
-X-Received: by 2002:a17:906:d781:: with SMTP id pj1mr9602419ejb.329.1611823388329;
-        Thu, 28 Jan 2021 00:43:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz1a78u8FKvTZXcVbcIA+2MiZd1VLUiatKlWwSCjuWctKG+Uxffs2RgHxBspXvhfk93fwJVgg==
-X-Received: by 2002:a17:906:d781:: with SMTP id pj1mr9602401ejb.329.1611823388180;
-        Thu, 28 Jan 2021 00:43:08 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id qk1sm1931282ejb.86.2021.01.28.00.43.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 00:43:07 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: fix CPUID entries returned by KVM_GET_CPUID2
- ioctl
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=mVOlWn6fClC1aj9sXl6eMnMf2fKSPMW6jC1fk0abkpo=;
+        b=FUNyqq/M5y1Lef3XAmmPotxrwMyJ4qiAHo7dDx1j56uZ4F0DkNFLMTnRF3LZkOH8aB
+         amTjGEOrKiBT4pdWp2Q0/qBu2ZdQ72ZmhbwgKf0k1nF3jsW4aeVbS7+MPM+RALgKKkRf
+         KZhh+UnYve8znHI1/c/TACqTfBDDs1GYzDePLeHvj9jWHLdEGu0T0sWemW2aW2HtHUwj
+         WPBNJUYkLaw+39gZNwbdr/XBpIBKsz5X7bETsZygWwjMpFnFsuKwga3OXvnsNhCFGKR2
+         z1fwo7XUNWgZiSPC8s1+6bujFw94hR0oocnER+5fw+0UE54463tEW24Gwca13mpJZLVi
+         /9fA==
+X-Gm-Message-State: AOAM531tiezREwkP3BnvW0HS0jMld+vt5pufkyEmJjCucRFp4Uq1iOkZ
+        LS+RA1qTeGTd5w5WR9HhS4lALthDTILOM+F22ixE9D4AsdUKuYQpQoVDoldFdHlmC+45J1K/EJj
+        DGc8HgR/rFRSv
+X-Received: by 2002:aa7:cfda:: with SMTP id r26mr12651347edy.142.1611823557706;
+        Thu, 28 Jan 2021 00:45:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy98B9YKIO7aw02SBaD4kYo9R1+fGvcQpoYEHbdm+QWcvhleOKyETk5hkri52Is6Tq/LWqs4Q==
+X-Received: by 2002:aa7:cfda:: with SMTP id r26mr12651334edy.142.1611823557548;
+        Thu, 28 Jan 2021 00:45:57 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id s22sm1932990ejd.106.2021.01.28.00.45.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jan 2021 00:45:56 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Michael Roth <michael.roth@amd.com.com>
-References: <20210128024451.1816770-1-michael.roth@amd.com>
- <87a6st31c6.fsf@vitty.brq.redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <304bd6db-4c67-a4bd-3b79-74c0474edefa@redhat.com>
-Date:   Thu, 28 Jan 2021 09:43:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 1/5] KVM: Make the maximum number of user memslots a
+ per-VM thing
+In-Reply-To: <09f96415-b32d-1073-0b4f-9c6e30d23b3a@oracle.com>
+References: <20210127175731.2020089-1-vkuznets@redhat.com>
+ <20210127175731.2020089-2-vkuznets@redhat.com>
+ <09f96415-b32d-1073-0b4f-9c6e30d23b3a@oracle.com>
+Date:   Thu, 28 Jan 2021 09:45:56 +0100
+Message-ID: <877dnx30vv.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87a6st31c6.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 09:36, Vitaly Kuznetsov wrote:
-> This is embarrassing but I have a (possible) excuse: copy_to_user's
-> argument is 'void *' so no warning was produced. Surprisingly, no test
-> caught the breakage. Thanks for debugging and fixing!
+"Maciej S. Szmigiero" <maciej.szmigiero@oracle.com> writes:
 
-So who writes the test:
+> On 27.01.2021 18:57, Vitaly Kuznetsov wrote:
+>> Limiting the maximum number of user memslots globally can be undesirable as
+>> different VMs may have different needs. Generally, a relatively small
+>> number should suffice and a VMM may want to enforce the limitation so a VM
+>> won't accidentally eat too much memory. On the other hand, the number of
+>> required memslots can depend on the number of assigned vCPUs, e.g. each
+>> Hyper-V SynIC may require up to two additional slots per vCPU.
+>> 
+>> Prepare to limit the maximum number of user memslots per-VM. No real
+>> functional change in this patch as the limit is still hard-coded to
+>> KVM_USER_MEM_SLOTS.
+>> 
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> ---
+>
+> Perhaps I didn't understand the idea clearly but I thought it was
+> to protect the kernel from a rogue userspace VMM allocating many
+> memslots and so consuming a lot of memory in kernel?
+>
+> But then what's the difference between allocating 32k memslots for
+> one VM and allocating 509 slots for 64 VMs?
+>
 
-- the author of the buggy patch
+It was Sean's idea :-) Initially, I had the exact same thoughts but now
+I agree with
 
-- the maintainer who failed to spot it
+"I see it as an easy way to mitigate the damage.  E.g. if a containers use case
+is spinning up hundreds of VMs and something goes awry in the config, it would
+be the difference between consuming tens of MBs and hundreds of MBs.  Cgroup
+limits should also be in play, but defense in depth and all that. "
 
-- the poor sod who fixed the issue
+https://lore.kernel.org/kvm/YAcU6swvNkpPffE7@google.com/
 
-?
+That said it is not really a security feature, VMM still stays in
+control. 
 
-(Just kidding, it will of course be either me or a fourth person :)).
+> A guest can't add a memslot on its own, only the host software
+> (like QEMU) can, right?
+>
 
-Paolo
+VMMs (especially big ones like QEMU) are complex and e.g. each driver
+can cause memory regions (-> memslots in KVM) to change. With this
+feature it becomes possible to set a limit upfront (based on VM
+configuration) so it'll be more obvious when it's hit.
+
+-- 
+Vitaly
 
