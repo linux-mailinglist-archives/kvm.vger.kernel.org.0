@@ -2,149 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 399AA306B77
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 04:13:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9EB7306BEA
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 05:09:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbhA1DNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 22:13:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21614 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229709AbhA1DNc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Jan 2021 22:13:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611803526;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DcrTmjoadIb7p2OxWm6C9AN0UzP4YCS8NJ0a7dpGJ98=;
-        b=dzTpi1kHMDfW1Z1T6b+qLPa+y6GDBAeSpj47WEp1NuHys/3G54xNM+KJQnU6FWB6WsnTq4
-        nm2Oo6ltEh3fAmqHbphcVjR+47mujn7B9JQSUR+NarUnoLGgbJQ2RNAF5zJLz7ZSnd65AJ
-        KGigqAHn261k4SJw8qQdR5M2dGmP5/4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-zc4-TNbrNLWVbKrUpxayDQ-1; Wed, 27 Jan 2021 22:12:04 -0500
-X-MC-Unique: zc4-TNbrNLWVbKrUpxayDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 362EE1005586;
-        Thu, 28 Jan 2021 03:12:02 +0000 (UTC)
-Received: from [10.72.12.167] (ovpn-12-167.pek2.redhat.com [10.72.12.167])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 649365D9E3;
-        Thu, 28 Jan 2021 03:11:51 +0000 (UTC)
-Subject: Re: [RFC v3 03/11] vdpa: Remove the restriction that only supports
- virtio-net devices
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Xie Yongji <xieyongji@bytedance.com>, mst@redhat.com,
-        stefanha@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
-        hch@infradead.org, rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-References: <20210119045920.447-1-xieyongji@bytedance.com>
- <20210119045920.447-4-xieyongji@bytedance.com>
- <310d7793-e4ff-fba3-f358-418cb64c7988@redhat.com>
- <20210120110832.oijcmywq7pf7psg3@steredhat>
- <1979cffc-240e-a9f9-b0ab-84a1f82ac81e@redhat.com>
- <20210127085728.j6x5yzrldp2wp55c@steredhat>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <3cb239f5-fdd5-8311-35a0-c0f50b552521@redhat.com>
-Date:   Thu, 28 Jan 2021 11:11:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S231390AbhA1EHu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 23:07:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50630 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231290AbhA1EGf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 23:06:35 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E7BC0617A7
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 19:52:58 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id gx5so5742844ejb.7
+        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 19:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=+O2qMiPa6DUHQGJGAVdYPz1g1ToZM+iWzcVRsrY0Xi8=;
+        b=cWVeFbmTHgO16wYgh40uSg+31tascuZOZGOnAVpdbRi9aI/sw1iSNSjNGZlY4fZrHI
+         Yr/cjYT6LahUKE4PZ/ukO5cBl32ntZ1Nj2Usso+D7lateBQZkMOOvUKzggpEjrsZbVSt
+         p6qFA7TycMwqn/IsSqvCB2nh7lzVpaM/bPqGmayDPbHbmvvKG2yhWXgLzOlfK4WjotTC
+         RylAk5xck6CSApCMP8OHFiqcFTTfYaMTXEXqz80EfLXTpbgAm9Im5cugb3EvTNA5r4bT
+         m/rKxQ1qYCHWx/xV/9cSaInXcxQTWnJKKR2l7q0P/7faYgVLJWyh0mHJSswcuqaFPfCM
+         +pyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=+O2qMiPa6DUHQGJGAVdYPz1g1ToZM+iWzcVRsrY0Xi8=;
+        b=b0ssF5WHW23Ndrv6QTYwyePzqq4R5GvkVN3ItIJ9JDw13Wv/ZmebtxOLE/not9sibP
+         01Mg4/51nCXtv2FhgZXNn6dWhIGmYjinX65cDoNArHjXWnpBecVfPIeivFxRt8uo1CIG
+         JBrGqIR9uehjx5Q0xywqTYgF8nmfVdj2ZyGJXhFRmJIwoujzzMg797Tf3gYgpH0ze2yv
+         +vz8Q9qr3oy84QZwstjnO/s+YetWdTC2AFX8uywyb/DF4jZc3b6ZCE3qqIBUHvSmJLnC
+         0Em9pHNzAv9l6lxBwEktvYrdw3l+Hp9LrfwGvNRLxe+mhiCuaRhOAww4AHbUiIFaTWUg
+         ZxfQ==
+X-Gm-Message-State: AOAM532kOG5D1Ql5iclVpGkUi8wM2raTqIh17Rocl0UKvUjteuZKXlaa
+        tkXlzB5eEUZo0tVlVevXfImnFCqlHZctEHSRb4+H
+X-Google-Smtp-Source: ABdhPJzTganDrHuz8JhcC1ya1QviFsDqnAscuVEhbF7bZ5b0uFePTtg2FCy+ZiWVARQ6EkK0Zu2XAwYNJMdtwF0Ttcg=
+X-Received: by 2002:a17:907:1629:: with SMTP id hb41mr8917531ejc.197.1611805976826;
+ Wed, 27 Jan 2021 19:52:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210127085728.j6x5yzrldp2wp55c@steredhat>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210119045920.447-1-xieyongji@bytedance.com> <20210119045920.447-2-xieyongji@bytedance.com>
+ <e8a2cc15-80f5-01e0-75ec-ea6281fda0eb@redhat.com> <CACycT3sN0+dg-NubAK+N-DWf3UDXwWh=RyRX-qC9fwdg3QaLWA@mail.gmail.com>
+ <6a5f0186-c2e3-4603-9826-50d5c68a3fda@redhat.com> <CACycT3sqDgccOfNcY_FNcHDqJ2DeMbigdFuHYm9DxWWMjkL7CQ@mail.gmail.com>
+ <b5c9f2d4-5b95-4552-3886-f5cbcb7de232@redhat.com>
+In-Reply-To: <b5c9f2d4-5b95-4552-3886-f5cbcb7de232@redhat.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 28 Jan 2021 11:52:45 +0800
+Message-ID: <CACycT3u6Ayf_X8Mv4EvF+B=B4OzFSK8ygvJMRnO6CDgYF13Qnw@mail.gmail.com>
+Subject: Re: Re: [RFC v3 01/11] eventfd: track eventfd_signal() recursion
+ depth separately in different cases
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Parav Pandit <parav@nvidia.com>, Bob Liu <bob.liu@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, bcrl@kvack.org, Jonathan Corbet <corbet@lwn.net>,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/1/27 下午4:57, Stefano Garzarella wrote:
-> On Wed, Jan 27, 2021 at 11:33:03AM +0800, Jason Wang wrote:
->>
->> On 2021/1/20 下午7:08, Stefano Garzarella wrote:
->>> On Wed, Jan 20, 2021 at 11:46:38AM +0800, Jason Wang wrote:
->>>>
->>>> On 2021/1/19 下午12:59, Xie Yongji wrote:
->>>>> With VDUSE, we should be able to support all kinds of virtio devices.
->>>>>
->>>>> Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
->>>>> ---
->>>>>  drivers/vhost/vdpa.c | 29 +++--------------------------
->>>>>  1 file changed, 3 insertions(+), 26 deletions(-)
->>>>>
->>>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>>>> index 29ed4173f04e..448be7875b6d 100644
->>>>> --- a/drivers/vhost/vdpa.c
->>>>> +++ b/drivers/vhost/vdpa.c
->>>>> @@ -22,6 +22,7 @@
->>>>>  #include <linux/nospec.h>
->>>>>  #include <linux/vhost.h>
->>>>>  #include <linux/virtio_net.h>
->>>>> +#include <linux/virtio_blk.h>
->>>>>  #include "vhost.h"
->>>>> @@ -185,26 +186,6 @@ static long vhost_vdpa_set_status(struct 
->>>>> vhost_vdpa *v, u8 __user *statusp)
->>>>>      return 0;
->>>>>  }
->>>>> -static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
->>>>> -                      struct vhost_vdpa_config *c)
->>>>> -{
->>>>> -    long size = 0;
->>>>> -
->>>>> -    switch (v->virtio_id) {
->>>>> -    case VIRTIO_ID_NET:
->>>>> -        size = sizeof(struct virtio_net_config);
->>>>> -        break;
->>>>> -    }
->>>>> -
->>>>> -    if (c->len == 0)
->>>>> -        return -EINVAL;
->>>>> -
->>>>> -    if (c->len > size - c->off)
->>>>> -        return -E2BIG;
->>>>> -
->>>>> -    return 0;
->>>>> -}
->>>>
->>>>
->>>> I think we should use a separate patch for this.
->>>
->>> For the vdpa-blk simulator I had the same issues and I'm adding a 
->>> .get_config_size() callback to vdpa devices.
->>>
->>> Do you think make sense or is better to remove this check in 
->>> vhost/vdpa, delegating the boundaries checks to 
->>> get_config/set_config callbacks.
->>
->>
->> A question here. How much value could we gain from get_config_size() 
->> consider we can let vDPA parent to validate the length in its 
->> get_config().
->>
+On Thu, Jan 28, 2021 at 11:05 AM Jason Wang <jasowang@redhat.com> wrote:
 >
-> I agree, most of the implementations already validate the length, the 
-> only gain is an error returned since get_config() is void, but 
-> eventually we can add a return value to it.
-
-
-Right, one problem here is that. For the virito path, its get_config() 
-returns void. So we can not propagate error to virtio drivers. But it 
-might not be a big issue since we trust kernel virtio driver.
-
-So I think it makes sense to change the return value in the vdpa config ops.
-
-Thanks
-
-
 >
-> Thanks,
-> Stefano
+> On 2021/1/27 =E4=B8=8B=E5=8D=885:11, Yongji Xie wrote:
+> > On Wed, Jan 27, 2021 at 11:38 AM Jason Wang <jasowang@redhat.com> wrote=
+:
+> >>
+> >> On 2021/1/20 =E4=B8=8B=E5=8D=882:52, Yongji Xie wrote:
+> >>> On Wed, Jan 20, 2021 at 12:24 PM Jason Wang <jasowang@redhat.com> wro=
+te:
+> >>>> On 2021/1/19 =E4=B8=8B=E5=8D=8812:59, Xie Yongji wrote:
+> >>>>> Now we have a global percpu counter to limit the recursion depth
+> >>>>> of eventfd_signal(). This can avoid deadlock or stack overflow.
+> >>>>> But in stack overflow case, it should be OK to increase the
+> >>>>> recursion depth if needed. So we add a percpu counter in eventfd_ct=
+x
+> >>>>> to limit the recursion depth for deadlock case. Then it could be
+> >>>>> fine to increase the global percpu counter later.
+> >>>> I wonder whether or not it's worth to introduce percpu for each even=
+tfd.
+> >>>>
+> >>>> How about simply check if eventfd_signal_count() is greater than 2?
+> >>>>
+> >>> It can't avoid deadlock in this way.
+> >>
+> >> I may miss something but the count is to avoid recursive eventfd call.
+> >> So for VDUSE what we suffers is e.g the interrupt injection path:
+> >>
+> >> userspace write IRQFD -> vq->cb() -> another IRQFD.
+> >>
+> >> It looks like increasing EVENTFD_WAKEUP_DEPTH should be sufficient?
+> >>
+> > Actually I mean the deadlock described in commit f0b493e ("io_uring:
+> > prevent potential eventfd recursion on poll"). It can break this bug
+> > fix if we just increase EVENTFD_WAKEUP_DEPTH.
+>
+>
+> Ok, so can wait do something similar in that commit? (using async stuffs
+> like wq).
 >
 
+We can do that. But it will reduce the performance. Because the
+eventfd recursion will be triggered every time kvm kick eventfd in
+vhost-vdpa cases:
+
+KVM write KICKFD -> ops->kick_vq -> VDUSE write KICKFD
+
+Thanks,
+Yongji
