@@ -2,82 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CF4F307AF9
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:31:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 853AB307AFB
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:31:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231532AbhA1QaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 11:30:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbhA1QaS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 11:30:18 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA901C061574
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:29:37 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id h15so3608570pli.8
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:29:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=QnW3q9QyfBy23IUUBbxB1+tEoGYrf3OEFE1JiHhnYNI=;
-        b=DRwK5JqFq7BywQ4Vm9vUysjNAG9F3h2O5beySmJlaCPbrr+5Qu46bjg5kRmaLQF4gf
-         rPPssfHJt7fgEoZDu6udCsswj+BWZFIdQRn57cd7N8+7UIOz/LIafNaYOefbmSjq3pwx
-         GT5AMtIWl5+3ImH1zsy9mVUQcCJdoriQROM97OO0uKwdfs2AZWsUZJjbTmtjn+lnA7VF
-         qmUByziV2yfYrznILz+NhPwbHvs7YM42HnyD2GVZ4zi5kqW5XjlaWPoGBkZ1ggSLx29B
-         UKvKOpgtQ3pheXwXvXT/67HP2avtCsaaqf4F1x0LtzarAEwcm6nwu8eAm2No2RRpHfnG
-         F5hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QnW3q9QyfBy23IUUBbxB1+tEoGYrf3OEFE1JiHhnYNI=;
-        b=m0n2xQuchsFppv+CPl8oO03S/EAyxlTbQ70xQ8dWHTzIIZvFSD2y9eKW3sTVt892Yh
-         7EbfOpStMaG84a4mfBQwtSeUkFY/clfOKBE7IsclHwqNkTW+0N2i1muUmjBTd72lDgxB
-         v/6zVCcTwIS1PKNQzu0LQG/Wf451f00Iv8slbfBxES2CqmexZ6DYLyxrkiuALldLyLMo
-         9dsbrV2rxc2IzBGLmBlBi7UUDu0OtUlA/zp+UnXWT1T5KJ85C0glp7hn3oCgX2FQSSjS
-         ydHD1x2NYbS+KGs3hgfdRlA5V6a+pePYENvpaBU3qvtccGhF6nvrk+dgPVFfJGP9bB2/
-         0ZbA==
-X-Gm-Message-State: AOAM532unMIh4SD8aPSlEiv01wSLlAuQBXXGv+kzsyz9Doh3YdVwXRek
-        z7q4LJhacGz54M37qlZJuTSjng==
-X-Google-Smtp-Source: ABdhPJwS2mNBw4warJqPOhYSugBs698YhL8w0kJ0zbQCzWy46eJPFTumY+EVRNujxC7cFEkpJvvHbQ==
-X-Received: by 2002:a17:902:b212:b029:df:ec2e:6a1f with SMTP id t18-20020a170902b212b02900dfec2e6a1fmr185717plr.24.1611851377109;
-        Thu, 28 Jan 2021 08:29:37 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:1ea0:b8ff:fe73:50f5])
-        by smtp.gmail.com with ESMTPSA id n8sm5715265pjo.18.2021.01.28.08.29.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 08:29:36 -0800 (PST)
-Date:   Thu, 28 Jan 2021 08:29:30 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH v2 14/14] KVM: SVM: Skip SEV cache flush if no ASIDs have
- been used
-Message-ID: <YBLmareW9CB0Kcta@google.com>
-References: <20210114003708.3798992-1-seanjc@google.com>
- <20210114003708.3798992-15-seanjc@google.com>
- <55a63dfb-94a4-6ba2-31d1-c9b6830ff791@redhat.com>
+        id S232350AbhA1QbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 11:31:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49291 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231860AbhA1QbM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:31:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611851384;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CBXJAn42N0v5gv2TukYAt13ncT1ZsjqXKLJyUwUjq/4=;
+        b=haWQvUz4GNiLlujtaWsXJDsGrkYVx85ysSoHJvt4Cds8JXUjeYwgWSDeNQDJnXysdJQdN6
+        yEIvuIUiKh/YUw+WqzHXPo1xl6UprZamizZP02MeAsVpIrEjiTI6/c6ng6tcIHVELJSOTb
+        iFVDKboN2tx+w0C1lnUsMkvE0iOqRss=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-BpwLIS-DNPGPtnH22Sl98w-1; Thu, 28 Jan 2021 11:29:43 -0500
+X-MC-Unique: BpwLIS-DNPGPtnH22Sl98w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67434100C605;
+        Thu, 28 Jan 2021 16:29:40 +0000 (UTC)
+Received: from gondolin (ovpn-112-12.ams2.redhat.com [10.36.112.12])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E1E311971B;
+        Thu, 28 Jan 2021 16:29:33 +0000 (UTC)
+Date:   Thu, 28 Jan 2021 17:29:30 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
+Message-ID: <20210128172930.74baff41.cohuck@redhat.com>
+In-Reply-To: <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
+References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+        <20210122122503.4e492b96@omen.home.shazbot.org>
+        <20210122200421.GH4147@nvidia.com>
+        <20210125172035.3b61b91b.cohuck@redhat.com>
+        <20210125180440.GR4147@nvidia.com>
+        <20210125163151.5e0aeecb@omen.home.shazbot.org>
+        <20210126004522.GD4147@nvidia.com>
+        <20210125203429.587c20fd@x1.home.shazbot.org>
+        <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55a63dfb-94a4-6ba2-31d1-c9b6830ff791@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 28, 2021, Paolo Bonzini wrote:
-> I can't find 00/14 in my inbox, so: queued 1-3 and 6-14, thanks.
+On Tue, 26 Jan 2021 15:27:43 +0200
+Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
 
-If it's not too late, v3 has a few tweaks that would be nice to have, as well as
-a new patch to remove the CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT dependency.
+> Hi Alex, Cornelia and Jason,
+> 
+> thanks for the reviewing this.
+> 
+> On 1/26/2021 5:34 AM, Alex Williamson wrote:
+> > On Mon, 25 Jan 2021 20:45:22 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >  
+> >> On Mon, Jan 25, 2021 at 04:31:51PM -0700, Alex Williamson wrote:
+> >>  
+> >>> We're supposed to be enlightened by a vendor driver that does nothing
+> >>> more than pass the opaque device_data through to the core functions,
+> >>> but in reality this is exactly the point of concern above.  At a
+> >>> minimum that vendor driver needs to look at the vdev to get the
+> >>> pdev,  
+> >> The end driver already havs the pdev, the RFC doesn't go enough into
+> >> those bits, it is a good comment.
+> >>
+> >> The dd_data pased to the vfio_create_pci_device() will be retrieved
+> >> from the ops to get back to the end drivers data. This can cleanly
+> >> include everything: the VF pci_device, PF pci_device, mlx5_core
+> >> pointer, vfio_device and vfio_pci_device.
+> >>
+> >> This is why the example passes in the mvadev:
+> >>
+> >> +	vdev = vfio_create_pci_device(pdev, &mlx5_vfio_pci_ops, mvadev);
+> >>
+> >> The mvadev has the PF, VF, and mlx5 core driver pointer.
+> >>
+> >> Getting that back out during the ops is enough to do what the mlx5
+> >> driver needs to do, which is relay migration related IOCTLs to the PF
+> >> function via the mlx5_core driver so the device can execute them on
+> >> behalf of the VF.
+> >>  
+> >>> but then what else does it look at, consume, or modify.  Now we have
+> >>> vendor drivers misusing the core because it's not clear which fields
+> >>> are private and how public fields can be used safely,  
+> >> The kernel has never followed rigid rules for data isolation, it is
+> >> normal to have whole private structs exposed in headers so that
+> >> container_of can be used to properly compose data structures.  
+> > I reject this assertion, there are plenty of structs that clearly
+> > indicate private vs public data or, as we've done in mdev, clearly
+> > marking the private data in a "private" header and provide access
+> > functions for public fields.  Including a "private" header to make use
+> > of a "library" is just wrong.  In the example above, there's no way for
+> > the mlx vendor driver to get back dd_data without extracting it from
+> > struct vfio_pci_device itself.  
+> 
+> I'll create a better separation between private/public fields according 
+> to my understanding for the V2.
+> 
+> I'll just mention that beyond this separation, future improvements will 
+> be needed and can be done incrementally.
+> 
+> I don't think that we should do so many changes at one shut. The 
+> incremental process is safer from subsystem point of view.
+> 
+> I also think that upstreaming mlx5_vfio_pci.ko and upstreaming vfio-pci 
+> separation into 2 modules doesn't have to happen in one-shut.
 
-https://lkml.kernel.org/r/20210122202144.2756381-1-seanjc@google.com
+The design can probably benefit from tossing a non-mlx5 driver into the
+mix.
+
+So, let me suggest the zdev support for that experiment (see
+e6b817d4b8217a9528fcfd59719b924ab8a5ff23 and friends.) It is quite
+straightforward: it injects some capabilities into the info ioctl. A
+specialized driver would basically only need to provide special
+handling for the ioctl callback and just forward anything else. It also
+would not need any matching for device ids etc., as it would only make
+sense on s390x, but regardless of the device. It could, however, help
+us to get an idea what a good split would look like.
+
+> 
+> But again, to make our point in this RFC, I'll improve it for V2.
+> 
+> >  
+> >> Look at struct device, for instance. Most of that is private to the
+> >> driver core.
+> >>
+> >> A few 'private to vfio-pci-core' comments would help, it is good
+> >> feedback to make that more clear.
+> >>  
+> >>> extensions potentially break vendor drivers, etc.  We're only even hand
+> >>> waving that existing device specific support could be farmed out to new
+> >>> device specific drivers without even going to the effort to prove that.  
+> >> This is a RFC, not a complete patch series. The RFC is to get feedback
+> >> on the general design before everyone comits alot of resources and
+> >> positions get dug in.
+> >>
+> >> Do you really think the existing device specific support would be a
+> >> problem to lift? It already looks pretty clean with the
+> >> vfio_pci_regops, looks easy enough to lift to the parent.
+> >>  
+> >>> So far the TODOs rather mask the dirty little secrets of the
+> >>> extension rather than showing how a vendor derived driver needs to
+> >>> root around in struct vfio_pci_device to do something useful, so
+> >>> probably porting actual device specific support rather than further
+> >>> hand waving would be more helpful.  
+> >> It would be helpful to get actual feedback on the high level design -
+> >> someting like this was already tried in May and didn't go anywhere -
+> >> are you surprised that we are reluctant to commit alot of resources
+> >> doing a complete job just to have it go nowhere again?  
+> > That's not really what I'm getting from your feedback, indicating
+> > vfio-pci is essentially done, the mlx stub driver should be enough to
+> > see the direction, and additional concerns can be handled with TODO
+> > comments.  Sorry if this is not construed as actual feedback, I think
+> > both Connie and I are making an effort to understand this and being
+> > hampered by lack of a clear api or a vendor driver that's anything more
+> > than vfio-pci plus an aux bus interface.  Thanks,  
+> 
+> I think I got the main idea and I'll try to summarize it:
+> 
+> The separation to vfio-pci.ko and vfio-pci-core.ko is acceptable, and we 
+> do need it to be able to create vendor-vfio-pci.ko driver in the future 
+> to include vendor special souse inside.
+
+One other thing I'd like to bring up: What needs to be done in
+userspace? Does a userspace driver like QEMU need changes to actually
+exploit this? Does management software like libvirt need to be involved
+in decision making, or does it just need to provide the knobs to make
+the driver configurable?
+
+> 
+> The separation implementation and the question of what is private and 
+> what is public, and the core APIs to the various drivers should be 
+> improved or better demonstrated in the V2.
+> 
+> I'll work on improving it and I'll send the V2.
+> 
+> 
+> If you have some feedback of the things/fields/structs you think should 
+> remain private to vfio-pci-core please let us know.
+> 
+> Thanks for the effort in the review,
+> 
+> -Max.
+> 
+> > Alex
+> >  
+> 
+
