@@ -2,174 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BFA1E307998
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 16:25:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BDF830799B
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 16:25:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232256AbhA1PYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 10:24:02 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11530 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232178AbhA1PWP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 10:22:15 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DRPKs1ZVgzjFdr;
-        Thu, 28 Jan 2021 23:20:17 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 28 Jan 2021 23:21:20 +0800
-Subject: Re: [PATCH v3 2/2] vfio/iommu_type1: Fix some sanity checks in detach
- group
-To:     Alex Williamson <alex.williamson@redhat.com>
-References: <20210122092635.19900-1-zhukeqian1@huawei.com>
- <20210122092635.19900-3-zhukeqian1@huawei.com>
- <20210127164641.36e17bf5@omen.home.shazbot.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        "Robin Murphy" <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <5093dace-4b8a-d455-ba16-d0c2da755573@huawei.com>
-Date:   Thu, 28 Jan 2021 23:21:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S232109AbhA1PY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 10:24:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34053 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232496AbhA1PW4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 10:22:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611847290;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7+YeWBZhpv/II3pgSGIZfZIZRfHFqPDaeTXzEFgNzdM=;
+        b=DcUdbOJweT0Niifvv4r24fCnnfarGMev0+qVIGFAIGcdxRZfEx3/8Sr2tlvG7CfX4tsrrB
+        piuVg6j1p9gbloGL43n5cx16YnBQXtXiliPJXzArwuH764SlLsb3UZ1dlTPmznaVVbP4LF
+        lwmsTpDsL6fyNwJJhQfrvGIw7PmlqVI=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-qu3ZUntANz6j4qIf_8LTEA-1; Thu, 28 Jan 2021 10:21:28 -0500
+X-MC-Unique: qu3ZUntANz6j4qIf_8LTEA-1
+Received: by mail-ej1-f71.google.com with SMTP id m4so2324154ejc.14
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 07:21:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=7+YeWBZhpv/II3pgSGIZfZIZRfHFqPDaeTXzEFgNzdM=;
+        b=K52eF6NlVRaGWeqvhOOUr+t8Ye3EnmkQ2V0YW/lXQoJSGVe2YdqfZWQemCUtEvpgT3
+         oM9neF07KXyMp/nxzZivUztkr59KAkVT2HMpI5tz8naYm+yOJ+9m2hALu04VtxCEeMXb
+         SAleW6WDHMjlTwjeErE1ctJ1rWfx1gp0nZxqgXihJ3JpfcLITzpQbweMs4ct2zn8uaAu
+         WWrB0RuhbXlA8pU6gn0P+RI6TCuC2trjgqQ2ef7x3Z+Jo106b2usPjsKD3GmEKl6/3li
+         qGaOIzfsOshm1wXQO/R5utlded4h5OMBcymwmsuPnCbGjZtBMEF6XRtLrbrFvRNyEAuu
+         bbrQ==
+X-Gm-Message-State: AOAM531IWz/vDLjNINrht1F28rbIGijUah40PZ5NUs+Oet/fUzJC/2Zy
+        nFWIqIY59iNKE/4H+XVrauefI9c94GySamOmegI1+98vLlb6IdcFZT03dbAZ9wCtsEIGTed9PGV
+        8yxLeDvqpmttv
+X-Received: by 2002:a17:907:1b27:: with SMTP id mp39mr11554928ejc.519.1611847286926;
+        Thu, 28 Jan 2021 07:21:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJytg1sbgUOlSyM0rQmxw9E7KQxVKIw5Cit9DkLJGAc8mTpfo9/oDLYviVwYXJsCP4GDoIU6lg==
+X-Received: by 2002:a17:907:1b27:: with SMTP id mp39mr11554897ejc.519.1611847286568;
+        Thu, 28 Jan 2021 07:21:26 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id g14sm2473957ejr.105.2021.01.28.07.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jan 2021 07:21:25 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 11/15] KVM: x86: hyper-v: Prepare to meet unallocated
+ Hyper-V context
+In-Reply-To: <fe1bb68d-96a0-cbb3-967a-8576c3533cf6@redhat.com>
+References: <20210126134816.1880136-1-vkuznets@redhat.com>
+ <20210126134816.1880136-12-vkuznets@redhat.com>
+ <fe1bb68d-96a0-cbb3-967a-8576c3533cf6@redhat.com>
+Date:   Thu, 28 Jan 2021 16:21:25 +0100
+Message-ID: <87y2gd140a.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210127164641.36e17bf5@omen.home.shazbot.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-
-On 2021/1/28 7:46, Alex Williamson wrote:
-> On Fri, 22 Jan 2021 17:26:35 +0800
-> Keqian Zhu <zhukeqian1@huawei.com> wrote:
-> 
->> vfio_sanity_check_pfn_list() is used to check whether pfn_list and
->> notifier are empty when remove the external domain, so it makes a
->> wrong assumption that only external domain will use the pinning
->> interface.
->>
->> Now we apply the pfn_list check when a vfio_dma is removed and apply
->> the notifier check when all domains are removed.
->>
->> Fixes: a54eb55045ae ("vfio iommu type1: Add support for mediated devices")
->> Signed-off-by: Keqian Zhu <zhukeqian1@huawei.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 33 ++++++++++-----------------------
->>  1 file changed, 10 insertions(+), 23 deletions(-)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 161725395f2f..d8c10f508321 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -957,6 +957,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->>  
->>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>  {
->> +	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
->>  	vfio_unmap_unpin(iommu, dma, true);
->>  	vfio_unlink_dma(iommu, dma);
->>  	put_task_struct(dma->task);
->> @@ -2250,23 +2251,6 @@ static void vfio_iommu_unmap_unpin_reaccount(struct vfio_iommu *iommu)
->>  	}
->>  }
->>  
->> -static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
->> -{
->> -	struct rb_node *n;
->> -
->> -	n = rb_first(&iommu->dma_list);
->> -	for (; n; n = rb_next(n)) {
->> -		struct vfio_dma *dma;
->> -
->> -		dma = rb_entry(n, struct vfio_dma, node);
->> -
->> -		if (WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list)))
->> -			break;
->> -	}
->> -	/* mdev vendor driver must unregister notifier */
->> -	WARN_ON(iommu->notifier.head);
->> -}
->> -
->>  /*
->>   * Called when a domain is removed in detach. It is possible that
->>   * the removed domain decided the iova aperture window. Modify the
->> @@ -2366,10 +2350,10 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->>  			kfree(group);
->>  
->>  			if (list_empty(&iommu->external_domain->group_list)) {
->> -				vfio_sanity_check_pfn_list(iommu);
->> -
->> -				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu))
->> +				if (!IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)) {
->> +					WARN_ON(iommu->notifier.head);
->>  					vfio_iommu_unmap_unpin_all(iommu);
->> +				}
->>  
->>  				kfree(iommu->external_domain);
->>  				iommu->external_domain = NULL;
->> @@ -2403,10 +2387,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->>  		 */
->>  		if (list_empty(&domain->group_list)) {
->>  			if (list_is_singular(&iommu->domain_list)) {
->> -				if (!iommu->external_domain)
->> +				if (!iommu->external_domain) {
->> +					WARN_ON(iommu->notifier.head);
->>  					vfio_iommu_unmap_unpin_all(iommu);
->> -				else
->> +				} else {
->>  					vfio_iommu_unmap_unpin_reaccount(iommu);
->> +				}
->>  			}
->>  			iommu_domain_free(domain->domain);
->>  			list_del(&domain->next);
->> @@ -2488,9 +2474,10 @@ static void vfio_iommu_type1_release(void *iommu_data)
->>  	struct vfio_iommu *iommu = iommu_data;
->>  	struct vfio_domain *domain, *domain_tmp;
->>  
->> +	WARN_ON(iommu->notifier.head);
-> 
-> I don't see that this does any harm, but isn't it actually redundant?
-> It seems vfio-core only calls the iommu backend release function after
-> removing all the groups, so the tests in _detach_group should catch all
-> cases.  We're expecting the vfio bus/mdev driver to remove the notifier
-> when a device is closed, which necessarily occurs before detaching the
-> group.  Thanks,
-> 
-> Alex
-Hi Alex,
-
-Sorry that today I was busy at sending the smmu HTTU based dma dirty log tracking.
-I will reply you tomorrow. Thanks!
-
-Keqian.
-
-> 
+> On 26/01/21 14:48, Vitaly Kuznetsov wrote:
+>> 
+>> +static inline u32 to_hv_vpindex(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
 >> +
->>  	if (iommu->external_domain) {
->>  		vfio_release_domain(iommu->external_domain, true);
->> -		vfio_sanity_check_pfn_list(iommu);
->>  		kfree(iommu->external_domain);
->>  	}
->>  
-> 
-> .
-> 
+>> +	return hv_vcpu ? hv_vcpu->vp_index : kvm_vcpu_get_idx(vcpu);
+>> +}
+>> +
+>
+> I'd rather restrict to_* names for pointer conversions. 
+> kvm_hv_get_vpindex is a better choice here.
+
+No objections, feel free to rename. Alternatively, I can send a
+follow-up patch.
+
+-- 
+Vitaly
+
