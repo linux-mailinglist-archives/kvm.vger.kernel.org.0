@@ -2,119 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2485307662
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 13:51:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1057307699
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 14:01:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231139AbhA1MuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 07:50:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50011 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229728AbhA1Mt7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 07:49:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611838112;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EUPoogxEubiZKmDpms6g+giQK6dPAk2ieocombt6yus=;
-        b=dtxfkYI5ybRJci2P8TEZ4ELSeOp/xVuPxbcerdHd5sL5IpkGQue33B5AsgJOWWUXjO4Md6
-        Srl3fEmb6rSkYb2kVg4zXdvkSfmG3qC1PebcQ/CKxIeKMdzr8wLHwa7J5j9XqtO0pq8eRB
-        zPWF/1ioUbSfw0cf1Zx1/rOYrRyE/l4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-ZgnV6iAgOVGWmelTyzYUjA-1; Thu, 28 Jan 2021 07:48:30 -0500
-X-MC-Unique: ZgnV6iAgOVGWmelTyzYUjA-1
-Received: by mail-ed1-f69.google.com with SMTP id a24so3101586eda.14
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 04:48:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EUPoogxEubiZKmDpms6g+giQK6dPAk2ieocombt6yus=;
-        b=nC7xauXGz6MqMJmEoFT0WiGz1IawnKu++Abm2puXJvaXMZUMg/f0m5+yH3sMnwdJ7x
-         ihSjjdYqIYkBAPTZKDsfEHXGIZYnj/J5VfiqcqhOyrzHkNJqQ4T+dy1OzRWwhVyIGLkT
-         uaN695a/c/vld/pcIlu7MDLD2rX3cP8jYcbBISv0uZURF0eARMHS5zOMD9Dtl/drWQjQ
-         /iMaJo0/BopbofWDb5Y2WH2SDauHRhV0x2MbLKxCqfYnctiub5/XJqFraOHIU++mfR7k
-         Ifax468xOMhOFMMdZpblI1Wz2R9tbdJTZbrBcXevwvi4jcclqGQgRYDlV2k7wHBResqX
-         dyLw==
-X-Gm-Message-State: AOAM533tA7IJwpXVEQVXydYm/VnSguL9DLbFFzON8M4SIJ40dAXSAkp+
-        OoJORPcpgdt9eNO8I/tVeq6PI3VZ54ZiUulrA+AhBqfYddjmwJkgqd6ssGrteeKVKob3Zal8JMP
-        i5/oc19zkNNk9
-X-Received: by 2002:a17:906:1741:: with SMTP id d1mr11214338eje.182.1611838109706;
-        Thu, 28 Jan 2021 04:48:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw/JAyUJF7PPPKqjMCwpTENChv61cKhvZqdnrTgL4rLTXUDksn14ITZ3hGVKqvIogwfrKLeYA==
-X-Received: by 2002:a17:906:1741:: with SMTP id d1mr11214320eje.182.1611838109554;
-        Thu, 28 Jan 2021 04:48:29 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x9sm2247425ejd.99.2021.01.28.04.48.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 04:48:28 -0800 (PST)
-Subject: Re: [PATCH v3 0/2] KVM: x86/mmu: Skip mmu_notifier changes when
- possible
-To:     David Stevens <stevensd@chromium.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
-        kvm-ppc@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Stevens <stevensd@google.com>
-References: <20210128060515.1732758-1-stevensd@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c01b01dc-c636-1d1b-fb42-df718e23d20a@redhat.com>
-Date:   Thu, 28 Jan 2021 13:48:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S231975AbhA1M7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 07:59:41 -0500
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:62208 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231932AbhA1M7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 07:59:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1611838756; x=1643374756;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=B56E1Awf7VEQPdUFQmhu23n9pP7LJrGNglTlfuHed+U=;
+  b=ERdJQ3q0L8dvF3APuLnziiKfn9NEKDpQpubh+o8HN7qA+Y+m5tQ3eLN1
+   3nfh847FpF1czOV4xRQu6/YTw8MIGNz+qhdLFcOtzXhlf95sZmPujaqcc
+   w7HXqVpJNWioN8ECo+IFIdgdl9Nk45NFKEyQx8R5rJm5GdFG4Mc+e3nAc
+   4=;
+X-IronPort-AV: E=Sophos;i="5.79,382,1602547200"; 
+   d="scan'208";a="82178107"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 28 Jan 2021 12:58:25 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id 6DE2AC0600;
+        Thu, 28 Jan 2021 12:58:22 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 28 Jan 2021 12:58:21 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.162.125) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 28 Jan 2021 12:58:14 +0000
+Subject: Re: [PATCH v4 0/2] System Generation ID driver and VMGENID backend
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        "Catangiu, Adrian Costin" <acatan@amazon.com>
+CC:     "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "ebiederm@xmission.com" <ebiederm@xmission.com>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
+        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+        "Jason@zx2c4.com" <Jason@zx2c4.com>,
+        "jannh@google.com" <jannh@google.com>, "w@1wt.eu" <w@1wt.eu>,
+        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "bonzini@gnu.org" <bonzini@gnu.org>,
+        "Singh, Balbir" <sblbir@amazon.com>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "mhocko@kernel.org" <mhocko@kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "pavel@ucw.cz" <pavel@ucw.cz>,
+        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+        "areber@redhat.com" <areber@redhat.com>,
+        "ovzxemul@gmail.com" <ovzxemul@gmail.com>,
+        "avagin@gmail.com" <avagin@gmail.com>,
+        "ptikhomirov@virtuozzo.com" <ptikhomirov@virtuozzo.com>,
+        "gil@azul.com" <gil@azul.com>,
+        "asmehra@redhat.com" <asmehra@redhat.com>,
+        "dgunigun@redhat.com" <dgunigun@redhat.com>,
+        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>,
+        "oridgar@gmail.com" <oridgar@gmail.com>,
+        "ghammer@redhat.com" <ghammer@redhat.com>
+References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
+ <20210112074658-mutt-send-email-mst@kernel.org>
+ <9952EF0C-CD1D-4EDB-BAB8-21F72C0BF90D@amazon.com>
+ <20210127074549-mutt-send-email-mst@kernel.org>
+From:   Alexander Graf <graf@amazon.de>
+Message-ID: <7bcd1cf3-d055-db46-95ea-5c023df2f184@amazon.de>
+Date:   Thu, 28 Jan 2021 13:58:12 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210128060515.1732758-1-stevensd@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210127074549-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.43.162.125]
+X-ClientProxiedBy: EX13D02UWC002.ant.amazon.com (10.43.162.6) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="windows-1252"; format="flowed"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 07:05, David Stevens wrote:
-> These patches reduce how often mmu_notifier updates block guest page
-> faults. The primary benefit of this is the reduction in the likelihood
-> of extreme latency when handling a page fault due to another thread
-> having been preempted while modifying host virtual addresses.
-> 
-> v2 -> v3:
->   - Added patch to skip check for MMIO page faults
->   - Style changes
-> 
-> David Stevens (1):
->    KVM: x86/mmu: Consider the hva in mmu_notifier retry
-> 
-> Sean Christopherson (1):
->    KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page fault
-> 
->   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
->   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
->   arch/x86/kvm/mmu/mmu.c                 | 16 ++++++++------
->   arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
->   include/linux/kvm_host.h               | 25 +++++++++++++++++++++-
->   virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
->   6 files changed, 65 insertions(+), 16 deletions(-)
-> 
+Hey Michael!
 
-Queued, thanks.
+On 27.01.21 13:47, Michael S. Tsirkin wrote:
+> =
 
-Paolo
+> On Thu, Jan 21, 2021 at 10:28:16AM +0000, Catangiu, Adrian Costin wrote:
+>> On 12/01/2021, 14:49, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>      On Tue, Jan 12, 2021 at 02:15:58PM +0200, Adrian Catangiu wrote:
+>>      > The first patch in the set implements a device driver which expos=
+es a
+>>      > read-only device /dev/sysgenid to userspace, which contains a
+>>      > monotonically increasing u32 generation counter. Libraries and
+>>      > applications are expected to open() the device, and then call rea=
+d()
+>>      > which blocks until the SysGenId changes. Following an update, rea=
+d()
+>>      > calls no longer block until the application acknowledges the new
+>>      > SysGenId by write()ing it back to the device. Non-blocking read()=
+ calls
+>>      > return EAGAIN when there is no new SysGenId available. Alternativ=
+ely,
+>>      > libraries can mmap() the device to get a single shared page which
+>>      > contains the latest SysGenId at offset 0.
+>>
+>>      Looking at some specifications, the gen ID might actually be located
+>>      at an arbitrary address. How about instead of hard-coding the offse=
+t,
+>>      we expose it e.g. in sysfs?
+>>
+>> The functionality is split between SysGenID which exposes an internal u32
+>> counter to userspace, and an (optional) VmGenID backend which drives
+>> SysGenID generation changes based on hw vmgenid updates.
+>>
+>> The hw UUID you're referring to (vmgenid) is not mmap-ed to userspace or
+>> otherwise exposed to userspace. It is only used internally by the vmgenid
+>> driver to find out about VM generation changes and drive the more generic
+>> SysGenID.
+>>
+>> The SysGenID u32 monotonic increasing counter is the one that is mmaped =
+to
+>> userspace, but it is a software counter. I don't see any value in using =
+a dynamic
+>> offset in the mmaped page. Offset 0 is fast and easy and most importantl=
+y it is
+>> static so no need to dynamically calculate or find it at runtime.
+> =
+
+> Well you are burning a whole page on it, using an offset the page
+> can be shared with other functionality.
+
+Currently, the SysGenID lives is one page owned by Linux that we share =
+
+out to multiple user space clients. So yes, we burn a single page of the =
+
+system here.
+
+If we put more data in that same page, what data would you put there? =
+
+Random other bits from other subsystems? At that point, we'd be =
+
+reinventing vdso all over again, no? Probably with the same problems.
+
+Which gets me to the second alternative: Reuse VDSO. The problem there =
+
+is that the VDSO is an extremely architecture specific mechanism. Any =
+
+new architecture we'd want to support would need multiple layers of =
+
+changes in multiple layers of both kernel and libc. I'd like to avoid =
+
+that if we can :).
+
+So that leaves us with either wasting a page per system or not having an =
+
+mmap() interface in the first place.
+
+The reason we have the mmap() interface is that it's be easier to =
+
+consume for libraries, that are not hooked into the main event loop.
+
+So, uh, what are you suggesting? :)
+
+
+Alex
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
 
