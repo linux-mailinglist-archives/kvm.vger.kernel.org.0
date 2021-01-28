@@ -2,247 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59FB5307BC3
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:08:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 951A4307BCF
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:11:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232803AbhA1RGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 12:06:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49705 "EHLO
+        id S232135AbhA1RIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 12:08:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43227 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229785AbhA1RGA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:06:00 -0500
+        by vger.kernel.org with ESMTP id S232799AbhA1RHz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:07:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611853474;
+        s=mimecast20190719; t=1611853586;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=LvcQzCTMhw0EZfzlSb3F515FxbS4cvGqc8hLzWtIraw=;
-        b=imQ5x/dTgYhCZdHdJvNxE6KrhEiNB6paQvsNob+tU1/0PTEPkzcy87/qpwT0pehpC8o8bZ
-        B9nsd0nwzd6s24VzcMPAMAcN1cqGW5mJoSc0HAXMlIHFxz0A5I5kSW2g5x85Kzq/WqrYok
-        F6RDuosksHWbm66cZKPHsAi5MlAIBDo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-3UPcuQhkPy2LYUpl4YJ1zg-1; Thu, 28 Jan 2021 12:04:31 -0500
-X-MC-Unique: 3UPcuQhkPy2LYUpl4YJ1zg-1
-Received: by mail-wr1-f71.google.com with SMTP id b14so3434751wrw.12
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:04:31 -0800 (PST)
+        bh=wWoEDV2+x1rSSxBhCMufc3CCrdduXE65gmsAzlecp3s=;
+        b=HQsZoKyiEayjsWrvxQ75/NuJhNYeVA1g7onQls9iHxGfbh6Wh/ZFfM/dZ8xPiEvgTWqBHS
+        zRPw0zM7uPVDSDw94F/aKwzYgRdFreXR9fo5Lxs7dvEYwi1FeVAuZzc2mAJMyR0fdAGqru
+        tE1FSEk2FWIpyD8gPke+z7kZ7kaiZ+k=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-XB6UKEPWMOS82su0WFE9tA-1; Thu, 28 Jan 2021 12:06:24 -0500
+X-MC-Unique: XB6UKEPWMOS82su0WFE9tA-1
+Received: by mail-ed1-f72.google.com with SMTP id w4so3493334edu.0
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:06:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=LvcQzCTMhw0EZfzlSb3F515FxbS4cvGqc8hLzWtIraw=;
-        b=Cr5/gclx7OBZFhFY8J1UbDbr2wYATSFemUIsJyMjFpuc3brh7kizrFbyt1N5OqjsR8
-         DHiSC+26kA5X31lZ9xESOr8pGogf3q+68DI6jp0W0efanss3L3NfErHyEbq9E55bz0+w
-         7fscduFlMuk2MCsTY8CB8gkgSWm8lNaMuQupq/8GAHxTTlTHVosdbNmKCXs8Cm8JRXyS
-         ieF39GfF39VnG0yQVUi1duXEpFfBzWMVNPJindRnoaXGmJ3KJ6VNERezRo3dJDcEfMkS
-         OqBPKqFHXOKuH4Gem74HUqi5Buuw+wAC6DjIFm6T4cQuTN8CNZiaDN81hInVmOqf2y+Z
-         iwEw==
-X-Gm-Message-State: AOAM530+FH83018ajzVrY7o+0QC4SgfZvb3zeJNgC/luN+vW27P49cRj
-        BXo78IOJNAfkutGqBTpA3JHtdfvO6irzi0VT6hOu1AgEiqocvyabHGV3iCVwXiwR1nRjUOPuU4e
-        NsfRpbRqCrr69
-X-Received: by 2002:adf:9148:: with SMTP id j66mr47623wrj.28.1611853470503;
-        Thu, 28 Jan 2021 09:04:30 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyFXNXAEEeUISjmsj6o5JuE/Q8ctqnwUsP41thgGGDQLpC8xK5225WjWWJKnBOg3AVOH+RIYQ==
-X-Received: by 2002:adf:9148:: with SMTP id j66mr47572wrj.28.1611853470215;
-        Thu, 28 Jan 2021 09:04:30 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id v4sm8574382wrw.42.2021.01.28.09.04.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 09:04:29 -0800 (PST)
-Date:   Thu, 28 Jan 2021 18:04:26 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 05/13] af_vsock: rest of SEQPACKET support
-Message-ID: <20210128170426.522mpkocdd35bt2e@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210125111321.598653-1-arseny.krasnov@kaspersky.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wWoEDV2+x1rSSxBhCMufc3CCrdduXE65gmsAzlecp3s=;
+        b=ai9UiI3B3riyvQ7mBDEpCJZT6Y6j8WNvI7NtHKdIHlhVsKZzuN5lVvz5CjxNxHFCmE
+         +zgIsXh8KRC4LT1x+bC0qN9QmaenoG6T6Ir6Iy7Blwe7LTm9cWxnr/DP/mGVh849zIyo
+         OqY6zApCX4FQqqEgxfMAhrTtwE9x0xzIM2NffrXMr2zRUd+66odPr9rYuJIaXpaBM/7G
+         Ob3Q5zkbhREn9k5mVBkGF/pA7qOX1xFUA7HyDjfgsABm2nEi83wqWaM2CtqTpfVP4s02
+         0dnZgOuIDy1t05eW7PkAwPfeszH3tNzHqLIzIUvLvh2eiWb1TZl1pfzU4RF1PqriKB5/
+         hLKA==
+X-Gm-Message-State: AOAM533TGbAkaeYLuWrZwHwLkwqihWYVlbM6eN2X/E4WOQsYllkEIy87
+        XLzvngdGl4yG2gZlOE0oGACeYfBdlAFK0/B/8KXvYSQuER3rv5ppj2TUpRNf6jFURm6Se4XSB0L
+        9lF+yeyVTt8Ag
+X-Received: by 2002:aa7:d0cf:: with SMTP id u15mr532302edo.115.1611853583728;
+        Thu, 28 Jan 2021 09:06:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx42bUQ5y6gme8lfeeQLMxR56j8DxRTU5kVgISp3SFuW9jPxSqggneqWcz0CXcvkkRN4B9sFw==
+X-Received: by 2002:aa7:d0cf:: with SMTP id u15mr532279edo.115.1611853583521;
+        Thu, 28 Jan 2021 09:06:23 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id s3sm2457200ejn.47.2021.01.28.09.06.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jan 2021 09:06:22 -0800 (PST)
+Subject: Re: [PATCH v5 15/16] KVM: Add documentation for Xen hypercall and
+ shared_info updates
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+References: <20210111195725.4601-1-dwmw2@infradead.org>
+ <20210111195725.4601-16-dwmw2@infradead.org>
+ <e79d508e-454f-f34e-018b-e6b63fe3d825@redhat.com>
+ <dd496053b8d51a400b66622cd25c10f4540ac4d9.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <204b5082-2f8b-9936-675f-0ddc12a6ab43@redhat.com>
+Date:   Thu, 28 Jan 2021 18:06:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210125111321.598653-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <dd496053b8d51a400b66622cd25c10f4540ac4d9.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 02:13:18PM +0300, Arseny Krasnov wrote:
->This does rest of SOCK_SEQPACKET support:
->1) Adds socket ops for SEQPACKET type.
->2) Allows to create socket with SEQPACKET type.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 71 ++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 71 insertions(+)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 4600c1ec3bb3..bbc3c31085aa 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -452,6 +452,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 		new_transport = transport_dgram;
-> 		break;
-> 	case SOCK_STREAM:
->+	case SOCK_SEQPACKET:
-> 		if (vsock_use_local_transport(remote_cid))
-> 			new_transport = transport_local;
-> 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
->@@ -459,6 +460,13 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 			new_transport = transport_g2h;
-> 		else
-> 			new_transport = transport_h2g;
->+
->+		if (sk->sk_type == SOCK_SEQPACKET) {
+On 28/01/21 17:49, David Woodhouse wrote:
+> On Thu, 2021-01-28 at 13:18 +0100, Paolo Bonzini wrote:
+>> My only qualm is really that the userspace API is really ugly.
+>>
+>> Can you just have both a VM and a VCPU ioctl (so no vcpu_id to pass!),
+> 
+> Sure, that seems like a sensible thing to do.
+> 
+>> add a generous padding to the struct,
+> 
+> I think I added *some* padding to the struct kvm_xen_hvm_attr which
+> wasn't there in Joao's original. I can add more, certainly.
+> 
+>>   and just get everything out with a
+>> single ioctl without having to pass in a type?
+> 
+> Honestly, I don't even care about reading it out except for long_mode
+> which the kernel *does* infer for itself when the MSR is used to fill
+> in the hypercall page.
 
-I think you must also check that new_transport is not NULL.
+What about VM migration?
 
->+			if (!new_transport->seqpacket_seq_send_len ||
->+			    !new_transport->seqpacket_seq_get_len ||
->+			    !new_transport->seqpacket_dequeue)
->+				return -ENODEV;
+> I quite like keeping them separate; they *do* get set separately, in
+> response to different hypercalls from the guest. And the capabilities
+> translate naturally to a given field existing or not existing; having
+> another mapping of that to fields in a binary structure would be
+> additional complexity.
 
-I'm not sure about ENODEV is the better choice in this case, since the 
-transport exists, but it doesn't support SOCK_SEQPACKET, so maybe is 
-better ESOCKTNOSUPPORT.
+Does it make sense to reuse the bits that you return from 
+KVM_CHECK_EXTENSION as a bitset for both the get and set ioctls?  The 
+struct then would be
 
->+		}
-> 		break;
-> 	default:
-> 		return -ESOCKTNOSUPPORT;
->@@ -684,6 +692,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
->
-> 	switch (sk->sk_socket->type) {
-> 	case SOCK_STREAM:
->+	case SOCK_SEQPACKET:
-> 		spin_lock_bh(&vsock_table_lock);
-> 		retval = __vsock_bind_connectible(vsk, addr);
-> 		spin_unlock_bh(&vsock_table_lock);
->@@ -1406,6 +1415,12 @@ static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
-> 	return vsock_connect(sock, addr, addr_len, flags);
-> }
->
->+static int vsock_seqpacket_connect(struct socket *sock, struct sockaddr *addr,
->+				   int addr_len, int flags)
->+{
->+	return vsock_connect(sock, addr, addr_len, flags);
->+}
->+
-> static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
-> 			bool kern)
-> {
->@@ -1633,6 +1648,16 @@ static int vsock_stream_setsockopt(struct socket *sock,
-> 					    optlen);
-> }
->
->+static int vsock_seqpacket_setsockopt(struct socket *sock,
->+				      int level,
->+				      int optname,
->+				      sockptr_t optval,
->+				      unsigned int optlen)
->+{
->+	return vsock_connectible_setsockopt(sock, level, optname, optval,
->+					    optlen);
->+}
->+
-> static int vsock_connectible_getsockopt(struct socket *sock,
-> 					int level, int optname,
-> 					char __user *optval,
->@@ -1713,6 +1738,15 @@ static int vsock_stream_getsockopt(struct socket *sock,
-> 					    optlen);
-> }
->
->+static int vsock_seqpacket_getsockopt(struct socket *sock,
->+				      int level, int optname,
->+				      char __user *optval,
->+				      int __user *optlen)
->+{
->+	return vsock_connectible_getsockopt(sock, level, optname, optval,
->+					    optlen);
->+}
->+
-> static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 				     size_t len)
-> {
->@@ -1870,6 +1904,12 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	return vsock_connectible_sendmsg(sock, msg, len);
-> }
->
->+static int vsock_seqpacket_sendmsg(struct socket *sock, struct msghdr *msg,
->+				   size_t len)
->+{
->+	return vsock_connectible_sendmsg(sock, msg, len);
->+}
->+
-> static int vsock_wait_data(struct sock *sk, struct wait_queue_entry *wait,
-> 			   long timeout,
-> 			   struct vsock_transport_recv_notify_data *recv_data,
->@@ -2184,6 +2224,13 @@ vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	return vsock_connectible_recvmsg(sock, msg, len, flags);
-> }
->
->+static int
->+vsock_seqpacket_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			int flags)
->+{
->+	return vsock_connectible_recvmsg(sock, msg, len, flags);
->+}
->+
+	struct kvm_xen_attr {
+		uint32_t valid;
+		uint32_t lm;
+		struct {
+		} ...;
+		uint8_t pad[nnn /* to 128 bytes */];
+	};
 
-As I said, I think you don't need to implement all of this helpers and 
-you can directly assign the vsock_connectible_* functions in the 
-'vsock_seqpacket_ops'.
+The get ioctl would return a constant value in "valid" (different for 
+the VM and VCPU ioctls of course), the set ioctl would look only at the 
+fields mentioned in "valid" and error out if they're unsupported or 
+invalid for VM/VCPU.  Basically the "switch" you have becomes a series 
+of "if (attr->valid & ...)" statements.
 
-> static const struct proto_ops vsock_stream_ops = {
-> 	.family = PF_VSOCK,
-> 	.owner = THIS_MODULE,
->@@ -2205,6 +2252,27 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.sendpage = sock_no_sendpage,
-> };
->
->+static const struct proto_ops vsock_seqpacket_ops = {
->+	.family = PF_VSOCK,
->+	.owner = THIS_MODULE,
->+	.release = vsock_release,
->+	.bind = vsock_bind,
->+	.connect = vsock_seqpacket_connect,
->+	.socketpair = sock_no_socketpair,
->+	.accept = vsock_accept,
->+	.getname = vsock_getname,
->+	.poll = vsock_poll,
->+	.ioctl = sock_no_ioctl,
->+	.listen = vsock_listen,
->+	.shutdown = vsock_shutdown,
->+	.setsockopt = vsock_seqpacket_setsockopt,
->+	.getsockopt = vsock_seqpacket_getsockopt,
->+	.sendmsg = vsock_seqpacket_sendmsg,
->+	.recvmsg = vsock_seqpacket_recvmsg,
->+	.mmap = sock_no_mmap,
->+	.sendpage = sock_no_sendpage,
->+};
->+
-> static int vsock_create(struct net *net, struct socket *sock,
-> 			int protocol, int kern)
-> {
->@@ -2225,6 +2293,9 @@ static int vsock_create(struct net *net, struct socket *sock,
-> 	case SOCK_STREAM:
-> 		sock->ops = &vsock_stream_ops;
-> 		break;
->+	case SOCK_SEQPACKET:
->+		sock->ops = &vsock_seqpacket_ops;
->+		break;
-> 	default:
-> 		return -ESOCKTNOSUPPORT;
-> 	}
->-- 
->2.25.1
->
+Paolo
 
