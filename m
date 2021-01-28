@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D72AE307877
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 15:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6481A30788C
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 15:49:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231883AbhA1Oo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 09:44:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38603 "EHLO
+        id S232372AbhA1Or1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 09:47:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50471 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231819AbhA1Oof (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 09:44:35 -0500
+        by vger.kernel.org with ESMTP id S231875AbhA1Oog (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 09:44:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611844987;
+        s=mimecast20190719; t=1611844988;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c7HCM/SNmx4ZimiXL2rXx+7Y6RyIQSv6irjastxz4Gs=;
-        b=NaN1WTLdE0b+TSxNCU61lEwKzPhzhzppfmfaU2NeN3PIjitxmXeAn9XWpYlv/OVTeY65Qp
-        fgMWSHUtDDWvdG6U/E7LhxJSzpJyXFd34FO822vBTdzQO677/mnh77kDRQ/r2wK9U15Y/m
-        N+AaVfDjzn5C9ji0knbOhySnMiY0Kws=
+        bh=+3jmE6N8rPoESTgIJH4wKKCx1Af/7e/Avo5KLtNY0Vk=;
+        b=G3ejKID0e+1pUMJzx1JMne6wUZLr3jssVvokT9/DnvvtpJB873Tv1TacHVDVHfbpDHfwcK
+        ewm0MgIgph6PMVIsu73EFpPBrIWpRo0ij4kd90GGJfCF4Mi6mDGdWWZV1GsSjjtOEJuFWW
+        77B6OB4eVjmL/OMpBbZUfvSfRFvsFA4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-524-_t3eUBPMNIGQYdF2gTYMLg-1; Thu, 28 Jan 2021 09:43:04 -0500
-X-MC-Unique: _t3eUBPMNIGQYdF2gTYMLg-1
+ us-mta-217-5X9q1AeKMCaCTL8PkALksQ-1; Thu, 28 Jan 2021 09:43:07 -0500
+X-MC-Unique: 5X9q1AeKMCaCTL8PkALksQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CFF78030A5;
-        Thu, 28 Jan 2021 14:43:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DED5B8030A7;
+        Thu, 28 Jan 2021 14:43:05 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-113-219.ams2.redhat.com [10.36.113.219])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 20B0F10023B1;
-        Thu, 28 Jan 2021 14:43:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE44E10027A5;
+        Thu, 28 Jan 2021 14:43:03 +0000 (UTC)
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     virtualization@lists.linux-foundation.org
 Cc:     Xie Yongji <xieyongji@bytedance.com>,
@@ -42,9 +42,9 @@ Cc:     Xie Yongji <xieyongji@bytedance.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
         Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH RFC v2 08/10] vdpa: add vdpa simulator for block device
-Date:   Thu, 28 Jan 2021 15:41:25 +0100
-Message-Id: <20210128144127.113245-9-sgarzare@redhat.com>
+Subject: [PATCH RFC v2 09/10] vdpa_sim_blk: implement ramdisk behaviour
+Date:   Thu, 28 Jan 2021 15:41:26 +0100
+Message-Id: <20210128144127.113245-10-sgarzare@redhat.com>
 In-Reply-To: <20210128144127.113245-1-sgarzare@redhat.com>
 References: <20210128144127.113245-1-sgarzare@redhat.com>
 MIME-Version: 1.0
@@ -54,211 +54,230 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
+The previous implementation wrote only the status of each request.
+This patch implements a more accurate block device simulator,
+providing a ramdisk-like behavior.
 
-This will allow running vDPA for virtio block protocol.
-
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-[sgarzare: various cleanups/fixes]
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
 v2:
-- rebased on top of other changes (dev_attr, get_config(), notify(), etc.)
-- memset to 0 the config structure in vdpasim_blk_get_config()
-- used vdpasim pointer in vdpasim_blk_get_config()
-
-v1:
-- Removed unused headers
-- Used cpu_to_vdpasim*() to store config fields
-- Replaced 'select VDPA_SIM' with 'depends on VDPA_SIM' since selected
-  option can not depend on other [Jason]
-- Start with a single queue for now [Jason]
-- Add comments to memory barriers
+- used %zd %zx to print size_t and ssize_t variables in dev_err()
+- removed unnecessary new line [Jason]
+- moved VIRTIO_BLK_T_GET_ID in another patch [Jason]
+- used push/pull instead of write/read terminology
+- added vdpasim_blk_check_range() to avoid overflows [Stefan]
+- use vdpasim*_to_cpu instead of le*_to_cpu
+- used vringh_kiov_length() helper [Jason]
 ---
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 145 +++++++++++++++++++++++++++
- drivers/vdpa/Kconfig                 |   7 ++
- drivers/vdpa/vdpa_sim/Makefile       |   1 +
- 3 files changed, 153 insertions(+)
- create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 164 ++++++++++++++++++++++++---
+ 1 file changed, 146 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-new file mode 100644
-index 000000000000..999f9ca0b628
---- /dev/null
+index 999f9ca0b628..fc47e8320358 100644
+--- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-@@ -0,0 +1,145 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * VDPA simulator for block device.
-+ *
-+ * Copyright (c) 2020, Mellanox Technologies. All rights reserved.
-+ *
+@@ -3,6 +3,7 @@
+  * VDPA simulator for block device.
+  *
+  * Copyright (c) 2020, Mellanox Technologies. All rights reserved.
++ * Copyright (c) 2021, Red Hat Inc. All rights reserved.
+  *
+  */
+ 
+@@ -13,6 +14,7 @@
+ #include <linux/sched.h>
+ #include <linux/vringh.h>
+ #include <linux/vdpa.h>
++#include <linux/blkdev.h>
+ #include <uapi/linux/virtio_blk.h>
+ 
+ #include "vdpa_sim.h"
+@@ -36,10 +38,151 @@
+ 
+ static struct vdpasim *vdpasim_blk_dev;
+ 
++static bool vdpasim_blk_check_range(u64 start_sector, size_t range_size)
++{
++	u64 range_sectors = range_size >> SECTOR_SHIFT;
++
++	if (range_size > VDPASIM_BLK_SIZE_MAX * VDPASIM_BLK_SEG_MAX)
++		return false;
++
++	if (start_sector > VDPASIM_BLK_CAPACITY)
++		return false;
++
++	if (range_sectors > VDPASIM_BLK_CAPACITY - start_sector)
++		return false;
++
++	return true;
++}
++
++/* Returns 'true' if the request is handled (with or without an I/O error)
++ * and the status is correctly written in the last byte of the 'in iov',
++ * 'false' otherwise.
 + */
-+
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/device.h>
-+#include <linux/kernel.h>
-+#include <linux/sched.h>
-+#include <linux/vringh.h>
-+#include <linux/vdpa.h>
-+#include <uapi/linux/virtio_blk.h>
-+
-+#include "vdpa_sim.h"
-+
-+#define DRV_VERSION  "0.1"
-+#define DRV_AUTHOR   "Max Gurtovoy <mgurtovoy@nvidia.com>"
-+#define DRV_DESC     "vDPA Device Simulator for block device"
-+#define DRV_LICENSE  "GPL v2"
-+
-+#define VDPASIM_BLK_FEATURES	(VDPASIM_FEATURES | \
-+				 (1ULL << VIRTIO_BLK_F_SIZE_MAX) | \
-+				 (1ULL << VIRTIO_BLK_F_SEG_MAX)  | \
-+				 (1ULL << VIRTIO_BLK_F_BLK_SIZE) | \
-+				 (1ULL << VIRTIO_BLK_F_TOPOLOGY) | \
-+				 (1ULL << VIRTIO_BLK_F_MQ))
-+
-+#define VDPASIM_BLK_CAPACITY	0x40000
-+#define VDPASIM_BLK_SIZE_MAX	0x1000
-+#define VDPASIM_BLK_SEG_MAX	32
-+#define VDPASIM_BLK_VQ_NUM	1
-+
-+static struct vdpasim *vdpasim_blk_dev;
-+
-+static void vdpasim_blk_work(struct work_struct *work)
++static bool vdpasim_blk_handle_req(struct vdpasim *vdpasim,
++				   struct vdpasim_virtqueue *vq)
 +{
-+	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
-+	u8 status = VIRTIO_BLK_S_OK;
-+	int i;
-+
-+	spin_lock(&vdpasim->lock);
-+
-+	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
-+		goto out;
-+
-+	for (i = 0; i < VDPASIM_BLK_VQ_NUM; i++) {
-+		struct vdpasim_virtqueue *vq = &vdpasim->vqs[i];
-+
-+		if (!vq->ready)
-+			continue;
-+
-+		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
-+					    &vq->in_iov, &vq->head,
-+					    GFP_ATOMIC) > 0) {
-+			int write;
-+
-+			vq->in_iov.i = vq->in_iov.used - 1;
-+			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
-+						      &status, 1);
-+			if (write <= 0)
-+				break;
-+
-+			/* Make sure data is wrote before advancing index */
-+			smp_wmb();
-+
-+			vringh_complete_iotlb(&vq->vring, vq->head, write);
-+
-+			/* Make sure used is visible before rasing the interrupt. */
-+			smp_wmb();
-+
-+			local_bh_disable();
-+			if (vringh_need_notify_iotlb(&vq->vring) > 0)
-+				vringh_notify(&vq->vring);
-+			local_bh_enable();
-+		}
-+	}
-+out:
-+	spin_unlock(&vdpasim->lock);
-+}
-+
-+static void vdpasim_blk_get_config(struct vdpasim *vdpasim, void *config)
-+{
-+	struct virtio_blk_config *blk_config =
-+		(struct virtio_blk_config *)config;
-+
-+	memset(config, 0, sizeof(struct virtio_blk_config));
-+
-+	blk_config->capacity = cpu_to_vdpasim64(vdpasim, VDPASIM_BLK_CAPACITY);
-+	blk_config->size_max = cpu_to_vdpasim32(vdpasim, VDPASIM_BLK_SIZE_MAX);
-+	blk_config->seg_max = cpu_to_vdpasim32(vdpasim, VDPASIM_BLK_SEG_MAX);
-+	blk_config->num_queues = cpu_to_vdpasim16(vdpasim, VDPASIM_BLK_VQ_NUM);
-+	blk_config->min_io_size = cpu_to_vdpasim16(vdpasim, 1);
-+	blk_config->opt_io_size = cpu_to_vdpasim32(vdpasim, 1);
-+	blk_config->blk_size = cpu_to_vdpasim32(vdpasim, SECTOR_SIZE);
-+}
-+
-+static int __init vdpasim_blk_init(void)
-+{
-+	struct vdpasim_dev_attr dev_attr = {};
++	size_t pushed = 0, to_pull, to_push;
++	struct virtio_blk_outhdr hdr;
++	ssize_t bytes;
++	loff_t offset;
++	u64 sector;
++	u8 status;
++	u32 type;
 +	int ret;
 +
-+	dev_attr.id = VIRTIO_ID_BLOCK;
-+	dev_attr.supported_features = VDPASIM_BLK_FEATURES;
-+	dev_attr.nvqs = VDPASIM_BLK_VQ_NUM;
-+	dev_attr.config_size = sizeof(struct virtio_blk_config);
-+	dev_attr.get_config = vdpasim_blk_get_config;
-+	dev_attr.work_fn = vdpasim_blk_work;
-+	dev_attr.buffer_size = PAGE_SIZE;
++	ret = vringh_getdesc_iotlb(&vq->vring, &vq->out_iov, &vq->in_iov,
++				   &vq->head, GFP_ATOMIC);
++	if (ret != 1)
++		return false;
 +
-+	vdpasim_blk_dev = vdpasim_create(&dev_attr);
-+	if (IS_ERR(vdpasim_blk_dev)) {
-+		ret = PTR_ERR(vdpasim_blk_dev);
-+		goto out;
++	if (vq->out_iov.used < 1 || vq->in_iov.used < 1) {
++		dev_err(&vdpasim->vdpa.dev, "missing headers - out_iov: %u in_iov %u\n",
++			vq->out_iov.used, vq->in_iov.used);
++		return false;
 +	}
 +
-+	ret = vdpa_register_device(&vdpasim_blk_dev->vdpa);
-+	if (ret)
-+		goto put_dev;
++	if (vq->in_iov.iov[vq->in_iov.used - 1].iov_len < 1) {
++		dev_err(&vdpasim->vdpa.dev, "request in header too short\n");
++		return false;
++	}
 +
-+	return 0;
++	/* The last byte is the status and we checked if the last iov has
++	 * enough room for it.
++	 */
++	to_push = vringh_kiov_length(&vq->in_iov) - 1;
 +
-+put_dev:
-+	put_device(&vdpasim_blk_dev->vdpa.dev);
-+out:
-+	return ret;
++	to_pull = vringh_kiov_length(&vq->out_iov);
++
++	bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov, &hdr,
++				      sizeof(hdr));
++	if (bytes != sizeof(hdr)) {
++		dev_err(&vdpasim->vdpa.dev, "request out header too short\n");
++		return false;
++	}
++
++	to_pull -= bytes;
++
++	type = vdpasim32_to_cpu(vdpasim, hdr.type);
++	sector = vdpasim64_to_cpu(vdpasim, hdr.sector);
++	offset = sector << SECTOR_SHIFT;
++	status = VIRTIO_BLK_S_OK;
++
++	switch (type) {
++	case VIRTIO_BLK_T_IN:
++		if (!vdpasim_blk_check_range(sector, to_push)) {
++			dev_err(&vdpasim->vdpa.dev,
++				"reading over the capacity - offset: 0x%llx len: 0x%zx\n",
++				offset, to_push);
++			status = VIRTIO_BLK_S_IOERR;
++			break;
++		}
++
++		bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
++					      vdpasim->buffer + offset,
++					      to_push);
++		if (bytes < 0) {
++			dev_err(&vdpasim->vdpa.dev,
++				"vringh_iov_push_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
++				bytes, offset, to_push);
++			status = VIRTIO_BLK_S_IOERR;
++			break;
++		}
++
++		pushed += bytes;
++		break;
++
++	case VIRTIO_BLK_T_OUT:
++		if (!vdpasim_blk_check_range(sector, to_pull)) {
++			dev_err(&vdpasim->vdpa.dev,
++				"writing over the capacity - offset: 0x%llx len: 0x%zx\n",
++				offset, to_pull);
++			status = VIRTIO_BLK_S_IOERR;
++			break;
++		}
++
++		bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov,
++					      vdpasim->buffer + offset,
++					      to_pull);
++		if (bytes < 0) {
++			dev_err(&vdpasim->vdpa.dev,
++				"vringh_iov_pull_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
++				bytes, offset, to_pull);
++			status = VIRTIO_BLK_S_IOERR;
++			break;
++		}
++		break;
++
++	default:
++		dev_warn(&vdpasim->vdpa.dev,
++			 "Unsupported request type %d\n", type);
++		status = VIRTIO_BLK_S_IOERR;
++		break;
++	}
++
++	/* If some operations fail, we need to skip the remaining bytes
++	 * to put the status in the last byte
++	 */
++	if (to_push - pushed > 0)
++		vringh_kiov_advance(&vq->in_iov, to_push - pushed);
++
++	/* Last byte is the status */
++	bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov, &status, 1);
++	if (bytes != 1)
++		return false;
++
++	pushed += bytes;
++
++	/* Make sure data is wrote before advancing index */
++	smp_wmb();
++
++	vringh_complete_iotlb(&vq->vring, vq->head, pushed);
++
++	return true;
 +}
 +
-+static void __exit vdpasim_blk_exit(void)
-+{
-+	struct vdpa_device *vdpa = &vdpasim_blk_dev->vdpa;
-+
-+	vdpa_unregister_device(vdpa);
-+}
-+
-+module_init(vdpasim_blk_init)
-+module_exit(vdpasim_blk_exit)
-+
-+MODULE_VERSION(DRV_VERSION);
-+MODULE_LICENSE(DRV_LICENSE);
-+MODULE_AUTHOR(DRV_AUTHOR);
-+MODULE_DESCRIPTION(DRV_DESC);
-diff --git a/drivers/vdpa/Kconfig b/drivers/vdpa/Kconfig
-index 21a23500f430..b8bd92cf04f9 100644
---- a/drivers/vdpa/Kconfig
-+++ b/drivers/vdpa/Kconfig
-@@ -26,6 +26,13 @@ config VDPA_SIM_NET
- 	help
- 	  vDPA networking device simulator which loops TX traffic back to RX.
+ static void vdpasim_blk_work(struct work_struct *work)
+ {
+ 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
+-	u8 status = VIRTIO_BLK_S_OK;
+ 	int i;
  
-+config VDPA_SIM_BLOCK
-+	tristate "vDPA simulator for block device"
-+	depends on VDPA_SIM
-+	help
-+	  vDPA block device simulator which terminates IO request in a
-+	  memory buffer.
-+
- config IFCVF
- 	tristate "Intel IFC VF vDPA driver"
- 	depends on PCI_MSI
-diff --git a/drivers/vdpa/vdpa_sim/Makefile b/drivers/vdpa/vdpa_sim/Makefile
-index 79d4536d347e..d458103302f2 100644
---- a/drivers/vdpa/vdpa_sim/Makefile
-+++ b/drivers/vdpa/vdpa_sim/Makefile
-@@ -1,3 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_VDPA_SIM) += vdpa_sim.o
- obj-$(CONFIG_VDPA_SIM_NET) += vdpa_sim_net.o
-+obj-$(CONFIG_VDPA_SIM_BLOCK) += vdpa_sim_blk.o
+ 	spin_lock(&vdpasim->lock);
+@@ -53,22 +196,7 @@ static void vdpasim_blk_work(struct work_struct *work)
+ 		if (!vq->ready)
+ 			continue;
+ 
+-		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
+-					    &vq->in_iov, &vq->head,
+-					    GFP_ATOMIC) > 0) {
+-			int write;
+-
+-			vq->in_iov.i = vq->in_iov.used - 1;
+-			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
+-						      &status, 1);
+-			if (write <= 0)
+-				break;
+-
+-			/* Make sure data is wrote before advancing index */
+-			smp_wmb();
+-
+-			vringh_complete_iotlb(&vq->vring, vq->head, write);
+-
++		while (vdpasim_blk_handle_req(vdpasim, vq)) {
+ 			/* Make sure used is visible before rasing the interrupt. */
+ 			smp_wmb();
+ 
+@@ -109,7 +237,7 @@ static int __init vdpasim_blk_init(void)
+ 	dev_attr.config_size = sizeof(struct virtio_blk_config);
+ 	dev_attr.get_config = vdpasim_blk_get_config;
+ 	dev_attr.work_fn = vdpasim_blk_work;
+-	dev_attr.buffer_size = PAGE_SIZE;
++	dev_attr.buffer_size = VDPASIM_BLK_CAPACITY << SECTOR_SHIFT;
+ 
+ 	vdpasim_blk_dev = vdpasim_create(&dev_attr);
+ 	if (IS_ERR(vdpasim_blk_dev)) {
 -- 
 2.29.2
 
