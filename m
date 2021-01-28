@@ -2,77 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C67CC307930
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 16:10:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 785A530793C
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 16:15:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232539AbhA1PJ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 10:09:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48191 "EHLO
+        id S231893AbhA1PMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 10:12:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59645 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232450AbhA1PJI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 10:09:08 -0500
+        by vger.kernel.org with ESMTP id S232511AbhA1PL2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 10:11:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611846459;
+        s=mimecast20190719; t=1611846602;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BTgUbUK04S+AE+SXl9oa06nYx0xizsEpdYjWl3KZECA=;
-        b=Rs8/lM0omxm1VWvdkQeYwbt+2jBrWHPypa4lTs3IIO35aV0pTLC/dGl7UscI2HGHQQtG2D
-        HPX1E+OulbJU0GP2Q7F7HGJxsyNh2EuXrQPxWSfvMz9y1M+SLcXAUWo8CROm8XmGqgZOw9
-        gXh3oa3ssCnmkHE5OHa2qnpmXE/B8YA=
+        bh=Hhj0Ci4ubmUQAoG6OK5IyEkrRViQ/scCNDoyVb3q4mQ=;
+        b=NR3dnObxx8Eihp52ZBg7xx6uODXZTAQrz8M00b1FoBBTgoAm7TVGTS1c6wpaB7k4HXfG+W
+        gYx44Sh5QdE/IW5yqbWCNQCNXaBQPTIUP+Ux6uSZhinQpk14oWB9iI4GesP/kkCsO5fj5H
+        5Me+JHF0rGuPjYfSTx/Y+RW1WqsvXEo=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-6MYxTjrGMnG6C0Zcyr64bA-1; Thu, 28 Jan 2021 10:07:36 -0500
-X-MC-Unique: 6MYxTjrGMnG6C0Zcyr64bA-1
-Received: by mail-ej1-f72.google.com with SMTP id by20so2310387ejc.1
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 07:07:36 -0800 (PST)
+ us-mta-268-_Lc6Vl1LOPys18dWiahEYg-1; Thu, 28 Jan 2021 10:10:00 -0500
+X-MC-Unique: _Lc6Vl1LOPys18dWiahEYg-1
+Received: by mail-ej1-f72.google.com with SMTP id m4so2307971ejc.14
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 07:09:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BTgUbUK04S+AE+SXl9oa06nYx0xizsEpdYjWl3KZECA=;
-        b=Y0O2iajJFEexEaPhoyMPGZQGaYAjlWXTBGYS5DFeYiPHT89MIi306RNVy/H+UF0t/k
-         ArZVx/ajA6Q5BND0wUkRKSiuB0eMUQaqWZUusn4rL/sqQ1B4H+xFwJffLa6mZvMG0s2/
-         lxBhtzmvDzSYufUqdDowJLNMuK1n/dgkTQe6zuFs4zmKzAanW8+Yyw1FkydMhPtG9wDO
-         t5VdBh8M+awfBHlMgvOx19hrToOFGs8/V7473WK0uBux93S1p9ecz30a+XSGsxZ/qegs
-         M3YgymmRtVObGj43Hs/LsWvSXoViHPdjBP/eCKa7WbaN0Nl+HmDpe0gi+yl0W/1B24xO
-         URYA==
-X-Gm-Message-State: AOAM533ciM31val/FHcWyr8k9uxDLCHW8z/Dm9/IUFKwf2WsY8/OtitZ
-        75AIvjBGiHHjJJxnWCEA/6emVxEm/YU1VIeJceC2QksZ0VPiqdCLiU9oDZmKKO0NXX1gHM4AEKF
-        7zFhAIWJFQ8bu
-X-Received: by 2002:a17:907:104c:: with SMTP id oy12mr11492439ejb.503.1611846455478;
-        Thu, 28 Jan 2021 07:07:35 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy6MqOgCM2JylpXHGLATWOIoR2fX+kK2gf5U9sB6HR+mHn5JvfqvEVhY3xK7+22I0WlVH+R+A==
-X-Received: by 2002:a17:907:104c:: with SMTP id oy12mr11492414ejb.503.1611846455254;
-        Thu, 28 Jan 2021 07:07:35 -0800 (PST)
+        bh=Hhj0Ci4ubmUQAoG6OK5IyEkrRViQ/scCNDoyVb3q4mQ=;
+        b=IulpF1MeioO9XPFUPQkxOZq3cTm10B4GQJNaOaDmM03PKo8WGmGWZOBiXmgVvNoWRK
+         04uB5dXcsvRciSfG9fE91FM2+8RtdXbLI3yR8fgrdPZCle29DBo3HoTr26PIPilTj6Kw
+         nCzOYwE8Mbd/iOBEqjjXK5THRrpCsbqhov6KUynkrw9U4+LOrfAK29eYe90GHc0QcoKq
+         x3d2RJXyj6LLl6nultZCVQC+AOtEiwDhFbPpPuRqTL9jWfs0cDb4IhqHD7SnO8jAxhOh
+         Tpi9LO3H9ncmrofMHQmguODGi0ByIglsQwH6UnpPO5aCKVGyh0ojAmvtQDiNgBpJsEUm
+         tjCw==
+X-Gm-Message-State: AOAM530Ew6Lt8w11sJSn/frQ3fDMhn5HR9hjiKd6NV8jKe1bEiUr2HWO
+        IWKaBBZkRiVGZsTndpRSFM6JMtie7IvF2zmRxPAlvfxK33OOik5Ory6t2Vcwckn/hqXJ4TPT93I
+        xzlm6hSsfdPjm
+X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr14873148edc.68.1611846597817;
+        Thu, 28 Jan 2021 07:09:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx1REmvoZPIJf+xL+eFSS8Ak+MJ/YNFFHwKFPfHuNuoqq5vaw2RU+a2VckY/qs6e13g6PjcYA==
+X-Received: by 2002:a05:6402:3487:: with SMTP id v7mr14873116edc.68.1611846597610;
+        Thu, 28 Jan 2021 07:09:57 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s12sm3218300edu.28.2021.01.28.07.07.32
+        by smtp.gmail.com with ESMTPSA id s22sm2381402ejd.106.2021.01.28.07.09.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 07:07:34 -0800 (PST)
-Subject: Re: [PATCH v2 05/14] KVM: x86: Override reported SME/SEV feature
- flags with host mask
-To:     Sean Christopherson <seanjc@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
+        Thu, 28 Jan 2021 07:09:56 -0800 (PST)
+Subject: Re: [PATCH v2 04/14] x86/cpufeatures: Assign dedicated feature word
+ for AMD mem encryption
+To:     Borislav Petkov <bp@suse.de>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
         Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        linux-kernel@vger.kernel.org,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Brijesh Singh <brijesh.singh@amd.com>
 References: <20210114003708.3798992-1-seanjc@google.com>
- <20210114003708.3798992-6-seanjc@google.com>
+ <20210114003708.3798992-5-seanjc@google.com> <20210114113528.GC13213@zn.tnic>
+ <YAB6yLXb4Es+pJ8G@google.com> <20210114171631.GD13213@zn.tnic>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <74642db3-14dc-4e13-3130-dc8abe1a2b6e@redhat.com>
-Date:   Thu, 28 Jan 2021 16:07:31 +0100
+Message-ID: <c177d918-7421-9441-fb24-45ffe46f8298@redhat.com>
+Date:   Thu, 28 Jan 2021 16:09:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210114003708.3798992-6-seanjc@google.com>
+In-Reply-To: <20210114171631.GD13213@zn.tnic>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,50 +82,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/01/21 01:36, Sean Christopherson wrote:
-> Add a reverse-CPUID entry for the memory encryption word, 0x8000001F.EAX,
-> and use it to override the supported CPUID flags reported to userspace.
-> Masking the reported CPUID flags avoids over-reporting KVM support, e.g.
-> without the mask a SEV-SNP capable CPU may incorrectly advertise SNP
-> support to userspace.
+On 14/01/21 18:16, Borislav Petkov wrote:
+> On Thu, Jan 14, 2021 at 09:09:28AM -0800, Sean Christopherson wrote:
+>> Hmm, patch 05/14 depends on the existence of the new word.  That's a non-issue
+>> if you're planning on taking this for 5.11.  If it's destined for 5.12, maybe
+>> get an ack from Paolo on patch 05 and take both through tip?
 > 
-> Cc: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/cpuid.c | 2 ++
->   arch/x86/kvm/cpuid.h | 1 +
->   2 files changed, 3 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 13036cf0b912..b7618cdd06b5 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -855,6 +855,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->   	case 0x8000001F:
->   		if (!boot_cpu_has(X86_FEATURE_SEV))
->   			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> +		else
-> +			cpuid_entry_override(entry, CPUID_8000_001F_EAX);
->   		break;
->   	/*Add support for Centaur's CPUID instruction*/
->   	case 0xC0000000:
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index dc921d76e42e..8b6fc9bde248 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -63,6 +63,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
->   	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
->   	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
->   	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
-> +	[CPUID_8000_001F_EAX] = {0x8000001f, 1, CPUID_EAX},
->   };
->   
->   /*
-> 
+> Yeah, I guess that. Both are not urgent 5.11 material to take 'em now.
+> So I guess I'll wait for Paolo's ACK.
 
-I don't understand, wouldn't this also need a kvm_cpu_cap_mask call 
-somewhere else?  As it is, it doesn't do anything.
+If you think this patch is valuable go ahead and pick it.  I can wait 
+until after the merge window to queue patch 5.  It is independent from 
+the others and I had questions, so I am just queuing the others for 5.12.
 
 Paolo
+
+>> I can drop them from this series when I send v3. In hindsight, I
+>> should have split these two patches into a separate mini-series from
+>> the get-go.
+> 
+> Nah, no worries. We do patch acrobatics on a daily basis. :-)
 
