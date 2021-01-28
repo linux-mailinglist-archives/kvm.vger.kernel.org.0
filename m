@@ -2,374 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2D19307C28
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:22:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEE7C307C36
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:25:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233053AbhA1RVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 12:21:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:59726 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233052AbhA1RTW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 12:19:22 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10SH9v2L142536;
-        Thu, 28 Jan 2021 17:18:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=YIhT6RDIvq6WNr9ty14ITrahbvo6Iw5CivDMt2ItaSw=;
- b=ksP9yEZZoPQh03Sc3bwq1Aczn+sR7z2IbJertR0rX23riYJgrP4+FmeENGNBx+OFNAPc
- BuFqkwbnVbHO+nTj+HehTe0PX/4U1eM+uxZZ7CXepCafP2uUUJAytXxKqAL3S1xRM03j
- gCWFzY3Sux2tjtC8yKIQ4yWcmyix1ts1RaXNo/TWwymmsBnksK9I+kzDEt9hXT7UUf5k
- ZnL/SZ5qxXmXTF9D9STiIU/TfNeX2HC1yaCzfn/qhPhZtkfvSiw9pndZLR0+BPxsHKYS
- mNM+pmMrF6rbHJ5fsjDWFPpJAz2uYuMvTO4LEQDuiS1evHMW4V4+kpDktXr4QA7Pjm+d 5A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 368b7r5acy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jan 2021 17:18:35 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10SHAd0u112490;
-        Thu, 28 Jan 2021 17:18:34 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
-        by aserp3020.oracle.com with ESMTP id 368wq2018k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jan 2021 17:18:34 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IXexaUJPt2Gh8N3eq6cQMQUwfGh5Znod2oPw1vO45yiYS2gx0ldL4sllSmhXXj1LEZxCcDPDM6Z5+aNgs7KHV6+HjbnXMNL4NTyzcJDlQNbgXa6+oxsFOspO2vfWLRYN2HTSmRlhhAkojoK+ZEafJKqKua1eSIhhB/j6w6TZOkw+ltGPB9w5XbOxk0b/U1pCdHQWtLgeaw13/ea1jV8aQpOSFyOWS8yzxvZPo3msldNjpJ+kUndMO5k8Ph74gvQDIfhUVEekoFVnphBV6IIGTw3Wr15qyUkUHJjKu3bn7aNna1cT2yRx6UFvMqiCpGpBz4ypdgm+R+qv9qZQcZMCpg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YIhT6RDIvq6WNr9ty14ITrahbvo6Iw5CivDMt2ItaSw=;
- b=e3LNpj10d1o7neTrK2XrzS+XamOze1p0+lkULhuZT/nZefsDmTGXwrejTjZQgnyT+6z+WdKYkcE29u92+/qjLCe5ZCUBOlcSpG0SlxfRTaxYFoJhqsh+Q4SprI43rjwkRD+KZ0qnT383sF7K1dG3S4P6zqpskEU0oZbdomHMRKpYuzV4Whp9XItSHxl8Z6XaVBzUvvVmig1gXm7fCBqeU/fxZIzNgvFW6x3sxG9UVUhTtbKHsMCfcpq8NSDW4jm7zilLACfBXq8qtIg04R0qwjTphTeo/prHNYeqnSr/OdWQXwR14vw6Fpu7g+XWY8ajRgjxVZ/bPTwrEVgHN+7XUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YIhT6RDIvq6WNr9ty14ITrahbvo6Iw5CivDMt2ItaSw=;
- b=okAQsVTne9cKtYIoWhYMviYXZAVYTmI3I4si0hNtTZjWzLG4HHftFRIDpFLIc2J4oJfV3hmVEah8dgUEtQMxYu5Gim1SOtWftpfaS7zkCvvPKEU/K/wquZJfIYttc9FzmW0XGSKQBEUstFJ4FXB/11bncZNrz/thiPIDU4S4QrU=
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com (2603:10b6:a03:155::17)
- by BY5PR10MB4241.namprd10.prod.outlook.com (2603:10b6:a03:208::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Thu, 28 Jan
- 2021 17:18:32 +0000
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::9123:2652:e975:aa26]) by BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::9123:2652:e975:aa26%5]) with mapi id 15.20.3805.017; Thu, 28 Jan 2021
- 17:18:32 +0000
-Subject: Re: [PATCH V2 9/9] vfio/type1: block on invalid vaddr
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <1611078509-181959-1-git-send-email-steven.sistare@oracle.com>
- <1611078509-181959-10-git-send-email-steven.sistare@oracle.com>
- <20210122155946.3f42dfc9@omen.home.shazbot.org>
- <2df4d9b2-e668-788d-7c2c-8c27199a0818@oracle.com>
- <20210127170325.0967e16c@omen.home.shazbot.org>
- <20210128100709.5e4e7bed@omen.home.shazbot.org>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <3e81ad22-37e3-1ac2-48ec-18a2715c2fde@oracle.com>
-Date:   Thu, 28 Jan 2021 12:18:28 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
-In-Reply-To: <20210128100709.5e4e7bed@omen.home.shazbot.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [24.62.106.7]
-X-ClientProxiedBy: CH2PR07CA0042.namprd07.prod.outlook.com
- (2603:10b6:610:5b::16) To BYAPR10MB3240.namprd10.prod.outlook.com
- (2603:10b6:a03:155::17)
+        id S233004AbhA1RWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 12:22:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51534 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233081AbhA1RU4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:20:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611854369;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=C3eK8ADi3ZeyPV4PVYDApesK2wmgAogV+vFpEBdBI34=;
+        b=CAtd+js9CWodlUPuJWsWLEuPaL8j6f8WnxHTYmAPvV+YsmYl1tSbThMwsE8+ArO0+Sn0Q3
+        n9MQa+LBrsfKa8TFOyst2u108bIxqDL8hI30YC+3FyIeVXUukG/ejqILeURJmhv93eEeO4
+        V76ZYmFcZTrlPVsJ0b0i1OpdxiLQ51s=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-xJiqINGSMzCEPPau6vf9PQ-1; Thu, 28 Jan 2021 12:19:27 -0500
+X-MC-Unique: xJiqINGSMzCEPPau6vf9PQ-1
+Received: by mail-wm1-f70.google.com with SMTP id y9so2681554wmi.8
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 09:19:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=C3eK8ADi3ZeyPV4PVYDApesK2wmgAogV+vFpEBdBI34=;
+        b=tk2i2faBFKZB8iTo5i1R6WNSnSlCj/Qre4e6TN0dGQY6QJabN+b/zUQQRH/F6o5FKD
+         XBATTRSvcjRjhEQCxam5vERWQcJERWtWfSYgfVfETPI6OMYlbAcxLZDi1NoC+avTjsBi
+         COSXgiE6DmooGnb5KOirPe+RuF5BK2qsvi8zw0dkXuPD+ZkIUCxSzgSlJac/oIhBc0B1
+         2u3WiLfHy1Pd8cJWzGsaLd9S85H3ANcYsMQrD1qsD59hp95LvXAWicVGq0N/YYpfaCBc
+         Wi01cjwBRHWdgOpFQLWroQ19ddNe2W0VZHQoSaCopaHW/2hOkWVrsUMxXxlCqv3W/PON
+         aGpA==
+X-Gm-Message-State: AOAM5331H0DWYiP3vrTIPPkQamtKmv8+i6GuqIZFHanTBoyf62DN1M6L
+        L2nmcJpqAAWfqhu/CROjU1eAzZ1m04PvrZYjnGLq6cCY5o7GqXjmPAvk0k5Fk1b6XfXeMvcMoEe
+        64uYfYZL4fBbH
+X-Received: by 2002:adf:ee43:: with SMTP id w3mr132411wro.200.1611854366590;
+        Thu, 28 Jan 2021 09:19:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy/v8ANcRwlI8G7EsFYD8nauxfmP7TArGJygNoYeVZtqgy5WGQaFyFb7Is20oZGBeCQYNOxTA==
+X-Received: by 2002:adf:ee43:: with SMTP id w3mr132383wro.200.1611854366394;
+        Thu, 28 Jan 2021 09:19:26 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id y18sm7666251wrt.19.2021.01.28.09.19.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Jan 2021 09:19:25 -0800 (PST)
+Date:   Thu, 28 Jan 2021 18:19:23 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+Message-ID: <20210128171923.esyna5ccv5s27jyu@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.92] (24.62.106.7) by CH2PR07CA0042.namprd07.prod.outlook.com (2603:10b6:610:5b::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17 via Frontend Transport; Thu, 28 Jan 2021 17:18:31 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 08c97335-5e04-4ffa-6f57-08d8c3b0bccc
-X-MS-TrafficTypeDiagnostic: BY5PR10MB4241:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR10MB4241EEF6E7517D03463607D7F9BA9@BY5PR10MB4241.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uO+CZbwKukkzZNHeOzvW0FhOlL5j2jmvnOOwGc6Rx1gR6eK3kdRG+z8DT7Z4gqAhiM6EdQusxU4yKc99maNccp3s4R8gjGL6hnrucC4QWb9fxVBDd+sa2ANv/tanlxv+ynV4VXU2XAuILloIV/m+F88LzPtzccK6Z3N7kgqdSCkov01Lydt4VzfdAhE4F9klMvEIvm79SSs17PCcoxMYhRVg9baUcPdYAkF1TCW4AC0lCc2VSWR9vREtyClOefiAjI5p7WraQm3B4c0WZyZ7L5BEPi99rD315d10z2aQKlJV/ESpgPliK+3aQP+TLygR4fNaJBAm2+ITBxhW8H8EfJfVeFzM/wJS7b5BwQ6bNCKKq5ll/YUILd8OUzqzcFtAnrqL6UPOAft05kLOC+DG7Sl/w+TVKW3lBQ3l3pcw6W6joOLTVzYvY4p3acCdRjUl/Oy6Y52V2IXdLTyrUpZe0ZUcodqmAHGQi5eRhL6D0YnVp6AgjbXl8RA2V7EOp2qovTMV3EQcE5dwcvbeadszfRhl1TIOM1BNrCn2dkzLNrF12zXdY7KTHle0526basyLO1og+C/tcyLiy69K8PUXW3w+jCk/oJ2kbjXb4Z+thPs=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB3240.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(346002)(39860400002)(366004)(136003)(376002)(6486002)(6666004)(186003)(16526019)(2906002)(8936002)(31696002)(86362001)(16576012)(5660300002)(31686004)(478600001)(36916002)(36756003)(6916009)(4326008)(54906003)(44832011)(66556008)(66946007)(66476007)(26005)(956004)(53546011)(2616005)(8676002)(83380400001)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?N2U2bDVSMVBhUk9PV2tkckV4SWt2UzJmdC9vNEJvU2YrWmVaOUF3Q1V6Z2FZ?=
- =?utf-8?B?bThIakVEays5QVlaeXRqbHBTZ2FycDVPTG5qRGVnWk5lck5JM0VvcVpQZ0F1?=
- =?utf-8?B?Nk9OSnlEWm1nZm51dHhyT0J4WlZDWklZQmRYRHZRckp5bUovRDBaNDN6QVhm?=
- =?utf-8?B?aVIrRDFqRUFjUW1QV2krK2xCQ0hYWHh2TmlOY0tUNkp6ejlVRVNHSDdjbml4?=
- =?utf-8?B?M3F1NEFSSEpQZ3ZOWUIxaWdDSzB6Uk1zSkdweFlhMDlTd0dpQ29yWERwZ0RN?=
- =?utf-8?B?VWRDS05QL2VqOHBINEdGc2wxcUFvN1NUY2QzdzdCRXI2NDFCcVB6bXJGNzJQ?=
- =?utf-8?B?c3FZU1BRaEVZV3lXbjk0d3hONXA3QzdsZThLY2JWNlYxakNSVitvcEw2V2ww?=
- =?utf-8?B?U2FVdnNIT2EwSHltREhTVW92U2NFQnA4dFJoaFZzVGkyQTloZy9LNlk5ajNV?=
- =?utf-8?B?VzhlZFdSMEVrcDhRZU1CenlmbTVtN3FZQTU0NWhrVUpsb0wybUJMTTFkemJJ?=
- =?utf-8?B?TjIvL1ZiR2s5SURVSjdjM0dvenl0V2R1NVhiV0pYR0RSWFlGcUJnUFRUcUF1?=
- =?utf-8?B?Y1pody95UmVvaUJXOE9MQzBRT1ZBbm1xOXgrN215RGR2eG8xRG9HK0Y1UE5x?=
- =?utf-8?B?S1cranFNTWtNdHR5cVVhaVdheEt2Q2pYOHlxWStDRW84c3hnOVBNSTBpT00v?=
- =?utf-8?B?ZlV1b0NJUk4yL3JpSUFSWTM4TEJ3NTM5clFxczk0NFlkaDdZcFJBZ3AvUHQr?=
- =?utf-8?B?YUFLbjMxc3I5Um55TnJlMnNsU0FxUHV6S2ltODJFc3hsUFNGMmRpT082enVM?=
- =?utf-8?B?K0VLZklZb2MrM3JDcUFVdnlMU3V4eE5TL1hlUUc2NVNUU1hleFgxMUJaSUp5?=
- =?utf-8?B?djhjQ1JmZ3hJS2lZK1l0NkZLVXFPT2IxTnkvd2cxZktkYjFNOHZjNk81bUpF?=
- =?utf-8?B?OHhFV3dBenFSc2c5NVJJS3h1TmgyYkRsSlo1NTcrVGZtaHlKekY3RnUvZmJu?=
- =?utf-8?B?RG9BV3liWENQRTRCOXlvUFFIaFUySE4wdnRyTy9YYU90eCt2MUN4TXNyRUp0?=
- =?utf-8?B?NjVNb3QvN2thUm9KUDBVaW50V3E5YTlDZDAwMmNtcGVxTzVndUs2MnVvRERu?=
- =?utf-8?B?NUlmcEF5TkhvVU81WFVBZG5CazBlTFhlTjM2aE10NW1HSWJMWG9wajh0VGJG?=
- =?utf-8?B?d0N6N0QzeEVmaUVBUGZZbWJkVHQ3R1hyc2JMd0p0OXpvMzVVa1N3Zzh3R3cv?=
- =?utf-8?B?SkdYNFpZdy81ZmE3MnZyZC9CL3JXa0pYYVQvd0lRTjZrazFzaU5DS3U1RXNK?=
- =?utf-8?B?dytxRXBYQzRRb3JLWkgyK1lET3JmS05SN1RkR3ZmUXQ4TEZ0TkxQNTlPSi9C?=
- =?utf-8?B?RnBoM2loK0RZamFqSUdBYWlhbGhkK3Fwa3RQM0xRZnI1djcwY2tJbk1VQVRY?=
- =?utf-8?Q?M2D4YMOb?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08c97335-5e04-4ffa-6f57-08d8c3b0bccc
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB3240.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2021 17:18:32.4668
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eRKG9G21rgd0SJgPqDG9+Iugrs7KWyO0jyYdQpnnEe3qpXF6/AbO84DfSY8PAxd6UOvHZSHoXXFlZeUxevDXQQOzknNHjNo0ro1UncYUids=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4241
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9878 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0 spamscore=0
- adultscore=0 bulkscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101280083
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9878 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 phishscore=0
- adultscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101280083
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/28/2021 12:07 PM, Alex Williamson wrote:
-> On Wed, 27 Jan 2021 17:03:25 -0700
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> On Wed, 27 Jan 2021 18:25:13 -0500
->> Steven Sistare <steven.sistare@oracle.com> wrote:
->>
->>> On 1/22/2021 5:59 PM, Alex Williamson wrote:  
->>>> On Tue, 19 Jan 2021 09:48:29 -0800
->>>> Steve Sistare <steven.sistare@oracle.com> wrote:
->>>>     
->>>>> Block translation of host virtual address while an iova range has an
->>>>> invalid vaddr.
->>>>>
->>>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->>>>> ---
->>>>>  drivers/vfio/vfio_iommu_type1.c | 83 +++++++++++++++++++++++++++++++++++++----
->>>>>  1 file changed, 76 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->>>>> index 0167996..c97573a 100644
->>>>> --- a/drivers/vfio/vfio_iommu_type1.c
->>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>>>> @@ -31,6 +31,7 @@
->>>>>  #include <linux/rbtree.h>
->>>>>  #include <linux/sched/signal.h>
->>>>>  #include <linux/sched/mm.h>
->>>>> +#include <linux/kthread.h>
->>>>>  #include <linux/slab.h>
->>>>>  #include <linux/uaccess.h>
->>>>>  #include <linux/vfio.h>
->>>>> @@ -75,6 +76,7 @@ struct vfio_iommu {
->>>>>  	bool			dirty_page_tracking;
->>>>>  	bool			pinned_page_dirty_scope;
->>>>>  	bool			controlled;
->>>>> +	wait_queue_head_t	vaddr_wait;
->>>>>  };
->>>>>  
->>>>>  struct vfio_domain {
->>>>> @@ -145,6 +147,8 @@ struct vfio_regions {
->>>>>  #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
->>>>>  #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
->>>>>  
->>>>> +#define WAITED 1
->>>>> +
->>>>>  static int put_pfn(unsigned long pfn, int prot);
->>>>>  
->>>>>  static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
->>>>> @@ -505,6 +509,52 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->>>>>  }
->>>>>  
->>>>>  /*
->>>>> + * Wait for vaddr of *dma_p to become valid.  iommu lock is dropped if the task
->>>>> + * waits, but is re-locked on return.  If the task waits, then return an updated
->>>>> + * dma struct in *dma_p.  Return 0 on success with no waiting, 1 on success if    
->>>>
->>>> s/1/WAITED/    
->>>
->>> OK, but the WAITED state will not need to be returned in the new scheme below.
->>>   
->>>>> + * waited, and -errno on error.
->>>>> + */
->>>>> +static int vfio_vaddr_wait(struct vfio_iommu *iommu, struct vfio_dma **dma_p)
->>>>> +{
->>>>> +	struct vfio_dma *dma = *dma_p;
->>>>> +	unsigned long iova = dma->iova;
->>>>> +	size_t size = dma->size;
->>>>> +	int ret = 0;
->>>>> +	DEFINE_WAIT(wait);
->>>>> +
->>>>> +	while (!dma->vaddr_valid) {
->>>>> +		ret = WAITED;
->>>>> +		prepare_to_wait(&iommu->vaddr_wait, &wait, TASK_KILLABLE);
->>>>> +		mutex_unlock(&iommu->lock);
->>>>> +		schedule();
->>>>> +		mutex_lock(&iommu->lock);
->>>>> +		finish_wait(&iommu->vaddr_wait, &wait);
->>>>> +		if (kthread_should_stop() || !iommu->controlled ||
->>>>> +		    fatal_signal_pending(current)) {
->>>>> +			return -EFAULT;
->>>>> +		}
->>>>> +		*dma_p = dma = vfio_find_dma(iommu, iova, size);
->>>>> +		if (!dma)
->>>>> +			return -EINVAL;
->>>>> +	}
->>>>> +	return ret;
->>>>> +}
->>>>> +
->>>>> +/*
->>>>> + * Find dma struct and wait for its vaddr to be valid.  iommu lock is dropped
->>>>> + * if the task waits, but is re-locked on return.  Return result in *dma_p.
->>>>> + * Return 0 on success, 1 on success if waited,  and -errno on error.
->>>>> + */
->>>>> +static int vfio_find_vaddr(struct vfio_iommu *iommu, dma_addr_t start,
->>>>> +			   size_t size, struct vfio_dma **dma_p)    
->>>>
->>>> more of a vfio_find_dma_valid()    
->>>
->>> I will slightly modify and rename this with the new scheme I describe below.
->>>   
->>>>> +{
->>>>> +	*dma_p = vfio_find_dma(iommu, start, size);
->>>>> +	if (!*dma_p)
->>>>> +		return -EINVAL;
->>>>> +	return vfio_vaddr_wait(iommu, dma_p);
->>>>> +}
->>>>> +
->>>>> +/*
->>>>>   * Attempt to pin pages.  We really don't want to track all the pfns and
->>>>>   * the iommu can only map chunks of consecutive pfns anyway, so get the
->>>>>   * first page and all consecutive pages with the same locking.
->>>>> @@ -693,11 +743,11 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->>>>>  		struct vfio_pfn *vpfn;
->>>>>  
->>>>>  		iova = user_pfn[i] << PAGE_SHIFT;
->>>>> -		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->>>>> -		if (!dma) {
->>>>> -			ret = -EINVAL;
->>>>> +		ret = vfio_find_vaddr(iommu, iova, PAGE_SIZE, &dma);
->>>>> +		if (ret < 0)
->>>>>  			goto pin_unwind;
->>>>> -		}
->>>>> +		else if (ret == WAITED)
->>>>> +			do_accounting = !IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu);    
->>>>
->>>> We're iterating through an array of pfns to provide translations, once
->>>> we've released the lock it's not just the current one that could be
->>>> invalid.  I'm afraid we need to unwind and try again, but I think it's
->>>> actually worse than that because if we've marked pages within a
->>>> vfio_dma's pfn_list as pinned, then during the locking gap it gets
->>>> unmapped, the unmap path will call the unmap notifier chain to release
->>>> the page that the vendor driver doesn't have yet.  Yikes!    
->>>
->>> Yikes indeed.  The fix is easy, though.  I will maintain a count in vfio_iommu of 
->>> vfio_dma objects with invalid vaddr's, modified and tested while holding the lock, 
->>> provide a function to wait for the count to become 0, and call that function at the 
->>> start of vfio_iommu_type1_pin_pages and vfio_iommu_replay.  I will use iommu->vaddr_wait 
->>> for wait and wake.  
->>
->> I prefer the overhead of this, but the resulting behavior seems pretty
->> non-intuitive.  Any invalidated vaddr blocks all vaddr use cases, which
->> almost suggests the unmap _VADDR flag should only be allowed with the
->> _ALL flag, but then the map _VADDR flag can only be per mapping, which
->> would make accounting and recovering from _VADDR + _ALL pretty
->> complicated.  Thanks,
-> 
-> I wonder if there's a hybrid approach, a counter on the vfio_iommu
-> which when non-zero causes pin pages to pre-test vaddr on all required
-> vfio_dma objects, waiting and being woken on counter decrement to check
-> again.  Thanks,
+Hi Arseny,
+I reviewed a part, tomorrow I hope to finish the other patches.
 
-Sounds good, thanks.
+Just a couple of comments in the TODOs below.
 
-- Steve
+On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
+>	This patchset impelements support of SOCK_SEQPACKET for virtio
+>transport.
+>	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>do it, new packet operation was added: it marks start of record (with
+>record length in header), such packet doesn't carry any data.  To send
+>record, packet with start marker is sent first, then all data is sent
+>as usual 'RW' packets. On receiver's side, length of record is known
+>from packet with start record marker. Now as  packets of one socket
+>are not reordered neither on vsock nor on vhost transport layers, such
+>marker allows to restore original record on receiver's side. If user's
+>buffer is smaller that record length, when all out of size data is
+>dropped.
+>	Maximum length of datagram is not limited as in stream socket,
+>because same credit logic is used. Difference with stream socket is
+>that user is not woken up until whole record is received or error
+>occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>	Tests also implemented.
+>
+> Arseny Krasnov (13):
+>  af_vsock: prepare for SOCK_SEQPACKET support
+>  af_vsock: prepare 'vsock_connectible_recvmsg()'
+>  af_vsock: implement SEQPACKET rx loop
+>  af_vsock: implement send logic for SOCK_SEQPACKET
+>  af_vsock: rest of SEQPACKET support
+>  af_vsock: update comments for stream sockets
+>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>  virtio/vsock: fetch length for SEQPACKET record
+>  virtio/vsock: add SEQPACKET receive logic
+>  virtio/vsock: rest of SOCK_SEQPACKET support
+>  virtio/vsock: setup SEQPACKET ops for transport
+>  vhost/vsock: setup SEQPACKET ops for transport
+>  vsock_test: add SOCK_SEQPACKET tests
+>
+> drivers/vhost/vsock.c                   |   7 +-
+> include/linux/virtio_vsock.h            |  12 +
+> include/net/af_vsock.h                  |   6 +
+> include/uapi/linux/virtio_vsock.h       |   9 +
+> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
+> net/vmw_vsock/virtio_transport.c        |   4 +
+> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
+> tools/testing/vsock/util.c              |  32 +-
+> tools/testing/vsock/util.h              |   3 +
+> tools/testing/vsock/vsock_test.c        | 126 +++++
+> 10 files changed, 862 insertions(+), 175 deletions(-)
+>
+> TODO:
+> - Support for record integrity control. As transport could drop some
+>   packets, something like "record-id" and record end marker need to
+>   be implemented. Idea is that SEQ_BEGIN packet carries both record
+>   length and record id, end marker(let it be SEQ_END) carries only
+>   record id. To be sure that no one packet was lost, receiver checks
+>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
+>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
+>   means that both markers were not dropped. I think that easiest way
+>   to implement record id for SEQ_BEGIN is to reuse another field of
+>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
+>   SEQ_END record id could be stored in 'flags'.
 
->>>>>  		if ((dma->prot & prot) != prot) {
->>>>>  			ret = -EPERM;
->>>>> @@ -1496,6 +1546,22 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
->>>>>  	unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
->>>>>  	int ret;
->>>>>  
->>>>> +	/*
->>>>> +	 * Wait for all vaddr to be valid so they can be used in the main loop.
->>>>> +	 * If we do wait, the lock was dropped and re-taken, so start over to
->>>>> +	 * ensure the dma list is consistent.
->>>>> +	 */
->>>>> +again:
->>>>> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
->>>>> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->>>>> +
->>>>> +		ret = vfio_vaddr_wait(iommu, &dma);
->>>>> +		if (ret < 0)
->>>>> +			return ret;
->>>>> +		else if (ret == WAITED)
->>>>> +			goto again;
->>>>> +	}    
->>>>
->>>> This "do nothing until all the vaddrs are valid" approach could work
->>>> above too, but gosh is that a lot of cache unfriendly work for a rare
->>>> invalidation.  Thanks,    
->>>
->>> The new wait function described above is fast in the common case, just a check that
->>> the invalid vaddr count is 0.
->>>
->>> - Steve
->>>   
->>>>> +
->>>>>  	/* Arbitrarily pick the first domain in the list for lookups */
->>>>>  	if (!list_empty(&iommu->domain_list))
->>>>>  		d = list_first_entry(&iommu->domain_list,
->>>>> @@ -2522,6 +2588,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
->>>>>  	iommu->controlled = true;
->>>>>  	mutex_init(&iommu->lock);
->>>>>  	BLOCKING_INIT_NOTIFIER_HEAD(&iommu->notifier);
->>>>> +	init_waitqueue_head(&iommu->vaddr_wait);
->>>>>  
->>>>>  	return iommu;
->>>>>  }
->>>>> @@ -2972,12 +3039,13 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->>>>>  	struct vfio_dma *dma;
->>>>>  	bool kthread = current->mm == NULL;
->>>>>  	size_t offset;
->>>>> +	int ret;
->>>>>  
->>>>>  	*copied = 0;
->>>>>  
->>>>> -	dma = vfio_find_dma(iommu, user_iova, 1);
->>>>> -	if (!dma)
->>>>> -		return -EINVAL;
->>>>> +	ret = vfio_find_vaddr(iommu, user_iova, 1, &dma);
->>>>> +	if (ret < 0)
->>>>> +		return ret;
->>>>>  
->>>>>  	if ((write && !(dma->prot & IOMMU_WRITE)) ||
->>>>>  			!(dma->prot & IOMMU_READ))
->>>>> @@ -3055,6 +3123,7 @@ static void vfio_iommu_type1_notify(void *iommu_data, unsigned int event,
->>>>>  	mutex_lock(&iommu->lock);
->>>>>  	iommu->controlled = false;
->>>>>  	mutex_unlock(&iommu->lock);
->>>>> +	wake_up_all(&iommu->vaddr_wait);
->>>>>  }
->>>>>  
->>>>>  static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {    
->>>>     
->>>   
->>
-> 
+I don't really like the idea of reusing the 'flags' field for this 
+purpose.
+
+>     Another way to implement it, is to move metadata of both SEQ_END
+>   and SEQ_BEGIN to payload. But this approach has problem, because
+>   if we move something to payload, such payload is accounted by
+>   credit logic, which fragments payload, while payload with record
+>   length and id couldn't be fragmented. One way to overcome it is to
+>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
+>   is to update 'stream_has_space()' function: current implementation
+>   return non-zero when at least 1 byte is allowed to use,but updated
+>   version will have extra argument, which is needed length. For 'RW'
+>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
+>   record id) and for SEQ_END it is sizeof(record id).
+
+Is the payload accounted by credit logic also if hdr.op is not 
+VIRTIO_VSOCK_OP_RW?
+
+I think that we can define a specific header to put after the 
+virtio_vsock_hdr when hdr.op is SEQ_BEGIN or SEQ_END, and in this header 
+we can store the id and the length of the message.
+
+>
+> - What to do, when server doesn't support SOCK_SEQPACKET. In current
+>   implementation RST is replied in the same way when listening port
+>   is not found. I think that current RST is enough,because case when
+>   server doesn't support SEQ_PACKET is same when listener missed(e.g.
+>   no listener in both cases).
+
+I think so, but I'll check better if we can have some issues.
+
+Thanks,
+Stefano
+
+>
+> v2 -> v3:
+> - patches reorganized: split for prepare and implementation patches
+> - local variables are declared in "Reverse Christmas tree" manner
+> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>   fields access
+> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>   between stream and seqpacket sockets.
+> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+> - af_vsock.c: 'vsock_wait_data()' refactored.
+>
+> v1 -> v2:
+> - patches reordered: af_vsock.c related changes now before virtio vsock
+> - patches reorganized: more small patches, where +/- are not mixed
+> - tests for SOCK_SEQPACKET added
+> - all commit messages updated
+> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>   'vsock_connectible_recvmsg()'
+> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>   was not found
+> - virtio_transport_common.c: transport callback for seqpacket dequeue
+> - virtio_transport_common.c: simplified
+>   'virtio_transport_recv_connected()'
+> - virtio_transport_common.c: send reset on socket and packet type
+>			      mismatch.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>
+>-- 
+>2.25.1
+>
+
