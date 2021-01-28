@@ -2,87 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 263E6307D91
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 19:15:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9240307D90
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 19:15:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbhA1SOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 13:14:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231460AbhA1SH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 13:07:26 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDBEFC061574
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 10:04:55 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id t29so4498208pfg.11
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 10:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=l+c1w6fiiLX9kxCupjhibRajZzK8pqS48Kplrt4ilkA=;
-        b=T3m9rl3PNu0va9eG4D3kmd7qcXfuWtB5669NgtCNk+n6h6gQt2JmZnPTA4O8551Qho
-         uxSFmjeshjifkB0qCBN3OQyh4nyni1taYjzxvMVbZpVZag9E/lbT3dgwtJY27ooOeEXK
-         yshp+XxJH/nqGrjxuT+1uF7RTeOLjotvJzUTNCUjB3XFmS8NVsx5K6VKE7o5YCPxZCJ1
-         fWQnExyY8N/F/5INWDgZXRVtBWeGqUgST0zgxR8XrsFs3sp9gRLLQxe5kCwLzffH1fHC
-         ggR/O4dsGCsjF16YlG7+mcvCh9hseMh6kwxyPNe/I3fZhe170acMeHwDvMU2tGGtb8jE
-         LYdA==
+        id S231658AbhA1SO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 13:14:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54127 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231527AbhA1SHs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 13:07:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611857181;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rLpGMEsWUFtvOGdp4Bl4045lZDRmMlzwwfBz1eKojT4=;
+        b=e7graWW/odro6lZVGOPqTa50wLWOVTBHs1RPFCU368FgNwVE/J+3WCPsDBIY8gP6oK+Lxy
+        iF8njjBS0Y+wJGPu82f9lvx4jV00Gc2F7EWuttPdOXAmaZSRUzWoikzCODybL0Yvwjo3K8
+        ZuOugehiZlQVb/V70vqH2S1gOajxrIQ=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-7JmswXs1OEazVsk4X8Bs1Q-1; Thu, 28 Jan 2021 13:06:19 -0500
+X-MC-Unique: 7JmswXs1OEazVsk4X8Bs1Q-1
+Received: by mail-ed1-f69.google.com with SMTP id f21so3585551edx.23
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 10:06:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=l+c1w6fiiLX9kxCupjhibRajZzK8pqS48Kplrt4ilkA=;
-        b=big1Zhan/qmpE1kji5S+Luwd6T/196bnE/dBcGpCNu58u8u4IrFQo0ovynaVzDG4TC
-         sA5SfBNXgH9suvL35DcqblzIJf/BDB2WotZPoxRp26O0abVbIjA1i8s7CwHBd+C1ZHHL
-         LTnjNGD035EpTXRBzzk+BoYxu3ccInD5V590YNBhy7XH7UdMELjnSpu5O+DCH/RvvlDZ
-         N7dJuMkhQMjVbvH1Ghke6jFUJr/yElBouhJTN9AAntHMAAKrB+sPqsJEwjwjCZKAr6zk
-         l3uofYVVW5YHPEJNf+9DDXpJ6FW02HKNbYOwJyd6ggAoDX30Cs9BdkmDGSInqReWD2CU
-         lamg==
-X-Gm-Message-State: AOAM530b8ddTV+Qp9mA6Ooyq/96HE7z1K7m+6/7zWKg/l21Z1lrNfQwM
-        IQQeOX5jfo7lL4ouuuqLjG1FGR54nlJb0A==
-X-Google-Smtp-Source: ABdhPJzgotNp2OoYBkNnmmQ6aWuLzyj9BkoBDCjhGVKIlPnXaes0QrP6iblBCQrSBBtvP0cxAs4q/Q==
-X-Received: by 2002:a63:3e0c:: with SMTP id l12mr667543pga.165.1611857095234;
-        Thu, 28 Jan 2021 10:04:55 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:91fd:c415:8a8b:ccc4])
-        by smtp.gmail.com with ESMTPSA id fs21sm5558089pjb.30.2021.01.28.10.04.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 10:04:54 -0800 (PST)
-Date:   Thu, 28 Jan 2021 10:04:48 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rLpGMEsWUFtvOGdp4Bl4045lZDRmMlzwwfBz1eKojT4=;
+        b=IfuXHH5npomHBiMMG9M25L2/widrgg4SvJJd8YZ9wqRcHJKIZ/2AP5MWE5E19QMb+0
+         srMUIiRssUlnBhPB0zY5i5y3QX4vYBX2WGtoackoWtbYkjEVgG0ttwQKBbS23OEDKc2+
+         JVF+pYa8RUV1Kg7m65sLvk+Gp6ODSW9yDxyojLr/I0NRmb+XynRrymG4FSreTOEwyr6p
+         P2g+iecdqWaP6vBqIaLMkRk7jyBUjBGAP8QjOLFkyXqCbmZ9Dno3zRxvc2WLABVQJI4Q
+         0G8U+tKbnqGXrMPNHHGxaOZnOnxM2F6zNZ+JEWdUsbDKCUsWYBUlcUaXsmimQAkCj+UV
+         obnw==
+X-Gm-Message-State: AOAM532l40MJBwC6aPnE/0aBCg4OX6WdhEtyMbW39JzREt6zRHEOXeCs
+        OMqV61vaMdcaXv0G0Jr8o13gZMSY7q8rrvKJlQZP119f3rjEaAtTU8cg/aK2L0vpRpz9rHXnsgi
+        4ZckIJdul9Ay3
+X-Received: by 2002:a17:906:a48:: with SMTP id x8mr626109ejf.444.1611857177304;
+        Thu, 28 Jan 2021 10:06:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzHfUKevTd/4l9Cq7zXQgMsfc9UehVxY6ry045/wWY1PjhtT8vA4WzaKXdxYCtMCcp0FrzTOA==
+X-Received: by 2002:a17:906:a48:: with SMTP id x8mr626095ejf.444.1611857177168;
+        Thu, 28 Jan 2021 10:06:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p15sm2652745ejd.121.2021.01.28.10.06.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jan 2021 10:06:16 -0800 (PST)
+Subject: Re: [PATCH v14 00/13] Introduce support for guest CET feature
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jmattson@google.com,
         yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v14 00/13] Introduce support for guest CET feature
-Message-ID: <YBL8wOsgzTtKWXgU@google.com>
 References: <20201106011637.14289-1-weijiang.yang@intel.com>
  <c6e87502-6443-62f7-5df8-d7fcee0bca58@redhat.com>
+ <YBL8wOsgzTtKWXgU@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <32c9cdf7-7432-1212-2fe4-fe35ad27105a@redhat.com>
+Date:   Thu, 28 Jan 2021 19:06:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6e87502-6443-62f7-5df8-d7fcee0bca58@redhat.com>
+In-Reply-To: <YBL8wOsgzTtKWXgU@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 28, 2021, Paolo Bonzini wrote:
-> On 06/11/20 02:16, Yang Weijiang wrote:
-> > Control-flow Enforcement Technology (CET) provides protection against
-> > Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
-> > sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
-> > SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
-
-...
-
-> I reviewed the patch and it is mostly okay.  However, if I understand it
-> correctly, it will not do anything until host support materializes, because
-> otherwise XSS will be 0.
-
-IIRC, it won't even compile due to the X86_FEATURE_SHSTK and X86_FEATURE_IBT
-dependencies.
-
-> If this is the case, I plan to apply locally v15 and hold on it until the
-> host code is committed.
+On 28/01/21 19:04, Sean Christopherson wrote:
+> On Thu, Jan 28, 2021, Paolo Bonzini wrote:
+>> On 06/11/20 02:16, Yang Weijiang wrote:
+>>> Control-flow Enforcement Technology (CET) provides protection against
+>>> Return/Jump-Oriented Programming (ROP/JOP) attack. There're two CET
+>>> sub-features: Shadow Stack (SHSTK) and Indirect Branch Tracking (IBT).
+>>> SHSTK is to prevent ROP programming and IBT is to prevent JOP programming.
 > 
-> Paolo
+> ...
 > 
+>> I reviewed the patch and it is mostly okay.  However, if I understand it
+>> correctly, it will not do anything until host support materializes, because
+>> otherwise XSS will be 0.
+> 
+> IIRC, it won't even compile due to the X86_FEATURE_SHSTK and X86_FEATURE_IBT
+> dependencies.
+
+Of course, but if that was the only issue I would sort it out with Boris 
+as usual.  OTOH if it is dead code I won't push it to Linus.
+
+Paolo
+
+>> If this is the case, I plan to apply locally v15 and hold on it until the
+>> host code is committed.
+>>
+>> Paolo
+>>
+> 
+
