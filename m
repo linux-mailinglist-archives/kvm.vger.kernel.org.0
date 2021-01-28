@@ -2,157 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B56BE3068C7
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 01:45:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEC01306B31
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 03:47:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231362AbhA1AoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Jan 2021 19:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35448 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbhA1Ana (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Jan 2021 19:43:30 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA5AC061573
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 16:42:50 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id i9so3193076wmq.1
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 16:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=4FUggc4yzu1KtYVghJzSJJr7MdA1Yc7w8ID3X4Mlw2M=;
-        b=F+xs49xd/VAG5Vm+qCegbXtUW14C8tNcQpSgLW1vJ1JJutem1Z8oCxoGrjVvzuNnso
-         8TIGOGC0dpl9msUfrnnUGuUXKX01aPdNT9kfZfuelfGz9zk/6VLsdMMdIH5ZugakqQOx
-         eHLRXeBdi60nTXcku9IMazLo73M/8Mx8B16qQQj5N2zQHvP8xpDQdQ9O9E6/1B/PNeaH
-         RLOtfxQ6+ywxN7t6rkj58wXxjCVJVFznAjYAI6EaqbWRE2fUSwi+HA+TKtCRf1n9V5qE
-         50qtkx0TN2giWRnjzSsfiCzUccjz0IY3rTLlbG7/jVZhd/hLvOf2hTAOzxZShl7Gen3y
-         zw/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=4FUggc4yzu1KtYVghJzSJJr7MdA1Yc7w8ID3X4Mlw2M=;
-        b=VVoVzKB/1KcWjA9ofb0uKGEFdaIqUQBUyszgrUrg0hyL+7zRJjuxVGO9JaNLDqiBYf
-         JG3KpTcaEzDNYMKsF1/oj+Db+SbY8hsy7jTqfjSEfFbBTGEk5euUCMU/gjhvQN4HnnQ7
-         fNJBjYmR8gWC0Ldd+nSJUjenw3v9Yv/fTEzEmpqn3hwcc1yEEdpGsPxV/OeNX3bB5JyJ
-         GH+M/oID3kOH7hO4Ikj+d5en5HhVJP4H5V62TwVFI+JTjhaVSXzBhu/EQ0mJH2hWz6GX
-         l8SfiKdbj78pUTlJ3ULHaMf1x3UbMMJq6zqBdG4Bu4xor26o8vWpIfYumtI62J43yeiE
-         wg/Q==
-X-Gm-Message-State: AOAM532zj+ZBER7LYvIinwgsGGPAqFsvodTCOvZrtTvQgFVFVep2kyUG
-        7xI/E8CXKpt+nrd8lIm1rvBnxg==
-X-Google-Smtp-Source: ABdhPJybTXFN9BRWqacIhqXMQQBrv/YSjbVjMcWL1N4zB9EwkDozKrP6iQxgjot5N25UyTcAVhw9sw==
-X-Received: by 2002:a1c:f706:: with SMTP id v6mr6301059wmh.85.1611794569066;
-        Wed, 27 Jan 2021 16:42:49 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id s24sm4020238wmh.22.2021.01.27.16.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 16:42:47 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 050D81FF7E;
-        Thu, 28 Jan 2021 00:42:47 +0000 (GMT)
-References: <20200929224355.1224017-1-philmd@redhat.com>
-User-agent: mu4e 1.5.7; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Fam Zheng <fam@euphon.net>,
-        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
-Subject: Re: [PATCH v4 00/12] Support disabling TCG on ARM (part 2)
-Date:   Thu, 28 Jan 2021 00:41:50 +0000
-In-reply-to: <20200929224355.1224017-1-philmd@redhat.com>
-Message-ID: <87r1m5x56h.fsf@linaro.org>
+        id S229872AbhA1Cqq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Jan 2021 21:46:46 -0500
+Received: from mail-bgr052100131063.outbound.protection.outlook.com ([52.100.131.63]:23182
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229595AbhA1Cqo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Jan 2021 21:46:44 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UWdzJUEBuhE8Z9GoGLyzUHyN8YFFxd8XpczaUE2hAyJWiALAT+NggjezBnPNaIJzAElQqxA7d/nHlBdnByqjxSDeKsOmfadT2MWBq/+IAY6geIQrivsam4vTOisGhp5976rRxUeRU8WYLOjDcW31AA2vmTiPlyv9yM9qMpKZ9ruYFFEky8Ai5OWwEZJsfXWlGhE6mqLLBJ/0ZYHSjsGLrewnWYoE1pGrWa/gJrqk00SgQsxie1kSmJaawkmayZfsvScyV4Tl62X8ry+OyIXQEkEa9JopXQkxzWS2wswT4LunjszKKxuD9Xt66U1Nv6OSxlH2bNC0Nat2CMBwnuVmLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ah+2WTeHV3cgZV+NQieR0mV66QREvWaoPTLB0UQhZ8s=;
+ b=daIslSvkxGOC7dzHnv8l8b4KC4XCYjudnVoBKWtYtLesdlCa4OBPq0W8Iw4Hb/mXqoiWwIF+PSyZNCUus19xqUAsuK0/S0gdE7+Rg1IPklyKBe1GEGqz6djNyICWzmUeDab5TM08IjleJeHy/KGm/Y8Ul4xs+Cq5CTazIEMSvRsbHA+fylXCHEVEHR15HIW4HzlSUU7iWu4V3LpOItJWLUNPkkJ/t+vy6xyNidFNP0OEegQcxu0ogBCiujQFgcme4qJie0LMc88rsPbgvCb/MwhIr8pJ6IYS7z1BlSz4nkGXtah2vv2ChlfRRqsscaCfSPS+MHTsitQxJfKdUELe/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ah+2WTeHV3cgZV+NQieR0mV66QREvWaoPTLB0UQhZ8s=;
+ b=ZC/h47ZOZ+F7UaoHxFkJZ6sguBOcIEr3ZUV82C9YBM/mfNPFWXaa+gjm26OSsLgwREx3xFjnFZSdtTx9AWkZp5TJx0HKK6MYkjiL61t+sqtdBmYhsaFaNWdTtQawKA3PsD3IGbRh8TATO5iGAU4Pe0jv7zWOJ6BdXnBeCegvN/Y=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
+ by CH2PR12MB3702.namprd12.prod.outlook.com (2603:10b6:610:27::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Thu, 28 Jan
+ 2021 02:45:54 +0000
+Received: from CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::81f6:605c:f345:b99f]) by CH2PR12MB4133.namprd12.prod.outlook.com
+ ([fe80::81f6:605c:f345:b99f%3]) with mapi id 15.20.3784.019; Thu, 28 Jan 2021
+ 02:45:54 +0000
+From:   Michael Roth <michael.roth@amd.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org,
+        Michael Roth <michael.roth@amd.com.com>
+Subject: [PATCH] KVM: x86: fix CPUID entries returned by KVM_GET_CPUID2 ioctl
+Date:   Wed, 27 Jan 2021 20:44:51 -0600
+Message-Id: <20210128024451.1816770-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [165.204.53.104]
+X-ClientProxiedBy: BYAPR11CA0107.namprd11.prod.outlook.com
+ (2603:10b6:a03:f4::48) To CH2PR12MB4133.namprd12.prod.outlook.com
+ (2603:10b6:610:7a::13)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (165.204.53.104) by BYAPR11CA0107.namprd11.prod.outlook.com (2603:10b6:a03:f4::48) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Thu, 28 Jan 2021 02:45:53 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ddd54df3-9f12-49d7-eb09-08d8c336d4d0
+X-MS-TrafficTypeDiagnostic: CH2PR12MB3702:
+X-Microsoft-Antispam-PRVS: <CH2PR12MB3702DB5FDA618D34066CE2B695BA9@CH2PR12MB3702.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:800;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +4DP4gAKJPGFZFYAjfiquvlYry8A22u04fL4oHP6lwo6XK4O2NIxRGupNSl+e1DJAYprGOiXmlplt+KSabGAdrjwfXFOKFt/XK2802cqZ/HPdJDHIv3TJucKRAXtHNjjBhLymIhscTQvdbpJ9nWrOfG/A3Rbr4zESdKOb8lfcQBHx0GsjyhIMf/AAa0FZ9EpqKWAzXdC1qpUOaMY01ldUGSpPmBHNJq5NBd69XV+2p/3mML12336PnzMECU8qe1T/B6/G+onQzDESdb+Bf67hzMzK0thai+4A/BznqEDazc+DkSMxcJccNj/Kh5FtoLysyGs773hbfgruv54U6uFviAmNWgxOeLK7zY8oZJKzuEFVdzue//lz+np4rt2d9y3r4EWFYOKahqw4cg21cecG5+MDFZjhPXeiKaV4/QHs8qeZh4P5uj3cqNmotcSGpHyWnUtI9EkBxpT8EA5fqy1MwxE2wSPfbau6Xj5iEmr0XYQV3T3kO3z7oG2JjgTQjNDNgIBGhDIY8fzPc1vGAR5n8PJxsvcT1wk3P9epIEaxuK1Jaj3eUCd0D+4PKECYnMmUWfnNYUEVZIik/nZyeRhFc94FjRVAPBO9zfc+MxPQEjWdUrt2G6mYqnV05TyTimqaqmRgASK0LCYInAk6PeVLSzMgeKxIQP+ZpnIJ2YAPM0YdhENjDT3ZoecoXcS8Q2ktLxUTuIh8NrXo2yYddV5lmLoKgILmDNoq8XiVMmqYpYbJvMpMuWcXTqfF78H228EH5PdbePzK6XRukpAU+e1JtNuIyC7E87eoPLZXn3C7a8Nm/4OB0UDVlewwKzVYS9foZLVJg9uHSN7ePAY/Yrz2tWD0Esm34Id6Dky/nVgUCNr6ZIBoOZA2EK/zjUs1kQ1+/ujFMAGp9EzDpXBWORAcA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(1076003)(66476007)(956004)(2616005)(66556008)(26005)(6496006)(66946007)(316002)(7416002)(5660300002)(54906003)(52116002)(44832011)(83380400001)(36756003)(186003)(16526019)(86362001)(8936002)(8676002)(6486002)(6916009)(478600001)(2906002)(4326008)(23200700001);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?mtRilc6IbyXs/KfESncKTg/YlkZieZoTO/sH6YL0oklxcxc6mTCnXDgrZSBO?=
+ =?us-ascii?Q?e4gLVeb6TD+0HYO4A1Q1Hh8s9s3bVkQeUl8GS1PjJpxE++2XyTnthkgmtmAz?=
+ =?us-ascii?Q?EiXStHJnLf2HVlJbmffsrR6Wv1gGd363U8QokLNtZlTr72pxscTNE7L3YyaM?=
+ =?us-ascii?Q?MfZaFSc+p21BHXPMZDP6zF7Nb/wHuUB9Y8rCvlmHDUjYSdUE+WHVpKZbsg8F?=
+ =?us-ascii?Q?rQjAUQaYoSNTlWoAqU1TS9GKY9pvqbYRhVgZW2oM37XI3Bm0xpJC+EYeUVhG?=
+ =?us-ascii?Q?c29jXGnZKiiGDFsbT4JUO6jYlP6jMSzD/fzeQGlB7WIrrxJ+9HvBTTiYLSoM?=
+ =?us-ascii?Q?1RwKZNAl5agWWbWphnRMkas9N8iF+AtP6DCA3DVPVAsHGf6K14uIeviRUc9J?=
+ =?us-ascii?Q?Lls4u84J/+Pz4XE6U1blk82FWWTYYSSrDD/W6syUHc5BjgAnL/QnAVLdxbg4?=
+ =?us-ascii?Q?pO0CrzbQVrWcGONXFG9+ANv5nI1YTVCYQm2QJ4PPu04nY+1BqQOLH2rJDuxW?=
+ =?us-ascii?Q?Sg+1JlW7Yuik13Gs0mccqzhTjcA19/qHpkxh1/iL0E8fs07dC2vDvA0F2gwA?=
+ =?us-ascii?Q?vv6xCogc4K2zPDMbPVVj4uGk66CpOkPWJ0f5z5EERi0OqACK0HlZS8sc5FXc?=
+ =?us-ascii?Q?/nqqUJLLK4TgOhwDGtii/vTN4fkwH5RdTJ7TSROnNzjIY6N09YJ/5HrG/dS3?=
+ =?us-ascii?Q?u0+7W/q/X7IPIIbKNLszZLIagU/e4NOPsbbFT4HFp3RYtLIqr1gsTJU+hsay?=
+ =?us-ascii?Q?UEZ4D8auyGUmmBg7TpXsStR4F+XUS/m++WNm4WXnSHJWzsHbFmNHUwWJAeH2?=
+ =?us-ascii?Q?duZuu5w8lyz3g8soVETZRgISLc29yLnI9rwRK0yIhzGwvN2g8ZiEn3xeuSUC?=
+ =?us-ascii?Q?nYuE9C6N+dDBfPo+Zr5RVM3ZXUHMwAVLKhIk7EHWvAZUZMXzGPrg0BD2d1IV?=
+ =?us-ascii?Q?gp7MwTUDfBovgwkOucnTL6+Xy/SlKZJz0S0907aEfBYeXQm7AABsA9AtMokb?=
+ =?us-ascii?Q?mnhB3xRC1O6B872aMQe2GPyAZMAZDr6Zak0qrZsSbFpIte0CJOX4Z6v2KKWJ?=
+ =?us-ascii?Q?iyrwGO+C?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddd54df3-9f12-49d7-eb09-08d8c336d4d0
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2021 02:45:54.0779
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KPNo7LW3gNxirAYMyk1YzsOgp/bU/2fHY77kNNVS4/sFXuYoknjESBnhzxIJpvLqNkD65ly8WVhXKGcSgsrXXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3702
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Recent commit 255cbecfe0 modified struct kvm_vcpu_arch to make
+'cpuid_entries' a pointer to an array of kvm_cpuid_entry2 entries
+rather than embedding the array in the struct. KVM_SET_CPUID and
+KVM_SET_CPUID2 were updated accordingly, but KVM_GET_CPUID2 was missed.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+As a result, KVM_GET_CPUID2 currently returns random fields from struct
+kvm_vcpu_arch to userspace rather than the expected CPUID values. Fix
+this by treating 'cpuid_entries' as a pointer when copying its
+contents to userspace buffer.
 
-> Cover from Samuel Ortiz from (part 1) [1]:
->
->   This patchset allows for building and running ARM targets with TCG
->   disabled. [...]
->
->   The rationale behind this work comes from the NEMU project where we're
->   trying to only support x86 and ARM 64-bit architectures, without
->   including the TCG code base. We can only do so if we can build and run
->   ARM binaries with TCG disabled.
->
-> v4 almost 2 years later... [2]:
-> - Rebased on Meson
-> - Addressed Richard review comments
-> - Addressed Claudio review comments
+Fixes: 255cbecfe0c9 ("KVM: x86: allocate vcpu->arch.cpuid_entries dynamically")
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Michael Roth <michael.roth@amd.com.com>
+---
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Have you re-based recently because I was having a look but ran into
-merge conflicts. I'd like to get the merged at some point because I ran
-into similar issues with the Xen only build without TCG.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 13036cf0b912..38172ca627d3 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -321,7 +321,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+ 	if (cpuid->nent < vcpu->arch.cpuid_nent)
+ 		goto out;
+ 	r = -EFAULT;
+-	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
++	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
+ 			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
+ 		goto out;
+ 	return 0;
+-- 
+2.25.1
 
->
-> v3 almost 18 months later [3]:
-> - Rebased
-> - Addressed Thomas review comments
-> - Added Travis-CI job to keep building --disable-tcg on ARM
->
-> v2 [4]:
-> - Addressed review comments from Richard and Thomas from v1 [1]
->
-> Regards,
->
-> Phil.
->
-> [1]: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02451.html
-> [2]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg689168.html
-> [3]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg641796.html
-> [4]: https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05003.html
->
-> Green CI:
-> - https://cirrus-ci.com/build/4572961761918976
-> - https://gitlab.com/philmd/qemu/-/pipelines/196047779
-> - https://travis-ci.org/github/philmd/qemu/builds/731370972
->
-> Based-on: <20200929125609.1088330-1-philmd@redhat.com>
-> "hw/arm: Restrict APEI tables generation to the 'virt' machine"
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg745792.html
->
-> Philippe Mathieu-Daud=C3=A9 (10):
->   accel/tcg: Add stub for cpu_loop_exit()
->   meson: Allow optional target/${ARCH}/Kconfig
->   target/arm: Select SEMIHOSTING if TCG is available
->   target/arm: Restrict ARMv4 cpus to TCG accel
->   target/arm: Restrict ARMv5 cpus to TCG accel
->   target/arm: Restrict ARMv6 cpus to TCG accel
->   target/arm: Restrict ARMv7 R-profile cpus to TCG accel
->   target/arm: Restrict ARMv7 M-profile cpus to TCG accel
->   target/arm: Reorder meson.build rules
->   .travis.yml: Add a KVM-only Aarch64 job
->
-> Samuel Ortiz (1):
->   target/arm: Do not build TCG objects when TCG is off
->
-> Thomas Huth (1):
->   target/arm: Make m_helper.c optional via CONFIG_ARM_V7M
->
->  default-configs/arm-softmmu.mak |  3 --
->  meson.build                     |  8 +++-
->  target/arm/cpu.h                | 12 ------
->  accel/stubs/tcg-stub.c          |  5 +++
->  target/arm/cpu_tcg.c            |  4 +-
->  target/arm/helper.c             |  7 ----
->  target/arm/m_helper-stub.c      | 73 +++++++++++++++++++++++++++++++++
->  .travis.yml                     | 35 ++++++++++++++++
->  hw/arm/Kconfig                  | 32 +++++++++++++++
->  target/arm/Kconfig              |  4 ++
->  target/arm/meson.build          | 40 +++++++++++-------
->  11 files changed, 184 insertions(+), 39 deletions(-)
->  create mode 100644 target/arm/m_helper-stub.c
->  create mode 100644 target/arm/Kconfig
-
-
---=20
-Alex Benn=C3=A9e
