@@ -2,117 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A356306FEE
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 08:47:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E7B4306FEC
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 08:47:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232143AbhA1Hmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 02:42:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58424 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232152AbhA1HmZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 02:42:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611819658;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/rpC7ddPFGCWpfnn+1743DPZ4Gs/0jrXdvPAj93Ra8I=;
-        b=Sq+5wjhCs+iamRmV6qzGcm82iJx85k5ZwjQjl+fk1WLFaHFMsHH0YP+6FKlrwC7MB2Vm4p
-        e6S918I60Yi0J+DpZJk+FY7vtubg+npUHxStZBZ6StvMVb9nWlOBRSjCkZKrjHy6I/MAPH
-        MPKSl6vEw8rdIsmNHlOCfYUxjH9SVkI=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-APYVHJp4NnuUFI9OWJLLjg-1; Thu, 28 Jan 2021 02:40:56 -0500
-X-MC-Unique: APYVHJp4NnuUFI9OWJLLjg-1
-Received: by mail-ed1-f71.google.com with SMTP id q12so2774154edr.2
-        for <kvm@vger.kernel.org>; Wed, 27 Jan 2021 23:40:56 -0800 (PST)
+        id S232132AbhA1HmO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 02:42:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40322 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232070AbhA1HmC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 02:42:02 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2CFEC061573;
+        Wed, 27 Jan 2021 23:41:21 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id x71so5084247oia.9;
+        Wed, 27 Jan 2021 23:41:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=s4OuxxgWe2Ahx+yCxHgtlR+K9khejRjBXvMJQGWTjFA=;
+        b=ZW69HnstykrV7cO0QdoErRAX0lOqZLQKPJ8VTZjabYJgySEH72vmx1TPUPIE4Df05B
+         sfXrPqum1pVjfHtFOA5IkQhSIOJbzxKdAmL/5zezZealW/crspNjMafo07/sOdX+taF9
+         de/5hI9yWD8/+kTxgNaMC7mHMLQmujXzE4JZzCHVSBx/IA/1HbgkScVJCkpc2QbcGc8c
+         xPoL8r/C29jzxxmHVvY7qsmDBDMf0aHabAeXqkkcnmg1cXKwgRn068pX3ykBddawAo+9
+         Kg0RzP9rCpW+r/g6Yu+0idSRIpYEJUNq8CD/OA8dkuYkeatVgGiPfgeIaVtiIxNn965L
+         rIaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/rpC7ddPFGCWpfnn+1743DPZ4Gs/0jrXdvPAj93Ra8I=;
-        b=rEVI4+83FwyoILhZ0tmRE/Yo7SRu6BVv7gMCdTpHta2OMp0n+TMmRiSiw66PGF4Gwe
-         IPW7d6jvGkeesKaxg9NvwpaRB/w0epJwr4DPtY73dokRWSSCpTJ9xpeDI7yw2u0ZZxuY
-         XnNB46Ki0gsjxougljM29nt50BnI4L3HicfQ36OWVIz/1ybFVKHTyHMrEF5BtNBc9db0
-         URragUQ2ZCvl4L9rE6icT7Kwztr9yuWxgFzf6UM8bAlaANqHqJ8CN3NH1imdaOJV5VKX
-         ZzQrS4znkP/LS0BLpMYvNp46mgCETqktI89R3C5lGOJ1r6H0MPkcgJ3+E5yIcE5NJAvU
-         BtiQ==
-X-Gm-Message-State: AOAM533TBsO/RTWxjI1bIBsge179459GDwwaJmJJLzOrueFF88BIlBkB
-        Qadgj3WBeAUGmnGrFhnLpF74ssf6mEGg7Z1/8/2mJtvhn62glIsh8LC9ZDoY2lbHbYoe8M9uAzX
-        GNyXEgn0ocrDv
-X-Received: by 2002:aa7:c3d9:: with SMTP id l25mr13337977edr.188.1611819655516;
-        Wed, 27 Jan 2021 23:40:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxFjdrmXT9dvSZ+acbS7vO5a3TnIsm96Ym62RPqqCJIS/DU2MtwL3OBa2sUxfbD2gSmy6f4Mw==
-X-Received: by 2002:aa7:c3d9:: with SMTP id l25mr13337959edr.188.1611819655395;
-        Wed, 27 Jan 2021 23:40:55 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x21sm1874078eje.118.2021.01.27.23.40.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 23:40:54 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: fix CPUID entries returned by KVM_GET_CPUID2
- ioctl
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=s4OuxxgWe2Ahx+yCxHgtlR+K9khejRjBXvMJQGWTjFA=;
+        b=V4srMVr0s+eoTTw0tEuQUSH7OB7rsqumdGAR+E9vYlT/Nqb0rJS/gqX8VGTTREXjxH
+         6v5gzV1sdiibf+m1gTJsADHQGYuZMzobq7IW13VK4LslHw2be4QDepy0jxzSqoQ5Kud0
+         EIHegI9sgY7HeFSlGA0IyRkMF8Bc/UJkUIyXvvDq7nKHO8zdaCbZykAbckvohcyVjvh7
+         68I90nS77RxrriFFve528l4o8JlAwuJAG2gA1INEJTtGfyseWb/Ox41DjR4pD86epxBd
+         j0hdAvxe9KlKMgMxFAA7VgV7309YizflROY7rcmR6L2Zdnz+t+nx2ApTYk0R8MHnTQUl
+         pNeg==
+X-Gm-Message-State: AOAM531JAaWFlwP5noXqFbSM1TgvnJ7B+JkdpkXC9CmD/shZwYm8Y5xU
+        3f80IOcvQhtOP9+QLJAJCyf3aweUrsIOQLPvpCQ=
+X-Google-Smtp-Source: ABdhPJw/eiXe4gLSfUUZ31T65hzmkeEcYKgxYTY70SJ4q1VB9Y3ZQ7dcRSvDe2HIclNoi4wiSxkA+Iony1yi4CVxcx0=
+X-Received: by 2002:aca:f510:: with SMTP id t16mr5936180oih.141.1611819681371;
+ Wed, 27 Jan 2021 23:41:21 -0800 (PST)
+MIME-Version: 1.0
+References: <1610960877-3110-1-git-send-email-wanpengli@tencent.com>
+ <CANRm+Cx65UHSJA+S4qRR1wdZ=dhyM=U=KwZnbNUSN4XdM1nyQA@mail.gmail.com>
+ <146d2a3f-88db-ff80-29d6-de2b22efdf61@redhat.com> <CANRm+CwcrrTC8w5h3GrszOcu0H2vtcXNi0GD1iXc6O4-x_Ms0A@mail.gmail.com>
+In-Reply-To: <CANRm+CwcrrTC8w5h3GrszOcu0H2vtcXNi0GD1iXc6O4-x_Ms0A@mail.gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 28 Jan 2021 15:41:09 +0800
+Message-ID: <CANRm+Cw-DkVHU-q5cq1q6Md587Qu2n3utwNPx8gMJPCUw51zrA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: kvmclock: Fix vCPUs > 64 can't be online/hotpluged
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Michael Roth <michael.roth@amd.com.com>
-References: <20210128024451.1816770-1-michael.roth@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1aa519bb-9464-0721-17c9-7ea43ddfa536@redhat.com>
-Date:   Thu, 28 Jan 2021 08:40:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <20210128024451.1816770-1-michael.roth@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 03:44, Michael Roth wrote:
-> Recent commit 255cbecfe0 modified struct kvm_vcpu_arch to make
-> 'cpuid_entries' a pointer to an array of kvm_cpuid_entry2 entries
-> rather than embedding the array in the struct. KVM_SET_CPUID and
-> KVM_SET_CPUID2 were updated accordingly, but KVM_GET_CPUID2 was missed.
-> 
-> As a result, KVM_GET_CPUID2 currently returns random fields from struct
-> kvm_vcpu_arch to userspace rather than the expected CPUID values. Fix
-> this by treating 'cpuid_entries' as a pointer when copying its
-> contents to userspace buffer.
-> 
-> Fixes: 255cbecfe0c9 ("KVM: x86: allocate vcpu->arch.cpuid_entries dynamically")
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com.com>
-> ---
->   arch/x86/kvm/cpuid.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 13036cf0b912..38172ca627d3 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -321,7 +321,7 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
->   	if (cpuid->nent < vcpu->arch.cpuid_nent)
->   		goto out;
->   	r = -EFAULT;
-> -	if (copy_to_user(entries, &vcpu->arch.cpuid_entries,
-> +	if (copy_to_user(entries, vcpu->arch.cpuid_entries,
->   			 vcpu->arch.cpuid_nent * sizeof(struct kvm_cpuid_entry2)))
->   		goto out;
->   	return 0;
-> 
+On Wed, 27 Jan 2021 at 08:28, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> On Wed, 27 Jan 2021 at 01:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 26/01/21 02:28, Wanpeng Li wrote:
+> > > ping=EF=BC=8C
+> > > On Mon, 18 Jan 2021 at 17:08, Wanpeng Li <kernellwp@gmail.com> wrote:
+> > >>
+> > >> From: Wanpeng Li <wanpengli@tencent.com>
+> > >>
+> > >> The per-cpu vsyscall pvclock data pointer assigns either an element =
+of the
+> > >> static array hv_clock_boot (#vCPU <=3D 64) or dynamically allocated =
+memory
+> > >> hvclock_mem (vCPU > 64), the dynamically memory will not be allocate=
+d if
+> > >> kvmclock vsyscall is disabled, this can result in cpu hotpluged fail=
+s in
+> > >> kvmclock_setup_percpu() which returns -ENOMEM. This patch fixes it b=
+y not
+> > >> assigning vsyscall pvclock data pointer if kvmclock vdso_clock_mode =
+is not
+> > >> VDSO_CLOCKMODE_PVCLOCK.
+> >
+> > I am sorry, I still cannot figure out this patch.
+> >
+> > Is hotplug still broken if kvm vsyscall is enabled?
+>
+> Just when kvm vsyscall is disabled. :)
+>
+> # lscpu
+> Architecture:           x86_64
+> CPU op-mode(s):    32-bit, 64-bit
+> Byte Order:             Little Endian
+> CPU(s):                   88
+> On-line CPU(s) list:   0-63
+> Off-line CPU(s) list:  64-87
+>
+> # cat /proc/cmdline
+> BOOT_IMAGE=3D/vmlinuz-5.10.0-rc3-tlinux2-0050+ root=3D/dev/mapper/cl-root
+> ro rd.lvm.lv=3Dcl/root rhgb quiet console=3DttyS0 LANG=3Den_US
+> .UTF-8 no-kvmclock-vsyscall
+>
+> # echo 1 > /sys/devices/system/cpu/cpu76/online
+> -bash: echo: write error: Cannot allocate memory
 
-Queued, thanks.  I'll also write a testcase.
+The original bug report is here.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D210213
 
-Paolo
-
+    Wanpeng
