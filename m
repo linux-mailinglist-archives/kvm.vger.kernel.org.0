@@ -2,242 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADB51307B89
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 17:58:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7E7C307BC6
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 18:08:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232664AbhA1Q6N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 11:58:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60036 "EHLO
+        id S232901AbhA1RHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 12:07:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50638 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232363AbhA1Q4w (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 11:56:52 -0500
+        by vger.kernel.org with ESMTP id S232793AbhA1RAH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 12:00:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611852925;
+        s=mimecast20190719; t=1611853120;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HgtxAPALtY+nCny47e18Ou0vNrOzLT1OduAQqQAsR8o=;
-        b=dEF+xAKD3c90Ckg9ajmBEyYf4esEiK8KqqWcUEFXdKyMg1WTnavLwtr03Doug6PuwFkXwk
-        hBbI5hXXCKibR2DHOc4aptOV+Y0EToCgePzqXWWRZE/C+q6+mQbR0HAa4EdnzA1ESykkBT
-        I18uazIpo3+OKiCVFaF0jN8Mwy1TQwU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-Ce-nktAcPf2Nl9pfJY0huA-1; Thu, 28 Jan 2021 11:55:23 -0500
-X-MC-Unique: Ce-nktAcPf2Nl9pfJY0huA-1
-Received: by mail-wr1-f69.google.com with SMTP id n15so3414291wrv.20
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:55:23 -0800 (PST)
+        bh=G4jD35+hnsHoKaUUBuRwrYC+j4SclCwEjlq41Rscm40=;
+        b=LLz4o0N4Ekh9OFu05q3MAzzlmCAFZ6g7SdkzxVNzXp8dNJcHYNZqwzF6v9TErwGBcJuEDo
+        0B2IOpRIffL5lV56s+ETt8rB2aWKwZj+Vh4XaC5nrP+kV1GBEwBiBqC81cCTUOvlS77Rd3
+        LuEdWTqjR7pF9gHQ/t3pt6gHv5IoG0E=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-i8egr1pCNSGDb_YAPUhgpA-1; Thu, 28 Jan 2021 11:58:39 -0500
+X-MC-Unique: i8egr1pCNSGDb_YAPUhgpA-1
+Received: by mail-ed1-f70.google.com with SMTP id j12so3461532edq.10
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 08:58:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HgtxAPALtY+nCny47e18Ou0vNrOzLT1OduAQqQAsR8o=;
-        b=AXpW1K0oXphxJ9E0cM/3P22bmQa8zIgohLQiuK8fnP33+azZvKx+9MNWBE3yZPDwIR
-         ZO8JzE+4c/TxfUhaCQPK8k2tMwBeMi/BJrbHFm7qdu/6ZQ9D7/UkVMS9xm0uKyrP3FgQ
-         RHZiNWBNnT4aRTO1zbKaz7slBaLr0KmQFMBSMmAhGmvdEaABEetAeiv5Q/5tBFGlJH/0
-         ZC+2PHqpKP5P9LoA/caji1acNhXDlZ11/5CizVWB4BAf77KKHB4puarw/W/6jsA1KYas
-         lLV1q9llk6Jrf8354bb+cvazO+chGN8NCr1s0ALzLGLl8LaDNeYcaxlFKzLKEYT/RTzc
-         /rvw==
-X-Gm-Message-State: AOAM530GhVUgy9KM9gbYHtKDloI3VTLcYA6FFzfqPXk8v+0uBternErJ
-        4xHhPdHqpIymQKQ+EbBm/C/EoH9t/nZdA83jLLjMtlXtQHvFMjCeNnoFxPjHlAJqQAxODg54/wi
-        84QFw0LrPC1GJ
-X-Received: by 2002:a1c:a549:: with SMTP id o70mr135295wme.71.1611852922173;
-        Thu, 28 Jan 2021 08:55:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyb6UPtRnhkfUKRNkSJfjFxJ3q1MvMrhDM7KtpKfLvcGV1YzLJVQtRahOZNlCd6vpRf46h8cQ==
-X-Received: by 2002:a1c:a549:: with SMTP id o70mr135279wme.71.1611852921999;
-        Thu, 28 Jan 2021 08:55:21 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id q6sm6320451wmj.32.2021.01.28.08.55.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 08:55:21 -0800 (PST)
-Date:   Thu, 28 Jan 2021 17:55:18 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v3 03/13] af_vsock: implement SEQPACKET rx loop
-Message-ID: <20210128165518.ho3csm5u7v5pnwnd@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210125111239.598377-1-arseny.krasnov@kaspersky.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=G4jD35+hnsHoKaUUBuRwrYC+j4SclCwEjlq41Rscm40=;
+        b=tG8Fly8qe95p4XsPfXw+je/GQBn2PUeGTm1mFelikWG42h76NdBb5vpIuqJr/WMkdQ
+         VYX4PqJk+t6HF3qhu/0+HsZwTs6yQH9JezgnUce1cLnyfBDbD2LAv9rmqWloq7uW/JfI
+         2ZqbRmj+CYDnrdwSG1oFYSks3wXQg5mNOzDUysz1LF9IWSNKcXm3eElIp0k/m8m/+NiI
+         oB4A+ea1rWzsmV/xryLTj+3jqXTchzAyKczgWaxb5WM4Py+oba4+aUde6bbW3AFrpBZM
+         SeCU78uf8RqMTcNcs9TAZ43PDefwkR9LsMi6SZVY19idd6lwIdUQF12SBZ0hnTL/qmCy
+         f41g==
+X-Gm-Message-State: AOAM533xGWSEsWiblTMvTcsvBx8/Na1bhClWKuXHt6D7lqQZBwF4r3Fd
+        /Pald1sSWRmb00wFDXdF/xlLkF7JySqs+U59bak8SBnIuJZLstGotN3KQha5qRHOfcSHWEclwWz
+        egb5OLR5PYSEz
+X-Received: by 2002:a05:6402:8cd:: with SMTP id d13mr454887edz.335.1611853118216;
+        Thu, 28 Jan 2021 08:58:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxTK53nJc/ZY8iLKLipDuvrqQk2AjWPBAuKb4t05OqdYgsJkRnBxTT/6kwaD0JSzhxEpTkwfg==
+X-Received: by 2002:a05:6402:8cd:: with SMTP id d13mr454864edz.335.1611853118068;
+        Thu, 28 Jan 2021 08:58:38 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id bo12sm2496665ejb.93.2021.01.28.08.58.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jan 2021 08:58:37 -0800 (PST)
+Subject: Re: [PATCH v2 11/15] KVM: x86: hyper-v: Prepare to meet unallocated
+ Hyper-V context
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20210126134816.1880136-1-vkuznets@redhat.com>
+ <20210126134816.1880136-12-vkuznets@redhat.com>
+ <fe1bb68d-96a0-cbb3-967a-8576c3533cf6@redhat.com>
+ <87y2gd140a.fsf@vitty.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f2255ad5-1109-44e3-a8f4-be0ac836a8bb@redhat.com>
+Date:   Thu, 28 Jan 2021 17:58:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210125111239.598377-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <87y2gd140a.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 02:12:36PM +0300, Arseny Krasnov wrote:
->This adds receive loop for SEQPACKET. It looks like receive loop for
->SEQPACKET, but there is a little bit difference:
->1) It doesn't call notify callbacks.
->2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
->   there is no sense for these values in SEQPACKET case.
->3) It waits until whole record is received or error is found during
->   receiving.
->4) It processes and sets 'MSG_TRUNC' flag.
->
->So to avoid extra conditions for two types of socket inside one loop, two
->independent functions were created.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/net/af_vsock.h   |   5 ++
-> net/vmw_vsock/af_vsock.c | 102 ++++++++++++++++++++++++++++++++++++++-
-> 2 files changed, 106 insertions(+), 1 deletion(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index b1c717286993..46073842d489 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -135,6 +135,11 @@ struct vsock_transport {
-> 	bool (*stream_is_active)(struct vsock_sock *);
-> 	bool (*stream_allow)(u32 cid, u32 port);
->
->+	/* SEQ_PACKET. */
->+	size_t (*seqpacket_seq_get_len)(struct vsock_sock *);
->+	ssize_t (*seqpacket_dequeue)(struct vsock_sock *, struct msghdr *,
->+				     size_t len, int flags);
->+
-> 	/* Notification. */
-> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
-> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 524df8fc84cd..3b266880b7c8 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -2006,7 +2006,107 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
-> static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
-> 				     size_t len, int flags)
-> {
->-	return -1;
->+	const struct vsock_transport *transport;
->+	const struct iovec *orig_iov;
->+	unsigned long orig_nr_segs;
->+	ssize_t dequeued_total = 0;
->+	struct vsock_sock *vsk;
->+	size_t record_len;
->+	long timeout;
->+	int err = 0;
->+	DEFINE_WAIT(wait);
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+
->+	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
->+	msg->msg_flags &= ~MSG_EOR;
+On 28/01/21 16:21, Vitaly Kuznetsov wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 26/01/21 14:48, Vitaly Kuznetsov wrote:
+>>>
+>>> +static inline u32 to_hv_vpindex(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+>>> +
+>>> +	return hv_vcpu ? hv_vcpu->vp_index : kvm_vcpu_get_idx(vcpu);
+>>> +}
+>>> +
+>>
+>> I'd rather restrict to_* names for pointer conversions.
+>> kvm_hv_get_vpindex is a better choice here.
+> 
+> No objections, feel free to rename. Alternatively, I can send a
+> follow-up patch.
 
-Maybe add a comment about why we need to clear MSG_EOR.
+Ok, will do.
 
->+	orig_nr_segs = msg->msg_iter.nr_segs;
->+	orig_iov = msg->msg_iter.iov;
->+
->+	while (1) {
->+		ssize_t dequeued;
->+		s64 ready;
->+
->+		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
->+		ready = vsock_stream_has_data(vsk);
->+
->+		if (ready == 0) {
->+			if (vsock_wait_data(sk, &wait, timeout, NULL, 0)) {
->+				/* In case of any loop break(timeout, signal
->+				 * interrupt or shutdown), we report user that
->+				 * nothing was copied.
->+				 */
->+				dequeued_total = 0;
->+				break;
->+			}
->+			continue;
->+		}
->+
->+		finish_wait(sk_sleep(sk), &wait);
->+
->+		if (ready < 0) {
->+			err = -ENOMEM;
->+			goto out;
->+		}
->+
->+		if (dequeued_total == 0) {
->+			record_len =
->+				transport->seqpacket_seq_get_len(vsk);
->+
->+			if (record_len == 0)
->+				continue;
->+		}
->+
->+		/* 'msg_iter.count' is number of unused bytes in iov.
->+		 * On every copy to iov iterator it is decremented at
->+		 * size of data.
->+		 */
->+		dequeued = transport->seqpacket_dequeue(vsk, msg,
->+					msg->msg_iter.count, flags);
-                                         ^
-                                         Is this needed or 'msg' can be 
-                                         used in the transport?
->+
->+		if (dequeued < 0) {
->+			dequeued_total = 0;
->+
->+			if (dequeued == -EAGAIN) {
->+				iov_iter_init(&msg->msg_iter, READ,
->+					      orig_iov, orig_nr_segs,
->+					      len);
->+				msg->msg_flags &= ~MSG_EOR;
->+				continue;
-
-Why we need to reset MSG_EOR here?
-
->+			}
->+
->+			err = -ENOMEM;
->+			break;
->+		}
->+
->+		dequeued_total += dequeued;
->+
->+		if (dequeued_total >= record_len)
->+			break;
->+	}
-
-Maybe a new line here.
-
->+	if (sk->sk_err)
->+		err = -sk->sk_err;
->+	else if (sk->sk_shutdown & RCV_SHUTDOWN)
->+		err = 0;
->+
->+	if (dequeued_total > 0) {
->+		/* User sets MSG_TRUNC, so return real length of
->+		 * packet.
->+		 */
->+		if (flags & MSG_TRUNC)
->+			err = record_len;
->+		else
->+			err = len - msg->msg_iter.count;
->+
->+		/* Always set MSG_TRUNC if real length of packet is
->+		 * bigger that user buffer.
-
-s/that/than
-
->+		 */
->+		if (record_len > len)
->+			msg->msg_flags |= MSG_TRUNC;
->+	}
->+out:
->+	return err;
-> }
->
-> static int
->-- 
->2.25.1
->
+Paolo
 
