@@ -2,103 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5204F3076AB
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 14:05:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADF90307708
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 14:28:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231618AbhA1NDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 08:03:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56417 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231250AbhA1NDb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 08:03:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611838925;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nBvfO0pJG5CW6SkjjFOYWgtGpflBhkmJYESt+YGWKBo=;
-        b=IacHNXZtxMNVrUbPq2tdwlM1TeHRqb1vSrsNpBjmPf6at/tTqr2dixOIjBeY1NhmNRJoV4
-        kdSgb2CTuS9qdlzrAnnX/vyWD49aCWDbJpkGzE0RnqGVBYNlAjgxIv11q4z7DjQ1IUCJgW
-        bBoDbYSPBjZflRuhtom524TV4PFn6Rs=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-b2XtWkdPNqq7BuybmGBG1A-1; Thu, 28 Jan 2021 08:02:02 -0500
-X-MC-Unique: b2XtWkdPNqq7BuybmGBG1A-1
-Received: by mail-ed1-f70.google.com with SMTP id r4so3132839eds.4
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 05:02:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nBvfO0pJG5CW6SkjjFOYWgtGpflBhkmJYESt+YGWKBo=;
-        b=Xa2qe8iXiYBCMOYOd9qkp16CnxzGxW39lDWbii3pk12e2Qx7rELp4tvxR2U38KM4iP
-         zEvQ2LpgKIDZ9daBD8GRcZJgMsBuY6LVyn44S4YoaI1FuF/mWcq4nSqhuxKOkkF5iVP8
-         CRQtPr2t8OemzqYsqf2LCnGrRLzjllVv1xqFh8reemVjmpuTXMo6bCTyNRHheLp7M5QM
-         DM2ucuRRhmpphWqY6rizXqwfj8stt/ehMMZlpNnzcWUViGYVCEZ5+Ay1OwTYJNKRfgon
-         9uJrC81txKgcPSMotNKcInJOPgtxu5ixs5bAdfIUHmT9BNBDemyhnrNsAqeSJtBuAkO+
-         bqQg==
-X-Gm-Message-State: AOAM530c0mCHM9CVoflKWG5zOVNJSjGlU3L8deWwVUFZqhBD8vJ+CnC2
-        iVFqoOdXgnwSRDG0TA7kU6zH05r7fxGpahBGRhW2t6kFZs1y9roM1Px+9WVrkP76Cuboih09DSA
-        6EEb4S/+HISIA
-X-Received: by 2002:a17:906:abd7:: with SMTP id kq23mr9264001ejb.292.1611838921119;
-        Thu, 28 Jan 2021 05:02:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz/c6AXVewiipZ2hRRD+V6ieXqc3J6x8OeuGPPacTELZqzyy1eAnfDrFD1Ou0XKXJN3PVxTAw==
-X-Received: by 2002:a17:906:abd7:: with SMTP id kq23mr9263924ejb.292.1611838920188;
-        Thu, 28 Jan 2021 05:02:00 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id pj11sm2217470ejb.58.2021.01.28.05.01.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 05:01:59 -0800 (PST)
-Subject: Re: [PATCH 1/5] KVM: Make the maximum number of user memslots a
- per-VM thing
-To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>
-References: <20210127175731.2020089-1-vkuznets@redhat.com>
- <20210127175731.2020089-2-vkuznets@redhat.com>
- <09f96415-b32d-1073-0b4f-9c6e30d23b3a@oracle.com>
- <877dnx30vv.fsf@vitty.brq.redhat.com>
- <5b6ac6b4-3cc8-2dc3-cd8c-a4e322379409@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <34f76035-8749-e06b-2fb0-f30e295f6425@redhat.com>
-Date:   Thu, 28 Jan 2021 14:01:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S231465AbhA1N1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 08:27:38 -0500
+Received: from 8bytes.org ([81.169.241.247]:53438 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229950AbhA1N1h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 08:27:37 -0500
+X-Greylist: delayed 513 seconds by postgrey-1.27 at vger.kernel.org; Thu, 28 Jan 2021 08:27:36 EST
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 8407751D; Thu, 28 Jan 2021 14:18:19 +0100 (CET)
+Date:   Thu, 28 Jan 2021 14:18:18 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Cc:     X86 ML <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v7 45/72] x86/entry/64: Add entry code for #VC handler
+Message-ID: <20210128131817.GP32671@8bytes.org>
+References: <20200907131613.12703-1-joro@8bytes.org>
+ <20200907131613.12703-46-joro@8bytes.org>
+ <CAJhGHyCMMCY9bZauzrSeQr_62SpJgZQEQy9P7Rh28HXJtF5O5A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <5b6ac6b4-3cc8-2dc3-cd8c-a4e322379409@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhGHyCMMCY9bZauzrSeQr_62SpJgZQEQy9P7Rh28HXJtF5O5A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 11:48, Maciej S. Szmigiero wrote:
->>
->> VMMs (especially big ones like QEMU) are complex and e.g. each driver
->> can cause memory regions (-> memslots in KVM) to change. With this
->> feature it becomes possible to set a limit upfront (based on VM
->> configuration) so it'll be more obvious when it's hit.
->>
+Hello Lai,
+
+On Sun, Jan 24, 2021 at 10:11:14PM +0800, Lai Jiangshan wrote:
+> > +
+> > +       /*
+> > +        * No need to switch back to the IST stack. The current stack is either
+> > +        * identical to the stack in the IRET frame or the VC fall-back stack,
+> > +        * so it is definitly mapped even with PTI enabled.
+> > +        */
+> > +       jmp     paranoid_exit
+> > +
+> >
 > 
-> I see: it's a kind of a "big switch", so every VMM doesn't have to be
-> modified or audited.
-> Thanks for the explanation.
+> Hello
+> 
+> I know we don't enable PTI on AMD, but the above comment doesn't align to the
+> next code.
+> 
+> We assume PTI is enabled as the comments said "even with PTI enabled".
+> 
+> When #VC happens after entry_SYSCALL_64 but before it switches to the
+> kernel CR3.  vc_switch_off_ist() will switch the stack to the kernel stack
+> and paranoid_exit can't work when it switches to user CR3 on the kernel stack.
+> 
+> The comment above lost information that the current stack is possible to be
+> the kernel stack which is mapped not user CR3.
+> 
+> Maybe I missed something.
 
-Not really, it's the opposite: the VMM needs to opt into a smaller 
-number of memslots.
+You are right, the scenario above would cause problems for the current
+#VC entry code. With SEV-ES an #VC exception can't happen in the early
+syscall entry code, so I think its the best to update the comment
+reflecting this.
 
-I don't know... I understand it would be defense in depth, however 
-between dynamic allocation of memslots arrays and GFP_KERNEL_ACCOUNT, it 
-seems to be a bit of a solution in search of a problem.  For now I 
-applied patches 1-2-5.
+In the future this might change and then the #VC entry code needs to
+take care of this case too. Thanks for pointing it out.
 
-Thanks,
+Regards,
 
-Paolo
-
+	Joerg
