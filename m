@@ -2,193 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A1057307699
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 14:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5204F3076AB
+	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 14:05:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbhA1M7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 07:59:41 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:62208 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231932AbhA1M7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 07:59:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1611838756; x=1643374756;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=B56E1Awf7VEQPdUFQmhu23n9pP7LJrGNglTlfuHed+U=;
-  b=ERdJQ3q0L8dvF3APuLnziiKfn9NEKDpQpubh+o8HN7qA+Y+m5tQ3eLN1
-   3nfh847FpF1czOV4xRQu6/YTw8MIGNz+qhdLFcOtzXhlf95sZmPujaqcc
-   w7HXqVpJNWioN8ECo+IFIdgdl9Nk45NFKEyQx8R5rJm5GdFG4Mc+e3nAc
-   4=;
-X-IronPort-AV: E=Sophos;i="5.79,382,1602547200"; 
-   d="scan'208";a="82178107"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 28 Jan 2021 12:58:25 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS id 6DE2AC0600;
-        Thu, 28 Jan 2021 12:58:22 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 28 Jan 2021 12:58:21 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.162.125) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 28 Jan 2021 12:58:14 +0000
-Subject: Re: [PATCH v4 0/2] System Generation ID driver and VMGENID backend
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>
-CC:     "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "ebiederm@xmission.com" <ebiederm@xmission.com>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "Jason@zx2c4.com" <Jason@zx2c4.com>,
-        "jannh@google.com" <jannh@google.com>, "w@1wt.eu" <w@1wt.eu>,
-        "MacCarthaigh, Colm" <colmmacc@amazon.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "bonzini@gnu.org" <bonzini@gnu.org>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "mhocko@kernel.org" <mhocko@kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "pavel@ucw.cz" <pavel@ucw.cz>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "areber@redhat.com" <areber@redhat.com>,
-        "ovzxemul@gmail.com" <ovzxemul@gmail.com>,
-        "avagin@gmail.com" <avagin@gmail.com>,
-        "ptikhomirov@virtuozzo.com" <ptikhomirov@virtuozzo.com>,
-        "gil@azul.com" <gil@azul.com>,
-        "asmehra@redhat.com" <asmehra@redhat.com>,
-        "dgunigun@redhat.com" <dgunigun@redhat.com>,
-        "vijaysun@ca.ibm.com" <vijaysun@ca.ibm.com>,
-        "oridgar@gmail.com" <oridgar@gmail.com>,
-        "ghammer@redhat.com" <ghammer@redhat.com>
-References: <1610453760-13812-1-git-send-email-acatan@amazon.com>
- <20210112074658-mutt-send-email-mst@kernel.org>
- <9952EF0C-CD1D-4EDB-BAB8-21F72C0BF90D@amazon.com>
- <20210127074549-mutt-send-email-mst@kernel.org>
-From:   Alexander Graf <graf@amazon.de>
-Message-ID: <7bcd1cf3-d055-db46-95ea-5c023df2f184@amazon.de>
-Date:   Thu, 28 Jan 2021 13:58:12 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.1
+        id S231618AbhA1NDd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 08:03:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56417 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231250AbhA1NDb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 08:03:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611838925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nBvfO0pJG5CW6SkjjFOYWgtGpflBhkmJYESt+YGWKBo=;
+        b=IacHNXZtxMNVrUbPq2tdwlM1TeHRqb1vSrsNpBjmPf6at/tTqr2dixOIjBeY1NhmNRJoV4
+        kdSgb2CTuS9qdlzrAnnX/vyWD49aCWDbJpkGzE0RnqGVBYNlAjgxIv11q4z7DjQ1IUCJgW
+        bBoDbYSPBjZflRuhtom524TV4PFn6Rs=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-b2XtWkdPNqq7BuybmGBG1A-1; Thu, 28 Jan 2021 08:02:02 -0500
+X-MC-Unique: b2XtWkdPNqq7BuybmGBG1A-1
+Received: by mail-ed1-f70.google.com with SMTP id r4so3132839eds.4
+        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 05:02:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nBvfO0pJG5CW6SkjjFOYWgtGpflBhkmJYESt+YGWKBo=;
+        b=Xa2qe8iXiYBCMOYOd9qkp16CnxzGxW39lDWbii3pk12e2Qx7rELp4tvxR2U38KM4iP
+         zEvQ2LpgKIDZ9daBD8GRcZJgMsBuY6LVyn44S4YoaI1FuF/mWcq4nSqhuxKOkkF5iVP8
+         CRQtPr2t8OemzqYsqf2LCnGrRLzjllVv1xqFh8reemVjmpuTXMo6bCTyNRHheLp7M5QM
+         DM2ucuRRhmpphWqY6rizXqwfj8stt/ehMMZlpNnzcWUViGYVCEZ5+Ay1OwTYJNKRfgon
+         9uJrC81txKgcPSMotNKcInJOPgtxu5ixs5bAdfIUHmT9BNBDemyhnrNsAqeSJtBuAkO+
+         bqQg==
+X-Gm-Message-State: AOAM530c0mCHM9CVoflKWG5zOVNJSjGlU3L8deWwVUFZqhBD8vJ+CnC2
+        iVFqoOdXgnwSRDG0TA7kU6zH05r7fxGpahBGRhW2t6kFZs1y9roM1Px+9WVrkP76Cuboih09DSA
+        6EEb4S/+HISIA
+X-Received: by 2002:a17:906:abd7:: with SMTP id kq23mr9264001ejb.292.1611838921119;
+        Thu, 28 Jan 2021 05:02:01 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz/c6AXVewiipZ2hRRD+V6ieXqc3J6x8OeuGPPacTELZqzyy1eAnfDrFD1Ou0XKXJN3PVxTAw==
+X-Received: by 2002:a17:906:abd7:: with SMTP id kq23mr9263924ejb.292.1611838920188;
+        Thu, 28 Jan 2021 05:02:00 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id pj11sm2217470ejb.58.2021.01.28.05.01.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jan 2021 05:01:59 -0800 (PST)
+Subject: Re: [PATCH 1/5] KVM: Make the maximum number of user memslots a
+ per-VM thing
+To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>
+References: <20210127175731.2020089-1-vkuznets@redhat.com>
+ <20210127175731.2020089-2-vkuznets@redhat.com>
+ <09f96415-b32d-1073-0b4f-9c6e30d23b3a@oracle.com>
+ <877dnx30vv.fsf@vitty.brq.redhat.com>
+ <5b6ac6b4-3cc8-2dc3-cd8c-a4e322379409@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <34f76035-8749-e06b-2fb0-f30e295f6425@redhat.com>
+Date:   Thu, 28 Jan 2021 14:01:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210127074549-mutt-send-email-mst@kernel.org>
+In-Reply-To: <5b6ac6b4-3cc8-2dc3-cd8c-a4e322379409@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Originating-IP: [10.43.162.125]
-X-ClientProxiedBy: EX13D02UWC002.ant.amazon.com (10.43.162.6) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="windows-1252"; format="flowed"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Michael!
-
-On 27.01.21 13:47, Michael S. Tsirkin wrote:
-> =
-
-> On Thu, Jan 21, 2021 at 10:28:16AM +0000, Catangiu, Adrian Costin wrote:
->> On 12/01/2021, 14:49, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 28/01/21 11:48, Maciej S. Szmigiero wrote:
 >>
->>      On Tue, Jan 12, 2021 at 02:15:58PM +0200, Adrian Catangiu wrote:
->>      > The first patch in the set implements a device driver which expos=
-es a
->>      > read-only device /dev/sysgenid to userspace, which contains a
->>      > monotonically increasing u32 generation counter. Libraries and
->>      > applications are expected to open() the device, and then call rea=
-d()
->>      > which blocks until the SysGenId changes. Following an update, rea=
-d()
->>      > calls no longer block until the application acknowledges the new
->>      > SysGenId by write()ing it back to the device. Non-blocking read()=
- calls
->>      > return EAGAIN when there is no new SysGenId available. Alternativ=
-ely,
->>      > libraries can mmap() the device to get a single shared page which
->>      > contains the latest SysGenId at offset 0.
+>> VMMs (especially big ones like QEMU) are complex and e.g. each driver
+>> can cause memory regions (-> memslots in KVM) to change. With this
+>> feature it becomes possible to set a limit upfront (based on VM
+>> configuration) so it'll be more obvious when it's hit.
 >>
->>      Looking at some specifications, the gen ID might actually be located
->>      at an arbitrary address. How about instead of hard-coding the offse=
-t,
->>      we expose it e.g. in sysfs?
->>
->> The functionality is split between SysGenID which exposes an internal u32
->> counter to userspace, and an (optional) VmGenID backend which drives
->> SysGenID generation changes based on hw vmgenid updates.
->>
->> The hw UUID you're referring to (vmgenid) is not mmap-ed to userspace or
->> otherwise exposed to userspace. It is only used internally by the vmgenid
->> driver to find out about VM generation changes and drive the more generic
->> SysGenID.
->>
->> The SysGenID u32 monotonic increasing counter is the one that is mmaped =
-to
->> userspace, but it is a software counter. I don't see any value in using =
-a dynamic
->> offset in the mmaped page. Offset 0 is fast and easy and most importantl=
-y it is
->> static so no need to dynamically calculate or find it at runtime.
-> =
+> 
+> I see: it's a kind of a "big switch", so every VMM doesn't have to be
+> modified or audited.
+> Thanks for the explanation.
 
-> Well you are burning a whole page on it, using an offset the page
-> can be shared with other functionality.
+Not really, it's the opposite: the VMM needs to opt into a smaller 
+number of memslots.
 
-Currently, the SysGenID lives is one page owned by Linux that we share =
+I don't know... I understand it would be defense in depth, however 
+between dynamic allocation of memslots arrays and GFP_KERNEL_ACCOUNT, it 
+seems to be a bit of a solution in search of a problem.  For now I 
+applied patches 1-2-5.
 
-out to multiple user space clients. So yes, we burn a single page of the =
+Thanks,
 
-system here.
-
-If we put more data in that same page, what data would you put there? =
-
-Random other bits from other subsystems? At that point, we'd be =
-
-reinventing vdso all over again, no? Probably with the same problems.
-
-Which gets me to the second alternative: Reuse VDSO. The problem there =
-
-is that the VDSO is an extremely architecture specific mechanism. Any =
-
-new architecture we'd want to support would need multiple layers of =
-
-changes in multiple layers of both kernel and libc. I'd like to avoid =
-
-that if we can :).
-
-So that leaves us with either wasting a page per system or not having an =
-
-mmap() interface in the first place.
-
-The reason we have the mmap() interface is that it's be easier to =
-
-consume for libraries, that are not hooked into the main event loop.
-
-So, uh, what are you suggesting? :)
-
-
-Alex
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
+Paolo
 
