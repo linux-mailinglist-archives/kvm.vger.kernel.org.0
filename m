@@ -2,77 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F7A23086C3
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 08:58:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 558A63086FE
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 09:28:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232318AbhA2Hyk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 02:54:40 -0500
-Received: from mga18.intel.com ([134.134.136.126]:39363 "EHLO mga18.intel.com"
+        id S232282AbhA2H5F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 02:57:05 -0500
+Received: from mga07.intel.com ([134.134.136.100]:56149 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232019AbhA2Hyi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 02:54:38 -0500
-IronPort-SDR: qCWRw9OgBVWmsNVTS14m1KST7EKe3t9kQBmrGu8COT+btnM432wpW0KtX//aQRkTk2kasEACJj
- weQbhIJx2w4A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9878"; a="168051066"
+        id S232365AbhA2H4y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 02:56:54 -0500
+IronPort-SDR: MyXuW59Vd+yI7Le6qpDKEfbqbjA3ySusoKPA+Anu+EwDRJ+LEzEmSh37gN/fWKz7DE/W3rn0OK
+ pD1HLhALnN/Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9878"; a="244470734"
 X-IronPort-AV: E=Sophos;i="5.79,384,1602572400"; 
-   d="scan'208";a="168051066"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2021 23:55:23 -0800
-IronPort-SDR: m5LIJzseWRcoACVo4HL7r0wDfos8wc750dt3JEew5Pgea1MR3NKDnLzPo3sNd5SQs1MFrILp+p
- 5FQWFgCTohAQ==
+   d="scan'208";a="244470734"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2021 23:56:38 -0800
+IronPort-SDR: r8+9M+Q6+eyqVnG+2+9qV6jgTxydFvAWXPrvfUvsbcxM88zLNQfOA2osBpJehVCJUS1YGXTgPw
+ L5HtwIQnCgBw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.79,384,1602572400"; 
-   d="scan'208";a="430898012"
+   d="scan'208";a="389205573"
 Received: from local-michael-cet-test.sh.intel.com (HELO localhost) ([10.239.159.172])
-  by orsmga001.jf.intel.com with ESMTP; 28 Jan 2021 23:55:21 -0800
-Date:   Fri, 29 Jan 2021 16:07:19 +0800
+  by orsmga008.jf.intel.com with ESMTP; 28 Jan 2021 23:56:36 -0800
+Date:   Fri, 29 Jan 2021 16:08:33 +0800
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, sean.j.christopherson@intel.com,
         jmattson@google.com, yu.c.zhang@linux.intel.com
-Subject: Re: [PATCH v14 07/13] KVM: VMX: Emulate reads and writes to CET MSRs
-Message-ID: <20210129080719.GA28424@local-michael-cet-test.sh.intel.com>
+Subject: Re: [PATCH v14 09/13] KVM: x86: Report CET MSRs as to-be-saved if
+ CET is supported
+Message-ID: <20210129080833.GB28424@local-michael-cet-test.sh.intel.com>
 References: <20201106011637.14289-1-weijiang.yang@intel.com>
- <20201106011637.14289-8-weijiang.yang@intel.com>
- <a73b590d-4cd3-f1b3-bea2-e674846595b3@redhat.com>
+ <20201106011637.14289-10-weijiang.yang@intel.com>
+ <732d1da2-70d7-1f8a-b41d-136e068516d7@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a73b590d-4cd3-f1b3-bea2-e674846595b3@redhat.com>
+In-Reply-To: <732d1da2-70d7-1f8a-b41d-136e068516d7@redhat.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 28, 2021 at 06:45:08PM +0100, Paolo Bonzini wrote:
+On Thu, Jan 28, 2021 at 06:46:37PM +0100, Paolo Bonzini wrote:
 > On 06/11/20 02:16, Yang Weijiang wrote:
+> > Report all CET MSRs, including the synthetic GUEST_SSP MSR, as
+> > to-be-saved, e.g. for migration, if CET is supported by KVM.
 > > 
-> > +static bool cet_is_ssp_msr_accessible(struct kvm_vcpu *vcpu,
-> > +				      struct msr_data *msr)
-> > +{
-> > +	u64 mask;
-> > +
-> > +	if (!kvm_cet_supported())
-> > +		return false;
-> > +
-> > +	if (msr->host_initiated)
-> > +		return true;
-> > +
-> > +	if (!guest_cpuid_has(vcpu, X86_FEATURE_SHSTK))
-> > +		return false;
-> > +
-> > +	if (msr->index == MSR_IA32_INT_SSP_TAB)
-> > +		return false;
+> > Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > ---
+> >   arch/x86/kvm/x86.c | 9 +++++++++
+> >   1 file changed, 9 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 751b62e871e5..d573cadf5baf 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -1248,6 +1248,8 @@ static const u32 msrs_to_save_all[] = {
+> >   	MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
+> >   	MSR_IA32_XSS,
+> > +	MSR_IA32_U_CET, MSR_IA32_S_CET, MSR_IA32_INT_SSP_TAB, MSR_KVM_GUEST_SSP,
+> > +	MSR_IA32_PL0_SSP, MSR_IA32_PL1_SSP, MSR_IA32_PL2_SSP, MSR_IA32_PL3_SSP,
+> >   };
+> >   static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+> > @@ -5761,6 +5763,13 @@ static void kvm_init_msr_list(void)
+> >   			if (!supported_xss)
+> >   				continue;
+> >   			break;
+> > +		case MSR_IA32_U_CET:
+> > +		case MSR_IA32_S_CET:
+> > +		case MSR_IA32_INT_SSP_TAB:
+> > +		case MSR_IA32_PL0_SSP ... MSR_IA32_PL3_SSP:
+> > +			if (!kvm_cet_supported())
+> > +				continue;
+> > +			break;
+> >   		default:
+> >   			break;
+> >   		}
+> > 
 > 
-> Shouldn't this return true?
+> Missing "case MSR_KVM_GUEST_SSP".
 >
-Hi, Paolo,
-Thanks for the feedback!
-Yes, it should be true, will fix it in next release.
+OK, will fix it in next version.
 > Paolo
-> 
-> > +	mask = (msr->index == MSR_IA32_PL3_SSP) ? XFEATURE_MASK_CET_USER :
-> > +						  XFEATURE_MASK_CET_KERNEL;
-> > +	return !!(vcpu->arch.guest_supported_xss & mask);
-> > +}
