@@ -2,601 +2,584 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 550E7308C23
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 19:10:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8878F308CD3
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 19:58:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232498AbhA2SHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 13:07:17 -0500
-Received: from foss.arm.com ([217.140.110.172]:52386 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232473AbhA2SHL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 13:07:11 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 535FB1515;
-        Fri, 29 Jan 2021 10:06:23 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6FE343F885;
-        Fri, 29 Jan 2021 10:06:21 -0800 (PST)
-Date:   Fri, 29 Jan 2021 18:05:39 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com, Jintack Lim <jintack.lim@linaro.org>
-Subject: Re: [PATCH v3 09/66] KVM: arm64: nv: Support virtual EL2 exceptions
-Message-ID: <20210129180539.2c508b6e@slackpad.fritz.box>
-In-Reply-To: <20201210160002.1407373-10-maz@kernel.org>
-References: <20201210160002.1407373-1-maz@kernel.org>
-        <20201210160002.1407373-10-maz@kernel.org>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S232767AbhA2Szl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 13:55:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41528 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232734AbhA2Szd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 13:55:33 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148CDC06174A
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 10:54:53 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id a25so11696408ljn.0
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 10:54:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=C8ZloSbHLscDtk7HCPXx9UE78ji6JaCCd6vtOwW4PMA=;
+        b=aAxp6uxwMOfFrdI1CQd2Ut/Rtko200NoP/uayc0bEjZsH2SmcGVHFwIVOSoZhpWcIW
+         +ByIa0t7ev12lyl5OfSGYY6hgA6agZpoWYIvFGX3Gq18dM7RU67ECQme2G0Ps9ro6wFq
+         sflHdA8qiurcwinZMwCnvPu0SW5gDT9LL8szljxpca9b6Oe99HZmF98iILWrLCj9/mmd
+         KWXhxKOO82WvKPbFrUEbg9MvFWpvYu0fjvVGdNiWu0tSq1VH7l98xclcOvUEyZQz4Por
+         NP+x496fOxGef39WKz4NZ6wFpZ/tw4Ma4LGEE7qae61BDldrD23fAXay3sNt2LCZQuJp
+         02lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=C8ZloSbHLscDtk7HCPXx9UE78ji6JaCCd6vtOwW4PMA=;
+        b=icH4Hd+OGW9Tmkcp0ksiq2VYR6SEk2Qvv4c2yzW25RJqNTX5wI9xX32JEXRs+5rUIv
+         voijj+HMDqhbzjiFzQ5IvrvZxZZyUjapJ/qwS9zfDPo4Rs2WOguKpBzWWncX87d2LnK8
+         wu2xWCmWezyqlX0bjhNzucYe8fQrZYiN8x+t1bPpxDX5WecdrH5XiFLGVjvrNuT2mWuW
+         PB3pgWXnDk0qoXEu3CtmrKUQIs7LFXhHFqs23QN6GrrVlH5My5LvKGWt2dH7jxd8/hpe
+         YeIdBWUSRuiwir79V+9HsQ15A9a0N/uZV+iFp4/AWAhCmv/S4KJ69Ue8bisB9KxcLX9r
+         DHyg==
+X-Gm-Message-State: AOAM531Vim4yv2X4I4NQ0M0cIJUEei90ZZuKryRTZuXmpHWjrEEBQLHE
+        UQjh7zjgw7YTNNe4cJEWEBuUvjw4A3p17Q==
+X-Google-Smtp-Source: ABdhPJy+IxydkYV7gyy7OwCAnAT5QMWhxstq+UM+fhXZNQqQgQBwE/eYrqKgVodvnyq7MqKut/KiGg==
+X-Received: by 2002:a2e:9613:: with SMTP id v19mr3015295ljh.135.1611946491089;
+        Fri, 29 Jan 2021 10:54:51 -0800 (PST)
+Received: from localhost.localdomain (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
+        by smtp.gmail.com with ESMTPSA id n21sm9762lja.9.2021.01.29.10.54.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jan 2021 10:54:50 -0800 (PST)
+From:   Elena Afanasova <eafanasova@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com, Elena Afanasova <eafanasova@gmail.com>
+Subject: [RESEND RFC v2 1/4] KVM: add initial support for KVM_SET_IOREGION
+Date:   Fri, 29 Jan 2021 21:48:26 +0300
+Message-Id: <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1611850290.git.eafanasova@gmail.com>
+References: <cover.1611850290.git.eafanasova@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 10 Dec 2020 15:59:05 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+This vm ioctl adds or removes an ioregionfd MMIO/PIO region. Guest
+read and write accesses are dispatched through the given ioregionfd
+instead of returning from ioctl(KVM_RUN). Regions can be deleted by
+setting fds to -1.
 
-Hi,
+Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+---
+Changes in v2:
+  - changes after code review
 
-> From: Jintack Lim <jintack.lim@linaro.org>
-> 
-> Support injecting exceptions and performing exception returns to and
-> from virtual EL2.  This must be done entirely in software except when
-> taking an exception from vEL0 to vEL2 when the virtual HCR_EL2.{E2H,TGE}
-> == {1,1}  (a VHE guest hypervisor).
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> [maz: switch to common exception injection framework]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_arm.h     |  17 +++
->  arch/arm64/include/asm/kvm_emulate.h |  10 ++
->  arch/arm64/kvm/Makefile              |   2 +-
->  arch/arm64/kvm/emulate-nested.c      | 176 +++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/exception.c       |  44 +++++--
->  arch/arm64/kvm/inject_fault.c        |  62 ++++++++--
->  arch/arm64/kvm/trace_arm.h           |  59 +++++++++
->  7 files changed, 352 insertions(+), 18 deletions(-)
->  create mode 100644 arch/arm64/kvm/emulate-nested.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 4e90c2debf70..e9e10e498785 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -332,4 +332,21 @@
->  #define CPACR_EL1_TTA		(1 << 28)
->  #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
->  
-> +#define kvm_mode_names				\
-> +	{ PSR_MODE_EL0t,	"EL0t" },	\
-> +	{ PSR_MODE_EL1t,	"EL1t" },	\
-> +	{ PSR_MODE_EL1h,	"EL1h" },	\
-> +	{ PSR_MODE_EL2t,	"EL2t" },	\
-> +	{ PSR_MODE_EL2h,	"EL2h" },	\
-> +	{ PSR_MODE_EL3t,	"EL3t" },	\
-> +	{ PSR_MODE_EL3h,	"EL3h" },	\
-> +	{ PSR_AA32_MODE_USR,	"32-bit USR" },	\
-> +	{ PSR_AA32_MODE_FIQ,	"32-bit FIQ" },	\
-> +	{ PSR_AA32_MODE_IRQ,	"32-bit IRQ" },	\
-> +	{ PSR_AA32_MODE_SVC,	"32-bit SVC" },	\
-> +	{ PSR_AA32_MODE_ABT,	"32-bit ABT" },	\
-> +	{ PSR_AA32_MODE_HYP,	"32-bit HYP" },	\
-> +	{ PSR_AA32_MODE_UND,	"32-bit UND" },	\
-> +	{ PSR_AA32_MODE_SYS,	"32-bit SYS" }
-> +
->  #endif /* __ARM64_KVM_ARM_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index e3e22d364dc9..deffd3cc4443 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -33,6 +33,12 @@ enum exception_type {
->  	except_type_serror	= 0x180,
->  };
->  
-> +#define kvm_exception_type_names		\
-> +	{ except_type_sync,	"SYNC"   },	\
-> +	{ except_type_irq,	"IRQ"    },	\
-> +	{ except_type_fiq,	"FIQ"    },	\
-> +	{ except_type_serror,	"SERROR" }
-> +
->  bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
->  void kvm_skip_instr32(struct kvm_vcpu *vcpu);
->  
-> @@ -41,6 +47,10 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
->  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
->  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
->  
-> +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
-> +int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
-> +int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
-> +
->  static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
->  {
->  	return !(vcpu->arch.hcr_el2 & HCR_RW);
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 60fd181df624..672acdf1e993 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -17,11 +17,11 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
->  	 guest.o debug.o reset.o sys_regs.o \
->  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
->  	 arch_timer.o \
-> +	 emulate-nested.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
->  	 vgic/vgic-v3.o vgic/vgic-v4.o \
->  	 vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->  	 vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
->  	 vgic/vgic-its.o vgic/vgic-debug.o
-> -
->  kvm-$(CONFIG_KVM_ARM_PMU)  += pmu-emul.o
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> new file mode 100644
-> index 000000000000..ee91bcd925d8
-> --- /dev/null
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -0,0 +1,176 @@
-> +/*
-> + * Copyright (C) 2016 - Linaro and Columbia University
-> + * Author: Jintack Lim <jintack.lim@linaro.org>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_nested.h>
-> +
-> +#include "hyp/include/hyp/adjust_pc.h"
-> +
-> +#include "trace.h"
-> +
-> +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 spsr, elr, mode;
-> +	bool direct_eret;
-> +
-> +	/*
-> +	 * Going through the whole put/load motions is a waste of time
-> +	 * if this is a VHE guest hypervisor returning to its own
-> +	 * userspace, or the hypervisor performing a local exception
-> +	 * return. No need to save/restore registers, no need to
-> +	 * switch S2 MMU. Just do the canonical ERET.
-> +	 */
-> +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +
-> +	direct_eret  = (mode == PSR_MODE_EL0t &&
-> +			vcpu_el2_e2h_is_set(vcpu) &&
-> +			vcpu_el2_tge_is_set(vcpu));
-> +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
-> +
-> +	if (direct_eret) {
-> +		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> +		*vcpu_cpsr(vcpu) = spsr;
-> +		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
-> +		return;
-> +	}
-> +
-> +	preempt_disable();
-> +	kvm_arch_vcpu_put(vcpu);
-> +
-> +	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
-> +
-> +	trace_kvm_nested_eret(vcpu, elr, spsr);
-> +
-> +	/*
-> +	 * Note that the current exception level is always the virtual EL2,
-> +	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
-> +	 */
-> +	*vcpu_pc(vcpu) = elr;
-> +	*vcpu_cpsr(vcpu) = spsr;
-> +
-> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +	preempt_enable();
-> +}
-> +
-> +static void kvm_inject_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
-> +				     enum exception_type type)
-> +{
-> +	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
-> +
-> +	switch (type) {
-> +	case except_type_sync:
-> +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_ELx_SYNC;
-> +		break;
-> +	case except_type_irq:
-> +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_ELx_IRQ;
-> +		break;
-> +	default:
-> +		WARN_ONCE(1, "Unsupported EL2 exception injection %d\n", type);
-> +	}
-> +
-> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL2		|
-> +			     KVM_ARM64_PENDING_EXCEPTION);
-> +
-> +	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
-> +}
-> +
-> +/*
-> + * Emulate taking an exception to EL2.
-> + * See ARM ARM J8.1.2 AArch64.TakeException()
-> + */
-> +static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
-> +			     enum exception_type type)
-> +{
-> +	u64 pstate, mode;
-> +	bool direct_inject;
-> +
-> +	if (!nested_virt_in_use(vcpu)) {
-> +		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
-> +				__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/*
-> +	 * As for ERET, we can avoid doing too much on the injection path by
-> +	 * checking that we either took the exception from a VHE host
-> +	 * userspace or from vEL2. In these cases, there is no change in
-> +	 * translation regime (or anything else), so let's do as little as
-> +	 * possible.
-> +	 */
-> +	pstate = *vcpu_cpsr(vcpu);
-> +	mode = pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +
-> +	direct_inject  = (mode == PSR_MODE_EL0t &&
-> +			  vcpu_el2_e2h_is_set(vcpu) &&
-> +			  vcpu_el2_tge_is_set(vcpu));
-> +	direct_inject |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
-> +
-> +	if (direct_inject) {
-> +		kvm_inject_el2_exception(vcpu, esr_el2, type);
-> +		return 1;
-> +	}
-> +
-> +	preempt_disable();
-> +	kvm_arch_vcpu_put(vcpu);
-> +
-> +	kvm_inject_el2_exception(vcpu, esr_el2, type);
-> +
-> +	/*
-> +	 * A hard requirement is that a switch between EL1 and EL2
-> +	 * contexts has to happen between a put/load, so that we can
-> +	 * pick the correct timer and interrupt configuration, among
-> +	 * other things.
-> +	 *
-> +	 * Make sure the exception actually took place before we load
-> +	 * the new context.
-> +	 */
-> +	__adjust_pc(vcpu);
-> +
-> +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +	preempt_enable();
-> +
-> +	return 1;
-> +}
-> +
-> +int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2)
-> +{
-> +	return kvm_inject_nested(vcpu, esr_el2, except_type_sync);
-> +}
-> +
-> +int kvm_inject_nested_irq(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * Do not inject an irq if the:
-> +	 *  - Current exception level is EL2, and
-> +	 *  - virtual HCR_EL2.TGE == 0
-> +	 *  - virtual HCR_EL2.IMO == 0
-> +	 *
-> +	 * See Table D1-17 "Physical interrupt target and masking when EL3 is
-> +	 * not implemented and EL2 is implemented" in ARM DDI 0487C.a.
-> +	 */
-> +
-> +	if (vcpu_mode_el2(vcpu) && !vcpu_el2_tge_is_set(vcpu) &&
-> +	    !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_IMO))
-> +		return 1;
-> +
-> +	/* esr_el2 value doesn't matter for exits due to irqs. */
-> +	return kvm_inject_nested(vcpu, 0, except_type_irq);
-> +}
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 73629094f903..7c8b3681dafd 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/
-> @@ -22,7 +22,9 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  {
->  	u64 val;
->  
-> -	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
-> +	if (unlikely(nested_virt_in_use(vcpu)))
-> +		return vcpu_read_sys_reg(vcpu, reg);
-> +	else if (__vcpu_read_sys_reg_from_cpu(reg, &val))
->  		return val;
->  
->  	return __vcpu_sys_reg(vcpu, reg);
-> @@ -30,14 +32,26 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  
->  static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  {
-> -	if (__vcpu_write_sys_reg_to_cpu(val, reg))
-> +	if (unlikely(nested_virt_in_use(vcpu)))
-> +		vcpu_write_sys_reg(vcpu, val, reg);
-> +	else if (__vcpu_write_sys_reg_to_cpu(val, reg))
->  		return;
->  
->  	 __vcpu_sys_reg(vcpu, reg) = val;
->  }
->  
-> -static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
-> +static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
-> +			      u64 val)
->  {
-> +	if (unlikely(nested_virt_in_use(vcpu))) {
-> +		if (target_mode == PSR_MODE_EL1h)
-> +			vcpu_write_sys_reg(vcpu, val, SPSR_EL1);
-> +		else
-> +			vcpu_write_sys_reg(vcpu, val, SPSR_EL2);
-> +
-> +		return;
-> +	}
-> +
->  	write_sysreg_el1(val, SYS_SPSR);
->  }
->  
-> @@ -97,6 +111,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
->  		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
->  		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
->  		break;
-> +	case PSR_MODE_EL2h:
-> +		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL2);
-> +		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-> +		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
-> +		break;
->  	default:
->  		/* Don't do that */
->  		BUG();
-> @@ -148,7 +167,7 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
->  	new |= target_mode;
->  
->  	*vcpu_cpsr(vcpu) = new;
-> -	__vcpu_write_spsr(vcpu, old);
-> +	__vcpu_write_spsr(vcpu, target_mode, old);
->  }
->  
->  /*
-> @@ -319,11 +338,22 @@ void kvm_inject_exception(struct kvm_vcpu *vcpu)
->  		      KVM_ARM64_EXCEPT_AA64_EL1):
->  			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
->  			break;
-> +
-> +		case (KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
-> +		      KVM_ARM64_EXCEPT_AA64_EL2):
-> +			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_sync);
-> +			break;
-> +
-> +		case (KVM_ARM64_EXCEPT_AA64_ELx_IRQ |
-> +		      KVM_ARM64_EXCEPT_AA64_EL2):
-> +			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_irq);
-> +			break;
-> +
->  		default:
->  			/*
-> -			 * Only EL1_SYNC makes sense so far, EL2_{SYNC,IRQ}
-> -			 * will be implemented at some point. Everything
-> -			 * else gets silently ignored.
-> +			 * Only EL1_SYNC and EL2_{SYNC,IRQ} makes
-> +			 * sense so far. Everything else gets silently
-> +			 * ignored.
->  			 */
->  			break;
->  		}
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index b47df73e98d7..530562eb09fd 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -14,17 +14,50 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/esr.h>
->  
-> +static void pend_sync_exception(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
-> +			     KVM_ARM64_PENDING_EXCEPTION);
-> +
-> +	/* If not nesting, EL1 is the only possible exception target */
-> +	if (likely(!nested_virt_in_use(vcpu))) {
+ arch/x86/kvm/Kconfig     |   1 +
+ arch/x86/kvm/Makefile    |   1 +
+ arch/x86/kvm/x86.c       |   1 +
+ include/linux/kvm_host.h |  17 +++
+ include/uapi/linux/kvm.h |  23 ++++
+ virt/kvm/Kconfig         |   3 +
+ virt/kvm/eventfd.c       |  25 +++++
+ virt/kvm/eventfd.h       |  14 +++
+ virt/kvm/ioregion.c      | 232 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/ioregion.h      |  15 +++
+ virt/kvm/kvm_main.c      |  11 ++
+ 11 files changed, 343 insertions(+)
+ create mode 100644 virt/kvm/eventfd.h
+ create mode 100644 virt/kvm/ioregion.c
+ create mode 100644 virt/kvm/ioregion.h
 
-This breaks compilation for the next 14 patches, because
-nested_virt_in_use() is unknown here. Patch 23/66 fixes this by adding
-kvm_nested.h to kvm_emulate.h.
-Shall we do this already in this patch here, or pull in kvm_nested.h in
-every C file we use nested_virt_in_use(), like exception.c above?
-
-Cheers,
-Andre
-
-> +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * With NV, we need to pick between EL1 and EL2. Note that we
-> +	 * never deal with a nesting exception here, hence never
-> +	 * changing context, and the exception itself can be delayed
-> +	 * until the next entry.
-> +	 */
-> +	switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
-> +	case PSR_MODE_EL2h:
-> +	case PSR_MODE_EL2t:
-> +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL2;
-> +		break;
-> +	case PSR_MODE_EL1h:
-> +	case PSR_MODE_EL1t:
-> +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
-> +		break;
-> +	case PSR_MODE_EL0t:
-> +		if (vcpu_el2_tge_is_set(vcpu) & HCR_TGE)
-> +			vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL2;
-> +		else
-> +			vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +}
-> +
->  static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
->  {
->  	unsigned long cpsr = *vcpu_cpsr(vcpu);
->  	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
->  	u32 esr = 0;
->  
-> -	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
-> -			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
-> -			     KVM_ARM64_PENDING_EXCEPTION);
-> -
-> -	vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
-> +	pend_sync_exception(vcpu);
->  
->  	/*
->  	 * Build an {i,d}abort, depending on the level and the
-> @@ -45,16 +78,22 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
->  	if (!is_iabt)
->  		esr |= ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT;
->  
-> -	vcpu_write_sys_reg(vcpu, esr | ESR_ELx_FSC_EXTABT, ESR_EL1);
-> +	esr |= ESR_ELx_FSC_EXTABT;
-> +
-> +	if (vcpu->arch.flags & KVM_ARM64_EXCEPT_AA64_EL1) {
-> +		vcpu_write_sys_reg(vcpu, addr, FAR_EL1);
-> +		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> +	} else {
-> +		vcpu_write_sys_reg(vcpu, addr, FAR_EL2);
-> +		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
-> +	}
->  }
->  
->  static void inject_undef64(struct kvm_vcpu *vcpu)
->  {
->  	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
->  
-> -	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
-> -			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
-> -			     KVM_ARM64_PENDING_EXCEPTION);
-> +	pend_sync_exception(vcpu);
->  
->  	/*
->  	 * Build an unknown exception, depending on the instruction
-> @@ -63,7 +102,10 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->  	if (kvm_vcpu_trap_il_is32bit(vcpu))
->  		esr |= ESR_ELx_IL;
->  
-> -	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> +	if (vcpu->arch.flags & KVM_ARM64_EXCEPT_AA64_EL1)
-> +		vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> +	else
-> +		vcpu_write_sys_reg(vcpu, esr, ESR_EL2);
->  }
->  
->  #define DFSR_FSC_EXTABT_LPAE	0x10
-> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> index ff0444352bba..5707011c4f47 100644
-> --- a/arch/arm64/kvm/trace_arm.h
-> +++ b/arch/arm64/kvm/trace_arm.h
-> @@ -2,6 +2,7 @@
->  #if !defined(_TRACE_ARM_ARM64_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
->  #define _TRACE_ARM_ARM64_KVM_H
->  
-> +#include <asm/kvm_emulate.h>
->  #include <kvm/arm_arch_timer.h>
->  #include <linux/tracepoint.h>
->  
-> @@ -367,6 +368,64 @@ TRACE_EVENT(kvm_timer_emulate,
->  		  __entry->timer_idx, __entry->should_fire)
->  );
->  
-> +TRACE_EVENT(kvm_nested_eret,
-> +	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long elr_el2,
-> +		 unsigned long spsr_el2),
-> +	TP_ARGS(vcpu, elr_el2, spsr_el2),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(struct kvm_vcpu *,	vcpu)
-> +		__field(unsigned long,		elr_el2)
-> +		__field(unsigned long,		spsr_el2)
-> +		__field(unsigned long,		target_mode)
-> +		__field(unsigned long,		hcr_el2)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->vcpu = vcpu;
-> +		__entry->elr_el2 = elr_el2;
-> +		__entry->spsr_el2 = spsr_el2;
-> +		__entry->target_mode = spsr_el2 & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +		__entry->hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-> +	),
-> +
-> +	TP_printk("elr_el2: 0x%lx spsr_el2: 0x%08lx (M: %s) hcr_el2: %lx",
-> +		  __entry->elr_el2, __entry->spsr_el2,
-> +		  __print_symbolic(__entry->target_mode, kvm_mode_names),
-> +		  __entry->hcr_el2)
-> +);
-> +
-> +TRACE_EVENT(kvm_inject_nested_exception,
-> +	TP_PROTO(struct kvm_vcpu *vcpu, u64 esr_el2, int type),
-> +	TP_ARGS(vcpu, esr_el2, type),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(struct kvm_vcpu *,		vcpu)
-> +		__field(unsigned long,			esr_el2)
-> +		__field(int,				type)
-> +		__field(unsigned long,			spsr_el2)
-> +		__field(unsigned long,			pc)
-> +		__field(unsigned long,			source_mode)
-> +		__field(unsigned long,			hcr_el2)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->vcpu = vcpu;
-> +		__entry->esr_el2 = esr_el2;
-> +		__entry->type = type;
-> +		__entry->spsr_el2 = *vcpu_cpsr(vcpu);
-> +		__entry->pc = *vcpu_pc(vcpu);
-> +		__entry->source_mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-> +		__entry->hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-> +	),
-> +
-> +	TP_printk("%s: esr_el2 0x%lx elr_el2: 0x%lx spsr_el2: 0x%08lx (M: %s) hcr_el2: %lx",
-> +		  __print_symbolic(__entry->type, kvm_exception_type_names),
-> +		  __entry->esr_el2, __entry->pc, __entry->spsr_el2,
-> +		  __print_symbolic(__entry->source_mode, kvm_mode_names),
-> +		  __entry->hcr_el2)
-> +);
-> +
->  #endif /* _TRACE_ARM_ARM64_KVM_H */
->  
->  #undef TRACE_INCLUDE_PATH
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index f92dfd8ef10d..b914ef375199 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -33,6 +33,7 @@ config KVM
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_EVENTFD
++	select KVM_IOREGION
+ 	select KVM_ASYNC_PF
+ 	select USER_RETURN_NOTIFIER
+ 	select KVM_MMIO
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index b804444e16d4..b3b17dc9f7d4 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
+ kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
+ 				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
++kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
+ 
+ kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
+ 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index e545a8a613b1..ddb28f5ca252 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_X86_USER_SPACE_MSR:
+ 	case KVM_CAP_X86_MSR_FILTER:
+ 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
++	case KVM_CAP_IOREGIONFD:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SYNC_REGS:
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 7f2e2a09ebbd..7cd667dddba9 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -470,6 +470,10 @@ struct kvm {
+ 		struct mutex      resampler_lock;
+ 	} irqfds;
+ 	struct list_head ioeventfds;
++#endif
++#ifdef CONFIG_KVM_IOREGION
++	struct list_head ioregions_mmio;
++	struct list_head ioregions_pio;
+ #endif
+ 	struct kvm_vm_stat stat;
+ 	struct kvm_arch arch;
+@@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args)
+ 
+ #endif /* CONFIG_HAVE_KVM_EVENTFD */
+ 
++#ifdef CONFIG_KVM_IOREGION
++void kvm_ioregionfd_init(struct kvm *kvm);
++int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args);
++
++#else
++
++static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
++static inline int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
++{
++	return -ENOSYS;
++}
++#endif
++
+ void kvm_arch_irq_routing_update(struct kvm *kvm);
+ 
+ static inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index ca41220b40b8..81e775778c66 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -732,6 +732,27 @@ struct kvm_ioeventfd {
+ 	__u8  pad[36];
+ };
+ 
++enum {
++	kvm_ioregion_flag_nr_pio,
++	kvm_ioregion_flag_nr_posted_writes,
++	kvm_ioregion_flag_nr_max,
++};
++
++#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
++#define KVM_IOREGION_POSTED_WRITES (1 << kvm_ioregion_flag_nr_posted_writes)
++
++#define KVM_IOREGION_VALID_FLAG_MASK ((1 << kvm_ioregion_flag_nr_max) - 1)
++
++struct kvm_ioregion {
++	__u64 guest_paddr; /* guest physical address */
++	__u64 memory_size; /* bytes */
++	__u64 user_data;
++	__s32 rfd;
++	__s32 wfd;
++	__u32 flags;
++	__u8  pad[28];
++};
++
+ #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+ #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+ #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+@@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_X86_USER_SPACE_MSR 188
+ #define KVM_CAP_X86_MSR_FILTER 189
+ #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
++#define KVM_CAP_IOREGIONFD 191
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
+ 					struct kvm_userspace_memory_region)
+ #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+ #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
++#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct kvm_ioregion)
+ 
+ /* enable ucontrol for s390 */
+ struct kvm_s390_ucas_mapping {
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 1c37ccd5d402..5e6620bbf000 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
+        bool
+        select EVENTFD
+ 
++config KVM_IOREGION
++       bool
++
+ config KVM_MMIO
+        bool
+ 
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index c2323c27a28b..aadb73903f8b 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -27,6 +27,7 @@
+ #include <trace/events/kvm.h>
+ 
+ #include <kvm/iodev.h>
++#include "ioregion.h"
+ 
+ #ifdef CONFIG_HAVE_KVM_IRQFD
+ 
+@@ -755,6 +756,23 @@ static const struct kvm_io_device_ops ioeventfd_ops = {
+ 	.destructor = ioeventfd_destructor,
+ };
+ 
++#ifdef CONFIG_KVM_IOREGION
++/* assumes kvm->slots_lock held */
++bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
++			  u64 start, u64 size)
++{
++	struct _ioeventfd *_p;
++
++	list_for_each_entry(_p, &kvm->ioeventfds, list)
++		if (_p->bus_idx == bus_idx &&
++		    overlap(start, size, _p->addr,
++			    !_p->length ? 8 : _p->length))
++			return true;
++
++	return false;
++}
++#endif
++
+ /* assumes kvm->slots_lock held */
+ static bool
+ ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
+@@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
+ 		       _p->datamatch == p->datamatch))))
+ 			return true;
+ 
++#ifdef CONFIG_KVM_IOREGION
++	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx == KVM_PIO_BUS)
++		if (kvm_ioregion_collides(kvm, p->bus_idx, p->addr,
++					  !p->length ? 8 : p->length))
++			return true;
++#endif
++
+ 	return false;
+ }
+ 
+diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
+new file mode 100644
+index 000000000000..73a621eebae3
+--- /dev/null
++++ b/virt/kvm/eventfd.h
+@@ -0,0 +1,14 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __KVM_EVENTFD_H__
++#define __KVM_EVENTFD_H__
++
++#ifdef CONFIG_KVM_IOREGION
++bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size);
++#else
++static inline bool
++kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size)
++{
++	return false;
++}
++#endif
++#endif
+diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
+new file mode 100644
+index 000000000000..48ff92bca966
+--- /dev/null
++++ b/virt/kvm/ioregion.c
+@@ -0,0 +1,232 @@
++// SPDX-License-Identifier: GPL-2.0-only
++#include <linux/kvm_host.h>
++#include <linux/fs.h>
++#include <kvm/iodev.h>
++#include "eventfd.h"
++
++void
++kvm_ioregionfd_init(struct kvm *kvm)
++{
++	INIT_LIST_HEAD(&kvm->ioregions_mmio);
++	INIT_LIST_HEAD(&kvm->ioregions_pio);
++}
++
++struct ioregion {
++	struct list_head     list;
++	u64                  paddr;  /* guest physical address */
++	u64                  size;   /* size in bytes */
++	struct file         *rf;
++	struct file         *wf;
++	u64                  user_data; /* opaque token used by userspace */
++	struct kvm_io_device dev;
++	bool                 posted_writes;
++};
++
++static inline struct ioregion *
++to_ioregion(struct kvm_io_device *dev)
++{
++	return container_of(dev, struct ioregion, dev);
++}
++
++/* assumes kvm->slots_lock held */
++static void
++ioregion_release(struct ioregion *p)
++{
++	fput(p->rf);
++	fput(p->wf);
++	list_del(&p->list);
++	kfree(p);
++}
++
++static int
++ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
++	      int len, void *val)
++{
++	return -EOPNOTSUPP;
++}
++
++static int
++ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
++		int len, const void *val)
++{
++	return -EOPNOTSUPP;
++}
++
++/*
++ * This function is called as KVM is completely shutting down.  We do not
++ * need to worry about locking just nuke anything we have as quickly as possible
++ */
++static void
++ioregion_destructor(struct kvm_io_device *this)
++{
++	struct ioregion *p = to_ioregion(this);
++
++	ioregion_release(p);
++}
++
++static const struct kvm_io_device_ops ioregion_ops = {
++	.read       = ioregion_read,
++	.write      = ioregion_write,
++	.destructor = ioregion_destructor,
++};
++
++static inline struct list_head *
++get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
++{
++	return (bus_idx == KVM_MMIO_BUS) ?
++		&kvm->ioregions_mmio : &kvm->ioregions_pio;
++}
++
++/* check for not overlapping case and reverse */
++inline bool
++overlap(u64 start1, u64 size1, u64 start2, u64 size2)
++{
++	u64 end1 = start1 + size1 - 1;
++	u64 end2 = start2 + size2 - 1;
++
++	return !(end1 < start2 || start1 >= end2);
++}
++
++/* assumes kvm->slots_lock held */
++bool
++kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
++		      u64 start, u64 size)
++{
++	struct ioregion *_p;
++	struct list_head *ioregions;
++
++	ioregions = get_ioregion_list(kvm, bus_idx);
++	list_for_each_entry(_p, ioregions, list)
++		if (overlap(start, size, _p->paddr, _p->size))
++			return true;
++
++	return false;
++}
++
++/* assumes kvm->slots_lock held */
++static bool
++ioregion_collision(struct kvm *kvm, struct ioregion *p, enum kvm_bus bus_idx)
++{
++	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p->size) ||
++	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p->size))
++		return true;
++
++	return false;
++}
++
++static enum kvm_bus
++get_bus_from_flags(__u32 flags)
++{
++	if (flags & KVM_IOREGION_PIO)
++		return KVM_PIO_BUS;
++	return KVM_MMIO_BUS;
++}
++
++int
++kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
++{
++	struct ioregion *p;
++	struct file *rfile, *wfile;
++	enum kvm_bus bus_idx;
++	int ret = 0;
++
++	if (!args->memory_size)
++		return -EINVAL;
++	if ((args->guest_paddr + args->memory_size - 1) < args->guest_paddr)
++		return -EINVAL;
++
++	rfile = fget(args->rfd);
++	if (!rfile)
++		return -EBADF;
++	wfile = fget(args->wfd);
++	if (!wfile) {
++		fput(rfile);
++		return -EBADF;
++	}
++	if ((rfile->f_flags & O_NONBLOCK) || (wfile->f_flags & O_NONBLOCK)) {
++		ret = -EINVAL;
++		goto fail;
++	}
++	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT);
++	if (!p) {
++		ret = -ENOMEM;
++		goto fail;
++	}
++
++	INIT_LIST_HEAD(&p->list);
++	p->paddr = args->guest_paddr;
++	p->size = args->memory_size;
++	p->user_data = args->user_data;
++	p->rf = rfile;
++	p->wf = wfile;
++	p->posted_writes = args->flags & KVM_IOREGION_POSTED_WRITES;
++	bus_idx = get_bus_from_flags(args->flags);
++
++	mutex_lock(&kvm->slots_lock);
++
++	if (ioregion_collision(kvm, p, bus_idx)) {
++		ret = -EEXIST;
++		goto unlock_fail;
++	}
++	kvm_iodevice_init(&p->dev, &ioregion_ops);
++	ret = kvm_io_bus_register_dev(kvm, bus_idx, p->paddr, p->size,
++				      &p->dev);
++	if (ret < 0)
++		goto unlock_fail;
++	list_add_tail(&p->list, get_ioregion_list(kvm, bus_idx));
++
++	mutex_unlock(&kvm->slots_lock);
++
++	return 0;
++
++unlock_fail:
++	mutex_unlock(&kvm->slots_lock);
++	kfree(p);
++fail:
++	fput(rfile);
++	fput(wfile);
++
++	return ret;
++}
++
++static int
++kvm_rm_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
++{
++	struct ioregion         *p, *tmp;
++	enum kvm_bus             bus_idx;
++	int                      ret = -ENOENT;
++	struct list_head        *ioregions;
++
++	if (args->rfd != -1 || args->wfd != -1)
++		return -EINVAL;
++
++	bus_idx = get_bus_from_flags(args->flags);
++	ioregions = get_ioregion_list(kvm, bus_idx);
++
++	mutex_lock(&kvm->slots_lock);
++
++	list_for_each_entry_safe(p, tmp, ioregions, list) {
++		if (p->paddr == args->guest_paddr  &&
++		    p->size == args->memory_size) {
++			kvm_io_bus_unregister_dev(kvm, bus_idx, &p->dev);
++			ioregion_release(p);
++			ret = 0;
++			break;
++		}
++	}
++
++	mutex_unlock(&kvm->slots_lock);
++
++	return ret;
++}
++
++int
++kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
++{
++	if (args->flags & ~KVM_IOREGION_VALID_FLAG_MASK)
++		return -EINVAL;
++	if (args->rfd == -1 || args->wfd == -1)
++		return kvm_rm_ioregion(kvm, args);
++
++	return kvm_set_ioregion(kvm, args);
++}
+diff --git a/virt/kvm/ioregion.h b/virt/kvm/ioregion.h
+new file mode 100644
+index 000000000000..23ffa812ec7a
+--- /dev/null
++++ b/virt/kvm/ioregion.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __KVM_IOREGION_H__
++#define __KVM_IOREGION_H__
++
++#ifdef CONFIG_KVM_IOREGION
++inline bool overlap(u64 start1, u64 size1, u64 start2, u64 size2);
++bool kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size);
++#else
++static inline bool
++kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size)
++{
++	return false;
++}
++#endif
++#endif
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 2541a17ff1c4..88b92fc3da51 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -747,6 +747,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	mmgrab(current->mm);
+ 	kvm->mm = current->mm;
+ 	kvm_eventfd_init(kvm);
++	kvm_ioregionfd_init(kvm);
+ 	mutex_init(&kvm->lock);
+ 	mutex_init(&kvm->irq_lock);
+ 	mutex_init(&kvm->slots_lock);
+@@ -3708,6 +3709,16 @@ static long kvm_vm_ioctl(struct file *filp,
+ 		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
+ 		break;
+ 	}
++	case KVM_SET_IOREGION: {
++		struct kvm_ioregion data;
++
++		r = -EFAULT;
++		if (copy_from_user(&data, argp, sizeof(data)))
++			goto out;
++
++		r = kvm_ioregionfd(kvm, &data);
++		break;
++	}
+ 	case KVM_GET_DIRTY_LOG: {
+ 		struct kvm_dirty_log log;
+ 
+-- 
+2.25.1
 
