@@ -2,43 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 723233085CF
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 07:33:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CD823085F7
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 07:44:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232204AbhA2G3x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 01:29:53 -0500
-Received: from mx12.kaspersky-labs.com ([91.103.66.155]:56223 "EHLO
-        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232194AbhA2G3k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 01:29:40 -0500
-Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
-        by relay12.kaspersky-labs.com (Postfix) with ESMTP id D4CED7612E;
-        Fri, 29 Jan 2021 09:28:51 +0300 (MSK)
+        id S232180AbhA2Gmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 01:42:44 -0500
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:44162 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231942AbhA2Gml (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 01:42:41 -0500
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id B548B521A8F;
+        Fri, 29 Jan 2021 09:41:54 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
-        s=mail; t=1611901731;
-        bh=QZjqDhhfWcW+0uZiIBXiBKnmWJ8H4HqGbYSfjDcKFJ0=;
+        s=mail; t=1611902514;
+        bh=+IG0V9Y8o9BcqXTY5Yf/8fDBfu3dY09Y0gxQgcF03/A=;
         h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
-        b=IpQH8aXXskkY/RhabPw5AGDoJiQfmpRsXX50HlZJZw60xhAnWTgd7U+jzFoX8OFC3
-         XehXBQi3LsWs+K0uxvnuvjhpX2ldWY3XZ2eQnKDUhf5fGxeIpjvgXYMVsSSLGs0WeB
-         eqswiQYXFG4GNuY+64P0wvsQEljhnaUe57JwjHjY=
+        b=ocmf7x8j1CgAxYS8RQRmtKdw1R7pRm4c50GTTykUL1eD5VGVJvfzr4kwORfbwaHNh
+         lhG5o7u4nbm+9lnKxfDdN9JHuUPdyCzSybRQDzFcKwoTLmeiRU/gXgTF9GneUeBGD/
+         lOt1TAgLYS3l5jkI2M1QI0nDSTpn+4EcchEz19KU=
 Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
-        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id E043C76168;
-        Fri, 29 Jan 2021 09:28:50 +0300 (MSK)
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id C5ECB521A7A;
+        Fri, 29 Jan 2021 09:41:53 +0300 (MSK)
 Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
  (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Fri, 29
- Jan 2021 09:28:50 +0300
-Subject: Re: [RFC PATCH v3 03/13] af_vsock: implement SEQPACKET rx loop
+ Jan 2021 09:41:52 +0300
+Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support
 To:     Stefano Garzarella <sgarzare@redhat.com>
 CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Andra Paraschiv <andraprs@amazon.com>,
         Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
         Jeff Vander Stoep <jeffv@google.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "virtualization@lists.linux-foundation.org" 
@@ -48,15 +49,14 @@ CC:     Stefan Hajnoczi <stefanha@redhat.com>,
         "stsp2@yandex.ru" <stsp2@yandex.ru>,
         "oxffffaa@gmail.com" <oxffffaa@gmail.com>
 References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210125111239.598377-1-arseny.krasnov@kaspersky.com>
- <20210128165518.ho3csm5u7v5pnwnd@steredhat>
+ <20210128171923.esyna5ccv5s27jyu@steredhat>
 From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Message-ID: <5e000f18-1457-068d-10c5-0a349c938497@kaspersky.com>
-Date:   Fri, 29 Jan 2021 09:28:49 +0300
+Message-ID: <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
+Date:   Fri, 29 Jan 2021 09:41:50 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210128165518.ho3csm5u7v5pnwnd@steredhat>
+In-Reply-To: <20210128171923.esyna5ccv5s27jyu@steredhat>
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -65,7 +65,7 @@ X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
  (10.64.67.243)
 X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
 X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 01/29/2021 06:13:35
+X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 01/29/2021 06:23:39
 X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
 X-KSE-AntiSpam-Method: none
 X-KSE-AntiSpam-Rate: 0
@@ -84,7 +84,7 @@ X-KSE-AntiSpam-Info: Method: none
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Deterministic
 X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/29/2021 06:16:00
+X-KSE-Antiphishing-Bases: 01/29/2021 06:26:00
 X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
  rules found
 X-KSE-Antivirus-Interceptor-Info: scan successful
@@ -105,172 +105,144 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 28.01.2021 19:55, Stefano Garzarella wrote:
-> On Mon, Jan 25, 2021 at 02:12:36PM +0300, Arseny Krasnov wrote:
->> This adds receive loop for SEQPACKET. It looks like receive loop for
->> SEQPACKET, but there is a little bit difference:
->> 1) It doesn't call notify callbacks.
->> 2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
->>   there is no sense for these values in SEQPACKET case.
->> 3) It waits until whole record is received or error is found during
->>   receiving.
->> 4) It processes and sets 'MSG_TRUNC' flag.
+On 28.01.2021 20:19, Stefano Garzarella wrote:
+> Hi Arseny,
+> I reviewed a part, tomorrow I hope to finish the other patches.
+>
+> Just a couple of comments in the TODOs below.
+>
+> On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
+>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
+>> transport.
+>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>> do it, new packet operation was added: it marks start of record (with
+>> record length in header), such packet doesn't carry any data.  To send
+>> record, packet with start marker is sent first, then all data is sent
+>> as usual 'RW' packets. On receiver's side, length of record is known
+> >from packet with start record marker. Now as  packets of one socket
+>> are not reordered neither on vsock nor on vhost transport layers, such
+>> marker allows to restore original record on receiver's side. If user's
+>> buffer is smaller that record length, when all out of size data is
+>> dropped.
+>> 	Maximum length of datagram is not limited as in stream socket,
+>> because same credit logic is used. Difference with stream socket is
+>> that user is not woken up until whole record is received or error
+>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>> 	Tests also implemented.
 >>
->> So to avoid extra conditions for two types of socket inside one loop, two
->> independent functions were created.
+>> Arseny Krasnov (13):
+>>  af_vsock: prepare for SOCK_SEQPACKET support
+>>  af_vsock: prepare 'vsock_connectible_recvmsg()'
+>>  af_vsock: implement SEQPACKET rx loop
+>>  af_vsock: implement send logic for SOCK_SEQPACKET
+>>  af_vsock: rest of SEQPACKET support
+>>  af_vsock: update comments for stream sockets
+>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>  virtio/vsock: fetch length for SEQPACKET record
+>>  virtio/vsock: add SEQPACKET receive logic
+>>  virtio/vsock: rest of SOCK_SEQPACKET support
+>>  virtio/vsock: setup SEQPACKET ops for transport
+>>  vhost/vsock: setup SEQPACKET ops for transport
+>>  vsock_test: add SOCK_SEQPACKET tests
+>>
+>> drivers/vhost/vsock.c                   |   7 +-
+>> include/linux/virtio_vsock.h            |  12 +
+>> include/net/af_vsock.h                  |   6 +
+>> include/uapi/linux/virtio_vsock.h       |   9 +
+>> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
+>> net/vmw_vsock/virtio_transport.c        |   4 +
+>> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
+>> tools/testing/vsock/util.c              |  32 +-
+>> tools/testing/vsock/util.h              |   3 +
+>> tools/testing/vsock/vsock_test.c        | 126 +++++
+>> 10 files changed, 862 insertions(+), 175 deletions(-)
+>>
+>> TODO:
+>> - Support for record integrity control. As transport could drop some
+>>   packets, something like "record-id" and record end marker need to
+>>   be implemented. Idea is that SEQ_BEGIN packet carries both record
+>>   length and record id, end marker(let it be SEQ_END) carries only
+>>   record id. To be sure that no one packet was lost, receiver checks
+>>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
+>>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
+>>   means that both markers were not dropped. I think that easiest way
+>>   to implement record id for SEQ_BEGIN is to reuse another field of
+>>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
+>>   SEQ_END record id could be stored in 'flags'.
+> I don't really like the idea of reusing the 'flags' field for this 
+> purpose.
+>
+>>     Another way to implement it, is to move metadata of both SEQ_END
+>>   and SEQ_BEGIN to payload. But this approach has problem, because
+>>   if we move something to payload, such payload is accounted by
+>>   credit logic, which fragments payload, while payload with record
+>>   length and id couldn't be fragmented. One way to overcome it is to
+>>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
+>>   is to update 'stream_has_space()' function: current implementation
+>>   return non-zero when at least 1 byte is allowed to use,but updated
+>>   version will have extra argument, which is needed length. For 'RW'
+>>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
+>>   record id) and for SEQ_END it is sizeof(record id).
+> Is the payload accounted by credit logic also if hdr.op is not 
+> VIRTIO_VSOCK_OP_RW?
+
+Yes, on send any packet with payload could be fragmented if
+
+there is not enough space at receiver. On receive 'fwd_cnt' and
+
+'buf_alloc' are updated with header of every packet. Of course,
+
+to every such case i've described i can add check for 'RW'
+
+packet, to exclude payload from credit accounting, but this is
+
+bunch of dumb checks.
+
+>
+> I think that we can define a specific header to put after the 
+> virtio_vsock_hdr when hdr.op is SEQ_BEGIN or SEQ_END, and in this header 
+> we can store the id and the length of the message.
+
+I think it is better than use payload and touch credit logic
+
+>
+>> - What to do, when server doesn't support SOCK_SEQPACKET. In current
+>>   implementation RST is replied in the same way when listening port
+>>   is not found. I think that current RST is enough,because case when
+>>   server doesn't support SEQ_PACKET is same when listener missed(e.g.
+>>   no listener in both cases).
+> I think so, but I'll check better if we can have some issues.
+>
+> Thanks,
+> Stefano
+>
+>> v2 -> v3:
+>> - patches reorganized: split for prepare and implementation patches
+>> - local variables are declared in "Reverse Christmas tree" manner
+>> - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>>   fields access
+>> - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>>   between stream and seqpacket sockets.
+>> - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+>> - af_vsock.c: 'vsock_wait_data()' refactored.
+>>
+>> v1 -> v2:
+>> - patches reordered: af_vsock.c related changes now before virtio vsock
+>> - patches reorganized: more small patches, where +/- are not mixed
+>> - tests for SOCK_SEQPACKET added
+>> - all commit messages updated
+>> - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>>   'vsock_connectible_recvmsg()'
+>> - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>>   was not found
+>> - virtio_transport_common.c: transport callback for seqpacket dequeue
+>> - virtio_transport_common.c: simplified
+>>   'virtio_transport_recv_connected()'
+>> - virtio_transport_common.c: send reset on socket and packet type
+>> 			      mismatch.
 >>
 >> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->> ---
->> include/net/af_vsock.h   |   5 ++
->> net/vmw_vsock/af_vsock.c | 102 ++++++++++++++++++++++++++++++++++++++-
->> 2 files changed, 106 insertions(+), 1 deletion(-)
 >>
->> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->> index b1c717286993..46073842d489 100644
->> --- a/include/net/af_vsock.h
->> +++ b/include/net/af_vsock.h
->> @@ -135,6 +135,11 @@ struct vsock_transport {
->> 	bool (*stream_is_active)(struct vsock_sock *);
->> 	bool (*stream_allow)(u32 cid, u32 port);
->>
->> +	/* SEQ_PACKET. */
->> +	size_t (*seqpacket_seq_get_len)(struct vsock_sock *);
->> +	ssize_t (*seqpacket_dequeue)(struct vsock_sock *, struct msghdr *,
->> +				     size_t len, int flags);
->> +
->> 	/* Notification. */
->> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
->> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 524df8fc84cd..3b266880b7c8 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -2006,7 +2006,107 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
->> static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->> 				     size_t len, int flags)
->> {
->> -	return -1;
->> +	const struct vsock_transport *transport;
->> +	const struct iovec *orig_iov;
->> +	unsigned long orig_nr_segs;
->> +	ssize_t dequeued_total = 0;
->> +	struct vsock_sock *vsk;
->> +	size_t record_len;
->> +	long timeout;
->> +	int err = 0;
->> +	DEFINE_WAIT(wait);
->> +
->> +	vsk = vsock_sk(sk);
->> +	transport = vsk->transport;
->> +
->> +	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
->> +	msg->msg_flags &= ~MSG_EOR;
-> Maybe add a comment about why we need to clear MSG_EOR.
->
->> +	orig_nr_segs = msg->msg_iter.nr_segs;
->> +	orig_iov = msg->msg_iter.iov;
->> +
->> +	while (1) {
->> +		ssize_t dequeued;
->> +		s64 ready;
->> +
->> +		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
->> +		ready = vsock_stream_has_data(vsk);
->> +
->> +		if (ready == 0) {
->> +			if (vsock_wait_data(sk, &wait, timeout, NULL, 0)) {
->> +				/* In case of any loop break(timeout, signal
->> +				 * interrupt or shutdown), we report user that
->> +				 * nothing was copied.
->> +				 */
->> +				dequeued_total = 0;
->> +				break;
->> +			}
->> +			continue;
->> +		}
->> +
->> +		finish_wait(sk_sleep(sk), &wait);
->> +
->> +		if (ready < 0) {
->> +			err = -ENOMEM;
->> +			goto out;
->> +		}
->> +
->> +		if (dequeued_total == 0) {
->> +			record_len =
->> +				transport->seqpacket_seq_get_len(vsk);
->> +
->> +			if (record_len == 0)
->> +				continue;
->> +		}
->> +
->> +		/* 'msg_iter.count' is number of unused bytes in iov.
->> +		 * On every copy to iov iterator it is decremented at
->> +		 * size of data.
->> +		 */
->> +		dequeued = transport->seqpacket_dequeue(vsk, msg,
->> +					msg->msg_iter.count, flags);
->                                          ^
->                                          Is this needed or 'msg' can be 
->                                          used in the transport?
-Yes, right
->> +
->> +		if (dequeued < 0) {
->> +			dequeued_total = 0;
->> +
->> +			if (dequeued == -EAGAIN) {
->> +				iov_iter_init(&msg->msg_iter, READ,
->> +					      orig_iov, orig_nr_segs,
->> +					      len);
->> +				msg->msg_flags &= ~MSG_EOR;
->> +				continue;
-> Why we need to reset MSG_EOR here?
-
-Because if previous attempt to receive record was failed, but
-
-MSG_EOR was set, so we clear it for next attempt to get record
-
->
->> +			}
->> +
->> +			err = -ENOMEM;
->> +			break;
->> +		}
->> +
->> +		dequeued_total += dequeued;
->> +
->> +		if (dequeued_total >= record_len)
->> +			break;
->> +	}
-> Maybe a new line here.
->
->> +	if (sk->sk_err)
->> +		err = -sk->sk_err;
->> +	else if (sk->sk_shutdown & RCV_SHUTDOWN)
->> +		err = 0;
->> +
->> +	if (dequeued_total > 0) {
->> +		/* User sets MSG_TRUNC, so return real length of
->> +		 * packet.
->> +		 */
->> +		if (flags & MSG_TRUNC)
->> +			err = record_len;
->> +		else
->> +			err = len - msg->msg_iter.count;
->> +
->> +		/* Always set MSG_TRUNC if real length of packet is
->> +		 * bigger that user buffer.
-> s/that/than
->
->> +		 */
->> +		if (record_len > len)
->> +			msg->msg_flags |= MSG_TRUNC;
->> +	}
->> +out:
->> +	return err;
->> }
->>
->> static int
 >> -- 
 >> 2.25.1
 >>
