@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D01D308B7A
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:33:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D557F308B75
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:32:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232392AbhA2RZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 12:25:08 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:40434 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231511AbhA2RZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 12:25:05 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10THO6CI066205;
-        Fri, 29 Jan 2021 17:24:22 GMT
+        id S232291AbhA2RX0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 12:23:26 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:43292 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232245AbhA2RXR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 12:23:17 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10THA1wg084135;
+        Fri, 29 Jan 2021 17:22:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=Jht8y0GDOpOhrB/UuJl9RZfl5NEsnAsBx4Quts4qYrY=;
- b=zELMBsmOQWEBn/zDBYbc6Hopw4hRvdR6v66cSCojomSAuOPdvTojJ+HclIhUhA5VoEgH
- NklqPVv0U4cg/X3IbQfvR45rzaGLeyEgBRAAbSISbpMEgAY5u8HG6flV0vV75l1vqH+i
- fYncaj+n5G+CLVO+2GQPQLq0LqqD0lbGf47RmBH11XxCFz6L+ST48SZp0vYyT7Huoekh
- xumnL+URivKh+GY0VcUciQJBfDzyhn8TORfjI/fPTpYuo/oSeUIrd8iUh9TwpoHvIIgK
- Fz6LLuZEtJowQ7/kPEYwyhyJZYNWClZtHAJG1qhdoWAdWvNXcvAfSyMpMsb7DyqV7SU4 2g== 
+ bh=gSZ5FqHantH7lxOs1ItApbz47LAt9JfG6HhsSgE5EMw=;
+ b=LWdBEpGAThlOFT+GKlbwmq9BJ/dT0ACxkl/UGV0Lwn9C/W+67SQcfbfKpxMjfSDeiDpB
+ YYeKZwitJsFBVBax4kSxDpn5ZWbMlYfcxhHSdt/EmxZHVbq7p7kDc66XnEQMO3IYTMzR
+ qOSvh90F5vDODIwGNTAsQDtjK6WHwgrlrNKhtLvkJ33RCtWnkdqrStzMb9Iun82Qz2Yt
+ 3OmUwHCgjLA/2V7Fo8TWyqvaTBNxTleSBSuEkzztvH2XDTPMD6nyr8aosBFRB3dVGDgt
+ LS3+Nlmw5zWxEkwDMkA1uOtKemhdy5p+Zqpj6TgLZSwP2Ju01Kg93XwcBVY//87xXvYL NQ== 
 Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 368b7rafbh-1
+        by aserp2130.oracle.com with ESMTP id 3689ab2kfs-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Jan 2021 17:24:22 +0000
+        Fri, 29 Jan 2021 17:22:26 +0000
 Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10TH5IpQ077004;
-        Fri, 29 Jan 2021 17:22:20 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 368wcsfkn0-1
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10TH5GZ6076655;
+        Fri, 29 Jan 2021 17:22:21 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 368wcsfknm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Jan 2021 17:22:20 +0000
+        Fri, 29 Jan 2021 17:22:21 +0000
 Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10THMJXn019219;
-        Fri, 29 Jan 2021 17:22:19 GMT
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 10THMKEr023167;
+        Fri, 29 Jan 2021 17:22:20 GMT
 Received: from ca-dev63.us.oracle.com (/10.211.8.221)
         by default (Oracle Beehive Gateway v4.0)
         with ESMTP ; Fri, 29 Jan 2021 09:22:19 -0800
@@ -45,9 +45,9 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>,
         Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V3 1/9] vfio: option to unmap all
-Date:   Fri, 29 Jan 2021 08:54:04 -0800
-Message-Id: <1611939252-7240-2-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V3 2/9] vfio/type1: unmap cleanup
+Date:   Fri, 29 Jan 2021 08:54:05 -0800
+Message-Id: <1611939252-7240-3-git-send-email-steven.sistare@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
 References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
@@ -58,61 +58,106 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxs
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2101290084
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9879 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 phishscore=0
- adultscore=1 impostorscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 clxscore=1015 phishscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 suspectscore=0 impostorscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2101290085
+ definitions=main-2101290084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-For the UNMAP_DMA ioctl, delete all mappings if VFIO_DMA_UNMAP_FLAG_ALL
-is set.  Define the corresponding VFIO_UNMAP_ALL extension.
+Minor changes in vfio_dma_do_unmap to improve readability, which also
+simplify the subsequent unmap-all patch.  No functional change.
 
 Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 ---
- include/uapi/linux/vfio.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 38 +++++++++++++++-----------------------
+ 1 file changed, 15 insertions(+), 23 deletions(-)
 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 9204705..55578b6 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -46,6 +46,9 @@
-  */
- #define VFIO_NOIOMMU_IOMMU		8
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 5fbf0c1..6bf33c2 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1073,34 +1073,28 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ {
+ 	struct vfio_dma *dma, *dma_last = NULL;
+ 	size_t unmapped = 0, pgsize;
+-	int ret = 0, retries = 0;
++	int ret = -EINVAL, retries = 0;
+ 	unsigned long pgshift;
++	dma_addr_t iova = unmap->iova;
++	unsigned long size = unmap->size;
  
-+/* Supports VFIO_DMA_UNMAP_FLAG_ALL */
-+#define VFIO_UNMAP_ALL			9
+ 	mutex_lock(&iommu->lock);
+ 
+ 	pgshift = __ffs(iommu->pgsize_bitmap);
+ 	pgsize = (size_t)1 << pgshift;
+ 
+-	if (unmap->iova & (pgsize - 1)) {
+-		ret = -EINVAL;
++	if (iova & (pgsize - 1))
+ 		goto unlock;
+-	}
+ 
+-	if (!unmap->size || unmap->size & (pgsize - 1)) {
+-		ret = -EINVAL;
++	if (!size || size & (pgsize - 1))
+ 		goto unlock;
+-	}
+ 
+-	if (unmap->iova + unmap->size - 1 < unmap->iova ||
+-	    unmap->size > SIZE_MAX) {
+-		ret = -EINVAL;
++	if (iova + size - 1 < iova || size > SIZE_MAX)
+ 		goto unlock;
+-	}
+ 
+ 	/* When dirty tracking is enabled, allow only min supported pgsize */
+ 	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
+ 	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
+-		ret = -EINVAL;
+ 		goto unlock;
+ 	}
+ 
+@@ -1138,20 +1132,18 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 	 * mappings within the range.
+ 	 */
+ 	if (iommu->v2) {
+-		dma = vfio_find_dma(iommu, unmap->iova, 1);
+-		if (dma && dma->iova != unmap->iova) {
+-			ret = -EINVAL;
++		dma = vfio_find_dma(iommu, iova, 1);
++		if (dma && dma->iova != iova)
+ 			goto unlock;
+-		}
+-		dma = vfio_find_dma(iommu, unmap->iova + unmap->size - 1, 0);
+-		if (dma && dma->iova + dma->size != unmap->iova + unmap->size) {
+-			ret = -EINVAL;
 +
- /*
-  * The IOCTL interface is designed for extensibility by embedding the
-  * structure length (argsz) and flags into structures passed between
-@@ -1074,6 +1077,7 @@ struct vfio_bitmap {
-  * field.  No guarantee is made to the user that arbitrary unmaps of iova
-  * or size different from those used in the original mapping call will
-  * succeed.
-+ *
-  * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get the dirty bitmap
-  * before unmapping IO virtual addresses. When this flag is set, the user must
-  * provide a struct vfio_bitmap in data[]. User must provide zero-allocated
-@@ -1083,11 +1087,15 @@ struct vfio_bitmap {
-  * indicates that the page at that offset from iova is dirty. A Bitmap of the
-  * pages in the range of unmapped size is returned in the user-provided
-  * vfio_bitmap.data.
-+ *
-+ * If flags & VFIO_DMA_UNMAP_FLAG_ALL, unmap all addresses.  iova and size
-+ * must be 0.  This may not be combined with the get-dirty-bitmap flag.
-  */
- struct vfio_iommu_type1_dma_unmap {
- 	__u32	argsz;
- 	__u32	flags;
- #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
-+#define VFIO_DMA_UNMAP_FLAG_ALL		     (1 << 1)
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
- 	__u8    data[];
++		dma = vfio_find_dma(iommu, iova + size - 1, 0);
++		if (dma && dma->iova + dma->size != iova + size)
+ 			goto unlock;
+-		}
+ 	}
+ 
+-	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
+-		if (!iommu->v2 && unmap->iova > dma->iova)
++	ret = 0;
++	while ((dma = vfio_find_dma(iommu, iova, size))) {
++		if (!iommu->v2 && iova > dma->iova)
+ 			break;
+ 		/*
+ 		 * Task with same address space who mapped this iova range is
+@@ -1189,7 +1181,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 
+ 		if (unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
+ 			ret = update_user_bitmap(bitmap->data, iommu, dma,
+-						 unmap->iova, pgsize);
++						 iova, pgsize);
+ 			if (ret)
+ 				break;
+ 		}
 -- 
 1.8.3.1
 
