@@ -2,100 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D52308ADD
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0449A308AF2
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:09:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231774AbhA2RAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 12:00:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231814AbhA2Q7O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 11:59:14 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5A3C061574
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 08:58:21 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id y10so1280878plk.7
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 08:58:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IEk9NbNMjO7h5rflP6rNtXSfouXuSq8Q4eNt49nSuwY=;
-        b=F63YQDk3Poqo6G7huaqoQ1fSvxyg6l5KbYQ4I5whx29cPIni2xT+DzwDNiZxaXwICb
-         tQRzSEsRG7ztZBQ3UExv4RsQvhP1fvEwURpOzQ4x81YJJADzXfELluRsX2NvlZhMEETR
-         w5oyPLRXzAbrmL/6vBmXF9G9/tuI3gi7hUziAmaspvA+1wPcoknbl5R9EbxJuZedIzcB
-         NuPYn6Qxa0x7njvsk3/nmtq9Kgnzr2bHN73HbeFRh7sv38UnG9WkZlIMZEc+FpuYtA8j
-         pBKQhw2XzVSyPtd3I+PDSgWzHQotAg2q+/Pny7P/yWQl5MWVyLgYt8yHgjwCho6zU0Lv
-         IECg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IEk9NbNMjO7h5rflP6rNtXSfouXuSq8Q4eNt49nSuwY=;
-        b=HgL4iRw7yahq4Mnl6xLlmPg21isxKxIOecgx/fVBGaII1Fwp+woxJmRr6Jfh4Mp+FQ
-         TXk636YkYAVWqmJeH2ASxACrdd87fkug6s8o1i7uwnCIlcFuvpc3mJLdQw4vpTUejr61
-         6JH6HR2cDOHIY+fe2kYhnWZ2D6v8yFs3nheSjwYjaUh5VVZhefRoaE4YA4zdSoyU0C8M
-         VzFwQ2f4KNzDQk7qAIXJTP1PiO87BKgm08ZNMfYEVpbxtWycxnDUZsGCzIr2kJHuC7R0
-         zzMi8Aade6rgaDiTYELKOV9L9BnoOzPNen8nH/aynOQYDEHgLl2hENtdC9jferpF/W5y
-         tcNA==
-X-Gm-Message-State: AOAM533VDIXozYIvC5rQbnPWejmjvEZeitJ4bfz3zyB6TSlrljD9MyZu
-        3T5AXUgMzA9MUxdRN6lIrdQwPA==
-X-Google-Smtp-Source: ABdhPJwKYVSVJ9bIADbGcmcjCupj10IlJHIcWaq/HnZTkQL+2KhGaDFpDE1UFkyz6IEFkZVd3//Udg==
-X-Received: by 2002:a17:90a:448f:: with SMTP id t15mr5454936pjg.159.1611939500573;
-        Fri, 29 Jan 2021 08:58:20 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:91fd:c415:8a8b:ccc4])
-        by smtp.gmail.com with ESMTPSA id z18sm9447971pfj.102.2021.01.29.08.58.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 08:58:19 -0800 (PST)
-Date:   Fri, 29 Jan 2021 08:58:13 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jmattson@google.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86: Allow guests to see MSR_IA32_TSX_CTRL even
- if tsx=off
-Message-ID: <YBQ+peAEdX2h3tro@google.com>
-References: <20210129101912.1857809-1-pbonzini@redhat.com>
+        id S230388AbhA2RHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 12:07:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48044 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229661AbhA2RHM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 12:07:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611939945;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g65XYsKeVTy5aaNxF3sJpXnm3ZqadQnBeDQa+nMvZR4=;
+        b=Xvk974yT+BSEhKd9gPZw7dquYyy9APesraARIpVaOgycFrtNYqMTuw+zRF2La+GFVo5fK5
+        m7wLDe5ZNhP+nnCsELj40ip/FBsfVPXq/Y2IZRB3/5CuO8AaafTv4SaGRwBZKGzRbDupSD
+        iuJ9VKRgbT+4FSv6Jv+HDf7P09gdR1g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-kFskcf8HO0SCGFNG47jfTg-1; Fri, 29 Jan 2021 12:05:43 -0500
+X-MC-Unique: kFskcf8HO0SCGFNG47jfTg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DC7D192CC42;
+        Fri, 29 Jan 2021 17:05:42 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 034E019C66;
+        Fri, 29 Jan 2021 17:05:41 +0000 (UTC)
+Date:   Fri, 29 Jan 2021 10:05:41 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH V2 0/9] vfio virtual address update
+Message-ID: <20210129100541.5b0c3d0f@omen.home.shazbot.org>
+In-Reply-To: <55725169-de0d-4019-f96c-ded20dfde0d7@oracle.com>
+References: <1611078509-181959-1-git-send-email-steven.sistare@oracle.com>
+        <55725169-de0d-4019-f96c-ded20dfde0d7@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210129101912.1857809-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 29, 2021, Paolo Bonzini wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 76bce832cade..15733013b266 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1401,7 +1401,7 @@ static u64 kvm_get_arch_capabilities(void)
->  	 *	  This lets the guest use VERW to clear CPU buffers.
+On Fri, 29 Jan 2021 10:48:10 -0500
+Steven Sistare <steven.sistare@oracle.com> wrote:
 
+> Hi Alex, thanks for the feedback on V2.  Any more comments before I submit V3? 
 
-This comment be updated to call out the new TSX_CTRL behavior.
+Nope, I'm ok with your proposals.  Thanks,
 
-	/*
-	 * On TAA affected systems:
-	 *      - nothing to do if TSX is disabled on the host.
-	 *      - we emulate TSX_CTRL if present on the host.
-	 *	  This lets the guest use VERW to clear CPU buffers.
-	 */
+Alex
 
->  	 */
->  	if (!boot_cpu_has(X86_FEATURE_RTM))
-> -		data &= ~(ARCH_CAP_TAA_NO | ARCH_CAP_TSX_CTRL_MSR);
-> +		data &= ~ARCH_CAP_TAA_NO;
-
-Hmm, simply clearing TSX_CTRL will only preserve the host value.  Since
-ARCH_CAPABILITIES is unconditionally emulated by KVM, wouldn't it make sense to
-unconditionally expose TSX_CTRL as well, as opposed to exposing it only if it's
-supported in the host?  I.e. allow migrating a TSX-disabled guest to a host
-without TSX.  Or am I misunderstanding how TSX_CTRL is checked/used?
-
->  	else if (!boot_cpu_has_bug(X86_BUG_TAA))
->  		data |= ARCH_CAP_TAA_NO;
->  
-> -- 
-> 2.26.2
+> On 1/19/2021 12:48 PM, Steve Sistare wrote:
+> > Add interfaces that allow the underlying memory object of an iova range
+> > to be mapped to a new virtual address in the host process:
+> > 
+> >   - VFIO_DMA_UNMAP_FLAG_VADDR for VFIO_IOMMU_UNMAP_DMA
+> >   - VFIO_DMA_MAP_FLAG_VADDR flag for VFIO_IOMMU_MAP_DMA
+> >   - VFIO_UPDATE_VADDR for VFIO_CHECK_EXTENSION
+> >   - VFIO_DMA_UNMAP_FLAG_ALL for VFIO_IOMMU_UNMAP_DMA
+> >   - VFIO_UNMAP_ALL for VFIO_CHECK_EXTENSION
+> > 
+> > Unmap-vaddr invalidates the host virtual address in an iova range and blocks
+> > vfio translation of host virtual addresses, but DMA to already-mapped pages
+> > continues.  Map-vaddr updates the base VA and resumes translation.  The
+> > implementation supports iommu type1 and mediated devices.  Unmap-all allows
+> > all ranges to be unmapped or invalidated in a single ioctl, which simplifies
+> > userland code.
+> > 
+> > This functionality is necessary for live update, in which a host process
+> > such as qemu exec's an updated version of itself, while preserving its
+> > guest and vfio devices.  The process blocks vfio VA translation, exec's
+> > its new self, mmap's the memory object(s) underlying vfio object, updates
+> > the VA, and unblocks translation.  For a working example that uses these
+> > new interfaces, see the QEMU patch series "[PATCH V2] Live Update" at
+> > https://lore.kernel.org/qemu-devel/1609861330-129855-1-git-send-email-steven.sistare@oracle.com
+> > 
+> > Patches 1-4 define and implement the flag to unmap all ranges.
+> > Patches 5-6 define and implement the flags to update vaddr.
+> > Patches 7-9 add blocking to complete the implementation.
+> > 
+> > Changes from V1:
+> >  - define a flag for unmap all instead of special range values
+> >  - define the VFIO_UNMAP_ALL extension
+> >  - forbid the combination of unmap-all and get-dirty-bitmap
+> >  - unwind in unmap on vaddr error
+> >  - add a new function to find first dma in a range instead of modifying
+> >    an existing function
+> >  - change names of update flags
+> >  - fix concurrency bugs due to iommu lock being dropped
+> >  - call down from from vfio to a new backend interface instead of up from
+> >    driver to detect container close
+> >  - use wait/wake instead of sleep and polling
+> >  - refine the uapi specification
+> >  - split patches into vfio vs type1
+> > 
+> > Steve Sistare (9):
+> >   vfio: option to unmap all
+> >   vfio/type1: find first dma
+> >   vfio/type1: unmap cleanup
+> >   vfio/type1: implement unmap all
+> >   vfio: interfaces to update vaddr
+> >   vfio/type1: implement interfaces to update vaddr
+> >   vfio: iommu driver notify callback
+> >   vfio/type1: implement notify callback
+> >   vfio/type1: block on invalid vaddr
+> > 
+> >  drivers/vfio/vfio.c             |   5 +
+> >  drivers/vfio/vfio_iommu_type1.c | 229 ++++++++++++++++++++++++++++++++++------
+> >  include/linux/vfio.h            |   5 +
+> >  include/uapi/linux/vfio.h       |  27 +++++
+> >  4 files changed, 231 insertions(+), 35 deletions(-)
+> >   
 > 
+
