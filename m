@@ -2,112 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A43330870B
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 09:31:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DF4D308864
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 12:42:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232173AbhA2I1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 03:27:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20901 "EHLO
+        id S232484AbhA2LIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 06:08:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59176 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232335AbhA2H7Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 02:59:24 -0500
+        by vger.kernel.org with ESMTP id S232207AbhA2K0V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 05:26:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611907164;
+        s=mimecast20190719; t=1611915856;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Byzj47V22ZrQMztSmUqNQcCJr1IEFCgRbNoQucSd/oo=;
-        b=b0eMgNojtJrbaIWKN0TNGSvXw6vdsNn5un76JYN81brsxIP9MbGzxqj5jyofvr1oCeLTQ8
-        Il5shrlNZD/ve+fmFp/6oMPhXd45748lZOEBfDrI3a/W7qufjxx5nwC/H10D5WjiVCKzCC
-        zfvUBGMVgcxhTSev3PKtKC5xK2hpC/U=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-561-PcsDw9XiPY26-Tuxjn3hnw-1; Fri, 29 Jan 2021 02:59:20 -0500
-X-MC-Unique: PcsDw9XiPY26-Tuxjn3hnw-1
-Received: by mail-ed1-f72.google.com with SMTP id o19so4545908edq.9
-        for <kvm@vger.kernel.org>; Thu, 28 Jan 2021 23:59:19 -0800 (PST)
+        bh=nP4l2G4dODpjaU7YDjg1QGuqXy7wbW7wVhXMNoRQIL8=;
+        b=Eqh7bkVyYpdnDsbErTErc62QFiAgHbnl8k8wiyObaT50FaWf+XNBBSf3CINep//4NxagIO
+        8CBhdmQpo+21Q6iVJbrPWI0H4C+hBdzBo+D/ytHZKZbeh1uGNk2sfyYhQ1fdvm+Z9accPO
+        kCYuZ/jYbUQqDEkKJYH7w0rJ0GQThgI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-588-JNRr4H3tPICzbRd9hukfxg-1; Fri, 29 Jan 2021 04:26:09 -0500
+X-MC-Unique: JNRr4H3tPICzbRd9hukfxg-1
+Received: by mail-ed1-f70.google.com with SMTP id q12so4634029edr.2
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 01:26:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Byzj47V22ZrQMztSmUqNQcCJr1IEFCgRbNoQucSd/oo=;
-        b=tFpF3vNZ1yuIuIwmTc/1+3epaMPcqytOM3bfZqhELctNHcZ+rocx1oXcHN6sM4oW5P
-         gAiSGx8ZfCtQnjyt/jXvsChWr/US/r8rohV78t3ylFHhOg/IpqvwHesO+a9fHaOXV7OG
-         2iO9cOU5C6VDu1RZKEwoUo/EAYnQpjPF1cSPKW9MX5zoyAsvV6zluBrLUxfZuRu36G9g
-         yl2hLHpBmAfLPFjHnoFeiIs8+oO+dYhGmQB6fLsl3sIOHRY/biojs6UC9sdSNd26NKsJ
-         mVtKu9ub4qHAHJyNxk0l9jQDNQfMblf4evsgQmTNuvGAIyJgqUDnTke5lKPA+yZ4//DC
-         F9pg==
-X-Gm-Message-State: AOAM530oQtLWBPft7gLmYWmNwd5f7uIO2C8sKH7JFCdCgFmdutut9NIB
-        tjlIMPa2Z2nAGn+C/3NHa94sQhVYGPfrMSJZKoXm1oF4041RP8lN+LPzcf8cRfzj5sEwlhi+NxP
-        Gnqqqvr6IUUIK
-X-Received: by 2002:a17:906:29d4:: with SMTP id y20mr3309916eje.294.1611907158989;
-        Thu, 28 Jan 2021 23:59:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJywpE3P6hDHWu+Bjipn2LzdsQzXwqew1cSC6UJAGouaOMMbbWb+RKGWpZ51kaucdbLkyAZRhw==
-X-Received: by 2002:a17:906:29d4:: with SMTP id y20mr3309900eje.294.1611907158843;
-        Thu, 28 Jan 2021 23:59:18 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i6sm3291971ejd.110.2021.01.28.23.59.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jan 2021 23:59:17 -0800 (PST)
-Subject: Re: [PATCH v5 15/16] KVM: Add documentation for Xen hypercall and
- shared_info updates
-To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com, hch@infradead.org
-References: <20210111195725.4601-1-dwmw2@infradead.org>
- <20210111195725.4601-16-dwmw2@infradead.org>
- <e79d508e-454f-f34e-018b-e6b63fe3d825@redhat.com>
- <dd496053b8d51a400b66622cd25c10f4540ac4d9.camel@infradead.org>
- <204b5082-2f8b-9936-675f-0ddc12a6ab43@redhat.com>
- <f9b2b4e613ea4e6dd1f253f5092254d121c93c07.camel@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e7075e1f-672c-f94c-3a3f-b824a45de61d@redhat.com>
-Date:   Fri, 29 Jan 2021 08:59:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=nP4l2G4dODpjaU7YDjg1QGuqXy7wbW7wVhXMNoRQIL8=;
+        b=em4AtVtfRtX6eLiqtnTBBfE4qMRVRhceyvqq33hDrkM2uz4ulgYCR1eGB/BhSo35LL
+         yA0b2Dwe/BPv7JSCqQ5p/6iFD2cEchbVDthH9u7u8Am274n6+xlrGgEh+bQLMJnk+IMj
+         BjZQfKrzq8J22XVaCBLufbBdyfYQjuEPsTYkWwYt3qb6WXs2BZHaEOl0vRbhuVcsh1wG
+         keq+3xwQE2O3Z/ws7f3fRjao3NQmOr4K1oWO9OSwbCKn3VadFzegn9MaeAG8Cwo/7uq0
+         IK/GgGtZLdp85eQk9yp4FQNIY5yrjD9FhtVqpThChcFpud7IqN0OuNNFp0IG3tgYaZIz
+         nvpA==
+X-Gm-Message-State: AOAM532H5WhnEWpF/adaCEYxNHrScN/ybWEy08UMIDGL788ia9EhyrXR
+        dg8twxZGqeR9qoVTrJmp3c0wxC7yLtyN+uFuq1QiklFuHQ0Xiw701pymwrsfJJwARyEpuVNqwDI
+        BUtgwShvl/2NY
+X-Received: by 2002:a05:6402:4242:: with SMTP id g2mr4091941edb.103.1611912368225;
+        Fri, 29 Jan 2021 01:26:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy2D+e1xoz9VblcO2a9mHDykKQQov6UxFQbNQz9AXlqGu90jfarHaQYZn2TFTNC1vtihyqKwg==
+X-Received: by 2002:a05:6402:4242:: with SMTP id g2mr4091910edb.103.1611912367935;
+        Fri, 29 Jan 2021 01:26:07 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id r23sm3509763ejd.56.2021.01.29.01.26.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jan 2021 01:26:07 -0800 (PST)
+Date:   Fri, 29 Jan 2021 10:26:04 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+Message-ID: <20210129092604.mgaw3ipiyv6xra3b@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+ <20210128171923.esyna5ccv5s27jyu@steredhat>
+ <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <f9b2b4e613ea4e6dd1f253f5092254d121c93c07.camel@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/01/21 20:26, David Woodhouse wrote:
->>> Honestly, I don't even care about reading it out except for long_mode
->>> which the kernel *does* infer for itself when the MSR is used to fill
->>> in the hypercall page.
->>
->> What about VM migration?
-> 
-> The VMM needs to know all these things anyway. It's not like it can
-> *forget* where each vCPU's vcpu_info is, then just ask the kernel when
-> it's time to orchestrate a migration.
-
-Yeah it may not be particularly useful but it's not hard to write the 
-code and it's easier to document.
-
-> I suppose *maybe* the upcall vector is an exception; the VMM *could*
-> forget that if it really wanted to, then ask the kernel for it on
-> migration. But we don't because that seems pointless.
+On Fri, Jan 29, 2021 at 09:41:50AM +0300, Arseny Krasnov wrote:
 >
-> But then it *theoretically* could have a sparse bitmap of "this feature
-> but not the next feature", even though that would probably never happen
-> in practice without weird selective backports. But it's still an icky
-> API. And frankly I could live without the 'get' for any of these except
-> LONG_MODE which the kernel might actually flip for us. The rest could
-> be write-only for all I care.
+>On 28.01.2021 20:19, Stefano Garzarella wrote:
+>> Hi Arseny,
+>> I reviewed a part, tomorrow I hope to finish the other patches.
+>>
+>> Just a couple of comments in the TODOs below.
+>>
+>> On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
+>>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
+>>> transport.
+>>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>>> do it, new packet operation was added: it marks start of record (with
+>>> record length in header), such packet doesn't carry any data.  To send
+>>> record, packet with start marker is sent first, then all data is sent
+>>> as usual 'RW' packets. On receiver's side, length of record is known
+>> >from packet with start record marker. Now as  packets of one socket
+>>> are not reordered neither on vsock nor on vhost transport layers, such
+>>> marker allows to restore original record on receiver's side. If user's
+>>> buffer is smaller that record length, when all out of size data is
+>>> dropped.
+>>> 	Maximum length of datagram is not limited as in stream socket,
+>>> because same credit logic is used. Difference with stream socket is
+>>> that user is not woken up until whole record is received or error
+>>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>>> 	Tests also implemented.
+>>>
+>>> Arseny Krasnov (13):
+>>>  af_vsock: prepare for SOCK_SEQPACKET support
+>>>  af_vsock: prepare 'vsock_connectible_recvmsg()'
+>>>  af_vsock: implement SEQPACKET rx loop
+>>>  af_vsock: implement send logic for SOCK_SEQPACKET
+>>>  af_vsock: rest of SEQPACKET support
+>>>  af_vsock: update comments for stream sockets
+>>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>>  virtio/vsock: fetch length for SEQPACKET record
+>>>  virtio/vsock: add SEQPACKET receive logic
+>>>  virtio/vsock: rest of SOCK_SEQPACKET support
+>>>  virtio/vsock: setup SEQPACKET ops for transport
+>>>  vhost/vsock: setup SEQPACKET ops for transport
+>>>  vsock_test: add SOCK_SEQPACKET tests
+>>>
+>>> drivers/vhost/vsock.c                   |   7 +-
+>>> include/linux/virtio_vsock.h            |  12 +
+>>> include/net/af_vsock.h                  |   6 +
+>>> include/uapi/linux/virtio_vsock.h       |   9 +
+>>> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
+>>> net/vmw_vsock/virtio_transport.c        |   4 +
+>>> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
+>>> tools/testing/vsock/util.c              |  32 +-
+>>> tools/testing/vsock/util.h              |   3 +
+>>> tools/testing/vsock/vsock_test.c        | 126 +++++
+>>> 10 files changed, 862 insertions(+), 175 deletions(-)
+>>>
+>>> TODO:
+>>> - Support for record integrity control. As transport could drop some
+>>>   packets, something like "record-id" and record end marker need to
+>>>   be implemented. Idea is that SEQ_BEGIN packet carries both record
+>>>   length and record id, end marker(let it be SEQ_END) carries only
+>>>   record id. To be sure that no one packet was lost, receiver checks
+>>>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
+>>>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
+>>>   means that both markers were not dropped. I think that easiest way
+>>>   to implement record id for SEQ_BEGIN is to reuse another field of
+>>>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
+>>>   SEQ_END record id could be stored in 'flags'.
+>> I don't really like the idea of reusing the 'flags' field for this
+>> purpose.
+>>
+>>>     Another way to implement it, is to move metadata of both SEQ_END
+>>>   and SEQ_BEGIN to payload. But this approach has problem, because
+>>>   if we move something to payload, such payload is accounted by
+>>>   credit logic, which fragments payload, while payload with record
+>>>   length and id couldn't be fragmented. One way to overcome it is to
+>>>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
+>>>   is to update 'stream_has_space()' function: current implementation
+>>>   return non-zero when at least 1 byte is allowed to use,but updated
+>>>   version will have extra argument, which is needed length. For 'RW'
+>>>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
+>>>   record id) and for SEQ_END it is sizeof(record id).
+>> Is the payload accounted by credit logic also if hdr.op is not
+>> VIRTIO_VSOCK_OP_RW?
+>
+>Yes, on send any packet with payload could be fragmented if
+>
+>there is not enough space at receiver. On receive 'fwd_cnt' and
+>
+>'buf_alloc' are updated with header of every packet. Of course,
+>
+>to every such case i've described i can add check for 'RW'
+>
+>packet, to exclude payload from credit accounting, but this is
+>
+>bunch of dumb checks.
+>
+>>
+>> I think that we can define a specific header to put after the
+>> virtio_vsock_hdr when hdr.op is SEQ_BEGIN or SEQ_END, and in this header
+>> we can store the id and the length of the message.
+>
+>I think it is better than use payload and touch credit logic
+>
 
-I don't think it's that icky, the alternative would be a KVM_GET_ONE_REG 
-like architecture that just returns a u64 but the bitmap works too. 
-It's not hard to write the code.
+Cool, so let's try this option, hoping there aren't a lot of issues.
 
-Paolo
+Another item for TODO could be to add the SOCK_SEQPACKET support also 
+for vsock_loopback. Should be simple since it also uses 
+virtio_transport_common APIs and it can be useful for testing and 
+debugging.
+
+Thanks,
+Stefano
 
