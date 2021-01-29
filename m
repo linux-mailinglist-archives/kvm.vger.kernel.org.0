@@ -2,193 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFE93308286
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 01:40:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 046F130829F
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 01:47:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbhA2AjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 19:39:16 -0500
-Received: from mail-bn8nam12on2064.outbound.protection.outlook.com ([40.107.237.64]:49601
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S231650AbhA2ApM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 19:45:12 -0500
+Received: from mail-dm6nam08on2058.outbound.protection.outlook.com ([40.107.102.58]:18528
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231467AbhA2Ai2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Jan 2021 19:38:28 -0500
+        id S231444AbhA2AoL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 19:44:11 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OfHIAOwH5dL/7AF2tlsTJAAC4CIcfnnl+5f236UcayfHEtPMfqMrSjJjGiHlBnP/poAALCueeAYbSNpe85h3D4gfFzXiIgiUwLqGT+CpJuXSs09UTMyFgxUSg127Td+fKKhr7a3FsjopHvcENtTk8BhhEAklEAJZly44Fqp3ykDe++VLaHD0AzKci0QNDKq5IGZbn6tXHPmZwYyh6UZyet7L1r9Pvkl4ncXc0ZQJEWiL29MUatYPdaZioNFJmXA172+vHOhpK252+Yb5hnp3k4aFINPM8dcbPlZ9EjxT1Lz1mcSzO3eUCKz4s2isbDeM6UA/vcBPCUJV6xSqTd5WZw==
+ b=GDwu4WxI9kECLFkQg22VTsOTxgKfsHQoM/talrVLxoER3/ir1qm1F5krjpMrUxs6H/mBOUvhVeyu/xo40eJejdP+02t6cut9KoSg9/zfMc9PZPVjEOxciI4XuOFFUku+/bkY3HWLLqxsKxwHczdVZ5ef29Wnv5hjBVFCJSJ9mND+Fu0dH96a1GcSbjdZ2ePUX2rCx/36hPzPmxDWiB4EeLx6rHe0yyXFb9DnEjcmmqM82TUNyVcWEUgq1MEsNqmrW4GABrK9G7gQ1DAqjUn/710+GKReNfEf3h3GAlLbae0EG+LLoLjddXvF5bbGSf8MKloc1990G7kFwi/qQEUJQA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=peXwcfq24eAMODaWFHYYRbuRqjpmR30FR0l51gPg/UE=;
- b=X0fw1p73TogabWrA+39SfWArDqyDFOy8pXOJq+AZ7W2iWhS6BTs6m2Ru53pW9Ptl07xG2Sk3J66MKYrLYM9Zfrww3ZgZWZS8Vr713IU8PspTy/OeTcPwwmkecjDBdZQfQi/XGKM+n37dXkMqfplAgD0/tauLhYqgTXOPkhPOXiL0KsOXVEKAdiRtDcoZ6r62JDQFCy4fh403jZrjB5ShNzEuPYj1rGwd7XhtLSMnHFRRX3sZjLKwisliPrmj23ATc+saaSp8CbGgXkF1qLtBvXPh8iKzmJTzZww6btpJiQLKkTxlJhKCTt68FYChkHrM48AI8Bn1EPCwRHacARvfuQ==
+ bh=u0wlbu+rGSGyJtV82TTyePIZ+f3cfD9tyoTp4dGGUeo=;
+ b=AZfcy3nvY+QPk2hT6tCtmOJQDUOgYc6GXSgVQf52hcUyAXsMmh0SdDu+8F9zUNQW77hx880oHtuH8UDaarf97slznjIgNpvXSq7Q2yQjHJag7MFGGAyXugdCfY84W/oUqMrRLFrH3MjbfwysYDCVL6ySLZCvxmuOQRyp1Lac5I9uUrWLCKGgOAjMVZHvBTB95Sigvc8DGey8TRXNPWPAvdlF9s35/rOPE1RGvlhpqCY0qNawuqxb16XwuPxWxLBqRzzVHPA8o3m7inIqAea8SsC/Iux4IMCrTCic3GR42zxsOe1mR/TxkMMuEvEU7k8n8n0Li39dpRpVRANJZBrrSg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=peXwcfq24eAMODaWFHYYRbuRqjpmR30FR0l51gPg/UE=;
- b=g9x4ow3r+m54OtZVOJjR9g84VEU0OMnEm0YsSAzTCWNL8vl7R5vmvm4WxrGGKHgzgAB5UHRciWCyzCCVNceG9x4dGKW1aGZtw6qWZTbYRPs66Wg0OHz+HFdKXE5EY5AnNIkqKxgR+X3OG9f2Zw3LtB7td34dlW/X6WZhnlQDqic=
-Authentication-Results: amd.com; dkim=none (message not signed)
- header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+ bh=u0wlbu+rGSGyJtV82TTyePIZ+f3cfD9tyoTp4dGGUeo=;
+ b=HJ4aOVoin8ZbTlKjqFWo+ScuzFFWqMi2vVCh1N1DsITZyj1mqwc1muacfEduoNII5x9O56hKTnuQqOxam56ulmBKW5qigNoA5PEkUEJcT/ItfEaa6m0hrPj0xMEieM714Qezl5YPsoFxAF3x+qktaUpyQbfOo5CSH1XT3yaTn3s=
+Authentication-Results: tencent.com; dkim=none (message not signed)
+ header.d=none;tencent.com; dmarc=none action=none header.from=amd.com;
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2525.namprd12.prod.outlook.com (2603:10b6:802:29::28) with
+ by SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Fri, 29 Jan
- 2021 00:36:27 +0000
+ 2021 00:43:17 +0000
 Received: from SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
  ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3805.019; Fri, 29 Jan 2021
- 00:36:27 +0000
-Subject: [kvm-unit-tests PATCH v2 2/2] x86: svm: Add SPEC_CTRL feature test
+ 00:43:17 +0000
+Subject: [PATCH v4 0/2] x86: Add the feature Virtual SPEC_CTRL
 From:   Babu Moger <babu.moger@amd.com>
-Cc:     kvm@vger.kernel.org
-Date:   Thu, 28 Jan 2021 18:36:25 -0600
-Message-ID: <161188058573.28708.18210438890249970432.stgit@bmoger-ubuntu>
-In-Reply-To: <161188044937.28708.9182196001493811398.stgit@bmoger-ubuntu>
-References: <161188044937.28708.9182196001493811398.stgit@bmoger-ubuntu>
+To:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de
+Cc:     fenghua.yu@intel.com, tony.luck@intel.com, wanpengli@tencent.com,
+        kvm@vger.kernel.org, thomas.lendacky@amd.com, peterz@infradead.org,
+        seanjc@google.com, joro@8bytes.org, x86@kernel.org,
+        kyung.min.park@intel.com, linux-kernel@vger.kernel.org,
+        krish.sadhukhan@oracle.com, hpa@zytor.com, mgross@linux.intel.com,
+        vkuznets@redhat.com, kim.phillips@amd.com, wei.huang2@amd.com,
+        jmattson@google.com
+Date:   Thu, 28 Jan 2021 18:43:16 -0600
+Message-ID: <161188083424.28787.9510741752032213167.stgit@bmoger-ubuntu>
 User-Agent: StGit/0.17.1-dirty
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN7PR04CA0199.namprd04.prod.outlook.com
- (2603:10b6:806:126::24) To SN1PR12MB2560.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN7PR04CA0107.namprd04.prod.outlook.com
+ (2603:10b6:806:122::22) To SN1PR12MB2560.namprd12.prod.outlook.com
  (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [127.0.1.1] (165.204.77.1) by SN7PR04CA0199.namprd04.prod.outlook.com (2603:10b6:806:126::24) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17 via Frontend Transport; Fri, 29 Jan 2021 00:36:26 +0000
+Received: from [127.0.1.1] (165.204.77.1) by SN7PR04CA0107.namprd04.prod.outlook.com (2603:10b6:806:122::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17 via Frontend Transport; Fri, 29 Jan 2021 00:43:16 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7a5be1e0-62e8-425c-d0a4-08d8c3ede9a1
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2525:
+X-MS-Office365-Filtering-Correlation-Id: 60361f35-5746-4c87-6fc2-08d8c3eede62
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2560:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2525E53D0B11B7BC0D3CD65D95B99@SN1PR12MB2525.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2560F2879D5B7FEF19313AEF95B99@SN1PR12MB2560.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: J5Bdk6Y/yISBZ/zAVFhDRfeohuj/ove6xHa+ja2ubxRSOu4jrSO3Se2KkKYzqcWdoBbaQa/zQi53IXD1NexVis094Y3yC7V9cZV2/buu/c7YTXHAvIyTJ+ZuuYbdt2kBuEC5AQ3UUDMq3+K4EgTUIXR12UC62FE8QfTtdGimM4ogRpuXP5hRppEqkN6G6NQ8YxGCbJhi0ElYYPVUdrit7EJrafiVjPGCzsELzhqbH49VQWUI/7BeUCK8adiG+Mhqn9PhDOInV6ne/luWIuJTk71Y/L26grfMYTOfGCO3gAzbMGkIz1JYVGC5LuCofqjk7FBSlzYKmPA+4GhbQSGO3GHK4hAnIF4lMDeaoHa+b9WSdr2L50gCIG6clofmGgdFJpjhlTu8x95BqsEQY4DvGfWgi4oLi/4L4xSThXLpfEqRo7uuWvmNqGlm3HMmAsAy3Xh4OjJYMKiKi8e7b22Uo4PA0j4xsVHwZXr00CS2uIIxET2gakNZzd7gTU13svSo845YhJ9INNINPfAI4bwIGA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(396003)(346002)(39860400002)(366004)(136003)(376002)(83380400001)(2906002)(103116003)(66946007)(8936002)(8676002)(52116002)(4326008)(86362001)(66476007)(66556008)(109986005)(186003)(6486002)(478600001)(16526019)(26005)(5660300002)(33716001)(44832011)(316002)(16576012)(9686003)(956004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?TWJqKzJBT1ZSUXZIekVhN3Q3TGR2cjZzUGhIelJxMVdVU1g4NnpwdUs1Zyt4?=
- =?utf-8?B?bzhBWXcydW52S0NvWkJlZ0tqNkdGKzdYMUIzYzY3RlF0WDcvdW5VVFhVT3dH?=
- =?utf-8?B?RXY3VVI0M0J6RUhZem1hMThNS3pZSUdzTlVPNmdHVVR4b0d3WUxFQ3N3Vndm?=
- =?utf-8?B?cU10ajRsQU50M0RFYlpwME4ralJaMUVtT3ZoQXhQV2NKSUIweXYwWjh0ZGFi?=
- =?utf-8?B?dXRhRWJWMHZ1WVc1Umx2L29LNlNGSVRqbk0ydGFOM3d1RlhkWnVwMVVnZlNE?=
- =?utf-8?B?bGtrR0lyQ3Y4STN3YTZvdVlRZkpqRE9wVDRCZ29NMWFpODNZeC9LdGlSWkpB?=
- =?utf-8?B?WGovaG9MalNEeVR1eGIvbzk4bVNRcnRQOEt0NjNQOVZSV0FrcXZma1RJNzF5?=
- =?utf-8?B?eFZGbWJORlJMdDlhR0QvbDFXR3hXbGpHMHVDTGVFQWVZc3RXcFB0MGN2U3Bu?=
- =?utf-8?B?RnhGTjZ4R21JSCthWSs2ZlZqT0lFL2k4RG56enpPajM0ZStYRGRVb0Qwejdl?=
- =?utf-8?B?d241QXlBVVgzb254ejNDUnBDSE9UenFBOEJHUFduQXp3czdQeEJVaTI4R2lZ?=
- =?utf-8?B?cGMyMGxTM3dMYnpLYXNvNFZjZ2NmNkdlNVIvT1cwZFE5cUdpWUlhSks4R1Yy?=
- =?utf-8?B?Y1VYMzl1YytGbGlQRHBOZzFFaWNRL0M4WXhudVZUWUtaZTZVeE84TjB0SHoz?=
- =?utf-8?B?d0trb1RwWmh3d3I4Q3ZsNDFtUldsdk9uSkFuMkdPUnJHYW5VL0pBaWpOTmVS?=
- =?utf-8?B?TEVEbFlURCtteEN1Zkl5Z1NyekkwczI2elZpSmdEVkZXOVEwVmNtLzByNWFP?=
- =?utf-8?B?U0djOGpsd3RQbVV3SGRTRVRHWFk5NHhGcUttL0VUdW5zSVhIS1prUERUSXFj?=
- =?utf-8?B?MGswdlVpOTdlTjNjMGtuTDV5TVdsOU9Ka0NyQjJPbUNqemNORGcxWmZHVHRV?=
- =?utf-8?B?OURrdVQyZW9OYWhsdUNYYW1pNllTN2ZtQmovZFJOQnRHZm11MjQyUFVkVnZJ?=
- =?utf-8?B?WDlRWVJyejBvZ2F0eWs0ZHdQZ2pXRXprbHJoZUR6K0pTODI1Zzd2MnZ1aXJC?=
- =?utf-8?B?NVVOVFJxaTZoL0NVV2V5cktvaU9GSW85MkphSkxxWGp4SDdxRUYzS0lqMFd1?=
- =?utf-8?B?NUF6N1U0TUgzL25IVjQ3OHBvcDlLbk00VkFHN05pTm1yenJjWkVxbkZubnlp?=
- =?utf-8?B?MXJ4Smp0Z0FTcnIxUldISEtCL0tTTDQxYk5tUTJNcFhBS2dPTDI2dS9ndGx0?=
- =?utf-8?B?NEQ1RnY5OVhiWWFkR2JJMnFWb0QzbFpSNUhpcklVTHppKzVWNzg0NGJPT1hW?=
- =?utf-8?B?VmJvOThmZCtxcVdLajNoNHB2U1p1ZWZMeGtqT3oycHV4dmZaYVk1OWlTc3ZQ?=
- =?utf-8?B?Z2RETTF0QUFTVVUzK0RXTXRUZWJsRThUQWFUY2RjRTlxeFNvSEZRQk1FQ253?=
- =?utf-8?Q?2nq0YqGJ?=
+X-Microsoft-Antispam-Message-Info: AU6Ynwm8ZILj39g8BC+OVmKCeiduD6FfHlExKYDkxilUBtY/N7I5/nmfVBSySQpxu7YyD7Wtft6EEen1oEjCZaAh6x2cBSUTBtK5JiYbO7mzWQvmltW6VAW0dGrJoPm/klaD8nnJnC5yGA7bYXJhzO4PNswEQw538e1gDqzIXQQwy/tYk7WFN83XU8vQqaJTY3ye5pXHM68LExX4leY/mKB/Z4bIAKRp4SAvIo1y04agYePRa/952QTXWDfXUxNwgv+WNmzZi1D2hHwpkg8Ek5urhYib6hgn83XDxpZYH2JPLh5Mo5aUuJr+JhR5F7+TH+mlRnNZPPoHd6My5xzuEA+9Gb2L6+msRfafYlC7XZt+AVzSL7I7ntocisSxz5uopay6xwQ4WBX8Y4i/2tKPUNJxLi+3MMVBkLDwbVvYjovndrvpehf7K/j+mwEMh3pQ0KaLSGfW79f2XBqkEMI8NQrz9RTbMI2MGRFGpcSJNrSwgIbp9JS3DYf2kIw+85uSuuYm0ynbTQGzKQYBdgMWYTpARhLWRwcRx4+pIkMkb22L8nNtlLwEpgBH4GW/z1aDU3PPh6nI/E6DfpOQdwuNpf6eBx7nVk7jNroCn/opJlk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(396003)(39860400002)(136003)(366004)(346002)(376002)(956004)(16576012)(52116002)(7416002)(8936002)(8676002)(316002)(86362001)(83380400001)(103116003)(44832011)(16526019)(186003)(33716001)(966005)(4326008)(478600001)(6486002)(9686003)(66476007)(66556008)(5660300002)(26005)(2906002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?WVVYYUZNYkZOa2cySFE5KzNselV2RDZYb1lyeUpnK21mMTU5M0lmc3dDS2RW?=
+ =?utf-8?B?THd1RHJ1QnlVWGRHZTZKL0o2TWhSRkNpWCt3TEdrZXViWGxvejVGQTA1ZXg1?=
+ =?utf-8?B?ZjcrazlvcSsvTU94bG9UVmk1OU4yRytBNDl3OThLQnpVK25hNi9meUdTSW1M?=
+ =?utf-8?B?QStacmRrdUZRZ0YyS3k0ekxRdnU3TUFrSUwveUluazkxSnZkRDNodlZBSFFo?=
+ =?utf-8?B?a1V2UHZPbWV2UjMzWlB3ekpZRXJDRlF3ZGo2QXNLSDg2Q2k1MHVYdUJvaTlN?=
+ =?utf-8?B?QlhGWXl0WmdGRW1NYTlaN21Pc052L3Joa2VXbC81VjRPZnRRQTdwOEc2aFBi?=
+ =?utf-8?B?bzVGWEVIRWdpWW5JeWpZK05YZ20wbjJzcnpFU29VRG8ydnFWbFFublR3ZmRz?=
+ =?utf-8?B?Z1BPRlpWV1VBMTZrUFFhRU5xNnF6VUlkZmJlc1FQOFBCUm01ajJIeW5mVG81?=
+ =?utf-8?B?Zk5IOWJOWmxsWXphTWdYUFpha1NzSzFyQjEzN0phRlhUN0lnWGtKMFAxMjNl?=
+ =?utf-8?B?LzVVR2t6ZGZRUG5ZTWh0dlVrb3AzUjBGVURjSU9pOUw0eVBrNzQ3THduVXhX?=
+ =?utf-8?B?L2FneHhOWktPK0xGR2FCeXpRWURZNFpobTB5L0gybGd1VUxMZkY2bzhKL0cz?=
+ =?utf-8?B?bjNCdUxiaVYvcVJUZmhidko2MmVGZ0h6bjBtcVBrZ2hNYnNWd2pDc0NVSm44?=
+ =?utf-8?B?T1FDb3FHTGozaGdzTkkwODZBdzBzZFF1dXl6WFZUOThaMVBwcmlqblNVdTVw?=
+ =?utf-8?B?WDZHNDRRK05LMUFMODNPbkFjbnFRd09QRXhjd1FWNXZOdnBBZ0YwblN5SE1x?=
+ =?utf-8?B?WjdackxTc2NZOWFvRGtZNXZGeG4vVlV3QXJyQ1EwWEowa1hCeXRZUGFBWGNs?=
+ =?utf-8?B?VVlteWg1RzM0R1RiRHVKdUl0cEdOdEZCZ1VNaUpNcW9ya25nMmkzM0s5eHdw?=
+ =?utf-8?B?RE9vd3U2TkVnZlErSEMza2poNDhGazZmNkd3aFRwQUJLTDlsSmVDVjkzOG0z?=
+ =?utf-8?B?RXhLd1FjZk8xK2taN0c3eXVDU29pNUpvYVIraXdtSW0yYmU0MFR6WCtnQmJU?=
+ =?utf-8?B?NVdFVU5EYnJxTjJPSW5DMEtmaG9nY3lrcUtmbHhpdm1NL0VRSUNWSFhsMkIw?=
+ =?utf-8?B?amJGU0FWZ0s2cDA5VytacVZuc05PQ0Q1ZExXbGtXbm5SNkRtbzhjZ2g4OStV?=
+ =?utf-8?B?NEZUYmpuSjVxYnh3V2lyZjNhc2M0NFdjSHgxYTJKRGhZRnF5bGVtU0pMZk9B?=
+ =?utf-8?B?MFBTQUoyRy9NVURxeE5tR2NDdlJldDZldnYwZ3N6b2JmNStOYlVSdTBOV01w?=
+ =?utf-8?B?ZHFYYS9kTitkVERSbXRXWG81YTkxMWU5UUJiMnBqNnBZOW5sQnFCWmJPbEti?=
+ =?utf-8?B?MklBQWxQVG1IZE9LQUZkOWlpbVdaVDZiQlhQK1pMWkdHSXhTdFN3MmcvM1BQ?=
+ =?utf-8?Q?8rHRhW4N?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a5be1e0-62e8-425c-d0a4-08d8c3ede9a1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60361f35-5746-4c87-6fc2-08d8c3eede62
 X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2021 00:36:27.1734
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2021 00:43:17.5240
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JZZkEDKic5UPfw3f2ZYwLTtnmJuMkJxIDsN5J/zzdUXJfFbbMwRWnUdSD6/9Wqlv
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2525
-To:     unlisted-recipients:; (no To-header on input)
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1tNBKMZwh0nJYQqRF9NtATWL+7Elc7S8D7nlAMqt+yg1XKfNkUCoYV2PkwstKuIH
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2560
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the SPEC_CTRL tests for SVM and make sure the settings on L2
-guests does not overwrite the L1 guest's SPEC_CTRL settings.
-
-Test Method.
-1. Save the L1 guests SPEC_CTRL settings(rdmsr). Normally 0.
-2. Start the L2 guest
-3. Change the L2 guests SPEC_CTRL settings.
-4. Exit the L2 guest.
-5. Verify if the settings from step #1 still holds.
-
-Signed-off-by: Babu Moger <babu.moger@amd.com>
+Newer AMD processors have a feature to virtualize the use of the
+SPEC_CTRL MSR on the guest. The series adds the feature support
+and enables the feature on SVM.
 ---
- x86/svm_tests.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+v4:
+  1. Taken care of comments from Sean Christopherson.
+     a. Updated svm_set_msr/svm_get_msr to read/write the spec_ctrl value
+        directly from save spec_ctrl.
+     b. Disabled the msr_interception in init_vmcb when V_SPEC_CTRL is
+        present.
+     c. Added the save restore for nested vm. Also tested to make sure
+        the nested SPEC_CTRL settings properly saved and restored between
+        L2 and L1 guests.
+  2. Added the kvm-unit-tests to verify that. Sent those patches separately.
 
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index 29a0b59..2867337 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -2002,6 +2002,55 @@ static bool init_intercept_check(struct svm_test *test)
-     return init_intercept;
- }
- 
-+/* Indirect Branch Restricted Speculation(bit 0) */
-+#define SPEC_CTRL_IBRS        1
-+/* Single Thread Indirect Branch Predictor (STIBP)(bit 1) */
-+#define SPEC_CTRL_STIBP       2
-+/* Speculative Store Bypass Disable (bit 2) */
-+#define SPEC_CTRL_SSBD        4
-+
-+static bool spec_ctrl_supported(void)
-+{
-+    return this_cpu_has(X86_FEATURE_AMD_SSBD) ||
-+           this_cpu_has(X86_FEATURE_AMD_STIBP) ||
-+           this_cpu_has(X86_FEATURE_AMD_IBRS);
-+}
-+
-+static void spec_ctrl_prepare(struct svm_test *test)
-+{
-+    vmcb_ident(vmcb);
-+    test->scratch = rdmsr(MSR_IA32_SPEC_CTRL);
-+}
-+
-+/*
-+ * Write it twice to bypass the interception. The first write to
-+ * SPEC_CTRL is intercepted in older kernels.
-+ */
-+static void spec_ctrl_test(struct svm_test *test)
-+{
-+    int spec_ctrl = 0;
-+
-+    if (this_cpu_has(X86_FEATURE_AMD_SSBD))
-+        spec_ctrl |= SPEC_CTRL_SSBD;
-+    if (this_cpu_has(X86_FEATURE_AMD_STIBP))
-+        spec_ctrl |= SPEC_CTRL_STIBP;
-+    if (this_cpu_has(X86_FEATURE_AMD_IBRS))
-+        spec_ctrl |= SPEC_CTRL_IBRS;
-+
-+    wrmsr(MSR_IA32_SPEC_CTRL, spec_ctrl);
-+    wrmsr(MSR_IA32_SPEC_CTRL, spec_ctrl);
-+}
-+
-+static bool spec_ctrl_finished(struct svm_test *test)
-+{
-+    return vmcb->control.exit_code == SVM_EXIT_VMMCALL;
-+}
-+
-+static bool spec_ctrl_check(struct svm_test *test)
-+{
-+    return test->scratch == rdmsr(MSR_IA32_SPEC_CTRL);
-+}
-+
- #define TEST(name) { #name, .v2 = name }
- 
- /*
-@@ -2492,6 +2541,9 @@ struct svm_test svm_tests[] = {
-     { "svm_init_intercept_test", smp_supported, init_intercept_prepare,
-       default_prepare_gif_clear, init_intercept_test,
-       init_intercept_finished, init_intercept_check, .on_vcpu = 2 },
-+    { "SPEC_CTRL", spec_ctrl_supported, spec_ctrl_prepare,
-+      default_prepare_gif_clear, spec_ctrl_test,
-+      spec_ctrl_finished, spec_ctrl_check },
-     TEST(svm_cr4_osxsave_test),
-     TEST(svm_guest_state_test),
-     TEST(svm_vmrun_errata_test),
+v3:
+  1. Taken care of recent changes in vmcb_save_area. Needed to adjust the save
+     area spec_ctrl definition.
+  2. Taken care of few comments from Tom.
+     a. Initialised the save area spec_ctrl in case of SEV-ES.
+     b. Removed the changes in svm_get_msr/svm_set_msr.
+     c. Reverted the changes to disable the msr interception to avoid compatibility
+        issue.
+  3. Updated the patch #1 with Acked-by from Boris.
+  
+v2:
+  NOTE: This is not final yet. Sending out the patches to make
+  sure I captured all the comments correctly.
 
+  1. Most of the changes are related to Jim and Sean's feedback.
+  2. Improved the description of patch #2.
+  3. Updated the vmcb save area's guest spec_ctrl value(offset 0x2E0)
+     properly. Initialized during init_vmcb and svm_set_msr and
+     returned the value from save area for svm_get_msr.
+  4. As Jim commented, transferred the value into the VMCB prior
+     to VMRUN and out of the VMCB after #VMEXIT.
+  5. Added kvm-unit-test to detect the SPEC CTRL feature.
+     https://lore.kernel.org/kvm/160865324865.19910.5159218511905134908.stgit@bmoger-ubuntu/
+  6. Sean mantioned of renaming MSR_AMD64_VIRT_SPEC_CTRL. But, it might
+     create even more confusion, so dropped the idea for now.
+
+v3: https://lore.kernel.org/kvm/161073115461.13848.18035972823733547803.stgit@bmoger-ubuntu/
+v2: https://lore.kernel.org/kvm/160867624053.3471.7106539070175910424.stgit@bmoger-ubuntu/
+v1: https://lore.kernel.org/kvm/160738054169.28590.5171339079028237631.stgit@bmoger-ubuntu/
+
+Babu Moger (2):
+      x86/cpufeatures: Add the Virtual SPEC_CTRL feature
+      KVM: SVM: Add support for Virtual SPEC_CTRL
+
+
+ arch/x86/include/asm/cpufeatures.h |    1 +
+ arch/x86/include/asm/svm.h         |    4 +++-
+ arch/x86/kvm/svm/nested.c          |    2 ++
+ arch/x86/kvm/svm/svm.c             |   27 ++++++++++++++++++++++-----
+ 4 files changed, 28 insertions(+), 6 deletions(-)
+
+--
