@@ -2,195 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF4D308864
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 12:42:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F3193088AC
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 12:57:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232484AbhA2LIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 06:08:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59176 "EHLO
+        id S232180AbhA2L5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 06:57:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51764 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232207AbhA2K0V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 05:26:21 -0500
+        by vger.kernel.org with ESMTP id S232349AbhA2L42 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 06:56:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611915856;
+        s=mimecast20190719; t=1611921001;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nP4l2G4dODpjaU7YDjg1QGuqXy7wbW7wVhXMNoRQIL8=;
-        b=Eqh7bkVyYpdnDsbErTErc62QFiAgHbnl8k8wiyObaT50FaWf+XNBBSf3CINep//4NxagIO
-        8CBhdmQpo+21Q6iVJbrPWI0H4C+hBdzBo+D/ytHZKZbeh1uGNk2sfyYhQ1fdvm+Z9accPO
-        kCYuZ/jYbUQqDEkKJYH7w0rJ0GQThgI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-JNRr4H3tPICzbRd9hukfxg-1; Fri, 29 Jan 2021 04:26:09 -0500
-X-MC-Unique: JNRr4H3tPICzbRd9hukfxg-1
-Received: by mail-ed1-f70.google.com with SMTP id q12so4634029edr.2
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 01:26:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nP4l2G4dODpjaU7YDjg1QGuqXy7wbW7wVhXMNoRQIL8=;
-        b=em4AtVtfRtX6eLiqtnTBBfE4qMRVRhceyvqq33hDrkM2uz4ulgYCR1eGB/BhSo35LL
-         yA0b2Dwe/BPv7JSCqQ5p/6iFD2cEchbVDthH9u7u8Am274n6+xlrGgEh+bQLMJnk+IMj
-         BjZQfKrzq8J22XVaCBLufbBdyfYQjuEPsTYkWwYt3qb6WXs2BZHaEOl0vRbhuVcsh1wG
-         keq+3xwQE2O3Z/ws7f3fRjao3NQmOr4K1oWO9OSwbCKn3VadFzegn9MaeAG8Cwo/7uq0
-         IK/GgGtZLdp85eQk9yp4FQNIY5yrjD9FhtVqpThChcFpud7IqN0OuNNFp0IG3tgYaZIz
-         nvpA==
-X-Gm-Message-State: AOAM532H5WhnEWpF/adaCEYxNHrScN/ybWEy08UMIDGL788ia9EhyrXR
-        dg8twxZGqeR9qoVTrJmp3c0wxC7yLtyN+uFuq1QiklFuHQ0Xiw701pymwrsfJJwARyEpuVNqwDI
-        BUtgwShvl/2NY
-X-Received: by 2002:a05:6402:4242:: with SMTP id g2mr4091941edb.103.1611912368225;
-        Fri, 29 Jan 2021 01:26:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy2D+e1xoz9VblcO2a9mHDykKQQov6UxFQbNQz9AXlqGu90jfarHaQYZn2TFTNC1vtihyqKwg==
-X-Received: by 2002:a05:6402:4242:: with SMTP id g2mr4091910edb.103.1611912367935;
-        Fri, 29 Jan 2021 01:26:07 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id r23sm3509763ejd.56.2021.01.29.01.26.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 01:26:07 -0800 (PST)
-Date:   Fri, 29 Jan 2021 10:26:04 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "stsp2@yandex.ru" <stsp2@yandex.ru>,
-        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210129092604.mgaw3ipiyv6xra3b@steredhat>
-References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
- <20210128171923.esyna5ccv5s27jyu@steredhat>
- <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=cMS/7pknUs0YwtKE5mir0RQEvSlJ4gZuoZK/GL0Bh2Y=;
+        b=V+Np74pZDHBoxkmgbxmuV5QR72nl7GYRg1cmm1E6F80+/vlw9SAxt4axUwlmR6YcUSy2Th
+        882wWKdPVpIlxmFqNRgN0hksybcJSqaPokw4oXjKHkNZ4d9330R317eXQTEprVMF3dc1sr
+        aVzMJloSOHcCwj07URmM//MbxvF/pJc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351--eV7d5yzP3q2OGNv-XIFLQ-1; Fri, 29 Jan 2021 05:19:15 -0500
+X-MC-Unique: -eV7d5yzP3q2OGNv-XIFLQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECCB418C8C01;
+        Fri, 29 Jan 2021 10:19:13 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7317B60C04;
+        Fri, 29 Jan 2021 10:19:13 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com, stable@vger.kernel.org
+Subject: [PATCH v2] KVM: x86: Allow guests to see MSR_IA32_TSX_CTRL even if tsx=off
+Date:   Fri, 29 Jan 2021 05:19:12 -0500
+Message-Id: <20210129101912.1857809-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 29, 2021 at 09:41:50AM +0300, Arseny Krasnov wrote:
->
->On 28.01.2021 20:19, Stefano Garzarella wrote:
->> Hi Arseny,
->> I reviewed a part, tomorrow I hope to finish the other patches.
->>
->> Just a couple of comments in the TODOs below.
->>
->> On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
->>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
->>> transport.
->>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->>> do it, new packet operation was added: it marks start of record (with
->>> record length in header), such packet doesn't carry any data.  To send
->>> record, packet with start marker is sent first, then all data is sent
->>> as usual 'RW' packets. On receiver's side, length of record is known
->> >from packet with start record marker. Now as  packets of one socket
->>> are not reordered neither on vsock nor on vhost transport layers, such
->>> marker allows to restore original record on receiver's side. If user's
->>> buffer is smaller that record length, when all out of size data is
->>> dropped.
->>> 	Maximum length of datagram is not limited as in stream socket,
->>> because same credit logic is used. Difference with stream socket is
->>> that user is not woken up until whole record is received or error
->>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
->>> 	Tests also implemented.
->>>
->>> Arseny Krasnov (13):
->>>  af_vsock: prepare for SOCK_SEQPACKET support
->>>  af_vsock: prepare 'vsock_connectible_recvmsg()'
->>>  af_vsock: implement SEQPACKET rx loop
->>>  af_vsock: implement send logic for SOCK_SEQPACKET
->>>  af_vsock: rest of SEQPACKET support
->>>  af_vsock: update comments for stream sockets
->>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
->>>  virtio/vsock: fetch length for SEQPACKET record
->>>  virtio/vsock: add SEQPACKET receive logic
->>>  virtio/vsock: rest of SOCK_SEQPACKET support
->>>  virtio/vsock: setup SEQPACKET ops for transport
->>>  vhost/vsock: setup SEQPACKET ops for transport
->>>  vsock_test: add SOCK_SEQPACKET tests
->>>
->>> drivers/vhost/vsock.c                   |   7 +-
->>> include/linux/virtio_vsock.h            |  12 +
->>> include/net/af_vsock.h                  |   6 +
->>> include/uapi/linux/virtio_vsock.h       |   9 +
->>> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
->>> net/vmw_vsock/virtio_transport.c        |   4 +
->>> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
->>> tools/testing/vsock/util.c              |  32 +-
->>> tools/testing/vsock/util.h              |   3 +
->>> tools/testing/vsock/vsock_test.c        | 126 +++++
->>> 10 files changed, 862 insertions(+), 175 deletions(-)
->>>
->>> TODO:
->>> - Support for record integrity control. As transport could drop some
->>>   packets, something like "record-id" and record end marker need to
->>>   be implemented. Idea is that SEQ_BEGIN packet carries both record
->>>   length and record id, end marker(let it be SEQ_END) carries only
->>>   record id. To be sure that no one packet was lost, receiver checks
->>>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
->>>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
->>>   means that both markers were not dropped. I think that easiest way
->>>   to implement record id for SEQ_BEGIN is to reuse another field of
->>>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
->>>   SEQ_END record id could be stored in 'flags'.
->> I don't really like the idea of reusing the 'flags' field for this
->> purpose.
->>
->>>     Another way to implement it, is to move metadata of both SEQ_END
->>>   and SEQ_BEGIN to payload. But this approach has problem, because
->>>   if we move something to payload, such payload is accounted by
->>>   credit logic, which fragments payload, while payload with record
->>>   length and id couldn't be fragmented. One way to overcome it is to
->>>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
->>>   is to update 'stream_has_space()' function: current implementation
->>>   return non-zero when at least 1 byte is allowed to use,but updated
->>>   version will have extra argument, which is needed length. For 'RW'
->>>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
->>>   record id) and for SEQ_END it is sizeof(record id).
->> Is the payload accounted by credit logic also if hdr.op is not
->> VIRTIO_VSOCK_OP_RW?
->
->Yes, on send any packet with payload could be fragmented if
->
->there is not enough space at receiver. On receive 'fwd_cnt' and
->
->'buf_alloc' are updated with header of every packet. Of course,
->
->to every such case i've described i can add check for 'RW'
->
->packet, to exclude payload from credit accounting, but this is
->
->bunch of dumb checks.
->
->>
->> I think that we can define a specific header to put after the
->> virtio_vsock_hdr when hdr.op is SEQ_BEGIN or SEQ_END, and in this header
->> we can store the id and the length of the message.
->
->I think it is better than use payload and touch credit logic
->
+Userspace that does not know about KVM_GET_MSR_FEATURE_INDEX_LIST
+will generally use the default value for MSR_IA32_ARCH_CAPABILITIES.
+When this happens and the host has tsx=on, it is possible to end up with
+virtual machines that have HLE and RTM disabled, but TSX_CTRL available.
 
-Cool, so let's try this option, hoping there aren't a lot of issues.
+If the fleet is then switched to tsx=off, kvm_get_arch_capabilities()
+will clear the ARCH_CAP_TSX_CTRL_MSR bit and it will not be possible to
+use the tsx=off hosts as migration destinations, even though the guests
+do not have TSX enabled.
 
-Another item for TODO could be to add the SOCK_SEQPACKET support also 
-for vsock_loopback. Should be simple since it also uses 
-virtio_transport_common APIs and it can be useful for testing and 
-debugging.
+To allow this migration, allow guests to write to their TSX_CTRL MSR,
+while keeping the host MSR unchanged for the entire life of the guests.
+This ensures that TSX remains disabled and also saves MSR reads and
+writes, and it's okay to do because with tsx=off we know that guests will
+not have the HLE and RTM features in their CPUID.  (If userspace sets
+bogus CPUID data, we do not expect HLE and RTM to work in guests anyway).
 
-Thanks,
-Stefano
+Cc: stable@vger.kernel.org
+Fixes: cbbaa2727aa3 ("KVM: x86: fix presentation of TSX feature in ARCH_CAPABILITIES")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 17 +++++++++++++----
+ arch/x86/kvm/x86.c     |  2 +-
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cc60b1fc3ee7..eb69fef57485 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6860,11 +6860,20 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
+ 		switch (index) {
+ 		case MSR_IA32_TSX_CTRL:
+ 			/*
+-			 * No need to pass TSX_CTRL_CPUID_CLEAR through, so
+-			 * let's avoid changing CPUID bits under the host
+-			 * kernel's feet.
++			 * TSX_CTRL_CPUID_CLEAR is handled in the CPUID
++			 * interception.  Keep the host value unchanged to avoid
++			 * changing CPUID bits under the host kernel's feet.
++			 *
++			 * hle=0, rtm=0, tsx_ctrl=1 can be found with some
++			 * combinations of new kernel and old userspace.  If
++			 * those guests run on a tsx=off host, do allow guests
++			 * to use TSX_CTRL, but do not change the value on the
++			 * host so that TSX remains always disabled.
+ 			 */
+-			vmx->guest_uret_msrs[j].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
++			if (boot_cpu_has(X86_FEATURE_RTM))
++				vmx->guest_uret_msrs[j].mask = ~(u64)TSX_CTRL_CPUID_CLEAR;
++			else
++				vmx->guest_uret_msrs[j].mask = 0;
+ 			break;
+ 		default:
+ 			vmx->guest_uret_msrs[j].mask = -1ull;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 76bce832cade..15733013b266 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1401,7 +1401,7 @@ static u64 kvm_get_arch_capabilities(void)
+ 	 *	  This lets the guest use VERW to clear CPU buffers.
+ 	 */
+ 	if (!boot_cpu_has(X86_FEATURE_RTM))
+-		data &= ~(ARCH_CAP_TAA_NO | ARCH_CAP_TSX_CTRL_MSR);
++		data &= ~ARCH_CAP_TAA_NO;
+ 	else if (!boot_cpu_has_bug(X86_BUG_TAA))
+ 		data |= ARCH_CAP_TAA_NO;
+ 
+-- 
+2.26.2
 
