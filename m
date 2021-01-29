@@ -2,223 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C05630808E
-	for <lists+kvm@lfdr.de>; Thu, 28 Jan 2021 22:31:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7F5D30827D
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 01:38:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbhA1Vaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Jan 2021 16:30:39 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16690 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229646AbhA1Vad (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Jan 2021 16:30:33 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10SL1mKT013629;
-        Thu, 28 Jan 2021 16:29:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=jt1RnwdHY5DjF/gvqVcwznXvpJQjKVhf8Q3qnBluuUs=;
- b=ORcxMv7Unpe2E2ddTEezVN+yBm/SeFaX3qkPk+kOZiNNTck5IMt4trBTjO+7hPRsfvFp
- R7g7yMOs+r373Nezc5T5awsmXMmdjWCt6mgQftj/l85dtPlI7QcnXLqSV0oa2EPmdNxd
- bAawrK3KpKtkZgEWeSiDpA4tgSQD0hRBCz4fPvM7EtZWqPAGCCbgEdxtoVj32dhEKFHK
- JjrJn3MbvyDEm0c4JyWV17DkzkGOCWYlhrmyrZiKkKF+YPhcryD0Rzw2nuuccPfuUuZb
- x/uDVE+w3SlsSxcYAfHOS0LUsyBdQEqCkb0YM9pDFC4drTIbhtfhDs3+ntW6DcPGCWDf oA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36c2fn4e7h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jan 2021 16:29:48 -0500
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 10SL2Siw017019;
-        Thu, 28 Jan 2021 16:29:47 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36c2fn4e7c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jan 2021 16:29:47 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10SLGwUD007064;
-        Thu, 28 Jan 2021 21:29:47 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma04wdc.us.ibm.com with ESMTP id 36ag3ykg0a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Jan 2021 21:29:47 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10SLTj5C9176008
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Jan 2021 21:29:45 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 82412AE05F;
-        Thu, 28 Jan 2021 21:29:45 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B41A6AE05C;
-        Thu, 28 Jan 2021 21:29:44 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.193.150])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Jan 2021 21:29:44 +0000 (GMT)
-Subject: Re: [PATCH v13 08/15] s390/vfio-ap: sysfs attribute to display the
- guest's matrix
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
- <20201223011606.5265-9-akrowiak@linux.ibm.com>
- <20210111235806.5df42658.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <6b526a2c-138c-55ad-d3f0-9c96558b255b@linux.ibm.com>
-Date:   Thu, 28 Jan 2021 16:29:44 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20210111235806.5df42658.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S231474AbhA2Ahk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Jan 2021 19:37:40 -0500
+Received: from mail-bn8nam12on2070.outbound.protection.outlook.com ([40.107.237.70]:21985
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231224AbhA2AhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Jan 2021 19:37:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OI+3tnVGtcdTbhopAoZ6ule685svDMKVqoH0pLPSKAMp5dKVcEwCtYD+401Yz0zgYItqDAC87/3fwP5+j9xWU/qSS1Hqstb9oGCZMoyYFA328cSIkxhJ8Jj8/QZQRWUNf3WcGlWCZQcnvqP/uWNafqRD/KaZDNa5mtUwjoYhJ9suF5kHLLu3UB3SN+CIJIR54ueRvTDBq/DIHaqBnOgaDSniJ1U1xbmwq0HljoULVTm+l1t7jN+gq+4j7OPqJDOk14jzd3kg6DleQ/Mfeb9/2K2hEg6Ov0xBdAB0s+133fWye5jOkR7ZInFHLGYgQqsy6w3iinAADzcD7t9CHZxsEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AruFte91wRB3UbNqyw/AX12Rp8NizpbMwBa1k3aBqnE=;
+ b=TZTbiBJXXnQ3t9z6/EVTAOFgvwYH5QO3ZuFS3EoZrVdjP58BSIZhWjmqRnlrPQ/5v1BBQ2UBTrd5qwcPWnmPHyF5tbdvStVfTQRhrPrrQh9NxJm6ABIdkMgDZpwRqEJHT5kvg20qwWQ8GYZ5x21c4s80U5dC2UhwOmxYAAeA7DWM8Io+Cs/wFzSyjlnXaO8QGKdhDGyFg6tWiZ01Hv+f9JHec22xCraf12dNDGnhLonkGInTSiMHkmyKD4vHJbonh0iXXQTCo2flRI09L0WuVYAAtNeC48ZjOckKqw/o77bNFRCBZv89pXd+Het8Ff6/AL1iGbvAQrWH7AxFwVURQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AruFte91wRB3UbNqyw/AX12Rp8NizpbMwBa1k3aBqnE=;
+ b=tr+VRiL2ebnHaMBq2iZOtseMCn2WqqE6ne28WhzQLKU5Dr4rFpGBVfPDzWkr2OFcemWfU8RC1VSsbsMUOPE/4KmXZdUIwY15U5ApkE1uaPkFe2lov/v7HX/730xTSdewEqzRENInis7Ds7DyUHqBJLdkmXz6ltwpYxbsxuL5nus=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2525.namprd12.prod.outlook.com (2603:10b6:802:29::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Fri, 29 Jan
+ 2021 00:36:13 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::8c0e:9a64:673b:4fff]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::8c0e:9a64:673b:4fff%5]) with mapi id 15.20.3805.019; Fri, 29 Jan 2021
+ 00:36:13 +0000
+Subject: [kvm-unit-tests PATCH v2 0/2] x86: SPEC_CTRL tests
+From:   Babu Moger <babu.moger@amd.com>
+Cc:     kvm@vger.kernel.org
+Date:   Thu, 28 Jan 2021 18:36:10 -0600
+Message-ID: <161188044937.28708.9182196001493811398.stgit@bmoger-ubuntu>
+User-Agent: StGit/0.17.1-dirty
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
- definitions=2021-01-28_12:2021-01-28,2021-01-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- spamscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 suspectscore=0 malwarescore=0 mlxscore=0
- mlxlogscore=999 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2101280099
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SN7PR04CA0291.namprd04.prod.outlook.com
+ (2603:10b6:806:123::26) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [127.0.1.1] (165.204.77.1) by SN7PR04CA0291.namprd04.prod.outlook.com (2603:10b6:806:123::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Fri, 29 Jan 2021 00:36:11 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 041bbfad-c033-40ef-933c-08d8c3ede060
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2525:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN1PR12MB252588D9DADA067AB4475A2995B99@SN1PR12MB2525.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Vg4zCzTeVA28k9+kc4lINKRQHeu5D9v2OC6vDDBLYetzbjvWCGJtMD8cX4kXl70hiVtIIa3fby8N2k/n0lhvLMP0q8H+iurYSTiECYZLMizS3tOrIAnvQki92wVc9whhjOvDCjowODLfxQImqpnOnuS2VUCAfjRb+44xlOEu4364mGyLyW61Gn3xhJUwyMszweTCTMAQoN/+mJDCwBseu1EUfavqF0ubnWED+WKZTLW98O3L8cCw3BGIkcq/OjCAbj3JRjY4+XfsoKHt/vk5EkKNGnxHacslKSCrjKPAKrCiHLa3yzslvgn+v7iL6o+Fx9u0+8RbJLaM7rPluC/YRKhFiUkTxdz4CDH4yjuS3XKd9MTRlym6iO0QG9nYQEcIOI0yQBEqI6ckOem1t9xKJd1GXFSfYBOKcFbM/uXG/lvQnHHPwKLIP3U8lUuvwCHeCUwwywWtdgWtLVB3D8bB51/Othh/MAaaob/Nvea9Q4CM4xHgoGZ9pT1eqCcZxvhlJFL8gTMVooWg4LVkaF9EOuxgWiJccul/LXKOTAgzQGykHRvOjko4jwcs+kA2wqOSutmH3+9sKIxC08XaU51qdTlvKi8Rjh6p+iwq5a5aTcY=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN1PR12MB2560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(396003)(346002)(39860400002)(366004)(136003)(376002)(83380400001)(2906002)(103116003)(66946007)(8936002)(8676002)(52116002)(4326008)(86362001)(66476007)(66556008)(109986005)(966005)(186003)(6486002)(478600001)(16526019)(26005)(5660300002)(4744005)(33716001)(44832011)(316002)(16576012)(9686003)(956004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?b2FRejRSVklWRHNhTFdpWFVjWEZiM1cySlhyVEJOWnlENXRyQ3owMU1wSUk5?=
+ =?utf-8?B?Tmo1L1lLS2JETXhHT3dSR2twQjMyOThUS1A1RHBEV1VSOWxsS0JYaTQ5RnZD?=
+ =?utf-8?B?YVpuVW5BUk91RWYzSVM4a29LeFh2eXBsU1dTdnVEYVRFMUVVOTFqSklSN2lU?=
+ =?utf-8?B?bXRQZ1c3azM0eHJDZ0hPZUlJTk9lelZMTFlYVWo5NmQreG9hc3MvcWRMdjFI?=
+ =?utf-8?B?eVlITHpZSzNXdWFJNEZCdHZCeWZNZmNGaURzRGV2c0dVOFVwV2t2ZHE5MklE?=
+ =?utf-8?B?Q3lmMyswb0ZKTjNHN3BZM3lQSXRpMjZjN2JSRUZMc0x6b1JaUDhKaDllUktB?=
+ =?utf-8?B?bFJUMTlyMEdCaHQrSHUvdVIvaXU5Mk81REwrM2YxZmszZHJmMjlZNmpHbVlu?=
+ =?utf-8?B?bTRiYUI2WHR4U2lick84amplVDBlVnhYRytEZThDUHRtZktYeE1jREh1WHRu?=
+ =?utf-8?B?RjVDTGZ6OHIraEtOQjVKQytQUUhPaWxQYUkxM3lodDlIYWZ0dmlRMEVqWmVy?=
+ =?utf-8?B?ekZUdnZKb1lqWEdUNGw4ZG44a2FhR0R6NkNab2VmS0NsSU9VSUdDMEZXZkRw?=
+ =?utf-8?B?UWJUTnMvTFpjTUxrbjgrOXVHL2lvUnZiYXpkME5NTGlJMEt2VmxQaU5BanZr?=
+ =?utf-8?B?QnJwS01Ib1BBUUYxemkyL2tVbk42dVZJekg1VVdJRVBuZjRySmY4bU1OTmJY?=
+ =?utf-8?B?ZWFobDVneVVZY2VHdGplVWswV1FvWi9tbXNIbGJoVzg0ZzJRMGNHNFlOTGRu?=
+ =?utf-8?B?U3dwWEdoT2hnZzFFRENPMGJobEJNTGNhUENZQmw2eVlXSzdpNkRyNWsyMlBa?=
+ =?utf-8?B?UkJGQ21Zb01uU1VLalk1VEtHNWR3V21pM212b3VtUlkzd1VjcFphMTR5T3h5?=
+ =?utf-8?B?TFAyUTQyT05TVlU1eVFJL0dKWG9xL3FjNTRpL2F5SjJOaVUvNmpRTGpYOEFM?=
+ =?utf-8?B?NklGVGNBRHJDVHRXT2FmNXlIL1NMeHIxeHc5Tzl1ZHBuUTNjenNnZ0NsemVk?=
+ =?utf-8?B?SEYybmN2Q00wRVkvR2JycWtvVW9xR1J3MkFsWmEvK2JVUEFnRXN1T0ZwbEFs?=
+ =?utf-8?B?cS9ZbU8vd3ZsVmhuQlluQ2xRRWVwd2RaTExVSUJBRXhrckp2a3NNZDZQTlhr?=
+ =?utf-8?B?RXd0TmVBU2t0YmpIbXVpRDJqRHpwejFkcTIwQzhnckExTmZjMVBkajQ1ZU11?=
+ =?utf-8?B?ZkExbkVDQzBjeTU3bkVxZzlsekdNT3Zoc2p3K29ubGt5Y3lUTGVJSXlzbWtz?=
+ =?utf-8?B?R2k1Vk5XSzlSOFUvU0hFbmVkV3pxemJuV3NiWi9adFg0TTRZVytwRG9vRTJh?=
+ =?utf-8?B?MnVMdjJYY0pJMkFZUGhQUjRZb2NRd08vY3JsUmZKcFVuQjAvSzFHejBlejBT?=
+ =?utf-8?B?RmFIVDBUQ1VnK2pHeVcwWXdnZmJtMXdxZzBDalg2andabXBzWFBNbmRGbUhC?=
+ =?utf-8?Q?dmiLPu/P?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 041bbfad-c033-40ef-933c-08d8c3ede060
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2021 00:36:13.2574
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WFEwliMHljL2QOlUqdhpBE13H5GxpFqXCroeVr71Ej/CgDltJuQIuRvkEmYmnYaj
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2525
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Add SPEC_CTRL detection and verification tests.
+---
+v2:
+   Added svm SPEC_CTRL verification tests.
+   Changed few texts.
+
+v1: https://lore.kernel.org/kvm/160865324865.19910.5159218511905134908.stgit@bmoger-ubuntu/
+
+Babu Moger (2):
+      x86: Add SPEC CTRL detection tests
+      x86: svm: Add SPEC_CTRL feature test
 
 
-On 1/11/21 5:58 PM, Halil Pasic wrote:
-> On Tue, 22 Dec 2020 20:15:59 -0500
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> The matrix of adapters and domains configured in a guest's APCB may
->> differ from the matrix of adapters and domains assigned to the matrix mdev,
->> so this patch introduces a sysfs attribute to display the matrix of
->> adapters and domains that are or will be assigned to the APCB of a guest
->> that is or will be using the matrix mdev. For a matrix mdev denoted by
->> $uuid, the guest matrix can be displayed as follows:
->>
->>     cat /sys/devices/vfio_ap/matrix/$uuid/guest_matrix
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
->
-> But because vfio_ap_mdev_commit_shadow_apcb() is not used (see prev
-> patch) the attribute won't show the guest matrix at this point. :(
+ lib/x86/processor.h |    5 +++++
+ x86/Makefile.x86_64 |    1 +
+ x86/spec_ctrl.c     |   30 +++++++++++++++++++++++++++++
+ x86/svm_tests.c     |   52 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ x86/unittests.cfg   |    5 +++++
+ 5 files changed, 93 insertions(+)
+ create mode 100644 x86/spec_ctrl.c
 
-I'll move this patch following all of the filtering and hot plug
-patches.
-
->
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 51 ++++++++++++++++++++++---------
->>   1 file changed, 37 insertions(+), 14 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
->> index 44b3a81cadfb..1b1d5975ee0e 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -894,29 +894,24 @@ static ssize_t control_domains_show(struct device *dev,
->>   }
->>   static DEVICE_ATTR_RO(control_domains);
->>   
->> -static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
->> -			   char *buf)
->> +static ssize_t vfio_ap_mdev_matrix_show(struct ap_matrix *matrix, char *buf)
->>   {
->> -	struct mdev_device *mdev = mdev_from_dev(dev);
->> -	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->>   	char *bufpos = buf;
->>   	unsigned long apid;
->>   	unsigned long apqi;
->>   	unsigned long apid1;
->>   	unsigned long apqi1;
->> -	unsigned long napm_bits = matrix_mdev->matrix.apm_max + 1;
->> -	unsigned long naqm_bits = matrix_mdev->matrix.aqm_max + 1;
->> +	unsigned long napm_bits = matrix->apm_max + 1;
->> +	unsigned long naqm_bits = matrix->aqm_max + 1;
->>   	int nchars = 0;
->>   	int n;
->>   
->> -	apid1 = find_first_bit_inv(matrix_mdev->matrix.apm, napm_bits);
->> -	apqi1 = find_first_bit_inv(matrix_mdev->matrix.aqm, naqm_bits);
->> -
->> -	mutex_lock(&matrix_dev->lock);
->> +	apid1 = find_first_bit_inv(matrix->apm, napm_bits);
->> +	apqi1 = find_first_bit_inv(matrix->aqm, naqm_bits);
->>   
->>   	if ((apid1 < napm_bits) && (apqi1 < naqm_bits)) {
->> -		for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, napm_bits) {
->> -			for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
->> +		for_each_set_bit_inv(apid, matrix->apm, napm_bits) {
->> +			for_each_set_bit_inv(apqi, matrix->aqm,
->>   					     naqm_bits) {
->>   				n = sprintf(bufpos, "%02lx.%04lx\n", apid,
->>   					    apqi);
->> @@ -925,25 +920,52 @@ static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
->>   			}
->>   		}
->>   	} else if (apid1 < napm_bits) {
->> -		for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, napm_bits) {
->> +		for_each_set_bit_inv(apid, matrix->apm, napm_bits) {
->>   			n = sprintf(bufpos, "%02lx.\n", apid);
->>   			bufpos += n;
->>   			nchars += n;
->>   		}
->>   	} else if (apqi1 < naqm_bits) {
->> -		for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, naqm_bits) {
->> +		for_each_set_bit_inv(apqi, matrix->aqm, naqm_bits) {
->>   			n = sprintf(bufpos, ".%04lx\n", apqi);
->>   			bufpos += n;
->>   			nchars += n;
->>   		}
->>   	}
->>   
->> +	return nchars;
->> +}
->> +
->> +static ssize_t matrix_show(struct device *dev, struct device_attribute *attr,
->> +			   char *buf)
->> +{
->> +	ssize_t nchars;
->> +	struct mdev_device *mdev = mdev_from_dev(dev);
->> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	nchars = vfio_ap_mdev_matrix_show(&matrix_mdev->matrix, buf);
->>   	mutex_unlock(&matrix_dev->lock);
->>   
->>   	return nchars;
->>   }
->>   static DEVICE_ATTR_RO(matrix);
->>   
->> +static ssize_t guest_matrix_show(struct device *dev,
->> +				 struct device_attribute *attr, char *buf)
->> +{
->> +	ssize_t nchars;
->> +	struct mdev_device *mdev = mdev_from_dev(dev);
->> +	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->> +
->> +	mutex_lock(&matrix_dev->lock);
->> +	nchars = vfio_ap_mdev_matrix_show(&matrix_mdev->shadow_apcb, buf);
->> +	mutex_unlock(&matrix_dev->lock);
->> +
->> +	return nchars;
->> +}
->> +static DEVICE_ATTR_RO(guest_matrix);
->> +
->>   static struct attribute *vfio_ap_mdev_attrs[] = {
->>   	&dev_attr_assign_adapter.attr,
->>   	&dev_attr_unassign_adapter.attr,
->> @@ -953,6 +975,7 @@ static struct attribute *vfio_ap_mdev_attrs[] = {
->>   	&dev_attr_unassign_control_domain.attr,
->>   	&dev_attr_control_domains.attr,
->>   	&dev_attr_matrix.attr,
->> +	&dev_attr_guest_matrix.attr,
->>   	NULL,
->>   };
->>   
-
+--
