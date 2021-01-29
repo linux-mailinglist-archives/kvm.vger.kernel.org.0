@@ -2,119 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66736308CD0
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 19:55:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 834D2308D4D
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 20:26:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232706AbhA2Syr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 13:54:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35253 "EHLO
+        id S233007AbhA2TXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 14:23:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34176 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230249AbhA2Syp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 13:54:45 -0500
+        by vger.kernel.org with ESMTP id S232849AbhA2TV2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Jan 2021 14:21:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611946387;
+        s=mimecast20190719; t=1611948001;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v2lQG7NOq1Y30ihZ3JvjW7LHsEzNf1l5ZIU262Ux5yw=;
-        b=c0PgIOjsr976CNPR89OESQ0xSsQ9hu4Lw3TcbFho97eBvzcNxipZGJzdi1cOaStyx7zRJ3
-        0YGYQjvlWUkJU4g2Ww88KsHp2txdbOWmDSs/aE+xXzKi2KvZeXZUnWhsyn8QfMbda/cD0T
-        Y1phN9Ph0/y16LurcAA3uGkojVefAMg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-zHMhC-cJMdqHelxNz2vpcA-1; Fri, 29 Jan 2021 13:53:04 -0500
-X-MC-Unique: zHMhC-cJMdqHelxNz2vpcA-1
-Received: by mail-wr1-f71.google.com with SMTP id l10so5728517wry.16
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 10:53:03 -0800 (PST)
+        bh=GdnpEoYNUkWjsRHDOqmWnvBPMBiezEDLGqN7vEPsTbA=;
+        b=LmsKCJUHgtj6rEYN1JBEN5kT5Xzdph3xDdBkT9E378DY7kqjem/tuKl9xTaSyQrFpt0AC2
+        +UiqO27RogwzmNUzfEv8s6Ems8j9OKRJHUVpmtiyPNZhmpoaeV9kzeOLb78KR5AXE+1ljT
+        iF2ZhuyYxTaFFEOQAAXPnxiVEfPz6pE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-7hRRF_RhP3u7aa8XwG_Wng-1; Fri, 29 Jan 2021 14:19:59 -0500
+X-MC-Unique: 7hRRF_RhP3u7aa8XwG_Wng-1
+Received: by mail-wr1-f70.google.com with SMTP id r5so5761083wrx.18
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 11:19:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=v2lQG7NOq1Y30ihZ3JvjW7LHsEzNf1l5ZIU262Ux5yw=;
-        b=ZvMkYJyf2qM5YxxLePhPWtC2x2JBOrQo1vfibBi3ZqjLMRapz6Oq6Vr5JbpUWPjVnx
-         ZbDxnCr37ecr3ydMpwkbmjc+yqzOzWr8iZQ9686siKp38vu1m8+THnkRcJ+ct2H92lPw
-         tsBZu07TVzqT0U0Z4D7568uPXcAaXfHIQcnWFGkQMrMylgeWvC26x+AtFXtT+PI1/Ep0
-         rvy4YYvs87Y9da9S+DS7eWNyIik5mN4W/bbo9FkZ44H8nK+Svo8hO77BGCN2lac3hqAR
-         2QOHN6gQZibgoJoVasY0B8DGBaFk62a/g54NzBursKQbVmRkxFam5hYzw1kb1EqP5j0d
-         lEUw==
-X-Gm-Message-State: AOAM533eqgUmal0STrCYMZzIxQrlnCExB4w9vPDadLS99Aw1fL9eGkU9
-        TvOQ4zGvWG2WI+tAxGtzTB8AYc+tgRBMt4GJYUv7lUijQsQg9YJl3VmPuo32r6VOOmrjzVkENdH
-        oPkgRWJt21lQW
-X-Received: by 2002:a1c:9609:: with SMTP id y9mr5027753wmd.75.1611946382859;
-        Fri, 29 Jan 2021 10:53:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyhbUhkw2usSXuyBhWcgXQlVTDKUdIPuIMDaI+Sf+8W+zkgRq8BrEHInJgZztI5WgVvi9yPgw==
-X-Received: by 2002:a1c:9609:: with SMTP id y9mr5027741wmd.75.1611946382729;
-        Fri, 29 Jan 2021 10:53:02 -0800 (PST)
-Received: from [192.168.1.36] (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
-        by smtp.gmail.com with ESMTPSA id 9sm3199432wra.80.2021.01.29.10.53.01
+        bh=GdnpEoYNUkWjsRHDOqmWnvBPMBiezEDLGqN7vEPsTbA=;
+        b=U4DKAGKpDGZ2oTwuY9dFfMT3EjonPuXcr7FdGHkQNiOMm+qqrHNTHtJCho0XrV4QIO
+         AdZSQfLO/9/StYgoi/EgkBG8Jj6j1bO10y8KhUAmPgLMI/IJpbGgeQbFQrkq374+6r+J
+         UAc/Nnx8Pchp8qt1NK7eOxbSQjVzEEfU28pHPJE6am1Nzar6M9LZQtDITyA5Vm3nmyPt
+         tn1nUubZmhEbT23ZZ3rc5XGIdI9L8Cy8fpiiCFHuuW44WBKUWG7FLH9aa6HkyPDPrJth
+         NexzUei0/R87lUq+8G8jMbUC1ObGFFw7FR2NZ9hlvOPAUJdlmxd0svlnN+u1ZacN1+B4
+         +VAA==
+X-Gm-Message-State: AOAM531Uc1bciAJmeCDtXKQBM/CE9JY2RdGLtngyyBEr4oIjkmzmqt7J
+        0F34aY+CTEG0Eiq0u/NoGISfHpdhHljoZiAunxdYY4LQdRLhBQ8NCNlEHXM7PsE20u+uvzMHjIQ
+        9fim5CyTr3bw/
+X-Received: by 2002:a1c:c343:: with SMTP id t64mr4984033wmf.19.1611947998296;
+        Fri, 29 Jan 2021 11:19:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwXQ0jObZ/AHOpBtT+RBtG05//ROo2D62CpOx0dEesMjPDqYP5ghTScg+pN/sduAQy/9xBxqg==
+X-Received: by 2002:a1c:c343:: with SMTP id t64mr4984018wmf.19.1611947998135;
+        Fri, 29 Jan 2021 11:19:58 -0800 (PST)
+Received: from [192.168.10.118] ([93.56.170.5])
+        by smtp.gmail.com with ESMTPSA id i59sm14758727wri.3.2021.01.29.11.19.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 29 Jan 2021 10:53:01 -0800 (PST)
-Subject: Re: [PATCH v4 09/12] target/arm: Make m_helper.c optional via
- CONFIG_ARM_V7M
-To:     Richard Henderson <richard.henderson@linaro.org>,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>, Fam Zheng <fam@euphon.net>,
-        Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>
-References: <20200929224355.1224017-1-philmd@redhat.com>
- <20200929224355.1224017-10-philmd@redhat.com>
- <d9af8896-efec-c850-655e-1d1eb2629762@linaro.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d57cc48a-2eb4-011d-7903-91042de507d3@redhat.com>
-Date:   Fri, 29 Jan 2021 19:53:00 +0100
+        Fri, 29 Jan 2021 11:19:57 -0800 (PST)
+Subject: Re: [PATCH v5 16/16] KVM: x86/xen: Add event channel interrupt vector
+ upcall
+To:     David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+References: <20210111195725.4601-1-dwmw2@infradead.org>
+ <20210111195725.4601-17-dwmw2@infradead.org>
+ <3b66ee62-bf12-c6ab-a954-a66e5f31f109@redhat.com>
+ <529a1e82a0c83f82e0079359b0b8ba74ac670e89.camel@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <97fef86f-fef3-3ee8-9ae9-2144d19fc2a5@redhat.com>
+Date:   Fri, 29 Jan 2021 20:19:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <d9af8896-efec-c850-655e-1d1eb2629762@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <529a1e82a0c83f82e0079359b0b8ba74ac670e89.camel@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/3/20 11:48 AM, Richard Henderson wrote:
-> On 9/29/20 5:43 PM, Philippe Mathieu-Daudé wrote:
->> +arm_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
->> +
->>  arm_ss.add(zlib)
->>  
->>  arm_ss.add(when: 'CONFIG_TCG', if_true: files('arm-semi.c'))
->> +arm_ss.add(when: 'CONFIG_TCG', if_false: files('m_helper-stub.c'))
+On 29/01/21 18:33, David Woodhouse wrote:
+> On Thu, 2021-01-28 at 13:43 +0100, Paolo Bonzini wrote:
+>> Independent of the answer to the above, this is really the only place
+>> where you're adding Xen code to a hot path.  Can you please use a
+>> STATIC_KEY_FALSE kvm_has_xen_vcpu (and a static inline function) to
+>> quickly return from kvm_xen_has_interrupt() if no vCPU has a shared info
+>> set up?
 > 
-> I'm a bit surprised about adding the file twice.
-> Since ARM_V7M depends on TCG, isn't the second line redundant?
+> Something like this, then?
+> 
+>  From 6504c78f76efd8c60630959111bd77c28d43fca7 Mon Sep 17 00:00:00 2001
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> Date: Fri, 29 Jan 2021 17:30:40 +0000
+> Subject: [PATCH] KVM: x86/xen: Add static branch to avoid overhead of checking
+>   Xen upcall vector
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 
-This does:
+Yes, that was the idea.  Thanks!
 
-if TCG
-    if CONFIG_ARM_V7M
-        files('m_helper.c')
-    else #!V7M
-        files('m_helper-stub.c'))
-    endif
-else #!TCG
-    files('m_helper-stub.c'))
-endif
-
-So:
-
-if !TCG or !V7M
-    files('m_helper-stub.c'))
-else
-    files('m_helper.c')
-endif
-
-There might be a better way to express that in Meson...
-I only understood how to do AND with arrays, but not OR.
-
-Paolo/Marc-André, is it possible?
-
-Thanks,
-
-Phil.
+Paolo
 
