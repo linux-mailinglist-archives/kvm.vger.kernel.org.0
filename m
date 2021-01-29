@@ -2,346 +2,300 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27EE6308BB7
-	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:43:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EB545308BCB
+	for <lists+kvm@lfdr.de>; Fri, 29 Jan 2021 18:43:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232660AbhA2RhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 12:37:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51962 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232527AbhA2Rel (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 12:34:41 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AAD7C061352
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 09:33:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GZP7WqtmDaeJut5IYZkaye6q6gozj5vpow0f8X3UYgs=; b=X9Cq7TbBHPYAvFixhIBytRVSeL
-        yGkrPjYBZO7lyz5MgBGzVF2iveZ+02XlHIm7aYQtcvvVDUQdFA0z+ZR9HpG1KfvGi6Jcv9DgoPavg
-        RdN7k9KbX6u5orRIFTgNadp1K/e/FQ0nKBhHp5slKgeTFY1WUf1KFTmYeQOgur3+7BxMghIqolWqh
-        NUYr71A6kEq6RNPMXyxGBArEi4zaZ7SPauFq0/W3fxKjVD5zXgI6tBITdJqO1/z+leyN5VZ/dsjcR
-        O2uLUEtc8n+eoPg7k/P/iK4NJYxEHAglPWueCPkKLCTp1oGEDdWOUOxzugV4Tsx0KyvQ0ri5hr5LV
-        u5PRyF5g==;
-Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u3832b3a9db3152.ant.amazon.com)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l5Xdu-0003PK-4v; Fri, 29 Jan 2021 17:33:10 +0000
-Message-ID: <529a1e82a0c83f82e0079359b0b8ba74ac670e89.camel@infradead.org>
-Subject: Re: [PATCH v5 16/16] KVM: x86/xen: Add event channel interrupt
- vector upcall
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
-        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
-        fandree@amazon.com, hch@infradead.org
-Date:   Fri, 29 Jan 2021 17:33:07 +0000
-In-Reply-To: <3b66ee62-bf12-c6ab-a954-a66e5f31f109@redhat.com>
-References: <20210111195725.4601-1-dwmw2@infradead.org>
-         <20210111195725.4601-17-dwmw2@infradead.org>
-         <3b66ee62-bf12-c6ab-a954-a66e5f31f109@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256";
-        protocol="application/x-pkcs7-signature";
-        boundary="=-W3kpulG/Vue3H0EC0uLv"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
-Mime-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+        id S232146AbhA2RnM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 12:43:12 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:39646 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232344AbhA2Rlm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 12:41:42 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10THctUY088543;
+        Fri, 29 Jan 2021 17:39:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=9i/uOoB4ZdRn1J3VB1WRhUoX+A4sDUqww9eICQv3RDM=;
+ b=luE+J28VBHejcEMmcNTXgIh+vQJzgT1utEcpSpDiLC7/ZXrUKHfYfG+3VgxLtCSrgqhY
+ liH4m3h+Hnz1oaMMcU8to6RdZZJkRrMyLYyg5wMJKGEmMGCGiTz6UAGzy7hs3/m5Icqw
+ 8yAY2S3Sj1jM7PFYh7O8xNDw6rAc/2GZPvNMTMkSvZmkKxVlS+kpBkyA9oji344dfWNK
+ Xakg2ZL4qW9V/6GPtDaqwh21OqmnUeGe2kOCHt+RJSrFQsTQAndfEnR5N6pHqehBSza+
+ 5Ht5/VcTRs6k5R8ohYLDQMYCLa/22/eyP93k2OISg6sjR15K8XWRnomD7e54VOSTjTFV VA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 36cmf88t7y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Jan 2021 17:39:35 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10THZvlZ158876;
+        Fri, 29 Jan 2021 17:39:34 GMT
+Received: from nam04-co1-obe.outbound.protection.outlook.com (mail-co1nam04lp2055.outbound.protection.outlook.com [104.47.45.55])
+        by userp3020.oracle.com with ESMTP id 36ceugyf9u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 29 Jan 2021 17:39:34 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DRRnMsFuv1nSISmfRw6p6hwe782CC0ByBII1JzbTkrmhM6UbiRokc/mOeOHgUMbuZgNhU0jzq9A2OidkXPRtsALHkQszXdUOhXORNpWFOi+XA4fEpl5Uf1Uh1AFfQaB97jewfnr1D6yn0yNzWQr1lQDZpUa5idsgbLQBrKa82v7VXLJhxXaEQka/rqhdD5DDdR3i9SheLyKMwX07MxYA7g1dLmOr5aUuArV2O0d6klJHNnxFvWSYT8vUCe0yzZjmsu760scJi5GrZontW8Vv4uyNuDvyLq2DbYfO44J3LdG9XW3kgmscR1XdctEeCPYZI9kkUoeT4plgzEf/8hb+YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9i/uOoB4ZdRn1J3VB1WRhUoX+A4sDUqww9eICQv3RDM=;
+ b=UAaedKFCxiTD24PlCJnhj5KeLls8uD2SRfrjzGNgqbeMcY6zzVdM1a8HKK9PIIeSsjpUncPTsJ44dS7RB7KZdVvudBzS5EpShL9alVYV9U+p7VqbEQEF1paVbEGMUOTHONBAGKOC9SJhJGwNe9O3WgiMWbnxHyKbYukg8CCwYXs6WthA+tra+tk/hhmvRuSzwmlsvTT6kClOBf+jN94iDzp6+zwmr4VTU3rkxaJD+ikB7vbF2kVPs5IXU9CKVfnDaTrOtnRR/9GwsdJDJBsN90CPhzgJGnDwzwTkkAEKZMtVoUafdPocqzsPuPKWqsfujIjMJQWpfyBEvtFOV9O4+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9i/uOoB4ZdRn1J3VB1WRhUoX+A4sDUqww9eICQv3RDM=;
+ b=Wkxj4XuTgAtdABPA3A80uqUYLUkUMVG9UhO+9cXc86Y7LOiGFQf4s1uzJVaS9hw23S/2ASCGhUipIDjBMBmw/Pv/oat4SyyHO1oz7Wz2JKtgPHJiBoKF4kd1R7ZDAvo3WZ+pVejD3zTsCmysIF5i9UZAZrjWFYBxgOJ/OX19sjk=
+Authentication-Results: amd.com; dkim=none (message not signed)
+ header.d=none;amd.com; dmarc=none action=none header.from=oracle.com;
+Received: from DM5PR10MB2044.namprd10.prod.outlook.com (2603:10b6:3:110::17)
+ by DM6PR10MB3018.namprd10.prod.outlook.com (2603:10b6:5:6d::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Fri, 29 Jan
+ 2021 17:39:32 +0000
+Received: from DM5PR10MB2044.namprd10.prod.outlook.com
+ ([fe80::3c1b:996a:6c0f:5bbe]) by DM5PR10MB2044.namprd10.prod.outlook.com
+ ([fe80::3c1b:996a:6c0f:5bbe%6]) with mapi id 15.20.3805.019; Fri, 29 Jan 2021
+ 17:39:32 +0000
+Date:   Fri, 29 Jan 2021 11:39:25 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v6 1/6] sev/i386: Add initial support for SEV-ES
+Message-ID: <20210129173925.GA231819@dt>
+References: <cover.1611682609.git.thomas.lendacky@amd.com>
+ <2e6386cbc1ddeaf701547dd5677adf5ddab2b6bd.1611682609.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2e6386cbc1ddeaf701547dd5677adf5ddab2b6bd.1611682609.git.thomas.lendacky@amd.com>
+X-Originating-IP: [209.17.40.36]
+X-ClientProxiedBy: MW4PR03CA0273.namprd03.prod.outlook.com
+ (2603:10b6:303:b5::8) To DM5PR10MB2044.namprd10.prod.outlook.com
+ (2603:10b6:3:110::17)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from dt (209.17.40.36) by MW4PR03CA0273.namprd03.prod.outlook.com (2603:10b6:303:b5::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Fri, 29 Jan 2021 17:39:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9cb48646-8a29-415c-ad67-08d8c47cd5f6
+X-MS-TrafficTypeDiagnostic: DM6PR10MB3018:
+X-Microsoft-Antispam-PRVS: <DM6PR10MB30186F6036A7A98A1AD41DC8E6B99@DM6PR10MB3018.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2043;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nXsIxP+laH/cyUQC2Dpmsa7/Flc+KtU//DlRqprje9/xlq5xBqj6FSFgTlXN1I05tIR/fANstutZTQOISRJDecJ/Ypt+3326QzLzAg8U6mnkndrd4AySD0xARWnC5jkIBntClXVia/H9FoBMnp4R3xmibtNl4Qk8DP4LcqPeFwJ0783HRZTOFYNTwwCfsDL5nA5d29wGWUm0Dq2Z3FRoe7PfhhddKs4xcAowjzDyzfnAVJ4HZH8b9NgFiBF72UtYCm7vZ9ZtGR04JDnSQ70d/1tLvCdTIEVoleWHMgk30hM9r3yVyQz8Olge1B+qJh+QWTxgRUY8Yssd9z2T1wVAJpAV3twOgJyFcM+HJ9vPo3pIxRZ+mclRTpf1QnS6nE4Z0o9p3HkNdgZwiEi5PwwLKZ7Tu7Ntt7eTUNEdo9g6OsDHYUdiBzsH2g4t97EragcaDg11oS5zHZiK0NBFxN/DjL/pvDr3Y5ai8PyXhzeSatSvQ8NlrWt4DgJfdVyal7C1qZF0n5alITx8enQEwjUN5QN+iZ3XGunCgUrkQt3W5zpaq4yjvl1DQ81ls/kW0E/mEFtMTxemby97UqQJJiqFFw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR10MB2044.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(366004)(396003)(346002)(136003)(376002)(33656002)(55016002)(186003)(9576002)(6666004)(16526019)(7416002)(8936002)(86362001)(9686003)(2906002)(1076003)(54906003)(6916009)(6496006)(4326008)(5660300002)(52116002)(66946007)(44832011)(66556008)(956004)(53546011)(26005)(8676002)(478600001)(33716001)(83380400001)(316002)(66476007)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?WMG/arDF9v03nwh5RpIxQmtOdnwGC/HvywlBK1XAkY1QWsMPk00bH43X68AX?=
+ =?us-ascii?Q?Ebh8AYeaZwCQZh5zWHjnFgo3ngmBrFq1zqYwDxHtQGHZ7ifx32urmqVmTeCt?=
+ =?us-ascii?Q?apDzjqXsF9nSgrY+nlIkPCsXXlv070NkYubAIUL51uIP2uvutYuv5HHzAWWQ?=
+ =?us-ascii?Q?QVceVeUWW1TDVJylov+ouPykEyxk9Ts/wsHBcbH6luPQwDf2giBcpy2pza/w?=
+ =?us-ascii?Q?cGyRk9c7AW8f8I1IElNgmUKBeM/+lRZOd9ee5FM4KNdv+ho8NurQpQWGCaFF?=
+ =?us-ascii?Q?3GK/srzC93LLIWIASg0vqJLx0783mhT+QMfpGk3WZjZyyKN05XZN+z1guJoz?=
+ =?us-ascii?Q?yBIvt7O+n9uZP2+om+CaO6gOQbdJYFu11cB4fvmo3mzXCRow9+1o9x/m5BGG?=
+ =?us-ascii?Q?1pdMU+AT2yHAvuJmwR21bQCeLPAk7cq4SvmHhvRicgew+ERbOSdBFYwcIsrC?=
+ =?us-ascii?Q?tt4U/IXroQpLB2Vff/HCQOMueHo8NrBCniChLuJk/adk4zRPOqVgqxX7AUY9?=
+ =?us-ascii?Q?nC5F3rh6JgJe3dpuY10JZKdaPjAkD90RScypnkQUc/XbGMm+JRxSqUxDx2oH?=
+ =?us-ascii?Q?+np/2MrvCT8keolxVsRJJyMlIa1KIEwvst4j48++UhX+npamzWsFeR7RwJXF?=
+ =?us-ascii?Q?uMYGjjNE/ovUIM6EGGEkBmk4GLk3bsrbSRlNyXxiwGZq/HHsMWz2Nlf09D0z?=
+ =?us-ascii?Q?Ey40GLR+7aOBCCwmRvg7wRYsY3judW8D7KNRBSRuYSNwqvJm0/9QjvjL2OKi?=
+ =?us-ascii?Q?vPjwTz+0cBW5xrbEjdqFipDUnsZ/jlhrdstzBxAVIqykgKyH65LPYBMyC1ia?=
+ =?us-ascii?Q?FmQ4Is87jm/mOgKkNBqOz3nwm4VEj4qSyeCa8M2SVSQTy5Aw7dD06ml8fDUc?=
+ =?us-ascii?Q?adxJ5lD48anHUa3EPDhcZal5jCY2MgzMUpS7GIp3Kj61FOoZ6G4IreME5P2D?=
+ =?us-ascii?Q?fqaSZtQwaBPA1zR/gIDd/Sd47xya4Nz/Sd/yf11cu9wJ/4+fN3zoGwCEa5kn?=
+ =?us-ascii?Q?EmY52zjlkI6pAuJOhf8PUS66EbSe0LPE4E8T2oogBQcwfeDCgpj2z/03kNz/?=
+ =?us-ascii?Q?4/TagEqO?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cb48646-8a29-415c-ad67-08d8c47cd5f6
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR10MB2044.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2021 17:39:32.0685
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H60Uu0GKsiGmjWLi5WKbNF9g+sGnMishfo7r9wdDMryq1B75fKokdBiw9DR52xdxIirnTg8QkyM/Rrw6ogzo11pA6W3DcvB1E+DHbv9VPt4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB3018
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9879 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ bulkscore=0 suspectscore=0 mlxscore=0 spamscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101290086
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9879 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 lowpriorityscore=0
+ spamscore=0 clxscore=1011 adultscore=0 priorityscore=1501 impostorscore=0
+ phishscore=0 mlxscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2101290086
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2021-01-26 11:36:44 -0600, Tom Lendacky wrote:
+> From: Tom Lendacky <thomas.lendacky@amd.com>
+> 
+> Provide initial support for SEV-ES. This includes creating a function to
+> indicate the guest is an SEV-ES guest (which will return false until all
+> support is in place), performing the proper SEV initialization and
+> ensuring that the guest CPU state is measured as part of the launch.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 
---=-W3kpulG/Vue3H0EC0uLv
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
 
-On Thu, 2021-01-28 at 13:43 +0100, Paolo Bonzini wrote:
-> Independent of the answer to the above, this is really the only place=20
-> where you're adding Xen code to a hot path.  Can you please use a=20
-> STATIC_KEY_FALSE kvm_has_xen_vcpu (and a static inline function) to=20
-> quickly return from kvm_xen_has_interrupt() if no vCPU has a shared info=
-=20
-> set up?
-
-Something like this, then?
-
-=46rom 6504c78f76efd8c60630959111bd77c28d43fca7 Mon Sep 17 00:00:00 2001
-From: David Woodhouse <dwmw@amazon.co.uk>
-Date: Fri, 29 Jan 2021 17:30:40 +0000
-Subject: [PATCH] KVM: x86/xen: Add static branch to avoid overhead of check=
-ing
- Xen upcall vector
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/kvm/x86.c |  1 +
- arch/x86/kvm/xen.c | 68 +++++++++++++++++++++++++++-------------------
- arch/x86/kvm/xen.h | 15 +++++++++-
- 3 files changed, 55 insertions(+), 29 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 870dea74ea94..fb2bc362efd8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10580,6 +10580,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 		kvm_x86_ops.vm_destroy(kvm);
- 	for (i =3D 0; i < kvm->arch.msr_filter.count; i++)
- 		kfree(kvm->arch.msr_filter.ranges[i].bitmap);
-+	kvm_xen_destroy(kvm);
- 	kvm_pic_destroy(kvm);
- 	kvm_ioapic_destroy(kvm);
- 	kvm_free_vcpus(kvm);
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 3041f774493e..9b6766e5d84f 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -19,6 +19,8 @@
-=20
- #include "trace.h"
-=20
-+DEFINE_STATIC_KEY_DEFERRED_FALSE(kvm_xen_has_vector, HZ);
-+
- static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- {
- 	gpa_t gpa =3D gfn_to_gpa(gfn);
-@@ -176,7 +178,7 @@ void kvm_xen_setup_runstate_page(struct kvm_vcpu *v)
- 	kvm_xen_update_runstate(v, RUNSTATE_running, steal_time);
- }
-=20
--int kvm_xen_has_interrupt(struct kvm_vcpu *v)
-+int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
- {
- 	u8 rc =3D 0;
-=20
-@@ -184,37 +186,42 @@ int kvm_xen_has_interrupt(struct kvm_vcpu *v)
- 	 * If the global upcall vector (HVMIRQ_callback_vector) is set and
- 	 * the vCPU's evtchn_upcall_pending flag is set, the IRQ is pending.
- 	 */
--	if (v->arch.xen.vcpu_info_set && v->kvm->arch.xen.upcall_vector) {
--		struct gfn_to_hva_cache *ghc =3D &v->arch.xen.vcpu_info_cache;
--		struct kvm_memslots *slots =3D kvm_memslots(v->kvm);
--		unsigned int offset =3D offsetof(struct vcpu_info, evtchn_upcall_pending=
-);
--
--		/* No need for compat handling here */
--		BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=3D
--			     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
--		BUILD_BUG_ON(sizeof(rc) !=3D
--			     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
--		BUILD_BUG_ON(sizeof(rc) !=3D
--			     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
--
--		/*
--		 * For efficiency, this mirrors the checks for using the valid
--		 * cache in kvm_read_guest_offset_cached(), but just uses
--		 * __get_user() instead. And falls back to the slow path.
--		 */
--		if (likely(slots->generation =3D=3D ghc->generation &&
--			   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
--			/* Fast path */
--			__get_user(rc, (u8 __user *)ghc->hva + offset);
--		} else {
--			/* Slow path */
--			kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
--						      sizeof(rc));
--		}
-+	struct gfn_to_hva_cache *ghc =3D &v->arch.xen.vcpu_info_cache;
-+	struct kvm_memslots *slots =3D kvm_memslots(v->kvm);
-+	unsigned int offset =3D offsetof(struct vcpu_info, evtchn_upcall_pending)=
-;
-+
-+	/* No need for compat handling here */
-+	BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=3D
-+		     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
-+	BUILD_BUG_ON(sizeof(rc) !=3D
-+		     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
-+	BUILD_BUG_ON(sizeof(rc) !=3D
-+		     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
-+
-+	/*
-+	 * For efficiency, this mirrors the checks for using the valid
-+	 * cache in kvm_read_guest_offset_cached(), but just uses
-+	 * __get_user() instead. And falls back to the slow path.
-+	 */
-+	if (likely(slots->generation =3D=3D ghc->generation &&
-+		   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
-+		/* Fast path */
-+		__get_user(rc, (u8 __user *)ghc->hva + offset);
-+	} else {
-+		/* Slow path */
-+		kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
-+					     sizeof(rc));
- 	}
-+
- 	return rc;
- }
-=20
-+void kvm_xen_destroy(struct kvm *kvm)
-+{
-+	if (kvm->arch.xen.upcall_vector)
-+		static_branch_slow_dec_deferred(&kvm_xen_has_vector);
-+}
-+
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- {
- 	struct kvm_vcpu *v;
-@@ -300,6 +307,11 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_x=
-en_hvm_attr *data)
- 			break;
- 		}
-=20
-+		if (data->u.vector && !kvm->arch.xen.upcall_vector)
-+			static_branch_inc(&kvm_xen_has_vector.key);
-+		else if (kvm->arch.xen.upcall_vector && !data->u.vector)
-+			static_branch_slow_dec_deferred(&kvm_xen_has_vector);
-+
- 		kvm->arch.xen.upcall_vector =3D data->u.vector;
- 		r =3D 0;
- 		break;
-diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
-index d64916ac4a12..d49cd8ea8da9 100644
---- a/arch/x86/kvm/xen.h
-+++ b/arch/x86/kvm/xen.h
-@@ -9,13 +9,16 @@
- #ifndef __ARCH_X86_KVM_XEN_H__
- #define __ARCH_X86_KVM_XEN_H__
-=20
-+#include <linux/jump_label_ratelimit.h>
-+
- void kvm_xen_setup_runstate_page(struct kvm_vcpu *vcpu);
- void kvm_xen_runstate_set_preempted(struct kvm_vcpu *vcpu);
--int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
-+int __kvm_xen_has_interrupt(struct kvm_vcpu *vcpu);
- int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data);
- int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
- int kvm_xen_hvm_config(struct kvm_vcpu *vcpu, u64 data);
-+void kvm_xen_destroy(struct kvm *kvm);
-=20
- static inline bool kvm_xen_hypercall_enabled(struct kvm *kvm)
- {
-@@ -23,6 +26,16 @@ static inline bool kvm_xen_hypercall_enabled(struct kvm =
-*kvm)
- 		KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
- }
-=20
-+extern struct static_key_false_deferred kvm_xen_has_vector;
-+
-+static inline int kvm_xen_has_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	if (static_branch_unlikely(&kvm_xen_has_vector.key) &&
-+	    vcpu->arch.xen.vcpu_info_set && vcpu->kvm->arch.xen.upcall_vector)
-+		return __kvm_xen_has_interrupt(vcpu);
-+
-+	return 0;
-+}
-=20
- /* 32-bit compatibility definitions, also used natively in 32-bit build */
- #include <asm/pvclock-abi.h>
---=20
-2.17.1
-
-
---=-W3kpulG/Vue3H0EC0uLv
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEw
-MTI5MTczMzA3WjAvBgkqhkiG9w0BCQQxIgQgDWyCDZDXbwOjtRhWXjY4djUV4rgjV/PCWqquQgIi
-O5Iwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAFtOBgWF9rfGDeXN6RW3RYys3Sy4MEKKyeseZ/WKTJ4iqAVnFUbpU8g4Jh0KMBF8
-lZ1N+ZXnsCbObigLNnTzlCLNvodSZzJZHAjcH27QAzEMQ2f7nGhjL1n5Lj7g5Wq2lANWOTnMHrr9
-1CN1bL49WQ2+lNZefs7DWww9HL/JnTkhz0rgjBZvdxcfeZ5nX2WkhfuE4WgeDiEhHuui9Q+bnsUC
-tGM+2XvPL+yu4O0gPp+SGPHVhOSRdbnay0/jF8YdIObBagaUNa1VHKC6Ypamig8o6HKT1npIswgw
-w3ATKA/cCgX835DhuYHVy5NaBt8GwapSlgIh2W1fB/qJh2ef1ZkAAAAAAAA=
-
-
---=-W3kpulG/Vue3H0EC0uLv--
-
+> ---
+>  target/i386/cpu.c      |  1 +
+>  target/i386/sev-stub.c |  6 ++++++
+>  target/i386/sev.c      | 44 ++++++++++++++++++++++++++++++++++++++++--
+>  target/i386/sev_i386.h |  1 +
+>  4 files changed, 50 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 72a79e6019..0415d8a99c 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -5987,6 +5987,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          break;
+>      case 0x8000001F:
+>          *eax = sev_enabled() ? 0x2 : 0;
+> +        *eax |= sev_es_enabled() ? 0x8 : 0;
+>          *ebx = sev_get_cbit_position();
+>          *ebx |= sev_get_reduced_phys_bits() << 6;
+>          *ecx = 0;
+> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+> index c1fecc2101..229a2ee77b 100644
+> --- a/target/i386/sev-stub.c
+> +++ b/target/i386/sev-stub.c
+> @@ -49,8 +49,14 @@ SevCapability *sev_get_capabilities(Error **errp)
+>      error_setg(errp, "SEV is not available in this QEMU");
+>      return NULL;
+>  }
+> +
+>  int sev_inject_launch_secret(const char *hdr, const char *secret,
+>                               uint64_t gpa, Error **errp)
+>  {
+>      return 1;
+>  }
+> +
+> +bool sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> diff --git a/target/i386/sev.c b/target/i386/sev.c
+> index 1546606811..fce2128c07 100644
+> --- a/target/i386/sev.c
+> +++ b/target/i386/sev.c
+> @@ -360,6 +360,12 @@ sev_enabled(void)
+>      return !!sev_guest;
+>  }
+>  
+> +bool
+> +sev_es_enabled(void)
+> +{
+> +    return false;
+> +}
+> +
+>  uint64_t
+>  sev_get_me_mask(void)
+>  {
+> @@ -580,6 +586,20 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
+>      return ret;
+>  }
+>  
+> +static int
+> +sev_launch_update_vmsa(SevGuestState *sev)
+> +{
+> +    int ret, fw_error;
+> +
+> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
+> +    if (ret) {
+> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
+> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
+> +    }
+> +
+> +    return ret;
+> +}
+> +
+>  static void
+>  sev_launch_get_measure(Notifier *notifier, void *unused)
+>  {
+> @@ -592,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
+>          return;
+>      }
+>  
+> +    if (sev_es_enabled()) {
+> +        /* measure all the VM save areas before getting launch_measure */
+> +        ret = sev_launch_update_vmsa(sev);
+> +        if (ret) {
+> +            exit(1);
+> +        }
+> +    }
+> +
+>      measurement = g_new0(struct kvm_sev_launch_measure, 1);
+>  
+>      /* query the measurement blob length */
+> @@ -686,7 +714,7 @@ sev_guest_init(const char *id)
+>  {
+>      SevGuestState *sev;
+>      char *devname;
+> -    int ret, fw_error;
+> +    int ret, fw_error, cmd;
+>      uint32_t ebx;
+>      uint32_t host_cbitpos;
+>      struct sev_user_data_status status = {};
+> @@ -747,8 +775,20 @@ sev_guest_init(const char *id)
+>      sev->api_major = status.api_major;
+>      sev->api_minor = status.api_minor;
+>  
+> +    if (sev_es_enabled()) {
+> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+> +            error_report("%s: guest policy requires SEV-ES, but "
+> +                         "host SEV-ES support unavailable",
+> +                         __func__);
+> +            goto err;
+> +        }
+> +        cmd = KVM_SEV_ES_INIT;
+> +    } else {
+> +        cmd = KVM_SEV_INIT;
+> +    }
+> +
+>      trace_kvm_sev_init();
+> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
+> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
+>      if (ret) {
+>          error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+>                       __func__, ret, fw_error, fw_error_to_str(fw_error));
+> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+> index 4db6960f60..4f9a5e9b21 100644
+> --- a/target/i386/sev_i386.h
+> +++ b/target/i386/sev_i386.h
+> @@ -29,6 +29,7 @@
+>  #define SEV_POLICY_SEV          0x20
+>  
+>  extern bool sev_enabled(void);
+> +extern bool sev_es_enabled(void);
+>  extern uint64_t sev_get_me_mask(void);
+>  extern SevInfo *sev_get_info(void);
+>  extern uint32_t sev_get_cbit_position(void);
+> -- 
+> 2.30.0
+> 
