@@ -2,446 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B5B9309698
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 17:18:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D97623096A4
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 17:22:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232282AbhA3QSr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 11:18:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50242 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232340AbhA3QN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Jan 2021 11:13:56 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0D27764E0F;
-        Sat, 30 Jan 2021 15:00:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612018851;
-        bh=rXNNF1Bu4TSqd9w6W2cGA5UDCIpKVjKo1/g03o4bo1o=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NjR6WchLnQdoNqsiODTW62d+ezlXz6PBJUm1OnHL0w5UhdcyI2iOOu10nAIp+kUAv
-         kq7eiRwZO4XD8hsA2R4Xa2CQI79gZAKlZc0j4qO3Yk3v6LhQz9zhJ8TNvRFHdqtJYq
-         dBXBYglVDxNJLbSOUuwkyxK7cC6yDVN0XoAofCS9fSiETUthDFyOUyl1r3g3Qp7So1
-         N2jARdP3+o6MukqRqN3cvcXE7X1JrwCfksA/oj6A7qgoOXd//M9+uKUsa69EFo7Ove
-         bTqpombgf+hbapVq2C6nuZx4f+YshMudkSiJC8Vv1PTkOXHRZOfrQ42z8SPXly2D0U
-         urd5jww6uMNyw==
-Date:   Sat, 30 Jan 2021 17:00:46 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com
-Subject: Re: [RFC PATCH v3 16/27] KVM: VMX: Convert vcpu_vmx.exit_reason to a
- union
-Message-ID: <YBV0nnqUHnING5qA@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <d32ab375be78315e3bc2540f2a741859637abcb0.1611634586.git.kai.huang@intel.com>
+        id S231705AbhA3Pj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 10:39:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52494 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231752AbhA3PiV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Jan 2021 10:38:21 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65902C0613D6
+        for <kvm@vger.kernel.org>; Sat, 30 Jan 2021 07:37:39 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id ke15so17424999ejc.12
+        for <kvm@vger.kernel.org>; Sat, 30 Jan 2021 07:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=78kOyNsh9PFQ35W6G6J34UFL3WJ0plW3fjCLydvhNGU=;
+        b=evI+JCiN4q9fC6wQYJuhNtFMDoH0y/ah6iDJRi+XmLvWYdNKZghG075xgvVS6nEH63
+         QdOKU1s/tbYWcdHwDvDugZGRZzCkn/NBqE3cYw+ytxwNgNK7h9d4lF1nfdaX2dqkhC1s
+         m4+eSEQWVVB2kCpgZVbmzfVhV2dfOIYlq6Vn8FQITksyJmROd5NLThrkFBPHH5OqjzTl
+         COIOuFHypRtV5TiZdLH/9lecUqz5sRcjDl+DEHJb6ojwly5a2AJDEb3Bk7F64IO5s7Q0
+         DlGL1cp0xxiiP+UvlIJqJPxke6LXOQduMAUGGia1Z027oaon4bMF7R08U/DuutijOrQs
+         ViAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=78kOyNsh9PFQ35W6G6J34UFL3WJ0plW3fjCLydvhNGU=;
+        b=QjUWqxxDShGdUN5L+L1RB15HPaOt9w/zNv/cJaCdL4HVF0KermKFnsO7IpVNpH7ati
+         J24FXB5OVhuYyjuTB8Ze7FRiA6Q62fSsbZ+zMyLzjuTdmZc/6mRiK5amOxIQ6gkYOzWC
+         upmHaXQx3dVtpx7R/HfQQq7EW/nODpsMMtiKNfWQ6AQL8uSjndPzZvgnNycMZ//Ogppi
+         IONKQQIDDrFdub2ODF+VH/PasoSUjpz+dCB83/VaxnCcj7t9qM1y2TEnGrYyziWpFXjf
+         O4hV5hQD9nmCVglxdp0qCBha6OlY5uhYEiwwHQAu0GmKdsalOUlQztbQOxFVUWUDGY/J
+         Vo6Q==
+X-Gm-Message-State: AOAM531UTy2Inb3BZpNDR7AWi68EvT1qBAa6PBx+vBNtdLohdj6JMymd
+        yUG18nA67mmntGPrQFN2vWp50k7x0NMn40A7DKoSWg==
+X-Google-Smtp-Source: ABdhPJyD++UlciKvmROO24kS3r/XXDVKijRu1H7xIYaJRV48MHyTsJtFtdfA1zpizwOdbfEwhqs6mx4IqJ20F8mkBMc=
+X-Received: by 2002:a17:906:b215:: with SMTP id p21mr9386002ejz.407.1612021058129;
+ Sat, 30 Jan 2021 07:37:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d32ab375be78315e3bc2540f2a741859637abcb0.1611634586.git.kai.huang@intel.com>
+References: <20210130015227.4071332-1-f4bug@amsat.org> <20210130015227.4071332-4-f4bug@amsat.org>
+In-Reply-To: <20210130015227.4071332-4-f4bug@amsat.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Sat, 30 Jan 2021 15:37:26 +0000
+Message-ID: <CAFEAcA8UCFghGDb4oMujek_W_wsyYz+duiQ-d8JyN09NYoff-g@mail.gmail.com>
+Subject: Re: [PATCH v5 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm-devel <kvm@vger.kernel.org>, Fam Zheng <fam@euphon.net>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Claudio Fontana <cfontana@suse.de>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        qemu-arm <qemu-arm@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 10:31:37PM +1300, Kai Huang wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
-> full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
-> bits 15:0, and single-bit modifiers in bits 31:16.
-> 
-> Historically, KVM has only had to worry about handling the "failed
-> VM-Entry" modifier, which could only be set in very specific flows and
-> required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
-> bit was a somewhat viable approach.  But even with only a single bit to
-> worry about, KVM has had several bugs related to comparing a basic exit
-> reason against the full exit reason store in vcpu_vmx.
-> 
-> Upcoming Intel features, e.g. SGX, will add new modifier bits that can
-> be set on more or less any VM-Exit, as opposed to the significantly more
-> restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
-> flows isn't scalable.  Tracking exit reason in a union forces code to
-> explicitly choose between consuming the full exit reason and the basic
-> exit, and is a convenient way to document and access the modifiers.
+On Sat, 30 Jan 2021 at 01:52, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> KVM requires a cpu based on (at least) the ARMv7 architecture.
 
-I *believe* that the change is correct but I dropped in the last paragraph
-- most likely only because of lack of expertise in this area.
+These days it requires ARMv8, because we dropped 32-bit host
+support, and all 64-bit host CPUs are v8.
 
-I ask the most basic question: why SGX will add new modifier bits?
-
-/Jarkko
-
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 42 +++++++++++++++---------
->  arch/x86/kvm/vmx/vmx.c    | 68 ++++++++++++++++++++-------------------
->  arch/x86/kvm/vmx/vmx.h    | 25 +++++++++++++-
->  3 files changed, 86 insertions(+), 49 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0fbb46990dfc..f112c2482887 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3311,7 +3311,11 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
->  	enum vm_entry_failure_code entry_failure_code;
->  	bool evaluate_pending_interrupts;
-> -	u32 exit_reason, failed_index;
-> +	u32 failed_index;
-> +	union vmx_exit_reason exit_reason = {
-> +		.basic = -1,
-> +		.failed_vmentry = 1,
-> +	};
->  
->  	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
->  		kvm_vcpu_flush_tlb_current(vcpu);
-> @@ -3363,7 +3367,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  
->  		if (nested_vmx_check_guest_state(vcpu, vmcs12,
->  						 &entry_failure_code)) {
-> -			exit_reason = EXIT_REASON_INVALID_STATE;
-> +			exit_reason.basic = EXIT_REASON_INVALID_STATE;
->  			vmcs12->exit_qualification = entry_failure_code;
->  			goto vmentry_fail_vmexit;
->  		}
-> @@ -3374,7 +3378,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  		vcpu->arch.tsc_offset += vmcs12->tsc_offset;
->  
->  	if (prepare_vmcs02(vcpu, vmcs12, &entry_failure_code)) {
-> -		exit_reason = EXIT_REASON_INVALID_STATE;
-> +		exit_reason.basic = EXIT_REASON_INVALID_STATE;
->  		vmcs12->exit_qualification = entry_failure_code;
->  		goto vmentry_fail_vmexit_guest_mode;
->  	}
-> @@ -3384,7 +3388,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  						   vmcs12->vm_entry_msr_load_addr,
->  						   vmcs12->vm_entry_msr_load_count);
->  		if (failed_index) {
-> -			exit_reason = EXIT_REASON_MSR_LOAD_FAIL;
-> +			exit_reason.basic = EXIT_REASON_MSR_LOAD_FAIL;
->  			vmcs12->exit_qualification = failed_index;
->  			goto vmentry_fail_vmexit_guest_mode;
->  		}
-> @@ -3452,7 +3456,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
->  		return NVMX_VMENTRY_VMEXIT;
->  
->  	load_vmcs12_host_state(vcpu, vmcs12);
-> -	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
-> +	vmcs12->vm_exit_reason = exit_reason.full;
->  	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
->  		vmx->nested.need_vmcs12_to_shadow_sync = true;
->  	return NVMX_VMENTRY_VMEXIT;
-> @@ -5540,7 +5544,12 @@ static int handle_vmfunc(struct kvm_vcpu *vcpu)
->  	return kvm_skip_emulated_instruction(vcpu);
->  
->  fail:
-> -	nested_vmx_vmexit(vcpu, vmx->exit_reason,
-> +	/*
-> +	 * This is effectively a reflected VM-Exit, as opposed to a synthesized
-> +	 * nested VM-Exit.  Pass the original exit reason, i.e. don't hardcode
-> +	 * EXIT_REASON_VMFUNC as the exit reason.
-> +	 */
-> +	nested_vmx_vmexit(vcpu, vmx->exit_reason.full,
->  			  vmx_get_intr_info(vcpu),
->  			  vmx_get_exit_qual(vcpu));
->  	return 1;
-> @@ -5608,7 +5617,8 @@ static bool nested_vmx_exit_handled_io(struct kvm_vcpu *vcpu,
->   * MSR bitmap. This may be the case even when L0 doesn't use MSR bitmaps.
->   */
->  static bool nested_vmx_exit_handled_msr(struct kvm_vcpu *vcpu,
-> -	struct vmcs12 *vmcs12, u32 exit_reason)
-> +					struct vmcs12 *vmcs12,
-> +					union vmx_exit_reason exit_reason)
->  {
->  	u32 msr_index = kvm_rcx_read(vcpu);
->  	gpa_t bitmap;
-> @@ -5622,7 +5632,7 @@ static bool nested_vmx_exit_handled_msr(struct kvm_vcpu *vcpu,
->  	 * First we need to figure out which of the four to use:
->  	 */
->  	bitmap = vmcs12->msr_bitmap;
-> -	if (exit_reason == EXIT_REASON_MSR_WRITE)
-> +	if (exit_reason.basic == EXIT_REASON_MSR_WRITE)
->  		bitmap += 2048;
->  	if (msr_index >= 0xc0000000) {
->  		msr_index -= 0xc0000000;
-> @@ -5759,11 +5769,12 @@ static bool nested_vmx_exit_handled_mtf(struct vmcs12 *vmcs12)
->   * Return true if L0 wants to handle an exit from L2 regardless of whether or not
->   * L1 wants the exit.  Only call this when in is_guest_mode (L2).
->   */
-> -static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
-> +static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
-> +				     union vmx_exit_reason exit_reason)
->  {
->  	u32 intr_info;
->  
-> -	switch ((u16)exit_reason) {
-> +	switch (exit_reason.basic) {
->  	case EXIT_REASON_EXCEPTION_NMI:
->  		intr_info = vmx_get_intr_info(vcpu);
->  		if (is_nmi(intr_info))
-> @@ -5819,12 +5830,13 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
->   * Return 1 if L1 wants to intercept an exit from L2.  Only call this when in
->   * is_guest_mode (L2).
->   */
-> -static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
-> +static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu,
-> +				     union vmx_exit_reason exit_reason)
->  {
->  	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
->  	u32 intr_info;
->  
-> -	switch ((u16)exit_reason) {
-> +	switch (exit_reason.basic) {
->  	case EXIT_REASON_EXCEPTION_NMI:
->  		intr_info = vmx_get_intr_info(vcpu);
->  		if (is_nmi(intr_info))
-> @@ -5943,7 +5955,7 @@ static bool nested_vmx_l1_wants_exit(struct kvm_vcpu *vcpu, u32 exit_reason)
->  bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	u32 exit_reason = vmx->exit_reason;
-> +	union vmx_exit_reason exit_reason = vmx->exit_reason;
->  	unsigned long exit_qual;
->  	u32 exit_intr_info;
->  
-> @@ -5962,7 +5974,7 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
->  		goto reflect_vmexit;
->  	}
->  
-> -	trace_kvm_nested_vmexit(exit_reason, vcpu, KVM_ISA_VMX);
-> +	trace_kvm_nested_vmexit(exit_reason.full, vcpu, KVM_ISA_VMX);
->  
->  	/* If L0 (KVM) wants the exit, it trumps L1's desires. */
->  	if (nested_vmx_l0_wants_exit(vcpu, exit_reason))
-> @@ -5988,7 +6000,7 @@ bool nested_vmx_reflect_vmexit(struct kvm_vcpu *vcpu)
->  	exit_qual = vmx_get_exit_qual(vcpu);
->  
->  reflect_vmexit:
-> -	nested_vmx_vmexit(vcpu, exit_reason, exit_intr_info, exit_qual);
-> +	nested_vmx_vmexit(vcpu, exit_reason.full, exit_intr_info, exit_qual);
->  	return true;
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 2af05d3b0590..746b87375aff 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1577,7 +1577,7 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
->  	 * i.e. we end up advancing IP with some random value.
->  	 */
->  	if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
-> -	    to_vmx(vcpu)->exit_reason != EXIT_REASON_EPT_MISCONFIG) {
-> +	    to_vmx(vcpu)->exit_reason.basic != EXIT_REASON_EPT_MISCONFIG) {
->  		orig_rip = kvm_rip_read(vcpu);
->  		rip = orig_rip + vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
->  #ifdef CONFIG_X86_64
-> @@ -5667,7 +5667,7 @@ static void vmx_get_exit_info(struct kvm_vcpu *vcpu, u64 *info1, u64 *info2,
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
->  	*info1 = vmx_get_exit_qual(vcpu);
-> -	if (!(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY)) {
-> +	if (!vmx->exit_reason.failed_vmentry) {
->  		*info2 = vmx->idt_vectoring_info;
->  		*intr_info = vmx_get_intr_info(vcpu);
->  		if (is_exception_with_error_code(*intr_info))
-> @@ -5911,8 +5911,9 @@ void dump_vmcs(void)
->  static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	u32 exit_reason = vmx->exit_reason;
-> +	union vmx_exit_reason exit_reason = vmx->exit_reason;
->  	u32 vectoring_info = vmx->idt_vectoring_info;
-> +	u16 exit_handler_index;
->  
->  	/*
->  	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
-> @@ -5954,11 +5955,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  			return 1;
->  	}
->  
-> -	if (exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY) {
-> +	if (exit_reason.failed_vmentry) {
->  		dump_vmcs();
->  		vcpu->run->exit_reason = KVM_EXIT_FAIL_ENTRY;
->  		vcpu->run->fail_entry.hardware_entry_failure_reason
-> -			= exit_reason;
-> +			= exit_reason.full;
->  		vcpu->run->fail_entry.cpu = vcpu->arch.last_vmentry_cpu;
->  		return 0;
->  	}
-> @@ -5980,18 +5981,18 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  	 * will cause infinite loop.
->  	 */
->  	if ((vectoring_info & VECTORING_INFO_VALID_MASK) &&
-> -			(exit_reason != EXIT_REASON_EXCEPTION_NMI &&
-> -			exit_reason != EXIT_REASON_EPT_VIOLATION &&
-> -			exit_reason != EXIT_REASON_PML_FULL &&
-> -			exit_reason != EXIT_REASON_APIC_ACCESS &&
-> -			exit_reason != EXIT_REASON_TASK_SWITCH)) {
-> +	    (exit_reason.basic != EXIT_REASON_EXCEPTION_NMI &&
-> +	     exit_reason.basic != EXIT_REASON_EPT_VIOLATION &&
-> +	     exit_reason.basic != EXIT_REASON_PML_FULL &&
-> +	     exit_reason.basic != EXIT_REASON_APIC_ACCESS &&
-> +	     exit_reason.basic != EXIT_REASON_TASK_SWITCH)) {
->  		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->  		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_DELIVERY_EV;
->  		vcpu->run->internal.ndata = 3;
->  		vcpu->run->internal.data[0] = vectoring_info;
-> -		vcpu->run->internal.data[1] = exit_reason;
-> +		vcpu->run->internal.data[1] = exit_reason.full;
->  		vcpu->run->internal.data[2] = vcpu->arch.exit_qualification;
-> -		if (exit_reason == EXIT_REASON_EPT_MISCONFIG) {
-> +		if (exit_reason.basic == EXIT_REASON_EPT_MISCONFIG) {
->  			vcpu->run->internal.ndata++;
->  			vcpu->run->internal.data[3] =
->  				vmcs_read64(GUEST_PHYSICAL_ADDRESS);
-> @@ -6023,38 +6024,39 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
->  	if (exit_fastpath != EXIT_FASTPATH_NONE)
->  		return 1;
->  
-> -	if (exit_reason >= kvm_vmx_max_exit_handlers)
-> +	if (exit_reason.basic >= kvm_vmx_max_exit_handlers)
->  		goto unexpected_vmexit;
->  #ifdef CONFIG_RETPOLINE
-> -	if (exit_reason == EXIT_REASON_MSR_WRITE)
-> +	if (exit_reason.basic == EXIT_REASON_MSR_WRITE)
->  		return kvm_emulate_wrmsr(vcpu);
-> -	else if (exit_reason == EXIT_REASON_PREEMPTION_TIMER)
-> +	else if (exit_reason.basic == EXIT_REASON_PREEMPTION_TIMER)
->  		return handle_preemption_timer(vcpu);
-> -	else if (exit_reason == EXIT_REASON_INTERRUPT_WINDOW)
-> +	else if (exit_reason.basic == EXIT_REASON_INTERRUPT_WINDOW)
->  		return handle_interrupt_window(vcpu);
-> -	else if (exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
-> +	else if (exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
->  		return handle_external_interrupt(vcpu);
-> -	else if (exit_reason == EXIT_REASON_HLT)
-> +	else if (exit_reason.basic == EXIT_REASON_HLT)
->  		return kvm_emulate_halt(vcpu);
-> -	else if (exit_reason == EXIT_REASON_EPT_MISCONFIG)
-> +	else if (exit_reason.basic == EXIT_REASON_EPT_MISCONFIG)
->  		return handle_ept_misconfig(vcpu);
->  #endif
->  
-> -	exit_reason = array_index_nospec(exit_reason,
-> -					 kvm_vmx_max_exit_handlers);
-> -	if (!kvm_vmx_exit_handlers[exit_reason])
-> +	exit_handler_index = array_index_nospec((u16)exit_reason.basic,
-> +						kvm_vmx_max_exit_handlers);
-> +	if (!kvm_vmx_exit_handlers[exit_handler_index])
->  		goto unexpected_vmexit;
->  
-> -	return kvm_vmx_exit_handlers[exit_reason](vcpu);
-> +	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
->  
->  unexpected_vmexit:
-> -	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n", exit_reason);
-> +	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
-> +		    exit_reason.full);
->  	dump_vmcs();
->  	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
->  	vcpu->run->internal.suberror =
->  			KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
->  	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = exit_reason;
-> +	vcpu->run->internal.data[0] = exit_reason.full;
->  	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
->  	return 0;
->  }
-> @@ -6373,9 +6375,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  
-> -	if (vmx->exit_reason == EXIT_REASON_EXTERNAL_INTERRUPT)
-> +	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
->  		handle_external_interrupt_irqoff(vcpu);
-> -	else if (vmx->exit_reason == EXIT_REASON_EXCEPTION_NMI)
-> +	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
->  		handle_exception_nmi_irqoff(vmx);
->  }
->  
-> @@ -6567,7 +6569,7 @@ void noinstr vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
->  
->  static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
->  {
-> -	switch (to_vmx(vcpu)->exit_reason) {
-> +	switch (to_vmx(vcpu)->exit_reason.basic) {
->  	case EXIT_REASON_MSR_WRITE:
->  		return handle_fastpath_set_msr_irqoff(vcpu);
->  	case EXIT_REASON_PREEMPTION_TIMER:
-> @@ -6766,17 +6768,17 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	vmx->idt_vectoring_info = 0;
->  
->  	if (unlikely(vmx->fail)) {
-> -		vmx->exit_reason = 0xdead;
-> +		vmx->exit_reason.full = 0xdead;
->  		return EXIT_FASTPATH_NONE;
->  	}
->  
-> -	vmx->exit_reason = vmcs_read32(VM_EXIT_REASON);
-> -	if (unlikely((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY))
-> +	vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
-> +	if (unlikely(vmx->exit_reason.basic == EXIT_REASON_MCE_DURING_VMENTRY))
->  		kvm_machine_check();
->  
-> -	trace_kvm_exit(vmx->exit_reason, vcpu, KVM_ISA_VMX);
-> +	trace_kvm_exit(vmx->exit_reason.full, vcpu, KVM_ISA_VMX);
->  
-> -	if (unlikely(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
-> +	if (unlikely(vmx->exit_reason.failed_vmentry))
->  		return EXIT_FASTPATH_NONE;
->  
->  	vmx->loaded_vmcs->launched = 1;
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 9d3a557949ac..903f246b5abd 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -70,6 +70,29 @@ struct pt_desc {
->  	struct pt_ctx guest;
->  };
->  
-> +union vmx_exit_reason {
-> +	struct {
-> +		u32	basic			: 16;
-> +		u32	reserved16		: 1;
-> +		u32	reserved17		: 1;
-> +		u32	reserved18		: 1;
-> +		u32	reserved19		: 1;
-> +		u32	reserved20		: 1;
-> +		u32	reserved21		: 1;
-> +		u32	reserved22		: 1;
-> +		u32	reserved23		: 1;
-> +		u32	reserved24		: 1;
-> +		u32	reserved25		: 1;
-> +		u32	reserved26		: 1;
-> +		u32	sgx_enclave_mode	: 1;
-> +		u32	smi_pending_mtf		: 1;
-> +		u32	smi_from_vmx_root	: 1;
-> +		u32	reserved30		: 1;
-> +		u32	failed_vmentry		: 1;
-> +	};
-> +	u32 full;
-> +};
-> +
->  /*
->   * The nested_vmx structure is part of vcpu_vmx, and holds information we need
->   * for correct emulation of VMX (i.e., nested VMX) on this vcpu.
-> @@ -244,7 +267,7 @@ struct vcpu_vmx {
->  	int vpid;
->  	bool emulation_required;
->  
-> -	u32 exit_reason;
-> +	union vmx_exit_reason exit_reason;
->  
->  	/* Posted interrupt descriptor */
->  	struct pi_desc pi_desc;
-> -- 
-> 2.29.2
-> 
-> 
+thanks
+-- PMM
