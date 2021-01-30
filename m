@@ -2,231 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E7D043096F3
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 17:56:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83AE03096FC
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 18:01:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231812AbhA3QzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 11:55:06 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:39192 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbhA3Qy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Jan 2021 11:54:58 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10UGjspr164420;
-        Sat, 30 Jan 2021 16:54:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=tbgmIb6p4FuuZ1ScxX/xvsNq8SAHc2xvp88N4rgslKc=;
- b=Wox/J5l0/rhore1OUo6vBvBB4jJ06HUURVt3L5FdelTRpi0WBeFI7QW0ZivN13ttStQ1
- QIhIfEWbvLA/Kju5VNMckz5rRp9Z6eKp9EI/EWS6f12ooPkb+XjNcxSsc/c75Rs7GxNX
- e81TH97p0rfzgFlb3LzvV9OwZsOYphAqH7+84MXUOGDsBSbE6/jf8qgoF7BXntOTypHS
- tFL3d8+ruaXYLG9SHO9fCGWwlNgkCR2m/bTneCD2gzBkWLGcJX0adjgbcBnC4uYAcbY/
- CcDkxP2DQv5tNuzDXzPcHUJhe5dGhTk8WlB4hROOYp9g71OSlhzuIEqRFmzN8Q7/f1Rv zg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 36cydkgxv4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 30 Jan 2021 16:54:11 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 10UGjJDU166514;
-        Sat, 30 Jan 2021 16:54:11 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2169.outbound.protection.outlook.com [104.47.56.169])
-        by aserp3030.oracle.com with ESMTP id 36cwg9tdqe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 30 Jan 2021 16:54:10 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DJerSrbDiC4nWU5d+rF+zQuoT87X5uamjOHMy/crY/k2vm25seqviTg64+2ZKOFC2zMEnhqA+KVRX+9GnKAy9cJh46aIlU7nAWizwLNfd30J8wRn6lYb36N7eQFprCJr9gGbutSUwNvGPmcGZPifNiU/pAtFXRr0YSoyQh7Hi//vvOUAztpl+Y2LmCTC+912bpcf63hM7+8kKzZnieGjJTbslNQhhjWqoCAtIKFXxkMLWcmmE81gH2cB5ht7UZWrS1YnPH0a26TudJ8mcqnaLG8v/yW44qKjxMx/n96//cVxHwbg0i72fUzUzJg9HnVubuTHYX+F2mu8ruBAPMToCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tbgmIb6p4FuuZ1ScxX/xvsNq8SAHc2xvp88N4rgslKc=;
- b=J63P0cbaIURVrIPvGpvxHEyBHvrZ0wNJlWjRGrQzzlXXbTNk9FOZtcoFDzx0s9kJ/QKosQLHAwDrAjiXFFAZ73EdyL+rqGASnMWFb8GTzG29VW/GZcjlG0shf5A4cZBa/2A6JK3fOvCRNXpg14bsF9HqePBzONS7wEioSuVpt9Y87cHieZKf52r3Eeetdnnveq9ks5HrjXrcVwxqzv3G6zZBrHXNzpnBsx2/kYGLaOuLXe+3qX/OIz7X5eOJ5Lg5IXfae/o8SdbUN2DzG2T1+XAQqtqOI9HJFZH0RhoinmVt5axSWwfOsAxetD3h6ERaNbq0fDHWVnd0j2by/5n/Ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tbgmIb6p4FuuZ1ScxX/xvsNq8SAHc2xvp88N4rgslKc=;
- b=Ec+EwzkXkaSTX2RmWxfOlggpHUl6Oh+hjkbpr7yjZgw0g8P+MxCScIOhyUGOSMv0XkESeUhhdoPlfXDwxgoilzYWOZsoExtgbt/AzYQbtElG3OS+1RPVXJFBoXkCpe+k7fnpuy/rNhcyjvhVbxxgySh8qMKRce0z3ulL5pYSXzQ=
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com (2603:10b6:a03:155::17)
- by BY5PR10MB4340.namprd10.prod.outlook.com (2603:10b6:a03:210::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.23; Sat, 30 Jan
- 2021 16:54:07 +0000
-Received: from BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::9123:2652:e975:aa26]) by BYAPR10MB3240.namprd10.prod.outlook.com
- ([fe80::9123:2652:e975:aa26%5]) with mapi id 15.20.3805.022; Sat, 30 Jan 2021
- 16:54:07 +0000
-Subject: Re: [PATCH V3 0/9] vfio virtual address update
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
- <20210129145550.566d5369@omen.home.shazbot.org>
-From:   Steven Sistare <steven.sistare@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <29f7a496-f3c5-c273-538a-34ae87215e0c@oracle.com>
-Date:   Sat, 30 Jan 2021 11:54:03 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
-In-Reply-To: <20210129145550.566d5369@omen.home.shazbot.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [24.62.106.7]
-X-ClientProxiedBy: BY3PR05CA0037.namprd05.prod.outlook.com
- (2603:10b6:a03:39b::12) To BYAPR10MB3240.namprd10.prod.outlook.com
- (2603:10b6:a03:155::17)
+        id S230197AbhA3RAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 12:00:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38056 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229851AbhA3RAf (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 30 Jan 2021 12:00:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612025947;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ff3uW0OQOdof4v0/LGeTTqD7WmLrOvPdVpmGtc8EjAc=;
+        b=KYp1aOE+sbcvHgMy0wnxdpTHySQoEjIckttjG4NowDn7Bophcd6ilDcCk+TLTo+u0otsAS
+        2iKdkYr1N+9yNhQppfuhdayzR9Mc260KyEkgZ2nkNfyUIKqbR2X9FnxVZHoIEOmK/MDqKk
+        9ZloH2QPYLT7WBWcGKPeTKOeUeLAHBg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-knMRBZSIMXG_YYwI_2OEjA-1; Sat, 30 Jan 2021 11:59:03 -0500
+X-MC-Unique: knMRBZSIMXG_YYwI_2OEjA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C43A2800D53;
+        Sat, 30 Jan 2021 16:59:01 +0000 (UTC)
+Received: from localhost (ovpn-112-96.ams2.redhat.com [10.36.112.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A07B5C1BD;
+        Sat, 30 Jan 2021 16:59:00 +0000 (UTC)
+Date:   Sat, 30 Jan 2021 16:58:59 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Elena Afanasova <eafanasova@gmail.com>
+Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Subject: Re: [RFC v2 2/4] KVM: x86: add support for ioregionfd signal handling
+Message-ID: <20210130165859.GC98016@stefanha-x1.localdomain>
+References: <cover.1611850290.git.eafanasova@gmail.com>
+ <aa049c6e5bade3565c5ffa820bbbb67bd5d1bf4b.1611850291.git.eafanasova@gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.92] (24.62.106.7) by BY3PR05CA0037.namprd05.prod.outlook.com (2603:10b6:a03:39b::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.10 via Frontend Transport; Sat, 30 Jan 2021 16:54:06 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2b23bc02-3db2-4ed6-47f3-08d8c53fa880
-X-MS-TrafficTypeDiagnostic: BY5PR10MB4340:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BY5PR10MB4340F923FA2309EB4F011A39F9B89@BY5PR10MB4340.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2lKDYCAPj+HnTHPOOBzM2Z4rFdRK+wzqkS6Nn+KYQ/J8VO5Mmrk5c91R58GGJDiL0pKbZrk6zAUaALYAA6/+g1zLQVb0Ecr6wTozNh6uvpcEhGG/ZAkuJJuY4QDA4F4Fh1/FlQYU4w2sccxecmzUFg/tApMbeSVJ6wLYtw5stGTorCQkBo7VvJ7l7NdOh6l3i6LgxbiC4kMpdV/7ZtybiTfnSqWfKGux4riZBMlaycB1yZPvG5Ti+8otGV4fj126FSB+Famlf5SQhKklxx+Qu9vMrSMWSlsrHyc+uA0El3JToWFuN1q8NUzH2MSQQcpHjyNkdV+T/pPR5tbO95gPwiskOa6VCDl59QaFZsj842Gy4KpowKrqzFPEK0+SHobgeeh+NFLi+v/sfWiE3S5MSbUtpXaz0TR5EVxeHrVYxB1E/z6zmTn5oMHmRTUlx2GiIha+LxCK0FtqUAuLM/RbJ0GeOjuGkBrVP+dQXWHshr9OtYNgMNJd5xXpT8TcHUiDagAZCTQ6gzQT75tFCB/MU6pWGxb7D9SWBoybSrT1K8FO8lcdCA/lNK3+ye45TToFUg17zFizbuoPG9agbEN4xo0ojM7qp/7kiUvkYtgJOKy2mZAHNCIDRJMCxz4kyKnRn7lbY36iP4IZJrTpsQBTQMIwfwEhKSicB3xF0dWm5ipwK8yeDfx6n8XP3IFtS/H0
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB3240.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(366004)(396003)(39860400002)(376002)(83380400001)(36756003)(6916009)(6666004)(6486002)(66556008)(66476007)(5660300002)(478600001)(53546011)(16526019)(36916002)(26005)(31686004)(66946007)(186003)(8936002)(44832011)(2616005)(31696002)(54906003)(8676002)(966005)(956004)(86362001)(4326008)(16576012)(2906002)(15650500001)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NnU3VjhjZXl2Wm1WRE80U3pKaGNhOVVPVHA0bUZWV1M1NlpObllhMmIwcCtW?=
- =?utf-8?B?NjFMR2w4QS9iWEhOekltM2IwRHlqZVFlajQ2ODcyTVBsUEh0L2U3R1lqTHdB?=
- =?utf-8?B?UlhKT3dSVE51d29RTitCdTU2Y0hSSmtLaU9UNW5xV3ZLMGdqL2dET3Fvb2dU?=
- =?utf-8?B?V2h3TU40OWdJZU9xRktJWmRoa1FXWFI5YWc3dVFpMFE4VmM1UEdYTEJzK0ZN?=
- =?utf-8?B?a253UzdRSHZXQ0Q4N0FNc2lueVI2ZjRybHhxZ1VxY3NOcDN1UU4yZnZzenlV?=
- =?utf-8?B?RFpDOElYUk9DSG5VOVN5NitoOFcwR3EweG9rOUt6VG1uSFN4Y1cxNm52NW1l?=
- =?utf-8?B?dTRpVTlZbkZKOVhXQ2U5QUppQU1wK3JTa2lFUVdaT0FHMEs0Q09La3FFaHJs?=
- =?utf-8?B?Y3lmYWRBTmFjVnhyREtJUzNyeE5TZmYzekRnakRKeEZqZytleUxrdEF4VVNi?=
- =?utf-8?B?TGNsd1NCek9vbUtWcWoyYjFaQ0VLcTBnSU5rZmdoVGdvcjRWamRQYVgydjRI?=
- =?utf-8?B?Y3U4bURIb29aVGszb1FYanVNYXhkcittQ0ZKKzkxTjZuS3FHMzFpcGI3ZnhH?=
- =?utf-8?B?LzlVbjBlZzREUlBPaDd6cGNxTkoyd1hRSTF0L1BSdEY1d3JGaTYvVi9xNXB3?=
- =?utf-8?B?VmpUdzkxaitUUjF6RkduYVlOMDZid2puMUZ4bXFZRG9LQlMra0MxbHNFcUty?=
- =?utf-8?B?Yk9UZkw5TmJpOTFkck8zZVdHNmFqOTcvQ2k2MlBhRm5jZkRLbFFobFM0bWZH?=
- =?utf-8?B?OUQ3eXIvUWptTHZmcG05TlpPWG9TVUY1akdsUUgzQWdCL0IzYTBzTlpTancr?=
- =?utf-8?B?aFZRUTZuMDdrOXh1UklBY1ZpUHp2VzdMbWtEMkFwY3ZjVFBrck1wRzl1dS9E?=
- =?utf-8?B?NzRnWWtDRVFmNzBGaFNqbHZibGVhcWpaVWxhcGEyaTYrY2pub0NJV2ZCeFdR?=
- =?utf-8?B?MHJvU1hMWmJ1b3UvSWNnTTdwSURScXV2T1VtUW9qd1FqNTY0M1VPUlhvMlBX?=
- =?utf-8?B?WTdMUEtPclV4SGJQS0h1OXJ1WjBUeXFZR3ExSVRrSjZsVDkzdVdocWZnREhO?=
- =?utf-8?B?N2E0ZkJ6dk9mQ3RZbmFaSzZTNFFLZ3FPLzRqcW1qL1FKMXRkT2tNcFdtOHFN?=
- =?utf-8?B?Sy8xVnNqakxUTTQwbzZVTEFIT2VWeU15VXVZTWZaUnNRY3RwZVRuNWhZUXFz?=
- =?utf-8?B?Z1FLTzY2aU9WcEZnOWt5ckZDa1ErczBocE92NDFReUc4UWpodDlycDA2NTk3?=
- =?utf-8?B?UzkyYUcyb0JMUHFZRDBmaGNNSG5XSW5uYTlDZi9IUm9vTWsxSExDYnY5NDRB?=
- =?utf-8?B?TkluOE1xazhmb2Q1RTJiT3pIS1ZvZkJ3L2dOVVlsSjdSNG1kZGkvSmlpeDVU?=
- =?utf-8?B?Q3A1NU5OL2VmV21uOG93a3BFdjkzd2NVay9xMGc3VUhlY0pMVk8yVVIrNjNz?=
- =?utf-8?Q?M2EVnYM2?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b23bc02-3db2-4ed6-47f3-08d8c53fa880
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB3240.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2021 16:54:07.4765
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fhortoeguL/IQ67OnVxJWBqZOo1aPqOV7zrRkff0yhL9Wjr43q7tlgGM4hkn6+PEQIMNXv0VyHmvLHsrq/zw8e0xugKgWOFyYP3nkUznaBM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4340
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9880 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- bulkscore=0 spamscore=0 suspectscore=0 mlxscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101300091
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9880 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 clxscore=1015
- spamscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2101300091
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Y5rl02BVI9TCfPar"
+Content-Disposition: inline
+In-Reply-To: <aa049c6e5bade3565c5ffa820bbbb67bd5d1bf4b.1611850291.git.eafanasova@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/29/2021 4:55 PM, Alex Williamson wrote:
-> On Fri, 29 Jan 2021 08:54:03 -0800
-> Steve Sistare <steven.sistare@oracle.com> wrote:
-> 
->> Add interfaces that allow the underlying memory object of an iova range
->> to be mapped to a new virtual address in the host process:
->>
->>   - VFIO_DMA_UNMAP_FLAG_VADDR for VFIO_IOMMU_UNMAP_DMA
->>   - VFIO_DMA_MAP_FLAG_VADDR flag for VFIO_IOMMU_MAP_DMA
->>   - VFIO_UPDATE_VADDR for VFIO_CHECK_EXTENSION
->>   - VFIO_DMA_UNMAP_FLAG_ALL for VFIO_IOMMU_UNMAP_DMA
->>   - VFIO_UNMAP_ALL for VFIO_CHECK_EXTENSION
->>
->> Unmap-vaddr invalidates the host virtual address in an iova range and blocks
->> vfio translation of host virtual addresses, but DMA to already-mapped pages
->> continues.  Map-vaddr updates the base VA and resumes translation.  The
->> implementation supports iommu type1 and mediated devices.  Unmap-all allows
->> all ranges to be unmapped or invalidated in a single ioctl, which simplifies
->> userland code.
->>
->> This functionality is necessary for live update, in which a host process
->> such as qemu exec's an updated version of itself, while preserving its
->> guest and vfio devices.  The process blocks vfio VA translation, exec's
->> its new self, mmap's the memory object(s) underlying vfio object, updates
->> the VA, and unblocks translation.  For a working example that uses these
->> new interfaces, see the QEMU patch series "[PATCH V2] Live Update" at
->> https://lore.kernel.org/qemu-devel/1609861330-129855-1-git-send-email-steven.sistare@oracle.com
->>
->> Patches 1-3 define and implement the flag to unmap all ranges.
->> Patches 4-6 define and implement the flags to update vaddr.
->> Patches 7-9 add blocking to complete the implementation.
-> 
-> Hi Steve,
-> 
-> It looks pretty good to me, but I have some nit-picky comments that
-> I'll follow-up with on the individual patches.  However, I've made the
-> changes I suggest in a branch that you can find here:
-> 
-> git://github.com/awilliam/linux-vfio.git vaddr-v3
-> 
-> If the changes look ok, just send me an ack, I don't want to attribute
-> something to you that you don't approve of.  Thanks,
 
-All changes look good, thanks!  
-Do you need anything more from me on this patch series?
+--Y5rl02BVI9TCfPar
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-- Steve
+On Thu, Jan 28, 2021 at 09:32:21PM +0300, Elena Afanasova wrote:
+> The vCPU thread may receive a signal during ioregionfd communication,
+> ioctl(KVM_RUN) needs to return to userspace and then ioctl(KVM_RUN)
+> must resume ioregionfd.
+>=20
+> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+> ---
+> Changes in v2:
+>   - add support for x86 signal handling
+>   - changes after code review
+>=20
+>  arch/x86/kvm/x86.c            | 196 +++++++++++++++++++++++++++++++---
+>  include/linux/kvm_host.h      |  13 +++
+>  include/uapi/linux/ioregion.h |  32 ++++++
+>  virt/kvm/ioregion.c           | 177 +++++++++++++++++++++++++++++-
+>  virt/kvm/kvm_main.c           |  16 ++-
+>  5 files changed, 415 insertions(+), 19 deletions(-)
+>  create mode 100644 include/uapi/linux/ioregion.h
+>=20
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ddb28f5ca252..a04516b531da 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5799,19 +5799,33 @@ static int vcpu_mmio_write(struct kvm_vcpu *vcpu,=
+ gpa_t addr, int len,
+>  {
+>  	int handled =3D 0;
+>  	int n;
+> +	int ret =3D 0;
+> +	bool is_apic;
+> =20
+>  	do {
+>  		n =3D min(len, 8);
+> -		if (!(lapic_in_kernel(vcpu) &&
+> -		      !kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, addr, n, v))
+> -		    && kvm_io_bus_write(vcpu, KVM_MMIO_BUS, addr, n, v))
+> -			break;
+> +		is_apic =3D lapic_in_kernel(vcpu) &&
+> +			  !kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev,
+> +					      addr, n, v);
+> +		if (!is_apic) {
+> +			ret =3D kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
+> +					       addr, n, v);
+> +			if (ret)
+> +				break;
+> +		}
+>  		handled +=3D n;
+>  		addr +=3D n;
+>  		len -=3D n;
+>  		v +=3D n;
+>  	} while (len);
+> =20
+> +#ifdef CONFIG_KVM_IOREGION
+> +	if (ret =3D=3D -EINTR) {
+> +		vcpu->run->exit_reason =3D KVM_EXIT_INTR;
+> +		++vcpu->stat.signal_exits;
+> +	}
+> +#endif
+> +
+>  	return handled;
+>  }
 
->> Changes in V2:
->>  - define a flag for unmap all instead of special range values
->>  - define the VFIO_UNMAP_ALL extension
->>  - forbid the combination of unmap-all and get-dirty-bitmap
->>  - unwind in unmap on vaddr error
->>  - add a new function to find first dma in a range instead of modifying
->>    an existing function
->>  - change names of update flags
->>  - fix concurrency bugs due to iommu lock being dropped
->>  - call down from from vfio to a new backend interface instead of up from
->>    driver to detect container close
->>  - use wait/wake instead of sleep and polling
->>  - refine the uapi specification
->>  - split patches into vfio vs type1
->>
->> Changes in V3:
->>  - add vaddr_invalid_count to fix pin_pages race with unmap
->>  - refactor the wait helper functions
->>  - traverse dma entries more efficiently in unmap
->>  - check unmap flag conflicts more explicitly
->>  - rename some local variables and functions
->>
->> Steve Sistare (9):
->>   vfio: option to unmap all
->>   vfio/type1: unmap cleanup
->>   vfio/type1: implement unmap all
->>   vfio: interfaces to update vaddr
->>   vfio/type1: massage unmap iteration
->>   vfio/type1: implement interfaces to update vaddr
->>   vfio: iommu driver notify callback
->>   vfio/type1: implement notify callback
->>   vfio/type1: block on invalid vaddr
->>
->>  drivers/vfio/vfio.c             |   5 +
->>  drivers/vfio/vfio_iommu_type1.c | 251 +++++++++++++++++++++++++++++++++++-----
->>  include/linux/vfio.h            |   5 +
->>  include/uapi/linux/vfio.h       |  27 +++++
->>  4 files changed, 256 insertions(+), 32 deletions(-)
->>
-> 
+There is a special case for crossing page boundaries:
+1. ioregion in the first 4 bytes (page 1) but not the second 4 bytes (page =
+2).
+2. ioregion in the second 4 bytes (page 2) but not the first 4 bytes (page =
+1).
+3. The first 4 bytes (page 1) in one ioregion and the second 4 bytes (page =
+2) in another ioregion.
+4. The first 4 bytes (page 1) in one ioregion and the second 4 bytes (page =
+2) in the same ioregion.
+
+Cases 3 and 4 are tricky. If I'm reading the code correctly we try
+ioregion accesses twice, even if the first one returns -EINTR?
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7cd667dddba9..5cfdecfca6db 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -318,6 +318,19 @@ struct kvm_vcpu {
+>  #endif
+>  	bool preempted;
+>  	bool ready;
+> +#ifdef CONFIG_KVM_IOREGION
+> +	bool ioregion_interrupted;
+
+Can this field move into ioregion_ctx?
+
+> +	struct {
+> +		struct kvm_io_device *dev;
+> +		int pio;
+> +		void *val;
+> +		u8 state;
+> +		u64 addr;
+> +		int len;
+> +		u64 data;
+> +		bool in;
+> +	} ioregion_ctx;
+
+This struct can be reordered to remove holes between fields.
+
+> +#endif
+>  	struct kvm_vcpu_arch arch;
+>  };
+> =20
+> diff --git a/include/uapi/linux/ioregion.h b/include/uapi/linux/ioregion.h
+> new file mode 100644
+> index 000000000000..7898c01f84a1
+> --- /dev/null
+> +++ b/include/uapi/linux/ioregion.h
+> @@ -0,0 +1,32 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+
+To encourage people to implement the wire protocol even beyond the Linux
+syscall environment (e.g. in other hypervisors and VMMs) you could make
+the license more permissive:
+
+  /* SPDX-License-Identifier: ((GPL-2.0-only WITH Linux-syscall-note) OR BS=
+D-3-Clause) */
+
+Several other <linux/*.h> files do this so that the header can be used
+outside Linux without license concerns.
+
+Here is the BSD 3-Clause license:
+https://opensource.org/licenses/BSD-3-Clause
+
+> +#ifndef _UAPI_LINUX_IOREGION_H
+> +#define _UAPI_LINUX_IOREGION_H
+
+Please add the wire protocol specification/documentation into this file.
+That way this header file will serve as a comprehensive reference for
+the protocol and changes to the header will also update the
+documentation.
+
+(The ioctl KVM_SET_IOREGIONFD parts belong in
+Documentation/virt/kvm/api.rst but the wire protocol should be in this
+header file instead.)
+
+> +
+> +/* Wire protocol */
+> +struct ioregionfd_cmd {
+> +	__u32 info;
+> +	__u32 padding;
+> +	__u64 user_data;
+> +	__u64 offset;
+> +	__u64 data;
+> +};
+> +
+> +struct ioregionfd_resp {
+> +	__u64 data;
+> +	__u8 pad[24];
+> +};
+> +
+> +#define IOREGIONFD_CMD_READ    0
+> +#define IOREGIONFD_CMD_WRITE   1
+> +
+> +#define IOREGIONFD_SIZE_8BIT   0
+> +#define IOREGIONFD_SIZE_16BIT  1
+> +#define IOREGIONFD_SIZE_32BIT  2
+> +#define IOREGIONFD_SIZE_64BIT  3
+
+It's possible that larger read/write operations will be needed in the
+future. For example, the PCI Express bus supports much larger
+transactions than just 64 bits.
+
+You don't need to address this right now but I wanted to mention it.
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 88b92fc3da51..df387857f51f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4193,6 +4193,7 @@ static int __kvm_io_bus_write(struct kvm_vcpu *vcpu=
+, struct kvm_io_bus *bus,
+>  			      struct kvm_io_range *range, const void *val)
+>  {
+>  	int idx;
+> +	int ret =3D 0;
+> =20
+>  	idx =3D kvm_io_bus_get_first_dev(bus, range->addr, range->len);
+>  	if (idx < 0)
+> @@ -4200,9 +4201,12 @@ static int __kvm_io_bus_write(struct kvm_vcpu *vcp=
+u, struct kvm_io_bus *bus,
+> =20
+>  	while (idx < bus->dev_count &&
+>  		kvm_io_bus_cmp(range, &bus->range[idx]) =3D=3D 0) {
+> -		if (!kvm_iodevice_write(vcpu, bus->range[idx].dev, range->addr,
+> -					range->len, val))
+> +		ret =3D kvm_iodevice_write(vcpu, bus->range[idx].dev, range->addr,
+> +					 range->len, val);
+> +		if (!ret)
+>  			return idx;
+> +		if (ret < 0 && ret !=3D -EOPNOTSUPP)
+> +			return ret;
+
+I audited all kvm_io_bus_read/write() callers to check that it's safe to
+add error return values besides -EOPNOTSUPP. Extending the meaning of
+the return value is fine but any arches that want to support ioregionfd
+need to explicitly handle -EINTR return values now. Only x86 does after
+this patch.
+
+--Y5rl02BVI9TCfPar
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmAVkFMACgkQnKSrs4Gr
+c8hs3QgAr7Thy+FO9FRs6Go3bnZsFouORvrsLmKn/MK2ZCdJfNkwcNDMO5l1HroN
+ILzf8DBYp7GLXT6VWc3ltaZSvd229gBwwaasnpckdn1MrFM8B9YgJhFuurDDielw
+FobQFwvXQzhxsTcY3SHK3FtkQWsTf1+Jug87FjwArelnUwbr3XBz8vsUFEjCijsR
+SAgKykL2YNyXYaStLKKyqENlxOeSHZgiw3YP76jMoU4rdQgMuUzb+dwqex+b+KLG
+zB8rvhoYgItavJEGSHCUH62T9ic1n2aZA6BJ4RPhibyP41cbG9Um+qNrnZawzk5V
+f4rY94iUsYFtwNtVf3Q3ph1lL0cx0A==
+=Tbva
+-----END PGP SIGNATURE-----
+
+--Y5rl02BVI9TCfPar--
+
