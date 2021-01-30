@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3990730941A
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:12:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A465309416
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:12:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231967AbhA3KMB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 05:12:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
+        id S232128AbhA3KLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 05:11:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232759AbhA3Byj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 20:54:39 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C92B2C06178B
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:17 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id s7so7635864wru.5
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:17 -0800 (PST)
+        with ESMTP id S233116AbhA3B4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 20:56:11 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC38C06178C
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:22 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id u14so8142492wml.4
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sHwmePAwBZnB/6MQG332p6aeurp1aOW9YUVHNzJgQQk=;
-        b=HJZc1PSaje6m+L7668kBqPcK1wBm9CBsKO2kC1XrobpTcPPnHU6ITs11hbUl/YKjbc
-         DzmcMbtXJnzP6jZlLgdJWwpTlE27nSIkIGsIVBfAmCGKQgMB/xWkVmaOqqSFYsifLlUd
-         43jJZWsgGnfdPJBE8xZg+aMXkJ51DSQ7epXkB4qfmO1Rp1YXYWGGo76hopz0wEqPZD4D
-         B0dQ+lKuMROs0W/ZONElGdzV5hnhFvdWMUgJODm2C2Sdaq2e81ytYWHR/5xXLEXTV9v9
-         iQCHMX91/noURZa+VVbdTq8Y8AIgbZ7bd2E4fXynsrlRzci32qoKpvpXMMtBXeUyxVrN
-         GbZg==
+        bh=Rd+PClqm9GCes/hSRY8Vwer9UM1+ZxmgnVmbkhC6bwQ=;
+        b=S8gP7rmCHgjQ7YTM/ADW7lbRknMIzFi/kvGjnDTBiXVwxuHAweAduqVLnoWGJLI2Ik
+         JfdEKMmuSM3Uo8wpGPc7O5efkIfwempgLB5LYyAxcpbOduzxSzOy25mGYctn0157CNuf
+         zV0ZhHXDZP2UT03nYTizMXR4Vs40tQPbvbnOmuxLCvtPCrY0PMsdGMwTdM2ArhKkBchH
+         TWyvRrzcqLAWdaanShYSz+sOqcrd7NvfsPGFpWW+5oIunY8vE5ZXCX2iLvPjoaAaSoPR
+         DrMJQdIPKVgaAINimQlPBxGcMGIfkres1tY3aYap3kkTCgMibqAulTso5blHDtdlfoUu
+         cwiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=sHwmePAwBZnB/6MQG332p6aeurp1aOW9YUVHNzJgQQk=;
-        b=iC3CMOqY0eGql5D1RXuft1QxDHymMDX1QhMBRvT8pYLi+RZSWv9xpFMq2U9YGPoqo2
-         epLUafOXvrS59/OxxKSQwzLgJy11mMCF6KMEKJvOeTtmdgpG7nIsR6cwkxveAMeEG9Dl
-         sKbWuG2M7Lf5m5TYsh+oh5j3QeBJkKxohObMYMUjYOtIyKprVeomPc0QB04xvLaxcMNZ
-         b2ordUThmdYSu6oaRPSc6kN16tajrIxJZsWOgWwyaoZ2tL8fKqNgE50Ie2xa+nUYvkM3
-         3zscPycPbs4sAIItzAl0sygkefL+bqq4YR4wAS4UZR5O3q3uvDxUtdd8y9R7CJlsbfj+
-         TN/w==
-X-Gm-Message-State: AOAM530IIg4bAm8dqITs+XrDyEAvzSOEGz7ZLWkpBUxVDC8YCGAd2Vwr
-        VN5TgLpabxlSr1B5XuBsL/0=
-X-Google-Smtp-Source: ABdhPJytRdW5ApRmNTPnsqDHD7BiuYa2AbAtlk3vbvJPE6VBSMcsUQvRsWX8iwp2BHbkvB+QsXhcxg==
-X-Received: by 2002:adf:d4ce:: with SMTP id w14mr7095039wrk.89.1611971596601;
-        Fri, 29 Jan 2021 17:53:16 -0800 (PST)
+        bh=Rd+PClqm9GCes/hSRY8Vwer9UM1+ZxmgnVmbkhC6bwQ=;
+        b=lJ2hBVXrGDBO6wOT2n4tYxn/Z4rr5wIRrF1HGlDXIbbtSXixiXgDar8F4GdODb7/z3
+         vnQ40LN/vnwvn5bK3/Uwicc5aB24YGys1jb3imm7s7m1tbsqcWACabstpbeER8Q7o1dx
+         PQHgEH2R8EpVRyv2idG4plGebP+QiqVeWcAI7SozdgVNFeYOlc3cONVUh0zUtCJdtL+s
+         NqcweajiysQzNYRe8klgdzZyhKhhePcdd5JoEcXJPioBabb7HZzIokGVF1jCNDPOtDAB
+         QdD63omDTsATfH2TmckHTf8ToSVrV4QC3ytPb2rpqhfBQvqm6ziAx493YB2t9FBLvPR2
+         VYAA==
+X-Gm-Message-State: AOAM530HCKgS6zTu2/BVRK8f/TRnsm1a0Ti2STyq1QuktyS+gWF55Hv3
+        j3l5+HUnZwEp/PCIvWh2VMg=
+X-Google-Smtp-Source: ABdhPJyiwfRfgUFvof6J96IEb3nlU6yPh2kst4/42gIlUzuKzVr51L9y/LCynY6WSCm+1mWXoo7usg==
+X-Received: by 2002:a05:600c:2204:: with SMTP id z4mr5915886wml.138.1611971601791;
+        Fri, 29 Jan 2021 17:53:21 -0800 (PST)
 Received: from localhost.localdomain (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
-        by smtp.gmail.com with ESMTPSA id p18sm10429022wrx.84.2021.01.29.17.53.15
+        by smtp.gmail.com with ESMTPSA id g1sm15181177wrq.30.2021.01.29.17.53.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 17:53:16 -0800 (PST)
+        Fri, 29 Jan 2021 17:53:21 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -59,10 +59,11 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Richard Henderson <rth@twiddle.net>,
         Claudio Fontana <cfontana@suse.de>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org
-Subject: [PATCH v5 09/11] target/arm: Reorder meson.build rules
-Date:   Sat, 30 Jan 2021 02:52:25 +0100
-Message-Id: <20210130015227.4071332-10-f4bug@amsat.org>
+        qemu-arm@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v5 10/11] target/arm: Do not build TCG objects when TCG is off
+Date:   Sat, 30 Jan 2021 02:52:26 +0100
+Message-Id: <20210130015227.4071332-11-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210130015227.4071332-1-f4bug@amsat.org>
 References: <20210130015227.4071332-1-f4bug@amsat.org>
@@ -73,65 +74,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-Reorder the rules to make this file easier to modify.
-No logical change introduced in this commit.
+We can now safely turn all TCG dependent build off when CONFIG_TCG is
+off. This allows building ARM binaries with --disable-tcg.
 
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+[PMD: Heavily rebased during more than 2 years then finally rewritten]
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/arm/meson.build | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ target/arm/meson.build | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/target/arm/meson.build b/target/arm/meson.build
-index 6c6081966cd..aac9a383a61 100644
+index aac9a383a61..11b7c0e18fe 100644
 --- a/target/arm/meson.build
 +++ b/target/arm/meson.build
-@@ -14,31 +14,36 @@
+@@ -27,7 +27,8 @@
+   'gdbstub64.c',
+ ))
  
- arm_ss = ss.source_set()
- arm_ss.add(gen)
-+arm_ss.add(zlib)
- arm_ss.add(files(
-   'cpu.c',
--  'crypto_helper.c',
--  'debug_helper.c',
-   'gdbstub.c',
-   'helper.c',
-+  'vfp_helper.c',
-+))
-+
-+arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
-+  'cpu64.c',
-+  'gdbstub64.c',
-+))
-+
-+arm_ss.add(files(
-+  'crypto_helper.c',
-+  'debug_helper.c',
+-arm_ss.add(files(
++arm_tcg_ss = ss.source_set()
++arm_tcg_ss.add(files(
+   'crypto_helper.c',
+   'debug_helper.c',
    'iwmmxt_helper.c',
-   'neon_helper.c',
-   'op_helper.c',
-   'tlb_helper.c',
-   'translate.c',
+@@ -38,12 +39,12 @@
    'vec_helper.c',
--  'vfp_helper.c',
    'cpu_tcg.c',
  ))
--arm_ss.add(zlib)
--
- arm_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
+-arm_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
++arm_tcg_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
  arm_ss.add(when: 'CONFIG_TCG', if_false: files('m_helper-stub.c'))
  
  arm_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c', 'kvm64.c'), if_false: files('kvm-stub.c'))
  
- arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
--  'cpu64.c',
--  'gdbstub64.c',
+-arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
++arm_tcg_ss.add(when: 'TARGET_AARCH64', if_true: files(
    'helper-a64.c',
    'mte_helper.c',
    'pauth_helper.c',
+@@ -52,14 +53,16 @@
+   'translate-sve.c',
+ ))
+ 
++arm_ss.add_all(when: 'CONFIG_TCG', if_true: arm_tcg_ss)
++
+ arm_softmmu_ss = ss.source_set()
+ arm_softmmu_ss.add(files(
+   'arch_dump.c',
+   'arm-powerctl.c',
+   'machine.c',
+   'monitor.c',
+-  'psci.c',
+ ))
++arm_softmmu_ss.add(when: 'CONFIG_TCG', if_true: files('psci.c'))
+ 
+ target_arch += {'arm': arm_ss}
+ target_softmmu_arch += {'arm': arm_softmmu_ss}
 -- 
 2.26.2
 
