@@ -2,82 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F1FF3090AF
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 00:40:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A077309163
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 02:56:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231244AbhA2Xj3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 18:39:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229828AbhA2Xj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 18:39:28 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9EC4C64DEC
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 23:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611963527;
-        bh=PrK3Wlc0DA0ICdjtkh2aP+SukoPT9Muy9k0ZUCnuowI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=EXtAtRQLVASaFhLJQNS1vQd2wgPxGf8gReaDecuK0ulmu0ZqE1gkseSFn/riEOvyU
-         4gJWs4/Z4StT/tBx7a/+I1vRp++9f63Jsip9qJA+gm5jYbt0TXkvMnS3wl8aUU86FB
-         Y3/9GR10Z2GYz2hTZDddW92CvFIdcVjsjK8207126Ufs/cSeE+Y8/SuxpapX0lJYhh
-         YNq0dgiVSt7juBQ69cazGurW3rPXdezEiSvGcrjIEPg8OGDVivzWxlyz5pMo69K8rP
-         pruZ+crqghfwyrnCM0+InZqlmAAXSBRUKCx6VPmSIOTn/23dDhsxYYsMs/lfqz0dw7
-         jzpMM3aztx/Zw==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 93CF5652D4; Fri, 29 Jan 2021 23:38:47 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 211467] Regression affecting 32->64 bit SYSENTER on AMD
-Date:   Fri, 29 Jan 2021 23:38:47 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-211467-28872-XMLxUDkv7V@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-211467-28872@https.bugzilla.kernel.org/>
-References: <bug-211467-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S233110AbhA3BzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 20:55:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232798AbhA3BxV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 20:53:21 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C066FC06174A
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:36 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id g10so10624810wrx.1
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=TWOO2zfu8P4UM754zwKeQRqNcelSJ+Vi3BwaB87IrgI=;
+        b=EZ4R0A6K45GJEpt3ikVxK/mZ5uOp/qSvLKwjO7LS5PbjeX+3sWdmNlr+4p56lnPtqL
+         CUdY1yW1rTe7NWAKG6FtSRNNZKnZUAI2VEHfT9t/GySrE8ds9BQbysvGJYiW2faVZNpm
+         DGZ+2ZzDYpOjHkDu0jST31KidNc+L9/fohOoZJZMRjKENmO2boj+1Bne8nOdoKsZZOk2
+         hms4LiJZ9snctfQC29BzW0EhHYsmNCX7dzY+CxfZJyC29i8WBBxcI2hmd0NS7su5sU/F
+         vCixTZjkQ3F8hOmBQQBzuo5d3mfiya1x/ZzCDk9XbkWe7CW7UiXUFmxJzINuRhOtpEh6
+         vHGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=TWOO2zfu8P4UM754zwKeQRqNcelSJ+Vi3BwaB87IrgI=;
+        b=CbN8iVsVgsaJMV15gM3hgmUA3LHo514arjKMVZctXaQIhp26L69dQH45Vhqkb7BD/X
+         NjiNYn8C6BzUpBzQ+ofZFf25vJS1jycaObQqDauLUBCsdfLK7/ki7SOXOleTdsRmIMrT
+         SzeO5GhDUBeH1M50KViTYOlGdvA3PrmqWLfHdPlB+iMZURAGGQgBp5+ohxPbm5ZO3AkP
+         Uqtr1hY+twv2W2USymj36kz9eIYiu8gGb6VccT74le2D2SO3iyparAYT+bTch1uJlg2u
+         N0s1FgRnZ3KQ0jq6xbhfluLRTacNobKsNtjDEc6rUkzWeOQFqaMIBavvNM3sUIPVnshs
+         RiQw==
+X-Gm-Message-State: AOAM533MUKJigGXr4rsY3cZ/HyUTqnbgpbee3rdn7x2HYAf+rCoEqLcu
+        GM3kk0Yh4jnYoNOK8FEND7Y=
+X-Google-Smtp-Source: ABdhPJwm3L7bSc0x4zKW4ljahz5/V9fkUWnJDpwudDy2IcbG2e/6dOTMtKI7Na8SK+4UY4kLg/lEbg==
+X-Received: by 2002:adf:e4c9:: with SMTP id v9mr7191301wrm.277.1611971555621;
+        Fri, 29 Jan 2021 17:52:35 -0800 (PST)
+Received: from localhost.localdomain (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
+        by smtp.gmail.com with ESMTPSA id u14sm11707719wml.19.2021.01.29.17.52.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Jan 2021 17:52:35 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To:     qemu-devel@nongnu.org
+Cc:     Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>,
+        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Claudio Fontana <cfontana@suse.de>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v5 01/11] exec: Restrict TCG specific headers
+Date:   Sat, 30 Jan 2021 02:52:17 +0100
+Message-Id: <20210130015227.4071332-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210130015227.4071332-1-f4bug@amsat.org>
+References: <20210130015227.4071332-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D211467
+Fixes when building with --disable-tcg:
 
-Sean Christopherson (seanjc@google.com) changed:
+  In file included from target/arm/helper.c:16:
+  include/exec/helper-proto.h:42:10: fatal error: tcg-runtime.h: No such file or directory
+     42 | #include "tcg-runtime.h"
+        |          ^~~~~~~~~~~~~~~
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |seanjc@google.com
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/exec/helper-proto.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
---- Comment #2 from Sean Christopherson (seanjc@google.com) ---
-LOL, this is awesome.  Presumably you're also exposing an Intel CPU model to
-the guest, otherwise KVM would inject a #UD on SYSENTER instead of emulatin=
-g.
+diff --git a/include/exec/helper-proto.h b/include/exec/helper-proto.h
+index 659f9298e8f..740bff3bb4d 100644
+--- a/include/exec/helper-proto.h
++++ b/include/exec/helper-proto.h
+@@ -39,8 +39,10 @@ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
+ 
+ #include "helper.h"
+ #include "trace/generated-helpers.h"
++#ifdef CONFIG_TCG
+ #include "tcg-runtime.h"
+ #include "plugin-helpers.h"
++#endif /* CONFIG_TCG */
+ 
+ #undef IN_HELPER_PROTO
+ 
+-- 
+2.26.2
 
-Anyways, hilarity aside, your patch looks correct as Intel CPUs uncondition=
-ally
-transition to 64-bit mode on SYSENTER from compatibility mode.  Want to sen=
-d a
-formal patch?  If you're not set up to send a patch, I'd be happy to write a
-changelog if you want to provide a Signed-off-by.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
