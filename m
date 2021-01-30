@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDA68309419
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:12:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CB2A30941D
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:12:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231801AbhA3KL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 05:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46542 "EHLO
+        id S232118AbhA3KMK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 05:12:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233082AbhA3Bye (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 20:54:34 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B09C061788
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:02 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id o10so7987918wmc.1
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:02 -0800 (PST)
+        with ESMTP id S233080AbhA3Byd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 20:54:33 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B679CC061573
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:07 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id m13so10618265wro.12
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=g1KU5IE9TGCZM/lU61E2LYHQF94GVZ2sjp5LehjcIJU=;
-        b=mFXWLnEV2J7F5vMWemzgA7H5rDlvI6++w0fS0CrZkpYvnv+K+N3XgEO3GKqwwuaANV
-         d0g2d43AkRHBIhnX13fL4uJHnEss03yuMlReAv0aU0IicAz94GcfWh5K7Snxt8N8VR2K
-         m2+R3VOFvTNVyzdmxAUUMMumOrI7WSHzLPeDPs3BE1Awvg7fhIjOEoY+KbEEZ3F+6VdF
-         6FPqa4w4nqQkxvEZACD/7lmP+n2g0PSuWwn57rp18al9fjHH4i5rs8wkEYgX4/S1vteX
-         co1K1JfSZCh937LeyFh7KfxD9XXT2OfA3b5Ooc/YPg83R/j8K/T+OOmAzvb9jg4OXvX5
-         t53g==
+        bh=pL3VFUfes4LLPpgaJDy8jU3gYau+sjFrKic4/sFvnNY=;
+        b=QlPx5vk/bo8ydtxxW9jNTxI4BE08Ejo8IlC/WMnhi4Wbme1fYmhJgyU1Upki/92NmF
+         WC2DbHcdeOoGbbqkX3uzvTl8MPRzbcKjiR9DkW3t+gelrCpi6lbR+YljJPOX4B/pNnJR
+         jLROfdsvWr2JLoQ3ukaZTPfmPpHIQ2tX5RT3QafM9bvIGcGYCZ4JbSGyIOolFM9zj2wp
+         8Lk2wKKiOifSwg1YsFs8CXFAh+ZPmwh7tkYJaYlPsNhSagHtmcD7TetDYtI5mpUQKEuJ
+         UxtEsewFWr9ZiT2uXhIw/Szt607GBXaZ6aLcK0stqf2PdjzbROXSDKfZ0OHCM4ASM64Z
+         ZiGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=g1KU5IE9TGCZM/lU61E2LYHQF94GVZ2sjp5LehjcIJU=;
-        b=VtDTRKVMMeq/SWbL1sEWbSWgHgmGX2PxH5Vp/dZ+5pufXT6nij6HCg2GZC7RtSjecB
-         QR9UJXoKr4PJg5UwAafgTjStresCVKjakNaANDU5e8k+M9Iw9/oxOpkgljiewUHFRviZ
-         dj5+UvhSb0dWllnXbL6S5OvGPtQKMQEzDrZG+qwfmVpq5qXzsfdy15kzoptimpcausk7
-         IoZH4Uegkv9kR2k2h+AiktuVpuKEiwwTqO5DY1G9sCLt+QThirKOOmMYVZwC+BIJsRN2
-         JP/cYTIv5lQIOkVRT0ZkyDUa24I9QehTMiQcXwkOceK2siBKHybSzb/HhAGK8WbZ1Ika
-         Zv7Q==
-X-Gm-Message-State: AOAM530lOWfO7ioil5Pzupx8rQyb7ROKaelCW2GC6Qy1BgCMmD8P5T3t
-        AKjBrsUPSD+XKQr1IxGonPo=
-X-Google-Smtp-Source: ABdhPJyA4Coz/8piVvaPk4EIcoOTmtcPznXjAqGGyUN4FELubBKdNdl58zv0jN7k1O/K2eCj4Luk0Q==
-X-Received: by 2002:a1c:b78b:: with SMTP id h133mr6103963wmf.151.1611971581368;
-        Fri, 29 Jan 2021 17:53:01 -0800 (PST)
+        bh=pL3VFUfes4LLPpgaJDy8jU3gYau+sjFrKic4/sFvnNY=;
+        b=LvjCMycpsE6PFOR/qhH+P3v+/IqyPo4O3e6QRErPsCmXo4cWejyvOifk/zPWHs/77A
+         D9Dw2LUbdeN0Um4W2hWXuDaHbRSBrx1LcMyy18dy9Zg6mS4kEaDkFPrt7xuZYrma3zIK
+         ZNf80A997fomszWJ8MB1BmNufxm66qzJ2k4BfEZwiq0UT5uaWhglYBH4VQIqySF1Eybh
+         cGkt/aGw4g430/UbdXM5J/coH+Le75AXt56Im9DDj4iKTyv9qb14u83A/mP854KCAaGf
+         JkPHAk6k34eIWWaXBWI6WKiSkbshyJucNSoxfzqQ79Hjqw3lY+rZeJ/tpsMoCta9Z53m
+         NnXQ==
+X-Gm-Message-State: AOAM531OAdkF+GmZpa8m7qazvpDmfdtcrs06FY7dJT0snY/w4rMX4GNm
+        omnV9W/mX3urzHFmZZIltoU=
+X-Google-Smtp-Source: ABdhPJwbM5w0TDBpvxYm44nUc4AYAH45EnulcrjfYKeG5PWB96HJ5mDacgEs5qWvrmDx0pRxmhlO2w==
+X-Received: by 2002:adf:a31d:: with SMTP id c29mr7307582wrb.306.1611971586564;
+        Fri, 29 Jan 2021 17:53:06 -0800 (PST)
 Received: from localhost.localdomain (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
-        by smtp.gmail.com with ESMTPSA id w25sm12591514wmc.42.2021.01.29.17.52.59
+        by smtp.gmail.com with ESMTPSA id f13sm8277528wmf.1.2021.01.29.17.53.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 17:53:00 -0800 (PST)
+        Fri, 29 Jan 2021 17:53:05 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -61,9 +61,9 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         qemu-arm@nongnu.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v5 06/11] target/arm: Restrict ARMv7 R-profile cpus to TCG accel
-Date:   Sat, 30 Jan 2021 02:52:22 +0100
-Message-Id: <20210130015227.4071332-7-f4bug@amsat.org>
+Subject: [PATCH v5 07/11] target/arm: Restrict ARMv7 M-profile cpus to TCG accel
+Date:   Sat, 30 Jan 2021 02:52:23 +0100
+Message-Id: <20210130015227.4071332-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210130015227.4071332-1-f4bug@amsat.org>
 References: <20210130015227.4071332-1-f4bug@amsat.org>
@@ -74,61 +74,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A KVM-only build won't be able to run R-profile cpus.
+A KVM-only build won't be able to run M-profile cpus.
 
-Only enable the following ARMv7 R-Profile CPUs when TCG is available:
+Only enable the following ARMv7 M-Profile CPUs when TCG is available:
 
-  - Cortex-R5
-  - Cortex-R5F
+  - Cortex-M0
+  - Cortex-M3
+  - Cortex-M4
+  - Cortex-M33
 
-The following machine is no more built when TCG is disabled:
+The following machines are no more built when TCG is disabled:
 
-  - xlnx-zcu102          Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5Fs
+  - emcraft-sf2          SmartFusion2 SOM kit from Emcraft (M2S010)
+  - highbank             Calxeda Highbank (ECX-1000)
+  - lm3s6965evb          Stellaris LM3S6965EVB
+  - lm3s811evb           Stellaris LM3S811EVB
+  - midway               Calxeda Midway (ECX-2000)
+  - mps2-an385           ARM MPS2 with AN385 FPGA image for Cortex-M3
+  - mps2-an386           ARM MPS2 with AN386 FPGA image for Cortex-M4
+  - mps2-an500           ARM MPS2 with AN500 FPGA image for Cortex-M7
+  - mps2-an505           ARM MPS2 with AN505 FPGA image for Cortex-M33
+  - mps2-an511           ARM MPS2 with AN511 DesignStart FPGA image for Cortex-M3
+  - mps2-an521           ARM MPS2 with AN521 FPGA image for dual Cortex-M33
+  - musca-a              ARM Musca-A board (dual Cortex-M33)
+  - musca-b1             ARM Musca-B1 board (dual Cortex-M33)
+  - netduino2            Netduino 2 Machine
+  - netduinoplus2        Netduino Plus 2 Machine
+
+We don't need to enforce CONFIG_ARM_V7M in default-configs anymore.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- default-configs/devices/aarch64-softmmu.mak | 1 -
- hw/arm/Kconfig                              | 7 +++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ default-configs/devices/arm-softmmu.mak | 11 -----------
+ hw/arm/Kconfig                          | 17 +++++++++++++----
+ 2 files changed, 13 insertions(+), 15 deletions(-)
 
-diff --git a/default-configs/devices/aarch64-softmmu.mak b/default-configs/devices/aarch64-softmmu.mak
-index 958b1e08e40..a4202f56817 100644
---- a/default-configs/devices/aarch64-softmmu.mak
-+++ b/default-configs/devices/aarch64-softmmu.mak
-@@ -3,6 +3,5 @@
- # We support all the 32 bit boards so need all their config
- include arm-softmmu.mak
+diff --git a/default-configs/devices/arm-softmmu.mak b/default-configs/devices/arm-softmmu.mak
+index ee80bf15150..b72926b8fce 100644
+--- a/default-configs/devices/arm-softmmu.mak
++++ b/default-configs/devices/arm-softmmu.mak
+@@ -1,28 +1,17 @@
+ # Default configuration for arm-softmmu
  
--CONFIG_XLNX_ZYNQMP_ARM=y
- CONFIG_XLNX_VERSAL=y
- CONFIG_SBSA_REF=y
+-# TODO: ARM_V7M is currently always required - make this more flexible!
+-CONFIG_ARM_V7M=y
+-
+ # CONFIG_PCI_DEVICES=n
+ # CONFIG_TEST_DEVICES=n
+ 
+ CONFIG_ARM_VIRT=y
+ CONFIG_CUBIEBOARD=y
+ CONFIG_EXYNOS4=y
+-CONFIG_HIGHBANK=y
+-CONFIG_MUSCA=y
+-CONFIG_STELLARIS=y
+ CONFIG_REALVIEW=y
+ CONFIG_VEXPRESS=y
+ CONFIG_ZYNQ=y
+ CONFIG_NPCM7XX=y
+-CONFIG_NETDUINO2=y
+-CONFIG_NETDUINOPLUS2=y
+-CONFIG_MPS2=y
+ CONFIG_RASPI=y
+ CONFIG_SABRELITE=y
+-CONFIG_EMCRAFT_SF2=y
+-CONFIG_MICROBIT=y
+ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_ARM_COMPATIBLE_SEMIHOSTING=y
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index daab7081994..320428bf97e 100644
+index 320428bf97e..f56c05c00a8 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -11,6 +11,11 @@ config ARM_V6
+@@ -16,6 +16,12 @@ config ARM_V7R
      depends on TCG
      select ARM_COMPATIBLE_SEMIHOSTING
  
-+config ARM_V7R
++config ARM_V7M
 +    bool
 +    depends on TCG
 +    select ARM_COMPATIBLE_SEMIHOSTING
++    select PTIMER
 +
  config ARM_VIRT
      bool
      imply PCI_DEVICES
-@@ -377,8 +382,10 @@ config STM32F405_SOC
+@@ -78,6 +84,7 @@ config EXYNOS4
  
- config XLNX_ZYNQMP_ARM
+ config HIGHBANK
      bool
 +    default y if TCG
+     select A9MPCORE
+     select A15MPCORE
      select AHCI
-     select ARM_GIC
-+    select ARM_V7R
-     select CADENCE
-     select DDC
-     select DPCD
+@@ -113,6 +120,7 @@ config MAINSTONE
+ 
+ config MUSCA
+     bool
++    default y if TCG
+     select ARMSSE
+     select PL011
+     select PL031
+@@ -133,10 +141,12 @@ config MUSICPAL
+ 
+ config NETDUINO2
+     bool
++    default y if TCG
+     select STM32F205_SOC
+ 
+ config NETDUINOPLUS2
+     bool
++    default y if TCG
+     select STM32F405_SOC
+ 
+ config NSERIES
+@@ -258,6 +268,7 @@ config SABRELITE
+ 
+ config STELLARIS
+     bool
++    default y if TCG
+     select ARM_V7M
+     select CMSDK_APB_WATCHDOG
+     select I2C
+@@ -331,10 +342,6 @@ config ZYNQ
+     select XILINX_SPIPS
+     select ZYNQ_DEVCFG
+ 
+-config ARM_V7M
+-    bool
+-    select PTIMER
+-
+ config ALLWINNER_A10
+     bool
+     select AHCI
+@@ -463,6 +470,7 @@ config ASPEED_SOC
+ 
+ config MPS2
+     bool
++    default y if TCG
+     select ARMSSE
+     select LAN9118
+     select MPS2_FPGAIO
+@@ -516,6 +524,7 @@ config NRF51_SOC
+ 
+ config EMCRAFT_SF2
+     bool
++    default y if TCG
+     select MSF2
+     select SSI_M25P80
+ 
 -- 
 2.26.2
 
