@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A465309416
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EC4C309415
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 11:11:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232128AbhA3KLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 05:11:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46894 "EHLO
+        id S230470AbhA3KLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 05:11:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233116AbhA3B4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233125AbhA3B4L (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 29 Jan 2021 20:56:11 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC38C06178C
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:22 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id u14so8142492wml.4
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:22 -0800 (PST)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7FA1C061793
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:27 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id g10so10625792wrx.1
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:53:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Rd+PClqm9GCes/hSRY8Vwer9UM1+ZxmgnVmbkhC6bwQ=;
-        b=S8gP7rmCHgjQ7YTM/ADW7lbRknMIzFi/kvGjnDTBiXVwxuHAweAduqVLnoWGJLI2Ik
-         JfdEKMmuSM3Uo8wpGPc7O5efkIfwempgLB5LYyAxcpbOduzxSzOy25mGYctn0157CNuf
-         zV0ZhHXDZP2UT03nYTizMXR4Vs40tQPbvbnOmuxLCvtPCrY0PMsdGMwTdM2ArhKkBchH
-         TWyvRrzcqLAWdaanShYSz+sOqcrd7NvfsPGFpWW+5oIunY8vE5ZXCX2iLvPjoaAaSoPR
-         DrMJQdIPKVgaAINimQlPBxGcMGIfkres1tY3aYap3kkTCgMibqAulTso5blHDtdlfoUu
-         cwiw==
+        bh=dDZADzgKI5lXuqqUK6CV2RYB4kAOXUW22/2lumwj8o4=;
+        b=e7psjHWNaDe5BRPalel5z+UrUPQyCYHO0ADPAqwnXvE6/jKDRHnq865wvhM3CvcziS
+         81EyjqLup5Sso5l2NVZ/0wY2xzImn5JfNEpSNIBoIBengxfy1LzI66lsP+ni/80f/evR
+         U7QLC+B3eBq5pi+hy3v4oWie/DVjl15VvVl+DUC7b4bFZ82n+IBpLOg69cciuSH0bv0o
+         ugmYLJK5GlHsO6ioN/+OP/utD5jbLp9Mf2b2fwCAn07n5bGBKAg2Ljhf/XruZU6V7ADq
+         ieVbF8YOSHcYMgG6rdoDn8FpNs1Ulo8zayvnM2zRRrDOTV3lmjsv5yKhGHhUzizRmIXS
+         CcDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=Rd+PClqm9GCes/hSRY8Vwer9UM1+ZxmgnVmbkhC6bwQ=;
-        b=lJ2hBVXrGDBO6wOT2n4tYxn/Z4rr5wIRrF1HGlDXIbbtSXixiXgDar8F4GdODb7/z3
-         vnQ40LN/vnwvn5bK3/Uwicc5aB24YGys1jb3imm7s7m1tbsqcWACabstpbeER8Q7o1dx
-         PQHgEH2R8EpVRyv2idG4plGebP+QiqVeWcAI7SozdgVNFeYOlc3cONVUh0zUtCJdtL+s
-         NqcweajiysQzNYRe8klgdzZyhKhhePcdd5JoEcXJPioBabb7HZzIokGVF1jCNDPOtDAB
-         QdD63omDTsATfH2TmckHTf8ToSVrV4QC3ytPb2rpqhfBQvqm6ziAx493YB2t9FBLvPR2
-         VYAA==
-X-Gm-Message-State: AOAM530HCKgS6zTu2/BVRK8f/TRnsm1a0Ti2STyq1QuktyS+gWF55Hv3
-        j3l5+HUnZwEp/PCIvWh2VMg=
-X-Google-Smtp-Source: ABdhPJyiwfRfgUFvof6J96IEb3nlU6yPh2kst4/42gIlUzuKzVr51L9y/LCynY6WSCm+1mWXoo7usg==
-X-Received: by 2002:a05:600c:2204:: with SMTP id z4mr5915886wml.138.1611971601791;
-        Fri, 29 Jan 2021 17:53:21 -0800 (PST)
+        bh=dDZADzgKI5lXuqqUK6CV2RYB4kAOXUW22/2lumwj8o4=;
+        b=roBg+DPdcXwxsi+xqXnO9F6iTwI/6L3rtATVVxC61n4HQ5K9u2WsxLsomu3jWgEkdd
+         PiBlIFrDB0PHjHmf6sOK08Ot30FM13VQyRgFZIBfFLXQvEW76MLbtGC0kOD6BWPPmNXO
+         9bYAfim3QnwbDgnUTpr6WfB3s3eWFMdFJwWVUStWhVTnrGVbzuE5lSaAcAZCOwBNFh7s
+         6BdGoGh9kE6kH8EfrNSdOeSI2usUnkF23w4q+KNFRCABikR2WqjjnVM5NZwXcQKhqdZs
+         FGpWoSwl143VomWbYZIuHUZowaKWkuSOSc/mTAQvHE8RIwuNMKNyLcmXRxFa0vAy4aBY
+         bN/w==
+X-Gm-Message-State: AOAM533lVl6WAXfdW5wJtkaTjY3SrlcJLJWHiBfUmyP5Y7G0bq1FIga7
+        TyQ1lPEO6+L0QPfhp3n2DGE=
+X-Google-Smtp-Source: ABdhPJxaH/w2Fme7el93QIXUQzDffvAxEB63h7HSmXGa9jkoVnLMptaWM3d09a23cIwVkku9tHUZXg==
+X-Received: by 2002:a5d:5049:: with SMTP id h9mr7559886wrt.404.1611971606779;
+        Fri, 29 Jan 2021 17:53:26 -0800 (PST)
 Received: from localhost.localdomain (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
-        by smtp.gmail.com with ESMTPSA id g1sm15181177wrq.30.2021.01.29.17.53.20
+        by smtp.gmail.com with ESMTPSA id d13sm14972889wrx.93.2021.01.29.17.53.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 17:53:21 -0800 (PST)
+        Fri, 29 Jan 2021 17:53:26 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -59,11 +59,10 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         Richard Henderson <rth@twiddle.net>,
         Claudio Fontana <cfontana@suse.de>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, Samuel Ortiz <sameo@linux.intel.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v5 10/11] target/arm: Do not build TCG objects when TCG is off
-Date:   Sat, 30 Jan 2021 02:52:26 +0100
-Message-Id: <20210130015227.4071332-11-f4bug@amsat.org>
+        qemu-arm@nongnu.org
+Subject: [PATCH v5 11/11] .travis.yml: Add a KVM-only Aarch64 job
+Date:   Sat, 30 Jan 2021 02:52:27 +0100
+Message-Id: <20210130015227.4071332-12-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210130015227.4071332-1-f4bug@amsat.org>
 References: <20210130015227.4071332-1-f4bug@amsat.org>
@@ -74,66 +73,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Samuel Ortiz <sameo@linux.intel.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-We can now safely turn all TCG dependent build off when CONFIG_TCG is
-off. This allows building ARM binaries with --disable-tcg.
+Add a job to build QEMU on Aarch64 with TCG disabled, so
+this configuration won't bitrot over time.
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
-[PMD: Heavily rebased during more than 2 years then finally rewritten]
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+We explicitly modify default-configs/aarch64-softmmu.mak to
+only select the 'virt' and 'SBSA-REF' machines.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/arm/meson.build | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Job ran for 7 min 30 sec
+https://travis-ci.org/github/philmd/qemu/jobs/731428859
+---
+ .travis.yml | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/target/arm/meson.build b/target/arm/meson.build
-index aac9a383a61..11b7c0e18fe 100644
---- a/target/arm/meson.build
-+++ b/target/arm/meson.build
-@@ -27,7 +27,8 @@
-   'gdbstub64.c',
- ))
+diff --git a/.travis.yml b/.travis.yml
+index 5f1dea873ec..4f1d662b5fc 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -264,6 +264,38 @@ jobs:
+         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
+         - UNRELIABLE=true
  
--arm_ss.add(files(
-+arm_tcg_ss = ss.source_set()
-+arm_tcg_ss.add(files(
-   'crypto_helper.c',
-   'debug_helper.c',
-   'iwmmxt_helper.c',
-@@ -38,12 +39,12 @@
-   'vec_helper.c',
-   'cpu_tcg.c',
- ))
--arm_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
-+arm_tcg_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('m_helper.c'), if_false: files('m_helper-stub.c'))
- arm_ss.add(when: 'CONFIG_TCG', if_false: files('m_helper-stub.c'))
- 
- arm_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c', 'kvm64.c'), if_false: files('kvm-stub.c'))
- 
--arm_ss.add(when: 'TARGET_AARCH64', if_true: files(
-+arm_tcg_ss.add(when: 'TARGET_AARCH64', if_true: files(
-   'helper-a64.c',
-   'mte_helper.c',
-   'pauth_helper.c',
-@@ -52,14 +53,16 @@
-   'translate-sve.c',
- ))
- 
-+arm_ss.add_all(when: 'CONFIG_TCG', if_true: arm_tcg_ss)
++    - name: "[aarch64] GCC (disable-tcg)"
++      arch: arm64
++      dist: focal
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libbrlapi-dev
++          - libcap-ng-dev
++          - libgcrypt20-dev
++          - libgnutls28-dev
++          - libgtk-3-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - libncurses5-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libpng-dev
++          - librados-dev
++          - libsdl2-dev
++          - libseccomp-dev
++          - liburcu-dev
++          - libusb-1.0-0-dev
++          - libvdeplug-dev
++          - libvte-2.91-dev
++          - ninja-build
++      env:
++        - CONFIG="--disable-containers --disable-tcg --enable-kvm --disable-xen --disable-tools --disable-docs"
++        - TEST_CMD="make check-unit"
++        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-aarch64"
 +
- arm_softmmu_ss = ss.source_set()
- arm_softmmu_ss.add(files(
-   'arch_dump.c',
-   'arm-powerctl.c',
-   'machine.c',
-   'monitor.c',
--  'psci.c',
- ))
-+arm_softmmu_ss.add(when: 'CONFIG_TCG', if_true: files('psci.c'))
- 
- target_arch += {'arm': arm_ss}
- target_softmmu_arch += {'arm': arm_softmmu_ss}
+     - name: "[ppc64] GCC check-tcg"
+       arch: ppc64le
+       dist: focal
 -- 
 2.26.2
 
