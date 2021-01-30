@@ -2,224 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7AC73097B4
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 19:56:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 858463097B2
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 19:56:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbhA3Szu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Jan 2021 13:55:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31174 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230045AbhA3Szt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 30 Jan 2021 13:55:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612032862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Ov9d4j/dLr2l+97bVEX2opM5HTQ6CfGiRe+Tx/Qzy8=;
-        b=cywqiOChy6pSVi1TmqMuwInQFEazjLxjUXedjyVlWx2maYxrMJL6qIj0c5d2jykj+Vdl/9
-        P+HQNZiQq9kbUu2S6XMwScPi49RDIkw5q6XhusD/z0/Lhl7fMgHeK5runsugeTyuKNQBTO
-        SQ+AIJnwY6pI20t0O3gSFinz3dO7oCQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-kT74L8TMMgiVTWWLnTZlXA-1; Sat, 30 Jan 2021 13:54:18 -0500
-X-MC-Unique: kT74L8TMMgiVTWWLnTZlXA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 285AB18C8C00;
-        Sat, 30 Jan 2021 18:54:17 +0000 (UTC)
-Received: from localhost (ovpn-112-96.ams2.redhat.com [10.36.112.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA3345D9D3;
-        Sat, 30 Jan 2021 18:54:16 +0000 (UTC)
-Date:   Sat, 30 Jan 2021 18:54:15 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-Subject: Re: [RFC v2 3/4] KVM: add support for ioregionfd cmds/replies
- serialization
-Message-ID: <20210130185415.GD98016@stefanha-x1.localdomain>
-References: <cover.1611850290.git.eafanasova@gmail.com>
- <294d8a0e08eff4ec9c8f8f62492f29163e6c4319.1611850291.git.eafanasova@gmail.com>
+        id S230036AbhA3Szc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Jan 2021 13:55:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230045AbhA3Sza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Jan 2021 13:55:30 -0500
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88230C061573
+        for <kvm@vger.kernel.org>; Sat, 30 Jan 2021 10:54:49 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id ke15so17943640ejc.12
+        for <kvm@vger.kernel.org>; Sat, 30 Jan 2021 10:54:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=oXtPVE2IbtRRYCpvUtiVFQgbW5mh8YjoQMknIuSaeAc=;
+        b=b1rE5reO+/ylwUvWHDQ6gFBD1ZMLvjmBVj7z6iHZEtOIrt85KafbIsrJiUTFMjgkMv
+         EO239Ch7/2vVc0sITyLPdJw79Y+DCrMrThTp86B/tp4yto0D8J7B2oagD+F+VrSA1ciu
+         I5poKTCsVbT2lrqibfeCp+VtxN5qYq2t6UgtTQzNfWSNTueccgRu9w7NSq60zrXpqF00
+         E+yG6zYuZ31QrSrfccmyDg4uryatxiI+pF7o1OOGRbojYu5vd9czNJSN+4ROCzG5yfv6
+         OGKU/10X2cC0Qells3y39Jm9YWDAtsEjcdG3fj0bTfhFF3WPV5yrPTu2+mgt4gwFPh4s
+         n7BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=oXtPVE2IbtRRYCpvUtiVFQgbW5mh8YjoQMknIuSaeAc=;
+        b=SM2ifTe/Y4J/27WKMu0+dgt/uOHbpZeLgo2jAEG+dm9+MBXBHjb6pfzPrF7fKYbz6i
+         zYosBfrL1JreSzlB7Bfmf5MC3qYWrdgvwpi7psfXLJ3Gin9Kqx1ZZWly/eOBG/vATeFA
+         Qvmpr6pYlB8lq6kqDrI9KkXC+TGRe7iis8ewRX0qCjU6+kW8BrI+DGf5EiIE+KQlEjgl
+         FHAsYsk2H0YtoqqBmogywSpFrk+drR++TPr6ONq8xiU6vMqx4p4i4sqPTa/FuQQ9+0Hl
+         70xBcACIsGY8/YY7Mu/q7mbcga6Y7lKKfOQ2M0jrWJna9xDytmp7MvT254LqgHkmjY1Z
+         5dWg==
+X-Gm-Message-State: AOAM533buazKmhe6Rb+izyeKIuyRJ5K7Pub4F2iyhFVqSaCLyW8iEPuu
+        ErtG3q+KeyJwWqHY+NtoMR23nrxk1Y8ViK+/TFl8nA==
+X-Google-Smtp-Source: ABdhPJwo7gvPhPJtvirAJL3BBx+tVDxaTzL7yXGFz6XeyRrStm+3laD7Nmfgez99qF2/kAXH8/BrkdUPl35U/QOjqxg=
+X-Received: by 2002:a17:906:b215:: with SMTP id p21mr10088000ejz.407.1612032888158;
+ Sat, 30 Jan 2021 10:54:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="48TaNjbzBVislYPb"
-Content-Disposition: inline
-In-Reply-To: <294d8a0e08eff4ec9c8f8f62492f29163e6c4319.1611850291.git.eafanasova@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210130015227.4071332-1-f4bug@amsat.org> <20210130015227.4071332-4-f4bug@amsat.org>
+ <CAFEAcA8UCFghGDb4oMujek_W_wsyYz+duiQ-d8JyN09NYoff-g@mail.gmail.com> <2871f7db-fe0a-51d6-312d-6d05ffa281a3@amsat.org>
+In-Reply-To: <2871f7db-fe0a-51d6-312d-6d05ffa281a3@amsat.org>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Sat, 30 Jan 2021 18:54:37 +0000
+Message-ID: <CAFEAcA-W1tcRREaPTfMw98cNsHs7JHk4gjaJWaJNLpxZoVnKaw@mail.gmail.com>
+Subject: Re: [PATCH v5 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
+To:     =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm-devel <kvm@vger.kernel.org>, Fam Zheng <fam@euphon.net>,
+        Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Claudio Fontana <cfontana@suse.de>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        qemu-arm <qemu-arm@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, 30 Jan 2021 at 18:36, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>
+> Hi Peter,
+>
+> On 1/30/21 4:37 PM, Peter Maydell wrote:
+> > On Sat, 30 Jan 2021 at 01:52, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
+org> wrote:
+> >>
+> >> KVM requires a cpu based on (at least) the ARMv7 architecture.
+> >
+> > These days it requires ARMv8, because we dropped 32-bit host
+> > support, and all 64-bit host CPUs are v8.
+>
+> Oh, this comment is about the target, to justify it is pointless to
+> include pre-v7 target cpus/machines in a KVM-only binary.
+>
+> I'll update as:
+>
+> "KVM requires the target cpu based on (at least) the ARMv7
+> architecture."
 
---48TaNjbzBVislYPb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+KVM requires the target CPU to be at least ARMv8, because
+we only support the "host" cpu type, and all KVM host CPUs
+are v8, which means you can't pass a v7 CPU as the target CPU.
+(This used to not be true when we still supported running
+KVM on a v7 CPU like the Cortex-A15, in which case you could
+pass it to the guest.)
 
-On Thu, Jan 28, 2021 at 09:32:22PM +0300, Elena Afanasova wrote:
-> Add ioregionfd context and kvm_io_device_ops->prepare/finish()
-> in order to serialize all bytes requested by guest.
->=20
-> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
-> ---
->  arch/x86/kvm/x86.c       |  19 ++++++++
->  include/kvm/iodev.h      |  14 ++++++
->  include/linux/kvm_host.h |   4 ++
->  virt/kvm/ioregion.c      | 102 +++++++++++++++++++++++++++++++++------
->  virt/kvm/kvm_main.c      |  32 ++++++++++++
->  5 files changed, 157 insertions(+), 14 deletions(-)
->=20
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a04516b531da..393fb0f4bf46 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5802,6 +5802,8 @@ static int vcpu_mmio_write(struct kvm_vcpu *vcpu, g=
-pa_t addr, int len,
->  	int ret =3D 0;
->  	bool is_apic;
-> =20
-> +	kvm_io_bus_prepare(vcpu, KVM_MMIO_BUS, addr, len);
-> +
->  	do {
->  		n =3D min(len, 8);
->  		is_apic =3D lapic_in_kernel(vcpu) &&
-> @@ -5823,8 +5825,10 @@ static int vcpu_mmio_write(struct kvm_vcpu *vcpu, =
-gpa_t addr, int len,
->  	if (ret =3D=3D -EINTR) {
->  		vcpu->run->exit_reason =3D KVM_EXIT_INTR;
->  		++vcpu->stat.signal_exits;
-> +		return handled;
->  	}
->  #endif
-> +	kvm_io_bus_finish(vcpu, KVM_MMIO_BUS, addr, len);
-
-Hmm...it would be nice for kvm_io_bus_prepare() to return the idx or the
-device pointer so the devices don't need to be searched in
-read/write/finish. However, it's complicated by the loop which may
-access multiple devices.
-
-> @@ -9309,6 +9325,7 @@ static int complete_ioregion_mmio(struct kvm_vcpu *=
-vcpu)
->  		vcpu->mmio_cur_fragment++;
->  	}
-> =20
-> +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
->  	vcpu->mmio_needed =3D 0;
->  	if (!vcpu->ioregion_ctx.in) {
->  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> @@ -9333,6 +9350,7 @@ static int complete_ioregion_pio(struct kvm_vcpu *v=
-cpu)
->  		vcpu->ioregion_ctx.val +=3D vcpu->ioregion_ctx.len;
->  	}
-> =20
-> +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
->  	if (vcpu->ioregion_ctx.in)
->  		r =3D kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> @@ -9352,6 +9370,7 @@ static int complete_ioregion_fast_pio(struct kvm_vc=
-pu *vcpu)
->  	complete_ioregion_access(vcpu, vcpu->ioregion_ctx.addr,
->  				 vcpu->ioregion_ctx.len,
->  				 vcpu->ioregion_ctx.val);
-> +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
->  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> =20
->  	if (vcpu->ioregion_ctx.in) {
-
-Normally userspace will invoke ioctl(KVM_RUN) and reach one of these
-completion functions, but what if the vcpu fd is closed instead?
-->finish() should still be called to avoid leaks.
-
-> diff --git a/include/kvm/iodev.h b/include/kvm/iodev.h
-> index d75fc4365746..db8a3c69b7bb 100644
-> --- a/include/kvm/iodev.h
-> +++ b/include/kvm/iodev.h
-> @@ -25,6 +25,8 @@ struct kvm_io_device_ops {
->  		     gpa_t addr,
->  		     int len,
->  		     const void *val);
-> +	void (*prepare)(struct kvm_io_device *this);
-> +	void (*finish)(struct kvm_io_device *this);
->  	void (*destructor)(struct kvm_io_device *this);
->  };
-> =20
-> @@ -55,6 +57,18 @@ static inline int kvm_iodevice_write(struct kvm_vcpu *=
-vcpu,
->  				 : -EOPNOTSUPP;
->  }
-> =20
-> +static inline void kvm_iodevice_prepare(struct kvm_io_device *dev)
-> +{
-> +	if (dev->ops->prepare)
-> +		dev->ops->prepare(dev);
-> +}
-> +
-> +static inline void kvm_iodevice_finish(struct kvm_io_device *dev)
-> +{
-> +	if (dev->ops->finish)
-> +		dev->ops->finish(dev);
-> +}
-
-A performance optimization: keep a separate list of struct
-kvm_io_devices that implement prepare/finish. That way the search
-doesn't need to iterate over devices that don't support this interface.
-
-Before implementing an optimization like this it would be good to check
-how this patch affects performance on guests with many in-kernel devices
-(e.g. a guest that has many multi-queue virtio-net/blk devices with
-ioeventfd). ioregionfd shouldn't reduce performance of existing KVM
-configurations, so it's worth measuring.
-
-> diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> index da38124e1418..3474090ccc8c 100644
-> --- a/virt/kvm/ioregion.c
-> +++ b/virt/kvm/ioregion.c
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  #include <linux/kvm_host.h>
-> -#include <linux/fs.h>
-> +#include <linux/wait.h>
->  #include <kvm/iodev.h>
->  #include "eventfd.h"
->  #include <uapi/linux/ioregion.h>
-> @@ -12,15 +12,23 @@ kvm_ioregionfd_init(struct kvm *kvm)
->  	INIT_LIST_HEAD(&kvm->ioregions_pio);
->  }
-> =20
-> +/* Serializes ioregionfd cmds/replies */
-
-Please expand on this comment:
-
-  ioregions that share the same rfd are serialized so that only one vCPU
-  thread sends a struct ioregionfd_cmd to userspace at a time. This
-  ensures that the struct ioregionfd_resp received from userspace will
-  be processed by the one and only vCPU thread that sent it.
-
-  A waitqueue is used to wake up waiting vCPU threads in order. Most of
-  the time the waitqueue is unused and the lock is not contended.
-  For best performance userspace should set up ioregionfds so that there
-  is no contention (e.g. dedicated ioregionfds for queue doorbell
-  registers on multi-queue devices).
-
-A comment along these lines will give readers an idea of why the code
-does this.
-
---48TaNjbzBVislYPb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmAVq1cACgkQnKSrs4Gr
-c8il4Qf/VkDAtPpTSWZQuPX8F+6fSyz08YpBTvviKk7jbwixTWz/G0qNAdlY2AQN
-DX0z7iWhfc0jxlTj9PLxObSvHTARxk9yYzA+cCYIuL+KjqxUHObE70aQgjFAqEP7
-u9pFjbyav45v8ca9TuGYD3+21TAZrOOwuFgh3DU2vsMzNxZ02rrgPY5q6kIC96jA
-fF0AXj2IBTPq/lwEj/dJmubLsw4yc/+XWr7EZorMJK1cmg3D6lGx9IkHw0DaDMeP
-XOcGEarN1DM9d1TSySztcY71I1cHUWaui/Nhg2nPykb7c0dkagV36WGTDL+hJYCg
-bTCwMQnYhPoTc6S55dTuFAsbPSeZGA==
-=sLwO
------END PGP SIGNATURE-----
-
---48TaNjbzBVislYPb--
-
+thanks
+-- PMM
