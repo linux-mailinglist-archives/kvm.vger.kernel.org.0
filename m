@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FA2C309173
-	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 03:07:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1835B309175
+	for <lists+kvm@lfdr.de>; Sat, 30 Jan 2021 03:07:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232683AbhA3B4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Jan 2021 20:56:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46240 "EHLO
+        id S233024AbhA3B4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Jan 2021 20:56:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232821AbhA3BxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Jan 2021 20:53:21 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76C7C061574
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:31 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id c127so8514628wmf.5
-        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:31 -0800 (PST)
+        with ESMTP id S232852AbhA3BxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Jan 2021 20:53:24 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A7EC061756
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:41 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id m1so5253344wml.2
+        for <kvm@vger.kernel.org>; Fri, 29 Jan 2021 17:52:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=adQegksKyg6ypqy8yaNY4IxRFUUd8NlguDdBcG0O0Dc=;
-        b=Jify+HIvCRI6v2kFDWjTZrLVCkFPKsirwWVmqbOedbFWxEWVegCK8Kfa5vj1pFUxNR
-         uVc5o1KEC4qiu0zDMpLGV/D0/60D4MPbPGua/hCXEYPst1Gv7htKhNx4uEL6eT4mq1+u
-         xrIxvT+4cmFzEtGbbarSXi7wPPUsqpBBh2xGR088evTJQDO5hPAkzcAnHItmWFdxuCtm
-         th5XWIsnQ2N49bSnJC6+lJtaNE46hgI0naP5dMuR0EKp4QP815M06UqGrxn62rOTX72K
-         b4eZU7IMeR8PULGxqjQi4Df8MG49oURxPLIda+TTg4pBpWCFlHieW7lxwh/2o1n0irDR
-         eUhg==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=G9dNmRIohMTgXAElzkQ+lpMLRmxhHG61au1rY6dJdIw=;
+        b=PEjpazXUgk6kR6UqDmwU45UySoXQLcz5AUjh6P8ScUgFkBsPisn+Tm/qm9hBMUWlxU
+         bXEcLJ8UugY9aEVPQbo6p4m/Hux6j9xRlGgX4nFBl3CdGdq2BBIrSjLEO86Z4aoFc8pO
+         sOUDNxqSQ0sq11WskYH43JUY8ipQhlYj/w/bYvz/VXaBRpbw+O5FYEX3aiwba24dV37x
+         eXoZz8Ukp5kBBqvvXXbiR7M0vIrCWLxvkVDzdRwwembHyYCl3SSmuG6HSoiE25+STMef
+         fVEoHq1XKPD0QMR5koqBX/Yf7PEsrpn+QnhlP/GxxXqA9IDdom/mYPcwNcgu4Y2ATxaQ
+         whbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=adQegksKyg6ypqy8yaNY4IxRFUUd8NlguDdBcG0O0Dc=;
-        b=a5hAFV+bwK1TJ4PYjDMtL5PEPdLLRzLmktvxjokfGaxGghLxhQoaJLQ9O8UQ2agVul
-         yIoFVBGmJEo8cj3NXx31LEU5XNkXLE1dVuQtitTTB5DZRZ6J0UVAmvxBfEgORK8Z7mI7
-         cDVr5VIZy2HAWZvK21Fq36FMNpkSQ6O7N2QTHgquqTAot3Kqi7pWwmpM2yoeWtUEwCs8
-         0t2vfmy7PslggSWqdvJvC0maFkiqu7L8ebAaMSG1GXfE1ncmpgHs+wya1r+WzKhS1fER
-         WS0j7SaEPnfh0STA3OoCjCWAmtmV/JNa750c0YQgovNidZtwIFqUUQEgAVIRrmlYVVuk
-         Uzpw==
-X-Gm-Message-State: AOAM531wulKHptTp9DyooAp6KIUb+W6nWr/pHyzYq86Ia9ydgYsBnArp
-        ehRXqDtFVBLqDoVNCxo3vG4=
-X-Google-Smtp-Source: ABdhPJzAZ1zraX1+wErsQAoxLg/4/5cge/k+zf+9AXuQRmCgsUUA0TAkV3aDzuzdcsuTqEd2pjPmTg==
-X-Received: by 2002:a1c:b087:: with SMTP id z129mr1504698wme.147.1611971550627;
-        Fri, 29 Jan 2021 17:52:30 -0800 (PST)
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=G9dNmRIohMTgXAElzkQ+lpMLRmxhHG61au1rY6dJdIw=;
+        b=t797YXQ8PaLabsOW/Ok8Fn+ASCaaR437TOaUmAYVt9e2LFsQE2+sY4PrRuy/sWu6rU
+         hWWXQUxBD0JNZeK4OtWKcJ2DgPK8z7YpHRvOxssJBmUOhDY7TGaFE/sBvJ3CMUThVQHY
+         XJoCoBVw7murg/+2FU8w1tVb7OeLcfFuQlarJtBIj+5OfpV+o9v4diEI6C/zbKGwN5ZN
+         bdBw/BZg9UPdS5O2jLvF8iWUKXZfDTKgAOLX1iCvCp7ACKGspysh/XJYvPk7DyrRORyv
+         R3ieDQqbE9uBNmjY3Homjo9TfzhiwFkBC33olN2eNC1yahhMIHYYx/E0reNUW0VKAe8p
+         l3+Q==
+X-Gm-Message-State: AOAM530G1ow1yPO1UEfaGgyHQTqq8WhFQYk3uWaz3UtlXK/gavu/03De
+        ADk3YeAFlOflZWJ0z3cxpys=
+X-Google-Smtp-Source: ABdhPJwskto+f53o9TCaynYuVK8iQ1uBoTdTN+CKWcrz2acq5nnSN55h/BCj1DXRiUJLZD6Cr+Hp6Q==
+X-Received: by 2002:a1c:21c6:: with SMTP id h189mr5786718wmh.173.1611971560647;
+        Fri, 29 Jan 2021 17:52:40 -0800 (PST)
 Received: from localhost.localdomain (13.red-83-57-169.dynamicip.rima-tde.net. [83.57.169.13])
-        by smtp.gmail.com with ESMTPSA id e4sm15520107wrw.96.2021.01.29.17.52.28
+        by smtp.gmail.com with ESMTPSA id w126sm12485133wma.43.2021.01.29.17.52.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 17:52:29 -0800 (PST)
+        Fri, 29 Jan 2021 17:52:40 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
         <philippe.mathieu.daude@gmail.com>
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
@@ -61,84 +61,39 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         qemu-arm@nongnu.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v5 00/11] Support disabling TCG on ARM (part 2)
-Date:   Sat, 30 Jan 2021 02:52:16 +0100
-Message-Id: <20210130015227.4071332-1-f4bug@amsat.org>
+Subject: [PATCH v5 02/11] default-configs: Remove unnecessary SEMIHOSTING selection
+Date:   Sat, 30 Jan 2021 02:52:18 +0100
+Message-Id: <20210130015227.4071332-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210130015227.4071332-1-f4bug@amsat.org>
+References: <20210130015227.4071332-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cover from Samuel Ortiz from (part 1) [1]:=0D
-=0D
-  This patchset allows for building and running ARM targets with TCG=0D
-  disabled. [...]=0D
-=0D
-  The rationale behind this work comes from the NEMU project where we're=0D
-  trying to only support x86 and ARM 64-bit architectures, without=0D
-  including the TCG code base. We can only do so if we can build and run=0D
-  ARM binaries with TCG disabled.=0D
-=0D
-v5:=0D
-- addressed Paolo/Richard/Thomas review comments from v4 [5].=0D
-=0D
-v4 almost 2 years later... [2]:=0D
-- Rebased on Meson=0D
-- Addressed Richard review comments=0D
-- Addressed Claudio review comments=0D
-=0D
-v3 almost 18 months later [3]:=0D
-- Rebased=0D
-- Addressed Thomas review comments=0D
-- Added Travis-CI job to keep building --disable-tcg on ARM=0D
-=0D
-v2 [4]:=0D
-- Addressed review comments from Richard and Thomas from v1 [1]=0D
-=0D
-Regards,=0D
-=0D
-Phil.=0D
-=0D
-[1]: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg02451.html=0D
-[2]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg689168.html=0D
-[3]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg641796.html=0D
-[4]: https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05003.html=0D
-[5]: https://www.mail-archive.com/qemu-devel@nongnu.org/msg746041.html=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (9):=0D
-  exec: Restrict TCG specific headers=0D
-  default-configs: Remove unnecessary SEMIHOSTING selection=0D
-  target/arm: Restrict ARMv4 cpus to TCG accel=0D
-  target/arm: Restrict ARMv5 cpus to TCG accel=0D
-  target/arm: Restrict ARMv6 cpus to TCG accel=0D
-  target/arm: Restrict ARMv7 R-profile cpus to TCG accel=0D
-  target/arm: Restrict ARMv7 M-profile cpus to TCG accel=0D
-  target/arm: Reorder meson.build rules=0D
-  .travis.yml: Add a KVM-only Aarch64 job=0D
-=0D
-Samuel Ortiz (1):=0D
-  target/arm: Do not build TCG objects when TCG is off=0D
-=0D
-Thomas Huth (1):=0D
-  target/arm: Make m_helper.c optional via CONFIG_ARM_V7M=0D
-=0D
- default-configs/devices/aarch64-softmmu.mak |  1 -=0D
- default-configs/devices/arm-softmmu.mak     | 28 --------=0D
- include/exec/helper-proto.h                 |  2 +=0D
- target/arm/cpu.h                            | 12 ----=0D
- hw/arm/realview.c                           |  7 +-=0D
- target/arm/cpu_tcg.c                        |  4 +-=0D
- target/arm/helper.c                         |  7 --=0D
- target/arm/m_helper-stub.c                  | 73 +++++++++++++++++++++=0D
- .travis.yml                                 | 32 +++++++++=0D
- hw/arm/Kconfig                              | 66 +++++++++++++++++--=0D
- target/arm/meson.build                      | 28 +++++---=0D
- 11 files changed, 196 insertions(+), 64 deletions(-)=0D
- create mode 100644 target/arm/m_helper-stub.c=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+Commit 56b5170c87e ("semihosting: Move ARM semihosting code to
+shared directories") selected ARM_COMPATIBLE_SEMIHOSTING which
+already selects SEMIHOSTING. No need to select it again.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ default-configs/devices/arm-softmmu.mak | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/default-configs/devices/arm-softmmu.mak b/default-configs/devices/arm-softmmu.mak
+index 0500156a0c7..341d439de6f 100644
+--- a/default-configs/devices/arm-softmmu.mak
++++ b/default-configs/devices/arm-softmmu.mak
+@@ -41,6 +41,5 @@ CONFIG_MICROBIT=y
+ CONFIG_FSL_IMX25=y
+ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+-CONFIG_SEMIHOSTING=y
+ CONFIG_ARM_COMPATIBLE_SEMIHOSTING=y
+ CONFIG_ALLWINNER_H3=y
+-- 
+2.26.2
+
