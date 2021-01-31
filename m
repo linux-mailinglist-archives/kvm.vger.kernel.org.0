@@ -2,201 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A08CC309C57
-	for <lists+kvm@lfdr.de>; Sun, 31 Jan 2021 14:37:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E560309C59
+	for <lists+kvm@lfdr.de>; Sun, 31 Jan 2021 14:37:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbhAaNbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Jan 2021 08:31:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56616 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231593AbhAaLwX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Jan 2021 06:52:23 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB5DC061573
-        for <kvm@vger.kernel.org>; Sun, 31 Jan 2021 03:50:54 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id c12so13511232wrc.7
-        for <kvm@vger.kernel.org>; Sun, 31 Jan 2021 03:50:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ELWTSu1rl/DhvuIH4cal4USbDecgDqC8O4/05ndhpXE=;
-        b=atxpO5/Camn9p7jABxjl2WTPortxY8V1F0jxEhdR2VF0SBEfPL9LK5Vq47+Eod8YM4
-         aSZuSFtkdwJyK3FzZaGake8jsnv3T1MqlWW+JvnWt/YTtBuI0fzJvdhdooOiQHAYpA8U
-         UVFjEvV4zBNtllHFhkwQzhLAeGmiSs62p2SIMZjyQGGHFYpj8/nWFB0rzW5VU5sTmUgU
-         qArFne3BXB4GxsdEsUtx2RothKht8yJaLcLGwCRcFLJ64xxggBPETOdIxL3w2xWx/eHW
-         kp9nxOa9ngRX8eU7jbkiS5Yj9hDjtee2VaqEn0fy7cAe7jyw4/p9JLsxgkBb5WKz3a/P
-         MdEQ==
+        id S231380AbhAaNbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jan 2021 08:31:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54516 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232004AbhAaMob (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 Jan 2021 07:44:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612096969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r+fgSsYmJt0f3GPKQSs64Hq+gfQen9Lha7MbKdEpdgY=;
+        b=OrBIfkmRuf7eqQSyugnz9icJlufK2Mb16k5XH4+IUrhpaQKLAZT9n64bsODLrv7exs4TJY
+        K+dggR14XB/tFVdoICT2O/AjlQNh9O6B2VbwT/qnoVY8YYMH6BDt8ptg0wtjMXOskNPKSX
+        +NW42QdigYZKSZOxMuA4rN+N2jFWLPk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-398-mbZmxvLvOrqn8uMiSlvEJA-1; Sun, 31 Jan 2021 07:42:45 -0500
+X-MC-Unique: mbZmxvLvOrqn8uMiSlvEJA-1
+Received: by mail-wm1-f71.google.com with SMTP id z188so6734971wme.1
+        for <kvm@vger.kernel.org>; Sun, 31 Jan 2021 04:42:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=ELWTSu1rl/DhvuIH4cal4USbDecgDqC8O4/05ndhpXE=;
-        b=ubZ3zaggJk8ZHTiGv+hPLB6fP8Bfx/g6T/1AvgCRCjyFhfummoTJJuXhSaoy5I2fYo
-         ms6shuTw5Xv7b5sJV80upQtlXLOQM6EVK2CfKLNZtDeY8xmE9OU/re+GvKSWgTQO3D8S
-         +QCoYawKxgH1W9rFdmjI2yAf5jIdPhSuU17TJ+ArIpr52/ihrDHsM7Pr8JGBOxIeBWMH
-         3K5C8peylseQOQP0RoRdwvB16Jrop8zdSlDVV1GxJXlkWJEd3hqqgBlwob1XjZif98e2
-         hRovQD74GFp34c4o4KCkRazwIIozZD54bFxoD1I72M7IonvBGKi/JNC+0dkZaEPGV49T
-         NWbw==
-X-Gm-Message-State: AOAM531junpUhch1s/0u1FS75bHMAk55grVf9ZdH/kOXLNmsrqGR0xii
-        iiLertVyIgkhW7xNq0pxiY0=
-X-Google-Smtp-Source: ABdhPJw052bc5n0sg8qrUOVnPuK+eGRq0Nn6pE/jzM3JbJxgQX3UIdClky2OLAwF4K5l6GeEHLBoOw==
-X-Received: by 2002:adf:9427:: with SMTP id 36mr13393596wrq.271.1612093853746;
-        Sun, 31 Jan 2021 03:50:53 -0800 (PST)
-Received: from localhost.localdomain (7.red-83-57-171.dynamicip.rima-tde.net. [83.57.171.7])
-        by smtp.gmail.com with ESMTPSA id w4sm2862428wrt.69.2021.01.31.03.50.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Jan 2021 03:50:53 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To:     qemu-devel@nongnu.org
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=r+fgSsYmJt0f3GPKQSs64Hq+gfQen9Lha7MbKdEpdgY=;
+        b=asEkBTqGcC8+CAY8y2LxRcldVSNVnU7IxDfkP2ixEqzr3eZmtNympvIMaAuJtGYbpo
+         KUnn7okO8EyyjG/gRh+8U5x3vyPrn9ja0cDG8g/4JxufYZmBST+arvZKbzOIDy3nhUrs
+         y3lLsXg1C8nS1VLQhQuPTfJx8qjq5hf9s9vMoH8Cin94eehgLJkAZBpWuI9UMloTpxMv
+         9LeAk0ONXwr2PZeGrjGcJN7665xZZI5g8K6Cih21KJ6RvgKc02qI1GgFIRGdUa3kA4lH
+         KLsx5ay0iybYqSNLEiwNrv2aU7idx1gt9gzXu1CqQXtA4o3vX7tqpQS9BDSDH2YBYxOi
+         dkww==
+X-Gm-Message-State: AOAM530Q2ErL9BR8QHuqls6G62A65ht53m25S9lHLgtZoJTz8GuJ2ZVT
+        T944Ifa1Va/cFIhHqPZdvs7HXcxGgVhI+JXv32I8MdtLw5x9gWhnwoonYAAMh9fWn4zf2JfFD1G
+        5qj2CyKVUNeto
+X-Received: by 2002:a5d:4c84:: with SMTP id z4mr13064334wrs.289.1612096964635;
+        Sun, 31 Jan 2021 04:42:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzs9GPD9xtKflLpJnbdjV3KK6LBZIj+1CU+JafEN0VHboDucTozFmqLuwCNxpKvag0RcpZQhQ==
+X-Received: by 2002:a5d:4c84:: with SMTP id z4mr13064319wrs.289.1612096964476;
+        Sun, 31 Jan 2021 04:42:44 -0800 (PST)
+Received: from [192.168.1.36] (7.red-83-57-171.dynamicip.rima-tde.net. [83.57.171.7])
+        by smtp.gmail.com with ESMTPSA id h207sm15855648wme.18.2021.01.31.04.42.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Jan 2021 04:42:43 -0800 (PST)
+Subject: Re: [PATCH v6 06/11] target/arm: Restrict ARMv7 R-profile cpus to TCG
+ accel
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org
 Cc:     Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
         Richard Henderson <rth@twiddle.net>,
         Fam Zheng <fam@euphon.net>, Claudio Fontana <cfontana@suse.de>,
         Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
         kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
         qemu-arm@nongnu.org,
         Richard Henderson <richard.henderson@linaro.org>,
         John Snow <jsnow@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v6 05/11] target/arm: Restrict ARMv6 cpus to TCG accel
-Date:   Sun, 31 Jan 2021 12:50:16 +0100
-Message-Id: <20210131115022.242570-6-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210131115022.242570-1-f4bug@amsat.org>
+        Peter Maydell <peter.maydell@linaro.org>
 References: <20210131115022.242570-1-f4bug@amsat.org>
+ <20210131115022.242570-7-f4bug@amsat.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <80af7db7-2311-7cc5-93a0-f0609b0222d0@redhat.com>
+Date:   Sun, 31 Jan 2021 13:42:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20210131115022.242570-7-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM requires the target cpu to be at least ARMv8 architecture
-(support on ARMv7 has been dropped in commit 82bf7ae84ce:
-"target/arm: Remove KVM support for 32-bit Arm hosts").
+On 1/31/21 12:50 PM, Philippe Mathieu-Daudé wrote:
+> KVM requires the target cpu to be at least ARMv8 architecture
+> (support on ARMv7 has been dropped in commit 82bf7ae84ce:
+> "target/arm: Remove KVM support for 32-bit Arm hosts").
+> 
+> Beside, KVM only supports A-profile, thus won't be able to run
+> R-profile cpus.
+> 
+> Only enable the following ARMv7 R-Profile CPUs when TCG is available:
+> 
+>   - Cortex-R5
+>   - Cortex-R5F
+> 
+> The following machine is no more built when TCG is disabled:
+> 
+>   - xlnx-zcu102          Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5Fs
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  default-configs/devices/aarch64-softmmu.mak | 1 -
+>  hw/arm/Kconfig                              | 2 ++
+>  target/arm/Kconfig                          | 4 ++++
+>  3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/devices/aarch64-softmmu.mak b/default-configs/devices/aarch64-softmmu.mak
+> index 958b1e08e40..a4202f56817 100644
+> --- a/default-configs/devices/aarch64-softmmu.mak
+> +++ b/default-configs/devices/aarch64-softmmu.mak
+> @@ -3,6 +3,5 @@
+>  # We support all the 32 bit boards so need all their config
+>  include arm-softmmu.mak
+>  
+> -CONFIG_XLNX_ZYNQMP_ARM=y
+>  CONFIG_XLNX_VERSAL=y
+>  CONFIG_SBSA_REF=y
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index 6c4bce4d637..4baf1f97694 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -360,8 +360,10 @@ config STM32F405_SOC
+>  
+>  config XLNX_ZYNQMP_ARM
+>      bool
+> +    default y if TCG && ARM
 
-Only enable the following ARMv6 CPUs when TCG is available:
+The correct line is:
 
-  - ARM1136
-  - ARM1176
-  - ARM11MPCore
-  - Cortex-M0
+      "default y if TCG && AARCH64"
 
-The following machines are no more built when TCG is disabled:
-
-  - kzm                  ARM KZM Emulation Baseboard (ARM1136)
-  - microbit             BBC micro:bit (Cortex-M0)
-  - n800                 Nokia N800 tablet aka. RX-34 (OMAP2420)
-  - n810                 Nokia N810 tablet aka. RX-44 (OMAP2420)
-  - realview-eb-mpcore   ARM RealView Emulation Baseboard (ARM11MPCore)
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- default-configs/devices/arm-softmmu.mak | 2 --
- hw/arm/realview.c                       | 2 +-
- tests/qtest/cdrom-test.c                | 2 +-
- hw/arm/Kconfig                          | 6 ++++++
- target/arm/Kconfig                      | 4 ++++
- 5 files changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/default-configs/devices/arm-softmmu.mak b/default-configs/devices/arm-softmmu.mak
-index 0aad35da0c4..175530595ce 100644
---- a/default-configs/devices/arm-softmmu.mak
-+++ b/default-configs/devices/arm-softmmu.mak
-@@ -10,9 +10,7 @@ CONFIG_ARM_VIRT=y
- CONFIG_CUBIEBOARD=y
- CONFIG_EXYNOS4=y
- CONFIG_HIGHBANK=y
--CONFIG_FSL_IMX31=y
- CONFIG_MUSCA=y
--CONFIG_NSERIES=y
- CONFIG_STELLARIS=y
- CONFIG_REALVIEW=y
- CONFIG_VEXPRESS=y
-diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-index 2dcf0a4c23e..0606d22da14 100644
---- a/hw/arm/realview.c
-+++ b/hw/arm/realview.c
-@@ -463,8 +463,8 @@ static void realview_machine_init(void)
- {
-     if (tcg_builtin()) {
-         type_register_static(&realview_eb_type);
-+        type_register_static(&realview_eb_mpcore_type);
-     }
--    type_register_static(&realview_eb_mpcore_type);
-     type_register_static(&realview_pb_a8_type);
-     type_register_static(&realview_pbx_a9_type);
- }
-diff --git a/tests/qtest/cdrom-test.c b/tests/qtest/cdrom-test.c
-index 1f1bc26fa7a..cb0409c5a11 100644
---- a/tests/qtest/cdrom-test.c
-+++ b/tests/qtest/cdrom-test.c
-@@ -224,8 +224,8 @@ int main(int argc, char **argv)
-         const char *armmachines[] = {
- #ifdef CONFIG_TCG
-             "realview-eb",
--#endif /* CONFIG_TCG */
-             "realview-eb-mpcore",
-+#endif /* CONFIG_TCG */
-             "realview-pb-a8",
-             "realview-pbx-a9", "versatileab", "versatilepb", "vexpress-a15",
-             "vexpress-a9", "virt", NULL
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 560442bfc5c..6c4bce4d637 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -123,6 +123,8 @@ config NETDUINOPLUS2
- 
- config NSERIES
-     bool
-+    default y if TCG && ARM
-+    select ARM_V6
-     select OMAP
-     select TMP105   # tempature sensor
-     select BLIZZARD # LCD/TV controller
-@@ -401,6 +403,8 @@ config FSL_IMX25
- 
- config FSL_IMX31
-     bool
-+    default y if TCG && ARM
-+    select ARM_V6
-     select SERIAL
-     select IMX
-     select IMX_I2C
-@@ -478,11 +482,13 @@ config FSL_IMX6UL
- 
- config MICROBIT
-     bool
-+    default y if TCG && ARM
-     select NRF51_SOC
- 
- config NRF51_SOC
-     bool
-     select I2C
-+    select ARM_V6
-     select ARM_V7M
-     select UNIMP
- 
-diff --git a/target/arm/Kconfig b/target/arm/Kconfig
-index 9b3635617dc..fbb7bba9018 100644
---- a/target/arm/Kconfig
-+++ b/target/arm/Kconfig
-@@ -14,6 +14,10 @@ config ARM_V5
-     bool
-     depends on TCG && ARM
- 
-+config ARM_V6
-+    bool
-+    depends on TCG && ARM
-+
- config ARM_V7M
-     bool
-     select PTIMER
--- 
-2.26.2
+>      select AHCI
+>      select ARM_GIC
+> +    select ARM_V7R
+>      select CADENCE
+>      select DDC
+>      select DPCD
+> diff --git a/target/arm/Kconfig b/target/arm/Kconfig
+> index fbb7bba9018..4dc96c46520 100644
+> --- a/target/arm/Kconfig
+> +++ b/target/arm/Kconfig
+> @@ -18,6 +18,10 @@ config ARM_V6
+>      bool
+>      depends on TCG && ARM
+>  
+> +config ARM_V7R
+> +    bool
+> +    depends on TCG && ARM
+> +
+>  config ARM_V7M
+>      bool
+>      select PTIMER
+> 
 
