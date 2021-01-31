@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08BC2309CF4
+	by mail.lfdr.de (Postfix) with ESMTP id 7C694309CF5
 	for <lists+kvm@lfdr.de>; Sun, 31 Jan 2021 15:36:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231854AbhAaOcd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Jan 2021 09:32:33 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44628 "EHLO mx2.suse.de"
+        id S232047AbhAaOcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jan 2021 09:32:53 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44996 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232302AbhAaOSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Jan 2021 09:18:55 -0500
+        id S231277AbhAaOUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Jan 2021 09:20:25 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C0275ABDA;
-        Sun, 31 Jan 2021 14:18:10 +0000 (UTC)
-Subject: Re: [PATCH v6 01/11] sysemu/tcg: Introduce tcg_builtin() helper
+        by mx2.suse.de (Postfix) with ESMTP id 57DB1AF13;
+        Sun, 31 Jan 2021 14:19:44 +0000 (UTC)
+Subject: Re: [PATCH v6 02/11] exec: Restrict TCG specific headers
 To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         qemu-devel@nongnu.org
 Cc:     Thomas Huth <thuth@redhat.com>,
@@ -28,17 +28,16 @@ Cc:     Thomas Huth <thuth@redhat.com>,
         qemu-arm@nongnu.org,
         Richard Henderson <richard.henderson@linaro.org>,
         John Snow <jsnow@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Markus Armbruster <armbru@redhat.com>
+        Peter Maydell <peter.maydell@linaro.org>
 References: <20210131115022.242570-1-f4bug@amsat.org>
- <20210131115022.242570-2-f4bug@amsat.org>
+ <20210131115022.242570-3-f4bug@amsat.org>
 From:   Claudio Fontana <cfontana@suse.de>
-Message-ID: <87d562ba-20e5-ee50-8793-59d77564f4da@suse.de>
-Date:   Sun, 31 Jan 2021 15:18:09 +0100
+Message-ID: <7a8bedbb-7e76-61bc-f158-f550d78539fa@suse.de>
+Date:   Sun, 31 Jan 2021 15:19:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20210131115022.242570-2-f4bug@amsat.org>
+In-Reply-To: <20210131115022.242570-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,56 +46,39 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 1/31/21 12:50 PM, Philippe Mathieu-Daudé wrote:
-> Modules are registered early with type_register_static().
+> Fixes when building with --disable-tcg on ARM:
 > 
-> We would like to call tcg_enabled() when registering QOM types,
-
-
-Hi Philippe,
-
-could this not be controlled by meson at this stage?
-On X86, I register the tcg-specific types in tcg/* in modules that are only built for TCG.
-
-Maybe tcg_builtin() is useful anyway, thinking long term at loadable modules,
-but there we are interested in whether tcg code is available or not, regardless of whether it's builtin,
-or needs to be loaded via a .so plugin..
-
-maybe tcg_available()?
-
-Ciao,
-
-Claudio
-
-> but tcg_enabled() returns tcg_allowed which is a runtime property
-> initialized later (See commit 2f181fbd5a9 which introduced the
-> MachineInitPhase in "hw/qdev-core.h" representing the different
-> phases of machine initialization and commit 0427b6257e2 which
-> document the initialization order).
-> 
-> As we are only interested if the TCG accelerator is builtin,
-> regardless of being enabled, introduce the tcg_builtin() helper.
+>   In file included from target/arm/helper.c:16:
+>   include/exec/helper-proto.h:42:10: fatal error: tcg-runtime.h: No such file or directory
+>      42 | #include "tcg-runtime.h"
+>         |          ^~~~~~~~~~~~~~~
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
-> Cc: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/sysemu/tcg.h | 2 ++
+>  include/exec/helper-proto.h | 2 ++
 >  1 file changed, 2 insertions(+)
 > 
-> diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
-> index 00349fb18a7..6ac5c2ca89d 100644
-> --- a/include/sysemu/tcg.h
-> +++ b/include/sysemu/tcg.h
-> @@ -13,8 +13,10 @@ void tcg_exec_init(unsigned long tb_size, int splitwx);
->  #ifdef CONFIG_TCG
->  extern bool tcg_allowed;
->  #define tcg_enabled() (tcg_allowed)
-> +#define tcg_builtin() 1
->  #else
->  #define tcg_enabled() 0
-> +#define tcg_builtin() 0
->  #endif
+> diff --git a/include/exec/helper-proto.h b/include/exec/helper-proto.h
+> index 659f9298e8f..740bff3bb4d 100644
+> --- a/include/exec/helper-proto.h
+> +++ b/include/exec/helper-proto.h
+> @@ -39,8 +39,10 @@ dh_ctype(ret) HELPER(name) (dh_ctype(t1), dh_ctype(t2), dh_ctype(t3), \
 >  
->  #endif
+>  #include "helper.h"
+>  #include "trace/generated-helpers.h"
+> +#ifdef CONFIG_TCG
+>  #include "tcg-runtime.h"
+>  #include "plugin-helpers.h"
+> +#endif /* CONFIG_TCG */
+>  
+>  #undef IN_HELPER_PROTO
+>  
 > 
 
+Ok, this would go away when applying the refactoring to ARM though right?
+
+Ie the file should not need including at all later on right?
+
+Anyway:
+
+Reviewed-by: Claudio Fontana <cfontana@suse.de>
