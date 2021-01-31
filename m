@@ -2,116 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7A14309DA3
-	for <lists+kvm@lfdr.de>; Sun, 31 Jan 2021 16:38:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C4F0309ED1
+	for <lists+kvm@lfdr.de>; Sun, 31 Jan 2021 21:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232238AbhAaPgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Jan 2021 10:36:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230192AbhAaPgn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Jan 2021 10:36:43 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 188F0C061573
-        for <kvm@vger.kernel.org>; Sun, 31 Jan 2021 07:36:01 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id p15so13852676wrq.8
-        for <kvm@vger.kernel.org>; Sun, 31 Jan 2021 07:36:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Tj9ynb2vRPFjqtE44EpTjMkFQtoIUjhfjhxMTiCpavE=;
-        b=bKISEXILOqbBKSyWxvRZTuqbFnMi0zbFX7AD4hLA5WBrs5OH0WAyfczzJO+CNwqZsH
-         Px6aqJnUVVzUonDQ10/D4g69YH1ddYR09nffJI/ZWFikuSfuVxu3j6deINIQFetTavz5
-         7CB+cq5ySm37Y8rJ8MwxUmhoZdKCfu36fgGzfloOWPaLi22Cp9ygPjj8aGlQIaaQHq8p
-         2IHzfac/aVBfZIQQtBiotSnheZvuijwqcKpFhuI1E5CjikLGMbyONtbX/FkkDI2N54ec
-         G0A6Ytwl9tirRcjmpbOsSElN5Jz/07qnnKLQNXGICM/tyABc8/kd8gkD8S3sorOVk8M9
-         9RCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Tj9ynb2vRPFjqtE44EpTjMkFQtoIUjhfjhxMTiCpavE=;
-        b=HLRFlfiFG5+ZZc/PAQwPiyQeP9gM4rdN3K5ZSRmiLCWF1yFH7FghALXysvLJ0j6+2c
-         qh3fIUm76/Xf/Wcanil/6LDM4KFCFpUz1+4rE72ytK43Gq/v4D6DFPwGUAFsYiHaWSxw
-         OlNm6qE9EaFx72dlVfy/UV/dLQHxNEqX59FzuPQn3J5YkO6eFtgyopmArAsMaT/x2Dem
-         +Z2jqR8cdcyR2QOaLlAJ3vefpxXHhaMKtgFIawPvxkwTuYEtfx5K58rZ4TUCx9iUzrdX
-         qWMKRZnY9w23e379D5s8aVMeY+INuIv+5nR/SAjlQX/vy1DjqQJiR5gTTYvv3eVXTsbg
-         ustA==
-X-Gm-Message-State: AOAM5315GVWHW5GDNIuvkB5SiAcR3MFRfZVKh/bT+VT+dC8eRaigsrXy
-        KFRJ7NpIk1QibUXU5BOt+nQ=
-X-Google-Smtp-Source: ABdhPJwxwfwJ1O3wZnQXDc1ZmYatUowqBlUM5eDlN14YoQfKfNZKRQ03jZH9GWmo0RCtIQi/fXcy0A==
-X-Received: by 2002:adf:ecc5:: with SMTP id s5mr13603929wro.423.1612107359885;
-        Sun, 31 Jan 2021 07:35:59 -0800 (PST)
-Received: from [192.168.1.36] (7.red-83-57-171.dynamicip.rima-tde.net. [83.57.171.7])
-        by smtp.gmail.com with ESMTPSA id f4sm23839332wrs.34.2021.01.31.07.35.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Jan 2021 07:35:59 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
-        <philippe.mathieu.daude@gmail.com>
-Subject: Re: [PATCH v5 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm-devel <kvm@vger.kernel.org>, Fam Zheng <fam@euphon.net>,
-        Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Claudio Fontana <cfontana@suse.de>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm <qemu-arm@nongnu.org>
-References: <20210130015227.4071332-1-f4bug@amsat.org>
- <20210130015227.4071332-4-f4bug@amsat.org>
- <CAFEAcA8UCFghGDb4oMujek_W_wsyYz+duiQ-d8JyN09NYoff-g@mail.gmail.com>
- <2871f7db-fe0a-51d6-312d-6d05ffa281a3@amsat.org>
- <CAFEAcA-W1tcRREaPTfMw98cNsHs7JHk4gjaJWaJNLpxZoVnKaw@mail.gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <40ca4720-7adf-8469-2593-6e6689d03fd6@amsat.org>
-Date:   Sun, 31 Jan 2021 16:35:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S229731AbhAaTcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jan 2021 14:32:07 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:2429 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229586AbhAaTbm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Jan 2021 14:31:42 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6016f2750000>; Sun, 31 Jan 2021 10:09:57 -0800
+Received: from [172.27.11.151] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sun, 31 Jan
+ 2021 18:09:51 +0000
+Subject: Re: [PATCH RFC v1 0/3] Introduce vfio-pci-core subsystem
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+References: <20210117181534.65724-1-mgurtovoy@nvidia.com>
+ <20210122122503.4e492b96@omen.home.shazbot.org>
+ <20210122200421.GH4147@nvidia.com>
+ <20210125172035.3b61b91b.cohuck@redhat.com>
+ <20210125180440.GR4147@nvidia.com>
+ <20210125163151.5e0aeecb@omen.home.shazbot.org>
+ <20210126004522.GD4147@nvidia.com>
+ <20210125203429.587c20fd@x1.home.shazbot.org>
+ <1419014f-fad2-9599-d382-9bba7686f1c4@nvidia.com>
+ <20210128172930.74baff41.cohuck@redhat.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <9335ae19-84dc-ee9a-b358-3b42bcd8fdcc@nvidia.com>
+Date:   Sun, 31 Jan 2021 20:09:48 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-W1tcRREaPTfMw98cNsHs7JHk4gjaJWaJNLpxZoVnKaw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210128172930.74baff41.cohuck@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612116597; bh=4ampxWcmy84N/IJQNcT+PxdGYY8dfcdNmjkSJ7/DsAg=;
+        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
+         MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+         Content-Language:X-Originating-IP:X-ClientProxiedBy;
+        b=qr9dhuyIWePWgfYH43cYL2GUlc+b9n86LhTBt1R5Bi/o6ffRDLVY9Sok5NwiFhmap
+         I7D7+ttxXQn3TXeME13ixdSzB8SC8MUXmlkJPpU9NVs7eswhUZ0oT8ZnHiNHHTkih2
+         gw6h2UlT27JbWClEWGNCRedjUL5DvuGh88k42F/Es9iXmUKDrWIRFdnEsidwTSKrLV
+         yLiARAEs2NrtdyE17rVUGp783EDgBZyFYHvn5laoz09fyZ8QfFILrMVLP2tHGXNAC0
+         Hw2yy3q0cfRnLLmD9qDvxqZ5DrvWTjrWaI5JHul7Ub/P7isHrTy/RTv2zo+VjzEtG+
+         D22T1GI4CMwHw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/21 7:54 PM, Peter Maydell wrote:
-> On Sat, 30 Jan 2021 at 18:36, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+
+On 1/28/2021 6:29 PM, Cornelia Huck wrote:
+> On Tue, 26 Jan 2021 15:27:43 +0200
+> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>
+>> Hi Alex, Cornelia and Jason,
 >>
->> Hi Peter,
+>> thanks for the reviewing this.
 >>
->> On 1/30/21 4:37 PM, Peter Maydell wrote:
->>> On Sat, 30 Jan 2021 at 01:52, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> On 1/26/2021 5:34 AM, Alex Williamson wrote:
+>>> On Mon, 25 Jan 2021 20:45:22 -0400
+>>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>   
+>>>> On Mon, Jan 25, 2021 at 04:31:51PM -0700, Alex Williamson wrote:
+>>>>   
+>>>>> We're supposed to be enlightened by a vendor driver that does nothing
+>>>>> more than pass the opaque device_data through to the core functions,
+>>>>> but in reality this is exactly the point of concern above.  At a
+>>>>> minimum that vendor driver needs to look at the vdev to get the
+>>>>> pdev,
+>>>> The end driver already havs the pdev, the RFC doesn't go enough into
+>>>> those bits, it is a good comment.
 >>>>
->>>> KVM requires a cpu based on (at least) the ARMv7 architecture.
->>>
->>> These days it requires ARMv8, because we dropped 32-bit host
->>> support, and all 64-bit host CPUs are v8.
+>>>> The dd_data pased to the vfio_create_pci_device() will be retrieved
+>>>> from the ops to get back to the end drivers data. This can cleanly
+>>>> include everything: the VF pci_device, PF pci_device, mlx5_core
+>>>> pointer, vfio_device and vfio_pci_device.
+>>>>
+>>>> This is why the example passes in the mvadev:
+>>>>
+>>>> +	vdev = vfio_create_pci_device(pdev, &mlx5_vfio_pci_ops, mvadev);
+>>>>
+>>>> The mvadev has the PF, VF, and mlx5 core driver pointer.
+>>>>
+>>>> Getting that back out during the ops is enough to do what the mlx5
+>>>> driver needs to do, which is relay migration related IOCTLs to the PF
+>>>> function via the mlx5_core driver so the device can execute them on
+>>>> behalf of the VF.
+>>>>   
+>>>>> but then what else does it look at, consume, or modify.  Now we have
+>>>>> vendor drivers misusing the core because it's not clear which fields
+>>>>> are private and how public fields can be used safely,
+>>>> The kernel has never followed rigid rules for data isolation, it is
+>>>> normal to have whole private structs exposed in headers so that
+>>>> container_of can be used to properly compose data structures.
+>>> I reject this assertion, there are plenty of structs that clearly
+>>> indicate private vs public data or, as we've done in mdev, clearly
+>>> marking the private data in a "private" header and provide access
+>>> functions for public fields.  Including a "private" header to make use
+>>> of a "library" is just wrong.  In the example above, there's no way for
+>>> the mlx vendor driver to get back dd_data without extracting it from
+>>> struct vfio_pci_device itself.
+>> I'll create a better separation between private/public fields according
+>> to my understanding for the V2.
 >>
->> Oh, this comment is about the target, to justify it is pointless to
->> include pre-v7 target cpus/machines in a KVM-only binary.
+>> I'll just mention that beyond this separation, future improvements will
+>> be needed and can be done incrementally.
 >>
->> I'll update as:
+>> I don't think that we should do so many changes at one shut. The
+>> incremental process is safer from subsystem point of view.
 >>
->> "KVM requires the target cpu based on (at least) the ARMv7
->> architecture."
-> 
-> KVM requires the target CPU to be at least ARMv8, because
-> we only support the "host" cpu type, and all KVM host CPUs
-> are v8, which means you can't pass a v7 CPU as the target CPU.
-> (This used to not be true when we still supported running
-> KVM on a v7 CPU like the Cortex-A15, in which case you could
-> pass it to the guest.)
+>> I also think that upstreaming mlx5_vfio_pci.ko and upstreaming vfio-pci
+>> separation into 2 modules doesn't have to happen in one-shut.
+> The design can probably benefit from tossing a non-mlx5 driver into the
+> mix.
+>
+> So, let me suggest the zdev support for that experiment (see
+> e6b817d4b8217a9528fcfd59719b924ab8a5ff23 and friends.) It is quite
+> straightforward: it injects some capabilities into the info ioctl. A
+> specialized driver would basically only need to provide special
+> handling for the ioctl callback and just forward anything else. It also
+> would not need any matching for device ids etc., as it would only make
+> sense on s390x, but regardless of the device. It could, however, help
+> us to get an idea what a good split would look like.
 
-Indeed:
+AFAIU, s390x is related to IBM architecture and not to a specific PCI 
+device. So I guess it should stay in the core as many PCI devices will 
+need these capabilities on IBM system.
 
-$ qemu-system-aarch64 -M xilinx-zynq-a9
-qemu-system-aarch64: KVM is not supported for this guest CPU type
-qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0):
-Invalid argument
+I think I'll use NVLINK2 P9 stuff as an example of the split and add it 
+to vfio_pci.ko instead of vfio_pci_core.ko as a first step.
+
+later we can create a dedicated module for these devices (V100 GPUs).
+
+>> But again, to make our point in this RFC, I'll improve it for V2.
+>>
+>>>   
+>>>> Look at struct device, for instance. Most of that is private to the
+>>>> driver core.
+>>>>
+>>>> A few 'private to vfio-pci-core' comments would help, it is good
+>>>> feedback to make that more clear.
+>>>>   
+>>>>> extensions potentially break vendor drivers, etc.  We're only even hand
+>>>>> waving that existing device specific support could be farmed out to new
+>>>>> device specific drivers without even going to the effort to prove that.
+>>>> This is a RFC, not a complete patch series. The RFC is to get feedback
+>>>> on the general design before everyone comits alot of resources and
+>>>> positions get dug in.
+>>>>
+>>>> Do you really think the existing device specific support would be a
+>>>> problem to lift? It already looks pretty clean with the
+>>>> vfio_pci_regops, looks easy enough to lift to the parent.
+>>>>   
+>>>>> So far the TODOs rather mask the dirty little secrets of the
+>>>>> extension rather than showing how a vendor derived driver needs to
+>>>>> root around in struct vfio_pci_device to do something useful, so
+>>>>> probably porting actual device specific support rather than further
+>>>>> hand waving would be more helpful.
+>>>> It would be helpful to get actual feedback on the high level design -
+>>>> someting like this was already tried in May and didn't go anywhere -
+>>>> are you surprised that we are reluctant to commit alot of resources
+>>>> doing a complete job just to have it go nowhere again?
+>>> That's not really what I'm getting from your feedback, indicating
+>>> vfio-pci is essentially done, the mlx stub driver should be enough to
+>>> see the direction, and additional concerns can be handled with TODO
+>>> comments.  Sorry if this is not construed as actual feedback, I think
+>>> both Connie and I are making an effort to understand this and being
+>>> hampered by lack of a clear api or a vendor driver that's anything more
+>>> than vfio-pci plus an aux bus interface.  Thanks,
+>> I think I got the main idea and I'll try to summarize it:
+>>
+>> The separation to vfio-pci.ko and vfio-pci-core.ko is acceptable, and we
+>> do need it to be able to create vendor-vfio-pci.ko driver in the future
+>> to include vendor special souse inside.
+> One other thing I'd like to bring up: What needs to be done in
+> userspace? Does a userspace driver like QEMU need changes to actually
+> exploit this? Does management software like libvirt need to be involved
+> in decision making, or does it just need to provide the knobs to make
+> the driver configurable?
+>
+>> The separation implementation and the question of what is private and
+>> what is public, and the core APIs to the various drivers should be
+>> improved or better demonstrated in the V2.
+>>
+>> I'll work on improving it and I'll send the V2.
+>>
+>>
+>> If you have some feedback of the things/fields/structs you think should
+>> remain private to vfio-pci-core please let us know.
+>>
+>> Thanks for the effort in the review,
+>>
+>> -Max.
+>>
+>>> Alex
+>>>   
