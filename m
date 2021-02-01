@@ -2,85 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F9B30A9C4
+	by mail.lfdr.de (Postfix) with ESMTP id D868430A9C5
 	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 15:31:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbhBAOaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 09:30:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28863 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229566AbhBAOaR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 09:30:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612189730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=+vZ66VqPrxvnrqTCUTK/999/9ewUHwH+ZXDKtfFOdSk=;
-        b=aKLGXUxGWcu2dw9R6MIMFlsCWqpG5wwiioWfO+DSCENdmsbFiADGsB4lNyNDg45tG7wavL
-        gmeE49VvLzW2qIZSj8o45P7kmvBWvk0/1njOGtOyVQ9kfTxSlK1zk4xMrVOepCp5JvW0bF
-        l5zpl0FaTsoip/c1xqxQYYPIzINNr70=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-486-ZLKHlcPBMhKSpKoJddYSzQ-1; Mon, 01 Feb 2021 09:28:49 -0500
-X-MC-Unique: ZLKHlcPBMhKSpKoJddYSzQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C57B1801AC4;
-        Mon,  1 Feb 2021 14:28:47 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.195.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A38D8100239A;
-        Mon,  1 Feb 2021 14:28:44 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: [PATCH] KVM: x86: Supplement __cr4_reserved_bits() with X86_FEATURE_PCID check
-Date:   Mon,  1 Feb 2021 15:28:43 +0100
-Message-Id: <20210201142843.108190-1-vkuznets@redhat.com>
+        id S229570AbhBAOaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 09:30:24 -0500
+Received: from mx2.suse.de ([195.135.220.15]:35422 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229634AbhBAOaS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 09:30:18 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0A2E0AE03;
+        Mon,  1 Feb 2021 14:29:36 +0000 (UTC)
+Subject: Re: [PATCH v6 01/11] sysemu/tcg: Introduce tcg_builtin() helper
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+Cc:     Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+        qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        John Snow <jsnow@redhat.com>, qemu-arm@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+References: <20210131115022.242570-1-f4bug@amsat.org>
+ <20210131115022.242570-2-f4bug@amsat.org>
+ <87d562ba-20e5-ee50-8793-59d77564f4da@suse.de>
+ <009b3856-cc7d-af85-0094-69490aa6e824@amsat.org>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <e448f5af-273d-25f4-a341-3867121a3ee9@suse.de>
+Date:   Mon, 1 Feb 2021 15:29:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
+In-Reply-To: <009b3856-cc7d-af85-0094-69490aa6e824@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 7a873e455567 ("KVM: selftests: Verify supported CR4 bits can be set
-before KVM_SET_CPUID2") reveals that KVM allows to set X86_CR4_PCIDE even
-when PCID support is missing:
+On 1/31/21 4:23 PM, Philippe Mathieu-Daudé wrote:
+> On 1/31/21 3:18 PM, Claudio Fontana wrote:
+>> On 1/31/21 12:50 PM, Philippe Mathieu-Daudé wrote:
+>>> Modules are registered early with type_register_static().
+>>>
+>>> We would like to call tcg_enabled() when registering QOM types,
+>>
+>>
+>> Hi Philippe,
+>>
+>> could this not be controlled by meson at this stage?
+>> On X86, I register the tcg-specific types in tcg/* in modules that are only built for TCG.
+>>
+>> Maybe tcg_builtin() is useful anyway, thinking long term at loadable modules,
+>> but there we are interested in whether tcg code is available or not, regardless of whether it's builtin,
+>> or needs to be loaded via a .so plugin..
+>>
+>> maybe tcg_available()?
+> 
+> The alternatives I found:
+> 
+> - reorder things in vl.c?
+> 
+> - use ugly #ifdef'ry, see this patch:
+>   https://lists.gnu.org/archive/html/qemu-devel/2021-01/msg08037.html
 
-==== Test Assertion Failure ====
-  x86_64/set_sregs_test.c:41: rc
-  pid=6956 tid=6956 - Invalid argument
-     1	0x000000000040177d: test_cr4_feature_bit at set_sregs_test.c:41
-     2	0x00000000004014fc: main at set_sregs_test.c:119
-     3	0x00007f2d9346d041: ?? ??:0
-     4	0x000000000040164d: _start at ??:?
-  KVM allowed unsupported CR4 bit (0x20000)
+Not sure it's that ugly,
+if it is followed (or replaced by) exporting those pieces to separate files, which are only built by meson on CONFIG_TCG.
 
-Add X86_FEATURE_PCID feature check to __cr4_reserved_bits() to make
-kvm_is_valid_cr4() fail.
+I did not try to do it, so you know best of course.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/x86.h | 2 ++
- 1 file changed, 2 insertions(+)
+Ciao,
 
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index c5ee0f5ce0f1..0f727b50bd3d 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -425,6 +425,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
- 		__reserved_bits |= X86_CR4_UMIP;        \
- 	if (!__cpu_has(__c, X86_FEATURE_VMX))           \
- 		__reserved_bits |= X86_CR4_VMXE;        \
-+	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
-+		__reserved_bits |= X86_CR4_PCIDE;       \
- 	__reserved_bits;                                \
- })
- 
--- 
-2.29.2
+Claudio
+
+> 
+> - this earlier approach I previously discarded:
+> 
+> -- >8 --
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index d378f13a116..30590c6fac3 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -403,9 +403,12 @@ struct Object
+>   *   parent class initialization has occurred, but before the class itself
+>   *   is initialized.  This is the function to use to undo the effects of
+>   *   memcpy from the parent class to the descendants.
+> - * @class_data: Data to pass to the @class_init,
+> + * @class_data: Data to pass to the @class_registerable, @class_init,
+>   *   @class_base_init. This can be useful when building dynamic
+>   *   classes.
+> + * @registerable: This function is called when modules are registered,
+> + *   prior to any class initialization. When present and returning %false,
+> + *   the type is not registered, the class is not present (not usable).
+>   * @interfaces: The list of interfaces associated with this type.  This
+>   *   should point to a static array that's terminated with a zero filled
+>   *   element.
+> @@ -428,6 +431,7 @@ struct TypeInfo
+>      void (*class_base_init)(ObjectClass *klass, void *data);
+>      void *class_data;
+> 
+> +    bool (*registerable)(void *data);
+>      InterfaceInfo *interfaces;
+>  };
+> 
+> diff --git a/qom/object.c b/qom/object.c
+> index 2fa0119647c..0febaffa12e 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -138,6 +138,10 @@ static TypeImpl *type_new(const TypeInfo *info)
+>  static TypeImpl *type_register_internal(const TypeInfo *info)
+>  {
+>      TypeImpl *ti;
+> +
+> +    if (info->registerable && !info->registerable(info->class_data)) {
+> +        return NULL;
+> +    }
+>      ti = type_new(info);
+> 
+>      type_table_add(ti);
+> 
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 990509d3852..1a2b1889da4 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/loader.h"
+>  #include "hw/arm/boot.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/tcg.h"
+>  #include "qom/object.h"
+> 
+>  #define SMPBOOT_ADDR    0x300 /* this should leave enough space for
+> ATAGS */
+> @@ -368,18 +369,26 @@ static void raspi3b_machine_class_init(ObjectClass
+> *oc, void *data)
+>  };
+>  #endif /* TARGET_AARCH64 */
+> 
+> +static bool raspi_machine_requiring_tcg_accel(void *data)
+> +{
+> +    return tcg_builtin();
+> +}
+> +
+>  static const TypeInfo raspi_machine_types[] = {
+>      {
+>          .name           = MACHINE_TYPE_NAME("raspi0"),
+>          .parent         = TYPE_RASPI_MACHINE,
+> +        .registerable   = raspi_machine_requiring_tcg_accel,
+>          .class_init     = raspi0_machine_class_init,
+>      }, {
+>          .name           = MACHINE_TYPE_NAME("raspi1ap"),
+>          .parent         = TYPE_RASPI_MACHINE,
+> +        .registerable   = raspi_machine_requiring_tcg_accel,
+>          .class_init     = raspi1ap_machine_class_init,
+>      }, {
+>          .name           = MACHINE_TYPE_NAME("raspi2b"),
+>          .parent         = TYPE_RASPI_MACHINE,
+> +        .registerable   = raspi_machine_requiring_tcg_accel,
+>          .class_init     = raspi2b_machine_class_init,
+>  #ifdef TARGET_AARCH64
+>      }, {
+> ---
+> 
+>>
+>> Ciao,
+>>
+>> Claudio
+>>
+>>> but tcg_enabled() returns tcg_allowed which is a runtime property
+>>> initialized later (See commit 2f181fbd5a9 which introduced the
+>>> MachineInitPhase in "hw/qdev-core.h" representing the different
+>>> phases of machine initialization and commit 0427b6257e2 which
+>>> document the initialization order).
+>>>
+>>> As we are only interested if the TCG accelerator is builtin,
+>>> regardless of being enabled, introduce the tcg_builtin() helper.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>> Cc: Markus Armbruster <armbru@redhat.com>
+>>> ---
+>>>  include/sysemu/tcg.h | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
+>>> index 00349fb18a7..6ac5c2ca89d 100644
+>>> --- a/include/sysemu/tcg.h
+>>> +++ b/include/sysemu/tcg.h
+>>> @@ -13,8 +13,10 @@ void tcg_exec_init(unsigned long tb_size, int splitwx);
+>>>  #ifdef CONFIG_TCG
+>>>  extern bool tcg_allowed;
+>>>  #define tcg_enabled() (tcg_allowed)
+>>> +#define tcg_builtin() 1
+>>>  #else
+>>>  #define tcg_enabled() 0
+>>> +#define tcg_builtin() 0
+>>>  #endif
+>>>  
+>>>  #endif
+>>>
+>>
+> 
 
