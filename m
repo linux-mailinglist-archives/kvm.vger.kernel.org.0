@@ -2,153 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1DE330ACA6
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 17:32:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3217230ACD6
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 17:41:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231451AbhBAQaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 11:30:46 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:9219 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231223AbhBAQaA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 11:30:00 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B60182c5f0000>; Mon, 01 Feb 2021 08:29:19 -0800
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Feb
- 2021 16:29:19 +0000
-Received: from r-nvmx02.mtr.labs.mlnx (172.20.145.6) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server id 15.0.1473.3 via Frontend
- Transport; Mon, 1 Feb 2021 16:29:14 +0000
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <jgg@nvidia.com>, <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <alex.williamson@redhat.com>
-CC:     <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
-        <mjrosato@linux.ibm.com>, <yishaih@nvidia.com>, <aik@ozlabs.ru>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 9/9] vfio/pci: use powernv naming instead of nvlink2
-Date:   Mon, 1 Feb 2021 16:28:28 +0000
-Message-ID: <20210201162828.5938-10-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20210201162828.5938-1-mgurtovoy@nvidia.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+        id S231359AbhBAQjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 11:39:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231289AbhBAQjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 11:39:18 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFC0C061756
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 08:38:32 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id s23so11150961pgh.11
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 08:38:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=o5OegAwYBP7PDdDVCaWSc0Mm4jxXMRKanjN+//S5os4=;
+        b=O3CWgP9TAyDK5LPmF4T2q9CV9B0Kz0SQv4SX26ugTFakH5Z7NpbgCSsX8NRm8CrRO1
+         nZVtaWJXHMdwPpQBBHDZWq1h4MI+QgroSUupDz+kfvxbDixmIZjpZrwCjeJQERAsZgKc
+         eZVg1It1HrEPukVaUWeHKV+099uzFegKWBAtRaNPQtOnvKxnNPDbyC7OPFBWYcxl2piC
+         F3WPln8n7tPDTroPasz6GQsr1XpZwdGoYhUWxQ5VQVR7jAYrDYPRbga7T6SCk7iqjF+I
+         JwzPb2ISY14r6kgkuY+Raw3hVmNX+3ew/iFVl+plRyFKBy8z0eBjKiI+PZjTfM70oHpc
+         FUbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=o5OegAwYBP7PDdDVCaWSc0Mm4jxXMRKanjN+//S5os4=;
+        b=jg9YQhQ7jWCPgvGDuWWdz6SIYcIly6YCwisruP3yB7SYvPI5660/edCBrjgG7N4F40
+         eaAqHtCexX+4eA7VNDWQOtFUKqpLsRVJYtuNy29g1luTry/3S7mTS4trHslwDhHL2Ess
+         415PARsG65YuPaJT41JVCzv/ACRHTPEc9d5AQZwSwACZfmadw2ABA971rycsw76MOK0P
+         YsmXVj+Vb7vrPZG3zm6fn33F1QAVVJkr15aLC8uuQyeHzdWjuuCEGyNA19SU94qkOuv5
+         qqz36izDkLX6hHunbDHYf7SaFjRJDqrMUJTHfEWORwhbPKzonYRmcB/hmNdYqdHzPWjo
+         rXTA==
+X-Gm-Message-State: AOAM533Xe2Ij+6QoACyUwzPsz5rFb2zYjpKfxSg96nqnAHeQ8PQZcm1v
+        3dpVMrxvhtoBx8Yc/xgPXbuVjQ==
+X-Google-Smtp-Source: ABdhPJyCTEYk3E/Io9fOnEjzLf2ujgaSewO5YsDaX6qy2kQ1ru/eTGxs2TRgjt4QlknJu5DaDj27tw==
+X-Received: by 2002:a63:2009:: with SMTP id g9mr17698369pgg.219.1612197511466;
+        Mon, 01 Feb 2021 08:38:31 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:829:fccd:80d7:796f])
+        by smtp.gmail.com with ESMTPSA id e12sm19159714pga.13.2021.02.01.08.38.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Feb 2021 08:38:30 -0800 (PST)
+Date:   Mon, 1 Feb 2021 08:38:24 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        jmattson@google.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: x86: Allow guests to see MSR_IA32_TSX_CTRL even
+ if tsx=off
+Message-ID: <YBgugM03fsEiOxz1@google.com>
+References: <20210129101912.1857809-1-pbonzini@redhat.com>
+ <YBQ+peAEdX2h3tro@google.com>
+ <37be5fb8-056f-8fba-3016-464634e069af@redhat.com>
+ <618c5513-5092-f7cd-b47b-933936001180@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1612196959; bh=PL1cT4xPs7B2FwQiAAgPtb8jyvIT3V5js+sZPZ7/YqY=;
-        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-         References:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        b=ioPzzw7TcLGQRKsZk2j6fICeqWPpvmpQ/gWmI26PxtwbcGs/fOkqPENi/namLDsHh
-         CwmWnngw30922ZaTa15Cq8rNM1MHSUG15F9OZYtcsq0+tLRorCFUrm4sNHK+Rqcj+m
-         ZZvd+l6zQQzU3zE1K0RCUBx21w+BpVy3+puzC70/iKljoRLLr3Fg2FJGRvd5bUimVa
-         2SDIM6af7wCATlJi5QyrmGfXLtV3rIDQEOtzVnuKqj21t/JRjX4Uo9YDXyIx6i6Cv9
-         dq+0rOU2MZtWji6xMHFE/VmAE26LM6gtwY3NZrXzzU16kt5pWISrZ1f1lUjmCRIbGh
-         98CPxDoqpicRA==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <618c5513-5092-f7cd-b47b-933936001180@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch doesn't change any logic but only align to the concept of
-vfio_pci_core extensions. Extensions that are related to a platform
-and not to a specific vendor of PCI devices should be part of the
-core driver. Extensions that are specific for PCI device vendor should go
-to a dedicated vendor vfio-pci driver.
+On Mon, Feb 01, 2021, Paolo Bonzini wrote:
+> On 01/02/21 09:46, Paolo Bonzini wrote:
+> > > 
+> > > This comment be updated to call out the new TSX_CTRL behavior.
+> > > 
+> > >     /*
+> > >      * On TAA affected systems:
+> > >      *      - nothing to do if TSX is disabled on the host.
+> > >      *      - we emulate TSX_CTRL if present on the host.
+> > >      *      This lets the guest use VERW to clear CPU buffers.
+> > >      */
+> > 
+> > Ok.
+> 
+> Hmm, but the comment is even more accurate now than before, isn't it? It
+> said nothing about hiding TSX_CTRL, so now it matches the code below.
 
-For now, powernv extensions will include only nvlink2.
+Ha, that is technically true.  But it says "nothing to do..." and then clears a
+flag.  The other interpretation of "nothing to do... at runtime" is also wrong
+as KVM emulates the MSR as a nop.
 
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/vfio/pci/Kconfig                                    | 6 ++++--
- drivers/vfio/pci/Makefile                                   | 2 +-
- drivers/vfio/pci/vfio_pci_core.c                            | 4 ++--
- drivers/vfio/pci/{vfio_pci_nvlink2.c =3D> vfio_pci_powernv.c} | 0
- drivers/vfio/pci/vfio_pci_private.h                         | 2 +-
- 5 files changed, 8 insertions(+), 6 deletions(-)
- rename drivers/vfio/pci/{vfio_pci_nvlink2.c =3D> vfio_pci_powernv.c} (100%=
-)
-
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index c98f2df01a60..fe0264b3d02f 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -47,11 +47,13 @@ config VFIO_PCI_X86
-=20
- 	  To enable Intel X86 extensions for vfio-pci-core, say Y.
-=20
--config VFIO_PCI_NVLINK2
-+config VFIO_PCI_POWERNV
- 	def_bool y
- 	depends on VFIO_PCI_CORE && PPC_POWERNV
- 	help
--	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
-+	  VFIO PCI extensions for IBM PowerNV (Non-Virtualized) platform
-+
-+	  To enable POWERNV extensions for vfio-pci-core, say Y.
-=20
- config VFIO_PCI_S390
- 	bool "VFIO PCI extensions for S390 platform"
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index d8ccb70e015a..442b7c78de4c 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -6,7 +6,7 @@ obj-$(CONFIG_MLX5_VFIO_PCI) +=3D mlx5-vfio-pci.o
-=20
- vfio-pci-core-y :=3D vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio=
-_pci_config.o
- vfio-pci-core-$(CONFIG_VFIO_PCI_X86) +=3D vfio_pci_x86.o
--vfio-pci-core-$(CONFIG_VFIO_PCI_NVLINK2) +=3D vfio_pci_nvlink2.o
-+vfio-pci-core-$(CONFIG_VFIO_PCI_POWERNV) +=3D vfio_pci_powernv.o
- vfio-pci-core-$(CONFIG_VFIO_PCI_ZDEV) +=3D vfio_pci_s390.o
-=20
- vfio-pci-y :=3D vfio_pci.o
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_c=
-ore.c
-index e0e258c37fb5..90cc728fffc7 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -337,7 +337,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev=
-)
- 	}
-=20
- 	if (pdev->vendor =3D=3D PCI_VENDOR_ID_NVIDIA &&
--	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
-+	    IS_ENABLED(CONFIG_VFIO_PCI_POWERNV)) {
- 		ret =3D vfio_pci_nvdia_v100_nvlink2_init(vdev);
- 		if (ret && ret !=3D -ENODEV) {
- 			pci_warn(pdev, "Failed to setup NVIDIA NV2 RAM region\n");
-@@ -346,7 +346,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev=
-)
- 	}
-=20
- 	if (pdev->vendor =3D=3D PCI_VENDOR_ID_IBM &&
--	    IS_ENABLED(CONFIG_VFIO_PCI_NVLINK2)) {
-+	    IS_ENABLED(CONFIG_VFIO_PCI_POWERNV)) {
- 		ret =3D vfio_pci_ibm_npu2_init(vdev);
- 		if (ret && ret !=3D -ENODEV) {
- 			pci_warn(pdev, "Failed to setup NVIDIA NV2 ATSD region\n");
-diff --git a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pc=
-i_powernv.c
-similarity index 100%
-rename from drivers/vfio/pci/vfio_pci_nvlink2.c
-rename to drivers/vfio/pci/vfio_pci_powernv.c
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pc=
-i_private.h
-index efc688525784..dc6a9191a704 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -173,7 +173,7 @@ static inline int vfio_pci_igd_init(struct vfio_pci_dev=
-ice *vdev)
- 	return -ENODEV;
- }
- #endif
--#ifdef CONFIG_VFIO_PCI_NVLINK2
-+#ifdef CONFIG_VFIO_PCI_POWERNV
- extern int vfio_pci_nvdia_v100_nvlink2_init(struct vfio_pci_device *vdev);
- extern int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev);
- #else
---=20
-2.25.4
-
+I guess I just find the whole comment more confusing than the code itself.
