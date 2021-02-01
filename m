@@ -2,133 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23F0930A864
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:14:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F8FD30A866
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:15:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231657AbhBANNl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 08:13:41 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11654 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbhBANNj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 08:13:39 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DTpHc4F8Sz162jk;
-        Mon,  1 Feb 2021 21:11:40 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 1 Feb 2021 21:12:49 +0800
-Subject: Re: [RFC PATCH 0/7] kvm: arm64: Implement SW/HW combined dirty log
-To:     Marc Zyngier <maz@kernel.org>
-References: <20210126124444.27136-1-zhukeqian1@huawei.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Cornelia Huck" <cohuck@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <xiexiangyou@huawei.com>, <zhengchuan@huawei.com>,
-        <yubihong@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <f68d12f2-fa98-ebdd-3075-bfdcd690ee51@huawei.com>
-Date:   Mon, 1 Feb 2021 21:12:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S231145AbhBANOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 08:14:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40264 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229707AbhBANOm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 08:14:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612185196;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L8mFTbevZoFA+kRF9PjmbiLGvgdcLVEv0nkhCmLgueg=;
+        b=fLV0kFqGX5SGlvcloQiQmkYMLBtDGNEAhD7nk8S5hWyGW2JuRDcg0KQF5gL+x3+3JsdZd4
+        bLWMxijUSbUsaIZddlxOFIFRWvQmUnFejfHkavrJuGBGmArU8LtsRUf2bJE20jbfmhmsAr
+        wjZBiYgVNhANI5UHRhLkFxkBaA93pDU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-519-Y0p2_DHEPEKo8zNrmR6rrA-1; Mon, 01 Feb 2021 08:13:12 -0500
+X-MC-Unique: Y0p2_DHEPEKo8zNrmR6rrA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 754681014E7A;
+        Mon,  1 Feb 2021 13:13:11 +0000 (UTC)
+Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B68B5D756;
+        Mon,  1 Feb 2021 13:13:07 +0000 (UTC)
+Date:   Mon, 1 Feb 2021 14:13:04 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH V3 1/9] vfio: option to unmap all
+Message-ID: <20210201141304.2e09a191.cohuck@redhat.com>
+In-Reply-To: <1c152346-88ad-80da-f093-a7ebc516a239@oracle.com>
+References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
+        <1611939252-7240-2-git-send-email-steven.sistare@oracle.com>
+        <20210201124206.49d3c71b.cohuck@redhat.com>
+        <1c152346-88ad-80da-f093-a7ebc516a239@oracle.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20210126124444.27136-1-zhukeqian1@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Mon, 1 Feb 2021 07:52:04 -0500
+Steven Sistare <steven.sistare@oracle.com> wrote:
 
-Do you have time to have a look at this? Thanks ;-)
+> On 2/1/2021 6:42 AM, Cornelia Huck wrote:
+> > On Fri, 29 Jan 2021 08:54:04 -0800
+> > Steve Sistare <steven.sistare@oracle.com> wrote:
+> >   
+> >> For the UNMAP_DMA ioctl, delete all mappings if VFIO_DMA_UNMAP_FLAG_ALL
+> >> is set.  Define the corresponding VFIO_UNMAP_ALL extension.
+> >>
+> >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> >> ---
+> >>  include/uapi/linux/vfio.h | 8 ++++++++
+> >>  1 file changed, 8 insertions(+)
+> >>
+> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >> index 9204705..55578b6 100644
+> >> --- a/include/uapi/linux/vfio.h
+> >> +++ b/include/uapi/linux/vfio.h
+> >> @@ -46,6 +46,9 @@
+> >>   */
+> >>  #define VFIO_NOIOMMU_IOMMU		8
+> >>  
+> >> +/* Supports VFIO_DMA_UNMAP_FLAG_ALL */
+> >> +#define VFIO_UNMAP_ALL			9
+> >> +
+> >>  /*
+> >>   * The IOCTL interface is designed for extensibility by embedding the
+> >>   * structure length (argsz) and flags into structures passed between
+> >> @@ -1074,6 +1077,7 @@ struct vfio_bitmap {
+> >>   * field.  No guarantee is made to the user that arbitrary unmaps of iova
+> >>   * or size different from those used in the original mapping call will
+> >>   * succeed.
+> >> + *
+> >>   * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get the dirty bitmap
+> >>   * before unmapping IO virtual addresses. When this flag is set, the user must
+> >>   * provide a struct vfio_bitmap in data[]. User must provide zero-allocated
+> >> @@ -1083,11 +1087,15 @@ struct vfio_bitmap {
+> >>   * indicates that the page at that offset from iova is dirty. A Bitmap of the
+> >>   * pages in the range of unmapped size is returned in the user-provided
+> >>   * vfio_bitmap.data.
+> >> + *
+> >> + * If flags & VFIO_DMA_UNMAP_FLAG_ALL, unmap all addresses.  iova and size
+> >> + * must be 0.  This may not be combined with the get-dirty-bitmap flag.  
+> > 
+> > wording nit: s/may not/cannot/  
+> 
+> OK. So, the same edit should be applied to this from patch 4:
+> 
+> + * iova's vaddr will block.  DMA to already-mapped pages continues.  This may
+> + * not be combined with the get-dirty-bitmap flag.
+> 
+> Alex, can you make these edits please?
 
-Keqian.
+With that,
 
-On 2021/1/26 20:44, Keqian Zhu wrote:
-> The intention:
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
 > 
-> On arm64 platform, we tracking dirty log of vCPU through guest memory abort.
-> KVM occupys some vCPU time of guest to change stage2 mapping and mark dirty.
-> This leads to heavy side effect on VM, especially when multi vCPU race and
-> some of them block on kvm mmu_lock.
+> - Steve
 > 
-> DBM is a HW auxiliary approach to log dirty. MMU chages PTE to be writable if
-> its DBM bit is set. Then KVM doesn't occupy vCPU time to log dirty.
+> > Or maybe
+> > 
+> > "VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP and VFIO_DMA_UNMAP_FLAG_ALL are
+> > mutually exclusive."
+> > 
+> > ?
+> >   
+> >>   */
+> >>  struct vfio_iommu_type1_dma_unmap {
+> >>  	__u32	argsz;
+> >>  	__u32	flags;
+> >>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >> +#define VFIO_DMA_UNMAP_FLAG_ALL		     (1 << 1)
+> >>  	__u64	iova;				/* IO virtual address */
+> >>  	__u64	size;				/* Size of mapping (bytes) */
+> >>  	__u8    data[];  
+> >   
 > 
-> About this patch series:
-> 
-> The biggest problem of apply DBM for stage2 is that software must scan PTs to
-> collect dirty state, which may cost much time and affect downtime of migration.
-> 
-> This series realize a SW/HW combined dirty log that can effectively solve this
-> problem (The smmu side can also use this approach to solve dma dirty log tracking).
-> 
-> The core idea is that we do not enable hardware dirty at start (do not add DBM bit).
-> When a arbitrary PT occurs fault, we execute soft tracking for this PT and enable
-> hardware tracking for its *nearby* PTs (e.g. Add DBM bit for nearby 16PTs). Then when
-> sync dirty log, we have known all PTs with hardware dirty enabled, so we do not need
-> to scan all PTs.
-> 
->         mem abort point             mem abort point
->               ↓                            ↓
-> ---------------------------------------------------------------
->         |********|        |        |********|        |        |
-> ---------------------------------------------------------------
->              ↑                            ↑
->         set DBM bit of               set DBM bit of
->      this PT section (64PTEs)      this PT section (64PTEs)
-> 
-> We may worry that when dirty rate is over-high we still need to scan too much PTs.
-> We mainly concern the VM stop time. With Qemu dirty rate throttling, the dirty memory
-> is closing to the VM stop threshold, so there is a little PTs to scan after VM stop.
-> 
-> It has the advantages of hardware tracking that minimizes side effect on vCPU,
-> and also has the advantages of software tracking that controls vCPU dirty rate.
-> Moreover, software tracking helps us to scan PTs at some fixed points, which
-> greatly reduces scanning time. And the biggest benefit is that we can apply this
-> solution for dma dirty tracking.
-> 
-> Test:
-> 
-> Host: Kunpeng 920 with 128 CPU 512G RAM. Disable Transparent Hugepage (Ensure test result
->       is not effected by dissolve of block page table at the early stage of migration).
-> VM:   16 CPU 16GB RAM. Run 4 pair of (redis_benchmark+redis_server).
-> 
-> Each run 5 times for software dirty log and SW/HW conbined dirty log. 
-> 
-> Test result:
-> 
-> Gain 5%~7% improvement of redis QPS during VM migration.
-> VM downtime is not affected fundamentally.
-> About 56.7% of DBM is effectively used.
-> 
-> Keqian Zhu (7):
->   arm64: cpufeature: Add API to report system support of HWDBM
->   kvm: arm64: Use atomic operation when update PTE
->   kvm: arm64: Add level_apply parameter for stage2_attr_walker
->   kvm: arm64: Add some HW_DBM related pgtable interfaces
->   kvm: arm64: Add some HW_DBM related mmu interfaces
->   kvm: arm64: Only write protect selected PTE
->   kvm: arm64: Start up SW/HW combined dirty log
-> 
->  arch/arm64/include/asm/cpufeature.h  |  12 +++
->  arch/arm64/include/asm/kvm_host.h    |   6 ++
->  arch/arm64/include/asm/kvm_mmu.h     |   7 ++
->  arch/arm64/include/asm/kvm_pgtable.h |  45 ++++++++++
->  arch/arm64/kvm/arm.c                 | 125 ++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 130 ++++++++++++++++++++++-----
->  arch/arm64/kvm/mmu.c                 |  47 +++++++++-
->  arch/arm64/kvm/reset.c               |   8 +-
->  8 files changed, 351 insertions(+), 29 deletions(-)
-> 
+
