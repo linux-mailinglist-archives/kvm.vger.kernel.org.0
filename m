@@ -2,112 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C448B30ADB2
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:25:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 602C630AD7A
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:12:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230091AbhBARYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 12:24:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4982 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229612AbhBARYk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 12:24:40 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111HG8FL148172;
-        Mon, 1 Feb 2021 12:23:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=5h6L+W9OKzWFhKXfgMXfJnyDMNx2bJEz/rcoPDTozZU=;
- b=gpPncXGzG6Yc9TluGbmqcK1Gr5KD861UwW+6gn6ZMSW3/VJxsM2bwdwEx+1YWCwORJ6s
- VOBHwgTGUMavi/TJrg0CwMFlwfzB3j6/tCJFCuigeFgcd7Tb+M93FKWF9sYBJFwfiZsg
- +RY/eIcSGwcY0uZzEb5IOoo9OlIQnfBpWgNibEqLX+UakzK5cF/H5uxsEKWIuwjqb0Re
- jmKZ/GtQzX+5GKoTf4wEj/aUvcK5ALPC4Bow6qWCEOoRdf+P9c20d3UZ2aqNMENGEb8v
- HZ8/jAyt840b+N4kqhvGHQsBeKQl1N230XWqhCHBL4vSCq8pQ/61SvyPQG1ea6zH1PNL eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36enw3r5hp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 12:23:54 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111HGoCC150138;
-        Mon, 1 Feb 2021 12:23:53 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36enw3r5es-7
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 12:23:53 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111GjiBd007782;
-        Mon, 1 Feb 2021 17:08:52 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02wdc.us.ibm.com with ESMTP id 36cy39049c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 17:08:52 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111H8pKi23462320
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 17:08:51 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BCABD112067;
-        Mon,  1 Feb 2021 17:08:51 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1617A112062;
-        Mon,  1 Feb 2021 17:08:47 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.84.157])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 17:08:46 +0000 (GMT)
-Subject: Re: [PATCH 6/9] vfio-pci/zdev: fix possible segmentation fault issue
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, liranl@nvidia.com, oren@nvidia.com,
-        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
-        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
-        kwankhede@nvidia.com, ACurrid@nvidia.com, gmataev@nvidia.com,
-        cjia@nvidia.com, yishaih@nvidia.com, aik@ozlabs.ru
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
- <20210201162828.5938-7-mgurtovoy@nvidia.com>
- <20210201175214.0dc3ba14.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <139adb14-f75a-25ef-06da-e87729c2ccf2@linux.ibm.com>
-Date:   Mon, 1 Feb 2021 12:08:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S231506AbhBARLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 12:11:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229599AbhBARLV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 12:11:21 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE78C061573
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:10:40 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id s7so14435068wru.5
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:10:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=uc51KV1Uicp82jgNC73/pa7OUeOjHlnVfQCmC5M7wRM=;
+        b=AxN1fu/MP4e8N+10JbV8io2tXAuQ0uwtPU+n/khscslUV+PzRiuoGomGh75465kPpn
+         WO+OeXDiufWq2NZE4pqKZd+1Hk/RNorETOnYrgmUIVsFnTlsmDc+PBt0p8tpZaf2KEVn
+         FMu/MlS7/Isv2XPSxTucCwyG70jqpAfZvpBjCXih0YKSNypBEcIP4F49Sdc8nBEbY2o1
+         JIJ7G1ZuSlWTH8unbCeAp3UCi22o86V2FNzogwfYQR9MKVAV2P7jwKwp/tw1u49ADTM1
+         cDJp8hkc8hp5c4cLV3AqIjhiAKukLVuzO9RhiIjPzmfd5Hl2UUqrSh95BuBi4LPXZPsm
+         1HOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=uc51KV1Uicp82jgNC73/pa7OUeOjHlnVfQCmC5M7wRM=;
+        b=Nh4mpZ75G7boe7hnyx12SLENBGScqhhqm8QvkRxST7NcvFSAeYYIq0jLqPCBnlXJ3f
+         3c/fEWl9c+Qhvq3Q9IATYLAPRDwc03VJcl/1/ypj5dH5PT/JAfYDr6IiiTcqp4AZfrmL
+         6vuZKuDbR3zlTemnCYX4tV1RYaTH0VsGQqR0otVZQMH4vl6qt3217KdVn2VhaUqS6ocz
+         /e2nxJNyVrOYzLf4Aw5XI2SXL2sTgIFgMekwqywcjDtn2LStSJWXr3w7+8fZUlVbqxeG
+         aICb5RTmw5wWXk8FJMeYzrbC3YesmuM5g4C1psR2EgBk/uAQHgT0jSOWmLww42yX2rVi
+         SumA==
+X-Gm-Message-State: AOAM533EyV87JYjqwo9eM3+mJNI9nk4yhilL62j580i96vGe9Bo1w4MW
+        Gqt+RfUh2VCqH9b5Hk3F/9FzvQ==
+X-Google-Smtp-Source: ABdhPJzW0+5MPR4jZiFi/k5fj29Kk9W5ktozhM0fVqMoMlvDmbMHtFjP7vlFdt6lAq20MKY5goBEDA==
+X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr19830466wri.105.1612199439664;
+        Mon, 01 Feb 2021 09:10:39 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id a16sm27138510wrr.89.2021.02.01.09.10.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Feb 2021 09:10:38 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 9B4981FF7E;
+        Mon,  1 Feb 2021 17:10:37 +0000 (GMT)
+References: <20210131115022.242570-1-f4bug@amsat.org>
+ <20210131115022.242570-4-f4bug@amsat.org>
+User-agent: mu4e 1.5.7; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Fam Zheng <fam@euphon.net>, Claudio Fontana <cfontana@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        qemu-arm@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        John Snow <jsnow@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
+Date:   Mon, 01 Feb 2021 17:10:30 +0000
+In-reply-to: <20210131115022.242570-4-f4bug@amsat.org>
+Message-ID: <87czxjvhma.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20210201175214.0dc3ba14.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-01_06:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 impostorscore=0 clxscore=1011 mlxscore=0
- spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102010087
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/21 11:52 AM, Cornelia Huck wrote:
-> On Mon, 1 Feb 2021 16:28:25 +0000
-> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> 
->> In case allocation fails, we must behave correctly and exit with error.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> 
-> Fixes: e6b817d4b821 ("vfio-pci/zdev: Add zPCI capabilities to VFIO_DEVICE_GET_INFO")
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
-> I think this should go in independently of this series. >
 
-Agreed, makes sense to me -- thanks for finding.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> KVM requires the target cpu to be at least ARMv8 architecture
+> (support on ARMv7 has been dropped in commit 82bf7ae84ce:
+> "target/arm: Remove KVM support for 32-bit Arm hosts").
+>
+> Only enable the following ARMv4 CPUs when TCG is available:
+>
+>   - StrongARM (SA1100/1110)
+>   - OMAP1510 (TI925T)
+>
+> The following machines are no more built when TCG is disabled:
+>
+>   - cheetah              Palm Tungsten|E aka. Cheetah PDA (OMAP310)
+>   - sx1                  Siemens SX1 (OMAP310) V2
+>   - sx1-v1               Siemens SX1 (OMAP310) V1
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
->> ---
->>   drivers/vfio/pci/vfio_pci_zdev.c | 4 ++++
->>   1 file changed, 4 insertions(+)
-> 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
+--=20
+Alex Benn=C3=A9e
