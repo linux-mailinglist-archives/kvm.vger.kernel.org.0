@@ -2,101 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 602C630AD7A
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:12:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B96D930AD87
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:14:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231506AbhBARLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 12:11:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
+        id S231902AbhBARNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 12:13:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbhBARLV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 12:11:21 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE78C061573
-        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:10:40 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id s7so14435068wru.5
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:10:40 -0800 (PST)
+        with ESMTP id S231805AbhBARNf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 12:13:35 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D24C061756
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:12:55 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id w14so12036417pfi.2
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:12:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=uc51KV1Uicp82jgNC73/pa7OUeOjHlnVfQCmC5M7wRM=;
-        b=AxN1fu/MP4e8N+10JbV8io2tXAuQ0uwtPU+n/khscslUV+PzRiuoGomGh75465kPpn
-         WO+OeXDiufWq2NZE4pqKZd+1Hk/RNorETOnYrgmUIVsFnTlsmDc+PBt0p8tpZaf2KEVn
-         FMu/MlS7/Isv2XPSxTucCwyG70jqpAfZvpBjCXih0YKSNypBEcIP4F49Sdc8nBEbY2o1
-         JIJ7G1ZuSlWTH8unbCeAp3UCi22o86V2FNzogwfYQR9MKVAV2P7jwKwp/tw1u49ADTM1
-         cDJp8hkc8hp5c4cLV3AqIjhiAKukLVuzO9RhiIjPzmfd5Hl2UUqrSh95BuBi4LPXZPsm
-         1HOA==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=wnxL/Wu6UUpfOivFYidUIhipJomX5KXsxYVYyO2G8yE=;
+        b=TvksATvAc6G2vbTvv9nKkYP7Zkep98KYIP24YvDzKYkbyu3f1/BLkRDiyOYhpNsHha
+         BJP9y5tUCKGhHV+IWl0ScrtI/ENwyP+bKqjy6M9JqWRfOconuXxQaE7ZB/vTpnmhXiHp
+         Srq+iMBGi1bUosS7lHO8fWomFpJGlBigTOr5jfMNNPRG5LYIAE5IusTxkMmvNuVvRbrw
+         92g1x25Nt54IIjLqflBsiaL0rL7UOXWyfY/BbB9ZUIuIipRHvbw2zlOP4++OsywgfNJI
+         Bg0AgegGY4lkVIjcSz3CHMWOVcl0WPvr8FstsVnRD8TH7vaz6YsxK5Lf7W9A/xegj4g2
+         k5tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=uc51KV1Uicp82jgNC73/pa7OUeOjHlnVfQCmC5M7wRM=;
-        b=Nh4mpZ75G7boe7hnyx12SLENBGScqhhqm8QvkRxST7NcvFSAeYYIq0jLqPCBnlXJ3f
-         3c/fEWl9c+Qhvq3Q9IATYLAPRDwc03VJcl/1/ypj5dH5PT/JAfYDr6IiiTcqp4AZfrmL
-         6vuZKuDbR3zlTemnCYX4tV1RYaTH0VsGQqR0otVZQMH4vl6qt3217KdVn2VhaUqS6ocz
-         /e2nxJNyVrOYzLf4Aw5XI2SXL2sTgIFgMekwqywcjDtn2LStSJWXr3w7+8fZUlVbqxeG
-         aICb5RTmw5wWXk8FJMeYzrbC3YesmuM5g4C1psR2EgBk/uAQHgT0jSOWmLww42yX2rVi
-         SumA==
-X-Gm-Message-State: AOAM533EyV87JYjqwo9eM3+mJNI9nk4yhilL62j580i96vGe9Bo1w4MW
-        Gqt+RfUh2VCqH9b5Hk3F/9FzvQ==
-X-Google-Smtp-Source: ABdhPJzW0+5MPR4jZiFi/k5fj29Kk9W5ktozhM0fVqMoMlvDmbMHtFjP7vlFdt6lAq20MKY5goBEDA==
-X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr19830466wri.105.1612199439664;
-        Mon, 01 Feb 2021 09:10:39 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id a16sm27138510wrr.89.2021.02.01.09.10.38
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=wnxL/Wu6UUpfOivFYidUIhipJomX5KXsxYVYyO2G8yE=;
+        b=roBjTrJDbifgVaBgwNcuO13Ai6rtYu4t9IhDFlfmPBkpsViZbDojepHQBcNK/JgAHX
+         i7pSP7GcyYA7zQtUgnlYmb1vJ/2lkxQ3BfWWpseTxGah/qKvdncoaur2u6k5Lc74ltkl
+         INgdKwurf0mZOpWz4JDYKHCaalF//z1xSdJtBjM0UU7tWv/QmpV4Sn53kkJgs+REr3q3
+         UsCsa47yYQCgJje2DKmv9tVuNwVCoEserubyzvT+k6Eem4U5qsH0x5u9M5OE9D/gO2bT
+         rqLOM8c/JAJZT+Z+aJPNzsE6t416xwSYidA+bfZu+A/ZCKJ1npklN7BXt9d2igaHmWgm
+         19mQ==
+X-Gm-Message-State: AOAM533oTxREkDXT6aS54Zv3L+gniuvOM7kZiEl9Lv4BsFRCv4/8IkC7
+        tO16YL+A6kQXzAl5hBs3mdpHEw==
+X-Google-Smtp-Source: ABdhPJzlfjcr/RNlVEJ1zibUwiriHwtPa4v2J/8gXajIL0KidyItWMtVCNTTgzXCBnNWe+XYqm30Gg==
+X-Received: by 2002:a62:18c5:0:b029:1bd:e72c:b4f2 with SMTP id 188-20020a6218c50000b02901bde72cb4f2mr17341052pfy.50.1612199574825;
+        Mon, 01 Feb 2021 09:12:54 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:829:fccd:80d7:796f])
+        by smtp.gmail.com with ESMTPSA id i62sm18397083pfe.84.2021.02.01.09.12.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 09:10:38 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 9B4981FF7E;
-        Mon,  1 Feb 2021 17:10:37 +0000 (GMT)
-References: <20210131115022.242570-1-f4bug@amsat.org>
- <20210131115022.242570-4-f4bug@amsat.org>
-User-agent: mu4e 1.5.7; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Fam Zheng <fam@euphon.net>, Claudio Fontana <cfontana@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
-        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        qemu-arm@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        John Snow <jsnow@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v6 03/11] target/arm: Restrict ARMv4 cpus to TCG accel
-Date:   Mon, 01 Feb 2021 17:10:30 +0000
-In-reply-to: <20210131115022.242570-4-f4bug@amsat.org>
-Message-ID: <87czxjvhma.fsf@linaro.org>
+        Mon, 01 Feb 2021 09:12:54 -0800 (PST)
+Date:   Mon, 1 Feb 2021 09:12:47 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
+        wanpengli@tencent.com
+Subject: Re: [RFC PATCH v3 16/27] KVM: VMX: Convert vcpu_vmx.exit_reason to a
+ union
+Message-ID: <YBg2j45w2IIUlZ0V@google.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+ <d32ab375be78315e3bc2540f2a741859637abcb0.1611634586.git.kai.huang@intel.com>
+ <YBV0nnqUHnING5qA@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YBV0nnqUHnING5qA@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Jan 30, 2021, Jarkko Sakkinen wrote:
+> On Tue, Jan 26, 2021 at 10:31:37PM +1300, Kai Huang wrote:
+> > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > 
+> > Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
+> > full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
+> > bits 15:0, and single-bit modifiers in bits 31:16.
+> > 
+> > Historically, KVM has only had to worry about handling the "failed
+> > VM-Entry" modifier, which could only be set in very specific flows and
+> > required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
+> > bit was a somewhat viable approach.  But even with only a single bit to
+> > worry about, KVM has had several bugs related to comparing a basic exit
+> > reason against the full exit reason store in vcpu_vmx.
+> > 
+> > Upcoming Intel features, e.g. SGX, will add new modifier bits that can
+> > be set on more or less any VM-Exit, as opposed to the significantly more
+> > restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
+> > flows isn't scalable.  Tracking exit reason in a union forces code to
+> > explicitly choose between consuming the full exit reason and the basic
+> > exit, and is a convenient way to document and access the modifiers.
+> 
+> I *believe* that the change is correct but I dropped in the last paragraph
+> - most likely only because of lack of expertise in this area.
+> 
+> I ask the most basic question: why SGX will add new modifier bits?
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Register state is loaded with synthetic state and/or trampoline state on VM-Exit
+from enclaves.  For all intents and purposes, emulation and other VMM/hypervisor
+behavior that accesses vCPU state is impossible.  E.g. on a #UD VM-Exit, RIP
+will point at the AEP; emulating would emulate some random instruction in the
+untrusted runtime, not the instruction that faulted.
 
-> KVM requires the target cpu to be at least ARMv8 architecture
-> (support on ARMv7 has been dropped in commit 82bf7ae84ce:
-> "target/arm: Remove KVM support for 32-bit Arm hosts").
->
-> Only enable the following ARMv4 CPUs when TCG is available:
->
->   - StrongARM (SA1100/1110)
->   - OMAP1510 (TI925T)
->
-> The following machines are no more built when TCG is disabled:
->
->   - cheetah              Palm Tungsten|E aka. Cheetah PDA (OMAP310)
->   - sx1                  Siemens SX1 (OMAP310) V2
->   - sx1-v1               Siemens SX1 (OMAP310) V1
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
+Hardware sets the "exit from enclave" modifier flag so that the VMM can try and
+do something moderately sane, e.g. inject a #UD into the guest instead of
+attempting to emulate random instructions.
