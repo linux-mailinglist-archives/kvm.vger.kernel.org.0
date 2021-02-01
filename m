@@ -2,70 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C506D30A8A6
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27B0230A8C8
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:32:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231444AbhBAN0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 08:26:54 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12061 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbhBAN0x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 08:26:53 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DTpZT24CpzMTCD;
-        Mon,  1 Feb 2021 21:24:33 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 1 Feb 2021 21:26:00 +0800
-Subject: Re: [RFC PATCH 0/7] kvm: arm64: Implement SW/HW combined dirty log
-To:     Marc Zyngier <maz@kernel.org>
-References: <20210126124444.27136-1-zhukeqian1@huawei.com>
- <f68d12f2-fa98-ebdd-3075-bfdcd690ee51@huawei.com>
- <9a64d4acd8e8b0b8c86143752b8c856d@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, Will Deacon <will@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        "Cornelia Huck" <cohuck@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <xiexiangyou@huawei.com>, <zhengchuan@huawei.com>,
-        <yubihong@huawei.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <3493e144-805a-033d-f90b-556a6d0d4bff@huawei.com>
-Date:   Mon, 1 Feb 2021 21:25:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S232290AbhBANc0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 08:32:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44938 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231477AbhBANcY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 08:32:24 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AD41964E8F;
+        Mon,  1 Feb 2021 13:31:43 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=hot-poop.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l6ZIr-00BHLa-I2; Mon, 01 Feb 2021 13:31:41 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     stable@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, gregkh@linuxfoundation.org,
+        kvm@vger.kernel.org, Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: [stable-5.4][PATCH] KVM: Forbid the use of tagged userspace addresses for memslots
+Date:   Mon,  1 Feb 2021 13:31:37 +0000
+Message-Id: <20210201133137.3541896-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <9a64d4acd8e8b0b8c86143752b8c856d@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: stable@vger.kernel.org, pbonzini@redhat.com, gregkh@linuxfoundation.org, kvm@vger.kernel.org, rick.p.edgecombe@intel.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+commit 139bc8a6146d92822c866cf2fd410159c56b3648 upstream.
 
+The use of a tagged address could be pretty confusing for the
+whole memslot infrastructure as well as the MMU notifiers.
 
-On 2021/2/1 21:17, Marc Zyngier wrote:
-> On 2021-02-01 13:12, Keqian Zhu wrote:
->> Hi Marc,
->>
->> Do you have time to have a look at this? Thanks ;-)
-> 
-> Not immediately. I'm busy with stuff that is planned to go
-> in 5.12, which isn't the case for this series. I'll get to
-> it eventually.
-> 
-> Thanks,
-> 
->         M.
-Sure, I am not eager. Please concentrate on your urgent work firstly. ;-) Thanks.
+Forbid it altogether, as it never quite worked the first place.
 
-Keqian.
+Cc: stable@vger.kernel.org
+Reported-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/api.txt | 3 +++
+ virt/kvm/kvm_main.c            | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+index a18e996fa54b..7064efd3b5ea 100644
+--- a/Documentation/virt/kvm/api.txt
++++ b/Documentation/virt/kvm/api.txt
+@@ -1132,6 +1132,9 @@ field userspace_addr, which must point at user addressable memory for
+ the entire memory slot size.  Any object may back this memory, including
+ anonymous memory, ordinary files, and hugetlbfs.
+ 
++On architectures that support a form of address tagging, userspace_addr must
++be an untagged address.
++
+ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+ be identical.  This allows large pages in the guest to be backed by large
+ pages in the host.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8f3b40ec02b7..f25b5043cbca 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1017,6 +1017,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	/* We can read the guest memory with __xxx_user() later on. */
+ 	if ((id < KVM_USER_MEM_SLOTS) &&
+ 	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
++	     (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
+ 	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+ 			mem->memory_size)))
+ 		goto out;
+-- 
+2.29.2
+
