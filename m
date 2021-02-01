@@ -2,119 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C8A030AA11
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 15:42:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B819730AA28
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 15:47:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbhBAOmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 09:42:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33718 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231337AbhBAOmU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 09:42:20 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111EVrH0079834;
-        Mon, 1 Feb 2021 09:41:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=TU3NyM68sAIZL9EFcGmmh9iUmXw/QQ+1LWXS/0Vd/KY=;
- b=hqsFVpQfQ0p9Lz7ZKCbd0lSgD1PrHnWdL3I1PQZ0czuHvMEb09WkNhUCksTW2jxw2WtM
- 6fC90N7GZ8QbYnm9R94RKWcR9V+Ldovds+w2j+tmn2RHzF44BHFzi7kITugSxrAfcRoQ
- 9YKIKGC87/NYjtouJSZTMAhUMO1tCBY/g/y4t2TQKXiZBXXQjRKO3qbX1B/e/iuwXwDc
- z4wfOoKMc2VTF8Kl0Vx1f7Gq0/tRpSqWpXf4TJXYSKgiIMmUx96SeL0o9AX4FhvFzbdQ
- 3wUJNxeLiDqQGG3W0DijEaca+5BddKw04sgJdzAOUKmeaUzjS+Mp+lQH22EBBX7BgKuW 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ek8c8yxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:41:34 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111EWQlu083514;
-        Mon, 1 Feb 2021 09:41:33 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ek8c8ywy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 09:41:33 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111EbkOY011553;
-        Mon, 1 Feb 2021 14:41:32 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02dal.us.ibm.com with ESMTP id 36cy38tv3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 14:41:32 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111EfU1j22217124
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 14:41:30 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A10D0124054;
-        Mon,  1 Feb 2021 14:41:30 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DD644124058;
-        Mon,  1 Feb 2021 14:41:29 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.203.235])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 14:41:29 +0000 (GMT)
-Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
- <20201223011606.5265-10-akrowiak@linux.ibm.com>
- <20210112021251.0d989225.pasic@linux.ibm.com>
- <20210112185550.1ac49768.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <5a221fb3-4dc0-0aef-7910-51f395ba1bcd@linux.ibm.com>
-Date:   Mon, 1 Feb 2021 09:41:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S231506AbhBAOp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 09:45:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25695 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231152AbhBAOpZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 09:45:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612190636;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zO1OziphBgebiueshJ1sNrFKTni87S/tUnj1XzD01UI=;
+        b=PuC8dfNkEwQlXC7CtJGmK/20jkxrHGz8oSdmOoPjbHIVphMSpqA0lYdS4LwOfZwf57A8bG
+        7dmglE/GVkvvhApyCd+ZUnoqUSLns9As50ruf25rkDLt9YHlUPSmhKfQtNDKrI8jAsG5wZ
+        L5BAXWra1EBGkNnPKdjyjU1GUbHhWWg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-F1r1Lm8wOFGK5kYNUH3DTQ-1; Mon, 01 Feb 2021 09:43:55 -0500
+X-MC-Unique: F1r1Lm8wOFGK5kYNUH3DTQ-1
+Received: by mail-wm1-f72.google.com with SMTP id u1so4918773wml.2
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 06:43:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zO1OziphBgebiueshJ1sNrFKTni87S/tUnj1XzD01UI=;
+        b=lkejoWP3GpFIAWp70wwMhKwwcb7pSDNH9mYrqFM7jqFIr00+vNqF2OVzxQLXkdon1B
+         AjY8E9+SmO/oi/dVm9pA7quR6T1HXlOMK2OpRgeNgFKQktKw0sxGMddbA1Bw6U9Iajr8
+         KARyykFPZTcIbKqgJjrDiEurrdHIFwl2bPA4bXunGLx51TqnMMIqZ2NdhsrMnvgzLPWg
+         YXs4KA8D9R0IMb6rOhq5BLDE0U+T/J3h1tXpr3QnKdx3pXGB4AhhtkBYaJMdFpQA1wed
+         jrcnUCt7M3zZRrNhFWcMD5nzVqEgmKpEiT2EvmQK/fs2dRNPci6obLpBIXAoUkrhaChR
+         7YtA==
+X-Gm-Message-State: AOAM533fpBB3HOvXy3moHB2km655v/ZvAPgbAqss8dqhm9MHKTeFXLIp
+        MBs+c5eGH+GAI7vRzMARFBGqCbOVz5gKGXjnQiGwJhGG1e641cNdY/0Mg/OEbGCYo0PhYOqmZEK
+        63U3woJCywuf8
+X-Received: by 2002:a05:6000:234:: with SMTP id l20mr18444166wrz.212.1612190633693;
+        Mon, 01 Feb 2021 06:43:53 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyuXTXobU6V4dlGwxCuARDIdcyljxLtersvGpuHS4HxSC9xa5oCXv0AYgwegMAApnKO/nP6TQ==
+X-Received: by 2002:a05:6000:234:: with SMTP id l20mr18444144wrz.212.1612190633447;
+        Mon, 01 Feb 2021 06:43:53 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id h15sm27313629wrt.10.2021.02.01.06.43.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Feb 2021 06:43:52 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: Supplement __cr4_reserved_bits() with
+ X86_FEATURE_PCID check
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>
+References: <20210201142843.108190-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c35f656d-1fff-8c5b-42a5-575c161e4209@redhat.com>
+Date:   Mon, 1 Feb 2021 15:43:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210112185550.1ac49768.pasic@linux.ibm.com>
+In-Reply-To: <20210201142843.108190-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-01_05:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- spamscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
- lowpriorityscore=0 impostorscore=0 adultscore=0 malwarescore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102010073
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 01/02/21 15:28, Vitaly Kuznetsov wrote:
+> Commit 7a873e455567 ("KVM: selftests: Verify supported CR4 bits can be set
+> before KVM_SET_CPUID2") reveals that KVM allows to set X86_CR4_PCIDE even
+> when PCID support is missing:
+> 
+> ==== Test Assertion Failure ====
+>    x86_64/set_sregs_test.c:41: rc
+>    pid=6956 tid=6956 - Invalid argument
+>       1	0x000000000040177d: test_cr4_feature_bit at set_sregs_test.c:41
+>       2	0x00000000004014fc: main at set_sregs_test.c:119
+>       3	0x00007f2d9346d041: ?? ??:0
+>       4	0x000000000040164d: _start at ??:?
+>    KVM allowed unsupported CR4 bit (0x20000)
+> 
+> Add X86_FEATURE_PCID feature check to __cr4_reserved_bits() to make
+> kvm_is_valid_cr4() fail.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>   arch/x86/kvm/x86.h | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index c5ee0f5ce0f1..0f727b50bd3d 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -425,6 +425,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+>   		__reserved_bits |= X86_CR4_UMIP;        \
+>   	if (!__cpu_has(__c, X86_FEATURE_VMX))           \
+>   		__reserved_bits |= X86_CR4_VMXE;        \
+> +	if (!__cpu_has(__c, X86_FEATURE_PCID))          \
+> +		__reserved_bits |= X86_CR4_PCIDE;       \
+>   	__reserved_bits;                                \
+>   })
+>   
+> 
 
+Queued, thanks.
 
-On 1/12/21 12:55 PM, Halil Pasic wrote:
-> On Tue, 12 Jan 2021 02:12:51 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
->
->>> @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
->>>   	apqi = AP_QID_QUEUE(q->apqn);
->>>   	vfio_ap_mdev_reset_queue(apid, apqi, 1);
->>>   
->>> -	if (q->matrix_mdev)
->>> +	if (q->matrix_mdev) {
->>> +		matrix_mdev = q->matrix_mdev;
->>>   		vfio_ap_mdev_unlink_queue(q);
->>> +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
->>> +	}
->>>   
->>>   	kfree(q);
->>>   	mutex_unlock(&matrix_dev->lock);
-> Shouldn't we first remove the queue from the APCB and then
-> reset? Sorry, I missed this one yesterday.
-
-Yes, that's probably the order in which  it should be done.
-I'll change it.
-
->
-> Regards,
-> Halil
+Paolo
 
