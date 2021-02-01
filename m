@@ -2,151 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E8A530AFB0
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 19:44:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDCF830AFC1
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 19:50:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbhBASoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 13:44:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45135 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231402AbhBASoH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 13:44:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612204959;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3gK4DMTFCpUGprBzVCp9eTqWhhzAb26o+GmrY8tvHmw=;
-        b=PTg3vmqh3aEJgfVc75M3LagU4g8MPZXtwwxwGZu0T3tmEoTAK4AuM2tautxWK61pbxk3w5
-        zjASu9iTvRXoNo/vyzUV3yZXgFWnK/JiceMH6ckz01d7A+poI0CAR7FkNl9122qiazrEzH
-        ENk43jnwDEFYLFW9jQ8siHlEkJ050nA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-U1cJSbheOw2OhUmi932Sew-1; Mon, 01 Feb 2021 13:42:35 -0500
-X-MC-Unique: U1cJSbheOw2OhUmi932Sew-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A438359;
-        Mon,  1 Feb 2021 18:42:32 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4100A648A3;
-        Mon,  1 Feb 2021 18:42:31 +0000 (UTC)
-Date:   Mon, 1 Feb 2021 11:42:30 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>, jgg@nvidia.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        liranl@nvidia.com, oren@nvidia.com, tzahio@nvidia.com,
-        leonro@nvidia.com, yarong@nvidia.com, aviadye@nvidia.com,
-        shahafs@nvidia.com, artemp@nvidia.com, kwankhede@nvidia.com,
-        ACurrid@nvidia.com, gmataev@nvidia.com, cjia@nvidia.com,
-        yishaih@nvidia.com, aik@ozlabs.ru
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-Message-ID: <20210201114230.37c18abd@omen.home.shazbot.org>
-In-Reply-To: <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
-        <20210201162828.5938-9-mgurtovoy@nvidia.com>
-        <20210201181454.22112b57.cohuck@redhat.com>
-        <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S230118AbhBAStd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 13:49:33 -0500
+Received: from mail-bn8nam12on2075.outbound.protection.outlook.com ([40.107.237.75]:38945
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229680AbhBASt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 13:49:29 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lObkGGM5DqEWxsZCE96LXd+9L6pavEMhE0/eMhaqyOIpTz1OfwMrMPtaxsMLHJelhfoQY0fZfhq6DLBBRvA9vdNAD6Sg88RIUBHIjULTrrobsK1MITXrxoZFEkPsUjTvYIyLtJu4U94Zg+Hc5m17MLothPwilEEygxw209RxIGWZX/EyV7lmigUL9mb49qwJj7Gc1Qiy+BEo/lHdUkG0D30faUMul9ZSnZM87zRdWmd15OzbNoeUC9U1stCnrWyr7y+H3OedlNUnyA8QU5DtrM93YkwKx5XWLnR2MnZ6e0mYi9mf0a6dgg5BSxXtBo4mM9AS16IFsOC4yWP+OjmkAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=alf/zCiutV3hIIRAd5wjjjpcaBfWRjQcxUoWKjOSxJI=;
+ b=b7+cpgOad4IB4nBhmZQdlUy9UZAIRy5o3H4+++CpfR3BXhKLW0BRZnaEbSwWsytgWcl+fwMt9gJeZYdDtWo70I26WhIkBQrkF/m6G9P+DV6JuxrUwyFrXJHrLy6+lgu8Gy/Xgyb5wtSFLIJcmC7Kp4+yRGLJ5R++vQU8e7oIbY7ekYuYML+2OlC01njzl6IwpV6GB+m2Y4tSUyYc1oA11Ghnlww28IaoCvHJpulbuMu3vv/Qb1yCXGmCnsTO82nIorr998gBLFj/hy9GRpKViGENuH5R2BICyVOPDnT3sbyh4corfWUX7DO7+qjTw2ZGFt3TB8C1P4AdzHN5CH3veQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=alf/zCiutV3hIIRAd5wjjjpcaBfWRjQcxUoWKjOSxJI=;
+ b=nUsCtIP87mhqUNDSHHu1zooLq8uoKXmMctzeXdNLpflQpboEnQz79iO8SAedGWr3yhGOF0jk3AU3dpRr8zRLKHzerkVB4/agYFae1VYqOeelVMUjlxASoycijRd4SVh80KL6LIlJ5I9hzGY3X+BghB3mTv6HLpF6hzIPulk6LI8=
+Authentication-Results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR12MB1354.namprd12.prod.outlook.com (2603:10b6:3:7a::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3805.17; Mon, 1 Feb 2021 18:48:31 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b8aa:f23e:fcad:23ee]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::b8aa:f23e:fcad:23ee%8]) with mapi id 15.20.3805.025; Mon, 1 Feb 2021
+ 18:48:31 +0000
+Subject: Re: [PATCH v6 3/6] sev/i386: Allow AP booting under SEV-ES
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Richard Henderson <richard.henderson@linaro.org>
+References: <cover.1611682609.git.thomas.lendacky@amd.com>
+ <22db2bfb4d6551aed661a9ae95b4fdbef613ca21.1611682609.git.thomas.lendacky@amd.com>
+ <20210129174416.GC231819@dt>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <08a46e00-940c-eec3-bc7e-a5d21d8f0609@amd.com>
+Date:   Mon, 1 Feb 2021 12:48:28 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20210129174416.GC231819@dt>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Originating-IP: [67.79.209.213]
+X-ClientProxiedBy: SN7PR04CA0055.namprd04.prod.outlook.com
+ (2603:10b6:806:120::30) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN7PR04CA0055.namprd04.prod.outlook.com (2603:10b6:806:120::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Mon, 1 Feb 2021 18:48:30 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: b44709f2-3a4a-4a45-14f5-08d8c6e1f88e
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1354:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB13542E0CA6D5211DF4572277ECB69@DM5PR12MB1354.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ugVjVLNUlmlfthcU+gBP/1VS4PN1DZnr18A8ok+0jaEipjM+P8AOjzF1CzBz12EBhW8AhhrSpPsTU0Sr9DkSEz6e0WkxNfw8FI67pJOA5ZjmqA82sm9Q2XlqpNfm+YFaZteL+P9xXYHan3DOElB4sITcnhWLzyuAbT6MhydM3LMeKl8eBUO3Y5AhgJlI0yXXCpg+/T+GRseLhziP1Ypy5FjOsULNn4TzcP64gNPN2sMS6D0bqUy9bvZPm/NdOCUBXvhrn0HFgGQaOlLA0uvlYU5GskhVLrE4y76RpSGwEKORpbH25hIkL9jRZKHZrzC2ckWyBo7xtseKBrx4YJmHgxpcOtcovxdbAsObdywDinflo3mkUpXWxX7Mxo2kmuY+bX2cC9XwFR4kaQPeS6sjYWP7FuciSyGCuYRTBLdEXWkfiPPFV7UZM/pSVnzAK7jMZK5LCYzV52v8tCvC3BQkGcgjZYnvMNykO3/YCxcFkIZQCPy7zxwfanVazZHZ4EPlwNcWuhwBLz2EyVcmmWtF2CLRHhD2T7Z87UTgEKfo4fpucIWiO93UKBq/EayZGr09kYvBX1TL3hEoxBpNSQnh39Res9im0GrpIUWkmJSmuVo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6506007)(53546011)(52116002)(7416002)(8676002)(6512007)(54906003)(6486002)(6916009)(66476007)(83380400001)(66556008)(66946007)(5660300002)(8936002)(2616005)(186003)(31686004)(2906002)(498600001)(16526019)(4326008)(36756003)(956004)(31696002)(86362001)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bmpYWkhwQnd4bXVuNjlpYkwrSmFmbXYxZ3dOSHhrdnZxWitPYlNWeUNIb2Nm?=
+ =?utf-8?B?eDBXcWIrMkpPVUhiYjZ5T1VjTUpxSEdJMEM2aHBveW92YklnbjQ0aTB2R1Jv?=
+ =?utf-8?B?NXdhMzJNOVBXVGRYYVNNUldwaWNaVlRubVlwUHQrajhYaGNsT1liRjV0WlVq?=
+ =?utf-8?B?cjRLS3hGaUZXeUc0enVQcy8vdnVmV1hoNDZpcHVuUXRtWURjbUJLYmY2cmdB?=
+ =?utf-8?B?MkxSMWlzRmZTVWJUelBqT3ZodVl5WG4zbGhoRWhkTWw2VUFOZ0w1S2h6Ti9n?=
+ =?utf-8?B?TS95c1NCSzg3a283SHh3SEx5Rk5zU1FMYlFhM2dYS2FobkhTdmVTRWRYbmVM?=
+ =?utf-8?B?Y3NIbEdQY1hpejIxYjZvZkppeXlVWi9XaXZJbGFDdUcrVTVpSG02Z1IyeDJ1?=
+ =?utf-8?B?Y0ZVMlVobXNXQ2VaUlJKSFUvMFp5dS9KeXVKcDZEQ3VMSWlUbEk2MkdkOTRS?=
+ =?utf-8?B?MnFNUlJ0UzlSOHc3VVBkTExaTDN0WG5tak93TS80Qmh6NWNtamJZeUplYkVK?=
+ =?utf-8?B?L3pyNlRSeTNJdU1JWmNvSHYwL0lLR2h2M0hlcVRtRThKTkVrME5Xd2gxaVhu?=
+ =?utf-8?B?d2V1SWlOMUZ0eDdGZCsvb2hLd21EeWVVL3Z6V2dPeG93QmNVS3UxVnhkOEE0?=
+ =?utf-8?B?d3p3VjRoQ0F2UFpsT3hwc2VSemNWWnpQa1crQWswWmdYc2tsU1llRk15Q3Vm?=
+ =?utf-8?B?bnBjV2ZNQktLQVlGanJkdk44YTFmU2ZkeTAvUytqQUxCYUtJQ1FjZDU4bUdx?=
+ =?utf-8?B?bUxVV0hZVzdxZGc1ZndvM0Q2QTBsVXZnMXlwQXFGTTJLT08xSExVTTFoVVN1?=
+ =?utf-8?B?OEhTNi9HWUIxeVFwb1V0QkN2cjlUYkV3NjN6SE5rU21XbUowZGZZQm1VOUJ2?=
+ =?utf-8?B?aVF6N01IY3hyZUdSVzdvOWZ4VVZGbytKYmxRNkVpN0QrK1l5YnV1dUplM2JF?=
+ =?utf-8?B?YUVSZzIvRHYvS2psRXVFQyt1R1gvVzNZT0l3MDJYQmQvY2xxaHAvcFZTb2No?=
+ =?utf-8?B?T2I2M1l6cFdsT2g4SjFrenRoZmZHMEV0ZEZYbkN1eTg2dGtuZXVPbk9OSVRa?=
+ =?utf-8?B?V2hLWk5pOE94NncyN09WY0lqM2xjaXU5c2wyeWQ3WWFsblpKNTRtTEVGdnUz?=
+ =?utf-8?B?MGR3MzZDN1dIaDZ0eXpVK3IzL0FQNlY4UnZpMXNVbUZwVHFXc21oSXRvUnF3?=
+ =?utf-8?B?N0dLNmdYWTk2MUtxR2ZQZFEyU2hlZllJbEM2N0h3UjQ2YVhQc2JaYVZsL0Vu?=
+ =?utf-8?B?MVZoYjd6Skw4cFhOd3VTT3FRVWVIOHBiK2VtMk41aDZZbzEyNUZYaEw3a2Fv?=
+ =?utf-8?B?K2h0T0RsR1lXSUJHaFZiSmF3SERQRVZsSUV2bTJVRTlFcTIvN05xV2JFVzBF?=
+ =?utf-8?B?cWNsQ3c5R1hJNTZVckIzdFVpZnJIWWV5MlJ6bHI1YXBPOWtETHdwODA1NUYx?=
+ =?utf-8?Q?mQVMFhim?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b44709f2-3a4a-4a45-14f5-08d8c6e1f88e
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2021 18:48:31.4886
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NvkPzCFD9laIUMCG97Lr61Ds40v9s6QjUDi6BAtNrcksSs3DV912Qu1kmQHOG6UcluGKo/cVn/sOYjVRzKDtZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1354
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Feb 2021 12:49:12 -0500
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> On 2/1/21 12:14 PM, Cornelia Huck wrote:
-> > On Mon, 1 Feb 2021 16:28:27 +0000
-> > Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> >   
-> >> This patch doesn't change any logic but only align to the concept of
-> >> vfio_pci_core extensions. Extensions that are related to a platform
-> >> and not to a specific vendor of PCI devices should be part of the core
-> >> driver. Extensions that are specific for PCI device vendor should go
-> >> to a dedicated vendor vfio-pci driver.  
-> > 
-> > My understanding is that igd means support for Intel graphics, i.e. a
-> > strict subset of x86. If there are other future extensions that e.g.
-> > only make sense for some devices found only on AMD systems, I don't
-> > think they should all be included under the same x86 umbrella.
-> > 
-> > Similar reasoning for nvlink, that only seems to cover support for some
-> > GPUs under Power, and is not a general platform-specific extension IIUC.
-> > 
-> > We can arguably do the zdev -> s390 rename (as zpci appears only on
-> > s390, and all PCI devices will be zpci on that platform), although I'm
-> > not sure about the benefit.  
+On 1/29/21 11:44 AM, Venu Busireddy wrote:
+> On 2021-01-26 11:36:46 -0600, Tom Lendacky wrote:
+>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> When SEV-ES is enabled, it is not possible modify the guests register
+>> state after it has been initially created, encrypted and measured.
+>>
+>> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
+>> hypervisor cannot emulate this because it cannot update the AP register
+>> state. For the very first boot by an AP, the reset vector CS segment
+>> value and the EIP value must be programmed before the register has been
+>> encrypted and measured. Search the guest firmware for the guest for a
+>> specific GUID that tells Qemu the value of the reset vector to use.
+>>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>> Cc: Richard Henderson <richard.henderson@linaro.org>
+>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>> Cc: Marcelo Tosatti <mtosatti@redhat.com>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+...
+>> +
+>> +    /*
+>> +     * SEV info block not found in the Firmware GUID Table (or there isn't
+>> +     * a Firmware GUID Table), fall back to the original implementation.
+>> +     */
+>> +    data = flash_ptr + flash_size - 0x20;
 > 
-> As far as I can tell, there isn't any benefit for s390 it's just 
-> "re-branding" to match the platform name rather than the zdev moniker, 
-> which admittedly perhaps makes it more clear to someone outside of s390 
-> that any PCI device on s390 is a zdev/zpci type, and thus will use this 
-> extension to vfio_pci(_core).  This would still be true even if we added 
-> something later that builds atop it (e.g. a platform-specific device 
-> like ism-vfio-pci).  Or for that matter, mlx5 via vfio-pci on s390x uses 
-> these zdev extensions today and would need to continue using them in a 
-> world where mlx5-vfio-pci.ko exists.
+> Even if the SEV_INFO_BLOCK_GUID is always located at 32 bytes from the end
+> of the flash, isn't it better to define a constant with a value of 0x20?
+
+A follow-on patch that updates both this and the table parser code from 
+James would probably be best.
+
+Thanks,
+Tom
+
 > 
-> I guess all that to say: if such a rename matches the 'grand scheme' of 
-> this design where we treat arch-level extensions to vfio_pci(_core) as 
-> "vfio_pci_(arch)" then I'm not particularly opposed to the rename.  But 
-> by itself it's not very exciting :)
-
-This all seems like the wrong direction to me.  The goal here is to
-modularize vfio-pci into a core library and derived vendor modules that
-make use of that core library.  If existing device specific extensions
-within vfio-pci cannot be turned into vendor modules through this
-support and are instead redefined as platform specific features of the
-new core library, that feels like we're already admitting failure of
-this core library to support known devices, let alone future devices.
-
-IGD is a specific set of devices.  They happen to rely on some platform
-specific support, whose availability should be determined via the
-vendor module probe callback.  Packing that support into an "x86"
-component as part of the core feels not only short sighted, but also
-avoids addressing the issues around how userspace determines an optimal
-module to use for a device.  Thanks,
-
-Alex
-
-> >> For now, x86 extensions will include only igd.
-> >>
-> >> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
-> >> ---
-> >>   drivers/vfio/pci/Kconfig                            | 13 ++++++-------
-> >>   drivers/vfio/pci/Makefile                           |  2 +-
-> >>   drivers/vfio/pci/vfio_pci_core.c                    |  2 +-
-> >>   drivers/vfio/pci/vfio_pci_private.h                 |  2 +-
-> >>   drivers/vfio/pci/{vfio_pci_igd.c => vfio_pci_x86.c} |  0
-> >>   5 files changed, 9 insertions(+), 10 deletions(-)
-> >>   rename drivers/vfio/pci/{vfio_pci_igd.c => vfio_pci_x86.c} (100%)  
-> > 
-> > (...)
-> >   
-> >> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> >> index c559027def2d..e0e258c37fb5 100644
-> >> --- a/drivers/vfio/pci/vfio_pci_core.c
-> >> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> >> @@ -328,7 +328,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
-> >>   
-> >>   	if (vfio_pci_is_vga(pdev) &&
-> >>   	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
-> >> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
-> >> +	    IS_ENABLED(CONFIG_VFIO_PCI_X86)) {
-> >>   		ret = vfio_pci_igd_init(vdev);  
-> > 
-> > This one explicitly checks for Intel devices, so I'm not sure why you
-> > want to generalize this to x86?
-> >   
-> >>   		if (ret && ret != -ENODEV) {
-> >>   			pci_warn(pdev, "Failed to setup Intel IGD regions\n");  
-> >   
-> 
-
+>> +
