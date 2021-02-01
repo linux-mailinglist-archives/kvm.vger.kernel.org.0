@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1DB130A543
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 11:23:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DF2D30A546
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 11:25:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232946AbhBAKWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 05:22:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28019 "EHLO
+        id S233018AbhBAKYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 05:24:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56634 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232679AbhBAKWw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 05:22:52 -0500
+        by vger.kernel.org with ESMTP id S232290AbhBAKYx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 05:24:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612174886;
+        s=mimecast20190719; t=1612175006;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=76s0xuNfIMYw2Zjhat6XiJ6WTlVIEyZzd1HMUW58qTQ=;
-        b=f+JEU8TezlIsDUfDZabQ3/XDaKYPHzyAqOnzyBMmJEQFkmnb8Lv8bRtvOAyhgfXoAoSH1R
-        rxti3UjtA9+hGh+t5JNIc34pc4Dfz6SZh308NZX4rs0QiTFTnMgskBvRN438dvlwoxUztk
-        mQiNrSQ+NqCArOhsutimPJgMxOqtX4I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-obo0S1CVPhiLZXvBWfeIdg-1; Mon, 01 Feb 2021 05:21:25 -0500
-X-MC-Unique: obo0S1CVPhiLZXvBWfeIdg-1
-Received: by mail-wm1-f69.google.com with SMTP id s10so4354699wme.8
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 02:21:25 -0800 (PST)
+        bh=P3maFpmEyWTTIxJdB5XqMO6xuqP9Omhc7XlJTDFaYw0=;
+        b=ZVm24BRa0jYW6CFsLw9y527DAPr0Dx/YLxBjDeHKw3pJKZjOTQtIMUu7TxeSCrhwWWPIYh
+        PrNK7v/zdjS1bf7isjve5M4hAk5lMPvIjRzJQkXO9F3cKyPbwrshK9YzzPT2mbD89KGd4X
+        Sl+234IGOMjJnF3Gb2x3M+RPzgsR2WQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-v_8qlaHJMUGC6TCA0CeawQ-1; Mon, 01 Feb 2021 05:23:24 -0500
+X-MC-Unique: v_8qlaHJMUGC6TCA0CeawQ-1
+Received: by mail-wm1-f72.google.com with SMTP id z188so7539908wme.1
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 02:23:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=76s0xuNfIMYw2Zjhat6XiJ6WTlVIEyZzd1HMUW58qTQ=;
-        b=C/ZzneMcZNBP0T7RhOg4VnyPZOou8WigvsQ6fPwWxlKkJqYjxqdeR2GfRspQLGSCWW
-         ISjETqWLCBkMNtfWt20oQsd33TmIqKWzmCKR2YJiGuMwIQFzgcb9FNc78A8A0jyLrOmP
-         XUvglkrJSqP2OLDjlyxiIJojMaeWw3JNEONRYuiuTDwp01cHgmidZR29B6mEdo9EvdkU
-         d9V/UU9nGdI1+cc2v4ipB/YWIrudqNalH/SikuRSsXAmDzgZEOeHkohnNYYdPLd5ukXM
-         V+VsTVcqnOIbbBqgeu+KqkG742OiAGvc3rpDShctvo53jDLYlSzQXoq663Dp+sR2ceFE
-         icNQ==
-X-Gm-Message-State: AOAM530qZNL7dBxSMKUEmMDrBRBqJ3HInC56qWZwS7MhUkaSQSBMqEZf
-        Mtq+xKxwzxeBnbCGmkZaavJsD3EcTla6uK5dOt82R8+E4OJikXGfws22sm0F1CwfblotES/I4LD
-        rFldQTXp5sQgO
-X-Received: by 2002:a7b:ce11:: with SMTP id m17mr14042898wmc.158.1612174883999;
-        Mon, 01 Feb 2021 02:21:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzLJ3fELTf0uO9C4XANpCrWi3BAnIjUJpj+2gUWkb8bzvrz1rKoHjP1RKX8FAajUrd4qAIQvw==
-X-Received: by 2002:a7b:ce11:: with SMTP id m17mr14042885wmc.158.1612174883799;
-        Mon, 01 Feb 2021 02:21:23 -0800 (PST)
+        bh=P3maFpmEyWTTIxJdB5XqMO6xuqP9Omhc7XlJTDFaYw0=;
+        b=mAL5RNIXcoAqD+YlTKjxUlxJ1mq/DELjg1Oc8/gQuzosyzaCJ9UgkxM5MBSNiUlCiU
+         7Iy3MXURX0nC9wTu299Yy9gzoiC3xBEbKyVzKL0Xzrl2k6yjMa/mRq0c6zsZZ5Lh+KwS
+         1lpB/opa/OCNQc8rFC6OU3QB9UHUyhO82HAvmLcADpY5IJLCPVbRAm1HyphIRb+krHfK
+         E4bhBD1fn2zcffpE/yqbunvInmS3ai8i5QcPByHsrbS7fperY194IwQxbfZy0yW2SVY9
+         JeKPLHFan7AKRjt9L0F3Sck9NSk06brbKBj+F2GQ9JxozyIYdfpffA2jPM3VvYpX//3F
+         xoWw==
+X-Gm-Message-State: AOAM531Puyum+nLgp5oSJNiu4cuG7Ry8khAed/x9iIQLJ7Jv8sfRhMFl
+        L8fd2G2Rda8HCC4MCkxHA0OYtzxvtaAIZ9zMNP2w6b66RH9UHHCPIlkSWisAFqGmemifcDpqoqS
+        vuhZLPumyQmQJ
+X-Received: by 2002:a05:600c:154c:: with SMTP id f12mr14733435wmg.40.1612175003524;
+        Mon, 01 Feb 2021 02:23:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwV/0SDXh0y/M5k5EK03Sm9O7AP+3Ymc68INpoLqvlEB+qZ48bkqmuuTgVUacF0hlX4wt0Axw==
+X-Received: by 2002:a05:600c:154c:: with SMTP id f12mr14733418wmg.40.1612175003301;
+        Mon, 01 Feb 2021 02:23:23 -0800 (PST)
 Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id e4sm26994287wrw.96.2021.02.01.02.21.22
+        by smtp.gmail.com with ESMTPSA id a17sm23415082wrx.63.2021.02.01.02.23.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 02:21:23 -0800 (PST)
-Date:   Mon, 1 Feb 2021 11:21:20 +0100
+        Mon, 01 Feb 2021 02:23:22 -0800 (PST)
+Date:   Mon, 1 Feb 2021 11:23:20 +0100
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     virtualization@lists.linux-foundation.org,
@@ -61,70 +61,38 @@ Cc:     virtualization@lists.linux-foundation.org,
         Stefan Hajnoczi <stefanha@redhat.com>,
         linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 03/10] vringh: reset kiov 'consumed' field in
- __vringh_iov()
-Message-ID: <20210201102120.kvbpbne3spaqv6yz@steredhat>
+Subject: Re: [PATCH RFC v2 04/10] vringh: implement vringh_kiov_advance()
+Message-ID: <20210201102320.rk77l2aus3ku4ezz@steredhat>
 References: <20210128144127.113245-1-sgarzare@redhat.com>
- <20210128144127.113245-4-sgarzare@redhat.com>
- <62bb2e93-4ac3-edf5-2baa-4c2be8257cf0@redhat.com>
+ <20210128144127.113245-5-sgarzare@redhat.com>
+ <78247eb0-8e6e-f2fa-a693-1b0f14db61dd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <62bb2e93-4ac3-edf5-2baa-4c2be8257cf0@redhat.com>
+In-Reply-To: <78247eb0-8e6e-f2fa-a693-1b0f14db61dd@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 01:40:01PM +0800, Jason Wang wrote:
+On Mon, Feb 01, 2021 at 01:43:23PM +0800, Jason Wang wrote:
 >
 >On 2021/1/28 下午10:41, Stefano Garzarella wrote:
->>__vringh_iov() overwrites the contents of riov and wiov, in fact it
->>resets the 'i' and 'used' fields, but also the consumed field should
->>be reset to avoid an inconsistent state.
+>>In some cases, it may be useful to provide a way to skip a number
+>>of bytes in a vringh_kiov.
 >>
->>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>Let's implement vringh_kiov_advance() for this purpose, reusing the
+>>code from vringh_iov_xfer().
+>>We replace that code calling the new vringh_kiov_advance().
 >
 >
->I had a question(I remember we had some discussion like this but I 
->forget the conclusion):
-
-Sorry, I forgot to update you.
-
+>Acked-by: Jason Wang <jasowang@redhat.com>
 >
->I see e.g in vringh_getdesc_kern() it has the following comment:
->
->/*
-> * Note that you may need to clean up riov and wiov, even on error!
-> */
->
->So it looks to me the correct way is to call vringh_kiov_cleanup() 
->before?
+>In the long run we need to switch to use iov iterator library instead.
 
-Looking at the code the right pattern should be:
-
-     vringh_getdesc_*(..., &out_iov, &in_iov, ...);
-
-     // use out_iov and in_iov
-
-     vringh_kiov_cleanup(&out_iov);
-     vringh_kiov_cleanup(&in_iov);
-
-This because vringh_getdesc_*() calls __vringh_iov() where 
-resize_iovec() is called to allocate the iov wrapped by 'struct 
-vringh_kiov' and vringh_kiov_cleanup() frees that memory.
-
-Looking better, __vringh_iov() is able to extend a 'vringh_kiov' 
-pre-allocated, so in order to avoid to allocate and free the iov for 
-each request we can avoid to call vringh_kiov_cleanup(), but this patch 
-is needed to avoid an inconsistent state.
-
-And also patch "vdpa_sim: cleanup kiovs in vdpasim_free()" is required 
-to free the iov when the device is going away.
-
-Does that make sense to you?
-
-Maybe I should add a comment in vringh.c to explain this better.
+Yes I agree.
+I've tried to do this, but it requires quite a bit of work to change 
+vringh, I'll put it on my todo list.
 
 Thanks,
 Stefano
@@ -133,23 +101,82 @@ Stefano
 >Thanks
 >
 >
->>---
->>  drivers/vhost/vringh.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
 >>
+>>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>---
+>>  include/linux/vringh.h |  2 ++
+>>  drivers/vhost/vringh.c | 41 +++++++++++++++++++++++++++++------------
+>>  2 files changed, 31 insertions(+), 12 deletions(-)
+>>
+>>diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+>>index 9c077863c8f6..755211ebd195 100644
+>>--- a/include/linux/vringh.h
+>>+++ b/include/linux/vringh.h
+>>@@ -199,6 +199,8 @@ static inline void vringh_kiov_cleanup(struct vringh_kiov *kiov)
+>>  	kiov->iov = NULL;
+>>  }
+>>+void vringh_kiov_advance(struct vringh_kiov *kiov, size_t len);
+>>+
+>>  int vringh_getdesc_kern(struct vringh *vrh,
+>>  			struct vringh_kiov *riov,
+>>  			struct vringh_kiov *wiov,
 >>diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
->>index f68122705719..bee63d68201a 100644
+>>index bee63d68201a..4d800e4f31ca 100644
 >>--- a/drivers/vhost/vringh.c
 >>+++ b/drivers/vhost/vringh.c
->>@@ -290,9 +290,9 @@ __vringh_iov(struct vringh *vrh, u16 i,
->>  		return -EINVAL;
->>  	if (riov)
->>-		riov->i = riov->used = 0;
->>+		riov->i = riov->used = riov->consumed = 0;
->>  	if (wiov)
->>-		wiov->i = wiov->used = 0;
->>+		wiov->i = wiov->used = wiov->consumed = 0;
->>  	for (;;) {
->>  		void *addr;
+>>@@ -75,6 +75,34 @@ static inline int __vringh_get_head(const struct vringh *vrh,
+>>  	return head;
+>>  }
+>>+/**
+>>+ * vringh_kiov_advance - skip bytes from vring_kiov
+>>+ * @iov: an iov passed to vringh_getdesc_*() (updated as we consume)
+>>+ * @len: the maximum length to advance
+>>+ */
+>>+void vringh_kiov_advance(struct vringh_kiov *iov, size_t len)
+>>+{
+>>+	while (len && iov->i < iov->used) {
+>>+		size_t partlen = min(iov->iov[iov->i].iov_len, len);
+>>+
+>>+		iov->consumed += partlen;
+>>+		iov->iov[iov->i].iov_len -= partlen;
+>>+		iov->iov[iov->i].iov_base += partlen;
+>>+
+>>+		if (!iov->iov[iov->i].iov_len) {
+>>+			/* Fix up old iov element then increment. */
+>>+			iov->iov[iov->i].iov_len = iov->consumed;
+>>+			iov->iov[iov->i].iov_base -= iov->consumed;
+>>+
+>>+			iov->consumed = 0;
+>>+			iov->i++;
+>>+		}
+>>+
+>>+		len -= partlen;
+>>+	}
+>>+}
+>>+EXPORT_SYMBOL(vringh_kiov_advance);
+>>+
+>>  /* Copy some bytes to/from the iovec.  Returns num copied. */
+>>  static inline ssize_t vringh_iov_xfer(struct vringh *vrh,
+>>  				      struct vringh_kiov *iov,
+>>@@ -95,19 +123,8 @@ static inline ssize_t vringh_iov_xfer(struct vringh *vrh,
+>>  		done += partlen;
+>>  		len -= partlen;
+>>  		ptr += partlen;
+>>-		iov->consumed += partlen;
+>>-		iov->iov[iov->i].iov_len -= partlen;
+>>-		iov->iov[iov->i].iov_base += partlen;
+>>-		if (!iov->iov[iov->i].iov_len) {
+>>-			/* Fix up old iov element then increment. */
+>>-			iov->iov[iov->i].iov_len = iov->consumed;
+>>-			iov->iov[iov->i].iov_base -= iov->consumed;
+>>-
+>>-			
+>>-			iov->consumed = 0;
+>>-			iov->i++;
+>>-		}
+>>+		vringh_kiov_advance(iov, partlen);
+>>  	}
+>>  	return done;
+>>  }
 >
 
