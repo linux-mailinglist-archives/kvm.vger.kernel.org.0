@@ -2,124 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82CCB30A8F1
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:40:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 27B8330A902
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:47:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232254AbhBANjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 08:39:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47066 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232196AbhBANjh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 08:39:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612186690;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wIidTHAlvNTypJNX4Ptuq/3z20fdadApbhIsv9h3oks=;
-        b=O0nla96WS5I3mFvU++6qS29oNBKpMX2rTChP2ci1G42uqdkY49GmSCmCOzARGGg5sw9AAl
-        Anik7RCQBurfH3yeHaa26leYwdapXeg6SVnOeNwjP3bTTiA4U+k3YWAVH1rlgXWMKS3/3t
-        G/LQIpNFSVtDDlHt9oFgMwTFik5I8S4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-h1K7icjwPMi53r4FrzYRAg-1; Mon, 01 Feb 2021 08:38:08 -0500
-X-MC-Unique: h1K7icjwPMi53r4FrzYRAg-1
-Received: by mail-ed1-f71.google.com with SMTP id o8so7956085edh.12
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 05:38:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wIidTHAlvNTypJNX4Ptuq/3z20fdadApbhIsv9h3oks=;
-        b=fEAdZv98nin/LP+WZ56gk/RHnx6XMZ8oMpqmzqPU8jRmqZW7cULcpNTwf++lQYlmjW
-         V9ifjKpLtq+Ur+hQHqxklSdyBm5/rW0Yajs+OEMCogLs3GkU8DJSro6oT/Bsc9FnGbs3
-         CKZUhkOux3qLuUZdifB/6H0vXN8gxyhdXWji0eyVcVg9ONLrjwtqxeWUIlgWhFwb0l5i
-         JewjsPFkxEaGpMHoyeLi3yfsnYVo3feNai/KUMzw821WhNZfWmmdU5W6ssRi8k3/gGWV
-         9/MXHbJLUT7bhrXbtwoOK3xt+j0VJsN4M6QypQsiVMDrlb/FI3lmAhS6gt66MyMEzGpa
-         QJ+Q==
-X-Gm-Message-State: AOAM531jP3zrbNktICNHBhueED8niJXYGr8Q3oNXprrx3G15W222fYrK
-        USuQawwxSKkYFT1wthRDm7SILXYVwQ8QKpUcSu0l/+EMos6UKKFHKrQ9A5XXEirroc4fQVT7q3K
-        9oF4jjNuzn4xv
-X-Received: by 2002:a17:906:25db:: with SMTP id n27mr17769655ejb.552.1612186687245;
-        Mon, 01 Feb 2021 05:38:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz7eaJLZccsr/7XoXoaYOhRjGJ3l7lY+Ixm9zSwzLhn0XeXkuWxpJSlECBzs8FAsL/W8npLDg==
-X-Received: by 2002:a17:906:25db:: with SMTP id n27mr17769642ejb.552.1612186687077;
-        Mon, 01 Feb 2021 05:38:07 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id bk2sm8137778ejb.98.2021.02.01.05.38.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Feb 2021 05:38:06 -0800 (PST)
-Subject: Re: [stable-5.4][PATCH] KVM: Forbid the use of tagged userspace
- addresses for memslots
-To:     Marc Zyngier <maz@kernel.org>, stable@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, kvm@vger.kernel.org,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210201133137.3541896-1-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b08e3ccf-9a69-819a-8632-46c82dade2fa@redhat.com>
-Date:   Mon, 1 Feb 2021 14:38:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S232142AbhBANqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 08:46:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47650 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231284AbhBANqg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 08:46:36 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9FAC864D99;
+        Mon,  1 Feb 2021 13:45:55 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l6ZWb-00BHWZ-EK; Mon, 01 Feb 2021 13:45:53 +0000
 MIME-Version: 1.0
-In-Reply-To: <20210201133137.3541896-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Date:   Mon, 01 Feb 2021 13:45:53 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
+        kvmarm@lists.cs.columbia.edu,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        James Morse <james.morse@arm.com>,
+        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: arm64: gen-hyprel.c:40:10: fatal error: generated/autoconf.h: No
+ such file or directory
+In-Reply-To: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
+References: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <5f072f84c7c9b03ded810e56687935b2@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, lkft-triage@lists.linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, sfr@canb.auug.org.au, arnd@arndb.de, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/02/21 14:31, Marc Zyngier wrote:
-> commit 139bc8a6146d92822c866cf2fd410159c56b3648 upstream.
+On 2021-02-01 13:38, Naresh Kamboju wrote:
+> Linux next 20210201 tag arm64 builds failed.
+> kernel config attached to this email.
 > 
-> The use of a tagged address could be pretty confusing for the
-> whole memslot infrastructure as well as the MMU notifiers.
+> BAD:    next-20210201
+> GOOD: next-20210129
 > 
-> Forbid it altogether, as it never quite worked the first place.
+> make --silent --keep-going --jobs=8
+> O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64
+> CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc'
+> 'HOSTCC=sccache gcc'
+> arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:40:10: fatal error:
+> generated/autoconf.h: No such file or directory
+>    40 | #include <generated/autoconf.h>
+>       |          ^~~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
 > 
-> Cc: stable@vger.kernel.org
-> Reported-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   Documentation/virt/kvm/api.txt | 3 +++
->   virt/kvm/kvm_main.c            | 1 +
->   2 files changed, 4 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
-> index a18e996fa54b..7064efd3b5ea 100644
-> --- a/Documentation/virt/kvm/api.txt
-> +++ b/Documentation/virt/kvm/api.txt
-> @@ -1132,6 +1132,9 @@ field userspace_addr, which must point at user addressable memory for
->   the entire memory slot size.  Any object may back this memory, including
->   anonymous memory, ordinary files, and hugetlbfs.
->   
-> +On architectures that support a form of address tagging, userspace_addr must
-> +be an untagged address.
-> +
->   It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
->   be identical.  This allows large pages in the guest to be backed by large
->   pages in the host.
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8f3b40ec02b7..f25b5043cbca 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1017,6 +1017,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   	/* We can read the guest memory with __xxx_user() later on. */
->   	if ((id < KVM_USER_MEM_SLOTS) &&
->   	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
-> +	     (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
->   	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
->   			mem->memory_size)))
->   		goto out;
-> 
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
-Indeed untagged_addr was added in 5.3.
+Could you please check with the fix suggested at [1]?
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks,
 
-Paolo
+         M.
 
+[1] https://lore.kernel.org/r/20210201104251.5foc64qq3ewgnhuz@google.com
+-- 
+Jazz is not dead. It just smells funny...
