@@ -2,145 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 499EC30A7B6
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 13:36:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAB7230A7B5
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 13:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230527AbhBAMgV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 07:36:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23145 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229707AbhBAMgT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 07:36:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612182892;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cBf4pU0yhonUe/A/Ug+skhbGlNPdOQ4PTTb8R0T6PjI=;
-        b=fd/JTgC1oLgwQHIYCBLlkXX2QyuGEoWEV22ZjPGDYCGXw1Qpa+m+ZjZ/r+/8IeLowJwEjk
-        A0zE9/BEN6kTTq3DybZlCVea+SNkHZJL7J4UYGGywUhdGZj1a8h7CKcBrvjrmN+hDM+0Y5
-        N1+BmfnQiAQpSfk4f5nbUtaCHPkd7sc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-rhsUc5ZuOLOO2u1-MlVZBg-1; Mon, 01 Feb 2021 07:34:50 -0500
-X-MC-Unique: rhsUc5ZuOLOO2u1-MlVZBg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D75B192FDAA;
-        Mon,  1 Feb 2021 12:34:49 +0000 (UTC)
-Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 31C241F6;
-        Mon,  1 Feb 2021 12:34:44 +0000 (UTC)
-Date:   Mon, 1 Feb 2021 13:34:40 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V3 7/9] vfio: iommu driver notify callback
-Message-ID: <20210201133440.001850f4.cohuck@redhat.com>
-In-Reply-To: <b3260683-7c45-4648-3b4b-3c81fb5ff5f7@oracle.com>
-References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
-        <1611939252-7240-8-git-send-email-steven.sistare@oracle.com>
-        <20210129145719.1b6cbe9c@omen.home.shazbot.org>
-        <b3260683-7c45-4648-3b4b-3c81fb5ff5f7@oracle.com>
-Organization: Red Hat GmbH
+        id S229892AbhBAMgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 07:36:18 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11653 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229500AbhBAMgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 07:36:17 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DTnSQ63XCz162Rt;
+        Mon,  1 Feb 2021 20:34:14 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Feb 2021 20:35:28 +0800
+Subject: Re: [PATCH v13 04/15] iommu/smmuv3: Allow s1 and s2 configs to
+ coexist
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-5-eric.auger@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <01cf1f27-43dc-fb4d-6755-c34c8cac8ec2@huawei.com>
+Date:   Mon, 1 Feb 2021 20:35:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201118112151.25412-5-eric.auger@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 30 Jan 2021 11:51:41 -0500
-Steven Sistare <steven.sistare@oracle.com> wrote:
+Hi Eric,
 
-> On 1/29/2021 4:57 PM, Alex Williamson wrote:
-> > On Fri, 29 Jan 2021 08:54:10 -0800
-> > Steve Sistare <steven.sistare@oracle.com> wrote:
-> >   
-> >> Define a vfio_iommu_driver_ops notify callback, for sending events to
-> >> the driver.  Drivers are not required to provide the callback, and
-> >> may ignore any events.  The handling of events is driver specific.
-> >>
-> >> Define the CONTAINER_CLOSE event, called when the container's file
-> >> descriptor is closed.  This event signifies that no further state changes
-> >> will occur via container ioctl's.
-> >>
-> >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >> ---
-> >>  drivers/vfio/vfio.c  | 5 +++++
-> >>  include/linux/vfio.h | 5 +++++
-> >>  2 files changed, 10 insertions(+)
-> >>
-> >> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-> >> index 262ab0e..99458fc 100644
-> >> --- a/drivers/vfio/vfio.c
-> >> +++ b/drivers/vfio/vfio.c
-> >> @@ -1220,6 +1220,11 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
-> >>  static int vfio_fops_release(struct inode *inode, struct file *filep)
-> >>  {
-> >>  	struct vfio_container *container = filep->private_data;
-> >> +	struct vfio_iommu_driver *driver = container->iommu_driver;
-> >> +
-> >> +	if (driver && driver->ops->notify)
-> >> +		driver->ops->notify(container->iommu_data,
-> >> +				    VFIO_DRIVER_NOTIFY_CONTAINER_CLOSE, NULL);
-> >>  
-> >>  	filep->private_data = NULL;
-> >>  
-> >> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> >> index 38d3c6a..9642579 100644
-> >> --- a/include/linux/vfio.h
-> >> +++ b/include/linux/vfio.h
-> >> @@ -57,6 +57,9 @@ extern int vfio_add_group_dev(struct device *dev,
-> >>  extern void vfio_device_put(struct vfio_device *device);
-> >>  extern void *vfio_device_data(struct vfio_device *device);
-> >>  
-> >> +/* events for the backend driver notify callback */
-> >> +#define VFIO_DRIVER_NOTIFY_CONTAINER_CLOSE	1  
-> > 
-> > We should use an enum for type checking.  
-> 
-> Agreed.
-> I see you changed the value to 0.  Do you want to reserve 0 for invalid-event?
-> (I know, this is internal and can be changed).  Your call.
+On 2020/11/18 19:21, Eric Auger wrote:
+> In true nested mode, both s1_cfg and s2_cfg will coexist.
+> Let's remove the union and add a "set" field in each
+> config structure telling whether the config is set and needs
+> to be applied when writing the STE. In legacy nested mode,
+> only the 2d stage is used. In true nested mode, the "set" field
+nit: s/2d/2nd
 
-I'm not sure what we would use an invalid-event event for... the type
-checking provided by the enum should be enough?
+> will be set when the guest passes the pasid table.
+nit: ... the "set" filed of s1_cfg and s2_cfg will be set ...
 
 > 
-> >> +
-> >>  /**
-> >>   * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-> >>   */
-> >> @@ -90,6 +93,8 @@ struct vfio_iommu_driver_ops {
-> >>  					       struct notifier_block *nb);
-> >>  	int		(*dma_rw)(void *iommu_data, dma_addr_t user_iova,
-> >>  				  void *data, size_t count, bool write);
-> >> +	void		(*notify)(void *iommu_data, unsigned int event,
-> >> +				  void *data);  
-> > 
-> > I'm not sure why we're pre-enabling this 3rd arg, do you have some
-> > short term usage in mind that we can't easily add on demand later?
-> > This is an internal API, not one we need to keep stable.  Thanks,  
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> No short term need, just seems sensible for an event callback.  I was mimic'ing the 
-> signature of the callback for vfio_register_notifier. Your call.
+> ---
+> v12 -> v13:
+> - does not dynamically allocate s1-cfg and s2_cfg anymore. Add
+>   the set field
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 43 +++++++++++++--------
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++--
+>  2 files changed, 31 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 1e4acc7f3d3c..18ac5af1b284 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -1195,8 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  	u64 val = le64_to_cpu(dst[0]);
+>  	bool ste_live = false;
+>  	struct arm_smmu_device *smmu = NULL;
+> -	struct arm_smmu_s1_cfg *s1_cfg = NULL;
+> -	struct arm_smmu_s2_cfg *s2_cfg = NULL;
+> +	struct arm_smmu_s1_cfg *s1_cfg;
+> +	struct arm_smmu_s2_cfg *s2_cfg;
+>  	struct arm_smmu_domain *smmu_domain = NULL;
+>  	struct arm_smmu_cmdq_ent prefetch_cmd = {
+>  		.opcode		= CMDQ_OP_PREFETCH_CFG,
+> @@ -1211,13 +1211,24 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  	}
+>  
+>  	if (smmu_domain) {
+> +		s1_cfg = &smmu_domain->s1_cfg;
+> +		s2_cfg = &smmu_domain->s2_cfg;
+> +
+>  		switch (smmu_domain->stage) {
+>  		case ARM_SMMU_DOMAIN_S1:
+> -			s1_cfg = &smmu_domain->s1_cfg;
+> +			s1_cfg->set = true;
+> +			s2_cfg->set = false;
+>  			break;
+>  		case ARM_SMMU_DOMAIN_S2:
+> +			s1_cfg->set = false;
+> +			s2_cfg->set = true;
+> +			break;
+>  		case ARM_SMMU_DOMAIN_NESTED:
+> -			s2_cfg = &smmu_domain->s2_cfg;
+> +			/*
+> +			 * Actual usage of stage 1 depends on nested mode:
+> +			 * legacy (2d stage only) or true nested mode
+> +			 */
+> +			s2_cfg->set = true;
+>  			break;
+>  		default:
+>  			break;
+> @@ -1244,7 +1255,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  	val = STRTAB_STE_0_V;
+>  
+>  	/* Bypass/fault */
+> -	if (!smmu_domain || !(s1_cfg || s2_cfg)) {
+> +	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
+>  		if (!smmu_domain && disable_bypass)
+>  			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
+>  		else
+> @@ -1263,7 +1274,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  		return;
+>  	}
+>  
+> -	if (s1_cfg) {
+> +	if (s1_cfg->set) {
+>  		BUG_ON(ste_live);
+>  		dst[1] = cpu_to_le64(
+>  			 FIELD_PREP(STRTAB_STE_1_S1DSS, STRTAB_STE_1_S1DSS_SSID0) |
+> @@ -1282,7 +1293,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  			FIELD_PREP(STRTAB_STE_0_S1FMT, s1_cfg->s1fmt);
+>  	}
+>  
+> -	if (s2_cfg) {
+> +	if (s2_cfg->set) {
+>  		BUG_ON(ste_live);
+>  		dst[2] = cpu_to_le64(
+>  			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
+> @@ -1846,24 +1857,24 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
+>  {
+>  	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+>  	struct arm_smmu_device *smmu = smmu_domain->smmu;
+> +	struct arm_smmu_s1_cfg *s1_cfg = &smmu_domain->s1_cfg;
+> +	struct arm_smmu_s2_cfg *s2_cfg = &smmu_domain->s2_cfg;
+>  
+>  	iommu_put_dma_cookie(domain);
+>  	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
+>  
+>  	/* Free the CD and ASID, if we allocated them */
+> -	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+> -		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+> -
+> +	if (s1_cfg->set) {
+>  		/* Prevent SVA from touching the CD while we're freeing it */
+>  		mutex_lock(&arm_smmu_asid_lock);
+> -		if (cfg->cdcfg.cdtab)
+> +		if (s1_cfg->cdcfg.cdtab)
+>  			arm_smmu_free_cd_tables(smmu_domain);
+> -		arm_smmu_free_asid(&cfg->cd);
+> +		arm_smmu_free_asid(&s1_cfg->cd);
+>  		mutex_unlock(&arm_smmu_asid_lock);
+> -	} else {
+> -		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+> -		if (cfg->vmid)
+> -			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
+> +	}
+> +	if (s2_cfg->set) {
+> +		if (s2_cfg->vmid)
+> +			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
+>  	}
+>  
+>  	kfree(smmu_domain);
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> index 19196eea7c1d..07f59252dd21 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+> @@ -562,12 +562,14 @@ struct arm_smmu_s1_cfg {
+>  	struct arm_smmu_ctx_desc	cd;
+>  	u8				s1fmt;
+>  	u8				s1cdmax;
+> +	bool				set;
+>  };
+>  
+>  struct arm_smmu_s2_cfg {
+>  	u16				vmid;
+>  	u64				vttbr;
+>  	u64				vtcr;
+> +	bool				set;
+>  };
+>  
+>  struct arm_smmu_strtab_cfg {
+> @@ -678,10 +680,8 @@ struct arm_smmu_domain {
+>  	atomic_t			nr_ats_masters;
+>  
+>  	enum arm_smmu_domain_stage	stage;
+> -	union {
+> -		struct arm_smmu_s1_cfg	s1_cfg;
+> -		struct arm_smmu_s2_cfg	s2_cfg;
+> -	};
+> +	struct arm_smmu_s1_cfg	s1_cfg;
+> +	struct arm_smmu_s2_cfg	s2_cfg;
+>  
+>  	struct iommu_domain		domain;
+>  
+Other looks good to me. ;-)
+> 
 
-I'd drop *data for now, if we don't have a concrete use case.
-
-> 
-> - Steve
-> 
-> > 
-> > Alex
-> >   
-> >>  };
-> >>  
-> >>  extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);  
-> >   
-> 
-
+Thanks,
+Keqian
