@@ -2,147 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53A6730ADB1
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:25:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60F9630ADAA
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:22:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229883AbhBARYN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 12:24:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbhBARYM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 12:24:12 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A61CBC0613ED
-        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:23:32 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id c12so17475933wrc.7
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:23:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=references:user-agent:from:to:cc:subject:date:in-reply-to
-         :message-id:mime-version:content-transfer-encoding;
-        bh=ucsvOyKHI+j26d1+CCymR51CUFNgYRXthquyKWI9Qpo=;
-        b=QJtyUOJLHrWfcXzoFmh9ZJaP2+QypJrswtnJF+QFICsC/koCEHML57IN3oHC0W4/PC
-         UPCsE3NDEUbOQe14tOF5VQIGHJpS75kjFcujixlCIOPYlOa0fvUqT8mS/EPJqfmaqi2o
-         jky/rKVM6XtIR+2qY3jo16QA2ATZpZANEad/pYX9t7BIQxFU6yfCddgXAQEQQeKXwWx6
-         06U2isp8ecUdy6P/wiKMTOl9/tEjciI71QDO+7Hm1GTfx8YW9HgAqDndLLF7Qp5cKPu6
-         Ij2mhffUsuPrhl7WCzVwQ+OqgHOiP4bpaXvEyduraJOJlcwDSHfFFZCPsWCbVhSzEzxp
-         cQlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
-         :in-reply-to:message-id:mime-version:content-transfer-encoding;
-        bh=ucsvOyKHI+j26d1+CCymR51CUFNgYRXthquyKWI9Qpo=;
-        b=DY4D497bPYKCO+vQy2HjoB9WTr0ywg/1FDNritnf+qUIC1ZBvIXuhMkeiQ93zfB2VG
-         /nWMvI7gVsl/ITF7wtzsUY09JFiJi6k/42O/F/jhQ+1yV+tEjtiDD2dnfKhoRX8eAeaq
-         02wsBt2SuOXzEAHbwjARJ1CEqp8vlf71fHbk69xyuOWdHp3vZVrHTCLO+/jlMFg9XRnA
-         jR8H3bvNPAgXPLyBhDynbGEULl2zEAylZFebWDoMRfTL1N+uJp8dcx8dZtZ8zfpDJOwY
-         rPAJrX53zEZ/v4OP8SLW15zcQ2JKSqH/hu1DkcSGVU8sH705aw+eDTc5kixo1ytRKFIu
-         5CTQ==
-X-Gm-Message-State: AOAM531I04YaKDJHhi1C0nzVUHYPDrtbvH9ubOdMEjdA/Go/6hw10fS7
-        wwv/jisaF2uEFHMc59KPdriqxw==
-X-Google-Smtp-Source: ABdhPJwjXhuymWPBu9w7pMkUStNsTqsql1I38VMvdViw3X/SZ+v0JHnQDqk2NLIEDLRdRpn/ybKk8g==
-X-Received: by 2002:adf:f512:: with SMTP id q18mr19318659wro.55.1612200211410;
-        Mon, 01 Feb 2021 09:23:31 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id l1sm27127413wrp.40.2021.02.01.09.23.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 09:23:29 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 2C6931FF7E;
-        Mon,  1 Feb 2021 17:23:29 +0000 (GMT)
-References: <20210131115022.242570-1-f4bug@amsat.org>
- <20210131115022.242570-6-f4bug@amsat.org>
-User-agent: mu4e 1.5.7; emacs 28.0.50
-From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc:     qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Fam Zheng <fam@euphon.net>, Claudio Fontana <cfontana@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
-        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
-        qemu-arm@nongnu.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        John Snow <jsnow@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v6 05/11] target/arm: Restrict ARMv6 cpus to TCG accel
-Date:   Mon, 01 Feb 2021 17:18:59 +0000
-In-reply-to: <20210131115022.242570-6-f4bug@amsat.org>
-Message-ID: <87a6snvh0u.fsf@linaro.org>
+        id S231721AbhBARWT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 12:22:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21036 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231459AbhBARWN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 12:22:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612200046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lB7mBZJ0mzw9zDnoYSD9tBEDLyo8dn6HvaUbvp5AL4E=;
+        b=Z7oL3pnveRuKE0r/P24laYOUKzi8ii0QBzn6Kwx96ABsT0H9XLX67GqxvKZm97uTnElmHS
+        K1fHQ2nHzLrWFWHAh1yO86Hnm5+4LkxWsRYb7kS+2xjTZvvHYz8hOZmCRlRcrZcSE50py0
+        0me6DmBL20gpz2IfkJhzUbFehSqdP9s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-ASbusc4dOImfoaj0ARpUQw-1; Mon, 01 Feb 2021 12:20:44 -0500
+X-MC-Unique: ASbusc4dOImfoaj0ARpUQw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A17001922048;
+        Mon,  1 Feb 2021 17:20:35 +0000 (UTC)
+Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF93A74AA7;
+        Mon,  1 Feb 2021 17:19:53 +0000 (UTC)
+Subject: Re: [PATCH v13 03/15] iommu/arm-smmu-v3: Maintain a SID->device
+ structure
+To:     Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com
+Cc:     jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+        zhangfei.gao@linaro.org
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-4-eric.auger@redhat.com>
+ <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <c457b450-8755-308e-7c7a-abe23b33d0d6@redhat.com>
+Date:   Mon, 1 Feb 2021 18:19:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Keqian,
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On 2/1/21 1:26 PM, Keqian Zhu wrote:
+> Hi Eric,
+> 
+> On 2020/11/18 19:21, Eric Auger wrote:
+>> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+>>
+>> When handling faults from the event or PRI queue, we need to find the
+>> struct device associated to a SID. Add a rb_tree to keep track of SIDs.
+>>
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> [...]
+> 
+>>  }
+>>  
+>> +static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
+>> +				  struct arm_smmu_master *master)
+>> +{
+>> +	int i;
+>> +	int ret = 0;
+>> +	struct arm_smmu_stream *new_stream, *cur_stream;
+>> +	struct rb_node **new_node, *parent_node = NULL;
+>> +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+>> +
+>> +	master->streams = kcalloc(fwspec->num_ids,
+>> +				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
+>> +	if (!master->streams)
+>> +		return -ENOMEM;
+>> +	master->num_streams = fwspec->num_ids;
+> This is not roll-backed when fail.
+> 
+>> +
+>> +	mutex_lock(&smmu->streams_mutex);
+>> +	for (i = 0; i < fwspec->num_ids && !ret; i++) {
+> Check ret at here, makes it hard to decide the start index of rollback.
+> 
+> If we fail at here, then start index is (i-2).
+> If we fail in the loop, then start index is (i-1).
+> 
+>> +		u32 sid = fwspec->ids[i];
+>> +
+>> +		new_stream = &master->streams[i];
+>> +		new_stream->id = sid;
+>> +		new_stream->master = master;
+>> +
+>> +		/*
+>> +		 * Check the SIDs are in range of the SMMU and our stream table
+>> +		 */
+>> +		if (!arm_smmu_sid_in_range(smmu, sid)) {
+>> +			ret = -ERANGE;
+>> +			break;
+>> +		}
+>> +
+>> +		/* Ensure l2 strtab is initialised */
+>> +		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
+>> +			ret = arm_smmu_init_l2_strtab(smmu, sid);
+>> +			if (ret)
+>> +				break;
+>> +		}
+>> +
+>> +		/* Insert into SID tree */
+>> +		new_node = &(smmu->streams.rb_node);
+>> +		while (*new_node) {
+>> +			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
+>> +					      node);
+>> +			parent_node = *new_node;
+>> +			if (cur_stream->id > new_stream->id) {
+>> +				new_node = &((*new_node)->rb_left);
+>> +			} else if (cur_stream->id < new_stream->id) {
+>> +				new_node = &((*new_node)->rb_right);
+>> +			} else {
+>> +				dev_warn(master->dev,
+>> +					 "stream %u already in tree\n",
+>> +					 cur_stream->id);
+>> +				ret = -EINVAL;
+>> +				break;
+>> +			}
+>> +		}
+>> +
+>> +		if (!ret) {
+>> +			rb_link_node(&new_stream->node, parent_node, new_node);
+>> +			rb_insert_color(&new_stream->node, &smmu->streams);
+>> +		}
+>> +	}
+>> +
+>> +	if (ret) {
+>> +		for (; i > 0; i--)
+> should be (i >= 0)?
+> And the start index seems not correct.
+> 
+>> +			rb_erase(&master->streams[i].node, &smmu->streams);
+>> +		kfree(master->streams);
+>> +	}
+>> +	mutex_unlock(&smmu->streams_mutex);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void arm_smmu_remove_master(struct arm_smmu_master *master)
+>> +{
+>> +	int i;
+>> +	struct arm_smmu_device *smmu = master->smmu;
+>> +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+>> +
+>> +	if (!smmu || !master->streams)
+>> +		return;
+>> +
+>> +	mutex_lock(&smmu->streams_mutex);
+>> +	for (i = 0; i < fwspec->num_ids; i++)
+>> +		rb_erase(&master->streams[i].node, &smmu->streams);
+>> +	mutex_unlock(&smmu->streams_mutex);
+>> +
+>> +	kfree(master->streams);
+>> +}
+>> +
+>>  static struct iommu_ops arm_smmu_ops;
+>>  
+>>  static struct iommu_device *arm_smmu_probe_device(struct device *dev)
+>>  {
+>> -	int i, ret;
+>> +	int ret;
+>>  	struct arm_smmu_device *smmu;
+>>  	struct arm_smmu_master *master;
+>>  	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(dev);
+>> @@ -2331,27 +2447,12 @@ static struct iommu_device *arm_smmu_probe_device(struct device *dev)
+>>  
+>>  	master->dev = dev;
+>>  	master->smmu = smmu;
+>> -	master->sids = fwspec->ids;
+>> -	master->num_sids = fwspec->num_ids;
+>>  	INIT_LIST_HEAD(&master->bonds);
+>>  	dev_iommu_priv_set(dev, master);
+>>  
+>> -	/* Check the SIDs are in range of the SMMU and our stream table */
+>> -	for (i = 0; i < master->num_sids; i++) {
+>> -		u32 sid = master->sids[i];
+>> -
+>> -		if (!arm_smmu_sid_in_range(smmu, sid)) {
+>> -			ret = -ERANGE;
+>> -			goto err_free_master;
+>> -		}
+>> -
+>> -		/* Ensure l2 strtab is initialised */
+>> -		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
+>> -			ret = arm_smmu_init_l2_strtab(smmu, sid);
+>> -			if (ret)
+>> -				goto err_free_master;
+>> -		}
+>> -	}
+>> +	ret = arm_smmu_insert_master(smmu, master);
+>> +	if (ret)
+>> +		goto err_free_master;
+>>  
+>>  	master->ssid_bits = min(smmu->ssid_bits, fwspec->num_pasid_bits);
+>>  
+>> @@ -2389,6 +2490,7 @@ static void arm_smmu_release_device(struct device *dev)
+>>  	WARN_ON(arm_smmu_master_sva_enabled(master));
+>>  	arm_smmu_detach_dev(master);
+>>  	arm_smmu_disable_pasid(master);
+>> +	arm_smmu_remove_master(master);
+>>  	kfree(master);
+> 
+> Thanks,
+> Keqian
+> 
+Thank you for the review. Jean will address this issues in his own
+series and on my end I will rebase on this latter.
 
-> KVM requires the target cpu to be at least ARMv8 architecture
-> (support on ARMv7 has been dropped in commit 82bf7ae84ce:
-> "target/arm: Remove KVM support for 32-bit Arm hosts").
->
-> Only enable the following ARMv6 CPUs when TCG is available:
->
->   - ARM1136
->   - ARM1176
->   - ARM11MPCore
->   - Cortex-M0
->
-> The following machines are no more built when TCG is disabled:
->
->   - kzm                  ARM KZM Emulation Baseboard (ARM1136)
->   - microbit             BBC micro:bit (Cortex-M0)
->   - n800                 Nokia N800 tablet aka. RX-34 (OMAP2420)
->   - n810                 Nokia N810 tablet aka. RX-44 (OMAP2420)
->   - realview-eb-mpcore   ARM RealView Emulation Baseboard (ARM11MPCore)
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  default-configs/devices/arm-softmmu.mak | 2 --
->  hw/arm/realview.c                       | 2 +-
->  tests/qtest/cdrom-test.c                | 2 +-
->  hw/arm/Kconfig                          | 6 ++++++
->  target/arm/Kconfig                      | 4 ++++
->  5 files changed, 12 insertions(+), 4 deletions(-)
->
-> diff --git a/default-configs/devices/arm-softmmu.mak b/default-configs/de=
-vices/arm-softmmu.mak
-> index 0aad35da0c4..175530595ce 100644
-> --- a/default-configs/devices/arm-softmmu.mak
-> +++ b/default-configs/devices/arm-softmmu.mak
-> @@ -10,9 +10,7 @@ CONFIG_ARM_VIRT=3Dy
->  CONFIG_CUBIEBOARD=3Dy
->  CONFIG_EXYNOS4=3Dy
->  CONFIG_HIGHBANK=3Dy
-> -CONFIG_FSL_IMX31=3Dy
->  CONFIG_MUSCA=3Dy
-> -CONFIG_NSERIES=3Dy
->  CONFIG_STELLARIS=3Dy
->  CONFIG_REALVIEW=3Dy
->  CONFIG_VEXPRESS=3Dy
-> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
-> index 2dcf0a4c23e..0606d22da14 100644
-> --- a/hw/arm/realview.c
-> +++ b/hw/arm/realview.c
-> @@ -463,8 +463,8 @@ static void realview_machine_init(void)
->  {
->      if (tcg_builtin()) {
->          type_register_static(&realview_eb_type);
-> +        type_register_static(&realview_eb_mpcore_type);
->      }
-> -    type_register_static(&realview_eb_mpcore_type);
->      type_register_static(&realview_pb_a8_type);
->      type_register_static(&realview_pbx_a9_type);
->  }
+Best Regards
 
-This confuses me - are we even able to run a realview image under KVM?
-Surely the whole of realview should be TCG only?
+Eric
 
-The rest looks fine to me though:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
