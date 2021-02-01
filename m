@@ -2,114 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00F6830AA60
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 16:04:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9500530AAE1
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 16:18:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231383AbhBAPCY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 10:02:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35636 "EHLO
+        id S229959AbhBAPQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 10:16:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231318AbhBAPB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 10:01:29 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437F2C06178B
-        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 07:01:18 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id y18so1886320edw.13
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 07:01:18 -0800 (PST)
+        with ESMTP id S231593AbhBAPQa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 10:16:30 -0500
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919CCC0613ED
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 07:15:50 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id o5so3311672wmq.2
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 07:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hZ3xD2/2lcYcAhtu708AbjR6mIFxqFO7i7RlxJAZ5ZU=;
-        b=vgNYmiNTNpQzx2jV86jycjLWMXZ6nJ4tSwFTGE5x9SuV+VLEyH6rZomNo5oqBVo48Z
-         DsUNK+cQyv8QkSJJyXCZV4tv7cR0lGYCjwpm+TwjNSzGMAIRQxs9GEmw8ufWoEShxBYa
-         GurBr5HHFFkdq90UWzoaiYGIUkN3QyDzID/0qAL8SuJUtIPCsK6PqLwuBRW7lZ+fqOpE
-         JjjRgi3SE94pzzb3u1PKCrV1lkLEtli/cajzD6YV9W7lzHADaLkPi5/ewt2oaZw4uKdu
-         tgk1m8Lrv1Qvlu+q7sAxQ2juiqAdpdQe2746+17+ZmPEo8rXHJ5J2rZ6cKbFzR+uOsZh
-         Rltg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=iCud/oZ0jp00VRdDLSDWa/VPzMcKe48VJwPVpyKJcE8=;
+        b=bljmv40viwV5v57+TtBOFwGAaz54F5a9tDXB2PSZe5+LMS1pOd9d8QiRNcEEtmVfmT
+         pdNUcTuIXIUH3CaAc+wpyhYC5hKvmCSEj3iNLAZHozaqd/vHgd82MB0cpAg+LE90lF16
+         4P26uy+BK3EEMlaZGLfJlDisoXkiQ0huHLkrVAmKcmxDHmxRD8LzSGmdL2Cr3wzW5T7M
+         zg97INgmlfCsvWBOEZA+9NcyNVwamwDVUFyds+AxAL8QQh5KBvfc3PUTwvICN//HHTDZ
+         qkNaJJ1NQUcUnxMsjuP69oEL1TAKNDjTmwV8/PCUe7VrMoqb6akq/NuC0JNy5Wkan48Y
+         G81A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hZ3xD2/2lcYcAhtu708AbjR6mIFxqFO7i7RlxJAZ5ZU=;
-        b=nqYcZafxsgyuSB4JHgKGcDqhxfa2a1NldA/Yr1Mmvwb7kfQBA6wp9PCIB1rtHk1NTl
-         8oBF+h3Fi7ymL/DDn1QbUO1o4sDRz2+Liy/+OqLyYOa5w3/8bG5eZvyor5xbb+wmy4MX
-         JL0f/Obd5kM8lpEuoLLlOV1D7Gj1JMMGfed+RAq8BCiBsPQMlCfRkHwQ8TolwKZYkLzs
-         ftS98hmeVgPKAqS3OUtK0f9/JIGDwuNVNWGaJbgbwmX3ttqct62pTLqxcbgKkjBqR72F
-         gudNmP4TWAdOYBx9j3Sg4xs0b22iEx0wj/50h8QkRgwY74m1Z14kJjRHt/UPp17touUt
-         t9Yw==
-X-Gm-Message-State: AOAM533DAgxbjF37FxRKJCgk2M5QnjAU7tBLakyrOxgKnRoLHYS2CtZ1
-        +BSj749UcUPm6MADWU0ofFGxRL2AjBXAHreSR70Aqw==
-X-Google-Smtp-Source: ABdhPJyUKDJgotj2iV/EZDBBDNQh6SKgJOObpqGbdfNKm6jwpeZr7z46WvIqVVcQo2wc5dGjzyguHOPwSCGKOdVqhQ8=
-X-Received: by 2002:a05:6402:26c9:: with SMTP id x9mr19192479edd.365.1612191676837;
- Mon, 01 Feb 2021 07:01:16 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=iCud/oZ0jp00VRdDLSDWa/VPzMcKe48VJwPVpyKJcE8=;
+        b=QNmSu6y4DKWDe4AHkhhAYpkDY7Woh4rwe40O4dw5eiXzNeIhhhjbPB5lBCM30FCJE5
+         zVB7sd2BHSm/yDqEC7uubh2zVF4K2mX4fYuC7UiohC0OAZCvbJSMLHU/Ah5sXOMTvFpO
+         oq6qbD871/pmZCpfphkaAT99h5uQ4ZcXLaTGiUONog06CiZSRyufjttNc4yRCmRstom/
+         OnqVUZC6YCDfRSNNGap1HhWEaK3ml8WxPZ5lxNsTCYX6snS+8Nf6mGoRKdnyntUAASSK
+         ZG6V3AUvp9MKMCyV4B5nFTh2b1WoC98WxCUllxYPFCTExn8lbK2x4ufr94EkEwK82oAO
+         69eg==
+X-Gm-Message-State: AOAM532EVLNnk/rzIB7TTu99XCDFXuL3HNxPHZe2cNtyypgtVwtn+7cP
+        v2tboZkaE8m3uwLXBXoop+G1+g==
+X-Google-Smtp-Source: ABdhPJxyP1BG+oDXc31HY7CW5MYwKqTaLbVBSjGD3rpSrDcbzKlD5YRXlGtJCbFbmp87GaK0VAFutQ==
+X-Received: by 2002:a7b:c8c3:: with SMTP id f3mr15569794wml.110.1612192549227;
+        Mon, 01 Feb 2021 07:15:49 -0800 (PST)
+Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
+        by smtp.gmail.com with ESMTPSA id y11sm26855292wrh.16.2021.02.01.07.15.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Feb 2021 07:15:48 -0800 (PST)
+Date:   Mon, 1 Feb 2021 16:15:29 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+        zhangfei.gao@linaro.org
+Subject: Re: [PATCH v13 03/15] iommu/arm-smmu-v3: Maintain a SID->device
+ structure
+Message-ID: <YBgbESEyReLV124Z@myrica>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-4-eric.auger@redhat.com>
+ <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
 MIME-Version: 1.0
-References: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
- <5f072f84c7c9b03ded810e56687935b2@kernel.org>
-In-Reply-To: <5f072f84c7c9b03ded810e56687935b2@kernel.org>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Mon, 1 Feb 2021 20:31:05 +0530
-Message-ID: <CA+G9fYs4u=E+jMxTds8A-gYWchC4OSdx26cCw7079+w3_bUiZQ@mail.gmail.com>
-Subject: Re: arm64: gen-hyprel.c:40:10: fatal error: generated/autoconf.h: No
- such file or directory
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        James Morse <james.morse@arm.com>,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Feb 2021 at 19:15, Marc Zyngier <maz@kernel.org> wrote:
->
-> On 2021-02-01 13:38, Naresh Kamboju wrote:
-> > Linux next 20210201 tag arm64 builds failed.
-> > kernel config attached to this email.
-> >
-> > BAD:    next-20210201
-> > GOOD: next-20210129
-> >
-> > make --silent --keep-going --jobs=8
-> > O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64
-> > CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc'
-> > 'HOSTCC=sccache gcc'
-> > arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:40:10: fatal error:
-> > generated/autoconf.h: No such file or directory
-> >    40 | #include <generated/autoconf.h>
-> >       |          ^~~~~~~~~~~~~~~~~~~~~~
-> > compilation terminated.
-> >
-> > Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
->
-> Could you please check with the fix suggested at [1]?
+On Mon, Feb 01, 2021 at 08:26:41PM +0800, Keqian Zhu wrote:
+> > +static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
+> > +				  struct arm_smmu_master *master)
+> > +{
+> > +	int i;
+> > +	int ret = 0;
+> > +	struct arm_smmu_stream *new_stream, *cur_stream;
+> > +	struct rb_node **new_node, *parent_node = NULL;
+> > +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+> > +
+> > +	master->streams = kcalloc(fwspec->num_ids,
+> > +				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
+> > +	if (!master->streams)
+> > +		return -ENOMEM;
+> > +	master->num_streams = fwspec->num_ids;
+> This is not roll-backed when fail.
 
-Here is the change I have applied and the arm64 builds successful now.
+No need, the caller frees master
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 09d04dd50eb8..ed10fcf1b345 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -7,7 +7,7 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__
+> > +
+> > +	mutex_lock(&smmu->streams_mutex);
+> > +	for (i = 0; i < fwspec->num_ids && !ret; i++) {
+> Check ret at here, makes it hard to decide the start index of rollback.
+> 
+> If we fail at here, then start index is (i-2).
+> If we fail in the loop, then start index is (i-1).
+> 
+[...]
+> > +	if (ret) {
+> > +		for (; i > 0; i--)
+> should be (i >= 0)?
+> And the start index seems not correct.
 
- hostprogs := gen-hyprel
--HOST_EXTRACFLAGS += -I$(srctree)/include
-+HOST_EXTRACFLAGS += -I$(objtree)/include
+Indeed, this whole bit is wrong. I'll fix it while resending the IOPF
+series.
 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-         hyp-main.o hyp-smp.o psci-relay.o
+Thanks,
+Jean
 
-
-> [1] https://lore.kernel.org/r/20210201104251.5foc64qq3ewgnhuz@google.com
-
-
-- Naresh
