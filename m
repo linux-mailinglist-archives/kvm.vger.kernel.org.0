@@ -2,105 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9E0830A21F
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 07:43:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B79130A21E
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 07:43:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232211AbhBAGnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 01:43:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231598AbhBAFls (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 00:41:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612158016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5mQIIlM5CFm8xeXBVRv4nhYcFaur8L2TXYtvPPpQAxw=;
-        b=dhKJrP/xoCyPJVF3+19azybF6bXigf5S1QqUbP0OcLRkomGIkEA3LySWzpHkifxUuXWbSz
-        rBSsQD3V/+pwLc0faEQwEoL9/26syyuQeVsDNbzTjzXQandpt9gPgc9Aa0cfsJV1Bq2qAX
-        ZiE2kpegDo8REL30KL8gSu1fDwLa3PU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-vKvb8gjeOfq7lZK4FcopZQ-1; Mon, 01 Feb 2021 00:40:15 -0500
-X-MC-Unique: vKvb8gjeOfq7lZK4FcopZQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD98FCC620;
-        Mon,  1 Feb 2021 05:40:13 +0000 (UTC)
-Received: from [10.72.13.120] (ovpn-13-120.pek2.redhat.com [10.72.13.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 476F627CA9;
-        Mon,  1 Feb 2021 05:40:03 +0000 (UTC)
-Subject: Re: [PATCH RFC v2 03/10] vringh: reset kiov 'consumed' field in
- __vringh_iov()
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     Xie Yongji <xieyongji@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        kvm@vger.kernel.org
-References: <20210128144127.113245-1-sgarzare@redhat.com>
- <20210128144127.113245-4-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <62bb2e93-4ac3-edf5-2baa-4c2be8257cf0@redhat.com>
-Date:   Mon, 1 Feb 2021 13:40:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210128144127.113245-4-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+        id S232195AbhBAGnJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 01:43:09 -0500
+Received: from mga07.intel.com ([134.134.136.100]:57255 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229629AbhBAFl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 00:41:27 -0500
+IronPort-SDR: WcjKEc16qNm1BVR2jC0CGEZabGoXC2bKcVXJbEuzWzrBW9vtN1mvmzArWKTH76PWeJm5S0VMnP
+ n9xEabmRxxGA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9881"; a="244719189"
+X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
+   d="scan'208";a="244719189"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2021 21:40:44 -0800
+IronPort-SDR: /54s9mM4Am73VgEz12gL36Rg4Npm4NklzgB81WLstnX/ew70oNp4wLBCq5nidYGzB9XaDOWNzG
+ BN2nihMGIdcw==
+X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
+   d="scan'208";a="371422526"
+Received: from jaramosm-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.254.79.53])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2021 21:40:41 -0800
+Date:   Mon, 1 Feb 2021 18:40:40 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver
+ even when SGX driver is disabled
+Message-Id: <20210201184040.646ea9923c2119c205b3378d@intel.com>
+In-Reply-To: <YBVxF2kAl7VzeRPS@kernel.org>
+References: <cover.1611634586.git.kai.huang@intel.com>
+        <5076ed2c486ac33bfd87dc0e17047a1673692b53.1611634586.git.kai.huang@intel.com>
+        <YBVxF2kAl7VzeRPS@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, 30 Jan 2021 16:45:43 +0200 Jarkko Sakkinen wrote:
+> On Tue, Jan 26, 2021 at 10:31:00PM +1300, Kai Huang wrote:
+> > Modify sgx_init() to always try to initialize the virtual EPC driver,
+> > even if the bare-metal SGX driver is disabled.  The bare-metal driver
+> > might be disabled if SGX Launch Control is in locked mode, or not
+> > supported in the hardware at all.  This allows (non-Linux) guests that
+> > support non-LC configurations to use SGX.
+> > 
+> > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > ---
+> > v2->v3:
+> > 
+> >  - Changed from sgx_virt_epc_init() to sgx_vepc_init().
+> > 
+> > ---
+> >  arch/x86/kernel/cpu/sgx/main.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
+> > index 21c2ffa13870..93d249f7bff3 100644
+> > --- a/arch/x86/kernel/cpu/sgx/main.c
+> > +++ b/arch/x86/kernel/cpu/sgx/main.c
+> > @@ -12,6 +12,7 @@
+> >  #include "driver.h"
+> >  #include "encl.h"
+> >  #include "encls.h"
+> > +#include "virt.h"
+> >  
+> >  struct sgx_epc_section sgx_epc_sections[SGX_MAX_EPC_SECTIONS];
+> >  static int sgx_nr_epc_sections;
+> > @@ -712,7 +713,8 @@ static int __init sgx_init(void)
+> >  		goto err_page_cache;
+> >  	}
+> >  
+> > -	ret = sgx_drv_init();
+> > +	/* Success if the native *or* virtual EPC driver initialized cleanly. */
+> > +	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+> 
+> If would create more dumb code and just add
+> 
+> ret = sgx_vepc_init()
+> if (ret)
+>         goto err_kthread;
 
-On 2021/1/28 下午10:41, Stefano Garzarella wrote:
-> __vringh_iov() overwrites the contents of riov and wiov, in fact it
-> resets the 'i' and 'used' fields, but also the consumed field should
-> be reset to avoid an inconsistent state.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Do you mean you want below?
 
+	ret = sgx_drv_init();
+	ret = sgx_vepc_init();
+	if (ret)
+		goto err_kthread;
 
-I had a question(I remember we had some discussion like this but I 
-forget the conclusion):
+This was Sean's original code, but Dave didn't like it.
 
-I see e.g in vringh_getdesc_kern() it has the following comment:
+Sean/Dave,
 
-/*
-  * Note that you may need to clean up riov and wiov, even on error!
-  */
+Please let me know which way you prefer.
 
-So it looks to me the correct way is to call vringh_kiov_cleanup() before?
-
-Thanks
-
-
-> ---
->   drivers/vhost/vringh.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index f68122705719..bee63d68201a 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -290,9 +290,9 @@ __vringh_iov(struct vringh *vrh, u16 i,
->   		return -EINVAL;
->   
->   	if (riov)
-> -		riov->i = riov->used = 0;
-> +		riov->i = riov->used = riov->consumed = 0;
->   	if (wiov)
-> -		wiov->i = wiov->used = 0;
-> +		wiov->i = wiov->used = wiov->consumed = 0;
->   
->   	for (;;) {
->   		void *addr;
-
+> 
+> >  	if (ret)
+> >  		goto err_kthread;
+> >  
+> > -- 
+> > 2.29.2
+> > 
+> 
+> /Jarkko
+> > 
