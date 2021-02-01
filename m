@@ -2,66 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84FCD30A6E0
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 12:52:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73C4530A6E5
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 12:54:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbhBALw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 06:52:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47921 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229609AbhBALwZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 06:52:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612180259;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UfWT8NBa3Z8EcBGImJFEzi/n2eKZb9k3BSqSQscMvIo=;
-        b=PZ0TrpadUR4KJx94CWiBL6lwdIkmD29fwsDxTW/jTnQm1GId4Q6VBR/0RwnVrgRi61oDxO
-        kHPhDu2//2qPqUFGiBVImtjvvKw+kkVWwE37M/qep7qy3p4b/UpvfRrpAOD+Buo0FrDg+n
-        zzwBV8PMobo3Bcekze+rbaLktG4eS8U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-qJZRGFGLMmmE9AR43aKarQ-1; Mon, 01 Feb 2021 06:50:57 -0500
-X-MC-Unique: qJZRGFGLMmmE9AR43aKarQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A838107ACE4;
-        Mon,  1 Feb 2021 11:50:56 +0000 (UTC)
-Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 43ECF10013C0;
-        Mon,  1 Feb 2021 11:50:52 +0000 (UTC)
-Date:   Mon, 1 Feb 2021 12:50:49 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Steve Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V3 2/9] vfio/type1: unmap cleanup
-Message-ID: <20210201125049.5e82fb0b.cohuck@redhat.com>
-In-Reply-To: <1611939252-7240-3-git-send-email-steven.sistare@oracle.com>
-References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
-        <1611939252-7240-3-git-send-email-steven.sistare@oracle.com>
-Organization: Red Hat GmbH
+        id S229731AbhBALxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 06:53:35 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11996 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229481AbhBALxd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 06:53:33 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DTmWC0lfWzjHP0;
+        Mon,  1 Feb 2021 19:51:35 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Feb 2021 19:52:45 +0800
+Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-3-eric.auger@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
+Date:   Mon, 1 Feb 2021 19:52:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201118112151.25412-3-eric.auger@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 29 Jan 2021 08:54:05 -0800
-Steve Sistare <steven.sistare@oracle.com> wrote:
+Hi Eric,
 
-> Minor changes in vfio_dma_do_unmap to improve readability, which also
-> simplify the subsequent unmap-all patch.  No functional change.
+On 2020/11/18 19:21, Eric Auger wrote:
+> On ARM, MSI are translated by the SMMU. An IOVA is allocated
+> for each MSI doorbell. If both the host and the guest are exposed
+> with SMMUs, we end up with 2 different IOVAs allocated by each.
+> guest allocates an IOVA (gIOVA) to map onto the guest MSI
+> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
+> onto the physical doorbell (hDB).
 > 
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 38 +++++++++++++++-----------------------
->  1 file changed, 15 insertions(+), 23 deletions(-)
+> So we end up with 2 untied mappings:
+>          S1            S2
+> gIOVA    ->    gDB
+>               hIOVA    ->    hDB
+> 
+> Currently the PCI device is programmed by the host with hIOVA
+> as MSI doorbell. So this does not work.
+> 
+> This patch introduces an API to pass gIOVA/gDB to the host so
+> that gIOVA can be reused by the host instead of re-allocating
+> a new IOVA. So the goal is to create the following nested mapping:
+Does the gDB can be reused under non-nested mode?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
+>          S1            S2
+> gIOVA    ->    gDB     ->    hDB
+> 
+> and program the PCI device with gIOVA MSI doorbell.
+> 
+> In case we have several devices attached to this nested domain
+> (devices belonging to the same group), they cannot be isolated
+> on guest side either. So they should also end up in the same domain
+> on guest side. We will enforce that all the devices attached to
+> the host iommu domain use the same physical doorbell and similarly
+> a single virtual doorbell mapping gets registered (1 single
+> virtual doorbell is used on guest as well).
+> 
+[...]
+
+> + *
+> + * The associated IOVA can be reused by the host to create a nested
+> + * stage2 binding mapping translating into the physical doorbell used
+> + * by the devices attached to the domain.
+> + *
+> + * All devices within the domain must share the same physical doorbell.
+> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
+> + */
+> +
+> +int iommu_bind_guest_msi(struct iommu_domain *domain,
+> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
+> +{
+> +	if (unlikely(!domain->ops->bind_guest_msi))
+> +		return -ENODEV;
+> +
+> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
+> +
+> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
+> +			    dma_addr_t iova)
+nit: s/iova/giova
+
+> +{
+> +	if (unlikely(!domain->ops->unbind_guest_msi))
+> +		return;
+> +
+> +	domain->ops->unbind_guest_msi(domain, iova);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
+> +
+[...]
+
+Thanks,
+Keqian
 
