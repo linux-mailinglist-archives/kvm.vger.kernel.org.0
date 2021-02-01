@@ -2,244 +2,292 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 580B530A1F8
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 07:34:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E4DB30A1EE
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 07:30:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231984AbhBAGd4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 01:33:56 -0500
-Received: from mga14.intel.com ([192.55.52.115]:26665 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232142AbhBAGOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 01:14:00 -0500
-IronPort-SDR: L5JEeIm/5mH8S7INYVga6ZhdtvcvpYFhjMabUJnOdzA/Q2dDAe/4qeS9l5+KW1zB5bnUpRIh3T
- P57nD5vddJ0w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9881"; a="179860909"
-X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
-   d="scan'208";a="179860909"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2021 22:08:33 -0800
-IronPort-SDR: r1ErT8/wQkiHn/NHaR1Abc/aFAtArKTH2Czu8TnjTEMcVw27QBWL9NIJZi5UpiM0xrUejiVdHc
- BT/aandOt8qg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
-   d="scan'208";a="368980445"
-Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by fmsmga008.fm.intel.com with ESMTP; 31 Jan 2021 22:08:30 -0800
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com,
-        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v14 11/11] selftests: kvm/x86: add test for pmu msr MSR_IA32_PERF_CAPABILITIES
-Date:   Mon,  1 Feb 2021 14:01:52 +0800
-Message-Id: <20210201060152.370069-5-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210201060152.370069-1-like.xu@linux.intel.com>
-References: <20210201051039.255478-1-like.xu@linux.intel.com>
- <20210201060152.370069-1-like.xu@linux.intel.com>
+        id S231811AbhBAG1i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 01:27:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23753 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231775AbhBAGFV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 01:05:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612159434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=d640g0AhW4H0p1MPXlNtTw79RpilHCze4Mi87EihdeA=;
+        b=JQ30XCia6RQN8/WsIBXUO/KhL39MLQQ+fWEwQZwFM2EUrivKnHS+Z9FY1cqN+yhc6hiljk
+        4JgI6RqVF+Io6TiLuXSve8XtBQgPWkzunihs8grI4RQFgRmDKi7ncrDr+C4PByjnL4t5M8
+        KqsGwhwCBL+2iRNw67bZZm9Tl90GIO0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-ic3WixtZMn-kEXpG8WCikA-1; Mon, 01 Feb 2021 01:03:52 -0500
+X-MC-Unique: ic3WixtZMn-kEXpG8WCikA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E5C8801817;
+        Mon,  1 Feb 2021 06:03:50 +0000 (UTC)
+Received: from [10.72.13.120] (ovpn-13-120.pek2.redhat.com [10.72.13.120])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D1C775D9DC;
+        Mon,  1 Feb 2021 06:03:40 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 09/10] vdpa_sim_blk: implement ramdisk behaviour
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        virtualization@lists.linux-foundation.org
+Cc:     Xie Yongji <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        kvm@vger.kernel.org
+References: <20210128144127.113245-1-sgarzare@redhat.com>
+ <20210128144127.113245-10-sgarzare@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <7084ff0d-6dd3-66bc-1c34-4f9f99970d97@redhat.com>
+Date:   Mon, 1 Feb 2021 14:03:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20210128144127.113245-10-sgarzare@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test will check the effect of various CPUID settings on the
-MSR_IA32_PERF_CAPABILITIES MSR, check that whatever user space writes
-with KVM_SET_MSR is _not_ modified from the guest and can be retrieved
-with KVM_GET_MSR, and check that invalid LBR formats are rejected.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  | 149 ++++++++++++++++++
- 3 files changed, 151 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+On 2021/1/28 下午10:41, Stefano Garzarella wrote:
+> The previous implementation wrote only the status of each request.
+> This patch implements a more accurate block device simulator,
+> providing a ramdisk-like behavior.
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+> v2:
+> - used %zd %zx to print size_t and ssize_t variables in dev_err()
+> - removed unnecessary new line [Jason]
+> - moved VIRTIO_BLK_T_GET_ID in another patch [Jason]
+> - used push/pull instead of write/read terminology
+> - added vdpasim_blk_check_range() to avoid overflows [Stefan]
+> - use vdpasim*_to_cpu instead of le*_to_cpu
+> - used vringh_kiov_length() helper [Jason]
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index ce8f4ad39684..28b71efe52a0 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -25,6 +25,7 @@
- /x86_64/vmx_set_nested_state_test
- /x86_64/vmx_tsc_adjust_test
- /x86_64/xss_msr_test
-+/x86_64/vmx_pmu_msrs_test
- /demand_paging_test
- /dirty_log_test
- /dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index fe41c6a0fa67..cf8737828dd4 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -59,6 +59,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
- TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_msrs_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-new file mode 100644
-index 000000000000..b3ad63e6ff12
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-@@ -0,0 +1,149 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * VMX-pmu related msrs test
-+ *
-+ * Copyright (C) 2021 Intel Corporation
-+ *
-+ * Test to check the effect of various CPUID settings
-+ * on the MSR_IA32_PERF_CAPABILITIES MSR, and check that
-+ * whatever we write with KVM_SET_MSR is _not_ modified
-+ * in the guest and test it can be retrieved with KVM_GET_MSR.
-+ *
-+ * Test to check that invalid LBR formats are rejected.
-+ */
-+
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <sys/ioctl.h>
-+
-+#include "kvm_util.h"
-+#include "vmx.h"
-+
-+#define VCPU_ID	      0
-+
-+#define X86_FEATURE_PDCM	(1<<15)
-+#define PMU_CAP_FW_WRITES	(1ULL << 13)
-+#define PMU_CAP_LBR_FMT		0x3f
-+
-+union cpuid10_eax {
-+	struct {
-+		unsigned int version_id:8;
-+		unsigned int num_counters:8;
-+		unsigned int bit_width:8;
-+		unsigned int mask_length:8;
-+	} split;
-+	unsigned int full;
-+};
-+
-+union perf_capabilities {
-+	struct {
-+		u64	lbr_format:6;
-+		u64	pebs_trap:1;
-+		u64	pebs_arch_reg:1;
-+		u64	pebs_format:4;
-+		u64	smm_freeze:1;
-+		u64	full_width_write:1;
-+		u64 pebs_baseline:1;
-+		u64	perf_metrics:1;
-+		u64	pebs_output_pt_available:1;
-+		u64	anythread_deprecated:1;
-+	};
-+	u64	capabilities;
-+};
-+
-+uint64_t rdmsr_on_cpu(uint32_t reg)
-+{
-+	uint64_t data;
-+	int fd;
-+	char msr_file[64];
-+
-+	sprintf(msr_file, "/dev/cpu/%d/msr", 0);
-+	fd = open(msr_file, O_RDONLY);
-+	if (fd < 0)
-+		exit(KSFT_SKIP);
-+
-+	if (pread(fd, &data, sizeof(data), reg) != sizeof(data))
-+		exit(KSFT_SKIP);
-+
-+	close(fd);
-+	return data;
-+}
-+
-+static void guest_code(void)
-+{
-+	wrmsr(MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_cpuid2 *cpuid;
-+	struct kvm_cpuid_entry2 *entry_1_0;
-+	struct kvm_cpuid_entry2 *entry_a_0;
-+	bool pdcm_supported = false;
-+	struct kvm_vm *vm;
-+	int ret;
-+	union cpuid10_eax eax;
-+	union perf_capabilities host_cap;
-+
-+	host_cap.capabilities = rdmsr_on_cpu(MSR_IA32_PERF_CAPABILITIES);
-+	host_cap.capabilities &= (PMU_CAP_FW_WRITES | PMU_CAP_LBR_FMT);
-+
-+	/* Create VM */
-+	vm = vm_create_default(VCPU_ID, 0, guest_code);
-+	cpuid = kvm_get_supported_cpuid();
-+
-+	if (kvm_get_cpuid_max_basic() >= 0xa) {
-+		entry_1_0 = kvm_get_supported_cpuid_index(1, 0);
-+		entry_a_0 = kvm_get_supported_cpuid_index(0xa, 0);
-+		pdcm_supported = entry_1_0 && !!(entry_1_0->ecx & X86_FEATURE_PDCM);
-+		eax.full = entry_a_0->eax;
-+	}
-+	if (!pdcm_supported) {
-+		print_skip("MSR_IA32_PERF_CAPABILITIES is not supported by the vCPU");
-+		exit(KSFT_SKIP);
-+	}
-+	if (!eax.split.version_id) {
-+		print_skip("PMU is not supported by the vCPU");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	/* testcase 1, set capabilities when we have PDCM bit */
-+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
-+
-+	/* check capabilities can be retrieved with KVM_GET_MSR */
-+	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
-+
-+	/* check whatever we write with KVM_SET_MSR is _not_ modified */
-+	vcpu_run(vm, VCPU_ID);
-+	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
-+
-+	/* testcase 2, check valid LBR formats are accepted */
-+	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0);
-+	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), 0);
-+
-+	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, host_cap.lbr_format);
-+	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), (u64)host_cap.lbr_format);
-+
-+	/* testcase 3, check invalid LBR format is rejected */
-+	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_LBR_FMT);
-+	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
-+
-+	/* testcase 4, set capabilities when we don't have PDCM bit */
-+	entry_1_0->ecx &= ~X86_FEATURE_PDCM;
-+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
-+	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
-+
-+	/* testcase 5, set capabilities when we don't have PMU version bits */
-+	entry_1_0->ecx |= X86_FEATURE_PDCM;
-+	eax.split.version_id = 0;
-+	entry_1_0->ecx = eax.full;
-+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-+	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
-+	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
-+
-+	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0);
-+	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), 0);
-+
-+	kvm_vm_free(vm);
-+}
--- 
-2.29.2
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+
+> ---
+>   drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 164 ++++++++++++++++++++++++---
+>   1 file changed, 146 insertions(+), 18 deletions(-)
+>
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> index 999f9ca0b628..fc47e8320358 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+> @@ -3,6 +3,7 @@
+>    * VDPA simulator for block device.
+>    *
+>    * Copyright (c) 2020, Mellanox Technologies. All rights reserved.
+> + * Copyright (c) 2021, Red Hat Inc. All rights reserved.
+>    *
+>    */
+>   
+> @@ -13,6 +14,7 @@
+>   #include <linux/sched.h>
+>   #include <linux/vringh.h>
+>   #include <linux/vdpa.h>
+> +#include <linux/blkdev.h>
+>   #include <uapi/linux/virtio_blk.h>
+>   
+>   #include "vdpa_sim.h"
+> @@ -36,10 +38,151 @@
+>   
+>   static struct vdpasim *vdpasim_blk_dev;
+>   
+> +static bool vdpasim_blk_check_range(u64 start_sector, size_t range_size)
+> +{
+> +	u64 range_sectors = range_size >> SECTOR_SHIFT;
+> +
+> +	if (range_size > VDPASIM_BLK_SIZE_MAX * VDPASIM_BLK_SEG_MAX)
+> +		return false;
+> +
+> +	if (start_sector > VDPASIM_BLK_CAPACITY)
+> +		return false;
+> +
+> +	if (range_sectors > VDPASIM_BLK_CAPACITY - start_sector)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +/* Returns 'true' if the request is handled (with or without an I/O error)
+> + * and the status is correctly written in the last byte of the 'in iov',
+> + * 'false' otherwise.
+> + */
+> +static bool vdpasim_blk_handle_req(struct vdpasim *vdpasim,
+> +				   struct vdpasim_virtqueue *vq)
+> +{
+> +	size_t pushed = 0, to_pull, to_push;
+> +	struct virtio_blk_outhdr hdr;
+> +	ssize_t bytes;
+> +	loff_t offset;
+> +	u64 sector;
+> +	u8 status;
+> +	u32 type;
+> +	int ret;
+> +
+> +	ret = vringh_getdesc_iotlb(&vq->vring, &vq->out_iov, &vq->in_iov,
+> +				   &vq->head, GFP_ATOMIC);
+> +	if (ret != 1)
+> +		return false;
+> +
+> +	if (vq->out_iov.used < 1 || vq->in_iov.used < 1) {
+> +		dev_err(&vdpasim->vdpa.dev, "missing headers - out_iov: %u in_iov %u\n",
+> +			vq->out_iov.used, vq->in_iov.used);
+> +		return false;
+> +	}
+> +
+> +	if (vq->in_iov.iov[vq->in_iov.used - 1].iov_len < 1) {
+> +		dev_err(&vdpasim->vdpa.dev, "request in header too short\n");
+> +		return false;
+> +	}
+> +
+> +	/* The last byte is the status and we checked if the last iov has
+> +	 * enough room for it.
+> +	 */
+> +	to_push = vringh_kiov_length(&vq->in_iov) - 1;
+> +
+> +	to_pull = vringh_kiov_length(&vq->out_iov);
+> +
+> +	bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov, &hdr,
+> +				      sizeof(hdr));
+> +	if (bytes != sizeof(hdr)) {
+> +		dev_err(&vdpasim->vdpa.dev, "request out header too short\n");
+> +		return false;
+> +	}
+> +
+> +	to_pull -= bytes;
+> +
+> +	type = vdpasim32_to_cpu(vdpasim, hdr.type);
+> +	sector = vdpasim64_to_cpu(vdpasim, hdr.sector);
+> +	offset = sector << SECTOR_SHIFT;
+> +	status = VIRTIO_BLK_S_OK;
+> +
+> +	switch (type) {
+> +	case VIRTIO_BLK_T_IN:
+> +		if (!vdpasim_blk_check_range(sector, to_push)) {
+> +			dev_err(&vdpasim->vdpa.dev,
+> +				"reading over the capacity - offset: 0x%llx len: 0x%zx\n",
+> +				offset, to_push);
+> +			status = VIRTIO_BLK_S_IOERR;
+> +			break;
+> +		}
+> +
+> +		bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
+> +					      vdpasim->buffer + offset,
+> +					      to_push);
+> +		if (bytes < 0) {
+> +			dev_err(&vdpasim->vdpa.dev,
+> +				"vringh_iov_push_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
+> +				bytes, offset, to_push);
+> +			status = VIRTIO_BLK_S_IOERR;
+> +			break;
+> +		}
+> +
+> +		pushed += bytes;
+> +		break;
+> +
+> +	case VIRTIO_BLK_T_OUT:
+> +		if (!vdpasim_blk_check_range(sector, to_pull)) {
+> +			dev_err(&vdpasim->vdpa.dev,
+> +				"writing over the capacity - offset: 0x%llx len: 0x%zx\n",
+> +				offset, to_pull);
+> +			status = VIRTIO_BLK_S_IOERR;
+> +			break;
+> +		}
+> +
+> +		bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov,
+> +					      vdpasim->buffer + offset,
+> +					      to_pull);
+> +		if (bytes < 0) {
+> +			dev_err(&vdpasim->vdpa.dev,
+> +				"vringh_iov_pull_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
+> +				bytes, offset, to_pull);
+> +			status = VIRTIO_BLK_S_IOERR;
+> +			break;
+> +		}
+> +		break;
+> +
+> +	default:
+> +		dev_warn(&vdpasim->vdpa.dev,
+> +			 "Unsupported request type %d\n", type);
+> +		status = VIRTIO_BLK_S_IOERR;
+> +		break;
+> +	}
+> +
+> +	/* If some operations fail, we need to skip the remaining bytes
+> +	 * to put the status in the last byte
+> +	 */
+> +	if (to_push - pushed > 0)
+> +		vringh_kiov_advance(&vq->in_iov, to_push - pushed);
+> +
+> +	/* Last byte is the status */
+> +	bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov, &status, 1);
+> +	if (bytes != 1)
+> +		return false;
+> +
+> +	pushed += bytes;
+> +
+> +	/* Make sure data is wrote before advancing index */
+> +	smp_wmb();
+> +
+> +	vringh_complete_iotlb(&vq->vring, vq->head, pushed);
+> +
+> +	return true;
+> +}
+> +
+>   static void vdpasim_blk_work(struct work_struct *work)
+>   {
+>   	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
+> -	u8 status = VIRTIO_BLK_S_OK;
+>   	int i;
+>   
+>   	spin_lock(&vdpasim->lock);
+> @@ -53,22 +196,7 @@ static void vdpasim_blk_work(struct work_struct *work)
+>   		if (!vq->ready)
+>   			continue;
+>   
+> -		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
+> -					    &vq->in_iov, &vq->head,
+> -					    GFP_ATOMIC) > 0) {
+> -			int write;
+> -
+> -			vq->in_iov.i = vq->in_iov.used - 1;
+> -			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
+> -						      &status, 1);
+> -			if (write <= 0)
+> -				break;
+> -
+> -			/* Make sure data is wrote before advancing index */
+> -			smp_wmb();
+> -
+> -			vringh_complete_iotlb(&vq->vring, vq->head, write);
+> -
+> +		while (vdpasim_blk_handle_req(vdpasim, vq)) {
+>   			/* Make sure used is visible before rasing the interrupt. */
+>   			smp_wmb();
+>   
+> @@ -109,7 +237,7 @@ static int __init vdpasim_blk_init(void)
+>   	dev_attr.config_size = sizeof(struct virtio_blk_config);
+>   	dev_attr.get_config = vdpasim_blk_get_config;
+>   	dev_attr.work_fn = vdpasim_blk_work;
+> -	dev_attr.buffer_size = PAGE_SIZE;
+> +	dev_attr.buffer_size = VDPASIM_BLK_CAPACITY << SECTOR_SHIFT;
+>   
+>   	vdpasim_blk_dev = vdpasim_create(&dev_attr);
+>   	if (IS_ERR(vdpasim_blk_dev)) {
 
