@@ -2,95 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BEA8830A569
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 11:34:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D15A330A61A
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 12:05:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbhBAKck (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 05:32:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38334 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232918AbhBAKci (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 05:32:38 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id A22D464DD8
-        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 10:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612175517;
-        bh=bl/uCuqN6Of9M6YmehpOuSSgQ+VCOyFyq6KmP7EEXY8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=GtwuA8LVtl9LvZCU2vz6Ct2t0IAw3QTTyqHd04RnPGRXRD27u1vxfinSSRKvVQQI5
-         UxksEPAGem4Ud71PvxMIySdokDZmVO9B9MWCuuIgoVFmGC1Yhxv9drFBVd38qfyJrp
-         1CkgKtPmVo0IoZ1BoijNfWLWwVYDQ+81iWxV9OnZ53EdGKDLSBdgl/C74/kDtpJOQd
-         T2d7ZimPKpG7QsUiuHJstlBZqLgvA26TFFb2KZBSZq1LR1iSeiIfsu/T4LPL2MLFTE
-         oPA1gvWBuCr/4/QlTLs1KT4CEOI2UROjl74nU/AFo59rPaWvhtXe0OF6CunwunnGpf
-         cqVx0fthgd7gg==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 8F58265303; Mon,  1 Feb 2021 10:31:57 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 211467] Regression affecting 32->64 bit SYSENTER on AMD
-Date:   Mon, 01 Feb 2021 10:31:57 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jonny@magicstring.co.uk
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.isobsolete attachments.created
-Message-ID: <bug-211467-28872-D4GyC4pvy9@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-211467-28872@https.bugzilla.kernel.org/>
-References: <bug-211467-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S233318AbhBALEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 06:04:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27927 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233272AbhBALEd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 06:04:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612177386;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AXwkC2/bPdrbI6fVlDSTD38OtfXWVbFESDZTO3soPEE=;
+        b=dp9uf7+WCBriARw4lYUvfYeV14wIdcri0CIfdLmszm6PhJLZdumaoO7GslOSV6oGdvTBvL
+        P2u5F9hN+mXZlJ2rh5qzLw1oZ1ival67xsosmB3iA/d1mXwYDUIrXFM9QQWodCO4zwIb4c
+        X0DO+2mzC1GFCr04an23IhDLTZrR+Po=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-XGx0jU_ZOxKU4k5c2Cf_Vg-1; Mon, 01 Feb 2021 06:03:04 -0500
+X-MC-Unique: XGx0jU_ZOxKU4k5c2Cf_Vg-1
+Received: by mail-wr1-f69.google.com with SMTP id l10so10195768wry.16
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 03:03:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=AXwkC2/bPdrbI6fVlDSTD38OtfXWVbFESDZTO3soPEE=;
+        b=G3fDXpkIRHNDMTgTXnJ9wWUrLHe7WBokHAM5p7bGjvNAw32r4Pu1NVBC+/gRY6/I5T
+         wU+YPtyt56hTv0buU7hbr33A5XkBWRa0kvxIILMPODJUMUtzv8MXrDOrvWCQTVznvHJX
+         UslrkwxbrButqgYTP4dlEqX0GgTBPcKMFpXBlTuz5L3k8n83woh4DbRU07v88uiqu5RL
+         zR83+8Tc2nCPW/OKR0vKuo7baA3z6YdXQmEt2tXJohjrqPs7ED2oE0Rxj0WcJmiBO3li
+         p3wtCT3fjlKtNkKKMTP2/QbFtntP8+F/SImgSgbqm9peSjlr+HM25FPm2+omUkcSGO30
+         rQBQ==
+X-Gm-Message-State: AOAM530msnLuplRXvTn90M/dD0ToCghKY7BsD/z97lYun5PS69Sqpbg/
+        hbEORxOcJjw5Vfw/LRDYxTmTsH/dJuFKsysWCBeLUlREOVSsPJU7gfKEh+lF/YahTaLmxZOPqRK
+        FbllQO+W1B2lD
+X-Received: by 2002:a05:600c:3506:: with SMTP id h6mr8535108wmq.21.1612177383216;
+        Mon, 01 Feb 2021 03:03:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxU2aKt9+Qw3PjsRAcMTwk73YwztptNIG52mUOO7l7e58mm0nQ36WJybasD3SZjm82qzwF5QA==
+X-Received: by 2002:a05:600c:3506:: with SMTP id h6mr8535044wmq.21.1612177382653;
+        Mon, 01 Feb 2021 03:03:02 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id g194sm20204347wme.39.2021.02.01.03.03.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Feb 2021 03:03:01 -0800 (PST)
+Date:   Mon, 1 Feb 2021 12:02:58 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+Message-ID: <20210201110258.7ze7a7izl7gesv4w@steredhat>
+References: <20210125110903.597155-1-arseny.krasnov@kaspersky.com>
+ <20210128171923.esyna5ccv5s27jyu@steredhat>
+ <63459bb3-da22-b2a4-71ee-e67660fd2e12@kaspersky.com>
+ <20210129092604.mgaw3ipiyv6xra3b@steredhat>
+ <cb6d5a9c-fd49-a9dd-33b3-52027ae2f71c@kaspersky.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cb6d5a9c-fd49-a9dd-33b3-52027ae2f71c@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D211467
+On Fri, Jan 29, 2021 at 06:52:23PM +0300, Arseny Krasnov wrote:
+>
+>On 29.01.2021 12:26, Stefano Garzarella wrote:
+>> On Fri, Jan 29, 2021 at 09:41:50AM +0300, Arseny Krasnov wrote:
+>>> On 28.01.2021 20:19, Stefano Garzarella wrote:
+>>>> Hi Arseny,
+>>>> I reviewed a part, tomorrow I hope to finish the other patches.
+>>>>
+>>>> Just a couple of comments in the TODOs below.
+>>>>
+>>>> On Mon, Jan 25, 2021 at 02:09:00PM +0300, Arseny Krasnov wrote:
+>>>>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
+>>>>> transport.
+>>>>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>>>>> do it, new packet operation was added: it marks start of record (with
+>>>>> record length in header), such packet doesn't carry any data.  To send
+>>>>> record, packet with start marker is sent first, then all data is sent
+>>>>> as usual 'RW' packets. On receiver's side, length of record is known
+>>>> >from packet with start record marker. Now as  packets of one socket
+>>>>> are not reordered neither on vsock nor on vhost transport layers, such
+>>>>> marker allows to restore original record on receiver's side. If user's
+>>>>> buffer is smaller that record length, when all out of size data is
+>>>>> dropped.
+>>>>> 	Maximum length of datagram is not limited as in stream socket,
+>>>>> because same credit logic is used. Difference with stream socket is
+>>>>> that user is not woken up until whole record is received or error
+>>>>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>>>>> 	Tests also implemented.
+>>>>>
+>>>>> Arseny Krasnov (13):
+>>>>>  af_vsock: prepare for SOCK_SEQPACKET support
+>>>>>  af_vsock: prepare 'vsock_connectible_recvmsg()'
+>>>>>  af_vsock: implement SEQPACKET rx loop
+>>>>>  af_vsock: implement send logic for SOCK_SEQPACKET
+>>>>>  af_vsock: rest of SEQPACKET support
+>>>>>  af_vsock: update comments for stream sockets
+>>>>>  virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>>>>  virtio/vsock: fetch length for SEQPACKET record
+>>>>>  virtio/vsock: add SEQPACKET receive logic
+>>>>>  virtio/vsock: rest of SOCK_SEQPACKET support
+>>>>>  virtio/vsock: setup SEQPACKET ops for transport
+>>>>>  vhost/vsock: setup SEQPACKET ops for transport
+>>>>>  vsock_test: add SOCK_SEQPACKET tests
+>>>>>
+>>>>> drivers/vhost/vsock.c                   |   7 +-
+>>>>> include/linux/virtio_vsock.h            |  12 +
+>>>>> include/net/af_vsock.h                  |   6 +
+>>>>> include/uapi/linux/virtio_vsock.h       |   9 +
+>>>>> net/vmw_vsock/af_vsock.c                | 543 ++++++++++++++++------
+>>>>> net/vmw_vsock/virtio_transport.c        |   4 +
+>>>>> net/vmw_vsock/virtio_transport_common.c | 295 ++++++++++--
+>>>>> tools/testing/vsock/util.c              |  32 +-
+>>>>> tools/testing/vsock/util.h              |   3 +
+>>>>> tools/testing/vsock/vsock_test.c        | 126 +++++
+>>>>> 10 files changed, 862 insertions(+), 175 deletions(-)
+>>>>>
+>>>>> TODO:
+>>>>> - Support for record integrity control. As transport could drop some
+>>>>>   packets, something like "record-id" and record end marker need to
+>>>>>   be implemented. Idea is that SEQ_BEGIN packet carries both record
+>>>>>   length and record id, end marker(let it be SEQ_END) carries only
+>>>>>   record id. To be sure that no one packet was lost, receiver checks
+>>>>>   length of data between SEQ_BEGIN and SEQ_END(it must be same with
+>>>>>   value in SEQ_BEGIN) and record ids of SEQ_BEGIN and SEQ_END(this
+>>>>>   means that both markers were not dropped. I think that easiest way
+>>>>>   to implement record id for SEQ_BEGIN is to reuse another field of
+>>>>>   packet header(SEQ_BEGIN already uses 'flags' as record length).For
+>>>>>   SEQ_END record id could be stored in 'flags'.
+>>>> I don't really like the idea of reusing the 'flags' field for this
+>>>> purpose.
+>>>>
+>>>>>     Another way to implement it, is to move metadata of both SEQ_END
+>>>>>   and SEQ_BEGIN to payload. But this approach has problem, because
+>>>>>   if we move something to payload, such payload is accounted by
+>>>>>   credit logic, which fragments payload, while payload with record
+>>>>>   length and id couldn't be fragmented. One way to overcome it is to
+>>>>>   ignore credit update for SEQ_BEGIN/SEQ_END packet.Another solution
+>>>>>   is to update 'stream_has_space()' function: current implementation
+>>>>>   return non-zero when at least 1 byte is allowed to use,but updated
+>>>>>   version will have extra argument, which is needed length. For 'RW'
+>>>>>   packet this argument is 1, for SEQ_BEGIN it is sizeof(record len +
+>>>>>   record id) and for SEQ_END it is sizeof(record id).
+>>>> Is the payload accounted by credit logic also if hdr.op is not
+>>>> VIRTIO_VSOCK_OP_RW?
+>>> Yes, on send any packet with payload could be fragmented if
+>>>
+>>> there is not enough space at receiver. On receive 'fwd_cnt' and
+>>>
+>>> 'buf_alloc' are updated with header of every packet. Of course,
+>>>
+>>> to every such case i've described i can add check for 'RW'
+>>>
+>>> packet, to exclude payload from credit accounting, but this is
+>>>
+>>> bunch of dumb checks.
+>>>
+>>>> I think that we can define a specific header to put after the
+>>>> virtio_vsock_hdr when hdr.op is SEQ_BEGIN or SEQ_END, and in this header
+>>>> we can store the id and the length of the message.
+>>> I think it is better than use payload and touch credit logic
+>>>
+>> Cool, so let's try this option, hoping there aren't a lot of issues.
+>
+>If i understand, current implementation has 'struct virtio_vsock_hdr',
+>
+>then i'll add 'struct virtio_vsock_hdr_seq' with message length and id.
+>
+>After that, in 'struct virtio_vsock_pkt' which describes packet, field for
+>
+>header(which is 'struct virtio_vsock_hdr') must be replaced with new
+>
+>structure which  contains both 'struct virtio_vsock_hdr' and 'struct
+>
+>virtio_vsock_hdr_seq', because header field of 'struct virtio_vsock_pkt'
+>
+>is buffer for virtio layer. After it all accesses to header(for example to
+>
+>'buf_alloc' field will go accross new  structure with both headers:
+>
+>pkt->hdr.buf_alloc   ->   pkt->extended_hdr.classic_hdr.buf_alloc
+>
+>May be to avoid this, packet's header could be allocated dynamically
+>
+>in the same manner as packet's buffer? Size of allocation is always
+>
+>sizeof(classic header) + sizeof(seq header). In 'struct virtio_vsock_pkt'
+>
+>such header will be implemented as union of two pointers: class header
+>
+>and extended header containing classic and seq header. Which pointer
+>
+>to use is depends on packet's op.
 
-jonny5532 (jonny@magicstring.co.uk) changed:
+I think that the 'classic header' can stay as is, and the extended 
+header can be dynamically allocated, as we do for the payload.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
- Attachment #294993|0                           |1
-        is obsolete|                            |
+But we have to be careful what happens if the other peer doesn't support 
+SEQPACKET and if it counts this extra header as a payload for the credit 
+mechanism.
 
---- Comment #3 from jonny5532 (jonny@magicstring.co.uk) ---
-Created attachment 295027
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D295027&action=3Dedit
-Patch with whitespace fix and SOB
+I'll try to take a closer look in the next few days.
 
-Thanks for confirming, here's the same patch again without the missing newl=
-ine
-and with my SOB tacked on the bottom. I am indeed not set up for sending
-patches so would appreciate it if you could do that bit.
+Thanks,
+Stefano
 
-I had a look through emulate.c to see if I could foresee any unintended side
-effects - it seems that SYSEXIT already handles the potential transition ba=
-ck
-from 64->32 bits.=20
-
-I do note that some of the transitions to PROT64 are wrapped in "#ifdef
-CONFIG_X86_64 ... #endif", for example in em_syscall. However that looks pr=
-etty
-dubious in itself - if em_syscall gets run with the guest in long mode, on =
-a 32
-bit kernel, then it'll just fail to update the EIP but carry on regardless.
-Probably an unlikely scenario however (KVM on AMD has only ever worked on 64
-bit procs as I understand).
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
