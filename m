@@ -2,161 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD62830AE6B
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:52:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5663130AF85
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 19:38:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231748AbhBARux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 12:50:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16658 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232447AbhBARuC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 12:50:02 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111HX8in006167;
-        Mon, 1 Feb 2021 12:49:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=YY3ecy/Al7aUatw1iTYUmj9VR3WvKFhhLF5UQ16Krwc=;
- b=bSbnhHqprdj3obR7MYmF261CjZFtcGsq/f6YmrgDVoBE/rVi/BvyfsSqa+uT4eW87pxI
- bff6m++Eo4mQ5zhbsAVPjDjnwtZtW4wNWebDcl/e9z0H44/rNiRZ/2N1BhEStwQw7+Sq
- 9OLsPFeYv8hJH65czipbX9FVwDpQhuc4JYPOOSfOEeazrUM1/zcjLugZA102D3fFvQdg
- wY7xg4uOhHgLkjzPWHUsXGVgDP2OMYvLANMGOBqa3+MN4GR1Y1i9/oEDFV47pGWzIIuf
- TIXWgbjYLYkWp10oucE0KxBR/qg8+Hcs7gsJH2nCWM8Qrz+mS8gStkcFA2Z08dyHV++s Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36endua4mv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 12:49:20 -0500
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111HXF9h006989;
-        Mon, 1 Feb 2021 12:49:20 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36endua4m8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 12:49:20 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111HcHBg008753;
-        Mon, 1 Feb 2021 17:49:18 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 36cy390ay2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 17:49:18 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111HnIYN29557098
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 17:49:18 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E364112061;
-        Mon,  1 Feb 2021 17:49:18 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5578112062;
-        Mon,  1 Feb 2021 17:49:13 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.84.157])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 17:49:13 +0000 (GMT)
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     jgg@nvidia.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, liranl@nvidia.com, oren@nvidia.com,
-        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
-        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
-        kwankhede@nvidia.com, ACurrid@nvidia.com, gmataev@nvidia.com,
-        cjia@nvidia.com, yishaih@nvidia.com, aik@ozlabs.ru
+        id S232825AbhBAShR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 13:37:17 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:19690 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231124AbhBASgs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 13:36:48 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60184a170002>; Mon, 01 Feb 2021 10:36:07 -0800
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Feb
+ 2021 18:36:05 +0000
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Feb
+ 2021 18:36:03 +0000
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 1 Feb 2021 18:36:02 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OZeUhKCvA9N4AiF4RlcIflSIjma3pDzXDhGUctVTErkg53X7GfC+VNCgCmEjaOYrNS+wrnWr3gEuAJHs1fGmydj7K8IRX43z0ZEKdBQ4MFI0FL65X/YHFfC7jwNvcbYlujkLMo5dIZeJrKpZjvKalQPuyku116NIcP6WHBxVEMYQ4SO9pdnZsm4JcxhFxe0x0n7rn0lNLgPGKEc+v0rhqaP2F/j/Mtirb0ze8v7MYLuhiqImvnGOQrAvIIkN97Eq/ar/REntCzyHIBp57X6y3qys7ogquFr18uY+zcJA+36zesn/0HhzZUd4te8tEmndTimysPWRgMhBFk2KKU7hJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jiTKruJO1AZI7fiHFHE5Rl0gmUMUSvyc/wvIj4+AKSs=;
+ b=cGA+oPVlIkknT9qBCBHYXdUh2KOjARMTod2KYS6tuiMFW7AGXdya9V49PMzuakNQXDq4h97g7ot7lva3iUa3RiREf2a1QvcWwaqGnyXWJ2CHrbyQ2/6jbWer1htO+6m2H3xr5VjOVCNIK2aCovzeI204ImD0QCQWhY9B8WscgAmA1xKgiyCqHKrwmALfry6W/b9R+A3ogZNpeQvqHQm8QN4ElKp/rTc1kRgqNF4mSM3Ea6UT5wIFOXKGxIDFNdjlmVVEyjJCdQORhj2EFBz3aVXqMpNyWLhvWYbpIVaLwFqX63kYD04C8xgrisqMlwNN0GO/UbvmEU5q1bEhWERuxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR12MB1244.namprd12.prod.outlook.com (2603:10b6:3:73::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.24; Mon, 1 Feb
+ 2021 18:36:00 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3805.025; Mon, 1 Feb 2021
+ 18:35:59 +0000
+Date:   Mon, 1 Feb 2021 14:35:58 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
+        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
+        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
+        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        <mjrosato@linux.ibm.com>, <yishaih@nvidia.com>, <aik@ozlabs.ru>
+Subject: Re: [PATCH 9/9] vfio/pci: use powernv naming instead of nvlink2
+Message-ID: <20210201183558.GM4247@nvidia.com>
 References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
- <20210201162828.5938-9-mgurtovoy@nvidia.com>
- <20210201181454.22112b57.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
-Date:   Mon, 1 Feb 2021 12:49:12 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+ <20210201162828.5938-10-mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210201162828.5938-10-mgurtovoy@nvidia.com>
+X-ClientProxiedBy: MN2PR18CA0001.namprd18.prod.outlook.com
+ (2603:10b6:208:23c::6) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <20210201181454.22112b57.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-01_06:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 impostorscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102010089
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR18CA0001.namprd18.prod.outlook.com (2603:10b6:208:23c::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Mon, 1 Feb 2021 18:35:59 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l6e3K-002HtE-DT; Mon, 01 Feb 2021 14:35:58 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612204567; bh=jiTKruJO1AZI7fiHFHE5Rl0gmUMUSvyc/wvIj4+AKSs=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=bi0UtzZlOamrA+yhLa1lWgGCqd0FtocnaKl4jMJoy3wgDwlUsHdeaVHznocEABouK
+         XK/11lEkaknpupxwuMadwzjeZmX+sZJst4ySu0i7iF2PqCQ54CLAFFMARgkZDBkAeC
+         IN5WI0S+eBB7gS1KJi9dORXHwNqMKBJpIGOofHKRFMz8wfWSvmqVbmE9ciAcuV0M/5
+         PRPvNLyLlxpP43KXNIsXO0ouPVx7ZMYg6DrwQADVdCbPjTZzRnI/sFAhBSlI3DJ/SF
+         4Pk9LXbD/CLCaTYxQ9LxvlxoJ+PkzdOQ0+o/jHKb1usMA5bA9IHPH1BJ2oEsbrEJfM
+         woZz3zmHep8qA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/21 12:14 PM, Cornelia Huck wrote:
-> On Mon, 1 Feb 2021 16:28:27 +0000
-> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+On Mon, Feb 01, 2021 at 04:28:28PM +0000, Max Gurtovoy wrote:
+> This patch doesn't change any logic but only align to the concept of
+> vfio_pci_core extensions. Extensions that are related to a platform
+> and not to a specific vendor of PCI devices should be part of the
+> core driver. Extensions that are specific for PCI device vendor should go
+> to a dedicated vendor vfio-pci driver.
 > 
->> This patch doesn't change any logic but only align to the concept of
->> vfio_pci_core extensions. Extensions that are related to a platform
->> and not to a specific vendor of PCI devices should be part of the core
->> driver. Extensions that are specific for PCI device vendor should go
->> to a dedicated vendor vfio-pci driver.
+> For now, powernv extensions will include only nvlink2.
 > 
-> My understanding is that igd means support for Intel graphics, i.e. a
-> strict subset of x86. If there are other future extensions that e.g.
-> only make sense for some devices found only on AMD systems, I don't
-> think they should all be included under the same x86 umbrella.
-> 
-> Similar reasoning for nvlink, that only seems to cover support for some
-> GPUs under Power, and is not a general platform-specific extension IIUC.
-> 
-> We can arguably do the zdev -> s390 rename (as zpci appears only on
-> s390, and all PCI devices will be zpci on that platform), although I'm
-> not sure about the benefit.
+> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+>  drivers/vfio/pci/Kconfig                                    | 6 ++++--
+>  drivers/vfio/pci/Makefile                                   | 2 +-
+>  drivers/vfio/pci/vfio_pci_core.c                            | 4 ++--
+>  drivers/vfio/pci/{vfio_pci_nvlink2.c => vfio_pci_powernv.c} | 0
+>  drivers/vfio/pci/vfio_pci_private.h                         | 2 +-
+>  5 files changed, 8 insertions(+), 6 deletions(-)
+>  rename drivers/vfio/pci/{vfio_pci_nvlink2.c => vfio_pci_powernv.c} (100%)
 
-As far as I can tell, there isn't any benefit for s390 it's just 
-"re-branding" to match the platform name rather than the zdev moniker, 
-which admittedly perhaps makes it more clear to someone outside of s390 
-that any PCI device on s390 is a zdev/zpci type, and thus will use this 
-extension to vfio_pci(_core).  This would still be true even if we added 
-something later that builds atop it (e.g. a platform-specific device 
-like ism-vfio-pci).  Or for that matter, mlx5 via vfio-pci on s390x uses 
-these zdev extensions today and would need to continue using them in a 
-world where mlx5-vfio-pci.ko exists.
+This is really nothing to do with PPC, "nvlink" is a PCI device that
+shows the entire GPU memory space on these special power systems, and
+the this driver changes the normal vfio-pci behavior to match the
+single device.
 
-I guess all that to say: if such a rename matches the 'grand scheme' of 
-this design where we treat arch-level extensions to vfio_pci(_core) as 
-"vfio_pci_(arch)" then I'm not particularly opposed to the rename.  But 
-by itself it's not very exciting :)
+This is probably the best existing example of something that could be
+a vendor PCI driver because of how single-device specific it really
+is.
 
-> 
->>
->> For now, x86 extensions will include only igd.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->> ---
->>   drivers/vfio/pci/Kconfig                            | 13 ++++++-------
->>   drivers/vfio/pci/Makefile                           |  2 +-
->>   drivers/vfio/pci/vfio_pci_core.c                    |  2 +-
->>   drivers/vfio/pci/vfio_pci_private.h                 |  2 +-
->>   drivers/vfio/pci/{vfio_pci_igd.c => vfio_pci_x86.c} |  0
->>   5 files changed, 9 insertions(+), 10 deletions(-)
->>   rename drivers/vfio/pci/{vfio_pci_igd.c => vfio_pci_x86.c} (100%)
-> 
-> (...)
-> 
->> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
->> index c559027def2d..e0e258c37fb5 100644
->> --- a/drivers/vfio/pci/vfio_pci_core.c
->> +++ b/drivers/vfio/pci/vfio_pci_core.c
->> @@ -328,7 +328,7 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
->>   
->>   	if (vfio_pci_is_vga(pdev) &&
->>   	    pdev->vendor == PCI_VENDOR_ID_INTEL &&
->> -	    IS_ENABLED(CONFIG_VFIO_PCI_IGD)) {
->> +	    IS_ENABLED(CONFIG_VFIO_PCI_X86)) {
->>   		ret = vfio_pci_igd_init(vdev);
-> 
-> This one explicitly checks for Intel devices, so I'm not sure why you
-> want to generalize this to x86?
-> 
->>   		if (ret && ret != -ENODEV) {
->>   			pci_warn(pdev, "Failed to setup Intel IGD regions\n");
-> 
+Read 7f92891778dff62303c070ac81de7b7d80de331a to get some sense of how
+very special a device it is.
 
+This could be like mlx5, with the single PCI ID pre-populated in a
+match table.
+
+That is probably the key test for vfio_pci_core vs vfio_pci - if the
+modification is triggered by a single PCI ID that can be matched it is
+vfio_pci side, not core.  Compared to the s390 stuff which applies to
+all PCI devices in the system.
+
+Jason
