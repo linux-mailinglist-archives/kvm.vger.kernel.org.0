@@ -2,83 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 27B8330A902
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:47:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D65830A923
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:56:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232142AbhBANqi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 08:46:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47650 "EHLO mail.kernel.org"
+        id S231776AbhBANzx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 08:55:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49072 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231284AbhBANqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 08:46:36 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9FAC864D99;
-        Mon,  1 Feb 2021 13:45:55 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l6ZWb-00BHWZ-EK; Mon, 01 Feb 2021 13:45:53 +0000
+        id S229707AbhBANzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 08:55:52 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E0C9B64D9D;
+        Mon,  1 Feb 2021 13:55:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612187711;
+        bh=dmMa6igSrfr8Kqr11tNDaLEvYhkM+qbuD/1gq1a+Pp8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=d9OMeoSn54heoMcY93O8Sy1eY721FH6QtFz00ZXp8ZGiMQMkGCDPYcmWheefS5PI6
+         3jqsL16flnObQNxUGRQ8ox/U0Q6bamMm9xcMqtcEPCan52yhV4bbAWWVI0DWM/q2J8
+         DVVuk0GCVkslZKKb7uCZ97lTb0xv/44ZES64p5QU=
+Date:   Mon, 1 Feb 2021 14:55:08 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, stable@vger.kernel.org,
+        kvm@vger.kernel.org, Rick Edgecombe <rick.p.edgecombe@intel.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [stable-5.4][PATCH] KVM: Forbid the use of tagged userspace
+ addresses for memslots
+Message-ID: <YBgIPLYuf3P4lqB3@kroah.com>
+References: <20210201133137.3541896-1-maz@kernel.org>
+ <b08e3ccf-9a69-819a-8632-46c82dade2fa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 01 Feb 2021 13:45:53 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        kvmarm@lists.cs.columbia.edu,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        James Morse <james.morse@arm.com>,
-        julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: arm64: gen-hyprel.c:40:10: fatal error: generated/autoconf.h: No
- such file or directory
-In-Reply-To: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
-References: <CA+G9fYvzh5GEssPJHM=r2TVUKOhsFJ8jqrY+pP4t7+jF8ctz9A@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <5f072f84c7c9b03ded810e56687935b2@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: naresh.kamboju@linaro.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, lkft-triage@lists.linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, sfr@canb.auug.org.au, arnd@arndb.de, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b08e3ccf-9a69-819a-8632-46c82dade2fa@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-02-01 13:38, Naresh Kamboju wrote:
-> Linux next 20210201 tag arm64 builds failed.
-> kernel config attached to this email.
+On Mon, Feb 01, 2021 at 02:38:05PM +0100, Paolo Bonzini wrote:
+> On 01/02/21 14:31, Marc Zyngier wrote:
+> > commit 139bc8a6146d92822c866cf2fd410159c56b3648 upstream.
+> > 
+> > The use of a tagged address could be pretty confusing for the
+> > whole memslot infrastructure as well as the MMU notifiers.
+> > 
+> > Forbid it altogether, as it never quite worked the first place.
+> > 
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   Documentation/virt/kvm/api.txt | 3 +++
+> >   virt/kvm/kvm_main.c            | 1 +
+> >   2 files changed, 4 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.txt b/Documentation/virt/kvm/api.txt
+> > index a18e996fa54b..7064efd3b5ea 100644
+> > --- a/Documentation/virt/kvm/api.txt
+> > +++ b/Documentation/virt/kvm/api.txt
+> > @@ -1132,6 +1132,9 @@ field userspace_addr, which must point at user addressable memory for
+> >   the entire memory slot size.  Any object may back this memory, including
+> >   anonymous memory, ordinary files, and hugetlbfs.
+> > +On architectures that support a form of address tagging, userspace_addr must
+> > +be an untagged address.
+> > +
+> >   It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+> >   be identical.  This allows large pages in the guest to be backed by large
+> >   pages in the host.
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 8f3b40ec02b7..f25b5043cbca 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1017,6 +1017,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> >   	/* We can read the guest memory with __xxx_user() later on. */
+> >   	if ((id < KVM_USER_MEM_SLOTS) &&
+> >   	    ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
+> > +	     (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
+> >   	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+> >   			mem->memory_size)))
+> >   		goto out;
+> > 
 > 
-> BAD:    next-20210201
-> GOOD: next-20210129
+> Indeed untagged_addr was added in 5.3.
 > 
-> make --silent --keep-going --jobs=8
-> O=/home/tuxbuild/.cache/tuxmake/builds/1/tmp ARCH=arm64
-> CROSS_COMPILE=aarch64-linux-gnu- 'CC=sccache aarch64-linux-gnu-gcc'
-> 'HOSTCC=sccache gcc'
-> arch/arm64/kvm/hyp/nvhe/gen-hyprel.c:40:10: fatal error:
-> generated/autoconf.h: No such file or directory
->    40 | #include <generated/autoconf.h>
->       |          ^~~~~~~~~~~~~~~~~~~~~~
-> compilation terminated.
-> 
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Could you please check with the fix suggested at [1]?
+Now queued up, thanks.
 
-Thanks,
-
-         M.
-
-[1] https://lore.kernel.org/r/20210201104251.5foc64qq3ewgnhuz@google.com
--- 
-Jazz is not dead. It just smells funny...
+greg k-h
