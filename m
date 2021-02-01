@@ -2,183 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B24C30A784
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 13:24:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7777830A79C
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 13:28:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbhBAMXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 07:23:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42376 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229500AbhBAMXl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 07:23:41 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 111CBejE068905;
-        Mon, 1 Feb 2021 07:22:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0CsY5/MfbVfHO833FCNa1XGAQEdhJHUd+HRdVcWP2pk=;
- b=WbZXVLyizstXSM4bXi0eY/4QOVrrEXdpxzc94LDQ0zH5xnQ5QJQZkm+Ly6TqmGcBUs64
- aD9gXjXp4K0ET3MdYDjzkCnNrCao2+/msu9WXm1QmYq0rEfUc2rdA3v5lo1iFXhFTr0j
- bWmV5lJgTRifbNoG2Y0CDDXhTA6IBN416tpNVDRoKrZmAQb76RhnOSadBRu5NqvdQsXj
- rqBpOdKrk3PZ6IEYZGuIi06u2/OhQ/Smb3dFedc5uob16vS8x3bUQd8vJXQscrpprrm2
- qN4TktmtTqa2NatUWl5en4kSJCJ6Rza/t4vWk4zW/na/qQX0AQkS8Qlp5feu4m8ynyZk dQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36ehe80axm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 07:22:58 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 111CBesq068888;
-        Mon, 1 Feb 2021 07:22:58 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36ehe80ax5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 07:22:58 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 111CCSaw015675;
-        Mon, 1 Feb 2021 12:22:56 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 36cy38hu72-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 Feb 2021 12:22:56 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 111CMrDK35127784
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Feb 2021 12:22:53 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 796F24C058;
-        Mon,  1 Feb 2021 12:22:53 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1333F4C050;
-        Mon,  1 Feb 2021 12:22:53 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.68.23])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Feb 2021 12:22:52 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v1 2/5] s390x: css: simplifications of the
- tests
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, imbrenda@linux.ibm.com
-References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
- <1611930869-25745-3-git-send-email-pmorel@linux.ibm.com>
- <4f5ca0b9-378e-431c-33ec-79946bdf21b2@linux.ibm.com>
- <10f3108b-c1fe-7da9-7153-803690d311d4@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <0069eb2c-7b9c-1582-c86f-0c68a147d608@linux.ibm.com>
-Date:   Mon, 1 Feb 2021 13:22:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S231355AbhBAM1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 07:27:43 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11652 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229624AbhBAM11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 07:27:27 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DTnGG4rnkz162kv;
+        Mon,  1 Feb 2021 20:25:26 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 1 Feb 2021 20:26:41 +0800
+Subject: Re: [PATCH v13 03/15] iommu/arm-smmu-v3: Maintain a SID->device
+ structure
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-4-eric.auger@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <a5cc1635-b69b-50a6-404a-5bf667296669@huawei.com>
+Date:   Mon, 1 Feb 2021 20:26:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <10f3108b-c1fe-7da9-7153-803690d311d4@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20201118112151.25412-4-eric.auger@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-01_04:2021-01-29,2021-02-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- phishscore=0 spamscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102010059
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/21 1:15 PM, Pierre Morel wrote:
-> 
-> 
-> On 2/1/21 11:11 AM, Janosch Frank wrote:
->> On 1/29/21 3:34 PM, Pierre Morel wrote:
-> 
-> ...snip...
-> 
->>> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
->>> index fe05021..f300969 100644
->>> --- a/lib/s390x/css_lib.c
->>> +++ b/lib/s390x/css_lib.c
->>> @@ -118,6 +118,31 @@ out:
->>>   	return schid;
->>>   }
->>>   
->>> +/*
->>> + * css_enable: enable the subchannel with the specified ISC
->>
->> enabled or enable?
-> 
-> Forgot to change the cut and paste :(
-> 
-> /*
->   * css_enabled: report if the sub channel is enabled
-> 
->>
->> I.e. do you test if it is enabled or do you want to enable it.
->>
->>> + * @schid: Subchannel Identifier
->>> + * Return value:
->>> + *   true if the subchannel is enabled
->>> + *   false otherwise
->>> + */
->>> +bool css_enabled(int schid)
->>> +{
->>> +	struct pmcw *pmcw = &schib.pmcw;
->>> +	int cc;
->>> +
->>> +	cc = stsch(schid, &schib);
->>> +	if (cc) {
->>> +		report_info("stsch: updating sch %08x failed with cc=%d",
->>> +			    schid, cc);
->>> +		return false;
->>> +	}
->>> +
->>> +	if (!(pmcw->flags & PMCW_ENABLE)) {
->>> +		report_info("stsch: sch %08x not enabled", schid);
->>> +		return 0;
->>
->> Please stay with true/false or change the return type to int and use ints.
-> 
-> yes
-> 
->>
->>> +	}
->>> +	return true;
->>> +}
-> 
-> ...snip...
-> 
->>> @@ -129,16 +120,21 @@ static void test_sense(void)
->>>   	report_info("reserved 0x%02x cu_type 0x%04x cu_model 0x%02x dev_type 0x%04x dev_model 0x%02x",
->>>   		    senseid->reserved, senseid->cu_type, senseid->cu_model,
->>>   		    senseid->dev_type, senseid->dev_model);
->>> +	report_info("cu_type expected 0x%04x got 0x%04x", (uint16_t)cu_type,
->>> +		    senseid->cu_type);
->>>   
->>> -	report(senseid->cu_type == cu_type, "cu_type expected 0x%04x got 0x%04x",
->>> -	       (uint16_t)cu_type, senseid->cu_type);
->>> +	retval = senseid->cu_type == cu_type;
->>>   
->>>   error:
->>>   	free_io_mem(ccw, sizeof(*ccw));
->>>   error_ccw:
->>>   	free_io_mem(senseid, sizeof(*senseid));
->>> -error_senseid:
->>> -	unregister_io_int_func(css_irq_io);
->>> +	return retval;
->>
->> Could you return senseid->cu_type == cu_type here?
-> 
-> It would work for the current code and DEFAULT_CU_TYPE.
-> But I do not think it is a good idea due to the goto we have in error 
-> case before I find that it makes the code less understandable.
-> 
-> Other opinion?
+Hi Eric,
 
-That's why I asked, it wasn't a direct suggestion.
-I'm not a big fan of the ret/retval naming but the function is short so
-it should be ok.
-
+On 2020/11/18 19:21, Eric Auger wrote:
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 > 
-> Thanks for the comments,
-> Pierre
+> When handling faults from the event or PRI queue, we need to find the
+> struct device associated to a SID. Add a rb_tree to keep track of SIDs.
 > 
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+[...]
 
+>  }
+>  
+> +static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
+> +				  struct arm_smmu_master *master)
+> +{
+> +	int i;
+> +	int ret = 0;
+> +	struct arm_smmu_stream *new_stream, *cur_stream;
+> +	struct rb_node **new_node, *parent_node = NULL;
+> +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+> +
+> +	master->streams = kcalloc(fwspec->num_ids,
+> +				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
+> +	if (!master->streams)
+> +		return -ENOMEM;
+> +	master->num_streams = fwspec->num_ids;
+This is not roll-backed when fail.
+
+> +
+> +	mutex_lock(&smmu->streams_mutex);
+> +	for (i = 0; i < fwspec->num_ids && !ret; i++) {
+Check ret at here, makes it hard to decide the start index of rollback.
+
+If we fail at here, then start index is (i-2).
+If we fail in the loop, then start index is (i-1).
+
+> +		u32 sid = fwspec->ids[i];
+> +
+> +		new_stream = &master->streams[i];
+> +		new_stream->id = sid;
+> +		new_stream->master = master;
+> +
+> +		/*
+> +		 * Check the SIDs are in range of the SMMU and our stream table
+> +		 */
+> +		if (!arm_smmu_sid_in_range(smmu, sid)) {
+> +			ret = -ERANGE;
+> +			break;
+> +		}
+> +
+> +		/* Ensure l2 strtab is initialised */
+> +		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
+> +			ret = arm_smmu_init_l2_strtab(smmu, sid);
+> +			if (ret)
+> +				break;
+> +		}
+> +
+> +		/* Insert into SID tree */
+> +		new_node = &(smmu->streams.rb_node);
+> +		while (*new_node) {
+> +			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
+> +					      node);
+> +			parent_node = *new_node;
+> +			if (cur_stream->id > new_stream->id) {
+> +				new_node = &((*new_node)->rb_left);
+> +			} else if (cur_stream->id < new_stream->id) {
+> +				new_node = &((*new_node)->rb_right);
+> +			} else {
+> +				dev_warn(master->dev,
+> +					 "stream %u already in tree\n",
+> +					 cur_stream->id);
+> +				ret = -EINVAL;
+> +				break;
+> +			}
+> +		}
+> +
+> +		if (!ret) {
+> +			rb_link_node(&new_stream->node, parent_node, new_node);
+> +			rb_insert_color(&new_stream->node, &smmu->streams);
+> +		}
+> +	}
+> +
+> +	if (ret) {
+> +		for (; i > 0; i--)
+should be (i >= 0)?
+And the start index seems not correct.
+
+> +			rb_erase(&master->streams[i].node, &smmu->streams);
+> +		kfree(master->streams);
+> +	}
+> +	mutex_unlock(&smmu->streams_mutex);
+> +
+> +	return ret;
+> +}
+> +
+> +static void arm_smmu_remove_master(struct arm_smmu_master *master)
+> +{
+> +	int i;
+> +	struct arm_smmu_device *smmu = master->smmu;
+> +	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(master->dev);
+> +
+> +	if (!smmu || !master->streams)
+> +		return;
+> +
+> +	mutex_lock(&smmu->streams_mutex);
+> +	for (i = 0; i < fwspec->num_ids; i++)
+> +		rb_erase(&master->streams[i].node, &smmu->streams);
+> +	mutex_unlock(&smmu->streams_mutex);
+> +
+> +	kfree(master->streams);
+> +}
+> +
+>  static struct iommu_ops arm_smmu_ops;
+>  
+>  static struct iommu_device *arm_smmu_probe_device(struct device *dev)
+>  {
+> -	int i, ret;
+> +	int ret;
+>  	struct arm_smmu_device *smmu;
+>  	struct arm_smmu_master *master;
+>  	struct iommu_fwspec *fwspec = dev_iommu_fwspec_get(dev);
+> @@ -2331,27 +2447,12 @@ static struct iommu_device *arm_smmu_probe_device(struct device *dev)
+>  
+>  	master->dev = dev;
+>  	master->smmu = smmu;
+> -	master->sids = fwspec->ids;
+> -	master->num_sids = fwspec->num_ids;
+>  	INIT_LIST_HEAD(&master->bonds);
+>  	dev_iommu_priv_set(dev, master);
+>  
+> -	/* Check the SIDs are in range of the SMMU and our stream table */
+> -	for (i = 0; i < master->num_sids; i++) {
+> -		u32 sid = master->sids[i];
+> -
+> -		if (!arm_smmu_sid_in_range(smmu, sid)) {
+> -			ret = -ERANGE;
+> -			goto err_free_master;
+> -		}
+> -
+> -		/* Ensure l2 strtab is initialised */
+> -		if (smmu->features & ARM_SMMU_FEAT_2_LVL_STRTAB) {
+> -			ret = arm_smmu_init_l2_strtab(smmu, sid);
+> -			if (ret)
+> -				goto err_free_master;
+> -		}
+> -	}
+> +	ret = arm_smmu_insert_master(smmu, master);
+> +	if (ret)
+> +		goto err_free_master;
+>  
+>  	master->ssid_bits = min(smmu->ssid_bits, fwspec->num_pasid_bits);
+>  
+> @@ -2389,6 +2490,7 @@ static void arm_smmu_release_device(struct device *dev)
+>  	WARN_ON(arm_smmu_master_sva_enabled(master));
+>  	arm_smmu_detach_dev(master);
+>  	arm_smmu_disable_pasid(master);
+> +	arm_smmu_remove_master(master);
+>  	kfree(master);
+
+Thanks,
+Keqian
