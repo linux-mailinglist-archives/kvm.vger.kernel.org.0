@@ -2,108 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1747830A886
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:21:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9D7930A882
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 14:20:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231622AbhBANUO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 08:20:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52550 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231907AbhBANSs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 08:18:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612185441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=86zf3NE2wSQpzSpx9fkGWeypfvPmWZ5ookbkREpbY4A=;
-        b=P04B9qjhtb+RcN/R4WfwR/gIhoTaU+/bFc8Wd4td+znKuZ0OsY6eDiLKof4ufToXA2zhnd
-        Bk5hPKUXwZS9jPa1j78b4RpSOuN0MRpj/QAWrH8/pq+YCTiSbBXurww5LLQ6UoSbxe4Ott
-        uk7M4LZRIIcF3HGzGImoOy1Wb/tXnrI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-Je11CXJ0NVOzvb6dzk6K0Q-1; Mon, 01 Feb 2021 08:17:20 -0500
-X-MC-Unique: Je11CXJ0NVOzvb6dzk6K0Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S231848AbhBANTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 08:19:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42372 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231849AbhBANSA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 08:18:00 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06C301005504;
-        Mon,  1 Feb 2021 13:17:19 +0000 (UTC)
-Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 34E0E5C1A3;
-        Mon,  1 Feb 2021 13:17:15 +0000 (UTC)
-Date:   Mon, 1 Feb 2021 14:17:12 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V3 7/9] vfio: iommu driver notify callback
-Message-ID: <20210201141712.255725b7.cohuck@redhat.com>
-In-Reply-To: <b7c5896d-d3f3-9dd2-15fa-a8137d56964c@oracle.com>
-References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
-        <1611939252-7240-8-git-send-email-steven.sistare@oracle.com>
-        <20210129145719.1b6cbe9c@omen.home.shazbot.org>
-        <b3260683-7c45-4648-3b4b-3c81fb5ff5f7@oracle.com>
-        <20210201133440.001850f4.cohuck@redhat.com>
-        <b7c5896d-d3f3-9dd2-15fa-a8137d56964c@oracle.com>
-Organization: Red Hat GmbH
+        by mail.kernel.org (Postfix) with ESMTPSA id 346B364E2A;
+        Mon,  1 Feb 2021 13:17:20 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l6Z4w-00BH6m-3U; Mon, 01 Feb 2021 13:17:18 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Date:   Mon, 01 Feb 2021 13:17:18 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com, jiangkunkun@huawei.com,
+        xiexiangyou@huawei.com, zhengchuan@huawei.com, yubihong@huawei.com
+Subject: Re: [RFC PATCH 0/7] kvm: arm64: Implement SW/HW combined dirty log
+In-Reply-To: <f68d12f2-fa98-ebdd-3075-bfdcd690ee51@huawei.com>
+References: <20210126124444.27136-1-zhukeqian1@huawei.com>
+ <f68d12f2-fa98-ebdd-3075-bfdcd690ee51@huawei.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <9a64d4acd8e8b0b8c86143752b8c856d@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: zhukeqian1@huawei.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org, catalin.marinas@arm.com, alex.williamson@redhat.com, kwankhede@nvidia.com, cohuck@redhat.com, mark.rutland@arm.com, james.morse@arm.com, robin.murphy@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com, jiangkunkun@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, yubihong@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Feb 2021 07:52:16 -0500
-Steven Sistare <steven.sistare@oracle.com> wrote:
-
-> On 2/1/2021 7:34 AM, Cornelia Huck wrote:
-> > On Sat, 30 Jan 2021 11:51:41 -0500
-> > Steven Sistare <steven.sistare@oracle.com> wrote:
-> >   
-> >> On 1/29/2021 4:57 PM, Alex Williamson wrote:  
-> >>> On Fri, 29 Jan 2021 08:54:10 -0800
-> >>> Steve Sistare <steven.sistare@oracle.com> wrote:
-> >>>     
-> >>>> Define a vfio_iommu_driver_ops notify callback, for sending events to
-> >>>> the driver.  Drivers are not required to provide the callback, and
-> >>>> may ignore any events.  The handling of events is driver specific.
-> >>>>
-> >>>> Define the CONTAINER_CLOSE event, called when the container's file
-> >>>> descriptor is closed.  This event signifies that no further state changes
-> >>>> will occur via container ioctl's.
-> >>>>
-> >>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >>>> ---
-> >>>>  drivers/vfio/vfio.c  | 5 +++++
-> >>>>  include/linux/vfio.h | 5 +++++
-> >>>>  2 files changed, 10 insertions(+)
-
-> >>>> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> >>>> index 38d3c6a..9642579 100644
-> >>>> --- a/include/linux/vfio.h
-> >>>> +++ b/include/linux/vfio.h
-> >>>> @@ -57,6 +57,9 @@ extern int vfio_add_group_dev(struct device *dev,
-> >>>>  extern void vfio_device_put(struct vfio_device *device);
-> >>>>  extern void *vfio_device_data(struct vfio_device *device);
-> >>>>  
-> >>>> +/* events for the backend driver notify callback */
-> >>>> +#define VFIO_DRIVER_NOTIFY_CONTAINER_CLOSE	1    
-> >>>
-> >>> We should use an enum for type checking.    
-> >>
-> >> Agreed.
-> >> I see you changed the value to 0.  Do you want to reserve 0 for invalid-event?
-> >> (I know, this is internal and can be changed).  Your call.  
-> > 
-> > I'm not sure what we would use an invalid-event event for... the type
-> > checking provided by the enum should be enough?  
+On 2021-02-01 13:12, Keqian Zhu wrote:
+> Hi Marc,
 > 
-> I should have described it as no-event or null-event.  It can be useful when
-> initializing a struct member that stores an event, eg, last-event-received.
+> Do you have time to have a look at this? Thanks ;-)
 
-I think we could just use -1 for that. Anyway, easy to change if a need
-comes up.
+Not immediately. I'm busy with stuff that is planned to go
+in 5.12, which isn't the case for this series. I'll get to
+it eventually.
 
+Thanks,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
