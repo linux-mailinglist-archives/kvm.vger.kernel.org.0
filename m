@@ -2,110 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F025530AE09
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:38:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3564230AE0F
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 18:38:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231263AbhBARhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 12:37:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41054 "EHLO
+        id S232256AbhBARil (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 12:38:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232228AbhBARhp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 12:37:45 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B52C0613D6
-        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:37:05 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id z21so12547920pgj.4
-        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:37:05 -0800 (PST)
+        with ESMTP id S232285AbhBARif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 12:38:35 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D55FC0613D6
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 09:37:55 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id g10so17542926wrx.1
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 09:37:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=e3tLlamqi6EsHVI2NML0yw8IMYcpeNFO/sOLZ/Il4hQ=;
-        b=iyRrXXzxgZFJhT+KMYt6Kuw+uzwHeh+0+EkgErubLCKnjEQw9Vik72Di9Ogu/Qh8y+
-         CpQzhU0GHe17xOUwyUvlBjixXGD+IH/Arvv63Yonyvp3HHiG/iMB3Q9kdx0I0PvEu5yb
-         gH9QtAUA+JXLDeIQts7wc/wkTLWiOjdSWBb0PCqe6evv4KXBFP+k0X6ilKl8l+qrD8DZ
-         QOq1bdQmuo+9fAtlziV6ZV/ahvcdvkxSbwDEAQsU0BRn38+FCegdeMcoyNdnnGhQ2VKb
-         dzc0V3ZK3QgA+aKeC9hrn2w4B1crU5u06JQvlQ2NSiinLNAASHIaiob2Sy+wWo7gmTRe
-         B+HA==
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=+/N4KgN5C2monjE5twfqaeTpOba08XYKc+5/16GV+SA=;
+        b=jFPHDIHoSoM/6p0pc3TfyjxWVOA/WyRLnxnUphvxcbQYPweRT0GBKeytGG3iOROjGU
+         /hibUUkX5IPCmuzE1TyFDUQ3zFUFKnEwLCVRklQxBhfgcj80m5wXEcb68+cyHBoofRbZ
+         7ZkS+nX+ttr9YaFAr5gBfz81CEBDkK/II5vx9QNirKTJStvbGn0Dzf9WulDEd6B/lA9a
+         X+yGwnaj8d4vLi5Xbv3sub5OnRumdu/BNsW8GdVOhfPFD7J9Aole4CGV6ziz7yP8IBkj
+         Xcz6RRtQ2euGC25jboYXM33MwCbJFW7/yPBM2h/WeBRSo0CYpqJV428OV+qd3LeDK3x6
+         x27w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=e3tLlamqi6EsHVI2NML0yw8IMYcpeNFO/sOLZ/Il4hQ=;
-        b=rMdPbdHKpptaYZFLGo6nlFyliGZMMhorvlW2ZMOu6QmXxEb5Sc9ujf3jmXE9aon3QQ
-         9MySyQvOpWxnfCIUvncjLFZpJKY40nGDeyRzrbl0AE1HNjEMoMMAUPTTBjp3ocwoyXia
-         o0Mflc7xrQ54HfZJLstsAeHc4BMjlIhCKouRDIn0PWAj2sviqcch/+3C5yXuwZ6IeXKl
-         xoDpjssc7nCcfmUmc33UI+T6EoRHSXldNrNrJ1fMtzs6IHsM+6m142joYTPceRSWYXLG
-         ZXuV0TiWV8JXljo7mQK1/rIXnipYKSdc7E01O9/d3cT+rczpdWst5zrfQks4zFbTIyjq
-         Q6vQ==
-X-Gm-Message-State: AOAM530eUgEboz/a6nA8ip6BbFHOlmBY3FWpjCY7CpBxGUPSaAyeKTLz
-        gS4T5DESiU6ZkjawQ+xn8gvo6B4jtAl3iw==
-X-Google-Smtp-Source: ABdhPJzXJTscogj6sdKLUOea1VrRG7owfCMyOVFziKIOgEM12lAm5hyJ1PaJ/GQS4SctTAhN96mMVA==
-X-Received: by 2002:a62:8f96:0:b029:1b7:75a9:a8b7 with SMTP id n144-20020a628f960000b02901b775a9a8b7mr17694285pfd.28.1612201024719;
-        Mon, 01 Feb 2021 09:37:04 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:829:fccd:80d7:796f])
-        by smtp.gmail.com with ESMTPSA id y75sm18416329pfg.119.2021.02.01.09.37.03
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=+/N4KgN5C2monjE5twfqaeTpOba08XYKc+5/16GV+SA=;
+        b=j08F2Dtl2bk0gbOzlKgOJmm7EIrmT1yBCcUudK0Y6DbMWbjrFrT2n8wDxLdxD6stL5
+         Ww2TZjDuQWp5Yes3ZkpNk7ErYhNlzODym0/6iURM8P5RQW8ZL0ovYkBkznkQbK8jArPQ
+         O+dGGySeJSi3xwIqcyh9VBbXYleezAdFlUdy/WZN53Vkfr6wqJTn3q8zdHFrXbCJHGjp
+         rAwzW8ivwHhq2BuQBdocUqraMssB4Yyj2USH6WAgzrtzWOM2ePtGgL3Ie4LZsq4mvMWj
+         FhG/MMJeKQN8CerT72t2SUDitkiju1YNCZJePIEge7jiUvcPhfyzxKpvL0oq2EOfJfk8
+         UhUQ==
+X-Gm-Message-State: AOAM531Os9G61Nau1X4Nsru1nJGS73cVPHByDk6/tztbr3VJILVi5LUs
+        eetvj9opLIbRr0O7+X1Ug78/jQ==
+X-Google-Smtp-Source: ABdhPJzJuYH3FM16GowHSyY9NWbraoztT9aumlPZDlqHl1ixDPQE1vRjYRFS6ktS9KgQmKzrW2MYDQ==
+X-Received: by 2002:adf:d1cb:: with SMTP id b11mr19731450wrd.118.1612201074212;
+        Mon, 01 Feb 2021 09:37:54 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id d30sm30226980wrc.92.2021.02.01.09.37.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 09:37:04 -0800 (PST)
-Date:   Mon, 1 Feb 2021 09:36:57 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jmattson@google.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86: Allow guests to see MSR_IA32_TSX_CTRL even
- if tsx=off
-Message-ID: <YBg8OcuPFhQjsz3w@google.com>
-References: <20210129101912.1857809-1-pbonzini@redhat.com>
- <YBQ+peAEdX2h3tro@google.com>
- <37be5fb8-056f-8fba-3016-464634e069af@redhat.com>
- <618c5513-5092-f7cd-b47b-933936001180@redhat.com>
- <YBgugM03fsEiOxz1@google.com>
- <cac389ad-96b0-293e-f977-4e9c6d719dea@redhat.com>
+        Mon, 01 Feb 2021 09:37:52 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 507551FF7E;
+        Mon,  1 Feb 2021 17:37:52 +0000 (GMT)
+References: <20210131115022.242570-1-f4bug@amsat.org>
+ <20210131115022.242570-7-f4bug@amsat.org>
+ <80af7db7-2311-7cc5-93a0-f0609b0222d0@redhat.com>
+User-agent: mu4e 1.5.7; emacs 28.0.50
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Fam Zheng <fam@euphon.net>, Claudio Fontana <cfontana@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
+        kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>,
+        qemu-arm@nongnu.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        John Snow <jsnow@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v6 06/11] target/arm: Restrict ARMv7 R-profile cpus to
+ TCG accel
+Date:   Mon, 01 Feb 2021 17:37:22 +0000
+In-reply-to: <80af7db7-2311-7cc5-93a0-f0609b0222d0@redhat.com>
+Message-ID: <874kivvgcv.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cac389ad-96b0-293e-f977-4e9c6d719dea@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021, Paolo Bonzini wrote:
-> On 01/02/21 17:38, Sean Christopherson wrote:
-> > > > >      /*
-> > > > >       * On TAA affected systems:
-> > > > >       *      - nothing to do if TSX is disabled on the host.
-> > > > >       *      - we emulate TSX_CTRL if present on the host.
-> > > > >       *      This lets the guest use VERW to clear CPU buffers.
-> > > > >       */
-> > 
-> > it says "nothing to do..." and then clears a
-> > flag.  The other interpretation of "nothing to do... at runtime" is also wrong
-> > as KVM emulates the MSR as a nop.
-> > 
-> > I guess I just find the whole comment more confusing than the code itself.
-> 
-> What about:
-> 
-> 
->         if (!boot_cpu_has(X86_FEATURE_RTM)) {
->                 /*
->                  * If RTM=0 because the kernel has disabled TSX, the host might
->                  * have TAA_NO or TSX_CTRL.  Clear TAA_NO (the guest sees RTM=0
->                  * and therefore knows that there cannot be TAA) but keep
->                  * TSX_CTRL: some buggy userspaces leave it set on tsx=on hosts,
->                  * and we want to allow migrating those guests to tsx=off hosts.
->                  */
->                 data &= ~ARCH_CAP_TAA_NO;
->         } else if (!boot_cpu_has_bug(X86_BUG_TAA)) {
->                 data |= ARCH_CAP_TAA_NO;
->         } else {
->                 /*
->                  * Nothing to do here; we emulate TSX_CTRL if present on the
->                  * host so the guest can choose between disabling TSX or
->                  * using VERW to clear CPU buffers.
->                  */
->         }
 
-Awesome!  Thanks much!
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> On 1/31/21 12:50 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> KVM requires the target cpu to be at least ARMv8 architecture
+>> (support on ARMv7 has been dropped in commit 82bf7ae84ce:
+>> "target/arm: Remove KVM support for 32-bit Arm hosts").
+>>=20
+>> Beside, KVM only supports A-profile, thus won't be able to run
+>> R-profile cpus.
+>>=20
+>> Only enable the following ARMv7 R-Profile CPUs when TCG is available:
+>>=20
+>>   - Cortex-R5
+>>   - Cortex-R5F
+>>=20
+>> The following machine is no more built when TCG is disabled:
+>>=20
+>>   - xlnx-zcu102          Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5=
+Fs
+>>=20
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  default-configs/devices/aarch64-softmmu.mak | 1 -
+>>  hw/arm/Kconfig                              | 2 ++
+>>  target/arm/Kconfig                          | 4 ++++
+>>  3 files changed, 6 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/default-configs/devices/aarch64-softmmu.mak b/default-confi=
+gs/devices/aarch64-softmmu.mak
+>> index 958b1e08e40..a4202f56817 100644
+>> --- a/default-configs/devices/aarch64-softmmu.mak
+>> +++ b/default-configs/devices/aarch64-softmmu.mak
+>> @@ -3,6 +3,5 @@
+>>  # We support all the 32 bit boards so need all their config
+>>  include arm-softmmu.mak
+>>=20=20
+>> -CONFIG_XLNX_ZYNQMP_ARM=3Dy
+>>  CONFIG_XLNX_VERSAL=3Dy
+>>  CONFIG_SBSA_REF=3Dy
+>> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+>> index 6c4bce4d637..4baf1f97694 100644
+>> --- a/hw/arm/Kconfig
+>> +++ b/hw/arm/Kconfig
+>> @@ -360,8 +360,10 @@ config STM32F405_SOC
+>>=20=20
+>>  config XLNX_ZYNQMP_ARM
+>>      bool
+>> +    default y if TCG && ARM
+>
+> The correct line is:
+>
+>       "default y if TCG && AARCH64"
+
+Ahh yes, TIL we had some R-profile cores in QEMU ;-)
+
+with the fix:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
