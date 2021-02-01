@@ -2,143 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 389CC309FEF
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 02:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D09C30A0DC
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 05:33:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231167AbhBABUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Jan 2021 20:20:30 -0500
-Received: from mga17.intel.com ([192.55.52.151]:59986 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231142AbhBABSM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Jan 2021 20:18:12 -0500
-IronPort-SDR: xixqrOVTz7BirzcvtVbTJjOWQu8RxxUVl3/OYrj+aW0FTJbzC4Ol9l/AP5pj8pqNmp+ViQzehx
- 9jnz+dl2U5Qw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9881"; a="160386674"
-X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
-   d="scan'208";a="160386674"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2021 17:17:25 -0800
-IronPort-SDR: ZjUrABCH9VeaMNX6B/bn0Qv7tEKrvdRUR403IqJV6+DhpEPP4RR8KzOpJ4N1CPumLY4Z8dkA5k
- Ggl98LrgkxxA==
-X-IronPort-AV: E=Sophos;i="5.79,391,1602572400"; 
-   d="scan'208";a="580477903"
-Received: from kpeng-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.130.129])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2021 17:17:22 -0800
-Date:   Mon, 1 Feb 2021 14:17:20 +1300
-From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v3 13/27] x86/sgx: Add helper to update
- SGX_LEPUBKEYHASHn MSRs
-Message-Id: <20210201141720.2249c9aef5b3f5ed9fda3f81@intel.com>
-In-Reply-To: <YBVx8P1QfRspUvkC@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
-        <db965546668e24857627a6695ee739aac5c15d3a.1611634586.git.kai.huang@intel.com>
-        <YBVx8P1QfRspUvkC@kernel.org>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S231475AbhBAEbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Jan 2021 23:31:13 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:41565 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231472AbhBAE3U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Jan 2021 23:29:20 -0500
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210201042802epoutp01248d2501780ad223b2e0e841c005d918~fhTuPqItM1196311963epoutp01S
+        for <kvm@vger.kernel.org>; Mon,  1 Feb 2021 04:28:02 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210201042802epoutp01248d2501780ad223b2e0e841c005d918~fhTuPqItM1196311963epoutp01S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1612153682;
+        bh=wYGV5gWfecQFhg6xzaMF6JtUcCvRNBh8Pi1Z/2G9s0w=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=Gn+9ZK6RdbrxVtxQs5SmadJA1whOY+M28nQSm2bFGSF1/YF7o5B7Tt2ytFXYMPcp2
+         7ulDKqjikAc+yMZC1A3p3+6T4ULvlIaP4YWaoLK7rbrnFxc778TfTTOKcBSct+u6j7
+         rXPYv9yT1JPpoNTmyh0BTyH6/tB58MDaYv7hrk8c=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20210201042801epcas5p3379a03a22ef539b8bbcbfa309ad6f767~fhTtnbOGb1572215722epcas5p38;
+        Mon,  1 Feb 2021 04:28:01 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.40.194]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4DTZgM3kzdz4x9Q9; Mon,  1 Feb
+        2021 04:27:59 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        63.03.15682.F4387106; Mon,  1 Feb 2021 13:27:59 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210201042758epcas5p1a6cb788bf5eb1bf85efa66662db2edf6~fhTq-u34C3002330023epcas5p1r;
+        Mon,  1 Feb 2021 04:27:58 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210201042758epsmtrp2eb63960f9e83c78101e1281f64552e43~fhTq_0gW-0999509995epsmtrp2j;
+        Mon,  1 Feb 2021 04:27:58 +0000 (GMT)
+X-AuditID: b6c32a49-8bfff70000013d42-68-6017834f8036
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        21.D0.08745.E4387106; Mon,  1 Feb 2021 13:27:58 +0900 (KST)
+Received: from localhost.localdomain (unknown [109.105.112.123]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210201042657epsmtip1482c387050911ba311e23757f522a620~fhSxTDb1x0727807278epsmtip1b;
+        Mon,  1 Feb 2021 04:26:50 +0000 (GMT)
+From:   "jie6.li" <jie6.li@samsung.com>
+To:     gregkh@linuxfoundation.org
+Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ks0204.kim@samsung.com, xing84.he@samsung.com,
+        gaofei.lv@samsung.com, jie6.li@samsung.com, security.xa@samsung.com
+Subject: [PATCH] uio: uio_pci_generic: don't fail probe if pdev->irq equals
+ to IRQ_NOTCONNECTED
+Date:   Mon,  1 Feb 2021 04:25:59 +0000
+Message-Id: <1612153559-17028-1-git-send-email-jie6.li@samsung.com>
+X-Mailer: git-send-email 2.6.4.windows.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFKsWRmVeSWpSXmKPExsWy7bCmlq5/s3iCweVeSYtdizeyWDQvXs9m
+        MXtaK7vF0T0cFnOmFlpc3jWHzeL/r1esFmcnfGC12Nvn48DpsX/uGnaP9/uusnn0bVnF6PF5
+        k1wAS1SOTUZqYkpqkUJqXnJ+SmZeuq2Sd3C8c7ypmYGhrqGlhbmSQl5ibqqtkotPgK5bZg7Q
+        IUoKZYk5pUChgMTiYiV9O5ui/NKSVIWM/OISW6XUgpScAkOjAr3ixNzi0rx0veT8XCtDAwMj
+        U6DKhJyMf18msxZ85qzoWFXWwLiCo4uRk0NCwETi35ZnzF2MXBxCArsZJW623WGBcD4xSqza
+        /hUq85lRYu2UqUwwLQt7XzNBJHYxSty/vJMVwvnKKNH5/zc7SBWbgKrEj5Wn2UBsEQE5iSe3
+        /zCD2MwCexklvs5wBbGFBRIllnZ9ZgGxWYDqv5zrAtvAK+AscWDDARaIbRoS6zv2g90kIbCJ
+        XWJ7/2E2iISLxMNpS9khbGGJV8e3QNlSEp/f7YWqqZc48/sIO0RzB6PEzoufWCES1hIXV98A
+        uogD6CJNifW79CGO45Po/f2ECSQsIcAr0dEmBFGtKDH73C6oe8QlXr57xAhhe0jc/XoKbK2Q
+        QKzEog/3mCYwysxCGLqAkXEVo2RqQXFuemqxaYFhXmo5cuRsYgQnKi3PHYx3H3zQO8TIxMF4
+        iFGCg1lJhPfUJLEEId6UxMqq1KL8+KLSnNTiQ4ymwHCayCwlmpwPTJV5JfGGpkZmZgaWBqbG
+        FmaGSuK8OwwexAsJpCeWpGanphakFsH0MXFwSjUwLV6zV3ZX5+rn+1UOpapWsfis2qF78sMl
+        9R7Gb0q/5rU5brT2Lp339cEDltJ1K6ec2rFSV0pF/M/rhmAd20MO86bzdj7bfVfiZw2HY9bN
+        OA3LT0mb4gQ0Th5jjKv3SZDOqr8VnvFR1GfNnQO1nFNP3fk6dX3av+p6ERkFyV2adT7qn3ru
+        MjGrr9Qt49/FtbNo75q8S+mXpDb59k6Y8OLWvEoX/quLo1Zv95nSe5dzLvc13WlXJvXsnfR2
+        blSozOKvRemLPj26kfXDIszU7cXPqOmttqd8NpjbVc9jXNcyT0va4vHs+rd3Vu2d3rvx0bX/
+        j69+Y5ln2l0hyhwryBc3a8U/+yt1X9b5dzXq9T4/FKfEUpyRaKjFXFScCADqHGXN3QMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgluLIzCtJLcpLzFFi42LZdlhJTtevWTzB4Ng5E4tdizeyWDQvXs9m
+        MXtaK7vF0T0cFnOmFlpc3jWHzeL/r1esFmcnfGC12Nvn48DpsX/uGnaP9/uusnn0bVnF6PF5
+        k1wASxSXTUpqTmZZapG+XQJXxr8vk1kLPnNWdKwqa2BcwdHFyMkhIWAisbD3NROILSSwg1Fi
+        2s4iiLi4xKFVP1ghbGGJlf+es3cxcgHVfGaU2P5iB1gDm4CqxI+Vp9lAbBEBOYknt/8wgxQx
+        CxxnlHh7YDJYQlggXmJj6yswmwWo4cu5LrBmXgFniQMbDrBAbNCQWN+xn2UCI88CRoZVjJKp
+        BcW56bnFhgVGeanlesWJucWleel6yfm5mxjBgaSltYNxz6oPeocYmTgYDzFKcDArifCemiSW
+        IMSbklhZlVqUH19UmpNafIhRmoNFSZz3QtfJeCGB9MSS1OzU1ILUIpgsEwenVAPTuthbvLKr
+        Ln48/XiKW6Cp0721L3+6Tpw1Je5s5HeueX4l16Tvef9UPMSdeGHlx5Cpsw9YG6qc/su1O0fg
+        1b1Zk01NclUPLn1bqSnNcG7yyivlVrovxa4fKjb8x/GqxqKgN5vzZbOnqNXNjfG1dzcnxC43
+        uLf27+Y3LVGnrnksfZrwskcu4vyRG72lKwOnPvexfrzB+yHf3LrLIiJh+xLNm9vXnlj1WtZl
+        l+iVxnezbO4Zt+45ZOB2ZtbeAr5YG9/kTRVOd+ZGf7Co2ihgFsvSzcIcabz5avbkLJ6wGblJ
+        vvba38Lerfn7amnyh4vRChMmxhvMen/E51n3ojyD1ed3bf077aKd2rlpBcvXdZr9ilZiKc5I
+        NNRiLipOBADHKPW8kwIAAA==
+X-CMS-MailID: 20210201042758epcas5p1a6cb788bf5eb1bf85efa66662db2edf6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210201042758epcas5p1a6cb788bf5eb1bf85efa66662db2edf6
+References: <CGME20210201042758epcas5p1a6cb788bf5eb1bf85efa66662db2edf6@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 30 Jan 2021 16:49:20 +0200 Jarkko Sakkinen wrote:
-> On Tue, Jan 26, 2021 at 10:31:05PM +1300, Kai Huang wrote:
-> > Add a helper to update SGX_LEPUBKEYHASHn MSRs.  SGX virtualization also
-> > needs to update those MSRs based on guest's "virtual" SGX_LEPUBKEYHASHn
-> > before EINIT from guest.
-> > 
-> > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> 
-> 
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+From: Jie Li <jie6.li@samsung.com>
 
-Thanks Jarkko.
+Some devices use 255 as default value of Interrupt Line register, and this
+maybe causes pdev->irq is set as IRQ_NOTCONNECTED in some scenarios. For
+example, NVMe controller connects to Intel Volume Management Device (VMD).
+In this situation, IRQ_NOTCONNECTED means INTx line is not connected, not
+fault. If bind uio_pci_generic to these devices, uio frame will return
+-ENOTCONN through request_irq.
 
-Hi Dave,
+This patch allows binding uio_pci_generic to device with dev->irq of
+IRQ_NOTCONNECTED.
 
-This patch originally had your Acked-by, but since I added a comment, I removed
-it. May I still have your Acked-by?
+Signed-off-by: Jie Li <jie6.li@samsung.com>
+Acked-by: Kyungsan Kim <ks0204.kim@samsung.com>
+---
+ drivers/uio/uio_pci_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> /Jarkko
-> 
-> > ---
-> > v2->v3:
-> > 
-> >  - Added comment for sgx_update_lepubkeyhash(), per Jarkko and Dave.
-> > 
-> > ---
-> >  arch/x86/kernel/cpu/sgx/ioctl.c |  5 ++---
-> >  arch/x86/kernel/cpu/sgx/main.c  | 15 +++++++++++++++
-> >  arch/x86/kernel/cpu/sgx/sgx.h   |  2 ++
-> >  3 files changed, 19 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/cpu/sgx/ioctl.c b/arch/x86/kernel/cpu/sgx/ioctl.c
-> > index e5977752c7be..1bae754268d1 100644
-> > --- a/arch/x86/kernel/cpu/sgx/ioctl.c
-> > +++ b/arch/x86/kernel/cpu/sgx/ioctl.c
-> > @@ -495,7 +495,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
-> >  			 void *token)
-> >  {
-> >  	u64 mrsigner[4];
-> > -	int i, j, k;
-> > +	int i, j;
-> >  	void *addr;
-> >  	int ret;
-> >  
-> > @@ -544,8 +544,7 @@ static int sgx_encl_init(struct sgx_encl *encl, struct sgx_sigstruct *sigstruct,
-> >  
-> >  			preempt_disable();
-> >  
-> > -			for (k = 0; k < 4; k++)
-> > -				wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + k, mrsigner[k]);
-> > +			sgx_update_lepubkeyhash(mrsigner);
-> >  
-> >  			ret = __einit(sigstruct, token, addr);
-> >  
-> > diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-> > index 93d249f7bff3..b456899a9532 100644
-> > --- a/arch/x86/kernel/cpu/sgx/main.c
-> > +++ b/arch/x86/kernel/cpu/sgx/main.c
-> > @@ -697,6 +697,21 @@ static bool __init sgx_page_cache_init(void)
-> >  	return true;
-> >  }
-> >  
-> > +
-> > +/*
-> > + * Update the SGX_LEPUBKEYHASH MSRs to the values specified by caller.
-> > + * Bare-metal driver requires to update them to hash of enclave's signer
-> > + * before EINIT. KVM needs to update them to guest's virtual MSR values
-> > + * before doing EINIT from guest.
-> > + */
-> > +void sgx_update_lepubkeyhash(u64 *lepubkeyhash)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < 4; i++)
-> > +		wrmsrl(MSR_IA32_SGXLEPUBKEYHASH0 + i, lepubkeyhash[i]);
-> > +}
-> > +
-> >  static int __init sgx_init(void)
-> >  {
-> >  	int ret;
-> > diff --git a/arch/x86/kernel/cpu/sgx/sgx.h b/arch/x86/kernel/cpu/sgx/sgx.h
-> > index 509f2af33e1d..ccd4f145c464 100644
-> > --- a/arch/x86/kernel/cpu/sgx/sgx.h
-> > +++ b/arch/x86/kernel/cpu/sgx/sgx.h
-> > @@ -83,4 +83,6 @@ void sgx_mark_page_reclaimable(struct sgx_epc_page *page);
-> >  int sgx_unmark_page_reclaimable(struct sgx_epc_page *page);
-> >  struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim);
-> >  
-> > +void sgx_update_lepubkeyhash(u64 *lepubkeyhash);
-> > +
-> >  #endif /* _X86_SGX_H */
-> > -- 
-> > 2.29.2
-> > 
-> > 
+diff --git a/drivers/uio/uio_pci_generic.c b/drivers/uio/uio_pci_generic.c
+index b8e44d16279f..c7d681fef198 100644
+--- a/drivers/uio/uio_pci_generic.c
++++ b/drivers/uio/uio_pci_generic.c
+@@ -92,7 +92,7 @@ static int probe(struct pci_dev *pdev,
+ 	gdev->info.version = DRIVER_VERSION;
+ 	gdev->info.release = release;
+ 	gdev->pdev = pdev;
+-	if (pdev->irq) {
++	if (pdev->irq && (pdev->irq != IRQ_NOTCONNECTED)) {
+ 		gdev->info.irq = pdev->irq;
+ 		gdev->info.irq_flags = IRQF_SHARED;
+ 		gdev->info.handler = irqhandler;
+-- 
+2.17.1
+
