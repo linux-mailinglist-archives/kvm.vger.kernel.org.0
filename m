@@ -2,113 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09BD430B206
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 22:23:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 933FF30B37E
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 00:28:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232357AbhBAVWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 16:22:47 -0500
-Received: from mga12.intel.com ([192.55.52.136]:44242 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230094AbhBAVWp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 16:22:45 -0500
-IronPort-SDR: jbVLfQW2Gn+FgYrqAh+Byjsc/Gs5+ebyoIGB4munYhBPgvP/XvfdJnjvUhehhtDausuhVAoEqj
- jrQbC7OjCTXw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9882"; a="159922505"
-X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
-   d="scan'208";a="159922505"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 13:22:03 -0800
-IronPort-SDR: UneeydW71itvdqbCZnqY7Cazh7OsC49p6cpr9Rkwwjtdujy3RTyz95H1QTSJvNRNdwGi8KsrVB
- 1GlABROfl89Q==
-X-IronPort-AV: E=Sophos;i="5.79,393,1602572400"; 
-   d="scan'208";a="578053640"
-Received: from ccmincem-mobl1.amr.corp.intel.com (HELO [10.212.145.244]) ([10.212.145.244])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 13:22:00 -0800
-Subject: Re: [RFC PATCH v3 13/27] x86/sgx: Add helper to update
- SGX_LEPUBKEYHASHn MSRs
-To:     Kai Huang <kai.huang@intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, haitao.huang@intel.com,
-        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-References: <cover.1611634586.git.kai.huang@intel.com>
- <db965546668e24857627a6695ee739aac5c15d3a.1611634586.git.kai.huang@intel.com>
- <YBVx8P1QfRspUvkC@kernel.org>
- <20210201141720.2249c9aef5b3f5ed9fda3f81@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <03163045-2958-d2f3-c04b-bf9f2fa5a741@intel.com>
-Date:   Mon, 1 Feb 2021 13:22:00 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S231211AbhBAX0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 18:26:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25273 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229842AbhBAX0o (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Feb 2021 18:26:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612221918;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=3NlvvSEK6Q9k5kOj7hFhTGXtCazv2Lc7Wa4M2xagkr4=;
+        b=OTvYOI+jHbZlSrvBjE6LsMeprU12S1YkCR3C4TQgCZJLqq893aAVgFQkXTd1mKxs7zhdnl
+        MgM+1ivjF7CaabU4PpyMK/ildQDru/8Xp9IQbpZcmzLTi84FUReQCkx2n6DTWMHZAFERCJ
+        ETmJesEQI2s99rKN4jKLrWZdEbAr8Ow=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-8hUBMuueNTOHm8ay6AkxBw-1; Mon, 01 Feb 2021 18:25:17 -0500
+X-MC-Unique: 8hUBMuueNTOHm8ay6AkxBw-1
+Received: by mail-wr1-f72.google.com with SMTP id n18so11426867wrm.8
+        for <kvm@vger.kernel.org>; Mon, 01 Feb 2021 15:25:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=3NlvvSEK6Q9k5kOj7hFhTGXtCazv2Lc7Wa4M2xagkr4=;
+        b=RxsiON16WezcQfW3S0PYark693ZAazCVc+Rj8QVMt5MxAsyWR0iS8GqSusHKuoNt6T
+         6WUhmn8a/vkFrYR5j9WGBvpYGOlr/7Hufw4RirXCYc8jkYgi2+E08kxweNLgk0a6qkzV
+         gK1PjplVb4NcoiN6yjdzYXCacFQdg8MEKQ3VRNOaHDgV2N7rW+CRQu5XcGbD8D9MAMPB
+         0mYoFioEsEddat8q30YZ3V00fsEH0ipUnDgOMi1ZPft5Hwt3gcZeoPI1pb+KeRMNQxq1
+         XW7ovk0qY0UUCUqk2a/StOaHUu50cMvXRo0vXLWSt+zD7J7saBjPZbzr5N/iyFBoRjYf
+         rLZA==
+X-Gm-Message-State: AOAM531aWpNwWAzgQMfAtW9aXGRz6Y1QwVwWo6YwBY8/wkCNJnojMZlA
+        /qynD56Uu+zpY+dRU2/83TrAWY7dKWu+eDBmykZT9D2kc8IsDqYq8RQD422jaRjCMNokA3gE5/h
+        YKHQKZt6DVw+6
+X-Received: by 2002:a5d:4389:: with SMTP id i9mr20449594wrq.272.1612221914729;
+        Mon, 01 Feb 2021 15:25:14 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy4HJP0YlL5i0Gxd468JQgYWduTKkfVlwthOeclSr3eUKT2z3XdRpKPsU0NR9y8yC+/NJR5iA==
+X-Received: by 2002:a5d:4389:: with SMTP id i9mr20449577wrq.272.1612221914513;
+        Mon, 01 Feb 2021 15:25:14 -0800 (PST)
+Received: from redhat.com (bzq-79-177-39-148.red.bezeqint.net. [79.177.39.148])
+        by smtp.gmail.com with ESMTPSA id z15sm27405334wrs.25.2021.02.01.15.25.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Feb 2021 15:25:13 -0800 (PST)
+Date:   Mon, 1 Feb 2021 18:25:10 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        elic@nvidia.com, jasowang@redhat.com, mst@redhat.com
+Subject: [GIT PULL] vdpa: bugfix
+Message-ID: <20210201182510-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210201141720.2249c9aef5b3f5ed9fda3f81@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/31/21 5:17 PM, Kai Huang wrote:
-> On Sat, 30 Jan 2021 16:49:20 +0200 Jarkko Sakkinen wrote:
->> On Tue, Jan 26, 2021 at 10:31:05PM +1300, Kai Huang wrote:
->>> Add a helper to update SGX_LEPUBKEYHASHn MSRs.  SGX virtualization also
->>> needs to update those MSRs based on guest's "virtual" SGX_LEPUBKEYHASHn
->>> before EINIT from guest.
->>>
->>> Signed-off-by: Kai Huang <kai.huang@intel.com>
->>
->> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> Thanks Jarkko.
-> 
-> Hi Dave,
-> 
-> This patch originally had your Acked-by, but since I added a comment, I removed
-> it. May I still have your Acked-by?
+The following changes since commit 19c329f6808995b142b3966301f217c831e7cf31:
 
-Yes, feel free to restore it.  This looks fine.
+  Linux 5.11-rc4 (2021-01-17 16:37:05 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 710eb8e32d04714452759f2b66884bfa7e97d495:
+
+  vdpa/mlx5: Fix memory key MTT population (2021-01-20 03:47:04 -0500)
+
+----------------------------------------------------------------
+vdpa: bugfix
+
+A single mlx bugfix.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Eli Cohen (1):
+      vdpa/mlx5: Fix memory key MTT population
+
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |  1 +
+ drivers/vdpa/mlx5/core/mr.c        | 28 ++++++++++++----------------
+ 2 files changed, 13 insertions(+), 16 deletions(-)
 
