@@ -2,203 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A035230AC39
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 17:04:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29EF830AC92
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 17:30:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbhBAQEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 11:04:16 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:60896 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbhBAQEI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 11:04:08 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 111FdTPh002079;
-        Mon, 1 Feb 2021 16:03:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=d0kWJDuormIwpUPZZtYMjOZdCeJxjvmiUtkloSbA/wM=;
- b=v5M5anzWijPZcdVJZPvWGvmZ1a3vx+FmPnGvuY58pPALutjqkZM1qttS4s3OPzWH8kJr
- A40so8nuCiDV9G4xRyFQ+nhNOqlRwfRsWeXCnkgVEzhH8ytfEby1qJ2LDqL9jni2A0F3
- fwqUeBEnD/A4JBewUOlU4ZiKiOgSpi5PXtIliXnotnoZopsormx6OczXoO1mF/oSK8zY
- nzcE5tJi5YEGC9f0+J8n8dTZ6lZOa+Uj9r+gyYf/j1JvPjg78rhsuy35/442pt9mSTdI
- 6RwLGRBdj3Mjmf2bPfhjKxVdGbKUFNW5HMmAOOJ//wejSDww9EwXnLnQ1OIk5Ns4atyg 1A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 36cvyap7mf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 01 Feb 2021 16:03:16 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 111FfRV5162451;
-        Mon, 1 Feb 2021 16:03:15 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2172.outbound.protection.outlook.com [104.47.55.172])
-        by aserp3030.oracle.com with ESMTP id 36dh1mjd4b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 01 Feb 2021 16:03:15 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ISH8XQXyojhhCASnveylQ+VcKSYIkoUG++C3bTaxjXmB7yeVwLvPVDDCUspU41u6YcGqvZFTDj1acvGVoa48MmCOSQERx+DRBmhqOR/RL1wUoDhY3J0tgSmnQQ6JBBWiun/YnkqJwcaRY5Er8hD820BekLrERAjwrSRXbuWmuOvYB/RI61iwkd9P/tJ5yQmyvw9KGPVf99pPXv4x+H9Ib0EooJ1L6BRqwxlB6EAa6Y7KENVyYO9b7pKhH2oGvVs0FVeS00hq4X2upBrf+5Uf15iJSoewXCBU5bEg1usa1YLaDGT8jtHL7yoA64bEt3fq5ATZz4iJRZSV5o6h0EEY7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d0kWJDuormIwpUPZZtYMjOZdCeJxjvmiUtkloSbA/wM=;
- b=eKqNu5hxlga/AFdxiqM99Aud2Rqs0ey3vA0H2+2xFDJPaX62IyWjCZb80AhS1oqxUDFMwoe37fibwpRNsYujifxZmtbt6Dkb6Ogej1U3FvsB4UgTM3b6NQWqjR01CrPL0WsHIp8GaflMVBMsP3S9u29W3NXLr4yZiwn3G7ILb/Kawz4kKxR2fbLN6zBonrJINd4E6nfXNCV4MYmL5rAf5afmrJbFWkFN6QA9ohk3535X5/QVbKZPhYS+7HKIHBqg/q5q7lGeCCug9MXjijYP/Tyly5/yKLNmgR/ti+bLa3NwUyrUrFflrLnbO+AUDL2Ex+uKfOIF1QDD80ykP7ps6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d0kWJDuormIwpUPZZtYMjOZdCeJxjvmiUtkloSbA/wM=;
- b=HxeAqs7jfnBqHfTXY3Ac+6jng4XFn8rdDfeZiwAW+ktnWvYhpdYWguZJzqTv1awMaOhB5byu1H+DwD3EOGycIYmYK2ZyPuSYjQm2+F/KjY/wxfbhbP8H6RFOuuC4+1cp/NfrpYYDyAk+B/4Ga1TQVHDrPOgkMcHAf/X1GzbR9gQ=
-Received: from CY4PR10MB1717.namprd10.prod.outlook.com (2603:10b6:910:c::16)
- by CY4PR10MB1782.namprd10.prod.outlook.com (2603:10b6:910:8::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.19; Mon, 1 Feb
- 2021 16:03:13 +0000
-Received: from CY4PR10MB1717.namprd10.prod.outlook.com
- ([fe80::96d:fd40:560c:3b0e]) by CY4PR10MB1717.namprd10.prod.outlook.com
- ([fe80::96d:fd40:560c:3b0e%11]) with mapi id 15.20.3805.027; Mon, 1 Feb 2021
- 16:03:13 +0000
-Subject: Re: [PATCH v2 1/1] vhost scsi: alloc vhost_scsi with kvzalloc() to
- avoid delay
-To:     Jason Wang <jasowang@redhat.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, James Bottomley <jejb@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, mst@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, aruna.ramakrishna@oracle.com
-References: <20210123080853.4214-1-dongli.zhang@oracle.com>
- <61ed58d6-052b-9065-361d-dc6010fc91ef@redhat.com>
-From:   Joe Jin <joe.jin@oracle.com>
-Message-ID: <7f9c745b-6944-ab6c-e231-ae0c55687c6d@oracle.com>
-Date:   Mon, 1 Feb 2021 08:03:08 -0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
-In-Reply-To: <61ed58d6-052b-9065-361d-dc6010fc91ef@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [2601:646:c601:8dd0:74df:cf15:e9d8:2385]
-X-ClientProxiedBy: CH0PR04CA0008.namprd04.prod.outlook.com
- (2603:10b6:610:76::13) To CY4PR10MB1717.namprd10.prod.outlook.com
- (2603:10b6:910:c::16)
+        id S229567AbhBAQ3P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 11:29:15 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:18188 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229483AbhBAQ3O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 11:29:14 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60182c320000>; Mon, 01 Feb 2021 08:28:34 -0800
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Feb
+ 2021 16:28:33 +0000
+Received: from r-nvmx02.mtr.labs.mlnx (172.20.145.6) by mail.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server id 15.0.1473.3 via Frontend
+ Transport; Mon, 1 Feb 2021 16:28:29 +0000
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <jgg@nvidia.com>, <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex.williamson@redhat.com>
+CC:     <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
+        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
+        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
+        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        <mjrosato@linux.ibm.com>, <yishaih@nvidia.com>, <aik@ozlabs.ru>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH v2 0/9] Introduce vfio-pci-core subsystem
+Date:   Mon, 1 Feb 2021 16:28:19 +0000
+Message-ID: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [IPv6:2601:646:c601:8dd0:74df:cf15:e9d8:2385] (2601:646:c601:8dd0:74df:cf15:e9d8:2385) by CH0PR04CA0008.namprd04.prod.outlook.com (2603:10b6:610:76::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Mon, 1 Feb 2021 16:03:11 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b4e04dde-db1e-4c16-609e-08d8c6cae0f9
-X-MS-TrafficTypeDiagnostic: CY4PR10MB1782:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR10MB17828241C6EBCED7F2CF59C380B69@CY4PR10MB1782.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: r83ZeQ374nsqwyfgZV494hMshxo/IjnwuEDJ10qrIV4hA2XHrhJdMCstZ4E3PQlSYzxS5CDRBMLmJeBkxoKA3nvaWaf88ZEXhKaYk91pbfR7Mb+o9yhnEODfJ8+9RUYGDv8lTPdv2ifzre3UK8mZlZdCA8/jHfAXXl/Sy6FJYEZ9Z06XDNeB1MDOG4o4OxCG5Ey4oZwVpUg1qQdRqmA7gQRLRsH3CwZU8n+PJTvd6LGytvacz4f8fiKUb3fXC6tC9XGUitxf+RnL+K+TYSGyYpdog+9dZrJ/IqOFbDU95npQCZMkginfl5mMWqK00xxNUUBNQZ8VM96T9h6Nu47/A+UaQrCClkYHQ+AoDyLBJIDi5C1Ndvs/xGxyJGurSrtoFjaMSpsa8YeBiuGJK7nb1lwMM/TpEYJSlFRPRjoPt7HyuiNuQ9cMKPk0CGUir4n1Fs1grlsUgp7rtbsuPSNEc8JiiZKOG8N25Fply5wQunMynU6wjFRK8VmWulqUZ4kjQLi9fXU6vmLPURPlYJnNFb5JJYr1RU/C2fKAelZzAufaWRmQc4ksVFnbAjTrtJDLc3cM5onA2v0hrMH8nHDfiyLqR/+1wHDwGzLbHd+xcd8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR10MB1717.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(136003)(366004)(396003)(39860400002)(346002)(86362001)(31696002)(36756003)(44832011)(478600001)(2906002)(4326008)(6666004)(16526019)(186003)(107886003)(8676002)(2616005)(6486002)(53546011)(66476007)(66946007)(316002)(110136005)(8936002)(5660300002)(31686004)(83380400001)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?OTdtR2NIVmlBeURoeEE2UjJMMVhWZWZVMCtFa3g0cWM3bE9NTExDZUp6WTV3?=
- =?utf-8?B?VFg5TnN5bGlGN3FQMEdJY2loRjlZN0FzU2ljSE0yOE55NTRabm42MTdLRWVP?=
- =?utf-8?B?aHFlSSt3aUNQazV3SEtsVE9EaG8zeWZodkRubmcrNzVoc0Q5bXdiSzEvSnEz?=
- =?utf-8?B?Sll0ZXJLLzRwb2xDaGUwN3I5SDk3YWtzUVVRbE94MEx5d0xpQ3RuWU5hc3Ro?=
- =?utf-8?B?RStWaHFQbzhMcnl1cUhUSGorYmI3OTNEVk5mc2dKZmIwcVkxYkFJTmlWTE1j?=
- =?utf-8?B?V0E0Skc5bk9hVWc3VDVsK2NITUxLMzN6alAwcU43UVFic0FMS2EzclRsM3pl?=
- =?utf-8?B?bEpMaFlwSWJwNnc2azYxNkcrMlJXaHNGekxpOEhqSHZkQ2RUd1huNE9wZ2R3?=
- =?utf-8?B?RlJxSDZjcDhwTUhKRWlGZFByR1JUUGFGUTJmeWNEQlhlWFU4d1MxVnVBQTNZ?=
- =?utf-8?B?cUZkWnhKSVRtNHJsSy92dy9xeTF1NWVuY0NYbFpGOVoyQjVaOUEwOGRKRnhx?=
- =?utf-8?B?V2VsZGdLRzl5K1dDakFBVXF5dU5WQlQ0c1QyRU9nS2FrT3UrMnZsVVNQTHlX?=
- =?utf-8?B?OVpkNkM5cTJTUmF1VmpVcmlsQnlJMGNVd2x6aVFxZHg5bGE0QjRiRStzNi95?=
- =?utf-8?B?RmE4Ry8zYlJubWpob2FkMXAvZTlsb0pGRGRCbWNFekdtUFJwVFd1RWJjclU4?=
- =?utf-8?B?NnBXZ1ZyMzdhQjdWSDZPdzZ5cGFhNW5JTE04QjdEUU44VVM2bjdIMy92YW1I?=
- =?utf-8?B?S0d2TExuN3BpQXZyWmdyT2M5MjFSTDQwK083RGJrbjVjdHNBN1h3UzBPYk9S?=
- =?utf-8?B?T2I1eXhPUTcwZm92RHBvQzR3bVNGL0ZaaXFuM0Znb2NaWldEdEFLMWhhWG9Z?=
- =?utf-8?B?VDZsRDU2K09wUHNvb3NWb0g5NEJvN2hqL2l1MzB6d2JpMjFUcGtiY1BKRVdt?=
- =?utf-8?B?VTRVMEg3QTk1RTZsd2ZjaGVaZlpIeVIyN2JmaldVemg0NFBvOFZVa094VFJ2?=
- =?utf-8?B?MlZOU2NNVis5YW1pYjBMOHRaQWpsNjlnTjlyMmNRd2dIOExaMGEvM2hSMlNS?=
- =?utf-8?B?aEVsdVNKSnlIQU81SThybUlDeEQvQmEyNzJmWkxIbENpTEg1bGQzN0JjQWds?=
- =?utf-8?B?UU1HOWJTZFVOVnh4U0dqRnVNNmdOVDlGNnRaUXN5RW1DN0xQY2E5a0ZkR0FW?=
- =?utf-8?B?WEF3Q2YwR0NOVnVjTXRRNktKOWxXMWpKV0xXNkdDMko1bVlWNGlBZnZSSUhv?=
- =?utf-8?B?MGlwSlMvd1d2MGJUVjIzeGtoMnI4NkFtdExOSklDM05Kc3padW5GTVJUcFBz?=
- =?utf-8?B?R3ZLUnk2d3FiSDN0WEVhZldYaTYydDZkVGRqSzBnTHBtR1c5dm94NXB1cTRS?=
- =?utf-8?B?NzFqb0NSbSsrZnQ4SXl4akJmU0lRdkljSmxRY2xCQmJtQVMvQ1NtQllPWWw3?=
- =?utf-8?B?RDZoaTNHM05wZUMrd3hwS2RLcXExVmorb0t5MWR1MFdZVEw3WFc5S3pyblhp?=
- =?utf-8?Q?E6kKAFTIJsOqZdDmDGfOkRjaYF6?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4e04dde-db1e-4c16-609e-08d8c6cae0f9
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR10MB1717.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2021 16:03:13.5147
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8Zdqk7VSypfW+P3/byr5NpXl5Pm37CIT6c6yP8/QSEtayL5AkIcUmdVs775BAooYEOi7fTfzwiNkS567zI2IRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR10MB1782
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9882 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 phishscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102010084
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9882 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 impostorscore=0
- mlxscore=0 spamscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102010084
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612196914; bh=JOHUJGgZP4f+PKr2kMxm2+gk8j/D8K5EuMOq21uy3gE=;
+        h=From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+         Content-Transfer-Encoding:Content-Type;
+        b=qhv2ioT4bFxaVDLCNCtoM19721RK4XMYEpM7JJ6HQ961lwv4MIn/RYx8m7iqlrWL9
+         0/1WpITpIFnrbsoqul4wt/pWyZhi92UCVh25DtsuN1SyezJ8ReEkp3lnLI5OvH2Sr/
+         d59u+1+jF1drXjMHzzXgyIvt5Unfhfv2jjAdi5V/d7/6ZDUmmUvgyheM/wvvuMvDid
+         9QsKRN6t7wAFrXYNomjwoiduCyd6TJ/uq/pKRmwc/SiRrJ0gsSSJeNpazpsF3rMdXu
+         txrXAQxkLckx/zQei3q3bID6XPP9re4VwbnbPwvqluM3KU6Hu/PHQDeprtM1Dpx70q
+         RHz/7k0PXumnw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Can anyone help to review this patch and give a review-by for it please?
+Hi Alex and Cornelia,
 
-Thanks,
-Joe
-On 1/24/21 7:12 PM, Jason Wang wrote:
->
-> On 2021/1/23 下午4:08, Dongli Zhang wrote:
->> The size of 'struct vhost_scsi' is order-10 (~2.3MB). It may take long time
->> delay by kzalloc() to compact memory pages by retrying multiple times when
->> there is a lack of high-order pages. As a result, there is latency to
->> create a VM (with vhost-scsi) or to hotadd vhost-scsi-based storage.
->>
->> The prior commit 595cb754983d ("vhost/scsi: use vmalloc for order-10
->> allocation") prefers to fallback only when really needed, while this patch
->> allocates with kvzalloc() with __GFP_NORETRY implicitly set to avoid
->> retrying memory pages compact for multiple times.
->>
->> The __GFP_NORETRY is implicitly set if the size to allocate is more than
->> PAGE_SZIE and when __GFP_RETRY_MAYFAIL is not explicitly set.
->>
->> Cc: Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
->> Cc: Joe Jin <joe.jin@oracle.com>
->> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
->> ---
->> Changed since v1:
->>    - To combine kzalloc() and vzalloc() as kvzalloc()
->>      (suggested by Jason Wang)
->>
->>   drivers/vhost/scsi.c | 9 +++------
->>   1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
->> index 4ce9f00ae10e..5de21ad4bd05 100644
->> --- a/drivers/vhost/scsi.c
->> +++ b/drivers/vhost/scsi.c
->> @@ -1814,12 +1814,9 @@ static int vhost_scsi_open(struct inode *inode, struct file *f)
->>       struct vhost_virtqueue **vqs;
->>       int r = -ENOMEM, i;
->>   -    vs = kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
->> -    if (!vs) {
->> -        vs = vzalloc(sizeof(*vs));
->> -        if (!vs)
->> -            goto err_vs;
->> -    }
->> +    vs = kvzalloc(sizeof(*vs), GFP_KERNEL);
->> +    if (!vs)
->> +        goto err_vs;
->>         vqs = kmalloc_array(VHOST_SCSI_MAX_VQ, sizeof(*vqs), GFP_KERNEL);
->>       if (!vqs)
->
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
->
->
+This series split the vfio_pci driver into 2 parts: pci driver and a
+subsystem driver that will also be library of code. The pci driver,
+vfio_pci.ko will be used as before and it will bind to the subsystem
+driver vfio_pci_core.ko to register to the VFIO subsystem. This patchset
+if fully backward compatible. This is a typical Linux subsystem
+framework behaviour. This framework can be also adopted by vfio_mdev
+devices as we'll see in the below sketch.
+
+This series is coming to solve the issues that were raised in the
+previous attempt for extending vfio-pci for vendor specific
+functionality: https://lkml.org/lkml/2020/5/17/376 by Yan Zhao.
+
+This solution is also deterministic in a sense that when a user will
+bind to a vendor specific vfio-pci driver, it will get all the special
+goodies of the HW.
+=20
+This subsystem framework will also ease on adding vendor specific
+functionality to VFIO devices in the future by allowing another module
+to provide the pci_driver that can setup number of details before
+registering to VFIO subsystem (such as inject its own operations).
+
+Below we can see the proposed changes (this patchset only deals with
+VFIO_PCI subsystem but it can easily be extended to VFIO_MDEV subsystem
+as well):
+
++------------------------------------------------------------------+
+|                                                                  |
+|                               VFIO                               |
+|                                                                  |
++------------------------------------------------------------------+
+
++------------------------------+    +------------------------------+
+|                              |    |                              |
+|        VFIO_PCI_CORE         |    |         VFIO_MDEV_CORE       |
+|                              |    |                              |
++------------------------------+    +------------------------------+
+
++--------------+ +-------------+    +-------------+ +--------------+
+|              | |             |    |             | |              |
+|              | |             |    |             | |              |
+|   VFIO_PCI   | |MLX5_VFIO_PCI|    |  VFIO_MDEV  | |MLX5_VFIO_MDEV|
+|              | |             |    |             | |              |
+|              | |             |    |             | |              |
++--------------+ +-------------+    +-------------+ +--------------+
+
+First 3 patches introduce the above changes for vfio_pci and
+vfio_pci_core.
+
+Patch (4/9) introduces a new mlx5 vfio-pci module that registers to VFIO
+subsystem using vfio_pci_core. It also registers to Auxiliary bus for
+binding to mlx5_core that is the parent of mlx5-vfio-pci devices. This
+will allow extending mlx5-vfio-pci devices with HW specific features
+such as Live Migration (mlx5_core patches are not part of this series
+that comes for proposing the changes need for the vfio pci subsystem).
+
+For our testing and development we used 2 VirtIO-BLK physical functions
+based on NVIDIAs Bluefield-2 SNAP technology. These 2 PCI functions were
+enumerated as 08:00.0 and 09:00.0 by the Hypervisor.
+
+The Bluefield-2 device driver, mlx5_core, will create auxiliary devices
+for each VirtIO-BLK SNAP PF (the "parent"/"manager" of each VirtIO-BLK PF
+will actually issue auxiliary device creation).
+
+These auxiliary devices will be seen on the Auxiliary bus as:
+mlx5_core.vfio_pci.2048 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05=
+:00.0/0000:06:00.0/0000:07:00.0/mlx5_core.vfio_pci.2048
+mlx5_core.vfio_pci.2304 -> ../../../devices/pci0000:00/0000:00:02.0/0000:05=
+:00.0/0000:06:00.0/0000:07:00.1/mlx5_core.vfio_pci.2304
+
+2048 represents BDF 08:00.0 (parent is 0000:07:00.0 Bluefield-2 p0) and
+2304 represents BDF 09:00.0 (parent is 0000:07:00.1 Bluefield-2 p1) in
+decimal view. In this manner, the administrator will be able to locate the
+correct vfio-pci module it should bind the desired BDF to (by finding
+the pointer to the module according to the Auxiliary driver of that BDF).
+
+Note: The discovery mechanism we used for the RFC might need some
+      improvements as mentioned in the TODO list.
+
+In this way, we'll use the HW vendor driver core to manage the lifecycle
+of these devices. This is reasonable since only the vendor driver knows
+exactly about the status on its internal state and the capabilities of
+its acceleratots, for example.
+
+changes from v1:
+ - Create a private and public vfio-pci structures (From Alex)
+ - register to vfio core directly from vfio-pci-core (for now, expose
+   minimal public funcionality to vfio pci drivers. This will remove the
+   implicit behaviour from v1. More power to the drivers can be added in
+   the future)
+ - Add patch 3/9 to emphasize the needed extension for LM feature (From
+   Cornelia)
+ - take/release refcount for the pci module during core open/release
+ - update nvlink, igd and zdev to PowerNV, X86 and s390 extensions for
+   vfio-pci core
+ - fix segfault bugs in current vfio-pci zdev code
+
+TODOs:
+1. Create subsystem module for VFIO_MDEV. This can be used for vendor
+   specific scalable functions for example (SFs).
+2. Add Live migration functionality for mlx5 SNAP devices
+   (NVMe/Virtio-BLK).
+3. Add Live migration functionality for mlx5 VFs
+4. Add the needed functionality for mlx5_core
+5. Improve userspace and discovery
+6. move VGA stuff to x86 extension
+
+I would like to thank the great team that was involved in this
+development, design and internal review:
+Oren, Liran, Jason, Leon, Aviad, Shahaf, Gary, Artem, Kirti, Neo, Andy
+and others.
+
+This series applies cleanly on top of kernel 5.11-rc5+ commit 13391c60da33:
+"Merge branch 'linus' of git://git.kernel.org/pub/scm/linux/kernel/git/herb=
+ert/crypto-2.6"
+from Linus.
+
+Note: Live migration for MLX5 SNAP devices is WIP and can be the first
+      example for adding vendor extension to vfio-pci devices. As the
+      changes to the subsystem must be defined as a pre-condition for
+      this work, we've decided to split the submission for now.
+
+Max Gurtovoy (9):
+  vfio-pci: rename vfio_pci.c to vfio_pci_core.c
+  vfio-pci: introduce vfio_pci_core subsystem driver
+  vfio-pci-core: export vfio_pci_register_dev_region function
+  mlx5-vfio-pci: add new vfio_pci driver for mlx5 devices
+  vfio-pci/zdev: remove unused vdev argument
+  vfio-pci/zdev: fix possible segmentation fault issue
+  vfio/pci: use s390 naming instead of zdev
+  vfio/pci: use x86 naming instead of igd
+  vfio/pci: use powernv naming instead of nvlink2
+
+ drivers/vfio/pci/Kconfig                      |   57 +-
+ drivers/vfio/pci/Makefile                     |   16 +-
+ drivers/vfio/pci/mlx5_vfio_pci.c              |  253 ++
+ drivers/vfio/pci/vfio_pci.c                   | 2384 +----------------
+ drivers/vfio/pci/vfio_pci_config.c            |   56 +-
+ drivers/vfio/pci/vfio_pci_core.c              | 2326 ++++++++++++++++
+ drivers/vfio/pci/vfio_pci_core.h              |   73 +
+ drivers/vfio/pci/vfio_pci_intrs.c             |   22 +-
+ ...{vfio_pci_nvlink2.c =3D> vfio_pci_powernv.c} |   47 +-
+ drivers/vfio/pci/vfio_pci_private.h           |   44 +-
+ drivers/vfio/pci/vfio_pci_rdwr.c              |   14 +-
+ .../pci/{vfio_pci_zdev.c =3D> vfio_pci_s390.c}  |   28 +-
+ .../pci/{vfio_pci_igd.c =3D> vfio_pci_x86.c}    |   18 +-
+ include/linux/mlx5/vfio_pci.h                 |   36 +
+ 14 files changed, 2916 insertions(+), 2458 deletions(-)
+ create mode 100644 drivers/vfio/pci/mlx5_vfio_pci.c
+ create mode 100644 drivers/vfio/pci/vfio_pci_core.c
+ create mode 100644 drivers/vfio/pci/vfio_pci_core.h
+ rename drivers/vfio/pci/{vfio_pci_nvlink2.c =3D> vfio_pci_powernv.c} (89%)
+ rename drivers/vfio/pci/{vfio_pci_zdev.c =3D> vfio_pci_s390.c} (80%)
+ rename drivers/vfio/pci/{vfio_pci_igd.c =3D> vfio_pci_x86.c} (89%)
+ create mode 100644 include/linux/mlx5/vfio_pci.h
+
+--=20
+2.25.4
 
