@@ -2,163 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EDCF830AFC1
-	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 19:50:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D93830B0CB
+	for <lists+kvm@lfdr.de>; Mon,  1 Feb 2021 20:52:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbhBAStd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 13:49:33 -0500
-Received: from mail-bn8nam12on2075.outbound.protection.outlook.com ([40.107.237.75]:38945
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229680AbhBASt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Feb 2021 13:49:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lObkGGM5DqEWxsZCE96LXd+9L6pavEMhE0/eMhaqyOIpTz1OfwMrMPtaxsMLHJelhfoQY0fZfhq6DLBBRvA9vdNAD6Sg88RIUBHIjULTrrobsK1MITXrxoZFEkPsUjTvYIyLtJu4U94Zg+Hc5m17MLothPwilEEygxw209RxIGWZX/EyV7lmigUL9mb49qwJj7Gc1Qiy+BEo/lHdUkG0D30faUMul9ZSnZM87zRdWmd15OzbNoeUC9U1stCnrWyr7y+H3OedlNUnyA8QU5DtrM93YkwKx5XWLnR2MnZ6e0mYi9mf0a6dgg5BSxXtBo4mM9AS16IFsOC4yWP+OjmkAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alf/zCiutV3hIIRAd5wjjjpcaBfWRjQcxUoWKjOSxJI=;
- b=b7+cpgOad4IB4nBhmZQdlUy9UZAIRy5o3H4+++CpfR3BXhKLW0BRZnaEbSwWsytgWcl+fwMt9gJeZYdDtWo70I26WhIkBQrkF/m6G9P+DV6JuxrUwyFrXJHrLy6+lgu8Gy/Xgyb5wtSFLIJcmC7Kp4+yRGLJ5R++vQU8e7oIbY7ekYuYML+2OlC01njzl6IwpV6GB+m2Y4tSUyYc1oA11Ghnlww28IaoCvHJpulbuMu3vv/Qb1yCXGmCnsTO82nIorr998gBLFj/hy9GRpKViGENuH5R2BICyVOPDnT3sbyh4corfWUX7DO7+qjTw2ZGFt3TB8C1P4AdzHN5CH3veQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=alf/zCiutV3hIIRAd5wjjjpcaBfWRjQcxUoWKjOSxJI=;
- b=nUsCtIP87mhqUNDSHHu1zooLq8uoKXmMctzeXdNLpflQpboEnQz79iO8SAedGWr3yhGOF0jk3AU3dpRr8zRLKHzerkVB4/agYFae1VYqOeelVMUjlxASoycijRd4SVh80KL6LIlJ5I9hzGY3X+BghB3mTv6HLpF6hzIPulk6LI8=
-Authentication-Results: linaro.org; dkim=none (message not signed)
- header.d=none;linaro.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR12MB1354.namprd12.prod.outlook.com (2603:10b6:3:7a::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3805.17; Mon, 1 Feb 2021 18:48:31 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b8aa:f23e:fcad:23ee]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::b8aa:f23e:fcad:23ee%8]) with mapi id 15.20.3805.025; Mon, 1 Feb 2021
- 18:48:31 +0000
-Subject: Re: [PATCH v6 3/6] sev/i386: Allow AP booting under SEV-ES
-To:     Venu Busireddy <venu.busireddy@oracle.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        id S232377AbhBATu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 14:50:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232566AbhBATtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Feb 2021 14:49:13 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5CFC06174A;
+        Mon,  1 Feb 2021 11:48:33 -0800 (PST)
+Received: from zn.tnic (p200300ec2f06fe00e55f3102cc5eb27e.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:fe00:e55f:3102:cc5e:b27e])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 26BD61EC0253;
+        Mon,  1 Feb 2021 20:48:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1612208910;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lOkZrEeAn9oVnNn743NqAyVIKQ3k9/Lp3V74SDhkd64=;
+        b=EM+rZpLJ9tNc2VbuYUaopFlP03mUsRMmq8qq/pgZ3JJsI6Y/KowJvU44oGPkeeGAD2qPsa
+        j3K801BVFENduL2KRFMJ4dbHjY93xQqSdkCzV0oRKi2WduQAxPNz6//O0rJUMn7L41a83g
+        pwy9/FLLvDRay4tdxWs6a0Sjt8mlIoM=
+Date:   Mon, 1 Feb 2021 20:48:28 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     xen-devel@lists.xenproject.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Deep Shah <sdeep@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-References: <cover.1611682609.git.thomas.lendacky@amd.com>
- <22db2bfb4d6551aed661a9ae95b4fdbef613ca21.1611682609.git.thomas.lendacky@amd.com>
- <20210129174416.GC231819@dt>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <08a46e00-940c-eec3-bc7e-a5d21d8f0609@amd.com>
-Date:   Mon, 1 Feb 2021 12:48:28 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20210129174416.GC231819@dt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [67.79.209.213]
-X-ClientProxiedBy: SN7PR04CA0055.namprd04.prod.outlook.com
- (2603:10b6:806:120::30) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>
+Subject: Re: [PATCH v4 07/15] x86/paravirt: switch time pvops functions to
+ use static_call()
+Message-ID: <20210201194828.GB14590@zn.tnic>
+References: <20210120135555.32594-1-jgross@suse.com>
+ <20210120135555.32594-8-jgross@suse.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from office-linux.texastahm.com (67.79.209.213) by SN7PR04CA0055.namprd04.prod.outlook.com (2603:10b6:806:120::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Mon, 1 Feb 2021 18:48:30 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: b44709f2-3a4a-4a45-14f5-08d8c6e1f88e
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1354:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB13542E0CA6D5211DF4572277ECB69@DM5PR12MB1354.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ugVjVLNUlmlfthcU+gBP/1VS4PN1DZnr18A8ok+0jaEipjM+P8AOjzF1CzBz12EBhW8AhhrSpPsTU0Sr9DkSEz6e0WkxNfw8FI67pJOA5ZjmqA82sm9Q2XlqpNfm+YFaZteL+P9xXYHan3DOElB4sITcnhWLzyuAbT6MhydM3LMeKl8eBUO3Y5AhgJlI0yXXCpg+/T+GRseLhziP1Ypy5FjOsULNn4TzcP64gNPN2sMS6D0bqUy9bvZPm/NdOCUBXvhrn0HFgGQaOlLA0uvlYU5GskhVLrE4y76RpSGwEKORpbH25hIkL9jRZKHZrzC2ckWyBo7xtseKBrx4YJmHgxpcOtcovxdbAsObdywDinflo3mkUpXWxX7Mxo2kmuY+bX2cC9XwFR4kaQPeS6sjYWP7FuciSyGCuYRTBLdEXWkfiPPFV7UZM/pSVnzAK7jMZK5LCYzV52v8tCvC3BQkGcgjZYnvMNykO3/YCxcFkIZQCPy7zxwfanVazZHZ4EPlwNcWuhwBLz2EyVcmmWtF2CLRHhD2T7Z87UTgEKfo4fpucIWiO93UKBq/EayZGr09kYvBX1TL3hEoxBpNSQnh39Res9im0GrpIUWkmJSmuVo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6506007)(53546011)(52116002)(7416002)(8676002)(6512007)(54906003)(6486002)(6916009)(66476007)(83380400001)(66556008)(66946007)(5660300002)(8936002)(2616005)(186003)(31686004)(2906002)(498600001)(16526019)(4326008)(36756003)(956004)(31696002)(86362001)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bmpYWkhwQnd4bXVuNjlpYkwrSmFmbXYxZ3dOSHhrdnZxWitPYlNWeUNIb2Nm?=
- =?utf-8?B?eDBXcWIrMkpPVUhiYjZ5T1VjTUpxSEdJMEM2aHBveW92YklnbjQ0aTB2R1Jv?=
- =?utf-8?B?NXdhMzJNOVBXVGRYYVNNUldwaWNaVlRubVlwUHQrajhYaGNsT1liRjV0WlVq?=
- =?utf-8?B?cjRLS3hGaUZXeUc0enVQcy8vdnVmV1hoNDZpcHVuUXRtWURjbUJLYmY2cmdB?=
- =?utf-8?B?MkxSMWlzRmZTVWJUelBqT3ZodVl5WG4zbGhoRWhkTWw2VUFOZ0w1S2h6Ti9n?=
- =?utf-8?B?TS95c1NCSzg3a283SHh3SEx5Rk5zU1FMYlFhM2dYS2FobkhTdmVTRWRYbmVM?=
- =?utf-8?B?Y3NIbEdQY1hpejIxYjZvZkppeXlVWi9XaXZJbGFDdUcrVTVpSG02Z1IyeDJ1?=
- =?utf-8?B?Y0ZVMlVobXNXQ2VaUlJKSFUvMFp5dS9KeXVKcDZEQ3VMSWlUbEk2MkdkOTRS?=
- =?utf-8?B?MnFNUlJ0UzlSOHc3VVBkTExaTDN0WG5tak93TS80Qmh6NWNtamJZeUplYkVK?=
- =?utf-8?B?L3pyNlRSeTNJdU1JWmNvSHYwL0lLR2h2M0hlcVRtRThKTkVrME5Xd2gxaVhu?=
- =?utf-8?B?d2V1SWlOMUZ0eDdGZCsvb2hLd21EeWVVL3Z6V2dPeG93QmNVS3UxVnhkOEE0?=
- =?utf-8?B?d3p3VjRoQ0F2UFpsT3hwc2VSemNWWnpQa1crQWswWmdYc2tsU1llRk15Q3Vm?=
- =?utf-8?B?bnBjV2ZNQktLQVlGanJkdk44YTFmU2ZkeTAvUytqQUxCYUtJQ1FjZDU4bUdx?=
- =?utf-8?B?bUxVV0hZVzdxZGc1ZndvM0Q2QTBsVXZnMXlwQXFGTTJLT08xSExVTTFoVVN1?=
- =?utf-8?B?OEhTNi9HWUIxeVFwb1V0QkN2cjlUYkV3NjN6SE5rU21XbUowZGZZQm1VOUJ2?=
- =?utf-8?B?aVF6N01IY3hyZUdSVzdvOWZ4VVZGbytKYmxRNkVpN0QrK1l5YnV1dUplM2JF?=
- =?utf-8?B?YUVSZzIvRHYvS2psRXVFQyt1R1gvVzNZT0l3MDJYQmQvY2xxaHAvcFZTb2No?=
- =?utf-8?B?T2I2M1l6cFdsT2g4SjFrenRoZmZHMEV0ZEZYbkN1eTg2dGtuZXVPbk9OSVRa?=
- =?utf-8?B?V2hLWk5pOE94NncyN09WY0lqM2xjaXU5c2wyeWQ3WWFsblpKNTRtTEVGdnUz?=
- =?utf-8?B?MGR3MzZDN1dIaDZ0eXpVK3IzL0FQNlY4UnZpMXNVbUZwVHFXc21oSXRvUnF3?=
- =?utf-8?B?N0dLNmdYWTk2MUtxR2ZQZFEyU2hlZllJbEM2N0h3UjQ2YVhQc2JaYVZsL0Vu?=
- =?utf-8?B?MVZoYjd6Skw4cFhOd3VTT3FRVWVIOHBiK2VtMk41aDZZbzEyNUZYaEw3a2Fv?=
- =?utf-8?B?K2h0T0RsR1lXSUJHaFZiSmF3SERQRVZsSUV2bTJVRTlFcTIvN05xV2JFVzBF?=
- =?utf-8?B?cWNsQ3c5R1hJNTZVckIzdFVpZnJIWWV5MlJ6bHI1YXBPOWtETHdwODA1NUYx?=
- =?utf-8?Q?mQVMFhim?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b44709f2-3a4a-4a45-14f5-08d8c6e1f88e
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2021 18:48:31.4886
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NvkPzCFD9laIUMCG97Lr61Ds40v9s6QjUDi6BAtNrcksSs3DV912Qu1kmQHOG6UcluGKo/cVn/sOYjVRzKDtZA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1354
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210120135555.32594-8-jgross@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/29/21 11:44 AM, Venu Busireddy wrote:
-> On 2021-01-26 11:36:46 -0600, Tom Lendacky wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> When SEV-ES is enabled, it is not possible modify the guests register
->> state after it has been initially created, encrypted and measured.
->>
->> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
->> hypervisor cannot emulate this because it cannot update the AP register
->> state. For the very first boot by an AP, the reset vector CS segment
->> value and the EIP value must be programmed before the register has been
->> encrypted and measured. Search the guest firmware for the guest for a
->> specific GUID that tells Qemu the value of the reset vector to use.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> Cc: Richard Henderson <richard.henderson@linaro.org>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> Cc: Marcelo Tosatti <mtosatti@redhat.com>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
->> ---
-...
->> +
->> +    /*
->> +     * SEV info block not found in the Firmware GUID Table (or there isn't
->> +     * a Firmware GUID Table), fall back to the original implementation.
->> +     */
->> +    data = flash_ptr + flash_size - 0x20;
+On Wed, Jan 20, 2021 at 02:55:47PM +0100, Juergen Gross wrote:
+> The time pvops functions are the only ones left which might be
+> used in 32-bit mode and which return a 64-bit value.
 > 
-> Even if the SEV_INFO_BLOCK_GUID is always located at 32 bytes from the end
-> of the flash, isn't it better to define a constant with a value of 0x20?
-
-A follow-on patch that updates both this and the table parser code from 
-James would probably be best.
-
-Thanks,
-Tom
-
+> Switch them to use the static_call() mechanism instead of pvops, as
+> this allows quite some simplification of the pvops implementation.
 > 
->> +
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+> V4:
+> - drop paravirt_time.h again
+> - don't move Hyper-V code (Michael Kelley)
+> ---
+>  arch/x86/Kconfig                      |  1 +
+>  arch/x86/include/asm/mshyperv.h       |  2 +-
+>  arch/x86/include/asm/paravirt.h       | 17 ++++++++++++++---
+>  arch/x86/include/asm/paravirt_types.h |  6 ------
+>  arch/x86/kernel/cpu/vmware.c          |  5 +++--
+>  arch/x86/kernel/kvm.c                 |  2 +-
+>  arch/x86/kernel/kvmclock.c            |  2 +-
+>  arch/x86/kernel/paravirt.c            | 16 ++++++++++++----
+>  arch/x86/kernel/tsc.c                 |  2 +-
+>  arch/x86/xen/time.c                   | 11 ++++-------
+>  drivers/clocksource/hyperv_timer.c    |  5 +++--
+>  drivers/xen/time.c                    |  2 +-
+>  12 files changed, 42 insertions(+), 29 deletions(-)
+> 
+> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> index 21f851179ff0..7ccd4a80788c 100644
+> --- a/arch/x86/Kconfig
+> +++ b/arch/x86/Kconfig
+> @@ -771,6 +771,7 @@ if HYPERVISOR_GUEST
+>  
+>  config PARAVIRT
+>  	bool "Enable paravirtualization code"
+> +	depends on HAVE_STATIC_CALL
+>  	help
+>  	  This changes the kernel so it can modify itself when it is run
+>  	  under a hypervisor, potentially improving performance significantly
+> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
+> index 30f76b966857..b4ee331d29a7 100644
+> --- a/arch/x86/include/asm/mshyperv.h
+> +++ b/arch/x86/include/asm/mshyperv.h
+> @@ -63,7 +63,7 @@ typedef int (*hyperv_fill_flush_list_func)(
+>  static __always_inline void hv_setup_sched_clock(void *sched_clock)
+>  {
+>  #ifdef CONFIG_PARAVIRT
+> -	pv_ops.time.sched_clock = sched_clock;
+> +	paravirt_set_sched_clock(sched_clock);
+>  #endif
+>  }
+>  
+> diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+> index 4abf110e2243..1e45b46fae84 100644
+> --- a/arch/x86/include/asm/paravirt.h
+> +++ b/arch/x86/include/asm/paravirt.h
+> @@ -15,11 +15,22 @@
+>  #include <linux/bug.h>
+>  #include <linux/types.h>
+>  #include <linux/cpumask.h>
+> +#include <linux/static_call_types.h>
+>  #include <asm/frame.h>
+>  
+> -static inline unsigned long long paravirt_sched_clock(void)
+> +u64 dummy_steal_clock(int cpu);
+> +u64 dummy_sched_clock(void);
+> +
+> +DECLARE_STATIC_CALL(pv_steal_clock, dummy_steal_clock);
+> +DECLARE_STATIC_CALL(pv_sched_clock, dummy_sched_clock);
+
+Did you build this before sending?
+
+I'm test-applying this on rc6 + tip/master so I probably am using a
+different tree so it looks like something has changed in the meantime.
+-rc6 has a couple of Xen changes which made applying those to need some
+wiggling in...
+
+Maybe you should redo them ontop of tip/master. That is, *if* they're
+going to eventually go through tip. The diffstat has Xen stuff too so we
+might need some synchronization here what goes where how...
+
+./arch/x86/include/asm/paravirt.h:24:1: warning: data definition has no type or storage class
+   24 | DECLARE_STATIC_CALL(pv_steal_clock, dummy_steal_clock);
+      | ^~~~~~~~~~~~~~~~~~~
+./arch/x86/include/asm/paravirt.h:24:1: error: type defaults to ‘int’ in declaration of ‘DECLARE_STATIC_CALL’ [-Werror=implicit-int]
+./arch/x86/include/asm/paravirt.h:24:1: warning: parameter names (without types) in function declaration
+./arch/x86/include/asm/paravirt.h:25:1: warning: data definition has no type or storage class
+   25 | DECLARE_STATIC_CALL(pv_sched_clock, dummy_sched_clock);
+      | ^~~~~~~~~~~~~~~~~~~
+./arch/x86/include/asm/paravirt.h:25:1: error: type defaults to ‘int’ in declaration of ‘DECLARE_STATIC_CALL’ [-Werror=implicit-int]
+./arch/x86/include/asm/paravirt.h:25:1: warning: parameter names (without types) in function declaration
+./arch/x86/include/asm/paravirt.h: In function ‘paravirt_sched_clock’:
+./arch/x86/include/asm/paravirt.h:33:9: error: implicit declaration of function ‘static_call’ [-Werror=implicit-function-declaration]
+   33 |  return static_call(pv_sched_clock)();
+      |         ^~~~~~~~~~~
+./arch/x86/include/asm/paravirt.h:33:21: error: ‘pv_sched_clock’ undeclared (first use in this function); did you mean ‘dummy_sched_clock’?
+   33 |  return static_call(pv_sched_clock)();
+      |                     ^~~~~~~~~~~~~~
+      |                     dummy_sched_clock
+./arch/x86/include/asm/paravirt.h:33:21: note: each undeclared identifier is reported only once for each function it appears in
+./arch/x86/include/asm/paravirt.h: In function ‘paravirt_steal_clock’:
+./arch/x86/include/asm/paravirt.h:47:21: error: ‘pv_steal_clock’ undeclared (first use in this function); did you mean ‘dummy_steal_clock’?
+   47 |  return static_call(pv_steal_clock)(cpu);
+      |                     ^~~~~~~~~~~~~~
+      |                     dummy_steal_clock
+cc1: some warnings being treated as errors
+make[1]: *** [scripts/Makefile.build:117: arch/x86/kernel/asm-offsets.s] Error 1
+make: *** [Makefile:1200: prepare0] Error 2
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
