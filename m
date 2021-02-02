@@ -2,131 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A08AF30BC66
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 11:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79EC930BCB9
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 12:14:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbhBBKvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 05:51:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbhBBKvj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 05:51:39 -0500
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DB0C061573;
-        Tue,  2 Feb 2021 02:50:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=QUFoL1M4pevTeMyLwnDogHEMlQrHMZssskb6wG1LFcA=; b=wg2o6QP/gHbhqBuIhn1RZoUGj
-        2iHotGU7ufXkLAWPw4UwYFPNHzUu8ddsLF6ZH7DAZK9ibPxZPao37pY3QUiSj2kNvPg18QoU3RIbp
-        SB9YdTsgzRp09KPTWE899TVtBN6b7+9uCVpM084z3RB+393ttTKlzy9IbXmuACxRaE7AQP1axErmx
-        9bdLyqL5Tzp+2AR1s8H8Ra8HKPn+VaEgvK7MKLCh/WvBYIcLxWRrMqhYn6+wAR7lOhqYiExSBYnla
-        2ZSGKUuSlOCD0mvUg9A5mz9A1bzzWPt0jeQ/XhpyrV3IGp6JHZ9fsbmIMsvJ8Mev9a6w8QLTZD9/a
-        CRpSMItzA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38176)
-        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1l6tFN-0004FH-LS; Tue, 02 Feb 2021 10:49:25 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1l6tFE-0002yZ-0J; Tue, 02 Feb 2021 10:49:16 +0000
-Date:   Tue, 2 Feb 2021 10:49:15 +0000
-From:   Russell King - ARM Linux admin <linux@armlinux.org.uk>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Vinod Koul <vkoul@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Eric Anholt <eric@anholt.net>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
-        kernel@pengutronix.de,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig.org@pengutronix.de>,
-        Mike Leach <mike.leach@linaro.org>,
-        Leo Yan <leo.yan@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, coresight@lists.linaro.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-i2c@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-        kvm@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 0/5] amba: minor fix and various cleanups
-Message-ID: <20210202104915.GK1463@shell.armlinux.org.uk>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+        id S230098AbhBBLNE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 06:13:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33028 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230073AbhBBLNC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 06:13:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612264295;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2oVg/Uf05KcV5nMGrP9DGalUbJY3Gt5M2iu6wQi4DjQ=;
+        b=eIsJcfy4sVmrpXVV02scNv6M8A+Byi87/s4oZ0PFg1TdYZeRml08CS+P1S7dtreY1Gzp+k
+        NjZAuAVCAiqLR0yxW7bdP5f6EsWcDsTOatnOEg1CtQH0WM74E0+UNfhiOpcMtn/zCe5Z/s
+        iwMXUmMz4WX4FXIf+0AGRqQDF7tgxuk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28---2nXXPQOFWCMH_eVUEF2A-1; Tue, 02 Feb 2021 06:11:31 -0500
+X-MC-Unique: --2nXXPQOFWCMH_eVUEF2A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53AF91DDE1;
+        Tue,  2 Feb 2021 11:11:30 +0000 (UTC)
+Received: from gondolin (ovpn-113-169.ams2.redhat.com [10.36.113.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A467B60C69;
+        Tue,  2 Feb 2021 11:11:25 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 12:11:23 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/5] s390x: css: Store CSS
+ Characteristics
+Message-ID: <20210202121123.2397d844.cohuck@redhat.com>
+In-Reply-To: <1611930869-25745-2-git-send-email-pmorel@linux.ibm.com>
+References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
+        <1611930869-25745-2-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Sender: Russell King - ARM Linux admin <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 05:58:30PM +0100, Uwe Kleine-König wrote:
-> From: Uwe Kleine-König <u.kleine-koenig.org@pengutronix.de
-> 
-> Hello,
-> 
-> Changes since v2 sent with Message-Id:
-> 20201124133139.3072124-1-uwe@kleine-koenig.org:
-> 
->  - Rebase to v5.11-rc1 (which resulted in a few conflicts in
->    drivers/hwtracing).
->  - Add various Acks.
->  - Send to more maintainers directly (which I think is one of the
->    reasons why there are so few Acks).
-> 
-> For my taste patch 4 needs some more acks (drivers/char/hw_random,
-> drivers/dma, drivers/gpu/drm/pl111, drivers/i2c, drivers/mmc,
-> drivers/vfio, drivers/watchdog and sound/arm have no maintainer feedback
-> yet).
-> 
-> My suggestion is to let this series go in via Russell King (who cares
-> for amba). Once enough Acks are there I can also provide a tag for
-> merging into different trees. Just tell me if you prefer this solution.
-> 
-> Would be great if this could make it for v5.12, but I'm aware it's
-> already late in the v5.11 cycle so it might have to wait for v5.13.
+On Fri, 29 Jan 2021 15:34:25 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-I think you need to have a 6th patch which moves the
-probe/remove/shutdown methods into the bus_type - if you're setting
-them for every struct device_driver, then there's no point doing that
-and they may as well be in the bus_type.
+> CSS characteristics exposes the features of the Channel SubSystem.
+> Let's use Store Channel Subsystem Characteristics to retrieve
+> the features of the CSS.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     | 57 +++++++++++++++++++++++++++++++++++++++++++++
+>  lib/s390x/css_lib.c | 50 ++++++++++++++++++++++++++++++++++++++-
+>  s390x/css.c         | 12 ++++++++++
+>  3 files changed, 118 insertions(+), 1 deletion(-)
+> 
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index 3e57445..bc0530d 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -288,4 +288,61 @@ int css_residual_count(unsigned int schid);
+>  void enable_io_isc(uint8_t isc);
+>  int wait_and_check_io_completion(int schid);
+>  
+> +/*
+> + * CHSC definitions
+> + */
+> +struct chsc_header {
+> +	u16 len;
+> +	u16 code;
+> +};
+> +
+> +/* Store Channel Subsystem Characteristics */
+> +struct chsc_scsc {
+> +	struct chsc_header req;
+> +	u32 reserved1;
+> +	u32 reserved2;
+> +	u32 reserved3;
+> +	struct chsc_header res;
+> +	u32 format;
+> +	u64 general_char[255];
+> +	u64 chsc_char[254];
 
-Apart from that, it looks good.
+Both the kernel and QEMU use arrays of 32 bit values to model that. Not
+a problem, just a stumbling block when comparing code :)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+> +};
+> +extern struct chsc_scsc *chsc_scsc;
+> +
+> +#define CSS_GENERAL_FEAT_BITLEN	(255 * 64)
+> +#define CSS_CHSC_FEAT_BITLEN	(254 * 64)
+> +
+> +int get_chsc_scsc(void);
+> +
+> +static inline int _chsc(void *p)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	.insn   rre,0xb25f0000,%2,0\n"
+> +		"	ipm     %0\n"
+> +		"	srl     %0,28\n"
+> +		: "=d" (cc), "=m" (p)
+> +		: "d" (p), "m" (p)
+> +		: "cc");
+> +
+> +	return cc;
+> +}
+> +
+> +#define CHSC_SCSC	0x0010
+> +#define CHSC_SCSC_LEN	0x0010
+> +
+> +static inline int chsc(void *p, uint16_t code, uint16_t len)
+> +{
+> +	struct chsc_header *h = p;
+> +
+> +	h->code = code;
+> +	h->len = len;
+> +	return _chsc(p);
+> +}
+
+I'm wondering how useful this function is. For store channel subsystem
+characteristics, you indeed only need to fill in code and len, but
+other commands may need more fields filled out in the header, and
+filling in code and len is not really extra work. I guess it depends
+whether you plan to add more commands in the future.
+
+Also maybe move the definitions to the actual invocation of scsc?
+
+> +
+> +#include <bitops.h>
+> +#define css_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
+> +#define css_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
+> +
+>  #endif
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index 3c24480..fe05021 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -15,11 +15,59 @@
+>  #include <asm/arch_def.h>
+>  #include <asm/time.h>
+>  #include <asm/arch_def.h>
+> -
+> +#include <alloc_page.h>
+>  #include <malloc_io.h>
+>  #include <css.h>
+>  
+>  static struct schib schib;
+> +struct chsc_scsc *chsc_scsc;
+> +
+> +int get_chsc_scsc(void)
+> +{
+> +	int i, n;
+> +	int ret = 0;
+> +	char buffer[510];
+> +	char *p;
+> +
+> +	report_prefix_push("Channel Subsystem Call");
+> +
+> +	if (chsc_scsc) {
+> +		report_info("chsc_scsc already initialized");
+> +		goto end;
+> +	}
+> +
+> +	chsc_scsc = alloc_pages(0);
+> +	report_info("scsc_scsc at: %016lx", (u64)chsc_scsc);
+> +	if (!chsc_scsc) {
+> +		ret = -1;
+> +		report(0, "could not allocate chsc_scsc page!");
+> +		goto end;
+> +	}
+> +
+> +	ret = chsc(chsc_scsc, CHSC_SCSC, CHSC_SCSC_LEN);
+> +	if (ret) {
+> +		report(0, "chsc: CC %d", ret);
+> +		goto end;
+> +	}
+
+Shouldn't you check the response code in the chsc area as well?
+
+> +
+> +	for (i = 0, p = buffer; i < CSS_GENERAL_FEAT_BITLEN; i++)
+> +		if (css_general_feature(i)) {
+> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
+> +			p += n;
+> +		}
+> +	report_info("General features: %s", buffer);
+> +
+> +	for (i = 0, p = buffer, ret = 0; i < CSS_CHSC_FEAT_BITLEN; i++)
+> +		if (css_chsc_feature(i)) {
+> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
+> +			p += n;
+> +		}
+> +	report_info("CHSC features: %s", buffer);
+> +
+> +end:
+> +	report_prefix_pop();
+> +	return ret;
+> +}
+>  
+>  /*
+>   * css_enumerate:
+
+(...)
+
