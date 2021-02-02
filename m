@@ -2,73 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55CB130C6FC
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:06:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA3BB30C747
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:17:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237161AbhBBRG3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:06:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57131 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237005AbhBBRES (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:04:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612285373;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=F9oAoXtAX+Cil+a1sW8Pz3+QVGLc8h16eVPUFtZSABM=;
-        b=LgRsP0+gGX811rh8Wjopr3tCeT/PWO+G1Z2D6GYtTmsGPCqezyN9m0/80gTY+IbN8ZJSIY
-        89ZDnXTku1UyLGOSXb1tOg3UmHGi27NSYMUDrGsR/zDk3rcrlawm9s855EsCOrM15wom+V
-        yvbjtZSYcYveext1HMLp61jFty24xyA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-l6UgDDbgPyelQPCboFbVhg-1; Tue, 02 Feb 2021 12:02:47 -0500
-X-MC-Unique: l6UgDDbgPyelQPCboFbVhg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFC87801817;
-        Tue,  2 Feb 2021 17:02:46 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F8A75D9C6;
-        Tue,  2 Feb 2021 17:02:46 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com
-Subject: [PATCH] KVM: cleanup DR6/DR7 reserved bits checks
-Date:   Tue,  2 Feb 2021 12:02:46 -0500
-Message-Id: <20210202170246.89436-1-pbonzini@redhat.com>
+        id S237371AbhBBRPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:15:53 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:9200 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237212AbhBBRMz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 12:12:55 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B601987ef0000>; Tue, 02 Feb 2021 09:12:15 -0800
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Feb
+ 2021 17:12:14 +0000
+Received: from HKMAIL101.nvidia.com (10.18.16.10) by HKMAIL102.nvidia.com
+ (10.18.16.11) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Feb
+ 2021 17:10:25 +0000
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by HKMAIL101.nvidia.com (10.18.16.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 2 Feb 2021 17:10:25 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cKGLb0Ue5+bOQrhxcCsKm2uJWyHZeDTdKBeMZ9SzzS9778EkMrv0rtfUTuUP9TohpKTFAQWj4zreNpWD9oJ/oHWeWt7NWjfJ9uyg11cABImFfyGNX1FCCr4UfBFe3Z7IoXynO72SOvbiJwMoC4NrnznEng9Cr17D+q/TDAju8PJrCwSecf0sogng9Qo9JTHYMCuVuFRueDs7/nQsZF12+yc5YqhmBpW+L68fgrhUjdTPSAOuonqXDlWMH5O5Fxs+7OfDN1/Jok78bKJh1dhS3jhQhrpCXPEAvRaHRqLc9DgeIUm0CIPFnTbyfbZA0Irg0ZSQD7/7EytQCUFXYxE9Jg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RV+PH22++d/37dWTpKti2udE+plzKen6d1E2uRzMCgY=;
+ b=XMLf6xmIDCKmEkEBefWphE3wGYwmV7izjjYI1daque/3t5RoMArNnW2ZrPuUpJC1z5p06iRiS40h/0IrI2Axza6Bi604lvZzWItpcYwpOcmubaZE/oTk1aXYE8whlA5Bmz58qucyMgoxZK/GV57mV+69XlTCOrwlC65MML0AiSSIUbErwcBL0Om4E7XmidDCDIfqG9rG/xS4GAy4/Cm5F4cM0FzTFuroklJq9S7FLoo+ANknz6OJ2LK8KwPPvC8BcXlPmCEH5JRzQbKz8FhBuXXkqOmNPeKG+ZhR6TWaHmcPm2oVNtc6Sce1RJY7OqGzD1u3YtOZG+4hdiEcWRM12w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4451.namprd12.prod.outlook.com (2603:10b6:5:2ab::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16; Tue, 2 Feb
+ 2021 17:10:23 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3805.025; Tue, 2 Feb 2021
+ 17:10:23 +0000
+Date:   Tue, 2 Feb 2021 13:10:21 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
+        <aik@ozlabs.ru>
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+Message-ID: <20210202171021.GW4247@nvidia.com>
+References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+ <20210201162828.5938-9-mgurtovoy@nvidia.com>
+ <20210201181454.22112b57.cohuck@redhat.com>
+ <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210202170659.1c62a9e8.cohuck@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0504.namprd13.prod.outlook.com
+ (2603:10b6:208:2c7::29) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0504.namprd13.prod.outlook.com (2603:10b6:208:2c7::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.10 via Frontend Transport; Tue, 2 Feb 2021 17:10:22 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l6zC1-002cSN-5n; Tue, 02 Feb 2021 13:10:21 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612285935; bh=RV+PH22++d/37dWTpKti2udE+plzKen6d1E2uRzMCgY=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=BT3etWhfLvDdGhhYnQBTmz9sR5V6LP2ywmMQ3Iy09N/3+wsvueGkKvu2IKR9ESqXk
+         OKgH7jSLVaWx2obTRPpViol/XNS0Jc14QWExmQt9YHrUa6sosSCGrrsmOiNshoAQyY
+         WjjyEeFst1zEdm+VrZvO3BG2/WWcDXJ7ZrpNgA8xJb6oN0rxar0O9fALXe8ZcWCX5F
+         /vf/qSeDcv/X5xQFl8ICRqQvmp6AlFdTTWkVEfsme07+Nw6aw24tAtp6Y49DqOo8iE
+         Z3nAuC9EmLjcSMDbXFitNWHKXzOIvDwaZfj0fu21b+yvvekSkK2jcHbx7TYvlQOqXd
+         q9C1ni5pfwnPg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_dr6_valid and kvm_dr7_valid check that bits 63:32 are zero.  Using
-them makes it easier to review the code for inconsistencies.
+On Tue, Feb 02, 2021 at 05:06:59PM +0100, Cornelia Huck wrote:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/x86.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On the other side, we have the zdev support, which both requires s390
+> and applies to any pci device on s390.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 97674204bf44..e52e38f8c74d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4414,9 +4414,9 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
- 	if (dbgregs->flags)
- 		return -EINVAL;
- 
--	if (dbgregs->dr6 & ~0xffffffffull)
-+	if (!kvm_dr6_valid(dbgregs->dr6))
- 		return -EINVAL;
--	if (dbgregs->dr7 & ~0xffffffffull)
-+	if (!kvm_dr7_valid(dbgregs->dr7))
- 		return -EINVAL;
- 
- 	memcpy(vcpu->arch.db, dbgregs->db, sizeof(vcpu->arch.db));
--- 
-2.26.2
+Is there a reason why CONFIG_VFIO_PCI_ZDEV exists? Why not just always
+return the s390 specific data in VFIO_DEVICE_GET_INFO if running on
+s390?
 
+It would be like returning data from ACPI on other platforms.
+
+It really seems like part of vfio-pci-core
+
+Jason
