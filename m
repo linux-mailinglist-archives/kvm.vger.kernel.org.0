@@ -2,160 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D100530CC1F
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 20:46:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E09B030CD29
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 21:37:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240008AbhBBTpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 14:45:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39168 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239833AbhBBTo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 14:44:59 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C72DEC061788
-        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 11:44:18 -0800 (PST)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l71a4-0002fO-D0; Tue, 02 Feb 2021 20:43:20 +0100
-Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l71Zv-0004SH-BD; Tue, 02 Feb 2021 20:43:11 +0100
-Date:   Tue, 2 Feb 2021 20:43:08 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Russell King <linux+pull@armlinux.org.uk>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Tushar Khandelwal <Tushar.Khandelwal@arm.com>,
-        Jassi Brar <jassisinghbrar@gmail.com>
-Cc:     linux-fbdev@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
-        Jaroslav Kysela <perex@perex.cz>,
-        Eric Anholt <eric@anholt.net>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-rtc@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Takashi Iwai <tiwai@suse.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Mike Leach <mike.leach@linaro.org>,
-        linux-watchdog@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-spi@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Leo Yan <leo.yan@linaro.org>, dmaengine@vger.kernel.org
-Subject: [PATCH] mailbox: arm_mhuv2: make remove callback return void
-Message-ID: <20210202194308.jm66vblqjwr5wo6v@pengutronix.de>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="agbwdn2ioogiuabj"
-Content-Disposition: inline
-In-Reply-To: <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+        id S232798AbhBBUgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 15:36:23 -0500
+Received: from mga05.intel.com ([192.55.52.43]:25768 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230094AbhBBUgW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 15:36:22 -0500
+IronPort-SDR: QVKNqy4NwuxsSx9Q81gE2ETwefyfPtFLrDQbr6be/YN1W1P1a7xCPhXwEBEooqhUEsdetM0UDi
+ FoZl/h7TzEag==
+X-IronPort-AV: E=McAfee;i="6000,8403,9883"; a="265758367"
+X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
+   d="scan'208";a="265758367"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 12:35:35 -0800
+IronPort-SDR: POfVSk7vGi04vDpbLhh+tFnD/EmXf0WzZtfgJsXHcc3v1s3WBmyo8/TAK2OUrXVvFS0Q3tXvE3
+ d7ocOsdeTPIA==
+X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
+   d="scan'208";a="433069135"
+Received: from asalasax-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.7.175])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 12:35:30 -0800
+Date:   Wed, 3 Feb 2021 09:35:28 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v3 14/27] x86/sgx: Add helpers to expose ECREATE and
+ EINIT to KVM
+Message-Id: <20210203093528.51d33baaaee390ba8d66bf0d@intel.com>
+In-Reply-To: <YBmJ9tvbw3RE63F6@kernel.org>
+References: <cover.1611634586.git.kai.huang@intel.com>
+        <e807033e3d56ede1177d7a1af34477678bfbfff9.1611634586.git.kai.huang@intel.com>
+        <YBVyfQQPo18Fyv64@kernel.org>
+        <20210201131744.30530bd817ae299df92b8164@intel.com>
+        <YBmJ9tvbw3RE63F6@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 2 Feb 2021 19:20:54 +0200 Jarkko Sakkinen wrote:
+> On Mon, Feb 01, 2021 at 01:17:44PM +1300, Kai Huang wrote:
+> > On Sat, 30 Jan 2021 16:51:41 +0200 Jarkko Sakkinen wrote:
+> > > On Tue, Jan 26, 2021 at 10:31:06PM +1300, Kai Huang wrote:
+> > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > > 
+> > > > The bare-metal kernel must intercept ECREATE to be able to impose policies
+> > > > on guests.  When it does this, the bare-metal kernel runs ECREATE against
+> > > > the userspace mapping of the virtualized EPC.
+> > > 
+> > > I guess Andy's earlier comment applies here, i.e. SGX driver?
+> > 
+> > Sure.
+> > 
+> > [...]
+> > 
+> > > > +	}
+> > > > +
+> > > > +	if (encls_faulted(ret)) {
+> > > > +		*trapnr = ENCLS_TRAPNR(ret);
+> 
+> Also here is an empty line needed.
 
---agbwdn2ioogiuabj
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I honestly don't like putting new line here, since it is just two lines of
+code. Adding new line is too sparse I think.
 
-My build tests failed to catch that amba driver that would have needed
-adaption in commit 3fd269e74f2f ("amba: Make the remove callback return
-void"). Change the remove function to make the driver build again.
+> 
+> > > > +		return -EFAULT;
+> > > > +	}
+> > > 
+> > > Empty line here before return. Applies also to sgx_virt_ecreate().
+> > 
+> > Yes I can remove, but I am just carious: isn't "having empty line before return"
+> > a good coding-style? Do you have any reference to the guideline?
+> 
+> In the initial SGX patch set, this was the review feedback that I got
+> from Boris, so I would presume it is tip tree convention. Also, looking
+> at a random selection of files under arch/x86, it is commonly done this
+> way.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: 3fd269e74f2f ("amba: Make the remove callback return void")
-Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
----
-Hello,
+I'll add a new line here. Sorry I misunderstood your original comment.
 
-I guess I missed that driver during rebase as it was only introduced in
-the last merge window. Sorry for that.
-
-I'm unsure what is the right thing to do now. Should I redo the pull
-request (with this patch squashed into 3fd269e74f2f)? Or do we just
-apply this patch on top?
-
-FTR, the test robot report is at https://lore.kernel.org/r/202102030343.D9j=
-1wukx-lkp@intel.com
-
-Best regards
-Uwe
-
- drivers/mailbox/arm_mhuv2.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/mailbox/arm_mhuv2.c b/drivers/mailbox/arm_mhuv2.c
-index 67fb10885bb4..6cf1991a5c9c 100644
---- a/drivers/mailbox/arm_mhuv2.c
-+++ b/drivers/mailbox/arm_mhuv2.c
-@@ -1095,14 +1095,12 @@ static int mhuv2_probe(struct amba_device *adev, co=
-nst struct amba_id *id)
- 	return ret;
- }
-=20
--static int mhuv2_remove(struct amba_device *adev)
-+static void mhuv2_remove(struct amba_device *adev)
- {
- 	struct mhuv2 *mhu =3D amba_get_drvdata(adev);
-=20
- 	if (mhu->frame =3D=3D SENDER_FRAME)
- 		writel_relaxed(0x0, &mhu->send->access_request);
--
--	return 0;
- }
-=20
- static struct amba_id mhuv2_ids[] =3D {
---=20
-2.29.2
-
-
---agbwdn2ioogiuabj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmAZq0gACgkQwfwUeK3K
-7AnvFwf/Vj/2rwm/LS2yBZgC9lI9lbNS7MDRNAth1Fq2eWp2ByCbKHdpRnFCokp/
-Bk350ppjYY61jBRAG9ts8T+mrfwcHD9fjOamGLqhCRg9sdwC29T72vxVbt7p8j5g
-ZMPgB1Cs1n56eeobyale3SG5V9DncI0cu9gr5q/s09YI0qZfLfd4oVj2M1AJd8x0
-FzlgEPrVQadxZxqVmFogIFepwe6xmpjPmBFLn6XK3RB6tQjamSqXd3XUYYy9DkAj
-Xt57rSlMAYgF69pHmEcEVcPdGOw3YwImELrFdBhM7GfXjxIiYI4VjKH1Z05hG/Bx
-KkEiVe0iL1vI9eSQ6l5bCY9dNdIxEg==
-=S1EL
------END PGP SIGNATURE-----
-
---agbwdn2ioogiuabj--
+> 
+> > 
+> > > 
+> > > > +	return ret;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(sgx_virt_einit);
+> > > > -- 
+> > > > 2.29.2
+> > > 
+> > > Great work. I think this patch sets is shaping up.
+> > > 
+> > > /Jarkko
+> > > > 
+> > > > 
+> > 
+> 
+> /Jarkko
