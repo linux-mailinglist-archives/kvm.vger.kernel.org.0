@@ -2,224 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 91FAF30CF86
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 00:01:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D638F30CFA0
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 00:08:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235885AbhBBW7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 17:59:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232681AbhBBW7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 17:59:41 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D0AC0613D6;
-        Tue,  2 Feb 2021 14:59:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=ENue7s30/AVYjJ+FLuK3utBLdl7fX7Wgo1RZFpgH4vM=; b=iCpPPCirUc9RhjKzpwe3y4FP9W
-        Er4hHDaCbraQPxNrWmL2Yao94VNYmaPyexKnej4DgMa6blaJPt+pVpsgTWVPOEstB1gcQYPe73aAF
-        v9VazIjrtXW9X/ChFtnTI+IpgqygQ3asQ16cZidy4PTIwoXo5z32Kxd87vp9zAXjdKA3kpFJuLBJE
-        geVlY2+N3EIhy5WY1aMvzjCXYGfmzbKT5mCqHMujL6Fv8rV2q4Zib9vzCFy9tEuqFUS1QvISsZGHe
-        WLRuK+q8+3pouAGoC2JuWkD8JsJGjQyF2NKqJlTbJhN+2kMaeBEtjP/6600EQAYF8StNRlB7VhEEF
-        rYfAw2Fg==;
-Received: from [2601:1c0:6280:3f0::2a53]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l74cg-0001Wj-VY; Tue, 02 Feb 2021 22:58:15 +0000
-Subject: Re: [PATCH v5 1/2] drivers/misc: sysgenid: add system generation id
- driver
-To:     Adrian Catangiu <acatan@amazon.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, graf@amazon.com, arnd@arndb.de,
-        ebiederm@xmission.com, rppt@kernel.org, 0x7f454c46@gmail.com,
-        borntraeger@de.ibm.com, Jason@zx2c4.com, jannh@google.com,
-        w@1wt.eu, colmmacc@amazon.com, luto@kernel.org, tytso@mit.edu,
-        ebiggers@kernel.org, dwmw@amazon.co.uk, bonzini@gnu.org,
-        sblbir@amazon.com, raduweis@amazon.com, corbet@lwn.net,
-        mst@redhat.com, mhocko@kernel.org, rafael@kernel.org, pavel@ucw.cz,
-        mpe@ellerman.id.au, areber@redhat.com, ovzxemul@gmail.com,
-        avagin@gmail.com, ptikhomirov@virtuozzo.com, gil@azul.com,
-        asmehra@redhat.com, dgunigun@redhat.com, vijaysun@ca.ibm.com,
-        oridgar@gmail.com, ghammer@redhat.com
-References: <1612200294-17561-1-git-send-email-acatan@amazon.com>
- <1612200294-17561-2-git-send-email-acatan@amazon.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <5290f6f5-396f-aa47-3b74-8d50c2434a04@infradead.org>
-Date:   Tue, 2 Feb 2021 14:58:02 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S236066AbhBBXGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 18:06:53 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:12505 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235664AbhBBXGt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 18:06:49 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6019dae10000>; Tue, 02 Feb 2021 15:06:09 -0800
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Feb
+ 2021 23:06:08 +0000
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.106)
+ by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 2 Feb 2021 23:06:08 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYk1yqceUNLtvTXR9+RwEfNiHXf1Mqv7UitCS55DYuZN6YzNSP/AYE7AtUPAFqR7aEDQNkBb8RgcqOwGk654sMWQn7jjEYI6mSXlnM6zIA25ftlNf/t9+72Led0v8TQt+l76BMDqjd4Z7iQpIX0kOEx7g9mdjSCbarqSK+3FRx/J6lqBEgyzXthvSRcFn5vixLFLIAJvypNf4u/5GGyeDMXPeq+wuJWjMpm9uoxoppecfun/2oFruys73500CbUh45iFS7ekhHlz8WZex0T5scl/9WPdkRvWZfhYYjxIA+0jrIOijE0XmWvK79re/eTYT3vMxhU5f/x3BKxLWUbxGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K0dzWgfpjvflZLMuenj4hzoJICmlXcr+Cl1I7K83j5w=;
+ b=Zl8JJvg7GsS2fSD5Ygv60OQmxOBWXb4dQzxt73n0DpTaDmO6s6ba/W4bGriRBVXdveL2zNelRFTng1hh7W8Aqf9VRIvVbnEUr6X4Z3QYPMH3BPpJs2/NHo5tomDgxnDWiEzfZwVWcmVqHfQej+q6BuNM+12H3hqWsBajFzXEeCkRJut7XM+bO6ykFHlbkOAJaVJX1YP+K/l4vM9SwjwvIO7LfPk90+G6KVGxjnL3d9jYH4xn7ms5JsWhGuK/NuUTdsZIvtcUfcqtUCyRB8O63i16xYj9v98K1+Vhw/E8PWuEuk3ICIOC+dFtL0qSADSEpfj/pTRuAGtHIX4RRVMcsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR1201MB0203.namprd12.prod.outlook.com (2603:10b6:4:56::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16; Tue, 2 Feb
+ 2021 23:06:07 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3805.025; Tue, 2 Feb 2021
+ 23:06:07 +0000
+Date:   Tue, 2 Feb 2021 19:06:04 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
+        <aik@ozlabs.ru>
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+Message-ID: <20210202230604.GD4247@nvidia.com>
+References: <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+ <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
+ <20210202105455.5a358980@omen.home.shazbot.org>
+ <20210202185017.GZ4247@nvidia.com>
+ <20210202123723.6cc018b8@omen.home.shazbot.org>
+ <20210202204432.GC4247@nvidia.com>
+ <5e9ee84e-d950-c8d9-ac70-df042f7d8b47@nvidia.com>
+ <20210202143013.06366e9d@omen.home.shazbot.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210202143013.06366e9d@omen.home.shazbot.org>
+X-ClientProxiedBy: MN2PR05CA0017.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::30) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <1612200294-17561-2-git-send-email-acatan@amazon.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR05CA0017.namprd05.prod.outlook.com (2603:10b6:208:c0::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.13 via Frontend Transport; Tue, 2 Feb 2021 23:06:06 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l74kG-002mC2-Gt; Tue, 02 Feb 2021 19:06:04 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612307169; bh=K0dzWgfpjvflZLMuenj4hzoJICmlXcr+Cl1I7K83j5w=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=Fdk9x+4pWbK0ODmWudsUpDrJ2eruqCvasfbAz3nBoTJaFRASOm2r515EISYdzkEXT
+         olxLmbvmv7e3Jal0hnjZM02XRXDQg20X3KVjvXXvi7ikOrvDmfucHmzrnL+5R8DHbq
+         8aw+n0o58qD+DNwiQZsjJ73kevc9udnrlzUXIFPFxM5gyyArs/pT66syLt/j0lwqLb
+         IwmRyGx4WeqyJKg+2fIUQAyan0eU/Su9T+piWHcF10tvn86xL5rm3sL6H/+wGbYSEL
+         w0lK1DdT4ejXKKUxE2VQdn5m9W9NXU0Be0MiWisAtkE0mSMulZTESDY0Qvu1PD53ii
+         TrKOFeLd0XeOw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi--
+On Tue, Feb 02, 2021 at 02:30:13PM -0700, Alex Williamson wrote:
 
-On 2/1/21 9:24 AM, Adrian Catangiu wrote:
-> - Background and problem
-> 
-> The System Generation ID feature is required in virtualized or
-> containerized environments by applications that work with local copies
-> or caches of world-unique data such as random values, uuids,
-> monotonically increasing counters, etc.
+> The first set of users already fail this specification though, we can't
+> base it strictly on device and vendor IDs, we need wildcards, class
+> codes, revision IDs, etc., just like any other PCI drvier.  We're not
+> going to maintain a set of specific device IDs for the IGD
+> extension,
 
-  ... if those applications want to comply with <some MS spec>.
+The Intel GPU driver already has a include/drm/i915_pciids.h that
+organizes all the PCI match table entries, no reason why VFIO IGD
+couldn't include that too and use the same match table as the real GPU
+driver. Same HW right?
 
-> Such applications can be negatively affected by VM or container
-> snapshotting when the VM or container is either cloned or returned to
-> an earlier point in time.
+Also how sure are you that this loose detection is going to work with
+future Intel discrete GPUs that likely won't need vfio_igd?
 
+> nor I suspect the NVLINK support as that would require a kernel update
+> every time a new GPU is released that makes use of the same interface.
 
-> Signed-off-by: Adrian Catangiu <acatan@amazon.com>
-> ---
->  Documentation/misc-devices/sysgenid.rst            | 236 ++++++++++++++++
->  Documentation/userspace-api/ioctl/ioctl-number.rst |   1 +
->  MAINTAINERS                                        |   8 +
->  drivers/misc/Kconfig                               |  16 ++
->  drivers/misc/Makefile                              |   1 +
->  drivers/misc/sysgenid.c                            | 307 +++++++++++++++++++++
->  include/uapi/linux/sysgenid.h                      |  17 ++
->  7 files changed, 586 insertions(+)
->  create mode 100644 Documentation/misc-devices/sysgenid.rst
->  create mode 100644 drivers/misc/sysgenid.c
->  create mode 100644 include/uapi/linux/sysgenid.h
-> 
-> diff --git a/Documentation/misc-devices/sysgenid.rst b/Documentation/misc-devices/sysgenid.rst
-> new file mode 100644
-> index 0000000..4337ca0
-> --- /dev/null
-> +++ b/Documentation/misc-devices/sysgenid.rst
-> @@ -0,0 +1,236 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +========
-> +SYSGENID
-> +========
-> +
-> +The System Generation ID feature is required in virtualized or
-> +containerized environments by applications that work with local copies
-> +or caches of world-unique data such as random values, UUIDs,
-> +monotonically increasing counters, etc.
-> +Such applications can be negatively affected by VM or container
-> +snapshotting when the VM or container is either cloned or returned to
-> +an earlier point in time.
-> +
-> +The System Generation ID is a simple concept meant to alleviate the
-> +issue by providing a monotonically increasing counter that changes
-> +each time the VM or container is restored from a snapshot.
-> +The driver for it lives at ``drivers/misc/sysgenid.c``.
-> +
-> +The ``sysgenid`` driver exposes a monotonic incremental System
-> +Generation u32 counter via a char-dev FS interface accessible through
+The nvlink device that required this special vfio code was a one
+off. Current devices do not use it. Not having an exact PCI ID match
+in this case is a bug.
 
-s/FS/filesystem/
+> As I understand Jason's reply, these vendor drivers would have an ids
+> table and a user could look at modalias for the device to compare to
+> the driver supported aliases for a match.  Does kmod already have this
+> as a utility outside of modprobe?
 
-> +``/dev/sysgenid`` that provides sync and async SysGen counter update
-> +notifications. It also provides SysGen counter retrieval and
-> +confirmation mechanisms.
-> +
-> +The counter starts from zero when the driver is initialized and
-> +monotonically increments every time the system generation changes.
-> +
-> +The ``sysgenid`` driver exports the ``void sysgenid_bump_generation()``
-> +symbol which can be used by backend drivers to drive system generation
-> +changes based on hardware events.
-> +System generation changes can also be driven by userspace software
-> +through a dedicated driver ioctl.
-> +
-> +Userspace applications or libraries can (a)synchronously consume the
-> +system generation counter through the provided FS interface, to make
+I think this is worth exploring.
 
-s/FS/filesystem/
+One idea that fits nicely with the existing infrastructure is to add
+to driver core a 'device mode' string. It would be "default" or "vfio"
 
-> +any necessary internal adjustments following a system generation update.
-> +
-> +Driver FS interface:
-> +
-> +``open()``:
-> +  When the device is opened, a copy of the current Sys-Gen-Id (counter)
-> +  is associated with the open file descriptor. The driver now tracks
-> +  this file as an independent *watcher*. The driver tracks how many
-> +  watchers are aware of the latest Sys-Gen-Id counter and how many of
-> +  them are *outdated*; outdated being those that have lived through
-> +  a Sys-Gen-Id change but not yet confirmed the new generation counter.
-> +
-> +``read()``:
-> +  Read is meant to provide the *new* system generation counter when a
-> +  generation change takes place. The read operation blocks until the
-> +  associated counter is no longer up to date, at which point the new
-> +  counter is provided/returned.
-> +  Nonblocking ``read()`` uses ``EAGAIN`` to signal that there is no
-> +  *new* counter value available. The generation counter is considered
-> +  *new* for each open file descriptor that hasn't confirmed the new
-> +  value following a generation change. Therefore, once a generation
-> +  change takes place, all ``read()`` calls will immediately return the
-> +  new generation counter and will continue to do so until the
-> +  new value is confirmed back to the driver through ``write()``.
-> +  Partial reads are not allowed - read buffer needs to be at least
-> +  32 bits in size.
-> +
-> +``write()``:
-> +  Write is used to confirm the up-to-date Sys Gen counter back to the
-> +  driver.
-> +  Following a VM generation change, all existing watchers are marked
-> +  as *outdated*. Each file descriptor will maintain the *outdated*
-> +  status until a ``write()`` confirms the up-to-date counter back to
-> +  the driver.
-> +  Partial writes are not allowed - write buffer should be exactly
-> +  32 bits in size.
-> +
-> +``poll()``:
-> +  Poll is implemented to allow polling for generation counter updates.
-> +  Such updates result in ``EPOLLIN`` polling status until the new
-> +  up-to-date counter is confirmed back to the driver through a
-> +  ``write()``.
-> +
-> +``ioctl()``:
-> +  The driver also adds support for waiting on open file descriptors
-> +  that haven't acknowledged a generation counter update, as well as a
-> +  mechanism for userspace to *force* a generation update:
-> +
-> +  - SYSGENID_WAIT_WATCHERS: blocks until there are no more *outdated*
-> +    watchers, or if a ``timeout`` argument is provided, until the
-> +    timeout expires.
-> +    If the current caller is *outdated* or a generation change happens
-> +    while waiting (thus making current caller *outdated*), the ioctl
-> +    returns ``-EINTR`` to signal the user to handle event and retry.
-> +  - SYSGENID_FORCE_GEN_UPDATE: forces a generation counter increment.
-> +    It takes a ``minimum-generation`` argument which represents the
-> +    minimum value the generation counter will be incremented to. For
+devices in vfio mode only match vfio mode device_drivers.
 
-                                            will be set to. For
-It's not so much an increment as it is a "set to this value or higher".
+devices in vfio mode generate a unique modalias string that includes
+some additional 'mode=vfio' identifier
 
-> +    example if current generation is ``5`` and ``SYSGENID_FORCE_GEN_UPDATE(8)``
-> +    is called, the generation counter will increment to ``8``.
-> +    This IOCTL can only be used by processes with CAP_CHECKPOINT_RESTORE
-> +    or CAP_SYS_ADMIN capabilities.
-> +
-> +``mmap()``:
-> +  The driver supports ``PROT_READ, MAP_SHARED`` mmaps of a single page
-> +  in size. The first 4 bytes of the mapped page will contain an
-> +  up-to-date u32 copy of the system generation counter.
-> +  The mapped memory can be used as a low-latency generation counter
-> +  probe mechanism in critical sections - see examples.
-> +
-> +``close()``:
-> +  Removes the file descriptor as a system generation counter *watcher*.
-> +
-> +Example application workflows
-> +-----------------------------
-> +
-[snip]
+drivers that run in vfio mode generate a module table string that
+includes the same mode=vfio
 
+The driver core can trigger driver auto loading soley based on the
+mode string, happens naturally.
 
--- 
-~Randy
+All the existing udev, depmod/etc tooling will transparently work.
 
+Like driver_override, but doesn't bypass all the ID and module loading
+parts of the driver core.
+
+(But lets not get too far down this path until we can agree that
+embracing the driver core like the RFC contemplates is the agreed
+direction)
+
+> Seems like it would be embedded in the aliases for the module, with
+> this explicit binding flag being the significant difference that
+> prevents auto loading the device.  We still have one of the races that
+> driver_override resolves though, the proposed explicit bind flag is on
+> the driver not the device, so a native host driver being loaded due to
+> a hotplug operation or independent actions of different admins could
+> usurp the device between unbind of old driver and bind to new driver.
+
+This is because the sysfs doesn't have an atomic way to bind and
+rebind a device, teaching 'bind' to how to do that would also solve
+this problem.
+
+> This seems unpredictable from a user perspective.  In either the igd or
+> nvlink cases, if the platform features aren't available, the feature
+> set of the device is reduced.  That's not apparent until the user tries
+> to start interacting with the device if the device specific driver
+> doesn't fail the probe.  Userspace policy would need to decide if a
+> fallback driver is acceptable or the vendor specific driver failure is
+> fatal. Thanks,
+
+It matches today's behavior, if it is a good idea to preserve it, then
+it can be so without much effort.
+
+I do prefer the explicitness because I think most use cases have a
+user that requires the special driver to run. Explicitly binding a
+the required driver seems preferable.
+
+Certainly nvlink and mlx5 should fail probe and not fall back to plain
+vfio-pci. If user wants plain vfio-pci user should ask explicitly. At
+least for the mlx5 cases this is a completely reasonable thing to
+do. I like that we can support this choice.
+
+I'm not so clear on IGD, especially how it would interact with future
+descrete cards that probably don't need it. IMHO, it would be fine if
+it was different for some good reason.
+
+Jason
