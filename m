@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2478130CFCB
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 00:18:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50EB930CFCD
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 00:18:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236442AbhBBXRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 18:17:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49904 "EHLO mail.kernel.org"
+        id S236318AbhBBXSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 18:18:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51186 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236418AbhBBXRI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 18:17:08 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3921B64F74;
-        Tue,  2 Feb 2021 23:16:27 +0000 (UTC)
+        id S233019AbhBBXSr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 18:18:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3B89C64FCA;
+        Tue,  2 Feb 2021 23:18:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612307787;
-        bh=vD9heg/ocCMzRX0Ub+/qDUdUBZRo012giLlKJyJKnX8=;
+        s=k20201202; t=1612307884;
+        bh=mGMgUO/eQntysQIC9QPi8zQ6ki6EtoB3AjPdjZSTC6c=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EFsyhma1Q5g+lrYAateEcRPIy/yd6gkRp0Q3ct3t053VBnCYKIVfDfka6MnDs3QX6
-         qVOPpSUOnfKCgXWqSJqVwnY0A8jaj6OHZSch0vD8LrQbab7vwd9zTElfoBqH+rqlZS
-         N7msE4Jd4MWtdvhFGBktMfqSs4Hff5YMNDxBWndS7btcno+5cv0Cmq1WbHYfkwdJdf
-         ULDHAOjFGTr22n9ofjymsP+9LHZ4PzoIYJ7f7HnxDjKjC2oKZpgCmtaURO4NZRsHF3
-         P4ps7K+utOgH4ftThUKMQ9gFfQ15gcEe89U4domHTArAaCGOKMl9V+3bRscSzPj9ao
-         bMyY1aMo9WBOw==
-Date:   Wed, 3 Feb 2021 01:16:20 +0200
+        b=llxwbx62CKnRMQRlC+AAzoRHvUsYWHjzZcSsYycTObfxXtd3uIBJN3m/fgKYzvQ9h
+         BnTJGzYXHnClOD9AVw9lfXzrHLb4rKyx5CV6e1bl2j4Oas64DYacI3GpIkfRLIfNT5
+         WwWlOq0z2W07Stg+/wgylOSXl1oAzWDB/MJnZGfIj7h466M1/xsSZARGYH0BHPtk7h
+         M9Mg0H5WAMGL29R24huDwsjXPP7I3awdDL6wMNtTHlZiziYEeL3b8f/4XJv4INoBdS
+         hSn8XAZNtFteUFLqNYwkwkFSSh7DmP4q/rpbMJ9fkCCfRKwCrdBj4YxSATqsj6ErLY
+         hwjfuuktcXH6w==
+Date:   Wed, 3 Feb 2021 01:17:57 +0200
 From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
  when SGX driver is disabled
-Message-ID: <YBndRM9m0XHYwsPP@kernel.org>
+Message-ID: <YBndpfQ6BKU909cn@kernel.org>
 References: <cover.1611634586.git.kai.huang@intel.com>
  <5076ed2c486ac33bfd87dc0e17047a1673692b53.1611634586.git.kai.huang@intel.com>
  <YBVxF2kAl7VzeRPS@kernel.org>
  <20210201184040.646ea9923c2119c205b3378d@intel.com>
  <YBmMrqxlTxClg9Eb@kernel.org>
- <YBmX/wFFshokDqWM@google.com>
+ <20210203074945.0e836486d6afc29e9b44fdbf@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YBmX/wFFshokDqWM@google.com>
+In-Reply-To: <20210203074945.0e836486d6afc29e9b44fdbf@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 02, 2021 at 10:20:47AM -0800, Sean Christopherson wrote:
-> On Tue, Feb 02, 2021, Jarkko Sakkinen wrote:
+On Wed, Feb 03, 2021 at 07:49:45AM +1300, Kai Huang wrote:
+> On Tue, 2 Feb 2021 19:32:30 +0200 Jarkko Sakkinen wrote:
 > > On Mon, Feb 01, 2021 at 06:40:40PM +1300, Kai Huang wrote:
 > > > On Sat, 30 Jan 2021 16:45:43 +0200 Jarkko Sakkinen wrote:
 > > > > On Tue, Jan 26, 2021 at 10:31:00PM +1300, Kai Huang wrote:
@@ -112,28 +112,23 @@ On Tue, Feb 02, 2021 at 10:20:47AM -0800, Sean Christopherson wrote:
 > > ret = sgx_vepc_init();
 > > if (ret)
 > > 	goto err_kthread;
+> > 
+> > There is problem here anyhow. I.e. -ENODEV's from sgx_drv_init().  I think
+> > how driver.c should be changed would be just to return 0 in the places
+> > where it now return -ENODEV. Consider "not initialized" as a successful
+> > initialization.
 > 
-> And that's wrong, it doesn't correctly handle the case where sgx_drv_init()
-> succeeds but sgx_vepc_init() fails.
+> Hi Jarkko,
+> 
+> Dave already pointed out above code won't work. The problem is failure to
+> initialize vepc will just goto err_kthread, no matter whether driver has been
+> initialized successfully or not. 
+> 
+> I am sticking to the original way (!! & !!).
 
-After reading all of this, I think that the only acceptable way to
-to manage this is to
+I think it is wrong, as it is not in line with the conditions when KVM SGX
+support is allowed. It's exactly allowed when SGX is not supported by the
+driver. Not when things are not behaving right. Would be insane to allow
+anything to initialize in that situation.
 
-ret = sgx_drv_init();
-if (ret && ret != -ENODEV)
-        goto err_kthread;
-
-ret = sgx_vepc_init();
-if (ret)
-	goto err_kthread;
-
-Anything else would be a bad idea.
-
-We do support allowing KVM when the driver does not *support* SGX,
-not when something is working incorrectly. In that case it is a bad
-idea to allow any SGX related initialization to continue.
-
-Agreed that my earlier example is incorrect but so is the condition
-in the original patch.
-
-/Jarkko 
+/Jarkko
