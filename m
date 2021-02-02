@@ -2,96 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DF41930BD64
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 12:49:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9790330BD6B
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 12:52:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbhBBLtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 06:49:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47021 "EHLO
+        id S231157AbhBBLuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 06:50:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39836 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231145AbhBBLto (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 06:49:44 -0500
+        by vger.kernel.org with ESMTP id S230058AbhBBLt7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 06:49:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612266498;
+        s=mimecast20190719; t=1612266513;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ecwjUL9ogQPnlg5os6JZZvpRuGjYi8S365zVuRrXRN0=;
-        b=N9HvGqj0Zs90stJQfhwoZiBsyQdSkSsl5zdMPVwNAzQLMxlNScHYSduuSN5rwdWnSj2jk+
-        P/6Oyd7afqha6tG5YsamBIgCn33/qmYRNOTTlz2+8tG3hW/fgm9aH0CYanLQdK5gy92S4e
-        hPskA+s5Jl2m88XPaN8UB2sT3iu5YIc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-sjMtiWriO4627-ZhGBpBSQ-1; Tue, 02 Feb 2021 06:48:14 -0500
-X-MC-Unique: sjMtiWriO4627-ZhGBpBSQ-1
-Received: by mail-ej1-f70.google.com with SMTP id gt18so9911716ejb.18
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 03:48:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ecwjUL9ogQPnlg5os6JZZvpRuGjYi8S365zVuRrXRN0=;
-        b=IAn3DWnvKcBNMYqhVHh89N9UMVDUNtHNklcaMuI2+xU5B0s3+oRVEBTqpPsfWHMUG7
-         ayxy1nJeihP2NgPD2wP0wGFbstHnTuNaQWWXDMVKTZbc0ghcbjqlVAz0I7F8siGEoRlY
-         qYhyE6eHmlwQmTBxB18HQDA+0+ZRjnNQIeFGWsJHkTvEzGwi93g4NxaSaBNh4VRD4ZRU
-         FjTCgtYszEsziqq1ZBumLBq0XoH3X79haFu0xVa6md/n2MGi4iIOxW9/vruowY2Y4hA6
-         Wv8k79USNX4DXmRVzIygqbu1s/fr5YowWZWXNL9LfdbE6u5Ks5XtBHkHYGeRaPYUlPXi
-         ryOQ==
-X-Gm-Message-State: AOAM531S0iL+lLWU8A5rjx4fIv4lJyXZyPiyLp+SMW7ToiYy/VBvSVoD
-        B1k4PmJ9yk///nXSqnfxMpQgBFro1EGoy2edOB5WZBKJrSbegn1zksFzpSDSeJtO0zYryqKsTGg
-        ZwGQ+KPEQMBr7
-X-Received: by 2002:a17:906:e18:: with SMTP id l24mr4823104eji.500.1612266493215;
-        Tue, 02 Feb 2021 03:48:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyXKadNE8loFIx9Vwhb8yb6G+ELvCav6sNirryjEr9VKc/JCBv37u6gJqBKqHiycC0AhKpG3A==
-X-Received: by 2002:a17:906:e18:: with SMTP id l24mr4823091eji.500.1612266492992;
-        Tue, 02 Feb 2021 03:48:12 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j4sm9952998edt.18.2021.02.02.03.48.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Feb 2021 03:48:11 -0800 (PST)
-Subject: Re: [PATCH v14 02/11] KVM: x86/pmu: Set up IA32_PERF_CAPABILITIES if
- PDCM bit is available
-To:     Like Xu <like.xu@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com,
-        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210201051039.255478-1-like.xu@linux.intel.com>
- <20210201051039.255478-3-like.xu@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0ddc6861-7830-84db-a0c9-9da842237f6b@redhat.com>
-Date:   Tue, 2 Feb 2021 12:48:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=58+78T5j/zr0YoqqIeJqBu8SPu3V3qztEXBV0KpmkVU=;
+        b=Ocihw2GVJn5pLu3VaU2pNpTnCpMJxJNUVmPVJ0hZFtCQ9ZC5nybl2pevvpWrfNXxlnDGoj
+        HWVM+hs0q7WAz6DKEMPmMq5aBIq2BtvDWxB78GJR28z82DNU2avuXhj3FVphCL1A2YbDkq
+        /R5XOPG/dS8C7ZaZ7AyCb9eRIem5CA4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-553-LDFRZODdM7eCJ48R-Yba7A-1; Tue, 02 Feb 2021 06:48:27 -0500
+X-MC-Unique: LDFRZODdM7eCJ48R-Yba7A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4220E107ACE6;
+        Tue,  2 Feb 2021 11:48:26 +0000 (UTC)
+Received: from gondolin (ovpn-113-169.ams2.redhat.com [10.36.113.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7DD1100164C;
+        Tue,  2 Feb 2021 11:48:20 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 12:48:18 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v1 3/5] s390x: css: implementing Set
+ CHannel Monitor
+Message-ID: <20210202124818.6084bb36.cohuck@redhat.com>
+In-Reply-To: <1611930869-25745-4-git-send-email-pmorel@linux.ibm.com>
+References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
+        <1611930869-25745-4-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20210201051039.255478-3-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/02/21 06:10, Like Xu wrote:
+On Fri, 29 Jan 2021 15:34:27 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> We implement the call of the Set CHannel Monitor instruction,
+> starting the monitoring of the all Channel Sub System, and
+
+"initializing channel subsystem monitoring" ?
+
+> the initialization of the monitoring on a Sub Channel.
+
+"enabling monitoring for a subchannel" ?
+
 > 
-> -	if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-> -		vcpu->arch.perf_capabilities = vmx_get_perf_capabilities();
+> An initial test reports the presence of the extended measurement
+> block feature.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     | 17 +++++++++-
+>  lib/s390x/css_lib.c | 77 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/css.c         |  7 +++++
+>  3 files changed, 100 insertions(+), 1 deletion(-)
+> 
 
-Why remove this "if"?
+(...)
 
->  	pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters, >  					 x86_pmu.num_counters_gp);
-> @@ -405,6 +402,8 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
->  		pmu->fixed_counters[i].idx = i + INTEL_PMC_IDX_FIXED;
->  		pmu->fixed_counters[i].current_config = 0;
->  	}
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index f300969..9e0f568 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -205,6 +205,83 @@ retry:
+>  	return -1;
+>  }
+>  
+> +/*
+> + * css_enable_mb: enable the subchannel Mesurement Block
+> + * @schid: Subchannel Identifier
+> + * @mb   : 64bit address of the measurement block
+> + * @format1: set if format 1 is to be used
+> + * @mbi : the measurement block offset
+> + * @flags : PMCW_MBUE to enable measurement block update
+> + *	    PMCW_DCTME to enable device connect time
+> + * Return value:
+> + *   On success: 0
+> + *   On error the CC of the faulty instruction
+> + *      or -1 if the retry count is exceeded.
+> + */
+> +int css_enable_mb(int schid, uint64_t mb, int format1, uint16_t mbi,
+> +		  uint16_t flags)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int retry_count = 0;
+> +	int cc;
 > +
-> +	vcpu->arch.perf_capabilities = 0;
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return cc;
+> +	}
+> +
+> +retry:
+> +	/* Update the SCHIB to enable the measurement block */
+> +	pmcw->flags |= flags;
+> +
+> +	if (format1)
+> +		pmcw->flags2 |= PMCW_MBF1;
+> +	else
+> +		pmcw->flags2 &= ~PMCW_MBF1;
+> +
+> +	pmcw->mbi = mbi;
+> +	schib.mbo = mb;
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	cc = msch(schid, &schib);
 
-Paolo
+Setting some invalid flags for measurements in the schib could lead to
+an operand exception. Do we want to rely on the caller always getting
+it right, or should we add handling for those invalid flags? (Might
+also make a nice test case.)
+
+> +	if (cc) {
+> +		/*
+> +		 * If the subchannel is status pending or
+> +		 * if a function is in progress,
+> +		 * we consider both cases as errors.
+> +		 */
+> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	/*
+> +	 * Read the SCHIB again to verify the measurement block origin
+> +	 */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: updating sch %08x failed with cc=%d",
+> +			    schid, cc);
+> +		return cc;
+> +	}
+> +
+> +	if (schib.mbo == mb) {
+> +		report_info("stsch: sch %08x successfully modified after %d retries",
+> +			    schid, retry_count);
+> +		return 0;
+> +	}
+> +
+> +	if (retry_count++ < MAX_ENABLE_RETRIES) {
+> +		mdelay(10); /* the hardware was not ready, give it some time */
+> +		goto retry;
+> +	}
+> +
+> +	report_info("msch: modifying sch %08x failed after %d retries. pmcw flags: %04x",
+> +		    schid, retry_count, pmcw->flags);
+> +	return -1;
+> +}
+> +
+>  static struct irb irb;
+>  
+>  void css_irq_io(void)
+
+(...)
 
