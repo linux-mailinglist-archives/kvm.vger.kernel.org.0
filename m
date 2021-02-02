@@ -2,111 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C84930C2AA
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 15:59:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E622830C2E0
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 16:04:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234715AbhBBO5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 09:57:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33362 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234851AbhBBO5K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 09:57:10 -0500
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A575C0613D6;
-        Tue,  2 Feb 2021 06:56:30 -0800 (PST)
-Received: by mail-io1-xd33.google.com with SMTP id u20so7458881iot.9;
-        Tue, 02 Feb 2021 06:56:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ywprqr49p03+cfZRBeKphtdcDQnuW/e8IgxGcaB3r4c=;
-        b=aEtV76fg9VVzGVjBp+L1dWv21UvqsLkrrN5OBin8JGqK5fZDNxkbjBMIparpAb+YAe
-         mMllGtQWZ0d38a2tLIG0BWqY0V21UYnSeSoBfNHdlliTjH8YSXhV46UaY+SFHSOMA5BB
-         iC/rQCvlRADxb7oWsUeA/5fH4j3Br28Apcai3NOOzYVEHkI2KLdC/BKl8iMqPLHDqKP5
-         F8yn1LI3YXvCMB6mcSUQ/JffxA2QmDHkF3Bfgr56U3XVEv3F+RYsm++yi2hfR1UMMfHg
-         yxy851+gExujpCZ4SIdSch4LPEsCNXxiydoqS03Ok5fTkvhTf5wg7jR1BhiSJEUQXE/n
-         c6Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ywprqr49p03+cfZRBeKphtdcDQnuW/e8IgxGcaB3r4c=;
-        b=KS3Zme5tqdKpVUYEOchm84dGpXpjXWsGQNMGv70RyYluZTXHFUBhXpkp217UGcvE5H
-         ZM0OCL/cZ8C1RIa2yWnuNEsePtQtbaTy+GDZuKRvgxmIaLIZN/eXG6A+eQSCOsjHbjB6
-         p/VC3T58Fo05B65nNkUlK15tLMvSRF3GBK+qK1lrlpCK8i6q3NzU0xPmYzI34/Q02caT
-         IyZmwRzwIK6gtiWYrhpWfvCeg/uKziJKrLF1uoyIQ0+bifvreYW0RRcoSEUwl0bpwtQ/
-         Qhac5Q2m/NC8VSWy5pSdiQKGA1gRdAIlDXzB31rLmSpgdGM4scFPmMnp/AdsOnjp22wx
-         Z0AQ==
-X-Gm-Message-State: AOAM532CS/MWY4gAHr7LjAj20cZc5s6dxGmy4eteDFOwSY1hKvok2+vw
-        LSV/pf8JUuEOgUSpdiMwxr9ZWVsrXYg1r/2uIpxZXC59O2Q=
-X-Google-Smtp-Source: ABdhPJxGVSF7gydx/xTnSJqhcdjUGh74ybjOaf6NWa0d6BxL4acTeJ5ohj306r/o/62agcvieNAmcXGajs5Bkm3rzeg=
-X-Received: by 2002:a5e:8903:: with SMTP id k3mr17233798ioj.36.1612277789491;
- Tue, 02 Feb 2021 06:56:29 -0800 (PST)
+        id S234832AbhBBPCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 10:02:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35147 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234866AbhBBPBj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 10:01:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612277998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=boBv4WGpof0FYgXpab1Tlyff1+sqYd9QdzyHJn+rW9o=;
+        b=YSxJEafzdQ3sgBa5GbvYGxAKunQxtV6xoGBEPgmx9C9Po3yH3+1y2gEp7kl5exdP5GlkkP
+        0rdCR6iHIM4oexGFZekZ8n5jarxbdDVQ2yRNfScYVl18ytho454eEnoe62tIMg7NsaILWg
+        Um/V6twVsjffYhpqDxSSaF2sIbQXszM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-78jhszx4OquBDQL1UuiDNA-1; Tue, 02 Feb 2021 09:59:54 -0500
+X-MC-Unique: 78jhszx4OquBDQL1UuiDNA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7F2C1800D41;
+        Tue,  2 Feb 2021 14:59:52 +0000 (UTC)
+Received: from localhost (ovpn-115-185.ams2.redhat.com [10.36.115.185])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 63A6A60C5F;
+        Tue,  2 Feb 2021 14:59:49 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 14:59:34 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        jasowang@redhat.com, John Levon <john.levon@nutanix.com>,
+        Elena Afanasova <eafanasova@gmail.com>
+Subject: Re: [RFC v2 0/4] Introduce MMIO/PIO dispatch file descriptors
+ (ioregionfd)
+Message-ID: <20210202145934.GA35955@stefanha-x1.localdomain>
+References: <cover.1611850290.git.eafanasova@gmail.com>
 MIME-Version: 1.0
-References: <20210123080853.4214-1-dongli.zhang@oracle.com>
-In-Reply-To: <20210123080853.4214-1-dongli.zhang@oracle.com>
-From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-Date:   Tue, 2 Feb 2021 15:56:18 +0100
-Message-ID: <CAM9Jb+hWqZbS_bT+K32M33vW0WmfR=JWxogH+FciHPx0SYKrvQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] vhost scsi: alloc vhost_scsi with kvzalloc() to
- avoid delay
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, joe.jin@oracle.com,
-        aruna.ramakrishna@oracle.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+Content-Disposition: inline
+In-Reply-To: <cover.1611850290.git.eafanasova@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> The size of 'struct vhost_scsi' is order-10 (~2.3MB). It may take long time
-> delay by kzalloc() to compact memory pages by retrying multiple times when
-> there is a lack of high-order pages. As a result, there is latency to
-> create a VM (with vhost-scsi) or to hotadd vhost-scsi-based storage.
->
-> The prior commit 595cb754983d ("vhost/scsi: use vmalloc for order-10
-> allocation") prefers to fallback only when really needed, while this patch
-> allocates with kvzalloc() with __GFP_NORETRY implicitly set to avoid
-> retrying memory pages compact for multiple times.
->
-> The __GFP_NORETRY is implicitly set if the size to allocate is more than
-> PAGE_SZIE and when __GFP_RETRY_MAYFAIL is not explicitly set.
->
-> Cc: Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
-> Cc: Joe Jin <joe.jin@oracle.com>
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
-> Changed since v1:
->   - To combine kzalloc() and vzalloc() as kvzalloc()
->     (suggested by Jason Wang)
->
->  drivers/vhost/scsi.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-> index 4ce9f00ae10e..5de21ad4bd05 100644
-> --- a/drivers/vhost/scsi.c
-> +++ b/drivers/vhost/scsi.c
-> @@ -1814,12 +1814,9 @@ static int vhost_scsi_open(struct inode *inode, struct file *f)
->         struct vhost_virtqueue **vqs;
->         int r = -ENOMEM, i;
->
-> -       vs = kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
-> -       if (!vs) {
-> -               vs = vzalloc(sizeof(*vs));
-> -               if (!vs)
-> -                       goto err_vs;
-> -       }
-> +       vs = kvzalloc(sizeof(*vs), GFP_KERNEL);
-> +       if (!vs)
-> +               goto err_vs;
->
->         vqs = kmalloc_array(VHOST_SCSI_MAX_VQ, sizeof(*vqs), GFP_KERNEL);
->         if (!vqs)
 
- Acked-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
+--X1bOJ3K7DJ5YkBrT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jan 28, 2021 at 09:32:19PM +0300, Elena Afanasova wrote:
+> This patchset introduces a KVM dispatch mechanism which can be used=20
+> for handling MMIO/PIO accesses over file descriptors without returning=20
+> from ioctl(KVM_RUN). This allows device emulation to run in another task=
+=20
+> separate from the vCPU task.
+>=20
+> This is achieved through KVM vm ioctl for registering MMIO/PIO regions an=
+d=20
+> a wire protocol that KVM uses to communicate with a task handling an=20
+> MMIO/PIO access.
+
+Hi Paolo,
+This patch series makes changes to the somewhat tricky x86 MMIO/PIO code
+and introduces a new ioctl(KVM_RUN) EINTR case. Please take a look if
+you have time!
+
+Reviews from anyone else are appreciated too!
+
+Thanks,
+Stefan
+
+>=20
+> TODOs:
+> * Implement KVM_EXIT_IOREGIONFD_FAILURE
+> * Add non-x86 arch support
+> * Add kvm-unittests
+>=20
+> Elena Afanasova (4):
+>   KVM: add initial support for KVM_SET_IOREGION
+>   KVM: x86: add support for ioregionfd signal handling
+>   KVM: add support for ioregionfd cmds/replies serialization
+>   KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
+>=20
+>  arch/x86/kvm/Kconfig          |   1 +
+>  arch/x86/kvm/Makefile         |   1 +
+>  arch/x86/kvm/x86.c            | 216 ++++++++++++++-
+>  include/kvm/iodev.h           |  14 +
+>  include/linux/kvm_host.h      |  34 +++
+>  include/uapi/linux/ioregion.h |  32 +++
+>  include/uapi/linux/kvm.h      |  23 ++
+>  virt/kvm/Kconfig              |   3 +
+>  virt/kvm/eventfd.c            |  25 ++
+>  virt/kvm/eventfd.h            |  14 +
+>  virt/kvm/ioregion.c           | 479 ++++++++++++++++++++++++++++++++++
+>  virt/kvm/ioregion.h           |  15 ++
+>  virt/kvm/kvm_main.c           |  68 ++++-
+>  13 files changed, 905 insertions(+), 20 deletions(-)
+>  create mode 100644 include/uapi/linux/ioregion.h
+>  create mode 100644 virt/kvm/eventfd.h
+>  create mode 100644 virt/kvm/ioregion.c
+>  create mode 100644 virt/kvm/ioregion.h
+>=20
+> --=20
+> 2.25.1
+>=20
+
+--X1bOJ3K7DJ5YkBrT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmAZaNQACgkQnKSrs4Gr
+c8hDGgf+PqYuZL9PS4kqIX2XiRPppuDyv0aZpfYSEe6NrJ+ZmiDljRkfJPC+GQFu
+Q9agBBNMnJBH8HR3sSigCNJxbqOHFJTBjmAk+yEsrUbcdbWIEjv4LYY29fY9HJZU
+QPclAzyAtIuMPB1aZLITK4LzECaIuPTbgYhJqrzy43baNaT8Hqg5RqWrTKf0h8dw
+e8L+WeClSAOGaXhyiymZCkqK2zcs+G68TrnSWwgRYM+VU8X2Trne7dC1hn1WAG/X
+yKsBC4xoyboK8DYgbhYW2vlTxtdWFECJ19j6a9XlIKcWLoggP21ocFRB56BqAiSc
+wvk+rt0aZFyQFGYcwDBszieYs3/vZg==
+=q3hJ
+-----END PGP SIGNATURE-----
+
+--X1bOJ3K7DJ5YkBrT--
+
