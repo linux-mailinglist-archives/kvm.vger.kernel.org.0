@@ -2,145 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C1530C8BD
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 19:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B64D30C8C8
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 19:03:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238118AbhBBR7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:59:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57947 "EHLO
+        id S238135AbhBBSAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 13:00:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38957 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237787AbhBBR4b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:56:31 -0500
+        by vger.kernel.org with ESMTP id S233941AbhBBR6J (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:58:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612288504;
+        s=mimecast20190719; t=1612288600;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gFJ77sSEB+f8Sj3B0GeEC2N3cMa86PYsToA2l7/Kaqo=;
-        b=LRw1Gyr8w4sbHjh41M2OlYzMQJDVfDewWIfpB6tB6FYTNdnLEe34xjKup2V8gdRwSedc5U
-        VtmPWLkU6nNFezXeCaXBKArj5VwgDQ+tTPcZ/aLB1aQazLdyLWjfFJl/1O9sgKQ5amrq6s
-        JTSFH2a2qR6wE5GakSsK54QYuPGY14w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-7p1PFqffPMSlCCwUTHedbQ-1; Tue, 02 Feb 2021 12:55:00 -0500
-X-MC-Unique: 7p1PFqffPMSlCCwUTHedbQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D55F5107ACE4;
-        Tue,  2 Feb 2021 17:54:57 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AAD7110016FD;
-        Tue,  2 Feb 2021 17:54:56 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 10:54:55 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <jgg@nvidia.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
-        <yishaih@nvidia.com>, <aik@ozlabs.ru>
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-Message-ID: <20210202105455.5a358980@omen.home.shazbot.org>
-In-Reply-To: <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
-        <20210201162828.5938-9-mgurtovoy@nvidia.com>
-        <20210201181454.22112b57.cohuck@redhat.com>
-        <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
-        <20210201114230.37c18abd@omen.home.shazbot.org>
-        <20210202170659.1c62a9e8.cohuck@redhat.com>
-        <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
+        bh=dN94EaBZoEheJv2bVKF3aVQ488mV21cwDUunabYy/Qg=;
+        b=O4kFm8mKlvgXxlcInVD0S6PfytYVLzNoidU3OsipJP4ZvXcSX/S4PWDwDM0dmAr0tdSXTy
+        20zxm87KO+0i6ZWWVGb7tp2vUmJasboBxqjEADzpyssOLFrU2FYDnskAzSFx8plH0rI43b
+        4gaeLcA4egXZZ8OqGAZV37guWYqF9lc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-CE4SB14bPaig1ECmxC2T6g-1; Tue, 02 Feb 2021 12:56:36 -0500
+X-MC-Unique: CE4SB14bPaig1ECmxC2T6g-1
+Received: by mail-ed1-f69.google.com with SMTP id f21so10017816edx.23
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 09:56:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dN94EaBZoEheJv2bVKF3aVQ488mV21cwDUunabYy/Qg=;
+        b=ZgMSG8Wij98Votz92WYvLUgaslYVocguKIOgG5eodhSv3WnxqiS7qZhdOn31cRQeW+
+         CsfdYH7mL2r5RVb8h913Y+g2+EgSK7v0HS8AB2xfwsdSDw6dLuxcqjd5bqYFwHyKTlpQ
+         g3jlmzw6VX3ZoECuvDYxFSzP4Kd5waH0fHUNqikxl5C/7kPz35aSwY7DlnjgunUgchD6
+         MAdpj8oqWt3ImOsBvyEs4dNxngc3V6FAytCCdFNddyJROa3IU2P2zo+6+1jKBIwkykTX
+         P1wQvMxEg2Cj3A/z1eRKgTeCjYV2Abpc5H5yTEWbMdhxwaC/7FnQT7tJ5NRpOxtCSEsX
+         k9NA==
+X-Gm-Message-State: AOAM531k8uXLiLgbXVEtOfYZI6pUTfjWJI+/GCIGE5+Vqn5aCooUCC7Y
+        AOJ3jS0PNZDCOwSiqZlOzctnw784Z9RkbhxQhYxe8ZzWpphInLFg/7SLPiqOK0FPCsSQ79+R4mA
+        tHfc7DhI810oG
+X-Received: by 2002:aa7:c884:: with SMTP id p4mr139200eds.212.1612288595839;
+        Tue, 02 Feb 2021 09:56:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJweACfB87YxeuSAxTmHEDhxNUQg9iEM2Fqa37a/m/k4cY0OXCQZyW6QjL2h5dDB1cEfiavzBA==
+X-Received: by 2002:aa7:c884:: with SMTP id p4mr139189eds.212.1612288595650;
+        Tue, 02 Feb 2021 09:56:35 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id z20sm10334643edx.15.2021.02.02.09.56.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Feb 2021 09:56:34 -0800 (PST)
+Subject: Re: [RFC PATCH v3 01/27] x86/cpufeatures: Add SGX1 and SGX2
+ sub-features
+To:     Kai Huang <kai.huang@intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        luto@kernel.org, haitao.huang@intel.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+References: <cover.1611634586.git.kai.huang@intel.com>
+ <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
+ <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
+ <3a82563d5a25b52f0b5f01560d70c50a2323f7e5.camel@intel.com>
+ <YBVdNl+pTBBm6igw@kernel.org>
+ <20210201130151.4bfb5258885ca0f0905858c6@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <89755f15-a873-badc-b3d6-d4f0f817326e@redhat.com>
+Date:   Tue, 2 Feb 2021 18:56:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210201130151.4bfb5258885ca0f0905858c6@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Feb 2021 19:41:16 +0200
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-
-> On 2/2/2021 6:06 PM, Cornelia Huck wrote:
-> > On Mon, 1 Feb 2021 11:42:30 -0700
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >  
-> >> On Mon, 1 Feb 2021 12:49:12 -0500
-> >> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> >>  
-> >>> On 2/1/21 12:14 PM, Cornelia Huck wrote:  
-> >>>> On Mon, 1 Feb 2021 16:28:27 +0000
-> >>>> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> >>>>        
-> >>>>> This patch doesn't change any logic but only align to the concept of
-> >>>>> vfio_pci_core extensions. Extensions that are related to a platform
-> >>>>> and not to a specific vendor of PCI devices should be part of the core
-> >>>>> driver. Extensions that are specific for PCI device vendor should go
-> >>>>> to a dedicated vendor vfio-pci driver.  
-> >>>> My understanding is that igd means support for Intel graphics, i.e. a
-> >>>> strict subset of x86. If there are other future extensions that e.g.
-> >>>> only make sense for some devices found only on AMD systems, I don't
-> >>>> think they should all be included under the same x86 umbrella.
-> >>>>
-> >>>> Similar reasoning for nvlink, that only seems to cover support for some
-> >>>> GPUs under Power, and is not a general platform-specific extension IIUC.
-> >>>>
-> >>>> We can arguably do the zdev -> s390 rename (as zpci appears only on
-> >>>> s390, and all PCI devices will be zpci on that platform), although I'm
-> >>>> not sure about the benefit.  
-> >>> As far as I can tell, there isn't any benefit for s390 it's just
-> >>> "re-branding" to match the platform name rather than the zdev moniker,
-> >>> which admittedly perhaps makes it more clear to someone outside of s390
-> >>> that any PCI device on s390 is a zdev/zpci type, and thus will use this
-> >>> extension to vfio_pci(_core).  This would still be true even if we added
-> >>> something later that builds atop it (e.g. a platform-specific device
-> >>> like ism-vfio-pci).  Or for that matter, mlx5 via vfio-pci on s390x uses
-> >>> these zdev extensions today and would need to continue using them in a
-> >>> world where mlx5-vfio-pci.ko exists.
-> >>>
-> >>> I guess all that to say: if such a rename matches the 'grand scheme' of
-> >>> this design where we treat arch-level extensions to vfio_pci(_core) as
-> >>> "vfio_pci_(arch)" then I'm not particularly opposed to the rename.  But
-> >>> by itself it's not very exciting :)  
-> >> This all seems like the wrong direction to me.  The goal here is to
-> >> modularize vfio-pci into a core library and derived vendor modules that
-> >> make use of that core library.  If existing device specific extensions
-> >> within vfio-pci cannot be turned into vendor modules through this
-> >> support and are instead redefined as platform specific features of the
-> >> new core library, that feels like we're already admitting failure of
-> >> this core library to support known devices, let alone future devices.
-> >>
-> >> IGD is a specific set of devices.  They happen to rely on some platform
-> >> specific support, whose availability should be determined via the
-> >> vendor module probe callback.  Packing that support into an "x86"
-> >> component as part of the core feels not only short sighted, but also
-> >> avoids addressing the issues around how userspace determines an optimal
-> >> module to use for a device.  
-> > Hm, it seems that not all current extensions to the vfio-pci code are
-> > created equal.
-> >
-> > IIUC, we have igd and nvlink, which are sets of devices that only show
-> > up on x86 or ppc, respectively, and may rely on some special features
-> > of those architectures/platforms. The important point is that you have
-> > a device identifier that you can match a driver against.  
+On 01/02/21 01:01, Kai Huang wrote:
+>>> I think we can remove comment for SGX1, since it is basically SGX.
+>>>
+>>> For SGX2, how about below?
+>>>
+>>> /* SGX Enclave Dynamic Memory Management */
+>> (EDMM)
+> Does EDMM obvious to everyone, instead of explicitly saying Enclave Dynamic
+> Memory Management?
 > 
-> maybe you can supply the ids ?
+> Also do you think we need a comment for SGX1 bit? I can add /* Basic SGX */,
+> but I am not sure whether it is required.
 > 
-> Alexey K, I saw you've been working on the NVLINK2 for P9. can you 
-> supply the exact ids for that should be bounded to this driver ?
-> 
-> I'll add it to V3.
 
-As noted previously, if we start adding ids for vfio drivers then we
-create conflicts with the native host driver.  We cannot register a
-vfio PCI driver that automatically claims devices.  At best, this
-NVLink driver and an IGD driver could reject devices that they don't
-support, ie. NVIDIA GPUs where there's not the correct platform
-provided support or Intel GPUs without an OpRegion.  Thanks,
+Yes, please use
 
-Alex
+/* "" Basic SGX */
+/* "" SGX Enclave Dynamic Memory Mgmt */
+
+Paolo
 
