@@ -2,183 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F38930C546
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 17:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2E2930C626
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 17:40:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232633AbhBBQSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 11:18:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59248 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236137AbhBBQQL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 11:16:11 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 112GDOtl137758;
-        Tue, 2 Feb 2021 11:15:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Yto4Q4S51dPnvwNvL9+elMmy/TSPqDq0etEpfyp42IE=;
- b=pElyvGYWhcKwN6QnBtuwzQgpZBU6bPpEJ6HOBD4943o6TTmrU0t586A3XHGWpHwnNSZz
- xObpMpUF1lWk59+xmmOXemXk8AzDP82tFQfUSskvkMLXhQO0RWBSsVkYQM1xvhdMaJa8
- mwB8Vh8jajIo1Ms/9lHRicBbDkQQcmy3FsDPUgDwqClS7hm5o19upKeZOa81ICCcgsZb
- CIQ/AOHRrRfYNLIvNWRm5jrYl52ofEnkKspVb946H4SxyRpssVFgaVeuMtlXiwxI0/AR
- LflQp+2EautK8zW5w5MgrBiR4T0Oo5aA4qrtWu6oViiGhDsHmlrc5f+gPQXbETbcddmi yQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36fa2m02ex-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Feb 2021 11:15:28 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 112GE3pV139587;
-        Tue, 2 Feb 2021 11:15:28 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36fa2m02ds-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Feb 2021 11:15:28 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 112Fah3q004976;
-        Tue, 2 Feb 2021 16:15:26 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 36cy38k1tt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 02 Feb 2021 16:15:26 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 112GFNI225493778
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 2 Feb 2021 16:15:23 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C7CDA4054;
-        Tue,  2 Feb 2021 16:15:23 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08C84A4066;
-        Tue,  2 Feb 2021 16:15:23 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.19.13])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  2 Feb 2021 16:15:22 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v1 3/5] s390x: css: implementing Set
- CHannel Monitor
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com
-References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
- <1611930869-25745-4-git-send-email-pmorel@linux.ibm.com>
- <20210202124818.6084bb36.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <e28ee611-faad-bb2d-ede2-3efcb7b56c53@linux.ibm.com>
-Date:   Tue, 2 Feb 2021 17:15:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S236753AbhBBQkE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 11:40:04 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:33488 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236719AbhBBQji (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 11:39:38 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 112GJhOY009437;
+        Tue, 2 Feb 2021 16:38:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2020-01-29;
+ bh=KNjrX0rK55s9aWETWv1OLbCJnKqJuWYa5q+oV4dZTfE=;
+ b=eh9M60Ig82Y0s8W/59/crxYMJpnbPLOxnuwRH7httzRf6kCLen3YxyDd0w1dGpfpBmLP
+ oMQKuscj52l2sSjXjKi6G3zC7O/+P2z0ePEydRW2acZYyD+aB7IYr7ymijB2+VrtFAad
+ J/BRVeJoBzcdQ68hqf9r+9jhAwvOoRt4Ts/n/JnjYcJ4XzDhcr8ADluLln5TVfREaayz
+ IwPPrXFLKi+7UVwSXramYklVL0dHF2agj5vUYmO3u5UnrpOnZq90g8x0qXCYgoG3YMGa
+ ycoKYlK7OG8QbE3MZghXHC4enmJhdP6T9VNmSYSuKhKD86GGnAoXy4lM/6q/cUUvVtv2 Dg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2130.oracle.com with ESMTP id 36cvyauwb7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 02 Feb 2021 16:38:05 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 112GGfN2095797;
+        Tue, 2 Feb 2021 16:38:04 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
+        by userp3030.oracle.com with ESMTP id 36dhcwyj9w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 02 Feb 2021 16:38:04 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dnhbZoXIBljYbeuVqjTuz8NVZu9cxsl8bg9MvSkCa1kfnHnV4W7uDd1u8pdxah9XqUK7EoeNaNLDrHaMr6pJUfNy6vlB710iVBU0ZWxB9eq/3cH/mVwKEW6G0MSAciyhe/wycrPK6SFBWHY687y47p6cRS4Kv7G9Q0SiIYfAqSL1q53kafRl0jeAqcRiQEpUywmVb46Y48qK0nnydPWkURLakbCWC45QDJ0eI8uruYTY9qqPObggnCf1fQpAzmUymg9AXTqFG7HnxqILSxcpxHkVq9TvvQNhC6lorB8lCwsDqHJifP3aId2PFAfyA2g6RObhbW0CCJzXWIret5HrvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KNjrX0rK55s9aWETWv1OLbCJnKqJuWYa5q+oV4dZTfE=;
+ b=lyq7gqbyIjqVHA9C6YWl6puvapxy82ajRS9SOLAbzekI4SBB4Dpx4GcsNHxXwTaUiZaXsPQTLCmXKTqnj6l1RKsqv0OV0blNeSy/QapS1DVkU0AlVIErjaXFAj6btyf22/PAy/ASLkgUTYLSlMnTsb6qbLvLgMfBqvtCikWEVcueXB67XEmLM6iByQfXLoOJbpzu8QJQSPzgEoSiR3jDIr5yNugtBxRWlC8WicVy3T2p5TDuxbz6n2Z7C3NRgzWvACNoDBN6RuhHJI8UNUv1kPFMb/mduI5VSaBZKA1O/NCVSMm5sf4uJiEIDSk74QpnKpF8B5tADv/HQsDJmLy1sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KNjrX0rK55s9aWETWv1OLbCJnKqJuWYa5q+oV4dZTfE=;
+ b=pw4M6ocrqjDOOc/zcon9ry+oIGgXAEZhVL4v1w30JvXUrcbp2bjm6CA9waV+kh2hlMXMu7c9bHcHf0nXvrjl83x0K/ACSYCuVrBwehJhBl7JA+vMOy6PclGuNH5x3aeNTk8yyE/ubJbW98IAu5NxRY1Z4JWX2saLH9r0sWYDHIo=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=oracle.com;
+Received: from BYAPR10MB2999.namprd10.prod.outlook.com (2603:10b6:a03:85::27)
+ by BY5PR10MB4115.namprd10.prod.outlook.com (2603:10b6:a03:213::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Tue, 2 Feb
+ 2021 16:38:01 +0000
+Received: from BYAPR10MB2999.namprd10.prod.outlook.com
+ ([fe80::e180:1ba2:d87:456]) by BYAPR10MB2999.namprd10.prod.outlook.com
+ ([fe80::e180:1ba2:d87:456%4]) with mapi id 15.20.3825.019; Tue, 2 Feb 2021
+ 16:38:01 +0000
+Date:   Tue, 2 Feb 2021 11:37:53 -0500
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Martin Radev <martin.b.radev@gmail.com>
+Cc:     Konrad Rzeszutek Wilk <konrad@darnok.org>,
+        Christoph Hellwig <hch@lst.de>, thomas.lendacky@amd.com,
+        file@sect.tu-berlin.de, robert.buhren@sect.tu-berlin.de,
+        kvm@vger.kernel.org, mathias.morbitzer@aisec.fraunhofer.de,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        iommu@lists.linux-foundation.org, robin.murphy@arm.com,
+        kirill.shutemov@linux.intel.com
+Subject: Re: [PATCH] swiotlb: Validate bounce size in the sync/unmap path
+Message-ID: <YBl/4c9j+KCTA0iQ@Konrads-MacBook-Pro.local>
+References: <X/27MSbfDGCY9WZu@martin>
+ <20210113113017.GA28106@lst.de>
+ <YAV0uhfkimXn1izW@martin>
+ <20210118151428.GA72213@fedora>
+ <YA8O/2qBBzZo5hi7@martin>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YA8O/2qBBzZo5hi7@martin>
+X-Originating-IP: [138.3.200.4]
+X-ClientProxiedBy: MWHPR22CA0037.namprd22.prod.outlook.com
+ (2603:10b6:300:69::23) To BYAPR10MB2999.namprd10.prod.outlook.com
+ (2603:10b6:a03:85::27)
 MIME-Version: 1.0
-In-Reply-To: <20210202124818.6084bb36.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-02_07:2021-02-02,2021-02-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- malwarescore=0 impostorscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
- mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Konrads-MacBook-Pro.local (138.3.200.4) by MWHPR22CA0037.namprd22.prod.outlook.com (2603:10b6:300:69::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Tue, 2 Feb 2021 16:37:58 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4549ced7-10a7-4951-911b-08d8c798e7b8
+X-MS-TrafficTypeDiagnostic: BY5PR10MB4115:
+X-Microsoft-Antispam-PRVS: <BY5PR10MB4115F6B824B114B011A7667D89B59@BY5PR10MB4115.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pz3YfKUoMuDBvS1njt8CXWXJojnL04ZzBRJtdA6DLcfYX8gFKS42fnO/Ejhan6WmqBv/Vmu6BxIz9b7hb5v462MzX719VxiLGwtTNlySDeJb9jcPtO7ozzoWHA19NRigXsoPBuO5puu2CxKu0tNWA2uF3Ymye9ZY0x3GEwlxQIUSJvIi6+NT8tTjEqXPi5wU4QTavAT9roL4pALWS+uD94ENxqz6WHeRcI4OXc3Ib9qovK24IDK8dR2lvb1fuiahjw0IKOtH8o/e6WPhHv8a708mPxrOdMYgfOZGaGFG1T+d+Z1oug5setLp2j40F1prvjZhk8PIQRPTgeYK7ApYtSsCg6qHvJaVbgtnrji7WSvswXh+0wfkThEPnAg0heW0LiO3i0nKNXxyvB6LulL5y37Ffcy2sEyXcXgdETnxY6h4pIrjXDSe6XTTOh1MQa/b0y+lY+NLOJfMHNQKdO5a7618N5vyws6IfEEtIpCyI42zy/O1BWtjmdikBEQJ5Dk5Tg9HLkr+2umif6DpVWqesOXhCJ901P1IyrAaKd0iiNUIEBv+RuxeCq5Mv7Qa8NREZIPoMX6P5ZbD+YVr9SGDt8mGZiSKurhRKASS1HYZEMw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2999.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(376002)(39860400002)(346002)(396003)(16526019)(478600001)(86362001)(6666004)(186003)(6506007)(966005)(55016002)(26005)(9686003)(83380400001)(5660300002)(2906002)(54906003)(66556008)(316002)(956004)(8936002)(6916009)(52116002)(66946007)(66476007)(7696005)(7416002)(8676002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?T5iFtJautGxKGgRlTBFkAqU12YZ8LrteL7YthkwCHlBAahUF1mMvMKdVkpYY?=
+ =?us-ascii?Q?RdJ3iHK2P2jRX2IvneHUOrG8Cywowkqh8n6sqB7Uuquh5rSlBcDboYi+GVMJ?=
+ =?us-ascii?Q?njx6ZMLu4lA+aJbLAc28mxS0Dxb6UWkltQIFTqifCAMfuO0fz3voNJhKW9FM?=
+ =?us-ascii?Q?BuSwKhqriA7N8uisf99G+KYU2i7D/Sk8F31wIBQtOdXdDAZuJEhkb7sinCVO?=
+ =?us-ascii?Q?+gmMvR0/N9wabNgGx+Ty2/WVAFqRJeaOvIh4lhfi8iHiBWRkAr1P5mqAjgS/?=
+ =?us-ascii?Q?IR3SyBGQNWMjTknrfKuLhODfKqcig/gzE9UntIRtTTfcdJ+R7D71GyZUeSXS?=
+ =?us-ascii?Q?aFQo6uLNRlW7nCyz3BFgmO+sqDRB8v8MHXEyrzTFRRFiGacr6F1R27qIWBwH?=
+ =?us-ascii?Q?/UreUTpP6fqlT10i4FlOmMTKbCzwnthoaTE/G4s5cuKp9zGJ24BgnB7H6ZdK?=
+ =?us-ascii?Q?otxGg4YPQhk0uITJ3ItBOPwoE1lpyASY6garoK4FBYqQ+2g5EfoK0MejRFJQ?=
+ =?us-ascii?Q?KXYpYMS8spRUyGiM+ASFl9Z/uTP3acG8zpG3Qhi21qvEc2VRG8PrV+EMTwQy?=
+ =?us-ascii?Q?DJGdQcNgYwmGEPRl6iYuVixq+1qzgP2oIkDn5z6yTY3m6nGJ7bo0ruvYOTud?=
+ =?us-ascii?Q?UHKAdkvVKORL9fjB6i6Hel2MhQV75i3/UMRWau9dcMHN2MqGKc/tWBN3vNub?=
+ =?us-ascii?Q?cz58jFVOH/MsL3DPlCT9fF9f70XGWyr1TAaRQQsgMTE2kEWVuDeVt/l4CbpH?=
+ =?us-ascii?Q?f9El/iAFHoSwM3wLSEsl0lIgmmH5qeVwo7+Dd9TSnWU4piAfuIyjard80N6e?=
+ =?us-ascii?Q?0/MlmQJOjAVfTLZZAhum97DcghFGUsq6iOJV87Pmu3P4aMVy/JoTfTxTKLqd?=
+ =?us-ascii?Q?y6s9CUXrstZkY0NdRaau3KWscDMu/e8YLtsRnPZBCY8+l5vKvyWFfF/teDne?=
+ =?us-ascii?Q?3RW/AIa3oKLK3A2g/GdA7qTFDmeYSBMu7HLXdOUa6iWaypQgvXGLERgsDWVr?=
+ =?us-ascii?Q?9xmuSiSI0ZNo9q6x+r/9/qVQs+M/plFQvd6RRk7K0fbzRom+jbuLdizKjOj1?=
+ =?us-ascii?Q?7Ob3ke2s?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4549ced7-10a7-4951-911b-08d8c798e7b8
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2999.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 16:38:01.7059
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X+KNOeZQpiAXrpqkQIT59g+IJArD5HXCQsl/x6i6yWxmLIhcL+wo72xmizkxrfsWoUbzLudefGh2dgWAkew90Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4115
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9883 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 phishscore=0
+ spamscore=0 suspectscore=0 malwarescore=0 adultscore=0 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102020106
+ definitions=main-2102020108
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9883 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 impostorscore=0
+ mlxscore=0 spamscore=0 bulkscore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 malwarescore=0 phishscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102020108
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2/2/21 12:48 PM, Cornelia Huck wrote:
-> On Fri, 29 Jan 2021 15:34:27 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Mon, Jan 25, 2021 at 07:33:35PM +0100, Martin Radev wrote:
+> On Mon, Jan 18, 2021 at 10:14:28AM -0500, Konrad Rzeszutek Wilk wrote:
+> > On Mon, Jan 18, 2021 at 12:44:58PM +0100, Martin Radev wrote:
+> > > On Wed, Jan 13, 2021 at 12:30:17PM +0100, Christoph Hellwig wrote:
+> > > > On Tue, Jan 12, 2021 at 04:07:29PM +0100, Martin Radev wrote:
+> > > > > The size of the buffer being bounced is not checked if it happens
+> > > > > to be larger than the size of the mapped buffer. Because the size
+> > > > > can be controlled by a device, as it's the case with virtio devices,
+> > > > > this can lead to memory corruption.
+> > > > > 
+> > > > 
+> > > > I'm really worried about all these hodge podge hacks for not trusted
+> > > > hypervisors in the I/O stack.  Instead of trying to harden protocols
+> > > > that are fundamentally not designed for this, how about instead coming
+> > > > up with a new paravirtualized I/O interface that is specifically
+> > > > designed for use with an untrusted hypervisor from the start?
+> > > 
+> > > Your comment makes sense but then that would require the cooperation
+> > > of these vendors and the cloud providers to agree on something meaningful.
+> > > I am also not sure whether the end result would be better than hardening
+> > > this interface to catch corruption. There is already some validation in
+> > > unmap path anyway.
+> > > 
+> > > Another possibility is to move this hardening to the common virtio code,
+> > > but I think the code may become more complicated there since it would
+> > > require tracking both the dma_addr and length for each descriptor.
+> > 
+> > Christoph,
+> > 
+> > I've been wrestling with the same thing - this is specific to busted
+> > drivers. And in reality you could do the same thing with a hardware
+> > virtio device (see example in http://thunderclap.io/) - where the
+> > mitigation is 'enable the IOMMU to do its job.'.
+> > 
+> > AMD SEV documents speak about utilizing IOMMU to do this (AMD SEV-SNP)..
+> > and while that is great in the future, SEV without IOMMU is now here.
+> > 
+> > Doing a full circle here, this issue can be exploited with virtio
+> > but you could say do that with real hardware too if you hacked the
+> > firmware, so if you say used Intel SR-IOV NIC that was compromised
+> > on an AMD SEV machine, and plumbed in the guest - the IOMMU inside
+> > of the guest would be SWIOTLB code. Last line of defense against
+> > bad firmware to say.
+> > 
+> > As such I am leaning towards taking this code, but I am worried
+> > about the performance hit .. but perhaps I shouldn't as if you
+> > are using SWIOTLB=force already you are kind of taking a
+> > performance hit?
+> > 
 > 
->> We implement the call of the Set CHannel Monitor instruction,
->> starting the monitoring of the all Channel Sub System, and
+> I have not measured the performance degradation. This will hit all AMD SEV,
+> Intel TDX, IBM Protected Virtualization VMs. I don't expect the hit to
+> be large since there are only few added operations per hundreads of copied
+> bytes. I could try to measure the performance hit by running some benchmark
+> with virtio-net/virtio-blk/virtio-rng.
 > 
-> "initializing channel subsystem monitoring" ?
+> Earlier I said:
+> > > Another possibility is to move this hardening to the common virtio code,
+> > > but I think the code may become more complicated there since it would
+> > > require tracking both the dma_addr and length for each descriptor.
+> 
+> Unfortunately, this doesn't make sense. Even if there's validation for
+> the size in the common virtio layer, there will be some other device
+> which controls a dma_addr and length passed to dma_unmap* in the
+> corresponding driver. The device can target a specific dma-mapped private
+> buffer by changing the dma_addr and set a good length to overwrite buffers
+> following it.
+> 
+> So, instead of doing the check in every driver and hitting a performance
+> cost even when swiotlb is not used, it's probably better to fix it in
+> swiotlb.
+> 
+> @Tom Lendacky, do you think that it makes sense to harden swiotlb or
+> some other approach may be better for the SEV features?
 
-Yes, better I take this.
+I am not Tom, but this change seems the right way forward regardless if
+is TDX, AMD SEV, or any other architecture that encrypt memory and use
+SWIOTLB.
 
+Let me queue it up in development branch and do some regression testing.
 > 
->> the initialization of the monitoring on a Sub Channel.
-> 
-> "enabling monitoring for a subchannel" ?
-> 
->>
->> An initial test reports the presence of the extended measurement
->> block feature.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   lib/s390x/css.h     | 17 +++++++++-
->>   lib/s390x/css_lib.c | 77 +++++++++++++++++++++++++++++++++++++++++++++
->>   s390x/css.c         |  7 +++++
->>   3 files changed, 100 insertions(+), 1 deletion(-)
->>
-> 
-> (...)
-> 
->> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
->> index f300969..9e0f568 100644
->> --- a/lib/s390x/css_lib.c
->> +++ b/lib/s390x/css_lib.c
->> @@ -205,6 +205,83 @@ retry:
->>   	return -1;
->>   }
->>   
->> +/*
->> + * css_enable_mb: enable the subchannel Mesurement Block
->> + * @schid: Subchannel Identifier
->> + * @mb   : 64bit address of the measurement block
->> + * @format1: set if format 1 is to be used
->> + * @mbi : the measurement block offset
->> + * @flags : PMCW_MBUE to enable measurement block update
->> + *	    PMCW_DCTME to enable device connect time
->> + * Return value:
->> + *   On success: 0
->> + *   On error the CC of the faulty instruction
->> + *      or -1 if the retry count is exceeded.
->> + */
->> +int css_enable_mb(int schid, uint64_t mb, int format1, uint16_t mbi,
->> +		  uint16_t flags)
->> +{
->> +	struct pmcw *pmcw = &schib.pmcw;
->> +	int retry_count = 0;
->> +	int cc;
->> +
->> +	/* Read the SCHIB for this subchannel */
->> +	cc = stsch(schid, &schib);
->> +	if (cc) {
->> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
->> +		return cc;
->> +	}
->> +
->> +retry:
->> +	/* Update the SCHIB to enable the measurement block */
->> +	pmcw->flags |= flags;
->> +
->> +	if (format1)
->> +		pmcw->flags2 |= PMCW_MBF1;
->> +	else
->> +		pmcw->flags2 &= ~PMCW_MBF1;
->> +
->> +	pmcw->mbi = mbi;
->> +	schib.mbo = mb;
->> +
->> +	/* Tell the CSS we want to modify the subchannel */
->> +	cc = msch(schid, &schib);
-> 
-> Setting some invalid flags for measurements in the schib could lead to
-> an operand exception. Do we want to rely on the caller always getting
-> it right, or should we add handling for those invalid flags? (Might
-> also make a nice test case.)
-
-Yes it does.
-I add new test cases to test if we get the right error.
-
-
-Thanks,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
