@@ -2,128 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 85F6330C46E
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 16:52:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D63330C502
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 17:11:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235697AbhBBPvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 10:51:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58063 "EHLO
+        id S236098AbhBBQIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 11:08:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43861 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235792AbhBBPvX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 10:51:23 -0500
+        by vger.kernel.org with ESMTP id S235907AbhBBQGk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 11:06:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612280996;
+        s=mimecast20190719; t=1612281911;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Xl3UYgDrwSAlvWw9aAeOlF3n/HRosBCyWycSbwiVnos=;
-        b=KwyWQHwu9BSdQmFFmFK2HkQZS7inr2mcn5GE5v1SmZrCbUxQaQFZxzPoHJNPz2MqI360vK
-        +AQHLyQBF8KMiLWNwmPwYQUvYIPo8X1ZkynVrR05va/IDMAdWKqfstl4Ts/jfwbkts8PNA
-        ju6Vp19GaR1j1cvKxsZ7TrymB7Ro1pI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-VWGtt9MPPHacU3HZ5AnOSw-1; Tue, 02 Feb 2021 10:49:55 -0500
-X-MC-Unique: VWGtt9MPPHacU3HZ5AnOSw-1
-Received: by mail-wm1-f72.google.com with SMTP id n17so1130648wmk.3
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 07:49:54 -0800 (PST)
+        bh=GoHqkcd1GD6lYKRpDHWZ6PFpXaEZ93xMiO7nY5L+AQ8=;
+        b=hS7D3dmQ3tw+TPruj+kZh94GIrwyrGQnF5OnglzdroQMi3xy+ZrKH7zVsvRotmhMU5eb83
+        aU+NxAAvbJcyV8U9IwGmVihw1Kd9fD2BL1yM40ys+ujcFRQ0WQK7CHmCt4ary4XNtQxI5E
+        rb7HLvV9ZSoumlQGLnXkpI3O4li4spc=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-24-DUgBMbeqOs63s-feAYRYpA-1; Tue, 02 Feb 2021 11:05:08 -0500
+X-MC-Unique: DUgBMbeqOs63s-feAYRYpA-1
+Received: by mail-ed1-f72.google.com with SMTP id t9so9812543edd.3
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 08:05:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Xl3UYgDrwSAlvWw9aAeOlF3n/HRosBCyWycSbwiVnos=;
-        b=Zpw2bqdCBAvWEO6pfxs6/WpaKcZEKhvKFL7mGdnqGGJm06zwkHtgOJSYjPkL55RPuT
-         KLGd5gslwdQLbXciorQEHpRHwEpH1+4DMRZshiYS7LQCGR5XMtz4Mw5KP/6ojkZMHAwK
-         4OS8lNtQM1Oba0ZT75lCUtlEOQuxMhhF+tsVy2sj6fy4MgscM2+l4vysGGKwkqeKONTs
-         ViEA5Kfrv5pOsoFANmqadZePoSv/hq90pBnX1XVng1tGUIa53tVtBIGgYn7dTl1IrTee
-         lh2Gas8/sYtjoT9Gig1HnoZoIKdh3nvMW3EAfkMRzTjDVjR+UKdv9/PxqU5pyjTgKIt2
-         1OkA==
-X-Gm-Message-State: AOAM530/ggZqygoujj/7BxDtWUgA2l30sGxOh17+dRt9tuNyBHZ1vUJV
-        lcjLvDCMSFR18eJYpo1Cb7hbSkAJ87uWUL1H/FDmQ3Nwv2B8ED39jAloo4eefUpN9z1fHns8ubo
-        qPxwnw8Xc1Yw4
-X-Received: by 2002:a05:600c:4f0d:: with SMTP id l13mr4266398wmq.92.1612280993773;
-        Tue, 02 Feb 2021 07:49:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzWu4WNYzB77YBRASb1WGMExDKDUMNYTw6v09BmpngKIZyogm2i5LC52DUiZnh7HxS460FjEg==
-X-Received: by 2002:a05:600c:4f0d:: with SMTP id l13mr4266379wmq.92.1612280993532;
-        Tue, 02 Feb 2021 07:49:53 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id f17sm34650125wrv.0.2021.02.02.07.49.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Feb 2021 07:49:52 -0800 (PST)
-Date:   Tue, 2 Feb 2021 16:49:50 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Xie Yongji <xieyongji@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH RFC v2 08/10] vdpa: add vdpa simulator for block device
-Message-ID: <20210202154950.g3rclpigyaigzfgo@steredhat>
-References: <20210128144127.113245-1-sgarzare@redhat.com>
- <20210128144127.113245-9-sgarzare@redhat.com>
- <20210202093412.GA243557@stefanha-x1.localdomain>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GoHqkcd1GD6lYKRpDHWZ6PFpXaEZ93xMiO7nY5L+AQ8=;
+        b=puCD0mrgYKOZdgZSjg+Hg+vUFjyeV9P77LfD8KFswARWiB0ty15HDOeBKUDhqRYwiV
+         eAecbwhLLXkSS3+qsg/hhqhU2DphWat1HMx3lUZn4wW5j7Wi7CV/jGUaaE0zxDd1kMAu
+         pZe9ii++ZGs/NmED5MGhGWbLP0ymJ8jbRuOKISbmHcNIhkQMbeTQrXF0PmXnOSBNT15u
+         E3P+0fKKRG2dr/FlNgS6gUsn2iHapz/+NqyFNxp+0z0Vz32JyYYw0pnF5eL/SLKf+6my
+         rXM2MqLg2aYj2eFE9jNDo4R7pIi/vjYUOAPFfHv1s3oylaV26Rb8thsT/4/utFNRXK+s
+         GVFw==
+X-Gm-Message-State: AOAM530qbY1wsO8obkrrVeukMSIlc5bNE2CQIMQTAinbEJkONxfmPngT
+        m7U4yYOXI20pYbxmM+7Zwk16b71tRo+6qektkQAlW5Kaedv7mLDeVXg4ZHPirlQpbscalpBnDCB
+        uLdZqSCwZgkAt
+X-Received: by 2002:aa7:d0d4:: with SMTP id u20mr23467795edo.203.1612281906842;
+        Tue, 02 Feb 2021 08:05:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyPM7p5TyqnwHjGKi0caOD1YfB9dGRpowZ+WQHtxS6E6Y0e0Ymh7IbcVOjUFtqL6dXlAH2MJg==
+X-Received: by 2002:aa7:d0d4:: with SMTP id u20mr23467772edo.203.1612281906630;
+        Tue, 02 Feb 2021 08:05:06 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id q16sm9657765ejd.39.2021.02.02.08.05.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Feb 2021 08:05:05 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
+To:     Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210202090433.13441-1-chenyi.qiang@intel.com>
+ <20210202090433.13441-2-chenyi.qiang@intel.com>
+ <3db069ba-b4e0-1288-ec79-66ac44938682@redhat.com>
+ <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ea9eaa84-999b-82cb-ef40-66fde361704d@redhat.com>
+Date:   Tue, 2 Feb 2021 17:05:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210202093412.GA243557@stefanha-x1.localdomain>
+In-Reply-To: <6678520f-e69e-6116-88c9-e9d6cd450934@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 02, 2021 at 09:34:12AM +0000, Stefan Hajnoczi wrote:
->On Thu, Jan 28, 2021 at 03:41:25PM +0100, Stefano Garzarella wrote:
->> +static void vdpasim_blk_work(struct work_struct *work)
->> +{
->> +	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
->> +	u8 status = VIRTIO_BLK_S_OK;
->> +	int i;
->> +
->> +	spin_lock(&vdpasim->lock);
->> +
->> +	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
->> +		goto out;
->> +
->> +	for (i = 0; i < VDPASIM_BLK_VQ_NUM; i++) {
->> +		struct vdpasim_virtqueue *vq = &vdpasim->vqs[i];
->> +
->> +		if (!vq->ready)
->> +			continue;
->> +
->> +		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
->> +					    &vq->in_iov, &vq->head,
->> +					    GFP_ATOMIC) > 0) {
->> +			int write;
->> +
->> +			vq->in_iov.i = vq->in_iov.used - 1;
->> +			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
->> +						      &status, 1);
->> +			if (write <= 0)
->> +				break;
->
->This code looks fragile:
->
->1. Relying on unsigned underflow and the while loop in
->   vringh_iov_push_iotlb() to handle the case where in_iov.used == 0 is
->   risky and could break.
->
->2. Does this assume that the last in_iov element has size 1? For
->   example, the guest driver may send a single "in" iovec with size 513
->   when reading 512 bytes (with an extra byte for the request status).
->
->Please validate inputs fully, even in test/development code, because
->it's likely to be copied by others when writing production code (or
->deployed in production by unsuspecting users) :).
+On 02/02/21 16:02, Xiaoyao Li wrote:
+> On 2/2/2021 10:49 PM, Paolo Bonzini wrote:
+>> On 02/02/21 10:04, Chenyi Qiang wrote:
+>>>
+>>>  #define DR6_FIXED_1    0xfffe0ff0
+>>> -#define DR6_INIT    0xffff0ff0
+>>> +/*
+>>> + * DR6_ACTIVE_LOW is actual the result of DR6_FIXED_1 | 
+>>> ACTIVE_LOW_BITS.
+>>> + * We can regard all the current FIXED_1 bits as active_low bits even
+>>> + * though in no case they will be turned into 0. But if they are 
+>>> defined
+>>> + * in the future, it will require no code change.
+>>> + * At the same time, it can be served as the init/reset value for DR6.
+>>> + */
+>>> +#define DR6_ACTIVE_LOW    0xffff0ff0
+>>>  #define DR6_VOLATILE    0x0001e00f
+>>>
+>>
+>> Committed with some changes in the wording of the comment.
+>>
+>> Also, DR6_FIXED_1 is (DR6_ACTIVE_LOW & ~DR6_VOLATILE).
+> 
+> Maybe we can add BUILD_BUG_ON() to make sure the correctness?
 
-Perfectly agree on that, so I addressed these things, also following 
-your review on the previous version, on the next patch of this series:
-"vdpa_sim_blk: implement ramdisk behaviour".
+We can even
 
-Do you think should I move these checks in this patch?
+#define DR_FIXED_1  (DR6_ACTIVE_LOW & ~DR6_VOLATILE)
 
-I did this to leave Max credit for this patch and add more code to 
-emulate a ramdisk in later patches.
+directly.  I have pushed this patch to kvm/queue, but the other two will 
+have to wait for Fenghua's bare metal support.
 
-Thanks,
-Stefano
+Paolo
 
