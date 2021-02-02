@@ -2,271 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C66430C396
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 16:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85F6330C46E
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 16:52:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235374AbhBBPXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 10:23:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54522 "EHLO
+        id S235697AbhBBPvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 10:51:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58063 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235487AbhBBPU6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 10:20:58 -0500
+        by vger.kernel.org with ESMTP id S235792AbhBBPvX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 10:51:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612279171;
+        s=mimecast20190719; t=1612280996;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=g76jh33f4NR+DjXTaiYSmk+NWUD/OnphJvhWM605zNI=;
-        b=YdVqbDRj2Y9bpPqlFHxe8rahfPhjUIBFkZIZw0v4bnhKlzzRrBrtbTwJzHh+dLEemtAuCF
-        sAn7EWFiJje/J8mdS4z747uL91LZLsu8w/6xP2gm+Eu0CBFUqJP4OrK2+X0Kzc+NMnXXc4
-        cBUNWIssjDmgvR46B34Vp5D89anqFY4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-YxK_xyFPOwO2BUcWfF-wSw-1; Tue, 02 Feb 2021 10:19:29 -0500
-X-MC-Unique: YxK_xyFPOwO2BUcWfF-wSw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7B3D1020C20;
-        Tue,  2 Feb 2021 15:19:27 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 65D6719EF1;
-        Tue,  2 Feb 2021 15:19:27 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Cun Li <cun.jia.li@gmail.com>
-Subject: [PATCH v2] KVM: Stop using deprecated jump label APIs
-Date:   Tue,  2 Feb 2021 10:19:26 -0500
-Message-Id: <20210202151926.214916-1-pbonzini@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xl3UYgDrwSAlvWw9aAeOlF3n/HRosBCyWycSbwiVnos=;
+        b=KwyWQHwu9BSdQmFFmFK2HkQZS7inr2mcn5GE5v1SmZrCbUxQaQFZxzPoHJNPz2MqI360vK
+        +AQHLyQBF8KMiLWNwmPwYQUvYIPo8X1ZkynVrR05va/IDMAdWKqfstl4Ts/jfwbkts8PNA
+        ju6Vp19GaR1j1cvKxsZ7TrymB7Ro1pI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-VWGtt9MPPHacU3HZ5AnOSw-1; Tue, 02 Feb 2021 10:49:55 -0500
+X-MC-Unique: VWGtt9MPPHacU3HZ5AnOSw-1
+Received: by mail-wm1-f72.google.com with SMTP id n17so1130648wmk.3
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 07:49:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Xl3UYgDrwSAlvWw9aAeOlF3n/HRosBCyWycSbwiVnos=;
+        b=Zpw2bqdCBAvWEO6pfxs6/WpaKcZEKhvKFL7mGdnqGGJm06zwkHtgOJSYjPkL55RPuT
+         KLGd5gslwdQLbXciorQEHpRHwEpH1+4DMRZshiYS7LQCGR5XMtz4Mw5KP/6ojkZMHAwK
+         4OS8lNtQM1Oba0ZT75lCUtlEOQuxMhhF+tsVy2sj6fy4MgscM2+l4vysGGKwkqeKONTs
+         ViEA5Kfrv5pOsoFANmqadZePoSv/hq90pBnX1XVng1tGUIa53tVtBIGgYn7dTl1IrTee
+         lh2Gas8/sYtjoT9Gig1HnoZoIKdh3nvMW3EAfkMRzTjDVjR+UKdv9/PxqU5pyjTgKIt2
+         1OkA==
+X-Gm-Message-State: AOAM530/ggZqygoujj/7BxDtWUgA2l30sGxOh17+dRt9tuNyBHZ1vUJV
+        lcjLvDCMSFR18eJYpo1Cb7hbSkAJ87uWUL1H/FDmQ3Nwv2B8ED39jAloo4eefUpN9z1fHns8ubo
+        qPxwnw8Xc1Yw4
+X-Received: by 2002:a05:600c:4f0d:: with SMTP id l13mr4266398wmq.92.1612280993773;
+        Tue, 02 Feb 2021 07:49:53 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzWu4WNYzB77YBRASb1WGMExDKDUMNYTw6v09BmpngKIZyogm2i5LC52DUiZnh7HxS460FjEg==
+X-Received: by 2002:a05:600c:4f0d:: with SMTP id l13mr4266379wmq.92.1612280993532;
+        Tue, 02 Feb 2021 07:49:53 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id f17sm34650125wrv.0.2021.02.02.07.49.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Feb 2021 07:49:52 -0800 (PST)
+Date:   Tue, 2 Feb 2021 16:49:50 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Xie Yongji <xieyongji@bytedance.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        linux-kernel@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH RFC v2 08/10] vdpa: add vdpa simulator for block device
+Message-ID: <20210202154950.g3rclpigyaigzfgo@steredhat>
+References: <20210128144127.113245-1-sgarzare@redhat.com>
+ <20210128144127.113245-9-sgarzare@redhat.com>
+ <20210202093412.GA243557@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210202093412.GA243557@stefanha-x1.localdomain>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Cun Li <cun.jia.li@gmail.com>
+On Tue, Feb 02, 2021 at 09:34:12AM +0000, Stefan Hajnoczi wrote:
+>On Thu, Jan 28, 2021 at 03:41:25PM +0100, Stefano Garzarella wrote:
+>> +static void vdpasim_blk_work(struct work_struct *work)
+>> +{
+>> +	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
+>> +	u8 status = VIRTIO_BLK_S_OK;
+>> +	int i;
+>> +
+>> +	spin_lock(&vdpasim->lock);
+>> +
+>> +	if (!(vdpasim->status & VIRTIO_CONFIG_S_DRIVER_OK))
+>> +		goto out;
+>> +
+>> +	for (i = 0; i < VDPASIM_BLK_VQ_NUM; i++) {
+>> +		struct vdpasim_virtqueue *vq = &vdpasim->vqs[i];
+>> +
+>> +		if (!vq->ready)
+>> +			continue;
+>> +
+>> +		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
+>> +					    &vq->in_iov, &vq->head,
+>> +					    GFP_ATOMIC) > 0) {
+>> +			int write;
+>> +
+>> +			vq->in_iov.i = vq->in_iov.used - 1;
+>> +			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
+>> +						      &status, 1);
+>> +			if (write <= 0)
+>> +				break;
+>
+>This code looks fragile:
+>
+>1. Relying on unsigned underflow and the while loop in
+>   vringh_iov_push_iotlb() to handle the case where in_iov.used == 0 is
+>   risky and could break.
+>
+>2. Does this assume that the last in_iov element has size 1? For
+>   example, the guest driver may send a single "in" iovec with size 513
+>   when reading 512 bytes (with an extra byte for the request status).
+>
+>Please validate inputs fully, even in test/development code, because
+>it's likely to be copied by others when writing production code (or
+>deployed in production by unsuspecting users) :).
 
-The use of 'struct static_key' and 'static_key_false' is
-deprecated. Use the new API.
+Perfectly agree on that, so I addressed these things, also following 
+your review on the previous version, on the next patch of this series:
+"vdpa_sim_blk: implement ramdisk behaviour".
 
-Signed-off-by: Cun Li <cun.jia.li@gmail.com>
-Message-Id: <20210111152435.50275-1-cun.jia.li@gmail.com>
-[Make it compile.  While at it, rename kvm_no_apic_vcpu to
- kvm_has_noapic_vcpu; the former reads too much like "true if
- no vCPU has an APIC". - Paolo]
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/lapic.c         | 25 +++++++++----------------
- arch/x86/kvm/lapic.h         | 13 ++++++-------
- arch/x86/kvm/mmu/mmu_audit.c |  8 ++++----
- arch/x86/kvm/x86.c           |  9 ++++-----
- 4 files changed, 23 insertions(+), 32 deletions(-)
+Do you think should I move these checks in this patch?
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 43cceadd073e..87f6b5a5a272 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -91,8 +91,8 @@ static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
- 	return __test_and_clear_bit(VEC_POS(vec), (bitmap) + REG_POS(vec));
- }
- 
--struct static_key_deferred apic_hw_disabled __read_mostly;
--struct static_key_deferred apic_sw_disabled __read_mostly;
-+__read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
-+__read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_sw_disabled, HZ);
- 
- static inline int apic_enabled(struct kvm_lapic *apic)
- {
-@@ -290,9 +290,9 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
- 	if (enabled != apic->sw_enabled) {
- 		apic->sw_enabled = enabled;
- 		if (enabled)
--			static_key_slow_dec_deferred(&apic_sw_disabled);
-+			static_branch_slow_dec_deferred(&apic_sw_disabled);
- 		else
--			static_key_slow_inc(&apic_sw_disabled.key);
-+			static_branch_inc(&apic_sw_disabled.key);
- 
- 		atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
- 	}
-@@ -2175,10 +2175,10 @@ void kvm_free_lapic(struct kvm_vcpu *vcpu)
- 	hrtimer_cancel(&apic->lapic_timer.timer);
- 
- 	if (!(vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE))
--		static_key_slow_dec_deferred(&apic_hw_disabled);
-+		static_branch_slow_dec_deferred(&apic_hw_disabled);
- 
- 	if (!apic->sw_enabled)
--		static_key_slow_dec_deferred(&apic_sw_disabled);
-+		static_branch_slow_dec_deferred(&apic_sw_disabled);
- 
- 	if (apic->regs)
- 		free_page((unsigned long)apic->regs);
-@@ -2250,9 +2250,9 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
- 	if ((old_value ^ value) & MSR_IA32_APICBASE_ENABLE) {
- 		if (value & MSR_IA32_APICBASE_ENABLE) {
- 			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
--			static_key_slow_dec_deferred(&apic_hw_disabled);
-+			static_branch_slow_dec_deferred(&apic_hw_disabled);
- 		} else {
--			static_key_slow_inc(&apic_hw_disabled.key);
-+			static_branch_inc(&apic_hw_disabled.key);
- 			atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
- 		}
- 	}
-@@ -2449,7 +2449,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	 * thinking that APIC state has changed.
- 	 */
- 	vcpu->arch.apic_base = MSR_IA32_APICBASE_ENABLE;
--	static_key_slow_inc(&apic_sw_disabled.key); /* sw disabled at reset */
-+	static_branch_inc(&apic_sw_disabled.key); /* sw disabled at reset */
- 	kvm_iodevice_init(&apic->dev, &apic_mmio_ops);
- 
- 	return 0;
-@@ -2904,13 +2904,6 @@ void kvm_apic_accept_events(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--void kvm_lapic_init(void)
--{
--	/* do not patch jump label more than once per second */
--	jump_label_rate_limit(&apic_hw_disabled, HZ);
--	jump_label_rate_limit(&apic_sw_disabled, HZ);
--}
--
- void kvm_lapic_exit(void)
- {
- 	static_key_deferred_flush(&apic_hw_disabled);
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index 4fb86e3a9dd3..ff4a7cc7d694 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -131,7 +131,6 @@ static inline bool kvm_hv_vapic_assist_page_enabled(struct kvm_vcpu *vcpu)
- }
- 
- int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len);
--void kvm_lapic_init(void);
- void kvm_lapic_exit(void);
- 
- #define VEC_POS(v) ((v) & (32 - 1))
-@@ -172,29 +171,29 @@ static inline void kvm_lapic_set_reg(struct kvm_lapic *apic, int reg_off, u32 va
- 	__kvm_lapic_set_reg(apic->regs, reg_off, val);
- }
- 
--extern struct static_key kvm_no_apic_vcpu;
-+DECLARE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
- 
- static inline bool lapic_in_kernel(struct kvm_vcpu *vcpu)
- {
--	if (static_key_false(&kvm_no_apic_vcpu))
-+	if (static_branch_unlikely(&kvm_has_noapic_vcpu))
- 		return vcpu->arch.apic;
- 	return true;
- }
- 
--extern struct static_key_deferred apic_hw_disabled;
-+extern struct static_key_false_deferred apic_hw_disabled;
- 
- static inline int kvm_apic_hw_enabled(struct kvm_lapic *apic)
- {
--	if (static_key_false(&apic_hw_disabled.key))
-+	if (static_branch_unlikely(&apic_hw_disabled.key))
- 		return apic->vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE;
- 	return MSR_IA32_APICBASE_ENABLE;
- }
- 
--extern struct static_key_deferred apic_sw_disabled;
-+extern struct static_key_false_deferred apic_sw_disabled;
- 
- static inline bool kvm_apic_sw_enabled(struct kvm_lapic *apic)
- {
--	if (static_key_false(&apic_sw_disabled.key))
-+	if (static_branch_unlikely(&apic_sw_disabled.key))
- 		return apic->sw_enabled;
- 	return true;
- }
-diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
-index c8d51a37e2ce..ced15fd58fde 100644
---- a/arch/x86/kvm/mmu/mmu_audit.c
-+++ b/arch/x86/kvm/mmu/mmu_audit.c
-@@ -234,7 +234,7 @@ static void audit_vcpu_spte(struct kvm_vcpu *vcpu)
- }
- 
- static bool mmu_audit;
--static struct static_key mmu_audit_key;
-+static DEFINE_STATIC_KEY_FALSE(mmu_audit_key);
- 
- static void __kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
- {
-@@ -250,7 +250,7 @@ static void __kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
- 
- static inline void kvm_mmu_audit(struct kvm_vcpu *vcpu, int point)
- {
--	if (static_key_false((&mmu_audit_key)))
-+	if (static_branch_unlikely((&mmu_audit_key)))
- 		__kvm_mmu_audit(vcpu, point);
- }
- 
-@@ -259,7 +259,7 @@ static void mmu_audit_enable(void)
- 	if (mmu_audit)
- 		return;
- 
--	static_key_slow_inc(&mmu_audit_key);
-+	static_branch_inc(&mmu_audit_key);
- 	mmu_audit = true;
- }
- 
-@@ -268,7 +268,7 @@ static void mmu_audit_disable(void)
- 	if (!mmu_audit)
- 		return;
- 
--	static_key_slow_dec(&mmu_audit_key);
-+	static_branch_dec(&mmu_audit_key);
- 	mmu_audit = false;
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d8fa41a541a6..83b012bba4ef 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7970,7 +7970,6 @@ int kvm_arch_init(void *opaque)
- 		supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
- 	}
- 
--	kvm_lapic_init();
- 	if (pi_inject_timer == -1)
- 		pi_inject_timer = housekeeping_enabled(HK_FLAG_TIMER);
- #ifdef CONFIG_X86_64
-@@ -9992,7 +9991,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 		if (kvm_apicv_activated(vcpu->kvm))
- 			vcpu->arch.apicv_active = true;
- 	} else
--		static_key_slow_inc(&kvm_no_apic_vcpu);
-+		static_branch_inc(&kvm_has_noapic_vcpu);
- 
- 	r = -ENOMEM;
- 
-@@ -10121,7 +10120,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	free_page((unsigned long)vcpu->arch.pio_data);
- 	kvfree(vcpu->arch.cpuid_entries);
- 	if (!lapic_in_kernel(vcpu))
--		static_key_slow_dec(&kvm_no_apic_vcpu);
-+		static_branch_dec(&kvm_has_noapic_vcpu);
- }
- 
- void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-@@ -10376,8 +10375,8 @@ bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
- 	return (vcpu->arch.apic_base & MSR_IA32_APICBASE_BSP) != 0;
- }
- 
--struct static_key kvm_no_apic_vcpu __read_mostly;
--EXPORT_SYMBOL_GPL(kvm_no_apic_vcpu);
-+__read_mostly DEFINE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
-+EXPORT_SYMBOL_GPL(kvm_has_noapic_vcpu);
- 
- void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
- {
--- 
-2.26.2
+I did this to leave Max credit for this patch and add more code to 
+emulate a ramdisk in later patches.
+
+Thanks,
+Stefano
 
