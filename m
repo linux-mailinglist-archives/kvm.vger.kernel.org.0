@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BE7030CAF4
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 20:09:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B07330CAF7
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 20:09:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239313AbhBBTHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 14:07:37 -0500
-Received: from mail-mw2nam12hn2219.outbound.protection.outlook.com ([52.100.167.219]:28736
+        id S234034AbhBBTHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 14:07:45 -0500
+Received: from mail-mw2nam12hn2225.outbound.protection.outlook.com ([52.100.167.225]:26626
         "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239411AbhBBTDV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 14:03:21 -0500
+        id S239431AbhBBTDv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 14:03:51 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MtJtpQkxn/9IDTPrarlO1wDHzkhuFZhzG0Qu6TiEfB8ZlYedv10ht3W4wKSDy4B13b0TzcXZ1egUht76FPEEocxdkd9PNVtEClzupRUx3lJPaZMd6X9UX3k6bzrjbTibaoW21gGRSPzOxgP81LRvYVJK4uk+eS7OxyYcJvCRd/buVnuRt75Wh170BbjSNtqDA/Sq7p4KL2M3I0rHjdQESLC/U+9iAzMT7M2XILkdGt8cwcoRrsxn0tc0JhifVtpQQDeoPptOSrGtAfOsyjUx45eOcSk7x8iBcjAJjzEEe0jRazi/yyNQDpGrBlhZOeZd4yAScOXolsc7gQCBWdHZ8Q==
+ b=KxMh7kn8odq1yh6UxF+FWfH6t01uZEj/oqvRSB3GB2OYrhT+twcqxZg+4lPPYrLZEb4+BOKJbvl0JJcOmh8KT8SkA8CTWmcN4JuJzHYzyKRUxOb/XtI+1u5cTPHCMy1o0WNExNiJLT14jz5XjCh/8JkGmPKniVEIIexK0IYTePwlbLLHciwlogmSamG8xaNu88PRzVKo5P6/SR5iRM4lUmRW8WA+EuN3bWdVRpiyAM+h7fE7+X44XTInUTPHmnHWZEZjWgbDYgcrMOSbkOrCxAHT8Xgv75kzZ1SEPiXPs7vQRLkcvh5nRa6pFPwbUWESz13yfzLjOiuGRIXVLQdT5A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=44wOblXdL5kqFLlvvvthkEjwALIAI0JsqHasc9b9oxc=;
- b=WE8baLDt0cXdbdbMpAAuu/R8q7JXcWIZhAXXkzQVkTDM+5sEh6Wi1D63uXc2Spr3vnI6js5zW8iSAJRefJh+UESDGmGreZGAJ48cZwcAcdxI7wJouji/utXf4VUhc6mChUwZH4NFl45NgCj/FEP+I34CDPvvkDEWdrOrppArDgVDvGN2vKVXzQcrbLcnU8e7At2PDAhhIFJcSqEJh1BBeG8u0sRZHLjTjlj7DtPuQ6VKDAoC1e3nc2KR1b3s005eaq2nHMqGluDhe7gJsITOJov4uIpGmKnVzuFQK+oR9DEfuakSUHj8kMt68mq6Uw+VxjpXv/5dJKArJAj4p7HJWA==
+ bh=g/sOqT9outqhrzEUhrYT5WaVS9dh0d1r0jcfU7DNVWE=;
+ b=c9siTLyTJTClZSm109oq6Rbi+BTMLPjtEJM7rUE8pMEkagTNVmyxad54++L3FTGvuEOXxJ8A9CPYgkZ9imslA5z/1/lDrcq2O8/cr90ToWWCpwYQA4KnQ6JPYwozru+VI1Z8BcBohBwZaX9KfN7a0MonxsuVuc78PI0/m8b4opfJIz48uKCuZnKvnp7Q56ZwbNho555c2QpKWaUKx4A27Cu/1Z/trN+D5kbryi2VHdpLOfSCXmlejiSU0WAZmftstvojBCuK9P2zl4Vbi1iEdJwdCKXFU1Kr+BRmbb9SGIWiy8kS0tHOtQ0mWsbXTqLUpmhbDY58zs4MYXwViX3fXw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=44wOblXdL5kqFLlvvvthkEjwALIAI0JsqHasc9b9oxc=;
- b=kpZwzOpDWBCCdhG7koy/77ct0fymLTstoJzXtHybmi1S90Gle6Caizs8YZSk68MXk8yJE8LubC2MsXhs7M6+DXZLiofE5H43Oxf1WzNsQhJGuzuZLlrrectM15oZ2SWZf672VKRr4Yh4xXfDWdiPP8w4e56bslEAUhCoy8ny0Ho=
+ bh=g/sOqT9outqhrzEUhrYT5WaVS9dh0d1r0jcfU7DNVWE=;
+ b=XtxB0PHAumMu/HAEMliICN+aDEGsq/M50Rkhxwt76naq/tYO6aAz+sYNq1YY1OwhBK5guK634hlR3cct/UX8dda4YljL19NWMuVKNt+ZfgXBGDn339KXqHdM3U3MT4sLS92yugB1NX1TkLyCjyUq6GXNrqQz3CIXSajEkRpmBis=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
  by CH2PR12MB4264.namprd12.prod.outlook.com (2603:10b6:610:a4::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.24; Tue, 2 Feb
- 2021 19:02:00 +0000
+ 2021 19:02:03 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::81f6:605c:f345:b99f]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::81f6:605c:f345:b99f%3]) with mapi id 15.20.3805.027; Tue, 2 Feb 2021
- 19:02:00 +0000
+ 19:02:03 +0000
 From:   Michael Roth <michael.roth@amd.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -49,291 +49,158 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: [PATCH v4 1/3] KVM: SVM: use vmsave/vmload for saving/restoring additional host state
-Date:   Tue,  2 Feb 2021 13:01:24 -0600
-Message-Id: <20210202190126.2185715-2-michael.roth@amd.com>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4 2/3] KVM: SVM: remove uneeded fields from host_save_users_msrs
+Date:   Tue,  2 Feb 2021 13:01:25 -0600
+Message-Id: <20210202190126.2185715-3-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210202190126.2185715-1-michael.roth@amd.com>
 References: <20210202190126.2185715-1-michael.roth@amd.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [165.204.78.25]
-X-ClientProxiedBy: SN6PR01CA0025.prod.exchangelabs.com (2603:10b6:805:b6::38)
+X-ClientProxiedBy: SN6PR01CA0012.prod.exchangelabs.com (2603:10b6:805:b6::25)
  To CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (165.204.78.25) by SN6PR01CA0025.prod.exchangelabs.com (2603:10b6:805:b6::38) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Tue, 2 Feb 2021 19:02:00 +0000
+Received: from localhost (165.204.78.25) by SN6PR01CA0012.prod.exchangelabs.com (2603:10b6:805:b6::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Tue, 2 Feb 2021 19:02:02 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8583233a-5021-4a9e-e748-08d8c7ad053a
+X-MS-Office365-Filtering-Correlation-Id: 50809c3d-2f7b-4f05-728a-08d8c7ad06e9
 X-MS-TrafficTypeDiagnostic: CH2PR12MB4264:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CH2PR12MB42647444BE18CDC13EC2005E95B59@CH2PR12MB4264.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4264980E78221C8434B3E1F195B59@CH2PR12MB4264.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rLhHZD+TsUOau5rrSa1PxlaWbkjuYGcFCHHOl3Fc7MizXnRD0qQYgEa/JTdeydpTYIIHKNUP+U/A61JYFL+gbThRmJERg0BS944k6Aw35SoKBXfilSD0JLtj8O+MtMUYtxk7GGj+VhkwhAhuiL/QxeIOuD4EJICgNqKTkHnIjs9nINnXsxIIUxtoqDJMeOnmPoxErxUnYVu3OVsSC8XyydZNoPJGRkR/6vUTPjdtgpd4XMdiWRxt+Qt3wfPRNPNtzvxT5Cgacf25ANdzdirDMCNnspgggSlx+tJge1D0YSs81D5/z9JgInFWpR0t6+6RDiME2CGrD+XOuS5Q1B+kZJbAvzEirriz105VxJ2YM8cJSFO5kORiGzVGAbS3ypMbeTd2go+1idkDVtkw1yZ2KZONBQk8siCnitZ/bQPr3t81wjMZIHYPdzpZKz0TFKNxZqIJfHRDA61RupQr0inqUWEZb8It8ekI+k8jnQ9jGiqayNwFXVbw0c9iIJYz+FJ5EA8ES/P7aiGEJw9rSUnNdvRII2fj32aldxYiPBl0aPkHtRG5hSOJ7hU0UAr5lOg32367fpiGT5aPTeoV8jZUv2ybub9/xWcvWuaL6VqptjBuQiJshWnfwwAvZ047mtPE1UOP3UnaA5XLYfo7Dt3F+Sfh8pgGFlAx3746QblUibn4Ouh3hBpL5mm1Up05nMZzSTXQczidW/kB4DRbuXtJhb79m2iSmPt41nl9iFomxrCgBB0nKb9iDW80XT7zJ+kfWM8VYCTTPl+PJNMW4pCpY7q8nscFA3AQZUoaHnzTHz6DNoPFo/fZ9+ZqbyKMMNkCALZ1nLYilFepV9QCLJSVz5SGwKo4BZF2TtZJ55lp+f8MSAP52iwyFhYJw2+5M5hq
+X-Microsoft-Antispam-Message-Info: k9UmSxLCSCxqh/l2QmnMJtmOURd8QW+BUvatQfzwWeVgEFqhknQXvu4iqIecaHbln0LCBfXgqP/SkqsDdOw7GU0eHOHNlfy86bbb3w/UKACEYtIeklIJyW3kI+HT4ePcA3bUsGP6EelSI6BYKyHERuQnKsWFyR2dOjr6gDt7DhrUXUiasfw0Yq2yGZ379eiwEoGorPNXzV0whCC1ysKtsrh1S+Gg4RM74hPyu5QnwiExnkrKdrHBYKCvny5kcJCdeHTCs/DipPeTwloWihdHtACjfw02NFYab1D8Fmjq4D/+SHkrfo1pZ7eE6ixWMh+cugSs19mUWUwMJ8j++Tt6EGfC4iOXvOvfuSaBG1y9M0X2B3zHxd0ojj4GH75hbpGwXodONHg/CkgmAkD/7k9W6K2hK79VyMd1SurEPugaFio1RpKhBjFJTwx9HqJz6fy/OjFLOnn2MPN7D/e4RTY1hIC20+wp6LOOH7oS1RGV27GKFdLw2Q4fzh0tA6tfCGeDPradvWO2tWN1dAedyCjnTVF/mU270mly8XuueRuRLC8Xn9vxW/pXdn7hvIp3sbWIGETbkbLtpYWtOLYZHxKydjER5iPJudRi1XHjChAz3xcVqy2y3GCEl9Mf9ruM22GmUpiHpIcCwqTnyc91aO3HiL91/S76m3Hex4at7JW/dQXNJpYnB106cq+Y5zcPFJVFrlQXdxzS9DKKSqEi9ewL9g7e7jCOc5lXKkynEnmBo7W4/pK0xHP0yI4SbQ2PSKxy/xm2SJvEm62u4WzELRqxDG3brHsTU7j8EycPHzTs8oUTcmwz0fjbISXvAtBwcTsd9wxabg1erJ1hcliMLFg8DGsURzDXdGNZynjImS6kaIBPBCjXg+EMYLY5VLCiX/E+
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4133.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(186003)(6666004)(16526019)(66476007)(66556008)(2616005)(956004)(36756003)(8936002)(44832011)(26005)(2906002)(54906003)(83380400001)(86362001)(478600001)(8676002)(6916009)(7416002)(1076003)(6486002)(52116002)(4326008)(5660300002)(66946007)(6496006)(316002)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?gDk+oEIdTL6tkiX0EnjZ3ZrkPhWcxpOVtHAojjKjG0OjisDYPBHoksLrpF+u?=
- =?us-ascii?Q?dEowqOqmiciXOwjKe0EL5V2mi7E5kAweT4sU/0FAWMMY2j9X55PsS6ESC5dH?=
- =?us-ascii?Q?2GooW4XilH7z/NTHAQcqIoq+T7G1bp0+aIeqfrtwW/vimQsXW3f9S2K5q9Xm?=
- =?us-ascii?Q?1nV0fxQhtK5QDePSmYBxK450605R3QlxVi4BqtfVCzJ3xUxmssl5Ep+1sVjq?=
- =?us-ascii?Q?S4286h57eSjUeIbboj9lrI/YRFaf7WagCuLHSPNSS4+7jm6Q5a2M2+wc9jRo?=
- =?us-ascii?Q?Pt8AfiE1e4M3U/X/ISfyG7tNUXAj6bx/2dkpLdR9g4WZDKKoYD+gjnFlJhp1?=
- =?us-ascii?Q?KrT6Bb+eZLgX+lcNaqQc81xbj88vglcGeQGhE5jDl72TREAvU49wbv0vmWFF?=
- =?us-ascii?Q?KvLgBxvgbWkrZjfRcV4ucd0BvqXtT5yuFwKVTJD9DlE0nWJku8znyZ/DicE+?=
- =?us-ascii?Q?U7w+Hm0TF6YKhBGAmNzH7KGv+8KHQZD9TkUKM9GzYdW+CuRExuxjOjru/C6c?=
- =?us-ascii?Q?E1sXxh/c3NUsE+TPQCdSS8BH2r5bprKySb1i4Yest7kqVbvNOGM/zUXAylbs?=
- =?us-ascii?Q?ZDO6TiNg0tSHiuqBxGbSnulKijGus4lBAbtcVeNrMOUfencrEwLUfgwJvxrZ?=
- =?us-ascii?Q?Nfw+sqaO9gQphFae+gKddZP5gRFXQodFMc/NnHgT/OpDvLZoNiVDUFZZQs2l?=
- =?us-ascii?Q?w6o0o/IXdNBsh8rrLM2NPE2U2Aa67jUo7io91L1hJiGi1IyPjr7/2BhvKWon?=
- =?us-ascii?Q?wZIofAZVTtSegQvV+fb2hq8BXUsnatfnxMF3DcoiLakkjM/qoxq5Rx7pzcJN?=
- =?us-ascii?Q?ppX44Ul4WlrQS5DPEwyt9zTmDOJsw6BmdQSBbnCP+dgPefpxk334cq7RUfEl?=
- =?us-ascii?Q?ccfuq9ixIkI6M3phIBnIQQrsbkV998jHIAsNiuztNE4mCtjLq9dok85JGZgK?=
- =?us-ascii?Q?BhrbR2UdITU7o+J7FZrvz5or5d1ltNH1c3VgkhtA27Oq+zRb/LcDP4jU4bMo?=
- =?us-ascii?Q?DiG6ng+k+36/a7Ey+Rwnp3mckRJE7TMpfX3Rb9qAvMED7HyLbUW3BUavY3oM?=
- =?us-ascii?Q?v8Fv3DnyhGBhFskFP1qkcN7iATVlD6Xwt/qbexioZXxR3HUURrCai3+swC5l?=
- =?us-ascii?Q?+IygyqlrQQ0yOmo1nO7RhN4/McSLDGxnzr1x0m2DTdOb+sg5mkQYw/IuViQQ?=
- =?us-ascii?Q?rABRh6nQNvNEizVVWyrFQ2Z+F6J7ysu5fGg857gNrGz8HL08RJayZbdTZGZ3?=
- =?us-ascii?Q?2VRdJ5T8bYD7BY2wExdTZIaN9cKXVyK4rCFOHxEaI9DeSN6Kf6ww6ieusuay?=
- =?us-ascii?Q?2nJj4joxWDl7koor4lvtvVP1?=
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?yu6zM14cc1CulhwASuADm+/L5sxUOWhjvXmuSVD45xnwFNvfZRXkxgQZae3N?=
+ =?us-ascii?Q?tU08F6dDjgWc6aDcH4/fCT66nJEcRXaFMKPF8kYa8esAK32khDIBFXqJpYfp?=
+ =?us-ascii?Q?2lSt+CTdz8Rw9Yq/5nnQu3ibu08rRwlCoq7+iWl6Qrvn9Ka+6BxR9LdJ6jm+?=
+ =?us-ascii?Q?YeiDLn/w2j+7qWQ53blS9u54Ozrpf0OLcpQVdS2Bn6KIHMf4Jbymomqf1UW/?=
+ =?us-ascii?Q?WbHwSFE9+hCZB6x2kC5OppZEe/XuC7XWIXoosEz9BywwV3NAx7Do0Z+aTAnE?=
+ =?us-ascii?Q?bXx5q1ZRMuWkP60CUwsiwe+0T5pDjhtA6DDAywxcRXxv7WT7j4bdR4yclGyo?=
+ =?us-ascii?Q?HW/ZdxtDbMlwtuKQ0jjv5ZDDIgWO0hrxaWAZYuEMpyjgkUU1pj4LCMWBwFQK?=
+ =?us-ascii?Q?g21T3LC8OrxB/m9yU7cZoEjD3V57M07JU3D9UUWMegmB+0Ej/ZdxCK+ZVXCe?=
+ =?us-ascii?Q?M6ImgC7Fm+FTUo2l96BttIa506VLU52c9QNSWyGb9ZrH7GPqnfSHHl0eblwt?=
+ =?us-ascii?Q?IeFygLBXQxqjxeqPWCFZsDOLD94A93PpwSEMFO571ZZkxjpWuh1Z30HwnEGo?=
+ =?us-ascii?Q?3e5z26ZtUpckez0WKwV1paeChqxhr2n7parI+TkMa+5xXc4bU+//xDp4Ac2c?=
+ =?us-ascii?Q?hfyfrPpV0mJI3LpuxtIyGPDBInp/OsAJTOhf4ugBXqsD6xPx1sDdusdZyQff?=
+ =?us-ascii?Q?LJMvWYOceN3scHGzxXxUNuMWp5fHo/Cjq8jGnyPXbkIh3EVg8lBIDSRZCj5e?=
+ =?us-ascii?Q?Go+PfUyBgfOSwN9YA4mcYVGzSMLNqGPzDi01WSGz9WpdWoNq77NlvaFw+w37?=
+ =?us-ascii?Q?McKpLdKOOMP88K8TTDvCKkj69orTJ5jwXg5AFpp1q5bTdRsGzsArQrLqjzSy?=
+ =?us-ascii?Q?OwgdF0oW3IJoKR6evjCUMylIRriEPzgEBoMlT5ZeWTYjUBEWuPIpx/zg7l2C?=
+ =?us-ascii?Q?FJqKRnSF7raDBvdVpMiqc7HViEOp5sTi+LXy77HQFSe6v4GUU7Zzd1izAqeY?=
+ =?us-ascii?Q?etkMcwHr39jVLcEG9YgMCwAzA7Z1Cz6LmfyyOwTHZuyM1sbZZlyN2tEd0NXf?=
+ =?us-ascii?Q?p017zRsoKMWkCa8sCcH7tAEPSoPUVgyKE/pbn1zOwkRkVhYSFIgX6fkPiWkM?=
+ =?us-ascii?Q?SFyXUEMDY+6rrHjEV4etcsgyGjcUsskJrhHrrqKQU0iKcTqHFehdJZEplQeb?=
+ =?us-ascii?Q?ew/hrLcmPwMFj7sVUyTBE1p4P9N8/THOLT7mbyvhPC74vFciexnARFZCDhfy?=
+ =?us-ascii?Q?TrOrcps2334xagmcwwJGGY5kFE40PyiATkGH13Fwh5cZRI38TNuB5t7Ghy7O?=
+ =?us-ascii?Q?vMUKIzk27ghYcK6HC9CjcXXm?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8583233a-5021-4a9e-e748-08d8c7ad053a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50809c3d-2f7b-4f05-728a-08d8c7ad06e9
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 19:02:00.5185
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 19:02:03.3839
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KFp2xgZ0mwBk/nYegL37/MHaXIPLBWvoKpG72Iru7nOAPFNXdza4VRfVZW4LNv3RFZZ/GYnJ7Xg6ZtRtKTd0Uw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ugKV/kXlqDxdcUP4SjOQ8FClmONOK5g+IJUZYHJrBHRNv7WqMXz5yk0oFq9scAjwJmDe3tTUYF1yw0rBCYU1cw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4264
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Using a guest workload which simply issues 'hlt' in a tight loop to
-generate VMEXITs, it was observed (on a recent EPYC processor) that a
-significant amount of the VMEXIT overhead measured on the host was the
-result of MSR reads/writes in svm_vcpu_load/svm_vcpu_put according to
-perf:
+Now that the set of host user MSRs that need to be individually
+saved/restored are the same with/without SEV-ES, we can drop the
+.sev_es_restored flag and just iterate through the list unconditionally
+for both cases. A subsequent patch can then move these loops to a
+common path.
 
-  67.49%--kvm_arch_vcpu_ioctl_run
-          |
-          |--23.13%--vcpu_put
-          |          kvm_arch_vcpu_put
-          |          |
-          |          |--21.31%--native_write_msr
-          |          |
-          |           --1.27%--svm_set_cr4
-          |
-          |--16.11%--vcpu_load
-          |          |
-          |           --15.58%--kvm_arch_vcpu_load
-          |                     |
-          |                     |--13.97%--svm_set_cr4
-          |                     |          |
-          |                     |          |--12.64%--native_read_msr
-
-Most of these MSRs relate to 'syscall'/'sysenter' and segment bases, and
-can be saved/restored using 'vmsave'/'vmload' instructions rather than
-explicit MSR reads/writes. In doing so there is a significant reduction
-in the svm_vcpu_load/svm_vcpu_put overhead measured for the above
-workload:
-
-  50.92%--kvm_arch_vcpu_ioctl_run
-          |
-          |--19.28%--disable_nmi_singlestep
-          |
-          |--13.68%--vcpu_load
-          |          kvm_arch_vcpu_load
-          |          |
-          |          |--9.19%--svm_set_cr4
-          |          |          |
-          |          |           --6.44%--native_read_msr
-          |          |
-          |           --3.55%--native_write_msr
-          |
-          |--6.05%--kvm_inject_nmi
-          |--2.80%--kvm_sev_es_mmio_read
-          |--2.19%--vcpu_put
-          |          |
-          |           --1.25%--kvm_arch_vcpu_put
-          |                     native_write_msr
-
-Quantifying this further, if we look at the raw cycle counts for a
-normal iteration of the above workload (according to 'rdtscp'),
-kvm_arch_vcpu_ioctl_run() takes ~4600 cycles from start to finish with
-the current behavior. Using 'vmsave'/'vmload', this is reduced to
-~2800 cycles, a savings of 39%.
-
-While this approach doesn't seem to manifest in any noticeable
-improvement for more realistic workloads like UnixBench, netperf, and
-kernel builds, likely due to their exit paths generally involving IO
-with comparatively high latencies, it does improve overall overhead
-of KVM_RUN significantly, which may still be noticeable for certain
-situations. It also simplifies some aspects of the code.
-
-With this change, explicit save/restore is no longer needed for the
-following host MSRs, since they are documented[1] as being part of the
-VMCB State Save Area:
-
-  MSR_STAR, MSR_LSTAR, MSR_CSTAR,
-  MSR_SYSCALL_MASK, MSR_KERNEL_GS_BASE,
-  MSR_IA32_SYSENTER_CS,
-  MSR_IA32_SYSENTER_ESP,
-  MSR_IA32_SYSENTER_EIP,
-  MSR_FS_BASE, MSR_GS_BASE
-
-and only the following MSR needs individual handling in
-svm_vcpu_put/svm_vcpu_load:
-
-  MSR_TSC_AUX
-
-We could drop the host_save_user_msrs array/loop and instead handle
-MSR read/write of MSR_TSC_AUX directly, but we leave that for now as
-a potential follow-up.
-
-Since 'vmsave'/'vmload' also handles the LDTR and FS/GS segment
-registers (and associated hidden state)[2], some of the code
-previously used to handle this is no longer needed, so we drop it
-as well.
-
-The first public release of the SVM spec[3] also documents the same
-handling for the host state in question, so we make these changes
-unconditionally.
-
-Also worth noting is that we 'vmsave' to the same page that is
-subsequently used by 'vmrun' to record some host additional state. This
-is okay, since, in accordance with the spec[2], the additional state
-written to the page by 'vmrun' does not overwrite any fields written by
-'vmsave'. This has also been confirmed through testing (for the above
-CPU, at least).
-
-[1] AMD64 Architecture Programmer's Manual, Rev 3.33, Volume 2, Appendix B, Table B-2
-[2] AMD64 Architecture Programmer's Manual, Rev 3.31, Volume 3, Chapter 4, VMSAVE/VMLOAD
-[3] Secure Virtual Machine Architecture Reference Manual, Rev 3.01
-
-Suggested-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/svm.c     | 31 +++++--------------------------
- arch/x86/kvm/svm/svm.h     | 17 -----------------
- arch/x86/kvm/svm/svm_ops.h |  5 +++++
- 3 files changed, 10 insertions(+), 43 deletions(-)
+ arch/x86/kvm/svm/sev.c | 16 ++++------------
+ arch/x86/kvm/svm/svm.c |  6 ++----
+ arch/x86/kvm/svm/svm.h |  7 ++-----
+ 3 files changed, 8 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 687876211ebe..bdc1921094dc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1422,16 +1422,11 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (sev_es_guest(svm->vcpu.kvm)) {
- 		sev_es_vcpu_load(svm, cpu);
- 	} else {
--#ifdef CONFIG_X86_64
--		rdmsrl(MSR_GS_BASE, to_svm(vcpu)->host.gs_base);
--#endif
--		savesegment(fs, svm->host.fs);
--		savesegment(gs, svm->host.gs);
--		svm->host.ldt = kvm_read_ldt();
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index a3e2b29f484d..87167ef8ca23 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2083,12 +2083,8 @@ void sev_es_vcpu_load(struct vcpu_svm *svm, int cpu)
+ 	 * Certain MSRs are restored on VMEXIT, only save ones that aren't
+ 	 * restored.
+ 	 */
+-	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
+-		if (host_save_user_msrs[i].sev_es_restored)
+-			continue;
 -
- 		for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
- 			rdmsrl(host_save_user_msrs[i].index,
- 			       svm->host_user_msrs[i]);
-+
-+		vmsave(__sme_page_pa(sd->save_area));
- 	}
+-		rdmsrl(host_save_user_msrs[i].index, svm->host_user_msrs[i]);
+-	}
++	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
++		rdmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
  
- 	if (static_cpu_has(X86_FEATURE_TSCRATEMSR)) {
-@@ -1463,17 +1458,6 @@ static void svm_vcpu_put(struct kvm_vcpu *vcpu)
- 	if (sev_es_guest(svm->vcpu.kvm)) {
- 		sev_es_vcpu_put(svm);
- 	} else {
--		kvm_load_ldt(svm->host.ldt);
--#ifdef CONFIG_X86_64
--		loadsegment(fs, svm->host.fs);
--		wrmsrl(MSR_KERNEL_GS_BASE, current->thread.gsbase);
--		load_gs_index(svm->host.gs);
--#else
--#ifdef CONFIG_X86_32_LAZY_GS
--		loadsegment(gs, svm->host.gs);
--#endif
--#endif
+ 	/* XCR0 is restored on VMEXIT, save the current host value */
+ 	hostsa = (struct vmcb_save_area *)(page_address(sd->save_area) + 0x400);
+@@ -2109,12 +2105,8 @@ void sev_es_vcpu_put(struct vcpu_svm *svm)
+ 	 * Certain MSRs are restored on VMEXIT and were saved with vmsave in
+ 	 * sev_es_vcpu_load() above. Only restore ones that weren't.
+ 	 */
+-	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++) {
+-		if (host_save_user_msrs[i].sev_es_restored)
+-			continue;
 -
- 		for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
- 			wrmsrl(host_save_user_msrs[i].index,
- 			       svm->host_user_msrs[i]);
-@@ -3780,16 +3764,11 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 	if (sev_es_guest(svm->vcpu.kvm)) {
- 		__svm_sev_es_vcpu_run(svm->vmcb_pa);
- 	} else {
-+		struct svm_cpu_data *sd = per_cpu(svm_data, vcpu->cpu);
-+
- 		__svm_vcpu_run(svm->vmcb_pa, (unsigned long *)&svm->vcpu.arch.regs);
- 
--#ifdef CONFIG_X86_64
--		native_wrmsrl(MSR_GS_BASE, svm->host.gs_base);
--#else
--		loadsegment(fs, svm->host.fs);
--#ifndef CONFIG_X86_32_LAZY_GS
--		loadsegment(gs, svm->host.gs);
--#endif
--#endif
-+		vmload(__sme_page_pa(sd->save_area));
- 	}
- 
- 	/*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 0fe874ae5498..525f1bf57917 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -27,17 +27,6 @@ static const struct svm_host_save_msrs {
- 	u32 index;		/* Index of the MSR */
- 	bool sev_es_restored;	/* True if MSR is restored on SEV-ES VMEXIT */
- } host_save_user_msrs[] = {
--#ifdef CONFIG_X86_64
--	{ .index = MSR_STAR,			.sev_es_restored = true },
--	{ .index = MSR_LSTAR,			.sev_es_restored = true },
--	{ .index = MSR_CSTAR,			.sev_es_restored = true },
--	{ .index = MSR_SYSCALL_MASK,		.sev_es_restored = true },
--	{ .index = MSR_KERNEL_GS_BASE,		.sev_es_restored = true },
--	{ .index = MSR_FS_BASE,			.sev_es_restored = true },
--#endif
--	{ .index = MSR_IA32_SYSENTER_CS,	.sev_es_restored = true },
--	{ .index = MSR_IA32_SYSENTER_ESP,	.sev_es_restored = true },
--	{ .index = MSR_IA32_SYSENTER_EIP,	.sev_es_restored = true },
- 	{ .index = MSR_TSC_AUX,			.sev_es_restored = false },
- };
- #define NR_HOST_SAVE_USER_MSRS ARRAY_SIZE(host_save_user_msrs)
-@@ -130,12 +119,6 @@ struct vcpu_svm {
- 	u64 next_rip;
- 
- 	u64 host_user_msrs[NR_HOST_SAVE_USER_MSRS];
--	struct {
--		u16 fs;
--		u16 gs;
--		u16 ldt;
--		u64 gs_base;
--	} host;
- 
- 	u64 spec_ctrl;
- 	/*
-diff --git a/arch/x86/kvm/svm/svm_ops.h b/arch/x86/kvm/svm/svm_ops.h
-index 0c8377aee52c..c2a05f56c8e4 100644
---- a/arch/x86/kvm/svm/svm_ops.h
-+++ b/arch/x86/kvm/svm/svm_ops.h
-@@ -56,4 +56,9 @@ static inline void vmsave(hpa_t pa)
- 	svm_asm1(vmsave, "a" (pa), "memory");
+-		wrmsrl(host_save_user_msrs[i].index, svm->host_user_msrs[i]);
+-	}
++	for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
++		wrmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
  }
  
-+static inline void vmload(hpa_t pa)
-+{
-+	svm_asm1(vmload, "a" (pa), "memory");
-+}
-+
- #endif /* __KVM_X86_SVM_OPS_H */
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index bdc1921094dc..ae897aaa4471 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1423,8 +1423,7 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 		sev_es_vcpu_load(svm, cpu);
+ 	} else {
+ 		for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
+-			rdmsrl(host_save_user_msrs[i].index,
+-			       svm->host_user_msrs[i]);
++			rdmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
+ 
+ 		vmsave(__sme_page_pa(sd->save_area));
+ 	}
+@@ -1459,8 +1458,7 @@ static void svm_vcpu_put(struct kvm_vcpu *vcpu)
+ 		sev_es_vcpu_put(svm);
+ 	} else {
+ 		for (i = 0; i < NR_HOST_SAVE_USER_MSRS; i++)
+-			wrmsrl(host_save_user_msrs[i].index,
+-			       svm->host_user_msrs[i]);
++			wrmsrl(host_save_user_msrs[i], svm->host_user_msrs[i]);
+ 	}
+ }
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 525f1bf57917..66d83dfefe18 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -23,11 +23,8 @@
+ 
+ #define __sme_page_pa(x) __sme_set(page_to_pfn(x) << PAGE_SHIFT)
+ 
+-static const struct svm_host_save_msrs {
+-	u32 index;		/* Index of the MSR */
+-	bool sev_es_restored;	/* True if MSR is restored on SEV-ES VMEXIT */
+-} host_save_user_msrs[] = {
+-	{ .index = MSR_TSC_AUX,			.sev_es_restored = false },
++static const u32 host_save_user_msrs[] = {
++	MSR_TSC_AUX,
+ };
+ #define NR_HOST_SAVE_USER_MSRS ARRAY_SIZE(host_save_user_msrs)
+ 
 -- 
 2.25.1
 
