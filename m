@@ -2,118 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CFE030CF2A
+	by mail.lfdr.de (Postfix) with ESMTP id EDB9130CF2C
 	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 23:42:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235661AbhBBWiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 17:38:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235493AbhBBWhY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 17:37:24 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B3F2C0613D6
-        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 14:36:43 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id g3so13342801plp.2
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 14:36:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oIoSVPmKEl02Ry4qgP49tJ5d1MCtOFHz6Id8es99aQ8=;
-        b=NrGjY7tv1aLp8A57+KA0gWARf4pkOWcwXtWLuuy3XjI1mrlAY6O+U1gqDcuT7LE9Y2
-         PNdq+knh6vPvHwLSc23PsZkro0J41BgAghcIX7NyCga1GYJ7lqHdADbKKaNcurFrFvth
-         iCjYm0lErxUBkiDwJKpj0a8oTtsYwlSqAyfRiKIMFEJ0tWfqBL6N8kVSUrOm/jq5aJkI
-         OkIOQiwxgVOB99mD+AgNuMrSHDfs6JJcb0NXj4l98HyUHryOiTsmaZj9+8jl1ygSjsNV
-         5qVuBXePJAaWJrQo/PEqwK0EW6xj4gNaz+HIXXSbRh+9oc1kYFfj9DSNtK0LvLh308zN
-         xPbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=oIoSVPmKEl02Ry4qgP49tJ5d1MCtOFHz6Id8es99aQ8=;
-        b=WBnO5zg8KngqAdFsA6etdvpIrnmEPKfKRf0xh+W8pAv4Bhcw0eDRM363blmaq4TBb5
-         kHbK47DMTyGsQ7l5mbQWopx5v8BXp16+NlxJWtgftYFmY/c978jp2jbAitPsx79tDdhl
-         /U9AdXbH6UcYrlObmflzT1X/9aT09MBS17uKEhrziPxJKNvMbBGaPkq4LJuUa/wB0Uo5
-         rZP3uKS5oujJ+nJ6tf6DpXQuf+jdL9KJVIxZchofafZ3JGlEhUP+9gZhnNcJ0M/SIokQ
-         rO1IoR9E4/8TDsj9FAf/fQjk7AE3wod2H2QNi0vdYRsw36SzlroqwhvZfSxjzNtft+Nn
-         /JrQ==
-X-Gm-Message-State: AOAM531mWl2VJfU2lmk+7n9MnUTglZ55vM/B5MubCOaLdUmzB1tsFfye
-        sLyV9FghtQiREuM5TgKXAJQqqQ==
-X-Google-Smtp-Source: ABdhPJzb7AOmzJ3vsd9oEZgebXCp7mHor62Iu3XCT60QLwa6RwOTaru7ziqdbYETgXLnMBoYioMHjA==
-X-Received: by 2002:a17:902:eccb:b029:de:8483:505d with SMTP id a11-20020a170902eccbb02900de8483505dmr93607plh.63.1612305402511;
-        Tue, 02 Feb 2021 14:36:42 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:e1bc:da69:2e4b:ce97])
-        by smtp.gmail.com with ESMTPSA id k5sm39512pfi.31.2021.02.02.14.36.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Feb 2021 14:36:41 -0800 (PST)
-Date:   Tue, 2 Feb 2021 14:36:35 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Robert Hu <robert.hu@intel.com>,
-        Farrah Chen <farrah.chen@intel.com>,
-        Danmei Wei <danmei.wei@intel.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Use 'unsigned long' for the physical address
- passed to VMSAVE
-Message-ID: <YBnT82xRKZkxbsN2@google.com>
-References: <20210202223416.2702336-1-seanjc@google.com>
+        id S235196AbhBBWiM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 17:38:12 -0500
+Received: from mga14.intel.com ([192.55.52.115]:6099 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235520AbhBBWhf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 17:37:35 -0500
+IronPort-SDR: Z3z0pg9AesEqKF1MRbbM1Te3KukM+0BipgeN71zyzpP1eK0vrvKmENmPATL/w5uqf4z6T9O8gn
+ 2spQ+wgsVwCw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9883"; a="180171168"
+X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
+   d="scan'208";a="180171168"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 14:36:45 -0800
+IronPort-SDR: A7pOru+OIVFktVUZVOjZn6ezFsYVxovt9mp+3becGQrs3JalMpTgG4fOCAKCJXH9hIYFnpchJa
+ qN2zsWWSYcmA==
+X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
+   d="scan'208";a="433100977"
+Received: from capeter1-mobl.amr.corp.intel.com (HELO [10.212.5.169]) ([10.212.5.169])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 14:36:43 -0800
+Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
+To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>
+Cc:     "corbet@lwn.net" <corbet@lwn.net>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "jethro@fortanix.com" <jethro@fortanix.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "b.thiel@posteo.de" <b.thiel@posteo.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "Huang, Haitao" <haitao.huang@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+ <4b4b9ed1d7756e8bccf548fc41d05c7dd8367b33.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <fc5c2507-b109-b4ab-0eb8-4203dc6ab552@intel.com>
+Date:   Tue, 2 Feb 2021 14:36:41 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210202223416.2702336-1-seanjc@google.com>
+In-Reply-To: <4b4b9ed1d7756e8bccf548fc41d05c7dd8367b33.camel@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 02, 2021, Sean Christopherson wrote:
-> Take an 'unsigned long' instead of 'hpa_t' in the recently added vmsave()
-> helper, as loading a 64-bit GPR isn't possible in 32-bit mode.  This is
-> properly reflected in the SVM ISA, which explicitly states that VMSAVE,
-> VMLOAD, VMRUN, etc... consume rAX based on the effective address size.
+On 2/2/21 2:21 PM, Edgecombe, Rick P wrote:
+> On Tue, 2021-01-26 at 23:10 +1300, Kai Huang wrote:
+>> This series adds KVM SGX virtualization support. The first 15 patches
+>> starting
+>> with x86/sgx or x86/cpu.. are necessary changes to x86 and SGX
+>> core/driver to
+>> support KVM SGX virtualization, while the rest are patches to KVM
+>> subsystem.
 > 
-> Don't bother with a WARN to detect breakage on 32-bit KVM, the VMCB PA is
-> stored as an 'unsigned long', i.e. the bad address is long since gone.
-> Not to mention that a 32-bit kernel is completely hosed if alloc_page()
-> hands out pages in high memory.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Cc: Robert Hu <robert.hu@intel.com>
-> Cc: Farrah Chen <farrah.chen@intel.com>
-> Cc: Danmei Wei <danmei.wei@intel.com>
-> Cc: Tom Lendacky <Thomas.Lendacky@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Do we need to restrict normal KVM host kernel access to EPC (i.e. via
+> __kvm_map_gfn() and friends)? As best I can tell the exact behavior of
+> this kind of access is undefined. The concern would be if any HW ever
+> treated it as an error, the guest could subject the host kernel to it.
+> Is it worth a check in those?
 
-Forgot got the Fixes tag.  Or just squash this.
+Geez, you're right.  It's not even a page fault we can recover from.
 
-Fixes: f84a54c04540 ("KVM: SVM: Use asm goto to handle unexpected #UD on SVM instructions")
+SDM, Vol. 3D 37-1, 37.3 ACCESS-CONTROL REQUIREMENTS, says:
 
-> ---
->  arch/x86/kvm/svm/svm_ops.h | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/svm_ops.h b/arch/x86/kvm/svm/svm_ops.h
-> index 0c8377aee52c..9f007bc8409a 100644
-> --- a/arch/x86/kvm/svm/svm_ops.h
-> +++ b/arch/x86/kvm/svm/svm_ops.h
-> @@ -51,7 +51,12 @@ static inline void invlpga(unsigned long addr, u32 asid)
->  	svm_asm2(invlpga, "c"(asid), "a"(addr));
->  }
->  
-> -static inline void vmsave(hpa_t pa)
-> +/*
-> + * Despite being a physical address, the portion of rAX that is consumed by
-> + * VMSAVE, VMLOAD, etc... is still controlled by the effective address size,
-> + * hence 'unsigned long' instead of 'hpa_t'.
-> + */
-> +static inline void vmsave(unsigned long pa)
->  {
->  	svm_asm1(vmsave, "a" (pa), "memory");
->  }
-> -- 
-> 2.30.0.365.g02bc693789-goog
-> 
+"Non-enclave accesses to EPC memory result in undefined behavior"
