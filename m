@@ -2,223 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B84930BE4D
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 13:37:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C00730BE61
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 13:39:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230168AbhBBMfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 07:35:33 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:12406 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231481AbhBBMfa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 07:35:30 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DVPPC5SkTzjFR0;
-        Tue,  2 Feb 2021 20:33:35 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Feb 2021 20:34:36 +0800
-Subject: Re: [PATCH v11 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
-        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-2-eric.auger@redhat.com>
-CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
-        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
-        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-Date:   Tue, 2 Feb 2021 20:34:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S231616AbhBBMjg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 07:39:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23353 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229823AbhBBMjb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 07:39:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612269482;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NZRr21VwPb+gddA+LsXP9sowDhSK8vzx4R4PPP1BuY4=;
+        b=BLdU5lioZPqal/0DTKGsvWF9csI95kWKNw3KPF8qmL4CvIXpE+TP2w92oUDFcl5tzoy8mg
+        1Gw4TKkfe4cI6w3Xo/qrAi78oxUrAIc2E0eHtbjgCF9nucs4G+pCDOmtui73VvYGvvTYcF
+        0We4gRBquhYxF5z5khgBEA/RnKkk6Fg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-RtDTpilTO6CBnelznmPS9A-1; Tue, 02 Feb 2021 07:38:00 -0500
+X-MC-Unique: RtDTpilTO6CBnelznmPS9A-1
+Received: by mail-ej1-f69.google.com with SMTP id by20so9902986ejc.1
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 04:38:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NZRr21VwPb+gddA+LsXP9sowDhSK8vzx4R4PPP1BuY4=;
+        b=XemXSZIpOEbFc8hcQyBU1JD8doQnzYocPndZ/FjQa6v9PEZWUkZ3vYaxgXucsQycht
+         Q8PDGpNIKQM4mSwDQiYAi4MPSUkkbuJXLTsKd0OjGBZNOFWjIytSHosRMg/fzrXs+Cd3
+         eY8XSPOBtnc/9oAb254pOiMyrIaagp6o7iaFYVi40oKxFkD8hZvawsjLNaLEh9c64pJ8
+         I1kRxXko7P1wFXkFeCpp/YlW6bTPpp6jroGDiWmQaw11OalCSk85MfRsP5V/Sf3ixw3G
+         mDGfCft08HuA/Jz1E4FNoDx8F+cplqHQd6iGcurkVFO9d2DK2c6HnCQrIMLjMfyj4d4s
+         7nlQ==
+X-Gm-Message-State: AOAM531AX1S3oci+D82B8klvPR7TQznYb8pFGz7N6XUkFBjJ0GA/ecDi
+        Gl8oE4arYNTgRMa+ALP7g0vHHINFHI5AyB11mnOVpLSAxD7pRONg4O5gbTgoUgcV30ZKOI558rr
+        vWlMQEQteYFNM
+X-Received: by 2002:a17:906:6407:: with SMTP id d7mr21780938ejm.133.1612269478984;
+        Tue, 02 Feb 2021 04:37:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwb3n7mJpsXPPiJxYDHpopR6AUqEvyXzcvdJxVyefUIP+rpzqYb8phud34qLF/UufS5lLe0QA==
+X-Received: by 2002:a17:906:6407:: with SMTP id d7mr21780920ejm.133.1612269478753;
+        Tue, 02 Feb 2021 04:37:58 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id v25sm9597237ejw.21.2021.02.02.04.37.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Feb 2021 04:37:57 -0800 (PST)
+Subject: Re: [PATCH v14 00/11] KVM: x86/pmu: Guest Last Branch Recording
+ Enabling
+To:     Like Xu <like.xu@linux.intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
+        wei.w.wang@intel.com, kan.liang@intel.com,
+        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210201051039.255478-1-like.xu@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <196ffa8c-4027-724a-ca29-f1db69f48ab7@redhat.com>
+Date:   Tue, 2 Feb 2021 13:37:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201116110030.32335-2-eric.auger@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <20210201051039.255478-1-like.xu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On 01/02/21 06:10, Like Xu wrote:
+> Hi geniuses,
+> 
+> Please help review this new version which enables the guest LBR.
+> 
+> We already upstreamed the guest LBR support in the host perf, please
+> check more details in each commit and feel free to test and comment.
+> 
+> QEMU part: https://lore.kernel.org/qemu-devel/20210201045453.240258-1-like.xu@linux.intel.com
+> kvm-unit-tests: https://lore.kernel.org/kvm/20210201045751.243231-1-like.xu@linux.intel.com
+> 
+> v13-v14 Changelog:
+> - Rewrite crud about vcpu->arch.perf_capabilities;
+> - Add PERF_CAPABILITIES testcases to tools/testing/selftests/kvm;
+> - Add basic LBR testcases to the kvm-unit-tests (w/ QEMU patches);
+> - Apply rewritten commit log from Paolo;
+> - Queued the first patch "KVM: x86: Move common set/get handler ...";
+> - Rename 'already_passthrough' to 'msr_passthrough';
+> - Check the values of MSR_IA32_PERF_CAPABILITIES early;
+> - Call kvm_x86_ops.pmu_ops->cleanup() always and drop extra_cleanup;
+> - Use INTEL_PMC_IDX_FIXED_VLBR directly;
+> - Fix a bug in the vmx_get_perf_capabilities();
+> 
+> Previous:
+> https://lore.kernel.org/kvm/20210108013704.134985-1-like.xu@linux.intel.com/
 
-On 2020/11/16 19:00, Eric Auger wrote:
-> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Queued, thanks.  There were some conflicts with the bus lock detection 
+patches, so I had to tweak a bit the DEBUGCTL MSR handling.
+
+Paolo
+
+> ---
 > 
-> This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
-> which aims to pass the virtual iommu guest configuration
-> to the host. This latter takes the form of the so-called
-> PASID table.
+> The last branch recording (LBR) is a performance monitor unit (PMU)
+> feature on Intel processors that records a running trace of the most
+> recent branches taken by the processor in the LBR stack. This patch
+> series is going to enable this feature for plenty of KVM guests.
 > 
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> with this patch set, the following error will be gone forever and cloud
+> developers can better understand their programs with less profiling overhead:
+> 
+>    $ perf record -b lbr ${WORKLOAD}
+>    or $ perf record --call-graph lbr ${WORKLOAD}
+>    Error:
+>    cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
+> 
+> The user space could configure whether it's enabled or not for each
+> guest via MSR_IA32_PERF_CAPABILITIES msr. As a first step, a guest
+> could only enable LBR feature if its cpu model is the same as the
+> host since the LBR feature is still one of model specific features.
+> 
+> If it's enabled on the guest, the guest LBR driver would accesses the
+> LBR MSR (including IA32_DEBUGCTLMSR and records MSRs) as host does.
+> The first guest access on the LBR related MSRs is always interceptible.
+> The KVM trap would create a special LBR event (called guest LBR event)
+> which enables the callstack mode and none of hardware counter is assigned.
+> The host perf would enable and schedule this event as usual.
+> 
+> Guest's first access to a LBR registers gets trapped to KVM, which
+> creates a guest LBR perf event. It's a regular LBR perf event which gets
+> the LBR facility assigned from the perf subsystem. Once that succeeds,
+> the LBR stack msrs are passed through to the guest for efficient accesses.
+> However, if another host LBR event comes in and takes over the LBR
+> facility, the LBR msrs will be made interceptible, and guest following
+> accesses to the LBR msrs will be trapped and meaningless.
+> 
+> Because saving/restoring tens of LBR MSRs (e.g. 32 LBR stack entries) in
+> VMX transition brings too excessive overhead to frequent vmx transition
+> itself, the guest LBR event would help save/restore the LBR stack msrs
+> during the context switching with the help of native LBR event callstack
+> mechanism, including LBR_SELECT msr.
+> 
+> If the guest no longer accesses the LBR-related MSRs within a scheduling
+> time slice and the LBR enable bit is unset, vPMU would release its guest
+> LBR event as a normal event of a unused vPMC and the pass-through
+> state of the LBR stack msrs would be canceled.
 > 
 > ---
-> v11 -> v12:
-> - use iommu_uapi_set_pasid_table
-> - check SET and UNSET are not set simultaneously (Zenghui)
 > 
-> v8 -> v9:
-> - Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
->   VFIO_IOMMU_SET_PASID_TABLE ioctl.
+> LBR testcase:
+> echo 1 > /proc/sys/kernel/watchdog
+> echo 25 > /proc/sys/kernel/perf_cpu_time_max_percent
+> echo 5000 > /proc/sys/kernel/perf_event_max_sample_rate
+> echo 0 > /proc/sys/kernel/perf_cpu_time_max_percent
+> perf record -b ./br_instr a
+> (perf record --call-graph lbr ./br_instr a)
 > 
-> v6 -> v7:
-> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
+> - Perf report on the host:
+> Samples: 72K of event 'cycles', Event count (approx.): 72512
+> Overhead  Command   Source Shared Object           Source Symbol                           Target Symbol                           Basic Block Cycles
+>    12.12%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           1
+>    11.05%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             5
+>     8.81%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             4
+>     5.04%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           20
+>     4.92%  br_instr  br_instr                       [.] lfsr_cond                           [.] cmp_end                             6
+>     4.88%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           6
+>     4.58%  br_instr  br_instr                       [.] cmp_end                             [.] lfsr_cond                           5
 > 
-> v3 -> v4:
-> - restore ATTACH/DETACH
-> - add unwind on failure
+> - Perf report on the guest:
+> Samples: 92K of event 'cycles', Event count (approx.): 92544
+> Overhead  Command   Source Shared Object  Source Symbol                                   Target Symbol                                   Basic Block Cycles
+>    12.03%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   1
+>    11.09%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     5
+>     8.57%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     4
+>     5.08%  br_instr  br_instr              [.] lfsr_cond                                   [.] cmp_end                                     6
+>     5.06%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   20
+>     4.87%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   6
+>     4.70%  br_instr  br_instr              [.] cmp_end                                     [.] lfsr_cond                                   5
 > 
-> v2 -> v3:
-> - s/BIND_PASID_TABLE/SET_PASID_TABLE
+> Conclusion: the profiling results on the guest are similar to that on the host.
 > 
-> v1 -> v2:
-> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
-> - remove the struct device arg
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 65 +++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       | 19 ++++++++++
->  2 files changed, 84 insertions(+)
+> Like Xu (11):
+>    KVM: x86/vmx: Make vmx_set_intercept_for_msr() non-static
+>    KVM: x86/pmu: Set up IA32_PERF_CAPABILITIES if PDCM bit is available
+>    KVM: vmx/pmu: Add PMU_CAP_LBR_FMT check when guest LBR is enabled
+>    KVM: vmx/pmu: Expose DEBUGCTLMSR_LBR in the MSR_IA32_DEBUGCTLMSR
+>    KVM: vmx/pmu: Create a guest LBR event when vcpu sets DEBUGCTLMSR_LBR
+>    KVM: vmx/pmu: Pass-through LBR msrs when the guest LBR event is ACTIVE
+>    KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
+>    KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
+>    KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
+>    KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES
+>    selftests: kvm/x86: add test for pmu msr MSR_IA32_PERF_CAPABILITIES
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 67e827638995..87ddd9e882dc 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2587,6 +2587,41 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->  	return ret;
->  }
->  
-> +static void
-> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
-> +{
-> +	struct vfio_domain *d;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	list_for_each_entry(d, &iommu->domain_list, next)
-> +		iommu_detach_pasid_table(d->domain);
-> +
-> +	mutex_unlock(&iommu->lock);
-> +}
-> +
-> +static int
-> +vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
-> +{
-> +	struct vfio_domain *d;
-> +	int ret = 0;
-> +
-> +	mutex_lock(&iommu->lock);
-> +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
-This design is not very clear to me. This assumes all iommu_domains share the same pasid table.
+>   arch/x86/kvm/pmu.c                            |   8 +-
+>   arch/x86/kvm/pmu.h                            |   2 +
+>   arch/x86/kvm/vmx/capabilities.h               |  19 +-
+>   arch/x86/kvm/vmx/pmu_intel.c                  | 281 +++++++++++++++++-
+>   arch/x86/kvm/vmx/vmx.c                        |  55 +++-
+>   arch/x86/kvm/vmx/vmx.h                        |  28 ++
+>   arch/x86/kvm/x86.c                            |   2 +-
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c  | 149 ++++++++++
+>   10 files changed, 524 insertions(+), 22 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> 
 
-As I understand, it's reasonable when there is only one group in the domain, and only one domain in the vfio_iommu.
-If more than one group in the vfio_iommu, the guest may put them into different guest iommu_domain, then they have different pasid table.
-
-Is this the use scenario?
-
-Thanks,
-Keqian
-
-> +		if (ret)
-> +			goto unwind;
-> +	}
-> +	goto unlock;
-> +unwind:
-> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
-> +		iommu_detach_pasid_table(d->domain);
-> +	}
-> +unlock:
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->  					   struct vfio_info_cap *caps)
->  {
-> @@ -2747,6 +2782,34 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->  			-EFAULT : 0;
->  }
->  
-> +static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
-> +					    unsigned long arg)
-> +{
-> +	struct vfio_iommu_type1_set_pasid_table spt;
-> +	unsigned long minsz;
-> +	int ret = -EINVAL;
-> +
-> +	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
-> +
-> +	if (copy_from_user(&spt, (void __user *)arg, minsz))
-> +		return -EFAULT;
-> +
-> +	if (spt.argsz < minsz)
-> +		return -EINVAL;
-> +
-> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET &&
-> +	    spt.flags & VFIO_PASID_TABLE_FLAG_UNSET)
-> +		return -EINVAL;
-> +
-> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET)
-> +		ret = vfio_attach_pasid_table(iommu, arg + minsz);
-> +	else if (spt.flags & VFIO_PASID_TABLE_FLAG_UNSET) {
-> +		vfio_detach_pasid_table(iommu);
-> +		ret = 0;
-> +	}
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->  					unsigned long arg)
->  {
-> @@ -2867,6 +2930,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  		return vfio_iommu_type1_unmap_dma(iommu, arg);
->  	case VFIO_IOMMU_DIRTY_PAGES:
->  		return vfio_iommu_type1_dirty_pages(iommu, arg);
-> +	case VFIO_IOMMU_SET_PASID_TABLE:
-> +		return vfio_iommu_type1_set_pasid_table(iommu, arg);
->  	default:
->  		return -ENOTTY;
->  	}
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 2f313a238a8f..78ce3ce6c331 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -14,6 +14,7 @@
->  
->  #include <linux/types.h>
->  #include <linux/ioctl.h>
-> +#include <linux/iommu.h>
->  
->  #define VFIO_API_VERSION	0
->  
-> @@ -1180,6 +1181,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
->  
->  #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
->  
-> +/*
-> + * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
-> + *			struct vfio_iommu_type1_set_pasid_table)
-> + *
-> + * The SET operation passes a PASID table to the host while the
-> + * UNSET operation detaches the one currently programmed. Setting
-> + * a table while another is already programmed replaces the old table.
-> + */
-> +struct vfio_iommu_type1_set_pasid_table {
-> +	__u32	argsz;
-> +	__u32	flags;
-> +#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
-> +#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
-> +	struct iommu_pasid_table_config config; /* used on SET */
-> +};
-> +
-> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
-> +
->  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->  
->  /*
-> 
