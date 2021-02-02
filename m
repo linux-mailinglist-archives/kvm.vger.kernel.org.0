@@ -2,108 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD1B130C299
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 15:56:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C84930C2AA
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 15:59:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234492AbhBBO4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 09:56:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40570 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232248AbhBBOzL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 09:55:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612277623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=63iUIFUeXpHPrYf2eKlD+tbc5HBRhOL3GBF5o8JxTlk=;
-        b=YAIHievJV8EColRfuahcyQYU28SojQcAt383QVb4zkTI8ldVlpAsGSCW/4CwcRyQuBa1Ig
-        WLSeOOWDt+KSD3KdDDt2oI1Ms8A5Lo7cXYWBqawCNRNs8U4jst7xwB9dnw63nWbdXyW5Ja
-        aEIi2EFQDa5/NMr2dSbY80/KgL0yvEk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-VENP4xeaMg-27EYHAKipFw-1; Tue, 02 Feb 2021 09:53:42 -0500
-X-MC-Unique: VENP4xeaMg-27EYHAKipFw-1
-Received: by mail-ed1-f71.google.com with SMTP id v19so9696087edx.22
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 06:53:41 -0800 (PST)
+        id S234715AbhBBO5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 09:57:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33362 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234851AbhBBO5K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 09:57:10 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A575C0613D6;
+        Tue,  2 Feb 2021 06:56:30 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id u20so7458881iot.9;
+        Tue, 02 Feb 2021 06:56:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ywprqr49p03+cfZRBeKphtdcDQnuW/e8IgxGcaB3r4c=;
+        b=aEtV76fg9VVzGVjBp+L1dWv21UvqsLkrrN5OBin8JGqK5fZDNxkbjBMIparpAb+YAe
+         mMllGtQWZ0d38a2tLIG0BWqY0V21UYnSeSoBfNHdlliTjH8YSXhV46UaY+SFHSOMA5BB
+         iC/rQCvlRADxb7oWsUeA/5fH4j3Br28Apcai3NOOzYVEHkI2KLdC/BKl8iMqPLHDqKP5
+         F8yn1LI3YXvCMB6mcSUQ/JffxA2QmDHkF3Bfgr56U3XVEv3F+RYsm++yi2hfR1UMMfHg
+         yxy851+gExujpCZ4SIdSch4LPEsCNXxiydoqS03Ok5fTkvhTf5wg7jR1BhiSJEUQXE/n
+         c6Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=63iUIFUeXpHPrYf2eKlD+tbc5HBRhOL3GBF5o8JxTlk=;
-        b=jLm3si9G3ejyv88jlRRcaNL0l00FlhmLq7HL08SUlhI0Gg4F2S614lihVCX4/xfsVT
-         ZW7Tp19XVFDV+s9dQWgRNnrb3tX4a5mNJm96iuiedK03IBfQHJKadzt/XaFnz2Q3ZzVX
-         5yg0/17kHgN3uEtHCU9Xdb6h6tqsZQqmPtyLTV7Ht34l4FSNtFhJqwfo+eVZ20rUQnAC
-         ZVCUEUGW35YFw3zExbBZ+sKr5tjxdmoKdNslNArqw4gXLBtrhIdC19XD/3tEUx0qKx1f
-         s2LKyaOPqXKXjTPcfxKSCCEnKAXIjsPIs0T9Pbz6dqQBg5g2DJThaGAdQDMzbeXgNFyL
-         pvuQ==
-X-Gm-Message-State: AOAM5318O78iYGQvR/1qWjyYr/Fk9axmUCTU1An5T0nzIX3TOARqYJ6m
-        Jmp4r70JM8XHjD2iyIZvS4Q96TZzoBmPWehF7GAd+Qgn+Z5R7tdnku/0j3XEOUtmnlggSZ8/lhz
-        pjXPpby1K03us
-X-Received: by 2002:aa7:da98:: with SMTP id q24mr24166761eds.370.1612277620975;
-        Tue, 02 Feb 2021 06:53:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxS9mIrFl6AZTBNvZUMHlM02ABoapOleP6I0hNt3ggSqA97e6S5oPNkoPpxyqUQzT6OIB0y9w==
-X-Received: by 2002:aa7:da98:: with SMTP id q24mr24166742eds.370.1612277620810;
-        Tue, 02 Feb 2021 06:53:40 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x17sm9996283edd.76.2021.02.02.06.53.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Feb 2021 06:53:39 -0800 (PST)
-Subject: Re: [PATCH v14 11/11] selftests: kvm/x86: add test for pmu msr
- MSR_IA32_PERF_CAPABILITIES
-To:     Like Xu <like.xu@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com,
-        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210201051039.255478-1-like.xu@linux.intel.com>
- <20210201060152.370069-1-like.xu@linux.intel.com>
- <20210201060152.370069-5-like.xu@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f77954f5-02ad-8a40-d7d3-31614628b007@redhat.com>
-Date:   Tue, 2 Feb 2021 15:53:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ywprqr49p03+cfZRBeKphtdcDQnuW/e8IgxGcaB3r4c=;
+        b=KS3Zme5tqdKpVUYEOchm84dGpXpjXWsGQNMGv70RyYluZTXHFUBhXpkp217UGcvE5H
+         ZM0OCL/cZ8C1RIa2yWnuNEsePtQtbaTy+GDZuKRvgxmIaLIZN/eXG6A+eQSCOsjHbjB6
+         p/VC3T58Fo05B65nNkUlK15tLMvSRF3GBK+qK1lrlpCK8i6q3NzU0xPmYzI34/Q02caT
+         IyZmwRzwIK6gtiWYrhpWfvCeg/uKziJKrLF1uoyIQ0+bifvreYW0RRcoSEUwl0bpwtQ/
+         Qhac5Q2m/NC8VSWy5pSdiQKGA1gRdAIlDXzB31rLmSpgdGM4scFPmMnp/AdsOnjp22wx
+         Z0AQ==
+X-Gm-Message-State: AOAM532CS/MWY4gAHr7LjAj20cZc5s6dxGmy4eteDFOwSY1hKvok2+vw
+        LSV/pf8JUuEOgUSpdiMwxr9ZWVsrXYg1r/2uIpxZXC59O2Q=
+X-Google-Smtp-Source: ABdhPJxGVSF7gydx/xTnSJqhcdjUGh74ybjOaf6NWa0d6BxL4acTeJ5ohj306r/o/62agcvieNAmcXGajs5Bkm3rzeg=
+X-Received: by 2002:a5e:8903:: with SMTP id k3mr17233798ioj.36.1612277789491;
+ Tue, 02 Feb 2021 06:56:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210201060152.370069-5-like.xu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210123080853.4214-1-dongli.zhang@oracle.com>
+In-Reply-To: <20210123080853.4214-1-dongli.zhang@oracle.com>
+From:   Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date:   Tue, 2 Feb 2021 15:56:18 +0100
+Message-ID: <CAM9Jb+hWqZbS_bT+K32M33vW0WmfR=JWxogH+FciHPx0SYKrvQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] vhost scsi: alloc vhost_scsi with kvzalloc() to
+ avoid delay
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, joe.jin@oracle.com,
+        aruna.ramakrishna@oracle.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/02/21 07:01, Like Xu wrote:
-> 
-> +uint64_t rdmsr_on_cpu(uint32_t reg)
-> +{
-> +	uint64_t data;
-> +	int fd;
-> +	char msr_file[64];
-> +
-> +	sprintf(msr_file, "/dev/cpu/%d/msr", 0);
-> +	fd = open(msr_file, O_RDONLY);
-> +	if (fd < 0)
-> +		exit(KSFT_SKIP);
-> +
-> +	if (pread(fd, &data, sizeof(data), reg) != sizeof(data))
-> +		exit(KSFT_SKIP);
-> +
-> +	close(fd);
-> +	return data;
-> +}
+> The size of 'struct vhost_scsi' is order-10 (~2.3MB). It may take long time
+> delay by kzalloc() to compact memory pages by retrying multiple times when
+> there is a lack of high-order pages. As a result, there is latency to
+> create a VM (with vhost-scsi) or to hotadd vhost-scsi-based storage.
+>
+> The prior commit 595cb754983d ("vhost/scsi: use vmalloc for order-10
+> allocation") prefers to fallback only when really needed, while this patch
+> allocates with kvzalloc() with __GFP_NORETRY implicitly set to avoid
+> retrying memory pages compact for multiple times.
+>
+> The __GFP_NORETRY is implicitly set if the size to allocate is more than
+> PAGE_SZIE and when __GFP_RETRY_MAYFAIL is not explicitly set.
+>
+> Cc: Aruna Ramakrishna <aruna.ramakrishna@oracle.com>
+> Cc: Joe Jin <joe.jin@oracle.com>
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+> Changed since v1:
+>   - To combine kzalloc() and vzalloc() as kvzalloc()
+>     (suggested by Jason Wang)
+>
+>  drivers/vhost/scsi.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 4ce9f00ae10e..5de21ad4bd05 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -1814,12 +1814,9 @@ static int vhost_scsi_open(struct inode *inode, struct file *f)
+>         struct vhost_virtqueue **vqs;
+>         int r = -ENOMEM, i;
+>
+> -       vs = kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
+> -       if (!vs) {
+> -               vs = vzalloc(sizeof(*vs));
+> -               if (!vs)
+> -                       goto err_vs;
+> -       }
+> +       vs = kvzalloc(sizeof(*vs), GFP_KERNEL);
+> +       if (!vs)
+> +               goto err_vs;
+>
+>         vqs = kmalloc_array(VHOST_SCSI_MAX_VQ, sizeof(*vqs), GFP_KERNEL);
+>         if (!vqs)
 
-In order to allow running as non-root, it's better to use the 
-KVM_GET_MSRS ioctl on the /dev/kvm file descriptor.
-
-The tests pass, but please take a look at the kvm/queue branch to see if 
-everything is ok.
-
-Paolo
-
+ Acked-by: Pankaj Gupta <pankaj.gupta@cloud.ionos.com>
