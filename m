@@ -2,46 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ADE0230CB7C
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 20:27:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC71930CB8F
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 20:32:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239762AbhBBT0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 14:26:08 -0500
-Received: from mga02.intel.com ([134.134.136.20]:28447 "EHLO mga02.intel.com"
+        id S239753AbhBBT25 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 14:28:57 -0500
+Received: from mga18.intel.com ([134.134.136.126]:27190 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239292AbhBBTYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 14:24:23 -0500
-IronPort-SDR: hcxCnVpsgwMjEzI0xw/12p9b+k+GYwMOxscVQIZVLbYzO97gmnRGLMa4yaX8FEjqLqvptrhlAq
- DLgkqXBs5ihA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9883"; a="168022815"
+        id S239763AbhBBT0L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 14:26:11 -0500
+IronPort-SDR: WmRM3o8XHv3vbiGATlmotJ+iFau9tUgY6RnAieCKCmU0wb/4DbuaGrKZaIqaEJrMmHC7iwPmS7
+ nPj/siDM+s2g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9883"; a="168593487"
 X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
-   d="scan'208";a="168022815"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 11:23:47 -0800
-IronPort-SDR: l5pgKg6I9ccL/0IrUbNE9oi/bDD8/Dv9qXFEgGwGU9B4T08x6RLL5/vQeB2ZETcNNL8G8H4XQu
- yeQujLo4sRmg==
+   d="scan'208";a="168593487"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 11:25:19 -0800
+IronPort-SDR: VIsgfvd+pYtRvxtZ1BRz1sUh/cS8WnNQvN6bNhIxaebnXwluYl76YdCF9dPOAptXXfvKV2tyzY
+ 9Q/CaGhT0cVw==
 X-IronPort-AV: E=Sophos;i="5.79,396,1602572400"; 
-   d="scan'208";a="413713179"
+   d="scan'208";a="372082524"
 Received: from asalasax-mobl2.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.7.175])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 11:23:42 -0800
-Date:   Wed, 3 Feb 2021 08:23:40 +1300
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 11:25:15 -0800
+Date:   Wed, 3 Feb 2021 08:25:13 +1300
 From:   Kai Huang <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com
-Subject: Re: [RFC PATCH v3 16/27] KVM: VMX: Convert vcpu_vmx.exit_reason to
- a union
-Message-Id: <20210203082340.e808a4d97318e07b265d0326@intel.com>
-In-Reply-To: <YBmK2lt/5r/+HrAO@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
+        jarkko@kernel.org, luto@kernel.org, haitao.huang@intel.com,
+        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v3 04/27] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Message-Id: <20210203082513.35b924312bfdb8c7d6f650ac@intel.com>
+In-Reply-To: <32df1e72-b53d-bdf7-9018-a5eee4550dc4@redhat.com>
 References: <cover.1611634586.git.kai.huang@intel.com>
-        <d32ab375be78315e3bc2540f2a741859637abcb0.1611634586.git.kai.huang@intel.com>
-        <YBV0nnqUHnING5qA@kernel.org>
-        <20210201133259.e0398c9f0b229fd79a8c16c6@intel.com>
-        <YBmK2lt/5r/+HrAO@kernel.org>
+        <d93adaec3d4371638f4ea2d9c6efb28e22eafcb3.1611634586.git.kai.huang@intel.com>
+        <8250aedb-a623-646d-071a-75ece2c41c09@intel.com>
+        <20210127142537.9e831f66f925cbf82b9ab45d@intel.com>
+        <32df1e72-b53d-bdf7-9018-a5eee4550dc4@redhat.com>
 X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -50,72 +48,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Feb 2021 19:24:42 +0200 Jarkko Sakkinen wrote:
-> On Mon, Feb 01, 2021 at 01:32:59PM +1300, Kai Huang wrote:
-> > On Sat, 30 Jan 2021 17:00:46 +0200 Jarkko Sakkinen wrote:
-> > > On Tue, Jan 26, 2021 at 10:31:37PM +1300, Kai Huang wrote:
-> > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > 
-> > > > Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
-> > > > full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
-> > > > bits 15:0, and single-bit modifiers in bits 31:16.
-> > > > 
-> > > > Historically, KVM has only had to worry about handling the "failed
-> > > > VM-Entry" modifier, which could only be set in very specific flows and
-> > > > required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
-> > > > bit was a somewhat viable approach.  But even with only a single bit to
-> > > > worry about, KVM has had several bugs related to comparing a basic exit
-> > > > reason against the full exit reason store in vcpu_vmx.
-> > > > 
-> > > > Upcoming Intel features, e.g. SGX, will add new modifier bits that can
-> 
-> BTW, SGX is not an upcoming CPU feature.
-
-Probably Sean was implying: "Upcoming CPU features that will be supported by
-Linux". I don't see big deal here.
-
-> 
-> Also, broadly speaking of upcoming features is not right thing to do.
-> Better just to scope this down SGX. Theoretically upcoming CPU features
-> can do pretty much anything. This is change is first and foremost done
-> for SGX.
-> 
-> > > > be set on more or less any VM-Exit, as opposed to the significantly more
-> > > > restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
-> > > > flows isn't scalable.  Tracking exit reason in a union forces code to
-> > > > explicitly choose between consuming the full exit reason and the basic
-> > > > exit, and is a convenient way to document and access the modifiers.
-> > > 
-> > > I *believe* that the change is correct but I dropped in the last paragraph
-> > > - most likely only because of lack of expertise in this area.
-> > > 
-> > > I ask the most basic question: why SGX will add new modifier bits?
+On Tue, 2 Feb 2021 19:00:48 +0100 Paolo Bonzini wrote:
+> On 27/01/21 02:25, Kai Huang wrote:
+> > On Tue, 26 Jan 2021 08:04:35 -0800 Dave Hansen wrote:
+> >> On 1/26/21 1:30 AM, Kai Huang wrote:
+> >>> From: Jarkko Sakkinen <jarkko@kernel.org>
+> >>>
+> >>> Encapsulate the snippet in sgx_free_epc_page() concerning EREMOVE to
+> >>> sgx_reset_epc_page(), which is a static helper function for
+> >>> sgx_encl_release().  It's the only function existing, which deals with
+> >>> initialized pages.
+> >>
+> >> Yikes.  I have no idea what that is saying.  Here's a rewrite:
+> >>
+> >> EREMOVE takes a pages and removes any association between that page and
+> >> an enclave.  It must be run on a page before it can be added into
+> >> another enclave.  Currently, EREMOVE is run as part of pages being freed
+> >> into the SGX page allocator.  It is not expected to fail.
+> >>
+> >> KVM does not track how guest pages are used, which means that SGX
+> >> virtualization use of EREMOVE might fail.
+> >>
+> >> Break out the EREMOVE call from the SGX page allocator.  This will allow
+> >> the SGX virtualization code to use the allocator directly.  (SGX/KVM
+> >> will also introduce a more permissive EREMOVE helper).
 > > 
-> > Not 100% sure about your question. Assuming you are asking SGX hardware
-> > behavior, SGX architecture adds a new modifier bit (27) to Exit Reason, similar
-> > to new #PF.SGX bit. 
+> > Thanks.
 > > 
-> > Please refer to SDM Volume 3, Chapter 27.2.1 Basic VM-Exit Information.
+> > Hi Jarkko,
 > > 
-> > Sean's commit msg already provides significant motivation of the change in this
-> > patch.
+> > Do you want me to update your patch directly, or do you want to take the
+> > change, and send me the patch again?
 > 
-> Just describe why SGX requires this. That's all.
+> I think you should treat all these 27 patches as yours now (including 
+> removing them, reordering them, adjusting commit message etc.).
 
-This patch is to change vmexit info from u32 to union, because at least one
-additional modifier is going to be added, due to SGX. So the motivation of this
-patch is the fact that "one or more additional modifier bits will be added",
-and SGX is just example. 
-
-So I don't think adding too much SGX backgroud in *THIS* patch is needed.
-And another patch: 
-
-[RFC PATCH v3 21/27] KVM: VMX: Add basic handling of VM-Exit from SGX enclave
-
-already has enough information of "why new modifier bit is aadded for SGX".
-Sean also replied to you. 
-
-Please look at that patch and see whether it satisfies you.
-
-> 
-> /Jarkko
+Agreed. Thank you Paolo for starting to review this series :)
