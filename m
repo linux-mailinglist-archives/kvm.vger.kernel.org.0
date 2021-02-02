@@ -2,92 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC12630C901
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 19:07:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1FEC30C97C
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 19:19:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238156AbhBBSG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 13:06:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38277 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238212AbhBBSEt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 13:04:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612289003;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=mLPn7R460RnvC3cVkzpTkUrq1JeELO52BKdk3debVIg=;
-        b=POwiJ7SW4jjuLVWoR+c7itUbsA/B4tn4/WEhQ1VwhmmVh8VrYK1F65BWk7cVr7YPhEfldF
-        87dR0wujdk8idNTbu1Golwng/o3JlQni4DkPlA7ezzH3XYpIh+M7m10gfZ0a+kpSImwfNJ
-        EdNXkoCUal1bsNdVK6M4jpdD0gglags=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-dPb05ZMAOEmJJ5Bbxa9q2g-1; Tue, 02 Feb 2021 13:03:20 -0500
-X-MC-Unique: dPb05ZMAOEmJJ5Bbxa9q2g-1
-Received: by mail-ej1-f69.google.com with SMTP id ox17so10350309ejb.2
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 10:03:20 -0800 (PST)
+        id S238327AbhBBSTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 13:19:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48514 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238394AbhBBSSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 13:18:03 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90684C0613D6
+        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 10:17:23 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id q131so14877317pfq.10
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 10:17:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=idF1iI/0Aj6wyNwjBCbePkMdBUwU00zdgCO6uffYaO4=;
+        b=a5bo5poAdvk/+hy4E1MEtzCP2VsQFhJx4aO5sNGIaN1zZ7h9Y+6/uIZQwaVBATuj2r
+         MADoYFRSufk2F29yng4H3CKlbm3nyCfasWUYEOOC7gLtlIp0H/avboXk21UkBqdn6TIR
+         wq0cLyA/gzq4+i/S//xCYsxeBW1bpVe2+9j8s3ftT12l57B4HAmpq/2g1gvqYST8rtEw
+         zkwFgthSmYiVAXKjw3/PkwiyPa+CmvXYcaMb+kdyGLh9d8V6wAk1p5lqtws/WRM5v9Qa
+         Nw37HBym28ZOgyMfJxoaasRY/4Xv27aPQE+k1ki46T9Z+k2/kIVko7CX+7GbqcwkyQ1O
+         VmMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mLPn7R460RnvC3cVkzpTkUrq1JeELO52BKdk3debVIg=;
-        b=VjOwTEikOqi1d1kAqBrSBe4C6H6D9FbSjKDz2Z4gHbk/vussuvsrNtV6XFzRvM96lc
-         vmWFd78N+Wpn0OED+tiplsPx3Iwe1IFkgt3cgxAWjLILVx+ZV8mgP2mNbA1Lh5sGHCKa
-         ujrHaxQRgQuQlXDyA22YDuG44SqyORc/n0Umdy/z9+8Moi3e9IffW7Qjc9J9kcOf3WlB
-         lXFmG7L3iNw4FtP0g+OruPvQ/9Lq4v6cTMBol0rZ3ZfE6nAcA8SZkMiG7kSax58+hoQT
-         D4FLHJuqauVL5xxyD2clghWs7EtpyaGLphQoZaITQbE0SH8IDgI6c2zJYPq4JHQnSZN9
-         o6KA==
-X-Gm-Message-State: AOAM530bRmjT/Sxe+lUV91CS4L7D4KwwqRttygXtDsfOvGSh48ah7uZN
-        j5dHP1FGr4J+nGImftbmpwYafMtTsyMNzdn6xemuqjh4/YjQZ/zlM9t5W4Syox99cIMSpbfXDtW
-        KMkQub4LTd+1A
-X-Received: by 2002:a17:906:178d:: with SMTP id t13mr23170036eje.455.1612288999408;
-        Tue, 02 Feb 2021 10:03:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzADgOhy6qNZuRtdUs4hh0I8tuFK0SynhOmPwZtOUx5lL+jJiUlY5P4NVnCn9SVSxL6EgWhzg==
-X-Received: by 2002:a17:906:178d:: with SMTP id t13mr23170023eje.455.1612288999265;
-        Tue, 02 Feb 2021 10:03:19 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i6sm9567406ejd.110.2021.02.02.10.03.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Feb 2021 10:03:18 -0800 (PST)
-Subject: Re: [RFC PATCH v3 01/27] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, haitao.huang@intel.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1611634586.git.kai.huang@intel.com>
- <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
- <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
- <3a82563d5a25b52f0b5f01560d70c50a2323f7e5.camel@intel.com>
- <YBVdNl+pTBBm6igw@kernel.org>
- <20210201130151.4bfb5258885ca0f0905858c6@intel.com>
- <89755f15-a873-badc-b3d6-d4f0f817326e@redhat.com>
- <87a8a3f4-3775-21f1-cb67-107cca1a78e5@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <88e25510-a2e0-c4b8-4dcf-0afb78d5532c@redhat.com>
-Date:   Tue, 2 Feb 2021 19:03:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=idF1iI/0Aj6wyNwjBCbePkMdBUwU00zdgCO6uffYaO4=;
+        b=k+koCKLgzexXc1dMWCqcqBqrAvaMXV97o+tOm9K53uwhLQ2+mteBKcmf7zBTf+4xhe
+         k+bH6SB/LD4UCK8IKsa4dpiQf3o3za87GajR0NPIGy9WxjW6hVpNbJhmtjXXg6vhgeIw
+         XtwvEwtIX0JGWrOfGvQ0SDczYmxJJ7fsY50zz/OovdkK3nZ/AVwhhEKfyznKudUsM8aD
+         07tJzFZJKFyqsefVt14wFI+xP7rYJuiA0JM4taa3Fg4fvddzrc1UXUXvsT6gk40lX69F
+         ArtfQZ9MopEiUfhxVz/bS/IKLly7IzGLhEOwHV/n6slbBWN/Uhzt3WBloc7S/cDKlpGX
+         W63w==
+X-Gm-Message-State: AOAM5303/tQB8+FsiLLBThUilitjAe2ySkEupPmxZ85qxBIWE+mzkxry
+        lsVNOJtVTUywK+HJ+MDXkTh9vQ==
+X-Google-Smtp-Source: ABdhPJxtPn0HqiRfKB7bL+xLhoQuwpiERYdfJ/zhJK+lCWA9rL8WbHAJbZVYHye3ehl/3C1o2BR/eA==
+X-Received: by 2002:aa7:92c6:0:b029:1cb:1c6f:c605 with SMTP id k6-20020aa792c60000b02901cb1c6fc605mr17478278pfa.4.1612289842810;
+        Tue, 02 Feb 2021 10:17:22 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e1bc:da69:2e4b:ce97])
+        by smtp.gmail.com with ESMTPSA id e17sm3548821pjh.39.2021.02.02.10.17.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Feb 2021 10:17:22 -0800 (PST)
+Date:   Tue, 2 Feb 2021 10:17:16 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/3] KVM: x86: move kvm_inject_gp up from kvm_set_dr to
+ callers
+Message-ID: <YBmXLJPPTS7yzClF@google.com>
+References: <20210202165141.88275-1-pbonzini@redhat.com>
+ <20210202165141.88275-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87a8a3f4-3775-21f1-cb67-107cca1a78e5@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210202165141.88275-4-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/21 19:00, Dave Hansen wrote:
->> /* "" Basic SGX */
->> /* "" SGX Enclave Dynamic Memory Mgmt */
-> Do you actually want to suppress these from /proc/cpuinfo with the ""?
+On Tue, Feb 02, 2021, Paolo Bonzini wrote:
+> Push the injection of #GP up to the callers, so that they can just use
+> kvm_complete_insn_gp. __kvm_set_dr is pretty much what the callers can use
+> together with kvm_complete_insn_gp, so rename it to kvm_set_dr and drop
+> the old kvm_set_dr wrapper.
 > 
+> This allows nested VMX code, which really wanted to use __kvm_set_dr, to
+> use the right function.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm/svm.c | 14 +++++++-------
+>  arch/x86/kvm/vmx/vmx.c | 19 ++++++++++---------
+>  arch/x86/kvm/x86.c     | 19 +++++--------------
+>  3 files changed, 22 insertions(+), 30 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index c0d41a6920f0..818cf3babef2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2599,6 +2599,7 @@ static int dr_interception(struct vcpu_svm *svm)
+>  {
+>  	int reg, dr;
+>  	unsigned long val;
+> +	int err;
+>  
+>  	if (svm->vcpu.guest_debug == 0) {
+>  		/*
+> @@ -2617,19 +2618,18 @@ static int dr_interception(struct vcpu_svm *svm)
+>  	reg = svm->vmcb->control.exit_info_1 & SVM_EXITINFO_REG_MASK;
+>  	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
+>  
+> +	if (!kvm_require_dr(&svm->vcpu, dr & 15))
 
-sgx1 yes.  However sgx2 can be useful to have there, I guess.
+Purely because I suck at reading base-10 bitwise operations, can we do "dr & 0xf"?
+This also creates separate logic for writes (AND versus SUB), can you also
+convert the other 'dr - 16'?
 
-Paolo
+Alternatively, grab the "mov to DR" flag early on, but that feels less
+readable, e.g.
 
+	mov_to_dr = dr & 0x10;
+	dr &= 0xf;
+
+> +		return 1;
+> +
+>  	if (dr >= 16) { /* mov to DRn */
+> -		if (!kvm_require_dr(&svm->vcpu, dr - 16))
+> -			return 1;
+>  		val = kvm_register_read(&svm->vcpu, reg);
+> -		kvm_set_dr(&svm->vcpu, dr - 16, val);
+> +		err = kvm_set_dr(&svm->vcpu, dr - 16, val);
+>  	} else {
+> -		if (!kvm_require_dr(&svm->vcpu, dr))
+> -			return 1;
+> -		kvm_get_dr(&svm->vcpu, dr, &val);
+> +		err = kvm_get_dr(&svm->vcpu, dr, &val);
+
+Technically, 'err' needs to be checked, else 'reg' will theoretically be
+clobbered with garbage.  I say "theoretically", because kvm_get_dr() always
+returns '0'; the CR4.DE=1 behavior is handled by kvm_require_dr(), presumably
+due to it being a #UD instead of #GP.  AFAICT, you can simply add a prep patch
+to change the return type to void.
+
+Side topic, is the kvm_require_dr() check needed on SVM interception?  The APM
+states:
+
+  All normal exception checks take precedence over the by implicit DR6/DR7 writes.)
+
+I can't find anything that would suggest the CR4.DE=1 #UD isn't a "normal"
+exception.
+
+>  		kvm_register_write(&svm->vcpu, reg, val);
+>  	}
+>  
+> -	return kvm_skip_emulated_instruction(&svm->vcpu);
+> +	return kvm_complete_insn_gp(&svm->vcpu, err);
+>  }
+>  
+>  static int cr8_write_interception(struct vcpu_svm *svm)
