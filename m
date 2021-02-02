@@ -2,185 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3491330C808
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:40:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 837AD30C819
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:44:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237077AbhBBRi6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:38:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40308 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237648AbhBBRgu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:36:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612287323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O4oTsdRd/8zp7Nz1DPVOiX2FHvUnLLUX8No6k0DaE4g=;
-        b=KR53mCPo4C2qVRjUMhVuqqPkAyo5CuLzUxyD3SXtAU8kWtb2TSy8DHr7MLlXqF79LTyWc7
-        B3bUlGBromdWDt6Ivqra+3CTIoXNumdo5O9OdpAlkuNeEvsHRCx7vTao9Ufh62PRzQnBy2
-        vtnk2Hslj4Kzjv3oLwpjZXXWZmstMPI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-120-F-7Hn6pjP9ejWcbt5wZ6eg-1; Tue, 02 Feb 2021 12:35:19 -0500
-X-MC-Unique: F-7Hn6pjP9ejWcbt5wZ6eg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88C2D192AB78;
-        Tue,  2 Feb 2021 17:35:18 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-112.ams2.redhat.com [10.36.112.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A2BB6544E8;
-        Tue,  2 Feb 2021 17:35:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v1 4/5] s390x: css: SCHM tests format 0
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com
-References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
- <1611930869-25745-5-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <b3086f69-98fa-07c0-72c7-711c17e71c9d@redhat.com>
-Date:   Tue, 2 Feb 2021 18:35:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S237674AbhBBRlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:41:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40086 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237696AbhBBRjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 12:39:14 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA42EC0613D6
+        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 09:38:33 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id g15so15344321pgu.9
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 09:38:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=pVSquQSJrpYri28cE6XyoyehQWlIu8NKqtes58NqYnw=;
+        b=iPjbSd3lMUVp+LL3SbLTaxLFPpifaaJDTb//4xQdc/L3ioPjSukPHVzjXBAe+udK0G
+         hVFCtFYJyIgmEZLl4DjM92zZxYk5lLtod1CPtuoE8YL9NulxrHBpdrnoU0Ht3fPC5HIx
+         F3o9wBimLyh+QvrM7zmD1Sc3us7fEjU16+ff0DX/VoKZ67zd4CF1+I9Jrh6yYJ9t0Y/w
+         2savrwGja6E2cxd7zyhENRS6JJJ1GaopyvVV7gLCC+iM7YsR8WZcXlay7rbB2xGfDMba
+         9Gw7TCEquEeYaNplRBBabw3aAswWwnqkeQ1tX8MM5It4QCVECGMDoU5v6S6QWxlmWfZX
+         7VIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=pVSquQSJrpYri28cE6XyoyehQWlIu8NKqtes58NqYnw=;
+        b=OvwFuOw7uzihb/XSIuva9jEHTAS0SfIYiS1im1NSFDhAM5LaUTIx6E2SwuEfxsQwHo
+         5QeIorvt75cbbId7PaxRmmVw+SERsJZAiQlgaDUGMQuOFzGkW90c9hwIGH7q7zL1jKlq
+         +NufpWH8rOHjomGN7AVl0xXOdvXpe7u6OBc0dimcMEJa7ar232bflMDaUlQerRqhDf9Q
+         lAVvpSbhYohuZKwKqOe7NJmpS1hD8Wm5LTjOiZPWiNAbV/lKLwV83f76fXaruP3Qz08Z
+         HsMIVJLBtB+1i3hjonMAlvcjLyp8AiC+g4hzrFpYXkcB3PUPP5lFHj39qiTS5La5rJwG
+         41sA==
+X-Gm-Message-State: AOAM533UTpA+5brI8h24SD7U1yiklLtDxEQN5MNVD8e6CbA4lOvs5SDY
+        NaHNYSi71Ze//V/U6kTuI5FZiA==
+X-Google-Smtp-Source: ABdhPJyscSr9KAYJt2pwrGFtbF+cqkEDEm4VWe11h1YjFChuKOikDuV0f84w6vLAkYydzOIFhBWIIQ==
+X-Received: by 2002:a62:ac06:0:b029:1cb:35bc:5e2c with SMTP id v6-20020a62ac060000b02901cb35bc5e2cmr16876009pfe.42.1612287513189;
+        Tue, 02 Feb 2021 09:38:33 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e1bc:da69:2e4b:ce97])
+        by smtp.gmail.com with ESMTPSA id i1sm23910312pfb.54.2021.02.02.09.38.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Feb 2021 09:38:32 -0800 (PST)
+Date:   Tue, 2 Feb 2021 09:38:26 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: x86: move kvm_inject_gp up from
+ kvm_handle_invpcid to callers
+Message-ID: <YBmOEt6YezYWtTjQ@google.com>
+References: <20210202165141.88275-1-pbonzini@redhat.com>
+ <20210202165141.88275-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1611930869-25745-5-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210202165141.88275-3-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/01/2021 15.34, Pierre Morel wrote:
-> We tests the update of the mesurement block format 0, the
-> mesurement block origin is calculated from the mbo argument
-> used by the SCHM instruction and the offset calculated using
-> the measurement block index of the SCHIB.
+On Tue, Feb 02, 2021, Paolo Bonzini wrote:
+> Push the injection of #GP up to the callers, so that they can just use
+> kvm_complete_insn_gp.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   lib/s390x/css.h | 29 ++++++++++++++++++++++++++++
->   s390x/css.c     | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 80 insertions(+)
-> 
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 938f0ab..ba0bc67 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-> @@ -358,7 +358,36 @@ static inline void schm(void *mbo, unsigned int flags)
->   	asm("schm" : : "d" (__gpr2), "d" (__gpr1));
->   }
->   
-> +#define SCHM_DCTM	1 /* activate Device Connection TiMe */
-> +#define SCHM_MBU	2 /* activate Measurement Block Update */
-> +
->   int css_enable_mb(int schid, uint64_t mb, int format1, uint16_t mbi,
->   		  uint16_t flags);
->   
-> +struct measurement_block_format0 {
-> +	uint16_t ssch_rsch_count;
-> +	uint16_t sample_count;
-> +	uint32_t device_connect_time;
-> +	uint32_t function_pending_time;
-> +	uint32_t device_disconnect_time;
-> +	uint32_t cu_queuing_time;
-> +	uint32_t device_active_only_time;
-> +	uint32_t device_busy_time;
-> +	uint32_t initial_cmd_resp_time;
-> +};
-> +
-> +struct measurement_block_format1 {
-> +	uint32_t ssch_rsch_count;
-> +	uint32_t sample_count;
-> +	uint32_t device_connect_time;
-> +	uint32_t function_pending_time;
-> +	uint32_t device_disconnect_time;
-> +	uint32_t cu_queuing_time;
-> +	uint32_t device_active_only_time;
-> +	uint32_t device_busy_time;
-> +	uint32_t initial_cmd_resp_time;
-> +	uint32_t irq_delay_time;
-> +	uint32_t irq_prio_delay_time;
-> +};
-> +
->   #endif
-> diff --git a/s390x/css.c b/s390x/css.c
-> index 000ce04..2e9ea47 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -155,10 +155,61 @@ static void css_init(void)
->   	report(1, "CSS initialized");
->   }
->   
-> +#define SCHM_UPDATE_CNT 10
-> +static void test_schm_fmt0(struct measurement_block_format0 *mb0)
-> +{
-> +	int ret;
-> +	int i;
-> +
-> +	report_prefix_push("Format 0");
-> +	ret = css_enable_mb(test_device_sid, 0, 0, 0, PMCW_MBUE);
-> +	if (ret) {
-> +		report(0, "Enabling measurement_block_format0");
-> +		goto end;
-> +	}
-> +
-> +	for (i = 0; i < SCHM_UPDATE_CNT; i++) {
-> +		if (!do_test_sense()) {
-> +			report(0, "Error during sense");
-> +			break;
-> +		}
-> +	}
-> +
-> +	report_info("ssch_rsch_count: %d", mb0->ssch_rsch_count);
-> +	report_info("sample_count: %d", mb0->sample_count);
-> +	report_info("device_connect_time: %d", mb0->device_connect_time);
-> +	report_info("function_pending_time: %d", mb0->function_pending_time);
-> +	report_info("device_disconnect_time: %d", mb0->device_disconnect_time);
-> +	report_info("cu_queuing_time: %d", mb0->cu_queuing_time);
-> +	report_info("device_active_only_time: %d", mb0->device_active_only_time);
-> +	report_info("device_busy_time: %d", mb0->device_busy_time);
-> +	report_info("initial_cmd_resp_time: %d", mb0->initial_cmd_resp_time);
-> +
-> +	report(i == mb0->ssch_rsch_count,
-> +	       "SSCH expected %d measured %d", i, mb0->ssch_rsch_count);
-> +
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
->   static void test_schm(void)
->   {
-> +	struct measurement_block_format0 *mb0;
-> +
->   	if (css_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK))
->   		report_info("Extended measurement block available");
-> +
-> +	mb0 = alloc_io_mem(sizeof(struct measurement_block_format0), 0);
-> +	if (!mb0) {
-> +		report(0, "measurement_block_format0 allocation");
-> +		goto end_free;
 
-If allocation failed, there is certainly no need to try to free it, so you 
-can get rid of the goto and the label here and return directly instead. Or 
-maybe
-Maybe also simply use report_abort() in this case?
+...
 
-  Thomas
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 08568c47337c..edbeb162012b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11375,7 +11375,6 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+>  		return kvm_handle_memory_failure(vcpu, r, &e);
 
+This is broken.  kvm_handle_memory_failure() injects a #PF and returns 1, which
+means an error here will trigger #PF->#GP->#DF.
 
-> +	}
-> +
-> +	schm(mb0, SCHM_MBU);
-> +	test_schm_fmt0(mb0);
-> +
-> +end_free:
-> +	free_io_mem(mb0, sizeof(struct measurement_block_format0));
->   }
->   
->   static struct {
-> 
+>  
+>  	if (operand.pcid >> 12 != 0) {
+> -		kvm_inject_gp(vcpu, 0);
+>  		return 1;
+>  	}
+
+Curly braces can be dropped.
+
+> @@ -11385,15 +11384,13 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+>  	case INVPCID_TYPE_INDIV_ADDR:
+>  		if ((!pcid_enabled && (operand.pcid != 0)) ||
+>  		    is_noncanonical_address(operand.gla, vcpu)) {
+> -			kvm_inject_gp(vcpu, 0);
+>  			return 1;
+>  		}
+>  		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+> -		return kvm_skip_emulated_instruction(vcpu);
+> +		return 0;
+>  
+>  	case INVPCID_TYPE_SINGLE_CTXT:
+>  		if (!pcid_enabled && (operand.pcid != 0)) {
+> -			kvm_inject_gp(vcpu, 0);
+>  			return 1;
+>  		}
+
+Same here.
+
+>  
+> @@ -11414,7 +11411,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+>  		 * resync will happen anyway before switching to any other CR3.
+>  		 */
+>  
+> -		return kvm_skip_emulated_instruction(vcpu);
+> +		return 0;
+>  
+>  	case INVPCID_TYPE_ALL_NON_GLOBAL:
+>  		/*
+> @@ -11427,7 +11424,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+>  		fallthrough;
+>  	case INVPCID_TYPE_ALL_INCL_GLOBAL:
+>  		kvm_mmu_unload(vcpu);
+> -		return kvm_skip_emulated_instruction(vcpu);
+> +		return 0;
+>  
+>  	default:
+>  		BUG(); /* We have already checked above that type <= 3 */
+> -- 
+> 2.26.2
+
+IMO, this isn't an improvement.  For flows that can't easily be consolidated to
+x86.c, e.g. CRs (and DRs?), I agree it makes sense to use kvm_complete_insn_gp(),
+but this feels forced.
+
+What about a pure refactoring of kvm_handle_invpcid() to get a similar effect?
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ef630f8d8bd2..b9f57f9f2422 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11363,28 +11363,23 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+        if (r != X86EMUL_CONTINUE)
+                return kvm_handle_memory_failure(vcpu, r, &e);
+ 
+-       if (operand.pcid >> 12 != 0) {
+-               kvm_inject_gp(vcpu, 0);
+-               return 1;
+-       }
++       if (operand.pcid >> 12 != 0)
++               goto inject_gp;
+ 
+        pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+ 
+        switch (type) {
+        case INVPCID_TYPE_INDIV_ADDR:
+                if ((!pcid_enabled && (operand.pcid != 0)) ||
+-                   is_noncanonical_address(operand.gla, vcpu)) {
+-                       kvm_inject_gp(vcpu, 0);
+-                       return 1;
+-               }
++                   is_noncanonical_address(operand.gla, vcpu))
++                       goto inject_gp;
++
+                kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
+-               return kvm_skip_emulated_instruction(vcpu);
++               break;
+ 
+        case INVPCID_TYPE_SINGLE_CTXT:
+-               if (!pcid_enabled && (operand.pcid != 0)) {
+-                       kvm_inject_gp(vcpu, 0);
+-                       return 1;
+-               }
++               if (!pcid_enabled && (operand.pcid != 0))
++                       goto inject_gp;
+ 
+                if (kvm_get_active_pcid(vcpu) == operand.pcid) {
+                        kvm_mmu_sync_roots(vcpu);
+@@ -11402,8 +11397,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+                 * given PCID, then nothing needs to be done here because a
+                 * resync will happen anyway before switching to any other CR3.
+                 */
+-
+-               return kvm_skip_emulated_instruction(vcpu);
++               break;
+ 
+        case INVPCID_TYPE_ALL_NON_GLOBAL:
+                /*
+@@ -11416,11 +11410,17 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
+                fallthrough;
+        case INVPCID_TYPE_ALL_INCL_GLOBAL:
+                kvm_mmu_unload(vcpu);
+-               return kvm_skip_emulated_instruction(vcpu);
++               break;
+ 
+        default:
+                BUG(); /* We have already checked above that type <= 3 */
+        }
++
++       return kvm_skip_emulated_instruction(vcpu);
++
++inject_gp:
++       kvm_inject_gp(vcpu, 0);
++       return 1;
+ }
+ EXPORT_SYMBOL_GPL(kvm_handle_invpcid);
+ 
 
