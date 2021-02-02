@@ -2,109 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1595E30C764
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:21:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A0830C787
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:25:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236109AbhBBRUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:20:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43442 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237428AbhBBRSn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 12:18:43 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 294A364ECE;
-        Tue,  2 Feb 2021 17:18:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612286283;
-        bh=ztqEUDdfJBfqYT57dN3W7l+zECPHVQXnH/jA6zkc4p0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cylXdh1Eu27aP2lkBXxgtPD3DlueNwoqbrqdB127wJT5y4a7j0EtUu/d6xFZrnCLu
-         gBdu/hZP+n4XQ8W2nJBRIZjro6dD8K4IBDKXcmPAUUD5dc/3v7WmctCRtsQLPTS1qc
-         KhBJu2dpq/OafhsmHbsixvTHYZqiORGuVh3fsEdjSD23Hw/s4eR2viF426jK5vtIz3
-         /Mi/AZRILkP2yyZT8nfHx0Cc++2uC6u8V4EuGCKLgfb0FQrOxQUAa7ZQWHB8/5z0zy
-         hvt/6p1ES0ONpY82WdkKotNrHRqCB2ayI6PXRmtmmO/MpV2jlT1ByQN67qCcoHT5CJ
-         DjfCSvqK/EpsQ==
-Date:   Tue, 2 Feb 2021 19:17:56 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v3 01/27] x86/cpufeatures: Add SGX1 and SGX2
- sub-features
-Message-ID: <YBmJRKRcg8gvxW1O@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <aefe8025b615f75eae3ff891f08191bf730b3c99.1611634586.git.kai.huang@intel.com>
- <ca0fa265-0886-2a37-e686-882346fe2a6f@intel.com>
- <3a82563d5a25b52f0b5f01560d70c50a2323f7e5.camel@intel.com>
- <YBVdNl+pTBBm6igw@kernel.org>
- <20210201130151.4bfb5258885ca0f0905858c6@intel.com>
+        id S237478AbhBBRWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237043AbhBBRUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 12:20:15 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7721AC0613ED
+        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 09:19:36 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id j12so14766403pfj.12
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 09:19:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VKy3eoqvCg/krr4iDU1R6HhW8EG/lr08wpIZgNms4lo=;
+        b=QjyWXaYE/ktH8k+M1PZXVFkDQGY654WnrlMbX2RT6lGlP7xYHOnJwdKIxE08g9do/Z
+         H9g/8s+/EXU/d+1pUIuup3xX+Yn6dfNEWhewWhfpQH56PvI5yrzP3z/oaggj9FD+TGXb
+         nhKSpQPrF5Gw5ZguRWglXnUrlMN3PK4RtAFifsUTfYdSl0Mu/Rtn50e5lI4b2QqWZmlQ
+         Wi+l3jQ+Iul4iHadIbo5TPfvJyOerkVZtM+BXlt4F3mC09w2PyTdWRVyMQzGiZq0PyVq
+         EeHTG4ipW47unwVSj3tEBAb16IYePzoGjhvszigAlmUFNYzMH3s6erDyOTRdQ+bVQfi+
+         b0JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VKy3eoqvCg/krr4iDU1R6HhW8EG/lr08wpIZgNms4lo=;
+        b=JNYPqRTLZwM476TP+qAWoIctba4UJ4/zCRueVFYN0ezgCTVSnOX0spNELiNCCryG4A
+         R2JC30LnDROjttpfWC7kT1WHFz+paQ7PJSmd9+F+HU0RoqkXqyT0qTt1baW7xMDw75WY
+         TlJxxks3AjoUL6qQ/Cj/7k79Xwi48dF0+prLTe1tcCB0Wk0aa8MYlu2ua2D7Jtz3LxsK
+         F+fIXnfEYx+FMg5/o6QtJRyhXHPqI/5ncRSNF7V5qk5uW3lZ1t9mJX4xR+LwO9Iiycru
+         MIs2EJtO+mxkArZQFP16jOsDFU1wOmS2mynfdUcvHex3qk9sgWlHjikh+jl69q5ASYST
+         dFqw==
+X-Gm-Message-State: AOAM533SMgObiFs6WhNbrmLJAhCZdA2l6LwV0+jTF5pZ4vWsqkgT/oZJ
+        NC5lZjeWdFeeNKjzzzSt2ulQYw==
+X-Google-Smtp-Source: ABdhPJyjEX2iatqs8Rpw3jRdeScsst9JctoPDeA6s/aCDfxBT52cKZsjTQOFXZkdskyhxwcfmxfAkg==
+X-Received: by 2002:a63:1c12:: with SMTP id c18mr23063900pgc.356.1612286375831;
+        Tue, 02 Feb 2021 09:19:35 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e1bc:da69:2e4b:ce97])
+        by smtp.gmail.com with ESMTPSA id l4sm3315225pju.26.2021.02.02.09.19.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Feb 2021 09:19:35 -0800 (PST)
+Date:   Tue, 2 Feb 2021 09:19:29 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: x86: move kvm_inject_gp up from kvm_set_xcr to
+ callers
+Message-ID: <YBmJoehBMbgvuuyW@google.com>
+References: <20210202165141.88275-1-pbonzini@redhat.com>
+ <20210202165141.88275-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210201130151.4bfb5258885ca0f0905858c6@intel.com>
+In-Reply-To: <20210202165141.88275-2-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 01:01:51PM +1300, Kai Huang wrote:
-> On Sat, 30 Jan 2021 15:20:54 +0200 Jarkko Sakkinen wrote:
-> > On Wed, Jan 27, 2021 at 12:18:32PM +1300, Kai Huang wrote:
-> > > On Tue, 2021-01-26 at 07:34 -0800, Dave Hansen wrote:
-> > > > On 1/26/21 1:30 AM, Kai Huang wrote:
-> > > > > From: Sean Christopherson <seanjc@google.com>
-> > > > > 
-> > > > > Add SGX1 and SGX2 feature flags, via CPUID.0x12.0x0.EAX, as scattered
-> > > > > features, since adding a new leaf for only two bits would be wasteful.
-> > > > > As part of virtualizing SGX, KVM will expose the SGX CPUID leafs to its
-> > > > > guest, and to do so correctly needs to query hardware and kernel support
-> > > > > for SGX1 and SGX2.
-> > > > 
-> > > > It's also not _just_ exposing the CPUID leaves.  There are some checks
-> > > > here when KVM is emulating some SGX instructions too, right?
-> > > 
-> > > I would say trapping instead of emulating, but yes KVM will do more. However those
-> > > are quite details, and I don't think we should put lots of details here. Or perhaps
-> > > we can use 'for instance' as brief description:
-> > > 
-> > > As part of virtualizing SGX, KVM will need to use the two flags, for instance, to
-> > > expose them to guest.
-> > > 
-> > > ?
-> > > 
-> > > > 
-> > > > > diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> > > > > index 84b887825f12..18b2d0c8bbbe 100644
-> > > > > --- a/arch/x86/include/asm/cpufeatures.h
-> > > > > +++ b/arch/x86/include/asm/cpufeatures.h
-> > > > > @@ -292,6 +292,8 @@
-> > > > >  #define X86_FEATURE_FENCE_SWAPGS_KERNEL	(11*32+ 5) /* "" LFENCE in kernel entry SWAPGS path */
-> > > > >  #define X86_FEATURE_SPLIT_LOCK_DETECT	(11*32+ 6) /* #AC for split lock */
-> > > > >  #define X86_FEATURE_PER_THREAD_MBA	(11*32+ 7) /* "" Per-thread Memory Bandwidth Allocation */
-> > > > > +#define X86_FEATURE_SGX1		(11*32+ 8) /* Software Guard Extensions sub-feature SGX1 */
-> > > > > +#define X86_FEATURE_SGX2        	(11*32+ 9) /* Software Guard Extensions sub-feature SGX2 */
-> > > > 
-> > > > FWIW, I'm not sure how valuable it is to spell the SGX acronym out three
-> > > > times.  Can't we use those bytes to put something more useful in that
-> > > > comment?
-> > > 
-> > > I think we can remove comment for SGX1, since it is basically SGX.
-> > > 
-> > > For SGX2, how about below?
-> > > 
-> > > /* SGX Enclave Dynamic Memory Management */
-> > 
-> > (EDMM)
-> 
-> Does EDMM obvious to everyone, instead of explicitly saying Enclave Dynamic
-> Memory Management?
-> 
-> Also do you think we need a comment for SGX1 bit? I can add /* Basic SGX */,
-> but I am not sure whether it is required.
+On Tue, Feb 02, 2021, Paolo Bonzini wrote:
+> Push the injection of #GP up to the callers, so that they can just use
+> kvm_complete_insn_gp.
 
-I would put write the whole thing down and put EDMM to parentheses.
+The SVM and VMX code is identical, IMO we should push all the code to x86.c
+instead of shuffling it around.
 
-For SGX1 I would put "Basic SGX features for enclave construction".
+I'd also like to change svm_exit_handlers to take @vcpu instead of @svm so that
+SVM can invoke common handlers directly.
 
-/Jarkko
+If you agree, I'll send a proper series to do the above, plus whatever other
+cleanups I find, e.g. INVD, WBINVD, etc...
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index fa7b2df6422b..bf917efde35c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1530,7 +1530,7 @@ int kvm_get_dr(struct kvm_vcpu *vcpu, int dr, unsigned long *val);
+ unsigned long kvm_get_cr8(struct kvm_vcpu *vcpu);
+ void kvm_lmsw(struct kvm_vcpu *vcpu, unsigned long msw);
+ void kvm_get_cs_db_l_bits(struct kvm_vcpu *vcpu, int *db, int *l);
+-int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr);
++int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu);
+
+ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr);
+ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 687876211ebe..842a74d88f1b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2334,14 +2334,7 @@ static int wbinvd_interception(struct vcpu_svm *svm)
+
+ static int xsetbv_interception(struct vcpu_svm *svm)
+ {
+-       u64 new_bv = kvm_read_edx_eax(&svm->vcpu);
+-       u32 index = kvm_rcx_read(&svm->vcpu);
+-
+-       if (kvm_set_xcr(&svm->vcpu, index, new_bv) == 0) {
+-               return kvm_skip_emulated_instruction(&svm->vcpu);
+-       }
+-
+-       return 1;
++       return kvm_emulate_xsetbv(&svm->vcpu);
+ }
+
+ static int rdpru_interception(struct vcpu_svm *svm)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cf0c397dc3eb..474a169835de 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5218,16 +5218,6 @@ static int handle_wbinvd(struct kvm_vcpu *vcpu)
+        return kvm_emulate_wbinvd(vcpu);
+ }
+
+-static int handle_xsetbv(struct kvm_vcpu *vcpu)
+-{
+-       u64 new_bv = kvm_read_edx_eax(vcpu);
+-       u32 index = kvm_rcx_read(vcpu);
+-
+-       if (kvm_set_xcr(vcpu, index, new_bv) == 0)
+-               return kvm_skip_emulated_instruction(vcpu);
+-       return 1;
+-}
+-
+ static int handle_apic_access(struct kvm_vcpu *vcpu)
+ {
+        if (likely(fasteoi)) {
+@@ -5689,7 +5679,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+        [EXIT_REASON_APIC_WRITE]              = handle_apic_write,
+        [EXIT_REASON_EOI_INDUCED]             = handle_apic_eoi_induced,
+        [EXIT_REASON_WBINVD]                  = handle_wbinvd,
+-       [EXIT_REASON_XSETBV]                  = handle_xsetbv,
++       [EXIT_REASON_XSETBV]                  = kvm_emulate_xsetbv,
+        [EXIT_REASON_TASK_SWITCH]             = handle_task_switch,
+        [EXIT_REASON_MCE_DURING_VMENTRY]      = handle_machine_check,
+        [EXIT_REASON_GDTR_IDTR]               = handle_desc,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 14fb8a138ec3..ef630f8d8bd2 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -984,16 +984,17 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
+        return 0;
+ }
+
+-int kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
++int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu)
+ {
+        if (static_call(kvm_x86_get_cpl)(vcpu) != 0 ||
+-           __kvm_set_xcr(vcpu, index, xcr)) {
++           __kvm_set_xcr(vcpu, kvm_rcx_read(vcpu), kvm_read_edx_eax(vcpu))) {
+                kvm_inject_gp(vcpu, 0);
+                return 1;
+        }
+-       return 0;
++
++       return kvm_skip_emulated_instruction(vcpu);
+ }
+-EXPORT_SYMBOL_GPL(kvm_set_xcr);
++EXPORT_SYMBOL_GPL(kvm_emulate_xsetbv);
+
+ bool kvm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ {
+
+
