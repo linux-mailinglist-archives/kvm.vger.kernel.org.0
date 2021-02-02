@@ -2,154 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F188230C521
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 17:15:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F38930C546
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 17:19:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235908AbhBBQNJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 11:13:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29475 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235959AbhBBQLr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 11:11:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612282220;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=sYZzkVHR2ls3xvESHEyOkdDA3MfonApqwRfCSseBrz8=;
-        b=TEIG5nGSvINMLGX9FsAbfccw2isTBm7Hhji9uAxq6ExChBCRrNzg5/b1X+Bh7hvGGZjCwh
-        4oM7XymLhG0ElJreeKM9hjg+vhG6m0qIupiatm7VwRs9lt8WIuXYIiSeyyXYEPMfMb9F8j
-        92Euuv3LvDVUy9Nzwm4xvw60em3xHVE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-Zc6Hv7T2NGaAwYtEqRBMcA-1; Tue, 02 Feb 2021 11:10:16 -0500
-X-MC-Unique: Zc6Hv7T2NGaAwYtEqRBMcA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9DF581621;
-        Tue,  2 Feb 2021 16:10:15 +0000 (UTC)
-Received: from virtlab511.virt.lab.eng.bos.redhat.com (virtlab511.virt.lab.eng.bos.redhat.com [10.19.152.198])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F4B25C22B;
-        Tue,  2 Feb 2021 16:10:15 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jbaron@akamai.com
-Subject: [PATCH] KVM: move EXIT_FASTPATH_REENTER_GUEST to common code
-Date:   Tue,  2 Feb 2021 11:10:14 -0500
-Message-Id: <20210202161014.67093-1-pbonzini@redhat.com>
+        id S232633AbhBBQSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 11:18:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59248 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236137AbhBBQQL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 11:16:11 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 112GDOtl137758;
+        Tue, 2 Feb 2021 11:15:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Yto4Q4S51dPnvwNvL9+elMmy/TSPqDq0etEpfyp42IE=;
+ b=pElyvGYWhcKwN6QnBtuwzQgpZBU6bPpEJ6HOBD4943o6TTmrU0t586A3XHGWpHwnNSZz
+ xObpMpUF1lWk59+xmmOXemXk8AzDP82tFQfUSskvkMLXhQO0RWBSsVkYQM1xvhdMaJa8
+ mwB8Vh8jajIo1Ms/9lHRicBbDkQQcmy3FsDPUgDwqClS7hm5o19upKeZOa81ICCcgsZb
+ CIQ/AOHRrRfYNLIvNWRm5jrYl52ofEnkKspVb946H4SxyRpssVFgaVeuMtlXiwxI0/AR
+ LflQp+2EautK8zW5w5MgrBiR4T0Oo5aA4qrtWu6oViiGhDsHmlrc5f+gPQXbETbcddmi yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36fa2m02ex-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Feb 2021 11:15:28 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 112GE3pV139587;
+        Tue, 2 Feb 2021 11:15:28 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36fa2m02ds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Feb 2021 11:15:28 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 112Fah3q004976;
+        Tue, 2 Feb 2021 16:15:26 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 36cy38k1tt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Feb 2021 16:15:26 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 112GFNI225493778
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Feb 2021 16:15:23 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C7CDA4054;
+        Tue,  2 Feb 2021 16:15:23 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08C84A4066;
+        Tue,  2 Feb 2021 16:15:23 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.19.13])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Feb 2021 16:15:22 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 3/5] s390x: css: implementing Set
+ CHannel Monitor
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
+ <1611930869-25745-4-git-send-email-pmorel@linux.ibm.com>
+ <20210202124818.6084bb36.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <e28ee611-faad-bb2d-ede2-3efcb7b56c53@linux.ibm.com>
+Date:   Tue, 2 Feb 2021 17:15:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20210202124818.6084bb36.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-02_07:2021-02-02,2021-02-02 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ malwarescore=0 impostorscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102020106
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that KVM is using static calls, calling vmx_vcpu_run and
-vmx_sync_pir_to_irr does not incur anymore the cost of a
-retpoline.
 
-Therefore there is no need anymore to handle EXIT_FASTPATH_REENTER_GUEST
-in vendor code.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/vmx.c | 19 +------------------
- arch/x86/kvm/x86.c     | 17 ++++++++++++++---
- arch/x86/kvm/x86.h     |  1 -
- 3 files changed, 15 insertions(+), 22 deletions(-)
+On 2/2/21 12:48 PM, Cornelia Huck wrote:
+> On Fri, 29 Jan 2021 15:34:27 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> We implement the call of the Set CHannel Monitor instruction,
+>> starting the monitoring of the all Channel Sub System, and
+> 
+> "initializing channel subsystem monitoring" ?
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cf0c397dc3eb..2e304ba06d16 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6711,11 +6711,9 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
- 
- static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- {
--	fastpath_t exit_fastpath;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	unsigned long cr3, cr4;
- 
--reenter_guest:
- 	/* Record the guest's net vcpu time for enforced NMI injections. */
- 	if (unlikely(!enable_vnmi &&
- 		     vmx->loaded_vmcs->soft_vnmi_blocked))
-@@ -6865,22 +6863,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (is_guest_mode(vcpu))
- 		return EXIT_FASTPATH_NONE;
- 
--	exit_fastpath = vmx_exit_handlers_fastpath(vcpu);
--	if (exit_fastpath == EXIT_FASTPATH_REENTER_GUEST) {
--		if (!kvm_vcpu_exit_request(vcpu)) {
--			/*
--			 * FIXME: this goto should be a loop in vcpu_enter_guest,
--			 * but it would incur the cost of a retpoline for now.
--			 * Revisit once static calls are available.
--			 */
--			if (vcpu->arch.apicv_active)
--				vmx_sync_pir_to_irr(vcpu);
--			goto reenter_guest;
--		}
--		exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
--	}
--
--	return exit_fastpath;
-+	return vmx_exit_handlers_fastpath(vcpu);
- }
- 
- static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 14fb8a138ec3..b5f2d290ef3c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1796,12 +1796,11 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_emulate_wrmsr);
- 
--bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
-+static inline bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
- {
- 	return vcpu->mode == EXITING_GUEST_MODE || kvm_request_pending(vcpu) ||
- 		xfer_to_guest_mode_work_pending();
- }
--EXPORT_SYMBOL_GPL(kvm_vcpu_exit_request);
- 
- /*
-  * The fast path for frequent and performance sensitive wrmsr emulation,
-@@ -9044,7 +9043,19 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		vcpu->arch.switch_db_regs &= ~KVM_DEBUGREG_RELOAD;
- 	}
- 
--	exit_fastpath = static_call(kvm_x86_run)(vcpu);
-+	for (;;) {
-+		exit_fastpath = static_call(kvm_x86_run)(vcpu);
-+		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
-+			break;
-+
-+                if (unlikely(kvm_vcpu_exit_request(vcpu))) {
-+			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
-+			break;
-+		}
-+
-+		if (vcpu->arch.apicv_active)
-+			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-+        }
- 
- 	/*
- 	 * Do this here before restoring debug registers on the host.  And
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 5f7c224f4bf2..cc652a348acc 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -395,7 +395,6 @@ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
- void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
- int kvm_spec_ctrl_test_value(u64 value);
- bool kvm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
--bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu);
- int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
- 			      struct x86_exception *e);
- int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva);
+Yes, better I take this.
+
+> 
+>> the initialization of the monitoring on a Sub Channel.
+> 
+> "enabling monitoring for a subchannel" ?
+> 
+>>
+>> An initial test reports the presence of the extended measurement
+>> block feature.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   lib/s390x/css.h     | 17 +++++++++-
+>>   lib/s390x/css_lib.c | 77 +++++++++++++++++++++++++++++++++++++++++++++
+>>   s390x/css.c         |  7 +++++
+>>   3 files changed, 100 insertions(+), 1 deletion(-)
+>>
+> 
+> (...)
+> 
+>> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+>> index f300969..9e0f568 100644
+>> --- a/lib/s390x/css_lib.c
+>> +++ b/lib/s390x/css_lib.c
+>> @@ -205,6 +205,83 @@ retry:
+>>   	return -1;
+>>   }
+>>   
+>> +/*
+>> + * css_enable_mb: enable the subchannel Mesurement Block
+>> + * @schid: Subchannel Identifier
+>> + * @mb   : 64bit address of the measurement block
+>> + * @format1: set if format 1 is to be used
+>> + * @mbi : the measurement block offset
+>> + * @flags : PMCW_MBUE to enable measurement block update
+>> + *	    PMCW_DCTME to enable device connect time
+>> + * Return value:
+>> + *   On success: 0
+>> + *   On error the CC of the faulty instruction
+>> + *      or -1 if the retry count is exceeded.
+>> + */
+>> +int css_enable_mb(int schid, uint64_t mb, int format1, uint16_t mbi,
+>> +		  uint16_t flags)
+>> +{
+>> +	struct pmcw *pmcw = &schib.pmcw;
+>> +	int retry_count = 0;
+>> +	int cc;
+>> +
+>> +	/* Read the SCHIB for this subchannel */
+>> +	cc = stsch(schid, &schib);
+>> +	if (cc) {
+>> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+>> +		return cc;
+>> +	}
+>> +
+>> +retry:
+>> +	/* Update the SCHIB to enable the measurement block */
+>> +	pmcw->flags |= flags;
+>> +
+>> +	if (format1)
+>> +		pmcw->flags2 |= PMCW_MBF1;
+>> +	else
+>> +		pmcw->flags2 &= ~PMCW_MBF1;
+>> +
+>> +	pmcw->mbi = mbi;
+>> +	schib.mbo = mb;
+>> +
+>> +	/* Tell the CSS we want to modify the subchannel */
+>> +	cc = msch(schid, &schib);
+> 
+> Setting some invalid flags for measurements in the schib could lead to
+> an operand exception. Do we want to rely on the caller always getting
+> it right, or should we add handling for those invalid flags? (Might
+> also make a nice test case.)
+
+Yes it does.
+I add new test cases to test if we get the right error.
+
+
+Thanks,
+Pierre
+
 -- 
-2.26.2
-
+Pierre Morel
+IBM Lab Boeblingen
