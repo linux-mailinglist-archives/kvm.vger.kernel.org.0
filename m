@@ -2,127 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCC4130C79C
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAB7F30C79E
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:29:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237512AbhBBRZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:25:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58927 "EHLO
+        id S237514AbhBBRZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:25:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53416 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236982AbhBBRXI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:23:08 -0500
+        by vger.kernel.org with ESMTP id S236637AbhBBRXb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:23:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612286502;
+        s=mimecast20190719; t=1612286526;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rtng0npx+0yDN+RLW8SrKhZZ+4kV4zvwZY21R7GQprE=;
-        b=GD2Rbbow20Gf/47q35dWwd784+1Q8PkaoFOO4yVaJUzr29t/XlvMg2duLmwaRn1QlXMhbB
-        d1GR5rs87B+b4oBeBKe/z24WUnvsEHWpjL9P7zKAzQn/cwebyesTHdogQ9EG3iR24SHgUG
-        unbHFD2seFiIaU9mKXOtfAZYK9f7J+A=
+        bh=c3tNOzSSX48fk87F3yP6GVgcUiDHmEx0tM3rnjbmDtU=;
+        b=W+KxEgS+jMqbP2JoargjwGZXrv5CoCvXxiGA/K4bJU973F5BW9MxdCLcoaUJAzqxvysGkX
+        zH3nTJlq8MnnXUXWn7GHxkQ/70tBKMF3AxoSNNRjHNG8UPv1wZ/0t/ZrDwAW6+krZ3+WCL
+        H9hYhFP3F0V/k1RKNbydILZ+0fsfnFE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-532-ZWKH4kK_NJaI_lc0RJdl-g-1; Tue, 02 Feb 2021 12:21:39 -0500
-X-MC-Unique: ZWKH4kK_NJaI_lc0RJdl-g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-289-0KyRTmpPNlGuBE9gPKJx7g-1; Tue, 02 Feb 2021 12:22:02 -0500
+X-MC-Unique: 0KyRTmpPNlGuBE9gPKJx7g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D6AA106BC6B;
-        Tue,  2 Feb 2021 17:21:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 675548049D0;
+        Tue,  2 Feb 2021 17:21:58 +0000 (UTC)
 Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA7DA6EF46;
-        Tue,  2 Feb 2021 17:21:37 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 10:21:37 -0700
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7F4F65D9D5;
+        Tue,  2 Feb 2021 17:21:56 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 10:21:55 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steve Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH V3 0/9] vfio virtual address update
-Message-ID: <20210202102137.1cf74d8f@omen.home.shazbot.org>
-In-Reply-To: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
-References: <1611939252-7240-1-git-send-email-steven.sistare@oracle.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        "Cornelia Huck" <cohuck@redhat.com>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "James Morse" <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>
+Subject: Re: [PATCH v3 0/2] vfio/iommu_type1: some fixes
+Message-ID: <20210202102155.60341d38@omen.home.shazbot.org>
+In-Reply-To: <20210122092635.19900-1-zhukeqian1@huawei.com>
+References: <20210122092635.19900-1-zhukeqian1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 29 Jan 2021 08:54:03 -0800
-Steve Sistare <steven.sistare@oracle.com> wrote:
+On Fri, 22 Jan 2021 17:26:33 +0800
+Keqian Zhu <zhukeqian1@huawei.com> wrote:
 
-> Add interfaces that allow the underlying memory object of an iova range
-> to be mapped to a new virtual address in the host process:
+> v3:
+>  - Populate bitmap unconditionally.
+>  - Sanity check notifier when remove all domains.
 > 
->   - VFIO_DMA_UNMAP_FLAG_VADDR for VFIO_IOMMU_UNMAP_DMA
->   - VFIO_DMA_MAP_FLAG_VADDR flag for VFIO_IOMMU_MAP_DMA
->   - VFIO_UPDATE_VADDR for VFIO_CHECK_EXTENSION
->   - VFIO_DMA_UNMAP_FLAG_ALL for VFIO_IOMMU_UNMAP_DMA
->   - VFIO_UNMAP_ALL for VFIO_CHECK_EXTENSION
+> v2:
+>  - Address suggestions from Alex.
+>  - Remove unnecessary patches.
+>  
 > 
-> Unmap-vaddr invalidates the host virtual address in an iova range and blocks
-> vfio translation of host virtual addresses, but DMA to already-mapped pages
-> continues.  Map-vaddr updates the base VA and resumes translation.  The
-> implementation supports iommu type1 and mediated devices.  Unmap-all allows
-> all ranges to be unmapped or invalidated in a single ioctl, which simplifies
-> userland code.
+> Keqian Zhu (2):
+>   vfio/iommu_type1: Populate full dirty when detach non-pinned group
+>   vfio/iommu_type1: Fix some sanity checks in detach group
 > 
-> This functionality is necessary for live update, in which a host process
-> such as qemu exec's an updated version of itself, while preserving its
-> guest and vfio devices.  The process blocks vfio VA translation, exec's
-> its new self, mmap's the memory object(s) underlying vfio object, updates
-> the VA, and unblocks translation.  For a working example that uses these
-> new interfaces, see the QEMU patch series "[PATCH V2] Live Update" at
-> https://lore.kernel.org/qemu-devel/1609861330-129855-1-git-send-email-steven.sistare@oracle.com
-> 
-> Patches 1-3 define and implement the flag to unmap all ranges.
-> Patches 4-6 define and implement the flags to update vaddr.
-> Patches 7-9 add blocking to complete the implementation.
-> 
-> Changes in V2:
->  - define a flag for unmap all instead of special range values
->  - define the VFIO_UNMAP_ALL extension
->  - forbid the combination of unmap-all and get-dirty-bitmap
->  - unwind in unmap on vaddr error
->  - add a new function to find first dma in a range instead of modifying
->    an existing function
->  - change names of update flags
->  - fix concurrency bugs due to iommu lock being dropped
->  - call down from from vfio to a new backend interface instead of up from
->    driver to detect container close
->  - use wait/wake instead of sleep and polling
->  - refine the uapi specification
->  - split patches into vfio vs type1
-> 
-> Changes in V3:
->  - add vaddr_invalid_count to fix pin_pages race with unmap
->  - refactor the wait helper functions
->  - traverse dma entries more efficiently in unmap
->  - check unmap flag conflicts more explicitly
->  - rename some local variables and functions
-> 
-> Steve Sistare (9):
->   vfio: option to unmap all
->   vfio/type1: unmap cleanup
->   vfio/type1: implement unmap all
->   vfio: interfaces to update vaddr
->   vfio/type1: massage unmap iteration
->   vfio/type1: implement interfaces to update vaddr
->   vfio: iommu driver notify callback
->   vfio/type1: implement notify callback
->   vfio/type1: block on invalid vaddr
-> 
->  drivers/vfio/vfio.c             |   5 +
->  drivers/vfio/vfio_iommu_type1.c | 251 +++++++++++++++++++++++++++++++++++-----
->  include/linux/vfio.h            |   5 +
->  include/uapi/linux/vfio.h       |  27 +++++
->  4 files changed, 256 insertions(+), 32 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 50 +++++++++++++++++----------------
+>  1 file changed, 26 insertions(+), 24 deletions(-)
 > 
 
-Applied to vfio next branch for v5.12 with discussed changes and
-Connie's R-b.  Thanks,
+Applied to vfio next branch for v5.12, dropped WARN_ON in release on
+patch 2.  Thanks,
 
 Alex
 
