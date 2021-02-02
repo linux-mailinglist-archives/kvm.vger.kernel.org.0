@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95BDF30BFC2
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 14:43:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ED6630C055
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 14:56:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232708AbhBBNkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 08:40:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34408 "EHLO mail.kernel.org"
+        id S233338AbhBBNzD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 08:55:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43044 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232566AbhBBNiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 08:38:12 -0500
+        id S233248AbhBBNwv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 08:52:51 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 15CB864DDA;
-        Tue,  2 Feb 2021 13:37:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5F05B64FC8;
+        Tue,  2 Feb 2021 13:43:50 +0000 (UTC)
 Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94)
         (envelope-from <maz@kernel.org>)
-        id 1l6vs0-00BVCV-8p; Tue, 02 Feb 2021 13:37:29 +0000
+        id 1l6vy8-00BVL3-Fe; Tue, 02 Feb 2021 13:43:48 +0000
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 02 Feb 2021 13:37:28 +0000
+Date:   Tue, 02 Feb 2021 13:43:48 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     Jianyong Wu <jianyong.wu@arm.com>
 Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com,
-        sean.j.christopherson@intel.com, richardcochran@gmail.com,
+        tglx@linutronix.de, pbonzini@redhat.com, richardcochran@gmail.com,
         Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
         Andre.Przywara@arm.com, steven.price@arm.com,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
-Subject: Re: [PATCH v16 7/9] ptp: arm/arm64: Enable ptp_kvm for arm/arm64
-In-Reply-To: <20201209060932.212364-8-jianyong.wu@arm.com>
+Subject: Re: [PATCH v16 8/9] doc: add ptp_kvm introduction for arm64 support
+In-Reply-To: <20201209060932.212364-9-jianyong.wu@arm.com>
 References: <20201209060932.212364-1-jianyong.wu@arm.com>
- <20201209060932.212364-8-jianyong.wu@arm.com>
+ <20201209060932.212364-9-jianyong.wu@arm.com>
 User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <b79a3502c215a1d2182c53e4b71f370c@kernel.org>
+Message-ID: <abe1ea58ddd13e43e62c25103e05fcf0@kernel.org>
 X-Sender: maz@kernel.org
 X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, sean.j.christopherson@intel.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
+X-SA-Exim-Rcpt-To: jianyong.wu@arm.com, netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, nd@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
@@ -52,330 +51,244 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2020-12-09 06:09, Jianyong Wu wrote:
-> Currently, there is no mechanism to keep time sync between guest and 
-> host
-> in arm/arm64 virtualization environment. Time in guest will drift 
-> compared
-> with host after boot up as they may both use third party time sources
-> to correct their time respectively. The time deviation will be in order
-> of milliseconds. But in some scenarios,like in cloud environment, we 
-> ask
-> for higher time precision.
-> 
-> kvm ptp clock, which chooses the host clock source as a reference
-> clock to sync time between guest and host, has been adopted by x86
-> which takes the time sync order from milliseconds to nanoseconds.
-> 
-> This patch enables kvm ptp clock for arm/arm64 and improves clock sync 
-> precision
-> significantly.
-> 
-> Test result comparisons between with kvm ptp clock and without it in 
-> arm/arm64
-> are as follows. This test derived from the result of command 'chronyc
-> sources'. we should take more care of the last sample column which 
-> shows
-> the offset between the local clock and the source at the last 
-> measurement.
-> 
-> no kvm ptp in guest:
-> MS Name/IP address   Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> ^* dns1.synet.edu.cn      2   6   377    13  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    21  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    29  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    37  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    45  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    53  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    61  +1040us[+1581us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377     4   -130us[ +796us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    12   -130us[ +796us] +/-   
-> 21ms
-> ^* dns1.synet.edu.cn      2   6   377    20   -130us[ +796us] +/-   
-> 21ms
-> 
-> in host:
-> MS Name/IP address   Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> ^* 120.25.115.20          2   7   377    72   -470us[ -603us] +/-   
-> 18ms
-> ^* 120.25.115.20          2   7   377    92   -470us[ -603us] +/-   
-> 18ms
-> ^* 120.25.115.20          2   7   377   112   -470us[ -603us] +/-   
-> 18ms
-> ^* 120.25.115.20          2   7   377     2   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377    22   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377    43   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377    63   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377    83   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377   103   +872ns[-6808ns] +/-   
-> 17ms
-> ^* 120.25.115.20          2   7   377   123   +872ns[-6808ns] +/-   
-> 17ms
-> 
-> The dns1.synet.edu.cn is the network reference clock for guest and
-> 120.25.115.20 is the network reference clock for host. we can't get the
-> clock error between guest and host directly, but a roughly estimated 
-> value
-> will be in order of hundreds of us to ms.
-> 
-> with kvm ptp in guest:
-> chrony has been disabled in host to remove the disturb by network 
-> clock.
-> 
-> MS Name/IP address         Stratum Poll Reach LastRx Last sample
-> ========================================================================
-> * PHC0                    0   3   377     8     -7ns[   +1ns] +/-    
-> 3ns
-> * PHC0                    0   3   377     8     +1ns[  +16ns] +/-    
-> 3ns
-> * PHC0                    0   3   377     6     -4ns[   -0ns] +/-    
-> 6ns
-> * PHC0                    0   3   377     6     -8ns[  -12ns] +/-    
-> 5ns
-> * PHC0                    0   3   377     5     +2ns[   +4ns] +/-    
-> 4ns
-> * PHC0                    0   3   377    13     +2ns[   +4ns] +/-    
-> 4ns
-> * PHC0                    0   3   377    12     -4ns[   -6ns] +/-    
-> 4ns
-> * PHC0                    0   3   377    11     -8ns[  -11ns] +/-    
-> 6ns
-> * PHC0                    0   3   377    10    -14ns[  -20ns] +/-    
-> 4ns
-> * PHC0                    0   3   377     8     +4ns[   +5ns] +/-    
-> 4ns
-> 
-> The PHC0 is the ptp clock which choose the host clock as its source
-> clock. So we can see that the clock difference between host and guest
-> is in order of ns.
+> PTP_KVM implementation depends on hypercall using SMCCC. So we
+> introduce a new SMCCC service ID. This doc explains how does the
+> ID define and how does PTP_KVM works on arm/arm64.
 > 
 > Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
 > ---
->  drivers/clocksource/arm_arch_timer.c | 29 ++++++++++++++++++
->  drivers/ptp/Kconfig                  |  2 +-
->  drivers/ptp/Makefile                 |  1 +
->  drivers/ptp/ptp_kvm_arm.c            | 45 ++++++++++++++++++++++++++++
->  4 files changed, 76 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/ptp/ptp_kvm_arm.c
+>  Documentation/virt/kvm/api.rst         |  9 +++++++
+>  Documentation/virt/kvm/arm/index.rst   |  1 +
+>  Documentation/virt/kvm/arm/ptp_kvm.rst | 31 +++++++++++++++++++++++
+>  Documentation/virt/kvm/timekeeping.rst | 35 ++++++++++++++++++++++++++
+>  4 files changed, 76 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
 > 
-> diff --git a/drivers/clocksource/arm_arch_timer.c
-> b/drivers/clocksource/arm_arch_timer.c
-> index d55acffb0b90..16cd0a663587 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -25,6 +25,8 @@
->  #include <linux/sched/clock.h>
->  #include <linux/sched_clock.h>
->  #include <linux/acpi.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/ptp_kvm.h>
-> 
->  #include <asm/arch_timer.h>
->  #include <asm/virt.h>
-> @@ -1650,3 +1652,30 @@ static int __init arch_timer_acpi_init(struct
-> acpi_table_header *table)
->  }
->  TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, arch_timer_acpi_init);
->  #endif
+> diff --git a/Documentation/virt/kvm/api.rst 
+> b/Documentation/virt/kvm/api.rst
+> index e00a66d72372..3769cc2f7d9c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6390,3 +6390,12 @@ When enabled, KVM will disable paravirtual
+> features provided to the
+>  guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
+>  (0x40000001). Otherwise, a guest may use the paravirtual features
+>  regardless of what has actually been exposed through the CPUID leaf.
 > +
-> +int kvm_arch_ptp_get_crosststamp(u64 *cycle, struct timespec64 *ts,
-> +			      struct clocksource **cs)
-> +{
-> +	struct arm_smccc_res hvc_res;
-> +	ktime_t ktime;
-> +	u32 ptp_counter;
+> +8.27 KVM_CAP_PTP_KVM
+> +--------------------
 > +
-> +	if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
-> +		ptp_counter = ARM_PTP_VIRT_COUNTER;
-> +	else
-> +		ptp_counter = ARM_PTP_PHY_COUNTER;
+> +:Architectures: arm64
 > +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-> +			     ptp_counter, &hvc_res);
-> +
-> +	if ((int)(hvc_res.a0) < 0)
-> +		return -EOPNOTSUPP;
-> +
-> +	ktime = (u64)hvc_res.a0 << 32 | hvc_res.a1;
-> +	*ts = ktime_to_timespec64(ktime);
-> +	*cycle = (u64)hvc_res.a2 << 32 | hvc_res.a3;
-> +	*cs = &clocksource_counter;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_arch_ptp_get_crosststamp);
-> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
-> index 942f72d8151d..677c7f696b70 100644
-> --- a/drivers/ptp/Kconfig
-> +++ b/drivers/ptp/Kconfig
-> @@ -106,7 +106,7 @@ config PTP_1588_CLOCK_PCH
->  config PTP_1588_CLOCK_KVM
->  	tristate "KVM virtual PTP clock"
->  	depends on PTP_1588_CLOCK
-> -	depends on KVM_GUEST && X86
-> +	depends on KVM_GUEST && X86 || (HAVE_ARM_SMCCC_DISCOVERY && 
-> ARM_ARCH_TIMER)
->  	default y
->  	help
->  	  This driver adds support for using kvm infrastructure as a PTP
-> diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-> index 699a4e4d19c2..9fa5ede44b2b 100644
-> --- a/drivers/ptp/Makefile
-> +++ b/drivers/ptp/Makefile
-> @@ -5,6 +5,7 @@
-> 
->  ptp-y					:= ptp_clock.o ptp_chardev.o ptp_sysfs.o
->  ptp_kvm-$(CONFIG_X86)			:= ptp_kvm_x86.o ptp_kvm_common.o
-> +ptp_kvm-$(CONFIG_HAVE_ARM_SMCCC)	:= ptp_kvm_arm.o ptp_kvm_common.o
->  obj-$(CONFIG_PTP_1588_CLOCK)		+= ptp.o
->  obj-$(CONFIG_PTP_1588_CLOCK_DTE)	+= ptp_dte.o
->  obj-$(CONFIG_PTP_1588_CLOCK_INES)	+= ptp_ines.o
-> diff --git a/drivers/ptp/ptp_kvm_arm.c b/drivers/ptp/ptp_kvm_arm.c
+> +This capability indicates that KVM virtual PTP service is supported in 
+> host.
+> +It must company with the implementation of KVM virtual PTP service in 
+> host
+> +so VMM can probe if there is the service in host by checking this 
+> capability.
+
+This reads a bit odd. I came up with the following:
+
++This capability indicates that the KVM virtual PTP service is
++supported in the host. A VMM can check whether the service is
++available to the guest on migration.
+
+
+> diff --git a/Documentation/virt/kvm/arm/index.rst
+> b/Documentation/virt/kvm/arm/index.rst
+> index 3e2b2aba90fc..78a9b670aafe 100644
+> --- a/Documentation/virt/kvm/arm/index.rst
+> +++ b/Documentation/virt/kvm/arm/index.rst
+> @@ -10,3 +10,4 @@ ARM
+>     hyp-abi
+>     psci
+>     pvtime
+> +   ptp_kvm
+> diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst
+> b/Documentation/virt/kvm/arm/ptp_kvm.rst
 > new file mode 100644
-> index 000000000000..ecb5ef273be5
+> index 000000000000..d729c1388a5c
 > --- /dev/null
-> +++ b/drivers/ptp/ptp_kvm_arm.c
-> @@ -0,0 +1,45 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + *  Virtual PTP 1588 clock for use with KVM guests
-> + *  Copyright (C) 2019 ARM Ltd.
-> + *  All Rights Reserved
-> + */
+> +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+> @@ -0,0 +1,31 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
-> +#include <linux/kernel.h>
-> +#include <linux/err.h>
-> +#include <asm/hypervisor.h>
-> +#include <linux/module.h>
-> +#include <linux/psci.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/timecounter.h>
-> +#include <linux/ptp_kvm.h>
-> +#include <linux/sched/clock.h>
-> +#include <asm/arch_timer.h>
-> +#include <asm/hypervisor.h>
+> +PTP_KVM support for arm/arm64
+> +=============================
 > +
-> +int kvm_arch_ptp_init(void)
-> +{
-> +	int ret;
+> +PTP_KVM is used for time sync between guest and host in a high 
+> precision.
+> +It needs to get the wall time and counter value from the host and
+> transfer these
+> +to guest via hypercall service. So one more hypercall service has been 
+> added.
 > +
-> +	ret = kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_PTP);
-> +	if (ret <= 0)
-> +		return -EOPNOTSUPP;
+> +This new SMCCC hypercall is defined as:
+
+It won't be new anymore the minute this is merged.
+
 > +
-> +	return 0;
-> +}
+> +* ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
 > +
-> +int kvm_arch_ptp_get_clock(struct timespec64 *ts)
-> +{
-> +	ktime_t ktime;
-> +	struct arm_smccc_res hvc_res;
+> +As both 32 and 64-bits ptp_kvm client should be supported, we choose
+> SMC32/HVC32
+> +calling convention.
 > +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-> +			     ARM_PTP_VIRT_COUNTER, &hvc_res);
-> +	if ((int)(hvc_res.a0) < 0)
-> +		return -EOPNOTSUPP;
+> +ARM_SMCCC_HYP_KVM_PTP_FUNC_ID:
 > +
-> +	ktime = (u64)hvc_res.a0 << 32 | hvc_res.a1;
-> +	*ts = ktime_to_timespec64(ktime);
+> +    =============    ==========    ==========
+> +    Function ID:     (uint32)      0x86000001
+> +    Arguments:       (uint32)      ARM_PTP_PHY_COUNTER(1) or
+> ARM_PTP_VIRT_COUNTER(0)
+> +                                   which indicate acquiring physical 
+> counter or
+> +                                   virtual counter respectively.
+> +    Return Value:    val0(uint32)  NOT_SUPPORTED(-1) or upper 32 bits
+> of wall clock time(64-bits).
+> +                     val1(uint32)  Lower 32 bits of wall clock time.
+> +                     val2(uint32)  Upper 32 bits of counter 
+> cycle(64-bits).
+> +                     val3(uint32)  Lower 32 bits of counter cycle.
+> +    Endianness:                    No Restrictions.
+> +    =============    ==========    ==========
+> +
+> +More info see section 5 in Documentation/virt/kvm/timekeeping.rst.
 
-This whole function can be trivially replaced with a call to
-kvm_arch_ptp_get_crosststamp with minimal changes to that function:
+I've tidied this up like this:
 
-diff --git a/drivers/clocksource/arm_arch_timer.c 
-b/drivers/clocksource/arm_arch_timer.c
-index e3a5ebbfb3d0..e7b07166e771 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -1663,16 +1663,16 @@ TIMER_ACPI_DECLARE(arch_timer, ACPI_SIG_GTDT, 
-arch_timer_acpi_init);
-  #endif
+diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst 
+b/Documentation/virt/kvm/arm/ptp_kvm.rst
+index d729c1388a5c..68cffb50d8bf 100644
+--- a/Documentation/virt/kvm/arm/ptp_kvm.rst
++++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
+@@ -3,29 +3,23 @@
+  PTP_KVM support for arm/arm64
+  =============================
 
-  int kvm_arch_ptp_get_crosststamp(u64 *cycle, struct timespec64 *ts,
--			      struct clocksource **cs)
-+				 struct clocksource **cs)
-  {
-  	struct arm_smccc_res hvc_res;
--	ktime_t ktime;
-  	u32 ptp_counter;
-+	ktime_t ktime;
-
-  	if (arch_timer_uses_ppi == ARCH_TIMER_VIRT_PPI)
--		ptp_counter = ARM_PTP_VIRT_COUNTER;
-+		ptp_counter = KVM_PTP_VIRT_COUNTER;
-  	else
--		ptp_counter = ARM_PTP_PHY_COUNTER;
-+		ptp_counter = KVM_PTP_PHYS_COUNTER;
-
-  	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-  			     ptp_counter, &hvc_res);
-@@ -1682,8 +1682,10 @@ int kvm_arch_ptp_get_crosststamp(u64 *cycle, 
-struct timespec64 *ts,
-
-  	ktime = (u64)hvc_res.a0 << 32 | hvc_res.a1;
-  	*ts = ktime_to_timespec64(ktime);
--	*cycle = (u64)hvc_res.a2 << 32 | hvc_res.a3;
--	*cs = &clocksource_counter;
-+	if (cycle)
-+		*cycle = (u64)hvc_res.a2 << 32 | hvc_res.a3;
-+	if (cs)
-+		*cs = &clocksource_counter;
-
-  	return 0;
-  }
-diff --git a/drivers/ptp/ptp_kvm_arm.c b/drivers/ptp/ptp_kvm_arm.c
-index ecb5ef273be5..b7d28c8dfb84 100644
---- a/drivers/ptp/ptp_kvm_arm.c
-+++ b/drivers/ptp/ptp_kvm_arm.c
-@@ -5,15 +5,9 @@
-   *  All Rights Reserved
-   */
-
--#include <linux/kernel.h>
--#include <linux/err.h>
--#include <asm/hypervisor.h>
--#include <linux/module.h>
--#include <linux/psci.h>
-  #include <linux/arm-smccc.h>
--#include <linux/timecounter.h>
-  #include <linux/ptp_kvm.h>
--#include <linux/sched/clock.h>
-+
-  #include <asm/arch_timer.h>
-  #include <asm/hypervisor.h>
-
-@@ -30,16 +24,5 @@ int kvm_arch_ptp_init(void)
-
-  int kvm_arch_ptp_get_clock(struct timespec64 *ts)
-  {
--	ktime_t ktime;
--	struct arm_smccc_res hvc_res;
+-PTP_KVM is used for time sync between guest and host in a high 
+precision.
+-It needs to get the wall time and counter value from the host and 
+transfer these
+-to guest via hypercall service. So one more hypercall service has been 
+added.
 -
--	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
--			     ARM_PTP_VIRT_COUNTER, &hvc_res);
--	if ((int)(hvc_res.a0) < 0)
--		return -EOPNOTSUPP;
+-This new SMCCC hypercall is defined as:
++PTP_KVM is used for high precision time sync between host and guests.
++It relies on transferring the wall clock and counter value from the
++host to the guest using a KVM-specific hypercall.
+
+  * ARM_SMCCC_HYP_KVM_PTP_FUNC_ID: 0x86000001
+
+-As both 32 and 64-bits ptp_kvm client should be supported, we choose 
+SMC32/HVC32
+-calling convention.
 -
--	ktime = (u64)hvc_res.a0 << 32 | hvc_res.a1;
--	*ts = ktime_to_timespec64(ktime);
+-ARM_SMCCC_HYP_KVM_PTP_FUNC_ID:
++This hypercall uses the SMC32/HVC32 calling convention:
+
++ARM_SMCCC_HYP_KVM_PTP_FUNC_ID
+      =============    ==========    ==========
+      Function ID:     (uint32)      0x86000001
+-    Arguments:       (uint32)      ARM_PTP_PHY_COUNTER(1) or 
+ARM_PTP_VIRT_COUNTER(0)
+-                                   which indicate acquiring physical 
+counter or
+-                                   virtual counter respectively.
+-    Return Value:    val0(uint32)  NOT_SUPPORTED(-1) or upper 32 bits 
+of wall clock time(64-bits).
+-                     val1(uint32)  Lower 32 bits of wall clock time.
+-                     val2(uint32)  Upper 32 bits of counter 
+cycle(64-bits).
+-                     val3(uint32)  Lower 32 bits of counter cycle.
++    Arguments:       (uint32)      KVM_PTP_VIRT_COUNTER(0)
++                                   KVM_PTP_PHYS_COUNTER(1)
++    Return Values:   (int32)       NOT_SUPPORTED(-1) on error, or
++                     (uint32)      Upper 32 bits of wall clock time 
+(r0)
++                     (uint32)      Lower 32 bits of wall clock time 
+(r1)
++                     (uint32)      Upper 32 bits of counter (r2)
++                     (uint32)      Lower 32 bits of counter (r3)
+      Endianness:                    No Restrictions.
+      =============    ==========    ==========
 -
--	return 0;
-+	return kvm_arch_ptp_get_crosststamp(NULL, ts, NULL);
-  }
+-More info see section 5 in Documentation/virt/kvm/timekeeping.rst.
+
+> diff --git a/Documentation/virt/kvm/timekeeping.rst
+> b/Documentation/virt/kvm/timekeeping.rst
+> index 21ae7efa29ba..c81383e38372 100644
+> --- a/Documentation/virt/kvm/timekeeping.rst
+> +++ b/Documentation/virt/kvm/timekeeping.rst
+> @@ -13,6 +13,7 @@ Timekeeping Virtualization for X86-Based 
+> Architectures
+>     2) Timing Devices
+>     3) TSC Hardware
+>     4) Virtualization Problems
+> +   5) KVM virtual PTP clock
+> 
+>  1. Overview
+>  ===========
+> @@ -643,3 +644,37 @@ by using CPU utilization itself as a signalling
+> channel.  Preventing such
+>  problems would require completely isolated virtual time which may not 
+> track
+>  real time any longer.  This may be useful in certain security or QA 
+> contexts,
+>  but in general isn't recommended for real-world deployment scenarios.
+> +
+> +5. KVM virtual PTP clock
+> +========================
+> +
+> +NTP (Network Time Protocol) is often used to sync time in a VM. 
+> Unfortunately,
+> +the precision of NTP is limited due to unknown delays in the network.
+> +
+> +KVM virtual PTP clock (PTP_KVM) offers another way to sync time in VM; 
+> use the
+> +host's clock rather than one from a remote machine. Having a 
+> synchronization
+> +mechanism for the virtualization environment allows us to keep all the 
+> guests
+> +running on the same host in sync.
+> +In general, the delay of communication between host and guest is quite
+> +small, so ptp_kvm can offer time sync precision up to in order of 
+> nanoseconds.
+> +Please keep in mind that ptp_kvm just limits itself to be a channel 
+> which
+> +transmits the remote clock from host to guest. An application, eg. 
+> chrony, is
+> +needed in usersapce of VM in order to set the guest time.
+> +
+> +After ptp_kvm is initialized, there will be a new device node under 
+> /dev called
+> +ptp%d. A guest userspace service, like chrony, can use this device to 
+> get host
+> +walltime, sometimes also counter cycle, which depends on the service 
+> it calls.
+> +Then this guest userspace service can use those data to do the time 
+> sync for
+> +the guest.
+> +The following is the work flow of ptp_kvm:
+> +
+> +a) time sync service in guest userspace call ioctl on ptp device 
+> /dev/ptp%d.
+> +b) ptp_kvm module in guest receives this request then invokes 
+> hypercall to
+> +   route into host kernel to request host's walltime/counter cycle.
+> +c) ptp_kvm hypercall service on the host responds to the request and 
+> sends data
+> +   back.
+> +d) ptp in guest copies the data to userspace.
+> +
+> +ptp_kvm consists of components running on the guest and host. Step 2
+> consists of
+> +a guest driver making a hypercall whilst step 3 involves the
+> hypervisor responding
+> +with information.
+
+I don't think we need any of this here, as the whole file
+focuses on x86-specific issues for timekeeping. If we want
+to document KVM PTP, this should probably be a separate document.
 
 Thanks,
 
