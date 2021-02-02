@@ -2,97 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1452A30C792
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:25:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41A7630C796
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:25:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237495AbhBBRYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:24:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44124 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237317AbhBBRVl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 12:21:41 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C1AFB64ECE;
-        Tue,  2 Feb 2021 17:21:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612286462;
-        bh=l1cr+1jzN0x/IKYQnemyT4VKd26L3hh91/hellYQCZc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CSg8T3qYM37zuuK09VNExJwVbwaYW1fkDTMzfLqrzQuLGkAzERqk73BuBA/fFrJe1
-         IWoW/hAhQyAI2vOpVuuBFGLyvimWirGbZBUpiWeWr8x+4w9xhjLIYlOKovB0J62GHW
-         Dkyq6pfag/Gm/45bw9+xLZMDVWTcY8QcqZ1c8+Ag8h2Uhi/ZRnPu3bGhdOQ0LpTyXo
-         8jrZn6W0dYXhYcjaWRzBf9txSX+XRcT26BIX6iI3cDqLuTTDLwO+Avd0PLSup/HIZ7
-         iNJOr1yMpottyiUIV6fxeksgLw4sIjV2IDdIuUxhvERrbr2HX5AMiynP8NQvjp0bp6
-         7jgqoJT92POwA==
-Date:   Tue, 2 Feb 2021 19:20:54 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v3 14/27] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-Message-ID: <YBmJ9tvbw3RE63F6@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <e807033e3d56ede1177d7a1af34477678bfbfff9.1611634586.git.kai.huang@intel.com>
- <YBVyfQQPo18Fyv64@kernel.org>
- <20210201131744.30530bd817ae299df92b8164@intel.com>
+        id S236884AbhBBRZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:25:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41971 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237480AbhBBRWy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:22:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612286489;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H/qoZi5ZLpNi2QThemswfpUvtVoBJ7tH1NpERx5PkV8=;
+        b=cdLuCEMWGF6gDNxe3vumzzX4ew9ZEBbAvsEs+ivwnQDHQJ7v/l2Z8nlwEraLh6veacE49x
+        fExIKelQZxMvOVC7l+03XrY+XD82tVnk2541LV2x7XAifa+wVnCcqpWU2DloUGAt2q6H8P
+        4wuxLPttQmPJ6fz8gM00lo8/RSgmLRY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-117-mMjaC4ANP4y79ga8-2WOSA-1; Tue, 02 Feb 2021 12:21:25 -0500
+X-MC-Unique: mMjaC4ANP4y79ga8-2WOSA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4F4C81621;
+        Tue,  2 Feb 2021 17:21:22 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1A319C71;
+        Tue,  2 Feb 2021 17:21:21 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 10:21:21 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, <jgg@nvidia.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
+        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
+        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
+        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        <mjrosato@linux.ibm.com>, <yishaih@nvidia.com>, <aik@ozlabs.ru>
+Subject: Re: [PATCH 5/9] vfio-pci/zdev: remove unused vdev argument
+Message-ID: <20210202102121.66cd39a2@omen.home.shazbot.org>
+In-Reply-To: <20210202085755.3e06184e.cohuck@redhat.com>
+References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+        <20210201162828.5938-6-mgurtovoy@nvidia.com>
+        <20210202085755.3e06184e.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210201131744.30530bd817ae299df92b8164@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 01:17:44PM +1300, Kai Huang wrote:
-> On Sat, 30 Jan 2021 16:51:41 +0200 Jarkko Sakkinen wrote:
-> > On Tue, Jan 26, 2021 at 10:31:06PM +1300, Kai Huang wrote:
-> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > 
-> > > The bare-metal kernel must intercept ECREATE to be able to impose policies
-> > > on guests.  When it does this, the bare-metal kernel runs ECREATE against
-> > > the userspace mapping of the virtualized EPC.
-> > 
-> > I guess Andy's earlier comment applies here, i.e. SGX driver?
-> 
-> Sure.
-> 
-> [...]
-> 
-> > > +	}
-> > > +
-> > > +	if (encls_faulted(ret)) {
-> > > +		*trapnr = ENCLS_TRAPNR(ret);
+On Tue, 2 Feb 2021 08:57:55 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Also here is an empty line needed.
-
-> > > +		return -EFAULT;
-> > > +	}
-> > 
-> > Empty line here before return. Applies also to sgx_virt_ecreate().
+> On Mon, 1 Feb 2021 16:28:24 +0000
+> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
 > 
-> Yes I can remove, but I am just carious: isn't "having empty line before return"
-> a good coding-style? Do you have any reference to the guideline?
-
-In the initial SGX patch set, this was the review feedback that I got
-from Boris, so I would presume it is tip tree convention. Also, looking
-at a random selection of files under arch/x86, it is commonly done this
-way.
-
+> > Zdev static functions does not use vdev argument. Remove it.  
+> 
+> s/does not use/do not use the/
 > 
 > > 
-> > > +	return ret;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(sgx_virt_einit);
-> > > -- 
-> > > 2.29.2
-> > 
-> > Great work. I think this patch sets is shaping up.
-> > 
-> > /Jarkko
-> > > 
-> > > 
+> > Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_zdev.c | 20 ++++++++------------
+> >  1 file changed, 8 insertions(+), 12 deletions(-)  
 > 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-/Jarkko
+Applied 5&6 to vfio next branch for v5.12 w/ Matt and Connie's R-b and
+trivial fix above.  Thanks,
+
+Alex
+
