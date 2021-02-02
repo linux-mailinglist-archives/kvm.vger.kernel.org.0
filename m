@@ -2,158 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C048C30B7F5
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 07:43:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C61A30B883
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 08:17:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbhBBGnB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 01:43:01 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:12402 "EHLO
+        id S232011AbhBBHQG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 02:16:06 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12403 "EHLO
         szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232110AbhBBGnA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 01:43:00 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DVFZc5zmtzjGjx;
-        Tue,  2 Feb 2021 14:41:12 +0800 (CST)
-Received: from [10.174.184.214] (10.174.184.214) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 2 Feb 2021 14:42:05 +0800
-Subject: Re: [RFC PATCH v1 0/4] vfio: Add IOPF support for VFIO passthrough
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>
-References: <20210125090402.1429-1-lushenming@huawei.com>
- <20210129155730.3a1d49c5@omen.home.shazbot.org>
- <MWHPR11MB188684B42632FD0B9B5CA1C08CB69@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <47bf7612-4fb0-c0bb-fa19-24c4e3d01d3f@huawei.com>
-Date:   Tue, 2 Feb 2021 14:41:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        with ESMTP id S229614AbhBBHQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 02:16:04 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DVGJm3qYtzjGgW;
+        Tue,  2 Feb 2021 15:14:16 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 2 Feb 2021 15:15:17 +0800
+Subject: Re: [PATCH v13 05/15] iommu/smmuv3: Get prepared for nested stage
+ support
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-6-eric.auger@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <118a047b-91f4-3c84-867f-6c0b89f9011e@huawei.com>
+Date:   Tue, 2 Feb 2021 15:14:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB188684B42632FD0B9B5CA1C08CB69@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+In-Reply-To: <20201118112151.25412-6-eric.auger@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.214]
+X-Originating-IP: [10.174.184.42]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/2/1 15:56, Tian, Kevin wrote:
->> From: Alex Williamson <alex.williamson@redhat.com>
->> Sent: Saturday, January 30, 2021 6:58 AM
->>
->> On Mon, 25 Jan 2021 17:03:58 +0800
->> Shenming Lu <lushenming@huawei.com> wrote:
->>
->>> Hi,
->>>
->>> The static pinning and mapping problem in VFIO and possible solutions
->>> have been discussed a lot [1, 2]. One of the solutions is to add I/O
->>> page fault support for VFIO devices. Different from those relatively
->>> complicated software approaches such as presenting a vIOMMU that
->> provides
->>> the DMA buffer information (might include para-virtualized optimizations),
->>> IOPF mainly depends on the hardware faulting capability, such as the PCIe
->>> PRI extension or Arm SMMU stall model. What's more, the IOPF support in
->>> the IOMMU driver is being implemented in SVA [3]. So do we consider to
->>> add IOPF support for VFIO passthrough based on the IOPF part of SVA at
->>> present?
->>>
->>> We have implemented a basic demo only for one stage of translation (GPA
->>> -> HPA in virtualization, note that it can be configured at either stage),
->>> and tested on Hisilicon Kunpeng920 board. The nested mode is more
->> complicated
->>> since VFIO only handles the second stage page faults (same as the non-
->> nested
->>> case), while the first stage page faults need to be further delivered to
->>> the guest, which is being implemented in [4] on ARM. My thought on this
->>> is to report the page faults to VFIO regardless of the occured stage (try
->>> to carry the stage information), and handle respectively according to the
->>> configured mode in VFIO. Or the IOMMU driver might evolve to support
->> more...
->>>
->>> Might TODO:
->>>  - Optimize the faulting path, and measure the performance (it might still
->>>    be a big issue).
->>>  - Add support for PRI.
->>>  - Add a MMU notifier to avoid pinning.
->>>  - Add support for the nested mode.
->>> ...
->>>
->>> Any comments and suggestions are very welcome. :-)
->>
->> I expect performance to be pretty bad here, the lookup involved per
->> fault is excessive.  There are cases where a user is not going to be
->> willing to have a slow ramp up of performance for their devices as they
->> fault in pages, so we might need to considering making this
->> configurable through the vfio interface.  Our page mapping also only
+Hi Eric,
+
+On 2020/11/18 19:21, Eric Auger wrote:
+> When nested stage translation is setup, both s1_cfg and
+> s2_cfg are set.
 > 
-> There is another factor to be considered. The presence of IOMMU_
-> DEV_FEAT_IOPF just indicates the device capability of triggering I/O 
-> page fault through the IOMMU, but not exactly means that the device 
-> can tolerate I/O page fault for arbitrary DMA requests.
-
-Yes, so I add a iopf_enabled field in VFIO to indicate the whole path faulting
-capability and set it to true after registering a VFIO page fault handler.
-
-> In reality, many 
-> devices allow I/O faulting only in selective contexts. However, there
-> is no standard way (e.g. PCISIG) for the device to report whether 
-> arbitrary I/O fault is allowed. Then we may have to maintain device
-> specific knowledge in software, e.g. in an opt-in table to list devices
-> which allows arbitrary faults. For devices which only support selective 
-> faulting, a mediator (either through vendor extensions on vfio-pci-core
-> or a mdev wrapper) might be necessary to help lock down non-faultable 
-> mappings and then enable faulting on the rest mappings.
-
-For devices which only support selective faulting, they could tell it to the
-IOMMU driver and let it filter out non-faultable faults? Do I get it wrong?
-
+> We introduce a new smmu domain abort field that will be set
+> upon guest stage1 configuration passing.
 > 
->> grows here, should mappings expire or do we need a least recently
->> mapped tracker to avoid exceeding the user's locked memory limit?  How
->> does a user know what to set for a locked memory limit?  The behavior
->> here would lead to cases where an idle system might be ok, but as soon
->> as load increases with more inflight DMA, we start seeing
->> "unpredictable" I/O faults from the user perspective.  Seems like there
->> are lots of outstanding considerations and I'd also like to hear from
->> the SVA folks about how this meshes with their work.  Thanks,
->>
+> arm_smmu_write_strtab_ent() is modified to write both stage
+> fields in the STE and deal with the abort field.
 > 
-> The main overlap between this feature and SVA is the IOPF reporting
-> framework, which currently still has gap to support both in nested
-> mode, as discussed here:
+> In nested mode, only stage 2 is "finalized" as the host does
+> not own/configure the stage 1 context descriptor; guest does.
 > 
-> https://lore.kernel.org/linux-acpi/YAaxjmJW+ZMvrhac@myrica/
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > 
-> Once that gap is resolved in the future, the VFIO fault handler just 
-> adopts different actions according to the fault-level: 1st level faults
-> are forwarded to userspace thru the vSVA path while 2nd-level faults
-> are fixed (or warned if not intended) by VFIO itself thru the IOMMU
-> mapping interface.
+> ---
+> v10 -> v11:
+> - Fix an issue reported by Shameer when switching from with vSMMU
+>   to without vSMMU. Despite the spec does not seem to mention it
+>   seems to be needed to reset the 2 high 64b when switching from
+>   S1+S2 cfg to S1 only. Especially dst[3] needs to be reset (S2TTB).
+>   On some implementations, if the S2TTB is not reset, this causes
+>   a C_BAD_STE error
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 64 +++++++++++++++++----
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  2 +
+>  2 files changed, 56 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> index 18ac5af1b284..412ea1bafa50 100644
+> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+> @@ -1181,8 +1181,10 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  	 * three cases at the moment:
+>  	 *
+>  	 * 1. Invalid (all zero) -> bypass/fault (init)
+> -	 * 2. Bypass/fault -> translation/bypass (attach)
+> -	 * 3. Translation/bypass -> bypass/fault (detach)
+> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
+> +	 * 3. Single or nested stage Translation/bypass -> bypass/fault (detach)
+> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
+> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
 
-I understand what you mean is:
-From the perspective of VFIO, first, we need to set FEAT_IOPF, and then regster its
-own handler with a flag to indicate FLAT or NESTED and which level is concerned,
-thus the VFIO handler can handle the page faults directly according to the carried
-level information.
+The following line "BUG_ON(ste_live && !nested);" forbids this transform.
+And I have a look at the 6th patch, the transform seems S1 + S2 -> abort.
+So after detach, the status is not the same as that before attach. Does it
+match our expectation?
 
-Is there any plan for evolving(implementing) the IOMMU driver to support this? Or
-could we help this?  :-)
+>  	 *
+>  	 * Given that we can't update the STE atomically and the SMMU
+>  	 * doesn't read the thing in a defined order, that leaves us
+> @@ -1193,7 +1195,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  	 * 3. Update Config, sync
+>  	 */
+>  	u64 val = le64_to_cpu(dst[0]);
+> -	bool ste_live = false;
+> +	bool s1_live = false, s2_live = false, ste_live;
+> +	bool abort, nested = false, translate = false;
+>  	struct arm_smmu_device *smmu = NULL;
+>  	struct arm_smmu_s1_cfg *s1_cfg;
+>  	struct arm_smmu_s2_cfg *s2_cfg;
+> @@ -1233,6 +1236,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  		default:
+>  			break;
+>  		}
+> +		nested = s1_cfg->set && s2_cfg->set;
+> +		translate = s1_cfg->set || s2_cfg->set;
+>  	}
+>  
+>  	if (val & STRTAB_STE_0_V) {
+> @@ -1240,23 +1245,36 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  		case STRTAB_STE_0_CFG_BYPASS:
+>  			break;
+>  		case STRTAB_STE_0_CFG_S1_TRANS:
+> +			s1_live = true;
+> +			break;
+>  		case STRTAB_STE_0_CFG_S2_TRANS:
+> -			ste_live = true;
+> +			s2_live = true;
+> +			break;
+> +		case STRTAB_STE_0_CFG_NESTED:
+> +			s1_live = true;
+> +			s2_live = true;
+>  			break;
+>  		case STRTAB_STE_0_CFG_ABORT:
+> -			BUG_ON(!disable_bypass);
+>  			break;
+>  		default:
+>  			BUG(); /* STE corruption */
+>  		}
+>  	}
+>  
+> +	ste_live = s1_live || s2_live;
+> +
+>  	/* Nuke the existing STE_0 value, as we're going to rewrite it */
+>  	val = STRTAB_STE_0_V;
+>  
+>  	/* Bypass/fault */
+> -	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
+> -		if (!smmu_domain && disable_bypass)
+> +
+> +	if (!smmu_domain)
+> +		abort = disable_bypass;
+> +	else
+> +		abort = smmu_domain->abort;
+> +
+> +	if (abort || !translate) {
+> +		if (abort)
+>  			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
+>  		else
+>  			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_BYPASS);
+> @@ -1274,8 +1292,16 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+>  		return;
+>  	}
+>  
+> +	BUG_ON(ste_live && !nested);
+> +
+> +	if (ste_live) {
+> +		/* First invalidate the live STE */
+> +		dst[0] = cpu_to_le64(STRTAB_STE_0_CFG_ABORT);
+> +		arm_smmu_sync_ste_for_sid(smmu, sid);
+> +	}
+> +
+[...]
 
 Thanks,
-Shenming
-
-> 
-> Thanks
-> Kevin
-> 
+Keqian
