@@ -2,96 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F11230C7C6
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:33:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB43E30C7B8
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:29:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237544AbhBBR3s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:29:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45016 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236982AbhBBRZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 12:25:28 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1BB1264ECE;
-        Tue,  2 Feb 2021 17:24:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612286689;
-        bh=qTVcg58dYz2tktDpLyrhv2bbFrtX8nF858qAAt+v8h8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RKMAXVB2l2x4IIRqxnt+M+dihjloQZbJznd+xuj1HCtAqXmKhhdxsXrQSz8wdBIdE
-         Gn+xpKIpHy/ghX/0mO7IMzsYmt6VTXsUFAsWsBdK2tbvmXIT4Aqq6FnNaWD0+q0UTN
-         LXtT0sFYNjoI3o+eYDfNnhXmxEtWNIM6FemHDIeYCaULnl9ZXRuMUU5nTwTmn6Tr5p
-         jb3Sqq8VtVKE/jgkJzOaYL6m9e8p59fP7hCYswV+ZBob8VFxZONdgc5J4PHT782b2V
-         Sd+rl2y5e0NNZ6hqELehc/5RfO48vFPtR+I+WvsBl19PhkP7QIRTpsBJCHbTd3CtvV
-         3vgN9w6qitjig==
-Date:   Tue, 2 Feb 2021 19:24:42 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        seanjc@google.com, luto@kernel.org, dave.hansen@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com
-Subject: Re: [RFC PATCH v3 16/27] KVM: VMX: Convert vcpu_vmx.exit_reason to a
- union
-Message-ID: <YBmK2lt/5r/+HrAO@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <d32ab375be78315e3bc2540f2a741859637abcb0.1611634586.git.kai.huang@intel.com>
- <YBV0nnqUHnING5qA@kernel.org>
- <20210201133259.e0398c9f0b229fd79a8c16c6@intel.com>
+        id S237401AbhBBR3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:29:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41355 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237333AbhBBR0w (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 12:26:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612286727;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U03ZGHQ39lo1H/R4t4Uwy6eD2Es1NBuz4KMoEVY1yK8=;
+        b=DcHKHvOmESrU+HM3PurrcqZKLeYYRXQpLDTZJf8y8e4FuvVINYtonc6bP48KDNY75W+dfS
+        3DncUp8tINrB1Ovz8FHa2WiQE58mSdkEGNW7QVnLNt8CfJ0rYPG/HR+9ddmD7e93kYSVIB
+        8FAuzvTxxSQ7P0kFlyg5ko1k+tb/NIo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-VS2pXZN1MJi6bTi0igr6UQ-1; Tue, 02 Feb 2021 12:25:22 -0500
+X-MC-Unique: VS2pXZN1MJi6bTi0igr6UQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E3CFAFA82;
+        Tue,  2 Feb 2021 17:25:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-112.ams2.redhat.com [10.36.112.112])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D9235C5FC;
+        Tue,  2 Feb 2021 17:25:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/5] s390x: css: Store CSS
+ Characteristics
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
+ <1611930869-25745-2-git-send-email-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <74ad7962-9217-5110-4089-9b83d519cfc1@redhat.com>
+Date:   Tue, 2 Feb 2021 18:25:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210201133259.e0398c9f0b229fd79a8c16c6@intel.com>
+In-Reply-To: <1611930869-25745-2-git-send-email-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 01:32:59PM +1300, Kai Huang wrote:
-> On Sat, 30 Jan 2021 17:00:46 +0200 Jarkko Sakkinen wrote:
-> > On Tue, Jan 26, 2021 at 10:31:37PM +1300, Kai Huang wrote:
-> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > 
-> > > Convert vcpu_vmx.exit_reason from a u32 to a union (of size u32).  The
-> > > full VM_EXIT_REASON field is comprised of a 16-bit basic exit reason in
-> > > bits 15:0, and single-bit modifiers in bits 31:16.
-> > > 
-> > > Historically, KVM has only had to worry about handling the "failed
-> > > VM-Entry" modifier, which could only be set in very specific flows and
-> > > required dedicated handling.  I.e. manually stripping the FAILED_VMENTRY
-> > > bit was a somewhat viable approach.  But even with only a single bit to
-> > > worry about, KVM has had several bugs related to comparing a basic exit
-> > > reason against the full exit reason store in vcpu_vmx.
-> > > 
-> > > Upcoming Intel features, e.g. SGX, will add new modifier bits that can
-
-BTW, SGX is not an upcoming CPU feature.
-
-Also, broadly speaking of upcoming features is not right thing to do.
-Better just to scope this down SGX. Theoretically upcoming CPU features
-can do pretty much anything. This is change is first and foremost done
-for SGX.
-
-> > > be set on more or less any VM-Exit, as opposed to the significantly more
-> > > restricted FAILED_VMENTRY, i.e. correctly handling everything in one-off
-> > > flows isn't scalable.  Tracking exit reason in a union forces code to
-> > > explicitly choose between consuming the full exit reason and the basic
-> > > exit, and is a convenient way to document and access the modifiers.
-> > 
-> > I *believe* that the change is correct but I dropped in the last paragraph
-> > - most likely only because of lack of expertise in this area.
-> > 
-> > I ask the most basic question: why SGX will add new modifier bits?
+On 29/01/2021 15.34, Pierre Morel wrote:
+> CSS characteristics exposes the features of the Channel SubSystem.
+> Let's use Store Channel Subsystem Characteristics to retrieve
+> the features of the CSS.
 > 
-> Not 100% sure about your question. Assuming you are asking SGX hardware
-> behavior, SGX architecture adds a new modifier bit (27) to Exit Reason, similar
-> to new #PF.SGX bit. 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   lib/s390x/css.h     | 57 +++++++++++++++++++++++++++++++++++++++++++++
+>   lib/s390x/css_lib.c | 50 ++++++++++++++++++++++++++++++++++++++-
+>   s390x/css.c         | 12 ++++++++++
+>   3 files changed, 118 insertions(+), 1 deletion(-)
 > 
-> Please refer to SDM Volume 3, Chapter 27.2.1 Basic VM-Exit Information.
-> 
-> Sean's commit msg already provides significant motivation of the change in this
-> patch.
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index 3e57445..bc0530d 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+> @@ -288,4 +288,61 @@ int css_residual_count(unsigned int schid);
+>   void enable_io_isc(uint8_t isc);
+>   int wait_and_check_io_completion(int schid);
+>   
+> +/*
+> + * CHSC definitions
+> + */
+> +struct chsc_header {
+> +	u16 len;
+> +	u16 code;
+> +};
+> +
+> +/* Store Channel Subsystem Characteristics */
+> +struct chsc_scsc {
+> +	struct chsc_header req;
+> +	u32 reserved1;
+> +	u32 reserved2;
+> +	u32 reserved3;
+> +	struct chsc_header res;
+> +	u32 format;
+> +	u64 general_char[255];
+> +	u64 chsc_char[254];
+> +};
+> +extern struct chsc_scsc *chsc_scsc;
+> +
+> +#define CSS_GENERAL_FEAT_BITLEN	(255 * 64)
+> +#define CSS_CHSC_FEAT_BITLEN	(254 * 64)
+> +
+> +int get_chsc_scsc(void);
+> +
+> +static inline int _chsc(void *p)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	.insn   rre,0xb25f0000,%2,0\n"
+> +		"	ipm     %0\n"
+> +		"	srl     %0,28\n"
+> +		: "=d" (cc), "=m" (p)
+> +		: "d" (p), "m" (p)
+> +		: "cc");
+> +
+> +	return cc;
+> +}
+> +
+> +#define CHSC_SCSC	0x0010
+> +#define CHSC_SCSC_LEN	0x0010
+> +
+> +static inline int chsc(void *p, uint16_t code, uint16_t len)
+> +{
+> +	struct chsc_header *h = p;
+> +
+> +	h->code = code;
+> +	h->len = len;
+> +	return _chsc(p);
+> +}
+> +
+> +#include <bitops.h>
+> +#define css_general_feature(bit) test_bit_inv(bit, chsc_scsc->general_char)
+> +#define css_chsc_feature(bit) test_bit_inv(bit, chsc_scsc->chsc_char)
+> +
+>   #endif
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index 3c24480..fe05021 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -15,11 +15,59 @@
+>   #include <asm/arch_def.h>
+>   #include <asm/time.h>
+>   #include <asm/arch_def.h>
+> -
+> +#include <alloc_page.h>
+>   #include <malloc_io.h>
+>   #include <css.h>
+>   
+>   static struct schib schib;
+> +struct chsc_scsc *chsc_scsc;
+> +
+> +int get_chsc_scsc(void)
+> +{
+> +	int i, n;
+> +	int ret = 0;
+> +	char buffer[510];
+> +	char *p;
+> +
+> +	report_prefix_push("Channel Subsystem Call");
+> +
+> +	if (chsc_scsc) {
+> +		report_info("chsc_scsc already initialized");
+> +		goto end;
+> +	}
+> +
+> +	chsc_scsc = alloc_pages(0);
+> +	report_info("scsc_scsc at: %016lx", (u64)chsc_scsc);
+> +	if (!chsc_scsc) {
+> +		ret = -1;
+> +		report(0, "could not allocate chsc_scsc page!");
+> +		goto end;
+> +	}
+> +
+> +	ret = chsc(chsc_scsc, CHSC_SCSC, CHSC_SCSC_LEN);
+> +	if (ret) {
+> +		report(0, "chsc: CC %d", ret);
+> +		goto end;
+> +	}
+> +
+> +	for (i = 0, p = buffer; i < CSS_GENERAL_FEAT_BITLEN; i++)
+> +		if (css_general_feature(i)) {
+> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
+> +			p += n;
+> +		}
+> +	report_info("General features: %s", buffer);
+> +
+> +	for (i = 0, p = buffer, ret = 0; i < CSS_CHSC_FEAT_BITLEN; i++)
+> +		if (css_chsc_feature(i)) {
+> +			n = snprintf(p, sizeof(buffer) - ret, "%d,", i);
+> +			p += n;
+> +		}
 
-Just describe why SGX requires this. That's all.
+Please use curly braces for the for-loops here, too. Rationale: Kernel 
+coding style:
 
-/Jarkko
+"Also, use braces when a loop contains more than a single simple statement"
+
+  Thanks,
+   Thomas
+
