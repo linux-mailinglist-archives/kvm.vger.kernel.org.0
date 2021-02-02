@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E686430B641
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 05:15:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 634EC30B642
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 05:15:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231628AbhBBEO4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Feb 2021 23:14:56 -0500
-Received: from ozlabs.org ([203.11.71.1]:33985 "EHLO ozlabs.org"
+        id S231630AbhBBEO6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Feb 2021 23:14:58 -0500
+Received: from ozlabs.org ([203.11.71.1]:41063 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231608AbhBBEOp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S231603AbhBBEOp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 1 Feb 2021 23:14:45 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4DVBHz1qqjz9tkv; Tue,  2 Feb 2021 15:13:19 +1100 (AEDT)
+        id 4DVBHz39fwz9tkx; Tue,  2 Feb 2021 15:13:19 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
         d=gibson.dropbear.id.au; s=201602; t=1612239199;
-        bh=sgqCxTU3ldDr2MDL7pZNPx7v/t7kq8/KrSPm5nvDlJE=;
+        bh=EC9nTg+Uv3v+VvRKFWEjtF2Rk7pUODae9A3gtMZRc6Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=X4L0x6hTVEYQusVRvDY1CcV4UGEiEcPCuk9+WDLdo9sE7z5an7PriJbbRMDxD/Bkr
-         mu4pFJJ7QQ9Tpbb346NHIz09+JQosqqaiyEtjhXMHVOU2UwYAEGLZ2cb7wuOlKW/rr
-         ezh64AAFsarEEY9WswP2jPNrEJqReUUYpHXfoUg8=
+        b=isurvp9Wqau9433wIFzYsTRwZtbwsrI/T8WfCTTV7juwUTbyw+YM3VrWT7kv6WBkG
+         7XspQYrSVJ2YnyAJsd65nx8PGfDUnQ+/o5qa7U2aq/x+R2Bri2Ypy68Eqf69EQ07yD
+         R3kCDXWlmIsCagH/GsvJqGOg2ZSMkhBcPSS0Ftlc=
 From:   David Gibson <david@gibson.dropbear.id.au>
 To:     dgilbert@redhat.com, pair@us.ibm.com, qemu-devel@nongnu.org,
         brijesh.singh@amd.com, pasic@linux.ibm.com
@@ -34,9 +34,9 @@ Cc:     pragyansri.pathi@intel.com, Greg Kurz <groug@kaod.org>,
         qemu-s390x@nongnu.org, thuth@redhat.com, mst@redhat.com,
         frankja@linux.ibm.com, jun.nakajima@intel.com,
         andi.kleen@intel.com, Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH v8 07/13] confidential guest support: Introduce cgs "ready" flag
-Date:   Tue,  2 Feb 2021 15:13:09 +1100
-Message-Id: <20210202041315.196530-8-david@gibson.dropbear.id.au>
+Subject: [PATCH v8 08/13] confidential guest support: Move SEV initialization into arch specific code
+Date:   Tue,  2 Feb 2021 15:13:10 +1100
+Message-Id: <20210202041315.196530-9-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210202041315.196530-1-david@gibson.dropbear.id.au>
 References: <20210202041315.196530-1-david@gibson.dropbear.id.au>
@@ -46,111 +46,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The platform specific details of mechanisms for implementing
-confidential guest support may require setup at various points during
-initialization.  Thus, it's not really feasible to have a single cgs
-initialization hook, but instead each mechanism needs its own
-initialization calls in arch or machine specific code.
-
-However, to make it harder to have a bug where a mechanism isn't
-properly initialized under some circumstances, we want to have a
-common place, late in boot, where we verify that cgs has been
-initialized if it was requested.
-
-This patch introduces a ready flag to the ConfidentialGuestSupport
-base type to accomplish this, which we verify in
-qemu_machine_creation_done().
+While we've abstracted some (potential) differences between mechanisms for
+securing guest memory, the initialization is still specific to SEV.  Given
+that, move it into x86's kvm_arch_init() code, rather than the generic
+kvm_init() code.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- include/exec/confidential-guest-support.h | 24 +++++++++++++++++++++++
- softmmu/vl.c                              | 10 ++++++++++
- target/i386/sev.c                         |  2 ++
- 3 files changed, 36 insertions(+)
+ accel/kvm/kvm-all.c   | 14 --------------
+ accel/kvm/sev-stub.c  |  4 ++--
+ target/i386/kvm/kvm.c | 20 ++++++++++++++++++++
+ target/i386/sev.c     |  7 ++++++-
+ 4 files changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/include/exec/confidential-guest-support.h b/include/exec/confidential-guest-support.h
-index 3db6380e63..5dcf602047 100644
---- a/include/exec/confidential-guest-support.h
-+++ b/include/exec/confidential-guest-support.h
-@@ -27,6 +27,30 @@ OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport, CONFIDENTIAL_GUEST_SUPPORT)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 3d820d0c7d..7150acdbcc 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2180,20 +2180,6 @@ static int kvm_init(MachineState *ms)
  
- struct ConfidentialGuestSupport {
-     Object parent;
+     kvm_state = s;
+ 
+-    /*
+-     * if memory encryption object is specified then initialize the memory
+-     * encryption context.
+-     */
+-    if (ms->cgs) {
+-        Error *local_err = NULL;
+-        /* FIXME handle mechanisms other than SEV */
+-        ret = sev_kvm_init(ms->cgs, &local_err);
+-        if (ret < 0) {
+-            error_report_err(local_err);
+-            goto err;
+-        }
+-    }
+-
+     ret = kvm_arch_init(ms, s);
+     if (ret < 0) {
+         goto err;
+diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
+index 512e205f7f..9587d1b2a3 100644
+--- a/accel/kvm/sev-stub.c
++++ b/accel/kvm/sev-stub.c
+@@ -17,6 +17,6 @@
+ 
+ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+ {
+-    /* SEV can't be selected if it's not compiled */
+-    g_assert_not_reached();
++    /* If we get here, cgs must be some non-SEV thing */
++    return 0;
+ }
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 6dc1ee052d..4788139128 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -42,6 +42,7 @@
+ #include "hw/i386/intel_iommu.h"
+ #include "hw/i386/x86-iommu.h"
+ #include "hw/i386/e820_memory_layout.h"
++#include "sysemu/sev.h"
+ 
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
+@@ -2135,6 +2136,25 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     uint64_t shadow_mem;
+     int ret;
+     struct utsname utsname;
++    Error *local_err = NULL;
 +
 +    /*
-+     * ready: flag set by CGS initialization code once it's ready to
-+     *        start executing instructions in a potentially-secure
-+     *        guest
++     * Initialize SEV context, if required
 +     *
-+     * The definition here is a bit fuzzy, because this is essentially
-+     * part of a self-sanity-check, rather than a strict mechanism.
++     * If no memory encryption is requested (ms->cgs == NULL) this is
++     * a no-op.
 +     *
-+     * It's not fasible to have a single point in the common machine
-+     * init path to configure confidential guest support, because
-+     * different mechanisms have different interdependencies requiring
-+     * initialization in different places, often in arch or machine
-+     * type specific code.  It's also usually not possible to check
-+     * for invalid configurations until that initialization code.
-+     * That means it would be very easy to have a bug allowing CGS
-+     * init to be bypassed entirely in certain configurations.
-+     *
-+     * Silently ignoring a requested security feature would be bad, so
-+     * to avoid that we check late in init that this 'ready' flag is
-+     * set if CGS was requested.  If the CGS init hasn't happened, and
-+     * so 'ready' is not set, we'll abort.
++     * It's also a no-op if a non-SEV confidential guest support
++     * mechanism is selected.  SEV is the only mechanism available to
++     * select on x86 at present, so this doesn't arise, but if new
++     * mechanisms are supported in future (e.g. TDX), they'll need
++     * their own initialization either here or elsewhere.
 +     */
-+    bool ready;
- };
- 
- typedef struct ConfidentialGuestSupportClass {
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 1b464e3474..1869ed54a9 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -101,6 +101,7 @@
- #include "qemu/plugin.h"
- #include "qemu/queue.h"
- #include "sysemu/arch_init.h"
-+#include "exec/confidential-guest-support.h"
- 
- #include "ui/qemu-spice.h"
- #include "qapi/string-input-visitor.h"
-@@ -2497,6 +2498,8 @@ static void qemu_create_cli_devices(void)
- 
- static void qemu_machine_creation_done(void)
- {
-+    MachineState *machine = MACHINE(qdev_get_machine());
-+
-     /* Did we create any drives that we failed to create a device for? */
-     drive_check_orphaned();
- 
-@@ -2516,6 +2519,13 @@ static void qemu_machine_creation_done(void)
- 
-     qdev_machine_creation_done();
- 
-+    if (machine->cgs) {
-+        /*
-+         * Verify that Confidential Guest Support has actually been initialized
-+         */
-+        assert(machine->cgs->ready);
++    ret = sev_kvm_init(ms->cgs, &local_err);
++    if (ret < 0) {
++        error_report_err(local_err);
++        return ret;
 +    }
-+
-     if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
-         exit(1);
-     }
+ 
+     if (!kvm_check_extension(s, KVM_CAP_IRQ_ROUTING)) {
+         error_report("kvm: KVM_CAP_IRQ_ROUTING not supported by KVM");
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 590cb31fa8..f9e9b5d8ae 100644
+index f9e9b5d8ae..11c9a3cc21 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -737,6 +737,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-     qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
-     qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
+@@ -664,13 +664,18 @@ sev_vm_state_change(void *opaque, int running, RunState state)
  
-+    cgs->ready = true;
+ int sev_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+ {
+-    SevGuestState *sev = SEV_GUEST(cgs);
++    SevGuestState *sev
++        = (SevGuestState *)object_dynamic_cast(OBJECT(cgs), TYPE_SEV_GUEST);
+     char *devname;
+     int ret, fw_error;
+     uint32_t ebx;
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
+ 
++    if (!sev) {
++        return 0;
++    }
 +
-     return 0;
- err:
-     sev_guest = NULL;
+     ret = ram_block_discard_disable(true);
+     if (ret) {
+         error_report("%s: cannot disable RAM discard", __func__);
 -- 
 2.29.2
 
