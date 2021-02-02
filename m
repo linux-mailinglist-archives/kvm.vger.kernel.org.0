@@ -2,162 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD1730CDF4
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 22:33:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02E4E30CE0E
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 22:40:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbhBBVbx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 16:31:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33565 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229793AbhBBVbu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Feb 2021 16:31:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612301422;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=G0kfi1Ead2f7sUwvPloDcAYNgV5q97py1bBvH50YBqM=;
-        b=NmLkaaWqbCyVkHZMQfmAj8qxIBEcezUC+3ma4Cecq5AfugalayzLz0o1TFNQNv5zMziw5G
-        d52npFHtj4SMiCgsRKksoQQYEbdBAgb3+Qz9dt+zT69A2Lb6mNo4PNckCu2xds5MBX1S+d
-        TCyTB0bx4yzTtK6AcgAfN5LkklQCiMI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-tUNrQbiCMC6gMWru6ngMiA-1; Tue, 02 Feb 2021 16:30:17 -0500
-X-MC-Unique: tUNrQbiCMC6gMWru6ngMiA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A781800D55;
-        Tue,  2 Feb 2021 21:30:15 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E3901899A;
-        Tue,  2 Feb 2021 21:30:14 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 14:30:13 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
-        <aik@ozlabs.ru>
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-Message-ID: <20210202143013.06366e9d@omen.home.shazbot.org>
-In-Reply-To: <5e9ee84e-d950-c8d9-ac70-df042f7d8b47@nvidia.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
-        <20210201162828.5938-9-mgurtovoy@nvidia.com>
-        <20210201181454.22112b57.cohuck@redhat.com>
-        <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
-        <20210201114230.37c18abd@omen.home.shazbot.org>
-        <20210202170659.1c62a9e8.cohuck@redhat.com>
-        <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
-        <20210202105455.5a358980@omen.home.shazbot.org>
-        <20210202185017.GZ4247@nvidia.com>
-        <20210202123723.6cc018b8@omen.home.shazbot.org>
-        <20210202204432.GC4247@nvidia.com>
-        <5e9ee84e-d950-c8d9-ac70-df042f7d8b47@nvidia.com>
+        id S233221AbhBBVjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 16:39:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35516 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233018AbhBBVjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 16:39:23 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3045C061786
+        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 13:38:23 -0800 (PST)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1l73KK-0005G0-0Y; Tue, 02 Feb 2021 22:35:12 +0100
+Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1l73KD-000359-6W; Tue, 02 Feb 2021 22:35:05 +0100
+Date:   Tue, 2 Feb 2021 22:35:02 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Russell King <linux+pull@armlinux.org.uk>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-fbdev@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        Jaroslav Kysela <perex@perex.cz>,
+        Eric Anholt <eric@anholt.net>, linux-i2c@vger.kernel.org,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Takashi Iwai <tiwai@suse.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Mike Leach <mike.leach@linaro.org>,
+        linux-watchdog@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-spi@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Leo Yan <leo.yan@linaro.org>, dmaengine@vger.kernel.org
+Subject: Re: [GIT PULL] immutable branch for amba changes targeting v5.12-rc1
+Message-ID: <20210202213502.ya4luwvklbte72sz@pengutronix.de>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="iy6nspqtdtxt6xyd"
+Content-Disposition: inline
+In-Reply-To: <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Feb 2021 22:59:27 +0200
-Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
 
-> On 2/2/2021 10:44 PM, Jason Gunthorpe wrote:
-> > On Tue, Feb 02, 2021 at 12:37:23PM -0700, Alex Williamson wrote:
-> >  
-> >> For the most part, this explicit bind interface is redundant to
-> >> driver_override, which already avoids the duplicate ID issue.  
-> > No, the point here is to have the ID tables in the PCI drivers because
-> > they fundamentally only work with their supported IDs. The normal
-> > driver core ID tables are a replacement for all the hardwired if's in
-> > vfio_pci.
-> >
-> > driver_override completely disables all the ID checking, it seems only
-> > useful for vfio_pci which works with everything. It should not be used
-> > with something like nvlink_vfio_pci.ko that needs ID checking.  
-> 
-> This mechanism of driver_override seems weird to me. In case of hotplug 
-> and both capable drivers (native device driver and vfio-pci) are loaded, 
-> both will compete on the device.
+--iy6nspqtdtxt6xyd
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-How would the hot-added device have driver_override set?  There's no
-competition, the native device driver would claim the device and the
-user could set driver_override, unbind and re-probe to get their
-specified driver.  Once a driver_override is set, there cannot be any
-competition, driver_override is used for match exclusively if set.
+Hello,
 
-> I think the proposed flags is very powerful and it does fix the original 
-> concern Alex had ("if we start adding ids for vfio drivers then we 
-> create conflicts with the native host driver") and it's very deterministic.
-> 
-> In this way we'll bind explicitly to a driver.
-> 
-> And the way we'll choose a vfio-pci driver is by device_id + vendor_id + 
-> subsystem_device + subsystem_vendor.
-> 
-> There shouldn't be 2 vfio-pci drivers that support a device with same 
-> above 4 ids.
+On Tue, Feb 02, 2021 at 02:53:50PM +0100, Uwe Kleine-K=F6nig wrote:
+> the following changes since commit 5c8fe583cce542aa0b84adc939ce85293de36e=
+5e:
+>=20
+>   Linux 5.11-rc1 (2020-12-27 15:30:22 -0800)
+>=20
+> are available in the Git repository at:
+>=20
+>   https://git.pengutronix.de/git/ukl/linux tags/amba-make-remove-return-v=
+oid
+>=20
+> for you to fetch changes up to f170b59fedd733b92f58c4d7c8357fbf7601d623:
+>=20
+>   amba: Make use of bus_type functions (2021-02-02 14:26:02 +0100)
+>=20
+> I expect this tag to be merged by Russell King as amba maintainer and by
+> Mathieu Poirier (or Greg Kroah-Hartman?) for coresight as there are some
+> pending conflicting changes. These are not hard to resolve but also
+> non-trivial. Tell me if you need assistance for resolving, also if it's o=
+nly a
+> second pair of eyes to judge your resolution.
 
-It's entirely possible there could be, but without neural implant
-devices to interpret the user's intentions, I think we'll have to
-accept there could be non-determinism here.
+Alternatively to my additional patch sent earlier today I prepared a v2
+tag at
 
-The first set of users already fail this specification though, we can't
-base it strictly on device and vendor IDs, we need wildcards, class
-codes, revision IDs, etc., just like any other PCI drvier.  We're not
-going to maintain a set of specific device IDs for the IGD extension,
-nor I suspect the NVLINK support as that would require a kernel update
-every time a new GPU is released that makes use of the same interface.
+  https://git.pengutronix.de/git/ukl/linux tags/amba-make-remove-return-voi=
+d-v2
 
-As I understand Jason's reply, these vendor drivers would have an ids
-table and a user could look at modalias for the device to compare to
-the driver supported aliases for a match.  Does kmod already have this
-as a utility outside of modprobe?
+with the build fix squashed in. Iff you prefer and both Russell and Greg
+agree to pull this one instead of the (implicit) v1 we can maybe prevent
+introducing this build regression in mainline. Please coordinate among
+you two. And sorry again for breaking the build.
 
-> if you don't find a suitable vendor-vfio-pci.ko, you'll try binding 
-> vfio-pci.ko.
-> 
-> Each driver will publish its supported ids in sysfs to help the user to 
-> decide.
+Best regards
+Uwe
 
-Seems like it would be embedded in the aliases for the module, with
-this explicit binding flag being the significant difference that
-prevents auto loading the device.  We still have one of the races that
-driver_override resolves though, the proposed explicit bind flag is on
-the driver not the device, so a native host driver being loaded due to
-a hotplug operation or independent actions of different admins could
-usurp the device between unbind of old driver and bind to new driver.
+PS: The range-diff between the original
+tags/amba-make-remove-return-void and
+tags/amba-make-remove-return-void-v2 is:
 
-> > Yes, this DRIVER_EXPLICIT_BIND_ONLY idea somewhat replaces
-> > driver_override because we could set the PCI any match on vfio_pci and
-> > manage the driver binding explicitly instead.
-> >  
-> >> A driver id table doesn't really help for binding the device,
-> >> ultimately even if a device is in the id table it might fail to
-> >> probe due to the missing platform support that each of these igd and
-> >> nvlink drivers expose,  
-> > What happens depends on what makes sense for the driver, some missing
-> > optional support could continue without it, or it could fail.
-> >
-> > IGD and nvlink can trivially go onwards and work if they don't find
-> > the platform support.
+1:  3fd269e74f2f ! 1:  481963c91284 amba: Make the remove callback return v=
+oid
+    @@ Commit message
+         Acked-by: Vladimir Zapolskiy <vz@mleia.com> # for memory/pl172
+         Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+         Link: https://lore.kernel.org/r/20210126165835.687514-5-u.kleine-k=
+oenig@pengutronix.de
+    +    [ukleinek: squashed in a build fix for drivers/mailbox/arm_mhuv2.c]
+         Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+    =20
+      ## drivers/amba/bus.c ##
+    @@ drivers/input/serio/ambakmi.c: static int amba_kmi_remove(struct amb=
+a_device *de
+     =20
+      static int __maybe_unused amba_kmi_resume(struct device *dev)
+    =20
+    + ## drivers/mailbox/arm_mhuv2.c ##
+    +@@ drivers/mailbox/arm_mhuv2.c: static int mhuv2_probe(struct amba_dev=
+ice *adev, const struct amba_id *id)
+    +   return ret;
+    + }
+    +=20
+    +-static int mhuv2_remove(struct amba_device *adev)
+    ++static void mhuv2_remove(struct amba_device *adev)
+    + {
+    +   struct mhuv2 *mhu =3D amba_get_drvdata(adev);
+    +=20
+    +   if (mhu->frame =3D=3D SENDER_FRAME)
+    +           writel_relaxed(0x0, &mhu->send->access_request);
+    +-
+    +-  return 0;
+    + }
+    +=20
+    + static struct amba_id mhuv2_ids[] =3D {
+    +
+      ## drivers/memory/pl172.c ##
+     @@ drivers/memory/pl172.c: static int pl172_probe(struct amba_device *=
+adev, const struct amba_id *id)
+        return ret;
+2:  f170b59fedd7 =3D 2:  f30d22a7bfab amba: Make use of bus_type functions
 
-This seems unpredictable from a user perspective.  In either the igd or
-nvlink cases, if the platform features aren't available, the feature
-set of the device is reduced.  That's not apparent until the user tries
-to start interacting with the device if the device specific driver
-doesn't fail the probe.  Userspace policy would need to decide if a
-fallback driver is acceptable or the vendor specific driver failure is
-fatal. Thanks,
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
-Alex
+--iy6nspqtdtxt6xyd
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmAZxYMACgkQwfwUeK3K
+7AnuCggAjiQbE+eiwx7Lq2dUAxw0U6bgjFY/EXIcLCMbTPjdEffSVExAzMT3cTCy
+zISJDI3QF315/RleMFcnEXrXJl7Ft8SkoEvZfheNfz5JmPu8jPIEUp5giooDmpBi
+TV/LqBdE+wmy+J7byBdoH8Chvg9RR52u6aJFyj8nzwAoqj/+YiSYcB2nsMtr962B
+GLNq7i0h7Lj0cZxGVTsh75QuVSyK7yedx7gS4F5wUURJpSa5LzeeWAboWgARpg+M
+/BIWHX1CAs2JGZQqzJF2hffd/HZhQCWJlgTa1x92sg2Ic62K+ufwdsHlo87Wuo42
+N6jvYIoY/t/LHHL+3zxpfxM1yFao+A==
+=lf3x
+-----END PGP SIGNATURE-----
+
+--iy6nspqtdtxt6xyd--
