@@ -2,210 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 837AD30C819
-	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:44:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 669FF30C830
+	for <lists+kvm@lfdr.de>; Tue,  2 Feb 2021 18:45:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237674AbhBBRlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Feb 2021 12:41:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40086 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237696AbhBBRjO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Feb 2021 12:39:14 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA42EC0613D6
-        for <kvm@vger.kernel.org>; Tue,  2 Feb 2021 09:38:33 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id g15so15344321pgu.9
-        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 09:38:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=pVSquQSJrpYri28cE6XyoyehQWlIu8NKqtes58NqYnw=;
-        b=iPjbSd3lMUVp+LL3SbLTaxLFPpifaaJDTb//4xQdc/L3ioPjSukPHVzjXBAe+udK0G
-         hVFCtFYJyIgmEZLl4DjM92zZxYk5lLtod1CPtuoE8YL9NulxrHBpdrnoU0Ht3fPC5HIx
-         F3o9wBimLyh+QvrM7zmD1Sc3us7fEjU16+ff0DX/VoKZ67zd4CF1+I9Jrh6yYJ9t0Y/w
-         2savrwGja6E2cxd7zyhENRS6JJJ1GaopyvVV7gLCC+iM7YsR8WZcXlay7rbB2xGfDMba
-         9Gw7TCEquEeYaNplRBBabw3aAswWwnqkeQ1tX8MM5It4QCVECGMDoU5v6S6QWxlmWfZX
-         7VIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=pVSquQSJrpYri28cE6XyoyehQWlIu8NKqtes58NqYnw=;
-        b=OvwFuOw7uzihb/XSIuva9jEHTAS0SfIYiS1im1NSFDhAM5LaUTIx6E2SwuEfxsQwHo
-         5QeIorvt75cbbId7PaxRmmVw+SERsJZAiQlgaDUGMQuOFzGkW90c9hwIGH7q7zL1jKlq
-         +NufpWH8rOHjomGN7AVl0xXOdvXpe7u6OBc0dimcMEJa7ar232bflMDaUlQerRqhDf9Q
-         lAVvpSbhYohuZKwKqOe7NJmpS1hD8Wm5LTjOiZPWiNAbV/lKLwV83f76fXaruP3Qz08Z
-         HsMIVJLBtB+1i3hjonMAlvcjLyp8AiC+g4hzrFpYXkcB3PUPP5lFHj39qiTS5La5rJwG
-         41sA==
-X-Gm-Message-State: AOAM533UTpA+5brI8h24SD7U1yiklLtDxEQN5MNVD8e6CbA4lOvs5SDY
-        NaHNYSi71Ze//V/U6kTuI5FZiA==
-X-Google-Smtp-Source: ABdhPJyscSr9KAYJt2pwrGFtbF+cqkEDEm4VWe11h1YjFChuKOikDuV0f84w6vLAkYydzOIFhBWIIQ==
-X-Received: by 2002:a62:ac06:0:b029:1cb:35bc:5e2c with SMTP id v6-20020a62ac060000b02901cb35bc5e2cmr16876009pfe.42.1612287513189;
-        Tue, 02 Feb 2021 09:38:33 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:e1bc:da69:2e4b:ce97])
-        by smtp.gmail.com with ESMTPSA id i1sm23910312pfb.54.2021.02.02.09.38.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Feb 2021 09:38:32 -0800 (PST)
-Date:   Tue, 2 Feb 2021 09:38:26 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: x86: move kvm_inject_gp up from
- kvm_handle_invpcid to callers
-Message-ID: <YBmOEt6YezYWtTjQ@google.com>
-References: <20210202165141.88275-1-pbonzini@redhat.com>
- <20210202165141.88275-3-pbonzini@redhat.com>
+        id S237832AbhBBRog (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Feb 2021 12:44:36 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:18566 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237751AbhBBRmG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Feb 2021 12:42:06 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60198ec50000>; Tue, 02 Feb 2021 09:41:25 -0800
+Received: from [172.27.0.48] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Feb
+ 2021 17:41:19 +0000
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     Matthew Rosato <mjrosato@linux.ibm.com>, <jgg@nvidia.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
+        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
+        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
+        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
+        <yishaih@nvidia.com>, <aik@ozlabs.ru>
+References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+ <20210201162828.5938-9-mgurtovoy@nvidia.com>
+ <20210201181454.22112b57.cohuck@redhat.com>
+ <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
+Date:   Tue, 2 Feb 2021 19:41:16 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210202165141.88275-3-pbonzini@redhat.com>
+In-Reply-To: <20210202170659.1c62a9e8.cohuck@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612287685; bh=T9u2m8ib6L6wjnHIIPMQb8zM6/4WXaLdn05UdqoTT0c=;
+        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
+         MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+         Content-Language:X-Originating-IP:X-ClientProxiedBy;
+        b=N7eZ8ReEx0/Bqg8xyxrqzQMO8fa7xE7tK+5n1zO5nKxn2aYadp7UDLxOdfBN4PSSe
+         jaiYRM/E0kIc4jRblHs/SaiNHjJ1jxm+uqMe8sH0sKUkui7HPuNc4b/T3WygdpT0Fs
+         bVxhgrB9M3V1aKw6FkHNIUq6bEnRf38pCsmYhM6J1CqsSu+IOT5Ki9g0aSjidqqIF1
+         t62ePGc3K4aYGh/H69wI4+ypPBwQZkih1aNx4aqUOc8u6J9hHW9WPxw4Wt23P3FVzQ
+         6VXZAy3ZTiVS85rAJgkB/woIpeIX+MwVm+d8aTCVdkEjAodn6ogQZ1h2oeXsrTkRff
+         xfJCT2DFJ5I+g==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 02, 2021, Paolo Bonzini wrote:
-> Push the injection of #GP up to the callers, so that they can just use
-> kvm_complete_insn_gp.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
 
-...
+On 2/2/2021 6:06 PM, Cornelia Huck wrote:
+> On Mon, 1 Feb 2021 11:42:30 -0700
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+>
+>> On Mon, 1 Feb 2021 12:49:12 -0500
+>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+>>
+>>> On 2/1/21 12:14 PM, Cornelia Huck wrote:
+>>>> On Mon, 1 Feb 2021 16:28:27 +0000
+>>>> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>>>>      
+>>>>> This patch doesn't change any logic but only align to the concept of
+>>>>> vfio_pci_core extensions. Extensions that are related to a platform
+>>>>> and not to a specific vendor of PCI devices should be part of the core
+>>>>> driver. Extensions that are specific for PCI device vendor should go
+>>>>> to a dedicated vendor vfio-pci driver.
+>>>> My understanding is that igd means support for Intel graphics, i.e. a
+>>>> strict subset of x86. If there are other future extensions that e.g.
+>>>> only make sense for some devices found only on AMD systems, I don't
+>>>> think they should all be included under the same x86 umbrella.
+>>>>
+>>>> Similar reasoning for nvlink, that only seems to cover support for some
+>>>> GPUs under Power, and is not a general platform-specific extension IIUC.
+>>>>
+>>>> We can arguably do the zdev -> s390 rename (as zpci appears only on
+>>>> s390, and all PCI devices will be zpci on that platform), although I'm
+>>>> not sure about the benefit.
+>>> As far as I can tell, there isn't any benefit for s390 it's just
+>>> "re-branding" to match the platform name rather than the zdev moniker,
+>>> which admittedly perhaps makes it more clear to someone outside of s390
+>>> that any PCI device on s390 is a zdev/zpci type, and thus will use this
+>>> extension to vfio_pci(_core).  This would still be true even if we added
+>>> something later that builds atop it (e.g. a platform-specific device
+>>> like ism-vfio-pci).  Or for that matter, mlx5 via vfio-pci on s390x uses
+>>> these zdev extensions today and would need to continue using them in a
+>>> world where mlx5-vfio-pci.ko exists.
+>>>
+>>> I guess all that to say: if such a rename matches the 'grand scheme' of
+>>> this design where we treat arch-level extensions to vfio_pci(_core) as
+>>> "vfio_pci_(arch)" then I'm not particularly opposed to the rename.  But
+>>> by itself it's not very exciting :)
+>> This all seems like the wrong direction to me.  The goal here is to
+>> modularize vfio-pci into a core library and derived vendor modules that
+>> make use of that core library.  If existing device specific extensions
+>> within vfio-pci cannot be turned into vendor modules through this
+>> support and are instead redefined as platform specific features of the
+>> new core library, that feels like we're already admitting failure of
+>> this core library to support known devices, let alone future devices.
+>>
+>> IGD is a specific set of devices.  They happen to rely on some platform
+>> specific support, whose availability should be determined via the
+>> vendor module probe callback.  Packing that support into an "x86"
+>> component as part of the core feels not only short sighted, but also
+>> avoids addressing the issues around how userspace determines an optimal
+>> module to use for a device.
+> Hm, it seems that not all current extensions to the vfio-pci code are
+> created equal.
+>
+> IIUC, we have igd and nvlink, which are sets of devices that only show
+> up on x86 or ppc, respectively, and may rely on some special features
+> of those architectures/platforms. The important point is that you have
+> a device identifier that you can match a driver against.
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 08568c47337c..edbeb162012b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11375,7 +11375,6 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
->  		return kvm_handle_memory_failure(vcpu, r, &e);
+maybe you can supply the ids ?
 
-This is broken.  kvm_handle_memory_failure() injects a #PF and returns 1, which
-means an error here will trigger #PF->#GP->#DF.
+Alexey K, I saw you've been working on the NVLINK2 for P9. can you 
+supply the exact ids for that should be bounded to this driver ?
 
->  
->  	if (operand.pcid >> 12 != 0) {
-> -		kvm_inject_gp(vcpu, 0);
->  		return 1;
->  	}
+I'll add it to V3.
 
-Curly braces can be dropped.
-
-> @@ -11385,15 +11384,13 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
->  	case INVPCID_TYPE_INDIV_ADDR:
->  		if ((!pcid_enabled && (operand.pcid != 0)) ||
->  		    is_noncanonical_address(operand.gla, vcpu)) {
-> -			kvm_inject_gp(vcpu, 0);
->  			return 1;
->  		}
->  		kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
-> -		return kvm_skip_emulated_instruction(vcpu);
-> +		return 0;
->  
->  	case INVPCID_TYPE_SINGLE_CTXT:
->  		if (!pcid_enabled && (operand.pcid != 0)) {
-> -			kvm_inject_gp(vcpu, 0);
->  			return 1;
->  		}
-
-Same here.
-
->  
-> @@ -11414,7 +11411,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
->  		 * resync will happen anyway before switching to any other CR3.
->  		 */
->  
-> -		return kvm_skip_emulated_instruction(vcpu);
-> +		return 0;
->  
->  	case INVPCID_TYPE_ALL_NON_GLOBAL:
->  		/*
-> @@ -11427,7 +11424,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
->  		fallthrough;
->  	case INVPCID_TYPE_ALL_INCL_GLOBAL:
->  		kvm_mmu_unload(vcpu);
-> -		return kvm_skip_emulated_instruction(vcpu);
-> +		return 0;
->  
->  	default:
->  		BUG(); /* We have already checked above that type <= 3 */
-> -- 
-> 2.26.2
-
-IMO, this isn't an improvement.  For flows that can't easily be consolidated to
-x86.c, e.g. CRs (and DRs?), I agree it makes sense to use kvm_complete_insn_gp(),
-but this feels forced.
-
-What about a pure refactoring of kvm_handle_invpcid() to get a similar effect?
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ef630f8d8bd2..b9f57f9f2422 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11363,28 +11363,23 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
-        if (r != X86EMUL_CONTINUE)
-                return kvm_handle_memory_failure(vcpu, r, &e);
- 
--       if (operand.pcid >> 12 != 0) {
--               kvm_inject_gp(vcpu, 0);
--               return 1;
--       }
-+       if (operand.pcid >> 12 != 0)
-+               goto inject_gp;
- 
-        pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
- 
-        switch (type) {
-        case INVPCID_TYPE_INDIV_ADDR:
-                if ((!pcid_enabled && (operand.pcid != 0)) ||
--                   is_noncanonical_address(operand.gla, vcpu)) {
--                       kvm_inject_gp(vcpu, 0);
--                       return 1;
--               }
-+                   is_noncanonical_address(operand.gla, vcpu))
-+                       goto inject_gp;
-+
-                kvm_mmu_invpcid_gva(vcpu, operand.gla, operand.pcid);
--               return kvm_skip_emulated_instruction(vcpu);
-+               break;
- 
-        case INVPCID_TYPE_SINGLE_CTXT:
--               if (!pcid_enabled && (operand.pcid != 0)) {
--                       kvm_inject_gp(vcpu, 0);
--                       return 1;
--               }
-+               if (!pcid_enabled && (operand.pcid != 0))
-+                       goto inject_gp;
- 
-                if (kvm_get_active_pcid(vcpu) == operand.pcid) {
-                        kvm_mmu_sync_roots(vcpu);
-@@ -11402,8 +11397,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
-                 * given PCID, then nothing needs to be done here because a
-                 * resync will happen anyway before switching to any other CR3.
-                 */
--
--               return kvm_skip_emulated_instruction(vcpu);
-+               break;
- 
-        case INVPCID_TYPE_ALL_NON_GLOBAL:
-                /*
-@@ -11416,11 +11410,17 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
-                fallthrough;
-        case INVPCID_TYPE_ALL_INCL_GLOBAL:
-                kvm_mmu_unload(vcpu);
--               return kvm_skip_emulated_instruction(vcpu);
-+               break;
- 
-        default:
-                BUG(); /* We have already checked above that type <= 3 */
-        }
-+
-+       return kvm_skip_emulated_instruction(vcpu);
-+
-+inject_gp:
-+       kvm_inject_gp(vcpu, 0);
-+       return 1;
- }
- EXPORT_SYMBOL_GPL(kvm_handle_invpcid);
- 
-
+>
+> On the other side, we have the zdev support, which both requires s390
+> and applies to any pci device on s390. If we added special handling for
+> ISM on s390, ISM would be in a category similar to igd/nvlink.
+>
+> Now, if somebody plugs a mlx5 device into an s390, we would want both
+> the zdev support and the specialized mlx5 driver. Maybe zdev should be
+> some kind of library that can be linked into normal vfio-pci, into
+> vfio-pci-mlx5, and a hypothetical vfio-pci-ism? You always want zdev on
+> s390 (if configured into the kernel).
+>
