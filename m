@@ -2,134 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D96A330E089
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 18:09:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AD8F30E119
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 18:30:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231879AbhBCRIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 12:08:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33194 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231214AbhBCRIp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 12:08:45 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10969C0613D6
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 09:08:00 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id w14so241788pfi.2
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 09:08:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=G1iwSbTVj6QBQpGti6KeydgsQsfsoS1OzKLwdbvGTlg=;
-        b=Y/iuW7ktUr9N60A9jncs5vg9Df3WAmp7Mz/GBlCJvytad9IsqzMFNSjX20mjDweX8t
-         SfeM0TrXnWtmLpCKXNenztGoOffKRBKoUGnBVldUZalpPxA1xHp5D4h2tVagdxcmdF+H
-         1QC9ns87ZGbm2a4Jc1Y43fqKAdDriiOZHZ+9MUipbLGb8jU4L85LwHxamry5Yu/yC8eO
-         exvxIiB/wwGng0NBVRiVJlrH4+0tylVlHdKpD3JYORITsgUmbQu4qzyeqApdloFnRuFz
-         cYTNSU8nE4/65pfz6TJssev82KTiljmL78AUr4aI7ttc6//FhQypp860FpBHC7ZCKanB
-         /XQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=G1iwSbTVj6QBQpGti6KeydgsQsfsoS1OzKLwdbvGTlg=;
-        b=WAfS5rQNUqKiiI7wm7mbvyKrKlCD8IE7ioSZQZ37o5hDqqJCca4ZWgW1zhebU7qEma
-         irJFofpIwhe/4pSF1bvionlgCSWjphewAjpCMcX7FPnzlTr85MqZTPE7Tl5wZALXJQpJ
-         wt9oH7tDUnvIaILGBT6YbuewYpIowfKQV7Pq43MdK2y2chdKPrNt6VIhbQpggeY9CEnt
-         26luTC4Za40vuhVCki2+ds/QUGAxpfTbMbsVa7rNUZtXymbBnsV5rAU3mOp6OBy8jxG3
-         opSpzUCztLVqQjnOMbdlpiJEZ+4wYJW8sb1vYQGvHZkWwpaqAa9ru8y8LOXpIBbOPqTl
-         /yPw==
-X-Gm-Message-State: AOAM530dszwNMRsT311ceCWPQSo0Avp/N/Vs7zUj6CKzzJqnKKIXnWBM
-        ibawkdKgdVnIIQNC9asfABqyog==
-X-Google-Smtp-Source: ABdhPJxCuXMUJNpQmsJXTGvIkc9S/pMWMsa405DX5HjgAscsYcnCDDnULytXFdhfFVDsbihZnILAyw==
-X-Received: by 2002:a63:e109:: with SMTP id z9mr4715327pgh.5.1612372079463;
-        Wed, 03 Feb 2021 09:07:59 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
-        by smtp.gmail.com with ESMTPSA id p8sm3258411pgi.21.2021.02.03.09.07.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 09:07:58 -0800 (PST)
-Date:   Wed, 3 Feb 2021 09:07:52 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Huang, Haitao" <haitao.huang@intel.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>
-Subject: Re: [RFC PATCH v3 23/27] KVM: VMX: Add SGX ENCLS[ECREATE] handler to
- enforce CPUID restrictions
-Message-ID: <YBrYaFxo6S79l0kA@google.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <d68c01baed78f859ac5fce4519646fc8a356c77d.1611634586.git.kai.huang@intel.com>
- <f60226157935d2bbc20958e6eae7c3532b72f7a3.camel@intel.com>
- <YBn+DBXJgPmA1iED@google.com>
- <20210203221110.c50ec5cd50a77d269c3656bd@intel.com>
+        id S232370AbhBCRab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 12:30:31 -0500
+Received: from foss.arm.com ([217.140.110.172]:44092 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231987AbhBCRa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 12:30:26 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 645D011FB;
+        Wed,  3 Feb 2021 09:29:40 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 30D533F719;
+        Wed,  3 Feb 2021 09:29:39 -0800 (PST)
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, kernel-team@android.com
+References: <20210125122638.2947058-1-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
+ <680c2e4f-cc9f-10c1-1158-7de32057fb0d@arm.com>
+ <20c1d805997523ae04f45be90fb4dd1a@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <606d0499-961d-53c5-e391-0f6f5fcd28cf@arm.com>
+Date:   Wed, 3 Feb 2021 17:29:36 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20c1d805997523ae04f45be90fb4dd1a@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210203221110.c50ec5cd50a77d269c3656bd@intel.com>
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 03, 2021, Kai Huang wrote:
-> On Tue, 2 Feb 2021 17:36:12 -0800 Sean Christopherson wrote:
-> > On Wed, Feb 03, 2021, Edgecombe, Rick P wrote:
-> > > On Tue, 2021-01-26 at 22:31 +1300, Kai Huang wrote:
-> > > > +       /*
-> > > > +        * Verify alignment early.  This conveniently avoids having
-> > > > to worry
-> > > > +        * about page splits on userspace addresses.
-> > > > +        */
-> > > > +       if (!IS_ALIGNED(pageinfo.metadata, 64) ||
-> > > > +           !IS_ALIGNED(pageinfo.contents, 4096)) {
-> > > > +               kvm_inject_gp(vcpu, 0);
-> > > > +               return 1;
-> > > > +       }
-> > > > +
-> > > > +       /*
-> > > > +        * Translate the SECINFO, SOURCE and SECS pointers from GVA
-> > > > to GPA.
-> > > > +        * Resume the guest on failure to inject a #PF.
-> > > > +        */
-> > > > +       if (sgx_gva_to_gpa(vcpu, pageinfo.metadata, false,
-> > > > &metadata_gpa) ||
-> > > > +           sgx_gva_to_gpa(vcpu, pageinfo.contents, false,
-> > > > &contents_gpa) ||
-> > > > +           sgx_gva_to_gpa(vcpu, secs_gva, true, &secs_gpa))
-> > > > +               return 1;
-> > > > +
-> > > 
-> > > Do pageinfo.metadata and pageinfo.contents need cannonical checks here?
-> > 
-> > Bugger, yes.  So much boilerplate needed in this code :-/
-> > 
-> > Maybe add yet another helper to do alignment+canonical checks, up where the
-> > IS_ALIGNED() calls are?
-> 
-> sgx_get_encls_gva() already does canonical check. Couldn't we just use it?
+Hi Marc,
 
-After rereading the SDM for the bajillionth time, yes, these should indeed use
-sgx_get_encls_gva().  Originally I was thinking they were linear addresses, but
-they are effective addresses that use DS, i.e. not using the helper to avoid the
-DS.base adjustment for 32-bit mode was also wrong.
+On 2/3/21 10:32 AM, Marc Zyngier wrote:
+> On 2021-01-27 17:41, Alexandru Elisei wrote:
+>> Hi Marc,
+>>
+>> Had another look at the patch, comments below.
+>>
+>> On 1/25/21 12:26 PM, Marc Zyngier wrote:
+>>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+>>> pretty easy. All that is required is support for PMMIR_EL1, which
+>>> is read-only, and for which returning 0 is a valid option as long
+>>> as we don't advertise STALL_SLOT as an implemented event.
+>>>
+>>> Let's just do that and adjust what we return to the guest.
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>> Â arch/arm64/include/asm/sysreg.h |Â  3 +++
+>>> Â arch/arm64/kvm/pmu-emul.cÂ Â Â Â Â Â  |Â  6 ++++++
+>>> Â arch/arm64/kvm/sys_regs.cÂ Â Â Â Â Â  | 11 +++++++----
+>>> Â 3 files changed, 16 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>>> index 8b5e7e5c3cc8..2fb3f386588c 100644
+>>> --- a/arch/arm64/include/asm/sysreg.h
+>>> +++ b/arch/arm64/include/asm/sysreg.h
+>>> @@ -846,7 +846,10 @@
+>>>
+>>> Â #define ID_DFR0_PERFMON_SHIFTÂ Â Â Â Â Â Â  24
+>>>
+>>> +#define ID_DFR0_PERFMON_8_0Â Â Â Â Â Â Â  0x3
+>>> Â #define ID_DFR0_PERFMON_8_1Â Â Â Â Â Â Â  0x4
+>>> +#define ID_DFR0_PERFMON_8_4Â Â Â Â Â Â Â  0x5
+>>> +#define ID_DFR0_PERFMON_8_5Â Â Â Â Â Â Â  0x6
+>>>
+>>> Â #define ID_ISAR4_SWP_FRAC_SHIFTÂ Â Â Â Â Â Â  28
+>>> Â #define ID_ISAR4_PSR_M_SHIFTÂ Â Â Â Â Â Â  24
+>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>>> index 398f6df1bbe4..72cd704a8368 100644
+>>> --- a/arch/arm64/kvm/pmu-emul.c
+>>> +++ b/arch/arm64/kvm/pmu-emul.c
+>>> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>>> Â Â Â Â Â Â Â Â  base = 0;
+>>> Â Â Â Â  } else {
+>>> Â Â Â Â Â Â Â Â  val = read_sysreg(pmceid1_el0);
+>>> +Â Â Â Â Â Â Â  /*
+>>> +Â Â Â Â Â Â Â Â  * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+>>> +Â Â Â Â Â Â Â Â  * as RAZ
+>>> +Â Â Â Â Â Â Â Â  */
+>>> +Â Â Â Â Â Â Â  if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
+>>> +Â Â Â Â Â Â Â Â Â Â Â  val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+>>
+>> This is confusing the me. We have kvm->arch.pmuver set to the hardware
+>> PMU version
+>> (as set by __armv8pmu_probe_pmu()), but we ignore it when reporting the PMU
+>> version to the guest. Why do we do that? We limit the event number in
+>> kvm_pmu_event_mask() based on the hardware PMU version, so even if we advertise
+>> Armv8.4 PMU, support for all those extra events added by Arm8.1 PMU is
+>> missing (I hope I understood the code correctly).
+>
+> That's a bit of mess-up. We obtain ID_AA64DFR0_EL1 from the sanitised
+> regs, but do most of our handling based on kvm->arch.pmuver. They really
+> should be the same, because that's what the sanitised registers give
+> you.
+>
+> As for the events themselves, I don't get your drift. We do support
+> all the ARMv8.1 PMU events as long as the HW supports it, and we
+> don't lie to the guest about it either (cpuid_feature_cap_perfmon_field
+> does *cap* the field to some value, it doesn't allow it to increase
+> past what the HW supports).
+That's the piece that I was missing - I didn't realize that
+cpuid_feature_cap_perfmon_field() makes sure that the final version doesn't exceed
+what the hardware supports. Thanks for clearing it up!
+>
+>> I looked at commit c854188ea010 ("KVM: arm64: limit PMU version to PMUv3 for
+>> ARMv8.1") which changed read_id_reg() to report PMUv3 for Armv8.1
+>> unconditionally,
+>> and there's no explanation why PMUv3 for Armv8.1 was chosen instead of
+>> plain PMUv3 (PMUVer = 0b0100).
+>
+> We picked ARMv8.1 because this is the first PMU revision that gives
+> you events in the 0x4000 range, all of which are available on
+> common ARMv8.2 HW.
 
-> For instance:
-> 
-> 	if (sgx_get_encls_gva(vcpu, pageinfo.metadata, 64, 64 &metadata_gva) ||
-> 	    sgx_get_encls_gva(vcpu, pageinfo.contents, 4096, 4096,
->                              &contents_gva))
-> 		return 1;
+Yes, makes sense in the context of cpuid_feature_cap_perfmon_field() capping
+PMUVer based on the hardware supported version.
+
+Thanks,
+Alex
