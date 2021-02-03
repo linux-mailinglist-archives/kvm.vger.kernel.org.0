@@ -2,74 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6433E30D700
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 11:04:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BB5730D70B
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 11:09:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233488AbhBCKEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 05:04:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44256 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233215AbhBCKEc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 05:04:32 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C842764DD4;
-        Wed,  3 Feb 2021 10:03:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612346631;
-        bh=iDRUK1dfIoKv6p3k1yQ5f2Cl0AFuONzv34q2WQe7GM0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=F0m4Sltz3uZxB1AklHhBuerzDt/tEJafYqB0uS0KywOB1mvXTeW9KjjmYoF53zGw7
-         vEZK8b0aseAfyl/bgDADaBF4N3ApbdRLeWnVBuihAqOL23L9kjH3id/n1Ar+/vV7Vl
-         8Z+40H+IfOZ7JaG8/wBoYgblQQav8n2ZwQ58L6zPkio2mt4AzS43UQD3dySKIRMjR6
-         VJ/goWdqchVa99j8T9IZC7dJyGpjd8GIS/HOH/Ha8eqm86S9a3nu+frBoQ/7NBxpeg
-         eLfVdzE8qJEf4s3gQJlrGYZqBnqh6QguRCQin4stnwiGAt6ZqfJxjbOemtKO4dLwJf
-         6GyNsAdvvTXxQ==
-Date:   Wed, 3 Feb 2021 12:03:44 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, seanjc@google.com,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v3 03/27] x86/sgx: Remove a warn from
- sgx_free_epc_page()
-Message-ID: <YBp1APi0LBhrbgQx@kernel.org>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <36e999dce8a1a4efb8ca69c9a6fbe3fa63305e08.1611634586.git.kai.huang@intel.com>
- <d09b8b34-6e8c-5323-e155-f45da5abb48b@intel.com>
- <6e859dc6610d317f09663a4ce76b7e13fc0c0f8e.camel@intel.com>
- <15dda40e-5875-aaa9-acbb-7d868a13f982@intel.com>
- <20210127142652.b9d181813b10f8660d0df664@intel.com>
- <20210201131110.d1425c4d0db46fb895bde10f@intel.com>
+        id S233554AbhBCKIy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 05:08:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48921 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233215AbhBCKIs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 05:08:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612346842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RRNWNZSEjYUISWzV/hzDQuuQn4Ann7n4iPTKBGa+3mE=;
+        b=i14Mw43vVugSlpNJEWo3TOtgRLaYSm6P8mL0hgnS6F1mcZLMpWRlH0Ya0+5Qu9lPuH3ANz
+        RgyfZLIaMJGCeTfkN7o3gGAIhsS85asOSGkeX6kEEAKktHGO2Hch0pQkhqeKUAnCqTdurD
+        AEWcF79iI4IAeB+steQf1LH10PgtKa4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-vSdjnu0nPBCMCMoCoXFmWA-1; Wed, 03 Feb 2021 05:07:20 -0500
+X-MC-Unique: vSdjnu0nPBCMCMoCoXFmWA-1
+Received: by mail-ed1-f69.google.com with SMTP id i13so5140041edq.19
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 02:07:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RRNWNZSEjYUISWzV/hzDQuuQn4Ann7n4iPTKBGa+3mE=;
+        b=aQWgVoERvqjdrYSMK/n0SZdHlAuJhQxD/OmFoeulLvsN4uF+7YCM31qryVTvLkYGAw
+         vr3x1UUUyZmEa6g6ZMNnDu1T2mo9+SUeE+IRFNOpIgg48cXwYFI7hTfdO2Sm7HeGOBoN
+         hJaDcwu13zEp8kPAFjPafDAq1TSreRhcLk8blB48xdkeQKwb/pvXx1lBQAH91OGcKsxD
+         Pyh3iuGf9ffWQQSp8Qaa/VE7cfA312zSOgig7qQzPcG3+xFEq118NKQc3WWIx/zxvj7f
+         zt9MI7kVDTQnG8OTT/ynWNFeAY2Ak2+s9MoW9fzZUCgyqTPn6XSKqZGXvJWJUasaIpCz
+         rpuA==
+X-Gm-Message-State: AOAM532L2eOuMU4+TW5gsrEQ/4ptSlT8GtQYotkEbaNouG/fx8m5rn4/
+        yF5v56k8VwIon9ZW71ubZt+CfBc/EQZftmU5pA0nbOmB1K0skL82tSWa6zE8ez9CoI6zKo5yNAs
+        bJasMK/FePAKc
+X-Received: by 2002:a05:6402:1118:: with SMTP id u24mr2157675edv.386.1612346839147;
+        Wed, 03 Feb 2021 02:07:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyNBYEODxX2CDv6VeeoBShNHoVFAtymdsHrukNbtazorn38PHHEcvCDODPGT2aOTgYsyvAhjg==
+X-Received: by 2002:a05:6402:1118:: with SMTP id u24mr2157652edv.386.1612346838998;
+        Wed, 03 Feb 2021 02:07:18 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id h25sm781475ejy.7.2021.02.03.02.07.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Feb 2021 02:07:18 -0800 (PST)
+Subject: Re: [PATCH v2 28/28] KVM: selftests: Disable dirty logging with vCPUs
+ running
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20210202185734.1680553-1-bgardon@google.com>
+ <20210202185734.1680553-29-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1edd4e34-5463-9802-bf07-7f4840f3d103@redhat.com>
+Date:   Wed, 3 Feb 2021 11:07:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210201131110.d1425c4d0db46fb895bde10f@intel.com>
+In-Reply-To: <20210202185734.1680553-29-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 01:11:10PM +1300, Kai Huang wrote:
-> On Wed, 27 Jan 2021 14:26:52 +1300 Kai Huang wrote:
-> > On Tue, 26 Jan 2021 17:12:12 -0800 Dave Hansen wrote:
-> > > On 1/26/21 5:08 PM, Kai Huang wrote:
-> > > > I don't have deep understanding of SGX driver. Would you help to answer?
-> > > 
-> > > Kai, as the patch submitter, you are expected to be able to at least
-> > > minimally explain what the patch is doing.  Please endeavor to obtain
-> > > this understanding before sending patches in the future.
-> > 
-> > I see. Thanks.
+On 02/02/21 19:57, Ben Gardon wrote:
+> Disabling dirty logging is much more intestesting from a testing
+> perspective if the vCPUs are still running. This also excercises the
+> code-path in which collapsible SPTEs must be faulted back in at a higher
+> level after disabling dirty logging.
 > 
-> Hi Jarkko,
+> To: linux-kselftest@vger.kernel.org
+> CC: Peter Xu <peterx@redhat.com>
+> CC: Andrew Jones <drjones@redhat.com>
+> CC: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>   tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> I think I'll remove this patch in next version, since it is not related to KVM
-> SGX. And I'll rebase your second patch based on current tip/x86/sgx. You may
-> send out this patch independently. Let me know if you have comment.
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 604ccefd6e76..d44a5b8ef232 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -205,11 +205,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   		}
+>   	}
+>   
+> -	/* Tell the vcpu thread to quit */
+> -	host_quit = true;
+> -	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+> -		pthread_join(vcpu_threads[vcpu_id], NULL);
+> -
+>   	/* Disable dirty logging */
+>   	clock_gettime(CLOCK_MONOTONIC, &start);
+>   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX, 0);
+> @@ -217,6 +212,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
+>   		ts_diff.tv_sec, ts_diff.tv_nsec);
+>   
+> +	/* Tell the vcpu thread to quit */
+> +	host_quit = true;
+> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+> +		pthread_join(vcpu_threads[vcpu_id], NULL);
+> +
+>   	avg = timespec_div(get_dirty_log_total, p->iterations);
+>   	pr_info("Get dirty log over %lu iterations took %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
+>   		p->iterations, get_dirty_log_total.tv_sec,
+> 
 
-I don't like to pre-ack changes.
+Queued the two selftests patches, because why not.
 
-My main concern is not to introduce multiple disjoint versions
-of sgx_free_epc_page(). It is just not sane because you can do
-an implementation where those don't exist.
+Paolo
 
-/Jarkko
