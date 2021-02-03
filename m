@@ -2,123 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AA6330E15B
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 18:47:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93EF230E15F
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 18:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231540AbhBCRqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 12:46:50 -0500
-Received: from mga04.intel.com ([192.55.52.120]:12562 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231236AbhBCRqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 12:46:48 -0500
-IronPort-SDR: jUKXGgUlyfMZ+sxN9PB5vmpcb1WJ0dpcOmPItZfxjuMDAmcDqP+TsX4S0zU7wZtI6AOKeQBMqF
- AbIXLXCitl+Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9884"; a="178524484"
-X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
-   d="scan'208";a="178524484"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 09:46:08 -0800
-IronPort-SDR: f/RpxycFolcEOcNgYjhr+Zd72520VG3ZUcAutWmuHfwYm0SIhNHtjfAT77fCuoTVswihDcWagN
- ahPFSTN0w09A==
-X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
-   d="scan'208";a="356099374"
-Received: from pmehra-mobl.amr.corp.intel.com (HELO [10.255.230.38]) ([10.255.230.38])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 09:46:06 -0800
-Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "jethro@fortanix.com" <jethro@fortanix.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "b.thiel@posteo.de" <b.thiel@posteo.de>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "Huang, Haitao" <haitao.huang@intel.com>
-References: <cover.1611634586.git.kai.huang@intel.com>
- <4b4b9ed1d7756e8bccf548fc41d05c7dd8367b33.camel@intel.com>
- <YBnTPmbPCAUS6XNl@google.com>
- <99135352-8e10-fe81-f0dc-8d552d73e3d3@intel.com>
- <YBnmow4e8WUkRl2H@google.com>
- <f50ac476-71f2-60d4-5008-672365f4d554@intel.com>
- <YBrfF0XQvzQf9PhR@google.com>
- <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <c827fed1-d7af-a94a-b69e-114d4a2ec988@intel.com>
-Date:   Wed, 3 Feb 2021 09:46:05 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S231941AbhBCRrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 12:47:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231761AbhBCRrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 12:47:22 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52F87C061573
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 09:46:42 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id f6so192199ioz.5
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 09:46:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dzh6Szd68SNbk4V2VI6tuXFXXPHzJoleMwdVCBlnvgU=;
+        b=Jq3Efsv/7vUYP40QeFUNejML2XmCm9ySZisia3boixp+rou/miUrGoX/23QXEWY0nq
+         fa+/HUz8/GxIjLWgJ+7Ip8Dr4izCHXA+VweL82YBSfJtrgWLN+TFKcyfA0vwsZBukONS
+         icmxX8a5Pzfc29plYqUHYjETk5jrtgfn8yTwdV2ugRP27y359nQUq4JSJMbqzHp82OsL
+         N8cHdX3Xyh2dFeUQLNiUIBXfyfqIWBMi1SOL0D/RYg9HpqMbonAudeOlGYL27a4v7bOD
+         RZ7RJbC/wCT5FD8bOwmdpq3MXPtW2cRZofasFD6hDLsxxNeenLYeFI0C7Vb70lFFtp4+
+         hlNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dzh6Szd68SNbk4V2VI6tuXFXXPHzJoleMwdVCBlnvgU=;
+        b=JRK9bCNbOjsXJxy7YlnEU3Znl2SVbi9M8TuLKLwohNRs9gQROV2IY8uKoTq95KH7iL
+         vHsa2TXTOr7OAuKdTL6y5dN8cNN3vXFu4/cXhAXk7r1Ep1aHBL09/F6+QQN/8nxbKuzv
+         rjJVVa3FaeFgwbSs9hh2CSIZdqjGXGsHZ5IIzXExPcrkqeZVezUXDw1FIk2zlGGC1Qyu
+         0lG7ePNsKovk3p19Y6qE0a6V0oWkAF2bPNUvoBdN057d0gQz515PGlJIkQTv/Jjhr0Fe
+         ZkYCpvo//sfpfo0yIIxcbjS6rXKyChqcAaSHo3s9YIBkOU4u+nRuwTw0LzY8ZGS9BrlF
+         cqdg==
+X-Gm-Message-State: AOAM530dz2qax0+Ab0knkXQp493BSrgdNWPMni8PRb+K7M/AY9c4Pk2E
+        QSpjQXaqPD0gZY77Jhf+ERlQ189zvwuNFU7pq08Wag==
+X-Google-Smtp-Source: ABdhPJwV/n6GtQBrLYdwdPxlhTaz5T6VrhI384pIUPj4Jh0GcYlZaFZ7DFmw2DUegateQtjgMHdC8NnmowO56cg8ZHE=
+X-Received: by 2002:a5d:8155:: with SMTP id f21mr3440813ioo.9.1612374401592;
+ Wed, 03 Feb 2021 09:46:41 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210202185734.1680553-1-bgardon@google.com> <20210202185734.1680553-24-bgardon@google.com>
+ <d2c4ae90-1e60-23ed-4bda-24cf88db04c9@redhat.com>
+In-Reply-To: <d2c4ae90-1e60-23ed-4bda-24cf88db04c9@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 3 Feb 2021 09:46:30 -0800
+Message-ID: <CANgfPd-ELyPrn5z0N+o8R6Ci=O25XF+EDU-HDGgvVXGV7uF-dQ@mail.gmail.com>
+Subject: Re: [PATCH v2 23/28] KVM: x86/mmu: Allow parallel page faults for the
+ TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/3/21 9:43 AM, Paolo Bonzini wrote:
-> On 03/02/21 18:36, Sean Christopherson wrote:
->> I'm not at all opposed to preventing KVM from accessing EPC, but I
->> really don't want to add a special check in KVM to avoid reading EPC.
->> KVM generally isn't aware of physical backings, and the relevant KVM
->> code is shared between all architectures.
-> 
-> Yeah, special casing KVM is almost always the wrong thing to do.
-> Anything that KVM can do, other subsystems will do as well.
+On Wed, Feb 3, 2021 at 4:40 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 02/02/21 19:57, Ben Gardon wrote:
+> >
+> > -     write_lock(&vcpu->kvm->mmu_lock);
+> > +
+> > +     if (is_tdp_mmu_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+> > +             read_lock(&vcpu->kvm->mmu_lock);
+> > +     else
+> > +             write_lock(&vcpu->kvm->mmu_lock);
+> > +
+>
+> I'd like to make this into two helper functions, but I'm not sure about
+> the naming:
+>
+> - kvm_mmu_read_lock_for_root/kvm_mmu_read_unlock_for_root: not precise
+> because it's really write-locked for shadow MMU roots
+>
+> - kvm_mmu_lock_for_root/kvm_mmu_unlock_for_root: not clear that TDP MMU
+> operations will need to operate in shared-lock mode
+>
+> I prefer the first because at least it's the conservative option, but
+> I'm open to other opinions and suggestions.
+>
+> Paolo
+>
 
-Agreed.  Thwarting ioremap itself seems like the right way to go.
+Of the above two options, I like the second one, though I'd be happy
+with either. I agree the first is more conservative, in that it's
+clear the MMU lock could be shared. It feels a little misleading,
+though to have read in the name of the function but then acquire the
+write lock, especially since there's code below that which expects the
+write lock. I don't know of a good way to abstract this into a helper
+without some comments to make it clear what's going on, but maybe
+there's a slightly more open-coded compromise:
+if (!kvm_mmu_read_lock_for_root(vcpu->kvm, vcpu->arch.mmu->root_hpa))
+         write_lock(&vcpu->kvm->mmu_lock);
+or
+enum kvm_mmu_lock_mode lock_mode =
+get_mmu_lock_mode_for_root(vcpu->kvm, vcpu->arch.mmu->root_hpa);
+....
+kvm_mmu_lock_for_mode(lock_mode);
+
+Not sure if either of those are actually clearer, but the latter
+trends in the direction the RCF took, having an enum to capture
+read/write and whether or not yo yield in a lock mode parameter.
