@@ -2,84 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E605930D399
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 08:00:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4C4030DB3F
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 14:30:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231773AbhBCG6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 01:58:50 -0500
-Received: from mga09.intel.com ([134.134.136.24]:46077 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230193AbhBCG6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 01:58:49 -0500
-IronPort-SDR: LKHcjCk+MCJOvNtZ5Ana8J3Ine1IkrgSWZnOOmdLa9Wo5Q6rIkeBZ2wQcSdP4s+6LswureBZWf
- Pm2Ed3Gwj8LA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9883"; a="181141693"
-X-IronPort-AV: E=Sophos;i="5.79,397,1602572400"; 
-   d="scan'208";a="181141693"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2021 22:57:02 -0800
-IronPort-SDR: yOYFXDoNims9sTqJO4yYV6ttQ36oBupccKAADmqXcJlbXrJY+OxBeeDTAfwotfwrqyU/ADOYoQ
- iCMOiQxyy+8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,397,1602572400"; 
-   d="scan'208";a="433239012"
-Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
-  by orsmga001.jf.intel.com with ESMTP; 02 Feb 2021 22:56:59 -0800
-From:   Like Xu <like.xu@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: vmx/pmu: Add VMCS fields check before exposing LBR_FMT
-Date:   Wed,  3 Feb 2021 14:50:27 +0800
-Message-Id: <20210203065027.314622-1-like.xu@linux.intel.com>
-X-Mailer: git-send-email 2.29.2
+        id S231894AbhBCN2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 08:28:04 -0500
+Received: from 198-20-226-115.unifiedlayer.com ([198.20.226.115]:51174 "EHLO
+        198-20-226-115.unifiedlayer.com" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231886AbhBCN2C (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 08:28:02 -0500
+X-Greylist: delayed 21682 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Feb 2021 08:27:03 EST
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=carnivalassure.com.bd; s=default; h=Content-Transfer-Encoding:Content-Type:
+        Message-ID:Reply-To:Subject:To:From:Date:MIME-Version:Sender:Cc:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=miRpAdBSO5eDo01VDX+EK9bqGCmqMjXHS3kO16T6iWw=; b=oR9DBi73zWrpNptVGG8joD1q3D
+        a2vFVnixMQAUcmehD6fgJOQ9JP9N27NiM2NuC8HmaSTuyc4tIbd8kMLlSjPNy8b19j5i4Yecn4k41
+        d2L53GGQ3KAYNm9cTjTcF00G/e0wgveF66KZo4CFoHY+VyQWZpnDvHs7YXjdM1k0LGC10SnlZJnOf
+        hyfuxn41TeLbFp37bqri+jK8o3wb0VHiGKRxBfijUx18MCanoqvAna1IaS7ccBxFfbvZdTXygBXlc
+        j3LFBSU0eQazmqTdBY+jvtCMEdlAV/WbBykAUBZA45AnMWlIO1A8LzPVfVBXCEwNqNeODasQNIR6+
+        B0GfR5SA==;
+Received: from [127.0.0.1] (port=46664 helo=dot.dotlines.com.sg)
+        by dot.dotlines.com.sg with esmtpa (Exim 4.93)
+        (envelope-from <noreply@carnivalassure.com.bd>)
+        id 1l7CVp-0005bM-9S; Wed, 03 Feb 2021 01:23:41 -0600
 MIME-Version: 1.0
+Date:   Wed, 03 Feb 2021 01:23:40 -0600
+From:   Francois Pinault <noreply@carnivalassure.com.bd>
+To:     undisclosed-recipients:;
+Subject: Hello/Hallo
+Organization: Donation
+Reply-To: francoispinault1936@outlook.com
+Mail-Reply-To: francoispinault1936@outlook.com
+Message-ID: <02cc13f2661d3cb7582fa6695be089c9@carnivalassure.com.bd>
+X-Sender: noreply@carnivalassure.com.bd
+User-Agent: Roundcube Webmail/1.3.15
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - dot.dotlines.com.sg
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - carnivalassure.com.bd
+X-Get-Message-Sender-Via: dot.dotlines.com.sg: authenticated_id: noreply@carnivalassure.com.bd
+X-Authenticated-Sender: dot.dotlines.com.sg: noreply@carnivalassure.com.bd
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before KVM exposes guest LBR_FMT perf capabilities, it needs to check
-whether VMCS has GUEST_IA32_DEBUGCTL guest status field and vmx switch
-support on IA32_DEBUGCTL MSR (including VM_EXIT_SAVE_DEBUG_CONTROLS
-and VM_ENTRY_LOAD_DEBUG_CONTROLS). It helps nested LBR enablement.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
----
- arch/x86/kvm/vmx/capabilities.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index d1d77985e889..ac3af06953a8 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -378,6 +378,12 @@ static inline bool vmx_pt_mode_is_host_guest(void)
- 	return pt_mode == PT_MODE_HOST_GUEST;
- }
- 
-+static inline bool cpu_has_vmx_lbr(void)
-+{
-+	return (vmcs_config.vmexit_ctrl & VM_EXIT_SAVE_DEBUG_CONTROLS) &&
-+		(vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_DEBUG_CONTROLS);
-+}
-+
- static inline u64 vmx_get_perf_capabilities(void)
- {
- 	u64 perf_cap = 0;
-@@ -385,7 +391,8 @@ static inline u64 vmx_get_perf_capabilities(void)
- 	if (boot_cpu_has(X86_FEATURE_PDCM))
- 		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
- 
--	perf_cap &= PMU_CAP_LBR_FMT;
-+	if (cpu_has_vmx_lbr())
-+		perf_cap &= PMU_CAP_LBR_FMT;
- 
- 	/*
- 	 * Since counters are virtualized, KVM would support full
 -- 
-2.29.2
+Hallo, ich bin Herr Francois Pinault, ich habe Ihnen gespendet. Sie 
+können mein Profil auf Wikipedia, Google oder Forbes überprüfen.
 
+Für Ihren Spendenanspruch und weitere Informationen kontaktieren Sie 
+mich umgehend unter francoispinault1936@outlook.com
+
+Mit freundlichen Grüßen,
+Herr Francois Pinault
