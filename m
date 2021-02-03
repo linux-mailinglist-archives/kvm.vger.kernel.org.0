@@ -2,299 +2,234 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 985BE30DC1E
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 15:03:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A8C730DC50
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 15:12:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232537AbhBCOCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 09:02:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49032 "EHLO
+        id S232317AbhBCOLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 09:11:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232458AbhBCOBP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 09:01:15 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41FEC0613D6
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 06:00:34 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id e15so13284108lft.13
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 06:00:34 -0800 (PST)
+        with ESMTP id S232306AbhBCOLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 09:11:25 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1557BC0613D6
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 06:10:45 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id m22so33527868lfg.5
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 06:10:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:subject:from:to:cc:date:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=fLQZEjeTPuypx7HQGPrDOBJQe4gkG920pRzfTXlQATw=;
-        b=X7Y0sJBeHotlK0Uw1aVosGmcRQw4jfWP0J+9twVI6fN+0xc2jlplK/vwrVq4voqhPE
-         3uegjz+9kUuVrSTsVlaDQx6P82z0k9q3x1CBSpFkTuGTcPDoy6a/zL0bVNPZVdoq9vat
-         5Ly2OYqrG1/8gTJYCIDstsR2eiceNRvAxY92dkoRjnKDLBRQ+QNussN26Cau48feJRJH
-         6gMpJ1facNYafN3gDr83Lk5pELb7KMa79XfCZC236XExyEwDFPglzLI88AdH8wIdQPM/
-         bml10K2nWPRm+E4pmMwK33ZhuFoFptY9ygjPB7uKd1ySc/cculMBkT16oZXsYYfYnwbB
-         SrYw==
+        bh=09KPk/n059WXdQl8E+jqgXMgLAAYdPBKwXAhIWYMTts=;
+        b=JWyKnLo59f0EZz2HZxDmPSp5o8rc6KdEMTuPEA/Ejx3Yj9bF3Df7UTeWI1FKikvb2x
+         Zi26Qgi9aozDO0v7H21t3vZ2abLj7zTKDLNxksFeG/BvbggYyEvwhDOPO/eS82BjYbjW
+         xcQ292MzBZFOH175H4XzXnNJrZHVeJfYHU4tggTj49xFUapvZ7yDyBZ20iKs01ocTVnR
+         WIv7a5VECdlX6IrhHhHdfgb/WQWFeepsIyX7bAbVcgBxrJXRevdisl5ij/177DaYt/1W
+         tEiLxPKpJAezs/nIuQWAny8T1xQhttHLWrcNpzyf38ssoVQPnCdaLZuj++FqVV57bImF
+         1y9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=fLQZEjeTPuypx7HQGPrDOBJQe4gkG920pRzfTXlQATw=;
-        b=XPx2TocSbaSRDNWPKuAg/3djsTWFGn2cRf/5ZVFLUAf7qkNeIQcMwqinaBCyOge1aX
-         VCam49GcBa4fNS45oZRX0o9tib9WFD3r/LwMKPvr2izWTf25V6x15rch9itpNhw4VJM/
-         oqnNS9LeMvizDJ7+vK8zC6HvP/wpWlGGpoF8Um8KW1+xHFN3yGscOIWNE9E0wbQ+ddSi
-         gauAb1viKOCdfq6FE0mgUjr0eaXg5Y6vV2zU8vKOFx01q+IY9ky+B/CeSDiVcyrTutK8
-         c9sKn+C4PmzloHFpGcWd8J1UxONAYmz5frI6GHCr24EwRTclaimM/p1zU8jMIo0Lou9k
-         cqQg==
-X-Gm-Message-State: AOAM531reGJuzSgSPTtl/gxxD9MkT4pf7LL73i9nIcAgLC0SKkNzJBmS
-        KsDq2bOp7fuzIBPmAw4OA5I=
-X-Google-Smtp-Source: ABdhPJxS6sG1ncmYhnzmrOk9gmlIZaF2tuCUA9V6CjUC+9eDQKAmJ7kgMgVkCiGfwNmseqaTi5gEZA==
-X-Received: by 2002:ac2:44da:: with SMTP id d26mr1837801lfm.306.1612360832984;
-        Wed, 03 Feb 2021 06:00:32 -0800 (PST)
+        bh=09KPk/n059WXdQl8E+jqgXMgLAAYdPBKwXAhIWYMTts=;
+        b=l/eOZ6uEvEFUtEIRIdp4nrz0U4cD5knqheTJdHCwn5DOmNl/Qyq6452/UbhjJs/fD7
+         ws3JKZbLVoeU72qonrPO7zLu3KI3RNKjZ2GLUNqYT518GP8tlfcqT9tWnxfls3GawK+g
+         xoMB9P/Bp6IwFHswwCvrlEs91hCI41jSOhRM3DK0Mp7UXX9xO28GWjZ5f3l0mtt4QXyp
+         jhPKlhcWOPpLAbOpCBHj7WeEZsX+734f4gi5ao9oI0667n46p0er+ZZZOcFoIIz2vO3a
+         /VaDd1SBAQOYdCbThifubmeadsDK29Jvoq0GVhzN8OaVgHU2ayEhQpUZ6v/dQ6vmV8XW
+         ITgw==
+X-Gm-Message-State: AOAM5338RVYxwSjmPi9cjupgM/+N69RI8ggnbmlThv5cS7cpY+F19z66
+        JoNFcU7i0OEd6cQLrCpQflIXNo3luGr8FQ==
+X-Google-Smtp-Source: ABdhPJyOOCHZTfxQuPqnWSircnOLYmypXJ0BDhCrlliqBmr7shUnhnSCkwWYII615s61CdlxKkoQpw==
+X-Received: by 2002:ac2:5396:: with SMTP id g22mr1831262lfh.4.1612361443471;
+        Wed, 03 Feb 2021 06:10:43 -0800 (PST)
 Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id y7sm252683lfy.39.2021.02.03.06.00.31
+        by smtp.gmail.com with ESMTPSA id c123sm253317lfd.95.2021.02.03.06.10.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 06:00:32 -0800 (PST)
-Message-ID: <43561304f4c05ddb052d7c587708343534774191.camel@gmail.com>
-Subject: Re: [RFC v2 2/4] KVM: x86: add support for ioregionfd signal
- handling
+        Wed, 03 Feb 2021 06:10:42 -0800 (PST)
+Message-ID: <dc35fdd3eb2febbe49cfd6561da6faf045f12ee3.camel@gmail.com>
+Subject: Re: [RFC v2 3/4] KVM: add support for ioregionfd cmds/replies
+ serialization
 From:   Elena Afanasova <eafanasova@gmail.com>
 To:     Stefan Hajnoczi <stefanha@redhat.com>
 Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
         elena.ufimtseva@oracle.com
-Date:   Wed, 03 Feb 2021 06:00:20 -0800
-In-Reply-To: <20210130165859.GC98016@stefanha-x1.localdomain>
+Date:   Wed, 03 Feb 2021 06:10:25 -0800
+In-Reply-To: <20210130185415.GD98016@stefanha-x1.localdomain>
 References: <cover.1611850290.git.eafanasova@gmail.com>
-         <aa049c6e5bade3565c5ffa820bbbb67bd5d1bf4b.1611850291.git.eafanasova@gmail.com>
-         <20210130165859.GC98016@stefanha-x1.localdomain>
+         <294d8a0e08eff4ec9c8f8f62492f29163e6c4319.1611850291.git.eafanasova@gmail.com>
+         <20210130185415.GD98016@stefanha-x1.localdomain>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2021-01-30 at 16:58 +0000, Stefan Hajnoczi wrote:
-> On Thu, Jan 28, 2021 at 09:32:21PM +0300, Elena Afanasova wrote:
-> > The vCPU thread may receive a signal during ioregionfd
-> > communication,
-> > ioctl(KVM_RUN) needs to return to userspace and then ioctl(KVM_RUN)
-> > must resume ioregionfd.
+On Sat, 2021-01-30 at 18:54 +0000, Stefan Hajnoczi wrote:
+> On Thu, Jan 28, 2021 at 09:32:22PM +0300, Elena Afanasova wrote:
+> > Add ioregionfd context and kvm_io_device_ops->prepare/finish()
+> > in order to serialize all bytes requested by guest.
 > > 
 > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
 > > ---
-> > Changes in v2:
-> >   - add support for x86 signal handling
-> >   - changes after code review
-> > 
-> >  arch/x86/kvm/x86.c            | 196
-> > +++++++++++++++++++++++++++++++---
-> >  include/linux/kvm_host.h      |  13 +++
-> >  include/uapi/linux/ioregion.h |  32 ++++++
-> >  virt/kvm/ioregion.c           | 177 +++++++++++++++++++++++++++++-
-> >  virt/kvm/kvm_main.c           |  16 ++-
-> >  5 files changed, 415 insertions(+), 19 deletions(-)
-> >  create mode 100644 include/uapi/linux/ioregion.h
+> >  arch/x86/kvm/x86.c       |  19 ++++++++
+> >  include/kvm/iodev.h      |  14 ++++++
+> >  include/linux/kvm_host.h |   4 ++
+> >  virt/kvm/ioregion.c      | 102 +++++++++++++++++++++++++++++++++
+> > ------
+> >  virt/kvm/kvm_main.c      |  32 ++++++++++++
+> >  5 files changed, 157 insertions(+), 14 deletions(-)
 > > 
 > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index ddb28f5ca252..a04516b531da 100644
+> > index a04516b531da..393fb0f4bf46 100644
 > > --- a/arch/x86/kvm/x86.c
 > > +++ b/arch/x86/kvm/x86.c
-> > @@ -5799,19 +5799,33 @@ static int vcpu_mmio_write(struct kvm_vcpu
+> > @@ -5802,6 +5802,8 @@ static int vcpu_mmio_write(struct kvm_vcpu
 > > *vcpu, gpa_t addr, int len,
-> >  {
-> >  	int handled = 0;
-> >  	int n;
-> > +	int ret = 0;
-> > +	bool is_apic;
+> >  	int ret = 0;
+> >  	bool is_apic;
 > >  
+> > +	kvm_io_bus_prepare(vcpu, KVM_MMIO_BUS, addr, len);
+> > +
 > >  	do {
 > >  		n = min(len, 8);
-> > -		if (!(lapic_in_kernel(vcpu) &&
-> > -		      !kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev,
-> > addr, n, v))
-> > -		    && kvm_io_bus_write(vcpu, KVM_MMIO_BUS, addr, n,
-> > v))
-> > -			break;
-> > +		is_apic = lapic_in_kernel(vcpu) &&
-> > +			  !kvm_iodevice_write(vcpu, &vcpu->arch.apic-
-> > >dev,
-> > +					      addr, n, v);
-> > +		if (!is_apic) {
-> > +			ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
-> > +					       addr, n, v);
-> > +			if (ret)
-> > +				break;
-> > +		}
-> >  		handled += n;
-> >  		addr += n;
-> >  		len -= n;
-> >  		v += n;
-> >  	} while (len);
-> >  
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (ret == -EINTR) {
-> > +		vcpu->run->exit_reason = KVM_EXIT_INTR;
-> > +		++vcpu->stat.signal_exits;
-> > +	}
-> > +#endif
-> > +
-> >  	return handled;
-> >  }
-> 
-> There is a special case for crossing page boundaries:
-> 1. ioregion in the first 4 bytes (page 1) but not the second 4 bytes
-> (page 2).
-> 2. ioregion in the second 4 bytes (page 2) but not the first 4 bytes
-> (page 1).
-> 3. The first 4 bytes (page 1) in one ioregion and the second 4 bytes
-> (page 2) in another ioregion.
-> 4. The first 4 bytes (page 1) in one ioregion and the second 4 bytes
-> (page 2) in the same ioregion.
-> 
-> Cases 3 and 4 are tricky. If I'm reading the code correctly we try
-> ioregion accesses twice, even if the first one returns -EINTR?
-> 
-Yes, in the case of crossing a page boundary
-emulator_read_write_onepage() will be called twice. This case isn’t
-supported in the current code. Also I think that synchronization code
-for vcpu_mmio_write/read() is wrong. Probably
-kvm_io_bus_prepare/finish() should be called for every
-kvm_io_bus_read/write(). I'll try to fix that.
-
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 7cd667dddba9..5cfdecfca6db 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -318,6 +318,19 @@ struct kvm_vcpu {
+> >  		is_apic = lapic_in_kernel(vcpu) &&
+> > @@ -5823,8 +5825,10 @@ static int vcpu_mmio_write(struct kvm_vcpu
+> > *vcpu, gpa_t addr, int len,
+> >  	if (ret == -EINTR) {
+> >  		vcpu->run->exit_reason = KVM_EXIT_INTR;
+> >  		++vcpu->stat.signal_exits;
+> > +		return handled;
+> >  	}
 > >  #endif
-> >  	bool preempted;
-> >  	bool ready;
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	bool ioregion_interrupted;
+> > +	kvm_io_bus_finish(vcpu, KVM_MMIO_BUS, addr, len);
 > 
-> Can this field move into ioregion_ctx?
+> Hmm...it would be nice for kvm_io_bus_prepare() to return the idx or
+> the
+> device pointer so the devices don't need to be searched in
+> read/write/finish. However, it's complicated by the loop which may
+> access multiple devices.
 > 
-Yes
+Agree
 
-> > +	struct {
-> > +		struct kvm_io_device *dev;
-> > +		int pio;
-> > +		void *val;
-> > +		u8 state;
-> > +		u64 addr;
-> > +		int len;
-> > +		u64 data;
-> > +		bool in;
-> > +	} ioregion_ctx;
+> > @@ -9309,6 +9325,7 @@ static int complete_ioregion_mmio(struct
+> > kvm_vcpu *vcpu)
+> >  		vcpu->mmio_cur_fragment++;
+> >  	}
+> >  
+> > +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
+> >  	vcpu->mmio_needed = 0;
+> >  	if (!vcpu->ioregion_ctx.in) {
+> >  		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > @@ -9333,6 +9350,7 @@ static int complete_ioregion_pio(struct
+> > kvm_vcpu *vcpu)
+> >  		vcpu->ioregion_ctx.val += vcpu->ioregion_ctx.len;
+> >  	}
+> >  
+> > +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
+> >  	if (vcpu->ioregion_ctx.in)
+> >  		r = kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
+> >  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > @@ -9352,6 +9370,7 @@ static int complete_ioregion_fast_pio(struct
+> > kvm_vcpu *vcpu)
+> >  	complete_ioregion_access(vcpu, vcpu->ioregion_ctx.addr,
+> >  				 vcpu->ioregion_ctx.len,
+> >  				 vcpu->ioregion_ctx.val);
+> > +	vcpu->ioregion_ctx.dev->ops->finish(vcpu->ioregion_ctx.dev);
+> >  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> >  
+> >  	if (vcpu->ioregion_ctx.in) {
 > 
-> This struct can be reordered to remove holes between fields.
+> Normally userspace will invoke ioctl(KVM_RUN) and reach one of these
+> completion functions, but what if the vcpu fd is closed instead?
+> ->finish() should still be called to avoid leaks.
 > 
-Ok, will do
+Will fix
 
-> > +#endif
-> >  	struct kvm_vcpu_arch arch;
+> > diff --git a/include/kvm/iodev.h b/include/kvm/iodev.h
+> > index d75fc4365746..db8a3c69b7bb 100644
+> > --- a/include/kvm/iodev.h
+> > +++ b/include/kvm/iodev.h
+> > @@ -25,6 +25,8 @@ struct kvm_io_device_ops {
+> >  		     gpa_t addr,
+> >  		     int len,
+> >  		     const void *val);
+> > +	void (*prepare)(struct kvm_io_device *this);
+> > +	void (*finish)(struct kvm_io_device *this);
+> >  	void (*destructor)(struct kvm_io_device *this);
 > >  };
 > >  
-> > diff --git a/include/uapi/linux/ioregion.h
-> > b/include/uapi/linux/ioregion.h
-> > new file mode 100644
-> > index 000000000000..7898c01f84a1
-> > --- /dev/null
-> > +++ b/include/uapi/linux/ioregion.h
-> > @@ -0,0 +1,32 @@
-> > +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+> > @@ -55,6 +57,18 @@ static inline int kvm_iodevice_write(struct
+> > kvm_vcpu *vcpu,
+> >  				 : -EOPNOTSUPP;
+> >  }
+> >  
+> > +static inline void kvm_iodevice_prepare(struct kvm_io_device *dev)
+> > +{
+> > +	if (dev->ops->prepare)
+> > +		dev->ops->prepare(dev);
+> > +}
+> > +
+> > +static inline void kvm_iodevice_finish(struct kvm_io_device *dev)
+> > +{
+> > +	if (dev->ops->finish)
+> > +		dev->ops->finish(dev);
+> > +}
 > 
-> To encourage people to implement the wire protocol even beyond the
-> Linux
-> syscall environment (e.g. in other hypervisors and VMMs) you could
-> make
-> the license more permissive:
+> A performance optimization: keep a separate list of struct
+> kvm_io_devices that implement prepare/finish. That way the search
+> doesn't need to iterate over devices that don't support this
+> interface.
 > 
->   /* SPDX-License-Identifier: ((GPL-2.0-only WITH Linux-syscall-note) 
-> OR BSD-3-Clause) */
-> 
-> Several other <linux/*.h> files do this so that the header can be
-> used
-> outside Linux without license concerns.
-> 
-> Here is the BSD 3-Clause license:
-> https://opensource.org/licenses/BSD-3-Clause
-> 
-> > +#ifndef _UAPI_LINUX_IOREGION_H
-> > +#define _UAPI_LINUX_IOREGION_H
-> 
-> Please add the wire protocol specification/documentation into this
-> file.
-> That way this header file will serve as a comprehensive reference for
-> the protocol and changes to the header will also update the
-> documentation.
-> 
-> (The ioctl KVM_SET_IOREGIONFD parts belong in
-> Documentation/virt/kvm/api.rst but the wire protocol should be in
-> this
-> header file instead.)
-> 
-Ok
+Thanks for the idea
 
-> > +
-> > +/* Wire protocol */
-> > +struct ioregionfd_cmd {
-> > +	__u32 info;
-> > +	__u32 padding;
-> > +	__u64 user_data;
-> > +	__u64 offset;
-> > +	__u64 data;
-> > +};
-> > +
-> > +struct ioregionfd_resp {
-> > +	__u64 data;
-> > +	__u8 pad[24];
-> > +};
-> > +
-> > +#define IOREGIONFD_CMD_READ    0
-> > +#define IOREGIONFD_CMD_WRITE   1
-> > +
-> > +#define IOREGIONFD_SIZE_8BIT   0
-> > +#define IOREGIONFD_SIZE_16BIT  1
-> > +#define IOREGIONFD_SIZE_32BIT  2
-> > +#define IOREGIONFD_SIZE_64BIT  3
+> Before implementing an optimization like this it would be good to
+> check
+> how this patch affects performance on guests with many in-kernel
+> devices
+> (e.g. a guest that has many multi-queue virtio-net/blk devices with
+> ioeventfd). ioregionfd shouldn't reduce performance of existing KVM
+> configurations, so it's worth measuring.
 > 
-> It's possible that larger read/write operations will be needed in the
-> future. For example, the PCI Express bus supports much larger
-> transactions than just 64 bits.
-> 
-> You don't need to address this right now but I wanted to mention it.
-> 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 88b92fc3da51..df387857f51f 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4193,6 +4193,7 @@ static int __kvm_io_bus_write(struct kvm_vcpu
-> > *vcpu, struct kvm_io_bus *bus,
-> >  			      struct kvm_io_range *range, const void
-> > *val)
-> >  {
-> >  	int idx;
-> > +	int ret = 0;
+> > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
+> > index da38124e1418..3474090ccc8c 100644
+> > --- a/virt/kvm/ioregion.c
+> > +++ b/virt/kvm/ioregion.c
+> > @@ -1,6 +1,6 @@
+> >  // SPDX-License-Identifier: GPL-2.0-only
+> >  #include <linux/kvm_host.h>
+> > -#include <linux/fs.h>
+> > +#include <linux/wait.h>
+> >  #include <kvm/iodev.h>
+> >  #include "eventfd.h"
+> >  #include <uapi/linux/ioregion.h>
+> > @@ -12,15 +12,23 @@ kvm_ioregionfd_init(struct kvm *kvm)
+> >  	INIT_LIST_HEAD(&kvm->ioregions_pio);
+> >  }
 > >  
-> >  	idx = kvm_io_bus_get_first_dev(bus, range->addr, range->len);
-> >  	if (idx < 0)
-> > @@ -4200,9 +4201,12 @@ static int __kvm_io_bus_write(struct
-> > kvm_vcpu *vcpu, struct kvm_io_bus *bus,
-> >  
-> >  	while (idx < bus->dev_count &&
-> >  		kvm_io_bus_cmp(range, &bus->range[idx]) == 0) {
-> > -		if (!kvm_iodevice_write(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > -					range->len, val))
-> > +		ret = kvm_iodevice_write(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > +					 range->len, val);
-> > +		if (!ret)
-> >  			return idx;
-> > +		if (ret < 0 && ret != -EOPNOTSUPP)
-> > +			return ret;
+> > +/* Serializes ioregionfd cmds/replies */
 > 
-> I audited all kvm_io_bus_read/write() callers to check that it's safe
-> to
-> add error return values besides -EOPNOTSUPP. Extending the meaning of
-> the return value is fine but any arches that want to support
-> ioregionfd
-> need to explicitly handle -EINTR return values now. Only x86 does
-> after
-> this patch.
+> Please expand on this comment:
+> 
+>   ioregions that share the same rfd are serialized so that only one
+> vCPU
+>   thread sends a struct ioregionfd_cmd to userspace at a time. This
+>   ensures that the struct ioregionfd_resp received from userspace
+> will
+>   be processed by the one and only vCPU thread that sent it.
+> 
+>   A waitqueue is used to wake up waiting vCPU threads in order. Most
+> of
+>   the time the waitqueue is unused and the lock is not contended.
+>   For best performance userspace should set up ioregionfds so that
+> there
+>   is no contention (e.g. dedicated ioregionfds for queue doorbell
+>   registers on multi-queue devices).
+> 
+> A comment along these lines will give readers an idea of why the code
+> does this.
+
+Ok, thank you
 
