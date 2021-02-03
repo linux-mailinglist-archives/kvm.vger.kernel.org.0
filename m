@@ -2,100 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7532230D867
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 12:20:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECC8E30D86E
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 12:21:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234164AbhBCLTB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 06:19:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35384 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234113AbhBCLSw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 06:18:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612351046;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YDwwnV6oAoWgNtINek2BnDn+JyBU0+eXPvom2Xfx5pY=;
-        b=esJ1Mpz+PkdJTken4H+RaUKcWmJA6Vyu1tMRlZvELPo0gj/8WH+Sj+cpGS2DzF/UH3jFQ2
-        4EW9R6hW9S2ioLZVwnrRJ09H0EkdSuX7bk9J+LKaRCY7wXugduE4HRPofX/+ojH0Jv6ygh
-        vmz1UJHcrs40lUeUUtQNh3VsD9IFAhY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-2ea39i7bMNWDXXIE6H6qCg-1; Wed, 03 Feb 2021 06:17:24 -0500
-X-MC-Unique: 2ea39i7bMNWDXXIE6H6qCg-1
-Received: by mail-ej1-f70.google.com with SMTP id d15so11738632ejc.21
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 03:17:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YDwwnV6oAoWgNtINek2BnDn+JyBU0+eXPvom2Xfx5pY=;
-        b=iQStR1c+oH43BNd+uWHVNcaia4+Cw9gA/KM2J+d1iwmnLvR+ZUDUsVS7WVeP3mXXf2
-         4DszX9Vpln7Gxrelx5A92yh9MG3dG7I9L5NY0hJ6Lomv9a9i/a5IHEiJRWUyN55iDKpm
-         w/Jr5mCpHVIvsjC0TeRLJnBtq6pIJXfkaq6AANesRv9yrKykZC4bSHbv7kM0BY+yXhIc
-         6SE+jB1G6cagoIcR/+4wd3TuVhf4cG4qbtO5jmi6ji8q1nBG0bCUw3oBQSJThMi1+Ze/
-         IvMcET2+/Oqi8yYsSFQ1cPenyUzr3ID1vjVwIcLKhHcjC0JtlC/JtXAZ0LtINxNpOSmt
-         X0Gw==
-X-Gm-Message-State: AOAM533kerI7EX85IiqbAEVQxFUr3vWHM8j0+DRDkhNjh+wDqelPVgvi
-        GZuF0sU21dCMELiqd2RFmjMDeBu3s6mLeQ34ZOoAIF/VPgoQNxIJq6f6w6dFvYLv49mrfG6nrzO
-        Ns5Cg5ALQQAlM
-X-Received: by 2002:a50:fd84:: with SMTP id o4mr2377539edt.340.1612351043440;
-        Wed, 03 Feb 2021 03:17:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx6DJB/yfWm5CLZI+cgY4t/zSaoLhE/4PGymObqGlzKNfu+A+pz91uz/yL9ObXeu3kpsxISnQ==
-X-Received: by 2002:a50:fd84:: with SMTP id o4mr2377519edt.340.1612351043304;
-        Wed, 03 Feb 2021 03:17:23 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r9sm856518eju.74.2021.02.03.03.17.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Feb 2021 03:17:22 -0800 (PST)
-Subject: Re: [PATCH v2 22/28] KVM: x86/mmu: Mark SPTEs in disconnected pages
- as removed
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-23-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cb7108c7-e4f2-ea59-24f4-7c7da45054a8@redhat.com>
-Date:   Wed, 3 Feb 2021 12:17:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S234079AbhBCLVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 06:21:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60356 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234061AbhBCLVU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 06:21:20 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 760BD64F67;
+        Wed,  3 Feb 2021 11:20:39 +0000 (UTC)
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l7GD7-00BjXu-B6; Wed, 03 Feb 2021 11:20:37 +0000
 MIME-Version: 1.0
-In-Reply-To: <20210202185734.1680553-23-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Wed, 03 Feb 2021 11:20:37 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Auger Eric <eric.auger@redhat.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
+In-Reply-To: <7808bec4-2ac5-a36d-2960-b4b90574e0d2@redhat.com>
+References: <20210125122638.2947058-1-maz@kernel.org>
+ <20210125122638.2947058-7-maz@kernel.org>
+ <56041147-0bd8-dbb2-d1ca-550f3db7f05d@redhat.com>
+ <adbdbfbcecb65a1eca21afa622679836@kernel.org>
+ <7808bec4-2ac5-a36d-2960-b4b90574e0d2@redhat.com>
+User-Agent: Roundcube Webmail/1.4.10
+Message-ID: <f6875f72511a69f9ac9a18ebf7698466@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/21 19:57, Ben Gardon wrote:
+On 2021-02-03 11:07, Auger Eric wrote:
+> Hi Marc,
+> On 2/3/21 11:36 AM, Marc Zyngier wrote:
+>> Hi Eric,
+>> 
+>> On 2021-01-27 17:53, Auger Eric wrote:
+>>> Hi Marc,
+>>> 
+>>> On 1/25/21 1:26 PM, Marc Zyngier wrote:
+>>>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
+>>>> pretty easy. All that is required is support for PMMIR_EL1, which
+>>>> is read-only, and for which returning 0 is a valid option as long
+>>>> as we don't advertise STALL_SLOT as an implemented event.
+>>>> 
+>>>> Let's just do that and adjust what we return to the guest.
+>>>> 
+>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>>> ---
+>>>>  arch/arm64/include/asm/sysreg.h |  3 +++
+>>>>  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
+>>>>  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
+>>>>  3 files changed, 16 insertions(+), 4 deletions(-)
+>>>> 
+>>>> diff --git a/arch/arm64/include/asm/sysreg.h
+>>>> b/arch/arm64/include/asm/sysreg.h
+>>>> index 8b5e7e5c3cc8..2fb3f386588c 100644
+>>>> --- a/arch/arm64/include/asm/sysreg.h
+>>>> +++ b/arch/arm64/include/asm/sysreg.h
+>>>> @@ -846,7 +846,10 @@
+>>>> 
+>>>>  #define ID_DFR0_PERFMON_SHIFT        24
+>>>> 
+>>>> +#define ID_DFR0_PERFMON_8_0        0x3
+>>>>  #define ID_DFR0_PERFMON_8_1        0x4
+>>>> +#define ID_DFR0_PERFMON_8_4        0x5
+>>>> +#define ID_DFR0_PERFMON_8_5        0x6
+>>>> 
+>>>>  #define ID_ISAR4_SWP_FRAC_SHIFT        28
+>>>>  #define ID_ISAR4_PSR_M_SHIFT        24
+>>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+>>>> index 398f6df1bbe4..72cd704a8368 100644
+>>>> --- a/arch/arm64/kvm/pmu-emul.c
+>>>> +++ b/arch/arm64/kvm/pmu-emul.c
+>>>> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu,
+>>>> bool pmceid1)
+>>>>          base = 0;
+>>>>      } else {
+>>>>          val = read_sysreg(pmceid1_el0);
+>>>> +        /*
+>>>> +         * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
+>>>> +         * as RAZ
+>>>> +         */
+>>>> +        if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
+>>>> +            val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
+>>> what about the STALL_SLOT_BACKEND and FRONTEND events then?
+>> 
+>> Aren't these a mandatory ARMv8.1 feature? I don't see a reason to
+>> drop them.
 > 
-> +			 * Marking the SPTE as a removed SPTE is not
-> +			 * strictly necessary here as the MMU lock should
+> I understand the 3 are linked together.
+> 
+> In D7.11 it is said
+> "
+> When any of the following common events are implemented, all three of
+> them are implemented:
+> 0x003D , STALL_SLOT_BACKEND, No operation sent for execution on a Slot
+> due to the backend,
+> 0x003E , STALL_SLOT_FRONTEND, No operation sent for execution on a Slot
+> due to the frontend.
+> 0x003F , STALL_SLOT, No operation sent for execution on a Slot.
+> "
 
-"should" is a bit too weak---the point of !shared is that the MMU lock 
-*will* stop other threads from concurrent modifications of the SPTEs.
+They are linked in the sense that they report related events, but they
+don't have to be implemented in the same level of the architecure, if 
+only
+because BACKEND/FRONTEND were introducedway before ARMv8.4.
 
-Paolo
+What the architecture says is:
 
-> +			 * stop other threads from concurrentrly modifying
-> +			 * this SPTE. Using the removed SPTE value keeps
-> +			 * the shared and non-atomic cases consistent and
-> +			 * simplifies the function.
-> +			 */
-> +			WRITE_ONCE(*sptep, REMOVED_SPTE);
+- For FEAT_PMUv3p1 (ARMv8.1):
+   "The STALL_FRONTEND and STALL_BACKEND events are required to be
+    implemented." (A2.4.1, DDI0487G.a)
 
+- For FEAT_PMUv3p4 (ARMv8.4):
+   "If FEAT_PMUv3p4 is implemented:
+    - If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED 
+whether the PMMIR System registers are implemented.
+    - If STALL_SLOT is implemented, then the PMMIR System registers are 
+implemented." (D7-2873, DDI0487G.a)
 
+So while BACKEND/FRONTEND are required in an ARMv8.4 implementation
+by virtue of being mandatory in ARMv8.1, STALL_SLOT isn't at any point.
+
+Thanks,
+
+          M.
+-- 
+Jazz is not dead. It just smells funny...
