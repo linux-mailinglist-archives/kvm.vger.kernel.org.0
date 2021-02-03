@@ -2,96 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E093D30D535
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 09:30:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04F4C30D581
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 09:47:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232793AbhBCI3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 03:29:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44900 "EHLO
+        id S232665AbhBCIqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 03:46:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34827 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232517AbhBCI3i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 03:29:38 -0500
+        by vger.kernel.org with ESMTP id S232238AbhBCIqw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 03:46:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612340892;
+        s=mimecast20190719; t=1612341926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Hwrk+FTuLG7Q9mmQWSF89fyayVM9Juk+kBi6JrWoyJM=;
-        b=DudyKzUXbQb66jy16nOaArrT4HDD/JQji7+xMuk1qBPCIgKSDQtK+W2LTRl7AuQu0Ey0xG
-        NXvJv9iTL8AYByT/VpYCoZLjNV8FwkZEFRYa1jV/WxpQxtc0238p/g43noWON/oTXMt1zx
-        25rWdVnMgrTBTqeu4S4DE1bsQSHJfgY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-1BVDLe5UO0OcEAq27cImbA-1; Wed, 03 Feb 2021 03:28:10 -0500
-X-MC-Unique: 1BVDLe5UO0OcEAq27cImbA-1
-Received: by mail-ej1-f70.google.com with SMTP id eb5so1861636ejc.6
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 00:28:10 -0800 (PST)
+        bh=x4plXTchef/sBjwOoHTzN6rEMhC93if4hIo33GzIkps=;
+        b=Ih00+5TqUnULPrA+I3TOOZ7W7HLrb+5uWkScCYy28LEe/hFTDMNn4+kjARcyE8+DfmbDT5
+        CvfWYanX3gk6mW/NbOI8El49Qia+PWOHLRnwugIq4r6ATp+VzbkBLd5RY9qzxR9IJ5eEvf
+        qXdVM80kebl3Mo1qMArrwQu4wuddi74=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-W8ZfPZk4Nsi4vGO-_cKe0Q-1; Wed, 03 Feb 2021 03:45:24 -0500
+X-MC-Unique: W8ZfPZk4Nsi4vGO-_cKe0Q-1
+Received: by mail-ej1-f69.google.com with SMTP id le12so11582502ejb.13
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 00:45:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Hwrk+FTuLG7Q9mmQWSF89fyayVM9Juk+kBi6JrWoyJM=;
-        b=JYha81kbmWIOIqWpnVufxXwR1h2xPV+2PNGfvFlo1isD1LVx099oTqkjXa/Jpyhmrt
-         4Hi9Ft0jnPWlho1DpPuUlp9H9gRCuWQT94BeXMl7U0XiwWJ+jMap+EilbtF0sC++rVlw
-         3EhVWdK28OsLvDtrRRe/xd3yoyOxKEdnegIypRZRLQZ3FMnbMg/Esj+5PryIRurlKih5
-         W/USGu8TwHuYcR7l/QSpMIC6rHWtlJJDYFgUnJ4wlv0WZgTB4ldMz6cJmxBhL0Zv+P81
-         pbErxgRi47tXV1vPiU4SqTU4wIAvkxyjUWJQERpfFxISS81R9U72YlfBMwyNY6ueOEDW
-         b+hQ==
-X-Gm-Message-State: AOAM531yfvPbdXpoUYJ+WZX2bLD1p99WWZJuPXXeZh3gHyqQJ2X2dUgM
-        4eNgi9CBa9nZ+t83ZfFMqCOKNj3Jb+l5Qf+Rw34huSV9TW+5ASiP0DelkpxX/hC1LoUYggZpZ8O
-        vRq95WT0XOzES/uCVa/wE1Q/3u0fSkBZn1ZR1Xm56YHYWbINBdkgTIjklI4AS2ilz
-X-Received: by 2002:a17:906:c00a:: with SMTP id e10mr2091763ejz.501.1612340889252;
-        Wed, 03 Feb 2021 00:28:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUvkxOC7hKKIz7OGBgJZSpg8doxelK0Cjst9iB13YoHobfg46zDnGcT5IzRnbxhQ0vS+MkRw==
-X-Received: by 2002:a17:906:c00a:: with SMTP id e10mr2091744ejz.501.1612340888985;
-        Wed, 03 Feb 2021 00:28:08 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l13sm649535eji.49.2021.02.03.00.28.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Feb 2021 00:28:08 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: cleanup CR3 reserved bits checks
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20210202170244.89334-1-pbonzini@redhat.com>
- <YBmbM8PToDWr9ti/@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7077098b-d5f0-afe1-9924-def460d06f96@redhat.com>
-Date:   Wed, 3 Feb 2021 09:28:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=x4plXTchef/sBjwOoHTzN6rEMhC93if4hIo33GzIkps=;
+        b=fX603xuMIQUHIbvbPDDLy+EKS/qaZgf68oZuIpwXsJJ5dNE74AuO0Yl7lhuaQ1ePLe
+         3ejNrvPR+999ezHy8yZe133JcWAXSU2KH+6GQ9O473YXQgwELOLctuDiUv1TMBkVAQbT
+         MKp9ckn+dXcxLDYV1MRjfJB4EKQaNS6d8zWzIiqxwpQf8dRasb0qiFDrL4v0MT3cDBw9
+         jHFGTZeYzMsb03s+8xL5p2/juKSwoxXP3jZ2TqVJ4DwdMOxLlC09xqg9OYHgITm3q0CV
+         1wMdbmspfuXpMpcr1tPyKGrFo2IXXuk5ebDxR6BpycpG2x1GmoL62ab1x5DtFxQIgpK1
+         iuVw==
+X-Gm-Message-State: AOAM532ms4rBYP17BweXz27+6VsEb05aIV7418ziHbDhsttEBrfjLu9c
+        AGKs9L0EJPmnnKMe9qGTLobmXdXKe/nR9QnCIXxi0TuINwOKVv/JkrMqYorFGfeuAkUU/OGU++Q
+        ys6KtBFx4ouyj
+X-Received: by 2002:a17:906:c9d8:: with SMTP id hk24mr2228954ejb.468.1612341923370;
+        Wed, 03 Feb 2021 00:45:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwgGBhPglx70yG4qONPwtTbv4doAdwIN5R7Hi+EcUvxTOQKKD4miBMOBmhfn3oy++u2/cf/bw==
+X-Received: by 2002:a17:906:c9d8:: with SMTP id hk24mr2228940ejb.468.1612341923184;
+        Wed, 03 Feb 2021 00:45:23 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id a10sm674399ejk.75.2021.02.03.00.45.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Feb 2021 00:45:22 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     chang.seok.bae@intel.com, kvm@vger.kernel.org, robert.hu@intel.com,
+        pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org
+Subject: Re: [RFC PATCH 03/12] kvm/vmx: Introduce the new tertiary
+ processor-based VM-execution controls
+In-Reply-To: <8310773354ce83691afae0e463e42ecf5cc572f5.camel@linux.intel.com>
+References: <1611565580-47718-1-git-send-email-robert.hu@linux.intel.com>
+ <1611565580-47718-4-git-send-email-robert.hu@linux.intel.com>
+ <87czxt4amd.fsf@vitty.brq.redhat.com>
+ <8310773354ce83691afae0e463e42ecf5cc572f5.camel@linux.intel.com>
+Date:   Wed, 03 Feb 2021 09:45:21 +0100
+Message-ID: <87bld1pmji.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YBmbM8PToDWr9ti/@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/21 19:34, Sean Christopherson wrote:
-> On Tue, Feb 02, 2021, Paolo Bonzini wrote:
->> If not in long mode, the low bits of CR3 are reserved but not enforced to
->> be zero, so remove those checks.  If in long mode, however, the MBZ bits
->> extend down to the highest physical address bit of the guest, excluding
->> the encryption bit.
->>
->> Make the checks consistent with the above, and match them between
->> nested_vmcb_checks and KVM_SET_SREGS.
->>
-> Fixes + Cc:stable@?
+Robert Hoo <robert.hu@linux.intel.com> writes:
 
-Difficult to say what it fixes, it's been there forever for KVM_SET_SREGS.
+> On Mon, 2021-01-25 at 10:41 +0100, Vitaly Kuznetsov wrote:
+>> Robert Hoo <robert.hu@linux.intel.com> writes:
+>> We'll have to do something about Enlightened VMCS I believe. In
+>> theory,
+>> when eVMCS is in use, 'CPU_BASED_ACTIVATE_TERTIARY_CONTROLS' should
+>> not
+>> be exposed, e.g. when KVM hosts a EVMCS enabled guest the control
+>> should
+>> be filtered out. Something like (completely untested):
+>> 
+>> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
+>> index 41f24661af04..c44ff05f3235 100644
+>> --- a/arch/x86/kvm/vmx/evmcs.c
+>> +++ b/arch/x86/kvm/vmx/evmcs.c
+>> @@ -299,6 +299,7 @@ const unsigned int nr_evmcs_1_fields =
+>> ARRAY_SIZE(vmcs_field_to_evmcs_1);
+>>  
+>>  __init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
+>>  {
+>> +       vmcs_conf->cpu_based_exec_ctrl &=
+>> ~EVMCS1_UNSUPPORTED_EXEC_CTRL;
+>>         vmcs_conf->pin_based_exec_ctrl &=
+>> ~EVMCS1_UNSUPPORTED_PINCTRL;
+>>         vmcs_conf->cpu_based_2nd_exec_ctrl &=
+>> ~EVMCS1_UNSUPPORTED_2NDEXEC;
+>>  
+>> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
+>> index bd41d9462355..bf2c5e7a4a8f 100644
+>> --- a/arch/x86/kvm/vmx/evmcs.h
+>> +++ b/arch/x86/kvm/vmx/evmcs.h
+>> @@ -50,6 +50,7 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
+>>   */
+>>  #define EVMCS1_UNSUPPORTED_PINCTRL (PIN_BASED_POSTED_INTR | \
+>>                                     PIN_BASED_VMX_PREEMPTION_TIMER)
+>> +#define EVMCS1_UNSUPPORTED_EXEC_CTRL
+>> (CPU_BASED_ACTIVATE_TERTIARY_CONTROLS)
+>>  #define
+>> EVMCS1_UNSUPPORTED_2NDEXEC                                     \
+>>         (SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY
+>> |                         \
+>>          SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
+>> |                      \
+>> 
+>> should do the job I think.
+>> 
+> Hi Vitaly,
+>
+> I'm going to incorporate above patch in my next version. Shall I have
+> it your signed-off-by?
+> [setup_vmcs_config: filter out tertiary control when using eVMCS]
+> signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-For the nSVM part I'll go with
+You can just incorporate it into your patch or, in case you want to have
+it separate, feel free just add a 'Suggested-by: Vitaly Kuznetsov
+<vkuznets@redhat.com>' tag.
 
-Fixes: 761e41693465 ("KVM: nSVM: Check that MBZ bits in CR3 and CR4 are 
-not set on vmrun of nested guests")
+Thanks!
 
-Paolo
-
->> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
-> Reviewed-by: Sean Christopherson<seanjc@google.com>  
-> 
+-- 
+Vitaly
 
