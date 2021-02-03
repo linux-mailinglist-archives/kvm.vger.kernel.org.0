@@ -2,151 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC8E30D86E
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 12:21:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3195030D8A8
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 12:29:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234079AbhBCLVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 06:21:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60356 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234061AbhBCLVU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 06:21:20 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 760BD64F67;
-        Wed,  3 Feb 2021 11:20:39 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <maz@kernel.org>)
-        id 1l7GD7-00BjXu-B6; Wed, 03 Feb 2021 11:20:37 +0000
+        id S234343AbhBCL3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 06:29:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29866 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234170AbhBCL1W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 06:27:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612351554;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sEB/LyeruEcu4oLY1qq972Bq0pPdpUz5iU5q3+LYBtU=;
+        b=RsRl5fMjKTfslSTE6pG7cd9MzYyeMLanY0JRLGyp16m3RvW+TD8Ay41h2MdvcMHM6Q6nFy
+        hAeWDHl0vZRb10BRi6BShT0tRrNCunFdIigFSevie65GvMtJOEhH9/l47An/s2y24PE6Zq
+        3JWJBSyTDbUd2INOnpPeeV3gAPcZCRk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-hRj5w5gdOluXyznyFwdbqA-1; Wed, 03 Feb 2021 06:25:53 -0500
+X-MC-Unique: hRj5w5gdOluXyznyFwdbqA-1
+Received: by mail-ej1-f70.google.com with SMTP id q11so11779518ejd.0
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 03:25:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sEB/LyeruEcu4oLY1qq972Bq0pPdpUz5iU5q3+LYBtU=;
+        b=TLDy91LsiG7L0iLyCNHSSZXBJyBpa+p5ZlFElXggTqPTm8pk8uDGnJEfMNxjgkk00Z
+         nRHxQPpwpuDTUJLbptSfawmQ6aiO+mf9IQrHLmfEc8y7hvR5nBuGD9xm+/6kyeWu0UYj
+         hhg0LFs03A+l3Rz95z57KVu+18ZAgwqjqIFDr0MAr36wwp4hZkfZdQQ8OvrXCVYM9c1H
+         IsMU57uWW93xg2txG8Qwg1CCdkLq4j/i5BUSa+JMgrzObwDdXfFF9yUoekCQ+OZWdUBp
+         zHGwVJ0/2lOYS1koSBCgABHKVj/AcxgnH7Fy0ua/twG7HNRZRQZdDAxn9dpCgAmORRDO
+         V0nw==
+X-Gm-Message-State: AOAM531Wz5EenTN29vl1u8gFMXjxA6Ni9xHHM0B/xXntpW/c3tuzQnZf
+        7Xs/qI4FlqwAZOdMoSVEh2D/Pn9GHDSvV7+WBfrmqX+kfgpHljLHtuKCqHahUqnheHQv5X3dC8y
+        6Kyjcb7qGmqWJ
+X-Received: by 2002:a17:906:9588:: with SMTP id r8mr2780615ejx.167.1612351552076;
+        Wed, 03 Feb 2021 03:25:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw5LF7V/ZFdg7RG3zBOSMF7OAPRHvwsAl6XPGFjrumkESOYUbSt8oa9zNB8/FuSYZsHp14QOw==
+X-Received: by 2002:a17:906:9588:: with SMTP id r8mr2780602ejx.167.1612351551955;
+        Wed, 03 Feb 2021 03:25:51 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id bo24sm711966edb.51.2021.02.03.03.25.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Feb 2021 03:25:51 -0800 (PST)
+Subject: Re: [PATCH v2 24/28] KVM: x86/mmu: Allow zap gfn range to operate
+ under the mmu read lock
+To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Peter Feiner <pfeiner@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>
+References: <20210202185734.1680553-1-bgardon@google.com>
+ <20210202185734.1680553-25-bgardon@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fee9f2d3-85f8-30de-b198-0b69e4a78628@redhat.com>
+Date:   Wed, 3 Feb 2021 12:25:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Wed, 03 Feb 2021 11:20:37 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Auger Eric <eric.auger@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Upgrade PMU support to ARMv8.4
-In-Reply-To: <7808bec4-2ac5-a36d-2960-b4b90574e0d2@redhat.com>
-References: <20210125122638.2947058-1-maz@kernel.org>
- <20210125122638.2947058-7-maz@kernel.org>
- <56041147-0bd8-dbb2-d1ca-550f3db7f05d@redhat.com>
- <adbdbfbcecb65a1eca21afa622679836@kernel.org>
- <7808bec4-2ac5-a36d-2960-b4b90574e0d2@redhat.com>
-User-Agent: Roundcube Webmail/1.4.10
-Message-ID: <f6875f72511a69f9ac9a18ebf7698466@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20210202185734.1680553-25-bgardon@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-02-03 11:07, Auger Eric wrote:
-> Hi Marc,
-> On 2/3/21 11:36 AM, Marc Zyngier wrote:
->> Hi Eric,
->> 
->> On 2021-01-27 17:53, Auger Eric wrote:
->>> Hi Marc,
->>> 
->>> On 1/25/21 1:26 PM, Marc Zyngier wrote:
->>>> Upgrading the PMU code from ARMv8.1 to ARMv8.4 turns out to be
->>>> pretty easy. All that is required is support for PMMIR_EL1, which
->>>> is read-only, and for which returning 0 is a valid option as long
->>>> as we don't advertise STALL_SLOT as an implemented event.
->>>> 
->>>> Let's just do that and adjust what we return to the guest.
->>>> 
->>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>> ---
->>>>  arch/arm64/include/asm/sysreg.h |  3 +++
->>>>  arch/arm64/kvm/pmu-emul.c       |  6 ++++++
->>>>  arch/arm64/kvm/sys_regs.c       | 11 +++++++----
->>>>  3 files changed, 16 insertions(+), 4 deletions(-)
->>>> 
->>>> diff --git a/arch/arm64/include/asm/sysreg.h
->>>> b/arch/arm64/include/asm/sysreg.h
->>>> index 8b5e7e5c3cc8..2fb3f386588c 100644
->>>> --- a/arch/arm64/include/asm/sysreg.h
->>>> +++ b/arch/arm64/include/asm/sysreg.h
->>>> @@ -846,7 +846,10 @@
->>>> 
->>>>  #define ID_DFR0_PERFMON_SHIFT        24
->>>> 
->>>> +#define ID_DFR0_PERFMON_8_0        0x3
->>>>  #define ID_DFR0_PERFMON_8_1        0x4
->>>> +#define ID_DFR0_PERFMON_8_4        0x5
->>>> +#define ID_DFR0_PERFMON_8_5        0x6
->>>> 
->>>>  #define ID_ISAR4_SWP_FRAC_SHIFT        28
->>>>  #define ID_ISAR4_PSR_M_SHIFT        24
->>>> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->>>> index 398f6df1bbe4..72cd704a8368 100644
->>>> --- a/arch/arm64/kvm/pmu-emul.c
->>>> +++ b/arch/arm64/kvm/pmu-emul.c
->>>> @@ -795,6 +795,12 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu,
->>>> bool pmceid1)
->>>>          base = 0;
->>>>      } else {
->>>>          val = read_sysreg(pmceid1_el0);
->>>> +        /*
->>>> +         * Don't advertise STALL_SLOT, as PMMIR_EL0 is handled
->>>> +         * as RAZ
->>>> +         */
->>>> +        if (vcpu->kvm->arch.pmuver >= ID_AA64DFR0_PMUVER_8_4)
->>>> +            val &= ~BIT_ULL(ARMV8_PMUV3_PERFCTR_STALL_SLOT - 32);
->>> what about the STALL_SLOT_BACKEND and FRONTEND events then?
->> 
->> Aren't these a mandatory ARMv8.1 feature? I don't see a reason to
->> drop them.
+On 02/02/21 19:57, Ben Gardon wrote:
 > 
-> I understand the 3 are linked together.
-> 
-> In D7.11 it is said
-> "
-> When any of the following common events are implemented, all three of
-> them are implemented:
-> 0x003D , STALL_SLOT_BACKEND, No operation sent for execution on a Slot
-> due to the backend,
-> 0x003E , STALL_SLOT_FRONTEND, No operation sent for execution on a Slot
-> due to the frontend.
-> 0x003F , STALL_SLOT, No operation sent for execution on a Slot.
-> "
+> @@ -5518,13 +5518,17 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
+>  		}
+>  	}
+>  
+> +	kvm_mmu_unlock(kvm);
+> +
+>  	if (kvm->arch.tdp_mmu_enabled) {
 
-They are linked in the sense that they report related events, but they
-don't have to be implemented in the same level of the architecure, if 
-only
-because BACKEND/FRONTEND were introducedway before ARMv8.4.
+Temporary compile error.
 
-What the architecture says is:
+Paolo
 
-- For FEAT_PMUv3p1 (ARMv8.1):
-   "The STALL_FRONTEND and STALL_BACKEND events are required to be
-    implemented." (A2.4.1, DDI0487G.a)
-
-- For FEAT_PMUv3p4 (ARMv8.4):
-   "If FEAT_PMUv3p4 is implemented:
-    - If STALL_SLOT is not implemented, it is IMPLEMENTATION DEFINED 
-whether the PMMIR System registers are implemented.
-    - If STALL_SLOT is implemented, then the PMMIR System registers are 
-implemented." (D7-2873, DDI0487G.a)
-
-So while BACKEND/FRONTEND are required in an ARMv8.4 implementation
-by virtue of being mandatory in ARMv8.1, STALL_SLOT isn't at any point.
-
-Thanks,
-
-          M.
--- 
-Jazz is not dead. It just smells funny...
