@@ -2,123 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7CA930D44F
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 08:52:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9443430D480
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 09:00:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232248AbhBCHvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 02:51:46 -0500
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:54749 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231654AbhBCHvp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 02:51:45 -0500
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l7CrV-0000mf-2a; Wed, 03 Feb 2021 08:46:05 +0100
-Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1l7CrM-0005LW-0J; Wed, 03 Feb 2021 08:45:56 +0100
-Date:   Wed, 3 Feb 2021 08:45:55 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Russell King - ARM Linux admin <linux@armlinux.org.uk>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        David Airlie <airlied@linux.ie>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        dri-devel@lists.freedesktop.org, Jaroslav Kysela <perex@perex.cz>,
-        Eric Anholt <eric@anholt.net>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
-        linux-spi@vger.kernel.org, Jiri Slaby <jirislaby@kernel.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-rtc@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
-        Guenter Roeck <linux@roeck-us.net>,
-        Mike Leach <mike.leach@linaro.org>,
-        Daniel Vetter <daniel@ffwll.ch>, Arnd Bergmann <arnd@arndb.de>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mark Brown <broonie@kernel.org>, linux-fbdev@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        linux-watchdog@vger.kernel.org,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        linux-mmc@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Leo Yan <leo.yan@linaro.org>, dmaengine@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH v3 0/5] amba: minor fix and various cleanups
-Message-ID: <20210203074555.tusulu3iqg5wgxeb@pengutronix.de>
-References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
- <20210202104915.GK1463@shell.armlinux.org.uk>
+        id S232007AbhBCIAQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 03:00:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26566 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231704AbhBCIAQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 03:00:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612339128;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Le4iuV0fc/jRHPu6t79f0QWPTHoOpEryhOXjwy8BhTY=;
+        b=L00SfHNIiHrT9tw0Z5SEkeyQNgTHVprBzmVGjrWv7heMjRb+fQdiWdaQdpUy+fakDz0z1i
+        y6gcI5nB2BaK7+k1uptwf5vnNEssCjRV1FJmDY38VAvszANAgM59pP0g0Z3GYzoDDwXkgI
+        asUtwHVpdf6hKtvsBdg2K3exg6nZ5mY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-QqafcvoAN3eKzpQYJggRQA-1; Wed, 03 Feb 2021 02:58:46 -0500
+X-MC-Unique: QqafcvoAN3eKzpQYJggRQA-1
+Received: by mail-ed1-f71.google.com with SMTP id u19so10990201edr.1
+        for <kvm@vger.kernel.org>; Tue, 02 Feb 2021 23:58:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Le4iuV0fc/jRHPu6t79f0QWPTHoOpEryhOXjwy8BhTY=;
+        b=Juq7yLWERobfAJchaaD3W5X0RCv1lroh2qLWf+XDyotKZUBAB+mfVQfho3+RLEL/QQ
+         2xz/ql+steUrP+kmPi9yH8U3sD9C5TYwY/8VNNAcyJEzlsX94rlWhtfgNqjsxICdCLrD
+         lZvKUk8qrQSzeHxgxm12fuHAzE2ai/E9tVKgdAp3fwcyrWwj+1cLpzonjYrLqHpEqUnI
+         PwD6/gK9VSKrSkPftUOuyg039plI2NUefcCQXFV43dMeycFNw3uXb0mdXRXWXJ3emERt
+         amVkeIbmTtKIFWRdi7wCj0Fw0BgDpQAjll3QmUqlMrFf6vAVTO1aKpUkTAQxGKjGP5ll
+         KGFw==
+X-Gm-Message-State: AOAM532tuAw6OWjaquT+NxX2iDo7a/q+Sic4OMHGUilYzJwVUnm7NrEX
+        KxEwA2DSBlPPGUagDTCeLYhYbA+WL2BYwveHFiIpIekFpMqu/TCvP5J3YB0bmSCa/rOeN/u0aPu
+        pjbY3Y7Tob41T
+X-Received: by 2002:a50:85c4:: with SMTP id q4mr1758707edh.7.1612339125181;
+        Tue, 02 Feb 2021 23:58:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyxqSe/aIV6dIfbUVUz74HMqp55I3lNhi5OrNIWNtt8xEda6IAGvtGzrH+zwwcWXss16JTlDw==
+X-Received: by 2002:a50:85c4:: with SMTP id q4mr1758695edh.7.1612339124995;
+        Tue, 02 Feb 2021 23:58:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k3sm601608ejv.121.2021.02.02.23.58.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Feb 2021 23:58:44 -0800 (PST)
+Subject: Re: Optimized clocksource with AMD AVIC enabled for Windows guest
+To:     Kechen Lu <kechenl@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+Cc:     "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        Somdutta Roy <somduttar@nvidia.com>
+References: <DM6PR12MB3500B7D1EDC5B5B26B6E96FBCAB49@DM6PR12MB3500.namprd12.prod.outlook.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5688445c-b9c8-dbd6-e9ee-ed40df84f8ca@redhat.com>
+Date:   Wed, 3 Feb 2021 08:58:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="nnu6wqtgppbbywlf"
-Content-Disposition: inline
-In-Reply-To: <20210202104915.GK1463@shell.armlinux.org.uk>
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: kvm@vger.kernel.org
+In-Reply-To: <DM6PR12MB3500B7D1EDC5B5B26B6E96FBCAB49@DM6PR12MB3500.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 03/02/21 07:40, Kechen Lu wrote:
+> From the above observations, trying to see if there's a way for
+> enabling AVIC while also having the most optimized clock source for
+> windows guest.
+> 
 
---nnu6wqtgppbbywlf
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You would have to change KVM, so that AVIC is only disabled if Auto-EOI 
+interrupts are used.
 
-Hello,
+Paolo
 
-we already talked about this via irc, but for the record and the benefit
-of others:
-
-On Tue, Feb 02, 2021 at 10:49:15AM +0000, Russell King - ARM Linux admin wr=
-ote:
-> I think you need to have a 6th patch which moves the
-> probe/remove/shutdown methods into the bus_type - if you're setting
-> them for every struct device_driver, then there's no point doing that
-> and they may as well be in the bus_type.
-
-This is implemented in patch 5 already.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---nnu6wqtgppbbywlf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmAaVLAACgkQwfwUeK3K
-7AlQLgf+P1DKYj6OELp8rvge2qlgjLziflPm/vmYKoER7GP62xMAt1jHBWvMgDLx
-SQfCWfc7aNauEmrPFy3TDOyu3SrNFjDVRf3DfOGZ+VpYmmtyUJihjezhbbhpysK5
-Pchia3IjZ0wVWPBC0mb8a1o5w1GQ7l49/QaVZ6buVR+RoNYiKGFdiKcEc8JB+c19
-s2ksv2HXH9eB66fQ+yNQY7W2lNiK98iTc0txk+lhP2wRnFXHPMgqQhFb3j2wt7Or
-ix27mqEX40GyAOv+Xmam2NtjLRM5WD4zflnasEKvxQoa0Qe0mpR6aSKIotUmM4yi
-oNcARpnSdJUwDrfHL0GDd9ksOomPMA==
-=r9/H
------END PGP SIGNATURE-----
-
---nnu6wqtgppbbywlf--
