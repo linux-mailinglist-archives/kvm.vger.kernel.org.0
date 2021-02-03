@@ -2,133 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BB5730D70B
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 11:09:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 055D430D710
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 11:10:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233554AbhBCKIy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 05:08:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48921 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233215AbhBCKIs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 05:08:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612346842;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RRNWNZSEjYUISWzV/hzDQuuQn4Ann7n4iPTKBGa+3mE=;
-        b=i14Mw43vVugSlpNJEWo3TOtgRLaYSm6P8mL0hgnS6F1mcZLMpWRlH0Ya0+5Qu9lPuH3ANz
-        RgyfZLIaMJGCeTfkN7o3gGAIhsS85asOSGkeX6kEEAKktHGO2Hch0pQkhqeKUAnCqTdurD
-        AEWcF79iI4IAeB+steQf1LH10PgtKa4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-vSdjnu0nPBCMCMoCoXFmWA-1; Wed, 03 Feb 2021 05:07:20 -0500
-X-MC-Unique: vSdjnu0nPBCMCMoCoXFmWA-1
-Received: by mail-ed1-f69.google.com with SMTP id i13so5140041edq.19
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 02:07:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RRNWNZSEjYUISWzV/hzDQuuQn4Ann7n4iPTKBGa+3mE=;
-        b=aQWgVoERvqjdrYSMK/n0SZdHlAuJhQxD/OmFoeulLvsN4uF+7YCM31qryVTvLkYGAw
-         vr3x1UUUyZmEa6g6ZMNnDu1T2mo9+SUeE+IRFNOpIgg48cXwYFI7hTfdO2Sm7HeGOBoN
-         hJaDcwu13zEp8kPAFjPafDAq1TSreRhcLk8blB48xdkeQKwb/pvXx1lBQAH91OGcKsxD
-         Pyh3iuGf9ffWQQSp8Qaa/VE7cfA312zSOgig7qQzPcG3+xFEq118NKQc3WWIx/zxvj7f
-         zt9MI7kVDTQnG8OTT/ynWNFeAY2Ak2+s9MoW9fzZUCgyqTPn6XSKqZGXvJWJUasaIpCz
-         rpuA==
-X-Gm-Message-State: AOAM532L2eOuMU4+TW5gsrEQ/4ptSlT8GtQYotkEbaNouG/fx8m5rn4/
-        yF5v56k8VwIon9ZW71ubZt+CfBc/EQZftmU5pA0nbOmB1K0skL82tSWa6zE8ez9CoI6zKo5yNAs
-        bJasMK/FePAKc
-X-Received: by 2002:a05:6402:1118:: with SMTP id u24mr2157675edv.386.1612346839147;
-        Wed, 03 Feb 2021 02:07:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyNBYEODxX2CDv6VeeoBShNHoVFAtymdsHrukNbtazorn38PHHEcvCDODPGT2aOTgYsyvAhjg==
-X-Received: by 2002:a05:6402:1118:: with SMTP id u24mr2157652edv.386.1612346838998;
-        Wed, 03 Feb 2021 02:07:18 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h25sm781475ejy.7.2021.02.03.02.07.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Feb 2021 02:07:18 -0800 (PST)
-Subject: Re: [PATCH v2 28/28] KVM: selftests: Disable dirty logging with vCPUs
- running
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Thomas Huth <thuth@redhat.com>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-29-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1edd4e34-5463-9802-bf07-7f4840f3d103@redhat.com>
-Date:   Wed, 3 Feb 2021 11:07:16 +0100
+        id S233577AbhBCKJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 05:09:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49602 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233509AbhBCKJu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 05:09:50 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 113A3YRA027426;
+        Wed, 3 Feb 2021 05:09:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PfGtKEooDvYrSNHEyGqtxGCIxVXpPGfsXjW5dql49yc=;
+ b=oer3a86Lr9NAi4wnO5R/bkTnidE9K3hS9DhNBrctLLYrcIEqFw2h4eiKhEpWvA+mF0gD
+ j0/B3SUii6Tg60onZ0bGZybWMQUo166GDNxUIV4SFXLoDol+CKqBbCir87LX4t/P7Zgg
+ wOzb4Tph1UHTekSj9WBESJX3SBnrmxIFkKmf4TjVXqoHlRDVsawYNrlm49v0kC6KUH1g
+ myx6HqTCC+EHRoPQbJrWViDG9PoFM1u5npzlWPIBvKRfYt4sGdkIVVJxU1tWKv9egucC
+ PGb1qL540ISIfi5pSOglP07Apwcv/BDgwuvbNR2R3XBBiuirSWDfugS7xKCx/Ad/SDeu 9A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36fsh0rmjb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Feb 2021 05:09:09 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 113A3ZNH027733;
+        Wed, 3 Feb 2021 05:09:08 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36fsh0rmhh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Feb 2021 05:09:08 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 113A4r9p032655;
+        Wed, 3 Feb 2021 10:09:06 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 36evvf1cr6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 03 Feb 2021 10:09:06 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 113A93Cg12583316
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 3 Feb 2021 10:09:03 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AFA96A405C;
+        Wed,  3 Feb 2021 10:09:03 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47D2FA405B;
+        Wed,  3 Feb 2021 10:09:03 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.145.177.106])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  3 Feb 2021 10:09:03 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 4/5] s390x: css: SCHM tests format 0
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
+        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+References: <1611930869-25745-1-git-send-email-pmorel@linux.ibm.com>
+ <1611930869-25745-5-git-send-email-pmorel@linux.ibm.com>
+ <b3086f69-98fa-07c0-72c7-711c17e71c9d@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Message-ID: <26db612d-45ea-de8b-5eed-bd2658f69aa0@linux.ibm.com>
+Date:   Wed, 3 Feb 2021 11:09:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210202185734.1680553-29-bgardon@google.com>
+In-Reply-To: <b3086f69-98fa-07c0-72c7-711c17e71c9d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-03_04:2021-02-02,2021-02-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102030060
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/21 19:57, Ben Gardon wrote:
-> Disabling dirty logging is much more intestesting from a testing
-> perspective if the vCPUs are still running. This also excercises the
-> code-path in which collapsible SPTEs must be faulted back in at a higher
-> level after disabling dirty logging.
-> 
-> To: linux-kselftest@vger.kernel.org
-> CC: Peter Xu <peterx@redhat.com>
-> CC: Andrew Jones <drjones@redhat.com>
-> CC: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->   tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 604ccefd6e76..d44a5b8ef232 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -205,11 +205,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   		}
->   	}
->   
-> -	/* Tell the vcpu thread to quit */
-> -	host_quit = true;
-> -	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
-> -		pthread_join(vcpu_threads[vcpu_id], NULL);
-> -
->   	/* Disable dirty logging */
->   	clock_gettime(CLOCK_MONOTONIC, &start);
->   	vm_mem_region_set_flags(vm, PERF_TEST_MEM_SLOT_INDEX, 0);
-> @@ -217,6 +212,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	pr_info("Disabling dirty logging time: %ld.%.9lds\n",
->   		ts_diff.tv_sec, ts_diff.tv_nsec);
->   
-> +	/* Tell the vcpu thread to quit */
-> +	host_quit = true;
-> +	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
-> +		pthread_join(vcpu_threads[vcpu_id], NULL);
-> +
->   	avg = timespec_div(get_dirty_log_total, p->iterations);
->   	pr_info("Get dirty log over %lu iterations took %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
->   		p->iterations, get_dirty_log_total.tv_sec,
-> 
 
-Queued the two selftests patches, because why not.
 
-Paolo
+On 2/2/21 6:35 PM, Thomas Huth wrote:
+> On 29/01/2021 15.34, Pierre Morel wrote:
+...snip...
+>>   static void test_schm(void)
+>>   {
+>> +    struct measurement_block_format0 *mb0;
+>> +
+>>       if (css_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK))
+>>           report_info("Extended measurement block available");
+>> +
+>> +    mb0 = alloc_io_mem(sizeof(struct measurement_block_format0), 0);
+>> +    if (!mb0) {
+>> +        report(0, "measurement_block_format0 allocation");
+>> +        goto end_free;
+> 
+> If allocation failed, there is certainly no need to try to free it, so 
 
+:) yes
+
+> you can get rid of the goto and the label here and return directly 
+> instead. Or maybe
+> Maybe also simply use report_abort() in this case?
+
+OK, report_abort when an allocation failed seems right.
+
+Thanks,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
