@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 928D230DD7F
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 16:04:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 168C730DD91
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 16:06:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233491AbhBCPCv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 10:02:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34062 "EHLO
+        id S233996AbhBCPFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 10:05:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233232AbhBCPCh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 10:02:37 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20ECC061797
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 07:01:21 -0800 (PST)
+        with ESMTP id S233603AbhBCPDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 10:03:19 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DE4C06121C
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 07:01:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Reply-To:Content-ID:Content-Description;
-        bh=9TWJ7Lvcpur4v5MGpd65YQExu+/eRFl/hisbDGZ44t8=; b=A/4QuFcuhOkE96SioPoFqMyLgl
-        jE6KX/J9itGBHlkVvrMne0mvlHIiyCrKzKMMC6emTsFvpsjCnZ/SMw/4WW0USz/iVF9CHETbmfzxj
-        u28ULJifJxC1o66hUwxqbd6+dLTXeJeomCyWabGaXVA1TYPoDTOQvgv7PbxQWCq3FzM1HkTJXHk50
-        m86GaU9MwPAMun40Fn0ycMQa2YwPmD1WTo83GZZ3VDW9tgyVBScWTfDUAREH1ynt0AgTfoPsMjl0w
-        7BGpLwGpzO9FDgk9HP7a6/ShKSnwMfn9vBctgLVYQ4STUnmmKjVptMpC/h1yVoFfUW544PhdmXMIG
-        NHnGWXUg==;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=RjNpm5dDXU16bpww+ucYeEgqh6ygR6CUUaklkn/NfwQ=; b=d9L7NuWzEJtQaRLSQ+HtaeU8kG
+        5B8NgUwGTPEdInGinS4Hnb8pCODAsnpzh/a9ZSy0mkMMFniwT5QXuA890uKRxhP98FI3HclwB4bWG
+        He8yN/g0G9mLe8DlIoHkyq7MnV4SMrPZVe7ByFHEk1l5lA4QgcDwguzx6R9qnmJOSKVyDDhxALv2g
+        Z4xkcSVJBvXJFHOerv+4CCY5qbjCjLBsJy8TSdUnYq/frbumHA1pP28qovGhWlF0iCFbzNg3thAne
+        2/qMTWqQfmZOMW6J8AoTX75p/j4cbt8IktU/O6vJO/U0uvRYwIDvRsGmAnB2U8WBWpSVgP/p6bH+a
+        +FR7lH8w==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l7Jeg-00015s-KD; Wed, 03 Feb 2021 15:01:18 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l7Jef-00H3zO-V0; Wed, 03 Feb 2021 15:01:20 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l7Jef-003rf0-H2; Wed, 03 Feb 2021 15:01:17 +0000
+        id 1l7Jef-003rf3-Hv; Wed, 03 Feb 2021 15:01:17 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -38,292 +38,243 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>, graf@amazon.com,
         iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
         fandree@amazon.com, hch@infradead.org
-Subject: [PATCH v6 18/19] KVM: x86: declare Xen HVM shared info capability and add test case
-Date:   Wed,  3 Feb 2021 15:01:13 +0000
-Message-Id: <20210203150114.920335-19-dwmw2@infradead.org>
+Subject: [PATCH v6 19/19] KVM: Add documentation for Xen hypercall and shared_info updates
+Date:   Wed,  3 Feb 2021 15:01:14 +0000
+Message-Id: <20210203150114.920335-20-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210203150114.920335-1-dwmw2@infradead.org>
 References: <20210203150114.920335-1-dwmw2@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Instead of adding a plethora of new KVM_CAP_XEN_FOO capabilities, just
-add bits to the return value of KVM_CAP_XEN_HVM.
-
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/x86.c                            |   3 +-
- include/uapi/linux/kvm.h                      |   3 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 197 ++++++++++++++++++
- 4 files changed, 203 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+ Documentation/virt/kvm/api.rst | 170 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 165 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cdcc8abf2216..6dc0376beac5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3761,7 +3761,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- 	case KVM_CAP_XEN_HVM:
- 		r = KVM_XEN_HVM_CONFIG_HYPERCALL_MSR |
--		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL;
-+		    KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL |
-+		    KVM_XEN_HVM_CONFIG_SHARED_INFO;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
- 		r = KVM_SYNC_X86_VALID_FIELDS;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index c828c94dbe8b..c61c49bbe0aa 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1150,6 +1150,7 @@ struct kvm_x86_mce {
- #ifdef KVM_CAP_XEN_HVM
- #define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
- #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
-+#define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 99ceb978c8b0..9c454c5b785c 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -960,6 +960,13 @@ memory.
+ 	__u8 pad2[30];
+   };
  
- struct kvm_xen_hvm_config {
- 	__u32 flags;
-@@ -1602,6 +1603,7 @@ struct kvm_xen_hvm_attr {
- 	} u;
- };
++If the KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL flag is returned from the
++KVM_CAP_XEN_HVM check, it may be set in the flags field of this ioctl.
++This requests KVM to generate the contents of the hypercall page
++automatically, and also to intercept hypercalls with KVM_EXIT_XEN.
++In this case, all of the blob size and address fields must be zero.
++
++No other flags are currently valid in the struct kvm_xen_hvm_config.
  
-+/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
- #define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
- #define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
- #define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x2
-@@ -1619,6 +1621,7 @@ struct kvm_xen_vcpu_attr {
- 	} u;
- };
+ 4.29 KVM_GET_CLOCK
+ ------------------
+@@ -4831,6 +4838,101 @@ into user space.
+ If a vCPU is in running state while this ioctl is invoked, the vCPU may
+ experience inconsistent filtering behavior on MSR accesses.
  
-+/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
- #define KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO	0x0
- #define KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO	0x1
++4.127 KVM_XEN_HVM_SET_ATTR
++--------------------------
++
++:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_xen_hvm_attr
++:Returns: 0 on success, < 0 on error
++
++::
++
++  struct kvm_xen_hvm_attr {
++	__u16 type;
++	__u16 pad[3];
++	union {
++		__u8 long_mode;
++		__u8 vector;
++		struct {
++			__u64 gfn;
++		} shared_info;
++		__u64 pad[4];
++	} u;
++  };
++
++type values:
++
++KVM_XEN_ATTR_TYPE_LONG_MODE
++  Sets the ABI mode of the VM to 32-bit or 64-bit (long mode). This
++  determines the layout of the shared info pages exposed to the VM.
++
++KVM_XEN_ATTR_TYPE_SHARED_INFO
++  Sets the guest physical frame number at which the Xen "shared info"
++  page resides. Note that although Xen places vcpu_info for the first
++  32 vCPUs in the shared_info page, KVM does not automatically do so
++  and instead requires that KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO be used
++  explicitly even when the vcpu_info for a given vCPU resides at the
++  "default" location in the shared_info page. This is because KVM is
++  not aware of the Xen CPU id which is used as the index into the
++  vcpu_info[] array, so cannot know the correct default location.
++
++KVM_XEN_ATTR_TYPE_UPCALL_VECTOR
++  Sets the exception vector used to deliver Xen event channel upcalls.
++
++4.128 KVM_XEN_HVM_GET_ATTR
++--------------------------
++
++:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
++:Architectures: x86
++:Type: vm ioctl
++:Parameters: struct kvm_xen_hvm_attr
++:Returns: 0 on success, < 0 on error
++
++Allows Xen VM attributes to be read. For the structure and types,
++see KVM_XEN_HVM_SET_ATTR above.
++
++4.129 KVM_XEN_VCPU_SET_ATTR
++---------------------------
++
++:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
++:Architectures: x86
++:Type: vcpu ioctl
++:Parameters: struct kvm_xen_vcpu_attr
++:Returns: 0 on success, < 0 on error
++
++::
++
++  struct kvm_xen_vcpu_attr {
++	__u16 type;
++	__u16 pad[3];
++	union {
++		__u64 gpa;
++		__u64 pad[4];
++	} u;
++  };
++
++type values:
++
++KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO
++  Sets the guest physical address of the vcpu_info for a given vCPU.
++
++KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO
++  Sets the guest physical address of an additional pvclock structure
++  for a given vCPU. This is typically used for guest vsyscall support.
++
++4.130 KVM_XEN_VCPU_GET_ATTR
++--------------------------
++
++:Capability: KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO
++:Architectures: x86
++:Type: vcpu ioctl
++:Parameters: struct kvm_xen_vcpu_attr
++:Returns: 0 on success, < 0 on error
++
++Allows Xen vCPU attributes to be read. For the structure and types,
++see KVM_XEN_VCPU_SET_ATTR above.
  
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 44a4128b4061..0fc29726f777 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -60,6 +60,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
- TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/user_msr_test
-+TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-new file mode 100644
-index 000000000000..517dfad2b2a6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -0,0 +1,197 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * svm_vmcall_test
-+ *
-+ * Copyright © 2020 Amazon.com, Inc. or its affiliates.
-+ *
-+ * Xen shared_info / pvclock testing
-+ */
+ 5. The kvm_run structure
+ ========================
+@@ -4996,13 +5098,18 @@ to the byte array.
+ 
+ .. note::
+ 
+-      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR,
++      For KVM_EXIT_IO, KVM_EXIT_MMIO, KVM_EXIT_OSI, KVM_EXIT_PAPR, KVM_EXIT_XEN,
+       KVM_EXIT_EPR, KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR the corresponding
+       operations are complete (and guest state is consistent) only after userspace
+       has re-entered the kernel with KVM_RUN.  The kernel side will first finish
+-      incomplete operations and then check for pending signals.  Userspace
+-      can re-enter the guest with an unmasked signal pending to complete
+-      pending operations.
++      incomplete operations and then check for pending signals.
 +
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
++      The pending state of the operation is not preserved in state which is
++      visible to userspace, thus userspace should ensure that the operation is
++      completed before performing a live migration.  Userspace can re-enter the
++      guest with an unmasked signal pending or with the immediate_exit field set
++      to complete pending operations without allowing any further instructions
++      to be executed.
+ 
+ ::
+ 
+@@ -5327,6 +5434,34 @@ wants to write. Once finished processing the event, user space must continue
+ vCPU execution. If the MSR write was unsuccessful, user space also sets the
+ "error" field to "1".
+ 
++::
 +
-+#include <stdint.h>
-+#include <time.h>
 +
-+#define VCPU_ID		5
++		struct kvm_xen_exit {
++  #define KVM_EXIT_XEN_HCALL          1
++			__u32 type;
++			union {
++				struct {
++					__u32 longmode;
++					__u32 cpl;
++					__u64 input;
++					__u64 result;
++					__u64 params[6];
++				} hcall;
++			} u;
++		};
++		/* KVM_EXIT_XEN */
++                struct kvm_hyperv_exit xen;
 +
-+#define SHINFO_REGION_GPA	0xc0000000ULL
-+#define SHINFO_REGION_SLOT	10
-+#define PAGE_SIZE		4096
++Indicates that the VCPU exits into userspace to process some tasks
++related to Xen emulation.
 +
-+#define PVTIME_ADDR	(SHINFO_REGION_GPA + PAGE_SIZE)
-+#define RUNSTATE_ADDR	(SHINFO_REGION_GPA + PAGE_SIZE + 0x20)
++Valid values for 'type' are:
 +
-+static struct kvm_vm *vm;
++  - KVM_EXIT_XEN_HCALL -- synchronously notify user-space about Xen hypercall.
++    Userspace is expected to place the hypercall result into the appropriate
++    field before invoking KVM_RUN again.
 +
-+#define XEN_HYPERCALL_MSR	0x40000000
+ ::
+ 
+ 		/* Fix the size of the union. */
+@@ -6415,7 +6550,6 @@ guest according to the bits in the KVM_CPUID_FEATURES CPUID leaf
+ (0x40000001). Otherwise, a guest may use the paravirtual features
+ regardless of what has actually been exposed through the CPUID leaf.
+ 
+-
+ 8.29 KVM_CAP_DIRTY_LOG_RING
+ ---------------------------
+ 
+@@ -6502,3 +6636,29 @@ KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG.  After enabling
+ KVM_CAP_DIRTY_LOG_RING with an acceptable dirty ring size, the virtual
+ machine will switch to ring-buffer dirty page tracking and further
+ KVM_GET_DIRTY_LOG or KVM_CLEAR_DIRTY_LOG ioctls will fail.
 +
-+struct pvclock_vcpu_time_info {
-+        u32   version;
-+        u32   pad0;
-+        u64   tsc_timestamp;
-+        u64   system_time;
-+        u32   tsc_to_system_mul;
-+        s8    tsc_shift;
-+        u8    flags;
-+        u8    pad[2];
-+} __attribute__((__packed__)); /* 32 bytes */
++8.30 KVM_CAP_XEN_HVM
++--------------------
 +
-+struct pvclock_wall_clock {
-+        u32   version;
-+        u32   sec;
-+        u32   nsec;
-+} __attribute__((__packed__));
++:Architectures: x86
 +
-+struct vcpu_runstate_info {
-+    uint32_t state;
-+    uint64_t state_entry_time;
-+    uint64_t time[4];
-+};
++This capability indicates the features that Xen supports for hosting Xen
++PVHVM guests. Valid flags are::
 +
-+static void guest_code(void)
-+{
-+	struct vcpu_runstate_info *rs = (void *)RUNSTATE_ADDR;
++  #define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
++  #define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
++  #define KVM_XEN_HVM_CONFIG_SHARED_INFO	(1 << 2)
 +
-+	/* Scribble on the runstate, just to make sure that... */
-+	rs->state = 0x5a;
++The KVM_XEN_HVM_CONFIG_HYPERCALL_MSR flag indicates that the KVM_XEN_HVM_CONFIG
++ioctl is available, for the guest to set its hypercall page.
 +
-+	GUEST_SYNC(1);
++If KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL is also set, the same flag may also be
++provided in the flags to KVM_XEN_HVM_CONFIG, without providing hypercall page
++contents, to request that KVM generate hypercall page content automatically
++and also enable interception of guest hypercalls with KVM_EXIT_XEN.
 +
-+	/* ... it is being set to RUNSTATE_running */
-+	GUEST_ASSERT(rs->state == 0);
-+	GUEST_DONE();
-+}
-+
-+static int cmp_timespec(struct timespec *a, struct timespec *b)
-+{
-+	if (a->tv_sec > b->tv_sec)
-+		return 1;
-+	else if (a->tv_sec < b->tv_sec)
-+		return -1;
-+	else if (a->tv_nsec > b->tv_nsec)
-+		return 1;
-+	else if (a->tv_nsec < b->tv_nsec)
-+		return -1;
-+	else
-+		return 0;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct timespec min_ts, max_ts, vm_ts;
-+
-+	if (!(kvm_check_cap(KVM_CAP_XEN_HVM) &
-+	      KVM_XEN_HVM_CONFIG_SHARED_INFO) ) {
-+		print_skip("KVM_XEN_HVM_CONFIG_SHARED_INFO not available");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	clock_gettime(CLOCK_REALTIME, &min_ts);
-+
-+	vm = vm_create_default(VCPU_ID, 0, (void *) guest_code);
-+	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
-+
-+	/* Map a region for the shared_info page */
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+                                    SHINFO_REGION_GPA, SHINFO_REGION_SLOT,
-+				    2 * getpagesize(), 0);
-+	virt_map(vm, SHINFO_REGION_GPA, SHINFO_REGION_GPA, 2, 0);
-+
-+	struct kvm_xen_hvm_config hvmc = {
-+		.flags = KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL,
-+		.msr = XEN_HYPERCALL_MSR,
-+	};
-+	vm_ioctl(vm, KVM_XEN_HVM_CONFIG, &hvmc);
-+
-+	struct kvm_xen_hvm_attr lm = {
-+		.type = KVM_XEN_ATTR_TYPE_LONG_MODE,
-+		.u.long_mode = 1,
-+	};
-+	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &lm);
-+
-+	struct kvm_xen_hvm_attr ha = {
-+		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
-+		.u.shared_info.gfn = SHINFO_REGION_GPA / PAGE_SIZE,
-+	};
-+	vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &ha);
-+
-+	struct kvm_xen_vcpu_attr vi = {
-+		.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO,
-+		.u.gpa = SHINFO_REGION_GPA + 40,
-+	};
-+	vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &vi);
-+
-+	struct kvm_xen_vcpu_attr pvclock = {
-+		.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO,
-+		.u.gpa = PVTIME_ADDR,
-+	};
-+	vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &pvclock);
-+
-+	struct kvm_xen_vcpu_attr st = {
-+		.type = KVM_XEN_VCPU_ATTR_TYPE_VCPU_RUNSTATE,
-+		.u.gpa = RUNSTATE_ADDR,
-+	};
-+	vcpu_ioctl(vm, VCPU_ID, KVM_XEN_VCPU_SET_ATTR, &st);
-+
-+	for (;;) {
-+		volatile struct kvm_run *run = vcpu_state(vm, VCPU_ID);
-+		struct ucall uc;
-+
-+		vcpu_run(vm, VCPU_ID);
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Got exit_reason other than KVM_EXIT_IO: %u (%s)\n",
-+			    run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vm, VCPU_ID, &uc)) {
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s", (const char *)uc.args[0]);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall 0x%lx.", uc.cmd);
-+		}
-+	}
-+
-+ done:
-+	clock_gettime(CLOCK_REALTIME, &max_ts);
-+
-+	/*
-+	 * Just a *really* basic check that things are being put in the
-+	 * right place. The actual calculations are much the same for
-+	 * Xen as they are for the KVM variants, so no need to check.
-+	 */
-+	struct pvclock_wall_clock *wc;
-+	struct pvclock_vcpu_time_info *ti, *ti2;
-+	struct vcpu_runstate_info *rs;
-+
-+	wc = addr_gva2hva(vm, SHINFO_REGION_GPA + 0xc00);
-+	ti = addr_gva2hva(vm, SHINFO_REGION_GPA + 0x40 + 0x20);
-+	ti2 = addr_gva2hva(vm, PVTIME_ADDR);
-+	rs = addr_gva2hva(vm, RUNSTATE_ADDR);
-+
-+	vm_ts.tv_sec = wc->sec;
-+	vm_ts.tv_nsec = wc->nsec;
-+        TEST_ASSERT(wc->version && !(wc->version & 1),
-+		    "Bad wallclock version %x", wc->version);
-+	TEST_ASSERT(cmp_timespec(&min_ts, &vm_ts) <= 0, "VM time too old");
-+	TEST_ASSERT(cmp_timespec(&max_ts, &vm_ts) >= 0, "VM time too new");
-+
-+	TEST_ASSERT(ti->version && !(ti->version & 1),
-+		    "Bad time_info version %x", ti->version);
-+	TEST_ASSERT(ti2->version && !(ti2->version & 1),
-+		    "Bad time_info version %x", ti->version);
-+
-+	/* Check for RUNSTATE_blocked */
-+	TEST_ASSERT(rs->state == 2, "Not RUNSTATE_blocked");
-+	TEST_ASSERT(rs->time[0], "No RUNSTATE_running time");
-+	TEST_ASSERT(rs->time[2], "No RUNSTATE_blocked time");
-+	kvm_vm_free(vm);
-+	return 0;
-+}
++The KVM_XEN_HVM_CONFIG_SHARED_INFO flag indicates the availability of the
++KVM_XEN_HVM_SET_ATTR, KVM_XEN_HVM_GET_ATTR, KVM_XEN_VCPU_SET_ATTR and
++KVM_XEN_VCPU_GET_ATTR ioctls, as well as the delivery of exception vectors
++for event channel upcalls when the evtchn_upcall_pending field of a vcpu's
++vcpu_info is set.
 -- 
 2.29.2
 
