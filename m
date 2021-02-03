@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C68530E291
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 19:33:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FB9C30E28C
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 19:32:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232681AbhBCScZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 13:32:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39039 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232638AbhBCScV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 13:32:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612377055;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TiOisWoMM5J0+N5wrdR7qjGRMcCnnxa5MwmQ2/1A7Ww=;
-        b=XqoUUP8S+eCfDG1g7ePQ9oF1eIoTIPClV0Xyg4LGCZDGotxzYsaz/AzmA2USRAQ+7kIiuv
-        I/nHwDXbvkfUSCWO2cMOxZrlVJp2YFurav2AbCnILFPZLdiQroFWb2VojR2zIsw+/Rb29f
-        cEoOmbcqXisMEA9OqLSbla9D2det5eY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474--1M4acE7NT6ousmpxDDK5g-1; Wed, 03 Feb 2021 13:30:53 -0500
-X-MC-Unique: -1M4acE7NT6ousmpxDDK5g-1
-Received: by mail-ej1-f69.google.com with SMTP id ar27so231650ejc.22
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 10:30:53 -0800 (PST)
+        id S232537AbhBCScG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 13:32:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232263AbhBCSb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 13:31:58 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31FEDC0613D6
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 10:31:18 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id x21so319913iog.10
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 10:31:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5icF/SSv4kj7JR39aT9z2fccgv7ASkGrVR8k5iH/1WA=;
+        b=oHANDXKgkccZkGxdARQzM+C8j1KtV8+qVeHfLOl+R2MlUSfMyNS33V0/FVTyzAHW80
+         +v4pCrqxhOCeHIklQuOltb1b0EUMAhpLlhmBz/uiMItDp0YtJHV4Es4GseeCuUS/d+vd
+         8czbzffcUC3iUpDVQjibd8qse1v8bSb8+xoeA9YMDpbawL3VO6lQlLvDkmuw6bKCiY9Q
+         YabtLYhSEAMl9R45N8RpUGOQtcJazzLVIaEHPFBMZJAW7R95nhDxApm0ORBlqQJ32Rf6
+         8LKMQVD1oAj+5aLJd3yPD6lTJN+r6QikWV4OjuvtZP7fIoUzWkQy3KX3WxhzkY3uiiDo
+         wxpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TiOisWoMM5J0+N5wrdR7qjGRMcCnnxa5MwmQ2/1A7Ww=;
-        b=Q09gFJ3cdgBcPK775UCyyGnDl3PwP/K/Ai824IfZaV7hkL6cE2QP5OK1pCK4QyoUqV
-         8bMTPavhGm8X6EyZHWk39JXqXOeOUm3F9ImYiKMfVIjJPgxpdp5nP/AdmC/M9A0fiY7e
-         4MmN8IPX3QVfex68xHNVNtOzD9FDtv1cb1m20UADRLxfQWuk95IXIyxlf7uGQpuyeCbu
-         Tx6mMjKHc2ROL7XRcmXFVFcuqrvKH20fng2vlqc/BCaISCkEUhWuGhFX1OxHs4aR9XuQ
-         6LV4l3ESEUNciX3fX8WGIk2dgk4POFcQhQ+h0MmJTJqDCS4Fpz/7FxjeLpJA4XETl8HG
-         8qfQ==
-X-Gm-Message-State: AOAM530VYbSN0f0q88eMhjNUr4nxfXLxt1xK13trhwRUszOS4Y/3lcUl
-        284Eg+9enSlZGawTrObm04LDwudixji+z9YDcq4Gxibk/6ucNW4Qsd3CYjeguCvHv3X5s6xFzp8
-        E+7SalD3hnCqs
-X-Received: by 2002:a17:906:2b11:: with SMTP id a17mr4461040ejg.203.1612377052469;
-        Wed, 03 Feb 2021 10:30:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxuzKzmIpNThLgL2hkQbClOrns4+7OkKK8je1Ds3SP1NLbweMJ1vlqIoalInh1oEg4EUt/rnw==
-X-Received: by 2002:a17:906:2b11:: with SMTP id a17mr4461028ejg.203.1612377052335;
-        Wed, 03 Feb 2021 10:30:52 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c18sm1263910edu.20.2021.02.03.10.30.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Feb 2021 10:30:51 -0800 (PST)
-Subject: Re: [PATCH v2 23/28] KVM: x86/mmu: Allow parallel page faults for the
- TDP MMU
-To:     Ben Gardon <bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5icF/SSv4kj7JR39aT9z2fccgv7ASkGrVR8k5iH/1WA=;
+        b=EZ4KfkFkPRZPfDqJVFtzAYYcYaklayvS2s4VlH2VcBxMS8aC5YHSw1H3lZo7UigTsC
+         m9pztoVUKTjIIgFWeaxg78gZ0jUT4wo6PpF8aWeuYlVsNrHJ591uRkdx0IKN9iat3fI+
+         Ec08sP/E6wcMdocP6iCBt38ZinelSsymzk5Y2Bx17+wTAqmybrvfWRtRNrmep3ov0l3r
+         oJLuVE2r21JmwlscW39qL4CGzb9RDAgIQuTryPazNqatPWWmuJF8u0kbyeS2V+8UiIpJ
+         0xZZL4grGgVN+TSBSWFlusdbdzK5T6FewpMEAceIEDTmG9jL//LzvgTnRExqSoizyV/g
+         9TtQ==
+X-Gm-Message-State: AOAM530lHd+N7CcwgkGyU2rGLBZjcI/xfCOSYWzRVZI+VjVXFsAiZudd
+        WIj+53BHc17SEaF24U53XqezN6+YGUBT+j5uBOhQYg==
+X-Google-Smtp-Source: ABdhPJzQoZV4k1ugfFEi2DC1BuUtnOS7uLutKuW1+SQxdmZzsKib3pbK8GKmpe+1mBaQKg64w7mZ1jAj6EhztWYQ+gQ=
+X-Received: by 2002:a02:a718:: with SMTP id k24mr4132560jam.25.1612377077474;
+ Wed, 03 Feb 2021 10:31:17 -0800 (PST)
+MIME-Version: 1.0
+References: <20210202185734.1680553-1-bgardon@google.com> <20210202185734.1680553-25-bgardon@google.com>
+ <813695b1-bcfc-73ea-f9fe-76ffd42044cd@redhat.com>
+In-Reply-To: <813695b1-bcfc-73ea-f9fe-76ffd42044cd@redhat.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 3 Feb 2021 10:31:06 -0800
+Message-ID: <CANgfPd9OTKUJfnuRtMguC7kBf1GZz5Ba0yT1ssX29YQ2Zm54aA@mail.gmail.com>
+Subject: Re: [PATCH v2 24/28] KVM: x86/mmu: Allow zap gfn range to operate
+ under the mmu read lock
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -65,42 +64,33 @@ Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-24-bgardon@google.com>
- <d2c4ae90-1e60-23ed-4bda-24cf88db04c9@redhat.com>
- <CANgfPd-ELyPrn5z0N+o8R6Ci=O25XF+EDU-HDGgvVXGV7uF-dQ@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <39751a29-3a47-a108-f626-8abf0008ea09@redhat.com>
-Date:   Wed, 3 Feb 2021 19:30:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <CANgfPd-ELyPrn5z0N+o8R6Ci=O25XF+EDU-HDGgvVXGV7uF-dQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/02/21 18:46, Ben Gardon wrote:
-> enum kvm_mmu_lock_mode lock_mode =
-> get_mmu_lock_mode_for_root(vcpu->kvm, vcpu->arch.mmu->root_hpa);
-> ....
-> kvm_mmu_lock_for_mode(lock_mode);
-> 
-> Not sure if either of those are actually clearer, but the latter
-> trends in the direction the RCF took, having an enum to capture
-> read/write and whether or not yo yield in a lock mode parameter.
+On Wed, Feb 3, 2021 at 3:26 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 02/02/21 19:57, Ben Gardon wrote:
+> > +#ifdef CONFIG_LOCKDEP
+> > +     if (shared)
+> > +             lockdep_assert_held_read(&kvm->mmu_lock);
+> > +     else
+> > +             lockdep_assert_held_write(&kvm->mmu_lock);
+> > +#endif /* CONFIG_LOCKDEP */
+>
+> Also, there's no need for the #ifdef here.
 
-Could be a possibility.  Also:
+I agree, I must have misinterpreted some feedback on a previous commit
+and gone overboard with it.
 
-enum kvm_mmu_lock_mode lock_mode =
-   kvm_mmu_lock_for_root(vcpu->kvm, vcpu->arch.mmu->root_hpa);
 
-kvm_mmu_unlock(vcpu->kvm, lock_mode);
+> Do we want a helper
+> kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm, bool shared)?
 
-Anyway it can be done on top.
+There are only two places that try to assert both ways as far as I can
+see on a cursory check, but it couldn't hurt.
 
-Paolo
-
+>
+> Paolo
+>
