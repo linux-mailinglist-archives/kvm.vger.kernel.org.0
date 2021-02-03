@@ -2,128 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1224F30E6F4
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 00:14:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 105A430E762
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 00:30:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232880AbhBCXOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 18:14:09 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55930 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233461AbhBCXN5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 18:13:57 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 113N5mmx118502;
-        Wed, 3 Feb 2021 18:13:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=iKqIILtW4S73yXe1HmBJvm0g7QX89FYzx94glAKWPeE=;
- b=CBgmEx0Dp9AyA86hn6Rw6gZqRGhUo/XkpzK9EnZNsXZ8XC2mUEk+JwzkvMq1OoJb9TuA
- rhpYhbAANMu2jiyDBs1x1CiaYcyq6MIGz3arChFXqiMn5G0u+L3SYKDE4Im3b85EetwJ
- jhN6ECktcgJhrJkrlgofcd/Gdra4hiY71utK1oV/A+n6XLDVVjhoO7pcq49xunz48LCX
- 2dBWJc883KFGWcCG2fMJQ4+A+xYymf2XkEPlWGqNIDr0uLp/uwNbCcjISkdtA2EB7D01
- vUR3MifTX+ZiVSMRg07/fv7GPItKICpUWsOPriPChFKagME0z/tj5vrTnv89mDYOzPnl Og== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36g4w28fxx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Feb 2021 18:13:13 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 113N5rEc118618;
-        Wed, 3 Feb 2021 18:13:12 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36g4w28fxh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Feb 2021 18:13:12 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 113N85GI016463;
-        Wed, 3 Feb 2021 23:13:12 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma03dal.us.ibm.com with ESMTP id 36f3kvg8dd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Feb 2021 23:13:12 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 113NDAEx35979556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 3 Feb 2021 23:13:10 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D0DD112062;
-        Wed,  3 Feb 2021 23:13:10 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 97444112061;
-        Wed,  3 Feb 2021 23:13:09 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.203.235])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  3 Feb 2021 23:13:09 +0000 (GMT)
-Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
- <20201223011606.5265-10-akrowiak@linux.ibm.com>
- <20210112021251.0d989225.pasic@linux.ibm.com>
- <20210112185550.1ac49768.pasic@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <73ad5b17-f252-2aad-1d08-14635c8460ef@linux.ibm.com>
-Date:   Wed, 3 Feb 2021 18:13:09 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        id S233745AbhBCXaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 18:30:11 -0500
+Received: from mga03.intel.com ([134.134.136.65]:59041 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232990AbhBCXaG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 18:30:06 -0500
+IronPort-SDR: yI342EANUoR1LHWaRif9FYmVBPlUUQixs88PZT0lJM3XBwwAJnZBJpBPOJGFZMlPVhgKuxj648
+ QdMECGxj2i2A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9884"; a="181209889"
+X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
+   d="scan'208";a="181209889"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 15:29:24 -0800
+IronPort-SDR: ZCyoeF85HpRQSAqr81wEd8lX9XHoGFN8PP4hIwaoMw0f++/Rh9X86Ek1zwIPcQfrH9TMwkek7J
+ 0jwgstSZ+7jA==
+X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
+   d="scan'208";a="392735178"
+Received: from rvchebia-mobl.amr.corp.intel.com ([10.251.7.104])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 15:29:20 -0800
+Message-ID: <b8b57360a1b4c0fa4486cd4c3892c7138e972fff.camel@intel.com>
+Subject: Re: [RFC PATCH v3 23/27] KVM: VMX: Add SGX ENCLS[ECREATE] handler
+ to enforce CPUID restrictions
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc:     "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Huang, Haitao" <haitao.huang@intel.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>
+Date:   Thu, 04 Feb 2021 12:29:18 +1300
+In-Reply-To: <YBr7R0ns79HB74XD@google.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+         <d68c01baed78f859ac5fce4519646fc8a356c77d.1611634586.git.kai.huang@intel.com>
+         <c235e9ca6fae38ae3a6828218cb1a68f2a0c3912.camel@intel.com>
+         <YBr7R0ns79HB74XD@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
-In-Reply-To: <20210112185550.1ac49768.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-03_09:2021-02-03,2021-02-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- clxscore=1015 impostorscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 spamscore=0 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102030138
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 2021-02-03 at 11:36 -0800, Sean Christopherson wrote:
+> On Wed, Feb 03, 2021, Edgecombe, Rick P wrote:
+> > On Tue, 2021-01-26 at 22:31 +1300, Kai Huang wrote:
+> > > +       /* Exit to userspace if copying from a host userspace address
+> > > fails. */
+> > > +       if (sgx_read_hva(vcpu, m_hva, &miscselect,
+> > > sizeof(miscselect)) ||
+> > > +           sgx_read_hva(vcpu, a_hva, &attributes,
+> > > sizeof(attributes)) ||
+> > > +           sgx_read_hva(vcpu, x_hva, &xfrm, sizeof(xfrm)) ||
+> > > +           sgx_read_hva(vcpu, s_hva, &size, sizeof(size)))
+> > > +               return 0;
+> > > +
+> > > +       /* Enforce restriction of access to the PROVISIONKEY. */
+> > > +       if (!vcpu->kvm->arch.sgx_provisioning_allowed &&
+> > > +           (attributes & SGX_ATTR_PROVISIONKEY)) {
+> > > +               if (sgx_12_1->eax & SGX_ATTR_PROVISIONKEY)
+> > > +                       pr_warn_once("KVM: SGX PROVISIONKEY
+> > > advertised but not allowed\n");
+> > > +               kvm_inject_gp(vcpu, 0);
+> > > +               return 1;
+> > > +       }
+> > > +
+> > > +       /* Enforce CPUID restrictions on MISCSELECT, ATTRIBUTES and
+> > > XFRM. */
+> > > +       if ((u32)miscselect & ~sgx_12_0->ebx ||
+> > > +           (u32)attributes & ~sgx_12_1->eax ||
+> > > +           (u32)(attributes >> 32) & ~sgx_12_1->ebx ||
+> > > +           (u32)xfrm & ~sgx_12_1->ecx ||
+> > > +           (u32)(xfrm >> 32) & ~sgx_12_1->edx) {
+> > > +               kvm_inject_gp(vcpu, 0);
+> > > +               return 1;
+> > > +       }
+> > 
+> > Don't you need to deep copy the pageinfo.contents struct as well?
+> > Otherwise the guest could change these after they were checked.
+> > 
+> > But it seems it is checked by the HW and something is caught that would
+> > inject a GP anyway? Can you elaborate on the importance of these
+> > checks?
+> 
+> Argh, yes.  These checks are to allow migration between systems with different
+> SGX capabilities, and more importantly to prevent userspace from doing an end
+> around on the restricted access to PROVISIONKEY.
+> 
+> IIRC, earlier versions did do a deep copy, but then I got clever.  Anyways, yeah,
+> sadly the entire pageinfo.contents page will need to be copied.
+
+I don't fully understand the problem. Are you worried about contents being updated by
+other vcpus during the trap? 
+
+And I don't see how copy can avoid this problem. Even you do copy, the content can
+still be modified afterwards, correct? So what's the point of copying? Looks a better
+solution is to kick all vcpus and put them into block state while KVM is doing ENCLS
+for guest.
 
 
-On 1/12/21 12:55 PM, Halil Pasic wrote:
-> On Tue, 12 Jan 2021 02:12:51 +0100
-> Halil Pasic <pasic@linux.ibm.com> wrote:
->
->>> @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
->>>   	apqi = AP_QID_QUEUE(q->apqn);
->>>   	vfio_ap_mdev_reset_queue(apid, apqi, 1);
->>>   
->>> -	if (q->matrix_mdev)
->>> +	if (q->matrix_mdev) {
->>> +		matrix_mdev = q->matrix_mdev;
->>>   		vfio_ap_mdev_unlink_queue(q);
->>> +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
->>> +	}
->>>   
->>>   	kfree(q);
->>>   	mutex_unlock(&matrix_dev->lock);
-> Shouldn't we first remove the queue from the APCB and then
-> reset? Sorry, I missed this one yesterday.
 
-I agreed to move the reset, however if the remove callback is
-invoked due to a manual unbind of the queue and the queue is
-in use by a guest, the cleanup of the IRQ resources after the
-reset of the queue will not happen because the link from the
-queue to the matrix mdev was removed. Consequently, I'm going
-to have to change the patch 05/15 to split the vfio_ap_mdev_unlink_queue()
-function into two functions: one to remove the link from the matrix mdev to
-the queue; and, one to remove the link from the queue to the matrix
-mdev. Only the first will be used for the remove callback which should
-be fine since the queue object is freed at the end of the remove
-function anyway.
 
->
-> Regards,
-> Halil
+
 
