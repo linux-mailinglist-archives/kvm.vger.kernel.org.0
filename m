@@ -2,205 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5C8430DF3B
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 17:09:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4161230DF79
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 17:16:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234840AbhBCQJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 11:09:00 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:7255 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234940AbhBCQIi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 11:08:38 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B601aca5c0002>; Wed, 03 Feb 2021 08:07:56 -0800
-Received: from [172.27.11.166] (172.20.145.6) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 3 Feb
- 2021 16:07:51 +0000
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     Matthew Rosato <mjrosato@linux.ibm.com>, <jgg@nvidia.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <liranl@nvidia.com>, <oren@nvidia.com>, <tzahio@nvidia.com>,
-        <leonro@nvidia.com>, <yarong@nvidia.com>, <aviadye@nvidia.com>,
-        <shahafs@nvidia.com>, <artemp@nvidia.com>, <kwankhede@nvidia.com>,
-        <ACurrid@nvidia.com>, <gmataev@nvidia.com>, <cjia@nvidia.com>,
-        <yishaih@nvidia.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
- <20210201162828.5938-9-mgurtovoy@nvidia.com>
- <20210201181454.22112b57.cohuck@redhat.com>
- <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
- <20210201114230.37c18abd@omen.home.shazbot.org>
- <20210202170659.1c62a9e8.cohuck@redhat.com>
- <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
- <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <34be24e6-7f62-9908-c56d-9e469c3b6965@nvidia.com>
-Date:   Wed, 3 Feb 2021 18:07:45 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S235015AbhBCQPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 11:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49900 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234773AbhBCQPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 11:15:21 -0500
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0FC3C061573
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 08:14:40 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id k142so397359oib.7
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 08:14:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bCfZ/a/6NOr6nE7maD0+c3yfEPShyNSVY7EhDvteykY=;
+        b=F30Nrt9vPiAB/zyqMpbpGMCX5+9GbissyHIBmWRmyMfHwYjqRyqHPvGGNSQswndDl8
+         ueuYjPhiYQRYrUuuoE2fCSgdN6wSgEVa4WV8ZAaC0Pdwh0MqPavWRi9wHjisevfaVscM
+         tKXh1rpbVgrfZgdHoSxmfIAY/17F42+Ith6ME=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bCfZ/a/6NOr6nE7maD0+c3yfEPShyNSVY7EhDvteykY=;
+        b=pZWicmGXDXaXfLQ2YAmTUgmg7N/yrVeYlAfZaku3GuAfoJnfvyOwtKdX/oArDE8QuW
+         f6wdICv2UD/ntCIeKptAv4ywH6ry4AiYEZoQvys8C0knA5KmMwrDYBp4HXUjiQA3u24h
+         wSzIwjbyNXOWVsPr7w5X1oeN47DbfuqfYoywYCfhzbFXjYPXOwmtjOnjAjmBZjon7QWM
+         O3L0U0KmtBtgoZLRA1C/P6umNUeT6Z3svOC7ruyej8sZ60MCwYPcdTUKuC/9Z+z9klnJ
+         aegK/+L/f65Mlr5n5CxwbjyrHdyT9tV120GNlDOd11+kaNymTn7Afv0u9/I6BrnY6fQz
+         cKTA==
+X-Gm-Message-State: AOAM531eNq1N5jOqV8Cjbt9w/TlV1p8BDsWXx9y6HmDL4+UzrF/QO4/m
+        SUbB5DPVbXrG/g7KrYLjTbPsudqn0b8coohsujBO+A==
+X-Google-Smtp-Source: ABdhPJxC2Hr09yAlU46Rq8Zw9mzo14g2j/8RncSJTzh5gFRD/Uq7tpWlsM64N23HZFbUWxoY/ZCynmvy0uA3EPvqdek=
+X-Received: by 2002:aca:1906:: with SMTP id l6mr2422037oii.101.1612368880228;
+ Wed, 03 Feb 2021 08:14:40 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+References: <20201127164131.2244124-1-daniel.vetter@ffwll.ch>
+ <20201127164131.2244124-13-daniel.vetter@ffwll.ch> <CAKMK7uGrdDrbtj0OyzqQc0CGrQwc2F3tFJU9vLfm2jjufAZ5YQ@mail.gmail.com>
+ <YAbtZBU5PMr68q9E@kroah.com> <CAKMK7uGHSgetm7mDso6_vj+aGrR4u+ChwHb3k0QvgG0K6X2fPg@mail.gmail.com>
+ <YAb4yD4IbpQ3qhJG@kroah.com> <CAKMK7uF9RfqhOGzcjgXTY62-dFS7ELr+uHuRDhEjOcO-kSgY+w@mail.gmail.com>
+In-Reply-To: <CAKMK7uF9RfqhOGzcjgXTY62-dFS7ELr+uHuRDhEjOcO-kSgY+w@mail.gmail.com>
+From:   Daniel Vetter <daniel.vetter@ffwll.ch>
+Date:   Wed, 3 Feb 2021 17:14:29 +0100
+Message-ID: <CAKMK7uG7QiP6m5jfidn7AWVhXp1JUZNpgpNPWOV6bqo9H+7vXA@mail.gmail.com>
+Subject: Re: [PATCH v7 12/17] PCI: Revoke mappings like devmem
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     DRI Development <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        KVM list <kvm@vger.kernel.org>, Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-samsung-soc <linux-samsung-soc@vger.kernel.org>,
+        "open list:DMA BUFFER SHARING FRAMEWORK" 
+        <linux-media@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Daniel Vetter <daniel.vetter@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Kees Cook <keescook@chromium.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, Linux PCI <linux-pci@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
- HQMAIL101.nvidia.com (172.20.187.10)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1612368476; bh=tIXZnn+jmTBeoqjEtveGiKhI6cHGL1dTBbU7/8sZPO4=;
-        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
-         MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-         Content-Language:X-Originating-IP:X-ClientProxiedBy;
-        b=Z992ODr10RtzQFisoWcFGj8C+dZUbFFixUMlEiiF0KkWD0EuBh8bCjm/IWQaQciAK
-         tmb9z1D405IdADby2eiiR9W03GkavNTuA78wuaERnvnn9GX7iaMbLwPi/Dj70rva9E
-         5WebGqTdGLcGgvrTifFo8pM1XNa8+ikP59R4S9iTYZ/0PeGH3OP/sT0NKUrQVoqn3e
-         nAFlMuOdGj2af1Kq62UQ3Ebb4BKkB0xu3GU/I3K8u9kXdCETYudtY45wfl/BRNUA7K
-         VNLm7IjhB6eUN1CyG2XJ8fy6rEPOYkWcwpLwd9Qkzv+1AT/q6VBZuuTCXf+6/Wvyzd
-         URe0i5ac4obxA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jan 19, 2021 at 5:03 PM Daniel Vetter <daniel.vetter@ffwll.ch> wrot=
+e:
+>
+> On Tue, Jan 19, 2021 at 4:20 PM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Tue, Jan 19, 2021 at 03:34:47PM +0100, Daniel Vetter wrote:
+> > > On Tue, Jan 19, 2021 at 3:32 PM Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > > >
+> > > > On Tue, Jan 19, 2021 at 09:17:55AM +0100, Daniel Vetter wrote:
+> > > > > On Fri, Nov 27, 2020 at 5:42 PM Daniel Vetter <daniel.vetter@ffwl=
+l.ch> wrote:
+> > > > > >
+> > > > > > Since 3234ac664a87 ("/dev/mem: Revoke mappings when a driver cl=
+aims
+> > > > > > the region") /dev/kmem zaps ptes when the kernel requests exclu=
+sive
+> > > > > > acccess to an iomem region. And with CONFIG_IO_STRICT_DEVMEM, t=
+his is
+> > > > > > the default for all driver uses.
+> > > > > >
+> > > > > > Except there's two more ways to access PCI BARs: sysfs and proc=
+ mmap
+> > > > > > support. Let's plug that hole.
+> > > > > >
+> > > > > > For revoke_devmem() to work we need to link our vma into the sa=
+me
+> > > > > > address_space, with consistent vma->vm_pgoff. ->pgoff is alread=
+y
+> > > > > > adjusted, because that's how (io_)remap_pfn_range works, but fo=
+r the
+> > > > > > mapping we need to adjust vma->vm_file->f_mapping. The cleanest=
+ way is
+> > > > > > to adjust this at at ->open time:
+> > > > > >
+> > > > > > - for sysfs this is easy, now that binary attributes support th=
+is. We
+> > > > > >   just set bin_attr->mapping when mmap is supported
+> > > > > > - for procfs it's a bit more tricky, since procfs pci access ha=
+s only
+> > > > > >   one file per device, and access to a specific resources first=
+ needs
+> > > > > >   to be set up with some ioctl calls. But mmap is only supporte=
+d for
+> > > > > >   the same resources as sysfs exposes with mmap support, and ot=
+herwise
+> > > > > >   rejected, so we can set the mapping unconditionally at open t=
+ime
+> > > > > >   without harm.
+> > > > > >
+> > > > > > A special consideration is for arch_can_pci_mmap_io() - we need=
+ to
+> > > > > > make sure that the ->f_mapping doesn't alias between ioport and=
+ iomem
+> > > > > > space. There's only 2 ways in-tree to support mmap of ioports: =
+generic
+> > > > > > pci mmap (ARCH_GENERIC_PCI_MMAP_RESOURCE), and sparc as the sin=
+gle
+> > > > > > architecture hand-rolling. Both approach support ioport mmap th=
+rough a
+> > > > > > special pfn range and not through magic pte attributes. Aliasin=
+g is
+> > > > > > therefore not a problem.
+> > > > > >
+> > > > > > The only difference in access checks left is that sysfs PCI mma=
+p does
+> > > > > > not check for CAP_RAWIO. I'm not really sure whether that shoul=
+d be
+> > > > > > added or not.
+> > > > > >
+> > > > > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> > > > > > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
+> > > > > > Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+> > > > > > Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> > > > > > Cc: Kees Cook <keescook@chromium.org>
+> > > > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > > > Cc: Andrew Morton <akpm@linux-foundation.org>
+> > > > > > Cc: John Hubbard <jhubbard@nvidia.com>
+> > > > > > Cc: J=C3=A9r=C3=B4me Glisse <jglisse@redhat.com>
+> > > > > > Cc: Jan Kara <jack@suse.cz>
+> > > > > > Cc: Dan Williams <dan.j.williams@intel.com>
+> > > > > > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > > > > > Cc: linux-mm@kvack.org
+> > > > > > Cc: linux-arm-kernel@lists.infradead.org
+> > > > > > Cc: linux-samsung-soc@vger.kernel.org
+> > > > > > Cc: linux-media@vger.kernel.org
+> > > > > > Cc: Bjorn Helgaas <bhelgaas@google.com>
+> > > > > > Cc: linux-pci@vger.kernel.org
+> > > > > > Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > > > > > --
+> > > > > > v2:
+> > > > > > - Totally new approach: Adjust filp->f_mapping at open time. No=
+te that
+> > > > > >   this now works on all architectures, not just those support
+> > > > > >   ARCH_GENERIC_PCI_MMAP_RESOURCE
+> > > > > > ---
+> > > > > >  drivers/pci/pci-sysfs.c | 4 ++++
+> > > > > >  drivers/pci/proc.c      | 1 +
+> > > > > >  2 files changed, 5 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+> > > > > > index d15c881e2e7e..3f1c31bc0b7c 100644
+> > > > > > --- a/drivers/pci/pci-sysfs.c
+> > > > > > +++ b/drivers/pci/pci-sysfs.c
+> > > > > > @@ -929,6 +929,7 @@ void pci_create_legacy_files(struct pci_bus=
+ *b)
+> > > > > >         b->legacy_io->read =3D pci_read_legacy_io;
+> > > > > >         b->legacy_io->write =3D pci_write_legacy_io;
+> > > > > >         b->legacy_io->mmap =3D pci_mmap_legacy_io;
+> > > > > > +       b->legacy_io->mapping =3D iomem_get_mapping();
+> > > > > >         pci_adjust_legacy_attr(b, pci_mmap_io);
+> > > > > >         error =3D device_create_bin_file(&b->dev, b->legacy_io)=
+;
+> > > > > >         if (error)
+> > > > > > @@ -941,6 +942,7 @@ void pci_create_legacy_files(struct pci_bus=
+ *b)
+> > > > > >         b->legacy_mem->size =3D 1024*1024;
+> > > > > >         b->legacy_mem->attr.mode =3D 0600;
+> > > > > >         b->legacy_mem->mmap =3D pci_mmap_legacy_mem;
+> > > > > > +       b->legacy_io->mapping =3D iomem_get_mapping();
+> > > > >
+> > > > > Unlike the normal pci stuff below, the legacy files here go boom
+> > > > > because they're set up much earlier in the boot sequence. This on=
+ly
+> > > > > affects HAVE_PCI_LEGACY architectures, which aren't that many. So=
+ what
+> > > > > should we do here now:
+> > > > > - drop the devmem revoke for these
+> > > > > - rework the init sequence somehow to set up these files a lot la=
+ter
+> > > > > - redo the sysfs patch so that it doesn't take an address_space
+> > > > > pointer, but instead a callback to get at that (since at open tim=
+e
+> > > > > everything is set up). Imo rather ugly
+> > > > > - ditch this part of the series (since there's not really any tak=
+ers
+> > > > > for the latter parts it might just not make sense to push for thi=
+s)
+> > > > > - something else?
+> > > > >
+> > > > > Bjorn, Greg, thoughts?
+> > > >
+> > > > What sysfs patch are you referring to here?
+> > >
+> > > Currently in linux-next:
+> > >
+> > > commit 74b30195395c406c787280a77ae55aed82dbbfc7 (HEAD ->
+> > > topic/iomem-mmap-vs-gup, drm/topic/iomem-mmap-vs-gup)
+> > > Author: Daniel Vetter <daniel.vetter@ffwll.ch>
+> > > Date:   Fri Nov 27 17:41:25 2020 +0100
+> > >
+> > >    sysfs: Support zapping of binary attr mmaps
+> > >
+> > > Or the patch right before this one in this submission here:
+> > >
+> > > https://lore.kernel.org/dri-devel/20201127164131.2244124-12-daniel.ve=
+tter@ffwll.ch/
+> >
+> > Ah.  Hm, a callback in the sysfs file logic seems really hairy, so I
+> > would prefer that not happen.  If no one really needs this stuff, why
+> > not just drop it like you mention?
+>
+> Well it is needed, but just on architectures I don't care about much.
+> Most relevant is perhaps powerpc (that's where Stephen hit the issue).
+> I do wonder whether we could move the legacy pci files setup to where
+> the modern stuff is set up from pci_create_resource_files() or maybe
+> pci_create_sysfs_dev_files() even for HAVE_PCI_LEGACY. I think that
+> might work, but since it's legacy flow on some funny architectures
+> (alpha, itanium, that kind of stuff) I have no idea what kind of
+> monsters I'm going to anger :-)
 
-On 2/3/2021 5:24 AM, Alexey Kardashevskiy wrote:
->
->
-> On 03/02/2021 04:41, Max Gurtovoy wrote:
->>
->> On 2/2/2021 6:06 PM, Cornelia Huck wrote:
->>> On Mon, 1 Feb 2021 11:42:30 -0700
->>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>
->>>> On Mon, 1 Feb 2021 12:49:12 -0500
->>>> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
->>>>
->>>>> On 2/1/21 12:14 PM, Cornelia Huck wrote:
->>>>>> On Mon, 1 Feb 2021 16:28:27 +0000
->>>>>> Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
->>>>>>> This patch doesn't change any logic but only align to the=20
->>>>>>> concept of
->>>>>>> vfio_pci_core extensions. Extensions that are related to a platform
->>>>>>> and not to a specific vendor of PCI devices should be part of=20
->>>>>>> the core
->>>>>>> driver. Extensions that are specific for PCI device vendor=20
->>>>>>> should go
->>>>>>> to a dedicated vendor vfio-pci driver.
->>>>>> My understanding is that igd means support for Intel graphics,=20
->>>>>> i.e. a
->>>>>> strict subset of x86. If there are other future extensions that e.g.
->>>>>> only make sense for some devices found only on AMD systems, I don't
->>>>>> think they should all be included under the same x86 umbrella.
->>>>>>
->>>>>> Similar reasoning for nvlink, that only seems to cover support=20
->>>>>> for some
->>>>>> GPUs under Power, and is not a general platform-specific=20
->>>>>> extension IIUC.
->>>>>>
->>>>>> We can arguably do the zdev -> s390 rename (as zpci appears only on
->>>>>> s390, and all PCI devices will be zpci on that platform),=20
->>>>>> although I'm
->>>>>> not sure about the benefit.
->>>>> As far as I can tell, there isn't any benefit for s390 it's just
->>>>> "re-branding" to match the platform name rather than the zdev=20
->>>>> moniker,
->>>>> which admittedly perhaps makes it more clear to someone outside of=20
->>>>> s390
->>>>> that any PCI device on s390 is a zdev/zpci type, and thus will use=20
->>>>> this
->>>>> extension to vfio_pci(_core).=C2=A0 This would still be true even if =
-we=20
->>>>> added
->>>>> something later that builds atop it (e.g. a platform-specific device
->>>>> like ism-vfio-pci).=C2=A0 Or for that matter, mlx5 via vfio-pci on=20
->>>>> s390x uses
->>>>> these zdev extensions today and would need to continue using them=20
->>>>> in a
->>>>> world where mlx5-vfio-pci.ko exists.
->>>>>
->>>>> I guess all that to say: if such a rename matches the 'grand=20
->>>>> scheme' of
->>>>> this design where we treat arch-level extensions to=20
->>>>> vfio_pci(_core) as
->>>>> "vfio_pci_(arch)" then I'm not particularly opposed to the=20
->>>>> rename.=C2=A0 But
->>>>> by itself it's not very exciting :)
->>>> This all seems like the wrong direction to me.=C2=A0 The goal here is =
-to
->>>> modularize vfio-pci into a core library and derived vendor modules=20
->>>> that
->>>> make use of that core library.=C2=A0 If existing device specific exten=
-sions
->>>> within vfio-pci cannot be turned into vendor modules through this
->>>> support and are instead redefined as platform specific features of the
->>>> new core library, that feels like we're already admitting failure of
->>>> this core library to support known devices, let alone future devices.
->>>>
->>>> IGD is a specific set of devices.=C2=A0 They happen to rely on some=20
->>>> platform
->>>> specific support, whose availability should be determined via the
->>>> vendor module probe callback.=C2=A0 Packing that support into an "x86"
->>>> component as part of the core feels not only short sighted, but also
->>>> avoids addressing the issues around how userspace determines an=20
->>>> optimal
->>>> module to use for a device.
->>> Hm, it seems that not all current extensions to the vfio-pci code are
->>> created equal.
->>>
->>> IIUC, we have igd and nvlink, which are sets of devices that only show
->>> up on x86 or ppc, respectively, and may rely on some special features
->>> of those architectures/platforms. The important point is that you have
->>> a device identifier that you can match a driver against.
->>
->> maybe you can supply the ids ?
->>
->> Alexey K, I saw you've been working on the NVLINK2 for P9. can you=20
->> supply the exact ids for that should be bounded to this driver ?
->>
->> I'll add it to V3.
->
-> Sorry no, I never really had the exact ids, they keep popping up after=20
-> years.
->
-> The nvlink2 support can only work if the platform supports it as there=20
-> is nothing to do to the GPUs themselves, it is about setting up those=20
-> nvlink2 links. If the platform advertises certain features in the=20
-> device tree - then any GPU in the SXM2 form factor (not sure about the=20
-> exact abbrev, not an usual PCIe device) should just work.
->
-> If the nvlink2 "subdriver" fails to find nvlinks (the platform does=20
-> not advertise them or some parameters are new to this subdriver, such=20
-> as link-speed), we still fall back to generic vfio-pci and try passing=20
-> through this GPU as a plain PCI device with no extra links.=20
-> Semi-optimal but if the user is mining cryptocoins, then highspeed=20
-> links are not really that important :) And the nvidia driver is=20
-> capable of running such GPUs without nvlinks. Thanks,
+Back from a week of vacation, I looked at this again and I think
+shouldn't be hard to fix this with the sam trick
+pci_create_sysfs_dev_files() uses: As long as sysfs_initialized isn't
+set we skip, and then later on when the vfs is up&running we can
+initialize everything.
 
- From the above I can conclude that nvlink2_vfio_pci will need to find=20
-nvlinks during the probe and fail in case it doesn't.
+To be able to apply the same thing to pci_create_legacy_files() I
+think all I need is to iterate overa all struct pci_bus in
+pci_sysfs_init() and we're good. Unfortunately I didn't find any
+for_each_pci_bus(), so how do I do that?
 
-which platform driver is responsible to advertise it ? can we use=20
-aux_device to represent these nvlink/nvlinks ?
-
-In case of a failure, the user can fallback to vfio-pci.ko and run=20
-without the nvlinks as you said.
-
-This is deterministic behavior and the user will know exactly what he's=20
-getting from vfio subsystem.
-
->
->
->>
->>>
->>> On the other side, we have the zdev support, which both requires s390
->>> and applies to any pci device on s390. If we added special handling for
->>> ISM on s390, ISM would be in a category similar to igd/nvlink.
->>>
->>> Now, if somebody plugs a mlx5 device into an s390, we would want both
->>> the zdev support and the specialized mlx5 driver. Maybe zdev should be
->>> some kind of library that can be linked into normal vfio-pci, into
->>> vfio-pci-mlx5, and a hypothetical vfio-pci-ism? You always want zdev on
->>> s390 (if configured into the kernel).
->>>
->
+Thanks, Daniel
+--=20
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
