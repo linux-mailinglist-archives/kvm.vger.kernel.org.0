@@ -2,96 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFAB330D613
-	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 10:18:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA6030D644
+	for <lists+kvm@lfdr.de>; Wed,  3 Feb 2021 10:28:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233235AbhBCJRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 04:17:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26548 "EHLO
+        id S233421AbhBCJ1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 04:27:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34731 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233342AbhBCJRV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 04:17:21 -0500
+        by vger.kernel.org with ESMTP id S233419AbhBCJZg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 04:25:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612343755;
+        s=mimecast20190719; t=1612344249;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cJJK3qNERG1luckatuh8Y6BGWPbFjbZumZ5BkOC5HpU=;
-        b=QQmaw9b7fHhaoHBGuEVIGM4feU2P0NS6PYeZh5MDRiY472MEZRE1yt7kMlZkErnSwqjITQ
-        KBUXygJ8L5z+vCQUT+nucAxs3tneL/I8H/5IKSCND8LYhMc+rktjZlXnT/C8uO41Qo1Pmd
-        yc6Ve4wsMZUbe25CeatdpgW6G6z6Dvg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-6NkwhtQcND-_rQvMsA5U3A-1; Wed, 03 Feb 2021 04:15:53 -0500
-X-MC-Unique: 6NkwhtQcND-_rQvMsA5U3A-1
-Received: by mail-ej1-f72.google.com with SMTP id bx12so4334286ejc.15
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 01:15:53 -0800 (PST)
+        bh=1AJOvNcVAHjnbmTLHPbHCklE5DkACQ51lJEvjK17KnY=;
+        b=cGcOvv4eR20wmF0PR3E/9TH+zneGfa4bIH0WNtkAHLrUHJ8pPju3FMuYeuSPLE0rbGQMIz
+        iXcUIhgzgUV9mg5oAP/bQZ2QnaH3Ib5XLjC/Xv92qNRrheFvoPw5ygjuRsoJQgeWnnG1QO
+        QQrNJ1dJltu3YY7SXThiKj6jfvI4eUs=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-b4rKuV1lNGmwtXPTH5Jc-w-1; Wed, 03 Feb 2021 04:24:04 -0500
+X-MC-Unique: b4rKuV1lNGmwtXPTH5Jc-w-1
+Received: by mail-ed1-f69.google.com with SMTP id x13so11121196edi.7
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 01:24:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=cJJK3qNERG1luckatuh8Y6BGWPbFjbZumZ5BkOC5HpU=;
-        b=dWYnlwe/XQBlGwdS7f/GMB7I137M46PspBgxsuN/G+bwjum31UnYioUxe2NwybN3gG
-         vvAgwp6iimfD89nlM+OTfhyC/4JbzxAdMVGz5a3si1YEts1VwZibAHjZ5F/rqdBBgc0Y
-         hjeZ5tNvoGQhH1Lf+DPGfPpi7Lu89I84eiphV4IX0TGrPI4PT4S/HEEPLvyZKool98SK
-         oCe/4hFByIwC3w/teuS5tOUKEcNeRS7CfirVgz3INxHi1fyMTuF/79NLCa2I1+beJBdP
-         i23kpEAzwKmmKDb+Cj4U940cKt+NwyobbrtpI0FdTePIqvXH6/X0wmLSQZj3tVDADYi9
-         tLgQ==
-X-Gm-Message-State: AOAM530mBc7lXJ2U7np9YwcWukSBXOM+j54fHFR61rZ4UYWrI6KG4m7E
-        hfF1B3L3eo2kkdgu4NdIjmdM/J1iNcRdgFfvqaBr2X7l70mgxc7IYH4pvqKezxBAALpMmdt5wRs
-        9eBSerFIXuxbE
-X-Received: by 2002:a05:6402:2029:: with SMTP id ay9mr1938186edb.373.1612343752599;
-        Wed, 03 Feb 2021 01:15:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzvLXv30MwxASwvybAz0WSIbo63Sp9neFadSuty3raoAfNRSnRLfoYp7EvFM06U1Ux0uQvinw==
-X-Received: by 2002:a05:6402:2029:: with SMTP id ay9mr1938174edb.373.1612343752464;
-        Wed, 03 Feb 2021 01:15:52 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id w3sm713171eja.52.2021.02.03.01.15.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 01:15:51 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Kechen Lu <kechenl@nvidia.com>
-Cc:     "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        Somdutta Roy <somduttar@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
-Subject: Re: Optimized clocksource with AMD AVIC enabled for Windows guest
-In-Reply-To: <5688445c-b9c8-dbd6-e9ee-ed40df84f8ca@redhat.com>
-References: <DM6PR12MB3500B7D1EDC5B5B26B6E96FBCAB49@DM6PR12MB3500.namprd12.prod.outlook.com>
- <5688445c-b9c8-dbd6-e9ee-ed40df84f8ca@redhat.com>
-Date:   Wed, 03 Feb 2021 10:15:51 +0100
-Message-ID: <878s85pl4o.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1AJOvNcVAHjnbmTLHPbHCklE5DkACQ51lJEvjK17KnY=;
+        b=c/D1CvA3WztcEHnHmqzRRoRRQEgr+ReU59aMCuYV5MI7JocgKDKZ8T0ic5gHW1IBN7
+         iTjvYLzrmQop5gvSvFp7VwIHpZpG5KI981Csn36voOH423cwNtsZXf/aZAF7G6EdvQei
+         TvWtBKwHO2nDzXCeDdQ8UHsJYGQvDK8Xp8IcjK8bD+m98y6c9msFNl+++Kfjkrk7H5Eh
+         QvUJXQ0mvQi9EOWgqqX5I+b6taER4jjD2/YF6GNIF8hrpqQPhnS27LFYrDdnetJnDlPY
+         LDxddKic676VDWBDGp/WjXdPSkGl3vgFGtjuctHm7FKNiLSv6GdP/bk43kR7xwbIWtX0
+         0Yow==
+X-Gm-Message-State: AOAM533DlxIGlnYWrUv+VKbR/WXaGstd4H2n/Ebw+8wsbWIMTDd6QBCY
+        YKcPCmpJ8t0I2JUAYAgDCU1aQNzbp+/sfAC420IAk1Kc88JVDNU/cFC2gI8AASb+3KEnoiF4isM
+        9a3/AWa2AQwXhMM9OJCe+QgAzmHJR4eZ8MGOEUd4id9DMnqrbMfQkMcKc3O4GyjZ3
+X-Received: by 2002:a05:6402:1bc7:: with SMTP id ch7mr2091781edb.124.1612344242772;
+        Wed, 03 Feb 2021 01:24:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxaAh0RhIxuArmFdv/po32/tcmIaKCC+5BlRfjZI28Vt6YtI4dzn5QmkclPNHfxI6/by0mCBg==
+X-Received: by 2002:a05:6402:1bc7:: with SMTP id ch7mr2091763edb.124.1612344242397;
+        Wed, 03 Feb 2021 01:24:02 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id x42sm576330ede.64.2021.02.03.01.24.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Feb 2021 01:24:01 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20210202165141.88275-1-pbonzini@redhat.com>
+ <20210202165141.88275-4-pbonzini@redhat.com> <YBmXLJPPTS7yzClF@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 3/3] KVM: x86: move kvm_inject_gp up from kvm_set_dr to
+ callers
+Message-ID: <63f19b57-7189-4b36-5159-a42df15336a5@redhat.com>
+Date:   Wed, 3 Feb 2021 10:24:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <YBmXLJPPTS7yzClF@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 02/02/21 19:17, Sean Christopherson wrote:
+>> @@ -2617,19 +2618,18 @@ static int dr_interception(struct vcpu_svm *svm)
+>>   	reg = svm->vmcb->control.exit_info_1 & SVM_EXITINFO_REG_MASK;
+>>   	dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
+>>   
+>> +	if (!kvm_require_dr(&svm->vcpu, dr & 15))
+> 
+> Purely because I suck at reading base-10 bitwise operations, can we do "dr & 0xf"?
 
-> On 03/02/21 07:40, Kechen Lu wrote:
->> From the above observations, trying to see if there's a way for
->> enabling AVIC while also having the most optimized clock source for
->> windows guest.
->> 
->
-> You would have to change KVM, so that AVIC is only disabled if Auto-EOI 
-> interrupts are used.
->
+I would have never said that having this => 
+https://www.youtube.com/watch?v=nfUY3_XVKHI as a kid would give me a 
+competitive advantage as KVM maintainer. :)
 
-(I vaguely recall having this was discussed already but apparently no
-changes were made since)
+(Aside: that game was incredibly popular in the 80s in Italy and as you 
+can see from the advertisement at 
+https://www.youtube.com/watch?v=o6L9cegnCrw it even had "the binary 
+teacher" in it, yes in English despite no one spoke English fluently at 
+the time.  The guy who invented it was an absolute genius.  Also, the 
+name means "branches").
 
-Hyper-V TLFS defines the following bit:
+But seriously: I think the usage of "-" was intentional because the AMD 
+exit codes have READ first and WRITE second---but it's (almost) a 
+coincidence that CR/DR intercepts are naturally aligned and bit 4 means 
+read vs. write.
 
-CPUID 0x40000004.EAX 
-Bit 9: Recommend deprecating AutoEOI.
+So v2 will remove the kvm_require_dr (I tested your hypothesis with 
+debug.flat and KVM_DEBUGREG_WONT_EXIT disabled, and you're right) and have:
 
-But this is merely a recommendation and older Windows versions may not
-know about the bit and still use it. We need to make sure the bit is
-set/exposed to Windows guests but we also must track AutoEOI usage and
-inhibit AVIC when detected.
+         dr = svm->vmcb->control.exit_code - SVM_EXIT_READ_DR0;
+         if (dr >= 16) { /* Move to dr.  */
+                 dr -= 16;
+                 val = kvm_register_read(&svm->vcpu, reg);
+                 err = kvm_set_dr(&svm->vcpu, dr, val);
+         } else {
+                 kvm_get_dr(&svm->vcpu, dr, &val);
+                 kvm_register_write(&svm->vcpu, reg, val);
+         }
 
--- 
-Vitaly
+Paolo
+
+> Technically, 'err' needs to be checked, else 'reg' will theoretically be
+> clobbered with garbage.  I say "theoretically", because kvm_get_dr() always
+> returns '0'; the CR4.DE=1 behavior is handled by kvm_require_dr(), presumably
+> due to it being a #UD instead of #GP.  AFAICT, you can simply add a prep patch
+> to change the return type to void.
+> 
+> Side topic, is the kvm_require_dr() check needed on SVM interception?  The APM
+> states:
+> 
+>    All normal exception checks take precedence over the by implicit DR6/DR7 writes.)
+> 
+> I can't find anything that would suggest the CR4.DE=1 #UD isn't a "normal"
+> exception.
+> 
+>>   		kvm_register_write(&svm->vcpu, reg, val);
+>>   	}
+>>   
+>> -	return kvm_skip_emulated_instruction(&svm->vcpu);
+>> +	return kvm_complete_insn_gp(&svm->vcpu, err);
+>>   }
+>>   
+>>   static int cr8_write_interception(struct vcpu_svm *svm)
+> 
 
