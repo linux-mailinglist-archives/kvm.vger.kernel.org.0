@@ -2,174 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D39830E842
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:06:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF3E430E83F
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:05:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233391AbhBDAFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 19:05:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234255AbhBDADV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 19:03:21 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 135C3C06121F
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 16:01:55 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id w4so1551463ybc.7
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 16:01:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=luNrCKLtsPU27ckN7gNdItwjuKJ5CIfky359N7ChVXk=;
-        b=p3Nfy1i5cJizykjazbp5BhDXRAb3f6qml14F9H38h0NuUPl4trhBkfZKE2UUmhpb+/
-         qT7GIEp+B1EmNxvcts14/ih1sGmKy/3Jeyu8qsiPUobvLC6o+SlBD1dQj6sjG0XFJqua
-         NuhJZwxcOkbQc8Jfl9Y1FT4ctIABenjNglrHM4zoudX0DJK3ybFJQlg1BdvCeutdnE6N
-         PplSMDNIPEdMZviV4TYTMIvFuqpEsyNZRaOzlg+VPRKpUl1cU/ur5FNKl5Asdu8N1REQ
-         9g/3DiBmMfmqz/ewtd/b/BpHnrL+WZa4b5R9m2aGxtV3GnSG8CrxiKVeP7YHQjabzCp6
-         G42Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=luNrCKLtsPU27ckN7gNdItwjuKJ5CIfky359N7ChVXk=;
-        b=BP/lZdpHPPDdSqN4pAgT+v9bpGS7huxdWOGpmhDQKR9Cw4ABRY5FROBuQ+KLxKF1LS
-         jJwr82/qroJXhjQJefcMHPKTE+apBn7v4v0mK+MkjsgoLK92ev7rBHG0BQVvye4elKxH
-         XiYr+X9GDjQX5luqXd/DcoE5kBIvFMp1Y743g6wrtKtRNOf1brKmoRVWIQLh0sRvRs0+
-         QTbi+ObbXVZ9FWNFuWwE33lEKYusa4gubvDvZ9geqLNMiTzwuKnF5WuwiD+W9LWFqat5
-         suFyYFyErOauRD7RyG0XlsrMcQs5+tWnYDK9i4TPP9SSCesAPNGb4z2+sDzTzLkgpE/b
-         9YEQ==
-X-Gm-Message-State: AOAM530ofz0md3cMd+z2/Lb3grRt1wLkqzrUHLbL25o/3k5UbKRt4vH5
-        tOv0auLY7cajnvk8jjg2RW+mfVcTlok=
-X-Google-Smtp-Source: ABdhPJzWxYdN+wSCf25IEtYIx8ntCF1X3y1H+Pg95o847to6WtjhpgKVS/wU2bzzPBiimahIyNkWXZK5al0=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
- (user=seanjc job=sendgmr) by 2002:a25:5557:: with SMTP id j84mr8065418ybb.472.1612396914318;
- Wed, 03 Feb 2021 16:01:54 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  3 Feb 2021 16:01:17 -0800
-In-Reply-To: <20210204000117.3303214-1-seanjc@google.com>
-Message-Id: <20210204000117.3303214-13-seanjc@google.com>
-Mime-Version: 1.0
-References: <20210204000117.3303214-1-seanjc@google.com>
-X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
-Subject: [PATCH 12/12] KVM: nSVM: Trace VM-Enter consistency check failures
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>
+        id S233461AbhBDAFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 19:05:31 -0500
+Received: from mga01.intel.com ([192.55.52.88]:26783 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233522AbhBDAFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 19:05:25 -0500
+IronPort-SDR: xulitVS0hXwzHhoHxJqeIvqjuAO3v1NI+Q6U5ssbHeAnq0iKtvakDvQHJYkrTvSeClff+urS1x
+ MCz3dxPA0qUA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9884"; a="200111745"
+X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
+   d="scan'208";a="200111745"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 16:04:37 -0800
+IronPort-SDR: 60masuulLU2E4MO1NE4WRaDQlhutp9bbEQ0NQ38rgWMEnTuQo+C6dxHgPPd1sJ7gW8XI73LQxN
+ iQKBRQDF4i8g==
+X-IronPort-AV: E=Sophos;i="5.79,399,1602572400"; 
+   d="scan'208";a="356193753"
+Received: from rvchebia-mobl.amr.corp.intel.com ([10.251.7.104])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2021 16:04:31 -0800
+Message-ID: <44b5a747aaf1d42fb8ef388bd28f49614d42cd50.camel@intel.com>
+Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "jethro@fortanix.com" <jethro@fortanix.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "b.thiel@posteo.de" <b.thiel@posteo.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "Huang, Haitao" <haitao.huang@intel.com>
+Date:   Thu, 04 Feb 2021 13:04:29 +1300
+In-Reply-To: <b6e0a32f-0070-f97e-5d94-d12f7972d474@intel.com>
+References: <cover.1611634586.git.kai.huang@intel.com>
+         <4b4b9ed1d7756e8bccf548fc41d05c7dd8367b33.camel@intel.com>
+         <YBnTPmbPCAUS6XNl@google.com>
+         <99135352-8e10-fe81-f0dc-8d552d73e3d3@intel.com>
+         <YBnmow4e8WUkRl2H@google.com>
+         <f50ac476-71f2-60d4-5008-672365f4d554@intel.com>
+         <YBrfF0XQvzQf9PhR@google.com>
+         <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
+         <c827fed1-d7af-a94a-b69e-114d4a2ec988@intel.com>
+         <d044ccde68171dc319d77917c8ab9f83e9a98645.camel@intel.com>
+         <YBsyqLHPtYOpqeW4@google.com>
+         <b6e0a32f-0070-f97e-5d94-d12f7972d474@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use trace_kvm_nested_vmenter_failed() and its macro magic to trace
-consistency check failures on nested VMRUN.  Tracing such failures by
-running the buggy VMM as a KVM guest is often the only way to get a
-precise explanation of why VMRUN failed.
+On Wed, 2021-02-03 at 15:37 -0800, Dave Hansen wrote:
+> On 2/3/21 3:32 PM, Sean Christopherson wrote:
+> > > > > Yeah, special casing KVM is almost always the wrong thing to do.
+> > > > > Anything that KVM can do, other subsystems will do as well.
+> > > > Agreed.  Thwarting ioremap itself seems like the right way to go.
+> > > This sounds irrelevant to KVM SGX, thus I won't include it to KVM SGX series.
+> > I would say it's relevant, but a pre-existing bug.  Same net effect on what's
+> > needed for this series..
+> > 
+> > I say it's a pre-existing bug, because I'm pretty sure KVM can be coerced into
+> > accessing the EPC by handing KVM a memslot that's backed by an enclave that was
+> > created by host userspace (via /dev/sgx_enclave).
+> 
+> Dang, you beat me to it.  I was composing another email that said the
+> exact same thing.
+> 
+> I guess we need to take a closer look at the KVM fallout from this.
+> It's a few spots where it KVM knew it might be consuming garbage.  It
+> just get extra weird stinky garbage now.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/nested.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+I don't quite understand how KVM will need to access EPC memslot. It is *guest*, but
+not KVM, who can read EPC from non-enclave. And if I understand correctly, there will
+be no place for KVM to use kernel address of EPC to access it. To KVM, there's no
+difference, whether EPC backend is from /dev/sgx_enclave, or /dev/sgx_vepc. And we
+really cannot prevent guest from doing anything. 
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index add3cd4295e1..16fea02471a7 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -29,6 +29,8 @@
- #include "lapic.h"
- #include "svm.h"
- 
-+#define CC KVM_NESTED_VMENTER_CONSISTENCY_CHECK
-+
- static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
- 				       struct x86_exception *fault)
- {
-@@ -216,14 +218,13 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 
- static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
- {
--	if ((vmcb_is_intercept(control, INTERCEPT_VMRUN)) == 0)
-+	if (CC(!vmcb_is_intercept(control, INTERCEPT_VMRUN)))
- 		return false;
- 
--	if (control->asid == 0)
-+	if (CC(control->asid == 0))
- 		return false;
- 
--	if ((control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) &&
--	    !npt_enabled)
-+	if (CC((control->nested_ctl & SVM_NESTED_CTL_NP_ENABLE) && !npt_enabled))
- 		return false;
- 
- 	return true;
-@@ -240,32 +241,36 @@ static bool nested_vmcb_check_cr3_cr4(struct vcpu_svm *svm,
- 	 * CR0.PG && EFER.LME.
- 	 */
- 	if ((save->efer & EFER_LME) && (save->cr0 & X86_CR0_PG)) {
--		if (!(save->cr4 & X86_CR4_PAE) || !(save->cr0 & X86_CR0_PE) ||
--		    kvm_vcpu_is_illegal_gpa(vcpu, save->cr3))
-+		if (CC(!(save->cr4 & X86_CR4_PAE)) ||
-+		    CC(!(save->cr0 & X86_CR0_PE)) ||
-+		    CC(kvm_vcpu_is_illegal_gpa(vcpu, save->cr3)))
- 			return false;
- 	}
- 
--	return kvm_is_valid_cr4(&svm->vcpu, save->cr4);
-+	if (CC(!kvm_is_valid_cr4(vcpu, save->cr4)))
-+		return false;
-+
-+	return true;
- }
- 
- /* Common checks that apply to both L1 and L2 state.  */
- static bool nested_vmcb_valid_sregs(struct vcpu_svm *svm,
- 				    struct vmcb_save_area *save)
- {
--	if (!(save->efer & EFER_SVME))
-+	if (CC(!(save->efer & EFER_SVME)))
- 		return false;
- 
--	if (((save->cr0 & X86_CR0_CD) == 0 && (save->cr0 & X86_CR0_NW)) ||
--	    (save->cr0 & ~0xffffffffULL))
-+	if (CC((save->cr0 & X86_CR0_CD) == 0 && (save->cr0 & X86_CR0_NW)) ||
-+	    CC(save->cr0 & ~0xffffffffULL))
- 		return false;
- 
--	if (!kvm_dr6_valid(save->dr6) || !kvm_dr7_valid(save->dr7))
-+	if (CC(!kvm_dr6_valid(save->dr6)) || CC(!kvm_dr7_valid(save->dr7)))
- 		return false;
- 
- 	if (!nested_vmcb_check_cr3_cr4(svm, save))
- 		return false;
- 
--	if (!kvm_valid_efer(&svm->vcpu, save->efer))
-+	if (CC(!kvm_valid_efer(&svm->vcpu, save->efer)))
- 		return false;
- 
- 	return true;
-@@ -367,12 +372,12 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
- static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 			       bool nested_npt)
- {
--	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
-+	if (CC(kvm_vcpu_is_illegal_gpa(vcpu, cr3)))
- 		return -EINVAL;
- 
- 	if (!nested_npt && is_pae_paging(vcpu) &&
- 	    (cr3 != kvm_read_cr3(vcpu) || pdptrs_changed(vcpu))) {
--		if (!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
-+		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
- 			return -EINVAL;
- 	}
- 
--- 
-2.30.0.365.g02bc693789-goog
+So how memremap() of EPC section is related to KVM SGX? For instance, the
+implementation of this series needs to be modified due to this?
 
