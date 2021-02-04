@@ -2,147 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A4E630FA86
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 19:02:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE73D30FA7C
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 19:01:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238687AbhBDSBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 13:01:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21612 "EHLO
+        id S238770AbhBDR7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 12:59:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30168 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238466AbhBDRYQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:24:16 -0500
+        by vger.kernel.org with ESMTP id S238234AbhBDR60 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:58:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612459370;
+        s=mimecast20190719; t=1612461420;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=o3uKySNVlPtFnZUr4id2X1iOfL1gG+jTT4Q7ufovkZI=;
-        b=XaMdI+m5AAngBfxY/m91oOTczyHL50ZptbLngRn14qB1qWTtui6JVXb3I5ILY6/wKffWQ9
-        uvCd9aqvXBv76nAcJdgnSXpbG/kesIE+asYEpzIAtAwb03cq8rDn0d0WfacuKTMbSpOAKY
-        3sT/eyef2t1b1Kj2zYPaZ80GDv9/PbM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-wEAy_4raMMifjWApUgkh7Q-1; Thu, 04 Feb 2021 12:22:46 -0500
-X-MC-Unique: wEAy_4raMMifjWApUgkh7Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E73A4196632A;
-        Thu,  4 Feb 2021 17:22:44 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-113-213.ams2.redhat.com [10.36.113.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6B9219709;
-        Thu,  4 Feb 2021 17:22:42 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH v3 02/13] vringh: add 'iotlb_lock' to synchronize iotlb accesses
-Date:   Thu,  4 Feb 2021 18:22:19 +0100
-Message-Id: <20210204172230.85853-3-sgarzare@redhat.com>
-In-Reply-To: <20210204172230.85853-1-sgarzare@redhat.com>
-References: <20210204172230.85853-1-sgarzare@redhat.com>
+        bh=s5YZVkjCD5/C4ET3SX6EfcYxaF5+N4XQ299/ZHaz3F4=;
+        b=I4jL+vj7G8xoDeKZ60g5PjT7bv2wcnmF7X/3pkUSNWcfV39D10JWHtJPSvct4eSajX6cMp
+        PSA34hDtu38MVc3MFYWmOgVOthNCU0kigeTh0SxCO+iymfw+L2/YD1O/jBfx1hbZ6zjlbg
+        kqKZh/ugaRadUauxN14+fdCOr9GNwT8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-208-EJVXo-OQPeCnwvo8b2h4kg-1; Thu, 04 Feb 2021 12:56:56 -0500
+X-MC-Unique: EJVXo-OQPeCnwvo8b2h4kg-1
+Received: by mail-wr1-f71.google.com with SMTP id n18so3281238wrm.8
+        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 09:56:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=s5YZVkjCD5/C4ET3SX6EfcYxaF5+N4XQ299/ZHaz3F4=;
+        b=QG8cTtDjSQIZnQQDDgHC7/Pphw1XJh8SR49+hw7ZhxNcrYuTckAo3VUwmIy9owm1Go
+         AKiD9U7GBj30ZKYdFMUWiP43P9qXGxJJcR6yPYCNP47FaVbR2dJL1nHp00ZPSkw+4Nd3
+         gbcoS59iYbGYKKk9pFFLSeUYxO/k1bunrWGsmh8j0TVn/UaWPDdPRX8ZKsaGEtbQFjvl
+         1kjI+8yU4e8UU/CIRLsYfau4XUsIJ/R9+VWYb170QR2FeocDwcguA5sRg95FdQBdXIRG
+         hdvdaJXgbGk4gTQbWdu0nqI2Cdk/GAOePXOxm89113YpSvMxsPSOHO2Qn9h2s9CxQy0D
+         pRkQ==
+X-Gm-Message-State: AOAM53251PPg/WanTsaixx1lQLf2tVxaqtwrD0abciNqBhqbQdBoAx08
+        ndtsvOumia/wDFvkZ6yfHHPiB+U30Ed56vMkjXgNAe51o1rrEH9wpaXLZnJRs5yC6ngJNaIXt+K
+        5KWXGwbIiF4mv
+X-Received: by 2002:a1c:e905:: with SMTP id q5mr335381wmc.84.1612461415359;
+        Thu, 04 Feb 2021 09:56:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwdM3Fux/LZYeI1PRL6P2CnPpwWo90HoYMM+BJpvd4gVKVgraKOTq986c9dJjLBOB4uFSVNNg==
+X-Received: by 2002:a1c:e905:: with SMTP id q5mr335372wmc.84.1612461415198;
+        Thu, 04 Feb 2021 09:56:55 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i7sm9116584wru.49.2021.02.04.09.56.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Feb 2021 09:56:54 -0800 (PST)
+Subject: Re: [PATCH 07/12] KVM: x86: SEV: Treat C-bit as legal GPA bit
+ regardless of vCPU mode
+To:     Sean Christopherson <seanjc@google.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc:     "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>
+References: <20210204000117.3303214-1-seanjc@google.com>
+ <20210204000117.3303214-8-seanjc@google.com>
+ <5fa85e81a54800737a1417be368f0061324e0aec.camel@intel.com>
+ <YBtZs4Z2ROeHyf3m@google.com>
+ <f1d2f324-d309-5039-f4f6-bbec9220259f@redhat.com>
+ <e68beed4c536712ddf28cdd8296050222731415e.camel@intel.com>
+ <YBw0a5fFvtOrDwOR@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c16cbc1c-a834-edd4-bfdf-753ec07c7008@redhat.com>
+Date:   Thu, 4 Feb 2021 18:56:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <YBw0a5fFvtOrDwOR@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Usually iotlb accesses are synchronized with a spinlock.
-Let's request it as a new parameter in vringh_set_iotlb() and
-hold it when we navigate the iotlb in iotlb_translate() to avoid
-race conditions with any new additions/deletions of ranges from
-the ioltb.
+On 04/02/21 18:52, Sean Christopherson wrote:
+>> Alternatively there could be something like a is_rsvd_cr3_bits() helper that
+>> just uses reserved_gpa_bits for now. Probably put the comment in the wrong
+>> place.  It's a minor point in any case.
+> That thought crossed my mind, too.  Maybe kvm_vcpu_is_illegal_cr3() to match
+> the gpa helpers?
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- include/linux/vringh.h           | 6 +++++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 3 ++-
- drivers/vhost/vringh.c           | 9 ++++++++-
- 3 files changed, 15 insertions(+), 3 deletions(-)
+Yes, that's certainly a good name but it doesn't have to be done now. 
+Or at least, if you do it, somebody is guaranteed to send a patch after 
+one month because the wrapper is useless. :)
 
-diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-index 59bd50f99291..9c077863c8f6 100644
---- a/include/linux/vringh.h
-+++ b/include/linux/vringh.h
-@@ -46,6 +46,9 @@ struct vringh {
- 	/* IOTLB for this vring */
- 	struct vhost_iotlb *iotlb;
- 
-+	/* spinlock to synchronize IOTLB accesses */
-+	spinlock_t *iotlb_lock;
-+
- 	/* The function to call to notify the guest about added buffers */
- 	void (*notify)(struct vringh *);
- };
-@@ -258,7 +261,8 @@ static inline __virtio64 cpu_to_vringh64(const struct vringh *vrh, u64 val)
- 
- #if IS_REACHABLE(CONFIG_VHOST_IOTLB)
- 
--void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb);
-+void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
-+		      spinlock_t *iotlb_lock);
- 
- int vringh_init_iotlb(struct vringh *vrh, u64 features,
- 		      unsigned int num, bool weak_barriers,
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 2183a833fcf4..53238989713d 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -284,7 +284,8 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr)
- 		goto err_iommu;
- 
- 	for (i = 0; i < dev_attr->nvqs; i++)
--		vringh_set_iotlb(&vdpasim->vqs[i].vring, vdpasim->iommu);
-+		vringh_set_iotlb(&vdpasim->vqs[i].vring, vdpasim->iommu,
-+				 &vdpasim->iommu_lock);
- 
- 	ret = iova_cache_get();
- 	if (ret)
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 85d85faba058..f68122705719 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -1074,6 +1074,8 @@ static int iotlb_translate(const struct vringh *vrh,
- 	int ret = 0;
- 	u64 s = 0;
- 
-+	spin_lock(vrh->iotlb_lock);
-+
- 	while (len > s) {
- 		u64 size, pa, pfn;
- 
-@@ -1103,6 +1105,8 @@ static int iotlb_translate(const struct vringh *vrh,
- 		++ret;
- 	}
- 
-+	spin_unlock(vrh->iotlb_lock);
-+
- 	return ret;
- }
- 
-@@ -1262,10 +1266,13 @@ EXPORT_SYMBOL(vringh_init_iotlb);
-  * vringh_set_iotlb - initialize a vringh for a ring with IOTLB.
-  * @vrh: the vring
-  * @iotlb: iotlb associated with this vring
-+ * @iotlb_lock: spinlock to synchronize the iotlb accesses
-  */
--void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb)
-+void vringh_set_iotlb(struct vringh *vrh, struct vhost_iotlb *iotlb,
-+		      spinlock_t *iotlb_lock)
- {
- 	vrh->iotlb = iotlb;
-+	vrh->iotlb_lock = iotlb_lock;
- }
- EXPORT_SYMBOL(vringh_set_iotlb);
- 
--- 
-2.29.2
+Paolo
+
 
