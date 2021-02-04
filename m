@@ -2,144 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7D4B30F836
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 17:43:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE02930F810
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 17:36:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237527AbhBDQlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 11:41:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51686 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237761AbhBDQ3k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Feb 2021 11:29:40 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B18C06178B
-        for <kvm@vger.kernel.org>; Thu,  4 Feb 2021 08:29:00 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id a16so2027764plh.8
-        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 08:29:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=plRvYvTXbrJav06tLJcFv3awfKApAI3ZId7jgrPzdbM=;
-        b=kryIB9hE370OkjDIE2fdWPkaaE+yd4yzATdvBphWBUa2sY6T7T2ftsnWhr67dIlvu3
-         yN942vKj/N0O6PdYxtTH8Cb2mmSqtB0gmW2uX50PCE6ATci6V5Mgs0hrH35aAkQ454GU
-         098ktIx8sIZW5yaMYnwnUZTTmNf2cUXE3Rk+UAEfRn2+rMR2K7s0ntIIdNmyNhs+ZJGk
-         7h5aRNEbHmm96AfTnfmBethDROpZb3PIl3rwKh680ZGxTakOq/6T5tUetRjNtYBbh+Uc
-         EfIcGuTKiO0CUo5r67r7v79hFcykGCE9TLeJKeVJo9uv23FT/f+xiprOjK6UQkQs2WD/
-         ZXkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=plRvYvTXbrJav06tLJcFv3awfKApAI3ZId7jgrPzdbM=;
-        b=FZU7MZfwkimrO+g0ostEI5kUqv+ugO+NZwWOi1j3be66m/OJMm/EZNwt1Gp0SuUZb2
-         WNTJXB5k4Tz4EsXy5wL5qrjPOWgYkrupyA9dyrxyzIY2Ug1hy5hFAiZ4ZAbUJIfrul/y
-         mnlY+UV7BPBhr4UkZ7rmYkLVLfAEHPSlQGoxo6IRobPlyFZhENJt22z6HF03m7oJmpFk
-         EsY4tlrARjxXoFTLPbecoFgxSNtHiL3Kub5MT/1okunDHXC2m7TOOl8kOtlfPuhdB9t0
-         tpwqzBvlqSKZ1to3UUNPRUiBHdK4gaKchtuFRYBwoHEzJNYFcATD4aDsgqwkFhuNNDsn
-         mcpA==
-X-Gm-Message-State: AOAM531sHfL8lXlwhucqhqLDKPigHHLLKQPYr78untMcRCAvvq75+5f8
-        R3sK//ImYKKtnlQsKuORyiO+TA==
-X-Google-Smtp-Source: ABdhPJzkuuhIByakzk2yIT7Y0I4Zxy7ssendU8ehBBB6nWHqPTI48vn719SYkbINdCHb0DzKiWZvUQ==
-X-Received: by 2002:a17:902:d304:b029:e1:7503:4dce with SMTP id b4-20020a170902d304b02900e175034dcemr8821912plc.23.1612456139205;
-        Thu, 04 Feb 2021 08:28:59 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:f16f:a28e:552e:abea])
-        by smtp.gmail.com with ESMTPSA id mw12sm706013pjb.38.2021.02.04.08.28.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 08:28:58 -0800 (PST)
-Date:   Thu, 4 Feb 2021 08:28:51 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kai Huang <kai.huang@intel.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "jethro@fortanix.com" <jethro@fortanix.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "b.thiel@posteo.de" <b.thiel@posteo.de>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "Huang, Haitao" <haitao.huang@intel.com>
-Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
-Message-ID: <YBwgw0vVCjlhFvqP@google.com>
-References: <f50ac476-71f2-60d4-5008-672365f4d554@intel.com>
- <YBrfF0XQvzQf9PhR@google.com>
- <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
- <c827fed1-d7af-a94a-b69e-114d4a2ec988@intel.com>
- <d044ccde68171dc319d77917c8ab9f83e9a98645.camel@intel.com>
- <YBsyqLHPtYOpqeW4@google.com>
- <b6e0a32f-0070-f97e-5d94-d12f7972d474@intel.com>
- <44b5a747aaf1d42fb8ef388bd28f49614d42cd50.camel@intel.com>
- <YBs/vveIBg00Im0U@google.com>
- <5bd3231e05911bc64f5c51e1eddc3ed1f6bfe6c4.camel@intel.com>
+        id S238090AbhBDQfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 11:35:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24532 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237847AbhBDQeu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 11:34:50 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 114GKW6O041102;
+        Thu, 4 Feb 2021 11:34:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/90AuOMBmgnZ+IVxYbKeH9X6T/L+gxSNDLt7a6KKrS4=;
+ b=oHDSSo2B7dZHr8uE9/zxHUNsH4rdWsPmFd3o+G/tw816V+AHowhXqLh1sgvoHD5kUvps
+ QURdpiXq2hkeKQ7mfYLsXC5+g8dOktO7nULFjshGDzT1RIcIcRNa7ydkDuv5Sv0Xx71s
+ 8xOse6pfEJ/TAHDPX3sofbE7sur8y+wLARG3stON/XHe1WkikFoO86ULlgzcEvHImQtZ
+ x/FQxzYEREaxnShcsZBD4vd9fZBNtwMyBz4FLxFvy9EceQAS3wUKo9Lw4XbG/8RoPcGH
+ vScEHZAIwyIWgo2M8+aeqGgiJXHeQfSayStEPTpoptOdlDKXPdxKaWkFR/0wtwigLXQq Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36gmc30bka-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Feb 2021 11:34:07 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 114GKYIJ041156;
+        Thu, 4 Feb 2021 11:34:07 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36gmc30bj8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Feb 2021 11:34:06 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 114GDgq4030237;
+        Thu, 4 Feb 2021 16:34:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06fra.de.ibm.com with ESMTP id 36g2a90fpv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Feb 2021 16:34:04 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 114GXq2K35062028
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Feb 2021 16:33:52 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B920AE055;
+        Thu,  4 Feb 2021 16:34:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20815AE04D;
+        Thu,  4 Feb 2021 16:34:01 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.164.237])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  4 Feb 2021 16:34:01 +0000 (GMT)
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-kernel@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, david@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, stable@vger.kernel.org
+References: <20210202180028.876888-1-imbrenda@linux.ibm.com>
+ <20210202180028.876888-2-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v2 1/2] s390/kvm: extend kvm_s390_shadow_fault to return
+ entry pointer
+Message-ID: <16522b25-a590-fbc4-0eb6-3537d8032577@linux.ibm.com>
+Date:   Thu, 4 Feb 2021 17:34:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5bd3231e05911bc64f5c51e1eddc3ed1f6bfe6c4.camel@intel.com>
+In-Reply-To: <20210202180028.876888-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-04_08:2021-02-04,2021-02-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
+ clxscore=1015 suspectscore=0 phishscore=0 spamscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102040100
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 04, 2021, Kai Huang wrote:
-> On Wed, 2021-02-03 at 16:28 -0800, Sean Christopherson wrote:
-> > On Thu, Feb 04, 2021, Kai Huang wrote:
-> > > On Wed, 2021-02-03 at 15:37 -0800, Dave Hansen wrote:
-> > > > On 2/3/21 3:32 PM, Sean Christopherson wrote:
-> > > > > > > > Yeah, special casing KVM is almost always the wrong thing to do.
-> > > > > > > > Anything that KVM can do, other subsystems will do as well.
-> > > > > > > Agreed.  Thwarting ioremap itself seems like the right way to go.
-> > > > > > This sounds irrelevant to KVM SGX, thus I won't include it to KVM SGX series.
-> > > > > I would say it's relevant, but a pre-existing bug.  Same net effect on what's
-> > > > > needed for this series..
-> > > > > 
-> > > > > I say it's a pre-existing bug, because I'm pretty sure KVM can be coerced into
-> > > > > accessing the EPC by handing KVM a memslot that's backed by an enclave that was
-> > > > > created by host userspace (via /dev/sgx_enclave).
-> > > > 
-> > > > Dang, you beat me to it.  I was composing another email that said the
-> > > > exact same thing.
-> > > > 
-> > > > I guess we need to take a closer look at the KVM fallout from this.
-> > > > It's a few spots where it KVM knew it might be consuming garbage.  It
-> > > > just get extra weird stinky garbage now.
-> > > 
-> > > I don't quite understand how KVM will need to access EPC memslot. It is *guest*, but
-> > > not KVM, who can read EPC from non-enclave. And if I understand correctly, there will
-> > > be no place for KVM to use kernel address of EPC to access it. To KVM, there's no
-> > > difference, whether EPC backend is from /dev/sgx_enclave, or /dev/sgx_vepc. And we
-> > > really cannot prevent guest from doing anything.
-> > > 
-> > > So how memremap() of EPC section is related to KVM SGX? For instance, the
-> > > implementation of this series needs to be modified due to this?
-> > 
-> > See kvm_vcpu_map() -> __kvm_map_gfn(), which blindly uses memremap() when the
-> > resulting pfn isn't a "valid" pfn.  KVM doesn't need access to an EPC memslot,
-> > we're talking the case where a malicious userspace/guest hands KVM a GPA that
-> > resolves to the EPC.  E.g. nested VM-Enter with the L1->L2 MSR bitmap pointing
-> > at EPC.  L0 KVM will intercept VM-Enter and then read L1's bitmap to merge it's
-> > desires with L0 KVM's requirements.  That read will hit the EPC, and thankfully
-> > for KVM, return garbage.
+On 2/2/21 7:00 PM, Claudio Imbrenda wrote:
+> Extend kvm_s390_shadow_fault to return the pointer to the valid leaf
+> DAT table entry, or to the invalid entry.
 > 
-> Right. I missed __kvm_map_gfn(). 
+> Also return some flags in the lower bits of the address:
+> DAT_PROT: indicates that DAT protection applies because of the
+>           protection bit in the segment (or, if EDAT, region) tables
+> NOT_PTE: indicates that the address of the DAT table entry returned
+>          does not refer to a PTE, but to a segment or region table.
 > 
-> I am not quite sure returning all ones can be treated as garbage, since one can means
-> true for a boolean, or one bit in bitmap as you said. But since this only happens
-> when guest/userspace is malicious, so causing misbehavior to the guest is fine?
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/s390/kvm/gaccess.c | 26 ++++++++++++++++++++++----
+>  arch/s390/kvm/gaccess.h |  5 ++++-
+>  arch/s390/kvm/vsie.c    |  8 ++++----
+>  3 files changed, 30 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> index 6d6b57059493..2d7bcbfb185e 100644
+> --- a/arch/s390/kvm/gaccess.c
+> +++ b/arch/s390/kvm/gaccess.c
+> @@ -1034,6 +1034,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>  			rfte.val = ptr;
+>  			goto shadow_r2t;
+>  		}
+> +		*pgt = ptr + vaddr.rfx * 8;
 
-Yes, it's fine.  It's really the guest causing misbehavior for itself.
+So pgt either is a table entry if rc > 0 or a pointer to the first pte
+on rc == 0 after this change?
 
-> Do we see any security risk here?
+Hrm, if it is really based on RCs than I might be able to come to terms
+with having two things in a ptr with the name pgt. But it needs a
+comment change.
 
-Not with current CPUs, which drop writes and read all ones.  If future CPUs take
-creatives liberties with the SDM, then we could have a problem, but that's why
-Dave is trying to get stronger guarantees into the SDM.
+>  		rc = gmap_read_table(parent, ptr + vaddr.rfx * 8, &rfte.val);
+>  		if (rc)
+>  			return rc;
+> @@ -1060,6 +1061,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>  			rste.val = ptr;
+>  			goto shadow_r3t;
+>  		}
+> +		*pgt = ptr + vaddr.rsx * 8;
+>  		rc = gmap_read_table(parent, ptr + vaddr.rsx * 8, &rste.val);
+>  		if (rc)
+>  			return rc;
+> @@ -1087,6 +1089,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>  			rtte.val = ptr;
+>  			goto shadow_sgt;
+>  		}
+> +		*pgt = ptr + vaddr.rtx * 8;
+>  		rc = gmap_read_table(parent, ptr + vaddr.rtx * 8, &rtte.val);
+>  		if (rc)
+>  			return rc;
+> @@ -1123,6 +1126,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>  			ste.val = ptr;
+>  			goto shadow_pgt;
+>  		}
+> +		*pgt = ptr + vaddr.sx * 8;
+>  		rc = gmap_read_table(parent, ptr + vaddr.sx * 8, &ste.val);
+>  		if (rc)
+>  			return rc;
+> @@ -1157,6 +1161,8 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>   * @vcpu: virtual cpu
+>   * @sg: pointer to the shadow guest address space structure
+>   * @saddr: faulting address in the shadow gmap
+> + * @pteptr: will contain the address of the faulting DAT table entry, or of
+> + *          the valid leaf, plus some flags
+
+pteptr is not the right name if it can be two things
+
+>   *
+>   * Returns: - 0 if the shadow fault was successfully resolved
+>   *	    - > 0 (pgm exception code) on exceptions while faulting
+> @@ -1165,11 +1171,11 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+>   *	    - -ENOMEM if out of memory
+>   */
+>  int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
+> -			  unsigned long saddr)
+> +			  unsigned long saddr, unsigned long *pteptr)
+>  {
+>  	union vaddress vaddr;
+>  	union page_table_entry pte;
+> -	unsigned long pgt;
+> +	unsigned long pgt = 0;
+>  	int dat_protection, fake;
+>  	int rc;
+>  
+> @@ -1191,8 +1197,20 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
+>  		pte.val = pgt + vaddr.px * PAGE_SIZE;
+>  		goto shadow_page;
+>  	}
+> -	if (!rc)
+> -		rc = gmap_read_table(sg->parent, pgt + vaddr.px * 8, &pte.val);
+> +
+> +	switch (rc) {
+> +	case PGM_SEGMENT_TRANSLATION:
+> +	case PGM_REGION_THIRD_TRANS:
+> +	case PGM_REGION_SECOND_TRANS:
+> +	case PGM_REGION_FIRST_TRANS:
+> +		pgt |= NOT_PTE;
+
+GACC_TRANSL_ENTRY_INV ?
+
+> +		break;
+> +	case 0:
+> +		pgt += vaddr.px * 8;
+> +		rc = gmap_read_table(sg->parent, pgt, &pte.val);
+> +	}
+> +	if (*pteptr)
+> +		*pteptr = pgt | dat_protection * DAT_PROT;
+>  	if (!rc && pte.i)
+>  		rc = PGM_PAGE_TRANSLATION;
+>  	if (!rc && pte.z)
+> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
+> index f4c51756c462..66a6e2cec97a 100644
+> --- a/arch/s390/kvm/gaccess.h
+> +++ b/arch/s390/kvm/gaccess.h
+> @@ -359,7 +359,10 @@ void ipte_unlock(struct kvm_vcpu *vcpu);
+>  int ipte_lock_held(struct kvm_vcpu *vcpu);
+>  int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra);
+>  
+> +#define DAT_PROT 2
+
+GACC_TRANSL_ENTRY_PROT
+
+> +#define NOT_PTE 4
+> +
+>  int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *shadow,
+> -			  unsigned long saddr);
+> +			  unsigned long saddr, unsigned long *pteptr);
+>  
+>  #endif /* __KVM_S390_GACCESS_H */
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index c5d0a58b2c29..7db022141db3 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -619,10 +619,10 @@ static int map_prefix(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  	/* with mso/msl, the prefix lies at offset *mso* */
+>  	prefix += scb_s->mso;
+>  
+> -	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, prefix);
+> +	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, prefix, NULL);
+>  	if (!rc && (scb_s->ecb & ECB_TE))
+>  		rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
+> -					   prefix + PAGE_SIZE);
+> +					   prefix + PAGE_SIZE, NULL);
+>  	/*
+>  	 * We don't have to mprotect, we will be called for all unshadows.
+>  	 * SIE will detect if protection applies and trigger a validity.
+> @@ -913,7 +913,7 @@ static int handle_fault(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  				    current->thread.gmap_addr, 1);
+>  
+>  	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
+> -				   current->thread.gmap_addr);
+> +				   current->thread.gmap_addr, NULL);
+>  	if (rc > 0) {
+>  		rc = inject_fault(vcpu, rc,
+>  				  current->thread.gmap_addr,
+> @@ -935,7 +935,7 @@ static void handle_last_fault(struct kvm_vcpu *vcpu,
+>  {
+>  	if (vsie_page->fault_addr)
+>  		kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
+> -				      vsie_page->fault_addr);
+> +				      vsie_page->fault_addr, NULL);
+
+Ok
+
+>  	vsie_page->fault_addr = 0;
+>  }
+>  
+> 
+
