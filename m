@@ -2,119 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC503310042
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 23:44:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A108B310044
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 23:44:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbhBDWlm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 17:41:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48133 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230122AbhBDWlc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 17:41:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612478403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GBsjjTZzpZzHtjldrpCw+SVyqxdXjpA9LJZmLvdvn/s=;
-        b=X1/p+359Ffxl0VY09oH7Zc/1KmYfs68Uvu+z90Pb/K9M1twzx/039w33tJ1dCug2mY5Ylj
-        KHjwsbc5eG2Bzy01s99RjX6faaiaXLMG7v1JDTB1ScOcy2CaAImgBxVcv9AHZI/7iWJ2Zb
-        xkTu8j5yVGUkCM6kYIEpPbR6i83eX4o=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-B9z13AvKNtKDrojnFfu95Q-1; Thu, 04 Feb 2021 17:40:01 -0500
-X-MC-Unique: B9z13AvKNtKDrojnFfu95Q-1
-Received: by mail-wr1-f72.google.com with SMTP id p16so3763646wrx.10
-        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 14:40:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GBsjjTZzpZzHtjldrpCw+SVyqxdXjpA9LJZmLvdvn/s=;
-        b=GTvb2WIQARyCUoj95FjFOsAJ5A2Qy1cPdDQeayg9b/xLVYS2+3bX/1jj7ctrTayW58
-         z39Sdy9ICywUH0Dqie0IUHvSpHrzcPOaPl4d4hhnKS5fB2mVvXGJKGGsuNa3imVBNfl8
-         xjJvVIQzuJV8OueqO9/paG+b4x10XEMVnnssAw3MkTn9JiFGEXwGBUqkbfNDqxxSnqND
-         ibl32tEWdUFfJTC4KBPrpZ92mX+H66H5pRgR4YtNBWY5td6WKr7KRZpPUTjvcYKcuoVJ
-         Wg5OS/q33Z8mAMa4efxDBNFBrwUo7i6yTOs2S0H2Mj4Yjhua3zv0UMyaMfpgT5yqrJQw
-         ATLQ==
-X-Gm-Message-State: AOAM532VDVBrDq3GuKZgGcdPPTEMnEFVF03zJglshVsVPjOvxJv1bNoC
-        thrqP4DlYmNhMLAKijK5I9qkWiiPCLd05wbE7SbOACG8epDmRKS8h1Oe0XU2vtwUuclDrBnalix
-        5Xgja3hn3ZpEf
-X-Received: by 2002:a05:6000:12c8:: with SMTP id l8mr1574962wrx.81.1612478399886;
-        Thu, 04 Feb 2021 14:39:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxiACX91olwg//Ry6RmfPnaxN+GPPpFshRzxO/ndAyxdguZIlrYaq6Fu7Iphb/KQ4Lb7+60iQ==
-X-Received: by 2002:a05:6000:12c8:: with SMTP id l8mr1574948wrx.81.1612478399709;
-        Thu, 04 Feb 2021 14:39:59 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id d10sm9665506wrn.88.2021.02.04.14.39.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 14:39:59 -0800 (PST)
-Date:   Thu, 4 Feb 2021 23:39:56 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     virtualization@lists.linux-foundation.org, kbuild-all@lists.01.org,
-        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 08/13] vdpa: add return value to get_config/set_config
- callbacks
-Message-ID: <20210204223956.3uuo7xskjpii3fvw@steredhat>
-References: <20210204172230.85853-9-sgarzare@redhat.com>
- <202102050632.J7DMzsOi-lkp@intel.com>
+        id S230001AbhBDWmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 17:42:23 -0500
+Received: from mga12.intel.com ([192.55.52.136]:38807 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229931AbhBDWmU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Feb 2021 17:42:20 -0500
+IronPort-SDR: dNs4OngiAN9jjE+Jh3c7qT055tUKDo4KTg1sl+vYeLKi3KD6GSJt4efBILYIDlj+QmRKJFMyEZ
+ QpAP39DZrQ0g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9885"; a="160501409"
+X-IronPort-AV: E=Sophos;i="5.81,153,1610438400"; 
+   d="scan'208";a="160501409"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 14:41:58 -0800
+IronPort-SDR: lKZEDHlqCzKlI9zbUS7sclC8xB+bR7Rv/oFV2mSTqjB6fHdgDi4ywoF7MHmta779XZ++kDj4/U
+ S5YoL2dUQ3LA==
+X-IronPort-AV: E=Sophos;i="5.81,153,1610438400"; 
+   d="scan'208";a="483736555"
+Received: from mmjajodi-mobl1.amr.corp.intel.com (HELO [10.251.130.164]) ([10.251.130.164])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 14:41:58 -0800
+Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Kai Huang <kai.huang@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+References: <YBmX/wFFshokDqWM@google.com> <YBndRM9m0XHYwsPP@kernel.org>
+ <20210203134906.78b5265502c65f13bacc5e68@intel.com>
+ <YBsdeco/t8sa7ecV@kernel.org> <YBsq45IDDX9PPc7s@google.com>
+ <YBtQRCC3NHBmtrck@kernel.org>
+ <b63bf7db09442e994563ccc3a3b608fc2f17b784.camel@intel.com>
+ <YBtkkEp5hXpTl84s@kernel.org> <YBtlTE2xZ3wBrukB@kernel.org>
+ <b523357d2f062bf801d8fa1b05bf7abf13c19e89.camel@intel.com>
+ <YBwJ5S0C3dMS2AFY@kernel.org>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <7a1d2316-5ce2-63fa-4186-a623dac1ecc8@intel.com>
+Date:   Thu, 4 Feb 2021 14:41:57 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <202102050632.J7DMzsOi-lkp@intel.com>
+In-Reply-To: <YBwJ5S0C3dMS2AFY@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 06:31:20AM +0800, kernel test robot wrote:
->Hi Stefano,
->
->I love your patch! Yet something to improve:
->
->[auto build test ERROR on vhost/linux-next]
->[also build test ERROR on linus/master v5.11-rc6 next-20210125]
->[If your patch is applied to the wrong git tree, kindly drop us a note.
->And when submitting patch, we suggest to use '--base' as documented in
->https://git-scm.com/docs/git-format-patch]
->
->url:    https://github.com/0day-ci/linux/commits/Stefano-Garzarella/vdpa-add-vdpa-simulator-for-block-device/20210205-020448
->base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
->config: parisc-randconfig-r005-20210204 (attached as .config)
->compiler: hppa-linux-gcc (GCC) 9.3.0
->reproduce (this is a W=1 build):
->        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->        chmod +x ~/bin/make.cross
->        # https://github.com/0day-ci/linux/commit/17cf2b1e6be083a27f43414cc0f2524cf81fff60
->        git remote add linux-review https://github.com/0day-ci/linux
->        git fetch --no-tags linux-review Stefano-Garzarella/vdpa-add-vdpa-simulator-for-block-device/20210205-020448
->        git checkout 17cf2b1e6be083a27f43414cc0f2524cf81fff60
->        # save the attached .config to linux build tree
->        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=parisc
->
->If you fix the issue, kindly add following tag as appropriate
->Reported-by: kernel test robot <lkp@intel.com>
->
->All errors (new ones prefixed by >>):
->
->   drivers/vdpa/mlx5/net/mlx5_vnet.c: In function 'mlx5_vdpa_get_config':
->>> drivers/vdpa/mlx5/net/mlx5_vnet.c:1810:10: error: expected ';' before '}' token
->    1810 |  return 0
->         |          ^
->         |          ;
->    1811 | }
->         | ~
+On 2/4/21 6:51 AM, Jarkko Sakkinen wrote:
+>>> A: ret == -ENODEV
+>>> B: ret == 0
+>>> C: ret != 0 && ret != -ENODEV
+>> Let me try again: 
+>>
+>> Why A and C should be treated differently? What will behave incorrectly, in case of
+>> C?
+> So you don't know what different error codes mean?
 
-
-Ooops, I forgot to add mlx5_vnet.c on my .config.
-
-Sorry for that, I'll fix in the next release and I'll build all vDPA 
-related stuff.
-
-Stefano
+How about we just leave the check in place as Sean wrote it, and add a
+nice comment to explain what it is doing:
+	
+	/*
+	 * Always try to initialize the native *and* KVM drivers.
+	 * The KVM driver is less picky than the native one and
+	 * can function if the native one is not supported on the
+	 * current system or fails to initialize.
+	 *
+	 * Error out only if both fail to initialize.
+ 	 */
+	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+	if (ret)
+		goto err_kthread;
 
