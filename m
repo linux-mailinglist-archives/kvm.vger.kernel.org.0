@@ -2,94 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 64CAE30F306
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 13:18:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D746230F31C
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 13:29:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235925AbhBDMPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 07:15:23 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:8779 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235711AbhBDMPV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Feb 2021 07:15:21 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B601be5300000>; Thu, 04 Feb 2021 04:14:40 -0800
-Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 4 Feb
- 2021 12:14:39 +0000
-Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL104.nvidia.com
- (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 4 Feb
- 2021 12:14:35 +0000
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
- by HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Thu, 4 Feb 2021 12:14:34 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hcR8PDUzT5MtyOT6xrKl1BzVuald/qzeM1pHf99FVnZB+d/vEzKiOFiMTDeLxOo/O0766GKinVm8Nq8VPAsshEE0Ri1sylWXAJtS1dWkP77XaQbKiaFTpT2UA9uSJLI8Allm4A+YBMlSkAPD92dUCBIKyD7NgFrmhwZFdg2N0Qp/V/Lygl9/ChHxLykN9Q7epo411Z4yzkA6rGtM7h19Cnyh716aVORtp8wrS58G++FFgY1Gcd52jzmjYF0dmHs7ZfTMfeZTXY4tJeAPD2sExWz/B3dTrKI/vdDjQKqUubKnKfICYP7duRHap3YDo3IBMkOapEV72AxV5GA1KP79vA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2VOJDGogQqjRgYUbfT1Iflm3uG4uRjcS1FsewGpHQcI=;
- b=JHAG6PBaeFX8hoeZMq71anAVPzS8kDsV/1VTVpYSv8ze1dh3DKZ31hDMUIkL+XijdaeHPJFC/AiYOPUExKLJ1Zf24+2ZLqLxMZh1g6Z2CXl72WtGlJCk3FrVSgWfUBQwkKUk3Tenham1UFfK8Bw/zpGGwJ8fxLs+SYcVZA4b7gUlOaZjhZ5oq0+hJBBr6Hf6bydygsvuTmULN1Qvh4+y58oog13Wy7e56o2rihA2WBHMPyjjyqWneBT56ZtjfQmrDUkksFiXYhx56arv9KcJfDuEhmfQewSQsUlN6vXXSEWCe8mMPsGQwprq7oav7WYE+GxyHvqGAI8Zb1uobGtQmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB4617.namprd12.prod.outlook.com (2603:10b6:5:35::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.19; Thu, 4 Feb
- 2021 12:14:33 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3805.033; Thu, 4 Feb 2021
- 12:14:33 +0000
-Date:   Thu, 4 Feb 2021 08:14:31 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Megha Dey <megha.dey@intel.com>
-CC:     <tglx@linutronix.de>, <linux-kernel@vger.kernel.org>,
-        <dave.jiang@intel.com>, <ashok.raj@intel.com>,
-        <kevin.tian@intel.com>, <dwmw@amazon.co.uk>, <x86@kernel.org>,
-        <tony.luck@intel.com>, <dan.j.williams@intel.com>,
-        <kvm@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
-        <alex.williamson@redhat.com>, <bhelgaas@google.com>,
-        <maz@kernel.org>, <linux-pci@vger.kernel.org>,
-        <baolu.lu@linux.intel.com>, <ravi.v.shankar@intel.com>,
-        Leon Romanovsky <leon@kernel.org>
-Subject: Re: [PATCH 11/12] platform-msi: Add platform check for subdevice irq
- domain
-Message-ID: <20210204121431.GH4247@nvidia.com>
-References: <1612385805-3412-1-git-send-email-megha.dey@intel.com>
- <1612385805-3412-12-git-send-email-megha.dey@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1612385805-3412-12-git-send-email-megha.dey@intel.com>
-X-ClientProxiedBy: BLAPR03CA0012.namprd03.prod.outlook.com
- (2603:10b6:208:32b::17) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S235850AbhBDM0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 07:26:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42486 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235804AbhBDMZ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 07:25:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612441472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=desXTW/pheCLBSR65rhQYJIsfviRlHkrz8lMFVWRLBk=;
+        b=TdadVFVn8jc+k5Z9lmE2lJK6XbZE4WlGrZ4f+dA3EnvyFqJjCfTwFaD9CJS7Iud39Bkzi5
+        HkHmVSe2dPGKj/HhARzyS/+FV5WN0xa725UDNajHiOj0Ht5aBwY4t/PwpMIizSU7w4Nqjp
+        oivYIkZZ4sdUNkjVq+9TIpn5s8yZ4XI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-_z7pg8taNwuv7k1xKWWKSw-1; Thu, 04 Feb 2021 07:24:31 -0500
+X-MC-Unique: _z7pg8taNwuv7k1xKWWKSw-1
+Received: by mail-ed1-f69.google.com with SMTP id f21so38383edx.10
+        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 04:24:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=desXTW/pheCLBSR65rhQYJIsfviRlHkrz8lMFVWRLBk=;
+        b=X4d7kOtdD97ZrCde78fZ4zGQcck0516r2oh53PKQ8b0ZGHjCndSbT1oSZInZDS0os6
+         PyK/57X0mlRhWuH63Iprq7hnkPILT7DaCNQCNlrOUlkBO7qRAG5zApiFNJ6mG+kv+nq+
+         8ASSqUW/YLYf4fGnMEQ1ov1L+KeeqvMmEgTZjnTLbbyNrSOXWyL6W2fD4prnehl+MjGD
+         dKymNbtrEI6eFYfISPsEYWeH6zX1WXweWSITpAac2PWUYcu5SJqS64ZbpdjDfzxay82z
+         pkotl/Z1G9YdzI/eXHmIn2pyHGUFCyEq+46eAe4lDPPIKe+K0YtcwqeG7Ad/8GQmJcNd
+         QndA==
+X-Gm-Message-State: AOAM533wOfKeFBc40GZyxTNVepCqkshFMHrBB/wHhXAtumXA2+FEkA5L
+        uBcoZ29HF3T7pWSs9tFK4sBgWuwD4j/gEmg6qG50iG7m4oStWlcla7X155VKV3DEmfvQfGKZU53
+        PKqEq0ylv5pa6
+X-Received: by 2002:aa7:de14:: with SMTP id h20mr689335edv.95.1612441470392;
+        Thu, 04 Feb 2021 04:24:30 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLQh5NF5zE0G7M0wrnnvFKe8qybVOeTgdq6IqrjOcxWzSyXAbk1exP3/8+tQKXH8iU+CnZ5w==
+X-Received: by 2002:aa7:de14:: with SMTP id h20mr689326edv.95.1612441470229;
+        Thu, 04 Feb 2021 04:24:30 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id y20sm2297293edc.84.2021.02.04.04.24.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Feb 2021 04:24:29 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Kechen Lu <kechenl@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        Somdutta Roy <somduttar@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>
+Subject: RE: Optimized clocksource with AMD AVIC enabled for Windows guest
+In-Reply-To: <DM6PR12MB35006123BF3E9D8B67042CC9CAB39@DM6PR12MB3500.namprd12.prod.outlook.com>
+References: <DM6PR12MB3500B7D1EDC5B5B26B6E96FBCAB49@DM6PR12MB3500.namprd12.prod.outlook.com>
+ <5688445c-b9c8-dbd6-e9ee-ed40df84f8ca@redhat.com>
+ <878s85pl4o.fsf@vitty.brq.redhat.com>
+ <DM6PR12MB35006123BF3E9D8B67042CC9CAB39@DM6PR12MB3500.namprd12.prod.outlook.com>
+Date:   Thu, 04 Feb 2021 13:24:28 +0100
+Message-ID: <87zh0knhqb.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BLAPR03CA0012.namprd03.prod.outlook.com (2603:10b6:208:32b::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.21 via Frontend Transport; Thu, 4 Feb 2021 12:14:32 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l7dWp-003L5X-9S; Thu, 04 Feb 2021 08:14:31 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1612440880; bh=2VOJDGogQqjRgYUbfT1Iflm3uG4uRjcS1FsewGpHQcI=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=aLngwBfsqqLwXA7j8VNyByLzXdXxLBBonQ/MDYEII5ORje9XKuuB0qK33JKyIRteW
-         iwTL9Lz1QSvBDE/W3jQb3BTOwZenUZwS+hiB9UTWjyt+CjGO9JQ7nNw4wO8da9tzYY
-         Y3smCB7fAgfEgHMPgkvzcECFjtLYmYJF6a+ouIO1ZkxaYzvt/XAoc0tcXwGlaDGPeg
-         NF42DKicd7vojph972rT4KVmlF6B8GNF66Cbl9WhuB//KsOEj9G20oRaDWZ4PgAHjO
-         fGRdhQ3Cl3XfN6XCWQHqVmXItDJroOL12a+2O9IOgTBSJaj0xKUFoXdKgb4ftt0LYI
-         SjMnAzKfR7qBw==
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 03, 2021 at 12:56:44PM -0800, Megha Dey wrote:
-> +bool arch_support_pci_device_ims(struct pci_dev *pdev)
-> +{
+Kechen Lu <kechenl@nvidia.com> writes:
 
-Consistent language please, we are not using IMS elsewhere, this
-feature is called device_msi in Linux.
+> Hi Vitaly and Paolo,
+>
+> Thanks so much for quick reply. This makes sense to me. From my understanding, basically this can be two part of it to resolve it. 
+>
+> First, we make sure to set and expose 0x40000004.EAX Bit9 to windows guest, like in kvm_vcpu_ioctl_get_hv_cpuid(), having this recommendation bit :
+> -----------------------
+> case HYPERV_CPUID_ENLIGHTMENT_INFO:
+> ...
+> +	ent->eax |= HV_DEPRECATING_AEOI_RECOMMENDED;
+> -----------------------
 
-Jason
+This also needs to be wired through userspace (e.g. QEMU) as this
+doesn't go to the guest directly.
+
+>
+> Second, although the above could tell guest to deprecate AutoEOI, older Windows OSes would not acknowledge this (I checked the Hyper-v TLFS, from spec v3.0 (i.e. Windows Server 2012), it starts having bit9 defined in 0x40000004.EAX), we may want to dynamically toggle off APICv/AVIC if we found the SynIC SINT vector has AutoEOI, under synic_update_vector(). E.g. like:
+> -----------------------------
+> if (synic_has_vector_auto_eoi(synic, vector)) {
+> 	kvm_request_apicv_update(vcpu->kvm, false, APICV_INHIBIT_REASON_HYPERV);
+> 	__set_bit(vector, synic->auto_eoi_bitmap);
+> } else {
+> 	kvm_request_apicv_update(vcpu->kvm, true, APICV_INHIBIT_REASON_HYPERV);
+> 	__clear_bit(vector, synic->auto_eoi_bitmap);
+> }
+> ---------------------------------
+
+APICV_INHIBIT_REASON_HYPERV is per-VM so we need to count how many
+AutoEOI SINTs were set in *all* SynICs (an atomic in 'struct kvm_hv'
+would do).
+
+> Curious about what current plan/status of upstream is for this. If
+> that's doable and not current pending patch covering this, I can make
+> a quick draft patch tested and sent out for reviewing. 
+
+I checked Linux VMs on genuine Hyper-V and surprisingly
+'HV_DEPRECATING_AEOI_RECOMMENDED' is not exposed. I'm going to pass it
+to WS2016/2019 and see what happens. If it all works as expected and if
+you don't beat me to it I'll be sending a patch.
+
+-- 
+Vitaly
+
