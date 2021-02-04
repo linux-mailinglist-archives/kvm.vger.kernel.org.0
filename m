@@ -2,96 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABD2130EA45
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 03:37:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F8C130EA71
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 03:52:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234533AbhBDCgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 21:36:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42628 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233928AbhBDCgV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 21:36:21 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE6FC0613D6
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 18:35:40 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id e62so1952777yba.5
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 18:35:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=+Rhoed1XQepPnJf3F6uh773jLZ78lN8W7AVU2qB258o=;
-        b=hyYr9tldNB35f9XCt4oiqOeUSNLxT3NzdiZyYRqw2VWSCllNgj7jm86k+RuoZo3WKC
-         Q4U6sRpqW1+G9vn2tlCUnmHvyT5H+18d2QWAzl+Wr05TzOvImbvKjxLjMLjanHNltUBv
-         Vlv//0aK+8HssbdNw2hanUTO9l8zEJupWTSUKoB2OcElbV4Q1j+sLzlK1ZmBrQwQYYPP
-         UsaC1/czjkdIps5Xd7KXfnryrTz+4GuQZT8OuBP1TvjNj6NHkVQYjp0/MmdJ0JKrCuM4
-         YMzNqdvDMd13Y7OwjUVX1lvwHxdiKQTWvtvXQ5eGLsgnzmbVykh/0Aj1aFFOh/ZBsP+M
-         BPJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc;
-        bh=+Rhoed1XQepPnJf3F6uh773jLZ78lN8W7AVU2qB258o=;
-        b=XliIVHAkz8cQSg3nitjmoUzPutzMs38/eEQ4gzQp1a+93nEtW/+MRSSKV0cbpj3Qb0
-         I1DPXxr+0TIqqzhbwbg6bLcQfGWSwA6+VJA4+WwhT4pusvJQQim1J1hH478bTxEzPg1R
-         GE2KRtUd8SaAHvjEd+YlM6tCYr/G4hEL//FHvC6kKJUluKmLOuo6L3Q130O5vm/7fqDQ
-         j/8USGIxPh39P4UuczG+s7ASFE7ORna72AVAA6TGUbIEqMWPNgBpQnnSoCjEIF2ZCKx2
-         fFZANuR3jTODea0WnTJodYkVdBiRCtoLUy9F531G/7py8XI/IHj65QlByzbl6sFcOBP3
-         ZzhA==
-X-Gm-Message-State: AOAM530ciDm4y/k3o5UvxwrDMvUMtw6KKSGTI5GcWGFllmHhjlf5UhuA
-        Pab95Q8rEazxupKqbwt259vjyhnNsvs=
-X-Google-Smtp-Source: ABdhPJz31YtwdDoZ04CvFBL+71M8C0dpug36wp8GedSEwyhOz06UH9fTvuGaPWWibtMV0aUW3dA9nSUivBU=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
- (user=seanjc job=sendgmr) by 2002:a25:4e07:: with SMTP id c7mr8588817ybb.288.1612406140095;
- Wed, 03 Feb 2021 18:35:40 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  3 Feb 2021 18:35:36 -0800
-Message-Id: <20210204023536.3397005-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
-Subject: [PATCH] KVM: SVM: Remove bogus WARN and emulation if guest #GPs with EFER.SVME=1
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Bandan Das <bsd@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S233966AbhBDCvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 21:51:32 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51745 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233875AbhBDCvb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 21:51:31 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DWNMr3fwqz9t0J; Thu,  4 Feb 2021 13:50:48 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1612407048;
+        bh=v1ouEE19lRP4+g+UVF5ceV1+C7vNtzNzXxc2/9RESoE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VtC/qSJrg+g8MjkZbYfGVu/t+QQVGEB4OmOz1hlU0/Z5hb9pmKn7Rw/Tj0XGv4sIK
+         +xLh/ceMnvEK2mA1fMU0aIplF6BFnTb1i6POojdKmza+p5XO1GuQk218vcwjrV/pur
+         1vi/wTljZpYXJasWmI31nweXaJpuWBQ8ziQZwJ9g=
+Date:   Thu, 4 Feb 2021 13:45:48 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     dgilbert@redhat.com, pair@us.ibm.com, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pasic@linux.ibm.com,
+        pragyansri.pathi@intel.com, richard.henderson@linaro.org,
+        berrange@redhat.com, David Hildenbrand <david@redhat.com>,
+        mdroth@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        pbonzini@redhat.com, mtosatti@redhat.com, borntraeger@de.ibm.com,
+        Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org,
+        qemu-s390x@nongnu.org, thuth@redhat.com, mst@redhat.com,
+        frankja@linux.ibm.com, jun.nakajima@intel.com,
+        andi.kleen@intel.com, Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v8 07/13] confidential guest support: Introduce cgs
+ "ready" flag
+Message-ID: <20210204024548.GA4729@yekko.fritz.box>
+References: <20210202041315.196530-1-david@gibson.dropbear.id.au>
+ <20210202041315.196530-8-david@gibson.dropbear.id.au>
+ <20210203171548.0d8e0494@bahia.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="azLHFNyN32YCQGCU"
+Content-Disposition: inline
+In-Reply-To: <20210203171548.0d8e0494@bahia.lan>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Immediately reinject #GP (if intercepted) if the VMware backdoor is
-disabled and the instruction is not affected by the erratum that causes
-bogus #GPs on SVM instructions.  It is completely reasonable for the
-guest to take a #GP(0) with EFER.SVME=1, e.g. when probing an MSR, and
-attempting emulation on an unknown instruction is obviously not good.
 
-Fixes: b3f4e11adc7d ("KVM: SVM: Add emulation support for #GP triggered by SVM instructions")
-Cc: Bandan Das <bsd@redhat.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f53e6377a933..707a2f85bcc6 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2263,7 +2263,8 @@ static int gp_interception(struct vcpu_svm *svm)
- 	opcode = svm_instr_opcode(vcpu);
- 
- 	if (opcode == NONE_SVM_INSTR) {
--		WARN_ON_ONCE(!enable_vmware_backdoor);
-+		if (!enable_vmware_backdoor)
-+			goto reinject;
- 
- 		/*
- 		 * VMware backdoor emulation on #GP interception only handles
--- 
-2.30.0.365.g02bc693789-goog
+On Wed, Feb 03, 2021 at 05:15:48PM +0100, Greg Kurz wrote:
+> On Tue,  2 Feb 2021 15:13:09 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > The platform specific details of mechanisms for implementing
+> > confidential guest support may require setup at various points during
+> > initialization.  Thus, it's not really feasible to have a single cgs
+> > initialization hook, but instead each mechanism needs its own
+> > initialization calls in arch or machine specific code.
+> >=20
+> > However, to make it harder to have a bug where a mechanism isn't
+> > properly initialized under some circumstances, we want to have a
+> > common place, late in boot, where we verify that cgs has been
+> > initialized if it was requested.
+> >=20
+> > This patch introduces a ready flag to the ConfidentialGuestSupport
+> > base type to accomplish this, which we verify in
+> > qemu_machine_creation_done().
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  include/exec/confidential-guest-support.h | 24 +++++++++++++++++++++++
+> >  softmmu/vl.c                              | 10 ++++++++++
+> >  target/i386/sev.c                         |  2 ++
+> >  3 files changed, 36 insertions(+)
+> >=20
+> > diff --git a/include/exec/confidential-guest-support.h b/include/exec/c=
+onfidential-guest-support.h
+> > index 3db6380e63..5dcf602047 100644
+> > --- a/include/exec/confidential-guest-support.h
+> > +++ b/include/exec/confidential-guest-support.h
+> > @@ -27,6 +27,30 @@ OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport,=
+ CONFIDENTIAL_GUEST_SUPPORT)
+> > =20
+> >  struct ConfidentialGuestSupport {
+> >      Object parent;
+> > +
+> > +    /*
+> > +     * ready: flag set by CGS initialization code once it's ready to
+> > +     *        start executing instructions in a potentially-secure
+> > +     *        guest
+> > +     *
+> > +     * The definition here is a bit fuzzy, because this is essentially
+> > +     * part of a self-sanity-check, rather than a strict mechanism.
+> > +     *
+> > +     * It's not fasible to have a single point in the common machine
+>=20
+> s/fasible/feasible
 
+Fixed, thanks.
+
+>=20
+> Anyway,
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> > +     * init path to configure confidential guest support, because
+> > +     * different mechanisms have different interdependencies requiring
+> > +     * initialization in different places, often in arch or machine
+> > +     * type specific code.  It's also usually not possible to check
+> > +     * for invalid configurations until that initialization code.
+> > +     * That means it would be very easy to have a bug allowing CGS
+> > +     * init to be bypassed entirely in certain configurations.
+> > +     *
+> > +     * Silently ignoring a requested security feature would be bad, so
+> > +     * to avoid that we check late in init that this 'ready' flag is
+> > +     * set if CGS was requested.  If the CGS init hasn't happened, and
+> > +     * so 'ready' is not set, we'll abort.
+> > +     */
+> > +    bool ready;
+> >  };
+> > =20
+> >  typedef struct ConfidentialGuestSupportClass {
+> > diff --git a/softmmu/vl.c b/softmmu/vl.c
+> > index 1b464e3474..1869ed54a9 100644
+> > --- a/softmmu/vl.c
+> > +++ b/softmmu/vl.c
+> > @@ -101,6 +101,7 @@
+> >  #include "qemu/plugin.h"
+> >  #include "qemu/queue.h"
+> >  #include "sysemu/arch_init.h"
+> > +#include "exec/confidential-guest-support.h"
+> > =20
+> >  #include "ui/qemu-spice.h"
+> >  #include "qapi/string-input-visitor.h"
+> > @@ -2497,6 +2498,8 @@ static void qemu_create_cli_devices(void)
+> > =20
+> >  static void qemu_machine_creation_done(void)
+> >  {
+> > +    MachineState *machine =3D MACHINE(qdev_get_machine());
+> > +
+> >      /* Did we create any drives that we failed to create a device for?=
+ */
+> >      drive_check_orphaned();
+> > =20
+> > @@ -2516,6 +2519,13 @@ static void qemu_machine_creation_done(void)
+> > =20
+> >      qdev_machine_creation_done();
+> > =20
+> > +    if (machine->cgs) {
+> > +        /*
+> > +         * Verify that Confidential Guest Support has actually been in=
+itialized
+> > +         */
+> > +        assert(machine->cgs->ready);
+> > +    }
+> > +
+> >      if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
+> >          exit(1);
+> >      }
+> > diff --git a/target/i386/sev.c b/target/i386/sev.c
+> > index 590cb31fa8..f9e9b5d8ae 100644
+> > --- a/target/i386/sev.c
+> > +++ b/target/i386/sev.c
+> > @@ -737,6 +737,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Err=
+or **errp)
+> >      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
+> >      qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
+> > =20
+> > +    cgs->ready =3D true;
+> > +
+> >      return 0;
+> >  err:
+> >      sev_guest =3D NULL;
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--azLHFNyN32YCQGCU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAbX9wACgkQbDjKyiDZ
+s5Ki0Q/9Hg8APeo1nsowCYqfcZ0BZzznrNdkwS+B0W8Z+6wHYanCfzzBT+pOFLPo
+elnkQbhAjJZkzOPsLGtS0vnbMZ0fG8xr8y5HQtIwutak/gLvgzrFFFVIwg5YjJlW
+l/Y69O1DghWe+cWC/M7hH6j2oReAFCCDa1ep5xYsYSe8bkPZGkiswKdFNVLtcwY/
+0vgIutDYHhSlFiJWoHCQcHfCf8DXRaADWJJ9H5LhwPFG3qs04IYy8+RarAkxURFN
+DgoAbi52SosvX5UiEFf4ddyuzCshvxXH1aq3am+mR7ffdvifMArgmd0MCm/MMI3Z
+7QF8/Yzp7epiUzZnlwjh/qPOrRbukWvqw+csO62TbcmHQhWGzhgwsMFdPJLrNwQj
+0H2Wjb36Cw43b+iAVSMN9rkIlXulO2l4KvBB+VtiCHHnzNdo8lV808OB+LxL9cLg
+7/a98502L8r+2jn8FtY+PSClak6ah2yvhe40G9M4R90nCqcLVMRfczYhIgsiJ2iU
+EwAFYjVr/dXRtytT8sGvXr7yksHVz6vXtlydslaG0nTVaZIhntS0BGYQeC6Z794Y
+QPTpMpEiic/weHP5DICtGZ8zDELO8u7WjXTUeNDSTWnEO9wDoTDe2zXE8F7ysjt4
+tenERcGGd3yfReUkwmCp1sbLYcMxtBeZpmYQ33fOqUKYRJGjI6Y=
+=Km6C
+-----END PGP SIGNATURE-----
+
+--azLHFNyN32YCQGCU--
