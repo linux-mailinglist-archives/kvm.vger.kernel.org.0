@@ -2,147 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55A9430E872
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:23:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C5C130E880
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:31:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233918AbhBDAWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 19:22:01 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36928 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233288AbhBDAWA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Feb 2021 19:22:00 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11402wxN073956;
-        Wed, 3 Feb 2021 19:21:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=R7F2Q13BX9BDFgdpcjCNlFEhUcI3W3Z/Tbbys4WkV5M=;
- b=ileOsj+0yYzRvMyumexxlcpoLY+uHdQwxLocMB5egIUXUFBv8hivKSW/hSTPtpSv+82B
- 4iS0Q8uabKT2GG+11u4BK8u2mruk1N+qt6xOeu6ZESKGWutxlE7EJtDrPN+eBG+lQA27
- K41i1mT8MJkzc8qdIxPYtnR4+lCkMhDBt33qkEQ10wno9NUQiY/tdO8DY1I/x0rvQ/xz
- s0FNWvuTMYSFODVPL3e5Ht9xP6QaQpZ5A8lL1XgcTVKJHLECeBLdF8Z11gjLUwPlFV1z
- y64FQnkezbGePMhkrDoLwuHH1Dwb14oxeNuh50QEnHpAejdSuQXisSOIqhs8tUXnS2oA UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36g5am1nut-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Feb 2021 19:21:17 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11403Ldh076220;
-        Wed, 3 Feb 2021 19:21:16 -0500
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36g5am1ntn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 03 Feb 2021 19:21:16 -0500
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11401rk7002617;
-        Thu, 4 Feb 2021 00:21:14 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 36cy3829du-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Feb 2021 00:21:14 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1140LBlb37552530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Feb 2021 00:21:11 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2CB1A405C;
-        Thu,  4 Feb 2021 00:21:10 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3B863A4060;
-        Thu,  4 Feb 2021 00:21:10 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.126])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu,  4 Feb 2021 00:21:10 +0000 (GMT)
-Date:   Thu, 4 Feb 2021 01:21:07 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com
-Subject: Re: [PATCH v13 09/15] s390/vfio-ap: allow hot plug/unplug of AP
- resources using mdev device
-Message-ID: <20210204012107.7215cf3b.pasic@linux.ibm.com>
-In-Reply-To: <73ad5b17-f252-2aad-1d08-14635c8460ef@linux.ibm.com>
-References: <20201223011606.5265-1-akrowiak@linux.ibm.com>
-        <20201223011606.5265-10-akrowiak@linux.ibm.com>
-        <20210112021251.0d989225.pasic@linux.ibm.com>
-        <20210112185550.1ac49768.pasic@linux.ibm.com>
-        <73ad5b17-f252-2aad-1d08-14635c8460ef@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S233997AbhBDA3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 19:29:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233702AbhBDA3f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 19:29:35 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A964FC0613D6
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 16:28:54 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id c132so928582pga.3
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 16:28:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BvFluTlIkULOLaKl7jy+jl1lM3clNsaQR0cSWQQ2zJ4=;
+        b=JZ7DGnacARYdo++T6lycBEhG1C7K/fY71j15lWIzXbSHTx5zr+RbWnmrDmkpQCqQwE
+         gBgVrMqbJ6GXzlGaRD+8TFA5z3NL68+s3zGPEwGimPV9j3sm4yQfl3mWH7uy4Y9kw9zD
+         01XKdiEDeDxYUlIfAkrRgELoQxj6xjrzy7UrHpsIvQSEEHr4NWeWiGoKxQJGdKCKa/hq
+         XHgSesWx93nQ9BSclRQF31HaL/dfxO1bWl9oP/BVxtwbCMVAT+xQ7tpKldQvrcN+9Xy2
+         BSboMti41CQpFr9m1SRJewqmzb7jW/PrEPuP4+qz3/LNwflYtDDrASNf2kU4Kof7feC9
+         n+dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BvFluTlIkULOLaKl7jy+jl1lM3clNsaQR0cSWQQ2zJ4=;
+        b=i0FYphX66Q6yDbD7+Llrf0p+6MOKllDebBtWxJhQg09z/avsm7GTiELrSsjIuGcl2y
+         u9ucoQJLlQu04AkQ40NI5DCJuJEScWeLdC+m2azY39Tmfo8o+eg4L06sjFYDw1EaQqpS
+         4VKPdMYQj4fzyqt20yUMAP64UpOLGo2TfsmvQXrKf3C1a5/vwwn4EREc9BvWdCFAIap0
+         b2ISdaYDmjF6G68OshpGY/YShlhgmD5xNzMenUregHgmX3DSdzpDF/g3bk9Itbu7EIjG
+         n5Nvyr57zTMxShYLgsehw+rS0896nQyW8g8n91QmTruVJZ6LEp8xFgKpVYRXEpbooVlI
+         KFxA==
+X-Gm-Message-State: AOAM531Q0x7c8NNdLnnLJqbZrb1eV97gJWVSuFQTM48TkM5nRqNPH6yS
+        Ik5lBBJ1wU8vjzAr+R7m2blcag==
+X-Google-Smtp-Source: ABdhPJyha8BVOyP6qluWrIDyhCiYq3xjf+nd6smVEzEQqGIyxChsmUs5hPa7Pi9rlm8VECQnbARC3Q==
+X-Received: by 2002:a05:6a00:1702:b029:1b5:1121:729a with SMTP id h2-20020a056a001702b02901b51121729amr5320745pfc.57.1612398533920;
+        Wed, 03 Feb 2021 16:28:53 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
+        by smtp.gmail.com with ESMTPSA id n73sm3410970pfd.109.2021.02.03.16.28.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Feb 2021 16:28:53 -0800 (PST)
+Date:   Wed, 3 Feb 2021 16:28:46 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "jethro@fortanix.com" <jethro@fortanix.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "b.thiel@posteo.de" <b.thiel@posteo.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "Huang, Haitao" <haitao.huang@intel.com>
+Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
+Message-ID: <YBs/vveIBg00Im0U@google.com>
+References: <99135352-8e10-fe81-f0dc-8d552d73e3d3@intel.com>
+ <YBnmow4e8WUkRl2H@google.com>
+ <f50ac476-71f2-60d4-5008-672365f4d554@intel.com>
+ <YBrfF0XQvzQf9PhR@google.com>
+ <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
+ <c827fed1-d7af-a94a-b69e-114d4a2ec988@intel.com>
+ <d044ccde68171dc319d77917c8ab9f83e9a98645.camel@intel.com>
+ <YBsyqLHPtYOpqeW4@google.com>
+ <b6e0a32f-0070-f97e-5d94-d12f7972d474@intel.com>
+ <44b5a747aaf1d42fb8ef388bd28f49614d42cd50.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-03_09:2021-02-03,2021-02-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 bulkscore=0 adultscore=0 suspectscore=0 impostorscore=0
- clxscore=1015 mlxscore=0 phishscore=0 lowpriorityscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102030144
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <44b5a747aaf1d42fb8ef388bd28f49614d42cd50.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Feb 2021 18:13:09 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> On 1/12/21 12:55 PM, Halil Pasic wrote:
-> > On Tue, 12 Jan 2021 02:12:51 +0100
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >  
-> >>> @@ -1347,8 +1437,11 @@ void vfio_ap_mdev_remove_queue(struct ap_device *apdev)
-> >>>   	apqi = AP_QID_QUEUE(q->apqn);
-> >>>   	vfio_ap_mdev_reset_queue(apid, apqi, 1);
-> >>>   
-> >>> -	if (q->matrix_mdev)
-> >>> +	if (q->matrix_mdev) {
-> >>> +		matrix_mdev = q->matrix_mdev;
-> >>>   		vfio_ap_mdev_unlink_queue(q);
-> >>> +		vfio_ap_mdev_refresh_apcb(matrix_mdev);
-> >>> +	}
-> >>>   
-> >>>   	kfree(q);
-> >>>   	mutex_unlock(&matrix_dev->lock);  
-> > Shouldn't we first remove the queue from the APCB and then
-> > reset? Sorry, I missed this one yesterday.  
+On Thu, Feb 04, 2021, Kai Huang wrote:
+> On Wed, 2021-02-03 at 15:37 -0800, Dave Hansen wrote:
+> > On 2/3/21 3:32 PM, Sean Christopherson wrote:
+> > > > > > Yeah, special casing KVM is almost always the wrong thing to do.
+> > > > > > Anything that KVM can do, other subsystems will do as well.
+> > > > > Agreed.  Thwarting ioremap itself seems like the right way to go.
+> > > > This sounds irrelevant to KVM SGX, thus I won't include it to KVM SGX series.
+> > > I would say it's relevant, but a pre-existing bug.  Same net effect on what's
+> > > needed for this series..
+> > > 
+> > > I say it's a pre-existing bug, because I'm pretty sure KVM can be coerced into
+> > > accessing the EPC by handing KVM a memslot that's backed by an enclave that was
+> > > created by host userspace (via /dev/sgx_enclave).
+> > 
+> > Dang, you beat me to it.  I was composing another email that said the
+> > exact same thing.
+> > 
+> > I guess we need to take a closer look at the KVM fallout from this.
+> > It's a few spots where it KVM knew it might be consuming garbage.  It
+> > just get extra weird stinky garbage now.
 > 
-> I agreed to move the reset, however if the remove callback is
-> invoked due to a manual unbind of the queue and the queue is
-> in use by a guest, the cleanup of the IRQ resources after the
-> reset of the queue will not happen because the link from the
-> queue to the matrix mdev was removed. Consequently, I'm going
-> to have to change the patch 05/15 to split the vfio_ap_mdev_unlink_queue()
-> function into two functions: one to remove the link from the matrix mdev to
-> the queue; and, one to remove the link from the queue to the matrix
-> mdev. 
-
-Does that mean we should reset before the unlink (or before the second
-part of it after the split up)?
-
-I mean have a look at unassign_adapter_store() with all patches
-of this series applied. It does an unlink but doesn't do any reset,
-or cleanup IRQ resources. And after the unlink we can't clean up
-the IRQ resources properly.
-
-But before all this we should resolve this circular lock dependency
-problem in a satisfactory way. I'm quite worried about how it is going
-to mesh with this series and dynamic ap pass-through.
-
-Regards,
-Halil
-
->Only the first will be used for the remove callback which should
-> be fine since the queue object is freed at the end of the remove
-> function anyway.
+> I don't quite understand how KVM will need to access EPC memslot. It is *guest*, but
+> not KVM, who can read EPC from non-enclave. And if I understand correctly, there will
+> be no place for KVM to use kernel address of EPC to access it. To KVM, there's no
+> difference, whether EPC backend is from /dev/sgx_enclave, or /dev/sgx_vepc. And we
+> really cannot prevent guest from doing anything.
 > 
-> >
-> > Regards,
-> > Halil  
-> 
+> So how memremap() of EPC section is related to KVM SGX? For instance, the
+> implementation of this series needs to be modified due to this?
 
+See kvm_vcpu_map() -> __kvm_map_gfn(), which blindly uses memremap() when the
+resulting pfn isn't a "valid" pfn.  KVM doesn't need access to an EPC memslot,
+we're talking the case where a malicious userspace/guest hands KVM a GPA that
+resolves to the EPC.  E.g. nested VM-Enter with the L1->L2 MSR bitmap pointing
+at EPC.  L0 KVM will intercept VM-Enter and then read L1's bitmap to merge it's
+desires with L0 KVM's requirements.  That read will hit the EPC, and thankfully
+for KVM, return garbage.
