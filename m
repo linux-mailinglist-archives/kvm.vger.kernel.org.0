@@ -2,284 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 066D730F9B5
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 18:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8248330FA18
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 18:50:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238515AbhBDR3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 12:29:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60339 "EHLO
+        id S238587AbhBDRpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 12:45:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60648 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238526AbhBDR0A (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:26:00 -0500
+        by vger.kernel.org with ESMTP id S238569AbhBDRav (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:30:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612459474;
+        s=mimecast20190719; t=1612459765;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uGL2XxxvonoRKn9Qyx3ijyw5nyfnwA232pR9zEDfWZY=;
-        b=JqP95IJdDNQ6nMlGpKxOC5lW7QopCZbwcFWMXlMDzeQh97u1DX0j4cUWLv9dvW6yJnl+D+
-        yBEXtj0WCMcwC2+CY4yd64iG93zZI+EMm+ptbPbUiw5mk/uAcR+9Iriqf7UXzm173pzrPJ
-        i1FA3xeO39ljaJLUropI+6r3gh/Qfe8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-JtwcKtCtOoCOz41VprIDMA-1; Thu, 04 Feb 2021 12:24:32 -0500
-X-MC-Unique: JtwcKtCtOoCOz41VprIDMA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 992B957052;
-        Thu,  4 Feb 2021 17:24:30 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-113-213.ams2.redhat.com [10.36.113.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A62705C290;
-        Thu,  4 Feb 2021 17:24:21 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     virtualization@lists.linux-foundation.org
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH v3 12/13] vdpa_sim_blk: implement ramdisk behaviour
-Date:   Thu,  4 Feb 2021 18:22:29 +0100
-Message-Id: <20210204172230.85853-13-sgarzare@redhat.com>
-In-Reply-To: <20210204172230.85853-1-sgarzare@redhat.com>
-References: <20210204172230.85853-1-sgarzare@redhat.com>
+        bh=gFpHt7ahtiWyI8hSPQbU/qGuLyn4UFc9M7zanW3r47A=;
+        b=U3ERHe76RucETXQzAIqDO0iroIefYh+apdH/Rq++rzvyV7ZLGNYGUI8RrShc83Uj/BUYUr
+        kk9tcG7ZRkzhQeGwMER/tqWrYl/9I2xj9R/A2w4h08O/ibxSHpPh+AVSJfSQy30oF5SwzM
+        9xqetVRT4z+onF+3lrzY8TX6O8YSKdk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-CIrNzj_0OZKgmClhlLImPg-1; Thu, 04 Feb 2021 12:29:22 -0500
+X-MC-Unique: CIrNzj_0OZKgmClhlLImPg-1
+Received: by mail-ej1-f69.google.com with SMTP id eb5so3134291ejc.6
+        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 09:29:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gFpHt7ahtiWyI8hSPQbU/qGuLyn4UFc9M7zanW3r47A=;
+        b=PMi7fCzR5DBSA0AeSFmADhGTykH521VYfZrdJsrAUl1R727WHFtZ6ZVs4xnVASsrPF
+         SFO67fzPNLZa25j/jISiVE1SVNNrjJiio/O9YZRMuM0yfnc1BQLc2xCwQb/nxmg3Mk8r
+         hYXp5qTX+M8oAectj2OAzV3n8+4/qN1A939D+TiLOUDObhp4CoMAbSZ5dQQx4tyu5BwU
+         ZrzucnqaK9q5nN9Blpy1cczuIiQLswWgVcSVj7QAOjnTOHJfYQl3nrVT0G/C4EkgpB3D
+         c0zE0xMfY3WpKtiZzpS/xtuvddCCKf+HuQbAFPNjNjoqCOWZ4FG5YonzjCSd/7mmYzt2
+         CftA==
+X-Gm-Message-State: AOAM530fZMNZhjoe98osT9kdU/Dfoda10bJ9bkLlbr7zI4veFN7j5xYO
+        I+4MVDHuet0Hk2mSbzmP4mnvrfc1bqHgmKvnuRrOIqnBfvPpl467/XsRQg6ktwUHKKwGeTXIDH8
+        jCPjqlZQq6lcU
+X-Received: by 2002:aa7:c9c9:: with SMTP id i9mr61168edt.160.1612459760707;
+        Thu, 04 Feb 2021 09:29:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJztaTv2pVAyoYOPJ3kepgWu3iCSAzPutECTPP0Bi8bIM7i7j9sdJUrZNJqP2AyGVilMDYxYkw==
+X-Received: by 2002:aa7:c9c9:: with SMTP id i9mr61158edt.160.1612459760554;
+        Thu, 04 Feb 2021 09:29:20 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id y8sm2728387eje.37.2021.02.04.09.29.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Feb 2021 09:29:19 -0800 (PST)
+Subject: Re: [PATCH v15 04/14] KVM: x86: Add #CP support in guest exception
+ dispatch
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, jmattson@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yu.c.zhang@linux.intel.com
+References: <20210203113421.5759-1-weijiang.yang@intel.com>
+ <20210203113421.5759-5-weijiang.yang@intel.com> <YBsZwvwhshw+s7yQ@google.com>
+ <5b822165-9eff-bfa9-000f-ae51add59320@redhat.com>
+ <YBwj78dE5iGZOLed@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aaf2c197-6122-3214-a0f1-d9a763c12439@redhat.com>
+Date:   Thu, 4 Feb 2021 18:29:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
+In-Reply-To: <YBwj78dE5iGZOLed@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The previous implementation wrote only the status of each request.
-This patch implements a more accurate block device simulator,
-providing a ramdisk-like behavior and adding input validation.
+On 04/02/21 17:42, Sean Christopherson wrote:
+> On Thu, Feb 04, 2021, Paolo Bonzini wrote:
+>> On 03/02/21 22:46, Sean Christopherson wrote:
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>>> index dbca1687ae8e..0b6dab6915a3 100644
+>>> --- a/arch/x86/kvm/vmx/nested.c
+>>> +++ b/arch/x86/kvm/vmx/nested.c
+>>> @@ -2811,7 +2811,7 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+>>>                  /* VM-entry interruption-info field: deliver error code */
+>>>                  should_have_error_code =
+>>>                          intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+>>> -                       x86_exception_has_error_code(vector);
+>>> +                       x86_exception_has_error_code(vcpu, vector);
+>>>                  if (CC(has_error_code != should_have_error_code))
+>>>                          return -EINVAL;
+>>>
+>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>> index 28fea7ff7a86..0288d6a364bd 100644
+>>> --- a/arch/x86/kvm/x86.c
+>>> +++ b/arch/x86/kvm/x86.c
+>>> @@ -437,17 +437,20 @@ EXPORT_SYMBOL_GPL(kvm_spurious_fault);
+>>>   #define EXCPT_CONTRIBUTORY     1
+>>>   #define EXCPT_PF               2
+>>>
+>>> -static int exception_class(int vector)
+>>> +static int exception_class(struct kvm_vcpu *vcpu, int vector)
+>>>   {
+>>>          switch (vector) {
+>>>          case PF_VECTOR:
+>>>                  return EXCPT_PF;
+>>> +       case CP_VECTOR:
+>>> +               if (vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET)
+>>> +                       return EXCPT_BENIGN;
+>>> +               return EXCPT_CONTRIBUTORY;
+>>>          case DE_VECTOR:
+>>>          case TS_VECTOR:
+>>>          case NP_VECTOR:
+>>>          case SS_VECTOR:
+>>>          case GP_VECTOR:
+>>> -       case CP_VECTOR:
+> 
+> This removal got lost when squasing.
+> 
+> arch/x86/kvm/x86.c: In function ‘exception_class’:
+> arch/x86/kvm/x86.c:455:2: error: duplicate case value
+>    455 |  case CP_VECTOR:
+>        |  ^~~~
+> arch/x86/kvm/x86.c:446:2: note: previously used here
+>    446 |  case CP_VECTOR:
+>        |  ^~~~
 
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-v2:
-- used %zd %zx to print size_t and ssize_t variables in dev_err()
-- removed unnecessary new line [Jason]
-- moved VIRTIO_BLK_T_GET_ID in another patch [Jason]
-- used push/pull instead of write/read terminology
-- added vdpasim_blk_check_range() to avoid overflows [Stefan]
-- use vdpasim*_to_cpu instead of le*_to_cpu
-- used vringh_kiov_length() helper [Jason]
----
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 164 ++++++++++++++++++++++++---
- 1 file changed, 146 insertions(+), 18 deletions(-)
+Well, it shows that I haven't even started including those 
+unlikely-for-5.12 patches (CET and #DB bus lock) in my builds, since 
+today I was focusing on getting a kvm/next push done.
 
-diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-index 9822f9edc511..2652a499fb34 100644
---- a/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-+++ b/drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
-@@ -3,6 +3,7 @@
-  * VDPA simulator for block device.
-  *
-  * Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
-+ * Copyright (c) 2021, Red Hat Inc. All rights reserved.
-  *
-  */
- 
-@@ -13,6 +14,7 @@
- #include <linux/sched.h>
- #include <linux/vringh.h>
- #include <linux/vdpa.h>
-+#include <linux/blkdev.h>
- #include <uapi/linux/virtio_blk.h>
- 
- #include "vdpa_sim.h"
-@@ -36,10 +38,151 @@
- 
- static struct vdpasim *vdpasim_blk_dev;
- 
-+static bool vdpasim_blk_check_range(u64 start_sector, size_t range_size)
-+{
-+	u64 range_sectors = range_size >> SECTOR_SHIFT;
-+
-+	if (range_size > VDPASIM_BLK_SIZE_MAX * VDPASIM_BLK_SEG_MAX)
-+		return false;
-+
-+	if (start_sector > VDPASIM_BLK_CAPACITY)
-+		return false;
-+
-+	if (range_sectors > VDPASIM_BLK_CAPACITY - start_sector)
-+		return false;
-+
-+	return true;
-+}
-+
-+/* Returns 'true' if the request is handled (with or without an I/O error)
-+ * and the status is correctly written in the last byte of the 'in iov',
-+ * 'false' otherwise.
-+ */
-+static bool vdpasim_blk_handle_req(struct vdpasim *vdpasim,
-+				   struct vdpasim_virtqueue *vq)
-+{
-+	size_t pushed = 0, to_pull, to_push;
-+	struct virtio_blk_outhdr hdr;
-+	ssize_t bytes;
-+	loff_t offset;
-+	u64 sector;
-+	u8 status;
-+	u32 type;
-+	int ret;
-+
-+	ret = vringh_getdesc_iotlb(&vq->vring, &vq->out_iov, &vq->in_iov,
-+				   &vq->head, GFP_ATOMIC);
-+	if (ret != 1)
-+		return false;
-+
-+	if (vq->out_iov.used < 1 || vq->in_iov.used < 1) {
-+		dev_err(&vdpasim->vdpa.dev, "missing headers - out_iov: %u in_iov %u\n",
-+			vq->out_iov.used, vq->in_iov.used);
-+		return false;
-+	}
-+
-+	if (vq->in_iov.iov[vq->in_iov.used - 1].iov_len < 1) {
-+		dev_err(&vdpasim->vdpa.dev, "request in header too short\n");
-+		return false;
-+	}
-+
-+	/* The last byte is the status and we checked if the last iov has
-+	 * enough room for it.
-+	 */
-+	to_push = vringh_kiov_length(&vq->in_iov) - 1;
-+
-+	to_pull = vringh_kiov_length(&vq->out_iov);
-+
-+	bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov, &hdr,
-+				      sizeof(hdr));
-+	if (bytes != sizeof(hdr)) {
-+		dev_err(&vdpasim->vdpa.dev, "request out header too short\n");
-+		return false;
-+	}
-+
-+	to_pull -= bytes;
-+
-+	type = vdpasim32_to_cpu(vdpasim, hdr.type);
-+	sector = vdpasim64_to_cpu(vdpasim, hdr.sector);
-+	offset = sector << SECTOR_SHIFT;
-+	status = VIRTIO_BLK_S_OK;
-+
-+	switch (type) {
-+	case VIRTIO_BLK_T_IN:
-+		if (!vdpasim_blk_check_range(sector, to_push)) {
-+			dev_err(&vdpasim->vdpa.dev,
-+				"reading over the capacity - offset: 0x%llx len: 0x%zx\n",
-+				offset, to_push);
-+			status = VIRTIO_BLK_S_IOERR;
-+			break;
-+		}
-+
-+		bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
-+					      vdpasim->buffer + offset,
-+					      to_push);
-+		if (bytes < 0) {
-+			dev_err(&vdpasim->vdpa.dev,
-+				"vringh_iov_push_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
-+				bytes, offset, to_push);
-+			status = VIRTIO_BLK_S_IOERR;
-+			break;
-+		}
-+
-+		pushed += bytes;
-+		break;
-+
-+	case VIRTIO_BLK_T_OUT:
-+		if (!vdpasim_blk_check_range(sector, to_pull)) {
-+			dev_err(&vdpasim->vdpa.dev,
-+				"writing over the capacity - offset: 0x%llx len: 0x%zx\n",
-+				offset, to_pull);
-+			status = VIRTIO_BLK_S_IOERR;
-+			break;
-+		}
-+
-+		bytes = vringh_iov_pull_iotlb(&vq->vring, &vq->out_iov,
-+					      vdpasim->buffer + offset,
-+					      to_pull);
-+		if (bytes < 0) {
-+			dev_err(&vdpasim->vdpa.dev,
-+				"vringh_iov_pull_iotlb() error: %zd offset: 0x%llx len: 0x%zx\n",
-+				bytes, offset, to_pull);
-+			status = VIRTIO_BLK_S_IOERR;
-+			break;
-+		}
-+		break;
-+
-+	default:
-+		dev_warn(&vdpasim->vdpa.dev,
-+			 "Unsupported request type %d\n", type);
-+		status = VIRTIO_BLK_S_IOERR;
-+		break;
-+	}
-+
-+	/* If some operations fail, we need to skip the remaining bytes
-+	 * to put the status in the last byte
-+	 */
-+	if (to_push - pushed > 0)
-+		vringh_kiov_advance(&vq->in_iov, to_push - pushed);
-+
-+	/* Last byte is the status */
-+	bytes = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov, &status, 1);
-+	if (bytes != 1)
-+		return false;
-+
-+	pushed += bytes;
-+
-+	/* Make sure data is wrote before advancing index */
-+	smp_wmb();
-+
-+	vringh_complete_iotlb(&vq->vring, vq->head, pushed);
-+
-+	return true;
-+}
-+
- static void vdpasim_blk_work(struct work_struct *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
--	u8 status = VIRTIO_BLK_S_OK;
- 	int i;
- 
- 	spin_lock(&vdpasim->lock);
-@@ -53,22 +196,7 @@ static void vdpasim_blk_work(struct work_struct *work)
- 		if (!vq->ready)
- 			continue;
- 
--		while (vringh_getdesc_iotlb(&vq->vring, &vq->out_iov,
--					    &vq->in_iov, &vq->head,
--					    GFP_ATOMIC) > 0) {
--			int write;
--
--			vq->in_iov.i = vq->in_iov.used - 1;
--			write = vringh_iov_push_iotlb(&vq->vring, &vq->in_iov,
--						      &status, 1);
--			if (write <= 0)
--				break;
--
--			/* Make sure data is wrote before advancing index */
--			smp_wmb();
--
--			vringh_complete_iotlb(&vq->vring, vq->head, write);
--
-+		while (vdpasim_blk_handle_req(vdpasim, vq)) {
- 			/* Make sure used is visible before rasing the interrupt. */
- 			smp_wmb();
- 
-@@ -109,7 +237,7 @@ static int __init vdpasim_blk_init(void)
- 	dev_attr.config_size = sizeof(struct virtio_blk_config);
- 	dev_attr.get_config = vdpasim_blk_get_config;
- 	dev_attr.work_fn = vdpasim_blk_work;
--	dev_attr.buffer_size = PAGE_SIZE;
-+	dev_attr.buffer_size = VDPASIM_BLK_CAPACITY << SECTOR_SHIFT;
- 
- 	vdpasim_blk_dev = vdpasim_create(&dev_attr);
- 	if (IS_ERR(vdpasim_blk_dev)) {
--- 
-2.29.2
+I'll probably push all those to kvm/intel-queue and remove them from 
+everyone's view, for now.
+
+Paolo
 
