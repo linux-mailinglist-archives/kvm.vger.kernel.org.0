@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 108E530E89B
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:37:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC2A30E89E
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 01:37:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234167AbhBDAgb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 19:36:31 -0500
-Received: from mail-bn7nam10on2044.outbound.protection.outlook.com ([40.107.92.44]:55968
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S234016AbhBDAhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 19:37:33 -0500
+Received: from mail-dm6nam12on2045.outbound.protection.outlook.com ([40.107.243.45]:57185
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233575AbhBDAg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 19:36:26 -0500
+        id S233343AbhBDAhb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 19:37:31 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EbnKD/8As3O3Uw+57afmgabbka8JMNFgIi6LFO9du1Lq0R2wLfGFdtOzFcJu2YCbrJr9F0HXuqqb1ypuhC/CFFtaQJ4bm5XLhrwOjY7UbwGIgqXVFXrYV+TyCOL/CHA7Gwdos58tbvRQ1HaZDjPb6mZHc1tCz8K4L5+Kn7gGJU7yOH0Oftr1KMezs/5pVLqWdzRtseg+GHg0gL01jOVSQH1+p63YqR5C9OHy5UXr6xQtgyS7HWZF9Sm1LkXwagKrEbkjx0BaEvH61vh3nSQt2BU/xIbohCNg+GNGpMqcppi4ud6Cwb6GjgW78RbNOnftAaZTRtBYZO9Xwx80rW0JVQ==
+ b=PG6DZUIPfP2TRdYCy8oAe8BEMV9XSizNPN7LRd+7kEryA+p7I6SzyRwDpL+3b5ABAh4JuMzgh55hV5NwrDsyn/BFJ4GCkU0qabiOOtttc5CFuoldwuHzTyLnokUZmIVLv58v17F4L9kU7LttCk3tkg4EnR2g7zXD8rfl3FjjSHp8pA+4ESzASGXSlh+87Z1lKRxfw0d8856ja5A5zufOQclyVK6aYMLrbWLxtFhSniEMkrdVAhiXHajeFeXSkYM+vHr08IdaNFqSXL1bbKkdAMKQvsG2rCgbthZ6i2t+9A6HaRb2bhksKgdmztWbTBUA6qLn07nF7fmkj7knzdTtHA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R7T+vhpMPPLIGK0XLHtGgpLkvORNt5FKH7o03p7ELsM=;
- b=gK/smQp8m4XR7uxYHNK3h/QP/0V3c0JidqzIWAu1p0LOtQKpPT0RW/P2xwz0ppl9uiAKidMlubbg1nWZuaaW4tmP42ZPy9OFUZsJPnQeL7C0YTOIc0rBom7gGp3IkEyQ6cLiiW63KOdXXTOVqxcQL7vw0eaAEjNf4K+Y98UQpdL72spH4pdF5QylN/Lo05PqhTdNdfF7qGr27U5RF+aS7ufPmscOgNEeqYaDK59ifwBta4eP2r6/PssaM8YdargldBlCXq5YL+9JyMsjJKISGRh3xHzBI8MDnLHrI8hUbVPnPuCN47EwTelYZubMQqK2vm6PLFKyed6YepWeM6/OJQ==
+ bh=rV4tmI0JPaYZJop2XHUnckbXZPG53Y5sV70d3NFdtGA=;
+ b=gqrzIgA+UQdatomxFzH7sSn6+Rccfc12zIS2rkuLOneEtKOYuNv6ZU1q7XAjahZ9Kz0Hba5Ya2ES6741YiZEcIe0jyNDeUlpmcTj8DrZy8/hWC1StnQUYfULIbRKxYO2wIX68MddSRKFwVugMiJ+A2YsYA4IF4EYi3xi8+TyEbF5xgP0VhxPgRCza5YCr79QqDlgUB5m0xE49RJjDxrFb8woMFwYHt4LAlmpIst+L2J3FXvYR0q+VLibTEG/yonSpvDi+bkSFiesfb6lvFUUO3n6DF0LOQnZI3G4PaIfONZ3PeOfAz5KXlTJDKx+RlpMlZNMcSdZxBWo8wHGNfKZjA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R7T+vhpMPPLIGK0XLHtGgpLkvORNt5FKH7o03p7ELsM=;
- b=xa7aiyUGxQYn1oM0HElhTdTkdfQ3mBHWyMRb0tLhpXdRhvc50lh+SWOLOS99Qgtkxr/oYYUUW+m1BjEvydr0WPJvPCpN8k4c2/EU3XQYPSmuycUZAEg4tfN+haguGypwpHFBQp4a/Lr6oRgwClIQtNmuW3JS4OUSMzwdgSjQlGo=
+ bh=rV4tmI0JPaYZJop2XHUnckbXZPG53Y5sV70d3NFdtGA=;
+ b=jDlu6dDaITZVML39wfUtffxErxEoNAT9UejaVmCxVZPRzARKtmZLWGGY4WWEL14Nq321VBGv5cza0xM5Qri1NLPhTCsDtu0RYZ/VueJ4087EoHi3eQdjL0LNmGTQ2OGCnNe2AODA9UwGVVWsOaHCqkwDLZLF3TS/v9tgtR4JDWM=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
  by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16; Thu, 4 Feb
- 2021 00:35:31 +0000
+ 2021 00:36:37 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3805.028; Thu, 4 Feb 2021
- 00:35:31 +0000
+ 00:36:37 +0000
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     pbonzini@redhat.com
 Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
@@ -44,265 +44,327 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, srutherford@google.com,
         seanjc@google.com, venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: [PATCH v10 00/17] Add AMD SEV guest live migration support
-Date:   Thu,  4 Feb 2021 00:35:22 +0000
-Message-Id: <cover.1612398155.git.ashish.kalra@amd.com>
+Subject: [PATCH v10 01/16] KVM: SVM: Add KVM_SEV SEND_START command
+Date:   Thu,  4 Feb 2021 00:36:28 +0000
+Message-Id: <48c18d02e68856fcc667dc95c965132f42080fb3.1612398155.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <cover.1612398155.git.ashish.kalra@amd.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN7PR04CA0091.namprd04.prod.outlook.com
- (2603:10b6:806:122::6) To SN6PR12MB2767.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA0PR11CA0071.namprd11.prod.outlook.com
+ (2603:10b6:806:d2::16) To SN6PR12MB2767.namprd12.prod.outlook.com
  (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SN7PR04CA0091.namprd04.prod.outlook.com (2603:10b6:806:122::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Thu, 4 Feb 2021 00:35:31 +0000
+Received: from ashkalra_ubuntu_server.amd.com (165.204.77.1) by SA0PR11CA0071.namprd11.prod.outlook.com (2603:10b6:806:d2::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Thu, 4 Feb 2021 00:36:37 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 89a5064d-b174-47d2-7f88-08d8c8a4c718
+X-MS-Office365-Filtering-Correlation-Id: e9a6b339-b1db-4224-8eba-08d8c8a4ee8e
 X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4384B002174F2A217CDF1BA08EB39@SA0PR12MB4384.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:229;
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4384E38FBB1AF02A78A18BA78EB39@SA0PR12MB4384.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UDhpB7XIkMq81uygGRz+7QFBZtnAin1f8YWN0zOFZVbFWl52d0b+EYRXHpDOe54GtfKaRuUADyMtxEU90zWc6oqTr4O2sGTqZSCu60Uv77b9MXy3tnE2ukjxQYqkn3Ca+t7c+jep7gE6xHeGrw9FBp4pwj3mSfhPvdJQ7Z4mk+MVkjCzjeQiPnm0IEghGId2dEVhaip0Uml58khVULHnCTF33R2RTlce6iUizBFZaiNPGx2qDo+sMSjUwvGFLBeXplpl9l1s56LeslxHHPuFeZWeROiRIbXLR/cm3vpO9A+FRCWwaDy9K56uBH19I91I4vwO3/tpC4eEi5c8YMKAEkjmXkbMYPe6Lyzn1ELkY9mSEkZflkv8Zy4GHdpH3rzJBd9+im9Czvbw38+1S4s1vbpP838seWKKmTO+YSZ8cv4dkUVdIaUX52e1U56zJAgh1zoJvLRY6e5/qN4KM81FVrdVN3M2z1uvqKgiwTMMUZJ4U/a0j9qrlkEIkUG0iQin+7bBzuCq2VcQuJDtBjcp4dj7DP32fSU2odRCMjrJcNn4ucRDa1aykUJ/hq0YqPd4Z12CkVb9LVS+EEYaEPA2F3+z6VB99MjgdRkR/U4DNT8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(366004)(346002)(376002)(396003)(8936002)(4326008)(66556008)(86362001)(6666004)(66476007)(2906002)(186003)(478600001)(26005)(6916009)(6486002)(966005)(5660300002)(52116002)(16526019)(36756003)(7696005)(7416002)(66946007)(83380400001)(8676002)(956004)(2616005)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?YkN6MzhXSm5JZ2JTeU9OeG1SN0pTTVVRSWd3MWhKTFB2M3J2OFlzTTFQYTdn?=
- =?utf-8?B?V2R0RFUwNThKSCtDemUycnpuT3p5WXBwcVlGdzlTNFJrOUQ1QmNmV3U1dHpS?=
- =?utf-8?B?TCsvcFVoSHlwV013dXM2N1RiOXBMNXB1MUpiNXh5eVAwVWpQeEoxM0hoeGpO?=
- =?utf-8?B?Q1hYUjNFOGdJYkh4L0VzOXY5OVRjWkRDMEJGelJNZ1BlTUh1d2duLzMrNmhK?=
- =?utf-8?B?bTViVHZjcEtjRjVzQXBqTHFXcDNleTdSdmNhN2ZjcjVjUWY0M2t1clBkY0xI?=
- =?utf-8?B?OG81VmNZUCtyNFhicHREZFVFTkIxUjhVT3NMcytkL0lidmZQZ2tDQjQ0YVJQ?=
- =?utf-8?B?TURRRzVieEdYWCs5K210Y3QrYnZiVEtWVjF6UGNOZnRIVTUxUjdja1B5OUJu?=
- =?utf-8?B?WXFoUVk1SFFVUmErcVVyYTVrU29IemRYSDV6bmVIcGxxVlFXbmJvOExvUW9x?=
- =?utf-8?B?NkdIV3ZBNTRxUHdQSWxTQjJQSnREZTNzb05Zc3JSN01DTG1DMmZEeHRWdGZL?=
- =?utf-8?B?S01waDBwVFJnbFYwOXFmQjhUdWVLT0tjcVMzM21DWVd0Zm5CQm9DeW1qY3U4?=
- =?utf-8?B?djkrTTREdGFMRGU0YTFEeUJab0MyUC9xNy9PcDdod0toQjdUSERRU01PUFBt?=
- =?utf-8?B?SkNvR1lmdnBJL0M4VSsxczdUeExXSTZzYkcraUxjMVZFbDJzUlJISGNYVVo4?=
- =?utf-8?B?bUY3dkdTWWlJZlFLOC9NM1lNOCtiZ2lERkRvQit3M1luM3NXaDhWR21rL2tK?=
- =?utf-8?B?eXo3aU9nVnl3MTNUb1VmY2ZkeC9TVUgxLzR3UERwa0NwWlBPSXluUzBodWJY?=
- =?utf-8?B?UmtzZDZxY2dLRHorUkNjR01WOXhVcDVlYlVXOVlrQWZudWZwNE1YVGZRellq?=
- =?utf-8?B?RlpCOXloNlEwRWcvM3pUNkF1R0NVUlEyb3o1UjdXNGNBVXYwcEFWWjBQREdJ?=
- =?utf-8?B?TVpQVmU2bkg5TnFVeDdJVElNYTk1anQ4cG5NZXhqSlp2eHgrS2E1M2Y0MnpW?=
- =?utf-8?B?T0k2ek1qYXk0T1ZwV3hvRHcxZjB5clZoRkhNV2RIalJZQ2VGVUtSa0R6NUpa?=
- =?utf-8?B?d0dINmNZbDlzK1pBUkluc1BxZE0zSjN2VzZmL24wZUd1Z0tPcjhhSXRFVzF2?=
- =?utf-8?B?R0NXK3hVYTdmaDk5dTZRbC9NOFJwaklYTmdPNjRIbTVBbG9iSVNiR0UxdWNW?=
- =?utf-8?B?bFdNL1VFNndCYk8xYmcyd2JFeWl6U0VxdzY5Tnc3Umx0Vy82a3UzVkxZSCtL?=
- =?utf-8?B?K3c5OGNmWFBsV0tMdElmd0lDaTFmV3VNUS82dDQyRUZsdFZJczluZzFTaWps?=
- =?utf-8?B?MHVST0poNkM5T3BmcmlpckVpWVcrcHd6QSt2dlFXeXRlYjRWT09xUkFhSndj?=
- =?utf-8?B?N0lVTXVtV1VJYkIrOE9BZHo5eXBEV1UvTmNsb1dheitJVFFnN2k3NDNRS2I4?=
- =?utf-8?B?a3A4Z3JmeFRtcmR1YUEwQm5RenFJS0JiM0tjSXlGUFduVmVaSDNoRmFEVWRk?=
- =?utf-8?B?cVNqeDIyVnQ4M1E0bklMdnRiMGdDb0duZEkxSTQ4NTkyWjQ4c2pFbnhaZzNV?=
- =?utf-8?B?N0JGR0FkdjNhQ2VYK0NNQU1QYzVETFdIaSs3bFpLSy8wenVzYVREeUt3Tmtz?=
- =?utf-8?B?cEt5amw4OE1kRzlaYVVwM05tOTQvUzlsb21Ud1ViTlJiekxjLzF6eFVqVWk2?=
- =?utf-8?B?ZHhIVGtTK2N3MXVCWUlQbUlWZGxHZmR3SDZ2Rk9JN2dLVDVtSG5rS2NTdlVo?=
- =?utf-8?Q?2GGwKVLIQo1KcsCbfHGjV7XeqGsF+3IXAz89vGj?=
+X-Microsoft-Antispam-Message-Info: ZtNHZNn8ydwiSDhducu4+bgmRccLQ2Wm1u4M4swGFz8mnuGyK5qnIIwIBsO459ZvkrhKydsn1AV0xRw4S1lGG9NySLFzVHPCJb9zfsdOeOHGdu1bouVRbmAVhGS+qvJW7B6r/zKzZ/NSAdANeRhtD3d2Hmx33E0RWa/hMQHsGROfhrvnnq3c2TWaU/B4yOxatsZcNH+SDYeRSkxsJ5EWjM+GdTXqXucLiDvRalakBrW9sW56uOkD4M3sJGa9OrqlaEGfmkrUpPi5iW+KBVtF08LyHMbItXDecvy/2ogxAuyhjs5tYpr0A5AAP7hLZYKeCnSQ0SVOUpWPWMrZkVXhDLcTlJUND0mC7YwgRX0LQ2PSdksXuYXHUderWW/fP7pWM9yb1Dzt9+IkkL2Gc2r873yl9WaEHK2BtIbYFoHpX/jZP6wHz64xynu9VBmU/70CiPOkHHOabzBlU7f9bS+wZPRMXYqZ5f7Hi+K0m0jffr2Fmn8J66etX/gnJSXVdO2xFzZa8caVxS/G435RWOVjnw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39850400004)(366004)(346002)(376002)(396003)(8936002)(4326008)(66556008)(86362001)(6666004)(66476007)(2906002)(186003)(478600001)(26005)(6916009)(6486002)(5660300002)(52116002)(16526019)(36756003)(7696005)(7416002)(66946007)(83380400001)(8676002)(956004)(2616005)(66574015)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MUxaelB5MnBINk4xWDcwMjM1S1FUL3RpMEJnbnJtdVlMOGw5L0twK2M3eXZY?=
+ =?utf-8?B?L0ZmL3JOd1pFRTB3ak5rRWVGTjVhVCs4KzhMa3NLMlhRaEpCNFVabXJNR3JR?=
+ =?utf-8?B?R0lqdmxhdDVMdkJXeEJDeFRKZjA1OWVtOEUvdXVpbSs4cXlnek1UZnZXeWpE?=
+ =?utf-8?B?NmZTZy9sWEtmb1M0dktDZ04vSnJNbk52Y292dytCRmpHZHZhOHpNUlhKRGlG?=
+ =?utf-8?B?T2JoUjFET01SVU1kcXFSQm9vR3RoaDdPTFBuUmVJTFkraDRzcko3OUJLbGlK?=
+ =?utf-8?B?eHdyNFNic3lZV0s5Y0JIU1NRa0twbjkybEkxR3pXVFBsOHl1bDFWa2lZNU02?=
+ =?utf-8?B?WnRsR295YnhQalVPUGErMWxUTTV6RGtOcjJ6OWl3bkJmc2VIOURHOWFPeXFG?=
+ =?utf-8?B?RXVVVytjWW1zTmVlbTlyTy9oMXJ2ckdDNkdrd3VNY05pcHBZYXlHaHhmaXh2?=
+ =?utf-8?B?TWRlNzZXYmw5ZGJIZVZORkZXRW9udkxSUS83eDJPSUNNY2FRcU5RZEdpS0Np?=
+ =?utf-8?B?VXdLd2kveGl1RHZQSlZFb2x5WVJZeTd5VmZZZnJ3WGV6UW5lSFRySnpETDJm?=
+ =?utf-8?B?THFlOXE3NWdKelBrMy9NRUl4ZlZ6Y3JqQnhEK2Q2aWNIVkgvRUVuUndLbzEx?=
+ =?utf-8?B?VUhDSVRtaGtoYzc3OTAzSk5Wa003NWdpZEx5V2hubHdZTG5ZWGxFV1JWZmxD?=
+ =?utf-8?B?NUl5M2twZG50U21BZWVZdXZuMXZlbzgzc2ZweENnWlM3bERONmxmVmVoK3Zs?=
+ =?utf-8?B?YWVGQXRLS1h3TTljRkdDNG9ZTlBnNjdNTDNjSVJ5SlRNUnlTODVxL2k4Qlk4?=
+ =?utf-8?B?NGhGUHdLa1B6M1pLa1lTaWNTTEJBK2sySFlZTU9aYWNXRHpGY1lEaEYzSStJ?=
+ =?utf-8?B?LzFhOGd4Unoxc21KL3U4Vkh5dkplYjVDVkJpV0w2NHRDMFg3VnNQT2s4RVJW?=
+ =?utf-8?B?ZzNJd2pJN0FTV3pQU2p2cVNOeE1QWHNtK1N1VEIxQWx6blVoYlh3NTk2UWZF?=
+ =?utf-8?B?QWpCTTArY091N3FIQWd4bkZCbGlSZS9qb3N1a3Q2S0E2UXZYMnppc2laY21Q?=
+ =?utf-8?B?dGdyUXRQRzU3UHowYit5N2F2MlJVMlVhNng5RWx3UDRVR0FtUGVGVW50NXY0?=
+ =?utf-8?B?bmtZYTRsR0hSWjFXaE1qSE5CQ00rUSsrU2w5WGtTN2MrbytqRVN3ckNqSGpo?=
+ =?utf-8?B?eHpkZzdCelRVSTF4VHF5WlRHMTBGbzVtc1EvbHZRcEVsZlRnZm1mWTRyRlp3?=
+ =?utf-8?B?T0NWaHlvbjBBMGkwUXVyOFlzc1g5MlJoZnorMGJIRVFsREx5ZnMvNkJNb01h?=
+ =?utf-8?B?WC9FTjRZb3lzcXBrd1JDMTI3eTIwV0VOMkZiNFQ1VjlZSjlIWWRMOEZzYUho?=
+ =?utf-8?B?YWxFc3N2cEtob3VpWHlyR25kY1ZDRjkraExMcjBTQjBVL2ViVDFPekR4c2tX?=
+ =?utf-8?B?YVdvU1BwdWNoZWZSaGVaMHdGMnVuZVRuNVVvMmtIWGlod3FCeUdaakpBd3BL?=
+ =?utf-8?B?MFYxVzc4ZHk5a1pqOENSSEVKd2V0SHVlWXFJa1UvVVNYamhGeURIcXFKS1BZ?=
+ =?utf-8?B?aTdwSC9oTytHZmJOZXE5eDhVMDF5UEMwYVFrcjRCUEdXMHhvSVZLZ0gxMFIw?=
+ =?utf-8?B?TGhaSTZLTHRqakI2NlQ5M2c3WFNaRmFoTnJMUXlmcEJscjJ4c2xsYXhpVm5T?=
+ =?utf-8?B?MEsySmhCQy9UelVZcGZsck9oRjdVZ0cxNWdaSFFLK0VUdUVoNjVZeEgwVTll?=
+ =?utf-8?Q?iHQKlBx1YEYGikUbRECXe1wAlcjwaqbBAz5QrQt?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89a5064d-b174-47d2-7f88-08d8c8a4c718
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9a6b339-b1db-4224-8eba-08d8c8a4ee8e
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2021 00:35:31.5357
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2021 00:36:37.7026
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sXHXYWnGVuvXxb0p1dD/quLF+LKX7H1h8QZOq34cbfSbnFuqRvTVPx066pOSwaYo2h4zcp5CJ+WrChzewjqo3g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: kdDpSJrbYif1TIZMWpFU9qIsepUEdN9FeqezCZ6jZY8AOed1eTz/6r0oBuGc41h4s83mvsKPYYR8CdFYgkISww==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-The series add support for AMD SEV guest live migration commands. To protect the
-confidentiality of an SEV protected guest memory while in transit we need to
-use the SEV commands defined in SEV API spec [1].
+The command is used to create an outgoing SEV guest encryption context.
 
-SEV guest VMs have the concept of private and shared memory. Private memory
-is encrypted with the guest-specific key, while shared memory may be encrypted
-with hypervisor key. The commands provided by the SEV FW are meant to be used
-for the private memory only. The patch series introduces a new hypercall.
-The guest OS can use this hypercall to notify the page encryption status.
-If the page is encrypted with guest specific-key then we use SEV command during
-the migration. If page is not encrypted then fallback to default.
-
-The patch adds new ioctls KVM_{SET,GET}_SHARED_PAGES_LIST. The ioctl can be used
-by the qemu to get the shared pages list. Qemu can consult this list
-during the migration to know whether the page is encrypted.
-
-This section descibes how the SEV live migration feature is negotiated
-between the host and guest, the host indicates this feature support via 
-KVM_FEATURE_CPUID. The guest firmware (OVMF) detects this feature and
-sets a UEFI enviroment variable indicating OVMF support for live
-migration, the guest kernel also detects the host support for this
-feature via cpuid and in case of an EFI boot verifies if OVMF also
-supports this feature by getting the UEFI enviroment variable and if it
-set then enables live migration feature on host by writing to a custom
-MSR, if not booted under EFI, then it simply enables the feature by
-again writing to the custom MSR. The host returns error as part of
-KVM_GET_SHARED_PAGES_LIST ioctl if guest has not enabled live migration.
-
-A branch containing these patches is available here:
-https://github.com/AMDESE/linux/tree/sev-migration-v10
-
-[1] https://developer.amd.com/wp-content/resources/55766.PDF
-
-Changes since v9:
-- Transitioning from page encryption bitmap to the shared pages list
-  to keep track of guest's shared/unencrypted memory regions.
-- Move back to marking the complete _bss_decrypted section as 
-  decrypted in the shared pages list.
-- Invoke a new function check_kvm_sev_migration() via kvm_init_platform()
-  for guest to query for host-side support for SEV live migration 
-  and to enable the SEV live migration feature, to avoid
-  #ifdefs in code 
-- Rename MSR_KVM_SEV_LIVE_MIG_EN to MSR_KVM_SEV_LIVE_MIGRATION.
-- Invoke a new function handle_unencrypted_region() from 
-  sev_dbg_crypt() to bypass unencrypted guest memory regions.
-
-Changes since v8:
-- Rebasing to kvm next branch.
-- Fixed and added comments as per review feedback on v8 patches.
-- Removed implicitly enabling live migration for incoming VMs in
-  in KVM_SET_PAGE_ENC_BITMAP, it is now done via KVM_SET_MSR ioctl.
-- Adds support for bypassing unencrypted guest memory regions for
-  DBG_DECRYPT API calls, guest memory region encryption status in
-  sev_dbg_decrypt() is referenced using the page encryption bitmap.
-
-Changes since v7:
-- Removed the hypervisor specific hypercall/paravirt callback for
-  SEV live migration and moved back to calling kvm_sev_hypercall3 
-  directly.
-- Fix build errors as
-  Reported-by: kbuild test robot <lkp@intel.com>, specifically fixed
-  build error when CONFIG_HYPERVISOR_GUEST=y and
-  CONFIG_AMD_MEM_ENCRYPT=n.
-- Implicitly enabled live migration for incoming VM(s) to handle 
-  A->B->C->... VM migrations.
-- Fixed Documentation as per comments on v6 patches.
-- Fixed error return path in sev_send_update_data() as per comments 
-  on v6 patches. 
-
-Changes since v6:
-- Rebasing to mainline and refactoring to the new split SVM
-  infrastructre.
-- Move to static allocation of the unified Page Encryption bitmap
-  instead of the dynamic resizing of the bitmap, the static allocation
-  is done implicitly by extending kvm_arch_commit_memory_region() callack
-  to add svm specific x86_ops which can read the userspace provided memory
-  region/memslots and calculate the amount of guest RAM managed by the KVM
-  and grow the bitmap.
-- Fixed KVM_SET_PAGE_ENC_BITMAP ioctl to set the whole bitmap instead
-  of simply clearing specific bits.
-- Removed KVM_PAGE_ENC_BITMAP_RESET ioctl, which is now performed using
-  KVM_SET_PAGE_ENC_BITMAP.
-- Extended guest support for enabling Live Migration feature by adding a
-  check for UEFI environment variable indicating OVMF support for Live
-  Migration feature and additionally checking for KVM capability for the
-  same feature. If not booted under EFI, then we simply check for KVM
-  capability.
-- Add hypervisor specific hypercall for SEV live migration by adding
-  a new paravirt callback as part of x86_hyper_runtime.
-  (x86 hypervisor specific runtime callbacks)
-- Moving MSR handling for MSR_KVM_SEV_LIVE_MIG_EN into svm/sev code 
-  and adding check for SEV live migration enabled by guest in the 
-  KVM_GET_PAGE_ENC_BITMAP ioctl.
-- Instead of the complete __bss_decrypted section, only specific variables
-  such as hv_clock_boot and wall_clock are marked as decrypted in the
-  page encryption bitmap
-
-Changes since v5:
-- Fix build errors as
-  Reported-by: kbuild test robot <lkp@intel.com>
-
-Changes since v4:
-- Host support has been added to extend KVM capabilities/feature bits to 
-  include a new KVM_FEATURE_SEV_LIVE_MIGRATION, which the guest can
-  query for host-side support for SEV live migration and a new custom MSR
-  MSR_KVM_SEV_LIVE_MIG_EN is added for guest to enable the SEV live
-  migration feature.
-- Ensure that _bss_decrypted section is marked as decrypted in the
-  page encryption bitmap.
-- Fixing KVM_GET_PAGE_ENC_BITMAP ioctl to return the correct bitmap
-  as per the number of pages being requested by the user. Ensure that
-  we only copy bmap->num_pages bytes in the userspace buffer, if
-  bmap->num_pages is not byte aligned we read the trailing bits
-  from the userspace and copy those bits as is. This fixes guest
-  page(s) corruption issues observed after migration completion.
-- Add kexec support for SEV Live Migration to reset the host's
-  page encryption bitmap related to kernel specific page encryption
-  status settings before we load a new kernel by kexec. We cannot
-  reset the complete page encryption bitmap here as we need to
-  retain the UEFI/OVMF firmware specific settings.
-
-Changes since v3:
-- Rebasing to mainline and testing.
-- Adding a new KVM_PAGE_ENC_BITMAP_RESET ioctl, which resets the 
-  page encryption bitmap on a guest reboot event.
-- Adding a more reliable sanity check for GPA range being passed to
-  the hypercall to ensure that guest MMIO ranges are also marked
-  in the page encryption bitmap.
-
-Changes since v2:
- - reset the page encryption bitmap on vcpu reboot
-
-Changes since v1:
- - Add support to share the page encryption between the source and target
-   machine.
- - Fix review feedbacks from Tom Lendacky.
- - Add check to limit the session blob length.
- - Update KVM_GET_PAGE_ENC_BITMAP icotl to use the base_gfn instead of
-   the memory slot when querying the bitmap.
-
-Ashish Kalra (5):
-  KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION feature &
-    Custom MSR.
-  EFI: Introduce the new AMD Memory Encryption GUID.
-  KVM: x86: Add guest support for detecting and enabling SEV Live
-    Migration feature.
-  KVM: x86: Add kexec support for SEV Live Migration.
-  KVM: SVM: Bypass DBG_DECRYPT API calls for unencrypted guest memory.
-
-Brijesh Singh (11):
-  KVM: SVM: Add KVM_SEV SEND_START command
-  KVM: SVM: Add KVM_SEND_UPDATE_DATA command
-  KVM: SVM: Add KVM_SEV_SEND_FINISH command
-  KVM: SVM: Add support for KVM_SEV_RECEIVE_START command
-  KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command
-  KVM: SVM: Add KVM_SEV_RECEIVE_FINISH command
-  KVM: x86: Add AMD SEV specific Hypercall3
-  KVM: X86: Introduce KVM_HC_PAGE_ENC_STATUS hypercall
-  mm: x86: Invoke hypercall when page encryption status is changed
-  KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST ioctl
-  KVM: x86: Introduce KVM_SET_SHARED_PAGES_LIST ioctl
-
- .../virt/kvm/amd-memory-encryption.rst        | 120 +++
- Documentation/virt/kvm/api.rst                |  44 +-
- Documentation/virt/kvm/cpuid.rst              |   5 +
- Documentation/virt/kvm/hypercalls.rst         |  15 +
- Documentation/virt/kvm/msr.rst                |  12 +
- arch/x86/include/asm/kvm_host.h               |   6 +
- arch/x86/include/asm/kvm_para.h               |  12 +
- arch/x86/include/asm/mem_encrypt.h            |   8 +
- arch/x86/include/asm/paravirt.h               |  10 +
- arch/x86/include/asm/paravirt_types.h         |   2 +
- arch/x86/include/uapi/asm/kvm_para.h          |   4 +
- arch/x86/kernel/kvm.c                         |  80 ++
- arch/x86/kernel/paravirt.c                    |   1 +
- arch/x86/kvm/svm/sev.c                        | 861 ++++++++++++++++++
- arch/x86/kvm/svm/svm.c                        |  20 +
- arch/x86/kvm/svm/svm.h                        |   9 +
- arch/x86/kvm/vmx/vmx.c                        |   1 +
- arch/x86/kvm/x86.c                            |  30 +
- arch/x86/mm/mem_encrypt.c                     |  98 +-
- arch/x86/mm/pat/set_memory.c                  |   7 +
- include/linux/efi.h                           |   1 +
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Reviewed-by: Steve Rutherford <srutherford@google.com>
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+---
+ .../virt/kvm/amd-memory-encryption.rst        |  27 ++++
+ arch/x86/kvm/svm/sev.c                        | 125 ++++++++++++++++++
  include/linux/psp-sev.h                       |   8 +-
- include/uapi/linux/kvm.h                      |  49 +
- include/uapi/linux/kvm_para.h                 |   1 +
- 24 files changed, 1398 insertions(+), 6 deletions(-)
+ include/uapi/linux/kvm.h                      |  12 ++
+ 4 files changed, 168 insertions(+), 4 deletions(-)
 
+diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
+index 09a8f2a34e39..9f9896b72d36 100644
+--- a/Documentation/virt/kvm/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/amd-memory-encryption.rst
+@@ -263,6 +263,33 @@ Returns: 0 on success, -negative on error
+                 __u32 trans_len;
+         };
+ 
++10. KVM_SEV_SEND_START
++----------------------
++
++The KVM_SEV_SEND_START command can be used by the hypervisor to create an
++outgoing guest encryption context.
++
++Parameters (in): struct kvm_sev_send_start
++
++Returns: 0 on success, -negative on error
++
++::
++        struct kvm_sev_send_start {
++                __u32 policy;                 /* guest policy */
++
++                __u64 pdh_cert_uaddr;         /* platform Diffie-Hellman certificate */
++                __u32 pdh_cert_len;
++
++                __u64 plat_certs_uaddr;        /* platform certificate chain */
++                __u32 plat_certs_len;
++
++                __u64 amd_certs_uaddr;        /* AMD certificate */
++                __u32 amd_certs_len;
++
++                __u64 session_uaddr;          /* Guest session information */
++                __u32 session_len;
++        };
++
+ References
+ ==========
+ 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index ac652bc476ae..3026c7fd2ffc 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1039,6 +1039,128 @@ static int sev_launch_secret(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 	return ret;
+ }
+ 
++/* Userspace wants to query session length. */
++static int
++__sev_send_start_query_session_length(struct kvm *kvm, struct kvm_sev_cmd *argp,
++				      struct kvm_sev_send_start *params)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_send_start *data;
++	int ret;
++
++	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
++	if (data == NULL)
++		return -ENOMEM;
++
++	data->handle = sev->handle;
++	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
++
++	params->session_len = data->session_len;
++	if (copy_to_user((void __user *)(uintptr_t)argp->data, params,
++				sizeof(struct kvm_sev_send_start)))
++		ret = -EFAULT;
++
++	kfree(data);
++	return ret;
++}
++
++static int sev_send_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_send_start *data;
++	struct kvm_sev_send_start params;
++	void *amd_certs, *session_data;
++	void *pdh_cert, *plat_certs;
++	int ret;
++
++	if (!sev_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data,
++				sizeof(struct kvm_sev_send_start)))
++		return -EFAULT;
++
++	/* if session_len is zero, userspace wants to query the session length */
++	if (!params.session_len)
++		return __sev_send_start_query_session_length(kvm, argp,
++				&params);
++
++	/* some sanity checks */
++	if (!params.pdh_cert_uaddr || !params.pdh_cert_len ||
++	    !params.session_uaddr || params.session_len > SEV_FW_BLOB_MAX_SIZE)
++		return -EINVAL;
++
++	/* allocate the memory to hold the session data blob */
++	session_data = kmalloc(params.session_len, GFP_KERNEL_ACCOUNT);
++	if (!session_data)
++		return -ENOMEM;
++
++	/* copy the certificate blobs from userspace */
++	pdh_cert = psp_copy_user_blob(params.pdh_cert_uaddr,
++				params.pdh_cert_len);
++	if (IS_ERR(pdh_cert)) {
++		ret = PTR_ERR(pdh_cert);
++		goto e_free_session;
++	}
++
++	plat_certs = psp_copy_user_blob(params.plat_certs_uaddr,
++				params.plat_certs_len);
++	if (IS_ERR(plat_certs)) {
++		ret = PTR_ERR(plat_certs);
++		goto e_free_pdh;
++	}
++
++	amd_certs = psp_copy_user_blob(params.amd_certs_uaddr,
++				params.amd_certs_len);
++	if (IS_ERR(amd_certs)) {
++		ret = PTR_ERR(amd_certs);
++		goto e_free_plat_cert;
++	}
++
++	data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
++	if (data == NULL) {
++		ret = -ENOMEM;
++		goto e_free_amd_cert;
++	}
++
++	/* populate the FW SEND_START field with system physical address */
++	data->pdh_cert_address = __psp_pa(pdh_cert);
++	data->pdh_cert_len = params.pdh_cert_len;
++	data->plat_certs_address = __psp_pa(plat_certs);
++	data->plat_certs_len = params.plat_certs_len;
++	data->amd_certs_address = __psp_pa(amd_certs);
++	data->amd_certs_len = params.amd_certs_len;
++	data->session_address = __psp_pa(session_data);
++	data->session_len = params.session_len;
++	data->handle = sev->handle;
++
++	ret = sev_issue_cmd(kvm, SEV_CMD_SEND_START, data, &argp->error);
++
++	if (!ret && copy_to_user((void __user *)(uintptr_t)params.session_uaddr,
++			session_data, params.session_len)) {
++		ret = -EFAULT;
++		goto e_free;
++	}
++
++	params.policy = data->policy;
++	params.session_len = data->session_len;
++	if (copy_to_user((void __user *)(uintptr_t)argp->data, &params,
++				sizeof(struct kvm_sev_send_start)))
++		ret = -EFAULT;
++
++e_free:
++	kfree(data);
++e_free_amd_cert:
++	kfree(amd_certs);
++e_free_plat_cert:
++	kfree(plat_certs);
++e_free_pdh:
++	kfree(pdh_cert);
++e_free_session:
++	kfree(session_data);
++	return ret;
++}
++
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -1089,6 +1211,9 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_LAUNCH_SECRET:
+ 		r = sev_launch_secret(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SEND_START:
++		r = sev_send_start(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 49d155cd2dfe..454f35904d47 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -325,11 +325,11 @@ struct sev_data_send_start {
+ 	u64 pdh_cert_address;			/* In */
+ 	u32 pdh_cert_len;			/* In */
+ 	u32 reserved1;
+-	u64 plat_cert_address;			/* In */
+-	u32 plat_cert_len;			/* In */
++	u64 plat_certs_address;			/* In */
++	u32 plat_certs_len;			/* In */
+ 	u32 reserved2;
+-	u64 amd_cert_address;			/* In */
+-	u32 amd_cert_len;			/* In */
++	u64 amd_certs_address;			/* In */
++	u32 amd_certs_len;			/* In */
+ 	u32 reserved3;
+ 	u64 session_address;			/* In */
+ 	u32 session_len;			/* In/Out */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 374c67875cdb..8f538fd873f6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1645,6 +1645,18 @@ struct kvm_sev_dbg {
+ 	__u32 len;
+ };
+ 
++struct kvm_sev_send_start {
++	__u32 policy;
++	__u64 pdh_cert_uaddr;
++	__u32 pdh_cert_len;
++	__u64 plat_certs_uaddr;
++	__u32 plat_certs_len;
++	__u64 amd_certs_uaddr;
++	__u32 amd_certs_len;
++	__u64 session_uaddr;
++	__u32 session_len;
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 -- 
 2.17.1
 
