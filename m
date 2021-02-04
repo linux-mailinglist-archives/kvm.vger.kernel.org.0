@@ -2,115 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5259E30F98F
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 18:25:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2304A30F995
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 18:25:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237386AbhBDRWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 12:22:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44166 "EHLO
+        id S238470AbhBDRYd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 12:24:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36392 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238431AbhBDRUx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:20:53 -0500
+        by vger.kernel.org with ESMTP id S238465AbhBDRYK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 12:24:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612459159;
+        s=mimecast20190719; t=1612459362;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=svxv4qHQFsjuspjy9H8OUHej/pXhuE68vUQIP6dXJ/4=;
-        b=F0N5R5LMOXwbegx2bR1PfbmsbpDZtW8ek/DNo6p+9QlkcPnjp/2CS/oGLQwPcJWP0357+L
-        DZPwNUMuS0yyuuzMIiDN4K4ftPAFYVMAEPVW9XGvfaaGTAfVbhUoYi7Qc4yLPixfgP9c6I
-        Ifyifz82Qc2CoP5pxUmj28JiWfZzWvc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-lsphgUxZPr2TPqa2-LHXTA-1; Thu, 04 Feb 2021 12:19:17 -0500
-X-MC-Unique: lsphgUxZPr2TPqa2-LHXTA-1
-Received: by mail-wr1-f69.google.com with SMTP id n15so3168895wrv.20
-        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 09:19:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=svxv4qHQFsjuspjy9H8OUHej/pXhuE68vUQIP6dXJ/4=;
-        b=hM3XRs7NdyB2yd1ENYsoRvt327l41YcVDVR8vOGf7jRPW97uEXiCgn5BHkW85gn2Xc
-         M7v8rcVcs+l/i23OAItP/Qjc/POv5dH7Gw1gRyU2v3YSAVhPolDhnSTnSH1Lfw81SKfg
-         67A2KlF2m0VEaQTXi+FTXSTPiZWZhmLnZ0lrw61sKFaxxyTF+U/M+56YCQ01dk0ETYW0
-         mX5rdNQA6t8QX7jr2QRk5dyICSwGJZ22fdhcs6oY10Sc5UojUSzi8gNKIL29gttP7cAZ
-         zYhiqYYmrtwsh3lPjawjnlzQ506uvwgygLScj0+ypvoyI7wppoT5lwYRODbxcstblI+1
-         SsXg==
-X-Gm-Message-State: AOAM533Dg5ve9fFCkwNKWyX5aFPABuID3H1vnaYQrpnJmtEHsrDAiPok
-        aqm039U+UCfoA51KOUVaJjiwuzCNbfe7xPCWv0KYwwX9bca3yqAL5ZtUSoOhPWKWMryzMkVU1/7
-        CD1/7jrbqOPaB0ghfTxURsrsp9svDE0MWimluW6HkDgNQRmcRip8MQ/jmWMQi+J5k
-X-Received: by 2002:a5d:4d08:: with SMTP id z8mr431600wrt.240.1612459156023;
-        Thu, 04 Feb 2021 09:19:16 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzTw9mCRRbJKUqPWl3+xwvMGDovGs/dhnqnx6zj4Qqqsg5EuahQrAPC93yk1JaoSgJaBIOgag==
-X-Received: by 2002:a5d:4d08:: with SMTP id z8mr431581wrt.240.1612459155833;
-        Thu, 04 Feb 2021 09:19:15 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id k4sm9679664wrm.53.2021.02.04.09.19.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Feb 2021 09:19:15 -0800 (PST)
-Subject: Re: [PATCH] mm: Export follow_pte() for KVM so that KVM can stop
- using follow_pfn()
-To:     Sean Christopherson <seanjc@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        David Stevens <stevensd@google.com>,
-        Jann Horn <jannh@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        kvm@vger.kernel.org
-References: <20210204171619.3640084-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <42ac99c2-830e-e4b7-00b9-011d531a0dda@redhat.com>
-Date:   Thu, 4 Feb 2021 18:19:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Zc+XWtfGtASjsMASpHkffR1pL11AhNAnMUdubmKUbE8=;
+        b=HDqF/3CD1/j+1U2Nr7g260J0ChyEqqwEL3QfH1OqilRzY7xcjyu/Mt+7vo+viGXpcGSanI
+        o4lCf8yUU5C7483MXbxnTBbIrRf2Ag7BU5n1vCIHHtOrlUjq7dNeV7lFLogcKtNVQp5FeV
+        kgEKH9bmGYVsVvQwyepNrCRkxKtU4pI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-GuaFadePOfu83dcFO57M_A-1; Thu, 04 Feb 2021 12:22:41 -0500
+X-MC-Unique: GuaFadePOfu83dcFO57M_A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2E1C879A0D;
+        Thu,  4 Feb 2021 17:22:39 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-113-213.ams2.redhat.com [10.36.113.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4092D1A87C;
+        Thu,  4 Feb 2021 17:22:31 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [PATCH v3 00/13] vdpa: add vdpa simulator for block device
+Date:   Thu,  4 Feb 2021 18:22:17 +0100
+Message-Id: <20210204172230.85853-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20210204171619.3640084-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/02/21 18:16, Sean Christopherson wrote:
-> Export follow_pte() to fix build breakage when KVM is built as a module.
-> An in-flight KVM fix switches from follow_pfn() to follow_pte() in order
-> to grab the page protections along with the PFN.
-> 
-> Fixes: bd2fae8da794 ("KVM: do not assume PTE is writable after follow_pfn")
-> Cc: David Stevens <stevensd@google.com>
-> Cc: Jann Horn <jannh@google.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> Paolo, maybe you can squash this with the appropriate acks?
+v3:
+- added new patches
+  - 'vringh: explain more about cleaning riov and wiov'
+  - 'vdpa: add return value to get_config/set_config callbacks'
+  - 'vhost/vdpa: remove vhost_vdpa_config_validate()'
+- split Xie's patch 'vhost/vdpa: Remove the restriction that only supports
+  virtio-net devices'
+- updated Mellanox copyright to NVIDIA [Max]
+- explained in the 'vdpa: add vdpa simulator for block device' commit
+  message that inputs are validated in subsequent patches [Stefan]
 
-Indeed, you beat me by a minute.  This change is why I hadn't sent out 
-the patch yet.
+v2: https://lore.kernel.org/lkml/20210128144127.113245-1-sgarzare@redhat.com/
+v1: https://lore.kernel.org/lkml/93f207c0-61e6-3696-f218-e7d7ea9a7c93@redhat.com/
 
-Andrew or Jason, ok to squash this?
+This series is the second part of the v1 linked above. The first part with
+refactoring of vdpa_sim has already been merged.
 
-Paolo
+The patches are based on Max Gurtovoy's work and extend the block simulator to
+have a ramdisk behaviour.
 
->   mm/memory.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index feff48e1465a..15cbd10afd59 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -4775,6 +4775,7 @@ int follow_pte(struct mm_struct *mm, unsigned long address,
->   out:
->   	return -EINVAL;
->   }
-> +EXPORT_SYMBOL_GPL(follow_pte);
->   
->   /**
->    * follow_pfn - look up PFN at a user virtual address
-> 
+As mentioned in the v1 there was 2 issues and I fixed them in this series:
+1. The identical mapping in the IOMMU used until now in vdpa_sim created issues
+   when mapping different virtual pages with the same physical address.
+   Fixed by patch "vdpa_sim: use iova module to allocate IOVA addresses"
+
+2. There was a race accessing the IOMMU between the vdpasim_blk_work() and the
+   device driver that map/unmap DMA regions. Fixed by patch "vringh: add
+   'iotlb_lock' to synchronize iotlb accesses"
+
+I used the Xie's patch coming from VDUSE series to allow vhost-vdpa to use
+block devices. As Jason suggested I split it into two patches and I added
+a return value to get_config()/set_config() callbacks.
+
+The series also includes small fixes for vringh, vdpa, and vdpa_sim that I
+discovered while implementing and testing the block simulator.
+
+Thanks for your feedback,
+Stefano
+
+Max Gurtovoy (1):
+  vdpa: add vdpa simulator for block device
+
+Stefano Garzarella (11):
+  vdpa_sim: use iova module to allocate IOVA addresses
+  vringh: add 'iotlb_lock' to synchronize iotlb accesses
+  vringh: reset kiov 'consumed' field in __vringh_iov()
+  vringh: explain more about cleaning riov and wiov
+  vringh: implement vringh_kiov_advance()
+  vringh: add vringh_kiov_length() helper
+  vdpa_sim: cleanup kiovs in vdpasim_free()
+  vdpa: add return value to get_config/set_config callbacks
+  vhost/vdpa: remove vhost_vdpa_config_validate()
+  vdpa_sim_blk: implement ramdisk behaviour
+  vdpa_sim_blk: handle VIRTIO_BLK_T_GET_ID
+
+Xie Yongji (1):
+  vhost/vdpa: Remove the restriction that only supports virtio-net
+    devices
+
+ drivers/vdpa/vdpa_sim/vdpa_sim.h     |   2 +
+ include/linux/vdpa.h                 |  18 +-
+ include/linux/vringh.h               |  19 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c      |  24 ++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c    |  17 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c     | 134 ++++++++-----
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c | 288 +++++++++++++++++++++++++++
+ drivers/vhost/vdpa.c                 |  47 ++---
+ drivers/vhost/vringh.c               |  69 +++++--
+ drivers/vdpa/Kconfig                 |   8 +
+ drivers/vdpa/vdpa_sim/Makefile       |   1 +
+ 11 files changed, 504 insertions(+), 123 deletions(-)
+ create mode 100644 drivers/vdpa/vdpa_sim/vdpa_sim_blk.c
+
+-- 
+2.29.2
 
