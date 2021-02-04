@@ -2,72 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5886D30EE3E
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 09:22:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE49D30EE4A
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 09:30:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234896AbhBDIV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 03:21:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28816 "EHLO
+        id S234777AbhBDI0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 03:26:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51369 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234881AbhBDIV5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 03:21:57 -0500
+        by vger.kernel.org with ESMTP id S233305AbhBDI01 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 03:26:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612426831;
+        s=mimecast20190719; t=1612427101;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nMux9xeg2o0Nzq5bnmpVyZk80lGMRhzWrGwfdgzhu+M=;
-        b=W3LRcfPVpimeHx+CUWTaSgMIk1CmKRrKjASO6zBIVeZS7QXilIDWLrWmMKxCBpAuPwD+M/
-        CWoIIspuLWlljQC/gAH5aIkuvaz7bx582a3ldkG9Z1pjkL0S5K3TJ9qrUaDQ2V6UKzvCJr
-        gvX7/CuhYqvEKSVhsZYT6VkRImypeIk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-av0CDugUNKaE5bZmuOaeCg-1; Thu, 04 Feb 2021 03:20:27 -0500
-X-MC-Unique: av0CDugUNKaE5bZmuOaeCg-1
-Received: by mail-wr1-f71.google.com with SMTP id h18so2235131wrr.5
-        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 00:20:27 -0800 (PST)
+        bh=Agalob5eH11KcCncI5ANijYagbVsZf9dz5lRtY7dI2Y=;
+        b=cG2cveMPpKkTn2WC2YD7inU1nnphvPKaufkRjuXwft8V/TtVRZkhjoLXmUq+6QqC4tqB6n
+        CfzQWudzZSg5hJIIrKhiq1wJntc8VUXlXhPIlQIG50usVF4aqNbYoq/fe3vFLKJtFem2h6
+        vGSdqIjQwYDS3JFJc79ABsGdovuOMMk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-CtIphCOMOXqdgEhcPN57og-1; Thu, 04 Feb 2021 03:24:59 -0500
+X-MC-Unique: CtIphCOMOXqdgEhcPN57og-1
+Received: by mail-ej1-f70.google.com with SMTP id aq28so2025517ejc.20
+        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 00:24:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=nMux9xeg2o0Nzq5bnmpVyZk80lGMRhzWrGwfdgzhu+M=;
-        b=ofiutz/6u6yzDWzECrzzFbxj4JdrNU8nkpap4o2XmE39k+N3aIoZiY2yc3zbu5I3kE
-         3ji9rozJs6KX44wzoXyroM1UTH9IhrCh2E88wrLmM36w9AsJHRZFA7yEkJstDvPEl4XY
-         DOA5F9QtrBQ00rzQRyTJgxGPSirn25wF3YZUBQP1bO0t6oQrjEZRUQDzrNEvjCsHu0YZ
-         OUTPC++C2F74MdrPQOaqLgO4WIQQg7QJIwfxA8sCwFxOzcxjO9Sj4V5YOkhi8OwKf2BA
-         uu8riwQiQoBwqb1a7OkLi6TvaMEBQ5lWUgZadk9Zv+xHcGNt+5EmU3X6n4HVzxFJZbng
-         d91Q==
-X-Gm-Message-State: AOAM531STr50zptUppZO6Ymv+ivHLHijrkiE7iPd7T4lpYYjtOQl+Z3O
-        F/kxPnNfsWhAtoXPgupcVmdobyhCIo3XCNb3wNgxgg8udjUIl5qveVRjJzkYXe+Vsv0p4JY2nO6
-        9p6wenySy2eyC
-X-Received: by 2002:a05:6000:48:: with SMTP id k8mr8056025wrx.340.1612426826842;
-        Thu, 04 Feb 2021 00:20:26 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxCv+uSSCqNqJhvOGDIOprVqWzgGeSsvHNPHsJBguW10RgCtSVMlhGlz9OjHYpIL+UQJmeGFA==
-X-Received: by 2002:a05:6000:48:: with SMTP id k8mr8056011wrx.340.1612426826663;
-        Thu, 04 Feb 2021 00:20:26 -0800 (PST)
+        bh=Agalob5eH11KcCncI5ANijYagbVsZf9dz5lRtY7dI2Y=;
+        b=tk+QZF1whXK8cAOGZKL5bCeQkT/3o+yLq1YlqNbvMwBps6pzB7Kx1+6tEaKigD/pW1
+         Aw2c3/Uk5BnTOiK0TiwLZfTcRCtQkpgEgUafOjsY/S76tAhkjP0YOr+IZdvZYvbN1pZm
+         MW7IpYfWxFqYVsQFRX1kRsxvIOkLJMPIyuxZGOdWZgdJwQYs8C1oHbHFkcQLJc0usj83
+         wUvq3zQkoKOUFSFfMcuPeHbtiJnW/XC9587zFpI9KdYke+JbB1XUNEEEA75MQVbSxECD
+         eAHlu9Ttdvbq2UuL5FDGFpIW8N8O+CioWK76nnTr5xIdNfRInFBc5r1Hxg4ZTJaAPD14
+         PFyA==
+X-Gm-Message-State: AOAM531AraqC3XiRqyE9TU4i91SftuXMU5W5HbYcE+YI7p7RND8UQaui
+        ThkDrj8QCkXl4Qhtt+Q3111U7V1boXZLKC1bTvnLdvP931fueYoOfDwcFXrR5NWY5vzwYyBcv1S
+        Kbb9hLuQabr6A
+X-Received: by 2002:a17:906:2583:: with SMTP id m3mr6857471ejb.499.1612427097592;
+        Thu, 04 Feb 2021 00:24:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzkBsKd0x1+29QtLLCUtiLfJ0rT3W7EMCqt70rGR6r6kWVYSj6J+x9/P+2cL4zFLhIyoC3J/w==
+X-Received: by 2002:a17:906:2583:: with SMTP id m3mr6857462ejb.499.1612427097363;
+        Thu, 04 Feb 2021 00:24:57 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id u10sm5071763wmj.40.2021.02.04.00.20.25
+        by smtp.gmail.com with ESMTPSA id x25sm1776375ejc.33.2021.02.04.00.24.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Feb 2021 00:20:25 -0800 (PST)
-Subject: Re: [PATCH] KVM: SVM: Remove bogus WARN and emulation if guest #GPs
- with EFER.SVME=1
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Bandan Das <bsd@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210204023536.3397005-1-seanjc@google.com>
+        Thu, 04 Feb 2021 00:24:56 -0800 (PST)
+Subject: Re: [PATCH v15 04/14] KVM: x86: Add #CP support in guest exception
+ dispatch
+To:     Sean Christopherson <seanjc@google.com>,
+        Yang Weijiang <weijiang.yang@intel.com>
+Cc:     jmattson@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yu.c.zhang@linux.intel.com
+References: <20210203113421.5759-1-weijiang.yang@intel.com>
+ <20210203113421.5759-5-weijiang.yang@intel.com> <YBsZwvwhshw+s7yQ@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dde46009-10b6-9274-fb36-a57c04bf1df5@redhat.com>
-Date:   Thu, 4 Feb 2021 09:20:24 +0100
+Message-ID: <5b822165-9eff-bfa9-000f-ae51add59320@redhat.com>
+Date:   Thu, 4 Feb 2021 09:24:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210204023536.3397005-1-seanjc@google.com>
+In-Reply-To: <YBsZwvwhshw+s7yQ@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,38 +73,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/02/21 03:35, Sean Christopherson wrote:
-> Immediately reinject #GP (if intercepted) if the VMware backdoor is
-> disabled and the instruction is not affected by the erratum that causes
-> bogus #GPs on SVM instructions.  It is completely reasonable for the
-> guest to take a #GP(0) with EFER.SVME=1, e.g. when probing an MSR, and
-> attempting emulation on an unknown instruction is obviously not good.
+On 03/02/21 22:46, Sean Christopherson wrote:
 > 
-> Fixes: b3f4e11adc7d ("KVM: SVM: Add emulation support for #GP triggered by SVM instructions")
-> Cc: Bandan Das <bsd@redhat.com>
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/svm/svm.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index dbca1687ae8e..0b6dab6915a3 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2811,7 +2811,7 @@ static int nested_check_vm_entry_controls(struct kvm_vcpu *vcpu,
+>                 /* VM-entry interruption-info field: deliver error code */
+>                 should_have_error_code =
+>                         intr_type == INTR_TYPE_HARD_EXCEPTION && prot_mode &&
+> -                       x86_exception_has_error_code(vector);
+> +                       x86_exception_has_error_code(vcpu, vector);
+>                 if (CC(has_error_code != should_have_error_code))
+>                         return -EINVAL;
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f53e6377a933..707a2f85bcc6 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2263,7 +2263,8 @@ static int gp_interception(struct vcpu_svm *svm)
->   	opcode = svm_instr_opcode(vcpu);
->   
->   	if (opcode == NONE_SVM_INSTR) {
-> -		WARN_ON_ONCE(!enable_vmware_backdoor);
-> +		if (!enable_vmware_backdoor)
-> +			goto reinject;
->   
->   		/*
->   		 * VMware backdoor emulation on #GP interception only handles
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 28fea7ff7a86..0288d6a364bd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -437,17 +437,20 @@ EXPORT_SYMBOL_GPL(kvm_spurious_fault);
+>  #define EXCPT_CONTRIBUTORY     1
+>  #define EXCPT_PF               2
+> 
+> -static int exception_class(int vector)
+> +static int exception_class(struct kvm_vcpu *vcpu, int vector)
+>  {
+>         switch (vector) {
+>         case PF_VECTOR:
+>                 return EXCPT_PF;
+> +       case CP_VECTOR:
+> +               if (vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET)
+> +                       return EXCPT_BENIGN;
+> +               return EXCPT_CONTRIBUTORY;
+>         case DE_VECTOR:
+>         case TS_VECTOR:
+>         case NP_VECTOR:
+>         case SS_VECTOR:
+>         case GP_VECTOR:
+> -       case CP_VECTOR:
+>                 return EXCPT_CONTRIBUTORY;
+>         default:
+>                 break;
+> @@ -588,8 +591,8 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+>                 kvm_make_request(KVM_REQ_TRIPLE_FAULT, vcpu);
+>                 return;
+>         }
+> -       class1 = exception_class(prev_nr);
+> -       class2 = exception_class(nr);
+> +       class1 = exception_class(vcpu, prev_nr);
+> +       class2 = exception_class(vcpu, nr);
+>         if ((class1 == EXCPT_CONTRIBUTORY && class2 == EXCPT_CONTRIBUTORY)
+>                 || (class1 == EXCPT_PF && class2 != EXCPT_BENIGN)) {
+>                 /*
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index a14da36a30ed..dce756ffb577 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -120,12 +120,16 @@ static inline bool is_la57_mode(struct kvm_vcpu *vcpu)
+>  #endif
+>  }
+> 
+> -static inline bool x86_exception_has_error_code(unsigned int vector)
+> +static inline bool x86_exception_has_error_code(struct kvm_vcpu *vcpu,
+> +                                               unsigned int vector)
+>  {
+>         static u32 exception_has_error_code = BIT(DF_VECTOR) | BIT(TS_VECTOR) |
+>                         BIT(NP_VECTOR) | BIT(SS_VECTOR) | BIT(GP_VECTOR) |
+>                         BIT(PF_VECTOR) | BIT(AC_VECTOR) | BIT(CP_VECTOR);
+> 
+> +       if (vector == CP_VECTOR && (vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET))
+> +               return false;
+> +
+>         return (1U << vector) & exception_has_error_code;
+>  }
+> 
+> 
+> 
 > 
 
-Squashed, thanks.
+Squashed, thanks.  I made a small change to the last hunk:
 
-Paolo
+         if (!((1U << vector) & exception_has_error_code))
+                 return false;
+
+         if (vector == CP_VECTOR)
+                 return !(vcpu->arch.cr4_guest_rsvd_bits & X86_CR4_CET);
+
+         return true;
 
