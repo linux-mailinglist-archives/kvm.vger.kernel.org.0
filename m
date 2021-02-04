@@ -2,98 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3544630EA0D
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 03:21:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABD2130EA45
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 03:37:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233375AbhBDCUU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Feb 2021 21:20:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
+        id S234533AbhBDCgX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Feb 2021 21:36:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233077AbhBDCUT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Feb 2021 21:20:19 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74762C061573
-        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 18:19:39 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id s24so810290pjp.5
-        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 18:19:39 -0800 (PST)
+        with ESMTP id S233928AbhBDCgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Feb 2021 21:36:21 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE6FC0613D6
+        for <kvm@vger.kernel.org>; Wed,  3 Feb 2021 18:35:40 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id e62so1952777yba.5
+        for <kvm@vger.kernel.org>; Wed, 03 Feb 2021 18:35:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=bI15oVQgc1lFGULeaCog8tE69ZYTPzxNtQA/R861SRY=;
-        b=Ul6QJPOqgKCpkIj2uU3Ya196bFz7RuWWlxzfr/nMwlbTiEGDHGVJTmdhE83/bPxc84
-         6J3JrRSXI8eEVh+dxZ1/9JzGIz+k5HZQn4NAzVeTnMx3iG/wLMNk/T8mM3jmPkrKSwWi
-         canJoZNADlCZC/y6Ej4WVzdIU5Vmb4YIbQCuuh1Cv/kDcze5rxHO0wd4iZIhF1oZS97J
-         jgaeP/ZYjTSP1vXp6b7p7Wi3rUkb7ZN6x8FCp89VRtGctCyV5gg1LlkcefV48s6qHRPL
-         bdE5ZIgnyhgsnAMnR+YoPYVZ7pDOBP2BkEBOhzBTi6kW1q75dsEAFi1w9eHRS7bDiATT
-         s2QQ==
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=+Rhoed1XQepPnJf3F6uh773jLZ78lN8W7AVU2qB258o=;
+        b=hyYr9tldNB35f9XCt4oiqOeUSNLxT3NzdiZyYRqw2VWSCllNgj7jm86k+RuoZo3WKC
+         Q4U6sRpqW1+G9vn2tlCUnmHvyT5H+18d2QWAzl+Wr05TzOvImbvKjxLjMLjanHNltUBv
+         Vlv//0aK+8HssbdNw2hanUTO9l8zEJupWTSUKoB2OcElbV4Q1j+sLzlK1ZmBrQwQYYPP
+         UsaC1/czjkdIps5Xd7KXfnryrTz+4GuQZT8OuBP1TvjNj6NHkVQYjp0/MmdJ0JKrCuM4
+         YMzNqdvDMd13Y7OwjUVX1lvwHxdiKQTWvtvXQ5eGLsgnzmbVykh/0Aj1aFFOh/ZBsP+M
+         BPJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=bI15oVQgc1lFGULeaCog8tE69ZYTPzxNtQA/R861SRY=;
-        b=X/U2GTp7i0FfYsBdTnDnal8g1WeD5gCMIDnn11E8fZCtTgJMOPw9UVVCeC9BOBNd4y
-         M3BPdSu7Dnu45PZNiZ+9hFmeYMynP1PRv6PJCnmqs0vViaV26YbKZIWtCvhjPUYIjq44
-         elR5U4m5QHziiCt2g59b+9JrjpgDnhJaOe9bXRDoa+ykvpgUZPJ6okd9g7b5sM8j2SGi
-         gx/9/MkuekLa4r+I+FQSIArDKB/9reGZZ5D2+JSbEvSu6JZhVPCA/44FJiYfa1xf4dlI
-         Qja31PxmvrVFwcT3/XpJMypKnTuOOMKWzEAF+ROOSvHuMgPG0zQUOyeSPYlZxYkaWPlK
-         tvAQ==
-X-Gm-Message-State: AOAM531cMI46GTUC4mDw9RfeTDNukZ9/ZTEqiDapLIbk5UWFpcAOjj6y
-        BgwxxIUec8Vz78ATx1w4FaEA0w==
-X-Google-Smtp-Source: ABdhPJypw/YUgiSi5ZA2WhWPE4I6mYx08kPE1EXRXSSrf4FwN3n6GhJer5RMDpiqQP5ClCUruKsa0w==
-X-Received: by 2002:a17:90b:4c85:: with SMTP id my5mr6184510pjb.225.1612405178717;
-        Wed, 03 Feb 2021 18:19:38 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
-        by smtp.gmail.com with ESMTPSA id u26sm3497603pfm.61.2021.02.03.18.19.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Feb 2021 18:19:38 -0800 (PST)
-Date:   Wed, 3 Feb 2021 18:19:31 -0800
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=+Rhoed1XQepPnJf3F6uh773jLZ78lN8W7AVU2qB258o=;
+        b=XliIVHAkz8cQSg3nitjmoUzPutzMs38/eEQ4gzQp1a+93nEtW/+MRSSKV0cbpj3Qb0
+         I1DPXxr+0TIqqzhbwbg6bLcQfGWSwA6+VJA4+WwhT4pusvJQQim1J1hH478bTxEzPg1R
+         GE2KRtUd8SaAHvjEd+YlM6tCYr/G4hEL//FHvC6kKJUluKmLOuo6L3Q130O5vm/7fqDQ
+         j/8USGIxPh39P4UuczG+s7ASFE7ORna72AVAA6TGUbIEqMWPNgBpQnnSoCjEIF2ZCKx2
+         fFZANuR3jTODea0WnTJodYkVdBiRCtoLUy9F531G/7py8XI/IHj65QlByzbl6sFcOBP3
+         ZzhA==
+X-Gm-Message-State: AOAM530ciDm4y/k3o5UvxwrDMvUMtw6KKSGTI5GcWGFllmHhjlf5UhuA
+        Pab95Q8rEazxupKqbwt259vjyhnNsvs=
+X-Google-Smtp-Source: ABdhPJz31YtwdDoZ04CvFBL+71M8C0dpug36wp8GedSEwyhOz06UH9fTvuGaPWWibtMV0aUW3dA9nSUivBU=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:a9a0:e924:d161:b6cb])
+ (user=seanjc job=sendgmr) by 2002:a25:4e07:: with SMTP id c7mr8588817ybb.288.1612406140095;
+ Wed, 03 Feb 2021 18:35:40 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed,  3 Feb 2021 18:35:36 -0800
+Message-Id: <20210204023536.3397005-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
+Subject: [PATCH] KVM: SVM: Remove bogus WARN and emulation if guest #GPs with EFER.SVME=1
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>
-Subject: Re: [PATCH 07/12] KVM: x86: SEV: Treat C-bit as legal GPA bit
- regardless of vCPU mode
-Message-ID: <YBtZs4Z2ROeHyf3m@google.com>
-References: <20210204000117.3303214-1-seanjc@google.com>
- <20210204000117.3303214-8-seanjc@google.com>
- <5fa85e81a54800737a1417be368f0061324e0aec.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5fa85e81a54800737a1417be368f0061324e0aec.camel@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Bandan Das <bsd@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 04, 2021, Edgecombe, Rick P wrote:
-> On Wed, 2021-02-03 at 16:01 -0800, Sean Christopherson wrote:
-> >  
-> > -       unsigned long cr3_lm_rsvd_bits;
-> > +       u64 reserved_gpa_bits;
-> 
-> LAM defines bits above the GFN in CR3:
-> https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
-> 
-> KVM doesn't support this today of course, but it might be confusing to
-> try to combine the two concepts.
+Immediately reinject #GP (if intercepted) if the VMware backdoor is
+disabled and the instruction is not affected by the erratum that causes
+bogus #GPs on SVM instructions.  It is completely reasonable for the
+guest to take a #GP(0) with EFER.SVME=1, e.g. when probing an MSR, and
+attempting emulation on an unknown instruction is obviously not good.
 
-Ah, took me a few minutes, but I see what you're saying.  LAM will introduce
-bits that are repurposed for CR3, but not generic GPAs.  And, the behavior is
-based on CPU support, so it'd make sense to have a mask cached in vcpu->arch
-as opposed to constantly generating it on the fly.
+Fixes: b3f4e11adc7d ("KVM: SVM: Add emulation support for #GP triggered by SVM instructions")
+Cc: Bandan Das <bsd@redhat.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Definitely agree that having a separate cr3_lm_rsvd_bits or whatever is the
-right way to go when LAM comes along.  Not sure it's worth keeping a duplicate
-field in the meantime, though it would avoid a small amount of thrash.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f53e6377a933..707a2f85bcc6 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2263,7 +2263,8 @@ static int gp_interception(struct vcpu_svm *svm)
+ 	opcode = svm_instr_opcode(vcpu);
+ 
+ 	if (opcode == NONE_SVM_INSTR) {
+-		WARN_ON_ONCE(!enable_vmware_backdoor);
++		if (!enable_vmware_backdoor)
++			goto reinject;
+ 
+ 		/*
+ 		 * VMware backdoor emulation on #GP interception only handles
+-- 
+2.30.0.365.g02bc693789-goog
 
-Paolo, any thoughts?
