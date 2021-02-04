@@ -2,111 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D82C730F377
-	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 13:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA51C30F3A3
+	for <lists+kvm@lfdr.de>; Thu,  4 Feb 2021 14:06:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236180AbhBDMwJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 07:52:09 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11114 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236113AbhBDMwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Feb 2021 07:52:08 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B601bedcf0000>; Thu, 04 Feb 2021 04:51:27 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 4 Feb
- 2021 12:51:27 +0000
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.105)
- by HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Thu, 4 Feb 2021 12:51:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UeeEDNSrI8YV2nB9Y5a1FiFrscM2Hx1iy3CJCZGOAYLLgLNS+9LFSlZ+ouJToigAUMLe6/AwDkVo3eg1N1RlKFroCLbLFB6OOJBiI521GCR4eet1+QbnDO8AvU03RqCauXSi3Hn61YXIltJLf6MhBjn1dnhrulh6px7urBNMriyvH89ptdsVLJf2udNNEGESCxq7Kv3WxqkNKln6Rq+2jX2BuNf0b5176GhLp/y6HVTi+VCiz16q5cpXUkdXR0Dmm0QbaUiimRpcmUfjSX3/TobaBlXOLxmMOtyc4nfRuPUAXlADDSWW8yT0H911Ql/Mpgr/owE6Ym6EsF7L+zufaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+IVfWPx+gDezPU8wuhMlGznCTEXl0liDaimEVhEj51g=;
- b=kTIBLih1cHIZ8ZnZm+o8FDGOFFBtud2WNFf0590wxFxVb4YUS3GIUD8C5K+DHG1eJLEG4OZ8I0oWV8i6a2+L0uQ/EujcevLW+8A/QSvojQy0uBGA72cXToHXSKErgUPICILjDfNXhaNSx0vF12Yco92sLJIXUCnADKduq4+c6eAAa4qKFusOK4YdRwdGHaTmTX94p6UZIiMKKlQ41WNp0IAXsTaxPvz71EjmnbaCu4fWQ4nfH478YIceU8WHByH5gUgH13n9IqDoscL+a8qj7olNK579zBIbld564Ct8L960H9AW5fjk9/FwGzSujaZNn8E1F36nCl5FCufUXwHNvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3212.namprd12.prod.outlook.com (2603:10b6:5:186::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Thu, 4 Feb
- 2021 12:51:26 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3805.033; Thu, 4 Feb 2021
- 12:51:26 +0000
-Date:   Thu, 4 Feb 2021 08:51:23 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-Message-ID: <20210204125123.GI4247@nvidia.com>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
- <20210201162828.5938-9-mgurtovoy@nvidia.com>
- <20210201181454.22112b57.cohuck@redhat.com>
- <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
- <20210201114230.37c18abd@omen.home.shazbot.org>
- <20210202170659.1c62a9e8.cohuck@redhat.com>
- <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
- <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
- <34be24e6-7f62-9908-c56d-9e469c3b6965@nvidia.com>
- <83ef0164-6291-c3d1-0ce5-2c9d6c97469e@ozlabs.ru>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <83ef0164-6291-c3d1-0ce5-2c9d6c97469e@ozlabs.ru>
-X-ClientProxiedBy: MN2PR05CA0030.namprd05.prod.outlook.com
- (2603:10b6:208:c0::43) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S236228AbhBDNFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 08:05:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28965 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236224AbhBDNFG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Feb 2021 08:05:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612443819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LNmCI2qa2oNRzk6pe2ACw9Aec8o5VaxAt01B6jxHxt8=;
+        b=aIzKvfKXpY00jiOC2t2Q34FFTB8h4m0Gl2jh166tpHEc5YjD2kz4W8rmCi6JrEun9OvtDd
+        H+cCsHoSN1s60aXOsmbIGXTOXfY0TDmY+nyq1Z64hSSFJg+c8P/wcyBJdD/9C+Z7aLNCVY
+        4F5Dux2Ab03UCd10PTqlrTzC3rgSQq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-563-Cv-AFhI7N1CYleqpF1kyrA-1; Thu, 04 Feb 2021 08:03:35 -0500
+X-MC-Unique: Cv-AFhI7N1CYleqpF1kyrA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17CFD18CAE18;
+        Thu,  4 Feb 2021 13:03:34 +0000 (UTC)
+Received: from gondolin (ovpn-113-130.ams2.redhat.com [10.36.113.130])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D584C60C5F;
+        Thu,  4 Feb 2021 13:03:32 +0000 (UTC)
+Date:   Thu, 4 Feb 2021 14:03:29 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Elena Afanasova <eafanasova@gmail.com>
+Cc:     kvm@vger.kernel.org, stefanha@redhat.com, jag.raman@oracle.com,
+        elena.ufimtseva@oracle.com
+Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for
+ KVM_SET_IOREGION
+Message-ID: <20210204140329.5f3a49ca.cohuck@redhat.com>
+In-Reply-To: <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
+References: <cover.1611850290.git.eafanasova@gmail.com>
+        <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR05CA0030.namprd05.prod.outlook.com (2603:10b6:208:c0::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.11 via Frontend Transport; Thu, 4 Feb 2021 12:51:24 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l7e6V-003Lmu-N3; Thu, 04 Feb 2021 08:51:23 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1612443087; bh=+IVfWPx+gDezPU8wuhMlGznCTEXl0liDaimEVhEj51g=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=OUAtAYtL3TUaBLF1hYq+RtjUfzQnB7BIxpOZfCqh6p8d2hTfnDi+McIXo1ksXNc/w
-         gqEqMcjumC9YdE1/e/MQl5R3C8bY4aLYr59az8fvpLW8wCMFLsy5vjh4jV82cj1XSC
-         OiSw7L0m9H0j0pyD1hT2BTFWJenEZHzCgg8tzqPzUWRyjwkHh8KW5Zx3RUeAjrZD5Q
-         h7jJ6hEGmHP1ciD1qRnBa1l+2Af0Ta4DaAcjvxXVxklZsOxrnZUK8YM+Sr4dTacm/N
-         oMgb1C/FDq2weKpQo9AD6qANPdzR63s7FJ4I1hH6mvG1BujdqruZ7tf4gQMcGYnPPy
-         lNZ4/XAcBVOoQ==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 04, 2021 at 12:05:22PM +1100, Alexey Kardashevskiy wrote:
+On Fri, 29 Jan 2021 21:48:26 +0300
+Elena Afanasova <eafanasova@gmail.com> wrote:
 
-> It is system firmware (==bios) which puts stuff in the device tree. The
-> stuff is:
-> 1. emulated pci devices (custom pci bridges), one per nvlink, emulated by
-> the firmware, the driver is "ibmnpu" and it is a part on the nvidia driver;
-> these are basically config space proxies to the cpu's side of nvlink.
-> 2. interconnect information - which of 6 gpus nvlinks connected to which
-> nvlink on the cpu side, and memory ranges.
+[Note: I've just started looking at this, please excuse any questions
+that have already been answered elsewhere.]
 
-So what is this vfio_nvlink driver supposed to be bound to? 
+> This vm ioctl adds or removes an ioregionfd MMIO/PIO region. Guest
+> read and write accesses are dispatched through the given ioregionfd
+> instead of returning from ioctl(KVM_RUN). Regions can be deleted by
+> setting fds to -1.
+> 
+> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+> ---
+> Changes in v2:
+>   - changes after code review
+> 
+>  arch/x86/kvm/Kconfig     |   1 +
+>  arch/x86/kvm/Makefile    |   1 +
+>  arch/x86/kvm/x86.c       |   1 +
+>  include/linux/kvm_host.h |  17 +++
+>  include/uapi/linux/kvm.h |  23 ++++
+>  virt/kvm/Kconfig         |   3 +
+>  virt/kvm/eventfd.c       |  25 +++++
+>  virt/kvm/eventfd.h       |  14 +++
+>  virt/kvm/ioregion.c      | 232 +++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/ioregion.h      |  15 +++
+>  virt/kvm/kvm_main.c      |  11 ++
+>  11 files changed, 343 insertions(+)
+>  create mode 100644 virt/kvm/eventfd.h
+>  create mode 100644 virt/kvm/ioregion.c
+>  create mode 100644 virt/kvm/ioregion.h
 
-The "emulated pci devices"?
+(...)
 
-A real GPU function?
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index ca41220b40b8..81e775778c66 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
+>  	__u8  pad[36];
+>  };
+>  
+> +enum {
+> +	kvm_ioregion_flag_nr_pio,
+> +	kvm_ioregion_flag_nr_posted_writes,
+> +	kvm_ioregion_flag_nr_max,
+> +};
+> +
+> +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
+> +#define KVM_IOREGION_POSTED_WRITES (1 << kvm_ioregion_flag_nr_posted_writes)
+> +
+> +#define KVM_IOREGION_VALID_FLAG_MASK ((1 << kvm_ioregion_flag_nr_max) - 1)
+> +
+> +struct kvm_ioregion {
+> +	__u64 guest_paddr; /* guest physical address */
+> +	__u64 memory_size; /* bytes */
+> +	__u64 user_data;
+> +	__s32 rfd;
+> +	__s32 wfd;
 
-A real nvswitch function?
+I guess these are read and write file descriptors? Maybe call them
+read_fd and write_fd?
 
-Something else?
+> +	__u32 flags;
+> +	__u8  pad[28];
+> +};
+> +
+>  #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+>  #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+>  #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_X86_USER_SPACE_MSR 188
+>  #define KVM_CAP_X86_MSR_FILTER 189
+>  #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+> +#define KVM_CAP_IOREGIONFD 191
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
+>  					struct kvm_userspace_memory_region)
+>  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct kvm_ioregion)
 
-Jason
+This new ioctl needs some documentation under
+Documentation/virt/kvm/api.rst. (That would also make review easier.)
+
+>  
+>  /* enable ucontrol for s390 */
+>  struct kvm_s390_ucas_mapping {
+
+(...)
+
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index c2323c27a28b..aadb73903f8b 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -27,6 +27,7 @@
+>  #include <trace/events/kvm.h>
+>  
+>  #include <kvm/iodev.h>
+> +#include "ioregion.h"
+>  
+>  #ifdef CONFIG_HAVE_KVM_IRQFD
+>  
+> @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops ioeventfd_ops = {
+>  	.destructor = ioeventfd_destructor,
+>  };
+>  
+> +#ifdef CONFIG_KVM_IOREGION
+> +/* assumes kvm->slots_lock held */
+> +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
+> +			  u64 start, u64 size)
+> +{
+> +	struct _ioeventfd *_p;
+> +
+> +	list_for_each_entry(_p, &kvm->ioeventfds, list)
+> +		if (_p->bus_idx == bus_idx &&
+> +		    overlap(start, size, _p->addr,
+> +			    !_p->length ? 8 : _p->length))
+
+Not a problem right now, as this is x86 only, but I'm not sure we can
+define "overlap" in a meaningful way for every bus_idx. (For example,
+the s390-only ccw notifications use addr to identify a device; as long
+as addr is unique, there will be no clash. I'm not sure yet if
+ioregions are usable for ccw devices, and if yes, in which form, but we
+should probably keep it in mind.)
+
+> +			return true;
+> +
+> +	return false;
+> +}
+> +#endif
+> +
+>  /* assumes kvm->slots_lock held */
+>  static bool
+>  ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
+> @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
+>  		       _p->datamatch == p->datamatch))))
+>  			return true;
+>  
+> +#ifdef CONFIG_KVM_IOREGION
+> +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx == KVM_PIO_BUS)
+> +		if (kvm_ioregion_collides(kvm, p->bus_idx, p->addr,
+> +					  !p->length ? 8 : p->length))
+
+What about KVM_FAST_MMIO_BUS?
+
+> +			return true;
+> +#endif
+> +
+>  	return false;
+>  }
+>  
+
+(...)
+
+> +/* check for not overlapping case and reverse */
+> +inline bool
+> +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
+> +{
+> +	u64 end1 = start1 + size1 - 1;
+> +	u64 end2 = start2 + size2 - 1;
+> +
+> +	return !(end1 < start2 || start1 >= end2);
+> +}
+
+I'm wondering whether there's already a generic function to do a check
+like this?
+
+(...)
+
