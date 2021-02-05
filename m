@@ -2,253 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB88031077B
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 10:16:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B1BF31078C
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 10:19:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbhBEJNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 04:13:45 -0500
-Received: from foss.arm.com ([217.140.110.172]:52918 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229534AbhBEJLj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 04:11:39 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8964731B;
-        Fri,  5 Feb 2021 01:10:52 -0800 (PST)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC14D3F73B;
-        Fri,  5 Feb 2021 01:10:48 -0800 (PST)
-Subject: Re: [PATCH v17 1/7] arm/arm64: Probe for the presence of KVM
- hypervisor
-To:     Marc Zyngier <maz@kernel.org>, netdev@vger.kernel.org,
-        yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de,
-        pbonzini@redhat.com, seanjc@google.com, richardcochran@gmail.com,
-        Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com,
-        Andre.Przywara@arm.com
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
-        kernel-team@android.com
-References: <20210202141204.3134855-1-maz@kernel.org>
- <20210202141204.3134855-2-maz@kernel.org>
-From:   Steven Price <steven.price@arm.com>
-Message-ID: <d5765ade-7199-2d1e-6d59-d3de6a52c6ce@arm.com>
-Date:   Fri, 5 Feb 2021 09:11:00 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229720AbhBEJQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 04:16:48 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11683 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229529AbhBEJOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 04:14:42 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DX8nY3fJxzlGg7;
+        Fri,  5 Feb 2021 17:12:17 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 5 Feb 2021 17:13:51 +0800
+Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
+ HTTU
+To:     Robin Murphy <robin.murphy@arm.com>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20210128151742.18840-1-zhukeqian1@huawei.com>
+ <20210128151742.18840-2-zhukeqian1@huawei.com>
+ <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
+CC:     Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, <jiangkunkun@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        "Cornelia Huck" <cohuck@redhat.com>, <lushenming@huawei.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        James Morse <james.morse@arm.com>,
+        <wanghaibin.wang@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com>
+Date:   Fri, 5 Feb 2021 17:13:50 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210202141204.3134855-2-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/02/2021 14:11, Marc Zyngier wrote:
-> From: Will Deacon <will@kernel.org>
+Hi Robin and Jean,
+
+On 2021/2/5 3:50, Robin Murphy wrote:
+> On 2021-01-28 15:17, Keqian Zhu wrote:
+>> From: jiangkunkun <jiangkunkun@huawei.com>
+>>
+>> The SMMU which supports HTTU (Hardware Translation Table Update) can
+>> update the access flag and the dirty state of TTD by hardware. It is
+>> essential to track dirty pages of DMA.
+>>
+>> This adds feature detection, none functional change.
+>>
+>> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
+>> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
+>> ---
+>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
+>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
+>>   include/linux/io-pgtable.h                  |  1 +
+>>   3 files changed, 25 insertions(+)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 8ca7415d785d..0f0fe71cc10d 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
+>>           .pgsize_bitmap    = smmu->pgsize_bitmap,
+>>           .ias        = ias,
+>>           .oas        = oas,
+>> +        .httu_hd    = smmu->features & ARM_SMMU_FEAT_HTTU_HD,
+>>           .coherent_walk    = smmu->features & ARM_SMMU_FEAT_COHERENCY,
+>>           .tlb        = &arm_smmu_flush_ops,
+>>           .iommu_dev    = smmu->dev,
+>> @@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+>>       if (reg & IDR0_HYP)
+>>           smmu->features |= ARM_SMMU_FEAT_HYP;
+>>   +    switch (FIELD_GET(IDR0_HTTU, reg)) {
 > 
-> Although the SMCCC specification provides some limited functionality for
-> describing the presence of hypervisor and firmware services, this is
-> generally applicable only to functions designated as "Arm Architecture
-> Service Functions" and no portable discovery mechanism is provided for
-> standard hypervisor services, despite having a designated range of
-> function identifiers reserved by the specification.
+> We need to accommodate the firmware override as well if we need this to be meaningful. Jean-Philippe is already carrying a suitable patch in the SVA stack[1].
+Robin, Thanks for pointing it out.
+
+Jean, I see that the IORT HTTU flag overrides the hardware register info unconditionally. I have some concern about it:
+
+If the override flag has HTTU but hardware doesn't support it, then driver will use this feature but receive access fault or permission fault from SMMU unexpectedly.
+1) If IOPF is not supported, then kernel can not work normally.
+2) If IOPF is supported, kernel will perform useless actions, such as HTTU based dma dirty tracking (this series).
+
+As the IORT spec doesn't give an explicit explanation for HTTU override, can we comprehend it as a mask for HTTU related hardware register?
+So the logic becomes: smmu->feature = HTTU override & IDR0_HTTU;
+
 > 
-> In an attempt to avoid the need for additional firmware changes every
-> time a new function is added, introduce a UID to identify the service
-> provider as being compatible with KVM. Once this has been established,
-> additional services can be discovered via a feature bitmap.
+>> +    case IDR0_HTTU_NONE:
+>> +        break;
+>> +    case IDR0_HTTU_HA:
+>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
+>> +        break;
+>> +    case IDR0_HTTU_HAD:
+>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
+>> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
+>> +        break;
+>> +    default:
+>> +        dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
+>> +        return -ENXIO;
+>> +    }
+>> +
+>>       /*
+>>        * The coherency feature as set by FW is used in preference to the ID
+>>        * register, but warn on mismatch.
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>> index 96c2e9565e00..e91bea44519e 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+>> @@ -33,6 +33,10 @@
+>>   #define IDR0_ASID16            (1 << 12)
+>>   #define IDR0_ATS            (1 << 10)
+>>   #define IDR0_HYP            (1 << 9)
+>> +#define IDR0_HTTU            GENMASK(7, 6)
+>> +#define IDR0_HTTU_NONE            0
+>> +#define IDR0_HTTU_HA            1
+>> +#define IDR0_HTTU_HAD            2
+>>   #define IDR0_COHACC            (1 << 4)
+>>   #define IDR0_TTF            GENMASK(3, 2)
+>>   #define IDR0_TTF_AARCH64        2
+>> @@ -286,6 +290,8 @@
+>>   #define CTXDESC_CD_0_TCR_TBI0        (1ULL << 38)
+>>     #define CTXDESC_CD_0_AA64        (1UL << 41)
+>> +#define CTXDESC_CD_0_HD            (1UL << 42)
+>> +#define CTXDESC_CD_0_HA            (1UL << 43)
+>>   #define CTXDESC_CD_0_S            (1UL << 44)
+>>   #define CTXDESC_CD_0_R            (1UL << 45)
+>>   #define CTXDESC_CD_0_A            (1UL << 46)
+>> @@ -604,6 +610,8 @@ struct arm_smmu_device {
+>>   #define ARM_SMMU_FEAT_RANGE_INV        (1 << 15)
+>>   #define ARM_SMMU_FEAT_BTM        (1 << 16)
+>>   #define ARM_SMMU_FEAT_SVA        (1 << 17)
+>> +#define ARM_SMMU_FEAT_HTTU_HA        (1 << 18)
+>> +#define ARM_SMMU_FEAT_HTTU_HD        (1 << 19)
+>>       u32                features;
+>>     #define ARM_SMMU_OPT_SKIP_PREFETCH    (1 << 0)
+>> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
+>> index ea727eb1a1a9..1a00ea8562c7 100644
+>> --- a/include/linux/io-pgtable.h
+>> +++ b/include/linux/io-pgtable.h
+>> @@ -97,6 +97,7 @@ struct io_pgtable_cfg {
+>>       unsigned long            pgsize_bitmap;
+>>       unsigned int            ias;
+>>       unsigned int            oas;
+>> +    bool                httu_hd;
 > 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> [maz: move code to its own file, plug it into PSCI]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20201209060932.212364-2-jianyong.wu@arm.com
-> ---
->   arch/arm/include/asm/hypervisor.h   |  3 ++
->   arch/arm64/include/asm/hypervisor.h |  3 ++
->   drivers/firmware/psci/psci.c        |  2 ++
->   drivers/firmware/smccc/Makefile     |  2 +-
->   drivers/firmware/smccc/kvm_guest.c  | 51 +++++++++++++++++++++++++++++
->   drivers/firmware/smccc/smccc.c      |  1 +
->   include/linux/arm-smccc.h           | 25 ++++++++++++++
->   7 files changed, 86 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/firmware/smccc/kvm_guest.c
+> This is very specific to the AArch64 stage 1 format, not a generic capability - I think it should be a quirk flag rather than a common field.
+OK, so BBML should be a quirk flag too?
+
+Though the word "quirk" is not suitable for HTTU and BBML, we have no other place to convey smmu feature to io-pgtable.
+
+Maybe we can add another field named "iommu_features"? Anyway, I am OK with putting them into quirk flag. :-)
+
 > 
-> diff --git a/arch/arm/include/asm/hypervisor.h b/arch/arm/include/asm/hypervisor.h
-> index df8524365637..bd61502b9715 100644
-> --- a/arch/arm/include/asm/hypervisor.h
-> +++ b/arch/arm/include/asm/hypervisor.h
-> @@ -4,4 +4,7 @@
->   
->   #include <asm/xen/hypervisor.h>
->   
-> +void kvm_init_hyp_services(void);
-> +bool kvm_arm_hyp_service_available(u32 func_id);
-> +
->   #endif
-> diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
-> index f9cc1d021791..0ae427f352c8 100644
-> --- a/arch/arm64/include/asm/hypervisor.h
-> +++ b/arch/arm64/include/asm/hypervisor.h
-> @@ -4,4 +4,7 @@
->   
->   #include <asm/xen/hypervisor.h>
->   
-> +void kvm_init_hyp_services(void);
-> +bool kvm_arm_hyp_service_available(u32 func_id);
-> +
->   #endif
-> diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-> index f5fc429cae3f..69e296f02902 100644
-> --- a/drivers/firmware/psci/psci.c
-> +++ b/drivers/firmware/psci/psci.c
-> @@ -23,6 +23,7 @@
->   
->   #include <asm/cpuidle.h>
->   #include <asm/cputype.h>
-> +#include <asm/hypervisor.h>
->   #include <asm/system_misc.h>
->   #include <asm/smp_plat.h>
->   #include <asm/suspend.h>
-> @@ -498,6 +499,7 @@ static int __init psci_probe(void)
->   		psci_init_cpu_suspend();
->   		psci_init_system_suspend();
->   		psci_init_system_reset2();
-> +		kvm_init_hyp_services();
->   	}
->   
->   	return 0;
-> diff --git a/drivers/firmware/smccc/Makefile b/drivers/firmware/smccc/Makefile
-> index 72ab84042832..40d19144a860 100644
-> --- a/drivers/firmware/smccc/Makefile
-> +++ b/drivers/firmware/smccc/Makefile
-> @@ -1,4 +1,4 @@
->   # SPDX-License-Identifier: GPL-2.0
->   #
-> -obj-$(CONFIG_HAVE_ARM_SMCCC_DISCOVERY)	+= smccc.o
-> +obj-$(CONFIG_HAVE_ARM_SMCCC_DISCOVERY)	+= smccc.o kvm_guest.o
->   obj-$(CONFIG_ARM_SMCCC_SOC_ID)	+= soc_id.o
-> diff --git a/drivers/firmware/smccc/kvm_guest.c b/drivers/firmware/smccc/kvm_guest.c
-> new file mode 100644
-> index 000000000000..23ce1ded88b4
-> --- /dev/null
-> +++ b/drivers/firmware/smccc/kvm_guest.c
-> @@ -0,0 +1,51 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#define pr_fmt(fmt) "smccc: KVM: " fmt
-> +
-> +#include <linux/init.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/kernel.h>
-> +#include <linux/string.h>
-> +
-> +static DECLARE_BITMAP(__kvm_arm_hyp_services, ARM_SMCCC_KVM_NUM_FUNCS) __ro_after_init = { };
-> +
-> +void __init kvm_init_hyp_services(void)
-> +{
-> +	int i;
-> +	struct arm_smccc_res res;
-> +
-> +	if (arm_smccc_1_1_get_conduit() != SMCCC_CONDUIT_HVC)
-> +		return;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, &res);
-> +	if (res.a0 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0 ||
-> +	    res.a1 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1 ||
-> +	    res.a2 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 ||
-> +	    res.a3 != ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3)
-> +		return;
-> +
-> +	memset(&res, 0, sizeof(res));
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID, &res);
-> +	for (i = 0; i < 32; ++i) {
-> +		if (res.a0 & (i))
-> +			set_bit(i + (32 * 0), __kvm_arm_hyp_services);
-> +		if (res.a1 & (i))
-> +			set_bit(i + (32 * 1), __kvm_arm_hyp_services);
-> +		if (res.a2 & (i))
-> +			set_bit(i + (32 * 2), __kvm_arm_hyp_services);
-> +		if (res.a3 & (i))
-> +			set_bit(i + (32 * 3), __kvm_arm_hyp_services);
-
-The bit shifts are missing, the tests should be of the form:
-
-	if (res.a0 & (1 << i))
-
-Or indeed using a BIT() macro.
-
-Steve
-
-> +	}
-> +
-> +	pr_info("hypervisor services detected (0x%08lx 0x%08lx 0x%08lx 0x%08lx)\n",
-> +		 res.a3, res.a2, res.a1, res.a0);
-> +}
-> +
-> +bool kvm_arm_hyp_service_available(u32 func_id)
-> +{
-> +	if (func_id >= ARM_SMCCC_KVM_NUM_FUNCS)
-> +		return -EINVAL;
-> +
-> +	return test_bit(func_id, __kvm_arm_hyp_services);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_arm_hyp_service_available);
-> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
-> index 00c88b809c0c..94eca6ffda05 100644
-> --- a/drivers/firmware/smccc/smccc.c
-> +++ b/drivers/firmware/smccc/smccc.c
-> @@ -7,6 +7,7 @@
->   
->   #include <linux/init.h>
->   #include <linux/arm-smccc.h>
-> +#include <linux/kernel.h>
->   
->   static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
->   static enum arm_smccc_conduit smccc_conduit = SMCCC_CONDUIT_NONE;
-> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
-> index f860645f6512..74e90b65b489 100644
-> --- a/include/linux/arm-smccc.h
-> +++ b/include/linux/arm-smccc.h
-> @@ -55,6 +55,8 @@
->   #define ARM_SMCCC_OWNER_TRUSTED_OS	50
->   #define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
->   
-> +#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
-> +
->   #define ARM_SMCCC_QUIRK_NONE		0
->   #define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
->   
-> @@ -87,6 +89,29 @@
->   			   ARM_SMCCC_SMC_32,				\
->   			   0, 0x7fff)
->   
-> +#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
-> +
-> +/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
-> +
-> +/* KVM "vendor specific" services */
-> +#define ARM_SMCCC_KVM_FUNC_FEATURES		0
-> +#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-> +#define ARM_SMCCC_KVM_NUM_FUNCS			128
-> +
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_FUNC_FEATURES)
-> +
->   #define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
->   
->   /* Paravirtualised time calls (defined by ARM DEN0057A) */
+> Robin.
 > 
-
+> [1] https://jpbrucker.net/git/linux/commit/?h=sva/current&id=1ef7d512fb9082450dfe0d22ca4f7e35625a097b
+> 
+>>       bool                coherent_walk;
+>>       const struct iommu_flush_ops    *tlb;
+>>       struct device            *iommu_dev;
+>>
+> .
+> 
+Thanks,
+Keqian
