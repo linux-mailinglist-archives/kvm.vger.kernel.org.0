@@ -2,235 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2F80310DDD
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 17:27:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD39310E3A
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 17:58:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232828AbhBEOr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 09:47:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43642 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229808AbhBEOlT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 09:41:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612541917;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OO/Z9Pbt3ecs88CwJUi87r2qp3LeYfy2PFUUcweybu4=;
-        b=LaE9WMomg7O8+qc/pEbruBstnc/YHzF9/5gybqpbBvsCVMr5U5fwTQ1vpud1/Fe7nK6lok
-        fBqFYu51Lct82JJiVcIo/vp1rWQFEGp3Oda4Jl5gJ/QzcZaEzs45mxsGS9WvpjaluMDZmV
-        cXTuxVYGIOiZpdEhwt3uj5a8q5GvyYY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-JjOKQRXqNmeTfRJ6sQkKCw-1; Fri, 05 Feb 2021 09:17:58 -0500
-X-MC-Unique: JjOKQRXqNmeTfRJ6sQkKCw-1
-Received: by mail-wr1-f70.google.com with SMTP id w3so5377880wrm.22
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 06:17:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=OO/Z9Pbt3ecs88CwJUi87r2qp3LeYfy2PFUUcweybu4=;
-        b=H3kC4Zan9S62aeg3yYLJKtlJHEtyN7idjajAJEzqtaK7H3pBvLGPr4pSUNe9qHJuwW
-         nK38YWI0zs0f6KRyj96UktGtb5C9OFsD4jT18s6yvAL6J2edkrS91aS1GXXcnVtyHisi
-         9D+utsa8FV0KXkYpxHLualzIczDlkWblUOyn6YJNm6YVctOnD0FFqPqfpCEbrIiI+U7i
-         ymMzlJLRkbFQK6CZHXw8bO0rvuAM3ZMafcJSW1lRIsqz2yXN+QTT9+Ho980zxoR40YoP
-         7Rvb481YhEZlFQ257vO2eEShZx5R7CLaHG8WSTgK8TDk1JRrHbC48I1rT7XpqmkI4Fgp
-         dnnA==
-X-Gm-Message-State: AOAM532dBy/KHgZWODoUyRIP9UM2WVwzJs2Tp02gHafBd8yxcXjqSWfa
-        8hLVRZ6FmCNY4k7WSvr5tGGGgNRbaxLH1riTruJbuDqErmzj+oUNwfdu/jsCLG706hbELwPD3rL
-        SXIcd4ldEA0Um
-X-Received: by 2002:a5d:6b47:: with SMTP id x7mr5469519wrw.170.1612534677389;
-        Fri, 05 Feb 2021 06:17:57 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzhXbMuzW+9lf4mHkd5Twhn2KBAz8ru70DzypAHZB3/V1aKyI0GBYXHQZ9Aqaw239oEpTOgNw==
-X-Received: by 2002:a5d:6b47:: with SMTP id x7mr5469488wrw.170.1612534677136;
-        Fri, 05 Feb 2021 06:17:57 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id n9sm12749550wrq.41.2021.02.05.06.17.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 06:17:56 -0800 (PST)
-Date:   Fri, 5 Feb 2021 15:17:54 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, Eli Cohen <elic@nvidia.com>,
-        virtualization@lists.linux-foundation.org,
-        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 08/13] vdpa: add return value to get_config/set_config
- callbacks
-Message-ID: <20210205141754.cyp4q77cqrj4xx7p@steredhat>
-References: <20210204172230.85853-1-sgarzare@redhat.com>
- <20210204172230.85853-9-sgarzare@redhat.com>
- <fe6d02be-b6f9-b07f-a86b-97912dddffdc@redhat.com>
- <20210205084847.d4pkqq2sbqs3p53r@steredhat>
- <20210205091123-mutt-send-email-mst@kernel.org>
+        id S233144AbhBEPLg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 10:11:36 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40954 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232452AbhBEPJG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 10:09:06 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 115EUUVk130128;
+        Fri, 5 Feb 2021 14:36:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=bZnsJRLCixV8Q4FHmdZUjiKTh0jq3DZTpRazAIj2Gyg=;
+ b=MbkFUBRyJviUHdqnr6hfIzoxP7jpMFCiT+na4RMCg7CCNc4n3V6qZYq2DtFZ1vqvpFev
+ w9dm9iBVu9ilYE4rVL5BxBME1K1i4GH2eNzs/S08ekU0UPRBqHb0ujpVf3SCyE3eeN9A
+ HNnwp6Aubr6qcYfN2g5iXa1qYApSVaA/FKY81DlivY5qpcoE8PSPpOca4k8+o0tL8hNM
+ gon5OXMQVF02QKQbKGlBvKz18iwgGR3gPweScKDvNdPJg9FHDqaaXYcMZPEXje0olhlY
+ Sl1BzIeK3bDVFAFFIV+0ixGsMcxHXy5JZ/bCi4scPbMWJCxsw6K+8BAhZKEJXjBgcd/N 9A== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 36cxvrcnd3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Feb 2021 14:36:54 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 115ETer1188784;
+        Fri, 5 Feb 2021 14:36:53 GMT
+Received: from nam04-bn8-obe.outbound.protection.outlook.com (mail-bn8nam08lp2040.outbound.protection.outlook.com [104.47.74.40])
+        by aserp3030.oracle.com with ESMTP id 36dh1u0fhx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Feb 2021 14:36:53 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N5sdtEyVK1erKhf/bl9Die4fmYhQJjMjuywPOz+3YAsOjffrykykSk2KC3DETgJtkDAT9XutUA/GHAB8eBc8wmJeAzY+2m9vyeSjxPoMCaBSGH4nBN6INEK8g1NDh9rhfmC0FNMUs7Q+vsVh1p1CRBvVrp3DeNN7cr3bnEKUaRYUnourtX15xqF0Y+F+UDiUzyx6BhmEJDA4G3jbavZVscYQ0DYjlhp5yRLCiCwVolQlq5iR9PyyaS+gQ+VytGOQpX0qrvUuecuiNQqq1Szu4TUfD2J1WfeImIFSCCeBczKHMBKbMRSjsvSPgrhirBQgW/QaMC7rLR0gkZ6+OdRymg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bZnsJRLCixV8Q4FHmdZUjiKTh0jq3DZTpRazAIj2Gyg=;
+ b=QQ9hIqOACdjTPS8yrlcVMbc4kzZnjth8E/aznNUu32s6J6z2IbvZy3EDF3vDfnFdMEK51fPNx1hWhXeTgw/oESY5Q+camNYrxeOpuJXZuukIejWqLKfXCol0WNwg7DZQhUccRVBYw3y5ypxNZXNd2mu7YXRefQKXn6pQrBjtVWiyL9Og4zI4gtkt/FjNdkPeIj8npnA6Aq+w2X0vaPm+W39PIaTXBtX+AWCDmEckXBIO9A+EP8Idtc6g4kBJe9SjOsJ1jnvTbLs+8auSlhBy6ocCiaybcy0AE9zbddBxBNpeZzfP0Ftgsif+9Xk/kbJ2ibL9x7VIwFIVicssY9/y4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bZnsJRLCixV8Q4FHmdZUjiKTh0jq3DZTpRazAIj2Gyg=;
+ b=qUekJ+XF+Ygtf3egS76H8sBGp6RZNEl2UtHS7YW2whgWdJWo4PcB+fTh7b6cAe8399Pzl5QEgF6bmEgDo5DfSjvwCGAfEZYzeOiO4qmO6RZYE1CTvaBCqXV2oqXkp41/s1jEWMK4ijKDfv+sMchH++tH7ZiF9IciFlx2np+ucNo=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from BYAPR10MB3077.namprd10.prod.outlook.com (2603:10b6:a03:8c::12)
+ by BY5PR10MB4369.namprd10.prod.outlook.com (2603:10b6:a03:204::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.19; Fri, 5 Feb
+ 2021 14:36:51 +0000
+Received: from BYAPR10MB3077.namprd10.prod.outlook.com
+ ([fe80::74a8:8649:e20b:d571]) by BYAPR10MB3077.namprd10.prod.outlook.com
+ ([fe80::74a8:8649:e20b:d571%7]) with mapi id 15.20.3805.024; Fri, 5 Feb 2021
+ 14:36:51 +0000
+Subject: Re: linux-next: Signed-off-by missing for commit in the kvm tree
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Woodhouse <dwmw@amazon.co.uk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        KVM <kvm@vger.kernel.org>
+References: <20210205071821.7cbcb8b8@canb.auug.org.au>
+From:   Joao Martins <joao.m.martins@oracle.com>
+Message-ID: <37cae84d-3ef2-f5fc-0dae-55b3d346ef3b@oracle.com>
+Date:   Fri, 5 Feb 2021 14:36:44 +0000
+In-Reply-To: <20210205071821.7cbcb8b8@canb.auug.org.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [94.61.1.144]
+X-ClientProxiedBy: LO4P123CA0092.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:191::7) To BYAPR10MB3077.namprd10.prod.outlook.com
+ (2603:10b6:a03:8c::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210205091123-mutt-send-email-mst@kernel.org>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.67] (94.61.1.144) by LO4P123CA0092.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:191::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.19 via Frontend Transport; Fri, 5 Feb 2021 14:36:49 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c335adfa-e292-419c-49b2-08d8c9e379f6
+X-MS-TrafficTypeDiagnostic: BY5PR10MB4369:
+X-Microsoft-Antispam-PRVS: <BY5PR10MB4369213E1AA740F83AE7B189BBB29@BY5PR10MB4369.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9t0ZITnjjaWtg7rIZKigH2dRaAuK8nVdie37KSdD2/4dWtvpkaK8jVAE5PAmqETQExFvUKZxJoeROoSb9OrB/GE4SAVbRFyyrtKGwGBbn7hMnO2Q9F0/i1fm1QNxZN2R8fPFcTd1sGOpt424JSkQOgWcHx639HHyb/o2CHL7xtsivytOP0O0qkzcass8VHWiksQD0/yYCzgo/qlM9yisPahbrrpPrez97YO/Ya+6/r4297JS1PSwanpZ+xleRvJ4//q8uYLLJfSGc3k9Sv+SoUJt4forRdTCfaJ+B/ST/SbLkVG4AZ+P1kyIgSDfEYT4FYJ8Ic8b4NCaqzJ2OIrGcW2DpSf9mcYTsddUP5vjecUNTzqPEaE5AB7xiV7KdHgFlKbVtjBmaudF5wrsprYL31/Ks+KfvnJ0CjqVheUEDZJziLlGBAL9upFkqTey6Vv5AXzf2ynT16YYxnFXEPxnf2A9yMOIY4qamA1rgOwErXcvJCRlzuwPHUGGELEaeAq0zlizyEVz/QqwplVH2v4vkZhWzKyhXBK3q0A7qbbsAtzF9O3l07LXBv7avgbD+DlxTc9ozKob4d1hJWvP6+P8Iw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB3077.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(346002)(396003)(376002)(39860400002)(366004)(6486002)(6916009)(53546011)(2616005)(5660300002)(86362001)(558084003)(31696002)(16576012)(31686004)(26005)(4326008)(956004)(186003)(6666004)(8676002)(16526019)(36756003)(54906003)(478600001)(66946007)(66476007)(8936002)(66556008)(2906002)(316002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?Windows-1252?Q?K0wF9IB1+KyM7qhUosEzZPtpEAGAZRRJEmVBnt9Wf6Y1IRLzFJ5+DeYG?=
+ =?Windows-1252?Q?XIuNL7ZGbJBt4le1cSkGw1DKafx95chtBlGvmFLzl/qPaGgLiGE1w1r5?=
+ =?Windows-1252?Q?34KDuPxtTN1exgm0+PZFq5HnKDhs9iTJAh0ZECoXqPdNzIyu/O5XMJnH?=
+ =?Windows-1252?Q?tp8FP19kqw+jOD4IRy600rU2qA+9j8sPigk+GJBy6nITkEanI2JY8tJV?=
+ =?Windows-1252?Q?AhhOGT7IEmaIjO4Z1PmWuJpMDgp0/5YD6IAFsN3kjAsGhnCKnU/0rMTt?=
+ =?Windows-1252?Q?0POEeGtIRmcBqKCDN6a1vj8YhwWy0xTF1Lr+hFqOPy4X9X/6oFhn95za?=
+ =?Windows-1252?Q?4TiS4nghY7q8SbsbcFgTzv9wEDah9JD0fTp2zwjzjqN83S1cL7WOAb3T?=
+ =?Windows-1252?Q?OkHeFQ5azu1LVj1zfQcD64IontXX4aqMKG+Uxc6OZS2Hi8YUxnhfFUJH?=
+ =?Windows-1252?Q?4VToKLJaZGRa85hxYc32auDkneO90Jm5SweI+ecNObIzt29x/y9wTWlP?=
+ =?Windows-1252?Q?98VrA9r5COhz01PSOq4L53Baf2QHkc3iDGNcvxEf510q2MXaR+cjCnl9?=
+ =?Windows-1252?Q?8Qilcl2DsYZ7KWPy5gJiFbHUo0Jv3qf3A3BV8hTZJ1Ilj/JyWj2YkNIz?=
+ =?Windows-1252?Q?PICEnONguiT0xSEv80HuGvU7i8aFtdqR5G3ZckbiNayC9cK9KNEkjSAX?=
+ =?Windows-1252?Q?lytPM4jTgzpwRmZQ6wi9B+J5Pn7k3yQ8eMAkfbhUCs3BlF/OQ5KwPupo?=
+ =?Windows-1252?Q?FNcy1nYIpSC81SQ8zwdQI50ZmIO/S6EB7jNabAmvb1sRItuW10C23XxE?=
+ =?Windows-1252?Q?s7o7JV50ffeMn39ozT5W1r9NgDK+JhbU2ZC4+Q8383dM8Pb96tBg55K8?=
+ =?Windows-1252?Q?Y/1uCEjxcuMfN2gfmm+dnV7KnRn7ssX4wn6GtdtyT/YhPr0t9l7tILVS?=
+ =?Windows-1252?Q?Aaa2KuC+ChPVXBK4+oj1zsK9hWgeiGW6a8fz72NaqSuf6qhxW7/U99W9?=
+ =?Windows-1252?Q?BKvnOdTJuUtClbgFqfZf+NLn9ufcatejgj/ixlWm0sD/YytE9b7ExN44?=
+ =?Windows-1252?Q?Fui5ZXtENWjRFRZ3Hr/LN/3lrqD1EYjmELh5ZBdQr7PYTl7HSZYdl88q?=
+ =?Windows-1252?Q?rwLfIWj8ILZZbgag5rRsaJ9Mc9wFgsXU802CuJhLqIBx/CcCDnWS9ph5?=
+ =?Windows-1252?Q?rX4pcckWHRAlEq7UpCE66W4yebAgYQTe62LJv3BMdfylvmQ5L5mAfmFW?=
+ =?Windows-1252?Q?TDYAyvDCieBHNhpsIultz5/gvev4JxCAZgdeT2xg76DzqGfJtiRxXwCH?=
+ =?Windows-1252?Q?g4KzIlOnphBMmU6CfzRzpBmCS/P5N7JQnu7jLXdKTDUTOMVJH5sU3arH?=
+ =?Windows-1252?Q?GgygskTcmqPz9RLEgRjlmAK9bHf0Sv2RYIdacHHADjOdVefnvZg5ECEo?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c335adfa-e292-419c-49b2-08d8c9e379f6
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB3077.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2021 14:36:51.7176
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ak6qh47xVqQMe3Jvui9y8Sl1woVi8GrC60v6hLSm7OgXKdsBpZA5bOvrirZrF6IVRGk3+uqkCGolo66nefhGnAThjdojNPqY2dZbIwSM1+A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4369
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9885 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 phishscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102050096
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9885 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ mlxscore=0 priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1011
+ suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102050096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 09:11:26AM -0500, Michael S. Tsirkin wrote:
->On Fri, Feb 05, 2021 at 09:48:47AM +0100, Stefano Garzarella wrote:
->> Adding Eli in the loop.
->>
->> On Fri, Feb 05, 2021 at 11:20:11AM +0800, Jason Wang wrote:
->> >
->> > On 2021/2/5 上午1:22, Stefano Garzarella wrote:
->> > > All implementations of these callbacks already validate inputs.
->> > >
->> > > Let's return an error from these callbacks, so the caller doesn't
->> > > need to validate the input anymore.
->> > >
->> > > We update all implementations to return -EINVAL in case of invalid
->> > > input.
->> > >
->> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> > > ---
->> > >  include/linux/vdpa.h              | 18 ++++++++++--------
->> > >  drivers/vdpa/ifcvf/ifcvf_main.c   | 24 ++++++++++++++++--------
->> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 17 +++++++++++------
->> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 16 ++++++++++------
->> > >  4 files changed, 47 insertions(+), 28 deletions(-)
->> > >
->> > > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->> > > index 4ab5494503a8..0e0cbd5fb41b 100644
->> > > --- a/include/linux/vdpa.h
->> > > +++ b/include/linux/vdpa.h
->> > > @@ -157,6 +157,7 @@ struct vdpa_iova_range {
->> > >   *				@buf: buffer used to read to
->> > >   *				@len: the length to read from
->> > >   *				configuration space
->> > > + *				Returns integer: success (0) or error (< 0)
->> > >   * @set_config:			Write to device specific configuration space
->> > >   *				@vdev: vdpa device
->> > >   *				@offset: offset from the beginning of
->> > > @@ -164,6 +165,7 @@ struct vdpa_iova_range {
->> > >   *				@buf: buffer used to write from
->> > >   *				@len: the length to write to
->> > >   *				configuration space
->> > > + *				Returns integer: success (0) or error (< 0)
->> > >   * @get_generation:		Get device config generation (optional)
->> > >   *				@vdev: vdpa device
->> > >   *				Returns u32: device generation
->> > > @@ -231,10 +233,10 @@ struct vdpa_config_ops {
->> > >  	u32 (*get_vendor_id)(struct vdpa_device *vdev);
->> > >  	u8 (*get_status)(struct vdpa_device *vdev);
->> > >  	void (*set_status)(struct vdpa_device *vdev, u8 status);
->> > > -	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
->> > > -			   void *buf, unsigned int len);
->> > > -	void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
->> > > -			   const void *buf, unsigned int len);
->> > > +	int (*get_config)(struct vdpa_device *vdev, unsigned int offset,
->> > > +			  void *buf, unsigned int len);
->> > > +	int (*set_config)(struct vdpa_device *vdev, unsigned int offset,
->> > > +			  const void *buf, unsigned int len);
->> > >  	u32 (*get_generation)(struct vdpa_device *vdev);
->> > >  	struct vdpa_iova_range (*get_iova_range)(struct vdpa_device *vdev);
->> > > @@ -329,8 +331,8 @@ static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
->> > >  }
->> > > -static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
->> > > -				   void *buf, unsigned int len)
->> > > +static inline int vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
->> > > +				  void *buf, unsigned int len)
->> > >  {
->> > >          const struct vdpa_config_ops *ops = vdev->config;
->> > > @@ -339,8 +341,8 @@ static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
->> > >  	 * If it does happen we assume a legacy guest.
->> > >  	 */
->> > >  	if (!vdev->features_valid)
->> > > -		vdpa_set_features(vdev, 0);
->> > > -	ops->get_config(vdev, offset, buf, len);
->> > > +		return vdpa_set_features(vdev, 0);
->> > > +	return ops->get_config(vdev, offset, buf, len);
->> > >  }
->> > >  /**
->> > > diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
->> > > index 7c8bbfcf6c3e..f5e6a90d8114 100644
->> > > --- a/drivers/vdpa/ifcvf/ifcvf_main.c
->> > > +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
->> > > @@ -332,24 +332,32 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
->> > >  	return IFCVF_QUEUE_ALIGNMENT;
->> > >  }
->> > > -static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
->> > > -				  unsigned int offset,
->> > > -				  void *buf, unsigned int len)
->> > > +static int ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
->> > > +				 unsigned int offset,
->> > > +				 void *buf, unsigned int len)
->> > >  {
->> > >  	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->> > > -	WARN_ON(offset + len > sizeof(struct virtio_net_config));
->> > > +	if (offset + len > sizeof(struct virtio_net_config))
->> > > +		return -EINVAL;
->> > > +
->> > >  	ifcvf_read_net_config(vf, offset, buf, len);
->> > > +
->> > > +	return 0;
->> > >  }
->> > > -static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
->> > > -				  unsigned int offset, const void *buf,
->> > > -				  unsigned int len)
->> > > +static int ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
->> > > +				 unsigned int offset, const void *buf,
->> > > +				 unsigned int len)
->> > >  {
->> > >  	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->> > > -	WARN_ON(offset + len > sizeof(struct virtio_net_config));
->> > > +	if (offset + len > sizeof(struct virtio_net_config))
->> > > +		return -EINVAL;
->> > > +
->> > >  	ifcvf_write_net_config(vf, offset, buf, len);
->> > > +
->> > > +	return 0;
->> > >  }
->> > >  static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
->> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> > > index 029822060017..9323b5ff7988 100644
->> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> > > @@ -1796,20 +1796,25 @@ static void mlx5_vdpa_set_status(struct vdpa_device *vdev, u8 status)
->> > >  	ndev->mvdev.status |= VIRTIO_CONFIG_S_FAILED;
->> > >  }
->> > > -static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
->> > > -				 unsigned int len)
->> > > +static int mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
->> > > +				unsigned int len)
->> > >  {
->> > >  	struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->> > >  	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->> > > -	if (offset + len < sizeof(struct virtio_net_config))
->> > > -		memcpy(buf, (u8 *)&ndev->config + offset, len);
->> > > +	if (offset + len > sizeof(struct virtio_net_config))
->> > > +		return -EINVAL;
->> >
->> >
->> > It looks to me we should use ">=" here?
->>
->>
->> Ehmm, I think it was wrong before this patch. If 'offset + len' is equal to
->> 'sizeof(struct virtio_net_config)', should be okay to copy, no?
->>
->> I think it's one of the rare cases where the copy and paste went well :-)
->>
->> Should I fix this in a separate patch?
->>
->> Thanks,
->> Stefano
->
->Sure.
->
+On 2/4/21 8:18 PM, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Commit
+> 
+>   79033bebf6fa ("KVM: x86/xen: Fix coexistence of Xen and Hyper-V hypercalls")
+> 
+> is missing a Signed-off-by from its author.
+> 
+Except that David is the author of this particular patch, not me.
 
-I'll do it.
-
-Thanks,
-Stefano
-
+	Joao
