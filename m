@@ -2,67 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D5003102FC
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 03:52:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AA72310315
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 04:02:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbhBECwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 21:52:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44824 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbhBECwG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Feb 2021 21:52:06 -0500
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8786C0613D6
-        for <kvm@vger.kernel.org>; Thu,  4 Feb 2021 18:51:25 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id bl23so9283027ejb.5
-        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 18:51:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:sender:from:mime-version:content-transfer-encoding
-         :content-description:subject:to:date:reply-to;
-        bh=hqf55dXwvcYwwL4sAkoYuOM6RPu6wxeec88n5sMRYiY=;
-        b=euTAcRophe84gDkP6+HHF/E8ix/I08jiZh9nnruE9PMdocNO+3WTsAT1cP+vdaqVWG
-         Z7aB8VSbn/ExpiHm7xEgpfrJyvdY5jY8DSNa+8M4tvYRpbGxRLcXUnR26fp/NWEc08C3
-         9Hd5StQ7y/lH4WxAHz+OwyAgxVOG5NqbaLXuUAc5yFiEnbiVHaU69JJlFgTEaFIlAfgG
-         50kO2k7+NTPVf+kSl2+3lU2w3xKcfkjs1hLvZMl2pdGX90P0uTYEsnflJQeLzV3kSXGh
-         iRYqygMBAyJ8pwLh2dGzN3vDy/QTRwUvdOJ5m7Y4MU7z7VXzCjPzYOraqCfsrameXWxO
-         kfYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:sender:from:mime-version
-         :content-transfer-encoding:content-description:subject:to:date
-         :reply-to;
-        bh=hqf55dXwvcYwwL4sAkoYuOM6RPu6wxeec88n5sMRYiY=;
-        b=S2ntuB4WjixdOM1RehY37i/wwVCtYeVG20j1X78ly03W04g9sKkO5/157fyLt9ZWvb
-         1d71XL5myS37xqh9A8rkY2pwfRRDgnn8HFr+GIIoVJPI+ecyvWC8jBA9Hsk2iih0fil5
-         F4/HE/TZDYVweGN91WWwbGGHCZ0QnsD15U7VC7APRkY3FxE3lAHF0MUnKEZU0gFoLKqj
-         kQiBoMtnWRks67L9BRbJ2UjiskuyxkLXprU48BhFS6Y6snP4X9L06bD8Ek8v2nDwMCFz
-         X0VB+cLOYhw3skJ4Lc8GvDBk7pmH37PIe4CkrzfymRuvZBpaqOputsMisAPz3wAXjgbK
-         rYRA==
-X-Gm-Message-State: AOAM531QZGCgkDX7WYSUDVUfLl7dc1TOIyQx9HMVdm5CNFtZgzmAJJDI
-        rODz3cmJOVWt2iKsyeFcDKc=
-X-Google-Smtp-Source: ABdhPJzfKy9qpqAoNY/LxS2YanNATw7NEE0zvf1F7kVmxRJkRHIKdFsT9ML+nife5U/do/Qzw4aJ/Q==
-X-Received: by 2002:a17:906:c0cd:: with SMTP id bn13mr1936457ejb.368.1612493484672;
-        Thu, 04 Feb 2021 18:51:24 -0800 (PST)
-Received: from [192.168.1.6] ([154.124.28.35])
-        by smtp.gmail.com with ESMTPSA id r23sm3251673ejd.56.2021.02.04.18.51.20
-        (version=TLS1 cipher=AES128-SHA bits=128/128);
-        Thu, 04 Feb 2021 18:51:23 -0800 (PST)
-Message-ID: <601cb2ab.1c69fb81.9923d.f342@mx.google.com>
-Sender: Skylar Anderson <barr.markimmbaye@gmail.com>
-From:   calantha camara <sgt.andersonskylar0@gmail.com>
-X-Google-Original-From: calantha camara
-Content-Type: text/plain; charset="iso-8859-1"
+        id S229984AbhBEDBL convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 4 Feb 2021 22:01:11 -0500
+Received: from mga11.intel.com ([192.55.52.93]:46073 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229979AbhBEDBG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Feb 2021 22:01:06 -0500
+IronPort-SDR: /2iAwB1Voxkjf8eSbPNHCb5k7150cX4PoC1EKNP55ukq/+2DmmOYZDHz0Vy2NQgGyHkGRbzzq/
+ LO39j8+ROPtw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9885"; a="177863845"
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="177863845"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 19:00:25 -0800
+IronPort-SDR: /N9KlomrGzE1NvDHkNF3/6VYBOFGIQCix9bArtsU56IhCHRnMcVq+RmSQ9NmjU4DUA5xGeJ6b0
+ BiNI8ZoKCKuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="415443677"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by FMSMGA003.fm.intel.com with ESMTP; 04 Feb 2021 19:00:25 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 4 Feb 2021 19:00:24 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 4 Feb 2021 19:00:24 -0800
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15]) by
+ ORSMSX602.amr.corp.intel.com ([10.22.229.15]) with mapi id 15.01.2106.002;
+ Thu, 4 Feb 2021 19:00:24 -0800
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>
+CC:     Sean Christopherson <seanjc@google.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "Huang, Haitao" <haitao.huang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>
+Subject: RE: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
+Thread-Topic: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
+Thread-Index: AQHW88S6tXP2pgrp0EKF1qhJ4uWs4apAy76AgAKMYQCAAlk3AIAADX2AgABSlACAABnrAIABY8yAgAAP/oCAACyPAIAA8E0A//8n5QCAAADgAIAA3TuA///m/ICAAIOBgIAAObmA//+IQVA=
+Date:   Fri, 5 Feb 2021 03:00:24 +0000
+Message-ID: <f37a40b7137b4c89ba202c65f781cc0e@intel.com>
+References: <20210203134906.78b5265502c65f13bacc5e68@intel.com>
+ <YBsdeco/t8sa7ecV@kernel.org> <YBsq45IDDX9PPc7s@google.com>
+ <YBtQRCC3NHBmtrck@kernel.org>
+ <b63bf7db09442e994563ccc3a3b608fc2f17b784.camel@intel.com>
+ <YBtkkEp5hXpTl84s@kernel.org> <YBtlTE2xZ3wBrukB@kernel.org>
+ <b523357d2f062bf801d8fa1b05bf7abf13c19e89.camel@intel.com>
+ <YBwJ5S0C3dMS2AFY@kernel.org>
+ <7a1d2316-5ce2-63fa-4186-a623dac1ecc8@intel.com>
+ <YByooRl8riad4moe@kernel.org>
+In-Reply-To: <YByooRl8riad4moe@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+x-originating-ip: [10.1.200.100]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: hi dear
-To:     Recipients <calantha@vger.kernel.org>
-Date:   Fri, 05 Feb 2021 02:51:13 +0000
-Reply-To: calanthac20@gmail.com
-X-Mailer: cdcaafe51be8cdb99a1c85906066cad3d0e60e273541515a58395093a7c4e1f0eefb01d7fc4e6278706e9fb8c4dad093c3263345202970888b6b4d817f9e998c032e7d59
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-do you speak Eglish
+> On Thu, Feb 04, 2021 at 02:41:57PM -0800, Dave Hansen wrote:
+> > On 2/4/21 6:51 AM, Jarkko Sakkinen wrote:
+> > >>> A: ret == -ENODEV
+> > >>> B: ret == 0
+> > >>> C: ret != 0 && ret != -ENODEV
+> > >> Let me try again:
+> > >>
+> > >> Why A and C should be treated differently? What will behave
+> > >> incorrectly, in case of C?
+> > > So you don't know what different error codes mean?
+> >
+> > How about we just leave the check in place as Sean wrote it, and add a
+> > nice comment to explain what it is doing:
+> >
+> > 	/*
+> > 	 * Always try to initialize the native *and* KVM drivers.
+> > 	 * The KVM driver is less picky than the native one and
+> > 	 * can function if the native one is not supported on the
+> > 	 * current system or fails to initialize.
+> > 	 *
+> > 	 * Error out only if both fail to initialize.
+> >  	 */
+> > 	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+> > 	if (ret)
+> > 		goto err_kthread;
+> 
+> WFM, I can go along, as long as there is a remark. There is a semantical
+> difference between "not supported" and "failure to initialize". The driving point
+> is that this should not be hidden. I was first thinking a note in the commit
+> message, but inline comment is actually a better idea. Thanks!
+> 
+> I can ack the next version, as long as this comment is included.
+
+Sure. Thanks Dave and Jarkko.
+
+> 
+> /Jarkko
