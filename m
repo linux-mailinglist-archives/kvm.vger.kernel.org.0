@@ -2,125 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8E203108CC
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 11:17:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 492573108F1
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 11:24:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231244AbhBEKOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 05:14:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56451 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230126AbhBEKMP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 05:12:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612519848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uwWH69RD/U8R/Yz9V56rEzUfEXvsQXclaTN8AOW6CJQ=;
-        b=ZSSGgvmYwPK4dGJI1ce+iS4F2bPIlIfB96cgiui1PmdnOR/D9fPr6X1h1QMlvjLs3z8H8P
-        r4YVmKPK8yc4gFl/AS30nVVnbVxUfl1Cyx1J1kbvdjwJ9Wi29X4HJVQhG+PvMWFFGQ4zTn
-        YRzRCsMpZCnaaAKi282XsSPrtEcQYHg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-vcxDt6RhNCyhPuRLUEnImw-1; Fri, 05 Feb 2021 05:10:46 -0500
-X-MC-Unique: vcxDt6RhNCyhPuRLUEnImw-1
-Received: by mail-wr1-f70.google.com with SMTP id h18so5086171wrr.5
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 02:10:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uwWH69RD/U8R/Yz9V56rEzUfEXvsQXclaTN8AOW6CJQ=;
-        b=QlKKO0fcdhuJlBgs9AYzr3ewLW41pAiVMzM6MIPmo5Bxt0gWHsNR2wXmVYPoyi7kbi
-         xKiWlvDevo24WwLwGkVTlJsUNzfmuRr1eQl6lqYL1iRL9p54i+W2K6uR7QOsztReVNIH
-         bNQCOcYzbSFWVZF0IrjJM6QdhMeKcn+EYA9nwKZ52GiM2nrpqjSX8a0+wNri7UnU7riF
-         X00qauOilQwiTr7oJ6olh8ZEIAwqWG8HwQmSLQvz7zYy2LQpZxbDlkLhmXnKxM9N1yp9
-         bfjsVqGjgWJA4R5rBVjslFzZZQDObuJeZ+cDrt+TKMaWA0tS3gQHEY8NsnDdjkke/6Xs
-         uXKg==
-X-Gm-Message-State: AOAM532id9KHpT8okCyPnm2Be5Zr6xiK1c6b/spXpwhFvSwpSFcSTS5g
-        IJ5u8pXOZoRpeC55jI4BQUJEXPO4CEHzqxnTZ0lV+73EIWxVBsf6MIHeXo9JBLWc5ygBwquf2A7
-        ama++Ipa/8iIZ
-X-Received: by 2002:adf:f6c4:: with SMTP id y4mr4033436wrp.127.1612519845816;
-        Fri, 05 Feb 2021 02:10:45 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxx47BL9I/3ugpty5hVt2p3Lu1LcqvAbsB3zBvejcpJSyGhSuJeFM9oXaqJJ5kZd9xpcKW0WA==
-X-Received: by 2002:adf:f6c4:: with SMTP id y4mr4033412wrp.127.1612519845639;
-        Fri, 05 Feb 2021 02:10:45 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id l10sm11574979wro.4.2021.02.05.02.10.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Feb 2021 02:10:44 -0800 (PST)
-Subject: Re: [PATCH v4 2/5] KVM: X86: Expose PKS to guest
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "x86@kernel.org" <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>
-References: <20210205083706.14146-1-chenyi.qiang@intel.com>
- <20210205083706.14146-3-chenyi.qiang@intel.com>
- <8768ad06-e051-250d-93ec-fa4d684bc7b0@redhat.com>
- <20210205095603.GB17488@zn.tnic>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e90dadf9-a4ad-96f2-01fd-9f57b284fa3f@redhat.com>
-Date:   Fri, 5 Feb 2021 11:10:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S231315AbhBEKW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 05:22:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54648 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231328AbhBEKTb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 05:19:31 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CEC5A64FED;
+        Fri,  5 Feb 2021 10:18:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612520300;
+        bh=s6zOJkZnJEbm1xu0sX2TF5RgsugvUfGcTGQRbF8fYFQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l8kKbOl3cDdM3E0eg11Cb78ojX1U42q1MLOpEbO9ohJ6ZsUhbIINgE9AGpi57xg07
+         nrjjNaNlf57dKR3WfAKi/M4HzTfRDGroizd8ACmJPeidm7+lvaabIXe7cQPaeWn9o/
+         A7dwUkMkXN6n1qunw/7DRnw+YFcS0Z5Mmkh9/ecc=
+Date:   Fri, 5 Feb 2021 11:18:17 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Russell King - ARM Linux admin <linux@armlinux.org.uk>,
+        linux-fbdev@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        kvm@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org,
+        Jaroslav Kysela <perex@perex.cz>,
+        Eric Anholt <eric@anholt.net>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
+        linux-spi@vger.kernel.org, Jiri Slaby <jirislaby@kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-watchdog@vger.kernel.org, linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Airlie <airlied@linux.ie>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Mike Leach <mike.leach@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, linux-crypto@vger.kernel.org,
+        Daniel Vetter <daniel@ffwll.ch>, Leo Yan <leo.yan@linaro.org>,
+        dmaengine@vger.kernel.org
+Subject: Re: [GIT PULL] immutable branch for amba changes targeting v5.12-rc1
+Message-ID: <YB0baUzgvpd+EoO6@kroah.com>
+References: <20210126165835.687514-1-u.kleine-koenig@pengutronix.de>
+ <20210202135350.36nj3dmcoq3t7gcf@pengutronix.de>
+ <YBlcTXlxemmC2lgr@kroah.com>
+ <20210204165224.GA1463@shell.armlinux.org.uk>
+ <YBwnUrQqlAz2LDPI@kroah.com>
+ <20210204165951.GB1463@shell.armlinux.org.uk>
+ <20210204181551.ethtuzm65flujmwe@pengutronix.de>
+ <20210205093744.kr4rc7yvfiq6wimq@pengutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20210205095603.GB17488@zn.tnic>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210205093744.kr4rc7yvfiq6wimq@pengutronix.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/02/21 10:56, Borislav Petkov wrote:
-> On Fri, Feb 05, 2021 at 10:25:48AM +0100, Paolo Bonzini wrote:
->> On 05/02/21 09:37, Chenyi Qiang wrote:
->>>
->>> diff --git a/arch/x86/mm/pkeys.c b/arch/x86/mm/pkeys.c
->>> index 57718716cc70..8027f854c600 100644
->>> --- a/arch/x86/mm/pkeys.c
->>> +++ b/arch/x86/mm/pkeys.c
->>> @@ -390,3 +390,9 @@ void pks_key_free(int pkey)
->>>   	__clear_bit(pkey, &pks_key_allocation_map);
->>>   }
->>>   EXPORT_SYMBOL_GPL(pks_key_free);
->>> +
->>> +u32 get_current_pkrs(void)
->>> +{
->>> +	return this_cpu_read(pkrs_cache);
->>> +}
->>> +EXPORT_SYMBOL_GPL(get_current_pkrs);
->>> diff --git a/include/linux/pkeys.h b/include/linux/pkeys.h
->>> index bed0e293f13b..480429020f4c 100644
->>> --- a/include/linux/pkeys.h
->>> +++ b/include/linux/pkeys.h
->>> @@ -72,6 +72,10 @@ static inline void pks_mk_readwrite(int pkey)
->>>   {
->>>   	pr_err("%s is not valid without PKS support\n", __func__);
->>>   }
->>> +static inline u32 get_current_pkrs(void)
->>> +{
->>> +	return 0;
->>> +}
->>>   #endif /* ! CONFIG_ARCH_HAS_SUPERVISOR_PKEYS */
->>
->> This would need an ack from the x86 people.  Andy, Boris?
+On Fri, Feb 05, 2021 at 10:37:44AM +0100, Uwe Kleine-König wrote:
+> Hello Russell, hello Greg,
 > 
-> This looks like the PKS baremetal pile needs to be upstream first.
+> On Thu, Feb 04, 2021 at 07:15:51PM +0100, Uwe Kleine-König wrote:
+> > On Thu, Feb 04, 2021 at 04:59:51PM +0000, Russell King - ARM Linux admin wrote:
+> > > On Thu, Feb 04, 2021 at 05:56:50PM +0100, Greg Kroah-Hartman wrote:
+> > > > On Thu, Feb 04, 2021 at 04:52:24PM +0000, Russell King - ARM Linux admin wrote:
+> > > > > On Tue, Feb 02, 2021 at 03:06:05PM +0100, Greg Kroah-Hartman wrote:
+> > > > > > I'm glad to take this through my char/misc tree, as that's where the
+> > > > > > other coresight changes flow through.  So if no one else objects, I will
+> > > > > > do so...
+> > > > > 
+> > > > > Greg, did you end up pulling this after all? If not, Uwe produced a v2.
+> > > > > I haven't merged v2 yet as I don't know what you've done.
+> > > > 
+> > > > I thought you merged this?
+> > > 
+> > > I took v1, and put it in a branch I've promised in the past not to
+> > > rebase/rewind. Uwe is now asking for me to take a v2 or apply a patch
+> > > on top.
+> > > 
+> > > The only reason to produce an "immutable" branch is if it's the basis
+> > > for some dependent work and you need that branch merged into other
+> > > people's trees... so the whole "lets produce a v2" is really odd
+> > > workflow... I'm confused about what I should do, and who has to be
+> > > informed which option I take.
+> > > 
+> > > I'm rather lost here too.
+> > 
+> > Sorry to have cause this confusion. After I saw that my initial tag
+> > missed to adapt a driver I wanted to make it easy for you to fix the
+> > situation.
+> > So I created a patch to fix it and created a second tag with the patch
+> > squashed in. Obviously only one of them have to be picked and I hoped
+> > you (= Russell + Greg) would agree which option to pick.
+> > 
+> > My preference would be if you both pick up v2 of the tag to yield a
+> > history that is bisectable without build problems, but if Russell (who
+> > already picked up the broken tag) considers his tree immutable and so
+> > isn't willing to rebase, then picking up the patch is the way to go.
+> 
+> OK, the current state is that Russell applied the patch fixing
+> drivers/mailbox/arm_mhuv2.c on top of merging my first tag.
+> 
+> So the way forward now is that Greg pulls
+> 
+> 	git://git.armlinux.org.uk/~rmk/linux-arm.git devel-stable
+> 
+> which currently points to 
+> 
+> 	860660fd829e ("ARM: 9055/1: mailbox: arm_mhuv2: make remove callback return void")
+> 
+> , into his tree that contains the hwtracing changes that conflict with my
+> changes. @Greg: Is this good enough, or do you require a dedicated tag
+> to pull that?
+> 
+> I think these conflicting hwtracing changes are not yet in any of Greg's
+> trees (at least they are not in next).
+> 
+> When I pull
+> 
+> 	https://git.kernel.org/pub/scm/linux/kernel/git/coresight/linux.git next
+> 
+> (currently pointing to 4e73ff249184 ("coresight: etm4x: Handle accesses
+> to TRCSTALLCTLR")) into 860660fd829e, I get a conflict in
+> drivers/hwtracing/coresight/coresight-etm4x-core.c as expected. My
+> resolution looks as follows:
 
-Yes, it does.  I would like to have an ack for including the above two 
-hunks once PKS is upstream.
+Ok, my resolution looked a bit different.
 
-I also have CET and bus lock #DB queued and waiting for the bare metal 
-functionality, however they do not touch anything outside arch/x86/kvm.
+Can you pull my char-misc-testing branch and verify I got this all
+pulled in correctly?
 
-Paolo
+thanks,
 
+greg k-h
