@@ -2,30 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAA48311339
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 22:16:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C49331133A
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 22:16:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233310AbhBEVPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 16:15:09 -0500
-Received: from mga12.intel.com ([192.55.52.136]:30881 "EHLO mga12.intel.com"
+        id S233468AbhBEVPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 16:15:15 -0500
+Received: from mga02.intel.com ([134.134.136.20]:36319 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233282AbhBETLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 14:11:25 -0500
-IronPort-SDR: wYDldr4DhXycNHLDSL9Yasl8x4khfqwaknoOdL4WiLLyrWgnI8xvWaAnhKadXt/TQAKEKoimN+
- xXIRLVUrjidg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="160645130"
+        id S233580AbhBETLV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 14:11:21 -0500
+IronPort-SDR: o1CebUpBRUMW728vh3sclPQDolHlG40Nfj0eUZeKDNsncjfdyZYL2mklupHr9b+l/oJzYpCghZ
+ SaqyYo99jVOg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="168606260"
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="160645130"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:53:01 -0800
-IronPort-SDR: UTqjwzv3JE77P49uRvkMuBpMF5TxMoIO2nJupHY3O3m2A/nBmkibq473+BYTa4o6nJhQYhf99X
- pLXKckMHRjqg==
+   d="scan'208";a="168606260"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:53:06 -0800
+IronPort-SDR: DhzVfB6V8LUBAZ2D+uT2lfqLGg+JhbtV0es1K/BU8hZchskavCUKdehpYTiM4k2uTc5my5Pmaj
+ zyigBoeI4A6Q==
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="434596829"
+   d="scan'208";a="373680385"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:52:59 -0800
-Subject: [PATCH v5 01/14] vfio/mdev: idxd: add theory of operation
- documentation for idxd mdev
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:53:06 -0800
+Subject: [PATCH v5 02/14] dmaengine: idxd: add IMS detection in base driver
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org
@@ -37,444 +36,223 @@ Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
         shahafs@mellanox.com, pbonzini@redhat.com,
         dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Date:   Fri, 05 Feb 2021 13:52:59 -0700
-Message-ID: <161255837927.339900.13569654778245565488.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 05 Feb 2021 13:53:05 -0700
+Message-ID: <161255838583.339900.1371114106574605023.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
 References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add idxd vfio mediated device theory of operation documentation.
-Provide description on mdev design, usage, and why vfio mdev was chosen.
+In preparation for support of VFIO mediated device for idxd driver, the
+enabling for Interrupt Message Store (IMS) interrupts is added for the idxd
+With IMS support the idxd driver can dynamically allocate interrupts on a
+per mdev basis based on how many IMS vectors that are mapped to the mdev
+device. This commit only provides the detection functions in the base driver
+and not the VFIO mdev code utilization.
 
-Reviewed-by: Ashok Raj <ashok.raj@intel.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+The commit has some portal related changes. A "portal" is a special
+location within the MMIO BAR2 of the DSA device where descriptors are
+submitted via the CPU command MOVDIR64B or ENQCMD(S). The offset for the
+portal address determines whether the submitted descriptor is for MSI-X
+or IMS notification.
+
+See Intel SIOV spec for more details:
+https://software.intel.com/en-us/download/intel-scalable-io-virtualization-technical-specification
+
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- Documentation/driver-api/vfio/mdev-idxd.rst |  397 +++++++++++++++++++++++++++
- MAINTAINERS                                 |    1 
- 2 files changed, 398 insertions(+)
- create mode 100644 Documentation/driver-api/vfio/mdev-idxd.rst
+ Documentation/ABI/stable/sysfs-driver-dma-idxd |    6 ++++++
+ drivers/dma/idxd/cdev.c                        |    4 ++--
+ drivers/dma/idxd/device.c                      |    2 +-
+ drivers/dma/idxd/idxd.h                        |   13 +++++++++----
+ drivers/dma/idxd/init.c                        |   19 +++++++++++++++++++
+ drivers/dma/idxd/registers.h                   |    7 +++++++
+ drivers/dma/idxd/sysfs.c                       |    9 +++++++++
+ 7 files changed, 53 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/driver-api/vfio/mdev-idxd.rst b/Documentation/driver-api/vfio/mdev-idxd.rst
-new file mode 100644
-index 000000000000..9bf93eafc7c8
---- /dev/null
-+++ b/Documentation/driver-api/vfio/mdev-idxd.rst
-@@ -0,0 +1,397 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=============
-+IDXD Overview
-+=============
-+IDXD (Intel Data Accelerator Driver) is the driver for the Intel Data
-+Streaming Accelerator (DSA).  Intel DSA is a high performance data copy
-+and transformation accelerator. In addition to data move operations,
-+the device also supports data fill, CRC generation, Data Integrity Field
-+(DIF), and memory compare and delta generation. Intel DSA supports
-+a variety of PCI-SIG defined capabilities such as Address Translation
-+Services (ATS), Process address Space ID (PASID), Page Request Interface
-+(PRI), Message Signalled Interrupts Extended (MSI-X), and Advanced Error
-+Reporting (AER). Some of those capabilities enable the device to support
-+Shared Virtual Memory (SVM), or also known as Shared Virtual Addressing
-+(SVA). Intel DSA also supports Intel Scalable I/O Virtualization (SIOV)
-+to improve scalability of device assignment.
-+
-+
-+The Intel DSA device contains the following basic components:
-+* Work queue (WQ)
-+
-+  A WQ is an on device storage to queue descriptors to the
-+  device. Requests are added to a WQ by using new CPU instructions
-+  (MOVDIR64B and ENQCMD(S)) to write the memory mapped “portal”
-+  associated with each WQ.
-+
-+* Engine
-+
-+  Operation unit that pulls descriptors from WQs and processes them.
-+
-+* Group
-+
-+  Abstract container to associate one or more engines with one or more WQs.
-+
-+
-+Two types of WQs are supported:
-+* Dedicated WQ (DWQ)
-+
-+  A single client should owns this exclusively and can submit work
-+  to it. The MOVDIR64B instruction is used to submit descriptors to
-+  this type of WQ. The instruction is a posted write, therefore the
-+  submitter must ensure not exceed the WQ length for submission. The
-+  use of PASID is optional with DWQ. Multiple clients can submit to
-+  a DWQ, but sychronization is required due to when the WQ is full,
-+  the submission is silently dropped.
-+
-+* Shared WQ (SWQ)
-+
-+  Multiple clients can submit work to this WQ. The submitter must use
-+  ENQMCDS (from supervisor mode) or ENQCMD (from user mode). These
-+  instructions will indicate via EFLAGS.ZF bit whether a submission
-+  succeeds. The use of PASID is mandatory to identify the address space
-+  of each client.
-+
-+
-+For more information about the new instructions [1][2].
-+
-+The IDXD driver is broken down into following usages:
-+* In kernel interface through dmaengine subsystem API.
-+* Userspace DMA support through character device. mmap(2) is utilized
-+  to map directly to mmio address (or portals) for descriptor submission.
-+* VFIO Mediated device (mdev) supporting device passthrough usages. This
-+  is only for the mdev usage.
-+
-+
-+=================================
-+Assignable Device Interface (ADI)
-+=================================
-+The term ADI is used to represent the minimal unit of assignment for
-+Intel Scalable IOV device. Each ADI instance refers to the set of device
-+backend resources that are allocated, configured and organized as an
-+isolated unit.
-+
-+Intel DSA defines each WQ as an ADI. The MMIO registers of each work queue
-+are partitioned into two categories:
-+* MMIO registers accessed for data-path operations.
-+* MMIO registers accessed for control-path operations.
-+
-+Data-path MMIO registers of each WQ are contained within
-+one or more system page size aligned regions and can be mapped in the
-+CPU page table for direct access from the guest. Control-path MMIO
-+registers of all WQs are located together but segregated from data-path
-+MMIO regions. Therefore, guest updates to control-path registers must
-+be intercepted and then go through the host driver to be reflected in
-+the device.
-+
-+Data-path MMIO registers of DSA WQ are portals for submitting descriptors
-+to the device. There are four portals per WQ, each being 64 bytes
-+in size and located on a separate 4KB page in BAR2. Each portal has
-+different implications regarding interrupt message type (MSI vs. IMS)
-+and occupancy control (limited vs. unlimited). It is not necessary to
-+map all portals to the guest.
-+
-+Control-path MMIO registers of DSA WQ include global configurations
-+(shared by all WQs) and WQ-specific configurations. The owner
-+(e.g. the guest) of the WQ is expected to only change WQ-specific
-+configurations. Intel DSA spec introduces a “Configuration Support”
-+capability which, if cleared, indicates that some fields of WQ
-+configuration registers are read-only and the WQ configuration is
-+pre-configured by the host.
-+
-+
-+Interrupt Message Store (IMS)
-+-----------------------------
-+The ADI utilizes Interrupt Message Store (IMS), a device-specific MSI
-+implementation, instead of MSIX for interrupts for the guest. This
-+preserves MSIX for host usages and also allows a significantly larger
-+number of interrupt vectors for large number of guests usage.
-+
-+Intel DSA device implements IMS as on-device memory mapped unified
-+storage. Each interrupt message is stored as a DWORD size data payload
-+and a 64-bit address (same as MSI-X). Access to the IMS is through the
-+host idxd driver.
-+
-+The idxd driver makes use of the generic IMS irq chip and domain which
-+stores the interrupt messages in an array in device memory. Allocation and
-+freeing of interrupts happens via the generic msi_domain_alloc/free_irqs()
-+interface. Driver only needs to ensure the interrupt domain is stored in
-+the underlying device struct.
-+
-+
-+ADI Isolation
-+-------------
-+Operations or functioning of one ADI must not affect the functioning
-+of another ADI or the physical device. Upstream memory requests from
-+different ADIs are distinguished using a Process Address Space Identifier
-+(PASID). With the support of PASID-granular address translation in Intel
-+VT-d, the address space targeted by a request from ADI can be a Host
-+Virtual Address (HVA), Host I/O Virtual Address (HIOVA), Guest Physical
-+Address (GPA), Guest Virtual Address (GVA), Guest I/O Virtual Address
-+(GIOVA), etc. The PASID identity for an ADI is expected to be accessed
-+or modified by privileged software through the host driver.
-+
-+=========================
-+Virtual DSA (vDSA) Device
-+=========================
-+The DSA WQ itself is not a PCI device thus must be composed into a
-+virtual DSA device to the guest.
-+
-+The composition logic needs to handle four main requirements:
-+* Emulate PCI config space.
-+* Map data-path portals for direct access from the guest.
-+* Emulate control-path MMIO registers and selectively forward WQ
-+  configuration requests through host driver to the device.
-+* Forward and emulate WQ interrupts to the guest.
-+
-+The composition logic tells the guest aspects of WQ which are configurable
-+through a combination of capability fields, e.g.:
-+* Configuration Support (if cleared, most aspects are not modifiable).
-+* WQ Mode Support (if cleared, cannot change between dedicated and
-+  shared mode).
-+* Dedicated Mode Support.
-+* Shared Mode Support.
-+* ...
-+
-+The virtual capability fields are set according to the vDSA
-+type. Following is an example of vDSA types and related WQ configurability:
-+* Type ‘1dwq-v1’
-+   * One DSA gen1 dedicated WQ to this guest
-+   * Guest cannot share the WQ between its clients (no guest SVA)
-+   * Guest cannot change any WQ configuration
-+
-+Besides, the composition logic also needs to serve administrative commands
-+(thru virtual CMD register) through host driver, including:
-+* Drain/abort all descriptors submitted by this guest.
-+* Drain/abort descriptors associated with a PASID.
-+* Enable/disable/reset the WQ (when it’s not shared by multiple VMs).
-+* Request interrupt handle.
-+
-+With this design, vDSA emulation is **greatly simplified**. Most
-+registers are emulated in simple READ-ONLY flavor, and handling limited
-+configurability is required only for a few registers.
-+
-+===========================
-+VFIO mdev vs. userspace DMA
-+===========================
-+There are two avenues to support vDSA composition.
-+1. VFIO mediated device (mdev)
-+2. Userspace DMA through char device
-+
-+VFIO mdev provides a generic subdevice passthrough framework. Unified
-+uAPIs are used for both device and subdevice passthrough, thus any
-+userspace VMM which already supports VFIO device passthrough would
-+naturally support mdev/subdevice passthrough. The implication of VFIO
-+mdev is putting emulation of device interface in the kernel (part of
-+host driver) which must be carefully scrutinized. Fortunately, vDSA
-+composition includes only a small portion of emulation code, due to the
-+fact that most registers are simply READ-ONLY to the guest. The majority
-+logic of handling limited configurability and administrative commands
-+is anyway required to sit in the kernel, regardless of which kernel uAPI
-+is pursued. In this regard, VFIO mdev is a nice fit for vDSA composition.
-+
-+IDXD driver provides a char device interface for applications to
-+map the WQ portal and directly submit descriptors to do DMA. This
-+interface provides only data-path access to userspace and relies on
-+the host driver to handle control-path configurations. Expanding such
-+interface to support subdevice passthrough allows moving the emulation
-+code to userspace. However, quite some work is required to grow it from
-+an application-oriented interface into a passthrough-oriented interface:
-+new uAPIs to handle guest WQ configurability and administrative commands,
-+and new uAPIs to handle passthrough specific requirements (e.g. DMA map,
-+guest SVA, live migration, posted interrupt, etc.). And once it is done,
-+every userspace VMM has to explicitly bind to IDXD specific uAPI, even
-+though the real user is in the guest (instead of the VMM itself) in the
-+passthrough scenario.
-+
-+Although some generalization might be possible to reduce the work of
-+handling passthrough, we feel the difference between userspace DMA
-+and subdevice passthrough is distinct in IDXD. Therefore, we choose to
-+build vDSA composition on top of VFIO mdev framework and leave userspace
-+DMA intact after discussion at LPC 2020.
-+
-+=============================
-+Host Registration and Release
-+=============================
-+
-+Intel DSA reports support for Intel Scalable IOV via a PCI Express
-+Designated Vendor Specific Extended Capability (DVSEC). In addition,
-+PASID-granular address translation capability is required in the
-+IOMMU. During host initialization, the IDXD driver should check the
-+presence of both capabilities before calling mdev_register_device()
-+to register with the VFIO mdev framework and provide a set of ops
-+(struct mdev_parent_ops). The IOMMU capability is indicated by the
-+IOMMU_DEV_FEAT_AUX feature flag with iommu_dev_has_feature() and enabled
-+with iommu_dev_enable_feature().
-+
-+On release, iommu_dev_disable_feature() is called after
-+mdev_unregister_device() to disable the IOMMU_DEV_FEAT_AUX flag that
-+the driver enabled during host initialization.
-+
-+The mdev_parent_ops data structure is filled out by the driver to provide
-+a number of ops called by VFIO mdev framework::
-+
-+        struct mdev_parent_ops {
-+                .supported_type_groups
-+                .create
-+                .remove
-+                .open
-+                .release
-+                .read
-+                .write
-+                .mmap
-+                .ioctl
-+        };
-+
-+Supported_type_groups
-+---------------------
-+At the moment only one vDSA type is supported.
-+
-+“1dwq-v1”:
-+  Single dedicated WQ (DSA 1.0) with read-only configuration exposed to
-+  the guest. On the guest kernel, a vDSA device shows up with a single
-+  WQ that is pre-configured by the host. The configuration for the WQ
-+  is entirely read-only and cannot be reconfigured. There is no support
-+  of guest SVA on this WQ.
-+
-+  The interrupt vector 0 is emulated by the host driver to support the admin
-+  command completion and error reporting. A second interrupt vector is
-+  bound to the IMS and used for I/O operation. In this implementation,
-+  there are only two vectors being supported.
-+
-+create
-+------
-+API function to create the mdev. mdev_set_iommu_device() is called to
-+associate the mdev device to the parent PCI device. This function is
-+where the driver sets up and initializes the resources to support a single
-+mdev device. This is triggered through sysfs to initiate the creation.
-+
-+remove
-+------
-+API function that mirrors the create() function and releases all the
-+resources backing the mdev.  This is also triggered through sysfs.
-+
-+open
-+----
-+API function that is called down from VFIO userspace to indicate to the
-+driver that the upper layers are ready to claim and utilize the mdev. IMS
-+entries are allocated and setup here.
-+
-+release
-+-------
-+The mirror function to open that releases the mdev by VFIO userspace.
-+
-+read / write
-+------------
-+This is where the Intel IDXD driver provides read/write emulation of
-+PCI config space and MMIO registers. These paths are the “slow” path
-+of the mediated device and emulation is used rather than direct access
-+to the hardware resources. Typically configuration and administrative
-+commands go through this path. This allows the mdev to show up as a
-+virtual PCI device on the guest kernel.
-+
-+The emulation of PCI config space is nothing special, which is simply
-+copied from kvmgt. In the future this part might be consolidated to
-+reduce duplication.
-+
-+Emulating MMIO reads are simply memory copies. There is no side-effect
-+to be emulated upon guest read.
-+
-+Emulating MMIO writes are required only for a few registers, due to
-+read-only configuration on the ‘1dwq-v1’ type. Majority of composition
-+logic is hooked in the CMD register for performing administrative commands
-+such as WQ drain, abort, enable, disable and reset operations. The rest of
-+the emulation is about handling errors (GENCTRL/SWERROR) and interrupts
-+(INTCAUSE/MSIXPERM) on the vDSA device. Future mdev types might allow
-+limited WQ configurability, which then requires additional emulation of
-+the WQCFG register.
-+
-+mmap
-+----
-+This is the function that provides the setup to expose a portion of the
-+hardware, also known as portals, for direct access for “fast” path
-+operations through the mmap() syscall. A limited region of the hardware
-+is mapped to the guest for direct I/O submission.
-+
-+There are four portals per WQ: unlimited MSI-X, limited MSI-X, unlimited
-+IMS, limited IMS.  Descriptors submitted to limited portals are subject
-+to threshold configuration limitations for shared WQs. The MSI-X portals
-+are used for host submissions, and the IMS portals are mapped to vm for
-+guest submission.
-+
-+ioctl
-+-----
-+This API function does several things
-+* Provides general device information to VFIO userspace.
-+* Provides device region information (PCI, mmio, etc).
-+* Get interrupts information
-+* Setup interrupts for the mediated device.
-+* Mdev device reset
-+
-+For the Intel idxd driver, Interrupt Message Store (IMS) vectors are being
-+used for mdev interrupts rather than MSIX vectors. IMS provides additional
-+interrupt vectors outside of PCI MSIX specification in order to support
-+significantly more vectors. The emulated interrupt (0) is connected through
-+kernel eventfd. When interrupt 0 needs to be asserted, the driver will
-+signal the eventfd to trigger vector 0 interrupt on the guest.
-+The IMS interrupts are setup via eventfd as well. However, it utilizes
-+irq bypass manager to directly inject the interrupt in the guest.
-+
-+To allocate IMS, we utilize the IMS array APIs. On host init, we need
-+to create the MSI domain::
-+
-+        struct ims_array_info ims_info;
-+        struct device *dev = &pci_dev->dev;
-+
-+
-+        /* assign the device IMS size */
-+        ims_info.max_slots = max_ims_size;
-+        /* assign the MMIO base address for the IMS table */
-+        ims_info.slots = mmio_base + ims_offset;
-+        /* assign the MSI domain to the device */
-+        dev->msi_domain = pci_ims_array_create_msi_irq_domain(pci_dev, &ims_info);
-+
-+When we are ready to allocate the interrupts::
-+
-+        struct device *dev = mdev_dev(mdev);
-+
-+        irq_domain = pci_dev->dev.msi_domain;
-+        /* the irqs are allocated against device of mdev */
-+        rc = msi_domain_alloc_irqs(irq_domain, dev, num_vecs);
-+
-+
-+        /* we can retrieve the slot index from msi_entry */
-+        for_each_msi_entry(entry, dev) {
-+                slot_index = entry->device_msi.hwirq;
-+                irq = entry->irq;
-+        }
-+
-+        request_irq(irq, interrupt_handler_function, 0, “ims”, context);
-+
-+
-+The DSA device is structured such that MSI-X table entry 0 is used for
-+admin commands completion, error reporting, and other misc commands. The
-+remaining MSI-X table entries are used for WQ completion. For vm support,
-+the virtual device also presents a similar layout. Therefore, vector 0
-+is emulated by the software. Additional vector(s) are associated with IMS.
-+
-+The index (slot) for the per device IMS entry is managed by the MSI
-+core. The index is the “interrupt handle” that the guest kernel
-+needs to program into a DMA descriptor. That interrupt handle tells the
-+hardware which IMS vector to trigger the interrupt on for the host.
-+
-+The virtual device presents an admin command called “request interrupt
-+handle” that is not supported by the physical device. On probe of
-+the DSA device on the guest kernel, the guest driver will issue the
-+“request interrupt handle” command in order to get the interrupt
-+handle for descriptor programming. The host driver will return the
-+assigned slot for the IMS entry table to the guest.
-+
-+==========
-+References
-+==========
-+[1] https://software.intel.com/content/www/us/en/develop/download/intel-architecture-instruction-set-extensions-programming-reference.html
-+[2] https://software.intel.com/en-us/articles/intel-sdm
-+[3] https://software.intel.com/sites/default/files/managed/cc/0e/intel-scalable-io-virtualization-technical-specification.pdf
-+[4] https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c2114daa6bc7..ae34b0331eb4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8970,6 +8970,7 @@ INTEL IADX DRIVER
- M:	Dave Jiang <dave.jiang@intel.com>
- L:	dmaengine@vger.kernel.org
- S:	Supported
-+F:	Documentation/driver-api/vfio/mdev-idxd.rst
- F:	drivers/dma/idxd/*
- F:	include/uapi/linux/idxd.h
+diff --git a/Documentation/ABI/stable/sysfs-driver-dma-idxd b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+index 55285c136cf0..95cd7975f488 100644
+--- a/Documentation/ABI/stable/sysfs-driver-dma-idxd
++++ b/Documentation/ABI/stable/sysfs-driver-dma-idxd
+@@ -129,6 +129,12 @@ KernelVersion:	5.10.0
+ Contact:	dmaengine@vger.kernel.org
+ Description:	The last executed device administrative command's status/error.
  
++What:		/sys/bus/dsa/devices/dsa<m>/ims_size
++Date:		Oct 15, 2020
++KernelVersion:	5.11.0
++Contact:	dmaengine@vger.kernel.org
++Description:	The total number of vectors available for Interrupt Message Store.
++
+ What:		/sys/bus/dsa/devices/wq<m>.<n>/block_on_fault
+ Date:		Oct 27, 2020
+ KernelVersion:	5.11.0
+diff --git a/drivers/dma/idxd/cdev.c b/drivers/dma/idxd/cdev.c
+index 0db9b82ed8cf..b1518106434f 100644
+--- a/drivers/dma/idxd/cdev.c
++++ b/drivers/dma/idxd/cdev.c
+@@ -205,8 +205,8 @@ static int idxd_cdev_mmap(struct file *filp, struct vm_area_struct *vma)
+ 		return rc;
+ 
+ 	vma->vm_flags |= VM_DONTCOPY;
+-	pfn = (base + idxd_get_wq_portal_full_offset(wq->id,
+-				IDXD_PORTAL_LIMITED)) >> PAGE_SHIFT;
++	pfn = (base + idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED,
++						     IDXD_IRQ_MSIX)) >> PAGE_SHIFT;
+ 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+ 	vma->vm_private_data = ctx;
+ 
+diff --git a/drivers/dma/idxd/device.c b/drivers/dma/idxd/device.c
+index 205156afeb54..d6c447d09a6f 100644
+--- a/drivers/dma/idxd/device.c
++++ b/drivers/dma/idxd/device.c
+@@ -290,7 +290,7 @@ int idxd_wq_map_portal(struct idxd_wq *wq)
+ 	resource_size_t start;
+ 
+ 	start = pci_resource_start(pdev, IDXD_WQ_BAR);
+-	start += idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED);
++	start += idxd_get_wq_portal_full_offset(wq->id, IDXD_PORTAL_LIMITED, IDXD_IRQ_MSIX);
+ 
+ 	wq->portal = devm_ioremap(dev, start, IDXD_PORTAL_SIZE);
+ 	if (!wq->portal)
+diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
+index a9386a66ab72..90c9458903e1 100644
+--- a/drivers/dma/idxd/idxd.h
++++ b/drivers/dma/idxd/idxd.h
+@@ -163,6 +163,7 @@ enum idxd_device_flag {
+ 	IDXD_FLAG_CONFIGURABLE = 0,
+ 	IDXD_FLAG_CMD_RUNNING,
+ 	IDXD_FLAG_PASID_ENABLED,
++	IDXD_FLAG_IMS_SUPPORTED,
+ };
+ 
+ struct idxd_device {
+@@ -190,6 +191,7 @@ struct idxd_device {
+ 
+ 	int num_groups;
+ 
++	u32 ims_offset;
+ 	u32 msix_perm_offset;
+ 	u32 wqcfg_offset;
+ 	u32 grpcfg_offset;
+@@ -197,6 +199,7 @@ struct idxd_device {
+ 
+ 	u64 max_xfer_bytes;
+ 	u32 max_batch_size;
++	int ims_size;
+ 	int max_groups;
+ 	int max_engines;
+ 	int max_tokens;
+@@ -279,15 +282,17 @@ enum idxd_interrupt_type {
+ 	IDXD_IRQ_IMS,
+ };
+ 
+-static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot)
++static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
++					    enum idxd_interrupt_type irq_type)
+ {
+-	return prot * 0x1000;
++	return prot * 0x1000 + irq_type * 0x2000;
+ }
+ 
+ static inline int idxd_get_wq_portal_full_offset(int wq_id,
+-						 enum idxd_portal_prot prot)
++						 enum idxd_portal_prot prot,
++						 enum idxd_interrupt_type irq_type)
+ {
+-	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot);
++	return ((wq_id * 4) << PAGE_SHIFT) + idxd_get_wq_portal_offset(prot, irq_type);
+ }
+ 
+ static inline void idxd_set_type(struct idxd_device *idxd)
+diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
+index 0c982337ef84..ee56b92108d8 100644
+--- a/drivers/dma/idxd/init.c
++++ b/drivers/dma/idxd/init.c
+@@ -254,10 +254,28 @@ static void idxd_read_table_offsets(struct idxd_device *idxd)
+ 	dev_dbg(dev, "IDXD Work Queue Config Offset: %#x\n", idxd->wqcfg_offset);
+ 	idxd->msix_perm_offset = offsets.msix_perm * IDXD_TABLE_MULT;
+ 	dev_dbg(dev, "IDXD MSIX Permission Offset: %#x\n", idxd->msix_perm_offset);
++	idxd->ims_offset = offsets.ims * IDXD_TABLE_MULT;
++	dev_dbg(dev, "IDXD IMS Offset: %#x\n", idxd->ims_offset);
+ 	idxd->perfmon_offset = offsets.perfmon * IDXD_TABLE_MULT;
+ 	dev_dbg(dev, "IDXD Perfmon Offset: %#x\n", idxd->perfmon_offset);
+ }
+ 
++static void idxd_check_ims(struct idxd_device *idxd)
++{
++	struct pci_dev *pdev = idxd->pdev;
++
++	/* verify that we have IMS vectors supported by device */
++	if (idxd->hw.gen_cap.max_ims_mult) {
++		idxd->ims_size = idxd->hw.gen_cap.max_ims_mult * 256ULL;
++		dev_dbg(&pdev->dev, "IMS size: %u\n", idxd->ims_size);
++		set_bit(IDXD_FLAG_IMS_SUPPORTED, &idxd->flags);
++		dev_dbg(&pdev->dev, "IMS supported for device\n");
++		return;
++	}
++
++	dev_dbg(&pdev->dev, "IMS unsupported for device\n");
++}
++
+ static void idxd_read_caps(struct idxd_device *idxd)
+ {
+ 	struct device *dev = &idxd->pdev->dev;
+@@ -276,6 +294,7 @@ static void idxd_read_caps(struct idxd_device *idxd)
+ 	dev_dbg(dev, "max xfer size: %llu bytes\n", idxd->max_xfer_bytes);
+ 	idxd->max_batch_size = 1U << idxd->hw.gen_cap.max_batch_shift;
+ 	dev_dbg(dev, "max batch size: %u\n", idxd->max_batch_size);
++	idxd_check_ims(idxd);
+ 	if (idxd->hw.gen_cap.config_en)
+ 		set_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags);
+ 
+diff --git a/drivers/dma/idxd/registers.h b/drivers/dma/idxd/registers.h
+index 5cbf368c7367..c97f700bcf34 100644
+--- a/drivers/dma/idxd/registers.h
++++ b/drivers/dma/idxd/registers.h
+@@ -385,4 +385,11 @@ union wqcfg {
+ #define GRPENGCFG_OFFSET(idxd_dev, n) ((idxd_dev)->grpcfg_offset + (n) * GRPCFG_SIZE + 32)
+ #define GRPFLGCFG_OFFSET(idxd_dev, n) ((idxd_dev)->grpcfg_offset + (n) * GRPCFG_SIZE + 40)
+ 
++#define PCI_EXT_CAP_ID_DVSEC		0x23	/* Designated Vendor-Specific */
++#define PCI_DVSEC_HEADER1		0x4	/* Designated Vendor-Specific Header1 */
++#define PCI_DVSEC_HEADER2		0x8	/* Designated Vendor-Specific Header2 */
++#define PCI_DVSEC_ID_INTEL_SIOV		0x0005
++#define PCI_DVSEC_INTEL_SIOV_CAP	0x0014
++#define PCI_DVSEC_INTEL_SIOV_CAP_IMS	0X00000001
++
+ #endif
+diff --git a/drivers/dma/idxd/sysfs.c b/drivers/dma/idxd/sysfs.c
+index 21c1e23cdf23..ab5c76e1226b 100644
+--- a/drivers/dma/idxd/sysfs.c
++++ b/drivers/dma/idxd/sysfs.c
+@@ -1444,6 +1444,14 @@ static ssize_t numa_node_show(struct device *dev,
+ }
+ static DEVICE_ATTR_RO(numa_node);
+ 
++static ssize_t ims_size_show(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct idxd_device *idxd = container_of(dev, struct idxd_device, conf_dev);
++
++	return sprintf(buf, "%u\n", idxd->ims_size);
++}
++static DEVICE_ATTR_RO(ims_size);
++
+ static ssize_t max_batch_size_show(struct device *dev,
+ 				   struct device_attribute *attr, char *buf)
+ {
+@@ -1639,6 +1647,7 @@ static struct attribute *idxd_device_attributes[] = {
+ 	&dev_attr_max_work_queues_size.attr,
+ 	&dev_attr_max_engines.attr,
+ 	&dev_attr_numa_node.attr,
++	&dev_attr_ims_size.attr,
+ 	&dev_attr_max_batch_size.attr,
+ 	&dev_attr_max_transfer_size.attr,
+ 	&dev_attr_op_cap.attr,
 
 
