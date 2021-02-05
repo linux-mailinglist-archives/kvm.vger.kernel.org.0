@@ -2,60 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C5A1310F59
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 19:02:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 12BCE310F6D
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 19:05:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233600AbhBEQTW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 11:19:22 -0500
-Received: from verein.lst.de ([213.95.11.211]:32946 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233524AbhBEQRR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 11:17:17 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1A3F667373; Fri,  5 Feb 2021 18:58:53 +0100 (CET)
-Date:   Fri, 5 Feb 2021 18:58:52 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        m.szyprowski@samsung.com, robin.murphy@arm.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        joro@8bytes.org, kirill.shutemov@linux.intel.com,
-        thomas.lendacky@amd.com, robert.buhren@sect.tu-berlin.de,
-        file@sect.tu-berlin.de, mathias.morbitzer@aisec.fraunhofer.de,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] swiotlb: Validate bounce size in the sync/unmap path
-Message-ID: <20210205175852.GA1021@lst.de>
-References: <X/27MSbfDGCY9WZu@martin> <20210113113017.GA28106@lst.de> <YAV0uhfkimXn1izW@martin> <20210203124922.GB16923@lst.de> <20210203193638.GA325136@fedora>
+        id S233635AbhBEQVT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 11:21:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233569AbhBEQTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 11:19:07 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88F76C0613D6
+        for <kvm@vger.kernel.org>; Fri,  5 Feb 2021 10:00:49 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id q20so4821107pfu.8
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 10:00:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8qb1CyCQjn/N+1y/YOs2JFjHcLhMQN11acgAoLNGKiQ=;
+        b=VVHaLfLKNyYdA5QhCxSkdfo9vcIXZlgeeExzIcDLdit6Cwz79JwZjnR9mN4wSkzjz4
+         dy0HpQQhUTiQOJD/dH0xmL+h/d6U3IA6hcdJWGCn0DnqZPInxzfyK5Mfoj+7UpAskeHv
+         gJlKMk0UN67uJOO3S6q01Lspk2sEmmBXz0CZ4N3g7jcm7pFR/TugKpafwtQAEdfDhgih
+         kljOAquYcTx+TMj3xOAFzy5MChDZ/zV8uGnHEYxJkbnzpPkkJIwf5EIjFgUFXzxF39rK
+         wajcA0PgmVfz8+eOdZHu/ooY6KtCYHjOQhZxn8CcYmlked0L6nzMXYZ32LBnnrluYOs9
+         Cwqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8qb1CyCQjn/N+1y/YOs2JFjHcLhMQN11acgAoLNGKiQ=;
+        b=RlC1Kth/3BsdFKxlHkrnosOnXp2J68qMjuYTOs/pc3hp05R1NWY61+QU0n7YKmBRHa
+         eLWvvC88hcAZwKQOB8y+03YYLbeTeFSCIefyzR2NOaPF3TFOBdBgE3FBhIrqgI8hkwzr
+         Ce1O6bSVah86jGNbOCB3G+g0owh3QKtB9jxASLG4vsMumLhVpfJhv9D3sFtln6Pzkntg
+         xf4gWxxUJ1yUmDbw9Y/ZQLuYG+ffhmZMPCwIJ5tewCRKJ57G6tRiU96T8w9550qEckJ+
+         E3T/ojPDVoIoXBCQatfVyVIDNR5LQKbtdRI7e7PhW0zmLnkDYSy0WRT6kNSu4A1K2Fj4
+         dcHw==
+X-Gm-Message-State: AOAM530LJ14XfjcwPVG5hWh/ZsxXSlBzK/LZM561Rl/EQxWWNTFDMwJ8
+        tj5qEWSvvLzJyE70WCzTaKk6eg==
+X-Google-Smtp-Source: ABdhPJyqrLSbGinpw8kAw9OAisrZH9ZMhkWsRghDbIat1Imo0jHkgsZrHsOrwJ9ds6qdleA9MfPldQ==
+X-Received: by 2002:a63:2f86:: with SMTP id v128mr5345741pgv.241.1612548048759;
+        Fri, 05 Feb 2021 10:00:48 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:d169:a9f7:513:e5])
+        by smtp.gmail.com with ESMTPSA id w12sm8852108pjq.26.2021.02.05.10.00.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 10:00:48 -0800 (PST)
+Date:   Fri, 5 Feb 2021 10:00:42 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Jonny Barker <jonny@jonnybarker.com>
+Subject: Re: [GIT PULL] KVM fixes for 5.11-rc7
+Message-ID: <YB2HykY8laADI+Qm@google.com>
+References: <20210205080456.30446-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210203193638.GA325136@fedora>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210205080456.30446-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 03, 2021 at 02:36:38PM -0500, Konrad Rzeszutek Wilk wrote:
-> > So what?  If you guys want to provide a new capability you'll have to do
-> > work.  And designing a new protocol based around the fact that the
-> > hardware/hypervisor is not trusted and a copy is always required makes
-> > a lot of more sense than throwing in band aids all over the place.
-> 
-> If you don't trust the hypervisor, what would this capability be in?
+On Fri, Feb 05, 2021, Paolo Bonzini wrote:
+> Sean Christopherson (3):
+>       KVM: x86: Update emulator context mode if SYSENTER xfers to 64-bit mode
 
-Well, they don't trust the hypervisor to not attack the guest somehow,
-except through the data read.  I never really understood the concept,
-as it leaves too many holes.
+Ah, shoot.  Too late now, but this should have been attributed to Jonny, I was
+just shepherding the official patch along and forgot to make Jonny the author.
 
-But the point is that these schemes want to force bounce buffering
-because they think it is more secure.  And if that is what you want
-you better have protocol build around the fact that each I/O needs
-to use bounce buffers, so you make those buffers the actual shared
-memory use for communication, and build the protocol around it.
-E.g. you don't force the ridiculous NVMe PRP offset rules on the block
-layer, just to make a complicated swiotlb allocation that needs to
-preserve the alignment just do I/O.  But instead you have a trivial
-ring buffer or whatever because you know I/O will be copied anyway
-and none of all the hard work higher layers do to make the I/O suitable
-for a normal device apply.
+Sorry Jonny :-/
