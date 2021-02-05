@@ -2,91 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0C9531158F
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 23:43:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01AA63116E7
+	for <lists+kvm@lfdr.de>; Sat,  6 Feb 2021 00:22:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231927AbhBEWeO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 17:34:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21903 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232145AbhBEONe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 09:13:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612540201;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=+vT+jbN1YVSVSpzQpXP9jC5D0CiFueilUGvKuUc6MhE=;
-        b=Pl8mWrGNOndtC9XADvofyiyNyA7yNr4jLV7fQ7HkTEv01iiYkZkhAqR1yM5YzaiN2YhWb5
-        MeHkfHu52tMdBcTxgPy5RPhFUZ9AC1jE/zzxwjz08MStHDGOBD3cn945gDqRCx5womwJPI
-        LH+ynVwpC7f/9zBHw/+9+Dssweb3xU0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-317-MHFSqBXYMCqxh1jPH4qOyw-1; Fri, 05 Feb 2021 10:45:26 -0500
-X-MC-Unique: MHFSqBXYMCqxh1jPH4qOyw-1
-Received: by mail-ej1-f69.google.com with SMTP id ar1so3589893ejc.22
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 07:45:25 -0800 (PST)
+        id S231865AbhBEXT4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 18:19:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52596 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229650AbhBEKEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 05:04:13 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9E8C061794
+        for <kvm@vger.kernel.org>; Fri,  5 Feb 2021 02:03:27 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id m6so4015115pfk.1
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 02:03:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CbYQyh/wUPH5WcnSCH7zbiSdkAdjW/rNp5kroeeG+hQ=;
+        b=oXwCFwAIzW1+p8qYzYussJeJMDKDssCHnCVHnxhympWx+CHOZ6zhK3D+PrN+EHfBtg
+         1IV1X23575kPhbgfbZcJghneTAR4ayzRV1uAe870b0w9HF8b90msSuz1/Ak1imfvwzWE
+         qGmMvdpV/0A/Hr3mczZqhz1sgwWcgIhwfCXMuqiaLRieY7KxWn9s76rypPG5KMHkYc69
+         BO+Lo8JdpDtN9Vo+8Llv1Sb0lSwvFSWKmsvlgQnLYOEav/X7l90ryqxGiW0q9iOGCxgA
+         n8+oHdvppb01HQT2IJ5lkekz9mhZBVQMG7P06MuythPAJaJSFswA7nZ25b3LZoh1TR3Q
+         6zRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=+vT+jbN1YVSVSpzQpXP9jC5D0CiFueilUGvKuUc6MhE=;
-        b=iaNX3MdIIDJTGbf5T3HI99WRR8rV4wiZD31tHPT7W34jAs/ATIcdwFkcsAky1LyoOG
-         c79VcMUvl41tgqT7fUa7vc47QF5lPeds4ZkOYkASoDzDzkmZFp4FkEwEtslJjrje7cx2
-         qEPe+sTBGBgGjNmRSSunfpFogbQxK59HMhvJRX1SYYE/vZC4YMFlaPIxpzKQ9gVIU/gq
-         hCRC+rUH+srNByfkHejzosMHp2F+p6n+b7z03WCqFKFRf3FRoCE3a28o9ManQsjn8ou2
-         2CrMIhsbWzIZv0qJPhuVpL7FpTYW942BbN1FWDe7oBC54/WehyjGv+qTyE4qHMXzHyPp
-         MmVw==
-X-Gm-Message-State: AOAM533n1M3tDinppiFLKzY0KXUuTKnhEfjvgbSB/YYsC3yU8/Y6rMqt
-        CY387m1O4eD8sPaQXZX5FhNAxtE0YH+k1tf1tGu/PgVXD2s96fWvP04TzNdaHCjXk93YDA854Vi
-        gGoEczWv/UuZT
-X-Received: by 2002:a17:906:8292:: with SMTP id h18mr4553202ejx.342.1612539924140;
-        Fri, 05 Feb 2021 07:45:24 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxqBUHpbvPYDpBnMWonVBrhZuXG+GwON2f3pVr2d/bLWj6ekzRtN+o9kgto+FKOSFfskxHUQg==
-X-Received: by 2002:a17:906:8292:: with SMTP id h18mr4553187ejx.342.1612539923963;
-        Fri, 05 Feb 2021 07:45:23 -0800 (PST)
-Received: from redhat.com (bzq-79-180-2-31.red.bezeqint.net. [79.180.2.31])
-        by smtp.gmail.com with ESMTPSA id y8sm4030809eje.37.2021.02.05.07.45.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 07:45:23 -0800 (PST)
-Date:   Fri, 5 Feb 2021 10:45:20 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        elic@nvidia.com, jasowang@redhat.com, mst@redhat.com
-Subject: [GIT PULL] vdpa: last minute bugfix
-Message-ID: <20210205104520-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CbYQyh/wUPH5WcnSCH7zbiSdkAdjW/rNp5kroeeG+hQ=;
+        b=Zo1cZxLn1AynPiFoAyxHwlWUnAWk44CCkJFdNDZ+2gJj63yoc37p1/me/3XO0rAcvh
+         P9FDkvHzyhYbudBiddfvOeWKb96iDKOhmRXRDAFnYGP/lko20eQBemG3HF2+tsJCFeV6
+         htCwTyxFX/xTZicsul/bLTzwmfR32oAujNzkPkklM2BuqR23Ord3tEsoGnUo/I/suRnS
+         6DNmgXLoGZweUEnkLPIcwlEBH2XukVawLp7eV6ltqagUe5yn1FghIRQYZj1JeX+Vt94C
+         2kfsRo4guCAZBS2IRSf/f/MLS+NrwdD6Lz6F3qaXuI39701hVKJCRttOHA+XOuSOVoPH
+         B54A==
+X-Gm-Message-State: AOAM530eQVn+s7wdXItTIDW1eFFQaOzQazZ9ContFTRV+3KjH/Er9rVG
+        vBvnitibQ6j1NjZ5mRBVdpJGTw==
+X-Google-Smtp-Source: ABdhPJxsOqdEPug9LcOofBdQrmkfXtTjd5kRElPCsAo3oxuUzCRmjprv29fFJ3DkqZrzLOYovaPP9g==
+X-Received: by 2002:a62:7dc4:0:b029:1ba:765:3af with SMTP id y187-20020a627dc40000b02901ba076503afmr3722368pfc.78.1612519407070;
+        Fri, 05 Feb 2021 02:03:27 -0800 (PST)
+Received: from C02CC49MMD6R.bytedance.net ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id l12sm8142562pjg.54.2021.02.05.02.03.20
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Feb 2021 02:03:26 -0800 (PST)
+From:   Zhimin Feng <fengzhimin@bytedance.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        fweisbec@gmail.com, zhouyibo@bytedance.com,
+        zhanghaozhong@bytedance.com, Zhimin Feng <fengzhimin@bytedance.com>
+Subject: [RESEND RFC: timer passthrough 0/9] Support timer passthrough for VM
+Date:   Fri,  5 Feb 2021 18:03:08 +0800
+Message-Id: <20210205100317.24174-1-fengzhimin@bytedance.com>
+X-Mailer: git-send-email 2.24.1 (Apple Git-126)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The following changes since commit 710eb8e32d04714452759f2b66884bfa7e97d495:
+The main motivation for this patch is to improve the performance of VM.
+This patch series introduces how to enable the timer passthrough in
+non-root mode.
 
-  vdpa/mlx5: Fix memory key MTT population (2021-01-20 03:47:04 -0500)
+The main idea is to offload the host timer to the preemtion timer in
+non-root mode. Through doing this, guest can write tscdeadline msr directly
+in non-root mode and host timer isn't lost. If CPU is in root mode,
+guest timer is switched to software timer.
 
-are available in the Git repository at:
+Testing on Intel(R) Xeon(R) Platinum 8260 server.
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+The guest OS is Debian(kernel: 4.19.28). The specific configuration is
+ is as follows: 8 cpu, 16GB memory, guest idle=poll
+memcached in guest(memcached -d -t 8 -u root)
 
-for you to fetch changes up to b35ccebe3ef76168aa2edaa35809c0232cb3578e:
+I use the memtier_benchmark tool to test performance
+(memtier_benchmark -P memcache_text -s guest_ip -c 16 -t 32
+ --key-maximum=10000000000 --random-data --data-size-range=64-128 -p 11211
+ --generate-keys --ratio 5:1 --test-time=500)
 
-  vdpa/mlx5: Restore the hardware used index after change map (2021-02-05 10:28:04 -0500)
+Total Ops can be improved 25% and Avg.Latency can be improved 20% when
+the timer-passthrough is enabled.
 
-----------------------------------------------------------------
-vdpa: last minute bugfix
+=============================================================
+               | Enable timer-passth | Disable timer-passth |
+=============================================================
+Totals Ops/sec |    514869.67        |     411766.67        |
+-------------------------------------------------------------
+Avg.Latency    |    0.99483          |     1.24294          |
+=============================================================
 
-A bugfix in the mlx driver I got at the last minute.
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Zhimin Feng (9):
+  KVM: vmx: hook set_next_event for getting the host tscd
+  KVM: vmx: enable host lapic timer offload preemtion timer
+  KVM: vmx: enable passthrough timer to guest
+  KVM: vmx: enable passth timer switch to sw timer
+  KVM: vmx: use tsc_adjust to enable tsc_offset timer passthrough
+  KVM: vmx: check enable_timer_passth strictly
+  KVM: vmx: save the initial value of host tscd
+  KVM: vmx: Dynamically open or close the timer-passthrough for pre-vm
+  KVM: vmx: query the state of timer-passth for vm
 
-----------------------------------------------------------------
-Eli Cohen (1):
-      vdpa/mlx5: Restore the hardware used index after change map
+ arch/x86/include/asm/kvm_host.h |  27 ++++
+ arch/x86/kvm/lapic.c            |   1 +
+ arch/x86/kvm/vmx/vmx.c          | 331 +++++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              |  26 +++-
+ include/linux/kvm_host.h        |   1 +
+ include/uapi/linux/kvm.h        |   3 +
+ kernel/time/tick-common.c       |   1 +
+ tools/include/uapi/linux/kvm.h  |   3 +
+ virt/kvm/kvm_main.c             |   1 +
+ 9 files changed, 389 insertions(+), 5 deletions(-)
 
- drivers/vdpa/mlx5/net/mlx5_vnet.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+-- 
+2.11.0
 
