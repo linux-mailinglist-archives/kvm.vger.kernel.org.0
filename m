@@ -2,177 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D34653114A9
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 23:14:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0B70311456
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 23:07:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231812AbhBEWLn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 17:11:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56347 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232798AbhBEOk6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 09:40:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612541897;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NnP5XCU4u3GLA5tU6K2RnQ5rd1UvAC9ZZ89SyiHV8bU=;
-        b=jHWLp9fXeO5yPVNAl5Qq4lKE1QLdW9VH2ka22e3qy0V5gQLW8KBACGp0rXKIZnX4uXUJZB
-        i77/O5NXtDuz+K3rDXVYd4x0R+76WGdCWSJ3ialrhOD4+u97xFBJFLOAy9MxLVkJtNvTLX
-        tUSQ6q5VGdlCmSmMeTD2vpOpY7noVQc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-SJzwipg3OWqg1c6qqbbG9w-1; Fri, 05 Feb 2021 09:17:11 -0500
-X-MC-Unique: SJzwipg3OWqg1c6qqbbG9w-1
-Received: by mail-wr1-f72.google.com with SMTP id l7so5406710wrp.1
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 06:17:11 -0800 (PST)
+        id S232861AbhBEWEK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 17:04:10 -0500
+Received: from mail-io1-f70.google.com ([209.85.166.70]:50344 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232842AbhBEOyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 09:54:33 -0500
+Received: by mail-io1-f70.google.com with SMTP id w15so6691898ioa.17
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 08:33:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=NnP5XCU4u3GLA5tU6K2RnQ5rd1UvAC9ZZ89SyiHV8bU=;
-        b=nOUtFAoUSzsmeebpwpNHSP1boTStmxRDtYyPx+/drBstmcIZx3KYUKA1aFx6umuZqq
-         +CzKGv3keCJcDVCVuQVdarWiKXLX614YdNQqaQoH8tsksM/yOkGU395kMfI2sZcT2m+c
-         Dq1uDUxbOdRliEG9rkx5D91TMG9cQllV51H0pSdon9ftd/lFpl9XwJvtLQBi6KPQApKx
-         iLnDhlStlImsgBYWyNIKZc/MqKYUVle9aI3z0ewadHJzEYl/KyiTb2SuZh3C94b5hJ80
-         fFbYTUliUO/TVWjkqwSXBok3lp1DeIs6+42b2a7D4y/1Im+eHNaS21Hf3ZF3PCs9x23z
-         Eb/w==
-X-Gm-Message-State: AOAM530jbKuvz2y5e0fpByaY3NXTCMSYzWjReZ4dwZWnzhTArP1WqsSx
-        XVn0b7KkAkc7Es8hHKOy5x6Iapv9m3KhXPpchExgXRWn3H+r04yOt4meBo6QhySW86jrsaIasZo
-        byxnrsyoMm8fh
-X-Received: by 2002:a5d:453b:: with SMTP id j27mr5351075wra.92.1612534630613;
-        Fri, 05 Feb 2021 06:17:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxoN6BUEbnc4t31XEyr636+ZdDqrgfqdIVz7cbLxF0zafdGnFimMKQJ7JMi3xLjdYuOKx6feA==
-X-Received: by 2002:a5d:453b:: with SMTP id j27mr5351061wra.92.1612534630414;
-        Fri, 05 Feb 2021 06:17:10 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id v6sm12579287wrx.32.2021.02.05.06.17.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 06:17:09 -0800 (PST)
-Date:   Fri, 5 Feb 2021 15:17:07 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
-        Laurent Vivier <lvivier@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 09/13] vhost/vdpa: remove vhost_vdpa_config_validate()
-Message-ID: <20210205141707.clbckauxnrzd7nmv@steredhat>
-References: <20210204172230.85853-1-sgarzare@redhat.com>
- <20210204172230.85853-10-sgarzare@redhat.com>
- <6919d2d4-cc8e-2b67-2385-35803de5e38b@redhat.com>
- <20210205091651.xfcdyuvwwzew2ufo@steredhat>
- <20210205083108-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=QLMdobwI21unXJ8AaGTczEYpBIwx778vxux7MxwfKw0=;
+        b=MKb6Nrt0bRny8i38LJYPxDyIeZ8By8AnGXLuX18kuzvuBqUYDx174UfLDwZusrXakR
+         rtUvsIV6/mYA6XyJ+xXfVwO7VSED2czgib93yI1L70hSIQgY9mNubLqHjAFDkgdSV5M1
+         BC22CgvbPOZ0WzTi0Ld7EnNpvYYD3MmS05txD8PWViayo9vQZOPbcjHBrfR7ft5IwPLa
+         qaM15DoDcUPilp0xYxpQt+RwSdcVp3piI4kSjz/TIieayDVgZK0xN6Yl+DCMtUUA8KDg
+         R99BsVOdHh4fVD3HDedEXRGWN3ZnUGTnnICC2wi6yLZNRA7U5hfKgUb2H4AgkiaqhShO
+         eOQA==
+X-Gm-Message-State: AOAM530egcIiHZ9cIG2rdwyooyIaJqrqhOLZGBQR2OL4YCrl0h4h8t/8
+        rF8+E+MdBrpRIZrWJqs9s+V5od6eqWH9OGaA5Q9wiCz0G1KJ
+X-Google-Smtp-Source: ABdhPJyTtj4JqxehYsbh8pCYlMZ6/g0siakHPFrYyRm/sexT0ghMwTNzvGcpEC0Nkz3MBf7DcpcR+YRs+wRZI/JNemcN6W8vEBul
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210205083108-mutt-send-email-mst@kernel.org>
+X-Received: by 2002:a05:6e02:1d88:: with SMTP id h8mr3911422ila.43.1612538416459;
+ Fri, 05 Feb 2021 07:20:16 -0800 (PST)
+Date:   Fri, 05 Feb 2021 07:20:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007ff56205ba985b60@google.com>
+Subject: general protection fault in vmx_vcpu_run (2)
+From:   syzbot <syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com>
+To:     bp@alien8.de, hpa@zytor.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 08:32:37AM -0500, Michael S. Tsirkin wrote:
->On Fri, Feb 05, 2021 at 10:16:51AM +0100, Stefano Garzarella wrote:
->> On Fri, Feb 05, 2021 at 11:27:32AM +0800, Jason Wang wrote:
->> >
->> > On 2021/2/5 上午1:22, Stefano Garzarella wrote:
->> > > get_config() and set_config() callbacks in the 'struct vdpa_config_ops'
->> > > usually already validated the inputs. Also now they can return an error,
->> > > so we don't need to validate them here anymore.
->> > >
->> > > Let's use the return value of these callbacks and return it in case of
->> > > error in vhost_vdpa_get_config() and vhost_vdpa_set_config().
->> > >
->> > > Originally-by: Xie Yongji <xieyongji@bytedance.com>
->> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> > > ---
->> > >  drivers/vhost/vdpa.c | 41 +++++++++++++----------------------------
->> > >  1 file changed, 13 insertions(+), 28 deletions(-)
->> > >
->> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> > > index ef688c8c0e0e..d61e779000a8 100644
->> > > --- a/drivers/vhost/vdpa.c
->> > > +++ b/drivers/vhost/vdpa.c
->> > > @@ -185,51 +185,35 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
->> > >  	return 0;
->> > >  }
->> > > -static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
->> > > -				      struct vhost_vdpa_config *c)
->> > > -{
->> > > -	long size = 0;
->> > > -
->> > > -	switch (v->virtio_id) {
->> > > -	case VIRTIO_ID_NET:
->> > > -		size = sizeof(struct virtio_net_config);
->> > > -		break;
->> > > -	}
->> > > -
->> > > -	if (c->len == 0)
->> > > -		return -EINVAL;
->> > > -
->> > > -	if (c->len > size - c->off)
->> > > -		return -E2BIG;
->> > > -
->> > > -	return 0;
->> > > -}
->> > > -
->> > >  static long vhost_vdpa_get_config(struct vhost_vdpa *v,
->> > >  				  struct vhost_vdpa_config __user *c)
->> > >  {
->> > >  	struct vdpa_device *vdpa = v->vdpa;
->> > >  	struct vhost_vdpa_config config;
->> > >  	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
->> > > +	long ret;
->> > >  	u8 *buf;
->> > >  	if (copy_from_user(&config, c, size))
->> > >  		return -EFAULT;
->> > > -	if (vhost_vdpa_config_validate(v, &config))
->> > > +	if (config.len == 0)
->> > >  		return -EINVAL;
->> > >  	buf = kvzalloc(config.len, GFP_KERNEL);
->> >
->> >
->> > Then it means usersapce can allocate a very large memory.
->>
->> Good point.
->>
->> >
->> > Rethink about this, we should limit the size here (e.g PAGE_SIZE) or
->> > fetch the config size first (either through a config ops as you
->> > suggested or a variable in the vdpa device that is initialized during
->> > device creation).
->>
->> Maybe PAGE_SIZE is okay as a limit.
->>
->> If instead we want to fetch the config size, then better a config ops in my
->> opinion, to avoid adding a new parameter to __vdpa_alloc_device().
->>
->> I vote for PAGE_SIZE, but it isn't a strong opinion.
->>
->> What do you and @Michael suggest?
->>
->> Thanks,
->> Stefano
->
->Devices know what the config size is. Just have them provide it.
->
+Hello,
 
-Okay, I'll add get_config_size() callback in vdpa_config_ops and I'll 
-leave vhost_vdpa_config_validate() that will use that callback instead 
-of 'virtio_id' to get the config size from the device.
+syzbot found the following issue on:
 
-At this point I think I can remove the "vdpa: add return value to 
-get_config/set_config callbacks" patch and leave void return to 
-get_config/set_config callbacks.
+HEAD commit:    aa2b8820 Add linux-next specific files for 20210205
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13d27b54d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=15c41e44a64aa1a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=42a71c84ef04577f1aef
 
-Does this make sense?
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Thanks,
-Stefano
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com
 
+general protection fault, probably for non-canonical address 0xdffffc0000001e26: 0000 [#1] PREEMPT SMP KASAN
+KASAN: probably user-memory-access in range [0x000000000000f130-0x000000000000f137]
+CPU: 0 PID: 18290 Comm: syz-executor.0 Not tainted 5.11.0-rc6-next-20210205-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:atomic_switch_perf_msrs arch/x86/kvm/vmx/vmx.c:6527 [inline]
+RIP: 0010:vmx_vcpu_run+0x538/0x2740 arch/x86/kvm/vmx/vmx.c:6698
+Code: 8a 55 00 39 eb 0f 8d fd 00 00 00 e8 42 85 55 00 48 8b 0c 24 48 63 c3 48 8d 04 40 48 8d 2c c1 48 8d 7d 08 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 05 1d 00 00 48 8d 7d 10 4c 8b 6d 08 48 89 f8
+RSP: 0018:ffffc9000238fb00 EFLAGS: 00010003
+RAX: 0000000000001e26 RBX: 0000000000000000 RCX: 000000000000f12e
+RDX: 0000000000040000 RSI: ffffffff811d679e RDI: 000000000000f136
+RBP: 000000000000f12e R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff811d675e R11: 0000000000000000 R12: ffff88806d8ba4d0
+R13: ffff88806d8ba520 R14: ffff88806d8b8000 R15: dffffc0000000000
+FS:  00007f1a30eaf700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1a30ece6b8 CR3: 000000001c387000 CR4: 00000000001526f0
+Call Trace:
+ vcpu_enter_guest+0x103d/0x3f90 arch/x86/kvm/x86.c:9015
+ vcpu_run arch/x86/kvm/x86.c:9155 [inline]
+ kvm_arch_vcpu_ioctl_run+0x440/0x1980 arch/x86/kvm/x86.c:9382
+ kvm_vcpu_ioctl+0x467/0xd90 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3283
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x465b09
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1a30eaf188 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000056c008 RCX: 0000000000465b09
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000007
+RBP: 00000000004b069f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c008
+R13: 00007ffde3d7a22f R14: 00007f1a30eaf300 R15: 0000000000022000
+Modules linked in:
+---[ end trace 7085899e9678fd16 ]---
+RIP: 0010:atomic_switch_perf_msrs arch/x86/kvm/vmx/vmx.c:6527 [inline]
+RIP: 0010:vmx_vcpu_run+0x538/0x2740 arch/x86/kvm/vmx/vmx.c:6698
+Code: 8a 55 00 39 eb 0f 8d fd 00 00 00 e8 42 85 55 00 48 8b 0c 24 48 63 c3 48 8d 04 40 48 8d 2c c1 48 8d 7d 08 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 05 1d 00 00 48 8d 7d 10 4c 8b 6d 08 48 89 f8
+RSP: 0018:ffffc9000238fb00 EFLAGS: 00010003
+RAX: 0000000000001e26 RBX: 0000000000000000 RCX: 000000000000f12e
+RDX: 0000000000040000 RSI: ffffffff811d679e RDI: 000000000000f136
+RBP: 000000000000f12e R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff811d675e R11: 0000000000000000 R12: ffff88806d8ba4d0
+R13: ffff88806d8ba520 R14: ffff88806d8b8000 R15: dffffc0000000000
+FS:  00007f1a30eaf700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1a30ece6b8 CR3: 000000001c387000 CR4: 00000000001526f0
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
