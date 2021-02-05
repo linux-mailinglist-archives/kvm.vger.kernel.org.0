@@ -2,88 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE7F0310298
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 03:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D5003102FC
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 03:52:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbhBECJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Feb 2021 21:09:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42156 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229508AbhBECJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Feb 2021 21:09:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 65C5A64FB0;
-        Fri,  5 Feb 2021 02:08:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612490921;
-        bh=ohT/o4ihZnrPvuQ1joQWVWE7+VxOLOWwPRzPgsnSby8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Zzvph+EX8RjaaCqQeBfjYAntCykri1cybHU5psGsewspD54LfTLifU8xbgNzKQ+Zp
-         7FZmSxaN5uO2P18A7XnORlrvQx4FIt69HOM7S+maECBXNslq5XTQbYGNxhPZWbraKw
-         lgg7fgQ+tYA657VUbSlTmUJay84f8XPrpm8QIJsY93qovVpQqQBon87w1vp5IMZ02W
-         2/ukVWq+3v9OFSpEejWeIWF1tanBPtlEBgGwE4ozJGSTr/gxYA3cTqeZTtaLP6ahqr
-         jGugI4mYokDHmw7ukwWiJIGvFkSysRZ4S3BfTB07x8Y+myav/5MXSFhyFmKDLpyTF9
-         tTt5/+0ybcrOg==
-Date:   Fri, 5 Feb 2021 04:08:33 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        luto@kernel.org, haitao.huang@intel.com, pbonzini@redhat.com,
-        bp@alien8.de, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v3 08/27] x86/sgx: Initialize virtual EPC driver even
- when SGX driver is disabled
-Message-ID: <YByooRl8riad4moe@kernel.org>
-References: <20210203134906.78b5265502c65f13bacc5e68@intel.com>
- <YBsdeco/t8sa7ecV@kernel.org>
- <YBsq45IDDX9PPc7s@google.com>
- <YBtQRCC3NHBmtrck@kernel.org>
- <b63bf7db09442e994563ccc3a3b608fc2f17b784.camel@intel.com>
- <YBtkkEp5hXpTl84s@kernel.org>
- <YBtlTE2xZ3wBrukB@kernel.org>
- <b523357d2f062bf801d8fa1b05bf7abf13c19e89.camel@intel.com>
- <YBwJ5S0C3dMS2AFY@kernel.org>
- <7a1d2316-5ce2-63fa-4186-a623dac1ecc8@intel.com>
+        id S229839AbhBECwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Feb 2021 21:52:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44824 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229793AbhBECwG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Feb 2021 21:52:06 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8786C0613D6
+        for <kvm@vger.kernel.org>; Thu,  4 Feb 2021 18:51:25 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id bl23so9283027ejb.5
+        for <kvm@vger.kernel.org>; Thu, 04 Feb 2021 18:51:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:sender:from:mime-version:content-transfer-encoding
+         :content-description:subject:to:date:reply-to;
+        bh=hqf55dXwvcYwwL4sAkoYuOM6RPu6wxeec88n5sMRYiY=;
+        b=euTAcRophe84gDkP6+HHF/E8ix/I08jiZh9nnruE9PMdocNO+3WTsAT1cP+vdaqVWG
+         Z7aB8VSbn/ExpiHm7xEgpfrJyvdY5jY8DSNa+8M4tvYRpbGxRLcXUnR26fp/NWEc08C3
+         9Hd5StQ7y/lH4WxAHz+OwyAgxVOG5NqbaLXuUAc5yFiEnbiVHaU69JJlFgTEaFIlAfgG
+         50kO2k7+NTPVf+kSl2+3lU2w3xKcfkjs1hLvZMl2pdGX90P0uTYEsnflJQeLzV3kSXGh
+         iRYqygMBAyJ8pwLh2dGzN3vDy/QTRwUvdOJ5m7Y4MU7z7VXzCjPzYOraqCfsrameXWxO
+         kfYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:sender:from:mime-version
+         :content-transfer-encoding:content-description:subject:to:date
+         :reply-to;
+        bh=hqf55dXwvcYwwL4sAkoYuOM6RPu6wxeec88n5sMRYiY=;
+        b=S2ntuB4WjixdOM1RehY37i/wwVCtYeVG20j1X78ly03W04g9sKkO5/157fyLt9ZWvb
+         1d71XL5myS37xqh9A8rkY2pwfRRDgnn8HFr+GIIoVJPI+ecyvWC8jBA9Hsk2iih0fil5
+         F4/HE/TZDYVweGN91WWwbGGHCZ0QnsD15U7VC7APRkY3FxE3lAHF0MUnKEZU0gFoLKqj
+         kQiBoMtnWRks67L9BRbJ2UjiskuyxkLXprU48BhFS6Y6snP4X9L06bD8Ek8v2nDwMCFz
+         X0VB+cLOYhw3skJ4Lc8GvDBk7pmH37PIe4CkrzfymRuvZBpaqOputsMisAPz3wAXjgbK
+         rYRA==
+X-Gm-Message-State: AOAM531QZGCgkDX7WYSUDVUfLl7dc1TOIyQx9HMVdm5CNFtZgzmAJJDI
+        rODz3cmJOVWt2iKsyeFcDKc=
+X-Google-Smtp-Source: ABdhPJzfKy9qpqAoNY/LxS2YanNATw7NEE0zvf1F7kVmxRJkRHIKdFsT9ML+nife5U/do/Qzw4aJ/Q==
+X-Received: by 2002:a17:906:c0cd:: with SMTP id bn13mr1936457ejb.368.1612493484672;
+        Thu, 04 Feb 2021 18:51:24 -0800 (PST)
+Received: from [192.168.1.6] ([154.124.28.35])
+        by smtp.gmail.com with ESMTPSA id r23sm3251673ejd.56.2021.02.04.18.51.20
+        (version=TLS1 cipher=AES128-SHA bits=128/128);
+        Thu, 04 Feb 2021 18:51:23 -0800 (PST)
+Message-ID: <601cb2ab.1c69fb81.9923d.f342@mx.google.com>
+Sender: Skylar Anderson <barr.markimmbaye@gmail.com>
+From:   calantha camara <sgt.andersonskylar0@gmail.com>
+X-Google-Original-From: calantha camara
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a1d2316-5ce2-63fa-4186-a623dac1ecc8@intel.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: hi dear
+To:     Recipients <calantha@vger.kernel.org>
+Date:   Fri, 05 Feb 2021 02:51:13 +0000
+Reply-To: calanthac20@gmail.com
+X-Mailer: cdcaafe51be8cdb99a1c85906066cad3d0e60e273541515a58395093a7c4e1f0eefb01d7fc4e6278706e9fb8c4dad093c3263345202970888b6b4d817f9e998c032e7d59
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 04, 2021 at 02:41:57PM -0800, Dave Hansen wrote:
-> On 2/4/21 6:51 AM, Jarkko Sakkinen wrote:
-> >>> A: ret == -ENODEV
-> >>> B: ret == 0
-> >>> C: ret != 0 && ret != -ENODEV
-> >> Let me try again: 
-> >>
-> >> Why A and C should be treated differently? What will behave incorrectly, in case of
-> >> C?
-> > So you don't know what different error codes mean?
-> 
-> How about we just leave the check in place as Sean wrote it, and add a
-> nice comment to explain what it is doing:
-> 	
-> 	/*
-> 	 * Always try to initialize the native *and* KVM drivers.
-> 	 * The KVM driver is less picky than the native one and
-> 	 * can function if the native one is not supported on the
-> 	 * current system or fails to initialize.
-> 	 *
-> 	 * Error out only if both fail to initialize.
->  	 */
-> 	ret = !!sgx_drv_init() & !!sgx_vepc_init();
-> 	if (ret)
-> 		goto err_kthread;
-
-WFM, I can go along, as long as there is a remark. There is a semantical
-difference between "not supported" and "failure to initialize". The
-driving point is that this should not be hidden. I was first thinking
-a note in the commit message, but inline comment is actually a better
-idea. Thanks!
-
-I can ack the next version, as long as this comment is included.
-
-/Jarkko
+do you speak Eglish
