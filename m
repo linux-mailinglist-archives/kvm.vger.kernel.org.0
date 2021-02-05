@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F6AE311304
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 22:03:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF824311319
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 22:08:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233489AbhBETUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 14:20:36 -0500
-Received: from mga06.intel.com ([134.134.136.31]:64265 "EHLO mga06.intel.com"
+        id S233744AbhBEVIF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 16:08:05 -0500
+Received: from mga07.intel.com ([134.134.136.100]:56062 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233624AbhBETMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 14:12:23 -0500
-IronPort-SDR: nSM3jjjnIHSyg+twsxOtU+94OWxV7dMkmlGzwNpS7tY2f5uYUaGb4RFMTheMcoD63hmyP/3cvP
- E28yeMro4nSw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="242990281"
+        id S233481AbhBETMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 14:12:09 -0500
+IronPort-SDR: ZvdZ+pGO4vRzHu/NU1/oNMRyH9qTnoSNOoSXZKS4jWV2R6e02+tsAUpMN3HCMY6QuTQTh0l22c
+ VmgScOyRQuUw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="245557951"
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="242990281"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:05 -0800
-IronPort-SDR: PajqOwiDjXskbWiMWCMobc+aQEjlgmErAdbdO33UjwDDoBectEaet4CLZreXZshgOBDvDjUI6J
- VFq2av9VA1zA==
+   d="scan'208";a="245557951"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:12 -0800
+IronPort-SDR: I49WTfDurRmURM/DTk/92r5bCOpZaF9j0yeGrW5dXKsWGtCIlkkYgSySBFhQAdk+CRAoJ9K80w
+ 43uPmeMeL6tQ==
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="357820056"
+   d="scan'208";a="508666130"
 Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:04 -0800
-Subject: [PATCH v5 11/14] vfio/mdev: idxd: ims setup for the vdcm
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:11 -0800
+Subject: [PATCH v5 12/14] vfio/mdev: idxd: add irq bypass for IMS vectors
 From:   Dave Jiang <dave.jiang@intel.com>
 To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
         tglx@linutronix.de, vkoul@kernel.org
@@ -36,8 +36,8 @@ Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
         shahafs@mellanox.com, pbonzini@redhat.com,
         dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
-Date:   Fri, 05 Feb 2021 13:54:04 -0700
-Message-ID: <161255844433.339900.3136365210231233047.stgit@djiang5-desk3.ch.intel.com>
+Date:   Fri, 05 Feb 2021 13:54:10 -0700
+Message-ID: <161255845083.339900.12339149209312159722.stgit@djiang5-desk3.ch.intel.com>
 In-Reply-To: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
 References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
 User-Agent: StGit/0.23-29-ga622f1
@@ -48,174 +48,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add setup for IMS enabling for the mediated device.
-
-On the actual hardware the MSIX vector 0 is misc interrupt and
-handles events such as administrative command completion, error
-reporting, performance monitor overflow, and etc. The MSIX vectors
-1...N are used for descriptor completion interrupts. On the guest
-kernel, the MSIX interrupts are backed by the mediated device through
-emulation or IMS vectors. Vector 0 is handled through emulation by
-the host vdcm. The vector 1 (and more may be supported later) is
-backed by IMS.
-
-IMS can be setup with interrupt handlers via request_irq() just like
-MSIX interrupts once the relevant IRQ domain is set.
-
-The msi_domain_alloc_irqs()/msi_domain_free_irqs() APIs can then be
-used to allocate interrupts from the above set domain.
+Add support to bypass host for IMS interrupts configured for the guest.
 
 Signed-off-by: Dave Jiang <dave.jiang@intel.com>
 ---
- drivers/dma/idxd/idxd.h       |    1 +
- drivers/vfio/mdev/idxd/mdev.c |   12 +++++++++
- drivers/vfio/mdev/idxd/vdev.c |   53 ++++++++++++++++++++++++++++++++---------
- kernel/irq/msi.c              |    2 ++
- 4 files changed, 57 insertions(+), 11 deletions(-)
+ drivers/vfio/mdev/Kconfig     |    1 +
+ drivers/vfio/mdev/idxd/mdev.c |   17 +++++++++++++++--
+ drivers/vfio/mdev/idxd/mdev.h |    1 +
+ 3 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 41eee987c9b7..c5ef6ccc9ba6 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -224,6 +224,7 @@ struct idxd_device {
- 	struct workqueue_struct *wq;
- 	struct work_struct work;
- 
-+	struct irq_domain *ims_domain;
- 	int *int_handles;
- 
- 	struct auxiliary_device *mdev_auxdev;
+diff --git a/drivers/vfio/mdev/Kconfig b/drivers/vfio/mdev/Kconfig
+index e9540e43d1f1..ab0a6f0930bc 100644
+--- a/drivers/vfio/mdev/Kconfig
++++ b/drivers/vfio/mdev/Kconfig
+@@ -22,6 +22,7 @@ config VFIO_MDEV_IDXD
+ 	depends on VFIO && VFIO_MDEV && X86_64
+ 	select AUXILIARY_BUS
+ 	select IMS_MSI_ARRAY
++	select IRQ_BYPASS_MANAGER
+ 	default n
+ 	help
+ 	  VFIO based mediated device driver for Intel Accelerator Devices driver.
 diff --git a/drivers/vfio/mdev/idxd/mdev.c b/drivers/vfio/mdev/idxd/mdev.c
-index 7cde707021db..8a4af882a47f 100644
+index 8a4af882a47f..d59920f78109 100644
 --- a/drivers/vfio/mdev/idxd/mdev.c
 +++ b/drivers/vfio/mdev/idxd/mdev.c
-@@ -1167,6 +1167,7 @@ static int alloc_supported_types(struct idxd_device *idxd)
- int idxd_mdev_host_init(struct idxd_device *idxd)
- {
- 	struct device *dev = &idxd->pdev->dev;
-+	struct ims_array_info ims_info;
- 	int rc;
+@@ -616,9 +616,13 @@ static int msix_trigger_unregister(struct vdcm_idxd *vidxd, int index)
  
- 	if (!test_bit(IDXD_FLAG_IMS_SUPPORTED, &idxd->flags))
-@@ -1188,6 +1189,15 @@ int idxd_mdev_host_init(struct idxd_device *idxd)
- 		return -EOPNOTSUPP;
+ 	dev_dbg(dev, "disable MSIX trigger %d\n", index);
+ 	if (index) {
++		struct irq_bypass_producer *producer;
+ 		u32 auxval;
+ 
++		producer = &vidxd->vdev.producer[index];
++		irq_bypass_unregister_producer(producer);
+ 		irq_entry = &vidxd->irq_entries[index];
++
+ 		if (irq_entry->irq_set) {
+ 			free_irq(irq_entry->irq, irq_entry);
+ 			irq_entry->irq_set = false;
+@@ -654,9 +658,10 @@ static int msix_trigger_register(struct vdcm_idxd *vidxd, u32 fd, int index)
  	}
  
-+	ims_info.max_slots = idxd->ims_size;
-+	ims_info.slots = idxd->reg_base + idxd->ims_offset;
-+	idxd->ims_domain = pci_ims_array_create_msi_irq_domain(idxd->pdev, &ims_info);
-+	if (!idxd->ims_domain) {
-+		dev_warn(dev, "Fail to acquire IMS domain\n");
-+		iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_AUX);
-+		return -ENODEV;
-+	}
-+
- 	return mdev_register_device(dev, &idxd_vdcm_ops);
- }
+ 	if (index) {
+-		u32 pasid;
+-		u32 auxval;
++		struct irq_bypass_producer *producer;
++		u32 pasid, auxval;
  
-@@ -1196,6 +1206,8 @@ void idxd_mdev_host_release(struct idxd_device *idxd)
- 	struct device *dev = &idxd->pdev->dev;
- 	int rc;
- 
-+	irq_domain_remove(idxd->ims_domain);
++		producer = &vidxd->vdev.producer[index];
+ 		irq_entry = &vidxd->irq_entries[index];
+ 		rc = idxd_mdev_get_pasid(mdev, &pasid);
+ 		if (rc < 0)
+@@ -682,6 +687,14 @@ static int msix_trigger_register(struct vdcm_idxd *vidxd, u32 fd, int index)
+ 			irq_set_auxdata(irq_entry->irq, IMS_AUXDATA_CONTROL_WORD, auxval);
+ 			return rc;
+ 		}
 +
- 	mdev_unregister_device(dev);
- 	if (iommu_dev_has_feature(dev, IOMMU_DEV_FEAT_AUX)) {
- 		rc = iommu_dev_disable_feature(dev, IOMMU_DEV_FEAT_AUX);
-diff --git a/drivers/vfio/mdev/idxd/vdev.c b/drivers/vfio/mdev/idxd/vdev.c
-index 766fd98e9eea..8626438a9e54 100644
---- a/drivers/vfio/mdev/idxd/vdev.c
-+++ b/drivers/vfio/mdev/idxd/vdev.c
-@@ -16,6 +16,7 @@
- #include <linux/intel-svm.h>
- #include <linux/kvm_host.h>
- #include <linux/eventfd.h>
-+#include <linux/irqchip/irq-ims-msi.h>
- #include <uapi/linux/idxd.h>
- #include "registers.h"
- #include "idxd.h"
-@@ -871,6 +872,47 @@ static void vidxd_wq_disable(struct vdcm_idxd *vidxd, int wq_id_mask)
- 	idxd_complete_command(vidxd, IDXD_CMDSTS_SUCCESS);
- }
- 
-+void vidxd_free_ims_entries(struct vdcm_idxd *vidxd)
-+{
-+	struct mdev_device *mdev = vidxd->vdev.mdev;
-+	struct device *dev = mdev_dev(mdev);
++		producer->token = trigger;
++		producer->irq = irq_entry->irq;
++		rc = irq_bypass_register_producer(producer);
++		if (unlikely(rc))
++			dev_info(dev, "irq bypass producer (token %p) registration failed: %d\n",
++				 producer->token, rc);
 +
-+	msi_domain_free_irqs(dev_get_msi_domain(dev), dev);
-+}
-+
-+int vidxd_setup_ims_entries(struct vdcm_idxd *vidxd)
-+{
-+	struct irq_domain *irq_domain;
-+	struct idxd_device *idxd = vidxd->idxd;
-+	struct mdev_device *mdev = vidxd->vdev.mdev;
-+	struct device *dev = mdev_dev(mdev);
-+	struct msi_desc *entry;
-+	struct ims_irq_entry *irq_entry;
-+	int rc, i;
-+
-+	irq_domain = idxd->ims_domain;
-+	dev_set_msi_domain(dev, irq_domain);
-+
-+	/* We are allocate MAX_MSIX - 1 is because vector 0 is emulated and not IMS backed. */
-+	rc = msi_domain_alloc_irqs(irq_domain, dev, VIDXD_MAX_MSIX_VECS - 1);
-+	if (rc < 0)
-+		return rc;
-+	/*
-+	 * The first MSIX vector on the guest is emulated and not backed by IMS. To make matters
-+	 * simple the ims entries include the emulated vector. Here the code starts at index
-+	 * 1 to setup all the IMS backed vectors.
-+	 */
-+	i = 1;
-+	for_each_msi_entry(entry, dev) {
-+		irq_entry = &vidxd->irq_entries[i];
-+		irq_entry->ims_idx = entry->device_msi.hwirq;
-+		irq_entry->irq = entry->irq;
-+		i++;
-+	}
-+
-+	return 0;
-+}
-+
- static bool command_supported(struct vdcm_idxd *vidxd, u32 cmd)
- {
- 	struct idxd_device *idxd = vidxd->idxd;
-@@ -938,14 +980,3 @@ void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val)
- 		break;
+ 		irq_entry->irq_set = true;
  	}
- }
--
--int vidxd_setup_ims_entries(struct vdcm_idxd *vidxd)
--{
--	/* PLACEHOLDER */
--	return 0;
--}
--
--void vidxd_free_ims_entries(struct vdcm_idxd *vidxd)
--{
--	/* PLACEHOLDER */
--}
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index d70d92eac322..d95299b4ae79 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -536,6 +536,7 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
  
- 	return ops->domain_alloc_irqs(domain, dev, nvec);
- }
-+EXPORT_SYMBOL_GPL(msi_domain_alloc_irqs);
+diff --git a/drivers/vfio/mdev/idxd/mdev.h b/drivers/vfio/mdev/idxd/mdev.h
+index 8421b4962ac7..1f867de416e7 100644
+--- a/drivers/vfio/mdev/idxd/mdev.h
++++ b/drivers/vfio/mdev/idxd/mdev.h
+@@ -45,6 +45,7 @@ struct idxd_vdev {
+ 	struct mdev_device *mdev;
+ 	struct vfio_group *vfio_group;
+ 	struct eventfd_ctx *msix_trigger[VIDXD_MAX_MSIX_ENTRIES];
++	struct irq_bypass_producer producer[VIDXD_MAX_MSIX_ENTRIES];
+ };
  
- void __msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
- {
-@@ -572,6 +573,7 @@ void msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
- 
- 	return ops->domain_free_irqs(domain, dev);
- }
-+EXPORT_SYMBOL_GPL(msi_domain_free_irqs);
- 
- /**
-  * msi_get_domain_info - Get the MSI interrupt domain info for @domain
+ struct vdcm_idxd {
 
 
