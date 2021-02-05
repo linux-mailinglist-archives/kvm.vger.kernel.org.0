@@ -2,116 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A431310678
+	by mail.lfdr.de (Postfix) with ESMTP id DA556310679
 	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 09:18:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbhBEIRn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 03:17:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30273 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231674AbhBEIRP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 03:17:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612512949;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5A2n83ZDnlm1NkFFw8bns49S50xt4DIpYPGWdbWm6fs=;
-        b=UMBb+IW0qNkE8R2VZnCJOXFsdsnDAv89tCypQaf9BJ6qmDflUZj7nG10IYvtfoXq4sc0yr
-        s5/BYkl6bhEGAIExR/UUoPgF/V/yQ8b+U7rKyLnOAkkHCkGQd2yyJY0etdcwGLkVrKuXwi
-        9LGiGayWpdZyyUZHaSyjHTHTWMeZClM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-AFEI_6lzNR2dvziMuldjfA-1; Fri, 05 Feb 2021 03:15:47 -0500
-X-MC-Unique: AFEI_6lzNR2dvziMuldjfA-1
-Received: by mail-ej1-f72.google.com with SMTP id aq28so6205233ejc.20
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 00:15:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5A2n83ZDnlm1NkFFw8bns49S50xt4DIpYPGWdbWm6fs=;
-        b=o1OknJeG4NYe5e+sY+KEa2liAqVZc1eLfCmgpbGwDuaPBwMcQKojdZFYAL3uYQZD4d
-         gXVQMYRRch51umK3p3DFr1AISj0Daw1hDaA/KbfDqTLuv4YLD0evG4/dT0xUwx3Ldge/
-         m5+Dt9vbEKAB2LRmLCAQEiBo0ilzOfITZBSk/V0DlFn7gkSVU7Oo0bkFefmTtgSG6lF2
-         0axpwKXrH/dkhTTctBhW35cBL23drKnqr/EVcbIHexJYiaBd0ES79c+7Ni2efjp9W9tS
-         tkjXQl9BYmyxZP33paMBs2xmjUKv6s9N5UOOP/hJM98AHSVv43wR10QkcA4Z2kzVrYy6
-         M/9Q==
-X-Gm-Message-State: AOAM531aZYIWDOXAHPg5k6FQm8RPEcoySg9ZrtXJ0zKbOPFWae0RkQBV
-        heH+onhV0V/PgXPxqSaDh1O3oI18m9A+jnbjtUQVAcJgsEaK8ShrOgtM/uBSPEJuGgSgLkeNSNc
-        8xzQF9dyLkUS2
-X-Received: by 2002:aa7:d2d2:: with SMTP id k18mr2501876edr.222.1612512946051;
-        Fri, 05 Feb 2021 00:15:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxeaKAF6aBanEvGHcCd7fxNJFLUULphXfvk9kbURBuLZvf1nOmdWlO/GtUMsm7nvs6507ZdlQ==
-X-Received: by 2002:aa7:d2d2:: with SMTP id k18mr2501864edr.222.1612512945903;
-        Fri, 05 Feb 2021 00:15:45 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id c1sm2270549eja.81.2021.02.05.00.15.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Feb 2021 00:15:45 -0800 (PST)
-Subject: Re: [PATCH 2/2] KVM: x86: Restore all 64 bits of DR6 and DR7 during
- RSM on x86-64
-To:     Sean Christopherson <seanjc@google.com>
+        id S231654AbhBEIRy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 03:17:54 -0500
+Received: from mga05.intel.com ([192.55.52.43]:45779 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231616AbhBEIRo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 03:17:44 -0500
+IronPort-SDR: ja+Hd8T03IL/KSij1j90C44fcpa9tftpPh5ussA+ZcDqzu2OfJG03szfSvEaKcOEdUU+QcBZuK
+ OevFsBnS164A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9885"; a="266230891"
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="266230891"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 00:17:00 -0800
+IronPort-SDR: CchZAmIblgIWP22MZmvVbIL4x1przYjfvTwcnt6qRUXZmU6Pgu9C0riDl6EcUDAa75qkN8ImdH
+ bugGpGDON5/w==
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="393757160"
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.238.4.93]) ([10.238.4.93])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 00:16:57 -0800
+Subject: Re: [PATCH v2 4/4] KVM: x86: Expose Architectural LBR CPUID and its
+ XSAVES bit
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210205012458.3872687-1-seanjc@google.com>
- <20210205012458.3872687-3-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4ed4e33e-191d-1ee9-eee5-1c5a8a553b41@redhat.com>
-Date:   Fri, 5 Feb 2021 09:15:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        linux-kernel@vger.kernel.org, Like Xu <like.xu@linux.intel.com>
+References: <20210203135714.318356-1-like.xu@linux.intel.com>
+ <20210203135714.318356-5-like.xu@linux.intel.com>
+ <8321d54b-173b-722b-ddce-df2f9bd7abc4@redhat.com>
+ <219d869b-0eeb-9e52-ea99-3444c6ab16a3@intel.com>
+From:   "Xu, Like" <like.xu@intel.com>
+Message-ID: <b73a2945-11b9-38bf-845a-c64e7caa9d2e@intel.com>
+Date:   Fri, 5 Feb 2021 16:16:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210205012458.3872687-3-seanjc@google.com>
+In-Reply-To: <219d869b-0eeb-9e52-ea99-3444c6ab16a3@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/02/21 02:24, Sean Christopherson wrote:
-> Restore the full 64-bit values of DR6 and DR7 when emulating RSM on
-> x86-64, as defined by both Intel's SDM and AMD's APM.
-> 
-> Note, bits 63:32 of DR6 and DR7 are reserved, so this is a glorified nop
-> unless the SMM handler is poking into SMRAM, which it most definitely
-> shouldn't be doing since both Intel and AMD list the DR6 and DR7 fields
-> as read-only.
-> 
-> Fixes: 660a5d517aaa ("KVM: x86: save/load state on SMM switch")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/emulate.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index 2e6e6c39922f..72a1bd04dfe1 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -2564,12 +2564,12 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
->   	ctxt->_eip   = GET_SMSTATE(u64, smstate, 0x7f78);
->   	ctxt->eflags = GET_SMSTATE(u32, smstate, 0x7f70) | X86_EFLAGS_FIXED;
->   
-> -	val = GET_SMSTATE(u32, smstate, 0x7f68);
-> +	val = GET_SMSTATE(u64, smstate, 0x7f68);
->   
->   	if (ctxt->ops->set_dr(ctxt, 6, val))
->   		return X86EMUL_UNHANDLEABLE;
->   
-> -	val = GET_SMSTATE(u32, smstate, 0x7f60);
-> +	val = GET_SMSTATE(u64, smstate, 0x7f60);
->   
->   	if (ctxt->ops->set_dr(ctxt, 7, val))
->   		return X86EMUL_UNHANDLEABLE;
-> 
+Hi Paolo,
 
-Queued, thanks.
+I am wondering if it is acceptable for you to
+review the minor Architecture LBR patch set without XSAVES for v5.12 ?
 
-Paolo
+As far as I know, the guest Arch LBR  can still work without XSAVES support.
+
+---
+thx,likexu
+
+On 2021/2/4 8:59, Xu, Like wrote:
+> On 2021/2/3 22:37, Paolo Bonzini wrote:
+>> On 03/02/21 14:57, Like Xu wrote:
+>>> If CPUID.(EAX=07H, ECX=0):EDX[19] is exposed to 1, the KVM supports Arch
+>>> LBRs and CPUID leaf 01CH indicates details of the Arch LBRs capabilities.
+>>> As the first step, KVM only exposes the current LBR depth on the host for
+>>> guest, which is likely to be the maximum supported value on the host.
+>>>
+>>> If KVM supports XSAVES, the CPUID.(EAX=0DH, ECX=1):EDX:ECX[bit 15]
+>>> is also exposed to 1, which means the availability of support for Arch
+>>> LBR configuration state save and restore. When available, guest software
+>>> operating at CPL=0 can use XSAVES/XRSTORS manage supervisor state
+>>> component Arch LBR for own purposes once IA32_XSS [bit 15] is set.
+>>> XSAVE support for Arch LBRs is enumerated in CPUID.(EAX=0DH, ECX=0FH).
+>>>
+>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>>> ---
+>>>   arch/x86/kvm/cpuid.c   | 23 +++++++++++++++++++++++
+>>>   arch/x86/kvm/vmx/vmx.c |  2 ++
+>>>   arch/x86/kvm/x86.c     | 10 +++++++++-
+>>>   3 files changed, 34 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>> index 944f518ca91b..900149eec42d 100644
+>>> --- a/arch/x86/kvm/cpuid.c
+>>> +++ b/arch/x86/kvm/cpuid.c
+>>> @@ -778,6 +778,29 @@ static inline int __do_cpuid_func(struct 
+>>> kvm_cpuid_array *array, u32 function)
+>>>               entry->edx = 0;
+>>>           }
+>>>           break;
+>>> +    /* Architectural LBR */
+>>> +    case 0x1c:
+>>> +    {
+>>> +        u64 lbr_depth_mask = 0;
+>>> +
+>>> +        if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
+>>> +            entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        /*
+>>> +         * KVM only exposes the maximum supported depth,
+>>> +         * which is also the fixed value used on the host.
+>>> +         *
+>>> +         * KVM doesn't allow VMM user sapce to adjust depth
+>>> +         * per guest, because the guest LBR emulation depends
+>>> +         * on the implementation of the host LBR driver.
+>>> +         */
+>>> +        lbr_depth_mask = 1UL << fls(entry->eax & 0xff);
+>>> +        entry->eax &= ~0xff;
+>>> +        entry->eax |= lbr_depth_mask;
+>>> +        break;
+>>> +    }
+>>>       /* Intel PT */
+>>>       case 0x14:
+>>>           if (!kvm_cpu_cap_has(X86_FEATURE_INTEL_PT)) {
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 9ddf0a14d75c..c22175d9564e 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -7498,6 +7498,8 @@ static __init void vmx_set_cpu_caps(void)
+>>>           kvm_cpu_cap_check_and_set(X86_FEATURE_INVPCID);
+>>>       if (vmx_pt_mode_is_host_guest())
+>>>           kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
+>>> +    if (cpu_has_vmx_arch_lbr())
+>>> +        kvm_cpu_cap_check_and_set(X86_FEATURE_ARCH_LBR);
+>>>         if (vmx_umip_emulated())
+>>>           kvm_cpu_cap_set(X86_FEATURE_UMIP);
+>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>> index 667d0042d0b7..107f2e72f526 100644
+>>> --- a/arch/x86/kvm/x86.c
+>>> +++ b/arch/x86/kvm/x86.c
+>>> @@ -10385,8 +10385,16 @@ int kvm_arch_hardware_setup(void *opaque)
+>>>         if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+>>>           supported_xss = 0;
+>>> -    else
+>>> +    else {
+>>>           supported_xss &= host_xss;
+>>> +        /*
+>>> +         * The host doesn't always set ARCH_LBR bit to hoss_xss since 
+>>> this
+>>> +         * Arch_LBR component is used on demand in the Arch LBR driver.
+>>> +         * Check e649b3f0188f "Support dynamic supervisor feature for 
+>>> LBR".
+>>> +         */
+>>> +        if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>>> +            supported_xss |= XFEATURE_MASK_LBR;
+>>> +    }
+>>>         /* Update CET features now that supported_xss is finalized. */
+>>>       if (!kvm_cet_supported()) {
+>>>
+>>
+>> This requires some of the XSS patches that Weijang posted for CET, right?
+>
+> Yes, at least we need three of them for Arch LBR:
+>
+> 3009dfd6d61f KVM: x86: Load guest fpu state when accessing MSRs managed 
+> by XSAVES
+> d39b0a16ad1f KVM: x86: Refresh CPUID on writes to MSR_IA32_XSS
+> e98bf65e51c9 KVM: x86: Report XSS as an MSR to be saved if there are 
+> supported features
+>
+>>
+>> Also, who takes care of saving/restoring the MSRs, if the host has not 
+>> added XFEATURE_MASK_LBR to MSR_IA32_XSS?
+>
+> I may not understand your concern on this. Let me try to explain:
+>
+> The guest Arch LBR driver will save the origin host_xss and
+> mark the LBR bit only in the XSS and then save/restore MSRs
+> in the extra specified guest memory, and restore the origin host_xss.
+>
+> On the host side, the same thing happens to vcpu thread
+> due to the help of guest LBR event created by the vPMU
+> and the hardware LBR MSRs are saved/restored in a exclusive way.
+>
+>>
+>> Thanks,
+>>
+>> Paolo
+>>
+>
 
