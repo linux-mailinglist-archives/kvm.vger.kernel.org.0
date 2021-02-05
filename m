@@ -2,296 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E2941310DDA
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 17:27:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2F80310DDD
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 17:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232824AbhBEOrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 09:47:22 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3808 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232799AbhBEOlB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 09:41:01 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 115E3lWF058468;
-        Fri, 5 Feb 2021 09:05:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=tcdaWIthUTWkXqt6x/uaa2unLerQNFi/+E+HFdjsbtY=;
- b=ApeGdxYLfxs4Rd8s7GRpfKRas9ahcVawmhT5b/HQeohoKsfTTlsxhjKTSphYvZ95buTC
- LvcUMkR5qK/vloV//BAH07PI83IqZCDXVd6gQr3oJRqAKa6lsRbaR+m6GjWDz2CkE7Qt
- JQz3yfyLB4s+HnmWNRwDdtb8Udo5GAFLMB1NO1Az4qZvKMgeqHTLPrQVnzQg7NLW+De4
- iET4vOk0JIaoh+0BXjpy2ghzLg5Awm71ZuhKrd/bUk2iDkHSozYAuUuYJai7UDUszJSW
- q/Zx5jvJJsqNr4d+57yWR4yaNHMW7sX92aYC0QXi2E7S3OcnIGO4T6E4li21OLNOEbbl yw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36h6x396dt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 09:05:30 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 115E4ZAV062140;
-        Fri, 5 Feb 2021 09:05:27 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36h6x3964v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 09:05:26 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 115DvDca030141;
-        Fri, 5 Feb 2021 14:05:18 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 36evvf3m9y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 05 Feb 2021 14:05:18 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 115E5FpL41615740
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 5 Feb 2021 14:05:16 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AEEF9A405D;
-        Fri,  5 Feb 2021 14:05:15 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5352AA4069;
-        Fri,  5 Feb 2021 14:05:15 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.1.216])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  5 Feb 2021 14:05:15 +0000 (GMT)
-Date:   Fri, 5 Feb 2021 15:05:08 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        david@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] s390/kvm: extend kvm_s390_shadow_fault to return
- entry pointer
-Message-ID: <20210205150508.75789dd0@ibm-vm>
-In-Reply-To: <9eb63005-a11f-a56a-d7e1-c65dd9e8d9a2@linux.ibm.com>
-References: <20210202180028.876888-1-imbrenda@linux.ibm.com>
- <20210202180028.876888-2-imbrenda@linux.ibm.com>
- <16522b25-a590-fbc4-0eb6-3537d8032577@linux.ibm.com>
- <20210205131555.0b4f32d1@ibm-vm>
- <9eb63005-a11f-a56a-d7e1-c65dd9e8d9a2@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S232828AbhBEOr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 09:47:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43642 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229808AbhBEOlT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 09:41:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612541917;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OO/Z9Pbt3ecs88CwJUi87r2qp3LeYfy2PFUUcweybu4=;
+        b=LaE9WMomg7O8+qc/pEbruBstnc/YHzF9/5gybqpbBvsCVMr5U5fwTQ1vpud1/Fe7nK6lok
+        fBqFYu51Lct82JJiVcIo/vp1rWQFEGp3Oda4Jl5gJ/QzcZaEzs45mxsGS9WvpjaluMDZmV
+        cXTuxVYGIOiZpdEhwt3uj5a8q5GvyYY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-578-JjOKQRXqNmeTfRJ6sQkKCw-1; Fri, 05 Feb 2021 09:17:58 -0500
+X-MC-Unique: JjOKQRXqNmeTfRJ6sQkKCw-1
+Received: by mail-wr1-f70.google.com with SMTP id w3so5377880wrm.22
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 06:17:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=OO/Z9Pbt3ecs88CwJUi87r2qp3LeYfy2PFUUcweybu4=;
+        b=H3kC4Zan9S62aeg3yYLJKtlJHEtyN7idjajAJEzqtaK7H3pBvLGPr4pSUNe9qHJuwW
+         nK38YWI0zs0f6KRyj96UktGtb5C9OFsD4jT18s6yvAL6J2edkrS91aS1GXXcnVtyHisi
+         9D+utsa8FV0KXkYpxHLualzIczDlkWblUOyn6YJNm6YVctOnD0FFqPqfpCEbrIiI+U7i
+         ymMzlJLRkbFQK6CZHXw8bO0rvuAM3ZMafcJSW1lRIsqz2yXN+QTT9+Ho980zxoR40YoP
+         7Rvb481YhEZlFQ257vO2eEShZx5R7CLaHG8WSTgK8TDk1JRrHbC48I1rT7XpqmkI4Fgp
+         dnnA==
+X-Gm-Message-State: AOAM532dBy/KHgZWODoUyRIP9UM2WVwzJs2Tp02gHafBd8yxcXjqSWfa
+        8hLVRZ6FmCNY4k7WSvr5tGGGgNRbaxLH1riTruJbuDqErmzj+oUNwfdu/jsCLG706hbELwPD3rL
+        SXIcd4ldEA0Um
+X-Received: by 2002:a5d:6b47:: with SMTP id x7mr5469519wrw.170.1612534677389;
+        Fri, 05 Feb 2021 06:17:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzhXbMuzW+9lf4mHkd5Twhn2KBAz8ru70DzypAHZB3/V1aKyI0GBYXHQZ9Aqaw239oEpTOgNw==
+X-Received: by 2002:a5d:6b47:: with SMTP id x7mr5469488wrw.170.1612534677136;
+        Fri, 05 Feb 2021 06:17:57 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id n9sm12749550wrq.41.2021.02.05.06.17.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 06:17:56 -0800 (PST)
+Date:   Fri, 5 Feb 2021 15:17:54 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Eli Cohen <elic@nvidia.com>,
+        virtualization@lists.linux-foundation.org,
+        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 08/13] vdpa: add return value to get_config/set_config
+ callbacks
+Message-ID: <20210205141754.cyp4q77cqrj4xx7p@steredhat>
+References: <20210204172230.85853-1-sgarzare@redhat.com>
+ <20210204172230.85853-9-sgarzare@redhat.com>
+ <fe6d02be-b6f9-b07f-a86b-97912dddffdc@redhat.com>
+ <20210205084847.d4pkqq2sbqs3p53r@steredhat>
+ <20210205091123-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-05_07:2021-02-05,2021-02-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
- malwarescore=0 phishscore=0 mlxscore=0 suspectscore=0 spamscore=0
- adultscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102050088
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210205091123-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 5 Feb 2021 13:56:53 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Fri, Feb 05, 2021 at 09:11:26AM -0500, Michael S. Tsirkin wrote:
+>On Fri, Feb 05, 2021 at 09:48:47AM +0100, Stefano Garzarella wrote:
+>> Adding Eli in the loop.
+>>
+>> On Fri, Feb 05, 2021 at 11:20:11AM +0800, Jason Wang wrote:
+>> >
+>> > On 2021/2/5 上午1:22, Stefano Garzarella wrote:
+>> > > All implementations of these callbacks already validate inputs.
+>> > >
+>> > > Let's return an error from these callbacks, so the caller doesn't
+>> > > need to validate the input anymore.
+>> > >
+>> > > We update all implementations to return -EINVAL in case of invalid
+>> > > input.
+>> > >
+>> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> > > ---
+>> > >  include/linux/vdpa.h              | 18 ++++++++++--------
+>> > >  drivers/vdpa/ifcvf/ifcvf_main.c   | 24 ++++++++++++++++--------
+>> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 17 +++++++++++------
+>> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c  | 16 ++++++++++------
+>> > >  4 files changed, 47 insertions(+), 28 deletions(-)
+>> > >
+>> > > diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+>> > > index 4ab5494503a8..0e0cbd5fb41b 100644
+>> > > --- a/include/linux/vdpa.h
+>> > > +++ b/include/linux/vdpa.h
+>> > > @@ -157,6 +157,7 @@ struct vdpa_iova_range {
+>> > >   *				@buf: buffer used to read to
+>> > >   *				@len: the length to read from
+>> > >   *				configuration space
+>> > > + *				Returns integer: success (0) or error (< 0)
+>> > >   * @set_config:			Write to device specific configuration space
+>> > >   *				@vdev: vdpa device
+>> > >   *				@offset: offset from the beginning of
+>> > > @@ -164,6 +165,7 @@ struct vdpa_iova_range {
+>> > >   *				@buf: buffer used to write from
+>> > >   *				@len: the length to write to
+>> > >   *				configuration space
+>> > > + *				Returns integer: success (0) or error (< 0)
+>> > >   * @get_generation:		Get device config generation (optional)
+>> > >   *				@vdev: vdpa device
+>> > >   *				Returns u32: device generation
+>> > > @@ -231,10 +233,10 @@ struct vdpa_config_ops {
+>> > >  	u32 (*get_vendor_id)(struct vdpa_device *vdev);
+>> > >  	u8 (*get_status)(struct vdpa_device *vdev);
+>> > >  	void (*set_status)(struct vdpa_device *vdev, u8 status);
+>> > > -	void (*get_config)(struct vdpa_device *vdev, unsigned int offset,
+>> > > -			   void *buf, unsigned int len);
+>> > > -	void (*set_config)(struct vdpa_device *vdev, unsigned int offset,
+>> > > -			   const void *buf, unsigned int len);
+>> > > +	int (*get_config)(struct vdpa_device *vdev, unsigned int offset,
+>> > > +			  void *buf, unsigned int len);
+>> > > +	int (*set_config)(struct vdpa_device *vdev, unsigned int offset,
+>> > > +			  const void *buf, unsigned int len);
+>> > >  	u32 (*get_generation)(struct vdpa_device *vdev);
+>> > >  	struct vdpa_iova_range (*get_iova_range)(struct vdpa_device *vdev);
+>> > > @@ -329,8 +331,8 @@ static inline int vdpa_set_features(struct vdpa_device *vdev, u64 features)
+>> > >  }
+>> > > -static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
+>> > > -				   void *buf, unsigned int len)
+>> > > +static inline int vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
+>> > > +				  void *buf, unsigned int len)
+>> > >  {
+>> > >          const struct vdpa_config_ops *ops = vdev->config;
+>> > > @@ -339,8 +341,8 @@ static inline void vdpa_get_config(struct vdpa_device *vdev, unsigned offset,
+>> > >  	 * If it does happen we assume a legacy guest.
+>> > >  	 */
+>> > >  	if (!vdev->features_valid)
+>> > > -		vdpa_set_features(vdev, 0);
+>> > > -	ops->get_config(vdev, offset, buf, len);
+>> > > +		return vdpa_set_features(vdev, 0);
+>> > > +	return ops->get_config(vdev, offset, buf, len);
+>> > >  }
+>> > >  /**
+>> > > diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+>> > > index 7c8bbfcf6c3e..f5e6a90d8114 100644
+>> > > --- a/drivers/vdpa/ifcvf/ifcvf_main.c
+>> > > +++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+>> > > @@ -332,24 +332,32 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+>> > >  	return IFCVF_QUEUE_ALIGNMENT;
+>> > >  }
+>> > > -static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+>> > > -				  unsigned int offset,
+>> > > -				  void *buf, unsigned int len)
+>> > > +static int ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+>> > > +				 unsigned int offset,
+>> > > +				 void *buf, unsigned int len)
+>> > >  {
+>> > >  	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>> > > -	WARN_ON(offset + len > sizeof(struct virtio_net_config));
+>> > > +	if (offset + len > sizeof(struct virtio_net_config))
+>> > > +		return -EINVAL;
+>> > > +
+>> > >  	ifcvf_read_net_config(vf, offset, buf, len);
+>> > > +
+>> > > +	return 0;
+>> > >  }
+>> > > -static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
+>> > > -				  unsigned int offset, const void *buf,
+>> > > -				  unsigned int len)
+>> > > +static int ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
+>> > > +				 unsigned int offset, const void *buf,
+>> > > +				 unsigned int len)
+>> > >  {
+>> > >  	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>> > > -	WARN_ON(offset + len > sizeof(struct virtio_net_config));
+>> > > +	if (offset + len > sizeof(struct virtio_net_config))
+>> > > +		return -EINVAL;
+>> > > +
+>> > >  	ifcvf_write_net_config(vf, offset, buf, len);
+>> > > +
+>> > > +	return 0;
+>> > >  }
+>> > >  static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
+>> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> > > index 029822060017..9323b5ff7988 100644
+>> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+>> > > @@ -1796,20 +1796,25 @@ static void mlx5_vdpa_set_status(struct vdpa_device *vdev, u8 status)
+>> > >  	ndev->mvdev.status |= VIRTIO_CONFIG_S_FAILED;
+>> > >  }
+>> > > -static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
+>> > > -				 unsigned int len)
+>> > > +static int mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset, void *buf,
+>> > > +				unsigned int len)
+>> > >  {
+>> > >  	struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
+>> > >  	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+>> > > -	if (offset + len < sizeof(struct virtio_net_config))
+>> > > -		memcpy(buf, (u8 *)&ndev->config + offset, len);
+>> > > +	if (offset + len > sizeof(struct virtio_net_config))
+>> > > +		return -EINVAL;
+>> >
+>> >
+>> > It looks to me we should use ">=" here?
+>>
+>>
+>> Ehmm, I think it was wrong before this patch. If 'offset + len' is equal to
+>> 'sizeof(struct virtio_net_config)', should be okay to copy, no?
+>>
+>> I think it's one of the rare cases where the copy and paste went well :-)
+>>
+>> Should I fix this in a separate patch?
+>>
+>> Thanks,
+>> Stefano
+>
+>Sure.
+>
 
-> On 2/5/21 1:15 PM, Claudio Imbrenda wrote:
-> > On Thu, 4 Feb 2021 17:34:00 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >   
-> >> On 2/2/21 7:00 PM, Claudio Imbrenda wrote:  
-> >>> Extend kvm_s390_shadow_fault to return the pointer to the valid
-> >>> leaf DAT table entry, or to the invalid entry.
-> >>>
-> >>> Also return some flags in the lower bits of the address:
-> >>> DAT_PROT: indicates that DAT protection applies because of the
-> >>>           protection bit in the segment (or, if EDAT, region)
-> >>> tables NOT_PTE: indicates that the address of the DAT table entry
-> >>> returned does not refer to a PTE, but to a segment or region
-> >>> table.
-> >>>
-> >>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >>> Cc: stable@vger.kernel.org
-> >>> ---
-> >>>  arch/s390/kvm/gaccess.c | 26 ++++++++++++++++++++++----
-> >>>  arch/s390/kvm/gaccess.h |  5 ++++-
-> >>>  arch/s390/kvm/vsie.c    |  8 ++++----
-> >>>  3 files changed, 30 insertions(+), 9 deletions(-)
-> >>>
-> >>> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> >>> index 6d6b57059493..2d7bcbfb185e 100644
-> >>> --- a/arch/s390/kvm/gaccess.c
-> >>> +++ b/arch/s390/kvm/gaccess.c
-> >>> @@ -1034,6 +1034,7 @@ static int kvm_s390_shadow_tables(struct
-> >>> gmap *sg, unsigned long saddr, rfte.val = ptr;
-> >>>  			goto shadow_r2t;
-> >>>  		}
-> >>> +		*pgt = ptr + vaddr.rfx * 8;    
-> >>
-> >> So pgt either is a table entry if rc > 0 or a pointer to the first
-> >> pte on rc == 0 after this change?  
-> > 
-> > yes
-> >   
-> >> Hrm, if it is really based on RCs than I might be able to come to
-> >> terms with having two things in a ptr with the name pgt. But it
-> >> needs a comment change.  
-> > 
-> > will do.
-> >   
-> >>>  		rc = gmap_read_table(parent, ptr + vaddr.rfx * 8,
-> >>> &rfte.val); if (rc)
-> >>>  			return rc;
-> >>> @@ -1060,6 +1061,7 @@ static int kvm_s390_shadow_tables(struct
-> >>> gmap *sg, unsigned long saddr, rste.val = ptr;
-> >>>  			goto shadow_r3t;
-> >>>  		}
-> >>> +		*pgt = ptr + vaddr.rsx * 8;
-> >>>  		rc = gmap_read_table(parent, ptr + vaddr.rsx * 8,
-> >>> &rste.val); if (rc)
-> >>>  			return rc;
-> >>> @@ -1087,6 +1089,7 @@ static int kvm_s390_shadow_tables(struct
-> >>> gmap *sg, unsigned long saddr, rtte.val = ptr;
-> >>>  			goto shadow_sgt;
-> >>>  		}
-> >>> +		*pgt = ptr + vaddr.rtx * 8;
-> >>>  		rc = gmap_read_table(parent, ptr + vaddr.rtx * 8,
-> >>> &rtte.val); if (rc)
-> >>>  			return rc;
-> >>> @@ -1123,6 +1126,7 @@ static int kvm_s390_shadow_tables(struct
-> >>> gmap *sg, unsigned long saddr, ste.val = ptr;
-> >>>  			goto shadow_pgt;
-> >>>  		}
-> >>> +		*pgt = ptr + vaddr.sx * 8;
-> >>>  		rc = gmap_read_table(parent, ptr + vaddr.sx * 8,
-> >>> &ste.val); if (rc)
-> >>>  			return rc;
-> >>> @@ -1157,6 +1161,8 @@ static int kvm_s390_shadow_tables(struct
-> >>> gmap *sg, unsigned long saddr,
-> >>>   * @vcpu: virtual cpu
-> >>>   * @sg: pointer to the shadow guest address space structure
-> >>>   * @saddr: faulting address in the shadow gmap
-> >>> + * @pteptr: will contain the address of the faulting DAT table
-> >>> entry, or of
-> >>> + *          the valid leaf, plus some flags    
-> >>
-> >> pteptr is not the right name if it can be two things  
-> > 
-> > it cannot be two things there, kvm_s390_shadow_fault always returns
-> > a DAT _entry_ (pte, segment, region).  
-> 
-> And that's exactly what I meant, it's not a pteptr i.e. not a (pte_t
-> *) as the name would suggest.
+I'll do it.
 
-fair enough, I'll rename it to something like entryptr or so
-
-> 
-> >   
-> >>>   *
-> >>>   * Returns: - 0 if the shadow fault was successfully resolved
-> >>>   *	    - > 0 (pgm exception code) on exceptions while
-> >>> faulting @@ -1165,11 +1171,11 @@ static int
-> >>> kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> >>>   *	    - -ENOMEM if out of memory
-> >>>   */
-> >>>  int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
-> >>> -			  unsigned long saddr)
-> >>> +			  unsigned long saddr, unsigned long
-> >>> *pteptr) {
-> >>>  	union vaddress vaddr;
-> >>>  	union page_table_entry pte;
-> >>> -	unsigned long pgt;
-> >>> +	unsigned long pgt = 0;
-> >>>  	int dat_protection, fake;
-> >>>  	int rc;
-> >>>  
-> >>> @@ -1191,8 +1197,20 @@ int kvm_s390_shadow_fault(struct kvm_vcpu
-> >>> *vcpu, struct gmap *sg, pte.val = pgt + vaddr.px * PAGE_SIZE;
-> >>>  		goto shadow_page;
-> >>>  	}
-> >>> -	if (!rc)
-> >>> -		rc = gmap_read_table(sg->parent, pgt + vaddr.px *
-> >>> 8, &pte.val); +
-> >>> +	switch (rc) {
-> >>> +	case PGM_SEGMENT_TRANSLATION:
-> >>> +	case PGM_REGION_THIRD_TRANS:
-> >>> +	case PGM_REGION_SECOND_TRANS:
-> >>> +	case PGM_REGION_FIRST_TRANS:
-> >>> +		pgt |= NOT_PTE;    
-> >>
-> >> GACC_TRANSL_ENTRY_INV ?  
-> > 
-> > no, this is only for non-pte entries
-> >   
-> >>> +		break;
-> >>> +	case 0:
-> >>> +		pgt += vaddr.px * 8;
-> >>> +		rc = gmap_read_table(sg->parent, pgt, &pte.val);
-> >>> +	}
-> >>> +	if (*pteptr)
-> >>> +		*pteptr = pgt | dat_protection * DAT_PROT;
-> >>>  	if (!rc && pte.i)
-> >>>  		rc = PGM_PAGE_TRANSLATION;
-> >>>  	if (!rc && pte.z)
-> >>> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> >>> index f4c51756c462..66a6e2cec97a 100644
-> >>> --- a/arch/s390/kvm/gaccess.h
-> >>> +++ b/arch/s390/kvm/gaccess.h
-> >>> @@ -359,7 +359,10 @@ void ipte_unlock(struct kvm_vcpu *vcpu);
-> >>>  int ipte_lock_held(struct kvm_vcpu *vcpu);
-> >>>  int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu,
-> >>> unsigned long gra); 
-> >>> +#define DAT_PROT 2    
-> >>
-> >> GACC_TRANSL_ENTRY_PROT  
-> > 
-> > this is also only for non-pte entries
-> >   
-> >>> +#define NOT_PTE 4
-> >>> +
-> >>>  int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap
-> >>> *shadow,
-> >>> -			  unsigned long saddr);
-> >>> +			  unsigned long saddr, unsigned long
-> >>> *pteptr); 
-> >>>  #endif /* __KVM_S390_GACCESS_H */
-> >>> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> >>> index c5d0a58b2c29..7db022141db3 100644
-> >>> --- a/arch/s390/kvm/vsie.c
-> >>> +++ b/arch/s390/kvm/vsie.c
-> >>> @@ -619,10 +619,10 @@ static int map_prefix(struct kvm_vcpu *vcpu,
-> >>> struct vsie_page *vsie_page) /* with mso/msl, the prefix lies at
-> >>> offset *mso* */ prefix += scb_s->mso;
-> >>>  
-> >>> -	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
-> >>> prefix);
-> >>> +	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, prefix,
-> >>> NULL); if (!rc && (scb_s->ecb & ECB_TE))
-> >>>  		rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
-> >>> -					   prefix + PAGE_SIZE);
-> >>> +					   prefix + PAGE_SIZE,
-> >>> NULL); /*
-> >>>  	 * We don't have to mprotect, we will be called for all
-> >>> unshadows.
-> >>>  	 * SIE will detect if protection applies and trigger a
-> >>> validity. @@ -913,7 +913,7 @@ static int handle_fault(struct
-> >>> kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-> >>> current->thread.gmap_addr, 1); 
-> >>>  	rc = kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
-> >>> -				   current->thread.gmap_addr);
-> >>> +				   current->thread.gmap_addr,
-> >>> NULL); if (rc > 0) {
-> >>>  		rc = inject_fault(vcpu, rc,
-> >>>  				  current->thread.gmap_addr,
-> >>> @@ -935,7 +935,7 @@ static void handle_last_fault(struct kvm_vcpu
-> >>> *vcpu, {
-> >>>  	if (vsie_page->fault_addr)
-> >>>  		kvm_s390_shadow_fault(vcpu, vsie_page->gmap,
-> >>> -				      vsie_page->fault_addr);
-> >>> +				      vsie_page->fault_addr,
-> >>> NULL);    
-> >>
-> >> Ok
-> >>  
-> >>>  	vsie_page->fault_addr = 0;
-> >>>  }
-> >>>  
-> >>>     
-> >>  
-> >   
-> 
+Thanks,
+Stefano
 
