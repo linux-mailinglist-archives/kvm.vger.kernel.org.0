@@ -2,72 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13091310B18
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 13:33:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07E78310B23
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 13:36:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232013AbhBEMcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 07:32:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55740 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbhBEM3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 07:29:49 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797A8C06178B;
-        Fri,  5 Feb 2021 04:29:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lxihe7+g5ZzQ+c8zVd+lEEiHfGJ0LiqT0TgJG/FT/uU=; b=BHQsyX9bmxrY1s8dN96+3jvcHN
-        jN8jKHvIiPjijCXlHow152yW9qZFw8mtFS4u07GHhtnFg0V4uSJdMzFBK3NM3XfKn3lspurKdECs+
-        UzhAacB4lsLVN/I62FgPYW9OsKZpkZAYZbX//QwDjJpRt/uOy5Knq6benGZcYWyk2z5wwKxbIVRW5
-        rGuD0NyXLMiTuvxtznnc/ZlHFLlVVTQaU75YHPnDroYnzzAu0kDVzBB7Lclo6l1YAsxfEuQG/XCNk
-        mWos7tP0bKtNHF+TSmI5n0TKIyFw1kydeW2JuoN2tTWa6o6qQlPD4i/6BU5eBqCGtNFjWfIY7U84O
-        IGl7qvpg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l80EC-00043f-9L; Fri, 05 Feb 2021 12:28:48 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CB9073059DD;
-        Fri,  5 Feb 2021 13:28:44 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7F5682BC43FEE; Fri,  5 Feb 2021 13:28:44 +0100 (CET)
-Date:   Fri, 5 Feb 2021 13:28:44 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Zhimin Feng <fengzhimin@bytedance.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        fweisbec@gmail.com, zhouyibo@bytedance.com,
-        zhanghaozhong@bytedance.com
-Subject: Re: [RFC: timer passthrough 1/9] KVM: vmx: hook set_next_event for
- getting the host tscd
-Message-ID: <YB05/GIyD/UQRIGn@hirez.programming.kicks-ass.net>
-References: <20210205100317.24174-1-fengzhimin@bytedance.com>
- <20210205100317.24174-2-fengzhimin@bytedance.com>
+        id S232172AbhBEMgL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 07:36:11 -0500
+Received: from mga03.intel.com ([134.134.136.65]:46470 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232148AbhBEMdm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 07:33:42 -0500
+IronPort-SDR: mSiTMEPLWrL85gMbWrnX3fTz5ghv0GFNiUkNqwanWs6tmH1L4m677nXefYqJXAQ5bOJ2RZO5tl
+ TveCGvnZknHw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9885"; a="181490635"
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="181490635"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 04:33:00 -0800
+IronPort-SDR: /RP21vhYieDly6c3NcARWjOrNa+aVTRf6m5/uYOoNbjVkzUbnRJWQgHssxtWMsp8HMs32Mx1eX
+ PywILmtIIRFQ==
+X-IronPort-AV: E=Sophos;i="5.81,154,1610438400"; 
+   d="scan'208";a="508523273"
+Received: from nadams-mobl1.amr.corp.intel.com ([10.254.96.120])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 04:32:56 -0800
+Message-ID: <35808048da366b7e531f291c3611c1172f988d6a.camel@intel.com>
+Subject: Re: [RFC PATCH v3 00/27] KVM SGX virtualization support
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "jethro@fortanix.com" <jethro@fortanix.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "b.thiel@posteo.de" <b.thiel@posteo.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "Huang, Haitao" <haitao.huang@intel.com>
+Date:   Sat, 06 Feb 2021 01:32:53 +1300
+In-Reply-To: <635e339e-e3f5-c437-0265-b9d44c180858@intel.com>
+References: <f50ac476-71f2-60d4-5008-672365f4d554@intel.com>
+         <YBrfF0XQvzQf9PhR@google.com>
+         <475c5f8b-efb7-629d-b8d2-2916ee150e4f@redhat.com>
+         <c827fed1-d7af-a94a-b69e-114d4a2ec988@intel.com>
+         <d044ccde68171dc319d77917c8ab9f83e9a98645.camel@intel.com>
+         <YBsyqLHPtYOpqeW4@google.com>
+         <b6e0a32f-0070-f97e-5d94-d12f7972d474@intel.com>
+         <44b5a747aaf1d42fb8ef388bd28f49614d42cd50.camel@intel.com>
+         <YBs/vveIBg00Im0U@google.com>
+         <5bd3231e05911bc64f5c51e1eddc3ed1f6bfe6c4.camel@intel.com>
+         <YBwgw0vVCjlhFvqP@google.com>
+         <635e339e-e3f5-c437-0265-b9d44c180858@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210205100317.24174-2-fengzhimin@bytedance.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 06:03:09PM +0800, Zhimin Feng wrote:
-> diff --git a/kernel/time/tick-common.c b/kernel/time/tick-common.c
-> index 6c9c342dd0e5..bc50f4a1a7c0 100644
-> --- a/kernel/time/tick-common.c
-> +++ b/kernel/time/tick-common.c
-> @@ -26,6 +26,7 @@
->   * Tick devices
->   */
->  DEFINE_PER_CPU(struct tick_device, tick_cpu_device);
-> +EXPORT_SYMBOL_GPL(tick_cpu_device);
->  /*
->   * Tick next event: keeps track of the tick time
->   */
+On Thu, 2021-02-04 at 08:48 -0800, Dave Hansen wrote:
+> On 2/4/21 8:28 AM, Sean Christopherson wrote:
+> > > Do we see any security risk here?
+> > Not with current CPUs, which drop writes and read all ones.  If future CPUs take
+> > creatives liberties with the SDM, then we could have a problem, but that's why
+> > Dave is trying to get stronger guarantees into the SDM.
+> 
+> I really don't like the idea of the abort page being used by code that
+> doesn't know what it's dealing with.  It just seems like trouble (aka.
+> security risk) waiting to happen.
 
-Oh heck no. Modules have no business what so ever accessing this.
+Hi Dave,
+
+Just to confirm, you want this (disallow ioremap() for EPC) fixed in upstream kernel
+before KVM SGX can be merged, correct?
+
+If so, and since it seems you also agreed that better solution is to modify ioremap()
+to refuse to map EPC, what do you think of the sample code Sean put in his previous
+reply?
+
+https://www.spinics.net/lists/kvm/msg234754.html
+
+IMHO adding 'bool sgx_epc' to ioremap_desc seems not ideal, since it's not generic.
+Instead, we may define some new flag here, and ioremap_desc->flag can just cope with
+it.
+
+Btw as Sean already pointed out, SGX code uses memremap() to initialize EPC section,
+and we could choose to still allow this to avoid code change to SGX driver. But it
+seems it is a little hack here. What's your opinion? 
+
+Hi Sean,
+
+If we all agree the fix is needed here, do you want to work on the patch (since you
+already provided your thought), or do you want me to do it, with Suggested-by you?
+
