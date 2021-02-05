@@ -2,127 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 38EBA310BF5
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 14:39:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8861A310C35
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 14:53:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231254AbhBENiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 08:38:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24119 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229669AbhBENgG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 08:36:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612532079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+FKg2DTzgviX+HjS8G7qH+HGbWsC/RfTXSUIVNIG9yc=;
-        b=jUVsXq7vj/Bs+RsnA54ayZwcTWh3GL/MASOZDEbWk0GnXrNg6KNlM9CaKWT3gJdBwVqh5N
-        BiYdcNRTj8RR1ChzFLyHZP2wjFNAHcnmfG8obpY1yS1VV17kGMdQkkmX1X1b49cOHu2qcH
-        HIY5YEk1UsDy9ByFaLLAGjlQaJXfoHM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-NVQ4NTpcMHCkbN2RLLwdSQ-1; Fri, 05 Feb 2021 08:34:37 -0500
-X-MC-Unique: NVQ4NTpcMHCkbN2RLLwdSQ-1
-Received: by mail-ej1-f70.google.com with SMTP id ia14so6688112ejc.8
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 05:34:37 -0800 (PST)
+        id S231363AbhBENwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 08:52:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231220AbhBENuK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 08:50:10 -0500
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB1BC0617AA
+        for <kvm@vger.kernel.org>; Fri,  5 Feb 2021 05:49:29 -0800 (PST)
+Received: by mail-qk1-x72a.google.com with SMTP id n15so6846890qkh.8
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 05:49:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ClyUAOZa7OFCglp1bjgNnlXnosYgcrxy4Bo5DWX5whw=;
+        b=FOINqIGCcM6JC0NsYY3CkXaBU8OT/mQFC438dCVwpji4LrPutJxYQeJ7dTf+VxP+u3
+         zInvInYh4EnxysFRQPofCeynn87IIMYWshQArmOWHQVoho53rCFN8ZNfUIeEupDBX+PD
+         pgDEPCsXI96sUaCb5FMllexsveMKMs7AqZTr11a4OIP70iyu6so8/OTmMbtio430oAvG
+         tSFKvPfhAParBvpOoMO6PT7wC9iJ2g5mw1TTV0/WT3fo8g2DLlqvBo0Cae7ra6/RaWI1
+         7J8MMdZ6ubw/VUkzXWw2Mx0E6GC1AYgATNJyIANBUnP1MSd3GOaVgE/ukYuk8ken0dhF
+         nrZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+FKg2DTzgviX+HjS8G7qH+HGbWsC/RfTXSUIVNIG9yc=;
-        b=bmnY4PAsPR1AepWZIlViezoX/qay9RsWwS1xJToevzA71JCNCJ26Dlbl7EN8gNsK5l
-         53Y9ayUJ8vxnK8WrTI9toUsAlzbI2F1QY/+ibIC92QbtDBdURv23PnALAXaEuoIgsURn
-         P8j90ZFyQpz2BcRLzSBUbQNrGZSOXe0XGooNaaz3r11gqPBvtoU+nj6YZ98P4is/el7x
-         8aOhvRoiJv8h9OVWDKSBbSsmqow1oxBzthz9g+xy2zHxtKnl1a/LFwOv1Ibnpph77kqx
-         Vth0f/lCP5E4Julh8t0qTg/Gnccg17Y9BYgzq1YOltfriiigDz3v7FyNEG+t4+ko9aK2
-         hzxw==
-X-Gm-Message-State: AOAM532XxK1jHoHilCJX5YALaQP54HgbC7GgrljBcjZuYPKq86LjBQ+B
-        nDIPnOciVlfSxIxNDtV474OOxKUvM9SIBYdtJWf6S7m8F70GtqgLc5w7f61SE7r7EkAzZQ676EI
-        tX0MvlWEIjz33
-X-Received: by 2002:aa7:dc17:: with SMTP id b23mr3572475edu.139.1612532076606;
-        Fri, 05 Feb 2021 05:34:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwHRaQZ6QkM5lJwBQoi1W7M9I9XGnD4C4hGg+cwtWLLAv4TNugbGm9Im1snFAe/Z2jIKqZbDQ==
-X-Received: by 2002:aa7:dc17:: with SMTP id b23mr3572459edu.139.1612532076428;
-        Fri, 05 Feb 2021 05:34:36 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x14sm3906639ejb.0.2021.02.05.05.34.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Feb 2021 05:34:35 -0800 (PST)
-To:     Zhimin Feng <fengzhimin@bytedance.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, fweisbec@gmail.com,
-        zhouyibo@bytedance.com, zhanghaozhong@bytedance.com
-References: <20210205100317.24174-1-fengzhimin@bytedance.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RESEND RFC: timer passthrough 0/9] Support timer passthrough for
- VM
-Message-ID: <1ec32a4a-8f05-c840-8c8e-29c9c2a7f868@redhat.com>
-Date:   Fri, 5 Feb 2021 14:34:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ClyUAOZa7OFCglp1bjgNnlXnosYgcrxy4Bo5DWX5whw=;
+        b=tHkmf9CnN4ZQe6/Pccv5g4qWBRxPnaHnNlS4DIk2E9VKF75P8G3ILioxfB10qLmBqp
+         sWfWAXiO1Q3bLubNPAe7TJTkXnm+FArkXy0epx0R89Wda4BJ+N+tdrf2DjF+iy/is+NF
+         EE8V7EWa+6HWHtugkIPl549MRZ760XNMq5HeKh9D9nAxnX7O36nBCNW0T8lH30ZWX3gd
+         8b4x3nl/iWxZAv1lODnsp7KVbtME29v6DJC9Ity4nWztl6sZdGaE7iKaVGoNuT0gv+wd
+         YEUzdMnMR51b9tiOn9U/iYNZoAeVznTn9n2O6hcZs607WBenq0/Ja1hZ7JIRJM9U7IK6
+         Hj3g==
+X-Gm-Message-State: AOAM5307h/g3GKcqzY3XG2aUjX9uEXRFkRI+NaLX4KWOzaP3iyOZSZ5f
+        oVJp3KUrqmN/9nxPF+z1BLq0AA==
+X-Google-Smtp-Source: ABdhPJyedZWbZ/VF4fBY6l7VFipJ5IDXzjqxEPVTrm3E52U13xSe3YTO2VmNXl+IpGlsoUFUyN3YCA==
+X-Received: by 2002:a37:a50e:: with SMTP id o14mr4388187qke.250.1612532968204;
+        Fri, 05 Feb 2021 05:49:28 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
+        by smtp.gmail.com with ESMTPSA id c5sm9349747qkg.99.2021.02.05.05.49.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 05:49:27 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1l81UF-003qUb-5e; Fri, 05 Feb 2021 09:49:27 -0400
+Date:   Fri, 5 Feb 2021 09:49:27 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+        dan.j.williams@intel.com
+Subject: Re: [PATCH 1/2] mm: provide a sane PTE walking API for modules
+Message-ID: <20210205134927.GL4718@ziepe.ca>
+References: <20210205103259.42866-1-pbonzini@redhat.com>
+ <20210205103259.42866-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210205100317.24174-1-fengzhimin@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210205103259.42866-2-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/02/21 11:03, Zhimin Feng wrote:
-> The main motivation for this patch is to improve the performance of VM.
-> This patch series introduces how to enable the timer passthrough in
-> non-root mode.
+On Fri, Feb 05, 2021 at 05:32:58AM -0500, Paolo Bonzini wrote:
+> Currently, the follow_pfn function is exported for modules but
+> follow_pte is not.  However, follow_pfn is very easy to misuse,
+> because it does not provide protections (so most of its callers
+> assume the page is writable!) and because it returns after having
+> already unlocked the page table lock.
 > 
-> The main idea is to offload the host timer to the preemtion timer in
-> non-root mode. Through doing this, guest can write tscdeadline msr directly
-> in non-root mode and host timer isn't lost. If CPU is in root mode,
-> guest timer is switched to software timer.
+> Provide instead a simplified version of follow_pte that does
+> not have the pmdpp and range arguments.  The older version
+> survives as follow_invalidate_pte() for use by fs/dax.c.
 > 
-> Testing on Intel(R) Xeon(R) Platinum 8260 server.
-> 
-> The guest OS is Debian(kernel: 4.19.28). The specific configuration is
->   is as follows: 8 cpu, 16GB memory, guest idle=poll
-> memcached in guest(memcached -d -t 8 -u root)
-> 
-> I use the memtier_benchmark tool to test performance
-> (memtier_benchmark -P memcache_text -s guest_ip -c 16 -t 32
->   --key-maximum=10000000000 --random-data --data-size-range=64-128 -p 11211
->   --generate-keys --ratio 5:1 --test-time=500)
-> 
-> Total Ops can be improved 25% and Avg.Latency can be improved 20% when
-> the timer-passthrough is enabled.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/s390/pci/pci_mmio.c |  2 +-
+>  fs/dax.c                 |  5 +++--
+>  include/linux/mm.h       |  6 ++++--
+>  mm/memory.c              | 35 ++++++++++++++++++++++++++++++-----
+>  4 files changed, 38 insertions(+), 10 deletions(-)
 
-As Peter noticed, this is very invasive.  Perhaps you could try 
-organizing the code like this:
+Looks good to me, thanks
 
-1) just for the sake of these patches, completely disable the usage of 
-the preemption timer
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
-2) add a module parameter that:
-
-- reads the TSC deadline MSR on vmentry and uses it to program the VMX 
-preemption timer
-
-- disables the host APIC timer while the guest runs
-
-- injects a timer interrupt on preemption timer vmexits
-
-3) also if the module parameter is 1, use the MSR autoload feature to 
-use TSC_ADJUST instead of the VMCS TSC offset
-
-4) also if the module parameter is 1 reintroduce the hv_timer callbacks, 
-but this time to program the TSC deadline timer via MSR autoload
-
-5) only when everything else is in place, figure out how to avoid the 
-RDMSR for the TSC deadline MSR.
-
-Thanks,
-
-Paolo
-
+Jason
