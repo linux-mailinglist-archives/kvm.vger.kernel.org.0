@@ -2,181 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B1BF31078C
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 10:19:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3E8C3107BC
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 10:26:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbhBEJQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 04:16:48 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11683 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhBEJOm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 04:14:42 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DX8nY3fJxzlGg7;
-        Fri,  5 Feb 2021 17:12:17 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 5 Feb 2021 17:13:51 +0800
-Subject: Re: [RFC PATCH 01/11] iommu/arm-smmu-v3: Add feature detection for
- HTTU
-To:     Robin Murphy <robin.murphy@arm.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-2-zhukeqian1@huawei.com>
- <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
-CC:     Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, <jiangkunkun@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Cornelia Huck" <cohuck@redhat.com>, <lushenming@huawei.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        James Morse <james.morse@arm.com>,
-        <wanghaibin.wang@huawei.com>, "Tian, Kevin" <kevin.tian@intel.com>
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Message-ID: <df1b8fb2-b853-e797-0072-9dbdffc4ff67@huawei.com>
-Date:   Fri, 5 Feb 2021 17:13:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+        id S229752AbhBEJXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 04:23:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40756 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230316AbhBEJSY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 04:18:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612516617;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=57F239YtV0oHbCCj5J8DpWnEViN3tCKhKGovQyK+Lic=;
+        b=ZzTPajMUgqW5xYX//MobQ/+xEIQNbQ2VWZ4IwSZwkV+jq4KgbNoxSxrjcDVb6MAHjcndBh
+        LNzb2pK8TnuLb8Zoh6mDAvxIFK2jvmgzNfufEz3vQnKwOJRckHwnlhApVml1GDZ55OUqgx
+        98tAqUUdJb9gDzGrl7bTVFDBzTwhsKI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-268-pLDmcMxeO7CKOwtBjzyz0w-1; Fri, 05 Feb 2021 04:16:55 -0500
+X-MC-Unique: pLDmcMxeO7CKOwtBjzyz0w-1
+Received: by mail-wm1-f69.google.com with SMTP id y9so2780906wmj.7
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 01:16:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=57F239YtV0oHbCCj5J8DpWnEViN3tCKhKGovQyK+Lic=;
+        b=Tb/dYuYMaNscgdhabIrFCQb9JrS7aVO7d2l9qpny38/oXsFVyxtYiGbqc+24Lin05D
+         gi6bZim8ANMi139dR6i+51MH0LxfE8VI1lbwGL9O5++BE3f05RatJemTpXeeeK34dqa5
+         njdzsOB844pWnJtOZUSO1dA5HXV77J38U8gI34oK7LiyqZqgr73NT6/Lg9oKtvAdWQRM
+         9TVMdxM53BWL0mFKqKc/SM91g/KK1YgB1/h4RoMk5zs0DIk7amd4SNINfzxDo3ekxR3i
+         mPE6MaffFefi82pJzDt72nm/ak6J35MqkjVw96MbHmQ4ix35pOSXQiw7dFXlBIuUWHXH
+         O2EA==
+X-Gm-Message-State: AOAM533y2TVzt/4Il8Zhi4acSuZUR737RQ5Ud6PDv6ksV7AsHaSTu8Kb
+        LorYPxPZbw99vtEwXeqlSr5ttFgMwgqaZ1ZgZ08YT31iEN6DXtoqscMugnwjuLFvNzi7ygb+wAr
+        yNhpQLNLxmc8p
+X-Received: by 2002:adf:d84a:: with SMTP id k10mr3934399wrl.156.1612516614250;
+        Fri, 05 Feb 2021 01:16:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxm4rfj82uV3tGDph5pyyVq3oRWewQ+gBUMQfr86xZKT355ALHumrHiplodlmOUoLsCMMAfbw==
+X-Received: by 2002:adf:d84a:: with SMTP id k10mr3934381wrl.156.1612516614060;
+        Fri, 05 Feb 2021 01:16:54 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id g14sm12104482wru.45.2021.02.05.01.16.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 01:16:53 -0800 (PST)
+Date:   Fri, 5 Feb 2021 10:16:51 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Xie Yongji <xieyongji@bytedance.com>, kvm@vger.kernel.org,
+        Laurent Vivier <lvivier@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 09/13] vhost/vdpa: remove vhost_vdpa_config_validate()
+Message-ID: <20210205091651.xfcdyuvwwzew2ufo@steredhat>
+References: <20210204172230.85853-1-sgarzare@redhat.com>
+ <20210204172230.85853-10-sgarzare@redhat.com>
+ <6919d2d4-cc8e-2b67-2385-35803de5e38b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f8be5718-d4d9-0565-eaf0-b5a128897d15@arm.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6919d2d4-cc8e-2b67-2385-35803de5e38b@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin and Jean,
-
-On 2021/2/5 3:50, Robin Murphy wrote:
-> On 2021-01-28 15:17, Keqian Zhu wrote:
->> From: jiangkunkun <jiangkunkun@huawei.com>
+On Fri, Feb 05, 2021 at 11:27:32AM +0800, Jason Wang wrote:
+>
+>On 2021/2/5 上午1:22, Stefano Garzarella wrote:
+>>get_config() and set_config() callbacks in the 'struct vdpa_config_ops'
+>>usually already validated the inputs. Also now they can return an error,
+>>so we don't need to validate them here anymore.
 >>
->> The SMMU which supports HTTU (Hardware Translation Table Update) can
->> update the access flag and the dirty state of TTD by hardware. It is
->> essential to track dirty pages of DMA.
+>>Let's use the return value of these callbacks and return it in case of
+>>error in vhost_vdpa_get_config() and vhost_vdpa_set_config().
 >>
->> This adds feature detection, none functional change.
+>>Originally-by: Xie Yongji <xieyongji@bytedance.com>
+>>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>---
+>>  drivers/vhost/vdpa.c | 41 +++++++++++++----------------------------
+>>  1 file changed, 13 insertions(+), 28 deletions(-)
 >>
->> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> ---
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++++
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++++++++
->>   include/linux/io-pgtable.h                  |  1 +
->>   3 files changed, 25 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 8ca7415d785d..0f0fe71cc10d 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -1987,6 +1987,7 @@ static int arm_smmu_domain_finalise(struct iommu_domain *domain,
->>           .pgsize_bitmap    = smmu->pgsize_bitmap,
->>           .ias        = ias,
->>           .oas        = oas,
->> +        .httu_hd    = smmu->features & ARM_SMMU_FEAT_HTTU_HD,
->>           .coherent_walk    = smmu->features & ARM_SMMU_FEAT_COHERENCY,
->>           .tlb        = &arm_smmu_flush_ops,
->>           .iommu_dev    = smmu->dev,
->> @@ -3224,6 +3225,21 @@ static int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
->>       if (reg & IDR0_HYP)
->>           smmu->features |= ARM_SMMU_FEAT_HYP;
->>   +    switch (FIELD_GET(IDR0_HTTU, reg)) {
-> 
-> We need to accommodate the firmware override as well if we need this to be meaningful. Jean-Philippe is already carrying a suitable patch in the SVA stack[1].
-Robin, Thanks for pointing it out.
+>>diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>>index ef688c8c0e0e..d61e779000a8 100644
+>>--- a/drivers/vhost/vdpa.c
+>>+++ b/drivers/vhost/vdpa.c
+>>@@ -185,51 +185,35 @@ static long vhost_vdpa_set_status(struct vhost_vdpa *v, u8 __user *statusp)
+>>  	return 0;
+>>  }
+>>-static int vhost_vdpa_config_validate(struct vhost_vdpa *v,
+>>-				      struct vhost_vdpa_config *c)
+>>-{
+>>-	long size = 0;
+>>-
+>>-	switch (v->virtio_id) {
+>>-	case VIRTIO_ID_NET:
+>>-		size = sizeof(struct virtio_net_config);
+>>-		break;
+>>-	}
+>>-
+>>-	if (c->len == 0)
+>>-		return -EINVAL;
+>>-
+>>-	if (c->len > size - c->off)
+>>-		return -E2BIG;
+>>-
+>>-	return 0;
+>>-}
+>>-
+>>  static long vhost_vdpa_get_config(struct vhost_vdpa *v,
+>>  				  struct vhost_vdpa_config __user *c)
+>>  {
+>>  	struct vdpa_device *vdpa = v->vdpa;
+>>  	struct vhost_vdpa_config config;
+>>  	unsigned long size = offsetof(struct vhost_vdpa_config, buf);
+>>+	long ret;
+>>  	u8 *buf;
+>>  	if (copy_from_user(&config, c, size))
+>>  		return -EFAULT;
+>>-	if (vhost_vdpa_config_validate(v, &config))
+>>+	if (config.len == 0)
+>>  		return -EINVAL;
+>>  	buf = kvzalloc(config.len, GFP_KERNEL);
+>
+>
+>Then it means usersapce can allocate a very large memory.
 
-Jean, I see that the IORT HTTU flag overrides the hardware register info unconditionally. I have some concern about it:
+Good point.
 
-If the override flag has HTTU but hardware doesn't support it, then driver will use this feature but receive access fault or permission fault from SMMU unexpectedly.
-1) If IOPF is not supported, then kernel can not work normally.
-2) If IOPF is supported, kernel will perform useless actions, such as HTTU based dma dirty tracking (this series).
+>
+>Rethink about this, we should limit the size here (e.g PAGE_SIZE) or 
+>fetch the config size first (either through a config ops as you 
+>suggested or a variable in the vdpa device that is initialized during 
+>device creation).
 
-As the IORT spec doesn't give an explicit explanation for HTTU override, can we comprehend it as a mask for HTTU related hardware register?
-So the logic becomes: smmu->feature = HTTU override & IDR0_HTTU;
+Maybe PAGE_SIZE is okay as a limit.
 
-> 
->> +    case IDR0_HTTU_NONE:
->> +        break;
->> +    case IDR0_HTTU_HA:
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->> +        break;
->> +    case IDR0_HTTU_HAD:
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HA;
->> +        smmu->features |= ARM_SMMU_FEAT_HTTU_HD;
->> +        break;
->> +    default:
->> +        dev_err(smmu->dev, "unknown/unsupported HTTU!\n");
->> +        return -ENXIO;
->> +    }
->> +
->>       /*
->>        * The coherency feature as set by FW is used in preference to the ID
->>        * register, but warn on mismatch.
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> index 96c2e9565e00..e91bea44519e 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
->> @@ -33,6 +33,10 @@
->>   #define IDR0_ASID16            (1 << 12)
->>   #define IDR0_ATS            (1 << 10)
->>   #define IDR0_HYP            (1 << 9)
->> +#define IDR0_HTTU            GENMASK(7, 6)
->> +#define IDR0_HTTU_NONE            0
->> +#define IDR0_HTTU_HA            1
->> +#define IDR0_HTTU_HAD            2
->>   #define IDR0_COHACC            (1 << 4)
->>   #define IDR0_TTF            GENMASK(3, 2)
->>   #define IDR0_TTF_AARCH64        2
->> @@ -286,6 +290,8 @@
->>   #define CTXDESC_CD_0_TCR_TBI0        (1ULL << 38)
->>     #define CTXDESC_CD_0_AA64        (1UL << 41)
->> +#define CTXDESC_CD_0_HD            (1UL << 42)
->> +#define CTXDESC_CD_0_HA            (1UL << 43)
->>   #define CTXDESC_CD_0_S            (1UL << 44)
->>   #define CTXDESC_CD_0_R            (1UL << 45)
->>   #define CTXDESC_CD_0_A            (1UL << 46)
->> @@ -604,6 +610,8 @@ struct arm_smmu_device {
->>   #define ARM_SMMU_FEAT_RANGE_INV        (1 << 15)
->>   #define ARM_SMMU_FEAT_BTM        (1 << 16)
->>   #define ARM_SMMU_FEAT_SVA        (1 << 17)
->> +#define ARM_SMMU_FEAT_HTTU_HA        (1 << 18)
->> +#define ARM_SMMU_FEAT_HTTU_HD        (1 << 19)
->>       u32                features;
->>     #define ARM_SMMU_OPT_SKIP_PREFETCH    (1 << 0)
->> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
->> index ea727eb1a1a9..1a00ea8562c7 100644
->> --- a/include/linux/io-pgtable.h
->> +++ b/include/linux/io-pgtable.h
->> @@ -97,6 +97,7 @@ struct io_pgtable_cfg {
->>       unsigned long            pgsize_bitmap;
->>       unsigned int            ias;
->>       unsigned int            oas;
->> +    bool                httu_hd;
-> 
-> This is very specific to the AArch64 stage 1 format, not a generic capability - I think it should be a quirk flag rather than a common field.
-OK, so BBML should be a quirk flag too?
+If instead we want to fetch the config size, then better a config ops in 
+my opinion, to avoid adding a new parameter to __vdpa_alloc_device().
 
-Though the word "quirk" is not suitable for HTTU and BBML, we have no other place to convey smmu feature to io-pgtable.
+I vote for PAGE_SIZE, but it isn't a strong opinion.
 
-Maybe we can add another field named "iommu_features"? Anyway, I am OK with putting them into quirk flag. :-)
+What do you and @Michael suggest?
 
-> 
-> Robin.
-> 
-> [1] https://jpbrucker.net/git/linux/commit/?h=sva/current&id=1ef7d512fb9082450dfe0d22ca4f7e35625a097b
-> 
->>       bool                coherent_walk;
->>       const struct iommu_flush_ops    *tlb;
->>       struct device            *iommu_dev;
->>
-> .
-> 
 Thanks,
-Keqian
+Stefano
+
