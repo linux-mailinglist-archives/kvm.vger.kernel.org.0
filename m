@@ -2,192 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 88201311303
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 22:03:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7560311491
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 23:14:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233404AbhBETUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 14:20:32 -0500
-Received: from mga12.intel.com ([192.55.52.136]:30881 "EHLO mga12.intel.com"
+        id S232846AbhBEWIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 17:08:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44342 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233630AbhBETMX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 14:12:23 -0500
-IronPort-SDR: gYIR2fB7z72T09LeE127MckFYCBnQlZFDBUfKid/acZojIKGPThDTrvMYuSs0YzYHBAdX+1OD3
- EYgBoKFqHrXQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="160645235"
-X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="160645235"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:25 -0800
-IronPort-SDR: uhZLUkkHEErKzCwzWYQJT5naWnl2dq0WsrMNy1yXXf8wDRsWV5X0cpgNFlAy/5ONLy2smKpGFX
- KlHEuIJjiBpg==
-X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="434597079"
-Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 12:54:23 -0800
-Subject: [PATCH v5 14/14] vfio/mdev: idxd: add error notification from host
- driver to mediated device
-From:   Dave Jiang <dave.jiang@intel.com>
-To:     alex.williamson@redhat.com, kwankhede@nvidia.com,
-        tglx@linutronix.de, vkoul@kernel.org
-Cc:     megha.dey@intel.com, jacob.jun.pan@intel.com, ashok.raj@intel.com,
-        jgg@mellanox.com, yi.l.liu@intel.com, baolu.lu@intel.com,
-        kevin.tian@intel.com, sanjay.k.kumar@intel.com,
-        tony.luck@intel.com, dan.j.williams@intel.com,
-        eric.auger@redhat.com, parav@mellanox.com, netanelg@mellanox.com,
-        shahafs@mellanox.com, pbonzini@redhat.com,
-        dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Fri, 05 Feb 2021 13:54:23 -0700
-Message-ID: <161255846348.339900.12785712530534526428.stgit@djiang5-desk3.ch.intel.com>
-In-Reply-To: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
-References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
-User-Agent: StGit/0.23-29-ga622f1
+        id S232881AbhBEOwM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 09:52:12 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 36E5C64FC9;
+        Fri,  5 Feb 2021 14:04:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612533851;
+        bh=T1jLO24sF0pYkT3lQr2onlwV1fj0AbfnrcXXdUAochg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BZOBBDws+/yhmPTxNLP4zonarclKLQMtK4MPPXtDYExmUzHRLjxXcJnfGq14VQa4L
+         yZhVB9oNHiU0DzaVx6si8j0aXHMHTj1MM3VS8xDsEeLmU5/b+5mHQBkgW7cT1CQKhX
+         bLMDr8tZSM1SipNLwaZFpx+i2Ki4uOTJ99+ziw0o=
+Date:   Fri, 5 Feb 2021 15:04:08 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        Jaroslav Kysela <perex@perex.cz>,
+        Eric Anholt <eric@anholt.net>,
+        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig.org@pengutronix.de>, linux-i2c@vger.kernel.org,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-watchdog@vger.kernel.org, linux-rtc@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Takashi Iwai <tiwai@suse.com>,
+        Russell King - ARM Linux admin <linux@armlinux.org.uk>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        linux-serial@vger.kernel.org, linux-input@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Mike Leach <mike.leach@linaro.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        alsa-devel@alsa-project.org,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        coresight@lists.linaro.org, Vladimir Zapolskiy <vz@mleia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Cornelia Huck <cohuck@redhat.com>, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org,
+        Vinod Koul <vkoul@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        linux-crypto@vger.kernel.org, Daniel Vetter <daniel@ffwll.ch>,
+        Leo Yan <leo.yan@linaro.org>, dmaengine@vger.kernel.org
+Subject: Re: [PATCH] coresight: etm4x: Fix merge resolution for amba rework
+Message-ID: <YB1QWFWPennQZmjw@kroah.com>
+References: <20210205130848.20009-1-uwe@kleine-koenig.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210205130848.20009-1-uwe@kleine-koenig.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a device error occurs, the mediated device need to be notified in
-order to notify the guest of device error. Add support to notify the
-specific mdev when an error is wq specific and broadcast errors to all mdev
-when it's a generic device error.
+On Fri, Feb 05, 2021 at 02:08:47PM +0100, Uwe Kleine-König wrote:
+> This was non-trivial to get right because commits
+> c23bc382ef0e ("coresight: etm4x: Refactor probing routine") and
+> 5214b563588e ("coresight: etm4x: Add support for sysreg only devices")
+> changed the code flow considerably. With this change the driver can be
+> built again.
+> 
+> Fixes: 0573d3fa4864 ("Merge branch 'devel-stable' of git://git.armlinux.org.uk/~rmk/linux-arm into char-misc-next")
+> Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
 
-Signed-off-by: Dave Jiang <dave.jiang@intel.com>
----
- drivers/dma/idxd/idxd.h       |    7 +++++++
- drivers/dma/idxd/irq.c        |    6 ++++++
- drivers/vfio/mdev/idxd/mdev.c |    5 +++++
- drivers/vfio/mdev/idxd/vdev.c |   32 ++++++++++++++++++++++++++++++++
- drivers/vfio/mdev/idxd/vdev.h |    1 +
- 5 files changed, 51 insertions(+)
+Now queued up, thanks!
 
-diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-index 4afe35385f85..6016df029ed4 100644
---- a/drivers/dma/idxd/idxd.h
-+++ b/drivers/dma/idxd/idxd.h
-@@ -295,10 +295,17 @@ enum idxd_interrupt_type {
- 	IDXD_IRQ_IMS,
- };
- 
-+struct aux_mdev_ops {
-+	void (*notify_error)(struct idxd_wq *wq);
-+};
-+
- struct idxd_mdev_aux_drv {
- 	        struct auxiliary_driver auxiliary_drv;
-+		const struct aux_mdev_ops ops;
- };
- 
-+#define to_mdev_aux_drv(_aux_drv) container_of(_aux_drv, struct idxd_mdev_aux_drv, auxiliary_drv)
-+
- static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
- 					    enum idxd_interrupt_type irq_type)
- {
-diff --git a/drivers/dma/idxd/irq.c b/drivers/dma/idxd/irq.c
-index 090926856df3..9cdd3e789799 100644
---- a/drivers/dma/idxd/irq.c
-+++ b/drivers/dma/idxd/irq.c
-@@ -118,6 +118,8 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
- 	u32 val = 0;
- 	int i;
- 	bool err = false;
-+	struct auxiliary_driver *auxdrv = to_auxiliary_drv(idxd->mdev_auxdev->dev.driver);
-+	struct idxd_mdev_aux_drv *mdevdrv = to_mdev_aux_drv(auxdrv);
- 
- 	if (cause & IDXD_INTC_ERR) {
- 		spin_lock_bh(&idxd->dev_lock);
-@@ -132,6 +134,8 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
- 
- 			if (wq->type == IDXD_WQT_USER)
- 				wake_up_interruptible(&wq->idxd_cdev.err_queue);
-+			else if (wq->type == IDXD_WQT_MDEV)
-+				mdevdrv->ops.notify_error(wq);
- 		} else {
- 			int i;
- 
-@@ -140,6 +144,8 @@ static int process_misc_interrupts(struct idxd_device *idxd, u32 cause)
- 
- 				if (wq->type == IDXD_WQT_USER)
- 					wake_up_interruptible(&wq->idxd_cdev.err_queue);
-+				else if (wq->type == IDXD_WQT_MDEV)
-+					mdevdrv->ops.notify_error(wq);
- 			}
- 		}
- 
-diff --git a/drivers/vfio/mdev/idxd/mdev.c b/drivers/vfio/mdev/idxd/mdev.c
-index 60913950a4f5..edccaad66c8c 100644
---- a/drivers/vfio/mdev/idxd/mdev.c
-+++ b/drivers/vfio/mdev/idxd/mdev.c
-@@ -1266,12 +1266,17 @@ static const struct auxiliary_device_id idxd_mdev_auxbus_id_table[] = {
- };
- MODULE_DEVICE_TABLE(auxiliary, idxd_mdev_auxbus_id_table);
- 
-+static const struct aux_mdev_ops aux_mdev_ops = {
-+	.notify_error = idxd_wq_vidxd_send_errors,
-+};
-+
- static struct idxd_mdev_aux_drv idxd_mdev_aux_drv = {
- 	.auxiliary_drv = {
- 		.id_table = idxd_mdev_auxbus_id_table,
- 		.probe = idxd_mdev_aux_probe,
- 		.remove = idxd_mdev_aux_remove,
- 	},
-+	.ops = aux_mdev_ops,
- };
- 
- static int idxd_mdev_auxdev_drv_register(struct idxd_mdev_aux_drv *drv)
-diff --git a/drivers/vfio/mdev/idxd/vdev.c b/drivers/vfio/mdev/idxd/vdev.c
-index 8626438a9e54..3aa9d5b870e8 100644
---- a/drivers/vfio/mdev/idxd/vdev.c
-+++ b/drivers/vfio/mdev/idxd/vdev.c
-@@ -980,3 +980,35 @@ void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val)
- 		break;
- 	}
- }
-+
-+static void vidxd_send_errors(struct vdcm_idxd *vidxd)
-+{
-+	struct idxd_device *idxd = vidxd->idxd;
-+	u8 *bar0 = vidxd->bar0;
-+	union sw_err_reg *swerr = (union sw_err_reg *)(bar0 + IDXD_SWERR_OFFSET);
-+	union genctrl_reg *genctrl = (union genctrl_reg *)(bar0 + IDXD_GENCTRL_OFFSET);
-+	u32 *intcause = (u32 *)(bar0 + IDXD_INTCAUSE_OFFSET);
-+	int i;
-+
-+	if (swerr->valid) {
-+		if (!swerr->overflow)
-+			swerr->overflow = 1;
-+		return;
-+	}
-+
-+	lockdep_assert_held(&idxd->dev_lock);
-+	for (i = 0; i < 4; i++)
-+		swerr->bits[i] = idxd->sw_err.bits[i];
-+
-+	*intcause |= IDXD_INTC_ERR;
-+	if (genctrl->softerr_int_en)
-+		vidxd_send_interrupt(&vidxd->irq_entries[0]);
-+}
-+
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq)
-+{
-+	struct vdcm_idxd *vidxd;
-+
-+	list_for_each_entry(vidxd, &wq->vdcm_list, list)
-+		vidxd_send_errors(vidxd);
-+}
-diff --git a/drivers/vfio/mdev/idxd/vdev.h b/drivers/vfio/mdev/idxd/vdev.h
-index fc0f405baa40..00df08f9a963 100644
---- a/drivers/vfio/mdev/idxd/vdev.h
-+++ b/drivers/vfio/mdev/idxd/vdev.h
-@@ -23,5 +23,6 @@ int vidxd_send_interrupt(struct ims_irq_entry *iie);
- int vidxd_setup_ims_entries(struct vdcm_idxd *vidxd);
- void vidxd_free_ims_entries(struct vdcm_idxd *vidxd);
- void vidxd_do_command(struct vdcm_idxd *vidxd, u32 val);
-+void idxd_wq_vidxd_send_errors(struct idxd_wq *wq);
- 
- #endif
-
-
+greg k-h
