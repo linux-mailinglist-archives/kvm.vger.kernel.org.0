@@ -2,99 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A4B86310A59
-	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 12:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B87FC310A53
+	for <lists+kvm@lfdr.de>; Fri,  5 Feb 2021 12:35:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhBELgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 06:36:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34307 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231737AbhBELZr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Feb 2021 06:25:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612524239;
+        id S231788AbhBELfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 06:35:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42978 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231269AbhBELa0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 06:30:26 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DF3C06178C;
+        Fri,  5 Feb 2021 03:29:46 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1612524584;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1khU1C0GfELsGU0Fj00nuXnaZ6zgV1rmRJ0fb1z6uq4=;
-        b=AjFOFKQTWbJtq8r016vXaDCLfA9a/Uf9lKMqe8U05mulXa+4klC24g8t7VmMrIbsQL+MBZ
-        JlvoXKdxB/zQEoxI3twmUgxFoW+MHiDojIw2ElfyowQWTVVUkELhNLzjazPdkouESl7dAH
-        OPjGvppGORwfcekfDLyx8NpExEG3xTw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-YGIWRmuOO8-Sgup-V2dHqQ-1; Fri, 05 Feb 2021 06:23:57 -0500
-X-MC-Unique: YGIWRmuOO8-Sgup-V2dHqQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744C8107ACC7;
-        Fri,  5 Feb 2021 11:23:56 +0000 (UTC)
-Received: from [10.36.113.43] (ovpn-113-43.ams2.redhat.com [10.36.113.43])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 08C3D60DA1;
-        Fri,  5 Feb 2021 11:23:54 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 10/11] arm64: gic: its-trigger: Don't
- trigger the LPI while it is pending
-To:     Alexandru Elisei <alexandru.elisei@arm.com>, drjones@redhat.com,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     andre.przywara@arm.com, Zenghui Yu <yuzenghui@huawei.com>
-References: <20210129163647.91564-1-alexandru.elisei@arm.com>
- <20210129163647.91564-11-alexandru.elisei@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <a3d1c79d-22d8-f1f0-f594-6ce616401950@redhat.com>
-Date:   Fri, 5 Feb 2021 12:23:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        bh=25MzDHo8cvo805GqTp3ymG5etlk+7u28hiYRA4P/Uhw=;
+        b=kvhJSIUqC/tY5pvHIf/BYbV6yMCjpZgPRahiBzAZu5HLoP4wjR0Hut5ytENaFrnGBHNjPT
+        p8hxa6wXv7M2VVsBmdIybKr7XSx83HJp8M/u9ouAJ1MN4ZTlC7AfkQF2xILXdrq1NMlQ3o
+        E73n7/vHDfPsdi6nkvTS7w1HHMdPABXku7g4vjJBEyMop1bC892EsQDGl3h4fJjkm5lC+9
+        6tkxjDNAFfQryMozD0UzuCiGF9NfiCZ5rkp9RUbEQJ3a36ykE8K9Hhmc1qECZjwLJ9bvUs
+        DvYOfZ/NngS7/EzSwqDtRd6Q1EZ7d6w92zfVGNMi9sLxCrPXmvziMLgSelP+2w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1612524584;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=25MzDHo8cvo805GqTp3ymG5etlk+7u28hiYRA4P/Uhw=;
+        b=zTO0EUpz6sP08Ly0QDpE+JohhFmbCtYWqVY/pjligeYGx6RQQ62GesGFiFILguAVUvhocq
+        aFlJiSmqBek8mdBw==
+To:     Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "x86\@kernel.org" <x86@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH v4 2/5] KVM: X86: Expose PKS to guest
+In-Reply-To: <e90dadf9-a4ad-96f2-01fd-9f57b284fa3f@redhat.com>
+References: <20210205083706.14146-1-chenyi.qiang@intel.com> <20210205083706.14146-3-chenyi.qiang@intel.com> <8768ad06-e051-250d-93ec-fa4d684bc7b0@redhat.com> <20210205095603.GB17488@zn.tnic> <e90dadf9-a4ad-96f2-01fd-9f57b284fa3f@redhat.com>
+Date:   Fri, 05 Feb 2021 12:29:44 +0100
+Message-ID: <87czxeah1z.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20210129163647.91564-11-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, Feb 05 2021 at 11:10, Paolo Bonzini wrote:
+> On 05/02/21 10:56, Borislav Petkov wrote:
+>>> This would need an ack from the x86 people.  Andy, Boris?
+>> 
+>> This looks like the PKS baremetal pile needs to be upstream first.
+>
+> Yes, it does.  I would like to have an ack for including the above two 
+> hunks once PKS is upstream.
+>
+> I also have CET and bus lock #DB queued and waiting for the bare metal 
+> functionality, however they do not touch anything outside arch/x86/kvm.
 
-On 1/29/21 5:36 PM, Alexandru Elisei wrote:
-> The its-trigger test checks that LPI 8195 is not delivered to the CPU while
-> it is disabled at the ITS level. After that it is re-enabled and the test
-> checks that the interrupt is properly asserted. After it's re-enabled and
-> before the stats are examined, the test triggers the interrupt again, which
-> can lead to the same interrupt being delivered twice: once after the
-> configuration invalidation and before the INT command, and once after the
-> INT command.
-> 
-> Add an explicit check that the interrupt has fired after the invalidation.
-> Leave the check after the INT command to make sure the INT command still
-> works for the now re-enabled LPI.
-> 
-> CC: Auger Eric <eric.auger@redhat.com>
-> Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+What's the exact point of queueing random stuff which lacks bare metal
+support?
 
-Eric
+Once PKS, CET or whatever is merged into tip then it's the point for
+resending the KVM patches for inclusion and that's the point where it
+gets acked and not $N month ahead when everything is still in flux.
 
-> ---
->  arm/gic.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arm/gic.c b/arm/gic.c
-> index af2c112336e7..8bc2a35908f2 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -802,6 +802,9 @@ static void test_its_trigger(void)
->  
->  	/* Now call the invall and check the LPI hits */
->  	its_send_invall(col3);
-> +	lpi_stats_expect(3, 8195);
-> +	check_lpi_stats("dev2/eventid=20 pending LPI is received");
-> +
->  	lpi_stats_expect(3, 8195);
->  	its_send_int(dev2, 20);
->  	check_lpi_stats("dev2/eventid=20 now triggers an LPI");
-> 
+Thanks,
+
+        tglx
+
 
