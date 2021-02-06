@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C379F311B28
-	for <lists+kvm@lfdr.de>; Sat,  6 Feb 2021 05:53:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E29BC311BA5
+	for <lists+kvm@lfdr.de>; Sat,  6 Feb 2021 06:47:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbhBFEwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 23:52:38 -0500
-Received: from mail-bn7nam10on2059.outbound.protection.outlook.com ([40.107.92.59]:20832
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S229561AbhBFFr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Feb 2021 00:47:27 -0500
+Received: from mail-dm6nam11on2049.outbound.protection.outlook.com ([40.107.223.49]:46464
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231578AbhBFEuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 23:50:19 -0500
+        id S229514AbhBFFrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Feb 2021 00:47:17 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S0OQFQ3eClykVW91mgjvWOeqwq8Xl7iF/lAYQax+j8GPGTONM48CPlA9kpLzbS2mrhVZZUnxssCYVTSm2gxVW79BJeAMZxKaiizrBErkGd6mlyFvmQXCUs6GvZnF887cJ0C+N2lggST2pafpnWSyVblrAYP2PvQN8B9FBpinzCSU98lvP1nncLrLsDk443uqGCdVsAssQwBlxpvgmVezXxzoCyr4PpkaJZFjJwtSZsNXXkc4rZCyxNXcCw8nw6rnlvflPQDGdQJj06MAbzUZYI9dOjeWyVE8z/g7HpKF8ApcrH6QtemuWBtr8/HIEdEmhJUf9kNYOgsgGG0y/L+6xw==
+ b=XTFdADpIpQNUSBOzFqfH19k1bEwVuIjfRuOsSLF5zrZcXUpMhkKJsKIXncwyiIgsSm3oQHuGeOnc89Z2PyXgVmNDq2jdviH2blgweXSSe957aUboeCm+bk6yWovxnjmbjLzm6QlMPQKbTpQWdda2lUe9mMPS/v68X4UEqtrYp9tokr8ukwVV8wm+83QYv0iQki5prTbUPzBMDS1hK8Ng8EWXSbz6CEHeEjjGdYtn1lurF/8dGHlciNn4XZLGFqf6aDvJ1QIcNWOuORtIQrPgUFmdIYpnjUbcoKAqyTz7FgI7K5F8/VvFLX/ZzLCtZy34iR10qXmjse38jC9iCJMNbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mfa8//jJqX/arrxRS3wCbZnagnckWziHvPyUvjAQLjc=;
- b=K8RJdi7sdaCeJwobXPHo7IJFLV8UGbDpZtnFD6tiim2ZLa/pXlJnBs6IZ4zjVALJcAMRKf9qaZ2c7VjT6EvGhhRaKIYoSW9BPlS9xqODT58j2TZpS7vm4ETHZeNbLJbVPG0JZLY6GG6OqF5VFTG9HF2gytEGy8F6x0bG1SrOc1vUZmWa8dGsD9N8mrJ9FLz2ryy04jtO3ZSsMCnr/xWfUM/Y8J/9smsVELb4eCr/2DYUXGVvGeiHs55VsozS1VqEpyETUWCyC13Dt/A3FBsTa8N1HWkXeZrtvgRx7I6sCVhsxBi6tc6REmmHU+35uzPw/qzsQ7IHNDGJOFix1huo1Q==
+ bh=Qw8ZVa/vhN+0dptiquE/IjkGdAKkeZnR0i6P+WqqZ7c=;
+ b=juIK838tMn9CarFTMtD96lCPydiaepjKT7T6B6fAG5AIkiHH2+Ftbre84hT/mGVoirSxNbGfI+6oQ8w2CX21bkAI+6hCQoHiPOwM4uigif2O41IFyNGnb/f8TN8OA4N8iab0CoWE0WnTc56tdGj6xYptIeCuXIgr9wFS9hZeX65JaX2HPldfVl6fufz0sIaGf4uWjsBibQz/2StTte6AeYdISQGNbvbbwY/EmoxUFuj3YGbd0KJwXLBCIZu4r1d3yJQFge1S6I+fv6jYQi/gyyWaq9quJwFM2PYs+tqOwanShMmA9I8r054ZK1gmuaUIZVFVW6TvWNem76X+PhjYpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mfa8//jJqX/arrxRS3wCbZnagnckWziHvPyUvjAQLjc=;
- b=VSp4CN9MgdYezNTY2bSU5uJ2NgFRxFyD6X7c4mMjUu5x/7nDSy0HPRbvqyynXcD8glf8s7lPB4T09RsTBv0BKPYDWe1R3h9jhHlHwbvUX2mw3D2oRINWeRcaJiLtiK6LY6q/egWQ4GORb/kvpmcWKFJTbnXu37qgzoD9rqb3eX4=
+ bh=Qw8ZVa/vhN+0dptiquE/IjkGdAKkeZnR0i6P+WqqZ7c=;
+ b=dLkpr70JmY+KsqKt1CucSh8/uaz5VpwqG6IVwey4VU9kIxx0rgaQmrYLPIb/wTiolPSJ1IAxBZafjP41t/ZQ8klgLY4sldUbc53NsvwLVG61v2IvJqwGk7IbTXyyD3YQz88ebf/kcs0RqZUv2Dgs7eFUlIJ5jl+EtkpOL5jc1GU=
 Authentication-Results: google.com; dkim=none (message not signed)
  header.d=none;google.com; dmarc=none action=none header.from=amd.com;
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SN6PR12MB2766.namprd12.prod.outlook.com (2603:10b6:805:78::10) with
+ by SN6PR12MB2717.namprd12.prod.outlook.com (2603:10b6:805:68::29) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.24; Sat, 6 Feb
- 2021 04:49:21 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.19; Sat, 6 Feb
+ 2021 05:46:22 +0000
 Received: from SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
  ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3805.028; Sat, 6 Feb 2021
- 04:49:21 +0000
-Date:   Sat, 6 Feb 2021 04:49:16 +0000
+ 05:46:22 +0000
+Date:   Sat, 6 Feb 2021 05:46:17 +0000
 From:   Ashish Kalra <ashish.kalra@amd.com>
 To:     Steve Rutherford <srutherford@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -54,7 +54,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Brijesh Singh <brijesh.singh@amd.com>
 Subject: Re: [PATCH v10 12/16] KVM: x86: Introduce new
  KVM_FEATURE_SEV_LIVE_MIGRATION feature & Custom MSR.
-Message-ID: <20210206044916.GA16038@ashkalra_ubuntu_server>
+Message-ID: <20210206054617.GA19422@ashkalra_ubuntu_server>
 References: <cover.1612398155.git.ashish.kalra@amd.com>
  <bb86eda2963d7bef0c469c1ef8d7b32222e3a145.1612398155.git.ashish.kalra@amd.com>
  <CABayD+fBrNA_Oz542D5zoLqoispQG=1LWgHt2b5vr8hTMOveOQ@mail.gmail.com>
@@ -65,63 +65,64 @@ Content-Disposition: inline
 In-Reply-To: <CABayD+eVwUsnB9pt+GA92uJis5dEGZ=zcrzraaR8_=YhuLTntg@mail.gmail.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Originating-IP: [165.204.77.1]
-X-ClientProxiedBy: SN2PR01CA0026.prod.exchangelabs.com (2603:10b6:804:2::36)
+X-ClientProxiedBy: SN2PR01CA0035.prod.exchangelabs.com (2603:10b6:804:2::45)
  To SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ashkalra_ubuntu_server (165.204.77.1) by SN2PR01CA0026.prod.exchangelabs.com (2603:10b6:804:2::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.20 via Frontend Transport; Sat, 6 Feb 2021 04:49:21 +0000
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SN2PR01CA0035.prod.exchangelabs.com (2603:10b6:804:2::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Sat, 6 Feb 2021 05:46:21 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: fd4fa0fa-7ea6-458f-3c45-08d8ca5a91c6
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2766:
+X-MS-Office365-Filtering-Correlation-Id: 9ff8e8ff-f36d-4f07-cf87-08d8ca628886
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2717:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR12MB276684A452CD728540B14FEE8EB19@SN6PR12MB2766.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1303;
+X-Microsoft-Antispam-PRVS: <SN6PR12MB271700E954EF3575F2BD30EF8EB19@SN6PR12MB2717.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8zKEEnoq5c8weyev7VlaCivM6+lkaELrhXLnkzvfBqRe5ucP5P5KBKupzYqdkwHI/YhZ4vluywe7r+UYtvRfp0g+7q97Z/CvD2aaLzIvtQYD4QEQt1LdZntAn6BRPPrH2nL274Mdt8WXktFMm+utM5HSdGGy86T4f7y6omNJcI+iiunbZuFwWPhBXOV13UrDSDeoNbOIxee8sZG/aOOR3AMNdyxCGP73Ic1VpP0pvpE/jLEwHruD3nl6op0+PzalQU9b1th8DTfthHjsLiVyd8SLAJZctgGbsmzuGA57pllaOcy9N5MV0v43BcSXE/8HQ9vNh5zmU0ejvWQbGoKlKFTT/qe+18yPPj3V52kmZOOhcpdBETnOhmRZ3DYTQBR/R07JltAhoY5vY0anTqVHRkK3ErQfufVIT2t+3b5yiEgCPTyrot6HJB8bB+cb1lJWN507lM7FliZ2dDh5lPoBtHyGQG+HHYNTY7mZ8pLY/4V6whUW5yvB8HmelvfmZQx1ppNZGwG5mP3/4JAotw8CQg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(366004)(346002)(136003)(376002)(396003)(54906003)(66556008)(33716001)(66946007)(478600001)(44832011)(9686003)(66476007)(186003)(55016002)(6666004)(316002)(83380400001)(30864003)(956004)(26005)(16526019)(1076003)(4326008)(5660300002)(8936002)(6496006)(33656002)(86362001)(7416002)(2906002)(6916009)(53546011)(8676002)(52116002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?arvudiCgpL6Lxk07kJQVblNWLDK3M1manLjnoiPVruq3f5V6Z01N1+NT29qA?=
- =?us-ascii?Q?St3S12cfKQPW207eFOrvqqdAgqF6nNwzIlHPlvWD2tANaDeozV0rEMyP3g8P?=
- =?us-ascii?Q?P3vE1tvxw1+mL3Ch5WbmkSVjH7VlTPeNMOIMds57jqGhKQT0yy8QrUmUDq0/?=
- =?us-ascii?Q?tf9upFNOiDQM2hubC2++ML1kEj2TKCvQpHZHmcQOTFfLDiybkiwNpHq8qEab?=
- =?us-ascii?Q?71Kb5fUgtdHySD1tTrxBPHwo3a/t+M97f1nK7dm5ZzoE2xz/GQq2KjVMX+lP?=
- =?us-ascii?Q?GNLRvEFl/raYkS9a3rBVkVCATdHM4QseGCzpX4qaloSp256qXsxLssRxuL6B?=
- =?us-ascii?Q?tFwI3lT5Ls6FZx+0QJH/m0aLWbuKFtS4tB5r+BL4nx1MOmXZKpDJUSz8DN98?=
- =?us-ascii?Q?qhJDmN7ghz0VNhk5YHkxI/aMmc1LiNCAvO43+t3SMl/9ZWP7L5jJzYUDGpX6?=
- =?us-ascii?Q?SZ5DsLYyhOSLbWvGc9VUMQFLVQwSxpo5n26PyVjw6B/goGgsBVZZdt34zUZk?=
- =?us-ascii?Q?rQH/XZ2BWwYDbMe+JqgmnH0ghNaeFChyc+S2Mlx8jf9m5smL1mvP9pLbDppw?=
- =?us-ascii?Q?2P6bdSpKoyPIR+5xJ/Aty9VhsxHtF92gvPDPtt/uwtkzWe9TOs/kr27DrhUr?=
- =?us-ascii?Q?eZQgdbCG42otJBG2KT8jVD/ug7I7XHox4sEtRum2tkPSvHExiKzUuHjOWfRm?=
- =?us-ascii?Q?5na7HSyl/jHlrX/NWPOyTbZVlpONlRf/2ChmQ6lmEz0o8KhwCYLtwqOI2yRQ?=
- =?us-ascii?Q?2UaSTq0snROKe7ZOkUkr3YizcF6w4IOKtqDvFET4MQ2few0mZy1yUWbvteWD?=
- =?us-ascii?Q?/pUHEIB9URA42S+vSSOWyJ9SGl86t+qlRMvAi/wrXZHEITMxajPJpMrAZxPP?=
- =?us-ascii?Q?u6g0jZvIKfn+Npl7JoBEsGk62KDOkFndIkR/lMYX319EIu9QXNTccWEHqTC0?=
- =?us-ascii?Q?IucDFQkz60XgUNFVmbMRSRn68BMY3WDmZCcpgBInv5vu3HKnb0xxAwXYeg+o?=
- =?us-ascii?Q?WyP1noirNubkt5Okg9rFl1jiLGS7q658la8umK1eN4idwXWfEC9wkV7xZn15?=
- =?us-ascii?Q?b3B92b5en2Ni8P1RQXDcaMYUNiI5JbfRkIuHOwJsIsrCT0Qp9N7gLpp91orH?=
- =?us-ascii?Q?UNV/bxzFIfbaC4/mHuHZnu1gWQds5VdQThvvNwkAGw1+qhdXAW/mhleRbo3a?=
- =?us-ascii?Q?tFJ2lX3KZwXXuRxniSdz46upEwEGEC9X6gHpQLY4Y5nNSOmjWUrEMN7K8rIC?=
- =?us-ascii?Q?CoHk7X6RriQKxuvi2/4anCD5xgoGiANCcca+/pT9ihkytzBUr85uuVQ5WNrN?=
- =?us-ascii?Q?BSTY3vxfOzVwn0ZprHasjeFB?=
+X-Microsoft-Antispam-Message-Info: jBUkyPHJOZKRfJH43JzRSr+BBqgmxpmzOj/wr7KhY8nCW8Q40lclBzrSSeoHj7cHizHVg60TfjgUK6m4aWIaOd69DSiETIutFpfV6f8UE/IoQKf++IeTs9EMiJHxlRYRF63JLXNV38kdNHHIgIaxY3UWSguffMTNOkR6ToiVURo8TPDK2SbSaI5cmrfKliCCylYGPRu/7Pbvn/23SdTthmb0IAAh1gclpleWmbryP9RGW9LQ/DHVrMTp9X2a7ssS8j/np8sWLwOVcK6+taFC54lrvWIvgCKnTj1ewJHHDcOuyYgNNOlFNYeCaxMzSQylffi+IJyHmVrba27cHd10MGrE3gXqKwfyk3+vpnTopQ14wHt0qogPPLkHkxinluRmJeZpdVJbB2yhkBD9HEyliGJi1/5+NZeCIBhMhZrdQD0nn/NdPM84sXgy9qRLxL/wwNNoEqDWyd/hm6/lChwSEgZyU/4u7P9XFCBlwDBDW1IvGtGlcPrue/5kKm5jNWAA5DWt5CI1AQ4Yr+jZOm6l7A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39850400004)(396003)(366004)(346002)(376002)(30864003)(6666004)(16526019)(66946007)(186003)(8676002)(5660300002)(26005)(2906002)(4326008)(478600001)(55016002)(6916009)(66476007)(86362001)(9686003)(33656002)(316002)(54906003)(83380400001)(956004)(66556008)(1076003)(8936002)(33716001)(52116002)(6496006)(53546011)(44832011)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?To4v9qK57wj21Ne6Px87gWi8UkDI64p/QgfuWCj+G9jor3Co4kkyfhoRdAlU?=
+ =?us-ascii?Q?qQ84votfBnRUnFDclJ7A5MsdvZZfDVCUyWcUyBP8FkN8BjLsfSxiB7UN6RbP?=
+ =?us-ascii?Q?CWjdUDIBZoLzupuT2XZgQ7xVv4cdANrTbzhXZrIl7KV4Xy+KxIYVGzgWg3u4?=
+ =?us-ascii?Q?0YVNnXJ26z2xIp5o3qS3bXACY9AaS2td5v4p3U7wx0HoBXmAGfRzuUcE19xD?=
+ =?us-ascii?Q?IcrLBHVah70GLyUkLgA7dE8CjZSR3EvM1/M6M/ydavXRXEjG9k43Zp81q2ob?=
+ =?us-ascii?Q?/9BgWVdpnWtDR714eoRdtxCGyNZSWMwkgu9iCIaI4PUIzgn2qmuh/8gMs4Rs?=
+ =?us-ascii?Q?O3xTLFw73ZXFiWC7vaDOqknkhuj/UeEdNWLEqsCz062yVpnVzKJOT5SHeqWM?=
+ =?us-ascii?Q?drE6mjRr1/zdP/BHEUZbQLpfi2ci2MV9Cy+ghBZxsScXCl3limQftOkM+7Is?=
+ =?us-ascii?Q?VunCs2pWJbqLdJFxvBZLqLJsMnJV8PrZY9Ros7QiaXD7YWaFROIxC2jN9c8a?=
+ =?us-ascii?Q?d2Er0pC0GyIogiDd5fMkk2DZ9ypmMSBEBmU4S+iCMv4D00hwxL+0rjVpIiBS?=
+ =?us-ascii?Q?MCb+agtfo140RtPzTs30V/IrwOJvWraTTR+Zk+YL/nLGQD/2tV/udQPMSEHw?=
+ =?us-ascii?Q?y4B3A5DW5dGFpjh9aVDTk4PDAFgf6iA/iPSee+qvagmty9c+LXMPrKKzXblO?=
+ =?us-ascii?Q?7CU0zinJ3RX950/Ka/wLzAy4aHmi3IBq4iKuwA0sMk4yCKV9FFPrDWVeoo8p?=
+ =?us-ascii?Q?Z1tVCWeXM7/h0rX6CVRJmLVwfTcvC26wArKfK4fZRoKXlTAWWCrRTOrKAz75?=
+ =?us-ascii?Q?Fzw8B/gEBCMBZCOgpPwRYmj1Zlt5hRAmkai3aWcho+2XQH6BIEg1WGbh0glG?=
+ =?us-ascii?Q?I6NDTOkpQF2RecSzLNXjwj3x/hKFTTfZnCp+edJFPIXzXtprWF1uhbXNv7iv?=
+ =?us-ascii?Q?B7Z2T2MvCAt0VXI78k+NF8ctJAArecUnIKjiPKxqxIcFZ0NGvq7TkGWbj+J+?=
+ =?us-ascii?Q?S+Kl6epGv7c6qVordIX/lYeWki/PDEIugzGzsN0r8OLmp4f9ErhYOB++36kA?=
+ =?us-ascii?Q?PpEe51iCrvveY19QZN2DtVshSsYPIpXi09zUDtYhwcfKu3ZYd4hOj1MXkwMX?=
+ =?us-ascii?Q?8YCplPnjoRW8FfuuF9OAZB7e/SnUu3vC1BSQIbFu4R9vvD9i3oCg/0igrXWT?=
+ =?us-ascii?Q?5nHUs6etVONP+oFy/LADSVY8fzJQjdu76Ks4XRFWwuSrJ5Pls/yuIO+A65SO?=
+ =?us-ascii?Q?otFuV0DVQYSKRYdeG8EJKPeZRiPdD/MQLFpLCaytYycQ3drbyFZWa0edJypE?=
+ =?us-ascii?Q?PsjK0jx6zrUWrMo4kMQYGYkk?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd4fa0fa-7ea6-458f-3c45-08d8ca5a91c6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ff8e8ff-f36d-4f07-cf87-08d8ca628886
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2021 04:49:21.6849
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2021 05:46:22.0936
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 037JvnWgYr1aa0qx20frwukUTFDLyDnTzpURcLqLczENMm0OAU04UXqEUl9dMLm92kTgUGQyiY7PNvTqgFLLTA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2766
+X-MS-Exchange-CrossTenant-UserPrincipalName: I4QNi12GwuIw2eFbDEEDMg1U/VIt3S7/SJTpgolwwss/Pnc7KZzMvM3lRMk0dGp+6x6PwXb9MVuGBUCLD4JBew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2717
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hello Steve,
 
-Let me first answer those queries which i can do immediately ...
+Continued response to your queries, especially related to userspace
+control of SEV live migration feature : 
 
 On Fri, Feb 05, 2021 at 06:54:21PM -0800, Steve Rutherford wrote:
 > On Thu, Feb 4, 2021 at 7:08 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
@@ -249,111 +250,7 @@ On Fri, Feb 05, 2021 at 06:54:21PM -0800, Steve Rutherford wrote:
 > back -EINVAL, I would probably think the bug is on my end. But it
 > could be on the guest's end! I would probably drop this, but you could
 > have KVM return an empty list of regions when this happens.
-
-You will get -EINVAL till the guest kernel has booted to a specific
-point, because live migration is enabled when guest kernel has checked
-for host support for live migration and also OVMF/UEFI support for
-live migration, as per this guest kernel code below :
-
-arch/x86/kernel/kvm.c:
-
-kvm_init_platform() -> check_kvm_sev_migration()
-..
-
-arch/x86/mm/mem_encrypt.c:
-
-void __init check_kvm_sev_migration(void)
-{
-        if (sev_active() &&
-            kvm_para_has_feature(KVM_FEATURE_SEV_LIVE_MIGRATION)) {
-                unsigned long nr_pages;
-
-                pr_info("KVM enable live migration\n");
-                sev_live_migration_enabled = true;
-
-                /*
-                 * Ensure that _bss_decrypted section is marked as decrypted in the
-                 * shared pages list.
-                 */
-                nr_pages = DIV_ROUND_UP(__end_bss_decrypted - __start_bss_decrypted,
-                                        PAGE_SIZE);
-                early_set_mem_enc_dec_hypercall((unsigned long)__start_bss_decrypted,
-                                                nr_pages, 0);
-
-                /*
-                 * If not booted using EFI, enable Live migration support.
-                 */
-                if (!efi_enabled(EFI_BOOT))
-                        wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION,
-                               KVM_SEV_LIVE_MIGRATION_ENABLED);
-	} else {
-                        pr_info("KVM enable live migration feature unsupported\n");
-                }       
-
-Later, setup_kvm_sev_migration() invoked via a late initcall, checks for
-live migration supported(setup above) and UEFI/OVMF support for live
-migration and then enables live migration on the host via the wrmrsl() :
-
-static int __init setup_kvm_sev_migration(void)
-{       
-        efi_char16_t efi_sev_live_migration_enabled[] = L"SevLiveMigrationEnabled";
-        efi_guid_t efi_variable_guid = MEM_ENCRYPT_GUID;
-        efi_status_t status;
-        unsigned long size;
-        bool enabled;
-        
-        /*
-         * check_kvm_sev_migration() invoked via kvm_init_platform() before
-         * this callback would have setup the indicator that live migration
-         * feature is supported/enabled.
-         */
-        if (!sev_live_migration_enabled)
-                return 0;
-        
-        if (!efi_enabled(EFI_RUNTIME_SERVICES)) {
-                pr_info("%s : EFI runtime services are not enabled\n", __func__);
-                return 0;
-        }
-
-        size = sizeof(enabled);
-
-        /* Get variable contents into buffer */
-        status = efi.get_variable(efi_sev_live_migration_enabled,
-                                  &efi_variable_guid, NULL, &size, &enabled);
-                                  
-        if (status == EFI_NOT_FOUND) {
-                pr_info("%s : EFI live migration variable not found\n", __func__);
-                return 0;
-        }
-        
-        if (status != EFI_SUCCESS) {
-                pr_info("%s : EFI variable retrieval failed\n", __func__);
-                return 0;
-        }
-        
-        if (enabled == 0) {
-                pr_info("%s: live migration disabled in EFI\n", __func__);
-                return 0;
-	}
-
-	pr_info("%s : live migration enabled in EFI\n", __func__);
-        wrmsrl(MSR_KVM_SEV_LIVE_MIGRATION, KVM_SEV_LIVE_MIGRATION_ENABLED);
-
-        return true;
-
-This ensures that host/guest live migration negotation is completed only
-when both host and guest have support for it and also UEFI/OVMF supports
-it. 
-
-Please note, that live migration cannot be initiated before this
-negotation is complete, which makes sense, as we don't want to enable it
-till the host/guest negotation is complete and UEFI/OVMF support for it
-is checked.
-
-So there is this window, till guest is booting and till the late
-initcall is invoked that live migration cannot be initiated, and 
-KVM_GET_SHARED_PAGES ioctl will return -EINVAL till then.
-               
+> 
 > Alternatively, as explained below, this could call guest_pv_has instead.
 > 
 > >
@@ -431,25 +328,6 @@ KVM_GET_SHARED_PAGES ioctl will return -EINVAL till then.
 > even if userspace didn't ask for the cpuid bit to be set. This should
 > not happen. Userspace should be in control of a new hypercall rolling
 > out.
-
-No, the guest will not invoke hypercall until live migration support
-has been enabled on the guest as i described above. The hypercall 
-invocation code does this check as shown below: 
-
-static void set_memory_enc_dec_hypercall(unsigned long vaddr, int npages,
-                                        bool enc)
-{
-        unsigned long sz = npages << PAGE_SHIFT;
-        unsigned long vaddr_end, vaddr_next;
-
-        if (!sev_live_migration_enabled)
-                return;
-...
-...
-
-Thanks,
-Ashish
-
 > 
 > I believe my interpretation last time was that the cpuid bit was
 > getting surfaced from the host kernel to host userspace, but I don't
@@ -469,6 +347,75 @@ Ashish
 > svm_vcpu_after_set_cpuid regardless of what userspace asks for.
 > Userspace should have a choice in the matter.
 > 
+
+To summarize, KVM (host) enables SEV live migration feature as
+following:
+
+static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+{
+...
+        /*
+         * If SEV guest then enable the Live migration feature.
+         */
+        if (sev_guest(vcpu->kvm)) {
+                struct kvm_cpuid_entry2 *best;
+
+                best = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
+                if (!best)
+                        return;
+
+                best->eax |= (1 << KVM_FEATURE_SEV_LIVE_MIGRATION);
+        }
+
+...
+...
+
+Later userspace can call cpuid(KVM_CPUID_FEATURES) and get the cpuid data
+and override it, for example, this is how Qemu userspace code currently
+fixups/overrides the KVM reported CPUID features : 
+
+target/i386/kvm/kvm.c:
+
+uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+                                      uint32_t index, int reg)
+{
+...
+...
+
+  cpuid = get_supported_cpuid(s);
+
+  struct kvm_cpuid_entry2 *entry = cpuid_find_entry(cpuid, function, index);
+  if (entry) {
+      ret = cpuid_entry_get_reg(entry, reg);
+  }
+    
+  /* Fixups for the data returned by KVM, below */
+
+  ...
+  ...
+
+  } else if (function == KVM_CPUID_FEATURES && reg == R_EAX) {
+        /* kvm_pv_unhalt is reported by GET_SUPPORTED_CPUID, but it can't
+         * be enabled without the in-kernel irqchip
+         */
+        if (!kvm_irqchip_in_kernel()) {
+            ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
+        }
+        if (kvm_irqchip_is_split()) {
+            ret |= 1U << KVM_FEATURE_MSI_EXT_DEST_ID;
+        }
+    } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
+        ret |= 1U << KVM_HINTS_REALTIME;
+    }
+    
+    return ret;
+
+So you can use a similar approach to override
+KVM_FEATURE_SEV_LIVE_MIGRATION feature.
+
+Thanks,
+Ashish
+
 > Looking at similar paravirt-y features, there's precedent for another
 > way of doing this (may be preferred over CHECK_EXTENSION/ENABLE_CAP?):
 > this could call guest_pv_has before running the hypercall. The feature
