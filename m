@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3111E31188B
-	for <lists+kvm@lfdr.de>; Sat,  6 Feb 2021 03:44:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F927311936
+	for <lists+kvm@lfdr.de>; Sat,  6 Feb 2021 04:00:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbhBFCk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Feb 2021 21:40:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38694 "EHLO
+        id S232050AbhBFC6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Feb 2021 21:58:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbhBFCh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Feb 2021 21:37:58 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE39FC08EE27
-        for <kvm@vger.kernel.org>; Fri,  5 Feb 2021 16:27:04 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id d26so4171618pfn.5
-        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 16:27:04 -0800 (PST)
+        with ESMTP id S231687AbhBFCpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Feb 2021 21:45:54 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7CAC08EE22
+        for <kvm@vger.kernel.org>; Fri,  5 Feb 2021 16:29:17 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id u11so4373634plg.13
+        for <kvm@vger.kernel.org>; Fri, 05 Feb 2021 16:29:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=EH3HRE/ibAwzd4o+wOpnfLPBD+oAmovzGutqmDQDCIg=;
-        b=lc8Qw0kNFzTtqe6BIDMx231cY0gFUoT9MZSiM+wnbBFQlaHgTDDk6kcV1GHTXnJhQo
-         KBTF79P9Zaax+amNTdEv9MGPTyOugyxRV0Q5NFBKrlcvwJfktwrS/ldssoNeQgbimTEA
-         jA6mRYrrznUQS/0osskEWOnkfXEy1vzRAHwS33kbFdujVkNmnu95KK/k/AVVIkNXrjzr
-         7xdyMk4EWNbkJbmrEbEFIZOGYEareyNfyJjDKkJVqqPAmKpZEoCiVh5gsY1Jy/k/f6i+
-         81AwnITy97MEdorNUdiRVxCQ7RNaQ47ohBhgoZSqaiA7tfwJsxTRld5l7EjscB4Qa6EB
-         nuSg==
+        bh=T7sb6ncr5R6wfUcQGMveYp/z+yGX8ZVufAGOzAOyT3k=;
+        b=h0gWg+Hg5xu/Yy2S6jOGQaWPkX14GYYxCS6NWxJLotd8KUKczFGhG2pqg8j1VPsYBa
+         U4KDRQ6QNIp8g43R3aT/kUnYoTlFtBznbnf/dIDoi6Y0SXddsK9U0zJxh8kN8NoGWCLy
+         R6JTP6LztRdG2yi+qfmXaU2q05fLTbH1jS0mVulEuLDv9+fJeRFwLUzQl6SIw/yM99u7
+         +hNNWKXhaPrJMyny8FCmCJgDom/9buVKN/q0448RcasAh6d16ZNbLRB0uQpm6UjnMh+H
+         lAojBuXgoL1qN7a/aoE+5U6N7xgMfovtrimShCPe1N8raoimErLrlKRBwSMJvp6VajJM
+         QUug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=EH3HRE/ibAwzd4o+wOpnfLPBD+oAmovzGutqmDQDCIg=;
-        b=ZB6Vh/++b5D2krMRlMN+95zSPBfAnj4K2Xxx9MOE6/0QCNVPWUBmanIvFcYFri23ku
-         vyd044kQKmHJk7bmUFkBtX6H8iKKMD0BQAzDeAE13YU0AvAYLYp8LrRV7c4+/rgVv59n
-         /uwdOX8vhVpfuUw/FaEZa7DulhCbVpH0/BY+H5pT53IYam+LbZXJf+yLdA5zqBzS3jJ5
-         RfLFaTBr78pDhSNzF9IE+LiGYYVQK2d8MGWd6lLxfPxzTDvULVBnH9ql7OvfemmiHJ+X
-         lBWK3qU+X8hSX7STLkELe9Sf0boZRQVDs8pWcxngSrMMYUgEr9ZX/jL/9OmfHzXIpWxp
-         Ok9w==
-X-Gm-Message-State: AOAM533XyOHbH2EBk/SAcu2P3DTqERVlVADX8I1hT/f1ZjqMr6l9IThs
-        dExtvh4tGP4iu3J7ZXjakDKybA==
-X-Google-Smtp-Source: ABdhPJwFPakzZi7F4YXbdMIn58tmOenc4WF1friZt/+b0HiEN1gqMvgZgMvx8X1RrcdLO6JKGXn7qw==
-X-Received: by 2002:aa7:92c6:0:b029:1cb:1c6f:c605 with SMTP id k6-20020aa792c60000b02901cb1c6fc605mr7100209pfa.4.1612571224287;
-        Fri, 05 Feb 2021 16:27:04 -0800 (PST)
+        bh=T7sb6ncr5R6wfUcQGMveYp/z+yGX8ZVufAGOzAOyT3k=;
+        b=n0YeAs1PljDTEgfM4X4C25395sJBb7XOAAGCjD51G5n5D7NPviicj8RW55y2ApOyws
+         fxg5S/7JZ12eVqj+p8Uf/GNTK46K0kBi1x2VSj6wB8O+VIh/rmWMURla6bHXU07JOa/a
+         U+v8bxxx2uOI3sdj4r29WOPY2MJrmZefdVRaJS7Ok//M8JwXytNQfV60CZZzybtSBwHo
+         qtCTVmKgsrYlg+S6jN9f/K9IdLMpfrLpO3gpuyujmOyqEqg3ddQ5E2nEPSlKcYNXrSRp
+         TVbtKGYr3+URU6s5rAGqBJbYSiNSW9vun/twDLuJXE90iJKpAKUTFIDERNyPbrXN/cU0
+         GVWQ==
+X-Gm-Message-State: AOAM532q4Lba3q8rMzLO0tc0yolk70coLVBtVqH9ZvJBMoItjesPUSaY
+        PaOJ+TfVSjmOUTOhTUD9FSZVVA==
+X-Google-Smtp-Source: ABdhPJw1OIcTGX649D2tHxeoNCRGC+hK7tKAtFvzxDG4DvBViD7hvDhdB3hwb06AxvnafUGuRcrmTA==
+X-Received: by 2002:a17:902:fe09:b029:e1:6964:98dc with SMTP id g9-20020a170902fe09b02900e1696498dcmr6634863plj.24.1612571356921;
+        Fri, 05 Feb 2021 16:29:16 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:d169:a9f7:513:e5])
-        by smtp.gmail.com with ESMTPSA id t6sm10993068pfe.177.2021.02.05.16.27.02
+        by smtp.gmail.com with ESMTPSA id o190sm11780244pgo.50.2021.02.05.16.29.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 16:27:03 -0800 (PST)
-Date:   Fri, 5 Feb 2021 16:26:57 -0800
+        Fri, 05 Feb 2021 16:29:16 -0800 (PST)
+Date:   Fri, 5 Feb 2021 16:29:09 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        Peter Shier <pshier@google.com>,
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
         Peter Feiner <pfeiner@google.com>,
         Junaid Shahid <junaids@google.com>,
         Jim Mattson <jmattson@google.com>,
@@ -60,42 +60,84 @@ Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
         Wanpeng Li <kernellwp@gmail.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Xiao Guangrong <xiaoguangrong.eric@gmail.com>
-Subject: Re: [PATCH v2 20/28] KVM: x86/mmu: Use atomic ops to set SPTEs in
- TDP MMU map
-Message-ID: <YB3iUde728MPiuo9@google.com>
+Subject: Re: [PATCH v2 21/28] KVM: x86/mmu: Flush TLBs after zap in TDP MMU
+ PF handler
+Message-ID: <YB3i1UXM/uIzHJuD@google.com>
 References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-21-bgardon@google.com>
- <81f13e36-b2f9-a4bc-ab8e-75cedb88bbb1@redhat.com>
+ <20210202185734.1680553-22-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <81f13e36-b2f9-a4bc-ab8e-75cedb88bbb1@redhat.com>
+In-Reply-To: <20210202185734.1680553-22-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 03, 2021, Paolo Bonzini wrote:
-> On 02/02/21 19:57, Ben Gardon wrote:
-> > To prepare for handling page faults in parallel, change the TDP MMU
-> > page fault handler to use atomic operations to set SPTEs so that changes
-> > are not lost if multiple threads attempt to modify the same SPTE.
-> > 
-> > Reviewed-by: Peter Feiner <pfeiner@google.com>
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > 
-> > ---
-> > 
-> > v1 -> v2
-> > - Rename "atomic" arg to "shared" in multiple functions
-> > - Merged the commit that protects the lists of TDP MMU pages with a new
-> >    lock
-> > - Merged the commits to add an atomic option for setting SPTEs and to
-> >    use that option in the TDP MMU page fault handler
+On Tue, Feb 02, 2021, Ben Gardon wrote:
+> +static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+> +					   struct tdp_iter *iter)
+> +{
+> +	/*
+> +	 * Freeze the SPTE by setting it to a special,
+> +	 * non-present value. This will stop other threads from
+> +	 * immediately installing a present entry in its place
+> +	 * before the TLBs are flushed.
+> +	 */
+> +	if (!tdp_mmu_set_spte_atomic(kvm, iter, REMOVED_SPTE))
+> +		return false;
+> +
+> +	kvm_flush_remote_tlbs_with_address(kvm, iter->gfn,
+> +					   KVM_PAGES_PER_HPAGE(iter->level));
+> +
+> +	/*
+> +	 * No other thread can overwrite the removed SPTE as they
+> +	 * must either wait on the MMU lock or use
+> +	 * tdp_mmu_set_spte_atomic which will not overrite the
+> +	 * special removed SPTE value. No bookkeeping is needed
+> +	 * here since the SPTE is going from non-present
+> +	 * to non-present.
+> +	 */
+
+Can we expand these comments out to 80 chars before the final/official push?
+
+> +	WRITE_ONCE(*iter->sptep, 0);
+> +
+> +	return true;
+> +}
+> +
+>  
+>  /*
+>   * __tdp_mmu_set_spte - Set a TDP MMU SPTE and handle the associated bookkeeping
+> @@ -523,6 +562,15 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+> +	/*
+> +	 * No thread should be using this function to set SPTEs to the
+> +	 * temporary removed SPTE value.
+> +	 * If operating under the MMU lock in read mode, tdp_mmu_set_spte_atomic
+> +	 * should be used. If operating under the MMU lock in write mode, the
+> +	 * use of the removed SPTE should not be necessary.
+> +	 */
+> +	WARN_ON(iter->old_spte == REMOVED_SPTE);
+> +
+>  	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
+>  
+>  	__handle_changed_spte(kvm, as_id, iter->gfn, iter->old_spte, new_spte,
+> @@ -790,12 +838,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+>  		 */
+>  		if (is_shadow_present_pte(iter.old_spte) &&
+>  		    is_large_pte(iter.old_spte)) {
+> -			if (!tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, 0))
+> +			if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
+>  				break;
+>  
+> -			kvm_flush_remote_tlbs_with_address(vcpu->kvm, iter.gfn,
+> -					KVM_PAGES_PER_HPAGE(iter.level));
+> -
+>  			/*
+>  			 * The iter must explicitly re-read the spte here
+>  			 * because the new value informs the !present
+> -- 
+> 2.30.0.365.g02bc693789-goog
 > 
-> I'll look at the kernel test robot report if nobody beats me to it.
-
-It's just a vanilla i386 compilation issue, the xchg() is on an 8-byte value.
-
-We could fudge around it via #ifdef around the xchg().  Making all of tdp_mmu.c
-x86-64 only would be nice to avoid future annoyance, though the number of stubs
-required would be painful...
