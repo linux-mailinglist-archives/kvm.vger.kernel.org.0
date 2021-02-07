@@ -2,212 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 581E13125FA
-	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 17:22:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FFA831274E
+	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 20:50:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbhBGQWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Feb 2021 11:22:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55698 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229491AbhBGQWA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 7 Feb 2021 11:22:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612714832;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FZqyDugOGOW0JQq4JTJQ1tDgFP/xH2dXqvp4jbAWnlA=;
-        b=C64pggroXqI7LiC81qHFoUTFSRLpDwYBJnoZlZTsAUed5gbbHVBUGRGR7dsOAyPcwzKmv3
-        V4xHKBxy9aIlhS58/Obq8Sy1joFu+mCOCqtnfNTM0wXCjurA+sXlPy2+/d13uH+1rs+XF6
-        lQTm5YVPFmPEsVoceRKxRpu6plxqcCk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-J11VWVvWPPqwjTHu_9lRIQ-1; Sun, 07 Feb 2021 11:20:31 -0500
-X-MC-Unique: J11VWVvWPPqwjTHu_9lRIQ-1
-Received: by mail-ed1-f69.google.com with SMTP id u19so11920352edr.1
-        for <kvm@vger.kernel.org>; Sun, 07 Feb 2021 08:20:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FZqyDugOGOW0JQq4JTJQ1tDgFP/xH2dXqvp4jbAWnlA=;
-        b=pKFidYFfKo3WE0a6HRpRiqrdr6+j7gQKYLPx4wcKMxsFteLECnecRiSp2RcG4w9Ewa
-         I+QwR6FopnuaGl8NwNJn6jdA9H9W3xvEH4VuegW8Q3bOdZnbv2DrHKCz4bfQ/MdoizKX
-         qoY7yxl/JMna6E+fDMQD70hHLzska/1FRbB2xzH8HkXAUEzxSjD0EKZxCY2yH6kbZyKx
-         uumZflZxgpJJ9Dk60ByGn3p4nWGaTvgUZZ4hAMWXZFbVsvqC26/m+5+N1m/Mb9fb3OHP
-         VtJI5tyHrsJBniqian405hfezG0e3TCOh72on1/QfC26otxXgZup74/kuB4QIsucA5dF
-         NW7Q==
-X-Gm-Message-State: AOAM530T2P8R7hX6p6YMEJ5u80UumvE15wMZGReh6FeR00BhVFwrz1+A
-        YGbXfz6ZvCvhEEbBs6BKG5vQPYX4z3283aulK58+Ga83dWX5UjAHT1LmLTOV9M99nbMdb7rFu9I
-        YgJPzNBZGch1K
-X-Received: by 2002:aa7:cb0d:: with SMTP id s13mr13143839edt.221.1612714830317;
-        Sun, 07 Feb 2021 08:20:30 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxSdcDNfe71ti67oDmkvTssos1+0OxTMKiTicFwRsqODDXrK/rf1JmpCvBGtLbnaWdb2ccmlQ==
-X-Received: by 2002:aa7:cb0d:: with SMTP id s13mr13143828edt.221.1612714830149;
-        Sun, 07 Feb 2021 08:20:30 -0800 (PST)
-Received: from redhat.com (bzq-79-180-2-31.red.bezeqint.net. [79.180.2.31])
-        by smtp.gmail.com with ESMTPSA id w3sm7043867eja.52.2021.02.07.08.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Feb 2021 08:20:29 -0800 (PST)
-Date:   Sun, 7 Feb 2021 11:20:25 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 00/17] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210207111954-mutt-send-email-mst@kernel.org>
-References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+        id S229638AbhBGTtR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Feb 2021 14:49:17 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:49371 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229445AbhBGTtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Feb 2021 14:49:15 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DYfpn2XcRz9sVr;
+        Mon,  8 Feb 2021 06:48:33 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1612727313;
+        bh=wl/S13xz9mOdUnm4g0maXyh7BN1T8qo7oiw7JVLhSPU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=YSQBGtKBTke7q9FwNGStTYtqrEoZQI2AKwtdpCLI+t5r/omTlkY5YNbBKCHewF78e
+         RdshWC46WmKH/U/mMZbUcHZUiB7BclURIvQ7U1WMLqFTnVrvJVdXSLUXtB4fiYNKK0
+         br2CAp4Ei/9ByzIokFA5AjusGtgADQq4xotmxO5hqPGQpxg/KRz66Et3XiuX7nSEfm
+         obVp00A/cf9f4blZ0tSBQPcByEwNjxNMHZIMgY6igB9dbU3U99XD+/Xy+iZw2KGT4z
+         pnhm7xAVS5bMARwlB1fKuh9NaJXLX+yOX3Kuy8rka2GIEQtiUd7cEVlAmcC4pkrcjX
+         +1G11NZWxs71Q==
+Date:   Mon, 8 Feb 2021 06:48:32 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the kvm tree
+Message-ID: <20210208064832.0624ac2e@canb.auug.org.au>
+In-Reply-To: <cac800cb-2e3e-0849-1a97-ef10c29b4e10@redhat.com>
+References: <20210205160224.279c6169@canb.auug.org.au>
+        <cac800cb-2e3e-0849-1a97-ef10c29b4e10@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+Content-Type: multipart/signed; boundary="Sig_/VDLHhucgpPkXC8uKFUQHq0d";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 07, 2021 at 06:12:56PM +0300, Arseny Krasnov wrote:
-> 	This patchset impelements support of SOCK_SEQPACKET for virtio
-> transport.
-> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
-> do it, two new packet operations were added: first for start of record
->  and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
-> both operations carries metadata - to maintain boundaries and payload
-> integrity. Metadata is introduced by adding special header with two
-> fields - message count and message length:
-> 
-> 	struct virtio_vsock_seq_hdr {
-> 		__le32  msg_cnt;
-> 		__le32  msg_len;
-> 	} __attribute__((packed));
-> 
-> 	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
-> packets(buffer of second virtio descriptor in chain) in the same way as
-> data transmitted in RW packets. Payload was chosen as buffer for this
-> header to avoid touching first virtio buffer which carries header of
-> packet, because someone could check that size of this buffer is equal
-> to size of packet header. To send record, packet with start marker is
-> sent first(it's header contains length of record and counter), then
-> counter is incremented and all data is sent as usual 'RW' packets and
-> finally SEQ_END is sent(it also carries counter of message, which is
-> counter of SEQ_BEGIN + 1), also after sedning SEQ_END counter is
-> incremented again. On receiver's side, length of record is known from
-> packet with start record marker. To check that no packets were dropped
-> by transport, counters of two sequential SEQ_BEGIN and SEQ_END are
-> checked(counter of SEQ_END must be bigger that counter of SEQ_BEGIN by
-> 1) and length of data between two markers is compared to length in
-> SEQ_BEGIN header.
-> 	Now as  packets of one socket are not reordered neither on
-> vsock nor on vhost transport layers, such markers allows to restore
-> original record on receiver's side. If user's buffer is smaller that
-> record length, when all out of size data is dropped.
-> 	Maximum length of datagram is not limited as in stream socket,
-> because same credit logic is used. Difference with stream socket is
-> that user is not woken up until whole record is received or error
-> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
-> 	Tests also implemented.
-> 
->  Arseny Krasnov (17):
->   af_vsock: update functions for connectible socket
->   af_vsock: separate wait data loop
->   af_vsock: separate receive data loop
->   af_vsock: implement SEQPACKET receive loop
->   af_vsock: separate wait space loop
->   af_vsock: implement send logic for SEQPACKET
->   af_vsock: rest of SEQPACKET support
->   af_vsock: update comments for stream sockets
->   virtio/vsock: dequeue callback for SOCK_SEQPACKET
->   virtio/vsock: fetch length for SEQPACKET record
->   virtio/vsock: add SEQPACKET receive logic
->   virtio/vsock: rest of SOCK_SEQPACKET support
->   virtio/vsock: setup SEQPACKET ops for transport
->   vhost/vsock: setup SEQPACKET ops for transport
->   vsock_test: add SOCK_SEQPACKET tests
->   loopback/vsock: setup SEQPACKET ops for transport
->   virtio/vsock: simplify credit update function API
-> 
->  drivers/vhost/vsock.c                   |   8 +-
->  include/linux/virtio_vsock.h            |  15 +
->  include/net/af_vsock.h                  |   9 +
->  include/uapi/linux/virtio_vsock.h       |  16 +
->  net/vmw_vsock/af_vsock.c                | 588 +++++++++++++++-------
->  net/vmw_vsock/virtio_transport.c        |   5 +
->  net/vmw_vsock/virtio_transport_common.c | 316 ++++++++++--
->  net/vmw_vsock/vsock_loopback.c          |   5 +
->  tools/testing/vsock/util.c              |  32 +-
->  tools/testing/vsock/util.h              |   3 +
->  tools/testing/vsock/vsock_test.c        | 126 +++++
->  11 files changed, 895 insertions(+), 228 deletions(-)
-> 
->  TODO:
->  - What to do, when server doesn't support SOCK_SEQPACKET. In current
->    implementation RST is replied in the same way when listening port
->    is not found. I think that current RST is enough,because case when
->    server doesn't support SEQ_PACKET is same when listener missed(e.g.
->    no listener in both cases).
+--Sig_/VDLHhucgpPkXC8uKFUQHq0d
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-   - virtio spec patch
+Hi Paolo,
 
->  v3 -> v4:
->  - callbacks for loopback transport
->  - SEQPACKET specific metadata moved from packet header to payload
->    and called 'virtio_vsock_seq_hdr'
->  - record integrity check:
->    1) SEQ_END operation was added, which marks end of record.
->    2) Both SEQ_BEGIN and SEQ_END carries counter which is incremented
->       on every marker send.
->  - af_vsock.c: socket operations for STREAM and SEQPACKET call same
->    functions instead of having own "gates" differs only by names:
->    'vsock_seqpacket/stream_getsockopt()' now replaced with
->    'vsock_connectible_getsockopt()'.
->  - af_vsock.c: 'seqpacket_dequeue' callback returns error and flag that
->    record ready. There is no need to return number of copied bytes,
->    because case when record received successfully is checked at virtio
->    transport layer, when SEQ_END is processed. Also user doesn't need
->    number of copied bytes, because 'recv()' from SEQPACKET could return
->    error, length of users's buffer or length of whole record(both are
->    known in af_vsock.c).
->  - af_vsock.c: both wait loops in af_vsock.c(for data and space) moved
->    to separate functions because now both called from several places.
->  - af_vsock.c: 'vsock_assign_transport()' checks that 'new_transport'
->    pointer is not NULL and returns 'ESOCKTNOSUPPORT' instead of 'ENODEV'
->    if failed to use transport.
->  - tools/testing/vsock/vsock_test.c: rename tests
-> 
->  v2 -> v3:
->  - patches reorganized: split for prepare and implementation patches
->  - local variables are declared in "Reverse Christmas tree" manner
->  - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
->    fields access
->  - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
->    between stream and seqpacket sockets.
->  - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
->  - af_vsock.c: 'vsock_wait_data()' refactored.
-> 
->  v1 -> v2:
->  - patches reordered: af_vsock.c related changes now before virtio vsock
->  - patches reorganized: more small patches, where +/- are not mixed
->  - tests for SOCK_SEQPACKET added
->  - all commit messages updated
->  - af_vsock.c: 'vsock_pre_recv_check()' inlined to
->    'vsock_connectible_recvmsg()'
->  - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
->    was not found
->  - virtio_transport_common.c: transport callback for seqpacket dequeue
->  - virtio_transport_common.c: simplified
->    'virtio_transport_recv_connected()'
->  - virtio_transport_common.c: send reset on socket and packet type
-> 			      mismatch.
-> 
-> -- 
-> 2.25.1
+On Fri, 5 Feb 2021 11:08:39 +0100 Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 05/02/21 06:02, Stephen Rothwell wrote:
+> > Hi all,
+> >=20
+> > After merging the kvm tree, today's linux-next build (powerpc
+> > ppc64_defconfig) failed like this:
+> >=20
+> > ERROR: modpost: ".follow_pte" [arch/powerpc/kvm/kvm.ko] undefined!
+> >=20
+> > Caused by commit
+> >=20
+> >    bd2fae8da794 ("KVM: do not assume PTE is writable after follow_pfn")
+> >=20
+> > follow_pte is not EXPORTed.
+> >=20
+> > I have used the kvm tree from next-20210204 for today.
+> >  =20
+>=20
+> Stephen, can you squash in the following for the time being?
 
+Wiil do.  I will drop it when it no longer applies.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/VDLHhucgpPkXC8uKFUQHq0d
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmAgRBAACgkQAVBC80lX
+0Gzlsgf/Vu3YM6NhY38hdezRiuj5ALhhnAJIR9mjPLbgLb/n+JD5iFzM/r/d/a7h
+rvAllgpNJIJYNMIDdRtO7YUOMI9g9NS9LhbtzJ/x6FsZF97xIxt30CbYhbLCfBvN
+MrXgtQJDU/3DKLSGc5fsyD0wlMmxZyq7nbIQNkqHlt8l7Ov9D/x8RXQIsHgL8qdc
+DibYN+MJhgSX7fRKf3SID19E5fAsN2++nHU6as2J/rYq9/NHi5dAvqIb+6nyBf56
+JpGDGIsuDHKgxMg1R91cFM44U8PY1GsPolUNxzbMY1IcXcKa9yCalfrRT1P7Erqu
+EEARN3Bmx4d0RSg34mRGZn3TxuPmPw==
+=Jtt3
+-----END PGP SIGNATURE-----
+
+--Sig_/VDLHhucgpPkXC8uKFUQHq0d--
