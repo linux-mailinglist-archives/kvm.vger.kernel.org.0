@@ -2,403 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4F50312270
-	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 09:20:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE36F312278
+	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 09:22:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbhBGITz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Feb 2021 03:19:55 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12471 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbhBGITw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Feb 2021 03:19:52 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DYMTk1cfMzjKdW;
-        Sun,  7 Feb 2021 16:17:46 +0800 (CST)
-Received: from [10.174.184.42] (10.174.184.42) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Sun, 7 Feb 2021 16:18:59 +0800
-From:   Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [RFC PATCH 04/11] iommu/arm-smmu-v3: Split block descriptor to a
- span of page
-To:     Robin Murphy <robin.murphy@arm.com>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <kvmarm@lists.cs.columbia.edu>, <iommu@lists.linux-foundation.org>,
-        "Will Deacon" <will@kernel.org>,
+        id S229751AbhBGIVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Feb 2021 03:21:23 -0500
+Received: from mga11.intel.com ([192.55.52.93]:47808 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229693AbhBGIUu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Feb 2021 03:20:50 -0500
+IronPort-SDR: GA/wlMb8QpMsCx3dgcEg2I/eQsZVyyozopFD5KZsQCbQEHchXhwrkjSKyWD+r4sEeKkzK8ZD+i
+ 5D/0b1IDgdDQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9887"; a="178084895"
+X-IronPort-AV: E=Sophos;i="5.81,159,1610438400"; 
+   d="scan'208";a="178084895"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2021 00:20:09 -0800
+IronPort-SDR: Xym7UOfOcihzzzfcmoYRDVWb4nBX3HYCVrAo+GHDsAFYv3C+JMVPT2zYOyR+a2an7Zx5SG1imS
+ 5SlDDa0jh31A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,159,1610438400"; 
+   d="scan'208";a="394637679"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+  by orsmga008.jf.intel.com with ESMTP; 07 Feb 2021 00:20:09 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Sun, 7 Feb 2021 00:20:08 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Sun, 7 Feb 2021 00:20:08 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
+ via Frontend Transport; Sun, 7 Feb 2021 00:20:08 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Sun, 7 Feb 2021 00:20:07 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e9FwQ58hYXjf7UX/qtWdvtBppH8EUdHW5meW2f8a7dRhBwKzLURWLDGNFmu5HMJ3PLR/2ZOmugPiQPgxH8vGzPyqvZPSrQxhFKFGSJ0oEiGM816she5MybSnyHj/b7MqtOQU8j6lAHh2HhTMbVfLPs/oxpWoFYMSALwvOQ/fl0MLBzolShZz7FLbXqbHCdjQEe7Vbe/j2e/61O9t0OYN45f7Fl9gpbaHi9RmYgC3YOHcI75kzeL6DoWeTe1VtoGPqqbpJoLyI7uMFb1p01S+WpHzupUjTWDUUshxPw2DFvrKeOeS5rCz1dqHgwaYCg9KEmqeI111kZxVghHzQm2Big==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+8qAwMRqJYJAIt2UlDamHZWRSsbRsWDs/vmPjSR3nm4=;
+ b=SAYtoH5cPLjv/Hce+THlqKmAhs8++TkHZiP06LgESh5Balcnzm+wR2dIwO/+QrcYgqAzkaBnDF7juNxmx15rXcSEWUpLn4FLrLaby1EFsQxuSnClwgQpQxw7q8/F/6GbnzMHNJonS7fYWHOd3gjGEkTWW0irNC15uPecClOQHovEKRFgbx42FhxGlD/ENEGdadeCfPgFXQxVwGwoDGnOQ75cPzZ9ReGYU8fQCtCBQfdStDQ3/gXVyG05vcffWQ/MHxND2WZATH3FKJM0uzv3/j75kE1TFgqrJtaSitRtCJMhSnyauYjauxsm+cf2lIHsc9PdAM+ws2SFlaZ2RaoLbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+8qAwMRqJYJAIt2UlDamHZWRSsbRsWDs/vmPjSR3nm4=;
+ b=mQIG+jQ6w/AnTtbF3YHA1PH+RhqGbzB2O+L4eQf//eimGJ76vAICITJ/WmPM8RQ4o0w3bgMy3lSSiM9wJd5A9H5yiRLq3U2o5DqNTfMfHFyKxv8LbqxXXBps/OEZ8M58W0CpGVFfmDLw/CBcCYRPTbuSNwR+aj6C+L9bFG0El5o=
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com (2603:10b6:300:110::9)
+ by MWHPR11MB2016.namprd11.prod.outlook.com (2603:10b6:300:26::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.27; Sun, 7 Feb
+ 2021 08:20:06 +0000
+Received: from MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::f1b4:bace:1e44:4a46]) by MWHPR11MB1886.namprd11.prod.outlook.com
+ ([fe80::f1b4:bace:1e44:4a46%6]) with mapi id 15.20.3825.029; Sun, 7 Feb 2021
+ 08:20:06 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+CC:     Shenming Lu <lushenming@huawei.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        "Marc Zyngier" <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-5-zhukeqian1@huawei.com>
- <b7f45b39-59c4-3707-13eb-937d161e72f0@arm.com>
-CC:     Kirti Wankhede <kwankhede@nvidia.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        <wanghaibin.wang@huawei.com>, <jiangkunkun@huawei.com>,
-        <yuzenghui@huawei.com>, <lushenming@huawei.com>
-Message-ID: <a2387bdd-97b6-1b66-43bc-927bf3e93456@huawei.com>
-Date:   Sun, 7 Feb 2021 16:18:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
-MIME-Version: 1.0
-In-Reply-To: <b7f45b39-59c4-3707-13eb-937d161e72f0@arm.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Auger <eric.auger@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
+        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+Subject: RE: [RFC PATCH v1 0/4] vfio: Add IOPF support for VFIO passthrough
+Thread-Topic: [RFC PATCH v1 0/4] vfio: Add IOPF support for VFIO passthrough
+Thread-Index: AQHW8vkytb+JKYXDyUeYG8HWtmg34ao/PksAgAOljRCAAZMegIADINTAgAHYDICAAupCcA==
+Date:   Sun, 7 Feb 2021 08:20:06 +0000
+Message-ID: <MWHPR11MB1886D07D927A77DCB2FF74D48CB09@MWHPR11MB1886.namprd11.prod.outlook.com>
+References: <20210125090402.1429-1-lushenming@huawei.com>
+ <20210129155730.3a1d49c5@omen.home.shazbot.org>
+ <MWHPR11MB188684B42632FD0B9B5CA1C08CB69@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <47bf7612-4fb0-c0bb-fa19-24c4e3d01d3f@huawei.com>
+ <MWHPR11MB1886C71A751B48EF626CAC938CB39@MWHPR11MB1886.namprd11.prod.outlook.com>
+ <YB0f5Yno9frihQq4@myrica>
+In-Reply-To: <YB0f5Yno9frihQq4@myrica>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [101.88.226.48]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 90703fa0-0a97-44da-cd2f-08d8cb412d0f
+x-ms-traffictypediagnostic: MWHPR11MB2016:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MWHPR11MB20162285C9D094CD573A06328CB09@MWHPR11MB2016.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qdRQoSgjoLTqJ27saBXfpSgvYltvXTRDGKmML49E2p3kuZoxAgRJk+9QkhLD3Kj6TQbWwcjiOOE05RWUS61C3IJOEpYPv8vTCnNQ5MLIc2eh7VaFLqUgl0n3+c0mPaTSf6Aoo+rUXTZzoMqtQu/WrvhA+tdBrQKCfKkI2cj3FyE6mGfauduunPIs3klz0lRDFgT3wrkDMlhUK+R9RSkRIVYON5PnvwhB2ik2F2rUhqTtvHpL0R6/8V/L/Q5Nuf3+QzH6+02V5y+Xi7aSAPKGzrzigebS788/4cvv1yUz3FeFmgzfh8SHjRK0yfR+DmU1IwoUmhDrwMxvh3dO3r5/lJNqtNwjGM7nnz+Eu7NHz3EvAvGnVYIxIfyjYigm09b8W+JvDTx0vo5pXeqKe5ROU4DRptg16oNSpEd3MC08ZGKheJPRUZaf42VmwcWknVEG+I4pM22Xz0CApA8AJvoRkJ1/aYggFs4NUg/afD7w+tvAuQX5DIl0/iUPw4vvm9YtBfC+ISzGRHo2iMi8tGoSK4u5Qx4LdwCjfqbSlUrP62eb0g6Bv6qhr9R9D/wLVx+9Ds9EmYLCIBtRaHh9NVXtsML9DD86juROVFk+NO19HYo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(39860400002)(366004)(136003)(396003)(376002)(83380400001)(66476007)(66946007)(55016002)(26005)(66446008)(66556008)(86362001)(76116006)(2906002)(478600001)(316002)(966005)(4326008)(6506007)(54906003)(5660300002)(52536014)(8676002)(7696005)(64756008)(8936002)(6916009)(186003)(33656002)(71200400001)(9686003)(7416002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?bWxhaUJ6L3ZPTW9GRHN5YUNPWnh4aysza3dBWS9rMmpicE9MdTRSbElwaVlX?=
+ =?utf-8?B?TnJjbTBkcnpDbkVnWlMvYzlYanRFVDRJYmViandQOFU4ZUplb1N4Z3dwOHhL?=
+ =?utf-8?B?VjBxakZJdjlidWlPMkFDNUVaZG5mVEVhZk4rMS85c0JjZlQ0QXpOTzNJMEdq?=
+ =?utf-8?B?MHMweGMza3lQRU44ckIzTk5LUmdrNVlUU2J2M0M2YlB2TzA4MTNtRjdBYzR2?=
+ =?utf-8?B?VVZWQ1VaMzZpc0NFdFAraHFKZkNPVkQvb2pQcE1COFlDcXB3TFJCQUlpR3JD?=
+ =?utf-8?B?eGNqUlozVU5DRmQyR0cyL2VuZE56dk1PbHE0NWg2c0VFL2FBZm44S09zakIr?=
+ =?utf-8?B?YWN2d2IyUTFDSUJKOVFIb2dWUElXWDd4cWR6T2k2d3VneWhlaXVldGFHZnBv?=
+ =?utf-8?B?emZxTTVvZVhUTWpUUXVYVjk0UWdmbEJpdG56YmErZnRma3M5S05YQ000cElH?=
+ =?utf-8?B?dkd3MG9BR2NwUG5xZHlURlEzZ3JMdUNMMHBIOXJiWHJDRnh2VzM3OEhnbEdy?=
+ =?utf-8?B?Y1JrMHQ5cG54UGVqeTVkL2ZEb1QzRXMwckRKVlJJNTdXeVdGcHV4MkFZVzUr?=
+ =?utf-8?B?a3M0Q3lTbU05eHFvRVR0bkt2L2xIYTBQZFNFVWM1Qi92RzlPTlhSZkE4bHlI?=
+ =?utf-8?B?Tnl1TUpGc2FtazErQW16R0pTbHo2Y0x3VURLVXoyNWlTMnh3NnBiZnhtTURI?=
+ =?utf-8?B?aXplQThMYTZzSElGd2swSTFoVGFyL1hXM0x4cGJSU2lNcDZLbk96dFNEOVVo?=
+ =?utf-8?B?ckNWN3hPZklIWlUyQ25jcWJJVjdHQkVJbWZXRDBuZnEyNnU3bFk5RVozQ2Rs?=
+ =?utf-8?B?WkIraTF4bGNzaThwWDVMZnNLKzFrMFJXQjJNb0k3QUhQT0VYeEhFc0hXZ0FT?=
+ =?utf-8?B?UmRCZW9oQ3Q5d01qQ0xkaGtNTWFNMCtCakpXVFJZdEtpS09lMzNCWUVkVVNO?=
+ =?utf-8?B?UktsaXorS1dWQjBwVG5adUV6d2xMSXZlN2RJbVJ1eWs5QXU1eUVpOVZjbldK?=
+ =?utf-8?B?d0dTT0VwN0JiajU2ck5ibFRUKzNjTVRWMURoaEpTQnp2SVZPRnZEak12UmFn?=
+ =?utf-8?B?eEsxWGR0eGlYamxQQXBtQS8reW40eHoySWJnSkZwR0JvVlRXUW1VNUVES1NB?=
+ =?utf-8?B?Q3MxOU5vTS9wdkxNTnZKWFlWVWdYbDN0SGNVTDlxQVc3RmVNUGxOdUk2WWxQ?=
+ =?utf-8?B?b3Avai85SFBobXZldXRHVnIrWGp2U0dBQ1g4bGFyd2g0Ky9rcDVvZXoxcXNJ?=
+ =?utf-8?B?RGxlRXBtSmFCYmQ5SlRBcEZGUGkyRWJhRHA2aFBWS1RmMUlCdW50TGdZOTZh?=
+ =?utf-8?B?MTdMRGtZbHN6bDNWaG5IamRRbnJ1U2tpNjFHNjJ1VUM0ZTJGTUVCVytnL3BD?=
+ =?utf-8?B?MExCYWs0VmhkSXVKbUZqcVR1ajZFaWdaU2tTS3o3QTdsbUl2N29JK0pQeFFJ?=
+ =?utf-8?B?a0FHRkJwMW9kRlFwVFlFdzZ0dW9GUWdKS2tmUkRLQ1E0YW1Lc2dRbUtEdGhu?=
+ =?utf-8?B?UnZRKzg2aGVOL3E1OUVtMk03Wmd3OUR3alNWa3Z5b043M3g2Tm1rY3N6bXRu?=
+ =?utf-8?B?dTFWQWJjZ0hTTG13emF2dklqOFBjM0QzaHF0b0xIb0g2QTVHRG40OElPSzlQ?=
+ =?utf-8?B?OGlKNW54ZG9RUUhzWjluelVZQXFzeTFEb2JmUnh5cUlmREVBZldqdXZSTWRs?=
+ =?utf-8?B?ckdzWjNrcTN5QStFWkk5YTM2V1BrN1RVYzVuOXFVRjNra1Z0cTI0bFVWbUZi?=
+ =?utf-8?Q?XqUMF4oqLw/M/jioGJmxlS+1XZnRkyAMwOdMKwY?=
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.184.42]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90703fa0-0a97-44da-cd2f-08d8cb412d0f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2021 08:20:06.0898
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sI4KRRXdBrU+qHFt0enrL8Vvrj36ro4cp7CICaxzvVPaAbn+xNDgZJI5OoMsHLt9Icp8k4CR/QbCT9nkoc6EiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB2016
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
-
-On 2021/2/5 3:51, Robin Murphy wrote:
-> On 2021-01-28 15:17, Keqian Zhu wrote:
->> From: jiangkunkun <jiangkunkun@huawei.com>
->>
->> Block descriptor is not a proper granule for dirty log tracking. This
->> adds a new interface named split_block in iommu layer and arm smmuv3
->> implements it, which splits block descriptor to an equivalent span of
->> page descriptors.
->>
->> During spliting block, other interfaces are not expected to be working,
->> so race condition does not exist. And we flush all iotlbs after the split
->> procedure is completed to ease the pressure of iommu, as we will split a
->> huge range of block mappings in general.
-> 
-> "Not expected to be" is not the same thing as "can not". Presumably the whole point of dirty log tracking is that it can be run speculatively in the background, so is there any actual guarantee that the guest can't, say, issue a hotplug event that would cause some memory to be released back to the host and unmapped while a scan might be in progress? Saying effectively "there is no race condition as long as you assume there is no race condition" isn't all that reassuring...
-Sorry for my inaccuracy expression. "Not expected to be" is inappropriate here, the actual meaning is "can not".
-
-As the only user of these newly added interfaces is vfio_iommu_type1 for now, and vfio_iommu_type1 always acquires "iommu->lock" before invoke them.
-
-> 
-> That said, it's not very clear why patches #4 and #5 are here at all, given that patches #6 and #7 appear quite happy to handle block entries.
-Split block into page is very important for dirty page tracking. Page mapping can greatly reduce the amount of dirty memory handling. The KVM mmu stage2 side also has this logic.
-
-Yes, #6 (log_sync) and #7 (log_clear) is designed to be applied for both block and page mapping. As the "split" operation may fail (e.g, without BBML1/2 or ENOMEM), but we can still track dirty at block granule, which is still a much better choice compared to the full dirty policy.
-
-> 
->> Co-developed-by: Keqian Zhu <zhukeqian1@huawei.com>
->> Signed-off-by: Kunkun Jiang <jiangkunkun@huawei.com>
->> ---
->>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  20 ++++
->>   drivers/iommu/io-pgtable-arm.c              | 122 ++++++++++++++++++++
->>   drivers/iommu/iommu.c                       |  40 +++++++
->>   include/linux/io-pgtable.h                  |   2 +
->>   include/linux/iommu.h                       |  10 ++
->>   5 files changed, 194 insertions(+)
->>
->> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> index 9208881a571c..5469f4fca820 100644
->> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> @@ -2510,6 +2510,25 @@ static int arm_smmu_domain_set_attr(struct iommu_domain *domain,
->>       return ret;
->>   }
->>   +static size_t arm_smmu_split_block(struct iommu_domain *domain,
->> +                   unsigned long iova, size_t size)
->> +{
->> +    struct arm_smmu_device *smmu = to_smmu_domain(domain)->smmu;
->> +    struct io_pgtable_ops *ops = to_smmu_domain(domain)->pgtbl_ops;
->> +
->> +    if (!(smmu->features & (ARM_SMMU_FEAT_BBML1 | ARM_SMMU_FEAT_BBML2))) {
->> +        dev_err(smmu->dev, "don't support BBML1/2 and split block\n");
->> +        return 0;
->> +    }
->> +
->> +    if (!ops || !ops->split_block) {
->> +        pr_err("don't support split block\n");
->> +        return 0;
->> +    }
->> +
->> +    return ops->split_block(ops, iova, size);
->> +}
->> +
->>   static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
->>   {
->>       return iommu_fwspec_add_ids(dev, args->args, 1);
->> @@ -2609,6 +2628,7 @@ static struct iommu_ops arm_smmu_ops = {
->>       .device_group        = arm_smmu_device_group,
->>       .domain_get_attr    = arm_smmu_domain_get_attr,
->>       .domain_set_attr    = arm_smmu_domain_set_attr,
->> +    .split_block        = arm_smmu_split_block,
->>       .of_xlate        = arm_smmu_of_xlate,
->>       .get_resv_regions    = arm_smmu_get_resv_regions,
->>       .put_resv_regions    = generic_iommu_put_resv_regions,
->> diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
->> index e299a44808ae..f3b7f7115e38 100644
->> --- a/drivers/iommu/io-pgtable-arm.c
->> +++ b/drivers/iommu/io-pgtable-arm.c
->> @@ -79,6 +79,8 @@
->>   #define ARM_LPAE_PTE_SH_IS        (((arm_lpae_iopte)3) << 8)
->>   #define ARM_LPAE_PTE_NS            (((arm_lpae_iopte)1) << 5)
->>   #define ARM_LPAE_PTE_VALID        (((arm_lpae_iopte)1) << 0)
->> +/* Block descriptor bits */
->> +#define ARM_LPAE_PTE_NT            (((arm_lpae_iopte)1) << 16)
->>     #define ARM_LPAE_PTE_ATTR_LO_MASK    (((arm_lpae_iopte)0x3ff) << 2)
->>   /* Ignore the contiguous bit for block splitting */
->> @@ -679,6 +681,125 @@ static phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
->>       return iopte_to_paddr(pte, data) | iova;
->>   }
->>   +static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
->> +                     unsigned long iova, size_t size, int lvl,
->> +                     arm_lpae_iopte *ptep);
->> +
->> +static size_t arm_lpae_do_split_blk(struct arm_lpae_io_pgtable *data,
->> +                    unsigned long iova, size_t size,
->> +                    arm_lpae_iopte blk_pte, int lvl,
->> +                    arm_lpae_iopte *ptep)
->> +{
->> +    struct io_pgtable_cfg *cfg = &data->iop.cfg;
->> +    arm_lpae_iopte pte, *tablep;
->> +    phys_addr_t blk_paddr;
->> +    size_t tablesz = ARM_LPAE_GRANULE(data);
->> +    size_t split_sz = ARM_LPAE_BLOCK_SIZE(lvl, data);
->> +    int i;
->> +
->> +    if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
->> +        return 0;
->> +
->> +    tablep = __arm_lpae_alloc_pages(tablesz, GFP_ATOMIC, cfg);
->> +    if (!tablep)
->> +        return 0;
->> +
->> +    blk_paddr = iopte_to_paddr(blk_pte, data);
->> +    pte = iopte_prot(blk_pte);
->> +    for (i = 0; i < tablesz / sizeof(pte); i++, blk_paddr += split_sz)
->> +        __arm_lpae_init_pte(data, blk_paddr, pte, lvl, &tablep[i]);
->> +
->> +    if (cfg->bbml == 1) {
->> +        /* Race does not exist */
->> +        blk_pte |= ARM_LPAE_PTE_NT;
->> +        __arm_lpae_set_pte(ptep, blk_pte, cfg);
->> +        io_pgtable_tlb_flush_walk(&data->iop, iova, size, size);
->> +    }
->> +    /* Race does not exist */
->> +    pte = arm_lpae_install_table(tablep, ptep, blk_pte, cfg);
->> +
->> +    /* Have splited it into page? */
->> +    if (lvl == (ARM_LPAE_MAX_LEVELS - 1))
->> +        return size;
->> +
->> +    /* Go back to lvl - 1 */
->> +    ptep -= ARM_LPAE_LVL_IDX(iova, lvl - 1, data);
->> +    return __arm_lpae_split_block(data, iova, size, lvl - 1, ptep);
-> 
-> If there is a good enough justification for actually using this, recursive splitting is a horrible way to do it. The theoretical split_blk_unmap case does it for the sake of simplicity and mitigating races wherein multiple parts of the same block may be unmapped, but if were were using this in anger then we'd need it to be fast - and a race does not exist, right? - so building the entire sub-table first then swizzling a single PTE would make far more sense.
-The main reason for recursive splitting is simplicity too, and simplicity means more reliable.
-
-I take a skeptical attitude to that recursive splitting introduces much extra trade-off compared to straight splitting.
-The recursive splitting takes a two step that firstly fills next-level table with block TTD and then *replaces* block TTD with next-next-level table address.
-The straight splitting can fill next-level table with next-next-level table address, thus omit the *replace* procedure.
-
-Take 1G block splitting as an example, I think the extra trade-off is 512 times of replacement, which should has little impact on total procedure.
-
-
-> 
->> +}
->> +
->> +static size_t __arm_lpae_split_block(struct arm_lpae_io_pgtable *data,
->> +                     unsigned long iova, size_t size, int lvl,
->> +                     arm_lpae_iopte *ptep)
->> +{
->> +    arm_lpae_iopte pte;
->> +    struct io_pgtable *iop = &data->iop;
->> +    size_t base, next_size, total_size;
->> +
->> +    if (WARN_ON(lvl == ARM_LPAE_MAX_LEVELS))
->> +        return 0;
->> +
->> +    ptep += ARM_LPAE_LVL_IDX(iova, lvl, data);
->> +    pte = READ_ONCE(*ptep);
->> +    if (WARN_ON(!pte))
->> +        return 0;
->> +
->> +    if (size == ARM_LPAE_BLOCK_SIZE(lvl, data)) {
->> +        if (iopte_leaf(pte, lvl, iop->fmt)) {
->> +            if (lvl == (ARM_LPAE_MAX_LEVELS - 1) ||
->> +                (pte & ARM_LPAE_PTE_AP_RDONLY))
->> +                return size;
->> +
->> +            /* We find a writable block, split it. */
->> +            return arm_lpae_do_split_blk(data, iova, size, pte,
->> +                    lvl + 1, ptep);
->> +        } else {
->> +            /* If it is the last table level, then nothing to do */
->> +            if (lvl == (ARM_LPAE_MAX_LEVELS - 2))
->> +                return size;
->> +
->> +            total_size = 0;
->> +            next_size = ARM_LPAE_BLOCK_SIZE(lvl + 1, data);
->> +            ptep = iopte_deref(pte, data);
->> +            for (base = 0; base < size; base += next_size)
->> +                total_size += __arm_lpae_split_block(data,
->> +                        iova + base, next_size, lvl + 1,
->> +                        ptep);
->> +            return total_size;
->> +        }
->> +    } else if (iopte_leaf(pte, lvl, iop->fmt)) {
->> +        WARN(1, "Can't split behind a block.\n");
->> +        return 0;
->> +    }
->> +
->> +    /* Keep on walkin */
->> +    ptep = iopte_deref(pte, data);
->> +    return __arm_lpae_split_block(data, iova, size, lvl + 1, ptep);
->> +}
->> +
->> +static size_t arm_lpae_split_block(struct io_pgtable_ops *ops,
->> +                   unsigned long iova, size_t size)
->> +{
->> +    struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(ops);
->> +    arm_lpae_iopte *ptep = data->pgd;
->> +    struct io_pgtable_cfg *cfg = &data->iop.cfg;
->> +    int lvl = data->start_level;
->> +    long iaext = (s64)iova >> cfg->ias;
->> +
->> +    if (WARN_ON(!size || (size & cfg->pgsize_bitmap) != size))
->> +        return 0;
->> +
->> +    if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1)
->> +        iaext = ~iaext;
->> +    if (WARN_ON(iaext))
->> +        return 0;
->> +
->> +    /* If it is smallest granule, then nothing to do */
->> +    if (size == ARM_LPAE_BLOCK_SIZE(ARM_LPAE_MAX_LEVELS - 1, data))
->> +        return size;
->> +
->> +    return __arm_lpae_split_block(data, iova, size, lvl, ptep);
->> +}
->> +
->>   static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
->>   {
->>       unsigned long granule, page_sizes;
->> @@ -757,6 +878,7 @@ arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
->>           .map        = arm_lpae_map,
->>           .unmap        = arm_lpae_unmap,
->>           .iova_to_phys    = arm_lpae_iova_to_phys,
->> +        .split_block    = arm_lpae_split_block,
->>       };
->>         return data;
->> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
->> index ffeebda8d6de..7dc0850448c3 100644
->> --- a/drivers/iommu/iommu.c
->> +++ b/drivers/iommu/iommu.c
->> @@ -2707,6 +2707,46 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
->>   }
->>   EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
->>   +size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
->> +             size_t size)
->> +{
->> +    const struct iommu_ops *ops = domain->ops;
->> +    unsigned int min_pagesz;
->> +    size_t pgsize, splited_size;
->> +    size_t splited = 0;
->> +
->> +    min_pagesz = 1 << __ffs(domain->pgsize_bitmap);
->> +
->> +    if (!IS_ALIGNED(iova | size, min_pagesz)) {
->> +        pr_err("unaligned: iova 0x%lx size 0x%zx min_pagesz 0x%x\n",
->> +               iova, size, min_pagesz);
->> +        return 0;
->> +    }
->> +
->> +    if (!ops || !ops->split_block) {
->> +        pr_err("don't support split block\n");
->> +        return 0;
->> +    }
->> +
->> +    while (size) {
->> +        pgsize = iommu_pgsize(domain, iova, size);
-> 
-> If the whole point of this operation is to split a mapping down to a specific granularity, why bother recalculating that granularity over and over again?
-Sorry for the unsuitable expression again. The computed pgsize is not our destined granularity, it's the max splitting size that meets alignment acquirement and fits into the pgsize_bitmap.
-
-The "split" interface assumes the @size fits into pgsize_bitmap to simplify its implementation. This assumption is same for "map" and "unmap", and the logic of "split" is very similar to "unmap".
-
-> 
->> +
->> +        splited_size = ops->split_block(domain, iova, pgsize);
->> +
->> +        pr_debug("splited: iova 0x%lx size 0x%zx\n", iova, splited_size);
->> +        iova += splited_size;
->> +        size -= splited_size;
->> +        splited += splited_size;
->> +
->> +        if (splited_size != pgsize)
->> +            break;
->> +    }
->> +    iommu_flush_iotlb_all(domain);
->> +
->> +    return splited;
-> 
-> Language tangent: note that "split" is one of those delightful irregular verbs, in that its past tense is also "split". This isn't the best operation for clear, unambigous naming :)
-Ouch, we ought to use another word here. ;-)
-
-> 
-> Don't let these idle nitpicks distract from the bigger concerns above, though. FWIW if the caller knows from the start that they want to keep track of things at page granularity, they always have the option of just stripping the larger sizes out of domain->pgsize_bitmap before mapping anything.
-Before dirty tracking, we use block mapping for best performance, and when dirty tracking start, we will split block mapping into page mapping for least dirty handling.
-I think we should not sacrifice DMA performance to omit splitting, as we test, splitting 1G block mapping to 4K mapping just takes about 2ms.
-
-Thanks,
-Keqian
-
-> 
-> Robin.
-> 
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_split_block);
->> +
->>   void iommu_get_resv_regions(struct device *dev, struct list_head *list)
->>   {
->>       const struct iommu_ops *ops = dev->bus->iommu_ops;
->> diff --git a/include/linux/io-pgtable.h b/include/linux/io-pgtable.h
->> index 26583beeb5d9..b87c6f4ecaa2 100644
->> --- a/include/linux/io-pgtable.h
->> +++ b/include/linux/io-pgtable.h
->> @@ -162,6 +162,8 @@ struct io_pgtable_ops {
->>               size_t size, struct iommu_iotlb_gather *gather);
->>       phys_addr_t (*iova_to_phys)(struct io_pgtable_ops *ops,
->>                       unsigned long iova);
->> +    size_t (*split_block)(struct io_pgtable_ops *ops, unsigned long iova,
->> +                  size_t size);
->>   };
->>     /**
->> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
->> index b3f0e2018c62..abeb811098a5 100644
->> --- a/include/linux/iommu.h
->> +++ b/include/linux/iommu.h
->> @@ -258,6 +258,8 @@ struct iommu_ops {
->>                      enum iommu_attr attr, void *data);
->>       int (*domain_set_attr)(struct iommu_domain *domain,
->>                      enum iommu_attr attr, void *data);
->> +    size_t (*split_block)(struct iommu_domain *domain, unsigned long iova,
->> +                  size_t size);
->>         /* Request/Free a list of reserved regions for a device */
->>       void (*get_resv_regions)(struct device *dev, struct list_head *list);
->> @@ -509,6 +511,8 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
->>                    void *data);
->>   extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
->>                    void *data);
->> +extern size_t iommu_split_block(struct iommu_domain *domain, unsigned long iova,
->> +                size_t size);
->>     /* Window handling function prototypes */
->>   extern int iommu_domain_window_enable(struct iommu_domain *domain, u32 wnd_nr,
->> @@ -903,6 +907,12 @@ static inline int iommu_domain_set_attr(struct iommu_domain *domain,
->>       return -EINVAL;
->>   }
->>   +static inline size_t iommu_split_block(struct iommu_domain *domain,
->> +                       unsigned long iova, size_t size)
->> +{
->> +    return 0;
->> +}
->> +
->>   static inline int  iommu_device_register(struct iommu_device *iommu)
->>   {
->>       return -ENODEV;
->>
-> .
-> 
+PiBGcm9tOiBKZWFuLVBoaWxpcHBlIEJydWNrZXIgPGplYW4tcGhpbGlwcGVAbGluYXJvLm9yZz4N
+Cj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSA1LCAyMDIxIDY6MzcgUE0NCj4gDQo+IEhpLA0KPiAN
+Cj4gT24gVGh1LCBGZWIgMDQsIDIwMjEgYXQgMDY6NTI6MTBBTSArMDAwMCwgVGlhbiwgS2V2aW4g
+d3JvdGU6DQo+ID4gPiA+Pj4gVGhlIHN0YXRpYyBwaW5uaW5nIGFuZCBtYXBwaW5nIHByb2JsZW0g
+aW4gVkZJTyBhbmQgcG9zc2libGUNCj4gc29sdXRpb25zDQo+ID4gPiA+Pj4gaGF2ZSBiZWVuIGRp
+c2N1c3NlZCBhIGxvdCBbMSwgMl0uIE9uZSBvZiB0aGUgc29sdXRpb25zIGlzIHRvIGFkZCBJL08N
+Cj4gPiA+ID4+PiBwYWdlIGZhdWx0IHN1cHBvcnQgZm9yIFZGSU8gZGV2aWNlcy4gRGlmZmVyZW50
+IGZyb20gdGhvc2UgcmVsYXRpdmVseQ0KPiA+ID4gPj4+IGNvbXBsaWNhdGVkIHNvZnR3YXJlIGFw
+cHJvYWNoZXMgc3VjaCBhcyBwcmVzZW50aW5nIGEgdklPTU1VIHRoYXQNCj4gPiA+ID4+IHByb3Zp
+ZGVzDQo+ID4gPiA+Pj4gdGhlIERNQSBidWZmZXIgaW5mb3JtYXRpb24gKG1pZ2h0IGluY2x1ZGUg
+cGFyYS12aXJ0dWFsaXplZA0KPiA+ID4gb3B0aW1pemF0aW9ucyksDQo+IA0KPiBJJ20gY3VyaW91
+cyBhYm91dCB0aGUgcGVyZm9ybWFuY2UgZGlmZmVyZW5jZSBiZXR3ZWVuIHRoaXMgYW5kIHRoZQ0K
+PiBtYXAvdW5tYXAgdklPTU1VLCBhcyB3ZWxsIGFzIHRoZSBjb0lPTU1VLiBUaGlzIGlzIHByb2Jh
+Ymx5IGEgbG90IGZhc3Rlcg0KPiBidXQgdGhvc2UgZG9uJ3QgZGVwZW5kIG9uIElPUEYgd2hpY2gg
+aXMgYSBwcmV0dHkgcmFyZSBmZWF0dXJlIGF0IHRoZQ0KPiBtb21lbnQuDQo+IA0KPiBbLi4uXQ0K
+PiA+ID4gPiBJbiByZWFsaXR5LCBtYW55DQo+ID4gPiA+IGRldmljZXMgYWxsb3cgSS9PIGZhdWx0
+aW5nIG9ubHkgaW4gc2VsZWN0aXZlIGNvbnRleHRzLiBIb3dldmVyLCB0aGVyZQ0KPiA+ID4gPiBp
+cyBubyBzdGFuZGFyZCB3YXkgKGUuZy4gUENJU0lHKSBmb3IgdGhlIGRldmljZSB0byByZXBvcnQg
+d2hldGhlcg0KPiA+ID4gPiBhcmJpdHJhcnkgSS9PIGZhdWx0IGlzIGFsbG93ZWQuIFRoZW4gd2Ug
+bWF5IGhhdmUgdG8gbWFpbnRhaW4gZGV2aWNlDQo+ID4gPiA+IHNwZWNpZmljIGtub3dsZWRnZSBp
+biBzb2Z0d2FyZSwgZS5nLiBpbiBhbiBvcHQtaW4gdGFibGUgdG8gbGlzdCBkZXZpY2VzDQo+ID4g
+PiA+IHdoaWNoIGFsbG93cyBhcmJpdHJhcnkgZmF1bHRzLiBGb3IgZGV2aWNlcyB3aGljaCBvbmx5
+IHN1cHBvcnQgc2VsZWN0aXZlDQo+ID4gPiA+IGZhdWx0aW5nLCBhIG1lZGlhdG9yIChlaXRoZXIg
+dGhyb3VnaCB2ZW5kb3IgZXh0ZW5zaW9ucyBvbiB2ZmlvLXBjaS1jb3JlDQo+ID4gPiA+IG9yIGEg
+bWRldiB3cmFwcGVyKSBtaWdodCBiZSBuZWNlc3NhcnkgdG8gaGVscCBsb2NrIGRvd24gbm9uLQ0K
+PiBmYXVsdGFibGUNCj4gPiA+ID4gbWFwcGluZ3MgYW5kIHRoZW4gZW5hYmxlIGZhdWx0aW5nIG9u
+IHRoZSByZXN0IG1hcHBpbmdzLg0KPiA+ID4NCj4gPiA+IEZvciBkZXZpY2VzIHdoaWNoIG9ubHkg
+c3VwcG9ydCBzZWxlY3RpdmUgZmF1bHRpbmcsIHRoZXkgY291bGQgdGVsbCBpdCB0byB0aGUNCj4g
+PiA+IElPTU1VIGRyaXZlciBhbmQgbGV0IGl0IGZpbHRlciBvdXQgbm9uLWZhdWx0YWJsZSBmYXVs
+dHM/IERvIEkgZ2V0IGl0IHdyb25nPw0KPiA+DQo+ID4gTm90IGV4YWN0bHkgdG8gSU9NTVUgZHJp
+dmVyLiBUaGVyZSBpcyBhbHJlYWR5IGEgdmZpb19waW5fcGFnZXMoKSBmb3INCj4gPiBzZWxlY3Rp
+dmVseSBwYWdlLXBpbm5pbmcuIFRoZSBtYXR0ZXIgaXMgdGhhdCAndGhleScgaW1wbHkgc29tZSBk
+ZXZpY2UNCj4gPiBzcGVjaWZpYyBsb2dpYyB0byBkZWNpZGUgd2hpY2ggcGFnZXMgbXVzdCBiZSBw
+aW5uZWQgYW5kIHN1Y2gga25vd2xlZGdlDQo+ID4gaXMgb3V0c2lkZSBvZiBWRklPLg0KPiA+DQo+
+ID4gRnJvbSBlbmFibGluZyBwLm8udiB3ZSBjb3VsZCBwb3NzaWJseSBkbyBpdCBpbiBwaGFzZWQg
+YXBwcm9hY2guIEZpcnN0DQo+ID4gaGFuZGxlcyBkZXZpY2VzIHdoaWNoIHRvbGVyYXRlIGFyYml0
+cmFyeSBETUEgZmF1bHRzLCBhbmQgdGhlbiBleHRlbmRzDQo+ID4gdG8gZGV2aWNlcyB3aXRoIHNl
+bGVjdGl2ZS1mYXVsdGluZy4gVGhlIGZvcm1lciBpcyBzaW1wbGVyLCBidXQgd2l0aCBvbmUNCj4g
+PiBtYWluIG9wZW4gd2hldGhlciB3ZSB3YW50IHRvIG1haW50YWluIHN1Y2ggZGV2aWNlIElEcyBp
+biBhIHN0YXRpYw0KPiA+IHRhYmxlIGluIFZGSU8gb3IgcmVseSBvbiBzb21lIGhpbnRzIGZyb20g
+b3RoZXIgY29tcG9uZW50cyAoZS5nLiBQRg0KPiA+IGRyaXZlciBpbiBWRiBhc3NpZ25tZW50IGNh
+c2UpLiBMZXQncyBzZWUgaG93IEFsZXggdGhpbmtzIGFib3V0IGl0Lg0KPiANCj4gRG8geW91IHRo
+aW5rIHNlbGVjdGl2ZS1mYXVsdGluZyB3aWxsIGJlIHRoZSBub3JtLCBvciBvbmx5IGEgcHJvYmxl
+bSBmb3INCj4gaW5pdGlhbCBJT1BGIGltcGxlbWVudGF0aW9ucz8gIFRvIG1lIGl0J3MgdGhlIHNl
+bGVjdGl2ZS1mYXVsdGluZyBraW5kIG9mDQo+IGRldmljZSB0aGF0IHdpbGwgYmUgdGhlIG9kZCBv
+bmUgb3V0LCBidXQgdGhhdCdzIHB1cmUgc3BlY3VsYXRpb24uIEVpdGhlcg0KPiB3YXkgbWFpbnRh
+aW5pbmcgYSBkZXZpY2UgbGlzdCBzZWVtcyBsaWtlIGEgcGFpbi4NCg0KSSB3b3VsZCB0aGluayBp
+dCdzIG5vcm0gZm9yIHF1aXRlIHNvbWUgdGltZSAoZS5nLiBtdWx0aXBsZSB5ZWFycyksIGFzIGZy
+b20NCndoYXQgSSBsZWFybmVkIHR1cm5pbmcgYSBjb21wbGV4IGFjY2VsZXJhdG9yIHRvIGFuIGlt
+cGxlbWVudGF0aW9uIA0KdG9sZXJhdGluZyBhcmJpdHJhcnkgRE1BIGZhdWx0IGlzIHdheSBjb21w
+bGV4IChpbiBldmVyeSBjcml0aWNhbCBwYXRoKSBhbmQNCm5vdCBjb3N0IGVmZmVjdGl2ZSAodHJh
+Y2tpbmcgaW4tZmx5IHJlcXVlc3RzKS4gSXQgbWlnaHQgYmUgT0sgZm9yIHNvbWUgDQpwdXJwb3Nl
+bHktYnVpbHQgZGV2aWNlcyBpbiBzcGVjaWZpYyB1c2FnZSBidXQgZm9yIG1vc3QgaXQgaGFzIHRv
+IGJlIGFuIA0KZXZvbHZpbmcgcGF0aCB0b3dhcmQgdGhlIDEwMCUtZmF1bHRhYmxlIGdvYWwuLi4N
+Cg0KPiANCj4gWy4uLl0NCj4gPiBZZXMsIGl0J3MgaW4gcGxhbiBidXQganVzdCBub3QgaGFwcGVu
+ZWQgeWV0LiBXZSBhcmUgc3RpbGwgZm9jdXNpbmcgb24gZ3Vlc3QNCj4gPiBTVkEgcGFydCB0aHVz
+IG9ubHkgdGhlIDFzdC1sZXZlbCBwYWdlIGZhdWx0ICgrWWkvSmFjb2IpLiBJdCdzIGFsd2F5cw0K
+PiB3ZWxjb21lZA0KPiA+IHRvIGNvbGxhYm9yYXRlL2hlbHAgaWYgeW91IGhhdmUgdGltZS4g8J+Y
+ig0KPiANCj4gQnkgdGhlIHdheSB0aGUgY3VycmVudCBmYXVsdCByZXBvcnQgQVBJIGlzIG1pc3Np
+bmcgYSB3YXkgdG8gaW52YWxpZGF0ZQ0KPiBwYXJ0aWFsIGZhdWx0czogd2hlbiB0aGUgSU9NTVUg
+ZGV2aWNlJ3MgUFJJIHF1ZXVlIG92ZXJmbG93cywgaXQgbWF5DQo+IGF1dG8tcmVzcG9uZCB0byBw
+YWdlIHJlcXVlc3QgZ3JvdXBzIHRoYXQgd2VyZSBhbHJlYWR5IHBhcnRpYWxseSByZXBvcnRlZA0K
+PiBieSB0aGUgSU9NTVUgZHJpdmVyLiBVcG9uIGRldGVjdGluZyBhbiBvdmVyZmxvdywgdGhlIElP
+TU1VIGRyaXZlciBuZWVkcw0KPiB0bw0KPiB0ZWxsIGFsbCBmYXVsdCBjb25zdW1lcnMgdG8gZGlz
+Y2FyZCB0aGVpciBwYXJ0aWFsIGdyb3Vwcy4NCj4gaW9wZl9xdWV1ZV9kaXNjYXJkX3BhcnRpYWwo
+KSBbMV0gZG9lcyB0aGlzIGZvciB0aGUgaW50ZXJuYWwgSU9QRiBoYW5kbGVyDQo+IGJ1dCB3ZSBo
+YXZlIG5vdGhpbmcgZm9yIHRoZSBsb3dlci1sZXZlbCBmYXVsdCBoYW5kbGVyIGF0IHRoZSBtb21l
+bnQuIEFuZA0KPiBpdCBnZXRzIG1vcmUgY29tcGxpY2F0ZWQgd2hlbiBpbmplY3RpbmcgSU9QRnMg
+dG8gZ3Vlc3RzLCB3ZSdkIG5lZWQgYQ0KPiBtZWNoYW5pc20gdG8gcmVjYWxsIHBhcnRpYWwgZ3Jv
+dXBzIGFsbCB0aGUgd2F5IHRocm91Z2gga2VybmVsLT51c2Vyc3BhY2UNCj4gYW5kIHVzZXJzcGFj
+ZS0+Z3Vlc3QuDQoNCkkgZGlkbid0IGtub3cgaG93IHRvIHJlY2FsbCBwYXJ0aWFsIGdyb3VwcyB0
+aHJvdWdoIGVtdWxhdGVkIHZJT01NVXMNCihhdCBsZWFzdCBmb3IgdmlydHVhbCBWVC1kKS4gUG9z
+c2libHkgaXQgY291bGQgYmUgc3VwcG9ydGVkIGJ5IHZpcnRpby1pb21tdS4NCkJ1dCBpbiBhbnkg
+Y2FzZSBJIGNvbnNpZGVyIGl0IG1vcmUgbGlrZSBhbiBvcHRpbWl6YXRpb24gaW5zdGVhZCBvZiBh
+IGZ1bmN0aW9uYWwNCnJlcXVpcmVtZW50IChhbmQgY291bGQgYmUgYXZvaWRlZCBpbiBiZWxvdyBT
+aGVubWluZydzIHN1Z2dlc3Rpb24pLg0KDQo+IA0KPiBTaGVubWluZyBzdWdnZXN0cyBbMl0gdG8g
+YWxzbyB1c2UgdGhlIElPUEYgaGFuZGxlciBmb3IgSU9QRnMgbWFuYWdlZCBieQ0KPiBkZXZpY2Ug
+ZHJpdmVycy4gSXQncyB3b3J0aCBjb25zaWRlcmluZyBpbiBteSBvcGluaW9uIGJlY2F1c2Ugd2Ug
+Y291bGQgaG9sZA0KPiBwYXJ0aWFsIGdyb3VwcyB3aXRoaW4gdGhlIGtlcm5lbCBhbmQgb25seSBy
+ZXBvcnQgZnVsbCBncm91cHMgdG8gZGV2aWNlDQo+IGRyaXZlcnMgKGFuZCBndWVzdHMpLiBJbiBh
+ZGRpdGlvbiB3ZSdkIGNvbnNvbGlkYXRlIHRyYWNraW5nIG9mIElPUEZzLA0KPiBzaW5jZSB0aGV5
+J3JlIGRvbmUgYm90aCBieSBpb21tdV9yZXBvcnRfZGV2aWNlX2ZhdWx0KCkgYW5kIHRoZSBJT1BG
+DQo+IGhhbmRsZXIgYXQgdGhlIG1vbWVudC4NCg0KSSBhbHNvIHRoaW5rIGl0J3MgdGhlIHJpZ2h0
+IHRoaW5nIHRvIGRvLiBJbiBjb25jZXB0IHcvIG9yIHcvbyBERVZfRkVBVF9JT1BGDQpqdXN0IHJl
+ZmxlY3RzIGhvdyBJT1BGcyBhcmUgZGVsaXZlcmVkIHRvIHRoZSBzeXN0ZW0gc29mdHdhcmUuIElu
+IHRoZSBlbmQgDQpJT1BGcyBhcmUgYWxsIGFib3V0IHBlcm1pc3Npb24gdmlvbGF0aW9ucyBpbiB0
+aGUgSU9NTVUgcGFnZSB0YWJsZXMgdGh1cw0Kd2Ugc2hvdWxkIHRyeSB0byByZXVzZS9jb25zb2xp
+ZGF0ZSB0aGUgSU9NTVUgZmF1bHQgcmVwb3J0aW5nIHN0YWNrIGFzIA0KbXVjaCBhcyBwb3NzaWJs
+ZS4NCg0KPiANCj4gTm90ZSB0aGF0IEkgcGxhbiB0byB1cHN0cmVhbSB0aGUgSU9QRiBwYXRjaCBb
+MV0gYXMgaXMgYmVjYXVzZSBpdCB3YXMNCj4gYWxyZWFkeSBpbiBnb29kIHNoYXBlIGZvciA1LjEy
+LCBhbmQgY29uc29saWRhdGluZyB0aGUgZmF1bHQgaGFuZGxlciB3aWxsDQo+IHJlcXVpcmUgc29t
+ZSB0aGlua2luZy4NCg0KVGhpcyBwbGFuIG1ha2VzIHNlbnNlLg0KDQo+IA0KPiBUaGFua3MsDQo+
+IEplYW4NCj4gDQo+IA0KPiBbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtaW9tbXUv
+MjAyMTAxMjcxNTQzMjIuMzk1OTE5Ni03LWplYW4tDQo+IHBoaWxpcHBlQGxpbmFyby5vcmcvDQo+
+IFsyXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1pb21tdS9mNzlmMDZiZS1lNDZiLWE2
+NWEtMzk1MS0NCj4gM2U3ZGJmYTY2YjRhQGh1YXdlaS5jb20vDQoNClRoYW5rcw0KS2V2aW4NCg==
