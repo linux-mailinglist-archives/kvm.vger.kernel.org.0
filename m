@@ -2,182 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7C3D31240D
-	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 12:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30135312415
+	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 12:50:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229800AbhBGLsq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Feb 2021 06:48:46 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11697 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbhBGLsT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Feb 2021 06:48:19 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DYS5t2549zlHFC;
-        Sun,  7 Feb 2021 19:45:54 +0800 (CST)
-Received: from [10.174.184.214] (10.174.184.214) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.498.0; Sun, 7 Feb 2021 19:47:29 +0800
-Subject: Re: [RFC PATCH v1 0/4] vfio: Add IOPF support for VFIO passthrough
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Auger <eric.auger@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "wanghaibin.wang@huawei.com" <wanghaibin.wang@huawei.com>,
-        "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>
-References: <20210125090402.1429-1-lushenming@huawei.com>
- <20210129155730.3a1d49c5@omen.home.shazbot.org>
- <MWHPR11MB188684B42632FD0B9B5CA1C08CB69@MWHPR11MB1886.namprd11.prod.outlook.com>
- <47bf7612-4fb0-c0bb-fa19-24c4e3d01d3f@huawei.com>
- <MWHPR11MB1886C71A751B48EF626CAC938CB39@MWHPR11MB1886.namprd11.prod.outlook.com>
- <YB0f5Yno9frihQq4@myrica>
- <MWHPR11MB1886D07D927A77DCB2FF74D48CB09@MWHPR11MB1886.namprd11.prod.outlook.com>
-From:   Shenming Lu <lushenming@huawei.com>
-Message-ID: <722bf67a-0f59-6335-77ab-095e971a6355@huawei.com>
-Date:   Sun, 7 Feb 2021 19:47:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+        id S230097AbhBGLuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Feb 2021 06:50:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229772AbhBGLtp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Feb 2021 06:49:45 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F29C06174A;
+        Sun,  7 Feb 2021 03:49:05 -0800 (PST)
+Received: from zn.tnic (p200300ec2f287c00fd7d89ed8712b97d.dip0.t-ipconnect.de [IPv6:2003:ec:2f28:7c00:fd7d:89ed:8712:b97d])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2B0E61EC0118;
+        Sun,  7 Feb 2021 12:49:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1612698540;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=akHfnhCK1MKhUH8obwmx+2AZkZVmst1LXxgWweXsm5k=;
+        b=B86vde7CMxLdMdCsOpJ2LUaIaL/ZHoZe45q6NJxyrXBFxvwweJZQhvKRLdBQl2p/jjTU3x
+        l6GL0bEgVSmxa8iGYaiXTcgIx9DEXlFhztFV/DUx4UtCibDcWzBq4lYW9bfXNNBsZA50JD
+        aFR8usmB45sfTxnU6XsXaYbBwiqdQpU=
+Date:   Sun, 7 Feb 2021 12:49:02 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Jing Liu <jing2.liu@linux.intel.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jing2.liu@intel.com,
+        x86-ml <x86@kernel.org>
+Subject: Re: [PATCH RFC 3/7] kvm: x86: XSAVE state and XFD MSRs context switch
+Message-ID: <20210207114902.GA6723@zn.tnic>
+References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+ <20210207154256.52850-4-jing2.liu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <MWHPR11MB1886D07D927A77DCB2FF74D48CB09@MWHPR11MB1886.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.184.214]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210207154256.52850-4-jing2.liu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/2/7 16:20, Tian, Kevin wrote:
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->> Sent: Friday, February 5, 2021 6:37 PM
->>
->> Hi,
->>
->> On Thu, Feb 04, 2021 at 06:52:10AM +0000, Tian, Kevin wrote:
->>>>>>> The static pinning and mapping problem in VFIO and possible
->> solutions
->>>>>>> have been discussed a lot [1, 2]. One of the solutions is to add I/O
->>>>>>> page fault support for VFIO devices. Different from those relatively
->>>>>>> complicated software approaches such as presenting a vIOMMU that
->>>>>> provides
->>>>>>> the DMA buffer information (might include para-virtualized
->>>> optimizations),
->>
->> I'm curious about the performance difference between this and the
->> map/unmap vIOMMU, as well as the coIOMMU. This is probably a lot faster
->> but those don't depend on IOPF which is a pretty rare feature at the
->> moment.
+On Sun, Feb 07, 2021 at 10:42:52AM -0500, Jing Liu wrote:
+> diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
+> index 7e0c68043ce3..fbb761fc13ec 100644
+> --- a/arch/x86/kernel/fpu/init.c
+> +++ b/arch/x86/kernel/fpu/init.c
+> @@ -145,6 +145,7 @@ EXPORT_SYMBOL_GPL(fpu_kernel_xstate_min_size);
+>   * can be dynamically expanded to include some states up to this size.
+>   */
+>  unsigned int fpu_kernel_xstate_max_size;
+> +EXPORT_SYMBOL_GPL(fpu_kernel_xstate_max_size);
+>  
+>  /* Get alignment of the TYPE. */
+>  #define TYPE_ALIGN(TYPE) offsetof(struct { char x; TYPE test; }, test)
+> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+> index 080f3be9a5e6..9c471a0364e2 100644
+> --- a/arch/x86/kernel/fpu/xstate.c
+> +++ b/arch/x86/kernel/fpu/xstate.c
+> @@ -77,12 +77,14 @@ static struct xfeature_capflag_info xfeature_capflags[] __initdata = {
+>   * XSAVE buffer, both supervisor and user xstates.
+>   */
+>  u64 xfeatures_mask_all __read_mostly;
+> +EXPORT_SYMBOL_GPL(xfeatures_mask_all);
+>  
+>  /*
+>   * This represents user xstates, a subset of xfeatures_mask_all, saved in a
+>   * dynamic kernel XSAVE buffer.
+>   */
+>  u64 xfeatures_mask_user_dynamic __read_mostly;
+> +EXPORT_SYMBOL_GPL(xfeatures_mask_user_dynamic);
+>  
+>  static unsigned int xstate_offsets[XFEATURE_MAX] = { [ 0 ... XFEATURE_MAX - 1] = -1};
+>  static unsigned int xstate_sizes[XFEATURE_MAX]   = { [ 0 ... XFEATURE_MAX - 1] = -1};
 
-Yeah, I will give the performance data later.
+Make sure you Cc x86@kernel.org when touching code outside of kvm.
 
->>
->> [...]
->>>>> In reality, many
->>>>> devices allow I/O faulting only in selective contexts. However, there
->>>>> is no standard way (e.g. PCISIG) for the device to report whether
->>>>> arbitrary I/O fault is allowed. Then we may have to maintain device
->>>>> specific knowledge in software, e.g. in an opt-in table to list devices
->>>>> which allows arbitrary faults. For devices which only support selective
->>>>> faulting, a mediator (either through vendor extensions on vfio-pci-core
->>>>> or a mdev wrapper) might be necessary to help lock down non-
->> faultable
->>>>> mappings and then enable faulting on the rest mappings.
->>>>
->>>> For devices which only support selective faulting, they could tell it to the
->>>> IOMMU driver and let it filter out non-faultable faults? Do I get it wrong?
->>>
->>> Not exactly to IOMMU driver. There is already a vfio_pin_pages() for
->>> selectively page-pinning. The matter is that 'they' imply some device
->>> specific logic to decide which pages must be pinned and such knowledge
->>> is outside of VFIO.
->>>
->>> From enabling p.o.v we could possibly do it in phased approach. First
->>> handles devices which tolerate arbitrary DMA faults, and then extends
->>> to devices with selective-faulting. The former is simpler, but with one
->>> main open whether we want to maintain such device IDs in a static
->>> table in VFIO or rely on some hints from other components (e.g. PF
->>> driver in VF assignment case). Let's see how Alex thinks about it.
->>
->> Do you think selective-faulting will be the norm, or only a problem for
->> initial IOPF implementations?  To me it's the selective-faulting kind of
->> device that will be the odd one out, but that's pure speculation. Either
->> way maintaining a device list seems like a pain.
-> 
-> I would think it's norm for quite some time (e.g. multiple years), as from
-> what I learned turning a complex accelerator to an implementation 
-> tolerating arbitrary DMA fault is way complex (in every critical path) and
-> not cost effective (tracking in-fly requests). It might be OK for some 
-> purposely-built devices in specific usage but for most it has to be an 
-> evolving path toward the 100%-faultable goal...
-> 
->>
->> [...]
->>> Yes, it's in plan but just not happened yet. We are still focusing on guest
->>> SVA part thus only the 1st-level page fault (+Yi/Jacob). It's always
->> welcomed
->>> to collaborate/help if you have time. 😊
->>
->> By the way the current fault report API is missing a way to invalidate
->> partial faults: when the IOMMU device's PRI queue overflows, it may
->> auto-respond to page request groups that were already partially reported
->> by the IOMMU driver. Upon detecting an overflow, the IOMMU driver needs
->> to
->> tell all fault consumers to discard their partial groups.
->> iopf_queue_discard_partial() [1] does this for the internal IOPF handler
->> but we have nothing for the lower-level fault handler at the moment. And
->> it gets more complicated when injecting IOPFs to guests, we'd need a
->> mechanism to recall partial groups all the way through kernel->userspace
->> and userspace->guest.
-> 
-> I didn't know how to recall partial groups through emulated vIOMMUs
-> (at least for virtual VT-d). Possibly it could be supported by virtio-iommu.
-> But in any case I consider it more like an optimization instead of a functional
-> requirement (and could be avoided in below Shenming's suggestion).
-> 
->>
->> Shenming suggests [2] to also use the IOPF handler for IOPFs managed by
->> device drivers. It's worth considering in my opinion because we could hold
->> partial groups within the kernel and only report full groups to device
->> drivers (and guests). In addition we'd consolidate tracking of IOPFs,
->> since they're done both by iommu_report_device_fault() and the IOPF
->> handler at the moment.
-> 
-> I also think it's the right thing to do. In concept w/ or w/o DEV_FEAT_IOPF
-> just reflects how IOPFs are delivered to the system software. In the end 
-> IOPFs are all about permission violations in the IOMMU page tables thus
-> we should try to reuse/consolidate the IOMMU fault reporting stack as 
-> much as possible.
-> 
->>
->> Note that I plan to upstream the IOPF patch [1] as is because it was
->> already in good shape for 5.12, and consolidating the fault handler will
->> require some thinking.
-> 
-> This plan makes sense.
+There's this script called scripts/get_maintainer.pl which will tell you who to
+Cc. Use it before you send next time please.
 
-Yeah, maybe this problem could be left for the implementation of a device(VFIO)
-specific fault handler... :-)
+Thx.
 
-Thanks,
-Shenming
+-- 
+Regards/Gruss,
+    Boris.
 
-> 
->>
->> Thanks,
->> Jean
->>
->>
->> [1] https://lore.kernel.org/linux-iommu/20210127154322.3959196-7-jean-
->> philippe@linaro.org/
->> [2] https://lore.kernel.org/linux-iommu/f79f06be-e46b-a65a-3951-
->> 3e7dbfa66b4a@huawei.com/
-> 
-> Thanks
-> Kevin
-> 
+https://people.kernel.org/tglx/notes-about-netiquette
