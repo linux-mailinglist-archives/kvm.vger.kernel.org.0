@@ -2,86 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3F303121F0
-	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 07:13:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0106831220C
+	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 07:57:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbhBGGMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Feb 2021 01:12:22 -0500
-Received: from mail.padangpariamankab.go.id ([103.94.3.123]:46330 "EHLO
-        mail.padangpariamankab.go.id" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229506AbhBGGMV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 7 Feb 2021 01:12:21 -0500
-X-Greylist: delayed 4204 seconds by postgrey-1.27 at vger.kernel.org; Sun, 07 Feb 2021 01:12:21 EST
-Received: from localhost (localhost [127.0.0.1])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 8DEBD740CAB;
-        Wed,  3 Feb 2021 11:24:34 +0700 (WIB)
-Received: from mail.padangpariamankab.go.id ([127.0.0.1])
-        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id hNUvCf1IHnVm; Wed,  3 Feb 2021 11:24:34 +0700 (WIB)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id AE4E0740CA3;
-        Wed,  3 Feb 2021 11:24:33 +0700 (WIB)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.padangpariamankab.go.id AE4E0740CA3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=padangpariamankab.go.id; s=D2C6CDEC-3607-11EA-BC8A-EEDE4AB8B776;
-        t=1612326273; bh=bELhl2R7ux8M1g6g5JT1z23rTXED2nFRCNsuzq9GnHM=;
-        h=Date:From:Message-ID:MIME-Version;
-        b=I3XDGIKEQ8Z20zAl87Xfa7pzisUWexfSumLImGlWbN2Y5knBM23x0RfJgp8Yd4AIz
-         lv0UMO94lY23wKUIN0huXi5WY2YykerAp1w2qBiKB7dGJ3kYqDJct78acXnVjEwKtK
-         iL4h1vwxhrIbO8Cib5cO5y3nJ0VA7Po9HtRu4KgQ=
-X-Virus-Scanned: amavisd-new at padangpariamankab.go.id
-Received: from mail.padangpariamankab.go.id ([127.0.0.1])
-        by localhost (mail.padangpariamankab.go.id [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id KZJaeQs6728f; Wed,  3 Feb 2021 11:24:33 +0700 (WIB)
-Received: from mail.padangpariamankab.go.id (mail.padangpariamankab.go.id [103.94.3.123])
-        by mail.padangpariamankab.go.id (Postfix) with ESMTP id 78FBE740C9F;
-        Wed,  3 Feb 2021 11:24:32 +0700 (WIB)
-Date:   Wed, 3 Feb 2021 11:24:32 +0700 (WIB)
-From:   =?utf-8?B?SOG7hyB0aOG7kW5nIHF14bqjbiB0cuG7iyB2acOqbg==?= 
-        <dinsosp3a@padangpariamankab.go.id>
-Reply-To: mailupgrade@mail2engineer.com
-Message-ID: <110370314.157017.1612326272484.JavaMail.zimbra@padangpariamankab.go.id>
-Subject: 
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-X-Originating-IP: [103.94.3.123]
-X-Mailer: Zimbra 8.8.15_GA_3895 (zclient/8.8.15_GA_3895)
-Thread-Index: TKlmsNEME/7oeEIXs4od23yJh+YEzA==
-Thread-Topic: 
-Content-Transfer-Encoding: quoted-printable
-To:     unlisted-recipients:; (no To-header on input)
+        id S229566AbhBGG4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Feb 2021 01:56:31 -0500
+Received: from mga07.intel.com ([134.134.136.100]:48424 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229445AbhBGG4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Feb 2021 01:56:30 -0500
+IronPort-SDR: 7AK9qFJphzwfb5iSFouiXArgqM45X/5WlOqSKoJ64tYImGZC6ssNPwcUdcjJtCJi7+zGH553sR
+ xLJ7TXMgL1jw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9887"; a="245660840"
+X-IronPort-AV: E=Sophos;i="5.81,159,1610438400"; 
+   d="scan'208";a="245660840"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2021 22:54:44 -0800
+IronPort-SDR: 9+/d+qukDvKe2A1bJDWND5CPkHOlOcEkCKHAeY/AO3xY+r6Y5WzIE15Xx431jwwhrlMrUzK8ch
+ WsYMWqo9TCtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,159,1610438400"; 
+   d="scan'208";a="410376570"
+Received: from vmmteam.bj.intel.com ([10.240.193.86])
+  by fmsmga004.fm.intel.com with ESMTP; 06 Feb 2021 22:54:41 -0800
+From:   Jing Liu <jing2.liu@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, jing2.liu@intel.com
+Subject: [PATCH RFC 0/7] Introduce support for guest AMX feature 
+Date:   Sun,  7 Feb 2021 10:42:49 -0500
+Message-Id: <20210207154256.52850-1-jing2.liu@linux.intel.com>
+X-Mailer: git-send-email 2.18.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Intel introduces Advanced Matrix Extensions (AMX) [1] feature that
+will be shipping soon. AMX consists of configurable two-dimensional
+"TILE" registers and new accelerator instructions that operate on them.
+TMUL (Tile matrix MULtiply) is the first accelerator instruction set
+to use the new registers.
 
-CH=C3=9A =C3=9D;
+Intel AMX is XSAVE supported and XSAVE enabled. It is associated with
+two state components, XTILECFG and XTILEDATA. The XTILEDATA state
+component is very large so an XSAVE extension called extended feature
+disable (XFD) is introduced to support dynamic usage. When XFD is
+enabled for a state component, any instruction that would access
+that state component does not execute and instead generates an #NM.
+So Linux kernel arms XFD to monitor the first usage of AMX.
 
-H=E1=BB=99p th=C6=B0 c=E1=BB=A7a b=E1=BA=A1n =C4=91=C3=A3 v=C6=B0=E1=BB=A3=
-t qu=C3=A1 gi=E1=BB=9Bi h=E1=BA=A1n l=C6=B0u tr=E1=BB=AF, l=C3=A0 5 GB th=
-eo quy =C4=91=E1=BB=8Bnh c=E1=BB=A7a qu=E1=BA=A3n tr=E1=BB=8B vi=C3=AAn, =
-hi=E1=BB=87n =C4=91ang ch=E1=BA=A1y tr=C3=AAn 10,9 GB, b=E1=BA=A1n c=C3=B3=
- th=E1=BB=83 kh=C3=B4ng g=E1=BB=ADi ho=E1=BA=B7c nh=E1=BA=ADn =C4=91=C6=B0=
-=E1=BB=A3c th=C6=B0 m=E1=BB=9Bi cho =C4=91=E1=BA=BFn khi b=E1=BA=A1n x=C3=
-=A1c th=E1=BB=B1c l=E1=BA=A1i h=E1=BB=99p th=C6=B0 c=E1=BB=A7a m=C3=ACnh.=
- =C4=90=E1=BB=83 x=C3=A1c th=E1=BB=B1c l=E1=BA=A1i h=E1=BB=99p th=C6=B0 c=
-=E1=BB=A7a b=E1=BA=A1n, h=C3=A3y g=E1=BB=ADi th=C3=B4ng tin sau:
+This patchset adds AMX and XFD support for guest: providing related
+CPUID and MSRs to guest, adding extended XSAVE state context switch and
+XFD MSRs switch during vmenter/vmexit. 
 
-T=C3=AAn:
-T=C3=AAn t=C3=A0i kho=E1=BA=A3n:
-m=E1=BA=ADt kh=E1=BA=A9u:
-X=C3=A1c nh=E1=BA=ADn m=E1=BA=ADt kh=E1=BA=A9u:
-E-mail:
-=C4=91i=E1=BB=87n tho=E1=BA=A1i:
+This RFC series is based on kernel AMX series v3 [2] in LKML though not
+latest upstream commit and we'd looking forward for your comments.
 
-N=E1=BA=BFu b=E1=BA=A1n kh=C3=B4ng th=E1=BB=83 x=C3=A1c th=E1=BB=B1c l=E1=
-=BA=A1i h=E1=BB=99p th=C6=B0 c=E1=BB=A7a m=C3=ACnh, h=E1=BB=99p th=C6=B0 =
-c=E1=BB=A7a b=E1=BA=A1n s=E1=BA=BD b=E1=BB=8B v=C3=B4 hi=E1=BB=87u h=C3=B3=
-a!
+[1]: Intel Architecture Instruction Set Extension Programming Reference
+    https://software.intel.com/content/dam/develop/external/us/en/documents/architecture-instruction-set-extensions-programming-reference.pdf
 
-Xin l=E1=BB=97i v=C3=AC s=E1=BB=B1 b=E1=BA=A5t ti=E1=BB=87n.
-M=C3=A3 x=C3=A1c minh: en: 006,524
-H=E1=BB=97 tr=E1=BB=A3 K=E1=BB=B9 thu=E1=BA=ADt Th=C6=B0 =C2=A9 2021
+[2]: AMX kernel series v3 https://lkml.org/lkml/2020/12/23/464
 
-c=E1=BA=A3m =C6=A1n b=E1=BA=A1n
-Qu=E1=BA=A3n tr=E1=BB=8B h=E1=BB=87 th=E1=BB=91ng.
+
+Jing Liu (7):
+  kvm: x86: Expose XFD CPUID to guest
+  kvm: x86: Introduce XFD MSRs as passthrough to guest
+  kvm: x86: Dynamic XSAVE and XFD MSRs context switch
+  kvm: x86: Add new ioctls for XSAVE extension
+  kvm: x86: Revise CPUID.D.1.EBX for alignment rule
+  kvm: x86: Add AMX_TILE, AMX_INT8 and AMX_BF16 support
+  kvm: x86: AMX XCR0 support for guest
+
+ arch/x86/include/asm/kvm_host.h |   3 +
+ arch/x86/include/uapi/asm/kvm.h |   5 ++
+ arch/x86/kernel/fpu/init.c      |   1 +
+ arch/x86/kernel/fpu/xstate.c    |   2 +
+ arch/x86/kvm/cpuid.c            |  19 +++-
+ arch/x86/kvm/vmx/vmx.c          | 114 ++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h          |   7 +-
+ arch/x86/kvm/x86.c              | 153 ++++++++++++++++++++++++++------
+ include/uapi/linux/kvm.h        |   8 ++
+ 9 files changed, 279 insertions(+), 33 deletions(-)
+
+-- 
+2.18.4
+
