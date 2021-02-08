@@ -2,93 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FDBB313360
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 14:34:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41AD1313379
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 14:41:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbhBHNd3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 08:33:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25104 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230414AbhBHNdW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 08:33:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612791116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dahq/nm+R81ocWaGeMo2dHc+enIoZRDUj+J9qHhMRUI=;
-        b=WmOZEbGxGzRzzfAu4Hl3HJNyULwtxbVzJoGvdDe/44ZxnC/WZo7pjSphymme76HtF2g1Ah
-        u4UdeLGPH1Gm1fR2U6mw1dl5Rd/RMkJEhS01OMzLFxNfWq4jRFPkIWI9iyLJqlIK40ejTW
-        oDvh/5r9hqZiOXL3WpKgR/uhb2dT46E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-fg8DxFWQPkuy-15RotwxpA-1; Mon, 08 Feb 2021 08:31:52 -0500
-X-MC-Unique: fg8DxFWQPkuy-15RotwxpA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S230295AbhBHNlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 08:41:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59002 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229611AbhBHNlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 08:41:16 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2C4251B2;
-        Mon,  8 Feb 2021 13:31:50 +0000 (UTC)
-Received: from [10.36.112.10] (ovpn-112-10.ams2.redhat.com [10.36.112.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AB4D75D743;
-        Mon,  8 Feb 2021 13:31:45 +0000 (UTC)
-Subject: Re: [RFC v4 2/3] vfio/platform: change cleanup order
-To:     Vikas Gupta <vikas.gupta@broadcom.com>, alex.williamson@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com,
-        ashwin.kamath@broadcom.com, zachary.schroff@broadcom.com,
-        manish.kurup@broadcom.com
-References: <20201214174514.22006-1-vikas.gupta@broadcom.com>
- <20210129172421.43299-1-vikas.gupta@broadcom.com>
- <20210129172421.43299-3-vikas.gupta@broadcom.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <1925f884-770a-9ec4-018f-02f2c2a881cc@redhat.com>
-Date:   Mon, 8 Feb 2021 14:31:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        by mail.kernel.org (Postfix) with ESMTPSA id 7B8746186A;
+        Mon,  8 Feb 2021 13:40:35 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1l96mH-00Cn0C-9k; Mon, 08 Feb 2021 13:40:33 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
+        tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
+        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
+        suzuki.poulose@arm.com, Andre.Przywara@arm.com,
+        steven.price@arm.com, lorenzo.pieralisi@arm.com,
+        sudeep.holla@arm.com
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
+        kernel-team@android.com
+Subject: [PATCH v18 0/7] KVM: arm64: Add host/guest KVM-PTP support
+Date:   Mon,  8 Feb 2021 13:40:22 +0000
+Message-Id: <20210208134029.3269384-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20210129172421.43299-3-vikas.gupta@broadcom.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org, tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com, richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org, suzuki.poulose@arm.com, Andre.Przywara@arm.com, steven.price@arm.com, lorenzo.pieralisi@arm.com, sudeep.holla@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vikas,
+Given that this series[0] has languished in my Inbox for the best of the
+past two years, and in an effort to eventually get it merged, I've
+taken the liberty to pick it up and do the changes I wanted to see
+instead of waiting to go through yet another round.
 
-On 1/29/21 6:24 PM, Vikas Gupta wrote:
-> In the case of msi, vendor specific msi module may require
-> region access to handle msi cleanup so we need to cleanup region
-> after irq cleanup only.
-> 
-> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Acked-by: Eric Auger <eric.auger@redhat.com>
+All the patches have a link to their original counterpart (though I
+have squashed a couple of them where it made sense). Tested both 64
+and 32bit guests for a good measure. Of course, I claim full
+responsibility for any bug introduced here.
 
-Thanks
+* From v17 [1]:
+  - Fixed compilation issue on 32bit systems not selecting
+    CONFIG_HAVE_ARM_SMCCC_DISCOVERY
+  - Fixed KVM service discovery not properly parsing the reply
+    from the hypervisor
 
-Eric
+* From v16 [0]:
+  - Moved the KVM service discovery to its own file, plugged it into
+    PSCI instead of the arch code, dropped the inlining, made use of
+    asm/hypervisor.h.
+  - Tidied-up the namespacing
+  - Cleanup the hypercall handler
+  - De-duplicate the guest code
+  - Tidied-up arm64-specific documentation
+  - Dropped the generic PTP documentation as it needs a new location,
+    and some cleanup
+  - Squashed hypercall documentation and capability into the
+    main KVM patch
+  - Rebased on top of 5.11-rc4
 
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index f2b1f0c3bfcc..1cc040e3ed1f 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -243,8 +243,8 @@ static void vfio_platform_release(void *device_data)
->  			WARN_ON(1);
->  		}
->  		pm_runtime_put(vdev->device);
-> -		vfio_platform_regions_cleanup(vdev);
->  		vfio_platform_irq_cleanup(vdev);
-> +		vfio_platform_regions_cleanup(vdev);
->  	}
->  
->  	mutex_unlock(&driver_lock);
-> 
+[0] https://lore.kernel.org/r/20201209060932.212364-1-jianyong.wu@arm.com
+[1] https://lore.kernel.org/r/20210202141204.3134855-1-maz@kernel.org
+
+Jianyong Wu (4):
+  ptp: Reorganize ptp_kvm.c to make it arch-independent
+  clocksource: Add clocksource id for arm arch counter
+  KVM: arm64: Add support for the KVM PTP service
+  ptp: arm/arm64: Enable ptp_kvm for arm/arm64
+
+Thomas Gleixner (1):
+  time: Add mechanism to recognize clocksource in time_get_snapshot
+
+Will Deacon (2):
+  arm/arm64: Probe for the presence of KVM hypervisor
+  KVM: arm64: Advertise KVM UID to guests via SMCCC
+
+ Documentation/virt/kvm/api.rst              |  9 ++
+ Documentation/virt/kvm/arm/index.rst        |  1 +
+ Documentation/virt/kvm/arm/ptp_kvm.rst      | 25 ++++++
+ arch/arm/include/asm/hypervisor.h           |  3 +
+ arch/arm64/include/asm/hypervisor.h         |  3 +
+ arch/arm64/kvm/arm.c                        |  1 +
+ arch/arm64/kvm/hypercalls.c                 | 80 +++++++++++++++--
+ drivers/clocksource/arm_arch_timer.c        | 36 ++++++++
+ drivers/firmware/psci/psci.c                |  2 +
+ drivers/firmware/smccc/Makefile             |  2 +-
+ drivers/firmware/smccc/kvm_guest.c          | 50 +++++++++++
+ drivers/firmware/smccc/smccc.c              |  1 +
+ drivers/ptp/Kconfig                         |  2 +-
+ drivers/ptp/Makefile                        |  2 +
+ drivers/ptp/ptp_kvm_arm.c                   | 28 ++++++
+ drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} | 84 +++++-------------
+ drivers/ptp/ptp_kvm_x86.c                   | 97 +++++++++++++++++++++
+ include/linux/arm-smccc.h                   | 41 +++++++++
+ include/linux/clocksource.h                 |  6 ++
+ include/linux/clocksource_ids.h             | 12 +++
+ include/linux/ptp_kvm.h                     | 19 ++++
+ include/linux/timekeeping.h                 | 12 +--
+ include/uapi/linux/kvm.h                    |  1 +
+ kernel/time/clocksource.c                   |  2 +
+ kernel/time/timekeeping.c                   |  1 +
+ 25 files changed, 442 insertions(+), 78 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/ptp_kvm.rst
+ create mode 100644 drivers/firmware/smccc/kvm_guest.c
+ create mode 100644 drivers/ptp/ptp_kvm_arm.c
+ rename drivers/ptp/{ptp_kvm.c => ptp_kvm_common.c} (60%)
+ create mode 100644 drivers/ptp/ptp_kvm_x86.c
+ create mode 100644 include/linux/clocksource_ids.h
+ create mode 100644 include/linux/ptp_kvm.h
+
+-- 
+2.29.2
 
