@@ -2,105 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9B4313CFC
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:17:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA5A313D02
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:17:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235535AbhBHSQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 13:16:20 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17086 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235237AbhBHSOB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 13:14:01 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B60217f3d0000>; Mon, 08 Feb 2021 10:13:17 -0800
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 8 Feb
- 2021 18:13:16 +0000
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
- HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Mon, 8 Feb 2021 18:13:16 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oMfMoYHcg08geZsQq02lK3cz2dRWpui0cNltFhJb8rCyST3L/dVJfP5ZHhYRt9/rtH+YgohaPKMeX9xNqueJkiRWUpmiO3TcjihuoA3hxrCDJnmAsXr3J5QA414ld14Ed/jl3UmLvK0acJaHhtsAu55/d0kKhKYRbBumB/Aat47JAx7vcSfJlenjNmXcBVaeced50koReK3bn94nC5/mF6DVlthZc4ZNnjm98IfvlZHeARJHVCNG+Wse2qBHjs4YuNivHfdnOqfF6mpe+V8/qHW+1JU0Mma/d1fTtroEYyAlBjZi9AAaigp6S9f8hSTVmalRqXP9YEjw+aQ8wDXaXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u9cPp2oIQq6GcYFP14tN532iDEEYJNPobmrQZRL71m4=;
- b=CexI+7wQBkPFPVAzx7aIFilwZrtRHGwwPAGhXoJEHLTcU541SDVhByGgOfaExJHvLL3wYCsj8uk/gkpjK9UQwZboQEfrofnPQMETd8H0acFSEuJFilTTZLIZzfNa+Fdm1anPcYcEYz6KAOiaXUXGUN2sRzTqos2i4+hjGmlvqp4fh3Vqj7vM4N84GBDALUfH6+HPWqbGr6GqXYsTOrxKA3Z8yVQy7gSJI1gb2sI9kqtHAYGJ5jk7EU9zDCVk8iChyrKFtleLx30VE3W2cIyQsG2gHPowW++Qu6hgXcrZ8t4smFBKVt6bmzZSRYOCWUFn0IgPqvxoMGAE3Ue79dQTAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB2938.namprd12.prod.outlook.com (2603:10b6:5:18a::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.30; Mon, 8 Feb
- 2021 18:13:15 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3825.030; Mon, 8 Feb 2021
- 18:13:15 +0000
-Date:   Mon, 8 Feb 2021 14:13:13 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-Message-ID: <20210208181313.GH4247@nvidia.com>
-References: <20210201181454.22112b57.cohuck@redhat.com>
- <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
- <20210201114230.37c18abd@omen.home.shazbot.org>
- <20210202170659.1c62a9e8.cohuck@redhat.com>
- <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
- <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
- <34be24e6-7f62-9908-c56d-9e469c3b6965@nvidia.com>
- <83ef0164-6291-c3d1-0ce5-2c9d6c97469e@ozlabs.ru>
- <20210204125123.GI4247@nvidia.com>
- <d69a7f3c-f552-cd25-4e15-3e894f4eb15a@ozlabs.ru>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <d69a7f3c-f552-cd25-4e15-3e894f4eb15a@ozlabs.ru>
-X-ClientProxiedBy: BL1PR13CA0322.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::27) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S235542AbhBHSQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 13:16:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230375AbhBHSOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 13:14:10 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85AEC061793
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 10:13:30 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id o7so9120726ils.2
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:13:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/e5PLp3RTxWM6g/qVFsn49ZO2ohirYic5f4PB4jc4ZY=;
+        b=BFg1UkNZ9SMlhyTC6i87VjnB4xZ+DXY84WteYAKejtKFAFnYFyKbtiYDMizAWFEG0I
+         ViJWJoUapoct5jaDBcHYqQQdfNXEXZtFalj1LtGZuOggkN3TWv8No4VxNdwVj0OvLSqj
+         y5h0I4mpHlgQapMx2SPYQ1981oYIKbarywq2rBhscty+X4vAi44jaG4BH192+HWTQnqc
+         OrhV4DRtqUXZTIxUqYzY9BPgs1wO8if6DKTA+R9J0p4Y+pz+2kQH6bMThBm5+T9FUBfh
+         dXkjetwjUFTdM1oLCuHS+2a0+QtUuB+WqPydFTR9l359i4u5DbS5ECw/lLohqlD+2Xh7
+         leow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/e5PLp3RTxWM6g/qVFsn49ZO2ohirYic5f4PB4jc4ZY=;
+        b=FmCvgwsfWmtaoaeyECcCflw0Hbga8rl1QW+NYjYdly0764r2WJDqGZJ13o4OV5eDnh
+         MpHpacwKJGPlNjWK8kpn3UwaR4Hjx/Sp4Li1MDRxUldGRtymZifQTDQt2JGCOL26qd7j
+         9iom6eNHkzaViTRa7+njOGJa/ymLAY38hmi0xxKFGJeSbYssmnAeIOtINSYK9SSipxKf
+         /NjsAmzy9yzLe0zYGSJ+csjxliWqHH7eL2u3dsNzKWKgG2lznVr/cAW31+Zs9/YIFcdZ
+         cvAHu5g2Bwh6LUj8VafK2dkC5NxLb1Ugkcjbi7H0oTu2BAvD1aQ/A+L3Ht5taBGbh51I
+         y6MQ==
+X-Gm-Message-State: AOAM531faSsZw1RbMqLfLFq3kWvAAqcSCa9f2MqaZ+Yx0VpYRNYSEVUm
+        LOy5orDws+4qgJK+aqCvzCG5pAkG+jOWPoFUzTC8fHYhcuelYQ==
+X-Google-Smtp-Source: ABdhPJxWBm/7+d+3KjPYZevjBOfi/4p7431fD5LmT+LRlgqWcGBxS3YK+5yPxuNo74mcVr37b5wgf5gpi43olmI6hwM=
+X-Received: by 2002:a92:3f06:: with SMTP id m6mr16244038ila.283.1612808009705;
+ Mon, 08 Feb 2021 10:13:29 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0322.namprd13.prod.outlook.com (2603:10b6:208:2c1::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.11 via Frontend Transport; Mon, 8 Feb 2021 18:13:14 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l9B29-0051kF-OY; Mon, 08 Feb 2021 14:13:13 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1612807997; bh=u9cPp2oIQq6GcYFP14tN532iDEEYJNPobmrQZRL71m4=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=jHz/6g+LC2Yp1n27lfPuzPNZRWv7851RFe/uwp3ccBGl4UgWZg++1l7nHYygvT/kG
-         ont1xu/9Nl7N5ps5rZSXxNdZbEZAvO97ljozJjVUDv/psKhrCc2eiSqHpBmbqceLNR
-         xE7ylSS3Czh8v7DDGfgwnSPX+Q2hnHMZZG5ubIeWy7pjktid3J2KuKv49Nh3JeQjZh
-         zfk8I5/F1Mp3aRFmSGj5eUqz1Z19fvObdSW+8HafffIKY4Z0o49T22CJZn0aZ6dkug
-         U2gsa2DvL0sonddJo+bNhvKqjGL1ZgNtjyj/zdXuKK3Glkqat+C/3geMfZoAyOf49O
-         nq3F86dDEO8Cw==
+References: <20210208090841.333724-1-wangyanan55@huawei.com> <20210208090841.333724-2-wangyanan55@huawei.com>
+In-Reply-To: <20210208090841.333724-2-wangyanan55@huawei.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 8 Feb 2021 10:13:18 -0800
+Message-ID: <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] KVM: selftests: Add a macro to get string of vm_mem_backing_src_type
+To:     Yanan Wang <wangyanan55@huawei.com>
+Cc:     kvm <kvm@vger.kernel.org>, linux-kselftest@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 11:42:11AM +1100, Alexey Kardashevskiy wrote:
-> > A real nvswitch function?
-> 
-> What do you mean by this exactly? The cpu side of nvlink is "emulated pci
-> devices", the gpu side is not in pci space at all, the nvidia driver manages
-> it via the gpu's mmio or/and cfg space.
+On Mon, Feb 8, 2021 at 1:08 AM Yanan Wang <wangyanan55@huawei.com> wrote:
+>
+> Add a macro to get string of the backing source memory type, so that
+> application can add choices for source types in the help() function,
+> and users can specify which type to use for testing.
 
-Some versions of the nvswitch chip have a PCI-E link too, that is what
-I though this was all about when I first saw it.
+Coincidentally, I sent out a change last week to do the same thing:
+"KVM: selftests: Add backing src parameter to dirty_log_perf_test"
+(https://lkml.org/lkml/2021/2/2/1430)
+Whichever way this ends up being implemented, I'm happy to see others
+interested in testing different backing source types too.
 
-So, it is really a special set of functions for NVIDIA GPU device
-assignment only applicable to P9 systems, much like IGD is for Intel
-on x86.
-
-Jason
+>
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
+>  tools/testing/selftests/kvm/lib/kvm_util.c     | 8 ++++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 5cbb861525ed..f5fc29dc9ee6 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -69,7 +69,9 @@ enum vm_guest_mode {
+>  #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
+>
+>  #define vm_guest_mode_string(m) vm_guest_mode_string[m]
+> +#define vm_mem_backing_src_type_string(s) vm_mem_backing_src_type_string[s]
+>  extern const char * const vm_guest_mode_string[];
+> +extern const char * const vm_mem_backing_src_type_string[];
+>
+>  struct vm_guest_mode_params {
+>         unsigned int pa_bits;
+> @@ -83,6 +85,7 @@ enum vm_mem_backing_src_type {
+>         VM_MEM_SRC_ANONYMOUS,
+>         VM_MEM_SRC_ANONYMOUS_THP,
+>         VM_MEM_SRC_ANONYMOUS_HUGETLB,
+> +       NUM_VM_BACKING_SRC_TYPES,
+>  };
+>
+>  int kvm_check_cap(long cap);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index fa5a90e6c6f0..a9b651c7f866 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -165,6 +165,14 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>                "Missing new mode params?");
+>
+> +const char * const vm_mem_backing_src_type_string[] = {
+> +       "VM_MEM_SRC_ANONYMOUS        ",
+> +       "VM_MEM_SRC_ANONYMOUS_THP    ",
+> +       "VM_MEM_SRC_ANONYMOUS_HUGETLB",
+> +};
+> +_Static_assert(sizeof(vm_mem_backing_src_type_string)/sizeof(char *) == NUM_VM_BACKING_SRC_TYPES,
+> +              "Missing new source type strings?");
+> +
+>  /*
+>   * VM Create
+>   *
+> --
+> 2.23.0
+>
