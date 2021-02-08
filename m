@@ -2,162 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D329B3130B0
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:23:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C74773130CA
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:27:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232908AbhBHLXj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 06:23:39 -0500
-Received: from mga12.intel.com ([192.55.52.136]:58110 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232931AbhBHLUS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 06:20:18 -0500
-IronPort-SDR: v28so8VD+CsdnwJvpZX1iSJJdthJpyWWNK0iLJ+43IvwrbzBQroyRSkmDO8aTsZc91Y9iviZI5
- UCMMHF0Am4SQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="160851215"
-X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="160851215"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 03:18:27 -0800
-IronPort-SDR: 05+wl6BZE4c/HyTfuNS+piVU3PmXPxCS6GwDZrhIjFZE2z11s/W85QIppL+HQ9ctTdZ3RJ6nE9
- l4esAJlqFs/w==
-X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="395347722"
-Received: from shaojieh-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.172.136])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 03:18:24 -0800
-Date:   Mon, 8 Feb 2021 19:18:22 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the kvm tree
-Message-ID: <20210208111822.b3bxehdnkcf3pzxg@linux.intel.com>
-References: <20210208163308.26c3c1c4@canb.auug.org.au>
+        id S233204AbhBHL05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 06:26:57 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12898 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233039AbhBHLXn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 06:23:43 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DZ3Wk0320zjK2N;
+        Mon,  8 Feb 2021 19:21:54 +0800 (CST)
+Received: from DESKTOP-TMVL5KK.china.huawei.com (10.174.187.128) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 8 Feb 2021 19:22:52 +0800
+From:   Yanan Wang <wangyanan55@huawei.com>
+To:     Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        "Julien Thierry" <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        <kvmarm@lists.cs.columbia.edu>,
+        <linux-arm-kernel@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <wanghaibin.wang@huawei.com>, <zhukeqian1@huawei.com>,
+        <yuzenghui@huawei.com>, Yanan Wang <wangyanan55@huawei.com>
+Subject: [RFC PATCH 0/4] KVM: arm64: Improve efficiency of stage2 page table
+Date:   Mon, 8 Feb 2021 19:22:46 +0800
+Message-ID: <20210208112250.163568-1-wangyanan55@huawei.com>
+X-Mailer: git-send-email 2.8.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210208163308.26c3c1c4@canb.auug.org.au>
-User-Agent: NeoMutt/20171215
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.128]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks a lot for reporting this, Stephen. Just sent out a patch
-to fix it in kvmgt.
+Hi,
 
-B.R.
-Yu
+This series makes some efficiency improvement of stage2 page table code,
+and there are some test results to present the performance changes, which
+were tested by a kvm selftest [1] that I have post:
+[1] https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/ 
 
-On Mon, Feb 08, 2021 at 04:33:08PM +1100, Stephen Rothwell wrote:
-> Hi all,
-> 
-> After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
-> failed like this:
-> 
-> drivers/gpu/drm/i915/gvt/kvmgt.c: In function 'kvmgt_page_track_add':
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1706:12: error: passing argument 1 of 'spin_lock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1706 |  spin_lock(&kvm->mmu_lock);
->       |            ^~~~~~~~~~~~~~
->       |            |
->       |            rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:352:51: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   352 | static __always_inline void spin_lock(spinlock_t *lock)
->       |                                       ~~~~~~~~~~~~^~~~
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1715:14: error: passing argument 1 of 'spin_unlock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1715 |  spin_unlock(&kvm->mmu_lock);
->       |              ^~~~~~~~~~~~~~
->       |              |
->       |              rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:392:53: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   392 | static __always_inline void spin_unlock(spinlock_t *lock)
->       |                                         ~~~~~~~~~~~~^~~~
-> drivers/gpu/drm/i915/gvt/kvmgt.c: In function 'kvmgt_page_track_remove':
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1740:12: error: passing argument 1 of 'spin_lock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1740 |  spin_lock(&kvm->mmu_lock);
->       |            ^~~~~~~~~~~~~~
->       |            |
->       |            rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:352:51: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   352 | static __always_inline void spin_lock(spinlock_t *lock)
->       |                                       ~~~~~~~~~~~~^~~~
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1749:14: error: passing argument 1 of 'spin_unlock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1749 |  spin_unlock(&kvm->mmu_lock);
->       |              ^~~~~~~~~~~~~~
->       |              |
->       |              rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:392:53: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   392 | static __always_inline void spin_unlock(spinlock_t *lock)
->       |                                         ~~~~~~~~~~~~^~~~
-> drivers/gpu/drm/i915/gvt/kvmgt.c: In function 'kvmgt_page_track_flush_slot':
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1775:12: error: passing argument 1 of 'spin_lock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1775 |  spin_lock(&kvm->mmu_lock);
->       |            ^~~~~~~~~~~~~~
->       |            |
->       |            rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:352:51: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   352 | static __always_inline void spin_lock(spinlock_t *lock)
->       |                                       ~~~~~~~~~~~~^~~~
-> drivers/gpu/drm/i915/gvt/kvmgt.c:1784:14: error: passing argument 1 of 'spin_unlock' from incompatible pointer type [-Werror=incompatible-pointer-types]
->  1784 |  spin_unlock(&kvm->mmu_lock);
->       |              ^~~~~~~~~~~~~~
->       |              |
->       |              rwlock_t *
-> In file included from include/linux/wait.h:9,
->                  from include/linux/pid.h:6,
->                  from include/linux/sched.h:14,
->                  from include/linux/ratelimit.h:6,
->                  from include/linux/dev_printk.h:16,
->                  from include/linux/device.h:15,
->                  from drivers/gpu/drm/i915/gvt/kvmgt.c:32:
-> include/linux/spinlock.h:392:53: note: expected 'spinlock_t *' {aka 'struct spinlock *'} but argument is of type 'rwlock_t *'
->   392 | static __always_inline void spin_unlock(spinlock_t *lock)
->       |                                         ~~~~~~~~~~~~^~~~
-> cc1: all warnings being treated as errors
-> 
-> Caused by commit
-> 
->   531810caa9f4 ("KVM: x86/mmu: Use an rwlock for the x86 MMU")
-> 
-> I have used the kvm tree from next-20210204 for today.
-> 
-> -- 
-> Cheers,
-> Stephen Rothwell
+About patch 1:
+We currently uniformly clean dcache in user_mem_abort() before calling the
+fault handlers, if we take a translation fault and the pfn is cacheable.
+But if there are concurrent translation faults on the same page or block,
+clean of dcache for the first time is necessary while the others are not.
 
+By moving clean of dcache to the map handler, we can easily identify the
+conditions where CMOs are really needed and avoid the unnecessary ones.
+As it's a time consuming process to perform CMOs especially when flushing
+a block range, so this solution reduces much load of kvm and improve the
+efficiency of creating mappings.
+
+Test results:
+(1) when 20 vCPUs concurrently access 20G ram (all 1G hugepages):
+KVM create block mappings time: 52.83s -> 3.70s
+KVM recover block mappings time(after dirty-logging): 52.0s -> 2.87s
+
+(2) when 40 vCPUs concurrently access 20G ram (all 1G hugepages):
+KVM creating block mappings time: 104.56s -> 3.70s
+KVM recover block mappings time(after dirty-logging): 103.93s -> 2.96s
+
+About patch 2, 3:
+When KVM needs to coalesce the normal page mappings into a block mapping,
+we currently invalidate the old table entry first followed by invalidation
+of TLB, then unmap the page mappings, and install the block entry at last.
+
+It will cost a lot of time to unmap the numerous page mappings, which means
+the table entry will be left invalid for a long time before installation of
+the block entry, and this will cause many spurious translation faults.
+
+So let's quickly install the block entry at first to ensure uninterrupted
+memory access of the other vCPUs, and then unmap the page mappings after
+installation. This will reduce most of the time when the table entry is
+invalid, and avoid most of the unnecessary translation faults.
+
+Test results based on patch 1:
+(1) when 20 vCPUs concurrently access 20G ram (all 1G hugepages):
+KVM recover block mappings time(after dirty-logging): 2.87s -> 0.30s
+
+(2) when 40 vCPUs concurrently access 20G ram (all 1G hugepages):
+KVM recover block mappings time(after dirty-logging): 2.96s -> 0.35s
+
+So combined with patch 1, it makes a big difference of KVM creating mappings
+and recovering block mappings with not much code change.
+
+About patch 4:
+A new method to distinguish cases of memcache allocations is introduced.
+By comparing fault_granule and vma_pagesize, cases that require allocations
+from memcache and cases that don't can be distinguished completely.
+
+---
+
+Details of test results
+platform: HiSilicon Kunpeng920 (FWB not supported)
+host kernel: Linux mainline (v5.11-rc6)
+
+(1) performance change of patch 1
+cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 20
+	   (20 vcpus, 20G memory, block mappings(granule 1G))
+Before patch: KVM_CREATE_MAPPINGS: 52.8338s 52.8327s 52.8336s 52.8255s 52.8303s
+After  patch: KVM_CREATE_MAPPINGS:  3.7022s  3.7031s  3.7028s  3.7012s  3.7024s
+
+Before patch: KVM_ADJUST_MAPPINGS: 52.0466s 52.0473s 52.0550s 52.0518s 52.0467s
+After  patch: KVM_ADJUST_MAPPINGS:  2.8787s  2.8781s  2.8785s  2.8742s  2.8759s
+
+cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 40
+	   (40 vcpus, 20G memory, block mappings(granule 1G))
+Before patch: KVM_CREATE_MAPPINGS: 104.560s 104.556s 104.554s 104.556s 104.550s
+After  patch: KVM_CREATE_MAPPINGS:  3.7011s  3.7103s  3.7005s  3.7024s  3.7106s
+
+Before patch: KVM_ADJUST_MAPPINGS: 103.931s 103.936s 103.927s 103.942s 103.927s
+After  patch: KVM_ADJUST_MAPPINGS:  2.9621s  2.9648s  2.9474s  2.9587s  2.9603s
+
+(2) performance change of patch 2, 3(based on patch 1)
+cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 1
+	   (1 vcpu, 20G memory, block mappings(granule 1G))
+Before patch: KVM_ADJUST_MAPPINGS: 2.8241s 2.8234s 2.8245s 2.8230s 2.8652s
+After  patch: KVM_ADJUST_MAPPINGS: 0.2444s 0.2442s 0.2423s 0.2441s 0.2429s
+
+cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 20
+	   (20 vcpus, 20G memory, block mappings(granule 1G))
+Before patch: KVM_ADJUST_MAPPINGS: 2.8787s 2.8781s 2.8785s 2.8742s 2.8759s
+After  patch: KVM_ADJUST_MAPPINGS: 0.3008s 0.3004s 0.2974s 0.2917s 0.2900s
+
+cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 40
+	   (40 vcpus, 20G memory, block mappings(granule 1G))
+Before patch: KVM_ADJUST_MAPPINGS: 2.9621s 2.9648s 2.9474s 2.9587s 2.9603s
+After  patch: KVM_ADJUST_MAPPINGS: 0.3541s 0.3694s 0.3656s 0.3693s 0.3687s
+
+---
+
+Yanan Wang (4):
+  KVM: arm64: Move the clean of dcache to the map handler
+  KVM: arm64: Add an independent API for coalescing tables
+  KVM: arm64: Install the block entry before unmapping the page mappings
+  KVM: arm64: Distinguish cases of memcache allocations completely
+
+ arch/arm64/include/asm/kvm_mmu.h | 16 -------
+ arch/arm64/kvm/hyp/pgtable.c     | 82 +++++++++++++++++++++-----------
+ arch/arm64/kvm/mmu.c             | 39 ++++++---------
+ 3 files changed, 69 insertions(+), 68 deletions(-)
+
+-- 
+2.23.0
 
