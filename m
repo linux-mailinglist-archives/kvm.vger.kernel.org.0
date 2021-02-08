@@ -2,106 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60E0B313CF1
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:14:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D9B4313CFC
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:17:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235369AbhBHSO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 13:14:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50182 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235183AbhBHSNy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 13:13:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612807948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Em5Q6izKRwuYnxNNv2p6LEzG/SfeITVQD9/V+T5jR/M=;
-        b=AuwqrnhytR+H7MDdRU82YX0yVC3tEWmtf8XESeYH+YDQfTJ63hu0ezRcF2Z/ae583/2Zb4
-        M0+uQYJaqARHwNpZijRIFfJqltst8kXPDbpKI6zkybkFZYZRGLKYaFI0eEhihmz/p92Jr4
-        +PqOqFJOzbLgUkqFgjmbr+cNz46FbD4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-gEsH5mn1PzyNZ1QM8wPCLQ-1; Mon, 08 Feb 2021 13:12:25 -0500
-X-MC-Unique: gEsH5mn1PzyNZ1QM8wPCLQ-1
-Received: by mail-wr1-f70.google.com with SMTP id s10so607794wro.13
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:12:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Em5Q6izKRwuYnxNNv2p6LEzG/SfeITVQD9/V+T5jR/M=;
-        b=km4chUekaJ/8onG6rH1a8JdGf5kozrrJgSIelvpYcVuCSg64tuWeN7omUTRAJHANES
-         lKBkm3EgA1ZEN4rpxMfR0cvs5mtt3ljLitKI+peiKnvhhDTi6PO1hWIjdc9u+x+bKhB+
-         OR0XwR6Vzy53olhjADYuFhHiNLjVkmdr1T9/diUekSsfHldsayieY+kSlnQdNlthugGC
-         ZISB9ImCxDutq/YckFeV+VrgP0qET9tbKJt4rXv9rM6OTEq/+XZqLvRTCeCSbe/6oc2x
-         hximG9d6bI1Y7S3amXyOnG6jyaPsj1eCyIBfU7f1js2G2pxKC95pu0fUVVJvhTKFflum
-         y6dg==
-X-Gm-Message-State: AOAM533jOrrTD/ja/CJ+Wj9JJcerHVpEoIQsKcYpW1cpZyk/nAbpvSjb
-        m75fli0Cn/tcG0h4T6I2fCtA65D9LH9w3cJysV9UGHvz0SRZeeBqHMAqXR3uQG56EWSuXZ86j1k
-        O6iOQ5MJYIuFB
-X-Received: by 2002:adf:b64f:: with SMTP id i15mr20465100wre.279.1612807944257;
-        Mon, 08 Feb 2021 10:12:24 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxWpAeK4msgOmM8v7VqEwvUaMXj+/R0pAL/O0nlqtcHUVclMsQXrcY9KuBLfX7dfzMQi4j5pA==
-X-Received: by 2002:adf:b64f:: with SMTP id i15mr20465080wre.279.1612807944075;
-        Mon, 08 Feb 2021 10:12:24 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id i3sm12022645wrr.19.2021.02.08.10.12.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Feb 2021 10:12:23 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jing Liu <jing2.liu@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-4-jing2.liu@linux.intel.com>
- <ae5b0195-b04f-8eef-9e0d-2a46c761d2d5@redhat.com>
- <YCF1d0F0AqPazYqC@google.com>
- <77b27707-721a-5c6a-c00d-e1768da55c64@redhat.com>
- <YCF9GztNd18t1zk/@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC 3/7] kvm: x86: XSAVE state and XFD MSRs context switch
-Message-ID: <c293cdbd-502c-d598-3166-4e177ac21c7a@redhat.com>
-Date:   Mon, 8 Feb 2021 19:12:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S235535AbhBHSQU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 13:16:20 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17086 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235237AbhBHSOB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 13:14:01 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60217f3d0000>; Mon, 08 Feb 2021 10:13:17 -0800
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 8 Feb
+ 2021 18:13:16 +0000
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.46) by
+ HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Mon, 8 Feb 2021 18:13:16 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oMfMoYHcg08geZsQq02lK3cz2dRWpui0cNltFhJb8rCyST3L/dVJfP5ZHhYRt9/rtH+YgohaPKMeX9xNqueJkiRWUpmiO3TcjihuoA3hxrCDJnmAsXr3J5QA414ld14Ed/jl3UmLvK0acJaHhtsAu55/d0kKhKYRbBumB/Aat47JAx7vcSfJlenjNmXcBVaeced50koReK3bn94nC5/mF6DVlthZc4ZNnjm98IfvlZHeARJHVCNG+Wse2qBHjs4YuNivHfdnOqfF6mpe+V8/qHW+1JU0Mma/d1fTtroEYyAlBjZi9AAaigp6S9f8hSTVmalRqXP9YEjw+aQ8wDXaXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u9cPp2oIQq6GcYFP14tN532iDEEYJNPobmrQZRL71m4=;
+ b=CexI+7wQBkPFPVAzx7aIFilwZrtRHGwwPAGhXoJEHLTcU541SDVhByGgOfaExJHvLL3wYCsj8uk/gkpjK9UQwZboQEfrofnPQMETd8H0acFSEuJFilTTZLIZzfNa+Fdm1anPcYcEYz6KAOiaXUXGUN2sRzTqos2i4+hjGmlvqp4fh3Vqj7vM4N84GBDALUfH6+HPWqbGr6GqXYsTOrxKA3Z8yVQy7gSJI1gb2sI9kqtHAYGJ5jk7EU9zDCVk8iChyrKFtleLx30VE3W2cIyQsG2gHPowW++Qu6hgXcrZ8t4smFBKVt6bmzZSRYOCWUFn0IgPqvxoMGAE3Ue79dQTAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB2938.namprd12.prod.outlook.com (2603:10b6:5:18a::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.30; Mon, 8 Feb
+ 2021 18:13:15 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3825.030; Mon, 8 Feb 2021
+ 18:13:15 +0000
+Date:   Mon, 8 Feb 2021 14:13:13 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
+        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
+        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
+        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
+        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+Message-ID: <20210208181313.GH4247@nvidia.com>
+References: <20210201181454.22112b57.cohuck@redhat.com>
+ <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+ <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
+ <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
+ <34be24e6-7f62-9908-c56d-9e469c3b6965@nvidia.com>
+ <83ef0164-6291-c3d1-0ce5-2c9d6c97469e@ozlabs.ru>
+ <20210204125123.GI4247@nvidia.com>
+ <d69a7f3c-f552-cd25-4e15-3e894f4eb15a@ozlabs.ru>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <d69a7f3c-f552-cd25-4e15-3e894f4eb15a@ozlabs.ru>
+X-ClientProxiedBy: BL1PR13CA0322.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::27) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-In-Reply-To: <YCF9GztNd18t1zk/@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0322.namprd13.prod.outlook.com (2603:10b6:208:2c1::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.11 via Frontend Transport; Mon, 8 Feb 2021 18:13:14 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l9B29-0051kF-OY; Mon, 08 Feb 2021 14:13:13 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612807997; bh=u9cPp2oIQq6GcYFP14tN532iDEEYJNPobmrQZRL71m4=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=jHz/6g+LC2Yp1n27lfPuzPNZRWv7851RFe/uwp3ccBGl4UgWZg++1l7nHYygvT/kG
+         ont1xu/9Nl7N5ps5rZSXxNdZbEZAvO97ljozJjVUDv/psKhrCc2eiSqHpBmbqceLNR
+         xE7ylSS3Czh8v7DDGfgwnSPX+Q2hnHMZZG5ubIeWy7pjktid3J2KuKv49Nh3JeQjZh
+         zfk8I5/F1Mp3aRFmSGj5eUqz1Z19fvObdSW+8HafffIKY4Z0o49T22CJZn0aZ6dkug
+         U2gsa2DvL0sonddJo+bNhvKqjGL1ZgNtjyj/zdXuKK3Glkqat+C/3geMfZoAyOf49O
+         nq3F86dDEO8Cw==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/02/21 19:04, Sean Christopherson wrote:
->> That said, the case where we saw MSR autoload as faster involved EFER, and
->> we decided that it was due to TLB flushes (commit f6577a5fa15d, "x86, kvm,
->> vmx: Always use LOAD_IA32_EFER if available", 2014-11-12). Do you know if
->> RDMSR/WRMSR is always slower than MSR autoload?
-> RDMSR/WRMSR may be marginally slower, but only because the autoload stuff avoids
-> serializing the pipeline after every MSR.
+On Fri, Feb 05, 2021 at 11:42:11AM +1100, Alexey Kardashevskiy wrote:
+> > A real nvswitch function?
+> 
+> What do you mean by this exactly? The cpu side of nvlink is "emulated pci
+> devices", the gpu side is not in pci space at all, the nvidia driver manages
+> it via the gpu's mmio or/and cfg space.
 
-That's probably adding up quickly...
+Some versions of the nvswitch chip have a PCI-E link too, that is what
+I though this was all about when I first saw it.
 
-> The autoload paths are effectively
-> just wrappers around the WRMSR ucode, plus some extra VM-Enter specific checks,
-> as ucode needs to perform all the normal fault checks on the index and value.
-> On the flip side, if the load lists are dynamically constructed, I suspect the
-> code overhead of walking the lists negates any advantages of the load lists.
+So, it is really a special set of functions for NVIDIA GPU device
+assignment only applicable to P9 systems, much like IGD is for Intel
+on x86.
 
-... but yeah this is not very encouraging.
-
-Context switch time is a problem for XFD.  In a VM that uses AMX, most 
-threads in the guest will have nonzero XFD but the vCPU thread itself 
-will have zero XFD.  So as soon as one thread in the VM forces the vCPU 
-thread to clear XFD, you pay a price on all vmexits and vmentries.
-
-However, running the host with _more_ bits set than necessary in XFD 
-should not be a problem as long as the host doesn't use the AMX 
-instructions.  So perhaps Jing can look into keeping XFD=0 for as little 
-time as possible, and XFD=host_XFD|guest_XFD as much as possible.
-
-Paolo
-
+Jason
