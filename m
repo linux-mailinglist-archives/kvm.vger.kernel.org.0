@@ -2,120 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E80273136FF
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:19:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62B1E3137AE
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:29:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232859AbhBHPSa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 10:18:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20961 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232733AbhBHPPL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 10:15:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612797224;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QnWSYO4DmxGTl0psJZQqO1COYOIHEj+7TNrQ9PAPK0k=;
-        b=YkDMsJmASEiJiNdESHpA/jYO8l4boIdVuXTB/jzwkfkyxjMqArnZDXHykbCCPYmqHxOJZX
-        kjTpF+2XkPrFPJ+FMpBMzcaCwx3oIyC1M9axAZEzZtyBmqjBGoFeUGWOf642YQeGAOXfPV
-        76iUhvvHF7sx6QXKXFiaManSN5ds5no=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-pKqytjObPiauuuj_PS7qEw-1; Mon, 08 Feb 2021 10:13:42 -0500
-X-MC-Unique: pKqytjObPiauuuj_PS7qEw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FEAA8EC5E8
-        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 15:13:17 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-117.ams2.redhat.com [10.36.112.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E787610190B7;
-        Mon,  8 Feb 2021 15:13:15 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Add new s390x targets to
- run tests with TCG and KVM accel
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Bandeira Condotta <mbandeir@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Marcelo Bandeira Condotta <mcondotta@redhat.com>
-References: <20210208150227.178953-1-mbandeir@redhat.com>
- <8f34cddf-84bf-0726-8074-1688974a74d8@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <6e56bdb9-72b4-369e-acb2-d5715e02ab92@redhat.com>
-Date:   Mon, 8 Feb 2021 16:13:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S233142AbhBHP30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 10:29:26 -0500
+Received: from mga17.intel.com ([192.55.52.151]:9937 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232525AbhBHPYD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 10:24:03 -0500
+IronPort-SDR: eNmXbxa2bq/7fmbx7u1aErWzDb20PokeUmy4tsIxK2qSOcsFnBYYZnsx8ldM5cD8PWG9MCrL0M
+ qXg/45WM2eNw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="161479707"
+X-IronPort-AV: E=Sophos;i="5.81,162,1610438400"; 
+   d="scan'208";a="161479707"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 07:23:15 -0800
+IronPort-SDR: 4+2YA9AuhuB4uOlU7aTdKYD5yCc4FRvmzcWeX7UoY6C14CkAmDdX0GUSwTJlF2ZtApPwwl7h1p
+ n6UXPFJ7PQ4w==
+X-IronPort-AV: E=Sophos;i="5.81,162,1610438400"; 
+   d="scan'208";a="418827376"
+Received: from chongkea-mobl1.amr.corp.intel.com (HELO [10.212.141.69]) ([10.212.141.69])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 07:23:14 -0800
+Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
+To:     Jing Liu <jing2.liu@linux.intel.com>, pbonzini@redhat.com
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
+Date:   Mon, 8 Feb 2021 07:23:13 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <8f34cddf-84bf-0726-8074-1688974a74d8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210208161659.63020-1-jing2.liu@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/02/2021 16.07, Paolo Bonzini wrote:
-> On 08/02/21 16:02, Marcelo Bandeira Condotta wrote:
->> From: Marcelo Bandeira Condotta <mcondotta@redhat.com>
->>
->> A new s390x z15 VM provided by IBM Community Cloud will be used to run
->> the s390x KVM Unit tests natively with both TCG and KVM accel options.
->>
->> Signed-off-by: Marcelo Bandeira Condotta <mbandeir@redhat.com>
->> ---
->>   .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
->>   1 file changed, 28 insertions(+)
->>
->> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
->> index d97e27e..bc7a115 100644
->> --- a/.gitlab-ci.yml
->> +++ b/.gitlab-ci.yml
->> @@ -155,3 +155,31 @@ cirrus-ci-macos-i386:
->>   cirrus-ci-macos-x86-64:
->>    <<: *cirrus_build_job_definition
->> +
->> +test-s390x-tcg:
->> +  stage: test
->> +  before_script: []
->> +  tags:
->> +    - s390x-z15-vm
->> +  script:
->> +    - ./configure --arch=s390x
->> +    - make -j2
->> +    - ACCEL=tcg ./run_tests.sh
->> +     selftest-setup intercept emulator sieve skey diag10 diag308 vector 
->> diag288
->> +     stsi sclp-1g sclp-3g
->> +     | tee results.txt
->> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
->> +
->> +test-s390x-kvm:
->> +  stage: test
->> +  before_script: []
->> +  tags:
->> +    - s390x-z15-vm
->> +  script:
->> +    - ./configure --arch=s390x
->> +    - make -j2
->> +    - ACCEL=kvm ./run_tests.sh
->> +     selftest-setup intercept emulator sieve skey diag10 diag308 vector 
->> diag288
->> +     stsi sclp-1g sclp-3g
->> +     | tee results.txt
->> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
+On 2/8/21 8:16 AM, Jing Liu wrote:
+> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
+> -
+>  static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
+>  {
+>  	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
+>  	/* Set XSTATE_BV and possibly XCOMP_BV.  */
+>  	xsave->header.xfeatures = xstate_bv;
+>  	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
+> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+> +					 xfeatures_mask_all;
 
-Acked-by: Thomas Huth <thuth@redhat.com>
-
-> 
-> So it will have a custom runner?  That's nice!
-> 
-> Do you have an example run already?
-
-I've been in touch with Marcelo during the past days already, and I've 
-already registered the runner that he set up on the s390x machine, so it 
-should theoretically work now once this patch has been merged.
-
-  Thomas
-
+Are 'host_xcr0' and 'xfeatures_mask_all' really interchangeable?  If so,
+shouldn't we just remove 'host_xcr0' everywhere?
