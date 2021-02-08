@@ -2,113 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0AD2B31404A
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 21:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCF9A31404C
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 21:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236766AbhBHUVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 15:21:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33678 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236716AbhBHUU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 15:20:26 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DCCC06178A
-        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 12:19:44 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id dr7so120217qvb.22
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 12:19:44 -0800 (PST)
+        id S236774AbhBHUVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 15:21:51 -0500
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:4995 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236779AbhBHUVg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 15:21:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=c92WD9tBjIN6OOgkPtPsSt2AYdNEujBjskOjMLRrrjI=;
-        b=wAql08sQVg8gABzEOZq6pnXO7zG/92jQFGKp6eugdemTbEjm4IL0/Lb+dByjT9sfhN
-         bjrPlvAKbj0oKas5ZqV4PV56jUcAei5nYjw5vJr6mG5xdB4wZk/JcHuHUioTCwKRaSdH
-         CJzxvvBlsaMq8ms4VQHX21CJcx+1rWOKfToT9ALVbjNAX97uhylRuuwIbn7USVcM6H/V
-         u6YsQqV0rBFRXWoILzy3Q/BkgFUMRBdVjg9XmKfKKp7sJYhoeMXuLxY9l5LbdxwGv1I7
-         EBzHC9tN987u4Q6Ixgn0WNBiw2/2BDxQI5v/Axz/egNhPcQU3LK2dUoaVTjSdEiOBElE
-         9JzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc:content-transfer-encoding;
-        bh=c92WD9tBjIN6OOgkPtPsSt2AYdNEujBjskOjMLRrrjI=;
-        b=RzvWSWajrSEmb81J0oW5iuuIgVHo7OMSj2ksAvv79IGh60dPtm2CMRbRzTVGEOuJlG
-         Zn2IqJKVmB3QmJLG+Njz8J+1gLMohJy/MniUmF4N9JOb+x6/I4Pir0dcPZpTh7Ljj+mP
-         w+K3yM9pM9IWTyMtmqCew4A4U1+ezTQt2gzEGxREe5U1wtlvbKTvXLV0bZuvj1+Ra3IS
-         iC1rSFW/f0Rv0kiLa5aY9mFmgI7W7r8I7G1kZQsHqMOzX5NNN7aHSsec8LKhQDztoP6r
-         8Aa36Pq211pasbcN+eexOPo5pbVP2tIwC02jBaL3LLX6biCIXRIydaCtEUSzaC7d0j8u
-         +3UA==
-X-Gm-Message-State: AOAM531QznqapCvfzaSBPb1+JqmLWsrqJwmNrf3bTwyX3uQ/4+rDy6K6
-        nEca+1TQRyPpFwHYR11O8IT7AsAfQ60=
-X-Google-Smtp-Source: ABdhPJwD9shv2X/SfBHMf5rkLqrlBt/yFuFy7BTxCqki+QSLka36BUA4rdWxltPGE4NO9eUMY8h7zFBUa+M=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e4db:abc1:a5c0:9dbc])
- (user=seanjc job=sendgmr) by 2002:a05:6214:125:: with SMTP id
- w5mr17608903qvs.20.1612815583538; Mon, 08 Feb 2021 12:19:43 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  8 Feb 2021 12:19:40 -0800
-Message-Id: <20210208201940.1258328-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH] KVM: Use kvm_pfn_t for local PFN variable in hva_to_pfn_remapped()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1612815696; x=1644351696;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:mime-version:content-transfer-encoding:subject;
+  bh=fgcIMRUI3QdGH+pY6oWx29TkvTBQmqKzczCE6mm7lm8=;
+  b=Zr0rKljfA4xCMjs7gsd3rbmgC8egwvZFBOcHn04YxfJItXt2boxNwpGQ
+   5yDYwOlisWpqSMNG2caeSwcf+TQl5J+deYqrw8Zeb5rIqUwUZxOioFEJr
+   j6invn9Lld4D/o1bngd7P1QF171nDLhrSPxYqHhGepmhZHO7d790qvYD9
+   E=;
+X-IronPort-AV: E=Sophos;i="5.81,163,1610409600"; 
+   d="scan'208";a="80547423"
+Subject: Re: [PATCH] KVM: x86/xen: Use hva_t for holding hypercall page address
+Thread-Topic: [PATCH] KVM: x86/xen: Use hva_t for holding hypercall page address
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-807d4a99.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 08 Feb 2021 20:20:49 +0000
+Received: from EX13MTAUEE001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-1a-807d4a99.us-east-1.amazon.com (Postfix) with ESMTPS id B93B7A1EC2;
+        Mon,  8 Feb 2021 20:20:45 +0000 (UTC)
+Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
+ EX13MTAUEE001.ant.amazon.com (10.43.62.200) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 8 Feb 2021 20:20:44 +0000
+Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
+ EX13D08UEB001.ant.amazon.com (10.43.60.245) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 8 Feb 2021 20:20:44 +0000
+Received: from EX13D08UEB001.ant.amazon.com ([10.43.60.245]) by
+ EX13D08UEB001.ant.amazon.com ([10.43.60.245]) with mapi id 15.00.1497.010;
+ Mon, 8 Feb 2021 20:20:44 +0000
+From:   "Woodhouse, David" <dwmw@amazon.co.uk>
+To:     "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>
+Thread-Index: AQHW/lc3NGecPBTL0U6JCWHR2wKbO6pOsxMA
+Date:   Mon, 8 Feb 2021 20:20:44 +0000
+Message-ID: <303f907814d75e2f3bdec01564be745d312356d1.camel@amazon.co.uk>
+References: <20210208201502.1239867-1-seanjc@google.com>
+In-Reply-To: <20210208201502.1239867-1-seanjc@google.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.161.146]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BF36EC6D65320C4A84FA7AA029B7800A@amazon.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use kvm_pfn_t, a.k.a. u64, for the local 'pfn' variable when retrieving
-a so called "remapped" hva/pfn pair.  In theory, the hva could resolve to
-a pfn in high memory on a 32-bit kernel.
-
-This bug was inadvertantly exposed by commit bd2fae8da794 ("KVM: do not
-assume PTE is writable after follow_pfn"), which added an error PFN value
-to the mix, causing gcc to comlain about overflowing the unsigned long.
-
-  arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function =E2=80=98hva_to_pf=
-n_remapped=E2=80=99:
-  include/linux/kvm_host.h:89:30: error: conversion from =E2=80=98long long=
- unsigned int=E2=80=99
-                                  to =E2=80=98long unsigned int=E2=80=99 ch=
-anges value from
-                                  =E2=80=989218868437227405314=E2=80=99 to =
-=E2=80=982=E2=80=99 [-Werror=3Doverflow]
-   89 | #define KVM_PFN_ERR_RO_FAULT (KVM_PFN_ERR_MASK + 2)
-      |                              ^
-virt/kvm/kvm_main.c:1935:9: note: in expansion of macro =E2=80=98KVM_PFN_ER=
-R_RO_FAULT=E2=80=99
-
-Cc: stable@vger.kernel.org
-Fixes: add6a0cd1c5b ("KVM: MMU: try to fix up page faults before giving up"=
-)
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-I don't actually know that it's possible for a remapped pfn to be a 64-bit
-value on a stock kernel.  But, backporting a one-liner is far easier and
-safer than trying to audit all possible flows.  :-)
-
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ee4ac2618ec5..001b9de4e727 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1906,7 +1906,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct =
-*vma,
- 			       bool write_fault, bool *writable,
- 			       kvm_pfn_t *p_pfn)
- {
--	unsigned long pfn;
-+	kvm_pfn_t pfn;
- 	pte_t *ptep;
- 	spinlock_t *ptl;
- 	int r;
---=20
-2.30.0.478.g8a0d178c01-goog
+T24gTW9uLCAyMDIxLTAyLTA4IGF0IDEyOjE1IC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBVc2UgaHZhX3QsIGEuay5hLiB1bnNpZ25lZCBsb25nLCBmb3IgdGhlIGxvY2FsIHZh
+cmlhYmxlIHRoYXQgaG9sZHMgdGhlDQo+IGh5cGVyY2FsbCBwYWdlIGFkZHJlc3MuICBPbiAzMi1i
+aXQgS1ZNLCBnY2MgY29tcGxhaW5zIGFib3V0IHVzaW5nIGEgdTY0DQo+IGR1ZSB0byB0aGUgaW1w
+bGljaXQgY2FzdCBmcm9tIGEgNjQtYml0IHZhbHVlIHRvIGEgMzItYml0IHBvaW50ZXIuDQo+IA0K
+PiAgIGFyY2gveDg2L2t2bS94ZW4uYzogSW4gZnVuY3Rpb24g4oCYa3ZtX3hlbl93cml0ZV9oeXBl
+cmNhbGxfcGFnZeKAmToNCj4gICBhcmNoL3g4Ni9rdm0veGVuLmM6MzAwOjIyOiBlcnJvcjogY2Fz
+dCB0byBwb2ludGVyIGZyb20gaW50ZWdlciBvZg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIGRpZmZlcmVudCBzaXplIFstV2Vycm9yPWludC10by1wb2ludGVyLWNhc3RdDQo+ICAgMzAw
+IHwgICBwYWdlID0gbWVtZHVwX3VzZXIoKHU4IF9fdXNlciAqKWJsb2JfYWRkciwgUEFHRV9TSVpF
+KTsNCg0KVGhhbmtzLg0KDQpBY2tlZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5j
+by51az4NCg0KPiBDYzogSm9hbyBNYXJ0aW5zIDxqb2FvLm0ubWFydGluc0BvcmFjbGUuY29tPg0K
+PiBDYzogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4NCj4gRml4ZXM6IDIzMjAw
+YjdhMzBkZSAoIktWTTogeDg2L3hlbjogaW50ZXJjZXB0IHhlbiBoeXBlcmNhbGxzIGlmIGVuYWJs
+ZWQiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xl
+LmNvbT4NCj4gLS0tDQo+ICBhcmNoL3g4Ni9rdm0veGVuLmMgfCA4ICsrKysrKy0tDQo+ICAxIGZp
+bGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAt
+LWdpdCBhL2FyY2gveDg2L2t2bS94ZW4uYyBiL2FyY2gveDg2L2t2bS94ZW4uYw0KPiBpbmRleCAy
+Y2VlMDM3NjQ1NWMuLmRlZGExYmE4YzE4YSAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3hl
+bi5jDQo+ICsrKyBiL2FyY2gveDg2L2t2bS94ZW4uYw0KPiBAQCAtMjg2LDggKzI4NiwxMiBAQCBp
+bnQga3ZtX3hlbl93cml0ZV9oeXBlcmNhbGxfcGFnZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2
+NCBkYXRhKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAxOw0KPiAg
+ICAgICAgICAgICAgICAgfQ0KPiAgICAgICAgIH0gZWxzZSB7DQo+IC0gICAgICAgICAgICAgICB1
+NjQgYmxvYl9hZGRyID0gbG0gPyBrdm0tPmFyY2gueGVuX2h2bV9jb25maWcuYmxvYl9hZGRyXzY0
+DQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgOiBrdm0tPmFyY2gueGVuX2h2
+bV9jb25maWcuYmxvYl9hZGRyXzMyOw0KPiArICAgICAgICAgICAgICAgLyoNCj4gKyAgICAgICAg
+ICAgICAgICAqIE5vdGUsIHRydW5jYXRpb24gaXMgYSBub24taXNzdWUgYXMgJ2xtJyBpcyBndWFy
+YW50ZWVkIHRvIGJlDQo+ICsgICAgICAgICAgICAgICAgKiBmYWxzZSBmb3IgYSAzMi1iaXQga2Vy
+bmVsLCBpLmUuIHdoZW4gaHZhX3QgaXMgb25seSA0IGJ5dGVzLg0KPiArICAgICAgICAgICAgICAg
+ICovDQo+ICsgICAgICAgICAgICAgICBodmFfdCBibG9iX2FkZHIgPSBsbSA/IGt2bS0+YXJjaC54
+ZW5faHZtX2NvbmZpZy5ibG9iX2FkZHJfNjQNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIDoga3ZtLT5hcmNoLnhlbl9odm1fY29uZmlnLmJsb2JfYWRkcl8zMjsNCj4gICAg
+ICAgICAgICAgICAgIHU4IGJsb2Jfc2l6ZSA9IGxtID8ga3ZtLT5hcmNoLnhlbl9odm1fY29uZmln
+LmJsb2Jfc2l6ZV82NA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgOiBrdm0t
+PmFyY2gueGVuX2h2bV9jb25maWcuYmxvYl9zaXplXzMyOw0KPiAgICAgICAgICAgICAgICAgdTgg
+KnBhZ2U7DQo+IC0tDQo+IDIuMzAuMC40NzguZzhhMGQxNzhjMDEtZ29vZw0KPiANCg0KCgoKQW1h
+em9uIERldmVsb3BtZW50IENlbnRyZSAoTG9uZG9uKSBMdGQuIFJlZ2lzdGVyZWQgaW4gRW5nbGFu
+ZCBhbmQgV2FsZXMgd2l0aCByZWdpc3RyYXRpb24gbnVtYmVyIDA0NTQzMjMyIHdpdGggaXRzIHJl
+Z2lzdGVyZWQgb2ZmaWNlIGF0IDEgUHJpbmNpcGFsIFBsYWNlLCBXb3JzaGlwIFN0cmVldCwgTG9u
+ZG9uIEVDMkEgMkZBLCBVbml0ZWQgS2luZ2RvbS4KCgo=
 
