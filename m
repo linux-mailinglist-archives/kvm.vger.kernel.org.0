@@ -2,182 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66A883137D1
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:32:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA3C731381D
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:37:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbhBHPcA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 10:32:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20916 "EHLO
+        id S234010AbhBHPgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 10:36:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54802 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232893AbhBHP3Y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 10:29:24 -0500
+        by vger.kernel.org with ESMTP id S232159AbhBHPel (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 10:34:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612798075;
+        s=mimecast20190719; t=1612798366;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Yq0Ti4bvg/0tu+i0KOgAFNuIbTb2acty2w5AsnsSKZY=;
-        b=PWULkhXprQIVP8ZmQNLRL+L0myAAwYNruM+8TBm9i3mMZTxxsJmhBkDdvvw8MzBS9R5IJ+
-        CqEHnBscPyALSGHrpMYL0HgMijoGp64MsrVa5MGDg+pGo5KVkpIj974pnOvso3o1uZlK76
-        v6ISsYT98djoLbADRFql+J4rtJhgNOg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-cXkYk-baOmOqIGYjRUMP7Q-1; Mon, 08 Feb 2021 10:27:54 -0500
-X-MC-Unique: cXkYk-baOmOqIGYjRUMP7Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76B6F107ACE3;
-        Mon,  8 Feb 2021 15:27:52 +0000 (UTC)
-Received: from [10.36.112.10] (ovpn-112-10.ams2.redhat.com [10.36.112.10])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 32EDE1002388;
-        Mon,  8 Feb 2021 15:27:47 +0000 (UTC)
-Subject: Re: [RFC v4 3/3] vfio: platform: reset: add msi support
-To:     Vikas Gupta <vikas.gupta@broadcom.com>, alex.williamson@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     vikram.prakash@broadcom.com, srinath.mannam@broadcom.com,
-        ashwin.kamath@broadcom.com, zachary.schroff@broadcom.com,
-        manish.kurup@broadcom.com
-References: <20201214174514.22006-1-vikas.gupta@broadcom.com>
- <20210129172421.43299-1-vikas.gupta@broadcom.com>
- <20210129172421.43299-4-vikas.gupta@broadcom.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <27d82212-0d68-3df8-8741-cd79a21f2b48@redhat.com>
-Date:   Mon, 8 Feb 2021 16:27:45 +0100
+        bh=3j7IDCtCgrVVxbDfUmZhTPgrXKWoZXIAfR3D/XPppB0=;
+        b=buSTZGTxbxJ7J9aZOU+R4lF9sl7n+qMonIoVtuW45I1eIn1MVSIRQVoSLfTOJYc9jDqooa
+        +I+Tty6CHusr6OiygZYfmdiQCD9btxlSTNXno5eWHKYRTp/vgCXPxStT6DUNRmbQezOlGH
+        9tNcLrlTboMhMsDXySveayKnuVYjjO0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-rAQJt2l-Mpqc8sr8gdfyLA-1; Mon, 08 Feb 2021 10:32:44 -0500
+X-MC-Unique: rAQJt2l-Mpqc8sr8gdfyLA-1
+Received: by mail-wr1-f69.google.com with SMTP id c9so2799151wrq.18
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 07:32:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3j7IDCtCgrVVxbDfUmZhTPgrXKWoZXIAfR3D/XPppB0=;
+        b=rduLsqNtXLp7lMl7Buxj1JR5rnYuywZNDGXgFJZrCs7ejMk77Uho1B1kB2G2DznXs5
+         XATtEZWNUrJS6c6P+wkG85KC1PHr94WqbdsAlgjznCgfkCE8pZ2v8J9uFhaPbPNAHr/k
+         /kxSsnRMWzxJLJmDNr50N4dN4mYmQMR0w/29frFMrqG1i70dFAW+A2ZMglD4zzKrQJfJ
+         i9zdtlvyW1DixOE8UGMVr0eFXLByb7xtRImmI4T0OwBhU1MRpoR2vXD/L+MUhZ/nT0yE
+         YJYfR3f5Hve9wc9dalhFMNQtK0bvNSVG7FskqhB7ManSfnVwNRLhe+V1r0+OeAuK8XOO
+         pglA==
+X-Gm-Message-State: AOAM531ki7/VjchgFy6NLfqN8r03FevWM2nw1SM/9TYS2FsZ3Vt5alVU
+        ONjffdQ5oAs+wvXHnG+wlvsYYlL9FUDwLtflZaWrhLiS/JjeQBBSbE+qnJiunMTCeTuZzKdg5eJ
+        SgvoRquGGQhGG
+X-Received: by 2002:adf:e511:: with SMTP id j17mr2012387wrm.251.1612798363039;
+        Mon, 08 Feb 2021 07:32:43 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwNv14P5B4oSXteUpoa8u5FTUNYABwIoLHt5oVH7X2toon9dAx2SPqJd1Tom+2DudYb9uJUSw==
+X-Received: by 2002:adf:e511:: with SMTP id j17mr2012357wrm.251.1612798362679;
+        Mon, 08 Feb 2021 07:32:42 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id m2sm20417012wml.34.2021.02.08.07.32.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Feb 2021 07:32:41 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Add new s390x targets to
+ run tests with TCG and KVM accel
+To:     Thomas Huth <thuth@redhat.com>,
+        Marcelo Bandeira Condotta <mbandeir@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Marcelo Bandeira Condotta <mcondotta@redhat.com>
+References: <20210208150227.178953-1-mbandeir@redhat.com>
+ <8f34cddf-84bf-0726-8074-1688974a74d8@redhat.com>
+ <6e56bdb9-72b4-369e-acb2-d5715e02ab92@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <344b1b84-8396-9df8-5c43-3f2538e7c89d@redhat.com>
+Date:   Mon, 8 Feb 2021 16:32:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210129172421.43299-4-vikas.gupta@broadcom.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <6e56bdb9-72b4-369e-acb2-d5715e02ab92@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Vikas,
-
-On 1/29/21 6:24 PM, Vikas Gupta wrote:
-> Add msi support for Broadcom FlexRm device.
+On 08/02/21 16:13, Thomas Huth wrote:
+> On 08/02/2021 16.07, Paolo Bonzini wrote:
+>> On 08/02/21 16:02, Marcelo Bandeira Condotta wrote:
+>>> From: Marcelo Bandeira Condotta <mcondotta@redhat.com>
+>>>
+>>> A new s390x z15 VM provided by IBM Community Cloud will be used to run
+>>> the s390x KVM Unit tests natively with both TCG and KVM accel options.
+>>>
+>>> Signed-off-by: Marcelo Bandeira Condotta <mbandeir@redhat.com>
+>>> ---
+>>>   .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+>>>   1 file changed, 28 insertions(+)
+>>>
+>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>> index d97e27e..bc7a115 100644
+>>> --- a/.gitlab-ci.yml
+>>> +++ b/.gitlab-ci.yml
+>>> @@ -155,3 +155,31 @@ cirrus-ci-macos-i386:
+>>>   cirrus-ci-macos-x86-64:
+>>>    <<: *cirrus_build_job_definition
+>>> +
+>>> +test-s390x-tcg:
+>>> +  stage: test
+>>> +  before_script: []
+>>> +  tags:
+>>> +    - s390x-z15-vm
+>>> +  script:
+>>> +    - ./configure --arch=s390x
+>>> +    - make -j2
+>>> +    - ACCEL=tcg ./run_tests.sh
+>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 
+>>> vector diag288
+>>> +     stsi sclp-1g sclp-3g
+>>> +     | tee results.txt
+>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
+>>> +
+>>> +test-s390x-kvm:
+>>> +  stage: test
+>>> +  before_script: []
+>>> +  tags:
+>>> +    - s390x-z15-vm
+>>> +  script:
+>>> +    - ./configure --arch=s390x
+>>> +    - make -j2
+>>> +    - ACCEL=kvm ./run_tests.sh
+>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 
+>>> vector diag288
+>>> +     stsi sclp-1g sclp-3g
+>>> +     | tee results.txt
+>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
 > 
-> Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-> ---
->  .../platform/reset/vfio_platform_bcmflexrm.c  | 72 ++++++++++++++++++-
->  1 file changed, 70 insertions(+), 2 deletions(-)
+> Acked-by: Thomas Huth <thuth@redhat.com>
 > 
-> diff --git a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-> index 96064ef8f629..6ca4ca12575b 100644
-> --- a/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-> +++ b/drivers/vfio/platform/reset/vfio_platform_bcmflexrm.c
-> @@ -21,7 +21,9 @@
->  #include <linux/init.h>
->  #include <linux/io.h>
->  #include <linux/kernel.h>
-> +#include <linux/msi.h>
->  #include <linux/module.h>
-> +#include <linux/vfio.h>
->  
->  #include "../vfio_platform_private.h"
->  
-> @@ -33,6 +35,9 @@
->  #define RING_VER					0x000
->  #define RING_CONTROL					0x034
->  #define RING_FLUSH_DONE					0x038
-> +#define RING_MSI_ADDR_LS				0x03c
-> +#define RING_MSI_ADDR_MS				0x040
-> +#define RING_MSI_DATA_VALUE				0x064
->  
->  /* Register RING_CONTROL fields */
->  #define CONTROL_FLUSH_SHIFT				5
-> @@ -105,8 +110,71 @@ static int vfio_platform_bcmflexrm_reset(struct vfio_platform_device *vdev)
->  	return ret;
->  }
->  
-> -module_vfio_reset_handler("brcm,iproc-flexrm-mbox",
-> -			  vfio_platform_bcmflexrm_reset);
-> +static u32 bcm_num_msi(struct vfio_platform_device *vdev)
-Please use the same prefix as for reset, ie. vfio_platform_bcmflexrm_get_msi
-> +{
-> +	struct vfio_platform_region *reg = &vdev->regions[0];> +
-> +	return (reg->size / RING_REGS_SIZE);
-> +}
-> +
-> +static void bcm_write_msi(struct vfio_platform_device *vdev,
-vfio_platform_bcmflexrm_msi_write?
-> +		struct msi_desc *desc,
-> +		struct msi_msg *msg)
-> +{
-> +	int i;
-> +	int hwirq = -1;
-> +	int msi_src;
-> +	void __iomem *ring;
-> +	struct vfio_platform_region *reg = &vdev->regions[0];
-> +
-> +	if (!reg)
-> +		return;
-why do you need this check? For this to be called, SET_IRQ IOCTL must
-have been called. This can only happen after vfio_platform_open which
-first calls vfio_platform_regions_init and then vfio_platform_irq_init
-> +
-> +	for (i = 0; i < vdev->num_irqs; i++)
-> +		if (vdev->irqs[i].type == VFIO_IRQ_TYPE_MSI)
-> +			hwirq = vdev->irqs[i].ctx[0].hwirq;
-nit: It would have been easier to record in vdev the last index of wired
-interrupts and just add the index of the MSI
-> +
-> +	if (hwirq < 0)
-> +		return;
-> +
-> +	msi_src = desc->irq - hwirq;
-> +
-> +	if (!reg->ioaddr) {
-> +		reg->ioaddr = ioremap(reg->addr, reg->size);
-> +		if (!reg->ioaddr)
-pr_warn_once("")?
-> +			return;
-> +	}
-> +
-> +	ring = reg->ioaddr + msi_src * RING_REGS_SIZE;
-> +
-> +	writel_relaxed(msg->address_lo, ring + RING_MSI_ADDR_LS);
-> +	writel_relaxed(msg->address_hi, ring + RING_MSI_ADDR_MS);
-> +	writel_relaxed(msg->data, ring + RING_MSI_DATA_VALUE);
-> +}
-> +
-> +static struct vfio_platform_reset_node vfio_platform_bcmflexrm_reset_node = {
-> +	.owner = THIS_MODULE,
-> +	.compat = "brcm,iproc-flexrm-mbox",
-> +	.of_reset = vfio_platform_bcmflexrm_reset,
-> +	.of_get_msi = bcm_num_msi,
-> +	.of_msi_write = bcm_write_msi
-> +};
-> +
-> +static int __init vfio_platform_bcmflexrm_reset_module_init(void)
-> +{
-> +	__vfio_platform_register_reset(&vfio_platform_bcmflexrm_reset_node);
-> +
-> +	return 0;
-> +}
-> +
-> +static void __exit vfio_platform_bcmflexrm_reset_module_exit(void)
-> +{
-> +	vfio_platform_unregister_reset("brcm,iproc-flexrm-mbox",
-> +				       vfio_platform_bcmflexrm_reset);
-> +}
-> +
-> +module_init(vfio_platform_bcmflexrm_reset_module_init);
-> +module_exit(vfio_platform_bcmflexrm_reset_module_exit);
->  
->  MODULE_LICENSE("GPL v2");
->  MODULE_AUTHOR("Anup Patel <anup.patel@broadcom.com>");
+>>
+>> So it will have a custom runner?  That's nice!
+>>
+>> Do you have an example run already?
 > 
+> I've been in touch with Marcelo during the past days already, and I've 
+> already registered the runner that he set up on the s390x machine, so it 
+> should theoretically work now once this patch has been merged.
 
-I think you should move the whole series in PATCH now.
+What's the reason to add test-s390x-tcg?  It would really cover only a 
+different TCG backend.
 
-Thanks
-
-Eric
+Paolo
 
