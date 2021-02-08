@@ -2,80 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13C60313B30
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 18:43:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45027313B9E
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 18:53:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233158AbhBHRmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 12:42:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55664 "EHLO
+        id S233744AbhBHRxc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 12:53:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234723AbhBHRkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 12:40:24 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C9CAC061788;
-        Mon,  8 Feb 2021 09:39:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=2LaNn/qF13ah973xAp5scg/XoCXhEtsM5ZWpiwsnd4Q=; b=hyYX+n70bqbLDJg9Sqx10LdePn
-        jbkVmtfoZx7vzottT/YxNc/v0guqB0G0eHUBAtuhfQNUUlUW3m6jk6e2CvOuWw3zpIyOqOl53SQ1W
-        ih2oN1FeVLsRoPrZOtiVvkuCaTg4AMNXlbQGNZjDFL1jR2kF1ibYPt5RWQVpLZlaDwD3Jf42O269r
-        7VIP7AcZmCAbSYvo3wPj2uLetU/4uTgfM/gtpHZBWf4DF0DjZ0+HgpRquHFYh1MVjaDLnuD3p0up1
-        2ImztteZI+qFVTakUg6I8H8jv352DUazF8XIF4cnBzuBwbYV2oqLrByIqf5g1cpTphNlYcXlZ6g2+
-        W0LzlqPg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l9AVc-006IA0-Vy; Mon, 08 Feb 2021 17:39:39 +0000
-Date:   Mon, 8 Feb 2021 17:39:36 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jgg@ziepe.ca,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
-        dan.j.williams@intel.com
-Subject: Re: [PATCH 1/2] mm: provide a sane PTE walking API for modules
-Message-ID: <20210208173936.GA1496438@infradead.org>
-References: <20210205103259.42866-1-pbonzini@redhat.com>
- <20210205103259.42866-2-pbonzini@redhat.com>
+        with ESMTP id S233747AbhBHRvz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 12:51:55 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92801C06178B
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 09:43:36 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id t25so10706869pga.2
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 09:43:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RxLUe7o0XBsEMnyZ2ayM5Zt5mnJyMnV0qymbKsVL5xI=;
+        b=Fl/ILLaQ27dYD+8sqFnFsVrXGNE10dTiegetvaiJTd8Yx6XriE47wKym0jVJrTwrHf
+         BmXGbYYJjosrvsmaLpdY3H9q8eF58k8PP1WFfWPi2qffZgrb0bNsvXa+VX5kf/QlqCkg
+         zW4C1Pgh1YcHlMdx2FTREafj2nwr2qb8xCxF5CC0JuF7pQad93EkK6uHwL4TQ0IkiiDw
+         FJr4HH2jpQqHubAZoiIhJicivZ4xX7kULKs7IFpO3L7Vq8FbOv9flC917FeP7y19cUoB
+         3oGKpOxnPKNDCLpYb9Q629nRD1dx2AcBjTiqkhi/qvw1ElSP4jICnl2jLeWyNUPnju0P
+         Zh+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RxLUe7o0XBsEMnyZ2ayM5Zt5mnJyMnV0qymbKsVL5xI=;
+        b=BEE1DDTMb6TpCqnGNeFahKUjjo6g7uXKZDuSQPeE/RAb+10+iPg8H5sVS92JTGxu+Z
+         dXQdrkCPH0GPUmx/ipu0bbyuo6tr/YLqCGReADyawQaI12IBEUOaG1YE2fQK/Gd76sG3
+         bbPe5nOnl7xnJw8K1+MdIZZgb145v6Sn7mGTXY+eES58LkCthZcmeMALe+tuHf8cw3wM
+         45u9b4yrLLqPKFie9WBHFiIxPKAD95N3IhVadLgXyTjdijZQTGu3CzIGoaSVWzgFy3LR
+         wg44du/hIFGVD9lmQ0D7zzVEHHmnucHjlptdsqKQclMjMxZvcxPTeiALLKOA9x4NIoqJ
+         EUEA==
+X-Gm-Message-State: AOAM531mWtt2ue/wA6vT+vnmqPaO1zQy8FbzkhKTZgrlO4JFLfW3N/Qe
+        VS1AfoS/OWPIwaTfNTeCd4OZ1w==
+X-Google-Smtp-Source: ABdhPJzgH48OCVyI5hH228/HKK7dPLNGjKP1Ay4WnHabg31jANO3Rit48bQBOUDkqOCYP8c+u+pspQ==
+X-Received: by 2002:a62:8cd7:0:b029:1d9:447c:e21a with SMTP id m206-20020a628cd70000b02901d9447ce21amr14414194pfd.2.1612806215874;
+        Mon, 08 Feb 2021 09:43:35 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:e4db:abc1:a5c0:9dbc])
+        by smtp.gmail.com with ESMTPSA id c18sm9730201pfo.171.2021.02.08.09.43.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Feb 2021 09:43:35 -0800 (PST)
+Date:   Mon, 8 Feb 2021 09:43:28 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yanan Wang <wangyanan55@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Subject: Re: [RFC PATCH 1/2] KVM: selftests: Add a macro to get string of
+ vm_mem_backing_src_type
+Message-ID: <YCF4QCPtSEFg3Qv4@google.com>
+References: <20210208090841.333724-1-wangyanan55@huawei.com>
+ <20210208090841.333724-2-wangyanan55@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210205103259.42866-2-pbonzini@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210208090841.333724-2-wangyanan55@huawei.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +int follow_invalidate_pte(struct mm_struct *mm, unsigned long address,
-> +			  struct mmu_notifier_range *range, pte_t **ptepp, pmd_t **pmdpp,
-> +			  spinlock_t **ptlp);
+On Mon, Feb 08, 2021, Yanan Wang wrote:
+> Add a macro to get string of the backing source memory type, so that
+> application can add choices for source types in the help() function,
+> and users can specify which type to use for testing.
+> 
+> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
+>  tools/testing/selftests/kvm/lib/kvm_util.c     | 8 ++++++++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 5cbb861525ed..f5fc29dc9ee6 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -69,7 +69,9 @@ enum vm_guest_mode {
+>  #define PTES_PER_MIN_PAGE	ptes_per_page(MIN_PAGE_SIZE)
+>  
+>  #define vm_guest_mode_string(m) vm_guest_mode_string[m]
+> +#define vm_mem_backing_src_type_string(s) vm_mem_backing_src_type_string[s]
 
-This adds a very pointless overy long line.
+Oof, I see this is just following vm_guest_mode_string.  IMO, defining the
+string to look like a function is unnecessary and rather mean.
 
-> +/**
-> + * follow_pte - look up PTE at a user virtual address
-> + * @vma: memory mapping
-> + * @address: user virtual address
-> + * @ptepp: location to store found PTE
-> + * @ptlp: location to store the lock for the PTE
-> + *
-> + * On a successful return, the pointer to the PTE is stored in @ptepp;
-> + * the corresponding lock is taken and its location is stored in @ptlp.
-> + * The contents of the PTE are only stable until @ptlp is released;
-> + * any further use, if any, must be protected against invalidation
-> + * with MMU notifiers.
-> + *
-> + * Only IO mappings and raw PFN mappings are allowed.  The mmap semaphore
-> + * should be taken for read.
-> + *
-> + * Return: zero on success, -ve otherwise.
-> + */
-> +int follow_pte(struct mm_struct *mm, unsigned long address,
-> +	       pte_t **ptepp, spinlock_t **ptlp)
-> +{
-> +	return follow_invalidate_pte(mm, address, NULL, ptepp, NULL, ptlp);
-> +}
-> +EXPORT_SYMBOL_GPL(follow_pte);
+>  extern const char * const vm_guest_mode_string[];
+> +extern const char * const vm_mem_backing_src_type_string[];
+>  
+>  struct vm_guest_mode_params {
+>  	unsigned int pa_bits;
+> @@ -83,6 +85,7 @@ enum vm_mem_backing_src_type {
+>  	VM_MEM_SRC_ANONYMOUS,
+>  	VM_MEM_SRC_ANONYMOUS_THP,
+>  	VM_MEM_SRC_ANONYMOUS_HUGETLB,
+> +	NUM_VM_BACKING_SRC_TYPES,
+>  };
+>  
+>  int kvm_check_cap(long cap);
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index fa5a90e6c6f0..a9b651c7f866 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -165,6 +165,14 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>  	       "Missing new mode params?");
+>  
+> +const char * const vm_mem_backing_src_type_string[] = {
 
-I still don't think this is good as a general API.  Please document this
-as KVM only for now, and hopefully next merge window I'll finish an
-export variant restricting us to specific modules.
+A shorter name would be nice, though I don't have a good suggestion.
+
+> +	"VM_MEM_SRC_ANONYMOUS        ",
+> +	"VM_MEM_SRC_ANONYMOUS_THP    ",
+> +	"VM_MEM_SRC_ANONYMOUS_HUGETLB",
+
+It'd be more robust to explicitly assign indices, that way tweaks to
+vm_mem_backing_src_type won't cause silent breakage.  Ditto for the existing
+vm_guest_mode_string.
+
+E.g. I think something like this would work (completely untested)
+
+const char *vm_guest_mode_string(int i)
+{
+	static const char *const strings[] = {
+		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
+		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
+		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
+		[VM_MODE_P48V48_64K]	= "PA-bits:48,  VA-bits:48, 64K pages",
+		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
+		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
+		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
+	};
+
+	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
+		       "Missing new mode strings?");
+
+	TEST_ASSERT(i < NUM_VM_MODES);
+
+	return strings[i];
+}
+
+
+> +};
+> +_Static_assert(sizeof(vm_mem_backing_src_type_string)/sizeof(char *) == NUM_VM_BACKING_SRC_TYPES,
+> +	       "Missing new source type strings?");
+> +
+>  /*
+>   * VM Create
+>   *
+> -- 
+> 2.23.0
+> 
