@@ -2,132 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B02313E20
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:54:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FCE9313E1D
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:54:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233895AbhBHSx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 13:53:58 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:60334 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233253AbhBHSwh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 13:52:37 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.93.0.4)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1l9BdK-00044c-5D; Mon, 08 Feb 2021 19:51:38 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] KVM: x86/mmu: Make HVA handler retpoline-friendly
-Date:   Mon,  8 Feb 2021 19:51:32 +0100
-Message-Id: <732d3fe9eb68aa08402a638ab0309199fa89ae56.1612810129.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.30.0
+        id S233747AbhBHSxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 13:53:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235832AbhBHSwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 13:52:16 -0500
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B09C061786
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 10:51:34 -0800 (PST)
+Received: by mail-qk1-x734.google.com with SMTP id d85so15503232qkg.5
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:51:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FREB4k4pL+/EwQVi/jq4eIfgwfGwgd8/O2V49WmG3yI=;
+        b=ayKBiVUeDmZgutOHEL4vMvTvHca+pVKQbcb658vawwG09uauE5m3ic5gN6c9JkzeTX
+         HGjYLobolsvKN/n9h49zmwT9Nf+FhGtdx+spz++X3Q0NB3znozLYOu+Qdt8ShcpBJ7gJ
+         Wgoe4nJSIHNuvgGHCdn9+HAGCM3L8K90nEXC7tOC9Ht1wLXziklRqWIiN7+njvhCJxGV
+         u8wDnYz+fsyNBQKkwR8jDwcXvXBHHeXX/L28GBohrBDWsLiCtakt8qbuEYDTbHafl2NP
+         jN6MmoSdE5Gryh2iz+rHB+pGMoQ2Q/eY5JpUSeBnyruSNGaJ1wjwA5t8B4qAF5p52D2d
+         jb5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FREB4k4pL+/EwQVi/jq4eIfgwfGwgd8/O2V49WmG3yI=;
+        b=oCQ5W6GCQ0GbtYEuKtVTCh5pxq4lvPgiSYVx643DYWmE+9FxxwxDwtHThy8NrTmcIT
+         S1iOvjg1FvgJeFpRQiG6gHgBq2BZGpG2dfKEj7gE7rrarW3lUcyp8OlQi2Yhs79e9vIW
+         nlI4EXxiZWuFhGrEzVblj7NbN4rYXdiKu3Lrxo+p252Qt/2avNYRVO/DO2zbSUAtxfly
+         sMXiPnl9H6XeFqJl+d51ZQteaZO/W4uEBHUdRoIDHtJom1xrJAxYXsZuVbWPblEjkvf6
+         wid0TeX8k1k1fmNzy59diaQ0hD36jUWQKrEicIfkE+mZUai2vYPUKsIehDft2S+5f7UQ
+         9yNg==
+X-Gm-Message-State: AOAM532iMj8MDHRUBiIEmy5Lozik7jiDfry2YHfxvCG4jsPp+aZ7mdbf
+        j9D0ULnAA6oblRf1EpXZ4YlNJg==
+X-Google-Smtp-Source: ABdhPJyWgaNBTCVawkQVPK0b06TB5cBGj1xy2Hg+/c/xFkZeuj/u1FCWtQfIhSeg/PKdKxAppdWkGg==
+X-Received: by 2002:a37:5905:: with SMTP id n5mr18045893qkb.191.1612810294198;
+        Mon, 08 Feb 2021 10:51:34 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
+        by smtp.gmail.com with ESMTPSA id w188sm17159979qkc.19.2021.02.08.10.51.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Feb 2021 10:51:33 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1l9BdF-0052Tc-8p; Mon, 08 Feb 2021 14:51:33 -0400
+Date:   Mon, 8 Feb 2021 14:51:33 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Peter Xu <peterx@redhat.com>, dan.j.williams@intel.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH 0/2] KVM: do not assume PTE is writable after follow_pfn
+Message-ID: <20210208185133.GW4718@ziepe.ca>
+References: <20210205103259.42866-1-pbonzini@redhat.com>
+ <20210205181411.GB3195@xz-x1>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210205181411.GB3195@xz-x1>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Fri, Feb 05, 2021 at 01:14:11PM -0500, Peter Xu wrote:
 
-When retpolines are enabled they have high overhead in the inner loop
-inside kvm_handle_hva_range() that iterates over the provided memory area.
+> But I do have a question on why dax as the only user needs to pass in the
+> notifier to follow_pte() for initialization.
 
-Let's mark this function and its TDP MMU equivalent __always_inline so
-compiler will be able to change the call to the actual handler function
-inside each of them into a direct one.
+Not sure either, why does DAX opencode something very much like
+page_mkclean() with dax_entry_mkclean()?
 
-This significantly improves performance on the unmap test on the existing
-kernel memslot code (tested on a Xeon 8167M machine):
-30 slots in use:
-Test       Before   After     Improvement
-Unmap      0.0353s  0.0334s   5%
-Unmap 2M   0.00104s 0.000407s 61%
+Also it looks like DAX uses the wrong notifier, it calls
+MMU_NOTIFY_CLEAR but page_mkclean_one() uses
+MMU_NOTIFY_PROTECTION_PAGE for the same PTE modification sequence??
 
-509 slots in use:
-Test       Before   After     Improvement
-Unmap      0.0742s  0.0740s   None
-Unmap 2M   0.00221s 0.00159s  28%
+page_mkclean() has some technique to make the notifier have the right
+size without becoming entangled in the PTL locks..
 
-Looks like having an indirect call in these functions (and, so, a
-retpoline) might have interfered with unrolling of the whole loop in the
-CPU.
-
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
-Changes from v1:
-    * Switch from static dispatch to __always_inline annotation.
-    
-    * Separate this patch from the rest of log(n) memslot code changes.
-    
-    * Redo benchmarks.
-
- arch/x86/kvm/mmu/mmu.c     | 21 +++++++++++----------
- arch/x86/kvm/mmu/tdp_mmu.c | 16 +++++++++++-----
- 2 files changed, 22 insertions(+), 15 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6d16481aa29d..38d7a38609d4 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1456,16 +1456,17 @@ static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
- 	     slot_rmap_walk_okay(_iter_);				\
- 	     slot_rmap_walk_next(_iter_))
- 
--static int kvm_handle_hva_range(struct kvm *kvm,
--				unsigned long start,
--				unsigned long end,
--				unsigned long data,
--				int (*handler)(struct kvm *kvm,
--					       struct kvm_rmap_head *rmap_head,
--					       struct kvm_memory_slot *slot,
--					       gfn_t gfn,
--					       int level,
--					       unsigned long data))
-+static __always_inline int
-+kvm_handle_hva_range(struct kvm *kvm,
-+		     unsigned long start,
-+		     unsigned long end,
-+		     unsigned long data,
-+		     int (*handler)(struct kvm *kvm,
-+				    struct kvm_rmap_head *rmap_head,
-+				    struct kvm_memory_slot *slot,
-+				    gfn_t gfn,
-+				    int level,
-+				    unsigned long data))
- {
- 	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b56d604809b8..f26c2269291f 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -639,11 +639,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
- 	return ret;
- }
- 
--static int kvm_tdp_mmu_handle_hva_range(struct kvm *kvm, unsigned long start,
--		unsigned long end, unsigned long data,
--		int (*handler)(struct kvm *kvm, struct kvm_memory_slot *slot,
--			       struct kvm_mmu_page *root, gfn_t start,
--			       gfn_t end, unsigned long data))
-+static __always_inline int
-+kvm_tdp_mmu_handle_hva_range(struct kvm *kvm,
-+			     unsigned long start,
-+			     unsigned long end,
-+			     unsigned long data,
-+			     int (*handler)(struct kvm *kvm,
-+					    struct kvm_memory_slot *slot,
-+					    struct kvm_mmu_page *root,
-+					    gfn_t start,
-+					    gfn_t end,
-+					    unsigned long data))
- {
- 	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
+Jason
