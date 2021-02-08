@@ -2,372 +2,387 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13630312760
-	for <lists+kvm@lfdr.de>; Sun,  7 Feb 2021 21:17:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA486312899
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 01:30:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbhBGUQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Feb 2021 15:16:52 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:34808 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbhBGUQs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Feb 2021 15:16:48 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 117KFPws138170;
-        Sun, 7 Feb 2021 20:15:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=n9FKvLQAeczvZoswT61qOyu+7DB7dC4v0hm4srGbWLw=;
- b=DxBWega8JtxbrotR/g7lUJFNMHpkcMS6X0K6pRhUF9UAlzH6J7xiv//LIuN9L+SIxZ8v
- 7aMkD/RIdX1OETmH6p1E/vLQk8Rm6gICYp67vaPXr1tiYR+Y+EhZInJUfwd4AnsDoACM
- B20r9Ylg5Q6rwed5U3lPHG+AP+F9teCkDYoyex6ZOwvR5ZMBaN2z4SdvfzFlW/opRIRf
- s12/kHqtYZhCpvnTaD7gx1c+RMCryteVjU3yx4+9nM9YIjvb3qBwY0hw0EQQD44B78LY
- YRDYTVMf+mmcSmyghccYstv2RUv8DaPE9FhH7vDYArhm1Vz7dVPdxOZuiRphfDyFKnhM gw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 36hjhqj988-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Feb 2021 20:15:55 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 117K6WbJ139925;
-        Sun, 7 Feb 2021 20:15:55 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2052.outbound.protection.outlook.com [104.47.36.52])
-        by userp3020.oracle.com with ESMTP id 36j4vp3a7s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Feb 2021 20:15:55 +0000
+        id S229623AbhBHAaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Feb 2021 19:30:02 -0500
+Received: from mail-bn7nam10on2043.outbound.protection.outlook.com ([40.107.92.43]:52288
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229537AbhBHA37 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Feb 2021 19:29:59 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mto68rbIBmhEvT27m9lXhE3u6WC461JFsV8PDuRLb7EBwdnugSNzILLzmwG6Z/jsgxvu220T3yAgo915kZ5/oWA+hgbfSFv86ingUyHT/A75xE6Dds35nLl+NVazKFz9SRlmECgQ1f7CPqut6+FAKfwR3toVFjL8KLogYumthTv6zDrYeBRexIEZgHphMb54ZydIAWyzU2CPnHnei21l7hbbdEIxWlBHoUwepU6nQZ2L9kMdK9YU4ES+uKO9bbpBS+trS5rlxAjWSAcyaVUTBWK3aUiYpojTVju9IHbAljleAirfrn9yNlsepou9Sjo2t73uR+gik96aaYiE9pduTg==
+ b=OvliGbjSKML3hHU1ziZpc87upRsWP20gO/VAFCk2ElhbKpV4UH9ws1yJsJ9RBXMWzgEUYQXC1TQEt4q6aIXgqa/qMcyuzib86T7flU1ZeOnCd4YvYGT4XhO5KhntlGrcxPU5GI0JFk28Fk+2mQUSVKUeXxRNRMBQJHaGOAiJTFJtW9cGDHpoPp0Vnv3lzuNlfcstrumlN8OhqlR/XJeRCt8gFu9rp74Fl0WPT3NVUgmM9jaCHPsZIsBniAu4WrUUFYKb+FNfkrU9WP1BIAYHhYh9Jci1FwhjdBCaX0bUgMEYJlwjJp2WYdoXchiYHaxpQwtgRhcaEJV6CLM4v94lHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n9FKvLQAeczvZoswT61qOyu+7DB7dC4v0hm4srGbWLw=;
- b=ZzcLJJYr2Moxy63pAk60QVTHWaKyXGg37XAVd0HLH97Ur/sJlwBMpSyODvVwtCbS2iTSVKSv3Y16vMpvxEGcvHZXd1zoXqVJ6rtRwRNW2HuKGQDuqL0HD0lK8r3L9BTDeVS2NsJf3uHPrxddF/6yMqe2EzjtyLEqlkkXO8erStP6XMjlVJ6u/fJiEUY3Ao5r5I5GA601UC2ZRmt3BTbJ6w6/NOukIAyaK15PzYQkI3yUCz9FHqrqjdvKebcnAn7j+au+gr0lHVfAbVBQ0ogrLqe6Sw/p1JbSW35yk7pUf/E+5IMJBJXZWveQtQn6DelIvzmiIG9WQQ9SQz9QlPLVYQ==
+ bh=AcKarMma6MbwIV8q50f3jfXPMoMybq1rogB4UqTMIPQ=;
+ b=Gqi6Oa5Ypc9lm0YPqAeIFPrWwnApUfp/ucivyi+jdIS1r/HjM+SLVdvDYMqJ3VW/tECHvOs6jNdzwTYZf3t4alnHUunRLvKu/zMOGaaYeAP91+arVoe1nHk8B7y+Gv9iRluclcIjGs6sQ/2Rfge8Kvv6C6HSZCKvl41mtXhMYquk6v0aQYNkM4WVvuQ8JGEfoGHvttPkSt8xnKVnZR+SWP/hXecHWEuEvRNPIVwQZ9ylFoyUTHpfUmJnpo12oTRNiU6GBMNZHffnTxvG6zhvddx7aCcto5WZhQlHy1n4NSH8p4Ic8xUDFr9TymGbHwwhqBBL4FE/IMORGnawpltGbg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n9FKvLQAeczvZoswT61qOyu+7DB7dC4v0hm4srGbWLw=;
- b=xsG3Z9DIf5RLV+VCqXtE5MJonwkoBGQRk3ssx+h1WAG9Apxutt8+i+Vjsb4yIkY82Tt6J/VT4xuJu8DbXlxg69q9qrm3mSHJu9cYmIX6/UJW1j0P+RV/oeAoiV0QCvBFfvHxVbiRbNQHeRA0tI4Uo4RNqnOsr4WnbNhpzCZQw48=
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com (2603:10b6:a02:a9::20)
- by SJ0PR10MB4590.namprd10.prod.outlook.com (2603:10b6:a03:2d1::6) with
+ bh=AcKarMma6MbwIV8q50f3jfXPMoMybq1rogB4UqTMIPQ=;
+ b=G5fH+w6BFGL/En++GjajdlOh9oTiaWAzUJAFKNIMb3b9iG4IIotBcmP/NcfckbkfXyvJpFD9MutE0S5EHUrUMjcUo1jk3gT5b5Cuv+DRJSp4uL98qunTtZm6Tq7JKZYVt8DttqiB2ludHiQidhtUGU9jxaQQ3ug+6han2SOKnjA=
+Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN1PR12MB2368.namprd12.prod.outlook.com (2603:10b6:802:32::23) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.20; Sun, 7 Feb
- 2021 20:15:53 +0000
-Received: from BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::b52e:bdd3:d193:4d14]) by BYAPR10MB2663.namprd10.prod.outlook.com
- ([fe80::b52e:bdd3:d193:4d14%7]) with mapi id 15.20.3825.030; Sun, 7 Feb 2021
- 20:15:53 +0000
-Subject: Re: [vdpa_sim_net] 79991caf52:
- net/ipv4/ipmr.c:#RCU-list_traversed_in_non-reader_section
-To:     kernel test robot <oliver.sang@intel.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, Eli Cohen <elic@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
-        lkp@intel.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, pbonzini@redhat.com,
-        stefanha@redhat.com, joe.jin@oracle.com,
-        aruna.ramakrishna@oracle.com
-References: <20210207030330.GB17282@xsang-OptiPlex-9020>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <3f5124a2-6dab-6bf0-1e40-417962a45d10@oracle.com>
-Date:   Sun, 7 Feb 2021 12:15:51 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
-In-Reply-To: <20210207030330.GB17282@xsang-OptiPlex-9020>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [2601:646:c303:6700::a4a4]
-X-ClientProxiedBy: BYAPR02CA0037.namprd02.prod.outlook.com
- (2603:10b6:a03:54::14) To BYAPR10MB2663.namprd10.prod.outlook.com
- (2603:10b6:a02:a9::20)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17; Mon, 8 Feb
+ 2021 00:29:03 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3825.030; Mon, 8 Feb 2021
+ 00:29:03 +0000
+Date:   Mon, 8 Feb 2021 00:28:58 +0000
+From:   Ashish Kalra <ashish.kalra@amd.com>
+To:     Steve Rutherford <srutherford@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 12/16] KVM: x86: Introduce new
+ KVM_FEATURE_SEV_LIVE_MIGRATION feature & Custom MSR.
+Message-ID: <20210208002858.GA23612@ashkalra_ubuntu_server>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <bb86eda2963d7bef0c469c1ef8d7b32222e3a145.1612398155.git.ashish.kalra@amd.com>
+ <CABayD+fBrNA_Oz542D5zoLqoispQG=1LWgHt2b5vr8hTMOveOQ@mail.gmail.com>
+ <20210205030753.GA26504@ashkalra_ubuntu_server>
+ <CABayD+eVwUsnB9pt+GA92uJis5dEGZ=zcrzraaR8_=YhuLTntg@mail.gmail.com>
+ <20210206054617.GA19422@ashkalra_ubuntu_server>
+ <20210206135646.GA21650@ashkalra_ubuntu_server>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210206135646.GA21650@ashkalra_ubuntu_server>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Originating-IP: [165.204.77.1]
+X-ClientProxiedBy: SA0PR13CA0003.namprd13.prod.outlook.com
+ (2603:10b6:806:130::8) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [IPv6:2601:646:c303:6700::a4a4] (2601:646:c303:6700::a4a4) by BYAPR02CA0037.namprd02.prod.outlook.com (2603:10b6:a03:54::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Sun, 7 Feb 2021 20:15:52 +0000
+Received: from ashkalra_ubuntu_server (165.204.77.1) by SA0PR13CA0003.namprd13.prod.outlook.com (2603:10b6:806:130::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.11 via Frontend Transport; Mon, 8 Feb 2021 00:29:02 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3edfe2e2-6469-4590-fe68-08d8cba52b29
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB4590:
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 52e7a6ad-8d21-4ce0-cf47-08d8cbc88922
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2368:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SJ0PR10MB4590C20388B0D4FFB2CB089DF0B09@SJ0PR10MB4590.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-Microsoft-Antispam-PRVS: <SN1PR12MB2368B19C8FEF9AA26F76D2A38E8F9@SN1PR12MB2368.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8bDo9aVN3sQpPWTrEbNCSrsr1YoteL6k4MuJjrgQbg6Q6pqj4qVyJ6VmH0mTcrC7XznChmkyM615s1IetZ7MRjuJ273rUUO1TljsO+6RHC33b8Guu4zLuR3b8JqR1L0rTrbQ+huOdTocHrVCMMeNx0Y4JDBVd6zoFw+lmF35DuhwBhwj4CERWorzWbJCat/3suTe/XzdvNXyb5zKdSZzzwHmz4DId4tc2wjqritELIN5Bz2aPNBJS5U9wi/8l4vQujKSiauBlaOep2y+/wqa/0MnovHrEmB5V/2QnLpTNMHkBJuP1Vy/WsSgffrh24psUkZz3EdpVelgL8V5DYkWqQ1OVEvRU/+9l8KxAtoTHp4Fdb3CYJJKdPIRYseSrO8z8gVSNm+E7suAQuDe4IlKArzbjDz8KyG+LMdxynoHro5FJEmiOivteC8+mRN7bjamjK0bxocn+kBvwpZ8hOStDMGYNUygqd6dH49ekapyIBbDltZ6mzJk4gt/wa+Bj2RRcLdjkId3OAJTO/lgvsIcDQsptCOYfRE4faeGDTkhjlfU1r07umY6S3zRXc4trq00lzy9qvKBAE59kiTkdT6QYFYRTHlubkY0COeMmXlvWTAXOcTv3vqCAxe2/BRPlpVa0ITNT6ZgzCbkurT2nG4ic5UuM7dVN77/5mcrjeu166TYISi815p4In0ls67DW2V3
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR10MB2663.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(136003)(366004)(346002)(376002)(39860400002)(16526019)(478600001)(4326008)(66946007)(83380400001)(66476007)(66556008)(966005)(186003)(86362001)(107886003)(8676002)(31686004)(44832011)(6916009)(316002)(8936002)(54906003)(53546011)(2906002)(7416002)(31696002)(5660300002)(6486002)(2616005)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?Windows-1252?Q?ndbBgHnGJpRApKE9pSQxHkuMv2B9c7oOwrw9pj9xnnbGdLvV66ufJLLB?=
- =?Windows-1252?Q?qmvY4SBVQ20KDvxGLkr6WeT7fPcCoKQiqhUxcsDepZqUxGCJwM/KMu2R?=
- =?Windows-1252?Q?gSprvDDqddt2tOvHahtzncsDarcWouCWPv28tEtqLJxZZ1sLYTiGgkN8?=
- =?Windows-1252?Q?M4tmCCrz4uvQz8qZMeXgCqc9pTYkRfMzfkAKIKRaGj6QvciKDBhQiP6E?=
- =?Windows-1252?Q?L1pBXg4EM6meDD24xR87WdU5FFsjqoFi1EjQ5NXoZI//zmJVgwTOibxg?=
- =?Windows-1252?Q?CxxDANxbxCqZs7XJAzvmfrxH31rRPHdkBghTfF9asevsqOuqPBWlU72z?=
- =?Windows-1252?Q?7+p8HgRywyFEpLIZTzM01jiUsWXkg6eyo2nzC3Yu4ZnP4HZCLlfRMAvJ?=
- =?Windows-1252?Q?IHYjayoVkyGFN9/xiOKgHLPZXcTI6xlP3URT+wVKQN7LJGUrhXnv74q1?=
- =?Windows-1252?Q?DiVK0PMpzJxUJUEkE1kF/Tg6C1wMsAaF0fzDWrU5Y4NCuBTMpS9AV9OT?=
- =?Windows-1252?Q?E+tRfWAwjZdRAMz+5PBypD6MiyQaqMS7VkBjYFrPOwKJyP8x8cUjlca/?=
- =?Windows-1252?Q?VnfwfU7qMi4a8aHSVezOzewQmn7XZNxaV3w4Wine1XlG8i29zC9GZECV?=
- =?Windows-1252?Q?x+wTKsiEVBFDWhZur/+Osypvssx6STrIKeRtzeFFpnEODndfOBGOz/sv?=
- =?Windows-1252?Q?FDszEpd5/DpSRtanfqYmhhVSp+I3pp4SvddWpN68MWaeQUIOK+QpiP2P?=
- =?Windows-1252?Q?mzCrHIYP4/ylcP8/9RTfY8bbPRGwxV4ymC1SuOHo11e8Fr0GzRbDkq3h?=
- =?Windows-1252?Q?UI0ulBSjoWD8oLbuogGx4jT285thkj9oIuJXGncSZ+Z7n+7PEqBPF6EW?=
- =?Windows-1252?Q?DgjlKV9X0HlrEWKtGnvAwSuQRbM5iZixil5TSU2RB8h2Io4Gj/cqCyU7?=
- =?Windows-1252?Q?lnR/LKIwcgq1YUGHm4iDUAqYEmHFgLJ+m3SdSboRELESe6Qyb9C4DoGh?=
- =?Windows-1252?Q?JMpXWOZMg2BvZzhtN4zUSsxsYS9+pCKQhIhylzU3mA2NRsScOc7/Dr7I?=
- =?Windows-1252?Q?1RHyz0QvF5Ck6lgaWeVRCk1E5BHdGthcfwCzTTJlNsEI4YFDKCzTnKr5?=
- =?Windows-1252?Q?fabRtCk8YlDprnWPdS++avdto7GK6ONrLp6zqy+kaLy/wx5UvsEkwVb+?=
- =?Windows-1252?Q?DzYQ6n1Pan2NUpiZtTmKxmYDc1ScuAv7RZod7qq0u52Czzt+GzPN7exP?=
- =?Windows-1252?Q?RqaM/j7DSAIo8aEu98l/xR2xGxDDJa5Wr48hEa5xXSuBn4kumcDBWmPY?=
- =?Windows-1252?Q?SvFUN5ZiPNx+Ncqm2ChffYkIvTSCvcBIZbfTyqByYqHt7opQlktWV6S5?=
- =?Windows-1252?Q?DwStnunpKJTnYYoVlZ6adZvMNCsqT8srfBXQQJ90wEKH2huSPiPNDH7j?=
- =?Windows-1252?Q?9VWV6LbyE2tT34DXVqU+Hg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3edfe2e2-6469-4590-fe68-08d8cba52b29
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR10MB2663.namprd10.prod.outlook.com
+X-Microsoft-Antispam-Message-Info: I9Ax+Xr/b4RWdk9n/Z3FMoSL/8PAmCS9ekgFiB+BPuinyRd1JCR6HW/fEkJyTI0hk7y6sbuMdGQUwDdNrd2bepWwEdXx3GpMSWm16Wzp9Ce07Hzzv30AhcxS7liONurmSHtoQzO6J6UpP5iFnApS1or5vJtXZtacECFO/hqPG0yrsqLngtiY+Kiw57mjUX43YVXzVHn+tPeCzhnPaLrTlHcxEmMiBoMpl7n6mN0tuuZuX+rJFQ9cJ6M9WM+Tj5fjHSUyb3XYFwOL2Q7SyFWdvwXUt16rqiZxDgnHSVXeUL478/uw7s7t48xhSbW3cgMmmoW3Lcvr/fU157eZtkPAMB//lEEcy7x3YOv0ksGlzP8nULsPSvlWsgY8Ekc6NyEx1NKzQ4hGhrlPgyP9Sv1tiQHJfX22D9dqx/BoFHQ2pTLwLey9vN/epi233mugo2tKkgE/DArf942tdEz7nyoRBCUPznI5ratZLhaVXeiw3q5tBeoSWf6op1E1ToUXeWrGyhhY2on0nPEzysSC+laewQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(376002)(136003)(396003)(39860400002)(186003)(66556008)(66946007)(83380400001)(16526019)(86362001)(66476007)(316002)(5660300002)(2906002)(33656002)(7416002)(6916009)(54906003)(53546011)(52116002)(44832011)(8936002)(8676002)(55016002)(30864003)(9686003)(1076003)(33716001)(4326008)(26005)(6666004)(478600001)(6496006)(956004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?F7BVnbAzIsDZwTze4gMo0Fmto7k9NybIb75/mHgWfQgTzfQtMatEvP8m9/JR?=
+ =?us-ascii?Q?HMVW5AY5t3qHng0qxLc+NP+wDkPUPht+0WjF7fnH53PZOP8WUxpgijDEcOAH?=
+ =?us-ascii?Q?ojVPaEu7bxH9+Ug9PkoeFvJmT+NS/66rQwq8k/sZ0L/+ZXFOchRDK4I066P0?=
+ =?us-ascii?Q?oiP4i3F9xQleSwk4QuW2PY68hmKg8wJlhbmDWQh/yzVNBuHbdXMZuVhunrTd?=
+ =?us-ascii?Q?cJIMrgxLyjX287+3pwrgGPDtCyP/0qRATD4sEc7S42m2zjNDoKs9iV0VeHeo?=
+ =?us-ascii?Q?5Ub1USkEomJHmboVZWY+DWiCNOszHccbrQwaiPdr6tqhu3tCYk5AsGekOdng?=
+ =?us-ascii?Q?rnpTaGZNnGOuPAO6UNtlD/fPa35DtFMjBH2x1RCmkAoy17BKn5tBeJ3Mx2U4?=
+ =?us-ascii?Q?ON5qkj6kLwckJShmdpbX1juVVs8w0/tIGYok4dzLKEPlONpJXQ/KZtCGx0NR?=
+ =?us-ascii?Q?453QDuwT4ewtu0/To5Gxp4w2t5tsXUkZSEXGkmlqtcU8Bap0bqfNEVc6damX?=
+ =?us-ascii?Q?JvEibyUaqWuUv46Ru/C49L5h6eTE014VuDEMRFmK9TqSFFZTskdU88Xbm8Mk?=
+ =?us-ascii?Q?x4dgp4PIbzBP2V3astzvEgEsVTNZribWQ9cX9m7k/XWcRkb8EwV37viV3wHb?=
+ =?us-ascii?Q?fCVO59zfOEA9lwPjxSOYg+IA2xzTC40edDoS0PvsCApRHP0KNrxkQINebMzQ?=
+ =?us-ascii?Q?E9iyJ+t5M8XhQ54lBuuMGwEAtxVd7CmnD0OK47Qw2MgLQizVBi2j2c+sU7fY?=
+ =?us-ascii?Q?zps8jJS6JgqTu6FCyDQiVcWWyVusVNsMz7hheCem7ztvpAgyNq9fmtz3RUy+?=
+ =?us-ascii?Q?GY2Fod26mrAUZ7lNcKc1J9p5H4zoXpmwgGBfyhMKP+6k0Xp80zEN5cP94ECm?=
+ =?us-ascii?Q?NJIAgkA+Bxz2QIfgIkS/vsM0U44z/kJX63cKNDoMBfW+tTFWcaYBnpnBE0zG?=
+ =?us-ascii?Q?fXHV8y8emdlnm4vxl6nzK+8qp/ZYkQiEBRJAymNZzDr/VUdvx43WshvSZr4I?=
+ =?us-ascii?Q?LlKPzICZi+lnq0mHTvnXOckhOmnW9D4KI0xyWYmAKUrqZIy64+gh8ONizoj8?=
+ =?us-ascii?Q?S/1iIQjTzUsQgQCjG7sxRZ913o0m/3qv9JfSjo6/y8SGWfmf2Fg6dRD0itPI?=
+ =?us-ascii?Q?170chN/yLTJH6M/qzEW3WVj94aAqLAzcEWbbR/hKL70pgrKlHwrD04BopSdB?=
+ =?us-ascii?Q?VKSp9W8jSWWB3vLdw8jwlqwYHUhwpENtsqqxWwVD9iLN/ZkR/5UXTzA0hTzY?=
+ =?us-ascii?Q?44ba3mQZpakSsHw28Xvv8HsH+C8AnpnuxMh1EHIG8lAW5Vmjd2cXmXimVIrl?=
+ =?us-ascii?Q?WMgPuBBM6vweTjjfaMTkaOeb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52e7a6ad-8d21-4ce0-cf47-08d8cbc88922
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2021 20:15:53.1937
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2021 00:29:03.1040
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1oSkubPpBqTRHJoRL/mLm0VVcoJTxC955durJMKR5Yc5ksEgCAGMS/f/lzXdlu9hUT+iOGFONEvd4ro8aDme3Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4590
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9888 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 malwarescore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102070145
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9888 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 impostorscore=0
- priorityscore=1501 bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1011 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102070146
+X-MS-Exchange-CrossTenant-UserPrincipalName: cWPCf6KMpsCE6iJrvi8ZS7ahqLKFU+Iee9drvmGs6KXQ9adYu95E5OPrwdoOYig09iO4mLEEEnnrlbAcorqHOg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2368
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Is it possible that the issue is not due to this change?
+Hello Steve, 
 
-This change is just to call different API to allocate memory, which is
-equivalent to kzalloc()+vzalloc().
+On Sat, Feb 06, 2021 at 01:56:46PM +0000, Ashish Kalra wrote:
+> Hello Steve,
+> 
+> On Sat, Feb 06, 2021 at 05:46:17AM +0000, Ashish Kalra wrote:
+> > Hello Steve,
+> > 
+> > Continued response to your queries, especially related to userspace
+> > control of SEV live migration feature : 
+> > 
+> > On Fri, Feb 05, 2021 at 06:54:21PM -0800, Steve Rutherford wrote:
+> > > On Thu, Feb 4, 2021 at 7:08 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+> > > >
+> > > > Hello Steve,
+> > > >
+> > > > On Thu, Feb 04, 2021 at 04:56:35PM -0800, Steve Rutherford wrote:
+> > > > > On Wed, Feb 3, 2021 at 4:39 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> > > > > >
+> > > > > > From: Ashish Kalra <ashish.kalra@amd.com>
+> > > > > >
+> > > > > > Add new KVM_FEATURE_SEV_LIVE_MIGRATION feature for guest to check
+> > > > > > for host-side support for SEV live migration. Also add a new custom
+> > > > > > MSR_KVM_SEV_LIVE_MIGRATION for guest to enable the SEV live migration
+> > > > > > feature.
+> > > > > >
+> > > > > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > > > > ---
+> > > > > >  Documentation/virt/kvm/cpuid.rst     |  5 +++++
+> > > > > >  Documentation/virt/kvm/msr.rst       | 12 ++++++++++++
+> > > > > >  arch/x86/include/uapi/asm/kvm_para.h |  4 ++++
+> > > > > >  arch/x86/kvm/svm/sev.c               | 13 +++++++++++++
+> > > > > >  arch/x86/kvm/svm/svm.c               | 16 ++++++++++++++++
+> > > > > >  arch/x86/kvm/svm/svm.h               |  2 ++
+> > > > > >  6 files changed, 52 insertions(+)
+> > > > > >
+> > > > > > diff --git a/Documentation/virt/kvm/cpuid.rst b/Documentation/virt/kvm/cpuid.rst
+> > > > > > index cf62162d4be2..0bdb6cdb12d3 100644
+> > > > > > --- a/Documentation/virt/kvm/cpuid.rst
+> > > > > > +++ b/Documentation/virt/kvm/cpuid.rst
+> > > > > > @@ -96,6 +96,11 @@ KVM_FEATURE_MSI_EXT_DEST_ID        15          guest checks this feature bit
+> > > > > >                                                 before using extended destination
+> > > > > >                                                 ID bits in MSI address bits 11-5.
+> > > > > >
+> > > > > > +KVM_FEATURE_SEV_LIVE_MIGRATION     16          guest checks this feature bit before
+> > > > > > +                                               using the page encryption state
+> > > > > > +                                               hypercall to notify the page state
+> > > > > > +                                               change
+> > > > > > +
+> > > > > >  KVM_FEATURE_CLOCKSOURCE_STABLE_BIT 24          host will warn if no guest-side
+> > > > > >                                                 per-cpu warps are expected in
+> > > > > >                                                 kvmclock
+> > > > > > diff --git a/Documentation/virt/kvm/msr.rst b/Documentation/virt/kvm/msr.rst
+> > > > > > index e37a14c323d2..020245d16087 100644
+> > > > > > --- a/Documentation/virt/kvm/msr.rst
+> > > > > > +++ b/Documentation/virt/kvm/msr.rst
+> > > > > > @@ -376,3 +376,15 @@ data:
+> > > > > >         write '1' to bit 0 of the MSR, this causes the host to re-scan its queue
+> > > > > >         and check if there are more notifications pending. The MSR is available
+> > > > > >         if KVM_FEATURE_ASYNC_PF_INT is present in CPUID.
+> > > > > > +
+> > > > > > +MSR_KVM_SEV_LIVE_MIGRATION:
+> > > > > > +        0x4b564d08
+> > > > > > +
+> > > > > > +       Control SEV Live Migration features.
+> > > > > > +
+> > > > > > +data:
+> > > > > > +        Bit 0 enables (1) or disables (0) host-side SEV Live Migration feature,
+> > > > > > +        in other words, this is guest->host communication that it's properly
+> > > > > > +        handling the shared pages list.
+> > > > > > +
+> > > > > > +        All other bits are reserved.
+> > > > > > diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> > > > > > index 950afebfba88..f6bfa138874f 100644
+> > > > > > --- a/arch/x86/include/uapi/asm/kvm_para.h
+> > > > > > +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> > > > > > @@ -33,6 +33,7 @@
+> > > > > >  #define KVM_FEATURE_PV_SCHED_YIELD     13
+> > > > > >  #define KVM_FEATURE_ASYNC_PF_INT       14
+> > > > > >  #define KVM_FEATURE_MSI_EXT_DEST_ID    15
+> > > > > > +#define KVM_FEATURE_SEV_LIVE_MIGRATION 16
+> > > > > >
+> > > > > >  #define KVM_HINTS_REALTIME      0
+> > > > > >
+> > > > > > @@ -54,6 +55,7 @@
+> > > > > >  #define MSR_KVM_POLL_CONTROL   0x4b564d05
+> > > > > >  #define MSR_KVM_ASYNC_PF_INT   0x4b564d06
+> > > > > >  #define MSR_KVM_ASYNC_PF_ACK   0x4b564d07
+> > > > > > +#define MSR_KVM_SEV_LIVE_MIGRATION     0x4b564d08
+> > > > > >
+> > > > > >  struct kvm_steal_time {
+> > > > > >         __u64 steal;
+> > > > > > @@ -136,4 +138,6 @@ struct kvm_vcpu_pv_apf_data {
+> > > > > >  #define KVM_PV_EOI_ENABLED KVM_PV_EOI_MASK
+> > > > > >  #define KVM_PV_EOI_DISABLED 0x0
+> > > > > >
+> > > > > > +#define KVM_SEV_LIVE_MIGRATION_ENABLED BIT_ULL(0)
+> > > > > > +
+> > > > > >  #endif /* _UAPI_ASM_X86_KVM_PARA_H */
+> > > > > > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > > > > > index b0d324aed515..93f42b3d3e33 100644
+> > > > > > --- a/arch/x86/kvm/svm/sev.c
+> > > > > > +++ b/arch/x86/kvm/svm/sev.c
+> > > > > > @@ -1627,6 +1627,16 @@ int svm_page_enc_status_hc(struct kvm *kvm, unsigned long gpa,
+> > > > > >         return ret;
+> > > > > >  }
+> > > > > >
+> > > > > > +void sev_update_migration_flags(struct kvm *kvm, u64 data)
+> > > > > > +{
+> > > > > > +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> > > > > > +
+> > > > > > +       if (!sev_guest(kvm))
+> > > > > > +               return;
+> > > > >
+> > > > > This should assert that userspace wanted the guest to be able to make
+> > > > > these calls (see more below).
+> > > > >
+> > > > > >
+> > > > > > +
+> > > > > > +       sev->live_migration_enabled = !!(data & KVM_SEV_LIVE_MIGRATION_ENABLED);
+> > > > > > +}
+> > > > > > +
+> > > > > >  int svm_get_shared_pages_list(struct kvm *kvm,
+> > > > > >                               struct kvm_shared_pages_list *list)
+> > > > > >  {
+> > > > > > @@ -1639,6 +1649,9 @@ int svm_get_shared_pages_list(struct kvm *kvm,
+> > > > > >         if (!sev_guest(kvm))
+> > > > > >                 return -ENOTTY;
+> > > > > >
+> > > > > > +       if (!sev->live_migration_enabled)
+> > > > > > +               return -EINVAL;
+> > > 
+> > > This is currently under guest control, so I'm not certain this is
+> > > helpful. If I called this with otherwise valid parameters, and got
+> > > back -EINVAL, I would probably think the bug is on my end. But it
+> > > could be on the guest's end! I would probably drop this, but you could
+> > > have KVM return an empty list of regions when this happens.
+> > > 
+> > > Alternatively, as explained below, this could call guest_pv_has instead.
+> > > 
+> > > >
+> > > > > > +
+> > > > > >         if (!list->size)
+> > > > > >                 return -EINVAL;
+> > > > > >
+> > > > > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > > > > index 58f89f83caab..43ea5061926f 100644
+> > > > > > --- a/arch/x86/kvm/svm/svm.c
+> > > > > > +++ b/arch/x86/kvm/svm/svm.c
+> > > > > > @@ -2903,6 +2903,9 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+> > > > > >                 svm->msr_decfg = data;
+> > > > > >                 break;
+> > > > > >         }
+> > > > > > +       case MSR_KVM_SEV_LIVE_MIGRATION:
+> > > > > > +               sev_update_migration_flags(vcpu->kvm, data);
+> > > > > > +               break;
+> > > > > >         case MSR_IA32_APICBASE:
+> > > > > >                 if (kvm_vcpu_apicv_active(vcpu))
+> > > > > >                         avic_update_vapic_bar(to_svm(vcpu), data);
+> > > > > > @@ -3976,6 +3979,19 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > > > > >                         vcpu->arch.cr3_lm_rsvd_bits &= ~(1UL << (best->ebx & 0x3f));
+> > > > > >         }
+> > > > > >
+> > > > > > +       /*
+> > > > > > +        * If SEV guest then enable the Live migration feature.
+> > > > > > +        */
+> > > > > > +       if (sev_guest(vcpu->kvm)) {
+> > > > > > +               struct kvm_cpuid_entry2 *best;
+> > > > > > +
+> > > > > > +               best = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
+> > > > > > +               if (!best)
+> > > > > > +                       return;
+> > > > > > +
+> > > > > > +               best->eax |= (1 << KVM_FEATURE_SEV_LIVE_MIGRATION);
+> > > > > > +       }
+> > > > > > +
+> > > > >
+> > > > > Looking at this, I believe the only way for this bit to get enabled is
+> > > > > if userspace toggles it. There needs to be a way for userspace to
+> > > > > identify if the kernel underneath them does, in fact, support SEV LM.
+> > > > > I'm at risk for having misread these patches (it's a long series), but
+> > > > > I don't see anything that communicates upwards.
+> > > > >
+> > > > > This could go upward with the other paravirt features flags in
+> > > > > cpuid.c. It could also be an explicit KVM Capability (checked through
+> > > > > check_extension).
+> > > > >
+> > > > > Userspace should then have a chance to decide whether or not this
+> > > > > should be enabled. And when it's not enabled, the host should return a
+> > > > > GP in response to the hypercall. This could be configured either
+> > > > > through userspace stripping out the LM feature bit, or by calling a VM
+> > > > > scoped enable cap (KVM_VM_IOCTL_ENABLE_CAP).
+> > > > >
+> > > > > I believe the typical path for a feature like this to be configured
+> > > > > would be to use ENABLE_CAP.
+> > > >
+> > > > I believe we have discussed and reviewed this earlier too.
+> > > >
+> > > > To summarize this feature, the host indicates if it supports the Live
+> > > > Migration feature and the feature and the hypercall are only enabled on
+> > > > the host when the guest checks for this support and does a wrmsrl() to
+> > > > enable the feature. Also the guest will not make the hypercall if the
+> > > > host does not indicate support for it.
+> > > 
+> > > I've gone through and read this patch a bit more closely, and the
+> > > surrounding code. Previously, I clearly misread this and the
+> > > surrounding space.
+> > > 
+> > > What happens if the guest just writes to the MSR anyway? Even if it
+> > > didn't receive a cue to do so? I believe the hypercall would still get
+> > > invoked here, since the hypercall does not check if SEV live migration
+> > > is enabled. Similarly, the MSR for enabling it is always available,
+> > > even if userspace didn't ask for the cpuid bit to be set. This should
+> > > not happen. Userspace should be in control of a new hypercall rolling
+> > > out.
+> > > 
+> > > I believe my interpretation last time was that the cpuid bit was
+> > > getting surfaced from the host kernel to host userspace, but I don't
+> > > actually see that in this patch series. Another way to ask this
+> > > question would be "How does userspace know the kernel they are on has
+> > > this patch series?". It needs some way of checking whether or not the
+> > > kernel underneath it supports SEV live migration. Technically, I think
+> > > userspace could call get_cpuid, set_cpuid (with the same values), and
+> > > then get_cpuid again, and it would be able to infer by checking the
+> > > SEV LM feature flag in the KVM leaf. This seems a bit kludgy. Checking
+> > > support should be easy.
+> > > 
+> > > An additional question is "how does userspace choose whether live
+> > > migration is advertised to the guest"? I believe userspace's desire
+> > > for a particular value of the paravirt feature flag in CPUID get's
+> > > overridden when they call set cpuid, since the feature flag is set in
+> > > svm_vcpu_after_set_cpuid regardless of what userspace asks for.
+> > > Userspace should have a choice in the matter.
+> > > 
+> 
+> Actually i did some more analysis of this, and i believe you are right
+> about the above, feature flag gets set in svm_vcpu_after_set_cpuid.
+> 
 
-Before the change:
+As you mentioned above and as i confirmed in my previous email,
+calling KVM_SET_CPUID2 vcpu ioctl will always set the live migration
+feature flag for the vCPU. 
 
-try kzalloc(sizeof(*vs), GFP_KERNEL | __GFP_NOWARN | __GFP_RETRY_MAYFAIL);
+This is what will be queried by the guest to enable the kernel's
+live migration feature and to start making hypercalls.
 
-... and then below if the former is failed.
+Now, i want to understand why do you want the userspace to have a 
+choice in this matter ?
 
-vzalloc(sizeof(*vs));
+After all, it is the userspace which actually initiates the live 
+migration process, so doesn't it have the final choice in this
+matter ?
 
+Even if this feature is reported by host, the guest only uses
+it to enable and make page encryption status hypercalls 
+and the host's shared pages list gets setup accordingly. 
 
-After the change:
+But unless userspace calls KVM_GET_SHARED_PAGES_LIST ioctl and
+initiates live migration process, the above is simply enabling
+the guest to make hypercalls whenever a page's encryption 
+status is changed.
 
-try kmalloc_node(size, FP_KERNEL|GFP_ZERO|__GFP_NOWARN|__GFP_NORETRY, node);
-
-... and then below if the former is failed
-
-__vmalloc_node(size, 1, GFP_KERNEL|GFP_ZERO, node, __builtin_return_address(0));
-
-
-The below is the first WARNING in uploaded dmesg. I assume it was called before
-to open /dev/vhost-scsi.
-
-Will this test try to open /dev/vhost-scsi?
-
-[    5.095515] =============================
-[    5.095515] WARNING: suspicious RCU usage
-[    5.095515] 5.11.0-rc4-00008-g79991caf5202 #1 Not tainted
-[    5.095534] -----------------------------
-[    5.096041] security/smack/smack_lsm.c:351 RCU-list traversed in non-reader
-section!!
-[    5.096982]
-[    5.096982] other info that might help us debug this:
-[    5.096982]
-[    5.097953]
-[    5.097953] rcu_scheduler_active = 1, debug_locks = 1
-[    5.098739] no locks held by kthreadd/2.
-[    5.099237]
-[    5.099237] stack backtrace:
-[    5.099537] CPU: 0 PID: 2 Comm: kthreadd Not tainted
-5.11.0-rc4-00008-g79991caf5202 #1
-[    5.100470] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.12.0-1 04/01/2014
-[    5.101442] Call Trace:
-[    5.101807]  dump_stack+0x15f/0x1bf
-[    5.102298]  smack_cred_prepare+0x400/0x420
-[    5.102840]  ? security_prepare_creds+0xd4/0x120
-[    5.103441]  security_prepare_creds+0x84/0x120
-[    5.103515]  prepare_creds+0x3f1/0x580
-[    5.103515]  copy_creds+0x65/0x480
-[    5.103515]  copy_process+0x7b4/0x3600
-[    5.103515]  ? check_prev_add+0xa40/0xa40
-[    5.103515]  ? lockdep_enabled+0xd/0x60
-[    5.103515]  ? lock_is_held_type+0x1a/0x100
-[    5.103515]  ? __cleanup_sighand+0xc0/0xc0
-[    5.103515]  ? lockdep_unlock+0x39/0x160
-[    5.103515]  kernel_clone+0x165/0xd20
-[    5.103515]  ? copy_init_mm+0x20/0x20
-[    5.103515]  ? pvclock_clocksource_read+0xd9/0x1a0
-[    5.103515]  ? sched_clock_local+0x99/0xc0
-[    5.103515]  ? kthread_insert_work_sanity_check+0xc0/0xc0
-[    5.103515]  kernel_thread+0xba/0x100
-[    5.103515]  ? __ia32_sys_clone3+0x40/0x40
-[    5.103515]  ? kthread_insert_work_sanity_check+0xc0/0xc0
-[    5.103515]  ? do_raw_spin_unlock+0xa9/0x160
-[    5.103515]  kthreadd+0x68f/0x7a0
-[    5.103515]  ? kthread_create_on_cpu+0x160/0x160
-[    5.103515]  ? lockdep_hardirqs_on+0x77/0x100
-[    5.103515]  ? _raw_spin_unlock_irq+0x24/0x60
-[    5.103515]  ? kthread_create_on_cpu+0x160/0x160
-[    5.103515]  ret_from_fork+0x22/0x30
-
-Thank you very much!
-
-Dongli Zhang
-
-
-On 2/6/21 7:03 PM, kernel test robot wrote:
-> 
-> Greeting,
-> 
-> FYI, we noticed the following commit (built with gcc-9):
-> 
-> commit: 79991caf5202c7989928be534727805f8f68bb8d ("vdpa_sim_net: Add support for user supported devices")
-> https://urldefense.com/v3/__https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git__;!!GqivPVa7Brio!LfgrgVVtPAjwjqTZX8yANgsix4f3cJmAA_CcMeCVymh5XYcamWdR9dnbIQA-p61PJtI$  Dongli-Zhang/vhost-scsi-alloc-vhost_scsi-with-kvzalloc-to-avoid-delay/20210129-191605
-> 
-> 
-> in testcase: trinity
-> version: trinity-static-x86_64-x86_64-f93256fb_2019-08-28
-> with following parameters:
-> 
-> 	runtime: 300s
-> 
-> test-description: Trinity is a linux system call fuzz tester.
-> test-url: https://urldefense.com/v3/__http://codemonkey.org.uk/projects/trinity/__;!!GqivPVa7Brio!LfgrgVVtPAjwjqTZX8yANgsix4f3cJmAA_CcMeCVymh5XYcamWdR9dnbIQA-6Y4x88c$ 
-> 
-> 
-> on test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 8G
-> 
-> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
-> 
-> 
-> +-------------------------------------------------------------------------+------------+------------+
-> |                                                                         | 39502d042a | 79991caf52 |
-> +-------------------------------------------------------------------------+------------+------------+
-> | boot_successes                                                          | 0          | 0          |
-> | boot_failures                                                           | 62         | 57         |
-> | WARNING:suspicious_RCU_usage                                            | 62         | 57         |
-> | security/smack/smack_lsm.c:#RCU-list_traversed_in_non-reader_section    | 62         | 57         |
-> | security/smack/smack_access.c:#RCU-list_traversed_in_non-reader_section | 62         | 57         |
-> | BUG:workqueue_lockup-pool                                               | 33         | 40         |
-> | BUG:kernel_hang_in_boot_stage                                           | 6          | 2          |
-> | net/mac80211/util.c:#RCU-list_traversed_in_non-reader_section           | 23         | 15         |
-> | WARNING:SOFTIRQ-safe->SOFTIRQ-unsafe_lock_order_detected                | 18         |            |
-> | WARNING:inconsistent_lock_state                                         | 5          |            |
-> | inconsistent{SOFTIRQ-ON-W}->{IN-SOFTIRQ-W}usage                         | 5          |            |
-> | calltrace:asm_call_irq_on_stack                                         | 2          |            |
-> | RIP:lock_acquire                                                        | 2          |            |
-> | RIP:check_kcov_mode                                                     | 1          |            |
-> | RIP:native_safe_halt                                                    | 2          |            |
-> | INFO:rcu_sched_self-detected_stall_on_CPU                               | 2          |            |
-> | RIP:clear_page_rep                                                      | 1          |            |
-> | WARNING:at_drivers/gpu/drm/vkms/vkms_crtc.c:#vkms_vblank_simulate       | 9          | 7          |
-> | RIP:vkms_vblank_simulate                                                | 9          | 7          |
-> | RIP:__slab_alloc                                                        | 3          | 3          |
-> | RIP:__do_softirq                                                        | 2          |            |
-> | RIP:console_unlock                                                      | 6          | 3          |
-> | invoked_oom-killer:gfp_mask=0x                                          | 1          |            |
-> | Mem-Info                                                                | 1          |            |
-> | RIP:vprintk_emit                                                        | 1          |            |
-> | RIP:__asan_load4                                                        | 1          |            |
-> | kernel_BUG_at_kernel/sched/core.c                                       | 0          | 1          |
-> | invalid_opcode:#[##]                                                    | 0          | 1          |
-> | RIP:sched_cpu_dying                                                     | 0          | 1          |
-> | WARNING:possible_circular_locking_dependency_detected                   | 0          | 1          |
-> | Kernel_panic-not_syncing:Fatal_exception                                | 0          | 1          |
-> | net/ipv4/ipmr.c:#RCU-list_traversed_in_non-reader_section               | 0          | 8          |
-> | RIP:arch_local_irq_restore                                              | 0          | 1          |
-> | RIP:idr_get_free                                                        | 0          | 1          |
-> | net/ipv6/ip6mr.c:#RCU-list_traversed_in_non-reader_section              | 0          | 2          |
-> +-------------------------------------------------------------------------+------------+------------+
-> 
-> 
-> If you fix the issue, kindly add following tag
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> 
-> 
-> [  890.196279] =============================
-> [  890.212608] WARNING: suspicious RCU usage
-> [  890.228281] 5.11.0-rc4-00008-g79991caf5202 #1 Tainted: G        W
-> [  890.244087] -----------------------------
-> [  890.259417] net/ipv4/ipmr.c:138 RCU-list traversed in non-reader section!!
-> [  890.275043]
-> [  890.275043] other info that might help us debug this:
-> [  890.275043]
-> [  890.318497]
-> [  890.318497] rcu_scheduler_active = 2, debug_locks = 1
-> [  890.346089] 2 locks held by trinity-c1/2476:
-> [  890.360897]  #0: ffff888149d6f400 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0xc0/0xe0
-> [  890.375165]  #1: ffff8881cabfd5c8 (&p->lock){+.+.}-{3:3}, at: seq_read_iter+0xa0/0x9c0
-> [  890.389706]
-> [  890.389706] stack backtrace:
-> [  890.416375] CPU: 1 PID: 2476 Comm: trinity-c1 Tainted: G        W         5.11.0-rc4-00008-g79991caf5202 #1
-> [  890.430706] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
-> [  890.444971] Call Trace:
-> [  890.458554]  dump_stack+0x15f/0x1bf
-> [  890.471996]  ipmr_get_table+0x140/0x160
-> [  890.485328]  ipmr_vif_seq_start+0x4d/0xe0
-> [  890.498620]  seq_read_iter+0x1b2/0x9c0
-> [  890.511469]  ? kvm_sched_clock_read+0x14/0x40
-> [  890.524008]  ? sched_clock+0x1b/0x40
-> [  890.536095]  ? iov_iter_init+0x7c/0xa0
-> [  890.548028]  seq_read+0x2fd/0x3e0
-> [  890.559948]  ? seq_hlist_next_percpu+0x140/0x140
-> [  890.572204]  ? should_fail+0x78/0x2a0
-> [  890.584189]  ? write_comp_data+0x2a/0xa0
-> [  890.596235]  ? __sanitizer_cov_trace_pc+0x1d/0x60
-> [  890.608134]  ? seq_hlist_next_percpu+0x140/0x140
-> [  890.620042]  proc_reg_read+0x14e/0x180
-> [  890.631585]  do_iter_read+0x397/0x420
-> [  890.642843]  vfs_readv+0xf5/0x160
-> [  890.653833]  ? vfs_iter_read+0x80/0x80
-> [  890.664229]  ? __fdget_pos+0xc0/0xe0
-> [  890.674236]  ? pvclock_clocksource_read+0xd9/0x1a0
-> [  890.684259]  ? kvm_sched_clock_read+0x14/0x40
-> [  890.693852]  ? sched_clock+0x1b/0x40
-> [  890.702898]  ? sched_clock_cpu+0x18/0x120
-> [  890.711648]  ? write_comp_data+0x2a/0xa0
-> [  890.720243]  ? __sanitizer_cov_trace_pc+0x1d/0x60
-> [  890.729290]  do_readv+0x111/0x260
-> [  890.738205]  ? vfs_readv+0x160/0x160
-> [  890.747154]  ? lockdep_hardirqs_on+0x77/0x100
-> [  890.756100]  ? syscall_enter_from_user_mode+0x8a/0x100
-> [  890.765126]  do_syscall_64+0x34/0x80
-> [  890.773795]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> [  890.782630] RIP: 0033:0x453b29
-> [  890.791189] Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 3b 84 00 00 c3 66 2e 0f 1f 84 00 00 00 00
-> [  890.810866] RSP: 002b:00007ffcda44fb18 EFLAGS: 00000246 ORIG_RAX: 0000000000000013
-> [  890.820764] RAX: ffffffffffffffda RBX: 0000000000000013 RCX: 0000000000453b29
-> [  890.830792] RDX: 000000000000009a RSI: 0000000001de1c00 RDI: 00000000000000b9
-> [  890.840626] RBP: 00007ffcda44fbc0 R08: 722c279d69ffc468 R09: 0000000000000400
-> [  890.850366] R10: 0098d82a42c63c22 R11: 0000000000000246 R12: 0000000000000002
-> [  890.860001] R13: 00007f042ae6f058 R14: 00000000010a2830 R15: 00007f042ae6f000
-> 
-> 
-> 
-> To reproduce:
-> 
->         # build kernel
-> 	cd linux
-> 	cp config-5.11.0-rc4-00008-g79991caf5202 .config
-> 	make HOSTCC=gcc-9 CC=gcc-9 ARCH=x86_64 olddefconfig prepare modules_prepare bzImage
-> 
->         git clone https://urldefense.com/v3/__https://github.com/intel/lkp-tests.git__;!!GqivPVa7Brio!LfgrgVVtPAjwjqTZX8yANgsix4f3cJmAA_CcMeCVymh5XYcamWdR9dnbIQA-Qkr9TyI$ 
->         cd lkp-tests
->         bin/lkp qemu -k <bzImage> job-script # job-script is attached in this email
-> 
-> 
-> 
-> Thanks,
-> Oliver Sang
-> 
+Thanks,
+Ashish
