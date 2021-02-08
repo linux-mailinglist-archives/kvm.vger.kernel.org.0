@@ -2,106 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8330E313B7B
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 18:50:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25111313BE7
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 18:59:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234975AbhBHRtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 12:49:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21349 "EHLO
+        id S233957AbhBHR6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 12:58:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40641 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235001AbhBHRrn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 12:47:43 -0500
+        by vger.kernel.org with ESMTP id S235037AbhBHR4Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 12:56:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612806367;
+        s=mimecast20190719; t=1612806898;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=AGNSJcTi1GoljhoR82wLbrQntb542AwjI3pFM5LOGco=;
-        b=E3XzRWm2LEH5CWPb4f5bq64G46CNvB1XiBUKyAiX4QqjqX7c9m3o2BRcHbgvNz6/E0s6s7
-        aHa7VL9cBjJGQ1j+IBQnlYa0b8NPqOLs+DMnPHp8RxMjlD6eAx6pekNVogW2S5HTaKzr9R
-        9O8OCpHJ0JVcFFmmyVb0rdlFRqxJH+Y=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-GnA_k6NBPQu_YSGAblo__A-1; Mon, 08 Feb 2021 12:46:04 -0500
-X-MC-Unique: GnA_k6NBPQu_YSGAblo__A-1
-Received: by mail-wm1-f71.google.com with SMTP id n17so7013401wmk.3
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 09:46:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AGNSJcTi1GoljhoR82wLbrQntb542AwjI3pFM5LOGco=;
-        b=WbZIya4cfUR4HmSeLurxHGr8SPrFefbYXwaTe5ts3+r27xK4+FeC0k5qzu1NQMwy6v
-         d1CnKyCXTk7YI2bDE2jn4QWT4ngvheCng6euk2+p4TgxWKkG6CfnzHB2IQFhrDQLT7Jo
-         M7aq9Sy1866jiXcr0DD9cTpB3eZ7HXc0PIeDjUw4tYE0dATpZVfEjPkqK7CGjiiATHSQ
-         L6GRFKAy+7xh8qgCqUizQWEkrxe5UJM58xKCAYPu1PJZrNsBKSkxtyhF3xkrDZaTGFgK
-         Yv3K2QwioimRQ/QGlqgalTXjeCAZPEkGf7zfMKpUUzvxWLKs/fo9nd4vkHlDcY4XV2iH
-         hPYg==
-X-Gm-Message-State: AOAM532iZt9Ji0ivu7Gaf9BQSnHtjPFCCUmYNfwBaOixIOeJ3odZi0Mt
-        yGedBaPzZlpjtxB8t259d/GT4n139/pifmj7+iXY3AJzb5ruSTxBEUo3+2jt0dVdQQr3/XBee31
-        RMXWRHqYKhlsZ
-X-Received: by 2002:a1c:9dcd:: with SMTP id g196mr14067084wme.30.1612806349440;
-        Mon, 08 Feb 2021 09:45:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJySadVeryWc/7vUh0Ff5GUx9WW+NmNKRHZ1APFrdW/36WG32BOLRjVIUusY0dEbCCjEaVe5ig==
-X-Received: by 2002:a1c:9dcd:: with SMTP id g196mr14066748wme.30.1612806338634;
-        Mon, 08 Feb 2021 09:45:38 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id d16sm29664733wrr.59.2021.02.08.09.45.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Feb 2021 09:45:36 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jing Liu <jing2.liu@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
- <20210207154256.52850-4-jing2.liu@linux.intel.com>
- <ae5b0195-b04f-8eef-9e0d-2a46c761d2d5@redhat.com>
- <YCF1d0F0AqPazYqC@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC 3/7] kvm: x86: XSAVE state and XFD MSRs context switch
-Message-ID: <77b27707-721a-5c6a-c00d-e1768da55c64@redhat.com>
-Date:   Mon, 8 Feb 2021 18:45:35 +0100
+        bh=s98GDwbnxHY4y2k855c0S2KhpXmXPPsQL15MMi+VCLw=;
+        b=IHME//utvBBjdy5exg13bBDLIHfeBOBWmaiVaGuhl+mD5V7rYbJ9Iw2HsETiTHpS5HunPB
+        oeYoZMqaIvUpj2ZOxHZZmaN47B8eb02MAtpvWmD3zDZALMxoANouE9RhKpvt8Khf3qLwKR
+        lv4D6g87QIcV4YaMLlTAnafW3RZ7xaU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-Prc_cZZYOYG9y2Pe5wsNRw-1; Mon, 08 Feb 2021 12:54:56 -0500
+X-MC-Unique: Prc_cZZYOYG9y2Pe5wsNRw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC25D19611A1
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 17:54:55 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-117.ams2.redhat.com [10.36.112.117])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E479010016F5;
+        Mon,  8 Feb 2021 17:54:51 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Add new s390x targets to
+ run tests with TCG and KVM accel
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Bandeira Condotta <mbandeir@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Marcelo Bandeira Condotta <mcondotta@redhat.com>
+References: <20210208150227.178953-1-mbandeir@redhat.com>
+ <8f34cddf-84bf-0726-8074-1688974a74d8@redhat.com>
+ <6e56bdb9-72b4-369e-acb2-d5715e02ab92@redhat.com>
+ <344b1b84-8396-9df8-5c43-3f2538e7c89d@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <251476c8-85ac-de95-c1b4-1c4356edad8b@redhat.com>
+Date:   Mon, 8 Feb 2021 18:54:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YCF1d0F0AqPazYqC@google.com>
+In-Reply-To: <344b1b84-8396-9df8-5c43-3f2538e7c89d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/02/21 18:31, Sean Christopherson wrote:
-> On Mon, Feb 08, 2021, Paolo Bonzini wrote:
->> On 07/02/21 16:42, Jing Liu wrote:
->>> In KVM, "guest_fpu" serves for any guest task working on this vcpu
->>> during vmexit and vmenter. We provide a pre-allocated guest_fpu space
->>> and entire "guest_fpu.state_mask" to avoid each dynamic features
->>> detection on each vcpu task. Meanwhile, to ensure correctly
->>> xsaves/xrstors guest state, set IA32_XFD as zero during vmexit and
->>> vmenter.
+On 08/02/2021 16.32, Paolo Bonzini wrote:
+> On 08/02/21 16:13, Thomas Huth wrote:
+>> On 08/02/2021 16.07, Paolo Bonzini wrote:
+>>> On 08/02/21 16:02, Marcelo Bandeira Condotta wrote:
+>>>> From: Marcelo Bandeira Condotta <mcondotta@redhat.com>
+>>>>
+>>>> A new s390x z15 VM provided by IBM Community Cloud will be used to run
+>>>> the s390x KVM Unit tests natively with both TCG and KVM accel options.
+>>>>
+>>>> Signed-off-by: Marcelo Bandeira Condotta <mbandeir@redhat.com>
+>>>> ---
+>>>>   .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+>>>>   1 file changed, 28 insertions(+)
+>>>>
+>>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>>> index d97e27e..bc7a115 100644
+>>>> --- a/.gitlab-ci.yml
+>>>> +++ b/.gitlab-ci.yml
+>>>> @@ -155,3 +155,31 @@ cirrus-ci-macos-i386:
+>>>>   cirrus-ci-macos-x86-64:
+>>>>    <<: *cirrus_build_job_definition
+>>>> +
+>>>> +test-s390x-tcg:
+>>>> +  stage: test
+>>>> +  before_script: []
+>>>> +  tags:
+>>>> +    - s390x-z15-vm
+>>>> +  script:
+>>>> +    - ./configure --arch=s390x
+>>>> +    - make -j2
+>>>> +    - ACCEL=tcg ./run_tests.sh
+>>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 vector 
+>>>> diag288
+>>>> +     stsi sclp-1g sclp-3g
+>>>> +     | tee results.txt
+>>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
+>>>> +
+>>>> +test-s390x-kvm:
+>>>> +  stage: test
+>>>> +  before_script: []
+>>>> +  tags:
+>>>> +    - s390x-z15-vm
+>>>> +  script:
+>>>> +    - ./configure --arch=s390x
+>>>> +    - make -j2
+>>>> +    - ACCEL=kvm ./run_tests.sh
+>>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 vector 
+>>>> diag288
+>>>> +     stsi sclp-1g sclp-3g
+>>>> +     | tee results.txt
+>>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
 >>
->> Most guests will not need the whole xstate feature set.  So perhaps you
->> could set XFD to the host value | the guest value, trap #NM if the host XFD
->> is zero, and possibly reflect the exception to the guest's XFD and XFD_ERR.
+>> Acked-by: Thomas Huth <thuth@redhat.com>
 >>
->> In addition, loading the guest XFD MSRs should use the MSR autoload feature
->> (add_atomic_switch_msr).
+>>>
+>>> So it will have a custom runner?  That's nice!
+>>>
+>>> Do you have an example run already?
+>>
+>> I've been in touch with Marcelo during the past days already, and I've 
+>> already registered the runner that he set up on the s390x machine, so it 
+>> should theoretically work now once this patch has been merged.
 > 
-> Why do you say that?  I would strongly prefer to use the load lists only if they
-> are absolutely necessary.  I don't think that's the case here, as I can't
-> imagine accessing FPU state in NMI context is allowed, at least not without a
-> big pile of save/restore code.
+> What's the reason to add test-s390x-tcg?  It would really cover only a 
+> different TCG backend.
 
-I was thinking more of the added vmentry/vmexit overhead due to 
-xfd_guest_enter xfd_guest_exit.
+I've removed the tcg target from the patch, changed it so that it now runs 
+all s390x tests (the ones that do not work are skipped automatically), and 
+restricted the job to projects where a variable called 
+S390X_Z15_RUNNER_AVAILABLE has been set (so that the job does not get stuck 
+on systems where the runner is not available), and finally pushed it to the 
+master branch, so we should have automatic test coverage on s390x now. Thank 
+you very much, Marcelo!
 
-That said, the case where we saw MSR autoload as faster involved EFER, 
-and we decided that it was due to TLB flushes (commit f6577a5fa15d, 
-"x86, kvm, vmx: Always use LOAD_IA32_EFER if available", 2014-11-12). 
-Do you know if RDMSR/WRMSR is always slower than MSR autoload?
-
-Paolo
+  Thomas
 
