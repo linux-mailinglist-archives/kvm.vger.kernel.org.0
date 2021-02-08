@@ -2,105 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 803AF312A63
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 07:04:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64F11312A6B
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 07:06:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbhBHGDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 01:03:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23967 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229581AbhBHGDu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 01:03:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612764144;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y2vTx3E0J0H2n7/sE7CO0zfIM3AOiTiPE3jhEp65l0w=;
-        b=GcaqLGipXsJV2awGd1DmENDQ9OrNOAevOI4GqybSpx+QQCrGysm0YWiP4jPmUH655M33Di
-        IFffg9k90Goz+LeCPQbcYv0Va3AlbASN3zoIxI99u9qrGNFuI/uiWt1W7WKzsBD87iIDvU
-        Y33cSVHOc5g2KYwI9X46Nzx0nrpfcJU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-gszUxB_rN16WpLacviXxqw-1; Mon, 08 Feb 2021 01:02:22 -0500
-X-MC-Unique: gszUxB_rN16WpLacviXxqw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 274561020C20;
-        Mon,  8 Feb 2021 06:02:21 +0000 (UTC)
-Received: from [10.72.13.185] (ovpn-13-185.pek2.redhat.com [10.72.13.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B60C1002388;
-        Mon,  8 Feb 2021 06:02:15 +0000 (UTC)
-Subject: Re: [RFC v2 0/4] Introduce MMIO/PIO dispatch file descriptors
- (ioregionfd)
-To:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-References: <cover.1611850290.git.eafanasova@gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <3bf222a2-1ce4-9732-1c1d-113333b6271f@redhat.com>
-Date:   Mon, 8 Feb 2021 14:02:14 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229623AbhBHGGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 01:06:24 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38745 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229581AbhBHGGX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 01:06:23 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DYwVr4Cc0z9sVS; Mon,  8 Feb 2021 17:05:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1612764340;
+        bh=QsTd9JlyiVYrs3pv84qEB+xJRgsi2LtjtpT0TDKtuCg=;
+        h=From:To:Cc:Subject:Date:From;
+        b=OkZ8kOWhiRzNTSlbk96N5V6YyrAkfrnsPyO6AVfgo4D8FL7SjfzWepIR3H0kG2h6N
+         koiG2mKdSB2S5F4TyJ0PDPLa/hL49eWeW5vj86/kdGfNQAIZYrRB2Dq5+gz1yyOOCc
+         oCjPm5wtaB0Vs5OGh694y/1PJZfXCLC/t0WXkQnY=
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     pasic@linux.ibm.com, dgilbert@redhat.com, pair@us.ibm.com,
+        qemu-devel@nongnu.org, brijesh.singh@amd.com
+Cc:     ehabkost@redhat.com, mtosatti@redhat.com, mst@redhat.com,
+        jun.nakajima@intel.com, kvm@vger.kernel.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        qemu-s390x@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        pbonzini@redhat.com, frankja@linux.ibm.com, andi.kleen@intel.com,
+        cohuck@redhat.com, Thomas Huth <thuth@redhat.com>,
+        borntraeger@de.ibm.com, mdroth@linux.vnet.ibm.com,
+        David Gibson <david@gibson.dropbear.id.au>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        qemu-ppc@nongnu.org, David Hildenbrand <david@redhat.com>,
+        Greg Kurz <groug@kaod.org>, pragyansri.pathi@intel.com
+Subject: [PULL v9 00/13] Cgs patches
+Date:   Mon,  8 Feb 2021 17:05:25 +1100
+Message-Id: <20210208060538.39276-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <cover.1611850290.git.eafanasova@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 2021/1/29 上午2:32, Elena Afanasova wrote:
-> This patchset introduces a KVM dispatch mechanism which can be used
-> for handling MMIO/PIO accesses over file descriptors without returning
-> from ioctl(KVM_RUN). This allows device emulation to run in another task
-> separate from the vCPU task.
->
-> This is achieved through KVM vm ioctl for registering MMIO/PIO regions and
-> a wire protocol that KVM uses to communicate with a task handling an
-> MMIO/PIO access.
->
-> TODOs:
-> * Implement KVM_EXIT_IOREGIONFD_FAILURE
-> * Add non-x86 arch support
-> * Add kvm-unittests
-
-
-It would be better to log the changes between versions to ease the 
-reviewers.
-
-Tanks
-
-
->
-> Elena Afanasova (4):
->    KVM: add initial support for KVM_SET_IOREGION
->    KVM: x86: add support for ioregionfd signal handling
->    KVM: add support for ioregionfd cmds/replies serialization
->    KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
->
->   arch/x86/kvm/Kconfig          |   1 +
->   arch/x86/kvm/Makefile         |   1 +
->   arch/x86/kvm/x86.c            | 216 ++++++++++++++-
->   include/kvm/iodev.h           |  14 +
->   include/linux/kvm_host.h      |  34 +++
->   include/uapi/linux/ioregion.h |  32 +++
->   include/uapi/linux/kvm.h      |  23 ++
->   virt/kvm/Kconfig              |   3 +
->   virt/kvm/eventfd.c            |  25 ++
->   virt/kvm/eventfd.h            |  14 +
->   virt/kvm/ioregion.c           | 479 ++++++++++++++++++++++++++++++++++
->   virt/kvm/ioregion.h           |  15 ++
->   virt/kvm/kvm_main.c           |  68 ++++-
->   13 files changed, 905 insertions(+), 20 deletions(-)
->   create mode 100644 include/uapi/linux/ioregion.h
->   create mode 100644 virt/kvm/eventfd.h
->   create mode 100644 virt/kvm/ioregion.c
->   create mode 100644 virt/kvm/ioregion.h
->
-
+The following changes since commit 5b19cb63d9dfda41b412373b8c9fe14641bcab60=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/rth-gitlab/tags/pull-tcg-20210205' =
+in=3D=0D
+to staging (2021-02-05 22:59:12 +0000)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://gitlab.com/dgibson/qemu.git tags/cgs-pull-request=0D
+=0D
+for you to fetch changes up to 651615d92d244a6dfd7c81ab97bd3369fbe41d06:=0D
+=0D
+  s390: Recognize confidential-guest-support option (2021-02-08 16:57:38 +1=
+10=3D=0D
+0)=0D
+=0D
+----------------------------------------------------------------=0D
+Generalize memory encryption models=0D
+=0D
+A number of hardware platforms are implementing mechanisms whereby the=0D
+hypervisor does not have unfettered access to guest memory, in order=0D
+to mitigate the security impact of a compromised hypervisor.=0D
+=0D
+AMD's SEV implements this with in-cpu memory encryption, and Intel has=0D
+its own memory encryption mechanism.  POWER has an upcoming mechanism=0D
+to accomplish this in a different way, using a new memory protection=0D
+level plus a small trusted ultravisor.  s390 also has a protected=0D
+execution environment.=0D
+=0D
+The current code (committed or draft) for these features has each=0D
+platform's version configured entirely differently.  That doesn't seem=0D
+ideal for users, or particularly for management layers.=0D
+=0D
+AMD SEV introduces a notionally generic machine option=0D
+"machine-encryption", but it doesn't actually cover any cases other=0D
+than SEV.=0D
+=0D
+This series is a proposal to at least partially unify configuration=0D
+for these mechanisms, by renaming and generalizing AMD's=0D
+"memory-encryption" property.  It is replaced by a=0D
+"confidential-guest-support" property pointing to a platform specific=0D
+object which configures and manages the specific details.=0D
+=0D
+Note to Ram Pai: the documentation I've included for PEF is very=0D
+minimal.  If you could send a patch expanding on that, it would be=0D
+very helpful.=0D
+=0D
+Changes since v8:=0D
+ * Rebase=0D
+ * Fixed some cosmetic typos=0D
+Changes since v7:=0D
+ * Tweaked and clarified meaning of the 'ready' flag=0D
+ * Polished the interface to the PEF internals=0D
+ * Shifted initialization for s390 PV later (I hope I've finally got=0D
+   this after apply_cpu_model() where it needs to be)=0D
+Changes since v6:=0D
+ * Moved to using OBJECT_DECLARE_TYPE and OBJECT_DEFINE_TYPE macros=0D
+ * Assorted minor fixes=0D
+Changes since v5:=0D
+ * Renamed from "securable guest memory" to "confidential guest=0D
+   support"=0D
+ * Simpler reworking of x86 boot time flash encryption=0D
+ * Added a bunch of documentation=0D
+ * Fixed some compile errors on POWER=0D
+Changes since v4:=0D
+ * Renamed from "host trust limitation" to "securable guest memory",=0D
+   which I think is marginally more descriptive=0D
+ * Re-organized initialization, because the previous model called at=0D
+   kvm_init didn't work for s390=0D
+ * Assorted fixes to the s390 implementation; rudimentary testing=0D
+   (gitlab CI) only=0D
+Changes since v3:=0D
+ * Rebased=0D
+ * Added first cut at handling of s390 protected virtualization=0D
+Changes since RFCv2:=0D
+ * Rebased=0D
+ * Removed preliminary SEV cleanups (they've been merged)=0D
+ * Changed name to "host trust limitation"=0D
+ * Added migration blocker to the PEF code (based on SEV's version)=0D
+Changes since RFCv1:=0D
+ * Rebased=0D
+ * Fixed some errors pointed out by Dave Gilbert=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+David Gibson (12):=0D
+  confidential guest support: Introduce new confidential guest support=0D
+    class=0D
+  sev: Remove false abstraction of flash encryption=0D
+  confidential guest support: Move side effect out of=0D
+    machine_set_memory_encryption()=0D
+  confidential guest support: Rework the "memory-encryption" property=0D
+  sev: Add Error ** to sev_kvm_init()=0D
+  confidential guest support: Introduce cgs "ready" flag=0D
+  confidential guest support: Move SEV initialization into arch specific=0D
+    code=0D
+  confidential guest support: Update documentation=0D
+  spapr: Add PEF based confidential guest support=0D
+  spapr: PEF: prevent migration=0D
+  confidential guest support: Alter virtio default properties for=0D
+    protected guests=0D
+  s390: Recognize confidential-guest-support option=0D
+=0D
+Greg Kurz (1):=0D
+  qom: Allow optional sugar props=0D
+=0D
+ accel/kvm/kvm-all.c                       |  38 ------=0D
+ accel/kvm/sev-stub.c                      |  10 +-=0D
+ accel/stubs/kvm-stub.c                    |  10 --=0D
+ backends/confidential-guest-support.c     |  33 +++++=0D
+ backends/meson.build                      |   1 +=0D
+ docs/amd-memory-encryption.txt            |   2 +-=0D
+ docs/confidential-guest-support.txt       |  49 ++++++++=0D
+ docs/papr-pef.txt                         |  30 +++++=0D
+ docs/system/s390x/protvirt.rst            |  19 ++-=0D
+ hw/core/machine.c                         |  63 ++++++++--=0D
+ hw/i386/pc_sysfw.c                        |  17 +--=0D
+ hw/ppc/meson.build                        |   1 +=0D
+ hw/ppc/pef.c                              | 140 ++++++++++++++++++++++=0D
+ hw/ppc/spapr.c                            |   8 +-=0D
+ hw/s390x/pv.c                             |  62 ++++++++++=0D
+ hw/s390x/s390-virtio-ccw.c                |   3 +=0D
+ include/exec/confidential-guest-support.h |  62 ++++++++++=0D
+ include/hw/boards.h                       |   2 +-=0D
+ include/hw/ppc/pef.h                      |  17 +++=0D
+ include/hw/s390x/pv.h                     |  17 +++=0D
+ include/qemu/typedefs.h                   |   1 +=0D
+ include/qom/object.h                      |   3 +-=0D
+ include/sysemu/kvm.h                      |  16 ---=0D
+ include/sysemu/sev.h                      |   4 +-=0D
+ qom/object.c                              |   4 +-=0D
+ softmmu/rtc.c                             |   3 +-=0D
+ softmmu/vl.c                              |  27 ++++-=0D
+ target/i386/kvm/kvm.c                     |  20 ++++=0D
+ target/i386/sev-stub.c                    |   5 +=0D
+ target/i386/sev.c                         |  95 ++++++---------=0D
+ target/ppc/kvm.c                          |  18 ---=0D
+ target/ppc/kvm_ppc.h                      |   6 -=0D
+ 32 files changed, 595 insertions(+), 191 deletions(-)=0D
+ create mode 100644 backends/confidential-guest-support.c=0D
+ create mode 100644 docs/confidential-guest-support.txt=0D
+ create mode 100644 docs/papr-pef.txt=0D
+ create mode 100644 hw/ppc/pef.c=0D
+ create mode 100644 include/exec/confidential-guest-support.h=0D
+ create mode 100644 include/hw/ppc/pef.h=0D
+=0D
+--=3D20=0D
+2.29.2=0D
+=0D
