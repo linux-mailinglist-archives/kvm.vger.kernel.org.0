@@ -2,115 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31B62313CC6
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:10:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60E0B313CF1
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:14:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235282AbhBHSJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 13:09:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235437AbhBHSGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 13:06:19 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3145C06178A
-        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 10:04:19 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id q20so10204826pfu.8
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:04:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vqBTy5Z1R7u/iLq38ng3aUddH37slkPbc8QUCtAKPsQ=;
-        b=FtevjA5bCw6VWdP7SFi293r0Lidhb4fwXnnngO7N3Rxtqqy8jS75FGRBfjbZlHCRvT
-         lrJ/i0LieWmYgUI3jy5a44RAlCtB7lvGyHH1cHraejyIs4uyWKwou7wK+Tk3gDzsPiYI
-         HTtnWN828PBmccKU2gPX284MajUXfG5+eL5HZGhoKjKy+pOlLnbuVE04Iy7tnBVm8+0o
-         us7miHaWbk14aJSB46Ur8WNkG6FN8OU9vdVvEGa4CoV1QrYI+ItdOFN0FJksCqMlqOPg
-         7/sTcMflMAEA/cpx7+5U+kR+XjUx7b5pnu5DO+won9Hyw/PHZeqWbZ0ydHyG9yNmx7SX
-         Komw==
+        id S235369AbhBHSO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 13:14:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50182 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235183AbhBHSNy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 13:13:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612807948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Em5Q6izKRwuYnxNNv2p6LEzG/SfeITVQD9/V+T5jR/M=;
+        b=AuwqrnhytR+H7MDdRU82YX0yVC3tEWmtf8XESeYH+YDQfTJ63hu0ezRcF2Z/ae583/2Zb4
+        M0+uQYJaqARHwNpZijRIFfJqltst8kXPDbpKI6zkybkFZYZRGLKYaFI0eEhihmz/p92Jr4
+        +PqOqFJOzbLgUkqFgjmbr+cNz46FbD4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-gEsH5mn1PzyNZ1QM8wPCLQ-1; Mon, 08 Feb 2021 13:12:25 -0500
+X-MC-Unique: gEsH5mn1PzyNZ1QM8wPCLQ-1
+Received: by mail-wr1-f70.google.com with SMTP id s10so607794wro.13
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:12:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vqBTy5Z1R7u/iLq38ng3aUddH37slkPbc8QUCtAKPsQ=;
-        b=DcuqNDX/gHJKWdjVjavEcjiMyEZP3WSnxzJ6SBKYWHnLrvxWDpDr/muF/l9+fWJjpS
-         B/SmFNYXvfYH9RTIX7v7mpy8P3yHDOy2xY6ARuciwx7bNI90HYNkLNeiTdRG1blR0nEh
-         lLtzguh6HscPYFxayfTSMjEDmHMeWir2X6dVcBGqPx8hmjsKeV2AFWQyje4daDkKLWsl
-         cEHoq7ueuFG+fz//lKFXlEYoTF2dTsoM6VTa57MRxPI82tN8QemPbARRTaDL1cBIjuJ/
-         JNVjxtjnI7e5P7jwduVhPDAGJ1YzkcTpU0GdycUYoaF0KF8vwqHqckL6tww54D8bm/5L
-         u/GA==
-X-Gm-Message-State: AOAM5320v4qHZ3jhndXHPjvVZ2eHdsi0JXXD1iIXmtPK2XmwBFiMsGNX
-        tbRZLxnTHBaQtKMTZ9g8Er+vLA==
-X-Google-Smtp-Source: ABdhPJxFrze8G+mo95UHCssyAzYuK7lSxLIPCuPvweYya2uspvD8XPQxNcyQSbIoyTzalhhNX76T4Q==
-X-Received: by 2002:a65:624a:: with SMTP id q10mr18192825pgv.2.1612807459130;
-        Mon, 08 Feb 2021 10:04:19 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:e4db:abc1:a5c0:9dbc])
-        by smtp.gmail.com with ESMTPSA id v2sm5501183pjr.23.2021.02.08.10.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 10:04:18 -0800 (PST)
-Date:   Mon, 8 Feb 2021 10:04:11 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Em5Q6izKRwuYnxNNv2p6LEzG/SfeITVQD9/V+T5jR/M=;
+        b=km4chUekaJ/8onG6rH1a8JdGf5kozrrJgSIelvpYcVuCSg64tuWeN7omUTRAJHANES
+         lKBkm3EgA1ZEN4rpxMfR0cvs5mtt3ljLitKI+peiKnvhhDTi6PO1hWIjdc9u+x+bKhB+
+         OR0XwR6Vzy53olhjADYuFhHiNLjVkmdr1T9/diUekSsfHldsayieY+kSlnQdNlthugGC
+         ZISB9ImCxDutq/YckFeV+VrgP0qET9tbKJt4rXv9rM6OTEq/+XZqLvRTCeCSbe/6oc2x
+         hximG9d6bI1Y7S3amXyOnG6jyaPsj1eCyIBfU7f1js2G2pxKC95pu0fUVVJvhTKFflum
+         y6dg==
+X-Gm-Message-State: AOAM533jOrrTD/ja/CJ+Wj9JJcerHVpEoIQsKcYpW1cpZyk/nAbpvSjb
+        m75fli0Cn/tcG0h4T6I2fCtA65D9LH9w3cJysV9UGHvz0SRZeeBqHMAqXR3uQG56EWSuXZ86j1k
+        O6iOQ5MJYIuFB
+X-Received: by 2002:adf:b64f:: with SMTP id i15mr20465100wre.279.1612807944257;
+        Mon, 08 Feb 2021 10:12:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxWpAeK4msgOmM8v7VqEwvUaMXj+/R0pAL/O0nlqtcHUVclMsQXrcY9KuBLfX7dfzMQi4j5pA==
+X-Received: by 2002:adf:b64f:: with SMTP id i15mr20465080wre.279.1612807944075;
+        Mon, 08 Feb 2021 10:12:24 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i3sm12022645wrr.19.2021.02.08.10.12.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Feb 2021 10:12:23 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Jing Liu <jing2.liu@linux.intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jing2.liu@intel.com
-Subject: Re: [PATCH RFC 3/7] kvm: x86: XSAVE state and XFD MSRs context switch
-Message-ID: <YCF9GztNd18t1zk/@google.com>
 References: <20210207154256.52850-1-jing2.liu@linux.intel.com>
  <20210207154256.52850-4-jing2.liu@linux.intel.com>
  <ae5b0195-b04f-8eef-9e0d-2a46c761d2d5@redhat.com>
  <YCF1d0F0AqPazYqC@google.com>
  <77b27707-721a-5c6a-c00d-e1768da55c64@redhat.com>
+ <YCF9GztNd18t1zk/@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH RFC 3/7] kvm: x86: XSAVE state and XFD MSRs context switch
+Message-ID: <c293cdbd-502c-d598-3166-4e177ac21c7a@redhat.com>
+Date:   Mon, 8 Feb 2021 19:12:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77b27707-721a-5c6a-c00d-e1768da55c64@redhat.com>
+In-Reply-To: <YCF9GztNd18t1zk/@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 08, 2021, Paolo Bonzini wrote:
-> On 08/02/21 18:31, Sean Christopherson wrote:
-> > On Mon, Feb 08, 2021, Paolo Bonzini wrote:
-> > > On 07/02/21 16:42, Jing Liu wrote:
-> > > > In KVM, "guest_fpu" serves for any guest task working on this vcpu
-> > > > during vmexit and vmenter. We provide a pre-allocated guest_fpu space
-> > > > and entire "guest_fpu.state_mask" to avoid each dynamic features
-> > > > detection on each vcpu task. Meanwhile, to ensure correctly
-> > > > xsaves/xrstors guest state, set IA32_XFD as zero during vmexit and
-> > > > vmenter.
-> > > 
-> > > Most guests will not need the whole xstate feature set.  So perhaps you
-> > > could set XFD to the host value | the guest value, trap #NM if the host XFD
-> > > is zero, and possibly reflect the exception to the guest's XFD and XFD_ERR.
-> > > 
-> > > In addition, loading the guest XFD MSRs should use the MSR autoload feature
-> > > (add_atomic_switch_msr).
-> > 
-> > Why do you say that?  I would strongly prefer to use the load lists only if they
-> > are absolutely necessary.  I don't think that's the case here, as I can't
-> > imagine accessing FPU state in NMI context is allowed, at least not without a
-> > big pile of save/restore code.
-> 
-> I was thinking more of the added vmentry/vmexit overhead due to
-> xfd_guest_enter xfd_guest_exit.
-> 
-> That said, the case where we saw MSR autoload as faster involved EFER, and
-> we decided that it was due to TLB flushes (commit f6577a5fa15d, "x86, kvm,
-> vmx: Always use LOAD_IA32_EFER if available", 2014-11-12). Do you know if
-> RDMSR/WRMSR is always slower than MSR autoload?
+On 08/02/21 19:04, Sean Christopherson wrote:
+>> That said, the case where we saw MSR autoload as faster involved EFER, and
+>> we decided that it was due to TLB flushes (commit f6577a5fa15d, "x86, kvm,
+>> vmx: Always use LOAD_IA32_EFER if available", 2014-11-12). Do you know if
+>> RDMSR/WRMSR is always slower than MSR autoload?
+> RDMSR/WRMSR may be marginally slower, but only because the autoload stuff avoids
+> serializing the pipeline after every MSR.
 
-RDMSR/WRMSR may be marginally slower, but only because the autoload stuff avoids
-serializing the pipeline after every MSR.  The autoload paths are effectively
-just wrappers around the WRMSR ucode, plus some extra VM-Enter specific checks,
-as ucode needs to perform all the normal fault checks on the index and value.
+That's probably adding up quickly...
 
-On the flip side, if the load lists are dynamically constructed, I suspect the
-code overhead of walking the lists negates any advantages of the load lists.
+> The autoload paths are effectively
+> just wrappers around the WRMSR ucode, plus some extra VM-Enter specific checks,
+> as ucode needs to perform all the normal fault checks on the index and value.
+> On the flip side, if the load lists are dynamically constructed, I suspect the
+> code overhead of walking the lists negates any advantages of the load lists.
 
-TL;DR: it likely depends on the exact use case.  My primary objection to using
-the load lists is that people tend to assume they are more performant that raw
-RDMSR/WRMSR, and so aren't as careful/thoughtful as they should be about adding
-MSRs to the save/restore paths.
+... but yeah this is not very encouraging.
 
-Note, the dedicated VMCS fields, e.g. EFER and SYSENTER, are 1-2 orders of
-magnitude faster than raw RDMSR/WRMSR or the load lists, as they obviously have
-dedicated handling in VM-Enter ucode.
+Context switch time is a problem for XFD.  In a VM that uses AMX, most 
+threads in the guest will have nonzero XFD but the vCPU thread itself 
+will have zero XFD.  So as soon as one thread in the VM forces the vCPU 
+thread to clear XFD, you pay a price on all vmexits and vmentries.
+
+However, running the host with _more_ bits set than necessary in XFD 
+should not be a problem as long as the host doesn't use the AMX 
+instructions.  So perhaps Jing can look into keeping XFD=0 for as little 
+time as possible, and XFD=host_XFD|guest_XFD as much as possible.
+
+Paolo
+
