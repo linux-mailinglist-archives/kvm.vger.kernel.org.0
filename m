@@ -2,109 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D3C7314025
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 21:17:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AD2B31404A
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 21:21:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235050AbhBHUQP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 15:16:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
+        id S236766AbhBHUVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 15:21:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236724AbhBHUPq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 15:15:46 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D9BC06178B
-        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 12:15:05 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 203so18150184ybz.2
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 12:15:05 -0800 (PST)
+        with ESMTP id S236716AbhBHUU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 15:20:26 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DCCC06178A
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 12:19:44 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id dr7so120217qvb.22
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 12:19:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc
          :content-transfer-encoding;
-        bh=mgnW8xfhzGkssYeGVKL8OKFJiT7oGpD36C+YLUEs9TA=;
-        b=oigVJzIQtqcKIBZDm0qdX4NdpwQ6YShdcaV1o/xGRooB0gzajPVvjJq100lfrHrhcF
-         T1pAdffB/uYeXuzx8TjxhlctRkOCQNo+TvMT+jo0Psl6fEIomkdO8xDPV0fPEsZIvwcw
-         MtFM6u/CauFDs+hv3kFBxRW1JcJidoQhvvUvZyqMtHXLQsxtboN9ldAuWxgpZ8p/sa1v
-         wifOxro9QPDE9Qp1SxByCmaBO9S5m64s4BiVREWoczYgOx82VXGfCixwlSytf/woCu4B
-         Wm8J1QB9vurDXXZDL1VWdJvnw8vCkYkyBUUC0OQ3TimAOxjR/QZJV6m+PMKwU9pbFMmc
-         edag==
+        bh=c92WD9tBjIN6OOgkPtPsSt2AYdNEujBjskOjMLRrrjI=;
+        b=wAql08sQVg8gABzEOZq6pnXO7zG/92jQFGKp6eugdemTbEjm4IL0/Lb+dByjT9sfhN
+         bjrPlvAKbj0oKas5ZqV4PV56jUcAei5nYjw5vJr6mG5xdB4wZk/JcHuHUioTCwKRaSdH
+         CJzxvvBlsaMq8ms4VQHX21CJcx+1rWOKfToT9ALVbjNAX97uhylRuuwIbn7USVcM6H/V
+         u6YsQqV0rBFRXWoILzy3Q/BkgFUMRBdVjg9XmKfKKp7sJYhoeMXuLxY9l5LbdxwGv1I7
+         EBzHC9tN987u4Q6Ixgn0WNBiw2/2BDxQI5v/Axz/egNhPcQU3LK2dUoaVTjSdEiOBElE
+         9JzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
          :subject:from:to:cc:content-transfer-encoding;
-        bh=mgnW8xfhzGkssYeGVKL8OKFJiT7oGpD36C+YLUEs9TA=;
-        b=RRDrMxmX9DF5fM94wNv6LsaxqL88Q9NgnoAwZI0MVpEGxYNQg1kDij1bxDtjYGbSoi
-         fTSqB3AcIzaSVfPSzl5wPeF9AFgoLyCtXrFTzWCelmn6YMncZxE2lb57GUROcTzh2NML
-         JMMbZhY0qG4FfVG+yhVLA38J3w1oGYTr7D52/FYghOp0ConjYkJ14/viA/kt3ZnMEBAm
-         EtdFd39FBK7EL+Jw1cdYXRPEQ2FjHkjigqQOm9Ut8/XUnfmn8zn4v5aBw8U6x/1R6Bgi
-         nKIxI9+YU8vjaX0FHuWc4yeGdju3A5AJPipsVuvlUikNsTbhPCpkJ8keu1Ohp/Sn3GmC
-         oxtQ==
-X-Gm-Message-State: AOAM532KwFl6Qkqsbb/meyvoz0RdkIGgPqFbCq+mTNonMwtmCv7owuPj
-        PD42+dyTy+o7vO8OKq3oo3NnK8pOTik=
-X-Google-Smtp-Source: ABdhPJw5y94S/wkdoGcsPKRP3Sy9BcFPhMape3rkfsMv3JYDBQ5F2mL/8AP6qLKHSFk15a98gta66uPQySk=
+        bh=c92WD9tBjIN6OOgkPtPsSt2AYdNEujBjskOjMLRrrjI=;
+        b=RzvWSWajrSEmb81J0oW5iuuIgVHo7OMSj2ksAvv79IGh60dPtm2CMRbRzTVGEOuJlG
+         Zn2IqJKVmB3QmJLG+Njz8J+1gLMohJy/MniUmF4N9JOb+x6/I4Pir0dcPZpTh7Ljj+mP
+         w+K3yM9pM9IWTyMtmqCew4A4U1+ezTQt2gzEGxREe5U1wtlvbKTvXLV0bZuvj1+Ra3IS
+         iC1rSFW/f0Rv0kiLa5aY9mFmgI7W7r8I7G1kZQsHqMOzX5NNN7aHSsec8LKhQDztoP6r
+         8Aa36Pq211pasbcN+eexOPo5pbVP2tIwC02jBaL3LLX6biCIXRIydaCtEUSzaC7d0j8u
+         +3UA==
+X-Gm-Message-State: AOAM531QznqapCvfzaSBPb1+JqmLWsrqJwmNrf3bTwyX3uQ/4+rDy6K6
+        nEca+1TQRyPpFwHYR11O8IT7AsAfQ60=
+X-Google-Smtp-Source: ABdhPJwD9shv2X/SfBHMf5rkLqrlBt/yFuFy7BTxCqki+QSLka36BUA4rdWxltPGE4NO9eUMY8h7zFBUa+M=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:e4db:abc1:a5c0:9dbc])
- (user=seanjc job=sendgmr) by 2002:a5b:745:: with SMTP id s5mr27855419ybq.265.1612815305037;
- Mon, 08 Feb 2021 12:15:05 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a05:6214:125:: with SMTP id
+ w5mr17608903qvs.20.1612815583538; Mon, 08 Feb 2021 12:19:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon,  8 Feb 2021 12:15:02 -0800
-Message-Id: <20210208201502.1239867-1-seanjc@google.com>
+Date:   Mon,  8 Feb 2021 12:19:40 -0800
+Message-Id: <20210208201940.1258328-1-seanjc@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH] KVM: x86/xen: Use hva_t for holding hypercall page address
+Subject: [PATCH] KVM: Use kvm_pfn_t for local PFN variable in hva_to_pfn_remapped()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Joao Martins <joao.m.martins@oracle.com>,
-        David Woodhouse <dwmw@amazon.co.uk>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use hva_t, a.k.a. unsigned long, for the local variable that holds the
-hypercall page address.  On 32-bit KVM, gcc complains about using a u64
-due to the implicit cast from a 64-bit value to a 32-bit pointer.
+Use kvm_pfn_t, a.k.a. u64, for the local 'pfn' variable when retrieving
+a so called "remapped" hva/pfn pair.  In theory, the hva could resolve to
+a pfn in high memory on a 32-bit kernel.
 
-  arch/x86/kvm/xen.c: In function =E2=80=98kvm_xen_write_hypercall_page=E2=
-=80=99:
-  arch/x86/kvm/xen.c:300:22: error: cast to pointer from integer of
-                             different size [-Werror=3Dint-to-pointer-cast]
-  300 |   page =3D memdup_user((u8 __user *)blob_addr, PAGE_SIZE);
+This bug was inadvertantly exposed by commit bd2fae8da794 ("KVM: do not
+assume PTE is writable after follow_pfn"), which added an error PFN value
+to the mix, causing gcc to comlain about overflowing the unsigned long.
 
-Cc: Joao Martins <joao.m.martins@oracle.com>
-Cc: David Woodhouse <dwmw@amazon.co.uk>
-Fixes: 23200b7a30de ("KVM: x86/xen: intercept xen hypercalls if enabled")
+  arch/x86/kvm/../../../virt/kvm/kvm_main.c: In function =E2=80=98hva_to_pf=
+n_remapped=E2=80=99:
+  include/linux/kvm_host.h:89:30: error: conversion from =E2=80=98long long=
+ unsigned int=E2=80=99
+                                  to =E2=80=98long unsigned int=E2=80=99 ch=
+anges value from
+                                  =E2=80=989218868437227405314=E2=80=99 to =
+=E2=80=982=E2=80=99 [-Werror=3Doverflow]
+   89 | #define KVM_PFN_ERR_RO_FAULT (KVM_PFN_ERR_MASK + 2)
+      |                              ^
+virt/kvm/kvm_main.c:1935:9: note: in expansion of macro =E2=80=98KVM_PFN_ER=
+R_RO_FAULT=E2=80=99
+
+Cc: stable@vger.kernel.org
+Fixes: add6a0cd1c5b ("KVM: MMU: try to fix up page faults before giving up"=
+)
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/xen.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 2cee0376455c..deda1ba8c18a 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -286,8 +286,12 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu=
-, u64 data)
- 				return 1;
- 		}
- 	} else {
--		u64 blob_addr =3D lm ? kvm->arch.xen_hvm_config.blob_addr_64
--				   : kvm->arch.xen_hvm_config.blob_addr_32;
-+		/*
-+		 * Note, truncation is a non-issue as 'lm' is guaranteed to be
-+		 * false for a 32-bit kernel, i.e. when hva_t is only 4 bytes.
-+		 */
-+		hva_t blob_addr =3D lm ? kvm->arch.xen_hvm_config.blob_addr_64
-+				     : kvm->arch.xen_hvm_config.blob_addr_32;
- 		u8 blob_size =3D lm ? kvm->arch.xen_hvm_config.blob_size_64
- 				  : kvm->arch.xen_hvm_config.blob_size_32;
- 		u8 *page;
+I don't actually know that it's possible for a remapped pfn to be a 64-bit
+value on a stock kernel.  But, backporting a one-liner is far easier and
+safer than trying to audit all possible flows.  :-)
+
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ee4ac2618ec5..001b9de4e727 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1906,7 +1906,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct =
+*vma,
+ 			       bool write_fault, bool *writable,
+ 			       kvm_pfn_t *p_pfn)
+ {
+-	unsigned long pfn;
++	kvm_pfn_t pfn;
+ 	pte_t *ptep;
+ 	spinlock_t *ptl;
+ 	int r;
 --=20
 2.30.0.478.g8a0d178c01-goog
 
