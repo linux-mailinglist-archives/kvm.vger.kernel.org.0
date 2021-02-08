@@ -2,110 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 62B1E3137AE
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 378F13137B6
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 16:30:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233142AbhBHP30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 10:29:26 -0500
-Received: from mga17.intel.com ([192.55.52.151]:9937 "EHLO mga17.intel.com"
+        id S231809AbhBHP3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 10:29:36 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36948 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232525AbhBHPYD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 10:24:03 -0500
-IronPort-SDR: eNmXbxa2bq/7fmbx7u1aErWzDb20PokeUmy4tsIxK2qSOcsFnBYYZnsx8ldM5cD8PWG9MCrL0M
- qXg/45WM2eNw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="161479707"
-X-IronPort-AV: E=Sophos;i="5.81,162,1610438400"; 
-   d="scan'208";a="161479707"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 07:23:15 -0800
-IronPort-SDR: 4+2YA9AuhuB4uOlU7aTdKYD5yCc4FRvmzcWeX7UoY6C14CkAmDdX0GUSwTJlF2ZtApPwwl7h1p
- n6UXPFJ7PQ4w==
-X-IronPort-AV: E=Sophos;i="5.81,162,1610438400"; 
-   d="scan'208";a="418827376"
-Received: from chongkea-mobl1.amr.corp.intel.com (HELO [10.212.141.69]) ([10.212.141.69])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 07:23:14 -0800
-Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
-To:     Jing Liu <jing2.liu@linux.intel.com>, pbonzini@redhat.com
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S233450AbhBHP1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 10:27:05 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D412964F1D;
+        Mon,  8 Feb 2021 15:15:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612797343;
+        bh=Z3NwpbMc3+FIymIKdL8oJDqLuu31Dr0homPLMdONXjA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WvMpiH69yDeoHwNFKuJuh/o+eXxNenyXbA0UxBt6ZCH6GyAvZTwks4HmGpSynPSbK
+         +1TkT5YRpu53+gvUGGw2RuvkzQzHM9UV8m0vIdumI8MR8QhBqV6ThlTw/pCHwwJuVj
+         bbYsvyKd/JiBz6jIVx6ZJTJalrv7qFScGi99wdmA=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
-Date:   Mon, 8 Feb 2021 07:23:13 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, Peter Gonda <pgonda@google.com>
+Subject: [PATCH 5.10 077/120] Fix unsynchronized access to sev members through svm_register_enc_region
+Date:   Mon,  8 Feb 2021 16:01:04 +0100
+Message-Id: <20210208145821.479412648@linuxfoundation.org>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20210208145818.395353822@linuxfoundation.org>
+References: <20210208145818.395353822@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-In-Reply-To: <20210208161659.63020-1-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/8/21 8:16 AM, Jing Liu wrote:
-> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
-> -
->  static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
->  {
->  	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
-> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
->  	/* Set XSTATE_BV and possibly XCOMP_BV.  */
->  	xsave->header.xfeatures = xstate_bv;
->  	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
-> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
-> +					 xfeatures_mask_all;
+From: Peter Gonda <pgonda@google.com>
 
-Are 'host_xcr0' and 'xfeatures_mask_all' really interchangeable?  If so,
-shouldn't we just remove 'host_xcr0' everywhere?
+commit 19a23da53932bc8011220bd8c410cb76012de004 upstream.
+
+Grab kvm->lock before pinning memory when registering an encrypted
+region; sev_pin_memory() relies on kvm->lock being held to ensure
+correctness when checking and updating the number of pinned pages.
+
+Add a lockdep assertion to help prevent future regressions.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Fixes: 1e80fdc09d12 ("KVM: SVM: Pin guest memory when SEV is active")
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+V2
+ - Fix up patch description
+ - Correct file paths svm.c -> sev.c
+ - Add unlock of kvm->lock on sev_pin_memory error
+
+V1
+ - https://lore.kernel.org/kvm/20210126185431.1824530-1-pgonda@google.com/
+
+Message-Id: <20210127161524.2832400-1-pgonda@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/sev.c |   17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -320,6 +320,8 @@ static struct page **sev_pin_memory(stru
+ 	unsigned long first, last;
+ 	int ret;
+ 
++	lockdep_assert_held(&kvm->lock);
++
+ 	if (ulen == 0 || uaddr + ulen < uaddr)
+ 		return ERR_PTR(-EINVAL);
+ 
+@@ -1001,12 +1003,20 @@ int svm_register_enc_region(struct kvm *
+ 	if (!region)
+ 		return -ENOMEM;
+ 
++	mutex_lock(&kvm->lock);
+ 	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
+ 	if (IS_ERR(region->pages)) {
+ 		ret = PTR_ERR(region->pages);
++		mutex_unlock(&kvm->lock);
+ 		goto e_free;
+ 	}
+ 
++	region->uaddr = range->addr;
++	region->size = range->size;
++
++	list_add_tail(&region->list, &sev->regions_list);
++	mutex_unlock(&kvm->lock);
++
+ 	/*
+ 	 * The guest may change the memory encryption attribute from C=0 -> C=1
+ 	 * or vice versa for this memory range. Lets make sure caches are
+@@ -1015,13 +1025,6 @@ int svm_register_enc_region(struct kvm *
+ 	 */
+ 	sev_clflush_pages(region->pages, region->npages);
+ 
+-	region->uaddr = range->addr;
+-	region->size = range->size;
+-
+-	mutex_lock(&kvm->lock);
+-	list_add_tail(&region->list, &sev->regions_list);
+-	mutex_unlock(&kvm->lock);
+-
+ 	return ret;
+ 
+ e_free:
+
+
