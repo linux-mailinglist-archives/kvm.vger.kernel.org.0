@@ -2,181 +2,263 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC4C5312FFF
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:02:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7108B31303F
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:11:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232295AbhBHLBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 06:01:45 -0500
-Received: from mga05.intel.com ([192.55.52.43]:15612 "EHLO mga05.intel.com"
+        id S232570AbhBHLLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 06:11:00 -0500
+Received: from mga14.intel.com ([192.55.52.115]:64856 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232718AbhBHK50 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 05:57:26 -0500
-IronPort-SDR: GRaoRPOvMWcc4ilEZOwy6RO28CeU1kCVjd4FNFEyBcqXsTl4aRNPcwCl/eOnyeymSG1cnsO0w8
- 2H33scnJFfZA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="266525520"
+        id S232838AbhBHLGl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 06:06:41 -0500
+IronPort-SDR: T7vLtO3R03D/vcBVXO08TGAFucbmbJ6noPvfY3Dsn9TYzmo8+OpCAHOtuQQ3A/RemCn39GabcM
+ OOi8OkUe3zcg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="180918197"
 X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="266525520"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:56:45 -0800
-IronPort-SDR: tOp+LK2t3eucjEPmhG6dNYeE8N9Jv+49hRIQ1vHwTTn0DEQbEwvPDvr61WpP3l40BIDTJKm+Fd
- 68JVq0CNQdKg==
+   d="scan'208";a="180918197"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 03:05:19 -0800
+IronPort-SDR: winturclMo5cxgK1dMR6mCNDla/gO+6YwbZs4M3YNHH5tHraLqh9PM028W5DLc6pHPWZghihjY
+ +b153LclKJHA==
 X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="374451368"
+   d="scan'208";a="395344625"
 Received: from jaeminha-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.11.62])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:56:40 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 03:05:14 -0800
+Date:   Tue, 9 Feb 2021 00:05:12 +1300
 From:   Kai Huang <kai.huang@intel.com>
-To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, corbet@lwn.net,
-        Andy Lutomirski <luto@amacapital.net>,
-        Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v4 26/26] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Mon,  8 Feb 2021 23:56:33 +1300
-Message-Id: <897b4a9088dc04a674b8bf244d465ebac042a8a2.1612777752.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.1612777752.git.kai.huang@intel.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     <linux-sgx@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>, <seanjc@google.com>, <jarkko@kernel.org>,
+        <luto@kernel.org>, <dave.hansen@intel.com>,
+        <rick.p.edgecombe@intel.com>, <haitao.huang@intel.com>,
+        <pbonzini@redhat.com>, <bp@alien8.de>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <hpa@zytor.com>, <jmattson@google.com>,
+        <joro@8bytes.org>, <vkuznets@redhat.com>, <wanpengli@tencent.com>,
+        robert.hu@intel.com
+Subject: Re: [RFC PATCH v4 18/26] KVM: x86: Add support for reverse CPUID
+ lookup of scattered features
+Message-Id: <20210209000512.c6f6eed81da5a8337c2c6510@intel.com>
+In-Reply-To: <3189b8090d5d1d4547dade6d1a7feb034af3c2c6.1612777752.git.kai.huang@intel.com>
 References: <cover.1612777752.git.kai.huang@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        <3189b8090d5d1d4547dade6d1a7feb034af3c2c6.1612777752.git.kai.huang@intel.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Hi Paolo,
 
-Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
-to grant a VM access to a priveleged attribute, with args[0] holding a
-file handle to a valid SGX attribute file.
+Although this series was sent as RFC, would you consider reviewing and merging
+this patch from Sean? As more Intel features are coming, KVM reverse lookup
+needs to handle scattered x86 feature bits. One example is Robert's KVM
+keylocker support:
 
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
+https://www.spinics.net/lists/kvm/msg233638.html
 
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.
+Thanks!
 
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
- arch/x86/kvm/cpuid.c           |  2 +-
- arch/x86/kvm/x86.c             | 22 ++++++++++++++++++++++
- include/uapi/linux/kvm.h       |  1 +
- 4 files changed, 47 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index c136e254b496..47c7c7c33025 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6037,6 +6037,29 @@ KVM_EXIT_X86_RDMSR and KVM_EXIT_X86_WRMSR exit notifications which user space
- can then handle to implement model specific MSR handling and/or user notifications
- to inform a user that an MSR was not handled.
- 
-+7.22 KVM_CAP_SGX_ATTRIBUTE
-+----------------------
-+
-+:Architectures: x86
-+:Target: VM
-+:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+          attribute is not supported by KVM.
-+
-+KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
-+more priveleged enclave attributes.  args[0] must hold a file handle to a valid
-+SGX attribute file corresponding to an attribute that is supported/restricted
-+by KVM (currently only PROVISIONKEY).
-+
-+The SGX subsystem restricts access to a subset of enclave attributes to provide
-+additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
-+is restricted to deter malware from using the PROVISIONKEY to obtain a stable
-+system fingerprint.  To prevent userspace from circumventing such restrictions
-+by running an enclave in a VM, KVM prevents access to privileged attributes by
-+default.
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 04b2f5de2d7b..ad00a1af1545 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -833,7 +833,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * expected to derive it from supported XCR0.
- 		 */
- 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
--			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
- 			      SGX_ATTR_KSS;
- 		entry->ebx &= 0;
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5ca7b181a3ae..3d1b4113a57b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -74,6 +74,8 @@
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
-+#include <asm/sgx.h>
-+#include <asm/sgx_arch.h>
- #include <clocksource/hyperv_timer.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -3767,6 +3769,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_USER_SPACE_MSR:
- 	case KVM_CAP_X86_MSR_FILTER:
- 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SYNC_REGS:
-@@ -5295,6 +5300,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		kvm->arch.user_space_msr_mask = cap->args[0];
- 		r = 0;
- 		break;
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		unsigned long allowed_attributes = 0;
-+
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
-+
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 374c67875cdb..e17bda18a9b4 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1058,6 +1058,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
- #define KVM_CAP_SYS_HYPERV_CPUID 191
- #define KVM_CAP_DIRTY_LOG_RING 192
-+#define KVM_CAP_SGX_ATTRIBUTE 200
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.29.2
-
+On Mon, 8 Feb 2021 23:55:28 +1300 Kai Huang wrote:
+> From: Sean Christopherson <seanjc@google.com>
+> 
+> Introduce a scheme that allows KVM's CPUID magic to support features
+> that are scattered in the kernel's feature words.  To advertise and/or
+> query guest support for CPUID-based features, KVM requires the bit
+> number of an X86_FEATURE_* to match the bit number in its associated
+> CPUID entry.  For scattered features, this does not hold true.
+> 
+> Add a framework to allow defining KVM-only words, stored in
+> kvm_cpu_caps after the shared kernel caps, that can be used to gather
+> the scattered feature bits by translating X86_FEATURE_* flags into their
+> KVM-defined feature.
+> 
+> Note, because reverse_cpuid_check() effectively forces kvm_cpu_caps
+> lookups to be resolved at compile time, there is no runtime cost for
+> translating from kernel-defined to kvm-defined features.
+> 
+> More details here:  https://lkml.kernel.org/r/X/jxCOLG+HUO4QlZ@google.com
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 32 +++++++++++++++++++++++++++-----
+>  arch/x86/kvm/cpuid.h | 39 ++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 61 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 13036cf0b912..f8037fab8950 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -28,7 +28,7 @@
+>   * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
+>   * aligned to sizeof(unsigned long) because it's not accessed via bitops.
+>   */
+> -u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
+> +u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+>  EXPORT_SYMBOL_GPL(kvm_cpu_caps);
+>  
+>  static u32 xstate_required_size(u64 xstate_bv, bool compacted)
+> @@ -53,6 +53,7 @@ static u32 xstate_required_size(u64 xstate_bv, bool compacted)
+>  }
+>  
+>  #define F feature_bit
+> +#define SF(name) (boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0)
+>  
+>  static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+>  	struct kvm_cpuid_entry2 *entries, int nent, u32 function, u32 index)
+> @@ -331,13 +332,13 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
+>  	return r;
+>  }
+>  
+> -static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+> +/* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
+> +static __always_inline void __kvm_cpu_cap_mask(enum cpuid_leafs leaf)
+>  {
+>  	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
+>  	struct kvm_cpuid_entry2 entry;
+>  
+>  	reverse_cpuid_check(leaf);
+> -	kvm_cpu_caps[leaf] &= mask;
+>  
+>  	cpuid_count(cpuid.function, cpuid.index,
+>  		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
+> @@ -345,6 +346,26 @@ static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+>  	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
+>  }
+>  
+> +static __always_inline void kvm_cpu_cap_mask(enum cpuid_leafs leaf, u32 mask)
+> +{
+> +	/* Use the "init" variant for scattered leafs. */
+> +	BUILD_BUG_ON(leaf >= NCAPINTS);
+> +
+> +	kvm_cpu_caps[leaf] &= mask;
+> +
+> +	__kvm_cpu_cap_mask(leaf);
+> +}
+> +
+> +static __always_inline void kvm_cpu_cap_init(enum cpuid_leafs leaf, u32 mask)
+> +{
+> +	/* Use the "mask" variant for hardwared-defined leafs. */
+> +	BUILD_BUG_ON(leaf < NCAPINTS);
+> +
+> +	kvm_cpu_caps[leaf] = mask;
+> +
+> +	__kvm_cpu_cap_mask(leaf);
+> +}
+> +
+>  void kvm_set_cpu_caps(void)
+>  {
+>  	unsigned int f_nx = is_efer_nx() ? F(NX) : 0;
+> @@ -355,12 +376,13 @@ void kvm_set_cpu_caps(void)
+>  	unsigned int f_gbpages = 0;
+>  	unsigned int f_lm = 0;
+>  #endif
+> +	memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
+>  
+> -	BUILD_BUG_ON(sizeof(kvm_cpu_caps) >
+> +	BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
+>  		     sizeof(boot_cpu_data.x86_capability));
+>  
+>  	memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
+> -	       sizeof(kvm_cpu_caps));
+> +	       sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)));
+>  
+>  	kvm_cpu_cap_mask(CPUID_1_ECX,
+>  		/*
+> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> index dc921d76e42e..2041e2f07347 100644
+> --- a/arch/x86/kvm/cpuid.h
+> +++ b/arch/x86/kvm/cpuid.h
+> @@ -7,7 +7,20 @@
+>  #include <asm/processor.h>
+>  #include <uapi/asm/kvm_para.h>
+>  
+> -extern u32 kvm_cpu_caps[NCAPINTS] __read_mostly;
+> +/*
+> + * Hardware-defined CPUID leafs that are scattered in the kernel, but need to
+> + * be directly used by KVM.  Note, these word values conflict with the kernel's
+> + * "bug" caps, but KVM doesn't use those.
+> + */
+> +enum kvm_only_cpuid_leafs {
+> +	NR_KVM_CPU_CAPS = NCAPINTS,
+> +
+> +	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> +};
+> +
+> +#define X86_KVM_FEATURE(w, f)		((w)*32 + (f))
+> +
+> +extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+>  void kvm_set_cpu_caps(void);
+>  
+>  void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
+> @@ -83,6 +96,20 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+>  	BUILD_BUG_ON(reverse_cpuid[x86_leaf].function == 0);
+>  }
+>  
+> +/*
+> + * Translate feature bits that are scattered in the kernel's cpufeatures word
+> + * into KVM feature words that align with hardware's definitions.
+> + */
+> +static __always_inline u32 __feature_translate(int x86_feature)
+> +{
+> +	return x86_feature;
+> +}
+> +
+> +static __always_inline u32 __feature_leaf(int x86_feature)
+> +{
+> +	return __feature_translate(x86_feature) / 32;
+> +}
+> +
+>  /*
+>   * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
+>   * the hardware defined bit number (stored in bits 4:0) and a software defined
+> @@ -91,6 +118,8 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
+>   */
+>  static __always_inline u32 __feature_bit(int x86_feature)
+>  {
+> +	x86_feature = __feature_translate(x86_feature);
+> +
+>  	reverse_cpuid_check(x86_feature / 32);
+>  	return 1 << (x86_feature & 31);
+>  }
+> @@ -99,7 +128,7 @@ static __always_inline u32 __feature_bit(int x86_feature)
+>  
+>  static __always_inline struct cpuid_reg x86_feature_cpuid(unsigned int x86_feature)
+>  {
+> -	unsigned int x86_leaf = x86_feature / 32;
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>  
+>  	reverse_cpuid_check(x86_leaf);
+>  	return reverse_cpuid[x86_leaf];
+> @@ -291,7 +320,7 @@ static inline bool cpuid_fault_enabled(struct kvm_vcpu *vcpu)
+>  
+>  static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
+>  {
+> -	unsigned int x86_leaf = x86_feature / 32;
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>  
+>  	reverse_cpuid_check(x86_leaf);
+>  	kvm_cpu_caps[x86_leaf] &= ~__feature_bit(x86_feature);
+> @@ -299,7 +328,7 @@ static __always_inline void kvm_cpu_cap_clear(unsigned int x86_feature)
+>  
+>  static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
+>  {
+> -	unsigned int x86_leaf = x86_feature / 32;
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>  
+>  	reverse_cpuid_check(x86_leaf);
+>  	kvm_cpu_caps[x86_leaf] |= __feature_bit(x86_feature);
+> @@ -307,7 +336,7 @@ static __always_inline void kvm_cpu_cap_set(unsigned int x86_feature)
+>  
+>  static __always_inline u32 kvm_cpu_cap_get(unsigned int x86_feature)
+>  {
+> -	unsigned int x86_leaf = x86_feature / 32;
+> +	unsigned int x86_leaf = __feature_leaf(x86_feature);
+>  
+>  	reverse_cpuid_check(x86_leaf);
+>  	return kvm_cpu_caps[x86_leaf] & __feature_bit(x86_feature);
+> -- 
+> 2.29.2
+> 
