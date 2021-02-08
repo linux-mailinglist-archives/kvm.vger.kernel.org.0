@@ -2,114 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC91A313DA1
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:35:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9B02313E20
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 19:54:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235799AbhBHSf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 13:35:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55731 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235632AbhBHSd7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 13:33:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612809153;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FONHI2TN+O9acLzuem6EKO8Yxg/GTLtQhMLyetszZzg=;
-        b=NJaMKdxdXgV17Ssve+rmiCf83yKIIMWBeSWXFjNl+SOq9tFjUkxRTryqIEX/WGY4BQol7u
-        L50UnHW07y71VLzqIJX+KYJUUlaJCjkR3oGRbE2GpQl462TJfiYBko5utGJVmNm7CMfGV4
-        ccyXIQUIk8QKpuBLULGtxvFqxtG5yuM=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-vt3sh3FzOSCA1OdzJT2s4w-1; Mon, 08 Feb 2021 13:32:31 -0500
-X-MC-Unique: vt3sh3FzOSCA1OdzJT2s4w-1
-Received: by mail-ej1-f71.google.com with SMTP id yc4so12741273ejb.2
-        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 10:32:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FONHI2TN+O9acLzuem6EKO8Yxg/GTLtQhMLyetszZzg=;
-        b=Uqo7S40XqlFvGDVSmqPIQh5dLMGq4uqKCbOj9u/CnVRzAWblAzBAqqob5vvur+onFv
-         7p2hl/tSWU5pEr2nVeOOC5DZBhpPQZFBT60a1bwCFsSNNsBeq5JK9SUjNgpro6rHBtS4
-         bMX5aitPou9PW4zym/SZniGCgBaemtZ+GJYdRojK9PEwFBIsCExoGZHZ3gwh729baO9s
-         JjGhA7qe3OHvuHRE7pEqfhDqsym20OkMwuQoBLSY/tK+R9xQDjawy+m2QsLdF84XjeDH
-         iJN+Bx96psWqAeLa4mP1Cxu7kMRJSE/lZWF0osiuXcNTBe+ZWmxV2a7BVSHvqQJTaBnb
-         OmyQ==
-X-Gm-Message-State: AOAM532Agiy5oBnCbvmanRUPX3HtmvNutPWe9ROt8aZbcJO4lBZFnm1i
-        dkP43RdhNqAWXcMZU1KVs1FjMeO1xTP7FhI//x/IxzQkKYdbcfzm4eYwhtf1RWkYb4aTv4xWpEf
-        r5XOMWv4wwSOO
-X-Received: by 2002:aa7:c755:: with SMTP id c21mr18592173eds.47.1612809148227;
-        Mon, 08 Feb 2021 10:32:28 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxpsuTp5sRzeOMNIjmosofGMT5Va6UgHF+7NHtSfOHTT8nBvBhqO12WkK46eKwRMOgobAa2CA==
-X-Received: by 2002:aa7:c755:: with SMTP id c21mr18592153eds.47.1612809148080;
-        Mon, 08 Feb 2021 10:32:28 -0800 (PST)
-Received: from redhat.com (bzq-79-180-2-31.red.bezeqint.net. [79.180.2.31])
-        by smtp.gmail.com with ESMTPSA id x5sm10415492edi.35.2021.02.08.10.32.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Feb 2021 10:32:27 -0800 (PST)
-Date:   Mon, 8 Feb 2021 13:32:24 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     kuba@kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Asias He <asias@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH net] vsock/virtio: update credit only if socket is not
- closed
-Message-ID: <20210208133211-mutt-send-email-mst@kernel.org>
-References: <20210208144454.84438-1-sgarzare@redhat.com>
+        id S233895AbhBHSx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 13:53:58 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:60334 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233253AbhBHSwh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 13:52:37 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps (TLS1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
+        (Exim 4.93.0.4)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1l9BdK-00044c-5D; Mon, 08 Feb 2021 19:51:38 +0100
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] KVM: x86/mmu: Make HVA handler retpoline-friendly
+Date:   Mon,  8 Feb 2021 19:51:32 +0100
+Message-Id: <732d3fe9eb68aa08402a638ab0309199fa89ae56.1612810129.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210208144454.84438-1-sgarzare@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 08, 2021 at 03:44:54PM +0100, Stefano Garzarella wrote:
-> If the socket is closed or is being released, some resources used by
-> virtio_transport_space_update() such as 'vsk->trans' may be released.
-> 
-> To avoid a use after free bug we should only update the available credit
-> when we are sure the socket is still open and we have the lock held.
-> 
-> Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+When retpolines are enabled they have high overhead in the inner loop
+inside kvm_handle_hva_range() that iterates over the provided memory area.
 
-Probably stable material.
+Let's mark this function and its TDP MMU equivalent __always_inline so
+compiler will be able to change the call to the actual handler function
+inside each of them into a direct one.
 
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 5956939eebb7..e4370b1b7494 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -1130,8 +1130,6 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->  
->  	vsk = vsock_sk(sk);
->  
-> -	space_available = virtio_transport_space_update(sk, pkt);
-> -
->  	lock_sock(sk);
->  
->  	/* Check if sk has been closed before lock_sock */
-> @@ -1142,6 +1140,8 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->  		goto free_pkt;
->  	}
->  
-> +	space_available = virtio_transport_space_update(sk, pkt);
-> +
->  	/* Update CID in case it has changed after a transport reset event */
->  	vsk->local_addr.svm_cid = dst.svm_cid;
->  
-> -- 
-> 2.29.2
+This significantly improves performance on the unmap test on the existing
+kernel memslot code (tested on a Xeon 8167M machine):
+30 slots in use:
+Test       Before   After     Improvement
+Unmap      0.0353s  0.0334s   5%
+Unmap 2M   0.00104s 0.000407s 61%
 
+509 slots in use:
+Test       Before   After     Improvement
+Unmap      0.0742s  0.0740s   None
+Unmap 2M   0.00221s 0.00159s  28%
+
+Looks like having an indirect call in these functions (and, so, a
+retpoline) might have interfered with unrolling of the whole loop in the
+CPU.
+
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+Changes from v1:
+    * Switch from static dispatch to __always_inline annotation.
+    
+    * Separate this patch from the rest of log(n) memslot code changes.
+    
+    * Redo benchmarks.
+
+ arch/x86/kvm/mmu/mmu.c     | 21 +++++++++++----------
+ arch/x86/kvm/mmu/tdp_mmu.c | 16 +++++++++++-----
+ 2 files changed, 22 insertions(+), 15 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6d16481aa29d..38d7a38609d4 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1456,16 +1456,17 @@ static void slot_rmap_walk_next(struct slot_rmap_walk_iterator *iterator)
+ 	     slot_rmap_walk_okay(_iter_);				\
+ 	     slot_rmap_walk_next(_iter_))
+ 
+-static int kvm_handle_hva_range(struct kvm *kvm,
+-				unsigned long start,
+-				unsigned long end,
+-				unsigned long data,
+-				int (*handler)(struct kvm *kvm,
+-					       struct kvm_rmap_head *rmap_head,
+-					       struct kvm_memory_slot *slot,
+-					       gfn_t gfn,
+-					       int level,
+-					       unsigned long data))
++static __always_inline int
++kvm_handle_hva_range(struct kvm *kvm,
++		     unsigned long start,
++		     unsigned long end,
++		     unsigned long data,
++		     int (*handler)(struct kvm *kvm,
++				    struct kvm_rmap_head *rmap_head,
++				    struct kvm_memory_slot *slot,
++				    gfn_t gfn,
++				    int level,
++				    unsigned long data))
+ {
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memory_slot *memslot;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index b56d604809b8..f26c2269291f 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -639,11 +639,17 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+ 	return ret;
+ }
+ 
+-static int kvm_tdp_mmu_handle_hva_range(struct kvm *kvm, unsigned long start,
+-		unsigned long end, unsigned long data,
+-		int (*handler)(struct kvm *kvm, struct kvm_memory_slot *slot,
+-			       struct kvm_mmu_page *root, gfn_t start,
+-			       gfn_t end, unsigned long data))
++static __always_inline int
++kvm_tdp_mmu_handle_hva_range(struct kvm *kvm,
++			     unsigned long start,
++			     unsigned long end,
++			     unsigned long data,
++			     int (*handler)(struct kvm *kvm,
++					    struct kvm_memory_slot *slot,
++					    struct kvm_mmu_page *root,
++					    gfn_t start,
++					    gfn_t end,
++					    unsigned long data))
+ {
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memory_slot *memslot;
