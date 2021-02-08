@@ -2,598 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00134312AAA
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 07:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C39A9312AC6
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 07:36:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbhBHGXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 01:23:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35733 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229626AbhBHGXm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 01:23:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612765308;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xpRYTzR7maPDehgcdUHPlZ7yHJ84h/9BkM9DJc30EIw=;
-        b=ZMK5Bw/r1WwXmxJhpr23fpS7j54jhEqXOUrc0T6WnZDwasJlE9SqqTUrS7NbMceNauFN1f
-        7Qn41kjOpt0Q8l5AB6sCiY+Zixmyuhuy3iHrMb/xrP4hplxPWQjEGd3YjXQb6IGeEgXQ89
-        0Ly6V1pdqg/PNQB7Oy1W3KP3mnfKtdA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-nRCpSeJbMnqk-3SjGkPvzg-1; Mon, 08 Feb 2021 01:21:45 -0500
-X-MC-Unique: nRCpSeJbMnqk-3SjGkPvzg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D467C801965;
-        Mon,  8 Feb 2021 06:21:43 +0000 (UTC)
-Received: from [10.72.13.185] (ovpn-13-185.pek2.redhat.com [10.72.13.185])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 26D915C1D0;
-        Mon,  8 Feb 2021 06:21:36 +0000 (UTC)
-Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for KVM_SET_IOREGION
-To:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-References: <cover.1611850290.git.eafanasova@gmail.com>
- <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
-Date:   Mon, 8 Feb 2021 14:21:35 +0800
+        id S229832AbhBHGfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 01:35:21 -0500
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:61690 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229745AbhBHGd7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 01:33:59 -0500
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id 770CB521864;
+        Mon,  8 Feb 2021 09:33:01 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail; t=1612765981;
+        bh=vGJIKcvNyCAWGkZdfQTcfoRfLevMPBJXafQ3HZHSHRk=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=kyoKePY09dLwBk0VkkPtybBspjMtAv2qTGxR56s2dt/wQ4Fa8KOLtma844QTFNVS6
+         H4Nl2XyduoHNP4pkxx5cJH0UKc9dYKczXCnzcShNtXl8/ypS2x9o1SAjbcRPDNJ4HW
+         kYGrPI42AwgzCr8KaAJvpGqIww7AiH4qIUFN070Y=
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 6E43C521863;
+        Mon,  8 Feb 2021 09:33:00 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.64.121) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Mon, 8 Feb
+ 2021 09:32:59 +0300
+Subject: Re: [RFC PATCH v4 00/17] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Alexander Popov <alex.popov@linux.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+ <20210207111954-mutt-send-email-mst@kernel.org>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <8bd3789c-8df1-4383-f233-b4b854b30970@kaspersky.com>
+Date:   Mon, 8 Feb 2021 09:32:59 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210207111954-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Originating-IP: [10.64.64.121]
+X-ClientProxiedBy: hqmailmbx2.avp.ru (10.64.67.242) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 02/06/2021 23:52:08
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 161679 [Feb 06 2021]
+X-KSE-AntiSpam-Info: LuaCore: 422 422 763e61bea9fcfcd94e075081cb96e065bc0509b4
+X-KSE-AntiSpam-Info: Version: 5.9.16.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: {Tracking_content_type, plain}
+X-KSE-AntiSpam-Info: {Tracking_date, moscow}
+X-KSE-AntiSpam-Info: {Tracking_c_tr_enc, eight_bit}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/06/2021 23:55:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/6/2021 9:17:00 PM
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/02/08 00:52:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/02/08 00:27:00 #16141106
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2021/1/30 上午2:48, Elena Afanasova wrote:
-> This vm ioctl adds or removes an ioregionfd MMIO/PIO region. Guest
-> read and write accesses are dispatched through the given ioregionfd
-> instead of returning from ioctl(KVM_RUN). Regions can be deleted by
-> setting fds to -1.
+On 07.02.2021 19:20, Michael S. Tsirkin wrote:
+> On Sun, Feb 07, 2021 at 06:12:56PM +0300, Arseny Krasnov wrote:
+>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
+>> transport.
+>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>> do it, two new packet operations were added: first for start of record
+>>  and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
+>> both operations carries metadata - to maintain boundaries and payload
+>> integrity. Metadata is introduced by adding special header with two
+>> fields - message count and message length:
+>>
+>> 	struct virtio_vsock_seq_hdr {
+>> 		__le32  msg_cnt;
+>> 		__le32  msg_len;
+>> 	} __attribute__((packed));
+>>
+>> 	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
+>> packets(buffer of second virtio descriptor in chain) in the same way as
+>> data transmitted in RW packets. Payload was chosen as buffer for this
+>> header to avoid touching first virtio buffer which carries header of
+>> packet, because someone could check that size of this buffer is equal
+>> to size of packet header. To send record, packet with start marker is
+>> sent first(it's header contains length of record and counter), then
+>> counter is incremented and all data is sent as usual 'RW' packets and
+>> finally SEQ_END is sent(it also carries counter of message, which is
+>> counter of SEQ_BEGIN + 1), also after sedning SEQ_END counter is
+>> incremented again. On receiver's side, length of record is known from
+>> packet with start record marker. To check that no packets were dropped
+>> by transport, counters of two sequential SEQ_BEGIN and SEQ_END are
+>> checked(counter of SEQ_END must be bigger that counter of SEQ_BEGIN by
+>> 1) and length of data between two markers is compared to length in
+>> SEQ_BEGIN header.
+>> 	Now as  packets of one socket are not reordered neither on
+>> vsock nor on vhost transport layers, such markers allows to restore
+>> original record on receiver's side. If user's buffer is smaller that
+>> record length, when all out of size data is dropped.
+>> 	Maximum length of datagram is not limited as in stream socket,
+>> because same credit logic is used. Difference with stream socket is
+>> that user is not woken up until whole record is received or error
+>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>> 	Tests also implemented.
+>>
+>>  Arseny Krasnov (17):
+>>   af_vsock: update functions for connectible socket
+>>   af_vsock: separate wait data loop
+>>   af_vsock: separate receive data loop
+>>   af_vsock: implement SEQPACKET receive loop
+>>   af_vsock: separate wait space loop
+>>   af_vsock: implement send logic for SEQPACKET
+>>   af_vsock: rest of SEQPACKET support
+>>   af_vsock: update comments for stream sockets
+>>   virtio/vsock: dequeue callback for SOCK_SEQPACKET
+>>   virtio/vsock: fetch length for SEQPACKET record
+>>   virtio/vsock: add SEQPACKET receive logic
+>>   virtio/vsock: rest of SOCK_SEQPACKET support
+>>   virtio/vsock: setup SEQPACKET ops for transport
+>>   vhost/vsock: setup SEQPACKET ops for transport
+>>   vsock_test: add SOCK_SEQPACKET tests
+>>   loopback/vsock: setup SEQPACKET ops for transport
+>>   virtio/vsock: simplify credit update function API
+>>
+>>  drivers/vhost/vsock.c                   |   8 +-
+>>  include/linux/virtio_vsock.h            |  15 +
+>>  include/net/af_vsock.h                  |   9 +
+>>  include/uapi/linux/virtio_vsock.h       |  16 +
+>>  net/vmw_vsock/af_vsock.c                | 588 +++++++++++++++-------
+>>  net/vmw_vsock/virtio_transport.c        |   5 +
+>>  net/vmw_vsock/virtio_transport_common.c | 316 ++++++++++--
+>>  net/vmw_vsock/vsock_loopback.c          |   5 +
+>>  tools/testing/vsock/util.c              |  32 +-
+>>  tools/testing/vsock/util.h              |   3 +
+>>  tools/testing/vsock/vsock_test.c        | 126 +++++
+>>  11 files changed, 895 insertions(+), 228 deletions(-)
+>>
+>>  TODO:
+>>  - What to do, when server doesn't support SOCK_SEQPACKET. In current
+>>    implementation RST is replied in the same way when listening port
+>>    is not found. I think that current RST is enough,because case when
+>>    server doesn't support SEQ_PACKET is same when listener missed(e.g.
+>>    no listener in both cases).
+>    - virtio spec patch
+Ok
 >
-> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
-> ---
-> Changes in v2:
->    - changes after code review
+>>  v3 -> v4:
+>>  - callbacks for loopback transport
+>>  - SEQPACKET specific metadata moved from packet header to payload
+>>    and called 'virtio_vsock_seq_hdr'
+>>  - record integrity check:
+>>    1) SEQ_END operation was added, which marks end of record.
+>>    2) Both SEQ_BEGIN and SEQ_END carries counter which is incremented
+>>       on every marker send.
+>>  - af_vsock.c: socket operations for STREAM and SEQPACKET call same
+>>    functions instead of having own "gates" differs only by names:
+>>    'vsock_seqpacket/stream_getsockopt()' now replaced with
+>>    'vsock_connectible_getsockopt()'.
+>>  - af_vsock.c: 'seqpacket_dequeue' callback returns error and flag that
+>>    record ready. There is no need to return number of copied bytes,
+>>    because case when record received successfully is checked at virtio
+>>    transport layer, when SEQ_END is processed. Also user doesn't need
+>>    number of copied bytes, because 'recv()' from SEQPACKET could return
+>>    error, length of users's buffer or length of whole record(both are
+>>    known in af_vsock.c).
+>>  - af_vsock.c: both wait loops in af_vsock.c(for data and space) moved
+>>    to separate functions because now both called from several places.
+>>  - af_vsock.c: 'vsock_assign_transport()' checks that 'new_transport'
+>>    pointer is not NULL and returns 'ESOCKTNOSUPPORT' instead of 'ENODEV'
+>>    if failed to use transport.
+>>  - tools/testing/vsock/vsock_test.c: rename tests
+>>
+>>  v2 -> v3:
+>>  - patches reorganized: split for prepare and implementation patches
+>>  - local variables are declared in "Reverse Christmas tree" manner
+>>  - virtio_transport_common.c: valid leXX_to_cpu() for vsock header
+>>    fields access
+>>  - af_vsock.c: 'vsock_connectible_*sockopt()' added as shared code
+>>    between stream and seqpacket sockets.
+>>  - af_vsock.c: loops in '__vsock_*_recvmsg()' refactored.
+>>  - af_vsock.c: 'vsock_wait_data()' refactored.
+>>
+>>  v1 -> v2:
+>>  - patches reordered: af_vsock.c related changes now before virtio vsock
+>>  - patches reorganized: more small patches, where +/- are not mixed
+>>  - tests for SOCK_SEQPACKET added
+>>  - all commit messages updated
+>>  - af_vsock.c: 'vsock_pre_recv_check()' inlined to
+>>    'vsock_connectible_recvmsg()'
+>>  - af_vsock.c: 'vsock_assign_transport()' returns ENODEV if transport
+>>    was not found
+>>  - virtio_transport_common.c: transport callback for seqpacket dequeue
+>>  - virtio_transport_common.c: simplified
+>>    'virtio_transport_recv_connected()'
+>>  - virtio_transport_common.c: send reset on socket and packet type
+>> 			      mismatch.
+>>
+>> -- 
+>> 2.25.1
 >
->   arch/x86/kvm/Kconfig     |   1 +
->   arch/x86/kvm/Makefile    |   1 +
->   arch/x86/kvm/x86.c       |   1 +
->   include/linux/kvm_host.h |  17 +++
->   include/uapi/linux/kvm.h |  23 ++++
->   virt/kvm/Kconfig         |   3 +
->   virt/kvm/eventfd.c       |  25 +++++
->   virt/kvm/eventfd.h       |  14 +++
->   virt/kvm/ioregion.c      | 232 +++++++++++++++++++++++++++++++++++++++
->   virt/kvm/ioregion.h      |  15 +++
->   virt/kvm/kvm_main.c      |  11 ++
->   11 files changed, 343 insertions(+)
->   create mode 100644 virt/kvm/eventfd.h
->   create mode 100644 virt/kvm/ioregion.c
->   create mode 100644 virt/kvm/ioregion.h
->
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index f92dfd8ef10d..b914ef375199 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -33,6 +33,7 @@ config KVM
->   	select HAVE_KVM_IRQ_BYPASS
->   	select HAVE_KVM_IRQ_ROUTING
->   	select HAVE_KVM_EVENTFD
-> +	select KVM_IOREGION
->   	select KVM_ASYNC_PF
->   	select USER_RETURN_NOTIFIER
->   	select KVM_MMIO
-> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> index b804444e16d4..b3b17dc9f7d4 100644
-> --- a/arch/x86/kvm/Makefile
-> +++ b/arch/x86/kvm/Makefile
-> @@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
->   kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
->   				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o
->   kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
-> +kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
->   
->   kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
->   			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e545a8a613b1..ddb28f5ca252 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_X86_USER_SPACE_MSR:
->   	case KVM_CAP_X86_MSR_FILTER:
->   	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> +	case KVM_CAP_IOREGIONFD:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SYNC_REGS:
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 7f2e2a09ebbd..7cd667dddba9 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -470,6 +470,10 @@ struct kvm {
->   		struct mutex      resampler_lock;
->   	} irqfds;
->   	struct list_head ioeventfds;
-> +#endif
-> +#ifdef CONFIG_KVM_IOREGION
-> +	struct list_head ioregions_mmio;
-> +	struct list_head ioregions_pio;
->   #endif
->   	struct kvm_vm_stat stat;
->   	struct kvm_arch arch;
-> @@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct kvm *kvm, struct kvm_ioeventfd *args)
->   
->   #endif /* CONFIG_HAVE_KVM_EVENTFD */
->   
-> +#ifdef CONFIG_KVM_IOREGION
-> +void kvm_ioregionfd_init(struct kvm *kvm);
-> +int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args);
-> +
-> +#else
-> +
-> +static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
-> +static inline int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
-> +{
-> +	return -ENOSYS;
-> +}
-> +#endif
-> +
->   void kvm_arch_irq_routing_update(struct kvm *kvm);
->   
->   static inline void kvm_make_request(int req, struct kvm_vcpu *vcpu)
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index ca41220b40b8..81e775778c66 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
->   	__u8  pad[36];
->   };
->   
-> +enum {
-> +	kvm_ioregion_flag_nr_pio,
-> +	kvm_ioregion_flag_nr_posted_writes,
-> +	kvm_ioregion_flag_nr_max,
-> +};
-> +
-> +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
-> +#define KVM_IOREGION_POSTED_WRITES (1 << kvm_ioregion_flag_nr_posted_writes)
-> +
-> +#define KVM_IOREGION_VALID_FLAG_MASK ((1 << kvm_ioregion_flag_nr_max) - 1)
-> +
-> +struct kvm_ioregion {
-> +	__u64 guest_paddr; /* guest physical address */
-> +	__u64 memory_size; /* bytes */
-
-
-Do we really need __u64 here?
-
-
-> +	__u64 user_data;
-> +	__s32 rfd;
-> +	__s32 wfd;
-> +	__u32 flags;
-> +	__u8  pad[28];
-> +};
-> +
->   #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
->   #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
->   #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-> @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_X86_USER_SPACE_MSR 188
->   #define KVM_CAP_X86_MSR_FILTER 189
->   #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-> +#define KVM_CAP_IOREGIONFD 191
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
->   					struct kvm_userspace_memory_region)
->   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
->   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-> +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct kvm_ioregion)
->   
->   /* enable ucontrol for s390 */
->   struct kvm_s390_ucas_mapping {
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 1c37ccd5d402..5e6620bbf000 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
->          bool
->          select EVENTFD
->   
-> +config KVM_IOREGION
-> +       bool
-> +
->   config KVM_MMIO
->          bool
->   
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index c2323c27a28b..aadb73903f8b 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -27,6 +27,7 @@
->   #include <trace/events/kvm.h>
->   
->   #include <kvm/iodev.h>
-> +#include "ioregion.h"
->   
->   #ifdef CONFIG_HAVE_KVM_IRQFD
->   
-> @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops ioeventfd_ops = {
->   	.destructor = ioeventfd_destructor,
->   };
->   
-> +#ifdef CONFIG_KVM_IOREGION
-> +/* assumes kvm->slots_lock held */
-> +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
-> +			  u64 start, u64 size)
-> +{
-> +	struct _ioeventfd *_p;
-> +
-> +	list_for_each_entry(_p, &kvm->ioeventfds, list)
-> +		if (_p->bus_idx == bus_idx &&
-> +		    overlap(start, size, _p->addr,
-> +			    !_p->length ? 8 : _p->length))
-> +			return true;
-> +
-> +	return false;
-> +}
-> +#endif
-> +
->   /* assumes kvm->slots_lock held */
->   static bool
->   ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
-> @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
->   		       _p->datamatch == p->datamatch))))
->   			return true;
->   
-> +#ifdef CONFIG_KVM_IOREGION
-> +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx == KVM_PIO_BUS)
-> +		if (kvm_ioregion_collides(kvm, p->bus_idx, p->addr,
-> +					  !p->length ? 8 : p->length))
-> +			return true;
-> +#endif
-> +
->   	return false;
->   }
->   
-> diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
-> new file mode 100644
-> index 000000000000..73a621eebae3
-> --- /dev/null
-> +++ b/virt/kvm/eventfd.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef __KVM_EVENTFD_H__
-> +#define __KVM_EVENTFD_H__
-> +
-> +#ifdef CONFIG_KVM_IOREGION
-> +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size);
-> +#else
-> +static inline bool
-> +kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +#endif
-> diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> new file mode 100644
-> index 000000000000..48ff92bca966
-> --- /dev/null
-> +++ b/virt/kvm/ioregion.c
-> @@ -0,0 +1,232 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +#include <linux/kvm_host.h>
-> +#include <linux/fs.h>
-> +#include <kvm/iodev.h>
-> +#include "eventfd.h"
-> +
-> +void
-> +kvm_ioregionfd_init(struct kvm *kvm)
-> +{
-> +	INIT_LIST_HEAD(&kvm->ioregions_mmio);
-> +	INIT_LIST_HEAD(&kvm->ioregions_pio);
-> +}
-> +
-> +struct ioregion {
-> +	struct list_head     list;
-> +	u64                  paddr;  /* guest physical address */
-> +	u64                  size;   /* size in bytes */
-> +	struct file         *rf;
-> +	struct file         *wf;
-> +	u64                  user_data; /* opaque token used by userspace */
-> +	struct kvm_io_device dev;
-> +	bool                 posted_writes;
-> +};
-> +
-> +static inline struct ioregion *
-> +to_ioregion(struct kvm_io_device *dev)
-> +{
-> +	return container_of(dev, struct ioregion, dev);
-> +}
-> +
-> +/* assumes kvm->slots_lock held */
-> +static void
-> +ioregion_release(struct ioregion *p)
-> +{
-> +	fput(p->rf);
-> +	fput(p->wf);
-> +	list_del(&p->list);
-> +	kfree(p);
-> +}
-> +
-> +static int
-> +ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
-> +	      int len, void *val)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int
-> +ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
-> +		int len, const void *val)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +/*
-> + * This function is called as KVM is completely shutting down.  We do not
-> + * need to worry about locking just nuke anything we have as quickly as possible
-> + */
-> +static void
-> +ioregion_destructor(struct kvm_io_device *this)
-> +{
-> +	struct ioregion *p = to_ioregion(this);
-> +
-> +	ioregion_release(p);
-> +}
-> +
-> +static const struct kvm_io_device_ops ioregion_ops = {
-> +	.read       = ioregion_read,
-> +	.write      = ioregion_write,
-> +	.destructor = ioregion_destructor,
-> +};
-> +
-> +static inline struct list_head *
-> +get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
-> +{
-> +	return (bus_idx == KVM_MMIO_BUS) ?
-> +		&kvm->ioregions_mmio : &kvm->ioregions_pio;
-> +}
-> +
-> +/* check for not overlapping case and reverse */
-> +inline bool
-> +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
-> +{
-> +	u64 end1 = start1 + size1 - 1;
-> +	u64 end2 = start2 + size2 - 1;
-> +
-> +	return !(end1 < start2 || start1 >= end2);
-> +}
-> +
-> +/* assumes kvm->slots_lock held */
-> +bool
-> +kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
-> +		      u64 start, u64 size)
-> +{
-> +	struct ioregion *_p;
-> +	struct list_head *ioregions;
-> +
-> +	ioregions = get_ioregion_list(kvm, bus_idx);
-> +	list_for_each_entry(_p, ioregions, list)
-> +		if (overlap(start, size, _p->paddr, _p->size))
-> +			return true;
-> +
-> +	return false;
-> +}
-> +
-> +/* assumes kvm->slots_lock held */
-> +static bool
-> +ioregion_collision(struct kvm *kvm, struct ioregion *p, enum kvm_bus bus_idx)
-> +{
-> +	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p->size) ||
-> +	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p->size))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static enum kvm_bus
-> +get_bus_from_flags(__u32 flags)
-> +{
-> +	if (flags & KVM_IOREGION_PIO)
-> +		return KVM_PIO_BUS;
-> +	return KVM_MMIO_BUS;
-> +}
-> +
-> +int
-> +kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
-> +{
-> +	struct ioregion *p;
-> +	struct file *rfile, *wfile;
-> +	enum kvm_bus bus_idx;
-> +	int ret = 0;
-> +
-> +	if (!args->memory_size)
-> +		return -EINVAL;
-> +	if ((args->guest_paddr + args->memory_size - 1) < args->guest_paddr)
-> +		return -EINVAL;
-> +
-> +	rfile = fget(args->rfd);
-> +	if (!rfile)
-> +		return -EBADF;
-
-
-So the question still, if we want to use ioregion fd for doorbell, we 
-don't need rfd in this case?
-
-
-> +	wfile = fget(args->wfd);
-> +	if (!wfile) {
-> +		fput(rfile);
-> +		return -EBADF;
-> +	}
-> +	if ((rfile->f_flags & O_NONBLOCK) || (wfile->f_flags & O_NONBLOCK)) {
-> +		ret = -EINVAL;
-> +		goto fail;
-> +	}
-
-
-I wonder how much value if we stick a check like this here (if our code 
-can gracefully deal with blocking fd).
-
-
-> +	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT);
-> +	if (!p) {
-> +		ret = -ENOMEM;
-> +		goto fail;
-> +	}
-> +
-> +	INIT_LIST_HEAD(&p->list);
-> +	p->paddr = args->guest_paddr;
-> +	p->size = args->memory_size;
-> +	p->user_data = args->user_data;
-> +	p->rf = rfile;
-> +	p->wf = wfile;
-> +	p->posted_writes = args->flags & KVM_IOREGION_POSTED_WRITES;
-> +	bus_idx = get_bus_from_flags(args->flags);
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +
-> +	if (ioregion_collision(kvm, p, bus_idx)) {
-> +		ret = -EEXIST;
-> +		goto unlock_fail;
-> +	}
-> +	kvm_iodevice_init(&p->dev, &ioregion_ops);
-> +	ret = kvm_io_bus_register_dev(kvm, bus_idx, p->paddr, p->size,
-> +				      &p->dev);
-
-
-I think we agree on previous version that we need to deal with FAST_MMIO 
-bus here?
-
-
-> +	if (ret < 0)
-> +		goto unlock_fail;
-> +	list_add_tail(&p->list, get_ioregion_list(kvm, bus_idx));
-> +
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return 0;
-> +
-> +unlock_fail:
-> +	mutex_unlock(&kvm->slots_lock);
-> +	kfree(p);
-> +fail:
-> +	fput(rfile);
-> +	fput(wfile);
-> +
-> +	return ret;
-> +}
-> +
-> +static int
-> +kvm_rm_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
-> +{
-> +	struct ioregion         *p, *tmp;
-> +	enum kvm_bus             bus_idx;
-> +	int                      ret = -ENOENT;
-> +	struct list_head        *ioregions;
-> +
-> +	if (args->rfd != -1 || args->wfd != -1)
-> +		return -EINVAL;
-> +
-> +	bus_idx = get_bus_from_flags(args->flags);
-> +	ioregions = get_ioregion_list(kvm, bus_idx);
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +
-> +	list_for_each_entry_safe(p, tmp, ioregions, list) {
-> +		if (p->paddr == args->guest_paddr  &&
-> +		    p->size == args->memory_size) {
-> +			kvm_io_bus_unregister_dev(kvm, bus_idx, &p->dev);
-> +			ioregion_release(p);
-> +			ret = 0;
-> +			break;
-> +		}
-> +	}
-> +
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
-> +int
-> +kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
-> +{
-> +	if (args->flags & ~KVM_IOREGION_VALID_FLAG_MASK)
-> +		return -EINVAL;
-> +	if (args->rfd == -1 || args->wfd == -1)
-> +		return kvm_rm_ioregion(kvm, args);
-> +
-> +	return kvm_set_ioregion(kvm, args);
-> +}
-> diff --git a/virt/kvm/ioregion.h b/virt/kvm/ioregion.h
-> new file mode 100644
-> index 000000000000..23ffa812ec7a
-> --- /dev/null
-> +++ b/virt/kvm/ioregion.h
-> @@ -0,0 +1,15 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +#ifndef __KVM_IOREGION_H__
-> +#define __KVM_IOREGION_H__
-> +
-> +#ifdef CONFIG_KVM_IOREGION
-> +inline bool overlap(u64 start1, u64 size1, u64 start2, u64 size2);
-> +bool kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size);
-> +#else
-> +static inline bool
-> +kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start, u64 size)
-> +{
-> +	return false;
-> +}
-> +#endif
-> +#endif
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2541a17ff1c4..88b92fc3da51 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -747,6 +747,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
->   	mmgrab(current->mm);
->   	kvm->mm = current->mm;
->   	kvm_eventfd_init(kvm);
-> +	kvm_ioregionfd_init(kvm);
->   	mutex_init(&kvm->lock);
->   	mutex_init(&kvm->irq_lock);
->   	mutex_init(&kvm->slots_lock);
-> @@ -3708,6 +3709,16 @@ static long kvm_vm_ioctl(struct file *filp,
->   		r = kvm_vm_ioctl_set_memory_region(kvm, &kvm_userspace_mem);
->   		break;
->   	}
-> +	case KVM_SET_IOREGION: {
-> +		struct kvm_ioregion data;
-> +
-> +		r = -EFAULT;
-> +		if (copy_from_user(&data, argp, sizeof(data)))
-> +			goto out;
-> +
-> +		r = kvm_ioregionfd(kvm, &data);
-> +		break;
-> +	}
->   	case KVM_GET_DIRTY_LOG: {
->   		struct kvm_dirty_log log;
->   
-
