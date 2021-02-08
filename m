@@ -2,149 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8469031437E
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 00:08:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B19DD3143A8
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 00:24:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbhBHXIU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 18:08:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23628 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229684AbhBHXIR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Feb 2021 18:08:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612825610;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tn1HyfWWr3G2js/2FnIdOhh1z1w4eH6lqFAEdutG0ts=;
-        b=HbMDLRaPqLb+3wqOByPyLNEgHcEURxOzZ3H+5eigzn3w6+6Ad3/h4Hbnkyh1cAo66GA65W
-        ULyDpqSN2sESKvv2w869PXXTboZ+PMtkQV+3Q96j+WD6VojvZQrS64PECSxAN5GqYmQO7r
-        5c6HPGWCTs0jU2NPir/rAImPBX+mwG8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-HDHslAowPLmzSTWS71ttKA-1; Mon, 08 Feb 2021 18:06:49 -0500
-X-MC-Unique: HDHslAowPLmzSTWS71ttKA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB4F3801962;
-        Mon,  8 Feb 2021 23:06:47 +0000 (UTC)
-Received: from starship (unknown [10.35.206.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 318405D6A8;
-        Mon,  8 Feb 2021 23:06:44 +0000 (UTC)
-Message-ID: <53c5fc3d29ed35ca3252cd5f6547dcb113ab21b9.camel@redhat.com>
-Subject: Re: [PATCH v2 10/15] KVM: x86: hyper-v: Always use to_hv_vcpu()
- accessor to get to 'struct kvm_vcpu_hv'
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>
-Date:   Tue, 09 Feb 2021 01:06:44 +0200
-In-Reply-To: <20210126134816.1880136-11-vkuznets@redhat.com>
-References: <20210126134816.1880136-1-vkuznets@redhat.com>
-         <20210126134816.1880136-11-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S230213AbhBHXYN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 18:24:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229760AbhBHXYL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 18:24:11 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1ACFC061786
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 15:23:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=MQZKEBWdevU9Wtq5jy3eQdq2M/+JDldM/SAS8N901aU=; b=c8lCLbF6XXXOsBQF5IqcFR464R
+        3SMggo34f3eXt5ujX2Ygsk66jB3ijss+QWmlJrLWnnhQPVwLeba+TWWDfQNtK9bktT2b7rW21LEZW
+        RPyGTsyPVLwxj5ifCPwLyHKhVd8ggRqxpUX3tzb3uXxxbDfafjkQqM8abWubTOXIQNVPzZpMRk+ma
+        udtgutqPSSRhPF4ezF1BET/qVfIzNOh5iG+LIuivDRi6AHfVzZd1bU1yGDfW3f6Ss9fa3PPJPhShq
+        vizRmMRy8UiJ9QJ/6i+yN4wqp7lu3U9IfQTbDsg6ROEdTWhWL6IBl/JymY2UVbtTcOi2Dux7S+9S9
+        0NcMSemQ==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l9FsO-0002eP-1f; Mon, 08 Feb 2021 23:23:28 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1l9FsM-007gAr-Uu; Mon, 08 Feb 2021 23:23:26 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Sean Christopherson <seanjc@google.com>, graf@amazon.com,
+        iaslan@amazon.de, pdurrant@amazon.com, aagch@amazon.com,
+        fandree@amazon.com, hch@infradead.org
+Subject: [PATCH 1/2] KVM: x86/xen: Allow reset of Xen attributes
+Date:   Mon,  8 Feb 2021 23:23:25 +0000
+Message-Id: <20210208232326.1830370-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-01-26 at 14:48 +0100, Vitaly Kuznetsov wrote:
+From: David Woodhouse <dwmw@amazon.co.uk>
 
+In order to support Xen SHUTDOWN_soft_reset (for guest kexec, etc.) the
+VMM needs to be able to tear everything down and return the Xen features
+to a clean slate.
 
-...
-> _vcpu_mask(
->  static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, u64 ingpa, u16 rep_cnt, bool ex)
->  {
->  	struct kvm *kvm = vcpu->kvm;
-> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
-> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(current_vcpu);
-You probably mean vcpu here instead of current_vcpu. Today I smoke tested the kvm/nested-svm branch,
-and had this fail on me while testing windows guests.
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c | 38 ++++++++++++++++++++++++++++----------
+ 1 file changed, 28 insertions(+), 10 deletions(-)
 
-
-Other than that HyperV seems to work and even survive nested migration (I had one
-windows reboot but I suspect windows update did it.)
-I'll leave my test overnight (now with updates disabled) to see if it is stable.
-
-Best regards,
-	Maxim Levitsky
-
-
->  	struct hv_tlb_flush_ex flush_ex;
->  	struct hv_tlb_flush flush;
->  	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
-> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-> index fdb321ba9c3f..be1e3f5d1df6 100644
-> --- a/arch/x86/kvm/hyperv.h
-> +++ b/arch/x86/kvm/hyperv.h
-> @@ -119,7 +119,9 @@ static inline struct kvm_vcpu *hv_stimer_to_vcpu(struct kvm_vcpu_hv_stimer *stim
->  
->  static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu)
->  {
-> -	return !bitmap_empty(vcpu->arch.hyperv.stimer_pending_bitmap,
-> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +
-> +	return !bitmap_empty(hv_vcpu->stimer_pending_bitmap,
->  			     HV_SYNIC_STIMER_COUNT);
->  }
->  
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 4de7579e206c..4ad2fbbd962a 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -6,6 +6,8 @@
->  
->  #include <linux/kvm_host.h>
->  
-> +#include "hyperv.h"
-> +
->  #define KVM_APIC_INIT		0
->  #define KVM_APIC_SIPI		1
->  #define KVM_APIC_LVT_NUM	6
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9db84508aa0b..443878dd775c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6733,12 +6733,14 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	x86_spec_ctrl_restore_host(vmx->spec_ctrl, 0);
->  
->  	/* All fields are clean at this point */
-> -	if (static_branch_unlikely(&enable_evmcs))
-> +	if (static_branch_unlikely(&enable_evmcs)) {
-> +		struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +
->  		current_evmcs->hv_clean_fields |=
->  			HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->  
-> -	if (static_branch_unlikely(&enable_evmcs))
-> -		current_evmcs->hv_vp_id = vcpu->arch.hyperv.vp_index;
-> +		current_evmcs->hv_vp_id = hv_vcpu->vp_index;
-> +	}
->  
->  	/* MSR_IA32_DEBUGCTLMSR is zeroed on vmexit. Restore it if needed */
->  	if (vmx->host_debugctlmsr)
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 868d2bf8fb95..4c2b1f4260c6 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8894,8 +8894,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  			goto out;
->  		}
->  		if (kvm_check_request(KVM_REQ_HV_EXIT, vcpu)) {
-> +			struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-> +
->  			vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-> -			vcpu->run->hyperv = vcpu->arch.hyperv.exit;
-> +			vcpu->run->hyperv = hv_vcpu->exit;
->  			r = 0;
->  			goto out;
->  		}
-
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 39a7ffcdcf22..06fec10ffc4f 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -118,12 +118,17 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
++		if (data->u.shared_info.gfn == GPA_INVALID) {
++			kvm->arch.xen.shinfo_set = false;
++			r = 0;
++			break;
++		}
+ 		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
+ 		break;
+ 
+ 
+ 	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
+-		if (data->u.vector < 0x10)
++		if (data->u.vector && data->u.vector < 0x10)
+ 			r = -EINVAL;
+ 		else {
+ 			kvm->arch.xen.upcall_vector = data->u.vector;
+@@ -152,10 +157,11 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+-		if (kvm->arch.xen.shinfo_set) {
++		if (kvm->arch.xen.shinfo_set)
+ 			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
+-			r = 0;
+-		}
++		else
++			data->u.shared_info.gfn = GPA_INVALID;
++		r = 0;
+ 		break;
+ 
+ 	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
+@@ -184,6 +190,11 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		BUILD_BUG_ON(sizeof(struct vcpu_info) !=
+ 			     sizeof(struct compat_vcpu_info));
+ 
++		if (data->u.gpa == GPA_INVALID) {
++			vcpu->arch.xen.vcpu_info_set = false;
++			break;
++		}
++
+ 		r = kvm_gfn_to_hva_cache_init(vcpu->kvm,
+ 					      &vcpu->arch.xen.vcpu_info_cache,
+ 					      data->u.gpa,
+@@ -195,6 +206,11 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
++		if (data->u.gpa == GPA_INVALID) {
++			vcpu->arch.xen.vcpu_time_info_set = false;
++			break;
++		}
++
+ 		r = kvm_gfn_to_hva_cache_init(vcpu->kvm,
+ 					      &vcpu->arch.xen.vcpu_time_info_cache,
+ 					      data->u.gpa,
+@@ -222,17 +238,19 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 
+ 	switch (data->type) {
+ 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO:
+-		if (vcpu->arch.xen.vcpu_info_set) {
++		if (vcpu->arch.xen.vcpu_info_set)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_info_cache.gpa;
+-			r = 0;
+-		}
++		else
++			data->u.gpa = GPA_INVALID;
++		r = 0;
+ 		break;
+ 
+ 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
+-		if (vcpu->arch.xen.vcpu_time_info_set) {
++		if (vcpu->arch.xen.vcpu_time_info_set)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_time_info_cache.gpa;
+-			r = 0;
+-		}
++		else
++			data->u.gpa = GPA_INVALID;
++		r = 0;
+ 		break;
+ 
+ 	default:
+-- 
+2.29.2
 
