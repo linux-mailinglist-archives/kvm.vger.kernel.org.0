@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1127C312FF6
-	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:00:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A085313005
+	for <lists+kvm@lfdr.de>; Mon,  8 Feb 2021 12:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232720AbhBHK74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 05:59:56 -0500
-Received: from mga03.intel.com ([134.134.136.65]:50165 "EHLO mga03.intel.com"
+        id S232951AbhBHLCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 06:02:11 -0500
+Received: from mga12.intel.com ([192.55.52.136]:12408 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231945AbhBHK4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 05:56:42 -0500
-IronPort-SDR: NcvBqZXpJElhK3adFCM0hviaVVrMyTdWu/C+np9MLNdr80/u5MB32matZ+OGxakiobmaimpfuq
- 2hWpvfidyolQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="181758509"
+        id S232724AbhBHK5e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 05:57:34 -0500
+IronPort-SDR: CNbOY0pMCjEp4sWdBD8A0m8jS09QKDZeJDve9K4MGawH+tCdxefNa0FK5KUhZ3bJi4VvnfbO5x
+ NdQXhDWUeahQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9888"; a="160848447"
 X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="181758509"
+   d="scan'208";a="160848447"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:55:55 -0800
-IronPort-SDR: xD+kZulZwEfF5aKEwnO+1tYH2X0YY3Xq6BSsN+CGgCiMbcJJcx6EcSNosep5bq1nT0C2tO3kI/
- U5VmiDRRr0lg==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:54:37 -0800
+IronPort-SDR: 6P61UZizKkR5CojD8/MKiSjDZ6UECYyFwBCXXug/ZAWDcsmBdQf0SgH9ljgR+lTVV7e5JgEGCT
+ Yku6NfzTaJrA==
 X-IronPort-AV: E=Sophos;i="5.81,161,1610438400"; 
-   d="scan'208";a="374451213"
+   d="scan'208";a="374450973"
 Received: from jaeminha-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.251.11.62])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:55:51 -0800
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 02:54:33 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         dave.hansen@intel.com, rick.p.edgecombe@intel.com,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v4 16/26] KVM: x86: Export kvm_mmu_gva_to_gpa_{read,write}() for SGX (VMX)
-Date:   Mon,  8 Feb 2021 23:55:26 +1300
-Message-Id: <59f541560bba9d65a0b113beaf034125082fb61f.1612777752.git.kai.huang@intel.com>
+        Kai Huang <kai.huang@intel.com>
+Subject: [RFC PATCH v4 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware error code
+Date:   Mon,  8 Feb 2021 23:54:08 +1300
+Message-Id: <3c1edb38e95843eb9bf3fcbbec6cf9bdd9b3e7b1.1612777752.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1612777752.git.kai.huang@intel.com>
 References: <cover.1612777752.git.kai.huang@intel.com>
@@ -46,48 +45,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Export the gva_to_gpa() helpers for use by SGX virtualization when
-executing ENCLS[ECREATE] and ENCLS[EINIT] on behalf of the guest.
-To execute ECREATE and EINIT, KVM must obtain the GPA of the target
-Secure Enclave Control Structure (SECS) in order to get its
-corresponding HVA.
+SGX driver can accurately track how enclave pages are used.  This
+enables SECS to be specifically targeted and EREMOVE'd only after all
+child pages have been EREMOVE'd.  This ensures that SGX driver will
+never encounter SGX_CHILD_PRESENT in normal operation.
 
-Because the SECS must reside in the Enclave Page Cache (EPC), copying
-the SECS's data to a host-controlled buffer via existing exported
-helpers is not a viable option as the EPC is not readable or writable
-by the kernel.
+Virtual EPC is different.  The host does not track how EPC pages are
+used by the guest, so it cannot guarantee EREMOVE success.  It might,
+for instance, encounter a SECS with a non-zero child count.
 
-SGX virtualization will also use gva_to_gpa() to obtain HVAs for
-non-EPC pages in order to pass user pointers directly to ECREATE and
-EINIT, which avoids having to copy pages worth of data into the kernel.
+Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+failures are expected, but only due to SGX_CHILD_PRESENT.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Acked-by: Dave Hansen <dave.hansen@intel.com>
 Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/kvm/x86.c | 2 ++
+v3->v4:
+
+ - Refined the commit msg, per Dave.
+
+v2->v3:
+
+ - Changed from 'Enclave has child' to 'SECS has child', per Jarkko.
+
+---
+ arch/x86/kernel/cpu/sgx/arch.h | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9a8969a6dd06..5ca7b181a3ae 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5891,6 +5891,7 @@ gpa_t kvm_mmu_gva_to_gpa_read(struct kvm_vcpu *vcpu, gva_t gva,
- 	u32 access = (kvm_x86_ops.get_cpl(vcpu) == 3) ? PFERR_USER_MASK : 0;
- 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
- }
-+EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_read);
- 
-  gpa_t kvm_mmu_gva_to_gpa_fetch(struct kvm_vcpu *vcpu, gva_t gva,
- 				struct x86_exception *exception)
-@@ -5907,6 +5908,7 @@ gpa_t kvm_mmu_gva_to_gpa_write(struct kvm_vcpu *vcpu, gva_t gva,
- 	access |= PFERR_WRITE_MASK;
- 	return vcpu->arch.walk_mmu->gva_to_gpa(vcpu, gva, access, exception);
- }
-+EXPORT_SYMBOL_GPL(kvm_mmu_gva_to_gpa_write);
- 
- /* uses this to access any guest's mapped memory without checking CPL */
- gpa_t kvm_mmu_gva_to_gpa_system(struct kvm_vcpu *vcpu, gva_t gva,
+diff --git a/arch/x86/kernel/cpu/sgx/arch.h b/arch/x86/kernel/cpu/sgx/arch.h
+index dd7602c44c72..abf99bb71fdc 100644
+--- a/arch/x86/kernel/cpu/sgx/arch.h
++++ b/arch/x86/kernel/cpu/sgx/arch.h
+@@ -26,12 +26,14 @@
+  * enum sgx_return_code - The return code type for ENCLS, ENCLU and ENCLV
+  * %SGX_NOT_TRACKED:		Previous ETRACK's shootdown sequence has not
+  *				been completed yet.
++ * %SGX_CHILD_PRESENT		SECS has child pages present in the EPC.
+  * %SGX_INVALID_EINITTOKEN:	EINITTOKEN is invalid and enclave signer's
+  *				public key does not match IA32_SGXLEPUBKEYHASH.
+  * %SGX_UNMASKED_EVENT:		An unmasked event, e.g. INTR, was received
+  */
+ enum sgx_return_code {
+ 	SGX_NOT_TRACKED			= 11,
++	SGX_CHILD_PRESENT		= 13,
+ 	SGX_INVALID_EINITTOKEN		= 16,
+ 	SGX_UNMASKED_EVENT		= 128,
+ };
 -- 
 2.29.2
 
