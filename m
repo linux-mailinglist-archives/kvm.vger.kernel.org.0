@@ -2,101 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18DE13158EB
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 22:51:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 473A5315968
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 23:28:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234063AbhBIVqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 16:46:04 -0500
-Received: from mga09.intel.com ([134.134.136.24]:23382 "EHLO mga09.intel.com"
+        id S234393AbhBIWY7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 17:24:59 -0500
+Received: from mga18.intel.com ([134.134.136.126]:23188 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233361AbhBIVF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 16:05:58 -0500
-IronPort-SDR: xeb8DKJH97gOMbP02x3EdWVi6HwSe7xglVS0TLEUxhm5JEoxQwlhyjdq2QK/A9citk/2CMy7oE
- hHH+rO6DH5pQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="182103815"
+        id S233090AbhBIWLL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 17:11:11 -0500
+IronPort-SDR: vQ9vi44B7hFDh3//matWgbALS77WVbae2SlpZkJg5ozCJQnAN4iRGnpzwJOTDoKgVRXyInoxoO
+ zNIuVayVTdZg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="169644450"
 X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
-   d="scan'208";a="182103815"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:03:08 -0800
-IronPort-SDR: CbQpsbuKsiguYldWjtRlI4ODucsEKPSH22XX5c8TCF7nABjZSvURmOTrPoqdxnU7hyDPtF3qZE
- 5MGTHGLeDqMw==
+   d="scan'208";a="169644450"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:36:09 -0800
+IronPort-SDR: NKnEYLvYl2OzbfQ3rOwEcVYA4N0FWsxV1kF1LkJ6X2Nle0ZjfVNpW/zXACBERsJEloezAcvAjc
+ /FX4S3LZE+tw==
 X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
-   d="scan'208";a="396391669"
-Received: from aellsw1-mobl.amr.corp.intel.com ([10.251.22.237])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:03:05 -0800
-Message-ID: <ddc22787d6d4abf51c47b28ec6fe6df85d0fea3e.camel@intel.com>
-Subject: Re: [RFC PATCH v4 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware
- error code
-From:   Kai Huang <kai.huang@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Dave Hansen <dave.hansen@intel.com>
+   d="scan'208";a="360952393"
+Received: from asklovsk-mobl.amr.corp.intel.com (HELO [10.212.123.206]) ([10.212.123.206])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:36:07 -0800
+Subject: Re: [RFC PATCH v4 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Kai Huang <kai.huang@intel.com>
 Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        jarkko@kernel.org, luto@kernel.org, rick.p.edgecombe@intel.com,
+        seanjc@google.com, luto@kernel.org, rick.p.edgecombe@intel.com,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Date:   Wed, 10 Feb 2021 10:03:02 +1300
-In-Reply-To: <YCLBQYq2HaA7MFKH@google.com>
 References: <cover.1612777752.git.kai.huang@intel.com>
-         <3c1edb38e95843eb9bf3fcbbec6cf9bdd9b3e7b1.1612777752.git.kai.huang@intel.com>
-         <b9e8a9a0-6a53-6523-4ea8-347c67e7ba86@intel.com>
-         <YCK81Zcz++PfGPnw@google.com>
-         <af80db88-9097-0947-e05d-9508daee18df@intel.com>
-         <YCLBQYq2HaA7MFKH@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+ <11a923a314accf36a82aac4b676310a4802f5c75.1612777752.git.kai.huang@intel.com>
+ <YCL8ErAGKNSnX2Up@kernel.org> <YCL8eNNfuo2k5ghO@kernel.org>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <9aebc8e6-cff5-b2b4-04af-d3968a3586dc@intel.com>
+Date:   Tue, 9 Feb 2021 13:36:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <YCL8eNNfuo2k5ghO@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-02-09 at 17:07 +0000, Sean Christopherson wrote:
-> On Tue, Feb 09, 2021, Dave Hansen wrote:
-> > On 2/9/21 8:48 AM, Sean Christopherson wrote:
-> > > On Tue, Feb 09, 2021, Dave Hansen wrote:
-> > > > On 2/8/21 2:54 AM, Kai Huang wrote:
-> > > > ...
-> > > > > Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
-> > > > > failures are expected, but only due to SGX_CHILD_PRESENT.
-> > > > This paragraph broke my brain when I read it.  How about:
-> > > > 
-> > > > 	Add a definition of SGX_CHILD_PRESENT.  It will be used
-> > > > 	exclusively by the SGX virtualization driver to suppress EREMOVE
-> > > > 	warnings.
-> > > Maybe worth clarifying that the driver isn't suppressing warnings willy-nilly?
-> > > And the error code isn't about suppressing warnings, it's about identifying the
-> > > expected EREMOVE failure scenario.  The patch that creates the separate helper
-> > > for doing EREMOVE without the WARN is what provides the suppression mechanism.
-> > > 
-> > > Something like this?
-> > > 
-> > >   Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
-> > >   the SGX virtualization driver to handle recoverable EREMOVE errors when
-> > >   saniziting EPC pages after they are reclaimed from a guest.
-> > 
-> > Looks great to me.  One nit: to a me, "reclaim" is different than
-> > "free".  Reclaim is a specific operation where a page is taken from one
-> > user and reclaimed for other use.  "Free" is the more general case
-> > (which includes reclaim) when a physical page is no longer being used
-> > (because the user is done *or* had the page reclaimed) and may be either
-> > used by someone else or put in a free pool.
-> > 
-> > I *think* this is actually a "free" operation, rather than a "reclaim".
-> >  IIRC, this code gets used at munmap().
+On 2/9/21 1:19 PM, Jarkko Sakkinen wrote:
+>> Without that clearly documented, it would be unwise to merge this.
+> E.g.
 > 
-> It does.  I used reclaim because userspace, which does the freeing from this
-> code's perspective, never touches the EPC pages.  The SGX_CHILD_PRESENT case is
-> handling the scenario where userspace has for all intents and purposed reclaimed
-> the EPC from a guest.  If the guest cleanly tears down its enclaves, EREMOVE
-> will not fail.
+> - Have ioctl() to turn opened fd as vEPC.
+> - If FLC is disabled, you could only use the fd for creating vEPC.
 > 
-> "free" is probably better though, the above is far from obvious and still not
-> guaranteed to be a true reclaim scenario.  If using "freed", drop the "from a
-> guest" part.
+> Quite easy stuff to implement.
 
-Thanks for feedback. I'll use below:
+The most important question to me is not how close vEPC is today, but
+how close it will be in the future.  It's basically the age old question
+of: do we make one syscall that does two things or two syscalls?
 
-  Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
-  the SGX virtualization driver to handle recoverable EREMOVE errors when
-  saniziting EPC pages after they are freed.
-
+Is there a _compelling_ reason to change direction?  How much code would
+we save?
