@@ -2,125 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0029231546D
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 17:54:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8548631547E
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 17:56:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232877AbhBIQxi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 11:53:38 -0500
-Received: from mga04.intel.com ([192.55.52.120]:26504 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233013AbhBIQxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 11:53:06 -0500
-IronPort-SDR: GLFFfm8BpM+QwqyBM7m0plNmmJ4DAPeSZXCVf4abmH49ZVp11sEoh90WfFNdfv9GasiEkL0Ptt
- bzrXAm55Xb6w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="179356477"
-X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
-   d="scan'208";a="179356477"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 08:52:24 -0800
-IronPort-SDR: 6S/lhOzysCHqnICn/wCG7jmaCesDfvHYIyGDvzz4aKnNhYnStVty3Bzrkl5kRKrx4IP7/uC1C9
- bFEloRqC3ZQQ==
-X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
-   d="scan'208";a="360792966"
-Received: from asklovsk-mobl.amr.corp.intel.com (HELO [10.212.123.206]) ([10.212.123.206])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 08:52:23 -0800
-Subject: Re: [RFC PATCH v4 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware
- error code
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-References: <cover.1612777752.git.kai.huang@intel.com>
- <3c1edb38e95843eb9bf3fcbbec6cf9bdd9b3e7b1.1612777752.git.kai.huang@intel.com>
- <b9e8a9a0-6a53-6523-4ea8-347c67e7ba86@intel.com>
- <YCK81Zcz++PfGPnw@google.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <af80db88-9097-0947-e05d-9508daee18df@intel.com>
-Date:   Tue, 9 Feb 2021 08:52:23 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232762AbhBIQ4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 11:56:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20050 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232814AbhBIQ4d (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 11:56:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612889707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I9b1PHDHkx3hhQyiMmZpnuR1MsEFs0dELFK1kzY2RAk=;
+        b=hW2v1ZEcwoEeiLieFI18tGOLVtU9fmG+eSOXR8F2x3yzYRUbYIcFQTZzY907ru/BMQyGNp
+        gC090j3dCT2ee4uCEmMQO3qPomaIKBnsi5acaFtSHES71too/odhl0KNN6K8lbIx837Y6F
+        v/TNrdcmb/6K3QeruxWTqDeEC89R+30=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-Sccf_1YAO4S4dEyubqTTYw-1; Tue, 09 Feb 2021 11:55:03 -0500
+X-MC-Unique: Sccf_1YAO4S4dEyubqTTYw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 218C685B667;
+        Tue,  9 Feb 2021 16:55:02 +0000 (UTC)
+Received: from [10.36.113.141] (ovpn-113-141.ams2.redhat.com [10.36.113.141])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BC6D68D22;
+        Tue,  9 Feb 2021 16:55:00 +0000 (UTC)
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+References: <20210209141554.22554-1-frankja@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Subject: Re: [kvm-unit-tests PATCH] s390x: Workaround smp stop and store
+ status race
+Message-ID: <38e70380-f3e4-58b1-6ee8-ea76999f1ed3@redhat.com>
+Date:   Tue, 9 Feb 2021 17:55:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <YCK81Zcz++PfGPnw@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210209141554.22554-1-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/9/21 8:48 AM, Sean Christopherson wrote:
-> On Tue, Feb 09, 2021, Dave Hansen wrote:
->> On 2/8/21 2:54 AM, Kai Huang wrote:
->> ...
->>> Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
->>> failures are expected, but only due to SGX_CHILD_PRESENT.
->> This paragraph broke my brain when I read it.  How about:
->>
->> 	Add a definition of SGX_CHILD_PRESENT.  It will be used
->> 	exclusively by the SGX virtualization driver to suppress EREMOVE
->> 	warnings.
-> Maybe worth clarifying that the driver isn't suppressing warnings willy-nilly?
-> And the error code isn't about suppressing warnings, it's about identifying the
-> expected EREMOVE failure scenario.  The patch that creates the separate helper
-> for doing EREMOVE without the WARN is what provides the suppression mechanism.
+On 09.02.21 15:15, Janosch Frank wrote:
+> KVM and QEMU handle a SIGP stop and store status in two steps:
+> 1) Stop the CPU by injecting a stop request
+> 2) Store when the CPU has left SIE because of the stop request
 > 
-> Something like this?
-> 
->   Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
->   the SGX virtualization driver to handle recoverable EREMOVE errors when
->   saniziting EPC pages after they are reclaimed from a guest.
+> The problem is that the SIGP order is already considered completed by
+> KVM/QEMU when step 1 has been performed and not once both have
+> completed. In addition we currently don't implement the busy CC so a
 
-Looks great to me.  One nit: to a me, "reclaim" is different than
-"free".  Reclaim is a specific operation where a page is taken from one
-user and reclaimed for other use.  "Free" is the more general case
-(which includes reclaim) when a physical page is no longer being used
-(because the user is done *or* had the page reclaimed) and may be either
-used by someone else or put in a free pool.
+QEMU remembers that stop-and-store-status is active in 
+"cpu->env.sigp_order" and rejects other orders until completed with 
+SIGP_CC_BUSY. See handle_sigp_single_dst().
 
-I *think* this is actually a "free" operation, rather than a "reclaim".
- IIRC, this code gets used at munmap().
+The "issue" is that the kernel does not know about that. The kernel will 
+continue handling
+- SIGP_SENSE
+- SIGP_EXTERNAL_CALL
+- SIGP_EMERGENCY_SIGNAL
+- SIGP_COND_EMERGENCY_SIGNAL
+- SIGP_SENSE_RUNNING
+itself and not go to user space where that information is present. And 
+for some of these orders we really don't want to go to user space.
+
+I remember that at least SIGP_SENSE_RUNNING doesn't give any guarantees, 
+so that one might be correct.
+
+I remember that it was a little unclear if all of these orders actually 
+have to wait for other orders to finish (IOW: return SIGP_CC_BUSY). 
+Especially with SIGPIF even the hardware has no idea if we are emulating 
+a SIGP STOP .* right now, how should it know? We would have to disable 
+the facility, and that's most probably not what the HW/facility was 
+designed for.
+
+Yeah, it's complicated. We would have to let QEMU "set" and "clear" a 
+SIGP busy status in the kernel. Then we could at least let SIGP SENSE be 
+correct and fast (I think that's the only critical one to get right).
+
+-- 
+Thanks,
+
+David / dhildenb
+
