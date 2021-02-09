@@ -2,137 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 321053153B0
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 17:20:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ABEE3153B3
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 17:21:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbhBIQTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 11:19:51 -0500
-Received: from mga17.intel.com ([192.55.52.151]:35604 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231249AbhBIQTm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 11:19:42 -0500
-IronPort-SDR: 81/f7TJv3FB1b2bOttGXXXJQXvWMddT0NVQS60KznvqMlcgfs1sT0CKfmxGhBPsj9dCxaB3Kiq
- 7HpSPfqZd0zA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="161658880"
-X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
-   d="scan'208";a="161658880"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 08:19:01 -0800
-IronPort-SDR: c3tSmeXtupPNHM56da6SXp3YklU1PUinSjZizs166mpKQGFtGf1uML/Ku0b0ag2AO6iGHOV2ZY
- XnO8CYEnUG6w==
-X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
-   d="scan'208";a="375015832"
-Received: from asklovsk-mobl.amr.corp.intel.com (HELO [10.212.123.206]) ([10.212.123.206])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 08:19:00 -0800
-Subject: Re: [RFC PATCH v4 03/26] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
-        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-References: <cover.1612777752.git.kai.huang@intel.com>
- <237b82e13e52191409577acddf9b4b28b16bf1bc.1612777752.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <38eb4166-8687-2f0d-0ca3-66c1afdf0a5d@intel.com>
-Date:   Tue, 9 Feb 2021 08:18:59 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S232621AbhBIQUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 11:20:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40414 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232561AbhBIQUo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 11:20:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612887559;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rs1U26YidrsL9SDdBBzeFvyIeFC5YMnTPS33wvzZgOY=;
+        b=NYXF3U97Y0vTtMNOfk7FVVb+9+4VqZ1CPOLQEGxH8Aa24S7ZGXHp/adUa/DEQgn03XxubW
+        s4lXB8O76GwQEWckTsuOB5Gm6K+ZnMieAyOIL0EnaFi47wcz/96TgPnTkk5sR0zfxIYiBn
+        pzED8qxLSAXUmGI9CkPO62Qmf2CBpQI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-QEcwZ5tpOYCF3PFLRISnBg-1; Tue, 09 Feb 2021 11:19:15 -0500
+X-MC-Unique: QEcwZ5tpOYCF3PFLRISnBg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EA11C7440;
+        Tue,  9 Feb 2021 16:19:13 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-56.ams2.redhat.com [10.36.114.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46DDA171F4;
+        Tue,  9 Feb 2021 16:19:09 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] s390x: Workaround smp stop and store
+ status race
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com
+References: <20210209141554.22554-1-frankja@linux.ibm.com>
+ <20210209170804.75d1fc9d@ibm-vm>
+ <a361e674-fa78-8c06-0583-29f8989d5493@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <f0aa4cc7-03dd-5761-8cc5-ceeb834526f8@redhat.com>
+Date:   Tue, 9 Feb 2021 17:19:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <237b82e13e52191409577acddf9b4b28b16bf1bc.1612777752.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a361e674-fa78-8c06-0583-29f8989d5493@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/8/21 2:54 AM, Kai Huang wrote:
-> From: Jarkko Sakkinen <jarkko@kernel.org>
+On 09/02/2021 17.14, Janosch Frank wrote:
+> On 2/9/21 5:08 PM, Claudio Imbrenda wrote:
+>> On Tue,  9 Feb 2021 09:15:54 -0500
+>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>
+>>> KVM and QEMU handle a SIGP stop and store status in two steps:
+>>> 1) Stop the CPU by injecting a stop request
+>>> 2) Store when the CPU has left SIE because of the stop request
+>>>
+>>> The problem is that the SIGP order is already considered completed by
+>>> KVM/QEMU when step 1 has been performed and not once both have
+>>> completed. In addition we currently don't implement the busy CC so a
+>>> kernel has no way of knowing that the store has finished other than
+>>> checking the location for the store.
+>>>
+>>> This workaround is based on the fact that for a new SIE entry (via the
+>>> added smp restart) a stop with the store status has to be finished
+>>> first.
+>>>
+>>> Correct handling of this in KVM/QEMU will need some thought and time.
+>>
+>> do I understand correctly that you are here "fixing" the test by not
+>> triggering the KVM bug? Shouldn't we try to trigger as many bugs as
+>> possible instead?
 > 
-> Encapsulate the snippet in sgx_free_epc_page() concerning EREMOVE to
-> sgx_reset_epc_page(), which is a static helper function for
-> sgx_encl_release().  It's the only function existing, which deals with
-> initialized pages.
+> This is not a bug, it's missing code :-)
+> 
+> We trigger a higher number of bugs by running tests and this workaround
+> does exactly that by letting Thomas use the smp test in the CI again.
 
-I didn't really like the changelog the last time around, so I wrote you
-a new one:
+Alternatively, we could use report_xfail here to make the test pass, but 
+still have the problem reported so that we do not forget to fix it later.
 
-> https://lore.kernel.org/kvm/8250aedb-a623-646d-071a-75ece2c41c09@intel.com/
+  Thomas
 
-The "v4" changelog is pretty hard for me to read.  It doesn't tell me
-why we can "wipe out EREMOVE" or how it is going to get used going forward.
-
-
-> +
-> +/*
-> + * Place the page in uninitialized state.  Called by in sgx_encl_release()
-> + * before sgx_free_epc_page(), which requires EPC page is already in clean
-> + * slate.
-> + */
-
-I really don't like comments like that that refer to callers.  They're
-basically guaranteed to become obsolete.
-
-/*
- * Place the page in uninitialized state.  Only usable by callers that
- * know the page is in a clean state in which EREMOVE will succeed.
- */
-
-> +static void sgx_reset_epc_page(struct sgx_epc_page *epc_page)
-> +{
-> +	int ret;
-> +
-> +	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> +
-> +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-> +	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
-> +		return;
-> +}
-
-The uncommented warnings aren't very nice, but I guess they're in the
-existing code.
