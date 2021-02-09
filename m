@@ -2,112 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D7CE3158E3
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 22:46:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18DE13158EB
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 22:51:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233567AbhBIVov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 16:44:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54794 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S234248AbhBIU6q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 15:58:46 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 119JXGqO091331;
-        Tue, 9 Feb 2021 14:49:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=1gsPEt1/kDSSNflaImtKJVxcfOurcbBEdIG2t/N6F+8=;
- b=mo+TQXicVlL/ceoR6QmzmGuRiUkrHwCF1KsxgqYAJQWrKD+UkaBvCChXGlipYOdUFzAh
- 8qkjbA2CftXI3LIIEvrwHmnLOrvMqWq+YarhtAiOYg0KccnnQFp7YRUB+UPJF7f57qlP
- EkNi+zmDwkCJs6eeSxf3QxcFGu37CAwHs+lVfCAzUy75jzczXTJNTd7tx5TDKqNlj7q9
- QXqUMcfnDb3LjFcvRu/3v6qJenNgZNWTkVyja1ed9raALR4QHow8UeQVBo9DoEvzpfaz
- cHhqRBhSBz9PNqbjgCRNdy9U/bUr9F8A4bpohK1sjXG6++3PxRNVVuea0C3zKMWCuNlj sA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36kyx7t8na-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 14:49:01 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 119JXKuf091898;
-        Tue, 9 Feb 2021 14:49:00 -0500
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36kyx7t8n6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 14:49:00 -0500
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 119Jgdpc003984;
-        Tue, 9 Feb 2021 19:49:00 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma01dal.us.ibm.com with ESMTP id 36hjr9f50u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 19:49:00 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 119JmxOf42729850
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 Feb 2021 19:48:59 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2E4C6B2065;
-        Tue,  9 Feb 2021 19:48:59 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8E612B205F;
-        Tue,  9 Feb 2021 19:48:58 +0000 (GMT)
-Received: from cpe-66-24-58-13.stny.res.rr.com.com (unknown [9.85.203.235])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  9 Feb 2021 19:48:58 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, borntraeger@de.ibm.com, cohuck@redhat.com,
-        kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH 0/1] fix circular lockdep when staring SE guest
-Date:   Tue,  9 Feb 2021 14:48:29 -0500
-Message-Id: <20210209194830.20271-1-akrowiak@linux.ibm.com>
-X-Mailer: git-send-email 2.21.1
+        id S234063AbhBIVqE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 16:46:04 -0500
+Received: from mga09.intel.com ([134.134.136.24]:23382 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233361AbhBIVF6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 16:05:58 -0500
+IronPort-SDR: xeb8DKJH97gOMbP02x3EdWVi6HwSe7xglVS0TLEUxhm5JEoxQwlhyjdq2QK/A9citk/2CMy7oE
+ hHH+rO6DH5pQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="182103815"
+X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
+   d="scan'208";a="182103815"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:03:08 -0800
+IronPort-SDR: CbQpsbuKsiguYldWjtRlI4ODucsEKPSH22XX5c8TCF7nABjZSvURmOTrPoqdxnU7hyDPtF3qZE
+ 5MGTHGLeDqMw==
+X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
+   d="scan'208";a="396391669"
+Received: from aellsw1-mobl.amr.corp.intel.com ([10.251.22.237])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 13:03:05 -0800
+Message-ID: <ddc22787d6d4abf51c47b28ec6fe6df85d0fea3e.camel@intel.com>
+Subject: Re: [RFC PATCH v4 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware
+ error code
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        jarkko@kernel.org, luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 10 Feb 2021 10:03:02 +1300
+In-Reply-To: <YCLBQYq2HaA7MFKH@google.com>
+References: <cover.1612777752.git.kai.huang@intel.com>
+         <3c1edb38e95843eb9bf3fcbbec6cf9bdd9b3e7b1.1612777752.git.kai.huang@intel.com>
+         <b9e8a9a0-6a53-6523-4ea8-347c67e7ba86@intel.com>
+         <YCK81Zcz++PfGPnw@google.com>
+         <af80db88-9097-0947-e05d-9508daee18df@intel.com>
+         <YCLBQYq2HaA7MFKH@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-09_06:2021-02-09,2021-02-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 suspectscore=0 spamscore=0 clxscore=1011
- bulkscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102090094
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Patch f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
-pointer invalidated") introduced a change that results in a circular
-locking dependency when a Secure Execution guest that is configured with
-crypto devices is started. The problem resulted due to the fact that the
-patch moved the setting of the guest's AP masks within the protection of
-the matrix_dev->lock when the vfio_ap driver is notified that the KVM 
-pointer has been set. Since it is not critical that setting/clearing of
-the guest's AP masks when the driver is notified, the masks will not be
-updated under the matrix_dev->lock. The lock is necessary for the
-setting/unsetting of the KVM pointer, however, so that will remain in
-place. 
+On Tue, 2021-02-09 at 17:07 +0000, Sean Christopherson wrote:
+> On Tue, Feb 09, 2021, Dave Hansen wrote:
+> > On 2/9/21 8:48 AM, Sean Christopherson wrote:
+> > > On Tue, Feb 09, 2021, Dave Hansen wrote:
+> > > > On 2/8/21 2:54 AM, Kai Huang wrote:
+> > > > ...
+> > > > > Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
+> > > > > failures are expected, but only due to SGX_CHILD_PRESENT.
+> > > > This paragraph broke my brain when I read it.  How about:
+> > > > 
+> > > > 	Add a definition of SGX_CHILD_PRESENT.  It will be used
+> > > > 	exclusively by the SGX virtualization driver to suppress EREMOVE
+> > > > 	warnings.
+> > > Maybe worth clarifying that the driver isn't suppressing warnings willy-nilly?
+> > > And the error code isn't about suppressing warnings, it's about identifying the
+> > > expected EREMOVE failure scenario.  The patch that creates the separate helper
+> > > for doing EREMOVE without the WARN is what provides the suppression mechanism.
+> > > 
+> > > Something like this?
+> > > 
+> > >   Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
+> > >   the SGX virtualization driver to handle recoverable EREMOVE errors when
+> > >   saniziting EPC pages after they are reclaimed from a guest.
+> > 
+> > Looks great to me.  One nit: to a me, "reclaim" is different than
+> > "free".  Reclaim is a specific operation where a page is taken from one
+> > user and reclaimed for other use.  "Free" is the more general case
+> > (which includes reclaim) when a physical page is no longer being used
+> > (because the user is done *or* had the page reclaimed) and may be either
+> > used by someone else or put in a free pool.
+> > 
+> > I *think* this is actually a "free" operation, rather than a "reclaim".
+> >  IIRC, this code gets used at munmap().
+> 
+> It does.  I used reclaim because userspace, which does the freeing from this
+> code's perspective, never touches the EPC pages.  The SGX_CHILD_PRESENT case is
+> handling the scenario where userspace has for all intents and purposed reclaimed
+> the EPC from a guest.  If the guest cleanly tears down its enclaves, EREMOVE
+> will not fail.
+> 
+> "free" is probably better though, the above is far from obvious and still not
+> guaranteed to be a true reclaim scenario.  If using "freed", drop the "from a
+> guest" part.
 
-The dependency chain for the circular lockdep resolved by this patch 
-is:
+Thanks for feedback. I'll use below:
 
-#2	vfio_ap_mdev_group_notifier:	kvm->lock
-					matrix_dev->lock
-
-#1:	handle_pqap:			matrix_dev->lock
-	kvm_vcpu_ioctl:			vcpu->mutex
-
-#0:	kvm_s390_cpus_to_pv:		vcpu->mutex
-	kvm_vm_ioctl:  			kvm->lock   
-
-Tony Krowiak (1):
-  s390/vfio-ap: fix circular lockdep when setting/clearing crypto masks
-
- drivers/s390/crypto/vfio_ap_ops.c | 75 ++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 30 deletions(-)
-
--- 
-2.21.1
+  Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
+  the SGX virtualization driver to handle recoverable EREMOVE errors when
+  saniziting EPC pages after they are freed.
 
