@@ -2,124 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D2A731450E
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 01:46:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 633FE314597
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 02:26:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbhBIAqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 19:46:33 -0500
-Received: from mga07.intel.com ([134.134.136.100]:34289 "EHLO mga07.intel.com"
+        id S230347AbhBIBZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 20:25:35 -0500
+Received: from mga04.intel.com ([192.55.52.120]:52715 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229545AbhBIAqb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 19:46:31 -0500
-IronPort-SDR: 4z8v5yUdjK0xIw9MRgmMisc9g9CNqg/rVn61bSMIncvc6mR2X+NTT4qhy4soXi3FGnpyV/7k29
- A91Pdtj9d08Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="245876489"
+        id S229816AbhBIBZb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 20:25:31 -0500
+IronPort-SDR: 8uYKV5aeiN4H1dYLReTaQJZO/cwcR6bP3UZPKSFcSyR7VoYozzujmr2co4Fam1LSD+358+HCOa
+ Tx4i/ppG2c9w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="179251872"
 X-IronPort-AV: E=Sophos;i="5.81,163,1610438400"; 
-   d="scan'208";a="245876489"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 16:44:44 -0800
-IronPort-SDR: enOuzo18U2oGng79sCChbSrbRM4bcsc9GQgCOvaOuEffFQ0NISs9JtDKtOPC8yFunfxI8n8w9g
- AsjDfiVFX3tg==
+   d="asc'?scan'208";a="179251872"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 17:23:45 -0800
+IronPort-SDR: y+jeXAsnNmZV6FvzVTPdNbgBq1SCupULaKJuXGMmiokZpuvDu8VVocQPqeiT6RBQ1tBYk2t0eg
+ VQzWsvQWIXIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,163,1610438400"; 
-   d="scan'208";a="411603615"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.128]) ([10.239.159.128])
-  by fmsmga004.fm.intel.com with ESMTP; 08 Feb 2021 16:44:39 -0800
-Cc:     baolu.lu@linux.intel.com, tglx@linutronix.de,
-        linux-kernel@vger.kernel.org, dave.jiang@intel.com,
-        ashok.raj@intel.com, kevin.tian@intel.com, dwmw@amazon.co.uk,
-        x86@kernel.org, tony.luck@intel.com, dan.j.williams@intel.com,
-        jgg@mellanox.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
-        bhelgaas@google.com, maz@kernel.org, linux-pci@vger.kernel.org,
-        ravi.v.shankar@intel.com
-Subject: Re: [PATCH 11/12] platform-msi: Add platform check for subdevice irq
- domain
-To:     Leon Romanovsky <leon@kernel.org>, Megha Dey <megha.dey@intel.com>
-References: <1612385805-3412-1-git-send-email-megha.dey@intel.com>
- <1612385805-3412-12-git-send-email-megha.dey@intel.com>
- <20210208082148.GA20265@unreal>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <b1ca6094-b561-1962-69a2-e6b678c42d3a@linux.intel.com>
-Date:   Tue, 9 Feb 2021 08:36:08 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+   d="asc'?scan'208";a="398603670"
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
+  by orsmga007.jf.intel.com with ESMTP; 08 Feb 2021 17:23:42 -0800
+Date:   Tue, 9 Feb 2021 09:08:17 +0800
+From:   Zhenyu Wang <zhenyuw@linux.intel.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
+        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
+        airlied@linux.ie, daniel@ffwll.ch,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] drm/i915/gvt/kvmgt: Fix the build failure in kvmgt.
+Message-ID: <20210209010817.GC2043@zhen-hp.sh.intel.com>
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+References: <20210208185210.6002-1-yu.c.zhang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210208082148.GA20265@unreal>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="f61P+fpdnY2FZS1u"
+Content-Disposition: inline
+In-Reply-To: <20210208185210.6002-1-yu.c.zhang@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Leon,
 
-On 2/8/21 4:21 PM, Leon Romanovsky wrote:
-> On Wed, Feb 03, 2021 at 12:56:44PM -0800, Megha Dey wrote:
->> From: Lu Baolu <baolu.lu@linux.intel.com>
->>
->> The pci_subdevice_msi_create_irq_domain() should fail if the underlying
->> platform is not able to support IMS (Interrupt Message Storage). Otherwise,
->> the isolation of interrupt is not guaranteed.
->>
->> For x86, IMS is only supported on bare metal for now. We could enable it
->> in the virtualization environments in the future if interrupt HYPERCALL
->> domain is supported or the hardware has the capability of interrupt
->> isolation for subdevices.
->>
->> Cc: David Woodhouse <dwmw@amazon.co.uk>
->> Cc: Leon Romanovsky <leon@kernel.org>
->> Cc: Kevin Tian <kevin.tian@intel.com>
->> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
->> Link: https://lore.kernel.org/linux-pci/87pn4nk7nn.fsf@nanos.tec.linutronix.de/
->> Link: https://lore.kernel.org/linux-pci/877dqrnzr3.fsf@nanos.tec.linutronix.de/
->> Link: https://lore.kernel.org/linux-pci/877dqqmc2h.fsf@nanos.tec.linutronix.de/
->> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
->> Signed-off-by: Megha Dey <megha.dey@intel.com>
->> ---
->>   arch/x86/pci/common.c       | 74 +++++++++++++++++++++++++++++++++++++++++++++
->>   drivers/base/platform-msi.c |  8 +++++
->>   include/linux/msi.h         |  1 +
->>   3 files changed, 83 insertions(+)
->>
->> diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
->> index 3507f45..263ccf6 100644
->> --- a/arch/x86/pci/common.c
->> +++ b/arch/x86/pci/common.c
->> @@ -12,6 +12,8 @@
->>   #include <linux/init.h>
->>   #include <linux/dmi.h>
->>   #include <linux/slab.h>
->> +#include <linux/iommu.h>
->> +#include <linux/msi.h>
->>
->>   #include <asm/acpi.h>
->>   #include <asm/segment.h>
->> @@ -724,3 +726,75 @@ struct pci_dev *pci_real_dma_dev(struct pci_dev *dev)
->>   	return dev;
->>   }
->>   #endif
->> +
->> +#ifdef CONFIG_DEVICE_MSI
-> 
-> Sorry for my naive question, but I see it in all your patches in this series
-> and wonder why did you wrap everything with ifdefs?.
+--f61P+fpdnY2FZS1u
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The added code is only called when DEVICE_MSI is configured.
+On 2021.02.09 02:52:10 +0800, Yu Zhang wrote:
+> Previously, commit 531810caa9f4 ("KVM: x86/mmu: Use
+> an rwlock for the x86 MMU") replaced KVM's mmu_lock
+> with type rwlock_t. This will cause a build failure
+> in kvmgt, which uses the same lock when trying to add/
+> remove some GFNs to/from the page tracker. Fix it with
+> write_lock/unlocks in kvmgt.
 
-> 
-> All *.c code is wrapped with those ifdefs, which is hard to navigate and
-> unlikely to give any code/size optimization benefit if kernel is compiled
-> without CONFIG_DEVICE_MSI. The more common approach is to put those
-> ifdef in the public header files and leave to the compiler to drop not
-> called functions.
+Thanks for the fix! I saw Paolo has already carried one
+in -next, so we are fine.
 
-Yes. This looks better.
+>=20
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> ---
+>  drivers/gpu/drm/i915/gvt/kvmgt.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
+kvmgt.c
+> index 60f1a386dd06..b4348256ae95 100644
+> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
+> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+> @@ -1703,7 +1703,7 @@ static int kvmgt_page_track_add(unsigned long handl=
+e, u64 gfn)
+>  		return -EINVAL;
+>  	}
+> =20
+> -	spin_lock(&kvm->mmu_lock);
+> +	write_lock(&kvm->mmu_lock);
+> =20
+>  	if (kvmgt_gfn_is_write_protected(info, gfn))
+>  		goto out;
+> @@ -1712,7 +1712,7 @@ static int kvmgt_page_track_add(unsigned long handl=
+e, u64 gfn)
+>  	kvmgt_protect_table_add(info, gfn);
+> =20
+>  out:
+> -	spin_unlock(&kvm->mmu_lock);
+> +	write_unlock(&kvm->mmu_lock);
+>  	srcu_read_unlock(&kvm->srcu, idx);
+>  	return 0;
+>  }
+> @@ -1737,7 +1737,7 @@ static int kvmgt_page_track_remove(unsigned long ha=
+ndle, u64 gfn)
+>  		return -EINVAL;
+>  	}
+> =20
+> -	spin_lock(&kvm->mmu_lock);
+> +	write_lock(&kvm->mmu_lock);
+> =20
+>  	if (!kvmgt_gfn_is_write_protected(info, gfn))
+>  		goto out;
+> @@ -1746,7 +1746,7 @@ static int kvmgt_page_track_remove(unsigned long ha=
+ndle, u64 gfn)
+>  	kvmgt_protect_table_del(info, gfn);
+> =20
+>  out:
+> -	spin_unlock(&kvm->mmu_lock);
+> +	write_unlock(&kvm->mmu_lock);
+>  	srcu_read_unlock(&kvm->srcu, idx);
+>  	return 0;
+>  }
+> @@ -1772,7 +1772,7 @@ static void kvmgt_page_track_flush_slot(struct kvm =
+*kvm,
+>  	struct kvmgt_guest_info *info =3D container_of(node,
+>  					struct kvmgt_guest_info, track_node);
+> =20
+> -	spin_lock(&kvm->mmu_lock);
+> +	write_lock(&kvm->mmu_lock);
+>  	for (i =3D 0; i < slot->npages; i++) {
+>  		gfn =3D slot->base_gfn + i;
+>  		if (kvmgt_gfn_is_write_protected(info, gfn)) {
+> @@ -1781,7 +1781,7 @@ static void kvmgt_page_track_flush_slot(struct kvm =
+*kvm,
+>  			kvmgt_protect_table_del(info, gfn);
+>  		}
+>  	}
+> -	spin_unlock(&kvm->mmu_lock);
+> +	write_unlock(&kvm->mmu_lock);
+>  }
+> =20
+>  static bool __kvmgt_vgpu_exist(struct intel_vgpu *vgpu, struct kvm *kvm)
+> --=20
+> 2.17.1
+>=20
 
-> 
-> Thanks
-> 
+--f61P+fpdnY2FZS1u
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Best regards,
-baolu
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCYCHggQAKCRCxBBozTXgY
+J4FcAJsFxkXndfIuWXcRxMohV8DLfSmIbwCeNihYVZJrpZ/nzUK+LJJnAinbtbE=
+=YD2h
+-----END PGP SIGNATURE-----
+
+--f61P+fpdnY2FZS1u--
