@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC3743150E4
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 14:53:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C04F3150ED
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 14:53:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbhBINw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 08:52:56 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6070 "EHLO
+        id S231626AbhBINxL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 08:53:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10634 "EHLO
         mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231838AbhBINvc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 08:51:32 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 119DWTa7036302;
-        Tue, 9 Feb 2021 08:50:50 -0500
+        by vger.kernel.org with ESMTP id S231842AbhBINvd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 08:51:33 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 119DWOwi172569;
+        Tue, 9 Feb 2021 08:50:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=ByvLnKrYY+rMkq0ReAiSiW4ZyteOVq1bmi+FGSYuKBc=;
- b=YSW5KNTA63rVCAX6fPcC9084/Goj8Jvt7YFNORUZsL9ygb6mCfD8fgbIDJMqNUPiPq+O
- PMHNIZ8OVuPirve0wdW0Of86aRdvSpCaxNbPOwl/4EW/nSQ6P1XzRpMLIclH7sAFLbeL
- YCEoK/J0zQigaQq4PRC1TnjIg9erc5ZpkCvvt3mt0yvyS57cYoaovu3DzXhYMRXPpn+R
- dNER3sfLXqUEo+jwr8KnGwgnmFgO65lSZLC3cTJPZYrQSg3NMNyvJsl3U5kPzpjaEueC
- tko64w0bNtS+KV2q3EFrAIAHILiuhY0vlPcHh69Y2KpWZHvGd+DkImQUSHwd9BxQ1cvE ig== 
+ bh=S8dvXIiy8agDEsyKoDBFzvGlDklevfSpUoONrKYP2gA=;
+ b=tRuSOrzVFPODbGBJXvdu5UggD9jb5iG/0ulE48JP+24csmQcfrF/4uJ7z9dhZwA9zhuq
+ /fdvLYxBrClG6GH3reiE5U6oigLwq9JdWG1Fl6KcRFcihilbVSIKgpQO3VBkVTjehsNr
+ GDa4GPZV9SvHu3gfryXXskHdHFJWBbyerXs4h/M8rQs4wEEtXKBe2vhBQMz9+6iTOjSm
+ cgibOeGr+Y28UQ2m4F0UXQiUrGwmM3EWFPToUbge7cc9SXpb+CVKhDkiubptbhoC2xVh
+ SkJREWxXI+ud8YWAvTUqgoMMZu1gHjJ2B8rva0ZGafVS7Z3ilz39K+ZfamB5OHAvys/1 uw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ku30h6jx-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36kts6a1yn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Feb 2021 08:50:51 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 119DWnwb174105;
+        Tue, 9 Feb 2021 08:50:51 -0500
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36kts6a1xn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 09 Feb 2021 08:50:50 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 119DX6hI039462;
-        Tue, 9 Feb 2021 08:50:50 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36ku30h6j2-1
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 119DRBvY031291;
+        Tue, 9 Feb 2021 13:50:48 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 36hjr7sr4n-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 08:50:50 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 119DTVFn011235;
-        Tue, 9 Feb 2021 13:50:47 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 36hjr81r9m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 13:50:47 +0000
+        Tue, 09 Feb 2021 13:50:48 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 119DoiHN38469940
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 119DojSK47317454
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 Feb 2021 13:50:44 GMT
+        Tue, 9 Feb 2021 13:50:45 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B5B3A404D;
+        by IMSVA (Postfix) with ESMTP id 77305A404D;
+        Tue,  9 Feb 2021 13:50:45 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2D01A4059;
         Tue,  9 Feb 2021 13:50:44 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E76B4A4051;
-        Tue,  9 Feb 2021 13:50:43 +0000 (GMT)
 Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  9 Feb 2021 13:50:43 +0000 (GMT)
+        Tue,  9 Feb 2021 13:50:44 +0000 (GMT)
 From:   Janosch Frank <frankja@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
         pmorel@linux.ibm.com, imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 4/8] s390x: Introduce and use CALL_INT_HANDLER macro
-Date:   Tue,  9 Feb 2021 08:49:21 -0500
-Message-Id: <20210209134925.22248-5-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 5/8] s390x: Provide preliminary backtrace support
+Date:   Tue,  9 Feb 2021 08:49:22 -0500
+Message-Id: <20210209134925.22248-6-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210209134925.22248-1-frankja@linux.ibm.com>
 References: <20210209134925.22248-1-frankja@linux.ibm.com>
@@ -69,104 +69,103 @@ Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
  definitions=2021-02-09_03:2021-02-09,2021-02-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 mlxlogscore=940 mlxscore=0 bulkscore=0 suspectscore=0
- impostorscore=0 phishscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ suspectscore=0 spamscore=0 impostorscore=0 adultscore=0 clxscore=1015
+ mlxlogscore=999 phishscore=0 priorityscore=1501 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2102090067
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ELF ABI dictates that we need to allocate 160 bytes of stack space
-for the C functions we're calling. Since we would need to do that for
-every interruption handler which, combined with the new stack argument
-being saved in GR2, makes cstart64.S look a bit messy.
-
-So let's introduce the CALL_INT_HANDLER macro that handles all of
-that, calls the C interrupt handler and handles cleanup afterwards.
+After the stack changes we can finally use -mbackchain and have a
+working backtrace.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- s390x/cstart64.S | 28 +++++-----------------------
- s390x/macros.S   | 17 +++++++++++++++++
- 2 files changed, 22 insertions(+), 23 deletions(-)
+ lib/s390x/interrupt.c | 12 ++++++++++++
+ lib/s390x/stack.c     | 20 ++++++++++++++------
+ s390x/Makefile        |  1 +
+ 3 files changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-index 35d20293..666a9567 100644
---- a/s390x/cstart64.S
-+++ b/s390x/cstart64.S
-@@ -92,37 +92,19 @@ memsetxc:
+diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+index 94a2cf9c..49f98759 100644
+--- a/lib/s390x/interrupt.c
++++ b/lib/s390x/interrupt.c
+@@ -115,6 +115,18 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
+ 	/* suppressed/terminated/completed point already at the next address */
+ }
  
- .section .text
- pgm_int:
--	SAVE_REGS_STACK
--	lgr     %r2, %r15
--	brasl	%r14, handle_pgm_int
--	RESTORE_REGS_STACK
--	lpswe	GEN_LC_PGM_OLD_PSW
-+	CALL_INT_HANDLER handle_pgm_int, GEN_LC_PGM_OLD_PSW
- 
- ext_int:
--	SAVE_REGS_STACK
--	lgr     %r2, %r15
--	brasl	%r14, handle_ext_int
--	RESTORE_REGS_STACK
--	lpswe	GEN_LC_EXT_OLD_PSW
-+	CALL_INT_HANDLER handle_ext_int, GEN_LC_EXT_OLD_PSW
- 
- mcck_int:
--	SAVE_REGS_STACK
--	brasl	%r14, handle_mcck_int
--	RESTORE_REGS_STACK
--	lpswe	GEN_LC_MCCK_OLD_PSW
-+	CALL_INT_HANDLER handle_mcck_int, GEN_LC_MCCK_OLD_PSW
- 
- io_int:
--	SAVE_REGS_STACK
--	lgr     %r2, %r15
--	brasl	%r14, handle_io_int
--	RESTORE_REGS_STACK
--	lpswe	GEN_LC_IO_OLD_PSW
-+	CALL_INT_HANDLER handle_io_int, GEN_LC_IO_OLD_PSW
- 
- svc_int:
--	SAVE_REGS_STACK
--	brasl	%r14, handle_svc_int
--	RESTORE_REGS_STACK
--	lpswe	GEN_LC_SVC_OLD_PSW
-+	CALL_INT_HANDLER handle_svc_int, GEN_LC_SVC_OLD_PSW
- 
- 	.align	8
- initial_psw:
-diff --git a/s390x/macros.S b/s390x/macros.S
-index 9810d2ff..1678c821 100644
---- a/s390x/macros.S
-+++ b/s390x/macros.S
-@@ -11,6 +11,23 @@
-  *  David Hildenbrand <david@redhat.com>
-  */
- #include <asm/asm-offsets.h>
-+/*
-+ * Exception handler macro that saves registers on the stack,
-+ * allocates stack space and calls the C handler function. Afterwards
-+ * we re-load the registers and load the old PSW.
-+ */
-+	.macro CALL_INT_HANDLER c_func, old_psw
-+	SAVE_REGS_STACK
-+	/* Save the stack address in GR2 which is the first function argument */
-+	lgr     %r2, %r15
-+	/* Allocate stack pace for called C function, as specified in s390 ELF ABI */
-+	slgfi   %r15, 160
-+	brasl	%r14, \c_func
-+	algfi   %r15, 160
-+	RESTORE_REGS_STACK
-+	lpswe	\old_psw
-+	.endm
++static void print_pgm_info(struct stack_frame_int *stack)
 +
- 	.macro SAVE_REGS
- 	/* save grs 0-15 */
- 	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
++{
++	printf("\n");
++	printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
++	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
++	       lc->pgm_int_id);
++	dump_stack();
++	report_summary();
++	abort();
++}
++
+ void handle_pgm_int(struct stack_frame_int *stack)
+ {
+ 	if (!pgm_int_expected) {
+diff --git a/lib/s390x/stack.c b/lib/s390x/stack.c
+index 0fcd1afb..4cf80dae 100644
+--- a/lib/s390x/stack.c
++++ b/lib/s390x/stack.c
+@@ -3,24 +3,32 @@
+  * s390x stack implementation
+  *
+  * Copyright (c) 2017 Red Hat Inc
++ * Copyright 2021 IBM Corp
+  *
+  * Authors:
+  *  Thomas Huth <thuth@redhat.com>
+  *  David Hildenbrand <david@redhat.com>
++ *  Janosch Frank <frankja@de.ibm.com>
+  */
+ #include <libcflat.h>
+ #include <stack.h>
++#include <asm/arch_def.h>
+ 
+ int backtrace_frame(const void *frame, const void **return_addrs, int max_depth)
+ {
+-	printf("TODO: Implement backtrace_frame(%p, %p, %d) function!\n",
+-	       frame, return_addrs, max_depth);
+-	return 0;
++	int depth = 0;
++	struct stack_frame *stack = (struct stack_frame *)frame;
++
++	for (depth = 0; stack && depth < max_depth; depth++) {
++		return_addrs[depth] = (void *)stack->grs[8];
++		stack = stack->back_chain;
++	}
++
++	return depth;
+ }
+ 
+ int backtrace(const void **return_addrs, int max_depth)
+ {
+-	printf("TODO: Implement backtrace(%p, %d) function!\n",
+-	       return_addrs, max_depth);
+-	return 0;
++	return backtrace_frame(__builtin_frame_address(0),
++			       return_addrs, max_depth);
+ }
+diff --git a/s390x/Makefile b/s390x/Makefile
+index f3b0fccf..20bb5683 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -39,6 +39,7 @@ CFLAGS += -ffreestanding
+ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/s390x -I lib
+ CFLAGS += -O2
+ CFLAGS += -march=zEC12
++CFLAGS += -mbackchain
+ CFLAGS += -fno-delete-null-pointer-checks
+ LDFLAGS += -nostdlib -Wl,--build-id=none
+ 
 -- 
 2.25.1
 
