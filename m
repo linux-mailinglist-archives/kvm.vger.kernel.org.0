@@ -2,114 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 056BA3154AA
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 18:09:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F11493154DD
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 18:19:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbhBIRID (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 12:08:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
+        id S233008AbhBIRT0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 12:19:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232990AbhBIRH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 12:07:59 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D37C061574
-        for <kvm@vger.kernel.org>; Tue,  9 Feb 2021 09:07:18 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id z9so2019240pjl.5
-        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 09:07:18 -0800 (PST)
+        with ESMTP id S232893AbhBIRTY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 12:19:24 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F45EC06174A
+        for <kvm@vger.kernel.org>; Tue,  9 Feb 2021 09:18:44 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id e24so3748288ioc.1
+        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 09:18:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NYn0hIXEI1Dd7es1MA3rMU4kotjM8jzL+1QZgKfs5N0=;
-        b=d9usAGL29F/qZldLYA3EJ7uPSzbSHy3kB9GW/Sthmsw4HRaH1PXk43WAZIJYkdjOCJ
-         rCuCbA8s5G20hMqlG8ZhY/Veu2r/9fnvdTESTvcGQfCjGNzPO2WggZ5qKQGb/2IUcrjj
-         O7dABTJ2DQFKLk14lWAG5ucxHLMS/KPMaR90a5d6XUbfjaWk9wsKjnk3pHc4s8glHoOR
-         39Xy5zTC5g2DoDeGVFKj3hill/w4A7cRYasw3EPS/0/FyWgTHOGp/V9iKSwy8xb9uth3
-         t8EV107UkAZ2JLH1645lcaNRqlqyb7l9n1DQ8F/hpiPRGswdzSJ5Fkyfy9tAAwAQFYkR
-         kjaQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lUtnzAW46dlZiTOiwqO9uCdRWksCkXtHA4sUKlf1iCA=;
+        b=mPGpo9TqUVCxuvsIWZXrYrqbXhuqiZq4/bgvFH8ETfoC2cwS70d9kNXKaa/2ycZ8Le
+         uGL/hKxZtc6ngGicBNMeisLGHgorEunI3Vjzy3q8yFjX3LGq+595QxFtPFoqqE+6Q50+
+         v6NQApSLIfutLGyuvNhgDhcX8dJUIuVmGBTCnhABsgfj3ezGTVmwE7U4BBCmhEsIBd1j
+         2rDoNUGKb2DDJ7VQ9Ve4rBhO+ucSyHWN04kGaQUYkFWHJNDzbedAZDmJfz8gKFd1q5Xt
+         ymQY579V9yr3YpEHKROPs/8D5XBXvAz9ksqH71y8prOYXRi/qMzDNM0792csQnSYnq0T
+         EmJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NYn0hIXEI1Dd7es1MA3rMU4kotjM8jzL+1QZgKfs5N0=;
-        b=o+/9l1LAWA+mjFxqGTExgz9p8lEOOyyOQUZKXFsa170kCrb28lBipbRP/yElHF4rPO
-         fwc9nqf9eh/2Pmup7f1ng02o0C7adINSGeWSxIDHsoVCSty5hJJOTzUMZ1Vbk2q0/zKu
-         +D2TDDL/Sjnmc6/ft4o0/at3B9rYfBw4w2ViOF68ftJjDur3K7A30/TdbFZvDrmMhAxj
-         0Do/AhMjX+M3KxnOfr9i/CUAxiicEUrBudlbC2hKRm+Kr073bwx3vZhxs1R0dfWj//QG
-         jjQLi0OrBFfNnCeGxMgU3sYLBbQLuFZ+tDU1E/rqJPAk1M+OyqjccF75vXKdNF6OmVFu
-         XjKA==
-X-Gm-Message-State: AOAM531plAY/NZb1gil4lERl+jRnP1KHXI7fGy1qUcWpUzDjfbYYDDuW
-        kwnt9la0/dPFlkbS+kZkayao/A==
-X-Google-Smtp-Source: ABdhPJxA47uSfwPY5CZ8jMym5yNQ34qyJTE7CkZ260kgwKGkj1O9fzpD81uk18+T/6xQ5Wc18Sn6Pg==
-X-Received: by 2002:a17:90a:70c8:: with SMTP id a8mr4844995pjm.209.1612890437612;
-        Tue, 09 Feb 2021 09:07:17 -0800 (PST)
-Received: from google.com (240.111.247.35.bc.googleusercontent.com. [35.247.111.240])
-        by smtp.gmail.com with ESMTPSA id lw4sm2681793pjb.16.2021.02.09.09.07.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Feb 2021 09:07:16 -0800 (PST)
-Date:   Tue, 9 Feb 2021 17:07:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v4 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware
- error code
-Message-ID: <YCLBQYq2HaA7MFKH@google.com>
-References: <cover.1612777752.git.kai.huang@intel.com>
- <3c1edb38e95843eb9bf3fcbbec6cf9bdd9b3e7b1.1612777752.git.kai.huang@intel.com>
- <b9e8a9a0-6a53-6523-4ea8-347c67e7ba86@intel.com>
- <YCK81Zcz++PfGPnw@google.com>
- <af80db88-9097-0947-e05d-9508daee18df@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lUtnzAW46dlZiTOiwqO9uCdRWksCkXtHA4sUKlf1iCA=;
+        b=nEmxhw5ku8PNAaBQ/HipS5Y5DgTgVY/gBJoGzSSm4+4+J1yw6qmHhJYZaHZ7UZMKXO
+         46ebLCNr++yt3MV1nJEKr4QjEaZl1njjVL5ml1wwaqZiHKTCU4qH2rOw0JG7DIAbYha9
+         u5/9tYzoaFr6+nSemMMJAlfyfUUQBAWMSofWRYZBPRXTFkap4ap5IfVzuFcBtYn6OJd5
+         NVsJmU7xFpo9A6qMV7aS+hsCuAiA6as+Giz5ceDHDrjUL7XNRJbvpLTJg/i+qUMJXiH1
+         s2q6bu4A3DtoAaXFkQdvKZjzNgyStmCyALGdiZvrhylY8AkMYqSQ2so1o2Picncq+oOg
+         Ff+Q==
+X-Gm-Message-State: AOAM533rycrMZL1rrI7dMA795gWy8tKRbd83S1aAAp4XuARMrwhZ0Swn
+        Q9+HB0lYKDRCyjvqhP+8X03WAm6qWDB+XG65OXsLZg==
+X-Google-Smtp-Source: ABdhPJweX41NuF64dCG1UI2nZGXXPZbi/LX4Sk0uxFDI+uTUx216zKSbRDPPiBcLSCyClF/rNTVuNKB74fH+EByTb+U=
+X-Received: by 2002:a05:6602:2e8c:: with SMTP id m12mr20049870iow.19.1612891123762;
+ Tue, 09 Feb 2021 09:18:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af80db88-9097-0947-e05d-9508daee18df@intel.com>
+References: <20210208090841.333724-1-wangyanan55@huawei.com>
+ <20210208090841.333724-2-wangyanan55@huawei.com> <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
+ <c9c1207f-09ae-e601-5789-bd39ceb4071e@huawei.com>
+In-Reply-To: <c9c1207f-09ae-e601-5789-bd39ceb4071e@huawei.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 9 Feb 2021 09:18:32 -0800
+Message-ID: <CANgfPd_u2uGmt645e9mLbBcTOV1mQ_iXjq8h7WwCDKETZJ9GJg@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] KVM: selftests: Add a macro to get string of vm_mem_backing_src_type
+To:     "wangyanan (Y)" <wangyanan55@huawei.com>
+Cc:     kvm <kvm@vger.kernel.org>, linux-kselftest@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        wanghaibin.wang@huawei.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 09, 2021, Dave Hansen wrote:
-> On 2/9/21 8:48 AM, Sean Christopherson wrote:
-> > On Tue, Feb 09, 2021, Dave Hansen wrote:
-> >> On 2/8/21 2:54 AM, Kai Huang wrote:
-> >> ...
-> >>> Add SGX_CHILD_PRESENT for use by SGX virtualization to assert EREMOVE
-> >>> failures are expected, but only due to SGX_CHILD_PRESENT.
-> >> This paragraph broke my brain when I read it.  How about:
+On Tue, Feb 9, 2021 at 3:21 AM wangyanan (Y) <wangyanan55@huawei.com> wrote:
+>
+>
+> On 2021/2/9 2:13, Ben Gardon wrote:
+> > On Mon, Feb 8, 2021 at 1:08 AM Yanan Wang <wangyanan55@huawei.com> wrote:
+> >> Add a macro to get string of the backing source memory type, so that
+> >> application can add choices for source types in the help() function,
+> >> and users can specify which type to use for testing.
+> > Coincidentally, I sent out a change last week to do the same thing:
+> > "KVM: selftests: Add backing src parameter to dirty_log_perf_test"
+> > (https://lkml.org/lkml/2021/2/2/1430)
+> > Whichever way this ends up being implemented, I'm happy to see others
+> > interested in testing different backing source types too.
+>
+> Thanks Ben! I have a little question here.
+>
+> Can we just present three IDs (0/1/2) but not strings for users to
+> choose which backing_src_type to use like the way of guest modes,
+
+That would be fine with me. The string names are easier for me to read
+than an ID number (especially if you were to add additional options
+e.g. 1G hugetlb or file backed  / shared memory) but it's mostly an
+aesthetic preference, so I don't have strong feelings either way.
+
+>
+> which I think can make cmdlines more consise and easier to print. And is
+> it better to make a universal API to get backing_src_strings
+>
+> like Sean have suggested, so that the API can be used elsewhere ?
+
+Definitely. This should be as easy as possible to incorporate into all
+selftests.
+
+>
+> >> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> >> ---
+> >>   tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
+> >>   tools/testing/selftests/kvm/lib/kvm_util.c     | 8 ++++++++
+> >>   2 files changed, 11 insertions(+)
 > >>
-> >> 	Add a definition of SGX_CHILD_PRESENT.  It will be used
-> >> 	exclusively by the SGX virtualization driver to suppress EREMOVE
-> >> 	warnings.
-> > Maybe worth clarifying that the driver isn't suppressing warnings willy-nilly?
-> > And the error code isn't about suppressing warnings, it's about identifying the
-> > expected EREMOVE failure scenario.  The patch that creates the separate helper
-> > for doing EREMOVE without the WARN is what provides the suppression mechanism.
-> > 
-> > Something like this?
-> > 
-> >   Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
-> >   the SGX virtualization driver to handle recoverable EREMOVE errors when
-> >   saniziting EPC pages after they are reclaimed from a guest.
-> 
-> Looks great to me.  One nit: to a me, "reclaim" is different than
-> "free".  Reclaim is a specific operation where a page is taken from one
-> user and reclaimed for other use.  "Free" is the more general case
-> (which includes reclaim) when a physical page is no longer being used
-> (because the user is done *or* had the page reclaimed) and may be either
-> used by someone else or put in a free pool.
-> 
-> I *think* this is actually a "free" operation, rather than a "reclaim".
->  IIRC, this code gets used at munmap().
-
-It does.  I used reclaim because userspace, which does the freeing from this
-code's perspective, never touches the EPC pages.  The SGX_CHILD_PRESENT case is
-handling the scenario where userspace has for all intents and purposed reclaimed
-the EPC from a guest.  If the guest cleanly tears down its enclaves, EREMOVE
-will not fail.
-
-"free" is probably better though, the above is far from obvious and still not
-guaranteed to be a true reclaim scenario.  If using "freed", drop the "from a
-guest" part.
+> >> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> >> index 5cbb861525ed..f5fc29dc9ee6 100644
+> >> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> >> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> >> @@ -69,7 +69,9 @@ enum vm_guest_mode {
+> >>   #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
+> >>
+> >>   #define vm_guest_mode_string(m) vm_guest_mode_string[m]
+> >> +#define vm_mem_backing_src_type_string(s) vm_mem_backing_src_type_string[s]
+> >>   extern const char * const vm_guest_mode_string[];
+> >> +extern const char * const vm_mem_backing_src_type_string[];
+> >>
+> >>   struct vm_guest_mode_params {
+> >>          unsigned int pa_bits;
+> >> @@ -83,6 +85,7 @@ enum vm_mem_backing_src_type {
+> >>          VM_MEM_SRC_ANONYMOUS,
+> >>          VM_MEM_SRC_ANONYMOUS_THP,
+> >>          VM_MEM_SRC_ANONYMOUS_HUGETLB,
+> >> +       NUM_VM_BACKING_SRC_TYPES,
+> >>   };
+> >>
+> >>   int kvm_check_cap(long cap);
+> >> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >> index fa5a90e6c6f0..a9b651c7f866 100644
+> >> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> >> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> >> @@ -165,6 +165,14 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+> >>   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+> >>                 "Missing new mode params?");
+> >>
+> >> +const char * const vm_mem_backing_src_type_string[] = {
+> >> +       "VM_MEM_SRC_ANONYMOUS        ",
+> >> +       "VM_MEM_SRC_ANONYMOUS_THP    ",
+> >> +       "VM_MEM_SRC_ANONYMOUS_HUGETLB",
+> >> +};
+> >> +_Static_assert(sizeof(vm_mem_backing_src_type_string)/sizeof(char *) == NUM_VM_BACKING_SRC_TYPES,
+> >> +              "Missing new source type strings?");
+> >> +
+> >>   /*
+> >>    * VM Create
+> >>    *
+> >> --
+> >> 2.23.0
+> >>
+> > .
