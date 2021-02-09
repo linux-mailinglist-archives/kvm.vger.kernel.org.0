@@ -2,70 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6FB6314B71
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 10:26:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7732E314B87
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 10:29:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbhBIJXB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 04:23:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51034 "EHLO
+        id S229754AbhBIJ0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 04:26:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21329 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230380AbhBIJSs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 04:18:48 -0500
+        by vger.kernel.org with ESMTP id S229646AbhBIJVF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 04:21:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612862241;
+        s=mimecast20190719; t=1612862378;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kR4sfJQwPWMNwNuj+DnkuEqp3smRfq3+g8cDBmgUXoA=;
-        b=AMKXNCMmv/WGUv7+37oC6HtIkHiDTtZJsrcNIjbYZSC/juw/sx8uo705SMinndjVap2RWX
-        hQ3otmkKBjd3gtI8Rb+yRQxi4DPIC6tZrxW0aVKVlv3rxqaaTTjZgbhtAbz6MEDkK69vEu
-        IYWane9GqzswZ8mgwEoRBlDoNNazHxA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-mbJwJl05Nnmo8B6_QSyX9w-1; Tue, 09 Feb 2021 04:17:18 -0500
-X-MC-Unique: mbJwJl05Nnmo8B6_QSyX9w-1
-Received: by mail-wr1-f69.google.com with SMTP id u15so16450756wrn.3
-        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 01:17:18 -0800 (PST)
+        bh=BFjv4UtzY9Kq1FYF0dpb6VHrc3ljOiW5dWjb2Re6blw=;
+        b=PLFNavfW+GMNCji0tDjhaHVOAEB6Y3Jva66Pfj6+4RY6xZwkhoy81zxKt2wKk2frYiSj7X
+        Vyot/NPXBD7jNcILq1LccuXve74FuichFDWizbyUgKjHKFmj3ic1kYnMRCL6Pfoi6C5Yvl
+        xesyNUrHw7DyJqFTel4ciuKLn7er0/w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-ncBa8qdKMCutvmENUoW6tA-1; Tue, 09 Feb 2021 04:19:37 -0500
+X-MC-Unique: ncBa8qdKMCutvmENUoW6tA-1
+Received: by mail-wm1-f69.google.com with SMTP id j204so2268369wmj.4
+        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 01:19:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=kR4sfJQwPWMNwNuj+DnkuEqp3smRfq3+g8cDBmgUXoA=;
-        b=oTLvlCT7pUijWgR2SD13Y0WNHi8SlMEXHOUzx8UHCuMSf4176zUiEDaQ5INiDYQf3J
-         KsESVPGqzcZQyaV/k+7Tr3aF3Je5Jb/sYj1ZO16zLCBlRPy2gz9PsuGbl7mYdZwXUiZC
-         GRhkAg4JExjKuRxFZcv4zD+kSVRmNH/6wRk8X6H7lWOyYSetMjNLqtOQW6UBuw/quhB8
-         wkM6UB/y7BnhfqDctBrwkTIR3UjIAm4gzeh5MuywTHxVQKULMvdsr+aGefsaykREWE8z
-         gpho4DPYGcEMHDeBWihgo/x8cBMnLmLncS5+JBuVLEkwpXonWQexfZO7Yex4A4lw+NoM
-         GdtA==
-X-Gm-Message-State: AOAM5318L/dBfmzL5MKbvAYND5uzNqpc0rfMMn4wLj7BnBMLvIW4UydC
-        iymOJjE1cFL1Z1ORDc6CPzKKqfMu2A+/1AqvsIaV90DaZ02z8KLCUMH0FnkIeoXTy7/qyozXyX/
-        OYCE+GDqHaw3k
-X-Received: by 2002:a1c:6487:: with SMTP id y129mr2492730wmb.106.1612862237464;
-        Tue, 09 Feb 2021 01:17:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwmwWCDV49tFTXVIYPvZaeseHOM7ABgseFOX6gJD/bn3tbrRsCVdjIey4yCLXII8UjBT2t/Xg==
-X-Received: by 2002:a1c:6487:: with SMTP id y129mr2492713wmb.106.1612862237289;
-        Tue, 09 Feb 2021 01:17:17 -0800 (PST)
+        bh=BFjv4UtzY9Kq1FYF0dpb6VHrc3ljOiW5dWjb2Re6blw=;
+        b=JK/LMZX9U/43mqLcBjnllBhpBRY7ZPXSKs2MFD91vIOwoqR1OKwJcwZtzVXOHvfQkH
+         RSHTctteacLTh5XoiKTf9EOV5wLRoJdmd+bimueNN4zurEL1I6FOPFujnOgN6CmjTow9
+         ubrk7MV0cH/tfLg3KsVd1mymo/iioSKdCD9tdDhS2Vn/EpH+2ODVhUp8U66gsOYlodtX
+         ZVvlkQ5UjUmiAh1Jgp1o+arQ0Cp8YIAZVfll33aaAvOZ4egmeQA0zMBFLDscy6PGJdc/
+         sOnya1Ixf61UcgdMur59KDjEzE3JgPMZY+mRvPtg2adiQ4YD4FwGfItT5fa6riNyxAmo
+         Cugg==
+X-Gm-Message-State: AOAM531XXZgTZYorJCa54lgvNIY1Gn26jt+kG0uaFXgYHnQJcRSzTWAK
+        rEuiaDdtruUg817VtGXSjz6AB83Mwg0oU0MzKIgRUvJXn5Xhe6b8Z0hkx1DpoF7hNR3UWf2gzVo
+        ll5knFoXy9j1s
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr2532084wme.171.1612862375892;
+        Tue, 09 Feb 2021 01:19:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJylyGxN6rAcQNsffz+2zGcPZnteVoUtmo8yoEcEep7Stu6LpFbD+RJDHfXVYYs7gR1qW5cazQ==
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr2532068wme.171.1612862375679;
+        Tue, 09 Feb 2021 01:19:35 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id j7sm37174348wrp.72.2021.02.09.01.17.15
+        by smtp.gmail.com with ESMTPSA id u142sm3652118wmu.3.2021.02.09.01.19.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Feb 2021 01:17:16 -0800 (PST)
-Subject: Re: [PATCH] KVM: x86: hyper-v: Fix erroneous 'current_vcpu' usage in
- kvm_hv_flush_tlb()
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20210209090448.378472-1-vkuznets@redhat.com>
+        Tue, 09 Feb 2021 01:19:34 -0800 (PST)
+Subject: Re: [PATCH 1/2] mm: provide a sane PTE walking API for modules
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jgg@ziepe.ca,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
+        dan.j.williams@intel.com, Daniel Vetter <daniel@ffwll.ch>
+References: <20210205103259.42866-1-pbonzini@redhat.com>
+ <20210205103259.42866-2-pbonzini@redhat.com>
+ <20210208173936.GA1496438@infradead.org>
+ <3b10057c-e117-89fa-1bd4-23fb5a4efb5f@redhat.com>
+ <20210209081408.GA1703597@infradead.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a6dc2d08-32b6-6fdb-95e3-ab5dd89981d0@redhat.com>
-Date:   Tue, 9 Feb 2021 10:17:15 +0100
+Message-ID: <d238b495-dbae-1bc4-3397-5bceadfddb7e@redhat.com>
+Date:   Tue, 9 Feb 2021 10:19:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210209090448.378472-1-vkuznets@redhat.com>
+In-Reply-To: <20210209081408.GA1703597@infradead.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,37 +75,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/02/21 10:04, Vitaly Kuznetsov wrote:
-> Previously, we used to use 'current_vcpu' instead of 'vcpu' in
-> kvm_hv_flush_tlb() but this is no longer the case, it should clearly
-> be 'vcpu' here, a mistake was made during rebase.
+On 09/02/21 09:14, Christoph Hellwig wrote:
+> On Mon, Feb 08, 2021 at 07:18:56PM +0100, Paolo Bonzini wrote:
+>> Fair enough.  I would expect that pretty much everyone using follow_pfn will
+>> at least want to switch to this one (as it's less bad and not impossible to
+>> use correctly), but I'll squash this in:
 > 
-> Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Fixes: d210b1e5b685 ("KVM: x86: hyper-v: Always use to_hv_vcpu() accessor to get to 'struct kvm_vcpu_hv'"
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> The broken patch is only in kvm/queue atm, we may as well want
-> to squash the change.
-> ---
->   arch/x86/kvm/hyperv.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 880ba3c678db..7d2dae92d638 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1555,7 +1555,7 @@ static __always_inline unsigned long *sparse_set_to_vcpu_mask(
->   static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, u64 ingpa, u16 rep_cnt, bool ex)
->   {
->   	struct kvm *kvm = vcpu->kvm;
-> -	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(current_vcpu);
-> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
->   	struct hv_tlb_flush_ex flush_ex;
->   	struct hv_tlb_flush flush;
->   	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+> Daniel looked into them, so he may correct me, but the other follow_pfn
+> users and their destiny are:
 > 
+>   - SGX, which is not modular and I think I just saw a patch to kill them
+>   - v4l videobuf and frame vector: I think those are going away
+>     entirely as they implement a rather broken pre-dmabuf P2P scheme
+>   - vfio: should use MMU notifiers eventually
 
-Squashed, thanks.
+Yes, I'm thinking mostly of vfio, which could use follow_pte as a 
+short-term fix for just the missing permission check.
+
+There's also s390 PCI, which is also not modular.
 
 Paolo
+
+> Daniel, what happened to your follow_pfn series?
+
 
