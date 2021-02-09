@@ -2,153 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ECE1B314E20
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 12:22:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 761A9314E2B
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 12:25:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231667AbhBILTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 06:19:17 -0500
-Received: from foss.arm.com ([217.140.110.172]:49894 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230133AbhBILRA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 06:17:00 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E7FC8ED1;
-        Tue,  9 Feb 2021 03:16:12 -0800 (PST)
-Received: from [10.57.49.26] (unknown [10.57.49.26])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBE543F73B;
-        Tue,  9 Feb 2021 03:16:09 -0800 (PST)
-Subject: Re: [RFC PATCH 10/11] vfio/iommu_type1: Optimize dirty bitmap
- population based on iommu HWDBM
-To:     Yi Sun <yi.y.sun@linux.intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        Marc Zyngier <maz@kernel.org>, jiangkunkun@huawei.com,
-        wanghaibin.wang@huawei.com, kevin.tian@intel.com,
-        yan.y.zhao@intel.com, Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, lushenming@huawei.com,
-        iommu@lists.linux-foundation.org, James Morse <james.morse@arm.com>
-References: <20210128151742.18840-1-zhukeqian1@huawei.com>
- <20210128151742.18840-11-zhukeqian1@huawei.com>
- <20210207095630.GA28580@yi.y.sun>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <8150bd3a-dbb9-2e2b-386b-04e66f4b68dc@arm.com>
-Date:   Tue, 9 Feb 2021 11:16:08 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229839AbhBILYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 06:24:43 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2582 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229851AbhBILWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 06:22:32 -0500
+Received: from dggeme764-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DZgQY40tpzW2Zc;
+        Tue,  9 Feb 2021 19:19:33 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggeme764-chm.china.huawei.com (10.3.19.110) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Tue, 9 Feb 2021 19:21:47 +0800
+Subject: Re: [RFC PATCH 1/2] KVM: selftests: Add a macro to get string of
+ vm_mem_backing_src_type
+To:     Ben Gardon <bgardon@google.com>
+CC:     kvm <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
+References: <20210208090841.333724-1-wangyanan55@huawei.com>
+ <20210208090841.333724-2-wangyanan55@huawei.com>
+ <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
+From:   "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <c9c1207f-09ae-e601-5789-bd39ceb4071e@huawei.com>
+Date:   Tue, 9 Feb 2021 19:21:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20210207095630.GA28580@yi.y.sun>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
+ dggeme764-chm.china.huawei.com (10.3.19.110)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-02-07 09:56, Yi Sun wrote:
-> Hi,
-> 
-> On 21-01-28 23:17:41, Keqian Zhu wrote:
-> 
-> [...]
-> 
->> +static void vfio_dma_dirty_log_start(struct vfio_iommu *iommu,
->> +				     struct vfio_dma *dma)
->> +{
->> +	struct vfio_domain *d;
->> +
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		/* Go through all domain anyway even if we fail */
->> +		iommu_split_block(d->domain, dma->iova, dma->size);
->> +	}
->> +}
-> 
-> This should be a switch to prepare for dirty log start. Per Intel
-> Vtd spec, there is SLADE defined in Scalable-Mode PASID Table Entry.
-> It enables Accessed/Dirty Flags in second-level paging entries.
-> So, a generic iommu interface here is better. For Intel iommu, it
-> enables SLADE. For ARM, it splits block.
 
- From a quick look, VT-D's SLADE and SMMU's HTTU appear to be the exact 
-same thing. This step isn't about enabling or disabling that feature 
-itself (the proposal for SMMU is to simply leave HTTU enabled all the 
-time), it's about controlling the granularity at which the dirty status 
-can be detected/reported at all, since that's tied to the pagetable 
-structure.
+On 2021/2/9 2:13, Ben Gardon wrote:
+> On Mon, Feb 8, 2021 at 1:08 AM Yanan Wang <wangyanan55@huawei.com> wrote:
+>> Add a macro to get string of the backing source memory type, so that
+>> application can add choices for source types in the help() function,
+>> and users can specify which type to use for testing.
+> Coincidentally, I sent out a change last week to do the same thing:
+> "KVM: selftests: Add backing src parameter to dirty_log_perf_test"
+> (https://lkml.org/lkml/2021/2/2/1430)
+> Whichever way this ends up being implemented, I'm happy to see others
+> interested in testing different backing source types too.
 
-However, if an IOMMU were to come along with some other way of reporting 
-dirty status that didn't depend on the granularity of individual 
-mappings, then indeed it wouldn't need this operation.
+Thanks Ben! I have a little question here.
 
-Robin.
+Can we just present three IDs (0/1/2) but not strings for users to 
+choose which backing_src_type to use like the way of guest modes,
 
+which I think can make cmdlines more consise and easier to print. And is 
+it better to make a universal API to get backing_src_strings
+
+like Sean have suggested, so that the API can be used elsewhere ?
+
+>> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+>> ---
+>>   tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
+>>   tools/testing/selftests/kvm/lib/kvm_util.c     | 8 ++++++++
+>>   2 files changed, 11 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+>> index 5cbb861525ed..f5fc29dc9ee6 100644
+>> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+>> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+>> @@ -69,7 +69,9 @@ enum vm_guest_mode {
+>>   #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
+>>
+>>   #define vm_guest_mode_string(m) vm_guest_mode_string[m]
+>> +#define vm_mem_backing_src_type_string(s) vm_mem_backing_src_type_string[s]
+>>   extern const char * const vm_guest_mode_string[];
+>> +extern const char * const vm_mem_backing_src_type_string[];
+>>
+>>   struct vm_guest_mode_params {
+>>          unsigned int pa_bits;
+>> @@ -83,6 +85,7 @@ enum vm_mem_backing_src_type {
+>>          VM_MEM_SRC_ANONYMOUS,
+>>          VM_MEM_SRC_ANONYMOUS_THP,
+>>          VM_MEM_SRC_ANONYMOUS_HUGETLB,
+>> +       NUM_VM_BACKING_SRC_TYPES,
+>>   };
+>>
+>>   int kvm_check_cap(long cap);
+>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> index fa5a90e6c6f0..a9b651c7f866 100644
+>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> @@ -165,6 +165,14 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>>   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>>                 "Missing new mode params?");
+>>
+>> +const char * const vm_mem_backing_src_type_string[] = {
+>> +       "VM_MEM_SRC_ANONYMOUS        ",
+>> +       "VM_MEM_SRC_ANONYMOUS_THP    ",
+>> +       "VM_MEM_SRC_ANONYMOUS_HUGETLB",
+>> +};
+>> +_Static_assert(sizeof(vm_mem_backing_src_type_string)/sizeof(char *) == NUM_VM_BACKING_SRC_TYPES,
+>> +              "Missing new source type strings?");
 >> +
->> +static void vfio_dma_dirty_log_stop(struct vfio_iommu *iommu,
->> +				    struct vfio_dma *dma)
->> +{
->> +	struct vfio_domain *d;
->> +
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		/* Go through all domain anyway even if we fail */
->> +		iommu_merge_page(d->domain, dma->iova, dma->size,
->> +				 d->prot | dma->prot);
->> +	}
->> +}
-> 
-> Same as above comment, a generic interface is required here.
-> 
->> +
->> +static void vfio_iommu_dirty_log_switch(struct vfio_iommu *iommu, bool start)
->> +{
->> +	struct rb_node *n;
->> +
->> +	/* Split and merge even if all iommu don't support HWDBM now */
->> +	for (n = rb_first(&iommu->dma_list); n; n = rb_next(n)) {
->> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
->> +
->> +		if (!dma->iommu_mapped)
->> +			continue;
->> +
->> +		/* Go through all dma range anyway even if we fail */
->> +		if (start)
->> +			vfio_dma_dirty_log_start(iommu, dma);
->> +		else
->> +			vfio_dma_dirty_log_stop(iommu, dma);
->> +	}
->> +}
->> +
->>   static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>   					unsigned long arg)
->>   {
->> @@ -2812,8 +2900,10 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>   		pgsize = 1 << __ffs(iommu->pgsize_bitmap);
->>   		if (!iommu->dirty_page_tracking) {
->>   			ret = vfio_dma_bitmap_alloc_all(iommu, pgsize);
->> -			if (!ret)
->> +			if (!ret) {
->>   				iommu->dirty_page_tracking = true;
->> +				vfio_iommu_dirty_log_switch(iommu, true);
->> +			}
->>   		}
->>   		mutex_unlock(&iommu->lock);
->>   		return ret;
->> @@ -2822,6 +2912,7 @@ static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>   		if (iommu->dirty_page_tracking) {
->>   			iommu->dirty_page_tracking = false;
->>   			vfio_dma_bitmap_free_all(iommu);
->> +			vfio_iommu_dirty_log_switch(iommu, false);
->>   		}
->>   		mutex_unlock(&iommu->lock);
->>   		return 0;
->> -- 
->> 2.19.1
-> _______________________________________________
-> iommu mailing list
-> iommu@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
-> 
+>>   /*
+>>    * VM Create
+>>    *
+>> --
+>> 2.23.0
+>>
+> .
