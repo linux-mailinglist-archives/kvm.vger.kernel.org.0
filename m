@@ -2,84 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE54E31527E
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD4083152BA
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbhBIPQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 10:16:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32560 "EHLO
+        id S232617AbhBIPZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 10:25:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48935 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232076AbhBIPQX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:16:23 -0500
+        by vger.kernel.org with ESMTP id S232618AbhBIPWy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:22:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612883697;
+        s=mimecast20190719; t=1612884088;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=p3nl8khMJqHiquy1CLRZQYryAyuIGVAlN0rUYVos1sI=;
-        b=JImP1RO3tqaYMg3IV+cmrpRJ27C6rvj+Ipyl4u8dVYe+RehZE51p5a9gMizrnJHJ5DZXP3
-        lsi8t4xUEeTp7M4y0dhZmrl1wmRjjCRKZk83HeVmHlrUJs4oSYIE3uTqO7PH1N6uB7CRBn
-        JJGTdawXb53VGsWx1hOXi8qWL0AP9JM=
+        bh=bf68nln4Sgm+T5RoUMWcekZndb2iiDQ7eQPV26Yg8kY=;
+        b=NEcutHbYr/Q3CnppaDr173D6AVJMwHW7Prlz+DPBg43SgOgOswWOnFcgSN6MIop9fvHctE
+        KgVjHwIKsfMljosYC5VLkrbJ0QnlFQNmlt6N2VEZq1ogwyBRXGzk8lQXpK4UHkAmbpd26V
+        XKItQTIg6hy1C+EyT0oJeGHyfARe/2U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-N8mkZGdVMnWJgYLXU-Mr7g-1; Tue, 09 Feb 2021 10:14:53 -0500
-X-MC-Unique: N8mkZGdVMnWJgYLXU-Mr7g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-55-NLBoHK1qN-G_nI9czj1NOA-1; Tue, 09 Feb 2021 10:21:26 -0500
+X-MC-Unique: NLBoHK1qN-G_nI9czj1NOA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F88B1005501;
-        Tue,  9 Feb 2021 15:14:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18DDA80196C;
+        Tue,  9 Feb 2021 15:21:25 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-114-56.ams2.redhat.com [10.36.114.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 296DD60C5C;
-        Tue,  9 Feb 2021 15:14:46 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH 1/8] s390x: Fix fpc store address in
- RESTORE_REGS_STACK
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com, pmorel@linux.ibm.com,
-        imbrenda@linux.ibm.com
-References: <20210209134925.22248-1-frankja@linux.ibm.com>
- <20210209134925.22248-2-frankja@linux.ibm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BB9710016F6;
+        Tue,  9 Feb 2021 15:21:20 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/4] libcflat: add SZ_1M and SZ_2G
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com,
+        frankja@linux.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com
+References: <20210209143835.1031617-1-imbrenda@linux.ibm.com>
+ <20210209143835.1031617-2-imbrenda@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <eff04587-8499-b987-d4a8-a7a2e20fb63a@redhat.com>
-Date:   Tue, 9 Feb 2021 16:14:46 +0100
+Message-ID: <bc698e30-883f-495f-c3c3-11cdffaf4152@redhat.com>
+Date:   Tue, 9 Feb 2021 16:21:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210209134925.22248-2-frankja@linux.ibm.com>
+In-Reply-To: <20210209143835.1031617-2-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/02/2021 14.49, Janosch Frank wrote:
-> The efpc stores in bits 32-63 of a register and we store a full 8
-> bytes to have the stack 8 byte aligned. This means that the fpc is
-> stored at offset 4 but we load it from offset 0. Lets replace efpc
-> with stfpc and get rid of the stg to store at offset 0.
+On 09/02/2021 15.38, Claudio Imbrenda wrote:
+> Add SZ_1M and SZ_2G to libcflat.h
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> s390x needs those for large/huge pages
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > ---
->   s390x/macros.S | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
+>   lib/libcflat.h | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/s390x/macros.S b/s390x/macros.S
-> index 37a6a63e..e51a557a 100644
-> --- a/s390x/macros.S
-> +++ b/s390x/macros.S
-> @@ -54,8 +54,7 @@
->   	.endr
->   	/* Save fpc, but keep stack aligned on 64bits */
->   	slgfi   %r15, 8
-> -	efpc	%r0
-> -	stg	%r0, 0(%r15)
-> +	stfpc	0(%r15)
->   	.endm
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index 460a1234..8dac0621 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -157,7 +157,9 @@ extern void setup_vm(void);
+>   #define SZ_8K			(1 << 13)
+>   #define SZ_16K			(1 << 14)
+>   #define SZ_64K			(1 << 16)
+> +#define SZ_1M			(1 << 20)
+>   #define SZ_2M			(1 << 21)
+>   #define SZ_1G			(1 << 30)
+> +#define SZ_2G			(1ul << 31)
+>   
+>   #endif
+> 
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
