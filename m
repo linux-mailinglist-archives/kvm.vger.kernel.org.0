@@ -2,152 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 633FE314597
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 02:26:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F2603145DB
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 02:55:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbhBIBZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Feb 2021 20:25:35 -0500
-Received: from mga04.intel.com ([192.55.52.120]:52715 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229816AbhBIBZb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Feb 2021 20:25:31 -0500
-IronPort-SDR: 8uYKV5aeiN4H1dYLReTaQJZO/cwcR6bP3UZPKSFcSyR7VoYozzujmr2co4Fam1LSD+358+HCOa
- Tx4i/ppG2c9w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="179251872"
-X-IronPort-AV: E=Sophos;i="5.81,163,1610438400"; 
-   d="asc'?scan'208";a="179251872"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2021 17:23:45 -0800
-IronPort-SDR: y+jeXAsnNmZV6FvzVTPdNbgBq1SCupULaKJuXGMmiokZpuvDu8VVocQPqeiT6RBQ1tBYk2t0eg
- VQzWsvQWIXIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,163,1610438400"; 
-   d="asc'?scan'208";a="398603670"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.160.147])
-  by orsmga007.jf.intel.com with ESMTP; 08 Feb 2021 17:23:42 -0800
-Date:   Tue, 9 Feb 2021 09:08:17 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     zhi.a.wang@intel.com, jani.nikula@linux.intel.com,
-        joonas.lahtinen@linux.intel.com, rodrigo.vivi@intel.com,
-        airlied@linux.ie, daniel@ffwll.ch,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] drm/i915/gvt/kvmgt: Fix the build failure in kvmgt.
-Message-ID: <20210209010817.GC2043@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20210208185210.6002-1-yu.c.zhang@linux.intel.com>
+        id S230326AbhBIBwx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Feb 2021 20:52:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229821AbhBIBwt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Feb 2021 20:52:49 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AF3C061788
+        for <kvm@vger.kernel.org>; Mon,  8 Feb 2021 17:52:10 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id g15so11456802pgu.9
+        for <kvm@vger.kernel.org>; Mon, 08 Feb 2021 17:52:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2srAivJsR8ZUb2Of5OZio4LXVkIXxX89sGFnynDTxFQ=;
+        b=mzW8QUkCHDb8txTgts6/c250bc5psaLG8vkJij6TG+bDHh0ltf2ZB555hvnxiZ4Tp3
+         NuFa51SYv9e+VDlKbK4QmbF+N1lKEnNJKrDVP4HthOy0YotW3zNUWHHVVl7Y7u1FY7dV
+         YgOI+jQ00Zrc4EvirXMlD3AU4kTzg9UbS5g3B/KPRE3gFVUEBSS5R2YAOe8lAd6ypZE2
+         NVx7M2gomjIftGUt0NTrwWOkYGGYdvAkltGSkx74W1D4W6vq6y9PRRAp1z+xMHSAraeQ
+         Yt+cYm6x0U0hk/Fxu9/5DA3uVm1xgFyMinOR0nsgAeu8MjxnYtu+z8ulhiVo8wBTkp6b
+         BgPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2srAivJsR8ZUb2Of5OZio4LXVkIXxX89sGFnynDTxFQ=;
+        b=s75jQ8pY/IMoEIY+zahsjEi5hxGVOVA+eYTbPOJKUuE/EBrGQYKoiqiIso9Wd2xdf6
+         WlJQcc9P4v8yPSDajUtfZVgc2D7sWY/8PVP+UBiT8eKh2KAiqqfAB/Ws8KBro5NRFph5
+         5it4YgKI141kv6bLDjTOeGmLjAlYNXuqa+m7jdRRIFMnhboStO5NOqqjKAt3sBZ7E4AP
+         KsGst1dqvyhDwYhej+2GMMnAQCJ/LPRP8dnbbBrJ6Uk2nNu8f2eZPU8RHdkMigbniltz
+         eeNvz+2mUUP7AYvSLZYFiTUy70D9Aa5QnapHL2cuxNi+FW4s5NQkiFGfr55lZT5VsXHf
+         Mapw==
+X-Gm-Message-State: AOAM533rtwzzmMr7Zu3Kk5UKBQYSOA2XluGLxS8roOa+6fVEciaf0NN1
+        FGAqJ338VOX8ViokTiV6cOgxeA==
+X-Google-Smtp-Source: ABdhPJwZftY+JfG4/ltpdGEm0VNS1bpBKVoGIJbWBMNCcNrjv07btIltmE0V7Uk4wPBBx9gbw16M0A==
+X-Received: by 2002:a62:1890:0:b029:1dc:1b2e:e07a with SMTP id 138-20020a6218900000b02901dc1b2ee07amr9121622pfy.14.1612835529512;
+        Mon, 08 Feb 2021 17:52:09 -0800 (PST)
+Received: from [192.168.10.23] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id nl12sm761085pjb.2.2021.02.08.17.52.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Feb 2021 17:52:08 -0800 (PST)
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
+        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
+        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
+        kwankhede@nvidia.com, ACurrid@nvidia.com, gmataev@nvidia.com,
+        cjia@nvidia.com, yishaih@nvidia.com
+References: <20210201181454.22112b57.cohuck@redhat.com>
+ <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+ <a413334c-3319-c6a3-3d8a-0bb68a10b9c1@nvidia.com>
+ <806c138e-685c-0955-7c15-93cb1d4fe0d9@ozlabs.ru>
+ <34be24e6-7f62-9908-c56d-9e469c3b6965@nvidia.com>
+ <83ef0164-6291-c3d1-0ce5-2c9d6c97469e@ozlabs.ru>
+ <20210204125123.GI4247@nvidia.com>
+ <d69a7f3c-f552-cd25-4e15-3e894f4eb15a@ozlabs.ru>
+ <20210208181313.GH4247@nvidia.com>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <7c5bf697-86a6-5147-061c-7a7c38b6897c@ozlabs.ru>
+Date:   Tue, 9 Feb 2021 12:51:59 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
+ Thunderbird/85.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="f61P+fpdnY2FZS1u"
-Content-Disposition: inline
-In-Reply-To: <20210208185210.6002-1-yu.c.zhang@linux.intel.com>
+In-Reply-To: <20210208181313.GH4247@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---f61P+fpdnY2FZS1u
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 2021.02.09 02:52:10 +0800, Yu Zhang wrote:
-> Previously, commit 531810caa9f4 ("KVM: x86/mmu: Use
-> an rwlock for the x86 MMU") replaced KVM's mmu_lock
-> with type rwlock_t. This will cause a build failure
-> in kvmgt, which uses the same lock when trying to add/
-> remove some GFNs to/from the page tracker. Fix it with
-> write_lock/unlocks in kvmgt.
+On 09/02/2021 05:13, Jason Gunthorpe wrote:
+> On Fri, Feb 05, 2021 at 11:42:11AM +1100, Alexey Kardashevskiy wrote:
+>>> A real nvswitch function?
+>>
+>> What do you mean by this exactly? The cpu side of nvlink is "emulated pci
+>> devices", the gpu side is not in pci space at all, the nvidia driver manages
+>> it via the gpu's mmio or/and cfg space.
+> 
+> Some versions of the nvswitch chip have a PCI-E link too, that is what
+> I though this was all about when I first saw it.
 
-Thanks for the fix! I saw Paolo has already carried one
-in -next, so we are fine.
+> So, it is really a special set of functions for NVIDIA GPU device
+> assignment only applicable to P9 systems, much like IGD is for Intel
+> on x86.
 
->=20
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/kvmgt.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->=20
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
-kvmgt.c
-> index 60f1a386dd06..b4348256ae95 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -1703,7 +1703,7 @@ static int kvmgt_page_track_add(unsigned long handl=
-e, u64 gfn)
->  		return -EINVAL;
->  	}
-> =20
-> -	spin_lock(&kvm->mmu_lock);
-> +	write_lock(&kvm->mmu_lock);
-> =20
->  	if (kvmgt_gfn_is_write_protected(info, gfn))
->  		goto out;
-> @@ -1712,7 +1712,7 @@ static int kvmgt_page_track_add(unsigned long handl=
-e, u64 gfn)
->  	kvmgt_protect_table_add(info, gfn);
-> =20
->  out:
-> -	spin_unlock(&kvm->mmu_lock);
-> +	write_unlock(&kvm->mmu_lock);
->  	srcu_read_unlock(&kvm->srcu, idx);
->  	return 0;
->  }
-> @@ -1737,7 +1737,7 @@ static int kvmgt_page_track_remove(unsigned long ha=
-ndle, u64 gfn)
->  		return -EINVAL;
->  	}
-> =20
-> -	spin_lock(&kvm->mmu_lock);
-> +	write_lock(&kvm->mmu_lock);
-> =20
->  	if (!kvmgt_gfn_is_write_protected(info, gfn))
->  		goto out;
-> @@ -1746,7 +1746,7 @@ static int kvmgt_page_track_remove(unsigned long ha=
-ndle, u64 gfn)
->  	kvmgt_protect_table_del(info, gfn);
-> =20
->  out:
-> -	spin_unlock(&kvm->mmu_lock);
-> +	write_unlock(&kvm->mmu_lock);
->  	srcu_read_unlock(&kvm->srcu, idx);
->  	return 0;
->  }
-> @@ -1772,7 +1772,7 @@ static void kvmgt_page_track_flush_slot(struct kvm =
-*kvm,
->  	struct kvmgt_guest_info *info =3D container_of(node,
->  					struct kvmgt_guest_info, track_node);
-> =20
-> -	spin_lock(&kvm->mmu_lock);
-> +	write_lock(&kvm->mmu_lock);
->  	for (i =3D 0; i < slot->npages; i++) {
->  		gfn =3D slot->base_gfn + i;
->  		if (kvmgt_gfn_is_write_protected(info, gfn)) {
-> @@ -1781,7 +1781,7 @@ static void kvmgt_page_track_flush_slot(struct kvm =
-*kvm,
->  			kvmgt_protect_table_del(info, gfn);
->  		}
->  	}
-> -	spin_unlock(&kvm->mmu_lock);
-> +	write_unlock(&kvm->mmu_lock);
->  }
-> =20
->  static bool __kvmgt_vgpu_exist(struct intel_vgpu *vgpu, struct kvm *kvm)
-> --=20
-> 2.17.1
->=20
 
---f61P+fpdnY2FZS1u
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+These GPUs are not P9 specific and they all have both PCIe and NVLink2 
+links. The special part is that some nvlinks are between P9 and GPU and 
+the rest are between GPUs, everywhere else (x86, may be ARM) the nvlinks 
+are used between GPUs but even there I do not think the nvlink logic is 
+presented to the host in the PCI space.
 
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCYCHggQAKCRCxBBozTXgY
-J4FcAJsFxkXndfIuWXcRxMohV8DLfSmIbwCeNihYVZJrpZ/nzUK+LJJnAinbtbE=
-=YD2h
------END PGP SIGNATURE-----
 
---f61P+fpdnY2FZS1u--
+
+-- 
+Alexey
