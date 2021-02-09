@@ -2,171 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A4F3159FC
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 00:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3189E3159FF
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 00:24:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234289AbhBIXVC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 18:21:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
+        id S234911AbhBIXXt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 18:23:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233968AbhBIW0u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 17:26:50 -0500
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F052EC06178A;
-        Tue,  9 Feb 2021 14:25:21 -0800 (PST)
-Received: by mail-ot1-x331.google.com with SMTP id q4so9374568otm.9;
-        Tue, 09 Feb 2021 14:25:21 -0800 (PST)
+        with ESMTP id S234005AbhBIW67 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 17:58:59 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A5EC061793
+        for <kvm@vger.kernel.org>; Tue,  9 Feb 2021 14:58:15 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id 124so1022qkg.6
+        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 14:58:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=1gLVS9nK6WhHrZCvdncqK42qXIN9H4CM0nYuiaxrwA8=;
-        b=W8N0og07ri1K4ftGlRDFehYZYS9dfZeHVIT2dk54OWafHg9jQtP1Js2mHw6F8NG7y9
-         /OcM9jtnzCo4N7ABF5Qc/Xac3qUGBN7zBmwpiobxZiZBnEdXYaOuaAMDsVwz8xcTUukl
-         zXqYMv09N5ymAOW2FTADn70jIjxRKZUyeeX1qM1v96lNT2XIJCxyGshVnlsZzcYJpf8w
-         VNdrE9cif/D9U89D9G4t38i3RNu+JBC+cZY4mOyoem1ySU1B0tTWRG7WUeuUaFQNs14V
-         Xu6G43y43BBPceRyxvgsoi5GVGtPobWQl4UwEWIW0hkqSSvUEqBYZq33lRJNxvgTvhM3
-         OX4g==
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=f+Sfzn1G8buhFeqBg3rOZ1CfjEptJKUCS3yLyjW3ukw=;
+        b=fXjKnajjwqEth6ETF1zmiiLoxMzax7fdB27dVNR262PGThQHBnxbxMp2UGW3t2jeCH
+         miWabgHcl2q1ZWnK9uGK9EoALG8Euee/lastlI5L2KdpJXgaIX0dqzTO9OuW0rc5cx6k
+         C5m5C7QQ9kc9qJRskvxfK1MN46Xvp2TVVnw2BTXt9ulo9j+Gc5ZzXBz5Oe+It8EeP8JE
+         8/BrdaedgiCLsiyzN/pd/4asmxv6isVt3lEg34B0E6I+bqoVL13zXrNS8RwcNcvQQDnH
+         nh6GuasHgotQuhqOcrCJMz7h5gyUoQluE6z2fn31ffj646DsMg1Ngnerf4JFEPNNtyRM
+         ujgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=1gLVS9nK6WhHrZCvdncqK42qXIN9H4CM0nYuiaxrwA8=;
-        b=jtt7yUbpGcCCbPBWy2/2mZYzrrvb6HyRsuT1Jub+3DyAqTEf2tAuZd+rbnQEXOIyeV
-         CACTdlSlSE+YFmm2A+4JONc9ypl+2cJvLp4Lsw8jsr6mV1b2pBgMiqEE3i3TVInW6WK3
-         e8N4TscMWcoBHv2sjxTUr1M6lnxpzknfMde4MC65+sUt0FXnQBOYBc+JNTE9NXV1EKGJ
-         +SOGU3tUF6RxuK8qBfOtuS2RCjYTioQGD/Cx/0zJGetEVT6P/ZqCUlRj+0bpprg5zubO
-         9VTWdR4ka9tafvBgoNJngQokx2e1boZb5RbE+F2HXfg6dewEGl2LjmRCqspzlo1eifS+
-         /g0w==
-X-Gm-Message-State: AOAM530VL6ddRyOcbHP39k4GHWNWmAjrgdY70dLZn31SLf4BY8MiE4c5
-        50b1IEZzzYpG/EFoDoJxosc=
-X-Google-Smtp-Source: ABdhPJx8DTNMEqsEpH9g5L7zRz4lHBPFybjAK99MllhY+H+TYKRmZp7gyYE7s7/Qw3YxyLzmSiQm8w==
-X-Received: by 2002:a9d:74d7:: with SMTP id a23mr9351267otl.331.1612909521283;
-        Tue, 09 Feb 2021 14:25:21 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id n27sm15083oij.36.2021.02.09.14.25.19
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 09 Feb 2021 14:25:20 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Tue, 9 Feb 2021 14:25:19 -0800
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=f+Sfzn1G8buhFeqBg3rOZ1CfjEptJKUCS3yLyjW3ukw=;
+        b=DzI2RMWxqmC6+bHWX+AuVc/5pBSiKz92leGc1uFryZt7rcJVogpyFrttStb4kd/55v
+         Yc+GqzOpLG1piq1tmcs2ZBf+wZbGbOYoR56Ck2rKwmAWiiDu/kADqRJc4THJjjWaDW4S
+         avY418aRDlR8sf6ni75JNBTYL9kjBkhPHpT+1lSAPebBK/uQcpq1TykeW1s71MDVXYPF
+         bct9/ZNLLybbwYSi4T5LJhYAyBjyw6SMdNj5EzZFRxIuLQFfjn2kxaqVjZRyAunrffxa
+         zF6mXG5AtCf3ruM63xDwQ+05H43YAcypEnboFKtQ4aIGyODmSJ7/IhFdNmGpyPiRXAVT
+         TTng==
+X-Gm-Message-State: AOAM532grD5Bg7hUnuZxD3UWwJiTkpp621arO9QLoG5AiGZsC1ST+icW
+        U41PPcpBuWQ+Gcn1nUeaimBwuw+NIQx8JQ==
+X-Google-Smtp-Source: ABdhPJwVyVK2Hl7yFH//muAVUIkgbpJI5i2isxVp7CWbCELE91YgCxgjZ6Rx+Ko4UqOEcwLTPJzkL/RFmhbwPg==
+Sender: "jmattson via sendgmr" <jmattson@turtle.sea.corp.google.com>
+X-Received: from turtle.sea.corp.google.com ([2620:15c:100:202:9942:27af:a628:1d1b])
+ (user=jmattson job=sendgmr) by 2002:a0c:b59f:: with SMTP id
+ g31mr446987qve.28.1612911494938; Tue, 09 Feb 2021 14:58:14 -0800 (PST)
+Date:   Tue,  9 Feb 2021 14:56:53 -0800
+Message-Id: <20210209225653.1393771-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
+Subject: Trouble with perf_guest_get_msrs() and pebs_no_isolation
+From:   Jim Mattson <jmattson@google.com>
+To:     Peter Shier <pshier@google.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jiri Olsa <jolsa@redhat.com>, Joerg Roedel <joro@8bytes.org>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Davidlohr Bueso <dbueso@suse.de>
-Subject: Re: [PATCH v2 06/28] locking/rwlocks: Add contention detection for
- rwlocks
-Message-ID: <20210209222519.GA178687@roeck-us.net>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-7-bgardon@google.com>
- <20210209203908.GA255655@roeck-us.net>
- <3ee109cd-e406-4a70-17e8-dfeae7664f5f@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3ee109cd-e406-4a70-17e8-dfeae7664f5f@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, x86@kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 09, 2021 at 04:46:02PM -0500, Waiman Long wrote:
-> On 2/9/21 3:39 PM, Guenter Roeck wrote:
-> > On Tue, Feb 02, 2021 at 10:57:12AM -0800, Ben Gardon wrote:
-> > > rwlocks do not currently have any facility to detect contention
-> > > like spinlocks do. In order to allow users of rwlocks to better manage
-> > > latency, add contention detection for queued rwlocks.
-> > > 
-> > > CC: Ingo Molnar <mingo@redhat.com>
-> > > CC: Will Deacon <will@kernel.org>
-> > > Acked-by: Peter Zijlstra <peterz@infradead.org>
-> > > Acked-by: Davidlohr Bueso <dbueso@suse.de>
-> > > Acked-by: Waiman Long <longman@redhat.com>
-> > > Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > When building mips:defconfig, this patch results in:
-> > 
-> > Error log:
-> > In file included from include/linux/spinlock.h:90,
-> >                   from include/linux/ipc.h:5,
-> >                   from include/uapi/linux/sem.h:5,
-> >                   from include/linux/sem.h:5,
-> >                   from include/linux/compat.h:14,
-> >                   from arch/mips/kernel/asm-offsets.c:12:
-> > arch/mips/include/asm/spinlock.h:17:28: error: redefinition of 'queued_spin_unlock'
-> >     17 | #define queued_spin_unlock queued_spin_unlock
-> >        |                            ^~~~~~~~~~~~~~~~~~
-> > arch/mips/include/asm/spinlock.h:22:20: note: in expansion of macro 'queued_spin_unlock'
-> >     22 | static inline void queued_spin_unlock(struct qspinlock *lock)
-> >        |                    ^~~~~~~~~~~~~~~~~~
-> > In file included from include/asm-generic/qrwlock.h:17,
-> >                   from ./arch/mips/include/generated/asm/qrwlock.h:1,
-> >                   from arch/mips/include/asm/spinlock.h:13,
-> >                   from include/linux/spinlock.h:90,
-> >                   from include/linux/ipc.h:5,
-> >                   from include/uapi/linux/sem.h:5,
-> >                   from include/linux/sem.h:5,
-> >                   from include/linux/compat.h:14,
-> >                   from arch/mips/kernel/asm-offsets.c:12:
-> > include/asm-generic/qspinlock.h:94:29: note: previous definition of 'queued_spin_unlock' was here
-> >     94 | static __always_inline void queued_spin_unlock(struct qspinlock *lock)
-> >        |                             ^~~~~~~~~~~~~~~~~~
-> 
-> I think the compile error is caused by the improper header file inclusion
-> ordering. Can you try the following change to see if it can fix the compile
-> error?
-> 
+On a host that suffers from pebs_no_isolation, perf_guest_get_msrs()
+adds an entry to cpuc->guest_switch_msrs for
+MSR_IA32_PEBS_ENABLE. Kvm's atomic_switch_perf_msrs() is the only
+caller of perf_guest_get_msrs(). If atomic_switch_perf_msrs() finds an
+entry for MSR_IA32_PEBS_ENABLE in cpuc->guest_switch_msrs, it puts the
+"host" value of this entry on the VM-exit MSR-load list for the
+current VMCS. At the next VM-exit, that "host" value will be written
+to MSR_IA32_PEBS_ENABLE.
 
-That results in:
+The problem is that by the next VM-exit, that "host" value may be
+stale. Though maskable interrupts are blocked from well before
+atomic_switch_perf_msrs() to the next VM-entry, PMIs are delivered as
+NMIs. Moreover, due to PMI throttling, the PMI handler may clear bits
+in MSR_IA32_PEBS_ENABLE. See the comment to that effect in
+handle_pmi_common(). In fact, by the time that perf_guest_get_msrs()
+returns to its caller, the "host" value that it has recorded for
+MSR_IA32_PEBS_ENABLE could already be stale.
 
-In file included from ./arch/mips/include/generated/asm/qrwlock.h:1,
-                 from ./arch/mips/include/asm/spinlock.h:13,
-                 from ./include/linux/spinlock.h:90,
-                 from ./include/linux/ipc.h:5,
-                 from ./include/uapi/linux/sem.h:5,
-                 from ./include/linux/sem.h:5,
-                 from ./include/linux/compat.h:14,
-                 from arch/mips/kernel/asm-offsets.c:12:
-./include/asm-generic/qrwlock.h: In function 'queued_rwlock_is_contended':
-./include/asm-generic/qrwlock.h:127:9: error: implicit declaration of function 'arch_spin_is_locked'
+What happens if a VM-exit sets a bit in MSR_IA32_PEBS_ENABLE that the
+perf subsystem thinks should be clear? In the short term, nothing
+happens at all. But note that this situation may not get better at the
+next VM-exit, because kvm won't add MSR_IA32_PEBS_ENABLE to the
+VM-exit MSR-load list if perf_guest_get_mrs() reports that the "host"
+value of the MSR is 0. So, if the new MSR_IA32_PEBS_ENABLE "host"
+value is 0, the stale bits can actually persist for a long time.
 
-Guenter
+If, at some point in the future, the perf subsystem programs a counter
+overflow interrupt on the same PMC for a PEBS-capable event, we are in
+for some nasty surprises. (Note that the perf subsystem never
+*intentionally* programs a PMC for both PEBS and counter overflow
+interrupts at the same time.)
 
-> Cheers,
-> Longman
-> 
-> diff --git a/include/asm-generic/qrwlock.h b/include/asm-generic/qrwlock.h
-> index 0020d3b820a7..d7178a9439b5 100644
-> --- a/include/asm-generic/qrwlock.h
-> +++ b/include/asm-generic/qrwlock.h
-> @@ -10,11 +10,11 @@
->  #define __ASM_GENERIC_QRWLOCK_H
-> 
->  #include <linux/atomic.h>
-> +#include <linux/spinlock.h>
->  #include <asm/barrier.h>
->  #include <asm/processor.h>
-> 
->  #include <asm-generic/qrwlock_types.h>
-> -#include <asm-generic/qspinlock.h>
-> 
->  /*
->   * Writer states & reader shift and bias.
-> 
-> 
-> 
+If a PEBS assist is triggered while in VMX non-root operation, the CPU
+will try to access the host's DS_AREA using the guest's page tables,
+and a page fault is likely (specifically on a read of the PEBS
+interrupt threshold at offset 0x38 in the DS_AREA).
+
+If the PEBS interrupt threshold is met while in VMX root operation,
+two separate PMIs are generated: one for the PEBS interrupt threshold
+and one for the counter overflow. This results in a message from
+unknown_nmi_error(): "Uhhuh. NMI received for unknown reason <xx> on
+CPU <n>."
