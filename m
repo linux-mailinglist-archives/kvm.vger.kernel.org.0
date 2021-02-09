@@ -2,83 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD4083152BA
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:26:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30831315302
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:44:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232617AbhBIPZA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 10:25:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48935 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232618AbhBIPWy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:22:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612884088;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bf68nln4Sgm+T5RoUMWcekZndb2iiDQ7eQPV26Yg8kY=;
-        b=NEcutHbYr/Q3CnppaDr173D6AVJMwHW7Prlz+DPBg43SgOgOswWOnFcgSN6MIop9fvHctE
-        KgVjHwIKsfMljosYC5VLkrbJ0QnlFQNmlt6N2VEZq1ogwyBRXGzk8lQXpK4UHkAmbpd26V
-        XKItQTIg6hy1C+EyT0oJeGHyfARe/2U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-NLBoHK1qN-G_nI9czj1NOA-1; Tue, 09 Feb 2021 10:21:26 -0500
-X-MC-Unique: NLBoHK1qN-G_nI9czj1NOA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18DDA80196C;
-        Tue,  9 Feb 2021 15:21:25 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-56.ams2.redhat.com [10.36.114.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BB9710016F6;
-        Tue,  9 Feb 2021 15:21:20 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v1 1/4] libcflat: add SZ_1M and SZ_2G
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, david@redhat.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com
-References: <20210209143835.1031617-1-imbrenda@linux.ibm.com>
- <20210209143835.1031617-2-imbrenda@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <bc698e30-883f-495f-c3c3-11cdffaf4152@redhat.com>
-Date:   Tue, 9 Feb 2021 16:21:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S232452AbhBIPnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 10:43:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36868 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232048AbhBIPnu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:43:50 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 119FWtSx137822;
+        Tue, 9 Feb 2021 10:43:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=pFWhtR68s1PAGHruUgjhtP/yzN5SoaUai8t9k3e9yzk=;
+ b=egIQrED65GAaqCXi2jSxZIoBsvand6HaOUGGPJZYYH1TOIBvF94fitPuK131OeE0geZV
+ SnVeMyC2LghMOJacQGpS7sz0Qglxuv5/IgT/qzWkogAkAPtkbHeCklKB2A4ag7592seN
+ 19zAcJHASS3/ChJ2TfIMMZDyoHHBI4VIF7XpOtcAFoeN7eWym5FitRnj4lRu7Xbc5EcM
+ IqXdoFK59DH8hSQLFlkw7NjW0VEInRiNHzUIgKy5STVOhkjYx/fSJEDNGptCqZE6WZgK
+ 6ZgFkF6doOeeosCvY8yM8GE5tLqZ535qN8xC2Sei15czTGbsxFIYrFILFLt4Nj4xfg+E Gw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36kw0eh0r3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Feb 2021 10:43:08 -0500
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 119FX8gE139388;
+        Tue, 9 Feb 2021 10:43:08 -0500
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36kw0eh0qc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Feb 2021 10:43:08 -0500
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 119Femv3029748;
+        Tue, 9 Feb 2021 15:43:06 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 36hjch1thw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 09 Feb 2021 15:43:05 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 119Fh3Nm40108316
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 9 Feb 2021 15:43:03 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 25BA2AE056;
+        Tue,  9 Feb 2021 15:43:03 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5922AE045;
+        Tue,  9 Feb 2021 15:43:02 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.1.216])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  9 Feb 2021 15:43:02 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v3 0/2] s390/kvm: fix MVPG when in VSIE
+Date:   Tue,  9 Feb 2021 16:43:00 +0100
+Message-Id: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20210209143835.1031617-2-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-09_03:2021-02-09,2021-02-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=750
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 phishscore=0
+ adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0 spamscore=0
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102090079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/02/2021 15.38, Claudio Imbrenda wrote:
-> Add SZ_1M and SZ_2G to libcflat.h
-> 
-> s390x needs those for large/huge pages
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
->   lib/libcflat.h | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index 460a1234..8dac0621 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -157,7 +157,9 @@ extern void setup_vm(void);
->   #define SZ_8K			(1 << 13)
->   #define SZ_16K			(1 << 14)
->   #define SZ_64K			(1 << 16)
-> +#define SZ_1M			(1 << 20)
->   #define SZ_2M			(1 << 21)
->   #define SZ_1G			(1 << 30)
-> +#define SZ_2G			(1ul << 31)
->   
->   #endif
-> 
+The current handling of the MVPG instruction when executed in a nested
+guest is wrong, and can lead to the nested guest hanging.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+This patchset fixes the behaviour to be more architecturally correct,
+and fixes the hangs observed.
+
+v2->v3
+* improved some comments
+* improved some variable and parameter names for increased readability
+* fixed missing handling of page faults in the MVPG handler
+* small readability improvements
+
+v1->v2
+* complete rewrite
+
+Claudio Imbrenda (2):
+  s390/kvm: extend kvm_s390_shadow_fault to return entry pointer
+  s390/kvm: VSIE: correctly handle MVPG when in VSIE
+
+ arch/s390/kvm/gaccess.c |  30 ++++++++++--
+ arch/s390/kvm/gaccess.h |   5 +-
+ arch/s390/kvm/vsie.c    | 101 ++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 121 insertions(+), 15 deletions(-)
+
+-- 
+2.26.2
 
