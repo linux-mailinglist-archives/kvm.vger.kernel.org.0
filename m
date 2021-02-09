@@ -2,80 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E569314A3A
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 09:28:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4632314A7B
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 09:40:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbhBII0O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 03:26:14 -0500
-Received: from mga12.intel.com ([192.55.52.136]:9711 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229544AbhBII0O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 03:26:14 -0500
-IronPort-SDR: hIZFTFkXLEx/jHQ/QXpcOvLPe4tHixvgRyGFW3H6xJmXJk63vkqvHL162TACIfPnHVb0/Yv408
- 3Rf6c0QKUBgg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="160999382"
-X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
-   d="scan'208";a="160999382"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 00:25:31 -0800
-IronPort-SDR: 3GUykSCShpgFEcHg+Ffwgwf+MBbiuf0MYD1n4gte55KB9evjW1o/NfAEXGfASI2O2cwxkgkT+E
- BHfilBx5kmrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
-   d="scan'208";a="378694156"
-Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.166])
-  by fmsmga008.fm.intel.com with ESMTP; 09 Feb 2021 00:25:30 -0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Yang Weijiang <weijiang.yang@intel.com>
-Subject: [PATCH] KVM: nVMX: Sync L2 guest CET states between L1/L2
-Date:   Tue,  9 Feb 2021 16:37:08 +0800
-Message-Id: <20210209083708.2680-1-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
+        id S229721AbhBIIkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 03:40:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51837 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229759AbhBIIkN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 03:40:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612859919;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AUSyGSU1zo934GUzUhAxq4NJf+/0gNgu/jsdZIqNiQ0=;
+        b=ayOpUGA0WPVFMYMUKjPLmR2n1vWgU1xu2Mhd3HzImmqj8J7SzuRzqxp5oIS1ylvU3pvUM6
+        OZR2PlSd9Zzqy52YmcPCShONpYz4g2Mdjs2QqMH89dRl+Cnnf1WzqTtwrcWLp24d9AY+dz
+        7iaQJaq7l2Igw0kA5aNHw1L7z0XtHNg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-6EI8R_w2N3iKHjU1jw6row-1; Tue, 09 Feb 2021 03:38:38 -0500
+X-MC-Unique: 6EI8R_w2N3iKHjU1jw6row-1
+Received: by mail-ed1-f69.google.com with SMTP id l23so14373922edt.23
+        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 00:38:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=AUSyGSU1zo934GUzUhAxq4NJf+/0gNgu/jsdZIqNiQ0=;
+        b=tq6gcllwLZyGJKLVcijn/Pgv8TYSQ5MvGHmZHBp7gguuYbxQbEDSiwsNVR2L+Opgfw
+         eBSFDZEOeubBgBFr5zgGaFKT0BxY4rhzYRmieAvpxxwy/Aks4iD6sGvUZCV6qGMQpUMA
+         Ub7unCyZSgNIStD7Gy1qIMXR+5mO9CSbJPPn7a7ANh7CF/pB4l1wgMJpVH4ws+w7V8yA
+         ONcGYz7c/Gv/dcUAMPE0scNrjf44jv/9xKYZQ++NwkcULGwdzywuUxwnxWeQjQIhnenJ
+         P+TbNWN3Ynv4WLE3fOD8ADVJEN6k3DUcq+BOBhkvR3stT0IKBT9cNTwzKOWnl2Pt6PDm
+         7VSA==
+X-Gm-Message-State: AOAM533iUxLeCtMNmybaqELf2V7jU9FNwZmArKfVPaI260V5Zuaw1oe3
+        FlEh9sidrx7V0Jzy/lRvowdpxXKdjqhepNkl8P1HcD5DDkM5QHTr9CrjgHdidyA8m+Mt/16Vx0u
+        Tqv7AMG/vQ4JK
+X-Received: by 2002:a17:906:71d5:: with SMTP id i21mr10728217ejk.232.1612859917031;
+        Tue, 09 Feb 2021 00:38:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwiG8hU2TU0F6vnQrnlrYiw+FEFd8tcjeZIFBf1okRS9eJXjngGuVJu5yC0GL6uNHSvX7P8Vw==
+X-Received: by 2002:a17:906:71d5:: with SMTP id i21mr10728205ejk.232.1612859916877;
+        Tue, 09 Feb 2021 00:38:36 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id bd27sm10494911edb.37.2021.02.09.00.38.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Feb 2021 00:38:36 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 10/15] KVM: x86: hyper-v: Always use to_hv_vcpu()
+ accessor to get to 'struct kvm_vcpu_hv'
+In-Reply-To: <53c5fc3d29ed35ca3252cd5f6547dcb113ab21b9.camel@redhat.com>
+References: <20210126134816.1880136-1-vkuznets@redhat.com>
+ <20210126134816.1880136-11-vkuznets@redhat.com>
+ <53c5fc3d29ed35ca3252cd5f6547dcb113ab21b9.camel@redhat.com>
+Date:   Tue, 09 Feb 2021 09:38:35 +0100
+Message-ID: <874kiloctw.fsf@vitty.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When L2 guest status has been changed by L1 QEMU/KVM, sync the change back
-to L2 guest before the later's next vm-entry. On the other hand, if it's
-changed due to L2 guest, sync it back so as to let L1 guest see the change.
+Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> On Tue, 2021-01-26 at 14:48 +0100, Vitaly Kuznetsov wrote:
+>
+>
+> ...
+>> _vcpu_mask(
+>>  static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, u64 ingpa, u16 rep_cnt, bool ex)
+>>  {
+>>  	struct kvm *kvm = vcpu->kvm;
+>> -	struct kvm_vcpu_hv *hv_vcpu = &vcpu->arch.hyperv;
+>> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(current_vcpu);
+> You probably mean vcpu here instead of current_vcpu. Today I smoke tested the kvm/nested-svm branch,
+> and had this fail on me while testing windows guests.
+>
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 9728efd529a1..b9d8db8facea 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2602,6 +2602,12 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 	/* Note: may modify VM_ENTRY/EXIT_CONTROLS and GUEST/HOST_IA32_EFER */
- 	vmx_set_efer(vcpu, vcpu->arch.efer);
- 
-+	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE) {
-+		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
-+		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
-+		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
-+	}
-+
- 	/*
- 	 * Guest state is invalid and unrestricted guest is disabled,
- 	 * which means L1 attempted VMEntry to L2 with invalid state.
-@@ -4152,6 +4158,12 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- 
- 	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
- 		vmcs12->guest_ia32_efer = vcpu->arch.efer;
-+
-+	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE) {
-+		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
-+		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
-+		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
-+	}
- }
- 
- /*
+Yes!!!
+
+We were using 'current_vcpu' instead of 'vcpu' here before but Sean
+warned me about the danger of shadowing global 'current_vcpu' so I added
+'KVM: x86: hyper-v: Stop shadowing global 'current_vcpu' variable' to
+the series. Aparently, I missed this 'current_vcpu' while
+rebasing. AFAIU, normally vcpu == current_vcpu when entering this
+function so nothing blew up in my testing.
+
+Thanks for the report! I'll be sending a patch to fix this shortly.
+
+>
+> Other than that HyperV seems to work and even survive nested migration (I had one
+> windows reboot but I suspect windows update did it.)
+> I'll leave my test overnight (now with updates disabled) to see if it
+> is stable.
+
+That's good to hear! Are you testing on Intel or AMD? With AMD there's a
+stale bug somewhere which prevents Gen2 (UEFI) L2 guests from booting,
+the firmare just hangs somewhere not making any progress. Both Hyper-V
+2016 and 2019 seem to be affected. Gen1 guests (including Windows in
+root partition) work fine. I tried approaching it a couple times but
+with no luck so far. Not sure if this is CPU specific or something...
+
 -- 
-2.26.2
+Vitaly
 
