@@ -2,121 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7CDF314AF8
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 10:00:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A136314B17
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 10:12:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbhBII5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 03:57:08 -0500
-Received: from mga04.intel.com ([192.55.52.120]:52068 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230217AbhBIIy4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 03:54:56 -0500
-IronPort-SDR: CiinekoSL8mxamcb0FEL2qOQap42R0UackW6hv91zy+toqRbZnZEi1lfWnoxB0Vm0xBdnCnu6h
- FoLCQYwyYb/A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="179290846"
-X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
-   d="scan'208";a="179290846"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 00:53:09 -0800
-IronPort-SDR: zdkKePOta+xEY3nrVeK6H7OBGPAwW43ot7gv7JjlNhcpM7QFBNtmofNWPksuTOygIuntJH3USc
- KqXUko8vtMNw==
-X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
-   d="scan'208";a="396028251"
-Received: from liujiaq1-mobl2.ccr.corp.intel.com (HELO localhost) ([10.249.174.87])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 00:53:05 -0800
-Date:   Tue, 9 Feb 2021 16:53:03 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     seanjc@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org
-Subject: Re: [PATCH v2] KVM: x86/MMU: Do not check unsync status for root SP.
-Message-ID: <20210209085303.kamlf4zc47ut6utp@linux.intel.com>
-References: <20210207122254.23056-1-yu.c.zhang@linux.intel.com>
- <671ae214-22b9-1d89-75cb-0c6da5230988@redhat.com>
- <20210208134923.smtvzeonvwxzdlwn@linux.intel.com>
- <404bce5c-19ef-e103-7b68-5c81697d2a1f@redhat.com>
- <20210209033319.w6nfb4s567zuly2c@linux.intel.com>
- <6ca2d73c-703a-9964-48ae-e3d910bebc48@redhat.com>
+        id S230183AbhBIJB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 04:01:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54034 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229980AbhBII7v (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 03:59:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612861103;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tCdoreBQHY3+ch19u+Vsgfj3CwKJzrhwkwL6m3kk98Q=;
+        b=VZo+IwWE5n887TtkfkDeBYBwGYer10ZjTEKt7IBZ4x/O5q1cVY/0O1+5XNmtU63Ulc7Ysw
+        9WaittLOXoVVN7nxUXRZtE+rUNz4xTRPTmGS9E3qsjdhAd2wHP9VxpOFaNNqR5tWZTitAn
+        TiWomcxud7CtQIRm2wRCGc64n7fWZAw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-287-yNR9t7TbPFyjgnBb2NfrQg-1; Tue, 09 Feb 2021 03:58:21 -0500
+X-MC-Unique: yNR9t7TbPFyjgnBb2NfrQg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00988AFA81;
+        Tue,  9 Feb 2021 08:58:21 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-114-56.ams2.redhat.com [10.36.114.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AD5910016F8;
+        Tue,  9 Feb 2021 08:58:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] gitlab-ci.yml: Add new s390x targets to
+ run tests with TCG and KVM accel
+From:   Thomas Huth <thuth@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Bandeira Condotta <mbandeir@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Marcelo Bandeira Condotta <mcondotta@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+References: <20210208150227.178953-1-mbandeir@redhat.com>
+ <8f34cddf-84bf-0726-8074-1688974a74d8@redhat.com>
+ <6e56bdb9-72b4-369e-acb2-d5715e02ab92@redhat.com>
+ <344b1b84-8396-9df8-5c43-3f2538e7c89d@redhat.com>
+ <251476c8-85ac-de95-c1b4-1c4356edad8b@redhat.com>
+Message-ID: <b0f31c56-b1de-c1d4-baa4-ddd8ad86031b@redhat.com>
+Date:   Tue, 9 Feb 2021 09:58:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <251476c8-85ac-de95-c1b4-1c4356edad8b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6ca2d73c-703a-9964-48ae-e3d910bebc48@redhat.com>
-User-Agent: NeoMutt/20171215
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 09, 2021 at 08:46:42AM +0100, Paolo Bonzini wrote:
-> On 09/02/21 04:33, Yu Zhang wrote:
-> > On Mon, Feb 08, 2021 at 05:47:22PM +0100, Paolo Bonzini wrote:
-> > > On 08/02/21 14:49, Yu Zhang wrote:
-> > > > On Mon, Feb 08, 2021 at 12:36:57PM +0100, Paolo Bonzini wrote:
-> > > > > On 07/02/21 13:22, Yu Zhang wrote:
-> > > > > > In shadow page table, only leaf SPs may be marked as unsync.
-> > > > > > And for non-leaf SPs, we use unsync_children to keep the number
-> > > > > > of the unsynced children. In kvm_mmu_sync_root(), sp->unsync
-> > > > > > shall always be zero for the root SP, , hence no need to check
-> > > > > > it. Instead, a warning inside mmu_sync_children() is added, in
-> > > > > > case someone incorrectly used it.
-> > > > > > 
-> > > > > > Also, clarify the mmu_need_write_protect(), by moving the warning
-> > > > > > into kvm_unsync_page().
-> > > > > > 
-> > > > > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > > > 
-> > > > > This should really be more of a Co-developed-by, and there are a couple
-> > > > > adjustments that could be made in the commit message.  I've queued the patch
-> > > > > and I'll fix it up later.
-> > > > 
-> > > > Indeed. Thanks for the remind, and I'll pay attention in the future. :)
-> > > 
-> > > Also:
-> > > 
-> > > arch/x86/kvm/mmu/mmu.c: In function ‘mmu_sync_children’:
-> > > arch/x86/kvm/mmu/mmu.c:2002:17: error: ‘sp’ is used uninitialized in this
-> > > function [-Werror=uninitialized]
-> > >    WARN_ON_ONCE(sp->unsync);
-> > 
-> > Oops. This is wrong. Should be WARN_ON_ONCE(parent->unsync);
-> > 
-> > > 
-> > > so how was this tested?
-> > > 
-> > 
-> > I ran access test in kvm-unit-test for previous version, which hasn't
-> > this code(also in my local repo "enable_ept" was explicitly set to
-> > 0 in order to test the shadow mode). But I did not test this one. I'm
-> > truely sorry for the negligence - even trying to compile should make
-> > this happen!
-> > 
-> > Should we submit another version? Any suggestions on the test cases?
+On 08/02/2021 18.54, Thomas Huth wrote:
+> On 08/02/2021 16.32, Paolo Bonzini wrote:
+>> On 08/02/21 16:13, Thomas Huth wrote:
+>>> On 08/02/2021 16.07, Paolo Bonzini wrote:
+>>>> On 08/02/21 16:02, Marcelo Bandeira Condotta wrote:
+>>>>> From: Marcelo Bandeira Condotta <mcondotta@redhat.com>
+>>>>>
+>>>>> A new s390x z15 VM provided by IBM Community Cloud will be used to run
+>>>>> the s390x KVM Unit tests natively with both TCG and KVM accel options.
+>>>>>
+>>>>> Signed-off-by: Marcelo Bandeira Condotta <mbandeir@redhat.com>
+>>>>> ---
+>>>>>   .gitlab-ci.yml | 28 ++++++++++++++++++++++++++++
+>>>>>   1 file changed, 28 insertions(+)
+>>>>>
+>>>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>>>> index d97e27e..bc7a115 100644
+>>>>> --- a/.gitlab-ci.yml
+>>>>> +++ b/.gitlab-ci.yml
+>>>>> @@ -155,3 +155,31 @@ cirrus-ci-macos-i386:
+>>>>>   cirrus-ci-macos-x86-64:
+>>>>>    <<: *cirrus_build_job_definition
+>>>>> +
+>>>>> +test-s390x-tcg:
+>>>>> +  stage: test
+>>>>> +  before_script: []
+>>>>> +  tags:
+>>>>> +    - s390x-z15-vm
+>>>>> +  script:
+>>>>> +    - ./configure --arch=s390x
+>>>>> +    - make -j2
+>>>>> +    - ACCEL=tcg ./run_tests.sh
+>>>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 
+>>>>> vector diag288
+>>>>> +     stsi sclp-1g sclp-3g
+>>>>> +     | tee results.txt
+>>>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
+>>>>> +
+>>>>> +test-s390x-kvm:
+>>>>> +  stage: test
+>>>>> +  before_script: []
+>>>>> +  tags:
+>>>>> +    - s390x-z15-vm
+>>>>> +  script:
+>>>>> +    - ./configure --arch=s390x
+>>>>> +    - make -j2
+>>>>> +    - ACCEL=kvm ./run_tests.sh
+>>>>> +     selftest-setup intercept emulator sieve skey diag10 diag308 
+>>>>> vector diag288
+>>>>> +     stsi sclp-1g sclp-3g
+>>>>> +     | tee results.txt
+>>>>> +    - if grep -q FAIL results.txt ; then exit 1 ; fi
+>>>
+>>> Acked-by: Thomas Huth <thuth@redhat.com>
+>>>
+>>>>
+>>>> So it will have a custom runner?  That's nice!
+>>>>
+>>>> Do you have an example run already?
+>>>
+>>> I've been in touch with Marcelo during the past days already, and I've 
+>>> already registered the runner that he set up on the s390x machine, so it 
+>>> should theoretically work now once this patch has been merged.
+>>
+>> What's the reason to add test-s390x-tcg?  It would really cover only a 
+>> different TCG backend.
 > 
-> Yes, please send v3.
-> 
-> The commit message can be:
-> 
-> In shadow page table, only leaf SPs may be marked as unsync; instead, for
-> non-leaf SPs, we store the number of unsynced children in unsync_children.
-> Therefore, in kvm_mmu_sync_root(), sp->unsync
-> shall always be zero for the root SP and there is no need to check
-> it.  Remove the check, and add a warning inside mmu_sync_children() to
-> assert that the flags are used properly.
-> 
-> While at it, move the warning from mmu_need_write_protect() to
-> kvm_unsync_page().
+> I've removed the tcg target from the patch, changed it so that it now runs 
+> all s390x tests [...]
+... and of course one of the tests ("smp") is flaky and succeeded on the
+staging branch, but failed on the master branch. Sigh.
+I've pushed yet another patch on top to only run the solid tests now:
 
-Thanks Paolo. Will send out v3.
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 13c798f..b7c0571 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -163,7 +163,10 @@ s390x-kvm:
+   script:
+    - ./configure --arch=s390x
+    - make -j$(nproc)
+-  - ACCEL=kvm ./run_tests.sh | tee results.txt
++  - ACCEL=kvm ./run_tests.sh
++      selftest-setup intercept emulator sieve sthyi skey diag10 diag308 pfmf
++      cmm vector gs iep cpumodel diag288 stsi sclp-1g sclp-3g css skrf sie
++      | tee results.txt
+    - grep -q PASS results.txt && ! grep -q FAIL results.txt
+   only:
+    variables:
 
-BTW, I just realized that mmu_sync_children() was not triggered by
-kvm-unit-test(the access.flat case), so I ran another test by running
-a regular VM using shadow, in which I witnessed the synchronization.
 
-B.R.
-Yu
+  Thomas
 
-> 
-> Paolo
-> 
