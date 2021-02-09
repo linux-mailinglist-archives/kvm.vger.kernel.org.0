@@ -2,89 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 811D1315235
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 15:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CB5E315245
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:01:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232313AbhBIO5Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 09:57:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51602 "EHLO
+        id S232223AbhBIPBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 10:01:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56693 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232139AbhBIO5H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 09:57:07 -0500
+        by vger.kernel.org with ESMTP id S230318AbhBIPBG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:01:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612882541;
+        s=mimecast20190719; t=1612882780;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=WSsdPlcWLs4B7/MYVeVITkDmFpb6BsySsmx2wFDfjIg=;
-        b=RNL/CcDL+IAKBwA0EISQhdXGo6HzhQ1YzsL7iIrDlgqlcUCzqV4aKvaskaqqThhdmCKZ5v
-        xvBPcOLRJhWWnrYLAEjC6n1jSBrTG0jmYyd2izIB+KLCe2dBf0Jn5t2n37k8dZkalkpkas
-        fP2vA7J6ykQ/3EFodGn8cmgOXMm4uy0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-EpDYcWexMQ-ru-vQ9l6rvg-1; Tue, 09 Feb 2021 09:55:40 -0500
-X-MC-Unique: EpDYcWexMQ-ru-vQ9l6rvg-1
-Received: by mail-wm1-f69.google.com with SMTP id x20so3122907wmc.0
-        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 06:55:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WSsdPlcWLs4B7/MYVeVITkDmFpb6BsySsmx2wFDfjIg=;
-        b=oMWH1lr/eIVW9iyqOQ/EnIUiW+H//KNFstzWQn0xODY0wcTc65Y1lLJ/YowkvVwXhG
-         3EDKMOBTiNgjXi9+Mqu97s0vu7rimOUi0ZRqpDiqhsosCZMB/b5n3FcvfWJ1xkEnzcEW
-         tubW1OQkpP6zjJvGYzx3zLQKGHe+A3CNsMjJkNZSDEpEWup7d+7q8ipEZ/vMwT84Y3H/
-         Z4IQyqf5TJFrcPJXarhN3B2vzsFiknat6fglSY+rFnW7gXZoHoXvKrVg9rCn34bhGuga
-         13YgSJFYhGmGIvW5m/f4szf5peleJALZ7ehKRRRy6gnGrO+scNTi5832cu77bC+enSj5
-         GVnA==
-X-Gm-Message-State: AOAM531Iga50jJKfDXyvfduNNfkiwNbX9Dw0ofye/JgPJY8Yjj1Vo/Xd
-        Vi/yRZCPDGh1g3fFtuD0/ihlP+ORXBiQ4Wb+f3TaptCCnKTl+YkZ0Bw3wBW5KsHEXHBgXxci2oc
-        6GO0Ks18kKYYS
-X-Received: by 2002:adf:eb82:: with SMTP id t2mr13792137wrn.231.1612882538031;
-        Tue, 09 Feb 2021 06:55:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzGiyD0i/pTC5CRicHdOTkBxICTMpZX9F+ZX+9eu4fC4Ozi+Yen5iR0i1cuW6uuuaqb68GylQ==
-X-Received: by 2002:adf:eb82:: with SMTP id t2mr13792098wrn.231.1612882537862;
-        Tue, 09 Feb 2021 06:55:37 -0800 (PST)
-Received: from redhat.com (bzq-79-180-2-31.red.bezeqint.net. [79.180.2.31])
-        by smtp.gmail.com with ESMTPSA id x15sm19731236wro.66.2021.02.09.06.55.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Feb 2021 06:55:37 -0800 (PST)
-Date:   Tue, 9 Feb 2021 09:55:32 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Adrian Catangiu <acatan@amazon.com>
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, gregkh@linuxfoundation.org,
-        graf@amazon.com, rdunlap@infradead.org, arnd@arndb.de,
-        ebiederm@xmission.com, rppt@kernel.org, 0x7f454c46@gmail.com,
-        borntraeger@de.ibm.com, Jason@zx2c4.com, jannh@google.com,
-        w@1wt.eu, colmmacc@amazon.com, luto@kernel.org, tytso@mit.edu,
-        ebiggers@kernel.org, dwmw@amazon.co.uk, bonzini@gnu.org,
-        sblbir@amazon.com, raduweis@amazon.com, corbet@lwn.net,
-        mhocko@kernel.org, rafael@kernel.org, pavel@ucw.cz,
-        mpe@ellerman.id.au, areber@redhat.com, ovzxemul@gmail.com,
-        avagin@gmail.com, ptikhomirov@virtuozzo.com, gil@azul.com,
-        asmehra@redhat.com, dgunigun@redhat.com, vijaysun@ca.ibm.com,
-        oridgar@gmail.com, ghammer@redhat.com
-Subject: Re: [PATCH v5 2/2] drivers/virt: vmgenid: add vm generation id driver
-Message-ID: <20210209095350-mutt-send-email-mst@kernel.org>
-References: <1612200294-17561-1-git-send-email-acatan@amazon.com>
- <1612200294-17561-3-git-send-email-acatan@amazon.com>
+        bh=KcOe0GN9pF5Dw/zjO0zgHlm657pw5f7rrM5PtyL6D1s=;
+        b=ImNHaHrOY6YSo/iHEf0j1Enj9cbFHOAQiJ4lfXbfLmXBYrOu1aNEdWoyS1Idv4vMXW8ZVI
+        9rVO2IM8dzfHXl7JLVRaV6elzE9N4qkNOQpuCNDOFXCJjN3fyimMSbY65lAW5BfKjOY/Rm
+        LJih6wge2/1rYPs9SuzFosxoLQ8LK2w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-5Z0Lgm3UM5Gs_mQQBkwtFQ-1; Tue, 09 Feb 2021 09:59:35 -0500
+X-MC-Unique: 5Z0Lgm3UM5Gs_mQQBkwtFQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F687107ACE3;
+        Tue,  9 Feb 2021 14:59:34 +0000 (UTC)
+Received: from localhost (ovpn-115-93.ams2.redhat.com [10.36.115.93])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D3071002382;
+        Tue,  9 Feb 2021 14:59:33 +0000 (UTC)
+Date:   Tue, 9 Feb 2021 14:59:32 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org,
+        jag.raman@oracle.com, elena.ufimtseva@oracle.com
+Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for KVM_SET_IOREGION
+Message-ID: <20210209145932.GB92126@stefanha-x1.localdomain>
+References: <cover.1611850290.git.eafanasova@gmail.com>
+ <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
+ <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="i9LlY+UWpKt15+FH"
 Content-Disposition: inline
-In-Reply-To: <1612200294-17561-3-git-send-email-acatan@amazon.com>
+In-Reply-To: <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +The ``vmgenid`` driver uses ACPI events to be notified by hardware
-> +changes to the 128-bit Vm Gen Id UUID.
 
-That's ok, problem is ACPI event processing is asynchronous.
-What we need is thus to flush out ACPI events whenever userspace
-does a read, otherwise the value it gets will be stale.
+--i9LlY+UWpKt15+FH
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-MST
+On Mon, Feb 08, 2021 at 02:21:35PM +0800, Jason Wang wrote:
+> On 2021/1/30 =E4=B8=8A=E5=8D=882:48, Elena Afanasova wrote:
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index ca41220b40b8..81e775778c66 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
+> >   	__u8  pad[36];
+> >   };
+> > +enum {
+> > +	kvm_ioregion_flag_nr_pio,
+> > +	kvm_ioregion_flag_nr_posted_writes,
+> > +	kvm_ioregion_flag_nr_max,
+> > +};
+> > +
+> > +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
+> > +#define KVM_IOREGION_POSTED_WRITES (1 << kvm_ioregion_flag_nr_posted_w=
+rites)
+> > +
+> > +#define KVM_IOREGION_VALID_FLAG_MASK ((1 << kvm_ioregion_flag_nr_max) =
+- 1)
+> > +
+> > +struct kvm_ioregion {
+> > +	__u64 guest_paddr; /* guest physical address */
+> > +	__u64 memory_size; /* bytes */
+>=20
+>=20
+> Do we really need __u64 here?
+
+I think 64-bit PCI BARs can be >4 GB. There is plenty of space in this
+struct to support a 64-bit field.
+
+That said, userspace could also add more ioregions if it needs to cover
+more than 4 GB. That would slow down ioregion lookups though since the
+in-kernel data structure would become larger.
+
+Making it 64-bit seems more future-proof and cleaner than having to work
+around the limitation using multiple ioregions. Did you have a
+particular reason in mind why this field should not be 64 bits?
+
+--i9LlY+UWpKt15+FH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmAio1QACgkQnKSrs4Gr
+c8jOtAgAnyH4Ea5EXtLAEwv10poXJySalJQPKbz5oZAzV7XHstrqaK/8fLF+FPlx
+ip++H9VifJeyqZei7WrvwST8m5wwXW+/NUZVpfB//qVax3J1qFXGsNzQKiockjIC
+IjnOQS5l4F2u9l/otZDPoNZR5Gch+rHnVpX5hAKDB6ofUElR6NVetfiOojZvpgGx
+u/Nf3i4HPgfZCrtMqFyBwAHcogD80hz9GzTLu8Fwb4wKP3W99zr64/yzMfDCW6Ff
+TXkjRwFa8yST51H8ayeolIdIKVIyWs2F+Qt9DYHgD2ggtALGIA2TGOlhCDV34DER
+6FFpLTEgtcp4KKlDhFJ/h5pP37SW3Q==
+=sTDY
+-----END PGP SIGNATURE-----
+
+--i9LlY+UWpKt15+FH--
 
