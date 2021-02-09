@@ -2,210 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EA27315305
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:44:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CE1931532A
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 16:51:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbhBIPnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 10:43:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60430 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232317AbhBIPnu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 10:43:50 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 119FfbNZ182448;
-        Tue, 9 Feb 2021 10:43:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=F9OGyISqe9CC1ZvzmD3oaX3IvDLcb4vjDhU2tgH+Zck=;
- b=UxWZ7RrKwNaMAITtZ3SZ1qOSSoBUmBZkVDjFO40r9i3FjP0Hnhz4eczgczlH0AVD6QwY
- Pat/JIxynyEQwNsVBhP6Qt0+dO0NsYKD/b93kve0g83/DiP+EUlM3iz1xUQLuMMQoz+H
- mxtTdudii+yHWx3/x9XmveMGiarN5+aE2jCobzSACKww7k2rF3FPZICJ/tFb0wR0D6W0
- dmj1eqbqxMTOWBsNTJpBt3BCrYtyxLMh8P7TO8U7Pnx8KZ3CT/70PzvqHK+bdxLPKewa
- fBh49539knQ3DWx9/53p0DHX4+ob8u3/okA1yUCRYRH4nxk+W/Chmk6DesNwFyx8ASWS Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36kw8r82hm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 10:43:09 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 119Ffn2O183926;
-        Tue, 9 Feb 2021 10:43:08 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36kw8r82gu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 10:43:08 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 119Fc0cM018080;
-        Tue, 9 Feb 2021 15:43:07 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 36hjr81tju-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 09 Feb 2021 15:43:06 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 119Fh4Pa42926540
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 9 Feb 2021 15:43:04 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0E6A8AE04D;
-        Tue,  9 Feb 2021 15:43:04 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9E9AAE056;
-        Tue,  9 Feb 2021 15:43:03 +0000 (GMT)
-Received: from ibm-vm.ibmuc.com (unknown [9.145.1.216])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  9 Feb 2021 15:43:03 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        cohuck@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: [PATCH v3 2/2] s390/kvm: VSIE: correctly handle MVPG when in VSIE
-Date:   Tue,  9 Feb 2021 16:43:02 +0100
-Message-Id: <20210209154302.1033165-3-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
-References: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
+        id S232538AbhBIPta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 10:49:30 -0500
+Received: from mga12.intel.com ([192.55.52.136]:42006 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232452AbhBIPt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 10:49:28 -0500
+IronPort-SDR: htOd6o5yqzRlGh/7OmH5DbfJcx1ilL7MXmBCdEq8FNx8BzU5O/KGf09sOoktSAaQs8Z0CNNcKg
+ OYXKqGSjGZ0Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="161052649"
+X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
+   d="scan'208";a="161052649"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 07:48:46 -0800
+IronPort-SDR: Y//QYvkquYurrVFuMqLqQs4CM2o1FKdB5yEJHDIq8L/suAzq4RbZg70TElHaOJIBHtqq0hhn3l
+ Q/hQuzzc3E2Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,165,1610438400"; 
+   d="scan'208";a="396196426"
+Received: from fmsmsx606.amr.corp.intel.com ([10.18.126.86])
+  by orsmga008.jf.intel.com with ESMTP; 09 Feb 2021 07:48:45 -0800
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 9 Feb 2021 07:48:45 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 9 Feb 2021 07:48:45 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
+ via Frontend Transport; Tue, 9 Feb 2021 07:48:44 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.1713.5; Tue, 9 Feb 2021 07:48:44 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ky7Ae2CsznDM0vls6YLDzJY6/+fpc/eOYATTSvYWW5g0SdufwLKe96EyqC5kY550VDOjuT+iEDqxL1tgp5MM9SbGR1EyT28dI1Mw2riLxU3HayK9TSY3uTnMWOj5LWmWLFBHKiceXJOtmeqD3VCZry5OFkwz6kTZ5gvUuKSGtQ1eq3VYMhj1O4C4UyfDRZNeDhDU65J84Fjs5tauw9QRAkAvNEvL22sUKqXAP8ZjnRTra6dBaHneOTgh4imNcv7Grurcou7SIWE6kGcLuYvOj5vOlcRbYKPPO+0cnHkq10X2owoRcZAi68ypecEZxkG8iMKA7tE2Vn7Tan8Tm3xgkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z2DCKmqLq4bISEfoBKQwWtUj7apc0xCsaL308vtwPu4=;
+ b=HWoRVa88KMI8U74v9GwsqfAuO2NQGeQ7YdYBfdhiXXWQ8vxlhWffWa4lBKD2NrBRX0g+r5mtvIycRCFD2QB9pk35KyMOe+V4DYaiQLs+RIQwwcaBIjyRVuqnabRHj2VA+Qj9cBMWXqApfMkB8tgdkbZEceujHH3dfPtgKzvSi8fdab08PihJqKG/M0aM4gDfbY9ZHsfd/N0QEiyA9FV80I2MAFhbxuFDfhGgCaoAgWeBgqDxUcDO6KSCqCcMohZh80NW6UgVCGQUxbEl9C7OWab1F6cZCsKpaxwQ7T6oUPMgNPmYlkYCcZ5P/nOBsUXSLosx2exPFXKRHPcVJt7a3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z2DCKmqLq4bISEfoBKQwWtUj7apc0xCsaL308vtwPu4=;
+ b=ZAfPUQTkYKivX996BT1t4B7UVVrEVOGG1/BQu9ts2/Y1gtbe+8oyFSL6ZmhqoGBk7/MdJ1+98Q3OdlNKV10eHvTR1uEG+wW4gq7kKaEZxjOLMWxK18hvEkNolTERrIXXRJoCl1lFoEwIDW++9ZMg6dZmMiBQ9NCqoicHnawgCcE=
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com (2603:10b6:510:41::12)
+ by PH0PR11MB4853.namprd11.prod.outlook.com (2603:10b6:510:40::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.24; Tue, 9 Feb
+ 2021 15:48:42 +0000
+Received: from PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::78e6:b455:ce90:fcb0]) by PH0PR11MB4855.namprd11.prod.outlook.com
+ ([fe80::78e6:b455:ce90:fcb0%6]) with mapi id 15.20.3825.030; Tue, 9 Feb 2021
+ 15:48:42 +0000
+From:   "Bae, Chang Seok" <chang.seok.bae@intel.com>
+To:     Borislav Petkov <bp@suse.de>
+CC:     Andy Lutomirski <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@kernel.org" <mingo@kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 10/21] x86/fpu/xstate: Update xstate save function to
+ support dynamic xstate
+Thread-Topic: [PATCH v3 10/21] x86/fpu/xstate: Update xstate save function to
+ support dynamic xstate
+Thread-Index: AQHW2UTrfabGiuGaq0+dx4jPc8ZDRKpOes+AgAHIvAA=
+Date:   Tue, 9 Feb 2021 15:48:42 +0000
+Message-ID: <F16A56D8-803E-4B9C-BAA0-B16753BB273C@intel.com>
+References: <20201223155717.19556-1-chang.seok.bae@intel.com>
+ <20201223155717.19556-11-chang.seok.bae@intel.com>
+ <20210208123359.GG17908@zn.tnic>
+In-Reply-To: <20210208123359.GG17908@zn.tnic>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3608.120.23.2.4)
+authentication-results: suse.de; dkim=none (message not signed)
+ header.d=none;suse.de; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [73.189.248.82]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ff0be20c-9bee-4ce3-2b2f-08d8cd122d84
+x-ms-traffictypediagnostic: PH0PR11MB4853:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <PH0PR11MB48531B26218313B899F8EB53D88E9@PH0PR11MB4853.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:751;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OCxxgcSk7QwDq6QOPNoCNLOyKhbxwwUhvtnlFFTAbJe2978ckPAR7IQzgMWErAYFzvXLu5NSXVd7ZJRgGfAtZjQin1kLEZfGCL6Bw2iAnwzV/bqqdykC0QjDjeNad/4yIHppYaGK2zhOWVWlvPpiTNcXL1mMs5yvHv8GruCg+ItSvbdXD1G/jGbb9p3cw1IZrumVEtbxGpL+LEM06CQahNXOTqur4EgH6bTxcbnjJ0bxxiX70BzKtDm8IhPyx4pwpNAiUja21KQF/7FCSp5oadwUttP7sDEbfwpN5nQEHjATIThIaANSA0KRV6WWvGgf7FsoAm59iTWeXJBNzjsC21yjZBxW3DW/7yl0cXavWHHN/zpEuj5knSJXCeJ8yeqsu8WvpyMUE7DOY+r89uJ081qeeOSseXKBdw8BH360nC+0ZEdC4YVlHBRuDlIUYuBn/8r2rEK6gqlHBML+i7q900WfPGa/02bcwdwjt66wqHZnQcIQRlYuiHvWCG7bOnWLlyO2Zjd3sh9IT0oFFYlnzdEpRo+i1AWZ0CneLW798dt++srt8Mnt5wFLE17qNB0vUR3Ddhxf3APO9lsqqFgek/5ksPlaRT/lQj9JBOBLPqfrklFtsDYj6Iw6LxMrAgWn4qH7gtydNb0XNDgvYgVuhp3h3DEJJjXkekotnrGmprA=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4855.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(396003)(136003)(366004)(376002)(316002)(54906003)(5660300002)(6486002)(76116006)(15650500001)(6512007)(8676002)(6916009)(2616005)(966005)(71200400001)(86362001)(4326008)(2906002)(478600001)(53546011)(64756008)(83380400001)(6506007)(66446008)(66946007)(66476007)(66556008)(8936002)(33656002)(26005)(36756003)(186003)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?b99RBc4mi4KlfwO+l7zNhJ4ii+dfnfevhtDv+h0oGVtbX/oTnCkNMMdOWRws?=
+ =?us-ascii?Q?tb7f1aW12tFkADaeZ9Jk/VAlV67xv4VqgnqhXZDYuXplgmtaFoF1qV7RYkr/?=
+ =?us-ascii?Q?28N/NtjhlaMAeW21bK1kBQJFiUXf/UZYPuji/+LUfY5RVFt8OVsyMNIa64dv?=
+ =?us-ascii?Q?PntGspPEbFx3Xlo3tlnMI6jxjxT96VPdlDBbAyKmrv+852dvWF82d4cByrQ/?=
+ =?us-ascii?Q?+5hHhGU8BnBf1Gjwl9tnXhFiIYjRnp2RaRzY3yusXSgHFEi2IrU25sNP86Yp?=
+ =?us-ascii?Q?+myK3Wjy9h3vY8wrijCIXdGfPsb7xkE79YEa+3DRZSMegvrO4/pgOzVQ5hNL?=
+ =?us-ascii?Q?00CQeWo/7LcYmlw3ASUfA/p85bjSEt2AGb6FeKnqOqRpmWIzH4k8tSK4/RkJ?=
+ =?us-ascii?Q?IFzDl/SV7ge1lHJ6vn2ahnluROhTjXC/i8qoE6tKERwTkqxb31mand70F2Z4?=
+ =?us-ascii?Q?y96GBV/fZ2gVP3z96iacoMEEZbKJBLn/qySn4ApJiYcE8VW37CQ5L8O7My3y?=
+ =?us-ascii?Q?oRlBqOCvGTRQ9a682rGOXwOz5hNKh+RZMKgmVWQUq230pGAFTBEP24w1RvlY?=
+ =?us-ascii?Q?rsFuY8xSkkAU29MaE0Cl41RsksWz7TVT5qqEo27LBdlNUWzy03tw6hwcEtKy?=
+ =?us-ascii?Q?yIv44Omgw7zGxnpi0NWQgLBL5dDBddEbHpmMspzeLm71JI36AK55jbb3SoIC?=
+ =?us-ascii?Q?F1pc8ifqXrszHpis+QlDuTfiVz7qiNTTZ5wUfEoaTAfHXel0SqfnH1KjFMFD?=
+ =?us-ascii?Q?6ut3h2RkNnhdYS4mOd+y33Hnm+pYixQ5i4YXuoVnzdlea4s6YmUOJoaa9y3o?=
+ =?us-ascii?Q?mj1R4TRlt06JQgv44kRwpg2xs0GhTHP8bge42rnN5PVQo447dAIorySMuTwY?=
+ =?us-ascii?Q?7DMlbsl+lyO15VkTzLMrKVwILm01LdvHJnB0g3UtHuN/0b+qs1Cod+yISkDj?=
+ =?us-ascii?Q?QlLSMvJp8Lx30T9hACH5UE6X+lEwRP30O1c25LpOJ5H3EEGRAZcSY15Vp3wn?=
+ =?us-ascii?Q?XSwUQgrC5S0PG4TLFn4pBsyRn6g6CqGstEkxyHBCXd+M+zwX8P339NSVpmdQ?=
+ =?us-ascii?Q?qgzZ3qemPBcrv+mhzKHVpFF5YpCLpS89IZ0O27KmOh7QV5WaNv0xR6JQ6MD+?=
+ =?us-ascii?Q?+5pHuTCofPtu8HlYd3UreNsvxwCPgdKkXbFSBPNvMmjCAy22OhVP4EH5/lQt?=
+ =?us-ascii?Q?LF4PAdJhMw3vBHvYdbC7uwIUWaZEUrRMUekjtkIp3O5oi1h+XY1KOY9qQHv2?=
+ =?us-ascii?Q?zB4ggnE85CbK61IP49wOp09XwNNe7KURzQGMddOiOxyLIcozILUpOXT5qzpm?=
+ =?us-ascii?Q?uHBtnEX5JtfylHw5b53yIhUOUAO2Fuk35JX1jM0v2/o83A=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <4C30D23ACD28D94A9E7F9B97CFF05237@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-09_03:2021-02-09,2021-02-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- phishscore=0 priorityscore=1501 adultscore=0 mlxlogscore=998 mlxscore=0
- clxscore=1015 impostorscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102090079
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4855.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff0be20c-9bee-4ce3-2b2f-08d8cd122d84
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Feb 2021 15:48:42.7775
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 94IfpqWlOUiK8h5Eh9KfYYmVHmpWQvCNfY7Qnd4oni9ZdZfWV4Z4Cg8hJa0NWaKo+1YvA+Wq01K8b9MV325gIuopcSW0lCP3jm9X8KyKGD8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4853
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Correctly handle the MVPG instruction when issued by a VSIE guest.
+On Feb 8, 2021, at 04:33, Borislav Petkov <bp@suse.de> wrote:
+> On Wed, Dec 23, 2020 at 07:57:06AM -0800, Chang S. Bae wrote:
+>> copy_xregs_to_kernel() used to save all user states in a kernel buffer.
+>> When the dynamic user state is enabled, it becomes conditional which sta=
+te
+>> to be saved.
+>>=20
+>> fpu->state_mask can indicate which state components are reserved to be
+>> saved in XSAVE buffer. Use it as XSAVE's instruction mask to select stat=
+es.
+>>=20
+>> KVM used to save all xstate via copy_xregs_to_kernel(). Update KVM to se=
+t a
+>> valid fpu->state_mask, which will be necessary to correctly handle dynam=
+ic
+>> state buffers.
+>=20
+> All this commit message should say is something along the lines of
+> "extend copy_xregs_to_kernel() to receive a mask argument of which
+> states to save, in preparation of dynamic states handling."
 
-Fixes: a3508fbe9dc6d ("KVM: s390: vsie: initial support for nested virtualization")
-Cc: stable@vger.kernel.org
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/kvm/vsie.c | 93 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 88 insertions(+), 5 deletions(-)
+Yes, I will change like that. Thanks.
 
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 7db022141db3..7dbb0d93c25f 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -416,11 +416,6 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		memcpy((void *)((u64)scb_o + 0xc0),
- 		       (void *)((u64)scb_s + 0xc0), 0xf0 - 0xc0);
- 		break;
--	case ICPT_PARTEXEC:
--		/* MVPG only */
--		memcpy((void *)((u64)scb_o + 0xc0),
--		       (void *)((u64)scb_s + 0xc0), 0xd0 - 0xc0);
--		break;
- 	}
- 
- 	if (scb_s->ihcpu != 0xffffU)
-@@ -982,6 +977,90 @@ static int handle_stfle(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 	return 0;
- }
- 
-+static u64 vsie_get_register(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, u8 reg)
-+{
-+	reg &= 0xf;
-+	switch (reg) {
-+	case 15:
-+		return vsie_page->scb_s.gg15;
-+	case 14:
-+		return vsie_page->scb_s.gg14;
-+	default:
-+		return vcpu->run->s.regs.gprs[reg];
-+	}
-+}
-+
-+static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
-+{
-+	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
-+	unsigned long pei_dest, pei_src, src, dest, mask = PAGE_MASK;
-+	u64 *pei_block = &vsie_page->scb_o->mcic;
-+	int edat, rc_dest, rc_src;
-+	union ctlreg0 cr0;
-+
-+	cr0.val = vcpu->arch.sie_block->gcr[0];
-+	edat = cr0.edat && test_kvm_facility(vcpu->kvm, 8);
-+	if (psw_bits(scb_s->gpsw).eaba == PSW_BITS_AMODE_24BIT)
-+		mask = 0xfff000;
-+	else if (psw_bits(scb_s->gpsw).eaba == PSW_BITS_AMODE_31BIT)
-+		mask = 0x7ffff000;
-+
-+	dest = vsie_get_register(vcpu, vsie_page, scb_s->ipb >> 16) & mask;
-+	src = vsie_get_register(vcpu, vsie_page, scb_s->ipb >> 20) & mask;
-+
-+	rc_dest = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, dest, &pei_dest);
-+	rc_src = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, src, &pei_src);
-+	/*
-+	 * Either everything went well, or something non-critical went wrong
-+	 * e.g. beause of a race. In either case, simply retry.
-+	 */
-+	if (rc_dest == -EAGAIN || rc_src == -EAGAIN || (!rc_dest && !rc_src)) {
-+		retry_vsie_icpt(vsie_page);
-+		return -EAGAIN;
-+	}
-+	/* Something more serious went wrong, propagate the error */
-+	if (rc_dest < 0)
-+		return rc_dest;
-+	if (rc_src < 0)
-+		return rc_src;
-+
-+	/* The only possible suppressing exception: just deliver it */
-+	if (rc_dest == PGM_TRANSLATION_SPEC || rc_src == PGM_TRANSLATION_SPEC) {
-+		clear_vsie_icpt(vsie_page);
-+		rc_dest = kvm_s390_inject_program_int(vcpu, PGM_TRANSLATION_SPEC);
-+		WARN_ON_ONCE(rc_dest);
-+		return 1;
-+	}
-+
-+	/*
-+	 * Forward the PEI intercept to the guest if it was a page fault, or
-+	 * also for segment and region table faults if EDAT applies.
-+	 */
-+	if (edat) {
-+		rc_dest = rc_dest == PGM_ASCE_TYPE ? rc_dest : 0;
-+		rc_src = rc_src == PGM_ASCE_TYPE ? rc_src : 0;
-+	} else {
-+		rc_dest = rc_dest != PGM_PAGE_TRANSLATION ? rc_dest : 0;
-+		rc_src = rc_src != PGM_PAGE_TRANSLATION ? rc_src : 0;
-+	}
-+	if (!rc_dest && !rc_src) {
-+		pei_block[0] = pei_dest;
-+		pei_block[1] = pei_src;
-+		return 1;
-+	}
-+
-+	retry_vsie_icpt(vsie_page);
-+
-+	/*
-+	 * The host has edat, and the guest does not, or it was an ASCE type
-+	 * exception. The host needs to inject the appropriate DAT interrupts
-+	 * into the guest.
-+	 */
-+	if (rc_dest)
-+		return inject_fault(vcpu, rc_dest, dest, 1);
-+	return inject_fault(vcpu, rc_src, src, 0);
-+}
-+
- /*
-  * Run the vsie on a shadow scb and a shadow gmap, without any further
-  * sanity checks, handling SIE faults.
-@@ -1068,6 +1147,10 @@ static int do_vsie_run(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		if ((scb_s->ipa & 0xf000) != 0xf000)
- 			scb_s->ipa += 0x1000;
- 		break;
-+	case ICPT_PARTEXEC:
-+		if (scb_s->ipa == 0xb254)
-+			rc = vsie_handle_mvpg(vcpu, vsie_page);
-+		break;
- 	}
- 	return rc;
- }
--- 
-2.26.2
+>> No functional change until the kernel supports dynamic user states.
+>=20
+> Same comment as before.
 
+This needs to be removed as per your comment [1].
+
+Chang
+
+[1] https://lore.kernel.org/lkml/20210209124906.GC15909@zn.tnic/=
