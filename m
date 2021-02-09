@@ -2,126 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 761A9314E2B
-	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 12:25:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1523314EAA
+	for <lists+kvm@lfdr.de>; Tue,  9 Feb 2021 13:09:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbhBILYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 06:24:43 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2582 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbhBILWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 06:22:32 -0500
-Received: from dggeme764-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DZgQY40tpzW2Zc;
-        Tue,  9 Feb 2021 19:19:33 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggeme764-chm.china.huawei.com (10.3.19.110) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Tue, 9 Feb 2021 19:21:47 +0800
-Subject: Re: [RFC PATCH 1/2] KVM: selftests: Add a macro to get string of
- vm_mem_backing_src_type
-To:     Ben Gardon <bgardon@google.com>
-CC:     kvm <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        <wanghaibin.wang@huawei.com>, <yuzenghui@huawei.com>
-References: <20210208090841.333724-1-wangyanan55@huawei.com>
- <20210208090841.333724-2-wangyanan55@huawei.com>
- <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
-From:   "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <c9c1207f-09ae-e601-5789-bd39ceb4071e@huawei.com>
-Date:   Tue, 9 Feb 2021 19:21:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S229729AbhBIMGx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 07:06:53 -0500
+Received: from mga09.intel.com ([134.134.136.24]:42985 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229558AbhBIMFU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 07:05:20 -0500
+IronPort-SDR: Zkke3K6ZRBiGI6nMCMcIQ9TCibpcKJN8455RqHcBwmzO5Gc2SSgp8aMT1QIBXZUm1j2PFVQeuo
+ BfTbjNLQ0hmw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9889"; a="182012859"
+X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
+   d="scan'208";a="182012859"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 04:03:16 -0800
+IronPort-SDR: 0ieoaeAKU7d3c11pykydksMQ7vj3nDDcGmtrF0t/KBBgWNh9lq8KKHEiw0mCbglS6xKJI2v75a
+ mLYjV2Vco98Q==
+X-IronPort-AV: E=Sophos;i="5.81,164,1610438400"; 
+   d="scan'208";a="396093725"
+Received: from yisun1-ubuntu.bj.intel.com (HELO yi.y.sun) ([10.238.156.116])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 09 Feb 2021 04:03:10 -0800
+Date:   Tue, 9 Feb 2021 19:57:44 +0800
+From:   Yi Sun <yi.y.sun@linux.intel.com>
+To:     Keqian Zhu <zhukeqian1@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        iommu@lists.linux-foundation.org, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        wanghaibin.wang@huawei.com, jiangkunkun@huawei.com,
+        yuzenghui@huawei.com, lushenming@huawei.com, kevin.tian@intel.com,
+        yan.y.zhao@intel.com, baolu.lu@linux.intel.com
+Subject: Re: [RFC PATCH 10/11] vfio/iommu_type1: Optimize dirty bitmap
+ population based on iommu HWDBM
+Message-ID: <20210209115744.GB28580@yi.y.sun>
+References: <20210128151742.18840-1-zhukeqian1@huawei.com>
+ <20210128151742.18840-11-zhukeqian1@huawei.com>
+ <20210207095630.GA28580@yi.y.sun>
+ <407d28db-1f86-8d4f-ab15-3c3ac56bbe7f@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CANgfPd967wgLk0tb6mNaWsaAa9Tn0LyecEZ_4-e+nKoa-HkCBg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggeme764-chm.china.huawei.com (10.3.19.110)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <407d28db-1f86-8d4f-ab15-3c3ac56bbe7f@huawei.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21-02-07 18:40:36, Keqian Zhu wrote:
+> Hi Yi,
+> 
+> On 2021/2/7 17:56, Yi Sun wrote:
+> > Hi,
+> > 
+> > On 21-01-28 23:17:41, Keqian Zhu wrote:
+> > 
+> > [...]
+> > 
+> >> +static void vfio_dma_dirty_log_start(struct vfio_iommu *iommu,
+> >> +				     struct vfio_dma *dma)
+> >> +{
+> >> +	struct vfio_domain *d;
+> >> +
+> >> +	list_for_each_entry(d, &iommu->domain_list, next) {
+> >> +		/* Go through all domain anyway even if we fail */
+> >> +		iommu_split_block(d->domain, dma->iova, dma->size);
+> >> +	}
+> >> +}
+> > 
+> > This should be a switch to prepare for dirty log start. Per Intel
+> > Vtd spec, there is SLADE defined in Scalable-Mode PASID Table Entry.
+> > It enables Accessed/Dirty Flags in second-level paging entries.
+> > So, a generic iommu interface here is better. For Intel iommu, it
+> > enables SLADE. For ARM, it splits block.
+> Indeed, a generic interface name is better.
+> 
+> The vendor iommu driver plays vendor's specific actions to start dirty log, and Intel iommu and ARM smmu may differ. Besides, we may add more actions in ARM smmu driver in future.
+> 
+> One question: Though I am not familiar with Intel iommu, I think it also should split block mapping besides enable SLADE. Right?
+> 
+I am not familiar with ARM smmu. :) So I want to clarify if the block
+in smmu is big page, e.g. 2M page? Intel Vtd manages the memory per
+page, 4KB/2MB/1GB. There are two ways to manage dirty pages.
+1. Keep default granularity. Just set SLADE to enable the dirty track.
+2. Split big page to 4KB to get finer granularity.
 
-On 2021/2/9 2:13, Ben Gardon wrote:
-> On Mon, Feb 8, 2021 at 1:08 AM Yanan Wang <wangyanan55@huawei.com> wrote:
->> Add a macro to get string of the backing source memory type, so that
->> application can add choices for source types in the help() function,
->> and users can specify which type to use for testing.
-> Coincidentally, I sent out a change last week to do the same thing:
-> "KVM: selftests: Add backing src parameter to dirty_log_perf_test"
-> (https://lkml.org/lkml/2021/2/2/1430)
-> Whichever way this ends up being implemented, I'm happy to see others
-> interested in testing different backing source types too.
+But question about the second solution is if it can benefit the user
+space, e.g. live migration. If my understanding about smmu block (i.e.
+the big page) is correct, have you collected some performance data to
+prove that the split can improve performance? Thanks!
 
-Thanks Ben! I have a little question here.
-
-Can we just present three IDs (0/1/2) but not strings for users to 
-choose which backing_src_type to use like the way of guest modes,
-
-which I think can make cmdlines more consise and easier to print. And is 
-it better to make a universal API to get backing_src_strings
-
-like Sean have suggested, so that the API can be used elsewhere ?
-
->> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
->> ---
->>   tools/testing/selftests/kvm/include/kvm_util.h | 3 +++
->>   tools/testing/selftests/kvm/lib/kvm_util.c     | 8 ++++++++
->>   2 files changed, 11 insertions(+)
->>
->> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
->> index 5cbb861525ed..f5fc29dc9ee6 100644
->> --- a/tools/testing/selftests/kvm/include/kvm_util.h
->> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
->> @@ -69,7 +69,9 @@ enum vm_guest_mode {
->>   #define PTES_PER_MIN_PAGE      ptes_per_page(MIN_PAGE_SIZE)
->>
->>   #define vm_guest_mode_string(m) vm_guest_mode_string[m]
->> +#define vm_mem_backing_src_type_string(s) vm_mem_backing_src_type_string[s]
->>   extern const char * const vm_guest_mode_string[];
->> +extern const char * const vm_mem_backing_src_type_string[];
->>
->>   struct vm_guest_mode_params {
->>          unsigned int pa_bits;
->> @@ -83,6 +85,7 @@ enum vm_mem_backing_src_type {
->>          VM_MEM_SRC_ANONYMOUS,
->>          VM_MEM_SRC_ANONYMOUS_THP,
->>          VM_MEM_SRC_ANONYMOUS_HUGETLB,
->> +       NUM_VM_BACKING_SRC_TYPES,
->>   };
->>
->>   int kvm_check_cap(long cap);
->> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
->> index fa5a90e6c6f0..a9b651c7f866 100644
->> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
->> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
->> @@ -165,6 +165,14 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->>   _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->>                 "Missing new mode params?");
->>
->> +const char * const vm_mem_backing_src_type_string[] = {
->> +       "VM_MEM_SRC_ANONYMOUS        ",
->> +       "VM_MEM_SRC_ANONYMOUS_THP    ",
->> +       "VM_MEM_SRC_ANONYMOUS_HUGETLB",
->> +};
->> +_Static_assert(sizeof(vm_mem_backing_src_type_string)/sizeof(char *) == NUM_VM_BACKING_SRC_TYPES,
->> +              "Missing new source type strings?");
->> +
->>   /*
->>    * VM Create
->>    *
->> --
->> 2.23.0
->>
-> .
+> Thanks,
+> Keqian
