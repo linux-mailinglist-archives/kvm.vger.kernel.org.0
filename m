@@ -2,158 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 815BE315DCD
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 04:34:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7748F315E10
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 05:11:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229678AbhBJDeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 22:34:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33075 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229581AbhBJDeI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Feb 2021 22:34:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612927959;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dIycg8TE3qvA5BDEadabLQSqpKyAlR7M5/0dpkVkaDg=;
-        b=UquISDiJjH4Fuc2WhguJziewTKaIVxAFG8Brr7R31lt0nr1c/ZjSQs1SdNxMx5LjgrjjhA
-        yw8c4NJ26YM4sOhH0a/Nu0w6axYSUSB8v4yESpYrLlGIKUmiQq8bdPyhKC4CVE9DQp1Hx7
-        DX+B2XkqhUFrGJRQXSegYY+ElFI2FXk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-9TvoC1MnOGG9tUQID_yKmQ-1; Tue, 09 Feb 2021 22:32:36 -0500
-X-MC-Unique: 9TvoC1MnOGG9tUQID_yKmQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D82851005501;
-        Wed, 10 Feb 2021 03:32:33 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-119-222.rdu2.redhat.com [10.10.119.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F120A19CA8;
-        Wed, 10 Feb 2021 03:32:28 +0000 (UTC)
-Subject: Re: [PATCH v2 06/28] locking/rwlocks: Add contention detection for
- rwlocks
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        id S229864AbhBJEKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 23:10:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49070 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230263AbhBJEKY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 23:10:24 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8C0B964E05;
+        Wed, 10 Feb 2021 04:09:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612930183;
+        bh=l2kXST1V8SQbEIgv6UjRYe6nKE73dsovX2h4nrQoK8k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NqKFp+LmWgE2y56eNFEzxpijrVU3L1Vxjfxetv0o15PD5/V5eFzkLawIAYCnYfMKH
+         lzmGyHoinNJ7MGhBbBswL7+/0k+vIm2aNaVMnGWHvFICGGn/i02axE+74C+qd1B6Wt
+         /VzP8AOYMv21uHFEVlLII3lmmO/1SnsjSuMyQCYw8826ejg0nzYIxhRYvI7JkCfS/b
+         RyAcVnxTOwG/a4lTRz9IhIWgp7FpclWUL5cnEzjIploBUyuP/xHl6q2vcTOI9nXZ9i
+         kX7bY8F8C8tzGbqWujYuKydjG1U/tqsmNzjRPpb077CjmOruiorjiPIjJcjpHYlyph
+         LQ7AQJ/Z0kLDw==
+Date:   Tue, 9 Feb 2021 21:09:42 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Peter Feiner <pfeiner@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Davidlohr Bueso <dbueso@suse.de>
-References: <20210202185734.1680553-1-bgardon@google.com>
- <20210202185734.1680553-7-bgardon@google.com>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <6287ff89-d869-e5ed-3e64-11621cc4796a@redhat.com>
-Date:   Tue, 9 Feb 2021 22:32:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] KVM: selftests: Add operand to vmsave/vmload/vmrun in
+ svm.c
+Message-ID: <20210210040942.GA1726907@ubuntu-m3-large-x86>
+References: <20210210031719.769837-1-ricarkol@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210202185734.1680553-7-bgardon@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210210031719.769837-1-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/2/21 1:57 PM, Ben Gardon wrote:
-> rwlocks do not currently have any facility to detect contention
-> like spinlocks do. In order to allow users of rwlocks to better manage
-> latency, add contention detection for queued rwlocks.
->
-> CC: Ingo Molnar <mingo@redhat.com>
-> CC: Will Deacon <will@kernel.org>
-> Acked-by: Peter Zijlstra <peterz@infradead.org>
-> Acked-by: Davidlohr Bueso <dbueso@suse.de>
-> Acked-by: Waiman Long <longman@redhat.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+On Wed, Feb 10, 2021 at 03:17:19AM +0000, Ricardo Koller wrote:
+> Building the KVM selftests with LLVM's integrated assembler fails with:
+> 
+>   $ CFLAGS=-fintegrated-as make -C tools/testing/selftests/kvm CC=clang
+>   lib/x86_64/svm.c:77:16: error: too few operands for instruction
+>           asm volatile ("vmsave\n\t" : : "a" (vmcb_gpa) : "memory");
+>                         ^
+>   <inline asm>:1:2: note: instantiated into assembly here
+>           vmsave
+>           ^
+>   lib/x86_64/svm.c:134:3: error: too few operands for instruction
+>                   "vmload\n\t"
+>                   ^
+>   <inline asm>:1:2: note: instantiated into assembly here
+>           vmload
+>           ^
+> This is because LLVM IAS does not currently support calling vmsave,
+> vmload, or vmload without an explicit %rax operand.
+
+It is worth noting that this has been fixed in LLVM already, available
+in 12.0.0-rc1 (final should be out in about a month or so as far as I am
+aware):
+
+http://github.com/llvm/llvm-project/commit/f47b07315a3c308a214119244b216602c537a1b2
+
+> Add an explicit operand to vmsave, vmload, and vmrum in svm.c. Fixing
+> this was suggested by Sean Christopherson.
+> 
+> Tested: building without this error in clang 11. The following patch
+> (not queued yet) needs to be applied to solve the other remaining error:
+> "selftests: kvm: remove reassignment of non-absolute variables".
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Link: https://lore.kernel.org/kvm/X+Df2oQczVBmwEzi@google.com/
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+
+Yes, same fix as commit f65cf84ee769 ("KVM: SVM: Add register operand to
+vmsave call in sev_es_vcpu_load").
+
+Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+
 > ---
->   include/asm-generic/qrwlock.h | 24 ++++++++++++++++++------
->   include/linux/rwlock.h        |  7 +++++++
->   2 files changed, 25 insertions(+), 6 deletions(-)
->
-> diff --git a/include/asm-generic/qrwlock.h b/include/asm-generic/qrwlock.h
-> index 84ce841ce735..0020d3b820a7 100644
-> --- a/include/asm-generic/qrwlock.h
-> +++ b/include/asm-generic/qrwlock.h
-> @@ -14,6 +14,7 @@
->   #include <asm/processor.h>
->   
->   #include <asm-generic/qrwlock_types.h>
-> +#include <asm-generic/qspinlock.h>
-
-As said in another thread, qspinlock and qrwlock can be independently 
-enabled for an architecture. So we shouldn't include qspinlock.h here. 
-Instead, just include the regular linux/spinlock.h file to make sure 
-that arch_spin_is_locked() is available.
-
-
->   
->   /*
->    * Writer states & reader shift and bias.
-> @@ -116,15 +117,26 @@ static inline void queued_write_unlock(struct qrwlock *lock)
->   	smp_store_release(&lock->wlocked, 0);
->   }
->   
-> +/**
-> + * queued_rwlock_is_contended - check if the lock is contended
-> + * @lock : Pointer to queue rwlock structure
-> + * Return: 1 if lock contended, 0 otherwise
-> + */
-> +static inline int queued_rwlock_is_contended(struct qrwlock *lock)
-> +{
-> +	return arch_spin_is_locked(&lock->wait_lock);
-> +}
-> +
->   /*
->    * Remapping rwlock architecture specific functions to the corresponding
->    * queue rwlock functions.
->    */
-> -#define arch_read_lock(l)	queued_read_lock(l)
-> -#define arch_write_lock(l)	queued_write_lock(l)
-> -#define arch_read_trylock(l)	queued_read_trylock(l)
-> -#define arch_write_trylock(l)	queued_write_trylock(l)
-> -#define arch_read_unlock(l)	queued_read_unlock(l)
-> -#define arch_write_unlock(l)	queued_write_unlock(l)
-> +#define arch_read_lock(l)		queued_read_lock(l)
-> +#define arch_write_lock(l)		queued_write_lock(l)
-> +#define arch_read_trylock(l)		queued_read_trylock(l)
-> +#define arch_write_trylock(l)		queued_write_trylock(l)
-> +#define arch_read_unlock(l)		queued_read_unlock(l)
-> +#define arch_write_unlock(l)		queued_write_unlock(l)
-> +#define arch_rwlock_is_contended(l)	queued_rwlock_is_contended(l)
->   
->   #endif /* __ASM_GENERIC_QRWLOCK_H */
-> diff --git a/include/linux/rwlock.h b/include/linux/rwlock.h
-> index 3dcd617e65ae..7ce9a51ae5c0 100644
-> --- a/include/linux/rwlock.h
-> +++ b/include/linux/rwlock.h
-> @@ -128,4 +128,11 @@ do {								\
->   	1 : ({ local_irq_restore(flags); 0; }); \
->   })
->   
-> +#ifdef arch_rwlock_is_contended
-> +#define rwlock_is_contended(lock) \
-> +	 arch_rwlock_is_contended(&(lock)->raw_lock)
-> +#else
-> +#define rwlock_is_contended(lock)	((void)(lock), 0)
-> +#endif /* arch_rwlock_is_contended */
-> +
->   #endif /* __LINUX_RWLOCK_H */
-
-Cheers,
-Longman
-
+>  tools/testing/selftests/kvm/lib/x86_64/svm.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> index 3a5c72ed2b79..827fe6028dd4 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
+> @@ -74,7 +74,7 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
+>  	wrmsr(MSR_VM_HSAVE_PA, svm->save_area_gpa);
+>  
+>  	memset(vmcb, 0, sizeof(*vmcb));
+> -	asm volatile ("vmsave\n\t" : : "a" (vmcb_gpa) : "memory");
+> +	asm volatile ("vmsave %0\n\t" : : "a" (vmcb_gpa) : "memory");
+>  	vmcb_set_seg(&save->es, get_es(), 0, -1U, data_seg_attr);
+>  	vmcb_set_seg(&save->cs, get_cs(), 0, -1U, code_seg_attr);
+>  	vmcb_set_seg(&save->ss, get_ss(), 0, -1U, data_seg_attr);
+> @@ -131,19 +131,19 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
+>  void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa)
+>  {
+>  	asm volatile (
+> -		"vmload\n\t"
+> +		"vmload %[vmcb_gpa]\n\t"
+>  		"mov rflags, %%r15\n\t"	// rflags
+>  		"mov %%r15, 0x170(%[vmcb])\n\t"
+>  		"mov guest_regs, %%r15\n\t"	// rax
+>  		"mov %%r15, 0x1f8(%[vmcb])\n\t"
+>  		LOAD_GPR_C
+> -		"vmrun\n\t"
+> +		"vmrun %[vmcb_gpa]\n\t"
+>  		SAVE_GPR_C
+>  		"mov 0x170(%[vmcb]), %%r15\n\t"	// rflags
+>  		"mov %%r15, rflags\n\t"
+>  		"mov 0x1f8(%[vmcb]), %%r15\n\t"	// rax
+>  		"mov %%r15, guest_regs\n\t"
+> -		"vmsave\n\t"
+> +		"vmsave %[vmcb_gpa]\n\t"
+>  		: : [vmcb] "r" (vmcb), [vmcb_gpa] "a" (vmcb_gpa)
+>  		: "r15", "memory");
+>  }
+> -- 
+> 2.30.0.478.g8a0d178c01-goog
+> 
