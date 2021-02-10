@@ -2,216 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B6B5316D1D
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 18:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43080316E9E
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 19:29:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232563AbhBJRpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 12:45:47 -0500
-Received: from foss.arm.com ([217.140.110.172]:41708 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232270AbhBJRpa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 12:45:30 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F97511D4;
-        Wed, 10 Feb 2021 09:44:44 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 748FA3F73B;
-        Wed, 10 Feb 2021 09:44:43 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-2-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
-Date:   Wed, 10 Feb 2021 17:44:59 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-2-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S233998AbhBJS3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 13:29:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234142AbhBJS0z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 13:26:55 -0500
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06931C06178C
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:15 -0800 (PST)
+Received: by mail-qt1-x84a.google.com with SMTP id t5so2264949qti.5
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=q+sIuVQJ6KcFkT5QFvyQWYzcdJ2lh3h/xyy/iLNsRYQ=;
+        b=di8qVqiUnwbZq+drUX5B4zxZ1i2Q93eORZ9i+xxj1lYzZzLPlYGgYljubSs5OY3tFS
+         mYD3hl33pPNMC+maQ5KN8CfmbqqmoOQYr0E/fFKZip9vd/CscLrYAvff2xvLEnyk0loB
+         gNG1WQhQKEBKiOuRQsD9xqjogNHt61/i5hpz573lRwpLmGRmDBbLQPcoRkZJl9Kr7k5j
+         nofOLI/uzrLCKrM8gP6jpHO0hnJ6+OjFb9N4T+r2vsAkErDblZIns4dJ3fPOA8da1WvX
+         B1RsREoFbnqXDGw0hRBspd9eIXSNxDO0rYqXl3HpEaPV2PYejQ65w2po74pXslOOvlNl
+         l3rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=q+sIuVQJ6KcFkT5QFvyQWYzcdJ2lh3h/xyy/iLNsRYQ=;
+        b=kKb7rf6Zk4Sgdg0k3FMvGCshKxvzN94EnNA4pKXnQFD3Cwm8CrO+9/cNhJNE7SjfPs
+         z8OR2G7FyVN3C1qSKDj5uPsbmsbdI2Wu05gJNq7TvbNxX2Es2VIeJAfL7xwkinrkeX4V
+         gxOzxt4jduWLsPZwFAaJT6fgbi0G+J82n5xcZyWpjUF9+ZLEjquo4zsV/df7/MWkp+sE
+         QVP1LHOL9DXePUIHl22EyjXV3IGPwDPUSTCvDwH/WpbE7spViRJvKwWPgEpC+3yfQ4J6
+         WfrQPlqu5c03Sp0rs04P/GC5JJB9TniKwcWRkIrZEepxFBAredXf7Rp/GfWoL0RhNJaD
+         Riag==
+X-Gm-Message-State: AOAM5338GnGsx0hAsMGif6a97Qhn+EXxwU/c1hyjh0Q2UwWnHMrL4uak
+        T7eFL28B0J6WiCtSbtrQ2XtNiaLP3ew=
+X-Google-Smtp-Source: ABdhPJwWYtIBmeRMFFyrmnZp1CUY6dAfZLe3CPlBHlBdXORhWl9XfX/dsq8lvN1lhUh4QsJWeuA70xZbYLA=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
+ (user=seanjc job=sendgmr) by 2002:a0c:fdec:: with SMTP id m12mr3978002qvu.11.1612981574160;
+ Wed, 10 Feb 2021 10:26:14 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 10 Feb 2021 10:26:04 -0800
+Message-Id: <20210210182609.435200-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
+Subject: [PATCH 0/5]  KVM: x86/xen: Selftest fixes and a cleanup
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, David Woodhouse <dwmw@amazon.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Fix a '40' vs '0x40' bug in the new Xen shinfo selftest, and clean up some
+other oddities that made root causing the problem far more painful than it
+needed to be.
 
-On 12/10/20 2:28 PM, Andre Przywara wrote:
-> Since x86 had a special need for registering tons of special I/O ports,
-> we had an ioport__setup_arch() callback, to allow each architecture
-> to do the same. As it turns out no one uses it beside x86, so we remove
-> that unnecessary abstraction.
->
-> The generic function was registered via a device_base_init() call, so
-> we just do the same for the x86 specific function only, and can remove
-> the unneeded ioport__setup_arch().
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm/ioport.c         |  5 -----
->  include/kvm/ioport.h |  1 -
->  ioport.c             | 28 ----------------------------
->  mips/kvm.c           |  5 -----
->  powerpc/ioport.c     |  6 ------
->  x86/ioport.c         | 25 ++++++++++++++++++++++++-
->  6 files changed, 24 insertions(+), 46 deletions(-)
->
-> diff --git a/arm/ioport.c b/arm/ioport.c
-> index 2f0feb9a..24092c9d 100644
-> --- a/arm/ioport.c
-> +++ b/arm/ioport.c
-> @@ -1,11 +1,6 @@
->  #include "kvm/ioport.h"
->  #include "kvm/irq.h"
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	return 0;
-> -}
-> -
->  void ioport__map_irq(u8 *irq)
->  {
->  	*irq = irq__alloc_line();
-> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index 039633f7..d0213541 100644
-> --- a/include/kvm/ioport.h
-> +++ b/include/kvm/ioport.h
-> @@ -35,7 +35,6 @@ struct ioport_operations {
->  							    enum irq_type));
->  };
->  
-> -int ioport__setup_arch(struct kvm *kvm);
->  void ioport__map_irq(u8 *irq);
->  
->  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
-> diff --git a/ioport.c b/ioport.c
-> index 844a832d..667e8386 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
->  	return 0;
->  }
->  
-> -static void ioport__unregister_all(void)
-> -{
-> -	struct ioport *entry;
-> -	struct rb_node *rb;
-> -	struct rb_int_node *rb_node;
-> -
-> -	rb = rb_first(&ioport_tree);
-> -	while (rb) {
-> -		rb_node = rb_int(rb);
-> -		entry = ioport_node(rb_node);
-> -		ioport_unregister(&ioport_tree, entry);
-> -		rb = rb_first(&ioport_tree);
-> -	}
-> -}
+Note, Paolo already queued a patch from Vitaly that adds the tests to
+.gitignore[*], i.e. patch 01 can likely be dropped.  I included it here
+for completeness.
 
-I get the impression this is a rebasing artifact. The commit message doesn't
-mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
-far as I can tell it's still needed because there are places other than
-ioport__setup_arch() from where ioport__register() is called.
+[*] https://lkml.kernel.org/r/20210129161821.74635-1-vkuznets@redhat.com
 
-Thanks,
+Sean Christopherson (5):
+  KVM: selftests: Ignore recently added Xen tests' build output
+  KVM: selftests: Fix size of memslots created by Xen tests
+  KVM: selftests: Fix hex vs. decimal snafu in Xen test
+  KVM: sefltests: Don't bother mapping GVA for Xen shinfo test
+  KVM: x86/xen: Explicitly pad struct compat_vcpu_info to 64 bytes
 
-Alex
+ arch/x86/kvm/xen.h                                   | 11 ++++++-----
+ tools/testing/selftests/kvm/.gitignore               |  2 ++
+ tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 12 +++++-------
+ tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c |  3 +--
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
-> -
->  static const char *to_direction(int direction)
->  {
->  	if (direction == KVM_EXIT_IO_IN)
-> @@ -220,16 +205,3 @@ out:
->  
->  	return !kvm->cfg.ioport_debug;
->  }
-> -
-> -int ioport__init(struct kvm *kvm)
-> -{
-> -	return ioport__setup_arch(kvm);
-> -}
-> -dev_base_init(ioport__init);
-> -
-> -int ioport__exit(struct kvm *kvm)
-> -{
-> -	ioport__unregister_all();
-> -	return 0;
-> -}
-> -dev_base_exit(ioport__exit);
-> diff --git a/mips/kvm.c b/mips/kvm.c
-> index 26355930..e110e5d5 100644
-> --- a/mips/kvm.c
-> +++ b/mips/kvm.c
-> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->  		die_perror("KVM_IRQ_LINE ioctl");
->  }
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	return 0;
-> -}
-> -
->  bool kvm__arch_cpu_supports_vm(void)
->  {
->  	return true;
-> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
-> index 0c188b61..a5cff4ee 100644
-> --- a/powerpc/ioport.c
-> +++ b/powerpc/ioport.c
-> @@ -12,12 +12,6 @@
->  
->  #include <stdlib.h>
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> -{
-> -	/* PPC has no legacy ioports to set up */
-> -	return 0;
-> -}
-> -
->  void ioport__map_irq(u8 *irq)
->  {
->  }
-> diff --git a/x86/ioport.c b/x86/ioport.c
-> index 7ad7b8f3..8c5c7699 100644
-> --- a/x86/ioport.c
-> +++ b/x86/ioport.c
-> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
->  {
->  }
->  
-> -int ioport__setup_arch(struct kvm *kvm)
-> +static int ioport__setup_arch(struct kvm *kvm)
->  {
->  	int r;
->  
-> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
->  
->  	return 0;
->  }
-> +dev_base_init(ioport__setup_arch);
-> +
-> +static int ioport__remove_arch(struct kvm *kvm)
-> +{
-> +	ioport__unregister(kvm, 0x510);
-> +	ioport__unregister(kvm, 0x402);
-> +	ioport__unregister(kvm, 0x03D5);
-> +	ioport__unregister(kvm, 0x03D4);
-> +	ioport__unregister(kvm, 0x0378);
-> +	ioport__unregister(kvm, 0x0278);
-> +	ioport__unregister(kvm, 0x00F0);
-> +	ioport__unregister(kvm, 0x00ED);
-> +	ioport__unregister(kvm, IOPORT_DBG);
-> +	ioport__unregister(kvm, 0x00C0);
-> +	ioport__unregister(kvm, 0x00A0);
-> +	ioport__unregister(kvm, 0x0092);
-> +	ioport__unregister(kvm, 0x0040);
-> +	ioport__unregister(kvm, 0x0020);
-> +	ioport__unregister(kvm, 0x0000);
-> +
-> +	return 0;
-> +}
-> +dev_base_exit(ioport__remove_arch);
+-- 
+2.30.0.478.g8a0d178c01-goog
+
