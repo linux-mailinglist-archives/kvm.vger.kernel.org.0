@@ -2,107 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AFE8316BD1
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 17:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89C66316BD3
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 17:56:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbhBJQzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 11:55:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44220 "EHLO
+        id S233284AbhBJQzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 11:55:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232294AbhBJQxL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 11:53:11 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB578C061574
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 08:52:31 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id n14so2049459pgi.8
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 08:52:31 -0800 (PST)
+        with ESMTP id S232776AbhBJQxN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 11:53:13 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6EEC061756
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 08:52:33 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id o38so1594918pgm.9
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 08:52:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=VLJOHZvAQq9lAsR5xQrDCvjmGXyVuxHkPaezCmKjd5U=;
-        b=BldTgab5X2aX+vdnSAuR4Nvj7qnjtNrTMrePVym0j2eCrVEnOliCV4Ez8DAhtnz3EM
-         nGFTWNmBDWcNc2yRAIoVeQ2jWiTXTDGtbcetRZF0k+5fh++Lr0rkl25mvKkEFXUAmfST
-         /PCYK5mC9PLkq8ET7JORItTIrcBh/rGhRAzOoZi7dHOq9EuFaub9nqQK2kMGuMQ8PE7H
-         r7YShgO2+d/KcDAnBkHcXTjxxPAvg7okueiYF2OehBATN+bVnoomJ2CCwarYBCSzxYVA
-         OcAdPhpaOPgAQFJka0TpWtgqwz++Xz0dOFimMziX2amCYz5/bls3LEpDVyiZY9zwMnwd
-         xF2Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=kzbr6goRS69+ZiiSMq5gwv7kmN9mL136qYSfdZ++e7I=;
+        b=sBD+p1x+Om9I07UVRmIOL81iFgdGxQs87RIfw0PlJNJdhEcZQxWueLg/J5pZnBnQFY
+         uPjI7Rj+EbAbziJqiLm/BPZTzyA3udAlsicmcbG9aseNBkKcgFgha5TJWHgm7767d8uW
+         UG9VZo/CWAXN+ESJvS3YSf01lSBg0UNfx/T/ldM/8iwkIJkTfh+C4NHHH4WEejWZuhMm
+         o4yf12vdQAkibNC8uDQANWro7LmeeFMLA0KlZ62/oGfjzwOPqH56TrJuVQExwROr+3uY
+         99+lfsh3h7Ikq5MLyxQ245CveYnFz9z9E3eumK5tcS0ROI0KKCXBm1BtOfRp+KPRWfdl
+         Jhuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=VLJOHZvAQq9lAsR5xQrDCvjmGXyVuxHkPaezCmKjd5U=;
-        b=Ip3ddTgteZiAToMraaGEreO4Rhif0hFjp5C5p4yLZXC2QvILHtmyaiNz2D5YgDp7da
-         VSbLo7QoRc8yHLzANIYcZ3Y86uQ00DLLIToVbY2q2CRT2MTvLw+XeAzpol7lzc8qUnlZ
-         VeiaFWdXactatI8iCHluLQ88myayP8NA7UtITwkirRbUFKRZhHfFPpn3U9xELWVDL0QR
-         JO/5g1SuR81+ElX+LJaUbDydrTrvuhk1rrw4nF1C4x6NiSfH0/++xGEkph1SFiRuIRSz
-         uM0wOZ92xNRwKLB6EtCj7NOJLCaalpn65Y1cBM4RFRoMvymDuzlRAtCdj2yOY78BuSZp
-         894g==
-X-Gm-Message-State: AOAM53380/jnri2MDWcKrlw//Ua9f0eSr3gckMNxXoxjYPUFkBngJuy0
-        psxfR4cUIMZyNRgeQPF0QTb7JelTnEIn/rhBataDyxYJldKFqXmGIS2tKEThOTq+FBmXR+SQ9HY
-        43yCsrb3vCkay+s06hxaVj6AC/NwELGLjvTNLPjLW6NS1C/HRk5MZPzN890JSOnrUxyzV
-X-Google-Smtp-Source: ABdhPJxXC/rKWStAUZXFjh1uU5s0KVIhelnbhsGszTQT5dFMeHWaO6BzGQO7cIQzl3w5djwHX0dkQIuXlTxryzmV
-Sender: "aaronlewis via sendgmr" <aaronlewis@aaronlewis1.sea.corp.google.com>
-X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:e137:6722:53be:42f7])
- (user=aaronlewis job=sendgmr) by 2002:a17:902:70c6:b029:df:d62a:8c69 with
- SMTP id l6-20020a17090270c6b02900dfd62a8c69mr3816730plt.20.1612975950984;
- Wed, 10 Feb 2021 08:52:30 -0800 (PST)
-Date:   Wed, 10 Feb 2021 08:50:36 -0800
-Message-Id: <20210210165035.3712489-1-aaronlewis@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH] selftests: kvm: Mmap the entire vcpu mmap area
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Steve Rutherford <srutherford@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=kzbr6goRS69+ZiiSMq5gwv7kmN9mL136qYSfdZ++e7I=;
+        b=ZnebbiP/l6MySoAFgFDYAEJ63p/Gx897z5MfoKeYciDr33V2UiEekLZIG4XqMxr1Og
+         aVdNzSh3mh8viMDHZE9ps3jN7swNVKSdevAI8PJ6ftmgEzRQMWdFzUvnsibmrWvD2kRv
+         g7CN0/wrfCgquQzbduEGc30KFbYjiuOeS3Kbr0XsKVfxVFYfcWq5TlZPrmlZhlOBNJbI
+         b6J6rhIvs7ioxqPA21SCz4vi46BhlbVHcbGvgYDCUpsmMalX/a9B3hBng1CTdBmM/un4
+         6U9e6GAVjLr/UEJ5kqjZgoQWQ/fTACrtcozEssTqkJK7IgMsiyM2dkAD0HIVQWJchiS1
+         sJQg==
+X-Gm-Message-State: AOAM532ntqDYn64L3knhbtNgwL/Ltn02koLWo9QcIO4Q3YmguRoXSMI6
+        XNNTx3qyu70BEzonfkCTFXnDsQ==
+X-Google-Smtp-Source: ABdhPJwun1z3tmYqGzKUbqmrTiAPAtIeg9j6D0sl5TNlKMlU/beqhpLVR4XHFJB5V2RtuOUd+Alh2A==
+X-Received: by 2002:aa7:9596:0:b029:1be:28cc:cfe8 with SMTP id z22-20020aa795960000b02901be28cccfe8mr4054281pfj.49.1612975953097;
+        Wed, 10 Feb 2021 08:52:33 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:1513:9e6:21c3:30d3])
+        by smtp.gmail.com with ESMTPSA id m5sm2880486pgj.11.2021.02.10.08.52.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Feb 2021 08:52:32 -0800 (PST)
+Date:   Wed, 10 Feb 2021 08:52:25 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kai Huang <kai.huang@intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
+        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v4 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+Message-ID: <YCQPSUNFlWd/s+up@google.com>
+References: <cover.1612777752.git.kai.huang@intel.com>
+ <11a923a314accf36a82aac4b676310a4802f5c75.1612777752.git.kai.huang@intel.com>
+ <YCL8ErAGKNSnX2Up@kernel.org>
+ <YCL8eNNfuo2k5ghO@kernel.org>
+ <9aebc8e6-cff5-b2b4-04af-d3968a3586dc@intel.com>
+ <ec9604199072e185de4b6b74209e84f30423c5e3.camel@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec9604199072e185de4b6b74209e84f30423c5e3.camel@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vcpu mmap area may consist of more than just the kvm_run struct.
-Allocate enough space for the entire vcpu mmap area. Without this, on
-x86, the PIO page, for example, will be missing.  This is problematic
-when dealing with an unhandled exception from the guest as the exception
-vector will be incorrectly reported as 0x0.
+On Wed, Feb 10, 2021, Kai Huang wrote:
+> On Tue, 2021-02-09 at 13:36 -0800, Dave Hansen wrote:
+> > On 2/9/21 1:19 PM, Jarkko Sakkinen wrote:
+> > > > Without that clearly documented, it would be unwise to merge this.
+> > > E.g.
+> > > 
+> > > - Have ioctl() to turn opened fd as vEPC.
+> > > - If FLC is disabled, you could only use the fd for creating vEPC.
+> > > 
+> > > Quite easy stuff to implement.
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Signed-off-by: Steve Rutherford <srutherford@google.com>
----
- tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+...
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index fa5a90e6c6f0..859a0b57c683 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -21,6 +21,8 @@
- #define KVM_UTIL_PGS_PER_HUGEPG 512
- #define KVM_UTIL_MIN_PFN	2
+> What's your opinion? Did I miss anything?
+
+Frankly, I think trying to smush them together would be a complete trainwreck.
+
+The vast majority of flows would need to go down completely different paths, so
+you'd end up with code like this:
+
+diff --git a/arch/x86/kernel/cpu/sgx/driver.c b/arch/x86/kernel/cpu/sgx/driver.c
+index f2eac41bb4ff..5128043c7871 100644
+--- a/arch/x86/kernel/cpu/sgx/driver.c
++++ b/arch/x86/kernel/cpu/sgx/driver.c
+@@ -46,6 +46,9 @@ static int sgx_release(struct inode *inode, struct file *file)
+        struct sgx_encl *encl = file->private_data;
+        struct sgx_encl_mm *encl_mm;
  
-+static int vcpu_mmap_sz(void);
++       if (encl->not_an_enclave)
++               return sgx_virt_epc_release(encl);
 +
- /* Aligns x up to the next multiple of size. Size must be a power of 2. */
- static void *align(void *x, size_t size)
- {
-@@ -509,7 +511,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
- 		vcpu->dirty_gfns = NULL;
- 	}
+        /*
+         * Drain the remaining mm_list entries. At this point the list contains
+         * entries for processes, which have closed the enclave file but have
+@@ -83,6 +86,9 @@ static int sgx_mmap(struct file *file, struct vm_area_struct *vma)
+        struct sgx_encl *encl = file->private_data;
+        int ret;
  
--	ret = munmap(vcpu->state, sizeof(*vcpu->state));
-+	ret = munmap(vcpu->state, vcpu_mmap_sz());
- 	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
- 		"errno: %i", ret, errno);
- 	close(vcpu->fd);
-@@ -978,7 +980,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
- 	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->state), "vcpu mmap size "
- 		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
- 		vcpu_mmap_sz(), sizeof(*vcpu->state));
--	vcpu->state = (struct kvm_run *) mmap(NULL, sizeof(*vcpu->state),
-+	vcpu->state = (struct kvm_run *) mmap(NULL, vcpu_mmap_sz(),
- 		PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->fd, 0);
- 	TEST_ASSERT(vcpu->state != MAP_FAILED, "mmap vcpu_state failed, "
- 		"vcpu id: %u errno: %i", vcpuid, errno);
--- 
-2.30.0.478.g8a0d178c01-goog
++       if (encl->not_an_enclave)
++               return sgx_virt_epc_mmap(encl, vma);
++
+        ret = sgx_encl_may_map(encl, vma->vm_start, vma->vm_end, vma->vm_flags);
+        if (ret)
+                return ret;
+@@ -104,6 +110,11 @@ static unsigned long sgx_get_unmapped_area(struct file *file,
+                                           unsigned long pgoff,
+                                           unsigned long flags)
+ {
++       struct sgx_encl *encl = file->private_data;
++
++       if (encl->not_an_enclave)
++               return sgx_virt_epc_mmap(encl, addr, len, pgoff, flags);
++
+        if ((flags & MAP_TYPE) == MAP_PRIVATE)
+                return -EINVAL;
 
+I suspect it would also be tricky to avoid introducing races, since anything that
+is different for virtual EPC would have a dependency on the ioctl() being called.
+
+This would also prevent making /dev/sgx_enclave root-only while allowing users
+access to /dev/sgx_vepc.  Forcing admins to use LSMs to do the same is silly.
+
+For the few flows that can share code, just split out the common bits to helpers.
