@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83D8D3171B6
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 21:53:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 356913171BF
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 21:55:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbhBJUxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 15:53:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39574 "EHLO
+        id S233042AbhBJUzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 15:55:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232103AbhBJUxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 15:53:21 -0500
+        with ESMTP id S233006AbhBJUyx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 15:54:53 -0500
 Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA696C061574;
-        Wed, 10 Feb 2021 12:52:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BA6AC06174A;
+        Wed, 10 Feb 2021 12:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=merlin.20170209; h=Mime-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MHHcGpb4gOQLQjN4KaymSh6gqFjQvC2Kdu4iWTjyAgo=; b=KD0EY5qs+STGP8mrHoY+b9ieS8
-        2yQh2OVg050XIgaI7n3ocunHRb03rpky6ytCt+sw2OkJPM1mAJ0KN9/9Cd1+3MQxWXDikXIV9hoCg
-        9wyUp5H+5Be/02oZimqDFow+Gm0UAmvhOovY18lmtWcUAgcLws6r/SZUQbAyvK51Fyv+qsy+bOcKp
-        su0pv43BknabM0VaBoq27yIb9DSurWggimPqGln24OrvcyNFomIwEMGd2kI3bfjqeLLed9JovJHZ+
-        A0oIFkP5iqnulQsc/JMghz+DCrwAVBJh7nNePiyhVCsbRWG6Hkq/catjfDR5D+5Vq1SRxLcm20fwY
-        7EuqDdLA==;
+        bh=G/aVLagxRA8lhR+ijassE0ikema+DXoAJMqMrAPRRbw=; b=LAfhUHIQl9VEZmxvWCGj8SM2qT
+        mNcvbIxdXutZE8+5TU7I2bljFXWs5lteET8xuZE+QMy97bDQH4IbsbGBS7Rr9LgfOsYIk5Pl4t1dv
+        yb8GoxojulolQjKUjdcClFSX6PNCUpqgfOoGhh6uli2vXz+juW2nJ3TM0fCddkQk69kbwb3jOjMaV
+        z0aQqhODIxhP3l5GNM0j04FCAQr9aQJ3z+3j0CmPqIRGgTMc+nYxXjx3zFseUq8tsYSEkxnxPoD8b
+        laJ9gLG1Xkj/VJpwe76TQthOr1iAlnubz0ZxPh0H0D7SP0VSH4oZCHWVgzwtUf0DZEahj2ai76O6S
+        tzEOc17A==;
 Received: from 54-240-197-233.amazon.com ([54.240.197.233] helo=freeip.amazon.com)
         by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l9wTE-0003nW-SU; Wed, 10 Feb 2021 20:52:21 +0000
-Message-ID: <be3c9169962b1f618293f2c29f8805838d01dbc9.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH 1/5] KVM: selftests: Ignore recently added
- Xen tests' build output
+        id 1l9wUk-0003rI-OA; Wed, 10 Feb 2021 20:53:55 +0000
+Message-ID: <f17bda668d171ddf76ce540ae7f7228fd417b7f2.camel@infradead.org>
+Subject: Re: [EXTERNAL] [PATCH 2/5] KVM: selftests: Fix size of memslots
+ created by Xen tests
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -38,13 +38,13 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Wed, 10 Feb 2021 20:52:18 +0000
-In-Reply-To: <20210210182609.435200-2-seanjc@google.com>
+Date:   Wed, 10 Feb 2021 20:53:52 +0000
+In-Reply-To: <20210210182609.435200-3-seanjc@google.com>
 References: <20210210182609.435200-1-seanjc@google.com>
-         <20210210182609.435200-2-seanjc@google.com>
+         <20210210182609.435200-3-seanjc@google.com>
 Content-Type: multipart/signed; micalg="sha-256";
         protocol="application/x-pkcs7-signature";
-        boundary="=-WDBzfKVMLnKD8yqEpS/s"
+        boundary="=-2yF8mEoknTio105OtDpd"
 X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
 Mime-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by merlin.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,21 +53,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-WDBzfKVMLnKD8yqEpS/s
+--=-2yF8mEoknTio105OtDpd
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, 2021-02-10 at 10:26 -0800, Sean Christopherson wrote:
-> Add the new Xen test binaries to KVM selftest's .gitnore.
+> For better or worse, the memslot APIs take the number of pages, not the
+> size in bytes.  The Xen tests need 2 pages, not 8192 pages.
 >=20
+> Fixes: 8d4e7e80838f ("KVM: x86: declare Xen HVM shared info capability an=
+d add test case")
+> Cc: David Woodhouse <dwmw@amazon.co.uk>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
 
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
 
-
---=-WDBzfKVMLnKD8yqEpS/s
+--=-2yF8mEoknTio105OtDpd
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -150,20 +152,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEw
-MjEwMjA1MjE4WjAvBgkqhkiG9w0BCQQxIgQgAqxrWjuJaytFgKRlO0lX+18VPP81XpRrvh5T3e+9
-QHIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjEwMjA1MzUyWjAvBgkqhkiG9w0BCQQxIgQg4jqWIXX0+FLQ8FX6IUT8lZU1I2Wbz3fyTcKFbmJE
+EFQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAHHBZx031ort8W+MHJ3M5IshQkr1TpuN8wkeV/1p66a0M+yiIyRzWErUlOVPo9aT
-Yg1/knQSkBqpawPLuKuhreZ85i0u5Ei3wFndCv6W9lcMFVM+dOmtBrUkqZfJvhSIhQV6AO6MJ/WM
-14MqdJdBmnuaiFhfWIPK/8GK3HhPQXy1pZdAESGWcY0bCaEs1Mko74XPf8R1RY2AIGQ/z/cjlE1k
-z50ENQMlxRifqCKtRKS0IiqEcqKV3FaMMl9lxue+WCyt/Z3Kk/k6HKXpwHIQuO7xiwu4E+5np3K2
-1u38TfB4OWPhmbNyPdO8cUsq6j+9n+OKZqJ6HGXq8osncJqgrnsAAAAAAAA=
+DQEBAQUABIIBAJr4dVMNQXe0mlEhDfuM1hFG4DE1H47pE0lX8v1qxl4YDrGD8fz2ZDO91IQJToOA
+JSCT+Vlo64qtybpgkEINzBLJ5fLjV6Kwn89tiyQ6nJQCI+PqLz2eM7SdkDut8H6Re9rVag9Sy3/a
+tmT1o0CJvv1m0YAtSxjI62fVjLPnYOVcdzqtgcVGKfHFZJV8sPXiHgueOFmnFDAX7Eod44pO6Qpw
+uHwPkGu/rqr2xBPCXt0c4bCwEmOAtbUQ5Sx8U+4OXkr4Abvl6dEsosEjcPbpfL2lShZcJE8hhDQG
+cBNKkMFH/Cs/kM2av3faoth56eHrx5WA2sb/5/YB5nhXkeTe4BYAAAAAAAA=
 
 
---=-WDBzfKVMLnKD8yqEpS/s--
+--=-2yF8mEoknTio105OtDpd--
 
