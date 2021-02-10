@@ -2,98 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B61AC315AC1
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 01:14:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F498315B5A
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 01:37:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235128AbhBJAK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Feb 2021 19:10:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44270 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233046AbhBIXZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Feb 2021 18:25:17 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF70C06174A
-        for <kvm@vger.kernel.org>; Tue,  9 Feb 2021 15:24:35 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id a17so447420ljq.2
-        for <kvm@vger.kernel.org>; Tue, 09 Feb 2021 15:24:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=C0AgyR2td8Wni5MnEa1+1u2wCmrll85Ef/D08+QnXD8=;
-        b=nJavZrIvPLItyZQRAcwbD/AO8RMXwGo6xg/GLEPYWAYW3PmyM4TPHFUry4440Kof4E
-         0wFIRYlSy5D9fpUSorA0R60w5lYEaYYtQsk52OvQVH/aEs3epOv1A18VBfK2NgEh4TjQ
-         hubDP/8J+9nUSE4z+suB30vnA6sAmM/j1wQs+Q0yDokqIxmUaX2/ziYv8q413YVCY2Tc
-         L3Wqh8JFTSeTeoFaemBxXyl9n7nbOLMun1GgY2D31QRyNRdvM4kajmfjxSunPuoTzQpb
-         BgFfhMaFV/XO4xzIBVKGwMYx0CYpQQy4NSiWyXuZ3mxQAfnVJXYH8hxmjVFBuegWKA/L
-         LpvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=C0AgyR2td8Wni5MnEa1+1u2wCmrll85Ef/D08+QnXD8=;
-        b=sOAdkMr748Z04QPxdil/Gp8Hh7qHmw8QbJIznByGSf8rTxIRaK+rfATzT802CaLfTl
-         jBH6v3gjA0PCo1ndSIhzlo/dc+KKJyM7N2pNrrrcuhUs8Uf9V6nulH4rnBLZEceQF6QV
-         PL/eIiv1EDaqL0oFW0qAe1II00wRI3ejGUD5hgS2A2NzbGfvsBOE1TQQDITWdrXLS6fJ
-         /f3YCiks3e+b4MeuSpzMnrPRJL7YkPkuPz0LYC+cl9ZLicp1LSoJ+Z2pnGlH5TkjluVr
-         nz3ZRkFQAEBOsZ7NSLVlWxMH7jXUQWudiSK5dr1fuEJBECG8P5fJb4C6e5J6TkneS65z
-         e+0A==
-X-Gm-Message-State: AOAM5314BXe2tS+SHpSLU4wkZ+3MFNshifssdg+jORfhO3eIKBYKTZVv
-        /1d3fXrDU+3Eg6QK9X64sPi1+bXq0d6YpjMy0Y8=
-X-Google-Smtp-Source: ABdhPJzpniLQZhFDtnEDP0iSqdgHVejqvdfz8KNpc6r2hToSy2+S8rH9r7Cr5W3/vQ+Utjaoo++7FfeuMxHf3G+EETs=
-X-Received: by 2002:a2e:9242:: with SMTP id v2mr135220ljg.188.1612913074211;
- Tue, 09 Feb 2021 15:24:34 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a2e:908c:0:0:0:0:0 with HTTP; Tue, 9 Feb 2021 15:24:33 -0800 (PST)
-Reply-To: mrssophia.robi@bk.ru
-From:   "Mrs. Sophia" <saraminna2332@gmail.com>
-Date:   Tue, 9 Feb 2021 15:24:33 -0800
-Message-ID: <CAE4xx=TNqS23v1j6Zdkv9P3HujgOz4FftY-Cvk=+-CoXzdfnKQ@mail.gmail.com>
-Subject: Dearest
-To:     undisclosed-recipients:;
+        id S233940AbhBJAgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Feb 2021 19:36:03 -0500
+Received: from mga07.intel.com ([134.134.136.100]:58436 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234066AbhBJAVt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Feb 2021 19:21:49 -0500
+IronPort-SDR: MFhaoI66IGxCUJ4SIKziyYZNIPwofg2JAv8r+YldaiFWeNzkRmSZCvSgU5fFhm5jBeLhyIL/Df
+ VJhaodmPG9kw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="246051038"
+X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
+   d="scan'208";a="246051038"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 16:20:41 -0800
+IronPort-SDR: pK+v243TtfXWJSiPrR97STHFoUWfBfE13a+T2wjCnycDCnBTG4Rrre9U5SAMxtmRlFGyQ8NxVF
+ W5iu+So+inBw==
+X-IronPort-AV: E=Sophos;i="5.81,166,1610438400"; 
+   d="scan'208";a="510142896"
+Received: from aellsw1-mobl.amr.corp.intel.com ([10.251.22.237])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2021 16:20:36 -0800
+Message-ID: <ec9604199072e185de4b6b74209e84f30423c5e3.camel@intel.com>
+Subject: Re: [RFC PATCH v4 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+From:   Kai Huang <kai.huang@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        seanjc@google.com, luto@kernel.org, rick.p.edgecombe@intel.com,
+        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
+        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Date:   Wed, 10 Feb 2021 13:20:32 +1300
+In-Reply-To: <9aebc8e6-cff5-b2b4-04af-d3968a3586dc@intel.com>
+References: <cover.1612777752.git.kai.huang@intel.com>
+         <11a923a314accf36a82aac4b676310a4802f5c75.1612777752.git.kai.huang@intel.com>
+         <YCL8ErAGKNSnX2Up@kernel.org> <YCL8eNNfuo2k5ghO@kernel.org>
+         <9aebc8e6-cff5-b2b4-04af-d3968a3586dc@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.3 (3.38.3-1.fc33) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello My Dearest
+On Tue, 2021-02-09 at 13:36 -0800, Dave Hansen wrote:
+> On 2/9/21 1:19 PM, Jarkko Sakkinen wrote:
+> > > Without that clearly documented, it would be unwise to merge this.
+> > E.g.
+> > 
+> > - Have ioctl() to turn opened fd as vEPC.
+> > - If FLC is disabled, you could only use the fd for creating vEPC.
+> > 
+> > Quite easy stuff to implement.
+> 
+> The most important question to me is not how close vEPC is today, but
+> how close it will be in the future.  It's basically the age old question
+> of: do we make one syscall that does two things or two syscalls?
+> 
+> Is there a _compelling_ reason to change direction?  How much code would
+> we save?
 
-Please I appeal to you to exercise a little patience and read through
-my mail carefully, I am contacting you personally for investment
-assistance and a long term business relationship in your Country.
+Basically we need to defer 'sgx_encl' related code from open to after mmap(). For
+instance, We need to defer 'sgx_encl' allocation from open to SGX_IOC_ENCLAVE_CREATE.
+And due to this change, we also need to move some members out of 'sgx_encl', and use
+them as common for enclave and vEPC. The 'struct xarray page_array' would be a good
+example.
 
-I am Mrs. Sophia Robin  a citizen of the united state of America ,  I
-work at HSBC Bank in Milan Italy  as a Telex Manager charge of wire
-transfer department.
+The code we can save, from my first glance, is just misc_register("/dev/sgx_vepc")
+related, maybe plus some mmap() related code. The logic to handle both host enclave
+and vEPC still needs to be there.
 
-I am contacting you for an important and  urgent business transaction,
-I  want the bank to transfer the money left by Dr. Cheng Chao,  A
-Chinese  Politician who  died, March 17th 2020 without any trace of
-his family members,  he used our bank to launder money overseas
-through the help of their Political advisers. And most of the funds
-which they transferred out of the shores of China  were gold and oil
-money that was supposed to have been used to develop the continent.
-Can you invest this money and also help the poor ? The amount value at
-$15.5million Dollars  ($US15,500,000), left in his account still
-unclaimed, if you know that you are capable to invest this fund into
-any  profitable business in your country kindly send me your details
-information as listed below to enable me draft you an application form
-of claim along with the deposit certificate which you are going to
-fill with your bank account detail necessary and contact the HSBC Bank
-in Italy  for immediate transfer of the Amounted sum into your bank
-account direct.
+To me the major concern is /dev/sgx_enclave, by its name, implies it is associated
+with host enclave. Adding IOCTL to *convert* it to vEPC is just mixing things up, and
+is ugly. If we really want to do this, IMHO we need at least change /dev/sgx_enclave
+to /dev/sgx_epc, for instance, to imply the fd we opened and mmap()'d just represents
+some raw EPC. However this is changing to existing userspace ABI.
 
-Percentage share will be 60,for me/ 40, for you.
+Sean,
 
-(1) Your full name..................................................
-(2) Your address....................................................
-(3) Your Nationality.................................................
-(4) Your Age / Sex.....................................................
-(5) Your  Occupation............................................
-(6) Your marital status......................................
-(7) Your direct telephone number..................
-(8) Your photo.......................................
+What's your opinion? Did I miss anything?
 
-Thanks with my best regards.
-Mrs. Sophia Robin
-Telex Manager
-Milan Italy  (H.S.B.C)
