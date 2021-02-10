@@ -2,144 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FDF9316D00
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 18:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88B2B316D0F
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 18:44:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232466AbhBJRk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 12:40:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27008 "EHLO
+        id S232880AbhBJRn2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 12:43:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22134 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232081AbhBJRkM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 12:40:12 -0500
+        by vger.kernel.org with ESMTP id S229834AbhBJRnO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 12:43:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612978724;
+        s=mimecast20190719; t=1612978908;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ulIYs4vjX02SWt4rVxo1O7Hqi68QURFqQUhPnrYP8Yo=;
-        b=AHZZ6+0jtNc5w9T2Y85EE1c+HrxozZtjxaEwudWY+X4HkdINk0z5nno9LzOZy0XC/Bkvf0
-        aFTkeummhxf+Hgbdoe2FgXF3b9l+X5aokB/UvTGySI/OkTRhbGovHT7m8vDc9dCbEHlMfn
-        U/5PMxCxYv3TGa5Jh/WnWiaaHIhIL1A=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-gYA2v5ADP4es-ykgXRx8zQ-1; Wed, 10 Feb 2021 12:38:42 -0500
-X-MC-Unique: gYA2v5ADP4es-ykgXRx8zQ-1
-Received: by mail-wm1-f70.google.com with SMTP id p8so1730612wmq.7
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 09:38:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ulIYs4vjX02SWt4rVxo1O7Hqi68QURFqQUhPnrYP8Yo=;
-        b=ehCxfp3wcuMv2b/hIcICyhIy5MKK4jE8OizAhtj55ex5jqsJGoVcKVS/ybFQcZ0vOw
-         XHlP/B4NVviaSc66RYESTUWzpHz4l91WR5P7VwW7+Tl9/ff+zu9FYfR+FW580y/8ekTO
-         ZQ30APTBRbddm/7k9++wPBKXOX2FqVGvp6FGpIXM94obpVIYwkelS3iD0p1rLO1eBXaT
-         RLiFYMwGp2yYRV2AqNcRMKfbFUqHF/lKgW11wHEnG5Vc2FWpoU/ehX4PmzhdIXLIJHeR
-         xdRoqf0AdHte/GZd/EsEW5lzVS1kFCxQakHNXeNyyfg+RKBmKUMVVZtKfYeL+GMMiAWY
-         +DUA==
-X-Gm-Message-State: AOAM530aTOUeCXmZOq/cZ64eahWePTGN0y9thoB/gE6ltzX/GsXnrfvR
-        SzgaTv2egqg40uCDytFxtHh4FJUtn9YQc1mnQxH+3wgNDclqQF0AptZM1cOdgZWejXjCDDG8RLC
-        JzXgAwfX1Txxp
-X-Received: by 2002:a5d:4d8d:: with SMTP id b13mr4631954wru.178.1612978721161;
-        Wed, 10 Feb 2021 09:38:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw8JVANRHxS+2EHhZNuHVwfrl6kd0Bb3JcxGG2kluWZGGBJ6/u/SH7eyaNJgQBWAKclRo4CIA==
-X-Received: by 2002:a5d:4d8d:: with SMTP id b13mr4631940wru.178.1612978720923;
-        Wed, 10 Feb 2021 09:38:40 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id r17sm4171824wro.46.2021.02.10.09.38.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Feb 2021 09:38:38 -0800 (PST)
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20210210155937.141569-1-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: nSVM: call nested_svm_load_cr3 on nested state load
-Message-ID: <9314afe0-7808-7877-0270-87f29a5f1191@redhat.com>
-Date:   Wed, 10 Feb 2021 18:38:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=UAo/ruM3T3lLQNsCNItrj/1VQO1R04osi4hOdZQ+vsc=;
+        b=bRZBeubm9KdvKCK5+IzgUnidoQvR3pbpORcZp0Pic1+hh5V2XFmvQ9PDr6bMQGx+K/kUqO
+        ihMFfPCX/FrHmz7/6KHRcl+VoiYiuXuSrR9khXim+pv5XvXlSaXkmC08bd54TcxtmoWNeU
+        ATj4cQYlZGgdCROt0mLLdK38z9tN6a8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-0LIAk_FwOyO114dpIdI72w-1; Wed, 10 Feb 2021 12:41:44 -0500
+X-MC-Unique: 0LIAk_FwOyO114dpIdI72w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFD9B107ACC7;
+        Wed, 10 Feb 2021 17:41:43 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B357D10074FC;
+        Wed, 10 Feb 2021 17:41:42 +0000 (UTC)
+Date:   Wed, 10 Feb 2021 18:41:38 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, Steve Rutherford <srutherford@google.com>
+Subject: Re: [PATCH] selftests: kvm: Mmap the entire vcpu mmap area
+Message-ID: <20210210174138.mgqfjvq63voksd4f@kamzik.brq.redhat.com>
+References: <20210210165035.3712489-1-aaronlewis@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210210155937.141569-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210210165035.3712489-1-aaronlewis@google.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/02/21 16:59, Maxim Levitsky wrote:
-> While KVM's MMU should be fully reset by loading of nested CR0/CR3/CR4
-> by KVM_SET_SREGS, we are not in nested mode yet when we do it and therefore
-> only root_mmu is reset.
+On Wed, Feb 10, 2021 at 08:50:36AM -0800, Aaron Lewis wrote:
+> The vcpu mmap area may consist of more than just the kvm_run struct.
+> Allocate enough space for the entire vcpu mmap area. Without this, on
+> x86, the PIO page, for example, will be missing.  This is problematic
+> when dealing with an unhandled exception from the guest as the exception
+> vector will be incorrectly reported as 0x0.
 > 
-> On regular nested entries we call nested_svm_load_cr3 which both updates the
-> guest's CR3 in the MMU when it is needed, and it also initializes
-> the mmu again which makes it initialize the walk_mmu as well when nested
-> paging is enabled in both host and guest.
-> 
-> Since we don't call nested_svm_load_cr3 on nested state load,
-> the walk_mmu can be left uninitialized, which can lead to a NULL pointer
-> dereference while accessing it if we happen to get a nested page fault
-> right after entering the nested guest first time after the migration and
-> we decide to emulate it, which leads to emulator trying to access
-> walk_mmu->gva_to_gpa which is NULL.
-> 
-> Therefore we should call this function on nested state load as well.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Signed-off-by: Steve Rutherford <srutherford@google.com>
 > ---
->   arch/x86/kvm/svm/nested.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 519fe84f2100..c209f1232928 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -1282,6 +1282,14 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
->   
->   	nested_vmcb02_prepare_control(svm);
->   
-> +	ret = nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
-> +				  nested_npt_enabled(svm));
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index fa5a90e6c6f0..859a0b57c683 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -21,6 +21,8 @@
+>  #define KVM_UTIL_PGS_PER_HUGEPG 512
+>  #define KVM_UTIL_MIN_PFN	2
+>  
+> +static int vcpu_mmap_sz(void);
 > +
-> +	if (ret) {
-> +		svm_leave_nested(svm);
-> +		goto out_free;
-> +	}
-> +
->   	kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
->   	ret = 0;
->   out_free:
-> 
+>  /* Aligns x up to the next multiple of size. Size must be a power of 2. */
+>  static void *align(void *x, size_t size)
+>  {
+> @@ -509,7 +511,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
+>  		vcpu->dirty_gfns = NULL;
+>  	}
+>  
+> -	ret = munmap(vcpu->state, sizeof(*vcpu->state));
+> +	ret = munmap(vcpu->state, vcpu_mmap_sz());
+>  	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
+>  		"errno: %i", ret, errno);
+>  	close(vcpu->fd);
+> @@ -978,7 +980,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
+>  	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->state), "vcpu mmap size "
+>  		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
+>  		vcpu_mmap_sz(), sizeof(*vcpu->state));
+> -	vcpu->state = (struct kvm_run *) mmap(NULL, sizeof(*vcpu->state),
+> +	vcpu->state = (struct kvm_run *) mmap(NULL, vcpu_mmap_sz(),
+>  		PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->fd, 0);
+>  	TEST_ASSERT(vcpu->state != MAP_FAILED, "mmap vcpu_state failed, "
+>  		"vcpu id: %u errno: %i", vcpuid, errno);
+> -- 
+> 2.30.0.478.g8a0d178c01-goog
+>
 
-I think you have to delay this to KVM_REQ_GET_NESTED_STATE_PAGES, 
-because the !nested_npt case can be accessing memory before the VM is 
-started (PDPTRs!).
-
-In fact the same is true for VMX: this code
-
-         /* Shadow page tables on either EPT or shadow page tables. */
-         if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, 
-nested_cpu_has_ept(vmcs12),
-                                 entry_failure_code))
-                 return -EINVAL;
-
-must be moved from prepare_vmcs02 to both nested_vmx_enter_non_root_mode 
-and nested_get_vmcs12_pages.
-
-Thanks,
-
-Paolo
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
