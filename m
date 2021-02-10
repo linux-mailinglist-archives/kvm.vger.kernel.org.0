@@ -2,146 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5804C3172D3
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 23:02:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 082423172EE
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 23:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232903AbhBJWC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 17:02:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232738AbhBJWCY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 17:02:24 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0DFC06174A
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 14:01:44 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id f6so3613683ioz.5
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 14:01:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=819I2ZDiOrD1SiujKJLyyJG/FvzyeHexHt0qDZ5Fk74=;
-        b=K+Bt/HJJh/OYC3wC/MXXKV2sTWU7SAnGDKDWCbHbVkFM870CeaEN6BXWI8qjZRH8KF
-         ItudNS5PnM/QlyjgVbfylw//i+VlXyVUW8KRBlsEp8ZbXG3GI9s3MOWL++nRFb3lvjS9
-         qZjxdUyCLXV/S6RTDn81a1Qv2sbzZc31YL2jDSbuFaHV4PSaas5JtYEL9j+6YSYAeR9Y
-         Km5abB3NH3RKHaC2T9z91hle0ZoaEA8VUHEYqX5mmcFRAJHz0F88/IouQWNGGN2Cizbj
-         oInGg2Spns9zoqYvwNoen19FLzcKE6SUxSYV/kYA3La3aASsBqYncwRHgjmS7SwqBCvF
-         Ac8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=819I2ZDiOrD1SiujKJLyyJG/FvzyeHexHt0qDZ5Fk74=;
-        b=U5MuIThfBVEkLVifrf1F9tHiy3ItydBl0F/0NzYo1h3HOxoqnd9C+UZG9ODPmIDoOe
-         hTAZ7Ee4ekS+fwe14+YoHiTXts7/6IY5LWWfk2NPDU5RnfSK99qWmR+bvcpX5GWtA79H
-         xXnnKX6OwVfMJ3nvJn1IEtXYTGTZeHTeQEB9P5+rDz4YZcUUA3z+JxkI19AxqlI6ueG4
-         Ps/xRfDY9+k6Zbee6aH4BcJG7TphQRObJmTgPVlLv9nOosikHX7NnXTH9VoeTKXHg+cT
-         TDy9bnH7fKiHM3+b3rtpGBmGFdjqMqcaQtw/gAeXbzpq9dGXZaHNNK2DFiPBq9z2f6Sd
-         QwtA==
-X-Gm-Message-State: AOAM530If9OUrWkb5bSWu2ZBPgOy5UBIrJrTyJUA3rkbBIqDTpj85QdM
-        K42ENT9OQNpCjsGrv2OMTQ8VoryebIMAu8ErnWCn8g==
-X-Google-Smtp-Source: ABdhPJywcdkezNgc1s+ZFEvgI7YMvy/CyaOA7X3tNxWC54tkTUhrMvCge4j0mtdtKmA3PGVVqts9qFv+Crtcc976qJ4=
-X-Received: by 2002:a05:6602:2d0d:: with SMTP id c13mr2728452iow.51.1612994503739;
- Wed, 10 Feb 2021 14:01:43 -0800 (PST)
+        id S233097AbhBJWIM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 17:08:12 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32502 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232103AbhBJWIJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 17:08:09 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11AM760T025147;
+        Wed, 10 Feb 2021 17:07:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dhNfFfaI6Zouk2ES5TERUMQ3DUWiy95RvkmjHFsyWg0=;
+ b=HlbXmcWjHgGB7NOsdRjdU/vlcGHJ2JT4WPdfjByt2uu9GjHkqgsB16DXYM1DxaOIXN+X
+ rK8E4wo3MSvfD6kLkvSsHpaw+VJV/6SPScyLg+wPMxlMPDg6/77oxT9i/zDOGbqJHbsM
+ hr5swdTKrXS8KbvgbHJ8ZX3zPtQVawqwsqM7oERpupAo5DbD6Wd4S4QUKPiCi2xtlyoJ
+ 7U0Zaf6Qs9LjJxm3PFPBvAllwfckxwVc1nwNjCA9NwJlwMSze7W/OP54qonYd+2d2LLw
+ svZnHOBTuT79grscwQW8xhZsX4Au8aqDsFUIpOWkOpzA9Pblh1rq/rfqmxUD5Gv0T/U3 eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36mqngge5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Feb 2021 17:07:25 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11AM7O86026303;
+        Wed, 10 Feb 2021 17:07:24 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36mqnggdmp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Feb 2021 17:07:24 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11AM2gCc006636;
+        Wed, 10 Feb 2021 22:03:42 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+        by ppma01dal.us.ibm.com with ESMTP id 36hjr9sdww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Feb 2021 22:03:42 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11AM3eRX18219422
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Feb 2021 22:03:40 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 69D026E090;
+        Wed, 10 Feb 2021 22:03:40 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 073A36E094;
+        Wed, 10 Feb 2021 22:03:38 +0000 (GMT)
+Received: from cpe-66-24-58-13.stny.res.rr.com (unknown [9.85.203.235])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 10 Feb 2021 22:03:38 +0000 (GMT)
+Subject: Re: [PATCH 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+To:     Halil Pasic <pasic@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, kwankhede@nvidia.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
+References: <20210209194830.20271-1-akrowiak@linux.ibm.com>
+ <20210209194830.20271-2-akrowiak@linux.ibm.com>
+ <20210210115334.46635966.cohuck@redhat.com>
+ <20210210162429.261fc17c.pasic@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Message-ID: <f709d4ec-c07a-3814-6f4d-27e1aaefada2@linux.ibm.com>
+Date:   Wed, 10 Feb 2021 17:03:38 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <cover.1612398155.git.ashish.kalra@amd.com> <bb86eda2963d7bef0c469c1ef8d7b32222e3a145.1612398155.git.ashish.kalra@amd.com>
- <CABayD+fBrNA_Oz542D5zoLqoispQG=1LWgHt2b5vr8hTMOveOQ@mail.gmail.com>
- <20210205030753.GA26504@ashkalra_ubuntu_server> <CABayD+eVwUsnB9pt+GA92uJis5dEGZ=zcrzraaR8_=YhuLTntg@mail.gmail.com>
- <20210206054617.GA19422@ashkalra_ubuntu_server> <20210206135646.GA21650@ashkalra_ubuntu_server>
- <20210208002858.GA23612@ashkalra_ubuntu_server> <CABayD+dB3fJ-YmZZ2qsP7ud-E+R8McjVmVXB4ER4Dmk18cAvoA@mail.gmail.com>
- <20210210203606.GA30775@ashkalra_ubuntu_server>
-In-Reply-To: <20210210203606.GA30775@ashkalra_ubuntu_server>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Wed, 10 Feb 2021 14:01:07 -0800
-Message-ID: <CABayD+cXJbRVV-fZFM+8xw3GypTLq=6WUES4ZrLnZEcgchVd9Q@mail.gmail.com>
-Subject: Re: [PATCH v10 12/16] KVM: x86: Introduce new KVM_FEATURE_SEV_LIVE_MIGRATION
- feature & Custom MSR.
-To:     Ashish Kalra <ashish.kalra@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210210162429.261fc17c.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-10_11:2021-02-10,2021-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 malwarescore=0 phishscore=0
+ adultscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102100191
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ashish,
 
-On Wed, Feb 10, 2021 at 12:37 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+
+On 2/10/21 10:24 AM, Halil Pasic wrote:
+> On Wed, 10 Feb 2021 11:53:34 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
 >
-> Hello Steve,
+>> On Tue,  9 Feb 2021 14:48:30 -0500
+>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>
+>>> This patch fixes a circular locking dependency in the CI introduced by
+>>> commit f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
+>>> pointer invalidated"). The lockdep only occurs when starting a Secure
+>>> Execution guest. Crypto virtualization (vfio_ap) is not yet supported for
+>>> SE guests; however, in order to avoid CI errors, this fix is being
+>>> provided.
+>>>
+>>> The circular lockdep was introduced when the masks in the guest's APCB
+>>> were taken under the matrix_dev->lock. While the lock is definitely
+>>> needed to protect the setting/unsetting of the KVM pointer, it is not
+>>> necessarily critical for setting the masks, so this will not be done under
+>>> protection of the matrix_dev->lock.
+>>>
+>>> Fixes: f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated")
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>>> ---
+>>>   drivers/s390/crypto/vfio_ap_ops.c | 75 ++++++++++++++++++-------------
+>>>   1 file changed, 45 insertions(+), 30 deletions(-)
+>>>    
+>>>   static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+>>>   {
+>>> -	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+>>> -	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>>> -	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+>>> -	kvm_put_kvm(matrix_mdev->kvm);
+>>> -	matrix_mdev->kvm = NULL;
+>>> +	if (matrix_mdev->kvm) {
+>> If you're doing setting/unsetting under matrix_dev->lock, is it
+>> possible that matrix_mdev->kvm gets unset between here and the next
+>> line, as you don't hold the lock?
+>>
+>> Maybe you could
+>> - grab a reference to kvm while holding the lock
+>> - call the mask handling functions with that kvm reference
+>> - lock again, drop the reference, and do the rest of the processing?
+> I agree, matrix_mdev->kvm can go NULL any time and we are risking
+> a null pointer dereference here.
 >
-> We can remove the implicit enabling of this live migration feature
-> from svm_vcpu_after_set_cpuid() callback invoked afer KVM_SET_CPUID2
-> ioctl, and let this feature flag be controlled by the userspace
-> VMM/qemu.
+> Another idea would be to do
 >
-> Userspace can set this feature flag explicitly by calling the
-> KVM_SET_CPUID2 ioctl and enable this feature whenever it is ready to
-> do so.
 >
-> I have tested this as part of Qemu code :
->
-> int kvm_arch_init_vcpu(CPUState *cs)
+> static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
 > {
-> ...
-> ...
->         c->function = KVM_CPUID_FEATURES | kvm_base;
->         c->eax = env->features[FEAT_KVM];
->         c->eax |= (1 << KVM_FEATURE_SEV_LIVE_MIGRATION);
-> ...
-> ...
+>          struct kvm *kvm;
+>                                                          
+>          mutex_lock(&matrix_dev->lock);
+>          if (matrix_mdev->kvm) {
+>                  kvm = matrix_mdev->kvm;
+>                  matrix_mdev->kvm = NULL;
+>                  mutex_unlock(&matrix_dev->lock);
+>                  kvm_arch_crypto_clear_masks(kvm);
+>                  mutex_lock(&matrix_dev->lock);
+>                  matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>                  vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+>                  kvm_put_kvm(kvm);
+>          }
+>          mutex_unlock(&matrix_dev->lock);
+> }
 >
->     r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
-> ...
+> That way only one unset would actually do the unset and cleanup
+> and every other invocation would bail out with only checking
+> matrix_mdev->kvm.
+
+How ironic, that is exactly what I did after agreeing with Connie.
+
 >
-> Let me know if this addresses your concerns.
-Removing implicit enablement is one part of the equation.
-The other two are:
-1) Host userspace being able to ask the kernel if it supports SEV Live Migration
-2) Host userspace being able to disable access to the MSR/hypercall
+>   
+>>> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+>>> +		mutex_lock(&matrix_dev->lock);
+>>> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+>>> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+>>> +		kvm_put_kvm(matrix_mdev->kvm);
+>>> +		matrix_mdev->kvm = NULL;
+>>> +		mutex_unlock(&matrix_dev->lock);
+>>> +	}
+>>>   }
 
-Feature flagging for paravirt features is pretty complicated, since
-you need all three parties to negotiate (host userspace/host
-kernel/guest), and every single one has veto power. In the end, the
-feature should only be available to the guest if every single party
-says yes.
-
-For an example of how to handle 1), the new feature flag could be
-checked when asking the kernel which cpuid bits it supports by adding
-it to the list of features that the kernel mentions in
-KVM_GET_SUPPORTED_CPUID.
-
-For example (in KVM's arch/x86/kvm/cpuid.c):
-case KVM_CPUID_FEATURES:
-==========
-entry->eax = (1 << KVM_FEATURE_CLOCKSOURCE) |
-    (1 << KVM_FEATURE_NOP_IO_DELAY) |
-...
-    (1 << KVM_FEATURE_PV_SCHED_YIELD) |
-+  (1 << KVM_FEATURE_ASYNC_PF_INT) |
--   (1 << KVM_FEATURE_ASYNC_PF_INT);
-+  (1 << KVM_FEATURE_SEV_LIVE_MIGRATION);
-==========
-
-Without this, userspace has to infer if the kernel it is on supports that flag.
-
-For an example of how to handle 2), in the new msr handler, KVM should
-throw a GP `if (!guest_pv_has(vcpu, KVM_FEATURE_SEV_LIVE_MIGRATION))`
-(it can do this by returning th. The issue here is "what if the guest
-ignores CPUID and calls the MSR/hypercall anyway". This is a less
-important issue as it requires the guest to be malicious, but still
-worth resolving. Additionally, the hypercall itself should check if
-the MSR has been toggled by the guest.
-
-Thanks,
-Steve
