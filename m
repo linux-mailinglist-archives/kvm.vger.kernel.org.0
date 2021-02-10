@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A0AD53174AC
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 00:47:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 831963174DC
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 01:00:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbhBJXr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 18:47:29 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8619 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232318AbhBJXr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 18:47:27 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B602470660001>; Wed, 10 Feb 2021 15:46:46 -0800
-Received: from HKMAIL101.nvidia.com (10.18.16.10) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 10 Feb
- 2021 23:46:45 +0000
-Received: from HKMAIL101.nvidia.com (10.18.16.10) by HKMAIL101.nvidia.com
- (10.18.16.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 10 Feb
- 2021 23:46:43 +0000
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
- by HKMAIL101.nvidia.com (10.18.16.10) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3 via Frontend Transport; Wed, 10 Feb 2021 23:46:43 +0000
+        id S234010AbhBKAAP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 19:00:15 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16979 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233633AbhBKAAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 19:00:13 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B602473650000>; Wed, 10 Feb 2021 15:59:33 -0800
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 10 Feb
+ 2021 23:59:31 +0000
+Received: from HKMAIL104.nvidia.com (10.18.16.13) by HKMAIL104.nvidia.com
+ (10.18.16.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 10 Feb
+ 2021 23:59:29 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.173)
+ by HKMAIL104.nvidia.com (10.18.16.13) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Wed, 10 Feb 2021 23:59:29 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P16YXOm7pRPkhJYZgziw8l5isp0zyfliZOwZ0AJJERRF0mJHzXSw7gguKtdNmAAIbcqKRwIs1v5oB4Jep+s/WzpPGPWvu5/LXfpeS22W98z4MAhQjRY9IayyJk0WHh7CO82cPFcPTCwdgxQF5Nc2iHT0xLx8pHFtZkoG3+lumZQ7/C4IGx+Ri09N7nn4zEEcs7rmLlauHNRGToMlnP0T+vECcZD/ARStz9TgTucEkIdPAoCLWsYMGMKEtxdX4d7eV5mgvYfMoWfLtyylESbolCltcryT1YoP18rNg2rSKlabEjpsWvTlExX2aV2IzG6bjz2ZlK1V0B5cIlut6e2HGQ==
+ b=ZE73QOvArqlRMErkL9FX1bmizWPt3V2mBQn9UIGM5K/o7injqYihwWCS5lzZGLgbTr3g+REP0uber4JgURxyYFbo7G54M2b8/wmw2yYusj8fYxyiXq5PWKaAw6NdzpdRm9r89RdUQUbmPTpQJvhnb3AJ9gMsL4BpBpDxoN4eDH4W8tK2x99GAl+Ri9Cy1jfvmK/poDLOx54ChwE5HrmuZxY/obin/8c2QvN1BTGSI4bQ3m4Fjj+qmzAAI81WWoMAlFWe1Jzz9+/EBfM90t2TyHFyEw5byK+7O84R5u56Kyedt6ItcAAIsfw7C5sDVgj5wuTpI0BDQDjU2/MYpl818g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TYzgz2EPPt+1Sp2WSxI20EaufzxLlSqAypZsTggrFcA=;
- b=JbSoF07xekIY5aA8idoR5qeo/BFAPTxzsZricUjj/v2o9GB9ZZd0VwXp3ddp9n4Bm1x3M9gcfiyjFbFCmAXK3XzRzymlPJevT6xbRVQBvDGJhOCcnl9tsubqnKp0a7NDBUp1oDxC+HxsvOfnv1Yzzb1xnL8q7Y27wX4ZlClOVY3Tszvs+yei2uFUCmHJGkj/GBl7AXBjtqYQq0ciyi0DwMIo/ibmC9XqR5+RbWF5NZdVibm47zXYkNPPMQymZaq5Dr9GFutYPORoYmxgXFAQHu1g+ACziUE1F1ixRj7VxiMKDF0vbw1+WmdPP0QbMvmhW+MLX/IQkKGGiFOtjOq1cg==
+ bh=5JUPEmN4dVgkBxOz+LvCz2eb0nvSv75QXtMWb8Rtiqw=;
+ b=RpPiBahIJEcFMN5mfR5hGdeOIsoAswbn4+hl7JGY67tcm0Pt3JLT4GebLQaUGWM9YLBLHjw2PaWBEvCGdqs9x6BC3n84X9P+2J6M1B/9s48ge5yf1gJua5FqfBXVQBMZ/gHEQtLI/jUYAshWNgpKcaqjGmN3m1/7ddDyG79F7ZlcihODcQ92iGl62oLLacZyPRaVTRbE3s62X55yCrOq88v1rIPu00vNYw7OrWJ8csMSbeSvONivaDGfcObg9or7LmYrhOEqqlRpewUzRpDDwnFXQmg1Aj+boDPLAUGkKl0VHSFkU1IOCXn0v4HRxu+oqQaV1g9uS0bkwUW/rWcW1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1756.namprd12.prod.outlook.com (2603:10b6:3:108::10) with
+ by DM5PR12MB2581.namprd12.prod.outlook.com (2603:10b6:4:b2::36) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.27; Wed, 10 Feb
- 2021 23:46:41 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Wed, 10 Feb
+ 2021 23:59:26 +0000
 Received: from DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
  ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.027; Wed, 10 Feb 2021
- 23:46:41 +0000
-Date:   Wed, 10 Feb 2021 19:46:39 -0400
+ 23:59:26 +0000
+Date:   Wed, 10 Feb 2021 19:59:24 -0400
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Dave Jiang <dave.jiang@intel.com>
 CC:     <alex.williamson@redhat.com>, <kwankhede@nvidia.com>,
@@ -54,254 +54,308 @@ CC:     <alex.williamson@redhat.com>, <kwankhede@nvidia.com>,
         <shahafs@mellanox.com>, <pbonzini@redhat.com>,
         <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>
-Subject: Re: [PATCH v5 04/14] vfio/mdev: idxd: Add auxialary device plumbing
- for idxd mdev support
-Message-ID: <20210210234639.GI4247@nvidia.com>
+Subject: Re: [PATCH v5 05/14] vfio/mdev: idxd: add basic mdev registration
+ and helper functions
+Message-ID: <20210210235924.GJ4247@nvidia.com>
 References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
- <161255839829.339900.16438737078488315104.stgit@djiang5-desk3.ch.intel.com>
+ <161255840486.339900.5478922203128287192.stgit@djiang5-desk3.ch.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <161255839829.339900.16438737078488315104.stgit@djiang5-desk3.ch.intel.com>
-X-ClientProxiedBy: MN2PR19CA0032.namprd19.prod.outlook.com
- (2603:10b6:208:178::45) To DM6PR12MB3834.namprd12.prod.outlook.com
+In-Reply-To: <161255840486.339900.5478922203128287192.stgit@djiang5-desk3.ch.intel.com>
+X-ClientProxiedBy: MN2PR20CA0029.namprd20.prod.outlook.com
+ (2603:10b6:208:e8::42) To DM6PR12MB3834.namprd12.prod.outlook.com
  (2603:10b6:5:14a::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR19CA0032.namprd19.prod.outlook.com (2603:10b6:208:178::45) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.27 via Frontend Transport; Wed, 10 Feb 2021 23:46:40 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l9zBv-006HwC-Bs; Wed, 10 Feb 2021 19:46:39 -0400
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR20CA0029.namprd20.prod.outlook.com (2603:10b6:208:e8::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.25 via Frontend Transport; Wed, 10 Feb 2021 23:59:25 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l9zOG-006IE5-PM; Wed, 10 Feb 2021 19:59:24 -0400
 X-Header: ProcessedBy-CMR-outbound
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1613000806; bh=TYzgz2EPPt+1Sp2WSxI20EaufzxLlSqAypZsTggrFcA=;
+        t=1613001573; bh=5JUPEmN4dVgkBxOz+LvCz2eb0nvSv75QXtMWb8Rtiqw=;
         h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
          From:To:CC:Subject:Message-ID:References:Content-Type:
          Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
          X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=rVGvDrFLVTyOmoySC2Dv8k6ZW3a14uKQ6wEiNDPDzmzj85JB+Klx0BA7tKeDw54Cu
-         1kq8kmU88lmLn73eQA1M5kqihAaQPwTiS0ycOpqHUzAWSemgByS20wxa8yJZUtpdGj
-         cvNXYO8tRRM4TeeB/FOkdwPKi0mgvrmjvvyyw7RrsA0LUsBgkxFzRh0tjMPTFmYgBY
-         4f0P4hCU/5t/adJy2JR2PPA0BBBXIHKHZKmJ145s85Hxh3GptMQoRv2kDok+MofuSM
-         RxSjfHTIcsqIAWotsP9UphdBetJVsagh/SZBoZfoyzCbKbB8zMCkGWkyjERx46Lm+O
-         lAXrtSjolFIWQ==
+        b=QFICxPmctqwdSALVyzViKH0VU0LI2M0CyAvOR0igykh/fxIRY3OySmAGiK9rxhcSK
+         VVa+4Z8tSXkmiJVE/W25ksC2esm+x6Ow6A3PKp5ihcqhyyWqcw/X36fsZ5YOv5WzET
+         gWgYFaraNToZ9B0IvMV+fuwkRvwemeMv6buuU0xGx8X7vzG0QAfBWYKfUTVSDJ442J
+         U12R5BivzHvrY1ZQHk5b8kJ1buk8k169DpmtlAG8oSqc9MS/LGvJZ199Vo4LZcuH0T
+         YCQwzzkM7e6tLnoWKQkAzARheEW2Gty98wIVep41WEv0ry3TZSXx9mkfq+GBeKN9h+
+         zyjdYw+Kfearg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 05, 2021 at 01:53:18PM -0700, Dave Jiang wrote:
-> diff --git a/drivers/dma/idxd/idxd.h b/drivers/dma/idxd/idxd.h
-> index a2438b3166db..f02c96164515 100644
-> +++ b/drivers/dma/idxd/idxd.h
-> @@ -8,6 +8,7 @@
->  #include <linux/percpu-rwsem.h>
->  #include <linux/wait.h>
->  #include <linux/cdev.h>
-> +#include <linux/auxiliary_bus.h>
->  #include "registers.h"
->  
->  #define IDXD_DRIVER_VERSION	"1.00"
-> @@ -221,6 +222,8 @@ struct idxd_device {
->  	struct work_struct work;
->  
->  	int *int_handles;
-> +
-> +	struct auxiliary_device *mdev_auxdev;
->  };
+On Fri, Feb 05, 2021 at 01:53:24PM -0700, Dave Jiang wrote:
 
-If there is only one aux device there not much reason to make it a
-dedicated allocation.
-
->  /* IDXD software descriptor */
-> @@ -282,6 +285,10 @@ enum idxd_interrupt_type {
->  	IDXD_IRQ_IMS,
->  };
->  
-> +struct idxd_mdev_aux_drv {
-> +	        struct auxiliary_driver auxiliary_drv;
-> +};
-
-Wrong indent. What is this even for?
-
-> +
->  static inline int idxd_get_wq_portal_offset(enum idxd_portal_prot prot,
->  					    enum idxd_interrupt_type irq_type)
+> +static int check_vma(struct idxd_wq *wq, struct vm_area_struct *vma)
 >  {
-> diff --git a/drivers/dma/idxd/init.c b/drivers/dma/idxd/init.c
-> index ee56b92108d8..fd57f39e4b7d 100644
-> +++ b/drivers/dma/idxd/init.c
-> @@ -382,6 +382,74 @@ static void idxd_disable_system_pasid(struct idxd_device *idxd)
->  	idxd->sva = NULL;
->  }
->  
-> +static void idxd_remove_mdev_auxdev(struct idxd_device *idxd)
+> -	/* FIXME: Fill in later */
+> +	if (vma->vm_end < vma->vm_start)
+> +		return -EINVAL;
+
+These checks are redundant
+
+> -static int idxd_mdev_host_release(struct idxd_device *idxd)
+> +static int idxd_vdcm_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
 > +{
-> +	if (!IS_ENABLED(CONFIG_VFIO_MDEV_IDXD))
-> +		return;
+> +	unsigned int wq_idx, rc;
+> +	unsigned long req_size, pgoff = 0, offset;
+> +	pgprot_t pg_prot;
+> +	struct vdcm_idxd *vidxd = mdev_get_drvdata(mdev);
+> +	struct idxd_wq *wq = vidxd->wq;
+> +	struct idxd_device *idxd = vidxd->idxd;
+> +	enum idxd_portal_prot virt_portal, phys_portal;
+> +	phys_addr_t base = pci_resource_start(idxd->pdev, IDXD_WQ_BAR);
+> +	struct device *dev = mdev_dev(mdev);
 > +
-> +	auxiliary_device_delete(idxd->mdev_auxdev);
-> +	auxiliary_device_uninit(idxd->mdev_auxdev);
-> +}
+> +	rc = check_vma(wq, vma);
+> +	if (rc)
+> +		return rc;
 > +
-> +static void idxd_auxdev_release(struct device *dev)
+> +	pg_prot = vma->vm_page_prot;
+> +	req_size = vma->vm_end - vma->vm_start;
+> +	vma->vm_flags |= VM_DONTCOPY;
+> +
+> +	offset = (vma->vm_pgoff << PAGE_SHIFT) &
+> +		 ((1ULL << VFIO_PCI_OFFSET_SHIFT) - 1);
+> +
+> +	wq_idx = offset >> (PAGE_SHIFT + 2);
+> +	if (wq_idx >= 1) {
+> +		dev_err(dev, "mapping invalid wq %d off %lx\n",
+> +			wq_idx, offset);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/*
+> +	 * Check and see if the guest wants to map to the limited or unlimited portal.
+> +	 * The driver will allow mapping to unlimited portal only if the the wq is a
+> +	 * dedicated wq. Otherwise, it goes to limited.
+> +	 */
+> +	virt_portal = ((offset >> PAGE_SHIFT) & 0x3) == 1;
+> +	phys_portal = IDXD_PORTAL_LIMITED;
+> +	if (virt_portal == IDXD_PORTAL_UNLIMITED && wq_dedicated(wq))
+> +		phys_portal = IDXD_PORTAL_UNLIMITED;
+> +
+> +	/* We always map IMS portals to the guest */
+> +	pgoff = (base + idxd_get_wq_portal_full_offset(wq->id, phys_portal,
+> +						       IDXD_IRQ_IMS)) >> PAGE_SHIFT;
+> +	dev_dbg(dev, "mmap %lx %lx %lx %lx\n", vma->vm_start, pgoff, req_size,
+> +		pgprot_val(pg_prot));
+> +	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +	vma->vm_private_data = mdev;
+
+What ensures the mdev pointer is valid strictly longer than the VMA?
+This needs refcounting.
+
+> +	vma->vm_pgoff = pgoff;
+> +
+> +	return remap_pfn_range(vma, vma->vm_start, pgoff, req_size, pg_prot);
+
+Nothing validated req_size - did you copy this from the Intel RDMA
+driver? It had a huge security bug just like this.
+> +
+> +static int msix_trigger_unregister(struct vdcm_idxd *vidxd, int index)
 > +{
-> +	struct auxiliary_device *auxdev = to_auxiliary_dev(dev);
-> +	struct idxd_device *idxd = dev_get_drvdata(dev);
-
-Nope, where did you see drvdata being used like this? You need to use
-container_of.
-
-If put the mdev_auxdev as a non pointer member then this is just:
-
-     struct idxd_device *idxd = container_of(dev, struct idxd_device, mdev_auxdev)
-     
-     put_device(&idxd->conf_dev);
-
-And fix the 'setup' to match this design
-
-> +	kfree(auxdev->name);
-
-This is weird, the name shouldn't be allocated, it is supposed to be a
-fixed string to make it easy to find the driver name in the code base.
-
-> +static int idxd_setup_mdev_auxdev(struct idxd_device *idxd)
-> +{
-> +	struct auxiliary_device *auxdev;
-> +	struct device *dev = &idxd->pdev->dev;
+> +	struct mdev_device *mdev = vidxd->vdev.mdev;
+> +	struct device *dev = mdev_dev(mdev);
+> +	struct ims_irq_entry *irq_entry;
 > +	int rc;
 > +
-> +	if (!IS_ENABLED(CONFIG_VFIO_MDEV_IDXD))
+> +	if (!vidxd->vdev.msix_trigger[index])
 > +		return 0;
 > +
-> +	auxdev = kzalloc(sizeof(*auxdev), GFP_KERNEL);
-> +	if (!auxdev)
-> +		return -ENOMEM;
+> +	dev_dbg(dev, "disable MSIX trigger %d\n", index);
+> +	if (index) {
+> +		u32 auxval;
 > +
-> +	auxdev->name = kasprintf(GFP_KERNEL, "mdev-%s", idxd_name[idxd->type]);
-> +	if (!auxdev->name) {
-> +		rc = -ENOMEM;
-> +		goto err_name;
+> +		irq_entry = &vidxd->irq_entries[index];
+> +		if (irq_entry->irq_set) {
+> +			free_irq(irq_entry->irq, irq_entry);
+> +			irq_entry->irq_set = false;
+> +		}
+> +
+> +		auxval = ims_ctrl_pasid_aux(0, false);
+> +		rc = irq_set_auxdata(irq_entry->irq, IMS_AUXDATA_CONTROL_WORD, auxval);
+> +		if (rc)
+> +			return rc;
 > +	}
+> +	eventfd_ctx_put(vidxd->vdev.msix_trigger[index]);
+> +	vidxd->vdev.msix_trigger[index] = NULL;
 > +
-> +	dev_dbg(&idxd->pdev->dev, "aux dev mdev: %s\n", auxdev->name);
-> +
-> +	auxdev->dev.parent = dev;
-> +	auxdev->dev.release = idxd_auxdev_release;
-> +	auxdev->id = idxd->id;
-> +
-> +	rc = auxiliary_device_init(auxdev);
-> +	if (rc < 0) {
-> +		dev_err(dev, "Failed to init aux dev: %d\n", rc);
-> +		goto err_auxdev;
-> +	}
-
-Put the init earlier so it can handle the error unwinds
-
-> +	rc = auxiliary_device_add(auxdev);
-> +	if (rc < 0) {
-> +		dev_err(dev, "Failed to add aux dev: %d\n", rc);
-> +		goto err_auxdev;
-> +	}
-> +
-> +	idxd->mdev_auxdev = auxdev;
-> +	dev_set_drvdata(&auxdev->dev, idxd);
-
-No to using drvdata, and this is in the wrong order anyhow.
-
 > +	return 0;
+> +}
 > +
-> + err_auxdev:
-> +	kfree(auxdev->name);
-> + err_name:
-> +	kfree(auxdev);
+> +static int msix_trigger_register(struct vdcm_idxd *vidxd, u32 fd, int index)
+> +{
+> +	struct mdev_device *mdev = vidxd->vdev.mdev;
+> +	struct device *dev = mdev_dev(mdev);
+> +	struct ims_irq_entry *irq_entry;
+> +	struct eventfd_ctx *trigger;
+> +	int rc;
+> +
+> +	if (vidxd->vdev.msix_trigger[index])
+> +		return 0;
+> +
+> +	dev_dbg(dev, "enable MSIX trigger %d\n", index);
+> +	trigger = eventfd_ctx_fdget(fd);
+> +	if (IS_ERR(trigger)) {
+> +		dev_warn(dev, "eventfd_ctx_fdget failed %d\n", index);
+> +		return PTR_ERR(trigger);
+> +	}
+> +
+> +	if (index) {
+> +		u32 pasid;
+> +		u32 auxval;
+> +
+> +		irq_entry = &vidxd->irq_entries[index];
+> +		rc = idxd_mdev_get_pasid(mdev, &pasid);
+> +		if (rc < 0)
+> +			return rc;
+> +
+> +		/*
+> +		 * Program and enable the pasid field in the IMS entry. The programmed pasid and
+> +		 * enabled field is checked against the  pasid and enable field for the work queue
+> +		 * configuration and the pasid for the descriptor. A mismatch will result in blocked
+> +		 * IMS interrupt.
+> +		 */
+> +		auxval = ims_ctrl_pasid_aux(pasid, true);
+> +		rc = irq_set_auxdata(irq_entry->irq, IMS_AUXDATA_CONTROL_WORD, auxval);
+> +		if (rc < 0)
+> +			return rc;
+> +
+> +		rc = request_irq(irq_entry->irq, idxd_guest_wq_completion, 0, "idxd-ims",
+> +				 irq_entry);
+> +		if (rc) {
+> +			dev_warn(dev, "failed to request ims irq\n");
+> +			eventfd_ctx_put(trigger);
+> +			auxval = ims_ctrl_pasid_aux(0, false);
+> +			irq_set_auxdata(irq_entry->irq, IMS_AUXDATA_CONTROL_WORD, auxval);
+> +			return rc;
+> +		}
+> +		irq_entry->irq_set = true;
+> +	}
+> +
+> +	vidxd->vdev.msix_trigger[index] = trigger;
+> +	return 0;
+> +}
+> +
+> +static int vdcm_idxd_set_msix_trigger(struct vdcm_idxd *vidxd,
+> +				      unsigned int index, unsigned int start,
+> +				      unsigned int count, uint32_t flags,
+> +				      void *data)
+> +{
+> +	int i, rc = 0;
+> +
+> +	if (count > VIDXD_MAX_MSIX_ENTRIES - 1)
+> +		count = VIDXD_MAX_MSIX_ENTRIES - 1;
+> +
+> +	if (count == 0 && (flags & VFIO_IRQ_SET_DATA_NONE)) {
+> +		/* Disable all MSIX entries */
+> +		for (i = 0; i < VIDXD_MAX_MSIX_ENTRIES; i++) {
+> +			rc = msix_trigger_unregister(vidxd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		}
+> +		return 0;
+> +	}
+> +
+> +	for (i = 0; i < count; i++) {
+> +		if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
+> +			u32 fd = *(u32 *)(data + i * sizeof(u32));
+> +
+> +			rc = msix_trigger_register(vidxd, fd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		} else if (flags & VFIO_IRQ_SET_DATA_NONE) {
+> +			rc = msix_trigger_unregister(vidxd, i);
+> +			if (rc < 0)
+> +				return rc;
+> +		}
+> +	}
 > +	return rc;
 > +}
 > +
->  static int idxd_probe(struct idxd_device *idxd)
->  {
->  	struct pci_dev *pdev = idxd->pdev;
-> @@ -434,11 +502,19 @@ static int idxd_probe(struct idxd_device *idxd)
->  		goto err_idr_fail;
->  	}
->  
-> +	rc = idxd_setup_mdev_auxdev(idxd);
-> +	if (rc < 0)
-> +		goto err_auxdev_fail;
+> +static int idxd_vdcm_set_irqs(struct vdcm_idxd *vidxd, uint32_t flags,
+> +			      unsigned int index, unsigned int start,
+> +			      unsigned int count, void *data)
+> +{
+> +	int (*func)(struct vdcm_idxd *vidxd, unsigned int index,
+> +		    unsigned int start, unsigned int count, uint32_t flags,
+> +		    void *data) = NULL;
+> +	struct mdev_device *mdev = vidxd->vdev.mdev;
+> +	struct device *dev = mdev_dev(mdev);
 > +
->  	idxd->major = idxd_cdev_get_major(idxd);
->  
->  	dev_dbg(dev, "IDXD device %d probed successfully\n", idxd->id);
->  	return 0;
->  
-> + err_auxdev_fail:
-> +	mutex_lock(&idxd_idr_lock);
-> +	idr_remove(&idxd_idrs[idxd->type], idxd->id);
-> +	mutex_unlock(&idxd_idr_lock);
+> +	switch (index) {
+> +	case VFIO_PCI_INTX_IRQ_INDEX:
+> +		dev_warn(dev, "intx interrupts not supported.\n");
+> +		break;
+> +	case VFIO_PCI_MSI_IRQ_INDEX:
+> +		dev_dbg(dev, "msi interrupt.\n");
+> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+> +		case VFIO_IRQ_SET_ACTION_MASK:
+> +		case VFIO_IRQ_SET_ACTION_UNMASK:
+> +			break;
+> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +			func = vdcm_idxd_set_msix_trigger;
 
-Probably wrong to order things like this..
+This would be a good place to insert a common VFIO helper library to
+take care of the MSI-X emulation for IMS.
 
-Also somehow this has a 
-
-	idxd = devm_kzalloc(dev, sizeof(struct idxd_device), GFP_KERNEL);
-
-but the idxd has a kref'd struct device in it:
-
-struct idxd_device {
-	enum idxd_type type;
-	struct device conf_dev;
-
-So that's not right either
-
-You'll need to fix the lifetime model for idxd_device before you get
-to adding auxdevices
-
-> +static int idxd_mdev_host_init(struct idxd_device *idxd)
+> +int idxd_mdev_host_init(struct idxd_device *idxd)
 > +{
-> +	/* FIXME: Fill in later */
-> +	return 0;
-> +}
-> +
-> +static int idxd_mdev_host_release(struct idxd_device *idxd)
-> +{
-> +	/* FIXME: Fill in later */
-> +	return 0;
-> +}
-
-Don't leave empty stubs like this, just provide the whole driver in
-the next patch
-
-> +static int idxd_mdev_aux_probe(struct auxiliary_device *auxdev,
-> +			       const struct auxiliary_device_id *id)
-> +{
-> +	struct idxd_device *idxd = dev_get_drvdata(&auxdev->dev);
-
-Continuing no to using drvdata, must use container_of
-
+> +	struct device *dev = &idxd->pdev->dev;
 > +	int rc;
 > +
-> +	rc = idxd_mdev_host_init(idxd);
-
-And why add this indirection? Just write what it here
-
-> +static struct idxd_mdev_aux_drv idxd_mdev_aux_drv = {
-> +	.auxiliary_drv = {
-> +		.id_table = idxd_mdev_auxbus_id_table,
-> +		.probe = idxd_mdev_aux_probe,
-> +		.remove = idxd_mdev_aux_remove,
-> +	},
-> +};
-
-Why idxd_mdev_aux_drv ? Does a later patch add something here?
-
-> +static int idxd_mdev_auxdev_drv_register(struct idxd_mdev_aux_drv *drv)
-> +{
-> +	return auxiliary_driver_register(&drv->auxiliary_drv);
-> +}
+> +	if (!test_bit(IDXD_FLAG_IMS_SUPPORTED, &idxd->flags))
+> +		return -EOPNOTSUPP;
 > +
-> +static void idxd_mdev_auxdev_drv_unregister(struct idxd_mdev_aux_drv *drv)
-> +{
-> +	auxiliary_driver_unregister(&drv->auxiliary_drv);
-> +}
-> +
-> +module_driver(idxd_mdev_aux_drv, idxd_mdev_auxdev_drv_register, idxd_mdev_auxdev_drv_unregister);
+> +	if (iommu_dev_has_feature(dev, IOMMU_DEV_FEAT_AUX)) {
+> +		rc = iommu_dev_enable_feature(dev, IOMMU_DEV_FEAT_AUX);
 
-There is some auxillary driver macro that does this boilerplate
+Huh. This is the first user of IOMMU_DEV_FEAT_AUX, why has so much
+dead-code infrastructure been already merged around this?
+
+
+> @@ -34,6 +1024,7 @@ static int idxd_mdev_aux_probe(struct auxiliary_device *auxdev,
+>  		return rc;
+>  	}
+>  
+> +	set_bit(IDXD_FLAG_MDEV_ENABLED, &idxd->flags);
+
+Something is being done wrong if this flag is needed
+
+> +int vidxd_send_interrupt(struct ims_irq_entry *iie)
+> +{
+> +	/* PLACE HOLDER */
+> +	return 0;
+> +}
+
+Here too, don't structure the patches like this
+
+> diff --git a/drivers/vfio/mdev/idxd/vdev.h b/drivers/vfio/mdev/idxd/vdev.h
+> new file mode 100644
+> index 000000000000..cc2ba6ccff7b
+> +++ b/drivers/vfio/mdev/idxd/vdev.h
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright(c) 2019,2020 Intel Corporation. All rights rsvd. */
+> +
+> +#ifndef _IDXD_VDEV_H_
+> +#define _IDXD_VDEV_H_
+> +
+> +#include "mdev.h"
+> +
+> +int vidxd_mmio_read(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
+> +int vidxd_mmio_write(struct vdcm_idxd *vidxd, u64 pos, void *buf, unsigned int size);
+> +int vidxd_cfg_read(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int count);
+> +int vidxd_cfg_write(struct vdcm_idxd *vidxd, unsigned int pos, void *buf, unsigned int size);
+> +void vidxd_mmio_init(struct vdcm_idxd *vidxd);
+> +void vidxd_reset(struct vdcm_idxd *vidxd);
+> +int vidxd_send_interrupt(struct ims_irq_entry *iie);
+> +int vidxd_setup_ims_entries(struct vdcm_idxd *vidxd);
+> +void vidxd_free_ims_entries(struct vdcm_idxd *vidxd);
+
+Why are these functions special??
 
 Jason
