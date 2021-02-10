@@ -2,173 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1404E3167E8
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 14:22:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0B131681B
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 14:36:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231744AbhBJNV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 08:21:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51256 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231873AbhBJNVN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 08:21:13 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11ADDLjW196273;
-        Wed, 10 Feb 2021 08:20:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=7CrLF66ZHGGi/L45r0MaJGuTVuMHsrdqG5zOCFD/PiI=;
- b=eG2XtSL/G5o1BwIlOUIF9glOUPXHpDbzNw+GHqjS6mNPg79nIB10Rxoi57Z1g49e3eoN
- sKvqPkcaIb48rx7vJlMgVMkPRgL5hciWn+XfsxsM6uz1pRbRJnzfmHbg7wkHLRArUh6G
- e81HZuxck2bTFDjzDolf6pPfBm7d9+jsvAu3YVoFJGELy2LO9g3LU69sCDfA2T51MfeU
- mAuq++VaD45lSuUcpFa3xBV4bmguHjlMHvSrAWLTyR7n/DrAKkKNGxVg/s/TsbaA5Ze2
- rvKHf9EHAjKgYjr0UYaEFuQUwjFNwC2E3DBjaTpllRsjY7X3/gfnOevnmMddKgzbBTLF hQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36mg66r6ny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Feb 2021 08:20:25 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11ADEx5N009338;
-        Wed, 10 Feb 2021 08:20:23 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36mg66r6n1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Feb 2021 08:20:23 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11ADHFqe026292;
-        Wed, 10 Feb 2021 13:20:21 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 36m1m2ry2y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Feb 2021 13:20:21 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11ADK8fO29950390
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Feb 2021 13:20:08 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2B51D4C04A;
-        Wed, 10 Feb 2021 13:20:18 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B332F4C040;
-        Wed, 10 Feb 2021 13:20:17 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.174.85])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 10 Feb 2021 13:20:17 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, frankja@linux.ibm.com,
-        david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v2 5/5] s390x: css: testing measurement block format 1
-Date:   Wed, 10 Feb 2021 14:20:14 +0100
-Message-Id: <1612963214-30397-6-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1612963214-30397-1-git-send-email-pmorel@linux.ibm.com>
-References: <1612963214-30397-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-10_05:2021-02-10,2021-02-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 suspectscore=0 phishscore=0 priorityscore=1501 adultscore=0
- mlxscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102100121
+        id S231290AbhBJNfn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 08:35:43 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:5319 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230229AbhBJNfi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 08:35:38 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6023e1000000>; Wed, 10 Feb 2021 05:34:56 -0800
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 10 Feb
+ 2021 13:34:55 +0000
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.177)
+ by HQMAIL109.nvidia.com (172.20.187.15) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Wed, 10 Feb 2021 13:34:55 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CQXZn3vGoPYu6b3nF0PFBEB7JBQhCLazRlc4shMC7ElBt0exX+ltqYE74Ny+DOykFDyyTAVTxYX9eQv+9O7JZW79WCK23TMlMhu3LpQQafmZFQm8kMilGvpuGG0cxbBJzYfcEgpqiuYSypGfPYgGr5Q6qiXAg3idbM1B3mKr6rYZDuCP8wdZI33WYxqZrWZ5j4zCCqG9lfVAlHDBF897Kgr++g29zCgtPe0GQz4NoMBbwq1Vi3+sebadvuYFJTIpxNbdviJ7QuRHRrPBAZ17k0jhnB9BwLhNF1UEUtT3gP7XxHNa0wliwJWmT2fQtR6UFD3CINgJi+Ik9Mxyl+5dkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BX90xb9kBpIhs/sBVmCDM0VJTidLOFK8DWfcHaOsyF8=;
+ b=k/uTPLAnZgjnou8OzgW6G71AoDmMwi5iL2p68xM6YjB3cpcVXX/RD70xy/Th8PtUiKhAhcOscWehjZH+RINi3r96rVIE+eZRm0ZvLvZJxNdqKN76WhkxcYoRzxlHoMewB3qB1JYg1g+c36tpu0hDXjcqB1SsJfRTjebhnrTpiDhcDxJ6OGri9hoBWdA9HK9hT9mmA4ms2awhUyqhJOZc2JW9wugiIw4myNXOp65VMxvo24oK4i2gVByzt+Reu4JKM7DTr7t9+T9OEwn8HXc7s/dj/gDCrvzYVA3C/KHEvXpWerZ2ZR8Ah6Wr++eWVBeDsL5WcHN66h4i/4a9Kwb2nQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR12MB2488.namprd12.prod.outlook.com (2603:10b6:4:b5::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.25; Wed, 10 Feb
+ 2021 13:34:54 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.027; Wed, 10 Feb 2021
+ 13:34:53 +0000
+Date:   Wed, 10 Feb 2021 09:34:52 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+CC:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "liranl@nvidia.com" <liranl@nvidia.com>,
+        "oren@nvidia.com" <oren@nvidia.com>,
+        "tzahio@nvidia.com" <tzahio@nvidia.com>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "yarong@nvidia.com" <yarong@nvidia.com>,
+        "aviadye@nvidia.com" <aviadye@nvidia.com>,
+        "shahafs@nvidia.com" <shahafs@nvidia.com>,
+        "artemp@nvidia.com" <artemp@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "ACurrid@nvidia.com" <ACurrid@nvidia.com>,
+        "gmataev@nvidia.com" <gmataev@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhao, Yan Y" <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v2 0/9] Introduce vfio-pci-core subsystem
+Message-ID: <20210210133452.GW4247@nvidia.com>
+References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+ <MWHPR11MB18867A429497117960344A798C8D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <MWHPR11MB18867A429497117960344A798C8D9@MWHPR11MB1886.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR11CA0021.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::26) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR11CA0021.namprd11.prod.outlook.com (2603:10b6:208:23b::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.25 via Frontend Transport; Wed, 10 Feb 2021 13:34:53 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1l9pds-005rQn-CM; Wed, 10 Feb 2021 09:34:52 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1612964096; bh=UoQcNyiFY97yQ+UdvJgsciYzIHzh/G0qVQ0SuDeyD0Y=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
+         X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=YDAaNnaB5PcakRan0aZm22dMMZSFuEDzFLm8vBOlA482JhmspGm5KJcdRRwdTlirO
+         r8qes3XHLDNAB4gJrU2mxAc1QfsAw2eAsRINZ8iOF8vL/s+1i2FQTAKEaz34wFHRxY
+         2Q2rAzPdck0IeE0bOqisABhvmT1BdtUgbL8ikaGLXei3wtR+wcUyBQQlsxbDS9G81r
+         d6h5ms6l0dhmYnpR00rmjqBFr6SjFb+/in5849AAOdvhnvgnhpqLAbk6fHcF+kWL6F
+         q7QlYv0JVpD/iNfPof872CmBfshe8Z53nCMDzlF3N7EndGtznv3dYHH+clImOtuqji
+         ZqsdBUZqZcP1A==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Measurement block format 1 is made available by the extended
-mesurement block facility and is indicated in the SCHIB by
-the bit in the PMCW.
+On Wed, Feb 10, 2021 at 07:52:08AM +0000, Tian, Kevin wrote:
+> > This subsystem framework will also ease on adding vendor specific
+> > functionality to VFIO devices in the future by allowing another module
+> > to provide the pci_driver that can setup number of details before
+> > registering to VFIO subsystem (such as inject its own operations).
+>=20
+> I'm a bit confused about the change from v1 to v2, especially about
+> how to inject module specific operations. From live migration p.o.v
+> it may requires two hook points at least for some devices (e.g. i40e=20
+> in original Yan's example):
 
-The MBO is specified in the SCHIB of each channel and the MBO
-defined by the SCHM instruction is ignored.
+IMHO, it was too soon to give up on putting the vfio_device_ops in the
+final driver- we should try to define a reasonable public/private
+split of vfio_pci_device as is the norm in the kernel. No reason we
+can't achieve that.
 
-The test of the MB format 1 is just skipped if the feature is
-not available.
+>  register a migration region and intercept guest writes to specific
+> registers. [PATCH 4/9] demonstrates the former but not the latter
+> (which is allowed in v1).
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/css.h | 14 ++++++++++++++
- s390x/css.c     | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
+And this is why, the ROI to wrapper every vfio op in a PCI op just to
+keep vfio_pci_device completely private is poor :(
 
-diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-index 5478f45..ee525f1 100644
---- a/lib/s390x/css.h
-+++ b/lib/s390x/css.h
-@@ -389,4 +389,18 @@ struct measurement_block_format0 {
- 	uint32_t initial_cmd_resp_time;
- };
- 
-+struct measurement_block_format1 {
-+	uint32_t ssch_rsch_count;
-+	uint32_t sample_count;
-+	uint32_t device_connect_time;
-+	uint32_t function_pending_time;
-+	uint32_t device_disconnect_time;
-+	uint32_t cu_queuing_time;
-+	uint32_t device_active_only_time;
-+	uint32_t device_busy_time;
-+	uint32_t initial_cmd_resp_time;
-+	uint32_t irq_delay_time;
-+	uint32_t irq_prio_delay_time;
-+};
-+
- #endif
-diff --git a/s390x/css.c b/s390x/css.c
-index f3fdc0c..ec5e365 100644
---- a/s390x/css.c
-+++ b/s390x/css.c
-@@ -246,6 +246,41 @@ end:
- 	report_prefix_pop();
- }
- 
-+static void test_schm_fmt1(void)
-+{
-+	struct measurement_block_format1 *mb1;
-+
-+	report_prefix_push("Format 1");
-+
-+	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
-+	if (!mb1) {
-+		report_abort("measurement_block_format1 allocation failed");
-+		goto end;
-+	}
-+
-+	schm(NULL, 0); /* Clear previous MB address */
-+	schm(0, SCHM_MBU);
-+
-+	/* Expect error for non aligned MB */
-+	report_prefix_push("Unaligned MB origin");
-+	report_xfail(start_measure((u64)mb1 + 1, 0, true), mb1->ssch_rsch_count != 0,
-+		     "SSCH measured %d", mb1->ssch_rsch_count);
-+	report_prefix_pop();
-+
-+	memset(mb1, 0, sizeof(*mb1));
-+
-+	/* Expect success */
-+	report_prefix_push("Valid MB address and index");
-+	report(start_measure((u64)mb1, 0, true) &&
-+	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
-+	       "SSCH measured %d", mb1->ssch_rsch_count);
-+	report_prefix_pop();
-+
-+	free_io_mem(mb1, sizeof(struct measurement_block_format1));
-+end:
-+	report_prefix_pop();
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
-@@ -257,6 +292,7 @@ static struct {
- 	{ "sense (ssch/tsch)", test_sense },
- 	{ "measurement block (schm)", test_schm },
- 	{ "measurement block format0", test_schm_fmt0 },
-+	{ "measurement block format1", test_schm_fmt1 },
- 	{ NULL, NULL }
- };
- 
--- 
-2.17.1
+> Then another question. Once we have this framework in place, do we=20
+> mandate this approach for any vendor specific tweak or still allow
+> doing it as vfio_pci_core extensions (such as igd and zdev in this
+> series)?
 
+I would say no to any further vfio_pci_core extensions that are tied
+to specific PCI devices. Things like zdev are platform features, they
+are not tied to specific PCI devices
+
+> If the latter, what is the criteria to judge which way is desired? Also w=
+hat=20
+> about the scenarios where we just want one-time vendor information,=20
+> e.g. to tell whether a device can tolerate arbitrary I/O page faults [1] =
+or
+> the offset in VF PCI config space to put PASID/ATS/PRI capabilities [2]?
+> Do we expect to create a module for each device to provide such info?
+> Having those questions answered is helpful for better understanding of
+> this proposal IMO. =F0=9F=98=8A
+>=20
+> [1] https://lore.kernel.org/kvm/d4c51504-24ed-2592-37b4-f390b97fdd00@huaw=
+ei.com/T/
+
+SVA is a platform feature, so no problem. Don't see a vfio-pci change
+in here?
+
+> [2] https://lore.kernel.org/kvm/20200407095801.648b1371@w520.home/
+
+This one could have been done as a broadcom_vfio_pci driver. Not sure
+exposing the entire config space unprotected is safe, hard to know
+what the device has put in there, and if it is secure to share with a
+guest..
+
+> MDEV core is already a well defined subsystem to connect mdev
+> bus driver (vfio-mdev) and mdev device driver (mlx5-mdev).
+
+mdev is two things
+
+ - a driver core bus layer and sysfs that makes a lifetime model
+ - a vfio bus driver that doesn't do anything but forward ops to the
+   main ops
+
+> vfio-mdev is just the channel to bring VFIO APIs through mdev core
+> to underlying vendor specific mdev device driver, which is already
+> granted flexibility to tweak whatever needs through mdev_parent_ops.
+
+This is the second thing, and it could just be deleted. The actual
+final mdev driver can just use vfio_device_ops directly. The
+redirection shim in vfio_mdev.c doesn't add value.
+
+> Then what exact extension is talked here by creating another subsystem
+> module? or are we talking about some general library which can be
+> shared by underlying mdev device drivers to reduce duplicated
+> emulation code?
+
+IMHO it is more a design philosophy that the end driver should
+implement the vfio_device_ops directly vs having a stack of ops
+structs.
+
+Jason
