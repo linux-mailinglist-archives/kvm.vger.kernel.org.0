@@ -2,20 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48AE53163B7
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 11:25:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48EAB3163BE
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 11:26:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbhBJKZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 05:25:04 -0500
-Received: from 8bytes.org ([81.169.241.247]:55220 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230484AbhBJKWk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 05:22:40 -0500
+        id S231126AbhBJKZb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 05:25:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230491AbhBJKWl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 05:22:41 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F175CC06174A;
+        Wed, 10 Feb 2021 02:22:00 -0800 (PST)
 Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
         (No client certificate requested)
-        by theia.8bytes.org (Postfix) with ESMTPSA id 9F5B747C;
-        Wed, 10 Feb 2021 11:21:57 +0100 (CET)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 27A3B48E;
+        Wed, 10 Feb 2021 11:21:58 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     x86@kernel.org
 Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
@@ -37,9 +40,9 @@ Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
         Arvind Sankar <nivedita@alum.mit.edu>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org
-Subject: [PATCH 5/7] x86/boot/compressed/64: Add CPUID sanity check to 32-bit boot-path
-Date:   Wed, 10 Feb 2021 11:21:33 +0100
-Message-Id: <20210210102135.30667-6-joro@8bytes.org>
+Subject: [PATCH 6/7] x86/boot/compressed/64: Check SEV encryption in 32-bit boot-path
+Date:   Wed, 10 Feb 2021 11:21:34 +0100
+Message-Id: <20210210102135.30667-7-joro@8bytes.org>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210210102135.30667-1-joro@8bytes.org>
 References: <20210210102135.30667-1-joro@8bytes.org>
@@ -51,77 +54,138 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-The 32-bit #VC handler has no GHCB and can only handle CPUID exit codes.
-It is needed by the early boot code to handle #VC exceptions raised in
-verify_cpu() and to get the position of the C bit.
-
-But the CPUID information comes from the hypervisor, which is untrusted
-and might return results which trick the guest into the no-SEV boot path
-with no C bit set in the page-tables. All data written to memory would
-then be unencrypted and could leak sensitive data to the hypervisor.
-
-Add sanity checks to the 32-bit boot #VC handler to make sure the
-hypervisor does not pretend that SEV is not enabled.
+Check whether the hypervisor reported the correct C-bit when running as
+an SEV guest. Using a wrong C-bit position could be used to leak
+sensitive data from the guest to the hypervisor.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- arch/x86/boot/compressed/mem_encrypt.S | 36 ++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/x86/boot/compressed/head_64.S     | 80 ++++++++++++++++++++++++++
+ arch/x86/boot/compressed/mem_encrypt.S |  1 +
+ 2 files changed, 81 insertions(+)
 
+diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+index eadaa0a082b8..047af1cba041 100644
+--- a/arch/x86/boot/compressed/head_64.S
++++ b/arch/x86/boot/compressed/head_64.S
+@@ -185,11 +185,18 @@ SYM_FUNC_START(startup_32)
+ 	 */
+ 	call	get_sev_encryption_bit
+ 	xorl	%edx, %edx
++#ifdef	CONFIG_AMD_MEM_ENCRYPT
+ 	testl	%eax, %eax
+ 	jz	1f
+ 	subl	$32, %eax	/* Encryption bit is always above bit 31 */
+ 	bts	%eax, %edx	/* Set encryption mask for page tables */
++	/*
++	 * Store the sme_me_mask as an indicator that SEV is active. It will be
++	 * set again in startup_64().
++	 */
++	movl	%edx, rva(sme_me_mask+4)(%ebp)
+ 1:
++#endif
+ 
+ 	/* Initialize Page tables to 0 */
+ 	leal	rva(pgtable)(%ebx), %edi
+@@ -274,6 +281,9 @@ SYM_FUNC_START(startup_32)
+ 	movl	%esi, %edx
+ 1:
+ #endif
++	/* Check if the C-bit position is correct when SEV is active */
++	call	sev_startup32_cbit_check
++
+ 	pushl	$__KERNEL_CS
+ 	pushl	%eax
+ 
+@@ -870,6 +880,76 @@ SYM_FUNC_START(startup32_load_idt)
+ 	ret
+ SYM_FUNC_END(startup32_load_idt)
+ #endif
++
++/*
++ * Check for the correct C-bit position when the startup_32 boot-path is used.
++ *
++ * The check makes use of the fact that all memory is encrypted when paging is
++ * disabled. The function creates 64 bits of random data using the RDRAND
++ * instruction. RDRAND is mandatory for SEV guests, so always available. If the
++ * hypervisor violates that the kernel will crash right here.
++ *
++ * The 64 bits of random data are stored to a memory location and at the same
++ * time kept in the %eax and %ebx registers. Since encryption is always active
++ * when paging is off the random data will be stored encrypted in main memory.
++ *
++ * Then paging is enabled. When the C-bit position is correct all memory is
++ * still mapped encrypted and comparing the register values with memory will
++ * succeed. An incorrect C-bit position will map all memory unencrypted, so that
++ * the compare will use the encrypted random data and fail.
++ */
++SYM_FUNC_START(sev_startup32_cbit_check)
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++	pushl	%eax
++	pushl	%ebx
++	pushl	%ecx
++	pushl	%edx
++
++	/* Check for non-zero sev_status */
++	movl	rva(sev_status)(%ebp), %eax
++	testl	%eax, %eax
++	jz	4f
++
++	/*
++	 * Get two 32-bit random values - Don't bail out if RDRAND fails
++	 * because it is better to prevent forward progress if no random value
++	 * can be gathered.
++	 */
++1:	rdrand	%eax
++	jnc	1b
++2:	rdrand	%ebx
++	jnc	2b
++
++	/* Store to memory and keep it in the registers */
++	movl	%eax, rva(sev_check_data)(%ebp)
++	movl	%ebx, rva(sev_check_data+4)(%ebp)
++
++	/* Enable paging to see if encryption is active */
++	movl	%cr0, %edx	/* Backup %cr0 in %edx */
++	movl	$(X86_CR0_PG | X86_CR0_PE), %ecx /* Enable Paging and Protected mode */
++	movl	%ecx, %cr0
++
++	cmpl	%eax, rva(sev_check_data)(%ebp)
++	jne	3f
++	cmpl	%ebx, rva(sev_check_data+4)(%ebp)
++	jne	3f
++
++	movl	%edx, %cr0	/* Restore previous %cr0 */
++
++	jmp	4f
++
++3:	/* Check failed - hlt the machine */
++	hlt
++	jmp	3b
++
++4:
++	popl	%edx
++	popl	%ecx
++	popl	%ebx
++	popl	%eax
++#endif
++	ret
++SYM_FUNC_END(sev_startup32_cbit_check)
+ /*
+  * Stack and heap for uncompression
+  */
 diff --git a/arch/x86/boot/compressed/mem_encrypt.S b/arch/x86/boot/compressed/mem_encrypt.S
-index 350ecb56c7e4..091502cde070 100644
+index 091502cde070..b80fed167903 100644
 --- a/arch/x86/boot/compressed/mem_encrypt.S
 +++ b/arch/x86/boot/compressed/mem_encrypt.S
-@@ -126,6 +126,34 @@ SYM_CODE_START(startup32_vc_handler)
- 	SEV_ES_REQ_CPUID fn=%ebx reg=3
- 	movl	%edx, (%esp)
+@@ -7,6 +7,7 @@
+  * Author: Tom Lendacky <thomas.lendacky@amd.com>
+  */
  
-+	/*
-+	 * Sanity check CPUID results from the Hypervisor. See comment in
-+	 * do_vc_no_ghcb() for more details on why this is necessary.
-+	 */
-+
-+	/* Fail if Hypervisor bit not set in CPUID[1].ECX[31] */
-+	cmpl    $1, %ebx
-+	jne     .Lcheck_leaf
-+	btl     $31, 4(%esp)
-+	jnc     .Lfail
-+	jmp     .Ldone
-+
-+.Lcheck_leaf:
-+	/* Fail if SEV leaf not available in CPUID[0x80000000].EAX */
-+	cmpl    $0x80000000, %ebx
-+	jne     .Lcheck_sev
-+	cmpl    $0x8000001f, 12(%esp)
-+	jb      .Lfail
-+	jmp     .Ldone
-+
-+.Lcheck_sev:
-+	/* Fail if SEV bit not set in CPUID[0x8000001f].EAX[1] */
-+	cmpl    $0x8000001f, %ebx
-+	jne     .Ldone
-+	btl     $1, 12(%esp)
-+	jnc     .Lfail
-+
-+.Ldone:
- 	popl	%edx
- 	popl	%ecx
- 	popl	%ebx
-@@ -139,6 +167,14 @@ SYM_CODE_START(startup32_vc_handler)
++#define rva(X) ((X) - startup_32)
+ #include <linux/linkage.h>
  
- 	iret
- .Lfail:
-+	/* Send terminate request to Hypervisor */
-+	movl    $0x100, %eax
-+	xorl    %edx, %edx
-+	movl    $MSR_AMD64_SEV_ES_GHCB, %ecx
-+	wrmsr
-+	rep; vmmcall
-+
-+	/* If request fails, go to hlt loop */
- 	hlt
- 	jmp .Lfail
- SYM_CODE_END(startup32_vc_handler)
+ #include <asm/processor-flags.h>
 -- 
 2.30.0
 
