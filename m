@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 231AA316EA0
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 19:30:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A209316EA4
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 19:30:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234094AbhBJS3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 13:29:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36202 "EHLO
+        id S234167AbhBJS3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 13:29:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234149AbhBJS06 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 13:26:58 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86304C061793
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:17 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id a12so2096062qvo.3
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:17 -0800 (PST)
+        with ESMTP id S234152AbhBJS1A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 13:27:00 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A54C061797
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:19 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id g17so754355ybh.4
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=JZ1+OeX1TQvRpSX6JVWSAIUPwsDYxG2Z3TWK9Qe0O5U=;
-        b=NfFuUEeo+s9u+tT8+c/ZsIpa4exSCJzAS5ypgoPfEefptNAPa7vv7w9wZsJhwDRjhl
-         IHTvI2lAI2kDu5osP8WWLS6XaoWEKHwTo1wFmdudx2DDti0whx0MZ9ecqlRTcoQvwSHP
-         UwBEe27vkJVFDsCrgO1lzIwnsZ46cBT2QqM8CXi0qiZe7dtnBf6gChHUWtI/MW8llzRj
-         0727GsQbZwC62YlQdfL1A0va57Ey5Kb+wDjRh7Encx9ta5jnZMJ18/P+4X1T/J4qZD/3
-         f+eglDIXE4QnxMrE3Bd4tROFQc5FtWEjKwsR48xU4EITj504ULALGIQE5EJC9y1eIVE9
-         pk5A==
+        bh=qP8W8fesy6rJnl8LFgqcqjLlutMaErDAaGGZqrc5ReM=;
+        b=IDp6SH8FucguzZwM8vydazWPuRkkyBURwiL/ZFhG83f5Q5Y+skiev5m88thBUBeLYl
+         Iay7T5UchXCsRJGKwHSl4hVNHJ/uBXakaJW5DzO7yZx/DyNf4TA8C9JFEoBsct6RZp0/
+         sKNwBbf3IFpvZbbYrwy15yEgKWeCtsA29trFbXPLw0+5eCelppO7mtBn+X/1IpXEQr70
+         iUilso7ROd+pLw5F43ylf16NL7Pyr8kl11UulCYa4UYzdZHZKsnhGvHosy94UoAabhaz
+         X1pvWU5032pfh2HnarV4zCvh06PlflO5u6EgP2Te3X8H5jJPaYw7yy+BC6lRWTPPQSOF
+         148g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=JZ1+OeX1TQvRpSX6JVWSAIUPwsDYxG2Z3TWK9Qe0O5U=;
-        b=npEOcS2D9rHRk6rmSCC9z7QPndRs21yAnfWuImQjVRtBbbVj7kmplAdOZyqufZmRH9
-         Btpa+DdJJRZV3gnrqDQLFH2NdtG5Kh8OFaE7DRa11+TXdL3l46R9V9j3DhMS/+i5RLdK
-         d0yEHEGmSKE6kxDdDndPQrP35ETQUjgvDUysbiW8saf0pqXaMs5UClSWGWeYbCW1hToy
-         FjBlDIacdkfZI8nuQOkYu/drSx985eTWT9NuliYfJX6AU7I/jFGUhIy/41+fF6YB0sUx
-         5Cvg5TdxzDnMSohpYKOJrg3rX9CrgQT0DtlSV4Qtrp7VR3kwX8mtZqHqCedj0TfA9ZPn
-         VrKw==
-X-Gm-Message-State: AOAM533Ba1eUrVD8WKTXPbg06au9IW/QvvUAA/+DP4LCixo/obT1zZLl
-        g9uRxC41lJoxF3ST75NAWnRsA3Kmh1M=
-X-Google-Smtp-Source: ABdhPJzxWDnH96alg+/xCqZ29NSwweiSbYq+2GZDKyN3IOAUJdc5jlmCZGKSGBCfA+Ulq5gRHfJa+xRx7AU=
+        bh=qP8W8fesy6rJnl8LFgqcqjLlutMaErDAaGGZqrc5ReM=;
+        b=DE7N/JaLq/fDkhoOaQkTVkVWfrrps2mZkuytu6sW8OGi8ocbRQsrV9h/YgAuFJ9mn6
+         BCVdPh5zVGz9WJ476eIEP/pG1FQ1IWGxT1EZzZQA6rQXW1GN3v61411cbtsLLmF6vjQ+
+         ZZ+wdJwXI/uHeR4tYaRmBaNyTJkJu4xZSyzuXU9HyfRUJ4iLNCYjNQ0pxob5+SwGnHi2
+         AVHT6UA8xBuCh5qv5KmrC74gLxFZQgr1Ebrkb08nsbJYyJ8kpANumiqnRYiyA0ssRVE1
+         8NVCRoJIBdc0yTHcbccLFXtO2RXGYPskdmxf6+PFyGRvmXB/di17NMtSt9MEGq6w9lZi
+         aEOA==
+X-Gm-Message-State: AOAM532m9eI0LENAYXZz5cQ1MxixVx+p3bcZ5zXlhTiFprjSFWiQbGaz
+        HN90vXWyMfsy8cno7J3eljI5QkBRP+Y=
+X-Google-Smtp-Source: ABdhPJyTPd8l9+mGvnSeTAJBG98ENRZMMYVImrNTwMJ6HjhsDvl2vtCgsZfrvQuK99U9B1lHIpDbTDAOWVM=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
- (user=seanjc job=sendgmr) by 2002:a0c:fa51:: with SMTP id k17mr425208qvo.29.1612981576645;
- Wed, 10 Feb 2021 10:26:16 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:ad26:: with SMTP id y38mr6225800ybi.391.1612981579216;
+ Wed, 10 Feb 2021 10:26:19 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 10 Feb 2021 10:26:05 -0800
+Date:   Wed, 10 Feb 2021 10:26:06 -0800
 In-Reply-To: <20210210182609.435200-1-seanjc@google.com>
-Message-Id: <20210210182609.435200-2-seanjc@google.com>
+Message-Id: <20210210182609.435200-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210210182609.435200-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 1/5] KVM: selftests: Ignore recently added Xen tests' build output
+Subject: [PATCH 2/5] KVM: selftests: Fix size of memslots created by Xen tests
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,26 +66,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the new Xen test binaries to KVM selftest's .gitnore.
+For better or worse, the memslot APIs take the number of pages, not the
+size in bytes.  The Xen tests need 2 pages, not 8192 pages.
 
+Fixes: 8d4e7e80838f ("KVM: x86: declare Xen HVM shared info capability and add test case")
+Cc: David Woodhouse <dwmw@amazon.co.uk>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 3 +--
+ tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 1b32c97f8c82..3a84394829ea 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -26,6 +26,8 @@
- /x86_64/vmx_set_nested_state_test
- /x86_64/vmx_tsc_adjust_test
- /x86_64/xapic_ipi_test
-+/x86_64/xen_shinfo_test
-+/x86_64/xen_vmcall_test
- /x86_64/xss_msr_test
- /x86_64/vmx_pmu_msrs_test
- /demand_paging_test
+diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+index bdb3feb86b5b..cb3963957b3b 100644
+--- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+@@ -79,8 +79,7 @@ int main(int argc, char *argv[])
+ 
+ 	/* Map a region for the shared_info page */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+-                                    SHINFO_REGION_GPA, SHINFO_REGION_SLOT,
+-				    2 * getpagesize(), 0);
++				    SHINFO_REGION_GPA, SHINFO_REGION_SLOT, 2, 0);
+ 	virt_map(vm, SHINFO_REGION_GPA, SHINFO_REGION_GPA, 2, 0);
+ 
+ 	struct kvm_xen_hvm_config hvmc = {
+diff --git a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
+index 86653361c695..8389e0bfd711 100644
+--- a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
+@@ -102,8 +102,7 @@ int main(int argc, char *argv[])
+ 
+ 	/* Map a region for the hypercall pages */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+-                                    HCALL_REGION_GPA, HCALL_REGION_SLOT,
+-				    2 * getpagesize(), 0);
++				    HCALL_REGION_GPA, HCALL_REGION_SLOT, 2, 0);
+ 	virt_map(vm, HCALL_REGION_GPA, HCALL_REGION_GPA, 2, 0);
+ 
+ 	for (;;) {
 -- 
 2.30.0.478.g8a0d178c01-goog
 
