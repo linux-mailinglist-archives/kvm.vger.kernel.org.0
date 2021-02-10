@@ -2,98 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 431D43173F9
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 00:09:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D27D5317426
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 00:16:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234061AbhBJXJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 18:09:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233897AbhBJXIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 18:08:54 -0500
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF3FDC061A28
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 15:07:07 -0800 (PST)
-Received: by mail-qk1-x749.google.com with SMTP id p185so2969836qkc.9
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 15:07:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=i/onZ3KiqIHBpv3eMUYx1zyRXltUgIE1V0UnnfUHTlU=;
-        b=cduvZoyAs6pKakf+DUM0JAes2PTO8Xs8SjSx1xNAQRHLUo21knOelo8gzCqGwDHQqB
-         KpP8TQfaQ9yfySQnM6cjOuNQvYt32rnyADYp42LMjK6RdTFJ2l+huXmQKxBDCHeAxkbE
-         v0snVtPybCrxaPnQfXhkc+FzGqFk7EmHzgwtTNC0D8r6b7cYlVA1KXdsG9t7nqC0gTAn
-         tyC1xAVjrMUsD8INIhne/bi2tsAdfhFmmtnDGoIuln/MNT1aqZBwDVdOtXO9p8LZCpX3
-         PBRUIlbJ3OQ4K1YsvOrElg48KybP6ODa07Qo7GJY2WoaJ1U2YMBiJH6U/QM4CWcHclqd
-         i8HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=i/onZ3KiqIHBpv3eMUYx1zyRXltUgIE1V0UnnfUHTlU=;
-        b=tWkTfAux8EQ7QJ9oniH/BK/vnaHCYGe1R6E50Dtk/f+oNy+sc7oqAOzJrGy5uR4J5H
-         qoz+kVhA4XmEF74X9wWUG/wFKlNwemYRIktgbLDSAFPOwX1lNnEubpbFsv7wEvPhTyBH
-         LUa8eW6/ObFRW+31rUO+WUthHKUmxiPtJ8NYfrPwlA+St1dlAGEx+ftsNZpB1n/LzTCm
-         +HQy13xA+EO8u/3lFESBDckAD0G5joOV19GXoJ3atnCzknZZMB+0luvTjknDYIpaUx9H
-         2UCxpOD1XcUJyVjZCTQNS2EtQzZ0/Tldm6wCESDEfVY2A5vwP+3WRjv6MWISxBKTbdh3
-         wXmg==
-X-Gm-Message-State: AOAM533MjOsKk4SAhfIj+DkXjrD2rNfEFcLlVsAeoqOXDaIxFahqfWST
-        WFai40DNDyWfKw58WT4+GQrHtZxYiD0=
-X-Google-Smtp-Source: ABdhPJzGJXgDaZRgmcj37pw6FCoVQ458rPN2FxbCfzyyF0dPrmlaITMAuJKlttUJ5rXiMxCAJaeo4VbIPeY=
-Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
-X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
- (user=seanjc job=sendgmr) by 2002:a05:6214:10e7:: with SMTP id
- q7mr5120746qvt.16.1612998426830; Wed, 10 Feb 2021 15:07:06 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 10 Feb 2021 15:06:25 -0800
-In-Reply-To: <20210210230625.550939-1-seanjc@google.com>
-Message-Id: <20210210230625.550939-16-seanjc@google.com>
+        id S233927AbhBJXP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 18:15:58 -0500
+Received: from mga12.intel.com ([192.55.52.136]:59962 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234366AbhBJXNH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 18:13:07 -0500
+IronPort-SDR: ose5+5MLuk1UhGX86n0jV4riMQ5sx4imqVPq4cgqumwdL13cQxrioYQLmmvFF2MfO2GOntrDXv
+ qjNbbXIxp7UA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9891"; a="161312464"
+X-IronPort-AV: E=Sophos;i="5.81,169,1610438400"; 
+   d="scan'208";a="161312464"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 15:12:22 -0800
+IronPort-SDR: 2Nmz5lwLG+yiGinCih9E8NYBbCP534jpDXDyZJwKG6K0zPob5ypBU4Ph1vsV2wyhGF7WDTuDJX
+ AOz7XvnWjmwA==
+X-IronPort-AV: E=Sophos;i="5.81,169,1610438400"; 
+   d="scan'208";a="489344248"
+Received: from gadalarx-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.252.135.39])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 15:12:18 -0800
+Date:   Thu, 11 Feb 2021 12:12:16 +1300
+From:   Kai Huang <kai.huang@intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, linux-sgx@vger.kernel.org,
+        kvm@vger.kernel.org, x86@kernel.org, luto@kernel.org,
+        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
+        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com
+Subject: Re: [RFC PATCH v4 05/26] x86/sgx: Introduce virtual EPC for use by
+ KVM guests
+Message-Id: <20210211121216.bb9a9430eee1f2fd43702e93@intel.com>
+In-Reply-To: <YCQPSUNFlWd/s+up@google.com>
+References: <cover.1612777752.git.kai.huang@intel.com>
+        <11a923a314accf36a82aac4b676310a4802f5c75.1612777752.git.kai.huang@intel.com>
+        <YCL8ErAGKNSnX2Up@kernel.org>
+        <YCL8eNNfuo2k5ghO@kernel.org>
+        <9aebc8e6-cff5-b2b4-04af-d3968a3586dc@intel.com>
+        <ec9604199072e185de4b6b74209e84f30423c5e3.camel@intel.com>
+        <YCQPSUNFlWd/s+up@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 Mime-Version: 1.0
-References: <20210210230625.550939-1-seanjc@google.com>
-X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 15/15] KVM: selftests: Get rid of gorilla math in memslots
- modification test
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the recently added perf_test_args.nr_bytes to define the location of
-the dummy memslot created/removed by the memslot modification test.
-Presumably, the goal of the existing code is simply to ensure the GPA of
-the dummy memslot doesn't overlap with perf_test's memslot.
+On Wed, 10 Feb 2021 08:52:25 -0800 Sean Christopherson wrote:
+> On Wed, Feb 10, 2021, Kai Huang wrote:
+> > On Tue, 2021-02-09 at 13:36 -0800, Dave Hansen wrote:
+> > > On 2/9/21 1:19 PM, Jarkko Sakkinen wrote:
+> > > > > Without that clearly documented, it would be unwise to merge this.
+> > > > E.g.
+> > > > 
+> > > > - Have ioctl() to turn opened fd as vEPC.
+> > > > - If FLC is disabled, you could only use the fd for creating vEPC.
+> > > > 
+> > > > Quite easy stuff to implement.
+> 
+> ...
+> 
+> > What's your opinion? Did I miss anything?
+> 
+> Frankly, I think trying to smush them together would be a complete trainwreck.
+> 
+> The vast majority of flows would need to go down completely different paths, so
+> you'd end up with code like this:
+> 
+> diff --git a/arch/x86/kernel/cpu/sgx/driver.c b/arch/x86/kernel/cpu/sgx/driver.c
+> index f2eac41bb4ff..5128043c7871 100644
+> --- a/arch/x86/kernel/cpu/sgx/driver.c
+> +++ b/arch/x86/kernel/cpu/sgx/driver.c
+> @@ -46,6 +46,9 @@ static int sgx_release(struct inode *inode, struct file *file)
+>         struct sgx_encl *encl = file->private_data;
+>         struct sgx_encl_mm *encl_mm;
+>  
+> +       if (encl->not_an_enclave)
+> +               return sgx_virt_epc_release(encl);
+> +
+>         /*
+>          * Drain the remaining mm_list entries. At this point the list contains
+>          * entries for processes, which have closed the enclave file but have
+> @@ -83,6 +86,9 @@ static int sgx_mmap(struct file *file, struct vm_area_struct *vma)
+>         struct sgx_encl *encl = file->private_data;
+>         int ret;
+>  
+> +       if (encl->not_an_enclave)
+> +               return sgx_virt_epc_mmap(encl, vma);
+> +
+>         ret = sgx_encl_may_map(encl, vma->vm_start, vma->vm_end, vma->vm_flags);
+>         if (ret)
+>                 return ret;
+> @@ -104,6 +110,11 @@ static unsigned long sgx_get_unmapped_area(struct file *file,
+>                                            unsigned long pgoff,
+>                                            unsigned long flags)
+>  {
+> +       struct sgx_encl *encl = file->private_data;
+> +
+> +       if (encl->not_an_enclave)
+> +               return sgx_virt_epc_mmap(encl, addr, len, pgoff, flags);
+> +
+>         if ((flags & MAP_TYPE) == MAP_PRIVATE)
+>                 return -EINVAL;
+> 
+> I suspect it would also be tricky to avoid introducing races, since anything that
+> is different for virtual EPC would have a dependency on the ioctl() being called.
+> 
+> This would also prevent making /dev/sgx_enclave root-only while allowing users
+> access to /dev/sgx_vepc.  Forcing admins to use LSMs to do the same is silly.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../testing/selftests/kvm/memslot_modification_stress_test.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Agreed. This is really a good point. Two different device nodes allows
+different permission control. Thanks.
 
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index 5ea9d7ef248e..cfc2b75619ba 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -114,10 +114,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	add_remove_memslot(vm, p->memslot_modification_delay,
- 			   p->nr_memslot_modifications,
--			   perf_test_args.gpa +
--			   (guest_percpu_mem_size * nr_vcpus) +
--			   getpagesize() +
--			   perf_test_args.guest_page_size);
-+			   perf_test_args.gpa + perf_test_args.nr_bytes);
- 
- 	run_vcpus = false;
- 
--- 
-2.30.0.478.g8a0d178c01-goog
-
+> 
+> For the few flows that can share code, just split out the common bits to helpers.
