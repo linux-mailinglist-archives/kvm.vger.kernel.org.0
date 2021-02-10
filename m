@@ -2,108 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4473B316472
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 11:59:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23AD03164A4
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 12:08:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbhBJK5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 05:57:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49505 "EHLO
+        id S229985AbhBJLIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 06:08:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27200 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231536AbhBJKzL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 05:55:11 -0500
+        by vger.kernel.org with ESMTP id S231594AbhBJLGm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Feb 2021 06:06:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612954425;
+        s=mimecast20190719; t=1612955113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UEBDm7SunPwkF3BoWeRyw0Tj/EvMcHXNW6J7Hdf+1LU=;
-        b=A/FkpYPuv6kU7owQmlZfDS1t8XmBumYRiI/3S92uMwEgKibQlNStQmQ1xuBw0C0K7vnEWn
-        yKMKvu4eyefNGYhmZKaVL/Rrjs+bc+uRFwV/HzcdjOrtDr0kprfF2AJEtwlh8HiF4L5G0A
-        LU9hkWosqlGUEwYe1Y5DrdWTXeOiQt8=
+        bh=z3pAfZk6r3KZwOINV4f5Aj8wihUC0MavkIHBBzDY0Q0=;
+        b=eKIBvYiE/BUF2EQYbUBe70FsZlDpthaxAexQhwAIC/ChAlXVQuHIqsu/KASmhGj5AYLsGv
+        siIgsMdnDK87om4tavZw0jjsbRFwDIBFsk4Ba9ylrUTYh7jV2Gwy1f+f5NewGgoKCRZDnh
+        +0BHNRW9Bb26S7LTDDJzPmMBTQdwS+A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-FZDUxRX4OaKcuyzYEPpJlQ-1; Wed, 10 Feb 2021 05:53:43 -0500
-X-MC-Unique: FZDUxRX4OaKcuyzYEPpJlQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-187-e5DvYtAqNzy5917UfTfg5w-1; Wed, 10 Feb 2021 06:05:11 -0500
+X-MC-Unique: e5DvYtAqNzy5917UfTfg5w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B3D6107ACC7;
-        Wed, 10 Feb 2021 10:53:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D045803F47;
+        Wed, 10 Feb 2021 11:05:10 +0000 (UTC)
 Received: from gondolin (ovpn-113-113.ams2.redhat.com [10.36.113.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0345C627DA;
-        Wed, 10 Feb 2021 10:53:36 +0000 (UTC)
-Date:   Wed, 10 Feb 2021 11:53:34 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B234210074FC;
+        Wed, 10 Feb 2021 11:05:03 +0000 (UTC)
+Date:   Wed, 10 Feb 2021 12:05:01 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210210115334.46635966.cohuck@redhat.com>
-In-Reply-To: <20210209194830.20271-2-akrowiak@linux.ibm.com>
-References: <20210209194830.20271-1-akrowiak@linux.ibm.com>
-        <20210209194830.20271-2-akrowiak@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH] Fix the length in the stsi check for the
+ VM name
+Message-ID: <20210210120501.0e492991.cohuck@redhat.com>
+In-Reply-To: <20210209155705.67601-1-thuth@redhat.com>
+References: <20210209155705.67601-1-thuth@redhat.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue,  9 Feb 2021 14:48:30 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Tue,  9 Feb 2021 16:57:05 +0100
+Thomas Huth <thuth@redhat.com> wrote:
 
-> This patch fixes a circular locking dependency in the CI introduced by
-> commit f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
-> pointer invalidated"). The lockdep only occurs when starting a Secure
-> Execution guest. Crypto virtualization (vfio_ap) is not yet supported for
-> SE guests; however, in order to avoid CI errors, this fix is being
-> provided.
+> sizeof(somepointer) results in the size of the pointer, i.e. 8 on a
+> 64-bit system, so the
 > 
-> The circular lockdep was introduced when the masks in the guest's APCB
-> were taken under the matrix_dev->lock. While the lock is definitely
-> needed to protect the setting/unsetting of the KVM pointer, it is not
-> necessarily critical for setting the masks, so this will not be done under
-> protection of the matrix_dev->lock.
+>  memcmp(data->ext_names[0], vm_name_ext, sizeof(vm_name_ext))
 > 
-> Fixes: f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> only compared the first 8 characters of the VM name here. Switch
+> to a proper array to get the sizeof() right.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  drivers/s390/crypto/vfio_ap_ops.c | 75 ++++++++++++++++++-------------
->  1 file changed, 45 insertions(+), 30 deletions(-)
-> 
+>  s390x/stsi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
->  static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
->  {
-> -	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> -	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> -	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> -	kvm_put_kvm(matrix_mdev->kvm);
-> -	matrix_mdev->kvm = NULL;
-> +	if (matrix_mdev->kvm) {
-
-If you're doing setting/unsetting under matrix_dev->lock, is it
-possible that matrix_mdev->kvm gets unset between here and the next
-line, as you don't hold the lock?
-
-Maybe you could
-- grab a reference to kvm while holding the lock
-- call the mask handling functions with that kvm reference
-- lock again, drop the reference, and do the rest of the processing?
-
-> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> +		mutex_lock(&matrix_dev->lock);
-> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> +		kvm_put_kvm(matrix_mdev->kvm);
-> +		matrix_mdev->kvm = NULL;
-> +		mutex_unlock(&matrix_dev->lock);
-> +	}
->  }
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
