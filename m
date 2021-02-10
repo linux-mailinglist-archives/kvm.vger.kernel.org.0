@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43080316E9E
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 19:29:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 231AA316EA0
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 19:30:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233998AbhBJS3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 13:29:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36192 "EHLO
+        id S234094AbhBJS3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 13:29:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234142AbhBJS0z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 13:26:55 -0500
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06931C06178C
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:15 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id t5so2264949qti.5
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:14 -0800 (PST)
+        with ESMTP id S234149AbhBJS06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 13:26:58 -0500
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86304C061793
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:17 -0800 (PST)
+Received: by mail-qv1-xf49.google.com with SMTP id a12so2096062qvo.3
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 10:26:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=q+sIuVQJ6KcFkT5QFvyQWYzcdJ2lh3h/xyy/iLNsRYQ=;
-        b=di8qVqiUnwbZq+drUX5B4zxZ1i2Q93eORZ9i+xxj1lYzZzLPlYGgYljubSs5OY3tFS
-         mYD3hl33pPNMC+maQ5KN8CfmbqqmoOQYr0E/fFKZip9vd/CscLrYAvff2xvLEnyk0loB
-         gNG1WQhQKEBKiOuRQsD9xqjogNHt61/i5hpz573lRwpLmGRmDBbLQPcoRkZJl9Kr7k5j
-         nofOLI/uzrLCKrM8gP6jpHO0hnJ6+OjFb9N4T+r2vsAkErDblZIns4dJ3fPOA8da1WvX
-         B1RsREoFbnqXDGw0hRBspd9eIXSNxDO0rYqXl3HpEaPV2PYejQ65w2po74pXslOOvlNl
-         l3rA==
+        h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
+         :subject:from:to:cc;
+        bh=JZ1+OeX1TQvRpSX6JVWSAIUPwsDYxG2Z3TWK9Qe0O5U=;
+        b=NfFuUEeo+s9u+tT8+c/ZsIpa4exSCJzAS5ypgoPfEefptNAPa7vv7w9wZsJhwDRjhl
+         IHTvI2lAI2kDu5osP8WWLS6XaoWEKHwTo1wFmdudx2DDti0whx0MZ9ecqlRTcoQvwSHP
+         UwBEe27vkJVFDsCrgO1lzIwnsZ46cBT2QqM8CXi0qiZe7dtnBf6gChHUWtI/MW8llzRj
+         0727GsQbZwC62YlQdfL1A0va57Ey5Kb+wDjRh7Encx9ta5jnZMJ18/P+4X1T/J4qZD/3
+         f+eglDIXE4QnxMrE3Bd4tROFQc5FtWEjKwsR48xU4EITj504ULALGIQE5EJC9y1eIVE9
+         pk5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
-         :subject:from:to:cc;
-        bh=q+sIuVQJ6KcFkT5QFvyQWYzcdJ2lh3h/xyy/iLNsRYQ=;
-        b=kKb7rf6Zk4Sgdg0k3FMvGCshKxvzN94EnNA4pKXnQFD3Cwm8CrO+9/cNhJNE7SjfPs
-         z8OR2G7FyVN3C1qSKDj5uPsbmsbdI2Wu05gJNq7TvbNxX2Es2VIeJAfL7xwkinrkeX4V
-         gxOzxt4jduWLsPZwFAaJT6fgbi0G+J82n5xcZyWpjUF9+ZLEjquo4zsV/df7/MWkp+sE
-         QVP1LHOL9DXePUIHl22EyjXV3IGPwDPUSTCvDwH/WpbE7spViRJvKwWPgEpC+3yfQ4J6
-         WfrQPlqu5c03Sp0rs04P/GC5JJB9TniKwcWRkIrZEepxFBAredXf7Rp/GfWoL0RhNJaD
-         Riag==
-X-Gm-Message-State: AOAM5338GnGsx0hAsMGif6a97Qhn+EXxwU/c1hyjh0Q2UwWnHMrL4uak
-        T7eFL28B0J6WiCtSbtrQ2XtNiaLP3ew=
-X-Google-Smtp-Source: ABdhPJwWYtIBmeRMFFyrmnZp1CUY6dAfZLe3CPlBHlBdXORhWl9XfX/dsq8lvN1lhUh4QsJWeuA70xZbYLA=
+        h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
+         :mime-version:references:subject:from:to:cc;
+        bh=JZ1+OeX1TQvRpSX6JVWSAIUPwsDYxG2Z3TWK9Qe0O5U=;
+        b=npEOcS2D9rHRk6rmSCC9z7QPndRs21yAnfWuImQjVRtBbbVj7kmplAdOZyqufZmRH9
+         Btpa+DdJJRZV3gnrqDQLFH2NdtG5Kh8OFaE7DRa11+TXdL3l46R9V9j3DhMS/+i5RLdK
+         d0yEHEGmSKE6kxDdDndPQrP35ETQUjgvDUysbiW8saf0pqXaMs5UClSWGWeYbCW1hToy
+         FjBlDIacdkfZI8nuQOkYu/drSx985eTWT9NuliYfJX6AU7I/jFGUhIy/41+fF6YB0sUx
+         5Cvg5TdxzDnMSohpYKOJrg3rX9CrgQT0DtlSV4Qtrp7VR3kwX8mtZqHqCedj0TfA9ZPn
+         VrKw==
+X-Gm-Message-State: AOAM533Ba1eUrVD8WKTXPbg06au9IW/QvvUAA/+DP4LCixo/obT1zZLl
+        g9uRxC41lJoxF3ST75NAWnRsA3Kmh1M=
+X-Google-Smtp-Source: ABdhPJzxWDnH96alg+/xCqZ29NSwweiSbYq+2GZDKyN3IOAUJdc5jlmCZGKSGBCfA+Ulq5gRHfJa+xRx7AU=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
- (user=seanjc job=sendgmr) by 2002:a0c:fdec:: with SMTP id m12mr3978002qvu.11.1612981574160;
- Wed, 10 Feb 2021 10:26:14 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:fa51:: with SMTP id k17mr425208qvo.29.1612981576645;
+ Wed, 10 Feb 2021 10:26:16 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 10 Feb 2021 10:26:04 -0800
-Message-Id: <20210210182609.435200-1-seanjc@google.com>
+Date:   Wed, 10 Feb 2021 10:26:05 -0800
+In-Reply-To: <20210210182609.435200-1-seanjc@google.com>
+Message-Id: <20210210182609.435200-2-seanjc@google.com>
 Mime-Version: 1.0
+References: <20210210182609.435200-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 0/5]  KVM: x86/xen: Selftest fixes and a cleanup
+Subject: [PATCH 1/5] KVM: selftests: Ignore recently added Xen tests' build output
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -63,29 +66,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a '40' vs '0x40' bug in the new Xen shinfo selftest, and clean up some
-other oddities that made root causing the problem far more painful than it
-needed to be.
+Add the new Xen test binaries to KVM selftest's .gitnore.
 
-Note, Paolo already queued a patch from Vitaly that adds the tests to
-.gitignore[*], i.e. patch 01 can likely be dropped.  I included it here
-for completeness.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/.gitignore | 2 ++
+ 1 file changed, 2 insertions(+)
 
-[*] https://lkml.kernel.org/r/20210129161821.74635-1-vkuznets@redhat.com
-
-Sean Christopherson (5):
-  KVM: selftests: Ignore recently added Xen tests' build output
-  KVM: selftests: Fix size of memslots created by Xen tests
-  KVM: selftests: Fix hex vs. decimal snafu in Xen test
-  KVM: sefltests: Don't bother mapping GVA for Xen shinfo test
-  KVM: x86/xen: Explicitly pad struct compat_vcpu_info to 64 bytes
-
- arch/x86/kvm/xen.h                                   | 11 ++++++-----
- tools/testing/selftests/kvm/.gitignore               |  2 ++
- tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 12 +++++-------
- tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c |  3 +--
- 4 files changed, 14 insertions(+), 14 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 1b32c97f8c82..3a84394829ea 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -26,6 +26,8 @@
+ /x86_64/vmx_set_nested_state_test
+ /x86_64/vmx_tsc_adjust_test
+ /x86_64/xapic_ipi_test
++/x86_64/xen_shinfo_test
++/x86_64/xen_vmcall_test
+ /x86_64/xss_msr_test
+ /x86_64/vmx_pmu_msrs_test
+ /demand_paging_test
 -- 
 2.30.0.478.g8a0d178c01-goog
 
