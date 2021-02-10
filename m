@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C00C316FA4
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 20:08:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BAEC31702B
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 20:32:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233462AbhBJTHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 14:07:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44674 "EHLO
+        id S234498AbhBJTc1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 14:32:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234443AbhBJTGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 14:06:48 -0500
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA189C061574
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 11:06:32 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id e17so4286503ljl.8
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 11:06:32 -0800 (PST)
+        with ESMTP id S234242AbhBJTc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 14:32:26 -0500
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68623C061574
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 11:31:44 -0800 (PST)
+Received: by mail-lj1-x232.google.com with SMTP id f8so4428836ljk.3
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 11:31:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:subject:from:to:cc:date:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=dlCkTHW6v3wuKIyeRxUAhTY2r6TzEjCfgUSAg7p1mZ8=;
-        b=s77gX2HnUjMBEQCDSatH+9PuEenPzrViXT9tYFrybxkD1Ax0S0VtspNHOQLlrRCFJ6
-         uia4Rz8i6ehT/NdE8j9jDeRdOHaCBwoDp0aWqtFLMjtkZE4TOWKsgENqoZ+SiR2Ccqx2
-         ewu5/20A44yJHLNsZZzQ2GFWTFYTf1NF9ZmPJUjnf77K+gJQ7Ak5XSR2d7blta4uTmF3
-         csaKfqQ4XX5s3rK3FyWfuTdLkBsGFiiZH5wXjBYqMh8I0qU8iIzpiV67d6xuDBuTbAmP
-         G65K9SR7HUjI9YKDQoXIOcywMjTCntrhqCX1pelllIg1EjXF36QiihNRZKqDrJe+Mg59
-         v4dw==
+        bh=Asn0BBkKuN7LBG58e1eML76CuTXGHpEPS41qheY7GrM=;
+        b=P+lr1B4HOIjTAsc67zp5bXqCkMpN4KTOC0Y5fPsPSSNBAzLRpxkhu8D3jbxvUTg8Zv
+         R7U8/TugUCtoKJV/sZzfmCFXjyCBXuN26zLvyj3gL/ti40psYVv+WIZJ4CEJidKy6sXX
+         MIJqyrMj/icstFNC9geg1tHl0LJg6fO0ucds+XIvJ07c1unM9JJ1Ji2LOeefxE27e6ij
+         Dgr9nJnT+VqvX6PtvyZqbH9IgKbkj9nbWIp8RwVNEpISdo/UJLPiUdDZ7xakooXCXFcS
+         YQj3c+9cD5+C00oITf1s7fjCMLaJs4RU7DN1DbswUkFH0n0DtlKLAG9csZ/6cLoQnh0F
+         onGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=dlCkTHW6v3wuKIyeRxUAhTY2r6TzEjCfgUSAg7p1mZ8=;
-        b=mz9RRpLX7n9IL2hMt+8IfLsI2z52YkFD74cVShF96DMx/3TL1hQLOgtkVLu0b3y1JX
-         ogDo9irbb8UgkOVWY5gIrWzF9yHKACL7ZvHLg1EZREyOlooJKigiga6taiov0+2oBybd
-         KuA+zCcE8fABcjaSf++7NHdzh6hqwMul2nZuzD3p6b16Pxtnt1iKj6iPAldGmntXTKPf
-         U3Wm/yZY4MI5B00nU1VhX9Ly1WIKAZCKBCkNZdDpOGbtlM8nXC6MjOtBqnpHRfQM7H70
-         TQweO1BF2r1V3z6GxsL5QL+5ewCipQO3g7iMjJDdhHcufpQQYKqs3Z8RTHihZtGAKC83
-         g/kw==
-X-Gm-Message-State: AOAM530bLI0AryoTG/KHCslXcOyMpye7Ks0bSeDiMuY75l+tyeoS4hiL
-        vtWEIYay5iasCwN1wrXMA7w=
-X-Google-Smtp-Source: ABdhPJzlffkHSUAORqKIgFVgT/8IahetO9kuzL7dl9G8tj8AUqa0EHOZPBrzrjssqa7kby6UMXPrlw==
-X-Received: by 2002:a2e:9a96:: with SMTP id p22mr2838505lji.403.1612983991029;
-        Wed, 10 Feb 2021 11:06:31 -0800 (PST)
+        bh=Asn0BBkKuN7LBG58e1eML76CuTXGHpEPS41qheY7GrM=;
+        b=UKY+yenOuF58RM+kK7IvQSwdUgBDrFiFrX3GP3cfE4WRhVWAaZ8hfVmnyryI68dZMj
+         nKIN/Db9Squ+PY9ade2y88Sie7556tqWLIi1+m4PuzdKhCCaJ3gruTZOtItU5z9sMgio
+         x8X85qyjv0YhqTM492SXu0LoKLtHhGcHypV7jBfaqCQkNxVVMdRJgzib6fHLCL1sIBLX
+         D3maFOu17GYu1/422QIT8u9CHXKM7aPCyU61b3qotIC3SFeOr3Zcx5o42FrNnNqqF1y/
+         HDhOQBXKbegBHEWYs6tk0HSWwZ/QXC/V6xuBf+d3kUuIJsGFJd0/DjkxNcDezJVvcibm
+         dZUA==
+X-Gm-Message-State: AOAM533RMf1YmI/YrgwLL/dCOLbg9EYx5FUIkwWYJ6N+DU/nWKCmYW3s
+        HxWS6+zUcDj9guKG7MwJQm8=
+X-Google-Smtp-Source: ABdhPJxXgH4aTDR9jGq8kEck09675YP3l8Rg0nDaNd3fulJCVB+fIANWUzR6JcEMi/g1v6eJ0W+xlg==
+X-Received: by 2002:a2e:b178:: with SMTP id a24mr2774068ljm.484.1612985502649;
+        Wed, 10 Feb 2021 11:31:42 -0800 (PST)
 Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id o11sm430948lfu.157.2021.02.10.11.06.29
+        by smtp.gmail.com with ESMTPSA id z20sm434192lfj.178.2021.02.10.11.31.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Feb 2021 11:06:30 -0800 (PST)
-Message-ID: <200c51d2aa23ea814ca869e5c07337758ee868c9.camel@gmail.com>
-Subject: Re: [RFC v2 2/4] KVM: x86: add support for ioregionfd signal
- handling
+        Wed, 10 Feb 2021 11:31:42 -0800 (PST)
+Message-ID: <da345926a4689016296970d62d4432bb9abdc7b7.camel@gmail.com>
+Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for
+ KVM_SET_IOREGION
 From:   Elena Afanasova <eafanasova@gmail.com>
 To:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org
 Cc:     stefanha@redhat.com, jag.raman@oracle.com,
         elena.ufimtseva@oracle.com
-Date:   Wed, 10 Feb 2021 11:06:16 -0800
-In-Reply-To: <909c71c9-e83e-e6d8-0a33-92dac5b0b5c6@redhat.com>
+Date:   Wed, 10 Feb 2021 11:31:30 -0800
+In-Reply-To: <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
 References: <cover.1611850290.git.eafanasova@gmail.com>
-         <aa049c6e5bade3565c5ffa820bbbb67bd5d1bf4b.1611850291.git.eafanasova@gmail.com>
-         <909c71c9-e83e-e6d8-0a33-92dac5b0b5c6@redhat.com>
+         <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
+         <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
@@ -67,799 +67,583 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-02-09 at 14:21 +0800, Jason Wang wrote:
-> On 2021/1/29 上午2:32, Elena Afanasova wrote:
-> > The vCPU thread may receive a signal during ioregionfd
-> > communication,
-> > ioctl(KVM_RUN) needs to return to userspace and then ioctl(KVM_RUN)
-> > must resume ioregionfd.
-> 
-> It looks to me the patch contains much more than just signal
-> handling 
-> (e.g the protocol). Please split.
-> 
-Ok
-
-> 
+On Mon, 2021-02-08 at 14:21 +0800, Jason Wang wrote:
+> On 2021/1/30 上午2:48, Elena Afanasova wrote:
+> > This vm ioctl adds or removes an ioregionfd MMIO/PIO region. Guest
+> > read and write accesses are dispatched through the given ioregionfd
+> > instead of returning from ioctl(KVM_RUN). Regions can be deleted by
+> > setting fds to -1.
+> > 
 > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
 > > ---
 > > Changes in v2:
-> >    - add support for x86 signal handling
 > >    - changes after code review
 > > 
-> >   arch/x86/kvm/x86.c            | 196
-> > +++++++++++++++++++++++++++++++---
-> >   include/linux/kvm_host.h      |  13 +++
-> >   include/uapi/linux/ioregion.h |  32 ++++++
-> >   virt/kvm/ioregion.c           | 177
-> > +++++++++++++++++++++++++++++-
-> >   virt/kvm/kvm_main.c           |  16 ++-
-> >   5 files changed, 415 insertions(+), 19 deletions(-)
-> >   create mode 100644 include/uapi/linux/ioregion.h
-> 
-> I wonder whether it's better to split into two patches:
-> 
-> 1) general signal support for KVM I/O device
-> 2) the ioregionfd part
-> 
-> 
+> >   arch/x86/kvm/Kconfig     |   1 +
+> >   arch/x86/kvm/Makefile    |   1 +
+> >   arch/x86/kvm/x86.c       |   1 +
+> >   include/linux/kvm_host.h |  17 +++
+> >   include/uapi/linux/kvm.h |  23 ++++
+> >   virt/kvm/Kconfig         |   3 +
+> >   virt/kvm/eventfd.c       |  25 +++++
+> >   virt/kvm/eventfd.h       |  14 +++
+> >   virt/kvm/ioregion.c      | 232
+> > +++++++++++++++++++++++++++++++++++++++
+> >   virt/kvm/ioregion.h      |  15 +++
+> >   virt/kvm/kvm_main.c      |  11 ++
+> >   11 files changed, 343 insertions(+)
+> >   create mode 100644 virt/kvm/eventfd.h
+> >   create mode 100644 virt/kvm/ioregion.c
+> >   create mode 100644 virt/kvm/ioregion.h
+> > 
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index f92dfd8ef10d..b914ef375199 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -33,6 +33,7 @@ config KVM
+> >   	select HAVE_KVM_IRQ_BYPASS
+> >   	select HAVE_KVM_IRQ_ROUTING
+> >   	select HAVE_KVM_EVENTFD
+> > +	select KVM_IOREGION
+> >   	select KVM_ASYNC_PF
+> >   	select USER_RETURN_NOTIFIER
+> >   	select KVM_MMIO
+> > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> > index b804444e16d4..b3b17dc9f7d4 100644
+> > --- a/arch/x86/kvm/Makefile
+> > +++ b/arch/x86/kvm/Makefile
+> > @@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
+> >   kvm-y			+= $(KVM)/kvm_main.o
+> > $(KVM)/coalesced_mmio.o \
+> >   				$(KVM)/eventfd.o $(KVM)/irqchip.o
+> > $(KVM)/vfio.o
+> >   kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
+> > +kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
+> >   
+> >   kvm-y			+= x86.o emulate.o i8259.o irq.o
+> > lapic.o \
+> >   			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o
+> > mtrr.o \
 > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index ddb28f5ca252..a04516b531da 100644
+> > index e545a8a613b1..ddb28f5ca252 100644
 > > --- a/arch/x86/kvm/x86.c
 > > +++ b/arch/x86/kvm/x86.c
-> > @@ -5799,19 +5799,33 @@ static int vcpu_mmio_write(struct kvm_vcpu
-> > *vcpu, gpa_t addr, int len,
-> >   {
-> >   	int handled = 0;
-> >   	int n;
-> > +	int ret = 0;
-> > +	bool is_apic;
-> >   
-> >   	do {
-> >   		n = min(len, 8);
-> > -		if (!(lapic_in_kernel(vcpu) &&
-> > -		      !kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev,
-> > addr, n, v))
-> > -		    && kvm_io_bus_write(vcpu, KVM_MMIO_BUS, addr, n,
-> > v))
-> > -			break;
-> > +		is_apic = lapic_in_kernel(vcpu) &&
-> > +			  !kvm_iodevice_write(vcpu, &vcpu->arch.apic-
-> > >dev,
-> > +					      addr, n, v);
-> 
-> A better name is needed since "is_apic" only covers the first
-> condition.
-> 
-> 
-> > +		if (!is_apic) {
-> > +			ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS,
-> > +					       addr, n, v);
-> > +			if (ret)
-> > +				break;
-> > +		}
-> >   		handled += n;
-> >   		addr += n;
-> >   		len -= n;
-> >   		v += n;
-> >   	} while (len);
-> >   
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (ret == -EINTR) {
-> > +		vcpu->run->exit_reason = KVM_EXIT_INTR;
-> > +		++vcpu->stat.signal_exits;
-> 
-> My understanding is that, we should check ERESTARTSYS instead of
-> EINTR. 
-> EINTR means the syscall can't be restarted.
-> 
-I think the case when ioregionfd communication is interrupted can be
-seen as interrupted ioctl(KVM_RUN).
-
-> E.g we had the following errno for sockets:
-> 
-> /* Alas, with timeout socket operations are not restartable.
->   * Compare this to poll().
->   */
-> static inline int sock_intr_errno(long timeo)
-> {
->      return timeo == MAX_SCHEDULE_TIMEOUT ? -ERESTARTSYS : -EINTR;
-> }
-> 
-> For the case of EINTR, do we need a fallback to vcpu userspace
-> process 
-> (Qemu)?
-> 
-Yes, ioctl(KVM_RUN) needs to return to userspace.
-
-> And we probably need a trace point here.
-> 
-> 
-> > +	}
-> > +#endif
-> > +
-> >   	return handled;
-> >   }
-> >   
-> > @@ -5819,14 +5833,20 @@ static int vcpu_mmio_read(struct kvm_vcpu
-> > *vcpu, gpa_t addr, int len, void *v)
-> >   {
-> >   	int handled = 0;
-> >   	int n;
-> > +	int ret = 0;
-> > +	bool is_apic;
-> >   
-> >   	do {
-> >   		n = min(len, 8);
-> > -		if (!(lapic_in_kernel(vcpu) &&
-> > -		      !kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev,
-> > -					 addr, n, v))
-> > -		    && kvm_io_bus_read(vcpu, KVM_MMIO_BUS, addr, n, v))
-> > -			break;
-> > +		is_apic = lapic_in_kernel(vcpu) &&
-> > +			  !kvm_iodevice_read(vcpu, &vcpu->arch.apic-
-> > >dev,
-> > +					     addr, n, v);
-> > +		if (!is_apic) {
-> > +			ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS,
-> > +					      addr, n, v);
-> > +			if (ret)
-> > +				break;
-> > +		}
-> >   		trace_kvm_mmio(KVM_TRACE_MMIO_READ, n, addr, v);
-> >   		handled += n;
-> >   		addr += n;
-> > @@ -5834,6 +5854,13 @@ static int vcpu_mmio_read(struct kvm_vcpu
-> > *vcpu, gpa_t addr, int len, void *v)
-> >   		v += n;
-> >   	} while (len);
-> >   
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (ret == -EINTR) {
-> > +		vcpu->run->exit_reason = KVM_EXIT_INTR;
-> > +		++vcpu->stat.signal_exits;
-> > +	}
-> > +#endif
-> > +
-> >   	return handled;
-> >   }
-> >   
-> > @@ -6294,6 +6321,12 @@ static int emulator_read_write(struct
-> > x86_emulate_ctxt *ctxt,
-> >   	vcpu->mmio_needed = 1;
-> >   	vcpu->mmio_cur_fragment = 0;
-> >   
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (vcpu->ioregion_interrupted &&
-> > +	    vcpu->run->exit_reason == KVM_EXIT_INTR)
-> > +		return (vcpu->ioregion_ctx.in) ? X86EMUL_IO_NEEDED :
-> > X86EMUL_CONTINUE;
-> > +#endif
-> > +
-> >   	vcpu->run->mmio.len = min(8u, vcpu->mmio_fragments[0].len);
-> >   	vcpu->run->mmio.is_write = vcpu->mmio_is_write = ops->write;
-> >   	vcpu->run->exit_reason = KVM_EXIT_MMIO;
-> > @@ -6411,16 +6444,23 @@ static int kernel_pio(struct kvm_vcpu
-> > *vcpu, void *pd)
-> >   
-> >   	for (i = 0; i < vcpu->arch.pio.count; i++) {
-> >   		if (vcpu->arch.pio.in)
-> > -			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, vcpu-
-> > >arch.pio.port,
-> > +			r = kvm_io_bus_read(vcpu, KVM_PIO_BUS,
-> > +					    vcpu->arch.pio.port,
-> >   					    vcpu->arch.pio.size, pd);
-> >   		else
-> >   			r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
-> > -					     vcpu->arch.pio.port, vcpu-
-> > >arch.pio.size,
-> > -					     pd);
-> > +					     vcpu->arch.pio.port,
-> > +					     vcpu->arch.pio.size, pd);
-> >   		if (r)
-> >   			break;
-> >   		pd += vcpu->arch.pio.size;
-> >   	}
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (vcpu->ioregion_interrupted && r == -EINTR) {
-> > +		vcpu->ioregion_ctx.pio = i;
-> > +	}
-> > +#endif
-> > +
-> >   	return r;
-> >   }
-> >   
-> > @@ -6428,16 +6468,27 @@ static int emulator_pio_in_out(struct
-> > kvm_vcpu *vcpu, int size,
-> >   			       unsigned short port, void *val,
-> >   			       unsigned int count, bool in)
-> >   {
-> > +	int ret = 0;
-> > +
-> >   	vcpu->arch.pio.port = port;
-> >   	vcpu->arch.pio.in = in;
-> >   	vcpu->arch.pio.count  = count;
-> >   	vcpu->arch.pio.size = size;
-> >   
-> > -	if (!kernel_pio(vcpu, vcpu->arch.pio_data)) {
-> > +	ret = kernel_pio(vcpu, vcpu->arch.pio_data);
-> > +	if (!ret) {
-> 
-> Unnecessary changes.
-> 
-> 
-> >   		vcpu->arch.pio.count = 0;
-> >   		return 1;
-> >   	}
-> >   
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (ret == -EINTR) {
-> > +		vcpu->run->exit_reason = KVM_EXIT_INTR;
-> > +		++vcpu->stat.signal_exits;
-> > +		return 0;
-> > +	}
-> > +#endif
-> > +
-> >   	vcpu->run->exit_reason = KVM_EXIT_IO;
-> >   	vcpu->run->io.direction = in ? KVM_EXIT_IO_IN :
-> > KVM_EXIT_IO_OUT;
-> >   	vcpu->run->io.size = size;
-> > @@ -7141,6 +7192,10 @@ static bool retry_instruction(struct
-> > x86_emulate_ctxt *ctxt,
-> >   
-> >   static int complete_emulated_mmio(struct kvm_vcpu *vcpu);
-> >   static int complete_emulated_pio(struct kvm_vcpu *vcpu);
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +static int complete_ioregion_io(struct kvm_vcpu *vcpu);
-> > +static int complete_ioregion_fast_pio(struct kvm_vcpu *vcpu);
-> > +#endif
-> >   
-> >   static void kvm_smm_changed(struct kvm_vcpu *vcpu)
-> >   {
-> > @@ -7405,6 +7460,14 @@ int x86_emulate_instruction(struct kvm_vcpu
-> > *vcpu, gpa_t cr2_or_gpa,
+> > @@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct kvm
+> > *kvm, long ext)
+> >   	case KVM_CAP_X86_USER_SPACE_MSR:
+> >   	case KVM_CAP_X86_MSR_FILTER:
+> >   	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
+> > +	case KVM_CAP_IOREGIONFD:
 > >   		r = 1;
-> >   		if (inject_emulated_exception(vcpu))
-> >   			return r;
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	} else if (vcpu->ioregion_interrupted &&
-> > +		   vcpu->run->exit_reason == KVM_EXIT_INTR) {
-> > +		if (vcpu->ioregion_ctx.in)
-> > +			writeback = false;
-> > +		vcpu->arch.complete_userspace_io =
-> > complete_ioregion_io;
-> > +		r = 0;
+> >   		break;
+> >   	case KVM_CAP_SYNC_REGS:
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 7f2e2a09ebbd..7cd667dddba9 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -470,6 +470,10 @@ struct kvm {
+> >   		struct mutex      resampler_lock;
+> >   	} irqfds;
+> >   	struct list_head ioeventfds;
 > > +#endif
-> >   	} else if (vcpu->arch.pio.count) {
-> >   		if (!vcpu->arch.pio.in) {
-> >   			/* FIXME: return into emulator if single-
-> > stepping.  */
-> > @@ -7501,6 +7564,11 @@ static int kvm_fast_pio_out(struct kvm_vcpu
-> > *vcpu, int size,
-> >   		vcpu->arch.complete_userspace_io =
-> >   			complete_fast_pio_out_port_0x7e;
-> >   		kvm_skip_emulated_instruction(vcpu);
 > > +#ifdef CONFIG_KVM_IOREGION
-> > +	} else if (vcpu->ioregion_interrupted &&
-> > +		   vcpu->run->exit_reason == KVM_EXIT_INTR) {
-> > +		vcpu->arch.complete_userspace_io =
-> > complete_ioregion_fast_pio;
-> > +#endif
-> >   	} else {
-> >   		vcpu->arch.pio.linear_rip = kvm_get_linear_rip(vcpu);
-> >   		vcpu->arch.complete_userspace_io =
-> > complete_fast_pio_out;
-> > @@ -7548,6 +7616,13 @@ static int kvm_fast_pio_in(struct kvm_vcpu
-> > *vcpu, int size,
-> >   		return ret;
-> >   	}
+> > +	struct list_head ioregions_mmio;
+> > +	struct list_head ioregions_pio;
+> >   #endif
+> >   	struct kvm_vm_stat stat;
+> >   	struct kvm_arch arch;
+> > @@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct kvm
+> > *kvm, struct kvm_ioeventfd *args)
+> >   
+> >   #endif /* CONFIG_HAVE_KVM_EVENTFD */
 > >   
 > > +#ifdef CONFIG_KVM_IOREGION
-> > +	if (vcpu->ioregion_interrupted &&
-> > +	    vcpu->run->exit_reason == KVM_EXIT_INTR) {
-> > +		vcpu->arch.complete_userspace_io =
-> > complete_ioregion_fast_pio;
-> > +		return 0;
-> > +	}
+> > +void kvm_ioregionfd_init(struct kvm *kvm);
+> > +int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args);
+> > +
+> > +#else
+> > +
+> > +static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
+> > +static inline int kvm_ioregionfd(struct kvm *kvm, struct
+> > kvm_ioregion *args)
+> > +{
+> > +	return -ENOSYS;
+> > +}
 > > +#endif
-> >   	vcpu->arch.pio.linear_rip = kvm_get_linear_rip(vcpu);
-> >   	vcpu->arch.complete_userspace_io = complete_fast_pio_in;
+> > +
+> >   void kvm_arch_irq_routing_update(struct kvm *kvm);
 > >   
-> > @@ -9204,6 +9279,101 @@ static int complete_emulated_mmio(struct
-> > kvm_vcpu *vcpu)
-> >   	return 0;
+> >   static inline void kvm_make_request(int req, struct kvm_vcpu
+> > *vcpu)
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index ca41220b40b8..81e775778c66 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
+> >   	__u8  pad[36];
+> >   };
+> >   
+> > +enum {
+> > +	kvm_ioregion_flag_nr_pio,
+> > +	kvm_ioregion_flag_nr_posted_writes,
+> > +	kvm_ioregion_flag_nr_max,
+> > +};
+> > +
+> > +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
+> > +#define KVM_IOREGION_POSTED_WRITES (1 <<
+> > kvm_ioregion_flag_nr_posted_writes)
+> > +
+> > +#define KVM_IOREGION_VALID_FLAG_MASK ((1 <<
+> > kvm_ioregion_flag_nr_max) - 1)
+> > +
+> > +struct kvm_ioregion {
+> > +	__u64 guest_paddr; /* guest physical address */
+> > +	__u64 memory_size; /* bytes */
+> 
+> Do we really need __u64 here?
+> 
+> 
+> > +	__u64 user_data;
+> > +	__s32 rfd;
+> > +	__s32 wfd;
+> > +	__u32 flags;
+> > +	__u8  pad[28];
+> > +};
+> > +
+> >   #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+> >   #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+> >   #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> > @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
+> >   #define KVM_CAP_X86_USER_SPACE_MSR 188
+> >   #define KVM_CAP_X86_MSR_FILTER 189
+> >   #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+> > +#define KVM_CAP_IOREGIONFD 191
+> >   
+> >   #ifdef KVM_CAP_IRQ_ROUTING
+> >   
+> > @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
+> >   					struct
+> > kvm_userspace_memory_region)
+> >   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+> >   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+> > +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct
+> > kvm_ioregion)
+> >   
+> >   /* enable ucontrol for s390 */
+> >   struct kvm_s390_ucas_mapping {
+> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> > index 1c37ccd5d402..5e6620bbf000 100644
+> > --- a/virt/kvm/Kconfig
+> > +++ b/virt/kvm/Kconfig
+> > @@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
+> >          bool
+> >          select EVENTFD
+> >   
+> > +config KVM_IOREGION
+> > +       bool
+> > +
+> >   config KVM_MMIO
+> >          bool
+> >   
+> > diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> > index c2323c27a28b..aadb73903f8b 100644
+> > --- a/virt/kvm/eventfd.c
+> > +++ b/virt/kvm/eventfd.c
+> > @@ -27,6 +27,7 @@
+> >   #include <trace/events/kvm.h>
+> >   
+> >   #include <kvm/iodev.h>
+> > +#include "ioregion.h"
+> >   
+> >   #ifdef CONFIG_HAVE_KVM_IRQFD
+> >   
+> > @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops
+> > ioeventfd_ops = {
+> >   	.destructor = ioeventfd_destructor,
+> >   };
+> >   
+> > +#ifdef CONFIG_KVM_IOREGION
+> > +/* assumes kvm->slots_lock held */
+> > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
+> > +			  u64 start, u64 size)
+> > +{
+> > +	struct _ioeventfd *_p;
+> > +
+> > +	list_for_each_entry(_p, &kvm->ioeventfds, list)
+> > +		if (_p->bus_idx == bus_idx &&
+> > +		    overlap(start, size, _p->addr,
+> > +			    !_p->length ? 8 : _p->length))
+> > +			return true;
+> > +
+> > +	return false;
+> > +}
+> > +#endif
+> > +
+> >   /* assumes kvm->slots_lock held */
+> >   static bool
+> >   ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
+> > @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm,
+> > struct _ioeventfd *p)
+> >   		       _p->datamatch == p->datamatch))))
+> >   			return true;
+> >   
+> > +#ifdef CONFIG_KVM_IOREGION
+> > +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx == KVM_PIO_BUS)
+> > +		if (kvm_ioregion_collides(kvm, p->bus_idx, p->addr,
+> > +					  !p->length ? 8 : p->length))
+> > +			return true;
+> > +#endif
+> > +
+> >   	return false;
 > >   }
 > >   
+> > diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
+> > new file mode 100644
+> > index 000000000000..73a621eebae3
+> > --- /dev/null
+> > +++ b/virt/kvm/eventfd.h
+> > @@ -0,0 +1,14 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef __KVM_EVENTFD_H__
+> > +#define __KVM_EVENTFD_H__
+> > +
 > > +#ifdef CONFIG_KVM_IOREGION
-> > +static void complete_ioregion_access(struct kvm_vcpu *vcpu, gpa_t
-> > addr,
-> > +				     int len, void *val)
+> > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start,
+> > u64 size);
+> > +#else
+> > +static inline bool
+> > +kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64
+> > size)
 > > +{
-> > +	if (vcpu->ioregion_ctx.in)
-> > +		vcpu->ioregion_ctx.dev->ops->read(vcpu, vcpu-
-> > >ioregion_ctx.dev,
-> > +						  addr, len, val);
-> > +	else
-> > +		vcpu->ioregion_ctx.dev->ops->write(vcpu, vcpu-
-> > >ioregion_ctx.dev,
-> > +						   addr, len, val);
-> 
-> Two dumb questions:
-> 
-> 1) So if the write is interrupted by the signal, we may do twice or
-> more 
-> write. Can this satisfies the semantics of all type of registers? 
-
-I think it's necessary to call kvm_io_bus_{read, write}() here. If
-there is no in-kernel device or ioregion gets deleted KVM needs to
-return to userspace with KVM_EXIT_MMIO/KVM_EXIT_IO.
-
-> E.g 
-> for the hardware that counts the time of write to a specific register
-> etc.
-> 2) If the answer is yes, can we simply rewind RIP to re-emulate the 
-> instruction?
-> 
-> 
+> > +	return false;
+> > +}
+> > +#endif
+> > +#endif
+> > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
+> > new file mode 100644
+> > index 000000000000..48ff92bca966
+> > --- /dev/null
+> > +++ b/virt/kvm/ioregion.c
+> > @@ -0,0 +1,232 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +#include <linux/kvm_host.h>
+> > +#include <linux/fs.h>
+> > +#include <kvm/iodev.h>
+> > +#include "eventfd.h"
+> > +
+> > +void
+> > +kvm_ioregionfd_init(struct kvm *kvm)
+> > +{
+> > +	INIT_LIST_HEAD(&kvm->ioregions_mmio);
+> > +	INIT_LIST_HEAD(&kvm->ioregions_pio);
 > > +}
 > > +
-> > +static int complete_ioregion_mmio(struct kvm_vcpu *vcpu)
+> > +struct ioregion {
+> > +	struct list_head     list;
+> > +	u64                  paddr;  /* guest physical address */
+> > +	u64                  size;   /* size in bytes */
+> > +	struct file         *rf;
+> > +	struct file         *wf;
+> > +	u64                  user_data; /* opaque token used by
+> > userspace */
+> > +	struct kvm_io_device dev;
+> > +	bool                 posted_writes;
+> > +};
+> > +
+> > +static inline struct ioregion *
+> > +to_ioregion(struct kvm_io_device *dev)
 > > +{
-> > +	struct kvm_mmio_fragment *frag;
-> > +	int idx, ret, i, n;
+> > +	return container_of(dev, struct ioregion, dev);
+> > +}
 > > +
-> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> > +	for (i = vcpu->mmio_cur_fragment; i < vcpu->mmio_nr_fragments;
-> > i++) {
-> > +		frag = &vcpu->mmio_fragments[i];
-> > +		do {
-> > +			n = min(8u, frag->len);
-> > +			complete_ioregion_access(vcpu, frag->gpa, n,
-> > frag->data);
-> > +			frag->len -= n;
-> > +			frag->data += n;
-> > +			frag->gpa += n;
-> > +		} while (frag->len);
-> > +		vcpu->mmio_cur_fragment++;
+> > +/* assumes kvm->slots_lock held */
+> > +static void
+> > +ioregion_release(struct ioregion *p)
+> > +{
+> > +	fput(p->rf);
+> > +	fput(p->wf);
+> > +	list_del(&p->list);
+> > +	kfree(p);
+> > +}
+> > +
+> > +static int
+> > +ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
+> > gpa_t addr,
+> > +	      int len, void *val)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int
+> > +ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
+> > gpa_t addr,
+> > +		int len, const void *val)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +
+> > +/*
+> > + * This function is called as KVM is completely shutting down.  We
+> > do not
+> > + * need to worry about locking just nuke anything we have as
+> > quickly as possible
+> > + */
+> > +static void
+> > +ioregion_destructor(struct kvm_io_device *this)
+> > +{
+> > +	struct ioregion *p = to_ioregion(this);
+> > +
+> > +	ioregion_release(p);
+> > +}
+> > +
+> > +static const struct kvm_io_device_ops ioregion_ops = {
+> > +	.read       = ioregion_read,
+> > +	.write      = ioregion_write,
+> > +	.destructor = ioregion_destructor,
+> > +};
+> > +
+> > +static inline struct list_head *
+> > +get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
+> > +{
+> > +	return (bus_idx == KVM_MMIO_BUS) ?
+> > +		&kvm->ioregions_mmio : &kvm->ioregions_pio;
+> > +}
+> > +
+> > +/* check for not overlapping case and reverse */
+> > +inline bool
+> > +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
+> > +{
+> > +	u64 end1 = start1 + size1 - 1;
+> > +	u64 end2 = start2 + size2 - 1;
+> > +
+> > +	return !(end1 < start2 || start1 >= end2);
+> > +}
+> > +
+> > +/* assumes kvm->slots_lock held */
+> > +bool
+> > +kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
+> > +		      u64 start, u64 size)
+> > +{
+> > +	struct ioregion *_p;
+> > +	struct list_head *ioregions;
+> > +
+> > +	ioregions = get_ioregion_list(kvm, bus_idx);
+> > +	list_for_each_entry(_p, ioregions, list)
+> > +		if (overlap(start, size, _p->paddr, _p->size))
+> > +			return true;
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +/* assumes kvm->slots_lock held */
+> > +static bool
+> > +ioregion_collision(struct kvm *kvm, struct ioregion *p, enum
+> > kvm_bus bus_idx)
+> > +{
+> > +	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p->size) ||
+> > +	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p->size))
+> > +		return true;
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +static enum kvm_bus
+> > +get_bus_from_flags(__u32 flags)
+> > +{
+> > +	if (flags & KVM_IOREGION_PIO)
+> > +		return KVM_PIO_BUS;
+> > +	return KVM_MMIO_BUS;
+> > +}
+> > +
+> > +int
+> > +kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
+> > +{
+> > +	struct ioregion *p;
+> > +	struct file *rfile, *wfile;
+> > +	enum kvm_bus bus_idx;
+> > +	int ret = 0;
+> > +
+> > +	if (!args->memory_size)
+> > +		return -EINVAL;
+> > +	if ((args->guest_paddr + args->memory_size - 1) < args-
+> > >guest_paddr)
+> > +		return -EINVAL;
+> > +
+> > +	rfile = fget(args->rfd);
+> > +	if (!rfile)
+> > +		return -EBADF;
+> 
+> So the question still, if we want to use ioregion fd for doorbell,
+> we 
+> don't need rfd in this case?
+> 
+Using ioregionfd for doorbell seems to be an open question. Probably it
+could just focus on the non-doorbell cases.
+
+> 
+> > +	wfile = fget(args->wfd);
+> > +	if (!wfile) {
+> > +		fput(rfile);
+> > +		return -EBADF;
+> > +	}
+> > +	if ((rfile->f_flags & O_NONBLOCK) || (wfile->f_flags &
+> > O_NONBLOCK)) {
+> > +		ret = -EINVAL;
+> > +		goto fail;
+> > +	}
+> 
+> I wonder how much value if we stick a check like this here (if our
+> code 
+> can gracefully deal with blocking fd).
+> 
+Do you think it would be better to remove this check and just mention
+that in a comment or documentation?
+
+> 
+> > +	p = kzalloc(sizeof(*p), GFP_KERNEL_ACCOUNT);
+> > +	if (!p) {
+> > +		ret = -ENOMEM;
+> > +		goto fail;
 > > +	}
 > > +
-> > +	vcpu->mmio_needed = 0;
-> > +	if (!vcpu->ioregion_ctx.in) {
-> > +		srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> > +		return 1;
-> > +	}
+> > +	INIT_LIST_HEAD(&p->list);
+> > +	p->paddr = args->guest_paddr;
+> > +	p->size = args->memory_size;
+> > +	p->user_data = args->user_data;
+> > +	p->rf = rfile;
+> > +	p->wf = wfile;
+> > +	p->posted_writes = args->flags & KVM_IOREGION_POSTED_WRITES;
+> > +	bus_idx = get_bus_from_flags(args->flags);
 > > +
-> > +	vcpu->mmio_read_completed = 1;
-> > +	ret = kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
-> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > +	mutex_lock(&kvm->slots_lock);
+> > +
+> > +	if (ioregion_collision(kvm, p, bus_idx)) {
+> > +		ret = -EEXIST;
+> > +		goto unlock_fail;
+> > +	}
+> > +	kvm_iodevice_init(&p->dev, &ioregion_ops);
+> > +	ret = kvm_io_bus_register_dev(kvm, bus_idx, p->paddr, p->size,
+> > +				      &p->dev);
+> 
+> I think we agree on previous version that we need to deal with
+> FAST_MMIO 
+> bus here?
+> 
+Yes, I’ll include FAST_MMIO support in a RFC v3 series.
+
+> 
+> > +	if (ret < 0)
+> > +		goto unlock_fail;
+> > +	list_add_tail(&p->list, get_ioregion_list(kvm, bus_idx));
+> > +
+> > +	mutex_unlock(&kvm->slots_lock);
+> > +
+> > +	return 0;
+> > +
+> > +unlock_fail:
+> > +	mutex_unlock(&kvm->slots_lock);
+> > +	kfree(p);
+> > +fail:
+> > +	fput(rfile);
+> > +	fput(wfile);
+> > +
 > > +	return ret;
 > > +}
 > > +
-> > +static int complete_ioregion_pio(struct kvm_vcpu *vcpu)
+> > +static int
+> > +kvm_rm_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
 > > +{
-> > +	int i, idx, r = 1;
+> > +	struct ioregion         *p, *tmp;
+> > +	enum kvm_bus             bus_idx;
+> > +	int                      ret = -ENOENT;
+> > +	struct list_head        *ioregions;
 > > +
-> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> > +	for (i = vcpu->ioregion_ctx.pio; i < vcpu->arch.pio.count; i++)
-> > {
-> > +		complete_ioregion_access(vcpu, vcpu->ioregion_ctx.addr,
-> > +					 vcpu->ioregion_ctx.len,
-> > +					 vcpu->ioregion_ctx.val);
-> > +		vcpu->ioregion_ctx.val += vcpu->ioregion_ctx.len;
+> > +	if (args->rfd != -1 || args->wfd != -1)
+> > +		return -EINVAL;
+> > +
+> > +	bus_idx = get_bus_from_flags(args->flags);
+> > +	ioregions = get_ioregion_list(kvm, bus_idx);
+> > +
+> > +	mutex_lock(&kvm->slots_lock);
+> > +
+> > +	list_for_each_entry_safe(p, tmp, ioregions, list) {
+> > +		if (p->paddr == args->guest_paddr  &&
+> > +		    p->size == args->memory_size) {
+> > +			kvm_io_bus_unregister_dev(kvm, bus_idx, &p-
+> > >dev);
+> > +			ioregion_release(p);
+> > +			ret = 0;
+> > +			break;
+> > +		}
 > > +	}
 > > +
-> > +	if (vcpu->ioregion_ctx.in)
-> > +		r = kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
-> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> > +	vcpu->arch.pio.count = 0;
+> > +	mutex_unlock(&kvm->slots_lock);
 > > +
-> > +	return r;
+> > +	return ret;
 > > +}
 > > +
-> > +static int complete_ioregion_fast_pio(struct kvm_vcpu *vcpu)
+> > +int
+> > +kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args)
 > > +{
-> > +	int idx;
-> > +	u64 val;
+> > +	if (args->flags & ~KVM_IOREGION_VALID_FLAG_MASK)
+> > +		return -EINVAL;
+> > +	if (args->rfd == -1 || args->wfd == -1)
+> > +		return kvm_rm_ioregion(kvm, args);
 > > +
-> > +	BUG_ON(!vcpu->ioregion_interrupted);
-> > +
-> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> > +	complete_ioregion_access(vcpu, vcpu->ioregion_ctx.addr,
-> > +				 vcpu->ioregion_ctx.len,
-> > +				 vcpu->ioregion_ctx.val);
-> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> > +
-> > +	if (vcpu->ioregion_ctx.in) {
-> > +		memcpy(&val, vcpu->ioregion_ctx.val, vcpu-
-> > >ioregion_ctx.len);
-> > +		kvm_rax_write(vcpu, val);
-> > +	}
-> > +	vcpu->arch.pio.count = 0;
-> > +
-> > +	return kvm_skip_emulated_instruction(vcpu);
+> > +	return kvm_set_ioregion(kvm, args);
 > > +}
-> > +
-> > +static int complete_ioregion_io(struct kvm_vcpu *vcpu)
-> > +{
-> > +	BUG_ON(!vcpu->ioregion_interrupted);
-> > +
-> > +	if (vcpu->mmio_needed)
-> > +		return complete_ioregion_mmio(vcpu);
-> > +	if (vcpu->arch.pio.count)
-> > +		return complete_ioregion_pio(vcpu);
-> > +}
-> > +#endif
-> > +
-> >   static void kvm_save_current_fpu(struct fpu *fpu)
-> >   {
-> >   	/*
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 7cd667dddba9..5cfdecfca6db 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -318,6 +318,19 @@ struct kvm_vcpu {
-> >   #endif
-> >   	bool preempted;
-> >   	bool ready;
-> > +#ifdef CONFIG_KVM_IOREGION
-> > +	bool ioregion_interrupted;
-> > +	struct {
-> > +		struct kvm_io_device *dev;
-> > +		int pio;
-> > +		void *val;
-> > +		u8 state;
-> 
-> Let's document the state machine here.
-> 
-> 
-> > +		u64 addr;
-> > +		int len;
-> > +		u64 data;
-> > +		bool in;
-> > +	} ioregion_ctx;
-> > +#endif
-> >   	struct kvm_vcpu_arch arch;
-> >   };
-> >   
-> > diff --git a/include/uapi/linux/ioregion.h
-> > b/include/uapi/linux/ioregion.h
+> > diff --git a/virt/kvm/ioregion.h b/virt/kvm/ioregion.h
 > > new file mode 100644
-> > index 000000000000..7898c01f84a1
+> > index 000000000000..23ffa812ec7a
 > > --- /dev/null
-> > +++ b/include/uapi/linux/ioregion.h
-> > @@ -0,0 +1,32 @@
-> > +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-> > +#ifndef _UAPI_LINUX_IOREGION_H
-> > +#define _UAPI_LINUX_IOREGION_H
+> > +++ b/virt/kvm/ioregion.h
+> > @@ -0,0 +1,15 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef __KVM_IOREGION_H__
+> > +#define __KVM_IOREGION_H__
 > > +
-> > +/* Wire protocol */
-> > +struct ioregionfd_cmd {
-> > +	__u32 info;
-> > +	__u32 padding;
-> > +	__u64 user_data;
-> > +	__u64 offset;
-> > +	__u64 data;
-> > +};
-> > +
-> > +struct ioregionfd_resp {
-> > +	__u64 data;
-> > +	__u8 pad[24];
-> > +};
-> > +
-> > +#define IOREGIONFD_CMD_READ    0
-> > +#define IOREGIONFD_CMD_WRITE   1
-> > +
-> > +#define IOREGIONFD_SIZE_8BIT   0
-> > +#define IOREGIONFD_SIZE_16BIT  1
-> > +#define IOREGIONFD_SIZE_32BIT  2
-> > +#define IOREGIONFD_SIZE_64BIT  3
-> > +
-> > +#define IOREGIONFD_SIZE_OFFSET 4
-> > +#define IOREGIONFD_RESP_OFFSET 6
-> > +#define IOREGIONFD_SIZE(x) ((x) << IOREGIONFD_SIZE_OFFSET)
-> > +#define IOREGIONFD_RESP(x) ((x) << IOREGIONFD_RESP_OFFSET)
-> 
-> Instead of using macros, why not explicitly define them in struct 
-> ioregionfd_cmd instead of using info?
-> 
-> 
-> > +
+> > +#ifdef CONFIG_KVM_IOREGION
+> > +inline bool overlap(u64 start1, u64 size1, u64 start2, u64 size2);
+> > +bool kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64
+> > start, u64 size);
+> > +#else
+> > +static inline bool
+> > +kvm_ioregion_collides(struct kvm *kvm, int bus_idx, u64 start, u64
+> > size)
+> > +{
+> > +	return false;
+> > +}
 > > +#endif
-> > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> > index 48ff92bca966..da38124e1418 100644
-> > --- a/virt/kvm/ioregion.c
-> > +++ b/virt/kvm/ioregion.c
-> > @@ -3,6 +3,7 @@
-> >   #include <linux/fs.h>
-> >   #include <kvm/iodev.h>
-> >   #include "eventfd.h"
-> > +#include <uapi/linux/ioregion.h>
-> >   
-> >   void
-> >   kvm_ioregionfd_init(struct kvm *kvm)
-> > @@ -38,18 +39,190 @@ ioregion_release(struct ioregion *p)
-> >   	kfree(p);
-> >   }
-> >   
-> > +static bool
-> > +pack_cmd(struct ioregionfd_cmd *cmd, u64 offset, u64 len, int opt,
-> > int resp,
-> > +	 u64 user_data, const void *val)
-> > +{
-> > +	u64 size = 0;
-> > +
-> > +	switch (len) {
-> > +	case 1:
-> > +		size = IOREGIONFD_SIZE_8BIT;
-> > +		break;
-> > +	case 2:
-> > +		size = IOREGIONFD_SIZE_16BIT;
-> > +		break;
-> > +	case 4:
-> > +		size = IOREGIONFD_SIZE_32BIT;
-> > +		break;
-> > +	case 8:
-> > +		size = IOREGIONFD_SIZE_64BIT;
-> > +		break;
-> > +	default:
-> > +		return false;
-> > +	}
-> > +
-> > +	if (val)
-> > +		memcpy(&cmd->data, val, len);
-> > +	cmd->user_data = user_data;
-> > +	cmd->offset = offset;
-> > +	cmd->info |= opt;
-> > +	cmd->info |= IOREGIONFD_SIZE(size);
-> > +	cmd->info |= IOREGIONFD_RESP(resp);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +enum {
-> > +	SEND_CMD,
-> > +	GET_REPLY,
-> > +	COMPLETE
-> > +};
-> > +
-> > +static void
-> > +ioregion_save_ctx(struct kvm_vcpu *vcpu, struct kvm_io_device
-> > *this,
-> > +		  bool in, gpa_t addr, int len, u64 data, u8 state,
-> > void *val)
-> > +{
-> > +	vcpu->ioregion_interrupted = true;
-> > +
-> > +	vcpu->ioregion_ctx.dev = this;
-> > +	vcpu->ioregion_ctx.val = val;
-> > +	vcpu->ioregion_ctx.state = state;
-> > +	vcpu->ioregion_ctx.addr = addr;
-> > +	vcpu->ioregion_ctx.len = len;
-> > +	vcpu->ioregion_ctx.data = data;
-> > +	vcpu->ioregion_ctx.in = in;
-> > +}
-> > +
-> >   static int
-> >   ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
-> > gpa_t addr,
-> >   	      int len, void *val)
-> >   {
-> > -	return -EOPNOTSUPP;
-> > +	struct ioregion *p = to_ioregion(this);
-> > +	union {
-> > +		struct ioregionfd_cmd cmd;
-> > +		struct ioregionfd_resp resp;
-> > +	} buf;
-> > +	int ret = 0;
-> > +	int state = 0;
-> 
-> Let's use SEND_CMD otherwise it would be hard for the reviewers...
-> 
-Ok
-
-> 
-> > +
-> > +	if ((addr + len - 1) > (p->paddr + p->size - 1))
-> > +		return -EINVAL;
-> > +
-> > +	if (unlikely(vcpu->ioregion_interrupted)) {
-> > +		vcpu->ioregion_interrupted = false;
-> > +
-> > +		switch (vcpu->ioregion_ctx.state) {
-> > +		case SEND_CMD:
-> > +			goto send_cmd;
-> > +		case GET_REPLY:
-> > +			goto get_repl;
-> > +		case COMPLETE:
-> 
-> I fail to understand under what condition can we reach here?
-> 
-I was thinking about the case when a signal is received after obtaining
-a reply. But it seems it’s unnecessary to consider this.
-
-> 
-> > +			memcpy(val, &vcpu->ioregion_ctx.data, len);
-> > +			return 0;
-> > +		}
-> > +	}
-> > +
-> > +send_cmd:
-> > +	memset(&buf, 0, sizeof(buf));
-> > +	if (!pack_cmd(&buf.cmd, addr - p->paddr, len,
-> > IOREGIONFD_CMD_READ,
-> > +		      1, p->user_data, NULL))
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	ret = kernel_write(p->wf, &buf.cmd, sizeof(buf.cmd), 0);
-> > +	state = (ret == sizeof(buf.cmd));
-> > +	if (signal_pending(current)) {
-> > +		ioregion_save_ctx(vcpu, this, 1, addr, len, 0, state,
-> > val);
-> > +		return -EINTR;
-> > +	}
-> > +	if (ret != sizeof(buf.cmd)) {
-> > +		ret = (ret < 0) ? ret : -EIO;
-> > +		return (ret == -EAGAIN || ret == -EWOULDBLOCK) ?
-> > -EINVAL : ret;
-> > +	}
-> > +
-> > +get_repl:
-> > +	memset(&buf, 0, sizeof(buf));
-> > +	ret = kernel_read(p->rf, &buf.resp, sizeof(buf.resp), 0);
-> > +	state += (ret == sizeof(buf.resp));
-> 
-> Let's use enum instead of doing tricks like this.
-> 
-> Thanks
-> 
-> 
-> > +	if (signal_pending(current)) {
-> > +		ioregion_save_ctx(vcpu, this, 1, addr, len,
-> > buf.resp.data, state, val);
-> > +		return -EINTR;
-> > +	}
-> > +	if (ret != sizeof(buf.resp)) {
-> > +		ret = (ret < 0) ? ret : -EIO;
-> > +		return (ret == -EAGAIN || ret == -EWOULDBLOCK) ?
-> > -EINVAL : ret;
-> > +	}
-> > +
-> > +	memcpy(val, &buf.resp.data, len);
-> > +
-> > +	return 0;
-> >   }
-> >   
-> >   static int
-> >   ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
-> > gpa_t addr,
-> >   		int len, const void *val)
-> >   {
-> > -	return -EOPNOTSUPP;
-> > +	struct ioregion *p = to_ioregion(this);
-> > +	union {
-> > +		struct ioregionfd_cmd cmd;
-> > +		struct ioregionfd_resp resp;
-> > +	} buf;
-> > +	int ret = 0;
-> > +	int state = 0;
-> > +
-> > +	if ((addr + len - 1) > (p->paddr + p->size - 1))
-> > +		return -EINVAL;
-> > +
-> > +	if (unlikely(vcpu->ioregion_interrupted)) {
-> > +		vcpu->ioregion_interrupted = false;
-> > +
-> > +		switch (vcpu->ioregion_ctx.state) {
-> > +		case SEND_CMD:
-> > +			goto send_cmd;
-> > +		case GET_REPLY:
-> > +			if (!p->posted_writes)
-> > +				goto get_repl;
-> > +			fallthrough;
-> > +		case COMPLETE:
-> > +			return 0;
-> > +		}
-> > +	}
-> > +
-> > +send_cmd:
-> > +	memset(&buf, 0, sizeof(buf));
-> > +	if (!pack_cmd(&buf.cmd, addr - p->paddr, len,
-> > IOREGIONFD_CMD_WRITE,
-> > +		      p->posted_writes ? 0 : 1, p->user_data, val))
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	ret = kernel_write(p->wf, &buf.cmd, sizeof(buf.cmd), 0);
-> > +	state = (ret == sizeof(buf.cmd));
-> > +	if (signal_pending(current)) {
-> > +		ioregion_save_ctx(vcpu, this, 0, addr, len,
-> > +				  0, state, (void *)val);
-> > +		return -EINTR;
-> > +	}
-> > +	if (ret != sizeof(buf.cmd)) {
-> > +		ret = (ret < 0) ? ret : -EIO;
-> > +		return (ret == -EAGAIN || ret == -EWOULDBLOCK) ?
-> > -EINVAL : ret;
-> > +	}
-> > +
-> > +get_repl:
-> > +	if (!p->posted_writes) {
-> > +		memset(&buf, 0, sizeof(buf));
-> > +		ret = kernel_read(p->rf, &buf.resp, sizeof(buf.resp),
-> > 0);
-> > +		state += (ret == sizeof(buf.resp));
-> > +		if (signal_pending(current)) {
-> > +			ioregion_save_ctx(vcpu, this, 0, addr, len,
-> > +					  0, state, (void *)val);
-> > +			return -EINTR;
-> > +		}
-> > +		if (ret != sizeof(buf.resp)) {
-> > +			ret = (ret < 0) ? ret : -EIO;
-> > +			return (ret == -EAGAIN || ret == -EWOULDBLOCK)
-> > ? -EINVAL : ret;
-> > +		}
-> > +	}
-> > +
-> > +	return 0;
-> >   }
-> >   
-> >   /*
+> > +#endif
 > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 88b92fc3da51..df387857f51f 100644
+> > index 2541a17ff1c4..88b92fc3da51 100644
 > > --- a/virt/kvm/kvm_main.c
 > > +++ b/virt/kvm/kvm_main.c
-> > @@ -4193,6 +4193,7 @@ static int __kvm_io_bus_write(struct kvm_vcpu
-> > *vcpu, struct kvm_io_bus *bus,
-> >   			      struct kvm_io_range *range, const void
-> > *val)
-> >   {
-> >   	int idx;
-> > +	int ret = 0;
-> >   
-> >   	idx = kvm_io_bus_get_first_dev(bus, range->addr, range->len);
-> >   	if (idx < 0)
-> > @@ -4200,9 +4201,12 @@ static int __kvm_io_bus_write(struct
-> > kvm_vcpu *vcpu, struct kvm_io_bus *bus,
-> >   
-> >   	while (idx < bus->dev_count &&
-> >   		kvm_io_bus_cmp(range, &bus->range[idx]) == 0) {
-> > -		if (!kvm_iodevice_write(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > -					range->len, val))
-> > +		ret = kvm_iodevice_write(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > +					 range->len, val);
-> > +		if (!ret)
-> >   			return idx;
-> > +		if (ret < 0 && ret != -EOPNOTSUPP)
-> > +			return ret;
-> >   		idx++;
+> > @@ -747,6 +747,7 @@ static struct kvm *kvm_create_vm(unsigned long
+> > type)
+> >   	mmgrab(current->mm);
+> >   	kvm->mm = current->mm;
+> >   	kvm_eventfd_init(kvm);
+> > +	kvm_ioregionfd_init(kvm);
+> >   	mutex_init(&kvm->lock);
+> >   	mutex_init(&kvm->irq_lock);
+> >   	mutex_init(&kvm->slots_lock);
+> > @@ -3708,6 +3709,16 @@ static long kvm_vm_ioctl(struct file *filp,
+> >   		r = kvm_vm_ioctl_set_memory_region(kvm,
+> > &kvm_userspace_mem);
+> >   		break;
 > >   	}
-> >   
-> > @@ -4264,6 +4268,7 @@ static int __kvm_io_bus_read(struct kvm_vcpu
-> > *vcpu, struct kvm_io_bus *bus,
-> >   			     struct kvm_io_range *range, void *val)
-> >   {
-> >   	int idx;
-> > +	int ret = 0;
-> >   
-> >   	idx = kvm_io_bus_get_first_dev(bus, range->addr, range->len);
-> >   	if (idx < 0)
-> > @@ -4271,9 +4276,12 @@ static int __kvm_io_bus_read(struct kvm_vcpu
-> > *vcpu, struct kvm_io_bus *bus,
-> >   
-> >   	while (idx < bus->dev_count &&
-> >   		kvm_io_bus_cmp(range, &bus->range[idx]) == 0) {
-> > -		if (!kvm_iodevice_read(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > -				       range->len, val))
-> > +		ret = kvm_iodevice_read(vcpu, bus->range[idx].dev,
-> > range->addr,
-> > +					range->len, val);
-> > +		if (!ret)
-> >   			return idx;
-> > +		if (ret < 0 && ret != -EOPNOTSUPP)
-> > +			return ret;
-> >   		idx++;
-> >   	}
+> > +	case KVM_SET_IOREGION: {
+> > +		struct kvm_ioregion data;
+> > +
+> > +		r = -EFAULT;
+> > +		if (copy_from_user(&data, argp, sizeof(data)))
+> > +			goto out;
+> > +
+> > +		r = kvm_ioregionfd(kvm, &data);
+> > +		break;
+> > +	}
+> >   	case KVM_GET_DIRTY_LOG: {
+> >   		struct kvm_dirty_log log;
 > >   
 
