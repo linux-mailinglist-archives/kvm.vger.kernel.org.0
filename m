@@ -2,88 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC873317230
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 22:21:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E204B31724F
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 22:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232166AbhBJVU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 16:20:59 -0500
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:63340 "EHLO
-        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbhBJVU6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 16:20:58 -0500
+        id S233553AbhBJV0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 16:26:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46216 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233624AbhBJVX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 16:23:57 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A84DAC061756
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 13:23:17 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id u17so3937813ybi.10
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 13:23:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1612992059; x=1644528059;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:mime-version:content-transfer-encoding:subject;
-  bh=Gw/p55C3EcrZRIb+r10UNE2J4XRblc54MM0mWDxYHNM=;
-  b=v1JuEZEeTWfjcquzii8qHt/2ruKVgU+igOJugURX/gX0N5mfxAt0wsf7
-   JT5jW199HnkAZTnxZ2IRLzAkUoxyTMjKK6fR3cfpJpXEGRIVUux/EjPjo
-   Ar/P/SqmbrLFkxekN1t7CiHVKIAYhSAh+tCtzdnnqhIERY7UxyJHSQoHK
-   8=;
-X-IronPort-AV: E=Sophos;i="5.81,169,1610409600"; 
-   d="scan'208";a="81802886"
-Subject: Re: [PATCH 5/5] KVM: x86/xen: Explicitly pad struct compat_vcpu_info to 64
- bytes
-Thread-Topic: [PATCH 5/5] KVM: x86/xen: Explicitly pad struct compat_vcpu_info to 64 bytes
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-715bee71.us-east-1.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 10 Feb 2021 21:20:12 +0000
-Received: from EX13MTAUEE001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1a-715bee71.us-east-1.amazon.com (Postfix) with ESMTPS id 2EBC7A20C6;
-        Wed, 10 Feb 2021 21:20:08 +0000 (UTC)
-Received: from EX13D08UEB004.ant.amazon.com (10.43.60.142) by
- EX13MTAUEE001.ant.amazon.com (10.43.62.200) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 10 Feb 2021 21:20:08 +0000
-Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
- EX13D08UEB004.ant.amazon.com (10.43.60.142) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Wed, 10 Feb 2021 21:20:08 +0000
-Received: from EX13D08UEB001.ant.amazon.com ([10.43.60.245]) by
- EX13D08UEB001.ant.amazon.com ([10.43.60.245]) with mapi id 15.00.1497.010;
- Wed, 10 Feb 2021 21:20:08 +0000
-From:   "Woodhouse, David" <dwmw@amazon.co.uk>
-To:     "seanjc@google.com" <seanjc@google.com>
-CC:     "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Thread-Index: AQHW/9pOzhEdoEl9PkGnB5lokEkwtKpR3VyAgAAF/YCAAAH0gA==
-Date:   Wed, 10 Feb 2021 21:20:08 +0000
-Message-ID: <9dbfbc342899895a13effb7ed745001549b51798.camel@amazon.co.uk>
-References: <20210210182609.435200-1-seanjc@google.com>
-         <20210210182609.435200-6-seanjc@google.com>
-         <8752a59b694671d25308d644cba661c4ec128094.camel@amazon.co.uk>
-         <YCRMY17WEdpJYd3C@google.com>
-In-Reply-To: <YCRMY17WEdpJYd3C@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.161.87]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E53F7ACE5AF36E448C20592C01D82242@amazon.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=iH07BZvtOZg2/xaJwWGnBDe966Ae6BJm3E9r806bdwI=;
+        b=f9MerrQ3yc5No+PHEyXTu562wgj9adm7emaSWysclxS37whKjRRLKObEnXG6gsUb49
+         Nx+wVsPTy7k7tDJLvCU6i9gJi/lTV80e+9ddccmOUUZEc1IN03ZYR//iKllKKgC2Ba5M
+         g9AKFbDlqr+5bE3gHCcEVMcJ0+ulaq9ZBh7fl88U46bQg78LS+pJ+o/IKBcgzXVj4b4h
+         w3UbXXb1Xyx74wwhZjQti/Rh8dG0O8cNGetRuCF/aE9XzUW4u45622Y83+SZztLWeo4l
+         F+NRPlo7dHBAu2Jc2dE+D5hdBG2UZpVcWnsrJ0v1we0SZ28UB2edQkVPupfLuwtH779F
+         Bvrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=iH07BZvtOZg2/xaJwWGnBDe966Ae6BJm3E9r806bdwI=;
+        b=pC0zpdQmu7NmgKW8XscuP/QNOl15b2lvz+7ujYCmRU4bia6vdgHMFAcPxzcSqMjg1s
+         VwUesGrVFU4UNogwvqjSchwcP0jrsxlvxAIgV5o6JgqbQym2EI2wcGkil2fwa2OxJ6RW
+         RxEiJNXDQEH/dHmS/16v5c1BQoyup1Z0BYTFIMrJe8clnkqZk4IRBIfYIA8NhzNXuPny
+         L9igO3xRoptW/d0IAO/zPA5QEII3vb2F0AwMr13T0ImjS/in7SdwUvhfSxoI0AUtePyN
+         Q4hHYVNg6LZNJR/HeVG6xXkQiu4pgEyn03jO6q9vUuNV1AZZl4nYePCnuhPgEJD8/F0w
+         iHpA==
+X-Gm-Message-State: AOAM530Lvkpji0K5sbJjNe9YfNPKSXiRpaLOkHwdIL58MAwpbbVtjAOb
+        Gjbp6Aj7tMnicBEy03IsG96qu2xzEY8fhyc/FdYACq3ul91xJvkAFuDiqe4AC/U87uiHVn2ECBK
+        9/GJIUeSgp4fOHh9LSxyWvig5ZWvWWVsAQ+IBwg5akoMwutUnoXm+g+noWaTbdR1VpnkXBKoc6o
+        iVyXY=
+X-Google-Smtp-Source: ABdhPJxe7vNZLjdS7N3FOYndJVUdUx14fym5AAgOU97G0glwYIFUMHDnbFR3SnuREh5r0MMg846S0VSNZS11NyeFZ/deAg==
+Sender: "makarandsonare via sendgmr" 
+        <makarandsonare@makarandsonare.sea.corp.google.com>
+X-Received: from makarandsonare.sea.corp.google.com ([2620:15c:100:202:6d8b:349:43f0:7f3c])
+ (user=makarandsonare job=sendgmr) by 2002:a25:83cc:: with SMTP id
+ v12mr7123634ybm.293.1612992196865; Wed, 10 Feb 2021 13:23:16 -0800 (PST)
+Date:   Wed, 10 Feb 2021 13:23:08 -0800
+Message-Id: <20210210212308.2219465-1-makarandsonare@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
+Subject: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging gets enabled/disabled
+From:   Makarand Sonare <makarandsonare@google.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, pshier@google.com,
+        jmattson@google.com
+Cc:     Makarand Sonare <makarandsonare@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDIxLTAyLTEwIGF0IDEzOjEzIC0wODAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBPbiBXZWQsIEZlYiAxMCwgMjAyMSwgV29vZGhvdXNlLCBEYXZpZCB3cm90ZToNCj4g
-PiBPbiBXZWQsIDIwMjEtMDItMTAgYXQgMTA6MjYgLTA4MDAsIFNlYW4gQ2hyaXN0b3BoZXJzb24g
-d3JvdGU6DQo+ID4gU28gaXQgaXNuJ3QgY2xlYXIgdGhlIGFkZGl0aW9uYWxseSBwYWRkaW5nIHJl
-YWxseSBidXlzIHVzIGFueXRoaW5nOyBpZg0KPiA+IHdlIHBsYXkgdGhpcyBnYW1lIHdpdGhvdXQg
-a25vd2luZyB0aGUgQUJJIHdlJ2QgYmUgc2NyZXdlZCBhbnl3YXkuIEJ1dA0KPiA+IGl0IGRvZXNu
-J3QgaHVydC4NCj4gDQo+IFlhLCB0aGlzIGlzIHB1cmVseSBmb3IgZm9sa3MgcmVhZGluZyB0aGUg
-Y29kZSBhbmQgd29uZGVyaW5nIGhvdyA2Mj09NjQuDQoNCkZhaXIgZW5vdWdoLiBUaGF0IGtpbmQg
-b2YgdGhpbmcgaXMgd2h5IEkgbGl0dGVyZWQgdGhlIGNvZGUgd2l0aA0KYXNzZXJ0aW9ucyBiYXNl
-ZCBvbiBzaXplb2YoKSBhbmQgb2Zmc2V0b2YoKSA6KQ0KCgoKQW1hem9uIERldmVsb3BtZW50IENl
-bnRyZSAoTG9uZG9uKSBMdGQuIFJlZ2lzdGVyZWQgaW4gRW5nbGFuZCBhbmQgV2FsZXMgd2l0aCBy
-ZWdpc3RyYXRpb24gbnVtYmVyIDA0NTQzMjMyIHdpdGggaXRzIHJlZ2lzdGVyZWQgb2ZmaWNlIGF0
-IDEgUHJpbmNpcGFsIFBsYWNlLCBXb3JzaGlwIFN0cmVldCwgTG9uZG9uIEVDMkEgMkZBLCBVbml0
-ZWQgS2luZ2RvbS4KCgo=
+Currently, if enable_pml=1 PML remains enabled for the entire lifetime
+of the VM irrespective of whether dirty logging is enable or disabled.
+When dirty logging is disabled, all the pages of the VM are manually
+marked dirty, so that PML is effectively non-operational. Clearing
+the dirty bits is an expensive operation which can cause severe MMU
+lock contention in a performance sensitive path when dirty logging
+is disabled after a failed or canceled live migration. Also, this
+would break if some other code path clears the dirty bits in which
+case, PML will actually start logging dirty pages even when dirty
+logging is disabled incurring unnecessary vmexits when the PML buffer
+becomes full. In order to avoid this extra overhead, we should
+enable or disable PML in VMCS when dirty logging gets enabled
+or disabled instead of keeping it always enabled.
+
+Tested:
+	kvm-unit-tests
+	dirty_log_test
+	dirty_log_perf_test
+
+Signed-off-by: Makarand Sonare <makarandsonare@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  4 +++
+ arch/x86/kvm/vmx/nested.c       |  5 ++++
+ arch/x86/kvm/vmx/vmx.c          | 49 +++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              |  4 +++
+ include/linux/kvm_host.h        |  1 +
+ virt/kvm/kvm_main.c             | 14 ++++++++--
+ 7 files changed, 76 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1ed1206c196db..6aca4f0f9d806 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -91,6 +91,8 @@
+ 	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
+ #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
++#define KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE \
++	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+@@ -1029,6 +1031,7 @@ struct kvm_arch {
+ 	} msr_filter;
+ 
+ 	bool bus_lock_detection_enabled;
++	bool pml_enabled;
+ 
+ 	struct kvm_pmu_event_filter *pmu_event_filter;
+ 	struct task_struct *nx_lpage_recovery_thread;
+@@ -1295,6 +1298,7 @@ struct kvm_x86_ops {
+ 					   struct kvm_memory_slot *slot,
+ 					   gfn_t offset, unsigned long mask);
+ 	int (*cpu_dirty_log_size)(void);
++	void (*update_vcpu_dirty_logging_state)(struct kvm_vcpu *vcpu);
+ 
+ 	/* pmu operations of sub-arch */
+ 	const struct kvm_pmu_ops *pmu_ops;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b2f0b5e9cd638..9e8e89fdc03a2 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4495,6 +4495,11 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		vmx_set_virtual_apic_mode(vcpu);
+ 	}
+ 
++	if (vmx->nested.deferred_update_pml_vmcs) {
++		vmx->nested.deferred_update_pml_vmcs = false;
++		vmx_update_pml_in_vmcs(vcpu);
++	}
++
+ 	/* Unpin physical memory we referred to in vmcs02 */
+ 	if (vmx->nested.apic_access_page) {
+ 		kvm_release_page_clean(vmx->nested.apic_access_page);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 777177ea9a35e..eb6639f0ee7eb 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4276,7 +4276,7 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	*/
+ 	exec_control &= ~SECONDARY_EXEC_SHADOW_VMCS;
+ 
+-	if (!enable_pml)
++	if (!enable_pml || !vcpu->kvm->arch.pml_enabled)
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+ 
+ 	if (cpu_has_vmx_xsaves()) {
+@@ -7133,7 +7133,8 @@ static void vmcs_set_secondary_exec_control(struct vcpu_vmx *vmx)
+ 		SECONDARY_EXEC_SHADOW_VMCS |
+ 		SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+ 		SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+-		SECONDARY_EXEC_DESC;
++		SECONDARY_EXEC_DESC |
++		SECONDARY_EXEC_ENABLE_PML;
+ 
+ 	u32 new_ctl = vmx->secondary_exec_control;
+ 	u32 cur_ctl = secondary_exec_controls_get(vmx);
+@@ -7509,6 +7510,19 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot)
+ {
++	/*
++	 * Check all slots and enable PML if dirty logging
++	 * is being enabled for the 1st slot
++	 *
++	 */
++	if (enable_pml &&
++	    kvm->dirty_logging_enable_count == 1 &&
++	    !kvm->arch.pml_enabled) {
++		kvm->arch.pml_enabled = true;
++		kvm_make_all_cpus_request(kvm,
++			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
++	}
++
+ 	if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+ 		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+ 	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
+@@ -7517,9 +7531,39 @@ static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+ static void vmx_slot_disable_log_dirty(struct kvm *kvm,
+ 				       struct kvm_memory_slot *slot)
+ {
++	/*
++	 * Check all slots and disable PML if dirty logging
++	 * is being disabled for the last slot
++	 *
++	 */
++	if (enable_pml &&
++	    kvm->dirty_logging_enable_count == 0 &&
++	    kvm->arch.pml_enabled) {
++		kvm->arch.pml_enabled = false;
++		kvm_make_all_cpus_request(kvm,
++			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
++	}
++
+ 	kvm_mmu_slot_set_dirty(kvm, slot);
+ }
+ 
++void vmx_update_pml_in_vmcs(struct kvm_vcpu *vcpu)
++{
++	if (cpu_has_secondary_exec_ctrls()) {
++		if (is_guest_mode(vcpu)) {
++			to_vmx(vcpu)->nested.deferred_update_pml_vmcs = true;
++			return;
++		}
++
++		if (vcpu->kvm->arch.pml_enabled)
++			vmcs_set_bits(SECONDARY_VM_EXEC_CONTROL,
++				SECONDARY_EXEC_ENABLE_PML);
++		else
++			vmcs_clear_bits(SECONDARY_VM_EXEC_CONTROL,
++				SECONDARY_EXEC_ENABLE_PML);
++	}
++}
++
+ static void vmx_flush_log_dirty(struct kvm *kvm)
+ {
+ 	kvm_flush_pml_buffers(kvm);
+@@ -7747,6 +7791,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.slot_disable_log_dirty = vmx_slot_disable_log_dirty,
+ 	.flush_log_dirty = vmx_flush_log_dirty,
+ 	.enable_log_dirty_pt_masked = vmx_enable_log_dirty_pt_masked,
++	.update_vcpu_dirty_logging_state = vmx_update_pml_in_vmcs,
+ 
+ 	.pre_block = vmx_pre_block,
+ 	.post_block = vmx_post_block,
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 12c53d05a902b..b7dc413cda7bd 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -181,6 +181,8 @@ struct nested_vmx {
+ 
+ 	struct loaded_vmcs vmcs02;
+ 
++	bool deferred_update_pml_vmcs;
++
+ 	/*
+ 	 * Guest pages referred to in the vmcs02 with host-physical
+ 	 * pointers, so we must keep them pinned while L2 runs.
+@@ -393,6 +395,7 @@ int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr);
+ void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu);
+ void vmx_set_intercept_for_msr(struct kvm_vcpu *vcpu,
+ 	u32 msr, int type, bool value);
++void vmx_update_pml_in_vmcs(struct kvm_vcpu *vcpu);
+ 
+ static inline u8 vmx_get_rvi(void)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d9f931c632936..75b924c9c5af0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8984,6 +8984,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			kvm_check_async_pf_completion(vcpu);
+ 		if (kvm_check_request(KVM_REQ_MSR_FILTER_CHANGED, vcpu))
+ 			static_call(kvm_x86_msr_filter_changed)(vcpu);
++
++		if (kvm_check_request(KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE,
++				      vcpu))
++			kvm_x86_ops.update_vcpu_dirty_logging_state(vcpu);
+ 	}
+ 
+ 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f417447129b9c..a8a28ba955923 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -518,6 +518,7 @@ struct kvm {
+ 	pid_t userspace_pid;
+ 	unsigned int max_halt_poll_ns;
+ 	u32 dirty_ring_size;
++	uint dirty_logging_enable_count;
+ };
+ 
+ #define kvm_err(fmt, ...) \
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ee4ac2618ec59..c6e5b026bbfe8 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -307,6 +307,7 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
+ {
+ 	return kvm_make_all_cpus_request_except(kvm, req, NULL);
+ }
++EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+ 
+ #ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+ void kvm_flush_remote_tlbs(struct kvm *kvm)
+@@ -1366,15 +1367,24 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	}
+ 
+ 	/* Allocate/free page dirty bitmap as needed */
+-	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
++	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+ 		new.dirty_bitmap = NULL;
+-	else if (!new.dirty_bitmap && !kvm->dirty_ring_size) {
++
++		if (old.flags & KVM_MEM_LOG_DIRTY_PAGES) {
++			WARN_ON(kvm->dirty_logging_enable_count == 0);
++			--kvm->dirty_logging_enable_count;
++		}
++
++	} else if (!new.dirty_bitmap && !kvm->dirty_ring_size) {
+ 		r = kvm_alloc_dirty_bitmap(&new);
+ 		if (r)
+ 			return r;
+ 
+ 		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+ 			bitmap_set(new.dirty_bitmap, 0, new.npages);
++
++		++kvm->dirty_logging_enable_count;
++		WARN_ON(kvm->dirty_logging_enable_count == 0);
+ 	}
+ 
+ 	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
+-- 
+2.30.0.478.g8a0d178c01-goog
 
