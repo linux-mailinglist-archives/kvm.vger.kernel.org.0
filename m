@@ -2,101 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 600E2316B1C
-	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 17:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BDAA316B23
+	for <lists+kvm@lfdr.de>; Wed, 10 Feb 2021 17:26:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232364AbhBJQYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 11:24:08 -0500
-Received: from foss.arm.com ([217.140.110.172]:40286 "EHLO foss.arm.com"
+        id S232100AbhBJQ0S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 11:26:18 -0500
+Received: from mga14.intel.com ([192.55.52.115]:56603 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230005AbhBJQXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 11:23:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA94E11D4;
-        Wed, 10 Feb 2021 08:23:08 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19FC33F73B;
-        Wed, 10 Feb 2021 08:23:04 -0800 (PST)
-Date:   Wed, 10 Feb 2021 16:22:14 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     netdev@vger.kernel.org, yangbo.lu@nxp.com, john.stultz@linaro.org,
-        tglx@linutronix.de, pbonzini@redhat.com, seanjc@google.com,
-        richardcochran@gmail.com, Mark.Rutland@arm.com, will@kernel.org,
-        suzuki.poulose@arm.com, steven.price@arm.com,
-        lorenzo.pieralisi@arm.com, sudeep.holla@arm.com,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Steve.Capper@arm.com, justin.he@arm.com, jianyong.wu@arm.com,
-        kernel-team@android.com
-Subject: Re: [PATCH v18 5/7] clocksource: Add clocksource id for arm arch
- counter
-Message-ID: <20210210162214.2e68e0da@slackpad.fritz.box>
-In-Reply-To: <20210208134029.3269384-6-maz@kernel.org>
-References: <20210208134029.3269384-1-maz@kernel.org>
-        <20210208134029.3269384-6-maz@kernel.org>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S232152AbhBJQZz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 11:25:55 -0500
+IronPort-SDR: IoBfMPJAhiVnMGDTtWl6YUoPwzTtjjUQERD3c2ha/LoLpCynd8C+qdtRBCrfROe003k8rGvqIy
+ UCpPFVu/LZnQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9891"; a="181328877"
+X-IronPort-AV: E=Sophos;i="5.81,168,1610438400"; 
+   d="scan'208";a="181328877"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 08:25:13 -0800
+IronPort-SDR: vh8ca9Rk+hpZui2u9ziCQUQP2R9XfBCgQ5uFK92I5KW/SHqkD8HCAqFw8HZ1ZShHDhWeADYWxo
+ JBLA5mwGewUA==
+X-IronPort-AV: E=Sophos;i="5.81,168,1610438400"; 
+   d="scan'208";a="488795823"
+Received: from tryu-mobl2.amr.corp.intel.com (HELO [10.209.100.152]) ([10.209.100.152])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 08:25:12 -0800
+Subject: Re: [PATCH 6/7] x86/boot/compressed/64: Check SEV encryption in
+ 32-bit boot-path
+To:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org
+Cc:     Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+References: <20210210102135.30667-1-joro@8bytes.org>
+ <20210210102135.30667-7-joro@8bytes.org>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <0526b64e-8ef0-2e3c-06a7-e07835be160c@intel.com>
+Date:   Wed, 10 Feb 2021 08:25:11 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210210102135.30667-7-joro@8bytes.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  8 Feb 2021 13:40:27 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+On 2/10/21 2:21 AM, Joerg Roedel wrote:
+> +1:	rdrand	%eax
+> +	jnc	1b
+> +2:	rdrand	%ebx
+> +	jnc	2b
+> +
+> +	/* Store to memory and keep it in the registers */
+> +	movl	%eax, rva(sev_check_data)(%ebp)
+> +	movl	%ebx, rva(sev_check_data+4)(%ebp)
+> +
+> +	/* Enable paging to see if encryption is active */
+> +	movl	%cr0, %edx	/* Backup %cr0 in %edx */
+> +	movl	$(X86_CR0_PG | X86_CR0_PE), %ecx /* Enable Paging and Protected mode */
+> +	movl	%ecx, %cr0
+> +
+> +	cmpl	%eax, rva(sev_check_data)(%ebp)
+> +	jne	3f
+> +	cmpl	%ebx, rva(sev_check_data+4)(%ebp)
+> +	jne	3f
+> +
+> +	movl	%edx, %cr0	/* Restore previous %cr0 */
+> +
+> +	jmp	4f
 
-> From: Jianyong Wu <jianyong.wu@arm.com>
-> 
-> Add clocksource id to the ARM generic counter so that it can be easily
-> identified from callers such as ptp_kvm.
-> 
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Signed-off-by: Jianyong Wu <jianyong.wu@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Link: https://lore.kernel.org/r/20201209060932.212364-6-jianyong.wu@arm.com
+This is all very cute.  But, if this fails, it means that the .data
+section is now garbage, right?.  I guess failing here is less
+entertaining than trying to run the kernel with random garbage in .data,
+but it doesn't make it very far either way, right?
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
-> ---
->  drivers/clocksource/arm_arch_timer.c | 2 ++
->  include/linux/clocksource_ids.h      | 1 +
->  2 files changed, 3 insertions(+)
-> 
-> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-> index d0177824c518..8f12e223703f 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -16,6 +16,7 @@
->  #include <linux/cpu_pm.h>
->  #include <linux/clockchips.h>
->  #include <linux/clocksource.h>
-> +#include <linux/clocksource_ids.h>
->  #include <linux/interrupt.h>
->  #include <linux/of_irq.h>
->  #include <linux/of_address.h>
-> @@ -191,6 +192,7 @@ static u64 arch_counter_read_cc(const struct cyclecounter *cc)
->  
->  static struct clocksource clocksource_counter = {
->  	.name	= "arch_sys_counter",
-> +	.id	= CSID_ARM_ARCH_COUNTER,
->  	.rating	= 400,
->  	.read	= arch_counter_read,
->  	.mask	= CLOCKSOURCE_MASK(56),
-> diff --git a/include/linux/clocksource_ids.h b/include/linux/clocksource_ids.h
-> index 4d8e19e05328..16775d7d8f8d 100644
-> --- a/include/linux/clocksource_ids.h
-> +++ b/include/linux/clocksource_ids.h
-> @@ -5,6 +5,7 @@
->  /* Enum to give clocksources a unique identifier */
->  enum clocksource_ids {
->  	CSID_GENERIC		= 0,
-> +	CSID_ARM_ARCH_COUNTER,
->  	CSID_MAX,
->  };
->  
-
+Why bother with rdrand, though?  Couldn't you just pick any old piece of
+.data and compare before and after?
