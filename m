@@ -2,75 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B07CE3191D5
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 19:06:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59E2E31922D
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 19:25:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230239AbhBKSGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 13:06:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51920 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231477AbhBKSDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 13:03:47 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9442864DF3
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 18:03:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613066585;
-        bh=seazP6u09eQMkDa/mO+XCCCWc9j3J9Gbeg0MY8zFolI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=bbfDAy7WjZlB8e2WRarGWda8dSTSCzLTsJISd7xF4L304qxAVq45SrEarf8oGACCG
-         QHop7UCjFTf0YLkWj27w7NqZ+8KhK7Y/BPQLNBGP5xNIJml1793Yril96FdNnFsEf+
-         Ye4DICTsuAODrV3EfEn2u34MeWKOac6jwrmLW3AjJGSTSZU4z6LrHtJ/XR41IcO6IG
-         /qyazo2GVpWdzDmGDzKDIgD6xo9VlKxJVXCm87coUWYOGcCZHuEQp7Pt8qWAZ5dQLx
-         3YCARav3dXljRFHNRuNBph4dSzrked/uC6PjNlvwJwbIe+7oHevtyHm5YEI7hvQGXN
-         AkwXWzpgOn9ww==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 861216530F; Thu, 11 Feb 2021 18:03:05 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 201753] AMD-Vi: Unable to write to IOMMU perf counter
-Date:   Thu, 11 Feb 2021 18:03:05 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: suravee.suthikulpanit@amd.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-201753-28872-kqF6iYcLPA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-201753-28872@https.bugzilla.kernel.org/>
-References: <bug-201753-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S231522AbhBKSXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 13:23:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232683AbhBKSVi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 13:21:38 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82BBC06178A
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 10:20:30 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id t25so4490072pga.2
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 10:20:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Cx7+IAlMjVEhgHQf7V03jqKNyPkobgGwu8xQGqHKAsI=;
+        b=t6mlYDY5o1l9HFJo3+mtRUEbkLgCwlPoyWFso3+T7umSCBjifIPc7mcSzE5cc8s6Wy
+         KosoWcL+NaUFa1UHqUHQqHiUDx0JccBybqIiecO4hla3BhxNjHJ18V5RfQaOj+G8+OSd
+         8yZ83RSQaM+k+FpGzTdruQ+oWZ6zHAJriVrTLUgj+B37QbHBWBWL8w+wyV4ZyG53TaDY
+         JJRrG6kn7V8M3wRwuv3OH3IbzhnDehmeL7ntRQjmR3mWOBaqmeOUorFHzr6vopySd7AI
+         T81S7KghtBTGQrHOGt6Ie/12bx7jYJL+IDWaBbJFddVQubqeRFh+tBRa2o79pypfW7vg
+         vhSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Cx7+IAlMjVEhgHQf7V03jqKNyPkobgGwu8xQGqHKAsI=;
+        b=Tzz2Q/u7pddmS9Ps+YPoFkeqBcbth2Z4ClQ2BSKs6ENCthCzGeNIv9PSSm5V+PJulR
+         UgW0FCVSJl61babRBTJku4FkUMBrf9puqjdCMnyVO2liogpu4B0D5yrQkhCULsi6qQBc
+         6gaNYe777WrtcRcqltMoMcSfYy+MAHRnpUo++0waJLjbFIS8ZavE3+MEadUKugqAvNTY
+         XY1TBaVFs2g9Qs/HXqWgUiFMV1porQYpf+xZVGFbiOzH38IOsrh+eIQ1pA0xloM9pD41
+         /bhZnuk1f9q62RxrskJhig4yTZVQADM1D0ntDcCVVGesRUPOu9oeOlIYL7Mb2d5ikTUt
+         dyXw==
+X-Gm-Message-State: AOAM531vN8Wk27eOFRUYLvcIsxxTj9uKrTxX+HSqlqjgYnBh9+S5M5BV
+        t2WIZZOk67ln/0ZZbBo3vfbAjw==
+X-Google-Smtp-Source: ABdhPJyT1OtutfI2yZlQMRd6GQwZS5ubkKsOpQJWkSY8DquqEy+HFzt/ZE4JZ3Qw2Lm2cfb7Aa7Ejw==
+X-Received: by 2002:a63:4346:: with SMTP id q67mr9262090pga.223.1613067629710;
+        Thu, 11 Feb 2021 10:20:29 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:f588:a708:f347:3ebb])
+        by smtp.gmail.com with ESMTPSA id s135sm6452304pfs.206.2021.02.11.10.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 10:20:29 -0800 (PST)
+Date:   Thu, 11 Feb 2021 10:20:22 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Makarand Sonare <makarandsonare@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pshier@google.com,
+        jmattson@google.com, Ben Gardon <bgardon@google.com>
+Subject: Re: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging
+ gets enabled/disabled
+Message-ID: <YCV1Zj+CJgyPN2jB@google.com>
+References: <20210210212308.2219465-1-makarandsonare@google.com>
+ <YCSAh31LP4QwBfHZ@google.com>
+ <d6dbe1e3-eaa9-f171-ce5f-6a00b21f1c9a@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6dbe1e3-eaa9-f171-ce5f-6a00b21f1c9a@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D201753
+On Thu, Feb 11, 2021, Paolo Bonzini wrote:
+> On 11/02/21 01:55, Sean Christopherson wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index ee4ac2618ec59..c6e5b026bbfe8 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -307,6 +307,7 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
+> > >   {
+> > >   	return kvm_make_all_cpus_request_except(kvm, req, NULL);
+> > >   }
+> > > +EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+> > If we move enable_pml into x86.c then this export and several of the kvm_x86_ops
+> > go away.  I know this because I have a series I was about to send that does that,
+> > among several other things.  I suspect that kvm->arch.pml_enabled could also go
+> > away, but that's just a guess.
+> 
+> I don't like the idea of moving enable_pml into x86.c, but I'm ready to be
+> convinced otherwise.  In any case, for sure you can _check_ enable_pml from
+> x86.c via kvm_x86_ops.flush_log_dirty or kvm_x86_ops.cpu_dirty_log_size.
 
---- Comment #8 from Suravee Suthikulpanit (suravee.suthikulpanit@amd.com) -=
---
-RFC v2 and v3 should be similar. I have modified the retry loop a bit in V3=
- to
-be more efficient.
+Ya, after taking another look at my series, exposing enable_pml isn't necessary.
+What I really dislike is bouncing through VMX and exporting MMU functions for
+no real benefit.  The x86/MMU functions/behavior are tightly coupled to VMX's
+implementation, bouncing through kvm_x86_ops doesn't magically decouple things.
 
-Patch has been submitted here (https://lkml.org/lkml/2021/2/8/486)
+Anyways, kvm_x86_ops.cpu_dirty_log_size can be change to a simple integer instead
+of a callback function, and with that change I'm happy using cpu_dirty_log_size
+as the check with x86.c/mmu.c to determine whether or not hardware dirty logging
+is supported.
 
-Thanks,
-Suravee
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks for the early sanity check :-)
