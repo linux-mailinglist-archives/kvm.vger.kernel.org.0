@@ -2,336 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 656F9318FA2
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:14:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 64F32319011
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:34:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231235AbhBKQNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 11:13:23 -0500
-Received: from foss.arm.com ([217.140.110.172]:54112 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229649AbhBKQLP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 11:11:15 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DED01063;
-        Thu, 11 Feb 2021 08:10:16 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 90D393F73D;
-        Thu, 11 Feb 2021 08:10:15 -0800 (PST)
-Subject: Re: [PATCH kvmtool 04/21] mmio: Extend handling to include ioport
- emulation
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-5-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a97cc31b-73b0-7c48-79bb-fc14f7ec0aa1@arm.com>
-Date:   Thu, 11 Feb 2021 16:10:16 +0000
+        id S230364AbhBKQdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 11:33:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26138 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231691AbhBKQaa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 11:30:30 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11BGDsOJ036022;
+        Thu, 11 Feb 2021 11:29:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1VwQ7jEAKnvB8fLAJVSh63TrP4R5BIlh1FXfJ8lm3Ew=;
+ b=JUQvUkV5B3gfrdV5fnpuaIwBJ/WysVIfYYdimsIH62BuCMeOVJ3llLnzuIpqbajCt2CO
+ HrUOyOyveieFbbGX6RHUehoobDrTBq+ZkbrpMLzii3lQ+I5BL6cN0VJzxgXp6iHqiYSy
+ H5ep5WLY/QgWLx0PbRFaoAaXMFbrJqZxldoIpYYSNA+dQYgxhSS3VoeJ1+3VtglFgFkW
+ NuCd1r8WpXij8uGBkmzemGNlR5ocEczEog9f5AiMPpbe5pDDWokFzqf98ZPEAzAbykWs
+ mMoaLG0eKL0lY3VNR5ZdDSWQRLQetR5Ycdtj/0DQh/oHwtJotul0vpdfciRRu/E3Gh+O sQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wv0mth-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 11:29:45 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11BGE3ce036934;
+        Thu, 11 Feb 2021 11:29:45 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wv0mst-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 11:29:44 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11BGRBO8021576;
+        Thu, 11 Feb 2021 16:29:43 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma03wdc.us.ibm.com with ESMTP id 36hjr9pxu4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 16:29:43 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11BGTgHZ6488610
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Feb 2021 16:29:42 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 18B57BE058;
+        Thu, 11 Feb 2021 16:29:42 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ABBE0BE056;
+        Thu, 11 Feb 2021 16:29:38 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.60.2])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Feb 2021 16:29:38 +0000 (GMT)
+Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, liranl@nvidia.com, oren@nvidia.com,
+        tzahio@nvidia.com, leonro@nvidia.com, yarong@nvidia.com,
+        aviadye@nvidia.com, shahafs@nvidia.com, artemp@nvidia.com,
+        kwankhede@nvidia.com, ACurrid@nvidia.com, gmataev@nvidia.com,
+        cjia@nvidia.com, yishaih@nvidia.com, aik@ozlabs.ru
+References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
+ <20210201162828.5938-9-mgurtovoy@nvidia.com>
+ <20210201181454.22112b57.cohuck@redhat.com>
+ <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
+ <20210201114230.37c18abd@omen.home.shazbot.org>
+ <20210202170659.1c62a9e8.cohuck@redhat.com>
+ <20210202171021.GW4247@nvidia.com>
+ <f49512dd-9a5c-b1d8-1609-da55e270635b@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <9fc2b752-88a3-0607-00fc-cb7414dcd5f6@linux.ibm.com>
+Date:   Thu, 11 Feb 2021 11:29:37 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-5-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <f49512dd-9a5c-b1d8-1609-da55e270635b@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-11_07:2021-02-11,2021-02-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ impostorscore=0 phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102110135
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On 2/11/21 10:47 AM, Max Gurtovoy wrote:
+> 
+> On 2/2/2021 7:10 PM, Jason Gunthorpe wrote:
+>> On Tue, Feb 02, 2021 at 05:06:59PM +0100, Cornelia Huck wrote:
+>>
+>>> On the other side, we have the zdev support, which both requires s390
+>>> and applies to any pci device on s390.
+>> Is there a reason why CONFIG_VFIO_PCI_ZDEV exists? Why not just always
+>> return the s390 specific data in VFIO_DEVICE_GET_INFO if running on
+>> s390?
+>>
+>> It would be like returning data from ACPI on other platforms.
+> 
+> Agree.
+> 
+> all agree that I remove it ?
 
-On 12/10/20 2:28 PM, Andre Przywara wrote:
-> In their core functionality MMIO and I/O port traps are not really
-> different, yet we still have two totally separate code paths for
-> handling them. Devices need to decide on one conduit or need to provide
-> different handler functions for each of them.
->
-> Extend the existing MMIO emulation to also cover ioport handlers.
-> This just adds another RB tree root for holding the I/O port handlers,
-> but otherwise uses the same tree population and lookup code.
+I did some archives digging on the discussions around 
+CONFIG_VFIO_PCI_ZDEV and whether we should/should not have a Kconfig 
+switch around this; it was something that was carried over various 
+attempts to get the zdev support upstream, but I can't really find (or 
+think of) a compelling reason that a Kconfig switch must be kept for it. 
+  The bottom line is if you're on s390, you really want zdev support.
 
-Maybe I'm missing something, but why two trees? Is it valid to have an overlap
-between IO port and MMIO emulation? Or was it done to make the removal of ioport
-emulation easier?
+So: I don't have an objection so long as the net result is that 
+vfio_pci_zdev.o is always built in to vfio-pci(-core) for s390.
 
-If it's not valid to have that overlap, then I think having one tree for both
-would better. Struct mmio_mapping would have to be augmented with a flags field
-that holds the same flags given to kvm__register_iotrap to differentiate between
-the two slightly different emulations. Saving the IOTRAP_COALESCE flag would also
-make it trivial to call KVM_UNREGISTER_COALESCED_MMIO in kvm__deregister_iotrap,
-which we currently don't do.
+> 
+> we already have a check in the code:
+> 
+> if (ret && ret != -ENODEV) {
+>                                  pci_warn(vdev->vpdev.pdev, "Failed to 
+> setup zPCI info capabilities\n");
+>                                  return ret;
+> }
+> 
+> so in case its not zdev we should get -ENODEV and continue in the good 
+> flow.
+> 
+>>
+>> It really seems like part of vfio-pci-core
+>>
+>> Jason
 
-> "ioport" or "mmio" just become a flag in the registration function.
-> Provide wrappers to not break existing users, and allow an easy
-> transition for the existing ioport handlers.
->
-> This also means that ioport handlers now can use the same emulation
-> callback prototype as MMIO handlers, which means we have to migrate them
-> over. To allow a smooth transition, we hook up the new I/O emulate
-> function to the end of the existing ioport emulation code.
-
-I'm sorry, but I don't understand that last sentence. Do you mean that the ioport
-emulation code has been modified to use kvm__emulate_pio() as a fallback for when
-the port is not found in the ioport_tree?
-
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/kvm.h | 42 +++++++++++++++++++++++++++++----
->  ioport.c          |  4 ++--
->  mmio.c            | 59 +++++++++++++++++++++++++++++++++++++++--------
->  3 files changed, 89 insertions(+), 16 deletions(-)
->
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index ee99c28e..14f9d58b 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -27,10 +27,16 @@
->  #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
->  #endif
->  
-> +#define IOTRAP_BUS_MASK		0xf
-
-It's not immediately obvious what this mask does. It turns out it's used to mask
-the enum flags defined in the header devices.h, header which is not included in
-this file.
-
-The flag names we pass to kvm__register_iotrap() are slightly inconsistent
-(DEVICE_BUS_PCI, DEVICE_BUS_MMIO and IOTRAP_COALESCE), where DEVICE_BUS_{PCI,
-MMIO} come from devices.h as an enum. I was wondering if I'm missing something and
-there is a particular reason why we don't define our own flags for that here
-(something like IOTRAP_PIO and IOTRAP_MMIO).
-
-If we do decide to keep the flags from devices.h, I think it would be worth it to
-have a compile time check (with BUILD_BUG_ON) that IOTRAP_BUS_MASK is >=
-DEVICES_BUS_MAX, which would also be a good indication of where those flags are
-coming from.
-
-> +#define IOTRAP_COALESCE		(1U << 4)
-> +
->  #define DEFINE_KVM_EXT(ext)		\
->  	.name = #ext,			\
->  	.code = ext
->  
-> +struct kvm_cpu;
-> +typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-> +				u32 len, u8 is_write, void *ptr);
->  typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);
->  
->  enum {
-> @@ -113,6 +119,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
->  void kvm__irq_trigger(struct kvm *kvm, int irq);
->  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
->  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> +		      int direction, int size, u32 count);
->  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
->  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
->  		      enum kvm_mem_type type);
-> @@ -136,10 +144,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
->  				 KVM_MEM_TYPE_RESERVED);
->  }
->  
-> -int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
-> -				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
-> -				    void *ptr);
-> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
-> +int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
-> +				      mmio_handler_fn mmio_fn, void *ptr,
-> +				      unsigned int flags);
-> +
-> +static inline
-> +int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
-> +				    u64 phys_addr_len, bool coalesce,
-> +				    mmio_handler_fn mmio_fn, void *ptr)
-> +{
-> +	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
-> +			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
-> +}
-> +static inline
-> +int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
-> +				   mmio_handler_fn mmio_fn, void *ptr)
-> +{
-> +	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
-> +				    DEVICE_BUS_IOPORT);
-> +}
-> +
-> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
-> +static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-> +{
-> +	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
-> +}
-> +static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
-> +{
-> +	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
-> +}
-> +
->  void kvm__reboot(struct kvm *kvm);
->  void kvm__pause(struct kvm *kvm);
->  void kvm__continue(struct kvm *kvm);
-> diff --git a/ioport.c b/ioport.c
-> index b98836d3..204d8103 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -147,7 +147,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
->  
->  	entry = ioport_get(&ioport_tree, port);
->  	if (!entry)
-> -		goto out;
-> +		return kvm__emulate_pio(vcpu, port, data, direction,
-> +					size, count);
-
-I have to admit this gave me pause because this patch doesn't add any users for
-kvm__register_pio() (although with this change the behaviour of kvm__emulate_io()
-remains exactly the same). Do you think this change would fit better in patch #7,
-where the first user for kvm__register_pio() is added, or do you prefer it here?
-
->  
->  	ops	= entry->ops;
->  
-> @@ -162,7 +163,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
->  
->  	ioport_put(&ioport_tree, entry);
->  
-> -out:
->  	if (ret)
->  		return true;
->  
-> diff --git a/mmio.c b/mmio.c
-> index cd141cd3..4cce1901 100644
-> --- a/mmio.c
-> +++ b/mmio.c
-> @@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
->  
->  struct mmio_mapping {
->  	struct rb_int_node	node;
-> -	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
-> +	mmio_handler_fn		mmio_fn;
->  	void			*ptr;
->  	u32			refcount;
->  	bool			remove;
->  };
->  
->  static struct rb_root mmio_tree = RB_ROOT;
-> +static struct rb_root pio_tree = RB_ROOT;
->  
->  static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
->  {
-> @@ -103,9 +104,9 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
->  	mutex_unlock(&mmio_lock);
->  }
->  
-> -int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
-> -		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
-> -			void *ptr)
-> +int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
-> +			 mmio_handler_fn mmio_fn, void *ptr,
-> +			 unsigned int flags)
->  {
->  	struct mmio_mapping *mmio;
->  	struct kvm_coalesced_mmio_zone zone;
-> @@ -127,7 +128,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
->  		.remove		= false,
->  	};
->  
-> -	if (coalesce) {
-> +	if (flags & IOTRAP_COALESCE) {
-
-There is no such flag being used in ioport.c, is it valid to have the flags
-DEVICE_BUS_IOPORT and IOTRAP_COALESCE set at the same time?
-
->  		zone = (struct kvm_coalesced_mmio_zone) {
->  			.addr	= phys_addr,
->  			.size	= phys_addr_len,
-> @@ -139,18 +140,27 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
->  		}
->  	}
->  	mutex_lock(&mmio_lock);
-> -	ret = mmio_insert(&mmio_tree, mmio);
-> +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-> +		ret = mmio_insert(&pio_tree, mmio);
-> +	else
-> +		ret = mmio_insert(&mmio_tree, mmio);
->  	mutex_unlock(&mmio_lock);
->  
->  	return ret;
->  }
->  
-> -bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-> +bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
->  {
->  	struct mmio_mapping *mmio;
-> +	struct rb_root *tree;
-> +
-> +	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-> +		tree = &pio_tree;
-> +	else
-> +		tree = &mmio_tree;
->  
->  	mutex_lock(&mmio_lock);
-> -	mmio = mmio_search_single(&mmio_tree, phys_addr);
-> +	mmio = mmio_search_single(tree, phys_addr);
->  	if (mmio == NULL) {
->  		mutex_unlock(&mmio_lock);
->  		return false;
-> @@ -167,7 +177,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
->  	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
->  	 */
->  	if (mmio->refcount == 0)
-> -		mmio_deregister(kvm, &mmio_tree, mmio);
-> +		mmio_deregister(kvm, tree, mmio);
->  	else
->  		mmio->remove = true;
->  	mutex_unlock(&mmio_lock);
-> @@ -175,7 +185,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
->  	return true;
->  }
->  
-> -bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
-> +bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
-> +		       u32 len, u8 is_write)
-
-I don't think style changes should be part of this patch, the patch is large
-enough as it is.
-
-Thanks,
-
-Alex
-
->  {
->  	struct mmio_mapping *mmio;
->  
-> @@ -194,3 +205,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
->  out:
->  	return true;
->  }
-> +
-> +bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> +		     int direction, int size, u32 count)
-> +{
-> +	struct mmio_mapping *mmio;
-> +	bool is_write = direction == KVM_EXIT_IO_OUT;
-> +
-> +	mmio = mmio_get(&pio_tree, port, size);
-> +	if (!mmio) {
-> +		if (vcpu->kvm->cfg.ioport_debug) {
-> +			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
-> +				to_direction(direction), port, size, count);
-> +
-> +			return false;
-> +		}
-> +		return true;
-> +	}
-> +
-> +	while (count--) {
-> +		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
-> +
-> +		data += size;
-> +	}
-> +
-> +	mmio_put(vcpu->kvm, &pio_tree, mmio);
-> +
-> +	return true;
-> +}
