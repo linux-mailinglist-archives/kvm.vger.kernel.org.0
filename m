@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 09C82318E18
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 16:23:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D424C318E36
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 16:24:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbhBKPUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 10:20:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52620 "EHLO mail.kernel.org"
+        id S230355AbhBKPXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 10:23:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52624 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230204AbhBKPSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 10:18:21 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D7A4B64F10;
-        Thu, 11 Feb 2021 15:06:00 +0000 (UTC)
+        id S230333AbhBKPUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 10:20:37 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5151464F2E;
+        Thu, 11 Feb 2021 15:07:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1613055961;
-        bh=TnW3LRvYFb3Bh56T1fRRhMh9otvJCWWAxpknbqrSmYM=;
+        s=korg; t=1613056020;
+        bh=MftR7VMP18psrqPKCYg64fQdJg2Q5xCCr+TeihrSvm0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=brW4hHbPzkFpmUGsNP0dJdyggDFKR/D9mdRKOz5ot73YrmzRmiZQdtelkJRS5L5gA
-         f0q+kHsxOmO5iSO4D5gQeaGxOyMmxY9o2IpGeGYopBmXCnXGW3v8ztotLQ+h9ExiZp
-         +A2nFHq5Nvha4DaWJebP/yCHkLUpRIwXt/af8CqI=
+        b=c8gw9etrzq5oQ1oE5KKkNGzZzvF07HcMHGF9naYJt2Rg2shZLeT/5hyGbxK54OnvD
+         AyxvSWO+xx9XH2AAncqEGlPYjNAgvQO0EaPUb203XBicVdJGgKYwdMH3/JR25Sae2r
+         UYXHNh15+HQYyMg1o/sy4Dled8gDT6R45V7FBcT0=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -32,12 +32,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Sean Christopherson <seanjc@google.com>, x86@kernel.org,
         kvm@vger.kernel.org, Peter Gonda <pgonda@google.com>
-Subject: [PATCH 5.4 21/24] Fix unsynchronized access to sev members through svm_register_enc_region
-Date:   Thu, 11 Feb 2021 16:02:44 +0100
-Message-Id: <20210211150149.446771096@linuxfoundation.org>
+Subject: [PATCH 4.19 19/24] Fix unsynchronized access to sev members through svm_register_enc_region
+Date:   Thu, 11 Feb 2021 16:02:53 +0100
+Message-Id: <20210211150148.593771643@linuxfoundation.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210211150148.516371325@linuxfoundation.org>
-References: <20210211150148.516371325@linuxfoundation.org>
+In-Reply-To: <20210211150147.743660073@linuxfoundation.org>
+References: <20210211150147.743660073@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -89,7 +89,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/x86/kvm/svm.c
 +++ b/arch/x86/kvm/svm.c
-@@ -1835,6 +1835,8 @@ static struct page **sev_pin_memory(stru
+@@ -1832,6 +1832,8 @@ static struct page **sev_pin_memory(stru
  	struct page **pages;
  	unsigned long first, last;
  
@@ -98,7 +98,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	if (ulen == 0 || uaddr + ulen < uaddr)
  		return NULL;
  
-@@ -7091,12 +7093,21 @@ static int svm_register_enc_region(struc
+@@ -7084,12 +7086,21 @@ static int svm_register_enc_region(struc
  	if (!region)
  		return -ENOMEM;
  
@@ -120,7 +120,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	/*
  	 * The guest may change the memory encryption attribute from C=0 -> C=1
  	 * or vice versa for this memory range. Lets make sure caches are
-@@ -7105,13 +7116,6 @@ static int svm_register_enc_region(struc
+@@ -7098,13 +7109,6 @@ static int svm_register_enc_region(struc
  	 */
  	sev_clflush_pages(region->pages, region->npages);
  
