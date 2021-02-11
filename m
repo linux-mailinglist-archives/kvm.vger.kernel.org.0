@@ -2,217 +2,404 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 83B0C31870E
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 10:30:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BAD5318718
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 10:30:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbhBKJ1A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 04:27:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37028 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230134AbhBKJUk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 04:20:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613035143;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=u4st3dUfUDrEYqTNg6+oyu4V3aGVRlCGOHLDzYx7178=;
-        b=Uc5oQ012GSx34olN3VAGfw4kPh8l9NPy7U8uOcI1EeyfNyhkzdKDUssVecmajZyKxIKfyZ
-        aTppbueQAEU2smbKXRPFkgBtDX/7IAH/SNzrfrnw7j3T20wiEYyTpM2kyY6H3zRkLBg07V
-        uUn1GmIdgIJSNPr58MspzCGOBgJo7UY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-cwDao8JwMxi9SulrTdCGIQ-1; Thu, 11 Feb 2021 04:19:01 -0500
-X-MC-Unique: cwDao8JwMxi9SulrTdCGIQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E031BBEE4;
-        Thu, 11 Feb 2021 09:18:59 +0000 (UTC)
-Received: from [10.36.114.52] (ovpn-114-52.ams2.redhat.com [10.36.114.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D2DF360C17;
-        Thu, 11 Feb 2021 09:18:57 +0000 (UTC)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        stable@vger.kernel.org
-References: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
- <20210209154302.1033165-2-imbrenda@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Subject: Re: [PATCH v3 1/2] s390/kvm: extend kvm_s390_shadow_fault to return
- entry pointer
-Message-ID: <2a65f089-1728-7bc7-a2a8-a2c089a01cec@redhat.com>
-Date:   Thu, 11 Feb 2021 10:18:56 +0100
+        id S229943AbhBKJ31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 04:29:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57936 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229720AbhBKJ1A (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 04:27:00 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11B9CxOT006033
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:25:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=nx8LG6uRISsryiHNA4tPMB0EHydzgThcPVm0BrBzETY=;
+ b=HUUqZY9PEV3m9FSmWiFjerxwxR060xm4cSY8HFHzAPxfY/+DhK+HLsVxM6Uemw426Nnl
+ apunA5gnerM48yv03YN7FrYW/k0pETgj7KA7JyPpygRIz/EqGngkvb0TiAZzVJKoEIpL
+ 2lfW7vpFD0u8X3M33lH5doZH/EZRT9P0YlwfoAnGIEAorKnUXoofR9XJOcalsCdJ9Fdw
+ W5f0kU0ykD/tvDSdVZqeFFMuuMWvqQYWHfbYjfVkFcETDyp6nTToPY1CyqA0IQ+6H7UK
+ 6B1z+Ahsw0rEsz84PrpB3wUGc/PxEmQsHbfTATjvQGh0wrXU7NuszqxbdkhmMM2320v1 Ig== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n1rk8c12-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:25:48 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11B9CtLO005908
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:25:47 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n1rk8c03-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 04:25:47 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11B9DZSg022949;
+        Thu, 11 Feb 2021 09:25:45 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma02fra.de.ibm.com with ESMTP id 36hjr8awug-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 09:25:45 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11B9PgmU42991890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Feb 2021 09:25:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36EE5AE059;
+        Thu, 11 Feb 2021 09:25:42 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0B4CAE055;
+        Thu, 11 Feb 2021 09:25:41 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.64.239])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Feb 2021 09:25:41 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v1 3/3] s390x: mvpg: simple test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     david@redhat.com, thuth@redhat.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com
+References: <20210209185154.1037852-1-imbrenda@linux.ibm.com>
+ <20210209185154.1037852-4-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <31954d68-bd2c-d803-5796-20de29930eb2@linux.ibm.com>
+Date:   Thu, 11 Feb 2021 10:25:38 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210209154302.1033165-2-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210209185154.1037852-4-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-11_05:2021-02-10,2021-02-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 suspectscore=0 adultscore=0 mlxscore=0
+ priorityscore=1501 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102110076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09.02.21 16:43, Claudio Imbrenda wrote:
-> Extend kvm_s390_shadow_fault to return the pointer to the valid leaf
-> DAT table entry, or to the invalid entry.
+On 2/9/21 7:51 PM, Claudio Imbrenda wrote:
+> A simple unit test for the MVPG instruction.
 > 
-> Also return some flags in the lower bits of the address:
-> DAT_PROT: indicates that DAT protection applies because of the
->            protection bit in the segment (or, if EDAT, region) tables
-> NOT_PTE: indicates that the address of the DAT table entry returned
->           does not refer to a PTE, but to a segment or region table.
+> The timeout is set to 10 seconds because the test should complete in a
+> fraction of a second even on busy machines. If the test is run in VSIE
+> and the host of the host is not handling MVPG properly, the test will
+> probably hang.
 > 
-
-I've been thinking about one possible issue, but I think it's not 
-actually an issue. Just sharing so others can verify:
-
-In case our guest uses huge pages / gigantic pages / ASCE R, we create 
-fake page tables (GMAP_SHADOW_FAKE_TABLE).
-
-So, it could be that kvm_s390_shadow_fault()->gmap_shadow_pgt_lookup()
-succeeds, however, we have a fake PTE in our hands. We lost the
-actual guest STE/RTE address. (I think it could be recovered somehow via 
-page->index, thought)
-
-But I guess, if there is a fake PTE, then there is not acutally
-something that could go wrong in gmap_shadow_page() anymore that could
-lead us in responding something wrong to the guest. We can only really
-fail with -EINVAL, -ENOMEM or -EFAULT.
-
-So if the guest changed anything in the meantime (e.g., zap a segment), 
-we would have unshadowed the whole fake page table hierarchy and would
-simply retry.
-
+> Testing MVPG behaviour in VSIE is the main motivation for this test.
+> 
+> Anything related to storage keys is not tested.
+> 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: stable@vger.kernel.org
+
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
+
 > ---
->   arch/s390/kvm/gaccess.c | 30 +++++++++++++++++++++++++-----
->   arch/s390/kvm/gaccess.h |  5 ++++-
->   arch/s390/kvm/vsie.c    |  8 ++++----
->   3 files changed, 33 insertions(+), 10 deletions(-)
+>  s390x/Makefile      |   1 +
+>  s390x/mvpg.c        | 266 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   4 +
+>  3 files changed, 271 insertions(+)
+>  create mode 100644 s390x/mvpg.c
 > 
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index 6d6b57059493..e0ab83f051d2 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -976,7 +976,9 @@ int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra)
->    * kvm_s390_shadow_tables - walk the guest page table and create shadow tables
->    * @sg: pointer to the shadow guest address space structure
->    * @saddr: faulting address in the shadow gmap
-> - * @pgt: pointer to the page table address result
-> + * @pgt: pointer to the beginning of the page table for the given address if
-> + *       successful (return value 0), or to the first invalid DAT entry in
-> + *       case of exceptions (return value > 0)
->    * @fake: pgt references contiguous guest memory block, not a pgtable
->    */
->   static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> @@ -1034,6 +1036,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   			rfte.val = ptr;
->   			goto shadow_r2t;
->   		}
-> +		*pgt = ptr + vaddr.rfx * 8;
->   		rc = gmap_read_table(parent, ptr + vaddr.rfx * 8, &rfte.val);
-
-Using
-
-gmap_read_table(parent, *pgt, &rfte.val);
-
-or similar with a local variable might then be even clearer. But no 
-strong opinion.
-
->   		if (rc)
->   			return rc;
-> @@ -1060,6 +1063,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   			rste.val = ptr;
->   			goto shadow_r3t;
->   		}
-> +		*pgt = ptr + vaddr.rsx * 8;
->   		rc = gmap_read_table(parent, ptr + vaddr.rsx * 8, &rste.val);
->   		if (rc)
->   			return rc;
-> @@ -1087,6 +1091,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   			rtte.val = ptr;
->   			goto shadow_sgt;
->   		}
-> +		*pgt = ptr + vaddr.rtx * 8;
->   		rc = gmap_read_table(parent, ptr + vaddr.rtx * 8, &rtte.val);
->   		if (rc)
->   			return rc;
-> @@ -1123,6 +1128,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->   			ste.val = ptr;
->   			goto shadow_pgt;
->   		}
-> +		*pgt = ptr + vaddr.sx * 8;
->   		rc = gmap_read_table(parent, ptr + vaddr.sx * 8, &ste.val);
->   		if (rc)
->   			return rc;
-> @@ -1157,6 +1163,8 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->    * @vcpu: virtual cpu
->    * @sg: pointer to the shadow guest address space structure
->    * @saddr: faulting address in the shadow gmap
-> + * @datptr: will contain the address of the faulting DAT table entry, or of
-> + *          the valid leaf, plus some flags
->    *
->    * Returns: - 0 if the shadow fault was successfully resolved
->    *	    - > 0 (pgm exception code) on exceptions while faulting
-> @@ -1165,11 +1173,11 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
->    *	    - -ENOMEM if out of memory
->    */
->   int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
-> -			  unsigned long saddr)
-> +			  unsigned long saddr, unsigned long *datptr)
->   {
->   	union vaddress vaddr;
->   	union page_table_entry pte;
-> -	unsigned long pgt;
-> +	unsigned long pgt = 0;
->   	int dat_protection, fake;
->   	int rc;
->   
-> @@ -1191,8 +1199,20 @@ int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
->   		pte.val = pgt + vaddr.px * PAGE_SIZE;
->   		goto shadow_page;
->   	}
-> -	if (!rc)
-> -		rc = gmap_read_table(sg->parent, pgt + vaddr.px * 8, &pte.val);
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 08d85c9f..770eaa0b 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -20,6 +20,7 @@ tests += $(TEST_DIR)/sclp.elf
+>  tests += $(TEST_DIR)/css.elf
+>  tests += $(TEST_DIR)/uv-guest.elf
+>  tests += $(TEST_DIR)/sie.elf
+> +tests += $(TEST_DIR)/mvpg.elf
+>  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/mvpg.c b/s390x/mvpg.c
+> new file mode 100644
+> index 00000000..fe6fe80a
+> --- /dev/null
+> +++ b/s390x/mvpg.c
+> @@ -0,0 +1,266 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Move Page instruction tests
+> + *
+> + * Copyright (c) 2020 IBM Corp
+> + *
+> + * Authors:
+> + *  Claudio Imbrenda <imbrenda@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm-generic/barrier.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/pgtable.h>
+> +#include <mmu.h>
+> +#include <asm/page.h>
+> +#include <asm/facility.h>
+> +#include <asm/mem.h>
+> +#include <asm/sigp.h>
+> +#include <smp.h>
+> +#include <alloc_page.h>
+> +#include <bitops.h>
 > +
-> +	switch (rc) {
-> +	case PGM_SEGMENT_TRANSLATION:
-> +	case PGM_REGION_THIRD_TRANS:
-> +	case PGM_REGION_SECOND_TRANS:
-> +	case PGM_REGION_FIRST_TRANS:
-> +		pgt |= NOT_PTE;
-> +		break;
-> +	case 0:
-> +		pgt += vaddr.px * 8;
-> +		rc = gmap_read_table(sg->parent, pgt, &pte.val);
+> +/* Used to build the appropriate test values for register 0 */
+> +#define KFC(x) ((x) << 10)
+> +#define CCO 0x100
+> +
+> +/* How much memory to allocate for the test */
+> +#define MEM_ORDER 12
+> +/* How many iterations to perform in the loops */
+> +#define ITER 8
+> +
+> +/* Used to generate the simple pattern */
+> +#define MAGIC 42
+> +
+> +static uint8_t source[PAGE_SIZE]  __attribute__((aligned(PAGE_SIZE)));
+> +static uint8_t buffer[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
+> +
+> +/* Keep track of fresh memory */
+> +static uint8_t *fresh;
+> +
+> +static inline int mvpg(unsigned long r0, void *dest, void *src)
+> +{
+> +	register unsigned long reg0 asm ("0") = r0;
+> +	int cc;
+> +
+> +	asm volatile("	mvpg    %1,%2\n"
+> +		     "	ipm     %0\n"
+> +		     "	srl     %0,28"
+> +		: "=&d" (cc) : "a" (dest), "a" (src), "d" (reg0)
+> +		: "memory", "cc");
+> +	return cc;
+> +}
+> +
+> +/*
+> + * Initialize a page with a simple pattern
+> + */
+> +static void init_page(uint8_t *p)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < PAGE_SIZE; i++)
+> +		p[i] = i + MAGIC;
+> +}
+> +
+> +/*
+> + * Check if the given page contains the simple pattern
+> + */
+> +static int page_ok(const uint8_t *p)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < PAGE_SIZE; i++)
+> +		if (p[i] != (uint8_t)(i + MAGIC))
+> +			return 0;
+> +	return 1;
+> +}
+> +
+> +static void test_exceptions(void)
+> +{
+> +	int i, expected;
+> +
+> +	report_prefix_push("exceptions");
+> +
+> +	/*
+> +	 * Key Function Control values 4 and 5 are allowed only in supervisor
+> +	 * state, and even then, only if the move-page-and-set-key facility
+> +	 * is present (STFLE bit 149)
+> +	 */
+> +	report_prefix_push("privileged");
+> +	if (test_facility(149)) {
+> +		expected = PGM_INT_CODE_PRIVILEGED_OPERATION;
+> +		for (i = 4; i < 6; i++) {
+> +			expect_pgm_int();
+> +			enter_pstate();
+> +			mvpg(KFC(i), buffer, source);
+> +			report(is_pgm(expected), "Key Function Control value %d", i);
+> +		}
+> +	} else {
+> +		report_skip("Key Function Control value %d", 4);
+> +		report_skip("Key Function Control value %d", 5);
+> +		i = 4;
 > +	}
-> +	if (*datptr)
-> +		*datptr = pgt | dat_protection * DAT_PROT;
->   	if (!rc && pte.i)
->   		rc = PGM_PAGE_TRANSLATION;
->   	if (!rc && pte.z)
-> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> index f4c51756c462..fec26bbb17ba 100644
-> --- a/arch/s390/kvm/gaccess.h
-> +++ b/arch/s390/kvm/gaccess.h
-> @@ -359,7 +359,10 @@ void ipte_unlock(struct kvm_vcpu *vcpu);
->   int ipte_lock_held(struct kvm_vcpu *vcpu);
->   int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu, unsigned long gra);
->   
-> +#define DAT_PROT 2
-> +#define NOT_PTE 4
-
-What if our guest is using ASCE.R ?
-
--- 
-Thanks,
-
-David / dhildenb
+> +	report_prefix_pop();
+> +
+> +	/*
+> +	 * Invalid values of the Key Function Control, or setting the
+> +	 * reserved bits, should result in a specification exception
+> +	 */
+> +	report_prefix_push("specification");
+> +	expected = PGM_INT_CODE_SPECIFICATION;
+> +	expect_pgm_int();
+> +	mvpg(KFC(3), buffer, source);
+> +	report(is_pgm(expected), "Key Function Control value 3");
+> +	for (; i < 32; i++) {
+> +		expect_pgm_int();
+> +		mvpg(KFC(i), buffer, source);
+> +		report(is_pgm(expected), "Key Function Control value %d", i);
+> +	}
+> +	report_prefix_pop();
+> +
+> +	/* Operands outside memory result in addressing exceptions, as usual */
+> +	report_prefix_push("addressing");
+> +	expected = PGM_INT_CODE_ADDRESSING;
+> +	expect_pgm_int();
+> +	mvpg(0, buffer, (void *)PAGE_MASK);
+> +	report(is_pgm(expected), "Second operand outside memory");
+> +
+> +	expect_pgm_int();
+> +	mvpg(0, (void *)PAGE_MASK, source);
+> +	report(is_pgm(expected), "First operand outside memory");
+> +	report_prefix_pop();
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_success(void)
+> +{
+> +	int cc;
+> +
+> +	report_prefix_push("success");
+> +	/* Test successful scenarios, both in supervisor and problem state */
+> +	cc = mvpg(0, buffer, source);
+> +	report(page_ok(buffer) && !cc, "Supervisor state MVPG successful");
+> +
+> +	enter_pstate();
+> +	cc = mvpg(0, buffer, source);
+> +	leave_pstate();
+> +	report(page_ok(buffer) && !cc, "Problem state MVPG successful");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_small_loop(const void *string)
+> +{
+> +	uint8_t *dest;
+> +	int i, cc;
+> +
+> +	/* Looping over cold and warm pages helps catch VSIE bugs */
+> +	report_prefix_push(string);
+> +	dest = fresh;
+> +	for (i = 0; i < ITER; i++) {
+> +		cc = mvpg(0, fresh, source);
+> +		report(page_ok(fresh) && !cc, "cold: %p, %p", source, fresh);
+> +		fresh += PAGE_SIZE;
+> +	}
+> +
+> +	for (i = 0; i < ITER; i++) {
+> +		memset(dest, 0, PAGE_SIZE);
+> +		cc = mvpg(0, dest, source);
+> +		report(page_ok(dest) && !cc, "warm: %p, %p", source, dest);
+> +		dest += PAGE_SIZE;
+> +	}
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_mmu_prot(void)
+> +{
+> +	int cc;
+> +
+> +	report_prefix_push("protection");
+> +	report_prefix_push("cco=0");
+> +
+> +	/* MVPG should still succeed when the source is read-only */
+> +	protect_page(source, PAGE_ENTRY_P);
+> +	cc = mvpg(0, fresh, source);
+> +	report(page_ok(fresh) && !cc, "source read only");
+> +	unprotect_page(source, PAGE_ENTRY_P);
+> +	fresh += PAGE_SIZE;
+> +
+> +	/*
+> +	 * When the source or destination are invalid, a page translation
+> +	 * exception should be raised; when the destination is read-only,
+> +	 * a protection exception should be raised.
+> +	 */
+> +	protect_page(fresh, PAGE_ENTRY_P);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(is_pgm(PGM_INT_CODE_PROTECTION), "destination read only");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(source, PAGE_ENTRY_I);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(is_pgm(PGM_INT_CODE_PAGE_TRANSLATION), "source invalid");
+> +	unprotect_page(source, PAGE_ENTRY_I);
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	expect_pgm_int();
+> +	mvpg(0, fresh, source);
+> +	report(is_pgm(PGM_INT_CODE_PAGE_TRANSLATION), "destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	report_prefix_pop();
+> +	report_prefix_push("cco=1");
+> +	/*
+> +	 * Setting the CCO bit should suppress page translation exceptions,
+> +	 * but not protection exceptions.
+> +	 */
+> +	protect_page(fresh, PAGE_ENTRY_P);
+> +	expect_pgm_int();
+> +	mvpg(CCO, fresh, source);
+> +	report(is_pgm(PGM_INT_CODE_PROTECTION), "destination read only");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 1, "destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(source, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 2, "source invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	protect_page(fresh, PAGE_ENTRY_I);
+> +	cc = mvpg(CCO, fresh, source);
+> +	report(cc == 2, "source and destination invalid");
+> +	fresh += PAGE_SIZE;
+> +
+> +	unprotect_page(source, PAGE_ENTRY_I);
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("mvpg");
+> +
+> +	init_page(source);
+> +	fresh = alloc_pages_flags(MEM_ORDER, FLAG_DONTZERO | FLAG_FRESH);
+> +	assert(fresh);
+> +
+> +	test_exceptions();
+> +	test_success();
+> +	test_small_loop("nommu");
+> +
+> +	setup_vm();
+> +
+> +	test_small_loop("mmu");
+> +	test_mmu_prot();
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 2298be6c..9f81a608 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -99,3 +99,7 @@ file = uv-guest.elf
+>  
+>  [sie]
+>  file = sie.elf
+> +
+> +[mvpg]
+> +file = mvpg.elf
+> +timeout = 10
+> 
 
