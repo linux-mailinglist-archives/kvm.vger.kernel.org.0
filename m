@@ -2,102 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3DC319134
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:37:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8E88319140
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:40:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232386AbhBKRg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 12:36:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbhBKReR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 12:34:17 -0500
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC201C061756
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:33:37 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id l3so6989087oii.2
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:33:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8P4xaiVI2tG5b2Ole1+tnRAqZYtVrf1Whd339/8WB6E=;
-        b=Z7604+y34s6xeuNm8+wCbPBgFd8e3828pzQ7LIQY6cCrUgusKKUU//W1K74Ram4Mjr
-         /GehiA5L2HNaOD/080Z7HsglI2qkhP1tvsfaz3RpwH3oxFStnn2UxYLJIuL9q8YHtjcl
-         Mc9Hboop2KfBy3Zq6GUCuI8+RfXoPxFEYmk1yIUHi9rlq4kqOoQ9yeAh4PgKkT6STNCq
-         sa6lOsfeGvtddTG8xb3BiJiRZ6Hm5Ag+ldsY6HnjtxuYwbdjlu95k3kjedFqrGEc2eq7
-         oDiukko4tEMupzQluzSZ8C7ea5oHMQQgOVxIdShF+9kC9AUt4xoc0sm6Jc4DG6f1eFaG
-         5GEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8P4xaiVI2tG5b2Ole1+tnRAqZYtVrf1Whd339/8WB6E=;
-        b=NUJEb99YMLjyYhmXM0fdJV4OunvhgNMztARZPUXPphnx1GhSTFD+hBy1FTF7e4aXvu
-         Q2RIjcLIVOdWwj7qVl/yrMxyl34QRdzSDytUgazS1grDi+s4qsURIj+7+yc2F1aYf6RZ
-         of5K6geAE8RmAdieNTG92WFHlZTS+qVogfFefl4O527FG6jOGu9bO9JDkGX1CFH4rsHy
-         926REB7dUDJoWr5FAs5gTV6rovMAGfe0tTj9Z++Ax94qiE7riUs8wIyZR3zeP/0uP1PA
-         +pXi0Hq8TIe3lo8sN3GH9H5/HLNijjFCT1GrcaFJLnCyu3685D3XpogUKR09FV+vtPHf
-         9CnA==
-X-Gm-Message-State: AOAM532GquR9MkmRp4iQYd3HKnRxpeEoFDSwy+Qaw0mFQuulA2mTxHxq
-        5+Z5txSacbkpjXiz85wQ+pPSTkIuYI5MnYgJUAL/Zg==
-X-Google-Smtp-Source: ABdhPJzxhIqMQoPXo1/OKDNuoU8KVYGDFfutR+x8G74OkgvrTWUFeqz/2TpHQNK/HJ/TWverkr8tq3R38cTEtHGsZCA=
-X-Received: by 2002:aca:3b06:: with SMTP id i6mr3487837oia.81.1613064816828;
- Thu, 11 Feb 2021 09:33:36 -0800 (PST)
+        id S232369AbhBKRj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 12:39:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40665 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232426AbhBKRhK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 12:37:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613064938;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ovn4XLZrYHU/jHtxdQ18Zp83BU5l3A71xzjYtmAEsIM=;
+        b=QlVNQ1zbudj41TTLdw1mN9a68JpT94/tRDCO1g3rQTTYAW9pKV6rKW6lqGI6gGUtJnyY+3
+        T1OOie/HgrBqY+HmJdC1YuAYmzDNDirB9WNz5KkN+5qnrjdDLiOatSNVKWYuWOgVWRoxwR
+        kiDD56P0Vu2+Hfcj52SjaxYpLM2IFi8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-Vcg4Znx-N2muzaI-yOl0lQ-1; Thu, 11 Feb 2021 12:35:34 -0500
+X-MC-Unique: Vcg4Znx-N2muzaI-yOl0lQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04833100A8EA;
+        Thu, 11 Feb 2021 17:35:32 +0000 (UTC)
+Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CFEA45D9D2;
+        Thu, 11 Feb 2021 17:35:24 +0000 (UTC)
+Subject: Re: [PATCH v13 06/15] iommu/smmuv3: Implement
+ attach/detach_pasid_table
+To:     Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com
+Cc:     jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+        zhangfei.gao@linaro.org
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-7-eric.auger@redhat.com>
+ <4c3dded7-8b60-a303-3bdf-fa610f0e1a73@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <da89ce83-f27f-3b81-9d06-085eb9c4c046@redhat.com>
+Date:   Thu, 11 Feb 2021 18:35:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210210230625.550939-1-seanjc@google.com> <20210210230625.550939-10-seanjc@google.com>
- <CANgfPd8itawTsza-SPSMehUEAAJ4DWtSQX4QRbHg1kX4c6VRBg@mail.gmail.com>
- <YCSOtMzs9OWO2AsR@google.com> <756fed52-8151-97ee-11f2-91f150afab42@redhat.com>
- <YCVUAdx3DYLPNwJU@google.com>
-In-Reply-To: <YCVUAdx3DYLPNwJU@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 11 Feb 2021 09:33:25 -0800
-Message-ID: <CANgfPd_W+wqx_UXHR7OWCBY7KEnsdNC12QZmGNjzOSBb1XOUyQ@mail.gmail.com>
-Subject: Re: [PATCH 09/15] KVM: selftests: Move per-VM GPA into perf_test_args
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <4c3dded7-8b60-a303-3bdf-fa610f0e1a73@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 11, 2021 at 7:58 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Feb 11, 2021, Paolo Bonzini wrote:
-> > On 11/02/21 02:56, Sean Christopherson wrote:
-> > > > > +       pta->gpa = (vm_get_max_gfn(vm) - guest_num_pages) * pta->guest_page_size;
-> > > > > +       pta->gpa &= ~(pta->host_page_size - 1);
-> > > > Also not related to this patch, but another case for align.
-> > > >
-> > > > >          if (backing_src == VM_MEM_SRC_ANONYMOUS_THP ||
-> > > > >              backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB)
-> > > > > -               guest_test_phys_mem &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
-> > > > > -
-> > > > > +               pta->gpa &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
-> > > > also align
-> > > >
-> > > > >   #ifdef __s390x__
-> > > > >          /* Align to 1M (segment size) */
-> > > > > -       guest_test_phys_mem &= ~((1 << 20) - 1);
-> > > > > +       pta->gpa &= ~((1 << 20) - 1);
-> > > > And here again (oof)
-> > >
-> > > Yep, I'll fix all these and the align() comment in v2.
-> >
-> > This is not exactly align in fact; it is x & ~y rather than (x + y) & ~y.
-> > Are you going to introduce a round-down macro or is it a bug?  (I am
-> > lazy...).
->
-> Good question.  I, too, was lazy.  I didn't look at the guts of align() when I
-> moved it, and I didn't look closely at Ben's suggestion.  I'll take a closer
-> look today and make sure everything is doing what it's supposed to do.
+Hi Keqian,
 
-Ooh, great point Paolo, that helper is indeed rounding up. My comment
-in patch #2 was totally wrong. I forgot anyone would ever want to
-round up. :/
-My misunderstanding and the above use cases are probably good evidence
-that it would be helpful to have both align_up and align_down helpers.
+On 2/2/21 9:03 AM, Keqian Zhu wrote:
+> Hi Eric,
+> 
+> On 2020/11/18 19:21, Eric Auger wrote:
+>> On attach_pasid_table() we program STE S1 related info set
+>> by the guest into the actual physical STEs. At minimum
+>> we need to program the context descriptor GPA and compute
+>> whether the stage1 is translated/bypassed or aborted.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v7 -> v8:
+>> - remove smmu->features check, now done on domain finalize
+>>
+>> v6 -> v7:
+>> - check versions and comment the fact we don't need to take
+>>   into account s1dss and s1fmt
+>> v3 -> v4:
+>> - adapt to changes in iommu_pasid_table_config
+>> - different programming convention at s1_cfg/s2_cfg/ste.abort
+>>
+>> v2 -> v3:
+>> - callback now is named set_pasid_table and struct fields
+>>   are laid out differently.
+>>
+>> v1 -> v2:
+>> - invalidate the STE before changing them
+>> - hold init_mutex
+>> - handle new fields
+>> ---
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
+>>  1 file changed, 89 insertions(+)
+>>
+>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> index 412ea1bafa50..805acdc18a3a 100644
+>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+>> @@ -2661,6 +2661,93 @@ static void arm_smmu_get_resv_regions(struct device *dev,
+>>  	iommu_dma_get_resv_regions(dev, head);
+>>  }
+>>  
+>> +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+>> +				       struct iommu_pasid_table_config *cfg)
+>> +{
+>> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+>> +	struct arm_smmu_master *master;
+>> +	struct arm_smmu_device *smmu;
+>> +	unsigned long flags;
+>> +	int ret = -EINVAL;
+>> +
+>> +	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
+>> +		return -EINVAL;
+>> +
+>> +	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
+>> +	    cfg->vendor_data.smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
+>> +		return -EINVAL;
+>> +
+>> +	mutex_lock(&smmu_domain->init_mutex);
+>> +
+>> +	smmu = smmu_domain->smmu;
+>> +
+>> +	if (!smmu)
+>> +		goto out;
+>> +
+>> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+>> +		goto out;
+>> +
+>> +	switch (cfg->config) {
+>> +	case IOMMU_PASID_CONFIG_ABORT:
+>> +		smmu_domain->s1_cfg.set = false;
+>> +		smmu_domain->abort = true;
+>> +		break;
+>> +	case IOMMU_PASID_CONFIG_BYPASS:
+>> +		smmu_domain->s1_cfg.set = false;
+>> +		smmu_domain->abort = false;
+> I didn't test it, but it seems that this will cause BUG() in arm_smmu_write_strtab_ent().
+> At the line "BUG_ON(ste_live && !nested);". Maybe I miss something?
+
+No you are fully correct. Shammeer hit the BUG_ON() when booting the
+guest with iommu.passthrough = 1. So I removed the BUG_ON(). The legacy
+BUG_ON(ste_live) still is there under the form of BUG_ON(s1_live).
+
+Thanks!
+
+Eric
+
+
+> 
+>> +		break;
+>> +	case IOMMU_PASID_CONFIG_TRANSLATE:
+>> +		/* we do not support S1 <-> S1 transitions */
+>> +		if (smmu_domain->s1_cfg.set)
+>> +			goto out;
+>> +
+>> +		/*
+>> +		 * we currently support a single CD so s1fmt and s1dss
+>> +		 * fields are also ignored
+>> +		 */
+>> +		if (cfg->pasid_bits)
+>> +			goto out;
+>> +
+>> +		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
+>> +		smmu_domain->s1_cfg.set = true;
+>> +		smmu_domain->abort = false;
+>> +		break;
+>> +	default:
+>> +		goto out;
+>> +	}
+>> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+>> +	list_for_each_entry(master, &smmu_domain->devices, domain_head)
+>> +		arm_smmu_install_ste_for_dev(master);
+>> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+>> +	ret = 0;
+>> +out:
+>> +	mutex_unlock(&smmu_domain->init_mutex);
+>> +	return ret;
+>> +}
+>> +
+> [...]
+> 
+> Thanks,
+> Keqian
+> 
+
