@@ -2,137 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33F62318A8D
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:30:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DFC2318AA2
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:34:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230259AbhBKM1Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 07:27:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22205 "EHLO
+        id S231294AbhBKMbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 07:31:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51726 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230319AbhBKMYs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:24:48 -0500
+        by vger.kernel.org with ESMTP id S229577AbhBKM2u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:28:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613046199;
+        s=mimecast20190719; t=1613046439;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=faRpucM8bYk3+6I7D614thA2FMfgheqmON/unvovBDw=;
-        b=hCTli6TjKEUkdHVP+kswbDvJtC3IWdYBm/g6pn5LbkrHBF8+oq3XUGiGsnp/4PmM5aTNw6
-        boJAOANAsRPcQo2K9j59VTS5U4vhnKq4Vzoxn3EwR3P2fnZ1OdchV9Udfp6dOSODLw//cE
-        A+++af+M58cV6sA/Uo/mmQWBrKd8srY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-aPNvSw21OQiRLgyafqWlog-1; Thu, 11 Feb 2021 07:23:15 -0500
-X-MC-Unique: aPNvSw21OQiRLgyafqWlog-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A20F81005501;
-        Thu, 11 Feb 2021 12:23:13 +0000 (UTC)
-Received: from gondolin (ovpn-112-229.ams2.redhat.com [10.36.112.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA37B60936;
-        Thu, 11 Feb 2021 12:23:08 +0000 (UTC)
-Date:   Thu, 11 Feb 2021 13:23:06 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210211132306.64249174.cohuck@redhat.com>
-In-Reply-To: <6e2842e4-334d-6592-a781-5b85ec0ed13c@linux.ibm.com>
-References: <20210209194830.20271-1-akrowiak@linux.ibm.com>
-        <20210209194830.20271-2-akrowiak@linux.ibm.com>
-        <20210210115334.46635966.cohuck@redhat.com>
-        <6e2842e4-334d-6592-a781-5b85ec0ed13c@linux.ibm.com>
-Organization: Red Hat GmbH
+        bh=HMz6zYsvhAUacFy6he/Ff5pa+8L4MB4YjmA0Jw1xjYQ=;
+        b=KP78mzwwuZ9KkhDlWCYN57R6TFXWi0OhIWRt2KVnAxClUlO722E1JtJ/JcctxD2v7Az/FR
+        wyrCLIfucnAGKBZ+hOEDB95g0ZR7F1ocNFVyS/PhCvGXleFiHaIHv5W6cu5oH4nQfLK+LP
+        zab0DPFWfhfHggE+99bZFXtzrR2xjFw=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-oCEuO4hxNEyb3tTFLfJdsg-1; Thu, 11 Feb 2021 07:27:18 -0500
+X-MC-Unique: oCEuO4hxNEyb3tTFLfJdsg-1
+Received: by mail-ed1-f69.google.com with SMTP id q2so4459081edt.16
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:27:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HMz6zYsvhAUacFy6he/Ff5pa+8L4MB4YjmA0Jw1xjYQ=;
+        b=JxSVz0tp3D16XXH4qqksSDNimYgbXiY4BlEDhgj3mStIwBAZULwIhFb897qWXYKF/A
+         wi2M6rri8wFs70Hy2X5vECgbDGnKFeHOrM2k/IhdHvbRUJ5OAU9GlAQQi/pCwkR8uEO4
+         74dSrVakIcn/STkWq0ftVH/ERyrFlWgVDNJ/h5K/jktX/y/xcEmxMGuTQl6o5C80i0Iq
+         jN790QAET/CX2cKMTeFjC3f+TLVj+1oJ9CTgDneCWAMbpQ2MqDMpi6VJILH5pHofLKlR
+         jlFDjc+9URKpZPz986ZrN/argxQZBn+jTxxojd9/L5bvWSZPxBH/9LaBC8vli+YJCpcQ
+         kYvg==
+X-Gm-Message-State: AOAM5316Fqop/7Ut0/5YYceXUk0dLWmm0VU3ScIlPzmTmSUTmFco9zcs
+        fP3kPbH9CboSijrZ/LJLxgmyr7gMzyu2JgVzavuo4DFHm5AyrezbX+QHZhOU0hV0up6/XtqMeiy
+        5+MDYg/hAlC9x
+X-Received: by 2002:a17:906:2747:: with SMTP id a7mr8529853ejd.250.1613046437362;
+        Thu, 11 Feb 2021 04:27:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyk6B6DSr3e6B0w/xlbcUeWXisr2RXOx2YRDpQHkAnrdl/RyyOhCzJ+iUDi0A/EsFUj4H9p5g==
+X-Received: by 2002:a17:906:2747:: with SMTP id a7mr8529844ejd.250.1613046437196;
+        Thu, 11 Feb 2021 04:27:17 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id bo24sm3698134edb.51.2021.02.11.04.27.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 04:27:16 -0800 (PST)
+Date:   Thu, 11 Feb 2021 13:27:14 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 07/17] af_vsock: rest of SEQPACKET support
+Message-ID: <20210211122714.rqiwg3qp3kuprktb@steredhat>
+References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+ <20210207151615.805115-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210207151615.805115-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Feb 2021 15:34:24 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Sun, Feb 07, 2021 at 06:16:12PM +0300, Arseny Krasnov wrote:
+>This does rest of SOCK_SEQPACKET support:
+>1) Adds socket ops for SEQPACKET type.
+>2) Allows to create socket with SEQPACKET type.
+>
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> net/vmw_vsock/af_vsock.c | 37 ++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 36 insertions(+), 1 deletion(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index a033d3340ac4..c77998a14018 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -452,6 +452,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> 		new_transport = transport_dgram;
+> 		break;
+> 	case SOCK_STREAM:
+>+	case SOCK_SEQPACKET:
+> 		if (vsock_use_local_transport(remote_cid))
+> 			new_transport = transport_local;
+> 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
+>@@ -459,6 +460,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> 			new_transport = transport_g2h;
+> 		else
+> 			new_transport = transport_h2g;
+>+
+>+		if (sk->sk_type == SOCK_SEQPACKET) {
+>+			if (!new_transport ||
+>+			    !new_transport->seqpacket_seq_send_len ||
+>+			    !new_transport->seqpacket_seq_send_eor ||
+>+			    !new_transport->seqpacket_seq_get_len ||
+>+			    !new_transport->seqpacket_dequeue)
+>+				return -ESOCKTNOSUPPORT;
+>+		}
 
-> On 2/10/21 5:53 AM, Cornelia Huck wrote:
-> > On Tue,  9 Feb 2021 14:48:30 -0500
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> >  
-> >> This patch fixes a circular locking dependency in the CI introduced by
-> >> commit f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
-> >> pointer invalidated"). The lockdep only occurs when starting a Secure
-> >> Execution guest. Crypto virtualization (vfio_ap) is not yet supported for
-> >> SE guests; however, in order to avoid CI errors, this fix is being
-> >> provided.
-> >>
-> >> The circular lockdep was introduced when the masks in the guest's APCB
-> >> were taken under the matrix_dev->lock. While the lock is definitely
-> >> needed to protect the setting/unsetting of the KVM pointer, it is not
-> >> necessarily critical for setting the masks, so this will not be done under
-> >> protection of the matrix_dev->lock.
-> >>
-> >> Fixes: f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated")
-> >> Cc: stable@vger.kernel.org
-> >> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/crypto/vfio_ap_ops.c | 75 ++++++++++++++++++-------------
-> >>   1 file changed, 45 insertions(+), 30 deletions(-)
-> >>
-> >>   static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
-> >>   {
-> >> -	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> >> -	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> >> -	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> >> -	kvm_put_kvm(matrix_mdev->kvm);
-> >> -	matrix_mdev->kvm = NULL;
-> >> +	if (matrix_mdev->kvm) {  
-> > If you're doing setting/unsetting under matrix_dev->lock, is it
-> > possible that matrix_mdev->kvm gets unset between here and the next
-> > line, as you don't hold the lock?  
-> 
-> That is highly unlikely because the only place the matrix_mdev->kvm
-> pointer is cleared is in this function which is called from only two
-> places: the notifier that handles the VFIO_GROUP_NOTIFY_SET_KVM
-> notification when the KVM pointer is cleared; the vfio_ap_mdev_release()
-> function which is called when the mdev fd is closed (i.e., when the guest
-> is shut down). The fact is, with the only end-to-end implementation
-> currently available, the notifier callback is never invoked to clear
-> the KVM pointer because the vfio_ap_mdev_release callback is
-> invoked first and it unregisters the notifier callback.
-> 
-> Having said that, I suppose there is no guarantee that there will not
-> be different userspace clients in the future that do things in a
-> different order. At the very least, it wouldn't hurt to protect against
-> that as you suggest below.
+Maybe we should move this check after the try_module_get() call, since 
+the memory pointed by 'new_transport' pointer can be deallocated in the 
+meantime.
 
-Yes, if userspace is able to use the interfaces in the certain way, we
-should always make sure that nothing bad happens if it does so, even if
-known userspace applications are well-behaved.
+Also, if the socket had a transport before, we should deassign it before 
+returning an error.
 
-[Can we make an 'evil userspace' test program, maybe? The hardware
-dependency makes this hard to run, though.]
-
-> 
-> >
-> > Maybe you could
-> > - grab a reference to kvm while holding the lock
-> > - call the mask handling functions with that kvm reference
-> > - lock again, drop the reference, and do the rest of the processing?
-> >  
-> >> +		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> >> +		mutex_lock(&matrix_dev->lock);
-> >> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> >> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> >> +		kvm_put_kvm(matrix_mdev->kvm);
-> >> +		matrix_mdev->kvm = NULL;
-> >> +		mutex_unlock(&matrix_dev->lock);
-> >> +	}
-> >>   }  
-> 
+> 		break;
+> 	default:
+> 		return -ESOCKTNOSUPPORT;
+>@@ -684,6 +694,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
+>
+> 	switch (sk->sk_socket->type) {
+> 	case SOCK_STREAM:
+>+	case SOCK_SEQPACKET:
+> 		spin_lock_bh(&vsock_table_lock);
+> 		retval = __vsock_bind_connectible(vsk, addr);
+> 		spin_unlock_bh(&vsock_table_lock);
+>@@ -769,7 +780,7 @@ static struct sock *__vsock_create(struct net *net,
+>
+> static bool sock_type_connectible(u16 type)
+> {
+>-	return type == SOCK_STREAM;
+>+	return (type == SOCK_STREAM) || (type == SOCK_SEQPACKET);
+> }
+>
+> static void __vsock_release(struct sock *sk, int level)
+>@@ -2199,6 +2210,27 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.sendpage = sock_no_sendpage,
+> };
+>
+>+static const struct proto_ops vsock_seqpacket_ops = {
+>+	.family = PF_VSOCK,
+>+	.owner = THIS_MODULE,
+>+	.release = vsock_release,
+>+	.bind = vsock_bind,
+>+	.connect = vsock_connect,
+>+	.socketpair = sock_no_socketpair,
+>+	.accept = vsock_accept,
+>+	.getname = vsock_getname,
+>+	.poll = vsock_poll,
+>+	.ioctl = sock_no_ioctl,
+>+	.listen = vsock_listen,
+>+	.shutdown = vsock_shutdown,
+>+	.setsockopt = vsock_connectible_setsockopt,
+>+	.getsockopt = vsock_connectible_getsockopt,
+>+	.sendmsg = vsock_connectible_sendmsg,
+>+	.recvmsg = vsock_connectible_recvmsg,
+>+	.mmap = sock_no_mmap,
+>+	.sendpage = sock_no_sendpage,
+>+};
+>+
+> static int vsock_create(struct net *net, struct socket *sock,
+> 			int protocol, int kern)
+> {
+>@@ -2219,6 +2251,9 @@ static int vsock_create(struct net *net, struct socket *sock,
+> 	case SOCK_STREAM:
+> 		sock->ops = &vsock_stream_ops;
+> 		break;
+>+	case SOCK_SEQPACKET:
+>+		sock->ops = &vsock_seqpacket_ops;
+>+		break;
+> 	default:
+> 		return -ESOCKTNOSUPPORT;
+> 	}
+>-- 
+>2.25.1
+>
 
