@@ -2,281 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 006B63188D0
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 11:59:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA9C63188CB
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 11:59:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231284AbhBKK5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 05:57:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28618 "EHLO
+        id S229919AbhBKK4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 05:56:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23498 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230346AbhBKKyH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 05:54:07 -0500
+        by vger.kernel.org with ESMTP id S230026AbhBKKyJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 05:54:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613040755;
+        s=mimecast20190719; t=1613040762;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c6JIyxLiRHESwY6rJeK+rsmJNAoxnfQJq+AkTGikyDY=;
-        b=gKi4hz7cnY6rmBf7RnSpVJLsJQT3TLOW50w6cAZC6rzhYjmc0evEVzXPj88ipov2A7g/aC
-        bM1nb/hMYRYwfGgxjGgscxCFL/lS32JIrC8fi5dx0WWzGOZrlq5W3/MYgoWPoN/RU10lZ9
-        i0/hKJaOaNFpjwQ8jGDabPUIOnlhqk4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-5Iro-AeoOD2PgFzgG3rhCg-1; Thu, 11 Feb 2021 05:52:34 -0500
-X-MC-Unique: 5Iro-AeoOD2PgFzgG3rhCg-1
-Received: by mail-ed1-f72.google.com with SMTP id g6so4487375edy.9
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 02:52:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=c6JIyxLiRHESwY6rJeK+rsmJNAoxnfQJq+AkTGikyDY=;
-        b=qAIKxqGFwFmiKpZ9+Q3xqjiBA6j9oQiAovnO/aUr5VmhC8R0795HFtjbdxhXw2XF6w
-         Iovm0FI9pCzcWxAys3xhK89hVid7CfU+8j1ADg2IzgfUst6S329U0/NmtuPIhQdMuWnz
-         b0WrkH2B3UslC6gVXbK2KQ6gv+YNxmpLGESDs+k+/9uDIU3pMhwj2HVw/Ze/GUGYeXcM
-         522QqAh2eM79fB/K8PTG7ene/w37NN5LSIQH4yN+FyT5UKGzAAGfuWwmIr9WLst8cTcq
-         fTAgzgF3zLQnEEflo6QqFuPFGmaFlQU4bPG1S7VBsxSNUQnrf5KEHd87QE6gnlfQ+uB7
-         OL2A==
-X-Gm-Message-State: AOAM530fDPDrbRbbWJm9qm49EC/RXk5Kpdpbk8VM1ABeHjuJ2ERGlHe+
-        EADqWgQhXEzsioxZO4YZ7tAk2bsXYmG9WRGr7yio7RDMvEA2KXd+PFaoGAi9yqPzN2BVLLBIfhj
-        O4ohHFIu/QhPE
-X-Received: by 2002:a50:b765:: with SMTP id g92mr7847350ede.317.1613040752989;
-        Thu, 11 Feb 2021 02:52:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw4L+tgVkXdxNZfo4WOdRQsyzuiJJ+oUQSD+Mof1i2r3UcuhRlRZ20qv++UXJ9lCcDs9kLlIA==
-X-Received: by 2002:a50:b765:: with SMTP id g92mr7847336ede.317.1613040752718;
-        Thu, 11 Feb 2021 02:52:32 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id l12sm3613142edn.83.2021.02.11.02.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 02:52:32 -0800 (PST)
-Date:   Thu, 11 Feb 2021 11:52:29 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 01/17] af_vsock: update functions for connectible
- socket
-Message-ID: <20210211105229.fmdonwqe3swhq6lb@steredhat>
-References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
- <20210207151426.804348-1-arseny.krasnov@kaspersky.com>
+        bh=8HThQPXUptMHzLx4V9Kjdirx0coF+DMARAihQm/C5mY=;
+        b=HVvABBXj4Qte5uSurE7axwHxYNq3MhIAVRUtMX2/Akpt5V+7fLgCX74HWDvOfg+kkYPSoR
+        5gYinLJa7vhRoLww2jMsAxjJ7p49cix1GMW3g7DkQU3n0RSyK97YTTDNanEaCDvfr7A3YH
+        777DQ341Q5dwiG0Eq+m7Ymbc8XbfIHE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-35-LXD2eLIYMluGNPlquGz46w-1; Thu, 11 Feb 2021 05:52:38 -0500
+X-MC-Unique: LXD2eLIYMluGNPlquGz46w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 072DF91185;
+        Thu, 11 Feb 2021 10:52:37 +0000 (UTC)
+Received: from [10.36.114.52] (ovpn-114-52.ams2.redhat.com [10.36.114.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1096360C47;
+        Thu, 11 Feb 2021 10:52:32 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x: introduce leave_pstate to
+ leave userspace
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     thuth@redhat.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        pmorel@linux.ibm.com, borntraeger@de.ibm.com
+References: <20210209185154.1037852-1-imbrenda@linux.ibm.com>
+ <20210209185154.1037852-2-imbrenda@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <de6db9d1-d831-07d8-4721-93750add3b60@redhat.com>
+Date:   Thu, 11 Feb 2021 11:52:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210207151426.804348-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210209185154.1037852-2-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 07, 2021 at 06:14:23PM +0300, Arseny Krasnov wrote:
->This prepares af_vsock.c for SEQPACKET support: some functions such
->as setsockopt(), getsockopt(), connect(), recvmsg(), sendmsg() are
->shared between both types of sockets, so rename them in general
->manner.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 64 +++++++++++++++++++++-------------------
-> 1 file changed, 34 insertions(+), 30 deletions(-)
+On 09.02.21 19:51, Claudio Imbrenda wrote:
+> In most testcases, we enter problem state (userspace) just to test if a
+> privileged instruction causes a fault. In some cases, though, we need
+> to test if an instruction works properly in userspace. This means that
+> we do not expect a fault, and we need an orderly way to leave problem
+> state afterwards.
+> 
+> This patch introduces a simple system based on the SVC instruction.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   lib/s390x/asm/arch_def.h |  5 +++++
+>   lib/s390x/interrupt.c    | 12 ++++++++++--
+>   2 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index 9c4e330a..9902e9fe 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -276,6 +276,11 @@ static inline void enter_pstate(void)
+>   	load_psw_mask(mask);
+>   }
+>   
+> +static inline void leave_pstate(void)
+> +{
+> +	asm volatile("	svc 1\n");
+> +}
+> +
+>   static inline int stsi(void *addr, int fc, int sel1, int sel2)
+>   {
+>   	register int r0 asm("0") = (fc << 28) | sel1;
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index 1ce36073..59e01b1a 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -188,6 +188,14 @@ int unregister_io_int_func(void (*f)(void))
+>   
+>   void handle_svc_int(void)
+>   {
+> -	report_abort("Unexpected supervisor call interrupt: on cpu %d at %#lx",
+> -		     stap(), lc->svc_old_psw.addr);
+> +	uint16_t code = lc->svc_int_code;
+> +
+> +	switch (code) {
+> +	case 1:
+> +		lc->svc_old_psw.mask &= ~PSW_MASK_PSTATE;
+> +		break;
+> +	default:
+> +		report_abort("Unexpected supervisor call interrupt: code %#x on cpu %d at %#lx",
+> +			      code, stap(), lc->svc_old_psw.addr);
+> +	}
+>   }
+> 
 
-This patch LGTM:
+Acked-by: David Hildenbrand <david@redhat.com>
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
+-- 
 Thanks,
-Stefano
 
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 6894f21dc147..f4fabec50650 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -604,8 +604,8 @@ static void vsock_pending_work(struct work_struct *work)
->
-> /**** SOCKET OPERATIONS ****/
->
->-static int __vsock_bind_stream(struct vsock_sock *vsk,
->-			       struct sockaddr_vm *addr)
->+static int __vsock_bind_connectible(struct vsock_sock *vsk,
->+				    struct sockaddr_vm *addr)
-> {
-> 	static u32 port;
-> 	struct sockaddr_vm new_addr;
->@@ -685,7 +685,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
-> 	switch (sk->sk_socket->type) {
-> 	case SOCK_STREAM:
-> 		spin_lock_bh(&vsock_table_lock);
->-		retval = __vsock_bind_stream(vsk, addr);
->+		retval = __vsock_bind_connectible(vsk, addr);
-> 		spin_unlock_bh(&vsock_table_lock);
-> 		break;
->
->@@ -767,6 +767,11 @@ static struct sock *__vsock_create(struct net *net,
-> 	return sk;
-> }
->
->+static bool sock_type_connectible(u16 type)
->+{
->+	return type == SOCK_STREAM;
->+}
->+
-> static void __vsock_release(struct sock *sk, int level)
-> {
-> 	if (sk) {
->@@ -785,7 +790,7 @@ static void __vsock_release(struct sock *sk, int level)
->
-> 		if (vsk->transport)
-> 			vsk->transport->release(vsk);
->-		else if (sk->sk_type == SOCK_STREAM)
->+		else if (sock_type_connectible(sk->sk_type))
-> 			vsock_remove_sock(vsk);
->
-> 		sock_orphan(sk);
->@@ -945,7 +950,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
-> 	sk = sock->sk;
-> 	if (sock->state == SS_UNCONNECTED) {
-> 		err = -ENOTCONN;
->-		if (sk->sk_type == SOCK_STREAM)
->+		if (sock_type_connectible(sk->sk_type))
-> 			return err;
-> 	} else {
-> 		sock->state = SS_DISCONNECTING;
->@@ -960,7 +965,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
-> 		sk->sk_state_change(sk);
-> 		release_sock(sk);
->
->-		if (sk->sk_type == SOCK_STREAM) {
->+		if (sock_type_connectible(sk->sk_type)) {
-> 			sock_reset_flag(sk, SOCK_DONE);
-> 			vsock_send_shutdown(sk, mode);
-> 		}
->@@ -1013,7 +1018,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> 		if (!(sk->sk_shutdown & SEND_SHUTDOWN))
-> 			mask |= EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
->
->-	} else if (sock->type == SOCK_STREAM) {
->+	} else if (sock_type_connectible(sk->sk_type)) {
-> 		const struct vsock_transport *transport;
->
-> 		lock_sock(sk);
->@@ -1263,8 +1268,8 @@ static void vsock_connect_timeout(struct work_struct *work)
-> 	sock_put(sk);
-> }
->
->-static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
->-				int addr_len, int flags)
->+static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->+			 int addr_len, int flags)
-> {
-> 	int err;
-> 	struct sock *sk;
->@@ -1414,7 +1419,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
->
-> 	lock_sock(listener);
->
->-	if (sock->type != SOCK_STREAM) {
->+	if (!sock_type_connectible(sock->type)) {
-> 		err = -EOPNOTSUPP;
-> 		goto out;
-> 	}
->@@ -1491,7 +1496,7 @@ static int vsock_listen(struct socket *sock, int backlog)
->
-> 	lock_sock(sk);
->
->-	if (sock->type != SOCK_STREAM) {
->+	if (!sock_type_connectible(sk->sk_type)) {
-> 		err = -EOPNOTSUPP;
-> 		goto out;
-> 	}
->@@ -1535,11 +1540,11 @@ static void vsock_update_buffer_size(struct vsock_sock *vsk,
-> 	vsk->buffer_size = val;
-> }
->
->-static int vsock_stream_setsockopt(struct socket *sock,
->-				   int level,
->-				   int optname,
->-				   sockptr_t optval,
->-				   unsigned int optlen)
->+static int vsock_connectible_setsockopt(struct socket *sock,
->+					int level,
->+					int optname,
->+					sockptr_t optval,
->+					unsigned int optlen)
-> {
-> 	int err;
-> 	struct sock *sk;
->@@ -1617,10 +1622,10 @@ static int vsock_stream_setsockopt(struct socket *sock,
-> 	return err;
-> }
->
->-static int vsock_stream_getsockopt(struct socket *sock,
->-				   int level, int optname,
->-				   char __user *optval,
->-				   int __user *optlen)
->+static int vsock_connectible_getsockopt(struct socket *sock,
->+					int level, int optname,
->+					char __user *optval,
->+					int __user *optlen)
-> {
-> 	int err;
-> 	int len;
->@@ -1688,8 +1693,8 @@ static int vsock_stream_getsockopt(struct socket *sock,
-> 	return 0;
-> }
->
->-static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
->-				size_t len)
->+static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
->+				     size_t len)
-> {
-> 	struct sock *sk;
-> 	struct vsock_sock *vsk;
->@@ -1828,10 +1833,9 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> 	return err;
-> }
->
->-
-> static int
->-vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->-		     int flags)
->+vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->+			  int flags)
-> {
-> 	struct sock *sk;
-> 	struct vsock_sock *vsk;
->@@ -2007,7 +2011,7 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.owner = THIS_MODULE,
-> 	.release = vsock_release,
-> 	.bind = vsock_bind,
->-	.connect = vsock_stream_connect,
->+	.connect = vsock_connect,
-> 	.socketpair = sock_no_socketpair,
-> 	.accept = vsock_accept,
-> 	.getname = vsock_getname,
->@@ -2015,10 +2019,10 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.ioctl = sock_no_ioctl,
-> 	.listen = vsock_listen,
-> 	.shutdown = vsock_shutdown,
->-	.setsockopt = vsock_stream_setsockopt,
->-	.getsockopt = vsock_stream_getsockopt,
->-	.sendmsg = vsock_stream_sendmsg,
->-	.recvmsg = vsock_stream_recvmsg,
->+	.setsockopt = vsock_connectible_setsockopt,
->+	.getsockopt = vsock_connectible_getsockopt,
->+	.sendmsg = vsock_connectible_sendmsg,
->+	.recvmsg = vsock_connectible_recvmsg,
-> 	.mmap = sock_no_mmap,
-> 	.sendpage = sock_no_sendpage,
-> };
->-- 
->2.25.1
->
+David / dhildenb
 
