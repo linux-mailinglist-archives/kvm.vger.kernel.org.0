@@ -2,101 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09B5318F28
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 16:53:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D63A318F3A
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 16:57:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231616AbhBKPux (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 10:50:53 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:3937 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231511AbhBKPsf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 10:48:35 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B602551940000>; Thu, 11 Feb 2021 07:47:32 -0800
-Received: from DRHQMAIL107.nvidia.com (10.27.9.16) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 11 Feb
- 2021 15:47:32 +0000
-Received: from [172.27.0.87] (172.20.145.6) by DRHQMAIL107.nvidia.com
- (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 11 Feb
- 2021 15:47:26 +0000
-Subject: Re: [PATCH 8/9] vfio/pci: use x86 naming instead of igd
-To:     Jason Gunthorpe <jgg@nvidia.com>, Cornelia Huck <cohuck@redhat.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <liranl@nvidia.com>,
-        <oren@nvidia.com>, <tzahio@nvidia.com>, <leonro@nvidia.com>,
-        <yarong@nvidia.com>, <aviadye@nvidia.com>, <shahafs@nvidia.com>,
-        <artemp@nvidia.com>, <kwankhede@nvidia.com>, <ACurrid@nvidia.com>,
-        <gmataev@nvidia.com>, <cjia@nvidia.com>, <yishaih@nvidia.com>,
-        <aik@ozlabs.ru>
-References: <20210201162828.5938-1-mgurtovoy@nvidia.com>
- <20210201162828.5938-9-mgurtovoy@nvidia.com>
- <20210201181454.22112b57.cohuck@redhat.com>
- <599c6452-8ba6-a00a-65e7-0167f21eac35@linux.ibm.com>
- <20210201114230.37c18abd@omen.home.shazbot.org>
- <20210202170659.1c62a9e8.cohuck@redhat.com>
- <20210202171021.GW4247@nvidia.com>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-Message-ID: <f49512dd-9a5c-b1d8-1609-da55e270635b@nvidia.com>
-Date:   Thu, 11 Feb 2021 17:47:23 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S229873AbhBKP4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 10:56:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229882AbhBKPyH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 10:54:07 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1713C0613D6
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 07:53:26 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id 18so3937454pfz.3
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 07:53:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Vnu2AtQ1spv0GWQmPrlWpgIMMltpVB1H3yMfq69YdQg=;
+        b=U++q29GI0JS9qimHjYxoLWA88JdkGYxzQC7VLD7nkBcz2ogRcyFq0nPvDNcwlztw41
+         49yM34YYFdP/2PbM53WapBfRyvXes0nJUcS3W07w1nGFCAJr/HlXg/mVhgnPMx8PSzkK
+         PaYcgoZR7saPS6cb/fOkpWR7ijvHPNVyb6lGdxxQzfMeo0fMf7rea0d4ku91YWdOFAwJ
+         fN7AgZZFKVbP3ued6lCe2wAnR9/08VK1+s439q/rMoSz0pP3V0LAmfH+LODOGx+5XofR
+         2kPq8+NEGMbkpeh+l1aNjGXo7Y3u7LDD4LXWVmh8rrW+A3t1IEgXzE3I4uX9nUJ+q0ef
+         nPog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Vnu2AtQ1spv0GWQmPrlWpgIMMltpVB1H3yMfq69YdQg=;
+        b=uGvLoELXXgyRs7LAyad/VEgvGMpezKznCr4JKSJFlUsIRObsTnDWh/zJyIPIL4wHqr
+         Jf6cq8yvljTEHKrwW4REXmU6XlMeYQ1m5O5s/PWSzuw5FhK2Ne/VMMg0y00B2LoN09TT
+         pcKIUmVdtio6jqmUBmjohb1WEM81Tbdc4iSuIzKRP45M7+JAs7sJPgc7A2m9aoM1cPWK
+         kfUMRFCsczijiKAoWrFIbMo7yRJOjfcJZiZZlpqZYI1yJnMprD2b1Y9hBKg5BKQkw8mH
+         Oj5LxeH/Ktr586XjXnrojoqGrAou4lbNlzbdsX6WhGeN15gU7/CY5LRphEFUb/2Zb+es
+         7KXw==
+X-Gm-Message-State: AOAM532KmGvm1mhbJtjI9VbvEyufDsd4xXKeDxD4SzeSVEmj2W6mgRqb
+        +TLudwYnFVeuAMJdiVeHEZKJdg==
+X-Google-Smtp-Source: ABdhPJw/TlRtkkNbkn2Zsea8YEd53t9+megM0TMZUVR3RMYIDC7aR4gTj2dH/GDqKoMwhcy5ttBbgQ==
+X-Received: by 2002:a62:35c6:0:b029:1ba:e795:d20e with SMTP id c189-20020a6235c60000b02901bae795d20emr8538633pfa.37.1613058806192;
+        Thu, 11 Feb 2021 07:53:26 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
+        by smtp.gmail.com with ESMTPSA id h11sm5341715pjg.46.2021.02.11.07.53.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 07:53:25 -0800 (PST)
+Date:   Thu, 11 Feb 2021 07:53:19 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Makarand Sonare <makarandsonare@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pshier@google.com,
+        jmattson@google.com, Ben Gardon <bgardon@google.com>
+Subject: Re: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging
+ gets enabled/disabled
+Message-ID: <YCVS79fnRkDRqfL2@google.com>
+References: <20210210212308.2219465-1-makarandsonare@google.com>
+ <7c78c6df-36e7-1473-e834-3786e257ebc5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210202171021.GW4247@nvidia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- DRHQMAIL107.nvidia.com (10.27.9.16)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1613058452; bh=UTOoJv9jmFrHAMyl7esEQ23+zBkmHWAQIZNkJ0IockI=;
-        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
-         MIME-Version:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-         Content-Language:X-Originating-IP:X-ClientProxiedBy;
-        b=jiIjxxbkXpvGXoJBCPSS1QO0ur9yeT8SMk8qDADTJAMPSOxQtx4Q6Q4YheC29tlDL
-         G26g+TEkk/Khm1+5Fhn3hYOm9WI2AztDMNsqzyiI5+S1V2LwKcgXUYEYI1ueJxTOgO
-         1WyYYNwFwWvFObVuhaBwl7DLc4TO4zKeAPZpCum/hPYNMOgP4sfRpBQfBLVcweY+wU
-         a1LnINk0/MW2kMhVWDs0MZSbDLLm9FH2VMA8hBqQRgsBUmDzTya1+0+h21rJQH6WwI
-         LbG4HtSKBFJ0WigqMhq2+kNNHFV/HEWmxAtEJd8JJBuX2eIR2Zp2OHKfU/+NyDLThJ
-         EiLwufx3RZvNg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c78c6df-36e7-1473-e834-3786e257ebc5@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Feb 11, 2021, Paolo Bonzini wrote:
+> On 10/02/21 22:23, Makarand Sonare wrote:
+> > +void vmx_update_pml_in_vmcs(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (cpu_has_secondary_exec_ctrls()) {
+> > +		if (is_guest_mode(vcpu)) {
+> > +			to_vmx(vcpu)->nested.deferred_update_pml_vmcs = true;
+> > +			return;
+> > +		}
+> > +
+> > +		if (vcpu->kvm->arch.pml_enabled)
+> > +			vmcs_set_bits(SECONDARY_VM_EXEC_CONTROL,
+> > +				SECONDARY_EXEC_ENABLE_PML);
+> > +		else
+> > +			vmcs_clear_bits(SECONDARY_VM_EXEC_CONTROL,
+> > +				SECONDARY_EXEC_ENABLE_PML);
+> > +	}
+> > +}
+> 
+> 
+> Since the execution controls are shadowed, they can be read quite
+> efficiently.  This means that there's no need for
+> vcpu->kvm->arch.pml_enabled, and also that the copy can be done
+> unconditionally in prepare_vmcs02 and nested_vmx_vmexit.
+> 
+> If the above is not true, we should at least combine
+> change_vmcs01_virtual_apic_mode, reload_vmcs01_apic_access_page and the new
+> field in a single bit field, for example vmx->nested.dirty_vmcs01_fields or
+> vmx->nested.vmexit_requests.
+> 
+> In any case I expect Sean to take care of submitting this patch and I have
+> to do nothing more about it, right?
 
-On 2/2/2021 7:10 PM, Jason Gunthorpe wrote:
-> On Tue, Feb 02, 2021 at 05:06:59PM +0100, Cornelia Huck wrote:
->
->> On the other side, we have the zdev support, which both requires s390
->> and applies to any pci device on s390.
-> Is there a reason why CONFIG_VFIO_PCI_ZDEV exists? Why not just always
-> return the s390 specific data in VFIO_DEVICE_GET_INFO if running on
-> s390?
->
-> It would be like returning data from ACPI on other platforms.
-
-Agree.
-
-all agree that I remove it ?
-
-we already have a check in the code:
-
-if (ret && ret !=3D -ENODEV) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pci_warn(vdev->vpdev.pdev, "Failed =
-to=20
-setup zPCI info capabilities\n");
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
-}
-
-so in case its not zdev we should get -ENODEV and continue in the good flow=
-.
-
->
-> It really seems like part of vfio-pci-core
->
-> Jason
+Right, we'll sort it out.
