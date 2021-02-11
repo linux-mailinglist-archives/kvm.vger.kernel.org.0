@@ -2,153 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C2C2318D03
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 15:13:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48FED318D43
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 15:24:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231126AbhBKOIq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 09:08:46 -0500
-Received: from foss.arm.com ([217.140.110.172]:52440 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232128AbhBKOGE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 09:06:04 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4293C31B;
-        Thu, 11 Feb 2021 06:05:16 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4598B3F719;
-        Thu, 11 Feb 2021 06:05:15 -0800 (PST)
-Subject: Re: [PATCH kvmtool 03/21] ioport: Retire .generate_fdt_node
- functionality
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-4-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <3f1cf056-1913-cbbf-b9cd-12d1a840c468@arm.com>
-Date:   Thu, 11 Feb 2021 14:05:27 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S231827AbhBKOXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 09:23:10 -0500
+Received: from new1-smtp.messagingengine.com ([66.111.4.221]:60409 "EHLO
+        new1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231419AbhBKOU7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 09:20:59 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 42C435802B1;
+        Thu, 11 Feb 2021 09:19:39 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Thu, 11 Feb 2021 09:19:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=YMJRaCtkHieJBNb9J1X6VVrVX9S
+        eNyMMz47nMnLDBZI=; b=PJWwH4P4Q8iRZEOV2XlknWmhpZcihU+j4UlXaqjyAvY
+        W5TdYVXX23xV8SyIAoyCI5eFRTOW4f8QQnacTyKCeoLIT1K/H+5GenyDyTk15Eu3
+        WCy6GjPjZoXiAmty4ItIbDa7fHbIdrAGkKtKlt+Ck8/mF5/uJkiUxDT77zTjiH08
+        Twg/23JUwvj4H3oWHOmCAANZK9VKBAxXybYTqW8Fd8ugr0gzsizM1sw2iqB6YhkT
+        crzxxry9MKTP6KuT+QJEKsoO4OsoQNNHi8xv9AE4FMObRTrslfRhnvd3bOxy7dc0
+        kqeYl4zKRc1UXyKoEvgvc3Sq8PXEnbHnx2NclW/5CLQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=YMJRaC
+        tkHieJBNb9J1X6VVrVX9SeNyMMz47nMnLDBZI=; b=oMtVOlVIdcdP/e2AxD5k0k
+        bEbSOPsM0/CfVrwjMnNNJB6JYtKDYbhXZHPvZuZuOyUFxkpL7F+4kxXhsgeT9YmW
+        YjQWq+CbEe32i2umHb3FmM5BfLada4H05UtstV21f5f5em4URWIDNudNl7mjjOo6
+        NNgzQJ1qi13fvib8eMjXEBT9hSWaiy326FgnSOVyyIDBoOayzu7FqI53YCv02d6n
+        XJZN3lDXF39LK5tWBNpdAEvYiHKkFl7Cq4Rc9qUjbsD90iihyT/3XyqHh1aAuufl
+        EM57AN0gNNPM4jTTUuP3dndyZWJQEa354D+KF6rHIcdxe0mW3BsNhxqurCo483pg
+        ==
+X-ME-Sender: <xms:-jwlYNLOJbxVGbGn-a3MyUFGKhVD2zFJpT2WRbAQcAwkCKYt1Jm0oA>
+    <xme:-jwlYJLXdyGPQ-iZvrH53sXR2YIUDrXsBXp-Dn_SvVWNjwN7aJVFizbHuMfqmZgVK
+    H39ZOol6-EidQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrheelgdeiudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghgucfm
+    jfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepueelledthe
+    ekleethfeludduvdfhffeuvdffudevgeehkeegieffveehgeeftefgnecuffhomhgrihhn
+    pehkvghrnhgvlhdrohhrghenucfkphepkeefrdekiedrjeegrdeigeenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhhdr
+    tghomh
+X-ME-Proxy: <xmx:-jwlYFtNrDl9PNr2TyGpMJ1UJTW5dLrBP74PoU8mHR9uMEvp7YWD5g>
+    <xmx:-jwlYOYdpNpERSS9ZrPNLL0dgKllhqdNaUTveJChnKXOxKts6gwN4A>
+    <xmx:-jwlYEYjCcuoksBu_6SU0-D4WlfnR5rUGpHwb2SyJPMrPSaBHxV4Dg>
+    <xmx:-zwlYBQTt2unJiwmRBw-xWoU1qMFx4c2KI2zeyF23cD8HU_KNgEokw>
+Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
+        by mail.messagingengine.com (Postfix) with ESMTPA id DF9F61080067;
+        Thu, 11 Feb 2021 09:19:37 -0500 (EST)
+Date:   Thu, 11 Feb 2021 15:19:36 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     stable@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH for 5.4] Fix unsynchronized access to sev members through
+ svm_register_enc_region
+Message-ID: <YCU8+Piht0VZzrzx@kroah.com>
+References: <20210208164855.772287-1-pgonda@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-4-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210208164855.772287-1-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
-
-On 12/10/20 2:28 PM, Andre Przywara wrote:
-> The ioport routines support a special way of registering FDT node
-> generator functions. There is no reason to have this separate from the
-> already existing way via the device header.
->
-> Now that the only user of this special ioport variety has been
-> transferred, we can retire this code, to simplify ioport handling.
-
-One comment below, but otherwise very nice cleanup.
-
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+On Mon, Feb 08, 2021 at 08:48:55AM -0800, Peter Gonda wrote:
+> commit 19a23da53932bc8011220bd8c410cb76012de004 upstream.
+> 
+> Grab kvm->lock before pinning memory when registering an encrypted
+> region; sev_pin_memory() relies on kvm->lock being held to ensure
+> correctness when checking and updating the number of pinned pages.
+> 
+> Add a lockdep assertion to help prevent future regressions.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Fixes: 1e80fdc09d12 ("KVM: SVM: Pin guest memory when SEV is active")
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> 
+> V2
+>  - Fix up patch description
+>  - Correct file paths svm.c -> sev.c
+>  - Add unlock of kvm->lock on sev_pin_memory error
+> 
+> V1
+>  - https://lore.kernel.org/kvm/20210126185431.1824530-1-pgonda@google.com/
+> 
+> Message-Id: <20210127161524.2832400-1-pgonda@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  include/kvm/ioport.h |  4 ----
->  ioport.c             | 34 ----------------------------------
->  2 files changed, 38 deletions(-)
->
-> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> index d0213541..a61038e2 100644
-> --- a/include/kvm/ioport.h
-> +++ b/include/kvm/ioport.h
-> @@ -29,10 +29,6 @@ struct ioport {
->  struct ioport_operations {
->  	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
->  	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> -	void (*generate_fdt_node)(struct ioport *ioport, void *fdt,
-> -				  void (*generate_irq_prop)(void *fdt,
-> -							    u8 irq,
-> -							    enum irq_type));
->  };
->  
->  void ioport__map_irq(u8 *irq);
-> diff --git a/ioport.c b/ioport.c
-> index 667e8386..b98836d3 100644
-> --- a/ioport.c
-> +++ b/ioport.c
-> @@ -56,7 +56,6 @@ static struct ioport *ioport_get(struct rb_root *root, u64 addr)
->  /* Called with ioport_lock held. */
->  static void ioport_unregister(struct rb_root *root, struct ioport *data)
->  {
-> -	device__unregister(&data->dev_hdr);
->  	ioport_remove(root, data);
->  	free(data);
->  }
-> @@ -70,30 +69,6 @@ static void ioport_put(struct rb_root *root, struct ioport *data)
->  	mutex_unlock(&ioport_lock);
->  }
->  
-> -#ifdef CONFIG_HAS_LIBFDT
-> -static void generate_ioport_fdt_node(void *fdt,
-> -				     struct device_header *dev_hdr,
-> -				     void (*generate_irq_prop)(void *fdt,
-> -							       u8 irq,
-> -							       enum irq_type))
-> -{
-> -	struct ioport *ioport = container_of(dev_hdr, struct ioport, dev_hdr);
-> -	struct ioport_operations *ops = ioport->ops;
-> -
-> -	if (ops->generate_fdt_node)
-> -		ops->generate_fdt_node(ioport, fdt, generate_irq_prop);
-> -}
-> -#else
-> -static void generate_ioport_fdt_node(void *fdt,
-> -				     struct device_header *dev_hdr,
-> -				     void (*generate_irq_prop)(void *fdt,
-> -							       u8 irq,
-> -							       enum irq_type))
-> -{
-> -	die("Unable to generate device tree nodes without libfdt\n");
-> -}
-> -#endif
-> -
->  int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
->  {
->  	struct ioport *entry;
-> @@ -107,10 +82,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
->  		.node		= RB_INT_INIT(port, port + count),
->  		.ops		= ops,
->  		.priv		= param,
-> -		.dev_hdr	= (struct device_header) {
-> -			.bus_type	= DEVICE_BUS_IOPORT,
-> -			.data		= generate_ioport_fdt_node,
-> -		},
+>  arch/x86/kvm/svm.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)a
 
-Since the dev_hdr field is not used anymore, maybe it could also be removed from
-struct ioport in include/kvm/ioport.h?
+Both backports now queued up, thanks.
 
-Thanks,
-
-Alex
-
->  		/*
->  		 * Start from 0 because ioport__unregister() doesn't decrement
->  		 * the reference count.
-> @@ -123,15 +94,10 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
->  	r = ioport_insert(&ioport_tree, entry);
->  	if (r < 0)
->  		goto out_free;
-> -	r = device__register(&entry->dev_hdr);
-> -	if (r < 0)
-> -		goto out_remove;
->  	mutex_unlock(&ioport_lock);
->  
->  	return port;
->  
-> -out_remove:
-> -	ioport_remove(&ioport_tree, entry);
->  out_free:
->  	free(entry);
->  	mutex_unlock(&ioport_lock);
+greg k-h
