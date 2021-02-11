@@ -2,92 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B320731904C
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:47:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C41D31905F
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:54:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231610AbhBKQqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 11:46:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231993AbhBKQod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 11:44:33 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF01DC06178C
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 08:43:46 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id j5so4264814pgb.11
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 08:43:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=q8cYYXpQD69b29Rz/wpLt70Z0TQIcwFQEc6shque2So=;
-        b=LOxo1kM4fI9rRUnG5+ONbkAIcsGEd/Rywcs4GV9HUOeuzBibBkGOj86HekEsV0s77W
-         Ahv4UuCate+g5qtkch9nKhsYPNL+uesmoJmpT2OZXdB6sE9Eh+R3Nuz+8weOHIQG5whG
-         KMBoms0r5ijFuu9X7mz1g9sgJN/fdhd7Yd/MZV/oN8x/IIkdJEgbw40m2oUTgFlrHYRn
-         c9/BoZ+08S8NUYfmQjrcSQYvTO8GsMxadIf1NWMmTgg1LXBOu4btY/EFOfbwG+2AWxjx
-         zOnmbTf3NN5Sg38BxiUX9lAJ/ZK1SISZNfwIFg4CbmHh2P7f9IFc+Vh9kD2w7UITHRLx
-         CMxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=q8cYYXpQD69b29Rz/wpLt70Z0TQIcwFQEc6shque2So=;
-        b=oqPgyIsRqjAnEc/tDaeV/xxhmjwSDBjsIU7+VSaPJ+WdDXzIwRKoI9sO2XYxULvjHL
-         muKaJVlhS0FzPs2lRfJxfk6zOwCnEwKm9smHaooorZfCeO5QYVXEYDPnV9cm5rFA+nSb
-         4oqj8wMC+wbD+5sJUVojrwvqovTn2q2juBznTCItb9V4J6REnCUza5ASnUb4hsE7jExB
-         MG1gwF/Mt8568qiYvaPumAg6sRtf4r+GVJRwupJQDtDXvXEBQSK18GPo16iKlMQ/0JbR
-         sqN/q/8ANJSxRI63cDWhcS3v48us2+1zQUrjsvJgzkgvctShP/gnsjzljqzn5PZu6uAQ
-         WdIA==
-X-Gm-Message-State: AOAM533nbwvXmyJ4z/E+lret1rKgQ40S4gf52RtEQ/7/7A0FHnzqBw3c
-        VW6rcJEDteIVDKkmEoSHYK1CB9uoim4KMQ==
-X-Google-Smtp-Source: ABdhPJzNtYM3Yj74V3gA5Zip72qFg0TSAP3m2hD2KDTKjTuS7T+diIoWhvPLpeKZcvBiVM/p+tb7YQ==
-X-Received: by 2002:aa7:9293:0:b029:1df:4e2:c981 with SMTP id j19-20020aa792930000b02901df04e2c981mr8512078pfa.41.1613061826269;
-        Thu, 11 Feb 2021 08:43:46 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
-        by smtp.gmail.com with ESMTPSA id p2sm6495119pgl.19.2021.02.11.08.43.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 08:43:45 -0800 (PST)
-Date:   Thu, 11 Feb 2021 08:43:39 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jan Beulich <jbeulich@suse.com>
-Cc:     Jonny Barker <jonny@jonnybarker.com>, KVM <kvm@vger.kernel.org>
-Subject: Re: your patch "KVM: x86: Update emulator context mode if SYSENTER
- xfers to 64-bit mode"
-Message-ID: <YCVeuxKYW2L6+pFs@google.com>
-References: <6032a7c3-94d3-0d53-4c94-4767b5a9d6c3@suse.com>
+        id S231881AbhBKQu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 11:50:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5388 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231947AbhBKQsu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 11:48:50 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11BGYB8V135888;
+        Thu, 11 Feb 2021 11:47:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Aqmz4aQl7nkrALMRdUdLq/F8auLEY5n8P94aY02T45c=;
+ b=m+uxjRhrfNPbgNmBVlmIOGzIeLGl6izrtUDDcRgnBoCaOkBfpBvv+ahCuKZupIYakPUw
+ xWeFInFbXEhG9e+Mkxg65JtRT1JuSHbi9+ExlV7/lmhPgKWT/DXTDlMULbDx8bALfJlY
+ uJtX6DldxNc+uzPiHuI0Xj5ua4DlVrVjt9feLokhpj8q2VUhs9f3M8F8OevE9dWIFWsb
+ 0NUslzRTSlPMOzuoEj+UV4ozpAMe6P2BSPeXAzUBNRANEjgG9/kGYOXmFlkfGvyKURB8
+ KJiL4+FH6+UnkfSaviP/EWghqj3ScczJApNnJ6x8uMz9Ay8uALQ6oC2lGagwAX9ol8l2 BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wm1h7t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 11:47:59 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11BGZNQU146157;
+        Thu, 11 Feb 2021 11:47:58 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wm1h71-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 11:47:58 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11BGhNlm008187;
+        Thu, 11 Feb 2021 16:47:57 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 36hjr8dya2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 16:47:56 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11BGlsbr32440596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Feb 2021 16:47:54 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0ED66A405F;
+        Thu, 11 Feb 2021 16:47:54 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73DE0A4068;
+        Thu, 11 Feb 2021 16:47:53 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.79])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 11 Feb 2021 16:47:53 +0000 (GMT)
+Date:   Thu, 11 Feb 2021 17:47:50 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org, borntraeger@de.ibm.com,
+        kwankhede@nvidia.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210211174750.24d91a65.pasic@linux.ibm.com>
+In-Reply-To: <8c461602-8c2c-4dd9-1d2b-5e424fc701f8@linux.ibm.com>
+References: <20210209194830.20271-1-akrowiak@linux.ibm.com>
+        <20210209194830.20271-2-akrowiak@linux.ibm.com>
+        <20210210115334.46635966.cohuck@redhat.com>
+        <20210210162429.261fc17c.pasic@linux.ibm.com>
+        <20210210163237.315d9a68.pasic@linux.ibm.com>
+        <59e8f084-c9ec-ce25-2326-b206e30d04d0@linux.ibm.com>
+        <20210210234606.1d0dbdec.pasic@linux.ibm.com>
+        <8c461602-8c2c-4dd9-1d2b-5e424fc701f8@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6032a7c3-94d3-0d53-4c94-4767b5a9d6c3@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-11_07:2021-02-11,2021-02-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 adultscore=0
+ spamscore=0 phishscore=0 priorityscore=1501 clxscore=1015 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102110135
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 10, 2021, Jan Beulich wrote:
-> I've noticed this patch while routinely screening the stable
-> kernel logs for issues we may also need to fix in Xen. Isn't
-> a similar change needed in SYSCALL emulation when going from
-> compat to 64-bit mode?
+On Thu, 11 Feb 2021 09:21:26 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Yep, it is.  AMD's APM explicitly states that compat always transitions to long
-mode.
+> Yes, it makes sense. I guess I didn't look closely at your
+> suggestion when I said it was exactly what I implemented
+> after agreeing with Connie. I had a slight difference in
+> my implementation:
+> 
+> static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+> {
+>      struct kvm *kvm;
+> 
+>      mutex_lock(&matrix_dev->lock);
+> 
+>      if (matrix_mdev->kvm) {
+>          kvm = matrix_mdev->kvm;
+>          mutex_unlock(&matrix_dev->lock);
 
-I believe em_sysexit() is technically buggy as well, though in the opposite way,
-as it doesn't set ctxt->mode when switching from long mode to compat mode.  But,
-it explicitly truncates rdx before assigning to rip so that's likely a benign
-bug, at least for now.
+The problem with this one is that as soon as we drop
+the lock here, another thread can in theory execute
+the critical section below, which drops our reference
+to kvm via kvm_put_kvm(kvm). Thus when we enter
+kvm_arch_crypto_clear_mask(), even if we are guaranteed
+to have a non-null pointer, the pointee is not guaranteed
+to be around. So like Connie suggested, you better take
+another reference to kvm in the first critical section.
 
-I don't see anything in em_rsm() that will fixup ctxt->mode, so I'm guessing an
-SMI with a 64-bit RIP will be fatal, too.
+Regards,
+Halil
 
-__emulate_int_real() can't switch mode, and INTn and company aren't emulated in
-protected mode.
-
-assign_eip_far() does update ctxt->mode, so far call/ret aren't broken.
-
-Given the number of flows that can potentially affect mode, and the difficulty
-in testing them, I feel like x86_emulate_insn() should handle refreshing the
-mode, or at least do a sanity check to verify that it was already updated.
-
-Side topic, I'm super curious why Intel lets SYSRET return to compat mode, when
-SYSCALL #UDs in compat mode...
+>          kvm_arch_crypto_clear_masks(kvm);
+>          mutex_lock(&matrix_dev->lock);
+>          kvm->arch.crypto.pqap_hook = NULL;
+>          vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+>          matrix_mdev->kvm = NULL;
+>          kvm_put_kvm(kvm);
+>      }
+> 
+>      mutex_unlock(&matrix_dev->lock);
+> }
