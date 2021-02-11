@@ -2,229 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F37093190E0
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:21:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E113B3190E2
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:21:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232297AbhBKRUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 12:20:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:54862 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231325AbhBKRSf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 12:18:35 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA88D11D4;
-        Thu, 11 Feb 2021 09:17:44 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8AA5A3F73B;
-        Thu, 11 Feb 2021 09:17:43 -0800 (PST)
-Date:   Thu, 11 Feb 2021 17:16:48 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
-Message-ID: <20210211171648.36000cce@slackpad.fritz.box>
-In-Reply-To: <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
-        <20201210142908.169597-2-andre.przywara@arm.com>
-        <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S231842AbhBKRVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 12:21:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48090 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232207AbhBKRSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 12:18:52 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A052C0613D6
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:18:11 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id k22so3656872pll.6
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:18:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=2Va0d5DLKmJ/vBD6ZtgEU+C4iwJe1g7ynRh/ylVryc4=;
+        b=KMBWmNG8WFCySwjMyO2je+ink+5pH3UJyvLsHL+4zn8IRQYjg0TJiDbLuahQJWniLR
+         DBZ3KSdJu0IuEYvrvnzy5EbhJ7UEVIExWceFJc/xxfGZImqiAGYeJrjyg5h+eu2vQ9lD
+         iySXL5sT9jjCInm5ASo67ncULa5FJesyT/BXjwIjaErWbt1pKb4KfYD2Vgs0zOYbS7x7
+         bku9ltYhf2Agf8DXinLHzFhloIXTDHvMyt/iRJMy0nYHMvDgzO13Id0TL7PS9ztPScXQ
+         wWSyWPfmT8pIaWsIl1NK7GUiH+VQGW0bSkoq6+7A3jEwjyiEnhfxoXzNfh+QTPr2vjPn
+         tYpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=2Va0d5DLKmJ/vBD6ZtgEU+C4iwJe1g7ynRh/ylVryc4=;
+        b=IQ84ePxgcgM5V5N/AbiKLzhOyVRxXvcFwivz5M8Zc3HvoSJJ+aSh1xu9FqHfmfSTAR
+         etbRChmi1kjvv9bVlU7ef5d0aBG5fSwvBbYCCKuR15xl3ucN4F0IUXilVLWQYP2Goj4s
+         0II6KKek3UnxEG37A3n1V9v+j4L4guG6BG1ECF0kVGvkCLfoxo2iYz6r5lV1Pp8M0PmE
+         Pf3YqoFIu2dYG7aEKOlZbeops3nixrhV0cWUxCWwt8gy6dD3OgsF/QcuqM221UuXnrNp
+         jRe0wpP1MSssgssrPYls1WP/dQHur6v7gsqCFr7qSouyb2eunpE+hcAC8KKMAs7m1FFL
+         Hwjw==
+X-Gm-Message-State: AOAM530Rcgrijkco3XsaEUgtWVl7JOjI08xc2h9xOxNHgJHtpyvoffCJ
+        Rp8F+a8Z+s0yjJnub4UkFYtlEA==
+X-Google-Smtp-Source: ABdhPJzsSHNjxdlE/n1tiPWh163tang06udG1kM1kfg0+KzmHOUO7GjIz6ZrldYrikuAB1Ps3L6IqQ==
+X-Received: by 2002:a17:90a:6347:: with SMTP id v7mr4970704pjs.22.1613063890677;
+        Thu, 11 Feb 2021 09:18:10 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:f588:a708:f347:3ebb])
+        by smtp.gmail.com with ESMTPSA id c84sm6383679pfb.16.2021.02.11.09.18.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 09:18:10 -0800 (PST)
+Date:   Thu, 11 Feb 2021 09:18:03 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: nVMX: Sync L2 guest CET states between L1/L2
+Message-ID: <YCVmyx8N6BYB7NGy@google.com>
+References: <20210209083708.2680-1-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210209083708.2680-1-weijiang.yang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Feb 2021 17:44:59 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-Hi Alex,
-
-> On 12/10/20 2:28 PM, Andre Przywara wrote:
-> > Since x86 had a special need for registering tons of special I/O ports,
-> > we had an ioport__setup_arch() callback, to allow each architecture
-> > to do the same. As it turns out no one uses it beside x86, so we remove
-> > that unnecessary abstraction.
-> >
-> > The generic function was registered via a device_base_init() call, so
-> > we just do the same for the x86 specific function only, and can remove
-> > the unneeded ioport__setup_arch().
-> >
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arm/ioport.c         |  5 -----
-> >  include/kvm/ioport.h |  1 -
-> >  ioport.c             | 28 ----------------------------
-> >  mips/kvm.c           |  5 -----
-> >  powerpc/ioport.c     |  6 ------
-> >  x86/ioport.c         | 25 ++++++++++++++++++++++++-
-> >  6 files changed, 24 insertions(+), 46 deletions(-)
-> >
-> > diff --git a/arm/ioport.c b/arm/ioport.c
-> > index 2f0feb9a..24092c9d 100644
-> > --- a/arm/ioport.c
-> > +++ b/arm/ioport.c
-> > @@ -1,11 +1,6 @@
-> >  #include "kvm/ioport.h"
-> >  #include "kvm/irq.h"
-> >  
-> > -int ioport__setup_arch(struct kvm *kvm)
-> > -{
-> > -	return 0;
-> > -}
-> > -
-> >  void ioport__map_irq(u8 *irq)
-> >  {
-> >  	*irq = irq__alloc_line();
-> > diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> > index 039633f7..d0213541 100644
-> > --- a/include/kvm/ioport.h
-> > +++ b/include/kvm/ioport.h
-> > @@ -35,7 +35,6 @@ struct ioport_operations {
-> >  							    enum irq_type));
-> >  };
-> >  
-> > -int ioport__setup_arch(struct kvm *kvm);
-> >  void ioport__map_irq(u8 *irq);
-> >  
-> >  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
-> > diff --git a/ioport.c b/ioport.c
-> > index 844a832d..667e8386 100644
-> > --- a/ioport.c
-> > +++ b/ioport.c
-> > @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
-> >  	return 0;
-> >  }
-> >  
-> > -static void ioport__unregister_all(void)
-> > -{
-> > -	struct ioport *entry;
-> > -	struct rb_node *rb;
-> > -	struct rb_int_node *rb_node;
-> > -
-> > -	rb = rb_first(&ioport_tree);
-> > -	while (rb) {
-> > -		rb_node = rb_int(rb);
-> > -		entry = ioport_node(rb_node);
-> > -		ioport_unregister(&ioport_tree, entry);
-> > -		rb = rb_first(&ioport_tree);
-> > -	}
-> > -}  
+On Tue, Feb 09, 2021, Yang Weijiang wrote:
+> When L2 guest status has been changed by L1 QEMU/KVM, sync the change back
+> to L2 guest before the later's next vm-entry. On the other hand, if it's
+> changed due to L2 guest, sync it back so as to let L1 guest see the change.
 > 
-> I get the impression this is a rebasing artifact. The commit message doesn't
-> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
-> far as I can tell it's still needed because there are places other than
-> ioport__setup_arch() from where ioport__register() is called.
-
-I agree that the commit message is a bit thin on this fact, but the
-functionality of ioport__unregister_all() is now in
-x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
-without removing ioport__exit() as well would look very weird, if not
-hackish.
-
-I can amend the commit message to mention this, or is there anything
-else I missed?
-
-Cheers,
-Andre
-
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> > -
-> >  static const char *to_direction(int direction)
-> >  {
-> >  	if (direction == KVM_EXIT_IO_IN)
-> > @@ -220,16 +205,3 @@ out:
-> >  
-> >  	return !kvm->cfg.ioport_debug;
-> >  }
-> > -
-> > -int ioport__init(struct kvm *kvm)
-> > -{
-> > -	return ioport__setup_arch(kvm);
-> > -}
-> > -dev_base_init(ioport__init);
-> > -
-> > -int ioport__exit(struct kvm *kvm)
-> > -{
-> > -	ioport__unregister_all();
-> > -	return 0;
-> > -}
-> > -dev_base_exit(ioport__exit);
-> > diff --git a/mips/kvm.c b/mips/kvm.c
-> > index 26355930..e110e5d5 100644
-> > --- a/mips/kvm.c
-> > +++ b/mips/kvm.c
-> > @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
-> >  		die_perror("KVM_IRQ_LINE ioctl");
-> >  }
-> >  
-> > -int ioport__setup_arch(struct kvm *kvm)
-> > -{
-> > -	return 0;
-> > -}
-> > -
-> >  bool kvm__arch_cpu_supports_vm(void)
-> >  {
-> >  	return true;
-> > diff --git a/powerpc/ioport.c b/powerpc/ioport.c
-> > index 0c188b61..a5cff4ee 100644
-> > --- a/powerpc/ioport.c
-> > +++ b/powerpc/ioport.c
-> > @@ -12,12 +12,6 @@
-> >  
-> >  #include <stdlib.h>
-> >  
-> > -int ioport__setup_arch(struct kvm *kvm)
-> > -{
-> > -	/* PPC has no legacy ioports to set up */
-> > -	return 0;
-> > -}
-> > -
-> >  void ioport__map_irq(u8 *irq)
-> >  {
-> >  }
-> > diff --git a/x86/ioport.c b/x86/ioport.c
-> > index 7ad7b8f3..8c5c7699 100644
-> > --- a/x86/ioport.c
-> > +++ b/x86/ioport.c
-> > @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
-> >  {
-> >  }
-> >  
-> > -int ioport__setup_arch(struct kvm *kvm)
-> > +static int ioport__setup_arch(struct kvm *kvm)
-> >  {
-> >  	int r;
-> >  
-> > @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
-> >  
-> >  	return 0;
-> >  }
-> > +dev_base_init(ioport__setup_arch);
-> > +
-> > +static int ioport__remove_arch(struct kvm *kvm)
-> > +{
-> > +	ioport__unregister(kvm, 0x510);
-> > +	ioport__unregister(kvm, 0x402);
-> > +	ioport__unregister(kvm, 0x03D5);
-> > +	ioport__unregister(kvm, 0x03D4);
-> > +	ioport__unregister(kvm, 0x0378);
-> > +	ioport__unregister(kvm, 0x0278);
-> > +	ioport__unregister(kvm, 0x00F0);
-> > +	ioport__unregister(kvm, 0x00ED);
-> > +	ioport__unregister(kvm, IOPORT_DBG);
-> > +	ioport__unregister(kvm, 0x00C0);
-> > +	ioport__unregister(kvm, 0x00A0);
-> > +	ioport__unregister(kvm, 0x0092);
-> > +	ioport__unregister(kvm, 0x0040);
-> > +	ioport__unregister(kvm, 0x0020);
-> > +	ioport__unregister(kvm, 0x0000);
-> > +
-> > +	return 0;
-> > +}
-> > +dev_base_exit(ioport__remove_arch);  
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 9728efd529a1..b9d8db8facea 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2602,6 +2602,12 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>  	/* Note: may modify VM_ENTRY/EXIT_CONTROLS and GUEST/HOST_IA32_EFER */
+>  	vmx_set_efer(vcpu, vcpu->arch.efer);
+>  
+> +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE) {
+> +		vmcs_writel(GUEST_SSP, vmcs12->guest_ssp);
+> +		vmcs_writel(GUEST_INTR_SSP_TABLE, vmcs12->guest_ssp_tbl);
+> +		vmcs_writel(GUEST_S_CET, vmcs12->guest_s_cet);
+> +	}
+> +
 
+This is incomplete.  If VM_ENTRY_LOAD_CET_STATE is not set, then CET state needs
+to be propagated from vmcs01 to vmcs02.  See nested.vmcs01_debugctl and
+nested.vmcs01_guest_bndcfgs.
+
+It's tempting to say that we should add machinery to simplify implementing new
+fields that are conditionally loading, e.g. define an array that specifies the
+field, its control, and its offset in vmcs12, then process the array at the
+appropriate time.  That might be overkill though...
+
+>  	/*
+>  	 * Guest state is invalid and unrestricted guest is disabled,
+>  	 * which means L1 attempted VMEntry to L2 with invalid state.
+> @@ -4152,6 +4158,12 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+>  
+>  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
+>  		vmcs12->guest_ia32_efer = vcpu->arch.efer;
+> +
+> +	if (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_CET_STATE) {
+
+This is wrong, guest state is saved on VM-Exit if the control is _supported_,
+it doesn't have to be enabled.
+
+  If the processor supports the 1-setting of the “load CET” VM-entry control,
+  the contents of the IA32_S_CET and IA32_INTERRUPT_SSP_TABLE_ADDR MSRs are
+  saved into the corresponding fields. On processors that do not support Intel
+  64 architecture, bits 63:32 of these MSRs are not saved.
+
+And I'm pretty sure we should define these fields as a so called "rare" fields,
+i.e. add 'em to the case statement in is_vmcs12_ext_field() and process them in
+sync_vmcs02_to_vmcs12_rare().  CET isn't easily emulated, so they should almost
+never be read/written by a VMM, and thus aren't with synchronizing to vmcs12 on
+every exit.
+
+> +		vmcs12->guest_ssp = vmcs_readl(GUEST_SSP);
+> +		vmcs12->guest_ssp_tbl = vmcs_readl(GUEST_INTR_SSP_TABLE);
+> +		vmcs12->guest_s_cet = vmcs_readl(GUEST_S_CET);
+> +	}
+>  }
+>  
+>  /*
+> -- 
+> 2.26.2
+> 
