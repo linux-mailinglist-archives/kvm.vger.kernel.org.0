@@ -2,245 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5A143189D8
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 12:54:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62F83318A04
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:03:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbhBKLu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 06:50:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32565 "EHLO
+        id S231652AbhBKMCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 07:02:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27202 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230518AbhBKLtV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 06:49:21 -0500
+        by vger.kernel.org with ESMTP id S230028AbhBKMA3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:00:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613044075;
+        s=mimecast20190719; t=1613044733;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=622PK+GXq9S1qrkes0QjDaGHdMGIQhnkDb8cr2jJCIE=;
-        b=b15nW0YPkZq4X1/AZ2v8FBI1TVF7uZJZeVT6ZqvfcakqE1w2ekT9dganCpOSFXi5en5JX4
-        PQeKg+jKiqsrW0RAgaoXD8XRsYJznhb9XrlMAgGunzQJFoTPD3QfgwP3qnHxUEyaDDI50+
-        FCrN+pUGPjI8BTg/mhZeysK6LvNp+qQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-XLZJeOuNMkaLvGarQSw6sA-1; Thu, 11 Feb 2021 06:47:53 -0500
-X-MC-Unique: XLZJeOuNMkaLvGarQSw6sA-1
-Received: by mail-ed1-f72.google.com with SMTP id z8so4454197edr.18
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 03:47:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=622PK+GXq9S1qrkes0QjDaGHdMGIQhnkDb8cr2jJCIE=;
-        b=ZlbYBXmwJ7UTfeHyyNFgtykb8uzjZ/YFUfcQ4zBI/cPNyVOAhsDv/iRsmpHwiXPrTc
-         DUodStU3EJei5r3p4BfzcUifX901YJ5O2T5kVRmAYn0Wu4PIsH8ukmhIe1WJN4oZygJX
-         /jz4fS2UuAyt5cxdKdkINRHCMibY9mCrL4Xzr+EoeSsttS6BMotT+Lpypsn2UuK0SQcP
-         KrAZj+tJJ5lV3voOz1QM6rOXfYldV2/adzXeCKywWqpbasMv6JhS40p3noROB0AVS4jC
-         q2jSJ+8omJS2BpdwQyjbaIaPZ3624ksuGGv/vqUurAlIxFhvgsWr9VBnW2aoYXKJEVnU
-         0dKg==
-X-Gm-Message-State: AOAM533yX70N+RwtRpfXdqLoUFLVTqlblrA+RxG5mZjSyLrM4PX2WtkT
-        XAsZ9ZObbILkF3kaFDPIqgzHb9TorpNQpH51Gr3heaM6ddDCy4dqXtaDQDIbGx1nECjLkSTTwAJ
-        K41Y9FrZljSy7
-X-Received: by 2002:a17:906:6087:: with SMTP id t7mr8301153ejj.90.1613044071890;
-        Thu, 11 Feb 2021 03:47:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzj6t5agYEkOXzy2VYeZHkZnED6Gv95JyBHm5LY8BHXS5lTBekja2hs7Ao+RNUkHsDuAOb8sg==
-X-Received: by 2002:a17:906:6087:: with SMTP id t7mr8301133ejj.90.1613044071704;
-        Thu, 11 Feb 2021 03:47:51 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id x17sm1593873edq.42.2021.02.11.03.47.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 03:47:51 -0800 (PST)
-Date:   Thu, 11 Feb 2021 12:47:48 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Alexander Popov <alex.popov@linux.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 04/17] af_vsock: implement SEQPACKET receive loop
-Message-ID: <20210211114748.jshxyiecqmbwzmv3@steredhat>
-References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
- <20210207151526.804741-1-arseny.krasnov@kaspersky.com>
+        bh=PBbv8Ik3MJk5Ifs8Y2ot0HB2Ai76el9x4Ro3xXxLdLQ=;
+        b=WCDVGEkl4ey/djGFjCxPqYe8uvfbQf9CPA3HcVXVlOR/SqceC00VlAy+4bzlwwZReJkC0z
+        Pfg5ehARAzTyCg67vx7jBYC6J8n9WVBweXL+z6BIDKj4nPTgqZjnXZH0N9Y+/Kr1mya74d
+        xTDm4NjdlHbuNwDBCdYSVbQ2EPfSsXQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-gBhHTZsqOq6Dw3-MLmTWMA-1; Thu, 11 Feb 2021 06:58:52 -0500
+X-MC-Unique: gBhHTZsqOq6Dw3-MLmTWMA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CAB080196C;
+        Thu, 11 Feb 2021 11:58:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C9DEA5D74A;
+        Thu, 11 Feb 2021 11:58:43 +0000 (UTC)
+Date:   Thu, 11 Feb 2021 12:58:41 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Peter Xu <peterx@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: Re: [PATCH 00/15] VM: selftests: Hugepage fixes and cleanups
+Message-ID: <20210211115841.sbs2a3p7xx4womrc@kamzik.brq.redhat.com>
+References: <20210210230625.550939-1-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210207151526.804741-1-arseny.krasnov@kaspersky.com>
+In-Reply-To: <20210210230625.550939-1-seanjc@google.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 07, 2021 at 06:15:22PM +0300, Arseny Krasnov wrote:
->This adds receive loop for SEQPACKET. It looks like receive loop for
->STREAM, but there is a little bit difference:
->1) It doesn't call notify callbacks.
->2) It doesn't care about 'SO_SNDLOWAT' and 'SO_RCVLOWAT' values, because
->   there is no sense for these values in SEQPACKET case.
->3) It waits until whole record is received or error is found during
->   receiving.
->4) It processes and sets 'MSG_TRUNC' flag.
+On Wed, Feb 10, 2021 at 03:06:10PM -0800, Sean Christopherson wrote:
+> Fix hugepage bugs in the KVM selftests that specifically affect dirty
+> logging and demand paging tests.  Found while attempting to verify KVM
+> changes/fixes related to hugepages and dirty logging (patches incoming in
+> a separate series).
+> 
+> Clean up the perf_test_args util on top of the hugepage fixes to clarify
+> what "page size" means, and to improve confidence in the code doing what
+> it thinks it's doing.  In a few cases, users of perf_test_args were
+> duplicating (approximating?) calculations made by perf_test_args, and it
+> wasn't obvious that both pieces of code were guaranteed to end up with the
+> same result.
+> 
+> Sean Christopherson (15):
+>   KVM: selftests: Explicitly state indicies for vm_guest_mode_params
+>     array
+>   KVM: selftests: Expose align() helpers to tests
+>   KVM: selftests: Align HVA for HugeTLB-backed memslots
+>   KVM: selftests: Force stronger HVA alignment (1gb) for hugepages
+>   KVM: selftests: Require GPA to be aligned when backed by hugepages
+>   KVM: selftests: Use shorthand local var to access struct
+>     perf_tests_args
+>   KVM: selftests: Capture per-vCPU GPA in perf_test_vcpu_args
+>   KVM: selftests: Use perf util's per-vCPU GPA/pages in demand paging
+>     test
+>   KVM: selftests: Move per-VM GPA into perf_test_args
+>   KVM: selftests: Remove perf_test_args.host_page_size
+>   KVM: selftests: Create VM with adjusted number of guest pages for perf
+>     tests
+>   KVM: selftests: Fill per-vCPU struct during "perf_test" VM creation
+>   KVM: selftests: Sync perf_test_args to guest during VM creation
+>   KVM: selftests: Track size of per-VM memslot in perf_test_args
+>   KVM: selftests: Get rid of gorilla math in memslots modification test
+> 
+>  .../selftests/kvm/demand_paging_test.c        |  39 ++---
+>  .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
+>  .../testing/selftests/kvm/include/kvm_util.h  |  28 ++++
+>  .../selftests/kvm/include/perf_test_util.h    |  18 +--
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  36 ++---
+>  .../selftests/kvm/lib/perf_test_util.c        | 139 ++++++++++--------
+>  .../kvm/memslot_modification_stress_test.c    |  16 +-
+>  7 files changed, 145 insertions(+), 141 deletions(-)
+> 
+> -- 
+> 2.30.0.478.g8a0d178c01-goog
 >
->So to avoid extra conditions for two types of socket inside one loop, two
->independent functions were created.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> include/net/af_vsock.h   |  5 +++
-> net/vmw_vsock/af_vsock.c | 96 +++++++++++++++++++++++++++++++++++++++-
-> 2 files changed, 100 insertions(+), 1 deletion(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index b1c717286993..bb6a0e52be86 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -135,6 +135,11 @@ struct vsock_transport {
-> 	bool (*stream_is_active)(struct vsock_sock *);
-> 	bool (*stream_allow)(u32 cid, u32 port);
->
->+	/* SEQ_PACKET. */
->+	size_t (*seqpacket_seq_get_len)(struct vsock_sock *);
->+	int (*seqpacket_dequeue)(struct vsock_sock *, struct msghdr *,
->+				     int flags, bool *msg_ready);
 
-CHECK: Alignment should match open parenthesis
-#35: FILE: include/net/af_vsock.h:141:
-+	int (*seqpacket_dequeue)(struct vsock_sock *, struct msghdr *,
-+				     int flags, bool *msg_ready);
+For the series
 
-And to make checkpatch.pl happy please use the identifier name also for 
-the others parameter. I know we haven't done this before, but for new 
-code I think we can do it.
-
->+
-> 	/* Notification. */
-> 	int (*notify_poll_in)(struct vsock_sock *, size_t, bool *);
-> 	int (*notify_poll_out)(struct vsock_sock *, size_t, bool *);
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 66c8a932f49b..3d8af987216a 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1977,6 +1977,97 @@ static int __vsock_stream_recvmsg(struct sock *sk, struct msghdr *msg,
-> 	return err;
-> }
->
->+static int __vsock_seqpacket_recvmsg(struct sock *sk, struct msghdr *msg,
->+				     size_t len, int flags)
->+{
->+	const struct vsock_transport *transport;
->+	const struct iovec *orig_iov;
->+	unsigned long orig_nr_segs;
->+	bool msg_ready;
->+	struct vsock_sock *vsk;
->+	size_t record_len;
->+	long timeout;
->+	int err = 0;
->+	DEFINE_WAIT(wait);
->+
->+	vsk = vsock_sk(sk);
->+	transport = vsk->transport;
->+
->+	timeout = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
->+	orig_nr_segs = msg->msg_iter.nr_segs;
->+	orig_iov = msg->msg_iter.iov;
->+	msg_ready = false;
->+	record_len = 0;
->+
->+	while (1) {
->+		err = vsock_wait_data(sk, &wait, timeout, NULL, 0);
->+
->+		if (err <= 0) {
->+			/* In case of any loop break(timeout, signal
->+			 * interrupt or shutdown), we report user that
->+			 * nothing was copied.
->+			 */
->+			err = 0;
->+			break;
->+		}
->+
->+		if (record_len == 0) {
->+			record_len =
->+				transport->seqpacket_seq_get_len(vsk);
->+
->+			if (record_len == 0)
->+				continue;
->+		}
->+
->+		err = transport->seqpacket_dequeue(vsk, msg,
->+					flags, &msg_ready);
-
-A single line here should be okay.
-
->+		if (err < 0) {
->+			if (err == -EAGAIN) {
->+				iov_iter_init(&msg->msg_iter, READ,
->+					      orig_iov, orig_nr_segs,
->+					      len);
->+				/* Clear 'MSG_EOR' here, because dequeue
->+				 * callback above set it again if it was
->+				 * set by sender. This 'MSG_EOR' is from
->+				 * dropped record.
->+				 */
->+				msg->msg_flags &= ~MSG_EOR;
->+				record_len = 0;
->+				continue;
->+			}
->+
->+			err = -ENOMEM;
->+			break;
->+		}
->+
->+		if (msg_ready)
->+			break;
->+	}
->+
->+	if (sk->sk_err)
->+		err = -sk->sk_err;
->+	else if (sk->sk_shutdown & RCV_SHUTDOWN)
->+		err = 0;
->+
->+	if (msg_ready) {
->+		/* User sets MSG_TRUNC, so return real length of
->+		 * packet.
->+		 */
->+		if (flags & MSG_TRUNC)
->+			err = record_len;
->+		else
->+			err = len - msg->msg_iter.count;
->+
->+		/* Always set MSG_TRUNC if real length of packet is
->+		 * bigger than user's buffer.
->+		 */
->+		if (record_len > len)
->+			msg->msg_flags |= MSG_TRUNC;
->+	}
->+
->+	return err;
->+}
->+
-> static int
-> vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 			  int flags)
->@@ -2032,7 +2123,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 		goto out;
-> 	}
->
->-	err = __vsock_stream_recvmsg(sk, msg, len, flags);
->+	if (sk->sk_type == SOCK_STREAM)
->+		err = __vsock_stream_recvmsg(sk, msg, len, flags);
->+	else
->+		err = __vsock_seqpacket_recvmsg(sk, msg, len, flags);
->
-> out:
-> 	release_sock(sk);
-
-The rest seems ok to me, but I need to get more familiar with SEQPACKET 
-before giving my R-b.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-Stefano
+drew
 
