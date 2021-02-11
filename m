@@ -2,223 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E79B318A1A
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:10:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39CDF318A46
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:21:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231673AbhBKMJV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 07:09:21 -0500
-Received: from foss.arm.com ([217.140.110.172]:51034 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231695AbhBKMGf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 07:06:35 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C48801063;
-        Thu, 11 Feb 2021 04:05:23 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBD5D3F73B;
-        Thu, 11 Feb 2021 04:05:22 -0800 (PST)
-Subject: Re: [PATCH kvmtool 02/21] hw/serial: Use device abstraction for FDT
- generator function
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-3-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <d0fbeccf-ecf6-5b53-c165-67a531e79e45@arm.com>
-Date:   Thu, 11 Feb 2021 12:05:35 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S231272AbhBKMS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 07:18:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48521 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231735AbhBKMPn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:15:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613045655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BEPfHOoOC9PkCRSqxehgaNL1z0I7JWFoen0MxY6aOAg=;
+        b=LFeEBnVLMu/3B+dvnNslsKAn7ukRH1dKK+BZk23xQ17D5hsAKI1mKpBN3kvO68ch5BbbDB
+        Eg+Q6jABLFlCbJSKCTpu2CsiaEGIqJnlH9mrLUaBnN/qQgzZlrpZDSDQ6FkjY423RW+pW6
+        7EhWtB/GegrhnjDJrU7WGSE/wrkxl/Y=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-q_es5ZIXNaGwpmO7MXicTg-1; Thu, 11 Feb 2021 07:14:14 -0500
+X-MC-Unique: q_es5ZIXNaGwpmO7MXicTg-1
+Received: by mail-ed1-f72.google.com with SMTP id u24so4455711eds.13
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:14:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BEPfHOoOC9PkCRSqxehgaNL1z0I7JWFoen0MxY6aOAg=;
+        b=djqfGnC7TY8814Jq18/LrgRWjvXtktxi42XfZvyOJfiYdND6bkKDcg9ldqGFFmJlX6
+         Sneejpb6i2V/1EBe1hUGPlmUew9RiMm0zS7CUKv5QrxwESaDkQtAyg3uBtB+NXHFVZ99
+         OnUGHJH70J7CFXerUjA4UiQCafr9cNC1WOwe/0x4k6EO88Wu8mewQ873JW9qRnOLAXXm
+         2z7Wh5x9G6AEkEA0JJ6j2saKC/5BZ88+4zgghlRzaX7eqlasHuw318MFZ3dMVjgfijNe
+         5CEFlL//MzGuPjEituFENbJRc9TE1/RJjw6ee02KU/qtCBLwY8foC7KEe7R2jYyPYYKX
+         xyyQ==
+X-Gm-Message-State: AOAM532bO0/k5zTMhp8m2pBDcanWM8qV41iBzKa+fcCZP460edwcpMnn
+        a6wRUzoJGCdr1sXXPvqMqRs+0krGCtRLWjVKKGwL4K6OISQptRBMX0kULsbKGMPNyHADdRO6iNG
+        k18NKcQpgtbZT
+X-Received: by 2002:a17:906:f8d1:: with SMTP id lh17mr2835194ejb.137.1613045652828;
+        Thu, 11 Feb 2021 04:14:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw7iYGVdrTZpB3saGpCtqnIsFnxkyZjFYwSdh7PVWVc2vA1axIrKedjuzKd7ebEYxovREQ/0w==
+X-Received: by 2002:a17:906:f8d1:: with SMTP id lh17mr2835178ejb.137.1613045652627;
+        Thu, 11 Feb 2021 04:14:12 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id t23sm4115198ejs.4.2021.02.11.04.14.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 04:14:12 -0800 (PST)
+Date:   Thu, 11 Feb 2021 13:14:09 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 05/17] af_vsock: separate wait space loop
+Message-ID: <20210211121409.y3yo3zzvm24rhmry@steredhat>
+References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+ <20210207151545.804889-1-arseny.krasnov@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-3-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210207151545.804889-1-arseny.krasnov@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
-
-On 12/10/20 2:28 PM, Andre Przywara wrote:
-> At the moment we use the .generate_fdt_node member of the ioport ops
-> structure to store the function pointer for the FDT node generator
-> function. ioport__register() will then put a wrapper and this pointer
-> into the device header.
-> The serial device is the only device making use of this special ioport
-> feature, so let's move this over to using the device header directly.
+On Sun, Feb 07, 2021 at 06:15:41PM +0300, Arseny Krasnov wrote:
+>This moves loop that waits for space on send to separate function,
+>because it will be used for SEQ_BEGIN/SEQ_END sending before and
+>after data transmission. Waiting for SEQ_BEGIN/SEQ_END is needed
+>because such packets carries SEQPACKET header that couldn't be
+>fragmented by credit mechanism, so to avoid it, sender waits until
+>enough space will be ready.
 >
-> This will allow us to get rid of this .generate_fdt_node member in the
-> ops and simplify the code.
+>Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>---
+> include/net/af_vsock.h   |  2 +
+> net/vmw_vsock/af_vsock.c | 93 ++++++++++++++++++++++++++--------------
+> 2 files changed, 62 insertions(+), 33 deletions(-)
 >
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  hw/serial.c       | 49 +++++++++++++++++++++++++++++++++++++----------
->  include/kvm/kvm.h |  2 ++
->  2 files changed, 41 insertions(+), 10 deletions(-)
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index bb6a0e52be86..19f6f22821ec 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -205,6 +205,8 @@ void vsock_remove_sock(struct vsock_sock *vsk);
+> void vsock_for_each_connected_socket(void (*fn)(struct sock *sk));
+> int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
+> bool vsock_find_cid(unsigned int cid);
+>+int vsock_wait_space(struct sock *sk, size_t space, int flags,
+>+		     struct vsock_transport_send_notify_data *send_data);
 >
-> diff --git a/hw/serial.c b/hw/serial.c
-> index 13c4663e..b0465d99 100644
-> --- a/hw/serial.c
-> +++ b/hw/serial.c
-> @@ -23,6 +23,7 @@
->  #define UART_IIR_TYPE_BITS	0xc0
->  
->  struct serial8250_device {
-> +	struct device_header	dev_hdr;
->  	struct mutex		mutex;
->  	u8			id;
->  
-> @@ -53,9 +54,20 @@ struct serial8250_device {
->  	.msr			= UART_MSR_DCD | UART_MSR_DSR | UART_MSR_CTS, \
->  	.mcr			= UART_MCR_OUT2,
->  
-> +#ifdef CONFIG_HAS_LIBFDT
-> +static
-> +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
-> +				  fdt_irq_fn irq_fn);
-> +#else
-> +#define serial8250_generate_fdt_node	NULL
-> +#endif
->  static struct serial8250_device devices[] = {
->  	/* ttyS0 */
->  	[0]	= {
-> +		.dev_hdr = {
-> +			.bus_type	= DEVICE_BUS_IOPORT,
-> +			.data		= serial8250_generate_fdt_node,
-> +		},
->  		.mutex			= MUTEX_INITIALIZER,
->  
->  		.id			= 0,
-> @@ -66,6 +78,10 @@ static struct serial8250_device devices[] = {
->  	},
->  	/* ttyS1 */
->  	[1]	= {
-> +		.dev_hdr = {
-> +			.bus_type	= DEVICE_BUS_IOPORT,
-> +			.data		= serial8250_generate_fdt_node,
-> +		},
->  		.mutex			= MUTEX_INITIALIZER,
->  
->  		.id			= 1,
-> @@ -76,6 +92,10 @@ static struct serial8250_device devices[] = {
->  	},
->  	/* ttyS2 */
->  	[2]	= {
-> +		.dev_hdr = {
-> +			.bus_type	= DEVICE_BUS_IOPORT,
-> +			.data		= serial8250_generate_fdt_node,
-> +		},
->  		.mutex			= MUTEX_INITIALIZER,
->  
->  		.id			= 2,
-> @@ -86,6 +106,10 @@ static struct serial8250_device devices[] = {
->  	},
->  	/* ttyS3 */
->  	[3]	= {
-> +		.dev_hdr = {
-> +			.bus_type	= DEVICE_BUS_IOPORT,
-> +			.data		= serial8250_generate_fdt_node,
-> +		},
->  		.mutex			= MUTEX_INITIALIZER,
->  
->  		.id			= 3,
-> @@ -371,13 +395,14 @@ char *fdt_stdout_path = NULL;
->  
->  #define DEVICE_NAME_MAX_LEN 32
->  static
-> -void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
-> -				  void (*generate_irq_prop)(void *fdt,
-> -							    u8 irq,
-> -							    enum irq_type))
-> +void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
-> +				  fdt_irq_fn irq_fn)
->  {
->  	char dev_name[DEVICE_NAME_MAX_LEN];
-> -	struct serial8250_device *dev = ioport->priv;
-> +	struct serial8250_device *dev = container_of(dev_hdr,
-> +						     struct serial8250_device,
-> +						     dev_hdr);
-> +
->  	u64 addr = KVM_IOPORT_AREA + dev->iobase;
->  	u64 reg_prop[] = {
->  		cpu_to_fdt64(addr),
-> @@ -395,24 +420,26 @@ void serial8250_generate_fdt_node(struct ioport *ioport, void *fdt,
->  	_FDT(fdt_begin_node(fdt, dev_name));
->  	_FDT(fdt_property_string(fdt, "compatible", "ns16550a"));
->  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
-> -	generate_irq_prop(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
-> +	irq_fn(fdt, dev->irq, IRQ_TYPE_LEVEL_HIGH);
->  	_FDT(fdt_property_cell(fdt, "clock-frequency", 1843200));
->  	_FDT(fdt_end_node(fdt));
->  }
-> -#else
-> -#define serial8250_generate_fdt_node	NULL
->  #endif
->  
->  static struct ioport_operations serial8250_ops = {
->  	.io_in			= serial8250_in,
->  	.io_out			= serial8250_out,
-> -	.generate_fdt_node	= serial8250_generate_fdt_node,
->  };
->  
-> -static int serial8250__device_init(struct kvm *kvm, struct serial8250_device *dev)
-> +static int serial8250__device_init(struct kvm *kvm,
-> +				   struct serial8250_device *dev)
->  {
->  	int r;
->  
-> +	r = device__register(&dev->dev_hdr);
-> +	if (r < 0)
-> +		return r;
-> +
->  	ioport__map_irq(&dev->irq);
->  	r = ioport__register(kvm, dev->iobase, &serial8250_ops, 8, dev);
+> /**** TAP ****/
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 3d8af987216a..ea99261e88ac 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1693,6 +1693,64 @@ static int vsock_connectible_getsockopt(struct socket *sock,
+> 	return 0;
+> }
+>
+>+int vsock_wait_space(struct sock *sk, size_t space, int flags,
+>+		     struct vsock_transport_send_notify_data *send_data)
+>+{
+>+	const struct vsock_transport *transport;
+>+	struct vsock_sock *vsk;
+>+	long timeout;
+>+	int err;
+>+
+>+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+>+
+>+	vsk = vsock_sk(sk);
+>+	transport = vsk->transport;
+>+	timeout = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
+>+	err = 0;
+>+
+>+	add_wait_queue(sk_sleep(sk), &wait);
+>+
+>+	while (vsock_stream_has_space(vsk) < space &&
+>+	       sk->sk_err == 0 &&
+>+	       !(sk->sk_shutdown & SEND_SHUTDOWN) &&
+>+	       !(vsk->peer_shutdown & RCV_SHUTDOWN)) {
 
-It's unfortunate that we now create two devices for one serial instance: one here,
-and one created by ioport__register(). But I guess that's unavoidable in this
-patch, and later patches will remove it.
+Maybe a new line here, like in the original code, would help the 
+readability.
 
->  
-> @@ -438,6 +465,7 @@ cleanup:
->  		struct serial8250_device *dev = &devices[j];
->  
->  		ioport__unregister(kvm, dev->iobase);
-> +		device__unregister(&dev->dev_hdr);
->  	}
->  
->  	return r;
-> @@ -455,6 +483,7 @@ int serial8250__exit(struct kvm *kvm)
->  		r = ioport__unregister(kvm, dev->iobase);
->  		if (r < 0)
->  			return r;
-> +		device__unregister(&dev->dev_hdr);
->  	}
->  
->  	return 0;
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 53373b08..ee99c28e 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -31,6 +31,8 @@
->  	.name = #ext,			\
->  	.code = ext
->  
-> +typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type);
+>+		/* Don't wait for non-blocking sockets. */
+>+		if (timeout == 0) {
+>+			err = -EAGAIN;
+>+			goto out_err;
+>+		}
+>+
+>+		if (send_data) {
+>+			err = transport->notify_send_pre_block(vsk, send_data);
+>+			if (err < 0)
+>+				goto out_err;
+>+		}
+>+
+>+		release_sock(sk);
+>+		timeout = wait_woken(&wait, TASK_INTERRUPTIBLE, timeout);
+>+		lock_sock(sk);
+>+		if (signal_pending(current)) {
+>+			err = sock_intr_errno(timeout);
+>+			goto out_err;
+>+		} else if (timeout == 0) {
+>+			err = -EAGAIN;
+>+			goto out_err;
+>+		}
+>+	}
+>+
+>+	if (sk->sk_err) {
+>+		err = -sk->sk_err;
+>+	} else if ((sk->sk_shutdown & SEND_SHUTDOWN) ||
+>+		   (vsk->peer_shutdown & RCV_SHUTDOWN)) {
+>+		err = -EPIPE;
+>+	}
+>+
+>+out_err:
+>+	remove_wait_queue(sk_sleep(sk), &wait);
+>+	return err;
+>+}
+>+EXPORT_SYMBOL_GPL(vsock_wait_space);
+>+
+> static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+> 				     size_t len)
+> {
 
-Shouldn't that last parameter be enum irq_type irq_type? Would you consider moving
-the typedef to include/kvm/fdt.h?
+After removing the wait loop in vsock_connectible_sendmsg(), we should 
+remove the 'timeout' variable because it is no longer used.
 
-Other than the nitpicks above, the patch looks sound to me. I also did a quick
-test by running kvm-unit-tests:
+>@@ -1751,39 +1809,8 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+> 	while (total_written < len) {
+> 		ssize_t written;
+>
+>-		add_wait_queue(sk_sleep(sk), &wait);
+>-		while (vsock_stream_has_space(vsk) == 0 &&
+>-		       sk->sk_err == 0 &&
+>-		       !(sk->sk_shutdown & SEND_SHUTDOWN) &&
+>-		       !(vsk->peer_shutdown & RCV_SHUTDOWN)) {
+>-
+>-			/* Don't wait for non-blocking sockets. */
+>-			if (timeout == 0) {
+>-				err = -EAGAIN;
+>-				remove_wait_queue(sk_sleep(sk), &wait);
+>-				goto out_err;
+>-			}
+>-
+>-			err = transport->notify_send_pre_block(vsk, &send_data);
+>-			if (err < 0) {
+>-				remove_wait_queue(sk_sleep(sk), &wait);
+>-				goto out_err;
+>-			}
+>-
+>-			release_sock(sk);
+>-			timeout = wait_woken(&wait, TASK_INTERRUPTIBLE, timeout);
+>-			lock_sock(sk);
+>-			if (signal_pending(current)) {
+>-				err = sock_intr_errno(timeout);
+>-				remove_wait_queue(sk_sleep(sk), &wait);
+>-				goto out_err;
+>-			} else if (timeout == 0) {
+>-				err = -EAGAIN;
+>-				remove_wait_queue(sk_sleep(sk), &wait);
+>-				goto out_err;
+>-			}
+>-		}
+>-		remove_wait_queue(sk_sleep(sk), &wait);
+>+		if (vsock_wait_space(sk, 1, msg->msg_flags, &send_data))
+>+			goto out_err;
+>
+> 		/* These checks occur both as part of and after the loop
+> 		 * conditional since we need to check before and after
+>-- 
+>2.25.1
+>
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-> +
->  enum {
->  	KVM_VMSTATE_RUNNING,
->  	KVM_VMSTATE_PAUSED,
