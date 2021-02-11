@@ -2,262 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C50A7318B61
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 14:04:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B412318B7B
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 14:05:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231485AbhBKNA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 08:00:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17492 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231825AbhBKM6s (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:58:48 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11BCk7aW026707;
-        Thu, 11 Feb 2021 07:58:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=QdQ7sXB56S7RetRm9u1Pk6q4tdb5or50B3OrRsZxoIE=;
- b=NL61gHzLyTPA2i0MJ88yQicYC37FU/zLMxYpjaEx2fooMdgObU+2zZpJuNS5pW4N+EzX
- VpEmQZhxMeYBHK9NP7323hHH/Vi94qK+9859EpmgaYA40fWS1zrUE9WacRUchOj8ViOZ
- vck4E1nnnlw34e1ZgaQqQXfKbe1sqZs3s80Dxvn2TD109h4m9YdIryuLaHlXZ6w2qRHX
- vFSPpt0U9gk6p1q/BG16JdjUISs/HO87+9j4yEeoUC9rpRD5sxg1MpDkj2T6NIOVdvVL
- S0NLFImO4YTqXA69oHSu5z1Fmms/YgtNA+i5BIG8rcvGvyi5X5fSCeJVr9+tGYNu7YEI eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36n4tm0f2d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 07:58:05 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11BCw4m0088550;
-        Thu, 11 Feb 2021 07:58:04 -0500
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36n4tm0f1t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 07:58:04 -0500
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11BCgvjM014332;
-        Thu, 11 Feb 2021 12:58:03 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03fra.de.ibm.com with ESMTP id 36hskb2vup-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 12:58:03 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11BCw0tN14483794
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Feb 2021 12:58:00 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0ACBF52050;
-        Thu, 11 Feb 2021 12:58:00 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.1.216])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A02A852057;
-        Thu, 11 Feb 2021 12:57:59 +0000 (GMT)
-Date:   Thu, 11 Feb 2021 13:57:56 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] s390/kvm: extend kvm_s390_shadow_fault to return
- entry pointer
-Message-ID: <20210211135756.249b535b@ibm-vm>
-In-Reply-To: <2a65f089-1728-7bc7-a2a8-a2c089a01cec@redhat.com>
-References: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
-        <20210209154302.1033165-2-imbrenda@linux.ibm.com>
-        <2a65f089-1728-7bc7-a2a8-a2c089a01cec@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S231481AbhBKNEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 08:04:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27906 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231659AbhBKNBm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 08:01:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613048415;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=INAHfmtIEGnguojwVLsOWi/AuzVJ2a1LEBIEt+WJHHk=;
+        b=CJnEr/UeCH6owHcbqvshHBn6elWUGRJleFYN7xXksJ5jv/tJyxyr1+Iywc/799xkTQ40u1
+        jyx74oYjQz/LP0GgC4hdbxSPNaiveDccTuq561gU8UNQZnEq9/vi2hhF1av35y7IL1+ttj
+        rUqc7HKRxpMgwmQJ21Wb9YwleLpipk8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-591-8FAvHCCaMumFH3UIVRnCFQ-1; Thu, 11 Feb 2021 08:00:12 -0500
+X-MC-Unique: 8FAvHCCaMumFH3UIVRnCFQ-1
+Received: by mail-wr1-f70.google.com with SMTP id q5so2455273wrs.20
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 05:00:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=INAHfmtIEGnguojwVLsOWi/AuzVJ2a1LEBIEt+WJHHk=;
+        b=W5kTGLJvM37Qi29wNZS0tU7qWShjEWXuAxQMR7BTNzM99hp0bsS4SfiR9UPZ2dCDSS
+         DWUWWHPJM0iffWs1VmDcw6Pc7aZR8ahb0Qd4NjNvs20kYSlBqYzQj21vt2ti5784817C
+         +2Ghh5Buce2Z20vjmBqHRzznT7Cjn4i3yts7Sqb5iE+IP6T+sOSE5Mlo0A3wovKBl6JN
+         LU70eJVyg/1/xwmKSW2AeixO13P7RWyfFcqJT5YBeb5fKIBeDGYx2INizK0wAz+ZuviE
+         wzXVt/5wDb4u2Ehax5uj7JmrmOS4dWPNBj+yLFEGjDZHwJfPWNychq+SQVXMkoChbC19
+         wxsA==
+X-Gm-Message-State: AOAM530ShmYHv8XzmYNTgev03qyEljHxKdykghtUHa+KDCff01U78oY8
+        hGmItIqzUE8SZiP6JxkoquHcX79WGnuhCxhWSGPP7mJfSUn1/bb50mUucvC09KYXPa4pl20vdYJ
+        dCiO3SqsDKBsA
+X-Received: by 2002:adf:e511:: with SMTP id j17mr5785498wrm.251.1613048410411;
+        Thu, 11 Feb 2021 05:00:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxSWnA3HIAAlozOKrW4ge/Bh5KEzG9RkV/rrmUb/VthvmslA6Ibdmm0IEfbmO9Msm3VsJ7Bvw==
+X-Received: by 2002:adf:e511:: with SMTP id j17mr5785473wrm.251.1613048410203;
+        Thu, 11 Feb 2021 05:00:10 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id j40sm9058088wmp.47.2021.02.11.05.00.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Feb 2021 05:00:09 -0800 (PST)
+Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.12-1 tag
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+References: <20210211072553.GA2877131@thinks.paulus.ozlabs.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eb082e35-e202-633d-d3e1-8a2eafcda68d@redhat.com>
+Date:   Thu, 11 Feb 2021 14:00:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210211072553.GA2877131@thinks.paulus.ozlabs.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-11_05:2021-02-10,2021-02-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- mlxscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102110109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Feb 2021 10:18:56 +0100
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 09.02.21 16:43, Claudio Imbrenda wrote:
-> > Extend kvm_s390_shadow_fault to return the pointer to the valid leaf
-> > DAT table entry, or to the invalid entry.
-> > 
-> > Also return some flags in the lower bits of the address:
-> > DAT_PROT: indicates that DAT protection applies because of the
-> >            protection bit in the segment (or, if EDAT, region)
-> > tables NOT_PTE: indicates that the address of the DAT table entry
-> > returned does not refer to a PTE, but to a segment or region table.
-> >   
+On 11/02/21 08:25, Paul Mackerras wrote:
+> Paolo,
 > 
-> I've been thinking about one possible issue, but I think it's not 
-> actually an issue. Just sharing so others can verify:
+> Please do a pull from my kvm-ppc-next-5.12-1 tag to get a PPC KVM
+> update for 5.12.  This one is quite small, with just one new feature,
+> support for the second data watchpoint in POWER10.
 > 
-> In case our guest uses huge pages / gigantic pages / ASCE R, we
-> create fake page tables (GMAP_SHADOW_FAKE_TABLE).
+> Thanks,
+> Paul.
 > 
-> So, it could be that kvm_s390_shadow_fault()->gmap_shadow_pgt_lookup()
-> succeeds, however, we have a fake PTE in our hands. We lost the
-> actual guest STE/RTE address. (I think it could be recovered somehow
-> via page->index, thought)
+> The following changes since commit 9294b8a12585f8b4ccb9c060b54bab0bd13f24b9:
 > 
-> But I guess, if there is a fake PTE, then there is not acutally
-> something that could go wrong in gmap_shadow_page() anymore that could
-> lead us in responding something wrong to the guest. We can only really
-> fail with -EINVAL, -ENOMEM or -EFAULT.
-
-this was also my reasoning
-
-> So if the guest changed anything in the meantime (e.g., zap a
-> segment), we would have unshadowed the whole fake page table
-> hierarchy and would simply retry.
+>    Documentation: kvm: fix warning (2021-02-09 08:42:10 -0500)
 > 
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >   arch/s390/kvm/gaccess.c | 30 +++++++++++++++++++++++++-----
-> >   arch/s390/kvm/gaccess.h |  5 ++++-
-> >   arch/s390/kvm/vsie.c    |  8 ++++----
-> >   3 files changed, 33 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> > index 6d6b57059493..e0ab83f051d2 100644
-> > --- a/arch/s390/kvm/gaccess.c
-> > +++ b/arch/s390/kvm/gaccess.c
-> > @@ -976,7 +976,9 @@ int kvm_s390_check_low_addr_prot_real(struct
-> > kvm_vcpu *vcpu, unsigned long gra)
-> >    * kvm_s390_shadow_tables - walk the guest page table and create
-> > shadow tables
-> >    * @sg: pointer to the shadow guest address space structure
-> >    * @saddr: faulting address in the shadow gmap
-> > - * @pgt: pointer to the page table address result
-> > + * @pgt: pointer to the beginning of the page table for the given
-> > address if
-> > + *       successful (return value 0), or to the first invalid DAT
-> > entry in
-> > + *       case of exceptions (return value > 0)
-> >    * @fake: pgt references contiguous guest memory block, not a
-> > pgtable */
-> >   static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long
-> > saddr, @@ -1034,6 +1036,7 @@ static int
-> > kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> > rfte.val = ptr; goto shadow_r2t;
-> >   		}
-> > +		*pgt = ptr + vaddr.rfx * 8;
-> >   		rc = gmap_read_table(parent, ptr + vaddr.rfx * 8,
-> > &rfte.val);  
+> are available in the git repository at:
 > 
-> Using
+>    git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.12-1
 > 
-> gmap_read_table(parent, *pgt, &rfte.val);
+> for you to fetch changes up to 72476aaa469179222b92c380de60c76b4cb9a318:
 > 
-> or similar with a local variable might then be even clearer. But no 
-> strong opinion.
-
-that's also something I had thought about, in the end this minimizes
-the number of lines / variables while still being readable
-
-> >   		if (rc)
-> >   			return rc;
-> > @@ -1060,6 +1063,7 @@ static int kvm_s390_shadow_tables(struct gmap
-> > *sg, unsigned long saddr, rste.val = ptr;
-> >   			goto shadow_r3t;
-> >   		}
-> > +		*pgt = ptr + vaddr.rsx * 8;
-> >   		rc = gmap_read_table(parent, ptr + vaddr.rsx * 8,
-> > &rste.val); if (rc)
-> >   			return rc;
-> > @@ -1087,6 +1091,7 @@ static int kvm_s390_shadow_tables(struct gmap
-> > *sg, unsigned long saddr, rtte.val = ptr;
-> >   			goto shadow_sgt;
-> >   		}
-> > +		*pgt = ptr + vaddr.rtx * 8;
-> >   		rc = gmap_read_table(parent, ptr + vaddr.rtx * 8,
-> > &rtte.val); if (rc)
-> >   			return rc;
-> > @@ -1123,6 +1128,7 @@ static int kvm_s390_shadow_tables(struct gmap
-> > *sg, unsigned long saddr, ste.val = ptr;
-> >   			goto shadow_pgt;
-> >   		}
-> > +		*pgt = ptr + vaddr.sx * 8;
-> >   		rc = gmap_read_table(parent, ptr + vaddr.sx * 8,
-> > &ste.val); if (rc)
-> >   			return rc;
-> > @@ -1157,6 +1163,8 @@ static int kvm_s390_shadow_tables(struct gmap
-> > *sg, unsigned long saddr,
-> >    * @vcpu: virtual cpu
-> >    * @sg: pointer to the shadow guest address space structure
-> >    * @saddr: faulting address in the shadow gmap
-> > + * @datptr: will contain the address of the faulting DAT table
-> > entry, or of
-> > + *          the valid leaf, plus some flags
-> >    *
-> >    * Returns: - 0 if the shadow fault was successfully resolved
-> >    *	    - > 0 (pgm exception code) on exceptions while
-> > faulting @@ -1165,11 +1173,11 @@ static int
-> > kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
-> >    *	    - -ENOMEM if out of memory
-> >    */
-> >   int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
-> > -			  unsigned long saddr)
-> > +			  unsigned long saddr, unsigned long
-> > *datptr) {
-> >   	union vaddress vaddr;
-> >   	union page_table_entry pte;
-> > -	unsigned long pgt;
-> > +	unsigned long pgt = 0;
-> >   	int dat_protection, fake;
-> >   	int rc;
-> >   
-> > @@ -1191,8 +1199,20 @@ int kvm_s390_shadow_fault(struct kvm_vcpu
-> > *vcpu, struct gmap *sg, pte.val = pgt + vaddr.px * PAGE_SIZE;
-> >   		goto shadow_page;
-> >   	}
-> > -	if (!rc)
-> > -		rc = gmap_read_table(sg->parent, pgt + vaddr.px *
-> > 8, &pte.val); +
-> > +	switch (rc) {
-> > +	case PGM_SEGMENT_TRANSLATION:
-> > +	case PGM_REGION_THIRD_TRANS:
-> > +	case PGM_REGION_SECOND_TRANS:
-> > +	case PGM_REGION_FIRST_TRANS:
-> > +		pgt |= NOT_PTE;
-> > +		break;
-> > +	case 0:
-> > +		pgt += vaddr.px * 8;
-> > +		rc = gmap_read_table(sg->parent, pgt, &pte.val);
-> > +	}
-> > +	if (*datptr)
-> > +		*datptr = pgt | dat_protection * DAT_PROT;
-> >   	if (!rc && pte.i)
-> >   		rc = PGM_PAGE_TRANSLATION;
-> >   	if (!rc && pte.z)
-> > diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> > index f4c51756c462..fec26bbb17ba 100644
-> > --- a/arch/s390/kvm/gaccess.h
-> > +++ b/arch/s390/kvm/gaccess.h
-> > @@ -359,7 +359,10 @@ void ipte_unlock(struct kvm_vcpu *vcpu);
-> >   int ipte_lock_held(struct kvm_vcpu *vcpu);
-> >   int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu,
-> > unsigned long gra); 
-> > +#define DAT_PROT 2
-> > +#define NOT_PTE 4  
+>    KVM: PPC: Book3S HV: Fix host radix SLB optimisation with hash guests (2021-02-11 17:28:15 +1100)
 > 
-> What if our guest is using ASCE.R ?
+> ----------------------------------------------------------------
+> PPC KVM update for 5.12
+> 
+> - Support for second data watchpoint on POWER10, from Ravi Bangoria
+> - Remove some complex workarounds for buggy early versions of POWER9
+> - Guest entry/exit fixes from Nick Piggin and Fabiano Rosas
+> 
+> ----------------------------------------------------------------
+> Fabiano Rosas (2):
+>        KVM: PPC: Book3S HV: Save and restore FSCR in the P9 path
+>        KVM: PPC: Don't always report hash MMU capability for P9 < DD2.2
+> 
+> Nicholas Piggin (5):
+>        KVM: PPC: Book3S HV: Remove support for running HPT guest on RPT host without mixed mode support
+>        KVM: PPC: Book3S HV: Fix radix guest SLB side channel
+>        KVM: PPC: Book3S HV: No need to clear radix host SLB before loading HPT guest
+>        KVM: PPC: Book3S HV: Use POWER9 SLBIA IH=6 variant to clear SLB
+>        KVM: PPC: Book3S HV: Fix host radix SLB optimisation with hash guests
+> 
+> Paul Mackerras (1):
+>        KVM: PPC: Book3S HV: Ensure radix guest has no SLB entries
+> 
+> Ravi Bangoria (4):
+>        KVM: PPC: Book3S HV: Allow nested guest creation when L0 hv_guest_state > L1
+>        KVM: PPC: Book3S HV: Rename current DAWR macros and variables
+>        KVM: PPC: Book3S HV: Add infrastructure to support 2nd DAWR
+>        KVM: PPC: Book3S HV: Introduce new capability for 2nd DAWR
+> 
+> Yang Li (1):
+>        KVM: PPC: remove unneeded semicolon
+> 
+>   Documentation/virt/kvm/api.rst            |  12 ++
+>   arch/powerpc/include/asm/hvcall.h         |  25 ++++-
+>   arch/powerpc/include/asm/kvm_book3s_asm.h |  11 --
+>   arch/powerpc/include/asm/kvm_host.h       |   7 +-
+>   arch/powerpc/include/asm/kvm_ppc.h        |   2 +
+>   arch/powerpc/include/uapi/asm/kvm.h       |   2 +
+>   arch/powerpc/kernel/asm-offsets.c         |   9 +-
+>   arch/powerpc/kvm/book3s_hv.c              | 149 +++++++++++++++----------
+>   arch/powerpc/kvm/book3s_hv_builtin.c      | 108 +-----------------
+>   arch/powerpc/kvm/book3s_hv_nested.c       |  70 +++++++++---
+>   arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 175 ++++++++++++++++--------------
+>   arch/powerpc/kvm/booke.c                  |   2 +-
+>   arch/powerpc/kvm/powerpc.c                |  14 ++-
+>   include/uapi/linux/kvm.h                  |   1 +
+>   tools/arch/powerpc/include/uapi/asm/kvm.h |   2 +
+>   tools/include/uapi/linux/kvm.h            |   1 +
+>   16 files changed, 309 insertions(+), 281 deletions(-)
+> 
 
-then we don't care.
+Pulled, thanks.
 
-if the guest is using ASCE.R, then shadowing will always succeed, and
-the VSIE MVPG handler will retry right away.
-
-if you are worried about the the lowest order bit, it can only be set
-if a specific feature is enabled in the host, and KVM doesn't use /
-support it, so the guest can't use it for its guest.
-
-
+Paolo
 
