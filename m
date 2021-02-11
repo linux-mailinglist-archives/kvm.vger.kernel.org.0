@@ -2,82 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D68703197A7
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 02:00:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C27FA3197B8
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 02:06:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbhBLA7u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 19:59:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34112 "EHLO
+        id S229862AbhBLBFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 20:05:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbhBLA7t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 19:59:49 -0500
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EB0FC061756
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 16:59:09 -0800 (PST)
-Received: by mail-ot1-x334.google.com with SMTP id i20so7010522otl.7
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 16:59:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E8dTklfppDgtQ5t+jdmFpUHmiL5MAONXlpGXODd+kf0=;
-        b=SorPw2Scef1yOshGti7Inf8DzOeiRsZ7yHSUKsbc8+NXWhPG7zW6N0DoyhxI6UIQNh
-         mayKPkr0QDB6iD4VNbHnqlgheyTykyjR8/q7e4w6T94NDAwfNxEWA95SmJyrzPkWaRRP
-         13sIzAmOwV6ixC/LwBlXS3oJ47cquyc5yETttJHrDGcTj8myLn377pxQMxqAWlE6CzyH
-         xHgkRcokd3P0ywLLItHIyZBp9MQhc649ifyZu/v3VpdQOi9XLPFydp7JZVvo96aSBbH6
-         m9JI3H6OhFvjpglhgPpXY6zDoGUkcpexn1f70W2OrhC+GOzZAtx0PpVQRaUUKjI+badu
-         jU7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E8dTklfppDgtQ5t+jdmFpUHmiL5MAONXlpGXODd+kf0=;
-        b=ULTHSibvROmENmyMNYDUy7LSxRghdktgQCZeFVNGgqq9D/F5KfBGqBFnqaKXUmI4hi
-         Mb56ppKc/dO+awh1fn+tfYhamCEfPqd/tvzEQOSOMiCQtL0E5pqGJaKw50+VPoZMQvI5
-         gcb/B9Joecuj4gk+pquOK5EzirTctLs1/kjVeAEg2zrZcv7XCJrI/txLkSoTpQcpwTa6
-         bpRxVCLXOe19yph5pnlN6ZFfyFDbokQo//amdT/8jKkYQ+hIfcq4cns/aEu7+zKhbtb6
-         yEcdaqN7/uc/lGCBcuWNo2wFdJF23oce7awFjPXQfDNROy3jWCRC2aOBEUhJpkgWudlc
-         Bv2Q==
-X-Gm-Message-State: AOAM532yg2kQZEuQUTb3Cxja5CyY9NazqIFhs5dlAhBkLAvIXZunIPpU
-        pmQ4EyE7wofJBPbheOGro9GVF16wZ2YKEpfFzRX6nw==
-X-Google-Smtp-Source: ABdhPJwboH2bgMuX2aLA+0ostnowl3Ehax1DZAhkm1wfOYTPGkTXxKvLSaPPwydNjb3E+ZSGF8jwG+s959v/ITGHUbc=
-X-Received: by 2002:a05:6830:902:: with SMTP id v2mr474189ott.56.1613091548340;
- Thu, 11 Feb 2021 16:59:08 -0800 (PST)
+        with ESMTP id S229611AbhBLBFi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 20:05:38 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57682C061756
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 17:04:58 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 4DcFf01gwbz9sS8; Fri, 12 Feb 2021 12:04:56 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1613091896;
+        bh=xWgAjhN0D4vxzyZEfMWHtI8v3B2sEWgccscZkUJwXJk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AgEA7vTxBO58TMRDn6ZfvxQK7OKmBDTEEDI8Rr2Lcf001d9J1/3mRO9bU/2jD7qO9
+         7ItV6iMF1Om6yR1l+E293+b81LXhN4+sxKZn/otYC6eKUUSb9aT2tg4h7YGeI6H/jq
+         pxNyh05Kx8S8qCmwFdmIWIv5a9czj6UMoAZics3s=
+Date:   Fri, 12 Feb 2021 10:48:30 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+Cc:     dgilbert@redhat.com, pair@us.ibm.com, qemu-devel@nongnu.org,
+        brijesh.singh@amd.com, pasic@linux.ibm.com,
+        pragyansri.pathi@intel.com, Greg Kurz <groug@kaod.org>,
+        richard.henderson@linaro.org, berrange@redhat.com,
+        David Hildenbrand <david@redhat.com>,
+        mdroth@linux.vnet.ibm.com, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        pbonzini@redhat.com, mtosatti@redhat.com, borntraeger@de.ibm.com,
+        Cornelia Huck <cohuck@redhat.com>, qemu-ppc@nongnu.org,
+        qemu-s390x@nongnu.org, thuth@redhat.com, mst@redhat.com,
+        frankja@linux.ibm.com, jun.nakajima@intel.com,
+        andi.kleen@intel.com, Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v8 07/13] confidential guest support: Introduce cgs
+ "ready" flag
+Message-ID: <YCXCTs9fAJV/f7z/@yekko.fritz.box>
+References: <20210202041315.196530-1-david@gibson.dropbear.id.au>
+ <20210202041315.196530-8-david@gibson.dropbear.id.au>
+ <20210210162530.GA84305@dt>
 MIME-Version: 1.0
-References: <20210212003411.1102677-1-seanjc@google.com> <20210212003411.1102677-4-seanjc@google.com>
-In-Reply-To: <20210212003411.1102677-4-seanjc@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 11 Feb 2021 16:58:57 -0800
-Message-ID: <CALMp9eQL4YOofdAV9CiZg-AD5atzxR28LcejB2sHHQ0SZZ6+ug@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: VMX: Allow INVPCID in guest without PCID
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Babu Moger <babu.moger@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="A3st2G4EAj1xJzch"
+Content-Disposition: inline
+In-Reply-To: <20210210162530.GA84305@dt>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 11, 2021 at 4:34 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Remove the restriction that prevents VMX from exposing INVPCID to the
-> guest without PCID also being exposed to the guest.  The justification of
-> the restriction is that INVPCID will #UD if it's disabled in the VMCS.
-> While that is a true statement, it's also true that RDTSCP will #UD if
-> it's disabled in the VMCS.  Neither of those things has any dependency
-> whatsoever on the guest being able to set CR4.PCIDE=1, which is what is
-> effectively allowed by exposing PCID to the guest.
->
-> Removing the bogus restriction aligns VMX with SVM, and also allows for
-> an interesting configuration.  INVPCID is that fastest way to do a global
-> TLB flush, e.g. see native_flush_tlb_global().  Allowing INVPCID without
-> PCID would let a guest use the expedited flush while also limiting the
-> number of ASIDs consumed by the guest.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-I always thought this was a bizarre one-off restriction.
-Reviewed-by: Jim Mattson <jmattson@google.com>
+
+--A3st2G4EAj1xJzch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Feb 10, 2021 at 10:25:30AM -0600, Venu Busireddy wrote:
+> On 2021-02-02 15:13:09 +1100, David Gibson wrote:
+> > The platform specific details of mechanisms for implementing
+> > confidential guest support may require setup at various points during
+> > initialization.  Thus, it's not really feasible to have a single cgs
+> > initialization hook, but instead each mechanism needs its own
+> > initialization calls in arch or machine specific code.
+> >=20
+> > However, to make it harder to have a bug where a mechanism isn't
+> > properly initialized under some circumstances, we want to have a
+> > common place, late in boot, where we verify that cgs has been
+> > initialized if it was requested.
+> >=20
+> > This patch introduces a ready flag to the ConfidentialGuestSupport
+> > base type to accomplish this, which we verify in
+> > qemu_machine_creation_done().
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  include/exec/confidential-guest-support.h | 24 +++++++++++++++++++++++
+> >  softmmu/vl.c                              | 10 ++++++++++
+> >  target/i386/sev.c                         |  2 ++
+> >  3 files changed, 36 insertions(+)
+> >=20
+> > diff --git a/include/exec/confidential-guest-support.h b/include/exec/c=
+onfidential-guest-support.h
+> > index 3db6380e63..5dcf602047 100644
+> > --- a/include/exec/confidential-guest-support.h
+> > +++ b/include/exec/confidential-guest-support.h
+> > @@ -27,6 +27,30 @@ OBJECT_DECLARE_SIMPLE_TYPE(ConfidentialGuestSupport,=
+ CONFIDENTIAL_GUEST_SUPPORT)
+> > =20
+> >  struct ConfidentialGuestSupport {
+> >      Object parent;
+> > +
+> > +    /*
+> > +     * ready: flag set by CGS initialization code once it's ready to
+> > +     *        start executing instructions in a potentially-secure
+> > +     *        guest
+> > +     *
+> > +     * The definition here is a bit fuzzy, because this is essentially
+> > +     * part of a self-sanity-check, rather than a strict mechanism.
+> > +     *
+> > +     * It's not fasible to have a single point in the common machine
+>=20
+> Just a nit pick.
+>=20
+> s/fasible/feasible/
+
+Already fixed in the version that got merged.
+
+> > +     * init path to configure confidential guest support, because
+> > +     * different mechanisms have different interdependencies requiring
+> > +     * initialization in different places, often in arch or machine
+> > +     * type specific code.  It's also usually not possible to check
+> > +     * for invalid configurations until that initialization code.
+> > +     * That means it would be very easy to have a bug allowing CGS
+> > +     * init to be bypassed entirely in certain configurations.
+> > +     *
+> > +     * Silently ignoring a requested security feature would be bad, so
+> > +     * to avoid that we check late in init that this 'ready' flag is
+> > +     * set if CGS was requested.  If the CGS init hasn't happened, and
+> > +     * so 'ready' is not set, we'll abort.
+> > +     */
+> > +    bool ready;
+> >  };
+> > =20
+> >  typedef struct ConfidentialGuestSupportClass {
+> > diff --git a/softmmu/vl.c b/softmmu/vl.c
+> > index 1b464e3474..1869ed54a9 100644
+> > --- a/softmmu/vl.c
+> > +++ b/softmmu/vl.c
+> > @@ -101,6 +101,7 @@
+> >  #include "qemu/plugin.h"
+> >  #include "qemu/queue.h"
+> >  #include "sysemu/arch_init.h"
+> > +#include "exec/confidential-guest-support.h"
+> > =20
+> >  #include "ui/qemu-spice.h"
+> >  #include "qapi/string-input-visitor.h"
+> > @@ -2497,6 +2498,8 @@ static void qemu_create_cli_devices(void)
+> > =20
+> >  static void qemu_machine_creation_done(void)
+> >  {
+> > +    MachineState *machine =3D MACHINE(qdev_get_machine());
+> > +
+> >      /* Did we create any drives that we failed to create a device for?=
+ */
+> >      drive_check_orphaned();
+> > =20
+> > @@ -2516,6 +2519,13 @@ static void qemu_machine_creation_done(void)
+> > =20
+> >      qdev_machine_creation_done();
+> > =20
+> > +    if (machine->cgs) {
+> > +        /*
+> > +         * Verify that Confidential Guest Support has actually been in=
+itialized
+> > +         */
+> > +        assert(machine->cgs->ready);
+> > +    }
+> > +
+> >      if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
+> >          exit(1);
+> >      }
+> > diff --git a/target/i386/sev.c b/target/i386/sev.c
+> > index 590cb31fa8..f9e9b5d8ae 100644
+> > --- a/target/i386/sev.c
+> > +++ b/target/i386/sev.c
+> > @@ -737,6 +737,8 @@ int sev_kvm_init(ConfidentialGuestSupport *cgs, Err=
+or **errp)
+> >      qemu_add_machine_init_done_notifier(&sev_machine_done_notify);
+> >      qemu_add_vm_change_state_handler(sev_vm_state_change, sev);
+> > =20
+> > +    cgs->ready =3D true;
+> > +
+> >      return 0;
+> >  err:
+> >      sev_guest =3D NULL;
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--A3st2G4EAj1xJzch
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmAlwk4ACgkQbDjKyiDZ
+s5JaSw//aZRxhFaO72/cinMj0mNK2Y0EJlhBPY8zYeG/1ln4zC8ZWHbfwYu0cTkR
+4zm/VYydY6pUNd+pfH5qdxXoDHoHi1eHYD3Kqo7Hd9plmeJUBMj1MR70zNJ3i0jG
+NBHJG0bPxIGk17jmaBSRWwrr2n+Hfls1TryAWf+G7IpPBuQAYQs4WmfUsLlLXc1e
+z0qQM6YfRuVtlAsVz9wyzhM+WgRuWg9pczRC8iy6q9pL3EPuYphwvRwkK3kx1LoP
+nngkOeu596DDgYSF0mEUBkILStcdC0EW5bBVrSUujwFwJ0AFeFPfhiNlmeXRzFPo
+tZAOBtHmG0tkauxuFcP4bw2Y96JzVzS9ovP7a2TL6FgKUaC7ub/pCnX08d9f5Yab
+z7JKepMveRU5DzSX0Dj5Z9cMe6IfCDQM77J/h6qAFb4xYuw5uH2mbPuvhXWB3U6g
+xirFQRI3KP3iaSI1O5Yl5ODSWojYoLGFh8ukmsSSn87tEY21BlrpeIFnCgjUnySE
+u8p2/ot3j6NuulvDTJS0wFnOberL7muWUFC+/hoWVvwXep2g8TU4WeiPhg9XDKJ+
+itvCXBw+cL3SvYHbiHgHlIh6tY3wSFnbPtILpbhvAh0w+AOFsI6Kwju4cPxWwLDx
+JaHJH07cNT7efAk9J+icUR1DDIHEeBOa814YEGgzF+wXPA8nDxA=
+=qfTZ
+-----END PGP SIGNATURE-----
+
+--A3st2G4EAj1xJzch--
