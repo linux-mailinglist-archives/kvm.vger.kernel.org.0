@@ -2,181 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DFC2318AA2
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 13:34:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C50A7318B61
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 14:04:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbhBKMbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 07:31:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51726 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229577AbhBKM2u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:28:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613046439;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HMz6zYsvhAUacFy6he/Ff5pa+8L4MB4YjmA0Jw1xjYQ=;
-        b=KP78mzwwuZ9KkhDlWCYN57R6TFXWi0OhIWRt2KVnAxClUlO722E1JtJ/JcctxD2v7Az/FR
-        wyrCLIfucnAGKBZ+hOEDB95g0ZR7F1ocNFVyS/PhCvGXleFiHaIHv5W6cu5oH4nQfLK+LP
-        zab0DPFWfhfHggE+99bZFXtzrR2xjFw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-oCEuO4hxNEyb3tTFLfJdsg-1; Thu, 11 Feb 2021 07:27:18 -0500
-X-MC-Unique: oCEuO4hxNEyb3tTFLfJdsg-1
-Received: by mail-ed1-f69.google.com with SMTP id q2so4459081edt.16
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 04:27:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HMz6zYsvhAUacFy6he/Ff5pa+8L4MB4YjmA0Jw1xjYQ=;
-        b=JxSVz0tp3D16XXH4qqksSDNimYgbXiY4BlEDhgj3mStIwBAZULwIhFb897qWXYKF/A
-         wi2M6rri8wFs70Hy2X5vECgbDGnKFeHOrM2k/IhdHvbRUJ5OAU9GlAQQi/pCwkR8uEO4
-         74dSrVakIcn/STkWq0ftVH/ERyrFlWgVDNJ/h5K/jktX/y/xcEmxMGuTQl6o5C80i0Iq
-         jN790QAET/CX2cKMTeFjC3f+TLVj+1oJ9CTgDneCWAMbpQ2MqDMpi6VJILH5pHofLKlR
-         jlFDjc+9URKpZPz986ZrN/argxQZBn+jTxxojd9/L5bvWSZPxBH/9LaBC8vli+YJCpcQ
-         kYvg==
-X-Gm-Message-State: AOAM5316Fqop/7Ut0/5YYceXUk0dLWmm0VU3ScIlPzmTmSUTmFco9zcs
-        fP3kPbH9CboSijrZ/LJLxgmyr7gMzyu2JgVzavuo4DFHm5AyrezbX+QHZhOU0hV0up6/XtqMeiy
-        5+MDYg/hAlC9x
-X-Received: by 2002:a17:906:2747:: with SMTP id a7mr8529853ejd.250.1613046437362;
-        Thu, 11 Feb 2021 04:27:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyk6B6DSr3e6B0w/xlbcUeWXisr2RXOx2YRDpQHkAnrdl/RyyOhCzJ+iUDi0A/EsFUj4H9p5g==
-X-Received: by 2002:a17:906:2747:: with SMTP id a7mr8529844ejd.250.1613046437196;
-        Thu, 11 Feb 2021 04:27:17 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id bo24sm3698134edb.51.2021.02.11.04.27.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 04:27:16 -0800 (PST)
-Date:   Thu, 11 Feb 2021 13:27:14 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Jeff Vander Stoep <jeffv@google.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 07/17] af_vsock: rest of SEQPACKET support
-Message-ID: <20210211122714.rqiwg3qp3kuprktb@steredhat>
-References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
- <20210207151615.805115-1-arseny.krasnov@kaspersky.com>
+        id S231485AbhBKNA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 08:00:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17492 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231825AbhBKM6s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 07:58:48 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11BCk7aW026707;
+        Thu, 11 Feb 2021 07:58:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=QdQ7sXB56S7RetRm9u1Pk6q4tdb5or50B3OrRsZxoIE=;
+ b=NL61gHzLyTPA2i0MJ88yQicYC37FU/zLMxYpjaEx2fooMdgObU+2zZpJuNS5pW4N+EzX
+ VpEmQZhxMeYBHK9NP7323hHH/Vi94qK+9859EpmgaYA40fWS1zrUE9WacRUchOj8ViOZ
+ vck4E1nnnlw34e1ZgaQqQXfKbe1sqZs3s80Dxvn2TD109h4m9YdIryuLaHlXZ6w2qRHX
+ vFSPpt0U9gk6p1q/BG16JdjUISs/HO87+9j4yEeoUC9rpRD5sxg1MpDkj2T6NIOVdvVL
+ S0NLFImO4YTqXA69oHSu5z1Fmms/YgtNA+i5BIG8rcvGvyi5X5fSCeJVr9+tGYNu7YEI eQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36n4tm0f2d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 07:58:05 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11BCw4m0088550;
+        Thu, 11 Feb 2021 07:58:04 -0500
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36n4tm0f1t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 07:58:04 -0500
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11BCgvjM014332;
+        Thu, 11 Feb 2021 12:58:03 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03fra.de.ibm.com with ESMTP id 36hskb2vup-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Feb 2021 12:58:03 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11BCw0tN14483794
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Feb 2021 12:58:00 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0ACBF52050;
+        Thu, 11 Feb 2021 12:58:00 +0000 (GMT)
+Received: from ibm-vm (unknown [9.145.1.216])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A02A852057;
+        Thu, 11 Feb 2021 12:57:59 +0000 (GMT)
+Date:   Thu, 11 Feb 2021 13:57:56 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] s390/kvm: extend kvm_s390_shadow_fault to return
+ entry pointer
+Message-ID: <20210211135756.249b535b@ibm-vm>
+In-Reply-To: <2a65f089-1728-7bc7-a2a8-a2c089a01cec@redhat.com>
+References: <20210209154302.1033165-1-imbrenda@linux.ibm.com>
+        <20210209154302.1033165-2-imbrenda@linux.ibm.com>
+        <2a65f089-1728-7bc7-a2a8-a2c089a01cec@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210207151615.805115-1-arseny.krasnov@kaspersky.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
+ definitions=2021-02-11_05:2021-02-10,2021-02-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ mlxscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102110109
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Feb 07, 2021 at 06:16:12PM +0300, Arseny Krasnov wrote:
->This does rest of SOCK_SEQPACKET support:
->1) Adds socket ops for SEQPACKET type.
->2) Allows to create socket with SEQPACKET type.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/af_vsock.c | 37 ++++++++++++++++++++++++++++++++++++-
-> 1 file changed, 36 insertions(+), 1 deletion(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index a033d3340ac4..c77998a14018 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -452,6 +452,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 		new_transport = transport_dgram;
-> 		break;
-> 	case SOCK_STREAM:
->+	case SOCK_SEQPACKET:
-> 		if (vsock_use_local_transport(remote_cid))
-> 			new_transport = transport_local;
-> 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
->@@ -459,6 +460,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 			new_transport = transport_g2h;
-> 		else
-> 			new_transport = transport_h2g;
->+
->+		if (sk->sk_type == SOCK_SEQPACKET) {
->+			if (!new_transport ||
->+			    !new_transport->seqpacket_seq_send_len ||
->+			    !new_transport->seqpacket_seq_send_eor ||
->+			    !new_transport->seqpacket_seq_get_len ||
->+			    !new_transport->seqpacket_dequeue)
->+				return -ESOCKTNOSUPPORT;
->+		}
+On Thu, 11 Feb 2021 10:18:56 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-Maybe we should move this check after the try_module_get() call, since 
-the memory pointed by 'new_transport' pointer can be deallocated in the 
-meantime.
+> On 09.02.21 16:43, Claudio Imbrenda wrote:
+> > Extend kvm_s390_shadow_fault to return the pointer to the valid leaf
+> > DAT table entry, or to the invalid entry.
+> > 
+> > Also return some flags in the lower bits of the address:
+> > DAT_PROT: indicates that DAT protection applies because of the
+> >            protection bit in the segment (or, if EDAT, region)
+> > tables NOT_PTE: indicates that the address of the DAT table entry
+> > returned does not refer to a PTE, but to a segment or region table.
+> >   
+> 
+> I've been thinking about one possible issue, but I think it's not 
+> actually an issue. Just sharing so others can verify:
+> 
+> In case our guest uses huge pages / gigantic pages / ASCE R, we
+> create fake page tables (GMAP_SHADOW_FAKE_TABLE).
+> 
+> So, it could be that kvm_s390_shadow_fault()->gmap_shadow_pgt_lookup()
+> succeeds, however, we have a fake PTE in our hands. We lost the
+> actual guest STE/RTE address. (I think it could be recovered somehow
+> via page->index, thought)
+> 
+> But I guess, if there is a fake PTE, then there is not acutally
+> something that could go wrong in gmap_shadow_page() anymore that could
+> lead us in responding something wrong to the guest. We can only really
+> fail with -EINVAL, -ENOMEM or -EFAULT.
 
-Also, if the socket had a transport before, we should deassign it before 
-returning an error.
+this was also my reasoning
 
-> 		break;
-> 	default:
-> 		return -ESOCKTNOSUPPORT;
->@@ -684,6 +694,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
->
-> 	switch (sk->sk_socket->type) {
-> 	case SOCK_STREAM:
->+	case SOCK_SEQPACKET:
-> 		spin_lock_bh(&vsock_table_lock);
-> 		retval = __vsock_bind_connectible(vsk, addr);
-> 		spin_unlock_bh(&vsock_table_lock);
->@@ -769,7 +780,7 @@ static struct sock *__vsock_create(struct net *net,
->
-> static bool sock_type_connectible(u16 type)
-> {
->-	return type == SOCK_STREAM;
->+	return (type == SOCK_STREAM) || (type == SOCK_SEQPACKET);
-> }
->
-> static void __vsock_release(struct sock *sk, int level)
->@@ -2199,6 +2210,27 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.sendpage = sock_no_sendpage,
-> };
->
->+static const struct proto_ops vsock_seqpacket_ops = {
->+	.family = PF_VSOCK,
->+	.owner = THIS_MODULE,
->+	.release = vsock_release,
->+	.bind = vsock_bind,
->+	.connect = vsock_connect,
->+	.socketpair = sock_no_socketpair,
->+	.accept = vsock_accept,
->+	.getname = vsock_getname,
->+	.poll = vsock_poll,
->+	.ioctl = sock_no_ioctl,
->+	.listen = vsock_listen,
->+	.shutdown = vsock_shutdown,
->+	.setsockopt = vsock_connectible_setsockopt,
->+	.getsockopt = vsock_connectible_getsockopt,
->+	.sendmsg = vsock_connectible_sendmsg,
->+	.recvmsg = vsock_connectible_recvmsg,
->+	.mmap = sock_no_mmap,
->+	.sendpage = sock_no_sendpage,
->+};
->+
-> static int vsock_create(struct net *net, struct socket *sock,
-> 			int protocol, int kern)
-> {
->@@ -2219,6 +2251,9 @@ static int vsock_create(struct net *net, struct socket *sock,
-> 	case SOCK_STREAM:
-> 		sock->ops = &vsock_stream_ops;
-> 		break;
->+	case SOCK_SEQPACKET:
->+		sock->ops = &vsock_seqpacket_ops;
->+		break;
-> 	default:
-> 		return -ESOCKTNOSUPPORT;
-> 	}
->-- 
->2.25.1
->
+> So if the guest changed anything in the meantime (e.g., zap a
+> segment), we would have unshadowed the whole fake page table
+> hierarchy and would simply retry.
+> 
+> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Cc: stable@vger.kernel.org
+> > ---
+> >   arch/s390/kvm/gaccess.c | 30 +++++++++++++++++++++++++-----
+> >   arch/s390/kvm/gaccess.h |  5 ++++-
+> >   arch/s390/kvm/vsie.c    |  8 ++++----
+> >   3 files changed, 33 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> > index 6d6b57059493..e0ab83f051d2 100644
+> > --- a/arch/s390/kvm/gaccess.c
+> > +++ b/arch/s390/kvm/gaccess.c
+> > @@ -976,7 +976,9 @@ int kvm_s390_check_low_addr_prot_real(struct
+> > kvm_vcpu *vcpu, unsigned long gra)
+> >    * kvm_s390_shadow_tables - walk the guest page table and create
+> > shadow tables
+> >    * @sg: pointer to the shadow guest address space structure
+> >    * @saddr: faulting address in the shadow gmap
+> > - * @pgt: pointer to the page table address result
+> > + * @pgt: pointer to the beginning of the page table for the given
+> > address if
+> > + *       successful (return value 0), or to the first invalid DAT
+> > entry in
+> > + *       case of exceptions (return value > 0)
+> >    * @fake: pgt references contiguous guest memory block, not a
+> > pgtable */
+> >   static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long
+> > saddr, @@ -1034,6 +1036,7 @@ static int
+> > kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+> > rfte.val = ptr; goto shadow_r2t;
+> >   		}
+> > +		*pgt = ptr + vaddr.rfx * 8;
+> >   		rc = gmap_read_table(parent, ptr + vaddr.rfx * 8,
+> > &rfte.val);  
+> 
+> Using
+> 
+> gmap_read_table(parent, *pgt, &rfte.val);
+> 
+> or similar with a local variable might then be even clearer. But no 
+> strong opinion.
+
+that's also something I had thought about, in the end this minimizes
+the number of lines / variables while still being readable
+
+> >   		if (rc)
+> >   			return rc;
+> > @@ -1060,6 +1063,7 @@ static int kvm_s390_shadow_tables(struct gmap
+> > *sg, unsigned long saddr, rste.val = ptr;
+> >   			goto shadow_r3t;
+> >   		}
+> > +		*pgt = ptr + vaddr.rsx * 8;
+> >   		rc = gmap_read_table(parent, ptr + vaddr.rsx * 8,
+> > &rste.val); if (rc)
+> >   			return rc;
+> > @@ -1087,6 +1091,7 @@ static int kvm_s390_shadow_tables(struct gmap
+> > *sg, unsigned long saddr, rtte.val = ptr;
+> >   			goto shadow_sgt;
+> >   		}
+> > +		*pgt = ptr + vaddr.rtx * 8;
+> >   		rc = gmap_read_table(parent, ptr + vaddr.rtx * 8,
+> > &rtte.val); if (rc)
+> >   			return rc;
+> > @@ -1123,6 +1128,7 @@ static int kvm_s390_shadow_tables(struct gmap
+> > *sg, unsigned long saddr, ste.val = ptr;
+> >   			goto shadow_pgt;
+> >   		}
+> > +		*pgt = ptr + vaddr.sx * 8;
+> >   		rc = gmap_read_table(parent, ptr + vaddr.sx * 8,
+> > &ste.val); if (rc)
+> >   			return rc;
+> > @@ -1157,6 +1163,8 @@ static int kvm_s390_shadow_tables(struct gmap
+> > *sg, unsigned long saddr,
+> >    * @vcpu: virtual cpu
+> >    * @sg: pointer to the shadow guest address space structure
+> >    * @saddr: faulting address in the shadow gmap
+> > + * @datptr: will contain the address of the faulting DAT table
+> > entry, or of
+> > + *          the valid leaf, plus some flags
+> >    *
+> >    * Returns: - 0 if the shadow fault was successfully resolved
+> >    *	    - > 0 (pgm exception code) on exceptions while
+> > faulting @@ -1165,11 +1173,11 @@ static int
+> > kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
+> >    *	    - -ENOMEM if out of memory
+> >    */
+> >   int kvm_s390_shadow_fault(struct kvm_vcpu *vcpu, struct gmap *sg,
+> > -			  unsigned long saddr)
+> > +			  unsigned long saddr, unsigned long
+> > *datptr) {
+> >   	union vaddress vaddr;
+> >   	union page_table_entry pte;
+> > -	unsigned long pgt;
+> > +	unsigned long pgt = 0;
+> >   	int dat_protection, fake;
+> >   	int rc;
+> >   
+> > @@ -1191,8 +1199,20 @@ int kvm_s390_shadow_fault(struct kvm_vcpu
+> > *vcpu, struct gmap *sg, pte.val = pgt + vaddr.px * PAGE_SIZE;
+> >   		goto shadow_page;
+> >   	}
+> > -	if (!rc)
+> > -		rc = gmap_read_table(sg->parent, pgt + vaddr.px *
+> > 8, &pte.val); +
+> > +	switch (rc) {
+> > +	case PGM_SEGMENT_TRANSLATION:
+> > +	case PGM_REGION_THIRD_TRANS:
+> > +	case PGM_REGION_SECOND_TRANS:
+> > +	case PGM_REGION_FIRST_TRANS:
+> > +		pgt |= NOT_PTE;
+> > +		break;
+> > +	case 0:
+> > +		pgt += vaddr.px * 8;
+> > +		rc = gmap_read_table(sg->parent, pgt, &pte.val);
+> > +	}
+> > +	if (*datptr)
+> > +		*datptr = pgt | dat_protection * DAT_PROT;
+> >   	if (!rc && pte.i)
+> >   		rc = PGM_PAGE_TRANSLATION;
+> >   	if (!rc && pte.z)
+> > diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
+> > index f4c51756c462..fec26bbb17ba 100644
+> > --- a/arch/s390/kvm/gaccess.h
+> > +++ b/arch/s390/kvm/gaccess.h
+> > @@ -359,7 +359,10 @@ void ipte_unlock(struct kvm_vcpu *vcpu);
+> >   int ipte_lock_held(struct kvm_vcpu *vcpu);
+> >   int kvm_s390_check_low_addr_prot_real(struct kvm_vcpu *vcpu,
+> > unsigned long gra); 
+> > +#define DAT_PROT 2
+> > +#define NOT_PTE 4  
+> 
+> What if our guest is using ASCE.R ?
+
+then we don't care.
+
+if the guest is using ASCE.R, then shadowing will always succeed, and
+the VSIE MVPG handler will retry right away.
+
+if you are worried about the the lowest order bit, it can only be set
+if a specific feature is enabled in the host, and KVM doesn't use /
+support it, so the guest can't use it for its guest.
+
+
 
