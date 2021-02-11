@@ -2,239 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1FF7319127
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:35:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF3DC319134
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 18:37:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231578AbhBKRev (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 12:34:51 -0500
-Received: from foss.arm.com ([217.140.110.172]:55140 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231743AbhBKRcb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 12:32:31 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 380C211D4;
-        Thu, 11 Feb 2021 09:31:46 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3CA723F73B;
-        Thu, 11 Feb 2021 09:31:45 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-2-andre.przywara@arm.com>
- <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
- <20210211171648.36000cce@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
-Date:   Thu, 11 Feb 2021 17:32:01 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S232386AbhBKRg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 12:36:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230097AbhBKReR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 12:34:17 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC201C061756
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:33:37 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id l3so6989087oii.2
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 09:33:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8P4xaiVI2tG5b2Ole1+tnRAqZYtVrf1Whd339/8WB6E=;
+        b=Z7604+y34s6xeuNm8+wCbPBgFd8e3828pzQ7LIQY6cCrUgusKKUU//W1K74Ram4Mjr
+         /GehiA5L2HNaOD/080Z7HsglI2qkhP1tvsfaz3RpwH3oxFStnn2UxYLJIuL9q8YHtjcl
+         Mc9Hboop2KfBy3Zq6GUCuI8+RfXoPxFEYmk1yIUHi9rlq4kqOoQ9yeAh4PgKkT6STNCq
+         sa6lOsfeGvtddTG8xb3BiJiRZ6Hm5Ag+ldsY6HnjtxuYwbdjlu95k3kjedFqrGEc2eq7
+         oDiukko4tEMupzQluzSZ8C7ea5oHMQQgOVxIdShF+9kC9AUt4xoc0sm6Jc4DG6f1eFaG
+         5GEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8P4xaiVI2tG5b2Ole1+tnRAqZYtVrf1Whd339/8WB6E=;
+        b=NUJEb99YMLjyYhmXM0fdJV4OunvhgNMztARZPUXPphnx1GhSTFD+hBy1FTF7e4aXvu
+         Q2RIjcLIVOdWwj7qVl/yrMxyl34QRdzSDytUgazS1grDi+s4qsURIj+7+yc2F1aYf6RZ
+         of5K6geAE8RmAdieNTG92WFHlZTS+qVogfFefl4O527FG6jOGu9bO9JDkGX1CFH4rsHy
+         926REB7dUDJoWr5FAs5gTV6rovMAGfe0tTj9Z++Ax94qiE7riUs8wIyZR3zeP/0uP1PA
+         +pXi0Hq8TIe3lo8sN3GH9H5/HLNijjFCT1GrcaFJLnCyu3685D3XpogUKR09FV+vtPHf
+         9CnA==
+X-Gm-Message-State: AOAM532GquR9MkmRp4iQYd3HKnRxpeEoFDSwy+Qaw0mFQuulA2mTxHxq
+        5+Z5txSacbkpjXiz85wQ+pPSTkIuYI5MnYgJUAL/Zg==
+X-Google-Smtp-Source: ABdhPJzxhIqMQoPXo1/OKDNuoU8KVYGDFfutR+x8G74OkgvrTWUFeqz/2TpHQNK/HJ/TWverkr8tq3R38cTEtHGsZCA=
+X-Received: by 2002:aca:3b06:: with SMTP id i6mr3487837oia.81.1613064816828;
+ Thu, 11 Feb 2021 09:33:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210211171648.36000cce@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210210230625.550939-1-seanjc@google.com> <20210210230625.550939-10-seanjc@google.com>
+ <CANgfPd8itawTsza-SPSMehUEAAJ4DWtSQX4QRbHg1kX4c6VRBg@mail.gmail.com>
+ <YCSOtMzs9OWO2AsR@google.com> <756fed52-8151-97ee-11f2-91f150afab42@redhat.com>
+ <YCVUAdx3DYLPNwJU@google.com>
+In-Reply-To: <YCVUAdx3DYLPNwJU@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 11 Feb 2021 09:33:25 -0800
+Message-ID: <CANgfPd_W+wqx_UXHR7OWCBY7KEnsdNC12QZmGNjzOSBb1XOUyQ@mail.gmail.com>
+Subject: Re: [PATCH 09/15] KVM: selftests: Move per-VM GPA into perf_test_args
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
-
-On 2/11/21 5:16 PM, Andre Przywara wrote:
-> On Wed, 10 Feb 2021 17:44:59 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, Feb 11, 2021 at 7:58 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Hi Alex,
+> On Thu, Feb 11, 2021, Paolo Bonzini wrote:
+> > On 11/02/21 02:56, Sean Christopherson wrote:
+> > > > > +       pta->gpa = (vm_get_max_gfn(vm) - guest_num_pages) * pta->guest_page_size;
+> > > > > +       pta->gpa &= ~(pta->host_page_size - 1);
+> > > > Also not related to this patch, but another case for align.
+> > > >
+> > > > >          if (backing_src == VM_MEM_SRC_ANONYMOUS_THP ||
+> > > > >              backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB)
+> > > > > -               guest_test_phys_mem &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
+> > > > > -
+> > > > > +               pta->gpa &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
+> > > > also align
+> > > >
+> > > > >   #ifdef __s390x__
+> > > > >          /* Align to 1M (segment size) */
+> > > > > -       guest_test_phys_mem &= ~((1 << 20) - 1);
+> > > > > +       pta->gpa &= ~((1 << 20) - 1);
+> > > > And here again (oof)
+> > >
+> > > Yep, I'll fix all these and the align() comment in v2.
+> >
+> > This is not exactly align in fact; it is x & ~y rather than (x + y) & ~y.
+> > Are you going to introduce a round-down macro or is it a bug?  (I am
+> > lazy...).
 >
->> On 12/10/20 2:28 PM, Andre Przywara wrote:
->>> Since x86 had a special need for registering tons of special I/O ports,
->>> we had an ioport__setup_arch() callback, to allow each architecture
->>> to do the same. As it turns out no one uses it beside x86, so we remove
->>> that unnecessary abstraction.
->>>
->>> The generic function was registered via a device_base_init() call, so
->>> we just do the same for the x86 specific function only, and can remove
->>> the unneeded ioport__setup_arch().
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  arm/ioport.c         |  5 -----
->>>  include/kvm/ioport.h |  1 -
->>>  ioport.c             | 28 ----------------------------
->>>  mips/kvm.c           |  5 -----
->>>  powerpc/ioport.c     |  6 ------
->>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
->>>  6 files changed, 24 insertions(+), 46 deletions(-)
->>>
->>> diff --git a/arm/ioport.c b/arm/ioport.c
->>> index 2f0feb9a..24092c9d 100644
->>> --- a/arm/ioport.c
->>> +++ b/arm/ioport.c
->>> @@ -1,11 +1,6 @@
->>>  #include "kvm/ioport.h"
->>>  #include "kvm/irq.h"
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	return 0;
->>> -}
->>> -
->>>  void ioport__map_irq(u8 *irq)
->>>  {
->>>  	*irq = irq__alloc_line();
->>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->>> index 039633f7..d0213541 100644
->>> --- a/include/kvm/ioport.h
->>> +++ b/include/kvm/ioport.h
->>> @@ -35,7 +35,6 @@ struct ioport_operations {
->>>  							    enum irq_type));
->>>  };
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm);
->>>  void ioport__map_irq(u8 *irq);
->>>  
->>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
->>> diff --git a/ioport.c b/ioport.c
->>> index 844a832d..667e8386 100644
->>> --- a/ioport.c
->>> +++ b/ioport.c
->>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
->>>  	return 0;
->>>  }
->>>  
->>> -static void ioport__unregister_all(void)
->>> -{
->>> -	struct ioport *entry;
->>> -	struct rb_node *rb;
->>> -	struct rb_int_node *rb_node;
->>> -
->>> -	rb = rb_first(&ioport_tree);
->>> -	while (rb) {
->>> -		rb_node = rb_int(rb);
->>> -		entry = ioport_node(rb_node);
->>> -		ioport_unregister(&ioport_tree, entry);
->>> -		rb = rb_first(&ioport_tree);
->>> -	}
->>> -}  
->> I get the impression this is a rebasing artifact. The commit message doesn't
->> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
->> far as I can tell it's still needed because there are places other than
->> ioport__setup_arch() from where ioport__register() is called.
-> I agree that the commit message is a bit thin on this fact, but the
-> functionality of ioport__unregister_all() is now in
-> x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
-> without removing ioport__exit() as well would look very weird, if not
-> hackish.
+> Good question.  I, too, was lazy.  I didn't look at the guts of align() when I
+> moved it, and I didn't look closely at Ben's suggestion.  I'll take a closer
+> look today and make sure everything is doing what it's supposed to do.
 
-Not necessarily. ioport__unregister_all() removes the ioports added by
-x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
-like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).
-
-Thanks,
-
-Alex
-
->
-> I can amend the commit message to mention this, or is there anything
-> else I missed?
->
-> Cheers,
-> Andre
->
->>> -
->>>  static const char *to_direction(int direction)
->>>  {
->>>  	if (direction == KVM_EXIT_IO_IN)
->>> @@ -220,16 +205,3 @@ out:
->>>  
->>>  	return !kvm->cfg.ioport_debug;
->>>  }
->>> -
->>> -int ioport__init(struct kvm *kvm)
->>> -{
->>> -	return ioport__setup_arch(kvm);
->>> -}
->>> -dev_base_init(ioport__init);
->>> -
->>> -int ioport__exit(struct kvm *kvm)
->>> -{
->>> -	ioport__unregister_all();
->>> -	return 0;
->>> -}
->>> -dev_base_exit(ioport__exit);
->>> diff --git a/mips/kvm.c b/mips/kvm.c
->>> index 26355930..e110e5d5 100644
->>> --- a/mips/kvm.c
->>> +++ b/mips/kvm.c
->>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->>>  		die_perror("KVM_IRQ_LINE ioctl");
->>>  }
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	return 0;
->>> -}
->>> -
->>>  bool kvm__arch_cpu_supports_vm(void)
->>>  {
->>>  	return true;
->>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
->>> index 0c188b61..a5cff4ee 100644
->>> --- a/powerpc/ioport.c
->>> +++ b/powerpc/ioport.c
->>> @@ -12,12 +12,6 @@
->>>  
->>>  #include <stdlib.h>
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> -{
->>> -	/* PPC has no legacy ioports to set up */
->>> -	return 0;
->>> -}
->>> -
->>>  void ioport__map_irq(u8 *irq)
->>>  {
->>>  }
->>> diff --git a/x86/ioport.c b/x86/ioport.c
->>> index 7ad7b8f3..8c5c7699 100644
->>> --- a/x86/ioport.c
->>> +++ b/x86/ioport.c
->>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
->>>  {
->>>  }
->>>  
->>> -int ioport__setup_arch(struct kvm *kvm)
->>> +static int ioport__setup_arch(struct kvm *kvm)
->>>  {
->>>  	int r;
->>>  
->>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
->>>  
->>>  	return 0;
->>>  }
->>> +dev_base_init(ioport__setup_arch);
->>> +
->>> +static int ioport__remove_arch(struct kvm *kvm)
->>> +{
->>> +	ioport__unregister(kvm, 0x510);
->>> +	ioport__unregister(kvm, 0x402);
->>> +	ioport__unregister(kvm, 0x03D5);
->>> +	ioport__unregister(kvm, 0x03D4);
->>> +	ioport__unregister(kvm, 0x0378);
->>> +	ioport__unregister(kvm, 0x0278);
->>> +	ioport__unregister(kvm, 0x00F0);
->>> +	ioport__unregister(kvm, 0x00ED);
->>> +	ioport__unregister(kvm, IOPORT_DBG);
->>> +	ioport__unregister(kvm, 0x00C0);
->>> +	ioport__unregister(kvm, 0x00A0);
->>> +	ioport__unregister(kvm, 0x0092);
->>> +	ioport__unregister(kvm, 0x0040);
->>> +	ioport__unregister(kvm, 0x0020);
->>> +	ioport__unregister(kvm, 0x0000);
->>> +
->>> +	return 0;
->>> +}
->>> +dev_base_exit(ioport__remove_arch);  
+Ooh, great point Paolo, that helper is indeed rounding up. My comment
+in patch #2 was totally wrong. I forgot anyone would ever want to
+round up. :/
+My misunderstanding and the above use cases are probably good evidence
+that it would be helpful to have both align_up and align_down helpers.
