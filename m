@@ -2,132 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C41D31905F
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:54:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F27B31907D
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 17:59:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231881AbhBKQu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 11:50:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5388 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231947AbhBKQsu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Feb 2021 11:48:50 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11BGYB8V135888;
-        Thu, 11 Feb 2021 11:47:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Aqmz4aQl7nkrALMRdUdLq/F8auLEY5n8P94aY02T45c=;
- b=m+uxjRhrfNPbgNmBVlmIOGzIeLGl6izrtUDDcRgnBoCaOkBfpBvv+ahCuKZupIYakPUw
- xWeFInFbXEhG9e+Mkxg65JtRT1JuSHbi9+ExlV7/lmhPgKWT/DXTDlMULbDx8bALfJlY
- uJtX6DldxNc+uzPiHuI0Xj5ua4DlVrVjt9feLokhpj8q2VUhs9f3M8F8OevE9dWIFWsb
- 0NUslzRTSlPMOzuoEj+UV4ozpAMe6P2BSPeXAzUBNRANEjgG9/kGYOXmFlkfGvyKURB8
- KJiL4+FH6+UnkfSaviP/EWghqj3ScczJApNnJ6x8uMz9Ay8uALQ6oC2lGagwAX9ol8l2 BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wm1h7t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 11:47:59 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11BGZNQU146157;
-        Thu, 11 Feb 2021 11:47:58 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36n7wm1h71-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 11:47:58 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11BGhNlm008187;
-        Thu, 11 Feb 2021 16:47:57 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 36hjr8dya2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Feb 2021 16:47:56 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11BGlsbr32440596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Feb 2021 16:47:54 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0ED66A405F;
-        Thu, 11 Feb 2021 16:47:54 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 73DE0A4068;
-        Thu, 11 Feb 2021 16:47:53 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.79])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 11 Feb 2021 16:47:53 +0000 (GMT)
-Date:   Thu, 11 Feb 2021 17:47:50 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org, borntraeger@de.ibm.com,
-        kwankhede@nvidia.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210211174750.24d91a65.pasic@linux.ibm.com>
-In-Reply-To: <8c461602-8c2c-4dd9-1d2b-5e424fc701f8@linux.ibm.com>
-References: <20210209194830.20271-1-akrowiak@linux.ibm.com>
-        <20210209194830.20271-2-akrowiak@linux.ibm.com>
-        <20210210115334.46635966.cohuck@redhat.com>
-        <20210210162429.261fc17c.pasic@linux.ibm.com>
-        <20210210163237.315d9a68.pasic@linux.ibm.com>
-        <59e8f084-c9ec-ce25-2326-b206e30d04d0@linux.ibm.com>
-        <20210210234606.1d0dbdec.pasic@linux.ibm.com>
-        <8c461602-8c2c-4dd9-1d2b-5e424fc701f8@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S230046AbhBKQ6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 11:58:42 -0500
+Received: from foss.arm.com ([217.140.110.172]:54624 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230252AbhBKQ4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 11:56:14 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5611E11D4;
+        Thu, 11 Feb 2021 08:55:28 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CF773F73B;
+        Thu, 11 Feb 2021 08:55:27 -0800 (PST)
+Subject: Re: [PATCH kvmtool 05/21] hw/i8042: Clean up data types
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-6-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <04b5f537-1594-61b9-b7ef-4062e732e380@arm.com>
+Date:   Thu, 11 Feb 2021 16:55:43 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-11_07:2021-02-11,2021-02-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 adultscore=0
- spamscore=0 phishscore=0 priorityscore=1501 clxscore=1015 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102110135
+In-Reply-To: <20201210142908.169597-6-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Feb 2021 09:21:26 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hi Andre,
 
-> Yes, it makes sense. I guess I didn't look closely at your
-> suggestion when I said it was exactly what I implemented
-> after agreeing with Connie. I had a slight difference in
-> my implementation:
-> 
-> static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
-> {
->      struct kvm *kvm;
-> 
->      mutex_lock(&matrix_dev->lock);
-> 
->      if (matrix_mdev->kvm) {
->          kvm = matrix_mdev->kvm;
->          mutex_unlock(&matrix_dev->lock);
+On 12/10/20 2:28 PM, Andre Przywara wrote:
 
-The problem with this one is that as soon as we drop
-the lock here, another thread can in theory execute
-the critical section below, which drops our reference
-to kvm via kvm_put_kvm(kvm). Thus when we enter
-kvm_arch_crypto_clear_mask(), even if we are guaranteed
-to have a non-null pointer, the pointee is not guaranteed
-to be around. So like Connie suggested, you better take
-another reference to kvm in the first critical section.
+> The i8042 is clearly an 8-bit era device, so there is little room for
+> 32-bit registers.
+> Clean up the data types used.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  hw/i8042.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/i8042.c b/hw/i8042.c
+> index 37a99a2d..36ee183f 100644
+> --- a/hw/i8042.c
+> +++ b/hw/i8042.c
+> @@ -64,11 +64,11 @@
+>  struct kbd_state {
+>  	struct kvm		*kvm;
+>  
+> -	char			kq[QUEUE_SIZE];	/* Keyboard queue */
+> +	u8			kq[QUEUE_SIZE];	/* Keyboard queue */
+>  	int			kread, kwrite;	/* Indexes into the queue */
+>  	int			kcount;		/* number of elements in queue */
+>  
+> -	char			mq[QUEUE_SIZE];
+> +	u8			mq[QUEUE_SIZE];
+>  	int			mread, mwrite;
+>  	int			mcount;
 
-Regards,
-Halil
+I think the write_cmd field further down should also be u8 because it stores the
+first byte of a command (and it's set only to an 8 bit value in kbd_write_command()).
 
->          kvm_arch_crypto_clear_masks(kvm);
->          mutex_lock(&matrix_dev->lock);
->          kvm->arch.crypto.pqap_hook = NULL;
->          vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
->          matrix_mdev->kvm = NULL;
->          kvm_put_kvm(kvm);
->      }
-> 
->      mutex_unlock(&matrix_dev->lock);
-> }
+Otherwise, it looks ok to me. osdev wiki seems to confirm that the device is
+indeed 8 bit only, and all the registers are 8 bit now:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>  
+> @@ -173,9 +173,9 @@ static void kbd_write_command(struct kvm *kvm, u8 val)
+>  /*
+>   * Called when the OS reads from port 0x60 (PS/2 data)
+>   */
+> -static u32 kbd_read_data(void)
+> +static u8 kbd_read_data(void)
+>  {
+> -	u32 ret;
+> +	u8 ret;
+>  	int i;
+>  
+>  	if (state.kcount != 0) {
+> @@ -202,9 +202,9 @@ static u32 kbd_read_data(void)
+>  /*
+>   * Called when the OS read from port 0x64, the command port
+>   */
+> -static u32 kbd_read_status(void)
+> +static u8 kbd_read_status(void)
+>  {
+> -	return (u32)state.status;
+> +	return state.status;
+>  }
+>  
+>  /*
+> @@ -212,7 +212,7 @@ static u32 kbd_read_status(void)
+>   * Things written here are generally arguments to commands previously
+>   * written to port 0x64 and stored in state.write_cmd
+>   */
+> -static void kbd_write_data(u32 val)
+> +static void kbd_write_data(u8 val)
+>  {
+>  	switch (state.write_cmd) {
+>  	case I8042_CMD_CTL_WCTR:
+> @@ -304,8 +304,8 @@ static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *
+>  		break;
+>  	}
+>  	case I8042_DATA_REG: {
+> -		u32 value = kbd_read_data();
+> -		ioport__write32(data, value);
+> +		u8 value = kbd_read_data();
+> +		ioport__write8(data, value);
+>  		break;
+>  	}
+>  	case I8042_PORT_B_REG: {
+> @@ -328,7 +328,7 @@ static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void
+>  		break;
+>  	}
+>  	case I8042_DATA_REG: {
+> -		u32 value = ioport__read32(data);
+> +		u8 value = ioport__read8(data);
+>  		kbd_write_data(value);
+>  		break;
+>  	}
