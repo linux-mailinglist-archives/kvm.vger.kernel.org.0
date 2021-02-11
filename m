@@ -2,116 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E78731835E
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 03:03:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B40E318371
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 03:10:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbhBKCAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 21:00:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
+        id S229768AbhBKCIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Feb 2021 21:08:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbhBKB4w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 20:56:52 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED9AC06178C
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 17:56:12 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id b145so2653445pfb.4
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 17:56:12 -0800 (PST)
+        with ESMTP id S229793AbhBKCH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Feb 2021 21:07:58 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D0AC061756
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 18:07:18 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id e7so2667871pge.0
+        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 18:07:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=tKLj/g3nhtAURGmPeDu+2QOeEfRKahaeGqDg+bXkVJU=;
-        b=GD54P6anPyNigOUVV/uON4RTNJJRworqBxXIlSkqOMqf4ocaF+6YPBU2hoo+gNimh3
-         zkqPo0H0h7cAlhPG3W50iskZkkBi6aKsxYHE3A0taDuHtjB2X8KsLzid7AyQnU4yyM5c
-         kk3MQVv9m5e9Q8eu1ETHA2LupiCItmt7OyrBlgeOkqMbLuMNzcWJ6NqkHYPn1Rng+rWs
-         K3wj8sNhuKQxpGDMCkPb7upokARfHZzyOnsRhMhtr2l+6+xUKYBELl89WkoyooWIM5pm
-         HOWyPvno0qd3SqMbExU3WZoob5lE29OgZlNTLBS2GXg/mfpEHIcJdEsVbki9mowKbQoT
-         mlYg==
+        bh=uFmtLVGPRsu+efbO+P3fLDbMMK5+lkfvkJ1xncGvBr0=;
+        b=AivknfLsO0hCCPPDsGkezVd/53chBqyt/2m+W0Zu1IzTWCwEgzLmqiH46zDo3CaS6n
+         +vJwVZpeL6tg7eodNpxuHxJo1wthfiQxdIrEbsXHCWik2NAC2KilSAgEWCvnepGI6VR2
+         RehLL8u2uZ7TmIqMNVWvX3S/+NYVYf8P6mw0lWIETbcBCbacoEGcKRHjcLHKFt4cO16Z
+         7nrnE6N+mCtCVl6dWUw7QNXpfnKNYqicFc/CluBWLscbJKYNIZnnZEGNStAg4dgtvDaW
+         vVQ9KM7u4tXlhZiLCuntTMrNs8zacPKpaXlypMh7IVll0c9pmXK+PhrGG2uU5t5+cBgc
+         5Nyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=tKLj/g3nhtAURGmPeDu+2QOeEfRKahaeGqDg+bXkVJU=;
-        b=Ct4NV+Ny3c6oIPXHhjXpSqCJzynGlpMoyiRkgyqa5wjoYhiWJiRnOrCvyknBNhFi1Q
-         n7dKQJVW9Zit1O/jp8rzZqqRER1KYAsSCH9OLZedoeKfand0i83OO1US3i7LXzrx/+pt
-         Sn/XTag9a6DpkssQgFx/IsIoJfay27Q9KDs4FVoCpexAi05efoDOagE5Q3IkR+ov3T3f
-         c2qRTxxUJguRiVeYM1Z7GuKa3Ay+k7+RWc+fK2alMgLaCKTH8EjY4aJzkHKwzGQz5/83
-         6d4TTV9WxXZEFQ/O+vX4hKZcIXgqfOstcM2HGCHnJcI1HwaTh+oIF4sbJwr6LHaVQvnp
-         aQWQ==
-X-Gm-Message-State: AOAM530mrv8NA4iXa6geaHjNQxJ3zwTZahdMPBzBhI3XusMXUlYOBLmq
-        yjALKtnXBfKPkEdGeXSuYuJn6g==
-X-Google-Smtp-Source: ABdhPJxI49ISepd0OO1jRXMVLETm6ZbA6jqQiTyBfPFVpp3NzJ1x7fGY0B9Bzq1rmMfjQ2qWt5/WIA==
-X-Received: by 2002:a63:6f8a:: with SMTP id k132mr5906900pgc.59.1613008571706;
-        Wed, 10 Feb 2021 17:56:11 -0800 (PST)
+        bh=uFmtLVGPRsu+efbO+P3fLDbMMK5+lkfvkJ1xncGvBr0=;
+        b=JVYKZVMY7Hxl2kPmWduJqoukXYrsGngRlvlenqXjEox1uImBEt4ZI4DI9qtHiQNTHQ
+         dpsL99kYEagvUzFF6zNXIVwG9mEA+PUpWPdL2DYJfOmHDWd/l7ELbDGjV3jL4O98ZsH1
+         wWPsT1oq2eRUNj3BJpNSuUJ7AdPjNuNdzhpEW7KjgMa5rlqH46KlGvdNxmWEv0oGjqJa
+         H6tB9PYK5w7lcSGrTcgc0YdyV8h4SBQR/Z1Mbq1sEEfVVuwErIohd9Bvhp8/c1lN+nol
+         S3bnJLm+mKi5o07L747wGhWbLUfosEt+1FrnwhdPc+/hkV1HXq3tKtFo5C4WAhQiwtGg
+         Bt0g==
+X-Gm-Message-State: AOAM533bBEjdgmx/U7wm8WeR2+hhf02acrSlpAhkM7Vlrfe3lv3074bM
+        FY/RMgRMItTL5Jk2zMk5Z+9gyw==
+X-Google-Smtp-Source: ABdhPJx7nxrAcdnXE3p2lQH5pMA0Nuzh2z+IMHmA4tpsNMqK60zvOC9pRVOU16ea/vpcu+wpHDfggQ==
+X-Received: by 2002:a62:7bd2:0:b029:1e5:3aed:34c with SMTP id w201-20020a627bd20000b02901e53aed034cmr5967082pfc.71.1613009233955;
+        Wed, 10 Feb 2021 18:07:13 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
-        by smtp.gmail.com with ESMTPSA id x20sm3602105pfn.14.2021.02.10.17.56.10
+        by smtp.gmail.com with ESMTPSA id j22sm3565885pff.57.2021.02.10.18.07.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Feb 2021 17:56:11 -0800 (PST)
-Date:   Wed, 10 Feb 2021 17:56:04 -0800
+        Wed, 10 Feb 2021 18:07:13 -0800 (PST)
+Date:   Wed, 10 Feb 2021 18:07:06 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH 09/15] KVM: selftests: Move per-VM GPA into perf_test_args
-Message-ID: <YCSOtMzs9OWO2AsR@google.com>
-References: <20210210230625.550939-1-seanjc@google.com>
- <20210210230625.550939-10-seanjc@google.com>
- <CANgfPd8itawTsza-SPSMehUEAAJ4DWtSQX4QRbHg1kX4c6VRBg@mail.gmail.com>
+To:     Makarand Sonare <makarandsonare@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, pshier@google.com, jmattson@google.com,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging
+ gets enabled/disabled
+Message-ID: <YCSRSiSNErkC6+9R@google.com>
+References: <20210210212308.2219465-1-makarandsonare@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd8itawTsza-SPSMehUEAAJ4DWtSQX4QRbHg1kX4c6VRBg@mail.gmail.com>
+In-Reply-To: <20210210212308.2219465-1-makarandsonare@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 10, 2021, Ben Gardon wrote:
-> > diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > index f22ce1836547..03f125236021 100644
-> > --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > @@ -9,8 +9,6 @@
-> >
-> >  struct perf_test_args perf_test_args;
-> >
-> > -uint64_t guest_test_phys_mem;
-> > -
-> >  /*
-> >   * Guest virtual memory offset of the testing memory slot.
-> >   * Must not conflict with identity mapped test code.
-> > @@ -87,29 +85,25 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
-> >         TEST_ASSERT(guest_num_pages < vm_get_max_gfn(vm),
-> >                     "Requested more guest memory than address space allows.\n"
-> >                     "    guest pages: %lx max gfn: %x vcpus: %d wss: %lx]\n",
-> > -                   guest_num_pages, vm_get_max_gfn(vm), vcpus,
-> > -                   vcpu_memory_bytes);
-> > +                   guest_num_pages, vm_get_max_gfn(vm), vcpus, vcpu_memory_bytes);
-> >
-> > -       guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
-> > -                             pta->guest_page_size;
-> > -       guest_test_phys_mem &= ~(pta->host_page_size - 1);
-> > +       pta->gpa = (vm_get_max_gfn(vm) - guest_num_pages) * pta->guest_page_size;
-> > +       pta->gpa &= ~(pta->host_page_size - 1);
-> 
-> Also not related to this patch, but another case for align.
-> 
-> >         if (backing_src == VM_MEM_SRC_ANONYMOUS_THP ||
-> >             backing_src == VM_MEM_SRC_ANONYMOUS_HUGETLB)
-> > -               guest_test_phys_mem &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
-> > -
-> > +               pta->gpa &= ~(KVM_UTIL_HUGEPAGE_ALIGNMENT - 1);
-> 
-> also align
-> 
-> >  #ifdef __s390x__
-> >         /* Align to 1M (segment size) */
-> > -       guest_test_phys_mem &= ~((1 << 20) - 1);
-> > +       pta->gpa &= ~((1 << 20) - 1);
-> 
-> And here again (oof)
+On Wed, Feb 10, 2021, Makarand Sonare wrote:
+> Currently, if enable_pml=1 PML remains enabled for the entire lifetime
+> of the VM irrespective of whether dirty logging is enable or disabled.
+> When dirty logging is disabled, all the pages of the VM are manually
+> marked dirty, so that PML is effectively non-operational. Clearing
+> the dirty bits is an expensive operation which can cause severe MMU
+> lock contention in a performance sensitive path when dirty logging
+> is disabled after a failed or canceled live migration. Also, this
+> would break if some other code path clears the dirty bits in which
+> case, PML will actually start logging dirty pages even when dirty
+> logging is disabled incurring unnecessary vmexits when the PML buffer
+> becomes full. In order to avoid this extra overhead, we should
+> enable or disable PML in VMCS when dirty logging gets enabled
+> or disabled instead of keeping it always enabled.
 
-Yep, I'll fix all these and the align() comment in v2.
+Breaking this up into a few paragraphs would be helpful.
+
+> Tested:
+> 	kvm-unit-tests
+> 	dirty_log_test
+> 	dirty_log_perf_test
+
+Eh, I get that we like these for internal tracking, but for upstream there's an
+assumption that you did your due diligence.  If there's something noteworthy
+about your testing (or lack thereof), throw it in the cover letter or in the
+part that's not recorded in the final commit.
+
+> Signed-off-by: Makarand Sonare <makarandsonare@google.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
+
+...
+
+> @@ -7517,9 +7531,39 @@ static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+>  static void vmx_slot_disable_log_dirty(struct kvm *kvm,
+>  				       struct kvm_memory_slot *slot)
+>  {
+> +	/*
+> +	 * Check all slots and disable PML if dirty logging
+> +	 * is being disabled for the last slot
+> +	 *
+> +	 */
+> +	if (enable_pml &&
+> +	    kvm->dirty_logging_enable_count == 0 &&
+> +	    kvm->arch.pml_enabled) {
+> +		kvm->arch.pml_enabled = false;
+> +		kvm_make_all_cpus_request(kvm,
+> +			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
+> +	}
+> +
+>  	kvm_mmu_slot_set_dirty(kvm, slot);
+
+The justification for dynamically toggling PML is that it means KVM can skip
+setting all the dirty bits when logging is disabled, but that code is still here.
+Is there a follow-up planned to reap the reward?
+
+>  }
