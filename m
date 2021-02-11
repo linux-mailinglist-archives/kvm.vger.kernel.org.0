@@ -2,123 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B40E318371
-	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 03:10:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C24603185A9
+	for <lists+kvm@lfdr.de>; Thu, 11 Feb 2021 08:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbhBKCIH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Feb 2021 21:08:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbhBKCH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Feb 2021 21:07:58 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D0AC061756
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 18:07:18 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id e7so2667871pge.0
-        for <kvm@vger.kernel.org>; Wed, 10 Feb 2021 18:07:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uFmtLVGPRsu+efbO+P3fLDbMMK5+lkfvkJ1xncGvBr0=;
-        b=AivknfLsO0hCCPPDsGkezVd/53chBqyt/2m+W0Zu1IzTWCwEgzLmqiH46zDo3CaS6n
-         +vJwVZpeL6tg7eodNpxuHxJo1wthfiQxdIrEbsXHCWik2NAC2KilSAgEWCvnepGI6VR2
-         RehLL8u2uZ7TmIqMNVWvX3S/+NYVYf8P6mw0lWIETbcBCbacoEGcKRHjcLHKFt4cO16Z
-         7nrnE6N+mCtCVl6dWUw7QNXpfnKNYqicFc/CluBWLscbJKYNIZnnZEGNStAg4dgtvDaW
-         vVQ9KM7u4tXlhZiLCuntTMrNs8zacPKpaXlypMh7IVll0c9pmXK+PhrGG2uU5t5+cBgc
-         5Nyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uFmtLVGPRsu+efbO+P3fLDbMMK5+lkfvkJ1xncGvBr0=;
-        b=JVYKZVMY7Hxl2kPmWduJqoukXYrsGngRlvlenqXjEox1uImBEt4ZI4DI9qtHiQNTHQ
-         dpsL99kYEagvUzFF6zNXIVwG9mEA+PUpWPdL2DYJfOmHDWd/l7ELbDGjV3jL4O98ZsH1
-         wWPsT1oq2eRUNj3BJpNSuUJ7AdPjNuNdzhpEW7KjgMa5rlqH46KlGvdNxmWEv0oGjqJa
-         H6tB9PYK5w7lcSGrTcgc0YdyV8h4SBQR/Z1Mbq1sEEfVVuwErIohd9Bvhp8/c1lN+nol
-         S3bnJLm+mKi5o07L747wGhWbLUfosEt+1FrnwhdPc+/hkV1HXq3tKtFo5C4WAhQiwtGg
-         Bt0g==
-X-Gm-Message-State: AOAM533bBEjdgmx/U7wm8WeR2+hhf02acrSlpAhkM7Vlrfe3lv3074bM
-        FY/RMgRMItTL5Jk2zMk5Z+9gyw==
-X-Google-Smtp-Source: ABdhPJx7nxrAcdnXE3p2lQH5pMA0Nuzh2z+IMHmA4tpsNMqK60zvOC9pRVOU16ea/vpcu+wpHDfggQ==
-X-Received: by 2002:a62:7bd2:0:b029:1e5:3aed:34c with SMTP id w201-20020a627bd20000b02901e53aed034cmr5967082pfc.71.1613009233955;
-        Wed, 10 Feb 2021 18:07:13 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:11fc:33d:bf1:4cb8])
-        by smtp.gmail.com with ESMTPSA id j22sm3565885pff.57.2021.02.10.18.07.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Feb 2021 18:07:13 -0800 (PST)
-Date:   Wed, 10 Feb 2021 18:07:06 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Makarand Sonare <makarandsonare@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, pshier@google.com, jmattson@google.com,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging
- gets enabled/disabled
-Message-ID: <YCSRSiSNErkC6+9R@google.com>
-References: <20210210212308.2219465-1-makarandsonare@google.com>
+        id S229544AbhBKH0p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 02:26:45 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41973 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229480AbhBKH0n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 02:26:43 -0500
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 4Dbp881PbXz9sB4; Thu, 11 Feb 2021 18:25:59 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1613028360; bh=qu6nEoHZwmR4++I5Abr6z1RTfdyjVVJh3qE95Ap47aM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=trt6YQD90kPke0B9zfpErNFjIIXhro2YWGjuYHgUXMof6m/hWBMC3zh98FS0podHT
+         h+EvZUd7g/lAsuOPSQzsDRLybQlrDga8eDhLp6EvSfbkmV57Sb47HlSNJivs+ac+A3
+         YeW1gqdSZExk/AgyVhmLMoHNKcBiVzolsqXkCgPT/gysf4srXOkfwNzIVBhCeQeB8J
+         ZGNFr5etZCGkt4pmkh79262BL+yGYT7+mHDFdimbZPMRchy4EICHSlcL1luumOL3Qt
+         rpOXwOo//Kohs1GaMcxebOqg61O9R9anjGg9myHkkWlqBBUxSNhSF/lk5uUds4vcRA
+         x40/8rH6Kbv9A==
+Date:   Thu, 11 Feb 2021 18:25:53 +1100
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.12-1 tag
+Message-ID: <20210211072553.GA2877131@thinks.paulus.ozlabs.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210210212308.2219465-1-makarandsonare@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 10, 2021, Makarand Sonare wrote:
-> Currently, if enable_pml=1 PML remains enabled for the entire lifetime
-> of the VM irrespective of whether dirty logging is enable or disabled.
-> When dirty logging is disabled, all the pages of the VM are manually
-> marked dirty, so that PML is effectively non-operational. Clearing
-> the dirty bits is an expensive operation which can cause severe MMU
-> lock contention in a performance sensitive path when dirty logging
-> is disabled after a failed or canceled live migration. Also, this
-> would break if some other code path clears the dirty bits in which
-> case, PML will actually start logging dirty pages even when dirty
-> logging is disabled incurring unnecessary vmexits when the PML buffer
-> becomes full. In order to avoid this extra overhead, we should
-> enable or disable PML in VMCS when dirty logging gets enabled
-> or disabled instead of keeping it always enabled.
+Paolo,
 
-Breaking this up into a few paragraphs would be helpful.
+Please do a pull from my kvm-ppc-next-5.12-1 tag to get a PPC KVM
+update for 5.12.  This one is quite small, with just one new feature,
+support for the second data watchpoint in POWER10.
 
-> Tested:
-> 	kvm-unit-tests
-> 	dirty_log_test
-> 	dirty_log_perf_test
+Thanks,
+Paul.
 
-Eh, I get that we like these for internal tracking, but for upstream there's an
-assumption that you did your due diligence.  If there's something noteworthy
-about your testing (or lack thereof), throw it in the cover letter or in the
-part that's not recorded in the final commit.
+The following changes since commit 9294b8a12585f8b4ccb9c060b54bab0bd13f24b9:
 
-> Signed-off-by: Makarand Sonare <makarandsonare@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> ---
+  Documentation: kvm: fix warning (2021-02-09 08:42:10 -0500)
 
-...
+are available in the git repository at:
 
-> @@ -7517,9 +7531,39 @@ static void vmx_slot_enable_log_dirty(struct kvm *kvm,
->  static void vmx_slot_disable_log_dirty(struct kvm *kvm,
->  				       struct kvm_memory_slot *slot)
->  {
-> +	/*
-> +	 * Check all slots and disable PML if dirty logging
-> +	 * is being disabled for the last slot
-> +	 *
-> +	 */
-> +	if (enable_pml &&
-> +	    kvm->dirty_logging_enable_count == 0 &&
-> +	    kvm->arch.pml_enabled) {
-> +		kvm->arch.pml_enabled = false;
-> +		kvm_make_all_cpus_request(kvm,
-> +			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
-> +	}
-> +
->  	kvm_mmu_slot_set_dirty(kvm, slot);
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.12-1
 
-The justification for dynamically toggling PML is that it means KVM can skip
-setting all the dirty bits when logging is disabled, but that code is still here.
-Is there a follow-up planned to reap the reward?
+for you to fetch changes up to 72476aaa469179222b92c380de60c76b4cb9a318:
 
->  }
+  KVM: PPC: Book3S HV: Fix host radix SLB optimisation with hash guests (2021-02-11 17:28:15 +1100)
+
+----------------------------------------------------------------
+PPC KVM update for 5.12
+
+- Support for second data watchpoint on POWER10, from Ravi Bangoria
+- Remove some complex workarounds for buggy early versions of POWER9
+- Guest entry/exit fixes from Nick Piggin and Fabiano Rosas
+
+----------------------------------------------------------------
+Fabiano Rosas (2):
+      KVM: PPC: Book3S HV: Save and restore FSCR in the P9 path
+      KVM: PPC: Don't always report hash MMU capability for P9 < DD2.2
+
+Nicholas Piggin (5):
+      KVM: PPC: Book3S HV: Remove support for running HPT guest on RPT host without mixed mode support
+      KVM: PPC: Book3S HV: Fix radix guest SLB side channel
+      KVM: PPC: Book3S HV: No need to clear radix host SLB before loading HPT guest
+      KVM: PPC: Book3S HV: Use POWER9 SLBIA IH=6 variant to clear SLB
+      KVM: PPC: Book3S HV: Fix host radix SLB optimisation with hash guests
+
+Paul Mackerras (1):
+      KVM: PPC: Book3S HV: Ensure radix guest has no SLB entries
+
+Ravi Bangoria (4):
+      KVM: PPC: Book3S HV: Allow nested guest creation when L0 hv_guest_state > L1
+      KVM: PPC: Book3S HV: Rename current DAWR macros and variables
+      KVM: PPC: Book3S HV: Add infrastructure to support 2nd DAWR
+      KVM: PPC: Book3S HV: Introduce new capability for 2nd DAWR
+
+Yang Li (1):
+      KVM: PPC: remove unneeded semicolon
+
+ Documentation/virt/kvm/api.rst            |  12 ++
+ arch/powerpc/include/asm/hvcall.h         |  25 ++++-
+ arch/powerpc/include/asm/kvm_book3s_asm.h |  11 --
+ arch/powerpc/include/asm/kvm_host.h       |   7 +-
+ arch/powerpc/include/asm/kvm_ppc.h        |   2 +
+ arch/powerpc/include/uapi/asm/kvm.h       |   2 +
+ arch/powerpc/kernel/asm-offsets.c         |   9 +-
+ arch/powerpc/kvm/book3s_hv.c              | 149 +++++++++++++++----------
+ arch/powerpc/kvm/book3s_hv_builtin.c      | 108 +-----------------
+ arch/powerpc/kvm/book3s_hv_nested.c       |  70 +++++++++---
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S   | 175 ++++++++++++++++--------------
+ arch/powerpc/kvm/booke.c                  |   2 +-
+ arch/powerpc/kvm/powerpc.c                |  14 ++-
+ include/uapi/linux/kvm.h                  |   1 +
+ tools/arch/powerpc/include/uapi/asm/kvm.h |   2 +
+ tools/include/uapi/linux/kvm.h            |   1 +
+ 16 files changed, 309 insertions(+), 281 deletions(-)
