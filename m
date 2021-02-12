@@ -2,218 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE1EA31A08E
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 15:22:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A7631A0BF
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 15:39:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230515AbhBLOVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 09:21:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62888 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231805AbhBLOVC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 09:21:02 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11CE3dxG063449;
-        Fri, 12 Feb 2021 09:20:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3tJyymR8z0aK6+sxHOtajKmGo1iKOgNjWeD+qGjR+Ew=;
- b=C7yNy2AAm6gOHvNwr97CPLslmxhs6jQj8La/o2pPVSpNR4EGCwlQpVDQ27T4qkVBOQce
- Me9yGceXnHPgaWRKMJ+RxFxRRm8tAU8e/yWlWqX2i4N6Ph7qW0dY1eeAG/e8+XN1SofU
- tDgLTCiGncEsr9xEeph5lu91B8EHkkWRSrHPUI5jPsQZWg/XcdkEJSL9nLauDOsh38gn
- fwX4mKnVSSZ5MrcBWMzcQZ3ntlZOLnEVR6HpqVYYh6hWYPe494OAOfhWrjkZkgBVmX9p
- eF7rjVQj8CiOvEIwG4odSLX0z5NMTVZLr7FfQifGwRK2bMJxwaIilOVWOofkJojYIY6x hA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36nu3x8p2k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 09:20:20 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11CE3uAM068239;
-        Fri, 12 Feb 2021 09:20:20 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36nu3x8p1s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 09:20:19 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11CEHVgR010880;
-        Fri, 12 Feb 2021 14:20:17 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 36j94wp10h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 14:20:17 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11CEKExN33227064
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Feb 2021 14:20:15 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 78C4342045;
-        Fri, 12 Feb 2021 14:20:13 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30AB242056;
-        Fri, 12 Feb 2021 14:20:13 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.28.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 12 Feb 2021 14:20:13 +0000 (GMT)
-Subject: Re: [PATCH v2 1/1] s390:kvm: diag9c forwarding
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com
-References: <1613119176-20864-1-git-send-email-pmorel@linux.ibm.com>
- <1613119176-20864-2-git-send-email-pmorel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <daea45df-8a44-f2c3-1892-58ff4f85f5be@linux.ibm.com>
-Date:   Fri, 12 Feb 2021 15:20:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230385AbhBLOiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 09:38:09 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46892 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229815AbhBLOh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 09:37:56 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0E7CB64DD9;
+        Fri, 12 Feb 2021 14:37:15 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lAZZJ-00DqME-4c; Fri, 12 Feb 2021 14:37:13 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Scull <ascull@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+Subject: [GIT PULL] KVM/arm64 updates for 5.12
+Date:   Fri, 12 Feb 2021 14:36:57 +0000
+Message-Id: <20210212143657.3312035-1-maz@kernel.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <1613119176-20864-2-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-12_04:2021-02-12,2021-02-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 malwarescore=0
- suspectscore=0 bulkscore=0 mlxlogscore=999 mlxscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102120110
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, ascull@google.com, ardb@kernel.org, dbrazdil@google.com, eric.auger@redhat.com, qperret@google.com, will@kernel.org, wangyanan55@huawei.com, james.morse@arm.com, julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Paolo,
 
+Here's the initial set of KVM/arm64 updates for 5.11.
 
-On 2/12/21 9:39 AM, Pierre Morel wrote:
-> When we receive intercept a DIAG_9C from the guest we verify
-> that the target real CPU associated with the virtual CPU
-> designated by the guest is running and if not we forward the
-> DIAG_9C to the target real CPU.
-> 
-> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
-> 
-> The rate is calculated as a count per second defined as a
-> new parameter of the s390 kvm module: diag9c_forwarding_hz .
-> 
-> The default value is to not forward diag9c.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   Documentation/virt/kvm/s390-diag.rst | 33 ++++++++++++++++++++++++++++
->   arch/s390/include/asm/kvm_host.h     |  1 +
->   arch/s390/include/asm/smp.h          |  1 +
->   arch/s390/kernel/smp.c               |  1 +
->   arch/s390/kvm/diag.c                 | 31 +++++++++++++++++++++++---
->   arch/s390/kvm/kvm-s390.c             |  6 +++++
->   arch/s390/kvm/kvm-s390.h             |  8 +++++++
->   7 files changed, 78 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/s390-diag.rst b/Documentation/virt/kvm/s390-diag.rst
-> index eaac4864d3d6..a6371bc4ea90 100644
-> --- a/Documentation/virt/kvm/s390-diag.rst
-> +++ b/Documentation/virt/kvm/s390-diag.rst
-> @@ -84,3 +84,36 @@ If the function code specifies 0x501, breakpoint functions may be performed.
->   This function code is handled by userspace.
->   
->   This diagnose function code has no subfunctions and uses no parameters.
-> +
-> +
-> +DIAGNOSE function code 'X'9C - Voluntary Time Slice Yield
-> +---------------------------------------------------------
-> +
-> +General register 1 contains the target CPU address.
-> +
-> +In a guest of a hypervisor like LPAR, KVM or z/VM using shared host CPUs,
-> +DIAGNOSE with function code 'X'9C may improve system performance by
-> +yielding the host CPU on which the guest CPU is running to be assigned
-> +to another guest CPU, preferably the logical CPU containing the specified
-> +target CPU.
-> +
-> +
-> +DIAG 'X'9C forwarding
-> ++++++++++++++++++++++
-> +
-> +Under KVM, the guest operating system may send a DIAGNOSE code 'X'9C to
-> +the host when it fails to acquire a spinlock for a virtual CPU
-> +and detects that the host CPU on which the virtual guest CPU owner is
-> +assigned to is not running to try to get this host CPU running and
-> +consequently the guest virtual CPU running and freeing the lock.
-> +
-> +However, on the logical partition the real CPU on which the previously
-> +targeted host CPU is assign may itself not be running.
-> +By forwarding the DIAGNOSE code 'X'9C, initially sent by the guest,
-> +from the host to LPAR hypervisor, this one will hopefully schedule
-> +the host CPU which will let KVM run the target guest CPU.
-> +
-> +diag9c_forwarding_hz
-> +    KVM kernel parameter allowing to specify the maximum number of DIAGNOSE
-> +    'X'9C forwarding per second in the purpose of avoiding a DIAGNOSE 'X'9C
-> +    forwarding storm.
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 527776a1f076..cb19508c22fb 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -456,6 +456,7 @@ struct kvm_vcpu_stat {
->   	u64 diagnose_44;
->   	u64 diagnose_9c;
->   	u64 diagnose_9c_ignored;
-> +	u64 diagnose_9c_forward;
->   	u64 diagnose_258;
->   	u64 diagnose_308;
->   	u64 diagnose_500;
-> diff --git a/arch/s390/include/asm/smp.h b/arch/s390/include/asm/smp.h
-> index 01e360004481..e317fd4866c1 100644
-> --- a/arch/s390/include/asm/smp.h
-> +++ b/arch/s390/include/asm/smp.h
-> @@ -63,5 +63,6 @@ extern void __noreturn cpu_die(void);
->   extern void __cpu_die(unsigned int cpu);
->   extern int __cpu_disable(void);
->   extern void schedule_mcck_handler(void);
-> +void notrace smp_yield_cpu(int cpu);
->   
->   #endif /* __ASM_SMP_H */
-> diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
-> index 27c763014114..15e207a671fd 100644
-> --- a/arch/s390/kernel/smp.c
-> +++ b/arch/s390/kernel/smp.c
-> @@ -422,6 +422,7 @@ void notrace smp_yield_cpu(int cpu)
->   	asm volatile("diag %0,0,0x9c"
->   		     : : "d" (pcpu_devices[cpu].address));
->   }
-> +EXPORT_SYMBOL(smp_yield_cpu);
->   
->   /*
->    * Send cpus emergency shutdown signal. This gives the cpus the
-> diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-> index 5b8ec1c447e1..34cf41fa6fa2 100644
-> --- a/arch/s390/kvm/diag.c
-> +++ b/arch/s390/kvm/diag.c
-> @@ -150,6 +150,19 @@ static int __diag_time_slice_end(struct kvm_vcpu *vcpu)
->   	return 0;
->   }
->   
-> +static unsigned int forward_cnt;
-> +static unsigned long cur_slice;
-> +
-> +static int diag9c_forwarding_overrun(void)
-> +{
-> +	/* Reset the count on a new slice */
-> +	if (time_after(jiffies, cur_slice)) {
-> +		cur_slice = jiffies;
-> +		forward_cnt = diag9c_forwarding_hz / HZ;
-> +	}
-> +	return forward_cnt-- ? 1 : 0;
+The most notable change this time is David's work to finally build the
+nVHE EL2 object as a relocatable object. This makes the code a lot
+cleaner, more reliable (we don't have to assume things about code
+generation), and allows... function pointers, with any ugly hack!
+Progress, at last, and a huge thank you to David!
 
-/o\
+We also gained support for the new TRNG standard hypercall, and a nice
+optimisation for concurrent translation faults targeting the same
+page. The rest is a small batch of fixes and other cleanups.
 
-seems a "<= 0 " has been forgotten here
+Note that there is another bunch of changes indirectly affecting
+KVM/arm64 that are routed via the arm64 tree, as we turn upside down
+the way we boot Linux on a VHE system. It's all good fun.
 
-I send the update asap.
+This pull request also comes with strings attached:
+- the kvmarm-fixes-5.11-2 tag in order to avoid ugly conflicts, which
+  explains a sense of déjà-vu in the short-log below
+- the arm64/for-next/misc branch because of dependencies
 
-regards,
-Pierre
+Please pull,
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+	M.
+
+The following changes since commit 19c329f6808995b142b3966301f217c831e7cf31:
+
+  Linux 5.11-rc4 (2021-01-17 16:37:05 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.12
+
+for you to fetch changes up to c93199e93e1232b7220482dffa05b7a32a195fe8:
+
+  Merge branch 'kvm-arm64/pmu-debug-fixes-5.11' into kvmarm-master/next (2021-02-12 14:08:41 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 5.12
+
+- Make the nVHE EL2 object relocatable, resulting in much more
+  maintainable code
+- Handle concurrent translation faults hitting the same page
+  in a more elegant way
+- Support for the standard TRNG hypervisor call
+- A bunch of small PMU/Debug fixes
+- Allow the disabling of symbol export from assembly code
+- Simplification of the early init hypercall handling
+
+----------------------------------------------------------------
+Alexandru Elisei (2):
+      KVM: arm64: Use the reg_to_encoding() macro instead of sys_reg()
+      KVM: arm64: Correct spelling of DBGDIDR register
+
+Andrew Scull (1):
+      KVM: arm64: Simplify __kvm_hyp_init HVC detection
+
+Ard Biesheuvel (2):
+      firmware: smccc: Add SMCCC TRNG function call IDs
+      KVM: arm64: Implement the TRNG hypervisor call
+
+David Brazdil (9):
+      KVM: arm64: Allow PSCI SYSTEM_OFF/RESET to return
+      KVM: arm64: Rename .idmap.text in hyp linker script
+      KVM: arm64: Set up .hyp.rodata ELF section
+      KVM: arm64: Add symbol at the beginning of each hyp section
+      KVM: arm64: Generate hyp relocation data
+      KVM: arm64: Apply hyp relocations at runtime
+      KVM: arm64: Fix constant-pool users in hyp
+      KVM: arm64: Remove patching of fn pointers in hyp
+      KVM: arm64: Remove hyp_symbol_addr
+
+Marc Zyngier (20):
+      KVM: arm64: Hide PMU registers from userspace when not available
+      KVM: arm64: Simplify handling of absent PMU system registers
+      arm64: Drop workaround for broken 'S' constraint with GCC 4.9
+      KVM: arm64: Filter out v8.1+ events on v8.0 HW
+      KVM: Forbid the use of tagged userspace addresses for memslots
+      Merge branch 'arm64/for-next/misc' into kvm-arm64/hyp-reloc
+      KVM: arm64: Make gen-hyprel endianness agnostic
+      KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
+      KVM: arm64: Fix AArch32 PMUv3 capping
+      KVM: arm64: Add handling of AArch32 PCMEID{2,3} PMUv3 registers
+      KVM: arm64: Refactor filtering of ID registers
+      KVM: arm64: Limit the debug architecture to ARMv8.0
+      KVM: arm64: Upgrade PMU support to ARMv8.4
+      KVM: arm64: Use symbolic names for the PMU versions
+      Merge tag 'kvmarm-fixes-5.11-2' into kvmarm-master/next
+      Merge branch 'kvm-arm64/misc-5.12' into kvmarm-master/next
+      Merge branch 'kvm-arm64/concurrent-translation-fault' into kvmarm-master/next
+      Merge branch 'kvm-arm64/hyp-reloc' into kvmarm-master/next
+      Merge branch 'kvm-arm64/rng-5.12' into kvmarm-master/next
+      Merge branch 'kvm-arm64/pmu-debug-fixes-5.11' into kvmarm-master/next
+
+Quentin Perret (2):
+      asm-generic: export: Stub EXPORT_SYMBOL with __DISABLE_EXPORTS
+      KVM: arm64: Stub EXPORT_SYMBOL for nVHE EL2 code
+
+Steven Price (1):
+      KVM: arm64: Compute TPIDR_EL2 ignoring MTE tag
+
+Yanan Wang (3):
+      KVM: arm64: Adjust partial code of hyp stage-1 map and guest stage-2 map
+      KVM: arm64: Filter out the case of only changing permissions from stage-2 map path
+      KVM: arm64: Mark the page dirty only if the fault is handled successfully
+
+ Documentation/virt/kvm/api.rst           |   3 +
+ arch/arm64/include/asm/hyp_image.h       |  29 +-
+ arch/arm64/include/asm/kvm_asm.h         |  26 --
+ arch/arm64/include/asm/kvm_host.h        |   2 +
+ arch/arm64/include/asm/kvm_mmu.h         |  61 ++---
+ arch/arm64/include/asm/kvm_pgtable.h     |   5 +
+ arch/arm64/include/asm/sections.h        |   3 +-
+ arch/arm64/include/asm/sysreg.h          |   3 +
+ arch/arm64/kernel/image-vars.h           |   1 -
+ arch/arm64/kernel/smp.c                  |   4 +-
+ arch/arm64/kernel/vmlinux.lds.S          |  18 +-
+ arch/arm64/kvm/Makefile                  |   2 +-
+ arch/arm64/kvm/arm.c                     |  10 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h  |   4 +-
+ arch/arm64/kvm/hyp/nvhe/.gitignore       |   2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile         |  33 ++-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c     | 438 +++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/host.S           |  29 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S       |  19 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c       |  11 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c        |   4 +-
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S        |   9 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c     |  37 ++-
+ arch/arm64/kvm/hyp/pgtable.c             |  83 +++---
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   2 +-
+ arch/arm64/kvm/hypercalls.c              |   6 +
+ arch/arm64/kvm/mmu.c                     |  13 +-
+ arch/arm64/kvm/pmu-emul.c                |  24 +-
+ arch/arm64/kvm/sys_regs.c                | 178 ++++++++-----
+ arch/arm64/kvm/trng.c                    |  85 ++++++
+ arch/arm64/kvm/va_layout.c               |  34 ++-
+ include/asm-generic/export.h             |   2 +-
+ include/linux/arm-smccc.h                |  31 +++
+ virt/kvm/kvm_main.c                      |   1 +
+ 34 files changed, 934 insertions(+), 278 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+ create mode 100644 arch/arm64/kvm/trng.c
