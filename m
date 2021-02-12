@@ -2,168 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CAFF31A525
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 20:15:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A32F431A526
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 20:15:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231743AbhBLTPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 14:15:32 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:10314 "EHLO
-        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbhBLTP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 14:15:29 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B6026d3a80001>; Fri, 12 Feb 2021 11:14:48 -0800
-Received: from HKMAIL103.nvidia.com (10.18.16.12) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 12 Feb
- 2021 19:14:48 +0000
-Received: from HKMAIL102.nvidia.com (10.18.16.11) by HKMAIL103.nvidia.com
- (10.18.16.12) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 12 Feb
- 2021 19:14:45 +0000
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- HKMAIL102.nvidia.com (10.18.16.11) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Fri, 12 Feb 2021 19:14:45 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TD9n8hbFgxLDhuAk9j+mUBRdukizZcRdjNEQW2Yz6D1bkuQBEiLpCbrBIZrD5Ok0eqadMCVR89mFHy9psuw11nLt4kmIdRfKJxloF2LeF6oQlItO19xYqZC33KGzOj/Y9dmy8lklOlGYbfYf7lk8i2Lw/qfhkYL3M+cG6yHf5N9G5Dot5b6NHjUdRBC7XLHkqL6EObjenRX7gkYX5E1RcniKYxKi56i2m5ctbqzCXEQ9sEZsrfRPDjYmyh8tA1N5XwsS8stA4coKNkUcO51aaXdVWzUaGQPy1cTYkfjEHQHNF9ujlEBspSsI7lG9r8nTOsrLTjKFDXzznXU/SspH8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QY7pI6janZHs9kpAEAxoz63NCTTjPdCoT320HyCxjgQ=;
- b=Q+W9u9zopRC9rgPE/lopx3Tb1FN0mi4ZfOOMxt5E7lD4LSR2IIb5KW/39CYhEG+dL31y6NsSJUn/46PGu89Kb/VZDa5fOr2Z4chM0yy9CWDR0moDuHCkw6Q8AA61X4WviV1NhX9RMj73bovlaRvVtColrlj5rUAIECCsrh+q0r3wnZqCxiM516UQwbV86yQyEjBpayj/DlW3nTEVJ2OdmZGV8OxSGsa5LMkpZClmZ+cj+g3C2ln2+eVSBRuOgSUEQZiYDu2Ct8qww1HncCwnso9MGEtn2Mpi+SwDaiv9GjUlIB2g2NuogmRIrM+do9tnM8rfrq1Kw2SZ3t299pGS+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB2487.namprd12.prod.outlook.com (2603:10b6:4:af::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.29; Fri, 12 Feb
- 2021 19:14:43 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.030; Fri, 12 Feb 2021
- 19:14:43 +0000
-Date:   Fri, 12 Feb 2021 15:14:41 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Dave Jiang <dave.jiang@intel.com>
-CC:     <alex.williamson@redhat.com>, <kwankhede@nvidia.com>,
-        <tglx@linutronix.de>, <vkoul@kernel.org>, <megha.dey@intel.com>,
-        <jacob.jun.pan@intel.com>, <ashok.raj@intel.com>,
-        <yi.l.liu@intel.com>, <baolu.lu@intel.com>, <kevin.tian@intel.com>,
-        <sanjay.k.kumar@intel.com>, <tony.luck@intel.com>,
-        <dan.j.williams@intel.com>, <eric.auger@redhat.com>,
-        <parav@mellanox.com>, <netanelg@mellanox.com>,
-        <shahafs@mellanox.com>, <pbonzini@redhat.com>,
-        <dmaengine@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH v5 04/14] vfio/mdev: idxd: Add auxialary device plumbing
- for idxd mdev support
-Message-ID: <20210212191441.GU4247@nvidia.com>
-References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
- <161255839829.339900.16438737078488315104.stgit@djiang5-desk3.ch.intel.com>
- <20210210234639.GI4247@nvidia.com>
- <92c0e4b2-c85c-bda6-811b-8547b027d1ee@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <92c0e4b2-c85c-bda6-811b-8547b027d1ee@intel.com>
-X-ClientProxiedBy: BL0PR02CA0078.namprd02.prod.outlook.com
- (2603:10b6:208:51::19) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S232010AbhBLTPf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 14:15:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42668 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231364AbhBLTPa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 14:15:30 -0500
+Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928A9C061756
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 11:14:50 -0800 (PST)
+Received: by mail-ot1-x32f.google.com with SMTP id d7so190098otq.6
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 11:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+         :cc;
+        bh=A9RqSgP87Al5N7r4wNTwTSkDFbyphCfYLvrQ6aInDRk=;
+        b=L5U7YEPjxH6G8nAqeSl22q3t4kc9cMj0V5ZcpRLpNt5ygWxXRI3ai4ukdwx5B0hA3S
+         5J5XVbQ0n5NG7fB8nIyycGr06gFKU3fGG0uvgArJkJMzCp9NnzHKQO73EhdFfMPHHR38
+         Dqwltz9ZPxWhnrZj0rpgy5AmfI3g+dzzSKQ7N5LyQyvvon1nXvvlfsTxPqiR4H+7GKJe
+         Uk2+w4Os4zl5CYMNXrKVoMCot74tyVzIehuVYoV3tccirX1laSx0PujItNqePBR1q5gv
+         7iXUTNg4hHReoYaFffIcA+HJmy0YT14hlR8ENfDblDYyY618KrdIDI5xW02qFMGOGXJ2
+         Vg1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+         :message-id:subject:to:cc;
+        bh=A9RqSgP87Al5N7r4wNTwTSkDFbyphCfYLvrQ6aInDRk=;
+        b=kQYCNqfVw3n9yHUJAC13tw9dN/bR0T0sYd/YYmagJPhpZ+aXREnhu6fozs0T3GCg9t
+         m0zvlWvf9JMXUzhUWaIvz9si2VGFqWwoKjF5FccKp3pfmjopqQ8B44+OGb8zb86UzfDI
+         VvYfi2mWStmsh/KN6jwbKyL1cwjPoR6nTRtU+Ii7OtMadPoHAOsxu1G5Y2NrnP+HjH59
+         u8eAsOWammr6/vwzEgexYxhwa++wjwts168Vef5oJqAblLecHUEcY/GPepkm5CAIHMcy
+         RHK/nSTVodqdOpzd+QkCl+VkCWWf8ap/Ilwod2RDazskQUxuQ7C7qKg4q3Ou/pwfYkC4
+         g5vQ==
+X-Gm-Message-State: AOAM531b4MbekFQoN0Vsyxf3+auyraDr7OoIGtmCw7U9j9dkPfguYRik
+        1Z2mDCa70Wgpq2d68h7ABuNKiDANIuzcWbquMQK3AQ==
+X-Google-Smtp-Source: ABdhPJyHUGrt4BzpIZGhfLTe31ciY2M3YXayULhRfj7BpsXoqqToMvRW7l98cOZfMUXRnLHhg9avxhJg+YTBLPKjel4=
+X-Received: by 2002:a05:6830:56e:: with SMTP id f14mr3037587otc.85.1613157289747;
+ Fri, 12 Feb 2021 11:14:49 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL0PR02CA0078.namprd02.prod.outlook.com (2603:10b6:208:51::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.25 via Frontend Transport; Fri, 12 Feb 2021 19:14:42 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lAdtp-007WJF-EI; Fri, 12 Feb 2021 15:14:41 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1613157288; bh=W59+Xy4Yajr8FztdOXMZS49J9m3JsW1Cs+qg2tGacM4=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:Content-Transfer-Encoding:In-Reply-To:
-         X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=OFeSMy4U66tZFo8aUNhDVxQli3GolKZWkGDB/OI4MiTH0t9c5H2KD9F5V4wftjcPu
-         mv4gxBU0Ea3PUxURpV5SCgF4/QmGaSG17yfsooODItw8ujyDXO69O7XDmamQjNVVCj
-         m/Bp+E7XI+CUhpEXbWcYeIKe8ksRELXcj4NbwXYIF3zHK9jcpUdkQhygn+d4KM7+A/
-         /lg0r++ABH6tu0ew9GJ4eexygwR14RFYtzIW49l3sbGHF4BVz1kBm3HzwdquYXrAQ7
-         0DUY5WMopWRdpj5Sc4AIV5mLLiygfENI57IlrFqTMSPdEuFS9YqW21VPAzBGrhcZ0m
-         giVoIPGF8nF8w==
+Received: by 2002:a05:6838:9251:0:0:0:0 with HTTP; Fri, 12 Feb 2021 11:14:49
+ -0800 (PST)
+In-Reply-To: <YCbE+hJC8xeWnKRg@google.com>
+References: <20210210212308.2219465-1-makarandsonare@google.com> <YCbE+hJC8xeWnKRg@google.com>
+From:   Makarand Sonare <makarandsonare@google.com>
+Date:   Fri, 12 Feb 2021 11:14:49 -0800
+Message-ID: <CA+qz5sqFYrFj=0+kq9m4huwkpC6V8MV_vy5c05VNqMgCPw+fDg@mail.gmail.com>
+Subject: Re: [RESEND PATCH ] KVM: VMX: Enable/disable PML when dirty logging
+ gets enabled/disabled
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, pshier@google.com, jmattson@google.com,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 12, 2021 at 11:56:24AM -0700, Dave Jiang wrote:
+>> Currently, if enable_pml=1 PML remains enabled for the entire lifetime
+>> of the VM irrespective of whether dirty logging is enable or disabled.
+>> When dirty logging is disabled, all the pages of the VM are manually
+>> marked dirty, so that PML is effectively non-operational. Clearing
+>
+> s/clearing/setting
+>
+> Clearing is also expensive, but that can't be optimized away with this
+> change.
 
-> > > @@ -434,11 +502,19 @@ static int idxd_probe(struct idxd_device *idxd)
-> > >   		goto err_idr_fail;
-> > >   	}
-> > > +	rc =3D idxd_setup_mdev_auxdev(idxd);
-> > > +	if (rc < 0)
-> > > +		goto err_auxdev_fail;
-> > > +
-> > >   	idxd->major =3D idxd_cdev_get_major(idxd);
-> > >   	dev_dbg(dev, "IDXD device %d probed successfully\n", idxd->id);
-> > >   	return 0;
-> > > + err_auxdev_fail:
-> > > +	mutex_lock(&idxd_idr_lock);
-> > > +	idr_remove(&idxd_idrs[idxd->type], idxd->id);
-> > > +	mutex_unlock(&idxd_idr_lock);
-> > Probably wrong to order things like this..
->=20
-> How should it be ordered?
+Thanks for catching the typo, it should be setting.
 
-The IDR is global data so some other thread could have read the IDR
-and got this pointer, but now it is being torn down in some racy
-way. It is best to make the store to global access be the very last
-thing so you never have to try to unstore from global memory and don't
-have to think about concurrency.
+>
+>> the dirty bits is an expensive operation which can cause severe MMU
+>> lock contention in a performance sensitive path when dirty logging
+>> is disabled after a failed or canceled live migration. Also, this
+>> would break if some other code path clears the dirty bits in which
+>> case, PML will actually start logging dirty pages even when dirty
+>> logging is disabled incurring unnecessary vmexits when the PML buffer
+>> becomes full. In order to avoid this extra overhead, we should
+>> enable or disable PML in VMCS when dirty logging gets enabled
+>> or disabled instead of keeping it always enabled.
+>
+>
+> ...
+>
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 777177ea9a35e..eb6639f0ee7eb 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -4276,7 +4276,7 @@ static void
+>> vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>>  	*/
+>>  	exec_control &= ~SECONDARY_EXEC_SHADOW_VMCS;
+>>
+>> -	if (!enable_pml)
+>> +	if (!enable_pml || !vcpu->kvm->arch.pml_enabled)
+>>  		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+>
+> The checks are unnecessary if PML is dynamically toggled, i.e. this snippet
+> can
+> unconditionally clear PML.  When setting SECONDARY_EXEC (below snippet),
+> PML
+> will be preserved in the current controls, which is what we want.
 
-> > Also somehow this has a
-> >=20
-> > 	idxd =3D devm_kzalloc(dev, sizeof(struct idxd_device), GFP_KERNEL);
-> >=20
-> > but the idxd has a kref'd struct device in it:
->=20
-> So the conf_dev is a struct device that let the driver do configuration o=
-f
-> the device and other components through sysfs. It's a child device to the
-> pdev. It should have no relation to the auxdev. The confdevs for each
-> component should not be released until the physical device is released. F=
-or
-> the mdev case, the auxdev shouldn't be released until the removal of the
-> pdev as well since it is a child of the pdev also.
->=20
-> pdev --- device conf_dev --- wq conf_dev
->=20
-> =C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |--- engine conf_=
-dev
->=20
-> =C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |--- group conf_d=
-ev
->=20
-> =C2=A0=C2=A0=C2=A0 |--- aux_dev
->=20
-> >=20
-> > struct idxd_device {
-> > 	enum idxd_type type;
-> > 	struct device conf_dev;
-> >=20
-> > So that's not right either
-> >=20
-> > You'll need to fix the lifetime model for idxd_device before you get
-> > to adding auxdevices
->=20
-> Can you kindly expand on how it's suppose to look like please?
+Assuming a new VCPU can be added at a later time after PML is already
+enabled, should we clear
+PML in VMCS for the new VCPU. If yes what will be the trigger for
+setting PML for the new VCPU?
 
-Well, you can't call kfree on memory that contains a struct device,
-you have to use put_device() - so the devm_kzalloc is unconditionally
-wrong. Maybe you could replace it with a devm put device action, but
-it would probably be alot saner to just put the required put_device's
-where they need to be in the first place.
+>
+>>  	if (cpu_has_vmx_xsaves()) {
+>> @@ -7133,7 +7133,8 @@ static void vmcs_set_secondary_exec_control(struct
+>> vcpu_vmx *vmx)
+>>  		SECONDARY_EXEC_SHADOW_VMCS |
+>>  		SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
+>>  		SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
+>> -		SECONDARY_EXEC_DESC;
+>> +		SECONDARY_EXEC_DESC |
+>> +		SECONDARY_EXEC_ENABLE_PML;
+>>
+>>  	u32 new_ctl = vmx->secondary_exec_control;
+>>  	u32 cur_ctl = secondary_exec_controls_get(vmx);
+>> @@ -7509,6 +7510,19 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int
+>> cpu)
+>>  static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+>>  				     struct kvm_memory_slot *slot)
+>>  {
+>> +	/*
+>> +	 * Check all slots and enable PML if dirty logging
+>> +	 * is being enabled for the 1st slot
+>> +	 *
+>> +	 */
+>> +	if (enable_pml &&
+>> +	    kvm->dirty_logging_enable_count == 1 &&
+>> +	    !kvm->arch.pml_enabled) {
+>> +		kvm->arch.pml_enabled = true;
+>> +		kvm_make_all_cpus_request(kvm,
+>> +			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
+>> +	}
+>
+> This is flawed.  .slot_enable_log_dirty() and .slot_disable_log_dirty() are
+> only
+> called when LOG_DIRTY_PAGE is toggled in an existing memslot _and_ only the
+> flags of the memslot are being changed.  This fails to enable PML if the
+> first
+> memslot with LOG_DIRTY_PAGE is created or moved, and fails to disable PML if
+> the
+> last memslot with LOG_DIRTY_PAGE is deleted.
 
-I didn't try to work out what this was all for, but once it is sorted
-out you can just embed the aux device here and chain its release to
-put_device on the conf_dev and all the lifetime will work out
-naturally.=20
+Thanks for pointing out. If there is such a scenario, what do you
+suggest to handle this?
 
-Jason
+>
+>> +
+>>  	if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+>>  		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+>>  	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
+>> @@ -7517,9 +7531,39 @@ static void vmx_slot_enable_log_dirty(struct kvm
+>> *kvm,
+>>  static void vmx_slot_disable_log_dirty(struct kvm *kvm,
+>>  				       struct kvm_memory_slot *slot)
+>>  {
+>> +	/*
+>> +	 * Check all slots and disable PML if dirty logging
+>> +	 * is being disabled for the last slot
+>> +	 *
+>> +	 */
+>> +	if (enable_pml &&
+>> +	    kvm->dirty_logging_enable_count == 0 &&
+>> +	    kvm->arch.pml_enabled) {
+>> +		kvm->arch.pml_enabled = false;
+>> +		kvm_make_all_cpus_request(kvm,
+>> +			KVM_REQ_UPDATE_VCPU_DIRTY_LOGGING_STATE);
+>> +	}
+>> +
+>>  	kvm_mmu_slot_set_dirty(kvm, slot);
+>>  }
+>
+> ...
+>
+>>  #define kvm_err(fmt, ...) \
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index ee4ac2618ec59..c6e5b026bbfe8 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -307,6 +307,7 @@ bool kvm_make_all_cpus_request(struct kvm *kvm,
+>> unsigned int req)
+>>  {
+>>  	return kvm_make_all_cpus_request_except(kvm, req, NULL);
+>>  }
+>> +EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+>>
+>>  #ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+>>  void kvm_flush_remote_tlbs(struct kvm *kvm)
+>> @@ -1366,15 +1367,24 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>>  	}
+>>
+>>  	/* Allocate/free page dirty bitmap as needed */
+>> -	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
+>> +	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+>>  		new.dirty_bitmap = NULL;
+>> -	else if (!new.dirty_bitmap && !kvm->dirty_ring_size) {
+>> +
+>> +		if (old.flags & KVM_MEM_LOG_DIRTY_PAGES) {
+>> +			WARN_ON(kvm->dirty_logging_enable_count == 0);
+>> +			--kvm->dirty_logging_enable_count;
+>
+> The count will be corrupted if kvm_set_memslot() fails.
+>
+> The easiest/cleanest way to fix both this and the refcounting bug is to
+> handle
+> the count in kvm_mmu_slot_apply_flags().  That will also allow making the
+> dirty
+> log count x86-only, and it can then be renamed to cpu_dirty_log_count to
+> align
+> with the
+>
+> We can always move/rename the count variable if additional motivation for
+> tracking dirty logging comes along.
+
+Thanks for pointing out. Will this solution take care of the scenario
+where a memslot is created/deleted with LOG_DIRTY_PAGE?
+
+>
+>
+>> +		}
+>> +
+>> +	} else if (!new.dirty_bitmap && !kvm->dirty_ring_size) {
+>>  		r = kvm_alloc_dirty_bitmap(&new);
+>>  		if (r)
+>>  			return r;
+>>
+>>  		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+>>  			bitmap_set(new.dirty_bitmap, 0, new.npages);
+>> +
+>> +		++kvm->dirty_logging_enable_count;
+>> +		WARN_ON(kvm->dirty_logging_enable_count == 0);
+>>  	}
+>>
+>>  	r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
+>> --
+>> 2.30.0.478.g8a0d178c01-goog
+>
