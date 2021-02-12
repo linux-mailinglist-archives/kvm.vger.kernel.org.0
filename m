@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5556D319D5C
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:29:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8529319DB9
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:59:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbhBLL2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 06:28:30 -0500
-Received: from foss.arm.com ([217.140.110.172]:35540 "EHLO foss.arm.com"
+        id S231217AbhBLL6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 06:58:00 -0500
+Received: from foss.arm.com ([217.140.110.172]:35832 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229608AbhBLL23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 06:28:29 -0500
+        id S231177AbhBLL47 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 06:56:59 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B9D4113E;
-        Fri, 12 Feb 2021 03:27:43 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6401B113E;
+        Fri, 12 Feb 2021 03:56:07 -0800 (PST)
 Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EC353F719;
-        Fri, 12 Feb 2021 03:27:42 -0800 (PST)
-Subject: Re: [PATCH kvmtool 09/21] x86/ioport: Switch to new trap handlers
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A3203F719;
+        Fri, 12 Feb 2021 03:56:06 -0800 (PST)
+Subject: Re: [PATCH kvmtool 10/21] hw/rtc: Refactor trap handlers
 To:     Andre Przywara <andre.przywara@arm.com>,
         Will Deacon <will@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-10-andre.przywara@arm.com>
+ <20201210142908.169597-11-andre.przywara@arm.com>
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <b5eb332b-392e-3b4f-8797-9b7a1e4b5e56@arm.com>
-Date:   Fri, 12 Feb 2021 11:27:59 +0000
+Message-ID: <cc9f2ae6-5a4d-c4d8-59d5-40d9cb770831@arm.com>
+Date:   Fri, 12 Feb 2021 11:56:19 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-10-andre.przywara@arm.com>
+In-Reply-To: <20201210142908.169597-11-andre.przywara@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -42,236 +42,147 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Andre,
 
 On 12/10/20 2:28 PM, Andre Przywara wrote:
-> Now that the x86 I/O ports have trap handlers adhering to the MMIO fault
-> handler prototype, let's switch over to the joint registration routine.
+> With the planned retirement of the special ioport emulation code, we
+> need to provide emulation functions compatible with the MMIO prototype.
 >
-> This allows us to get rid of the ioport shim routines.
+> Merge the two different trap handlers into one function, checking for
+> read/write and data/index register inside.
+> Adjust the trap handlers to use that new function, and provide shims to
+> implement the old ioport interface, for now.
 >
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  x86/ioport.c | 113 ++++++++++++++-------------------------------------
->  1 file changed, 30 insertions(+), 83 deletions(-)
+>  hw/rtc.c | 70 ++++++++++++++++++++++++++++----------------------------
+>  1 file changed, 35 insertions(+), 35 deletions(-)
 >
-> diff --git a/x86/ioport.c b/x86/ioport.c
-> index 932da20a..87955da1 100644
-> --- a/x86/ioport.c
-> +++ b/x86/ioport.c
-> @@ -8,16 +8,6 @@ static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  {
+> diff --git a/hw/rtc.c b/hw/rtc.c
+> index 5483879f..664d4cb0 100644
+> --- a/hw/rtc.c
+> +++ b/hw/rtc.c
+> @@ -42,11 +42,37 @@ static inline unsigned char bin2bcd(unsigned val)
+>  	return ((val / 10) << 4) + val % 10;
 >  }
 >  
-> -static bool debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	dummy_mmio(vcpu, port, data, size, true, NULL);
-> -	return 0;
-> -}
-
-0 is false in boolean logic, which means that emulation fails according to the
-(old) ioport emulation code (ioport.c::kvm__emulate_io()).
-
-So I guess I have a few questions:
-
-- Is this a bug in the emulation code, where the author thought that
-debug_io_out() returns an int, and in that case 0 actually means success?
-
-- If writing to the debug port is rightfully considered an error, do we care
-enough about it to print something to stdout like kvm__emulate_io() does when
-debug_io_out() returns false?
-
-Thanks,
-
-Alex
-
-> -
-> -static struct ioport_operations debug_ops = {
-> -	.io_out		= debug_io_out,
-> -};
-> -
->  static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  			       u32 len, u8 is_write, void *ptr)
+> -static bool cmos_ram_data_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> +			u32 len, u8 is_write, void *ptr)
 >  {
-> @@ -31,37 +21,6 @@ static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
->  	putchar(ch);
->  }
+>  	struct tm *tm;
+>  	time_t ti;
 >  
-> -static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	seabios_debug_mmio(vcpu, port, data, size, true, NULL);
-> -	return 0;
-> -}
+> +	if (is_write) {
+> +		if (addr == 0x70) {	/* index register */
+> +			u8 value = ioport__read8(data);
+> +
+> +			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
+> +			rtc.cmos_idx		= value & ~(1UL << 7);
+> +
+> +			return;
+> +		}
+> +
+> +		switch (rtc.cmos_idx) {
+> +		case RTC_REG_C:
+> +		case RTC_REG_D:
+> +			/* Read-only */
+> +			break;
+> +		default:
+> +			rtc.cmos_data[rtc.cmos_idx] = ioport__read8(data);
+> +			break;
+> +		}
+> +		return;
+> +	}
+> +
+> +	if (addr == 0x70)
+> +		return;
+> +
+>  	time(&ti);
+>  
+>  	tm = gmtime(&ti);
+> @@ -92,42 +118,23 @@ static bool cmos_ram_data_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 po
+>  		ioport__write8(data, rtc.cmos_data[rtc.cmos_idx]);
+>  		break;
+>  	}
 > -
-> -static struct ioport_operations seabios_debug_ops = {
-> -	.io_out		= seabios_debug_io_out,
-> -};
-> -
-> -static bool dummy_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	dummy_mmio(vcpu, port, data, size, false, NULL);
 > -	return true;
-> -}
-> -
-> -static bool dummy_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	dummy_mmio(vcpu, port, data, size, true, NULL);
-> -	return true;
-> -}
-> -
-> -static struct ioport_operations dummy_read_write_ioport_ops = {
-> -	.io_in		= dummy_io_in,
-> -	.io_out		= dummy_io_out,
-> -};
-> -
-> -static struct ioport_operations dummy_write_only_ioport_ops = {
-> -	.io_out		= dummy_io_out,
-> -};
-> -
->  /*
->   * The "fast A20 gate"
->   */
-> @@ -76,17 +35,6 @@ static void ps2_control_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->  		ioport__write8(data, 0x02);
 >  }
 >  
-> -static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> -{
-> -	ps2_control_mmio(vcpu, port, data, size, false, NULL);
-> -	return true;
-> -}
+> -static bool cmos_ram_data_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static bool cmos_ram_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>  {
+> -	switch (rtc.cmos_idx) {
+> -	case RTC_REG_C:
+> -	case RTC_REG_D:
+> -		/* Read-only */
+> -		break;
+> -	default:
+> -		rtc.cmos_data[rtc.cmos_idx] = ioport__read8(data);
+> -		break;
+> -	}
 > -
-> -static struct ioport_operations ps2_control_a_ops = {
-> -	.io_in		= ps2_control_a_io_in,
-> -	.io_out		= dummy_io_out,
+> +	cmos_ram_io(vcpu, port, data, size, false, NULL);
+>  	return true;
+>  }
+>  
+> -static struct ioport_operations cmos_ram_data_ioport_ops = {
+> -	.io_out		= cmos_ram_data_out,
+> -	.io_in		= cmos_ram_data_in,
 > -};
 > -
->  void ioport__map_irq(u8 *irq)
+> -static bool cmos_ram_index_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static bool cmos_ram_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
 >  {
->  }
-> @@ -98,75 +46,75 @@ static int ioport__setup_arch(struct kvm *kvm)
->  	/* Legacy ioport setup */
->  
->  	/* 0000 - 001F - DMA1 controller */
-> -	r = ioport__register(kvm, 0x0000, &dummy_read_write_ioport_ops, 32, NULL);
-> +	r = kvm__register_pio(kvm, 0x0000, 32, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x0020 - 0x003F - 8259A PIC 1 */
-> -	r = ioport__register(kvm, 0x0020, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x0020, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0040-005F - PIT - PROGRAMMABLE INTERVAL TIMER (8253, 8254) */
-> -	r = ioport__register(kvm, 0x0040, &dummy_read_write_ioport_ops, 4, NULL);
-> +	r = kvm__register_pio(kvm, 0x0040, 4, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0092 - PS/2 system control port A */
-> -	r = ioport__register(kvm, 0x0092, &ps2_control_a_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x0092, 1, ps2_control_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x00A0 - 0x00AF - 8259A PIC 2 */
-> -	r = ioport__register(kvm, 0x00A0, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x00A0, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 00C0 - 001F - DMA2 controller */
-> -	r = ioport__register(kvm, 0x00C0, &dummy_read_write_ioport_ops, 32, NULL);
-> +	r = kvm__register_pio(kvm, 0x00c0, 32, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 00E0-00EF are 'motherboard specific' so we use them for our
->  	   internal debugging purposes.  */
-> -	r = ioport__register(kvm, IOPORT_DBG, &debug_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, IOPORT_DBG, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 00ED - DUMMY PORT FOR DELAY??? */
-> -	r = ioport__register(kvm, 0x00ED, &dummy_write_only_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x00ed, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0x00F0 - 0x00FF - Math co-processor */
-> -	r = ioport__register(kvm, 0x00F0, &dummy_write_only_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x00f0, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0278-027A - PARALLEL PRINTER PORT (usually LPT1, sometimes LPT2) */
-> -	r = ioport__register(kvm, 0x0278, &dummy_read_write_ioport_ops, 3, NULL);
-> +	r = kvm__register_pio(kvm, 0x0278, 3, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 0378-037A - PARALLEL PRINTER PORT (usually LPT2, sometimes LPT3) */
-> -	r = ioport__register(kvm, 0x0378, &dummy_read_write_ioport_ops, 3, NULL);
-> +	r = kvm__register_pio(kvm, 0x0378, 3, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* PORT 03D4-03D5 - COLOR VIDEO - CRT CONTROL REGISTERS */
-> -	r = ioport__register(kvm, 0x03D4, &dummy_read_write_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x03d4, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
-> -	r = ioport__register(kvm, 0x03D5, &dummy_write_only_ioport_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x03d5, 1, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
-> -	r = ioport__register(kvm, 0x402, &seabios_debug_ops, 1, NULL);
-> +	r = kvm__register_pio(kvm, 0x0402, 1, seabios_debug_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
->  	/* 0510 - QEMU BIOS configuration register */
-> -	r = ioport__register(kvm, 0x510, &dummy_read_write_ioport_ops, 2, NULL);
-> +	r = kvm__register_pio(kvm, 0x0510, 2, dummy_mmio, NULL);
->  	if (r < 0)
->  		return r;
->  
-> @@ -176,22 +124,21 @@ dev_base_init(ioport__setup_arch);
->  
->  static int ioport__remove_arch(struct kvm *kvm)
->  {
-> -	ioport__unregister(kvm, 0x510);
-> -	ioport__unregister(kvm, 0x402);
-> -	ioport__unregister(kvm, 0x03D5);
-> -	ioport__unregister(kvm, 0x03D4);
-> -	ioport__unregister(kvm, 0x0378);
-> -	ioport__unregister(kvm, 0x0278);
-> -	ioport__unregister(kvm, 0x00F0);
-> -	ioport__unregister(kvm, 0x00ED);
-> -	ioport__unregister(kvm, IOPORT_DBG);
-> -	ioport__unregister(kvm, 0x00C0);
-> -	ioport__unregister(kvm, 0x00A0);
-> -	ioport__unregister(kvm, 0x0092);
-> -	ioport__unregister(kvm, 0x0040);
-> -	ioport__unregister(kvm, 0x0020);
-> -	ioport__unregister(kvm, 0x0000);
+> -	u8 value = ioport__read8(data);
 > -
-> +	kvm__deregister_pio(kvm, 0x510);
-> +	kvm__deregister_pio(kvm, 0x402);
-> +	kvm__deregister_pio(kvm, 0x3d5);
-> +	kvm__deregister_pio(kvm, 0x3d4);
-> +	kvm__deregister_pio(kvm, 0x378);
-> +	kvm__deregister_pio(kvm, 0x278);
-> +	kvm__deregister_pio(kvm, 0x0f0);
-> +	kvm__deregister_pio(kvm, 0x0ed);
-> +	kvm__deregister_pio(kvm, IOPORT_DBG);
-> +	kvm__deregister_pio(kvm, 0x0c0);
-> +	kvm__deregister_pio(kvm, 0x0a0);
-> +	kvm__deregister_pio(kvm, 0x092);
-> +	kvm__deregister_pio(kvm, 0x040);
-> +	kvm__deregister_pio(kvm, 0x020);
-> +	kvm__deregister_pio(kvm, 0x000);
+> -	vcpu->kvm->nmi_disabled	= value & (1UL << 7);
+> -	rtc.cmos_idx		= value & ~(1UL << 7);
+> -
+> +	cmos_ram_io(vcpu, port, data, size, true, NULL);
+>  	return true;
+>  }
+>  
+> -static struct ioport_operations cmos_ram_index_ioport_ops = {
+> -	.io_out		= cmos_ram_index_out,
+> +static struct ioport_operations cmos_ram_ioport_ops = {
+> +	.io_out		= cmos_ram_out,
+> +	.io_in		= cmos_ram_in,
+>  };
+>  
+>  #ifdef CONFIG_HAS_LIBFDT
+> @@ -162,21 +169,15 @@ int rtc__init(struct kvm *kvm)
+>  		return r;
+>  
+>  	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> -	r = ioport__register(kvm, 0x0070, &cmos_ram_index_ioport_ops, 1, NULL);
+> +	r = ioport__register(kvm, 0x0070, &cmos_ram_ioport_ops, 2, NULL);
+>  	if (r < 0)
+>  		goto out_device;
+>  
+> -	r = ioport__register(kvm, 0x0071, &cmos_ram_data_ioport_ops, 1, NULL);
+> -	if (r < 0)
+> -		goto out_ioport;
+> -
+>  	/* Set the VRT bit in Register D to indicate valid RAM and time */
+>  	rtc.cmos_data[RTC_REG_D] = RTC_REG_D_VRT;
+>  
+>  	return r;
+>  
+> -out_ioport:
+> -	ioport__unregister(kvm, 0x0070);
+>  out_device:
+>  	device__unregister(&rtc_dev_hdr);
+>  
+> @@ -188,7 +189,6 @@ int rtc__exit(struct kvm *kvm)
+>  {
+>  	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+>  	ioport__unregister(kvm, 0x0070);
+> -	ioport__unregister(kvm, 0x0071);
+>  
 >  	return 0;
 >  }
->  dev_base_exit(ioport__remove_arch);
+
+The behaviour is preserved with this patch, and it compiles, so:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
