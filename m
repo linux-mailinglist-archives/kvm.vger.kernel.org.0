@@ -2,269 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7794319B61
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 09:44:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35131319B8D
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 09:58:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbhBLIk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 03:40:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61158 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230209AbhBLIk1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 03:40:27 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11C8Xxie145185;
-        Fri, 12 Feb 2021 03:39:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references; s=pp1;
- bh=eEyyw/JG8dndF7Hy8KSpk/rjQK2Wmj2BTdpkw6D7exM=;
- b=iD2kheKr9WbZKRVRfCEj5xziF+HDckvk8nD+A8jkblKMPMxjzawMEPMxFkOiBCHzMrCJ
- g2TKeeX6RS/ULz1KdOH9n5MnmfrpM8fUZII/MeFMXE0aGQVUfu5Gy8SYX6oJsclHEYyD
- NI0NdVFb6l7P1jNbDcBY8EcNkXJQIItkzX4ChO+iDg1wSGhPHV2O6JXv1OdCZZWQAVzc
- lcqcgB/xbGHMK1750tLk/uzqgNMgI1oW2Z3DOepdTeFSgoWYTlxe4mZ5x2izUoO1e8sK
- DdNCPCBgcQkpSCRU3nbbmTc7Xu2rUAGnn3qpc8sB7to6a9EvGbaW/GDZ9+NwYUJH+DhU bw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36nnyfgk6n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 03:39:44 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11C8YJ65147319;
-        Fri, 12 Feb 2021 03:39:44 -0500
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36nnyfgk5t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 03:39:44 -0500
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11C8bDsS018646;
-        Fri, 12 Feb 2021 08:39:41 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 36hjch3cp6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 12 Feb 2021 08:39:41 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11C8dSEu32964874
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Feb 2021 08:39:28 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C62CA42041;
-        Fri, 12 Feb 2021 08:39:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57B6842042;
-        Fri, 12 Feb 2021 08:39:38 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.28.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 12 Feb 2021 08:39:38 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, pmorel@linux.ibm.com
-Subject: [PATCH v2 1/1] s390:kvm: diag9c forwarding
-Date:   Fri, 12 Feb 2021 09:39:36 +0100
-Message-Id: <1613119176-20864-2-git-send-email-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1613119176-20864-1-git-send-email-pmorel@linux.ibm.com>
-References: <1613119176-20864-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-12_02:2021-02-12,2021-02-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- spamscore=0 mlxscore=0 mlxlogscore=999 bulkscore=0 adultscore=0
- malwarescore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0
- phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102120060
+        id S229948AbhBLI4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 03:56:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56532 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229497AbhBLI4t (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 03:56:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613120122;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nma5RrDL02zgQCnQAmwMQggmlffp24gdJp2OtX7ZPuI=;
+        b=GrhwezraI6jnv9CqC41BRlV+ikJ2kjxywJ0d1ottoP3WOPhMT58IiMWFsPgBvmjDCGXm2D
+        1L40DaJWJiw1M0qsNl7InN87vWMiDOiGb9MDWFRVzvZ5OirAT5MBy3wgv/UCQF6GrWAnX1
+        dlLKILG0b9a7CJGfEjmM91aLfuu9cIc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-1LGCv3TxNmmITacLXAFtsw-1; Fri, 12 Feb 2021 03:55:20 -0500
+X-MC-Unique: 1LGCv3TxNmmITacLXAFtsw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 176EB6D4E0;
+        Fri, 12 Feb 2021 08:55:18 +0000 (UTC)
+Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B842F62AF8;
+        Fri, 12 Feb 2021 08:55:10 +0000 (UTC)
+Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
+To:     Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
+        alex.williamson@redhat.com
+Cc:     jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
+        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
+        zhangfei.gao@linaro.org
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-3-eric.auger@redhat.com>
+ <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
+Date:   Fri, 12 Feb 2021 09:55:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
+MIME-Version: 1.0
+In-Reply-To: <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When we receive intercept a DIAG_9C from the guest we verify
-that the target real CPU associated with the virtual CPU
-designated by the guest is running and if not we forward the
-DIAG_9C to the target real CPU.
+Hi Keqian,
 
-To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
+On 2/1/21 12:52 PM, Keqian Zhu wrote:
+> Hi Eric,
+> 
+> On 2020/11/18 19:21, Eric Auger wrote:
+>> On ARM, MSI are translated by the SMMU. An IOVA is allocated
+>> for each MSI doorbell. If both the host and the guest are exposed
+>> with SMMUs, we end up with 2 different IOVAs allocated by each.
+>> guest allocates an IOVA (gIOVA) to map onto the guest MSI
+>> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
+>> onto the physical doorbell (hDB).
+>>
+>> So we end up with 2 untied mappings:
+>>          S1            S2
+>> gIOVA    ->    gDB
+>>               hIOVA    ->    hDB
+>>
+>> Currently the PCI device is programmed by the host with hIOVA
+>> as MSI doorbell. So this does not work.
+>>
+>> This patch introduces an API to pass gIOVA/gDB to the host so
+>> that gIOVA can be reused by the host instead of re-allocating
+>> a new IOVA. So the goal is to create the following nested mapping:
+> Does the gDB can be reused under non-nested mode?
 
-The rate is calculated as a count per second defined as a
-new parameter of the s390 kvm module: diag9c_forwarding_hz .
+Under non nested mode the hIOVA is allocated within the MSI reserved
+region exposed by the SMMU driver, [0x8000000, 80fffff]. see
+iommu_dma_prepare_msi/iommu_dma_get_msi_page in dma_iommu.c. this hIOVA
+is programmed in the physical device so that the physical SMMU
+translates it into the physical doorbell (hDB = host physical ITS
+doorbell). The gDB is not used at pIOMMU programming level. It is only
+used when setting up the KVM irq route.
 
-The default value is to not forward diag9c.
+Hope this answers your question.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- Documentation/virt/kvm/s390-diag.rst | 33 ++++++++++++++++++++++++++++
- arch/s390/include/asm/kvm_host.h     |  1 +
- arch/s390/include/asm/smp.h          |  1 +
- arch/s390/kernel/smp.c               |  1 +
- arch/s390/kvm/diag.c                 | 31 +++++++++++++++++++++++---
- arch/s390/kvm/kvm-s390.c             |  6 +++++
- arch/s390/kvm/kvm-s390.h             |  8 +++++++
- 7 files changed, 78 insertions(+), 3 deletions(-)
+> 
+>>
+>>          S1            S2
+>> gIOVA    ->    gDB     ->    hDB
+>>
+>> and program the PCI device with gIOVA MSI doorbell.
+>>
+>> In case we have several devices attached to this nested domain
+>> (devices belonging to the same group), they cannot be isolated
+>> on guest side either. So they should also end up in the same domain
+>> on guest side. We will enforce that all the devices attached to
+>> the host iommu domain use the same physical doorbell and similarly
+>> a single virtual doorbell mapping gets registered (1 single
+>> virtual doorbell is used on guest as well).
+>>
+> [...]
+> 
+>> + *
+>> + * The associated IOVA can be reused by the host to create a nested
+>> + * stage2 binding mapping translating into the physical doorbell used
+>> + * by the devices attached to the domain.
+>> + *
+>> + * All devices within the domain must share the same physical doorbell.
+>> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
+>> + */
+>> +
+>> +int iommu_bind_guest_msi(struct iommu_domain *domain,
+>> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
+>> +{
+>> +	if (unlikely(!domain->ops->bind_guest_msi))
+>> +		return -ENODEV;
+>> +
+>> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
+>> +
+>> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
+>> +			    dma_addr_t iova)
+> nit: s/iova/giova
+sure
+> 
+>> +{
+>> +	if (unlikely(!domain->ops->unbind_guest_msi))
+>> +		return;
+>> +
+>> +	domain->ops->unbind_guest_msi(domain, iova);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
+>> +
+> [...]
+> 
+> Thanks,
+> Keqian
+> 
 
-diff --git a/Documentation/virt/kvm/s390-diag.rst b/Documentation/virt/kvm/s390-diag.rst
-index eaac4864d3d6..a6371bc4ea90 100644
---- a/Documentation/virt/kvm/s390-diag.rst
-+++ b/Documentation/virt/kvm/s390-diag.rst
-@@ -84,3 +84,36 @@ If the function code specifies 0x501, breakpoint functions may be performed.
- This function code is handled by userspace.
- 
- This diagnose function code has no subfunctions and uses no parameters.
-+
-+
-+DIAGNOSE function code 'X'9C - Voluntary Time Slice Yield
-+---------------------------------------------------------
-+
-+General register 1 contains the target CPU address.
-+
-+In a guest of a hypervisor like LPAR, KVM or z/VM using shared host CPUs,
-+DIAGNOSE with function code 'X'9C may improve system performance by
-+yielding the host CPU on which the guest CPU is running to be assigned
-+to another guest CPU, preferably the logical CPU containing the specified
-+target CPU.
-+
-+
-+DIAG 'X'9C forwarding
-++++++++++++++++++++++
-+
-+Under KVM, the guest operating system may send a DIAGNOSE code 'X'9C to
-+the host when it fails to acquire a spinlock for a virtual CPU
-+and detects that the host CPU on which the virtual guest CPU owner is
-+assigned to is not running to try to get this host CPU running and
-+consequently the guest virtual CPU running and freeing the lock.
-+
-+However, on the logical partition the real CPU on which the previously
-+targeted host CPU is assign may itself not be running.
-+By forwarding the DIAGNOSE code 'X'9C, initially sent by the guest,
-+from the host to LPAR hypervisor, this one will hopefully schedule
-+the host CPU which will let KVM run the target guest CPU.
-+
-+diag9c_forwarding_hz
-+    KVM kernel parameter allowing to specify the maximum number of DIAGNOSE
-+    'X'9C forwarding per second in the purpose of avoiding a DIAGNOSE 'X'9C
-+    forwarding storm.
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 527776a1f076..cb19508c22fb 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -456,6 +456,7 @@ struct kvm_vcpu_stat {
- 	u64 diagnose_44;
- 	u64 diagnose_9c;
- 	u64 diagnose_9c_ignored;
-+	u64 diagnose_9c_forward;
- 	u64 diagnose_258;
- 	u64 diagnose_308;
- 	u64 diagnose_500;
-diff --git a/arch/s390/include/asm/smp.h b/arch/s390/include/asm/smp.h
-index 01e360004481..e317fd4866c1 100644
---- a/arch/s390/include/asm/smp.h
-+++ b/arch/s390/include/asm/smp.h
-@@ -63,5 +63,6 @@ extern void __noreturn cpu_die(void);
- extern void __cpu_die(unsigned int cpu);
- extern int __cpu_disable(void);
- extern void schedule_mcck_handler(void);
-+void notrace smp_yield_cpu(int cpu);
- 
- #endif /* __ASM_SMP_H */
-diff --git a/arch/s390/kernel/smp.c b/arch/s390/kernel/smp.c
-index 27c763014114..15e207a671fd 100644
---- a/arch/s390/kernel/smp.c
-+++ b/arch/s390/kernel/smp.c
-@@ -422,6 +422,7 @@ void notrace smp_yield_cpu(int cpu)
- 	asm volatile("diag %0,0,0x9c"
- 		     : : "d" (pcpu_devices[cpu].address));
- }
-+EXPORT_SYMBOL(smp_yield_cpu);
- 
- /*
-  * Send cpus emergency shutdown signal. This gives the cpus the
-diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-index 5b8ec1c447e1..34cf41fa6fa2 100644
---- a/arch/s390/kvm/diag.c
-+++ b/arch/s390/kvm/diag.c
-@@ -150,6 +150,19 @@ static int __diag_time_slice_end(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static unsigned int forward_cnt;
-+static unsigned long cur_slice;
-+
-+static int diag9c_forwarding_overrun(void)
-+{
-+	/* Reset the count on a new slice */
-+	if (time_after(jiffies, cur_slice)) {
-+		cur_slice = jiffies;
-+		forward_cnt = diag9c_forwarding_hz / HZ;
-+	}
-+	return forward_cnt-- ? 1 : 0;
-+}
-+
- static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu *tcpu;
-@@ -167,9 +180,21 @@ static int __diag_time_slice_end_directed(struct kvm_vcpu *vcpu)
- 	if (!tcpu)
- 		goto no_yield;
- 
--	/* target already running */
--	if (READ_ONCE(tcpu->cpu) >= 0)
--		goto no_yield;
-+	/* target guest VCPU already running */
-+	if (READ_ONCE(tcpu->cpu) >= 0) {
-+		if (!diag9c_forwarding_hz || diag9c_forwarding_overrun())
-+			goto no_yield;
-+
-+		/* target host CPU already running */
-+		if (!vcpu_is_preempted(tcpu->cpu))
-+			goto no_yield;
-+		smp_yield_cpu(tcpu->cpu);
-+		VCPU_EVENT(vcpu, 5,
-+			   "diag time slice end directed to %d: yield forwarded",
-+			   tid);
-+		vcpu->stat.diagnose_9c_forward++;
-+		return 0;
-+	}
- 
- 	if (kvm_vcpu_yield_to(tcpu) <= 0)
- 		goto no_yield;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 053ef36784e4..c23e22610a89 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -157,6 +157,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	VCPU_STAT("instruction_diag_44", diagnose_44),
- 	VCPU_STAT("instruction_diag_9c", diagnose_9c),
- 	VCPU_STAT("diag_9c_ignored", diagnose_9c_ignored),
-+	VCPU_STAT("diag_9c_forward", diagnose_9c_forward),
- 	VCPU_STAT("instruction_diag_258", diagnose_258),
- 	VCPU_STAT("instruction_diag_308", diagnose_308),
- 	VCPU_STAT("instruction_diag_500", diagnose_500),
-@@ -190,6 +191,11 @@ static bool use_gisa  = true;
- module_param(use_gisa, bool, 0644);
- MODULE_PARM_DESC(use_gisa, "Use the GISA if the host supports it.");
- 
-+/* maximum diag9c forwarding per second */
-+unsigned int diag9c_forwarding_hz;
-+module_param(diag9c_forwarding_hz, uint, 0644);
-+MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second");
-+
- /*
-  * For now we handle at most 16 double words as this is what the s390 base
-  * kernel handles and stores in the prefix page. If we ever need to go beyond
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 79dcd647b378..9fad25109b0d 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -471,4 +471,12 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
-  * @kvm: the KVM guest
-  */
- void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
-+
-+/**
-+ * diag9c_forwarding_hz
-+ *
-+ * Set the maximum number of diag9c forwarding per second
-+ */
-+extern unsigned int diag9c_forwarding_hz;
-+
- #endif
--- 
-2.17.1
+Thanks
+
+Eric
 
