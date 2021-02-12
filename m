@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B363197DC
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 02:13:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51EFF3197DD
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 02:13:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbhBLBIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Feb 2021 20:08:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35720 "EHLO
+        id S230369AbhBLBIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Feb 2021 20:08:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230180AbhBLBHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Feb 2021 20:07:09 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCCDC0617A7
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 17:06:13 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id g17so5365814ybh.4
-        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 17:06:13 -0800 (PST)
+        with ESMTP id S230185AbhBLBHM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Feb 2021 20:07:12 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73505C0617AB
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 17:06:15 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id o16so6059011qkj.15
+        for <kvm@vger.kernel.org>; Thu, 11 Feb 2021 17:06:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=Fhv1Q9NSxxwZmv6ZVWXSl3ZrCdVknKiV94qk2PWj5KY=;
-        b=M6sNjp71JNXOPH26XcRa1YdrRCuZtL4Py6H/Hy2tsrpRa6Zhg12Hr8v7orLO2dXdjh
-         A+KWhDigFcqg5KAxt2kGBBOqPgYElc0VsDwlZA2Pu6bkeJqiNP+cUu3ccFBa3Ije+s7t
-         /jBtoGykJDuAQW+gcKxrwtnONoU/iok5WjANsDmK0mVOR3QwWPLdOI/9/6lIYrWX/kbj
-         qKc3QHkhd8jippcsGugpP7eh6otMsYLmveRp715jRaN2Q9Er58/hQZKh9Hb69nKpBwpG
-         bRWNJfX7J7x6SC41n4v/QE6e9r+toCi11KhZ7zao+fndrhyuGgQoIlfL3htU2i46BJjW
-         EZ9g==
+        bh=cEJRTvR1R8mp+nZlLc5IDPe77GXhuZ/MSPi9P8LN9jY=;
+        b=abpETcZ2hb0WlkAri6vgnfiqY8Xku/wFJFhluLYbZ5edXXT/xQWniUgmbpkcw5Be65
+         mCx67We2tMxTzLSJFw5T89OinhT6RO78GC9hEz6ox1szAjwhJoj6rnMs9Y485+Ap81L3
+         zfN6pQKB/Aq9RGIip0JmRwBEK7SbLPTcj+iCO0EaWfGP83z3gjaZ64l/36fTpDbOfOWR
+         rHE61zRhTB2vaT/cigBMjacAIoSv3ZRy57Ic5OZrydBtV+ehWYEjXeknwfczZtrzIgwd
+         JgywwHG/kWqn0LR7+wTyNEedMbg5Ntp69ply0kGkUOHgUGV8cKm2aaMYd7tsrBHWd1dB
+         3/uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=Fhv1Q9NSxxwZmv6ZVWXSl3ZrCdVknKiV94qk2PWj5KY=;
-        b=TB5aMpmkTVfybXWlrLouwQtCTZEvr3oecc+PdyVbA0siXX7cDAB2cQ3CGDy3qM6PXd
-         AqUsqbWCxkA8xakuvVaBiCDeMS9yB2v3B1at6sevht0OJOzxELaRcJbKsCWUb/7VBqjN
-         DHRPdVG7di7VUQUu21Q1hTdxVnxLdIva6UuFh9HVtqdqAtFGrlNiN4xW/3pejxsTY0oL
-         5MVHbdGUQaL7JZ1RQwhk1S+Jft2OWGyDG3XMdP8w0jI2cLvJ3sRkN0vvgu6EnQwuPqdJ
-         jz+FivtYRjF+BOauYP82xdyEmSEgd1YajyTn9ikpfQ+X8Un5u8Ehnvtekcb6V9n4JtRx
-         qEkw==
-X-Gm-Message-State: AOAM530QjVdTHehVlCVpoxgNF8PgwOwtKRbvlwe6qp2aHoGswEj0p+1s
-        V3c/GxF6CpGbHBpb8MPigWs/OTdXTU0=
-X-Google-Smtp-Source: ABdhPJxYLiR7Gj05G/CPO+CWigXBb8GTWY0DxsO//rw0ZXfWZiF/u6c32DhhVqZtgdkTylmeNAnIJoMIuj0=
+        bh=cEJRTvR1R8mp+nZlLc5IDPe77GXhuZ/MSPi9P8LN9jY=;
+        b=DnFdt99l0FuIe4DP3TnIiHNfL2hcBHe+ium0Xmw2GBPAk+1jQR5LkgcNdc2qaDr45H
+         msZE+bhzPreswjCX+zDtQJqVgHB//j6FILcLyyPD//zQspspqE0qBrULW3cQbinTVu6H
+         hQnKLd7Z/2ApQBUb4yL+W+vDhCmTjE/b3MvNhzGjr/3G8aTFh9X1WV/RGU2yq9Np3dNs
+         7wrQLrq3n0Ujmi5VkYtbFU3hkui/HVUi8aBPixpeEUsev/MbKQqHWY1/5BAJqgmKG9W0
+         z6IJigSoBpRhQ9DSj/+8KbQgw0+Enyg5nB+is3owkBVuvvB4JZm917dUfpHTHQW4KgOg
+         VTBw==
+X-Gm-Message-State: AOAM530p1Y+dO2JOUQJkphCZemYqusAjABhuppIJsDlHn6YufoxpkiN9
+        RfjrW2+UAyp3qbiyWTHtlgn5g3BmNOA=
+X-Google-Smtp-Source: ABdhPJz950wjkbLvEqaZkr7CuN6+xpFhkxiDLKvuDnPUCBT0ebF3wWGIz/wZ4KGMAdUw2ufbF++QSOXAT5Q=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:f588:a708:f347:3ebb])
- (user=seanjc job=sendgmr) by 2002:a25:908f:: with SMTP id t15mr782326ybl.47.1613091972358;
- Thu, 11 Feb 2021 17:06:12 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a0c:b611:: with SMTP id f17mr546095qve.42.1613091974598;
+ Thu, 11 Feb 2021 17:06:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 11 Feb 2021 17:06:03 -0800
+Date:   Thu, 11 Feb 2021 17:06:04 -0800
 In-Reply-To: <20210212010606.1118184-1-seanjc@google.com>
-Message-Id: <20210212010606.1118184-2-seanjc@google.com>
+Message-Id: <20210212010606.1118184-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210212010606.1118184-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [kvm-unit-tests PATCH 1/4] x86: Remove PCID test that INVPCID isn't
- enabled without PCID
+Subject: [kvm-unit-tests PATCH 2/4] x86: Iterate over all INVPCID types in the
+ enabled test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -62,43 +62,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop the test that verifies INVPCID isn't enabled in the guest without
-PCID also being enabled.  SVM allows !PCID && INVPCID, and VMX will soon
-follow.
-
-https://lkml.kernel.org/r/20210212003411.1102677-1-seanjc@google.com
+Verify that INVPCID works with all types, even those that take a PCID,
+when CR4.PCIDE=0.  So long as the target PCID=0, INVPCID is legal even
+if CR4.PCIDE=0.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/pcid.c | 8 --------
- 1 file changed, 8 deletions(-)
+ x86/pcid.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/x86/pcid.c b/x86/pcid.c
-index a8dc8cb..ee0b726 100644
+index ee0b726..64efd05 100644
 --- a/x86/pcid.c
 +++ b/x86/pcid.c
-@@ -26,12 +26,6 @@ static int invpcid_checking(unsigned long type, void *desc)
-     return exception_vector();
- }
+@@ -70,24 +70,28 @@ report:
  
--static void test_cpuid_consistency(int pcid_enabled, int invpcid_enabled)
--{
--    int passed = !(!pcid_enabled && invpcid_enabled);
--    report(passed, "CPUID consistency");
--}
--
- static void test_pcid_enabled(void)
+ static void test_invpcid_enabled(void)
  {
-     int passed = 0;
-@@ -135,8 +129,6 @@ int main(int ac, char **av)
-     if (this_cpu_has(X86_FEATURE_INVPCID))
-         invpcid_enabled = 1;
+-    int passed = 0;
++    int passed = 0, i;
+     ulong cr4 = read_cr4();
+     struct invpcid_desc desc;
+     desc.rsv = 0;
  
--    test_cpuid_consistency(pcid_enabled, invpcid_enabled);
--
-     if (pcid_enabled)
-         test_pcid_enabled();
-     else
+-    /* try executing invpcid when CR4.PCIDE=0, desc.pcid=0 and type=1
++    /* try executing invpcid when CR4.PCIDE=0, desc.pcid=0 and type=0..3
+      * no exception expected
+      */
+     desc.pcid = 0;
+-    if (invpcid_checking(1, &desc) != 0)
+-        goto report;
++    for (i = 0; i < 4; i++) {
++        if (invpcid_checking(i, &desc) != 0)
++            goto report;
++    }
+ 
+-    /* try executing invpcid when CR4.PCIDE=0, desc.pcid=1 and type=1
++    /* try executing invpcid when CR4.PCIDE=0, desc.pcid=1 and type=0..1
+      * #GP expected
+      */
+     desc.pcid = 1;
+-    if (invpcid_checking(1, &desc) != GP_VECTOR)
+-        goto report;
++    for (i = 0; i < 2; i++) {
++        if (invpcid_checking(i, &desc) != GP_VECTOR)
++            goto report;
++    }
+ 
+     if (write_cr4_checking(cr4 | X86_CR4_PCIDE) != 0)
+         goto report;
 -- 
 2.30.0.478.g8a0d178c01-goog
 
