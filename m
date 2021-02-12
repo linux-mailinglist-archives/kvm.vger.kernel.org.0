@@ -2,200 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D14131A35C
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 18:15:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C598F31A3F0
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 18:44:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231396AbhBLRNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 12:13:00 -0500
-Received: from foss.arm.com ([217.140.110.172]:40020 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230090AbhBLRMz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 12:12:55 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0D751063;
-        Fri, 12 Feb 2021 09:12:08 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B8C23F73B;
-        Fri, 12 Feb 2021 09:12:07 -0800 (PST)
-Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com,
-        Jianyong Wu <jianyong.wu@arm.com>
-References: <20210211142738.1478292-1-maz@kernel.org>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <4bfd380b-a654-c104-f424-a258bb142e34@arm.com>
-Date:   Fri, 12 Feb 2021 17:12:20 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S231766AbhBLRoN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 12:44:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51348 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231663AbhBLRoB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 12:44:01 -0500
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903B4C061574
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 09:43:22 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id q4so9127548otm.9
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 09:43:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ueLsT1PpHayONbeA4wkp8qTUPi1HCXdgnM5hYRnL65c=;
+        b=JwRCJS2Zy/S3drhk2ntApJokf9CtdDQEyvBxMU5/puiVAOV0a31zJjpB3AtUNXDmhY
+         aInOpBdD5+v5ia8n+dNiwuGxzl6Ei+O24NczJYv4FsEUWD3n8WNP8n8kItznd3eOCJCL
+         Up9ogRRY7OCP5Oo8WJ2KESpwr9cieA0Bjf+xOeHdMR12+qUJTdKtjcWLqahcYqEVNAvt
+         7pdVpfkqO+4sEYgQxqjOizhTSZ970GynqtRY3KEYcOV+2z8OR+lQYVIWzXYv4kN1RMBL
+         SzeGE4XvC4zwIAAmPamWKJeQf+hMgca5mmq2m8iblEPcS0xWlJaqeLYHOyoPRbst8gcS
+         0XoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ueLsT1PpHayONbeA4wkp8qTUPi1HCXdgnM5hYRnL65c=;
+        b=FSu1LETMNHfenhwz7U3cqENeRRTu/CPcpHagajV61ovYoMI6pNN8G9y68LTcVwuMzc
+         kYngTLdDzKpoksSPScDYU9MaIZnp2c+UkDvlqB6wHD0qU2eMc5RsGmKVU2VAygKg5t6q
+         HENgiNZV/oONkga4ypwDhDYwkFMwLdGUX0RrarGwoF/10wMzZjWbbntu6rp9GQsIdtqS
+         vg96/wck/CacgRQxg8qH+JDNz+cVbakxboJ9smR2d5X/H5voZoXlmmlpZtSeigcpNMzK
+         ZrbxJIOFg8xPLgXecai4EbFrev2eDLfuddtDYGKisYzhfnyYVYIqAjI4N7tFtGN+IFYq
+         BJow==
+X-Gm-Message-State: AOAM5328be12WGVx7dKqbq2ye+aCIbicqcROOPwkZu5KoZJTjoDD0ILn
+        Jsi1Vpgt0gFO0DHX7RpJ80kmW9J2SIp+iZsOk9MtWg==
+X-Google-Smtp-Source: ABdhPJyy2ltjG5PPOUmwdB5lU5hXiCeiEyjFSK77X2hUAi5XOeBxqjcW9+sg/AeXp0bfcnxLuHePDB5qHe5L3SM9j10=
+X-Received: by 2002:a05:6830:543:: with SMTP id l3mr2867099otb.241.1613151801618;
+ Fri, 12 Feb 2021 09:43:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210211142738.1478292-1-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20210211212241.3958897-1-bsd@redhat.com> <ac52c9b9-1561-21cd-6c8c-dad21e9356c6@redhat.com>
+ <jpgo8gpbath.fsf@linux.bootlegged.copy>
+In-Reply-To: <jpgo8gpbath.fsf@linux.bootlegged.copy>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 12 Feb 2021 09:43:10 -0800
+Message-ID: <CALMp9eQ370MQ1ZPtby4ezodCga9wDeXXGTcrqoXjj03WPJOEhQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] AMD invpcid exception fix
+To:     Bandan Das <bsd@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Huang2, Wei" <wei.huang2@amd.com>,
+        "Moger, Babu" <babu.moger@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-I've been trying to get my head around what the architecture says about CMOs, so
-please bare with me if I misunderstood some things.
-
-On 2/11/21 2:27 PM, Marc Zyngier wrote:
-> It appears that when a guest traps into KVM because it is
-> performing a CMO on a Read Only memslot, our handling of
-> this operation is "slightly suboptimal", as we treat it as
-> an MMIO access without a valid syndrome.
+On Fri, Feb 12, 2021 at 6:49 AM Bandan Das <bsd@redhat.com> wrote:
 >
-> The chances that userspace is adequately equiped to deal
-> with such an exception being slim, it would be better to
-> handle it in the kernel.
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 >
-> What we need to provide is roughly as follows:
->
-> (a) if a CMO hits writeable memory, handle it as a normal memory acess
-> (b) if a CMO hits non-memory, skip it
-> (c) if a CMO hits R/O memory, that's where things become fun:
->   (1) if the CMO is DC IVAC, the architecture says this should result
->       in a permission fault
->   (2) if the CMO is DC CIVAC, it should work similarly to (a)
+> > On 11/02/21 22:22, Bandan Das wrote:
+> >> The pcid-disabled test from kvm-unit-tests fails on a Milan host because the
+> >> processor injects a #GP while the test expects #UD. While setting the intercept
+> >> when the guest has it disabled seemed like the obvious thing to do, Babu Moger (AMD)
+> >> pointed me to an earlier discussion here - https://lkml.org/lkml/2020/6/11/949
+> >>
+> >> Jim points out there that  #GP has precedence over the intercept bit when invpcid is
+> >> called with CPL > 0 and so even if we intercept invpcid, the guest would end up with getting
+> >> and "incorrect" exception. To inject the right exception, I created an entry for the instruction
+> >> in the emulator to decode it successfully and then inject a UD instead of a GP when
+> >> the guest has it disabled.
+> >>
+> >> Bandan Das (3):
+> >>    KVM: Add a stub for invpcid in the emulator table
+> >>    KVM: SVM: Handle invpcid during gp interception
+> >>    KVM: SVM:  check if we need to track GP intercept for invpcid
+> >>
+> >>   arch/x86/kvm/emulate.c |  3 ++-
+> >>   arch/x86/kvm/svm/svm.c | 22 +++++++++++++++++++++-
+> >>   2 files changed, 23 insertions(+), 2 deletions(-)
+> >>
+> >
+> > Isn't this the same thing that "[PATCH 1/3] KVM: SVM: Intercept
+> > INVPCID when it's disabled to inject #UD" also does?
+> >
+> Yeah, Babu pointed me to Sean's series after I posted mine.
+> 1/3 indeed will fix the kvm-unit-test failure. IIUC, It doesn't look like it
+> handles the case for the guest executing invpcid at CPL > 0 when it's
+> disabled for the guest - #GP takes precedence over intercepts and will
+> be incorrectly injected instead of an #UD.
 
-When you say it should work similarly to (a), you mean it should be handled as a
-normal memory access, without the "CMO hits writeable memory" part, right?
+I know I was the one to complain about the #GP, but...
 
->
-> We already perform (a) and (b) correctly, but (c) is a total mess.
-> Hence we need to distinguish between IVAC (c.1) and CIVAC (c.2).
->
-> One way to do it is to treat CMOs generating a translation fault as
-> a *read*, even when they are on a RW memslot. This allows us to
-> further triage things:
->
-> If they come back with a permission fault, that is because this is
-> a DC IVAC instruction:
-> - inside a RW memslot: no problem, treat it as a write (a)(c.2)
-> - inside a RO memslot: inject a data abort in the guest (c.1)
->
-> The only drawback is that DC IVAC on a yet unmapped page faults
-> twice: one for the initial translation fault that result in a RO
-> mapping, and once for the permission fault. I think we can live with
-> that.
-
-I'm trying to make sure I understand what the problem is.
-
-gfn_to_pfn_prot() returnsKVM_HVA_ERR_RO_BAD if the write is to a RO memslot.
-KVM_HVA_ERR_RO_BAD is PAGE_OFFSET + PAGE_SIZE, which means that
-is_error_noslot_pfn() return true. In that case we exit to userspace with -EFAULT
-for DC IVAC and DC CIVAC. But what we should be doing is this:
-
-- For DC IVAC, inject a dabt with ISS = 0x10, meaning an external abort (that's
-what kvm_inject_dabt_does()).
-
-- For DC CIVAC, exit to userspace with -EFAULT.
-
-Did I get that right?
-
-Thanks,
-
-Alex
-
->
-> Reported-by: Jianyong Wu <jianyong.wu@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->
-> Notes:
->     I have taken the option to inject an abort in the guest when
->     it issues a DC IVAC on a R/O memslot, but another option would
->     be to just perform the invalidation ourselves as a DC CIAVAC.
->     
->     This would have the advantage of being consistent with what we
->     do for emulated MMIO.
->
->  arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++----------
->  1 file changed, 41 insertions(+), 12 deletions(-)
->
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7d2257cc5438..c7f4388bea45 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -760,7 +760,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	struct kvm_pgtable *pgt;
->  
->  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
-> -	write_fault = kvm_is_write_fault(vcpu);
-> +	/*
-> +	 * Treat translation faults on CMOs as read faults. Should
-> +	 * this further generate a permission fault on a R/O memslot,
-> +	 * it will be caught in kvm_handle_guest_abort(), with
-> +	 * prejudice. Permission faults on non-R/O memslot will be
-> +	 * gracefully handled as writes.
-> +	 */
-> +	if (fault_status == FSC_FAULT && kvm_vcpu_dabt_is_cm(vcpu))
-> +		write_fault = false;
-> +	else
-> +		write_fault = kvm_is_write_fault(vcpu);
->  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->  	VM_BUG_ON(write_fault && exec_fault);
->  
-> @@ -1013,19 +1023,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		}
->  
->  		/*
-> -		 * Check for a cache maintenance operation. Since we
-> -		 * ended-up here, we know it is outside of any memory
-> -		 * slot. But we can't find out if that is for a device,
-> -		 * or if the guest is just being stupid. The only thing
-> -		 * we know for sure is that this range cannot be cached.
-> +		 * Check for a cache maintenance operation. Three cases:
-> +		 *
-> +		 * - It is outside of any memory slot. But we can't find out
-> +		 *   if that is for a device, or if the guest is just being
-> +		 *   stupid. The only thing we know for sure is that this
-> +		 *   range cannot be cached.  So let's assume that the guest
-> +		 *   is just being cautious, and skip the instruction.
-> +		 *
-> +		 * - Otherwise, check whether this is a permission fault.
-> +		 *   If so, that's a DC IVAC on a R/O memslot, which is a
-> +		 *   pretty bad idea, and we tell the guest so.
->  		 *
-> -		 * So let's assume that the guest is just being
-> -		 * cautious, and skip the instruction.
-> +		 * - If this wasn't a permission fault, pass it along for
-> +		 *   further handling (including faulting the page in if it
-> +		 *   was a translation fault).
->  		 */
-> -		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
-> -			kvm_incr_pc(vcpu);
-> -			ret = 1;
-> -			goto out_unlock;
-> +		if (kvm_vcpu_dabt_is_cm(vcpu)) {
-> +			if (kvm_is_error_hva(hva)) {
-> +				kvm_incr_pc(vcpu);
-> +				ret = 1;
-> +				goto out_unlock;
-> +			}
-> +
-> +			if (fault_status == FSC_PERM) {
-> +				/* DC IVAC on a R/O memslot */
-> +				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> +				ret = 1;
-> +				goto out_unlock;
-> +			}
-> +
-> +			goto handle_access;
->  		}
->  
->  		/*
-> @@ -1039,6 +1067,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		goto out_unlock;
->  	}
->  
-> +handle_access:
->  	/* Userspace should not be able to register out-of-bounds IPAs */
->  	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
->  
+As a general rule, kvm cannot always guarantee a #UD for an
+instruction that is hidden from the guest. Consider, for example,
+popcnt, aesenc, vzeroall, movbe, addcx, clwb, ...
+I'm pretty sure that Paolo has brought this up in the past when I've
+made similar complaints.
