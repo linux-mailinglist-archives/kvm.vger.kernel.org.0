@@ -2,97 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5483C319CDE
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 11:54:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34601319CE2
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 11:55:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbhBLKwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 05:52:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50328 "EHLO
+        id S230166AbhBLKzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 05:55:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34201 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230399AbhBLKwj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 05:52:39 -0500
+        by vger.kernel.org with ESMTP id S230023AbhBLKzA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 05:55:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613127073;
+        s=mimecast20190719; t=1613127214;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J90exmfwr8uvT2pxkEllk1b4JYI35g7P87yhEwH1vw4=;
-        b=OxF9S1nJpFKIAKyLOa5snw3iZSlLpQzwEYFTvms67lkY4LNZqmNB8RODf45qxSRVqhcjuM
-        DAl8Vg+gEZ/4wXnlXnQGO6BZcLiq087/TcztgwjEQ7tfNFstZwX8JVGR7ji900FjrNQrkq
-        J9c6WzDVRzfCRzgKSzWH32tWZudplL0=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-cBWo43EqMSe1vbkesNXh3g-1; Fri, 12 Feb 2021 05:51:10 -0500
-X-MC-Unique: cBWo43EqMSe1vbkesNXh3g-1
-Received: by mail-ed1-f70.google.com with SMTP id o21so6433665edq.1
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 02:51:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=J90exmfwr8uvT2pxkEllk1b4JYI35g7P87yhEwH1vw4=;
-        b=AjV/WA5zl/IYdkF9cJ7T4TiIXoe+bZD4U2boEvnqf/7hwwx+KfNUrkqdEEe9U2kOGt
-         BMu0HyGEUVtfrMxea92VMj0YB+NRv3kwM1b11/rp5206z2gSo2cnxcD/LixLnfmcvW7y
-         v5BXytuo6K+V9jedfe9E4uqjHGBFWmIgWtby77CJYXaKX9ePLzxZ5igORkzI8cc/VHzb
-         JSiZdXV4QDQS2ljiB/qBdBAWvL4GOEUkzT+QY53wWnsh5T5lFv24rN7GVA0T+JdM7t0M
-         5niWSJaOS6mx0y+9RTV8nkRVo6RygV0xMSquC1tpPoYek7uDbbz2QpgbEg+CyerpGQ9f
-         7jZA==
-X-Gm-Message-State: AOAM531TLL19peL4gvvr7Ghy1bX2QInyBamQHA7vcb9OPj3ct12gAquN
-        HgNW0Y5ED5HuydQNDCGcKEANnubYMcH1s5C2/0krYODrsr0zWBxENxwEal4yVLNj/6p11mpnBtv
-        VjpPh0sKeEQYC
-X-Received: by 2002:a17:906:c34d:: with SMTP id ci13mr2362907ejb.333.1613127069630;
-        Fri, 12 Feb 2021 02:51:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxr7pk8xbUkM5+9rxZkFGRN3DZ+T9KdU7ZAHcik3HYskGIRC9vqlOiq64IlLZCvE/CaHuhS0A==
-X-Received: by 2002:a17:906:c34d:: with SMTP id ci13mr2362898ejb.333.1613127069485;
-        Fri, 12 Feb 2021 02:51:09 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id g20sm587842ejz.54.2021.02.12.02.51.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Feb 2021 02:51:08 -0800 (PST)
-Subject: Re: [PATCH 0/3] AMD invpcid exception fix
-To:     Bandan Das <bsd@redhat.com>, kvm@vger.kernel.org
-Cc:     jmattson@google.com, wei.huang2@amd.com, babu.moger@amd.com
-References: <20210211212241.3958897-1-bsd@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ac52c9b9-1561-21cd-6c8c-dad21e9356c6@redhat.com>
-Date:   Fri, 12 Feb 2021 11:51:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        bh=x6xsQ6qKCWc5VwzynBtKW0JR1zx1CuazVJUhCMJt7f8=;
+        b=VZWWlOhBmyR6mlAH7kQpOM2khzTzyKN6Bauq5yfbHou/um5BKnYuZSpqmaKbhxp83v7TOo
+        fWONQhOAfgXPLWDEiLyMVj+sUH2xXzpqgkli1SiN0Ql93UbZfsiPVvSHM+E2giU7NLW24R
+        f6eCFndNuPbAxdftnirorEVXSVBdJaQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-gkxIsTP1M6uCV-N1Wwq6Hw-1; Fri, 12 Feb 2021 05:53:30 -0500
+X-MC-Unique: gkxIsTP1M6uCV-N1Wwq6Hw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B6C680197B;
+        Fri, 12 Feb 2021 10:53:29 +0000 (UTC)
+Received: from gondolin (ovpn-113-189.ams2.redhat.com [10.36.113.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B4A166A90B;
+        Fri, 12 Feb 2021 10:53:09 +0000 (UTC)
+Date:   Fri, 12 Feb 2021 11:53:07 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 3/5] s390x: css: implementing Set
+ CHannel Monitor
+Message-ID: <20210212115307.627abe8a.cohuck@redhat.com>
+In-Reply-To: <1612963214-30397-4-git-send-email-pmorel@linux.ibm.com>
+References: <1612963214-30397-1-git-send-email-pmorel@linux.ibm.com>
+        <1612963214-30397-4-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20210211212241.3958897-1-bsd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/02/21 22:22, Bandan Das wrote:
-> The pcid-disabled test from kvm-unit-tests fails on a Milan host because the
-> processor injects a #GP while the test expects #UD. While setting the intercept
-> when the guest has it disabled seemed like the obvious thing to do, Babu Moger (AMD)
-> pointed me to an earlier discussion here - https://lkml.org/lkml/2020/6/11/949
+On Wed, 10 Feb 2021 14:20:12 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> We implement the call of the Set CHannel Monitor instruction,
+> starting the monitoring of the all Channel Sub System, and
+> initializing channel subsystem monitoring.
 > 
-> Jim points out there that  #GP has precedence over the intercept bit when invpcid is
-> called with CPL > 0 and so even if we intercept invpcid, the guest would end up with getting
-> and "incorrect" exception. To inject the right exception, I created an entry for the instruction
-> in the emulator to decode it successfully and then inject a UD instead of a GP when
-> the guest has it disabled.
+> An initial test reports the presence of the extended measurement
+> block feature.
 > 
-> Bandan Das (3):
->    KVM: Add a stub for invpcid in the emulator table
->    KVM: SVM: Handle invpcid during gp interception
->    KVM: SVM:  check if we need to track GP intercept for invpcid
+> Several tests on SCHM verify the error reporting of the hypervisor.
+
+Combine these two into one sentence?
+
+"Initial tests report the presence of the extended measurement block
+feature, and verify the error reporting of the hypervisor for SCHM."
+
+Also, you add the infrastructure for enabling measurements at the
+subchannel -- either mention this in the patch description or move it
+to a separate patch or the first user?
+
 > 
->   arch/x86/kvm/emulate.c |  3 ++-
->   arch/x86/kvm/svm/svm.c | 22 +++++++++++++++++++++-
->   2 files changed, 23 insertions(+), 2 deletions(-)
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     | 19 +++++++++++-
+>  lib/s390x/css_lib.c | 74 +++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/css.c         | 36 ++++++++++++++++++++++
+>  3 files changed, 128 insertions(+), 1 deletion(-)
 > 
 
-Isn't this the same thing that "[PATCH 1/3] KVM: SVM: Intercept INVPCID 
-when it's disabled to inject #UD" also does?
+(...)
 
-Paolo
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index 5426a6b..355881d 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -267,6 +267,80 @@ retry:
+>  	return -1;
+>  }
+>  
+> +static bool schib_update(int schid, uint64_t mb, uint16_t mbi, uint16_t flags,
+> +		  bool format1)
+
+Maybe schib_update_mb()?
+
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int cc;
+> +
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return false;
+> +	}
+> +
+> +	/* Update the SCHIB to enable the measurement block */
+> +	pmcw->flags |= flags;
+
+Do we also want to be able to disable it again?
+
+> +
+> +	if (format1)
+> +		pmcw->flags2 |= PMCW_MBF1;
+> +	else
+> +		pmcw->flags2 &= ~PMCW_MBF1;
+> +
+> +	pmcw->mbi = mbi;
+> +	schib.mbo = mb;
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	cc = msch(schid, &schib);
+> +	if (cc) {
+> +		/*
+> +		 * If the subchannel is status pending or
+> +		 * if a function is in progress,
+> +		 * we consider both cases as errors.
+> +		 */
+> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
+> +		return false;
+> +	}
+> +
+> +	/*
+> +	 * Read the SCHIB again to verify the measurement block origin
+> +	 */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: updating sch %08x failed with cc=%d",
+> +			    schid, cc);
+> +		return false;
+> +	}
+
+Hm, you only do the stsch, but do not check the result (that is done by
+the caller) -- remove the misleading comment or replace it with "Read
+the SCHIB again"?
+
+> +
+> +	return true;
+> +}
+> +
+
+(...)
+
+Otherwise, LGTM.
 
