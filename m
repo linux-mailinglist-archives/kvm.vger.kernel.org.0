@@ -2,132 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED035319D29
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:17:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5556D319D5C
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:29:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbhBLLR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 06:17:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26583 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229714AbhBLLRY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 06:17:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613128557;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=17yJ1jw3xbqfxBt88m+skOHFcZW/nd7tq99klhh9LIA=;
-        b=eIzOZJH2Y8rV3JcAjcMjs8AyQ2lFoT7MMzplrrK36d4pxyBx2jKOZtkD0Qe02dj3ZNQPIx
-        bMWFr6sFex9h+Rehnl4jy26fbX9N6ZZCvqOUcqNkEN4PEllvPiCYqZpOoE9ubfbiE0aVw8
-        Do8duUB/2NrZSVeyHqLARGv0TPFBkSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-E6B6qlt9P5yG0OReY0UpyQ-1; Fri, 12 Feb 2021 06:15:53 -0500
-X-MC-Unique: E6B6qlt9P5yG0OReY0UpyQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2697871220;
-        Fri, 12 Feb 2021 11:15:52 +0000 (UTC)
-Received: from gondolin (ovpn-113-189.ams2.redhat.com [10.36.113.189])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2AF9A60BF1;
-        Fri, 12 Feb 2021 11:15:47 +0000 (UTC)
-Date:   Fri, 12 Feb 2021 12:15:45 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
-        imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: css: testing measurement
- block format 1
-Message-ID: <20210212121545.44e13bd8.cohuck@redhat.com>
-In-Reply-To: <1612963214-30397-6-git-send-email-pmorel@linux.ibm.com>
-References: <1612963214-30397-1-git-send-email-pmorel@linux.ibm.com>
-        <1612963214-30397-6-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S229832AbhBLL2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 06:28:30 -0500
+Received: from foss.arm.com ([217.140.110.172]:35540 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229608AbhBLL23 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 06:28:29 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B9D4113E;
+        Fri, 12 Feb 2021 03:27:43 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EC353F719;
+        Fri, 12 Feb 2021 03:27:42 -0800 (PST)
+Subject: Re: [PATCH kvmtool 09/21] x86/ioport: Switch to new trap handlers
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-10-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b5eb332b-392e-3b4f-8797-9b7a1e4b5e56@arm.com>
+Date:   Fri, 12 Feb 2021 11:27:59 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20201210142908.169597-10-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 10 Feb 2021 14:20:14 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Hi Andre,
 
-> Measurement block format 1 is made available by the extended
-> mesurement block facility and is indicated in the SCHIB by
-
-s/mesurement/measurement/
-
-> the bit in the PMCW.
-> 
-> The MBO is specified in the SCHIB of each channel and the MBO
-> defined by the SCHM instruction is ignored.
-> 
-> The test of the MB format 1 is just skipped if the feature is
-> not available.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On 12/10/20 2:28 PM, Andre Przywara wrote:
+> Now that the x86 I/O ports have trap handlers adhering to the MMIO fault
+> handler prototype, let's switch over to the joint registration routine.
+>
+> This allows us to get rid of the ioport shim routines.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  lib/s390x/css.h | 14 ++++++++++++++
->  s390x/css.c     | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 50 insertions(+)
-
-(...)
-
-> +static void test_schm_fmt1(void)
-> +{
-> +	struct measurement_block_format1 *mb1;
-> +
-> +	report_prefix_push("Format 1");
-> +
-> +	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
-> +	if (!mb1) {
-> +		report_abort("measurement_block_format1 allocation failed");
-> +		goto end;
-> +	}
-> +
-> +	schm(NULL, 0); /* Clear previous MB address */
-
-Same comment as for the last patch.
-
-> +	schm(0, SCHM_MBU);
-> +
-> +	/* Expect error for non aligned MB */
-> +	report_prefix_push("Unaligned MB origin");
-> +	report_xfail(start_measure((u64)mb1 + 1, 0, true), mb1->ssch_rsch_count != 0,
-> +		     "SSCH measured %d", mb1->ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	memset(mb1, 0, sizeof(*mb1));
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index");
-> +	report(start_measure((u64)mb1, 0, true) &&
-> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
-> +	       "SSCH measured %d", mb1->ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
-
-Also here, you need to stop the measurements before freeing the block.
-
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -257,6 +292,7 @@ static struct {
->  	{ "sense (ssch/tsch)", test_sense },
->  	{ "measurement block (schm)", test_schm },
->  	{ "measurement block format0", test_schm_fmt0 },
-> +	{ "measurement block format1", test_schm_fmt1 },
->  	{ NULL, NULL }
->  };
+>  x86/ioport.c | 113 ++++++++++++++-------------------------------------
+>  1 file changed, 30 insertions(+), 83 deletions(-)
+>
+> diff --git a/x86/ioport.c b/x86/ioport.c
+> index 932da20a..87955da1 100644
+> --- a/x86/ioport.c
+> +++ b/x86/ioport.c
+> @@ -8,16 +8,6 @@ static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+>  {
+>  }
 >  
+> -static bool debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	dummy_mmio(vcpu, port, data, size, true, NULL);
+> -	return 0;
+> -}
 
+0 is false in boolean logic, which means that emulation fails according to the
+(old) ioport emulation code (ioport.c::kvm__emulate_io()).
+
+So I guess I have a few questions:
+
+- Is this a bug in the emulation code, where the author thought that
+debug_io_out() returns an int, and in that case 0 actually means success?
+
+- If writing to the debug port is rightfully considered an error, do we care
+enough about it to print something to stdout like kvm__emulate_io() does when
+debug_io_out() returns false?
+
+Thanks,
+
+Alex
+
+> -
+> -static struct ioport_operations debug_ops = {
+> -	.io_out		= debug_io_out,
+> -};
+> -
+>  static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+>  			       u32 len, u8 is_write, void *ptr)
+>  {
+> @@ -31,37 +21,6 @@ static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+>  	putchar(ch);
+>  }
+>  
+> -static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	seabios_debug_mmio(vcpu, port, data, size, true, NULL);
+> -	return 0;
+> -}
+> -
+> -static struct ioport_operations seabios_debug_ops = {
+> -	.io_out		= seabios_debug_io_out,
+> -};
+> -
+> -static bool dummy_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	dummy_mmio(vcpu, port, data, size, false, NULL);
+> -	return true;
+> -}
+> -
+> -static bool dummy_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	dummy_mmio(vcpu, port, data, size, true, NULL);
+> -	return true;
+> -}
+> -
+> -static struct ioport_operations dummy_read_write_ioport_ops = {
+> -	.io_in		= dummy_io_in,
+> -	.io_out		= dummy_io_out,
+> -};
+> -
+> -static struct ioport_operations dummy_write_only_ioport_ops = {
+> -	.io_out		= dummy_io_out,
+> -};
+> -
+>  /*
+>   * The "fast A20 gate"
+>   */
+> @@ -76,17 +35,6 @@ static void ps2_control_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+>  		ioport__write8(data, 0x02);
+>  }
+>  
+> -static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	ps2_control_mmio(vcpu, port, data, size, false, NULL);
+> -	return true;
+> -}
+> -
+> -static struct ioport_operations ps2_control_a_ops = {
+> -	.io_in		= ps2_control_a_io_in,
+> -	.io_out		= dummy_io_out,
+> -};
+> -
+>  void ioport__map_irq(u8 *irq)
+>  {
+>  }
+> @@ -98,75 +46,75 @@ static int ioport__setup_arch(struct kvm *kvm)
+>  	/* Legacy ioport setup */
+>  
+>  	/* 0000 - 001F - DMA1 controller */
+> -	r = ioport__register(kvm, 0x0000, &dummy_read_write_ioport_ops, 32, NULL);
+> +	r = kvm__register_pio(kvm, 0x0000, 32, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 0x0020 - 0x003F - 8259A PIC 1 */
+> -	r = ioport__register(kvm, 0x0020, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = kvm__register_pio(kvm, 0x0020, 2, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 0040-005F - PIT - PROGRAMMABLE INTERVAL TIMER (8253, 8254) */
+> -	r = ioport__register(kvm, 0x0040, &dummy_read_write_ioport_ops, 4, NULL);
+> +	r = kvm__register_pio(kvm, 0x0040, 4, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 0092 - PS/2 system control port A */
+> -	r = ioport__register(kvm, 0x0092, &ps2_control_a_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, 0x0092, 1, ps2_control_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 0x00A0 - 0x00AF - 8259A PIC 2 */
+> -	r = ioport__register(kvm, 0x00A0, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = kvm__register_pio(kvm, 0x00A0, 2, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 00C0 - 001F - DMA2 controller */
+> -	r = ioport__register(kvm, 0x00C0, &dummy_read_write_ioport_ops, 32, NULL);
+> +	r = kvm__register_pio(kvm, 0x00c0, 32, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 00E0-00EF are 'motherboard specific' so we use them for our
+>  	   internal debugging purposes.  */
+> -	r = ioport__register(kvm, IOPORT_DBG, &debug_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, IOPORT_DBG, 1, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 00ED - DUMMY PORT FOR DELAY??? */
+> -	r = ioport__register(kvm, 0x00ED, &dummy_write_only_ioport_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, 0x00ed, 1, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 0x00F0 - 0x00FF - Math co-processor */
+> -	r = ioport__register(kvm, 0x00F0, &dummy_write_only_ioport_ops, 2, NULL);
+> +	r = kvm__register_pio(kvm, 0x00f0, 2, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 0278-027A - PARALLEL PRINTER PORT (usually LPT1, sometimes LPT2) */
+> -	r = ioport__register(kvm, 0x0278, &dummy_read_write_ioport_ops, 3, NULL);
+> +	r = kvm__register_pio(kvm, 0x0278, 3, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 0378-037A - PARALLEL PRINTER PORT (usually LPT2, sometimes LPT3) */
+> -	r = ioport__register(kvm, 0x0378, &dummy_read_write_ioport_ops, 3, NULL);
+> +	r = kvm__register_pio(kvm, 0x0378, 3, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* PORT 03D4-03D5 - COLOR VIDEO - CRT CONTROL REGISTERS */
+> -	r = ioport__register(kvm, 0x03D4, &dummy_read_write_ioport_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, 0x03d4, 1, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+> -	r = ioport__register(kvm, 0x03D5, &dummy_write_only_ioport_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, 0x03d5, 1, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+> -	r = ioport__register(kvm, 0x402, &seabios_debug_ops, 1, NULL);
+> +	r = kvm__register_pio(kvm, 0x0402, 1, seabios_debug_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+>  	/* 0510 - QEMU BIOS configuration register */
+> -	r = ioport__register(kvm, 0x510, &dummy_read_write_ioport_ops, 2, NULL);
+> +	r = kvm__register_pio(kvm, 0x0510, 2, dummy_mmio, NULL);
+>  	if (r < 0)
+>  		return r;
+>  
+> @@ -176,22 +124,21 @@ dev_base_init(ioport__setup_arch);
+>  
+>  static int ioport__remove_arch(struct kvm *kvm)
+>  {
+> -	ioport__unregister(kvm, 0x510);
+> -	ioport__unregister(kvm, 0x402);
+> -	ioport__unregister(kvm, 0x03D5);
+> -	ioport__unregister(kvm, 0x03D4);
+> -	ioport__unregister(kvm, 0x0378);
+> -	ioport__unregister(kvm, 0x0278);
+> -	ioport__unregister(kvm, 0x00F0);
+> -	ioport__unregister(kvm, 0x00ED);
+> -	ioport__unregister(kvm, IOPORT_DBG);
+> -	ioport__unregister(kvm, 0x00C0);
+> -	ioport__unregister(kvm, 0x00A0);
+> -	ioport__unregister(kvm, 0x0092);
+> -	ioport__unregister(kvm, 0x0040);
+> -	ioport__unregister(kvm, 0x0020);
+> -	ioport__unregister(kvm, 0x0000);
+> -
+> +	kvm__deregister_pio(kvm, 0x510);
+> +	kvm__deregister_pio(kvm, 0x402);
+> +	kvm__deregister_pio(kvm, 0x3d5);
+> +	kvm__deregister_pio(kvm, 0x3d4);
+> +	kvm__deregister_pio(kvm, 0x378);
+> +	kvm__deregister_pio(kvm, 0x278);
+> +	kvm__deregister_pio(kvm, 0x0f0);
+> +	kvm__deregister_pio(kvm, 0x0ed);
+> +	kvm__deregister_pio(kvm, IOPORT_DBG);
+> +	kvm__deregister_pio(kvm, 0x0c0);
+> +	kvm__deregister_pio(kvm, 0x0a0);
+> +	kvm__deregister_pio(kvm, 0x092);
+> +	kvm__deregister_pio(kvm, 0x040);
+> +	kvm__deregister_pio(kvm, 0x020);
+> +	kvm__deregister_pio(kvm, 0x000);
+>  	return 0;
+>  }
+>  dev_base_exit(ioport__remove_arch);
