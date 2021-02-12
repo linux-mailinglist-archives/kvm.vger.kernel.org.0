@@ -2,146 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C08D319D22
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:16:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED035319D29
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 12:17:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbhBLLPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 06:15:12 -0500
-Received: from foss.arm.com ([217.140.110.172]:35280 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230373AbhBLLPJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 06:15:09 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB1D6113E;
-        Fri, 12 Feb 2021 03:14:23 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D91A53F719;
-        Fri, 12 Feb 2021 03:14:22 -0800 (PST)
-Subject: Re: [PATCH kvmtool 08/21] x86/ioport: Refactor trap handlers
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-9-andre.przywara@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <9089a68a-39ca-5047-24da-f1e2c1d52d22@arm.com>
-Date:   Fri, 12 Feb 2021 11:14:39 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S229872AbhBLLR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 06:17:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26583 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229714AbhBLLRY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 06:17:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613128557;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=17yJ1jw3xbqfxBt88m+skOHFcZW/nd7tq99klhh9LIA=;
+        b=eIzOZJH2Y8rV3JcAjcMjs8AyQ2lFoT7MMzplrrK36d4pxyBx2jKOZtkD0Qe02dj3ZNQPIx
+        bMWFr6sFex9h+Rehnl4jy26fbX9N6ZZCvqOUcqNkEN4PEllvPiCYqZpOoE9ubfbiE0aVw8
+        Do8duUB/2NrZSVeyHqLARGv0TPFBkSU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-583-E6B6qlt9P5yG0OReY0UpyQ-1; Fri, 12 Feb 2021 06:15:53 -0500
+X-MC-Unique: E6B6qlt9P5yG0OReY0UpyQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2697871220;
+        Fri, 12 Feb 2021 11:15:52 +0000 (UTC)
+Received: from gondolin (ovpn-113-189.ams2.redhat.com [10.36.113.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2AF9A60BF1;
+        Fri, 12 Feb 2021 11:15:47 +0000 (UTC)
+Date:   Fri, 12 Feb 2021 12:15:45 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: css: testing measurement
+ block format 1
+Message-ID: <20210212121545.44e13bd8.cohuck@redhat.com>
+In-Reply-To: <1612963214-30397-6-git-send-email-pmorel@linux.ibm.com>
+References: <1612963214-30397-1-git-send-email-pmorel@linux.ibm.com>
+        <1612963214-30397-6-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20201210142908.169597-9-andre.przywara@arm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Wed, 10 Feb 2021 14:20:14 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 12/10/20 2:28 PM, Andre Przywara wrote:
-> With the planned retirement of the special ioport emulation code, we
-> need to provide emulation functions compatible with the MMIO
-> prototype.
->
-> Adjust the trap handlers to use that new function, and provide shims to
-> implement the old ioport interface, for now.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Measurement block format 1 is made available by the extended
+> mesurement block facility and is indicated in the SCHIB by
+
+s/mesurement/measurement/
+
+> the bit in the PMCW.
+> 
+> The MBO is specified in the SCHIB of each channel and the MBO
+> defined by the SCHM instruction is ignored.
+> 
+> The test of the MB format 1 is just skipped if the feature is
+> not available.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  x86/ioport.c | 30 ++++++++++++++++++++++++++----
->  1 file changed, 26 insertions(+), 4 deletions(-)
->
-> diff --git a/x86/ioport.c b/x86/ioport.c
-> index 8c5c7699..932da20a 100644
-> --- a/x86/ioport.c
-> +++ b/x86/ioport.c
-> @@ -3,8 +3,14 @@
->  #include <stdlib.h>
->  #include <stdio.h>
->  
-> +static void dummy_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +		       u8 is_write, void *ptr)
+>  lib/s390x/css.h | 14 ++++++++++++++
+>  s390x/css.c     | 36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 50 insertions(+)
+
+(...)
+
+> +static void test_schm_fmt1(void)
 > +{
+> +	struct measurement_block_format1 *mb1;
+> +
+> +	report_prefix_push("Format 1");
+> +
+> +	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
+> +	if (!mb1) {
+> +		report_abort("measurement_block_format1 allocation failed");
+> +		goto end;
+> +	}
+> +
+> +	schm(NULL, 0); /* Clear previous MB address */
+
+Same comment as for the last patch.
+
+> +	schm(0, SCHM_MBU);
+> +
+> +	/* Expect error for non aligned MB */
+> +	report_prefix_push("Unaligned MB origin");
+> +	report_xfail(start_measure((u64)mb1 + 1, 0, true), mb1->ssch_rsch_count != 0,
+> +		     "SSCH measured %d", mb1->ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	memset(mb1, 0, sizeof(*mb1));
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index");
+> +	report(start_measure((u64)mb1, 0, true) &&
+> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
+> +	       "SSCH measured %d", mb1->ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
+
+Also here, you need to stop the measurements before freeing the block.
+
+> +end:
+> +	report_prefix_pop();
 > +}
 > +
->  static bool debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->  {
-> +	dummy_mmio(vcpu, port, data, size, true, NULL);
->  	return 0;
->  }
->  
-> @@ -12,15 +18,23 @@ static struct ioport_operations debug_ops = {
->  	.io_out		= debug_io_out,
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+> @@ -257,6 +292,7 @@ static struct {
+>  	{ "sense (ssch/tsch)", test_sense },
+>  	{ "measurement block (schm)", test_schm },
+>  	{ "measurement block format0", test_schm_fmt0 },
+> +	{ "measurement block format1", test_schm_fmt1 },
+>  	{ NULL, NULL }
 >  };
 >  
-> -static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static void seabios_debug_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-> +			       u32 len, u8 is_write, void *ptr)
->  {
->  	char ch;
->  
-> +	if (!is_write)
-> +		return;
-> +
->  	ch = ioport__read8(data);
->  
->  	putchar(ch);
-> +}
->  
-> -	return true;
-> +static bool seabios_debug_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +{
-> +	seabios_debug_mmio(vcpu, port, data, size, true, NULL);
-> +	return 0;
->  }
->  
->  static struct ioport_operations seabios_debug_ops = {
-> @@ -29,11 +43,13 @@ static struct ioport_operations seabios_debug_ops = {
->  
->  static bool dummy_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->  {
-> +	dummy_mmio(vcpu, port, data, size, false, NULL);
->  	return true;
->  }
->  
->  static bool dummy_io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->  {
-> +	dummy_mmio(vcpu, port, data, size, true, NULL);
->  	return true;
->  }
->  
-> @@ -50,13 +66,19 @@ static struct ioport_operations dummy_write_only_ioport_ops = {
->   * The "fast A20 gate"
->   */
->  
-> -static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +static void ps2_control_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
-> +			     u8 is_write, void *ptr)
->  {
->  	/*
->  	 * A20 is always enabled.
->  	 */
-> -	ioport__write8(data, 0x02);
-> +	if (!is_write)
-> +		ioport__write8(data, 0x02);
-> +}
->  
-> +static bool ps2_control_a_io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
-> +{
-> +	ps2_control_mmio(vcpu, port, data, size, false, NULL);
->  	return true;
->  }
->  
-
-Looks correct to me, if not particularly pretty; thankfully the next patch removes
-all of these dummy functions. It compiles, so:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-
-Alex
 
