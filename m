@@ -2,156 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35131319B8D
-	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 09:58:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6533319C39
+	for <lists+kvm@lfdr.de>; Fri, 12 Feb 2021 11:00:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbhBLI4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 03:56:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56532 "EHLO
+        id S230241AbhBLJ7w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 04:59:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56884 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229497AbhBLI4t (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 03:56:49 -0500
+        by vger.kernel.org with ESMTP id S229653AbhBLJ7r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Feb 2021 04:59:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613120122;
+        s=mimecast20190719; t=1613123895;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nma5RrDL02zgQCnQAmwMQggmlffp24gdJp2OtX7ZPuI=;
-        b=GrhwezraI6jnv9CqC41BRlV+ikJ2kjxywJ0d1ottoP3WOPhMT58IiMWFsPgBvmjDCGXm2D
-        1L40DaJWJiw1M0qsNl7InN87vWMiDOiGb9MDWFRVzvZ5OirAT5MBy3wgv/UCQF6GrWAnX1
-        dlLKILG0b9a7CJGfEjmM91aLfuu9cIc=
+        bh=R2tD4mIs1UmiwLo4/LxlJpBgP6Pe688tzWKdKjHlFi0=;
+        b=JpchevY6Jqa2nUEcBLKtbk+qU4C33dPhqa3SlsaSJoUzyPXws+OVVrewGh1FUtPKFk8ndk
+        uVV8qGzPSYI0folVLBEhe8F8jsZKjX0DNWpHk+QihprlhpN4Et9+hrhLGd6dEsMD/XZcOF
+        xh2htEkgdtO0uzRhU2bXo6DY6t08quw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-1LGCv3TxNmmITacLXAFtsw-1; Fri, 12 Feb 2021 03:55:20 -0500
-X-MC-Unique: 1LGCv3TxNmmITacLXAFtsw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-512-xyISVEXbOSO_KKe5qlVzsw-1; Fri, 12 Feb 2021 04:58:11 -0500
+X-MC-Unique: xyISVEXbOSO_KKe5qlVzsw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 176EB6D4E0;
-        Fri, 12 Feb 2021 08:55:18 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE0681009618;
+        Fri, 12 Feb 2021 09:58:09 +0000 (UTC)
 Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B842F62AF8;
-        Fri, 12 Feb 2021 08:55:10 +0000 (UTC)
-Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
-To:     Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
-        alex.williamson@redhat.com
-Cc:     jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
-        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
-        zhangfei.gao@linaro.org
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <20201118112151.25412-3-eric.auger@redhat.com>
- <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33DEA72F88;
+        Fri, 12 Feb 2021 09:57:47 +0000 (UTC)
+Subject: Re: [PATCH v7 02/16] iommu/smmu: Report empty domain nesting info
+To:     Vivek Gautam <vivek.gautam@arm.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "stefanha@gmail.com" <stefanha@gmail.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Will Deacon <will@kernel.org>, "Wu, Hao" <hao.wu@intel.com>
+References: <1599734733-6431-1-git-send-email-yi.l.liu@intel.com>
+ <1599734733-6431-3-git-send-email-yi.l.liu@intel.com>
+ <CAFp+6iFob_fy1cTgcEv0FOXBo70AEf3Z1UvXgPep62XXnLG9Gw@mail.gmail.com>
+ <DM5PR11MB14356D5688CA7DC346AA32DBC3AA0@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <CAFp+6iEnh6Tce26F0RHYCrQfiHrkf-W3_tXpx+ysGiQz6AWpEw@mail.gmail.com>
+ <DM5PR11MB1435D9ED79B2BE9C8F235428C3A90@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <6bcd5229-9cd3-a78c-ccb2-be92f2add373@redhat.com>
+ <DM5PR11MB143531EA8BD997A18F0A7671C3BF9@DM5PR11MB1435.namprd11.prod.outlook.com>
+ <CAFp+6iGZZ9fANN_0-NFb31kHfiytD5=vcsk1_Q8gp-_6L7xQVw@mail.gmail.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
-Date:   Fri, 12 Feb 2021 09:55:09 +0100
+Message-ID: <9b6d409b-266b-230a-800a-24b8e6b5cd09@redhat.com>
+Date:   Fri, 12 Feb 2021 10:57:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAFp+6iGZZ9fANN_0-NFb31kHfiytD5=vcsk1_Q8gp-_6L7xQVw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Keqian,
+Hi Vivek, Yi,
 
-On 2/1/21 12:52 PM, Keqian Zhu wrote:
-> Hi Eric,
+On 2/12/21 8:14 AM, Vivek Gautam wrote:
+> Hi Yi,
 > 
-> On 2020/11/18 19:21, Eric Auger wrote:
->> On ARM, MSI are translated by the SMMU. An IOVA is allocated
->> for each MSI doorbell. If both the host and the guest are exposed
->> with SMMUs, we end up with 2 different IOVAs allocated by each.
->> guest allocates an IOVA (gIOVA) to map onto the guest MSI
->> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
->> onto the physical doorbell (hDB).
+> 
+> On Sat, Jan 23, 2021 at 2:29 PM Liu, Yi L <yi.l.liu@intel.com> wrote:
 >>
->> So we end up with 2 untied mappings:
->>          S1            S2
->> gIOVA    ->    gDB
->>               hIOVA    ->    hDB
+>> Hi Eric,
 >>
->> Currently the PCI device is programmed by the host with hIOVA
->> as MSI doorbell. So this does not work.
+>>> From: Auger Eric <eric.auger@redhat.com>
+>>> Sent: Tuesday, January 19, 2021 6:03 PM
+>>>
+>>> Hi Yi, Vivek,
+>>>
+>> [...]
+>>>> I see. I think there needs a change in the code there. Should also expect
+>>>> a nesting_info returned instead of an int anymore. @Eric, how about your
+>>>> opinion?
+>>>>
+>>>>     domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
+>>>>     ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING,
+>>> &info);
+>>>>     if (ret || !(info.features & IOMMU_NESTING_FEAT_PAGE_RESP)) {
+>>>>             /*
+>>>>              * No need go futher as no page request service support.
+>>>>              */
+>>>>             return 0;
+>>>>     }
+>>> Sure I think it is "just" a matter of synchro between the 2 series. Yi,
 >>
->> This patch introduces an API to pass gIOVA/gDB to the host so
->> that gIOVA can be reused by the host instead of re-allocating
->> a new IOVA. So the goal is to create the following nested mapping:
-> Does the gDB can be reused under non-nested mode?
+>> exactly.
+>>
+>>> do you have plans to respin part of
+>>> [PATCH v7 00/16] vfio: expose virtual Shared Virtual Addressing to VMs
+>>> or would you allow me to embed this patch in my series.
+>>
+>> My v7 hasn’t touch the prq change yet. So I think it's better for you to
+>> embed it to  your series. ^_^>>
+> 
+> Can you please let me know if you have an updated series of these
+> patches? It will help me to work with virtio-iommu/arm side changes.
 
-Under non nested mode the hIOVA is allocated within the MSI reserved
-region exposed by the SMMU driver, [0x8000000, 80fffff]. see
-iommu_dma_prepare_msi/iommu_dma_get_msi_page in dma_iommu.c. this hIOVA
-is programmed in the physical device so that the physical SMMU
-translates it into the physical doorbell (hDB = host physical ITS
-doorbell). The gDB is not used at pIOMMU programming level. It is only
-used when setting up the KVM irq route.
+As per the previous discussion, I plan to take those 2 patches in my
+SMMUv3 nested stage series:
 
-Hope this answers your question.
+[PATCH v7 01/16] iommu: Report domain nesting info
+[PATCH v7 02/16] iommu/smmu: Report empty domain nesting info
 
-> 
->>
->>          S1            S2
->> gIOVA    ->    gDB     ->    hDB
->>
->> and program the PCI device with gIOVA MSI doorbell.
->>
->> In case we have several devices attached to this nested domain
->> (devices belonging to the same group), they cannot be isolated
->> on guest side either. So they should also end up in the same domain
->> on guest side. We will enforce that all the devices attached to
->> the host iommu domain use the same physical doorbell and similarly
->> a single virtual doorbell mapping gets registered (1 single
->> virtual doorbell is used on guest as well).
->>
-> [...]
-> 
->> + *
->> + * The associated IOVA can be reused by the host to create a nested
->> + * stage2 binding mapping translating into the physical doorbell used
->> + * by the devices attached to the domain.
->> + *
->> + * All devices within the domain must share the same physical doorbell.
->> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
->> + */
->> +
->> +int iommu_bind_guest_msi(struct iommu_domain *domain,
->> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
->> +{
->> +	if (unlikely(!domain->ops->bind_guest_msi))
->> +		return -ENODEV;
->> +
->> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
->> +
->> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
->> +			    dma_addr_t iova)
-> nit: s/iova/giova
-sure
-> 
->> +{
->> +	if (unlikely(!domain->ops->unbind_guest_msi))
->> +		return;
->> +
->> +	domain->ops->unbind_guest_msi(domain, iova);
->> +}
->> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
->> +
-> [...]
-> 
-> Thanks,
-> Keqian
-> 
+we need to upgrade both since we do not want to report an empty nesting
+info anymore, for arm.
 
 Thanks
 
 Eric
+> 
+> Thanks & regards
+> Vivek
+> 
 
