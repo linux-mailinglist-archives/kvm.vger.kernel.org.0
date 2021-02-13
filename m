@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B04B31A907
-	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 01:55:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84A6131A90E
+	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 01:55:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232336AbhBMAw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 19:52:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58120 "EHLO
+        id S232418AbhBMAxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 19:53:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232291AbhBMAwD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 19:52:03 -0500
+        with ESMTP id S232367AbhBMAwk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 19:52:40 -0500
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED095C06121D
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:40 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id x4so1505142ybj.22
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485BCC061221
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:43 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id s7so1574832ybj.0
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=Ieh3m7EQmvHAenB/lO365hnHz2Mjo7nHpxo7FvHHoBw=;
-        b=mNuXGR4d6txwMt3SlFenFMnZv3aIX6yvtjONUJnLPMPhv1wOi6LCn4DDstnc+BgAfR
-         zcoEDg6VUgK7a6RWWMDSJgC1CH/BdKj7XF+q57uWZPURSrqJpdkKCwtDX6Q7vO7MpwkW
-         FUne44zNf0ElX+1aXYr4XBGIkfi3emdxvP/3THped4mZElx6G7cKm3+JIFrnYUp8IOlU
-         6ZP785nI6R2m4TCfFvKdFw76c/bD3d7ZDtJb2d8qy3Mns/EGPOtI2ZKM0O5N4P2iWp6q
-         mC/ZnEMcEqXG7Bitfwp0mIf875iMUA4yyjATr5fzqlcMwVY8DUsXalYYfhcIVzu0xvD/
-         jR3A==
+        bh=eB7aZXTG/r9znzgI5ELRRkyUfRHeewkpT855MZu37AE=;
+        b=OVopWNaHtFPNCOpDQ1/tCi/GhbNIPMIFCXIxIk4h2rZQU17WGXCmdsamNVRvmid/Gl
+         38AMLiyl6bBcg3RMgSzWBEQMsjvoYeQB9uc86BaQg/WBSo5CabOUHS+IPJpcuAM3LrH5
+         CXbKdC4Iz6On9OGkJDk0bYRz42c/zFNtqxzhCafqhHMR1ttU/wgbpaiCkkeSoaepnnap
+         ZeGIAP5HxLzbhWaMzAmteFCV3Ln+LysJ+94LNf1b+0MvknxBMqI8BteX2eq/kDGlLNj6
+         T3sDrIeksAdHdldmrn7Ug7m5FmvQIblcIwRbV36CqDmgyXWh1r3VfU81xyuj+k5cDd3h
+         lsew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=Ieh3m7EQmvHAenB/lO365hnHz2Mjo7nHpxo7FvHHoBw=;
-        b=P3yKp7AjsUJJqG25AjFvM7MPVQubzWbDNL63iejVoGQQetZuhGV2XwNY4yX/4oASLA
-         AdtkcCUYLh18b0u71iavnL0sis/Twvl7D1d4kAyn/wdb0M5cOiRf8ihQ2n0NfbWka8V/
-         BV+pxJ0hsPHJFNgwz6ogBWyTumsvLZ0zb4hZXvdlFt8Enq9QHBugq2un7vj0tWycTQPY
-         w7istRNSUril/xb1npgBJJHpAr9LDFA/C4/s6B+UsMy7RosrS1UMoBbikPJj8P0Wic1H
-         +aajEAeiHzIG9Kb3ZgNlfYD0gMvJ+2xR+pG8Bu4iqhs1XbLRIymm/rlvIh0PkoydKGuw
-         Osyg==
-X-Gm-Message-State: AOAM532+hJindXrsBQPFnNALufC9A0cW+4Hyze/JUHLjKj6wOW3h8f3M
-        HZ+s4d9qqP8OVmy1kHbdSXrv3+OKyCM=
-X-Google-Smtp-Source: ABdhPJwTkYoQFr39i7NoXmnOU+dg9Dn93Bld3ArJYdgab0PwxQiWSWu+mp0scIpzemMdicfiwZLRRV4zHEc=
+        bh=eB7aZXTG/r9znzgI5ELRRkyUfRHeewkpT855MZu37AE=;
+        b=fz4PiSKxKBwtMYHbcm7XdyNl/XktQpEjB+LWRGc/rI9vBRFRTrBfJrKzf/6OErRhBv
+         NOlvVX7OWgRCdt+bl6SG7p8ViGLyIsNC4uxfEWJTTmOk1Pn/mM6M4mKtP67+rTZ3VceS
+         m2wx5LlCBuAUyCtLKjYej2rLoX9FUVqRVvpxwDEiZ8CmGI7m0RxLk6tCbSTzmweicPMi
+         kntjL4a06wIWLXFyfM+gESX/8f0/pdrwItt85X7ugDjCiXret+c5QD4y2ztcZ40TKdFY
+         QhWZpKpIRDbG3jYY7bysXjJXk+R1mG3lNDbGLyWymbeX55R986bnIh02ahylmvBMndrJ
+         eIFQ==
+X-Gm-Message-State: AOAM530/dqGf8uNZxYMF9RDgmuqRw6YgzrTOW8+aXot0hILrA2IYHwOb
+        GLQJihFnai0TQF4gHW7UGWA/AjR44TA=
+X-Google-Smtp-Source: ABdhPJz4tMH1EqczGDDlpnTKl59BDhmPNmaAEMWZFfS0wgHvCUC6pMK7TO8gbZZ33TZZ4xCW1FhHc0s5mXQ=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:b407:1780:13d2:b27])
- (user=seanjc job=sendgmr) by 2002:a25:db48:: with SMTP id g69mr7712789ybf.109.1613177440250;
- Fri, 12 Feb 2021 16:50:40 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:20c2:: with SMTP id g185mr8171042ybg.31.1613177442563;
+ Fri, 12 Feb 2021 16:50:42 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 Feb 2021 16:50:09 -0800
+Date:   Fri, 12 Feb 2021 16:50:10 -0800
 In-Reply-To: <20210213005015.1651772-1-seanjc@google.com>
-Message-Id: <20210213005015.1651772-9-seanjc@google.com>
+Message-Id: <20210213005015.1651772-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210213005015.1651772-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 08/14] KVM: x86/mmu: Make dirty log size hook (PML) a value,
- not a function
+Subject: [PATCH 09/14] KVM: x86: Move MMU's PML logic to common code
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,100 +67,283 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Store the vendor-specific dirty log size in a variable, there's no need
-to wrap it in a function since the value is constant after
-hardware_setup() runs.
+Drop the facade of KVM's PML logic being vendor specific and move the
+bits that aren't truly VMX specific into common x86 code.  The MMU logic
+for dealing with PML is tightly coupled to the feature and to VMX's
+implementation, bouncing through kvm_x86_ops obfuscates the code without
+providing any meaningful separation of concerns or encapsulation.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 -
- arch/x86/include/asm/kvm_host.h    | 2 +-
- arch/x86/kvm/mmu/mmu.c             | 5 +----
- arch/x86/kvm/vmx/vmx.c             | 9 ++-------
- 4 files changed, 4 insertions(+), 13 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  4 ---
+ arch/x86/include/asm/kvm_host.h    | 27 ++-------------
+ arch/x86/kvm/mmu/mmu.c             | 16 +++------
+ arch/x86/kvm/vmx/vmx.c             | 55 +-----------------------------
+ arch/x86/kvm/x86.c                 | 22 ++++++++----
+ 5 files changed, 24 insertions(+), 100 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 355a2ab8fc09..28c07cc01474 100644
+index 28c07cc01474..90affdb2cbbc 100644
 --- a/arch/x86/include/asm/kvm-x86-ops.h
 +++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -97,7 +97,6 @@ KVM_X86_OP_NULL(slot_enable_log_dirty)
- KVM_X86_OP_NULL(slot_disable_log_dirty)
- KVM_X86_OP_NULL(flush_log_dirty)
- KVM_X86_OP_NULL(enable_log_dirty_pt_masked)
--KVM_X86_OP_NULL(cpu_dirty_log_size)
+@@ -93,10 +93,6 @@ KVM_X86_OP(check_intercept)
+ KVM_X86_OP(handle_exit_irqoff)
+ KVM_X86_OP_NULL(request_immediate_exit)
+ KVM_X86_OP(sched_in)
+-KVM_X86_OP_NULL(slot_enable_log_dirty)
+-KVM_X86_OP_NULL(slot_disable_log_dirty)
+-KVM_X86_OP_NULL(flush_log_dirty)
+-KVM_X86_OP_NULL(enable_log_dirty_pt_masked)
  KVM_X86_OP_NULL(pre_block)
  KVM_X86_OP_NULL(post_block)
  KVM_X86_OP_NULL(vcpu_blocking)
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 84499aad01a4..fb59933610d9 100644
+index fb59933610d9..5cf382ec48b0 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1294,7 +1294,7 @@ struct kvm_x86_ops {
- 	void (*enable_log_dirty_pt_masked)(struct kvm *kvm,
- 					   struct kvm_memory_slot *slot,
- 					   gfn_t offset, unsigned long mask);
--	int (*cpu_dirty_log_size)(void);
-+	int cpu_dirty_log_size;
+@@ -1271,29 +1271,9 @@ struct kvm_x86_ops {
+ 	void (*sched_in)(struct kvm_vcpu *kvm, int cpu);
+ 
+ 	/*
+-	 * Arch-specific dirty logging hooks. These hooks are only supposed to
+-	 * be valid if the specific arch has hardware-accelerated dirty logging
+-	 * mechanism. Currently only for PML on VMX.
+-	 *
+-	 *  - slot_enable_log_dirty:
+-	 *	called when enabling log dirty mode for the slot.
+-	 *  - slot_disable_log_dirty:
+-	 *	called when disabling log dirty mode for the slot.
+-	 *	also called when slot is created with log dirty disabled.
+-	 *  - flush_log_dirty:
+-	 *	called before reporting dirty_bitmap to userspace.
+-	 *  - enable_log_dirty_pt_masked:
+-	 *	called when reenabling log dirty for the GFNs in the mask after
+-	 *	corresponding bits are cleared in slot->dirty_bitmap.
++	 * Size of the CPU's dirty log buffer, i.e. VMX's PML buffer.  A zero
++	 * value indicates CPU dirty logging is unsupported or disabled.
+ 	 */
+-	void (*slot_enable_log_dirty)(struct kvm *kvm,
+-				      struct kvm_memory_slot *slot);
+-	void (*slot_disable_log_dirty)(struct kvm *kvm,
+-				       struct kvm_memory_slot *slot);
+-	void (*flush_log_dirty)(struct kvm *kvm);
+-	void (*enable_log_dirty_pt_masked)(struct kvm *kvm,
+-					   struct kvm_memory_slot *slot,
+-					   gfn_t offset, unsigned long mask);
+ 	int cpu_dirty_log_size;
  
  	/* pmu operations of sub-arch */
- 	const struct kvm_pmu_ops *pmu_ops;
+@@ -1439,9 +1419,6 @@ void kvm_mmu_slot_largepage_remove_write_access(struct kvm *kvm,
+ 					struct kvm_memory_slot *memslot);
+ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+ 			    struct kvm_memory_slot *memslot);
+-void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+-				   struct kvm_memory_slot *slot,
+-				   gfn_t gfn_offset, unsigned long mask);
+ void kvm_mmu_zap_all(struct kvm *kvm);
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+ unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d5849a0e3de1..6c32e8e0f720 100644
+index 6c32e8e0f720..86182e79beaf 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1294,10 +1294,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 
- int kvm_cpu_dirty_log_size(void)
+@@ -1250,9 +1250,9 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+  *
+  * Used for PML to re-log the dirty GPAs after userspace querying dirty_bitmap.
+  */
+-void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+-				     struct kvm_memory_slot *slot,
+-				     gfn_t gfn_offset, unsigned long mask)
++static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
++					 struct kvm_memory_slot *slot,
++					 gfn_t gfn_offset, unsigned long mask)
  {
--	if (kvm_x86_ops.cpu_dirty_log_size)
--		return static_call(kvm_x86_cpu_dirty_log_size)();
--
--	return 0;
-+	return kvm_x86_ops.cpu_dirty_log_size;
- }
+ 	struct kvm_rmap_head *rmap_head;
  
- bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+@@ -1268,7 +1268,6 @@ void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 		mask &= mask - 1;
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(kvm_mmu_clear_dirty_pt_masked);
+ 
+ /**
+  * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+@@ -1284,10 +1283,8 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 				struct kvm_memory_slot *slot,
+ 				gfn_t gfn_offset, unsigned long mask)
+ {
+-	if (kvm_x86_ops.enable_log_dirty_pt_masked)
+-		static_call(kvm_x86_enable_log_dirty_pt_masked)(kvm, slot,
+-								gfn_offset,
+-								mask);
++	if (kvm_x86_ops.cpu_dirty_log_size)
++		kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+ 	else
+ 		kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+ }
+@@ -5616,7 +5613,6 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+ 	if (flush)
+ 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+ }
+-EXPORT_SYMBOL_GPL(kvm_mmu_slot_leaf_clear_dirty);
+ 
+ void kvm_mmu_slot_largepage_remove_write_access(struct kvm *kvm,
+ 					struct kvm_memory_slot *memslot)
+@@ -5633,7 +5629,6 @@ void kvm_mmu_slot_largepage_remove_write_access(struct kvm *kvm,
+ 	if (flush)
+ 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+ }
+-EXPORT_SYMBOL_GPL(kvm_mmu_slot_largepage_remove_write_access);
+ 
+ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+ 			    struct kvm_memory_slot *memslot)
+@@ -5649,7 +5644,6 @@ void kvm_mmu_slot_set_dirty(struct kvm *kvm,
+ 	if (flush)
+ 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+ }
+-EXPORT_SYMBOL_GPL(kvm_mmu_slot_set_dirty);
+ 
+ void kvm_mmu_zap_all(struct kvm *kvm)
+ {
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b47ed3f412ef..f843707dd7df 100644
+index f843707dd7df..862d1f5627e7 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7650,11 +7650,6 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- 	return supported & BIT(bit);
+@@ -5776,24 +5776,6 @@ static void vmx_flush_pml_buffer(struct kvm_vcpu *vcpu)
+ 	vmcs_write16(GUEST_PML_INDEX, PML_ENTITY_NUM - 1);
  }
  
--static int vmx_cpu_dirty_log_size(void)
+-/*
+- * Flush all vcpus' PML buffer and update logged GPAs to dirty_bitmap.
+- * Called before reporting dirty_bitmap to userspace.
+- */
+-static void kvm_flush_pml_buffers(struct kvm *kvm)
 -{
--	return enable_pml ? PML_ENTITY_NUM : 0;
+-	int i;
+-	struct kvm_vcpu *vcpu;
+-	/*
+-	 * We only need to kick vcpu out of guest mode here, as PML buffer
+-	 * is flushed at beginning of all VMEXITs, and it's obvious that only
+-	 * vcpus running in guest are possible to have unflushed GPAs in PML
+-	 * buffer.
+-	 */
+-	kvm_for_each_vcpu(i, vcpu, kvm)
+-		kvm_vcpu_kick(vcpu);
 -}
 -
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.hardware_unsetup = hardware_unsetup,
+ static void vmx_dump_sel(char *name, uint32_t sel)
+ {
+ 	pr_err("%s sel=0x%04x, attr=0x%05x, limit=0x%08x, base=0x%016lx\n",
+@@ -7517,32 +7499,6 @@ static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+ 		shrink_ple_window(vcpu);
+ }
  
-@@ -7758,6 +7753,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.slot_disable_log_dirty = vmx_slot_disable_log_dirty,
- 	.flush_log_dirty = vmx_flush_log_dirty,
- 	.enable_log_dirty_pt_masked = vmx_enable_log_dirty_pt_masked,
-+	.cpu_dirty_log_size = PML_ENTITY_NUM,
+-static void vmx_slot_enable_log_dirty(struct kvm *kvm,
+-				     struct kvm_memory_slot *slot)
+-{
+-	if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
+-		kvm_mmu_slot_leaf_clear_dirty(kvm, slot);
+-	kvm_mmu_slot_largepage_remove_write_access(kvm, slot);
+-}
+-
+-static void vmx_slot_disable_log_dirty(struct kvm *kvm,
+-				       struct kvm_memory_slot *slot)
+-{
+-	kvm_mmu_slot_set_dirty(kvm, slot);
+-}
+-
+-static void vmx_flush_log_dirty(struct kvm *kvm)
+-{
+-	kvm_flush_pml_buffers(kvm);
+-}
+-
+-static void vmx_enable_log_dirty_pt_masked(struct kvm *kvm,
+-					   struct kvm_memory_slot *memslot,
+-					   gfn_t offset, unsigned long mask)
+-{
+-	kvm_mmu_clear_dirty_pt_masked(kvm, memslot, offset, mask);
+-}
+-
+ static int vmx_pre_block(struct kvm_vcpu *vcpu)
+ {
+ 	if (pi_pre_block(vcpu))
+@@ -7749,10 +7705,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.sched_in = vmx_sched_in,
+ 
+-	.slot_enable_log_dirty = vmx_slot_enable_log_dirty,
+-	.slot_disable_log_dirty = vmx_slot_disable_log_dirty,
+-	.flush_log_dirty = vmx_flush_log_dirty,
+-	.enable_log_dirty_pt_masked = vmx_enable_log_dirty_pt_masked,
+ 	.cpu_dirty_log_size = PML_ENTITY_NUM,
  
  	.pre_block = vmx_pre_block,
- 	.post_block = vmx_post_block,
-@@ -7785,7 +7781,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+@@ -7897,13 +7849,8 @@ static __init int hardware_setup(void)
+ 	if (!enable_ept || !enable_ept_ad_bits || !cpu_has_vmx_pml())
+ 		enable_pml = 0;
  
- 	.msr_filter_changed = vmx_msr_filter_changed,
- 	.complete_emulated_msr = kvm_complete_insn_gp,
--	.cpu_dirty_log_size = vmx_cpu_dirty_log_size,
- 
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- };
-@@ -7907,7 +7902,7 @@ static __init int hardware_setup(void)
- 		vmx_x86_ops.slot_disable_log_dirty = NULL;
- 		vmx_x86_ops.flush_log_dirty = NULL;
- 		vmx_x86_ops.enable_log_dirty_pt_masked = NULL;
--		vmx_x86_ops.cpu_dirty_log_size = NULL;
-+		vmx_x86_ops.cpu_dirty_log_size = 0;
- 	}
+-	if (!enable_pml) {
+-		vmx_x86_ops.slot_enable_log_dirty = NULL;
+-		vmx_x86_ops.slot_disable_log_dirty = NULL;
+-		vmx_x86_ops.flush_log_dirty = NULL;
+-		vmx_x86_ops.enable_log_dirty_pt_masked = NULL;
++	if (!enable_pml)
+ 		vmx_x86_ops.cpu_dirty_log_size = 0;
+-	}
  
  	if (!cpu_has_vmx_preemption_timer())
+ 		enable_preemption_timer = false;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3fa140383f5d..e89fe98a0099 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5214,10 +5214,18 @@ static int kvm_vm_ioctl_reinject(struct kvm *kvm,
+ 
+ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ {
++
+ 	/*
+-	 * Flush potentially hardware-cached dirty pages to dirty_bitmap.
++	 * Flush all CPUs' dirty log buffers to the  dirty_bitmap.  Called
++	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
++	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
++	 * VM-Exit.
+ 	 */
+-	static_call_cond(kvm_x86_flush_log_dirty)(kvm);
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		kvm_vcpu_kick(vcpu);
+ }
+ 
+ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_event,
+@@ -10809,8 +10817,10 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 	 * is enabled the D-bit or the W-bit will be cleared.
+ 	 */
+ 	if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+-		if (kvm_x86_ops.slot_enable_log_dirty) {
+-			static_call(kvm_x86_slot_enable_log_dirty)(kvm, new);
++		if (kvm_x86_ops.cpu_dirty_log_size) {
++			if (!kvm_dirty_log_manual_protect_and_init_set(kvm))
++				kvm_mmu_slot_leaf_clear_dirty(kvm, new);
++			kvm_mmu_slot_largepage_remove_write_access(kvm, new);
+ 		} else {
+ 			int level =
+ 				kvm_dirty_log_manual_protect_and_init_set(kvm) ?
+@@ -10826,8 +10836,8 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 			 */
+ 			kvm_mmu_slot_remove_write_access(kvm, new, level);
+ 		}
+-	} else {
+-		static_call_cond(kvm_x86_slot_disable_log_dirty)(kvm, new);
++	} else if (kvm_x86_ops.cpu_dirty_log_size) {
++		kvm_mmu_slot_set_dirty(kvm, new);
+ 	}
+ }
+ 
 -- 
 2.30.0.478.g8a0d178c01-goog
 
