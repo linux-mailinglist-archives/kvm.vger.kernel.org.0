@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D6FD31ABBC
-	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 14:30:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2D831ABBA
+	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 14:29:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbhBMN3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Feb 2021 08:29:44 -0500
-Received: from mga03.intel.com ([134.134.136.65]:7932 "EHLO mga03.intel.com"
+        id S229780AbhBMN3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Feb 2021 08:29:54 -0500
+Received: from mga03.intel.com ([134.134.136.65]:7913 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229672AbhBMN3m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Feb 2021 08:29:42 -0500
-IronPort-SDR: t0kwf6DFDCMv51SEwx7dYPZDxB3gNcKpeV4PFmBiufjKej6y+w+EgAb2uCxEbMN+Xx+6Tj6YI7
- nrAXmHLyf9Fg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9893"; a="182595705"
+        id S229672AbhBMN3x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Feb 2021 08:29:53 -0500
+IronPort-SDR: SnGvLoAlR8J7yahgUYxT+oUhOGFYoyn+GcwT91xYIqgVV8awd304JBl+Bd4820AjvZbwGNSQJa
+ Vr6L/+NPKLhg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9893"; a="182595708"
 X-IronPort-AV: E=Sophos;i="5.81,176,1610438400"; 
-   d="scan'208";a="182595705"
+   d="scan'208";a="182595708"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2021 05:28:58 -0800
-IronPort-SDR: 4Cp+O0PfmoLnLDJBf1NkdgFiqIjXd0+5raW9MfO39a2CBGhI06qqy2YADDw0XCnVpAGGElrcK3
- OuYyD9EU9vHw==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2021 05:29:01 -0800
+IronPort-SDR: B/SJMgXIuU+kbGEM3t09oO4BPqGXGCE84IHIJ/7DiYq/8byRDWuapQVnuiEN3R0z8s0B/HKW34
+ Kk6AzPyyVPUA==
 X-IronPort-AV: E=Sophos;i="5.81,176,1610438400"; 
-   d="scan'208";a="398365959"
+   d="scan'208";a="398365965"
 Received: from kshah-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.239])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2021 05:28:55 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2021 05:28:58 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
@@ -31,9 +31,9 @@ Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v5 03/26] x86/sgx: Wipe out EREMOVE from sgx_free_epc_page()
-Date:   Sun, 14 Feb 2021 02:28:37 +1300
-Message-Id: <f6f9867642505d90968a260538c90444b3fe3809.1613221549.git.kai.huang@intel.com>
+Subject: [RFC PATCH v5 04/26] x86/sgx: Add SGX_CHILD_PRESENT hardware error code
+Date:   Sun, 14 Feb 2021 02:28:38 +1300
+Message-Id: <5eb17810365b7d33b9e106e7ba12502551eea1a8.1613221549.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1613221549.git.kai.huang@intel.com>
 References: <cover.1613221549.git.kai.huang@intel.com>
@@ -43,122 +43,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jarkko Sakkinen <jarkko@kernel.org>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-EREMOVE takes a pages and removes any association between that page and
-an enclave.  It must be run on a page before it can be added into
-another enclave.  Currently, EREMOVE is run as part of pages being freed
-into the SGX page allocator.  It is not expected to fail.
+SGX driver can accurately track how enclave pages are used.  This
+enables SECS to be specifically targeted and EREMOVE'd only after all
+child pages have been EREMOVE'd.  This ensures that SGX driver will
+never encounter SGX_CHILD_PRESENT in normal operation.
 
-KVM does not track how guest pages are used, which means that SGX
-virtualization use of EREMOVE might fail.
+Virtual EPC is different.  The host does not track how EPC pages are
+used by the guest, so it cannot guarantee EREMOVE success.  It might,
+for instance, encounter a SECS with a non-zero child count.
 
-Break out the EREMOVE call from the SGX page allocator.  This will allow
-the SGX virtualization code to use the allocator directly.  (SGX/KVM
-will also introduce a more permissive EREMOVE helper).
+Add a definition of SGX_CHILD_PRESENT.  It will be used exclusively by
+the SGX virtualization driver to handle recoverable EREMOVE errors when
+saniziting EPC pages after they are freed.
 
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Acked-by: Dave Hansen <dave.hansen@intel.com>
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
 v4->v5:
 
- - Refined the comment of sgx_reset_epc_page(), per Dave.
- - Refined the commit msg (which I missed in v4), per Dave.
- - Refined the grammar of the comment of sgx_free_epc_page() (which I missed
-   in v4), per Dave.
+ - Refined the last paragraph in commit message, per Dave and Sean.
+
+   (Hi Dave, I assumed I can still have your Acked-by. Let me know I got it
+    wrong. Thanks.)
 
 v3->v4:
 
- - Moved WARN() on SGX_EPC_PAGE_RECLAIMER_TRACKED flag to sgx_reset_epc_page(),
-   since the patch to remove the WARN() in v3 was removed. Dave and Sean were
-   not convinced, and Sean "tripped more than once in the past during one of
-   the many rebases of the virtual EPC and EPC cgroup branches".
- - Added a comment in sgx_reset_epc_page() to explain sgx_free_epc_page() now
-   won't do EREMOVE and is expecting EPC page already in clean slate, per Dave.
+ - Refined the commit msg, per Dave.
+
+v2->v3:
+
+ - Changed from 'Enclave has child' to 'SECS has child', per Jarkko.
 
 ---
- arch/x86/kernel/cpu/sgx/encl.c | 19 +++++++++++++++++++
- arch/x86/kernel/cpu/sgx/main.c | 12 ++++--------
- 2 files changed, 23 insertions(+), 8 deletions(-)
+ arch/x86/kernel/cpu/sgx/arch.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kernel/cpu/sgx/encl.c b/arch/x86/kernel/cpu/sgx/encl.c
-index 20a2dd5ba2b4..584fceab6c76 100644
---- a/arch/x86/kernel/cpu/sgx/encl.c
-+++ b/arch/x86/kernel/cpu/sgx/encl.c
-@@ -381,6 +381,22 @@ const struct vm_operations_struct sgx_vm_ops = {
- 	.access = sgx_vma_access,
- };
- 
-+
-+/*
-+ * Place the page in uninitialized state.  Only usable by callers that
-+ * know the page is in a clean state in which EREMOVE will succeed.
-+ */
-+static void sgx_reset_epc_page(struct sgx_epc_page *epc_page)
-+{
-+	int ret;
-+
-+	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-+
-+	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-+	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
-+		return;
-+}
-+
- /**
-  * sgx_encl_release - Destroy an enclave instance
-  * @kref:	address of a kref inside &sgx_encl
-@@ -404,6 +420,7 @@ void sgx_encl_release(struct kref *ref)
- 			if (sgx_unmark_page_reclaimable(entry->epc_page))
- 				continue;
- 
-+			sgx_reset_epc_page(entry->epc_page);
- 			sgx_free_epc_page(entry->epc_page);
- 			encl->secs_child_cnt--;
- 			entry->epc_page = NULL;
-@@ -415,6 +432,7 @@ void sgx_encl_release(struct kref *ref)
- 	xa_destroy(&encl->page_array);
- 
- 	if (!encl->secs_child_cnt && encl->secs.epc_page) {
-+		sgx_reset_epc_page(encl->secs.epc_page);
- 		sgx_free_epc_page(encl->secs.epc_page);
- 		encl->secs.epc_page = NULL;
- 	}
-@@ -423,6 +441,7 @@ void sgx_encl_release(struct kref *ref)
- 		va_page = list_first_entry(&encl->va_pages, struct sgx_va_page,
- 					   list);
- 		list_del(&va_page->list);
-+		sgx_reset_epc_page(va_page->epc_page);
- 		sgx_free_epc_page(va_page->epc_page);
- 		kfree(va_page);
- 	}
-diff --git a/arch/x86/kernel/cpu/sgx/main.c b/arch/x86/kernel/cpu/sgx/main.c
-index 8df81a3ed945..44fe91a5bfb3 100644
---- a/arch/x86/kernel/cpu/sgx/main.c
-+++ b/arch/x86/kernel/cpu/sgx/main.c
-@@ -598,18 +598,14 @@ struct sgx_epc_page *sgx_alloc_epc_page(void *owner, bool reclaim)
-  * sgx_free_epc_page() - Free an EPC page
-  * @page:	an EPC page
-  *
-- * Call EREMOVE for an EPC page and insert it back to the list of free pages.
-+ * Put the EPC page back to the list of free pages. It's the caller's
-+ * responsibility to make sure that the page is in uninitialized state. In other
-+ * words, do EREMOVE, EWB or whatever operation is necessary before calling
-+ * this function.
+diff --git a/arch/x86/kernel/cpu/sgx/arch.h b/arch/x86/kernel/cpu/sgx/arch.h
+index dd7602c44c72..abf99bb71fdc 100644
+--- a/arch/x86/kernel/cpu/sgx/arch.h
++++ b/arch/x86/kernel/cpu/sgx/arch.h
+@@ -26,12 +26,14 @@
+  * enum sgx_return_code - The return code type for ENCLS, ENCLU and ENCLV
+  * %SGX_NOT_TRACKED:		Previous ETRACK's shootdown sequence has not
+  *				been completed yet.
++ * %SGX_CHILD_PRESENT		SECS has child pages present in the EPC.
+  * %SGX_INVALID_EINITTOKEN:	EINITTOKEN is invalid and enclave signer's
+  *				public key does not match IA32_SGXLEPUBKEYHASH.
+  * %SGX_UNMASKED_EVENT:		An unmasked event, e.g. INTR, was received
   */
- void sgx_free_epc_page(struct sgx_epc_page *page)
- {
- 	struct sgx_epc_section *section = &sgx_epc_sections[page->section];
--	int ret;
--
--	WARN_ON_ONCE(page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
--
--	ret = __eremove(sgx_get_epc_virt_addr(page));
--	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
--		return;
- 
- 	spin_lock(&section->lock);
- 	list_add_tail(&page->list, &section->page_list);
+ enum sgx_return_code {
+ 	SGX_NOT_TRACKED			= 11,
++	SGX_CHILD_PRESENT		= 13,
+ 	SGX_INVALID_EINITTOKEN		= 16,
+ 	SGX_UNMASKED_EVENT		= 128,
+ };
 -- 
 2.29.2
 
