@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13BC231A90D
-	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 01:55:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B04B31A907
+	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 01:55:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232360AbhBMAxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 19:53:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58306 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232338AbhBMAw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S232336AbhBMAw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 12 Feb 2021 19:52:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232291AbhBMAwD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 19:52:03 -0500
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A07CCC06121C
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:38 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id u1so1523879ybu.14
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED095C06121D
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:40 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id x4so1505142ybj.22
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 16:50:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=qgHHy11/Gmg7Kjm2oa98mzp3zSXXJwJ1MHurK3QurWI=;
-        b=JzER6/A4WcR1Yxht+KX+/Ie2lNSUt4QDexn+mTaBXkA3mUuSs4eh+qma7hs8FCrhX9
-         a9I98dy32xEYCSrwTkDbadFnZmBsAvDRXPreGzmTPDzI+orEI3qKKMoQCqZrjCZYaFzQ
-         ZX9qU1Qc3D3y3vWrxxbTo0GMSfTBQDPJkm3Xg4rrVmifiiu3rpbeYzAGZfUx/wZFYAOt
-         pGsIfZQFJe+yFQzjKJCfQNMnBMNNVaxP/iY4lWZNItq6y10vYPBYxA2U28WcfVOnchbv
-         hCL6a1w9X8EeRIMsP5yVhf6s+o0YxVuA3x45+RgbRo2wmMaETBELL+eM/OJB0ixMaYw5
-         CPzA==
+        bh=Ieh3m7EQmvHAenB/lO365hnHz2Mjo7nHpxo7FvHHoBw=;
+        b=mNuXGR4d6txwMt3SlFenFMnZv3aIX6yvtjONUJnLPMPhv1wOi6LCn4DDstnc+BgAfR
+         zcoEDg6VUgK7a6RWWMDSJgC1CH/BdKj7XF+q57uWZPURSrqJpdkKCwtDX6Q7vO7MpwkW
+         FUne44zNf0ElX+1aXYr4XBGIkfi3emdxvP/3THped4mZElx6G7cKm3+JIFrnYUp8IOlU
+         6ZP785nI6R2m4TCfFvKdFw76c/bD3d7ZDtJb2d8qy3Mns/EGPOtI2ZKM0O5N4P2iWp6q
+         mC/ZnEMcEqXG7Bitfwp0mIf875iMUA4yyjATr5fzqlcMwVY8DUsXalYYfhcIVzu0xvD/
+         jR3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=qgHHy11/Gmg7Kjm2oa98mzp3zSXXJwJ1MHurK3QurWI=;
-        b=BPijwuW2mJtvRoZue42IEH3xezpTnr6AHScr5dIkE9WBQXEZ4JD/mlQAUpZWbhZwf3
-         t3s9Jt7UXmVHvA0ugo3tmWlkMUESOD369B9XFkq0giiAYEZlM65HmMdD5Cv31FhP5VJh
-         8Co8bgfC8Bdq0WpzEVNtTGx42erARAudsV0lTWtGE32Z3V3vifW3c/T/H6+ZCs4+0sB8
-         IVavyznDEpOIFhhwUyyKXL98a4gywzSNK74GdJ+iz6rX5OL3zNzHyizAnvxvCblD2B/t
-         tdMkvUjorKKpad9L459LBgLXPUzSgZUTncDMFDLV3SAGQdNkMZ7aKDgNRnOWZnGLxLYN
-         ibJw==
-X-Gm-Message-State: AOAM531DSirDbfLIowiniEWz7osqXVmWMxEo+lTVBL2H6kJqB3mpHKId
-        ZFc4c851dtal6B3TgdiF7edflQQ7XkI=
-X-Google-Smtp-Source: ABdhPJz1CJdQJZRt8FQ7rL9sa+SP7EuA2BCPuYyVPIm2ReE/REHoc291v+SKPS1vg/Ta3l+cxKlaFs0Ntx4=
+        bh=Ieh3m7EQmvHAenB/lO365hnHz2Mjo7nHpxo7FvHHoBw=;
+        b=P3yKp7AjsUJJqG25AjFvM7MPVQubzWbDNL63iejVoGQQetZuhGV2XwNY4yX/4oASLA
+         AdtkcCUYLh18b0u71iavnL0sis/Twvl7D1d4kAyn/wdb0M5cOiRf8ihQ2n0NfbWka8V/
+         BV+pxJ0hsPHJFNgwz6ogBWyTumsvLZ0zb4hZXvdlFt8Enq9QHBugq2un7vj0tWycTQPY
+         w7istRNSUril/xb1npgBJJHpAr9LDFA/C4/s6B+UsMy7RosrS1UMoBbikPJj8P0Wic1H
+         +aajEAeiHzIG9Kb3ZgNlfYD0gMvJ+2xR+pG8Bu4iqhs1XbLRIymm/rlvIh0PkoydKGuw
+         Osyg==
+X-Gm-Message-State: AOAM532+hJindXrsBQPFnNALufC9A0cW+4Hyze/JUHLjKj6wOW3h8f3M
+        HZ+s4d9qqP8OVmy1kHbdSXrv3+OKyCM=
+X-Google-Smtp-Source: ABdhPJwTkYoQFr39i7NoXmnOU+dg9Dn93Bld3ArJYdgab0PwxQiWSWu+mp0scIpzemMdicfiwZLRRV4zHEc=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:b407:1780:13d2:b27])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1d2:: with SMTP id
- u18mr7581074ybh.103.1613177437917; Fri, 12 Feb 2021 16:50:37 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:db48:: with SMTP id g69mr7712789ybf.109.1613177440250;
+ Fri, 12 Feb 2021 16:50:40 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 Feb 2021 16:50:08 -0800
+Date:   Fri, 12 Feb 2021 16:50:09 -0800
 In-Reply-To: <20210213005015.1651772-1-seanjc@google.com>
-Message-Id: <20210213005015.1651772-8-seanjc@google.com>
+Message-Id: <20210213005015.1651772-9-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210213005015.1651772-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 07/14] KVM: x86/mmu: Expand on the comment in kvm_vcpu_ad_need_write_protect()
+Subject: [PATCH 08/14] KVM: x86/mmu: Make dirty log size hook (PML) a value,
+ not a function
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,32 +68,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expand the comment about need to use write-protection for nested EPT
-when PML is enabled to clarify that the tagging is a nop when PML is
-_not_ enabled.  Without the clarification, omitting the PML check looks
-wrong at first^Wfifth glance.
+Store the vendor-specific dirty log size in a variable, there's no need
+to wrap it in a function since the value is constant after
+hardware_setup() runs.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm-x86-ops.h | 1 -
+ arch/x86/include/asm/kvm_host.h    | 2 +-
+ arch/x86/kvm/mmu/mmu.c             | 5 +----
+ arch/x86/kvm/vmx/vmx.c             | 9 ++-------
+ 4 files changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 0b55aa561ec8..72b0928f2b2d 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -84,7 +84,10 @@ static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
- 	 * When using the EPT page-modification log, the GPAs in the log
- 	 * would come from L2 rather than L1.  Therefore, we need to rely
- 	 * on write protection to record dirty pages.  This also bypasses
--	 * PML, since writes now result in a vmexit.
-+	 * PML, since writes now result in a vmexit.  Note, this helper will
-+	 * tag SPTEs as needing write-protection even if PML is disabled or
-+	 * unsupported, but that's ok because the tag is consumed if and only
-+	 * if PML is enabled.  Omit the PML check to save a few uops.
- 	 */
- 	return vcpu->arch.mmu == &vcpu->arch.guest_mmu;
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 355a2ab8fc09..28c07cc01474 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -97,7 +97,6 @@ KVM_X86_OP_NULL(slot_enable_log_dirty)
+ KVM_X86_OP_NULL(slot_disable_log_dirty)
+ KVM_X86_OP_NULL(flush_log_dirty)
+ KVM_X86_OP_NULL(enable_log_dirty_pt_masked)
+-KVM_X86_OP_NULL(cpu_dirty_log_size)
+ KVM_X86_OP_NULL(pre_block)
+ KVM_X86_OP_NULL(post_block)
+ KVM_X86_OP_NULL(vcpu_blocking)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 84499aad01a4..fb59933610d9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1294,7 +1294,7 @@ struct kvm_x86_ops {
+ 	void (*enable_log_dirty_pt_masked)(struct kvm *kvm,
+ 					   struct kvm_memory_slot *slot,
+ 					   gfn_t offset, unsigned long mask);
+-	int (*cpu_dirty_log_size)(void);
++	int cpu_dirty_log_size;
+ 
+ 	/* pmu operations of sub-arch */
+ 	const struct kvm_pmu_ops *pmu_ops;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index d5849a0e3de1..6c32e8e0f720 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1294,10 +1294,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 
+ int kvm_cpu_dirty_log_size(void)
+ {
+-	if (kvm_x86_ops.cpu_dirty_log_size)
+-		return static_call(kvm_x86_cpu_dirty_log_size)();
+-
+-	return 0;
++	return kvm_x86_ops.cpu_dirty_log_size;
  }
+ 
+ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b47ed3f412ef..f843707dd7df 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7650,11 +7650,6 @@ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+ 	return supported & BIT(bit);
+ }
+ 
+-static int vmx_cpu_dirty_log_size(void)
+-{
+-	return enable_pml ? PML_ENTITY_NUM : 0;
+-}
+-
+ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.hardware_unsetup = hardware_unsetup,
+ 
+@@ -7758,6 +7753,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 	.slot_disable_log_dirty = vmx_slot_disable_log_dirty,
+ 	.flush_log_dirty = vmx_flush_log_dirty,
+ 	.enable_log_dirty_pt_masked = vmx_enable_log_dirty_pt_masked,
++	.cpu_dirty_log_size = PML_ENTITY_NUM,
+ 
+ 	.pre_block = vmx_pre_block,
+ 	.post_block = vmx_post_block,
+@@ -7785,7 +7781,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.msr_filter_changed = vmx_msr_filter_changed,
+ 	.complete_emulated_msr = kvm_complete_insn_gp,
+-	.cpu_dirty_log_size = vmx_cpu_dirty_log_size,
+ 
+ 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+ };
+@@ -7907,7 +7902,7 @@ static __init int hardware_setup(void)
+ 		vmx_x86_ops.slot_disable_log_dirty = NULL;
+ 		vmx_x86_ops.flush_log_dirty = NULL;
+ 		vmx_x86_ops.enable_log_dirty_pt_masked = NULL;
+-		vmx_x86_ops.cpu_dirty_log_size = NULL;
++		vmx_x86_ops.cpu_dirty_log_size = 0;
+ 	}
+ 
+ 	if (!cpu_has_vmx_preemption_timer())
 -- 
 2.30.0.478.g8a0d178c01-goog
 
