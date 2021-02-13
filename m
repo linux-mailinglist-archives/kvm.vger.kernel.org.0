@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A53131A94B
-	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 02:09:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C806931A94F
+	for <lists+kvm@lfdr.de>; Sat, 13 Feb 2021 02:09:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232391AbhBMBHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Feb 2021 20:07:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33188 "EHLO
+        id S231317AbhBMBIA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Feb 2021 20:08:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232318AbhBMBHH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Feb 2021 20:07:07 -0500
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88D3C061356
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 17:05:44 -0800 (PST)
-Received: by mail-qk1-x74a.google.com with SMTP id n62so1022534qkn.7
-        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 17:05:44 -0800 (PST)
+        with ESMTP id S232415AbhBMBHc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Feb 2021 20:07:32 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52B6C06121C
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 17:05:46 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id u3so1577509ybj.13
+        for <kvm@vger.kernel.org>; Fri, 12 Feb 2021 17:05:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=P+psZ8urjSB19xd68DRcw5VIbpFuXXaxHhSRR+LYyzM=;
-        b=k6qkmAvojRBdZtQiL1P3/gZ3Ohf8rmwo3kI3u0nfcqM5xXx6p631Ajcjl7zcdiSRHw
-         rSrO6ebqY02dZji0IdXk3bfJ5KOGfMWTqIEHeOxX/52Zirlye6uHVDxtE9b/IDBHvRMg
-         em81wXDx2Jhw8H9RLPrAkYG/HGeB5hKozyuYvnjJPqLUrKf1n9QWMuJSFLigZ3fOum4j
-         2/ObS62FRkWpAfG/DsdH1nX+jFmy9f4dP1o81l/TVYOlbhERATidBSkyhF5QDQtg1pCE
-         OKGBlkJBVpi6IWvji/drU8AyH4AyrGrPJRERqG/70KuSCMqWJXjR3VG/8KB+shu6U8F0
-         0eGA==
+        bh=4l7lJ89dUN/mDifctyjmka3i9z9nrBYEG0xhjmdSUUo=;
+        b=YuUYSqFaQ2X/0AytqcSo2UGtMt7JtxTw3r9Xzk7NzwzyffwnESubnEoE7LsExZarvt
+         8+srTOrLYWx8VNCnh+NMkLm8HBBYc1aW8jDYfjBjnNkbW2s58daTr3p+gHwV0OxNV4Sy
+         hdMM2vEhrY+wf282MZxoJGM4ELVodFjb7XGiRYxSVFYFPhMv9IfdS1QpJBg37RLjdTaS
+         Buc7LUfI+pockTKv0tdUNTVMnQEvhEy6Y6evVbg5LUTcpDwaFrNuNyICJdyXI3KOy5Dz
+         HFreFKXVzbUi+HaSHgAEDNC4ycPviQrRrczVyEzojLuex32wF3Q5yVCFbp69zythHxiO
+         pEhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=P+psZ8urjSB19xd68DRcw5VIbpFuXXaxHhSRR+LYyzM=;
-        b=AzQuBhNFZYRBshIQvNqdQdnl6fuPlDFIY/AlynMGC6As9kfidf12mXOfRmGTwutO1f
-         ZaeXuIn2+n+2BVT2Yz1ij7KJXwEA81kfb1dbN/ugG/G9t56iVAh4meomoEkxdStE7Slf
-         QMB9zoi3t24EvOzYHtYetUEAMYmi7FeYO+O/sRdnBm9tMn24J87CHJ22B0F+CYxDyeNZ
-         ep0mQ72XMaafwpfk1yo1Tq7r8LHh1iuGwJjJ34KdRmm08umgmuFjH1w/Pc1MicqLjsl0
-         ahHbCoO2K3u0HpduyXtuYwBQITJU4bI8v6751u4iqZKZmn25Ln7mh4DZNq+w6000AfB0
-         OOTA==
-X-Gm-Message-State: AOAM530mjJNfVT0w31DzO+H/jAbyyedYoBS8E1NVOK6R5IafKjF2gIuI
-        w5BMHqMGPNq0B2c6es3rGeCYjzH1zsY=
-X-Google-Smtp-Source: ABdhPJy0LFozKYfLKCDmm992FOaE4QAa6HOq5vsXSWWjOS4e2eIfXgPp1+BlwSSEBaBZnvdBtmc0SFrpE7w=
+        bh=4l7lJ89dUN/mDifctyjmka3i9z9nrBYEG0xhjmdSUUo=;
+        b=Y0cD6PO/b2Fl7Aj2VIDszzxufE1EEB3LlPCD7eBZc8ern4uqn8oy939AYD4rkc8ZEp
+         2dhrRHjJMBomz8bQucuriG6LEk1x8T49lHmmWMtPixStTkiUfWLZVWlin1CTxN66Jvip
+         Bz9QG5DLr/OdnbQ6FMwZ8wqu6iGmBjoHBUyUPVzp/Jvac95TXUlDPgBMAQsTwqLqHTkq
+         NM6FBu106ucypL0pZqPoV5LmAItGmyD/QYAC7RknEA0Pi3ZcuKDzJfVUSYl24c/h5CBZ
+         0OFnEbICM/j36xVcUSH4uvYqQP8K8PeyH2jKI6LYPwf2dLhgCO14TFpov9Mx6mASz8j/
+         SY5Q==
+X-Gm-Message-State: AOAM532E0yxYmIvpnlpC0b2DETggrT5N37Ul9OCzHTUrvjXW5AMgqzs6
+        XgIzY8tky47Gk/pFUMtf/FkWqFxy/W4=
+X-Google-Smtp-Source: ABdhPJwRv7XF/pVWzpewg9HbbCCXg2ivDZcIqXVajCZywXnqWbM7K4Of/uyX2s/OJKRsluXzj0diKX6QMO0=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:b407:1780:13d2:b27])
- (user=seanjc job=sendgmr) by 2002:a05:6214:94a:: with SMTP id
- dn10mr5178605qvb.28.1613178343985; Fri, 12 Feb 2021 17:05:43 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:b904:: with SMTP id x4mr7134861ybj.189.1613178346051;
+ Fri, 12 Feb 2021 17:05:46 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 12 Feb 2021 17:05:16 -0800
+Date:   Fri, 12 Feb 2021 17:05:17 -0800
 In-Reply-To: <20210213010518.1682691-1-seanjc@google.com>
-Message-Id: <20210213010518.1682691-8-seanjc@google.com>
+Message-Id: <20210213010518.1682691-9-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210213010518.1682691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH 7/9] KVM: x86/xen: Drop RAX[63:32] when processing hypercall
+Subject: [PATCH 8/9] KVM: SVM: Use default rAX size for INVLPGA emulation
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,34 +68,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Truncate RAX to 32 bits, i.e. consume EAX, when retrieving the hypecall
-index for a Xen hypercall.  Per Xen documentation[*], the index is EAX
-when the vCPU is not in 64-bit mode.
+Drop bits 63:32 of RAX when grabbing the address for INVLPGA emulation
+outside of 64-bit mode to make KVM's emulation slightly less wrong.  The
+address for INVLPGA is determined by the effective address size, i.e.
+it's not hardcoded to 64/32 bits for a given mode.  Add a FIXME to call
+out that the emulation is wrong.
 
-[*] http://xenbits.xenproject.org/docs/sphinx-unstable/guest-guide/x86/hypercall-abi.html
+Opportunistically tweak the ASID handling to make it clear that it's
+defined by ECX, not rCX.
 
-Fixes: 23200b7a30de ("KVM: x86/xen: intercept xen hypercalls if enabled")
-Cc: Joao Martins <joao.m.martins@oracle.com>
-Cc: David Woodhouse <dwmw@amazon.co.uk>
+Per the APM:
+   The portion of rAX used to form the address is determined by the
+   effective address size (current execution mode and optional address
+   size prefix). The ASID is taken from ECX.
+
+Fixes: ff092385e828 ("KVM: SVM: Implement INVLPGA")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/xen.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index af8f6562fce4..5bfed72edd07 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -383,7 +383,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
- 	bool longmode;
- 	u64 input, params[6];
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d077584d45ec..4dc64ebaa756 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2327,12 +2327,17 @@ static int clgi_interception(struct vcpu_svm *svm)
+ static int invlpga_interception(struct vcpu_svm *svm)
+ {
+ 	struct kvm_vcpu *vcpu = &svm->vcpu;
++	gva_t gva = kvm_rax_read(vcpu);
++	u32 asid = kvm_rcx_read(vcpu);
  
--	input = (u64)kvm_register_read(vcpu, VCPU_REGS_RAX);
-+	input = (u64)kvm_register_readl(vcpu, VCPU_REGS_RAX);
+-	trace_kvm_invlpga(svm->vmcb->save.rip, kvm_rcx_read(&svm->vcpu),
+-			  kvm_rax_read(&svm->vcpu));
++	/* FIXME: Handle an address size prefix. */
++	if (!is_long_mode(vcpu))
++		gva = (u32)gva;
++
++	trace_kvm_invlpga(svm->vmcb->save.rip, asid, gva);
  
- 	/* Hyper-V hypercalls get bit 31 set in EAX */
- 	if ((input & 0x80000000) &&
+ 	/* Let's treat INVLPGA the same as INVLPG (can be optimized!) */
+-	kvm_mmu_invlpg(vcpu, kvm_rax_read(&svm->vcpu));
++	kvm_mmu_invlpg(vcpu, gva);
+ 
+ 	return kvm_skip_emulated_instruction(&svm->vcpu);
+ }
 -- 
 2.30.0.478.g8a0d178c01-goog
 
