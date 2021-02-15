@@ -2,552 +2,374 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D31E31B190
-	for <lists+kvm@lfdr.de>; Sun, 14 Feb 2021 18:31:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4703531B432
+	for <lists+kvm@lfdr.de>; Mon, 15 Feb 2021 04:22:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbhBNRa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Feb 2021 12:30:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53315 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229759AbhBNRaU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 14 Feb 2021 12:30:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613323730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=mJNTtX4s1qBoY3u4p3ir1UnvA/3tMc4y2IumGyjFCQQ=;
-        b=IKhcpARD8sXzqw0dbB1VPe0HQeg9hd+0EYtTiRhEnaED5YidfNhGydM1wf4kqAbXPamE/x
-        819x0N4F3H/4opR9yowRxaWDCrFH7KVxRNXN7nGJicHb+JUCJGSo2Q9Q/DuPD5U3K1j+Sx
-        zyXwpD+eyA3HtWW4JDuCkhRjqaLEa98=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-1SsbvHpEN9W5UBqEYTTvuw-1; Sun, 14 Feb 2021 12:28:48 -0500
-X-MC-Unique: 1SsbvHpEN9W5UBqEYTTvuw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B367107ACE3;
-        Sun, 14 Feb 2021 17:28:47 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A2DCB5C241;
-        Sun, 14 Feb 2021 17:28:46 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] First batch of KVM changes for Linux 5.12
-Date:   Sun, 14 Feb 2021 12:28:45 -0500
-Message-Id: <20210214172845.1047934-1-pbonzini@redhat.com>
+        id S229839AbhBODVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Feb 2021 22:21:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52392 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229815AbhBODVs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Feb 2021 22:21:48 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F72C061574
+        for <kvm@vger.kernel.org>; Sun, 14 Feb 2021 19:21:08 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id r21so4847249otk.13
+        for <kvm@vger.kernel.org>; Sun, 14 Feb 2021 19:21:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=/L5927FW0PJeKWkGe7AMfL2lEoNXO6iaCnmpFrNtJo8=;
+        b=QPXvM5ep4u7AFzLYUlo4zTXZybbLg5HIOHyW74YuRRWjccKGwTbN8zhR7RbGaRlrWq
+         eDkiKVyyQXSTrG2wcPSlx7Cxd+JLB4aHL/irehDtoYkLszFSz+21OHkGFAJixpeZTZrV
+         Qt1V8NIWM1AKmtdg4k0RsAkg8BgWdGGJkXLJEtuLywiZN9c1Wlmmm+3EHyA6lrTX94nM
+         IQPEmdpqyigykxnMoBkMLzFHnVO9NSNv6B/awiWavMyD9InBD3BNrgAfUmXUGmZ1rCts
+         yiHPc5aA++6O+H4SoCmSGB7HLEI2RTgTfeXVkrelTOkff+0cL7x0Etf0ZtqeLIDXVXiX
+         Kf7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=/L5927FW0PJeKWkGe7AMfL2lEoNXO6iaCnmpFrNtJo8=;
+        b=Dt6xA1p7MBSaCV9WiYFROEZqw30wK9vaYNeWWfgQrhdV1+HUovGpoGKBuIgTNi55k7
+         Z9qx7wW776iHtrmdk8olG+SDRJoc/n8YT1x0GGKkGvru2XNvH6gS/aPr+HFiXLGCGC5U
+         BxyNx7sWRm8pfwK4UWzV2ujMfFlCOggRbW+C/l2QRFZ3ucP3mgdyURnFjHB00YDr/Xfy
+         Q2gKnC3uXmVUvfKcTDfnsA4BKq8TUAq6fgJl7ih25BAbYTgfngs6ZuxEf6ptTVX48imD
+         dgdpFKDY0FZQDbLA4qsIaMVubEzVi4H+38It41aia26KSjwU5IYBUinrpWG0lqzmhLO4
+         9Yhw==
+X-Gm-Message-State: AOAM531w76ZVSh2kJ6UBK+NHSddj1CUQgYFDeli1DT/PJU18ky0vcg3M
+        EWvea9znkPYZiu9OZ9stoELF91P8pq/rC0QpAPk=
+X-Google-Smtp-Source: ABdhPJxeas4prT4W2Hv/WtSh3DotTf/ideaCtzWu04gr/rowA4F3a3dk4UOrrpq/Wfb5S74xORXT4Xx7xLIMdniBrJU=
+X-Received: by 2002:a05:6830:16cc:: with SMTP id l12mr9847319otr.214.1613359267380;
+ Sun, 14 Feb 2021 19:21:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received: by 2002:a4a:ca15:0:0:0:0:0 with HTTP; Sun, 14 Feb 2021 19:21:06
+ -0800 (PST)
+Reply-To: lindawilliam2026@gmail.com
+From:   cashmia andy <cashmaiandy@gmail.com>
+Date:   Mon, 15 Feb 2021 03:21:06 +0000
+Message-ID: <CABMbD62J4=nBDhyF0dOcqjO90PEjdDDJ5G0X_opaufxbkv2Zww@mail.gmail.com>
+Subject: KONTAKTIEREN SIE DEN BANKDIREKTOR.
+To:     undisclosed-recipients:;
+Content-Type: multipart/mixed; boundary="000000000000071b3b05bb577ac5"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+--000000000000071b3b05bb577ac5
+Content-Type: text/plain; charset="UTF-8"
 
-I am sending an early pull request with the material that does not depend
-on any bare metal changes, especially since ARM64 and PPC submaintainers
-have already sent their stuff to me.
 
-The following changes since commit 87aa9ec939ec7277b730786e19c161c9194cc8ca:
 
-  KVM: x86/mmu: Fix TDP MMU zap collapsible SPTEs (2021-02-04 04:38:53 -0500)
+--000000000000071b3b05bb577ac5
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document; 
+	name="CONTATE URGENTEMENTE O DIRETOR DO BANCO ORA..docx"
+Content-Disposition: attachment; 
+	filename="CONTATE URGENTEMENTE O DIRETOR DO BANCO ORA..docx"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: file0
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 8c6e67bec3192f16fa624203c8131e10cc4814ba:
-
-  Merge tag 'kvmarm-5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2021-02-12 11:23:44 -0500)
-
-----------------------------------------------------------------
-x86:
-- Support for userspace to emulate Xen hypercalls
-- Raise the maximum number of user memslots
-- Scalability improvements for the new MMU.  Instead of the complex
-  "fast page fault" logic that is used in mmu.c, tdp_mmu.c uses an
-  rwlock so that page faults are concurrent, but the code that can run
-  against page faults is limited.  Right now only page faults take the
-  lock for reading; in the future this will be extended to some
-  cases of page table destruction.  I hope to switch the default MMU
-  around 5.12-rc3 (some testing was delayed due to Chinese New Year).
-- Cleanups for MAXPHYADDR checks
-- Use static calls for vendor-specific callbacks
-- On AMD, use VMLOAD/VMSAVE to save and restore host state
-- Stop using deprecated jump label APIs
-- Workaround for AMD erratum that made nested virtualization unreliable
-- Support for LBR emulation in the guest
-- Support for communicating bus lock vmexits to userspace
-- Add support for SEV attestation command
-- Miscellaneous cleanups
-
-PPC:
-- Support for second data watchpoint on POWER10
-- Remove some complex workarounds for buggy early versions of POWER9
-- Guest entry/exit fixes
-
-ARM64
-- Make the nVHE EL2 object relocatable
-- Cleanups for concurrent translation faults hitting the same page
-- Support for the standard TRNG hypervisor call
-- A bunch of small PMU/Debug fixes
-- Simplification of the early init hypercall handling
-
-Non-KVM changes (with acks):
-- Detection of contended rwlocks (implemented only for qrwlocks,
-  because KVM only needs it for x86)
-- Allow __DISABLE_EXPORTS from assembly code
-- Provide a saner follow_pfn replacements for modules
-
-----------------------------------------------------------------
-
-Regarding conflicts, I would have expected git to figure it out,
-but anyway the line in the pull request is the correct one:
-
-<<<<<<< pull request (correct)
-        vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
-=======
-        vcpu->arch.cr3_lm_rsvd_bits = rsvd_bits(cpuid_maxphyaddr(vcpu), 63);
->>>>>>> 5.11
-
-Thanks,
-
-Paolo
-
-Alexandru Elisei (1):
-      KVM: arm64: Correct spelling of DBGDIDR register
-
-Andrew Scull (1):
-      KVM: arm64: Simplify __kvm_hyp_init HVC detection
-
-Ard Biesheuvel (2):
-      firmware: smccc: Add SMCCC TRNG function call IDs
-      KVM: arm64: Implement the TRNG hypervisor call
-
-Bandan Das (1):
-      KVM: SVM: Add emulation support for #GP triggered by SVM instructions
-
-Ben Gardon (30):
-      KVM: selftests: Rename timespec_diff_now to timespec_elapsed
-      KVM: selftests: Avoid flooding debug log while populating memory
-      KVM: selftests: Convert iterations to int in dirty_log_perf_test
-      KVM: selftests: Fix population stage in dirty_log_perf_test
-      KVM: selftests: Add option to overlap vCPU memory access
-      KVM: selftests: Add memslot modification stress test
-      KVM: selftests: Add backing src parameter to dirty_log_perf_test
-      KVM: selftests: Disable dirty logging with vCPUs running
-      KVM: x86/mmu: change TDP MMU yield function returns to match cond_resched
-      KVM: x86/mmu: Add comment on __tdp_mmu_set_spte
-      KVM: x86/mmu: Add lockdep when setting a TDP MMU SPTE
-      KVM: x86/mmu: Don't redundantly clear TDP MMU pt memory
-      KVM: x86/mmu: Factor out handling of removed page tables
-      KVM: x86/mmu: Fix braces in kvm_recover_nx_lpages
-      KVM: x86/mmu: Merge flush and non-flush tdp_mmu_iter_cond_resched
-      KVM: x86/mmu: Rename goal_gfn to next_last_level_gfn
-      KVM: x86/mmu: Ensure forward progress when yielding in TDP MMU iter
-      KVM: x86/mmu: Yield in TDU MMU iter even if no SPTES changed
-      KVM: x86/mmu: Skip no-op changes in TDP MMU functions
-      KVM: x86/mmu: Clear dirtied pages mask bit before early break
-      KVM: x86/mmu: Protect TDP MMU page table memory with RCU
-      locking/rwlocks: Add contention detection for rwlocks
-      sched: Add needbreak for rwlocks
-      sched: Add cond_resched_rwlock
-      KVM: x86/mmu: Use an rwlock for the x86 MMU
-      KVM: x86/mmu: Factor out functions to add/remove TDP MMU pages
-      KVM: x86/mmu: Use atomic ops to set SPTEs in TDP MMU map
-      KVM: x86/mmu: Flush TLBs after zap in TDP MMU PF handler
-      KVM: x86/mmu: Mark SPTEs in disconnected pages as removed
-      KVM: x86/mmu: Allow parallel page faults for the TDP MMU
-
-Brijesh Singh (1):
-      KVM/SVM: add support for SEV attestation command
-
-Chenyi Qiang (4):
-      KVM: X86: Reset the vcpu->run->flags at the beginning of vcpu_run
-      KVM: VMX: Enable bus lock VM exit
-      KVM: X86: Add the Document for KVM_CAP_X86_BUS_LOCK_EXIT
-      KVM: X86: Rename DR6_INIT to DR6_ACTIVE_LOW
-
-Cun Li (1):
-      KVM: Stop using deprecated jump label APIs
-
-David Brazdil (8):
-      KVM: arm64: Rename .idmap.text in hyp linker script
-      KVM: arm64: Set up .hyp.rodata ELF section
-      KVM: arm64: Add symbol at the beginning of each hyp section
-      KVM: arm64: Generate hyp relocation data
-      KVM: arm64: Apply hyp relocations at runtime
-      KVM: arm64: Fix constant-pool users in hyp
-      KVM: arm64: Remove patching of fn pointers in hyp
-      KVM: arm64: Remove hyp_symbol_addr
-
-David P. Reed (1):
-      x86/virt: Mark flags and memory as clobbered by VMXOFF
-
-David Woodhouse (12):
-      KVM: x86/xen: Fix __user pointer handling for hypercall page installation
-      KVM: x86/xen: Move KVM_XEN_HVM_CONFIG handling to xen.c
-      KVM: x86/xen: Add kvm_xen_enabled static key
-      KVM: x86/xen: latch long_mode when hypercall page is set up
-      KVM: x86/xen: add definitions of compat_shared_info, compat_vcpu_info
-      xen: add wc_sec_hi to struct shared_info
-      KVM: x86/xen: Add KVM_XEN_VCPU_SET_ATTR/KVM_XEN_VCPU_GET_ATTR
-      KVM: x86/xen: Add event channel interrupt vector upcall
-      KVM: x86: declare Xen HVM shared info capability and add test case
-      KVM: Add documentation for Xen hypercall and shared_info updates
-      KVM: x86/xen: Remove extra unlock in kvm_xen_hvm_set_attr()
-      KVM: x86/xen: Allow reset of Xen attributes
-
-Fabiano Rosas (2):
-      KVM: PPC: Book3S HV: Save and restore FSCR in the P9 path
-      KVM: PPC: Don't always report hash MMU capability for P9 < DD2.2
-
-Jason Baron (3):
-      KVM: X86: prepend vmx/svm prefix to additional kvm_x86_ops functions
-      KVM: x86: introduce definitions to support static calls for kvm_x86_ops
-      KVM: x86: use static calls to reduce kvm_x86_ops overhead
-
-Joao Martins (9):
-      KVM: x86/xen: fix Xen hypercall page msr handling
-      KVM: x86/xen: intercept xen hypercalls if enabled
-      KVM: x86/xen: Fix coexistence of Xen and Hyper-V hypercalls
-      KVM: x86/xen: add KVM_XEN_HVM_SET_ATTR/KVM_XEN_HVM_GET_ATTR
-      KVM: x86/xen: register shared_info page
-      KVM: x86/xen: update wallclock region
-      KVM: x86/xen: register vcpu info
-      KVM: x86/xen: setup pvclock updates
-      KVM: x86/xen: register vcpu time info region
-
-Krish Sadhukhan (1):
-      KVM: SVM: Replace hard-coded value with #define
-
-Kyung Min Park (1):
-      Enumerate AVX Vector Neural Network instructions
-
-Like Xu (10):
-      KVM: VMX: read/write MSR_IA32_DEBUGCTLMSR from GUEST_IA32_DEBUGCTL
-      KVM: x86/vmx: Make vmx_set_intercept_for_msr() non-static
-      KVM: vmx/pmu: Add PMU_CAP_LBR_FMT check when guest LBR is enabled
-      KVM: vmx/pmu: Create a guest LBR event when vcpu sets DEBUGCTLMSR_LBR
-      KVM: vmx/pmu: Pass-through LBR msrs when the guest LBR event is ACTIVE
-      KVM: vmx/pmu: Reduce the overhead of LBR pass-through or cancellation
-      KVM: vmx/pmu: Emulate legacy freezing LBRs on virtual PMI
-      KVM: vmx/pmu: Release guest LBR event via lazy release mechanism
-      KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES
-      selftests: kvm/x86: add test for pmu msr MSR_IA32_PERF_CAPABILITIES
-
-Maciej S. Szmigiero (1):
-      KVM: x86/mmu: Make HVA handler retpoline-friendly
-
-Marc Zyngier (16):
-      arm64: Drop workaround for broken 'S' constraint with GCC 4.9
-      Merge branch 'arm64/for-next/misc' into kvm-arm64/hyp-reloc
-      KVM: arm64: Make gen-hyprel endianness agnostic
-      KVM: arm64: Fix missing RES1 in emulation of DBGBIDR
-      KVM: arm64: Fix AArch32 PMUv3 capping
-      KVM: arm64: Add handling of AArch32 PCMEID{2,3} PMUv3 registers
-      KVM: arm64: Refactor filtering of ID registers
-      KVM: arm64: Limit the debug architecture to ARMv8.0
-      KVM: arm64: Upgrade PMU support to ARMv8.4
-      KVM: arm64: Use symbolic names for the PMU versions
-      Merge tag 'kvmarm-fixes-5.11-2' into kvmarm-master/next
-      Merge branch 'kvm-arm64/misc-5.12' into kvmarm-master/next
-      Merge branch 'kvm-arm64/concurrent-translation-fault' into kvmarm-master/next
-      Merge branch 'kvm-arm64/hyp-reloc' into kvmarm-master/next
-      Merge branch 'kvm-arm64/rng-5.12' into kvmarm-master/next
-      Merge branch 'kvm-arm64/pmu-debug-fixes-5.11' into kvmarm-master/next
-
-Michael Roth (3):
-      KVM: SVM: use vmsave/vmload for saving/restoring additional host state
-      KVM: SVM: remove uneeded fields from host_save_users_msrs
-      KVM: SVM: use .prepare_guest_switch() to handle CPU register save/setup
-
-Nicholas Piggin (5):
-      KVM: PPC: Book3S HV: Remove support for running HPT guest on RPT host without mixed mode support
-      KVM: PPC: Book3S HV: Fix radix guest SLB side channel
-      KVM: PPC: Book3S HV: No need to clear radix host SLB before loading HPT guest
-      KVM: PPC: Book3S HV: Use POWER9 SLBIA IH=6 variant to clear SLB
-      KVM: PPC: Book3S HV: Fix host radix SLB optimisation with hash guests
-
-Paolo Bonzini (14):
-      KVM: do not assume PTE is writable after follow_pfn
-      KVM: x86/pmu: preserve IA32_PERF_CAPABILITIES across CPUID refresh
-      KVM: vmx/pmu: Add PMU_CAP_LBR_FMT check when guest LBR is enabled
-      KVM: move EXIT_FASTPATH_REENTER_GUEST to common code
-      KVM: cleanup DR6/DR7 reserved bits checks
-      KVM: x86: move kvm_inject_gp up from kvm_set_xcr to callers
-      i915: kvmgt: the KVM mmu_lock is now an rwlock
-      KVM: x86: compile out TDP MMU on 32-bit systems
-      mm: provide a saner PTE walking API for modules
-      KVM: x86: reading DR cannot fail
-      KVM: x86: move kvm_inject_gp up from kvm_set_dr to callers
-      Documentation: kvm: fix warning
-      Merge tag 'kvm-ppc-next-5.12-1' of git://git.kernel.org/.../paulus/powerpc into HEAD
-      Merge tag 'kvmarm-5.12' of git://git.kernel.org/.../kvmarm/kvmarm into HEAD
-
-Paul Mackerras (1):
-      KVM: PPC: Book3S HV: Ensure radix guest has no SLB entries
-
-Peter Shier (2):
-      KVM: selftests: Test IPI to halted vCPU in xAPIC while backing page moves
-      KVM: selftests: Add missing header file needed by xAPIC IPI tests
-
-Quentin Perret (2):
-      asm-generic: export: Stub EXPORT_SYMBOL with __DISABLE_EXPORTS
-      KVM: arm64: Stub EXPORT_SYMBOL for nVHE EL2 code
-
-Ravi Bangoria (4):
-      KVM: PPC: Book3S HV: Allow nested guest creation when L0 hv_guest_state > L1
-      KVM: PPC: Book3S HV: Rename current DAWR macros and variables
-      KVM: PPC: Book3S HV: Add infrastructure to support 2nd DAWR
-      KVM: PPC: Book3S HV: Introduce new capability for 2nd DAWR
-
-Ricardo Koller (1):
-      KVM: selftests: Add operand to vmsave/vmload/vmrun in svm.c
-
-Sean Christopherson (34):
-      KVM: x86: Remove obsolete disabling of page faults in kvm_arch_vcpu_put()
-      KVM: x86: Take KVM's SRCU lock only if steal time update is needed
-      KVM: x86/mmu: Use boolean returns for (S)PTE accessors
-      KVM: x86: Zap the oldest MMU pages, not the newest
-      KVM: x86/mmu: Remove the defunct update_pte() paging hook
-      KVM: VMX: Convert vcpu_vmx.exit_reason to a union
-      x86/apic: Export x2apic_mode for use by KVM in "warm" path
-      KVM: VMX: Use x2apic_mode to avoid RDMSR when querying PI state
-      x86/virt: Eat faults on VMXOFF in reboot flows
-      x86/reboot: Force all cpus to exit VMX root if VMX is supported
-      KVM: VMX: Move Intel PT shenanigans out of VMXON/VMXOFF flows
-      KVM: VMX: Use the kernel's version of VMXOFF
-      KVM: SVM: Use asm goto to handle unexpected #UD on SVM instructions
-      KVM: x86: Set so called 'reserved CR3 bits in LM mask' at vCPU reset
-      KVM: nSVM: Don't strip host's C-bit from guest's CR3 when reading PDPTRs
-      KVM: x86: Add a helper to check for a legal GPA
-      KVM: x86: Add a helper to handle legal GPA with an alignment requirement
-      KVM: VMX: Use GPA legality helpers to replace open coded equivalents
-      KVM: nSVM: Use common GPA helper to check for illegal CR3
-      KVM: x86: SEV: Treat C-bit as legal GPA bit regardless of vCPU mode
-      KVM: x86: Use reserved_gpa_bits to calculate reserved PxE bits
-      KVM: x86/mmu: Add helper to generate mask of reserved HPA bits
-      KVM: x86: Add helper to consolidate "raw" reserved GPA mask calculations
-      KVM: Use kvm_pfn_t for local PFN variable in hva_to_pfn_remapped()
-      KVM: x86/xen: Use hva_t for holding hypercall page address
-      KVM: x86: Remove misleading DR6/DR7 adjustments from RSM emulation
-      KVM: x86: Restore all 64 bits of DR6 and DR7 during RSM on x86-64
-      KVM: SVM: Move AVIC vCPU kicking snippet to helper function
-      KVM: SVM: Remove an unnecessary forward declaration
-      KVM: selftests: Ignore recently added Xen tests' build output
-      KVM: selftests: Fix size of memslots created by Xen tests
-      KVM: selftests: Fix hex vs. decimal snafu in Xen test
-      KVM: selftests: Don't bother mapping GVA for Xen shinfo test
-      KVM: x86/xen: Explicitly pad struct compat_vcpu_info to 64 bytes
-
-Stephen Zhang (1):
-      KVM: x86/mmu: Add '__func__' in rmap_printk()
-
-Tian Tao (1):
-      KVM: X86: use vzalloc() instead of vmalloc/memset
-
-Uros Bizjak (1):
-      KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
-
-Vitaly Kuznetsov (18):
-      selftest: kvm: x86: test KVM_GET_CPUID2 and guest visible CPUIDs against KVM_GET_SUPPORTED_CPUID
-      selftests: kvm: Raise the default timeout to 120 seconds
-      KVM: Raise the maximum number of user memslots
-      selftests: kvm: Move kvm_get_supported_hv_cpuid() to common code
-      selftests: kvm: Properly set Hyper-V CPUIDs in evmcs_test
-      KVM: x86: hyper-v: Drop unused kvm_hv_vapic_assist_page_enabled()
-      KVM: x86: hyper-v: Rename vcpu_to_hv_vcpu() to to_hv_vcpu()
-      KVM: x86: hyper-v: Rename vcpu_to_synic()/synic_to_vcpu()
-      KVM: x86: hyper-v: Rename vcpu_to_stimer()/stimer_to_vcpu()
-      KVM: x86: hyper-v: Rename vcpu_to_hv_syndbg() to to_hv_syndbg()
-      KVM: x86: hyper-v: Introduce to_kvm_hv() helper
-      KVM: x86: hyper-v: Stop shadowing global 'current_vcpu' variable
-      KVM: x86: hyper-v: Always use to_hv_vcpu() accessor to get to 'struct kvm_vcpu_hv'
-      KVM: x86: hyper-v: Prepare to meet unallocated Hyper-V context
-      KVM: x86: hyper-v: Allocate 'struct kvm_vcpu_hv' dynamically
-      KVM: x86: hyper-v: Make Hyper-V emulation enablement conditional
-      KVM: x86: hyper-v: Allocate Hyper-V context lazily
-      KVM: x86: hyper-v: Drop hv_vcpu_to_vcpu() helper
-
-Waiman Long (1):
-      locking/arch: Move qrwlock.h include after qspinlock.h
-
-Wei Huang (3):
-      KVM: x86: Factor out x86 instruction emulation with decoding
-      KVM: SVM: Add support for SVM instruction address check change
-      KVM: SVM: Fix #GP handling for doubly-nested virtualization
-
-Wei Yongjun (1):
-      KVM: SVM: Make symbol 'svm_gp_erratum_intercept' static
-
-YANG LI (1):
-      x86: kvm: style: Simplify bool comparison
-
-Yanan Wang (3):
-      KVM: arm64: Adjust partial code of hyp stage-1 map and guest stage-2 map
-      KVM: arm64: Filter out the case of only changing permissions from stage-2 map path
-      KVM: arm64: Mark the page dirty only if the fault is handled successfully
-
-Yang Li (1):
-      KVM: PPC: remove unneeded semicolon
-
-Yang Zhong (1):
-      KVM: Expose AVX_VNNI instruction to guset
-
- Documentation/virt/kvm/amd-memory-encryption.rst   |  21 +
- Documentation/virt/kvm/api.rst                     | 228 ++++++-
- Documentation/virt/kvm/locking.rst                 |   9 +-
- arch/arm64/include/asm/hyp_image.h                 |  29 +-
- arch/arm64/include/asm/kvm_asm.h                   |  26 -
- arch/arm64/include/asm/kvm_host.h                  |   3 +-
- arch/arm64/include/asm/kvm_mmu.h                   |  61 +-
- arch/arm64/include/asm/kvm_pgtable.h               |   5 +
- arch/arm64/include/asm/sections.h                  |   3 +-
- arch/arm64/include/asm/spinlock.h                  |   2 +-
- arch/arm64/include/asm/sysreg.h                    |   3 +
- arch/arm64/kernel/image-vars.h                     |   1 -
- arch/arm64/kernel/smp.c                            |   4 +-
- arch/arm64/kernel/vmlinux.lds.S                    |  18 +-
- arch/arm64/kvm/Makefile                            |   2 +-
- arch/arm64/kvm/arm.c                               |   7 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            |   4 +-
- arch/arm64/kvm/hyp/nvhe/.gitignore                 |   2 +
- arch/arm64/kvm/hyp/nvhe/Makefile                   |  33 +-
- arch/arm64/kvm/hyp/nvhe/gen-hyprel.c               | 438 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/host.S                     |  29 +-
- arch/arm64/kvm/hyp/nvhe/hyp-init.S                 |  19 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |  11 +-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c                  |   4 +-
- arch/arm64/kvm/hyp/nvhe/hyp.lds.S                  |   9 +-
- arch/arm64/kvm/hyp/nvhe/psci-relay.c               |  24 +-
- arch/arm64/kvm/hyp/pgtable.c                       |  83 +--
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c           |   2 +-
- arch/arm64/kvm/hypercalls.c                        |   6 +
- arch/arm64/kvm/mmu.c                               |  13 +-
- arch/arm64/kvm/pmu-emul.c                          |  14 +-
- arch/arm64/kvm/sys_regs.c                          |  85 ++-
- arch/arm64/kvm/trng.c                              |  85 +++
- arch/arm64/kvm/va_layout.c                         |  34 +-
- arch/mips/include/asm/kvm_host.h                   |   1 -
- arch/mips/include/asm/spinlock.h                   |   2 +-
- arch/powerpc/include/asm/hvcall.h                  |  25 +-
- arch/powerpc/include/asm/kvm_book3s_asm.h          |  11 -
- arch/powerpc/include/asm/kvm_host.h                |   8 +-
- arch/powerpc/include/asm/kvm_ppc.h                 |   2 +
- arch/powerpc/include/uapi/asm/kvm.h                |   2 +
- arch/powerpc/kernel/asm-offsets.c                  |   9 +-
- arch/powerpc/kvm/book3s_hv.c                       | 149 +++--
- arch/powerpc/kvm/book3s_hv_builtin.c               | 108 +---
- arch/powerpc/kvm/book3s_hv_nested.c                |  70 +-
- arch/powerpc/kvm/book3s_hv_rmhandlers.S            | 175 ++---
- arch/powerpc/kvm/booke.c                           |   2 +-
- arch/powerpc/kvm/powerpc.c                         |  14 +-
- arch/s390/include/asm/kvm_host.h                   |   1 -
- arch/s390/pci/pci_mmio.c                           |   4 +-
- arch/sparc/include/asm/spinlock_64.h               |   2 +-
- arch/x86/include/asm/cpufeatures.h                 |   2 +
- arch/x86/include/asm/kvm-x86-ops.h                 | 127 ++++
- arch/x86/include/asm/kvm_host.h                    |  89 ++-
- arch/x86/include/asm/virtext.h                     |  25 +-
- arch/x86/include/asm/vmx.h                         |   1 +
- arch/x86/include/asm/vmxfeatures.h                 |   1 +
- arch/x86/include/asm/xen/interface.h               |   3 +
- arch/x86/include/uapi/asm/kvm.h                    |   1 +
- arch/x86/include/uapi/asm/vmx.h                    |   4 +-
- arch/x86/kernel/apic/apic.c                        |   1 +
- arch/x86/kernel/reboot.c                           |  30 +-
- arch/x86/kvm/Makefile                              |   5 +-
- arch/x86/kvm/cpuid.c                               |  24 +-
- arch/x86/kvm/cpuid.h                               |  24 +-
- arch/x86/kvm/emulate.c                             |  14 +-
- arch/x86/kvm/hyperv.c                              | 343 ++++++----
- arch/x86/kvm/hyperv.h                              |  54 +-
- arch/x86/kvm/irq.c                                 |  10 +-
- arch/x86/kvm/kvm_cache_regs.h                      |  10 +-
- arch/x86/kvm/kvm_emulate.h                         |   2 +-
- arch/x86/kvm/lapic.c                               |  60 +-
- arch/x86/kvm/lapic.h                               |  20 +-
- arch/x86/kvm/mmu.h                                 |   8 +-
- arch/x86/kvm/mmu/mmu.c                             | 353 +++++-----
- arch/x86/kvm/mmu/mmu_audit.c                       |   8 +-
- arch/x86/kvm/mmu/mmu_internal.h                    |   7 +-
- arch/x86/kvm/mmu/page_track.c                      |   8 +-
- arch/x86/kvm/mmu/paging_tmpl.h                     |   8 +-
- arch/x86/kvm/mmu/spte.c                            |   2 +-
- arch/x86/kvm/mmu/spte.h                            |  33 +-
- arch/x86/kvm/mmu/tdp_iter.c                        |  46 +-
- arch/x86/kvm/mmu/tdp_iter.h                        |  21 +-
- arch/x86/kvm/mmu/tdp_mmu.c                         | 554 ++++++++++++----
- arch/x86/kvm/mmu/tdp_mmu.h                         |  32 +-
- arch/x86/kvm/mtrr.c                                |  12 +-
- arch/x86/kvm/pmu.c                                 |  10 +-
- arch/x86/kvm/pmu.h                                 |   2 +
- arch/x86/kvm/svm/avic.c                            |  35 +-
- arch/x86/kvm/svm/nested.c                          |   8 +-
- arch/x86/kvm/svm/sev.c                             | 104 ++-
- arch/x86/kvm/svm/svm.c                             | 303 +++++----
- arch/x86/kvm/svm/svm.h                             |  29 +-
- arch/x86/kvm/svm/svm_ops.h                         |  69 ++
- arch/x86/kvm/trace.h                               |  40 +-
- arch/x86/kvm/vmx/capabilities.h                    |  28 +-
- arch/x86/kvm/vmx/nested.c                          | 106 ++-
- arch/x86/kvm/vmx/pmu_intel.c                       | 294 ++++++++-
- arch/x86/kvm/vmx/posted_intr.c                     |   6 +-
- arch/x86/kvm/vmx/vmenter.S                         |   2 +-
- arch/x86/kvm/vmx/vmx.c                             | 282 ++++----
- arch/x86/kvm/vmx/vmx.h                             |  56 +-
- arch/x86/kvm/x86.c                                 | 718 +++++++++++----------
- arch/x86/kvm/x86.h                                 |  12 +-
- arch/x86/kvm/xen.c                                 | 431 +++++++++++++
- arch/x86/kvm/xen.h                                 |  78 +++
- arch/xtensa/include/asm/spinlock.h                 |   2 +-
- drivers/crypto/ccp/sev-dev.c                       |   1 +
- drivers/gpu/drm/i915/gvt/kvmgt.c                   |  12 +-
- fs/dax.c                                           |   5 +-
- include/asm-generic/export.h                       |   2 +-
- include/asm-generic/qrwlock.h                      |  25 +-
- include/linux/arm-smccc.h                          |  31 +
- include/linux/kvm_host.h                           |  10 +-
- include/linux/mm.h                                 |   6 +-
- include/linux/psp-sev.h                            |  17 +
- include/linux/rwlock.h                             |   7 +
- include/linux/sched.h                              |  29 +
- include/uapi/linux/kvm.h                           |  74 +++
- include/xen/interface/xen.h                        |   4 +-
- kernel/locking/qrwlock.c                           |   1 -
- kernel/sched/core.c                                |  40 ++
- mm/memory.c                                        |  41 +-
- tools/arch/powerpc/include/uapi/asm/kvm.h          |   2 +
- tools/include/uapi/linux/kvm.h                     |   1 +
- tools/testing/selftests/kvm/.gitignore             |   6 +
- tools/testing/selftests/kvm/Makefile               |   6 +
- tools/testing/selftests/kvm/demand_paging_test.c   |  43 +-
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  92 +--
- tools/testing/selftests/kvm/include/kvm_util.h     |   6 -
- tools/testing/selftests/kvm/include/numaif.h       |  55 ++
- .../testing/selftests/kvm/include/perf_test_util.h |   7 +-
- tools/testing/selftests/kvm/include/test_util.h    |  16 +-
- .../selftests/kvm/include/x86_64/processor.h       |  41 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |   1 +
- tools/testing/selftests/kvm/lib/perf_test_util.c   |  31 +-
- tools/testing/selftests/kvm/lib/test_util.c        |  31 +-
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 144 +++++
- tools/testing/selftests/kvm/lib/x86_64/svm.c       |   8 +-
- .../kvm/memslot_modification_stress_test.c         | 212 ++++++
- tools/testing/selftests/kvm/settings               |   1 +
- tools/testing/selftests/kvm/x86_64/evmcs_test.c    |   3 +-
- .../testing/selftests/kvm/x86_64/get_cpuid_test.c  | 175 +++++
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c  |  31 +-
- .../selftests/kvm/x86_64/vmx_pmu_msrs_test.c       | 131 ++++
- .../testing/selftests/kvm/x86_64/xapic_ipi_test.c  | 544 ++++++++++++++++
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 167 +++++
- .../testing/selftests/kvm/x86_64/xen_vmcall_test.c | 149 +++++
- virt/kvm/dirty_ring.c                              |   8 +-
- virt/kvm/kvm_main.c                                |  54 +-
- virt/kvm/mmu_lock.h                                |  23 +
- 151 files changed, 6686 insertions(+), 2066 deletions(-)
-
+UEsDBBQABgAIAAAAIQAJJIeCgQEAAI4FAAATAAgCW0NvbnRlbnRfVHlwZXNdLnhtbCCiBAIooAAC
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC0
+lE1Pg0AQhu8m/geyVwPbejDGlPag9ahNrPG8LkPZyH5kZ/v17x1KS6qhpVq9kMAy7/vMCzOD0UqX
+0QI8KmtS1k96LAIjbabMLGWv08f4lkUYhMlEaQ2kbA3IRsPLi8F07QAjqjaYsiIEd8c5ygK0wMQ6
+MHSSW69FoFs/407IDzEDft3r3XBpTQAT4lBpsOHgAXIxL0M0XtHjmsRDiSy6r1+svFImnCuVFIFI
++cJk31zirUNClZt3sFAOrwiD8VaH6uSwwbbumaLxKoNoInx4Epow+NL6jGdWzjX1kByXaeG0ea4k
+NPWVmvNWAiJlrsukOdFCmR3/QQ4M6xLw7ylq3RPt31QoxnkOkj52dx4a46rppLbYq+12gxAopFNM
+vv6CcVfouFXuRFjC+8u/UeyJd4LkNBpT8V7CCYn/MIxGuhMi0LwD31z7Z3NsZI5Z0mRMvHVI+8P/
+ou3dgqiqYxo5Bz4oaFZE24g1jrR7zu4Pqu2WQdbizTfbdPgJAAD//wMAUEsDBBQABgAIAAAAIQAe
+kRq38wAAAE4CAAALAAgCX3JlbHMvLnJlbHMgogQCKKAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjJLbSgNBDIbvBd9hyH032woi0tneSKF3
+IusDhJnsAXcOzKTavr2jILpQ217m9OfLT9abg5vUO6c8Bq9hWdWg2JtgR99reG23iwdQWchbmoJn
+DUfOsGlub9YvPJGUoTyMMaui4rOGQSQ+ImYzsKNchci+VLqQHEkJU4+RzBv1jKu6vsf0VwOamaba
+WQ1pZ+9AtcdYNl/WDl03Gn4KZu/Yy4kVyAdhb9kuYipsScZyjWop9SwabDDPJZ2RYqwKNuBpotX1
+RP9fi46FLAmhCYnP83x1nANaXg902aJ5x687HyFZLBZ9e/tDg7MvaD4BAAD//wMAUEsDBBQABgAI
+AAAAIQB8O5c5IgEAALkDAAAcAAgBd29yZC9fcmVscy9kb2N1bWVudC54bWwucmVscyCiBAEooAAB
+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
+--000000000000071b3b05bb577ac5--
