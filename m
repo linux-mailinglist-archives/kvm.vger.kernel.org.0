@@ -2,178 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF2B731B633
-	for <lists+kvm@lfdr.de>; Mon, 15 Feb 2021 10:09:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D2E631B63D
+	for <lists+kvm@lfdr.de>; Mon, 15 Feb 2021 10:13:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhBOJJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Feb 2021 04:09:23 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64846 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229595AbhBOJJM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Feb 2021 04:09:12 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11F8pYXM182157;
-        Mon, 15 Feb 2021 04:08:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type; s=pp1; bh=zhzD6lzfk/9hR7ZxhwdE3wefpwG7G2ibfeJIZDszfjw=;
- b=VjVOuuynu40rgYoIAlF3J2Btvi+xJNbBwtlq3W0kFMAnRMt/wTj2geElUHEpW8dE38TC
- uYCZMdEU53sYwwMQuOGgOHLJd2kKz/b+NDIP6iUP/I7nvGzsTMl4fJTdsQQtHAix2Flq
- GdtzdQkW2wch9T61TDWQIWAlmEkEKviEM1IeJR6OGgA3vKr/YvM2F507XIAd+TXiMBgA
- gIuYCV7u05GK6QNKHPU9zIiTRsd6dg8vRwI2WlahZKEV7jbn5FsK+4ap2IvfDcosp1cs
- nvGdlzLXXo6tRb6FepZbAOxpKMXnir6WNbmeiiuLL8uw8tG1rXmtpgBvdg3mJhMh9UcH ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36qntn8dta-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 04:08:26 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11F8qTwY183967;
-        Mon, 15 Feb 2021 04:08:25 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36qntn8dss-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 04:08:25 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11F97N4T017948;
-        Mon, 15 Feb 2021 09:08:23 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 36p6d89nvm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Feb 2021 09:08:23 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11F98KGs39387582
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Feb 2021 09:08:20 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ACD3DA4060;
-        Mon, 15 Feb 2021 09:08:20 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0C7F4A405B;
-        Mon, 15 Feb 2021 09:08:20 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.82.150])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Feb 2021 09:08:19 +0000 (GMT)
-To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>, borntraeger@de.ibm.com,
-        david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     rdunlap@infradead.org
-References: <20210213153227.1640682-1-unixbhaskar@gmail.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH] arch: s390: kvm: Fix oustanding to outstanding in the
- file kvm-s390.c
-Message-ID: <f90e91a5-7bc0-2489-51d4-6004eef9db7a@linux.ibm.com>
-Date:   Mon, 15 Feb 2021 10:08:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230122AbhBOJMp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Feb 2021 04:12:45 -0500
+Received: from mx13.kaspersky-labs.com ([91.103.66.164]:26078 "EHLO
+        mx13.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229919AbhBOJMl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Feb 2021 04:12:41 -0500
+Received: from relay13.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay13.kaspersky-labs.com (Postfix) with ESMTP id D167C521847;
+        Mon, 15 Feb 2021 12:11:55 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1613380315;
+        bh=wl5bInwndQYHnhr0/slUsUtb2bYyEjBdhWRXtViAFy8=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=xWtSehnCkFk9xqGuSFItfDrxBQgvhHALiWpaEwIZRxU8sXfePDQpBakQjOntylZSc
+         jEl9a6L2XjswWTE4Mj16OvE+CtVPbT3W74FjO9I4Jxm2+doJG4kO5ToXxbiAm5Pn8g
+         viTnlH5AgAk00rpPGXgG59ibt22G0lX9xXHWVCT0p7BD4sP7yjT+T8JXfRzpVblwCJ
+         aPP3XQFEIOkVFs2RmqF/F5pVXtJCbk4b1qnh4fwlsAgdYm5nwjV/3fMbA/zrK3n93b
+         uN6LMfN8opGq3fcgvO9lZRU8o2Ransa6+MLxxOpW4S/GeLeZ4/mMhFzJslQj0aJFkg
+         4jI1kom4g2bLg==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub13.kaspersky-labs.com (Postfix) with ESMTPS id 02721521853;
+        Mon, 15 Feb 2021 12:11:55 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.128) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Mon, 15
+ Feb 2021 12:11:54 +0300
+Subject: Re: [RFC PATCH v4 07/17] af_vsock: rest of SEQPACKET support
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Jeff Vander Stoep <jeffv@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210207151259.803917-1-arseny.krasnov@kaspersky.com>
+ <20210207151615.805115-1-arseny.krasnov@kaspersky.com>
+ <20210211122714.rqiwg3qp3kuprktb@steredhat>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <53525ac0-1632-1a49-5c80-9ed2aa0012e0@kaspersky.com>
+Date:   Mon, 15 Feb 2021 12:11:53 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210213153227.1640682-1-unixbhaskar@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="zYdbmPEWRcp4fnBKDtNJQJxFmauwtBTRZ"
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.737
- definitions=2021-02-15_02:2021-02-12,2021-02-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
- mlxscore=0 suspectscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102150072
+In-Reply-To: <20210211122714.rqiwg3qp3kuprktb@steredhat>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.64.68.128]
+X-ClientProxiedBy: hqmailmbx3.avp.ru (10.64.67.243) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 02/06/2021 23:52:08
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 161679 [Feb 06 2021]
+X-KSE-AntiSpam-Info: LuaCore: 422 422 763e61bea9fcfcd94e075081cb96e065bc0509b4
+X-KSE-AntiSpam-Info: Version: 5.9.16.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: {Tracking_content_type, plain}
+X-KSE-AntiSpam-Info: {Tracking_date, moscow}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/06/2021 23:55:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 06.02.2021 21:17:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/02/15 08:17:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/02/15 05:13:00 #16229789
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zYdbmPEWRcp4fnBKDtNJQJxFmauwtBTRZ
-Content-Type: multipart/mixed; boundary="cMR6E0UzQFHfdCrb6Mp7D2cFWBX3LPQo3";
- protected-headers="v1"
-From: Janosch Frank <frankja@linux.ibm.com>
-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>, borntraeger@de.ibm.com,
- david@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: rdunlap@infradead.org
-Message-ID: <f90e91a5-7bc0-2489-51d4-6004eef9db7a@linux.ibm.com>
-Subject: Re: [PATCH] arch: s390: kvm: Fix oustanding to outstanding in the
- file kvm-s390.c
-References: <20210213153227.1640682-1-unixbhaskar@gmail.com>
-In-Reply-To: <20210213153227.1640682-1-unixbhaskar@gmail.com>
 
---cMR6E0UzQFHfdCrb6Mp7D2cFWBX3LPQo3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On 11.02.2021 15:27, Stefano Garzarella wrote:
+> On Sun, Feb 07, 2021 at 06:16:12PM +0300, Arseny Krasnov wrote:
+>> This does rest of SOCK_SEQPACKET support:
+>> 1) Adds socket ops for SEQPACKET type.
+>> 2) Allows to create socket with SEQPACKET type.
+>>
+>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
+>> ---
+>> net/vmw_vsock/af_vsock.c | 37 ++++++++++++++++++++++++++++++++++++-
+>> 1 file changed, 36 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index a033d3340ac4..c77998a14018 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -452,6 +452,7 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>> 		new_transport = transport_dgram;
+>> 		break;
+>> 	case SOCK_STREAM:
+>> +	case SOCK_SEQPACKET:
+>> 		if (vsock_use_local_transport(remote_cid))
+>> 			new_transport = transport_local;
+>> 		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
+>> @@ -459,6 +460,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>> 			new_transport = transport_g2h;
+>> 		else
+>> 			new_transport = transport_h2g;
+>> +
+>> +		if (sk->sk_type == SOCK_SEQPACKET) {
+>> +			if (!new_transport ||
+>> +			    !new_transport->seqpacket_seq_send_len ||
+>> +			    !new_transport->seqpacket_seq_send_eor ||
+>> +			    !new_transport->seqpacket_seq_get_len ||
+>> +			    !new_transport->seqpacket_dequeue)
+>> +				return -ESOCKTNOSUPPORT;
+>> +		}
+> Maybe we should move this check after the try_module_get() call, since 
+> the memory pointed by 'new_transport' pointer can be deallocated in the 
+> meantime.
+>
+> Also, if the socket had a transport before, we should deassign it before 
+> returning an error.
 
-On 2/13/21 4:32 PM, Bhaskar Chowdhury wrote:
->=20
-> s/oustanding/outstanding/
+I think previous transport is deassigned immediately after this
 
-Hey Bhaskar,
+'switch()' on sk->sk_type:
 
-while I do encourage anyone to send in changes I'm not a big fan of
-comment fixes if they are only a couple of characters and when the
-meaning is still intact despite the spelling mistake.
+if (vsk->transport) {
 
-You're creating more work for me than you had writing this patch and the
-improvement is close to zero.
+    ...
 
-Be warned that I might not pick up such patches in the future.
+    vsock_deassign_transport(vsk);
 
-
-If you're ok with it I'll fix up the subject to this and pick up the patc=
-h:
-"kvm: s390: Fix comment spelling in kvm_s390_vcpu_start()"
-
-Cheers,
-Janosch
-
->=20
-> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
-> ---
->  arch/s390/kvm/kvm-s390.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index dbafd057ca6a..1d01afaca9fe 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4545,7 +4545,7 @@ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->  		/*
->  		 * As we are starting a second VCPU, we have to disable
->  		 * the IBS facility on all VCPUs to remove potentially
-> -		 * oustanding ENABLE requests.
-> +		 * outstanding ENABLE requests.
->  		 */
->  		__disable_ibs_on_all_vcpus(vcpu->kvm);
->  	}
-> --
-> 2.30.1
->=20
+}
 
 
+Ok, check will be moved after 'try_module_get()'.
 
---cMR6E0UzQFHfdCrb6Mp7D2cFWBX3LPQo3--
-
---zYdbmPEWRcp4fnBKDtNJQJxFmauwtBTRZ
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAmAqOgMFAwAAAAAACgkQ41TmuOI4ufiN
-JBAAyRHM+AND+KcsBaVD4lhw/E3DfIHRYfDsRubZlqe+wqdw7u5umTX9IY0j9tMnOy4oM7Q4UuX1
-nwHMjCNtAGqm68FkfpfxqfZfIH9fTeYpDP/iPmQqgAPuoNJoCc8vwjJm75YylQL6bfh7Q+/+tAAi
-p7fvsb7/sXVJKTl4DxAeftlbi5ObK2Y/7zDIJ1Rj9RmiUAu46kPsYHo3Lw/A7VaE/QFcfneRJGdt
-sm3Jvlc4elPO1QMU4ZE2ezekAqQSBdxNkhEDyEC92mNmujNF39/ARNYQjfS0asTjrnAaoNPAbyq0
-TnO5peeO7YBMtbRwCvVyaXVDjgirZX68Yi70ONOshAu8ckS6kJC6RmURTrZPnlnMmh0+rQOxL6eP
-OAtxd5J/34cAKGkPJnXes5qNbiI7GkfH+93wW2w7ifBjilnbIU6daOgk6rtQFAFuhoTaJx5YbhE0
-gtzZl+wF0sZ7BBCxgIC321ffXdQXUz2kiOfX1E0oQcj5613/yO7lSmvlYpC64PKBNF6bR7hSbrt+
-Y9XwUVnss9oMoqcXapLtACV/sT5oxyIohnxxpZ0N0r1VDQtLJrgW/SQlA/5GHOFsHfRhhq/cRFJW
-ZGlSBemWG7HAGounlYbQ6MAN5bm49L2OI8e7GRAJj2bxEaxHimtmWG5jCj8yctjvzSX9/BK3SLhg
-vLA=
-=g++n
------END PGP SIGNATURE-----
-
---zYdbmPEWRcp4fnBKDtNJQJxFmauwtBTRZ--
-
+>
+>> 		break;
+>> 	default:
+>> 		return -ESOCKTNOSUPPORT;
+>> @@ -684,6 +694,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
+>>
+>> 	switch (sk->sk_socket->type) {
+>> 	case SOCK_STREAM:
+>> +	case SOCK_SEQPACKET:
+>> 		spin_lock_bh(&vsock_table_lock);
+>> 		retval = __vsock_bind_connectible(vsk, addr);
+>> 		spin_unlock_bh(&vsock_table_lock);
+>> @@ -769,7 +780,7 @@ static struct sock *__vsock_create(struct net *net,
+>>
+>> static bool sock_type_connectible(u16 type)
+>> {
+>> -	return type == SOCK_STREAM;
+>> +	return (type == SOCK_STREAM) || (type == SOCK_SEQPACKET);
+>> }
+>>
+>> static void __vsock_release(struct sock *sk, int level)
+>> @@ -2199,6 +2210,27 @@ static const struct proto_ops vsock_stream_ops = {
+>> 	.sendpage = sock_no_sendpage,
+>> };
+>>
+>> +static const struct proto_ops vsock_seqpacket_ops = {
+>> +	.family = PF_VSOCK,
+>> +	.owner = THIS_MODULE,
+>> +	.release = vsock_release,
+>> +	.bind = vsock_bind,
+>> +	.connect = vsock_connect,
+>> +	.socketpair = sock_no_socketpair,
+>> +	.accept = vsock_accept,
+>> +	.getname = vsock_getname,
+>> +	.poll = vsock_poll,
+>> +	.ioctl = sock_no_ioctl,
+>> +	.listen = vsock_listen,
+>> +	.shutdown = vsock_shutdown,
+>> +	.setsockopt = vsock_connectible_setsockopt,
+>> +	.getsockopt = vsock_connectible_getsockopt,
+>> +	.sendmsg = vsock_connectible_sendmsg,
+>> +	.recvmsg = vsock_connectible_recvmsg,
+>> +	.mmap = sock_no_mmap,
+>> +	.sendpage = sock_no_sendpage,
+>> +};
+>> +
+>> static int vsock_create(struct net *net, struct socket *sock,
+>> 			int protocol, int kern)
+>> {
+>> @@ -2219,6 +2251,9 @@ static int vsock_create(struct net *net, struct socket *sock,
+>> 	case SOCK_STREAM:
+>> 		sock->ops = &vsock_stream_ops;
+>> 		break;
+>> +	case SOCK_SEQPACKET:
+>> +		sock->ops = &vsock_seqpacket_ops;
+>> +		break;
+>> 	default:
+>> 		return -ESOCKTNOSUPPORT;
+>> 	}
+>> -- 
+>> 2.25.1
+>>
+>
