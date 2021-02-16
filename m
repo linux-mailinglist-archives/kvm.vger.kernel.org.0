@@ -2,151 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D08031D1AC
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 21:41:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A2231D1AF
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 21:43:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbhBPUkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 15:40:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbhBPUks (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 15:40:48 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DF2C061574
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 12:40:07 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id o3so11765109edv.4
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 12:40:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qsbkrWZGkD91kMd27lJYVWXYLDx45J5nDBTki3Poz/Y=;
-        b=GYlUAEcxf+YrKRO9EV5o4/Z+28j3rfdzii+w6iCzZUbQExjtVDl60KciVFUspFaevd
-         xQSimjJ/cKCSAjpA2c6+1IwGP+b9RsJeFUgaGgIQI9CHFXTR045ViXPxwRMKJbmKzBsQ
-         dAYOvturlAhwMrFBnspAhiHq5WWA2Hkdic64X8Rcert/bP/eE1q1Jv7U4+KFDK5bEbTc
-         /CSI3/tdjWwHApgQq7qDVuwhFwQXKrhmaTsx+j7jU6+/8SJ3r9U8+h3wqTu3CVO4gC9b
-         /RRgmqX0ARNglqqE3GjZ6Ihebj0PnyzmcQHZB0bQ0S4W5F+0TaIpoP+exgxw3GtFqYl4
-         am7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qsbkrWZGkD91kMd27lJYVWXYLDx45J5nDBTki3Poz/Y=;
-        b=X5UJS9I1oNYgo7DHoHfG37UGHtzSsEz7uMUwEqfe9QFHNKH01h9m4sJuKLHtib8XGv
-         yTVFu70GNFTl+lxn18+at6clLeZoj82DYUQL2t3roCUI4z53O7Ms2xT5ridIG1Fki8Df
-         k6J4AVWSuz44AfAeNYdYDvWiOoHAl243Ku145P1z4zEziz5bQgJUF6DEore564262rzT
-         LkFmJwwx6gBmji54wlNYV0UY+kpd7JPC4q1MwxmiAoftLJcYkto/MxZJ9y8rWkQZrSFV
-         KtqWDcgrC5NID64W9Vlw9sXOB3FJCcZogBP3Dm4tuajoUnj60RDUbfBUX5TH/Vq2D2Hc
-         Iadg==
-X-Gm-Message-State: AOAM533pZYi098rZj06Iy2eSP67LNCDkh7IRRISJNbvInEX5CMNVNyr2
-        JgJ9d8JVphcNbIRceoa6e86beBYtSJaxd3OrHzyZWg==
-X-Google-Smtp-Source: ABdhPJzItTBAgOKzcio391IOuVIAv/Zadl6m2XXBki/3fUYt940zA/MAddwv1fJXGyV5MfPeAf92HQRO8cYR7bKO5J8=
-X-Received: by 2002:a05:6402:559:: with SMTP id i25mr15504185edx.300.1613508006214;
- Tue, 16 Feb 2021 12:40:06 -0800 (PST)
+        id S230125AbhBPUnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 15:43:17 -0500
+Received: from mga01.intel.com ([192.55.52.88]:59650 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229796AbhBPUnQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 15:43:16 -0500
+IronPort-SDR: pUwqDX4NKpsvnukQWTr1omr9GEr9WCA5c8cjMu/ZmBc+pQ4bRuMABUOKz6MsI58hm5jAqrNn6n
+ +zlt4jewX7qQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="202210025"
+X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
+   d="scan'208";a="202210025"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 12:42:35 -0800
+IronPort-SDR: BTyRH5s5DawYWw83+42XssVfBwuJiCsvK0VDwAjUffP72fMFSNkH5qJxgPXKBRMNHCFZO5o1Oy
+ kX1Cv1e5Hfcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
+   d="scan'208";a="399666836"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 16 Feb 2021 12:42:35 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 16 Feb 2021 12:42:34 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 16 Feb 2021 12:42:34 -0800
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15]) by
+ ORSMSX602.amr.corp.intel.com ([10.22.229.15]) with mapi id 15.01.2106.002;
+ Tue, 16 Feb 2021 12:42:34 -0800
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "Hansen, Dave" <dave.hansen@intel.com>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>
+CC:     "seanjc@google.com" <seanjc@google.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Huang, Haitao" <haitao.huang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>
+Subject: RE: [RFC PATCH v5 03/26] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Thread-Topic: [RFC PATCH v5 03/26] x86/sgx: Wipe out EREMOVE from
+ sgx_free_epc_page()
+Thread-Index: AQHXAgqCiMCWrYnrK0Whc7d+icsirqpbjZWA//+2gGA=
+Date:   Tue, 16 Feb 2021 20:42:34 +0000
+Message-ID: <679324c4b4644ed4a6419718252d318c@intel.com>
+References: <cover.1613221549.git.kai.huang@intel.com>
+ <f6f9867642505d90968a260538c90444b3fe3809.1613221549.git.kai.huang@intel.com>
+ <57878292-69d0-2234-d732-131318795726@intel.com>
+In-Reply-To: <57878292-69d0-2234-d732-131318795726@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+x-originating-ip: [10.1.200.100]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
- <161255840486.339900.5478922203128287192.stgit@djiang5-desk3.ch.intel.com>
- <20210210235924.GJ4247@nvidia.com> <8ff16d76-6b36-0da6-03ee-aebec2d1a731@intel.com>
-In-Reply-To: <8ff16d76-6b36-0da6-03ee-aebec2d1a731@intel.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 16 Feb 2021 12:39:56 -0800
-Message-ID: <CAPcyv4jDmofa+77q_hG1EimaKxq2_hYu-kVOVbU4mN4XSdOUWA@mail.gmail.com>
-Subject: Re: [PATCH v5 05/14] vfio/mdev: idxd: add basic mdev registration and
- helper functions
-To:     Dave Jiang <dave.jiang@intel.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        kwankhede@nvidia.com, Thomas Gleixner <tglx@linutronix.de>,
-        Vinod Koul <vkoul@kernel.org>,
-        "Dey, Megha" <megha.dey@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>, Yi L Liu <yi.l.liu@intel.com>,
-        Baolu Lu <baolu.lu@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Sanjay K Kumar <sanjay.k.kumar@intel.com>,
-        "Luck, Tony" <tony.luck@intel.com>, eric.auger@redhat.com,
-        Parav Pandit <parav@mellanox.com>, netanelg@mellanox.com,
-        shahafs@mellanox.com, Paolo Bonzini <pbonzini@redhat.com>,
-        dmaengine@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 16, 2021 at 11:05 AM Dave Jiang <dave.jiang@intel.com> wrote:
->
->
-> On 2/10/2021 4:59 PM, Jason Gunthorpe wrote:
-> > On Fri, Feb 05, 2021 at 01:53:24PM -0700, Dave Jiang wrote:
-> >
-> >> +static int check_vma(struct idxd_wq *wq, struct vm_area_struct *vma)
-> >>   {
-> >> -    /* FIXME: Fill in later */
-> >> +    if (vma->vm_end < vma->vm_start)
-> >> +            return -EINVAL;
-> > These checks are redundant
->
-> Thanks. Will remove.
->
-> >
-> >> -static int idxd_mdev_host_release(struct idxd_device *idxd)
-> >> +static int idxd_vdcm_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
-> >> +{
-> >> +    unsigned int wq_idx, rc;
-> >> +    unsigned long req_size, pgoff = 0, offset;
-> >> +    pgprot_t pg_prot;
-> >> +    struct vdcm_idxd *vidxd = mdev_get_drvdata(mdev);
-> >> +    struct idxd_wq *wq = vidxd->wq;
-> >> +    struct idxd_device *idxd = vidxd->idxd;
-> >> +    enum idxd_portal_prot virt_portal, phys_portal;
-> >> +    phys_addr_t base = pci_resource_start(idxd->pdev, IDXD_WQ_BAR);
-> >> +    struct device *dev = mdev_dev(mdev);
-> >> +
-> >> +    rc = check_vma(wq, vma);
-> >> +    if (rc)
-> >> +            return rc;
-> >> +
-> >> +    pg_prot = vma->vm_page_prot;
-> >> +    req_size = vma->vm_end - vma->vm_start;
-> >> +    vma->vm_flags |= VM_DONTCOPY;
-> >> +
-> >> +    offset = (vma->vm_pgoff << PAGE_SHIFT) &
-> >> +             ((1ULL << VFIO_PCI_OFFSET_SHIFT) - 1);
-> >> +
-> >> +    wq_idx = offset >> (PAGE_SHIFT + 2);
-> >> +    if (wq_idx >= 1) {
-> >> +            dev_err(dev, "mapping invalid wq %d off %lx\n",
-> >> +                    wq_idx, offset);
-> >> +            return -EINVAL;
-> >> +    }
-> >> +
-> >> +    /*
-> >> +     * Check and see if the guest wants to map to the limited or unlimited portal.
-> >> +     * The driver will allow mapping to unlimited portal only if the the wq is a
-> >> +     * dedicated wq. Otherwise, it goes to limited.
-> >> +     */
-> >> +    virt_portal = ((offset >> PAGE_SHIFT) & 0x3) == 1;
-> >> +    phys_portal = IDXD_PORTAL_LIMITED;
-> >> +    if (virt_portal == IDXD_PORTAL_UNLIMITED && wq_dedicated(wq))
-> >> +            phys_portal = IDXD_PORTAL_UNLIMITED;
-> >> +
-> >> +    /* We always map IMS portals to the guest */
-> >> +    pgoff = (base + idxd_get_wq_portal_full_offset(wq->id, phys_portal,
-> >> +                                                   IDXD_IRQ_IMS)) >> PAGE_SHIFT;
-> >> +    dev_dbg(dev, "mmap %lx %lx %lx %lx\n", vma->vm_start, pgoff, req_size,
-> >> +            pgprot_val(pg_prot));
-> >> +    vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-> >> +    vma->vm_private_data = mdev;
-> > What ensures the mdev pointer is valid strictly longer than the VMA?
-> > This needs refcounting.
->
-> Going to take a kref at open and then put_device at close. Does that
-> sound reasonable or should I be calling get_device() in mmap() and then
-> register a notifier for when vma is released?
-
-Where does this enabling ever look at vm_private_data again? It seems
-to me it should be reasonable for the mdev to die out from underneath
-a vma, just need some tracking to block future uses of the
-vma->vm_private_data from being attempted.
+PiA+ICsvKg0KPiA+ICsgKiBQbGFjZSB0aGUgcGFnZSBpbiB1bmluaXRpYWxpemVkIHN0YXRlLiAg
+T25seSB1c2FibGUgYnkgY2FsbGVycw0KPiA+ICt0aGF0DQo+ID4gKyAqIGtub3cgdGhlIHBhZ2Ug
+aXMgaW4gYSBjbGVhbiBzdGF0ZSBpbiB3aGljaCBFUkVNT1ZFIHdpbGwgc3VjY2VlZC4NCj4gPiAr
+ICovDQo+ID4gK3N0YXRpYyB2b2lkIHNneF9yZXNldF9lcGNfcGFnZShzdHJ1Y3Qgc2d4X2VwY19w
+YWdlICplcGNfcGFnZSkgew0KPiA+ICsJaW50IHJldDsNCj4gPiArDQo+ID4gKwlXQVJOX09OX09O
+Q0UoZXBjX3BhZ2UtPmZsYWdzICYNCj4gU0dYX0VQQ19QQUdFX1JFQ0xBSU1FUl9UUkFDS0VEKTsN
+Cj4gPiArDQo+ID4gKwlyZXQgPSBfX2VyZW1vdmUoc2d4X2dldF9lcGNfdmlydF9hZGRyKGVwY19w
+YWdlKSk7DQo+ID4gKwlpZiAoV0FSTl9PTkNFKHJldCwgIkVSRU1PVkUgcmV0dXJuZWQgJWQgKDB4
+JXgpIiwgcmV0LCByZXQpKQ0KPiA+ICsJCXJldHVybjsNCj4gPiArfQ0KPiANCj4gU2hvdWxkbid0
+IHRoaXMganVzdCBiZToNCj4gDQo+IC4uLg0KPiAJcmV0ID0gX19lcmVtb3ZlKHNneF9nZXRfZXBj
+X3ZpcnRfYWRkcihlcGNfcGFnZSkpOw0KPiAJV0FSTl9PTkNFKHJldCwgIkVSRU1PVkUgcmV0dXJu
+ZWQgJWQgKDB4JXgpIiwgcmV0LCByZXQpOyB9DQo+IA0KPiBTb21ldGltZXMsIHlvdSBhY3R1YWxs
+eSBuZWVkIHRvIGxvb2sgYXQgdGhlIGNvZGUgdGhhdCB5b3UgY3V0IGFuZCBwYXN0ZS4gOykNCg0K
+Q29ycmVjdCEgVGhhbmtzIGZvciBjYXRjaGluZy4gSSdsbCByZW1vdmUgdGhpcyB1c2VsZXNzICdy
+ZXR1cm4nIGluIG5leHQgdmVyc2lvbi4NCg0K
