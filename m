@@ -2,115 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6783431D07C
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:54:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8007E31D09B
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 20:04:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229867AbhBPSxq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 13:53:46 -0500
-Received: from mga12.intel.com ([192.55.52.136]:2143 "EHLO mga12.intel.com"
+        id S229802AbhBPTD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 14:03:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49132 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229780AbhBPSxp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 13:53:45 -0500
-IronPort-SDR: 4WWdjfXb7IGKWoz9uNCz6q54vTwKtibqtLQ/z2aCBh4toRtIEePbgkM+HH088hT4IL2IfsoO6H
- Dedh/PO5uX1g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="162119195"
-X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="162119195"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:53:04 -0800
-IronPort-SDR: /vbzP0GKneg46nRBJsUt0PWJhe12KvCFWs6k+mvm4iqkPOkWjvs6eKdmJwVHND3j9ok0Ycicgt
- rmXnmzd0JYOg==
-X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="589336611"
-Received: from twblanch-mobl.amr.corp.intel.com (HELO [10.209.156.22]) ([10.209.156.22])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:53:03 -0800
-Subject: Re: [RFC PATCH v5 08/26] x86/sgx: Expose SGX architectural
- definitions to the kernel
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Huang, Haitao" <haitao.huang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>
-References: <cover.1613221549.git.kai.huang@intel.com>
- <1d6fe6bd392b604091b57842c15cc5460aa92593.1613221549.git.kai.huang@intel.com>
- <YCsrNqcB1C0Tyxz9@kernel.org> <cdc73d737d634e778de4c691ca4fd080@intel.com>
- <20210216103218.GB10592@zn.tnic> <a792bf6271da4fddb537085845cf868f@intel.com>
- <20210216114851.GD10592@zn.tnic>
- <9dca76b9-a0f9-a7aa-5d85-f8b43f89a3d2@intel.com>
- <20210216184718.GE10592@zn.tnic>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <b3966341-b777-fb89-e2f2-7aa4735cb28a@intel.com>
-Date:   Tue, 16 Feb 2021 10:53:03 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210216184718.GE10592@zn.tnic>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S229628AbhBPTD7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 14:03:59 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C8A7364E28;
+        Tue, 16 Feb 2021 19:03:17 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lC5cx-00ETSL-MA; Tue, 16 Feb 2021 19:03:15 +0000
+Date:   Tue, 16 Feb 2021 19:03:15 +0000
+Message-ID: <87lfbnq1ho.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Haibo Xu <haibo.xu@linaro.org>
+Cc:     arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+        kvmarm <kvmarm@lists.cs.columbia.edu>, kvm@vger.kernel.org,
+        kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 63/66] KVM: arm64: nv: Allocate VNCR page when required
+In-Reply-To: <CAJc+Z1G6QEEiUh=KLdS6Xut7q63zZ6zQxfpGCkCtY5tTSXPeZw@mail.gmail.com>
+References: <20201210160002.1407373-1-maz@kernel.org>
+        <20201210160002.1407373-64-maz@kernel.org>
+        <CAJc+Z1G6QEEiUh=KLdS6Xut7q63zZ6zQxfpGCkCtY5tTSXPeZw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: haibo.xu@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com, andre.przywara@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/16/21 10:47 AM, Borislav Petkov wrote:
-> header which contains the architectural definitions at the *top* and at
-> their end, there'll be a:
+On Thu, 21 Jan 2021 02:47:45 +0000,
+Haibo Xu <haibo.xu@linaro.org> wrote:
 > 
-> /* Do not put any hardware-defined SGX structure representations below this line! */
+> On Fri, 11 Dec 2020 at 00:04, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > If running a NV guest on an ARMv8.4-NV capable system, let's
+> > allocate an additional page that will be used by the hypervisor
+> > to fulfill system register accesses.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 3 ++-
+> >  arch/arm64/kvm/nested.c           | 8 ++++++++
+> >  arch/arm64/kvm/reset.c            | 1 +
+> >  3 files changed, 11 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 78630bd5124d..dada0678c28e 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -523,7 +523,8 @@ struct kvm_vcpu_arch {
+> >   */
+> >  static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
+> >  {
+> > -       if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
+> > +       if (unlikely(cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
+> > +                    r >= __VNCR_START__ && ctxt->vncr_array))
+> >                 return &ctxt->vncr_array[r - __VNCR_START__];
+> >
+> >         return (u64 *)&ctxt->sys_regs[r];
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index eef8f9873814..88147ec99755 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -47,6 +47,12 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >         if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+> >                 return -EINVAL;
+> >
+> > +       if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
+> > +               vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
+> > +               if (!vcpu->arch.ctxt.vncr_array)
+> > +                       return -ENOMEM;
+> > +       }
+> > +
 > 
-> and after that line begin the other, software definitions?
+> If KVM_ARM_VCPU_INIT was called multiple times, the above codes
+> would try to allocate a new page without free-ing the previous
+> one. Besides that, the following kvm_free_stage2_pgd() call would
 
-Fine with me.  It's just as easy to miss this comment as is would be to
-miss the comment at the top of sgx_arch.h. :)
+I assume you mean kvm_init_stage2_mmu() here.
+
+> fail in the second call with the error message "kvm_arch already
+> initialized?".  I think a possible fix is to add a new flag to
+> indicate whether the NV related meta data have been initialized, and
+> only initialize them for the first call.
+
+Good catch. But I think we have all the data we need at this stage to
+avoid this issue:
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index abb0669bdd4c..baff7373863f 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -390,7 +390,20 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
+ 	int cpu, err;
+ 	struct kvm_pgtable *pgt;
+ 
++	/*
++	 * If we already have our page tables in place, and that the
++	 * MMU context is the canonical one, we have a bug somewhere,
++	 * as this is only supposed to ever happen once per VM.
++	 *
++	 * Otherwise, we're building nested page tables, and that's
++	 * probably because userspace called KVM_ARM_VCPU_INIT more
++	 * than once on the same vcpu. Since that's actually legal,
++	 * don't kick a fuss and leave gracefully.
++	 */
+ 	if (mmu->pgt != NULL) {
++		if (&kvm->arch.mmu != mmu)
++			return 0;
++
+ 		kvm_err("kvm_arch already initialized?\n");
+ 		return -EINVAL;
+ 	}
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 88147ec99755..3b21ea57fbce 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -48,7 +48,9 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 		return -EINVAL;
+ 
+ 	if (cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT)) {
+-		vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
++		if (!vcpu->arch.ctxt.vncr_array)
++			vcpu->arch.ctxt.vncr_array = (u64 *)__get_free_page(GFP_KERNEL | __GFP_ZERO);
++
+ 		if (!vcpu->arch.ctxt.vncr_array)
+ 			return -ENOMEM;
+ 	}
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
