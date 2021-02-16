@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3B3331C76F
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 09:38:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8F5231C775
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 09:43:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhBPIiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 03:38:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44064 "EHLO mail.kernel.org"
+        id S229873AbhBPIjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 03:39:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44166 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229944AbhBPIgc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 03:36:32 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0CED164DAF;
-        Tue, 16 Feb 2021 08:35:39 +0000 (UTC)
+        id S229930AbhBPIht (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 03:37:49 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 79D4164DF0;
+        Tue, 16 Feb 2021 08:37:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613464540;
-        bh=tVT3AoqFxbTj4f/8qoqQrzOb0nYSW8gDU+ATKen7DJ8=;
+        s=k20201202; t=1613464628;
+        bh=71n+NtZascOOwZiNMWY9fqgebqhWv+w6YQ5mThEwJLI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AHWDo+qNgP4wOSk5C27CNMG3Gg92OespKczTiLicz7OpoxvB3nEIsdqbQzXMwppyh
-         6pWbEjdS6mUzQ97wsCzCvVxoVHmaszc4TzpuWE7nlkxZh75sJnGf0Bj5rZH8EfLFgl
-         z8eCFmx82Gnv0UjwPDVtAV4rFqrFGcksHeLVcKr3rvhq9vAnn/GymfA/DIUlwFsSCY
-         aJ9Z2A/tvf75qurr8DGxdmJqb8KflGTT7DhbSyol2QJ/NJnWq7k4n2tizUHJiR86Pf
-         ZIjqG7okrsnBm3LWaq12VI4uxJcxwafbLWUBOA4aFPeSjZ3vT68uR0YjDtFNLuwVCN
-         38GWVAKCJ4iNg==
-Date:   Tue, 16 Feb 2021 10:35:27 +0200
+        b=HY4QkH9xcekWT4DZgWz2halarAJG3EcImPUgBt7u4sL1+DX4yr+4iYgw08L9KMW7s
+         /AEdw24y83mtCoEIg9QSZ0HCent0anC5qn7k/t7fnDrvb9dXB+7XyMxpyoZCaJPLYe
+         sdO2xP5srRPOdQmroPJzLu0rbPhul3TW/PG0BP3AcPfba2lE6kcVMgm58/gnatpGZ1
+         AN/bevLPbEb2lhSoX9+zzWtX7lF0re2PWRqwLObzseXL3YV76tF78KhNNdL5D7oBSx
+         4W+BG2b63xZeWA/B+pknJEF7SE7ORlFwGopQJiJgj2/+PID8zUPjrWF/cThq9cSz7Z
+         CfmkjKPRpbSTQ==
+Date:   Tue, 16 Feb 2021 10:36:55 +0200
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     "Huang, Kai" <kai.huang@intel.com>
 Cc:     "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
@@ -38,219 +38,230 @@ Cc:     "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
         "bp@alien8.de" <bp@alien8.de>,
         "tglx@linutronix.de" <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>
-Subject: Re: [RFC PATCH v5 13/26] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-Message-ID: <YCuDz3jzQkc5j23T@kernel.org>
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "jethro@fortanix.com" <jethro@fortanix.com>,
+        "b.thiel@posteo.de" <b.thiel@posteo.de>
+Subject: Re: [RFC PATCH v5 06/26] x86/cpu/intel: Allow SGX virtualization
+ without Launch Control support
+Message-ID: <YCuEHJ7a2HLG6jk/@kernel.org>
 References: <cover.1613221549.git.kai.huang@intel.com>
- <4b8921da8e0d037b1e99d5cc92eea8f8470cf2e0.1613221549.git.kai.huang@intel.com>
- <YCs3IZ/Edv6AeIYo@kernel.org>
- <YCs3Wt+il5+pnwCV@kernel.org>
- <87b9c4bfe61545c0803f7a46b177e10e@intel.com>
- <YCuDSj3t5KlUi6b5@kernel.org>
+ <82c304d6f4e8ebfa9b35d1be74360a5004179c5f.1613221549.git.kai.huang@intel.com>
+ <YCsq0uFdzwLrFCMW@kernel.org>
+ <af4798077c93450e8e30dddbc7c650d0@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YCuDSj3t5KlUi6b5@kernel.org>
+In-Reply-To: <af4798077c93450e8e30dddbc7c650d0@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 16, 2021 at 10:33:17AM +0200, Jarkko Sakkinen wrote:
-> On Tue, Feb 16, 2021 at 04:55:49AM +0000, Huang, Kai wrote:
-> > > 
-> > > On Tue, Feb 16, 2021 at 05:08:20AM +0200, Jarkko Sakkinen wrote:
-> > > > On Sun, Feb 14, 2021 at 02:29:15AM +1300, Kai Huang wrote:
-> > > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > >
-> > > > > The host kernel must intercept ECREATE to be able to impose policies
-> > > > > on guests.  When it does this, the host kernel runs ECREATE against
-> > > > > the userspace mapping of the virtualized EPC.
-> > > > >
-> > > > > Provide wrappers around __ecreate() and __einit() to hide the
-> > > > > ugliness of overloading the ENCLS return value to encode multiple
-> > > > > error formats in a single int.  KVM will trap-and-execute ECREATE
-> > > > > and EINIT as part of SGX virtualization, and on an exception, KVM
-> > > > > needs the trapnr so that it can inject the correct fault into the guest.
-> > > > >
-> > > > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > > > Signed-off-by: Kai Huang <kai.huang@intel.com>
-> > > > > ---
-> > > > > v4->v5:
-> > > > >
-> > > > >  - No code change.
-> > > > >
-> > > > > v3->v4:
-> > > > >
-> > > > >  - Added one new line before last return in sgx_virt_einit(), per Jarkko.
-> > > > >
-> > > > > v2->v3:
-> > > > >
-> > > > >  - Added kdoc for sgx_virt_ecreate() and sgx_virt_einit(), per Jarkko.
-> > > > >  - Changed to use CONFIG_X86_SGX_KVM.
-> > > > >
-> > > > > ---
-> > > > >  arch/x86/include/asm/sgx.h     | 16 ++++++
-> > > > >  arch/x86/kernel/cpu/sgx/virt.c | 94
-> > > > > ++++++++++++++++++++++++++++++++++
-> > > > >  2 files changed, 110 insertions(+)
-> > > > >  create mode 100644 arch/x86/include/asm/sgx.h
-> > > > >
-> > > > > diff --git a/arch/x86/include/asm/sgx.h b/arch/x86/include/asm/sgx.h
-> > > > > new file mode 100644 index 000000000000..8a3ea3e1efbe
-> > > > > --- /dev/null
-> > > > > +++ b/arch/x86/include/asm/sgx.h
-> > > > > @@ -0,0 +1,16 @@
-> > > > > +/* SPDX-License-Identifier: GPL-2.0 */ #ifndef _ASM_X86_SGX_H
-> > > > > +#define _ASM_X86_SGX_H
-> > > > > +
-> > > > > +#include <linux/types.h>
-> > > > > +
-> > > > > +#ifdef CONFIG_X86_SGX_KVM
-> > > > > +struct sgx_pageinfo;
-> > > > > +
-> > > > > +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-> > > > > +		     int *trapnr);
-> > > > > +int sgx_virt_einit(void __user *sigstruct, void __user *token,
-> > > > > +		   void __user *secs, u64 *lepubkeyhash, int *trapnr);
-> > > >
-> > > > s/virt/vepc/g
+On Tue, Feb 16, 2021 at 05:03:26AM +0000, Huang, Kai wrote:
 > > 
-> > No. The two are related to enclave construction (from guest), not EPC. 
+> > On Sun, Feb 14, 2021 at 02:29:05AM +1300, Kai Huang wrote:
+> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
+> > >
+> > > The kernel will currently disable all SGX support if the hardware does
+> > > not support launch control.  Make it more permissive to allow SGX
+> > > virtualization on systems without Launch Control support.  This will
+> > > allow KVM to expose SGX to guests that have less-strict requirements
+> > > on the availability of flexible launch control.
+> > >
+> > > Improve error message to distinguish between three cases.  There are
+> > > two cases where SGX support is completely disabled:
+> > > 1) SGX has been disabled completely by the BIOS
+> > > 2) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
+> > >    of LC unavailability.  SGX virtualization is unavailable (because of
+> > >    Kconfig).
+> > > One where it is partially available:
+> > > 3) SGX LC is locked by the BIOS.  Bare-metal support is disabled because
+> > >    of LC unavailability.  SGX virtualization is supported.
+> > >
+> > > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > > Co-developed-by: Kai Huang <kai.huang@intel.com>
+> > > Signed-off-by: Kai Huang <kai.huang@intel.com>
+> > > ---
+> > > v4->v5:
+> > >
+> > >  - No code change.
+> > >
+> > > v3->v4:
+> > >
+> > >  - Removed cpu_has(X86_FEATURE_SGX1) check in enable_sgx_any, since it
+> > logically
+> > >    is not related to KVM SGX series, per Sean.
+> > >  - Changed declaration of variables to be in reverse-christmas tree style, per
+> > >    Jarkko.
+> > >
+> > > v2->v3:
+> > >
+> > >  - Added to use 'enable_sgx_any', per Dave.
+> > >  - Changed to call clear_cpu_cap() directly, rather than using clear_sgx_caps()
+> > >    and clear_sgx_lc().
+> > >  - Changed to use CONFIG_X86_SGX_KVM, instead of
+> > CONFIG_X86_SGX_VIRTUALIZATION.
+> > >
+> > > v1->v2:
+> > >
+> > >  - Refined commit message per Dave's comments.
+> > >  - Added check to only enable SGX virtualization when VMX is supported, per
+> > >    Dave's comment.
+> > >  - Refined error msg print to explicitly call out SGX virtualization will be
+> > >    supported when LC is locked by BIOS, per Dave's comment.
+> > >
+> > > ---
+> > >  arch/x86/kernel/cpu/feat_ctl.c | 57
+> > > ++++++++++++++++++++++++++--------
+> > >  1 file changed, 44 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kernel/cpu/feat_ctl.c
+> > > b/arch/x86/kernel/cpu/feat_ctl.c index 27533a6e04fa..96c370284913
+> > > 100644
+> > > --- a/arch/x86/kernel/cpu/feat_ctl.c
+> > > +++ b/arch/x86/kernel/cpu/feat_ctl.c
+> > > @@ -105,7 +105,8 @@ early_param("nosgx", nosgx);  void
+> > > init_ia32_feat_ctl(struct cpuinfo_x86 *c)  {
+> > >  	bool tboot = tboot_enabled();
+> > > -	bool enable_sgx;
+> > > +	bool enable_sgx_any, enable_sgx_kvm, enable_sgx_driver;
+> > > +	bool enable_vmx;
+> > >  	u64 msr;
+> > >
+> > >  	if (rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr)) { @@ -114,13 +115,21
+> > @@
+> > > void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+> > >  		return;
+> > >  	}
+> > >
+> > > +	enable_vmx = cpu_has(c, X86_FEATURE_VMX) &&
+> > > +		     IS_ENABLED(CONFIG_KVM_INTEL);
 > > 
-> > For instance, what does ECREATE mean for virtual EPC? ECREATE is meaningful for enclave.
-> > 
-> > > >
-> > > > > +#endif
-> > > > > +
-> > > > > +#endif /* _ASM_X86_SGX_H */
-> > > > > diff --git a/arch/x86/kernel/cpu/sgx/virt.c
-> > > > > b/arch/x86/kernel/cpu/sgx/virt.c index 47542140f8c1..016bad7cff8d
-> > > > > 100644
-> > > > > --- a/arch/x86/kernel/cpu/sgx/virt.c
-> > > > > +++ b/arch/x86/kernel/cpu/sgx/virt.c
-> > > >
-> > > > Rename as vepc.c.
-> > 
-> > No. This file contains more than virtual EPC implementation, but also other staff like sgx_virt_ecreate()/sgx_virt_einit(), which are used by KVM to run ECREATE/EINIT on behalf of guest.
-> > 
-> > > >
-> > > > > @@ -257,3 +257,97 @@ int __init sgx_vepc_init(void)
-> > > > >
-> > > > >  	return misc_register(&sgx_vepc_dev);  }
-> > > > > +
-> > > > > +/**
-> > > > > + * sgx_virt_ecreate() - Run ECREATE on behalf of guest
-> > > > > + * @pageinfo:	Pointer to PAGEINFO structure
-> > > > > + * @secs:	Userspace pointer to SECS page
-> > > > > + * @trapnr:	trap number injected to guest in case of ECREATE error
-> > > > > + *
-> > > > > + * Run ECREATE on behalf of guest after KVM traps ECREATE for the
-> > > > > +purpose
-> > > > > + * of enforcing policies of guest's enclaves, and return the trap
-> > > > > +number
-> > > > > + * which should be injected to guest in case of any ECREATE error.
-> > > > > + *
-> > > > > + * Return:
-> > > > > + * - 0: 	ECREATE was successful.
-> > > > > + * - -EFAULT:	ECREATE returned error.
-> > > > > + */
-> > > > > +int sgx_virt_ecreate(struct sgx_pageinfo *pageinfo, void __user *secs,
-> > > > > +		     int *trapnr)
-> > > > > +{
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	/*
-> > > > > +	 * @secs is userspace address, and it's not guaranteed @secs points at
-> > > > > +	 * an actual EPC page. It's also possible to generate a kernel mapping
-> > > > > +	 * to physical EPC page by resolving PFN but using __uaccess_xx() is
-> > > > > +	 * simpler.
-> > > > > +	 */
-> > > > > +	__uaccess_begin();
-> > > > > +	ret = __ecreate(pageinfo, (void *)secs);
-> > > > > +	__uaccess_end();
-> > > > > +
-> > > > > +	if (encls_faulted(ret)) {
-> > > > > +		*trapnr = ENCLS_TRAPNR(ret);
-> > > > > +		return -EFAULT;
-> > > > > +	}
-> > > > > +
-> > > > > +	/* ECREATE doesn't return an error code, it faults or succeeds. */
-> > > > > +	WARN_ON_ONCE(ret);
-> > > >
-> > > > Empty line.
-> > > >
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +EXPORT_SYMBOL_GPL(sgx_virt_ecreate);
-> > > > > +
-> > > > > +static int __sgx_virt_einit(void __user *sigstruct, void __user *token,
-> > > > > +			    void __user *secs)
-> > > > > +{
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	__uaccess_begin();
-> > > > > +	ret =  __einit((void *)sigstruct, (void *)token, (void *)secs);
-> > > > > +	__uaccess_end();
-> > > >
-> > > > Ditto.
-> > > >
-> > > > > +	return ret;
-> > > > > +}
-> > > > > +
-> > > > > +/**
-> > > > > + * sgx_virt_einit() - Run EINIT on behalf of guest
-> > > > > + * @sigstruct:		Userspace pointer to SIGSTRUCT structure
-> > > > > + * @token:		Userspace pointer to EINITTOKEN structure
-> > > > > + * @secs:		Userspace pointer to SECS page
-> > > > > + * @lepubkeyhash:	Pointer to guest's *virtual* SGX_LEPUBKEYHASH MSR
-> > > > > + * 			values
-> > > > > + * @trapnr:		trap number injected to guest in case of EINIT error
-> > > > > + *
-> > > > > + * Run EINIT on behalf of guest after KVM traps EINIT. If SGX_LC is
-> > > > > +available
-> > > > > + * in host, SGX driver may rewrite the hardware values at wish,
-> > > > > +therefore KVM
-> > > > > + * needs to update hardware values to guest's virtual MSR values in
-> > > > > +order to
-> > > > > + * ensure EINIT is executed with expected hardware values.
-> > > > > + *
-> > > > > + * Return:
-> > > > > + * - 0: 	EINIT was successful.
-> > > > > + * - -EFAULT:	EINIT returned error.
-> > > > > + */
-> > > > > +int sgx_virt_einit(void __user *sigstruct, void __user *token,
-> > > > > +		   void __user *secs, u64 *lepubkeyhash, int *trapnr) {
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	if (!boot_cpu_has(X86_FEATURE_SGX_LC)) {
-> > > > > +		ret = __sgx_virt_einit(sigstruct, token, secs);
-> > > > > +	} else {
-> > > > > +		preempt_disable();
-> > > > > +
-> > > > > +		sgx_update_lepubkeyhash(lepubkeyhash);
-> > > > > +
-> > > > > +		ret = __sgx_virt_einit(sigstruct, token, secs);
-> > > > > +		preempt_enable();
-> > > > > +	}
-> > > > > +
-> > > > > +	if (encls_faulted(ret)) {
-> > > > > +		*trapnr = ENCLS_TRAPNR(ret);
-> > > > > +		return -EFAULT;
-> > > > > +	}
-> > > > > +
-> > > > > +	return ret;
-> > > > > +}
-> > > > > +EXPORT_SYMBOL_GPL(sgx_virt_einit);
-> > > 
-> > > Remove exports.
-> > 
-> > Why? KVM needs to use them in later patches.
+> > It's less than 100 characters:
 > 
-> Because they are only required for LKM's.
+> Just carious, shouldn't be 80 characters to wrap a new line, instead of 100?
 
-I mean when LKM needs to call kernel functions.
+Try with checkpatch.pl.
 
-Right, KVM can be compiled as LKM.
+> 
+> > 
+> >         enable_vmx = cpu_has(c, X86_FEATURE_VMX) &&
+> > IS_ENABLED(CONFIG_KVM_INTEL);
+> > 
+> > This is better:
+> > 
+> >         enable_vmx = IS_ENABLED(CONFIG_KVM_INTEL) && cpu_has(c,
+> > X86_FEATURE_VMX);
+> > 
+> > You only want to evaluate cpu_has() if COHNFIG_KVM_INTEL is enabled.
+> 
+> If you look at the original code, cpu_has() comes first. It's just one-time booting time code, and I don't think it matters.
+> 
+> Btw, are you also suggesting IS_ENABLED(CONFIG_X86_SGX) should come before cpu_has() for SGX in below code? 
+> 
+> That being said, cpu_has() comes first for both VMX and SGX in the original code. I don't know why I need to change the sequence in this patch.
+> 
+> > 
+> > > +
+> > >  	/*
+> > > -	 * Enable SGX if and only if the kernel supports SGX and Launch Control
+> > > -	 * is supported, i.e. disable SGX if the LE hash MSRs can't be written.
+> > > +	 * Separate out SGX driver enabling from KVM.  This allows KVM
+> > > +	 * guests to use SGX even if the kernel SGX driver refuses to
+> > > +	 * use it.  This happens if flexible Faunch Control is not
+> > > +	 * available.
+> > >  	 */
+> > > -	enable_sgx = cpu_has(c, X86_FEATURE_SGX) &&
+> > > -		     cpu_has(c, X86_FEATURE_SGX_LC) &&
+> > > -		     IS_ENABLED(CONFIG_X86_SGX);
+> > > +	enable_sgx_any = cpu_has(c, X86_FEATURE_SGX) &&
+> > > +			 IS_ENABLED(CONFIG_X86_SGX);
+> > > +	enable_sgx_driver = enable_sgx_any &&
+> > > +			    cpu_has(c, X86_FEATURE_SGX_LC);
+> > > +	enable_sgx_kvm = enable_sgx_any && enable_vmx &&
+> > > +			  IS_ENABLED(CONFIG_X86_SGX_KVM);
+> > >
+> > >  	if (msr & FEAT_CTL_LOCKED)
+> > >  		goto update_caps;
+> > > @@ -136,15 +145,18 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+> > >  	 * i.e. KVM is enabled, to avoid unnecessarily adding an attack vector
+> > >  	 * for the kernel, e.g. using VMX to hide malicious code.
+> > >  	 */
+> > > -	if (cpu_has(c, X86_FEATURE_VMX) &&
+> > IS_ENABLED(CONFIG_KVM_INTEL)) {
+> > > +	if (enable_vmx) {
+> > >  		msr |= FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
+> > >
+> > >  		if (tboot)
+> > >  			msr |= FEAT_CTL_VMX_ENABLED_INSIDE_SMX;
+> > >  	}
+> > >
+> > > -	if (enable_sgx)
+> > > -		msr |= FEAT_CTL_SGX_ENABLED |
+> > FEAT_CTL_SGX_LC_ENABLED;
+> > > +	if (enable_sgx_kvm || enable_sgx_driver) {
+> > > +		msr |= FEAT_CTL_SGX_ENABLED;
+> > > +		if (enable_sgx_driver)
+> > > +			msr |= FEAT_CTL_SGX_LC_ENABLED;
+> > > +	}
+> > >
+> > >  	wrmsrl(MSR_IA32_FEAT_CTL, msr);
+> > >
+> > > @@ -167,10 +179,29 @@ void init_ia32_feat_ctl(struct cpuinfo_x86 *c)
+> > >  	}
+> > >
+> > >  update_sgx:
+> > > -	if (!(msr & FEAT_CTL_SGX_ENABLED) ||
+> > > -	    !(msr & FEAT_CTL_SGX_LC_ENABLED) || !enable_sgx) {
+> > > -		if (enable_sgx)
+> > > -			pr_err_once("SGX disabled by BIOS\n");
+> > > +	if (!(msr & FEAT_CTL_SGX_ENABLED)) {
+> > > +		if (enable_sgx_kvm || enable_sgx_driver)
+> > > +			pr_err_once("SGX disabled by BIOS.\n");
+> > >  		clear_cpu_cap(c, X86_FEATURE_SGX);
+> > 
+> > Empty line before return statement.
+> 
+> It's just two statements inside the if() {} statement. Putting a new line here is too sparse IMHO.
+> 
+> I'd like to hear more.
+
+This was a common review comment in original SGX series, so I'm
+sticking to the pattern.
+
+> 
+> Dave, do you have any comment?
+> 
+> > 
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	/*
+> > > +	 * VMX feature bit may be cleared due to being disabled in BIOS,
+> > > +	 * in which case SGX virtualization cannot be supported either.
+> > > +	 */
+> > > +	if (!cpu_has(c, X86_FEATURE_VMX) && enable_sgx_kvm) {
+> > > +		pr_err_once("SGX virtualization disabled due to lack of VMX.\n");
+> > > +		enable_sgx_kvm = 0;
+> > > +	}
+> > > +
+> > > +	if (!(msr & FEAT_CTL_SGX_LC_ENABLED) && enable_sgx_driver) {
+> > > +		if (!enable_sgx_kvm) {
+> > > +			pr_err_once("SGX Launch Control is locked. Disable
+> > SGX.\n");
+> > > +			clear_cpu_cap(c, X86_FEATURE_SGX);
+> > > +		} else {
+> > > +			pr_err_once("SGX Launch Control is locked. Support
+> > SGX virtualization only.\n");
+> > > +			clear_cpu_cap(c, X86_FEATURE_SGX_LC);
+> > > +		}
+> > >  	}
+> > >  }
+> > > --
+> > > 2.29.2
+> > >
+> > >
+> > 
+> > /Jarkko
+> 
 
 /Jarkko
