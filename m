@@ -2,104 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A13F31C963
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 12:09:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A73131C985
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 12:17:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbhBPLJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 06:09:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36759 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230000AbhBPLIU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Feb 2021 06:08:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613473614;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=IpPnQESKftP4YmMf+TpJQvg8smPe15Q/eS96QieNViM=;
-        b=d2duA8GUjYgHLclbFEwC+hB+E8rdlWrZ8piRfI5P50IdsBcgC+AO7HccBRogaRYeHniX0A
-        1No3OPNEMQuzStv0c1ygGtFBhrNvbyKvEo593nIQchZciaA3+KJ6z7Lsow08ek6IgG0SY6
-        wyrsMrXfRnMPPB4dIb1RMhVI1cdxRU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-581-ib7Oj_NUMRODwPrYhZOZvA-1; Tue, 16 Feb 2021 06:06:52 -0500
-X-MC-Unique: ib7Oj_NUMRODwPrYhZOZvA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06BF3107ACF7;
-        Tue, 16 Feb 2021 11:06:51 +0000 (UTC)
-Received: from gondolin.redhat.com (ovpn-113-145.ams2.redhat.com [10.36.113.145])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 727F45D9CC;
-        Tue, 16 Feb 2021 11:06:49 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>, stable@vger.kernel.org
-Subject: [PATCH v2] virtio/s390: implement virtio-ccw revision 2 correctly
-Date:   Tue, 16 Feb 2021 12:06:45 +0100
-Message-Id: <20210216110645.1087321-1-cohuck@redhat.com>
+        id S230233AbhBPLQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 06:16:34 -0500
+Received: from mga14.intel.com ([192.55.52.115]:11247 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229912AbhBPLQb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 06:16:31 -0500
+IronPort-SDR: OXEf40TxlM/NJhDx9/bBChETAijR0yUP2XiZFb9E2bOxTCzC/DYn9etnmHNsCNTmLMwgdYaCGD
+ b6FfOD/sXn+g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9896"; a="182079232"
+X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
+   d="scan'208";a="182079232"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 03:15:36 -0800
+IronPort-SDR: OHNR5e1JOcrH21t0+6p1clrEVmDONMaJDkqEZ9zsve3jqh5GyrI17ZRuRdC4zeqVFXg+MIfYWK
+ F/LPJAdq2qRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
+   d="scan'208";a="377524270"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga002.jf.intel.com with ESMTP; 16 Feb 2021 03:15:36 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 16 Feb 2021 03:15:35 -0800
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 16 Feb 2021 03:15:35 -0800
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15]) by
+ ORSMSX602.amr.corp.intel.com ([10.22.229.15]) with mapi id 15.01.2106.002;
+ Tue, 16 Feb 2021 03:15:35 -0800
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Jarkko Sakkinen <jarkko@kernel.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+        "Huang, Haitao" <haitao.huang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>
+Subject: RE: [RFC PATCH v5 08/26] x86/sgx: Expose SGX architectural
+ definitions to the kernel
+Thread-Topic: [RFC PATCH v5 08/26] x86/sgx: Expose SGX architectural
+ definitions to the kernel
+Thread-Index: AQHXAgqNtwlxthmplU6cFSX1Hb3mCqpalcMAgAACzaCAAId3AP//ga0A
+Date:   Tue, 16 Feb 2021 11:15:35 +0000
+Message-ID: <a792bf6271da4fddb537085845cf868f@intel.com>
+References: <cover.1613221549.git.kai.huang@intel.com>
+ <1d6fe6bd392b604091b57842c15cc5460aa92593.1613221549.git.kai.huang@intel.com>
+ <YCsrNqcB1C0Tyxz9@kernel.org> <cdc73d737d634e778de4c691ca4fd080@intel.com>
+ <20210216103218.GB10592@zn.tnic>
+In-Reply-To: <20210216103218.GB10592@zn.tnic>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+x-originating-ip: [10.1.200.100]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CCW_CMD_READ_STATUS was introduced with revision 2 of virtio-ccw,
-and drivers should only rely on it being implemented when they
-negotiated at least that revision with the device.
-
-However, virtio_ccw_get_status() issued READ_STATUS for any
-device operating at least at revision 1. If the device accepts
-READ_STATUS regardless of the negotiated revision (which some
-implementations like QEMU do, even though the spec currently does
-not allow it), everything works as intended. While a device
-rejecting the command should also be handled gracefully, we will
-not be able to see any changes the device makes to the status,
-such as setting NEEDS_RESET or setting the status to zero after
-a completed reset.
-
-We negotiated the revision to at most 1, as we never bumped the
-maximum revision; let's do that now and properly send READ_STATUS
-only if we are operating at least at revision 2.
-
-Cc: stable@vger.kernel.org
-Fixes: 7d3ce5ab9430 ("virtio/s390: support READ_STATUS command for virtio-ccw")
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
-
-v1->v2:
-  tweak patch description and cc:stable
-
----
- drivers/s390/virtio/virtio_ccw.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index 5730572b52cd..54e686dca6de 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -117,7 +117,7 @@ struct virtio_rev_info {
- };
- 
- /* the highest virtio-ccw revision we support */
--#define VIRTIO_CCW_REV_MAX 1
-+#define VIRTIO_CCW_REV_MAX 2
- 
- struct virtio_ccw_vq_info {
- 	struct virtqueue *vq;
-@@ -952,7 +952,7 @@ static u8 virtio_ccw_get_status(struct virtio_device *vdev)
- 	u8 old_status = vcdev->dma_area->status;
- 	struct ccw1 *ccw;
- 
--	if (vcdev->revision < 1)
-+	if (vcdev->revision < 2)
- 		return vcdev->dma_area->status;
- 
- 	ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw));
--- 
-2.26.2
-
+PiANCj4gT24gVHVlLCBGZWIgMTYsIDIwMjEgYXQgMTA6MzA6MDNBTSArMDAwMCwgSHVhbmcsIEth
+aSB3cm90ZToNCj4gPiBCZWNhdXNlIHRob3NlIGNvbnRlbnRzIGFyZSAqYXJjaGl0ZWN0dXJhbCou
+IFRoZXkgYXJlIGRlZmluZWQgaW4gU0RNLg0KPiA+DQo+ID4gQW5kIHBhdGNoIDEzICh4ODYvc2d4
+OiBBZGQgaGVscGVycyB0byBleHBvc2UgRUNSRUFURSBhbmQgRUlOSVQgdG8gS1ZNKQ0KPiA+IHdp
+bGwgaW50cm9kdWNlIGFyY2gveDg2L2luY2x1ZGUvYXNtL3NneC5oLCB3aGVyZSBub24tYXJjaGl0
+ZWN0dXJhbA0KPiA+IGZ1bmN0aW9ucyB3aWxsIGJlIGRlY2xhcmVkLg0KPiANCj4gV2hvIGNhcmVz
+IGFib3V0IHRoZSBTRE0/DQoNClNvcnJ5IEkgYW0gbm90IHN1cmUgSSB1bmRlcnN0YW5kIHlvdXIg
+cXVlc3Rpb24uIENvdWxkIHlvdSBlbGFib3JhdGU/DQoNCklNSE8gaXQncyBiZXR0ZXIgdG8gcHV0
+IGFyY2hpdGVjdHVyYWwgc3RhZmYgKHN1Y2ggYXMgZGF0YSBzdHJ1Y3R1cmVzIGRlZmluZWQgaW4g
+U0RNIGFuZCB1c2VkIGJ5IGhhcmR3YXJlKSBpbnRvIG9uZSBoZWFkZXIsIGFuZCBvdGhlciBub24t
+YXJjaGl0ZWN0dXJhbCBzdGFmZiBpbnRvIGFub3RoZXIgaGVhZGVyLCBzbyB0aGF0IHRoZSB1c2Vy
+IGNhbiBpbmNsdWRlIHRoZSBvbmUgdGhhdCBpcyBhY3R1YWxseSByZXF1aXJlZCwgYnV0IGRvZXNu
+J3QgaGF2ZSB0byBpbmNsdWRlIG9uZSBiaWcgaGVhZGVyIHdoaWNoIGluY2x1ZGVzIGFsbCBTR1gg
+cmVsYXRlZCBkYXRhIHN0cnVjdHVyZXMgYW5kIGZ1bmN0aW9ucy4NCg0K
