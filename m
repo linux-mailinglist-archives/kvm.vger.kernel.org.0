@@ -2,93 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 541DE31C826
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 10:34:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17F4E31C84D
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 10:46:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbhBPJeF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 16 Feb 2021 04:34:05 -0500
-Received: from mga03.intel.com ([134.134.136.65]:34795 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229907AbhBPJdz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 04:33:55 -0500
-IronPort-SDR: 3K46jTKjgnYpjN+ajB8QNhXxnkoKsbSRL/hsZd7tToVuGToV5jXG58KUYRmxNNwXrbhtTe/0Pb
- EgYtXha+c2ng==
-X-IronPort-AV: E=McAfee;i="6000,8403,9896"; a="182917492"
-X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
-   d="scan'208";a="182917492"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 01:33:14 -0800
-IronPort-SDR: 6WFS4cwYTI+ObYv/qp4BSvof2Bi80COztCBszkP7iuLyNVYXeoqDGtis/cJsTNiQgm4JRZlmKp
- eiQ5t1jKiXjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
-   d="scan'208";a="580419873"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga005.jf.intel.com with ESMTP; 16 Feb 2021 01:33:14 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Feb 2021 01:33:13 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Feb 2021 01:33:13 -0800
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15]) by
- ORSMSX602.amr.corp.intel.com ([10.22.229.15]) with mapi id 15.01.2106.002;
- Tue, 16 Feb 2021 01:33:13 -0800
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-CC:     "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Huang, Haitao" <haitao.huang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>
-Subject: RE: [RFC PATCH v5 13/26] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-Thread-Topic: [RFC PATCH v5 13/26] x86/sgx: Add helpers to expose ECREATE and
- EINIT to KVM
-Thread-Index: AQHXAgqQS1vAJ1WsIEqPe3ZtzCQoJapao/iAgAAARAD//5VNEIAAxTkAgAAAn4D//4ldcA==
-Date:   Tue, 16 Feb 2021 09:33:13 +0000
-Message-ID: <ffcde32f499248ab8d0105efff290961@intel.com>
-References: <cover.1613221549.git.kai.huang@intel.com>
- <4b8921da8e0d037b1e99d5cc92eea8f8470cf2e0.1613221549.git.kai.huang@intel.com>
- <YCs3IZ/Edv6AeIYo@kernel.org> <YCs3Wt+il5+pnwCV@kernel.org>
- <87b9c4bfe61545c0803f7a46b177e10e@intel.com> <YCuDSj3t5KlUi6b5@kernel.org>
- <YCuDz3jzQkc5j23T@kernel.org>
-In-Reply-To: <YCuDz3jzQkc5j23T@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-x-originating-ip: [10.1.200.100]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S229919AbhBPJqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 04:46:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36817 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229626AbhBPJqd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Feb 2021 04:46:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613468707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wcnd7ClbZgShooWszPEgOAqPp+c33seC7pun/tamuzE=;
+        b=hti9g678GWwU23gGIDts/48Kubo5NXXl/1cT/UQlemoHVxp53DCzgmQGQCCE87GwvSFwPS
+        Cs8EulP2Q30rGhWDNW6kOAAt895hwf2nOUH7HC7eJE4iYn5gTIMkfrLDVqHO0/Yo+RSGXv
+        Cg7a34t/6+mDLNMvOdrsvlV5u2K3RHc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-474-MA4WhP80O1ixGB_T6ZurCA-1; Tue, 16 Feb 2021 04:45:04 -0500
+X-MC-Unique: MA4WhP80O1ixGB_T6ZurCA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CD6A801998;
+        Tue, 16 Feb 2021 09:45:03 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E7BD15D9C0;
+        Tue, 16 Feb 2021 09:44:55 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     virtualization@lists.linux-foundation.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Subject: [RFC PATCH 00/10] vdpa: get/set_config() rework
+Date:   Tue, 16 Feb 2021 10:44:44 +0100
+Message-Id: <20210216094454.82106-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > > > +EXPORT_SYMBOL_GPL(sgx_virt_einit);
-> > > >
-> > > > Remove exports.
-> > >
-> > > Why? KVM needs to use them in later patches.
-> >
-> > Because they are only required for LKM's.
-> 
-> I mean when LKM needs to call kernel functions.
-> 
-> Right, KVM can be compiled as LKM.
+Following the discussion with Michael and Jason [1], I reworked a bit
+get/set_config() in vdpa.
 
-Just to confirm, you are OK with exposing them as symbol, since KVM (as a module) needs to use them, right?
+I changed vdpa_get_config() to check the boundaries and added vdpa_set_config().
+When 'offset' or 'len' parameters exceed boundaries, we limit the reading to
+the available configuration space in the device, and we return the amount of
+bytes read/written.
+
+In this way the user space can pass buffers bigger than config space.
+I also returned the amount of bytes read and written to user space.
+
+Patches also available here:
+https://github.com/stefano-garzarella/linux/tree/vdpa-get-set-config-refactoring
+
+Thanks for your comments,
+Stefano
+
+[1] https://lkml.org/lkml/2021/2/10/350
+
+Stefano Garzarella (10):
+  vdpa: add get_config_size callback in vdpa_config_ops
+  vdpa: check vdpa_get_config() parameters and return bytes read
+  vdpa: add vdpa_set_config() helper
+  vdpa: remove param checks in the get/set_config callbacks
+  vdpa: remove WARN_ON() in the get/set_config callbacks
+  virtio_vdpa: use vdpa_set_config()
+  vhost/vdpa: use vdpa_set_config()
+  vhost/vdpa: allow user space to pass buffers bigger than config space
+  vhost/vdpa: use get_config_size callback in
+    vhost_vdpa_config_validate()
+  vhost/vdpa: return configuration bytes read and written to user space
+
+ include/linux/vdpa.h              | 22 ++++-------
+ drivers/vdpa/ifcvf/ifcvf_base.c   |  3 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c   |  8 +++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c |  9 ++++-
+ drivers/vdpa/vdpa.c               | 51 ++++++++++++++++++++++++
+ drivers/vdpa/vdpa_sim/vdpa_sim.c  | 15 +++++---
+ drivers/vhost/vdpa.c              | 64 ++++++++++++++++---------------
+ drivers/virtio/virtio_vdpa.c      |  3 +-
+ 8 files changed, 116 insertions(+), 59 deletions(-)
+
+-- 
+2.29.2
+
