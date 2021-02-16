@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FAB631D054
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30BC931D055
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:42:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbhBPSkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 13:40:53 -0500
-Received: from mga11.intel.com ([192.55.52.93]:23406 "EHLO mga11.intel.com"
+        id S230458AbhBPSmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 13:42:00 -0500
+Received: from mga05.intel.com ([192.55.52.43]:62181 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229628AbhBPSku (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 13:40:50 -0500
-IronPort-SDR: hHe7etTkdbXM5iRWP/Bu/dY/sRf66H97EwscOPXnlmzcebgL/Mkq+LO8WEmHpTHqHNLMEd6UTO
- i/g3fRCy3AQA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="179475861"
+        id S229945AbhBPSl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 13:41:59 -0500
+IronPort-SDR: 61j/DqjYGxz4qNHwkMjyCUsfD93EB646Fr5J8Nm1FUwqFc2fZHb7Y0u7GQMq6IFqOmG6QfIOtL
+ O/jq2pZZTtlg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="267828448"
 X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="179475861"
+   d="scan'208";a="267828448"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:40:09 -0800
-IronPort-SDR: eORaqr6C0IuWb9pK8/kPI9WEKlGoofR0/fBR7GEfpW4H9pEeWx/NzWBpM1m927At0TO2AQJ7Uo
- bnjo37aqTKCA==
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:41:19 -0800
+IronPort-SDR: dp5E+o3nHerotmMO9InlZlEJa1E472pNAlAAQo49qSJK+oK9EEd3npZSg/ctBK1vLfgvfGjn/U
+ lF/dYIpe2UFg==
 X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="589333012"
+   d="scan'208";a="589333373"
 Received: from twblanch-mobl.amr.corp.intel.com (HELO [10.209.156.22]) ([10.209.156.22])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:40:08 -0800
-Subject: Re: [RFC PATCH v5 06/26] x86/cpu/intel: Allow SGX virtualization
- without Launch Control support
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:41:18 -0800
+Subject: Re: [RFC PATCH v5 07/26] x86/sgx: Initialize virtual EPC driver even
+ when SGX driver is disabled
 To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         rick.p.edgecombe@intel.com, haitao.huang@intel.com,
         pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
-        b.thiel@posteo.de
+        mingo@redhat.com, hpa@zytor.com
 References: <cover.1613221549.git.kai.huang@intel.com>
- <82c304d6f4e8ebfa9b35d1be74360a5004179c5f.1613221549.git.kai.huang@intel.com>
+ <1ab775bbf5212cd0b85d7a41234cccf710cb1656.1613221549.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -79,12 +78,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <51a7138e-e025-b55b-e4c6-fb58bf2fe460@intel.com>
-Date:   Tue, 16 Feb 2021 10:40:08 -0800
+Message-ID: <4a27fb94-9417-b585-618a-04ac900abc82@intel.com>
+Date:   Tue, 16 Feb 2021 10:41:18 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <82c304d6f4e8ebfa9b35d1be74360a5004179c5f.1613221549.git.kai.huang@intel.com>
+In-Reply-To: <1ab775bbf5212cd0b85d7a41234cccf710cb1656.1613221549.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -93,13 +92,16 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2/13/21 5:29 AM, Kai Huang wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> Modify sgx_init() to always try to initialize the virtual EPC driver,
+> even if the SGX driver is disabled.  The SGX driver might be disabled
+> if SGX Launch Control is in locked mode, or not supported in the
+> hardware at all.  This allows (non-Linux) guests that support non-LC
+> configurations to use SGX.
 > 
-> The kernel will currently disable all SGX support if the hardware does
-> not support launch control.  Make it more permissive to allow SGX
-> virtualization on systems without Launch Control support.  This will
-> allow KVM to expose SGX to guests that have less-strict requirements on
-> the availability of flexible launch control.
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
 ...
+> +	ret = !!sgx_drv_init() & !!sgx_vepc_init();
+
+That little nugget is starting to grow on me.
 
 Acked-by: Dave Hansen <dave.hansen@intel.com>
