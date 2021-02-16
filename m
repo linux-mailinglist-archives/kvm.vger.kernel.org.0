@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92D8331D053
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:41:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FAB631D054
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:41:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbhBPSj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 13:39:28 -0500
-Received: from mga02.intel.com ([134.134.136.20]:48766 "EHLO mga02.intel.com"
+        id S230055AbhBPSkx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 13:40:53 -0500
+Received: from mga11.intel.com ([192.55.52.93]:23406 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230362AbhBPSj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 13:39:26 -0500
-IronPort-SDR: Qqp10DiXQ9fFzuBLmO4W7trAbVXZmHjwLgqmTHfBvWP+dIN96S9bHZ72wHC5TcD0Y2jdxn9agL
- ucUFPIbSALVQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="170113484"
+        id S229628AbhBPSku (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 13:40:50 -0500
+IronPort-SDR: hHe7etTkdbXM5iRWP/Bu/dY/sRf66H97EwscOPXnlmzcebgL/Mkq+LO8WEmHpTHqHNLMEd6UTO
+ i/g3fRCy3AQA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="179475861"
 X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="170113484"
+   d="scan'208";a="179475861"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:38:44 -0800
-IronPort-SDR: ZcKwjlU3ZwM2jn/gFh8ZKugK6sChsdR8YrJ7jEjkEelq+kUVgF5K90vXW40gLcOnOtPxQ19kCW
- ZWK8+/UkwYvQ==
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:40:09 -0800
+IronPort-SDR: eORaqr6C0IuWb9pK8/kPI9WEKlGoofR0/fBR7GEfpW4H9pEeWx/NzWBpM1m927At0TO2AQJ7Uo
+ bnjo37aqTKCA==
 X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="589332575"
+   d="scan'208";a="589333012"
 Received: from twblanch-mobl.amr.corp.intel.com (HELO [10.209.156.22]) ([10.209.156.22])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:38:43 -0800
-Subject: Re: [RFC PATCH v5 05/26] x86/sgx: Introduce virtual EPC for use by
- KVM guests
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 10:40:08 -0800
+Subject: Re: [RFC PATCH v5 06/26] x86/cpu/intel: Allow SGX virtualization
+ without Launch Control support
 To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
         kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         rick.p.edgecombe@intel.com, haitao.huang@intel.com,
         pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
+        mingo@redhat.com, hpa@zytor.com, jethro@fortanix.com,
+        b.thiel@posteo.de
 References: <cover.1613221549.git.kai.huang@intel.com>
- <4813545fa5765d05c2ed18f2e2c44275bd087c0a.1613221549.git.kai.huang@intel.com>
+ <82c304d6f4e8ebfa9b35d1be74360a5004179c5f.1613221549.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
@@ -78,56 +79,27 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  OPsw5tV/LmQ5GXH0JQ/TZXWygyRFyyI2FqNTx4WHqUn3yFj8rwTAU1tluRUYyeLy0ayUlKBH
  ybj0N71vWO936MqP6haFERzuPAIpxj2ezwu0xb1GjTk4ynna6h5GjnKgdfOWoRtoWndMZxbA
  z5cecg==
-Message-ID: <eafcdcae-ae66-e717-2f8b-2bdfb8e7d0d5@intel.com>
-Date:   Tue, 16 Feb 2021 10:38:42 -0800
+Message-ID: <51a7138e-e025-b55b-e4c6-fb58bf2fe460@intel.com>
+Date:   Tue, 16 Feb 2021 10:40:08 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <4813545fa5765d05c2ed18f2e2c44275bd087c0a.1613221549.git.kai.huang@intel.com>
+In-Reply-To: <82c304d6f4e8ebfa9b35d1be74360a5004179c5f.1613221549.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/13/21 5:28 AM, Kai Huang wrote:
-> SGX driver uses misc device /dev/sgx_enclave to support userspace to
-> create enclave.  Each file descriptor from opening /dev/sgx_enclave
-> represents an enclave.  
-
-Is this strictly true?  Does dup(2) create a new enclave?
-
-> Unlike SGX driver, KVM doesn't control how guest
-> uses EPC, therefore EPC allocated to KVM guest is not associated to an
-> encalve, and /dev/sgx_enclave is not suitable for allocating EPC for KVM
-
-  ^ enclave
-
-> guest.
-
-
-> Having separate device nodes for SGX driver and KVM virtual EPC also
-> allows separate permission control for running host SGX enclaves and
-> KVM SGX guests.
-
-Specifically, 'sgx_vepc' is a less restrictive interface.  It would make
-a lot of sense to more tightly control access compared to 'sgx_enclave'.
-
-> More specifically, to allocate a virtual EPC instance with particular
-> size, the userspace hypervisor opens /dev/sgx_vepc, and uses mmap()
-> with the intended size to get an address range of virtual EPC.  Then
-> it may use the address range to create one KVM memory slot as virtual
-> EPC for guest.
-
-This paragraph doesn't really explain anything important to me.  Both
-devices require using mmap().
-
-With typos in the changelog fixed, I'm OK with the rest:
+On 2/13/21 5:29 AM, Kai Huang wrote:
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+> 
+> The kernel will currently disable all SGX support if the hardware does
+> not support launch control.  Make it more permissive to allow SGX
+> virtualization on systems without Launch Control support.  This will
+> allow KVM to expose SGX to guests that have less-strict requirements on
+> the availability of flexible launch control.
+...
 
 Acked-by: Dave Hansen <dave.hansen@intel.com>
-
-BTW...  A lot of this patch is just a skeletal device driver.  I'm a
-horrible device driver writer, so take this ack as "everything seems
-explained well" versus "I promise this will pass muster with the guys
-who review device drivers all day long."
