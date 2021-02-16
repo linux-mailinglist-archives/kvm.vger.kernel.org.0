@@ -2,114 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEAA31CA6A
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 13:12:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C97D31CA7E
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 13:20:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230240AbhBPMMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 07:12:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbhBPMMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 07:12:36 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB45C061574;
-        Tue, 16 Feb 2021 04:11:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qydaGrdRobsyV5LaMgil96UsQSn4K3xiCgp4dxh0juc=; b=W1OSaSNnkgJkSGPTgy8i13Fnth
-        Q3yMBTUQI35ZC32HOj6lyR72QpKJCByW9IX627qEuospypeWxHjJGIexIeRPMxqE0ne9uQQtNhjrq
-        bpoTv7CK6Y9Cg9FFNDqGjoFa67aUgp2jyFviMRH0o/L4iQMLWden+bu1eFoSy6H1so5yKTP+0qufM
-        SbTdZckJ2IAXD57Vh/FXcxwpn5F8FXBRV1s8PxB45PtPKblZ4qOdDNxWQBJdHGBMLZWA/6dB/GbRW
-        Ryy2BGjIC60/A5VLY8h27Nsvwue8yeJOw2/C9GZKFS6+uYPlFf8abXeJ8FKrixF4vTrxoLGrcBvM1
-        rJh/I4Uw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lBzBS-00GpyS-Qf; Tue, 16 Feb 2021 12:10:52 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BCFB13059DD;
-        Tue, 16 Feb 2021 13:10:25 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A5D6B2B9C6CCA; Tue, 16 Feb 2021 13:10:25 +0100 (CET)
-Date:   Tue, 16 Feb 2021 13:10:25 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, Juergen Gross <jgross@suse.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        linux-hyperv@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org,
-        Michael Kelley <mikelley@microsoft.com>
-Subject: Re: [PATCH v5 4/8] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Message-ID: <YCu2MQFdV4JTrUQb@hirez.programming.kicks-ass.net>
-References: <20210209221653.614098-1-namit@vmware.com>
- <20210209221653.614098-5-namit@vmware.com>
+        id S230219AbhBPMT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 07:19:27 -0500
+Received: from foss.arm.com ([217.140.110.172]:34072 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230310AbhBPMT0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 07:19:26 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AF321FB;
+        Tue, 16 Feb 2021 04:18:34 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 061823F73B;
+        Tue, 16 Feb 2021 04:18:32 -0800 (PST)
+Subject: Re: [PATCH] KVM: arm64: Handle CMOs on Read Only memslots
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc:     James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>, kernel-team@android.com,
+        Jianyong Wu <jianyong.wu@arm.com>
+References: <20210211142738.1478292-1-maz@kernel.org>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <63fbfcec-b31f-7248-0382-0cad4165424c@arm.com>
+Date:   Tue, 16 Feb 2021 12:18:31 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210209221653.614098-5-namit@vmware.com>
+In-Reply-To: <20210211142738.1478292-1-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 09, 2021 at 02:16:49PM -0800, Nadav Amit wrote:
-> @@ -816,8 +821,8 @@ STATIC_NOPV void native_flush_tlb_others(const struct cpumask *cpumask,
->  	 * doing a speculative memory access.
->  	 */
->  	if (info->freed_tables) {
-> -		smp_call_function_many(cpumask, flush_tlb_func,
-> -			       (void *)info, 1);
-> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
-> +				      cpumask);
->  	} else {
->  		/*
->  		 * Although we could have used on_each_cpu_cond_mask(),
-> @@ -844,14 +849,15 @@ STATIC_NOPV void native_flush_tlb_others(const struct cpumask *cpumask,
->  			if (tlb_is_not_lazy(cpu))
->  				__cpumask_set_cpu(cpu, cond_cpumask);
+Hi Marc,
+
+Played with this for a bit to try to understand the problem better, wrote a simple
+MMIO device in kvmtool which maps the memory as a read-only memslot [1] and poked
+it with kvm-unit-tests [2].
+
+[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/mmiodev-wip1
+
+[2] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/mmiodev-wip1
+
+On 2/11/21 2:27 PM, Marc Zyngier wrote:
+> It appears that when a guest traps into KVM because it is
+> performing a CMO on a Read Only memslot, our handling of
+> this operation is "slightly suboptimal", as we treat it as
+> an MMIO access without a valid syndrome.
+>
+> The chances that userspace is adequately equiped to deal
+> with such an exception being slim, it would be better to
+> handle it in the kernel.
+>
+> What we need to provide is roughly as follows:
+>
+> (a) if a CMO hits writeable memory, handle it as a normal memory acess
+> (b) if a CMO hits non-memory, skip it
+> (c) if a CMO hits R/O memory, that's where things become fun:
+>   (1) if the CMO is DC IVAC, the architecture says this should result
+>       in a permission fault
+>   (2) if the CMO is DC CIVAC, it should work similarly to (a)
+>
+> We already perform (a) and (b) correctly, but (c) is a total mess.
+> Hence we need to distinguish between IVAC (c.1) and CIVAC (c.2).
+>
+> One way to do it is to treat CMOs generating a translation fault as
+> a *read*, even when they are on a RW memslot. This allows us to
+> further triage things:
+>
+> If they come back with a permission fault, that is because this is
+> a DC IVAC instruction:
+> - inside a RW memslot: no problem, treat it as a write (a)(c.2)
+> - inside a RO memslot: inject a data abort in the guest (c.1)
+>
+> The only drawback is that DC IVAC on a yet unmapped page faults
+> twice: one for the initial translation fault that result in a RO
+> mapping, and once for the permission fault. I think we can live with
+> that.
+>
+> Reported-by: Jianyong Wu <jianyong.wu@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> Notes:
+>     I have taken the option to inject an abort in the guest when
+>     it issues a DC IVAC on a R/O memslot, but another option would
+>     be to just perform the invalidation ourselves as a DC CIAVAC.
+>     
+>     This would have the advantage of being consistent with what we
+>     do for emulated MMIO.
+>
+>  arch/arm64/kvm/mmu.c | 53 ++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 41 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7d2257cc5438..c7f4388bea45 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -760,7 +760,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	struct kvm_pgtable *pgt;
+>  
+>  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+> -	write_fault = kvm_is_write_fault(vcpu);
+> +	/*
+> +	 * Treat translation faults on CMOs as read faults. Should
+> +	 * this further generate a permission fault on a R/O memslot,
+> +	 * it will be caught in kvm_handle_guest_abort(), with
+> +	 * prejudice. Permission faults on non-R/O memslot will be
+> +	 * gracefully handled as writes.
+> +	 */
+> +	if (fault_status == FSC_FAULT && kvm_vcpu_dabt_is_cm(vcpu))
+> +		write_fault = false;
+
+This means that every DC CIVAC will map the IPA with read permissions in the stage
+2 tables, regardless of the IPA being already mapped. It's harmless, but a bit
+unexpected.
+
+> +	else
+> +		write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+>  	VM_BUG_ON(write_fault && exec_fault);
+>  
+> @@ -1013,19 +1023,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
 >  		}
-> -		smp_call_function_many(cond_cpumask, flush_tlb_func, (void *)info, 1);
-> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
-> +				      cpumask);
+>  
+>  		/*
+> -		 * Check for a cache maintenance operation. Since we
+> -		 * ended-up here, we know it is outside of any memory
+> -		 * slot. But we can't find out if that is for a device,
+> -		 * or if the guest is just being stupid. The only thing
+> -		 * we know for sure is that this range cannot be cached.
+> +		 * Check for a cache maintenance operation. Three cases:
+> +		 *
+> +		 * - It is outside of any memory slot. But we can't find out
+> +		 *   if that is for a device, or if the guest is just being
+> +		 *   stupid. The only thing we know for sure is that this
+> +		 *   range cannot be cached.  So let's assume that the guest
+> +		 *   is just being cautious, and skip the instruction.
+> +		 *
+> +		 * - Otherwise, check whether this is a permission fault.
+> +		 *   If so, that's a DC IVAC on a R/O memslot, which is a
+> +		 *   pretty bad idea, and we tell the guest so.
+>  		 *
+> -		 * So let's assume that the guest is just being
+> -		 * cautious, and skip the instruction.
+> +		 * - If this wasn't a permission fault, pass it along for
+> +		 *   further handling (including faulting the page in if it
+> +		 *   was a translation fault).
+>  		 */
+> -		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> -			kvm_incr_pc(vcpu);
+> -			ret = 1;
+> -			goto out_unlock;
+> +		if (kvm_vcpu_dabt_is_cm(vcpu)) {
+> +			if (kvm_is_error_hva(hva)) {
+> +				kvm_incr_pc(vcpu);
+> +				ret = 1;
+> +				goto out_unlock;
+> +			}
+> +
+> +			if (fault_status == FSC_PERM) {
+> +				/* DC IVAC on a R/O memslot */
+> +				kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +				ret = 1;
+> +				goto out_unlock;
+> +			}
+
+I don't like the inconsistency. We go from exiting to userspace for both DC
+IVAC/DC CIVAC to mapping the IPA with read permissions for DC CIVAC, but injecting
+a DABT for a DC IVAC. DC IVAC acts just like a DC CIVAC and requires the same
+permissions when executed by a guest, so I'm not sure we should be handling them
+differently.
+
+Thanks,
+
+Alex
+
+> +
+> +			goto handle_access;
+>  		}
+>  
+>  		/*
+> @@ -1039,6 +1067,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		goto out_unlock;
 >  	}
->  }
-
-Surely on_each_cpu_mask() is more appropriate? There the compiler can do
-the NULL propagation because it's on the same TU.
-
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -821,8 +821,7 @@ STATIC_NOPV void native_flush_tlb_multi(
- 	 * doing a speculative memory access.
- 	 */
- 	if (info->freed_tables) {
--		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
--				      cpumask);
-+		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
- 	} else {
- 		/*
- 		 * Although we could have used on_each_cpu_cond_mask(),
-@@ -849,8 +848,7 @@ STATIC_NOPV void native_flush_tlb_multi(
- 			if (tlb_is_not_lazy(cpu))
- 				__cpumask_set_cpu(cpu, cond_cpumask);
- 		}
--		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
--				      cpumask);
-+		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
- 	}
- }
- 
+>  
+> +handle_access:
+>  	/* Userspace should not be able to register out-of-bounds IPAs */
+>  	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
+>  
