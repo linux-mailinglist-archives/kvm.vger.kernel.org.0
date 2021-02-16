@@ -2,124 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF93431CE34
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 17:38:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0653731CE99
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 18:04:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbhBPQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 11:38:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51020 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229784AbhBPQiX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 11:38:23 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA75C06174A
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 08:37:43 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id d15so5777079plh.4
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 08:37:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=t851ALRFQoN0vUtn9EUut2fHWBLpxeMZ3NXgwr6AUeM=;
-        b=fq5SP4z55DVN4+pd/l+O/CXCjXi7hEKYgzXyNJ5AqSWfYacN26reMqGmAh5Y1QKq9p
-         FX5jGWKIJT3l9j3RKzUb0cU2nwGUd1SR3Wx6oSNwFH9Wxfai6fhrRXsmWQk0JYROPRLD
-         o9C4BY23lKc9AY7pHg8za1pwq1VP2ouA47COHFk2LrelFt4H4mik2a21J/A6A1vlecAW
-         tRz90f7+cexplz0LpzbT1j0hO9SmfbLGCAbGd7ZL5LjUqG6T9SRwOehCSGEJ7L7G0Mf5
-         auL9gaRXqI9OsPBWRHmS2/uJF1UVpeEWgLA7u5DuqsDVBk5QChSc+hh2wKi2MRp/3c9Z
-         XbMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=t851ALRFQoN0vUtn9EUut2fHWBLpxeMZ3NXgwr6AUeM=;
-        b=D3Rgq9ZgjI3h0MFif/tG9i1CxKaaGiRELTZRjIM1xnWRMfhI1aImaYe1FDiwP3Cfij
-         CG4xKJ9L+g0QdLa0MOICzKYwME5CPIoq19nfWy3ePBLyX5YD399oQIVIG6a3uZCaVvKw
-         bb+6OFBljhuthtpR6YsALNyQW+fAA6gBo/xQnVEQ76EYoKFcNVNG1MArgqiaaIXE4m3Y
-         FC21SAHCuztlp1KE2aRPpgmV35BScUZcoGhpX0fus+nJ7SVFALIVw6pHbg98pdcalWYn
-         Mv6B89OwLES+C3aHqCYHdESQTIA4EMfrXmXEK6FcLULwAfAMFFktTj7lNfrywpvw245h
-         p3WA==
-X-Gm-Message-State: AOAM533FL8TVildEkMdw2nyCnmJpEkabX44Zan/SbQCdWfeCnrIbC+MS
-        hhqdfyq0Wf09H0WtSRCDNOq0VjSrf1V2Qg==
-X-Google-Smtp-Source: ABdhPJwd+4sTQ6b9A+9ilAi7rAE8hdvceb3fdgbURpht6/znmpuCJg6JC2Nac1YAt8T9dGBtkhHARA==
-X-Received: by 2002:a17:90a:4306:: with SMTP id q6mr4937249pjg.138.1613493462597;
-        Tue, 16 Feb 2021 08:37:42 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:d107:e68e:347d:fd04])
-        by smtp.gmail.com with ESMTPSA id l190sm22696798pfl.205.2021.02.16.08.37.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 08:37:41 -0800 (PST)
-Date:   Tue, 16 Feb 2021 08:37:35 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, Steve Rutherford <srutherford@google.com>
-Subject: Re: [PATCH] selftests: kvm: Mmap the entire vcpu mmap area
-Message-ID: <YCv0z2H+oWJDt+TF@google.com>
-References: <20210210165035.3712489-1-aaronlewis@google.com>
+        id S230310AbhBPRDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 12:03:44 -0500
+Received: from foss.arm.com ([217.140.110.172]:39226 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229784AbhBPRDl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 12:03:41 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A539C101E;
+        Tue, 16 Feb 2021 09:02:55 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A99363F73B;
+        Tue, 16 Feb 2021 09:02:54 -0800 (PST)
+Subject: Re: [PATCH kvmtool 17/21] virtio: Switch trap handling to use MMIO
+ handler
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-18-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <0c6e033e-4bc4-bc81-173f-c7c195ded78a@arm.com>
+Date:   Tue, 16 Feb 2021 17:03:04 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210210165035.3712489-1-aaronlewis@google.com>
+In-Reply-To: <20201210142908.169597-18-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 10, 2021, Aaron Lewis wrote:
-> The vcpu mmap area may consist of more than just the kvm_run struct.
-> Allocate enough space for the entire vcpu mmap area. Without this, on
-> x86, the PIO page, for example, will be missing.  This is problematic
-> when dealing with an unhandled exception from the guest as the exception
-> vector will be incorrectly reported as 0x0.
-> 
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Signed-off-by: Steve Rutherford <srutherford@google.com>
+Hi Andre,
 
-Assuming Steve is the Co-author, this needs Co-developed-by.  And your SOB
-should come after Steve's since, by virtue of sending the actual email, you're
-the most recent handler of the patch.  See 'When to use Acked-by:, Cc:, and
-Co-developed-by:' in Documentation/process/submitting-patches.rst.
+Nitpick below, otherwise looks good.
 
-  Co-developed-by: Steve Rutherford <srutherford@google.com>
-  Signed-off-by: Steve Rutherford <srutherford@google.com>
-  Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-
+On 12/10/20 2:29 PM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide an emulation function compatible with the MMIO prototype.
+>
+> Adjust the existing MMIO callback routine to automatically determine
+> the region this trap came through, and call the existing I/O handlers.
+> Register the ioport region using the new registration function.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index fa5a90e6c6f0..859a0b57c683 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -21,6 +21,8 @@
->  #define KVM_UTIL_PGS_PER_HUGEPG 512
->  #define KVM_UTIL_MIN_PFN	2
+>  virtio/pci.c | 42 ++++++++++--------------------------------
+>  1 file changed, 10 insertions(+), 32 deletions(-)
+>
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 6eea6c68..49d3f4d5 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -178,15 +178,6 @@ static bool virtio_pci__data_in(struct kvm_cpu *vcpu, struct virtio_device *vdev
+>  	return ret;
+>  }
 >  
-> +static int vcpu_mmap_sz(void);
-
-I'd vote to hoist the helper up instead of adding a forward declaration, but
-either way works.
-
-> +
->  /* Aligns x up to the next multiple of size. Size must be a power of 2. */
->  static void *align(void *x, size_t size)
+> -static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	struct virtio_device *vdev = ioport->priv;
+> -	struct virtio_pci *vpci = vdev->virtio;
+> -	unsigned long offset = port - virtio_pci__port_addr(vpci);
+> -
+> -	return virtio_pci__data_in(vcpu, vdev, offset, data, size);
+> -}
+> -
+>  static void update_msix_map(struct virtio_pci *vpci,
+>  			    struct msix_table *msix_entry, u32 vecnum)
 >  {
-> @@ -509,7 +511,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
->  		vcpu->dirty_gfns = NULL;
->  	}
+> @@ -334,20 +325,6 @@ static bool virtio_pci__data_out(struct kvm_cpu *vcpu, struct virtio_device *vde
+>  	return ret;
+>  }
 >  
-> -	ret = munmap(vcpu->state, sizeof(*vcpu->state));
-> +	ret = munmap(vcpu->state, vcpu_mmap_sz());
->  	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
->  		"errno: %i", ret, errno);
->  	close(vcpu->fd);
-> @@ -978,7 +980,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
->  	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->state), "vcpu mmap size "
->  		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
->  		vcpu_mmap_sz(), sizeof(*vcpu->state));
-> -	vcpu->state = (struct kvm_run *) mmap(NULL, sizeof(*vcpu->state),
-> +	vcpu->state = (struct kvm_run *) mmap(NULL, vcpu_mmap_sz(),
->  		PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->fd, 0);
->  	TEST_ASSERT(vcpu->state != MAP_FAILED, "mmap vcpu_state failed, "
->  		"vcpu id: %u errno: %i", vcpuid, errno);
-> -- 
-> 2.30.0.478.g8a0d178c01-goog
-> 
+> -static bool virtio_pci__io_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> -{
+> -	struct virtio_device *vdev = ioport->priv;
+> -	struct virtio_pci *vpci = vdev->virtio;
+> -	unsigned long offset = port - virtio_pci__port_addr(vpci);
+> -
+> -	return virtio_pci__data_out(vcpu, vdev, offset, data, size);
+> -}
+> -
+> -static struct ioport_operations virtio_pci__io_ops = {
+> -	.io_in	= virtio_pci__io_in,
+> -	.io_out	= virtio_pci__io_out,
+> -};
+> -
+>  static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+>  					   u64 addr, u8 *data, u32 len,
+>  					   u8 is_write, void *ptr)
+> @@ -455,12 +432,15 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+>  {
+>  	struct virtio_device *vdev = ptr;
+>  	struct virtio_pci *vpci = vdev->virtio;
+> -	u32 mmio_addr = virtio_pci__mmio_addr(vpci);
+> +	u32 base_addr = virtio_pci__mmio_addr(vpci);
+> +
+> +	if (addr < base_addr || addr >= base_addr + PCI_IO_SIZE)
+> +		base_addr = virtio_pci__port_addr(vpci);
+
+There are only two BARs that use this callback, the ioport BAR (BAR0) and the
+memory BAR (BAR1) (MSIX uses a different emulation callback). The condition above
+says that if addr is not inside the region described by the memory BAR, then it's
+an ioport BAR. How about checking explicitly that it is inside the ioport region
+like this (compile tested only), which looks a bit more intuitive for me:
+
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 49d3f4d524b2..4024bcd709cd 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -432,10 +432,15 @@ static void virtio_pci__io_mmio_callback(struct kvm_cpu *vcpu,
+ {
+        struct virtio_device *vdev = ptr;
+        struct virtio_pci *vpci = vdev->virtio;
+-       u32 base_addr = virtio_pci__mmio_addr(vpci);
++       u32 mmio_addr = virtio_pci__mmio_addr(vpci);
++       u32 ioport_addr = virtio_pci__port_addr(vpci);
++       u32 base_addr;
+ 
+-       if (addr < base_addr || addr >= base_addr + PCI_IO_SIZE)
+-               base_addr = virtio_pci__port_addr(vpci);
++       if (addr >= ioport_addr &&
++           addr < ioport_addr + pci__bar_size(&vpci->pci_hdr, 0))
++               base_addr = ioport_addr;
++       else
++               base_addr = mmio_addr;
+ 
+        if (!is_write)
+                virtio_pci__data_in(vcpu, vdev, addr - base_addr, data, len);
+
+Thanks,
+
+Alex
+
+>  
+>  	if (!is_write)
+> -		virtio_pci__data_in(vcpu, vdev, addr - mmio_addr, data, len);
+> +		virtio_pci__data_in(vcpu, vdev, addr - base_addr, data, len);
+>  	else
+> -		virtio_pci__data_out(vcpu, vdev, addr - mmio_addr, data, len);
+> +		virtio_pci__data_out(vcpu, vdev, addr - base_addr, data, len);
+>  }
+>  
+>  static int virtio_pci__bar_activate(struct kvm *kvm,
+> @@ -478,10 +458,8 @@ static int virtio_pci__bar_activate(struct kvm *kvm,
+>  
+>  	switch (bar_num) {
+>  	case 0:
+> -		r = ioport__register(kvm, bar_addr, &virtio_pci__io_ops,
+> -				     bar_size, vdev);
+> -		if (r > 0)
+> -			r = 0;
+> +		r = kvm__register_pio(kvm, bar_addr, bar_size,
+> +				      virtio_pci__io_mmio_callback, vdev);
+>  		break;
+>  	case 1:
+>  		r =  kvm__register_mmio(kvm, bar_addr, bar_size, false,
+> @@ -510,7 +488,7 @@ static int virtio_pci__bar_deactivate(struct kvm *kvm,
+>  
+>  	switch (bar_num) {
+>  	case 0:
+> -		r = ioport__unregister(kvm, bar_addr);
+> +		r = kvm__deregister_pio(kvm, bar_addr);
+>  		break;
+>  	case 1:
+>  	case 2:
+> @@ -625,7 +603,7 @@ int virtio_pci__exit(struct kvm *kvm, struct virtio_device *vdev)
+>  	virtio_pci__reset(kvm, vdev);
+>  	kvm__deregister_mmio(kvm, virtio_pci__mmio_addr(vpci));
+>  	kvm__deregister_mmio(kvm, virtio_pci__msix_io_addr(vpci));
+> -	ioport__unregister(kvm, virtio_pci__port_addr(vpci));
+> +	kvm__deregister_pio(kvm, virtio_pci__port_addr(vpci));
+>  
+>  	return 0;
+>  }
