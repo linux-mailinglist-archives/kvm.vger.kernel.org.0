@@ -2,115 +2,389 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C003331CEA1
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 18:05:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1DB031CFDC
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 19:07:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230488AbhBPRFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 12:05:19 -0500
-Received: from mga02.intel.com ([134.134.136.20]:38670 "EHLO mga02.intel.com"
+        id S229767AbhBPSGz convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 16 Feb 2021 13:06:55 -0500
+Received: from foss.arm.com ([217.140.110.172]:40474 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230454AbhBPRFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 12:05:16 -0500
-IronPort-SDR: aNV41zNvWjWyv3oOIrXW9d1I+jh/NJ7fLpDNWgqjx7iI6UNU+ty0amTZ/8opr6ArBiz2YvZ59s
- DCZ+fnAJ69jg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9897"; a="170081670"
-X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="170081670"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 09:04:29 -0800
-IronPort-SDR: BFjrZ2wZbybembjxfRLB+E7QumBZHjfL0PpXV7rBkjvdCpr2lLYWxt1dGOi/j0VLSVxu27yEN3
- bbDvjVHDvz1A==
-X-IronPort-AV: E=Sophos;i="5.81,184,1610438400"; 
-   d="scan'208";a="589291958"
-Received: from twblanch-mobl.amr.corp.intel.com (HELO [10.209.156.22]) ([10.209.156.22])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 09:04:26 -0800
-Subject: Re: [RFC PATCH v5 03/26] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-To:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        rick.p.edgecombe@intel.com, haitao.huang@intel.com,
-        pbonzini@redhat.com, bp@alien8.de, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com
-References: <cover.1613221549.git.kai.huang@intel.com>
- <f6f9867642505d90968a260538c90444b3fe3809.1613221549.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <57878292-69d0-2234-d732-131318795726@intel.com>
-Date:   Tue, 16 Feb 2021 09:04:25 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229572AbhBPSGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 13:06:48 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E1E79101E;
+        Tue, 16 Feb 2021 10:06:00 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D16F33F73B;
+        Tue, 16 Feb 2021 10:05:59 -0800 (PST)
+Date:   Tue, 16 Feb 2021 18:04:48 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, eric.auger@redhat.com,
+        yuzenghui@huawei.com
+Subject: Re: [kvm-unit-tests PATCH v2 08/12] arm/arm64: gic: Split
+ check_acked() into two functions
+Message-ID: <20210216180448.20fe4e59@slackpad.fritz.box>
+In-Reply-To: <b4c0b997-bb96-6ee9-c959-ec9c1bd2258f@arm.com>
+References: <20201217141400.106137-1-alexandru.elisei@arm.com>
+        <20201217141400.106137-9-alexandru.elisei@arm.com>
+        <3539c229-fd05-2e1c-2159-995e51e2dcc4@arm.com>
+        <857a3c2d-772b-0d29-536c-41a829ab8954@arm.com>
+        <20210127151051.3e4298f9@slackpad.fritz.box>
+        <b4c0b997-bb96-6ee9-c959-ec9c1bd2258f@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <f6f9867642505d90968a260538c90444b3fe3809.1613221549.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +/*
-> + * Place the page in uninitialized state.  Only usable by callers that
-> + * know the page is in a clean state in which EREMOVE will succeed.
-> + */
-> +static void sgx_reset_epc_page(struct sgx_epc_page *epc_page)
-> +{
-> +	int ret;
-> +
-> +	WARN_ON_ONCE(epc_page->flags & SGX_EPC_PAGE_RECLAIMER_TRACKED);
-> +
-> +	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-> +	if (WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret))
-> +		return;
-> +}
+On Wed, 27 Jan 2021 16:00:46 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Shouldn't this just be:
+Hi Alex,
 
-...
-	ret = __eremove(sgx_get_epc_virt_addr(epc_page));
-	WARN_ONCE(ret, "EREMOVE returned %d (0x%x)", ret, ret);
-}
+> On 1/27/21 3:10 PM, Andre Przywara wrote:
+> > On Mon, 25 Jan 2021 17:27:35 +0000
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi Alex,
+> >  
+> >> On 12/18/20 3:52 PM, André Przywara wrote:  
+> >>> On 17/12/2020 14:13, Alexandru Elisei wrote:    
+> >>>> check_acked() has several peculiarities: is the only function among the
+> >>>> check_* functions which calls report() directly, it does two things
+> >>>> (waits for interrupts and checks for misfired interrupts) and it also
+> >>>> mixes printf, report_info and report calls.
+> >>>>
+> >>>> check_acked() also reports a pass and returns as soon all the target CPUs
+> >>>> have received interrupts, However, a CPU not having received an interrupt
+> >>>> *now* does not guarantee not receiving an erroneous interrupt if we wait
+> >>>> long enough.
+> >>>>
+> >>>> Rework the function by splitting it into two separate functions, each with
+> >>>> a single responsibility: wait_for_interrupts(), which waits for the
+> >>>> expected interrupts to fire, and check_acked() which checks that interrupts
+> >>>> have been received as expected.
+> >>>>
+> >>>> wait_for_interrupts() also waits an extra 100 milliseconds after the
+> >>>> expected interrupts have been received in an effort to make sure we don't
+> >>>> miss misfiring interrupts.
+> >>>>
+> >>>> Splitting check_acked() into two functions will also allow us to
+> >>>> customize the behavior of each function in the future more easily
+> >>>> without using an unnecessarily long list of arguments for check_acked().    
+> >>> Yes, splitting this up looks much better, in general this is a nice
+> >>> cleanup, thank you!
+> >>>
+> >>> Some comments below:
+> >>>    
+> >>>> CC: Andre Przywara <andre.przywara@arm.com>
+> >>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> >>>> ---
+> >>>>  arm/gic.c | 73 +++++++++++++++++++++++++++++++++++--------------------
+> >>>>  1 file changed, 47 insertions(+), 26 deletions(-)
+> >>>>
+> >>>> diff --git a/arm/gic.c b/arm/gic.c
+> >>>> index ec733719c776..a9ef1a5def56 100644
+> >>>> --- a/arm/gic.c
+> >>>> +++ b/arm/gic.c
+> >>>> @@ -62,41 +62,42 @@ static void stats_reset(void)
+> >>>>  	}
+> >>>>  }
+> >>>>  
+> >>>> -static void check_acked(const char *testname, cpumask_t *mask)
+> >>>> +static void wait_for_interrupts(cpumask_t *mask)
+> >>>>  {
+> >>>> -	int missing = 0, extra = 0, unexpected = 0;
+> >>>>  	int nr_pass, cpu, i;
+> >>>> -	bool bad = false;
+> >>>>  
+> >>>>  	/* Wait up to 5s for all interrupts to be delivered */
+> >>>> -	for (i = 0; i < 50; ++i) {
+> >>>> +	for (i = 0; i < 50; i++) {
+> >>>>  		mdelay(100);
+> >>>>  		nr_pass = 0;
+> >>>>  		for_each_present_cpu(cpu) {
+> >>>> +			/*
+> >>>> +			 * A CPU having received more than one interrupts will
+> >>>> +			 * show up in check_acked(), and no matter how long we
+> >>>> +			 * wait it cannot un-receive it. Consider at least one
+> >>>> +			 * interrupt as a pass.
+> >>>> +			 */
+> >>>>  			nr_pass += cpumask_test_cpu(cpu, mask) ?
+> >>>> -				acked[cpu] == 1 : acked[cpu] == 0;
+> >>>> -			smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> >>>> -
+> >>>> -			if (bad_sender[cpu] != -1) {
+> >>>> -				printf("cpu%d received IPI from wrong sender %d\n",
+> >>>> -					cpu, bad_sender[cpu]);
+> >>>> -				bad = true;
+> >>>> -			}
+> >>>> -
+> >>>> -			if (bad_irq[cpu] != -1) {
+> >>>> -				printf("cpu%d received wrong irq %d\n",
+> >>>> -					cpu, bad_irq[cpu]);
+> >>>> -				bad = true;
+> >>>> -			}
+> >>>> +				acked[cpu] >= 1 : acked[cpu] == 0;    
+> >>> I wonder if this logic was already flawed to begin with: For interrupts
+> >>> we expect to fire, we wait for up to 5 seconds (really that long?), but
+> >>> for interrupts we expect *not* to fire we are OK if they don't show up
+> >>> in the first 100 ms. That does not sound consistent.    
+> >> There are two ways that I see to fix this:
+> >>
+> >> - Have the caller wait for however long it sees fit, and *after* that waiting
+> >> period call wait_for_interrupts().
+> >>
+> >> - Pass a flag to wait_for_interrupts() to specify that the behaviour should be to
+> >> wait for the entire duration instead of until the expected interrupts have been
+> >> received.
+> >>
+> >> Neither sounds appealing to me for inclusion in this patch set, since I want to
+> >> concentrate on reworking check_acked() while keeping much of the current behaviour
+> >> intact.
+> >>  
+> >>> I am wondering if we should *not* have the initial 100ms wait at all,
+> >>> since most interrupts will fire immediately (especially in KVM). And
+> >>> then have *one* extra wait for, say 100ms, to cover latecomers and
+> >>> spurious interrupts.    
+> >> I don't think it really matters where the 100 millisecond delay is in the loop.  
+> > I think it does. I ran tests with 256 vCPUs, I think we support even
+> > more, and running k-u-t on those setups is one of the cases where it
+> > really matters and we can find real bugs.
+> > So 100ms on their own does not sound much, but it means we wait at least
+> > 25.6 seconds, even if everything is fine. I found this scary, confusing
+> > and annoying (in that order), so was wondering if we can avoid that.  
+> 
+> I'm not sure where that 25.6 second delay is coming from. The mdelay() is at the
+> start of the for loop, *before* the for_each_cpu() loop, so it's not executed for
+> each VCPU.
 
-Sometimes, you actually need to look at the code that you cut and paste. ;)
+I think that comes from some other patches of mine, which call the test
+on *each* VCPU. There this small delay adds up.
+
+> I've also run the ipi test on my rockpro64 with 256 vcpus with kvmtool and I
+> didn't notice any unexpected delays.
+
+Thanks for doing that.
+
+> >> If
+> >> we call wait_for_interrupts() to actually check that interrupts have fired (as
+> >> opposed to checking that they haven't been asserted), then at most we save 100ms
+> >> when they are asserted before the start of the loop. I don't think the GIC spec
+> >> guarantees that interrupts written to the LR registers will be presented to the
+> >> CPU after the guest resumes,  
+> > I don't know if the spec says anything about it, I guess it would be
+> > out of scope to do so there anyway, but AFAIK this is exactly how it's
+> > implemented: when we drop to EL1 with the VGIC armed, the GIC jumps in
+> > before the guest executes the first instruction (that ELR_EL2 points
+> > to), and raises the IRQ exception in EL1.
+> >  
+> >> so it is conceivable that there might be a delay,  
+> > The only practical reason for a delay would be PSTATE.I being set, or
+> > the GICV being disabled, I think.
+> >
+> > I would say one would expect interrupts to fire *immediately*, and
+> > allowing them 100ms slack does not sound like the right thing. If there
+> > is some delay, I would at least like to know about it. And I would
+> > grant them a few instructions delay, at best.  
+> 
+> I think you're forgetting the fact that the interrupts are delivered to the other
+> VCPUs, not to the VCPU that is calling wait_for_interrupts().
+
+That is one use case, but for the IPI self test we do this on the
+same VCPU. My concern was just that those functions are generic, so
+should cater for any kind of interrupt tests thrown at them. And as
+mentioned above, I had tests which got delayed by the mandatory wait.
+
+For the records: I was coming from my manual testing during the VGIC
+development/rework a few years back, where some bugs only showed under
+(heavy) *parallel* interrupt load. So I guess I am a bit biased when it
+comes to that.
+
+But this is indeed of no concern for what we currently have, so I guess
+I will just revisit this as needed, should we get more sophisticated
+tests.
+
+Which means the changes here are fine on their own and are definitely
+an improvement, so we should go ahead with that.
+
+Cheers,
+Andre
+
+
+> So it's the
+> interrupt handlers running on the other VCPUs that update acked, which afterwards
+> is read in wait_for_interrupts().
+> 
+> As an experiment, I moved the mdelay() at the end of the loop and I tried running
+> the IPI test with 2 and 256 VCPUs:
+> 
+> $ taskset -c 4,5 ~/lkvm-static run -c2 -m128 -f arm/gic.flat -p 'ipi'
+>   # lkvm run --firmware arm/gic.flat -m 128 -c 2 --name guest-1720
+>   Info: Placing fdt at 0x80200000 - 0x80210000
+> chr_testdev_init: chr-testdev: can't find a virtio-console
+> PASS: gicv3: ipi: self: Interrupts received
+> INFO: gicv3: ipi: target-list: interrupts took more than 100 ms
+> PASS: gicv3: ipi: target-list: Interrupts received
+> INFO: gicv3: ipi: broadcast: interrupts took more than 100 ms
+> PASS: gicv3: ipi: broadcast: Interrupts received
+> SUMMARY: 3 tests
+> 
+> $ taskset -c 4,5 ~/lkvm-static run -c256 -m128 -f arm/gic.flat -p 'ipi'
+>   # lkvm run --firmware arm/gic.flat -m 128 -c 256 --name guest-2000
+>   Info: Placing fdt at 0x80200000 - 0x80210000
+>   # Warning: The maximum recommended amount of VCPUs is 6
+> chr_testdev_init: chr-testdev: can't find a virtio-console
+> PASS: gicv3: ipi: self: Interrupts received
+> INFO: gicv3: ipi: target-list: interrupts took more than 100 ms
+> PASS: gicv3: ipi: target-list: Interrupts received
+> INFO: gicv3: ipi: broadcast: interrupts took more than 100 ms
+> PASS: gicv3: ipi: broadcast: Interrupts received
+> SUMMARY: 3 tests
+> 
+> For the 256 VCPUs test, on two runs I got the "interrupts took more than 100 ms"
+> message for target-list, on one test I didn't (but for broadcast I always got the
+> message).
+> 
+> For the 2 VCPUs test, I always got the message (tried it 5 times).
+> 
+> Thanks,
+> Alex
+> >
+> > If you still think you need that delay, because everything else would
+> > be too complicated (at least for this iteration), then please make it
+> > *much* smaller (< 1us).
+> >
+> > Cheers,
+> > Andre
+> >
+> >  
+> >> thus ending up in waiting the extra 100ms even if the delay is at the end of the loop.
+> >>
+> >> There are two reasons I chose the approach of having the delay at the start of the
+> >> loop:
+> >>
+> >> 1. To preserve the current behaviour.
+> >>
+> >> 2. To match what the timer test those (see gic_timer_check_state()). I am also
+> >> thinking that maybe at some point we could unify these test-independent functions
+> >> in the gic driver.
+> >>
+> >> As for the 5 seconds delay, I think we can come up with a patch to pass the delay
+> >> as a parameter to the function if needed (if I remember correctly, you needed a
+> >> shorter waiting period for your GIC tests).
+> >>  
+> >>> But this might be a topic for some extra work/patch?    
+> >> Yes, I would rather make this changes when we have an actual test that needs them.
+> >>  
+> >>>    
+> >>>>  		}
+> >>>> +
+> >>>>  		if (nr_pass == nr_cpus) {
+> >>>> -			report(!bad, "%s", testname);
+> >>>>  			if (i)
+> >>>> -				report_info("took more than %d ms", i * 100);
+> >>>> +				report_info("interrupts took more than %d ms", i * 100);
+> >>>> +			mdelay(100);    
+> >>> So this is the extra 100ms you mention in the commit message? I am not
+> >>> convinced this is the right way (see above) or even the right place
+> >>> (rather at the call site?) to wait. But at least it deserves a comment,
+> >>> I believe.    
+> >> I'm not sure moving it into the caller is the right thing to do. This is something
+> >> that has to do with how interrupts are asserted, not something that is specific to
+> >> one test.
+> >>
+> >> You are right about the comment, I'll add one.
+> >>
+> >> Thanks,
+> >> Alex  
+> >>>>  			return;
+> >>>>  		}
+> >>>>  	}
+> >>>>  
+> >>>> +	report_info("interrupts timed-out (5s)");
+> >>>> +}
+> >>>> +
+> >>>> +static bool check_acked(cpumask_t *mask)
+> >>>> +{
+> >>>> +	int missing = 0, extra = 0, unexpected = 0;
+> >>>> +	bool pass = true;
+> >>>> +	int cpu;
+> >>>> +
+> >>>>  	for_each_present_cpu(cpu) {
+> >>>>  		if (cpumask_test_cpu(cpu, mask)) {
+> >>>>  			if (!acked[cpu])
+> >>>> @@ -107,11 +108,28 @@ static void check_acked(const char *testname, cpumask_t *mask)
+> >>>>  			if (acked[cpu])
+> >>>>  				++unexpected;
+> >>>>  		}
+> >>>> +		smp_rmb(); /* pairs with smp_wmb in ipi_handler */
+> >>>> +
+> >>>> +		if (bad_sender[cpu] != -1) {
+> >>>> +			report_info("cpu%d received IPI from wrong sender %d",
+> >>>> +					cpu, bad_sender[cpu]);
+> >>>> +			pass = false;
+> >>>> +		}
+> >>>> +
+> >>>> +		if (bad_irq[cpu] != -1) {
+> >>>> +			report_info("cpu%d received wrong irq %d",
+> >>>> +					cpu, bad_irq[cpu]);
+> >>>> +			pass = false;
+> >>>> +		}
+> >>>> +	}
+> >>>> +
+> >>>> +	if (missing || extra || unexpected) {
+> >>>> +		report_info("ACKS: missing=%d extra=%d unexpected=%d",
+> >>>> +				missing, extra, unexpected);
+> >>>> +		pass = false;    
+> >>> Thanks, that so much easier to read now.
+> >>>
+> >>> Cheers,
+> >>> Andre
+> >>>    
+> >>>>  	}
+> >>>>  
+> >>>> -	report(false, "%s", testname);
+> >>>> -	report_info("Timed-out (5s). ACKS: missing=%d extra=%d unexpected=%d",
+> >>>> -		    missing, extra, unexpected);
+> >>>> +	return pass;
+> >>>>  }
+> >>>>  
+> >>>>  static void check_spurious(void)
+> >>>> @@ -303,7 +321,8 @@ static void ipi_test_self(void)
+> >>>>  	cpumask_clear(&mask);
+> >>>>  	cpumask_set_cpu(smp_processor_id(), &mask);
+> >>>>  	gic->ipi.send_self();
+> >>>> -	check_acked("IPI: self", &mask);
+> >>>> +	wait_for_interrupts(&mask);
+> >>>> +	report(check_acked(&mask), "Interrupts received");
+> >>>>  	report_prefix_pop();
+> >>>>  }
+> >>>>  
+> >>>> @@ -318,7 +337,8 @@ static void ipi_test_smp(void)
+> >>>>  	for (i = smp_processor_id() & 1; i < nr_cpus; i += 2)
+> >>>>  		cpumask_clear_cpu(i, &mask);
+> >>>>  	gic_ipi_send_mask(IPI_IRQ, &mask);
+> >>>> -	check_acked("IPI: directed", &mask);
+> >>>> +	wait_for_interrupts(&mask);
+> >>>> +	report(check_acked(&mask), "Interrupts received");
+> >>>>  	report_prefix_pop();
+> >>>>  
+> >>>>  	report_prefix_push("broadcast");
+> >>>> @@ -326,7 +346,8 @@ static void ipi_test_smp(void)
+> >>>>  	cpumask_copy(&mask, &cpu_present_mask);
+> >>>>  	cpumask_clear_cpu(smp_processor_id(), &mask);
+> >>>>  	gic->ipi.send_broadcast();
+> >>>> -	check_acked("IPI: broadcast", &mask);
+> >>>> +	wait_for_interrupts(&mask);
+> >>>> +	report(check_acked(&mask), "Interrupts received");
+> >>>>  	report_prefix_pop();
+> >>>>  }
+> >>>>  
+> >>>>    
+
