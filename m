@@ -2,105 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BA9F431CA44
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 12:58:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAEAA31CA6A
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 13:12:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230243AbhBPL5j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 06:57:39 -0500
-Received: from mga18.intel.com ([134.134.136.126]:50548 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230139AbhBPL5Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 06:57:25 -0500
-IronPort-SDR: bc/phsjlxRIO7mHOnSrIPokb8sz+myfwpoAALOY/i2evNpFuhngwGVQzPGXtm5Ah8+bc0h6/sf
- W94Y/56C3X3w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9896"; a="170527266"
-X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
-   d="scan'208";a="170527266"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2021 03:56:41 -0800
-IronPort-SDR: 3Fd3atm6Q5PB6/Zz/EwQKid+oaWGsVb7sjmHQNTFnXMz72aqJMPOasLEptzygCRehiH6b6gu5v
- xvkl8eZuWSOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.81,183,1610438400"; 
-   d="scan'208";a="418065709"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Feb 2021 03:56:40 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Feb 2021 03:56:40 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Feb 2021 03:56:40 -0800
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15]) by
- ORSMSX602.amr.corp.intel.com ([10.22.229.15]) with mapi id 15.01.2106.002;
- Tue, 16 Feb 2021 03:56:39 -0800
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     Jarkko Sakkinen <jarkko@kernel.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
-        "Huang, Haitao" <haitao.huang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>
-Subject: RE: [RFC PATCH v5 08/26] x86/sgx: Expose SGX architectural
- definitions to the kernel
-Thread-Topic: [RFC PATCH v5 08/26] x86/sgx: Expose SGX architectural
- definitions to the kernel
-Thread-Index: AQHXAgqNtwlxthmplU6cFSX1Hb3mCqpalcMAgAACzaCAAId3AP//ga0AgACTtoD//3rw4A==
-Date:   Tue, 16 Feb 2021 11:56:39 +0000
-Message-ID: <5ed9fee6292f4d779003aff3dddf3ae0@intel.com>
-References: <cover.1613221549.git.kai.huang@intel.com>
- <1d6fe6bd392b604091b57842c15cc5460aa92593.1613221549.git.kai.huang@intel.com>
- <YCsrNqcB1C0Tyxz9@kernel.org> <cdc73d737d634e778de4c691ca4fd080@intel.com>
- <20210216103218.GB10592@zn.tnic> <a792bf6271da4fddb537085845cf868f@intel.com>
- <20210216114851.GD10592@zn.tnic>
-In-Reply-To: <20210216114851.GD10592@zn.tnic>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-x-originating-ip: [10.1.200.100]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S230240AbhBPMMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 07:12:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229812AbhBPMMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 07:12:36 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB45C061574;
+        Tue, 16 Feb 2021 04:11:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qydaGrdRobsyV5LaMgil96UsQSn4K3xiCgp4dxh0juc=; b=W1OSaSNnkgJkSGPTgy8i13Fnth
+        Q3yMBTUQI35ZC32HOj6lyR72QpKJCByW9IX627qEuospypeWxHjJGIexIeRPMxqE0ne9uQQtNhjrq
+        bpoTv7CK6Y9Cg9FFNDqGjoFa67aUgp2jyFviMRH0o/L4iQMLWden+bu1eFoSy6H1so5yKTP+0qufM
+        SbTdZckJ2IAXD57Vh/FXcxwpn5F8FXBRV1s8PxB45PtPKblZ4qOdDNxWQBJdHGBMLZWA/6dB/GbRW
+        Ryy2BGjIC60/A5VLY8h27Nsvwue8yeJOw2/C9GZKFS6+uYPlFf8abXeJ8FKrixF4vTrxoLGrcBvM1
+        rJh/I4Uw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lBzBS-00GpyS-Qf; Tue, 16 Feb 2021 12:10:52 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BCFB13059DD;
+        Tue, 16 Feb 2021 13:10:25 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A5D6B2B9C6CCA; Tue, 16 Feb 2021 13:10:25 +0100 (CET)
+Date:   Tue, 16 Feb 2021 13:10:25 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Michael Kelley <mikelley@microsoft.com>
+Subject: Re: [PATCH v5 4/8] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Message-ID: <YCu2MQFdV4JTrUQb@hirez.programming.kicks-ass.net>
+References: <20210209221653.614098-1-namit@vmware.com>
+ <20210209221653.614098-5-namit@vmware.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210209221653.614098-5-namit@vmware.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiANCj4gT24gVHVlLCBGZWIgMTYsIDIwMjEgYXQgMTE6MTU6MzVBTSArMDAwMCwgSHVhbmcsIEth
-aSB3cm90ZToNCj4gPiBTb3JyeSBJIGFtIG5vdCBzdXJlIEkgdW5kZXJzdGFuZCB5b3VyIHF1ZXN0
-aW9uLiBDb3VsZCB5b3UgZWxhYm9yYXRlPw0KPiA+DQo+ID4gSU1ITyBpdCdzIGJldHRlciB0byBw
-dXQgYXJjaGl0ZWN0dXJhbCBzdGFmZiAoc3VjaCBhcyBkYXRhIHN0cnVjdHVyZXMNCj4gPiBkZWZp
-bmVkIGluIFNETSBhbmQgdXNlZCBieSBoYXJkd2FyZSkgaW50byBvbmUgaGVhZGVyLCBhbmQgb3Ro
-ZXINCj4gPiBub24tYXJjaGl0ZWN0dXJhbCBzdGFmZiBpbnRvIGFub3RoZXIgaGVhZGVyLCBzbyB0
-aGF0IHRoZSB1c2VyIGNhbg0KPiA+IGluY2x1ZGUgdGhlIG9uZSB0aGF0IGlzIGFjdHVhbGx5IHJl
-cXVpcmVkLCBidXQgZG9lc24ndCBoYXZlIHRvIGluY2x1ZGUNCj4gPiBvbmUgYmlnIGhlYWRlciB3
-aGljaCBpbmNsdWRlcyBhbGwgU0dYIHJlbGF0ZWQgZGF0YSBzdHJ1Y3R1cmVzIGFuZA0KPiA+IGZ1
-bmN0aW9ucy4NCj4gDQo+IEFuZCBpbmNsdWRpbmcgb25lIGJpZyAtIChub3Qgc3VyZSBhYm91dCAi
-YmlnIiAtIHdlIGhhdmUgYSBsb3QgYmlnZ2VyKSAtIGhlYWRlciBpcw0KPiBhbiBhY3R1YWwgcHJv
-YmxlbSBiZWNhdXNlPw0KPiANCj4gV2hhdCBJJ20gdHJ5aW5nIHRvIHBvaW50IHlvdSBhdCBpcywg
-dG8gbm90IGdpdmUgc29tZSBhcnRpZmljaWFsIHJlYXNvbnMgd2h5IHRoZQ0KPiBoZWFkZXJzIHNo
-b3VsZCBiZSBzZXBhcmF0ZSAtIGFydGlmaWNpYWwgYXMgdGhlIFNETSBzYXlzIGl0IGlzIGFyY2hp
-dGVjdHVyYWwgYW5kIHNvDQo+IG9uIC0gYnV0IGdpdmUgYSByZWFzb24gZnJvbSBzb2Z0d2FyZSBk
-ZXNpZ24gcGVyc3BlY3RpdmUgd2h5IHRoZSBzZXBhcmF0aW9uIGlzDQo+IG5lZWRlZDogYmV0dGVy
-IGJ1aWxkIHRpbWVzLCBsZXNzIHN5bWJvbHMgZXhwb3NlZCB0byBtb2R1bGVzLCBibGFibGEgYW5k
-IHNvIG9uLg0KPiANCj4gSWYgeW91IGRvbid0IGhhdmUgc3VjaCByZWFzb25zLCB0aGVuIGl0IGFs
-bCBpcyBqdXN0IHVubmVjZXNzYXJ5IGFuZCBub3QgbmVlZGVkDQo+IGNodXJuLiBBbmQgaW4gdGhh
-dCBjYXNlLCBrZWVwaW5nIGl0IHNpbXBsZSBpcyB0aGUgcHJvcGVyIGFwcHJvYWNoLg0KPiANCj4g
-VGhvc2UgaGVhZGVycyBjYW4gYWx3YXlzIGJlIHNwbGl0IGxhdGVyLCB3aGVuIHJlYWxseSBuZWVk
-ZWQuDQo+IA0KPiBIVEguDQoNClRoYW5rcyBmb3IgZmVlZGJhY2shIEknbGwgdGFrZSBhIGRlZXBl
-ciBsb29rIGF0IHRoZSBjb2RlIGFuZCBnaXZlIGZlZWRiYWNrICh0b28gbGF0ZSBmb3IgbWUgdG9k
-YXkpLg0KDQo+IA0KPiAtLQ0KPiBSZWdhcmRzL0dydXNzLA0KPiAgICAgQm9yaXMuDQo+IA0KPiBo
-dHRwczovL3Blb3BsZS5rZXJuZWwub3JnL3RnbHgvbm90ZXMtYWJvdXQtbmV0aXF1ZXR0ZQ0K
+On Tue, Feb 09, 2021 at 02:16:49PM -0800, Nadav Amit wrote:
+> @@ -816,8 +821,8 @@ STATIC_NOPV void native_flush_tlb_others(const struct cpumask *cpumask,
+>  	 * doing a speculative memory access.
+>  	 */
+>  	if (info->freed_tables) {
+> -		smp_call_function_many(cpumask, flush_tlb_func,
+> -			       (void *)info, 1);
+> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+> +				      cpumask);
+>  	} else {
+>  		/*
+>  		 * Although we could have used on_each_cpu_cond_mask(),
+> @@ -844,14 +849,15 @@ STATIC_NOPV void native_flush_tlb_others(const struct cpumask *cpumask,
+>  			if (tlb_is_not_lazy(cpu))
+>  				__cpumask_set_cpu(cpu, cond_cpumask);
+>  		}
+> -		smp_call_function_many(cond_cpumask, flush_tlb_func, (void *)info, 1);
+> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+> +				      cpumask);
+>  	}
+>  }
+
+Surely on_each_cpu_mask() is more appropriate? There the compiler can do
+the NULL propagation because it's on the same TU.
+
+--- a/arch/x86/mm/tlb.c
++++ b/arch/x86/mm/tlb.c
+@@ -821,8 +821,7 @@ STATIC_NOPV void native_flush_tlb_multi(
+ 	 * doing a speculative memory access.
+ 	 */
+ 	if (info->freed_tables) {
+-		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+-				      cpumask);
++		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
+ 	} else {
+ 		/*
+ 		 * Although we could have used on_each_cpu_cond_mask(),
+@@ -849,8 +848,7 @@ STATIC_NOPV void native_flush_tlb_multi(
+ 			if (tlb_is_not_lazy(cpu))
+ 				__cpumask_set_cpu(cpu, cond_cpumask);
+ 		}
+-		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+-				      cpumask);
++		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
+ 	}
+ }
+ 
