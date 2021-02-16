@@ -2,89 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAC3531D0CA
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 20:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 407E531D0D6
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 20:19:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230009AbhBPTQl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 14:16:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbhBPTQl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 14:16:41 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C10C06174A
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 11:15:57 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id e9so6036147plh.3
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 11:15:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UNT4p+ndT2CF9uJiolrgGldwNqQhpBDFWUyxsDRx5GE=;
-        b=qCOiDvhFBQYE/D1huT4njGW6vTXfkg1S9pyHSS15xIYSLbOWIuvdNsCftHYmizD17V
-         tNa25FTCpt2mmJEgWcKr75wxHzEPA5W883gY/23TDGf7UrPvOdzLWEB6Z5hzeIMYm7oI
-         JTTSUJ9EcM2J25y1YtcCwI33cbf3O0oUNW97vz1Phx0ktziMpKa6rUt0IaolbKXXS5Kj
-         imn0+Yjmobv9ROABEhvlKa9s8czxqxnZmMqZmiuldeBONXvwhMhepwfCbhwBOfAEFqrE
-         U4vwS9iywpbjPmDCKQp6GewntABq1jZsmJJMFCXzwPeR5Mqb9AGoLpFM2I12Sni25qNh
-         LNdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=UNT4p+ndT2CF9uJiolrgGldwNqQhpBDFWUyxsDRx5GE=;
-        b=HVW70fhoTy+7D1o/Xu289T/GjxLaw0/pprBYMWJzYxDTEir57BrEvxL32siloViOg8
-         oyv+H7fWOFjxh97j5+EjBxyxDginjMy0M72b1LrXWPkfkGl50hvIZbltxjilRgf56P2I
-         4yPFrsrDcgkhJqWW4YhM9Q8EvxVmY/Pom0gqcDczKu7fp5v8lri98z1NINUyCpFszwW2
-         V74mbx+G0DG8wTMBaU1EXmHIK0GJEy2SlOaA0GOdDMbcPqLHbqVGZjNl7ihKYpYhct7s
-         C5AwWlIUEBq+QShHzA7yym6e1AdJng0vHIPIsw7grWFoxSmAkmq5HclfQK0Kz28o0qBR
-         1P0w==
-X-Gm-Message-State: AOAM53210sNzApIxYJRtbQCkGE8CjRP573Et2OMOndbCpkoBvAIvBy+C
-        tAFc9hHPcB4b2YFhRQnJWlOHRw==
-X-Google-Smtp-Source: ABdhPJyXB0wyF3P7diNUHr5UTQ8EgVg+gtnluS2wMuZ34wnFoxWWkMzmwA5Qon7jA7FYNpPaOA2ZUw==
-X-Received: by 2002:a17:902:778e:b029:de:b475:c430 with SMTP id o14-20020a170902778eb02900deb475c430mr21207524pll.53.1613502957186;
-        Tue, 16 Feb 2021 11:15:57 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
-        by smtp.gmail.com with ESMTPSA id j185sm22613248pge.46.2021.02.16.11.15.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 11:15:56 -0800 (PST)
-Date:   Tue, 16 Feb 2021 11:15:49 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jethro@fortanix.com, b.thiel@posteo.de, jmattson@google.com,
-        joro@8bytes.org, vkuznets@redhat.com, wanpengli@tencent.com,
-        corbet@lwn.net
-Subject: Re: [RFC PATCH v5 00/26] KVM SGX virtualization support
-Message-ID: <YCwZ5fI/CVfPNATJ@google.com>
-References: <cover.1613221549.git.kai.huang@intel.com>
- <0e4e044c-020e-51a3-1f27-123c81f22c33@intel.com>
+        id S230391AbhBPTSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 14:18:51 -0500
+Received: from mail-dm6nam11on2040.outbound.protection.outlook.com ([40.107.223.40]:17089
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230225AbhBPTSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 14:18:48 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cUcCvkj/p/pc+k+FB1NOm4UrrGQ1dIsxVClkCADAqOvjAj4bziB1OvNsH4dVCN63wiRQ/DLV4bbRxvD2/VMkrDqFI51tLRh9Myomol7efl02/1CjTlN5NvZSWqapWcZRimuKtJ99n6Leikee4KyRTdJTbg6KtRiAVpLvmZAkEMcOsfWh8B6+sR1cPCSuQ7m8T3ANQAmJqOxNxmxsPaOXtGqwIddMdjt4aZ9vX4yO1CZu0cUg0zMsl+Id0hyxmwKfPeV3HlAIddhUMUmamX0Fn8b91H5/kPD3K33d8w7th7Bj3nOtRteTH8D+/izogjY4o9x4r7QKw1e5iCyWz2maCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jWIVzoNz7KPULPlDSYoUIXf7hWoOx4E1oEeVSH8mL5s=;
+ b=Lmva3OZfnpTwL6GBRoQyFWiU72yyx9kOXvd1FZH9hGOMgIj9g3Uwp328PLyA6FGKJbI41pmTNtukK/9s7r8mTlXx5/7hXqqjAPmVPyKf/u6Vy9AR4oXSyRq7/7OyTlg/Z9iyOSSbHGIuWXS9CNdirMJtdLi3dYT5NPlYwd++tYqQysz1bTbuo3oxoIcmOKSAbmyHcj1+uX4NryKRCRy6raXK3qp0gCJ2h9K53oQJ4jA76pG6Jo5iVW1+bKnUCL2AnRRJvYHlDxcRk2KULyRrBasJdYI7aqntz2Sgd9aHOF0sdxhuUu1JeaAacST9BWbjvr06LtvHutTF1RzuSlfZbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jWIVzoNz7KPULPlDSYoUIXf7hWoOx4E1oEeVSH8mL5s=;
+ b=R9BZir0A3CZetCVcQw+Ja7Y8mbvE/qrLupBhwaWV7JJjYvqeQxwAAs3fnowgXBPmBUWM/2W3NYhrMSphlLGG75Q68UtBa2Mv69x1zJfRKKD4L3C68AzRJcgxS9G4UEhc0erynJtON7Sqn/MSsBYrbc1Uchg/6ItqCvwtbcKLRks=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (2603:10b6:a03:4a::18)
+ by BY3PR05MB8083.namprd05.prod.outlook.com (2603:10b6:a03:36e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.11; Tue, 16 Feb
+ 2021 19:17:55 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::ddba:e1e9:fde7:3b31]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::ddba:e1e9:fde7:3b31%3]) with mapi id 15.20.3846.039; Tue, 16 Feb 2021
+ 19:17:55 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        X86 ML <x86@kernel.org>, Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        KVM <kvm@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        Michael Kelley <mikelley@microsoft.com>
+Subject: Re: [PATCH v5 4/8] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Topic: [PATCH v5 4/8] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Index: AQHXBFzuDk/+97dVSEa5i3JTefGxeKpbKCAA
+Date:   Tue, 16 Feb 2021 19:17:54 +0000
+Message-ID: <AFA552C0-88B1-4D58-B3C5-1A571DBF0EA6@vmware.com>
+References: <20210209221653.614098-1-namit@vmware.com>
+ <20210209221653.614098-5-namit@vmware.com>
+ <YCu2MQFdV4JTrUQb@hirez.programming.kicks-ass.net>
+In-Reply-To: <YCu2MQFdV4JTrUQb@hirez.programming.kicks-ass.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: infradead.org; dkim=none (message not signed)
+ header.d=none;infradead.org; dmarc=none action=none header.from=vmware.com;
+x-originating-ip: [24.6.216.183]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8d0a60f0-c67d-4e85-3a49-08d8d2af9010
+x-ms-traffictypediagnostic: BY3PR05MB8083:
+x-microsoft-antispam-prvs: <BY3PR05MB8083829349529D99571540C2D0879@BY3PR05MB8083.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5516;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: LPbUNtFBn0N04M5Lm1C3N0zrODoag8LRvwSmI5RqGwf1xyR8CgukS91tO8L/m0b3nYZ6QhlPgMXJvHuMNZn3RQdQG8yg4vumbtgl5LsTzw+qlnczlC4GTBRkIbWV4JrUjK/h2vD2VnP1rMtqOqqYSACd32YkR0b9sKUVsJm1YofFd6VDsPPCWB9INz6erPh/Ht00pn3yU0l7DrwaIzN0Lu/Iu2WAcSbL+fnfMyY7ikovSjj03trUGYRiJcxWMTdiX7fIJn30ryMX6VLLdAKcKEz/IPpfnEh61B+SwaUEEBUGLsfu4nyAWb4YgcjZRAP1si7KKjaqv6q/gtzz5r9IHvLaJjd4QIr82803pOylR9vyF3ehkSipoyu/H9iKe/Cdbf7tVI4HYm4Sp5i3pT+8jOnlLyHXyax9ytawwIhBmuQh6AJssDyJNsimjb22KHM6ckNEjvD/j050Hd261/ppZw8DRCtNWPjKfnucdF+/3z3pt2lllHIAjR2vXrD6WENCpPvMR3EaiTixuN48ZoYhb49YNZGkugoNSwheN2V1F64DDjg83NV/52pHQM7ss2aEou6iSote3Z+pky8VysyH+A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR05MB4776.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(5660300002)(33656002)(4326008)(6512007)(6486002)(53546011)(478600001)(66946007)(8936002)(2906002)(54906003)(86362001)(83380400001)(316002)(66446008)(186003)(66476007)(66556008)(76116006)(26005)(71200400001)(36756003)(7416002)(2616005)(6916009)(8676002)(64756008)(6506007)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?fyNbfqSd9ANotjCBaT4ktWFbtGRkNLuUxd1+oQ/DB+m87EmQFbfMxnm2cp+i?=
+ =?us-ascii?Q?iM5ozZR5UUJ/OZafBBMcBXa6sqcUtT7+GRC5YnxBQnx2zLH6a+cbLjfeVSTT?=
+ =?us-ascii?Q?SQEAfxa/hxr+mvee9M2qM1y/ca56f+I1wgWVF1aZvrCFIQ3GNZNcjWw70/gr?=
+ =?us-ascii?Q?Y5f24d5dvrt22Qhz/XC9Pt8BqkR9mLOGDFxvN/ROfnk7lqkscAmMeqtJ8iCd?=
+ =?us-ascii?Q?Hlv/cE7tqGlELWkCkjpEZ/hzKpMVPtE63ID7IHlMiIdRAAyU1baBowig2qpi?=
+ =?us-ascii?Q?benTkh4oFrj4I61f2zpDqZj/2WbBhs+jfT6xwDHfb3SFLqi8BmDZrZeuxvkd?=
+ =?us-ascii?Q?g/NYuJ6KWoTP3kMH6jZYKnoiKpRq6ZPuS7saqUvj+p5zLSt3fSdNzaaYSP7+?=
+ =?us-ascii?Q?IgIj31Wi05yZEpfNNDaoqRGJEEBeE0tUVbjvMCORdzx39kzDbwhdq8KLN1aa?=
+ =?us-ascii?Q?r/VuRW2HtLN9sneLkCRWh7vFL7Yx/923YXuWNkxRAZ+cvY3Dhq45HHDzdUg5?=
+ =?us-ascii?Q?QH6gB6gddZQjJ9AVuGjLQsJzCJfnUj3jRJseN+pcbWdb8FYlJARvO0d/OpUL?=
+ =?us-ascii?Q?0cMgZ7mToS8GrRLZKaodp6DvCIpvLZQ4saXcHkbd49RRk8wDKNw3SqL7+ZCz?=
+ =?us-ascii?Q?IEAHl8kPzFQY75I7kkxYISxXFccwBhuNTCJhkaVCsbdUXkvbfrQdGkYS67Qf?=
+ =?us-ascii?Q?3RLnJ1Z3Yd0ES8q80OlRKiVHHkLiX7mjvRmkI+gt3U8xk3RzUoQIWBi9vzhp?=
+ =?us-ascii?Q?26ugbP9cWt5k+JZ5bpvbfDW3CwDsMJRN/5wdpLPsBfG/le3U9kXRWG3jpfTn?=
+ =?us-ascii?Q?n5EVMctzKXjEK73qf9VtfAd0W3pecmu8x0w9bZ/1FZsi1g/czrJ4xX6q8yME?=
+ =?us-ascii?Q?riZF0aFcqY+hOonx37uKBYI/0tCf3GUd66Ib4DvDpSlqO+EVc2EhkKRYhVqX?=
+ =?us-ascii?Q?5Eu88EoeK5OmWfxgCv8zT/YUhQEu8UPVzrI9UEoPC8eKwx6MCXRfvgJNNi3P?=
+ =?us-ascii?Q?UTWJCc4KqFJWkaVvjOJY8OfqGjB1Z921aDk26pGyS2Ai0/EQFwcOx2GoSdnT?=
+ =?us-ascii?Q?zt32ET24WlMzSz9vYz39fmOQUM+Vn3ftnJUW9i3uuIV808DiBhD0JnyAsJoU?=
+ =?us-ascii?Q?TEcDqdJ1QFvWT6yG0uD1ogBw7nfn5eMbBxBp6gtHaOy8sIboedzkV1nZel+a?=
+ =?us-ascii?Q?wPGRu8YP61h7t32vVTsHIM7EW1PHD4QYh89z0jUc5NfyU106Z6MGxKhK3IGO?=
+ =?us-ascii?Q?jRRUlGtxkFpULb+0Ltk9EO86BIdYRpV6FijKxAUpTPx2ur73S+Nk9tpUWJsJ?=
+ =?us-ascii?Q?n7gtPRmstlastTmA2XYCAGyL?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <9390762EDE2D8D4786E55865DEDAE795@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e4e044c-020e-51a3-1f27-123c81f22c33@intel.com>
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR05MB4776.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d0a60f0-c67d-4e85-3a49-08d8d2af9010
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Feb 2021 19:17:54.9690
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SKPOxAghkr3M152dfPKEi0yLDWpx04TQBHLmVJW8qpd/dObjW4As10/cLm99NXak6CNWCIRfDRVTBzg4MqdH1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR05MB8083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 16, 2021, Dave Hansen wrote:
-> On 2/13/21 5:28 AM, Kai Huang wrote:
-> >  arch/x86/kvm/vmx/sgx.c                        | 466 ++++++++++++++++++
-> >  arch/x86/kvm/vmx/sgx.h                        |  34 ++
-> 
-> Changes to these files won't hit the SGX MAINTAINERS entry if you run
-> get_maintainer.pl.  That means Jarkko (and me, and the SGX mailing list)
-> probably won't get cc'd on changes here.
-> 
-> Is that a bug or a feature? :)
+> On Feb 16, 2021, at 4:10 AM, Peter Zijlstra <peterz@infradead.org> wrote:
+>=20
+> On Tue, Feb 09, 2021 at 02:16:49PM -0800, Nadav Amit wrote:
+>> @@ -816,8 +821,8 @@ STATIC_NOPV void native_flush_tlb_others(const struc=
+t cpumask *cpumask,
+>> 	 * doing a speculative memory access.
+>> 	 */
+>> 	if (info->freed_tables) {
+>> -		smp_call_function_many(cpumask, flush_tlb_func,
+>> -			       (void *)info, 1);
+>> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+>> +				      cpumask);
+>> 	} else {
+>> 		/*
+>> 		 * Although we could have used on_each_cpu_cond_mask(),
+>> @@ -844,14 +849,15 @@ STATIC_NOPV void native_flush_tlb_others(const str=
+uct cpumask *cpumask,
+>> 			if (tlb_is_not_lazy(cpu))
+>> 				__cpumask_set_cpu(cpu, cond_cpumask);
+>> 		}
+>> -		smp_call_function_many(cond_cpumask, flush_tlb_func, (void *)info, 1)=
+;
+>> +		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+>> +				      cpumask);
+>> 	}
+>> }
+>=20
+> Surely on_each_cpu_mask() is more appropriate? There the compiler can do
+> the NULL propagation because it's on the same TU.
+>=20
+> --- a/arch/x86/mm/tlb.c
+> +++ b/arch/x86/mm/tlb.c
+> @@ -821,8 +821,7 @@ STATIC_NOPV void native_flush_tlb_multi(
+> 	 * doing a speculative memory access.
+> 	 */
+> 	if (info->freed_tables) {
+> -		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+> -				      cpumask);
+> +		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
+> 	} else {
+> 		/*
+> 		 * Although we could have used on_each_cpu_cond_mask(),
+> @@ -849,8 +848,7 @@ STATIC_NOPV void native_flush_tlb_multi(
+> 			if (tlb_is_not_lazy(cpu))
+> 				__cpumask_set_cpu(cpu, cond_cpumask);
+> 		}
+> -		on_each_cpu_cond_mask(NULL, flush_tlb_func, (void *)info, true,
+> -				      cpumask);
+> +		on_each_cpu_mask(cpumask, flush_tlb_func, (void *)info, true);
+> 	}
+> }
 
-Feature.  The stuff in those files is pure KVM, there's nothing interesting from
-an SGX subsystem persective.  That's another reason to have sgx/virt.c, the
-stuff that does impact SGX can all go in there.
+Indeed, and there is actually an additional bug - I used cpumask in the
+second on_each_cpu_cond_mask() instead of cond_cpumask.
 
-The KVM SGX code is in split out because virtualizing ENCLS leafs takes a
-painful amount of code, and because SGX already has a separate Kconfig.
-Association with the SGX subsystem was a non-factor in that choice.
