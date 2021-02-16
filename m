@@ -2,149 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E77531CB55
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 14:41:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6B9031CBC7
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 15:23:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbhBPNlW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 08:41:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41412 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbhBPNlV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 08:41:21 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF9A0C061574;
-        Tue, 16 Feb 2021 05:40:39 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id t63so9389783qkc.1;
-        Tue, 16 Feb 2021 05:40:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3JewOjQw0FtJtNgCeApdgGf7kQbjOdx2qp+PtYPRynk=;
-        b=SO+jkcapCDtBxWnZFrxewnr06ShtzsemKW6mDn+qTmYv7WV1qM4payyLSQFd3Wssbi
-         4ebKGzqCvnQWJVL7dAQY4wFscsQFWFz2VoP7XLfwbRxOcOd1+jmEu5fdcMTkwlunyR03
-         L0u22YzPQFbp37xmNwPWMWLmE0h2XdQsevJkCCB47up75o/uxfA/J/MlDquWYrEOF4GO
-         dK8kbUGrDTJX6r1UtqXVfofmSiwD9vw6vBiac/Mzk2AQSrvg9B8wCOtLLA9FZxkSqror
-         j8NqS5K7MpJJ6qxjIbBvEsNCZZGy0cbC3oXrJvHGe/54U+tJrA9pgH41+4y4+crnoY5f
-         Qkjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=3JewOjQw0FtJtNgCeApdgGf7kQbjOdx2qp+PtYPRynk=;
-        b=Uw4N8iO2XyAoT3IWlmrbtoXLiMJUMDvVBKV2j3IQXdDEpSF1DySoIdTynvTggJycDo
-         fzk/GinnDSRP5PDW5NgZmpJ8Yfs3ifCUhTs2x/o7Lud9p07Ts0Zc6atn8g2IPbx4SAGm
-         T+Y37bDZd4KCGvvptqFkNfFAHlGukvak7edVOVpMDM3wra5nPBqx4zI193fdpB9DPe/H
-         CYstgggG1OFIJeMzrWRoWB4kUgXQOPg/RjET142+1AYhrua3XOnDljfcDkpGTrrPzpnY
-         pvs8z3zeBkRXiG93ylhA15T2J3/QyYS3egzePyhBwqrTH4sBBhOEh10+NNJ1l5ITTSXJ
-         MyAQ==
-X-Gm-Message-State: AOAM533wH+GY5SVUwmkLTofLnFitOYUQVqWWDWSggUl+/tQ6MW5tCJ13
-        q143f/zQOC0A4Gyx0UCfNWA=
-X-Google-Smtp-Source: ABdhPJwgyn6Rx0Ml7fck+ccdshjky57XCc1KnkwdqZuhTTpZLK4lPXduVr5+NncQH2D++f5vBPhpQw==
-X-Received: by 2002:a37:468e:: with SMTP id t136mr19220977qka.440.1613482838936;
-        Tue, 16 Feb 2021 05:40:38 -0800 (PST)
-Received: from OpenSuse ([143.244.44.229])
-        by smtp.gmail.com with ESMTPSA id c7sm13343484qtm.60.2021.02.16.05.40.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 05:40:37 -0800 (PST)
-Date:   Tue, 16 Feb 2021 19:10:29 +0530
-From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rdunlap@infradead.org
-Subject: Re: [PATCH] arch: s390: kvm: Fix oustanding to outstanding in the
- file kvm-s390.c
-Message-ID: <YCvLTSjlChLHvygM@OpenSuse>
-Mail-Followup-To: Janosch Frank <frankja@linux.ibm.com>,
-        borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, rdunlap@infradead.org
-References: <20210213153227.1640682-1-unixbhaskar@gmail.com>
- <f90e91a5-7bc0-2489-51d4-6004eef9db7a@linux.ibm.com>
+        id S229959AbhBPOWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 09:22:48 -0500
+Received: from foss.arm.com ([217.140.110.172]:36018 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229827AbhBPOWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 09:22:47 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E120A31B;
+        Tue, 16 Feb 2021 06:22:00 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E571D3F694;
+        Tue, 16 Feb 2021 06:21:59 -0800 (PST)
+Subject: Re: [PATCH kvmtool 13/21] hw/serial: Refactor trap handler
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-14-andre.przywara@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <5c91e8f2-7bdf-4c4a-1da3-08dac79fd9a4@arm.com>
+Date:   Tue, 16 Feb 2021 14:22:05 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="MM1/o3wLr7SJP/Ol"
-Content-Disposition: inline
-In-Reply-To: <f90e91a5-7bc0-2489-51d4-6004eef9db7a@linux.ibm.com>
+In-Reply-To: <20201210142908.169597-14-andre.przywara@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Andre,
 
---MM1/o3wLr7SJP/Ol
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+Patch looks good, nitpicks below.
 
-On 10:08 Mon 15 Feb 2021, Janosch Frank wrote:
->On 2/13/21 4:32 PM, Bhaskar Chowdhury wrote:
->>
->> s/oustanding/outstanding/
+On 12/10/20 2:29 PM, Andre Przywara wrote:
+> With the planned retirement of the special ioport emulation code, we
+> need to provide an emulation function compatible with the MMIO prototype.
 >
->Hey Bhaskar,
+> Adjust the trap handler to use that new function, and provide shims to
+> implement the old ioport interface, for now.
 >
->while I do encourage anyone to send in changes I'm not a big fan of
->comment fixes if they are only a couple of characters and when the
->meaning is still intact despite the spelling mistake.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  hw/serial.c | 97 +++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 65 insertions(+), 32 deletions(-)
 >
->You're creating more work for me than you had writing this patch and the
->improvement is close to zero.
->
->Be warned that I might not pick up such patches in the future.
->
->
->If you're ok with it I'll fix up the subject to this and pick up the patch:
->"kvm: s390: Fix comment spelling in kvm_s390_vcpu_start()"
->
-Pls do.
+> diff --git a/hw/serial.c b/hw/serial.c
+> index b0465d99..2907089c 100644
+> --- a/hw/serial.c
+> +++ b/hw/serial.c
+> @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
+>  	sysrq_pending = sysrq;
+>  }
+>  
+> -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+> -			   void *data, int size)
+> +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			   u16 offset, u8 data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+> -	char *addr = data;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_TX:
+>  		if (dev->lcr & UART_LCR_DLAB) {
+> -			dev->dll = ioport__read8(data);
+> +			dev->dll = data;
+>  			break;
+>  		}
+>  
+>  		/* Loopback mode */
+>  		if (dev->mcr & UART_MCR_LOOP) {
+>  			if (dev->rxcnt < FIFO_LEN) {
+> -				dev->rxbuf[dev->rxcnt++] = *addr;
+> +				dev->rxbuf[dev->rxcnt++] = data;
+>  				dev->lsr |= UART_LSR_DR;
+>  			}
+>  			break;
+>  		}
+>  
+>  		if (dev->txcnt < FIFO_LEN) {
+> -			dev->txbuf[dev->txcnt++] = *addr;
+> +			dev->txbuf[dev->txcnt++] = data;
+>  			dev->lsr &= ~UART_LSR_TEMT;
+>  			if (dev->txcnt == FIFO_LEN / 2)
+>  				dev->lsr &= ~UART_LSR_THRE;
+> @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		break;
+>  	case UART_IER:
+>  		if (!(dev->lcr & UART_LCR_DLAB))
+> -			dev->ier = ioport__read8(data) & 0x0f;
+> +			dev->ier = data & 0x0f;
+>  		else
+> -			dev->dlm = ioport__read8(data);
+> +			dev->dlm = data;
+>  		break;
+>  	case UART_FCR:
+> -		dev->fcr = ioport__read8(data);
+> +		dev->fcr = data;
+>  		break;
+>  	case UART_LCR:
+> -		dev->lcr = ioport__read8(data);
+> +		dev->lcr = data;
+>  		break;
+>  	case UART_MCR:
+> -		dev->mcr = ioport__read8(data);
+> +		dev->mcr = data;
+>  		break;
+>  	case UART_LSR:
+>  		/* Factory test */
+> @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+>  		/* Not used */
+>  		break;
+>  	case UART_SCR:
+> -		dev->scr = ioport__read8(data);
+> +		dev->scr = data;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -336,46 +331,43 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
+>  	}
+>  }
+>  
+> -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> +			  u16 offset, u8 *data)
+>  {
+> -	struct serial8250_device *dev = ioport->priv;
+> -	u16 offset;
+>  	bool ret = true;
+>  
+>  	mutex_lock(&dev->mutex);
+>  
+> -	offset = port - dev->iobase;
+> -
+>  	switch (offset) {
+>  	case UART_RX:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dll);
+> +			*data = dev->dll;
+>  		else
+>  			serial8250_rx(dev, data);
+>  		break;
+>  	case UART_IER:
+>  		if (dev->lcr & UART_LCR_DLAB)
+> -			ioport__write8(data, dev->dlm);
+> +			*data = dev->dlm;
+>  		else
+> -			ioport__write8(data, dev->ier);
+> +			*data = dev->ier;
+>  		break;
+>  	case UART_IIR:
+> -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
+> +		*data = dev->iir | UART_IIR_TYPE_BITS;
+>  		break;
+>  	case UART_LCR:
+> -		ioport__write8(data, dev->lcr);
+> +		*data = dev->lcr;
+>  		break;
+>  	case UART_MCR:
+> -		ioport__write8(data, dev->mcr);
+> +		*data = dev->mcr;
+>  		break;
+>  	case UART_LSR:
+> -		ioport__write8(data, dev->lsr);
+> +		*data = dev->lsr;
+>  		break;
+>  	case UART_MSR:
+> -		ioport__write8(data, dev->msr);
+> +		*data = dev->msr;
+>  		break;
+>  	case UART_SCR:
+> -		ioport__write8(data, dev->scr);
+> +		*data = dev->scr;
+>  		break;
+>  	default:
+>  		ret = false;
+> @@ -389,6 +381,47 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+>  	return ret;
+>  }
+>  
+> +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> +			    u8 is_write, void *ptr)
+> +{
+> +	struct serial8250_device *dev = ptr;
+> +	u8 value = 0;
+> +
+> +	if (is_write) {
+> +		 value = *data;
 
->Cheers,
->Janosch
->
->>
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->> ---
->>  arch/s390/kvm/kvm-s390.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index dbafd057ca6a..1d01afaca9fe 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4545,7 +4545,7 @@ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->>  		/*
->>  		 * As we are starting a second VCPU, we have to disable
->>  		 * the IBS facility on all VCPUs to remove potentially
->> -		 * oustanding ENABLE requests.
->> +		 * outstanding ENABLE requests.
->>  		 */
->>  		__disable_ibs_on_all_vcpus(vcpu->kvm);
->>  	}
->> --
->> 2.30.1
->>
->
->
+Extra space before value.
 
+> +
+> +		serial8250_out(dev, vcpu, addr - dev->iobase, value);
+> +	} else {
+> +		if (serial8250_in(dev, vcpu, addr - dev->iobase, &value))
+> +			*data = value;
+> +	}
+> +}
+> +
+> +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				  u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +	u8 value = ioport__read8(data);
+> +
+> +	serial8250_mmio(vcpu, port, &value, 1, true, dev);
+> +
+> +	return true;
+> +}
+> +
+> +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+> +				 u16 port, void *data, int size)
+> +{
+> +	struct serial8250_device *dev = ioport->priv;
+> +	u8 value = 0;
+> +
+> +
+> +	serial8250_mmio(vcpu, port, &value, 1, false, dev);
+> +
+> +	ioport__write8(data, value);
 
+This is correct, but confusing. You pass the address of a local variable as *data
+to serial8250_mmio, serial8250_mmio conditionally updates the value at data (which
+is &value from here), and then here we update the *data unconditionally. Why not
+pass data directly to serial8250_mmio and skip the local variable? Am I missing
+something?
 
+Thanks,
 
---MM1/o3wLr7SJP/Ol
-Content-Type: application/pgp-signature; name="signature.asc"
+Alex
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAmAry0kACgkQsjqdtxFL
-KRXHdwf/fQnnFjWrAG1FY7B2hDZDpGIwgQTiJwMamKsugT/y73/WNDIamMqIn0W+
-27G6ohO5mjH94Br/2o6IhEfydhyN/buFh/oyklvvlcikfHkC+UoxEHaYCnSx77S3
-C/1Uc126wgQR7YEZ5Bzua9lNbc9+gp1DgHCtL9uBCJFvH2PvQ+aR8XyRZWW52Tuc
-oDFQY4AdmLX92v30pKWiIVEUvCNFXJoeCyVPJ7la9SzDfJE9em642FztEo+vP3CX
-D6Q5y8C6CKWmvxPcPgDOh+DM5FD8C1qCDNtHOPJfBFDbiPwyCidJrLlPDx+gLYpY
-liXmDequghHB/ZqvHHBJPR16CIA7yA==
-=RGPJ
------END PGP SIGNATURE-----
-
---MM1/o3wLr7SJP/Ol--
+> +
+> +	return true;
+> +}
+> +
+>  #ifdef CONFIG_HAS_LIBFDT
+>  
+>  char *fdt_stdout_path = NULL;
+> @@ -427,8 +460,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+>  #endif
+>  
+>  static struct ioport_operations serial8250_ops = {
+> -	.io_in			= serial8250_in,
+> -	.io_out			= serial8250_out,
+> +	.io_in			= serial8250_ioport_in,
+> +	.io_out			= serial8250_ioport_out,
+>  };
+>  
+>  static int serial8250__device_init(struct kvm *kvm,
