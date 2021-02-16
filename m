@@ -2,81 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CF6B31D0F0
-	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 20:26:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D08031D1AC
+	for <lists+kvm@lfdr.de>; Tue, 16 Feb 2021 21:41:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbhBPT0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 14:26:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58810 "EHLO
+        id S229845AbhBPUkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 15:40:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbhBPT0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 14:26:20 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E81C061756
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 11:25:39 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id e9so6609886pjj.0
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 11:25:39 -0800 (PST)
+        with ESMTP id S229628AbhBPUks (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 15:40:48 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DF2C061574
+        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 12:40:07 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id o3so11765109edv.4
+        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 12:40:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6pGhr0lLQTg5Y4WWGGYsJGmCuH6QGJ7ZmH7j+4B6fO0=;
-        b=jcMSHmqrBxMlYE72GFYJYYQF9nFoMT8f+DpsnOohzDyd03St4i7DqZo89SaolbnFTi
-         e2Ja5TFI5EAPny5wzmltnBh3TnjCIuBMMKD2VbabO0byZD+hbj0fv5xMkgcd96ZcfbF8
-         7coS2ZCkbkduIOP7Lir7k+0AXpJBUGYDQqOeb025Ah8HhINiEOq+7OEyYmz3SsTpykf1
-         z2T5A7RcJR3wACjRKz5B78r53Y7LSrvjB6CPezaI+HQiOnvRBGUTQf3iDGnSekdZQT8q
-         C4Xad8BMkgdPWe5l/EXlqy9ZY8eGBSh1suVbQTPR5DMs/PtewpmyzSk9R5b/Z13UI65f
-         rJzA==
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qsbkrWZGkD91kMd27lJYVWXYLDx45J5nDBTki3Poz/Y=;
+        b=GYlUAEcxf+YrKRO9EV5o4/Z+28j3rfdzii+w6iCzZUbQExjtVDl60KciVFUspFaevd
+         xQSimjJ/cKCSAjpA2c6+1IwGP+b9RsJeFUgaGgIQI9CHFXTR045ViXPxwRMKJbmKzBsQ
+         dAYOvturlAhwMrFBnspAhiHq5WWA2Hkdic64X8Rcert/bP/eE1q1Jv7U4+KFDK5bEbTc
+         /CSI3/tdjWwHApgQq7qDVuwhFwQXKrhmaTsx+j7jU6+/8SJ3r9U8+h3wqTu3CVO4gC9b
+         /RRgmqX0ARNglqqE3GjZ6Ihebj0PnyzmcQHZB0bQ0S4W5F+0TaIpoP+exgxw3GtFqYl4
+         am7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=6pGhr0lLQTg5Y4WWGGYsJGmCuH6QGJ7ZmH7j+4B6fO0=;
-        b=L+4RjZKhSpZFa98efKl6glPbUgAOarFbpIVBNJpO/ftcW9fBEiqHEhPVWen/mj7qV9
-         497p/FGGnuvO+gdZOoyW2IzTTv+ah1woaMsD5xdBveMrFRVNQiVS2dxoTzi33tSUWA3F
-         /J8fA+cNH5XqQrQ69Hn3xSKoRhB0MHjhkvVYQxW9YyO/qDD/imrdd5kr7szo+X4twsIK
-         yc9Uflml5cdPkEeUPu3lmdUGA4lDrfCNKzdM1i+AzuIQR15iNdo+EAesLv/MW9EStvoA
-         Grky4tO+M89skdKwu+W+UC/HR01p+avf6BIwhj0dEWjGOk8pIZxAu8pmqXcq/8gbm9mW
-         QBgQ==
-X-Gm-Message-State: AOAM530/QLwkdQbkcRYgx6MfsXd3oeTo51DOS3irxz4jb5HcMC7fL7Vu
-        VCOTHd+e3qaCMGZYh63CX2o97A==
-X-Google-Smtp-Source: ABdhPJzGo17ipEZb1+AmMEOCTgvYjDPeWMOyjad0F6FQnkAP6Tl1TEqdffLRGZ/5kQI2xxLAmUpZZA==
-X-Received: by 2002:a17:90b:224f:: with SMTP id hk15mr5582032pjb.31.1613503539177;
-        Tue, 16 Feb 2021 11:25:39 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
-        by smtp.gmail.com with ESMTPSA id z16sm3244505pgk.13.2021.02.16.11.25.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 11:25:38 -0800 (PST)
-Date:   Tue, 16 Feb 2021 11:25:32 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v5 05/26] x86/sgx: Introduce virtual EPC for use by
- KVM guests
-Message-ID: <YCwcLIyUypf4huX1@google.com>
-References: <cover.1613221549.git.kai.huang@intel.com>
- <4813545fa5765d05c2ed18f2e2c44275bd087c0a.1613221549.git.kai.huang@intel.com>
- <eafcdcae-ae66-e717-2f8b-2bdfb8e7d0d5@intel.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qsbkrWZGkD91kMd27lJYVWXYLDx45J5nDBTki3Poz/Y=;
+        b=X5UJS9I1oNYgo7DHoHfG37UGHtzSsEz7uMUwEqfe9QFHNKH01h9m4sJuKLHtib8XGv
+         yTVFu70GNFTl+lxn18+at6clLeZoj82DYUQL2t3roCUI4z53O7Ms2xT5ridIG1Fki8Df
+         k6J4AVWSuz44AfAeNYdYDvWiOoHAl243Ku145P1z4zEziz5bQgJUF6DEore564262rzT
+         LkFmJwwx6gBmji54wlNYV0UY+kpd7JPC4q1MwxmiAoftLJcYkto/MxZJ9y8rWkQZrSFV
+         KtqWDcgrC5NID64W9Vlw9sXOB3FJCcZogBP3Dm4tuajoUnj60RDUbfBUX5TH/Vq2D2Hc
+         Iadg==
+X-Gm-Message-State: AOAM533pZYi098rZj06Iy2eSP67LNCDkh7IRRISJNbvInEX5CMNVNyr2
+        JgJ9d8JVphcNbIRceoa6e86beBYtSJaxd3OrHzyZWg==
+X-Google-Smtp-Source: ABdhPJzItTBAgOKzcio391IOuVIAv/Zadl6m2XXBki/3fUYt940zA/MAddwv1fJXGyV5MfPeAf92HQRO8cYR7bKO5J8=
+X-Received: by 2002:a05:6402:559:: with SMTP id i25mr15504185edx.300.1613508006214;
+ Tue, 16 Feb 2021 12:40:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eafcdcae-ae66-e717-2f8b-2bdfb8e7d0d5@intel.com>
+References: <161255810396.339900.7646244556839438765.stgit@djiang5-desk3.ch.intel.com>
+ <161255840486.339900.5478922203128287192.stgit@djiang5-desk3.ch.intel.com>
+ <20210210235924.GJ4247@nvidia.com> <8ff16d76-6b36-0da6-03ee-aebec2d1a731@intel.com>
+In-Reply-To: <8ff16d76-6b36-0da6-03ee-aebec2d1a731@intel.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 16 Feb 2021 12:39:56 -0800
+Message-ID: <CAPcyv4jDmofa+77q_hG1EimaKxq2_hYu-kVOVbU4mN4XSdOUWA@mail.gmail.com>
+Subject: Re: [PATCH v5 05/14] vfio/mdev: idxd: add basic mdev registration and
+ helper functions
+To:     Dave Jiang <dave.jiang@intel.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kwankhede@nvidia.com, Thomas Gleixner <tglx@linutronix.de>,
+        Vinod Koul <vkoul@kernel.org>,
+        "Dey, Megha" <megha.dey@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>, Yi L Liu <yi.l.liu@intel.com>,
+        Baolu Lu <baolu.lu@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Sanjay K Kumar <sanjay.k.kumar@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>, eric.auger@redhat.com,
+        Parav Pandit <parav@mellanox.com>, netanelg@mellanox.com,
+        shahafs@mellanox.com, Paolo Bonzini <pbonzini@redhat.com>,
+        dmaengine@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 16, 2021, Dave Hansen wrote:
-> > Having separate device nodes for SGX driver and KVM virtual EPC also
-> > allows separate permission control for running host SGX enclaves and
-> > KVM SGX guests.
-> 
-> Specifically, 'sgx_vepc' is a less restrictive interface.  It would make
-> a lot of sense to more tightly control access compared to 'sgx_enclave'.
+On Tue, Feb 16, 2021 at 11:05 AM Dave Jiang <dave.jiang@intel.com> wrote:
+>
+>
+> On 2/10/2021 4:59 PM, Jason Gunthorpe wrote:
+> > On Fri, Feb 05, 2021 at 01:53:24PM -0700, Dave Jiang wrote:
+> >
+> >> +static int check_vma(struct idxd_wq *wq, struct vm_area_struct *vma)
+> >>   {
+> >> -    /* FIXME: Fill in later */
+> >> +    if (vma->vm_end < vma->vm_start)
+> >> +            return -EINVAL;
+> > These checks are redundant
+>
+> Thanks. Will remove.
+>
+> >
+> >> -static int idxd_mdev_host_release(struct idxd_device *idxd)
+> >> +static int idxd_vdcm_mmap(struct mdev_device *mdev, struct vm_area_struct *vma)
+> >> +{
+> >> +    unsigned int wq_idx, rc;
+> >> +    unsigned long req_size, pgoff = 0, offset;
+> >> +    pgprot_t pg_prot;
+> >> +    struct vdcm_idxd *vidxd = mdev_get_drvdata(mdev);
+> >> +    struct idxd_wq *wq = vidxd->wq;
+> >> +    struct idxd_device *idxd = vidxd->idxd;
+> >> +    enum idxd_portal_prot virt_portal, phys_portal;
+> >> +    phys_addr_t base = pci_resource_start(idxd->pdev, IDXD_WQ_BAR);
+> >> +    struct device *dev = mdev_dev(mdev);
+> >> +
+> >> +    rc = check_vma(wq, vma);
+> >> +    if (rc)
+> >> +            return rc;
+> >> +
+> >> +    pg_prot = vma->vm_page_prot;
+> >> +    req_size = vma->vm_end - vma->vm_start;
+> >> +    vma->vm_flags |= VM_DONTCOPY;
+> >> +
+> >> +    offset = (vma->vm_pgoff << PAGE_SHIFT) &
+> >> +             ((1ULL << VFIO_PCI_OFFSET_SHIFT) - 1);
+> >> +
+> >> +    wq_idx = offset >> (PAGE_SHIFT + 2);
+> >> +    if (wq_idx >= 1) {
+> >> +            dev_err(dev, "mapping invalid wq %d off %lx\n",
+> >> +                    wq_idx, offset);
+> >> +            return -EINVAL;
+> >> +    }
+> >> +
+> >> +    /*
+> >> +     * Check and see if the guest wants to map to the limited or unlimited portal.
+> >> +     * The driver will allow mapping to unlimited portal only if the the wq is a
+> >> +     * dedicated wq. Otherwise, it goes to limited.
+> >> +     */
+> >> +    virt_portal = ((offset >> PAGE_SHIFT) & 0x3) == 1;
+> >> +    phys_portal = IDXD_PORTAL_LIMITED;
+> >> +    if (virt_portal == IDXD_PORTAL_UNLIMITED && wq_dedicated(wq))
+> >> +            phys_portal = IDXD_PORTAL_UNLIMITED;
+> >> +
+> >> +    /* We always map IMS portals to the guest */
+> >> +    pgoff = (base + idxd_get_wq_portal_full_offset(wq->id, phys_portal,
+> >> +                                                   IDXD_IRQ_IMS)) >> PAGE_SHIFT;
+> >> +    dev_dbg(dev, "mmap %lx %lx %lx %lx\n", vma->vm_start, pgoff, req_size,
+> >> +            pgprot_val(pg_prot));
+> >> +    vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> >> +    vma->vm_private_data = mdev;
+> > What ensures the mdev pointer is valid strictly longer than the VMA?
+> > This needs refcounting.
+>
+> Going to take a kref at open and then put_device at close. Does that
+> sound reasonable or should I be calling get_device() in mmap() and then
+> register a notifier for when vma is released?
 
-The opposite is just as likely, i.e. exposing SGX to a guest but not allowing
-enclaves in the host.  Not from a "sgx_enclave is easier to abuse" perspective,
-but from a "enclaves should never be runnable in the host in our environment".
+Where does this enabling ever look at vm_private_data again? It seems
+to me it should be reasonable for the mdev to die out from underneath
+a vma, just need some tracking to block future uses of the
+vma->vm_private_data from being attempted.
