@@ -2,97 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84A9C31DCE8
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:09:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 585A731DCE3
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:07:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233972AbhBQQIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 11:08:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50845 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233858AbhBQQIM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:08:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613578006;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xx/3WvlTzcC3JQ0X57zlgEH5/O7A+hGnATTqDH1zbwA=;
-        b=eRaHfqlS/vNC7JXC3fBFKn1eS/NZH+6VyIX9f5NBY8LgqC7Sd1kBDahN7JVbuo5c0EEMOu
-        JO8zl9OKKNgbfFlLWJbtCeB3Wj/C04McUYADptbBTg1enakFzFIl2qCvo+kbmWVz/SqUPB
-        ZK/WwGEvNLyzXMCBd4GzQPQvGVq2taY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-di-TkgRGP5mzlf3gVcy8Mg-1; Wed, 17 Feb 2021 11:06:45 -0500
-X-MC-Unique: di-TkgRGP5mzlf3gVcy8Mg-1
-Received: by mail-wm1-f70.google.com with SMTP id j204so2522820wmj.4
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:06:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xx/3WvlTzcC3JQ0X57zlgEH5/O7A+hGnATTqDH1zbwA=;
-        b=ey8XYNQFDJRmfq9kLBjLiNsTS8IQvsvxX5sUMMWw7ZDjVZRQGXibSR1mwJPllGZ9FL
-         mOxv027AIwx8FAHLEfUJ0iwm9cSBez56Nw1xYcf059TIwFhzTNPr93y12M4N4FMD2yB4
-         tGBOAbrAVh6pdZdTK/afVOlHlrPyq9KBmawnD0zqJv362dk0hs68ZZG/IUXml5+0O7EZ
-         yoqsnIuWY1g63UUk54jbtr7XFMyV0ONAmPoPq4+b3g1VkqZbt5UmTpMm2cM8r1abLMXi
-         s07M3+p+z/jT9KDUsqVIbY+yYvJcyNq4IyhqWxB2t0uAwz/LMwM4RdpMVHCsTlk478st
-         LxQQ==
-X-Gm-Message-State: AOAM530w5nSceANeChMf5Ipz+ycYpDRDhcdv1WTjgbMZObfKTM2NEAck
-        DJzawJYnanjKZm7nkCz3ZitqrlL4xZwLehyzMgEAoramjnyE888eqY2q1GfYTpbHvxZLHyiwoLu
-        Hk2QPegOz4LLN
-X-Received: by 2002:a1c:9a06:: with SMTP id c6mr7621580wme.140.1613578004142;
-        Wed, 17 Feb 2021 08:06:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyOeuR/6k5/Yu56xP0XRWEW2iDB8En4mmF4J9uPErF7EqilyJenTCKXNRiVaeCiRpw4PziTug==
-X-Received: by 2002:a1c:9a06:: with SMTP id c6mr7621469wme.140.1613578002183;
-        Wed, 17 Feb 2021 08:06:42 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t9sm4444132wrw.76.2021.02.17.08.06.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Feb 2021 08:06:40 -0800 (PST)
-Subject: Re: [PATCH 1/7] KVM: VMX: read idt_vectoring_info a bit earlier
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <20210217145718.1217358-1-mlevitsk@redhat.com>
- <20210217145718.1217358-2-mlevitsk@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <09de977a-0275-0f4f-cf75-f45e4b5d9ca5@redhat.com>
-Date:   Wed, 17 Feb 2021 17:06:39 +0100
+        id S233968AbhBQQHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:07:21 -0500
+Received: from foss.arm.com ([217.140.110.172]:33206 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233740AbhBQQHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 11:07:21 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A2E3D113E;
+        Wed, 17 Feb 2021 08:06:35 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A65573F694;
+        Wed, 17 Feb 2021 08:06:34 -0800 (PST)
+Subject: Re: [PATCH kvmtool 03/21] ioport: Retire .generate_fdt_node
+ functionality
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-4-andre.przywara@arm.com>
+ <3f1cf056-1913-cbbf-b9cd-12d1a840c468@arm.com>
+ <20210217155428.1574884b@slackpad.fritz.box>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <7a22b213-af6f-adca-612c-225e12b5cd6e@arm.com>
+Date:   Wed, 17 Feb 2021 16:06:42 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210217145718.1217358-2-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <20210217155428.1574884b@slackpad.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/02/21 15:57, Maxim Levitsky wrote:
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b3e36dc3f164..e428d69e21c0 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6921,13 +6921,15 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (unlikely((u16)vmx->exit_reason.basic == EXIT_REASON_MCE_DURING_VMENTRY))
->  		kvm_machine_check();
->  
-> +	if (likely(!vmx->exit_reason.failed_vmentry))
-> +		vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
-> +
+Hi Andre,
 
-Any reason for the if?
+On 2/17/21 3:54 PM, Andre Przywara wrote:
+> On Thu, 11 Feb 2021 14:05:27 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+>> Hi Andre,
+>>
+>> On 12/10/20 2:28 PM, Andre Przywara wrote:
+>>> The ioport routines support a special way of registering FDT node
+>>> generator functions. There is no reason to have this separate from the
+>>> already existing way via the device header.
+>>>
+>>> Now that the only user of this special ioport variety has been
+>>> transferred, we can retire this code, to simplify ioport handling.  
+>> One comment below, but otherwise very nice cleanup.
+>>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>> ---
+>>>  include/kvm/ioport.h |  4 ----
+>>>  ioport.c             | 34 ----------------------------------
+>>>  2 files changed, 38 deletions(-)
+>>>
+>>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+>>> index d0213541..a61038e2 100644
+>>> --- a/include/kvm/ioport.h
+>>> +++ b/include/kvm/ioport.h
+>>> @@ -29,10 +29,6 @@ struct ioport {
+>>>  struct ioport_operations {
+>>>  	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+>>>  	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
+>>> -	void (*generate_fdt_node)(struct ioport *ioport, void *fdt,
+>>> -				  void (*generate_irq_prop)(void *fdt,
+>>> -							    u8 irq,
+>>> -							    enum irq_type));
+>>>  };
+>>>  
+>>>  void ioport__map_irq(u8 *irq);
+>>> diff --git a/ioport.c b/ioport.c
+>>> index 667e8386..b98836d3 100644
+>>> --- a/ioport.c
+>>> +++ b/ioport.c
+>>> @@ -56,7 +56,6 @@ static struct ioport *ioport_get(struct rb_root *root, u64 addr)
+>>>  /* Called with ioport_lock held. */
+>>>  static void ioport_unregister(struct rb_root *root, struct ioport *data)
+>>>  {
+>>> -	device__unregister(&data->dev_hdr);
+>>>  	ioport_remove(root, data);
+>>>  	free(data);
+>>>  }
+>>> @@ -70,30 +69,6 @@ static void ioport_put(struct rb_root *root, struct ioport *data)
+>>>  	mutex_unlock(&ioport_lock);
+>>>  }
+>>>  
+>>> -#ifdef CONFIG_HAS_LIBFDT
+>>> -static void generate_ioport_fdt_node(void *fdt,
+>>> -				     struct device_header *dev_hdr,
+>>> -				     void (*generate_irq_prop)(void *fdt,
+>>> -							       u8 irq,
+>>> -							       enum irq_type))
+>>> -{
+>>> -	struct ioport *ioport = container_of(dev_hdr, struct ioport, dev_hdr);
+>>> -	struct ioport_operations *ops = ioport->ops;
+>>> -
+>>> -	if (ops->generate_fdt_node)
+>>> -		ops->generate_fdt_node(ioport, fdt, generate_irq_prop);
+>>> -}
+>>> -#else
+>>> -static void generate_ioport_fdt_node(void *fdt,
+>>> -				     struct device_header *dev_hdr,
+>>> -				     void (*generate_irq_prop)(void *fdt,
+>>> -							       u8 irq,
+>>> -							       enum irq_type))
+>>> -{
+>>> -	die("Unable to generate device tree nodes without libfdt\n");
+>>> -}
+>>> -#endif
+>>> -
+>>>  int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
+>>>  {
+>>>  	struct ioport *entry;
+>>> @@ -107,10 +82,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+>>>  		.node		= RB_INT_INIT(port, port + count),
+>>>  		.ops		= ops,
+>>>  		.priv		= param,
+>>> -		.dev_hdr	= (struct device_header) {
+>>> -			.bus_type	= DEVICE_BUS_IOPORT,
+>>> -			.data		= generate_ioport_fdt_node,
+>>> -		},  
+>> Since the dev_hdr field is not used anymore, maybe it could also be removed from
+>> struct ioport in include/kvm/ioport.h?
+> I could (seems to indeed still work without it), but this whole
+> structure will go away with a later patch, so I didn't bother so far.
+> That's why I am not sure it's useful to do this at this point then.
 
-Paolo
+Yes, you're totally right, no need to fiddle too much with it now because it will
+removed later:
 
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+
+Alex
+
+>
+> Cheers,
+> Andre
+>
+>>>  		/*
+>>>  		 * Start from 0 because ioport__unregister() doesn't decrement
+>>>  		 * the reference count.
+>>> @@ -123,15 +94,10 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
+>>>  	r = ioport_insert(&ioport_tree, entry);
+>>>  	if (r < 0)
+>>>  		goto out_free;
+>>> -	r = device__register(&entry->dev_hdr);
+>>> -	if (r < 0)
+>>> -		goto out_remove;
+>>>  	mutex_unlock(&ioport_lock);
+>>>  
+>>>  	return port;
+>>>  
+>>> -out_remove:
+>>> -	ioport_remove(&ioport_tree, entry);
+>>>  out_free:
+>>>  	free(entry);
+>>>  	mutex_unlock(&ioport_lock);  
