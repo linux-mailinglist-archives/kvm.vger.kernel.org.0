@@ -2,85 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9773331D81C
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 12:24:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCAFC31D909
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 13:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231483AbhBQLWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 06:22:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbhBQLVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 06:21:45 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A659C061574
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 03:21:05 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id a4so6708157pgc.11
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 03:21:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=i6f3GZ8jdDvgbs0AJK9wY2MdXfBUn9J76vvvhk6rUzQ=;
-        b=BXfpnpf1tEDVdt0zSqhShr3IJ3HDd5f/dzBuXW/ga7x6DAq2pwJ8hMm0j7lOURobcY
-         xLabBJ7qmv6NyW+Ib/mIP3usdLSoMTW5syXcJE2Cl3YD05vtSJPhNLdfGfmjwbcrYWUU
-         8h71BUj6frkglDOXfnX1vy1eQoW+Rq3qxjIYacNMOYWIW/4ruZL4BgSdwEi7iIj+DZkD
-         oz2RPudYZPBurvF+iHOTSWgq2rC5hPYL37LDttAPv4c5cJwwne763RTsAkbs+WesfJp7
-         YpUeJzte+NK+DXmJqNVlASu9lnkk2miPhOEXFh/2Grc6whnN/FhwWCNZgBzZHoaFoUqN
-         RM2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=i6f3GZ8jdDvgbs0AJK9wY2MdXfBUn9J76vvvhk6rUzQ=;
-        b=Rq/iDT9Yjpbz34cWn5QxnCAbyXsiMBgiCJNiz81IF8Qpauk/AsSIXL783eEyt8Fgy6
-         ku8TjmL/V8EVfOCTNU9wpSCiEboWMmHi5WtuNPQb7euLSZPPuQc/Je2CRwdMD7bJFIIT
-         JdMIeIOlOa4L67Us8BUVgAfjlm7iFiKujLUOEUAiZ2yepLUfcArCacxU4ySkARXm8Is2
-         oUoOi0PLFcNHkLu90W5quHV4EefoLFOJR3e43CTheZ6wqRchE/d9reAktylJTCJeHNzD
-         ETM2zhU1L7rZJ0WPNpVGHoUWtrB30G5bVT5mSMKW+bMeclBz6qxmJfbOctDYxSIqeBQ2
-         7Twg==
-X-Gm-Message-State: AOAM531tGLt24uyWuS47V7fMWcBEOp+wGaUM2YXQDwOfr89iFrn4nG5M
-        1yy01DMH+nZbpcf+EEQCMnaqhdG+ma9lGAV0gPQ=
-X-Google-Smtp-Source: ABdhPJxnMSdsOKBDhot8t2lbuadLZ52XpYW7Jies9d7/3O9VtW7EQGfaVeGbIyZOc5+Ue61YQUfvQ7XILuvqF+YQPh4=
-X-Received: by 2002:a62:683:0:b029:1ec:c88c:8ea2 with SMTP id
- 125-20020a6206830000b02901ecc88c8ea2mr6215189pfg.27.1613560864360; Wed, 17
- Feb 2021 03:21:04 -0800 (PST)
+        id S232549AbhBQMDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 07:03:31 -0500
+Received: from 8bytes.org ([81.169.241.247]:55946 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232583AbhBQMDA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 07:03:00 -0500
+Received: from cap.home.8bytes.org (p549adcf6.dip0.t-ipconnect.de [84.154.220.246])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by theia.8bytes.org (Postfix) with ESMTPSA id 2E8D9246;
+        Wed, 17 Feb 2021 13:02:08 +0100 (CET)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     x86@kernel.org
+Cc:     Joerg Roedel <joro@8bytes.org>, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH 0/3] x86/sev-es: Check for trusted regs->sp in __sev_es_ist_enter()
+Date:   Wed, 17 Feb 2021 13:01:40 +0100
+Message-Id: <20210217120143.6106-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-References: <CAJSP0QWWg__21otbMXAXWGD1FaHYLzZP7axZ47Unq6jtMvdfsA@mail.gmail.com>
- <1613136163375.99584@amazon.com>
-In-Reply-To: <1613136163375.99584@amazon.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Wed, 17 Feb 2021 11:20:53 +0000
-Message-ID: <CAJSP0QXEvw6o7XFk9FXudr9PmorFHiOuNRg16DjJhBgj_qC-FQ@mail.gmail.com>
-Subject: Re: [Rust-VMM] Call for Google Summer of Code 2021 project ideas
-To:     "Florescu, Andreea" <fandree@amazon.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        "rust-vmm@lists.opendev.org" <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Alexander Graf <agraf@csgraf.de>,
-        Alberto Garcia <berto@igalia.com>,
-        David Hildenbrand <david@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Julia Suvorova <jusual@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks, I have published the rust-vmm project ideas on the wiki:
-https://wiki.qemu.org/Google_Summer_of_Code_2021
+From: Joerg Roedel <jroedel@suse.de>
 
-Please see Sergio's reply about virtio-consoile is libkrun. Maybe it
-affects the project idea?
+Hi,
 
-Stefan
+here are some changes to the Linux SEV-ES code to check whether the
+value in regs->sp can be trusted, before checking whether it points to
+the #VC IST stack.
+
+Andy Lutomirski reported that it is entirely possible to reach this
+function with a regs->sp value which was set by user-space. So check
+for this condition and don't use regs->sp if it can't be trusted.
+
+Also improve the comments around __sev_es_ist_enter/exit() to better
+explain what these function do and why they are there.
+
+Please review.
+
+Thanks,
+
+	Joerg
+
+Joerg Roedel (3):
+  x86/sev-es: Introduce from_syscall_gap() helper
+  x86/sev-es: Check if regs->sp is trusted before adjusting #VC IST
+    stack
+  x86/sev-es: Improve comments in and around __sev_es_ist_enter/exit()
+
+ arch/x86/include/asm/ptrace.h |  8 ++++++++
+ arch/x86/kernel/sev-es.c      | 27 +++++++++++++++++++--------
+ arch/x86/kernel/traps.c       |  3 +--
+ 3 files changed, 28 insertions(+), 10 deletions(-)
+
+-- 
+2.30.0
+
