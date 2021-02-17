@@ -2,160 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7D4331DCC5
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:58:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ABB131DCC8
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:58:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233886AbhBQP4Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 10:56:16 -0500
-Received: from foss.arm.com ([217.140.110.172]:32942 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233645AbhBQP4P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 10:56:15 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E2AA4ED1;
-        Wed, 17 Feb 2021 07:55:29 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AAB543F694;
-        Wed, 17 Feb 2021 07:55:28 -0800 (PST)
-Date:   Wed, 17 Feb 2021 15:54:28 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH kvmtool 03/21] ioport: Retire .generate_fdt_node
- functionality
-Message-ID: <20210217155428.1574884b@slackpad.fritz.box>
-In-Reply-To: <3f1cf056-1913-cbbf-b9cd-12d1a840c468@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
-        <20201210142908.169597-4-andre.przywara@arm.com>
-        <3f1cf056-1913-cbbf-b9cd-12d1a840c468@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S233898AbhBQP4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 10:56:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42969 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233891AbhBQP4u (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 10:56:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613577324;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YS3nxZW1QzFmYQoRE9ZNNk1HsBK/ykLDpT4WFPyqals=;
+        b=Rz5mThWHUAKDa6554xLfbjwH72+73JQ0G+kjPq1VBK2jyFEBIo989vR3VYSs9HZ7rRWqFl
+        l+LHNjbcLxMkMpo5pRcfFcMWhpmPh0WkCcYOrgkZmaKSG+xqXjpcOsHa3RBs4YgR9soQRC
+        OCs2DGzgrOlZC/FXLJafvKEgRqkyvf0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-588-hhIhBlgvO-aonsf_87Fx5Q-1; Wed, 17 Feb 2021 10:55:20 -0500
+X-MC-Unique: hhIhBlgvO-aonsf_87Fx5Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2408192CC46;
+        Wed, 17 Feb 2021 15:55:19 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-116.ams2.redhat.com [10.36.112.116])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 20B885C67A;
+        Wed, 17 Feb 2021 15:55:13 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 4/8] s390x: Introduce and use
+ CALL_INT_HANDLER macro
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        pmorel@linux.ibm.com, david@redhat.com
+References: <20210217144116.3368-1-frankja@linux.ibm.com>
+ <20210217144116.3368-5-frankja@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <313546fb-35df-22ab-79f8-d5b49286058f@redhat.com>
+Date:   Wed, 17 Feb 2021 16:55:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210217144116.3368-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Feb 2021 14:05:27 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Hi Andre,
+On 17/02/2021 15.41, Janosch Frank wrote:
+> The ELF ABI dictates that we need to allocate 160 bytes of stack space
+> for the C functions we're calling. Since we would need to do that for
+> every interruption handler which, combined with the new stack argument
+> being saved in GR2, makes cstart64.S look a bit messy.
 > 
-> On 12/10/20 2:28 PM, Andre Przywara wrote:
-> > The ioport routines support a special way of registering FDT node
-> > generator functions. There is no reason to have this separate from the
-> > already existing way via the device header.
-> >
-> > Now that the only user of this special ioport variety has been
-> > transferred, we can retire this code, to simplify ioport handling.  
+> So let's introduce the CALL_INT_HANDLER macro that handles all of
+> that, calls the C interrupt handler and handles cleanup afterwards.
 > 
-> One comment below, but otherwise very nice cleanup.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   s390x/cstart64.S | 28 +++++-----------------------
+>   s390x/macros.S   | 17 +++++++++++++++++
+>   2 files changed, 22 insertions(+), 23 deletions(-)
 > 
-> >
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  include/kvm/ioport.h |  4 ----
-> >  ioport.c             | 34 ----------------------------------
-> >  2 files changed, 38 deletions(-)
-> >
-> > diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> > index d0213541..a61038e2 100644
-> > --- a/include/kvm/ioport.h
-> > +++ b/include/kvm/ioport.h
-> > @@ -29,10 +29,6 @@ struct ioport {
-> >  struct ioport_operations {
-> >  	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> >  	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> > -	void (*generate_fdt_node)(struct ioport *ioport, void *fdt,
-> > -				  void (*generate_irq_prop)(void *fdt,
-> > -							    u8 irq,
-> > -							    enum irq_type));
-> >  };
-> >  
-> >  void ioport__map_irq(u8 *irq);
-> > diff --git a/ioport.c b/ioport.c
-> > index 667e8386..b98836d3 100644
-> > --- a/ioport.c
-> > +++ b/ioport.c
-> > @@ -56,7 +56,6 @@ static struct ioport *ioport_get(struct rb_root *root, u64 addr)
-> >  /* Called with ioport_lock held. */
-> >  static void ioport_unregister(struct rb_root *root, struct ioport *data)
-> >  {
-> > -	device__unregister(&data->dev_hdr);
-> >  	ioport_remove(root, data);
-> >  	free(data);
-> >  }
-> > @@ -70,30 +69,6 @@ static void ioport_put(struct rb_root *root, struct ioport *data)
-> >  	mutex_unlock(&ioport_lock);
-> >  }
-> >  
-> > -#ifdef CONFIG_HAS_LIBFDT
-> > -static void generate_ioport_fdt_node(void *fdt,
-> > -				     struct device_header *dev_hdr,
-> > -				     void (*generate_irq_prop)(void *fdt,
-> > -							       u8 irq,
-> > -							       enum irq_type))
-> > -{
-> > -	struct ioport *ioport = container_of(dev_hdr, struct ioport, dev_hdr);
-> > -	struct ioport_operations *ops = ioport->ops;
-> > -
-> > -	if (ops->generate_fdt_node)
-> > -		ops->generate_fdt_node(ioport, fdt, generate_irq_prop);
-> > -}
-> > -#else
-> > -static void generate_ioport_fdt_node(void *fdt,
-> > -				     struct device_header *dev_hdr,
-> > -				     void (*generate_irq_prop)(void *fdt,
-> > -							       u8 irq,
-> > -							       enum irq_type))
-> > -{
-> > -	die("Unable to generate device tree nodes without libfdt\n");
-> > -}
-> > -#endif
-> > -
-> >  int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
-> >  {
-> >  	struct ioport *entry;
-> > @@ -107,10 +82,6 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
-> >  		.node		= RB_INT_INIT(port, port + count),
-> >  		.ops		= ops,
-> >  		.priv		= param,
-> > -		.dev_hdr	= (struct device_header) {
-> > -			.bus_type	= DEVICE_BUS_IOPORT,
-> > -			.data		= generate_ioport_fdt_node,
-> > -		},  
+> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
+> index 35d20293..666a9567 100644
+> --- a/s390x/cstart64.S
+> +++ b/s390x/cstart64.S
+> @@ -92,37 +92,19 @@ memsetxc:
+>   
+>   .section .text
+>   pgm_int:
+> -	SAVE_REGS_STACK
+> -	lgr     %r2, %r15
+> -	brasl	%r14, handle_pgm_int
+> -	RESTORE_REGS_STACK
+> -	lpswe	GEN_LC_PGM_OLD_PSW
+> +	CALL_INT_HANDLER handle_pgm_int, GEN_LC_PGM_OLD_PSW
+>   
+>   ext_int:
+> -	SAVE_REGS_STACK
+> -	lgr     %r2, %r15
+> -	brasl	%r14, handle_ext_int
+> -	RESTORE_REGS_STACK
+> -	lpswe	GEN_LC_EXT_OLD_PSW
+> +	CALL_INT_HANDLER handle_ext_int, GEN_LC_EXT_OLD_PSW
+>   
+>   mcck_int:
+> -	SAVE_REGS_STACK
+> -	brasl	%r14, handle_mcck_int
+> -	RESTORE_REGS_STACK
+> -	lpswe	GEN_LC_MCCK_OLD_PSW
+> +	CALL_INT_HANDLER handle_mcck_int, GEN_LC_MCCK_OLD_PSW
+>   
+>   io_int:
+> -	SAVE_REGS_STACK
+> -	lgr     %r2, %r15
+> -	brasl	%r14, handle_io_int
+> -	RESTORE_REGS_STACK
+> -	lpswe	GEN_LC_IO_OLD_PSW
+> +	CALL_INT_HANDLER handle_io_int, GEN_LC_IO_OLD_PSW
+>   
+>   svc_int:
+> -	SAVE_REGS_STACK
+> -	brasl	%r14, handle_svc_int
+> -	RESTORE_REGS_STACK
+> -	lpswe	GEN_LC_SVC_OLD_PSW
+> +	CALL_INT_HANDLER handle_svc_int, GEN_LC_SVC_OLD_PSW
+>   
+>   	.align	8
+>   initial_psw:
+> diff --git a/s390x/macros.S b/s390x/macros.S
+> index a7d62c6f..212a3823 100644
+> --- a/s390x/macros.S
+> +++ b/s390x/macros.S
+> @@ -11,6 +11,23 @@
+>    *  David Hildenbrand <david@redhat.com>
+>    */
+>   #include <asm/asm-offsets.h>
+> +/*
+> + * Exception handler macro that saves registers on the stack,
+> + * allocates stack space and calls the C handler function. Afterwards
+> + * we re-load the registers and load the old PSW.
+> + */
+> +	.macro CALL_INT_HANDLER c_func, old_psw
+> +	SAVE_REGS_STACK
+> +	/* Save the stack address in GR2 which is the first function argument */
+> +	lgr     %r2, %r15
+> +	/* Allocate stack pace for called C function, as specified in s390 ELF ABI */
+> +	slgfi   %r15, 160
+
+By the way, don't you have to store a back chain pointer at the bottom of 
+that area, too, if you want to use -mbackchoin in the next patch?
+
+  Thomas
+
+
+> +	brasl	%r14, \c_func
+> +	algfi   %r15, 160
+> +	RESTORE_REGS_STACK
+> +	lpswe	\old_psw
+> +	.endm
+> +
+>   	.macro SAVE_REGS
+>   	/* save grs 0-15 */
+>   	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
 > 
-> Since the dev_hdr field is not used anymore, maybe it could also be removed from
-> struct ioport in include/kvm/ioport.h?
-
-I could (seems to indeed still work without it), but this whole
-structure will go away with a later patch, so I didn't bother so far.
-That's why I am not sure it's useful to do this at this point then.
-
-Cheers,
-Andre
-
-> >  		/*
-> >  		 * Start from 0 because ioport__unregister() doesn't decrement
-> >  		 * the reference count.
-> > @@ -123,15 +94,10 @@ int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, i
-> >  	r = ioport_insert(&ioport_tree, entry);
-> >  	if (r < 0)
-> >  		goto out_free;
-> > -	r = device__register(&entry->dev_hdr);
-> > -	if (r < 0)
-> > -		goto out_remove;
-> >  	mutex_unlock(&ioport_lock);
-> >  
-> >  	return port;
-> >  
-> > -out_remove:
-> > -	ioport_remove(&ioport_tree, entry);
-> >  out_free:
-> >  	free(entry);
-> >  	mutex_unlock(&ioport_lock);  
 
