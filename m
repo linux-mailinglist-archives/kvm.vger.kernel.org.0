@@ -2,114 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C098131DD5F
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:31:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1763F31DD9A
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:47:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234129AbhBQQbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 11:31:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57057 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233084AbhBQQa6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:30:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613579372;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ogjeFLx6f8wS8oULOo5urcfaXCqjTKbtarJ5n6850Gk=;
-        b=V1J8j/dYDN3kx1FVAv+f436QCyT0AmzVZunL8mm1JERGVrWcMQekMEHqtPJezIUNPWrUm2
-        /uF5/0ixZ3kNlNe0EV+ggZomAyLIQCGe1jy36SRrnDC7AhefDAtPoHj/B8qDxgjhsD0VX6
-        jAsfDUb61RHl4XrEmF5qtO74uUIBPNo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-0j2Usa0AO_-sDGl0stM_JA-1; Wed, 17 Feb 2021 11:29:30 -0500
-X-MC-Unique: 0j2Usa0AO_-sDGl0stM_JA-1
-Received: by mail-wm1-f69.google.com with SMTP id u186so2234635wmb.0
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:29:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ogjeFLx6f8wS8oULOo5urcfaXCqjTKbtarJ5n6850Gk=;
-        b=jy4p9oRZzqFcfCuQeCCVFHOlKghEpxb5Qe7rtNDUSSuzW9o2MXBOV6WMmZrRgPxBEv
-         sa1BXV38aaJLB+NRyi1hCwRtwEwRODTvAjlLGH4sr13vFgboCsleQEfIeodMNjiagNAq
-         bRyODPIYLwejsWerOKadVSteJnKKeDbLlsYrCugUzXhhtQ35OTUFQf3jEeUNMsg0OPi7
-         NegVPABBYyVNzY0fQuctIFGUzZTY9Dk2rkeNvGcNdDkf5N3sVNENv5VS20XOY9+yFXbA
-         JSfCzoONfdPRyIHG5FShvVt3iNR/du4QNIhzXLxdgeZA66EnUCvF9zIx0N3zLb3yjYlp
-         VibA==
-X-Gm-Message-State: AOAM532eSLgWpl2b1ECbd5SlqDxTiXOLAWQVsmsrHg/ElTRUIr9ExsUz
-        nekMaqze6uR6kxidKoY6QEjVbokKfDdbHP79JDDU+vfn55FKJeWC+R62pwMcf7ex/ZRFLbShj5j
-        ZVRwR786VSdDN
-X-Received: by 2002:a5d:66c5:: with SMTP id k5mr67292wrw.302.1613579369181;
-        Wed, 17 Feb 2021 08:29:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyGiKt9ZaoBvLpCf/2NQOYGBsJJzApNDzwuDqPtEiFGGB8EW6xroD1eYyxOkbO4a1JPNMNw8g==
-X-Received: by 2002:a5d:66c5:: with SMTP id k5mr67272wrw.302.1613579368980;
-        Wed, 17 Feb 2021 08:29:28 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id s23sm3820305wmc.29.2021.02.17.08.29.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Feb 2021 08:29:27 -0800 (PST)
-Subject: Re: [PATCH 1/7] KVM: VMX: read idt_vectoring_info a bit earlier
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <20210217145718.1217358-1-mlevitsk@redhat.com>
- <20210217145718.1217358-2-mlevitsk@redhat.com>
- <09de977a-0275-0f4f-cf75-f45e4b5d9ca5@redhat.com>
- <666eb754189a380899b82e0a9798eb2560ae6972.camel@redhat.com>
- <YC1Cljte2ozGSKV/@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <26f7ee7b-568f-c838-d0e0-db125cfbd4e5@redhat.com>
-Date:   Wed, 17 Feb 2021 17:29:26 +0100
+        id S234249AbhBQQrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:47:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60350 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233986AbhBQQrD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:47:03 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11HGXifq029905;
+        Wed, 17 Feb 2021 11:46:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=qm4KK/xRpXnLHX8hdWM/BnjzFFuIgNTkaPz5F6Yh+Dc=;
+ b=ggv6bcdVQ++Lrls6RSr1khq8Y6MmSivo9/cSrvz6jJxFbpUXPQq9cu862q6aYHUzKpaU
+ 5tn2xzOJrZPWnerCu3IOxuBApENDriRwz3+CS8Zr8doM28k4QYej+pdkaq2nhE9sEpbB
+ mMYGWAjghqOvzGRinqI5AavgrdSueEeHO/vKYaJLeEAo6mfyoeuFUSJMPvHmbAS0LBGG
+ i2vFcOG06japlKY9R9HttB5FvpAgLJ6BqvCESzM69/ABWxLf8MLAK7zAKAttsRC5EuAF
+ APmTAGj4scqBltEaty9oE9ygSeFwJMionWHleL1x5xYh3ikPIRzDppRmbG51Qe/Yanjr aA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s63t9m68-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 11:46:22 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11HGYdCI035198;
+        Wed, 17 Feb 2021 11:46:21 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s63t9m53-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 11:46:21 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11HGRhAW011313;
+        Wed, 17 Feb 2021 16:46:19 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 36p61hbv2d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 16:46:19 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11HGk4w335914218
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Feb 2021 16:46:04 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3220C52050;
+        Wed, 17 Feb 2021 16:46:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.1.64])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CCEBD52054;
+        Wed, 17 Feb 2021 16:46:15 +0000 (GMT)
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        pmorel@linux.ibm.com, david@redhat.com
+References: <20210217144116.3368-1-frankja@linux.ibm.com>
+ <20210217144116.3368-9-frankja@linux.ibm.com>
+ <4fd224a2-1c4d-1663-6615-685eadcf81f6@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 8/8] s390x: Remove SAVE/RESTORE_stack
+Message-ID: <bd386faf-c635-970a-6be8-659f5f6b4ba8@linux.ibm.com>
+Date:   Wed, 17 Feb 2021 17:46:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <YC1Cljte2ozGSKV/@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <4fd224a2-1c4d-1663-6615-685eadcf81f6@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-17_13:2021-02-16,2021-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 malwarescore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ clxscore=1015 mlxscore=0 impostorscore=0 bulkscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102170122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/02/21 17:21, Sean Christopherson wrote:
-> On Wed, Feb 17, 2021, Maxim Levitsky wrote:
->> On Wed, 2021-02-17 at 17:06 +0100, Paolo Bonzini wrote:
->>> On 17/02/21 15:57, Maxim Levitsky wrote:
->>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->>>> index b3e36dc3f164..e428d69e21c0 100644
->>>> --- a/arch/x86/kvm/vmx/vmx.c
->>>> +++ b/arch/x86/kvm/vmx/vmx.c
->>>> @@ -6921,13 +6921,15 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>>>   	if (unlikely((u16)vmx->exit_reason.basic == EXIT_REASON_MCE_DURING_VMENTRY))
->>>>   		kvm_machine_check();
->>>>   
->>>> +	if (likely(!vmx->exit_reason.failed_vmentry))
->>>> +		vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
->>>> +
->>>
->>> Any reason for the if?
+On 2/17/21 5:18 PM, Thomas Huth wrote:
+> On 17/02/2021 15.41, Janosch Frank wrote:
+>> There are no more users.
 >>
->> Sean Christopherson asked me to do this to avoid updating idt_vectoring_info on failed
->> VM entry, to keep things as they were logically before this patch.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   s390x/macros.S | 29 -----------------------------
+>>   1 file changed, 29 deletions(-)
+>>
+>> diff --git a/s390x/macros.S b/s390x/macros.S
+>> index 212a3823..399a87c6 100644
+>> --- a/s390x/macros.S
+>> +++ b/s390x/macros.S
+>> @@ -28,35 +28,6 @@
+>>   	lpswe	\old_psw
+>>   	.endm
+>>   
+>> -	.macro SAVE_REGS
+>> -	/* save grs 0-15 */
+>> -	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
+>> -	/* save crs 0-15 */
+>> -	stctg	%c0, %c15, GEN_LC_SW_INT_CRS
+>> -	/* load a cr0 that has the AFP control bit which enables all FPRs */
+>> -	larl	%r1, initial_cr0
+>> -	lctlg	%c0, %c0, 0(%r1)
+>> -	/* save fprs 0-15 + fpc */
+>> -	la	%r1, GEN_LC_SW_INT_FPRS
+>> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> -	std	\i, \i * 8(%r1)
+>> -	.endr
+>> -	stfpc	GEN_LC_SW_INT_FPC
+>> -	.endm
+>> -
+>> -	.macro RESTORE_REGS
+>> -	/* restore fprs 0-15 + fpc */
+>> -	la	%r1, GEN_LC_SW_INT_FPRS
+>> -	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+>> -	ld	\i, \i * 8(%r1)
+>> -	.endr
+>> -	lfpc	GEN_LC_SW_INT_FPC
 > 
-> Ya, specifically because the field isn't valid if VM-Enter fails.  I'm also ok
-> with an unconditional VMREAD if we add a comment stating that it's unnecessary
-> if VM-Enter failed, but faster in the common case.
+> Could we now also remove the sw_int_fprs and sw_int_fpc from the lowcore?
+> 
+>   Thomas
+> 
 
-It's okay, just good to know!
+git grep tells me that we can.
+Do you want to have both the offset macro and the struct member removed
+or only the macro?
 
-Thanks,
-
-paolo
-
+We'll still need the grs and crs for the cpu setup in lib/s390x/smp.c
