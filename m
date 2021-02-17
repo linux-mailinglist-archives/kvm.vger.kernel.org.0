@@ -2,115 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1980E31DD16
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:15:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E014A31DD29
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:21:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234146AbhBQQOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 11:14:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234135AbhBQQNw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 11:13:52 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6797CC061756
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:13:12 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id ba1so7662071plb.1
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:13:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=30obSL6wNoXFckVZgqPZYM3QP6QIWGyiK7vFvnqdzsc=;
-        b=uMcxqdXTNNbAbHrPi3G1vCKyjA5zEkRIsBX4o5BMlHNrbUndUYMFl3/Nn2C4stNK67
-         47C3V5ZBfV4pPQpdrUjEtvQimOKxcpNoJqVmiaT1eg19JROswfZEOvUeVycCpVOTWueO
-         E8C5xkypv0DAHJz0zWUprp2lflWttCQ8nV/dlqVPr12YIcv6QoI9x6pLkKqm4UcFvFks
-         rRu9azNmLqRHl0mcfSUcuzS7JeqXkGIfaOZYwsGQ2hSjBVUROEJMU3FU+N49Hf95pAC5
-         jv4GiyvYx2ef8pjKB+Z/5lz1frOibN1bwOvKaj31tt+fly7rxZaS4KvxQg2RDLhmtWA+
-         mDbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=30obSL6wNoXFckVZgqPZYM3QP6QIWGyiK7vFvnqdzsc=;
-        b=eCCzeZExsTiG1uWszu/StDPfXGZOVboTuD9+4ibnBc4nGbnjirvIHCveLp3Sk6O0xK
-         f9TaeH9Qhao2HohNMhs7HlwtcuKSHNxF4xAQT9Km6xa8SlbcAbID2rm8OH0jG6tj+meI
-         cNsbgGi2tHhyF6nzRiUY83gIZWnxXHvaLRo4Z4OH/tCqzGFjQ0qPqJ1hSDBLDreWACh2
-         FS/4YBLHvOmIwTHTaQf5jVAYWYhouOkzlE6oGHvXYBIFlpix5q76DRA2xHTrWrFhVtC3
-         HMBbC4rq3ORy0xr29mN13KIC5Udy+QBL2JOGq9BXDEI9kbkOu7Lno8WloDHHApxsJdnR
-         zfxQ==
-X-Gm-Message-State: AOAM533eUjaAtLAply/zZGCE7NLgM/ZOa16F9oX3y3JHoBo4oXOJGYH8
-        EcpZnkz6KZUCGdVoKHdLitkNWw==
-X-Google-Smtp-Source: ABdhPJyfKy2Cz1wXMvzNBd+cA8KhTW+umCAlEIA2Ctay8I7b4LKIUZ2LOEJzneCCMkuYOtND/wuWbA==
-X-Received: by 2002:a17:90a:1503:: with SMTP id l3mr9758253pja.41.1613578391687;
-        Wed, 17 Feb 2021 08:13:11 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
-        by smtp.gmail.com with ESMTPSA id 8sm3129452pfp.171.2021.02.17.08.13.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Feb 2021 08:13:11 -0800 (PST)
-Date:   Wed, 17 Feb 2021 08:13:04 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
- ioctl
-Message-ID: <YC1AkNPNET+T928c@google.com>
-References: <cover.1612398155.git.ashish.kalra@amd.com>
- <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
- <YCxrV4u98ZQtInOE@google.com>
- <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+        id S234039AbhBQQUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:20:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34240 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234015AbhBQQUB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:20:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613578715;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gSopKRjxSoVocCtQC39gpXrfRXN9hZVDEXQjfMG00wI=;
+        b=PhMa8IyxVXCoomgz46TVwu+/UZGXncXqHHBNJHGGScve1x2lMysGN0FkJhKQWizk4LY5/v
+        DMM7l5dqEAdUECzQOlsZasjvrlcMJ52gmUJv0eKjaIku6aY41fv8xEKudB8xn7qREnGfuE
+        ISEsd5V55sVgqBcyRBscsjDKOXHTjWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-tDoSXVT9P9WbUFO6cZN0-w-1; Wed, 17 Feb 2021 11:18:33 -0500
+X-MC-Unique: tDoSXVT9P9WbUFO6cZN0-w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 323E5107ACE8;
+        Wed, 17 Feb 2021 16:18:30 +0000 (UTC)
+Received: from starship (unknown [10.35.206.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7982C60C6E;
+        Wed, 17 Feb 2021 16:18:25 +0000 (UTC)
+Message-ID: <666eb754189a380899b82e0a9798eb2560ae6972.camel@redhat.com>
+Subject: Re: [PATCH 1/7] KVM: VMX: read idt_vectoring_info a bit earlier
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+Date:   Wed, 17 Feb 2021 18:18:24 +0200
+In-Reply-To: <09de977a-0275-0f4f-cf75-f45e4b5d9ca5@redhat.com>
+References: <20210217145718.1217358-1-mlevitsk@redhat.com>
+         <20210217145718.1217358-2-mlevitsk@redhat.com>
+         <09de977a-0275-0f4f-cf75-f45e4b5d9ca5@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 17, 2021, Kalra, Ashish wrote:
-> From: Sean Christopherson <seanjc@google.com> 
-> On Thu, Feb 04, 2021, Ashish Kalra wrote:
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > The ioctl is used to retrieve a guest's shared pages list.
+On Wed, 2021-02-17 at 17:06 +0100, Paolo Bonzini wrote:
+> On 17/02/21 15:57, Maxim Levitsky wrote:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index b3e36dc3f164..e428d69e21c0 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -6921,13 +6921,15 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >  	if (unlikely((u16)vmx->exit_reason.basic == EXIT_REASON_MCE_DURING_VMENTRY))
+> >  		kvm_machine_check();
+> >  
+> > +	if (likely(!vmx->exit_reason.failed_vmentry))
+> > +		vmx->idt_vectoring_info = vmcs_read32(IDT_VECTORING_INFO_FIELD);
+> > +
 > 
-> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS is passed
-> >through to userspace?  That way, userspace could manage the set of pages >in
-> >whatever data structure they want, and these get/set ioctls go away.
+> Any reason for the if?
+
+Sean Christopherson asked me to do this to avoid updating idt_vectoring_info on failed
+VM entry, to keep things as they were logically before this patch.
+
+Best regards,
+	Maxim Levitsky
+
 > 
-> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to user-space
-> ?
+> Paolo
 > 
-> As such it is just a simple interface to get the shared page list via the
-> get/set ioctl's. simply an array is passed to these ioctl to get/set the
-> shared pages list.
 
-It eliminates any probability of the kernel choosing the wrong data structure,
-and it's two fewer ioctls to maintain and test.
 
-> >Also, aren't there plans for an in-guest migration helper?  If so, do we
-> >have any idea what that interface will look like?  E.g. if we're going to
-> >end up with a full >fledged driver in the guest, why not bite the bullet now
-> >and bypass KVM entirely?
-> 
-> Even the in-guest migration helper will be using page encryption status
-> hypercalls, so some interface is surely required.
-
-If it's a driver with a more extensive interace, then the hypercalls can be
-replaced by a driver operation.  That's obviously a big if, though.
-
-> Also the in-guest migration will be mainly an OVMF component, won't  really
-> be a full fledged kernel driver in the guest.
-
-Is there code and/or a description of what the proposed helper would look like?
