@@ -2,340 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2DB831DD0C
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:12:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6006531DD12
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:14:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234092AbhBQQMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 11:12:40 -0500
-Received: from foss.arm.com ([217.140.110.172]:33322 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233982AbhBQQMU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 11:12:20 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DEBB91063;
-        Wed, 17 Feb 2021 08:11:33 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3BC43F694;
-        Wed, 17 Feb 2021 08:11:32 -0800 (PST)
-Subject: Re: [PATCH kvmtool 19/21] Remove ioport specific routines
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-20-andre.przywara@arm.com>
- <05a0df3a-625f-74de-8014-e78aee9e8427@arm.com>
-Message-ID: <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
-Date:   Wed, 17 Feb 2021 16:11:51 +0000
+        id S234102AbhBQQNW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:13:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45188 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233982AbhBQQNG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:13:06 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11HG4Qwq156529;
+        Wed, 17 Feb 2021 11:12:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=gZZy4shRbyB4GxdZc61mS7tg83C6TUCJr2wq6YTRaMU=;
+ b=ELH+Edvv8iN1P48z2Ey0u0ctIkKMV+3Izy8DV7+oC1FCgY88hojaLmDusjByiQG5FVFt
+ iNAlFy6EhvizD9irqWrGVfP8gyT2do/J0SV0pHwqtdjonqmBVGrphaXp3UdweICTkL7n
+ WhEiXddrHvHPXj6sphOtgSkYKPg1P6gQr7zG2QrZBz2B9Gh9wo2LyRq4PupZG3oQHdnJ
+ mo1FTKZUnHvDIo2xCZYhi3ycW75gSloYhtKU9dYVML5mnKKlrjZ63u7Kf3eQIHwkDK8E
+ Ua0Cvyq4xJdFv7rXLPhRdj2+72GmN0jbfI+xd+OgBPu8RzCGjWtoPPqjkuTgx3z6YwqP Vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s588351c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 11:12:22 -0500
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11HG4sJp159292;
+        Wed, 17 Feb 2021 11:12:22 -0500
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s5883500-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 11:12:22 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11HG2UNG028682;
+        Wed, 17 Feb 2021 16:12:19 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma02fra.de.ibm.com with ESMTP id 36p6d8j0u6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 16:12:19 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11HGCGeR62587312
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Feb 2021 16:12:16 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B1B652050;
+        Wed, 17 Feb 2021 16:12:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.1.64])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E95505204E;
+        Wed, 17 Feb 2021 16:12:15 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: Provide preliminary
+ backtrace support
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        pmorel@linux.ibm.com, david@redhat.com
+References: <20210217144116.3368-1-frankja@linux.ibm.com>
+ <20210217144116.3368-6-frankja@linux.ibm.com>
+ <1bba9659-efa4-192a-ef60-ab62069f2901@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Message-ID: <81d9d0f4-691e-50c5-6e9d-afa8ebb73d48@linux.ibm.com>
+Date:   Wed, 17 Feb 2021 17:12:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <05a0df3a-625f-74de-8014-e78aee9e8427@arm.com>
+In-Reply-To: <1bba9659-efa4-192a-ef60-ab62069f2901@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-17_13:2021-02-16,2021-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 adultscore=0
+ malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2102170122
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
-
-On 2/17/21 3:49 PM, Alexandru Elisei wrote:
-> Hi Andre,
->
-> On 12/10/20 2:29 PM, Andre Przywara wrote:
->> Now that all users of the dedicated ioport trap handler interface are
->> gone, we can retire the code associated with it.
+On 2/17/21 5:01 PM, Thomas Huth wrote:
+> On 17/02/2021 15.41, Janosch Frank wrote:
+>> After the stack changes we can finally use -mbackchain and have a
+>> working backtrace.
 >>
->> This removes ioport.c and ioport.h, along with removing prototypes from
->> other header files.
->>
->> This also transfers the responsibility for port I/O trap handling
->> entirely into the new routine in mmio.c.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  Makefile             |   1 -
->>  include/kvm/ioport.h |  20 -----
->>  include/kvm/kvm.h    |   2 -
->>  ioport.c             | 173 -------------------------------------------
->>  mmio.c               |   2 +-
->>  5 files changed, 1 insertion(+), 197 deletions(-)
->>  delete mode 100644 ioport.c
+>>   lib/s390x/interrupt.c | 12 ++++++++++++
+>>   lib/s390x/stack.c     | 20 ++++++++++++++------
+>>   s390x/Makefile        |  1 +
+>>   3 files changed, 27 insertions(+), 6 deletions(-)
 >>
->> diff --git a/Makefile b/Makefile
->> index 35bb1182..94ff5da6 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -56,7 +56,6 @@ OBJS	+= framebuffer.o
->>  OBJS	+= guest_compat.o
->>  OBJS	+= hw/rtc.o
->>  OBJS	+= hw/serial.o
->> -OBJS	+= ioport.o
->>  OBJS	+= irq.o
->>  OBJS	+= kvm-cpu.o
->>  OBJS	+= kvm.o
->> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->> index a61038e2..38636553 100644
->> --- a/include/kvm/ioport.h
->> +++ b/include/kvm/ioport.h
->> @@ -17,28 +17,8 @@
->>  
->>  struct kvm;
-> Looks to me like the above forward declaration can be removed; same for all the
-> includes except linux/byteorder.h, needed for the lexx_to_cpu/cpu_to_lexx
-> functions, and linux/types.h for the uxx typedefs. Otherwise looks good.
+>> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+>> index a59df80e..23ad922c 100644
+>> --- a/lib/s390x/interrupt.c
+>> +++ b/lib/s390x/interrupt.c
+>> @@ -115,6 +115,18 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
+>>   	/* suppressed/terminated/completed point already at the next address */
+>>   }
+>>   
+>> +static void print_pgm_info(struct stack_frame_int *stack)
+>> +
+>> +{
+>> +	printf("\n");
+>> +	printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
+>> +	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
+>> +	       lc->pgm_int_id);
+>> +	dump_stack();
+>> +	report_summary();
+>> +	abort();
+>> +}
+> 
+> I asssume this hunk should go into the next patch instead?
+> Or should the change to handle_pgm_int() from the next patch go into this 
+> patch here instead?
+> Otherwise you have an unused static function here and the compiler might 
+> complain about it (when bisecting later).
 
-Actually, ignore the part about removing the includes, it opens a new can of worms
-- byteorder.h doesn't include compiler.h where __always_inline is defined, and
-various files where struct kvm_cpu is used don't include kvm-cpu.h (like pci.c,
-hw/serial.c, etc). The header removal is not trivial and I think it should be part
-of another cleanup patch.
+I'll move it to the next patch
 
-Thanks,
+> 
+>   Thomas
+> 
 
-Alex
-
->
-> Thanks,
->
-> Alex
->
->>  
->> -struct ioport {
->> -	struct rb_int_node		node;
->> -	struct ioport_operations	*ops;
->> -	void				*priv;
->> -	struct device_header		dev_hdr;
->> -	u32				refcount;
->> -	bool				remove;
->> -};
->> -
->> -struct ioport_operations {
->> -	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
->> -	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
->> -};
->> -
->>  void ioport__map_irq(u8 *irq);
->>  
->> -int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
->> -				  int count, void *param);
->> -int ioport__unregister(struct kvm *kvm, u16 port);
->> -int ioport__init(struct kvm *kvm);
->> -int ioport__exit(struct kvm *kvm);
->> -
->>  static inline u8 ioport__read8(u8 *data)
->>  {
->>  	return *data;
->> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
->> index 14f9d58b..e70f8ef6 100644
->> --- a/include/kvm/kvm.h
->> +++ b/include/kvm/kvm.h
->> @@ -119,8 +119,6 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
->>  void kvm__irq_trigger(struct kvm *kvm, int irq);
->>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
->>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
->> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
->> -		      int direction, int size, u32 count);
->>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
->>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
->>  		      enum kvm_mem_type type);
->> diff --git a/ioport.c b/ioport.c
->> deleted file mode 100644
->> index 204d8103..00000000
->> --- a/ioport.c
->> +++ /dev/null
->> @@ -1,173 +0,0 @@
->> -#include "kvm/ioport.h"
->> -
->> -#include "kvm/kvm.h"
->> -#include "kvm/util.h"
->> -#include "kvm/rbtree-interval.h"
->> -#include "kvm/mutex.h"
->> -
->> -#include <linux/kvm.h>	/* for KVM_EXIT_* */
->> -#include <linux/types.h>
->> -
->> -#include <stdbool.h>
->> -#include <limits.h>
->> -#include <stdlib.h>
->> -#include <stdio.h>
->> -
->> -#define ioport_node(n) rb_entry(n, struct ioport, node)
->> -
->> -static DEFINE_MUTEX(ioport_lock);
->> -
->> -static struct rb_root		ioport_tree = RB_ROOT;
->> -
->> -static struct ioport *ioport_search(struct rb_root *root, u64 addr)
->> -{
->> -	struct rb_int_node *node;
->> -
->> -	node = rb_int_search_single(root, addr);
->> -	if (node == NULL)
->> -		return NULL;
->> -
->> -	return ioport_node(node);
->> -}
->> -
->> -static int ioport_insert(struct rb_root *root, struct ioport *data)
->> -{
->> -	return rb_int_insert(root, &data->node);
->> -}
->> -
->> -static void ioport_remove(struct rb_root *root, struct ioport *data)
->> -{
->> -	rb_int_erase(root, &data->node);
->> -}
->> -
->> -static struct ioport *ioport_get(struct rb_root *root, u64 addr)
->> -{
->> -	struct ioport *ioport;
->> -
->> -	mutex_lock(&ioport_lock);
->> -	ioport = ioport_search(root, addr);
->> -	if (ioport)
->> -		ioport->refcount++;
->> -	mutex_unlock(&ioport_lock);
->> -
->> -	return ioport;
->> -}
->> -
->> -/* Called with ioport_lock held. */
->> -static void ioport_unregister(struct rb_root *root, struct ioport *data)
->> -{
->> -	ioport_remove(root, data);
->> -	free(data);
->> -}
->> -
->> -static void ioport_put(struct rb_root *root, struct ioport *data)
->> -{
->> -	mutex_lock(&ioport_lock);
->> -	data->refcount--;
->> -	if (data->remove && data->refcount == 0)
->> -		ioport_unregister(root, data);
->> -	mutex_unlock(&ioport_lock);
->> -}
->> -
->> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
->> -{
->> -	struct ioport *entry;
->> -	int r;
->> -
->> -	entry = malloc(sizeof(*entry));
->> -	if (entry == NULL)
->> -		return -ENOMEM;
->> -
->> -	*entry = (struct ioport) {
->> -		.node		= RB_INT_INIT(port, port + count),
->> -		.ops		= ops,
->> -		.priv		= param,
->> -		/*
->> -		 * Start from 0 because ioport__unregister() doesn't decrement
->> -		 * the reference count.
->> -		 */
->> -		.refcount	= 0,
->> -		.remove		= false,
->> -	};
->> -
->> -	mutex_lock(&ioport_lock);
->> -	r = ioport_insert(&ioport_tree, entry);
->> -	if (r < 0)
->> -		goto out_free;
->> -	mutex_unlock(&ioport_lock);
->> -
->> -	return port;
->> -
->> -out_free:
->> -	free(entry);
->> -	mutex_unlock(&ioport_lock);
->> -	return r;
->> -}
->> -
->> -int ioport__unregister(struct kvm *kvm, u16 port)
->> -{
->> -	struct ioport *entry;
->> -
->> -	mutex_lock(&ioport_lock);
->> -	entry = ioport_search(&ioport_tree, port);
->> -	if (!entry) {
->> -		mutex_unlock(&ioport_lock);
->> -		return -ENOENT;
->> -	}
->> -	/* The same reasoning from kvm__deregister_mmio() applies. */
->> -	if (entry->refcount == 0)
->> -		ioport_unregister(&ioport_tree, entry);
->> -	else
->> -		entry->remove = true;
->> -	mutex_unlock(&ioport_lock);
->> -
->> -	return 0;
->> -}
->> -
->> -static const char *to_direction(int direction)
->> -{
->> -	if (direction == KVM_EXIT_IO_IN)
->> -		return "IN";
->> -	else
->> -		return "OUT";
->> -}
->> -
->> -static void ioport_error(u16 port, void *data, int direction, int size, u32 count)
->> -{
->> -	fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n", to_direction(direction), port, size, count);
->> -}
->> -
->> -bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count)
->> -{
->> -	struct ioport_operations *ops;
->> -	bool ret = false;
->> -	struct ioport *entry;
->> -	void *ptr = data;
->> -	struct kvm *kvm = vcpu->kvm;
->> -
->> -	entry = ioport_get(&ioport_tree, port);
->> -	if (!entry)
->> -		return kvm__emulate_pio(vcpu, port, data, direction,
->> -					size, count);
->> -
->> -	ops	= entry->ops;
->> -
->> -	while (count--) {
->> -		if (direction == KVM_EXIT_IO_IN && ops->io_in)
->> -				ret = ops->io_in(entry, vcpu, port, ptr, size);
->> -		else if (direction == KVM_EXIT_IO_OUT && ops->io_out)
->> -				ret = ops->io_out(entry, vcpu, port, ptr, size);
->> -
->> -		ptr += size;
->> -	}
->> -
->> -	ioport_put(&ioport_tree, entry);
->> -
->> -	if (ret)
->> -		return true;
->> -
->> -	if (kvm->cfg.ioport_debug)
->> -		ioport_error(port, data, direction, size, count);
->> -
->> -	return !kvm->cfg.ioport_debug;
->> -}
->> diff --git a/mmio.c b/mmio.c
->> index 4cce1901..5249af39 100644
->> --- a/mmio.c
->> +++ b/mmio.c
->> @@ -206,7 +206,7 @@ out:
->>  	return true;
->>  }
->>  
->> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
->> +bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data,
->>  		     int direction, int size, u32 count)
->>  {
->>  	struct mmio_mapping *mmio;
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
