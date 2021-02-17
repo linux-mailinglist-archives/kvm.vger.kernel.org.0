@@ -2,155 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ABB131DCC8
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:58:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2979131DCDB
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:03:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233898AbhBQP4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 10:56:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42969 "EHLO
+        id S233939AbhBQQCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:02:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28758 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233891AbhBQP4u (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 10:56:50 -0500
+        by vger.kernel.org with ESMTP id S233811AbhBQQCu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:02:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613577324;
+        s=mimecast20190719; t=1613577684;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YS3nxZW1QzFmYQoRE9ZNNk1HsBK/ykLDpT4WFPyqals=;
-        b=Rz5mThWHUAKDa6554xLfbjwH72+73JQ0G+kjPq1VBK2jyFEBIo989vR3VYSs9HZ7rRWqFl
-        l+LHNjbcLxMkMpo5pRcfFcMWhpmPh0WkCcYOrgkZmaKSG+xqXjpcOsHa3RBs4YgR9soQRC
-        OCs2DGzgrOlZC/FXLJafvKEgRqkyvf0=
+        bh=cmZglzZ54ozWbqqK1NjGe7+944JUuKg5N2LK9/XrvMA=;
+        b=UzGoMGvs1LMb7mJAEhVGfeYDRsEJEMRf47HrwiZ/Gtjdf1qxlQJrNAEGFBHj37389XO4aZ
+        ItNZ9eU4dyl4dYcx88TorfJoZFQRtDn2wW9Vk/1V+2JGMYC0EC8XE19WnpkwMNjnWBgGva
+        98xrp1ab+fHsBcN3XJpeJqyJwwG1xxo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-588-hhIhBlgvO-aonsf_87Fx5Q-1; Wed, 17 Feb 2021 10:55:20 -0500
-X-MC-Unique: hhIhBlgvO-aonsf_87Fx5Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-256-0v8fbV9MPY278gv7-0ZeRw-1; Wed, 17 Feb 2021 11:01:22 -0500
+X-MC-Unique: 0v8fbV9MPY278gv7-0ZeRw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2408192CC46;
-        Wed, 17 Feb 2021 15:55:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA73B100CCCD;
+        Wed, 17 Feb 2021 16:01:20 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-116.ams2.redhat.com [10.36.112.116])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 20B885C67A;
-        Wed, 17 Feb 2021 15:55:13 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 4/8] s390x: Introduce and use
- CALL_INT_HANDLER macro
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62DCC60657;
+        Wed, 17 Feb 2021 16:01:16 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: Provide preliminary
+ backtrace support
 To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
         pmorel@linux.ibm.com, david@redhat.com
 References: <20210217144116.3368-1-frankja@linux.ibm.com>
- <20210217144116.3368-5-frankja@linux.ibm.com>
+ <20210217144116.3368-6-frankja@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <313546fb-35df-22ab-79f8-d5b49286058f@redhat.com>
-Date:   Wed, 17 Feb 2021 16:55:13 +0100
+Message-ID: <1bba9659-efa4-192a-ef60-ab62069f2901@redhat.com>
+Date:   Wed, 17 Feb 2021 17:01:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210217144116.3368-5-frankja@linux.ibm.com>
+In-Reply-To: <20210217144116.3368-6-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 17/02/2021 15.41, Janosch Frank wrote:
-> The ELF ABI dictates that we need to allocate 160 bytes of stack space
-> for the C functions we're calling. Since we would need to do that for
-> every interruption handler which, combined with the new stack argument
-> being saved in GR2, makes cstart64.S look a bit messy.
-> 
-> So let's introduce the CALL_INT_HANDLER macro that handles all of
-> that, calls the C interrupt handler and handles cleanup afterwards.
+> After the stack changes we can finally use -mbackchain and have a
+> working backtrace.
 > 
 > Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->   s390x/cstart64.S | 28 +++++-----------------------
->   s390x/macros.S   | 17 +++++++++++++++++
->   2 files changed, 22 insertions(+), 23 deletions(-)
+>   lib/s390x/interrupt.c | 12 ++++++++++++
+>   lib/s390x/stack.c     | 20 ++++++++++++++------
+>   s390x/Makefile        |  1 +
+>   3 files changed, 27 insertions(+), 6 deletions(-)
 > 
-> diff --git a/s390x/cstart64.S b/s390x/cstart64.S
-> index 35d20293..666a9567 100644
-> --- a/s390x/cstart64.S
-> +++ b/s390x/cstart64.S
-> @@ -92,37 +92,19 @@ memsetxc:
+> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
+> index a59df80e..23ad922c 100644
+> --- a/lib/s390x/interrupt.c
+> +++ b/lib/s390x/interrupt.c
+> @@ -115,6 +115,18 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
+>   	/* suppressed/terminated/completed point already at the next address */
+>   }
 >   
->   .section .text
->   pgm_int:
-> -	SAVE_REGS_STACK
-> -	lgr     %r2, %r15
-> -	brasl	%r14, handle_pgm_int
-> -	RESTORE_REGS_STACK
-> -	lpswe	GEN_LC_PGM_OLD_PSW
-> +	CALL_INT_HANDLER handle_pgm_int, GEN_LC_PGM_OLD_PSW
->   
->   ext_int:
-> -	SAVE_REGS_STACK
-> -	lgr     %r2, %r15
-> -	brasl	%r14, handle_ext_int
-> -	RESTORE_REGS_STACK
-> -	lpswe	GEN_LC_EXT_OLD_PSW
-> +	CALL_INT_HANDLER handle_ext_int, GEN_LC_EXT_OLD_PSW
->   
->   mcck_int:
-> -	SAVE_REGS_STACK
-> -	brasl	%r14, handle_mcck_int
-> -	RESTORE_REGS_STACK
-> -	lpswe	GEN_LC_MCCK_OLD_PSW
-> +	CALL_INT_HANDLER handle_mcck_int, GEN_LC_MCCK_OLD_PSW
->   
->   io_int:
-> -	SAVE_REGS_STACK
-> -	lgr     %r2, %r15
-> -	brasl	%r14, handle_io_int
-> -	RESTORE_REGS_STACK
-> -	lpswe	GEN_LC_IO_OLD_PSW
-> +	CALL_INT_HANDLER handle_io_int, GEN_LC_IO_OLD_PSW
->   
->   svc_int:
-> -	SAVE_REGS_STACK
-> -	brasl	%r14, handle_svc_int
-> -	RESTORE_REGS_STACK
-> -	lpswe	GEN_LC_SVC_OLD_PSW
-> +	CALL_INT_HANDLER handle_svc_int, GEN_LC_SVC_OLD_PSW
->   
->   	.align	8
->   initial_psw:
-> diff --git a/s390x/macros.S b/s390x/macros.S
-> index a7d62c6f..212a3823 100644
-> --- a/s390x/macros.S
-> +++ b/s390x/macros.S
-> @@ -11,6 +11,23 @@
->    *  David Hildenbrand <david@redhat.com>
->    */
->   #include <asm/asm-offsets.h>
-> +/*
-> + * Exception handler macro that saves registers on the stack,
-> + * allocates stack space and calls the C handler function. Afterwards
-> + * we re-load the registers and load the old PSW.
-> + */
-> +	.macro CALL_INT_HANDLER c_func, old_psw
-> +	SAVE_REGS_STACK
-> +	/* Save the stack address in GR2 which is the first function argument */
-> +	lgr     %r2, %r15
-> +	/* Allocate stack pace for called C function, as specified in s390 ELF ABI */
-> +	slgfi   %r15, 160
+> +static void print_pgm_info(struct stack_frame_int *stack)
+> +
+> +{
+> +	printf("\n");
+> +	printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
+> +	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
+> +	       lc->pgm_int_id);
+> +	dump_stack();
+> +	report_summary();
+> +	abort();
+> +}
 
-By the way, don't you have to store a back chain pointer at the bottom of 
-that area, too, if you want to use -mbackchoin in the next patch?
+I asssume this hunk should go into the next patch instead?
+Or should the change to handle_pgm_int() from the next patch go into this 
+patch here instead?
+Otherwise you have an unused static function here and the compiler might 
+complain about it (when bisecting later).
 
   Thomas
-
-
-> +	brasl	%r14, \c_func
-> +	algfi   %r15, 160
-> +	RESTORE_REGS_STACK
-> +	lpswe	\old_psw
-> +	.endm
-> +
->   	.macro SAVE_REGS
->   	/* save grs 0-15 */
->   	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
-> 
 
