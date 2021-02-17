@@ -2,81 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8301831D311
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 00:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7773831D383
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 02:07:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbhBPXpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 18:45:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57363 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229876AbhBPXpI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Feb 2021 18:45:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613519022;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CSP5TYqu650KhYGvjztOmE5csI9NW0yzVVbY0leWkZI=;
-        b=DrTSy3kafGd7ffVdU1taQe9jO/Spb5kDV2AlsM+bxFAqYGh2CjQMnxHuDAN+6wXsiytC7H
-        JF01K23QH2Z5hUnffvO+08R6AuaSac29/T9TwLgrw4AO6PNuKnilghn1eTZtfDfAeivwX3
-        wMVnmM7AqSefGozLK9//KGA5b//8LCg=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-GPkCL7QtPxybKXRD9zqMzg-1; Tue, 16 Feb 2021 18:43:40 -0500
-X-MC-Unique: GPkCL7QtPxybKXRD9zqMzg-1
-Received: by mail-qk1-f199.google.com with SMTP id s6so9510540qkg.15
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 15:43:40 -0800 (PST)
+        id S230375AbhBQBEL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Feb 2021 20:04:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229868AbhBQBEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Feb 2021 20:04:09 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93300C061574
+        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 17:03:27 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id m2so7431518pgq.5
+        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 17:03:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qtwKaBiuPYUvz0xWl8m1S45ms1wew6GiKaYyXPstShY=;
+        b=hR+6zsrZvmQI1jiLm98fGBSwoksg+qAfy20KAE1ORvWET6C9nkuhCS8n4UTgOAZKkv
+         QObyw5pSdj33watWVnWiNP07EWbdZc74aX3ehGOZmjNbuJztbzqGFDJ06jB74mjrQ/pw
+         GwWTJssT9ffcLgU021QHckdCmh/VNAyERhwRqiHu/8cN8bn6eYhGi6ba7zj1drC7Ohsl
+         N/NZROd+s7fujzMa4Y/UxFsjQvwP02LO3CFyvFdXyiEVmhYr3K4QwyIWmcUIkeC7PwfT
+         /wSZgn/cMzk70byBU5oQZGLzMpyCslk3pmdvj4l6poYtvj9ILOCqPptxG9q9b97JaxDH
+         F97g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=CSP5TYqu650KhYGvjztOmE5csI9NW0yzVVbY0leWkZI=;
-        b=Cue9aJBs32+geTEWrMfbGrBQzeCaWz2f1WXD/biqZWhQ2CrJXy+eJMaF+qjuFTlvh+
-         nk9z3BvqVZSCzE/7bloRMLf+/VEJ5PU1YpUzT6AF3btjsjiLp3+jgfEoSmfrLoR+osTv
-         ohfQd2UqB81zAG/LYNnXgdZ99yQ7YByz9QmyQMToBFL9MbeSabh0juf5YbH0hoZNkVBo
-         MNVkFmlUpVlxhbLT8tOqesRDCa4khYVeJIO3KAm/2FQGagAKMAziMOanhuMkqmWoDxgw
-         4UvxXZpXCciq1KQP6JtQVP7OoPhIfzCU0pUOlv5WLKnAhvN/FZJbE2jd3HuYquLvC7rn
-         fjKw==
-X-Gm-Message-State: AOAM530ew+FYoN3iUFpd5Z4mSFwCP2h2UzN9DUFgIe1Dm5bB4TDA+Q1w
-        STYVrsKbzkCaTZATSaDavlwVBy5URsmvAfpc0+iYpWkhM2x9TUr+1VMOpoutIQ1euzPA5tnvAK7
-        4GoN48KFOy/5z
-X-Received: by 2002:a05:620a:cd6:: with SMTP id b22mr21492231qkj.451.1613519020095;
-        Tue, 16 Feb 2021 15:43:40 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwoewrF38Q6wgd1ErfBYD6lARPXXVDP/Bm9c/cbXWNMU4YW9mO/tBw/lLitRcK/s+IpTQcsSQ==
-X-Received: by 2002:a05:620a:cd6:: with SMTP id b22mr21492214qkj.451.1613519019928;
-        Tue, 16 Feb 2021 15:43:39 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-20-174-93-89-182.dsl.bell.ca. [174.93.89.182])
-        by smtp.gmail.com with ESMTPSA id d17sm418815qkc.40.2021.02.16.15.43.38
+        bh=qtwKaBiuPYUvz0xWl8m1S45ms1wew6GiKaYyXPstShY=;
+        b=iUNuWLSPnPyZsAfdvc8mv0r6ZXcDr7ugP/C3WnT4N8yJbochqRj8uHUwNilEM+LKP8
+         ZqQVEgSe73pMS/CeylcfLtUN9r7dHKPoihID8BL9guvBeuihE/qVs5k6pLNRlMlXVNwn
+         sSrroAkR7oGhASosWUpEauSjTmUVHyaH7wFb+wDPrqnqzsGl4OYCS99jhKcPqg2uJQBA
+         BjEdYpKayJiYwoNl/G78tH7wfJl8KAEJfSvz77mF7spP8ZBoNjGtLYPJjr0EHLHcZ16X
+         GL2aUdr1XExy29RRyYi18AkxG6ATesM0rY3WKyEBXt2DnEQF8pKN23HT6GlU+D6x8Qsf
+         XjnA==
+X-Gm-Message-State: AOAM530oxjJQWGbc+RL7MWL0fSBvxkmk2W6mxRKV1DHTA8x+78+0Ynxe
+        ufbdi944oHLbP2YA7ezYb1uGKA==
+X-Google-Smtp-Source: ABdhPJwjZFj3CFYYa4dEPkFYRXMEe77KR30ZgCJLDDPCSZBQF+i+bCpafGAOHWyio9En1S2D5oOqgg==
+X-Received: by 2002:a63:4e4c:: with SMTP id o12mr21708720pgl.143.1613523806692;
+        Tue, 16 Feb 2021 17:03:26 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
+        by smtp.gmail.com with ESMTPSA id v31sm308840pgl.76.2021.02.16.17.03.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 15:43:39 -0800 (PST)
-Date:   Tue, 16 Feb 2021 18:43:37 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, jgg@nvidia.com
-Subject: Re: [PATCH v2] vfio/type1: Use follow_pte()
-Message-ID: <20210216234337.GE91264@xz-x1>
-References: <161351571186.15573.5602248562129684350.stgit@gimli.home>
+        Tue, 16 Feb 2021 17:03:25 -0800 (PST)
+Date:   Tue, 16 Feb 2021 17:03:19 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        hpa@zytor.com, rkrcmar@redhat.com, joro@8bytes.org, bp@suse.de,
+        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, srutherford@google.com,
+        venu.busireddy@oracle.com, brijesh.singh@amd.com
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Message-ID: <YCxrV4u98ZQtInOE@google.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <161351571186.15573.5602248562129684350.stgit@gimli.home>
+In-Reply-To: <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 16, 2021 at 03:49:34PM -0700, Alex Williamson wrote:
-> follow_pfn() doesn't make sure that we're using the correct page
-> protections, get the pte with follow_pte() so that we can test
-> protections and get the pfn from the pte.
+On Thu, Feb 04, 2021, Ashish Kalra wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Fixes: 5cbf3264bc71 ("vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()")
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> The ioctl is used to retrieve a guest's shared pages list.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS is passed
+through to userspace?  That way, userspace could manage the set of pages in
+whatever data structure they want, and these get/set ioctls go away.
 
--- 
-Peter Xu
-
+Also, aren't there plans for an in-guest migration helper?  If so, do we have
+any idea what that interface will look like?  E.g. if we're going to end up with
+a full fledged driver in the guest, why not bite the bullet now and bypass KVM
+entirely?
