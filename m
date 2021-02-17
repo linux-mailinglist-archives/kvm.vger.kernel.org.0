@@ -2,118 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 389FF31DEB6
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:02:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3D6B31DEBC
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:03:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234681AbhBQSAv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 13:00:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37416 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234667AbhBQSAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 13:00:48 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943A5C061574;
-        Wed, 17 Feb 2021 10:00:08 -0800 (PST)
-Received: from zn.tnic (p200300ec2f05bb00a5a1b5cb6f03bfce.dip0.t-ipconnect.de [IPv6:2003:ec:2f05:bb00:a5a1:b5cb:6f03:bfce])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 37E1F1EC0531;
-        Wed, 17 Feb 2021 19:00:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1613584806;
+        id S234750AbhBQSCg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 13:02:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39453 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234742AbhBQSC1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 13:02:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613584860;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=W/PjtAFD7kN1k373OiTnMpXJo6wSfCFewIb7shmRoAo=;
-        b=eWIvMjcR2w2Szi9tvlUj/PBm2DwWXFJEV6+2klCghZf1r9mpzHJQsSclQG/T7mwfY0uiQo
-        rMtKbbqzVOerG0czLj1WllEinByD4lSHtLn93sBH0+1z7g/qOd18ASqqXmXgniWL7fCCaj
-        U249HiTnjWRQTmgbdVAvXjFEVHgaw54=
-Date:   Wed, 17 Feb 2021 19:00:09 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
-        Andy Lutomirski <luto@kernel.org>, stable@vger.kernel.org,
-        hpa@zytor.com, Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
- adjusting #VC IST stack
-Message-ID: <20210217180009.GB6479@zn.tnic>
-References: <20210217120143.6106-1-joro@8bytes.org>
- <20210217120143.6106-3-joro@8bytes.org>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sWiGWfzcYfTRYNwn5bn45x4oOrqQ38WANY07Gox027I=;
+        b=XJ7gvUDaz5af9lVrJxx9TJCsC6U5awozspDAQWSxSOmQP9nI0qKLP/kChrfcGC7aqFq2Za
+        /7iPRNpuEOlKV4tPEPZhMTnZ7eGV+O50LpcgNbhH/tEhVYEUZqEewIBDKMEo86+eBiOTht
+        GQbyDPYVmt5B/f8z7UUOw93smMQOaqo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-494-At8CO9eYM4GaR3H_MzV6UA-1; Wed, 17 Feb 2021 13:00:57 -0500
+X-MC-Unique: At8CO9eYM4GaR3H_MzV6UA-1
+Received: by mail-wr1-f71.google.com with SMTP id x1so17326239wrg.22
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 10:00:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sWiGWfzcYfTRYNwn5bn45x4oOrqQ38WANY07Gox027I=;
+        b=fwKzYMIvkHBGhqK9VYVL8UyLitXemX60xrlDQJF6EtFxFESltaTB5eOOn7Ue4bA4DT
+         vtistt7wZrZ59a6MsPBacGgQzX49hZ4JsJ1v31uwbJdegZnQYKNBhM2V4tZBLKvvYUfy
+         ZBdeygRlJrizWxRW4EjQy34NgaNc+X7BdFuRus006wbhZvrImhJKE4g9snQea7VKzDXm
+         srSgeIjAy/0hkyUmV4WJ7chPVh+PPeseAMzIw4QzpNs1kxUeZgYjL77pood876wmq4gM
+         HwyudlklRym5BxymR6tCFkf2jr8lg/pklKTQoivUZIiqhISpR7/4StbOk74UbVABabLa
+         zStA==
+X-Gm-Message-State: AOAM533HRSnWE66xyFhkPUZ98/4/EebYmyGojuRqQJ8tMZy2nd2UzXfX
+        trgAHaaR5g1aLzm+JhAysD9+C49cciQDoHSD9TrzcyVoB8DwH9wgw9iqvCpjcjsMoZTLtOOpBV5
+        92+9q9tovDwW1
+X-Received: by 2002:adf:f2c1:: with SMTP id d1mr333582wrp.345.1613584855009;
+        Wed, 17 Feb 2021 10:00:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwFbK08+UJ8QUvz0FNgBrsOTzClkMMR80nNg+ZQ4AVeH8xPFZd3/7fo8iwxuuNubrXMLO5KEA==
+X-Received: by 2002:adf:f2c1:: with SMTP id d1mr333563wrp.345.1613584854817;
+        Wed, 17 Feb 2021 10:00:54 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id l1sm3917755wmi.48.2021.02.17.10.00.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Feb 2021 10:00:53 -0800 (PST)
+Subject: Re: [PATCH 4/7] KVM: nVMX: move inject_page_fault tweak to
+ .complete_mmu_init
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+References: <20210217145718.1217358-1-mlevitsk@redhat.com>
+ <20210217145718.1217358-5-mlevitsk@redhat.com> <YC1ShhSZ+6ST63nZ@google.com>
+ <5a8bea9b-deb1-673a-3dc8-f08b679de4c5@redhat.com>
+ <YC1ZI6DW49u0UP7m@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d4f00fbb-aeea-0aee-f22a-807aa32a3f39@redhat.com>
+Date:   Wed, 17 Feb 2021 19:00:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210217120143.6106-3-joro@8bytes.org>
+In-Reply-To: <YC1ZI6DW49u0UP7m@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 17, 2021 at 01:01:42PM +0100, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> The code in the NMI handler to adjust the #VC handler IST stack is
-> needed in case an NMI hits when the #VC handler is still using its IST
-> stack.
-> But the check for this condition also needs to look if the regs->sp
-> value is trusted, meaning it was not set by user-space. Extend the
-> check to not use regs->sp when the NMI interrupted user-space code or
-> the SYSCALL gap.
-> 
-> Reported-by: Andy Lutomirski <luto@kernel.org>
-> Fixes: 315562c9af3d5 ("x86/sev-es: Adjust #VC IST Stack on entering NMI handler")
-> Cc: stable@vger.kernel.org # 5.10+
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/kernel/sev-es.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-> index 84c1821819af..0df38b185d53 100644
-> --- a/arch/x86/kernel/sev-es.c
-> +++ b/arch/x86/kernel/sev-es.c
-> @@ -144,7 +144,9 @@ void noinstr __sev_es_ist_enter(struct pt_regs *regs)
->  	old_ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
->  
->  	/* Make room on the IST stack */
-> -	if (on_vc_stack(regs->sp))
-> +	if (on_vc_stack(regs->sp) &&
-> +	    !user_mode(regs) &&
-> +	    !from_syscall_gap(regs))
+On 17/02/21 18:57, Sean Christopherson wrote:
+>> That said, I'm also rusty on_why_  this code is needed.  Why isn't it enough
+>> to inject the exception normally, and let nested_vmx_check_exception decide
+>> whether to inject a vmexit to L1 or an exception into L2?
+>
+> Hmm, I suspect it was required at one point due to deficiencies elsewhere.
+> Handling this in the common fault handler logic does seem like the right
+> approach.
 
-Why not add those checks to on_vc_stack() directly? Because in it, you
-can say:
+I think I'm going to merge a variant of patch 5 just to unbreak things. 
+But we should get rid of all this because after the exception payload 
+changes we shouldn't need it.
 
-on_vc_stack():
+Paolo
 
-	/* user mode rSP is not trusted */
-	if (user_mode())
-		return false;
+>> Also, bonus question which should have been in the 5/7 changelog: are there
+>> kvm-unit-tests testcases that fail with npt=0, and if not could we write
+>> one?  [Answer: the mode_switch testcase fails, but I haven't checked why].
 
-	/* ditto */
-	if (ip_within_syscall_gap())
-		return false;
-
-	...
-
-?
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
