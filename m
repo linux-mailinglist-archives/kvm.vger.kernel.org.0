@@ -2,126 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6006531DD12
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:14:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1980E31DD16
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 17:15:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234102AbhBQQNW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 11:13:22 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45188 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233982AbhBQQNG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 11:13:06 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11HG4Qwq156529;
-        Wed, 17 Feb 2021 11:12:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=gZZy4shRbyB4GxdZc61mS7tg83C6TUCJr2wq6YTRaMU=;
- b=ELH+Edvv8iN1P48z2Ey0u0ctIkKMV+3Izy8DV7+oC1FCgY88hojaLmDusjByiQG5FVFt
- iNAlFy6EhvizD9irqWrGVfP8gyT2do/J0SV0pHwqtdjonqmBVGrphaXp3UdweICTkL7n
- WhEiXddrHvHPXj6sphOtgSkYKPg1P6gQr7zG2QrZBz2B9Gh9wo2LyRq4PupZG3oQHdnJ
- mo1FTKZUnHvDIo2xCZYhi3ycW75gSloYhtKU9dYVML5mnKKlrjZ63u7Kf3eQIHwkDK8E
- Ua0Cvyq4xJdFv7rXLPhRdj2+72GmN0jbfI+xd+OgBPu8RzCGjWtoPPqjkuTgx3z6YwqP Vg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36s588351c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Feb 2021 11:12:22 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11HG4sJp159292;
-        Wed, 17 Feb 2021 11:12:22 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36s5883500-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Feb 2021 11:12:22 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11HG2UNG028682;
-        Wed, 17 Feb 2021 16:12:19 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma02fra.de.ibm.com with ESMTP id 36p6d8j0u6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 17 Feb 2021 16:12:19 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11HGCGeR62587312
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 17 Feb 2021 16:12:16 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B1B652050;
-        Wed, 17 Feb 2021 16:12:16 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.1.64])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E95505204E;
-        Wed, 17 Feb 2021 16:12:15 +0000 (GMT)
-Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: Provide preliminary
- backtrace support
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        pmorel@linux.ibm.com, david@redhat.com
-References: <20210217144116.3368-1-frankja@linux.ibm.com>
- <20210217144116.3368-6-frankja@linux.ibm.com>
- <1bba9659-efa4-192a-ef60-ab62069f2901@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Message-ID: <81d9d0f4-691e-50c5-6e9d-afa8ebb73d48@linux.ibm.com>
-Date:   Wed, 17 Feb 2021 17:12:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S234146AbhBQQOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 11:14:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234135AbhBQQNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 11:13:52 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6797CC061756
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:13:12 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id ba1so7662071plb.1
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 08:13:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=30obSL6wNoXFckVZgqPZYM3QP6QIWGyiK7vFvnqdzsc=;
+        b=uMcxqdXTNNbAbHrPi3G1vCKyjA5zEkRIsBX4o5BMlHNrbUndUYMFl3/Nn2C4stNK67
+         47C3V5ZBfV4pPQpdrUjEtvQimOKxcpNoJqVmiaT1eg19JROswfZEOvUeVycCpVOTWueO
+         E8C5xkypv0DAHJz0zWUprp2lflWttCQ8nV/dlqVPr12YIcv6QoI9x6pLkKqm4UcFvFks
+         rRu9azNmLqRHl0mcfSUcuzS7JeqXkGIfaOZYwsGQ2hSjBVUROEJMU3FU+N49Hf95pAC5
+         jv4GiyvYx2ef8pjKB+Z/5lz1frOibN1bwOvKaj31tt+fly7rxZaS4KvxQg2RDLhmtWA+
+         mDbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=30obSL6wNoXFckVZgqPZYM3QP6QIWGyiK7vFvnqdzsc=;
+        b=eCCzeZExsTiG1uWszu/StDPfXGZOVboTuD9+4ibnBc4nGbnjirvIHCveLp3Sk6O0xK
+         f9TaeH9Qhao2HohNMhs7HlwtcuKSHNxF4xAQT9Km6xa8SlbcAbID2rm8OH0jG6tj+meI
+         cNsbgGi2tHhyF6nzRiUY83gIZWnxXHvaLRo4Z4OH/tCqzGFjQ0qPqJ1hSDBLDreWACh2
+         FS/4YBLHvOmIwTHTaQf5jVAYWYhouOkzlE6oGHvXYBIFlpix5q76DRA2xHTrWrFhVtC3
+         HMBbC4rq3ORy0xr29mN13KIC5Udy+QBL2JOGq9BXDEI9kbkOu7Lno8WloDHHApxsJdnR
+         zfxQ==
+X-Gm-Message-State: AOAM533eUjaAtLAply/zZGCE7NLgM/ZOa16F9oX3y3JHoBo4oXOJGYH8
+        EcpZnkz6KZUCGdVoKHdLitkNWw==
+X-Google-Smtp-Source: ABdhPJyfKy2Cz1wXMvzNBd+cA8KhTW+umCAlEIA2Ctay8I7b4LKIUZ2LOEJzneCCMkuYOtND/wuWbA==
+X-Received: by 2002:a17:90a:1503:: with SMTP id l3mr9758253pja.41.1613578391687;
+        Wed, 17 Feb 2021 08:13:11 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
+        by smtp.gmail.com with ESMTPSA id 8sm3129452pfp.171.2021.02.17.08.13.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Feb 2021 08:13:11 -0800 (PST)
+Date:   Wed, 17 Feb 2021 08:13:04 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Message-ID: <YC1AkNPNET+T928c@google.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <1bba9659-efa4-192a-ef60-ab62069f2901@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-17_13:2021-02-16,2021-02-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- mlxscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
- priorityscore=1501 impostorscore=0 clxscore=1015 adultscore=0
- malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102170122
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/17/21 5:01 PM, Thomas Huth wrote:
-> On 17/02/2021 15.41, Janosch Frank wrote:
->> After the stack changes we can finally use -mbackchain and have a
->> working backtrace.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>   lib/s390x/interrupt.c | 12 ++++++++++++
->>   lib/s390x/stack.c     | 20 ++++++++++++++------
->>   s390x/Makefile        |  1 +
->>   3 files changed, 27 insertions(+), 6 deletions(-)
->>
->> diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
->> index a59df80e..23ad922c 100644
->> --- a/lib/s390x/interrupt.c
->> +++ b/lib/s390x/interrupt.c
->> @@ -115,6 +115,18 @@ static void fixup_pgm_int(struct stack_frame_int *stack)
->>   	/* suppressed/terminated/completed point already at the next address */
->>   }
->>   
->> +static void print_pgm_info(struct stack_frame_int *stack)
->> +
->> +{
->> +	printf("\n");
->> +	printf("Unexpected program interrupt: %d on cpu %d at %#lx, ilen %d\n",
->> +	       lc->pgm_int_code, stap(), lc->pgm_old_psw.addr,
->> +	       lc->pgm_int_id);
->> +	dump_stack();
->> +	report_summary();
->> +	abort();
->> +}
+On Wed, Feb 17, 2021, Kalra, Ashish wrote:
+> From: Sean Christopherson <seanjc@google.com> 
+> On Thu, Feb 04, 2021, Ashish Kalra wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > 
+> > The ioctl is used to retrieve a guest's shared pages list.
 > 
-> I asssume this hunk should go into the next patch instead?
-> Or should the change to handle_pgm_int() from the next patch go into this 
-> patch here instead?
-> Otherwise you have an unused static function here and the compiler might 
-> complain about it (when bisecting later).
-
-I'll move it to the next patch
-
+> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS is passed
+> >through to userspace?  That way, userspace could manage the set of pages >in
+> >whatever data structure they want, and these get/set ioctls go away.
 > 
->   Thomas
+> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to user-space
+> ?
 > 
+> As such it is just a simple interface to get the shared page list via the
+> get/set ioctl's. simply an array is passed to these ioctl to get/set the
+> shared pages list.
 
+It eliminates any probability of the kernel choosing the wrong data structure,
+and it's two fewer ioctls to maintain and test.
+
+> >Also, aren't there plans for an in-guest migration helper?  If so, do we
+> >have any idea what that interface will look like?  E.g. if we're going to
+> >end up with a full >fledged driver in the guest, why not bite the bullet now
+> >and bypass KVM entirely?
+> 
+> Even the in-guest migration helper will be using page encryption status
+> hypercalls, so some interface is surely required.
+
+If it's a driver with a more extensive interace, then the hypercalls can be
+replaced by a driver operation.  That's obviously a big if, though.
+
+> Also the in-guest migration will be mainly an OVMF component, won't  really
+> be a full fledged kernel driver in the guest.
+
+Is there code and/or a description of what the proposed helper would look like?
