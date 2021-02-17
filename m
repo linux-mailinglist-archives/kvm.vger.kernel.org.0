@@ -2,165 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A02D31DEB8
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:02:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E5A631DEC9
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:08:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234667AbhBQSBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 13:01:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37586 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234713AbhBQSBe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 13:01:34 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B80C061574;
-        Wed, 17 Feb 2021 10:00:52 -0800 (PST)
-Received: from zn.tnic (p200300ec2f05bb00a5a1b5cb6f03bfce.dip0.t-ipconnect.de [IPv6:2003:ec:2f05:bb00:a5a1:b5cb:6f03:bfce])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 426BF1EC0402;
-        Wed, 17 Feb 2021 19:00:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1613584851;
+        id S233536AbhBQSIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 13:08:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22060 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233121AbhBQSIE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 13:08:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613585197;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=OyC60AEXb/9wdHg79nRJVAwmz+d5y82NOII64Aytkw4=;
-        b=rZCe/fUCQVQIdCLfy0ZZX86wa1k2dVKkf+PDmFOG4MS7fmj2VZoM4iC/mO0MQe9ouVSUV4
-        AA5HzXgovgE4O63ljYDoXrY24nbmBoNNpStJFJOEg2TL1n1FfPZSR6+rMznkaIIGgV6+e8
-        Ls90hdQStGA73QaE4V43VHLz45AeEIc=
-Date:   Wed, 17 Feb 2021 19:00:54 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 3/3] x86/sev-es: Improve comments in and around
- __sev_es_ist_enter/exit()
-Message-ID: <20210217180054.GC6479@zn.tnic>
-References: <20210217120143.6106-1-joro@8bytes.org>
- <20210217120143.6106-4-joro@8bytes.org>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k+PafZtTxxRkQ/4iNlBI25yfowv1emoIIbzvsMB2gSE=;
+        b=Y/chTFCJ2hixJEiLF88GIhd6CPmu93FcwVns2gkwxSaOn7+mq5vJweNBlZZDP07I73s67u
+        1K2s1humEN/USTwgWIGwAAib44kOmtBoUBxQK8OBaBlz27I3zqLm3va94WPETtnkkoHhQc
+        xFu5or32tas1vg6jYuSsbRqbtmdXE2M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-eSfdebhSMNqQy1FENNYJyA-1; Wed, 17 Feb 2021 13:06:35 -0500
+X-MC-Unique: eSfdebhSMNqQy1FENNYJyA-1
+Received: by mail-wm1-f71.google.com with SMTP id z67so2696107wme.3
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 10:06:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=k+PafZtTxxRkQ/4iNlBI25yfowv1emoIIbzvsMB2gSE=;
+        b=NiMxoUt+P613fk5Eq3mV3rJ0GZsO/xNEp6hY41yhxCPPEaRdGDYOeFlfxY2oSLwqrp
+         BInMXV1BClM6UoWoryL1b14a4I7QdXHoqBIn+IakIFpDq/YhH69LmSmxj5U4ecU2L1VS
+         29QP2yHiAgB1KU1eOPdE1WHsi9yVpOHQOHWkLDPFVurRP2kPkoOy/1wAq+HnEs8K1AWf
+         Nw4DKXZpQNKCvLkRGq4kC3kyX56S2LlORuKar6pHC36iI2QjVumqJy4TfACTDwlfCacK
+         E3hkaAm1QgiELS4PRinho4D1YYqdew6bxio4I/gTJDAVi9F7Fp1NIeCiDxycsPSfFWqW
+         jSsQ==
+X-Gm-Message-State: AOAM530NBpxWY6HJHEDvy81glFyJ2l/arf6N8B3hn6gt9NZrrcN3muYS
+        1bWtntAI65u/qPGRIImFyiFXZzBs/vYB4O7Fg8sPfBUcXJqEwqLTohkpptbTGSuYvfsWgijV/v+
+        tQ5JpbqEPwZpZ
+X-Received: by 2002:a7b:c397:: with SMTP id s23mr136719wmj.10.1613585194475;
+        Wed, 17 Feb 2021 10:06:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzj3+yONrD5USEwpi0jytCwqxYl0gWMNhs6MJDy1RnaxhN+ylhooyQJKQvSXLrh8MQUjAvhhA==
+X-Received: by 2002:a7b:c397:: with SMTP id s23mr136705wmj.10.1613585194201;
+        Wed, 17 Feb 2021 10:06:34 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id w8sm5037173wrm.21.2021.02.17.10.06.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Feb 2021 10:06:33 -0800 (PST)
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+References: <20210217145718.1217358-1-mlevitsk@redhat.com>
+ <20210217145718.1217358-7-mlevitsk@redhat.com> <YC1X2FMdPn32ci1C@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 6/7] KVM: nVMX: don't load PDPTRS right after nested state
+ set
+Message-ID: <8660e415-5375-d4cf-54d4-b0b8eb6e1dc3@redhat.com>
+Date:   Wed, 17 Feb 2021 19:06:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210217120143.6106-4-joro@8bytes.org>
+In-Reply-To: <YC1X2FMdPn32ci1C@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 17, 2021 at 01:01:43PM +0100, Joerg Roedel wrote:
-> From: Joerg Roedel <jroedel@suse.de>
-> 
-> Better explain why this code is necessary and what it is doing.
-> 
-> Signed-off-by: Joerg Roedel <jroedel@suse.de>
-> ---
->  arch/x86/kernel/sev-es.c | 23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
-> index 0df38b185d53..79241bc45f25 100644
-> --- a/arch/x86/kernel/sev-es.c
-> +++ b/arch/x86/kernel/sev-es.c
-> @@ -127,14 +127,20 @@ static __always_inline bool on_vc_stack(unsigned long sp)
->  }
->  
->  /*
-> - * This function handles the case when an NMI is raised in the #VC exception
-> - * handler entry code. In this case, the IST entry for #VC must be adjusted, so
-> - * that any subsequent #VC exception will not overwrite the stack contents of the
-> - * interrupted #VC handler.
-> + * This function handles the case when an NMI is raised in the #VC
-> + * exception handler entry code, before the #VC handler has switched off
-> + * its IST stack. In this case, the IST entry for #VC must be adjusted,
-> + * so that any nested #VC exception will not overwrite the stack
-> + * contents of the interrupted #VC handler.
->   *
->   * The IST entry is adjusted unconditionally so that it can be also be
-> - * unconditionally adjusted back in sev_es_ist_exit(). Otherwise a nested
-> - * sev_es_ist_exit() call may adjust back the IST entry too early.
-> + * unconditionally adjusted back in __sev_es_ist_exit(). Otherwise a
-> + * nested sev_es_ist_exit() call may adjust back the IST entry too
-> + * early.
-> + *
-> + * The __sev_es_ist_enter() and __sev_es_ist_exit() functions always run
-> + * on the NMI IST stack, as they are only called from NMI handling code
-> + * right now.
->   */
->  void noinstr __sev_es_ist_enter(struct pt_regs *regs)
->  {
-> @@ -143,7 +149,10 @@ void noinstr __sev_es_ist_enter(struct pt_regs *regs)
->  	/* Read old IST entry */
->  	old_ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
->  
-> -	/* Make room on the IST stack */
-> +	/*
-> +	 * Make room on the IST stack - Reserve 8 bytes to store the old
-> +	 * IST entry.
-> +	 */
->  	if (on_vc_stack(regs->sp) &&
->  	    !user_mode(regs) &&
->  	    !from_syscall_gap(regs))
-> -- 
+On 17/02/21 18:52, Sean Christopherson wrote:
+>>
+>> Just move the call to nested_vmx_load_cr3 to nested_get_vmcs12_pages
+>> to implement this.
+>
+> I don't love this approach.  KVM_SET_NESTED_STATE will now succeed with a bad
+> vmcs12.GUEST_CR3.  At a minimum, GUEST_CR3 should be checked in
+> nested_vmx_check_guest_state().  It also feels like vcpu->arch.cr3 should be set
+> immediately, e.g. KVM_SET_NESTED_STATE -> KVM_GET_SREGS should reflect L2's CR3
+> even if KVM_RUN hasn't been invoked.
 
-Yah, and then we probably should simplify this __sev_es_ist_enter()
-function even more as it is not easy to grok.
+Note that KVM_SET_NESTED_STATE does not remove the need to invoke 
+KVM_SET_SREGS.  Calling KVM_SET_NESTED_STATE does not necessarily saying 
+anything about the value of KVM_GET_SREGS after it.
 
-For example, the ALIGN_DOWN(regs->sp, 8) is not really needed, right?
+In particular on SVM it's a "feature" that KVM_SET_NESTED_STATE does not 
+include any guest register state; the nested state only includes the 
+VMCB12 control state and the L1 save state.  But thinking more about it, 
+loading the PDPTRs for the guest CR3 might not be advisable even upon 
+KVM_SET_SREGS, and we might want to extend KVM_REQ_GET_NESTED_PAGES to 
+cover non-nested PDPTRs as well.
 
-Also, both branches do "- sizeof(old_ist);" so you can just as well do
-it unconditionally.
+Paolo
 
-And the sizeof(old_ist) is just a confusing way to write 8, right? We're
-64-bit only so there's no need for that, I'd say.
-
-And then you probably should change the comments from
-
-	/* Store old IST entry */
-
-and
-
-	/* Set new IST entry */
-
-to something like:
-
- /*
-  * If on the #VC IST stack, new_ist gets set to point one stack slot
-  * further down from the #VC interrupt frame which has been pushed on
-  * it during the first #VC exception entry.
-  *
-  * If not, simply the next slot on the #VC IST stack is set to point...
-
-and here I'm not even sure why we're doing it?
-
-The else branch, when we're not on the #VC stack, why are we doing
-
-	new_ist = old_ist - sizeof(old_ist);
-
-?
-
-I mean, if the NMI handler causes a #VC exception, it will simply run on
-the #VC IST stack so why do we have to do that - 8 thing at all?
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
