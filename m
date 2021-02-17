@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07D7231DBD1
+	by mail.lfdr.de (Postfix) with ESMTP id 7903231DBD2
 	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:00:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233704AbhBQO7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 09:59:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37361 "EHLO
+        id S233707AbhBQO7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 09:59:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40374 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233605AbhBQO7P (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 09:59:15 -0500
+        by vger.kernel.org with ESMTP id S233680AbhBQO7S (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 09:59:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613573869;
+        s=mimecast20190719; t=1613573872;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=d7hdrmggGz0IX+vXiyJwgHKownPeIRNtGuiBFLCAaUw=;
-        b=Z3oxzDAsRXXEpRBtPkaQ1r0xFv7T4U0LSS0B5Rk3ncNq1INyFDDjhlkNw67Tgd+EHF/UST
-        xJ/93FrDDXCXOtlJp9HZpQKe20yZZNCC6kD57736E+o8q7AT1scFen7ZuRmmvdHeW1XTTl
-        NPhPH7+j/bDQm/nCEgn7wrBycblG5MY=
+        bh=D6vYOR0dgL/biSGZfHd88o0jtjehBMmGld8Fzmh3jxI=;
+        b=HFoG+g50Wc6wVI7HT0v79J7yurVGrkEzhUJW5zZxklzZXmuPemMM2kaS34XiFS/WQdlObz
+        EeG14pDKOGc4bmiAKVqvv3PSRY6Wg0Gu/f9ebB3smt4houok1l7RxsJ1GJo08R72wAmslP
+        IXoQYGmWzjSEhBaTwonft/gdSHU7xFU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-0hpgskSyOPycxJdIbXKYSA-1; Wed, 17 Feb 2021 09:57:46 -0500
-X-MC-Unique: 0hpgskSyOPycxJdIbXKYSA-1
+ us-mta-3-ABdhTXJ3NLuaTxT6sZ4Pvw-1; Wed, 17 Feb 2021 09:57:50 -0500
+X-MC-Unique: ABdhTXJ3NLuaTxT6sZ4Pvw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F9BB192AB78;
-        Wed, 17 Feb 2021 14:57:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F268D192AB78;
+        Wed, 17 Feb 2021 14:57:48 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE8BB10023AF;
-        Wed, 17 Feb 2021 14:57:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9EB7A10023AF;
+        Wed, 17 Feb 2021 14:57:45 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
@@ -47,9 +47,9 @@ Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 6/7] KVM: nVMX: don't load PDPTRS right after nested state set
-Date:   Wed, 17 Feb 2021 16:57:17 +0200
-Message-Id: <20210217145718.1217358-7-mlevitsk@redhat.com>
+Subject: [PATCH 7/7] KVM: nSVM: call nested_svm_load_cr3 on nested state load
+Date:   Wed, 17 Feb 2021 16:57:18 +0200
+Message-Id: <20210217145718.1217358-8-mlevitsk@redhat.com>
 In-Reply-To: <20210217145718.1217358-1-mlevitsk@redhat.com>
 References: <20210217145718.1217358-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -59,62 +59,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Just like all other nested memory accesses, after a migration loading
-PDPTRs should be delayed to first VM entry to ensure
-that guest memory is fully initialized.
+While KVM's MMU should be fully reset by loading of nested CR0/CR3/CR4
+by KVM_SET_SREGS, we are not in nested mode yet when we do it and therefore
+only root_mmu is reset.
 
-Just move the call to nested_vmx_load_cr3 to nested_get_vmcs12_pages
-to implement this.
+On regular nested entries we call nested_svm_load_cr3 which both updates the
+guest's CR3 in the MMU when it is needed, and it also initializes
+the mmu again which makes it initialize the walk_mmu as well when nested
+paging is enabled in both host and guest.
 
+Since we don't call nested_svm_load_cr3 on nested state load,
+the walk_mmu can be left uninitialized, which can lead to a NULL pointer
+dereference while accessing it, if we happen to get a nested page fault
+right after entering the nested guest first time after the migration and
+if we decide to emulate it.
+This makes the emulator access NULL walk_mmu->gva_to_gpa.
+
+Therefore we should call this function on nested state load as well.
+
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ arch/x86/kvm/svm/nested.c | 40 +++++++++++++++++++++------------------
+ 1 file changed, 22 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index f9de729dbea6..26084f8eee82 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2596,11 +2596,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 		return -EINVAL;
- 	}
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 53b9037259b5..ebc7dfaa9f13 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -215,24 +215,6 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
+ 	return true;
+ }
  
--	/* Shadow page tables on either EPT or shadow page tables. */
--	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
--				entry_failure_code))
--		return -EINVAL;
+-static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_svm *svm = to_svm(vcpu);
 -
- 	/*
- 	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
- 	 * on nested VM-Exit, which can occur without actually running L2 and
-@@ -3138,11 +3133,16 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
- static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+-	if (WARN_ON(!is_guest_mode(vcpu)))
+-		return true;
+-
+-	if (!nested_svm_vmrun_msrpm(svm)) {
+-		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
+-		vcpu->run->internal.suberror =
+-			KVM_INTERNAL_ERROR_EMULATION;
+-		vcpu->run->internal.ndata = 0;
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+ static bool nested_vmcb_check_controls(struct vmcb_control_area *control)
  {
- 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	enum vm_entry_failure_code entry_failure_code;
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	struct kvm_host_map *map;
- 	struct page *page;
- 	u64 hpa;
+ 	if (CC(!vmcb_is_intercept(control, INTERCEPT_VMRUN)))
+@@ -1311,6 +1293,28 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
  
-+	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
-+				&entry_failure_code))
++static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	if (WARN_ON(!is_guest_mode(vcpu)))
++		return true;
++
++	if (nested_svm_load_cr3(&svm->vcpu, vcpu->arch.cr3,
++				nested_npt_enabled(svm)))
 +		return false;
 +
- 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
- 		/*
- 		 * Translate L1 physical address to host physical
-@@ -3386,6 +3386,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	}
- 
- 	if (from_vmentry) {
-+		if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3,
-+		    nested_cpu_has_ept(vmcs12), &entry_failure_code))
-+			goto vmentry_fail_vmexit_guest_mode;
++	if (!nested_svm_vmrun_msrpm(svm)) {
++		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
++		vcpu->run->internal.suberror =
++			KVM_INTERNAL_ERROR_EMULATION;
++		vcpu->run->internal.ndata = 0;
++		return false;
++	}
 +
- 		failed_index = nested_vmx_load_msr(vcpu,
- 						   vmcs12->vm_entry_msr_load_addr,
- 						   vmcs12->vm_entry_msr_load_count);
++	return true;
++}
++
+ struct kvm_x86_nested_ops svm_nested_ops = {
+ 	.check_events = svm_check_nested_events,
+ 	.get_nested_state_pages = svm_get_nested_state_pages,
 -- 
 2.26.2
 
