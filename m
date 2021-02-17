@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1950731DBCF
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:00:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07D7231DBD1
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 16:00:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233671AbhBQO7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 09:59:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53164 "EHLO
+        id S233704AbhBQO7p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 09:59:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37361 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233688AbhBQO7K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 09:59:10 -0500
+        by vger.kernel.org with ESMTP id S233605AbhBQO7P (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 09:59:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613573864;
+        s=mimecast20190719; t=1613573869;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cXC9PCMpIbRFpZekIm74aFA90Ezuln3DIDaR/mC8t7U=;
-        b=ZeqArFTCWC/TMilOASZG3vJPu/jmbpUoDaPlu14cwFbcS3sjrkvO4BdrnkM2OakTPhlJdD
-        kGzq7tcCagpYNW3Ez56rml53KwbTYeQus5U5nk+vYOWVUhAN1KAYZ6PrVq8afArUB8ktu4
-        KAskvXihtc6VEV+uzuYQ6grFtKGBxkQ=
+        bh=d7hdrmggGz0IX+vXiyJwgHKownPeIRNtGuiBFLCAaUw=;
+        b=Z3oxzDAsRXXEpRBtPkaQ1r0xFv7T4U0LSS0B5Rk3ncNq1INyFDDjhlkNw67Tgd+EHF/UST
+        xJ/93FrDDXCXOtlJp9HZpQKe20yZZNCC6kD57736E+o8q7AT1scFen7ZuRmmvdHeW1XTTl
+        NPhPH7+j/bDQm/nCEgn7wrBycblG5MY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-okOqrkgtNyG8-LCW3kbhLg-1; Wed, 17 Feb 2021 09:57:43 -0500
-X-MC-Unique: okOqrkgtNyG8-LCW3kbhLg-1
+ us-mta-316-0hpgskSyOPycxJdIbXKYSA-1; Wed, 17 Feb 2021 09:57:46 -0500
+X-MC-Unique: 0hpgskSyOPycxJdIbXKYSA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EC82CE64F;
-        Wed, 17 Feb 2021 14:57:41 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F9BB192AB78;
+        Wed, 17 Feb 2021 14:57:45 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 18B0A10023AF;
-        Wed, 17 Feb 2021 14:57:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DE8BB10023AF;
+        Wed, 17 Feb 2021 14:57:41 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
@@ -47,9 +47,9 @@ Cc:     linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Ingo Molnar <mingo@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 5/7] KVM: nSVM: fix running nested guests when npt=0
-Date:   Wed, 17 Feb 2021 16:57:16 +0200
-Message-Id: <20210217145718.1217358-6-mlevitsk@redhat.com>
+Subject: [PATCH 6/7] KVM: nVMX: don't load PDPTRS right after nested state set
+Date:   Wed, 17 Feb 2021 16:57:17 +0200
+Message-Id: <20210217145718.1217358-7-mlevitsk@redhat.com>
 In-Reply-To: <20210217145718.1217358-1-mlevitsk@redhat.com>
 References: <20210217145718.1217358-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -59,81 +59,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In case of npt=0 on host,
-nSVM needs the same .inject_page_fault tweak as VMX has,
-to make sure that shadow mmu faults are injected as vmexits.
+Just like all other nested memory accesses, after a migration loading
+PDPTRs should be delayed to first VM entry to ensure
+that guest memory is fully initialized.
+
+Just move the call to nested_vmx_load_cr3 to nested_get_vmcs12_pages
+to implement this.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 18 ++++++++++++++++++
- arch/x86/kvm/svm/svm.c    |  5 ++++-
- arch/x86/kvm/svm/svm.h    |  1 +
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 1bc31e2e8fe0..53b9037259b5 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -53,6 +53,23 @@ static void nested_svm_inject_npf_exit(struct kvm_vcpu *vcpu,
- 	nested_svm_vmexit(svm);
- }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f9de729dbea6..26084f8eee82 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2596,11 +2596,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 		return -EINVAL;
+ 	}
  
-+void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_exception *fault)
-+{
-+       struct vcpu_svm *svm = to_svm(vcpu);
-+       WARN_ON(!is_guest_mode(vcpu));
-+
-+       if (vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
-+	   !svm->nested.nested_run_pending) {
-+               svm->vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
-+               svm->vmcb->control.exit_code_hi = 0;
-+               svm->vmcb->control.exit_info_1 = fault->error_code;
-+               svm->vmcb->control.exit_info_2 = fault->address;
-+               nested_svm_vmexit(svm);
-+       } else {
-+               kvm_inject_page_fault(vcpu, fault);
-+       }
-+}
-+
- static u64 nested_svm_get_tdp_pdptr(struct kvm_vcpu *vcpu, int index)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -531,6 +548,7 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb12_gpa,
- 	if (ret)
- 		return ret;
- 
-+
- 	svm_set_gif(svm, true);
- 
- 	return 0;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 74a334c9902a..59e1767df030 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3915,7 +3915,10 @@ static void svm_load_mmu_pgd(struct kvm_vcpu *vcpu, unsigned long root,
- 
- static void svm_complete_mmu_init(struct kvm_vcpu *vcpu)
- {
+-	/* Shadow page tables on either EPT or shadow page tables. */
+-	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
+-				entry_failure_code))
+-		return -EINVAL;
 -
-+	if (!npt_enabled && is_guest_mode(vcpu)) {
-+		WARN_ON(mmu_is_nested(vcpu));
-+		vcpu->arch.mmu->inject_page_fault = svm_inject_page_fault_nested;
-+	}
- }
+ 	/*
+ 	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
+ 	 * on nested VM-Exit, which can occur without actually running L2 and
+@@ -3138,11 +3133,16 @@ static bool nested_get_evmcs_page(struct kvm_vcpu *vcpu)
+ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ {
+ 	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	enum vm_entry_failure_code entry_failure_code;
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	struct kvm_host_map *map;
+ 	struct page *page;
+ 	u64 hpa;
  
- static int is_disabled(void)
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 7b6ca0e49a14..fda80d56c6e3 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -437,6 +437,7 @@ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- 	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
- }
++	if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3, nested_cpu_has_ept(vmcs12),
++				&entry_failure_code))
++		return false;
++
+ 	if (nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+ 		/*
+ 		 * Translate L1 physical address to host physical
+@@ -3386,6 +3386,10 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
+ 	}
  
-+void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_exception *fault);
- int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb_gpa, struct vmcb *vmcb12);
- void svm_leave_nested(struct vcpu_svm *svm);
- void svm_free_nested(struct vcpu_svm *svm);
+ 	if (from_vmentry) {
++		if (nested_vmx_load_cr3(vcpu, vmcs12->guest_cr3,
++		    nested_cpu_has_ept(vmcs12), &entry_failure_code))
++			goto vmentry_fail_vmexit_guest_mode;
++
+ 		failed_index = nested_vmx_load_msr(vcpu,
+ 						   vmcs12->vm_entry_msr_load_addr,
+ 						   vmcs12->vm_entry_msr_load_count);
 -- 
 2.26.2
 
