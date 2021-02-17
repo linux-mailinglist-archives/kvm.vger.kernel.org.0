@@ -2,176 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D69B31DE34
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 18:33:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 751FE31DE78
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 18:40:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233571AbhBQRbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 12:31:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232222AbhBQRbN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 12:31:13 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F8DC061574
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 09:30:33 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 194so12809858ybl.5
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 09:30:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=jHfqonvlMKl1wsgB/F2W/qoXTxBiDKQ8+KEhAtz6vqY=;
-        b=PzcnGWb+9YlawHHBzCy0ixjJsg6CAcCZLbYZJPCjxkNLvmnH4MzE58JTFFCBzx1IoZ
-         IeMKw+kpNLMNSMaqCBQd6PH+TUwrSLCXGcqfEvUXmNgdEPa21PmkkBqpLDwA/tC2uRGT
-         1K66VUnyqGxYkxZ5qtIR5idf035Rwo2ROgzhEX8FdTuLBSqXUhuA23b+JqhrIkpiXtyz
-         S1SG6kOWbk7rby4JMKYwTC4ABRaFmev+e8uYejP3K2HVjawu/km+bOD3WdGemy3jWIwG
-         azGtQzru9zBdL4aO3SIeZMTEF6qz4z9vbHtTSyyQle9J+BMqBV2d9BhXclosuYX3JFcQ
-         8pgg==
+        id S234599AbhBQRjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 12:39:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21907 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234565AbhBQRi5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 12:38:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613583450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UPGAdvbPe3s8hDQD7kYYeKCejFf3hkqwhppMcQX39O8=;
+        b=TbN6S8z/R44ta0lZG8hhlF5B/BzsJE8/wPs4tCEsvl/1cl57mLqQUmqfflhQOdOW1xkFxG
+        BGYp0KEtBULO4IZ/DD8twNfcn+cl0VS3wFZGDFEAIjKX4m8hjVCywCtTD0DwAG/L0bxNQb
+        wFmIPh05FXuHVF5K6Q7iCwTM05kYfHU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-DkqxMa1CO1iaKL_uYEAvsw-1; Wed, 17 Feb 2021 12:37:28 -0500
+X-MC-Unique: DkqxMa1CO1iaKL_uYEAvsw-1
+Received: by mail-wm1-f72.google.com with SMTP id i4so2280145wmb.0
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 09:37:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=jHfqonvlMKl1wsgB/F2W/qoXTxBiDKQ8+KEhAtz6vqY=;
-        b=dzszYmk/Rvw6krRkJgsEn5FVnmY1XmfvQC91w0rOc1RaWZ3b8WU2aFz3OiFc53jcq+
-         vrjl1ebke9hfBj+YAf3lpPFfoweloW6ccx6Qs6MFnz5eeqPIF8EallqUeN3lbpXV4PEU
-         LCqnJkv3PwXyOV0gt0Ec21tCaGgE/EKfw+H7B07+wDQuvK7emDxgVtkHpDuAL35/RdCe
-         kzztOtMDPOp0D/OExIiE/1tR+1OKS2dWESjqAPke5Wr5Zja8XfQVIl773SqofY0ngHs9
-         07TV2bvQLnb9BwiGF4+VGBvJ1TXUwRbIyd50AXY3hrVLnmGV2ICX4gf08ALPkq4acn1E
-         qXtw==
-X-Gm-Message-State: AOAM53158gOSFt5jzi+RQJ7dBR+H9NbXFmw/UgMYiI69XMhEY+d8p03x
-        7wnNPCVxs6qeVXk7Ic+WoVLFsrLM69hc7TkECDTzJKaZMP1RIUcV/w1S8IA9K3X36tShh+QT7/J
-        jqrY1HahNR7WzPWtEmGZCLswJLGVwEA5Nj02mT6XbFpJ7G6UJy1bTvebdWRlZ7GKsosGy
-X-Google-Smtp-Source: ABdhPJykAOfKVkSiVgyo1aPX35HYdsLlFd9CbcWO7jIpaPUMALw7DAoA8kQIytI/+7X/9Sh/PjZB7o9j2mN6JY1f
-Sender: "aaronlewis via sendgmr" <aaronlewis@aaronlewis1.sea.corp.google.com>
-X-Received: from aaronlewis1.sea.corp.google.com ([2620:15c:100:202:95fa:4161:5a32:e12])
- (user=aaronlewis job=sendgmr) by 2002:a25:af52:: with SMTP id
- c18mr761621ybj.196.1613583032910; Wed, 17 Feb 2021 09:30:32 -0800 (PST)
-Date:   Wed, 17 Feb 2021 09:27:31 -0800
-Message-Id: <20210217172730.1521644-1-aaronlewis@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH v2] selftests: kvm: Mmap the entire vcpu mmap area
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, Aaron Lewis <aaronlewis@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UPGAdvbPe3s8hDQD7kYYeKCejFf3hkqwhppMcQX39O8=;
+        b=hiRwo2cp7rLrH6fWqn+ghTlgTkaWM8WwilYbXn1l4Z4sz1KuqFmINrJEuwGquIRwkv
+         9lNc8pEMNi5ku6WfIAyoWl1ZWEcUIh4hEUFX6jahpn0KblmkVvE6W0CDo4VkYWi2T/cy
+         5ps7Yc5aLsTFgSPewp1+O4mcNck9DhvFC4hHzCspTcIn0xQZGtYjZresqruitQ22GVdC
+         B3NBeIc4kk9nEoLUU0+JhrucnIN+I43e0MquyNWF5pt7umWLfAGcjbN+Z1WM8d3bJtUh
+         XugJdlJtKtMVFjBg005aoJVJGq7dqQi6shATOWtdVLscgQh6JHDkBVcZ0hMZG7YnhRLf
+         BT4Q==
+X-Gm-Message-State: AOAM532pkj/wBXS9MZiH0U4OWOi0vm9R1PsMYKW0gPdDUHPrNQl71UX4
+        WSBc9y97hE8KPsDDuxNzcUn5njW+UYPf4uJGXsgkgedl+7F2trTdox2J8Vl7+TH1LqxAPqWD5m0
+        X0ij1pH0QZIif
+X-Received: by 2002:a1c:bbc5:: with SMTP id l188mr58840wmf.32.1613583447210;
+        Wed, 17 Feb 2021 09:37:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzE1/ypz4t+gMfd5XV3rMhW1vFNWYoK+YTd/GqoJtUHKsj6mlHffXpSQ+5XtDl1Rs4O73+XjQ==
+X-Received: by 2002:a1c:bbc5:: with SMTP id l188mr58817wmf.32.1613583446952;
+        Wed, 17 Feb 2021 09:37:26 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id i10sm6137319wrp.0.2021.02.17.09.37.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Feb 2021 09:37:26 -0800 (PST)
+Subject: Re: [PATCH 4/7] KVM: nVMX: move inject_page_fault tweak to
+ .complete_mmu_init
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>
+References: <20210217145718.1217358-1-mlevitsk@redhat.com>
+ <20210217145718.1217358-5-mlevitsk@redhat.com> <YC1ShhSZ+6ST63nZ@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5a8bea9b-deb1-673a-3dc8-f08b679de4c5@redhat.com>
+Date:   Wed, 17 Feb 2021 18:37:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <YC1ShhSZ+6ST63nZ@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vcpu mmap area may consist of more than just the kvm_run struct.
-Allocate enough space for the entire vcpu mmap area. Without this, on
-x86, the PIO page, for example, will be missing.  This is problematic
-when dealing with an unhandled exception from the guest as the exception
-vector will be incorrectly reported as 0x0.
+On 17/02/21 18:29, Sean Christopherson wrote:
+> All that being said, I'm pretty we can eliminate setting 
+> inject_page_fault dynamically. I think that would yield more 
+> maintainable code. Following these flows is a nightmare. The change 
+> itself will be scarier, but I'm pretty sure the end result will be a lot 
+> cleaner.
 
-Co-developed-by: Steve Rutherford <srutherford@google.com>
-Signed-off-by: Steve Rutherford <srutherford@google.com>
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/lib/kvm_util.c | 66 +++++++++++-----------
- 1 file changed, 33 insertions(+), 33 deletions(-)
+I had a similar reaction, though my proposal was different.
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index fa5a90e6c6f0..a2874e366d0f 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -486,6 +486,37 @@ struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid)
- 	return NULL;
- }
- 
-+/*
-+ * VCPU mmap Size
-+ *
-+ * Input Args: None
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Size of VCPU state
-+ *
-+ * Returns the size of the structure pointed to by the return value
-+ * of vcpu_state().
-+ */
-+static int vcpu_mmap_sz(void)
-+{
-+	int dev_fd, ret;
-+
-+	dev_fd = open(KVM_DEV_PATH, O_RDONLY);
-+	if (dev_fd < 0)
-+		exit(KSFT_SKIP);
-+
-+	ret = ioctl(dev_fd, KVM_GET_VCPU_MMAP_SIZE, NULL);
-+	TEST_ASSERT(ret >= sizeof(struct kvm_run),
-+		"%s KVM_GET_VCPU_MMAP_SIZE ioctl failed, rc: %i errno: %i",
-+		__func__, ret, errno);
-+
-+	close(dev_fd);
-+
-+	return ret;
-+}
-+
- /*
-  * VM VCPU Remove
-  *
-@@ -509,7 +540,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
- 		vcpu->dirty_gfns = NULL;
- 	}
- 
--	ret = munmap(vcpu->state, sizeof(*vcpu->state));
-+	ret = munmap(vcpu->state, vcpu_mmap_sz());
- 	TEST_ASSERT(ret == 0, "munmap of VCPU fd failed, rc: %i "
- 		"errno: %i", ret, errno);
- 	close(vcpu->fd);
-@@ -909,37 +940,6 @@ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
- 	__vm_mem_region_delete(vm, memslot2region(vm, slot));
- }
- 
--/*
-- * VCPU mmap Size
-- *
-- * Input Args: None
-- *
-- * Output Args: None
-- *
-- * Return:
-- *   Size of VCPU state
-- *
-- * Returns the size of the structure pointed to by the return value
-- * of vcpu_state().
-- */
--static int vcpu_mmap_sz(void)
--{
--	int dev_fd, ret;
--
--	dev_fd = open(KVM_DEV_PATH, O_RDONLY);
--	if (dev_fd < 0)
--		exit(KSFT_SKIP);
--
--	ret = ioctl(dev_fd, KVM_GET_VCPU_MMAP_SIZE, NULL);
--	TEST_ASSERT(ret >= sizeof(struct kvm_run),
--		"%s KVM_GET_VCPU_MMAP_SIZE ioctl failed, rc: %i errno: %i",
--		__func__, ret, errno);
--
--	close(dev_fd);
--
--	return ret;
--}
--
- /*
-  * VM VCPU Add
-  *
-@@ -978,7 +978,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
- 	TEST_ASSERT(vcpu_mmap_sz() >= sizeof(*vcpu->state), "vcpu mmap size "
- 		"smaller than expected, vcpu_mmap_sz: %i expected_min: %zi",
- 		vcpu_mmap_sz(), sizeof(*vcpu->state));
--	vcpu->state = (struct kvm_run *) mmap(NULL, sizeof(*vcpu->state),
-+	vcpu->state = (struct kvm_run *) mmap(NULL, vcpu_mmap_sz(),
- 		PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->fd, 0);
- 	TEST_ASSERT(vcpu->state != MAP_FAILED, "mmap vcpu_state failed, "
- 		"vcpu id: %u errno: %i", vcpuid, errno);
--- 
-2.30.0.478.g8a0d178c01-goog
+The only thing we're changing in complete_mmu_init is the page fault 
+callback for init_kvm_softmmu, so couldn't that be the callback directly 
+(i.e. something like context->inject_page_fault = 
+kvm_x86_ops.inject_softmmu_page_fault)?  And then adding is_guest_mode 
+to the conditional that is already in vmx_inject_page_fault_nested and 
+svm_inject_page_fault_nested.
+
+That said, I'm also rusty on _why_ this code is needed.  Why isn't it 
+enough to inject the exception normally, and let 
+nested_vmx_check_exception decide whether to inject a vmexit to L1 or an 
+exception into L2?
+
+Also, bonus question which should have been in the 5/7 changelog: are 
+there kvm-unit-tests testcases that fail with npt=0, and if not could we 
+write one?  [Answer: the mode_switch testcase fails, but I haven't 
+checked why].
+
+
+Paolo
 
