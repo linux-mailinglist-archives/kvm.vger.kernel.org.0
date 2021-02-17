@@ -2,84 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C5E9D31D388
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 02:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A40B831D6E6
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 10:20:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231371AbhBQBHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Feb 2021 20:07:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbhBQBHT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Feb 2021 20:07:19 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19F87C06174A
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 17:06:39 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id e9so6501971plh.3
-        for <kvm@vger.kernel.org>; Tue, 16 Feb 2021 17:06:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=VpU8qAYD0HfOV0jRoZxTxXUNEpZbr3IDKBiNxw+6kmw=;
-        b=hcBGgzS01cvj3tS1uU+Qlhb0PBxMUQN4G476DRnY6E4TanTlZqzBytvm3YxtC8XAhD
-         Oggmw8J639+xVybtpjkc8Hf2nTKcZJuMp4QQaL6ubCoEwCkUt11OVSC+cEpG3ZV/H4gQ
-         aThc8eKCVZoKPZa6OKXgGuuvo+/6fqs9YrF/JJ50XajCL57Ml/0ojj3onIapz/V6Msnp
-         aFSMHvwvcbC+JfsmUSqztpcipzp2YJZ02my6HOd1FZXSfxjUj3kBoCrLNzhwFhGfH2mm
-         CQ6Pq9315s7Pr3kOZ/qYHOFolLrdGvKYF+0aNSTKxt8ylCUQZO6T8rO2whGDBLJ8IxWi
-         DLLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=VpU8qAYD0HfOV0jRoZxTxXUNEpZbr3IDKBiNxw+6kmw=;
-        b=pLI2uSwQVl2Rn5n+gjTsv5QjQkWKws4P04ezDZ4lowjKxCnYTu6++FTxmaGls2PRiw
-         kQPaCu0t6TJjmW3im/bHPs9O+tl4WA7Awbpx73ASZSI5Re+wmafu8yR9J6jZE8xY7Hz8
-         gS7DVS0Res6InRsoANDThy/nfFsgIY81g8MhZhPKxhRTVKxtcawVa4L2FLAz/JAfsikM
-         K2jvK48x+9gdAVYN2zgPKQhyQYo2fl7dZ4RYKUS+nOoqBx4+7jMI0x8iYZV7c21W9RPI
-         giekLcYHG+UPuyLmq8/8eIIfFxx/cLbKZmgdrtXDZirxEHgCVKQuQOAxjnaG1JYaz8Z3
-         PpXw==
-X-Gm-Message-State: AOAM532uuMpK5F3mPW1LBn/pMnL1OJEm9ed5sTqBgO1BFtmWsB/gta44
-        Bm77onIvWQTMoCrrYbKfJXZI3A==
-X-Google-Smtp-Source: ABdhPJymcHbHtR/rOaL0XXTVk3Pb4CatDHwqs5lW/oLEZk5H/tZBdT3zvB5dU9EN7jnhOe/nHALDLA==
-X-Received: by 2002:a17:90a:ad97:: with SMTP id s23mr486958pjq.212.1613523998512;
-        Tue, 16 Feb 2021 17:06:38 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
-        by smtp.gmail.com with ESMTPSA id z12sm164166pjz.16.2021.02.16.17.06.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 17:06:37 -0800 (PST)
-Date:   Tue, 16 Feb 2021 17:06:31 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, joro@8bytes.org, bp@suse.de,
-        thomas.lendacky@amd.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, srutherford@google.com,
-        venu.busireddy@oracle.com, brijesh.singh@amd.com
-Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
- ioctl
-Message-ID: <YCxsFz2meMBdkn7t@google.com>
-References: <cover.1612398155.git.ashish.kalra@amd.com>
- <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+        id S231847AbhBQJTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 04:19:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21284 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229553AbhBQJTL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 04:19:11 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11H90dMt026168;
+        Wed, 17 Feb 2021 04:18:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Ia97Hv6vISsG9Ib9rQmb1DZFC45uId5MKmhx6AfP8W8=;
+ b=YxKvHF0avTHXHFMcyQSst74SbNLMamyS0ABtA65fa/D0yFOUgmdvZeZfNrxUikxrM5n/
+ xN1vLljgqPjSTP4Thf7Wh2WFh3kyRYlQhn+Y/Q9Kjsba7LFh4BINixli1pKHzev0ELTy
+ G4R2rMBVZlP8Co7LYN7Vi9hkfhQ7i6ArSVKc/9kxzt6qoKz+mKY0hl/XYZPDkaTBHkSm
+ iz1kfviRZeDMCrfnao5TvYX6fdEruZyGil6fXM+j5ickk11JF+E5ArfpVdsStrDbid0n
+ XSXtHmV3AhftCPiaTxVVupJtiD8mDPjtYUJD83rT5RwsNM7wY4wRjPtRJjqkJ1ug5RPS UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s03brqb3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 04:18:21 -0500
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11H9HjAQ103877;
+        Wed, 17 Feb 2021 04:18:21 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36s03brqaf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 04:18:21 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11H9DhxN010720;
+        Wed, 17 Feb 2021 09:18:18 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 36p6d8bhq5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 Feb 2021 09:18:18 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11H9IGvZ36897094
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Feb 2021 09:18:16 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6CD59A405E;
+        Wed, 17 Feb 2021 09:18:16 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8429A4053;
+        Wed, 17 Feb 2021 09:18:12 +0000 (GMT)
+Received: from [9.160.89.213] (unknown [9.160.89.213])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 17 Feb 2021 09:18:12 +0000 (GMT)
+Subject: Re: [PATCH for 5.4] Fix unsynchronized access to sev members through
+ svm_register_enc_region
+To:     Peter Gonda <pgonda@google.com>, stable@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Sean Christopherson <seanjc@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210208164855.772287-1-pgonda@google.com>
+From:   Dov Murik <dovmurik@linux.vnet.ibm.com>
+Message-ID: <2ddf06e9-a541-3d9c-3a0c-db557a04afcc@linux.vnet.ibm.com>
+Date:   Wed, 17 Feb 2021 11:18:11 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
+In-Reply-To: <20210208164855.772287-1-pgonda@google.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-17_06:2021-02-16,2021-02-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
+ bulkscore=0 mlxlogscore=999 phishscore=0 adultscore=0 impostorscore=0
+ spamscore=0 suspectscore=0 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102170064
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 04, 2021, Ashish Kalra wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+Hi Peter,
+
+On 08/02/2021 18:48, Peter Gonda wrote:
+> commit 19a23da53932bc8011220bd8c410cb76012de004 upstream.
 > 
-> The ioctl is used to retrieve a guest's shared pages list.
+> Grab kvm->lock before pinning memory when registering an encrypted
+> region; sev_pin_memory() relies on kvm->lock being held to ensure
+> correctness when checking and updating the number of pinned pages.
+> 
+> Add a lockdep assertion to help prevent future regressions.
 > 
 > Cc: Thomas Gleixner <tglx@linutronix.de>
 > Cc: Ingo Molnar <mingo@redhat.com>
 > Cc: "H. Peter Anvin" <hpa@zytor.com>
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Brijesh Singh <brijesh.singh@amd.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: x86@kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Fixes: 1e80fdc09d12 ("KVM: SVM: Pin guest memory when SEV is active")
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> 
+> V2
+>  - Fix up patch description
+>  - Correct file paths svm.c -> sev.c
+>  - Add unlock of kvm->lock on sev_pin_memory error
+> 
+> V1
+>  - https://lore.kernel.org/kvm/20210126185431.1824530-1-pgonda@google.com/
+> 
+> Message-Id: <20210127161524.2832400-1-pgonda@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 2b506904be02..93c89f1ffc5d 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -1830,6 +1830,8 @@ static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uaddr,
+>  	struct page **pages;
+>  	unsigned long first, last;
+> 
+> +	lockdep_assert_held(&kvm->lock);
+> +
+>  	if (ulen == 0 || uaddr + ulen < uaddr)
+>  		return NULL;
+> 
+> @@ -7086,12 +7088,21 @@ static int svm_register_enc_region(struct kvm *kvm,
+>  	if (!region)
+>  		return -ENOMEM;
+> 
+> +	mutex_lock(&kvm->lock);
+>  	region->pages = sev_pin_memory(kvm, range->addr, range->size, &region->npages, 1);
+>  	if (!region->pages) {
+>  		ret = -ENOMEM;
+> +		mutex_unlock(&kvm->lock);
+>  		goto e_free;
+>  	}
+> 
+> +	region->uaddr = range->addr;
+> +	region->size = range->size;
+> +
+> +	mutex_lock(&kvm->lock);
 
-AFAIK, Radim is no longer involved with KVM, and his RedHat email is bouncing.
-Probably best to drop his Cc in future revisions.
+This extra mutex_lock call doesn't appear in the upstream patch (committed 
+as 19a23da5393), but does appear in the 5.4 and 4.19 backports.  Is it
+needed here?
+
+-Dov
+
+
+> +	list_add_tail(&region->list, &sev->regions_list);
+> +	mutex_unlock(&kvm->lock);
+> +
+>  	/*
+>  	 * The guest may change the memory encryption attribute from C=0 -> C=1
+>  	 * or vice versa for this memory range. Lets make sure caches are
+> @@ -7100,13 +7111,6 @@ static int svm_register_enc_region(struct kvm *kvm,
+>  	 */
+>  	sev_clflush_pages(region->pages, region->npages);
+> 
+> -	region->uaddr = range->addr;
+> -	region->size = range->size;
+> -
+> -	mutex_lock(&kvm->lock);
+> -	list_add_tail(&region->list, &sev->regions_list);
+> -	mutex_unlock(&kvm->lock);
+> -
+>  	return ret;
+> 
+>  e_free:
+> 
