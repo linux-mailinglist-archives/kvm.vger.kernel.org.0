@@ -2,109 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 413EA31DEA7
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 18:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E18931DEAD
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:00:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234688AbhBQR6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 12:58:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232216AbhBQR6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 12:58:43 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5645C061756
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 09:58:02 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id m2so8964047pgq.5
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 09:58:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PoIPEb3cJaoO15qUdGXOK4VdWSU6X8gTdQslJu2SzXM=;
-        b=mwiH+KOkEgPnBs2j/jYq/1jyU2RT2Qt36YKFXAkBxmz9L2jqBKuI5OO4cJFSKXxHi5
-         45ykmUuHr8SyEpxAnzI7auY/HZFBtlmVCylljSEvVeZXMY4HMi51jsD36gG30NL9C18R
-         9bMmO67O/8A1V/xjWQcX08hs/wF8nao6ghFTP/QE8dnW4d4NpFlmb7iTzttrM/6fihd1
-         /qfK4ybyULMnVOPNCRFhxz9u48ivHDkQqLaC54XISNr2eKsh7aSJXBXOFfm2RqwWGniH
-         bu5QLD79IHivALbhEm1Zu6xLfKmTQO6I7Aex8nEqylDLe4WspGvFGIBH+6fKNy/e8IBC
-         AxWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PoIPEb3cJaoO15qUdGXOK4VdWSU6X8gTdQslJu2SzXM=;
-        b=PcDZf+ysf5hp19ebT7HKcf5gNfpgzGxzMkF/8dEvOj0N7/sXbDzmLTvXvTV8Eh4j47
-         ADcPh5CAhV/waN5IcSNBCi6mJlPkpMWLwvfgL4hOgE1ce/COeZVknUIqwrg3if9Gz5ar
-         MHYWMzrUIgMHt77HRYV/1ycdkAVN51MgDPAzAlsrtQbSEcDxRTkHc/Poe35++YYhf3ek
-         TMDk5tgOSCbZ4sAP+Zh4PullsFhFMw5ovAl72Rt/ZkIEAUWpUBGlcEMZs4zZPS3O2oKO
-         0RMsfGcP/C/LLAHlqa7jPujo6zhb8WdWuJ8CrMn8apOaDG/4lYht8eow6TmvFtgmo4yk
-         FAHQ==
-X-Gm-Message-State: AOAM5321P/RZ/XhdAKswvsL2tVnNOzwW+PNepKKn3teHAx0TgX2qMgkm
-        KI7GowpL2scaKowr7A5KS6HC4g==
-X-Google-Smtp-Source: ABdhPJyjyz+ZCBmOTi2t6osFAbSVUzTL5//qYLsDcNG1WP1Apmj9aEkE1RhuACgO+bjOlTRW25k1DQ==
-X-Received: by 2002:a63:5453:: with SMTP id e19mr450722pgm.439.1613584682279;
-        Wed, 17 Feb 2021 09:58:02 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:6948:259b:72c6:5517])
-        by smtp.gmail.com with ESMTPSA id y67sm2975404pfb.71.2021.02.17.09.58.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Feb 2021 09:58:01 -0800 (PST)
-Date:   Wed, 17 Feb 2021 09:57:55 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-Subject: Re: [PATCH 4/7] KVM: nVMX: move inject_page_fault tweak to
- .complete_mmu_init
-Message-ID: <YC1ZI6DW49u0UP7m@google.com>
-References: <20210217145718.1217358-1-mlevitsk@redhat.com>
- <20210217145718.1217358-5-mlevitsk@redhat.com>
- <YC1ShhSZ+6ST63nZ@google.com>
- <5a8bea9b-deb1-673a-3dc8-f08b679de4c5@redhat.com>
+        id S233003AbhBQSA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 13:00:26 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:38786 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231856AbhBQSAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 13:00:25 -0500
+Received: from zn.tnic (p200300ec2f05bb00a5a1b5cb6f03bfce.dip0.t-ipconnect.de [IPv6:2003:ec:2f05:bb00:a5a1:b5cb:6f03:bfce])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED4941EC0402;
+        Wed, 17 Feb 2021 18:59:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1613584784;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=WmuQ8y/fflrvmjf86SX6xiFBOAxGxvoIY9jzq881ltE=;
+        b=VtuqqWV9FksO9bvGEz8s/uGpYsmQhciTMb5Bf5x7ZRbliGBwcMAr4OEUnISJXR69BwU8JS
+        gfteNUD430fYDD5Kj6HzYtes586+ku381MB0OWQ2UpD4sqHIPXR8P3HfmMaEIRoEW+MeMV
+        +StFS37yM89lDHr/vpDza8tR87BZG+M=
+Date:   Wed, 17 Feb 2021 18:59:39 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>,
+        stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH 1/3] x86/sev-es: Introduce from_syscall_gap() helper
+Message-ID: <20210217175939.GA6479@zn.tnic>
+References: <20210217120143.6106-1-joro@8bytes.org>
+ <20210217120143.6106-2-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5a8bea9b-deb1-673a-3dc8-f08b679de4c5@redhat.com>
+In-Reply-To: <20210217120143.6106-2-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 17, 2021, Paolo Bonzini wrote:
-> On 17/02/21 18:29, Sean Christopherson wrote:
-> > All that being said, I'm pretty we can eliminate setting
-> > inject_page_fault dynamically. I think that would yield more
-> > maintainable code. Following these flows is a nightmare. The change
-> > itself will be scarier, but I'm pretty sure the end result will be a lot
-> > cleaner.
-> 
-> I had a similar reaction, though my proposal was different.
-> 
-> The only thing we're changing in complete_mmu_init is the page fault
-> callback for init_kvm_softmmu, so couldn't that be the callback directly
-> (i.e. something like context->inject_page_fault =
-> kvm_x86_ops.inject_softmmu_page_fault)?  And then adding is_guest_mode to
-> the conditional that is already in vmx_inject_page_fault_nested and
-> svm_inject_page_fault_nested.
+I guess subject prefix should be "x86/traps:" but I'll fix that up while
+applying eventually.
 
-Heh, that exact code crossed my mind as well.
-
-> That said, I'm also rusty on _why_ this code is needed.  Why isn't it enough
-> to inject the exception normally, and let nested_vmx_check_exception decide
-> whether to inject a vmexit to L1 or an exception into L2?
-
-Hmm, I suspect it was required at one point due to deficiencies elsewhere.
-Handling this in the common fault handler logic does seem like the right
-approach.
-
-> Also, bonus question which should have been in the 5/7 changelog: are there
-> kvm-unit-tests testcases that fail with npt=0, and if not could we write
-> one?  [Answer: the mode_switch testcase fails, but I haven't checked why].
+On Wed, Feb 17, 2021 at 01:01:41PM +0100, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
+> Introduce a helper to check whether an exception came from the syscall
+> gap and use it in the SEV-ES code
 > 
-> Paolo
+> Fixes: 315562c9af3d5 ("x86/sev-es: Adjust #VC IST Stack on entering NMI handler")
+> Cc: stable@vger.kernel.org # 5.10+
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/include/asm/ptrace.h | 8 ++++++++
+>  arch/x86/kernel/traps.c       | 3 +--
+>  2 files changed, 9 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/ptrace.h b/arch/x86/include/asm/ptrace.h
+> index d8324a236696..14854b2c4944 100644
+> --- a/arch/x86/include/asm/ptrace.h
+> +++ b/arch/x86/include/asm/ptrace.h
+> @@ -94,6 +94,8 @@ struct pt_regs {
+>  #include <asm/paravirt_types.h>
+>  #endif
+>  
+> +#include <asm/proto.h>
+> +
+>  struct cpuinfo_x86;
+>  struct task_struct;
+>  
+> @@ -175,6 +177,12 @@ static inline bool any_64bit_mode(struct pt_regs *regs)
+>  #ifdef CONFIG_X86_64
+>  #define current_user_stack_pointer()	current_pt_regs()->sp
+>  #define compat_user_stack_pointer()	current_pt_regs()->sp
+> +
+> +static inline bool from_syscall_gap(struct pt_regs *regs)
+
+rip_within_syscall_gap() sounds kinda better to me and it is more
+readable when you look at it at the usage site:
+
+	if (rip_within_syscall_gap(regs))
+		...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
