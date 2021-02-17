@@ -2,105 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E5A631DEC9
-	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:08:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 048FE31DEDD
+	for <lists+kvm@lfdr.de>; Wed, 17 Feb 2021 19:11:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233536AbhBQSIG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 13:08:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22060 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233121AbhBQSIE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Feb 2021 13:08:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613585197;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=k+PafZtTxxRkQ/4iNlBI25yfowv1emoIIbzvsMB2gSE=;
-        b=Y/chTFCJ2hixJEiLF88GIhd6CPmu93FcwVns2gkwxSaOn7+mq5vJweNBlZZDP07I73s67u
-        1K2s1humEN/USTwgWIGwAAib44kOmtBoUBxQK8OBaBlz27I3zqLm3va94WPETtnkkoHhQc
-        xFu5or32tas1vg6jYuSsbRqbtmdXE2M=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-537-eSfdebhSMNqQy1FENNYJyA-1; Wed, 17 Feb 2021 13:06:35 -0500
-X-MC-Unique: eSfdebhSMNqQy1FENNYJyA-1
-Received: by mail-wm1-f71.google.com with SMTP id z67so2696107wme.3
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 10:06:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=k+PafZtTxxRkQ/4iNlBI25yfowv1emoIIbzvsMB2gSE=;
-        b=NiMxoUt+P613fk5Eq3mV3rJ0GZsO/xNEp6hY41yhxCPPEaRdGDYOeFlfxY2oSLwqrp
-         BInMXV1BClM6UoWoryL1b14a4I7QdXHoqBIn+IakIFpDq/YhH69LmSmxj5U4ecU2L1VS
-         29QP2yHiAgB1KU1eOPdE1WHsi9yVpOHQOHWkLDPFVurRP2kPkoOy/1wAq+HnEs8K1AWf
-         Nw4DKXZpQNKCvLkRGq4kC3kyX56S2LlORuKar6pHC36iI2QjVumqJy4TfACTDwlfCacK
-         E3hkaAm1QgiELS4PRinho4D1YYqdew6bxio4I/gTJDAVi9F7Fp1NIeCiDxycsPSfFWqW
-         jSsQ==
-X-Gm-Message-State: AOAM530NBpxWY6HJHEDvy81glFyJ2l/arf6N8B3hn6gt9NZrrcN3muYS
-        1bWtntAI65u/qPGRIImFyiFXZzBs/vYB4O7Fg8sPfBUcXJqEwqLTohkpptbTGSuYvfsWgijV/v+
-        tQ5JpbqEPwZpZ
-X-Received: by 2002:a7b:c397:: with SMTP id s23mr136719wmj.10.1613585194475;
-        Wed, 17 Feb 2021 10:06:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzj3+yONrD5USEwpi0jytCwqxYl0gWMNhs6MJDy1RnaxhN+ylhooyQJKQvSXLrh8MQUjAvhhA==
-X-Received: by 2002:a7b:c397:: with SMTP id s23mr136705wmj.10.1613585194201;
-        Wed, 17 Feb 2021 10:06:34 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id w8sm5037173wrm.21.2021.02.17.10.06.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Feb 2021 10:06:33 -0800 (PST)
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <20210217145718.1217358-1-mlevitsk@redhat.com>
- <20210217145718.1217358-7-mlevitsk@redhat.com> <YC1X2FMdPn32ci1C@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 6/7] KVM: nVMX: don't load PDPTRS right after nested state
- set
-Message-ID: <8660e415-5375-d4cf-54d4-b0b8eb6e1dc3@redhat.com>
-Date:   Wed, 17 Feb 2021 19:06:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S233149AbhBQSKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 13:10:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44824 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232903AbhBQSKm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 13:10:42 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3025764EAF
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 18:10:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613585401;
+        bh=L1OIdISDMiKRSiSWhaILOTGeRPn9DN0OB9U34bRhQek=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=tmjHATDWxlVbs//lCjmhXz0QNI7+Gw1Xbz5+af5khjJyi1muOTUw92d/TN1UtGt2+
+         1Z/+ybuCpbO2EuU6sV6G2o8r0rOKaIMJnntjfXGRivIE+IA4mvYi4YbzoyMI7hDer/
+         W+sMpeU/DLDaMfSZAZqoR6H7pmny3c26/AsJDPnaPUqaignJNnOMxixNqBG5+/ifts
+         CzF4JzxfYfG65uKYzuVz7Hvgsk6W8mumOCseKs0S+r2vq7S9vppmiuoK4a5bGMEgTe
+         g0nDVaEOni97kwzYuN4Nci8afgF/Ru1s3VKUKUEVwa0DQWACmxa4F/Mwiofk9/5hLe
+         afBfHjtP+JZig==
+Received: by mail-lf1-f53.google.com with SMTP id z11so23116566lfb.9
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 10:10:01 -0800 (PST)
+X-Gm-Message-State: AOAM532FyYqZZG/YQOZziN3Jp/oaGfqaMz383W39Faa7bGtVg/7XC893
+        KrcU44VzuhG9A7RecwvJL3c4tcjdLVF0KmdBVezEDg==
+X-Google-Smtp-Source: ABdhPJzwArcpxgytNfc42oZjlVBrqCPpsnJwfz+6zR5LkK02Ldu1E4mXTepd7vnfdobtpuRYckLoG8BqletPssvhb9Y=
+X-Received: by 2002:a17:906:b356:: with SMTP id cd22mr175224ejb.253.1613585399128;
+ Wed, 17 Feb 2021 10:09:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <YC1X2FMdPn32ci1C@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210217120143.6106-1-joro@8bytes.org> <20210217120143.6106-3-joro@8bytes.org>
+In-Reply-To: <20210217120143.6106-3-joro@8bytes.org>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Wed, 17 Feb 2021 10:09:46 -0800
+X-Gmail-Original-Message-ID: <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
+Message-ID: <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
+ adjusting #VC IST stack
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     X86 ML <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        stable <stable@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/02/21 18:52, Sean Christopherson wrote:
->>
->> Just move the call to nested_vmx_load_cr3 to nested_get_vmcs12_pages
->> to implement this.
+On Wed, Feb 17, 2021 at 4:02 AM Joerg Roedel <joro@8bytes.org> wrote:
 >
-> I don't love this approach.  KVM_SET_NESTED_STATE will now succeed with a bad
-> vmcs12.GUEST_CR3.  At a minimum, GUEST_CR3 should be checked in
-> nested_vmx_check_guest_state().  It also feels like vcpu->arch.cr3 should be set
-> immediately, e.g. KVM_SET_NESTED_STATE -> KVM_GET_SREGS should reflect L2's CR3
-> even if KVM_RUN hasn't been invoked.
+> From: Joerg Roedel <jroedel@suse.de>
+>
+> The code in the NMI handler to adjust the #VC handler IST stack is
+> needed in case an NMI hits when the #VC handler is still using its IST
+> stack.
+> But the check for this condition also needs to look if the regs->sp
+> value is trusted, meaning it was not set by user-space. Extend the
+> check to not use regs->sp when the NMI interrupted user-space code or
+> the SYSCALL gap.
+>
+> Reported-by: Andy Lutomirski <luto@kernel.org>
+> Fixes: 315562c9af3d5 ("x86/sev-es: Adjust #VC IST Stack on entering NMI handler")
+> Cc: stable@vger.kernel.org # 5.10+
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/kernel/sev-es.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/sev-es.c b/arch/x86/kernel/sev-es.c
+> index 84c1821819af..0df38b185d53 100644
+> --- a/arch/x86/kernel/sev-es.c
+> +++ b/arch/x86/kernel/sev-es.c
+> @@ -144,7 +144,9 @@ void noinstr __sev_es_ist_enter(struct pt_regs *regs)
+>         old_ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
+>
+>         /* Make room on the IST stack */
+> -       if (on_vc_stack(regs->sp))
+> +       if (on_vc_stack(regs->sp) &&
+> +           !user_mode(regs) &&
+> +           !from_syscall_gap(regs))
+>                 new_ist = ALIGN_DOWN(regs->sp, 8) - sizeof(old_ist);
+>         else
+>
 
-Note that KVM_SET_NESTED_STATE does not remove the need to invoke 
-KVM_SET_SREGS.  Calling KVM_SET_NESTED_STATE does not necessarily saying 
-anything about the value of KVM_GET_SREGS after it.
+Can you get rid of the linked list hack while you're at it?  This code
+is unnecessarily convoluted right now, and it seems to be just asking
+for weird bugs.  Just stash the old value in a local variable, please.
 
-In particular on SVM it's a "feature" that KVM_SET_NESTED_STATE does not 
-include any guest register state; the nested state only includes the 
-VMCB12 control state and the L1 save state.  But thinking more about it, 
-loading the PDPTRs for the guest CR3 might not be advisable even upon 
-KVM_SET_SREGS, and we might want to extend KVM_REQ_GET_NESTED_PAGES to 
-cover non-nested PDPTRs as well.
+Meanwhile, I'm pretty sure I can break this whole scheme if the
+hypervisor is messing with us.  As a trivial example, the sequence
+SYSCALL gap -> #VC -> NMI -> #VC will go quite poorly.  Is this really
+better than just turning IST off for #VC and documenting that we are
+not secure against a malicious hypervisor yet?
 
-Paolo
-
+--Andy
