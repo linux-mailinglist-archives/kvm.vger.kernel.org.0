@@ -2,235 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A06031E9EB
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 13:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A345C31E9F4
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 13:47:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232905AbhBRMcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 07:32:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23464 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229893AbhBRKuO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 05:50:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613645326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xrLVPyhrv8/F8fL5Wp8KW8EGwEwKdeCoRYS/Gw5ZWiY=;
-        b=OzM2Fs8IolYgYQ4bQwpLqAQ43o//mLibOr7fMCdXJSpxBb2+FReuzfS/4FUCKKRtBt+SKq
-        qN6vJtnEt8Tb31jnPYm7p0hwmyvMftQvs1RYUSK8XFY5RN9MMzDg12+gzM+kerW3trf8Hp
-        3pnS1nB1kOVSClNEPd8jWjJukq2fXKs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-zLEF85eQO1Sv2WJwOi_wrA-1; Thu, 18 Feb 2021 05:48:43 -0500
-X-MC-Unique: zLEF85eQO1Sv2WJwOi_wrA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC3E2192CC42;
-        Thu, 18 Feb 2021 10:48:40 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EB6762679;
-        Thu, 18 Feb 2021 10:48:32 +0000 (UTC)
-Subject: Re: [PATCH v11 12/13] vfio/pci: Register a DMA fault response region
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Cc:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-13-eric.auger@redhat.com>
- <6c00965615844f03954faecb6fcb9294@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <13efbf21-90cc-9b52-a6cd-68280ea73db2@redhat.com>
-Date:   Thu, 18 Feb 2021 11:48:30 +0100
+        id S233082AbhBRMga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 07:36:30 -0500
+Received: from foss.arm.com ([217.140.110.172]:50414 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232244AbhBRMND (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 07:13:03 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1C961042;
+        Thu, 18 Feb 2021 03:17:43 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0029F3F73D;
+        Thu, 18 Feb 2021 03:17:42 -0800 (PST)
+Subject: Re: [PATCH kvmtool 06/21] hw/i8042: Refactor trap handler
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-7-andre.przywara@arm.com>
+ <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
+ <20210218103425.26a27000@slackpad.fritz.box>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <5d2d7233-46f6-3056-e2b2-813a3fc56d88@arm.com>
+Date:   Thu, 18 Feb 2021 11:17:58 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <6c00965615844f03954faecb6fcb9294@huawei.com>
+In-Reply-To: <20210218103425.26a27000@slackpad.fritz.box>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameer,
+Hi Andre,
 
-On 2/18/21 11:36 AM, Shameerali Kolothum Thodi wrote:
-> Hi Eric,
-> 
->>> -----Original Message-----
->>> From: Eric Auger [mailto:eric.auger@redhat.com]
->>> Sent: 16 November 2020 11:00
->>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
->>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
->>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
->>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
->>> alex.williamson@redhat.com
->>> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
->>> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
->>> Thodi <shameerali.kolothum.thodi@huawei.com>;
->>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
->>> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
->>> Subject: [PATCH v11 12/13] vfio/pci: Register a DMA fault response
->>> region
+On 2/18/21 10:34 AM, Andre Przywara wrote:
+> On Thu, 11 Feb 2021 17:23:13 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>
+>> Hi Andre,
+>>
+>> On 12/10/20 2:28 PM, Andre Przywara wrote:
+>>> With the planned retirement of the special ioport emulation code, we
+>>> need to provide an emulation function compatible with the MMIO
+>>> prototype.
 >>>
->>> In preparation for vSVA, let's register a DMA fault response region,
->>> where the userspace will push the page responses and increment the
->>> head of the buffer. The kernel will pop those responses and inject
->>> them on iommu side.
+>>> Adjust the trap handler to use that new function, and provide shims to
+>>> implement the old ioport interface, for now.
 >>>
->>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >>> ---
->>>  drivers/vfio/pci/vfio_pci.c         | 114 +++++++++++++++++++++++++---
->>>  drivers/vfio/pci/vfio_pci_private.h |   5 ++
->>>  drivers/vfio/pci/vfio_pci_rdwr.c    |  39 ++++++++++
->>>  include/uapi/linux/vfio.h           |  32 ++++++++
->>>  4 files changed, 181 insertions(+), 9 deletions(-)
+>>>  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
+>>>  1 file changed, 34 insertions(+), 34 deletions(-)
 >>>
->>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->>> index 65a83fd0e8c0..e9a904ce3f0d 100644
->>> --- a/drivers/vfio/pci/vfio_pci.c
->>> +++ b/drivers/vfio/pci/vfio_pci.c
->>> @@ -318,9 +318,20 @@ static void vfio_pci_dma_fault_release(struct
->>> vfio_pci_device *vdev,
->>>  	kfree(vdev->fault_pages);
->>>  }
->>>
->>> -static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
->>> -				   struct vfio_pci_region *region,
->>> -				   struct vm_area_struct *vma)
->>> +static void
->>> +vfio_pci_dma_fault_response_release(struct vfio_pci_device *vdev,
->>> +				    struct vfio_pci_region *region) {
->>> +	if (vdev->dma_fault_response_wq)
->>> +		destroy_workqueue(vdev->dma_fault_response_wq);
->>> +	kfree(vdev->fault_response_pages);
->>> +	vdev->fault_response_pages = NULL;
->>> +}
->>> +
->>> +static int __vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
->>> +				     struct vfio_pci_region *region,
->>> +				     struct vm_area_struct *vma,
->>> +				     u8 *pages)
->>>  {
->>>  	u64 phys_len, req_len, pgoff, req_start;
->>>  	unsigned long long addr;
->>> @@ -333,14 +344,14 @@ static int vfio_pci_dma_fault_mmap(struct
->>> vfio_pci_device *vdev,
->>>  		((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
->>>  	req_start = pgoff << PAGE_SHIFT;
->>>
->>> -	/* only the second page of the producer fault region is mmappable */
->>> +	/* only the second page of the fault region is mmappable */
->>>  	if (req_start < PAGE_SIZE)
->>>  		return -EINVAL;
->>>
->>>  	if (req_start + req_len > phys_len)
->>>  		return -EINVAL;
->>>
->>> -	addr = virt_to_phys(vdev->fault_pages);
->>> +	addr = virt_to_phys(pages);
->>>  	vma->vm_private_data = vdev;
->>>  	vma->vm_pgoff = (addr >> PAGE_SHIFT) + pgoff;
->>>
->>> @@ -349,13 +360,29 @@ static int vfio_pci_dma_fault_mmap(struct
->>> vfio_pci_device *vdev,
->>>  	return ret;
->>>  }
->>>
->>> -static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
->>> -					     struct vfio_pci_region *region,
->>> -					     struct vfio_info_cap *caps)
->>> +static int vfio_pci_dma_fault_mmap(struct vfio_pci_device *vdev,
->>> +				   struct vfio_pci_region *region,
->>> +				   struct vm_area_struct *vma)
->>> +{
->>> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
->>> vdev->fault_pages);
->>> +}
->>> +
->>> +static int
->>> +vfio_pci_dma_fault_response_mmap(struct vfio_pci_device *vdev,
->>> +				struct vfio_pci_region *region,
->>> +				struct vm_area_struct *vma)
->>> +{
->>> +	return __vfio_pci_dma_fault_mmap(vdev, region, vma,
->>> vdev->fault_response_pages);
->>> +}
->>> +
->>> +static int __vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
->>> +					       struct vfio_pci_region *region,
->>> +					       struct vfio_info_cap *caps,
->>> +					       u32 cap_id)
->>>  {
->>>  	struct vfio_region_info_cap_sparse_mmap *sparse = NULL;
->>>  	struct vfio_region_info_cap_fault cap = {
->>> -		.header.id = VFIO_REGION_INFO_CAP_DMA_FAULT,
->>> +		.header.id = cap_id,
->>>  		.header.version = 1,
->>>  		.version = 1,
+>>> diff --git a/hw/i8042.c b/hw/i8042.c
+>>> index 36ee183f..eb1f9d28 100644
+>>> --- a/hw/i8042.c
+>>> +++ b/hw/i8042.c
+>>> @@ -292,52 +292,52 @@ static void kbd_reset(void)
 >>>  	};
->>> @@ -383,6 +410,14 @@ static int
->>> vfio_pci_dma_fault_add_capability(struct
->>> vfio_pci_device *vdev,
->>>  	return ret;
 >>>  }
->>>
->>> +static int vfio_pci_dma_fault_add_capability(struct vfio_pci_device *vdev,
->>> +					     struct vfio_pci_region *region,
->>> +					     struct vfio_info_cap *caps) {
->>> +	return __vfio_pci_dma_fault_add_capability(vdev, region, caps,
->>> +						   VFIO_REGION_INFO_CAP_DMA_FAULT); }
+>>>  
+>>> -/*
+>>> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+>>> - */
+>>> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>>> +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+>>> +		   u8 is_write, void *ptr)
+>>>  {
+>>> -	switch (port) {
+>>> -	case I8042_COMMAND_REG: {
+>>> -		u8 value = kbd_read_status();
+>>> -		ioport__write8(data, value);
+>>> +	u8 value;
 >>> +
->>>  static const struct vfio_pci_regops vfio_pci_dma_fault_regops = {
->>>  	.rw		= vfio_pci_dma_fault_rw,
->>>  	.release	= vfio_pci_dma_fault_release,
->>> @@ -390,6 +425,13 @@ static const struct vfio_pci_regops
->>> vfio_pci_dma_fault_regops = {
->>>  	.add_capability = vfio_pci_dma_fault_add_capability,
->>>  };
->>>
->>> +static const struct vfio_pci_regops vfio_pci_dma_fault_response_regops = {
->>> +	.rw		= vfio_pci_dma_fault_response_rw,
->>> +	.release	= vfio_pci_dma_fault_response_release,
->>> +	.mmap		= vfio_pci_dma_fault_response_mmap,
->>> +	.add_capability = vfio_pci_dma_fault_add_capability,
-> 
-> As I mentioned in the Qemu patch ([RFC v7 26/26] vfio/pci: Implement 
-> return_page_response page response callback), it looks like we are using the
-> VFIO_REGION_INFO_CAP_DMA_FAULT cap id for the dma_fault_response here
-> as well. Is that intentional?
-> (Was wondering how it worked in the first place and noted this).
-yep, copy paste error :-(
+>>> +	if (is_write)
+>>> +		value = ioport__read8(data);
+>>> +
+>>> +	switch (addr) {
+>>> +	case I8042_COMMAND_REG:
+>>> +		if (is_write)
+>>> +			kbd_write_command(vcpu->kvm, value);
+>>> +		else
+>>> +			value = kbd_read_status();
+>>>  		break;
+>>> -	}
+>>> -	case I8042_DATA_REG: {
+>>> -		u8 value = kbd_read_data();
+>>> -		ioport__write8(data, value);
+>>> +	case I8042_DATA_REG:
+>>> +		if (is_write)
+>>> +			kbd_write_data(value);
+>>> +		else
+>>> +			value = kbd_read_data();
+>>>  		break;
+>>> -	}
+>>> -	case I8042_PORT_B_REG: {
+>>> -		ioport__write8(data, 0x20);
+>>> +	case I8042_PORT_B_REG:
+>>> +		if (!is_write)
+>>> +			value = 0x20;
+>>>  		break;
+>>> -	}
+>>>  	default:
+>>> -		return false;
+>>> +		return;  
+>> Any particular reason for removing the false return value? I don't see it
+>> mentioned in the commit message. Otherwise this is identical to the two functions
+>> it replaces.
+> Because the MMIO handler prototype is void, in contrast to the PIO one.
+> Since on returning "false" we only seem to panic kvmtool, this is of
+> quite limited use, I'd say.
 
-Thanks
+Actually, in ioport.c::kvm__emulate_io(), if kvm->cfg.ioport_debug is true, it
+will print an error and then panic in kvm_cpu__start(); otherwise the error is
+silently ignored. serial.c is another device where an unknown register returns
+false. In rtc.c, the unknown register is ignored. cfi_flash.c prints debugging
+information. So I guess kvmtool implements all possible methods of handling an
+unknown register *at the same time*, so it's up to you how you want to handle it.
 
-Eric
-> 
-> Please check.
-> 
-> Thanks,
-> Shameer
-> 
+>>>  	}
+>>>  
+>>> +	if (!is_write)
+>>> +		ioport__write8(data, value);
+>>> +}
+>>> +
+>>> +/*
+>>> + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+>>> + */
+>>> +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>>> +{
+>>> +	kbd_io(vcpu, port, data, size, false, NULL);  
+>> is_write is an u8, not a bool.
+> Right, will fix this.
+>
+>> I never could wrap my head around the ioport convention of "in" (read) and "out"
+>> (write). To be honest, changing is_write changed to an enum so it's crystal clear
+>> what is happening would help with that a lot, but I guess that's a separate patch.
+> "in" and "out" are the x86 assembly mnemonics, but it's indeed
+> confusing, because the device side has a different view (CPU "in" means
+> pushing data "out" of the device). I usually look at the code to see
+> what it's actually meant to do.
+> So yeah, I feel like a lot of those device emulations could use
+> some update. but that's indeed something for another day.
 
+Agreed.
+
+Thanks,
+
+Alex
+
+>
+> Cheers,
+> Andre
+>
+>>> +
+>>>  	return true;
+>>>  }
+>>>  
+>>>  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+>>>  {
+>>> -	switch (port) {
+>>> -	case I8042_COMMAND_REG: {
+>>> -		u8 value = ioport__read8(data);
+>>> -		kbd_write_command(vcpu->kvm, value);
+>>> -		break;
+>>> -	}
+>>> -	case I8042_DATA_REG: {
+>>> -		u8 value = ioport__read8(data);
+>>> -		kbd_write_data(value);
+>>> -		break;
+>>> -	}
+>>> -	case I8042_PORT_B_REG: {
+>>> -		break;
+>>> -	}
+>>> -	default:
+>>> -		return false;
+>>> -	}
+>>> +	kbd_io(vcpu, port, data, size, true, NULL);
+>>>  
+>>>  	return true;
+>>>  }  
