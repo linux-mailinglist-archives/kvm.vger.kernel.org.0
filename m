@@ -2,93 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FA0331EE41
+	by mail.lfdr.de (Postfix) with ESMTP id B216D31EE42
 	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231649AbhBRS1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:27:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232831AbhBRQYn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 11:24:43 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00226C06178A
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:24:01 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id kr16so1643068pjb.2
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:24:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7zsJa5G96QbfzfGP1GUeN5cQ6tflYt1YqBlPzygiUVU=;
-        b=Op9KFq/D8S6hUm3uN8wid54j0rwTGYg0n1s/L5rbJ3861uOm8LFv1Cr0ItlKReGHlm
-         0Oq/cgmC8gF2E/3AAuheF6PlVc8QGi9Y5znFhso54yshc0RKxwBT3MCn2aJGM1hILGoC
-         6EQ8kOnPaQL63Ly34Jg80Lk1gqsBvZwPXJfvdGntgAElCI2fFt/4qmiH/TXwAJsOIpsX
-         9mQVtwHQ4LsZYV1ka4cEuatiwMTW36nREbbXVjOjIQ8VpCQWCPfNLPzShoPrt1QKGOxG
-         VO4wr2X3LawDYhGbTR+eWX3UmFjJ2ydbfhLtNB5SzAji1ijhAAdLV5IC84G1Lntgt2PV
-         F+vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7zsJa5G96QbfzfGP1GUeN5cQ6tflYt1YqBlPzygiUVU=;
-        b=S3e7meX8GqSmBSOdU0efRzWk4ezM3mHWaUhu5+50cw3IzUQWNDkKKDEepxg84VPPwE
-         F9NnlCmlrgVFLKeaaWoy8XjgOQj/V+v9wrDNbSfeBOYjQvpun5gX/9GnypPMSdrSTl3I
-         9IyLbcU3Kt31gmgQpChwHPxD0XaWrAa32oWLkI2cx6q7j9zrBMFxfSrRFzzNWcffPFlT
-         xXKRjXxUc30h9LZll7JmjQB/uD9blGrDr544PWjBbHDdo++NPjIpxsfL8/P/rQ0ngQov
-         zHB+1qcONvA2qZl2aJEHwBAv+STuZef8CWRcTJ11IrZ9Lc43a5mJhRsNzXeLFggvCe8M
-         ZOxw==
-X-Gm-Message-State: AOAM533QXFxuQesY40AT5pQsQYS9/bcdV5gZBE8vDidv5QDfBBFQy9pc
-        x/2OMonUj2CFp1l+Bf+5Kvc4jA==
-X-Google-Smtp-Source: ABdhPJwQbfGU3Wbtmu5ZkDWW8j1ysqNCykojI28OXgaOS4Yu8u6jFFg02JjmGh6SpqzKahhgI7b47g==
-X-Received: by 2002:a17:90a:ac14:: with SMTP id o20mr4668126pjq.171.1613665441048;
-        Thu, 18 Feb 2021 08:24:01 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id y12sm5736500pjc.56.2021.02.18.08.23.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 08:24:00 -0800 (PST)
-Date:   Thu, 18 Feb 2021 08:23:54 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Makarand Sonare <makarandsonare@google.com>
-Subject: Re: [PATCH 05/14] KVM: x86/mmu: Consult max mapping level when
- zapping collapsible SPTEs
-Message-ID: <YC6UmukeFlrdWAxe@google.com>
-References: <20210213005015.1651772-1-seanjc@google.com>
- <20210213005015.1651772-6-seanjc@google.com>
- <caa90b6b-c2fa-d8b7-3ee6-263d485c5913@redhat.com>
+        id S231903AbhBRS2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:28:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27174 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233597AbhBRQaE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 11:30:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613665718;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7n6Dv7TL968Ih5U8eggCJpLl9IZAG+GVZ7m57WR0dUw=;
+        b=bQ7RmRx+usdoqvOCdNeSof+U2ghbPa9y+E2FJG9WRHBU/HTpOlq+ZPAWgavst/D5vkr/lH
+        BH+Uu3/rfbqfUHADrrDGQG6gtIcEMopuygy7sG9D+QIBMfeuHMEhTgYKDyZwrNtIOAqMlE
+        XRNjP4adfwikJarjzCqWxGkoo+eCnBE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-NcuK9xVoObOOMUB8lotdwA-1; Thu, 18 Feb 2021 11:28:34 -0500
+X-MC-Unique: NcuK9xVoObOOMUB8lotdwA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71EC980196C;
+        Thu, 18 Feb 2021 16:28:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EC39C5C1C4;
+        Thu, 18 Feb 2021 16:28:31 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jroedel@suse.de, seanjc@google.com, mlevitsk@redhat.com
+Subject: [PATCH] KVM: nSVM: prepare guest save area while is_guest_mode is true
+Date:   Thu, 18 Feb 2021 11:28:31 -0500
+Message-Id: <20210218162831.1407616-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <caa90b6b-c2fa-d8b7-3ee6-263d485c5913@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Paolo Bonzini wrote:
-> On 13/02/21 01:50, Sean Christopherson wrote:
-> > 
-> >  		pfn = spte_to_pfn(iter.old_spte);
-> >  		if (kvm_is_reserved_pfn(pfn) ||
-> > -		    (!PageTransCompoundMap(pfn_to_page(pfn)) &&
-> > -		     !kvm_is_zone_device_pfn(pfn)))
-> > +		    iter.level >= kvm_mmu_max_mapping_level(kvm, slot, iter.gfn,
-> > +							    pfn, PG_LEVEL_NUM))
-> >  			continue;
-> 
-> 
-> This changes the test to PageCompound.  Is it worth moving the change to
-> patch 1?
+Right now, enter_svm_guest_mode is calling nested_prepare_vmcb_save and
+nested_prepare_vmcb_control.  This results in is_guest_mode being false
+until the end of nested_prepare_vmcb_control.
 
-Yes?  I originally did that in a separate patch, then changed my mind.
+This is a problem because nested_prepare_vmcb_save can in turn cause
+changes to the intercepts and these have to be applied to the "host VMCB"
+(stored in svm->nested.hsave) and then merged with the VMCB12 intercepts
+into svm->vmcb.
 
-If PageTransCompoundMap() also detects HugeTLB pages, then it is the "better"
-option as it checks that the page is actually mapped huge.  I dropped the change
-because PageTransCompound() is just a wrapper around PageCompound(), and so I
-assumed PageTransCompoundMap() would detect HugeTLB pages, too.  I'm not so sure
-about that after rereading the code, yet again.
+In particular, without this change we forget to set the CR0 read and CR0
+write intercepts when running a real mode L2 guest with NPT disabled.
+The guest is therefore able to see the CR0.PG bit that KVM sets to
+enable "paged real mode".  This patch fixes the svm.flat mode_switch
+test case with npt=0.  There are no other problematic calls in
+nested_prepare_vmcb_save.
+
+The bug is present since commit 06fc7772690d ("KVM: SVM: Activate nested
+state only when guest state is complete", 2010-04-25).  Unfortunately,
+it is not clear from the commit message what issue exactly led to the
+change back then.  It was probably related to svm_set_cr0 however because
+the patch series cover letter[1] mentioned lazy FPU switching.
+
+[1] https://lore.kernel.org/kvm/1266493115-28386-1-git-send-email-joerg.roedel@amd.com/
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/nested.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 92d3aaaac612..35891d9a1099 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -469,8 +469,8 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb12_gpa,
+ 
+ 	svm->nested.vmcb12_gpa = vmcb12_gpa;
+ 	load_nested_vmcb_control(svm, &vmcb12->control);
+-	nested_prepare_vmcb_save(svm, vmcb12);
+ 	nested_prepare_vmcb_control(svm);
++	nested_prepare_vmcb_save(svm, vmcb12);
+ 
+ 	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
+ 				  nested_npt_enabled(svm));
+-- 
+2.26.2
+
