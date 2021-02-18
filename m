@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D03031E376
+	by mail.lfdr.de (Postfix) with ESMTP id 9F1E731E377
 	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 01:23:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbhBRAXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 19:23:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34558 "EHLO
+        id S230017AbhBRAXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 19:23:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbhBRAXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 19:23:04 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F28BC061788
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:24 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 6so630694ybq.7
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:24 -0800 (PST)
+        with ESMTP id S229745AbhBRAXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 19:23:10 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE60DC06178A
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:26 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id v6so623024ybk.9
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rxD7Cfx1GqsmSmL2P7darQKc+AFaLsyrpkiIH6lHspA=;
-        b=LQNnOingSAg+AL3Sigaum//AnfCSGXUZGSCViO/WKWbJaEQn1/FXZOJYAqX8K0PAIa
-         XqnluSAId3sOouUwP/Kc/Zve4M7SZaVkLH5TCyni4pK9FGGKx9Lj8D/IiPZEf9ryiNWA
-         Qdb7K0LEFBm4j9C6L1zBtyBwxpWqSEz0QbQqvdccmxE6y5J/kNs3rvLl4B65/jMzprkY
-         VzGTzIDV9iSJySz34f4oWk+XDV0A88Mjy+9yeUDlNMSszosFaGkWZ6UFWc/gX+LX7F8N
-         OBs4uANZHqMp5p6I5OA1LKQymV+BECdyC4zqkm26OfT5XrJaD04WVsKtCjmywkYjvyrr
-         o5aQ==
+        bh=N5u+tYaA6jheO+s3TAYApGNDG7kt8AjvjeXnlM3gIWM=;
+        b=qtyX3O2CMgZmUaDOiNhk1mGOb/MPylrnIyF/boq3B2Pd16GZPOhcUM8QnfEnCLdkLH
+         M0kAuC1OWSHLd9chonD8xejblgRPETL2oHTXAwZKi9GqJOIZLndSPyQIS7gaJHdifTqc
+         NLtt5sQa+OiRGVuDq01d3k68F9TtTL7uisHmM5m30CniTjp2/MGKqTLfXq4PdYAwrLLT
+         hVdondAKS0BZYnSKjX7imuqYdPqtWSSRG7Jz4qy1bRagGBQuicU7h64+Vb8VaVh48Jlo
+         v5vguKwyGCGa1LP6StdnxEG5bMVGG7nNwanQMtMAX3NqqXvGNsY6UaXivutc9BHceEGN
+         v3Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rxD7Cfx1GqsmSmL2P7darQKc+AFaLsyrpkiIH6lHspA=;
-        b=XqMpJs/0IopmNo4H/fHMcCld6P25dIb2/CU4WS7rq61XAZbh3Q1OgDQ1Yz35rjnPCy
-         jzg6KWo3VvBlhj5cX26rwhSzVx2YHQRgbiz941tk6MeCPzK9PFeOT5tKJk0WEuPR9QIt
-         5s0tgVTHbd9ipZkR1A7OJgPMuKD6Q8RE8S1LIqQ+HSocKAsG61Dad/nuvMS8F0bCdIg7
-         pitITh8HNfu4mxUdUm06AuiklTyp2/08n5Fn8nGRn55IA2VGuQpsaX/OXKEZ85QfNfXY
-         yKfXS7NbqeZt2pb9K+0IllPc/B4PHBpuahfiwEE27UYZ84rq73zZEDv5lmC4lkP4LFRI
-         Ky6g==
-X-Gm-Message-State: AOAM531+dWZ4kATHwTp4Ob/xZfGY2kGyF3RcKEx+WIUh2wZ6y0hB47lR
-        Dm1FZlq+aRh5uIWFzuBDYAFYvpcBthA=
-X-Google-Smtp-Source: ABdhPJzb7URA3rw3seV6AMppbxWPBjCEcaCUGtBdb1JkdC5tXnIBWrqtEy/1i2a9S2ora8/iDrCPZ4v/LvE=
+        bh=N5u+tYaA6jheO+s3TAYApGNDG7kt8AjvjeXnlM3gIWM=;
+        b=H9Q0fsf12S+1zvcBk1Y9vD4/6IzshXayGWSd4CIKZTNOUpt6x4daKj0J2r7C4PASqz
+         pLQXWndX32cKHyoLUrpvz//hAa4HKCjz45bdVfIEF+u1z7VBmOMQzrkbx3X/tk1HfKLV
+         1o9WqTMrf2YEjCqBfvDuBaQZhtbR5tcls0Eot//A7WKdR1bLIbfAfSJL5+1BQ0J1GDaT
+         ygLToM1YHdeAU6EiJcvh+oeqNYyVijuF1OZdXxMXJrbAByvVkKDRu0nYUcQVqAz1UDjq
+         Vy4VBqS+JkChdQ97DQfLvyLbvF2+htpyhFkDvWCgnbaSQ28ZczRVBciBynAuPg6/jKSF
+         wU/Q==
+X-Gm-Message-State: AOAM533P4yyPzRTrF/PCbuMMhHZ7Q9784UduQgjmq532j+tDDQpkldRk
+        FRzMS7mBxdGwsPA74pJxhE2cM6s66qM=
+X-Google-Smtp-Source: ABdhPJz/aoTxw95aEuVUHG09L+tENFh2lidZIeh4/kTigJZPsy/SgMR8unS42hU020VTwA92qZ4J4pMxKKY=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
- (user=seanjc job=sendgmr) by 2002:a25:abce:: with SMTP id v72mr3310906ybi.152.1613607743713;
- Wed, 17 Feb 2021 16:22:23 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:1fc5:: with SMTP id f188mr2904496ybf.389.1613607746050;
+ Wed, 17 Feb 2021 16:22:26 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 17 Feb 2021 16:22:09 -0800
+Date:   Wed, 17 Feb 2021 16:22:10 -0800
 In-Reply-To: <20210218002212.2904647-1-seanjc@google.com>
-Message-Id: <20210218002212.2904647-4-seanjc@google.com>
+Message-Id: <20210218002212.2904647-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210218002212.2904647-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [kvm-unit-tests PATCH 3/6] x86: nVMX: Improve report messages for
- segment selector tests
+Subject: [kvm-unit-tests PATCH 4/6] x86: nVMX: Improve report messages for
+ segment base tests
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>,
@@ -63,126 +63,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tweak the segment selector tests to clarify if they are testing a valid
-versus invalid condition, display the actual condition, and stringify
-the name of the field instead of copy-pasting the field name into a
-string.
+Tweak the segment base tests to state exactly what's being tested, note
+whether or not the segment is usable, and stringify the name of the field
+instead of copy-pasting the field name into a string.
 
-Opportunistically wrap the complex macro in a do-while.
+Opportunistically wrap the complex macros in do-while.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx_tests.c | 57 ++++++++++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 31 deletions(-)
+ x86/vmx_tests.c | 67 +++++++++++++++++++++++--------------------------
+ 1 file changed, 31 insertions(+), 36 deletions(-)
 
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 35463b6..4ea2624 100644
+index 4ea2624..94ab499 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -7985,10 +7985,19 @@ static void test_load_guest_bndcfgs(void)
+@@ -8085,22 +8085,26 @@ skip_ss_tests:
+ 	vmcs_write(CPU_EXEC_CTRL1, cpu_ctrl1_saved);
+ }
  
- #define	GUEST_SEG_UNUSABLE_MASK	(1u << 16)
- #define	GUEST_SEG_SEL_TI_MASK	(1u << 2)
--#define	TEST_SEGMENT_SEL(xfail, sel, sel_name, val)			\
-+
-+
-+#define	TEST_SEGMENT_SEL(test, xfail, sel, val)				\
-+do {									\
- 	vmcs_write(sel, val);						\
--	test_guest_state("Test Guest Segment Selector",	xfail, val,	\
--			 sel_name);
-+	test_guest_state(test " segment", xfail, val, xstr(sel));	\
+-#define	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(xfail, seg_base, seg_base_name)\
+-	addr_saved = vmcs_read(seg_base);				\
+-	for (i = 32; i < 63; i = i + 4) {				\
+-		addr = addr_saved | 1ull << i;				\
+-		vmcs_write(seg_base, addr);				\
+-		test_guest_state(seg_base_name,	xfail, addr,		\
+-				seg_base_name);				\
+-	}								\
+-	vmcs_write(seg_base, addr_saved);
++#define	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(xfail, seg_base)			\
++do {										\
++	addr_saved = vmcs_read(seg_base);					\
++	for (i = 32; i < 63; i = i + 4) {					\
++		addr = addr_saved | 1ull << i;					\
++		vmcs_write(seg_base, addr);					\
++		test_guest_state("seg.BASE[63:32] != 0, usable = " xstr(xfail),	\
++				 xfail, addr, xstr(seg_base));			\
++	}									\
++	vmcs_write(seg_base, addr_saved);					\
 +} while (0)
-+
-+#define	TEST_INVALID_SEG_SEL(sel, val) \
-+	TEST_SEGMENT_SEL("Invalid: " xstr(val), true, sel, val);
-+
-+#define	TEST_VALID_SEG_SEL(sel, val) \
-+	TEST_SEGMENT_SEL("Valid: " xstr(val), false, sel, val);
+ 
+-#define	TEST_SEGMENT_BASE_ADDR_CANONICAL(xfail, seg_base, seg_base_name)\
+-	addr_saved = vmcs_read(seg_base);				\
+-	vmcs_write(seg_base, NONCANONICAL);				\
+-	test_guest_state(seg_base_name,	xfail, NONCANONICAL,		\
+-			seg_base_name);					\
+-	vmcs_write(seg_base, addr_saved);
++#define	TEST_SEGMENT_BASE_ADDR_CANONICAL(xfail, seg_base)		  \
++do {									  \
++	addr_saved = vmcs_read(seg_base);				  \
++	vmcs_write(seg_base, NONCANONICAL);				  \
++	test_guest_state("seg.BASE non-canonical, usable = " xstr(xfail), \
++			 xfail, NONCANONICAL, xstr(seg_base));		  \
++	vmcs_write(seg_base, addr_saved);				  \
++} while (0)
  
  /*
-  * The following checks are done on the Selector field of the Guest Segment
-@@ -8013,8 +8022,7 @@ static void test_guest_segment_sel_fields(void)
- 	 * Test for GUEST_SEL_TR
- 	 */
- 	sel_saved = vmcs_read(GUEST_SEL_TR);
--	TEST_SEGMENT_SEL(true, GUEST_SEL_TR, "GUEST_SEL_TR",
--			 sel_saved | GUEST_SEG_SEL_TI_MASK);
-+	TEST_INVALID_SEG_SEL(GUEST_SEL_TR, sel_saved | GUEST_SEG_SEL_TI_MASK);
- 	vmcs_write(GUEST_SEL_TR, sel_saved);
- 
+  * The following checks are done on the Base Address field of the Guest
+@@ -8123,57 +8127,48 @@ static void test_guest_segment_base_addr_fields(void)
  	/*
-@@ -8024,17 +8032,13 @@ static void test_guest_segment_sel_fields(void)
+ 	 * The address of TR, FS, GS and LDTR must be canonical.
+ 	 */
+-	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_TR, "GUEST_BASE_TR");
+-	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_FS, "GUEST_BASE_FS");
+-	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_GS, "GUEST_BASE_GS");
++	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_TR);
++	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_FS);
++	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_GS);
  	ar_saved = vmcs_read(GUEST_AR_LDTR);
- 	/* LDTR is set unusable */
+ 	/* Make LDTR unusable */
  	vmcs_write(GUEST_AR_LDTR, ar_saved | GUEST_SEG_UNUSABLE_MASK);
--	TEST_SEGMENT_SEL(false, GUEST_SEL_LDTR, "GUEST_SEL_LDTR",
--			 sel_saved | GUEST_SEG_SEL_TI_MASK);
--	TEST_SEGMENT_SEL(false, GUEST_SEL_LDTR, "GUEST_SEL_LDTR",
--			 sel_saved & ~GUEST_SEG_SEL_TI_MASK);
-+	TEST_VALID_SEG_SEL(GUEST_SEL_LDTR, sel_saved | GUEST_SEG_SEL_TI_MASK);
-+	TEST_VALID_SEG_SEL(GUEST_SEL_LDTR, sel_saved & ~GUEST_SEG_SEL_TI_MASK);
- 	/* LDTR is set usable */
+-	TEST_SEGMENT_BASE_ADDR_CANONICAL(false, GUEST_BASE_LDTR,
+-					"GUEST_BASE_LDTR");
++	TEST_SEGMENT_BASE_ADDR_CANONICAL(false, GUEST_BASE_LDTR);
+ 	/* Make LDTR usable */
  	vmcs_write(GUEST_AR_LDTR, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
--	TEST_SEGMENT_SEL(true, GUEST_SEL_LDTR, "GUEST_SEL_LDTR",
--			 sel_saved | GUEST_SEG_SEL_TI_MASK);
-+	TEST_INVALID_SEG_SEL(GUEST_SEL_LDTR, sel_saved | GUEST_SEG_SEL_TI_MASK);
- 
--	TEST_SEGMENT_SEL(false, GUEST_SEL_LDTR, "GUEST_SEL_LDTR",
--			 sel_saved & ~GUEST_SEG_SEL_TI_MASK);
-+	TEST_VALID_SEG_SEL(GUEST_SEL_LDTR, sel_saved & ~GUEST_SEG_SEL_TI_MASK);
+-	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_LDTR,
+-					"GUEST_BASE_LDTR");
++	TEST_SEGMENT_BASE_ADDR_CANONICAL(true, GUEST_BASE_LDTR);
  
  	vmcs_write(GUEST_AR_LDTR, ar_saved);
- 	vmcs_write(GUEST_SEL_LDTR, sel_saved);
-@@ -8049,39 +8053,30 @@ static void test_guest_segment_sel_fields(void)
- 	vmcs_write(CPU_EXEC_CTRL1, cpu_ctrl1_saved & ~CPU_URG);
- 	cs_rpl_bits = vmcs_read(GUEST_SEL_CS) & 0x3;
- 	sel_saved = vmcs_read(GUEST_SEL_SS);
--	TEST_SEGMENT_SEL(true, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
-+	TEST_INVALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
- 	/* Make SS usable if it's unusable or vice-versa */
- 	if (ar_saved & GUEST_SEG_UNUSABLE_MASK)
- 		vmcs_write(GUEST_AR_SS, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
- 	else
- 		vmcs_write(GUEST_AR_SS, ar_saved | GUEST_SEG_UNUSABLE_MASK);
--	TEST_SEGMENT_SEL(true, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
--	vmcs_write(CPU_EXEC_CTRL0, cpu_ctrl0_saved);
--	vmcs_write(CPU_EXEC_CTRL1, cpu_ctrl1_saved);
-+	TEST_INVALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
  
- 	/* Need a valid EPTP as the passing case fully enters the guest. */
- 	if (enable_unrestricted_guest(true))
- 		goto skip_ss_tests;
- 
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
-+
- 	/* Make SS usable if it's unusable or vice-versa */
- 	if (vmcs_read(GUEST_AR_SS) & GUEST_SEG_UNUSABLE_MASK)
- 		vmcs_write(GUEST_AR_SS, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
- 	else
- 		vmcs_write(GUEST_AR_SS, ar_saved | GUEST_SEG_UNUSABLE_MASK);
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
--	TEST_SEGMENT_SEL(false, GUEST_SEL_SS, "GUEST_SEL_SS",
--				 ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (~cs_rpl_bits & 0x3)));
-+	TEST_VALID_SEG_SEL(GUEST_SEL_SS, ((sel_saved & ~0x3) | (cs_rpl_bits & 0x3)));
- skip_ss_tests:
- 
+ 	/*
+ 	 * Bits 63:32 in CS, SS, DS and ES base address must be zero
+ 	 */
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_CS,
+-					 "GUEST_BASE_CS");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_CS);
+ 	ar_saved = vmcs_read(GUEST_AR_SS);
+ 	/* Make SS unusable */
+ 	vmcs_write(GUEST_AR_SS, ar_saved | GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_SS,
+-					 "GUEST_BASE_SS");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_SS);
+ 	/* Make SS usable */
+ 	vmcs_write(GUEST_AR_SS, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_SS,
+-					 "GUEST_BASE_SS");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_SS);
  	vmcs_write(GUEST_AR_SS, ar_saved);
+ 
+ 	ar_saved = vmcs_read(GUEST_AR_DS);
+ 	/* Make DS unusable */
+ 	vmcs_write(GUEST_AR_DS, ar_saved | GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_DS,
+-					 "GUEST_BASE_DS");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_DS);
+ 	/* Make DS usable */
+ 	vmcs_write(GUEST_AR_DS, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_DS,
+-					 "GUEST_BASE_DS");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_DS);
+ 	vmcs_write(GUEST_AR_DS, ar_saved);
+ 
+ 	ar_saved = vmcs_read(GUEST_AR_ES);
+ 	/* Make ES unusable */
+ 	vmcs_write(GUEST_AR_ES, ar_saved | GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_ES,
+-					 "GUEST_BASE_ES");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(false, GUEST_BASE_ES);
+ 	/* Make ES usable */
+ 	vmcs_write(GUEST_AR_ES, ar_saved & ~GUEST_SEG_UNUSABLE_MASK);
+-	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_ES,
+-					 "GUEST_BASE_ES");
++	TEST_SEGMENT_BASE_ADDR_UPPER_BITS(true, GUEST_BASE_ES);
+ 	vmcs_write(GUEST_AR_ES, ar_saved);
+ }
+ 
 -- 
 2.30.0.478.g8a0d178c01-goog
 
