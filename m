@@ -2,74 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D8F431EE72
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:39:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 146F131EE73
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:40:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232693AbhBRSf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:35:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbhBRSDN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 13:03:13 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E65C0613D6
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:02:32 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id b145so1828708pfb.4
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:02:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ls8LFMuOfFIGXP+zyESQQVzdohbKJv1NNu1HQ2O+7mo=;
-        b=vt0xaUaXssRiggG9KZr6gimnPEHznpV2Fa9on2er/KvXV+DyDwLdjMew6tUAPjAD+D
-         3Kx9Tel6z3LhvrvChjjVuFCDg1HvRNA+h4TM3bMvryyE7e36j65FrOtYMrLhh0750jDJ
-         mTZcyC2G7fj5/nFo4K6RtySvrjPXw9bFGIldUlTVda1VEkiME5d5iPk22YGTikR9/7rD
-         vYPeoC4/r3iocdVPiuw9n9CesvbMZSjGHZo4BXanF4k5BUsvoD27VDG8XIcOEIgxjQQA
-         agTyDddQ0gbN6niYP+htkntLzffcs5eVDRZ6yTiYJeuJG+XAYtU0zAAt9kmE59/ZxlbU
-         1kTQ==
+        id S232721AbhBRSgY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:36:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31105 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231529AbhBRSFj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 13:05:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613671450;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F/NjJm1o0S+ptTSdUddueRD/FVZWiax6r93BjVuqS/A=;
+        b=HwLs7QOrW+Mvg7w3aYE73vW/NXDbrSWp76+RoJnByQ2d9NJOsc0Qqr51SfAMfdBgfjAesC
+        Qq/qeCC57qseSnEW7+HjuwReG/IY4y+zAqBGfDvwDyFXuKMh2ENxeXw5b8UYU2bHZblL0g
+        njdUpIW4vauPIUDeoL1QWx3WF++oDHA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-co9QC32EOVeKv9Mu9FHY5g-1; Thu, 18 Feb 2021 13:04:07 -0500
+X-MC-Unique: co9QC32EOVeKv9Mu9FHY5g-1
+Received: by mail-wm1-f71.google.com with SMTP id p8so1505433wmq.7
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:04:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ls8LFMuOfFIGXP+zyESQQVzdohbKJv1NNu1HQ2O+7mo=;
-        b=EKWEvePl4Firu1dZEN+cVAyx7Okh+43USqUvI1iH6bSe/CAf9FngQMOnBSf0U2d8Vt
-         HS44X1i+SNpurIA5UB9RNDMKTgV6pfgnvKLVHjSRhGqRkI6VtSS2cLuCMSNTrnFUXE0f
-         Y/7fR/SSHNdi+uoYqSeKRts0/XZ4nPGJAh9evFAIf7fHvuIb7wTDGGaQ5ycaNF46GLKr
-         xtvVPaz0EcfaicTNzls5Stb1Xk7M6k7nHqV9xPsh7e5g3exv5X5+T/l9InfObqsoWf2l
-         CblA9G+dK8BGssWsL+nP/gBghz8n8fKK4AHZSX28+7D7kl5OGe8tBlcoocy6EE+UUTMI
-         YHqA==
-X-Gm-Message-State: AOAM533BU9+4K3+HkmRE/e3ENsyT8c6wfGBpPQHz/Z+83sUgj84s5A86
-        wtAm2MAzcLMAeoGXJGt5RyW00Q==
-X-Google-Smtp-Source: ABdhPJxSw0HbBab/Pii65Ovw+NhRgLoHYHkzQzk2SDTtnMynKpXQnHY6nm19yGrTglJTiJWQM+2WUw==
-X-Received: by 2002:a65:4b89:: with SMTP id t9mr4975224pgq.211.1613671352128;
-        Thu, 18 Feb 2021 10:02:32 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id ml7sm1210320pjb.28.2021.02.18.10.02.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 10:02:31 -0800 (PST)
-Date:   Thu, 18 Feb 2021 10:02:25 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH kvm-unit-tests] x86: clean up EFER definitions
-Message-ID: <YC6rsTdE1iqiYYYO@google.com>
-References: <20210218132648.1397421-1-pbonzini@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=F/NjJm1o0S+ptTSdUddueRD/FVZWiax6r93BjVuqS/A=;
+        b=EpYE2FDbV1ltSEoWfAw5Ff5lv3oTgdT51augNJiP1lk19PtomBaMcz8WOFRJpaXnt9
+         dTM+5uCTaP8/lB7O7sZKx1djMst1tQ7EhkMXwGAhTtnzRlb/MQG2pLbtKwdFuib8D1JT
+         PurDwoloDev8wRFok8Ihh+tKgQjs3RMAhR7YN74A1UE++SKtLxMF1SLIpzZY962n6A4I
+         0x/4b4f1gfjE8LSsz2hdM4qDzyPK1kcbS3/u7iC6GhkiTXw/QKqgOoLdUwnMODChNCGs
+         sml3n66xnYKexqyCfKEUxV+NFXOF+rE76Tkhi5bXLsG+Tu6FSuxzJM4+QRC9nDEgHWaD
+         D3xw==
+X-Gm-Message-State: AOAM530b5I0hNUd4//EsqboeENt3YysD5TNgmPzrOkPaOudaMdZjfS0e
+        WkTDYqWOiPGWmX7452THm4wzfZCxw+ydg+7JpB6gnYXhsmCXxBn+QSlC8gdaiLrwMj1jcWhAUmo
+        CA3XUIE6G7m+Y
+X-Received: by 2002:a05:600c:41d6:: with SMTP id t22mr4722944wmh.74.1613671446398;
+        Thu, 18 Feb 2021 10:04:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzToIuOaBYg4YsXjWIPNzTToi29MrO1jvQGdbhSJ1/zUpu0V8O/tNhmqRFtToS3jfljw7kFzQ==
+X-Received: by 2002:a05:600c:41d6:: with SMTP id t22mr4722910wmh.74.1613671446175;
+        Thu, 18 Feb 2021 10:04:06 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id b2sm10537937wrn.2.2021.02.18.10.04.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Feb 2021 10:04:05 -0800 (PST)
+Subject: Re: [PATCH] KVM: x86: dump_vmcs should not assume GUEST_IA32_EFER is
+ valid
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     David Edmondson <dme@dme.org>, LKML <linux-kernel@vger.kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>
+References: <20210218100450.2157308-1-david.edmondson@oracle.com>
+ <708f2956-fa0f-b008-d3d2-93067f95783c@redhat.com> <cuntuq9ilg4.fsf@dme.org>
+ <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com>
+ <YC6XVrWPRQJ7V6Nd@google.com>
+ <CALMp9eTX4Na2VTY2aU=-SUrGhst5aExdCB3f=4krKj1mFPgcqQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <13461f99-09a3-6e9a-d015-2658a46b628a@redhat.com>
+Date:   Thu, 18 Feb 2021 19:04:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210218132648.1397421-1-pbonzini@redhat.com>
+In-Reply-To: <CALMp9eTX4Na2VTY2aU=-SUrGhst5aExdCB3f=4krKj1mFPgcqQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Paolo Bonzini wrote:
-> The X86_EFER_LMA definition is wrong, while X86_IA32_EFER is unused.
-> There are also two useless WRMSRs that try to set EFER_LMA in
-> x86/pks.c and x86/pku.c.  Clean them all up.
+On 18/02/21 18:55, Jim Mattson wrote:
+>>> Got it now.  It would sort of help, because while dumping the MSR load/store
+>>> area you could get hold of the real EFER, and use it to decide whether to
+>>> dump the PDPTRs.
+>> EFER isn't guaranteed to be in the load list, either, e.g. if guest and host
+>> have the same desired value.
+>>
+>> The proper way to retrieve the effective EFER is to reuse the logic in
+>> nested_vmx_calc_efer(), i.e. look at VM_ENTRY_IA32E_MODE if EFER isn't being
+>> loaded via VMCS.
+>
+> Shouldn't dump_vmcs() simply dump the contents of the VMCS, in its
+> entirety? What does it matter what the value of EFER is?
 
-For posterity: EFER_LMA is incorrectly defined as EFER_LME, and both PKS and PKU
-tests are 64-bit only, so the WRMSRs are guaranteed to be nops.
+Currently it has some conditionals, but it wouldn't be a problem indeed 
+to remove them.
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+The MSR load list is missing state that dump_vmcs should print though.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Paolo
+
