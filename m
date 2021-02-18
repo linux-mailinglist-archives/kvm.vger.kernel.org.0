@@ -2,236 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9367931E9F6
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 13:47:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59F6C31EBFB
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 17:05:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233095AbhBRMhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 07:37:05 -0500
-Received: from foss.arm.com ([217.140.110.172]:50478 "EHLO foss.arm.com"
+        id S232983AbhBRQBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 11:01:43 -0500
+Received: from foss.arm.com ([217.140.110.172]:50568 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230357AbhBRMTJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 07:19:09 -0500
+        id S232802AbhBRM20 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 07:28:26 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 985861FB;
-        Thu, 18 Feb 2021 04:18:23 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9B7123F73D;
-        Thu, 18 Feb 2021 04:18:22 -0800 (PST)
-Subject: Re: [PATCH kvmtool 20/21] hw/serial: ARM/arm64: Use MMIO at higher
- addresses
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42CAFED1;
+        Thu, 18 Feb 2021 02:35:24 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B9D03F73B;
+        Thu, 18 Feb 2021 02:35:22 -0800 (PST)
+Date:   Thu, 18 Feb 2021 10:34:25 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 06/21] hw/i8042: Refactor trap handler
+Message-ID: <20210218103425.26a27000@slackpad.fritz.box>
+In-Reply-To: <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
 References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-21-andre.przywara@arm.com>
- <bce317a9-2c8e-2254-57c3-e0bea9a13760@arm.com>
-Message-ID: <f16f89dc-78fd-1046-eefc-1dccd468fba8@arm.com>
-Date:   Thu, 18 Feb 2021 12:18:38 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        <20201210142908.169597-7-andre.przywara@arm.com>
+        <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <bce317a9-2c8e-2254-57c3-e0bea9a13760@arm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Thu, 11 Feb 2021 17:23:13 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-On 2/17/21 4:48 PM, Alexandru Elisei wrote:
 > Hi Andre,
->
-> On 12/10/20 2:29 PM, Andre Przywara wrote:
->> Using the UART devices at their legacy I/O addresses as set by IBM in
->> 1981 was a kludge we used for simplicity on ARM platforms as well.
->> However this imposes problems due to their missing alignment and overlap
->> with the PCI I/O address space.
->>
->> Now that we can switch a device easily between using ioports and MMIO,
->> let's move the UARTs out of the first 4K of memory on ARM platforms.
->>
->> That should be transparent for well behaved guests, since the change is
->> naturally reflected in the device tree. Even "earlycon" keeps working,
->> as the stdout-path property is adjusted automatically.
->>
->> People providing direct earlycon parameters via the command line need to
->> adjust it to: "earlycon=uart,mmio,0x1000000".
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  hw/serial.c | 52 ++++++++++++++++++++++++++++++++++++----------------
->>  1 file changed, 36 insertions(+), 16 deletions(-)
->>
->> diff --git a/hw/serial.c b/hw/serial.c
->> index d840eebc..00fb3aa8 100644
->> --- a/hw/serial.c
->> +++ b/hw/serial.c
->> @@ -13,6 +13,24 @@
->>  
->>  #include <pthread.h>
->>  
->> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
->> +#define serial_iobase(nr)	(0x1000000 + (nr) * 0x1000)
->> +#define serial_irq(nr)		(32 + (nr))
->> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
->> +#else
->> +#define serial_iobase_0		0x3f8
->> +#define serial_iobase_1		0x2f8
->> +#define serial_iobase_2		0x3e8
->> +#define serial_iobase_3		0x2e8
->> +#define serial_irq_0		4
->> +#define serial_irq_1		3
->> +#define serial_irq_2		4
->> +#define serial_irq_3		3
-> Nitpick: serial_iobase_* and serial_irq_* could be changed to have two leading
-> underscores, to stress the fact that they are helpers for serial_iobase() and
-> serial_irq() and are not meant to be used by themselves. But that's just personal
-> preference, otherwise the patch looks really nice and clean:
->
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> 
+> On 12/10/20 2:28 PM, Andre Przywara wrote:
+> > With the planned retirement of the special ioport emulation code, we
+> > need to provide an emulation function compatible with the MMIO
+> > prototype.
+> >
+> > Adjust the trap handler to use that new function, and provide shims to
+> > implement the old ioport interface, for now.
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
+> >  1 file changed, 34 insertions(+), 34 deletions(-)
+> >
+> > diff --git a/hw/i8042.c b/hw/i8042.c
+> > index 36ee183f..eb1f9d28 100644
+> > --- a/hw/i8042.c
+> > +++ b/hw/i8042.c
+> > @@ -292,52 +292,52 @@ static void kbd_reset(void)
+> >  	};
+> >  }
+> >  
+> > -/*
+> > - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> > - */
+> > -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> > +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> > +		   u8 is_write, void *ptr)
+> >  {
+> > -	switch (port) {
+> > -	case I8042_COMMAND_REG: {
+> > -		u8 value = kbd_read_status();
+> > -		ioport__write8(data, value);
+> > +	u8 value;
+> > +
+> > +	if (is_write)
+> > +		value = ioport__read8(data);
+> > +
+> > +	switch (addr) {
+> > +	case I8042_COMMAND_REG:
+> > +		if (is_write)
+> > +			kbd_write_command(vcpu->kvm, value);
+> > +		else
+> > +			value = kbd_read_status();
+> >  		break;
+> > -	}
+> > -	case I8042_DATA_REG: {
+> > -		u8 value = kbd_read_data();
+> > -		ioport__write8(data, value);
+> > +	case I8042_DATA_REG:
+> > +		if (is_write)
+> > +			kbd_write_data(value);
+> > +		else
+> > +			value = kbd_read_data();
+> >  		break;
+> > -	}
+> > -	case I8042_PORT_B_REG: {
+> > -		ioport__write8(data, 0x20);
+> > +	case I8042_PORT_B_REG:
+> > +		if (!is_write)
+> > +			value = 0x20;
+> >  		break;
+> > -	}
+> >  	default:
+> > -		return false;
+> > +		return;  
+> 
+> Any particular reason for removing the false return value? I don't see it
+> mentioned in the commit message. Otherwise this is identical to the two functions
+> it replaces.
 
-I gave it more thought and I think I spoke too soon. I think it would be good to
-document in the commit message how you came to the base MMIO address and size
-(even if it was just a nice looking number). Also, the CFI flash device has its
-memory range described in the memory layout for the architecture, in
-arm/include/arm-common/kvm-arch.h. I think it would be a good idea to put the
-serial region there, to prevent regressions in the future.
+Because the MMIO handler prototype is void, in contrast to the PIO one.
+Since on returning "false" we only seem to panic kvmtool, this is of
+quite limited use, I'd say.
 
-I did the math to make sure there's no overlap with the ioport region (16M >> 16K)
-or the flash region (16M + 0x4000 < 32M). I also tested the changes with a kernel
-with 4K and 64K pages (I can't access any hardware with 16K pages at the moment),
-and everything worked as expected.
+> >  	}
+> >  
+> > +	if (!is_write)
+> > +		ioport__write8(data, value);
+> > +}
+> > +
+> > +/*
+> > + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
+> > + */
+> > +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> > +{
+> > +	kbd_io(vcpu, port, data, size, false, NULL);  
+> 
+> is_write is an u8, not a bool.
 
-Thanks,
+Right, will fix this.
 
-Alex
+> I never could wrap my head around the ioport convention of "in" (read) and "out"
+> (write). To be honest, changing is_write changed to an enum so it's crystal clear
+> what is happening would help with that a lot, but I guess that's a separate patch.
 
-> Thanks,
->
-> Alex
->
->> +#define serial_iobase(nr)	serial_iobase_##nr
->> +#define serial_irq(nr)		serial_irq_##nr
->> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_IOPORT
->> +#endif
->> +
->>  /*
->>   * This fakes a U6_16550A. The fifo len needs to be 64 as the kernel
->>   * expects that for autodetection.
->> @@ -27,7 +45,7 @@ struct serial8250_device {
->>  	struct mutex		mutex;
->>  	u8			id;
->>  
->> -	u16			iobase;
->> +	u32			iobase;
->>  	u8			irq;
->>  	u8			irq_state;
->>  	int			txcnt;
->> @@ -65,56 +83,56 @@ static struct serial8250_device devices[] = {
->>  	/* ttyS0 */
->>  	[0]	= {
->>  		.dev_hdr = {
->> -			.bus_type	= DEVICE_BUS_IOPORT,
->> +			.bus_type	= SERIAL8250_BUS_TYPE,
->>  			.data		= serial8250_generate_fdt_node,
->>  		},
->>  		.mutex			= MUTEX_INITIALIZER,
->>  
->>  		.id			= 0,
->> -		.iobase			= 0x3f8,
->> -		.irq			= 4,
->> +		.iobase			= serial_iobase(0),
->> +		.irq			= serial_irq(0),
->>  
->>  		SERIAL_REGS_SETTING
->>  	},
->>  	/* ttyS1 */
->>  	[1]	= {
->>  		.dev_hdr = {
->> -			.bus_type	= DEVICE_BUS_IOPORT,
->> +			.bus_type	= SERIAL8250_BUS_TYPE,
->>  			.data		= serial8250_generate_fdt_node,
->>  		},
->>  		.mutex			= MUTEX_INITIALIZER,
->>  
->>  		.id			= 1,
->> -		.iobase			= 0x2f8,
->> -		.irq			= 3,
->> +		.iobase			= serial_iobase(1),
->> +		.irq			= serial_irq(1),
->>  
->>  		SERIAL_REGS_SETTING
->>  	},
->>  	/* ttyS2 */
->>  	[2]	= {
->>  		.dev_hdr = {
->> -			.bus_type	= DEVICE_BUS_IOPORT,
->> +			.bus_type	= SERIAL8250_BUS_TYPE,
->>  			.data		= serial8250_generate_fdt_node,
->>  		},
->>  		.mutex			= MUTEX_INITIALIZER,
->>  
->>  		.id			= 2,
->> -		.iobase			= 0x3e8,
->> -		.irq			= 4,
->> +		.iobase			= serial_iobase(2),
->> +		.irq			= serial_irq(2),
->>  
->>  		SERIAL_REGS_SETTING
->>  	},
->>  	/* ttyS3 */
->>  	[3]	= {
->>  		.dev_hdr = {
->> -			.bus_type	= DEVICE_BUS_IOPORT,
->> +			.bus_type	= SERIAL8250_BUS_TYPE,
->>  			.data		= serial8250_generate_fdt_node,
->>  		},
->>  		.mutex			= MUTEX_INITIALIZER,
->>  
->>  		.id			= 3,
->> -		.iobase			= 0x2e8,
->> -		.irq			= 3,
->> +		.iobase			= serial_iobase(3),
->> +		.irq			= serial_irq(3),
->>  
->>  		SERIAL_REGS_SETTING
->>  	},
->> @@ -444,7 +462,8 @@ static int serial8250__device_init(struct kvm *kvm,
->>  		return r;
->>  
->>  	ioport__map_irq(&dev->irq);
->> -	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
->> +	r = kvm__register_iotrap(kvm, dev->iobase, 8, serial8250_mmio, dev,
->> +				 SERIAL8250_BUS_TYPE);
->>  
->>  	return r;
->>  }
->> @@ -467,7 +486,7 @@ cleanup:
->>  	for (j = 0; j <= i; j++) {
->>  		struct serial8250_device *dev = &devices[j];
->>  
->> -		kvm__deregister_pio(kvm, dev->iobase);
->> +		kvm__deregister_iotrap(kvm, dev->iobase, SERIAL8250_BUS_TYPE);
->>  		device__unregister(&dev->dev_hdr);
->>  	}
->>  
->> @@ -483,7 +502,8 @@ int serial8250__exit(struct kvm *kvm)
->>  	for (i = 0; i < ARRAY_SIZE(devices); i++) {
->>  		struct serial8250_device *dev = &devices[i];
->>  
->> -		r = kvm__deregister_pio(kvm, dev->iobase);
->> +		r = kvm__deregister_iotrap(kvm, dev->iobase,
->> +					   SERIAL8250_BUS_TYPE);
->>  		if (r < 0)
->>  			return r;
->>  		device__unregister(&dev->dev_hdr);
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+"in" and "out" are the x86 assembly mnemonics, but it's indeed
+confusing, because the device side has a different view (CPU "in" means
+pushing data "out" of the device). I usually look at the code to see
+what it's actually meant to do.
+So yeah, I feel like a lot of those device emulations could use
+some update. but that's indeed something for another day.
+
+Cheers,
+Andre
+
+> > +
+> >  	return true;
+> >  }
+> >  
+> >  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> >  {
+> > -	switch (port) {
+> > -	case I8042_COMMAND_REG: {
+> > -		u8 value = ioport__read8(data);
+> > -		kbd_write_command(vcpu->kvm, value);
+> > -		break;
+> > -	}
+> > -	case I8042_DATA_REG: {
+> > -		u8 value = ioport__read8(data);
+> > -		kbd_write_data(value);
+> > -		break;
+> > -	}
+> > -	case I8042_PORT_B_REG: {
+> > -		break;
+> > -	}
+> > -	default:
+> > -		return false;
+> > -	}
+> > +	kbd_io(vcpu, port, data, size, true, NULL);
+> >  
+> >  	return true;
+> >  }  
+
