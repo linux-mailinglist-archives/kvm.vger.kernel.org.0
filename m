@@ -2,95 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7807A31EE70
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:39:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D8F431EE72
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:39:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232650AbhBRSfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:35:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25845 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234891AbhBRSCM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 13:02:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613671246;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=knU/yki0BfF5dJoH+kKkOxiLiSgQ2mddkhxf1LFdIuI=;
-        b=FyCvK1Wccvh0FNrKzVV79kh8nvk9lToVHig962vZ8ag00QhZb4PBp0AbSgtsc32kzORdXX
-        HPQqacazR10+bkqEzBnJm8Aja9GWlYKGkh14sI8eRmcxWmFBFx0kCetXN+JYFgY37YH0fj
-        gdW1KInXUClhykNmVwEwX1mpb6M8yhY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-u4C2RYxtN0GBgN2aVlqUOQ-1; Thu, 18 Feb 2021 13:00:44 -0500
-X-MC-Unique: u4C2RYxtN0GBgN2aVlqUOQ-1
-Received: by mail-wm1-f69.google.com with SMTP id j204so1521107wmj.4
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:00:43 -0800 (PST)
+        id S232693AbhBRSf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:35:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230071AbhBRSDN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 13:03:13 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E65C0613D6
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:02:32 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id b145so1828708pfb.4
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:02:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ls8LFMuOfFIGXP+zyESQQVzdohbKJv1NNu1HQ2O+7mo=;
+        b=vt0xaUaXssRiggG9KZr6gimnPEHznpV2Fa9on2er/KvXV+DyDwLdjMew6tUAPjAD+D
+         3Kx9Tel6z3LhvrvChjjVuFCDg1HvRNA+h4TM3bMvryyE7e36j65FrOtYMrLhh0750jDJ
+         mTZcyC2G7fj5/nFo4K6RtySvrjPXw9bFGIldUlTVda1VEkiME5d5iPk22YGTikR9/7rD
+         vYPeoC4/r3iocdVPiuw9n9CesvbMZSjGHZo4BXanF4k5BUsvoD27VDG8XIcOEIgxjQQA
+         agTyDddQ0gbN6niYP+htkntLzffcs5eVDRZ6yTiYJeuJG+XAYtU0zAAt9kmE59/ZxlbU
+         1kTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=knU/yki0BfF5dJoH+kKkOxiLiSgQ2mddkhxf1LFdIuI=;
-        b=Dfq1GuCfG4esxpbGVx0PMZXIDJqYgMjPmowoVihSZ8pThY5gxbjhjYM2DzB6RGTK2y
-         8JCKxRJvg36wpx7ZwOwKqdeU0/rB8UDJeAKUqtp9/XXXASA+T7fLdDhTV2t+pqH+fTu2
-         Ki6ugaVusF7M6A8FdYOZEHf4dFT6JJLvLVFItB8MEGy+KfUehXc79Iuwe5TP5o/Wvxx/
-         dOjlDuHcLCBXw8NyMv0Qw057BY1sOEVXsydZujOLzrEYVDMZnLkYTrPt69LUstUdZWMs
-         LT+hgmWID1fZAAUlw2AT4873XcjOGv/r5AafLUTZSFjtAakphZG0m3m1U4KWoNaWcxaI
-         vQNA==
-X-Gm-Message-State: AOAM533M49PMsJQQ/MR5gA5/v72gkfmsh1Jk/fIBLpltTlXuiTv0WlgP
-        2r9oiJBozSjEzB6eE0brMuylVE/AYnVFMX8oIRImDfG6J06EiU+wTxARvFgxTQ1F8A1/dpeGMab
-        +qGcIR0c45O/T
-X-Received: by 2002:a5d:5104:: with SMTP id s4mr5336465wrt.277.1613671242968;
-        Thu, 18 Feb 2021 10:00:42 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxg81dCsuwIpBmnRINMv5sFy4QWWKQMpP2/bYb3VgK6odiPlu1XN3GP4HB1vH47LzUx80nnSw==
-X-Received: by 2002:a5d:5104:: with SMTP id s4mr5336452wrt.277.1613671242790;
-        Thu, 18 Feb 2021 10:00:42 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id e16sm12302377wrt.36.2021.02.18.10.00.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Feb 2021 10:00:41 -0800 (PST)
-Subject: Re: [PATCH] KVM: nSVM: prepare guest save area while is_guest_mode is
- true
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jroedel@suse.de,
-        mlevitsk@redhat.com
-References: <20210218162831.1407616-1-pbonzini@redhat.com>
- <YC6m8xoRUDtn3V+y@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cf1b338c-68bc-6e7e-1a10-98bc653d34ce@redhat.com>
-Date:   Thu, 18 Feb 2021 19:00:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ls8LFMuOfFIGXP+zyESQQVzdohbKJv1NNu1HQ2O+7mo=;
+        b=EKWEvePl4Firu1dZEN+cVAyx7Okh+43USqUvI1iH6bSe/CAf9FngQMOnBSf0U2d8Vt
+         HS44X1i+SNpurIA5UB9RNDMKTgV6pfgnvKLVHjSRhGqRkI6VtSS2cLuCMSNTrnFUXE0f
+         Y/7fR/SSHNdi+uoYqSeKRts0/XZ4nPGJAh9evFAIf7fHvuIb7wTDGGaQ5ycaNF46GLKr
+         xtvVPaz0EcfaicTNzls5Stb1Xk7M6k7nHqV9xPsh7e5g3exv5X5+T/l9InfObqsoWf2l
+         CblA9G+dK8BGssWsL+nP/gBghz8n8fKK4AHZSX28+7D7kl5OGe8tBlcoocy6EE+UUTMI
+         YHqA==
+X-Gm-Message-State: AOAM533BU9+4K3+HkmRE/e3ENsyT8c6wfGBpPQHz/Z+83sUgj84s5A86
+        wtAm2MAzcLMAeoGXJGt5RyW00Q==
+X-Google-Smtp-Source: ABdhPJxSw0HbBab/Pii65Ovw+NhRgLoHYHkzQzk2SDTtnMynKpXQnHY6nm19yGrTglJTiJWQM+2WUw==
+X-Received: by 2002:a65:4b89:: with SMTP id t9mr4975224pgq.211.1613671352128;
+        Thu, 18 Feb 2021 10:02:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
+        by smtp.gmail.com with ESMTPSA id ml7sm1210320pjb.28.2021.02.18.10.02.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Feb 2021 10:02:31 -0800 (PST)
+Date:   Thu, 18 Feb 2021 10:02:25 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH kvm-unit-tests] x86: clean up EFER definitions
+Message-ID: <YC6rsTdE1iqiYYYO@google.com>
+References: <20210218132648.1397421-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YC6m8xoRUDtn3V+y@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210218132648.1397421-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/02/21 18:42, Sean Christopherson wrote:
->> The bug is present since commit 06fc7772690d ("KVM: SVM: Activate nested
->> state only when guest state is complete", 2010-04-25).  Unfortunately,
->> it is not clear from the commit message what issue exactly led to the
->> change back then.  It was probably related to svm_set_cr0 however because
->> the patch series cover letter[1] mentioned lazy FPU switching.
->
-> Aha!  It was indeed related to svm_set_cr0().  Specifically, the next patch,
-> commit 66a562f7e257 ("KVM: SVM: Make lazy FPU switching work with nested svm"),
-> added is_nested() checks in update_cr0_intercept() to merge L1's intercepts with
-> L0's intercepts.
+On Thu, Feb 18, 2021, Paolo Bonzini wrote:
+> The X86_EFER_LMA definition is wrong, while X86_IA32_EFER is unused.
+> There are also two useless WRMSRs that try to set EFER_LMA in
+> x86/pks.c and x86/pku.c.  Clean them all up.
 
-Yeah, the problem is I don't understand why 06fc7772690d fixed things in 
-11 year old KVM instead of breaking them, because effectively this patch 
-is reverting it.
+For posterity: EFER_LMA is incorrectly defined as EFER_LME, and both PKS and PKU
+tests are 64-bit only, so the WRMSRs are guaranteed to be nops.
 
-I don't care _that_ much because so much has changed since then; the 
-world switch logic is abstracted better nowadays, and it is easier to 
-review the change.  But it is weird, nevertheless.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Paolo
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
