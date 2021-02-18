@@ -2,118 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3004231EE43
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9323A31EE46
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232086AbhBRS20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:28:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45672 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230455AbhBRQkN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 11:40:13 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE2AC06178B
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:39:30 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id g20so1555383plo.2
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:39:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tAXH7YAvVuou21SXxWV1oEs6Zbi0HoK7NLFcDJuhkUA=;
-        b=RaylJLQWFDukLtP3lYtl5lQ33ROSeOwO/SaAsdJFq7bR03ReAHTpTVKqq1d9ctYIjc
-         r2v02QbKpPOQLqvscd+VcbprwB0nT0FPsGMqfjpZloEhKgSuM0iFQPBUbrItZezAtysL
-         SvyQALCnKYzuBiIcG0KdU28l1ouOFPwyZlIM6i9xKjrsvvSLBJbsgARTfrZZ0dKOZ6tU
-         +ohiKEStWWILnaEYFv/bipW8TYsKNNok211hOpPLeuojZDQsRA8SAF192qdagD57F6jB
-         LK/kN0cHSl+darl9LTLSEPekZiEWjKIQl8MVFRmUW+ueTZdBkieZ99bxhkE/gPRampiG
-         GpOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tAXH7YAvVuou21SXxWV1oEs6Zbi0HoK7NLFcDJuhkUA=;
-        b=EsrokjGA4stBzF7X4j9IhodSGqMMrZ1McB2MB+lS3fZZFMv4Va+kzpyogvCtLfh7Yu
-         EZwkHEUdF2m79Yy78/dYaKQWSbi8ilYqVv0aDtsO06Rq5Z+9w6oPkmz8E3AzLhyBbiDM
-         yuwZyDxL/4a953H8PJTJp78jHnDkA7X2MS6kzHQUjrfDeDXHNSufbmZDrEr9erM0wz9u
-         tcaTuBnH8pG3rfFXxPCYj0lDlCYPjhk/1L19ksTH+Oz8kFnQy7OSwdwpBJCNPcG4Rrc/
-         2J6FCS0gxO7BZoIezgXdtMVG00NbF0IVm9Gu+n538VGoDKPDwlYDLzqSpWM1C9rS3Ure
-         gVHQ==
-X-Gm-Message-State: AOAM533FE5hhfzGivbYxaxyadbyrY0C50uci2aCOu6iaDiT/tL9A0Ldc
-        w6AJcUgEYohXxR+eMgYdwFLHTA==
-X-Google-Smtp-Source: ABdhPJwubJnoW5ptbBz//HSdFUifLFNVclJakKkrpbIvA9T+sfPDIzNCeNzlNhEjk4nRGe8nE1PkCQ==
-X-Received: by 2002:a17:90a:4083:: with SMTP id l3mr4785105pjg.109.1613666369535;
-        Thu, 18 Feb 2021 08:39:29 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id l190sm6691625pfl.205.2021.02.18.08.39.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 08:39:29 -0800 (PST)
-Date:   Thu, 18 Feb 2021 08:39:22 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
- ioctl
-Message-ID: <YC6YOuJyNlSxKVR4@google.com>
-References: <cover.1612398155.git.ashish.kalra@amd.com>
- <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
- <YCxrV4u98ZQtInOE@google.com>
- <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YC1AkNPNET+T928c@google.com>
- <SN6PR12MB27676C0BF3BBA872E55D5FC78E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+        id S232308AbhBRS2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:28:35 -0500
+Received: from foss.arm.com ([217.140.110.172]:53308 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233820AbhBRQnM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 11:43:12 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A57F9106F;
+        Thu, 18 Feb 2021 08:42:16 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5F3893F73D;
+        Thu, 18 Feb 2021 08:42:14 -0800 (PST)
+Date:   Thu, 18 Feb 2021 16:41:17 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 21/21] hw/rtc: ARM/arm64: Use MMIO at higher
+ addresses
+Message-ID: <20210218164117.15fbd67a@slackpad.fritz.box>
+In-Reply-To: <102807a0-812f-d4bf-b8b4-560f999c6e6c@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+        <20201210142908.169597-22-andre.przywara@arm.com>
+        <102807a0-812f-d4bf-b8b4-560f999c6e6c@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB27676C0BF3BBA872E55D5FC78E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Kalra, Ashish wrote:
-> From: Sean Christopherson <seanjc@google.com> 
-> 
-> On Wed, Feb 17, 2021, Kalra, Ashish wrote:
-> >> From: Sean Christopherson <seanjc@google.com> On Thu, Feb 04, 2021, 
-> >> Ashish Kalra wrote:
-> >> > From: Brijesh Singh <brijesh.singh@amd.com>
-> >> > 
-> >> > The ioctl is used to retrieve a guest's shared pages list.
-> >> 
-> >> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS is 
-> >> >passed through to userspace?  That way, userspace could manage the 
-> >> >set of pages >in whatever data structure they want, and these get/set ioctls go away.
-> >> 
-> >> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to 
-> >> user-space ?
-> >> 
-> >> As such it is just a simple interface to get the shared page list via 
-> >> the get/set ioctl's. simply an array is passed to these ioctl to 
-> >> get/set the shared pages list.
-> 
-> > It eliminates any probability of the kernel choosing the wrong data
-> > structure, and it's two fewer ioctls to maintain and test.
-> 
-> The set shared pages list ioctl cannot be avoided as it needs to be issued to
-> setup the shared pages list on the migrated VM, it cannot be achieved by
-> passing KVM_HC_PAGE_ENC_STATUS through to user-space.
+On Thu, 18 Feb 2021 13:33:15 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Why's that?  AIUI, KVM doesn't do anything with the list other than pass it back
-to userspace.  Assuming that's the case, userspace can just hold onto the list
-for the next migration.
+> Hi Andre,
+> 
+> On 12/10/20 2:29 PM, Andre Przywara wrote:
+> > Using the RTC device at its legacy I/O address as set by IBM in 1981
+> > was a kludge we used for simplicity on ARM platforms as well.
+> > However this imposes problems due to their missing alignment and overlap
+> > with the PCI I/O address space.
+> >
+> > Now that we can switch a device easily between using ioports and
+> > MMIO, let's move the RTC out of the first 4K of memory on ARM platforms.
+> >
+> > That should be transparent for well behaved guests, since the change is
+> > naturally reflected in the device tree.
+> >
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> >  hw/rtc.c | 24 ++++++++++++++++--------
+> >  1 file changed, 16 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/hw/rtc.c b/hw/rtc.c
+> > index ee4c9102..bdb88f0f 100644
+> > --- a/hw/rtc.c
+> > +++ b/hw/rtc.c
+> > @@ -5,6 +5,15 @@
+> >  
+> >  #include <time.h>
+> >  
+> > +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> > +#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
+> > +#define RTC_BASE_ADDRESS	0x1010000  
+> 
+> This looks correct, the base address is the serial base address + 64k, so they
+> don't overlap, and it doesn't overlap with the flash memory either. Same comment
+> as for the serial, I think the reason for choosing this address should be
+> mentioned, and the region should be put in the arch memory layout file. Other than
+> that, the patch looks good.
 
-> So it makes sense to add both get/set shared pages list ioctl, passing
-> through to user-space is just adding more complexity without any significant
-> gains.
+Yep, will do!
 
-No, it reduces complexity for KVM by avoiding locking and memslot dependencies.
+Thanks,
+Andre
+
+> 
+> > +#else
+> > +/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> > +#define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
+> > +#define RTC_BASE_ADDRESS	0x70
+> > +#endif
+> > +
+> >  /*
+> >   * MC146818 RTC registers
+> >   */
+> > @@ -49,7 +58,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> >  	time_t ti;
+> >  
+> >  	if (is_write) {
+> > -		if (addr == 0x70) {	/* index register */
+> > +		if (addr == RTC_BASE_ADDRESS) {	/* index register */
+> >  			u8 value = ioport__read8(data);
+> >  
+> >  			vcpu->kvm->nmi_disabled	= value & (1UL << 7);
+> > @@ -70,7 +79,7 @@ static void cmos_ram_io(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> >  		return;
+> >  	}
+> >  
+> > -	if (addr == 0x70)
+> > +	if (addr == RTC_BASE_ADDRESS)	/* index register is write-only */
+> >  		return;
+> >  
+> >  	time(&ti);
+> > @@ -127,7 +136,7 @@ static void generate_rtc_fdt_node(void *fdt,
+> >  							    u8 irq,
+> >  							    enum irq_type))
+> >  {
+> > -	u64 reg_prop[2] = { cpu_to_fdt64(0x70), cpu_to_fdt64(2) };
+> > +	u64 reg_prop[2] = { cpu_to_fdt64(RTC_BASE_ADDRESS), cpu_to_fdt64(2) };
+> >  
+> >  	_FDT(fdt_begin_node(fdt, "rtc"));
+> >  	_FDT(fdt_property_string(fdt, "compatible", "motorola,mc146818"));
+> > @@ -139,7 +148,7 @@ static void generate_rtc_fdt_node(void *fdt,
+> >  #endif
+> >  
+> >  struct device_header rtc_dev_hdr = {
+> > -	.bus_type = DEVICE_BUS_IOPORT,
+> > +	.bus_type = RTC_BUS_TYPE,
+> >  	.data = generate_rtc_fdt_node,
+> >  };
+> >  
+> > @@ -151,8 +160,8 @@ int rtc__init(struct kvm *kvm)
+> >  	if (r < 0)
+> >  		return r;
+> >  
+> > -	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> > -	r = kvm__register_pio(kvm, 0x0070, 2, cmos_ram_io, NULL);
+> > +	r = kvm__register_iotrap(kvm, RTC_BASE_ADDRESS, 2, cmos_ram_io, NULL,
+> > +				 RTC_BUS_TYPE);
+> >  	if (r < 0)
+> >  		goto out_device;
+> >  
+> > @@ -170,8 +179,7 @@ dev_init(rtc__init);
+> >  
+> >  int rtc__exit(struct kvm *kvm)
+> >  {
+> > -	/* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> > -	kvm__deregister_pio(kvm, 0x0070);
+> > +	kvm__deregister_iotrap(kvm, RTC_BASE_ADDRESS, RTC_BUS_TYPE);
+> >  
+> >  	return 0;
+> >  }  
+
