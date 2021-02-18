@@ -2,60 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7431531EE76
+	by mail.lfdr.de (Postfix) with ESMTP id E7CA031EE77
 	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:40:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231709AbhBRShQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:37:16 -0500
-Received: from mail.jvpinto.com ([65.49.11.60]:33577 "EHLO mail.JVPinto.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231447AbhBRSRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 13:17:45 -0500
-Received: from RW-EXC1.JVPinto.com (2002:ac20:10d::ac20:10d) by
- RW-EXC1.JVPinto.com (2002:ac20:10d::ac20:10d) with Microsoft SMTP Server
- (TLS) id 15.0.1497.2; Thu, 18 Feb 2021 10:16:42 -0800
-Received: from User (20.48.109.21) by RW-EXC1.JVPinto.com (172.32.1.13) with
- Microsoft SMTP Server id 15.0.1497.2 via Frontend Transport; Thu, 18 Feb 2021
- 10:16:31 -0800
-Reply-To: <ms.reem@yandex.com>
-From:   "Ms. Reem" <johnpinto@jvpinto.com>
-Subject: Re:ok
-Date:   Thu, 18 Feb 2021 18:16:42 +0000
+        id S232790AbhBRShs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:37:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31262 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231461AbhBRSaa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 13:30:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613672942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=epfvCT9jrqIjj7Il6iW7EYzFb2mh6dSz2os3H/L544Q=;
+        b=cK9i2BAOH/bU7A31lKPu8ia7c3Lxqy9rnQjA3fIG3bM+q3iULMBh2oxNkdJJjEPvfsdQcQ
+        SfvhYUW3uDDZQHwb6noGdvWe1nPu7/C21IXVLSNvnUn9Hq19RKJfv/e0ZSwtPQAtCuUpvS
+        JcmJjxHM8PlldBf2m5gCaZWaLmJQavg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-2ClHIsfpPr6kkfrqlXk9ew-1; Thu, 18 Feb 2021 13:29:00 -0500
+X-MC-Unique: 2ClHIsfpPr6kkfrqlXk9ew-1
+Received: by mail-wr1-f70.google.com with SMTP id q5so1305319wrs.20
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 10:29:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=epfvCT9jrqIjj7Il6iW7EYzFb2mh6dSz2os3H/L544Q=;
+        b=YmUiiyeT2ROq27SaFwKRMKmiV2xvtpoVGxvYqcFC47qgC1irlBLiHA/Zb0nEH/KhTv
+         8UfCeHMvYdm1HEEI8xhUj3KxjcfkvWXTW3F/LEv9AjEy1Vvnv77pSjM/I3oVi7io76RM
+         CIcVIcAJAabawFv4aiOyexFSLHdUoEatXEbiY9Rij38MtwEoGqVIaIHCNz+oECijN0Hy
+         CfmFF98HIFQGQ/MPxOjVNCEW73PYayZkFhHbUOKCtETeMjXSHKN2fMqH6RnLTmkXBYWM
+         toF/1bfTTYXAj3DMDUc0fcFb9cbLxEUczsd9J/ih4PhtX0gvkrTgWMsoeNqpMOju5CZP
+         rUkw==
+X-Gm-Message-State: AOAM530LEqdC7lwxNReOnc2TLNCqOt/J5IBs6s+snlAxEgpSp8lJVpzG
+        MQtApEZXuYX9r2nl/2JgOKWAmOYbWWRTNqBG+0XOlbXb43phDVneB4PpuIR2tkjcu3WCxtBWKt3
+        4ExD7iydzoRox
+X-Received: by 2002:adf:a4c8:: with SMTP id h8mr5713592wrb.286.1613672939537;
+        Thu, 18 Feb 2021 10:28:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzH3Meos3s1fNj1v73OLg4ed8bjMQK5hBBhuPoMsOZj43SGrOpZoupj3jdijWQmjlXNAFf1Bw==
+X-Received: by 2002:adf:a4c8:: with SMTP id h8mr5713576wrb.286.1613672939309;
+        Thu, 18 Feb 2021 10:28:59 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d23sm9246030wmd.11.2021.02.18.10.28.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Feb 2021 10:28:58 -0800 (PST)
+Subject: Re: [PATCH] KVM: nSVM: prepare guest save area while is_guest_mode is
+ true
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jroedel@suse.de,
+        mlevitsk@redhat.com
+References: <20210218162831.1407616-1-pbonzini@redhat.com>
+ <YC6m8xoRUDtn3V+y@google.com>
+ <cf1b338c-68bc-6e7e-1a10-98bc653d34ce@redhat.com>
+ <YC6uGgKgImRnuhTA@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <50bcc6e3-5f6e-32a3-6975-db7d857e88f3@redhat.com>
+Date:   Thu, 18 Feb 2021 19:28:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="Windows-1251"
+In-Reply-To: <YC6uGgKgImRnuhTA@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-ID: <2db6ea9eda864dd69034e342b1d20693@RW-EXC1.JVPinto.com>
-To:     Undisclosed recipients:;
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On 18/02/21 19:12, Sean Christopherson wrote:
+>> Yeah, the problem is I don't understand why 06fc7772690d fixed things in 11
+>> year old KVM instead of breaking them, because effectively this patch is
+>> reverting it.
+>
+> 11 year old KVM didn't grab a different VMCB when updating the intercepts, it
+> had already copied/merged L1's stuff to L0's VMCB, and then updated L0's VMCB
+> regardless of is_nested().
 
-My name is Ms. Reem Ebrahim Al-Hashimi, I am the "Minister of state
-and Petroleum" also "Minister of State for International Cooperation"
-in UAE. I write to you on behalf of my other "three (3) colleagues"
-who has approved me to solicit for your "partnership in claiming of
-{us$47=Million}" from a Financial Home in Cambodia on their behalf and
-for our "Mutual Benefits".
+Ok, so the bug was introduced when adding recalc_intercepts, which threw 
+away the intercept manipulations that svm_set_cr0 had done in the 
+meanwhile.  That's commit 384c63684397 ("KVM: SVM: Add function to 
+recalculate intercept masks", 2011-01-12).
 
-The Fund {us$47=Million} is our share from the (over-invoiced) Oil/Gas
-deal with Cambodian/Vietnam Government within 2013/2014, however, we
-don't want our government to know about the fund. If this proposal
-interests you, let me know, by sending me an email and I will send to
-you detailed information on how this business would be successfully
-transacted. Be informed that nobody knows about the secret of this
-fund except us, and we know how to carry out the entire transaction.
-So I am compelled to ask, that you will stand on our behalf and
-receive this fund into any account that is solely controlled by you.
+That piece of information makes me feel less uneasy about missing 
+something.  recalc_intercepts has been there for a long time, but not as 
+long as 06fc7772690d.
 
-We will compensate you with 15% of the total amount involved as
-gratification for being our partner in this transaction. Reply to:
-ms.reem@yandex.com
+Paolo
 
-Regards,
-Ms. Reem.
