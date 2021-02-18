@@ -2,346 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD5A731EE49
+	by mail.lfdr.de (Postfix) with ESMTP id 3AD6031EE48
 	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232396AbhBRS2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:28:41 -0500
-Received: from foss.arm.com ([217.140.110.172]:53370 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233722AbhBRQsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 11:48:09 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 795A61042;
-        Thu, 18 Feb 2021 08:35:47 -0800 (PST)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD5C73F73D;
-        Thu, 18 Feb 2021 08:35:44 -0800 (PST)
-Date:   Thu, 18 Feb 2021 16:34:46 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH kvmtool 19/21] Remove ioport specific routines
-Message-ID: <20210218163446.655df12f@slackpad.fritz.box>
-In-Reply-To: <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
-        <20201210142908.169597-20-andre.przywara@arm.com>
-        <05a0df3a-625f-74de-8014-e78aee9e8427@arm.com>
-        <389aa087-b079-cafb-b018-eab599e337ed@arm.com>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S232361AbhBRS2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:28:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46444 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233841AbhBRQoN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 11:44:13 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF499C061788
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:35:42 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id 189so1650351pfy.6
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=DqLb1nMq14/rKI2+/NThAnihxh+nHxjLWJAo5ipH1Ws=;
+        b=md44/Px+2SYhg3j59P0MfiNu7AvOT5R8yCXllWmXN1HLCn41bzTgMiigaxhw+qQ3nS
+         8Vl0kNQwvSu/lWr12I2+sryWC9Xsu5ecLXdqdqfE8/yxOTBGxxFYvHwOS/C84LQ1u0hf
+         mxdFswTZrTeNLMuTMil8ktlWYBYm8nzG8PThHZvZefb2zVMvdI7jbE9Dmrv3KnrTtQwO
+         ueDZbeL2tBuyZrjKpfd8+hyNtYkuUHaM8qtrpQZk7M+r7jiRjRqNA0nm6vz7+uQ4OmnZ
+         bRpUeHSkaUqRPHLH8sp5vDA1/z1wHWhL9iuWOUqh/tsixm5v9XUMFTxxUVMRtOZwWXSe
+         M9ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DqLb1nMq14/rKI2+/NThAnihxh+nHxjLWJAo5ipH1Ws=;
+        b=uKdYfJCwMKgDpFtyWe0v7RRbx9rWLFZ5wxfF4+f83GaD3vRXwklwQQiV4ghl2P1qMI
+         mLbbaNyPp6p9nlhyY+MZHn+UbW6sEA/CBAe+w1yfjRc0h7jG1Bi7AzXxXSNCRZkD6spw
+         WZ6S+m8e4+XJHCDOQgJHmrHYuin3Cl+a4fPHHvHpRztxwHmuv3g1nP0A7JusCQ6ja+A0
+         o/fjEYUyNrCk/VOQSiMXzt2wRDt6xLrYCxmI+gEjMelWveaJEJH9tFQhTHx5Hv2VRKgJ
+         PEvWrOM4bv0FlymzBBcoHvFZgu70KOE3foEiAJIFh++1/F7a7fSsxM6VMtGUoJSbOkAv
+         hxSw==
+X-Gm-Message-State: AOAM530Xb2e5nUpB0j7Gyjafbp9VBuKACrQjXgIsHfbPNxdRG6+rIqqg
+        +BTtgB+APURuRJUDZMgU/9ntjg==
+X-Google-Smtp-Source: ABdhPJx4qmdTfrJEOoVNnYWhC+COxjc2izCvLNNT+7AllgY3YfPaHqJiw+a2Ps64S8Z5Argnnu8NKw==
+X-Received: by 2002:a63:214e:: with SMTP id s14mr4641755pgm.101.1613666141653;
+        Thu, 18 Feb 2021 08:35:41 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
+        by smtp.gmail.com with ESMTPSA id q7sm3116401pfb.185.2021.02.18.08.35.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Feb 2021 08:35:40 -0800 (PST)
+Date:   Thu, 18 Feb 2021 08:35:34 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Edmondson <dme@dme.org>, linux-kernel@vger.kernel.org,
+        Borislav Petkov <bp@alien8.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH] KVM: x86: dump_vmcs should not assume GUEST_IA32_EFER is
+ valid
+Message-ID: <YC6XVrWPRQJ7V6Nd@google.com>
+References: <20210218100450.2157308-1-david.edmondson@oracle.com>
+ <708f2956-fa0f-b008-d3d2-93067f95783c@redhat.com>
+ <cuntuq9ilg4.fsf@dme.org>
+ <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Feb 2021 16:11:51 +0000
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-> Hi Andre,
+On Thu, Feb 18, 2021, Paolo Bonzini wrote:
+> On 18/02/21 13:56, David Edmondson wrote:
+> > On Thursday, 2021-02-18 at 12:54:52 +01, Paolo Bonzini wrote:
+> > 
+> > > On 18/02/21 11:04, David Edmondson wrote:
+> > > > When dumping the VMCS, retrieve the current guest value of EFER from
+> > > > the kvm_vcpu structure if neither VM_EXIT_SAVE_IA32_EFER or
+> > > > VM_ENTRY_LOAD_IA32_EFER is set, which can occur if the processor does
+> > > > not support the relevant VM-exit/entry controls.
+> > > 
+> > > Printing vcpu->arch.efer is not the best choice however.  Could we dump
+> > > the whole MSR load/store area instead?
+> > 
+> > I'm happy to do that, and think that it would be useful, but it won't
+> > help with the original problem (which I should have explained more).
+> > 
+> > If the guest has EFER_LMA set but we aren't using the entry/exit
+> > controls, vm_read64(GUEST_IA32_EFER) returns 0, causing dump_vmcs() to
+> > erroneously dump the PDPTRs.
 > 
-> On 2/17/21 3:49 PM, Alexandru Elisei wrote:
-> > Hi Andre,
-> >
-> > On 12/10/20 2:29 PM, Andre Przywara wrote:  
-> >> Now that all users of the dedicated ioport trap handler interface are
-> >> gone, we can retire the code associated with it.
-> >>
-> >> This removes ioport.c and ioport.h, along with removing prototypes from
-> >> other header files.
-> >>
-> >> This also transfers the responsibility for port I/O trap handling
-> >> entirely into the new routine in mmio.c.
-> >>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >>  Makefile             |   1 -
-> >>  include/kvm/ioport.h |  20 -----
-> >>  include/kvm/kvm.h    |   2 -
-> >>  ioport.c             | 173 -------------------------------------------
-> >>  mmio.c               |   2 +-
-> >>  5 files changed, 1 insertion(+), 197 deletions(-)
-> >>  delete mode 100644 ioport.c
-> >>
-> >> diff --git a/Makefile b/Makefile
-> >> index 35bb1182..94ff5da6 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -56,7 +56,6 @@ OBJS	+= framebuffer.o
-> >>  OBJS	+= guest_compat.o
-> >>  OBJS	+= hw/rtc.o
-> >>  OBJS	+= hw/serial.o
-> >> -OBJS	+= ioport.o
-> >>  OBJS	+= irq.o
-> >>  OBJS	+= kvm-cpu.o
-> >>  OBJS	+= kvm.o
-> >> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
-> >> index a61038e2..38636553 100644
-> >> --- a/include/kvm/ioport.h
-> >> +++ b/include/kvm/ioport.h
-> >> @@ -17,28 +17,8 @@
-> >>  
-> >>  struct kvm;  
-> > Looks to me like the above forward declaration can be removed; same for all the
-> > includes except linux/byteorder.h, needed for the lexx_to_cpu/cpu_to_lexx
-> > functions, and linux/types.h for the uxx typedefs. Otherwise looks good.  
-> 
-> Actually, ignore the part about removing the includes, it opens a new can of worms
-> - byteorder.h doesn't include compiler.h where __always_inline is defined, and
-> various files where struct kvm_cpu is used don't include kvm-cpu.h (like pci.c,
-> hw/serial.c, etc). The header removal is not trivial and I think it should be part
-> of another cleanup patch.
+> Got it now.  It would sort of help, because while dumping the MSR load/store
+> area you could get hold of the real EFER, and use it to decide whether to
+> dump the PDPTRs.
 
-Well, it looks like I can remove some obvious headers like for fdt and
-rbtree. Will do that.
+EFER isn't guaranteed to be in the load list, either, e.g. if guest and host
+have the same desired value.
 
-Cheers,
-Andre
-
-> >
-> > Thanks,
-> >
-> > Alex
-> >  
-> >>  
-> >> -struct ioport {
-> >> -	struct rb_int_node		node;
-> >> -	struct ioport_operations	*ops;
-> >> -	void				*priv;
-> >> -	struct device_header		dev_hdr;
-> >> -	u32				refcount;
-> >> -	bool				remove;
-> >> -};
-> >> -
-> >> -struct ioport_operations {
-> >> -	bool (*io_in)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> >> -	bool (*io_out)(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size);
-> >> -};
-> >> -
-> >>  void ioport__map_irq(u8 *irq);
-> >>  
-> >> -int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
-> >> -				  int count, void *param);
-> >> -int ioport__unregister(struct kvm *kvm, u16 port);
-> >> -int ioport__init(struct kvm *kvm);
-> >> -int ioport__exit(struct kvm *kvm);
-> >> -
-> >>  static inline u8 ioport__read8(u8 *data)
-> >>  {
-> >>  	return *data;
-> >> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> >> index 14f9d58b..e70f8ef6 100644
-> >> --- a/include/kvm/kvm.h
-> >> +++ b/include/kvm/kvm.h
-> >> @@ -119,8 +119,6 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
-> >>  void kvm__irq_trigger(struct kvm *kvm, int irq);
-> >>  bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
-> >>  bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> >> -		      int direction, int size, u32 count);
-> >>  int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
-> >>  int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
-> >>  		      enum kvm_mem_type type);
-> >> diff --git a/ioport.c b/ioport.c
-> >> deleted file mode 100644
-> >> index 204d8103..00000000
-> >> --- a/ioport.c
-> >> +++ /dev/null
-> >> @@ -1,173 +0,0 @@
-> >> -#include "kvm/ioport.h"
-> >> -
-> >> -#include "kvm/kvm.h"
-> >> -#include "kvm/util.h"
-> >> -#include "kvm/rbtree-interval.h"
-> >> -#include "kvm/mutex.h"
-> >> -
-> >> -#include <linux/kvm.h>	/* for KVM_EXIT_* */
-> >> -#include <linux/types.h>
-> >> -
-> >> -#include <stdbool.h>
-> >> -#include <limits.h>
-> >> -#include <stdlib.h>
-> >> -#include <stdio.h>
-> >> -
-> >> -#define ioport_node(n) rb_entry(n, struct ioport, node)
-> >> -
-> >> -static DEFINE_MUTEX(ioport_lock);
-> >> -
-> >> -static struct rb_root		ioport_tree = RB_ROOT;
-> >> -
-> >> -static struct ioport *ioport_search(struct rb_root *root, u64 addr)
-> >> -{
-> >> -	struct rb_int_node *node;
-> >> -
-> >> -	node = rb_int_search_single(root, addr);
-> >> -	if (node == NULL)
-> >> -		return NULL;
-> >> -
-> >> -	return ioport_node(node);
-> >> -}
-> >> -
-> >> -static int ioport_insert(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	return rb_int_insert(root, &data->node);
-> >> -}
-> >> -
-> >> -static void ioport_remove(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	rb_int_erase(root, &data->node);
-> >> -}
-> >> -
-> >> -static struct ioport *ioport_get(struct rb_root *root, u64 addr)
-> >> -{
-> >> -	struct ioport *ioport;
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	ioport = ioport_search(root, addr);
-> >> -	if (ioport)
-> >> -		ioport->refcount++;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return ioport;
-> >> -}
-> >> -
-> >> -/* Called with ioport_lock held. */
-> >> -static void ioport_unregister(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	ioport_remove(root, data);
-> >> -	free(data);
-> >> -}
-> >> -
-> >> -static void ioport_put(struct rb_root *root, struct ioport *data)
-> >> -{
-> >> -	mutex_lock(&ioport_lock);
-> >> -	data->refcount--;
-> >> -	if (data->remove && data->refcount == 0)
-> >> -		ioport_unregister(root, data);
-> >> -	mutex_unlock(&ioport_lock);
-> >> -}
-> >> -
-> >> -int ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops, int count, void *param)
-> >> -{
-> >> -	struct ioport *entry;
-> >> -	int r;
-> >> -
-> >> -	entry = malloc(sizeof(*entry));
-> >> -	if (entry == NULL)
-> >> -		return -ENOMEM;
-> >> -
-> >> -	*entry = (struct ioport) {
-> >> -		.node		= RB_INT_INIT(port, port + count),
-> >> -		.ops		= ops,
-> >> -		.priv		= param,
-> >> -		/*
-> >> -		 * Start from 0 because ioport__unregister() doesn't decrement
-> >> -		 * the reference count.
-> >> -		 */
-> >> -		.refcount	= 0,
-> >> -		.remove		= false,
-> >> -	};
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	r = ioport_insert(&ioport_tree, entry);
-> >> -	if (r < 0)
-> >> -		goto out_free;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return port;
-> >> -
-> >> -out_free:
-> >> -	free(entry);
-> >> -	mutex_unlock(&ioport_lock);
-> >> -	return r;
-> >> -}
-> >> -
-> >> -int ioport__unregister(struct kvm *kvm, u16 port)
-> >> -{
-> >> -	struct ioport *entry;
-> >> -
-> >> -	mutex_lock(&ioport_lock);
-> >> -	entry = ioport_search(&ioport_tree, port);
-> >> -	if (!entry) {
-> >> -		mutex_unlock(&ioport_lock);
-> >> -		return -ENOENT;
-> >> -	}
-> >> -	/* The same reasoning from kvm__deregister_mmio() applies. */
-> >> -	if (entry->refcount == 0)
-> >> -		ioport_unregister(&ioport_tree, entry);
-> >> -	else
-> >> -		entry->remove = true;
-> >> -	mutex_unlock(&ioport_lock);
-> >> -
-> >> -	return 0;
-> >> -}
-> >> -
-> >> -static const char *to_direction(int direction)
-> >> -{
-> >> -	if (direction == KVM_EXIT_IO_IN)
-> >> -		return "IN";
-> >> -	else
-> >> -		return "OUT";
-> >> -}
-> >> -
-> >> -static void ioport_error(u16 port, void *data, int direction, int size, u32 count)
-> >> -{
-> >> -	fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n", to_direction(direction), port, size, count);
-> >> -}
-> >> -
-> >> -bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count)
-> >> -{
-> >> -	struct ioport_operations *ops;
-> >> -	bool ret = false;
-> >> -	struct ioport *entry;
-> >> -	void *ptr = data;
-> >> -	struct kvm *kvm = vcpu->kvm;
-> >> -
-> >> -	entry = ioport_get(&ioport_tree, port);
-> >> -	if (!entry)
-> >> -		return kvm__emulate_pio(vcpu, port, data, direction,
-> >> -					size, count);
-> >> -
-> >> -	ops	= entry->ops;
-> >> -
-> >> -	while (count--) {
-> >> -		if (direction == KVM_EXIT_IO_IN && ops->io_in)
-> >> -				ret = ops->io_in(entry, vcpu, port, ptr, size);
-> >> -		else if (direction == KVM_EXIT_IO_OUT && ops->io_out)
-> >> -				ret = ops->io_out(entry, vcpu, port, ptr, size);
-> >> -
-> >> -		ptr += size;
-> >> -	}
-> >> -
-> >> -	ioport_put(&ioport_tree, entry);
-> >> -
-> >> -	if (ret)
-> >> -		return true;
-> >> -
-> >> -	if (kvm->cfg.ioport_debug)
-> >> -		ioport_error(port, data, direction, size, count);
-> >> -
-> >> -	return !kvm->cfg.ioport_debug;
-> >> -}
-> >> diff --git a/mmio.c b/mmio.c
-> >> index 4cce1901..5249af39 100644
-> >> --- a/mmio.c
-> >> +++ b/mmio.c
-> >> @@ -206,7 +206,7 @@ out:
-> >>  	return true;
-> >>  }
-> >>  
-> >> -bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-> >> +bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data,
-> >>  		     int direction, int size, u32 count)
-> >>  {
-> >>  	struct mmio_mapping *mmio;  
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm  
-
+The proper way to retrieve the effective EFER is to reuse the logic in
+nested_vmx_calc_efer(), i.e. look at VM_ENTRY_IA32E_MODE if EFER isn't being
+loaded via VMCS.
