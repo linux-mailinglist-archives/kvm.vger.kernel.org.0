@@ -2,175 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAD5031EE5E
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37E9D31EE63
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232572AbhBRSdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:33:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234718AbhBRRuG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 12:50:06 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AAB8064ECF
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 17:49:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613670561;
-        bh=S9HE1UIVHUZqDSOtYFkGj6UL4dBAx+REIzCSaf9/6jc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=s7bhIMQZdYrG115ebgBKzwl67Mff9DzrFYN7FBNnFvbaYIpVQsBRPRLjt5la2sqql
-         HofxG61fNGWR5NSXUJAVA3F24wHCq2KZWx2NfTdppplelzOyi9oZFIW+xAAJ7Z9CYo
-         qQD5ZelrwNt0dE8TsJSPnzQ2RY6z80va1NYTrIqaebkWdWIQhZSDTMmh4HWzXUTAc1
-         WqQx0UgPovE8pAUPgG0jZSluzgLarSDOT1M2KgSUu1ZIzKVaf2BG+Cmu+Q783dEdMc
-         n/dIDW/5TxMrn4rMqcWawfXKKkxttuwxbiAw4yblW9egVcdvq+nU3J2n9Q6up3qBc6
-         xSV1GYkvB9Irw==
-Received: by mail-ej1-f53.google.com with SMTP id w1so6967353ejf.11
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:49:20 -0800 (PST)
-X-Gm-Message-State: AOAM53338GGGagxWzOaOshACpWyncs9OjUuiEKt2y/r8B7f3StBarpmt
-        jMgbuE12h1SXMn4I/Y60bk3B3vXT/pQ5SeBjwbqAFw==
-X-Google-Smtp-Source: ABdhPJwj3aEDXoeyomFpvPGRsKjYAWGF9foiPbsnT1S5rrYJDU4WAyOZvJVqaV0lfVp5BLdNddsftppBTtCUMQqxZB4=
-X-Received: by 2002:a17:906:d10d:: with SMTP id b13mr4988544ejz.204.1613670557791;
- Thu, 18 Feb 2021 09:49:17 -0800 (PST)
+        id S231256AbhBRSdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:33:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60908 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234729AbhBRRvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 12:51:14 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928B4C061756
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:50:33 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id b8so1632435plh.12
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:50:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ar4qumgxjcARbIFNPkL/fEc8ffnJvriNV7C8I9UZSSE=;
+        b=o9eKOmDlEvLgF6YUJdS59NPQ8hR9UNjLOg6pdh1fOYz7oj26RjNd0/gdCyvhR16Ss/
+         QEcxfxRP6GOdmQy214V4gKyYY4uKZib7/caSaZpMfA6vAEL6fSnN4J+vdISK4TJG9wZD
+         thU6v9SnWg7mQLwZgyRSZptilY/oodJWLDHejowBBpAdZAvass3h+C5x4P9eYuzOrt1j
+         DVGR5cLo9uSbG9yZjLiReEyaxEacNfhi9lV/sBvAJenk1S7uAh3hIFzCk9AyRtxwiiZo
+         h0vkp8pTMfBjQWGQVsaqHh8ooO21nVhiEy32WU6TRpte+qrTgd5ihTtAxqPoRc/nqJK3
+         CMZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ar4qumgxjcARbIFNPkL/fEc8ffnJvriNV7C8I9UZSSE=;
+        b=DgJYH5Lh9f85OH9BTQ3Qs8rWy5Udg4YQZo5zp2FFmHCpN59sVLpz7GXJmza7a0y62N
+         RzJOXORNERE8H87XgT5ixd8Y/1ere4H8pyc72paKkn9heyjbEtDc9+ttstmaHgR1TwB5
+         0vchOpsIIUtkkdRIpYv+yg6rBsOd4VP0WPM148mEW577Y3NCUfEZkloPYqJU6m8+f/GZ
+         nzEzyUaie3m/PKELGnCp/l6l/vL+qP434gnbAP3HckPOto/YKls9hLv6PVScbQYnKSqX
+         BIkm7qAv1vhiiE2tz4H5MyeIqxuqrHppBWXdb+hlNXTa3iCKbPUsujccyK0flMFAftV9
+         hNKw==
+X-Gm-Message-State: AOAM531vUpTMQRmwpx3KPC+FGZ81/kSman4+ZujUGD73XGyzPZAkxvea
+        /gHyfl9r+AkwisV8+MwGp+XSUQ==
+X-Google-Smtp-Source: ABdhPJxae0TGH4xiwe5Lj9mlTgbQqTEgLNrW6Vk+Pi9f/XdUSadjneFfcPUzbsnvAzsiXDlRBwG2hw==
+X-Received: by 2002:a17:90b:4c8c:: with SMTP id my12mr4926719pjb.29.1613670632785;
+        Thu, 18 Feb 2021 09:50:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
+        by smtp.gmail.com with ESMTPSA id 6sm6451766pgv.70.2021.02.18.09.50.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Feb 2021 09:50:32 -0800 (PST)
+Date:   Thu, 18 Feb 2021 09:50:25 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Message-ID: <YC6o4YwTAOU7UE1u@google.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YC1AkNPNET+T928c@google.com>
+ <SN6PR12MB27676C0BF3BBA872E55D5FC78E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YC6YOuJyNlSxKVR4@google.com>
+ <SN6PR12MB2767A978C3A2B43982F2F4898E859@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-References: <20210217120143.6106-1-joro@8bytes.org> <20210217120143.6106-3-joro@8bytes.org>
- <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com> <20210218112500.GH7302@8bytes.org>
-In-Reply-To: <20210218112500.GH7302@8bytes.org>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Thu, 18 Feb 2021 09:49:06 -0800
-X-Gmail-Original-Message-ID: <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
-Message-ID: <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
- adjusting #VC IST stack
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
-        Joerg Roedel <jroedel@suse.de>,
-        stable <stable@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR12MB2767A978C3A2B43982F2F4898E859@SN6PR12MB2767.namprd12.prod.outlook.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 3:25 AM Joerg Roedel <joro@8bytes.org> wrote:
->
-> Hi Andy,
->
-> On Wed, Feb 17, 2021 at 10:09:46AM -0800, Andy Lutomirski wrote:
-> > Can you get rid of the linked list hack while you're at it?  This code
-> > is unnecessarily convoluted right now, and it seems to be just asking
-> > for weird bugs.  Just stash the old value in a local variable, please.
->
-> Yeah, the linked list is not really necessary right now, because of the
-> way nested NMI handling works and given that these functions are only
-> used in the NMI handler right now.
-> The whole #VC handling code was written with future requirements in
-> mind, like what is needed when debugging registers get virtualized and
-> #HV gets enabled.
-> Until its clear whether __sev_es_ist_enter/exit() is needed in any of
-> these paths, I'd like to keep the linked list for now. It is more
-> complicated but allows nesting.
+On Thu, Feb 18, 2021, Kalra, Ashish wrote:
+> From: Sean Christopherson <seanjc@google.com> 
+> 
+> On Thu, Feb 18, 2021, Kalra, Ashish wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > 
+> > On Wed, Feb 17, 2021, Kalra, Ashish wrote:
+> > >> From: Sean Christopherson <seanjc@google.com> On Thu, Feb 04, 2021, 
+> > >> Ashish Kalra wrote:
+> > >> > From: Brijesh Singh <brijesh.singh@amd.com>
+> > >> > 
+> > >> > The ioctl is used to retrieve a guest's shared pages list.
+> > >> 
+> > >> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS 
+> > >> >is passed through to userspace?  That way, userspace could manage 
+> > >> >the set of pages >in whatever data structure they want, and these get/set ioctls go away.
+> > >> 
+> > >> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to 
+> > >> user-space ?
+> > >> 
+> > >> As such it is just a simple interface to get the shared page list 
+> > >> via the get/set ioctl's. simply an array is passed to these ioctl 
+> > >> to get/set the shared pages list.
+> >> 
+> >> > It eliminates any probability of the kernel choosing the wrong data 
+> >> > structure, and it's two fewer ioctls to maintain and test.
+> >> 
+> >> The set shared pages list ioctl cannot be avoided as it needs to be 
+> >> issued to setup the shared pages list on the migrated VM, it cannot be 
+> >> achieved by passing KVM_HC_PAGE_ENC_STATUS through to user-space.
+> 
+> >Why's that?  AIUI, KVM doesn't do anything with the list other than pass it
+> >back to userspace.  Assuming that's the case, userspace can just hold onto
+> >the list >for the next migration.
+> 
+> KVM does use it as part of the SEV DBG_DECTYPT API, within sev_dbg_decrypt()
+> to check if the guest page(s) are encrypted or not, and accordingly use it to
+> decide whether to decrypt the guest page(s) and return that back to
+> user-space or just return it as it is.
 
-I don't understand what this means.  The whole entry mechanism on x86
-is structured so that we call a C function *and return from that C
-function without longjmp-like magic* with the sole exception of
-unwind_stack_do_exit().  This means that you can match up enters and
-exits, and that unwind_stack_do_exit() needs to unwind correctly.  In
-the former case, it's normal C and we can use normal local variables.
-In the latter case, we know exactly what state we're trying to restore
-and we can restore it directly without any linked lists or similar.
-
-What do you have in mind that requires a linked list?
-
->
-> > Meanwhile, I'm pretty sure I can break this whole scheme if the
-> > hypervisor is messing with us.  As a trivial example, the sequence
-> > SYSCALL gap -> #VC -> NMI -> #VC will go quite poorly.
->
-> I don't see how this would break, can you elaborate?
->
-> What I think happens is:
->
-> SYSCALL gap (RSP is from userspace and untrusted)
->
->         -> #VC - Handler on #VC IST stack detects that it interrupted
->            the SYSCALL gap and switches to the task stack.
->
-
-Can you point me to exactly what code you're referring to?  I spent a
-while digging through the code and macro tangle and I can't find this.
-
->
->         -> NMI - Now running on NMI IST stack. Depending on whether the
->            stack switch in the #VC handler already happened, the #VC IST
->            entry is adjusted so that a subsequent #VC will not overwrite
->            the interrupted handlers stack frame.
->
->         -> #VC - Handler runs on the adjusted #VC IST stack and switches
->            itself back to the NMI IST stack. This is safe wrt. nested
->            NMIs as long as nested NMIs itself are safe.
->
-> As a rule of thumb, think of the #VC handler as trying to be a non-IST
-> handler by switching itself to the interrupted stack or the task stack.
-> If it detects that this is not possible (which can't happen right now,
-> but with SNP), it will kill the guest.
-
-I will try to think of this, but it's hard, since I can't find the code :)
-
-I found this comment:
-
- * With the current implementation it is always possible to switch to a safe
- * stack because #VC exceptions only happen at known places, like intercepted
- * instructions or accesses to MMIO areas/IO ports. They can also happen with
- * code instrumentation when the hypervisor intercepts #DB, but the critical
- * paths are forbidden to be instrumented, so #DB exceptions currently also
- * only happen in safe places.
-
-Unless AMD is more magic than I realize, the MOV SS bug^Wfeature means
-that #DB is *not* always called in safe places.
-
-But I *thnk* the code you're talking about is this:
-
-    /*
-     * If the entry is from userspace, switch stacks and treat it as
-     * a normal entry.
-     */
-    testb    $3, CS-ORIG_RAX(%rsp)
-    jnz    .Lfrom_usermode_switch_stack_\@
-
-which does not run on #VC from kernel code.
-
-> It needs to be IST, even without SNP, because #DB is IST too. When the
-> hypervisor intercepts #DB then any #DB exception will be turned into
-> #VC, so #VC needs to be handled anywhere a #DB can happen.
-
-Eww.
-
->
-> And with SNP we need to be able to at least detect a malicious HV so we
-> can reliably kill the guest. Otherwise the HV could potentially take
-> control over the guest's execution flow and make it reveal its secrets.
-
-True.  But is the rest of the machinery to be secure against EFLAGS.IF
-violations and such in place yet?
-
->
-> Regards,
->
->         Joerg
+Why is handling shared memory KVM's responsibility?  Userspace shouldn't be
+asking KVM to decrypt memory it knows isn't encrypted.  My understanding is that
+bogus decryption won't harm the kernel, it will only corrupt the guest.  In
+other words, patch 16 can be dropped if managing the set of shared pages is
+punted to userspace.
