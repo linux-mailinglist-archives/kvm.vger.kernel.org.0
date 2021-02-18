@@ -2,115 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE4D131EE5C
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DAD5031EE5E
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232523AbhBRSdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:33:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234504AbhBRRor (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 12:44:47 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79CCC06178A
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:44:04 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id 75so1564454pgf.13
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:44:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7Xh74tiaKTLgu6iSFVSNwadSz4xskX8HanaA+nosu/A=;
-        b=Td2Sr5J5o1Z/PzUcOrqIT/3IQ5NAKiexgxuyzDqdkNFIq3Oj8rrsB0WZyBm0sQMtZR
-         tDEPOX4FlzHlTtrL1rqjxy00CXfxMHkGfbbC15K08umBkjmE5wfO5YTnpsNbtRdr31Vs
-         b+WM8Db/UjWIhmjUktMlqBxp3haVlX++KnVgO0hMVAxVziQmujxpHhO9jyt12s//ZIDj
-         UoEF6029XTwA3sg/FKspQCDPrIvf5sxI0jUuAwmlv5EVcyPCa/WJzmlTIiQpDsCT9Ypv
-         o4uR7JfN7/QgabeLyAWfHQ9sdudBKRsSt+CKi9yz3w1oDB63k+xo7DPRjuQcPqj9JIBM
-         bVag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7Xh74tiaKTLgu6iSFVSNwadSz4xskX8HanaA+nosu/A=;
-        b=h0hJH0o+WWfQxKbVpHGG0bbSF+lJZuIGPInt3zUAqDGJ72VtD3UkeXDXCiCGnAABMl
-         iWzWCQYOQZKvg/P+/sEm8mC7uQIeayZ9g5sMUaQA9Czm/8szuL/iaJxsJEh7b6za8NDo
-         NPOzXh694/jEIkQvz/gvqBSeejUASTD9oaVw+IszohgwKS+YdsS8CJoREJQuh0E+Hqhd
-         2lx9bO0o3tG5WfeSmoA+4nWXd+hvch+jOks7uPFLgNxND60Zlipti3MqianenDHk0igW
-         WP4pbe1gsWsoeQjYXOqkGvnQSE65KdxrJ2V0IreYZGR+lJzA2rB0rZG82bkoxQU2LS9J
-         VvCA==
-X-Gm-Message-State: AOAM530NC26IcvmXef9IocE0ueixni+jlX1gWERJ3wL7NCcoxa7xzIvG
-        pn8fNrX5m7Tkpua4jOIe5Rw3bBXqZtUdaYsMuT0=
-X-Google-Smtp-Source: ABdhPJwZfCFi1qt998/YfwPE+9jq7ogTdqh51FACnJE3iBBuQd3kdVn3+n+GgdDB010i9pbbTnd1vf9xL/WMlchW95E=
-X-Received: by 2002:a63:1723:: with SMTP id x35mr4987883pgl.393.1613670244019;
- Thu, 18 Feb 2021 09:44:04 -0800 (PST)
+        id S232572AbhBRSdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:33:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234718AbhBRRuG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 12:50:06 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AAB8064ECF
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 17:49:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613670561;
+        bh=S9HE1UIVHUZqDSOtYFkGj6UL4dBAx+REIzCSaf9/6jc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=s7bhIMQZdYrG115ebgBKzwl67Mff9DzrFYN7FBNnFvbaYIpVQsBRPRLjt5la2sqql
+         HofxG61fNGWR5NSXUJAVA3F24wHCq2KZWx2NfTdppplelzOyi9oZFIW+xAAJ7Z9CYo
+         qQD5ZelrwNt0dE8TsJSPnzQ2RY6z80va1NYTrIqaebkWdWIQhZSDTMmh4HWzXUTAc1
+         WqQx0UgPovE8pAUPgG0jZSluzgLarSDOT1M2KgSUu1ZIzKVaf2BG+Cmu+Q783dEdMc
+         n/dIDW/5TxMrn4rMqcWawfXKKkxttuwxbiAw4yblW9egVcdvq+nU3J2n9Q6up3qBc6
+         xSV1GYkvB9Irw==
+Received: by mail-ej1-f53.google.com with SMTP id w1so6967353ejf.11
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:49:20 -0800 (PST)
+X-Gm-Message-State: AOAM53338GGGagxWzOaOshACpWyncs9OjUuiEKt2y/r8B7f3StBarpmt
+        jMgbuE12h1SXMn4I/Y60bk3B3vXT/pQ5SeBjwbqAFw==
+X-Google-Smtp-Source: ABdhPJwj3aEDXoeyomFpvPGRsKjYAWGF9foiPbsnT1S5rrYJDU4WAyOZvJVqaV0lfVp5BLdNddsftppBTtCUMQqxZB4=
+X-Received: by 2002:a17:906:d10d:: with SMTP id b13mr4988544ejz.204.1613670557791;
+ Thu, 18 Feb 2021 09:49:17 -0800 (PST)
 MIME-Version: 1.0
-References: <CAJSP0QWWg__21otbMXAXWGD1FaHYLzZP7axZ47Unq6jtMvdfsA@mail.gmail.com>
- <1613136163375.99584@amazon.com> <CAJSP0QXEvw6o7XFk9FXudr9PmorFHiOuNRg16DjJhBgj_qC-FQ@mail.gmail.com>
- <f0493c86-e92b-8bb6-a4a9-33646bf05fab@amazon.com>
-In-Reply-To: <f0493c86-e92b-8bb6-a4a9-33646bf05fab@amazon.com>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Thu, 18 Feb 2021 17:43:52 +0000
-Message-ID: <CAJSP0QUH5Ewa=xC5wUfPTbseg=5GCAzXtNYK8c40HKikRWkxSA@mail.gmail.com>
-Subject: Re: [Rust-VMM] Call for Google Summer of Code 2021 project ideas
-To:     Andreea Florescu <fandree@amazon.com>
-Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
-        "rust-vmm@lists.opendev.org" <rust-vmm@lists.opendev.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        Alexander Graf <agraf@csgraf.de>,
-        Alberto Garcia <berto@igalia.com>,
-        David Hildenbrand <david@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Julia Suvorova <jusual@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+References: <20210217120143.6106-1-joro@8bytes.org> <20210217120143.6106-3-joro@8bytes.org>
+ <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com> <20210218112500.GH7302@8bytes.org>
+In-Reply-To: <20210218112500.GH7302@8bytes.org>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Thu, 18 Feb 2021 09:49:06 -0800
+X-Gmail-Original-Message-ID: <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
+Message-ID: <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
+ adjusting #VC IST stack
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, X86 ML <x86@kernel.org>,
+        Joerg Roedel <jroedel@suse.de>,
+        stable <stable@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 11:50 AM Andreea Florescu <fandree@amazon.com> wrote:
-> On 2/17/21 1:20 PM, Stefan Hajnoczi wrote:
-> > CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> >
-> >
-> >
-> > Thanks, I have published the rust-vmm project ideas on the wiki:
-> > https://wiki.qemu.org/Google_Summer_of_Code_2021
-> Thanks, Stefan!
-> >
-> > Please see Sergio's reply about virtio-consoile is libkrun. Maybe it
-> > affects the project idea?
-> I synced offline with Sergio. It seems I've misread his comment.
-> The code is already available in libkrun, and to port it to rust-vmm
-> will likely take just a couple of days. We explored the option of also
-> requesting to implement VIRTIO_CONSOLE_F_MULTIPORT to make it an
-> appropriate GSoC project, but we decided this is not a good idea since
-> it doesn't look like that feature is useful for the projects consuming
-> rust-vmm. It also adds complexity, and we would need to maintain that as
-> well.
+On Thu, Feb 18, 2021 at 3:25 AM Joerg Roedel <joro@8bytes.org> wrote:
 >
-> Since it would still be nice to have virtio-console in rust-vmm, I'll
-> just open an issue in vm-virtio and label it with "help wanted" so
-> people can pick it up.
-> Can we remove the virtio-console project from the list of GSoC ideas?
+> Hi Andy,
+>
+> On Wed, Feb 17, 2021 at 10:09:46AM -0800, Andy Lutomirski wrote:
+> > Can you get rid of the linked list hack while you're at it?  This code
+> > is unnecessarily convoluted right now, and it seems to be just asking
+> > for weird bugs.  Just stash the old value in a local variable, please.
+>
+> Yeah, the linked list is not really necessary right now, because of the
+> way nested NMI handling works and given that these functions are only
+> used in the NMI handler right now.
+> The whole #VC handling code was written with future requirements in
+> mind, like what is needed when debugging registers get virtualized and
+> #HV gets enabled.
+> Until its clear whether __sev_es_ist_enter/exit() is needed in any of
+> these paths, I'd like to keep the linked list for now. It is more
+> complicated but allows nesting.
 
-Done.
+I don't understand what this means.  The whole entry mechanism on x86
+is structured so that we call a C function *and return from that C
+function without longjmp-like magic* with the sole exception of
+unwind_stack_do_exit().  This means that you can match up enters and
+exits, and that unwind_stack_do_exit() needs to unwind correctly.  In
+the former case, it's normal C and we can use normal local variables.
+In the latter case, we know exactly what state we're trying to restore
+and we can restore it directly without any linked lists or similar.
 
-> Also, iul@amazon.com will like to help with mentoring the GSoC projects.
-> Can he be added as a co-mentor of: "Mocking framework for Virtio Queues"?
+What do you have in mind that requires a linked list?
 
-Done.
+>
+> > Meanwhile, I'm pretty sure I can break this whole scheme if the
+> > hypervisor is messing with us.  As a trivial example, the sequence
+> > SYSCALL gap -> #VC -> NMI -> #VC will go quite poorly.
+>
+> I don't see how this would break, can you elaborate?
+>
+> What I think happens is:
+>
+> SYSCALL gap (RSP is from userspace and untrusted)
+>
+>         -> #VC - Handler on #VC IST stack detects that it interrupted
+>            the SYSCALL gap and switches to the task stack.
+>
 
-Thanks for getting the rust-vmm mentors together! I'm looking forward
-to more Rust virtualization projects :).
+Can you point me to exactly what code you're referring to?  I spent a
+while digging through the code and macro tangle and I can't find this.
 
-Stefan
+>
+>         -> NMI - Now running on NMI IST stack. Depending on whether the
+>            stack switch in the #VC handler already happened, the #VC IST
+>            entry is adjusted so that a subsequent #VC will not overwrite
+>            the interrupted handlers stack frame.
+>
+>         -> #VC - Handler runs on the adjusted #VC IST stack and switches
+>            itself back to the NMI IST stack. This is safe wrt. nested
+>            NMIs as long as nested NMIs itself are safe.
+>
+> As a rule of thumb, think of the #VC handler as trying to be a non-IST
+> handler by switching itself to the interrupted stack or the task stack.
+> If it detects that this is not possible (which can't happen right now,
+> but with SNP), it will kill the guest.
+
+I will try to think of this, but it's hard, since I can't find the code :)
+
+I found this comment:
+
+ * With the current implementation it is always possible to switch to a safe
+ * stack because #VC exceptions only happen at known places, like intercepted
+ * instructions or accesses to MMIO areas/IO ports. They can also happen with
+ * code instrumentation when the hypervisor intercepts #DB, but the critical
+ * paths are forbidden to be instrumented, so #DB exceptions currently also
+ * only happen in safe places.
+
+Unless AMD is more magic than I realize, the MOV SS bug^Wfeature means
+that #DB is *not* always called in safe places.
+
+But I *thnk* the code you're talking about is this:
+
+    /*
+     * If the entry is from userspace, switch stacks and treat it as
+     * a normal entry.
+     */
+    testb    $3, CS-ORIG_RAX(%rsp)
+    jnz    .Lfrom_usermode_switch_stack_\@
+
+which does not run on #VC from kernel code.
+
+> It needs to be IST, even without SNP, because #DB is IST too. When the
+> hypervisor intercepts #DB then any #DB exception will be turned into
+> #VC, so #VC needs to be handled anywhere a #DB can happen.
+
+Eww.
+
+>
+> And with SNP we need to be able to at least detect a malicious HV so we
+> can reliably kill the guest. Otherwise the HV could potentially take
+> control over the guest's execution flow and make it reveal its secrets.
+
+True.  But is the rest of the machinery to be secure against EFLAGS.IF
+violations and such in place yet?
+
+>
+> Regards,
+>
+>         Joerg
