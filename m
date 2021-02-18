@@ -2,178 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F124031F177
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 21:59:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FA3431F1E3
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 22:58:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbhBRU6A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 15:58:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62542 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230380AbhBRU5i (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 15:57:38 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11IKWXkx148229;
-        Thu, 18 Feb 2021 15:56:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=81IqNu1Zi1DbpbVFWWvsqaxth3EU563pyBqtxxg4bCc=;
- b=iPDlQH8QGinMqVuk5naEfsrNj7qnEG98i+4kILHXMhTCxj0fFX7JObKRbadAXPyEFlBp
- heiH4l1j+4SiJ8+oc4f5b/124SOB5jK4b4Z1fauqu0syyY0+TRhjeeWUnTQCvav7kQyE
- NrMjgatCRyEDTPIbeUCfiakDwSw/sH18FD/UnGnEXQo2LTPKoYijiFZUiox8WJUS0csL
- X/oZFgTm/Uk5o3Lz41fb0y6fSH0t6s7/ibVQ+0GHaWqmduJimmGnxyGxbgqZjNfB3any
- +ioyA3fXCrW7QmYpPzOizsdqtvqAb8LjE/WiWsEwiDFBZi27GEVLn8Er846NplRN/ZO4 Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36sy3vgwy9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Feb 2021 15:56:52 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11IKY1Ol152859;
-        Thu, 18 Feb 2021 15:56:52 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36sy3vgwy1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Feb 2021 15:56:52 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11IKpjLB013265;
-        Thu, 18 Feb 2021 20:56:51 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma03dal.us.ibm.com with ESMTP id 36p6d9twrm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Feb 2021 20:56:51 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11IKunNP50463082
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Feb 2021 20:56:50 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAC636E04E;
-        Thu, 18 Feb 2021 20:56:49 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32F6A6E04C;
-        Thu, 18 Feb 2021 20:56:49 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.211.37.34])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Feb 2021 20:56:49 +0000 (GMT)
-Subject: Re: [PATCH 1/1] vfio/pci: remove CONFIG_VFIO_PCI_ZDEV from Kconfig
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>, cohuck@redhat.com,
-        kvm@vger.kernel.org, alex.williamson@redhat.com
-Cc:     oren@nvidia.com, jgg@nvidia.com
-References: <20210218104435.464773-1-mgurtovoy@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Message-ID: <f2814341-c5e2-4dd4-19aa-0183acf734ed@linux.ibm.com>
-Date:   Thu, 18 Feb 2021 15:56:48 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229991AbhBRV5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 16:57:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21882 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229954AbhBRV5i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 16:57:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613685371;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UwfqdvgXW5YV2n7ZLVg99JtxtTC8HlmnYeiQHi+6cYw=;
+        b=FBUo2KCglpPDX4nNYZFxzw23opABSPoXHaKTITxsZ1hhfgTPRNw3YsA8nywvKGoDlQngGb
+        n9ku0tv4EoWIUi04t6hh0413kLgpk6k7+RASUHT0+905KjTlzqs9AasjlfKP1E4Ctwc1rS
+        iLsnVdLCsIf+gPFkuGqA7B8As8YAOD4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-561-m66-vAlkOGi0aAkq3DdAfA-1; Thu, 18 Feb 2021 16:56:09 -0500
+X-MC-Unique: m66-vAlkOGi0aAkq3DdAfA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DFA0BBEF5;
+        Thu, 18 Feb 2021 21:56:07 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C6DD050DDE;
+        Thu, 18 Feb 2021 21:56:06 +0000 (UTC)
+Date:   Thu, 18 Feb 2021 14:56:06 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
+Subject: Re: [PATCH 1/3] vfio: Introduce vma ops registration and notifier
+Message-ID: <20210218145606.09f08044@omen.home.shazbot.org>
+In-Reply-To: <20210218011209.GB4247@nvidia.com>
+References: <161315658638.7320.9686203003395567745.stgit@gimli.home>
+        <161315805248.7320.13358719859656681660.stgit@gimli.home>
+        <20210212212057.GW4247@nvidia.com>
+        <20210218011209.GB4247@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20210218104435.464773-1-mgurtovoy@nvidia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-18_09:2021-02-18,2021-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 phishscore=0 bulkscore=0 mlxlogscore=999 adultscore=0
- clxscore=1011 mlxscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102180166
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/18/21 5:44 AM, Max Gurtovoy wrote:
-> In case we're running on s390 system always expose the capabilities for
-> configuration of zPCI devices. In case we're running on different
-> platform, continue as usual.
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+On Wed, 17 Feb 2021 21:12:09 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Sanity-tested on s390 to verify that zdev caps are still available after 
-CONFIG_VFIO_PCI_ZDEV is removed.
-
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
-> ---
->   drivers/vfio/pci/Kconfig            | 12 ------------
->   drivers/vfio/pci/Makefile           |  2 +-
->   drivers/vfio/pci/vfio_pci.c         | 12 +++++-------
->   drivers/vfio/pci/vfio_pci_private.h |  2 +-
->   4 files changed, 7 insertions(+), 21 deletions(-)
+> On Fri, Feb 12, 2021 at 05:20:57PM -0400, Jason Gunthorpe wrote:
+> > On Fri, Feb 12, 2021 at 12:27:39PM -0700, Alex Williamson wrote:  
+> > > Create an interface through vfio-core where a vfio bus driver (ex.
+> > > vfio-pci) can register the vm_operations_struct it uses to map device
+> > > memory, along with a set of registration callbacks.  This allows
+> > > vfio-core to expose interfaces for IOMMU backends to match a
+> > > vm_area_struct to a bus driver and register a notifier for relavant
+> > > changes to the device mapping.  For now we define only a notifier
+> > > action for closing the device.
+> > > 
+> > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > >  drivers/vfio/vfio.c  |  120 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  include/linux/vfio.h |   20 ++++++++
+> > >  2 files changed, 140 insertions(+)
+> > > 
+> > > diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> > > index 38779e6fd80c..568f5e37a95f 100644
+> > > +++ b/drivers/vfio/vfio.c
+> > > @@ -47,6 +47,8 @@ static struct vfio {
+> > >  	struct cdev			group_cdev;
+> > >  	dev_t				group_devt;
+> > >  	wait_queue_head_t		release_q;
+> > > +	struct list_head		vm_ops_list;
+> > > +	struct mutex			vm_ops_lock;
+> > >  } vfio;
+> > >  
+> > >  struct vfio_iommu_driver {
+> > > @@ -2354,6 +2356,121 @@ struct iommu_domain *vfio_group_iommu_domain(struct vfio_group *group)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
+> > >  
+> > > +struct vfio_vma_ops {
+> > > +	const struct vm_operations_struct	*vm_ops;
+> > > +	vfio_register_vma_nb_t			*reg_fn;
+> > > +	vfio_unregister_vma_nb_t		*unreg_fn;
+> > > +	struct list_head			next;
+> > > +};
+> > > +
+> > > +int vfio_register_vma_ops(const struct vm_operations_struct *vm_ops,
+> > > +			  vfio_register_vma_nb_t *reg_fn,
+> > > +			  vfio_unregister_vma_nb_t *unreg_fn)  
+> > 
+> > This just feels a little bit too complicated
+> > 
+> > I've recently learned from Daniel that we can use the address_space
+> > machinery to drive the zap_vma_ptes() via unmap_mapping_range(). This
+> > technique replaces all the open, close and vma_list logic in vfio_pci  
 > 
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 40a223381ab6..ac3c1dd3edef 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -45,15 +45,3 @@ config VFIO_PCI_NVLINK2
->   	depends on VFIO_PCI && PPC_POWERNV
->   	help
->   	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
-> -
-> -config VFIO_PCI_ZDEV
-> -	bool "VFIO PCI ZPCI device CLP support"
-> -	depends on VFIO_PCI && S390
-> -	default y
-> -	help
-> -	  Enabling this option exposes VFIO capabilities containing hardware
-> -	  configuration for zPCI devices. This enables userspace (e.g. QEMU)
-> -	  to supply proper configuration values instead of hard-coded defaults
-> -	  for zPCI devices passed through via VFIO on s390.
-> -
-> -	  Say Y here.
-> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> index 781e0809d6ee..eff97a7cd9f1 100644
-> --- a/drivers/vfio/pci/Makefile
-> +++ b/drivers/vfio/pci/Makefile
-> @@ -3,6 +3,6 @@
->   vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
->   vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
->   vfio-pci-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2.o
-> -vfio-pci-$(CONFIG_VFIO_PCI_ZDEV) += vfio_pci_zdev.o
-> +vfio-pci-$(CONFIG_S390) += vfio_pci_zdev.o
->   
->   obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 706de3ef94bb..65e7e6b44578 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -807,6 +807,7 @@ static long vfio_pci_ioctl(void *device_data,
->   		struct vfio_device_info info;
->   		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
->   		unsigned long capsz;
-> +		int ret;
->   
->   		minsz = offsetofend(struct vfio_device_info, num_irqs);
->   
-> @@ -832,13 +833,10 @@ static long vfio_pci_ioctl(void *device_data,
->   		info.num_regions = VFIO_PCI_NUM_REGIONS + vdev->num_regions;
->   		info.num_irqs = VFIO_PCI_NUM_IRQS;
->   
-> -		if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV)) {
-> -			int ret = vfio_pci_info_zdev_add_caps(vdev, &caps);
-> -
-> -			if (ret && ret != -ENODEV) {
-> -				pci_warn(vdev->pdev, "Failed to setup zPCI info capabilities\n");
-> -				return ret;
-> -			}
-> +		ret = vfio_pci_info_zdev_add_caps(vdev, &caps);
-> +		if (ret && ret != -ENODEV) {
-> +			pci_warn(vdev->pdev, "Failed to setup zPCI info capabilities\n");
-> +			return ret;
->   		}
->   
->   		if (caps.size) {
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index 5c90e560c5c7..9cd1882a05af 100644
-> --- a/drivers/vfio/pci/vfio_pci_private.h
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -214,7 +214,7 @@ static inline int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
->   }
->   #endif
->   
-> -#ifdef CONFIG_VFIO_PCI_ZDEV
-> +#ifdef CONFIG_S390
->   extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_device *vdev,
->   				       struct vfio_info_cap *caps);
->   #else
+> Here is my effort to make rdma use this, it removes a lot of ugly code:
 > 
+> https://github.com/jgunthorpe/linux/commits/rdma_addr_space
+> 
+> Still needs some more detailed testing.
+> 
+> This gives an option to detect vfio VMAs by checking
+> 
+>    if (vma->vm_file &&
+>        file_inode(vma->vm_file) &&
+>        file_inode(vma->vm_file)->i_sb->s_type == vfio_fs_type)
+> 
+> And all vfio VMA's can have some consistent vm_private_data, or at
+> worst a consistent extended vm operations struct.
+
+Looks pretty slick.  I won't claim it's fully gelled in my head yet,
+but AIUI you're creating these inodes on your new pseudo fs and
+associating it via the actual user fd via the f_mapping pointer, which
+allows multiple fds to associate and address space back to this inode
+when you want to call unmap_mapping_range().  That clarifies from the
+previous email how we'd store the inode on the vfio_device without
+introducing yet another tracking list for device fds.  I'll try to
+piece together something similar for vfio, especially if we can avoid
+that nasty lock switcheroo we copied from
+uverbs_user_mmap_disassociate().  Thanks,
+
+Alex
 
