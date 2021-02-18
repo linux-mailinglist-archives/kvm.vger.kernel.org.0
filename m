@@ -2,510 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0C3331E657
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 07:31:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9897531E68A
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 08:01:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230376AbhBRG1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 01:27:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25596 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230468AbhBRGYG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 01:24:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613629346;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RV87NivPd0ZALgKt8K1FcgB4HkbiHuyMv0EqKeJaFo0=;
-        b=D98KUZTyOyHUVA914guKR9qATMLCHw89U5q/4yCYcCN3/L/e5hJrkBzWbkiJ2mrT991Y6S
-        z1fLG9bwQRSL37HT+bCbvL1OAA7NSvoV2awmLHASGsmbYhG47GoO7x+uD8fEL6YbZl6EF9
-        TgR5DxeMo1++/eqLiq/2wimKZugn7Q8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-584-ky6cP737N--_cEV0Fk6G0Q-1; Thu, 18 Feb 2021 01:22:24 -0500
-X-MC-Unique: ky6cP737N--_cEV0Fk6G0Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B20D189DF4E;
-        Thu, 18 Feb 2021 06:22:23 +0000 (UTC)
-Received: from [10.72.13.28] (ovpn-13-28.pek2.redhat.com [10.72.13.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1431A60C5F;
-        Thu, 18 Feb 2021 06:22:16 +0000 (UTC)
-Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for KVM_SET_IOREGION
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com
-References: <cover.1611850290.git.eafanasova@gmail.com>
- <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
- <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
- <da345926a4689016296970d62d4432bb9abdc7b7.camel@gmail.com>
- <20210211145918.GV247031@stefanha-x1.localdomain>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <9b7c557e-08ac-bffd-256c-7e25992d213e@redhat.com>
-Date:   Thu, 18 Feb 2021 14:22:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210211145918.GV247031@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        id S230413AbhBRGyf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 01:54:35 -0500
+Received: from mail-mw2nam10on2072.outbound.protection.outlook.com ([40.107.94.72]:15520
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231261AbhBRGtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 01:49:41 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R7X9YPcFrwU/uHwcHqt98FVHpg5FaXOBcDDP3rD75RXYgcAywhWEBYV/mTQL287NquQYSG/9ScRONkD63BaFw5irvIzBlgqXSTsOupaNIsj6u0gqH1XQWnQ3l16E1VXTgfZhf4GhMlB7wim1vL9T5IXmm+feS5qB1bePHmai0gj7mDhFZM9qPu6NInkt7DTnbQi2YSmdG0UmbBCTgD2HkqW4umHEsSsL6+k9nQPmP+OIOgvMN8ljBLkHqdsONpY/F+h9Mnq3ifXqf8QKD1dVGqZAYPz6MLj6LpdUQpmnCSf+K1EeMZGVgB7Dp4VPUcKbIccgktDKG/G4pY99qXJM+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zpZlNRpSh7XDDgBOipBNUVTqRgogCtg+zXzht3hsovE=;
+ b=Xx+8BN7mY046EtpLjAn21UNw8CIwAasD9oZ6XxOdVUY5IRMwYafg/u2l0rZZOFLABexetAs3LTlUuF2K5cG+doPlEZMr7lOhTNxl12i60VxjVZ8jRYw55MfxSTsYV2bQxa8nMEmywmtLUg4ZDbxLKbLUsNOijszw7Q0laHMbsooZRyB3VXhauedIreCENSB/EJ/KBiA5jydc3MCGGv7c66jZLYaXjDPcXE5iN4DCrOtEAWbWXXWgXyhmWanY18uA8PBRNUUYxsKuMl49aDsth+Zt+fYHuHcg9qpTQem9/IayiR0tjUV+gNGsSPsxxRPO5eMzV+UxaSGH1FUvNKXX/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zpZlNRpSh7XDDgBOipBNUVTqRgogCtg+zXzht3hsovE=;
+ b=2X+JNgiXlNCpBjRk4DTgSM7mcc2WDI4qC4BEX9JGUNl+DVLwJQ72Q22OM+gIZCk9hvpewcdSnPf0kGVxMoJWoLCc8yOk9d8J+QQsy3ZZEtbsE6K+bjKRsi1dkOhUqCwS/08tRhUKDQbgtWXW2rwn7B3hQi1sBNiXlDUdZTa3O0U=
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SN6PR12MB2685.namprd12.prod.outlook.com (2603:10b6:805:67::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.34; Thu, 18 Feb
+ 2021 06:48:31 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::24bb:3e53:c95e:cb8e%7]) with mapi id 15.20.3846.038; Thu, 18 Feb 2021
+ 06:48:31 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+Subject: RE: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Thread-Topic: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
+ ioctl
+Thread-Index: AQHW+o4w4C5VGgubRkqZlElkExidF6pbnD+AgADRN1CAACz4AIAA7nZg
+Date:   Thu, 18 Feb 2021 06:48:31 +0000
+Message-ID: <SN6PR12MB27676C0BF3BBA872E55D5FC78E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1612398155.git.ashish.kalra@amd.com>
+ <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com>
+ <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YC1AkNPNET+T928c@google.com>
+In-Reply-To: <YC1AkNPNET+T928c@google.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Enabled=true;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SetDate=2021-02-18T06:48:26Z;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Method=Privileged;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_Name=Public_0;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ActionId=92813286-7e8a-42dc-8876-5cb5b51e1532;
+ MSIP_Label_0d814d60-469d-470c-8cb0-58434e2bf457_ContentBits=1
+authentication-results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=amd.com;
+x-originating-ip: [183.83.213.136]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: f3fc2e1a-03aa-41d5-251a-08d8d3d9345c
+x-ms-traffictypediagnostic: SN6PR12MB2685:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR12MB2685FBC4DD0BCC0C413A4CF28E859@SN6PR12MB2685.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /Z/GdIQivdBwF8bmyWlqSfCe2MvOefVsyIs5M+/oNPzB7uK8e/9ng4UHWuxGiatTkfZS6oM+hvq+eeZGFn6fsE6ABuCrGUAUoJyUEDjEvTMruwYMcHd6tKZV3GkfW6RpBx7S1j2yw1g96NIaFZJESMzveYHlAmJr30Q+sP6TQ0K6LnvD2JMScpXmbQQEZYOJTC8Q6kQbqVum3wb2nywBvpATOAAusYOFZdOaGmBuVbL5q9D90+dxIHyOFxyZl+24Xd+C9ZQv9Xwh5q+XT2urD1tZlZboGjnOTEY8QJjCfI5Ta6izoeJg0IJ0hhSqRIPmjHIHn0FT0x0zwGwcmA9lESa096Di10C0qckEGWg2Xg7isVerKEImFcxyNULSlr3IFwU+xLdyVmyMz7ES22jFI2Iam+HqQ3fAJAWR2zt+4A7t1Uyeu7l3RUfevs/PmTR0LWWooJK7efmz13EqtCik6DEs52MBxoffog0LtZyX0pIERPeStQGXrVmk6QeTSekCkejdeMfWk8/W+ZaUqy6O0w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(376002)(346002)(366004)(39860400002)(396003)(66446008)(66476007)(66556008)(5660300002)(64756008)(7416002)(2906002)(33656002)(55016002)(9686003)(7696005)(6916009)(52536014)(186003)(71200400001)(26005)(316002)(83380400001)(76116006)(86362001)(54906003)(478600001)(6506007)(66946007)(53546011)(8676002)(8936002)(4326008);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?u108LN2t7sz6nMY0O0VDo1MaJJe6Ze0E6IFP2/uOz/bSYUZfdnc2RAu+G98S?=
+ =?us-ascii?Q?oPWs5pva3qLwSv8Wuht5itfALjcmWo56zuNxbHZVLjhMx/krLt1eIttTsMXZ?=
+ =?us-ascii?Q?9B30iCR47Uqovs2+bEFLUPgqADx7zcX4FmhaVT5vqWHMIBHYRB9CqvrJzZlB?=
+ =?us-ascii?Q?1APBlXm2U3tgHYUkZFlIUtH2PCR8vXacVJuDxZkBtrsPepB4XWY1JCnzwYC6?=
+ =?us-ascii?Q?Be+EXDhxw+ZPzNrGXSI10+u4tXqFLxn1LkjbjV9P0NC/LMLPUO575j6119s0?=
+ =?us-ascii?Q?+PYy4fMRq9jMaLHsaKqh/aDEP3Wkg8J0c/gYyUZJiBe6YeTmgetmo27dpt+U?=
+ =?us-ascii?Q?C414t4RVC+/EdE+yfUFumSCdN7xaisOwEKB3we2s46k99NQN5c1Cqam50Blr?=
+ =?us-ascii?Q?9O2lKKxG0B1MN7OrU3umazRAY7+X3PkxnyJlk/Gkd2MfZA0sBdtKA2I0HON6?=
+ =?us-ascii?Q?cZ4223LTbcBrOuKH3CsuG5933W3SF7rmGmZkfqhGPdXaIYMnBqZnaY778cgW?=
+ =?us-ascii?Q?c6PDfBVVT8yJ2kU8wB+d0mUJjrBOHf2G35fNQm8iMcoFvnEQQCfsT5aKpmub?=
+ =?us-ascii?Q?tvc+ITVotjUbIU18xZBkfUsBEu2ok2KhCAMbmHuarTftMOWwwuCC3znTaaFC?=
+ =?us-ascii?Q?IJpu2CP4WVQyg/t0urkubGJgLa3tHcM7jOvu6tCRqsiQJi1rOp4K5UdDMINf?=
+ =?us-ascii?Q?8jCyK40AYmPoSlMSYPZK97+fK0e2lbDFwUCeGa3mI6N/pbmZfwhvjS6pPsK1?=
+ =?us-ascii?Q?f4dpowQ2PLSSvOaKze/PwbntxCooRdAc8RIUaALim9LF2In33mgn0VZ3f9lN?=
+ =?us-ascii?Q?mNoqa8wsi2nisj/ZXG1bT/jktS7HgYJ9BnpaUoIU6KBUp8aazfp9+2Hc5o2R?=
+ =?us-ascii?Q?tZsznSNqaBKfb91Grxm2YfpFzELdBYSUn2UoxwXznlAR/IiVHJemNkedbYVF?=
+ =?us-ascii?Q?v54483RDqPoZebV8Tn8IymXeMV9xHBSkloT09lUSRbetH/EyX3ToyfYEjvno?=
+ =?us-ascii?Q?5gKv/56TzgUb9xQUhBQoOk+nYIxXxt928ZbfRGMYvOwhDOpwM27sKr75bMEt?=
+ =?us-ascii?Q?HrdValQKF7LoUH0TvJVfXeQnZw+DjDVh0q6PQIsy+twbMh4XkUbgVv7tyAEf?=
+ =?us-ascii?Q?VQia/DmklwtxZBN7Mw38vYUAho5EK4cHgZu9bzMzgphpepeJqd3Qen78poMW?=
+ =?us-ascii?Q?nrSgX040YT8XkAI3xNAixSh8FCI8WT9UkHK2xXaoheQRxn+HR0Cr/c/MN6MN?=
+ =?us-ascii?Q?3X7BhbuigdtVSt6Bkin9n5T2FbdAeEg2y0uiaF8fHaXTUM3crs4y76ZSZZhG?=
+ =?us-ascii?Q?AH8mP4nPIj4vwe07EQJWNohe?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3fc2e1a-03aa-41d5-251a-08d8d3d9345c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2021 06:48:31.1104
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UJ/WkF2qhe56EQfOaTt1zv18/R7Ho0R0TBXZXkOEcp0EC4ikHwNJyqC/A7+BvdyOu+794YQ2snmf40yenPLLig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2685
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+[AMD Public Use]
 
-On 2021/2/11 下午10:59, Stefan Hajnoczi wrote:
-> On Wed, Feb 10, 2021 at 11:31:30AM -0800, Elena Afanasova wrote:
->> On Mon, 2021-02-08 at 14:21 +0800, Jason Wang wrote:
->>> On 2021/1/30 上午2:48, Elena Afanasova wrote:
->>>> This vm ioctl adds or removes an ioregionfd MMIO/PIO region. Guest
->>>> read and write accesses are dispatched through the given ioregionfd
->>>> instead of returning from ioctl(KVM_RUN). Regions can be deleted by
->>>> setting fds to -1.
->>>>
->>>> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
->>>> ---
->>>> Changes in v2:
->>>>     - changes after code review
->>>>
->>>>    arch/x86/kvm/Kconfig     |   1 +
->>>>    arch/x86/kvm/Makefile    |   1 +
->>>>    arch/x86/kvm/x86.c       |   1 +
->>>>    include/linux/kvm_host.h |  17 +++
->>>>    include/uapi/linux/kvm.h |  23 ++++
->>>>    virt/kvm/Kconfig         |   3 +
->>>>    virt/kvm/eventfd.c       |  25 +++++
->>>>    virt/kvm/eventfd.h       |  14 +++
->>>>    virt/kvm/ioregion.c      | 232
->>>> +++++++++++++++++++++++++++++++++++++++
->>>>    virt/kvm/ioregion.h      |  15 +++
->>>>    virt/kvm/kvm_main.c      |  11 ++
->>>>    11 files changed, 343 insertions(+)
->>>>    create mode 100644 virt/kvm/eventfd.h
->>>>    create mode 100644 virt/kvm/ioregion.c
->>>>    create mode 100644 virt/kvm/ioregion.h
->>>>
->>>> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
->>>> index f92dfd8ef10d..b914ef375199 100644
->>>> --- a/arch/x86/kvm/Kconfig
->>>> +++ b/arch/x86/kvm/Kconfig
->>>> @@ -33,6 +33,7 @@ config KVM
->>>>    	select HAVE_KVM_IRQ_BYPASS
->>>>    	select HAVE_KVM_IRQ_ROUTING
->>>>    	select HAVE_KVM_EVENTFD
->>>> +	select KVM_IOREGION
->>>>    	select KVM_ASYNC_PF
->>>>    	select USER_RETURN_NOTIFIER
->>>>    	select KVM_MMIO
->>>> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
->>>> index b804444e16d4..b3b17dc9f7d4 100644
->>>> --- a/arch/x86/kvm/Makefile
->>>> +++ b/arch/x86/kvm/Makefile
->>>> @@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
->>>>    kvm-y			+= $(KVM)/kvm_main.o
->>>> $(KVM)/coalesced_mmio.o \
->>>>    				$(KVM)/eventfd.o $(KVM)/irqchip.o
->>>> $(KVM)/vfio.o
->>>>    kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
->>>> +kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
->>>>    
->>>>    kvm-y			+= x86.o emulate.o i8259.o irq.o
->>>> lapic.o \
->>>>    			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o
->>>> mtrr.o \
->>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>>> index e545a8a613b1..ddb28f5ca252 100644
->>>> --- a/arch/x86/kvm/x86.c
->>>> +++ b/arch/x86/kvm/x86.c
->>>> @@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct kvm
->>>> *kvm, long ext)
->>>>    	case KVM_CAP_X86_USER_SPACE_MSR:
->>>>    	case KVM_CAP_X86_MSR_FILTER:
->>>>    	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
->>>> +	case KVM_CAP_IOREGIONFD:
->>>>    		r = 1;
->>>>    		break;
->>>>    	case KVM_CAP_SYNC_REGS:
->>>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->>>> index 7f2e2a09ebbd..7cd667dddba9 100644
->>>> --- a/include/linux/kvm_host.h
->>>> +++ b/include/linux/kvm_host.h
->>>> @@ -470,6 +470,10 @@ struct kvm {
->>>>    		struct mutex      resampler_lock;
->>>>    	} irqfds;
->>>>    	struct list_head ioeventfds;
->>>> +#endif
->>>> +#ifdef CONFIG_KVM_IOREGION
->>>> +	struct list_head ioregions_mmio;
->>>> +	struct list_head ioregions_pio;
->>>>    #endif
->>>>    	struct kvm_vm_stat stat;
->>>>    	struct kvm_arch arch;
->>>> @@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct kvm
->>>> *kvm, struct kvm_ioeventfd *args)
->>>>    
->>>>    #endif /* CONFIG_HAVE_KVM_EVENTFD */
->>>>    
->>>> +#ifdef CONFIG_KVM_IOREGION
->>>> +void kvm_ioregionfd_init(struct kvm *kvm);
->>>> +int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion *args);
->>>> +
->>>> +#else
->>>> +
->>>> +static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
->>>> +static inline int kvm_ioregionfd(struct kvm *kvm, struct
->>>> kvm_ioregion *args)
->>>> +{
->>>> +	return -ENOSYS;
->>>> +}
->>>> +#endif
->>>> +
->>>>    void kvm_arch_irq_routing_update(struct kvm *kvm);
->>>>    
->>>>    static inline void kvm_make_request(int req, struct kvm_vcpu
->>>> *vcpu)
->>>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>>> index ca41220b40b8..81e775778c66 100644
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
->>>>    	__u8  pad[36];
->>>>    };
->>>>    
->>>> +enum {
->>>> +	kvm_ioregion_flag_nr_pio,
->>>> +	kvm_ioregion_flag_nr_posted_writes,
->>>> +	kvm_ioregion_flag_nr_max,
->>>> +};
->>>> +
->>>> +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
->>>> +#define KVM_IOREGION_POSTED_WRITES (1 <<
->>>> kvm_ioregion_flag_nr_posted_writes)
->>>> +
->>>> +#define KVM_IOREGION_VALID_FLAG_MASK ((1 <<
->>>> kvm_ioregion_flag_nr_max) - 1)
->>>> +
->>>> +struct kvm_ioregion {
->>>> +	__u64 guest_paddr; /* guest physical address */
->>>> +	__u64 memory_size; /* bytes */
->>> Do we really need __u64 here?
->>>
->>>
->>>> +	__u64 user_data;
->>>> +	__s32 rfd;
->>>> +	__s32 wfd;
->>>> +	__u32 flags;
->>>> +	__u8  pad[28];
->>>> +};
->>>> +
->>>>    #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
->>>>    #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
->>>>    #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
->>>> @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
->>>>    #define KVM_CAP_X86_USER_SPACE_MSR 188
->>>>    #define KVM_CAP_X86_MSR_FILTER 189
->>>>    #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
->>>> +#define KVM_CAP_IOREGIONFD 191
->>>>    
->>>>    #ifdef KVM_CAP_IRQ_ROUTING
->>>>    
->>>> @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
->>>>    					struct
->>>> kvm_userspace_memory_region)
->>>>    #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
->>>>    #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
->>>> +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct
->>>> kvm_ioregion)
->>>>    
->>>>    /* enable ucontrol for s390 */
->>>>    struct kvm_s390_ucas_mapping {
->>>> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
->>>> index 1c37ccd5d402..5e6620bbf000 100644
->>>> --- a/virt/kvm/Kconfig
->>>> +++ b/virt/kvm/Kconfig
->>>> @@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
->>>>           bool
->>>>           select EVENTFD
->>>>    
->>>> +config KVM_IOREGION
->>>> +       bool
->>>> +
->>>>    config KVM_MMIO
->>>>           bool
->>>>    
->>>> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
->>>> index c2323c27a28b..aadb73903f8b 100644
->>>> --- a/virt/kvm/eventfd.c
->>>> +++ b/virt/kvm/eventfd.c
->>>> @@ -27,6 +27,7 @@
->>>>    #include <trace/events/kvm.h>
->>>>    
->>>>    #include <kvm/iodev.h>
->>>> +#include "ioregion.h"
->>>>    
->>>>    #ifdef CONFIG_HAVE_KVM_IRQFD
->>>>    
->>>> @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops
->>>> ioeventfd_ops = {
->>>>    	.destructor = ioeventfd_destructor,
->>>>    };
->>>>    
->>>> +#ifdef CONFIG_KVM_IOREGION
->>>> +/* assumes kvm->slots_lock held */
->>>> +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
->>>> +			  u64 start, u64 size)
->>>> +{
->>>> +	struct _ioeventfd *_p;
->>>> +
->>>> +	list_for_each_entry(_p, &kvm->ioeventfds, list)
->>>> +		if (_p->bus_idx == bus_idx &&
->>>> +		    overlap(start, size, _p->addr,
->>>> +			    !_p->length ? 8 : _p->length))
->>>> +			return true;
->>>> +
->>>> +	return false;
->>>> +}
->>>> +#endif
->>>> +
->>>>    /* assumes kvm->slots_lock held */
->>>>    static bool
->>>>    ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd *p)
->>>> @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm,
->>>> struct _ioeventfd *p)
->>>>    		       _p->datamatch == p->datamatch))))
->>>>    			return true;
->>>>    
->>>> +#ifdef CONFIG_KVM_IOREGION
->>>> +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx == KVM_PIO_BUS)
->>>> +		if (kvm_ioregion_collides(kvm, p->bus_idx, p->addr,
->>>> +					  !p->length ? 8 : p->length))
->>>> +			return true;
->>>> +#endif
->>>> +
->>>>    	return false;
->>>>    }
->>>>    
->>>> diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
->>>> new file mode 100644
->>>> index 000000000000..73a621eebae3
->>>> --- /dev/null
->>>> +++ b/virt/kvm/eventfd.h
->>>> @@ -0,0 +1,14 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +#ifndef __KVM_EVENTFD_H__
->>>> +#define __KVM_EVENTFD_H__
->>>> +
->>>> +#ifdef CONFIG_KVM_IOREGION
->>>> +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start,
->>>> u64 size);
->>>> +#else
->>>> +static inline bool
->>>> +kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start, u64
->>>> size)
->>>> +{
->>>> +	return false;
->>>> +}
->>>> +#endif
->>>> +#endif
->>>> diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
->>>> new file mode 100644
->>>> index 000000000000..48ff92bca966
->>>> --- /dev/null
->>>> +++ b/virt/kvm/ioregion.c
->>>> @@ -0,0 +1,232 @@
->>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>> +#include <linux/kvm_host.h>
->>>> +#include <linux/fs.h>
->>>> +#include <kvm/iodev.h>
->>>> +#include "eventfd.h"
->>>> +
->>>> +void
->>>> +kvm_ioregionfd_init(struct kvm *kvm)
->>>> +{
->>>> +	INIT_LIST_HEAD(&kvm->ioregions_mmio);
->>>> +	INIT_LIST_HEAD(&kvm->ioregions_pio);
->>>> +}
->>>> +
->>>> +struct ioregion {
->>>> +	struct list_head     list;
->>>> +	u64                  paddr;  /* guest physical address */
->>>> +	u64                  size;   /* size in bytes */
->>>> +	struct file         *rf;
->>>> +	struct file         *wf;
->>>> +	u64                  user_data; /* opaque token used by
->>>> userspace */
->>>> +	struct kvm_io_device dev;
->>>> +	bool                 posted_writes;
->>>> +};
->>>> +
->>>> +static inline struct ioregion *
->>>> +to_ioregion(struct kvm_io_device *dev)
->>>> +{
->>>> +	return container_of(dev, struct ioregion, dev);
->>>> +}
->>>> +
->>>> +/* assumes kvm->slots_lock held */
->>>> +static void
->>>> +ioregion_release(struct ioregion *p)
->>>> +{
->>>> +	fput(p->rf);
->>>> +	fput(p->wf);
->>>> +	list_del(&p->list);
->>>> +	kfree(p);
->>>> +}
->>>> +
->>>> +static int
->>>> +ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
->>>> gpa_t addr,
->>>> +	      int len, void *val)
->>>> +{
->>>> +	return -EOPNOTSUPP;
->>>> +}
->>>> +
->>>> +static int
->>>> +ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
->>>> gpa_t addr,
->>>> +		int len, const void *val)
->>>> +{
->>>> +	return -EOPNOTSUPP;
->>>> +}
->>>> +
->>>> +/*
->>>> + * This function is called as KVM is completely shutting down.  We
->>>> do not
->>>> + * need to worry about locking just nuke anything we have as
->>>> quickly as possible
->>>> + */
->>>> +static void
->>>> +ioregion_destructor(struct kvm_io_device *this)
->>>> +{
->>>> +	struct ioregion *p = to_ioregion(this);
->>>> +
->>>> +	ioregion_release(p);
->>>> +}
->>>> +
->>>> +static const struct kvm_io_device_ops ioregion_ops = {
->>>> +	.read       = ioregion_read,
->>>> +	.write      = ioregion_write,
->>>> +	.destructor = ioregion_destructor,
->>>> +};
->>>> +
->>>> +static inline struct list_head *
->>>> +get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
->>>> +{
->>>> +	return (bus_idx == KVM_MMIO_BUS) ?
->>>> +		&kvm->ioregions_mmio : &kvm->ioregions_pio;
->>>> +}
->>>> +
->>>> +/* check for not overlapping case and reverse */
->>>> +inline bool
->>>> +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
->>>> +{
->>>> +	u64 end1 = start1 + size1 - 1;
->>>> +	u64 end2 = start2 + size2 - 1;
->>>> +
->>>> +	return !(end1 < start2 || start1 >= end2);
->>>> +}
->>>> +
->>>> +/* assumes kvm->slots_lock held */
->>>> +bool
->>>> +kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
->>>> +		      u64 start, u64 size)
->>>> +{
->>>> +	struct ioregion *_p;
->>>> +	struct list_head *ioregions;
->>>> +
->>>> +	ioregions = get_ioregion_list(kvm, bus_idx);
->>>> +	list_for_each_entry(_p, ioregions, list)
->>>> +		if (overlap(start, size, _p->paddr, _p->size))
->>>> +			return true;
->>>> +
->>>> +	return false;
->>>> +}
->>>> +
->>>> +/* assumes kvm->slots_lock held */
->>>> +static bool
->>>> +ioregion_collision(struct kvm *kvm, struct ioregion *p, enum
->>>> kvm_bus bus_idx)
->>>> +{
->>>> +	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p->size) ||
->>>> +	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p->size))
->>>> +		return true;
->>>> +
->>>> +	return false;
->>>> +}
->>>> +
->>>> +static enum kvm_bus
->>>> +get_bus_from_flags(__u32 flags)
->>>> +{
->>>> +	if (flags & KVM_IOREGION_PIO)
->>>> +		return KVM_PIO_BUS;
->>>> +	return KVM_MMIO_BUS;
->>>> +}
->>>> +
->>>> +int
->>>> +kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
->>>> +{
->>>> +	struct ioregion *p;
->>>> +	struct file *rfile, *wfile;
->>>> +	enum kvm_bus bus_idx;
->>>> +	int ret = 0;
->>>> +
->>>> +	if (!args->memory_size)
->>>> +		return -EINVAL;
->>>> +	if ((args->guest_paddr + args->memory_size - 1) < args-
->>>>> guest_paddr)
->>>> +		return -EINVAL;
->>>> +
->>>> +	rfile = fget(args->rfd);
->>>> +	if (!rfile)
->>>> +		return -EBADF;
->>> So the question still, if we want to use ioregion fd for doorbell,
->>> we
->>> don't need rfd in this case?
->>>
->> Using ioregionfd for doorbell seems to be an open question. Probably it
->> could just focus on the non-doorbell cases.
-> Below you replied FAST_MMIO will be in v3. That is the doorbell case, so
-> maybe it is in scope for this patch series?
->
-> I think continuing to use ioeventfd for most doorbell registers makes
-> sense.
->
-> However, there are two cases where ioregionfd doorbell support is
-> interesting:
->
-> 1. The (non-FAST_MMIO) case where the application needs to know the
->     value written to the doorbell. ioeventfd cannot do this (datamatch
->     can handle a subset of cases but not all) so we need ioregionfd for
->     this.
->
-> 2. The FAST_MMIO case just for convenience if applications prefer to use
->     a single API (ioregionfd) instead of implementing both ioregionfd and
->     ioeventfd.
+-----Original Message-----
+From: Sean Christopherson <seanjc@google.com>=20
+Sent: Wednesday, February 17, 2021 10:13 AM
+To: Kalra, Ashish <Ashish.Kalra@amd.com>
+Cc: pbonzini@redhat.com; tglx@linutronix.de; mingo@redhat.com; hpa@zytor.co=
+m; rkrcmar@redhat.com; joro@8bytes.org; bp@suse.de; Lendacky, Thomas <Thoma=
+s.Lendacky@amd.com>; x86@kernel.org; kvm@vger.kernel.org; linux-kernel@vger=
+.kernel.org; srutherford@google.com; venu.busireddy@oracle.com; Singh, Brij=
+esh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIS=
+T ioctl
 
+On Wed, Feb 17, 2021, Kalra, Ashish wrote:
+>> From: Sean Christopherson <seanjc@google.com> On Thu, Feb 04, 2021,=20
+>> Ashish Kalra wrote:
+>> > From: Brijesh Singh <brijesh.singh@amd.com>
+>> >=20
+>> > The ioctl is used to retrieve a guest's shared pages list.
+>>=20
+>> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS is=20
+>> >passed through to userspace?  That way, userspace could manage the=20
+>> >set of pages >in whatever data structure they want, and these get/set i=
+octls go away.
+>>=20
+>> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to=20
+>> user-space ?
+>>=20
+>> As such it is just a simple interface to get the shared page list via=20
+>> the get/set ioctl's. simply an array is passed to these ioctl to=20
+>> get/set the shared pages list.
 
-Yes.
+> It eliminates any probability of the kernel choosing the wrong data struc=
+ture, and it's two fewer ioctls to maintain and test.
 
+The set shared pages list ioctl cannot be avoided as it needs to be issued =
+to setup the shared pages list on the migrated
+VM, it cannot be achieved by passing KVM_HC_PAGE_ENC_STATUS through to user=
+-space.
 
->
-> ioeventfd will still have its benefits (and limitations) that make it
-> different from ioregionfd. In particular, ioregionfd will not merge
-> doorbell writes into a single message because doing so would basically
-> involve reimplementing ioeventfd functionality as part of ioregionfd and
-> isn't compatible with the current approach where userspace can provide
-> any file descriptor for communication.
->
-> Elena and Jason: do you agree with this API design?
+So it makes sense to add both get/set shared pages list ioctl, passing thro=
+ugh to user-space is just adding more complexity
+without any significant gains.
 
+> >Also, aren't there plans for an in-guest migration helper?  If so, do=20
+> >we have any idea what that interface will look like?  E.g. if we're=20
+> >going to end up with a full >fledged driver in the guest, why not=20
+> >bite the bullet now and bypass KVM entirely?
+>=20
+> Even the in-guest migration helper will be using page encryption=20
+> status hypercalls, so some interface is surely required.
 
-I agree.
+>If it's a driver with a more extensive interace, then the hypercalls can b=
+e replaced by a driver operation.  That's obviously a big if, though.
 
-Thanks
+> Also the in-guest migration will be mainly an OVMF component, won't =20
+> really be a full fledged kernel driver in the guest.
 
+>Is there code and/or a description of what the proposed helper would look =
+like?
 
+Not right now, there are prototype(s) under development, I assume they will=
+ be posted upstream soon.
+
+Thanks,
+Ashish
