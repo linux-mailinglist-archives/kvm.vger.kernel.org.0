@@ -2,105 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AD6031EE48
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20B7031EE45
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:30:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232361AbhBRS2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:28:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233841AbhBRQoN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 11:44:13 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF499C061788
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:35:42 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id 189so1650351pfy.6
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 08:35:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DqLb1nMq14/rKI2+/NThAnihxh+nHxjLWJAo5ipH1Ws=;
-        b=md44/Px+2SYhg3j59P0MfiNu7AvOT5R8yCXllWmXN1HLCn41bzTgMiigaxhw+qQ3nS
-         8Vl0kNQwvSu/lWr12I2+sryWC9Xsu5ecLXdqdqfE8/yxOTBGxxFYvHwOS/C84LQ1u0hf
-         mxdFswTZrTeNLMuTMil8ktlWYBYm8nzG8PThHZvZefb2zVMvdI7jbE9Dmrv3KnrTtQwO
-         ueDZbeL2tBuyZrjKpfd8+hyNtYkuUHaM8qtrpQZk7M+r7jiRjRqNA0nm6vz7+uQ4OmnZ
-         bRpUeHSkaUqRPHLH8sp5vDA1/z1wHWhL9iuWOUqh/tsixm5v9XUMFTxxUVMRtOZwWXSe
-         M9ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DqLb1nMq14/rKI2+/NThAnihxh+nHxjLWJAo5ipH1Ws=;
-        b=uKdYfJCwMKgDpFtyWe0v7RRbx9rWLFZ5wxfF4+f83GaD3vRXwklwQQiV4ghl2P1qMI
-         mLbbaNyPp6p9nlhyY+MZHn+UbW6sEA/CBAe+w1yfjRc0h7jG1Bi7AzXxXSNCRZkD6spw
-         WZ6S+m8e4+XJHCDOQgJHmrHYuin3Cl+a4fPHHvHpRztxwHmuv3g1nP0A7JusCQ6ja+A0
-         o/fjEYUyNrCk/VOQSiMXzt2wRDt6xLrYCxmI+gEjMelWveaJEJH9tFQhTHx5Hv2VRKgJ
-         PEvWrOM4bv0FlymzBBcoHvFZgu70KOE3foEiAJIFh++1/F7a7fSsxM6VMtGUoJSbOkAv
-         hxSw==
-X-Gm-Message-State: AOAM530Xb2e5nUpB0j7Gyjafbp9VBuKACrQjXgIsHfbPNxdRG6+rIqqg
-        +BTtgB+APURuRJUDZMgU/9ntjg==
-X-Google-Smtp-Source: ABdhPJx4qmdTfrJEOoVNnYWhC+COxjc2izCvLNNT+7AllgY3YfPaHqJiw+a2Ps64S8Z5Argnnu8NKw==
-X-Received: by 2002:a63:214e:: with SMTP id s14mr4641755pgm.101.1613666141653;
-        Thu, 18 Feb 2021 08:35:41 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id q7sm3116401pfb.185.2021.02.18.08.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 08:35:40 -0800 (PST)
-Date:   Thu, 18 Feb 2021 08:35:34 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Edmondson <dme@dme.org>, linux-kernel@vger.kernel.org,
-        Borislav Petkov <bp@alien8.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: x86: dump_vmcs should not assume GUEST_IA32_EFER is
- valid
-Message-ID: <YC6XVrWPRQJ7V6Nd@google.com>
-References: <20210218100450.2157308-1-david.edmondson@oracle.com>
- <708f2956-fa0f-b008-d3d2-93067f95783c@redhat.com>
- <cuntuq9ilg4.fsf@dme.org>
- <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com>
+        id S232154AbhBRS2c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:28:32 -0500
+Received: from foss.arm.com ([217.140.110.172]:53246 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231993AbhBRQkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 11:40:16 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54398113E;
+        Thu, 18 Feb 2021 08:39:30 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24AA83F73D;
+        Thu, 18 Feb 2021 08:39:28 -0800 (PST)
+Date:   Thu, 18 Feb 2021 16:38:31 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH kvmtool 20/21] hw/serial: ARM/arm64: Use MMIO at higher
+ addresses
+Message-ID: <20210218163831.476c0f35@slackpad.fritz.box>
+In-Reply-To: <f16f89dc-78fd-1046-eefc-1dccd468fba8@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+        <20201210142908.169597-21-andre.przywara@arm.com>
+        <bce317a9-2c8e-2254-57c3-e0bea9a13760@arm.com>
+        <f16f89dc-78fd-1046-eefc-1dccd468fba8@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Paolo Bonzini wrote:
-> On 18/02/21 13:56, David Edmondson wrote:
-> > On Thursday, 2021-02-18 at 12:54:52 +01, Paolo Bonzini wrote:
-> > 
-> > > On 18/02/21 11:04, David Edmondson wrote:
-> > > > When dumping the VMCS, retrieve the current guest value of EFER from
-> > > > the kvm_vcpu structure if neither VM_EXIT_SAVE_IA32_EFER or
-> > > > VM_ENTRY_LOAD_IA32_EFER is set, which can occur if the processor does
-> > > > not support the relevant VM-exit/entry controls.
-> > > 
-> > > Printing vcpu->arch.efer is not the best choice however.  Could we dump
-> > > the whole MSR load/store area instead?
-> > 
-> > I'm happy to do that, and think that it would be useful, but it won't
-> > help with the original problem (which I should have explained more).
-> > 
-> > If the guest has EFER_LMA set but we aren't using the entry/exit
-> > controls, vm_read64(GUEST_IA32_EFER) returns 0, causing dump_vmcs() to
-> > erroneously dump the PDPTRs.
+On Thu, 18 Feb 2021 12:18:38 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+
+> Hi Andre,
 > 
-> Got it now.  It would sort of help, because while dumping the MSR load/store
-> area you could get hold of the real EFER, and use it to decide whether to
-> dump the PDPTRs.
+> On 2/17/21 4:48 PM, Alexandru Elisei wrote:
+> > Hi Andre,
+> >
+> > On 12/10/20 2:29 PM, Andre Przywara wrote:  
+> >> Using the UART devices at their legacy I/O addresses as set by IBM in
+> >> 1981 was a kludge we used for simplicity on ARM platforms as well.
+> >> However this imposes problems due to their missing alignment and overlap
+> >> with the PCI I/O address space.
+> >>
+> >> Now that we can switch a device easily between using ioports and MMIO,
+> >> let's move the UARTs out of the first 4K of memory on ARM platforms.
+> >>
+> >> That should be transparent for well behaved guests, since the change is
+> >> naturally reflected in the device tree. Even "earlycon" keeps working,
+> >> as the stdout-path property is adjusted automatically.
+> >>
+> >> People providing direct earlycon parameters via the command line need to
+> >> adjust it to: "earlycon=uart,mmio,0x1000000".
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  hw/serial.c | 52 ++++++++++++++++++++++++++++++++++++----------------
+> >>  1 file changed, 36 insertions(+), 16 deletions(-)
+> >>
+> >> diff --git a/hw/serial.c b/hw/serial.c
+> >> index d840eebc..00fb3aa8 100644
+> >> --- a/hw/serial.c
+> >> +++ b/hw/serial.c
+> >> @@ -13,6 +13,24 @@
+> >>  
+> >>  #include <pthread.h>
+> >>  
+> >> +#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> >> +#define serial_iobase(nr)	(0x1000000 + (nr) * 0x1000)
+> >> +#define serial_irq(nr)		(32 + (nr))
+> >> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
+> >> +#else
+> >> +#define serial_iobase_0		0x3f8
+> >> +#define serial_iobase_1		0x2f8
+> >> +#define serial_iobase_2		0x3e8
+> >> +#define serial_iobase_3		0x2e8
+> >> +#define serial_irq_0		4
+> >> +#define serial_irq_1		3
+> >> +#define serial_irq_2		4
+> >> +#define serial_irq_3		3  
+> > Nitpick: serial_iobase_* and serial_irq_* could be changed to have two leading
+> > underscores, to stress the fact that they are helpers for serial_iobase() and
+> > serial_irq() and are not meant to be used by themselves. But that's just personal
+> > preference, otherwise the patch looks really nice and clean:
+> >
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>  
+> 
+> I gave it more thought and I think I spoke too soon. I think it would be good to
+> document in the commit message how you came to the base MMIO address and size
+> (even if it was just a nice looking number). Also, the CFI flash device has its
+> memory range described in the memory layout for the architecture, in
+> arm/include/arm-common/kvm-arch.h. I think it would be a good idea to put the
+> serial region there, to prevent regressions in the future.
 
-EFER isn't guaranteed to be in the load list, either, e.g. if guest and host
-have the same desired value.
+Yes, that's very true, the memory map should be described in one place
+only. Will try to do that.
 
-The proper way to retrieve the effective EFER is to reuse the logic in
-nested_vmx_calc_efer(), i.e. look at VM_ENTRY_IA32E_MODE if EFER isn't being
-loaded via VMCS.
+
+> 
+> I did the math to make sure there's no overlap with the ioport region (16M >> 16K)
+> or the flash region (16M + 0x4000 < 32M). I also tested the changes with a kernel
+> with 4K and 64K pages (I can't access any hardware with 16K pages at the moment),
+> and everything worked as expected.
+
+Thanks!
+Andre
+
+> >> +#define serial_iobase(nr)	serial_iobase_##nr
+> >> +#define serial_irq(nr)		serial_irq_##nr
+> >> +#define SERIAL8250_BUS_TYPE	DEVICE_BUS_IOPORT
+> >> +#endif
+> >> +
+> >>  /*
+> >>   * This fakes a U6_16550A. The fifo len needs to be 64 as the kernel
+> >>   * expects that for autodetection.
+> >> @@ -27,7 +45,7 @@ struct serial8250_device {
+> >>  	struct mutex		mutex;
+> >>  	u8			id;
+> >>  
+> >> -	u16			iobase;
+> >> +	u32			iobase;
+> >>  	u8			irq;
+> >>  	u8			irq_state;
+> >>  	int			txcnt;
+> >> @@ -65,56 +83,56 @@ static struct serial8250_device devices[] = {
+> >>  	/* ttyS0 */
+> >>  	[0]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 0,
+> >> -		.iobase			= 0x3f8,
+> >> -		.irq			= 4,
+> >> +		.iobase			= serial_iobase(0),
+> >> +		.irq			= serial_irq(0),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS1 */
+> >>  	[1]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 1,
+> >> -		.iobase			= 0x2f8,
+> >> -		.irq			= 3,
+> >> +		.iobase			= serial_iobase(1),
+> >> +		.irq			= serial_irq(1),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS2 */
+> >>  	[2]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 2,
+> >> -		.iobase			= 0x3e8,
+> >> -		.irq			= 4,
+> >> +		.iobase			= serial_iobase(2),
+> >> +		.irq			= serial_irq(2),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >>  	/* ttyS3 */
+> >>  	[3]	= {
+> >>  		.dev_hdr = {
+> >> -			.bus_type	= DEVICE_BUS_IOPORT,
+> >> +			.bus_type	= SERIAL8250_BUS_TYPE,
+> >>  			.data		= serial8250_generate_fdt_node,
+> >>  		},
+> >>  		.mutex			= MUTEX_INITIALIZER,
+> >>  
+> >>  		.id			= 3,
+> >> -		.iobase			= 0x2e8,
+> >> -		.irq			= 3,
+> >> +		.iobase			= serial_iobase(3),
+> >> +		.irq			= serial_irq(3),
+> >>  
+> >>  		SERIAL_REGS_SETTING
+> >>  	},
+> >> @@ -444,7 +462,8 @@ static int serial8250__device_init(struct kvm *kvm,
+> >>  		return r;
+> >>  
+> >>  	ioport__map_irq(&dev->irq);
+> >> -	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
+> >> +	r = kvm__register_iotrap(kvm, dev->iobase, 8, serial8250_mmio, dev,
+> >> +				 SERIAL8250_BUS_TYPE);
+> >>  
+> >>  	return r;
+> >>  }
+> >> @@ -467,7 +486,7 @@ cleanup:
+> >>  	for (j = 0; j <= i; j++) {
+> >>  		struct serial8250_device *dev = &devices[j];
+> >>  
+> >> -		kvm__deregister_pio(kvm, dev->iobase);
+> >> +		kvm__deregister_iotrap(kvm, dev->iobase, SERIAL8250_BUS_TYPE);
+> >>  		device__unregister(&dev->dev_hdr);
+> >>  	}
+> >>  
+> >> @@ -483,7 +502,8 @@ int serial8250__exit(struct kvm *kvm)
+> >>  	for (i = 0; i < ARRAY_SIZE(devices); i++) {
+> >>  		struct serial8250_device *dev = &devices[i];
+> >>  
+> >> -		r = kvm__deregister_pio(kvm, dev->iobase);
+> >> +		r = kvm__deregister_iotrap(kvm, dev->iobase,
+> >> +					   SERIAL8250_BUS_TYPE);
+> >>  		if (r < 0)
+> >>  			return r;
+> >>  		device__unregister(&dev->dev_hdr);  
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm  
+
