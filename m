@@ -2,191 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A345C31E9F4
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 13:47:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5E3F31E9EC
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 13:47:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233082AbhBRMga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 07:36:30 -0500
-Received: from foss.arm.com ([217.140.110.172]:50414 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232244AbhBRMND (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 07:13:03 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1C961042;
-        Thu, 18 Feb 2021 03:17:43 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0029F3F73D;
-        Thu, 18 Feb 2021 03:17:42 -0800 (PST)
-Subject: Re: [PATCH kvmtool 06/21] hw/i8042: Refactor trap handler
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-7-andre.przywara@arm.com>
- <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
- <20210218103425.26a27000@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <5d2d7233-46f6-3056-e2b2-813a3fc56d88@arm.com>
-Date:   Thu, 18 Feb 2021 11:17:58 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S232966AbhBRMdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 07:33:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231371AbhBRLjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 06:39:25 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2B7C061756;
+        Thu, 18 Feb 2021 03:28:47 -0800 (PST)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 017B6247; Thu, 18 Feb 2021 12:25:03 +0100 (CET)
+Date:   Thu, 18 Feb 2021 12:25:00 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     X86 ML <x86@kernel.org>, Joerg Roedel <jroedel@suse.de>,
+        stable <stable@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
+ adjusting #VC IST stack
+Message-ID: <20210218112500.GH7302@8bytes.org>
+References: <20210217120143.6106-1-joro@8bytes.org>
+ <20210217120143.6106-3-joro@8bytes.org>
+ <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210218103425.26a27000@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Hi Andy,
 
-On 2/18/21 10:34 AM, Andre Przywara wrote:
-> On Thu, 11 Feb 2021 17:23:13 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
->> Hi Andre,
->>
->> On 12/10/20 2:28 PM, Andre Przywara wrote:
->>> With the planned retirement of the special ioport emulation code, we
->>> need to provide an emulation function compatible with the MMIO
->>> prototype.
->>>
->>> Adjust the trap handler to use that new function, and provide shims to
->>> implement the old ioport interface, for now.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
->>>  1 file changed, 34 insertions(+), 34 deletions(-)
->>>
->>> diff --git a/hw/i8042.c b/hw/i8042.c
->>> index 36ee183f..eb1f9d28 100644
->>> --- a/hw/i8042.c
->>> +++ b/hw/i8042.c
->>> @@ -292,52 +292,52 @@ static void kbd_reset(void)
->>>  	};
->>>  }
->>>  
->>> -/*
->>> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
->>> - */
->>> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>> +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->>> +		   u8 is_write, void *ptr)
->>>  {
->>> -	switch (port) {
->>> -	case I8042_COMMAND_REG: {
->>> -		u8 value = kbd_read_status();
->>> -		ioport__write8(data, value);
->>> +	u8 value;
->>> +
->>> +	if (is_write)
->>> +		value = ioport__read8(data);
->>> +
->>> +	switch (addr) {
->>> +	case I8042_COMMAND_REG:
->>> +		if (is_write)
->>> +			kbd_write_command(vcpu->kvm, value);
->>> +		else
->>> +			value = kbd_read_status();
->>>  		break;
->>> -	}
->>> -	case I8042_DATA_REG: {
->>> -		u8 value = kbd_read_data();
->>> -		ioport__write8(data, value);
->>> +	case I8042_DATA_REG:
->>> +		if (is_write)
->>> +			kbd_write_data(value);
->>> +		else
->>> +			value = kbd_read_data();
->>>  		break;
->>> -	}
->>> -	case I8042_PORT_B_REG: {
->>> -		ioport__write8(data, 0x20);
->>> +	case I8042_PORT_B_REG:
->>> +		if (!is_write)
->>> +			value = 0x20;
->>>  		break;
->>> -	}
->>>  	default:
->>> -		return false;
->>> +		return;  
->> Any particular reason for removing the false return value? I don't see it
->> mentioned in the commit message. Otherwise this is identical to the two functions
->> it replaces.
-> Because the MMIO handler prototype is void, in contrast to the PIO one.
-> Since on returning "false" we only seem to panic kvmtool, this is of
-> quite limited use, I'd say.
+On Wed, Feb 17, 2021 at 10:09:46AM -0800, Andy Lutomirski wrote:
+> Can you get rid of the linked list hack while you're at it?  This code
+> is unnecessarily convoluted right now, and it seems to be just asking
+> for weird bugs.  Just stash the old value in a local variable, please.
 
-Actually, in ioport.c::kvm__emulate_io(), if kvm->cfg.ioport_debug is true, it
-will print an error and then panic in kvm_cpu__start(); otherwise the error is
-silently ignored. serial.c is another device where an unknown register returns
-false. In rtc.c, the unknown register is ignored. cfi_flash.c prints debugging
-information. So I guess kvmtool implements all possible methods of handling an
-unknown register *at the same time*, so it's up to you how you want to handle it.
+Yeah, the linked list is not really necessary right now, because of the
+way nested NMI handling works and given that these functions are only
+used in the NMI handler right now.
+The whole #VC handling code was written with future requirements in
+mind, like what is needed when debugging registers get virtualized and
+#HV gets enabled.
+Until its clear whether __sev_es_ist_enter/exit() is needed in any of
+these paths, I'd like to keep the linked list for now. It is more
+complicated but allows nesting.
 
->>>  	}
->>>  
->>> +	if (!is_write)
->>> +		ioport__write8(data, value);
->>> +}
->>> +
->>> +/*
->>> + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
->>> + */
->>> +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>> +{
->>> +	kbd_io(vcpu, port, data, size, false, NULL);  
->> is_write is an u8, not a bool.
-> Right, will fix this.
->
->> I never could wrap my head around the ioport convention of "in" (read) and "out"
->> (write). To be honest, changing is_write changed to an enum so it's crystal clear
->> what is happening would help with that a lot, but I guess that's a separate patch.
-> "in" and "out" are the x86 assembly mnemonics, but it's indeed
-> confusing, because the device side has a different view (CPU "in" means
-> pushing data "out" of the device). I usually look at the code to see
-> what it's actually meant to do.
-> So yeah, I feel like a lot of those device emulations could use
-> some update. but that's indeed something for another day.
+> Meanwhile, I'm pretty sure I can break this whole scheme if the
+> hypervisor is messing with us.  As a trivial example, the sequence
+> SYSCALL gap -> #VC -> NMI -> #VC will go quite poorly.
 
-Agreed.
+I don't see how this would break, can you elaborate?
 
-Thanks,
+What I think happens is:
 
-Alex
+SYSCALL gap (RSP is from userspace and untrusted)
 
->
-> Cheers,
-> Andre
->
->>> +
->>>  	return true;
->>>  }
->>>  
->>>  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>>  {
->>> -	switch (port) {
->>> -	case I8042_COMMAND_REG: {
->>> -		u8 value = ioport__read8(data);
->>> -		kbd_write_command(vcpu->kvm, value);
->>> -		break;
->>> -	}
->>> -	case I8042_DATA_REG: {
->>> -		u8 value = ioport__read8(data);
->>> -		kbd_write_data(value);
->>> -		break;
->>> -	}
->>> -	case I8042_PORT_B_REG: {
->>> -		break;
->>> -	}
->>> -	default:
->>> -		return false;
->>> -	}
->>> +	kbd_io(vcpu, port, data, size, true, NULL);
->>>  
->>>  	return true;
->>>  }  
+	-> #VC - Handler on #VC IST stack detects that it interrupted
+	   the SYSCALL gap and switches to the task stack.
+
+
+	-> NMI - Now running on NMI IST stack. Depending on whether the
+	   stack switch in the #VC handler already happened, the #VC IST
+	   entry is adjusted so that a subsequent #VC will not overwrite
+	   the interrupted handlers stack frame.
+
+	-> #VC - Handler runs on the adjusted #VC IST stack and switches
+	   itself back to the NMI IST stack. This is safe wrt. nested
+	   NMIs as long as nested NMIs itself are safe.
+
+As a rule of thumb, think of the #VC handler as trying to be a non-IST
+handler by switching itself to the interrupted stack or the task stack.
+If it detects that this is not possible (which can't happen right now,
+but with SNP), it will kill the guest.
+
+Also #VC is currently not safe against #MC, but this is the same as with
+NMI and #MC. And more care is needed when SNP gets enabled and #VCs can
+happen in the stack switching/stack adjustment code itself. I will
+probably just add a check then to kill the guest if an SNP related #VC
+comes from noinstr code.
+
+> Is this really better than just turning IST off for #VC and
+> documenting that we are not secure against a malicious hypervisor yet?
+
+It needs to be IST, even without SNP, because #DB is IST too. When the
+hypervisor intercepts #DB then any #DB exception will be turned into
+#VC, so #VC needs to be handled anywhere a #DB can happen.
+
+And with SNP we need to be able to at least detect a malicious HV so we
+can reliably kill the guest. Otherwise the HV could potentially take
+control over the guest's execution flow and make it reveal its secrets.
+
+Regards,
+
+	Joerg
