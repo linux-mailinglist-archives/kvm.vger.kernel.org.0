@@ -2,126 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92D0E31EE5B
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:34:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE4D131EE5C
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbhBRSdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:33:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59144 "EHLO
+        id S232523AbhBRSdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:33:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234420AbhBRRm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 12:42:59 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21B8C0613D6
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:42:18 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id b21so1578291pgk.7
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:42:18 -0800 (PST)
+        with ESMTP id S234504AbhBRRor (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 12:44:47 -0500
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79CCC06178A
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:44:04 -0800 (PST)
+Received: by mail-pg1-x52c.google.com with SMTP id 75so1564454pgf.13
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:44:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=InRyD+Xla6obrQpV9LQcANEheEe1QGIC/pMhRnQojK0=;
-        b=S9zZQxkRxkYHxFN6IJf3kMQKiVKqvmYE8fG9oCJCmhMXA/NRCoNe36+0xPhSUrEFCn
-         ZPOTddfRbi+pD7FU6MCpcBqyVMGZa6UbrnzbVQrlIGOGljQR1mNgEoKJZGgPbc1q+x4j
-         rRlqU3IhVN1qb/EAf039q5L4ClHn7xygQ3tA9+nvtIEcq/XhbbxDf2GeQ7LbxT5FLPne
-         miO/lTWU3ZKkluvKIhYGr20iU6US2+4Y9DvOX0NzO3A3YgfgAQh+1A9m7A4J+WqdZ6H/
-         FLC00XWDGj7Te7zpqNardG1xw50iC4GR0Hpj4halJS183obQTEZhTFNzEIFS77/m2mrC
-         zuEA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7Xh74tiaKTLgu6iSFVSNwadSz4xskX8HanaA+nosu/A=;
+        b=Td2Sr5J5o1Z/PzUcOrqIT/3IQ5NAKiexgxuyzDqdkNFIq3Oj8rrsB0WZyBm0sQMtZR
+         tDEPOX4FlzHlTtrL1rqjxy00CXfxMHkGfbbC15K08umBkjmE5wfO5YTnpsNbtRdr31Vs
+         b+WM8Db/UjWIhmjUktMlqBxp3haVlX++KnVgO0hMVAxVziQmujxpHhO9jyt12s//ZIDj
+         UoEF6029XTwA3sg/FKspQCDPrIvf5sxI0jUuAwmlv5EVcyPCa/WJzmlTIiQpDsCT9Ypv
+         o4uR7JfN7/QgabeLyAWfHQ9sdudBKRsSt+CKi9yz3w1oDB63k+xo7DPRjuQcPqj9JIBM
+         bVag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=InRyD+Xla6obrQpV9LQcANEheEe1QGIC/pMhRnQojK0=;
-        b=rZGvnTB/XZ0FWUkFHZldO2rnTummgu5XH1g0lLPEZsJiRMx7kbxns9q0ve4zs0EZVV
-         Vd6aJ57J0rD42PAf+8u/pnDLfq7SST4VdWjNQzY2c4YHA/eWkKd23oK2zkJE73yxbYHL
-         t2FmooeZCggDtpZ6ck/+W/xlZgtR1DUOdGyE+i6sjqRjJPwhrf3n+PdViL07Eltq73ho
-         4l/NTm6CwAguGAP6tJwTk04bx732F/I9iS8Mpyt9aRo5bRhD7ysQXvFElYbaTyXEPDBr
-         iWcfj7ewhrej1h/Q2eZ6c79YO3/HKQfgOMUZB1mzRHj2ikQ1ZneH/7Sx49ST9HZT4n3J
-         h8sw==
-X-Gm-Message-State: AOAM533zxaVxuwTGntQDkN2Wcs/R+e21TlJKzvlxlqqx2cjlDWQLWPeE
-        P3MJ6PZ0s6IL4LjMweASn8xTz5SHHGwZrg==
-X-Google-Smtp-Source: ABdhPJzG+iibL1c6LMDf6p5/bXLgME7e8UIfVaFqoe2uaYYoQijwStSXrMr/9GK9oi5BJG/YmvvNLQ==
-X-Received: by 2002:a63:5f44:: with SMTP id t65mr169753pgb.321.1613670138321;
-        Thu, 18 Feb 2021 09:42:18 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id ke13sm6008339pjb.44.2021.02.18.09.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 09:42:17 -0800 (PST)
-Date:   Thu, 18 Feb 2021 09:42:11 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jroedel@suse.de,
-        mlevitsk@redhat.com
-Subject: Re: [PATCH] KVM: nSVM: prepare guest save area while is_guest_mode
- is true
-Message-ID: <YC6m8xoRUDtn3V+y@google.com>
-References: <20210218162831.1407616-1-pbonzini@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7Xh74tiaKTLgu6iSFVSNwadSz4xskX8HanaA+nosu/A=;
+        b=h0hJH0o+WWfQxKbVpHGG0bbSF+lJZuIGPInt3zUAqDGJ72VtD3UkeXDXCiCGnAABMl
+         iWzWCQYOQZKvg/P+/sEm8mC7uQIeayZ9g5sMUaQA9Czm/8szuL/iaJxsJEh7b6za8NDo
+         NPOzXh694/jEIkQvz/gvqBSeejUASTD9oaVw+IszohgwKS+YdsS8CJoREJQuh0E+Hqhd
+         2lx9bO0o3tG5WfeSmoA+4nWXd+hvch+jOks7uPFLgNxND60Zlipti3MqianenDHk0igW
+         WP4pbe1gsWsoeQjYXOqkGvnQSE65KdxrJ2V0IreYZGR+lJzA2rB0rZG82bkoxQU2LS9J
+         VvCA==
+X-Gm-Message-State: AOAM530NC26IcvmXef9IocE0ueixni+jlX1gWERJ3wL7NCcoxa7xzIvG
+        pn8fNrX5m7Tkpua4jOIe5Rw3bBXqZtUdaYsMuT0=
+X-Google-Smtp-Source: ABdhPJwZfCFi1qt998/YfwPE+9jq7ogTdqh51FACnJE3iBBuQd3kdVn3+n+GgdDB010i9pbbTnd1vf9xL/WMlchW95E=
+X-Received: by 2002:a63:1723:: with SMTP id x35mr4987883pgl.393.1613670244019;
+ Thu, 18 Feb 2021 09:44:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210218162831.1407616-1-pbonzini@redhat.com>
+References: <CAJSP0QWWg__21otbMXAXWGD1FaHYLzZP7axZ47Unq6jtMvdfsA@mail.gmail.com>
+ <1613136163375.99584@amazon.com> <CAJSP0QXEvw6o7XFk9FXudr9PmorFHiOuNRg16DjJhBgj_qC-FQ@mail.gmail.com>
+ <f0493c86-e92b-8bb6-a4a9-33646bf05fab@amazon.com>
+In-Reply-To: <f0493c86-e92b-8bb6-a4a9-33646bf05fab@amazon.com>
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Thu, 18 Feb 2021 17:43:52 +0000
+Message-ID: <CAJSP0QUH5Ewa=xC5wUfPTbseg=5GCAzXtNYK8c40HKikRWkxSA@mail.gmail.com>
+Subject: Re: [Rust-VMM] Call for Google Summer of Code 2021 project ideas
+To:     Andreea Florescu <fandree@amazon.com>
+Cc:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        "rust-vmm@lists.opendev.org" <rust-vmm@lists.opendev.org>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        Alexander Graf <agraf@csgraf.de>,
+        Alberto Garcia <berto@igalia.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Julia Suvorova <jusual@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Aleksandar Markovic <Aleksandar.Markovic@rt-rk.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Paolo Bonzini wrote:
-> Right now, enter_svm_guest_mode is calling nested_prepare_vmcb_save and
-> nested_prepare_vmcb_control.  This results in is_guest_mode being false
-> until the end of nested_prepare_vmcb_control.
-> 
-> This is a problem because nested_prepare_vmcb_save can in turn cause
-> changes to the intercepts and these have to be applied to the "host VMCB"
-> (stored in svm->nested.hsave) and then merged with the VMCB12 intercepts
-> into svm->vmcb.
-> 
-> In particular, without this change we forget to set the CR0 read and CR0
-> write intercepts when running a real mode L2 guest with NPT disabled.
-> The guest is therefore able to see the CR0.PG bit that KVM sets to
-> enable "paged real mode".  This patch fixes the svm.flat mode_switch
-> test case with npt=0.  There are no other problematic calls in
-> nested_prepare_vmcb_save.
+On Thu, Feb 18, 2021 at 11:50 AM Andreea Florescu <fandree@amazon.com> wrote:
+> On 2/17/21 1:20 PM, Stefan Hajnoczi wrote:
+> > CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
+> >
+> >
+> >
+> > Thanks, I have published the rust-vmm project ideas on the wiki:
+> > https://wiki.qemu.org/Google_Summer_of_Code_2021
+> Thanks, Stefan!
+> >
+> > Please see Sergio's reply about virtio-consoile is libkrun. Maybe it
+> > affects the project idea?
+> I synced offline with Sergio. It seems I've misread his comment.
+> The code is already available in libkrun, and to port it to rust-vmm
+> will likely take just a couple of days. We explored the option of also
+> requesting to implement VIRTIO_CONSOLE_F_MULTIPORT to make it an
+> appropriate GSoC project, but we decided this is not a good idea since
+> it doesn't look like that feature is useful for the projects consuming
+> rust-vmm. It also adds complexity, and we would need to maintain that as
+> well.
+>
+> Since it would still be nice to have virtio-console in rust-vmm, I'll
+> just open an issue in vm-virtio and label it with "help wanted" so
+> people can pick it up.
+> Can we remove the virtio-console project from the list of GSoC ideas?
 
-It might be worth explicitly pointing out that get_host_vmcb() in
-svm_clr_intercept() and svm_set_intercept() will grab the wrong VMCB.
- 
-> The bug is present since commit 06fc7772690d ("KVM: SVM: Activate nested
-> state only when guest state is complete", 2010-04-25).  Unfortunately,
-> it is not clear from the commit message what issue exactly led to the
-> change back then.  It was probably related to svm_set_cr0 however because
-> the patch series cover letter[1] mentioned lazy FPU switching.
+Done.
 
-Aha!  It was indeed related to svm_set_cr0().  Specifically, the next patch,
-commit 66a562f7e257 ("KVM: SVM: Make lazy FPU switching work with nested svm"),
-added is_nested() checks in update_cr0_intercept() to merge L1's intercepts with
-L0's intercepts.
+> Also, iul@amazon.com will like to help with mentoring the GSoC projects.
+> Can he be added as a co-mentor of: "Mocking framework for Virtio Queues"?
 
-I dug through all other is_nested() usage, none of them were reachable via the
-world switch logic.
+Done.
 
-> [1] https://lore.kernel.org/kvm/1266493115-28386-1-git-send-email-joerg.roedel@amd.com/
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks for getting the rust-vmm mentors together! I'm looking forward
+to more Rust virtualization projects :).
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
-> ---
->  arch/x86/kvm/svm/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 92d3aaaac612..35891d9a1099 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -469,8 +469,8 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb12_gpa,
->  
->  	svm->nested.vmcb12_gpa = vmcb12_gpa;
->  	load_nested_vmcb_control(svm, &vmcb12->control);
-> -	nested_prepare_vmcb_save(svm, vmcb12);
->  	nested_prepare_vmcb_control(svm);
-> +	nested_prepare_vmcb_save(svm, vmcb12);
->  
->  	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
->  				  nested_npt_enabled(svm));
-> -- 
-> 2.26.2
-> 
+Stefan
