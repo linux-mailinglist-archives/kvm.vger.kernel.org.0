@@ -2,128 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 37E9D31EE63
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9548231EE66
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 19:35:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231256AbhBRSdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 13:33:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60908 "EHLO
+        id S232578AbhBRSef (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 13:34:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234729AbhBRRvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 12:51:14 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928B4C061756
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:50:33 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id b8so1632435plh.12
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:50:33 -0800 (PST)
+        with ESMTP id S234645AbhBRRzw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 12:55:52 -0500
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E68C061756
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:55:12 -0800 (PST)
+Received: by mail-ot1-x336.google.com with SMTP id q4so2644470otm.9
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 09:55:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ar4qumgxjcARbIFNPkL/fEc8ffnJvriNV7C8I9UZSSE=;
-        b=o9eKOmDlEvLgF6YUJdS59NPQ8hR9UNjLOg6pdh1fOYz7oj26RjNd0/gdCyvhR16Ss/
-         QEcxfxRP6GOdmQy214V4gKyYY4uKZib7/caSaZpMfA6vAEL6fSnN4J+vdISK4TJG9wZD
-         thU6v9SnWg7mQLwZgyRSZptilY/oodJWLDHejowBBpAdZAvass3h+C5x4P9eYuzOrt1j
-         DVGR5cLo9uSbG9yZjLiReEyaxEacNfhi9lV/sBvAJenk1S7uAh3hIFzCk9AyRtxwiiZo
-         h0vkp8pTMfBjQWGQVsaqHh8ooO21nVhiEy32WU6TRpte+qrTgd5ihTtAxqPoRc/nqJK3
-         CMZg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Tgi2PT/4+anU3pfYa8JYNys7ChKyAjV7/eCb1ADvlbQ=;
+        b=qnE6/yHiDn67OdK7pvvUIINFuUG0S7jPrr6b+2c9mMjTNonTCnBWnGpIwWe1t3UQcG
+         CpBm51EqMP4Wns59KX4czCyugG21sPLFkFMHuYE7SkXkX8NfYQmKW013EmuPJWXwqy+3
+         +hEyGZm/ZL+7DK+fNy9PTWj4OFleCawPLaOK+fXIwwDiIvDVbFXMx3L76C04CpnDdhZd
+         yRh+2OFj6Xs7Foamx9ojJ+rktQ6XVgtH4xk/JQohBbaI0u7VUlxmVTKHTV1OVfS4u8ZF
+         ChRahBKg3/KFerxqZZq+cRsFzwZjPWHc07YQ4mKX0cgPTOVOdbdhztLFuBVv1Z16Bfbx
+         IpoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ar4qumgxjcARbIFNPkL/fEc8ffnJvriNV7C8I9UZSSE=;
-        b=DgJYH5Lh9f85OH9BTQ3Qs8rWy5Udg4YQZo5zp2FFmHCpN59sVLpz7GXJmza7a0y62N
-         RzJOXORNERE8H87XgT5ixd8Y/1ere4H8pyc72paKkn9heyjbEtDc9+ttstmaHgR1TwB5
-         0vchOpsIIUtkkdRIpYv+yg6rBsOd4VP0WPM148mEW577Y3NCUfEZkloPYqJU6m8+f/GZ
-         nzEzyUaie3m/PKELGnCp/l6l/vL+qP434gnbAP3HckPOto/YKls9hLv6PVScbQYnKSqX
-         BIkm7qAv1vhiiE2tz4H5MyeIqxuqrHppBWXdb+hlNXTa3iCKbPUsujccyK0flMFAftV9
-         hNKw==
-X-Gm-Message-State: AOAM531vUpTMQRmwpx3KPC+FGZ81/kSman4+ZujUGD73XGyzPZAkxvea
-        /gHyfl9r+AkwisV8+MwGp+XSUQ==
-X-Google-Smtp-Source: ABdhPJxae0TGH4xiwe5Lj9mlTgbQqTEgLNrW6Vk+Pi9f/XdUSadjneFfcPUzbsnvAzsiXDlRBwG2hw==
-X-Received: by 2002:a17:90b:4c8c:: with SMTP id my12mr4926719pjb.29.1613670632785;
-        Thu, 18 Feb 2021 09:50:32 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
-        by smtp.gmail.com with ESMTPSA id 6sm6451766pgv.70.2021.02.18.09.50.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 09:50:32 -0800 (PST)
-Date:   Thu, 18 Feb 2021 09:50:25 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>
-Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST
- ioctl
-Message-ID: <YC6o4YwTAOU7UE1u@google.com>
-References: <cover.1612398155.git.ashish.kalra@amd.com>
- <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
- <YCxrV4u98ZQtInOE@google.com>
- <SN6PR12MB2767168CA61257A85B29C26D8E869@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YC1AkNPNET+T928c@google.com>
- <SN6PR12MB27676C0BF3BBA872E55D5FC78E859@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YC6YOuJyNlSxKVR4@google.com>
- <SN6PR12MB2767A978C3A2B43982F2F4898E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Tgi2PT/4+anU3pfYa8JYNys7ChKyAjV7/eCb1ADvlbQ=;
+        b=ttuOY/ApGYTUhe2/jSPZH8nNm9KXttKoYZhoyw7NOr+VePEX234fWt+NwDgFJE0kg3
+         Wmzll0ZnVPgyrrOet0afT+AZCU8k1MW2MlO2f3dH3flEi1t57N30EVmW8cPn+BMmXjmu
+         2mcsc9Wk+4qVoVctfjnyJ7H1p7PDIvImGN3kRFb5sjhd+OKd+pNg5BwwW+mHHqtN+tUh
+         8Q559p5dFV3O7VT2j0MMz7DCGofqYmdnrTyG4URsRmknUhVPajPqwQ9YmOmQ7YeirsAc
+         Lnk12fGMarmUSIG1yoMxLPgK6DGH+Mwd9ejtOw/6EP9todzZilPWc+rM2/pq7eGtNdt7
+         XBww==
+X-Gm-Message-State: AOAM532jrV8LVeF9IiA8WMGOSCCADZOjw2O4MR95zALGU1ijaKiNPPFv
+        7CKiSjy3beLDdjwKrCUx9LtN7notEj8+sDr2jERgGg==
+X-Google-Smtp-Source: ABdhPJxFq2xp4sEJi4/hmbQAsrJdWcJiX+FB/+//cEcqbBtjBEZwTThD0tidD8SXZHFNNbODkrlqFAox11M6bmbDA3Q=
+X-Received: by 2002:a9d:7a47:: with SMTP id z7mr3786711otm.295.1613670911413;
+ Thu, 18 Feb 2021 09:55:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767A978C3A2B43982F2F4898E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <20210218100450.2157308-1-david.edmondson@oracle.com>
+ <708f2956-fa0f-b008-d3d2-93067f95783c@redhat.com> <cuntuq9ilg4.fsf@dme.org>
+ <8f9d4ef7-ddad-160b-2d94-69f4370e8702@redhat.com> <YC6XVrWPRQJ7V6Nd@google.com>
+In-Reply-To: <YC6XVrWPRQJ7V6Nd@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 18 Feb 2021 09:55:00 -0800
+Message-ID: <CALMp9eTX4Na2VTY2aU=-SUrGhst5aExdCB3f=4krKj1mFPgcqQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: dump_vmcs should not assume GUEST_IA32_EFER is valid
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, David Edmondson <dme@dme.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm list <kvm@vger.kernel.org>,
+        Joerg Roedel <joro@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021, Kalra, Ashish wrote:
-> From: Sean Christopherson <seanjc@google.com> 
-> 
-> On Thu, Feb 18, 2021, Kalra, Ashish wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > 
-> > On Wed, Feb 17, 2021, Kalra, Ashish wrote:
-> > >> From: Sean Christopherson <seanjc@google.com> On Thu, Feb 04, 2021, 
-> > >> Ashish Kalra wrote:
-> > >> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > >> > 
-> > >> > The ioctl is used to retrieve a guest's shared pages list.
-> > >> 
-> > >> >What's the performance hit to boot time if KVM_HC_PAGE_ENC_STATUS 
-> > >> >is passed through to userspace?  That way, userspace could manage 
-> > >> >the set of pages >in whatever data structure they want, and these get/set ioctls go away.
-> > >> 
-> > >> What is the advantage of passing KVM_HC_PAGE_ENC_STATUS through to 
-> > >> user-space ?
-> > >> 
-> > >> As such it is just a simple interface to get the shared page list 
-> > >> via the get/set ioctl's. simply an array is passed to these ioctl 
-> > >> to get/set the shared pages list.
-> >> 
-> >> > It eliminates any probability of the kernel choosing the wrong data 
-> >> > structure, and it's two fewer ioctls to maintain and test.
-> >> 
-> >> The set shared pages list ioctl cannot be avoided as it needs to be 
-> >> issued to setup the shared pages list on the migrated VM, it cannot be 
-> >> achieved by passing KVM_HC_PAGE_ENC_STATUS through to user-space.
-> 
-> >Why's that?  AIUI, KVM doesn't do anything with the list other than pass it
-> >back to userspace.  Assuming that's the case, userspace can just hold onto
-> >the list >for the next migration.
-> 
-> KVM does use it as part of the SEV DBG_DECTYPT API, within sev_dbg_decrypt()
-> to check if the guest page(s) are encrypted or not, and accordingly use it to
-> decide whether to decrypt the guest page(s) and return that back to
-> user-space or just return it as it is.
+On Thu, Feb 18, 2021 at 8:35 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Feb 18, 2021, Paolo Bonzini wrote:
+> > On 18/02/21 13:56, David Edmondson wrote:
+> > > On Thursday, 2021-02-18 at 12:54:52 +01, Paolo Bonzini wrote:
+> > >
+> > > > On 18/02/21 11:04, David Edmondson wrote:
+> > > > > When dumping the VMCS, retrieve the current guest value of EFER from
+> > > > > the kvm_vcpu structure if neither VM_EXIT_SAVE_IA32_EFER or
+> > > > > VM_ENTRY_LOAD_IA32_EFER is set, which can occur if the processor does
+> > > > > not support the relevant VM-exit/entry controls.
+> > > >
+> > > > Printing vcpu->arch.efer is not the best choice however.  Could we dump
+> > > > the whole MSR load/store area instead?
+> > >
+> > > I'm happy to do that, and think that it would be useful, but it won't
+> > > help with the original problem (which I should have explained more).
+> > >
+> > > If the guest has EFER_LMA set but we aren't using the entry/exit
+> > > controls, vm_read64(GUEST_IA32_EFER) returns 0, causing dump_vmcs() to
+> > > erroneously dump the PDPTRs.
+> >
+> > Got it now.  It would sort of help, because while dumping the MSR load/store
+> > area you could get hold of the real EFER, and use it to decide whether to
+> > dump the PDPTRs.
+>
+> EFER isn't guaranteed to be in the load list, either, e.g. if guest and host
+> have the same desired value.
+>
+> The proper way to retrieve the effective EFER is to reuse the logic in
+> nested_vmx_calc_efer(), i.e. look at VM_ENTRY_IA32E_MODE if EFER isn't being
+> loaded via VMCS.
 
-Why is handling shared memory KVM's responsibility?  Userspace shouldn't be
-asking KVM to decrypt memory it knows isn't encrypted.  My understanding is that
-bogus decryption won't harm the kernel, it will only corrupt the guest.  In
-other words, patch 16 can be dropped if managing the set of shared pages is
-punted to userspace.
+Shouldn't dump_vmcs() simply dump the contents of the VMCS, in its
+entirety? What does it matter what the value of EFER is?
