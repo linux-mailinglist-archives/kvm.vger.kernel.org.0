@@ -2,79 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3690D31E7B9
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 10:00:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F10E131E809
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 10:36:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231260AbhBRIzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 03:55:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42791 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231390AbhBRIxY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Feb 2021 03:53:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613638298;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZbWdMtncEuCway5u1Fc3JThSWZ7Q/0Uv7tQCFJpjmn0=;
-        b=H5ym0xKPU9HCXrotnUe5ed07c4GwqOTRpw9fgfWz/Kkneabh+rXS+X538EeNnMQjzdPkv7
-        gcUD1+9UWH2WcsQhwITblMDDgUQI2riau+QfOSJMty4wN1WyiOrkZZstG4nR5Vsm/3vms+
-        NyBwJHubcrMaquiKZLt0UsIxkb3pj20=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-Iq2rtfcDMzmh7MoQfQ8ZBg-1; Thu, 18 Feb 2021 03:51:35 -0500
-X-MC-Unique: Iq2rtfcDMzmh7MoQfQ8ZBg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26D7F87499B;
-        Thu, 18 Feb 2021 08:51:34 +0000 (UTC)
-Received: from gondolin (ovpn-113-63.ams2.redhat.com [10.36.113.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3D5E298C9;
-        Thu, 18 Feb 2021 08:51:32 +0000 (UTC)
-Date:   Thu, 18 Feb 2021 09:51:30 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH] s390x: Remove sthyi partition number
- check
-Message-ID: <20210218095130.29117480.cohuck@redhat.com>
-In-Reply-To: <20210218082449.29876-1-frankja@linux.ibm.com>
-References: <20210218082449.29876-1-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S231273AbhBRJ1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 04:27:21 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12924 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231538AbhBRJKt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 04:10:49 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Dh7WF1DQPzjMg3;
+        Thu, 18 Feb 2021 16:42:33 +0800 (CST)
+Received: from [10.174.184.42] (10.174.184.42) by
+ DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
+ 14.3.498.0; Thu, 18 Feb 2021 16:43:44 +0800
+Subject: Re: [PATCH v13 02/15] iommu: Introduce bind/unbind_guest_msi
+To:     Auger Eric <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>, <alex.williamson@redhat.com>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <20201118112151.25412-3-eric.auger@redhat.com>
+ <6a70d93d-329f-4129-bd90-03f8589c5de4@huawei.com>
+ <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>
+From:   Keqian Zhu <zhukeqian1@huawei.com>
+Message-ID: <bc7b223e-7c30-9baa-85e3-2195e03dfe48@huawei.com>
+Date:   Thu, 18 Feb 2021 16:43:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1ef4f5ae-9ca6-7c6d-f8a9-31240e5688c2@redhat.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Originating-IP: [10.174.184.42]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Feb 2021 03:24:49 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Hi Eric,
 
-> Turns out that partition numbers start from 0 and not from 1 so a 0
-> check doesn't make sense here.
+On 2021/2/12 16:55, Auger Eric wrote:
+> Hi Keqian,
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  s390x/sthyi.c | 1 -
->  1 file changed, 1 deletion(-)
+> On 2/1/21 12:52 PM, Keqian Zhu wrote:
+>> Hi Eric,
+>>
+>> On 2020/11/18 19:21, Eric Auger wrote:
+>>> On ARM, MSI are translated by the SMMU. An IOVA is allocated
+>>> for each MSI doorbell. If both the host and the guest are exposed
+>>> with SMMUs, we end up with 2 different IOVAs allocated by each.
+>>> guest allocates an IOVA (gIOVA) to map onto the guest MSI
+>>> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
+>>> onto the physical doorbell (hDB).
+>>>
+>>> So we end up with 2 untied mappings:
+>>>          S1            S2
+>>> gIOVA    ->    gDB
+>>>               hIOVA    ->    hDB
+>>>
+>>> Currently the PCI device is programmed by the host with hIOVA
+>>> as MSI doorbell. So this does not work.
+>>>
+>>> This patch introduces an API to pass gIOVA/gDB to the host so
+>>> that gIOVA can be reused by the host instead of re-allocating
+>>> a new IOVA. So the goal is to create the following nested mapping:
+>> Does the gDB can be reused under non-nested mode?
 > 
-> diff --git a/s390x/sthyi.c b/s390x/sthyi.c
-> index d8dfc854..db90b56f 100644
-> --- a/s390x/sthyi.c
-> +++ b/s390x/sthyi.c
-> @@ -128,7 +128,6 @@ static void test_fcode0_par(struct sthyi_par_sctn *par)
->  		report(sum, "core counts");
->  
->  	if (par->INFPVAL1 & PART_STSI_SUC) {
-> -		report(par->INFPPNUM, "number");
->  		report(memcmp(par->INFPPNAM, null_buf, sizeof(par->INFPPNAM)),
->  		       "name");
->  	}
+> Under non nested mode the hIOVA is allocated within the MSI reserved
+> region exposed by the SMMU driver, [0x8000000, 80fffff]. see
+> iommu_dma_prepare_msi/iommu_dma_get_msi_page in dma_iommu.c. this hIOVA
+> is programmed in the physical device so that the physical SMMU
+> translates it into the physical doorbell (hDB = host physical ITS
+So, AFAIU, under non-nested mode, at smmu side, we reuse the workflow of non-virtualization scenario.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> doorbell). The gDB is not used at pIOMMU programming level. It is only
+> used when setting up the KVM irq route.
+> 
+> Hope this answers your question.
+Thanks for your explanation!
+> 
 
+Thanks,
+Keqian
+
+>>
+>>>
+>>>          S1            S2
+>>> gIOVA    ->    gDB     ->    hDB
+>>>
+>>> and program the PCI device with gIOVA MSI doorbell.
+>>>
+>>> In case we have several devices attached to this nested domain
+>>> (devices belonging to the same group), they cannot be isolated
+>>> on guest side either. So they should also end up in the same domain
+>>> on guest side. We will enforce that all the devices attached to
+>>> the host iommu domain use the same physical doorbell and similarly
+>>> a single virtual doorbell mapping gets registered (1 single
+>>> virtual doorbell is used on guest as well).
+>>>
+>> [...]
+>>
+>>> + *
+>>> + * The associated IOVA can be reused by the host to create a nested
+>>> + * stage2 binding mapping translating into the physical doorbell used
+>>> + * by the devices attached to the domain.
+>>> + *
+>>> + * All devices within the domain must share the same physical doorbell.
+>>> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
+>>> + */
+>>> +
+>>> +int iommu_bind_guest_msi(struct iommu_domain *domain,
+>>> +			 dma_addr_t giova, phys_addr_t gpa, size_t size)
+>>> +{
+>>> +	if (unlikely(!domain->ops->bind_guest_msi))
+>>> +		return -ENODEV;
+>>> +
+>>> +	return domain->ops->bind_guest_msi(domain, giova, gpa, size);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
+>>> +
+>>> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
+>>> +			    dma_addr_t iova)
+>> nit: s/iova/giova
+> sure
+>>
+>>> +{
+>>> +	if (unlikely(!domain->ops->unbind_guest_msi))
+>>> +		return;
+>>> +
+>>> +	domain->ops->unbind_guest_msi(domain, iova);
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
+>>> +
+>> [...]
+>>
+>> Thanks,
+>> Keqian
+>>
+> 
+> Thanks
+> 
+> Eric
+> 
+> .
+> 
