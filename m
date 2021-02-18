@@ -2,129 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A315531EFD8
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 20:30:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4514D31F0A1
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 21:01:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232110AbhBRT3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 14:29:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48290 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230169AbhBRTWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 14:22:01 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id AC386AED2;
-        Thu, 18 Feb 2021 19:21:19 +0000 (UTC)
-Date:   Thu, 18 Feb 2021 20:21:17 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Joerg Roedel <joro@8bytes.org>, X86 ML <x86@kernel.org>,
-        stable <stable@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
- adjusting #VC IST stack
-Message-ID: <20210218192117.GL12716@suse.de>
-References: <20210217120143.6106-1-joro@8bytes.org>
- <20210217120143.6106-3-joro@8bytes.org>
- <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
- <20210218112500.GH7302@8bytes.org>
- <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S230033AbhBRT7N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 14:59:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59834 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230368AbhBRT4k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 14:56:40 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF30FC0613D6
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 11:56:00 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id o8so1734725pls.7
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 11:56:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=7bVBB7/eb43F7sJCb2A73jGKQH5d6crP4qDBABCXugI=;
+        b=MSGiXWGc/XBlhRD4FT6+UEMZ+VJARxb3RibM8Xi7pgr9pz0bgTNlOAetGX3p8x57hC
+         D9NGC/+GSPxXLIuX4N+ZhEma+EfYEksySW3hvgaO5RI92DO3YOkf+l3+Hz/4dRKkCJdf
+         4cMVb+Q2gHQlbE6XqbqTxkfw4bfAhObx0/dyqaDQRbt5/srIvx75jQGbX1PbYcJkSlg8
+         hI0qu06XNCzJQ1hwwZl3Vi7StUkGbOxBPOtK7067VGnDl7Ahv9l8EKanVlB9gfUPJ6gp
+         ChDRajvVL/VyOf74x+UM1yxcIda7D3fmjy8aa7r0MT38Aa/sNHX4SLupLZYl1t5ZYLIJ
+         5EvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=7bVBB7/eb43F7sJCb2A73jGKQH5d6crP4qDBABCXugI=;
+        b=YuZcqUDHVi5XQvLfeqtzt/0QR8dq2KztWPctabIT62OldUyr7soSwQdq7RE91Gn2qr
+         aQ0nQfsx+D+3cZffXr3X16GfEXFU4cILXaJEzyQ5dcatW1v0Y3EaT0TnvrjZ9O2jNQxT
+         MqTpwn9J87V9Zr0AZEqdxpDoHsp6BFx8y7T3ifaQj+Mv3VQDFBvsReOXayJM8Ixi3rM2
+         0sYI7k+5v22LQ7V0JB0W9bnafLMWP+bsZU4rqgbKYTkfqFpszuTpoXue/YK3S9/9r0fs
+         GzWGLRBJ2aC/0nZzOsn5boNlKDoB7yljg666LFY0O3Fkq/M2suc3xl773F+5LvNh+Bj7
+         aERA==
+X-Gm-Message-State: AOAM531RJ4vaMopepzXyugiJRomZwUwoAjVvZhu8Hox9qE1BunKiiyjy
+        McIPPd0s8A5XkKXCBK7ZbaELgShK2STx
+X-Google-Smtp-Source: ABdhPJwJ107wMcTLi0gXo6iW/YPA31DgLY3oqSY85ZPspZZPcWLIo/f/8WwkOevVbXHZFcJm+ZFZ40/7R3qQ
+Sender: "vipinsh via sendgmr" <vipinsh@vipinsh.kir.corp.google.com>
+X-Received: from vipinsh.kir.corp.google.com ([2620:0:1008:10:580f:a4a0:74ce:b3b4])
+ (user=vipinsh job=sendgmr) by 2002:a62:6304:0:b029:1c0:d62d:d213 with SMTP id
+ x4-20020a6263040000b02901c0d62dd213mr5825540pfb.79.1613678160277; Thu, 18 Feb
+ 2021 11:56:00 -0800 (PST)
+Date:   Thu, 18 Feb 2021 11:55:47 -0800
+Message-Id: <20210218195549.1696769-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.617.g56c4b15f3c-goog
+Subject: [RFC 0/2] cgroup: New misc cgroup controller
+From:   Vipin Sharma <vipinsh@google.com>
+To:     tj@kernel.org, thomas.lendacky@amd.com, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, pbonzini@redhat.com,
+        hannes@cmpxchg.org, frankja@linux.ibm.com, borntraeger@de.ibm.com
+Cc:     corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 09:49:06AM -0800, Andy Lutomirski wrote:
-> I don't understand what this means.  The whole entry mechanism on x86
-> is structured so that we call a C function *and return from that C
-> function without longjmp-like magic* with the sole exception of
-> unwind_stack_do_exit().  This means that you can match up enters and
-> exits, and that unwind_stack_do_exit() needs to unwind correctly.  In
-> the former case, it's normal C and we can use normal local variables.
-> In the latter case, we know exactly what state we're trying to restore
-> and we can restore it directly without any linked lists or similar.
+Hello,
 
-Okay, the unwinder will likely get confused by this logic.
+This patch is creating a new misc cgroup controller for allocation and
+tracking of resources which are not abstract like other cgroup
+controllers.
 
-> What do you have in mind that requires a linked list?
+This controller was initially proposed as encryption_id but after
+the feedbacks, it is now changed to misc cgroup.
+https://lore.kernel.org/lkml/20210108012846.4134815-2-vipinsh@google.com/
 
-Cases when there are multiple IST vectors besides NMI that can hit while
-the #VC handler is still on its own IST stack. #MCE comes to mind, but
-that is broken anyway. At some point #VC itself will be one of them, but
-when that happens the code will kill the machine.
-This leaves #HV in the list, and I am not sure how that is going to be
-handled yet. I think the goal is that the #HV handler is not allowed to
-cause any #VC exception. In that case the linked-list logic will not be
-needed.
+Changes from the encryption_id controller are:
+1. There are only 3 files misc.{capacity, max, current} for all
+   resources compared to each resource having their own 3 files in
+   encryption_id cgroup.
+2. If a resource capacity is 0 then it is considered inactive and won't
+   show up in control files.
+2. This is a lockless implementation similar to page counter APIs
+   compared to single lock implementation in encryption_id cgroup.
 
-> > I don't see how this would break, can you elaborate?
-> >
-> > What I think happens is:
-> >
-> > SYSCALL gap (RSP is from userspace and untrusted)
-> >
-> >         -> #VC - Handler on #VC IST stack detects that it interrupted
-> >            the SYSCALL gap and switches to the task stack.
-> >
-> 
-> Can you point me to exactly what code you're referring to?  I spent a
-> while digging through the code and macro tangle and I can't find this.
+Please provide any feedback for this RFC or if it is good for
+merging then I can send a patch for merging.
 
-See the entry code in arch/x86/entry/entry_64.S, macro idtentry_vc. It
-creates the assembly code for the handler. At some point it calls
-vc_switch_off_ist(), which is a C function in arch/x86/kernel/traps.c.
-This function tries to find a new stack for the #VC handler.
+Thanks
 
-The first thing it does is checking whether the exception came from the
-SYSCALL gap and just uses the task stack in that case.
+Vipin Sharma (2):
+  cgroup: sev: Add misc cgroup controller
+  cgroup: sev: Miscellaneous cgroup documentation.
 
-Then it will check for other kernel stacks which are safe to switch
-to. If that fails it uses the fall-back stack (VC2), which will direct
-the handler to a separate function which, for now, just calls panic().
-Not safe are the entry or unknown stacks.
+ Documentation/admin-guide/cgroup-v1/misc.rst |   1 +
+ Documentation/admin-guide/cgroup-v2.rst      |  64 ++-
+ arch/x86/kvm/svm/sev.c                       |  60 ++-
+ arch/x86/kvm/svm/svm.h                       |   1 +
+ include/linux/cgroup_subsys.h                |   4 +
+ include/linux/misc_cgroup.h                  |  75 +++
+ init/Kconfig                                 |  14 +
+ kernel/cgroup/Makefile                       |   1 +
+ kernel/cgroup/misc.c                         | 456 +++++++++++++++++++
+ 9 files changed, 664 insertions(+), 12 deletions(-)
+ create mode 100644 Documentation/admin-guide/cgroup-v1/misc.rst
+ create mode 100644 include/linux/misc_cgroup.h
+ create mode 100644 kernel/cgroup/misc.c
 
-The function then copies pt_regs and returns the new stack pointer to
-assembly code, which then writes it to %RSP.
+-- 
+2.30.0.617.g56c4b15f3c-goog
 
-> Unless AMD is more magic than I realize, the MOV SS bug^Wfeature means
-> that #DB is *not* always called in safe places.
-
-You are right, forgot about this. The MOV SS bug can very well
-trigger a #VC(#DB) exception from the syscall gap.
-
-> > And with SNP we need to be able to at least detect a malicious HV so we
-> > can reliably kill the guest. Otherwise the HV could potentially take
-> > control over the guest's execution flow and make it reveal its secrets.
-> 
-> True.  But is the rest of the machinery to be secure against EFLAGS.IF
-> violations and such in place yet?
-
-Not sure what you mean by EFLAGS.IF violations, probably enabling IRQs
-while in the #VC handler? The #VC handler _must_ _not_ enable IRQs
-anywhere in its call-path. If that ever happens it is a bug.
-
-Regards,
-
-	Joerg
