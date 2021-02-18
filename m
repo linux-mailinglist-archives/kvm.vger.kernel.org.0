@@ -2,548 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0C5431E2E8
-	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 00:06:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D37531E374
+	for <lists+kvm@lfdr.de>; Thu, 18 Feb 2021 01:23:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbhBQXGV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Feb 2021 18:06:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46394 "EHLO
+        id S230021AbhBRAW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Feb 2021 19:22:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhBQXGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Feb 2021 18:06:19 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9735C061574
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 15:05:38 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id c17so18087605ljn.0
-        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 15:05:38 -0800 (PST)
+        with ESMTP id S230018AbhBRAW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Feb 2021 19:22:57 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B37C061756
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:17 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id j4so569520ybt.23
+        for <kvm@vger.kernel.org>; Wed, 17 Feb 2021 16:22:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=D6hWOspvnF0bJnl46JKUcR6KMzeWafmpiTa2ZXRDLpk=;
-        b=YtpMGSXNu9aA722PwCcOpgIQeASNG2GMKjV7R5Yxng8L3Az28BCGszQrwfzJe5ZYOM
-         CwcW/eUb8MK4Cr6AVzf2VOor2gMS/N4lkfpPK6LphRMvDxp8x5S0wIfA4Lj4nwgOGodw
-         uYAj7Y2pgIHhZ/HaJUnBbnxnkhtHxRp5hbmwZKQnb+XzhX2B0XNWDEFzpK89/Z9YdJwZ
-         75OLF2diNMJbOCqdB6FUhIQ2ZikI62Rv02b/6h6pfbVLp+xnADnQ5nFIgff+r5frFtkQ
-         isDs61wvpL9OroC3TGCCm7zjhcKcTErokP1pQluT2FeSdY+0ia/S10VOxpt+cMV8zWar
-         OR8A==
+        d=google.com; s=20161025;
+        h=sender:reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=IZw0ECVBlM9vyeDxDPM3cu3JxE36bgau1ZklK6oBKCM=;
+        b=o//q+l0doxtqMPGEFqL/aFoXZ+/AZTyaoBBzkVBU48AKiEljEvZdMOQPZflMHfhxs6
+         mVYP90gDcAUKdcknXIysP5uBenkZyzcDznZ6fN56LEWVgOW8gfpQlkyHP/co5Fc/+t8b
+         T17ohirUpvdodKqqQOkTZ7Kk6Nd9jDN211M7zKy94fPRNombhl1QlwIiwG7y3v5Mz4qx
+         EIRg/bCW+hDaQMU9vktK3PFCnZaTL1R8g2aY+6ka2KFRLt78xJH4jnFjtOA0HCJwyIFV
+         1DJsvmO0rj9YutDoyoKfquzC5tF1mhXa8uNHBlS6qlpsFxvNGMEvLoy2K1dsxgWS+0IW
+         qzOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=D6hWOspvnF0bJnl46JKUcR6KMzeWafmpiTa2ZXRDLpk=;
-        b=LaDUXiHl1RSDGplvixbX6DMu1Ivnkoj0l52yCDdla+ra26NbfiSODl7fjDWqH1teW2
-         c2G2tZtm3mmXL7WXQBTSKVuyW7HE2XYJVqV30N2vBPNQRyubGAoqYVZd90TWDfFwRuE6
-         u+nUwx7vTd7lm4VaUlEe3TRUr81/1iI9VXQZp/TAVpKssk0H0/jiDS3NTVGjYW31CW4j
-         u+MnzaobWCQ9VxaVWziGz4sEobQaC58z8OTAUGOvt8iSmDXZLgiqZYo7KdPmi2FjcsbJ
-         5Cq6iFrQkcaBlO+kARpctUSrjHbBW54x2ykZe7dHKHM6QaEzKx/GJjLBhlm3jUlEJyZv
-         ysEQ==
-X-Gm-Message-State: AOAM5335f13ekYmDCCwiyBhTQprzvgMObh6TxqxYAanrgqg/qt2efl6+
-        JmK1haN8Ayv4SLiXaUs/1Ag8AdBhZLHm+A==
-X-Google-Smtp-Source: ABdhPJxnFigFahJGCtua+vnFeonJb/xq6OSbvCcNccQzu018cwG4ftVYp+aGby+dtV63ijazj3VeRg==
-X-Received: by 2002:a2e:5ca:: with SMTP id 193mr950902ljf.70.1613603135785;
-        Wed, 17 Feb 2021 15:05:35 -0800 (PST)
-Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id w16sm398855ljh.86.2021.02.17.15.05.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Feb 2021 15:05:35 -0800 (PST)
-Message-ID: <e4eaeb9cf9955dc0ac0cde323f402a3bf024ab48.camel@gmail.com>
-Subject: Re: [RESEND RFC v2 1/4] KVM: add initial support for
- KVM_SET_IOREGION
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        jag.raman@oracle.com, elena.ufimtseva@oracle.com
-Date:   Wed, 17 Feb 2021 15:05:24 -0800
-In-Reply-To: <20210211145918.GV247031@stefanha-x1.localdomain>
-References: <cover.1611850290.git.eafanasova@gmail.com>
-         <de84fca7e7ad62943eb15e4e9dd598d4d0f806ef.1611850291.git.eafanasova@gmail.com>
-         <a3794e77-54ec-7866-35ba-c3d8a3908aa6@redhat.com>
-         <da345926a4689016296970d62d4432bb9abdc7b7.camel@gmail.com>
-         <20210211145918.GV247031@stefanha-x1.localdomain>
+        h=x-gm-message-state:sender:reply-to:date:message-id:mime-version
+         :subject:from:to:cc;
+        bh=IZw0ECVBlM9vyeDxDPM3cu3JxE36bgau1ZklK6oBKCM=;
+        b=SrBjvSOIbhe76YtWU9Jy0ssttPpEuXuuXtsRXMUUxGf6gOmeVRyRhhmJ2+iR2IlOeU
+         SD9GE72Za+vxxidTL9o4MSMKiRAb6gmFhwmK2OSE0gH5BOwSWY70X8Qcmer2k3uBHPEs
+         QThV56U+inw0Zz/1AJFZLLFVPNfNZ6atE18beqP6uFOftNDqqs2FUHjnkcUJijhDNQND
+         OIAIM3l652fXa0JVmGpLUmkoVrtwWhI4QWPNX47k/OOG7QKZwrHoVYXLx6ASE8pMJH7S
+         DtADakoAqd1UUktBhRYIx3rgZoYKK6uInmQvdQbpYamZjJyDDBedDomvuO1yXWHxhar0
+         UTow==
+X-Gm-Message-State: AOAM532Lk4OAVmTJlRyGb8TIOd5jli7S3UU+N5HDHsAU7AWfN7vkIJxb
+        yzq6s+doqgpM22ttmH/AZbdR6z5/Bzs=
+X-Google-Smtp-Source: ABdhPJyuXxO6IJnmRblKWvsaOLykVraSs3serv70iFI92zddcWDm6sHWUmPMNzmuf/8vDSc6NXkpeNIq2KE=
+Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:dc76:757f:9e9e:647c])
+ (user=seanjc job=sendgmr) by 2002:a25:4a84:: with SMTP id x126mr2878599yba.408.1613607736656;
+ Wed, 17 Feb 2021 16:22:16 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 17 Feb 2021 16:22:06 -0800
+Message-Id: <20210218002212.2904647-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
+Subject: [kvm-unit-tests PATCH 0/6] x86: nVMX: Unrestricted guest fix and cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.4-0ubuntu1 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-02-11 at 14:59 +0000, Stefan Hajnoczi wrote:
-> On Wed, Feb 10, 2021 at 11:31:30AM -0800, Elena Afanasova wrote:
-> > On Mon, 2021-02-08 at 14:21 +0800, Jason Wang wrote:
-> > > On 2021/1/30 上午2:48, Elena Afanasova wrote:
-> > > > This vm ioctl adds or removes an ioregionfd MMIO/PIO region.
-> > > > Guest
-> > > > read and write accesses are dispatched through the given
-> > > > ioregionfd
-> > > > instead of returning from ioctl(KVM_RUN). Regions can be
-> > > > deleted by
-> > > > setting fds to -1.
-> > > > 
-> > > > Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
-> > > > ---
-> > > > Changes in v2:
-> > > >    - changes after code review
-> > > > 
-> > > >   arch/x86/kvm/Kconfig     |   1 +
-> > > >   arch/x86/kvm/Makefile    |   1 +
-> > > >   arch/x86/kvm/x86.c       |   1 +
-> > > >   include/linux/kvm_host.h |  17 +++
-> > > >   include/uapi/linux/kvm.h |  23 ++++
-> > > >   virt/kvm/Kconfig         |   3 +
-> > > >   virt/kvm/eventfd.c       |  25 +++++
-> > > >   virt/kvm/eventfd.h       |  14 +++
-> > > >   virt/kvm/ioregion.c      | 232
-> > > > +++++++++++++++++++++++++++++++++++++++
-> > > >   virt/kvm/ioregion.h      |  15 +++
-> > > >   virt/kvm/kvm_main.c      |  11 ++
-> > > >   11 files changed, 343 insertions(+)
-> > > >   create mode 100644 virt/kvm/eventfd.h
-> > > >   create mode 100644 virt/kvm/ioregion.c
-> > > >   create mode 100644 virt/kvm/ioregion.h
-> > > > 
-> > > > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> > > > index f92dfd8ef10d..b914ef375199 100644
-> > > > --- a/arch/x86/kvm/Kconfig
-> > > > +++ b/arch/x86/kvm/Kconfig
-> > > > @@ -33,6 +33,7 @@ config KVM
-> > > >   	select HAVE_KVM_IRQ_BYPASS
-> > > >   	select HAVE_KVM_IRQ_ROUTING
-> > > >   	select HAVE_KVM_EVENTFD
-> > > > +	select KVM_IOREGION
-> > > >   	select KVM_ASYNC_PF
-> > > >   	select USER_RETURN_NOTIFIER
-> > > >   	select KVM_MMIO
-> > > > diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-> > > > index b804444e16d4..b3b17dc9f7d4 100644
-> > > > --- a/arch/x86/kvm/Makefile
-> > > > +++ b/arch/x86/kvm/Makefile
-> > > > @@ -12,6 +12,7 @@ KVM := ../../../virt/kvm
-> > > >   kvm-y			+= $(KVM)/kvm_main.o
-> > > > $(KVM)/coalesced_mmio.o \
-> > > >   				$(KVM)/eventfd.o
-> > > > $(KVM)/irqchip.o
-> > > > $(KVM)/vfio.o
-> > > >   kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
-> > > > +kvm-$(CONFIG_KVM_IOREGION)	+= $(KVM)/ioregion.o
-> > > >   
-> > > >   kvm-y			+= x86.o emulate.o i8259.o irq.o
-> > > > lapic.o \
-> > > >   			   i8254.o ioapic.o irq_comm.o cpuid.o
-> > > > pmu.o
-> > > > mtrr.o \
-> > > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > > index e545a8a613b1..ddb28f5ca252 100644
-> > > > --- a/arch/x86/kvm/x86.c
-> > > > +++ b/arch/x86/kvm/x86.c
-> > > > @@ -3739,6 +3739,7 @@ int kvm_vm_ioctl_check_extension(struct
-> > > > kvm
-> > > > *kvm, long ext)
-> > > >   	case KVM_CAP_X86_USER_SPACE_MSR:
-> > > >   	case KVM_CAP_X86_MSR_FILTER:
-> > > >   	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-> > > > +	case KVM_CAP_IOREGIONFD:
-> > > >   		r = 1;
-> > > >   		break;
-> > > >   	case KVM_CAP_SYNC_REGS:
-> > > > diff --git a/include/linux/kvm_host.h
-> > > > b/include/linux/kvm_host.h
-> > > > index 7f2e2a09ebbd..7cd667dddba9 100644
-> > > > --- a/include/linux/kvm_host.h
-> > > > +++ b/include/linux/kvm_host.h
-> > > > @@ -470,6 +470,10 @@ struct kvm {
-> > > >   		struct mutex      resampler_lock;
-> > > >   	} irqfds;
-> > > >   	struct list_head ioeventfds;
-> > > > +#endif
-> > > > +#ifdef CONFIG_KVM_IOREGION
-> > > > +	struct list_head ioregions_mmio;
-> > > > +	struct list_head ioregions_pio;
-> > > >   #endif
-> > > >   	struct kvm_vm_stat stat;
-> > > >   	struct kvm_arch arch;
-> > > > @@ -1262,6 +1266,19 @@ static inline int kvm_ioeventfd(struct
-> > > > kvm
-> > > > *kvm, struct kvm_ioeventfd *args)
-> > > >   
-> > > >   #endif /* CONFIG_HAVE_KVM_EVENTFD */
-> > > >   
-> > > > +#ifdef CONFIG_KVM_IOREGION
-> > > > +void kvm_ioregionfd_init(struct kvm *kvm);
-> > > > +int kvm_ioregionfd(struct kvm *kvm, struct kvm_ioregion
-> > > > *args);
-> > > > +
-> > > > +#else
-> > > > +
-> > > > +static inline void kvm_ioregionfd_init(struct kvm *kvm) {}
-> > > > +static inline int kvm_ioregionfd(struct kvm *kvm, struct
-> > > > kvm_ioregion *args)
-> > > > +{
-> > > > +	return -ENOSYS;
-> > > > +}
-> > > > +#endif
-> > > > +
-> > > >   void kvm_arch_irq_routing_update(struct kvm *kvm);
-> > > >   
-> > > >   static inline void kvm_make_request(int req, struct kvm_vcpu
-> > > > *vcpu)
-> > > > diff --git a/include/uapi/linux/kvm.h
-> > > > b/include/uapi/linux/kvm.h
-> > > > index ca41220b40b8..81e775778c66 100644
-> > > > --- a/include/uapi/linux/kvm.h
-> > > > +++ b/include/uapi/linux/kvm.h
-> > > > @@ -732,6 +732,27 @@ struct kvm_ioeventfd {
-> > > >   	__u8  pad[36];
-> > > >   };
-> > > >   
-> > > > +enum {
-> > > > +	kvm_ioregion_flag_nr_pio,
-> > > > +	kvm_ioregion_flag_nr_posted_writes,
-> > > > +	kvm_ioregion_flag_nr_max,
-> > > > +};
-> > > > +
-> > > > +#define KVM_IOREGION_PIO (1 << kvm_ioregion_flag_nr_pio)
-> > > > +#define KVM_IOREGION_POSTED_WRITES (1 <<
-> > > > kvm_ioregion_flag_nr_posted_writes)
-> > > > +
-> > > > +#define KVM_IOREGION_VALID_FLAG_MASK ((1 <<
-> > > > kvm_ioregion_flag_nr_max) - 1)
-> > > > +
-> > > > +struct kvm_ioregion {
-> > > > +	__u64 guest_paddr; /* guest physical address */
-> > > > +	__u64 memory_size; /* bytes */
-> > > 
-> > > Do we really need __u64 here?
-> > > 
-> > > 
-> > > > +	__u64 user_data;
-> > > > +	__s32 rfd;
-> > > > +	__s32 wfd;
-> > > > +	__u32 flags;
-> > > > +	__u8  pad[28];
-> > > > +};
-> > > > +
-> > > >   #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
-> > > >   #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
-> > > >   #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-> > > > @@ -1053,6 +1074,7 @@ struct kvm_ppc_resize_hpt {
-> > > >   #define KVM_CAP_X86_USER_SPACE_MSR 188
-> > > >   #define KVM_CAP_X86_MSR_FILTER 189
-> > > >   #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
-> > > > +#define KVM_CAP_IOREGIONFD 191
-> > > >   
-> > > >   #ifdef KVM_CAP_IRQ_ROUTING
-> > > >   
-> > > > @@ -1308,6 +1330,7 @@ struct kvm_vfio_spapr_tce {
-> > > >   					struct
-> > > > kvm_userspace_memory_region)
-> > > >   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
-> > > >   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
-> > > > +#define KVM_SET_IOREGION          _IOW(KVMIO,  0x49, struct
-> > > > kvm_ioregion)
-> > > >   
-> > > >   /* enable ucontrol for s390 */
-> > > >   struct kvm_s390_ucas_mapping {
-> > > > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> > > > index 1c37ccd5d402..5e6620bbf000 100644
-> > > > --- a/virt/kvm/Kconfig
-> > > > +++ b/virt/kvm/Kconfig
-> > > > @@ -17,6 +17,9 @@ config HAVE_KVM_EVENTFD
-> > > >          bool
-> > > >          select EVENTFD
-> > > >   
-> > > > +config KVM_IOREGION
-> > > > +       bool
-> > > > +
-> > > >   config KVM_MMIO
-> > > >          bool
-> > > >   
-> > > > diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> > > > index c2323c27a28b..aadb73903f8b 100644
-> > > > --- a/virt/kvm/eventfd.c
-> > > > +++ b/virt/kvm/eventfd.c
-> > > > @@ -27,6 +27,7 @@
-> > > >   #include <trace/events/kvm.h>
-> > > >   
-> > > >   #include <kvm/iodev.h>
-> > > > +#include "ioregion.h"
-> > > >   
-> > > >   #ifdef CONFIG_HAVE_KVM_IRQFD
-> > > >   
-> > > > @@ -755,6 +756,23 @@ static const struct kvm_io_device_ops
-> > > > ioeventfd_ops = {
-> > > >   	.destructor = ioeventfd_destructor,
-> > > >   };
-> > > >   
-> > > > +#ifdef CONFIG_KVM_IOREGION
-> > > > +/* assumes kvm->slots_lock held */
-> > > > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx,
-> > > > +			  u64 start, u64 size)
-> > > > +{
-> > > > +	struct _ioeventfd *_p;
-> > > > +
-> > > > +	list_for_each_entry(_p, &kvm->ioeventfds, list)
-> > > > +		if (_p->bus_idx == bus_idx &&
-> > > > +		    overlap(start, size, _p->addr,
-> > > > +			    !_p->length ? 8 : _p->length))
-> > > > +			return true;
-> > > > +
-> > > > +	return false;
-> > > > +}
-> > > > +#endif
-> > > > +
-> > > >   /* assumes kvm->slots_lock held */
-> > > >   static bool
-> > > >   ioeventfd_check_collision(struct kvm *kvm, struct _ioeventfd
-> > > > *p)
-> > > > @@ -770,6 +788,13 @@ ioeventfd_check_collision(struct kvm *kvm,
-> > > > struct _ioeventfd *p)
-> > > >   		       _p->datamatch == p->datamatch))))
-> > > >   			return true;
-> > > >   
-> > > > +#ifdef CONFIG_KVM_IOREGION
-> > > > +	if (p->bus_idx == KVM_MMIO_BUS || p->bus_idx ==
-> > > > KVM_PIO_BUS)
-> > > > +		if (kvm_ioregion_collides(kvm, p->bus_idx, p-
-> > > > >addr,
-> > > > +					  !p->length ? 8 : p-
-> > > > >length))
-> > > > +			return true;
-> > > > +#endif
-> > > > +
-> > > >   	return false;
-> > > >   }
-> > > >   
-> > > > diff --git a/virt/kvm/eventfd.h b/virt/kvm/eventfd.h
-> > > > new file mode 100644
-> > > > index 000000000000..73a621eebae3
-> > > > --- /dev/null
-> > > > +++ b/virt/kvm/eventfd.h
-> > > > @@ -0,0 +1,14 @@
-> > > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > > +#ifndef __KVM_EVENTFD_H__
-> > > > +#define __KVM_EVENTFD_H__
-> > > > +
-> > > > +#ifdef CONFIG_KVM_IOREGION
-> > > > +bool kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64
-> > > > start,
-> > > > u64 size);
-> > > > +#else
-> > > > +static inline bool
-> > > > +kvm_eventfd_collides(struct kvm *kvm, int bus_idx, u64 start,
-> > > > u64
-> > > > size)
-> > > > +{
-> > > > +	return false;
-> > > > +}
-> > > > +#endif
-> > > > +#endif
-> > > > diff --git a/virt/kvm/ioregion.c b/virt/kvm/ioregion.c
-> > > > new file mode 100644
-> > > > index 000000000000..48ff92bca966
-> > > > --- /dev/null
-> > > > +++ b/virt/kvm/ioregion.c
-> > > > @@ -0,0 +1,232 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > > +#include <linux/kvm_host.h>
-> > > > +#include <linux/fs.h>
-> > > > +#include <kvm/iodev.h>
-> > > > +#include "eventfd.h"
-> > > > +
-> > > > +void
-> > > > +kvm_ioregionfd_init(struct kvm *kvm)
-> > > > +{
-> > > > +	INIT_LIST_HEAD(&kvm->ioregions_mmio);
-> > > > +	INIT_LIST_HEAD(&kvm->ioregions_pio);
-> > > > +}
-> > > > +
-> > > > +struct ioregion {
-> > > > +	struct list_head     list;
-> > > > +	u64                  paddr;  /* guest physical address
-> > > > */
-> > > > +	u64                  size;   /* size in bytes */
-> > > > +	struct file         *rf;
-> > > > +	struct file         *wf;
-> > > > +	u64                  user_data; /* opaque token used by
-> > > > userspace */
-> > > > +	struct kvm_io_device dev;
-> > > > +	bool                 posted_writes;
-> > > > +};
-> > > > +
-> > > > +static inline struct ioregion *
-> > > > +to_ioregion(struct kvm_io_device *dev)
-> > > > +{
-> > > > +	return container_of(dev, struct ioregion, dev);
-> > > > +}
-> > > > +
-> > > > +/* assumes kvm->slots_lock held */
-> > > > +static void
-> > > > +ioregion_release(struct ioregion *p)
-> > > > +{
-> > > > +	fput(p->rf);
-> > > > +	fput(p->wf);
-> > > > +	list_del(&p->list);
-> > > > +	kfree(p);
-> > > > +}
-> > > > +
-> > > > +static int
-> > > > +ioregion_read(struct kvm_vcpu *vcpu, struct kvm_io_device
-> > > > *this,
-> > > > gpa_t addr,
-> > > > +	      int len, void *val)
-> > > > +{
-> > > > +	return -EOPNOTSUPP;
-> > > > +}
-> > > > +
-> > > > +static int
-> > > > +ioregion_write(struct kvm_vcpu *vcpu, struct kvm_io_device
-> > > > *this,
-> > > > gpa_t addr,
-> > > > +		int len, const void *val)
-> > > > +{
-> > > > +	return -EOPNOTSUPP;
-> > > > +}
-> > > > +
-> > > > +/*
-> > > > + * This function is called as KVM is completely shutting
-> > > > down.  We
-> > > > do not
-> > > > + * need to worry about locking just nuke anything we have as
-> > > > quickly as possible
-> > > > + */
-> > > > +static void
-> > > > +ioregion_destructor(struct kvm_io_device *this)
-> > > > +{
-> > > > +	struct ioregion *p = to_ioregion(this);
-> > > > +
-> > > > +	ioregion_release(p);
-> > > > +}
-> > > > +
-> > > > +static const struct kvm_io_device_ops ioregion_ops = {
-> > > > +	.read       = ioregion_read,
-> > > > +	.write      = ioregion_write,
-> > > > +	.destructor = ioregion_destructor,
-> > > > +};
-> > > > +
-> > > > +static inline struct list_head *
-> > > > +get_ioregion_list(struct kvm *kvm, enum kvm_bus bus_idx)
-> > > > +{
-> > > > +	return (bus_idx == KVM_MMIO_BUS) ?
-> > > > +		&kvm->ioregions_mmio : &kvm->ioregions_pio;
-> > > > +}
-> > > > +
-> > > > +/* check for not overlapping case and reverse */
-> > > > +inline bool
-> > > > +overlap(u64 start1, u64 size1, u64 start2, u64 size2)
-> > > > +{
-> > > > +	u64 end1 = start1 + size1 - 1;
-> > > > +	u64 end2 = start2 + size2 - 1;
-> > > > +
-> > > > +	return !(end1 < start2 || start1 >= end2);
-> > > > +}
-> > > > +
-> > > > +/* assumes kvm->slots_lock held */
-> > > > +bool
-> > > > +kvm_ioregion_collides(struct kvm *kvm, int bus_idx,
-> > > > +		      u64 start, u64 size)
-> > > > +{
-> > > > +	struct ioregion *_p;
-> > > > +	struct list_head *ioregions;
-> > > > +
-> > > > +	ioregions = get_ioregion_list(kvm, bus_idx);
-> > > > +	list_for_each_entry(_p, ioregions, list)
-> > > > +		if (overlap(start, size, _p->paddr, _p->size))
-> > > > +			return true;
-> > > > +
-> > > > +	return false;
-> > > > +}
-> > > > +
-> > > > +/* assumes kvm->slots_lock held */
-> > > > +static bool
-> > > > +ioregion_collision(struct kvm *kvm, struct ioregion *p, enum
-> > > > kvm_bus bus_idx)
-> > > > +{
-> > > > +	if (kvm_ioregion_collides(kvm, bus_idx, p->paddr, p-
-> > > > >size) ||
-> > > > +	    kvm_eventfd_collides(kvm, bus_idx, p->paddr, p-
-> > > > >size))
-> > > > +		return true;
-> > > > +
-> > > > +	return false;
-> > > > +}
-> > > > +
-> > > > +static enum kvm_bus
-> > > > +get_bus_from_flags(__u32 flags)
-> > > > +{
-> > > > +	if (flags & KVM_IOREGION_PIO)
-> > > > +		return KVM_PIO_BUS;
-> > > > +	return KVM_MMIO_BUS;
-> > > > +}
-> > > > +
-> > > > +int
-> > > > +kvm_set_ioregion(struct kvm *kvm, struct kvm_ioregion *args)
-> > > > +{
-> > > > +	struct ioregion *p;
-> > > > +	struct file *rfile, *wfile;
-> > > > +	enum kvm_bus bus_idx;
-> > > > +	int ret = 0;
-> > > > +
-> > > > +	if (!args->memory_size)
-> > > > +		return -EINVAL;
-> > > > +	if ((args->guest_paddr + args->memory_size - 1) < args-
-> > > > > guest_paddr)
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	rfile = fget(args->rfd);
-> > > > +	if (!rfile)
-> > > > +		return -EBADF;
-> > > 
-> > > So the question still, if we want to use ioregion fd for
-> > > doorbell,
-> > > we 
-> > > don't need rfd in this case?
-> > > 
-> > Using ioregionfd for doorbell seems to be an open question.
-> > Probably it
-> > could just focus on the non-doorbell cases.
-> 
-> Below you replied FAST_MMIO will be in v3. That is the doorbell case,
-> so
-> maybe it is in scope for this patch series?
-> 
-Ok, will fix
+Two fixes to skip (sub)tests that rely on unrestricted guest if URG isn't
+supported, clean ups for related code to make triaging test failures a bit
+easier. Ideally, even more info would be provided on failure, e.g. line
+number, but that'd best be done as a (much) larger overhaul.
 
-> I think continuing to use ioeventfd for most doorbell registers makes
-> sense.
-> 
-> However, there are two cases where ioregionfd doorbell support is
-> interesting:
-> 
-> 1. The (non-FAST_MMIO) case where the application needs to know the
->    value written to the doorbell. ioeventfd cannot do this (datamatch
->    can handle a subset of cases but not all) so we need ioregionfd
-> for
->    this.
-> 
-> 2. The FAST_MMIO case just for convenience if applications prefer to
-> use
->    a single API (ioregionfd) instead of implementing both ioregionfd
-> and
->    ioeventfd.
-> 
-> ioeventfd will still have its benefits (and limitations) that make it
-> different from ioregionfd. In particular, ioregionfd will not merge
-> doorbell writes into a single message because doing so would
-> basically
-> involve reimplementing ioeventfd functionality as part of ioregionfd
-> and
-> isn't compatible with the current approach where userspace can
-> provide
-> any file descriptor for communication.
-> 
-> Elena and Jason: do you agree with this API design?
+Sean Christopherson (6):
+  x86: nVMX: Verify unrestricted guest is supported in segment tests
+  x86: nVMX: Skip unrestricted guest (URG) test if URG isn't supported
+  x86: nVMX: Improve report messages for segment selector tests
+  x86: nVMX: Improve report messages for segment base tests
+  x86: nVMX: Use more descriptive name for GDT/IDT limit tests
+  x86: nVMX: Add an equals sign to show value assoc. in
+    test_guest_state()
 
-I’m still not sure about coalescing the writes support, but in general
-it looks ok to me.
+ x86/vmx_tests.c | 157 ++++++++++++++++++++++++------------------------
+ 1 file changed, 77 insertions(+), 80 deletions(-)
+
+-- 
+2.30.0.478.g8a0d178c01-goog
 
