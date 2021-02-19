@@ -2,147 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E86D731F91D
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:13:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EFE731F91E
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:13:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbhBSMK7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 07:10:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45579 "EHLO
+        id S229879AbhBSMMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 07:12:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33558 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230241AbhBSMKv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 07:10:51 -0500
+        by vger.kernel.org with ESMTP id S229524AbhBSMM0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 07:12:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613736559;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1613736659;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=H0j06Q/EpAZvGEReV+kqCVRCNZpaO1eYalr07yFsh78=;
-        b=cq7ft99J0WAmsQ+/sZheDmYdqHNvx1bMp1KD6ItbRE4DVM7YJl7hKOiYfVJuH0QNpvn7WZ
-        vTOSoCsey/DMyvvd1TEhMuyx4W6d+k8FAQJdAhzW9zrqEyBxLTttNndjZNVpQlQUb8NJRT
-        ogJVXR1F/3kcZSo6HtQFD48jG6QU900=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-VmaPh9eDOoGcai2XI86w2A-1; Fri, 19 Feb 2021 07:09:17 -0500
-X-MC-Unique: VmaPh9eDOoGcai2XI86w2A-1
-Received: by mail-wr1-f72.google.com with SMTP id l3so724538wrx.15
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 04:09:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H0j06Q/EpAZvGEReV+kqCVRCNZpaO1eYalr07yFsh78=;
-        b=DPggsGQroS1IsuCyj0ZBJtR9MIX9XsLrIyBiXToAXoX1X60AAa512RxxRSlXer6dVz
-         SJt3YsZFswoxm1XI83jXcpVXne9+tvV5Y8MkKvLFlNllr1IgxfhvChcZlJfJU9NkIlwh
-         t1lui8LYPw6UgYxjAi+nZgfR9v83cqHe3hw/OTaM1c4C5KxNUHK3HtgKmzsKb/OsiEpJ
-         RHxO/WLZlza+BHS9bVzPFcKNiRe+CrrM1TJ9rahUubHYhC6JzeEG51OZloKV1SE/N966
-         7/eV0pfKijXy/JtG7NEs0vc+AN1+1oFGFhDQKCGxdSEK4PWnU/5zKLF643zs0ILc7LFB
-         30Yg==
-X-Gm-Message-State: AOAM531qHAzyCuuC1kFENbuLOlAoWgN3lyxFgwsmumIzEiI85IyG7xIc
-        DO2BPv7QehOgeYK3A4yuJQX5OVUg/6RBkvGT1roKgikTbydCJZXBAZXMxlo6fj8ZoYj7m3ghm1a
-        Z0t2aagf2+lsB8oIRTX4g2NwPkdiFVWxLUnTdI877jfEH5qu+FOFtJ/iTM+3FxQ==
-X-Received: by 2002:adf:dc83:: with SMTP id r3mr9028697wrj.53.1613736555950;
-        Fri, 19 Feb 2021 04:09:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxw/T3ZfMjUCs4n5WYSN6vBdrm/b7SQb17yJe6mqRiyTZfFmy9E3rQEwsMtWD3AILPt2bfV/g==
-X-Received: by 2002:adf:dc83:: with SMTP id r3mr9028654wrj.53.1613736555703;
-        Fri, 19 Feb 2021 04:09:15 -0800 (PST)
-Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id o129sm11997743wme.21.2021.02.19.04.09.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Feb 2021 04:09:15 -0800 (PST)
-Subject: Re: [PATCH 0/7] hw/kvm: Exit gracefully when KVM is not supported
+        bh=45Dm/mZfrJbWzizoN9wLVx4pShqBQ+9iMXBHgbG5TR0=;
+        b=VIcFCYwwxZkaEh9FI7T3JH5HW0ogcVtMvS+Wvssi+66HaS5X2mizXEwZV/tQUMLi+YSNql
+        fO24TCnW+MG1GPHHSW/G7cPjtW0awyoyfgsENRgbU08yQBXihWkUBOQp0Ck9kesZsXcUaI
+        yNBJQ8Jb+oFqz3zQPWLTIfyBBafK4gI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-AFE5aQfpPteMhmzp8Pa9qA-1; Fri, 19 Feb 2021 07:10:43 -0500
+X-MC-Unique: AFE5aQfpPteMhmzp8Pa9qA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDEB1100A8E9;
+        Fri, 19 Feb 2021 12:10:40 +0000 (UTC)
+Received: from redhat.com (ovpn-113-184.ams2.redhat.com [10.36.113.184])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 653155C1BB;
+        Fri, 19 Feb 2021 12:10:30 +0000 (UTC)
+Date:   Fri, 19 Feb 2021 12:10:27 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
         Radoslaw Biernacki <rad@semihalf.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        qemu-s390x <qemu-s390x@nongnu.org>, Greg Kurz <groug@kaod.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Thomas Huth <thuth@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
+        kvm-devel <kvm@vger.kernel.org>,
         David Hildenbrand <david@redhat.com>,
-        qemu-ppc <qemu-ppc@nongnu.org>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
         Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        kvm-devel <kvm@vger.kernel.org>
+        Thomas Huth <thuth@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+        Leif Lindholm <leif@nuviainc.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>, qemu-s390x <qemu-s390x@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        qemu-ppc <qemu-ppc@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [PATCH 2/7] hw/boards: Introduce 'kvm_supported' field to
+ MachineClass
+Message-ID: <YC+qs7R140qAWnJY@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20210219114428.1936109-1-philmd@redhat.com>
- <CAFEAcA_66DuWfrftpaodqBZwBhS-VOD9uH=KwvGYC_VcksVFAA@mail.gmail.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f0677f28-9b1a-eac6-c160-a8db13606216@redhat.com>
-Date:   Fri, 19 Feb 2021 13:09:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ <20210219114428.1936109-3-philmd@redhat.com>
+ <YC+nxWnB+eaiq736@redhat.com>
+ <CAFEAcA-A=TG43w2yNfrDwCgYYNZBEa25cM_yYgREfQyKa=PZEQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_66DuWfrftpaodqBZwBhS-VOD9uH=KwvGYC_VcksVFAA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFEAcA-A=TG43w2yNfrDwCgYYNZBEa25cM_yYgREfQyKa=PZEQ@mail.gmail.com>
+User-Agent: Mutt/2.0.5 (2021-01-21)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/19/21 12:55 PM, Peter Maydell wrote:
-> On Fri, 19 Feb 2021 at 11:44, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->> This series aims to improve user experience by providing
->> a better error message when the user tries to enable KVM
->> on machines not supporting it.
+On Fri, Feb 19, 2021 at 12:08:05PM +0000, Peter Maydell wrote:
+> On Fri, 19 Feb 2021 at 11:58, Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > Is the behaviour reported really related to KVM specifically, as opposed
+> > to all hardware based virt backends ?
+> >
+> > eg is it actually a case of some machine types being  "tcg_only" ?
 > 
-> Thanks for having a look at this; fixing the ugly assertion
-> failure if you try to enable KVM for the raspi boards has
-> been vaguely on my todo list but never made it up to the top...
-
-The other one annoying was the xlnx-zcu102 when creating
-the Cortex-R cores.
-
->> Philippe Mathieu-Daudé (7):
->>   accel/kvm: Check MachineClass kvm_type() return value
->>   hw/boards: Introduce 'kvm_supported' field to MachineClass
->>   hw/arm: Set kvm_supported for KVM-compatible machines
->>   hw/mips: Set kvm_supported for KVM-compatible machines
->>   hw/ppc: Set kvm_supported for KVM-compatible machines
->>   hw/s390x: Set kvm_supported to s390-ccw-virtio machines
->>   accel/kvm: Exit gracefully when KVM is not supported
+> Interesting question. At least for Arm the major items are:
+>  * does the accelerator support emulation of EL3/TrustZone?
+>    (KVM doesn't; this is the proximate cause of the assertion
+>    failure if you try to enable KVM for the raspi boards.)
+>  * does the board type require a particular CPU type which
+>    KVM doesn't/can't support?
+> Non-KVM accelerators could at least in theory have different answers
+> to those questions, though in practice I think they do not.
 > 
-> Don't we also need to set kvm_supported for the relevant
-> machine types in hw/i386 ?
+> I think my take is that we probably should mark the boards
+> as 'tcg-only' vs 'not-tcg-only', because in practice that's
+> the interesting distinction. Specifically, our security policy
+> https://qemu.readthedocs.io/en/latest/system/security.html
+> draws a boundary between "virtualization use case" and
+> "emulated", so it's really helpful to be able to say clearly
+> "this board model does not support virtualization, and therefore
+> any bugs in it or its devices are simply outside the realm of
+> being security issues" when doing analysis of the codebase or
+> when writing or reviewing new code.
 
-Lol, clearly a parapraxis =)
+Oh, yes, that is useful to correlate with.
 
-I'll send it as 8/7 until I get more review comments for a
-v2 (in particular on the PPC patch):
+> If we ever have support for some new accelerator type where there's
+> a board type distinction between KVM and that new accelerator and
+> it makes sense to try to say "this board is supported by the new
+> thing even though it won't work with KVM", the folks interested in
+> adding that new accelerator will have the motivation to look
+> into exactly which boards they want to enable support for and
+> can add a funky_accelerator_supported flag or whatever at that time.
+> 
+> Summary: we should name this machine class field
+> "virtualization_supported" and check it in all the virtualization
+> accelerators (kvm, hvf, whpx, xen).
 
--- >8 --
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 6329f90ef90..da895aa051d 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1218,6 +1218,7 @@ static void x86_machine_class_init(ObjectClass
-*oc, void *data)
-     mc->cpu_index_to_instance_props = x86_cpu_index_to_props;
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-+    mc->kvm_supported = true;
-     x86mc->compat_apic_id_mode = false;
-     x86mc->save_tsc_khz = true;
-     nc->nmi_monitor_handler = x86_nmi;
----
+Agreed.
 
 Regards,
-
-Phil.
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
