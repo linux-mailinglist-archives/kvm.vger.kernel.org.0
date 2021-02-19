@@ -2,82 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A63931F95C
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:23:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0276731F971
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:37:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbhBSMXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 07:23:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36435 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229808AbhBSMXJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 07:23:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613737303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+Tg+vSjGJcVmeddEziwuXmeKFVeBsoRCqWhBDUVvD+U=;
-        b=Pw/9HkAUGfvk3qnspmqHWQiq7fwCT6O0llWr/nDElkVBSEz7zcSAl7PzXB4//6z048/3XN
-        gcDZkyh2snoOySjVBRNaih8Vo7Y7toz3s1+uaICTeXnB88b4RN5UAi8xr4JMI8BdcAAFoE
-        3y/q3eyoKUfmfgxb8b9yTDWM1evauTI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-zGtX_md1PLO-mW0aPqUi2Q-1; Fri, 19 Feb 2021 07:21:39 -0500
-X-MC-Unique: zGtX_md1PLO-mW0aPqUi2Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95067801985;
-        Fri, 19 Feb 2021 12:21:38 +0000 (UTC)
-Received: from gondolin (ovpn-113-92.ams2.redhat.com [10.36.113.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 18ECB5D723;
-        Fri, 19 Feb 2021 12:21:33 +0000 (UTC)
-Date:   Fri, 19 Feb 2021 13:21:31 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tian Tao <tiantao6@hisilicon.com>
-Cc:     <alex.williamson@redhat.com>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH] vfio/iommu_type1: Fix duplicate included kthread.h
-Message-ID: <20210219132131.0414e977.cohuck@redhat.com>
-In-Reply-To: <1613614649-59501-1-git-send-email-tiantao6@hisilicon.com>
-References: <1613614649-59501-1-git-send-email-tiantao6@hisilicon.com>
-Organization: Red Hat GmbH
+        id S230245AbhBSMf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 07:35:29 -0500
+Received: from mx2.suse.de ([195.135.220.15]:54172 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230180AbhBSMf0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Feb 2021 07:35:26 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 15495ACBF;
+        Fri, 19 Feb 2021 12:34:45 +0000 (UTC)
+Subject: Re: [PATCH 0/7] hw/kvm: Exit gracefully when KVM is not supported
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Radoslaw Biernacki <rad@semihalf.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Thomas Huth <thuth@redhat.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+        Leif Lindholm <leif@nuviainc.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org,
+        qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+References: <20210219114428.1936109-1-philmd@redhat.com>
+From:   Claudio Fontana <cfontana@suse.de>
+Message-ID: <89bb6db0-0411-e219-3df8-8300664b54f3@suse.de>
+Date:   Fri, 19 Feb 2021 13:34:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210219114428.1936109-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Feb 2021 10:17:29 +0800
-Tian Tao <tiantao6@hisilicon.com> wrote:
-
-> linux/kthread.h is included more than once, remove the one that isn't
-> necessary.
+On 2/19/21 12:44 PM, Philippe Mathieu-Daudé wrote:
+> Hi,
 > 
-> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 1 -
->  1 file changed, 1 deletion(-)
+> This series aims to improve user experience by providing
+> a better error message when the user tries to enable KVM
+> on machines not supporting it.
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ec9fd95..b3df383 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -31,7 +31,6 @@
->  #include <linux/rbtree.h>
->  #include <linux/sched/signal.h>
->  #include <linux/sched/mm.h>
-> -#include <linux/kthread.h>
->  #include <linux/slab.h>
->  #include <linux/uaccess.h>
->  #include <linux/vfio.h>
+> Regards,
+> 
+> Phil.
 
-This is not in Linus' tree yet, only on Alex' next branch, would be
-good to mention that.
+Hi Philippe, not sure if it fits in this series,
 
-Fixes: 898b9eaeb3fe ("vfio/type1: block on invalid vaddr")
+but also the experience of a user running on a machine with cortex-a72,
+choosing that very same cpu with -cpu and then getting:
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+qemu-system-aarch64: kvm_init_vcpu: kvm_arch_init_vcpu failed (0): Invalid argument
+
+is not super-friendly. Maybe some suggestion to use -cpu host with KVM could be good?
+
+Thanks,
+
+Claudio
+
+> 
+> Philippe Mathieu-Daudé (7):
+>   accel/kvm: Check MachineClass kvm_type() return value
+>   hw/boards: Introduce 'kvm_supported' field to MachineClass
+>   hw/arm: Set kvm_supported for KVM-compatible machines
+>   hw/mips: Set kvm_supported for KVM-compatible machines
+>   hw/ppc: Set kvm_supported for KVM-compatible machines
+>   hw/s390x: Set kvm_supported to s390-ccw-virtio machines
+>   accel/kvm: Exit gracefully when KVM is not supported
+> 
+>  include/hw/boards.h        |  6 +++++-
+>  accel/kvm/kvm-all.c        | 12 ++++++++++++
+>  hw/arm/sbsa-ref.c          |  1 +
+>  hw/arm/virt.c              |  1 +
+>  hw/arm/xlnx-versal-virt.c  |  1 +
+>  hw/mips/loongson3_virt.c   |  1 +
+>  hw/mips/malta.c            |  1 +
+>  hw/ppc/e500plat.c          |  1 +
+>  hw/ppc/mac_newworld.c      |  1 +
+>  hw/ppc/mac_oldworld.c      |  1 +
+>  hw/ppc/mpc8544ds.c         |  1 +
+>  hw/ppc/ppc440_bamboo.c     |  1 +
+>  hw/ppc/prep.c              |  1 +
+>  hw/ppc/sam460ex.c          |  1 +
+>  hw/ppc/spapr.c             |  1 +
+>  hw/s390x/s390-virtio-ccw.c |  1 +
+>  16 files changed, 31 insertions(+), 1 deletion(-)
+> 
 
