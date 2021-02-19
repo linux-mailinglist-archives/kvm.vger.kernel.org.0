@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEA6231F93A
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:15:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9B2031F93C
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:15:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbhBSMPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 07:15:11 -0500
-Received: from foss.arm.com ([217.140.110.172]:35110 "EHLO foss.arm.com"
+        id S230419AbhBSMPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 07:15:17 -0500
+Received: from foss.arm.com ([217.140.110.172]:35114 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230195AbhBSMPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Feb 2021 07:15:07 -0500
+        id S230382AbhBSMPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Feb 2021 07:15:08 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D19813D5;
-        Fri, 19 Feb 2021 04:13:40 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 312AC143B;
+        Fri, 19 Feb 2021 04:13:41 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F9C93F73B;
-        Fri, 19 Feb 2021 04:13:39 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 535863F73B;
+        Fri, 19 Feb 2021 04:13:40 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     drjones@redhat.com, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu
 Cc:     andre.przywara@arm.com, eric.auger@redhat.com
-Subject: [kvm-unit-tests PATCH v4 06/11] arm/arm64: gic: Check spurious and bad_sender in the active test
-Date:   Fri, 19 Feb 2021 12:13:32 +0000
-Message-Id: <20210219121337.76533-7-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v4 07/11] arm/arm64: gic: Wait for writes to acked or spurious to complete
+Date:   Fri, 19 Feb 2021 12:13:33 +0000
+Message-Id: <20210219121337.76533-8-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210219121337.76533-1-alexandru.elisei@arm.com>
 References: <20210219121337.76533-1-alexandru.elisei@arm.com>
@@ -33,72 +33,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The gicv{2,3}-active test sends an IPI from the boot CPU to itself, then
-checks that the interrupt has been received as expected. The
-ipi_clear_active_handler() clears the active state of the interrupt with a
-write to the GICD_ICACTIVER register instead of writing the to EOI
-register.
+The IPI test has two parts: in the first part, it tests that the sender CPU
+can send an IPI to itself (ipi_test_self()), and in the second part it
+sends interrupts to even-numbered CPUs (ipi_test_smp()). When acknowledging
+an interrupt, if we read back a spurious interrupt ID (1023), the handler
+increments the index in the static array spurious corresponding to the CPU
+ID that the handler is running on; if we get the expected interrupt ID, we
+increment the same index in the acked array.
 
-When acknowledging the interrupt it is possible to get back an spurious
-interrupt ID (ID 1023), and the interrupt handler increments the number of
-spurious interrupts received on the current processor. However, this is not
-checked at the end of the test. Let's also check for spurious interrupts,
-like the IPI test does.
+Reads of the spurious and acked arrays are synchronized with writes
+performed before sending the IPI. The synchronization is done either in the
+IPI sender function (GICv3), either by creating a data dependency (GICv2).
 
-For IPIs on GICv2, the value returned by a read of the GICC_IAR register
-performed when acknowledging the interrupt also contains the sender CPU
-ID. Add a check for that too.
+At the end of the test, the sender CPU reads from the acked and spurious
+arrays to check against the expected behaviour. We need to make sure the
+that writes in ipi_handler() are observable by the sender CPU. Use a DSB
+ISHST to make sure that the writes have completed.
+
+One might rightfully argue that there are no guarantees regarding when the
+DSB instruction completes, just like there are no guarantees regarding when
+the value is observed by the other CPUs. However, let's do our best and
+instruct the CPU to complete the memory access when we know that it will be
+needed.
+
+We still need to follow the message passing pattern for the acked,
+respectively bad_irq and bad_sender, because DSB guarantees that all memory
+accesses that come before the barrier have completed, not that they have
+completed in program order.
 
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/gic.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ arm/gic.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/arm/gic.c b/arm/gic.c
-index c1b6c94a5f5e..982c96681cf9 100644
+index 982c96681cf9..af4d4645c0ae 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -125,12 +125,12 @@ static void check_spurious(void)
- 	}
- }
- 
--static void check_ipi_sender(u32 irqstat)
-+static void check_ipi_sender(u32 irqstat, int sender)
+@@ -117,7 +117,6 @@ static void check_spurious(void)
  {
- 	if (gic_version() == 2) {
- 		int src = (irqstat >> 10) & 7;
+ 	int cpu;
  
--		if (src != IPI_SENDER)
-+		if (src != sender)
- 			bad_sender[smp_processor_id()] = src;
- 	}
- }
-@@ -148,7 +148,7 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 
- 	if (irqnr != GICC_INT_SPURIOUS) {
- 		gic_write_eoir(irqstat);
--		check_ipi_sender(irqstat);
-+		check_ipi_sender(irqstat, IPI_SENDER);
- 		check_irqnr(irqnr);
- 		smp_wmb(); /* pairs with smp_rmb in check_acked */
- 		++acked[smp_processor_id()];
-@@ -382,6 +382,7 @@ static void ipi_clear_active_handler(struct pt_regs *regs __unused)
- 
- 		writel(val, base + GICD_ICACTIVER);
- 
-+		check_ipi_sender(irqstat, smp_processor_id());
- 		check_irqnr(irqnr);
+-	smp_rmb();
+ 	for_each_present_cpu(cpu) {
+ 		if (spurious[cpu])
+ 			report_info("WARN: cpu%d got %d spurious interrupts",
+@@ -154,8 +153,10 @@ static void ipi_handler(struct pt_regs *regs __unused)
  		++acked[smp_processor_id()];
  	} else {
-@@ -394,6 +395,7 @@ static void run_active_clear_test(void)
- 	report_prefix_push("active");
- 	setup_irq(ipi_clear_active_handler);
- 	ipi_test_self();
-+	check_spurious();
- 	report_prefix_pop();
+ 		++spurious[smp_processor_id()];
+-		smp_wmb();
+ 	}
++
++	/* Wait for writes to acked/spurious to complete */
++	dsb(ishst);
  }
  
+ static void setup_irq(irq_handler_fn handler)
 -- 
 2.30.1
 
