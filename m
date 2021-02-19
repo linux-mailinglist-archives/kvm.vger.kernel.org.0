@@ -2,153 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56DCB31F3B0
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 02:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 668AD31F7E7
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:07:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbhBSBvW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 20:51:22 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:51976 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbhBSBvV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 20:51:21 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11J1k10V081831;
-        Fri, 19 Feb 2021 01:50:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : in-reply-to : references : date : message-id : content-type :
- mime-version; s=corp-2020-01-29;
- bh=+QG1zWH1ppShT0dMhv1m48pdvl6SN4oIUNnr+QC+e3o=;
- b=QjdjURj8CXTgoe80LWlXapmXVFp/RYotJ6BaERi8K45tOxs9A14/cKp5Hp+8vkuRRqxo
- f6sCdWxvyVk7XYP5w8eJaB3QUBxzlwdCpyWFdq3R8her0s1c7uQCBdpGX5Hmk25nFRKk
- PghDtqVrc297wNWurShMgAbmzpLaOhECk++vkZX/qg5xmUMbjPf45pcTrmK5G5iudcuL
- lhpdsKvK53Da6KCWJtUNxwGSAgT/JVJp2otplPK3DvZZ30RrCLpuPPZWr2jBePMLHnSl
- ivFZ8JZcJi0VFEgQIWxA3SEFS4OsTTRMIeHC0ubT+DWIEMQJDc1YYNzEHinSZQQZ3RXi Ow== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 36p66r7xge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Feb 2021 01:50:25 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11J1kQJj073127;
-        Fri, 19 Feb 2021 01:50:25 GMT
-Received: from nam04-sn1-obe.outbound.protection.outlook.com (mail-sn1nam04lp2058.outbound.protection.outlook.com [104.47.44.58])
-        by userp3030.oracle.com with ESMTP id 36prq19d4h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Feb 2021 01:50:25 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fxa7PQF/NW5WEgwbBYf7xYEz0a0dLflKEieCZyZ+C1EFxiqEuk8p3no0IsrWYXXevrDTDYOxm7cALFVM+OK88U2W4AxCyZXQYNJk4q47ZETSk/om5/m87hukVg7VCxYDkp1eROHsuExVp713iJfwpPa1lCoW/50+PESQkEnSy55BvGoPTiqeaRvP8D06FkafcCXgSOV1InhraNOMF+/sykh2ftQEUCkkwGIbENABPbcuuzt1HgtzI2dJk/T2u9KI0e1xOhPaKmMobxuXbBouGk7gU0fIEPt4vBXTZWwzczY1zT0MyL+gbwDBI2uaEqhQhP5JldBqmJQ/epjkXWzn6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+QG1zWH1ppShT0dMhv1m48pdvl6SN4oIUNnr+QC+e3o=;
- b=hA6K2nMa2x+p1mLcu57HIo7NxZw9tLgwCMOZPZr8TEBGoCrPPQ9VJhhX+XfaiS+5OIV3bPr6Nvb09HNGuVlY5KEQXKigKV+qTkE2hEL8ZqDT6WjCqayUfBwlAQlVxm/RowPDDQMkgaIENZvUa8lWvkQGDpRfs+NThmKkbR6EHUc0dS/Qa2E28kwup7q+IYtcyr4vWmJBDy2h+RpeYSFO85v6Zfx9LhNyhsIYkxWsy+ifvsJf7TmTFKljsg6gMadZH40Lv/necJvVa932Ccaug9G33BRQsoTm6T1W0S3VpwRT1DqxzBChwCm5BwenY9/XF326zltq/Bp7MfPGj2pnRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+QG1zWH1ppShT0dMhv1m48pdvl6SN4oIUNnr+QC+e3o=;
- b=STdlAKENemt8rqfQaNu9I6zfCMvUQWEMm1jBse/WGCdrmzzjHzn+hphZeqcdNQT3nIuhLC3WCKcaVmmN4bniYZprZRRflRU6arBa39f7px5VRFdt4nKJLDV+Ughq21b5pjSDpIgd2cQr6396aD5RSqixc7dLAKb6HNFB+Nf7fL4=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from MWHPR10MB1774.namprd10.prod.outlook.com (2603:10b6:301:9::13)
- by CO1PR10MB4468.namprd10.prod.outlook.com (2603:10b6:303:6c::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.26; Fri, 19 Feb
- 2021 01:50:23 +0000
-Received: from MWHPR10MB1774.namprd10.prod.outlook.com
- ([fe80::24eb:1300:dd70:4183]) by MWHPR10MB1774.namprd10.prod.outlook.com
- ([fe80::24eb:1300:dd70:4183%3]) with mapi id 15.20.3846.042; Fri, 19 Feb 2021
- 01:50:23 +0000
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Steven Sistare <steven.sistare@oracle.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] vfio/type1: batch page pinning
-In-Reply-To: <20210218120153.4023ae85@omen.home.shazbot.org>
-References: <20210203204756.125734-1-daniel.m.jordan@oracle.com>
- <20210203204756.125734-4-daniel.m.jordan@oracle.com>
- <20210218120153.4023ae85@omen.home.shazbot.org>
-Date:   Thu, 18 Feb 2021 20:50:08 -0500
-Message-ID: <87mtw0x1v3.fsf@oracle.com>
-Content-Type: text/plain
-X-Originating-IP: [98.229.125.203]
-X-ClientProxiedBy: MN2PR03CA0002.namprd03.prod.outlook.com
- (2603:10b6:208:23a::7) To MWHPR10MB1774.namprd10.prod.outlook.com
- (2603:10b6:301:9::13)
+        id S230206AbhBSLGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 06:06:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230106AbhBSLGh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Feb 2021 06:06:37 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5589CC061574;
+        Fri, 19 Feb 2021 03:05:57 -0800 (PST)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id AAE9A295; Fri, 19 Feb 2021 12:05:54 +0100 (CET)
+Date:   Fri, 19 Feb 2021 12:05:49 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Joerg Roedel <jroedel@suse.de>, X86 ML <x86@kernel.org>,
+        stable <stable@vger.kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>
+Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
+ adjusting #VC IST stack
+Message-ID: <20210219110549.GI7302@8bytes.org>
+References: <20210217120143.6106-1-joro@8bytes.org>
+ <20210217120143.6106-3-joro@8bytes.org>
+ <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
+ <20210218112500.GH7302@8bytes.org>
+ <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
+ <20210218192117.GL12716@suse.de>
+ <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from parnassus (98.229.125.203) by MN2PR03CA0002.namprd03.prod.outlook.com (2603:10b6:208:23a::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.27 via Frontend Transport; Fri, 19 Feb 2021 01:50:22 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d2e43920-fdfe-4d46-ead6-08d8d478b8a7
-X-MS-TrafficTypeDiagnostic: CO1PR10MB4468:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CO1PR10MB44686FC1352B946AE6942E7FD9849@CO1PR10MB4468.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d7ktVdIjOztRHh8iqLG/XT53iZKHOmS2eDbQhe464ulQ+Qp0PyGXAJgZw0WbqkC1CXns7KGUqvsq/+ZM8vhEKaHpJONKQCyIkXm6PZbrU6BZgngWuGC4HHMthW9g/qeoqj1UeHS0q/xAdN3Dp/UtNijNCwvSq/8p19VzzAO3u67Z/gi60Ww8tGdAPJecLAFnGK5xl8ZU7gaqB3iyW59UskpICVjRNQe+p5E+pZ3fLvMSetrVL41d5c2GhUttoiPEZN4UsMvSb5K6f1YShhEz7y01xlQ9bjG2oUgelVNOx5k3KIP6w0fnFRNL4sXJVfMF3b+g/BSC6QFlAcknNPAMB3dTbihjX0UGmVmdQ6k9gLb3NWAuPw0VTyQHWreL5/RJ51Z87JuhJRPFswLmQGNDlEnJhpYOz4atsbmiYQdsMLPoR/OzNmtF71yTRUU1VO+Xhntn0eNY1UF/l0CLSY0KReafX1Q3Zrsd80N0DVgMf0D6fpNfonOG4xCLA8KlW52HeFlyLRbXDRVyk6IbbZk0NA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR10MB1774.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(376002)(39860400002)(396003)(346002)(66476007)(2616005)(66946007)(6486002)(6666004)(558084003)(6496006)(36756003)(26005)(5660300002)(4326008)(186003)(6916009)(956004)(54906003)(2906002)(8936002)(316002)(16526019)(86362001)(66556008)(8676002)(52116002)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?tSmIU6as9tenNCqfytWTJhk8EpO4E9gme2YmHJPkiWjUXSO9QMoWa1ee1Ysz?=
- =?us-ascii?Q?MqfEaPKI1cLwONtK65nef09JrVT1tGWgDSBcgcVibOyx+EwqplhECw5xu7MM?=
- =?us-ascii?Q?acnGUU3Da8zrbUtYiDSv867FfqBd7y785swMjKILNVyK8T4rsysYQYpXwsLE?=
- =?us-ascii?Q?zjd2HyBK6yWdiDTaStPRQeopHXX23LFBeIeY5m7ycph78MKMXxS4Igmoqguv?=
- =?us-ascii?Q?AwcBn6eb9gmH2+SWA0B1kDshbU3kgSpLCMu62+DE7QMC8IRl1sPzueyZY/qq?=
- =?us-ascii?Q?fL0hHzdnf3HwE75K6oaRg/uzm32K6O5WUDq48zB56mXMmg+P68j6JXxpZ5kj?=
- =?us-ascii?Q?vAUrAs3OQMgbT3NiDT9Y2FXMe4ZaXxjt/8IAMVIT7jPNzTUhONQS1Z8a9ujt?=
- =?us-ascii?Q?W3fSSkQLKIycb2ygjQ6dpBYc9yX0YkrjN3zjMrNeZOyjKzdJCkHQeAEFj9Zs?=
- =?us-ascii?Q?nJv3WZueNg1TiA0McoNAkeXB82mDPy8d4FyJY9v6+hrLG7lkPsKOWPyH6Ybw?=
- =?us-ascii?Q?e3CjgR6k7Wr9hOkp57fmJktH91kOGXX1pZOJwy9jKTOKC0HORxeH08Z+Ieee?=
- =?us-ascii?Q?4aMlIsz3CIaZvtnyt5zg390PcJODXXsl0qWjso6OnZtqOSOwz6/LIccx1n89?=
- =?us-ascii?Q?J6APamCng6wlfCmiythhKXdFosF7If0dAmaRRgbCdsJpgJHbF9qktFmGa2ZO?=
- =?us-ascii?Q?EOhBJwoT1efzrzqdDutCA0m87CIAQg8dIY+xrMIN1JU8LI6+Ng6ntdZ0ICTc?=
- =?us-ascii?Q?iMen9qT0KAZXYDFQ9jArtuTiQpgc1x3MujGQd8SSmFCrLcfPmeCz/jSPoh71?=
- =?us-ascii?Q?i+9Nlf+jN2r9b8XFCqVDNuLqJp0Oq6UV8LXSlSzxfqA63Vy4Gpr3s2ruQI4p?=
- =?us-ascii?Q?Z2i5c+lsWA9X0EOF5Z2Cw7oZ6lLmObh9ESphPY9xrg+QMYkWqHqDBpQyxm7Q?=
- =?us-ascii?Q?xlywZ9Hapjpot+DYsAwX1aJ33bOup1H12JdegY6RLQ54g6Fr3hCsVgEvtiRY?=
- =?us-ascii?Q?3jdLZj6HdiAt6Hh2EvfeK64fcroWhPh23E44vav0fhHjDqiZDd4KKyP+S7Ub?=
- =?us-ascii?Q?y8pr6Y0xEQwmtofOq3CQMFwVSoxMdzbQJGu1azHMiEaAukHExyVlCFQdsLcS?=
- =?us-ascii?Q?r0JLLm1WxiXn3gLY84NH1uB1vnkOVS4nqYbM5PnoXDX/qeXDgM34N0JMjXZv?=
- =?us-ascii?Q?J13+GzL4b73HxCORzjhel3Ge4wIRvDrDfzRXmkUk4HDUEEbdmZj1wTIvPPnv?=
- =?us-ascii?Q?bMJ5IumilF9vFghHMyQVS724Xw90SPzmvR+fyEBAJVWbh82KArDW/ZPMwgb/?=
- =?us-ascii?Q?k6o7iqO/WqmTOQbyvD1rzcF3?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2e43920-fdfe-4d46-ead6-08d8d478b8a7
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR10MB1774.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2021 01:50:23.5090
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MukJ1h3dJvjUJpw5sa7JVETxEFRm3Kqqe1mR4yL8tJtSwSsoBAE8Mz9PdSYwcjkaphOHG9Dy58U6o7gXI5G/DJWhvPsMwDjHD+TlEoUavbI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4468
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9899 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
- phishscore=0 adultscore=0 mlxscore=0 suspectscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102190008
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9899 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 suspectscore=0
- impostorscore=0 priorityscore=1501 clxscore=1015 spamscore=0 mlxscore=0
- phishscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102190008
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex Williamson <alex.williamson@redhat.com> writes:
-> This might not be the first batch we fill, I think this needs to unwind
-> rather than direct return.
+On Thu, Feb 18, 2021 at 04:28:36PM -0800, Andy Lutomirski wrote:
+> On Thu, Feb 18, 2021 at 11:21 AM Joerg Roedel <jroedel@suse.de> wrote:
+> Can you give me an example, even artificial, in which the linked-list
+> logic is useful?
 
-So it does, well spotted.  And it's the same thing with the ENODEV case
-farther up.
+So here we go, its of course artificial, but still:
 
-> Series looks good otherwise.
+	1. #VC happens, not important where
+	2. NMI in the #VC prologue before it moved off its IST stack
+	   - first VC IST adjustment happening here
+	3. #VC in the NMI handler
+	4. #HV in the #VC prologue again
+	   - second VC IST adjustment happening here, so the #HV handler
+	     can cause its own #VC exceptions.
 
-Thanks for going through it!
+Can only happen if the #HV handler is allowed to cause #VC exceptions.
+But even if its not allowed, it can happen with SNP and a malicious
+Hypervisor. But in this case the only option is to reliably panic.
+
+> Can you explain your reasoning in considering the entry stack unsafe?
+> It's 4k bytes these days.
+
+I wasn't aware that it is 4k in size now. I still thought it was just
+these 64 words large and one can not simply execute C code on it.
+
+> You forgot about entry_SYSCALL_compat.
+
+Right, thanks for pointing this out.
+
+> Your 8-byte alignment is confusing to me.  In valid kernel code, SP
+> should be 8-byte-aligned already, and, if you're trying to match
+> architectural behavior, the CPU aligns to 16 bytes.
+
+Yeah, I was just being cautious. The explicit alignment can be removed,
+Boris also pointed this out.
+
+> We're not robust against #VC, NMI in the #VC prologue before the magic
+> stack switch, and a new #VC in the NMI prologue.  Nor do we appear to
+> have any detection of the case where #VC nests directly inside its own
+> prologue.  Or did I miss something else here?
+
+No, you don't miss anything here. At the moment #VC can't happen at
+those places, so this is not handled yet. With SNP it can happen and
+needs to be handled in a way to at least allow a reliable panic (because
+if it really happens the Hypervisor is messing with us).
+
+> If we get NMI and get #VC in the NMI *asm*, the #VC magic stack switch
+> looks like it will merrily run itself in the NMI special-stack-layout
+> section, and that sounds really quite bad.
+
+Yes, I havn't looked at the details yet, but if a #VC happens there it
+probably better not returns.
+
+
+> I mean that, IIRC, a malicious hypervisor can inject inappropriate
+> vectors at inappropriate times if the #HV mechanism isn't enabled.
+> For example, it could inject a page fault or an interrupt in a context
+> in which we have the wrong GSBASE loaded.
+
+Yes, a malicious Hypervisor can do that, and without #HV there is no
+real protection against this besides turning all vectors (even IRQs)
+into paranoid entries. Maybe even more care is needed, but I think its
+not worth to care about this. 
+
+> But the #DB issue makes this moot.  We have to use IST unless we turn
+> off SCE.  But I admit I'm leaning toward turning off SCE until we have
+> a solution that seems convincingly robust.
+
+Turning off SCE might be tempting, but I guess doing so would break a
+quite some user-space code, no?
+
+Regards,
+
+	Joerg
