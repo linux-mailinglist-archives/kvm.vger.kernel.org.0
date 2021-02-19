@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9731D31FE10
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:42:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EEE231FE12
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:42:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbhBSRks (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 12:40:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23067 "EHLO
+        id S229577AbhBSRkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 12:40:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31261 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229607AbhBSRko (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:44 -0500
+        by vger.kernel.org with ESMTP id S229930AbhBSRku (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613756357;
+        s=mimecast20190719; t=1613756363;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CHXCPuc7uWQdwucv7FWJOUQ8ceg9IO3ZY73rXU3+wF0=;
-        b=Q//+IvXATgpteRyAb5zA5a1N4Jbhh7Y/VARQF41rbKKoehBpCZYfXiN3A6qzJk5otpfWBT
-        uw5m8qoBe1OPLYjujE3N/rS37CPpwruk1TvjrUAZsP+GZaWmypi55xt1xrlg28tmuTKSY9
-        cEK7Zj28mrsA6D3UfjtmIdRRfrUfZo0=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-555-8jm2tcdsOfO0MchGmEInWg-1; Fri, 19 Feb 2021 12:39:14 -0500
-X-MC-Unique: 8jm2tcdsOfO0MchGmEInWg-1
-Received: by mail-wm1-f72.google.com with SMTP id p8so2768848wmq.7
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:14 -0800 (PST)
+        bh=ltjnESlJDd3H5QR2j8eiWOyKx9h8jJk2C0jWkjeNUew=;
+        b=eq9f8YTsHSiZHbZaEbSyygRDuLddjYVZUiSZjEmOtmPvGeR5wxzWfqNuoKpHKzYNJ5+oCC
+        m/pFJAeWJmnA+7E6qAjCBQ6jIDSz4LxESwzBeomPps4ZIcMsXpys4aYJiinK506u07eovq
+        v28D+PeiZGWHcWyHk4DsGUtF37m80oQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-392-ZGLsO0QIPd26Dl4ag2rtYg-1; Fri, 19 Feb 2021 12:39:20 -0500
+X-MC-Unique: ZGLsO0QIPd26Dl4ag2rtYg-1
+Received: by mail-wr1-f69.google.com with SMTP id d10so2748099wrq.17
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=CHXCPuc7uWQdwucv7FWJOUQ8ceg9IO3ZY73rXU3+wF0=;
-        b=Ro4rr+fur67r4yuNTsPp/5fSIuLhbA9QdRw8ry/SciD43Wmzqy9pD3Mw6Z/edKozhd
-         xO2RHdpTkWcHY/PvWwP5D0d5VdmKCRk+HZFSOeYrHuhpCDh1zBzxHO1qrL/n56qV40na
-         qcCYc8oJzqMozwpQtph+zlZfQ+2HNpKECjYOrJBOzZXHGFnuWEEt6lcYYualqf5IBwdo
-         NW9jXf4XV+vgUv8i7EpBfi0ENgB7G3yvy8qtcy1Ppk2NWtW13AzoqlMpqSPhcUKql7LZ
-         qj3FXf/2Z67+3aeGRkaB3jr8dPfc/GqMpz8rErMvWZ1NkRaq4+JoSMJOpf37SfR1ewPd
-         gJ+w==
-X-Gm-Message-State: AOAM531m9bMouxHI8pLh5grMzz2wkESxoG/0o5oCR9Lyg4qD3WrbtcUL
-        S5SxY4uRnmXJMVukc1GVWn0Ls95dZ0WKBbHm0l9kLLu0A5xKNP6gMT23FUV7BHDOltXxvRcYoMM
-        6Vmt00kHjRnX6
-X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr10610942wri.105.1613756353508;
-        Fri, 19 Feb 2021 09:39:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwrzSzq1o4kGieINb1Q744LtUd4TVffu+lfi/YVrFtocFVQ1Ale5KqgmXk7Upte5EwmyzFbHA==
-X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr10610915wri.105.1613756353383;
-        Fri, 19 Feb 2021 09:39:13 -0800 (PST)
+        bh=ltjnESlJDd3H5QR2j8eiWOyKx9h8jJk2C0jWkjeNUew=;
+        b=fPAJOJrokRzxHESUebyAfMHbIaGUEdt2qwtJGAIBLnS0JcMRiBNBYdHGROsMGue7Nh
+         PVHkrWu/TpyGhNRydUT2ImecL76P07nhYRmsizWGMc3e5X7UTE9aNQz/9I0rjTQhC029
+         ceiJAT1CEink/U3T0gid6AwB+tnmUliMn41wE7GyylGRAlFsoM0CCCDNNieQ0ZryrdNF
+         ETD5Ydtv0S4WUTHRiPcxKmBsxjzvfzSsjEVZDtPkOx4vF1MJELS6/SA3p8aNzRAZKPVQ
+         e7el62voaB3WykgX1P0QX24gL0WpIzZbe3xW8CIZ+PjRN50IHDjJFTseYkS+4m2jPYQC
+         Mx0Q==
+X-Gm-Message-State: AOAM532azuyQmhFPyUjTY6Xr6Wky+SIJGn8MeI1ccv+9M2gMUh2ih7jk
+        tcRbpLpJEFVLgkHuEg//XPcB2Tie11t4KZQ5y4IMluREka/cQpmSn48IxiS6cD7zQdKd41dapIK
+        PotQ5kfoXDZPs
+X-Received: by 2002:a5d:558b:: with SMTP id i11mr10341338wrv.125.1613756359008;
+        Fri, 19 Feb 2021 09:39:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyksADAECUrKIFfE8NXfSBq0p9Yv0QU1jPKKdp6ensUX0SFo+MEZzOE/tMgXW9KlqBOatRsLw==
+X-Received: by 2002:a5d:558b:: with SMTP id i11mr10341310wrv.125.1613756358861;
+        Fri, 19 Feb 2021 09:39:18 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id q20sm12010000wmc.14.2021.02.19.09.39.11
+        by smtp.gmail.com with ESMTPSA id f7sm14534967wre.78.2021.02.19.09.39.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 09:39:12 -0800 (PST)
+        Fri, 19 Feb 2021 09:39:18 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -83,9 +83,9 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v2 04/11] hw/arm: Restrit KVM to the virt & versal machines
-Date:   Fri, 19 Feb 2021 18:38:40 +0100
-Message-Id: <20210219173847.2054123-5-philmd@redhat.com>
+Subject: [PATCH v2 05/11] hw/mips: Restrict KVM to the malta & virt machines
+Date:   Fri, 19 Feb 2021 18:38:41 +0100
+Message-Id: <20210219173847.2054123-6-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210219173847.2054123-1-philmd@redhat.com>
 References: <20210219173847.2054123-1-philmd@redhat.com>
@@ -96,62 +96,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Restrit KVM to the following ARM machines:
-- virt
-- xlnx-versal-virt
+Restrit KVM to the following MIPS machines:
+- malta
+- loongson3-virt
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/arm/virt.c             | 5 +++++
- hw/arm/xlnx-versal-virt.c | 5 +++++
+ hw/mips/loongson3_virt.c | 5 +++++
+ hw/mips/malta.c          | 5 +++++
  2 files changed, 10 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 371147f3ae9..8e9861b61a9 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2527,6 +2527,10 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
- 
-+static const char *const valid_accels[] = {
-+    "tcg", "kvm", "hvf", NULL
-+};
-+
- /*
-  * for arm64 kvm_type [7-0] encodes the requested number of bits
-  * in the IPA address space
-@@ -2582,6 +2586,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
-     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
-     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-+    mc->valid_accelerators = valid_accels;
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 8482cd61960..d424813cae1 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -610,6 +610,10 @@ static void versal_virt_machine_instance_init(Object *obj)
- {
+diff --git a/hw/mips/loongson3_virt.c b/hw/mips/loongson3_virt.c
+index d4a82fa5367..c3679dff043 100644
+--- a/hw/mips/loongson3_virt.c
++++ b/hw/mips/loongson3_virt.c
+@@ -612,6 +612,10 @@ static void mips_loongson3_virt_init(MachineState *machine)
+     loongson3_virt_devices_init(machine, liointc);
  }
  
 +static const char *const valid_accels[] = {
 +    "tcg", "kvm", NULL
 +};
 +
- static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+ static void loongson3v_machine_class_init(ObjectClass *oc, void *data)
  {
      MachineClass *mc = MACHINE_CLASS(oc);
-@@ -621,6 +625,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
-     mc->no_cdrom = true;
-     mc->default_ram_id = "ddr";
+@@ -622,6 +626,7 @@ static void loongson3v_machine_class_init(ObjectClass *oc, void *data)
+     mc->max_cpus = LOONGSON_MAX_VCPUS;
+     mc->default_ram_id = "loongson3.highram";
+     mc->default_ram_size = 1600 * MiB;
++    mc->valid_accelerators = valid_accels;
+     mc->kvm_type = mips_kvm_type;
+     mc->minimum_page_bits = 14;
+ }
+diff --git a/hw/mips/malta.c b/hw/mips/malta.c
+index 9afc0b427bf..0212048dc63 100644
+--- a/hw/mips/malta.c
++++ b/hw/mips/malta.c
+@@ -1443,6 +1443,10 @@ static const TypeInfo mips_malta_device = {
+     .instance_init = mips_malta_instance_init,
+ };
+ 
++static const char *const valid_accels[] = {
++    "tcg", "kvm", NULL
++};
++
+ static void mips_malta_machine_init(MachineClass *mc)
+ {
+     mc->desc = "MIPS Malta Core LV";
+@@ -1456,6 +1460,7 @@ static void mips_malta_machine_init(MachineClass *mc)
+     mc->default_cpu_type = MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
+     mc->default_ram_id = "mips_malta.ram";
 +    mc->valid_accelerators = valid_accels;
  }
  
- static const TypeInfo versal_virt_machine_init_typeinfo = {
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
 -- 
 2.26.2
 
