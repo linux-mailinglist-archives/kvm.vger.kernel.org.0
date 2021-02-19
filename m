@@ -2,173 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 179CC31F358
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 01:30:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EBFF31F3A4
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 02:32:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbhBSA3e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Feb 2021 19:29:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40930 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229652AbhBSA3b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Feb 2021 19:29:31 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 04A0C64EDF
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 00:28:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613694530;
-        bh=XbsLoD79HzHQqly0S2VCaRsexsZhuulcwadlRryuFVI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=EnEjMAplbBMgUU632l47b6HXvamYNlVa+mQE9mxN4F4s94i7qtxd+yapdnJScJDDq
-         IXVBtGB+/LFTRSjADCif2XD+KpEXV8Dg70ZRZECSTl4iHUXZHMey0qS5KED3ATohJn
-         C5cgquAM4QdQAIgdCNiBPZd7cvcD0iot1iUb89jJzbUCqzUxyUa4dvZPUveUdr055H
-         Z4vBn2UIz7CkcYjOM0mISuooqMCrNrPMtmvurqGm/RN599eJCQ9b6Dfo5QH0g7p3i2
-         uWtMcAqOqtG6+AiWtmGawtF+Q2FyQBFCSHshXf1L2tOGaMaXelCISBqBuWWHStjNDT
-         SLENxy9qFpEyg==
-Received: by mail-ed1-f49.google.com with SMTP id v22so6505585edx.13
-        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 16:28:49 -0800 (PST)
-X-Gm-Message-State: AOAM530JBH0GTJf/B17g3NdzKAHwqLSYrh4So0EJb4onWwectQsxBvbq
-        VgPkGSly5Ejsr6YznfRzPUskrHyzfC/W3Ysbeg+Zqg==
-X-Google-Smtp-Source: ABdhPJx9Qwm+IMP0TSh4MJrTsmNPHFpGyuNNe6499NISrHkiZ2SBmP2qxLCKH+CtYfp41fQqlTZSqQIL14KE4DiEbFI=
-X-Received: by 2002:a17:906:a44:: with SMTP id x4mr6276642ejf.101.1613694527433;
- Thu, 18 Feb 2021 16:28:47 -0800 (PST)
+        id S229577AbhBSBcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Feb 2021 20:32:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46836 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229474AbhBSBcN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Feb 2021 20:32:13 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE66AC061756
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 17:31:32 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id o63so2553197pgo.6
+        for <kvm@vger.kernel.org>; Thu, 18 Feb 2021 17:31:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=on3Xc1kBgya2mQ7PYzrDRMNVrOI3FgA//zQyIz5f6Ck=;
+        b=UD8xyuSA7oEUWkY01nX3UQto5fSE1E3SYJmEIbKQgMo9Tjwnh0IZnqET/U1low3KHH
+         Fd/D+fV0BPwn2SzaD7qpH6icokDQoKJeb53cSxTJaroQQUse8pJr60/q+qnP2b7MFZsA
+         yE0TZ0LV96LC2YBxbkmhAbKa0IM3YAlld/uuN5NSkWQcA4N1YEybw2JYz9OV07+NPEpe
+         Xf+EVPpxdHbyEFuLrDcDfM2pCVt86TQnwvuEXZ67Tg+5kcBx6vP29XbOvR1ld8TxfBxZ
+         APXtT0C4c85Xv+nHw8gHIg/3eNtRg+glflOdvR5MyUexuL9pnERrvw1Ta3Ok1Z0kEkiJ
+         h5lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=on3Xc1kBgya2mQ7PYzrDRMNVrOI3FgA//zQyIz5f6Ck=;
+        b=bTi7rHEfQsMJz7A6+m9+B8m1J0/ZqDodHjTYRdRtdfEdt6rMdYTtrljFqVYstgfU1Z
+         kBuIEByhwZzOUDXjuttAi6Mtzd/P3YWouM82bpdshjUVX2WexSi9+MWwV3UzYSqXvTeE
+         KTxQGde6zPAWO1nATMQm0RwZ7apfbBEA3pq+MiOc6fRzpkS5YedSVlf1mJFE9+tEdZbS
+         mIzmX1/GgC/mNSsnr+0n6n4tOedyaGjyN4FW88LGt8S/azQfMvhKFrrkA1G8Kpa/xjjg
+         o2ea288i5fRIeV2QDL2KpJLBMf1h2HE4J/PkBGwxsc+zoeDQYf/q6s1rOvqajVmEdhcI
+         ZEYQ==
+X-Gm-Message-State: AOAM531LY7AFEYP9xtRRC4sUDflwfAyU72gj2nLuus1F4m55e6l4gpgr
+        fDHZucmYodcU/H+I+D+bVw2o6g==
+X-Google-Smtp-Source: ABdhPJz+0RxCQ1buHKHhC9nAomV4SeEGZheG5rRB3NgkMO+fVeDVGEBz8TJc09l1ix1ZbTs2qSiaQQ==
+X-Received: by 2002:a63:2b82:: with SMTP id r124mr6350359pgr.310.1613698292070;
+        Thu, 18 Feb 2021 17:31:32 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:903f:bec1:f9d:479b])
+        by smtp.gmail.com with ESMTPSA id m10sm6396678pjn.33.2021.02.18.17.31.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Feb 2021 17:31:31 -0800 (PST)
+Date:   Thu, 18 Feb 2021 17:31:24 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Mike Kravetz <mike.kravetz@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Makarand Sonare <makarandsonare@google.com>
+Subject: Re: [PATCH 05/14] KVM: x86/mmu: Consult max mapping level when
+ zapping collapsible SPTEs
+Message-ID: <YC8U7IagCOfzeBpW@google.com>
+References: <20210213005015.1651772-1-seanjc@google.com>
+ <20210213005015.1651772-6-seanjc@google.com>
+ <caa90b6b-c2fa-d8b7-3ee6-263d485c5913@redhat.com>
+ <YC6UmukeFlrdWAxe@google.com>
+ <df6eb767-0ae0-84a3-3f05-1ece4cb9ce22@oracle.com>
 MIME-Version: 1.0
-References: <20210217120143.6106-1-joro@8bytes.org> <20210217120143.6106-3-joro@8bytes.org>
- <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
- <20210218112500.GH7302@8bytes.org> <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
- <20210218192117.GL12716@suse.de>
-In-Reply-To: <20210218192117.GL12716@suse.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Thu, 18 Feb 2021 16:28:36 -0800
-X-Gmail-Original-Message-ID: <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
-Message-ID: <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
-Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
- adjusting #VC IST stack
-To:     Joerg Roedel <jroedel@suse.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        X86 ML <x86@kernel.org>, stable <stable@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df6eb767-0ae0-84a3-3f05-1ece4cb9ce22@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 11:21 AM Joerg Roedel <jroedel@suse.de> wrote:
->
-> On Thu, Feb 18, 2021 at 09:49:06AM -0800, Andy Lutomirski wrote:
-> > I don't understand what this means.  The whole entry mechanism on x86
-> > is structured so that we call a C function *and return from that C
-> > function without longjmp-like magic* with the sole exception of
-> > unwind_stack_do_exit().  This means that you can match up enters and
-> > exits, and that unwind_stack_do_exit() needs to unwind correctly.  In
-> > the former case, it's normal C and we can use normal local variables.
-> > In the latter case, we know exactly what state we're trying to restore
-> > and we can restore it directly without any linked lists or similar.
->
-> Okay, the unwinder will likely get confused by this logic.
->
-> > What do you have in mind that requires a linked list?
->
-> Cases when there are multiple IST vectors besides NMI that can hit while
-> the #VC handler is still on its own IST stack. #MCE comes to mind, but
-> that is broken anyway. At some point #VC itself will be one of them, but
-> when that happens the code will kill the machine.
-> This leaves #HV in the list, and I am not sure how that is going to be
-> handled yet. I think the goal is that the #HV handler is not allowed to
-> cause any #VC exception. In that case the linked-list logic will not be
-> needed.
+On Thu, Feb 18, 2021, Mike Kravetz wrote:
+> On 2/18/21 8:23 AM, Sean Christopherson wrote:
+> > On Thu, Feb 18, 2021, Paolo Bonzini wrote:
+> >> On 13/02/21 01:50, Sean Christopherson wrote:
+> >>>
+> >>>  		pfn = spte_to_pfn(iter.old_spte);
+> >>>  		if (kvm_is_reserved_pfn(pfn) ||
+> >>> -		    (!PageTransCompoundMap(pfn_to_page(pfn)) &&
+> >>> -		     !kvm_is_zone_device_pfn(pfn)))
+> >>> +		    iter.level >= kvm_mmu_max_mapping_level(kvm, slot, iter.gfn,
+> >>> +							    pfn, PG_LEVEL_NUM))
+> >>>  			continue;
+> >>
+> >>
+> >> This changes the test to PageCompound.  Is it worth moving the change to
+> >> patch 1?
+> > 
+> > Yes?  I originally did that in a separate patch, then changed my mind.
+> > 
+> > If PageTransCompoundMap() also detects HugeTLB pages, then it is the "better"
+> > option as it checks that the page is actually mapped huge.  I dropped the change
+> > because PageTransCompound() is just a wrapper around PageCompound(), and so I
+> > assumed PageTransCompoundMap() would detect HugeTLB pages, too.  I'm not so sure
+> > about that after rereading the code, yet again.
+> 
+> I have not followed this thread, but HugeTLB hit my mail filter and I can
+> help with this question.
+> 
+> No, PageTransCompoundMap() will not detect HugeTLB.  hugetlb pages do not
+> use the compound_mapcount_ptr field.  So, that final check/return in
+> PageTransCompoundMap() will always be false.
 
-Can you give me an example, even artificial, in which the linked-list
-logic is useful?
+Thanks Mike!
 
->
-> > > I don't see how this would break, can you elaborate?
-> > >
-> > > What I think happens is:
-> > >
-> > > SYSCALL gap (RSP is from userspace and untrusted)
-> > >
-> > >         -> #VC - Handler on #VC IST stack detects that it interrupted
-> > >            the SYSCALL gap and switches to the task stack.
-> > >
-> >
-> > Can you point me to exactly what code you're referring to?  I spent a
-> > while digging through the code and macro tangle and I can't find this.
->
-> See the entry code in arch/x86/entry/entry_64.S, macro idtentry_vc. It
-> creates the assembly code for the handler. At some point it calls
-> vc_switch_off_ist(), which is a C function in arch/x86/kernel/traps.c.
-> This function tries to find a new stack for the #VC handler.
->
-> The first thing it does is checking whether the exception came from the
-> SYSCALL gap and just uses the task stack in that case.
->
-> Then it will check for other kernel stacks which are safe to switch
-> to. If that fails it uses the fall-back stack (VC2), which will direct
-> the handler to a separate function which, for now, just calls panic().
-> Not safe are the entry or unknown stacks.
-
-Can you explain your reasoning in considering the entry stack unsafe?
-It's 4k bytes these days.
-
-You forgot about entry_SYSCALL_compat.
-
-Your 8-byte alignment is confusing to me.  In valid kernel code, SP
-should be 8-byte-aligned already, and, if you're trying to match
-architectural behavior, the CPU aligns to 16 bytes.
-
-We're not robust against #VC, NMI in the #VC prologue before the magic
-stack switch, and a new #VC in the NMI prologue.  Nor do we appear to
-have any detection of the case where #VC nests directly inside its own
-prologue.  Or did I miss something else here?
-
-If we get NMI and get #VC in the NMI *asm*, the #VC magic stack switch
-looks like it will merrily run itself in the NMI special-stack-layout
-section, and that sounds really quite bad.
-
->
-> The function then copies pt_regs and returns the new stack pointer to
-> assembly code, which then writes it to %RSP.
->
-> > Unless AMD is more magic than I realize, the MOV SS bug^Wfeature means
-> > that #DB is *not* always called in safe places.
->
-> You are right, forgot about this. The MOV SS bug can very well
-> trigger a #VC(#DB) exception from the syscall gap.
->
-> > > And with SNP we need to be able to at least detect a malicious HV so we
-> > > can reliably kill the guest. Otherwise the HV could potentially take
-> > > control over the guest's execution flow and make it reveal its secrets.
-> >
-> > True.  But is the rest of the machinery to be secure against EFLAGS.IF
-> > violations and such in place yet?
->
-> Not sure what you mean by EFLAGS.IF violations, probably enabling IRQs
-> while in the #VC handler? The #VC handler _must_ _not_ enable IRQs
-> anywhere in its call-path. If that ever happens it is a bug.
->
-
-I mean that, IIRC, a malicious hypervisor can inject inappropriate
-vectors at inappropriate times if the #HV mechanism isn't enabled.
-For example, it could inject a page fault or an interrupt in a context
-in which we have the wrong GSBASE loaded.
-
-But the #DB issue makes this moot.  We have to use IST unless we turn
-off SCE.  But I admit I'm leaning toward turning off SCE until we have
-a solution that seems convincingly robust.
+Paolo, I agree it makes sense to switch to PageCompound in the earlier patch, in
+case this one needs to be reverted.
