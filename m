@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F78A31FCE7
+	by mail.lfdr.de (Postfix) with ESMTP id F348131FCE9
 	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 17:15:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbhBSQOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 11:14:36 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:60424 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbhBSQOX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Feb 2021 11:14:23 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11JGARu3064502;
-        Fri, 19 Feb 2021 16:13:23 GMT
+        id S229974AbhBSQOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 11:14:43 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40172 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229826AbhBSQO0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Feb 2021 11:14:26 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11JG92u7160223;
+        Fri, 19 Feb 2021 16:13:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references :
  content-transfer-encoding : content-type : mime-version;
- s=corp-2020-01-29; bh=I8Eue09ui4c6W079IE76+/dJP1KETRcPp5O8R310Q7Y=;
- b=ZzKt7nWQr2voo4GyAiFjwJ9WbCmS3nl4PLdp+F44lFt1L6vRNelYlSNmlEM6Ai2algno
- g9kxM5rM15GBpAnI3tuh7XdVl86Bw7SZsbBE/sSOAo3i5GWHn+vjC+ObPQxoS05LMywF
- pukWaJI1rtvicO1fFppE7pcEAzfF8FkzyHXim3qLz1BGpA31bZdSdnc4nt865Pvfhr+U
- r0IZBctLt0QdtxVilessjziRR+FUB8NA2kgAeyAaqpnQahc6bC5JADF3Ri7eMnWUS2iV
- 0mIF3ojaQnyuC7OKwocWANcPKze9AtZrBi3cFNSUmaSKcNrmj1gt8xDXbQFTJlfGAS72 oQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 36p49bj6ny-1
+ s=corp-2020-01-29; bh=5zackTxoA0RJJHEkuijSFmeurzsR3/En0vMm++KsGWg=;
+ b=f92D1SJdUsHWu1jUfprKh9ucgtSZQisyGeRihXh/dK4SrqAEbrNZtaqr3QwFOA3hT+f8
+ xTTBIKV2DVbLT0KI+nV6COurknx+B1cQRfXT0Vr1eoC12Dma0f8RGunflaEpCECfn0Ng
+ FqKl+82TSjQfEqJGZwrZuHfB6gkuqxUGyWKYAxQujR9xwHWC6HVsjS2KzHcHCABFEDsd
+ DZIhIIEpXdh1bJtTIcewCN2zsKCpd+On9MVh711BfcYNrIF4lkxZZBGInu6tNW764aIT
+ 9ZPOERMKo9I42/5VM2b5pgLEPgPYSmcPCzbX8rKAYU3IHVw1eTlz340Kt+8ZZMpYNeb/ Tg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 36p66ra26b-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Feb 2021 16:13:23 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11JGAWwP166919;
-        Fri, 19 Feb 2021 16:13:22 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2054.outbound.protection.outlook.com [104.47.36.54])
-        by aserp3030.oracle.com with ESMTP id 36prbs9rm0-1
+        Fri, 19 Feb 2021 16:13:24 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11JGBmeq146540;
+        Fri, 19 Feb 2021 16:13:24 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam08lp2047.outbound.protection.outlook.com [104.47.73.47])
+        by userp3020.oracle.com with ESMTP id 36prhvtevc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Feb 2021 16:13:22 +0000
+        Fri, 19 Feb 2021 16:13:24 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hlxphXNDtnPFdznuchlB36iJ3M8/wZn+gcHa1UemAe52fV35T7cQRZAkLCAg75QmRySWbPn7Ki+S+s2mLLVxYVRSGyVQQnqPtKP6FTVBGaD85uiSRxUUT49kj6axFLt2g/d3zOcipCukxPeEkEEUP0tJjJds4aTgQK5SPdXmcjEUps9GuAbQObhwu/nvE7l3sH+xaRJf5/95lC2o9xw9BfAaJ94AlkUe3LQNy5xJpnc3RHvxT6g5wcr1exDeFcskXULKB1vnxJOrvTFx5TKidr2Q0B1rWULHkS5ahgDGr8euispabCz5/0Ll/0EuxS8xRknZwoeaUOgzuY06VeyAxA==
+ b=NDAhXsYdxObOFevVWpLuUyz/MblmH4f5HUWAanNCOZqHE4nIo513Oe6m+gjfq9zu2xf2CnoyQ8QnBNpAVsPTaDfVa4tclYUu2N71ygwGyv7hLPSi2rBOjqkOdb9deSCYjh2VPaK54yzYtbf4nQ+MPuJBvQbTVmRtrfk+Ff8B3oJbItA74w7JE8biSba1X0b9LPAObC/8qDNVi1IGCePXiLyH9n21iQ1SIo/tdXDN4RxI1idPNlmvCeP4I05ORabYKd3+lbCKvRcSw+DIIEmGgubQ0f+3XMaa/gqdbvKn1qe6deqog5+kXQFkM9oxJEhFdV2fHoH7QDV5ze+Wa74frw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I8Eue09ui4c6W079IE76+/dJP1KETRcPp5O8R310Q7Y=;
- b=cpP3TFknoHN2knVRQcpN7W5JNVx9u5L4Pyg6zpYfZJWCbZ9Sl7fySc4VOJfB6xvBOP4JCwdo6FUHE0mt0ztnPtCpdm922Jyv+SIPteVsaxgaA6bkejfvNdVnm1z3AlVN/kz9Tj5FEsg4hZJvsydKiSqIh6Rncfx2vnFIPiQ8nkTcjq7jVQVW/XnpOx0gNlvkJnbrUSVtk/Rz3TRUBdSLD69C+6JjkM95Sjtq+K/R6VRHg0wVr29iM6fTDVkHiMfOaXL34tNDzB5l9vlh6AMO48k36e/W9OrHJKkttntpfRqHD25Y/ZgRqej36syMgser/99oeblqUXm8qcFR4Pv+zw==
+ bh=5zackTxoA0RJJHEkuijSFmeurzsR3/En0vMm++KsGWg=;
+ b=nAjYZXUY+4Wy1asNRJs8ntv3uU/6TMlR1UCX8I5N4ln0PTq7pv0dpF2VdI/oUoHnRYkn3dtD4MT6PYgPLF/jT7vz4lQrZ6QhoJ9VhJdhkOQBsrTdP8Qt9OmjVyqyxbkvyVG63fesVmRnOgO4rlaJ7rQZKbIaqgZrUJJazdF2nooExHmci365El0TTBzUcpgE6pq5QdgwHsWOj9yxF49/LmXgTZ+Sv4hSGEz5zUePH/LNvNXjkrfo5kC+6mmGzndsYzSls0luNx2STLvWkynU8ixKUwi/6kDRsbxJ97OfZ9Zfl8FWWRm9ody8x1WxAfADL7n1pdrAIOvyVqs9wxq92Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I8Eue09ui4c6W079IE76+/dJP1KETRcPp5O8R310Q7Y=;
- b=RGPldKZGB8ucvRPR30QqHGFp3IJO41CXwpYg9tEQ4vEG2q6IkVVT1g5G3xQeLKqEwj8FhqYEp3hybfB/eAJiYAvfSmyNV5y0lh93XqBZLlne+8s+28xfEvOHrtMWB/IKMpxed/ViTg5kDKOhG1aE5LBhxX0QetbB0lVdEJY3Eeg=
+ bh=5zackTxoA0RJJHEkuijSFmeurzsR3/En0vMm++KsGWg=;
+ b=BOu58/MB926FfGhS7eK/1iYB7V7iA9QOcln9vNbUfoaZOwmiMyMVwlCN5AeBsOMnbj9JOkwjf1cg3n23BYJVFguRSf8I2BC5+3qFPGHu6rfPzTvDSUHxXZS0R1xAiGm4S7MH9/gg4rixMaVlcdL+wkbc+ZfBDKAUsyMxCadYF/4=
 Authentication-Results: redhat.com; dkim=none (message not signed)
  header.d=none;redhat.com; dmarc=none action=none header.from=oracle.com;
 Received: from MWHPR10MB1774.namprd10.prod.outlook.com (2603:10b6:301:9::13)
- by CO1PR10MB4595.namprd10.prod.outlook.com (2603:10b6:303:98::21) with
+ by MWHPR10MB1662.namprd10.prod.outlook.com (2603:10b6:301:a::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.25; Fri, 19 Feb
- 2021 16:13:21 +0000
+ 2021 16:13:22 +0000
 Received: from MWHPR10MB1774.namprd10.prod.outlook.com
  ([fe80::24eb:1300:dd70:4183]) by MWHPR10MB1774.namprd10.prod.outlook.com
  ([fe80::24eb:1300:dd70:4183%3]) with mapi id 15.20.3846.042; Fri, 19 Feb 2021
- 16:13:21 +0000
+ 16:13:22 +0000
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>
@@ -69,9 +69,9 @@ Cc:     Jason Gunthorpe <jgg@nvidia.com>,
         Steven Sistare <steven.sistare@oracle.com>,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v2 1/3] vfio/type1: Change success value of vaddr_get_pfn()
-Date:   Fri, 19 Feb 2021 11:13:03 -0500
-Message-Id: <20210219161305.36522-2-daniel.m.jordan@oracle.com>
+Subject: [PATCH v2 2/3] vfio/type1: Prepare for batched pinning with struct vfio_batch
+Date:   Fri, 19 Feb 2021 11:13:04 -0500
+Message-Id: <20210219161305.36522-3-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210219161305.36522-1-daniel.m.jordan@oracle.com>
 References: <20210219161305.36522-1-daniel.m.jordan@oracle.com>
@@ -83,152 +83,278 @@ X-ClientProxiedBy: BL0PR0102CA0052.prod.exchangelabs.com
  (2603:10b6:301:9::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (98.229.125.203) by BL0PR0102CA0052.prod.exchangelabs.com (2603:10b6:208:25::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.28 via Frontend Transport; Fri, 19 Feb 2021 16:13:19 +0000
+Received: from localhost.localdomain (98.229.125.203) by BL0PR0102CA0052.prod.exchangelabs.com (2603:10b6:208:25::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.28 via Frontend Transport; Fri, 19 Feb 2021 16:13:21 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7fe5d379-5006-49b8-a91e-08d8d4f14672
-X-MS-TrafficTypeDiagnostic: CO1PR10MB4595:
+X-MS-Office365-Filtering-Correlation-Id: ab5be0c1-f341-40c8-cd48-08d8d4f1473f
+X-MS-TrafficTypeDiagnostic: MWHPR10MB1662:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CO1PR10MB4595623BD680EA740A8FD9A0D9849@CO1PR10MB4595.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Microsoft-Antispam-PRVS: <MWHPR10MB1662EBC5E4D44A8A7F7C22CBD9849@MWHPR10MB1662.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XLEno0DV+1HhyTeqDjM0JGFzGdFkqLuUuRBcws0Ks49nSQjj8yX841N2kQLNp3Yfq2mSBMHAhOsBSgLpJjedd2Zbqcbbxjli1bLUZLO0X9PH8vqcmpHcRY+k53uI5SVL1DP32ob4CXxCWvTYmbK23ET9BObjZYphmOSA3bOlK/6n/78dIQWBtQTPqktKP7g9so3U5Fcd8Fk7uJY4s4VcE28zge8jaqqKOwP6oPlRe/JE1lcUWeC0KMbxxb2Xu8kaOPBiTEcUranGbULzT9CDJIaBEHCP9jFjULJ7oh3/eY/8tE64SaiezKG28JESQZiXo7RaAsVxPUVPhB5Jhq+xWDLH7E6SRyaNvugYmm5v42yQI25fINFrpDpNyNrii8TaTkIcA8nmPAinGMHhx5q6PP+J7q5MvwIsEOIr9Yl397tFC22aOet/LJzbEFgNj7DrDo0P5LKLgA47sds9kafMc7TFB9TBwcTDEr8WYAH1PO0L2X2+zwx6Ul4xoZof6LK9bwGXaZiBNqQkhYtvqldvWrziWv8l3RaD5qXC6tLUDIOABq+V54s2O+YCy+/1KBsm7m2jQ0CimotekvAEBbhWLw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR10MB1774.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(396003)(376002)(366004)(39860400002)(136003)(2906002)(66556008)(66476007)(107886003)(6486002)(66946007)(6506007)(16526019)(186003)(6512007)(6666004)(4326008)(5660300002)(26005)(52116002)(36756003)(316002)(103116003)(83380400001)(54906003)(2616005)(956004)(1076003)(8676002)(478600001)(110136005)(8936002)(86362001)(69590400012);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?pdspbllJ6YUI2I3pnWFOSrnKFvs+oIArT7HDQBVPPwmMgb1FM4mT8m9Q3zC7?=
- =?us-ascii?Q?vqiN191R37WS8slEg9mHy8jQXg3Pxhg7a6MOiHpA/IQDpk9L9ZRjHElumtPB?=
- =?us-ascii?Q?6PFCvEao25882coujMj7E51wc7Uoq+UiKQOM6Yph44Gk+13vtHU/jMteZ3kV?=
- =?us-ascii?Q?JUlB7ECCalOkJgr5eU+eFsyKkPZ6MGN3Sow2HuvaZ1Ksc5YpU3OMGuF5+LYQ?=
- =?us-ascii?Q?J/WdCSqU3CetytWxWIqevna1Z4iHcFppKIHA7pC6QiW+AXPcuEGHt1wx3tJj?=
- =?us-ascii?Q?nQWR0zAbMuG5k+CfkEsf5urwME/BWXfCopujWmQHzWewLFLJnZnmYoHg4h+j?=
- =?us-ascii?Q?JJiGfHissKRm+60XVy7G6kimO5ptlwZoLi2+ar0fhcZFsffnXwwkmx2VTrGv?=
- =?us-ascii?Q?D2kAsAx6pKw4CbrTIaWKuu/+MEFu4C90L1+Sfw7x6Y6YkEckvnB75uUV/d4z?=
- =?us-ascii?Q?hbE8SY7BfftIy7TecIld/bOAat1u21RfMfmFb47l9eJOlhKh55/npzBBDYEM?=
- =?us-ascii?Q?e2d0pPtj/RiN1jGAWeN/KUZX4B1WmIpEARFxm9Jfm/Eb/Lwk/l0PlUmy7j6e?=
- =?us-ascii?Q?rSpbECZ5ejYOYm31mmU0eACR+LIwEettJfYuWBjAph7HKQvsjmKHNsGu8jRM?=
- =?us-ascii?Q?mMohN4xTJ31+toblvzVERJ6znzEb7NH0PLnXTyYFc74zScNjBG8DnxtV2nO1?=
- =?us-ascii?Q?JysQg7HDR93f/stsnb0VfXHBLSb4VNsWTBbR/3HYR3UBSxYLwXXWLc7EEsfI?=
- =?us-ascii?Q?LOAIsY7IJRSfwnLfDFxK7N96j+tyvWfevAhU40kSV4SOXnbSf84VXl8bGAoD?=
- =?us-ascii?Q?BMUFLy8R92VAsi92xYTnJ8f5NqSZzaiITjdcPJoIKPspYeWj1mzuLVD+7V7h?=
- =?us-ascii?Q?YyJgOvOcI5bRRrmgEY5twXGtSZ/0gSAfpogk2T6IxDcxd4lI5P9xRZ9KqVpq?=
- =?us-ascii?Q?wCOD9O7lGVc7TGjGbcun/YxSeUrco6aPLtudGrZN9F4f802DrWdyLE3Tbok5?=
- =?us-ascii?Q?IEzAkRcRGU8k+1dvnWscgAjw8YML/XSyovWdxqn4xE0V//h+U5+hY5m5OU0R?=
- =?us-ascii?Q?CyWvVBislHw0HYk6/HAZUY7pxUD/D+KKSbRgqV81KOCVCAZgLeulKiyIBn+4?=
- =?us-ascii?Q?jnZa578lMnHujYl/r//u5kDr7d9uY7mnzGehqOSH37Aq6JbRCu81wI7FA/QM?=
- =?us-ascii?Q?D8eG7d4SKTZCLWANy0k5cRte10z4+vYWvCbHs6++p5lCDR/q3X8eSa27FLlY?=
- =?us-ascii?Q?DA62t3yuzdKPPp0WVPP6WwA9vf2viegYdzOBuL3B1+UssFjrpbbfoWKTwDQ5?=
- =?us-ascii?Q?8fPzNEnhkcs79ek9bibePDlR?=
+X-Microsoft-Antispam-Message-Info: 4ywCh3DmjWTj74BBQF8FGdHxRmnj/5n8x8U1cJ/hwt7CZy+EH+pCl/ZKM6INpERINQjp1qlmP6Bg1AuyCDnR+iD45k/rzFwDa40nyEiC+MqY4NT2WO/hHjvomIdi9cPamaVLu1T5YhV/lmBamcG4Xyk2pxaGQL5vgQx5Cm61FgOHxR9FDRYVltzR8B90FkaIXSHoZlBGpXp3Acody10xfB7pay6SQAcnzNWMsu2eK6JyYABP1jNsL0m0s8+qqnLFn/C45KJmAOk92Q1Xlzs5MODT88hbokQEmNniWtC5ondY3VE1fJrR11iC9JbK7F30AtMYG71LQedhhuLHQbXzSAS7inGh6rEYJen64NsQMjjMTPjgdwrxUfGDfiVSgqxVWGXNtKt625e9OBZ2bQA02S3eD2upVMQRkctx6gnjDDpS/Ql3c28BaRVa2DAO0+69R5eDDeYOnQWVQjkMiQdOuxC6p+vXbDLGHX1TE8IPKdQXnNDxYk9R/EnKKnwRFZCoWebcrCHvP4uR1dczX1YS8m0glm28ViOEhNGhZaa1uli4VVFh0b45DA54+SNX93FZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR10MB1774.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(396003)(39860400002)(136003)(346002)(376002)(83380400001)(2906002)(36756003)(316002)(2616005)(186003)(54906003)(110136005)(6486002)(4326008)(16526019)(66946007)(8676002)(1076003)(5660300002)(26005)(69590400012)(86362001)(103116003)(8936002)(107886003)(6512007)(6506007)(6666004)(478600001)(956004)(52116002)(66556008)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?PR+oKP99vKV9IaXx21eNZc5kMvbqWExNravFKcCtITPlKp7z6J/0PaHkyEJL?=
+ =?us-ascii?Q?6IrxfujiiONZox/lsooOqZmNY/xobRsietrIxvrLgGhXHdfxpFrPqpHZO2jn?=
+ =?us-ascii?Q?exa9VzfW1i9ivCG+jgVraB/Y9XOy3+2q2TFHq2Q7RulckMPKqTiq3ld4LTLo?=
+ =?us-ascii?Q?z2GixZG367BeT/rG7PO6jPuAUFJm4peW0NE/jtQaftZPWN30CEKXVq2dDu+U?=
+ =?us-ascii?Q?Ihpr1H3Q7goD2vZcBUmlqjzA2Ec4227lPHGsPJIvoH0h5dabZFhh12CcvVCv?=
+ =?us-ascii?Q?fKIH+E/91tUFLHdar+CvjI1J+OQsuNoa0mCbEtYNmt0x4RrKSHFtyztbxSJa?=
+ =?us-ascii?Q?8waUXlKmAIVK2Tx8DaM715IzHkpjmjTP2ZSYLbWBP8WK0atatY6AUiBoFsLS?=
+ =?us-ascii?Q?XcEK91BS7LhX07orelrRHP3fKn8RuHsWLYNAqBLErRCVr50ZKpxUChzhwV2v?=
+ =?us-ascii?Q?8tWMDBT3x01o1fB+TwQtkcnw/jmDuqWv1ehOrfXO4aZOy7hIj3RjLd/OZK3G?=
+ =?us-ascii?Q?cVW3we6I4QIHeRXwM9ceULt1heOTMo7h2XF4IO0U6oZo1eLNWZzk0J0IirZw?=
+ =?us-ascii?Q?MZoBNajJ0Xj/le+D7X3OuM7KJk58EjECNqxvP9sBO/edg8CRPvGrRu02N9fu?=
+ =?us-ascii?Q?Gls39YyCHMIWoTGtaBCLcKRqx5sqqm6Sd8wQQo1trvLiv+kbwwcp3ls8Zy7a?=
+ =?us-ascii?Q?ekZoWw53pSpu6Tmy8FTE3zbl8N07QMC1dK1ZnqmCoO9ly1hFNLvE3LjvsRNi?=
+ =?us-ascii?Q?b0ibIDDgXIpDnxnPVJPuoLJzmXSj9OQfO8GUsXxAM/0VDr9eHFMEQ5xuhuEz?=
+ =?us-ascii?Q?enuMgAYNmceHzyqTKYxbqi4bPi1tpNFYXgzCT5osbh2sqMfthJEYgmqsZLfH?=
+ =?us-ascii?Q?PkowcogKrESt2aQWFvcMOYs+P0HtxWzm7SzuLFt/sSZYVhkl85HB2BP0O1d1?=
+ =?us-ascii?Q?TMkrcq1DJi3Qh0QQyjIHh46JZICyZZv+32EkT1cOjSLMymDkDPYU33RRDAh4?=
+ =?us-ascii?Q?/IiwJCwRNIbH7Lw1UeOdurStcgRfRO/Nrju8LndEukz6lJaa7YVidmvMy+nm?=
+ =?us-ascii?Q?BJuUkpKsxBgzJEsps6luyaf1UvNQMtuM1jJu8ISfStf7hw0lzPe+zaCWGobR?=
+ =?us-ascii?Q?AeqmyBXzATggSkFsQ6n/EctZ5rqPpCTwE+A7uHCgpH4rL+qfiBp/sBCO7eUX?=
+ =?us-ascii?Q?EnYSpirjcloSpGUhGQLJ7sS7T4O3G/WqTF5+/rrl+Nu0zpBHo/eqOyUmSSY/?=
+ =?us-ascii?Q?3P6EZDHlAEnCnV5LA4cF5U22XmNaqvAlADEpILjsflMRTjYlQfU0fDP87eb2?=
+ =?us-ascii?Q?X5ORsjtk5tYk2cyvQ8tI13E3?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7fe5d379-5006-49b8-a91e-08d8d4f14672
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab5be0c1-f341-40c8-cd48-08d8d4f1473f
 X-MS-Exchange-CrossTenant-AuthSource: MWHPR10MB1774.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2021 16:13:20.8900
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Feb 2021 16:13:22.3354
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wev8dRjEYgRHkvP9OaDTwHm60CgRXfkbsa2EGS69l4cn+o5fXuDokxBqrRq8ETYI3w9cE5Ez0tqzN0tNeUjyyxZ4E0QGSaPwDbaRz86INwk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4595
+X-MS-Exchange-CrossTenant-UserPrincipalName: OyDnk6cgODIbyVeiHvDAfVs9xE643RX49f41/BamdhNzB/6etxHzysO4jULaJMRW8rOYyiS3IKEuC8faf9J9FbeqSh3HqzkQcyDCismCvaQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1662
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9900 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 mlxscore=0
- phishscore=0 adultscore=0 bulkscore=0 mlxlogscore=999 suspectscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0 mlxscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 spamscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2102190127
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9900 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 impostorscore=0 mlxlogscore=999
- adultscore=0 malwarescore=0 phishscore=0 clxscore=1015 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102190127
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 clxscore=1015 spamscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 bulkscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102190127
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vaddr_get_pfn() simply returns 0 on success.  Have it report the number
-of pfns successfully gotten instead, whether from page pinning or
-follow_fault_pfn(), which will be used later when batching pinning.
+Get ready to pin more pages at once with struct vfio_batch, which
+represents a batch of pinned pages.
 
-Change the last check in vfio_pin_pages_remote() for consistency with
-the other two.
+The struct has a fallback page pointer to avoid two unlikely scenarios:
+pointlessly allocating a page if disable_hugepages is enabled or failing
+the whole pinning operation if the kernel can't allocate memory.
+
+vaddr_get_pfn() becomes vaddr_get_pfns() to prepare for handling
+multiple pages, though for now only one page is stored in the pages
+array.
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 71 +++++++++++++++++++++++++++------
+ 1 file changed, 58 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index ec9fd95a138b..7abaaad518a6 100644
+index 7abaaad518a6..b7247a2fc87e 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -485,6 +485,10 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
- 	return ret;
+@@ -103,6 +103,12 @@ struct vfio_dma {
+ 	unsigned long		*bitmap;
+ };
+ 
++struct vfio_batch {
++	struct page		**pages;	/* for pin_user_pages_remote */
++	struct page		*fallback_page; /* if pages alloc fails */
++	int			capacity;	/* length of pages array */
++};
++
+ struct vfio_group {
+ 	struct iommu_group	*iommu_group;
+ 	struct list_head	next;
+@@ -459,6 +465,31 @@ static int put_pfn(unsigned long pfn, int prot)
+ 	return 0;
  }
  
-+/*
-+ * Returns the positive number of pfns successfully obtained or a negative
-+ * error code.
-+ */
- static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 			 int prot, unsigned long *pfn)
++#define VFIO_BATCH_MAX_CAPACITY (PAGE_SIZE / sizeof(struct page *))
++
++static void vfio_batch_init(struct vfio_batch *batch)
++{
++	if (unlikely(disable_hugepages))
++		goto fallback;
++
++	batch->pages = (struct page **) __get_free_page(GFP_KERNEL);
++	if (!batch->pages)
++		goto fallback;
++
++	batch->capacity = VFIO_BATCH_MAX_CAPACITY;
++	return;
++
++fallback:
++	batch->pages = &batch->fallback_page;
++	batch->capacity = 1;
++}
++
++static void vfio_batch_fini(struct vfio_batch *batch)
++{
++	if (batch->capacity == VFIO_BATCH_MAX_CAPACITY)
++		free_page((unsigned long)batch->pages);
++}
++
+ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+ 			    unsigned long vaddr, unsigned long *pfn,
+ 			    bool write_fault)
+@@ -489,10 +520,10 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
+  * Returns the positive number of pfns successfully obtained or a negative
+  * error code.
+  */
+-static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+-			 int prot, unsigned long *pfn)
++static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
++			  long npages, int prot, unsigned long *pfn,
++			  struct page **pages)
  {
-@@ -501,7 +505,6 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 				    page, NULL, NULL);
- 	if (ret == 1) {
- 		*pfn = page_to_pfn(page[0]);
--		ret = 0;
+-	struct page *page[1];
+ 	struct vm_area_struct *vma;
+ 	unsigned int flags = 0;
+ 	int ret;
+@@ -501,10 +532,10 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+ 		flags |= FOLL_WRITE;
+ 
+ 	mmap_read_lock(mm);
+-	ret = pin_user_pages_remote(mm, vaddr, 1, flags | FOLL_LONGTERM,
+-				    page, NULL, NULL);
+-	if (ret == 1) {
+-		*pfn = page_to_pfn(page[0]);
++	ret = pin_user_pages_remote(mm, vaddr, npages, flags | FOLL_LONGTERM,
++				    pages, NULL, NULL);
++	if (ret > 0) {
++		*pfn = page_to_pfn(pages[0]);
  		goto done;
  	}
  
-@@ -515,8 +518,12 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 		if (ret == -EAGAIN)
- 			goto retry;
- 
--		if (!ret && !is_invalid_reserved_pfn(*pfn))
--			ret = -EFAULT;
-+		if (!ret) {
-+			if (is_invalid_reserved_pfn(*pfn))
-+				ret = 1;
-+			else
-+				ret = -EFAULT;
-+		}
- 	}
- done:
- 	mmap_read_unlock(mm);
-@@ -597,7 +604,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+@@ -592,7 +623,7 @@ static int vfio_wait_all_valid(struct vfio_iommu *iommu)
+  */
+ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 				  long npage, unsigned long *pfn_base,
+-				  unsigned long limit)
++				  unsigned long limit, struct vfio_batch *batch)
+ {
+ 	unsigned long pfn = 0;
+ 	long ret, pinned = 0, lock_acct = 0;
+@@ -603,7 +634,8 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	if (!current->mm)
  		return -ENODEV;
  
- 	ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, pfn_base);
--	if (ret)
-+	if (ret < 0)
+-	ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, pfn_base);
++	ret = vaddr_get_pfns(current->mm, vaddr, 1, dma->prot, pfn_base,
++			     batch->pages);
+ 	if (ret < 0)
  		return ret;
  
- 	pinned++;
-@@ -624,7 +631,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+@@ -630,7 +662,8 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
+ 	/* Lock all the consecutive pages from pfn_base */
  	for (vaddr += PAGE_SIZE, iova += PAGE_SIZE; pinned < npage;
  	     pinned++, vaddr += PAGE_SIZE, iova += PAGE_SIZE) {
- 		ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
--		if (ret)
-+		if (ret < 0)
+-		ret = vaddr_get_pfn(current->mm, vaddr, dma->prot, &pfn);
++		ret = vaddr_get_pfns(current->mm, vaddr, 1, dma->prot, &pfn,
++				     batch->pages);
+ 		if (ret < 0)
  			break;
  
- 		if (pfn != *pfn_base + pinned ||
-@@ -650,7 +657,7 @@ static long vfio_pin_pages_remote(struct vfio_dma *dma, unsigned long vaddr,
- 	ret = vfio_lock_acct(dma, lock_acct, false);
+@@ -693,6 +726,7 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+ 				  unsigned long *pfn_base, bool do_accounting)
+ {
++	struct page *pages[1];
+ 	struct mm_struct *mm;
+ 	int ret;
  
- unpin_out:
--	if (ret) {
-+	if (ret < 0) {
- 		if (!rsvd) {
- 			for (pfn = *pfn_base ; pinned ; pfn++, pinned--)
- 				put_pfn(pfn, dma->prot);
-@@ -694,7 +701,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+@@ -700,7 +734,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+ 	if (!mm)
  		return -ENODEV;
  
- 	ret = vaddr_get_pfn(mm, vaddr, dma->prot, pfn_base);
--	if (!ret && do_accounting && !is_invalid_reserved_pfn(*pfn_base)) {
-+	if (ret == 1 && do_accounting && !is_invalid_reserved_pfn(*pfn_base)) {
+-	ret = vaddr_get_pfn(mm, vaddr, dma->prot, pfn_base);
++	ret = vaddr_get_pfns(mm, vaddr, 1, dma->prot, pfn_base, pages);
+ 	if (ret == 1 && do_accounting && !is_invalid_reserved_pfn(*pfn_base)) {
  		ret = vfio_lock_acct(dma, 1, true);
  		if (ret) {
- 			put_pfn(*pfn_base, dma->prot);
+@@ -1394,15 +1428,19 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ {
+ 	dma_addr_t iova = dma->iova;
+ 	unsigned long vaddr = dma->vaddr;
++	struct vfio_batch batch;
+ 	size_t size = map_size;
+ 	long npage;
+ 	unsigned long pfn, limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+ 	int ret = 0;
+ 
++	vfio_batch_init(&batch);
++
+ 	while (size) {
+ 		/* Pin a contiguous chunk of memory */
+ 		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
+-					      size >> PAGE_SHIFT, &pfn, limit);
++					      size >> PAGE_SHIFT, &pfn, limit,
++					      &batch);
+ 		if (npage <= 0) {
+ 			WARN_ON(!npage);
+ 			ret = (int)npage;
+@@ -1422,6 +1460,7 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 		dma->size += npage << PAGE_SHIFT;
+ 	}
+ 
++	vfio_batch_fini(&batch);
+ 	dma->iommu_mapped = true;
+ 
+ 	if (ret)
+@@ -1598,6 +1637,7 @@ static int vfio_bus_type(struct device *dev, void *data)
+ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 			     struct vfio_domain *domain)
+ {
++	struct vfio_batch batch;
+ 	struct vfio_domain *d = NULL;
+ 	struct rb_node *n;
+ 	unsigned long limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+@@ -1612,6 +1652,8 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 		d = list_first_entry(&iommu->domain_list,
+ 				     struct vfio_domain, next);
+ 
++	vfio_batch_init(&batch);
++
+ 	n = rb_first(&iommu->dma_list);
+ 
+ 	for (; n; n = rb_next(n)) {
+@@ -1659,7 +1701,8 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 
+ 				npage = vfio_pin_pages_remote(dma, vaddr,
+ 							      n >> PAGE_SHIFT,
+-							      &pfn, limit);
++							      &pfn, limit,
++							      &batch);
+ 				if (npage <= 0) {
+ 					WARN_ON(!npage);
+ 					ret = (int)npage;
+@@ -1692,6 +1735,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 		dma->iommu_mapped = true;
+ 	}
+ 
++	vfio_batch_fini(&batch);
+ 	return 0;
+ 
+ unwind:
+@@ -1732,6 +1776,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 		}
+ 	}
+ 
++	vfio_batch_fini(&batch);
+ 	return ret;
+ }
+ 
 -- 
 2.30.1
 
