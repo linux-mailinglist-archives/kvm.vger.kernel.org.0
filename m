@@ -2,116 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9AF031FEB8
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 19:22:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4561F31FF27
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 20:01:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229725AbhBSSVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 13:21:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230006AbhBSSVD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Feb 2021 13:21:03 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79ADC061756
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 10:20:20 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id o10so4834270wmc.1
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 10:20:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:reply-to:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QWLOIiitmqBo5+3UaA0iJ43f4RC209g18TM/vosn6KU=;
-        b=POVBAu9h6VXtheGXvk2NfpN7VuXcoirzXDBHZeSRMcMGwnLtXNDmDnbRloswSncCiu
-         UUBmOonAiKAxfUdgfpFKvVHNlcCFmDWcmG8TCbHlREKDdpiW5tij6aSeDioQohoQDmeC
-         l2FziYTXDZmhyOPKjnAEbFWKjYxdlG6G3js9cUC1ajMTGuLS3fEZNPbSMl5onWT1CxdM
-         Q2YUQQV7bJTmWqgCLcKw5KDw4nOFUtWukP3ASDJiAqkYmBSvJTP2EuipIaJIBK23iSfg
-         JQjIFR1ep2dPw3zIHeetdBiKkyAERCkBqJuP8d2NkTJ+YjJg4vONwd4TsJwMnLvHRhe0
-         xrxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:reply-to:subject:to:cc:references
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=QWLOIiitmqBo5+3UaA0iJ43f4RC209g18TM/vosn6KU=;
-        b=bdKr1zfVWPK3VJxTd3MIyJHatMJQKa/RLVZduII2XPfL/UvxdfWA8oq6b28zwZB7H4
-         KMR0KrubWhLhBQhaf8NWQ/psKCQ/rBrvPOFxfdn72lcx4n3ZSyZXzTeDRwIhbbkUpf4J
-         vRaUUWQhkklCz0nUfBkSBG4ifXErdIwuS/59mLrjjX5Ggzfm/18uq+qFA6ujzSR1OI2z
-         qEENOQeis7+H+k20tUV7ReTQqXkvg7SlQ5JiX9Nm8MT6l+DjDIX9sfUOixKHVQYvo0eK
-         itnNWOT6fh/Odbx67GD+zE6hvyYZKVgCyZR/ZLMIwRRfVif5OXvGz7fDgSaMCEBZa1MM
-         hSKQ==
-X-Gm-Message-State: AOAM533MnC6UrpFNNb7rvqOIzOeAUCtzw86f6hAmQHigNVpyusZPbG//
-        pOR41V78Uhgpvbwc2OciE64=
-X-Google-Smtp-Source: ABdhPJyPeyLs0ufJRIjEcmZzmn8XKM8ztr4zDFZnUaEnnHiY3eTI/16kdMKEeG8iwgyT/uZdHskVEw==
-X-Received: by 2002:a1c:a795:: with SMTP id q143mr9362251wme.113.1613758819494;
-        Fri, 19 Feb 2021 10:20:19 -0800 (PST)
-Received: from ?IPv6:2a00:23c5:5785:9a01:101f:7370:9e02:844f? ([2a00:23c5:5785:9a01:101f:7370:9e02:844f])
-        by smtp.gmail.com with ESMTPSA id y16sm14031151wrw.46.2021.02.19.10.20.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Feb 2021 10:20:19 -0800 (PST)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2 09/11] hw/xenpv: Restrict Xen Para-virtualized machine
- to Xen accelerator
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Aurelien Jarno <aurelien@aurel32.net>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Greg Kurz <groug@kaod.org>,
+        id S229891AbhBSTBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 14:01:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1492 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229871AbhBSTBR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 14:01:17 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 11JIVlfq125303;
+        Fri, 19 Feb 2021 14:00:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=kYBrrtSge5RPCw/T4HxQULOmmog1iRXNHvJMgs2CZT4=;
+ b=kKAoV2CarNi65lB7bDgJJPVMwt7HpyH8cmsf5+djc2OtQcPjqI0moFMkUkV1jMlc/rUP
+ TWa+TwWTBey+dGsOyiZTBqkWNJhKSMQOF7LZhniZaze5x6nrzJvFaYKoJDq2loNMTadm
+ VoyrtafisQyyhT5E2nYc4Co8PWVuMwbSSjlUmAagu/+FwbU5WCfswrUKBCo+xBS9EpZC
+ 6jIdGNBaPZbgDIfHRvsE1dasiW37mTL1kfjO+3lGrYMgsIFo8VbLEXIPX6F9Tp9aDoWX
+ wcPYS/V/8ILZm5Z60pecFpFr8nlkp35GJGdpWFqz/4hCJ28Rbm8Mq+ot+tlcQjWXsPLl UQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36tgvqmg62-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Feb 2021 14:00:35 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 11JIaEqT140149;
+        Fri, 19 Feb 2021 14:00:34 -0500
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36tgvqmg4s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Feb 2021 14:00:34 -0500
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11JIw72s008348;
+        Fri, 19 Feb 2021 19:00:32 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 36p6d8dtku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 19 Feb 2021 19:00:31 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11JJ0Tf52753092
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Feb 2021 19:00:29 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DBD87AE055;
+        Fri, 19 Feb 2021 19:00:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A2B6AE045;
+        Fri, 19 Feb 2021 19:00:28 +0000 (GMT)
+Received: from localhost (unknown [9.171.86.198])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 19 Feb 2021 19:00:28 +0000 (GMT)
+Date:   Fri, 19 Feb 2021 20:00:24 +0100
+From:   Vasily Gorbik <gor@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        David Hildenbrand <david@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20210219173847.2054123-1-philmd@redhat.com>
- <20210219173847.2054123-10-philmd@redhat.com>
-Message-ID: <f386d7c4-f139-4f17-4e5b-5a3c5288b238@xen.org>
-Date:   Fri, 19 Feb 2021 18:20:17 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v2] virtio/s390: implement virtio-ccw revision 2 correctly
+Message-ID: <your-ad-here.call-01613761224-ext-6505@work.hours>
+References: <20210216110645.1087321-1-cohuck@redhat.com>
+ <20210219173828.6a2ab5d4.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210219173847.2054123-10-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210219173828.6a2ab5d4.cohuck@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-19_08:2021-02-18,2021-02-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 bulkscore=0 impostorscore=0 mlxlogscore=842
+ clxscore=1011 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102190142
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/02/2021 17:38, Philippe Mathieu-Daudé wrote:
-> When started with other accelerator than Xen, the XenPV machine
-> fails with a criptic message:
-> 
->    $ qemu-system-x86_64 -M xenpv,accel=kvm
->    xen be core: can't connect to xenstored
->    qemu-system-x86_64: xen_init_pv: xen backend core setup failed
-> 
-> By restricting it to Xen, we display a clearer error message:
-> 
->    $ qemu-system-x86_64 -M xenpv,accel=kvm
->    qemu-system-x86_64: invalid accelerator 'kvm' for machine xenpv
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Fri, Feb 19, 2021 at 05:38:28PM +0100, Cornelia Huck wrote:
+> I was thinking of queuing this, but maybe it is quicker to pick it into
+> the s390 tree directly and save us the extra pull request dance?
+> Especially as this is a stable-worthy bugfix.
 
-Acked-by: Paul Durrant <paul@xen.org>
+Yes, sure. I'll pick it up. Thanks.
