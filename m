@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4C331FE18
+	by mail.lfdr.de (Postfix) with ESMTP id 3BD8E31FE16
 	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:43:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbhBSRlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 12:41:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58429 "EHLO
+        id S230009AbhBSRl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 12:41:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26927 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229991AbhBSRlL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:41:11 -0500
+        by vger.kernel.org with ESMTP id S229734AbhBSRlU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:41:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613756385;
+        s=mimecast20190719; t=1613756393;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m89dmrSplgkgoyBA9XFoMMYsKZX69TbxEanq9oDkcW0=;
-        b=JEKKxhMc4fPJKMm8IN1nbv2+K5pOJGMwCJpYZ3by1SgsbEYLRuEpDK//Q2ZmcQHmTlZe5h
-        0pVMeyHrg6cpiUfX90g3lutN3L4jh+VYpMbz12nyaUoBkiAs7aw68Qdhu8VkoWFUJYhe0+
-        Cc7PtECKSByiWWyKTW/d6gqn9e9Nxqo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-NEXKjxB9MsiFboNGiHssAw-1; Fri, 19 Feb 2021 12:39:43 -0500
-X-MC-Unique: NEXKjxB9MsiFboNGiHssAw-1
-Received: by mail-wm1-f71.google.com with SMTP id b201so2769705wmb.9
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:43 -0800 (PST)
+        bh=23DXGFBg27YE0s/hCFn43oTEX31jOtnU+ISUArv5+bE=;
+        b=IcQ2AKXs++61QBO0a1ox544KU5XDzKHjZEBKrHaL5JgGgQhBvuDIra0LSyQNdE7gKo8jgT
+        yQsUSdD4thYkYWNJQKI/PDNNY/61WANoL+3M52HGtYtSAIVcjdn+Gy2gs8d7+V9qr9xh6u
+        s0aMVjPSdaUPDTXDdX+BdWbf1b5zjrI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-602-NTANttm1MkKGdUkO7WTkmA-1; Fri, 19 Feb 2021 12:39:49 -0500
+X-MC-Unique: NTANttm1MkKGdUkO7WTkmA-1
+Received: by mail-wr1-f70.google.com with SMTP id l3so1135880wrx.15
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=m89dmrSplgkgoyBA9XFoMMYsKZX69TbxEanq9oDkcW0=;
-        b=A0mploV6hRQfkhxdgWqAZ3rfyzYD67fanwfOvqLxvpe3q9S5lgIp8HEsYeg+MTgfMU
-         oNwdM5tDySL8CwGoehcAEl6hLnFwIwoI/5HVHtAr9g+RlbDfxRkv9KBJDzxVJ/xCZYjI
-         SKlDbOjNiTxIf3VnthNqNpnNjDT5Ik2xAGfQ9zDMUKWSHJ3HPq3v+NZuJxbCF7CRXtCh
-         puyy8DFHnYBh+aoP94Cm97sIfldISiYcenFRSmgp+16DAiubLqSYZZkUauVkthH1DgRI
-         N2IKFBuizm+xeh1xSOqXahSNrMrCfQ3hAKyuNZoTNpLKNFzhXauzm37tAR62zCvnnaTx
-         Xwew==
-X-Gm-Message-State: AOAM533GhMrzcOrAfMYz0OvQPF+IyZKzCzJfq/gWrKXvr3J7sonc7vGl
-        5fFooqGEkXp2QaOa3H/Ko1ZWcoP8ecUhLoIhZOOBnH11K50EVWh2O2L5qK7JvExG/RMuWcTLTno
-        AgVNhZJab7RLB
-X-Received: by 2002:a1c:c6:: with SMTP id 189mr9272312wma.128.1613756382370;
-        Fri, 19 Feb 2021 09:39:42 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyfL/zeX1Twd/41yRwfBzbYwswnUhtDRMBecaJ3a8NHeinaw0+wzScyZWOOrq01liX3KOGGMQ==
-X-Received: by 2002:a1c:c6:: with SMTP id 189mr9272291wma.128.1613756382214;
-        Fri, 19 Feb 2021 09:39:42 -0800 (PST)
+        bh=23DXGFBg27YE0s/hCFn43oTEX31jOtnU+ISUArv5+bE=;
+        b=iwcNicuwmFJC/66enQ3X0fvDqrllcaQptO9JQ5jUe34Bhgqfz+VDjqftNGhT92xE+G
+         szUqRI3V417JSfK3BEEFLwSN44QuD2pH1Wo0v2pgdaHlCnoMmWMl+/69fR+BLoku8/4V
+         91OLYMird7oyu72tQdraOd/hwdI572wqyfqi05Cj+LT0BZqJYm4FOPK9wdcu+ldC8mTq
+         hC0vcCUVDhpWPain1DKTbqaqltGVaggc5/3PXu5q2MzIILwH55zmg7J6IvlpAsTzhN+O
+         xjbT0ALdaopxkjm5taJlNvyFSZlZ9QBF+LC3GFlSqVLY1Aar+9xEKzvPbWd9ceq3hWxG
+         7XfA==
+X-Gm-Message-State: AOAM530f5ySQNv0JutVV0fM9+rRX5V2FrX142p+yOQtPkoUAFBPq+dU2
+        YFppBhitJd3a3qrCCrcF57dQFB5M/crGTo1rl/fYqsDPPIKegLV8q2wh4L2r6b9MaF9VAxhTxfB
+        NzAp03LRCSr/g
+X-Received: by 2002:a7b:c095:: with SMTP id r21mr3049546wmh.48.1613756387884;
+        Fri, 19 Feb 2021 09:39:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxiAWfgHRpHyAW3kKe8U38bgrZikJVMduVGw3sP0TrSilsr1/3Kg29a0ZDcfjt7MheizWAw2g==
+X-Received: by 2002:a7b:c095:: with SMTP id r21mr3049522wmh.48.1613756387730;
+        Fri, 19 Feb 2021 09:39:47 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id b72sm13082236wmd.4.2021.02.19.09.39.40
+        by smtp.gmail.com with ESMTPSA id v9sm9098392wrn.86.2021.02.19.09.39.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 09:39:41 -0800 (PST)
+        Fri, 19 Feb 2021 09:39:47 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -83,9 +83,9 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v2 09/11] hw/xenpv: Restrict Xen Para-virtualized machine to Xen accelerator
-Date:   Fri, 19 Feb 2021 18:38:45 +0100
-Message-Id: <20210219173847.2054123-10-philmd@redhat.com>
+Subject: [PATCH v2 10/11] hw/board: Only allow TCG accelerator by default
+Date:   Fri, 19 Feb 2021 18:38:46 +0100
+Message-Id: <20210219173847.2054123-11-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210219173847.2054123-1-philmd@redhat.com>
 References: <20210219173847.2054123-1-philmd@redhat.com>
@@ -96,45 +96,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When started with other accelerator than Xen, the XenPV machine
-fails with a criptic message:
+By default machines can only use the TCG and QTest accelerators.
 
-  $ qemu-system-x86_64 -M xenpv,accel=kvm
-  xen be core: can't connect to xenstored
-  qemu-system-x86_64: xen_init_pv: xen backend core setup failed
-
-By restricting it to Xen, we display a clearer error message:
-
-  $ qemu-system-x86_64 -M xenpv,accel=kvm
-  qemu-system-x86_64: invalid accelerator 'kvm' for machine xenpv
+If a machine can use another accelerator, it has to explicitly
+list it in its MachineClass valid_accelerators[].
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/xenpv/xen_machine_pv.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/hw/boards.h | 4 ++--
+ hw/core/machine.c   | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 8df575a457c..d7747bcec98 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -86,12 +86,17 @@ static void xen_init_pv(MachineState *machine)
-     atexit(xen_config_cleanup);
- }
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 4d08bc12093..b93d290b348 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -146,8 +146,8 @@ typedef struct {
+  * @valid_accelerators:
+  *    If this machine supports a specific set of virtualization accelerators,
+  *    this contains a NULL-terminated list of the accelerators that can be
+- *    used. If this field is not set, any accelerator is valid. The QTest
+- *    accelerator is always valid.
++ *    used. If this field is not set, a default list containing only the TCG
++ *    accelerator is used. The QTest accelerator is always valid.
+  * @kvm_type:
+  *    Return the type of KVM corresponding to the kvm-type string option or
+  *    computed based on other criteria such as the host kernel capabilities
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c42d8e382b1..ca7c9ee2a0c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -520,11 +520,11 @@ static void machine_set_nvdimm_persistence(Object *obj, const char *value,
  
-+static const char *valid_accels[] = {
-+    "xen", NULL
-+};
-+
- static void xenpv_machine_init(MachineClass *mc)
+ bool machine_class_valid_for_accelerator(MachineClass *mc, const char *acc_name)
  {
-     mc->desc = "Xen Para-virtualized PC";
-     mc->init = xen_init_pv;
-     mc->max_cpus = 1;
-     mc->default_machine_opts = "accel=xen";
-+    mc->valid_accelerators = valid_accels;
- }
+-    const char *const *name = mc->valid_accelerators;
++    static const char *const default_accels[] = {
++        "tcg", NULL
++    };
++    const char *const *name = mc->valid_accelerators ? : default_accels;
  
- DEFINE_MACHINE("xenpv", xenpv_machine_init)
+-    if (!name) {
+-        return true;
+-    }
+     if (strcmp(acc_name, "qtest") == 0) {
+         return true;
+     }
 -- 
 2.26.2
 
