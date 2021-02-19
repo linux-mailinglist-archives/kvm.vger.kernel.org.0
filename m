@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C838A31FE0C
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:40:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C459031FE0D
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:40:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbhBSRkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 12:40:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51658 "EHLO
+        id S229840AbhBSRka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 12:40:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57693 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229658AbhBSRkW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:22 -0500
+        by vger.kernel.org with ESMTP id S229658AbhBSRk2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613756334;
+        s=mimecast20190719; t=1613756342;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=lykBUd6DAhrahT8nCJAC5FU9Ql8oesKH07nupx8xYdk=;
-        b=LIXgwv60bbXZZIwcDQ5k5imvtugFoGSyk/vJ1Bny4rs/hfhyo1pGIW2lrWwXa1STjYL7aA
-        7voQzyf/1T5wLwpLKktFTHSITkJzk6eLWwZ6sVMTYRPCeLnD5uHOnqlq9pDs3F4Kpn/Idg
-        PzUyjlL8BkIi3Qry/IlDxDaeCRhXiZQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-492-sUJmk8MLO3ShdUet-3m-4A-1; Fri, 19 Feb 2021 12:38:52 -0500
-X-MC-Unique: sUJmk8MLO3ShdUet-3m-4A-1
-Received: by mail-wr1-f70.google.com with SMTP id f5so2782322wro.7
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:38:52 -0800 (PST)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=98X4DsBNdk1BN09KWcHx0mE3/gzzTZdKxOLSGajyIeI=;
+        b=f+zaNRcDyHOGFgQzgmzI1vGQTqanXW+HRFwydtdmYIhDR12kw6EKpXwgZZaeWwq4mSSmMr
+        QqjjZCx6PUXvPzANDqTKL7piZRIfBn5rFhCQcEm3zsxEK0eTgXt4Nw317mbdED25dOmSMK
+        iHDM9R7tJdN7IxfnkKj20TsYZTc8I0U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-LrRgB1XcMSit_nQi_B59-Q-1; Fri, 19 Feb 2021 12:38:58 -0500
+X-MC-Unique: LrRgB1XcMSit_nQi_B59-Q-1
+Received: by mail-wm1-f72.google.com with SMTP id j204so2793868wmj.4
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:38:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lykBUd6DAhrahT8nCJAC5FU9Ql8oesKH07nupx8xYdk=;
-        b=SKWgju7pWDq7PyHm15YbZoNM9V1B2seiwc37sLjd/A9yAur1sPjvyB9xgLKfA0ew8y
-         hpku5uJAW4dwZvexqkO3qP/MVNY5ZgHkhFRKMTj2mQy3HSwgcfJAAgk1XgNh1mzwZvA+
-         zS8JnW03cRSpeO1C2mz/qz8chxnuqqNKCxyQ53BgTZKyEGA/3VtUhka/ePkCTMWgJygz
-         WVW/DTFYlVMDI834/+M+UvBjiIIknQj6PgaUrNAi4TxlAT7YhBxL5arbnYb+aHNpRbVx
-         TBG7EaPJinODCiYTt1TyxJVz7HpcT4nKqpkN/V3szIc+9kWqQfN9IBrAYl6vXxv7eLNv
-         Cd7Q==
-X-Gm-Message-State: AOAM530mmL2QZHqNp0677mmScIP5jiqyCGsR6vU2HNf9oqr10f0mIPqa
-        v3+XolozllfMgR/4YZZ9NyJVgfkoZd5uIzfABATWHeNlDboUdso1IZz+SCcZT5Q0AGBiieVcump
-        X33k6oRrSxB4q
-X-Received: by 2002:adf:e4c3:: with SMTP id v3mr10542040wrm.210.1613756331025;
-        Fri, 19 Feb 2021 09:38:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwI/byrZ/GWSkkhxlUrl1Omb6LyZ4OFFS/CSa2qXI7tP50C7ZajzgipQ5EfU9sygOtDbt6r2g==
-X-Received: by 2002:adf:e4c3:: with SMTP id v3mr10542005wrm.210.1613756330876;
-        Fri, 19 Feb 2021 09:38:50 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=98X4DsBNdk1BN09KWcHx0mE3/gzzTZdKxOLSGajyIeI=;
+        b=PjHVjDJ9iBnbLTf2yoqML5R70DRfSc+fgfeg8xtBkU2/HtpwnL9EWBqKgZFTnSDRdW
+         vpJaLo2rAenGCabd8hYSkCLths1wu2Dw9VsJ1xvmSvKU0AODuJny4S7ZXrZRVsOvNCud
+         8+O3Emjaw8WEwLxb8pbDhOtVm5Xdl03koeQpFMoIgs6mcqTEQqnfiEatTshmwYNMpoMo
+         1OoZtN3whqK+0vJJnD++AD3PFPaSdzOsg34ZP9lr8if9X3Wz3yMvhBP7CnQ75EHfyQsV
+         sOz6m/yzDDRkBF/j8NzkbRILyGqPgaDmSHZzL4ULkBvb+2na17X7YOTO3cLF4DBdN8L5
+         cTjw==
+X-Gm-Message-State: AOAM532DvAsnpT7XXU9cJJJ4Ih0JZ1shr7SQTFqISpRxK0gj7z1UeJ1J
+        7XbGcL/kaWyY7ZOg2Z0N+kt25PLMWG8Y+4jsLvegcDq1VKumnS+4O/wlNMj4sRfIo83lx0WCqY8
+        H6VMKY6Nrtrff
+X-Received: by 2002:adf:b60f:: with SMTP id f15mr10395981wre.83.1613756336824;
+        Fri, 19 Feb 2021 09:38:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzk+AP79F8l3TWLxyR5RU8SmferiSbz3yhDIC5dQKM04uA2QaqDVPRO6H3UVoBxcUQFmDZVKw==
+X-Received: by 2002:adf:b60f:: with SMTP id f15mr10395942wre.83.1613756336683;
+        Fri, 19 Feb 2021 09:38:56 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id l2sm13785629wrm.6.2021.02.19.09.38.48
+        by smtp.gmail.com with ESMTPSA id i7sm23525949wmq.2.2021.02.19.09.38.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 09:38:50 -0800 (PST)
+        Fri, 19 Feb 2021 09:38:56 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -82,69 +83,59 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v2 00/11] hw/accel: Exit gracefully when accelerator is
- invalid
-Date:   Fri, 19 Feb 2021 18:38:36 +0100
-Message-Id: <20210219173847.2054123-1-philmd@redhat.com>
+Subject: [PATCH v2 01/11] accel/kvm: Check MachineClass kvm_type() return value
+Date:   Fri, 19 Feb 2021 18:38:37 +0100
+Message-Id: <20210219173847.2054123-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210219173847.2054123-1-philmd@redhat.com>
+References: <20210219173847.2054123-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,=0D
-=0D
-This series aims to improve user experience by providing=0D
-a better error message when the user tries to enable KVM=0D
-on machines not supporting it.=0D
-=0D
-Since v1:=0D
-- added missing x86 arch (Peter)=0D
-- consider all accelerators (Daniel and Peter)=0D
-- do not enable KVM on sbsa-ref (Leif)=0D
-- updated 'query-machines' (Daniel)=0D
-- new patch for XenPV=0D
-=0D
-Supersedes: <20210219114428.1936109-1-philmd@redhat.com>=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (11):=0D
-  accel/kvm: Check MachineClass kvm_type() return value=0D
-  hw/boards: Introduce machine_class_valid_for_accelerator()=0D
-  hw/core: Restrict 'query-machines' to those supported by current accel=0D
-  hw/arm: Restrit KVM to the virt & versal machines=0D
-  hw/mips: Restrict KVM to the malta & virt machines=0D
-  hw/ppc: Restrict KVM to various PPC machines=0D
-  hw/s390x: Explicit the s390-ccw-virtio machines support TCG and KVM=0D
-  hw/i386: Explicit x86 machines support all current accelerators=0D
-  hw/xenpv: Restrict Xen Para-virtualized machine to Xen accelerator=0D
-  hw/board: Only allow TCG accelerator by default=0D
-  softmmu/vl: Exit gracefully when accelerator is not supported=0D
-=0D
- include/hw/boards.h        | 27 ++++++++++++++++++++++++++-=0D
- accel/kvm/kvm-all.c        |  6 ++++++=0D
- hw/arm/virt.c              |  5 +++++=0D
- hw/arm/xlnx-versal-virt.c  |  5 +++++=0D
- hw/core/machine-qmp-cmds.c |  4 ++++=0D
- hw/core/machine.c          | 26 ++++++++++++++++++++++++++=0D
- hw/i386/x86.c              |  5 +++++=0D
- hw/mips/loongson3_virt.c   |  5 +++++=0D
- hw/mips/malta.c            |  5 +++++=0D
- hw/ppc/e500plat.c          |  5 +++++=0D
- hw/ppc/mac_newworld.c      |  6 ++++++=0D
- hw/ppc/mac_oldworld.c      |  5 +++++=0D
- hw/ppc/mpc8544ds.c         |  5 +++++=0D
- hw/ppc/ppc440_bamboo.c     |  5 +++++=0D
- hw/ppc/prep.c              |  5 +++++=0D
- hw/ppc/sam460ex.c          |  5 +++++=0D
- hw/ppc/spapr.c             |  5 +++++=0D
- hw/s390x/s390-virtio-ccw.c |  5 +++++=0D
- hw/xenpv/xen_machine_pv.c  |  5 +++++=0D
- softmmu/vl.c               |  7 +++++++=0D
- 20 files changed, 145 insertions(+), 1 deletion(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+MachineClass::kvm_type() can return -1 on failure.
+Document it, and add a check in kvm_init().
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/hw/boards.h | 3 ++-
+ accel/kvm/kvm-all.c | 6 ++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a46dfe5d1a6..68d3d10f6b0 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -127,7 +127,8 @@ typedef struct {
+  *    implement and a stub device is required.
+  * @kvm_type:
+  *    Return the type of KVM corresponding to the kvm-type string option or
+- *    computed based on other criteria such as the host kernel capabilities.
++ *    computed based on other criteria such as the host kernel capabilities
++ *    (which can't be negative), or -1 on error.
+  * @numa_mem_supported:
+  *    true if '--numa node.mem' option is supported and false otherwise
+  * @smp_parse:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 84c943fcdb2..b069938d881 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
+                                                             "kvm-type",
+                                                             &error_abort);
+         type = mc->kvm_type(ms, kvm_type);
++        if (type < 0) {
++            ret = -EINVAL;
++            fprintf(stderr, "Failed to detect kvm-type for machine '%s'\n",
++                    mc->name);
++            goto err;
++        }
+     }
+ 
+     do {
+-- 
+2.26.2
 
