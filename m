@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 965FA31FE09
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:40:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9731D31FE10
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:42:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229842AbhBSRkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 12:40:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46415 "EHLO
+        id S229919AbhBSRks (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 12:40:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23067 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229607AbhBSRkh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:37 -0500
+        by vger.kernel.org with ESMTP id S229607AbhBSRko (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:40:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613756351;
+        s=mimecast20190719; t=1613756357;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HQ6bR9q2nTx8UZfcCwDp8YyWJ5IdPylW4EMLv5ePnSc=;
-        b=aiIBXvVyVz8UZbKJ1VRMWUICNBGe/Ged0aq2gyJIxKbrGg/y/4qW6C+GOeGtIqz8jtKocz
-        5JzrOWvPQ7Ac/lyOQZIzNKA0PophRMhi2pvyfybwaAlU4CSSoR35XxHQdA1Qhusxog216A
-        8gIlUEBGhNHKT/IFLkIGd8rknRMOg3c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-tagFiIxWOY-s7oEXMF7aig-1; Fri, 19 Feb 2021 12:39:09 -0500
-X-MC-Unique: tagFiIxWOY-s7oEXMF7aig-1
-Received: by mail-wr1-f72.google.com with SMTP id x14so2174130wrr.13
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:08 -0800 (PST)
+        bh=CHXCPuc7uWQdwucv7FWJOUQ8ceg9IO3ZY73rXU3+wF0=;
+        b=Q//+IvXATgpteRyAb5zA5a1N4Jbhh7Y/VARQF41rbKKoehBpCZYfXiN3A6qzJk5otpfWBT
+        uw5m8qoBe1OPLYjujE3N/rS37CPpwruk1TvjrUAZsP+GZaWmypi55xt1xrlg28tmuTKSY9
+        cEK7Zj28mrsA6D3UfjtmIdRRfrUfZo0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-555-8jm2tcdsOfO0MchGmEInWg-1; Fri, 19 Feb 2021 12:39:14 -0500
+X-MC-Unique: 8jm2tcdsOfO0MchGmEInWg-1
+Received: by mail-wm1-f72.google.com with SMTP id p8so2768848wmq.7
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HQ6bR9q2nTx8UZfcCwDp8YyWJ5IdPylW4EMLv5ePnSc=;
-        b=ZZqHEj4fjDwkvkUUMR9mRmOZrBMoboxY7iwMdi3CBrKnEdpqjeu+3lE/fZ0S4s4l0z
-         EUYdI2ByvrP8XzgXBGUprgttxW6xNmJaT7C9ZlSzhd07opaia2i2U0rCXfSWux29j4/z
-         wXhkZQt8qWImYSsb4FRmF3Sze3ay25xVlu0GL+nh4p8evDcC4kq0duz41AkDlzHxVbBS
-         c5tJZCV6JJAnqZf20bwLEGZghuf3ZUnN//YIx7nvkrjaPIp+YXcZkLz9iGCYbGEuHH37
-         TBvEiqmAsJ2fZgb04hW9mJEkmup14IPqOWfXlSMh2zBr/LjWCVH2IeTUg3JsnF5rpr9F
-         aXNw==
-X-Gm-Message-State: AOAM531p8ZLC6jhuBN22Ti9aU8vjpLHZ8LAHmgYmZGe/sWqsrs+8ia4V
-        P0MWx+tY7GEKiAse+CHwNx8km+NjAptBshkw9moAD1+OSEOsCw/aIoKsb++Lr6n+CjKAo+l0/FJ
-        NULsMTT+O1eNZ
-X-Received: by 2002:adf:b342:: with SMTP id k2mr10246413wrd.264.1613756347939;
-        Fri, 19 Feb 2021 09:39:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzRIsqLMFpNjZYF3WUU2UHyYdzuctCSQdLydicZwE25C3zYE3MQJaOoIUNZctaN8YvHWyznKA==
-X-Received: by 2002:adf:b342:: with SMTP id k2mr10246368wrd.264.1613756347790;
-        Fri, 19 Feb 2021 09:39:07 -0800 (PST)
+        bh=CHXCPuc7uWQdwucv7FWJOUQ8ceg9IO3ZY73rXU3+wF0=;
+        b=Ro4rr+fur67r4yuNTsPp/5fSIuLhbA9QdRw8ry/SciD43Wmzqy9pD3Mw6Z/edKozhd
+         xO2RHdpTkWcHY/PvWwP5D0d5VdmKCRk+HZFSOeYrHuhpCDh1zBzxHO1qrL/n56qV40na
+         qcCYc8oJzqMozwpQtph+zlZfQ+2HNpKECjYOrJBOzZXHGFnuWEEt6lcYYualqf5IBwdo
+         NW9jXf4XV+vgUv8i7EpBfi0ENgB7G3yvy8qtcy1Ppk2NWtW13AzoqlMpqSPhcUKql7LZ
+         qj3FXf/2Z67+3aeGRkaB3jr8dPfc/GqMpz8rErMvWZ1NkRaq4+JoSMJOpf37SfR1ewPd
+         gJ+w==
+X-Gm-Message-State: AOAM531m9bMouxHI8pLh5grMzz2wkESxoG/0o5oCR9Lyg4qD3WrbtcUL
+        S5SxY4uRnmXJMVukc1GVWn0Ls95dZ0WKBbHm0l9kLLu0A5xKNP6gMT23FUV7BHDOltXxvRcYoMM
+        6Vmt00kHjRnX6
+X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr10610942wri.105.1613756353508;
+        Fri, 19 Feb 2021 09:39:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwrzSzq1o4kGieINb1Q744LtUd4TVffu+lfi/YVrFtocFVQ1Ale5KqgmXk7Upte5EwmyzFbHA==
+X-Received: by 2002:a05:6000:188c:: with SMTP id a12mr10610915wri.105.1613756353383;
+        Fri, 19 Feb 2021 09:39:13 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id y62sm15299048wmy.9.2021.02.19.09.39.06
+        by smtp.gmail.com with ESMTPSA id q20sm12010000wmc.14.2021.02.19.09.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 09:39:07 -0800 (PST)
+        Fri, 19 Feb 2021 09:39:12 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -82,11 +82,10 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        =?UTF-8?q?Daniel=20Berrang=C3=A9?= <berrange@redhat.com>
-Subject: [PATCH v2 03/11] hw/core: Restrict 'query-machines' to those supported by current accel
-Date:   Fri, 19 Feb 2021 18:38:39 +0100
-Message-Id: <20210219173847.2054123-4-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v2 04/11] hw/arm: Restrit KVM to the virt & versal machines
+Date:   Fri, 19 Feb 2021 18:38:40 +0100
+Message-Id: <20210219173847.2054123-5-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210219173847.2054123-1-philmd@redhat.com>
 References: <20210219173847.2054123-1-philmd@redhat.com>
@@ -97,30 +96,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not let 'query-machines' return machines not valid with
-the current accelerator.
+Restrit KVM to the following ARM machines:
+- virt
+- xlnx-versal-virt
 
-Suggested-by: Daniel Berrangé <berrange@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/core/machine-qmp-cmds.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/arm/virt.c             | 5 +++++
+ hw/arm/xlnx-versal-virt.c | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-index 44e979e503b..c8630bc2ddc 100644
---- a/hw/core/machine-qmp-cmds.c
-+++ b/hw/core/machine-qmp-cmds.c
-@@ -204,6 +204,10 @@ MachineInfoList *qmp_query_machines(Error **errp)
-         MachineClass *mc = el->data;
-         MachineInfo *info;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 371147f3ae9..8e9861b61a9 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2527,6 +2527,10 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+     return NULL;
+ }
  
-+        if (!machine_class_valid_for_current_accelerator(mc)) {
-+            continue;
-+        }
++static const char *const valid_accels[] = {
++    "tcg", "kvm", "hvf", NULL
++};
 +
-         info = g_malloc0(sizeof(*info));
-         if (mc->is_default) {
-             info->has_is_default = true;
+ /*
+  * for arm64 kvm_type [7-0] encodes the requested number of bits
+  * in the IPA address space
+@@ -2582,6 +2586,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
++    mc->valid_accelerators = valid_accels;
+     mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 8482cd61960..d424813cae1 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -610,6 +610,10 @@ static void versal_virt_machine_instance_init(Object *obj)
+ {
+ }
+ 
++static const char *const valid_accels[] = {
++    "tcg", "kvm", NULL
++};
++
+ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -621,6 +625,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
+     mc->no_cdrom = true;
+     mc->default_ram_id = "ddr";
++    mc->valid_accelerators = valid_accels;
+ }
+ 
+ static const TypeInfo versal_virt_machine_init_typeinfo = {
 -- 
 2.26.2
 
