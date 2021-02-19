@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A591031F890
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:46:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A215531F895
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:48:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbhBSLqQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 06:46:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43934 "EHLO
+        id S230408AbhBSLqU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 06:46:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42128 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230308AbhBSLqN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 06:46:13 -0500
+        by vger.kernel.org with ESMTP id S230308AbhBSLqS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 06:46:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613735087;
+        s=mimecast20190719; t=1613735092;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KroGD2ykh3pOVhGFDhJBF9D2GPtRIz+7OKOBV/uF+8M=;
-        b=GJLQTgmi/JFLQPK/vALSqIn5FC6CL/YpjZ722xUmxF2VWzdyP6XITFq8pObi8L8xiSNawI
-        gM/i4DdTHnax/bOdIbFkOR9H5HYGzBICc3mB30AE/sMw8/o5NImzHRvJkhn2W6tE1ujNSN
-        NDW2GWEmqnpB86CFsFZtp9nzFFcfUZo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-sZr34-H9NKOeEzjLkYRw3w-1; Fri, 19 Feb 2021 06:44:44 -0500
-X-MC-Unique: sZr34-H9NKOeEzjLkYRw3w-1
-Received: by mail-wm1-f69.google.com with SMTP id i5so366422wmq.0
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 03:44:44 -0800 (PST)
+        bh=H2sRdB0zIoimpAVT57VzO2FhLqlcfJwpEUsEldtsV6E=;
+        b=IVI8idI2fOPiXQUalz6tx4ri9bh3BpVsrs5TkY5kOtoJsVlGKpdUXTt9vp5DXYuKB2jNTm
+        GUXCw798T8kPYurSAh9ONiwDts6M6wsIReYmnq2AOz6z9AboKrwe0ThDzQ4BLlcsvXopGp
+        JsPTQYEXLV0S4lHoVXy0cPkp2h26BH8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-CW7A2RPpO5OXEHJLtsDUBg-1; Fri, 19 Feb 2021 06:44:50 -0500
+X-MC-Unique: CW7A2RPpO5OXEHJLtsDUBg-1
+Received: by mail-wr1-f71.google.com with SMTP id e12so2321142wrw.14
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 03:44:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KroGD2ykh3pOVhGFDhJBF9D2GPtRIz+7OKOBV/uF+8M=;
-        b=oOHUUsFCuoL0ubNm2SB3t4Y8CFh8FV6APhdbXT0CoLFg7ysFN2mDeDDUnACTstP6ZG
-         1BbfZ9U1/K2NjglXE8MO9pElEB8snpoErSuTUwOSWLtb0iE6Av2HvOjv9PdJs1jsvMp8
-         st1RIbgQ07+I8VNy0J646IyrNoVbvJODXC6MxPGke5ED6ET0LfXucBhQNuSK73wNJOc9
-         lcynp10L1G7S9PE67mi9HRM1gA/Kg5rXHLbf9wVDwScAMklWDKgNCARWffF4hInpoC/T
-         uoM66pSgQX7aSZMeuQ002Ww7/Gy2LzfLgcRkOeR4pMwd6Ols/Sux84/oQgNy6U96kQeV
-         jusg==
-X-Gm-Message-State: AOAM533J6jfYr2440qVgM/u1+wgCGVyluu47BWfAiy/FINFKXGnF5Vul
-        Gb8XvCnOMESJ7bjlDIf94aYG0sCS58RBD5VCxLK1Tpv36vnKaeDY8hbX7o3GkHrlw8fCMp7YuvG
-        08Rpwxn6xAE3y
-X-Received: by 2002:adf:b342:: with SMTP id k2mr8775456wrd.264.1613735083595;
-        Fri, 19 Feb 2021 03:44:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzTU+1RNp+4PgoRKirdLYmchYJdEj6kCfrIRKlfJu5y+NrUB3ZU6NxI5lqZZ59zN2qat0RgFg==
-X-Received: by 2002:adf:b342:: with SMTP id k2mr8775447wrd.264.1613735083454;
-        Fri, 19 Feb 2021 03:44:43 -0800 (PST)
+        bh=H2sRdB0zIoimpAVT57VzO2FhLqlcfJwpEUsEldtsV6E=;
+        b=e1OpBO21FaqsRTHJlqGYXWHwXXEP5kgxFgC/3kdcH9Vn3UkmBL0a1gPYSPtKSLtWXw
+         I5anIX13P/qQVU3MBUEw2AIu4KDKGpzbeKiUEOYWYoNBbW8NQuhodduCaZPBxU54b7QH
+         QdaJd8A0PTPFMSED4KJatVy1xbCXQYJ6GCFJjjMltZEBcm3otlpOtiskRf/Q65ysXxE0
+         v8SIIAIC/lSIHvIWSXhk5eB2eKsBwEm6WKEtY+OW9dcVm0zUkAKdSnyrc/EdxJjYLeYF
+         QvqKBgvATANyELprH20PiSNsoCBge11KfuKMJUx89xh133sv9I6hKgeeUmVIW3qwHBBO
+         2weA==
+X-Gm-Message-State: AOAM530v1MV3ET7y3BYra/sRigWXpPVd/MoWTcf8TfKMzgA6z4laqnkO
+        3yS4DbPilAQxPVBWo7PAcl68g+kkgUuEWRm1BUFFbDg+KEoUCY3O80zSaC7jLlaFMduSmmeK7dE
+        +5NhB4QYp8yjZ
+X-Received: by 2002:a1c:23c2:: with SMTP id j185mr7787108wmj.96.1613735089336;
+        Fri, 19 Feb 2021 03:44:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzgm4hoiLeIRkPi+gaIG0uc4d/99GH2Q3rzeROPR607tJ3j/N9Qtv1NMuMxJComOxflJzzI2w==
+X-Received: by 2002:a1c:23c2:: with SMTP id j185mr7787095wmj.96.1613735089135;
+        Fri, 19 Feb 2021 03:44:49 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id k15sm11528304wmj.6.2021.02.19.03.44.41
+        by smtp.gmail.com with ESMTPSA id z63sm11490157wme.8.2021.02.19.03.44.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 03:44:43 -0800 (PST)
+        Fri, 19 Feb 2021 03:44:48 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Radoslaw Biernacki <rad@semihalf.com>,
@@ -78,9 +78,9 @@ Cc:     Radoslaw Biernacki <rad@semihalf.com>,
         Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
         kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 2/7] hw/boards: Introduce 'kvm_supported' field to MachineClass
-Date:   Fri, 19 Feb 2021 12:44:23 +0100
-Message-Id: <20210219114428.1936109-3-philmd@redhat.com>
+Subject: [PATCH 3/7] hw/arm: Set kvm_supported for KVM-compatible machines
+Date:   Fri, 19 Feb 2021 12:44:24 +0100
+Message-Id: <20210219114428.1936109-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210219114428.1936109-1-philmd@redhat.com>
 References: <20210219114428.1936109-1-philmd@redhat.com>
@@ -91,35 +91,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce the 'kvm_supported' field to express whether
-a machine supports KVM acceleration or not.
+The following ARM machines support KVM:
+- virt
+- sbsa-ref
+- xlnx-versal-virt
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/boards.h | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/arm/sbsa-ref.c         | 1 +
+ hw/arm/virt.c             | 1 +
+ hw/arm/xlnx-versal-virt.c | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 68d3d10f6b0..0959aa743ee 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -129,6 +129,8 @@ typedef struct {
-  *    Return the type of KVM corresponding to the kvm-type string option or
-  *    computed based on other criteria such as the host kernel capabilities
-  *    (which can't be negative), or -1 on error.
-+ * @kvm_supported:
-+ *    true if '-enable-kvm' option is supported and false otherwise.
-  * @numa_mem_supported:
-  *    true if '--numa node.mem' option is supported and false otherwise
-  * @smp_parse:
-@@ -209,6 +211,7 @@ struct MachineClass {
-     bool nvdimm_supported;
-     bool numa_mem_supported;
-     bool auto_enable_numa;
-+    bool kvm_supported;
-     const char *default_ram_id;
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 9f707351531..6923b6e77ff 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -858,6 +858,7 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *data)
+     mc->possible_cpu_arch_ids = sbsa_ref_possible_cpu_arch_ids;
+     mc->cpu_index_to_instance_props = sbsa_ref_cpu_index_to_props;
+     mc->get_default_cpu_node_id = sbsa_ref_get_default_cpu_node_id;
++    mc->kvm_supported = true;
+ }
  
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+ static const TypeInfo sbsa_ref_info = {
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 371147f3ae9..7e3748b6cd6 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2582,6 +2582,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
++    mc->kvm_supported = true;
+     mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 8482cd61960..fb623c0cd54 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -621,6 +621,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
+     mc->no_cdrom = true;
+     mc->default_ram_id = "ddr";
++    mc->kvm_supported = true;
+ }
+ 
+ static const TypeInfo versal_virt_machine_init_typeinfo = {
 -- 
 2.26.2
 
