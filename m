@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAB7E31F88E
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:46:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28BB231F88F
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:46:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhBSLqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 06:46:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23637 "EHLO
+        id S230378AbhBSLqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 06:46:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59273 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230222AbhBSLqB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 06:46:01 -0500
+        by vger.kernel.org with ESMTP id S230308AbhBSLqH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 06:46:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613735074;
+        s=mimecast20190719; t=1613735080;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=aBiPAh6j0La2jswV89eyq5qlhizmmpayYHhAIblEKKQ=;
-        b=C3zKWfLM5MrEwuKltoQbAerZTNU10TdB5xlVeMHOPbAwOBbCFMaGXH4AIQWpKacL10xc3n
-        AXLe1gQwxvq63XAdmpVJaLA1ZtPnVLVUURz9jkQkYW/jxdFSb08dl7mCSIb9WefJF6K5/Y
-        cYZE4ARBil08WZMsq7RsDWL/a7h3kQM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-_O25KnmQMwSLdq4cLQsL9Q-1; Fri, 19 Feb 2021 06:44:32 -0500
-X-MC-Unique: _O25KnmQMwSLdq4cLQsL9Q-1
-Received: by mail-wr1-f69.google.com with SMTP id f5so2346977wro.7
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 03:44:32 -0800 (PST)
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=98X4DsBNdk1BN09KWcHx0mE3/gzzTZdKxOLSGajyIeI=;
+        b=NtMesX1+Zeqvpm9/jZNRgi1h4EN5bIYdcec9PvD9MpsI067OC7+Ra5jscK2053LG5ADn02
+        ekJcpy94Oj5PTsbjMqUN8nO2Z96s9GddyUWYUK98lpmDGPq69H171LQ6jT+YtPC1Z8K52z
+        4GSvGFKhHf+SvH375bFUqbRhSelBBow=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-508-RpR5mxJUPa-9twbBIAnbmQ-1; Fri, 19 Feb 2021 06:44:38 -0500
+X-MC-Unique: RpR5mxJUPa-9twbBIAnbmQ-1
+Received: by mail-wm1-f71.google.com with SMTP id b201so2353510wmb.9
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 03:44:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=aBiPAh6j0La2jswV89eyq5qlhizmmpayYHhAIblEKKQ=;
-        b=BNGKl+cXE5+FvpH7zQFQJaZbS7QZNTer5Rf+PpbuGvADrS0cKsnxTt9oWXzuGkMYbl
-         Ga1ZSg8An0itDA9DTsqtU+F59Cf+Kb4RtyvriW6NCP1R1yQAluxQRWBjd+BTVfsGmaNZ
-         cMl8TdULBHJztT363LW9z81kuk0lu5HMJpaFL9Ax5s/ZHx0a6LfXVGJ2Pi9+pxC3TWxi
-         N+2Vj/QsxaC9oQKv4tOLJZvsffvCjoaP5togJb4awoQE4B3lyXVeq28TWZcRuzuI0ZVh
-         DScxk1vHxExJnvfnLiW62UjpW/kPJF0x2Hl7hSVC6ZV4vKVcMrRf22U9cXMlXeZ/fy8k
-         fKZQ==
-X-Gm-Message-State: AOAM533sn1Qg1nK+VWYU1sDCD6B83o6PI/Nb7WDHTCc+8r5ttWa4p5wY
-        mnuLJWSk2FnC34qq9MTvR7b+mAnWVjJyHzgcleymK5fa579tqjK99yVuQZmhXQzFlNL/DXu1JnW
-        NBeshOC05TvyK
-X-Received: by 2002:a05:600c:8a2:: with SMTP id l34mr7983459wmp.4.1613735071626;
-        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzCQmJUMzqBp58GRknzlFcK+50J5x/1xbRxspDX0PSKwBAjo2a1yxhfME/pP4E86Lbkjw1cYw==
-X-Received: by 2002:a05:600c:8a2:: with SMTP id l34mr7983425wmp.4.1613735071474;
-        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=98X4DsBNdk1BN09KWcHx0mE3/gzzTZdKxOLSGajyIeI=;
+        b=bo8O9xJsG0C37oRFi51piBi3j4+HUu8p182tmWi1O/23aL7GnO77GX9tIkFNRqkuEn
+         X2ICIroGFP3Ms9Dna5/bppa0oNLn3K2pNWUAQoSwN/4yMif/54yzPpuIxsrgsQX/RIAI
+         RnTaNR7FEBsVQyiTMJFBb3KbSNgSbCzjEKKqhYkD5NP19k+j2mTZkOZWawEHhoKmpcmB
+         UZTkLYS/RFLbPpw53tWkPXT8sVR4nZ2OpSWuCaiWM9Gzjvx1gYH9y5My8flQ1UsgKPwM
+         FfneMsAfhRqwMJagpDccHFZpn4QkiTd7KFhxE1NzYTTme0hU4BCd87oAaZLyGBlgDVjE
+         cI+A==
+X-Gm-Message-State: AOAM530yX+t3SPgdKOFH8iDrzmxYi7Mpqilg8USD28TZuIta7MzuN8cQ
+        XhjWGYA9tly5+TdpBo7/zMMx6ayrWSZeRYG30OaV6r0hTEurR9dTs4Va3u+1dNJH94OXAf9qn3B
+        KLOujmeqS3Maa
+X-Received: by 2002:adf:b357:: with SMTP id k23mr8694387wrd.354.1613735077426;
+        Fri, 19 Feb 2021 03:44:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy8BoyDIy3MZrDx4a9/uBNg8Gu4uQrRfjBpdhkb1HenxWvZ3lMMW1roaXGxl/Jsmb64BZpXBA==
+X-Received: by 2002:adf:b357:: with SMTP id k23mr8694350wrd.354.1613735077292;
+        Fri, 19 Feb 2021 03:44:37 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id l17sm1537098wmq.46.2021.02.19.03.44.29
+        by smtp.gmail.com with ESMTPSA id w81sm11424135wmb.3.2021.02.19.03.44.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
+        Fri, 19 Feb 2021 03:44:36 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Radoslaw Biernacki <rad@semihalf.com>,
@@ -77,55 +78,59 @@ Cc:     Radoslaw Biernacki <rad@semihalf.com>,
         Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
         kvm@vger.kernel.org,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 0/7] hw/kvm: Exit gracefully when KVM is not supported
-Date:   Fri, 19 Feb 2021 12:44:21 +0100
-Message-Id: <20210219114428.1936109-1-philmd@redhat.com>
+Subject: [PATCH 1/7] accel/kvm: Check MachineClass kvm_type() return value
+Date:   Fri, 19 Feb 2021 12:44:22 +0100
+Message-Id: <20210219114428.1936109-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210219114428.1936109-1-philmd@redhat.com>
+References: <20210219114428.1936109-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,=0D
-=0D
-This series aims to improve user experience by providing=0D
-a better error message when the user tries to enable KVM=0D
-on machines not supporting it.=0D
-=0D
-Regards,=0D
-=0D
-Phil.=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (7):=0D
-  accel/kvm: Check MachineClass kvm_type() return value=0D
-  hw/boards: Introduce 'kvm_supported' field to MachineClass=0D
-  hw/arm: Set kvm_supported for KVM-compatible machines=0D
-  hw/mips: Set kvm_supported for KVM-compatible machines=0D
-  hw/ppc: Set kvm_supported for KVM-compatible machines=0D
-  hw/s390x: Set kvm_supported to s390-ccw-virtio machines=0D
-  accel/kvm: Exit gracefully when KVM is not supported=0D
-=0D
- include/hw/boards.h        |  6 +++++-=0D
- accel/kvm/kvm-all.c        | 12 ++++++++++++=0D
- hw/arm/sbsa-ref.c          |  1 +=0D
- hw/arm/virt.c              |  1 +=0D
- hw/arm/xlnx-versal-virt.c  |  1 +=0D
- hw/mips/loongson3_virt.c   |  1 +=0D
- hw/mips/malta.c            |  1 +=0D
- hw/ppc/e500plat.c          |  1 +=0D
- hw/ppc/mac_newworld.c      |  1 +=0D
- hw/ppc/mac_oldworld.c      |  1 +=0D
- hw/ppc/mpc8544ds.c         |  1 +=0D
- hw/ppc/ppc440_bamboo.c     |  1 +=0D
- hw/ppc/prep.c              |  1 +=0D
- hw/ppc/sam460ex.c          |  1 +=0D
- hw/ppc/spapr.c             |  1 +=0D
- hw/s390x/s390-virtio-ccw.c |  1 +=0D
- 16 files changed, 31 insertions(+), 1 deletion(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+MachineClass::kvm_type() can return -1 on failure.
+Document it, and add a check in kvm_init().
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/hw/boards.h | 3 ++-
+ accel/kvm/kvm-all.c | 6 ++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a46dfe5d1a6..68d3d10f6b0 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -127,7 +127,8 @@ typedef struct {
+  *    implement and a stub device is required.
+  * @kvm_type:
+  *    Return the type of KVM corresponding to the kvm-type string option or
+- *    computed based on other criteria such as the host kernel capabilities.
++ *    computed based on other criteria such as the host kernel capabilities
++ *    (which can't be negative), or -1 on error.
+  * @numa_mem_supported:
+  *    true if '--numa node.mem' option is supported and false otherwise
+  * @smp_parse:
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 84c943fcdb2..b069938d881 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
+                                                             "kvm-type",
+                                                             &error_abort);
+         type = mc->kvm_type(ms, kvm_type);
++        if (type < 0) {
++            ret = -EINVAL;
++            fprintf(stderr, "Failed to detect kvm-type for machine '%s'\n",
++                    mc->name);
++            goto err;
++        }
+     }
+ 
+     do {
+-- 
+2.26.2
 
