@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC41531FE15
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:42:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4C331FE18
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 18:43:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229990AbhBSRlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 12:41:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34423 "EHLO
+        id S229996AbhBSRlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 12:41:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58429 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229967AbhBSRlH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:41:07 -0500
+        by vger.kernel.org with ESMTP id S229991AbhBSRlL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 12:41:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613756381;
+        s=mimecast20190719; t=1613756385;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0XNpw7EsZwRfqH5jj+d5q0K26B/2H8ocJXujjf2y0q0=;
-        b=RDQEjTRLZTWO2mxBVuE+CjuwWYnePnPDhe8EbBtHCO5ciJX6yb2P6dMZLwdDp105DHn+43
-        Wv5sAUTAyloJyAW4gJabhwg3ByiTlGol+azzEp4iDiIbEuA8TSWDwMwzJ4m3WXVtyG3h8Q
-        DTITpNp4g3ky6p7qnB3q5/xLThu8hm0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-q0Qp5HYGM2yqTLcX5CyFkw-1; Fri, 19 Feb 2021 12:39:38 -0500
-X-MC-Unique: q0Qp5HYGM2yqTLcX5CyFkw-1
-Received: by mail-wm1-f69.google.com with SMTP id b62so2784990wmc.5
-        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:37 -0800 (PST)
+        bh=m89dmrSplgkgoyBA9XFoMMYsKZX69TbxEanq9oDkcW0=;
+        b=JEKKxhMc4fPJKMm8IN1nbv2+K5pOJGMwCJpYZ3by1SgsbEYLRuEpDK//Q2ZmcQHmTlZe5h
+        0pVMeyHrg6cpiUfX90g3lutN3L4jh+VYpMbz12nyaUoBkiAs7aw68Qdhu8VkoWFUJYhe0+
+        Cc7PtECKSByiWWyKTW/d6gqn9e9Nxqo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-NEXKjxB9MsiFboNGiHssAw-1; Fri, 19 Feb 2021 12:39:43 -0500
+X-MC-Unique: NEXKjxB9MsiFboNGiHssAw-1
+Received: by mail-wm1-f71.google.com with SMTP id b201so2769705wmb.9
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 09:39:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0XNpw7EsZwRfqH5jj+d5q0K26B/2H8ocJXujjf2y0q0=;
-        b=smsPJdMQ5zlJWabxei/8lu87yf/RFVGs8/TjDJV60gWBJGU0YZ/YTtObDkEgTtkexx
-         sv9GxKxjelafs0R7ZnEtyfCB/Wnf4iikHpCSvCQlrOZkzM1cr8aw8Ggj7aP2QwXkdyFQ
-         ALJmv55PPnRp03zCJnbIz4aQ+AUOuR3308bFlU8JW+Sud7bhmB5KFtkv3tOmTn6MMmGV
-         dVF4fEI8Av7kkwYaBVBKvBIKFjvFmEJDYcK3+gmTRfIcTInJ/34Fk9Jnmy61sZ/BKGGw
-         CO9E84YOzJxVlS+JGCAYFdW+Mvez0zTaDTdLdJ2ztUMlYi+7p+wTO5ryXnQLU3n+9N3P
-         ADQA==
-X-Gm-Message-State: AOAM530eRHrKXhEEmcCHeeAwuvoGudW7E5nUZA5xcs+Vc9hZSD72EIei
-        WDqEVDANwhZBuoVC+NhyvpZl1MI04/XTLn15JRaM6b33hmr7MlY1impYuDwEP9Ka8ZDDw2DeYqw
-        D8/8WBXKA7HqD
-X-Received: by 2002:adf:fb91:: with SMTP id a17mr10124640wrr.93.1613756376927;
-        Fri, 19 Feb 2021 09:39:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwUWYk16cfFnjfBZLMWl2Vy5aAjSJDcFd3Zrj54+kp+HHEcqph2ioitLZ00EdqyQhCQF2e9eA==
-X-Received: by 2002:adf:fb91:: with SMTP id a17mr10124607wrr.93.1613756376757;
-        Fri, 19 Feb 2021 09:39:36 -0800 (PST)
+        bh=m89dmrSplgkgoyBA9XFoMMYsKZX69TbxEanq9oDkcW0=;
+        b=A0mploV6hRQfkhxdgWqAZ3rfyzYD67fanwfOvqLxvpe3q9S5lgIp8HEsYeg+MTgfMU
+         oNwdM5tDySL8CwGoehcAEl6hLnFwIwoI/5HVHtAr9g+RlbDfxRkv9KBJDzxVJ/xCZYjI
+         SKlDbOjNiTxIf3VnthNqNpnNjDT5Ik2xAGfQ9zDMUKWSHJ3HPq3v+NZuJxbCF7CRXtCh
+         puyy8DFHnYBh+aoP94Cm97sIfldISiYcenFRSmgp+16DAiubLqSYZZkUauVkthH1DgRI
+         N2IKFBuizm+xeh1xSOqXahSNrMrCfQ3hAKyuNZoTNpLKNFzhXauzm37tAR62zCvnnaTx
+         Xwew==
+X-Gm-Message-State: AOAM533GhMrzcOrAfMYz0OvQPF+IyZKzCzJfq/gWrKXvr3J7sonc7vGl
+        5fFooqGEkXp2QaOa3H/Ko1ZWcoP8ecUhLoIhZOOBnH11K50EVWh2O2L5qK7JvExG/RMuWcTLTno
+        AgVNhZJab7RLB
+X-Received: by 2002:a1c:c6:: with SMTP id 189mr9272312wma.128.1613756382370;
+        Fri, 19 Feb 2021 09:39:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyfL/zeX1Twd/41yRwfBzbYwswnUhtDRMBecaJ3a8NHeinaw0+wzScyZWOOrq01liX3KOGGMQ==
+X-Received: by 2002:a1c:c6:: with SMTP id 189mr9272291wma.128.1613756382214;
+        Fri, 19 Feb 2021 09:39:42 -0800 (PST)
 Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id c133sm2365046wme.46.2021.02.19.09.39.34
+        by smtp.gmail.com with ESMTPSA id b72sm13082236wmd.4.2021.02.19.09.39.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Feb 2021 09:39:36 -0800 (PST)
+        Fri, 19 Feb 2021 09:39:41 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Aurelien Jarno <aurelien@aurel32.net>,
@@ -83,9 +83,9 @@ Cc:     Aurelien Jarno <aurelien@aurel32.net>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [RFC PATCH v2 08/11] hw/i386: Explicit x86 machines support all current accelerators
-Date:   Fri, 19 Feb 2021 18:38:44 +0100
-Message-Id: <20210219173847.2054123-9-philmd@redhat.com>
+Subject: [PATCH v2 09/11] hw/xenpv: Restrict Xen Para-virtualized machine to Xen accelerator
+Date:   Fri, 19 Feb 2021 18:38:45 +0100
+Message-Id: <20210219173847.2054123-10-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210219173847.2054123-1-philmd@redhat.com>
 References: <20210219173847.2054123-1-philmd@redhat.com>
@@ -96,38 +96,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-x86 machines currently support all accelerators.
+When started with other accelerator than Xen, the XenPV machine
+fails with a criptic message:
+
+  $ qemu-system-x86_64 -M xenpv,accel=kvm
+  xen be core: can't connect to xenstored
+  qemu-system-x86_64: xen_init_pv: xen backend core setup failed
+
+By restricting it to Xen, we display a clearer error message:
+
+  $ qemu-system-x86_64 -M xenpv,accel=kvm
+  qemu-system-x86_64: invalid accelerator 'kvm' for machine xenpv
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
-RFC: not sure about this, x86 is not my cup of tea
-
- hw/i386/x86.c | 5 +++++
+ hw/xenpv/xen_machine_pv.c | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 6329f90ef90..2dc10e7d386 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -1209,6 +1209,10 @@ static void x86_machine_initfn(Object *obj)
-     x86ms->pci_irq_mask = ACPI_BUILD_PCI_IRQS;
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 8df575a457c..d7747bcec98 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -86,12 +86,17 @@ static void xen_init_pv(MachineState *machine)
+     atexit(xen_config_cleanup);
  }
  
-+static const char *const valid_accels[] = {
-+    "tcg", "kvm", "xen", "hax", "hvf", "whpx", NULL
++static const char *valid_accels[] = {
++    "xen", NULL
 +};
 +
- static void x86_machine_class_init(ObjectClass *oc, void *data)
+ static void xenpv_machine_init(MachineClass *mc)
  {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1218,6 +1222,7 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-     mc->cpu_index_to_instance_props = x86_cpu_index_to_props;
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
+     mc->desc = "Xen Para-virtualized PC";
+     mc->init = xen_init_pv;
+     mc->max_cpus = 1;
+     mc->default_machine_opts = "accel=xen";
 +    mc->valid_accelerators = valid_accels;
-     x86mc->compat_apic_id_mode = false;
-     x86mc->save_tsc_khz = true;
-     nc->nmi_monitor_handler = x86_nmi;
+ }
+ 
+ DEFINE_MACHINE("xenpv", xenpv_machine_init)
 -- 
 2.26.2
 
