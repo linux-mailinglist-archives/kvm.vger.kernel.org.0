@@ -2,132 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EFE731F91E
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:13:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3362031F931
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 13:14:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbhBSMMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 07:12:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33558 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229524AbhBSMM0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 07:12:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613736659;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=45Dm/mZfrJbWzizoN9wLVx4pShqBQ+9iMXBHgbG5TR0=;
-        b=VIcFCYwwxZkaEh9FI7T3JH5HW0ogcVtMvS+Wvssi+66HaS5X2mizXEwZV/tQUMLi+YSNql
-        fO24TCnW+MG1GPHHSW/G7cPjtW0awyoyfgsENRgbU08yQBXihWkUBOQp0Ck9kesZsXcUaI
-        yNBJQ8Jb+oFqz3zQPWLTIfyBBafK4gI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-AFE5aQfpPteMhmzp8Pa9qA-1; Fri, 19 Feb 2021 07:10:43 -0500
-X-MC-Unique: AFE5aQfpPteMhmzp8Pa9qA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDEB1100A8E9;
-        Fri, 19 Feb 2021 12:10:40 +0000 (UTC)
-Received: from redhat.com (ovpn-113-184.ams2.redhat.com [10.36.113.184])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 653155C1BB;
-        Fri, 19 Feb 2021 12:10:30 +0000 (UTC)
-Date:   Fri, 19 Feb 2021 12:10:27 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Thomas Huth <thuth@redhat.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-s390x <qemu-s390x@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-        qemu-ppc <qemu-ppc@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-Subject: Re: [PATCH 2/7] hw/boards: Introduce 'kvm_supported' field to
- MachineClass
-Message-ID: <YC+qs7R140qAWnJY@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20210219114428.1936109-1-philmd@redhat.com>
- <20210219114428.1936109-3-philmd@redhat.com>
- <YC+nxWnB+eaiq736@redhat.com>
- <CAFEAcA-A=TG43w2yNfrDwCgYYNZBEa25cM_yYgREfQyKa=PZEQ@mail.gmail.com>
+        id S230348AbhBSMOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 07:14:24 -0500
+Received: from foss.arm.com ([217.140.110.172]:35010 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229804AbhBSMOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Feb 2021 07:14:19 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BBC3ED1;
+        Fri, 19 Feb 2021 04:13:33 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC28E3F73B;
+        Fri, 19 Feb 2021 04:13:32 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     drjones@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     andre.przywara@arm.com, eric.auger@redhat.com
+Subject: [kvm-unit-tests PATCH v4 00/11] GIC fixes and improvements
+Date:   Fri, 19 Feb 2021 12:13:26 +0000
+Message-Id: <20210219121337.76533-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA-A=TG43w2yNfrDwCgYYNZBEa25cM_yYgREfQyKa=PZEQ@mail.gmail.com>
-User-Agent: Mutt/2.0.5 (2021-01-21)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 19, 2021 at 12:08:05PM +0000, Peter Maydell wrote:
-> On Fri, 19 Feb 2021 at 11:58, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > Is the behaviour reported really related to KVM specifically, as opposed
-> > to all hardware based virt backends ?
-> >
-> > eg is it actually a case of some machine types being  "tcg_only" ?
-> 
-> Interesting question. At least for Arm the major items are:
->  * does the accelerator support emulation of EL3/TrustZone?
->    (KVM doesn't; this is the proximate cause of the assertion
->    failure if you try to enable KVM for the raspi boards.)
->  * does the board type require a particular CPU type which
->    KVM doesn't/can't support?
-> Non-KVM accelerators could at least in theory have different answers
-> to those questions, though in practice I think they do not.
-> 
-> I think my take is that we probably should mark the boards
-> as 'tcg-only' vs 'not-tcg-only', because in practice that's
-> the interesting distinction. Specifically, our security policy
-> https://qemu.readthedocs.io/en/latest/system/security.html
-> draws a boundary between "virtualization use case" and
-> "emulated", so it's really helpful to be able to say clearly
-> "this board model does not support virtualization, and therefore
-> any bugs in it or its devices are simply outside the realm of
-> being security issues" when doing analysis of the codebase or
-> when writing or reviewing new code.
+What started this series is Andre's SPI and group interrupts tests [1],
+which prompted me to attempt to rewrite check_acked() so it's more flexible
+and not so complicated to review. When I was doing that I noticed that the
+message passing pattern for accesses to the acked, bad_irq and bad_sender
+arrays didn't look quite right, and that turned into the first 7 patches of
+the series. Even though the diffs are relatively small, they are not
+trivial and the reviewer can skip them for the more palatable patches that
+follow. I would still appreciate someone having a look at the memory
+ordering fixes.
 
-Oh, yes, that is useful to correlate with.
+Patch #8 ("Split check_acked() into two functions") is where check_acked()
+is reworked with an eye towards supporting different timeout values or
+silent reporting without adding too many arguments to check_acked().
 
-> If we ever have support for some new accelerator type where there's
-> a board type distinction between KVM and that new accelerator and
-> it makes sense to try to say "this board is supported by the new
-> thing even though it won't work with KVM", the folks interested in
-> adding that new accelerator will have the motivation to look
-> into exactly which boards they want to enable support for and
-> can add a funky_accelerator_supported flag or whatever at that time.
-> 
-> Summary: we should name this machine class field
-> "virtualization_supported" and check it in all the virtualization
-> accelerators (kvm, hvf, whpx, xen).
+After changing the IPI tests, I turned my attention to the LPI tests, which
+followed the same memory synchronization patterns, but invented their own
+interrupt handler and testing functions. Instead of redoing the work that I
+did for the IPI tests, I decided to convert the LPI tests to use the same
+infrastructure.
 
-Agreed.
+For v2, I ran tests on the following machines and didn't see any issues:
 
-Regards,
-Daniel
+- Ampere EMAG: all arm64 tests 10,000+ times (combined) under qemu and
+  kvmtool.
+
+- rockpro64: the arm GICv2 and GICv3 tests 10,000+ times under kvmtool (I
+  chose kvmtool because it's faster than qemu); the arm64 gic tests (GICv2
+  and GICv3) 5000+ times with qemu (didn't realize that ./run_tests.sh -g
+  gic doesn't include the its tests); the arm64 GICv2 and GICv3 and ITS
+  tests under kvmtool 13,000+ times.
+
+For v3, because the changes weren't too big, I ran ./run_tests.sh for arm
+and arm64 with qemu TCG on the my x86 machine; ran ./run_tests.sh for arm64
+on rockpro64; and ran all the gic tests for arm and arm64 under kvmtool on
+the rockpro64.
+
+For v4, same tests as for v3.
+
+Changes in v4:
+
+ * Gathered Reviewed-by and Acked-by tags, thank you for the feedback!
+
+ * Cosmetic changes to the commit message for #4 ("arm/arm64: gic: Remove
+   unnecessary synchronization with stats_reset()").
+
+ * Dropped the unneeded wmb() before its_send_invall() in #11 ("arm64: gic:
+   Use IPI test checking for the LPI tests") (the wmb is present in
+   its_send_inval->its_send_single_command->its_post_commands->writeq.
+
+Changes in v3:
+
+* Gathered Reviewed-by tags, thank you for the feedback!
+
+* Reworked patch #2 and renamed it to "lib: arm/arm64: gicv2: Document
+  existing barriers when sending IPIs". The necessary barriers were already in
+  place in writel/readl. Dropped the R-b tag.
+
+* Removed the GICv2 smp_rmb() barrier in #4 ("arm/arm64: gic: Remove unnecessary
+  synchronization with stats_reset") because of the rmb() already present in
+  readl() and reworded the commit message accordingly. Dropped the R-b tag.
+
+* Commented the extra delay in wait_for_interrupts() for patch #8
+  ("arm/arm64: gic: Split check_acked() into two functions").
+
+* Minor change to the commit message for #10 ("arm64: gic: its-trigger:
+  Don't trigger the LPI while it is pending") as per Andre's suggestion.
+
+* Dropped patch #11 ("lib: arm64: gic-v3-its: Add wmb() barrier before INT
+  command") because the wmb() was already present in __its_send_int() ->
+  its_send_single_command() -> its_post_commands() -> writeq().
+
+Changes in v2:
+
+* Gathered Reviewed-by tags, thank you for the feedback!
+
+* Modified code comments in #1 ("lib: arm/arm64: gicv3: Add missing barrier
+  when sending IPIs") as per review suggestions.
+
+* Moved the barrier() in gicv2_ipi_send_self() from #3 ("arm/arm64: gic:
+  Remove memory synchronization from ipi_clear_active_handler()") to #2
+  ("lib: arm/arm64: gicv2: Add missing barrier when sending IPIs").
+
+* Renamed #3, changed "[..] Remove memory synchronization [..]" to
+  "[..] Remove SMP synchronization [..]".
+
+* Moved the removal of smp_rmb() from check_spurious() from #5 ("arm/arm64:
+  gic: Use correct memory ordering for the IPI test") to patch #7
+  ("arm/arm64: gic: Wait for writes to acked or spurious to complete").
+
+* Fixed typos in #8 ("arm/arm64: gic: Split check_acked() into two
+  functions").
+
+* Patch #10 ("arm64: gic: its-trigger: Don't trigger the LPI while it is
+  pending") is new. It was added to fix an issue found in v1 [2].
+
+* Patch #11 ("lib: arm64: gic-v3-its: Add wmb() barrier before INT
+  command") is also new; it was split from #12 ("arm64: gic: Use IPI test
+  checking for the LPI tests") following review comments.
+
+* Removed the now redundant call to stats_reset() from its_prerequisites()
+  in #12 ("arm64: gic: Use IPI test checking for the LPI tests").
+
+[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2019-November/037853.html
+[2] https://www.spinics.net/lists/kvm-arm/msg43628.html
+
+Alexandru Elisei (11):
+  lib: arm/arm64: gicv3: Add missing barrier when sending IPIs
+  lib: arm/arm64: gicv2: Document existing barriers when sending IPIs
+  arm/arm64: gic: Remove SMP synchronization from
+    ipi_clear_active_handler()
+  arm/arm64: gic: Remove unnecessary synchronization with stats_reset()
+  arm/arm64: gic: Use correct memory ordering for the IPI test
+  arm/arm64: gic: Check spurious and bad_sender in the active test
+  arm/arm64: gic: Wait for writes to acked or spurious to complete
+  arm/arm64: gic: Split check_acked() into two functions
+  arm/arm64: gic: Make check_acked() more generic
+  arm64: gic: its-trigger: Don't trigger the LPI while it is pending
+  arm64: gic: Use IPI test checking for the LPI tests
+
+ lib/arm/gic-v2.c |   6 +
+ lib/arm/gic-v3.c |   6 +
+ arm/gic.c        | 336 +++++++++++++++++++++++++----------------------
+ 3 files changed, 188 insertions(+), 160 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.30.1
 
