@@ -2,134 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 668AD31F7E7
-	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAB7E31F88E
+	for <lists+kvm@lfdr.de>; Fri, 19 Feb 2021 12:46:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230206AbhBSLGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Feb 2021 06:06:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56130 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbhBSLGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Feb 2021 06:06:37 -0500
-Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5589CC061574;
-        Fri, 19 Feb 2021 03:05:57 -0800 (PST)
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id AAE9A295; Fri, 19 Feb 2021 12:05:54 +0100 (CET)
-Date:   Fri, 19 Feb 2021 12:05:49 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Joerg Roedel <jroedel@suse.de>, X86 ML <x86@kernel.org>,
-        stable <stable@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH 2/3] x86/sev-es: Check if regs->sp is trusted before
- adjusting #VC IST stack
-Message-ID: <20210219110549.GI7302@8bytes.org>
-References: <20210217120143.6106-1-joro@8bytes.org>
- <20210217120143.6106-3-joro@8bytes.org>
- <CALCETrWw-we3O4_upDoXJ4NzZHsBqNO69ht6nBp3y+QFhwPgKw@mail.gmail.com>
- <20210218112500.GH7302@8bytes.org>
- <CALCETrUohqQPVTBJZZKh-pj=4aZrwDAu5UFSetj3k5pGLDPbkA@mail.gmail.com>
- <20210218192117.GL12716@suse.de>
- <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
+        id S230375AbhBSLqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Feb 2021 06:46:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23637 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230222AbhBSLqB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Feb 2021 06:46:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613735074;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aBiPAh6j0La2jswV89eyq5qlhizmmpayYHhAIblEKKQ=;
+        b=C3zKWfLM5MrEwuKltoQbAerZTNU10TdB5xlVeMHOPbAwOBbCFMaGXH4AIQWpKacL10xc3n
+        AXLe1gQwxvq63XAdmpVJaLA1ZtPnVLVUURz9jkQkYW/jxdFSb08dl7mCSIb9WefJF6K5/Y
+        cYZE4ARBil08WZMsq7RsDWL/a7h3kQM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-_O25KnmQMwSLdq4cLQsL9Q-1; Fri, 19 Feb 2021 06:44:32 -0500
+X-MC-Unique: _O25KnmQMwSLdq4cLQsL9Q-1
+Received: by mail-wr1-f69.google.com with SMTP id f5so2346977wro.7
+        for <kvm@vger.kernel.org>; Fri, 19 Feb 2021 03:44:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aBiPAh6j0La2jswV89eyq5qlhizmmpayYHhAIblEKKQ=;
+        b=BNGKl+cXE5+FvpH7zQFQJaZbS7QZNTer5Rf+PpbuGvADrS0cKsnxTt9oWXzuGkMYbl
+         Ga1ZSg8An0itDA9DTsqtU+F59Cf+Kb4RtyvriW6NCP1R1yQAluxQRWBjd+BTVfsGmaNZ
+         cMl8TdULBHJztT363LW9z81kuk0lu5HMJpaFL9Ax5s/ZHx0a6LfXVGJ2Pi9+pxC3TWxi
+         N+2Vj/QsxaC9oQKv4tOLJZvsffvCjoaP5togJb4awoQE4B3lyXVeq28TWZcRuzuI0ZVh
+         DScxk1vHxExJnvfnLiW62UjpW/kPJF0x2Hl7hSVC6ZV4vKVcMrRf22U9cXMlXeZ/fy8k
+         fKZQ==
+X-Gm-Message-State: AOAM533sn1Qg1nK+VWYU1sDCD6B83o6PI/Nb7WDHTCc+8r5ttWa4p5wY
+        mnuLJWSk2FnC34qq9MTvR7b+mAnWVjJyHzgcleymK5fa579tqjK99yVuQZmhXQzFlNL/DXu1JnW
+        NBeshOC05TvyK
+X-Received: by 2002:a05:600c:8a2:: with SMTP id l34mr7983459wmp.4.1613735071626;
+        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzCQmJUMzqBp58GRknzlFcK+50J5x/1xbRxspDX0PSKwBAjo2a1yxhfME/pP4E86Lbkjw1cYw==
+X-Received: by 2002:a05:600c:8a2:: with SMTP id l34mr7983425wmp.4.1613735071474;
+        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
+Received: from localhost.localdomain (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
+        by smtp.gmail.com with ESMTPSA id l17sm1537098wmq.46.2021.02.19.03.44.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Feb 2021 03:44:31 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Radoslaw Biernacki <rad@semihalf.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, qemu-s390x@nongnu.org,
+        Greg Kurz <groug@kaod.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        qemu-arm@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        BALATON Zoltan <balaton@eik.bme.hu>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Leif Lindholm <leif@nuviainc.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Thomas Huth <thuth@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, qemu-ppc@nongnu.org,
+        =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        kvm@vger.kernel.org,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH 0/7] hw/kvm: Exit gracefully when KVM is not supported
+Date:   Fri, 19 Feb 2021 12:44:21 +0100
+Message-Id: <20210219114428.1936109-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALCETrUaOLwO51Js+OGNY03aep8BHoncZKTMr8sG1guUhLk40A@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 04:28:36PM -0800, Andy Lutomirski wrote:
-> On Thu, Feb 18, 2021 at 11:21 AM Joerg Roedel <jroedel@suse.de> wrote:
-> Can you give me an example, even artificial, in which the linked-list
-> logic is useful?
+Hi,=0D
+=0D
+This series aims to improve user experience by providing=0D
+a better error message when the user tries to enable KVM=0D
+on machines not supporting it.=0D
+=0D
+Regards,=0D
+=0D
+Phil.=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (7):=0D
+  accel/kvm: Check MachineClass kvm_type() return value=0D
+  hw/boards: Introduce 'kvm_supported' field to MachineClass=0D
+  hw/arm: Set kvm_supported for KVM-compatible machines=0D
+  hw/mips: Set kvm_supported for KVM-compatible machines=0D
+  hw/ppc: Set kvm_supported for KVM-compatible machines=0D
+  hw/s390x: Set kvm_supported to s390-ccw-virtio machines=0D
+  accel/kvm: Exit gracefully when KVM is not supported=0D
+=0D
+ include/hw/boards.h        |  6 +++++-=0D
+ accel/kvm/kvm-all.c        | 12 ++++++++++++=0D
+ hw/arm/sbsa-ref.c          |  1 +=0D
+ hw/arm/virt.c              |  1 +=0D
+ hw/arm/xlnx-versal-virt.c  |  1 +=0D
+ hw/mips/loongson3_virt.c   |  1 +=0D
+ hw/mips/malta.c            |  1 +=0D
+ hw/ppc/e500plat.c          |  1 +=0D
+ hw/ppc/mac_newworld.c      |  1 +=0D
+ hw/ppc/mac_oldworld.c      |  1 +=0D
+ hw/ppc/mpc8544ds.c         |  1 +=0D
+ hw/ppc/ppc440_bamboo.c     |  1 +=0D
+ hw/ppc/prep.c              |  1 +=0D
+ hw/ppc/sam460ex.c          |  1 +=0D
+ hw/ppc/spapr.c             |  1 +=0D
+ hw/s390x/s390-virtio-ccw.c |  1 +=0D
+ 16 files changed, 31 insertions(+), 1 deletion(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-So here we go, its of course artificial, but still:
-
-	1. #VC happens, not important where
-	2. NMI in the #VC prologue before it moved off its IST stack
-	   - first VC IST adjustment happening here
-	3. #VC in the NMI handler
-	4. #HV in the #VC prologue again
-	   - second VC IST adjustment happening here, so the #HV handler
-	     can cause its own #VC exceptions.
-
-Can only happen if the #HV handler is allowed to cause #VC exceptions.
-But even if its not allowed, it can happen with SNP and a malicious
-Hypervisor. But in this case the only option is to reliably panic.
-
-> Can you explain your reasoning in considering the entry stack unsafe?
-> It's 4k bytes these days.
-
-I wasn't aware that it is 4k in size now. I still thought it was just
-these 64 words large and one can not simply execute C code on it.
-
-> You forgot about entry_SYSCALL_compat.
-
-Right, thanks for pointing this out.
-
-> Your 8-byte alignment is confusing to me.  In valid kernel code, SP
-> should be 8-byte-aligned already, and, if you're trying to match
-> architectural behavior, the CPU aligns to 16 bytes.
-
-Yeah, I was just being cautious. The explicit alignment can be removed,
-Boris also pointed this out.
-
-> We're not robust against #VC, NMI in the #VC prologue before the magic
-> stack switch, and a new #VC in the NMI prologue.  Nor do we appear to
-> have any detection of the case where #VC nests directly inside its own
-> prologue.  Or did I miss something else here?
-
-No, you don't miss anything here. At the moment #VC can't happen at
-those places, so this is not handled yet. With SNP it can happen and
-needs to be handled in a way to at least allow a reliable panic (because
-if it really happens the Hypervisor is messing with us).
-
-> If we get NMI and get #VC in the NMI *asm*, the #VC magic stack switch
-> looks like it will merrily run itself in the NMI special-stack-layout
-> section, and that sounds really quite bad.
-
-Yes, I havn't looked at the details yet, but if a #VC happens there it
-probably better not returns.
-
-
-> I mean that, IIRC, a malicious hypervisor can inject inappropriate
-> vectors at inappropriate times if the #HV mechanism isn't enabled.
-> For example, it could inject a page fault or an interrupt in a context
-> in which we have the wrong GSBASE loaded.
-
-Yes, a malicious Hypervisor can do that, and without #HV there is no
-real protection against this besides turning all vectors (even IRQs)
-into paranoid entries. Maybe even more care is needed, but I think its
-not worth to care about this. 
-
-> But the #DB issue makes this moot.  We have to use IST unless we turn
-> off SCE.  But I admit I'm leaning toward turning off SCE until we have
-> a solution that seems convincingly robust.
-
-Turning off SCE might be tempting, but I guess doing so would break a
-quite some user-space code, no?
-
-Regards,
-
-	Joerg
