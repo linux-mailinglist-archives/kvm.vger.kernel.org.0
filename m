@@ -2,98 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3217320A36
-	for <lists+kvm@lfdr.de>; Sun, 21 Feb 2021 13:12:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F2E320BEE
+	for <lists+kvm@lfdr.de>; Sun, 21 Feb 2021 18:08:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbhBUMMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Feb 2021 07:12:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbhBUMMH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Feb 2021 07:12:07 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B07D0C06178C
-        for <kvm@vger.kernel.org>; Sun, 21 Feb 2021 04:11:26 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id a17so47264940ljq.2
-        for <kvm@vger.kernel.org>; Sun, 21 Feb 2021 04:11:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6BaYeStx5XlEI2H6fREV0PGgKmNTuolmOOj8Wnxngjs=;
-        b=QGUUUqwYGj3Bl/lr90Oe9KVytxhiEOK0IuBBCOV9l8LowRPufr5Q1TSW1mhdPCzXYX
-         7BJGIOm78YenXRt/KoPDcC3kvQH7WDjFMLGcCIkfaQTDRKdFM9Btfha5YnnDx71gtX8v
-         g1a9d+N5dRoYIB8pmtf4e+Y5FokO2hil6Q67hd5syBEwQ3kAdmacR4f+p2zfRA7Ac8Bn
-         y32Idt0CCDrhKZrmyMQ8OK4Bvz7bxMMogHUMafNbk2Jno46LNYx/KbLmQFPdnB9YC3+J
-         Y3b7zrBEng2F4TKcSr51V1ddyeKR1sfvjaKwOmbi3JCyCZkO16/yhSF7Jb61SYpXUlVr
-         v5rA==
+        id S230088AbhBURI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Feb 2021 12:08:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55506 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230060AbhBURIW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 21 Feb 2021 12:08:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613927214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qxxxo+Cy9kESrt27fv9A3+kiw9hw+4IOipfKR/JRLTg=;
+        b=ZHcAPvLbtv2vSR3Z42IUXNbp0IqbDK6sXFcvvvZpOWayQj4ZzFhZbPhv/O+pER1GGzstMp
+        bMLzLl9sEYN5YuSEUNJ96kqkoxyUFnny1VtYu/kqMywAlsTm4jAgrOB64EoYdgagiVSGYk
+        tXcMju09W2d1dQEU+MsA9s8T9BYmau0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-adnsskRXOpWJVJ7--jf0EQ-1; Sun, 21 Feb 2021 12:06:52 -0500
+X-MC-Unique: adnsskRXOpWJVJ7--jf0EQ-1
+Received: by mail-wr1-f71.google.com with SMTP id c9so4992962wrq.18
+        for <kvm@vger.kernel.org>; Sun, 21 Feb 2021 09:06:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6BaYeStx5XlEI2H6fREV0PGgKmNTuolmOOj8Wnxngjs=;
-        b=cLo0WNCEOXy9QFCpBaAKqCNT/A8y5MkNW5QKJpObjOnzHxd6w06t5bMPkghHytmEQT
-         Q6MUt5HuVCcXDysmyL2wq9MgGL9LsywOp7hPnq8Uo5EFPUjjIylmwAbi3V6XGk8MP2AI
-         P+bTXJphpk6mQQeEtJidAHSUq73J//PzbYZ6kzZHJIuG6FOiGgl1LMAb6n75zBadXULT
-         sxjWdVq5sg1FZEGjDVaA7GlJgSRcGwhsoWqcJKC8OqnW9NrHU0iVEA3ODCWEqmnt6Ox4
-         MBvNKwnFh3+w2qkyPw4dmzx3treRfaE093kn39uA9zXoHKVxAX9ETX9ddYgcWf9gugoM
-         DzKw==
-X-Gm-Message-State: AOAM533rCz6LHoFffRyo5uhZ/nhOAVqObhY9O725W67IwZtWFlGpr6TN
-        qQgLCBD0hsWG0IWnx6db4jqUXnCeMt7NRfnQ
-X-Google-Smtp-Source: ABdhPJxru09ZwV8MbCjkpcHfT/qCx8SjEGcn+/3yVxYO9XyvcHoJpoqW2hvMt3h6EXnCoHwSuj0Exw==
-X-Received: by 2002:a2e:9b5a:: with SMTP id o26mr3274555ljj.6.1613909484968;
-        Sun, 21 Feb 2021 04:11:24 -0800 (PST)
-Received: from localhost.localdomain (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id q6sm1547715lfn.23.2021.02.21.04.11.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Feb 2021 04:11:24 -0800 (PST)
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     kvm@vger.kernel.org
+        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Qxxxo+Cy9kESrt27fv9A3+kiw9hw+4IOipfKR/JRLTg=;
+        b=KbQeZ9TSNgcbIaE6GdZhxqa0J5G40wt63/yS6Kv/gmVNBinToN+jr3M18vF04/4WFk
+         Ts8Z1FISrKRfAKenK8pfkt3GE0lx+jgL64TUiAMIOtxGF8+t2YdInJ2tV0S4JUwmrr7F
+         DaEiOvVdpCBbnvA33S7B3SMA03Vch6EWfm6K3wgYhRj9v/bjtdFarMjwDc9htuQkOEYT
+         +RfPNMhGqaywSee8pcQw1bUyb8Km0o0UrxCIs+pIwU2gb/OV0UCr0ZwJTPWUoM7wKF0T
+         puww0SsfDoCoNkYKO9uBhuohK0sl91LdGWoxWo2i9odyilEMlCSJdfWBSQjCf8nzwV/+
+         NsJw==
+X-Gm-Message-State: AOAM533CY/vwIwUaj/Xi3n+la3sTfxu3gxuO/ZVHFOtVVgNRm9Y++7zG
+        mrM7k20kq3Wk5KeD5Dpg+EwbLH7oD2XjjNK3Ap6fYjZxpetgRF7taCDm5e+7eNeVSU51S20ubMb
+        QX2ZBrr0WQTKF
+X-Received: by 2002:a1c:8005:: with SMTP id b5mr17030204wmd.130.1613927211774;
+        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx9QIJnst3EfbCAjYi8KyjAPa3Kc30Zq3Ybs1M5PuHEXoNHanyj4BMN/RxaiSIFlVBfAHpERA==
+X-Received: by 2002:a1c:8005:: with SMTP id b5mr17030191wmd.130.1613927211611;
+        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id t23sm2298544wmn.13.2021.02.21.09.06.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
+To:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org
 Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, pbonzini@redhat.com,
-        jasowang@redhat.com, mst@redhat.com, cohuck@redhat.com,
-        john.levon@nutanix.com, Elena Afanasova <eafanasova@gmail.com>
-Subject: [RFC v3 5/5] KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
-Date:   Sun, 21 Feb 2021 15:04:41 +0300
-Message-Id: <bca4faec42f779d17b7fad7890eb9d27bfea76fc.1613828727.git.eafanasova@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1613828726.git.eafanasova@gmail.com>
+        elena.ufimtseva@oracle.com, jasowang@redhat.com, mst@redhat.com,
+        cohuck@redhat.com, john.levon@nutanix.com
 References: <cover.1613828726.git.eafanasova@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC v3 0/5] Introduce MMIO/PIO dispatch file descriptors
+ (ioregionfd)
+Message-ID: <8fc8eae6-7bea-9333-47cb-e49cf86fa336@redhat.com>
+Date:   Sun, 21 Feb 2021 18:06:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <cover.1613828726.git.eafanasova@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-ioregionfd relies on kmemcg in order to limit the amount of kernel memory
-that userspace can consume. Enforce NR_IOBUS_DEVS hardcoded limit in case
-kmemcg is disabled.
+On 21/02/21 13:04, Elena Afanasova wrote:
+> This patchset introduces a KVM dispatch mechanism which can be used
+> for handling MMIO/PIO accesses over file descriptors without returning
+> from ioctl(KVM_RUN). This allows device emulation to run in another task
+> separate from the vCPU task.
+> 
+> This is achieved through KVM vm ioctl for registering MMIO/PIO regions and
+> a wire protocol that KVM uses to communicate with a task handling an
+> MMIO/PIO access.
+> 
+> TODOs:
+> * Implement KVM_EXIT_IOREGIONFD_FAILURE
+> * Add non-x86 arch support
+> * Add kvm-unittests
+> * Flush waiters if ioregion is deleted
 
-Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
----
- virt/kvm/kvm_main.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Hi ELena,
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index df387857f51f..99a828153afd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4320,9 +4320,12 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 	if (!bus)
- 		return -ENOMEM;
- 
--	/* exclude ioeventfd which is limited by maximum fd */
--	if (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1)
--		return -ENOSPC;
-+	/* enforce hard limit if kmemcg is disabled and
-+	 * exclude ioeventfd which is limited by maximum fd
-+	 */
-+	if (!memcg_kmem_enabled())
-+		if (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1)
-+			return -ENOSPC;
- 
- 	new_bus = kmalloc(struct_size(bus, range, bus->dev_count + 1),
- 			  GFP_KERNEL_ACCOUNT);
--- 
-2.25.1
+as a quick thing that jumped at me before starting the review, you 
+should add a test for the new API in tools/testing/selftests/kvm, as 
+well as documentation.  Ideally, patch 4 would also add a testcase that 
+fails before and passes afterwards.
+
+Also, does this work already with io_uring?
+
+Paolo
+
+> v3:
+>   - add FAST_MMIO bus support
+>   - add KVM_IOREGION_DEASSIGN flag
+>   - rename kvm_ioregion read/write file descriptors
+>   - split ioregionfd signal handling support into two patches
+>   - move ioregion_interrupted flag to ioregion_ctx
+>   - reorder ioregion_ctx fields
+>   - rework complete_ioregion operations
+>   - add signal handling support for crossing a page boundary case
+>   - change wire protocol license
+>   - fix ioregionfd state machine
+>   - remove ioregionfd_cmd info and drop appropriate macros
+>   - add comment on ioregionfd cmds/replies serialization
+>   - drop kvm_io_bus_finish/prepare()
+> 
+> Elena Afanasova (5):
+>    KVM: add initial support for KVM_SET_IOREGION
+>    KVM: x86: add support for ioregionfd signal handling
+>    KVM: implement wire protocol
+>    KVM: add ioregionfd context
+>    KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
+> 
+>   arch/x86/kvm/Kconfig          |   1 +
+>   arch/x86/kvm/Makefile         |   1 +
+>   arch/x86/kvm/vmx/vmx.c        |  40 ++-
+>   arch/x86/kvm/x86.c            | 273 +++++++++++++++++-
+>   include/linux/kvm_host.h      |  28 ++
+>   include/uapi/linux/ioregion.h |  30 ++
+>   include/uapi/linux/kvm.h      |  25 ++
+>   virt/kvm/Kconfig              |   3 +
+>   virt/kvm/eventfd.c            |  25 ++
+>   virt/kvm/eventfd.h            |  14 +
+>   virt/kvm/ioregion.c           | 529 ++++++++++++++++++++++++++++++++++
+>   virt/kvm/ioregion.h           |  15 +
+>   virt/kvm/kvm_main.c           |  36 ++-
+>   13 files changed, 996 insertions(+), 24 deletions(-)
+>   create mode 100644 include/uapi/linux/ioregion.h
+>   create mode 100644 virt/kvm/eventfd.h
+>   create mode 100644 virt/kvm/ioregion.c
+>   create mode 100644 virt/kvm/ioregion.h
+> 
 
