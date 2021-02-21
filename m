@@ -2,142 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6F2E320BEE
-	for <lists+kvm@lfdr.de>; Sun, 21 Feb 2021 18:08:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BA82320C89
+	for <lists+kvm@lfdr.de>; Sun, 21 Feb 2021 19:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230088AbhBURI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Feb 2021 12:08:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55506 "EHLO
+        id S230148AbhBUSW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Feb 2021 13:22:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32898 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230060AbhBURIW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 21 Feb 2021 12:08:22 -0500
+        by vger.kernel.org with ESMTP id S230026AbhBUSWt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 21 Feb 2021 13:22:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613927214;
+        s=mimecast20190719; t=1613931682;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Qxxxo+Cy9kESrt27fv9A3+kiw9hw+4IOipfKR/JRLTg=;
-        b=ZHcAPvLbtv2vSR3Z42IUXNbp0IqbDK6sXFcvvvZpOWayQj4ZzFhZbPhv/O+pER1GGzstMp
-        bMLzLl9sEYN5YuSEUNJ96kqkoxyUFnny1VtYu/kqMywAlsTm4jAgrOB64EoYdgagiVSGYk
-        tXcMju09W2d1dQEU+MsA9s8T9BYmau0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-adnsskRXOpWJVJ7--jf0EQ-1; Sun, 21 Feb 2021 12:06:52 -0500
-X-MC-Unique: adnsskRXOpWJVJ7--jf0EQ-1
-Received: by mail-wr1-f71.google.com with SMTP id c9so4992962wrq.18
-        for <kvm@vger.kernel.org>; Sun, 21 Feb 2021 09:06:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:subject:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Qxxxo+Cy9kESrt27fv9A3+kiw9hw+4IOipfKR/JRLTg=;
-        b=KbQeZ9TSNgcbIaE6GdZhxqa0J5G40wt63/yS6Kv/gmVNBinToN+jr3M18vF04/4WFk
-         Ts8Z1FISrKRfAKenK8pfkt3GE0lx+jgL64TUiAMIOtxGF8+t2YdInJ2tV0S4JUwmrr7F
-         DaEiOvVdpCBbnvA33S7B3SMA03Vch6EWfm6K3wgYhRj9v/bjtdFarMjwDc9htuQkOEYT
-         +RfPNMhGqaywSee8pcQw1bUyb8Km0o0UrxCIs+pIwU2gb/OV0UCr0ZwJTPWUoM7wKF0T
-         puww0SsfDoCoNkYKO9uBhuohK0sl91LdGWoxWo2i9odyilEMlCSJdfWBSQjCf8nzwV/+
-         NsJw==
-X-Gm-Message-State: AOAM533CY/vwIwUaj/Xi3n+la3sTfxu3gxuO/ZVHFOtVVgNRm9Y++7zG
-        mrM7k20kq3Wk5KeD5Dpg+EwbLH7oD2XjjNK3Ap6fYjZxpetgRF7taCDm5e+7eNeVSU51S20ubMb
-        QX2ZBrr0WQTKF
-X-Received: by 2002:a1c:8005:: with SMTP id b5mr17030204wmd.130.1613927211774;
-        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx9QIJnst3EfbCAjYi8KyjAPa3Kc30Zq3Ybs1M5PuHEXoNHanyj4BMN/RxaiSIFlVBfAHpERA==
-X-Received: by 2002:a1c:8005:: with SMTP id b5mr17030191wmd.130.1613927211611;
-        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t23sm2298544wmn.13.2021.02.21.09.06.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 21 Feb 2021 09:06:51 -0800 (PST)
-To:     Elena Afanasova <eafanasova@gmail.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, jasowang@redhat.com, mst@redhat.com,
-        cohuck@redhat.com, john.levon@nutanix.com
-References: <cover.1613828726.git.eafanasova@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC v3 0/5] Introduce MMIO/PIO dispatch file descriptors
- (ioregionfd)
-Message-ID: <8fc8eae6-7bea-9333-47cb-e49cf86fa336@redhat.com>
-Date:   Sun, 21 Feb 2021 18:06:49 +0100
+        bh=Zglb5HPjQwXkwakAytJHCKEB76+JAMUrAbTe4isW8k8=;
+        b=MPm5qNVsGEjFSNnefpKLLJQqqG1PQVsroa3PqD+8bgCheFSJisNSXraRfI89NGpIgwRjjT
+        VupDn07OnOeVx0mD4biDL9rsJKIgL8rkdY8tV79UQ6U95SYMhCgG1fD1Bx32DVk/S/+i9q
+        TBj7JNxeJqs70zl+lvpdeQyx3Ox1VD0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-l2jy31ocMDOPi0f0jf4RdQ-1; Sun, 21 Feb 2021 13:21:17 -0500
+X-MC-Unique: l2jy31ocMDOPi0f0jf4RdQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 965521E565;
+        Sun, 21 Feb 2021 18:21:14 +0000 (UTC)
+Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 816935D9CA;
+        Sun, 21 Feb 2021 18:21:04 +0000 (UTC)
+Subject: Re: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+Cc:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
+        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+        "tn@semihalf.com" <tn@semihalf.com>,
+        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "linuxarm@openeuler.org" <linuxarm@openeuler.org>
+References: <20201118112151.25412-1-eric.auger@redhat.com>
+ <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
+Date:   Sun, 21 Feb 2021 19:21:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <cover.1613828726.git.eafanasova@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/02/21 13:04, Elena Afanasova wrote:
-> This patchset introduces a KVM dispatch mechanism which can be used
-> for handling MMIO/PIO accesses over file descriptors without returning
-> from ioctl(KVM_RUN). This allows device emulation to run in another task
-> separate from the vCPU task.
+Hi Shameer,
+On 1/8/21 6:05 PM, Shameerali Kolothum Thodi wrote:
+> Hi Eric,
 > 
-> This is achieved through KVM vm ioctl for registering MMIO/PIO regions and
-> a wire protocol that KVM uses to communicate with a task handling an
-> MMIO/PIO access.
+>> -----Original Message-----
+>> From: Eric Auger [mailto:eric.auger@redhat.com]
+>> Sent: 18 November 2020 11:22
+>> To: eric.auger.pro@gmail.com; eric.auger@redhat.com;
+>> iommu@lists.linux-foundation.org; linux-kernel@vger.kernel.org;
+>> kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; will@kernel.org;
+>> joro@8bytes.org; maz@kernel.org; robin.murphy@arm.com;
+>> alex.williamson@redhat.com
+>> Cc: jean-philippe@linaro.org; zhangfei.gao@linaro.org;
+>> zhangfei.gao@gmail.com; vivek.gautam@arm.com; Shameerali Kolothum
+>> Thodi <shameerali.kolothum.thodi@huawei.com>;
+>> jacob.jun.pan@linux.intel.com; yi.l.liu@intel.com; tn@semihalf.com;
+>> nicoleotsuka@gmail.com; yuzenghui <yuzenghui@huawei.com>
+>> Subject: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
+>>
+>> This series brings the IOMMU part of HW nested paging support
+>> in the SMMUv3. The VFIO part is submitted separately.
+>>
+>> The IOMMU API is extended to support 2 new API functionalities:
+>> 1) pass the guest stage 1 configuration
+>> 2) pass stage 1 MSI bindings
+>>
+>> Then those capabilities gets implemented in the SMMUv3 driver.
+>>
+>> The virtualizer passes information through the VFIO user API
+>> which cascades them to the iommu subsystem. This allows the guest
+>> to own stage 1 tables and context descriptors (so-called PASID
+>> table) while the host owns stage 2 tables and main configuration
+>> structures (STE).
 > 
-> TODOs:
-> * Implement KVM_EXIT_IOREGIONFD_FAILURE
-> * Add non-x86 arch support
-> * Add kvm-unittests
-> * Flush waiters if ioregion is deleted
-
-Hi ELena,
-
-as a quick thing that jumped at me before starting the review, you 
-should add a test for the new API in tools/testing/selftests/kvm, as 
-well as documentation.  Ideally, patch 4 would also add a testcase that 
-fails before and passes afterwards.
-
-Also, does this work already with io_uring?
-
-Paolo
-
-> v3:
->   - add FAST_MMIO bus support
->   - add KVM_IOREGION_DEASSIGN flag
->   - rename kvm_ioregion read/write file descriptors
->   - split ioregionfd signal handling support into two patches
->   - move ioregion_interrupted flag to ioregion_ctx
->   - reorder ioregion_ctx fields
->   - rework complete_ioregion operations
->   - add signal handling support for crossing a page boundary case
->   - change wire protocol license
->   - fix ioregionfd state machine
->   - remove ioregionfd_cmd info and drop appropriate macros
->   - add comment on ioregionfd cmds/replies serialization
->   - drop kvm_io_bus_finish/prepare()
+> I am seeing an issue with Guest testpmd run with this series.
+> I have two different setups and testpmd works fine with the
+> first one but not with the second.
 > 
-> Elena Afanasova (5):
->    KVM: add initial support for KVM_SET_IOREGION
->    KVM: x86: add support for ioregionfd signal handling
->    KVM: implement wire protocol
->    KVM: add ioregionfd context
->    KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
+> 1). Guest doesn't have kernel driver built-in for pass-through dev.
 > 
->   arch/x86/kvm/Kconfig          |   1 +
->   arch/x86/kvm/Makefile         |   1 +
->   arch/x86/kvm/vmx/vmx.c        |  40 ++-
->   arch/x86/kvm/x86.c            | 273 +++++++++++++++++-
->   include/linux/kvm_host.h      |  28 ++
->   include/uapi/linux/ioregion.h |  30 ++
->   include/uapi/linux/kvm.h      |  25 ++
->   virt/kvm/Kconfig              |   3 +
->   virt/kvm/eventfd.c            |  25 ++
->   virt/kvm/eventfd.h            |  14 +
->   virt/kvm/ioregion.c           | 529 ++++++++++++++++++++++++++++++++++
->   virt/kvm/ioregion.h           |  15 +
->   virt/kvm/kvm_main.c           |  36 ++-
->   13 files changed, 996 insertions(+), 24 deletions(-)
->   create mode 100644 include/uapi/linux/ioregion.h
->   create mode 100644 virt/kvm/eventfd.h
->   create mode 100644 virt/kvm/ioregion.c
->   create mode 100644 virt/kvm/ioregion.h
+> root@ubuntu:/# lspci -v
+> ...
+> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
+> Subsystem: Huawei Technologies Co., Ltd. Device 0000
+> Flags: fast devsel
+> Memory at 8000100000 (64-bit, prefetchable) [disabled] [size=64K]
+> Memory at 8000000000 (64-bit, prefetchable) [disabled] [size=1M]
+> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
+> Capabilities: [a0] MSI-X: Enable- Count=67 Masked-
+> Capabilities: [b0] Power Management version 3
+> Capabilities: [100] Access Control Services
+> Capabilities: [300] Transaction Processing Hints
+> 
+> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
+> 
+> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0  -l 0-1 -n 2 -- -i
+> EAL: Detected 8 lcore(s)
+> EAL: Detected 1 NUMA nodes
+> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+> EAL: Selected IOVA mode 'VA'
+> EAL: No available hugepages reported in hugepages-32768kB
+> EAL: No available hugepages reported in hugepages-64kB
+> EAL: No available hugepages reported in hugepages-1048576kB
+> EAL: Probing VFIO support...
+> EAL: VFIO support initialized
+> EAL:   Invalid NUMA socket, default to 0
+> EAL:   using IOMMU type 1 (Type 1)
+> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
+> EAL: No legacy callbacks, legacy socket not created
+> Interactive-mode selected
+> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
+> testpmd: preferred mempool ops selected: ring_mp_mc
+> 
+> Warning! port-topology=paired and odd forward ports number, the last port will pair with itself.
+> 
+> Configuring Port 0 (socket 0)
+> Port 0: 8E:A6:8C:43:43:45
+> Checking link statuses...
+> Done
+> testpmd>
+> 
+> 2). Guest have kernel driver built-in for pass-through dev.
+> 
+> root@ubuntu:/# lspci -v
+> ...
+> 00:02.0 Ethernet controller: Huawei Technologies Co., Ltd. Device a22e (rev 21)
+> Subsystem: Huawei Technologies Co., Ltd. Device 0000
+> Flags: bus master, fast devsel, latency 0
+> Memory at 8000100000 (64-bit, prefetchable) [size=64K]
+> Memory at 8000000000 (64-bit, prefetchable) [size=1M]
+> Capabilities: [40] Express Root Complex Integrated Endpoint, MSI 00
+> Capabilities: [a0] MSI-X: Enable+ Count=67 Masked-
+> Capabilities: [b0] Power Management version 3
+> Capabilities: [100] Access Control Services
+> Capabilities: [300] Transaction Processing Hints
+> Kernel driver in use: hns3
+> 
+> root@ubuntu:/# echo vfio-pci > /sys/bus/pci/devices/0000:00:02.0/driver_override
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers/hns3/unbind
+> root@ubuntu:/# echo 0000:00:02.0 > /sys/bus/pci/drivers_probe
+> 
+> root@ubuntu:/mnt/dpdk/build/app# ./testpmd -w 0000:00:02.0 --file-prefix socket0 -l 0-1 -n 2 -- -i
+> EAL: Detected 8 lcore(s)
+> EAL: Detected 1 NUMA nodes
+> EAL: Multi-process socket /var/run/dpdk/socket0/mp_socket
+> EAL: Selected IOVA mode 'VA'
+> EAL: No available hugepages reported in hugepages-32768kB
+> EAL: No available hugepages reported in hugepages-64kB
+> EAL: No available hugepages reported in hugepages-1048576kB
+> EAL: Probing VFIO support...
+> EAL: VFIO support initialized
+> EAL:   Invalid NUMA socket, default to 0
+> EAL:   using IOMMU type 1 (Type 1)
+> EAL: Probe PCI driver: net_hns3_vf (19e5:a22e) device: 0000:00:02.0 (socket 0)
+> 0000:00:02.0 hns3_get_mbx_resp(): VF could not get mbx(11,0) head(1) tail(0) lost(1) from PF in_irq:0
+> hns3vf_get_queue_info(): Failed to get tqp info from PF: -62
+> hns3vf_init_vf(): Failed to fetch configuration: -62
+> hns3vf_dev_init(): Failed to init vf: -62
+> EAL: Releasing pci mapped resource for 0000:00:02.0
+> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100800000
+> EAL: Calling pci_unmap_resource for 0000:00:02.0 at 0x1100810000
+> EAL: Requested device 0000:00:02.0 cannot be used
+> EAL: Bus (pci) probe failed.
+> EAL: No legacy callbacks, legacy socket not created
+> testpmd: No probed ethernet devices
+> Interactive-mode selected
+> testpmd: create a new mbuf pool <mbuf_pool_socket_0>: n=155456, size=2176, socket=0
+> testpmd: preferred mempool ops selected: ring_mp_mc
+> Done
+> testpmd>
+> 
+> And in this case, smmu(host) reports a translation fault,
+> 
+> [ 6542.670624] arm-smmu-v3 arm-smmu-v3.2.auto: event 0x10 received:
+> [ 6542.670630] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00007d1200000010
+> [ 6542.670631] arm-smmu-v3 arm-smmu-v3.2.auto: 0x000012000000007c
+> [ 6542.670633] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef040
+> [ 6542.670634] arm-smmu-v3 arm-smmu-v3.2.auto: 0x00000000fffef000
+> 
+> Tested with Intel 82599 card(ixgbevf) as well. but same errror.
+
+So this should be fixed in the next release. The problem came from the
+fact the MSI giova was not duly unregistered. When vfio is not in used
+on guest side, the guest kernel allocates giovas for MSIs @fffef000 - 40
+is the ITS translater offset ;-) - When passthrough is in use, the iova
+is allocated @0x8000000. As fffef000 MSI giova was not properly
+unregistered, the host kernel used it - despite it has been unmapped by
+the guest kernel -, hence the translation fault. So the fix is to
+unregister the MSI in the VFIO QEMU code when msix are disabled. So to
+me this is a QEMU integration issue.
+
+Thank you very much for testing and reporting!
+
+Thanks
+
+Eric
+> 
+> Not able to root cause the problem yet. With the hope that, this is 
+> related to tlb entries not being invlaidated properly, I tried explicitly
+> issuing CMD_TLBI_NSNH_ALL and CMD_CFGI_CD_ALL just before
+> the STE update, but no luck yet :(
+> 
+> Please let me know if I am missing something here or has any clue if you
+> can replicate this on your setup.
+> 
+> Thanks,
+> Shameer
+> 
+>>
+>> Best Regards
+>>
+>> Eric
+>>
+>> This series can be found at:
+>> https://github.com/eauger/linux/tree/5.10-rc4-2stage-v13
+>> (including the VFIO part in his last version: v11)
+>>
+>> The series includes a patch from Jean-Philippe. It is better to
+>> review the original patch:
+>> [PATCH v8 2/9] iommu/arm-smmu-v3: Maintain a SID->device structure
+>>
+>> The VFIO series is sent separately.
+>>
+>> History:
+>>
+>> v12 -> v13:
+>> - fixed compilation issue with CONFIG_ARM_SMMU_V3_SVA
+>>   reported by Shameer. This urged me to revisit patch 4 into
+>>   iommu/smmuv3: Allow s1 and s2 configs to coexist where
+>>   s1_cfg and s2_cfg are not dynamically allocated anymore.
+>>   Instead I use a new set field in existing structs
+>> - fixed 2 others config checks
+>> - Updated "iommu/arm-smmu-v3: Maintain a SID->device structure"
+>>   according to the last version
+>>
+>> v11 -> v12:
+>> - rebase on top of v5.10-rc4
+>>
+>> Eric Auger (14):
+>>   iommu: Introduce attach/detach_pasid_table API
+>>   iommu: Introduce bind/unbind_guest_msi
+>>   iommu/smmuv3: Allow s1 and s2 configs to coexist
+>>   iommu/smmuv3: Get prepared for nested stage support
+>>   iommu/smmuv3: Implement attach/detach_pasid_table
+>>   iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+>>   iommu/smmuv3: Implement cache_invalidate
+>>   dma-iommu: Implement NESTED_MSI cookie
+>>   iommu/smmuv3: Nested mode single MSI doorbell per domain enforcement
+>>   iommu/smmuv3: Enforce incompatibility between nested mode and HW MSI
+>>     regions
+>>   iommu/smmuv3: Implement bind/unbind_guest_msi
+>>   iommu/smmuv3: Report non recoverable faults
+>>   iommu/smmuv3: Accept configs with more than one context descriptor
+>>   iommu/smmuv3: Add PASID cache invalidation per PASID
+>>
+>> Jean-Philippe Brucker (1):
+>>   iommu/arm-smmu-v3: Maintain a SID->device structure
+>>
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 659
+>> ++++++++++++++++++--
+>>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h | 103 ++-
+>>  drivers/iommu/dma-iommu.c                   | 142 ++++-
+>>  drivers/iommu/iommu.c                       | 105 ++++
+>>  include/linux/dma-iommu.h                   |  16 +
+>>  include/linux/iommu.h                       |  41 ++
+>>  include/uapi/linux/iommu.h                  |  54 ++
+>>  7 files changed, 1042 insertions(+), 78 deletions(-)
+>>
+>> --
+>> 2.21.3
 > 
 
