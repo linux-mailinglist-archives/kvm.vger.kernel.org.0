@@ -2,97 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0845B321D6E
+	by mail.lfdr.de (Postfix) with ESMTP id E9F91321D70
 	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:52:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbhBVQwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:52:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54820 "EHLO
+        id S231312AbhBVQw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 11:52:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43337 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229952AbhBVQwA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:52:00 -0500
+        by vger.kernel.org with ESMTP id S231261AbhBVQwO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:52:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614012634;
+        s=mimecast20190719; t=1614012646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=CgcpckDo9UEWBagLaIjLCEPd9ZKR8yZthDIdNf7Trmc=;
-        b=iqEmFTrbr6PuSzXSjQX4wO2CKRv4h2PwG0jgnsIlArmYlQ/6DoCDHL69WMQcyl9RC7RTfx
-        qV4DPsoW+ZFGZvavyUMMKLiL7eAylddS12d6fSwBaCAWoMUGErt6xNs4FY+3D4laGBKYYI
-        9caPjFxXtotnmcysN+MCbQIpW0KkvlY=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QBaujFxExGLh2CQgduXZKM8P6MRyUxKv108wObRTJvA=;
+        b=CJ5By3aAylgMLnmKRDXakaljJ8yE2BtD9PNl+UMdN+KhB77Xw9J6q50RySo1KKBat1vPbr
+        Sb0aOlcAFhGFt1Mm2GpOlE5+7HL2QqiCGOo9JfhrPZjQY1deFJzvPHf60HqK0BW/ins1FL
+        c+Wrouf3GVyeAXdpxuKbZZhStRSELJA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-TU9vfHv_MuKmOaZx2C8S7Q-1; Mon, 22 Feb 2021 11:50:32 -0500
-X-MC-Unique: TU9vfHv_MuKmOaZx2C8S7Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-366-40sXcic-NSuS7zqAYZdLNg-1; Mon, 22 Feb 2021 11:50:43 -0500
+X-MC-Unique: 40sXcic-NSuS7zqAYZdLNg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1764ECC627;
-        Mon, 22 Feb 2021 16:50:30 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45AE9CC620;
+        Mon, 22 Feb 2021 16:50:42 +0000 (UTC)
 Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A3FA5D9D3;
-        Mon, 22 Feb 2021 16:50:23 +0000 (UTC)
-Subject: [RFC PATCH 00/10] vfio: Device memory DMA mapping improvements
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 877C25C1BD;
+        Mon, 22 Feb 2021 16:50:35 +0000 (UTC)
+Subject: [RFC PATCH 01/10] vfio: Create vfio_fs_type with inode per device
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     alex.williamson@redhat.com
 Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
-Date:   Mon, 22 Feb 2021 09:50:22 -0700
-Message-ID: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+Date:   Mon, 22 Feb 2021 09:50:35 -0700
+Message-ID: <161401263517.16443.7534035240372538844.stgit@gimli.home>
+In-Reply-To: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a re-implementation of [1] following suggestions and code from
-Jason Gunthorpe.  This is lightly tested but seems functional and
-throws no lockdep warnings.  In this series we tremendously simplify
-zapping of vmas mapping device memory using unmap_mapping_range(), we
-create a protocol for looking up a vfio_device from a vma and provide
-an interface to get a reference from that vma, using that device
-reference, the caller can register a notifier for the device to
-trigger on events such as device release.  This notifier is only
-enabled here for vfio-pci, but both the vma policy and the notifier
-trigger should be trivial to add to any vfio bus driver after RFC.
+By linking all the device fds we provide to userspace to an
+address space through a new pseudo fs, we can use tools like
+unmap_mapping_range() to zap all vmas associated with a device.
 
-Does this look more like the direction we should go?
-
-Note that like the last series we're still not dropping DMA mappings
-on device memory disable as this would likely break userspace in some
-instances, we don't have IOMMU interfaces to modify protection bits,
-and it's not clear an IOMMU fault is absolutely better than the bus
-error.  Thanks,
-
-Alex
-
-[1]https://lore.kernel.org/kvm/161315658638.7320.9686203003395567745.stgit@gimli.home/T/#m64859ccd7d92f39a924759c7423f2dcf7d367c84
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
+ drivers/vfio/vfio.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-Alex Williamson (10):
-      vfio: Create vfio_fs_type with inode per device
-      vfio: Update vfio_add_group_dev() API
-      vfio: Export unmap_mapping_range() wrapper
-      vfio/pci: Use vfio_device_unmap_mapping_range()
-      vfio: Create a vfio_device from vma lookup
-      vfio: Add a device notifier interface
-      vfio/pci: Notify on device release
-      vfio/type1: Refactor pfn_list clearing
-      vfio/type1: Pass iommu and dma objects through to vaddr_get_pfn
-      vfio/type1: Register device notifier
-
-
- drivers/vfio/Kconfig                         |    1 
- drivers/vfio/fsl-mc/vfio_fsl_mc.c            |    6 -
- drivers/vfio/mdev/vfio_mdev.c                |    5 -
- drivers/vfio/pci/vfio_pci.c                  |  223 ++++----------------------
- drivers/vfio/pci/vfio_pci_private.h          |    3 
- drivers/vfio/platform/vfio_platform_common.c |    7 +
- drivers/vfio/vfio.c                          |  143 +++++++++++++++--
- drivers/vfio/vfio_iommu_type1.c              |  211 ++++++++++++++++++++-----
- include/linux/vfio.h                         |   19 ++
- 9 files changed, 368 insertions(+), 250 deletions(-)
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 38779e6fd80c..464caef97aff 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -32,11 +32,18 @@
+ #include <linux/vfio.h>
+ #include <linux/wait.h>
+ #include <linux/sched/signal.h>
++#include <linux/pseudo_fs.h>
++#include <linux/mount.h>
+ 
+ #define DRIVER_VERSION	"0.3"
+ #define DRIVER_AUTHOR	"Alex Williamson <alex.williamson@redhat.com>"
+ #define DRIVER_DESC	"VFIO - User Level meta-driver"
+ 
++#define VFIO_MAGIC 0x5646494f /* "VFIO" */
++
++static int vfio_fs_cnt;
++static struct vfsmount *vfio_fs_mnt;
++
+ static struct vfio {
+ 	struct class			*class;
+ 	struct list_head		iommu_drivers_list;
+@@ -97,6 +104,7 @@ struct vfio_device {
+ 	struct vfio_group		*group;
+ 	struct list_head		group_next;
+ 	void				*device_data;
++	struct inode			*inode;
+ };
+ 
+ #ifdef CONFIG_VFIO_NOIOMMU
+@@ -529,6 +537,34 @@ static struct vfio_group *vfio_group_get_from_dev(struct device *dev)
+ 	return group;
+ }
+ 
++static int vfio_fs_init_fs_context(struct fs_context *fc)
++{
++	return init_pseudo(fc, VFIO_MAGIC) ? 0 : -ENOMEM;
++}
++
++static struct file_system_type vfio_fs_type = {
++	.name = "vfio",
++	.owner = THIS_MODULE,
++	.init_fs_context = vfio_fs_init_fs_context,
++	.kill_sb = kill_anon_super,
++};
++
++static struct inode *vfio_fs_inode_new(void)
++{
++	struct inode *inode;
++	int ret;
++
++	ret = simple_pin_fs(&vfio_fs_type, &vfio_fs_mnt, &vfio_fs_cnt);
++	if (ret)
++		return ERR_PTR(ret);
++
++	inode = alloc_anon_inode(vfio_fs_mnt->mnt_sb);
++	if (IS_ERR(inode))
++		simple_release_fs(&vfio_fs_mnt, &vfio_fs_cnt);
++
++	return inode;
++}
++
+ /**
+  * Device objects - create, release, get, put, search
+  */
+@@ -539,11 +575,19 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
+ 					     void *device_data)
+ {
+ 	struct vfio_device *device;
++	struct inode *inode;
+ 
+ 	device = kzalloc(sizeof(*device), GFP_KERNEL);
+ 	if (!device)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	inode = vfio_fs_inode_new();
++	if (IS_ERR(inode)) {
++		kfree(device);
++		return (struct vfio_device *)inode;
++	}
++	device->inode = inode;
++
+ 	kref_init(&device->kref);
+ 	device->dev = dev;
+ 	device->group = group;
+@@ -574,6 +618,9 @@ static void vfio_device_release(struct kref *kref)
+ 
+ 	dev_set_drvdata(device->dev, NULL);
+ 
++	iput(device->inode);
++	simple_release_fs(&vfio_fs_mnt, &vfio_fs_cnt);
++
+ 	kfree(device);
+ 
+ 	/* vfio_del_group_dev may be waiting for this device */
+@@ -1488,6 +1535,13 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+ 	 */
+ 	filep->f_mode |= (FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE);
+ 
++	/*
++	 * Use the pseudo fs inode on the device to link all mmaps
++	 * to the same address space, allowing us to unmap all vmas
++	 * associated to this device using unmap_mapping_range().
++	 */
++	filep->f_mapping = device->inode->i_mapping;
++
+ 	atomic_inc(&group->container_users);
+ 
+ 	fd_install(ret, filep);
 
