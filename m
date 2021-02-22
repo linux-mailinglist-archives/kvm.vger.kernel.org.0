@@ -2,123 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56922321F46
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 19:42:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD9803220B8
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 21:18:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231730AbhBVSlg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 13:41:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23241 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231452AbhBVSky (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 13:40:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614019168;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vTDJEhb85J67AdQAHgz7f5oACpIbuhttKKGtn62KUTU=;
-        b=JmlGlkz9UwKphqZX811+QZP/3pC3W3H54Ztz2S2MnJsJa5pRHQS/q6qvMtd+ggGB8zGvGX
-        sy8lJZQPqKKYDG0xRemS4XjUA3BItCjetT90x9cUHkE3ys6vyA7CYt15LP0H7OvTjb7C2A
-        yz8tMlgClj3ekgJ2NdHUIfV+3OpOrRc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-536-O_GYt-tGMt-lFkSYootDsQ-1; Mon, 22 Feb 2021 13:39:26 -0500
-X-MC-Unique: O_GYt-tGMt-lFkSYootDsQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CD811020C22;
-        Mon, 22 Feb 2021 18:39:25 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8ED25D9D3;
-        Mon, 22 Feb 2021 18:39:12 +0000 (UTC)
-Date:   Mon, 22 Feb 2021 11:39:11 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, jgg@nvidia.com,
-        peterx@redhat.com
-Subject: Re: [PATCH v2] vfio/type1: Use follow_pte()
-Message-ID: <20210222113911.0ec8a4e5@omen.home.shazbot.org>
-In-Reply-To: <161351571186.15573.5602248562129684350.stgit@gimli.home>
-References: <161351571186.15573.5602248562129684350.stgit@gimli.home>
+        id S233418AbhBVURT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 15:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229996AbhBVURR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 15:17:17 -0500
+X-Greylist: delayed 707 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 22 Feb 2021 12:16:37 PST
+Received: from zero.eik.bme.hu (zero.eik.bme.hu [IPv6:2001:738:2001:2001::2001])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD78C061574
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 12:16:37 -0800 (PST)
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+        by localhost (Postfix) with SMTP id 02F4C7462D3;
+        Mon, 22 Feb 2021 21:03:56 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+        id B583A7462BD; Mon, 22 Feb 2021 21:03:55 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by zero.eik.bme.hu (Postfix) with ESMTP id B37E474581E;
+        Mon, 22 Feb 2021 21:03:55 +0100 (CET)
+Date:   Mon, 22 Feb 2021 21:03:55 +0100 (CET)
+From:   BALATON Zoltan <balaton@eik.bme.hu>
+To:     =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org,
+        Paul Durrant <paul@xen.org>,
+        David Hildenbrand <david@redhat.com>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        xen-devel@lists.xenproject.org, Leif Lindholm <leif@nuviainc.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org,
+        qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+        Radoslaw Biernacki <rad@semihalf.com>,
+        =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        qemu-ppc@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>
+Subject: Re: [PATCH v2 04/11] hw/arm: Restrit KVM to the virt & versal
+ machines
+In-Reply-To: <20210219173847.2054123-5-philmd@redhat.com>
+Message-ID: <36692cea-e747-b054-51ff-bbcfbbdd4151@eik.bme.hu>
+References: <20210219173847.2054123-1-philmd@redhat.com> <20210219173847.2054123-5-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: multipart/mixed; boundary="3866299591-317435051-1614024235=:60531"
+X-Spam-Checker-Version: Sophos PMX: 6.4.8.2820816, Antispam-Engine: 2.7.2.2107409, Antispam-Data: 2021.2.22.191817, AntiVirus-Engine: 5.79.0, AntiVirus-Data: 2020.12.21.5790000
+X-Spam-Flag: NO
+X-Spam-Probability: 9%
+X-Spam-Level: 
+X-Spam-Status: No, score=9% required=50%
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Feb 2021 15:49:34 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> follow_pfn() doesn't make sure that we're using the correct page
-> protections, get the pte with follow_pte() so that we can test
-> protections and get the pfn from the pte.
-> 
-> Fixes: 5cbf3264bc71 ("vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()")
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+--3866299591-317435051-1614024235=:60531
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Fri, 19 Feb 2021, Philippe Mathieu-Daudé wrote:
+> Restrit KVM to the following ARM machines:
+
+Typo: "Restrict" (also in patch title).
+
+Regards,
+BALATON Zoltan
+
+> - virt
+> - xlnx-versal-virt
+>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> 
-> v2: Update to current follow_pte() API, add Reviews
-> 
->  drivers/vfio/vfio_iommu_type1.c |   14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index ec9fd95a138b..ae4fd2295c95 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -463,9 +463,11 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  			    unsigned long vaddr, unsigned long *pfn,
->  			    bool write_fault)
->  {
-> +	pte_t *ptep;
-> +	spinlock_t *ptl;
->  	int ret;
->  
-> -	ret = follow_pfn(vma, vaddr, pfn);
-> +	ret = follow_pte(vma->vm_mm, vaddr, &ptep, &ptl);
->  	if (ret) {
->  		bool unlocked = false;
->  
-> @@ -479,9 +481,17 @@ static int follow_fault_pfn(struct vm_area_struct *vma, struct mm_struct *mm,
->  		if (ret)
->  			return ret;
->  
-> -		ret = follow_pfn(vma, vaddr, pfn);
-> +		ret = follow_pte(vma->vm_mm, vaddr, &ptep, &ptl);
-> +		if (ret)
-> +			return ret;
->  	}
->  
-> +	if (write_fault && !pte_write(*ptep))
-> +		ret = -EFAULT;
-> +	else
-> +		*pfn = pte_pfn(*ptep);
+> hw/arm/virt.c             | 5 +++++
+> hw/arm/xlnx-versal-virt.c | 5 +++++
+> 2 files changed, 10 insertions(+)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 371147f3ae9..8e9861b61a9 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2527,6 +2527,10 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
+>     return NULL;
+> }
+>
+> +static const char *const valid_accels[] = {
+> +    "tcg", "kvm", "hvf", NULL
+> +};
 > +
-> +	pte_unmap_unlock(ptep, ptl);
->  	return ret;
->  }
->  
-> 
-
-Adding the following to resolve 32-bit build:
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 8a777250764a..ed03f3fcb07e 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -24,6 +24,7 @@
- #include <linux/compat.h>
- #include <linux/device.h>
- #include <linux/fs.h>
-+#include <linux/highmem.h>
- #include <linux/iommu.h>
- #include <linux/module.h>
- #include <linux/mm.h>
-
+> /*
+>  * for arm64 kvm_type [7-0] encodes the requested number of bits
+>  * in the IPA address space
+> @@ -2582,6 +2586,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+>     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+>     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+>     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
+> +    mc->valid_accelerators = valid_accels;
+>     mc->kvm_type = virt_kvm_type;
+>     assert(!mc->get_hotplug_handler);
+>     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
+> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+> index 8482cd61960..d424813cae1 100644
+> --- a/hw/arm/xlnx-versal-virt.c
+> +++ b/hw/arm/xlnx-versal-virt.c
+> @@ -610,6 +610,10 @@ static void versal_virt_machine_instance_init(Object *obj)
+> {
+> }
+>
+> +static const char *const valid_accels[] = {
+> +    "tcg", "kvm", NULL
+> +};
+> +
+> static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+> {
+>     MachineClass *mc = MACHINE_CLASS(oc);
+> @@ -621,6 +625,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+>     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
+>     mc->no_cdrom = true;
+>     mc->default_ram_id = "ddr";
+> +    mc->valid_accelerators = valid_accels;
+> }
+>
+> static const TypeInfo versal_virt_machine_init_typeinfo = {
+>
+--3866299591-317435051-1614024235=:60531--
