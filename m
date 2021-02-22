@@ -2,236 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A33A321D84
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:56:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 052C1321DAB
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 18:02:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231635AbhBVQzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:55:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38096 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230008AbhBVQyL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:54:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614012762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CMKYi977B1ceJjf8ogDnhhIiFZDTPthFKkUwzRtjKSk=;
-        b=N2B0X0acUB8iAfbl5YpfADfJIkCVIYChY53LTbmo3c9aEug16ANWwtaiVq6NST+w79gaXI
-        dfUHjo+H769KUcCkg/P7y+gObr+mEPxX3/gZvG+No6AHhpW8nqQqTDJFuG8GRWNtKlR1KC
-        04Fjy4YbTAsAuUC8nOnfwu5mOBNjWiY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-8r2AjvF6N0S4Z3izvkOrgA-1; Mon, 22 Feb 2021 11:52:40 -0500
-X-MC-Unique: 8r2AjvF6N0S4Z3izvkOrgA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B4A6100CCC0;
-        Mon, 22 Feb 2021 16:52:39 +0000 (UTC)
-Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BA0C5D6B1;
-        Mon, 22 Feb 2021 16:52:33 +0000 (UTC)
-Subject: [RFC PATCH 10/10] vfio/type1: Register device notifier
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     alex.williamson@redhat.com
-Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
-Date:   Mon, 22 Feb 2021 09:52:32 -0700
-Message-ID: <161401275279.16443.6350471385325897377.stgit@gimli.home>
-In-Reply-To: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+        id S230177AbhBVRCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 12:02:50 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13222 "EHLO
+        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230147AbhBVRCl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 12:02:41 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6033e3850000>; Mon, 22 Feb 2021 09:01:57 -0800
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
+ 2021 17:01:56 +0000
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.108)
+ by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Mon, 22 Feb 2021 17:01:56 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EbiewWYlwEFOJntoGDTERhWN3nJQoZWACV/cvA6rH/qQtdtLSltslN0YAPI+8fcjb4qeL66HSmhoniKIamFWdXUSE1S6UmcjLBz0Hl92OU+Wg1DoiNZMn/TnKpa9ETI6xmJ4HnKVjUNCMPvH5a5czWVNCycf5ytuk9LhTk4u/0OkQgkUTJ6+t0F/c680HvC0vr49JaknmkgO6p5hcb1n7yfR8qd1YnLUd0kp96gFHGj9mNGPsFnc46kMf0F4ZE1aPDs33vSo5Ecl0BjBwomT0hscydw7+/01jDmuEU/qKUqH9hnpgX0GjgZ63wKYHTZk8vcE+3q6ywdyROx1JjZ8Ng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=h67s1nCfBtDwpKvUhdWEc7st7LyoX4JctSC/I5x922w=;
+ b=KKnpEDdYmxgtdOEcOjN+ItQyXRhjBSjBOlSosB42xrlLjy6H+4Cn5cLGWNB5e6EOlJDer0kLqBfYUQLRuB2JGypk2gBGAY6I9ovaqXztdlt5i6drWWKvmWN0zOPj6SB0NZBbeBB6gDX7m2PYwFlQ6vNspVxfSStyXcYGkSK9OjziwOZbbOOO4l+BMQMzRd9+7XM5+nBWo5tCwkvu70g88XmrFWku0CmJHtvbctKreDoI1eKYMoW29a5Xp18/Ag8GU2zyX3fk5vU/kol/VB8U6OanCf2TW6NBd0jcOiyaQEP+u/mZwrAtNnG8A9Zg/ys9UpH57G+vpKWarzCBl+BIgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4041.namprd12.prod.outlook.com (2603:10b6:5:210::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.27; Mon, 22 Feb
+ 2021 17:01:55 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.045; Mon, 22 Feb 2021
+ 17:01:55 +0000
+Date:   Mon, 22 Feb 2021 13:01:53 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
+Subject: Re: [RFC PATCH 02/10] vfio: Update vfio_add_group_dev() API
+Message-ID: <20210222170153.GN4247@nvidia.com>
 References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+ <161401264735.16443.5908636631567017543.stgit@gimli.home>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <161401264735.16443.5908636631567017543.stgit@gimli.home>
+X-ClientProxiedBy: BL0PR02CA0079.namprd02.prod.outlook.com
+ (2603:10b6:208:51::20) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL0PR02CA0079.namprd02.prod.outlook.com (2603:10b6:208:51::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.27 via Frontend Transport; Mon, 22 Feb 2021 17:01:55 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lEEan-00ESBi-Lp; Mon, 22 Feb 2021 13:01:53 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1614013317; bh=h67s1nCfBtDwpKvUhdWEc7st7LyoX4JctSC/I5x922w=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=loP4zRplp7W9Jfgtpvtr4qx8jC+35NBLclUD+ahvWaThi9SdZ4T2MsEDEDvFhbwY8
+         U3e539azYOWUPYcOw0BdsT3JAF6SZ6AeeQk5BYc2XTGIurJqqRheDI9JhtP2DJyz1w
+         SapfXS+UP4HSEuJjZ2K8cGltJ0FDkBbCTroEtpHksDEEhZo+AXQfE6uGO2kRjUIswq
+         1yYgu++v9ZJfeC2QCJSoiYGnR+HCz7bNN3r0D3eeNcXdrr1fl4lj5LkhBF0DssnM3v
+         Riu9KExT/QLRBf2smbnNYbEkSQwN6xvER4l8eT6VkU4+Cv3lmpXmKeATKjEO8iPWPO
+         ldN71RQy39VjA==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a new default strict MMIO mapping mode where the vma for
-a VM_PFNMAP mapping must be backed by a vfio device.  This allows
-holding a reference to the device and registering a notifier for the
-device, which additionally keeps the device in an IOMMU context for
-the extent of the DMA mapping.  On notification of device release,
-automatically drop the DMA mappings for it.
+On Mon, Feb 22, 2021 at 09:50:47AM -0700, Alex Williamson wrote:
+> diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+> index 464caef97aff..067cd843961c 100644
+> +++ b/drivers/vfio/vfio.c
+> @@ -848,8 +848,9 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
+>  /**
+>   * VFIO driver API
+>   */
+> -int vfio_add_group_dev(struct device *dev,
+> -		       const struct vfio_device_ops *ops, void *device_data)
+> +struct vfio_device *vfio_add_group_dev(struct device *dev,
+> +				       const struct vfio_device_ops *ops,
+> +				       void *device_data)
+>  {
+>  	struct iommu_group *iommu_group;
+>  	struct vfio_group *group;
+> @@ -857,14 +858,14 @@ int vfio_add_group_dev(struct device *dev,
+>  
+>  	iommu_group = iommu_group_get(dev);
+>  	if (!iommu_group)
+> -		return -EINVAL;
+> +		return ERR_PTR(-EINVAL);
+>  
+>  	group = vfio_group_get_from_iommu(iommu_group);
+>  	if (!group) {
+>  		group = vfio_create_group(iommu_group);
+>  		if (IS_ERR(group)) {
+>  			iommu_group_put(iommu_group);
+> -			return PTR_ERR(group);
+> +			return (struct vfio_device *)group;
 
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/vfio_iommu_type1.c |  124 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+), 1 deletion(-)
+Use ERR_CAST() here
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index b34ee4b96a4a..2a16257bd5b6 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -61,6 +61,11 @@ module_param_named(dma_entry_limit, dma_entry_limit, uint, 0644);
- MODULE_PARM_DESC(dma_entry_limit,
- 		 "Maximum number of user DMA mappings per container (65535).");
- 
-+static bool strict_mmio_maps = true;
-+module_param_named(strict_mmio_maps, strict_mmio_maps, bool, 0644);
-+MODULE_PARM_DESC(strict_mmio_maps,
-+		 "Restrict to safe DMA mappings of device memory (true).");
-+
- struct vfio_iommu {
- 	struct list_head	domain_list;
- 	struct list_head	iova_list;
-@@ -88,6 +93,14 @@ struct vfio_domain {
- 	bool			fgsp;		/* Fine-grained super pages */
- };
- 
-+/* Req separate object for async removal from notifier vs dropping vfio_dma */
-+struct pfnmap_obj {
-+	struct notifier_block	nb;
-+	struct work_struct	work;
-+	struct vfio_iommu	*iommu;
-+	struct vfio_device	*device;
-+};
-+
- struct vfio_dma {
- 	struct rb_node		node;
- 	dma_addr_t		iova;		/* Device address */
-@@ -100,6 +113,7 @@ struct vfio_dma {
- 	struct task_struct	*task;
- 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
- 	unsigned long		*bitmap;
-+	struct pfnmap_obj	*pfnmap;
- };
- 
- struct vfio_group {
-@@ -517,6 +531,68 @@ static int unmap_dma_pfn_list(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 	return 0;
- }
- 
-+static void unregister_device_bg(struct work_struct *work)
-+{
-+	struct pfnmap_obj *pfnmap = container_of(work, struct pfnmap_obj, work);
-+
-+	vfio_device_unregister_notifier(pfnmap->device, &pfnmap->nb);
-+	vfio_device_put(pfnmap->device);
-+	kfree(pfnmap);
-+}
-+
-+/*
-+ * pfnmap object can exist beyond the dma mapping referencing it, but it holds
-+ * a container reference assuring the iommu exists.  Find the dma, if exists.
-+ */
-+struct vfio_dma *pfnmap_find_dma(struct pfnmap_obj *pfnmap)
-+{
-+	struct rb_node *n;
-+
-+	for (n = rb_first(&pfnmap->iommu->dma_list); n; n = rb_next(n)) {
-+		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-+
-+		if (dma->pfnmap == pfnmap)
-+			return dma;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma);
-+
-+static int vfio_device_nb_cb(struct notifier_block *nb,
-+			     unsigned long action, void *unused)
-+{
-+	struct pfnmap_obj *pfnmap = container_of(nb, struct pfnmap_obj, nb);
-+
-+	switch (action) {
-+	case VFIO_DEVICE_RELEASE:
-+	{
-+		struct vfio_dma *dma, *dma_last = NULL;
-+		int retries = 0;
-+again:
-+		mutex_lock(&pfnmap->iommu->lock);
-+		dma = pfnmap_find_dma(pfnmap);
-+		if (dma) {
-+			if (unmap_dma_pfn_list(pfnmap->iommu, dma,
-+					       &dma_last, &retries))
-+				goto again;
-+
-+			dma->pfnmap = NULL;
-+			vfio_remove_dma(pfnmap->iommu, dma);
-+		}
-+		mutex_unlock(&pfnmap->iommu->lock);
-+
-+		/* Cannot unregister notifier from callback chain */
-+		INIT_WORK(&pfnmap->work, unregister_device_bg);
-+		schedule_work(&pfnmap->work);
-+		break;
-+	}
-+	}
-+
-+	return NOTIFY_OK;
-+}
-+
- static int vaddr_get_pfn(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			 struct mm_struct *mm, unsigned long vaddr,
- 			 unsigned long *pfn)
-@@ -549,8 +625,48 @@ static int vaddr_get_pfn(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 		if (ret == -EAGAIN)
- 			goto retry;
- 
--		if (!ret && !is_invalid_reserved_pfn(*pfn))
-+		if (!ret && !is_invalid_reserved_pfn(*pfn)) {
- 			ret = -EFAULT;
-+			goto done;
-+		}
-+
-+		if (!dma->pfnmap) {
-+			struct pfnmap_obj *pfnmap;
-+			struct vfio_device *device;
-+
-+			pfnmap = kzalloc(sizeof(*pfnmap), GFP_KERNEL);
-+			if (!pfnmap) {
-+				ret = -ENOMEM;
-+				goto done;
-+			}
-+
-+			pfnmap->iommu = iommu;
-+			pfnmap->nb.notifier_call = vfio_device_nb_cb;
-+
-+			device = vfio_device_get_from_vma(vma);
-+			if (IS_ERR(device)) {
-+				kfree(pfnmap);
-+				if (strict_mmio_maps)
-+					ret = PTR_ERR(device);
-+
-+				goto done;
-+			}
-+
-+			pfnmap->device = device;
-+			ret = vfio_device_register_notifier(device,
-+							    &pfnmap->nb);
-+			if (ret) {
-+				vfio_device_put(device);
-+				kfree(pfnmap);
-+				if (!strict_mmio_maps)
-+					ret = 0;
-+
-+				goto done;
-+			}
-+
-+			dma->pfnmap = pfnmap;
-+		}
-+
- 	}
- done:
- 	mmap_read_unlock(mm);
-@@ -1097,6 +1213,12 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- {
- 	WARN_ON(!RB_EMPTY_ROOT(&dma->pfn_list));
-+	if (dma->pfnmap) {
-+		vfio_device_unregister_notifier(dma->pfnmap->device,
-+						&dma->pfnmap->nb);
-+		vfio_device_put(dma->pfnmap->device);
-+		kfree(dma->pfnmap);
-+	}
- 	vfio_unmap_unpin(iommu, dma, true);
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
+Also, I've wrote a small series last week that goes further than this,
+I made 'struct vfio_device *' the universal handle to refer to the
+device, instead of using 'void *' or 'struct device *' as a surrogate.
 
+It is interesting that you hit on the same issue as a blocker to this
+series. So for I've found quite a few other things that are out of
+sorts because of this.
+
+Cheers,
+Jason
