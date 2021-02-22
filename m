@@ -2,161 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AA74321A77
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 15:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E155321AB4
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 16:02:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231210AbhBVOhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 09:37:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20305 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231213AbhBVOgg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 09:36:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614004506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ROXc4pPESl2hnVPAmTj87jG8Y89YLot+XFk/YVIBdHE=;
-        b=a6FzvpREOb71ocXIkgvwd2O0RdCvzc7NjONwc2wjl7AKb3iASPNYLYjWr6wHD3Qf3y/SKY
-        FRVYf0LogT38iAbeUaZXk1h1zeiuVdrFjhLxehlgaquV9EmWJDbfqhg7DGt4XDp/TPITG5
-        piDuKCsHy01aSH+/vJ5oWU7+fhzyTxc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-xH4wBsufNEeheuIwgbKevw-1; Mon, 22 Feb 2021 09:35:04 -0500
-X-MC-Unique: xH4wBsufNEeheuIwgbKevw-1
-Received: by mail-ej1-f70.google.com with SMTP id g7so1256057ejd.16
-        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 06:35:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ROXc4pPESl2hnVPAmTj87jG8Y89YLot+XFk/YVIBdHE=;
-        b=h46tyZTb/JlgXiF0JDJfKf6NpJRG0Rrr91I/4qUTlrj4R+gHXJ5LeXYIqphOX0FfH6
-         aLSa2Qq0+0hAaq50jBzBj0cOF7YSE3AAZYeZw1m4IWg9a1cLkv7HqR/YvD5D/HpgK25K
-         ZY56TChwQOwzXHE5yh7SRBcMcCXob6VDHtF/FvHAlujZ/k4G4QFKAaw6U9tb4Jul+/M4
-         fwpgJ+M0m5ITP2J+ZdfVkUeLxgTLQse1B21Rur7YE3VuHtawIeamIO4TtnFJECfS9Tvq
-         Eczb6+6MFYeQcYgE7MObO79298fkpRV0YrMszQ6D1wS+Xm9xNBBiNsAxsXnn36o5sCUi
-         uvkg==
-X-Gm-Message-State: AOAM533WwXNrA2QWOC4J5ZCgu3sLfrbR5WGUOwfHt9UVixxAZKfINByS
-        piI3uy5ekwEgJFCOYdcaFlEu3yxlkiyV0mixw32nqHvjNnOJn8HJvo2n2Ka841VCJASy7gkX9sl
-        Mq5eg07mQHUoT
-X-Received: by 2002:a50:9dc9:: with SMTP id l9mr22865678edk.377.1614004503646;
-        Mon, 22 Feb 2021 06:35:03 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyumDD7RCrt3aWNrG+469eebI8wUrsStbqcQO2s6zYWdcqMS9H6mt2qeXwl0MrBf/vG1e+wdw==
-X-Received: by 2002:a50:9dc9:: with SMTP id l9mr22865651edk.377.1614004503527;
-        Mon, 22 Feb 2021 06:35:03 -0800 (PST)
-Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id s14sm10457606ejf.47.2021.02.22.06.35.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Feb 2021 06:35:02 -0800 (PST)
-Subject: Re: [PATCH 0/2] sysemu: Let VMChangeStateHandler take boolean
- 'running' argument
-To:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Huacai Chen <chenhuacai@kernel.org>, Greg Kurz <groug@kaod.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
-        Amit Shah <amit@kernel.org>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>,
-        qemu-s390x@nongnu.org, Paul Durrant <paul@xen.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Max Reitz <mreitz@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Halil Pasic <pasic@linux.ibm.com>, Fam Zheng <fam@euphon.net>,
-        qemu-ppc@nongnu.org, kvm@vger.kernel.org,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        xen-devel@lists.xenproject.org, Cornelia Huck <cohuck@redhat.com>,
-        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Thomas Huth <thuth@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>
-References: <20210111152020.1422021-1-philmd@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <84048681-32d3-7217-e94c-461501cf550b@redhat.com>
-Date:   Mon, 22 Feb 2021 15:34:59 +0100
+        id S230141AbhBVPCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 10:02:12 -0500
+Received: from foss.arm.com ([217.140.110.172]:51614 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230113AbhBVPCL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 10:02:11 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E7C5A31B;
+        Mon, 22 Feb 2021 07:01:21 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E73633F73B;
+        Mon, 22 Feb 2021 07:01:20 -0800 (PST)
+Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+ <20201210142908.169597-2-andre.przywara@arm.com>
+ <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
+ <20210211171648.36000cce@slackpad.fritz.box>
+ <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
+ <20210217155459.3a4bc991@slackpad.fritz.box>
+ <20210222102333.2f1cb9e2@slackpad.fritz.box>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <861fd8a5-240e-3439-877b-28ba3490ebb4@arm.com>
+Date:   Mon, 22 Feb 2021 15:01:28 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210111152020.1422021-1-philmd@redhat.com>
+In-Reply-To: <20210222102333.2f1cb9e2@slackpad.fritz.box>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo, this series is fully reviewed, can it go via your
-misc tree?
+Hi Andre,
 
-On 1/11/21 4:20 PM, Philippe Mathieu-Daudé wrote:
-> Trivial prototype change to clarify the use of the 'running'
-> argument of VMChangeStateHandler.
-> 
-> Green CI:
-> https://gitlab.com/philmd/qemu/-/pipelines/239497352
-> 
-> Philippe Mathieu-Daudé (2):
->   sysemu/runstate: Let runstate_is_running() return bool
->   sysemu: Let VMChangeStateHandler take boolean 'running' argument
-> 
->  include/sysemu/runstate.h   | 12 +++++++++---
->  target/arm/kvm_arm.h        |  2 +-
->  target/ppc/cpu-qom.h        |  2 +-
->  accel/xen/xen-all.c         |  2 +-
->  audio/audio.c               |  2 +-
->  block/block-backend.c       |  2 +-
->  gdbstub.c                   |  2 +-
->  hw/block/pflash_cfi01.c     |  2 +-
->  hw/block/virtio-blk.c       |  2 +-
->  hw/display/qxl.c            |  2 +-
->  hw/i386/kvm/clock.c         |  2 +-
->  hw/i386/kvm/i8254.c         |  2 +-
->  hw/i386/kvmvapic.c          |  2 +-
->  hw/i386/xen/xen-hvm.c       |  2 +-
->  hw/ide/core.c               |  2 +-
->  hw/intc/arm_gicv3_its_kvm.c |  2 +-
->  hw/intc/arm_gicv3_kvm.c     |  2 +-
->  hw/intc/spapr_xive_kvm.c    |  2 +-
->  hw/misc/mac_via.c           |  2 +-
->  hw/net/e1000e_core.c        |  2 +-
->  hw/nvram/spapr_nvram.c      |  2 +-
->  hw/ppc/ppc.c                |  2 +-
->  hw/ppc/ppc_booke.c          |  2 +-
->  hw/s390x/tod-kvm.c          |  2 +-
->  hw/scsi/scsi-bus.c          |  2 +-
->  hw/usb/hcd-ehci.c           |  2 +-
->  hw/usb/host-libusb.c        |  2 +-
->  hw/usb/redirect.c           |  2 +-
->  hw/vfio/migration.c         |  2 +-
->  hw/virtio/virtio-rng.c      |  2 +-
->  hw/virtio/virtio.c          |  2 +-
->  net/net.c                   |  2 +-
->  softmmu/memory.c            |  2 +-
->  softmmu/runstate.c          |  4 ++--
->  target/arm/kvm.c            |  2 +-
->  target/i386/kvm/kvm.c       |  2 +-
->  target/i386/sev.c           |  2 +-
->  target/i386/whpx/whpx-all.c |  2 +-
->  target/mips/kvm.c           |  4 ++--
->  ui/gtk.c                    |  2 +-
->  ui/spice-core.c             |  2 +-
->  41 files changed, 51 insertions(+), 45 deletions(-)
-> 
+On 2/22/21 10:23 AM, Andre Przywara wrote:
+> On Wed, 17 Feb 2021 16:46:47 +0000
+> Andre Przywara <andre.przywara@arm.com> wrote:
+>
+>> On Thu, 11 Feb 2021 17:32:01 +0000
+>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>
+>> Hi,
+>>
+>>> On 2/11/21 5:16 PM, Andre Przywara wrote:  
+>>>> On Wed, 10 Feb 2021 17:44:59 +0000
+>>>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>>>
+>>>> Hi Alex,
+>>>>    
+>>>>> On 12/10/20 2:28 PM, Andre Przywara wrote:    
+>>>>>> Since x86 had a special need for registering tons of special I/O ports,
+>>>>>> we had an ioport__setup_arch() callback, to allow each architecture
+>>>>>> to do the same. As it turns out no one uses it beside x86, so we remove
+>>>>>> that unnecessary abstraction.
+>>>>>>
+>>>>>> The generic function was registered via a device_base_init() call, so
+>>>>>> we just do the same for the x86 specific function only, and can remove
+>>>>>> the unneeded ioport__setup_arch().
+>>>>>>
+>>>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>>>>> ---
+>>>>>>  arm/ioport.c         |  5 -----
+>>>>>>  include/kvm/ioport.h |  1 -
+>>>>>>  ioport.c             | 28 ----------------------------
+>>>>>>  mips/kvm.c           |  5 -----
+>>>>>>  powerpc/ioport.c     |  6 ------
+>>>>>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
+>>>>>>  6 files changed, 24 insertions(+), 46 deletions(-)
+>>>>>>
+>>>>>> diff --git a/arm/ioport.c b/arm/ioport.c
+>>>>>> index 2f0feb9a..24092c9d 100644
+>>>>>> --- a/arm/ioport.c
+>>>>>> +++ b/arm/ioport.c
+>>>>>> @@ -1,11 +1,6 @@
+>>>>>>  #include "kvm/ioport.h"
+>>>>>>  #include "kvm/irq.h"
+>>>>>>  
+>>>>>> -int ioport__setup_arch(struct kvm *kvm)
+>>>>>> -{
+>>>>>> -	return 0;
+>>>>>> -}
+>>>>>> -
+>>>>>>  void ioport__map_irq(u8 *irq)
+>>>>>>  {
+>>>>>>  	*irq = irq__alloc_line();
+>>>>>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+>>>>>> index 039633f7..d0213541 100644
+>>>>>> --- a/include/kvm/ioport.h
+>>>>>> +++ b/include/kvm/ioport.h
+>>>>>> @@ -35,7 +35,6 @@ struct ioport_operations {
+>>>>>>  							    enum irq_type));
+>>>>>>  };
+>>>>>>  
+>>>>>> -int ioport__setup_arch(struct kvm *kvm);
+>>>>>>  void ioport__map_irq(u8 *irq);
+>>>>>>  
+>>>>>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+>>>>>> diff --git a/ioport.c b/ioport.c
+>>>>>> index 844a832d..667e8386 100644
+>>>>>> --- a/ioport.c
+>>>>>> +++ b/ioport.c
+>>>>>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
+>>>>>>  	return 0;
+>>>>>>  }
+>>>>>>  
+>>>>>> -static void ioport__unregister_all(void)
+>>>>>> -{
+>>>>>> -	struct ioport *entry;
+>>>>>> -	struct rb_node *rb;
+>>>>>> -	struct rb_int_node *rb_node;
+>>>>>> -
+>>>>>> -	rb = rb_first(&ioport_tree);
+>>>>>> -	while (rb) {
+>>>>>> -		rb_node = rb_int(rb);
+>>>>>> -		entry = ioport_node(rb_node);
+>>>>>> -		ioport_unregister(&ioport_tree, entry);
+>>>>>> -		rb = rb_first(&ioport_tree);
+>>>>>> -	}
+>>>>>> -}      
+>>>>> I get the impression this is a rebasing artifact. The commit message doesn't
+>>>>> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
+>>>>> far as I can tell it's still needed because there are places other than
+>>>>> ioport__setup_arch() from where ioport__register() is called.    
+>>>> I agree that the commit message is a bit thin on this fact, but the
+>>>> functionality of ioport__unregister_all() is now in
+>>>> x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
+>>>> without removing ioport__exit() as well would look very weird, if not
+>>>> hackish.    
+>>> Not necessarily. ioport__unregister_all() removes the ioports added by
+>>> x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
+>>> like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).  
+>> Right, indeed. Not that it really matters, since we are about to exit
+>> anyway, but it looks indeed I need to move this to a generic teardown
+>> method, or actually just keep that part here in this file.
+>>
+>> Will give this a try.
+> Well, now having a closer look I needed to remove this from here,
+> because this whole file will go away.
+> To keep the current functionality, we would need to add it to mmio.c,
+> and interestingly we don't do any kind of similar cleanup there for the
+> MMIO regions (probably this is kvmtool exiting anyway, see above).
 
+This is a very good point. If the MMIO emulation doesn't unregister each MMIO
+region before exiting (and has never done that since it was implemented), then I
+don't think there's a reason that we should add it now. After all, kvmtool will
+terminate after calling dev_base_exit destructors, which will take care of
+deallocating the entire process memory.
+
+Thanks,
+
+Alex
+
+>
+> I will see if I can introduce it there, for good measure.
+>
+> Cheers,
+> Andre
+>
+>
+>> Thanks!
+>> Andre
+>>
+>>>> I can amend the commit message to mention this, or is there anything
+>>>> else I missed?
+>>>>
+>>>> Cheers,
+>>>> Andre
+>>>>    
+>>>>>> -
+>>>>>>  static const char *to_direction(int direction)
+>>>>>>  {
+>>>>>>  	if (direction == KVM_EXIT_IO_IN)
+>>>>>> @@ -220,16 +205,3 @@ out:
+>>>>>>  
+>>>>>>  	return !kvm->cfg.ioport_debug;
+>>>>>>  }
+>>>>>> -
+>>>>>> -int ioport__init(struct kvm *kvm)
+>>>>>> -{
+>>>>>> -	return ioport__setup_arch(kvm);
+>>>>>> -}
+>>>>>> -dev_base_init(ioport__init);
+>>>>>> -
+>>>>>> -int ioport__exit(struct kvm *kvm)
+>>>>>> -{
+>>>>>> -	ioport__unregister_all();
+>>>>>> -	return 0;
+>>>>>> -}
+>>>>>> -dev_base_exit(ioport__exit);
+>>>>>> diff --git a/mips/kvm.c b/mips/kvm.c
+>>>>>> index 26355930..e110e5d5 100644
+>>>>>> --- a/mips/kvm.c
+>>>>>> +++ b/mips/kvm.c
+>>>>>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
+>>>>>>  		die_perror("KVM_IRQ_LINE ioctl");
+>>>>>>  }
+>>>>>>  
+>>>>>> -int ioport__setup_arch(struct kvm *kvm)
+>>>>>> -{
+>>>>>> -	return 0;
+>>>>>> -}
+>>>>>> -
+>>>>>>  bool kvm__arch_cpu_supports_vm(void)
+>>>>>>  {
+>>>>>>  	return true;
+>>>>>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
+>>>>>> index 0c188b61..a5cff4ee 100644
+>>>>>> --- a/powerpc/ioport.c
+>>>>>> +++ b/powerpc/ioport.c
+>>>>>> @@ -12,12 +12,6 @@
+>>>>>>  
+>>>>>>  #include <stdlib.h>
+>>>>>>  
+>>>>>> -int ioport__setup_arch(struct kvm *kvm)
+>>>>>> -{
+>>>>>> -	/* PPC has no legacy ioports to set up */
+>>>>>> -	return 0;
+>>>>>> -}
+>>>>>> -
+>>>>>>  void ioport__map_irq(u8 *irq)
+>>>>>>  {
+>>>>>>  }
+>>>>>> diff --git a/x86/ioport.c b/x86/ioport.c
+>>>>>> index 7ad7b8f3..8c5c7699 100644
+>>>>>> --- a/x86/ioport.c
+>>>>>> +++ b/x86/ioport.c
+>>>>>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
+>>>>>>  {
+>>>>>>  }
+>>>>>>  
+>>>>>> -int ioport__setup_arch(struct kvm *kvm)
+>>>>>> +static int ioport__setup_arch(struct kvm *kvm)
+>>>>>>  {
+>>>>>>  	int r;
+>>>>>>  
+>>>>>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
+>>>>>>  
+>>>>>>  	return 0;
+>>>>>>  }
+>>>>>> +dev_base_init(ioport__setup_arch);
+>>>>>> +
+>>>>>> +static int ioport__remove_arch(struct kvm *kvm)
+>>>>>> +{
+>>>>>> +	ioport__unregister(kvm, 0x510);
+>>>>>> +	ioport__unregister(kvm, 0x402);
+>>>>>> +	ioport__unregister(kvm, 0x03D5);
+>>>>>> +	ioport__unregister(kvm, 0x03D4);
+>>>>>> +	ioport__unregister(kvm, 0x0378);
+>>>>>> +	ioport__unregister(kvm, 0x0278);
+>>>>>> +	ioport__unregister(kvm, 0x00F0);
+>>>>>> +	ioport__unregister(kvm, 0x00ED);
+>>>>>> +	ioport__unregister(kvm, IOPORT_DBG);
+>>>>>> +	ioport__unregister(kvm, 0x00C0);
+>>>>>> +	ioport__unregister(kvm, 0x00A0);
+>>>>>> +	ioport__unregister(kvm, 0x0092);
+>>>>>> +	ioport__unregister(kvm, 0x0040);
+>>>>>> +	ioport__unregister(kvm, 0x0020);
+>>>>>> +	ioport__unregister(kvm, 0x0000);
+>>>>>> +
+>>>>>> +	return 0;
+>>>>>> +}
+>>>>>> +dev_base_exit(ioport__remove_arch);      
