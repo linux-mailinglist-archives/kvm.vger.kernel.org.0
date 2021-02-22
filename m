@@ -2,219 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F366C32126D
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 09:57:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E02E32127C
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 10:00:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230063AbhBVI5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 03:57:21 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:2846 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbhBVI5U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 03:57:20 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4DkbZc2M5zz13wpY;
-        Mon, 22 Feb 2021 16:54:00 +0800 (CST)
-Received: from dggema763-chm.china.huawei.com (10.1.198.205) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Mon, 22 Feb 2021 16:56:31 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- dggema763-chm.china.huawei.com (10.1.198.205) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Mon, 22 Feb 2021 16:56:30 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2106.006; Mon, 22 Feb 2021 08:56:29 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Auger Eric <eric.auger@redhat.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-CC:     "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "tn@semihalf.com" <tn@semihalf.com>,
-        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Topic: [PATCH v13 00/15] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Index: AQHWvZ3PFBCcuzrn5UiXiOG2BGlsE6oeOV7wgEVIA4CAAPORcA==
-Date:   Mon, 22 Feb 2021 08:56:29 +0000
-Message-ID: <8ba61a0ca6534b5cb9a129def21e9259@huawei.com>
-References: <20201118112151.25412-1-eric.auger@redhat.com>
- <ad88f78cf56f4f7fb69728cbf22a1052@huawei.com>
- <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
-In-Reply-To: <9554e747-59fe-3bda-8cfc-13f40f74f0ca@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.88.147]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S230099AbhBVJAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 04:00:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8764 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229934AbhBVJAA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 04:00:00 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11M8whfB141485;
+        Mon, 22 Feb 2021 03:59:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=vuRLhnrN0FZn6h/Va0uxgrip9AUObOGa8pIcB5cKFpY=;
+ b=Uk4+MlTJ3sCIHdSGLsoMSKZsYFBAvHilEnzQ3jEuga8Lc4tL3fuOYLHwgtYVGIgT8SOW
+ KICz+xVSkWbvlUtpa4SFJYAPyQ/OFM/NUeQkFvpUee3icFmOwzw2VfLzHnisf84HkBBp
+ AbGNPKyb96QF19Hl5qCEvn+TPbFjOdibrHj3Ydh7N39JoIFiUucejQTbNUzCKTSTTbDE
+ i6HhQh4rLADLb+rbhcuX5WwFkI3+sIJ8PU8977zCeNqWfyK4/OxC1NmjVfhFIZQbnETi
+ h21EzVxIpj1K1RFqq+Ehw6GJTbEDG+ecXznBlkLvtn6zC5uvQW6W9JEAGVf5cmaLRUUP og== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36v9jt81eg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 03:59:18 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11M8x2Pc143321;
+        Mon, 22 Feb 2021 03:59:16 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 36v9jt81c5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 03:59:16 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11M8wDdO029103;
+        Mon, 22 Feb 2021 08:59:12 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 36tt281exx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 22 Feb 2021 08:59:12 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11M8wvMK14025056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Feb 2021 08:58:57 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 69559AE04D;
+        Mon, 22 Feb 2021 08:59:09 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA9ECAE053;
+        Mon, 22 Feb 2021 08:59:08 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 22 Feb 2021 08:59:08 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        pmorel@linux.ibm.com, david@redhat.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 1/7] s390x: Fix fpc store address in RESTORE_REGS_STACK
+Date:   Mon, 22 Feb 2021 03:57:50 -0500
+Message-Id: <20210222085756.14396-2-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210222085756.14396-1-frankja@linux.ibm.com>
+References: <20210222085756.14396-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-22_02:2021-02-18,2021-02-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ mlxscore=0 malwarescore=0 suspectscore=0 phishscore=0 clxscore=1015
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102220076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQXVnZXIgRXJpYyBbbWFp
-bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMjEgRmVicnVhcnkgMjAyMSAxODoy
-MQ0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50
-aG9kaUBodWF3ZWkuY29tPjsNCj4gZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOyBpb21tdUBsaXN0
-cy5saW51eC1mb3VuZGF0aW9uLm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsg
-a3ZtQHZnZXIua2VybmVsLm9yZzsNCj4ga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdTsgd2ls
-bEBrZXJuZWwub3JnOyBqb3JvQDhieXRlcy5vcmc7DQo+IG1hekBrZXJuZWwub3JnOyByb2Jpbi5t
-dXJwaHlAYXJtLmNvbTsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20NCj4gQ2M6IGplYW4tcGhp
-bGlwcGVAbGluYXJvLm9yZzsgemhhbmdmZWkuZ2FvQGxpbmFyby5vcmc7DQo+IHpoYW5nZmVpLmdh
-b0BnbWFpbC5jb207IHZpdmVrLmdhdXRhbUBhcm0uY29tOw0KPiBqYWNvYi5qdW4ucGFuQGxpbnV4
-LmludGVsLmNvbTsgeWkubC5saXVAaW50ZWwuY29tOyB0bkBzZW1paGFsZi5jb207DQo+IG5pY29s
-ZW90c3VrYUBnbWFpbC5jb207IHl1emVuZ2h1aSA8eXV6ZW5naHVpQGh1YXdlaS5jb20+OyBaZW5n
-dGFvIChCKQ0KPiA8cHJpbWUuemVuZ0BoaXNpbGljb24uY29tPjsgbGludXhhcm1Ab3BlbmV1bGVy
-Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxMyAwMC8xNV0gU01NVXYzIE5lc3RlZCBTdGFn
-ZSBTZXR1cCAoSU9NTVUgcGFydCkNCj4gDQo+IEhpIFNoYW1lZXIsDQo+IE9uIDEvOC8yMSA2OjA1
-IFBNLCBTaGFtZWVyYWxpIEtvbG90aHVtIFRob2RpIHdyb3RlOg0KPiA+IEhpIEVyaWMsDQo+ID4N
-Cj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogRXJpYyBBdWdlciBb
-bWFpbHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogMTggTm92ZW1iZXIgMjAy
-MCAxMToyMg0KPiA+PiBUbzogZXJpYy5hdWdlci5wcm9AZ21haWwuY29tOyBlcmljLmF1Z2VyQHJl
-ZGhhdC5jb207DQo+ID4+IGlvbW11QGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOyBsaW51eC1r
-ZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+PiBrdm1Admdlci5rZXJuZWwub3JnOyBrdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1OyB3aWxsQGtlcm5lbC5vcmc7DQo+ID4+IGpvcm9AOGJ5dGVz
-Lm9yZzsgbWF6QGtlcm5lbC5vcmc7IHJvYmluLm11cnBoeUBhcm0uY29tOw0KPiA+PiBhbGV4Lndp
-bGxpYW1zb25AcmVkaGF0LmNvbQ0KPiA+PiBDYzogamVhbi1waGlsaXBwZUBsaW5hcm8ub3JnOyB6
-aGFuZ2ZlaS5nYW9AbGluYXJvLm9yZzsNCj4gPj4gemhhbmdmZWkuZ2FvQGdtYWlsLmNvbTsgdml2
-ZWsuZ2F1dGFtQGFybS5jb207IFNoYW1lZXJhbGkgS29sb3RodW0NCj4gPj4gVGhvZGkgPHNoYW1l
-ZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47DQo+ID4+IGphY29iLmp1bi5wYW5AbGlu
-dXguaW50ZWwuY29tOyB5aS5sLmxpdUBpbnRlbC5jb207IHRuQHNlbWloYWxmLmNvbTsNCj4gPj4g
-bmljb2xlb3RzdWthQGdtYWlsLmNvbTsgeXV6ZW5naHVpIDx5dXplbmdodWlAaHVhd2VpLmNvbT4N
-Cj4gPj4gU3ViamVjdDogW1BBVENIIHYxMyAwMC8xNV0gU01NVXYzIE5lc3RlZCBTdGFnZSBTZXR1
-cCAoSU9NTVUgcGFydCkNCj4gPj4NCj4gPj4gVGhpcyBzZXJpZXMgYnJpbmdzIHRoZSBJT01NVSBw
-YXJ0IG9mIEhXIG5lc3RlZCBwYWdpbmcgc3VwcG9ydA0KPiA+PiBpbiB0aGUgU01NVXYzLiBUaGUg
-VkZJTyBwYXJ0IGlzIHN1Ym1pdHRlZCBzZXBhcmF0ZWx5Lg0KPiA+Pg0KPiA+PiBUaGUgSU9NTVUg
-QVBJIGlzIGV4dGVuZGVkIHRvIHN1cHBvcnQgMiBuZXcgQVBJIGZ1bmN0aW9uYWxpdGllczoNCj4g
-Pj4gMSkgcGFzcyB0aGUgZ3Vlc3Qgc3RhZ2UgMSBjb25maWd1cmF0aW9uDQo+ID4+IDIpIHBhc3Mg
-c3RhZ2UgMSBNU0kgYmluZGluZ3MNCj4gPj4NCj4gPj4gVGhlbiB0aG9zZSBjYXBhYmlsaXRpZXMg
-Z2V0cyBpbXBsZW1lbnRlZCBpbiB0aGUgU01NVXYzIGRyaXZlci4NCj4gPj4NCj4gPj4gVGhlIHZp
-cnR1YWxpemVyIHBhc3NlcyBpbmZvcm1hdGlvbiB0aHJvdWdoIHRoZSBWRklPIHVzZXIgQVBJDQo+
-ID4+IHdoaWNoIGNhc2NhZGVzIHRoZW0gdG8gdGhlIGlvbW11IHN1YnN5c3RlbS4gVGhpcyBhbGxv
-d3MgdGhlIGd1ZXN0DQo+ID4+IHRvIG93biBzdGFnZSAxIHRhYmxlcyBhbmQgY29udGV4dCBkZXNj
-cmlwdG9ycyAoc28tY2FsbGVkIFBBU0lEDQo+ID4+IHRhYmxlKSB3aGlsZSB0aGUgaG9zdCBvd25z
-IHN0YWdlIDIgdGFibGVzIGFuZCBtYWluIGNvbmZpZ3VyYXRpb24NCj4gPj4gc3RydWN0dXJlcyAo
-U1RFKS4NCj4gPg0KPiA+IEkgYW0gc2VlaW5nIGFuIGlzc3VlIHdpdGggR3Vlc3QgdGVzdHBtZCBy
-dW4gd2l0aCB0aGlzIHNlcmllcy4NCj4gPiBJIGhhdmUgdHdvIGRpZmZlcmVudCBzZXR1cHMgYW5k
-IHRlc3RwbWQgd29ya3MgZmluZSB3aXRoIHRoZQ0KPiA+IGZpcnN0IG9uZSBidXQgbm90IHdpdGgg
-dGhlIHNlY29uZC4NCj4gPg0KPiA+IDEpLiBHdWVzdCBkb2Vzbid0IGhhdmUga2VybmVsIGRyaXZl
-ciBidWlsdC1pbiBmb3IgcGFzcy10aHJvdWdoIGRldi4NCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi8j
-IGxzcGNpIC12DQo+ID4gLi4uDQo+ID4gMDA6MDIuMCBFdGhlcm5ldCBjb250cm9sbGVyOiBIdWF3
-ZWkgVGVjaG5vbG9naWVzIENvLiwgTHRkLiBEZXZpY2UgYTIyZSAocmV2DQo+IDIxKQ0KPiA+IFN1
-YnN5c3RlbTogSHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4gRGV2aWNlIDAwMDANCj4gPiBG
-bGFnczogZmFzdCBkZXZzZWwNCj4gPiBNZW1vcnkgYXQgODAwMDEwMDAwMCAoNjQtYml0LCBwcmVm
-ZXRjaGFibGUpIFtkaXNhYmxlZF0gW3NpemU9NjRLXQ0KPiA+IE1lbW9yeSBhdCA4MDAwMDAwMDAw
-ICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW2Rpc2FibGVkXSBbc2l6ZT0xTV0NCj4gPiBDYXBhYmls
-aXRpZXM6IFs0MF0gRXhwcmVzcyBSb290IENvbXBsZXggSW50ZWdyYXRlZCBFbmRwb2ludCwgTVNJ
-IDAwDQo+ID4gQ2FwYWJpbGl0aWVzOiBbYTBdIE1TSS1YOiBFbmFibGUtIENvdW50PTY3IE1hc2tl
-ZC0NCj4gPiBDYXBhYmlsaXRpZXM6IFtiMF0gUG93ZXIgTWFuYWdlbWVudCB2ZXJzaW9uIDMNCj4g
-PiBDYXBhYmlsaXRpZXM6IFsxMDBdIEFjY2VzcyBDb250cm9sIFNlcnZpY2VzDQo+ID4gQ2FwYWJp
-bGl0aWVzOiBbMzAwXSBUcmFuc2FjdGlvbiBQcm9jZXNzaW5nIEhpbnRzDQo+ID4NCj4gPiByb290
-QHVidW50dTovIyBlY2hvIHZmaW8tcGNpID4NCj4gL3N5cy9idXMvcGNpL2RldmljZXMvMDAwMDow
-MDowMi4wL2RyaXZlcl9vdmVycmlkZQ0KPiA+IHJvb3RAdWJ1bnR1Oi8jIGVjaG8gMDAwMDowMDow
-Mi4wID4gL3N5cy9idXMvcGNpL2RyaXZlcnNfcHJvYmUNCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi9t
-bnQvZHBkay9idWlsZC9hcHAjIC4vdGVzdHBtZCAtdyAwMDAwOjAwOjAyLjAgLS1maWxlLXByZWZp
-eA0KPiBzb2NrZXQwICAtbCAwLTEgLW4gMiAtLSAtaQ0KPiA+IEVBTDogRGV0ZWN0ZWQgOCBsY29y
-ZShzKQ0KPiA+IEVBTDogRGV0ZWN0ZWQgMSBOVU1BIG5vZGVzDQo+ID4gRUFMOiBNdWx0aS1wcm9j
-ZXNzIHNvY2tldCAvdmFyL3J1bi9kcGRrL3NvY2tldDAvbXBfc29ja2V0DQo+ID4gRUFMOiBTZWxl
-Y3RlZCBJT1ZBIG1vZGUgJ1ZBJw0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBv
-cnRlZCBpbiBodWdlcGFnZXMtMzI3NjhrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdl
-cyByZXBvcnRlZCBpbiBodWdlcGFnZXMtNjRrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2Vw
-YWdlcyByZXBvcnRlZCBpbiBodWdlcGFnZXMtMTA0ODU3NmtCDQo+ID4gRUFMOiBQcm9iaW5nIFZG
-SU8gc3VwcG9ydC4uLg0KPiA+IEVBTDogVkZJTyBzdXBwb3J0IGluaXRpYWxpemVkDQo+ID4gRUFM
-OiAgIEludmFsaWQgTlVNQSBzb2NrZXQsIGRlZmF1bHQgdG8gMA0KPiA+IEVBTDogICB1c2luZyBJ
-T01NVSB0eXBlIDEgKFR5cGUgMSkNCj4gPiBFQUw6IFByb2JlIFBDSSBkcml2ZXI6IG5ldF9obnMz
-X3ZmICgxOWU1OmEyMmUpIGRldmljZTogMDAwMDowMDowMi4wIChzb2NrZXQNCj4gMCkNCj4gPiBF
-QUw6IE5vIGxlZ2FjeSBjYWxsYmFja3MsIGxlZ2FjeSBzb2NrZXQgbm90IGNyZWF0ZWQNCj4gPiBJ
-bnRlcmFjdGl2ZS1tb2RlIHNlbGVjdGVkDQo+ID4gdGVzdHBtZDogY3JlYXRlIGEgbmV3IG1idWYg
-cG9vbCA8bWJ1Zl9wb29sX3NvY2tldF8wPjogbj0xNTU0NTYsDQo+IHNpemU9MjE3Niwgc29ja2V0
-PTANCj4gPiB0ZXN0cG1kOiBwcmVmZXJyZWQgbWVtcG9vbCBvcHMgc2VsZWN0ZWQ6IHJpbmdfbXBf
-bWMNCj4gPg0KPiA+IFdhcm5pbmchIHBvcnQtdG9wb2xvZ3k9cGFpcmVkIGFuZCBvZGQgZm9yd2Fy
-ZCBwb3J0cyBudW1iZXIsIHRoZSBsYXN0IHBvcnQNCj4gd2lsbCBwYWlyIHdpdGggaXRzZWxmLg0K
-PiA+DQo+ID4gQ29uZmlndXJpbmcgUG9ydCAwIChzb2NrZXQgMCkNCj4gPiBQb3J0IDA6IDhFOkE2
-OjhDOjQzOjQzOjQ1DQo+ID4gQ2hlY2tpbmcgbGluayBzdGF0dXNlcy4uLg0KPiA+IERvbmUNCj4g
-PiB0ZXN0cG1kPg0KPiA+DQo+ID4gMikuIEd1ZXN0IGhhdmUga2VybmVsIGRyaXZlciBidWlsdC1p
-biBmb3IgcGFzcy10aHJvdWdoIGRldi4NCj4gPg0KPiA+IHJvb3RAdWJ1bnR1Oi8jIGxzcGNpIC12
-DQo+ID4gLi4uDQo+ID4gMDA6MDIuMCBFdGhlcm5ldCBjb250cm9sbGVyOiBIdWF3ZWkgVGVjaG5v
-bG9naWVzIENvLiwgTHRkLiBEZXZpY2UgYTIyZSAocmV2DQo+IDIxKQ0KPiA+IFN1YnN5c3RlbTog
-SHVhd2VpIFRlY2hub2xvZ2llcyBDby4sIEx0ZC4gRGV2aWNlIDAwMDANCj4gPiBGbGFnczogYnVz
-IG1hc3RlciwgZmFzdCBkZXZzZWwsIGxhdGVuY3kgMA0KPiA+IE1lbW9yeSBhdCA4MDAwMTAwMDAw
-ICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW3NpemU9NjRLXQ0KPiA+IE1lbW9yeSBhdCA4MDAwMDAw
-MDAwICg2NC1iaXQsIHByZWZldGNoYWJsZSkgW3NpemU9MU1dDQo+ID4gQ2FwYWJpbGl0aWVzOiBb
-NDBdIEV4cHJlc3MgUm9vdCBDb21wbGV4IEludGVncmF0ZWQgRW5kcG9pbnQsIE1TSSAwMA0KPiA+
-IENhcGFiaWxpdGllczogW2EwXSBNU0ktWDogRW5hYmxlKyBDb3VudD02NyBNYXNrZWQtDQo+ID4g
-Q2FwYWJpbGl0aWVzOiBbYjBdIFBvd2VyIE1hbmFnZW1lbnQgdmVyc2lvbiAzDQo+ID4gQ2FwYWJp
-bGl0aWVzOiBbMTAwXSBBY2Nlc3MgQ29udHJvbCBTZXJ2aWNlcw0KPiA+IENhcGFiaWxpdGllczog
-WzMwMF0gVHJhbnNhY3Rpb24gUHJvY2Vzc2luZyBIaW50cw0KPiA+IEtlcm5lbCBkcml2ZXIgaW4g
-dXNlOiBobnMzDQo+ID4NCj4gPiByb290QHVidW50dTovIyBlY2hvIHZmaW8tcGNpID4NCj4gL3N5
-cy9idXMvcGNpL2RldmljZXMvMDAwMDowMDowMi4wL2RyaXZlcl9vdmVycmlkZQ0KPiA+IHJvb3RA
-dWJ1bnR1Oi8jIGVjaG8gMDAwMDowMDowMi4wID4gL3N5cy9idXMvcGNpL2RyaXZlcnMvaG5zMy91
-bmJpbmQNCj4gPiByb290QHVidW50dTovIyBlY2hvIDAwMDA6MDA6MDIuMCA+IC9zeXMvYnVzL3Bj
-aS9kcml2ZXJzX3Byb2JlDQo+ID4NCj4gPiByb290QHVidW50dTovbW50L2RwZGsvYnVpbGQvYXBw
-IyAuL3Rlc3RwbWQgLXcgMDAwMDowMDowMi4wIC0tZmlsZS1wcmVmaXgNCj4gc29ja2V0MCAtbCAw
-LTEgLW4gMiAtLSAtaQ0KPiA+IEVBTDogRGV0ZWN0ZWQgOCBsY29yZShzKQ0KPiA+IEVBTDogRGV0
-ZWN0ZWQgMSBOVU1BIG5vZGVzDQo+ID4gRUFMOiBNdWx0aS1wcm9jZXNzIHNvY2tldCAvdmFyL3J1
-bi9kcGRrL3NvY2tldDAvbXBfc29ja2V0DQo+ID4gRUFMOiBTZWxlY3RlZCBJT1ZBIG1vZGUgJ1ZB
-Jw0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBodWdlcGFnZXMt
-MzI3NjhrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBodWdl
-cGFnZXMtNjRrQg0KPiA+IEVBTDogTm8gYXZhaWxhYmxlIGh1Z2VwYWdlcyByZXBvcnRlZCBpbiBo
-dWdlcGFnZXMtMTA0ODU3NmtCDQo+ID4gRUFMOiBQcm9iaW5nIFZGSU8gc3VwcG9ydC4uLg0KPiA+
-IEVBTDogVkZJTyBzdXBwb3J0IGluaXRpYWxpemVkDQo+ID4gRUFMOiAgIEludmFsaWQgTlVNQSBz
-b2NrZXQsIGRlZmF1bHQgdG8gMA0KPiA+IEVBTDogICB1c2luZyBJT01NVSB0eXBlIDEgKFR5cGUg
-MSkNCj4gPiBFQUw6IFByb2JlIFBDSSBkcml2ZXI6IG5ldF9obnMzX3ZmICgxOWU1OmEyMmUpIGRl
-dmljZTogMDAwMDowMDowMi4wIChzb2NrZXQNCj4gMCkNCj4gPiAwMDAwOjAwOjAyLjAgaG5zM19n
-ZXRfbWJ4X3Jlc3AoKTogVkYgY291bGQgbm90IGdldCBtYngoMTEsMCkgaGVhZCgxKSB0YWlsKDAp
-DQo+IGxvc3QoMSkgZnJvbSBQRiBpbl9pcnE6MA0KPiA+IGhuczN2Zl9nZXRfcXVldWVfaW5mbygp
-OiBGYWlsZWQgdG8gZ2V0IHRxcCBpbmZvIGZyb20gUEY6IC02Mg0KPiA+IGhuczN2Zl9pbml0X3Zm
-KCk6IEZhaWxlZCB0byBmZXRjaCBjb25maWd1cmF0aW9uOiAtNjINCj4gPiBobnMzdmZfZGV2X2lu
-aXQoKTogRmFpbGVkIHRvIGluaXQgdmY6IC02Mg0KPiA+IEVBTDogUmVsZWFzaW5nIHBjaSBtYXBw
-ZWQgcmVzb3VyY2UgZm9yIDAwMDA6MDA6MDIuMA0KPiA+IEVBTDogQ2FsbGluZyBwY2lfdW5tYXBf
-cmVzb3VyY2UgZm9yIDAwMDA6MDA6MDIuMCBhdCAweDExMDA4MDAwMDANCj4gPiBFQUw6IENhbGxp
-bmcgcGNpX3VubWFwX3Jlc291cmNlIGZvciAwMDAwOjAwOjAyLjAgYXQgMHgxMTAwODEwMDAwDQo+
-ID4gRUFMOiBSZXF1ZXN0ZWQgZGV2aWNlIDAwMDA6MDA6MDIuMCBjYW5ub3QgYmUgdXNlZA0KPiA+
-IEVBTDogQnVzIChwY2kpIHByb2JlIGZhaWxlZC4NCj4gPiBFQUw6IE5vIGxlZ2FjeSBjYWxsYmFj
-a3MsIGxlZ2FjeSBzb2NrZXQgbm90IGNyZWF0ZWQNCj4gPiB0ZXN0cG1kOiBObyBwcm9iZWQgZXRo
-ZXJuZXQgZGV2aWNlcw0KPiA+IEludGVyYWN0aXZlLW1vZGUgc2VsZWN0ZWQNCj4gPiB0ZXN0cG1k
-OiBjcmVhdGUgYSBuZXcgbWJ1ZiBwb29sIDxtYnVmX3Bvb2xfc29ja2V0XzA+OiBuPTE1NTQ1NiwN
-Cj4gc2l6ZT0yMTc2LCBzb2NrZXQ9MA0KPiA+IHRlc3RwbWQ6IHByZWZlcnJlZCBtZW1wb29sIG9w
-cyBzZWxlY3RlZDogcmluZ19tcF9tYw0KPiA+IERvbmUNCj4gPiB0ZXN0cG1kPg0KPiA+DQo+ID4g
-QW5kIGluIHRoaXMgY2FzZSwgc21tdShob3N0KSByZXBvcnRzIGEgdHJhbnNsYXRpb24gZmF1bHQs
-DQo+ID4NCj4gPiBbIDY1NDIuNjcwNjI0XSBhcm0tc21tdS12MyBhcm0tc21tdS12My4yLmF1dG86
-IGV2ZW50IDB4MTAgcmVjZWl2ZWQ6DQo+ID4gWyA2NTQyLjY3MDYzMF0gYXJtLXNtbXUtdjMgYXJt
-LXNtbXUtdjMuMi5hdXRvOiAweDAwMDA3ZDEyMDAwMDAwMTANCj4gPiBbIDY1NDIuNjcwNjMxXSBh
-cm0tc21tdS12MyBhcm0tc21tdS12My4yLmF1dG86IDB4MDAwMDEyMDAwMDAwMDA3Yw0KPiA+IFsg
-NjU0Mi42NzA2MzNdIGFybS1zbW11LXYzIGFybS1zbW11LXYzLjIuYXV0bzogMHgwMDAwMDAwMGZm
-ZmVmMDQwDQo+ID4gWyA2NTQyLjY3MDYzNF0gYXJtLXNtbXUtdjMgYXJtLXNtbXUtdjMuMi5hdXRv
-OiAweDAwMDAwMDAwZmZmZWYwMDANCj4gPg0KPiA+IFRlc3RlZCB3aXRoIEludGVsIDgyNTk5IGNh
-cmQoaXhnYmV2ZikgYXMgd2VsbC4gYnV0IHNhbWUgZXJycm9yLg0KPiANCj4gU28gdGhpcyBzaG91
-bGQgYmUgZml4ZWQgaW4gdGhlIG5leHQgcmVsZWFzZS4gVGhlIHByb2JsZW0gY2FtZSBmcm9tIHRo
-ZQ0KPiBmYWN0IHRoZSBNU0kgZ2lvdmEgd2FzIG5vdCBkdWx5IHVucmVnaXN0ZXJlZC4gV2hlbiB2
-ZmlvIGlzIG5vdCBpbiB1c2VkDQo+IG9uIGd1ZXN0IHNpZGUsIHRoZSBndWVzdCBrZXJuZWwgYWxs
-b2NhdGVzIGdpb3ZhcyBmb3IgTVNJcyBAZmZmZWYwMDAgLSA0MA0KPiBpcyB0aGUgSVRTIHRyYW5z
-bGF0ZXIgb2Zmc2V0IDstKSAtIFdoZW4gcGFzc3Rocm91Z2ggaXMgaW4gdXNlLCB0aGUgaW92YQ0K
-PiBpcyBhbGxvY2F0ZWQgQDB4ODAwMDAwMC4gQXMgZmZmZWYwMDAgTVNJIGdpb3ZhIHdhcyBub3Qg
-cHJvcGVybHkNCj4gdW5yZWdpc3RlcmVkLCB0aGUgaG9zdCBrZXJuZWwgdXNlZCBpdCAtIGRlc3Bp
-dGUgaXQgaGFzIGJlZW4gdW5tYXBwZWQgYnkNCj4gdGhlIGd1ZXN0IGtlcm5lbCAtLCBoZW5jZSB0
-aGUgdHJhbnNsYXRpb24gZmF1bHQuIFNvIHRoZSBmaXggaXMgdG8NCj4gdW5yZWdpc3RlciB0aGUg
-TVNJIGluIHRoZSBWRklPIFFFTVUgY29kZSB3aGVuIG1zaXggYXJlIGRpc2FibGVkLiBTbyB0bw0K
-PiBtZSB0aGlzIGlzIGEgUUVNVSBpbnRlZ3JhdGlvbiBpc3N1ZS4NCg0KU3VwZXIhLiBJIHdhcyBm
-b2N1c2luZyBvbiB0aGUgVExCSSBzaWRlIGFuZCB3YXMgc2xpZ2h0bHkgd29ycmllZCBpdCBpcyBz
-b21laG93DQpyZWxhdGVkIG91ciBzcGVjaWZpYyBoYXJkd2FyZS4gVGhhdOKAmXMgYSByZWxpZWYg
-OikuDQoNClRoYW5rcywNClNoYW1lZXIgDQoNCg0K
+The efpc stores in bits 32-63 of a register and we store a full 8
+bytes to have the stack 8 byte aligned. This means that the fpc is
+stored at offset 4 but we load it from offset 0. Lets replace efpc
+with stfpc and get rid of the stg to store at offset 0.
+
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ s390x/macros.S | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/s390x/macros.S b/s390x/macros.S
+index 37a6a63e..e51a557a 100644
+--- a/s390x/macros.S
++++ b/s390x/macros.S
+@@ -54,8 +54,7 @@
+ 	.endr
+ 	/* Save fpc, but keep stack aligned on 64bits */
+ 	slgfi   %r15, 8
+-	efpc	%r0
+-	stg	%r0, 0(%r15)
++	stfpc	0(%r15)
+ 	.endm
+ 
+ /* Restore the register in reverse order */
+-- 
+2.25.1
+
