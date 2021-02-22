@@ -2,230 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBB56321C4B
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:07:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57FE3321C69
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:10:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbhBVQFW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:05:22 -0500
-Received: from foss.arm.com ([217.140.110.172]:54414 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231194AbhBVQEw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 11:04:52 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A081A1FB;
-        Mon, 22 Feb 2021 08:03:58 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A36C63F73B;
-        Mon, 22 Feb 2021 08:03:57 -0800 (PST)
-Subject: Re: [PATCH kvmtool 06/21] hw/i8042: Refactor trap handler
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-7-andre.przywara@arm.com>
- <288df0e8-997c-7691-2dda-017876dba3f4@arm.com>
- <20210218103425.26a27000@slackpad.fritz.box>
- <5d2d7233-46f6-3056-e2b2-813a3fc56d88@arm.com>
- <20210218114808.5ea4ba60@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <30bcaa57-2cbb-b687-faff-8e1d743a03e3@arm.com>
-Date:   Mon, 22 Feb 2021 16:03:37 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S231232AbhBVQIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 11:08:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231673AbhBVQHz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 11:07:55 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE7C3C06178B
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:07:03 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id t25so10497272pga.2
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:07:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=mp7wIhLHWdhboT6kIoeZS80417khoNPc/CItzMbajCM=;
+        b=GghBN+pJW634uiH0KTvYQM25/DQNpQPu4VEF3pllmDO/S+sXWWXvfEcPZD7QzQs9p2
+         wK0aVSoTe3R/o1UKotnmlXWXlWMFWQpMfOHkxdrSr3K+i2TOjz5/oNfo+VXAplIz9O7Y
+         m7DPjmLtPN09xoGaMg1HPRJwS84c0QxxavAABptUXuOocx4cfM30gvi+OS7sH5SHNMKu
+         VTiebkIQROzGNQguER8Oo5Y+llKPvpVwvIOihvewwLxecWoFR5rilxSvmx8UoGi/SDlO
+         4nY5QInyKBTSATXZax+wF/Xiaq55FURXrt0wCErG40INjLE41UPsXY+wgpvigM00HtLY
+         81Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mp7wIhLHWdhboT6kIoeZS80417khoNPc/CItzMbajCM=;
+        b=sV+Pa0lbPxByoUrTf8MA/rlMwfsgmYjBKLDWN2haqCgP1vxv1CttR1nG++chYbSqpg
+         yl4q+KOvperaROr7n0rTmzZnPqL6YwXn8bmmIEBni5zaKz/Pe6hoiZhGSu05vwoVgiYw
+         yBYNJ/WXO3mGGVEwxNnpbwVuc/lH1wls23pwcQaQrLoWPwjuSbogqHOBAqePFqkRJdiL
+         U1x9+9cQs6xJh2vcWxzUyGFJMSEVxyltdHig6PIiY59Ipevj4BId2Ac4X3IexkDudd9J
+         qPcYb6xH0rDthWUxjEKzCuPfSFRSd4wCzKpToyCKSMSteUiKF4GpA+VR4YgWZmtusFel
+         7zlQ==
+X-Gm-Message-State: AOAM533219ONlmNBFL/BcXBtn20XD0gyvoc5nJopN202HMPVRdf+VbyD
+        wvO1WNpBJ9v4SGE2+gPLV/+lEg==
+X-Google-Smtp-Source: ABdhPJwG9nn/7s/1PvvBnUYYLfgZNtt6cka/dQQtMqdxrWrWI6kD7up/F5zZXHkLMYSfoyhbP4JtMw==
+X-Received: by 2002:a63:cf05:: with SMTP id j5mr4302479pgg.384.1614010023095;
+        Mon, 22 Feb 2021 08:07:03 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:655e:415b:3b95:bd58])
+        by smtp.gmail.com with ESMTPSA id k128sm20069508pfd.137.2021.02.22.08.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 08:07:02 -0800 (PST)
+Date:   Mon, 22 Feb 2021 08:06:55 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Liu, Jing2" <jing2.liu@linux.intel.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
+Message-ID: <YDPWn70DTA64psQb@google.com>
+References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
+ <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
+ <YCFzztFESzcnKRqQ@google.com>
+ <c33335d3-abbe-04e0-2fa1-47f57ad154ac@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20210218114808.5ea4ba60@slackpad.fritz.box>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c33335d3-abbe-04e0-2fa1-47f57ad154ac@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Mon, Feb 22, 2021, Liu, Jing2 wrote:
+> 
+> On 2/9/2021 1:24 AM, Sean Christopherson wrote:
+> > On Mon, Feb 08, 2021, Dave Hansen wrote:
+> > > On 2/8/21 8:16 AM, Jing Liu wrote:
+> > > > -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
+> > > > -
+> > > >   static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
+> > > >   {
+> > > >   	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+> > > > @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
+> > > >   	/* Set XSTATE_BV and possibly XCOMP_BV.  */
+> > > >   	xsave->header.xfeatures = xstate_bv;
+> > > >   	if (boot_cpu_has(X86_FEATURE_XSAVES))
+> > > > -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
+> > > > +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+> > > > +					 xfeatures_mask_all;
+> > This is wrong, xfeatures_mask_all also tracks supervisor states.
+> When looking at SDM Vol2 XSAVES instruction Operation part, it says as
+> follows,
+> 
+> RFBM ← (XCR0 OR IA32_XSS) AND EDX:EAX;
+> COMPMASK ← RFBM OR 80000000_00000000H;
+> ...
+> 
+> XCOMP_BV field in XSAVE header ← COMPMASK;
+> 
+> 
+> So it seems xcomp_bv also tracks supervisor states?
 
-On 2/18/21 11:48 AM, Andre Przywara wrote:
-> On Thu, 18 Feb 2021 11:17:58 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
->> Hi Andre,
->>
->> On 2/18/21 10:34 AM, Andre Przywara wrote:
->>> On Thu, 11 Feb 2021 17:23:13 +0000
->>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>>  
->>>> Hi Andre,
->>>>
->>>> On 12/10/20 2:28 PM, Andre Przywara wrote:  
->>>>> With the planned retirement of the special ioport emulation code, we
->>>>> need to provide an emulation function compatible with the MMIO
->>>>> prototype.
->>>>>
->>>>> Adjust the trap handler to use that new function, and provide shims to
->>>>> implement the old ioport interface, for now.
->>>>>
->>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>>> ---
->>>>>  hw/i8042.c | 68 +++++++++++++++++++++++++++---------------------------
->>>>>  1 file changed, 34 insertions(+), 34 deletions(-)
->>>>>
->>>>> diff --git a/hw/i8042.c b/hw/i8042.c
->>>>> index 36ee183f..eb1f9d28 100644
->>>>> --- a/hw/i8042.c
->>>>> +++ b/hw/i8042.c
->>>>> @@ -292,52 +292,52 @@ static void kbd_reset(void)
->>>>>  	};
->>>>>  }
->>>>>  
->>>>> -/*
->>>>> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
->>>>> - */
->>>>> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>>>> +static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->>>>> +		   u8 is_write, void *ptr)
->>>>>  {
->>>>> -	switch (port) {
->>>>> -	case I8042_COMMAND_REG: {
->>>>> -		u8 value = kbd_read_status();
->>>>> -		ioport__write8(data, value);
->>>>> +	u8 value;
->>>>> +
->>>>> +	if (is_write)
->>>>> +		value = ioport__read8(data);
->>>>> +
->>>>> +	switch (addr) {
->>>>> +	case I8042_COMMAND_REG:
->>>>> +		if (is_write)
->>>>> +			kbd_write_command(vcpu->kvm, value);
->>>>> +		else
->>>>> +			value = kbd_read_status();
->>>>>  		break;
->>>>> -	}
->>>>> -	case I8042_DATA_REG: {
->>>>> -		u8 value = kbd_read_data();
->>>>> -		ioport__write8(data, value);
->>>>> +	case I8042_DATA_REG:
->>>>> +		if (is_write)
->>>>> +			kbd_write_data(value);
->>>>> +		else
->>>>> +			value = kbd_read_data();
->>>>>  		break;
->>>>> -	}
->>>>> -	case I8042_PORT_B_REG: {
->>>>> -		ioport__write8(data, 0x20);
->>>>> +	case I8042_PORT_B_REG:
->>>>> +		if (!is_write)
->>>>> +			value = 0x20;
->>>>>  		break;
->>>>> -	}
->>>>>  	default:
->>>>> -		return false;
->>>>> +		return;    
->>>> Any particular reason for removing the false return value? I don't see it
->>>> mentioned in the commit message. Otherwise this is identical to the two functions
->>>> it replaces.  
->>> Because the MMIO handler prototype is void, in contrast to the PIO one.
->>> Since on returning "false" we only seem to panic kvmtool, this is of
->>> quite limited use, I'd say.  
->> Actually, in ioport.c::kvm__emulate_io(), if kvm->cfg.ioport_debug is true, it
->> will print an error and then panic in kvm_cpu__start(); otherwise the error is
->> silently ignored. serial.c is another device where an unknown register returns
->> false. In rtc.c, the unknown register is ignored. cfi_flash.c prints debugging
->> information. So I guess kvmtool implements all possible methods of handling an
->> unknown register *at the same time*, so it's up to you how you want to handle it.
-> Well, the MMIO prototype we are going to use is void anyway, so it's
-> just one patch earlier that we get this new behaviour.
-> For handling MMIO errors:
-> - Hardware MMIO doesn't have a back channel: if the MMIO write triggers
->   some error condition, the device would need to deal with it (setting
->   internal error state, ignore, etc.). On some systems the device could
->   throw some kind of bus error or SError, but this is a rather drastic
->   measure, and is certainly not exercised by those ancient devices.
-> - Any kind of error reporting which can be triggered by a guest is
->   frowned upon: it could spam the console or some log file, and so
->   impact host operation. At the end an administrator can't do much about
->   it, anyway.
-> - Which leaves the only use to some kvmtool developer debugging some
->   device emulation or investigating weird guest behaviour. And in this
->   case we can more easily have a debug message *inside* the device
->   emulation code, can't we?
+Yes, sorry, I got distracted by Dave's question and didn't read the changelog
+closely.
 
-That's what I had in mind, debugging messages in the device emulation. If the
-guest can access an unknown register offset this can mean one of two things in my
-opinion: the emulated device registered a memory region bigger that necessary or
-the emulated device is not handling all device registers. But that's a subject for
-another series.
+Now that I have, I find "Since fpstate_init() has initialized xcomp_bv, let's
+just use that." confusing.  I think what you intend to say is that we can use
+the same _logic_ as fpstate_init_xstate() for calculating xcomp_bv.
 
-Thanks,
-
-Alex
-
->
-> And since the MMIO handler prototype is void, we have no choice anyway,
-> at least not without another huge (and pointless) series to change
-> those user as well ;-)
->
-> Cheers,
-> Andre
->
->>>>>  	}
->>>>>  
->>>>> +	if (!is_write)
->>>>> +		ioport__write8(data, value);
->>>>> +}
->>>>> +
->>>>> +/*
->>>>> + * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
->>>>> + */
->>>>> +static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>>>> +{
->>>>> +	kbd_io(vcpu, port, data, size, false, NULL);    
->>>> is_write is an u8, not a bool.  
->>> Right, will fix this.
->>>  
->>>> I never could wrap my head around the ioport convention of "in" (read) and "out"
->>>> (write). To be honest, changing is_write changed to an enum so it's crystal clear
->>>> what is happening would help with that a lot, but I guess that's a separate patch.  
->>> "in" and "out" are the x86 assembly mnemonics, but it's indeed
->>> confusing, because the device side has a different view (CPU "in" means
->>> pushing data "out" of the device). I usually look at the code to see
->>> what it's actually meant to do.
->>> So yeah, I feel like a lot of those device emulations could use
->>> some update. but that's indeed something for another day.  
->> Agreed.
->>
->> Thanks,
->>
->> Alex
->>
->>> Cheers,
->>> Andre
->>>  
->>>>> +
->>>>>  	return true;
->>>>>  }
->>>>>  
->>>>>  static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>>>>  {
->>>>> -	switch (port) {
->>>>> -	case I8042_COMMAND_REG: {
->>>>> -		u8 value = ioport__read8(data);
->>>>> -		kbd_write_command(vcpu->kvm, value);
->>>>> -		break;
->>>>> -	}
->>>>> -	case I8042_DATA_REG: {
->>>>> -		u8 value = ioport__read8(data);
->>>>> -		kbd_write_data(value);
->>>>> -		break;
->>>>> -	}
->>>>> -	case I8042_PORT_B_REG: {
->>>>> -		break;
->>>>> -	}
->>>>> -	default:
->>>>> -		return false;
->>>>> -	}
->>>>> +	kbd_io(vcpu, port, data, size, true, NULL);
->>>>>  
->>>>>  	return true;
->>>>>  }    
+That said, it would be helpful for the changelog to explain why it's correct to
+use xfeatures_mask_all, e.g. just a short comment stating that the variable holds
+all XCR0 and XSS bits enabled by the host kernel.  Justifying a change with
+"because other code does it" is sketchy, becuse there's no guarantee that what
+something else does is also correct for KVM, or that the existing code itself is
+even correct.
