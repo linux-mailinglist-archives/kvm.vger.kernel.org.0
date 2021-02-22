@@ -2,173 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E9F91321D70
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:52:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D86C7321D71
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:52:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhBVQw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:52:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43337 "EHLO
+        id S231258AbhBVQwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 11:52:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59050 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231261AbhBVQwO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:52:14 -0500
+        by vger.kernel.org with ESMTP id S231292AbhBVQwZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:52:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614012646;
+        s=mimecast20190719; t=1614012658;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QBaujFxExGLh2CQgduXZKM8P6MRyUxKv108wObRTJvA=;
-        b=CJ5By3aAylgMLnmKRDXakaljJ8yE2BtD9PNl+UMdN+KhB77Xw9J6q50RySo1KKBat1vPbr
-        Sb0aOlcAFhGFt1Mm2GpOlE5+7HL2QqiCGOo9JfhrPZjQY1deFJzvPHf60HqK0BW/ins1FL
-        c+Wrouf3GVyeAXdpxuKbZZhStRSELJA=
+        bh=3d+4akFeShefY1mDCC6qtlOmhNGy6H9oh3THeYy9xOs=;
+        b=UaBeGAP4EmLflcrj3Vp9QOS56MMHg4tuXG4YTrADpiXtgHnSddPQFlSdwRZFQSlB1JOfm/
+        AGC//hlM69Fv/AYVNdymNC9gbHmvZIMK01KhRIRMerBwUm68pBd59CcBhvNB6nafctVgxn
+        ZEenjO4FLo8BcmSvqjKPRi/aU8DwWII=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-40sXcic-NSuS7zqAYZdLNg-1; Mon, 22 Feb 2021 11:50:43 -0500
-X-MC-Unique: 40sXcic-NSuS7zqAYZdLNg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-344-wIHTWIsqOzuklEt-q2uO8g-1; Mon, 22 Feb 2021 11:50:55 -0500
+X-MC-Unique: wIHTWIsqOzuklEt-q2uO8g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45AE9CC620;
-        Mon, 22 Feb 2021 16:50:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34D45CC621;
+        Mon, 22 Feb 2021 16:50:54 +0000 (UTC)
 Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 877C25C1BD;
-        Mon, 22 Feb 2021 16:50:35 +0000 (UTC)
-Subject: [RFC PATCH 01/10] vfio: Create vfio_fs_type with inode per device
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB1225D71D;
+        Mon, 22 Feb 2021 16:50:47 +0000 (UTC)
+Subject: [RFC PATCH 02/10] vfio: Update vfio_add_group_dev() API
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     alex.williamson@redhat.com
 Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
-Date:   Mon, 22 Feb 2021 09:50:35 -0700
-Message-ID: <161401263517.16443.7534035240372538844.stgit@gimli.home>
+Date:   Mon, 22 Feb 2021 09:50:47 -0700
+Message-ID: <161401264735.16443.5908636631567017543.stgit@gimli.home>
 In-Reply-To: <161401167013.16443.8389863523766611711.stgit@gimli.home>
 References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-By linking all the device fds we provide to userspace to an
-address space through a new pseudo fs, we can use tools like
-unmap_mapping_range() to zap all vmas associated with a device.
+Rather than an errno, return a pointer to the opaque vfio_device
+to allow the bus driver to call into vfio-core without additional
+lookups and references.  Note that bus drivers are still required
+to use vfio_del_group_dev() to teardown the vfio_device.
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- drivers/vfio/vfio.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c            |    6 ++++--
+ drivers/vfio/mdev/vfio_mdev.c                |    5 ++++-
+ drivers/vfio/pci/vfio_pci.c                  |    7 +++++--
+ drivers/vfio/platform/vfio_platform_common.c |    7 +++++--
+ drivers/vfio/vfio.c                          |   23 ++++++++++-------------
+ include/linux/vfio.h                         |    6 +++---
+ 6 files changed, 31 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 38779e6fd80c..464caef97aff 100644
---- a/drivers/vfio/vfio.c
-+++ b/drivers/vfio/vfio.c
-@@ -32,11 +32,18 @@
- #include <linux/vfio.h>
- #include <linux/wait.h>
- #include <linux/sched/signal.h>
-+#include <linux/pseudo_fs.h>
-+#include <linux/mount.h>
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+index f27e25112c40..a4c2d0b9cd51 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+@@ -592,6 +592,7 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
+ 	struct iommu_group *group;
+ 	struct vfio_fsl_mc_device *vdev;
+ 	struct device *dev = &mc_dev->dev;
++	struct vfio_device *device;
+ 	int ret;
  
- #define DRIVER_VERSION	"0.3"
- #define DRIVER_AUTHOR	"Alex Williamson <alex.williamson@redhat.com>"
- #define DRIVER_DESC	"VFIO - User Level meta-driver"
+ 	group = vfio_iommu_group_get(dev);
+@@ -608,8 +609,9 @@ static int vfio_fsl_mc_probe(struct fsl_mc_device *mc_dev)
  
-+#define VFIO_MAGIC 0x5646494f /* "VFIO" */
+ 	vdev->mc_dev = mc_dev;
+ 
+-	ret = vfio_add_group_dev(dev, &vfio_fsl_mc_ops, vdev);
+-	if (ret) {
++	device = vfio_add_group_dev(dev, &vfio_fsl_mc_ops, vdev);
++	if (IS_ERR(device)) {
++		ret = PTR_ERR(device);
+ 		dev_err(dev, "VFIO_FSL_MC: Failed to add to vfio group\n");
+ 		goto out_group_put;
+ 	}
+diff --git a/drivers/vfio/mdev/vfio_mdev.c b/drivers/vfio/mdev/vfio_mdev.c
+index b52eea128549..32901b265864 100644
+--- a/drivers/vfio/mdev/vfio_mdev.c
++++ b/drivers/vfio/mdev/vfio_mdev.c
+@@ -124,8 +124,11 @@ static const struct vfio_device_ops vfio_mdev_dev_ops = {
+ static int vfio_mdev_probe(struct device *dev)
+ {
+ 	struct mdev_device *mdev = to_mdev_device(dev);
++	struct vfio_device *device;
+ 
+-	return vfio_add_group_dev(dev, &vfio_mdev_dev_ops, mdev);
++	device = vfio_add_group_dev(dev, &vfio_mdev_dev_ops, mdev);
 +
-+static int vfio_fs_cnt;
-+static struct vfsmount *vfio_fs_mnt;
-+
- static struct vfio {
- 	struct class			*class;
- 	struct list_head		iommu_drivers_list;
-@@ -97,6 +104,7 @@ struct vfio_device {
- 	struct vfio_group		*group;
- 	struct list_head		group_next;
- 	void				*device_data;
-+	struct inode			*inode;
- };
- 
- #ifdef CONFIG_VFIO_NOIOMMU
-@@ -529,6 +537,34 @@ static struct vfio_group *vfio_group_get_from_dev(struct device *dev)
- 	return group;
++	return IS_ERR(device) ? PTR_ERR(device) : 0;
  }
  
-+static int vfio_fs_init_fs_context(struct fs_context *fc)
-+{
-+	return init_pseudo(fc, VFIO_MAGIC) ? 0 : -ENOMEM;
-+}
-+
-+static struct file_system_type vfio_fs_type = {
-+	.name = "vfio",
-+	.owner = THIS_MODULE,
-+	.init_fs_context = vfio_fs_init_fs_context,
-+	.kill_sb = kill_anon_super,
-+};
-+
-+static struct inode *vfio_fs_inode_new(void)
-+{
-+	struct inode *inode;
-+	int ret;
-+
-+	ret = simple_pin_fs(&vfio_fs_type, &vfio_fs_mnt, &vfio_fs_cnt);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	inode = alloc_anon_inode(vfio_fs_mnt->mnt_sb);
-+	if (IS_ERR(inode))
-+		simple_release_fs(&vfio_fs_mnt, &vfio_fs_cnt);
-+
-+	return inode;
-+}
-+
- /**
-  * Device objects - create, release, get, put, search
-  */
-@@ -539,11 +575,19 @@ struct vfio_device *vfio_group_create_device(struct vfio_group *group,
- 					     void *device_data)
+ static void vfio_mdev_remove(struct device *dev)
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 65e7e6b44578..f0a1d05f0137 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -1926,6 +1926,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  {
- 	struct vfio_device *device;
-+	struct inode *inode;
+ 	struct vfio_pci_device *vdev;
+ 	struct iommu_group *group;
++	struct vfio_device *device;
+ 	int ret;
  
- 	device = kzalloc(sizeof(*device), GFP_KERNEL);
- 	if (!device)
- 		return ERR_PTR(-ENOMEM);
+ 	if (vfio_pci_is_denylisted(pdev))
+@@ -1968,9 +1969,11 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	INIT_LIST_HEAD(&vdev->vma_list);
+ 	init_rwsem(&vdev->memory_lock);
  
-+	inode = vfio_fs_inode_new();
-+	if (IS_ERR(inode)) {
-+		kfree(device);
-+		return (struct vfio_device *)inode;
+-	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+-	if (ret)
++	device = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
++	if (IS_ERR(device)) {
++		ret = PTR_ERR(device);
+ 		goto out_free;
 +	}
-+	device->inode = inode;
-+
- 	kref_init(&device->kref);
- 	device->dev = dev;
- 	device->group = group;
-@@ -574,6 +618,9 @@ static void vfio_device_release(struct kref *kref)
  
- 	dev_set_drvdata(device->dev, NULL);
+ 	ret = vfio_pci_reflck_attach(vdev);
+ 	if (ret)
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index fb4b385191f2..ff41fe0b758e 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -657,6 +657,7 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 			       struct device *dev)
+ {
+ 	struct iommu_group *group;
++	struct vfio_device *device;
+ 	int ret;
  
-+	iput(device->inode);
-+	simple_release_fs(&vfio_fs_mnt, &vfio_fs_cnt);
-+
- 	kfree(device);
+ 	if (!vdev)
+@@ -685,9 +686,11 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 		goto put_reset;
+ 	}
  
- 	/* vfio_del_group_dev may be waiting for this device */
-@@ -1488,6 +1535,13 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+-	ret = vfio_add_group_dev(dev, &vfio_platform_ops, vdev);
+-	if (ret)
++	device = vfio_add_group_dev(dev, &vfio_platform_ops, vdev);
++	if (IS_ERR(device)) {
++		ret = PTR_ERR(device);
+ 		goto put_iommu;
++	}
+ 
+ 	mutex_init(&vdev->igate);
+ 
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 464caef97aff..067cd843961c 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -848,8 +848,9 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
+ /**
+  * VFIO driver API
+  */
+-int vfio_add_group_dev(struct device *dev,
+-		       const struct vfio_device_ops *ops, void *device_data)
++struct vfio_device *vfio_add_group_dev(struct device *dev,
++				       const struct vfio_device_ops *ops,
++				       void *device_data)
+ {
+ 	struct iommu_group *iommu_group;
+ 	struct vfio_group *group;
+@@ -857,14 +858,14 @@ int vfio_add_group_dev(struct device *dev,
+ 
+ 	iommu_group = iommu_group_get(dev);
+ 	if (!iommu_group)
+-		return -EINVAL;
++		return ERR_PTR(-EINVAL);
+ 
+ 	group = vfio_group_get_from_iommu(iommu_group);
+ 	if (!group) {
+ 		group = vfio_create_group(iommu_group);
+ 		if (IS_ERR(group)) {
+ 			iommu_group_put(iommu_group);
+-			return PTR_ERR(group);
++			return (struct vfio_device *)group;
+ 		}
+ 	} else {
+ 		/*
+@@ -880,23 +881,19 @@ int vfio_add_group_dev(struct device *dev,
+ 			 iommu_group_id(iommu_group));
+ 		vfio_device_put(device);
+ 		vfio_group_put(group);
+-		return -EBUSY;
++		return ERR_PTR(-EBUSY);
+ 	}
+ 
+ 	device = vfio_group_create_device(group, dev, ops, device_data);
+-	if (IS_ERR(device)) {
+-		vfio_group_put(group);
+-		return PTR_ERR(device);
+-	}
+ 
+ 	/*
+-	 * Drop all but the vfio_device reference.  The vfio_device holds
+-	 * a reference to the vfio_group, which holds a reference to the
+-	 * iommu_group.
++	 * Drop all but the vfio_device reference.  The vfio_device, if
++	 * !IS_ERR() holds a reference to the vfio_group, which holds a
++	 * reference to the iommu_group.
  	 */
- 	filep->f_mode |= (FMODE_LSEEK | FMODE_PREAD | FMODE_PWRITE);
+ 	vfio_group_put(group);
  
-+	/*
-+	 * Use the pseudo fs inode on the device to link all mmaps
-+	 * to the same address space, allowing us to unmap all vmas
-+	 * associated to this device using unmap_mapping_range().
-+	 */
-+	filep->f_mapping = device->inode->i_mapping;
-+
- 	atomic_inc(&group->container_users);
+-	return 0;
++	return device;
+ }
+ EXPORT_SYMBOL_GPL(vfio_add_group_dev);
  
- 	fd_install(ret, filep);
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index b7e18bde5aa8..b784463000d4 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -48,9 +48,9 @@ struct vfio_device_ops {
+ extern struct iommu_group *vfio_iommu_group_get(struct device *dev);
+ extern void vfio_iommu_group_put(struct iommu_group *group, struct device *dev);
+ 
+-extern int vfio_add_group_dev(struct device *dev,
+-			      const struct vfio_device_ops *ops,
+-			      void *device_data);
++extern struct vfio_device *vfio_add_group_dev(struct device *dev,
++					const struct vfio_device_ops *ops,
++					void *device_data);
+ 
+ extern void *vfio_del_group_dev(struct device *dev);
+ extern struct vfio_device *vfio_device_get_from_dev(struct device *dev);
 
