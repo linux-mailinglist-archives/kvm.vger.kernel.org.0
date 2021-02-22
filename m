@@ -2,155 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 97960321D41
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:42:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0845B321D6E
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:52:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231263AbhBVQmM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:42:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231386AbhBVQlX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 11:41:23 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22056C06174A
-        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:40:43 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id d24so6699280lfs.8
-        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:40:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=dUJJMpAGKGo8HRpjRwpwydLIj3FkS0MLnsKzd8YFmro=;
-        b=kfJWtINjCcO+Zu6gLW43xnxvzkYhggILERV1ml820MsNt5ddkRQ+nDSrgOAYx4dm0R
-         hSDbG5iiz3KJ7ilz6A1ndHOajvgAbbXdVwtrz6I6yclF7AojhqzcoKmdtKeV2/iEwofZ
-         aOo9me47PWI/NxTqzCSIZOenKriN19HAEt9nLDodWv3SGJ0C9t5/hI2oxikMl7fwj4Kn
-         gmRNl27KdX16ZgQ0rM1pnmRCL+W5YFlGcQ53FsTBVHpdyaZzO4htCOxYqZ5wYYUWkpAi
-         ZvcKNqLOixh+m2uM6tJOg8gW7IPbeITlleYjQOyC3kBD1mK05Z182xNK3x1/lDONB5Zx
-         Tfrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=dUJJMpAGKGo8HRpjRwpwydLIj3FkS0MLnsKzd8YFmro=;
-        b=brGVz04Ysx+IHQYnOysaLDGQkCpSNUCxVDiFn4ictOafbHwX4rD8V3rS+UQMCPjtdp
-         BR9+46aXHQs9gf6CFzwf0zB1kZS5JSS2ykCmrbGpDe4jLJPDGtV5jQzr0YZoi0HRER+l
-         yB+pxw1MIDWwOHr+Hyl51qh2acvwHNY7JD7Z6Yg+DrXRovd8OPEchjrkniPX3YVMSwc+
-         QAC68vs4DjPaFQ3I8T9fJnxhbYx17CLOKy0bXLpeGNBTCR+7mpnGmhu/GU8b0eBgJ+S3
-         hwX7ThkWG9dU9eY91GK7ZxzwJfh+zGgeS3+RHV4xzXXyMBjW5YT00CBOPm5sYxZEiaMA
-         gOoQ==
-X-Gm-Message-State: AOAM530kMKffXIMCpMtCL/K7z3UNidbC0YZYtWFOJbwE6qYsnQW0X477
-        6mKfsbNi0pAV0ZGdaZXR6pk=
-X-Google-Smtp-Source: ABdhPJypFE6vh1Cw7yWJ0D4WXOwTgEM/Mbuw/QYqK0wpfizKmnHAxVfYUcslkih9RD6v5ipbZPEuvQ==
-X-Received: by 2002:a19:810c:: with SMTP id c12mr14737671lfd.244.1614012041520;
-        Mon, 22 Feb 2021 08:40:41 -0800 (PST)
-Received: from [192.168.167.128] (37-145-186-126.broadband.corbina.ru. [37.145.186.126])
-        by smtp.gmail.com with ESMTPSA id o16sm1163569lfn.252.2021.02.22.08.40.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Feb 2021 08:40:41 -0800 (PST)
-Message-ID: <2690c9daa9127a55bef0daa2a4d83688a2b396d1.camel@gmail.com>
-Subject: Re: [RFC v3 0/5] Introduce MMIO/PIO dispatch file descriptors
- (ioregionfd)
-From:   Elena Afanasova <eafanasova@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     stefanha@redhat.com, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, jasowang@redhat.com, mst@redhat.com,
-        cohuck@redhat.com, john.levon@nutanix.com
-Date:   Mon, 22 Feb 2021 08:40:28 -0800
-In-Reply-To: <8fc8eae6-7bea-9333-47cb-e49cf86fa336@redhat.com>
-References: <cover.1613828726.git.eafanasova@gmail.com>
-         <8fc8eae6-7bea-9333-47cb-e49cf86fa336@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.4-0ubuntu1 
+        id S230441AbhBVQwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 11:52:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54820 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229952AbhBVQwA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 11:52:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614012634;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CgcpckDo9UEWBagLaIjLCEPd9ZKR8yZthDIdNf7Trmc=;
+        b=iqEmFTrbr6PuSzXSjQX4wO2CKRv4h2PwG0jgnsIlArmYlQ/6DoCDHL69WMQcyl9RC7RTfx
+        qV4DPsoW+ZFGZvavyUMMKLiL7eAylddS12d6fSwBaCAWoMUGErt6xNs4FY+3D4laGBKYYI
+        9caPjFxXtotnmcysN+MCbQIpW0KkvlY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-TU9vfHv_MuKmOaZx2C8S7Q-1; Mon, 22 Feb 2021 11:50:32 -0500
+X-MC-Unique: TU9vfHv_MuKmOaZx2C8S7Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1764ECC627;
+        Mon, 22 Feb 2021 16:50:30 +0000 (UTC)
+Received: from gimli.home (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A3FA5D9D3;
+        Mon, 22 Feb 2021 16:50:23 +0000 (UTC)
+Subject: [RFC PATCH 00/10] vfio: Device memory DMA mapping improvements
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jgg@nvidia.com, peterx@redhat.com
+Date:   Mon, 22 Feb 2021 09:50:22 -0700
+Message-ID: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 2021-02-21 at 18:06 +0100, Paolo Bonzini wrote:
-> On 21/02/21 13:04, Elena Afanasova wrote:
-> > This patchset introduces a KVM dispatch mechanism which can be used
-> > for handling MMIO/PIO accesses over file descriptors without
-> > returning
-> > from ioctl(KVM_RUN). This allows device emulation to run in another
-> > task
-> > separate from the vCPU task.
-> > 
-> > This is achieved through KVM vm ioctl for registering MMIO/PIO
-> > regions and
-> > a wire protocol that KVM uses to communicate with a task handling
-> > an
-> > MMIO/PIO access.
-> > 
-> > TODOs:
-> > * Implement KVM_EXIT_IOREGIONFD_FAILURE
-> > * Add non-x86 arch support
-> > * Add kvm-unittests
-> > * Flush waiters if ioregion is deleted
-> 
-> Hi ELena,
-> 
+This is a re-implementation of [1] following suggestions and code from
+Jason Gunthorpe.  This is lightly tested but seems functional and
+throws no lockdep warnings.  In this series we tremendously simplify
+zapping of vmas mapping device memory using unmap_mapping_range(), we
+create a protocol for looking up a vfio_device from a vma and provide
+an interface to get a reference from that vma, using that device
+reference, the caller can register a notifier for the device to
+trigger on events such as device release.  This notifier is only
+enabled here for vfio-pci, but both the vma policy and the notifier
+trigger should be trivial to add to any vfio bus driver after RFC.
 
-Hi Paolo,
+Does this look more like the direction we should go?
 
-Thank you for your answer.
+Note that like the last series we're still not dropping DMA mappings
+on device memory disable as this would likely break userspace in some
+instances, we don't have IOMMU interfaces to modify protection bits,
+and it's not clear an IOMMU fault is absolutely better than the bus
+error.  Thanks,
 
-> as a quick thing that jumped at me before starting the review, you 
-> should add a test for the new API in tools/testing/selftests/kvm, as 
-> well as documentation.  Ideally, patch 4 would also add a testcase
-> that 
-> fails before and passes afterwards.
-> 
-Ok
+Alex
 
-> Also, does this work already with io_uring?
-> 
-I have a few kvm-unittests and QEMU testdev patch for testing base
-functionality. I haven't tried to run them with io_uring (only run with
-socket and pipes). Will do.
+[1]https://lore.kernel.org/kvm/161315658638.7320.9686203003395567745.stgit@gimli.home/T/#m64859ccd7d92f39a924759c7423f2dcf7d367c84
+---
 
-> Paolo
-> 
-> > v3:
-> >   - add FAST_MMIO bus support
-> >   - add KVM_IOREGION_DEASSIGN flag
-> >   - rename kvm_ioregion read/write file descriptors
-> >   - split ioregionfd signal handling support into two patches
-> >   - move ioregion_interrupted flag to ioregion_ctx
-> >   - reorder ioregion_ctx fields
-> >   - rework complete_ioregion operations
-> >   - add signal handling support for crossing a page boundary case
-> >   - change wire protocol license
-> >   - fix ioregionfd state machine
-> >   - remove ioregionfd_cmd info and drop appropriate macros
-> >   - add comment on ioregionfd cmds/replies serialization
-> >   - drop kvm_io_bus_finish/prepare()
-> > 
-> > Elena Afanasova (5):
-> >    KVM: add initial support for KVM_SET_IOREGION
-> >    KVM: x86: add support for ioregionfd signal handling
-> >    KVM: implement wire protocol
-> >    KVM: add ioregionfd context
-> >    KVM: enforce NR_IOBUS_DEVS limit if kmemcg is disabled
-> > 
-> >   arch/x86/kvm/Kconfig          |   1 +
-> >   arch/x86/kvm/Makefile         |   1 +
-> >   arch/x86/kvm/vmx/vmx.c        |  40 ++-
-> >   arch/x86/kvm/x86.c            | 273 +++++++++++++++++-
-> >   include/linux/kvm_host.h      |  28 ++
-> >   include/uapi/linux/ioregion.h |  30 ++
-> >   include/uapi/linux/kvm.h      |  25 ++
-> >   virt/kvm/Kconfig              |   3 +
-> >   virt/kvm/eventfd.c            |  25 ++
-> >   virt/kvm/eventfd.h            |  14 +
-> >   virt/kvm/ioregion.c           | 529
-> > ++++++++++++++++++++++++++++++++++
-> >   virt/kvm/ioregion.h           |  15 +
-> >   virt/kvm/kvm_main.c           |  36 ++-
-> >   13 files changed, 996 insertions(+), 24 deletions(-)
-> >   create mode 100644 include/uapi/linux/ioregion.h
-> >   create mode 100644 virt/kvm/eventfd.h
-> >   create mode 100644 virt/kvm/ioregion.c
-> >   create mode 100644 virt/kvm/ioregion.h
-> > 
+Alex Williamson (10):
+      vfio: Create vfio_fs_type with inode per device
+      vfio: Update vfio_add_group_dev() API
+      vfio: Export unmap_mapping_range() wrapper
+      vfio/pci: Use vfio_device_unmap_mapping_range()
+      vfio: Create a vfio_device from vma lookup
+      vfio: Add a device notifier interface
+      vfio/pci: Notify on device release
+      vfio/type1: Refactor pfn_list clearing
+      vfio/type1: Pass iommu and dma objects through to vaddr_get_pfn
+      vfio/type1: Register device notifier
+
+
+ drivers/vfio/Kconfig                         |    1 
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c            |    6 -
+ drivers/vfio/mdev/vfio_mdev.c                |    5 -
+ drivers/vfio/pci/vfio_pci.c                  |  223 ++++----------------------
+ drivers/vfio/pci/vfio_pci_private.h          |    3 
+ drivers/vfio/platform/vfio_platform_common.c |    7 +
+ drivers/vfio/vfio.c                          |  143 +++++++++++++++--
+ drivers/vfio/vfio_iommu_type1.c              |  211 ++++++++++++++++++++-----
+ include/linux/vfio.h                         |   19 ++
+ 9 files changed, 368 insertions(+), 250 deletions(-)
 
