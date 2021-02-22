@@ -2,166 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 41391321EBD
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 19:02:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E4F321EBC
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 19:02:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231970AbhBVSBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 13:01:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52127 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231961AbhBVSBb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 13:01:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614016804;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=g0daaZIiL7zB1dNQnlGOdmrK5Ct4nJWAQKVeDV4S+9U=;
-        b=SxAvLQEgIQg4AF43XkIExc4cZPw1W0kFjn25idJ41GmCzCFGeNIKelKJtCCKHnHXT8l8fM
-        raDcsdZXnT3ihpQ+y0m5xdVmdGqpQdxpf9vv8yJHoKnd52CjRlog/vOomjy6wOoOdpqTEZ
-        C7C2mLthoiCOD1Ddm9yxOwe2VJTujzY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-x6AyWPnMMK6ocNz1yohAhA-1; Mon, 22 Feb 2021 13:00:02 -0500
-X-MC-Unique: x6AyWPnMMK6ocNz1yohAhA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAB31192CC57;
-        Mon, 22 Feb 2021 17:59:56 +0000 (UTC)
-Received: from gondolin (ovpn-113-115.ams2.redhat.com [10.36.113.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 90F5F60DA0;
-        Mon, 22 Feb 2021 17:59:33 +0000 (UTC)
-Date:   Mon, 22 Feb 2021 18:59:30 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Cc:     qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Paul Durrant <paul@xen.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-        Greg Kurz <groug@kaod.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        David Hildenbrand <david@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 02/11] hw/boards: Introduce
- machine_class_valid_for_accelerator()
-Message-ID: <20210222185930.4c08cb69.cohuck@redhat.com>
-In-Reply-To: <6ceff55c-6da4-e773-7809-de3be2f566ab@redhat.com>
-References: <20210219173847.2054123-1-philmd@redhat.com>
-        <20210219173847.2054123-3-philmd@redhat.com>
-        <20210222183400.0c151d46.cohuck@redhat.com>
-        <6ceff55c-6da4-e773-7809-de3be2f566ab@redhat.com>
-Organization: Red Hat GmbH
+        id S231852AbhBVSBg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 13:01:36 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:11902 "EHLO
+        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231950AbhBVSBS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 13:01:18 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B6033f1450003>; Mon, 22 Feb 2021 10:00:37 -0800
+Received: from HKMAIL102.nvidia.com (10.18.16.11) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
+ 2021 18:00:36 +0000
+Received: from HKMAIL101.nvidia.com (10.18.16.10) by HKMAIL102.nvidia.com
+ (10.18.16.11) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
+ 2021 18:00:35 +0000
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
+ HKMAIL101.nvidia.com (10.18.16.10) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Mon, 22 Feb 2021 18:00:34 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PEyE5Foyx+LzFgedN5t4danpXvj94WoA0xlnZL3tfSGgFPcMEHGtxaKik0K9wBp+wCBOZIDVjrNk0eLbA/qse+G2r3gaZ8G043ieB7Zw2uLeP++X1QwAUjeTycLwy1qnvt/tcYeqJqvJ5Siqn4vxeAxjBkE7BP35u4nKoE8EmWMAcrGld0cql7W5mjWUaJRFCxL7gddLKflvob+FTmoo9dA3xURJvtrE6wZtL8dByNR9FiPYKOXJ5BkAkkZ8UJ0/5uJ/LWGjhg7cAICewmj6puGGINUSf7k3/x/lZb8rLBxuVMQg7ZXTpsaBz9LtbSgur2PW2hEPDZfh+qYjp0aPEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/xMU25c5qARPtud9sssUX2OPCpeDLepzDuGHSJoSGz8=;
+ b=oa3jsq2xAd7TAFPhPezwB8iz+gZZHJrltHCDLNFsl5AOd5RRp7zJV2Rn7WCThby82PFZStEAI/w6iBR8gR1o9SxKtF3HjvYRuXPSDUA4t8tb/r6PGAHpEB58QW0j/Qd9NKbMJbqA3fsKwyQrDWAyKGHm37CwBkTK+4CVijpQ8iYGaC2TOWbPAGgMcBrFEWhklqWZQ2z/A2IVfiXAedgKqIW+8NuxSFlChs5Jvg0g5j6lj/enfGwW1RByURvQepZAEkfkoVD8+qu/S5xGaOLg3662W0qG13DK/3P7MhGGabpVuFUZKcuamZ0ktGtpVf1eEL4nTDlwuNDC7srVNbJUuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4497.namprd12.prod.outlook.com (2603:10b6:5:2a5::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.30; Mon, 22 Feb
+ 2021 18:00:32 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.045; Mon, 22 Feb 2021
+ 18:00:32 +0000
+Date:   Mon, 22 Feb 2021 14:00:31 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
+Subject: Re: [RFC PATCH 00/10] vfio: Device memory DMA mapping improvements
+Message-ID: <20210222180031.GR4247@nvidia.com>
+References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+X-ClientProxiedBy: BL0PR02CA0030.namprd02.prod.outlook.com
+ (2603:10b6:207:3c::43) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL0PR02CA0030.namprd02.prod.outlook.com (2603:10b6:207:3c::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.27 via Frontend Transport; Mon, 22 Feb 2021 18:00:32 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lEFVX-00ETGP-Ds; Mon, 22 Feb 2021 14:00:31 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1614016837; bh=/xMU25c5qARPtud9sssUX2OPCpeDLepzDuGHSJoSGz8=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=msGmGPpziq2wJhyYVNFv+IBLQhCRHBQ6GKORP/uy376hauC/NccVj92T9p85ahlRN
+         jJog9RgNA1fvx9NvMkWrxelopAs/34kcGKmr7+mMyp4R3vXldQgB5JH/Lzg2LJFHZR
+         bRvXr7rdoQ0OeoPjBnhh/P3arpiBdlsUSr0Xb6iDBJ/7JV5txD8gDJeqQDwRYIOXHY
+         MWFAqWnNVfkhrXwKopsbT8XrQRvGefSrOmDviw6ZrBzniYb7aJ9vyJrYN2PH17YB4g
+         PUZ6UHKW/8FrupEWMJCBAEAWtzHJHf/wtNvkn0OR0YU+7wGx2HE9COsaNZApxzEaNg
+         /9CHVrcAPpfsg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Feb 2021 18:46:15 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On Mon, Feb 22, 2021 at 09:50:22AM -0700, Alex Williamson wrote:
+> This is a re-implementation of [1] following suggestions and code from
+> Jason Gunthorpe.  This is lightly tested but seems functional and
+> throws no lockdep warnings.  In this series we tremendously simplify
+> zapping of vmas mapping device memory using unmap_mapping_range(), we
+> create a protocol for looking up a vfio_device from a vma and provide
+> an interface to get a reference from that vma, using that device
+> reference, the caller can register a notifier for the device to
+> trigger on events such as device release.  This notifier is only
+> enabled here for vfio-pci, but both the vma policy and the notifier
+> trigger should be trivial to add to any vfio bus driver after RFC.
+> 
+> Does this look more like the direction we should go?
 
-> On 2/22/21 6:34 PM, Cornelia Huck wrote:
-> > On Fri, 19 Feb 2021 18:38:38 +0100
-> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
-> >  =20
-> >> Introduce the valid_accelerators[] field to express the list
-> >> of valid accelators a machine can use, and add the
-> >> machine_class_valid_for_current_accelerator() and
-> >> machine_class_valid_for_accelerator() methods.
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >> ---
-> >>  include/hw/boards.h | 24 ++++++++++++++++++++++++
-> >>  hw/core/machine.c   | 26 ++++++++++++++++++++++++++
-> >>  2 files changed, 50 insertions(+)
-> >>
-> >> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> >> index 68d3d10f6b0..4d08bc12093 100644
-> >> --- a/include/hw/boards.h
-> >> +++ b/include/hw/boards.h
-> >> @@ -36,6 +36,24 @@ void machine_set_cpu_numa_node(MachineState *machin=
-e,
-> >>                                 const CpuInstanceProperties *props,
-> >>                                 Error **errp);
-> >> =20
-> >> +/**
-> >> + * machine_class_valid_for_accelerator:
-> >> + * @mc: the machine class
-> >> + * @acc_name: accelerator name
-> >> + *
-> >> + * Returns %true if the accelerator is valid for the machine, %false
-> >> + * otherwise. See #MachineClass.valid_accelerators. =20
-> >=20
-> > Naming confusion: is the machine class valid for the accelerator, or
-> > the accelerator valid for the machine class? Or either? :) =20
->=20
-> "the accelerator valid for the machine class".
->=20
-> Is this clearer?
->=20
-> "Returns %true if the current accelerator is valid for the
->  selected machine, %false otherwise.
->=20
-> Or...
->=20
-> "Returns %true if the selected accelerator is valid for the
->  current machine, %false otherwise.
+Yep, it seems pretty good already, see my remarks in each patch
 
-Maybe that one, given how it ends up being called? Or "specified
-machine"?
->=20
-> How would look "either"?
->=20
-> The machine is already selected, and the accelerator too...
+For security only vfio_device's that have been enabled for P2P, set
+the vm_pgoff to the pfn, and trigger invalidation, should be used with
+this mechanism.
 
-Yes, so this is basically testing the (machine,accelerator) tuple,
-which is what I meant with 'either'.
+I'd add some global opt-in so vfio_device_get_from_vma() will refuse
+to return vfio_device's that don't declare they have support.
 
->=20
-> >  =20
-> >> + */
-> >> +bool machine_class_valid_for_accelerator(MachineClass *mc, const char=
- *acc_name);
-> >> +/**
-> >> + * machine_class_valid_for_current_accelerator:
-> >> + * @mc: the machine class
-> >> + *
-> >> + * Returns %true if the accelerator is valid for the current machine,
-> >> + * %false otherwise. See #MachineClass.valid_accelerators. =20
-> >=20
-> > Same here: current accelerator vs. current machine.
+Add a flags member to vfio_device_ops would get it done fairly cleanly
 
-So maybe
-
-"Returns %true if the current accelerator is valid for the specified
-machine class..." ?
-
-> >  =20
-> >> + */
-> >> +bool machine_class_valid_for_current_accelerator(MachineClass *mc);
-
+Jason
