@@ -2,163 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B16B53213A0
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 11:01:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BA0F321421
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 11:26:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbhBVKBb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 05:01:31 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13614 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230209AbhBVKAs (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 05:00:48 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11M9vjtG063171;
-        Mon, 22 Feb 2021 05:00:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=b+leU8p/djmFqf5rzqEMmh41Y4UnIZj9PPKk1WmeHQM=;
- b=lk9bJ3qy/JmFtSaywZLNmXoq2KJSF6Ihm25ADXQuP2Rr1eGjVwxznULt/MCxBLSMazKY
- WsN9PEyskHlSQ9qWIOffNIhqYRQsj3VDcHCiZO0LOpMZOwPSW8RiYCKVeYKDRtTdfbBF
- kFATTKnzPKCWPAxKuCRAvqogMQSjkXS6gPf6mu9dVR1X822M2OdJSr8nySh5N3/EWlCU
- ddhoU7tfnIS1G9Phj9l1nXqzc4Hy5myazNiEU9w6czcA0Z1AqfQBLJ4dgCwHSDemLfs5
- +jSUs1CgZntlD+Px7dVpDzsu3nHVki5U25bJYs0Euvfwkl2s6ogIiG+T/j7vDqgJMJ5v OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36vacb09cd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 04:59:58 -0500
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11M9rpG7020713;
-        Mon, 22 Feb 2021 04:59:19 -0500
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36vacb0707-8
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 04:59:19 -0500
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11M8vPp1024219;
-        Mon, 22 Feb 2021 08:59:17 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 36tt288rby-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 22 Feb 2021 08:59:17 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11M8xE6o61735380
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 22 Feb 2021 08:59:14 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90A51AE051;
-        Mon, 22 Feb 2021 08:59:14 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC68AAE053;
-        Mon, 22 Feb 2021 08:59:13 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 22 Feb 2021 08:59:13 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        pmorel@linux.ibm.com, david@redhat.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 7/7] s390x: Remove SAVE/RESTORE_STACK and lowcore fpc and fprs save areas
-Date:   Mon, 22 Feb 2021 03:57:56 -0500
-Message-Id: <20210222085756.14396-8-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210222085756.14396-1-frankja@linux.ibm.com>
-References: <20210222085756.14396-1-frankja@linux.ibm.com>
+        id S230299AbhBVK0Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 05:26:24 -0500
+Received: from foss.arm.com ([217.140.110.172]:39458 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230189AbhBVKZe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 05:25:34 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 99B69D6E;
+        Mon, 22 Feb 2021 02:24:38 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C95E3F73B;
+        Mon, 22 Feb 2021 02:24:37 -0800 (PST)
+Date:   Mon, 22 Feb 2021 10:23:33 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
+Message-ID: <20210222102333.2f1cb9e2@slackpad.fritz.box>
+In-Reply-To: <20210217155459.3a4bc991@slackpad.fritz.box>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+        <20201210142908.169597-2-andre.przywara@arm.com>
+        <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
+        <20210211171648.36000cce@slackpad.fritz.box>
+        <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
+        <20210217155459.3a4bc991@slackpad.fritz.box>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-22_02:2021-02-18,2021-02-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- malwarescore=0 priorityscore=1501 suspectscore=0 impostorscore=0
- mlxscore=0 adultscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- mlxlogscore=947 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102220086
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are no more users. At the same time remove sw_int_fpc and
-sw_int_frps plus their asm offsets macros since they are also unused
-now.
+On Wed, 17 Feb 2021 16:46:47 +0000
+Andre Przywara <andre.przywara@arm.com> wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/asm-offsets.c  |  2 --
- lib/s390x/asm/arch_def.h |  4 +---
- s390x/macros.S           | 29 -----------------------------
- 3 files changed, 1 insertion(+), 34 deletions(-)
+> On Thu, 11 Feb 2021 17:32:01 +0000
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> > On 2/11/21 5:16 PM, Andre Przywara wrote:  
+> > > On Wed, 10 Feb 2021 17:44:59 +0000
+> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Hi Alex,
+> > >    
+> > >> On 12/10/20 2:28 PM, Andre Przywara wrote:    
+> > >>> Since x86 had a special need for registering tons of special I/O ports,
+> > >>> we had an ioport__setup_arch() callback, to allow each architecture
+> > >>> to do the same. As it turns out no one uses it beside x86, so we remove
+> > >>> that unnecessary abstraction.
+> > >>>
+> > >>> The generic function was registered via a device_base_init() call, so
+> > >>> we just do the same for the x86 specific function only, and can remove
+> > >>> the unneeded ioport__setup_arch().
+> > >>>
+> > >>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > >>> ---
+> > >>>  arm/ioport.c         |  5 -----
+> > >>>  include/kvm/ioport.h |  1 -
+> > >>>  ioport.c             | 28 ----------------------------
+> > >>>  mips/kvm.c           |  5 -----
+> > >>>  powerpc/ioport.c     |  6 ------
+> > >>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
+> > >>>  6 files changed, 24 insertions(+), 46 deletions(-)
+> > >>>
+> > >>> diff --git a/arm/ioport.c b/arm/ioport.c
+> > >>> index 2f0feb9a..24092c9d 100644
+> > >>> --- a/arm/ioport.c
+> > >>> +++ b/arm/ioport.c
+> > >>> @@ -1,11 +1,6 @@
+> > >>>  #include "kvm/ioport.h"
+> > >>>  #include "kvm/irq.h"
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  	*irq = irq__alloc_line();
+> > >>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
+> > >>> index 039633f7..d0213541 100644
+> > >>> --- a/include/kvm/ioport.h
+> > >>> +++ b/include/kvm/ioport.h
+> > >>> @@ -35,7 +35,6 @@ struct ioport_operations {
+> > >>>  							    enum irq_type));
+> > >>>  };
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm);
+> > >>>  void ioport__map_irq(u8 *irq);
+> > >>>  
+> > >>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
+> > >>> diff --git a/ioport.c b/ioport.c
+> > >>> index 844a832d..667e8386 100644
+> > >>> --- a/ioport.c
+> > >>> +++ b/ioport.c
+> > >>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
+> > >>>  	return 0;
+> > >>>  }
+> > >>>  
+> > >>> -static void ioport__unregister_all(void)
+> > >>> -{
+> > >>> -	struct ioport *entry;
+> > >>> -	struct rb_node *rb;
+> > >>> -	struct rb_int_node *rb_node;
+> > >>> -
+> > >>> -	rb = rb_first(&ioport_tree);
+> > >>> -	while (rb) {
+> > >>> -		rb_node = rb_int(rb);
+> > >>> -		entry = ioport_node(rb_node);
+> > >>> -		ioport_unregister(&ioport_tree, entry);
+> > >>> -		rb = rb_first(&ioport_tree);
+> > >>> -	}
+> > >>> -}      
+> > >> I get the impression this is a rebasing artifact. The commit message doesn't
+> > >> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
+> > >> far as I can tell it's still needed because there are places other than
+> > >> ioport__setup_arch() from where ioport__register() is called.    
+> > > I agree that the commit message is a bit thin on this fact, but the
+> > > functionality of ioport__unregister_all() is now in
+> > > x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
+> > > without removing ioport__exit() as well would look very weird, if not
+> > > hackish.    
+> > 
+> > Not necessarily. ioport__unregister_all() removes the ioports added by
+> > x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
+> > like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).  
+> 
+> Right, indeed. Not that it really matters, since we are about to exit
+> anyway, but it looks indeed I need to move this to a generic teardown
+> method, or actually just keep that part here in this file.
+> 
+> Will give this a try.
 
-diff --git a/lib/s390x/asm-offsets.c b/lib/s390x/asm-offsets.c
-index 2658b59a..fbea3278 100644
---- a/lib/s390x/asm-offsets.c
-+++ b/lib/s390x/asm-offsets.c
-@@ -54,8 +54,6 @@ int main(void)
- 	OFFSET(GEN_LC_MCCK_NEW_PSW, lowcore, mcck_new_psw);
- 	OFFSET(GEN_LC_IO_NEW_PSW, lowcore, io_new_psw);
- 	OFFSET(GEN_LC_SW_INT_GRS, lowcore, sw_int_grs);
--	OFFSET(GEN_LC_SW_INT_FPRS, lowcore, sw_int_fprs);
--	OFFSET(GEN_LC_SW_INT_FPC, lowcore, sw_int_fpc);
- 	OFFSET(GEN_LC_SW_INT_CRS, lowcore, sw_int_crs);
- 	OFFSET(GEN_LC_SW_INT_PSW, lowcore, sw_int_psw);
- 	OFFSET(GEN_LC_MCCK_EXT_SA_ADDR, lowcore, mcck_ext_sa_addr);
-diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-index b8e9fe40..13e19b8a 100644
---- a/lib/s390x/asm/arch_def.h
-+++ b/lib/s390x/asm/arch_def.h
-@@ -103,9 +103,7 @@ struct lowcore {
- 	struct psw	io_new_psw;			/* 0x01f0 */
- 	/* sw definition: save area for registers in interrupt handlers */
- 	uint64_t	sw_int_grs[16];			/* 0x0200 */
--	uint64_t	sw_int_fprs[16];		/* 0x0280 */
--	uint32_t	sw_int_fpc;			/* 0x0300 */
--	uint8_t		pad_0x0304[0x0308 - 0x0304];	/* 0x0304 */
-+	uint8_t		pad_0x0304[0x0308 - 0x0280];	/* 0x0280 */
- 	uint64_t	sw_int_crs[16];			/* 0x0308 */
- 	struct psw	sw_int_psw;			/* 0x0388 */
- 	uint8_t		pad_0x0310[0x11b0 - 0x0398];	/* 0x0398 */
-diff --git a/s390x/macros.S b/s390x/macros.S
-index d4f41ec4..13cff299 100644
---- a/s390x/macros.S
-+++ b/s390x/macros.S
-@@ -33,35 +33,6 @@
- 	lpswe	\old_psw
- 	.endm
- 
--	.macro SAVE_REGS
--	/* save grs 0-15 */
--	stmg	%r0, %r15, GEN_LC_SW_INT_GRS
--	/* save crs 0-15 */
--	stctg	%c0, %c15, GEN_LC_SW_INT_CRS
--	/* load a cr0 that has the AFP control bit which enables all FPRs */
--	larl	%r1, initial_cr0
--	lctlg	%c0, %c0, 0(%r1)
--	/* save fprs 0-15 + fpc */
--	la	%r1, GEN_LC_SW_INT_FPRS
--	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
--	std	\i, \i * 8(%r1)
--	.endr
--	stfpc	GEN_LC_SW_INT_FPC
--	.endm
--
--	.macro RESTORE_REGS
--	/* restore fprs 0-15 + fpc */
--	la	%r1, GEN_LC_SW_INT_FPRS
--	.irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
--	ld	\i, \i * 8(%r1)
--	.endr
--	lfpc	GEN_LC_SW_INT_FPC
--	/* restore crs 0-15 */
--	lctlg	%c0, %c15, GEN_LC_SW_INT_CRS
--	/* restore grs 0-15 */
--	lmg	%r0, %r15, GEN_LC_SW_INT_GRS
--	.endm
--
- /* Save registers on the stack (r15), so we can have stacked interrupts. */
- 	.macro SAVE_REGS_STACK
- 	/* Allocate a full stack frame */
--- 
-2.25.1
+Well, now having a closer look I needed to remove this from here,
+because this whole file will go away.
+To keep the current functionality, we would need to add it to mmio.c,
+and interestingly we don't do any kind of similar cleanup there for the
+MMIO regions (probably this is kvmtool exiting anyway, see above).
+
+I will see if I can introduce it there, for good measure.
+
+Cheers,
+Andre
+
+
+> 
+> Thanks!
+> Andre
+> 
+> > >
+> > > I can amend the commit message to mention this, or is there anything
+> > > else I missed?
+> > >
+> > > Cheers,
+> > > Andre
+> > >    
+> > >>> -
+> > >>>  static const char *to_direction(int direction)
+> > >>>  {
+> > >>>  	if (direction == KVM_EXIT_IO_IN)
+> > >>> @@ -220,16 +205,3 @@ out:
+> > >>>  
+> > >>>  	return !kvm->cfg.ioport_debug;
+> > >>>  }
+> > >>> -
+> > >>> -int ioport__init(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return ioport__setup_arch(kvm);
+> > >>> -}
+> > >>> -dev_base_init(ioport__init);
+> > >>> -
+> > >>> -int ioport__exit(struct kvm *kvm)
+> > >>> -{
+> > >>> -	ioport__unregister_all();
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -dev_base_exit(ioport__exit);
+> > >>> diff --git a/mips/kvm.c b/mips/kvm.c
+> > >>> index 26355930..e110e5d5 100644
+> > >>> --- a/mips/kvm.c
+> > >>> +++ b/mips/kvm.c
+> > >>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
+> > >>>  		die_perror("KVM_IRQ_LINE ioctl");
+> > >>>  }
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  bool kvm__arch_cpu_supports_vm(void)
+> > >>>  {
+> > >>>  	return true;
+> > >>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
+> > >>> index 0c188b61..a5cff4ee 100644
+> > >>> --- a/powerpc/ioport.c
+> > >>> +++ b/powerpc/ioport.c
+> > >>> @@ -12,12 +12,6 @@
+> > >>>  
+> > >>>  #include <stdlib.h>
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> -{
+> > >>> -	/* PPC has no legacy ioports to set up */
+> > >>> -	return 0;
+> > >>> -}
+> > >>> -
+> > >>>  void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  }
+> > >>> diff --git a/x86/ioport.c b/x86/ioport.c
+> > >>> index 7ad7b8f3..8c5c7699 100644
+> > >>> --- a/x86/ioport.c
+> > >>> +++ b/x86/ioport.c
+> > >>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
+> > >>>  {
+> > >>>  }
+> > >>>  
+> > >>> -int ioport__setup_arch(struct kvm *kvm)
+> > >>> +static int ioport__setup_arch(struct kvm *kvm)
+> > >>>  {
+> > >>>  	int r;
+> > >>>  
+> > >>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
+> > >>>  
+> > >>>  	return 0;
+> > >>>  }
+> > >>> +dev_base_init(ioport__setup_arch);
+> > >>> +
+> > >>> +static int ioport__remove_arch(struct kvm *kvm)
+> > >>> +{
+> > >>> +	ioport__unregister(kvm, 0x510);
+> > >>> +	ioport__unregister(kvm, 0x402);
+> > >>> +	ioport__unregister(kvm, 0x03D5);
+> > >>> +	ioport__unregister(kvm, 0x03D4);
+> > >>> +	ioport__unregister(kvm, 0x0378);
+> > >>> +	ioport__unregister(kvm, 0x0278);
+> > >>> +	ioport__unregister(kvm, 0x00F0);
+> > >>> +	ioport__unregister(kvm, 0x00ED);
+> > >>> +	ioport__unregister(kvm, IOPORT_DBG);
+> > >>> +	ioport__unregister(kvm, 0x00C0);
+> > >>> +	ioport__unregister(kvm, 0x00A0);
+> > >>> +	ioport__unregister(kvm, 0x0092);
+> > >>> +	ioport__unregister(kvm, 0x0040);
+> > >>> +	ioport__unregister(kvm, 0x0020);
+> > >>> +	ioport__unregister(kvm, 0x0000);
+> > >>> +
+> > >>> +	return 0;
+> > >>> +}
+> > >>> +dev_base_exit(ioport__remove_arch);      
+> 
 
