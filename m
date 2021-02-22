@@ -2,275 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E155321AB4
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 16:02:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E438B321B6B
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 16:30:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230141AbhBVPCM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 10:02:12 -0500
-Received: from foss.arm.com ([217.140.110.172]:51614 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230113AbhBVPCL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 10:02:11 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E7C5A31B;
-        Mon, 22 Feb 2021 07:01:21 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E73633F73B;
-        Mon, 22 Feb 2021 07:01:20 -0800 (PST)
-Subject: Re: [PATCH kvmtool 01/21] ioport: Remove ioport__setup_arch()
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-2-andre.przywara@arm.com>
- <814e0cd9-5e54-fade-f05c-80ea2b4a9039@arm.com>
- <20210211171648.36000cce@slackpad.fritz.box>
- <111b6cd6-ddf3-ec67-b782-67120be97943@arm.com>
- <20210217155459.3a4bc991@slackpad.fritz.box>
- <20210222102333.2f1cb9e2@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <861fd8a5-240e-3439-877b-28ba3490ebb4@arm.com>
-Date:   Mon, 22 Feb 2021 15:01:28 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S231276AbhBVP2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 10:28:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56093 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231499AbhBVP07 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 10:26:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614007532;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tflmRNKq1Lj+d2pXfKiLiMojvzDHMb3JaLn1wBwNDos=;
+        b=ILljJOHB66N/p6tMlZ8ZQR9l3paIo54X9CqshwStGzMevT6D+tAQhd00CnpXcwNDNQltUU
+        h29syOLaQDh8JKnVu/qSnnCjhFCO4rJcvKJD515NIW1qeABaHkWXcjhGun6VgFWgf2Rtda
+        c2jT3tluOMgl2XPsXHFUyai6fr80q+s=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-FXwer6i9PEenPSJXmOStHQ-1; Mon, 22 Feb 2021 10:25:29 -0500
+X-MC-Unique: FXwer6i9PEenPSJXmOStHQ-1
+Received: by mail-ej1-f71.google.com with SMTP id hx26so4129915ejc.3
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 07:25:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=tflmRNKq1Lj+d2pXfKiLiMojvzDHMb3JaLn1wBwNDos=;
+        b=Ii1W+0SzUBGA+va+idB+Yiu3PpnJ1JmK5mhKa7vyn/TL39JEbpNZCCs9bg5NV7IUTA
+         CRFyr0OY2AsIdQMu79NpFYOOHm7tvv+MzEVJD+xvYP27e4DmCbedwUpzTSZT823kUDQe
+         HDuA6SW1U+J58kdpF0SPm4x2I2ekWpINnAKynaDHYUmwdB8lzu/xjTGGo5bPm8ZXY7ST
+         4MRB0o8IeUmS8C2cyWLvDK+lIHL5BZWyz7/ZAtXjGSg5JYs91mTbr87ylj+HJaGh06YL
+         ymjl475iYfjJ4Lsf06nMzupC/wdE1rV0JKrGK/EKcpIWRjwBbXHJe0rodn+Kgorm/LNG
+         b8Ow==
+X-Gm-Message-State: AOAM531C61vNoyj7WxjxzaDEVlqJ6LE9BRtkV19AB92Zx6ximrgO58Zs
+        ovcfB/sGLphfDm2eTX7sp8Izgn3XXt/3xffj59UmXGSXn2FzB83/xdBWMNT+rudHouqLCI2OhpY
+        ahmyntbw5IrUQfXlT/ewEM5cGEbpD+vZZYWHMOk4rOSyUT2NiU14wzuyA1D4wtX+J
+X-Received: by 2002:a50:fc0e:: with SMTP id i14mr9752606edr.91.1614007528029;
+        Mon, 22 Feb 2021 07:25:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwrxy658Ivld/kxrkrpRzq0DflFQFYuLCNqh41ax1E2OjWXwabEqAAgWGgOq20SW9jpZ9JqYA==
+X-Received: by 2002:a50:fc0e:: with SMTP id i14mr9752586edr.91.1614007527815;
+        Mon, 22 Feb 2021 07:25:27 -0800 (PST)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id n5sm12355408edw.7.2021.02.22.07.25.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 07:25:27 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     jroedel@suse.de, seanjc@google.com, mlevitsk@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: nSVM: prepare guest save area while is_guest_mode
+ is true
+In-Reply-To: <20210218162831.1407616-1-pbonzini@redhat.com>
+References: <20210218162831.1407616-1-pbonzini@redhat.com>
+Date:   Mon, 22 Feb 2021 16:25:26 +0100
+Message-ID: <87blcc3z15.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210222102333.2f1cb9e2@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 2/22/21 10:23 AM, Andre Przywara wrote:
-> On Wed, 17 Feb 2021 16:46:47 +0000
-> Andre Przywara <andre.przywara@arm.com> wrote:
+> Right now, enter_svm_guest_mode is calling nested_prepare_vmcb_save and
+> nested_prepare_vmcb_control.  This results in is_guest_mode being false
+> until the end of nested_prepare_vmcb_control.
 >
->> On Thu, 11 Feb 2021 17:32:01 +0000
->> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>
->> Hi,
->>
->>> On 2/11/21 5:16 PM, Andre Przywara wrote:  
->>>> On Wed, 10 Feb 2021 17:44:59 +0000
->>>> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->>>>
->>>> Hi Alex,
->>>>    
->>>>> On 12/10/20 2:28 PM, Andre Przywara wrote:    
->>>>>> Since x86 had a special need for registering tons of special I/O ports,
->>>>>> we had an ioport__setup_arch() callback, to allow each architecture
->>>>>> to do the same. As it turns out no one uses it beside x86, so we remove
->>>>>> that unnecessary abstraction.
->>>>>>
->>>>>> The generic function was registered via a device_base_init() call, so
->>>>>> we just do the same for the x86 specific function only, and can remove
->>>>>> the unneeded ioport__setup_arch().
->>>>>>
->>>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>>>> ---
->>>>>>  arm/ioport.c         |  5 -----
->>>>>>  include/kvm/ioport.h |  1 -
->>>>>>  ioport.c             | 28 ----------------------------
->>>>>>  mips/kvm.c           |  5 -----
->>>>>>  powerpc/ioport.c     |  6 ------
->>>>>>  x86/ioport.c         | 25 ++++++++++++++++++++++++-
->>>>>>  6 files changed, 24 insertions(+), 46 deletions(-)
->>>>>>
->>>>>> diff --git a/arm/ioport.c b/arm/ioport.c
->>>>>> index 2f0feb9a..24092c9d 100644
->>>>>> --- a/arm/ioport.c
->>>>>> +++ b/arm/ioport.c
->>>>>> @@ -1,11 +1,6 @@
->>>>>>  #include "kvm/ioport.h"
->>>>>>  #include "kvm/irq.h"
->>>>>>  
->>>>>> -int ioport__setup_arch(struct kvm *kvm)
->>>>>> -{
->>>>>> -	return 0;
->>>>>> -}
->>>>>> -
->>>>>>  void ioport__map_irq(u8 *irq)
->>>>>>  {
->>>>>>  	*irq = irq__alloc_line();
->>>>>> diff --git a/include/kvm/ioport.h b/include/kvm/ioport.h
->>>>>> index 039633f7..d0213541 100644
->>>>>> --- a/include/kvm/ioport.h
->>>>>> +++ b/include/kvm/ioport.h
->>>>>> @@ -35,7 +35,6 @@ struct ioport_operations {
->>>>>>  							    enum irq_type));
->>>>>>  };
->>>>>>  
->>>>>> -int ioport__setup_arch(struct kvm *kvm);
->>>>>>  void ioport__map_irq(u8 *irq);
->>>>>>  
->>>>>>  int __must_check ioport__register(struct kvm *kvm, u16 port, struct ioport_operations *ops,
->>>>>> diff --git a/ioport.c b/ioport.c
->>>>>> index 844a832d..667e8386 100644
->>>>>> --- a/ioport.c
->>>>>> +++ b/ioport.c
->>>>>> @@ -158,21 +158,6 @@ int ioport__unregister(struct kvm *kvm, u16 port)
->>>>>>  	return 0;
->>>>>>  }
->>>>>>  
->>>>>> -static void ioport__unregister_all(void)
->>>>>> -{
->>>>>> -	struct ioport *entry;
->>>>>> -	struct rb_node *rb;
->>>>>> -	struct rb_int_node *rb_node;
->>>>>> -
->>>>>> -	rb = rb_first(&ioport_tree);
->>>>>> -	while (rb) {
->>>>>> -		rb_node = rb_int(rb);
->>>>>> -		entry = ioport_node(rb_node);
->>>>>> -		ioport_unregister(&ioport_tree, entry);
->>>>>> -		rb = rb_first(&ioport_tree);
->>>>>> -	}
->>>>>> -}      
->>>>> I get the impression this is a rebasing artifact. The commit message doesn't
->>>>> mention anything about removing ioport__exit() -> ioport__unregister_all(), and as
->>>>> far as I can tell it's still needed because there are places other than
->>>>> ioport__setup_arch() from where ioport__register() is called.    
->>>> I agree that the commit message is a bit thin on this fact, but the
->>>> functionality of ioport__unregister_all() is now in
->>>> x86/ioport.c:ioport__remove_arch(). I think removing ioport__init()
->>>> without removing ioport__exit() as well would look very weird, if not
->>>> hackish.    
->>> Not necessarily. ioport__unregister_all() removes the ioports added by
->>> x86/ioport.c::ioport__setup_arch(), *plus* ioports added by different devices,
->>> like serial, rtc, virtio-pci and vfio-pci (which are used by arm/arm64).  
->> Right, indeed. Not that it really matters, since we are about to exit
->> anyway, but it looks indeed I need to move this to a generic teardown
->> method, or actually just keep that part here in this file.
->>
->> Will give this a try.
-> Well, now having a closer look I needed to remove this from here,
-> because this whole file will go away.
-> To keep the current functionality, we would need to add it to mmio.c,
-> and interestingly we don't do any kind of similar cleanup there for the
-> MMIO regions (probably this is kvmtool exiting anyway, see above).
+> This is a problem because nested_prepare_vmcb_save can in turn cause
+> changes to the intercepts and these have to be applied to the "host VMCB"
+> (stored in svm->nested.hsave) and then merged with the VMCB12 intercepts
+> into svm->vmcb.
+>
+> In particular, without this change we forget to set the CR0 read and CR0
+> write intercepts when running a real mode L2 guest with NPT disabled.
+> The guest is therefore able to see the CR0.PG bit that KVM sets to
+> enable "paged real mode".  This patch fixes the svm.flat mode_switch
+> test case with npt=0.  There are no other problematic calls in
+> nested_prepare_vmcb_save.
+>
+> The bug is present since commit 06fc7772690d ("KVM: SVM: Activate nested
+> state only when guest state is complete", 2010-04-25).  Unfortunately,
+> it is not clear from the commit message what issue exactly led to the
+> change back then.  It was probably related to svm_set_cr0 however because
+> the patch series cover letter[1] mentioned lazy FPU switching.
+>
+> [1] https://lore.kernel.org/kvm/1266493115-28386-1-git-send-email-joerg.roedel@amd.com/
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm/nested.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 92d3aaaac612..35891d9a1099 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -469,8 +469,8 @@ int enter_svm_guest_mode(struct vcpu_svm *svm, u64 vmcb12_gpa,
+>  
+>  	svm->nested.vmcb12_gpa = vmcb12_gpa;
+>  	load_nested_vmcb_control(svm, &vmcb12->control);
+> -	nested_prepare_vmcb_save(svm, vmcb12);
+>  	nested_prepare_vmcb_control(svm);
+> +	nested_prepare_vmcb_save(svm, vmcb12);
+>  
+>  	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
+>  				  nested_npt_enabled(svm));
 
-This is a very good point. If the MMIO emulation doesn't unregister each MMIO
-region before exiting (and has never done that since it was implemented), then I
-don't think there's a reason that we should add it now. After all, kvmtool will
-terminate after calling dev_base_exit destructors, which will take care of
-deallocating the entire process memory.
+For the record,
 
-Thanks,
+this seems to fix the bug when Gen2 guests were not booting on Hyper-V
+on KVM (SVM). They boot now, thanks!
 
-Alex
+Tested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
->
-> I will see if I can introduce it there, for good measure.
->
-> Cheers,
-> Andre
->
->
->> Thanks!
->> Andre
->>
->>>> I can amend the commit message to mention this, or is there anything
->>>> else I missed?
->>>>
->>>> Cheers,
->>>> Andre
->>>>    
->>>>>> -
->>>>>>  static const char *to_direction(int direction)
->>>>>>  {
->>>>>>  	if (direction == KVM_EXIT_IO_IN)
->>>>>> @@ -220,16 +205,3 @@ out:
->>>>>>  
->>>>>>  	return !kvm->cfg.ioport_debug;
->>>>>>  }
->>>>>> -
->>>>>> -int ioport__init(struct kvm *kvm)
->>>>>> -{
->>>>>> -	return ioport__setup_arch(kvm);
->>>>>> -}
->>>>>> -dev_base_init(ioport__init);
->>>>>> -
->>>>>> -int ioport__exit(struct kvm *kvm)
->>>>>> -{
->>>>>> -	ioport__unregister_all();
->>>>>> -	return 0;
->>>>>> -}
->>>>>> -dev_base_exit(ioport__exit);
->>>>>> diff --git a/mips/kvm.c b/mips/kvm.c
->>>>>> index 26355930..e110e5d5 100644
->>>>>> --- a/mips/kvm.c
->>>>>> +++ b/mips/kvm.c
->>>>>> @@ -100,11 +100,6 @@ void kvm__irq_trigger(struct kvm *kvm, int irq)
->>>>>>  		die_perror("KVM_IRQ_LINE ioctl");
->>>>>>  }
->>>>>>  
->>>>>> -int ioport__setup_arch(struct kvm *kvm)
->>>>>> -{
->>>>>> -	return 0;
->>>>>> -}
->>>>>> -
->>>>>>  bool kvm__arch_cpu_supports_vm(void)
->>>>>>  {
->>>>>>  	return true;
->>>>>> diff --git a/powerpc/ioport.c b/powerpc/ioport.c
->>>>>> index 0c188b61..a5cff4ee 100644
->>>>>> --- a/powerpc/ioport.c
->>>>>> +++ b/powerpc/ioport.c
->>>>>> @@ -12,12 +12,6 @@
->>>>>>  
->>>>>>  #include <stdlib.h>
->>>>>>  
->>>>>> -int ioport__setup_arch(struct kvm *kvm)
->>>>>> -{
->>>>>> -	/* PPC has no legacy ioports to set up */
->>>>>> -	return 0;
->>>>>> -}
->>>>>> -
->>>>>>  void ioport__map_irq(u8 *irq)
->>>>>>  {
->>>>>>  }
->>>>>> diff --git a/x86/ioport.c b/x86/ioport.c
->>>>>> index 7ad7b8f3..8c5c7699 100644
->>>>>> --- a/x86/ioport.c
->>>>>> +++ b/x86/ioport.c
->>>>>> @@ -69,7 +69,7 @@ void ioport__map_irq(u8 *irq)
->>>>>>  {
->>>>>>  }
->>>>>>  
->>>>>> -int ioport__setup_arch(struct kvm *kvm)
->>>>>> +static int ioport__setup_arch(struct kvm *kvm)
->>>>>>  {
->>>>>>  	int r;
->>>>>>  
->>>>>> @@ -150,3 +150,26 @@ int ioport__setup_arch(struct kvm *kvm)
->>>>>>  
->>>>>>  	return 0;
->>>>>>  }
->>>>>> +dev_base_init(ioport__setup_arch);
->>>>>> +
->>>>>> +static int ioport__remove_arch(struct kvm *kvm)
->>>>>> +{
->>>>>> +	ioport__unregister(kvm, 0x510);
->>>>>> +	ioport__unregister(kvm, 0x402);
->>>>>> +	ioport__unregister(kvm, 0x03D5);
->>>>>> +	ioport__unregister(kvm, 0x03D4);
->>>>>> +	ioport__unregister(kvm, 0x0378);
->>>>>> +	ioport__unregister(kvm, 0x0278);
->>>>>> +	ioport__unregister(kvm, 0x00F0);
->>>>>> +	ioport__unregister(kvm, 0x00ED);
->>>>>> +	ioport__unregister(kvm, IOPORT_DBG);
->>>>>> +	ioport__unregister(kvm, 0x00C0);
->>>>>> +	ioport__unregister(kvm, 0x00A0);
->>>>>> +	ioport__unregister(kvm, 0x0092);
->>>>>> +	ioport__unregister(kvm, 0x0040);
->>>>>> +	ioport__unregister(kvm, 0x0020);
->>>>>> +	ioport__unregister(kvm, 0x0000);
->>>>>> +
->>>>>> +	return 0;
->>>>>> +}
->>>>>> +dev_base_exit(ioport__remove_arch);      
+-- 
+Vitaly
+
