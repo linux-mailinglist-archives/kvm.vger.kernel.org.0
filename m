@@ -2,160 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C683F321CB4
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:21:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5B96321CDA
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 17:26:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231312AbhBVQUj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 11:20:39 -0500
-Received: from foss.arm.com ([217.140.110.172]:55120 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230045AbhBVQUc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 11:20:32 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 211ED1FB;
-        Mon, 22 Feb 2021 08:19:44 -0800 (PST)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 265383F73B;
-        Mon, 22 Feb 2021 08:19:43 -0800 (PST)
-Subject: Re: [PATCH kvmtool 07/21] hw/i8042: Switch to new trap handlers
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
+        id S231274AbhBVQZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 11:25:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55600 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231415AbhBVQZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 11:25:40 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AB9C061786
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id b15so4371247pjb.0
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 08:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+        b=ZkL+DPyOhtNNe7hZI9CaKbe4ebR0w/c08TMwcW6jEWxnEH8r794ZleXZWoZ/UR0m9l
+         /JvwszOIsqxGcoQusTcqqjnSjevmzjijIqmibZWhNlf1fAH+fqB2XaC9yYLNGSgQajKW
+         cQ37mvXb34+aOOxfrJiSDd0duyNERIQhiKqe1mF+9oUWIOq5QI43wZI8wjHcqYbkkeNz
+         F74iB1b0pF2iLrhK6gzgmonIkdXMBmp9UGOP+w4UrVRBbDRpQmc5IjIAIQwXpNnoKanf
+         hCRm8lc+Mszq2AP9WNUUdxblVMsJd9jJlh10sSOCswStuXopFHTvKoZcecsf/gsAVlr3
+         E8CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=K8Mk8DPpk11B6V3YwuQN3+iAtbjKIINrpZOMJr9ijMU=;
+        b=aNNucl5sE3cSyjad2P0vEZI14dXCIyQk2rLVpDECSQoyR/MlPNv7da13zSi+hE1YNr
+         k6Ao80x5AdUP49VqVr0+vXC7dZJts0tbz4XzBJ+u/lWW/EK/uLEl+VE6Qe5QttNtz6ID
+         0MeHS7uHEw+mGHQ1zqf1Ax44C9Nan7NaEntYi7E6Lviq+xW0nFvNGgtPsYNIotWXLuqV
+         0UCBzY910vQH4kZYLvlxJpjUBaVdNJoxc9sPR3fzKF4DvWYYd/3gIPGZfrUolkmk+1He
+         rYe3vAtNzFOc8mwmawgR+WByODK7Qdo604PSRl75PHo5idbNMmeo0GVkz3ApPptRjHFK
+         hAQA==
+X-Gm-Message-State: AOAM531VopetVEKYgGyElLIcZzFhEHv30lefo9tRTdCkwqpBywJAZ2ku
+        xKeOa07GiAo5wOf2khKriLoR8w==
+X-Google-Smtp-Source: ABdhPJzpaRZ20ovy1dpVfBdxXc3ZVF23iR3XDePJsjQUoeSVBm8Osbw6p/Oa6Rqwlvu7+JfquMJWyQ==
+X-Received: by 2002:a17:903:1d0:b029:df:d098:f1cb with SMTP id e16-20020a17090301d0b02900dfd098f1cbmr23104083plh.49.1614011099559;
+        Mon, 22 Feb 2021 08:24:59 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:655e:415b:3b95:bd58])
+        by smtp.gmail.com with ESMTPSA id f2sm21929378pfk.63.2021.02.22.08.24.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 08:24:58 -0800 (PST)
+Date:   Mon, 22 Feb 2021 08:24:51 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Stevens <stevensd@chromium.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
-References: <20201210142908.169597-1-andre.przywara@arm.com>
- <20201210142908.169597-8-andre.przywara@arm.com>
- <a995ed28-27c0-888c-c3d4-ecb70c08a13e@arm.com>
- <20210218120902.630dcb2b@slackpad.fritz.box>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <908c3706-75b8-b03e-4c01-88072d02696e@arm.com>
-Date:   Mon, 22 Feb 2021 16:19:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v4 2/2] KVM: x86/mmu: Consider the hva in mmu_notifier
+ retry
+Message-ID: <YDPa07i3S3Y7/iwy@google.com>
+References: <20210222024522.1751719-1-stevensd@google.com>
+ <20210222024522.1751719-3-stevensd@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210218120902.630dcb2b@slackpad.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210222024522.1751719-3-stevensd@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On Mon, Feb 22, 2021, David Stevens wrote:
+> ---
+> v3 -> v4:
+>  - Skip prefetch while invalidations are in progress
 
-On 2/18/21 12:09 PM, Andre Przywara wrote:
-> On Fri, 12 Feb 2021 10:41:20 +0000
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
->> On 12/10/20 2:28 PM, Andre Przywara wrote:
->>> Now that the PC keyboard has a trap handler adhering to the MMIO fault
->>> handler prototype, let's switch over to the joint registration routine.
->>>
->>> This allows us to get rid of the ioport shim routines.
->>>
->>> Make the kbd_init() function static on the way.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  hw/i8042.c          | 30 ++++--------------------------
->>>  include/kvm/i8042.h |  1 -
->>>  2 files changed, 4 insertions(+), 27 deletions(-)
->>>
->>> diff --git a/hw/i8042.c b/hw/i8042.c
->>> index eb1f9d28..91d79dc4 100644
->>> --- a/hw/i8042.c
->>> +++ b/hw/i8042.c
->>> @@ -325,40 +325,18 @@ static void kbd_io(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
->>>  		ioport__write8(data, value);
->>>  }
->>>  
->>> -/*
->>> - * Called when the OS has written to one of the keyboard's ports (0x60 or 0x64)
->>> - */
->>> -static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>> -{
->>> -	kbd_io(vcpu, port, data, size, false, NULL);
->>> -
->>> -	return true;
->>> -}
->>> -
->>> -static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
->>> -{
->>> -	kbd_io(vcpu, port, data, size, true, NULL);
->>> -
->>> -	return true;
->>> -}
->>> -
->>> -static struct ioport_operations kbd_ops = {
->>> -	.io_in		= kbd_in,
->>> -	.io_out		= kbd_out,
->>> -};
->>> -
->>> -int kbd__init(struct kvm *kvm)
->>> +static int kbd__init(struct kvm *kvm)
->>>  {
->>>  	int r;
->>>  
->>>  	kbd_reset();
->>>  	state.kvm = kvm;
->>> -	r = ioport__register(kvm, I8042_DATA_REG, &kbd_ops, 2, NULL);
->>> +	r = kvm__register_pio(kvm, I8042_DATA_REG, 2, kbd_io, NULL);  
->> I guess you are registering two addresses here to cover I8042_PORT_B_REG, right?
->> Might be worth a comment.
-> I am registering two ports because the original code did, and I didn't
-> dare to touch this. I guess we put this on the wishlist for the device
-> emulation fixup series? ;-)
->
-> Maybe the intention was to just *reserve* those ports?
+Oof, nice catch.
 
-Considering that I8042_DATA_REG = 0x60 and I8042_PORT_B_REG = 0x61, and the
-emulation handlers handle both of them, I'm pretty sure the intention was to
-reserve memory to cover both ports.
+...
 
->
->>>  	if (r < 0)
->>>  		return r;
->>> -	r = ioport__register(kvm, I8042_COMMAND_REG, &kbd_ops, 2, NULL);
->>> +	r = kvm__register_pio(kvm, I8042_COMMAND_REG, 2, kbd_io, NULL);  
->> Shouldn't length be 1? The emulation should work only for address 0x64
->> (command/status register), right? Or am I missing something?
-> I don't think you are, same as above. Maybe some weird guest is using
-> half-word accesses (outw)?
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 9ac0a727015d..f6aaac729667 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2758,6 +2758,13 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
+>  	if (sp->role.level > PG_LEVEL_4K)
+>  		return;
+>  
+> +	/*
+> +	 * If addresses are being invalidated, skip prefetching to avoid
+> +	 * accidentally prefetching those addresses.
+> +	 */
+> +	if (unlikely(vcpu->kvm->mmu_notifier_count))
+> +		return;
 
-I think you're right, let's not mess with the device emulation right now, after
-all that's not the purpose of the series. And I'm fairly confident you know more
-about the device and the x86 architecture than me, so I'll trust your judgement on
-this.
+FNAME(pte_prefetch) needs the same check.
 
-Thanks,
+Paolo, this brings up a good addition for the work to integrate the mmu notifier
+into the rest of KVM, e.g. for vmcs12 pages.  Ideally, gfn_to_page_many_atomic()
+and __gfn_to_pfn_memslot() would WARN if mmu_notifier_count is non-zero, but
+that will fire all over the place until the nested code properly integrates the
+notifier.  There are a few use cases where racing with the notifier is acceptable,
+e.g. reexecute_instruction(), but hopefully we can address those flows without
+things getting too ugly.
 
-Alex
-
->
-> Cheers,
-> Andre
->
->
->> Thanks,
->>
->> Alex
->>
->>>  	if (r < 0) {
->>> -		ioport__unregister(kvm, I8042_DATA_REG);
->>> +		kvm__deregister_pio(kvm, I8042_DATA_REG);
->>>  		return r;
->>>  	}
->>>  
->>> diff --git a/include/kvm/i8042.h b/include/kvm/i8042.h
->>> index 3b4ab688..cd4ae6bb 100644
->>> --- a/include/kvm/i8042.h
->>> +++ b/include/kvm/i8042.h
->>> @@ -7,6 +7,5 @@ struct kvm;
->>>  
->>>  void mouse_queue(u8 c);
->>>  void kbd_queue(u8 c);
->>> -int kbd__init(struct kvm *kvm);
->>>  
->>>  #endif  
+> +
+>  	__direct_pte_prefetch(vcpu, sp, sptep);
+>  }
