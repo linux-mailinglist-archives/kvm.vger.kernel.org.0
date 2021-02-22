@@ -2,173 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47603321EC9
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 19:06:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6E23321F0A
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 19:20:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231195AbhBVSGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 13:06:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23965 "EHLO
+        id S232346AbhBVSTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 13:19:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28984 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230437AbhBVSGI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 13:06:08 -0500
+        by vger.kernel.org with ESMTP id S232270AbhBVSSi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 13:18:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614017081;
+        s=mimecast20190719; t=1614017832;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SSsnX5SjnKwxu3rr90T4nBZzi1MZ/dtXAKPK6GY/CHA=;
-        b=OZiOmE6m/jD0XPsSqTgs66nSkG6nyiMaWcOsKpFfBz5UPyABejUi0e8Varm93xYrgJOxal
-        xiHSXD4vO0TF+T45VaXvDYKOmJQkO7pB5/n7eR53+VTVkYk2ZdiKy0vCT77QaiLrvP2eB7
-        0tjoJY4pqI1lIdLhFMbXuQA+jThdjmE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-Ke7zSFnMMP2VDhwauLITQw-1; Mon, 22 Feb 2021 13:04:37 -0500
-X-MC-Unique: Ke7zSFnMMP2VDhwauLITQw-1
-Received: by mail-ed1-f71.google.com with SMTP id d3so7457632edk.22
-        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 10:04:37 -0800 (PST)
+        bh=M1O2O9X5RXSfF+m5PX0DyBo6+zLejZgNhGtzl18mwLU=;
+        b=FNRVHNe5CfMAVPXVFmRvIU5n9TtA7YYFEYjtQBkgOC/QcmIouTfKp1Os1gxR6Rk3cVoFcw
+        OBdvccM/XxS9Ad7gD+7PwdCPL60S/diPZK6xrZVZS/sf6i+HdxYOo9LBCb/GMPuq7fFWSj
+        b+1esQY5BV02h5mBuOhTRZEnnBK8RAY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-444-LZD0ODcDPUWjC0rG36xO8A-1; Mon, 22 Feb 2021 13:17:09 -0500
+X-MC-Unique: LZD0ODcDPUWjC0rG36xO8A-1
+Received: by mail-ej1-f69.google.com with SMTP id ml13so4319813ejb.2
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 10:17:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=SSsnX5SjnKwxu3rr90T4nBZzi1MZ/dtXAKPK6GY/CHA=;
-        b=mh3pmwws9abvtMVhfpUGFR6AC39SEIO1/Xgyvmqc18VkVhnlRgznRMG6WmMNfcCVT7
-         GdXT2hX1+5ASqsYY7mkRQiVcatQFsnOuBTkC202RC8dLFZRyrhrESSAoHAusrm5mItqh
-         CMhth6+zDvGQuM6aSlfa7+rUJP7QsaL54oZmQRI5cAay9HHIcWL9yQSDvpT8tN7ZLIdh
-         q78uBpvxEv4JxJh4zoRazSDXc779iRpgPdfr4lHntzchXGIJ6A5qdtdBx4Kyl3rZmKRB
-         RxXk9RqQeR7UzlQ/Z3C6uqcTvtGpDlXIP3NaLkuJa4YgpO4EKAD12dzzHnDaC1pSZdYg
-         HzPw==
-X-Gm-Message-State: AOAM5301+mvhJLWb/c4k6IUYjFzB3CLcfObrXxQEkagQlN2EvgHowWeq
-        lMRYpfaWJr9rByY8QdGHephhjXQuJJnOEjWfoqPy6GzIbj0bh8Ontguyid/yFELSHMB0KsEx1wd
-        ozoP5DsdICo5N
-X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr21995943ejr.177.1614017076007;
-        Mon, 22 Feb 2021 10:04:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz/JC++82lk2ObRrXbPMXgvjOy+aii8aMRtQqY2wAzax0ZKP5G6jLvuYpnN+D+qmV72Wu/wKA==
-X-Received: by 2002:a17:906:7e42:: with SMTP id z2mr21995909ejr.177.1614017075776;
-        Mon, 22 Feb 2021 10:04:35 -0800 (PST)
-Received: from [192.168.1.36] (68.red-83-57-175.dynamicip.rima-tde.net. [83.57.175.68])
-        by smtp.gmail.com with ESMTPSA id b27sm7825403eja.64.2021.02.22.10.04.33
+        bh=M1O2O9X5RXSfF+m5PX0DyBo6+zLejZgNhGtzl18mwLU=;
+        b=ZrrpiNF9fc7n6sRcBJVkSbrvU8T46kY9OAfb3nmsarPn+6aSOl0gYSXR8Qn+uWZP2X
+         XVtyVlfRSoF9A/wtTpJKPhyr5PsKL2819/1euOJxt2KfGRTVA/tDnfLUBUWtqvO+DUec
+         aDJycdywoZCPl/c6WIoe7/Jnc53Re3JVuM64UNsuvy3ChgAp6V/RJtagJs2Hb1VnV4rn
+         n5dvCkRxoZ5Pu16jD6yAixtv+1uxpxGyamSXZSincKEr9UbwFfsZxLPyzC/OBtQ9NFKw
+         I2wZwrh3xsrDTTBVMkhsX4Q8qsTlfVgib2z5bGYBV/f8qJ8sx/kYVtS+KmKlaOxsyI4f
+         0wLA==
+X-Gm-Message-State: AOAM53104prO4Ko5LbMUcylERE/kbvPyw2lR9etxAG441MlVpNDgjpjP
+        PjvtN+VnZaN5+qTXELVlQt0Cx7GHWCoelP6e0RA3hozBlsqzaqt/l+PDUUphjwvRliI838RApwV
+        7EcErptstJirD
+X-Received: by 2002:a17:906:1c4f:: with SMTP id l15mr11171181ejg.148.1614017828674;
+        Mon, 22 Feb 2021 10:17:08 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzT03kSWOr2tXOOmqkmqccMekugd1GPN0H9nHYrXxVs3CozSxxVXGpHmYF/OdiWxYx0Hw1ilw==
+X-Received: by 2002:a17:906:1c4f:: with SMTP id l15mr11171153ejg.148.1614017828484;
+        Mon, 22 Feb 2021 10:17:08 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id d5sm12773936edu.12.2021.02.22.10.17.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Feb 2021 10:04:35 -0800 (PST)
-Subject: Re: [PATCH v2 01/11] accel/kvm: Check MachineClass kvm_type() return
- value
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
+        Mon, 22 Feb 2021 10:17:07 -0800 (PST)
+Subject: Re: [PATCH v4 0/2] KVM: x86/mmu: Skip mmu_notifier changes when
+ possible
+To:     David Stevens <stevensd@chromium.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Huacai Chen <chenhuacai@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Paul Durrant <paul@xen.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-        Greg Kurz <groug@kaod.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        linux-mips@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+        kvm-ppc@vger.kernel.org,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20210219173847.2054123-1-philmd@redhat.com>
- <20210219173847.2054123-2-philmd@redhat.com>
- <20210222182405.3e6e9a6f.cohuck@redhat.com>
- <bc37276d-74cc-22f0-fcc0-4ee5e62cf1df@redhat.com>
- <20210222185044.23fccecc.cohuck@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0f2a252e-34d8-6714-d1fd-d4e3764feef7@redhat.com>
-Date:   Mon, 22 Feb 2021 19:04:32 +0100
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Stevens <stevensd@google.com>
+References: <20210222024522.1751719-1-stevensd@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7fe10f74-e183-411a-468b-93fcdf786bb6@redhat.com>
+Date:   Mon, 22 Feb 2021 19:17:06 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210222185044.23fccecc.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210222024522.1751719-1-stevensd@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/22/21 6:50 PM, Cornelia Huck wrote:
-> On Mon, 22 Feb 2021 18:41:07 +0100
-> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+On 22/02/21 03:45, David Stevens wrote:
+> These patches reduce how often mmu_notifier updates block guest page
+> faults. The primary benefit of this is the reduction in the likelihood
+> of extreme latency when handling a page fault due to another thread
+> having been preempted while modifying host virtual addresses.
 > 
->> On 2/22/21 6:24 PM, Cornelia Huck wrote:
->>> On Fri, 19 Feb 2021 18:38:37 +0100
->>> Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>>   
->>>> MachineClass::kvm_type() can return -1 on failure.
->>>> Document it, and add a check in kvm_init().
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>> ---
->>>>  include/hw/boards.h | 3 ++-
->>>>  accel/kvm/kvm-all.c | 6 ++++++
->>>>  2 files changed, 8 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>> index a46dfe5d1a6..68d3d10f6b0 100644
->>>> --- a/include/hw/boards.h
->>>> +++ b/include/hw/boards.h
->>>> @@ -127,7 +127,8 @@ typedef struct {
->>>>   *    implement and a stub device is required.
->>>>   * @kvm_type:
->>>>   *    Return the type of KVM corresponding to the kvm-type string option or
->>>> - *    computed based on other criteria such as the host kernel capabilities.
->>>> + *    computed based on other criteria such as the host kernel capabilities
->>>> + *    (which can't be negative), or -1 on error.
->>>>   * @numa_mem_supported:
->>>>   *    true if '--numa node.mem' option is supported and false otherwise
->>>>   * @smp_parse:
->>>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->>>> index 84c943fcdb2..b069938d881 100644
->>>> --- a/accel/kvm/kvm-all.c
->>>> +++ b/accel/kvm/kvm-all.c
->>>> @@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
->>>>                                                              "kvm-type",
->>>>                                                              &error_abort);
->>>>          type = mc->kvm_type(ms, kvm_type);
->>>> +        if (type < 0) {
->>>> +            ret = -EINVAL;
->>>> +            fprintf(stderr, "Failed to detect kvm-type for machine '%s'\n",
->>>> +                    mc->name);
->>>> +            goto err;
->>>> +        }
->>>>      }
->>>>  
->>>>      do {  
->>>
->>> No objection to this patch; but I'm wondering why some non-pseries
->>> machines implement the kvm_type callback, when I see the kvm-type
->>> property only for pseries? Am I holding my git grep wrong?  
->>
->> Can it be what David commented here?
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg784508.html
->>
+> v3 -> v4:
+>   - Fix bug by skipping prefetch during invalidation
 > 
-> Ok, I might be confused about the other ppc machines; but I'm wondering
-> about the kvm_type callback for mips and arm/virt. Maybe I'm just
-> confused by the whole mechanism?
+> v2 -> v3:
+>   - Added patch to skip check for MMIO page faults
+>   - Style changes
+> 
+> David Stevens (1):
+>    KVM: x86/mmu: Consider the hva in mmu_notifier retry
+> 
+> Sean Christopherson (1):
+>    KVM: x86/mmu: Skip mmu_notifier check when handling MMIO page fault
+> 
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+>   arch/x86/kvm/mmu/mmu.c                 | 23 ++++++++++++++------
+>   arch/x86/kvm/mmu/paging_tmpl.h         |  7 ++++---
+>   include/linux/kvm_host.h               | 25 +++++++++++++++++++++-
+>   virt/kvm/kvm_main.c                    | 29 ++++++++++++++++++++++----
+>   6 files changed, 72 insertions(+), 16 deletions(-)
+> 
 
-For MIPS see https://www.linux-kvm.org/images/f/f2/01x08a-MIPS.pdf
-and Jiaxun comment here:
-https://lore.kernel.org/linux-mips/a2a2cfe3-5618-43b1-a6a4-cc768fc1b9fb@www.fastmail.com/
+Rebased, and queued with the fix that Sean suggested.
 
-TE KVM: Trap-and-Emul guest kernel
-VZ KVM: HW Virtualized
-
-For "the whole mechanism" I'll defer to Paolo =)
+Paolo
 
