@@ -2,131 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70E56321E04
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 18:24:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59F61321E12
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 18:27:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbhBVRXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 12:23:15 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16415 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230432AbhBVRXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 12:23:13 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B6033e8590002>; Mon, 22 Feb 2021 09:22:33 -0800
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 22 Feb
- 2021 17:22:33 +0000
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Mon, 22 Feb 2021 17:22:33 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oC06WsMuW2cuPpSzw9TxGE4wqIU+w9HsD03TSDXMHvHU4aueeW/d+jh1yXtcCV07lTON2VLllqoern4+kb+2G4pYFHZbZa5tUTI+b1TxdBiWF8M7J23x6AZE+/fYh5qJRQEQZ/vP0qwfxcjSO3KLPWPEy2yY5YvTW8uMpdvRiWlKfSpGsHhyyU7asIBYNG01yTNGh/ETdFevn8fVUtNyL0HbYYw8z48id/m/9ja8glMuuj87/5+h0VsXRO/lSg4v106Ujoj2StlhakcOFpW8CygFLsArPDxfaIqjTXmqJ4elP9ZIuSGFHNgQVGVdQqkSxU4ESouT3vGs1JDnqm1Big==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y8sLryL/ZP0p1XdKIDarogJY/SJmBjUcOL4B+1Amq78=;
- b=XfvOjF9LQdtXLv03M1lHqpZ7umZ6nYHZZi+hDPnjUZABn/0mvpf7sxM7OE6f7VXvDP7t6X0o8jr1E0wf8QIJILv6l/mkvLElE1iFBbMD+/tGj0ReawwCZmiPsCbI6S65GLtlJg8vEVBKg0/T48edTPEot35H31YrV+ApFh98P04m/B0t7RJF7CFyHURW6m+y2Q9PqhVKdyBUt5sxZlMeJ8UOsEQTCtOJf96eELTQvPEMVfryIGIouSTcbcMKvwIVQ3uUKVC4S3A3JNz23CFgr5a9v7QIuP+28uyvx2AdBO8T4/qNjAhAoszQ7MYE+4arv3CPyriNenbBoP5QSsn16g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM6PR12MB3516.namprd12.prod.outlook.com (2603:10b6:5:18b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3846.27; Mon, 22 Feb
- 2021 17:22:32 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::d6b:736:fa28:5e4%7]) with mapi id 15.20.3846.045; Mon, 22 Feb 2021
- 17:22:32 +0000
-Date:   Mon, 22 Feb 2021 13:22:30 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
-Subject: Re: [RFC PATCH 04/10] vfio/pci: Use vfio_device_unmap_mapping_range()
-Message-ID: <20210222172230.GO4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401267316.16443.11184767955094847849.stgit@gimli.home>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <161401267316.16443.11184767955094847849.stgit@gimli.home>
-X-ClientProxiedBy: BL1PR13CA0484.namprd13.prod.outlook.com
- (2603:10b6:208:2c7::9) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S231292AbhBVR0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 12:26:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49283 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231215AbhBVRZ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 12:25:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614014672;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=H5mrm3DZDcM5fraUv4fndEkj6st2YNZQP0B5Q36J9Uo=;
+        b=eA2hPWtNFSBChFkO1/svU5YW0B/7ijE61JlzagtOiKJapbOMVXecxssihddYHsR2e0XcVo
+        ufgAUMf6r3XFMvfHYKa3zY2CkQSi0rSX7jDp56bXut8qoOGt43K1w4WzGp42MTaXV71poE
+        6oMYOqYqgZRuPm22tG1Fwa5NrqWF4Es=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-1b80s02bMCOR2lkI1fzehA-1; Mon, 22 Feb 2021 12:24:29 -0500
+X-MC-Unique: 1b80s02bMCOR2lkI1fzehA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 498CB1936B68;
+        Mon, 22 Feb 2021 17:24:26 +0000 (UTC)
+Received: from gondolin (ovpn-113-115.ams2.redhat.com [10.36.113.115])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1AD85D9D3;
+        Mon, 22 Feb 2021 17:24:07 +0000 (UTC)
+Date:   Mon, 22 Feb 2021 18:24:05 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        BALATON Zoltan <balaton@eik.bme.hu>,
+        Leif Lindholm <leif@nuviainc.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Radoslaw Biernacki <rad@semihalf.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Paul Durrant <paul@xen.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        =?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+        Greg Kurz <groug@kaod.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        David Hildenbrand <david@redhat.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 01/11] accel/kvm: Check MachineClass kvm_type()
+ return value
+Message-ID: <20210222182405.3e6e9a6f.cohuck@redhat.com>
+In-Reply-To: <20210219173847.2054123-2-philmd@redhat.com>
+References: <20210219173847.2054123-1-philmd@redhat.com>
+        <20210219173847.2054123-2-philmd@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0484.namprd13.prod.outlook.com (2603:10b6:208:2c7::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.8 via Frontend Transport; Mon, 22 Feb 2021 17:22:31 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lEEuk-00ESeq-HZ; Mon, 22 Feb 2021 13:22:30 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614014553; bh=y8sLryL/ZP0p1XdKIDarogJY/SJmBjUcOL4B+1Amq78=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=M8PkYZHeehhlIpFDPc1qr9UDSnMTIO1DR08Hei0HN/HnmfLC3FPsUsVkb2lEHhkGx
-         Jqvf2704mv0NO5/C47eoV1CPHW0kQD4urSfMNP+DB51apkmN0cg9G6xLhmv80Ipgyu
-         F3Y4YGRf9uAmf5x0ixuKEWPXFxpwl/GXcPSwZzmQos4beS92d27osDTfnBhkNG1LxM
-         7lLngyM5GBf7UmwgRoNMut0CL9ml206jza/wLGUCG+mUU+UQhSnFK/DNpOcscC3Fxk
-         O5D7tmP1sjuTNT1yMfrKt765MZTXRTtXAvMTg5N/exCYoilith0dCtJKDf9PcyImUb
-         w4KuT14rFKcIw==
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 22, 2021 at 09:51:13AM -0700, Alex Williamson wrote:
+On Fri, 19 Feb 2021 18:38:37 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> +	vfio_device_unmap_mapping_range(vdev->device,
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX));
+> MachineClass::kvm_type() can return -1 on failure.
+> Document it, and add a check in kvm_init().
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  include/hw/boards.h | 3 ++-
+>  accel/kvm/kvm-all.c | 6 ++++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index a46dfe5d1a6..68d3d10f6b0 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -127,7 +127,8 @@ typedef struct {
+>   *    implement and a stub device is required.
+>   * @kvm_type:
+>   *    Return the type of KVM corresponding to the kvm-type string option=
+ or
+> - *    computed based on other criteria such as the host kernel capabilit=
+ies.
+> + *    computed based on other criteria such as the host kernel capabilit=
+ies
+> + *    (which can't be negative), or -1 on error.
+>   * @numa_mem_supported:
+>   *    true if '--numa node.mem' option is supported and false otherwise
+>   * @smp_parse:
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 84c943fcdb2..b069938d881 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
+>                                                              "kvm-type",
+>                                                              &error_abort=
+);
+>          type =3D mc->kvm_type(ms, kvm_type);
+> +        if (type < 0) {
+> +            ret =3D -EINVAL;
+> +            fprintf(stderr, "Failed to detect kvm-type for machine '%s'\=
+n",
+> +                    mc->name);
+> +            goto err;
+> +        }
+>      }
+> =20
+>      do {
 
-Isn't this the same as invalidating everything? I see in
-vfio_pci_mmap():
+No objection to this patch; but I'm wondering why some non-pseries
+machines implement the kvm_type callback, when I see the kvm-type
+property only for pseries? Am I holding my git grep wrong?
 
-	if (index >= VFIO_PCI_ROM_REGION_INDEX)
-		return -EINVAL;
-
-> @@ -2273,15 +2112,13 @@ static int vfio_pci_try_zap_and_vma_lock_cb(struct pci_dev *pdev, void *data)
->  
->  	vdev = vfio_device_data(device);
->  
-> -	/*
-> -	 * Locking multiple devices is prone to deadlock, runaway and
-> -	 * unwind if we hit contention.
-> -	 */
-> -	if (!vfio_pci_zap_and_vma_lock(vdev, true)) {
-> +	if (!down_write_trylock(&vdev->memory_lock)) {
->  		vfio_device_put(device);
->  		return -EBUSY;
->  	}
-
-And this is only done as part of VFIO_DEVICE_PCI_HOT_RESET?
-
-It looks like VFIO_DEVICE_PCI_HOT_RESET effects the entire slot?
-
-How about putting the inode on the reflck structure, which is also
-per-slot, and then a single unmap_mapping_range() will take care of
-everything, no need to iterate over things in the driver core.
-
-Note the vm->pg_off space doesn't have any special meaning, it is
-fine that two struct vfio_pci_device's are sharing the same address
-space and using an incompatible overlapping pg_offs
-
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index 9cd1882a05af..ba37f4eeefd0 100644
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -101,6 +101,7 @@ struct vfio_pci_mmap_vma {
->  
->  struct vfio_pci_device {
->  	struct pci_dev		*pdev;
-> +	struct vfio_device	*device;
-
-Ah, I did this too, but I didn't use a pointer :)
-
-All the places trying to call vfio_device_put() when they really want
-a vfio_pci_device * become simpler now. Eg struct vfio_devices wants
-to have an array of vfio_pci_device, and get_pf_vdev() only needs to
-return one pointer.
-
-Jason
