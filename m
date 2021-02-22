@@ -2,255 +2,315 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8ACC32148C
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 11:57:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEA0532149B
+	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 12:00:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230399AbhBVKzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 05:55:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52122 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230348AbhBVKzT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Feb 2021 05:55:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613991232;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4OT0Rqw5Wl9T/7XHQTc0+4SQvZIZjrveo3V9rnAMoIU=;
-        b=BibsbbTY3dl5UJ7jD4bIKTjum36eBtaXs9Pu9FwhgtC+NY0+BDG0QFGVbspevxGH7eb4pZ
-        uQSE3XjfWNRGqcuh74h0v/fSj7OW2macCnoIYOP3Te92hQ9ETfd6HjhQQtpZBB58xuzUou
-        Opz3gdQ2s7yGzm6yZKWH7xORrWcJNm8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-fsHw0bK2OuWq84CK_CtRJA-1; Mon, 22 Feb 2021 05:53:50 -0500
-X-MC-Unique: fsHw0bK2OuWq84CK_CtRJA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 784AD801965;
-        Mon, 22 Feb 2021 10:53:48 +0000 (UTC)
-Received: from [10.36.114.34] (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A573F10016DB;
-        Mon, 22 Feb 2021 10:53:40 +0000 (UTC)
-Subject: Re: [PATCH v11 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-To:     Keqian Zhu <zhukeqian1@huawei.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        joro@8bytes.org, maz@kernel.org, robin.murphy@arm.com,
-        alex.williamson@redhat.com
-Cc:     jean-philippe@linaro.org, jacob.jun.pan@linux.intel.com,
-        nicoleotsuka@gmail.com, vivek.gautam@arm.com, yi.l.liu@intel.com,
-        zhangfei.gao@linaro.org
-References: <20201116110030.32335-1-eric.auger@redhat.com>
- <20201116110030.32335-2-eric.auger@redhat.com>
- <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <e476f85d-f49f-f9a6-3232-e99a4cb5a0a2@redhat.com>
-Date:   Mon, 22 Feb 2021 11:53:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S230345AbhBVK7J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 05:59:09 -0500
+Received: from mx12.kaspersky-labs.com ([91.103.66.155]:18754 "EHLO
+        mx12.kaspersky-labs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230125AbhBVK7E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 05:59:04 -0500
+Received: from relay12.kaspersky-labs.com (unknown [127.0.0.10])
+        by relay12.kaspersky-labs.com (Postfix) with ESMTP id 0A0997634E;
+        Mon, 22 Feb 2021 13:58:14 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaspersky.com;
+        s=mail202102; t=1613991494;
+        bh=SHYi7PV63WP4rrEl4a+UIz2wZejxCQTWp3Pmwar1YxU=;
+        h=Subject:To:From:Message-ID:Date:MIME-Version:Content-Type;
+        b=XmsIZFekDth4nLp9WJTj3Z1tgj0NPMdWS9aUgF1iEYPKlze0dAZGlVPi3U+9ldjrI
+         IiDy8D47/zFIlMo1kzsKxDHYAg32YGnwkUDFB1bYJzFTLEnkyxMJLC1kBGSoPJzbrO
+         xe2ag0GpogpRgnlx7DZTNOEfA0WPQJKA2qZusyufteB4u12JTA71Qht6RAfQ55Q1O2
+         M0Vzz/+xCk0pAIIutFkxmaDpy+2s7P0VUrDseTlUTvNykKWDGvHLsowN2LklXtoqDm
+         qAv7uAH5gFW1YKWt389aiPHyyx+iX6ARYEpj9DWTlvjadFPC0WHmileGa5ZAo4RxKq
+         gMdc0/A2YP5Gw==
+Received: from mail-hq2.kaspersky.com (unknown [91.103.66.206])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (Client CN "mail-hq2.kaspersky.com", Issuer "Kaspersky MailRelays CA G3" (verified OK))
+        by mailhub12.kaspersky-labs.com (Postfix) with ESMTPS id 38DCB76298;
+        Mon, 22 Feb 2021 13:58:13 +0300 (MSK)
+Received: from [10.16.171.77] (10.64.68.129) by hqmailmbx3.avp.ru
+ (10.64.67.243) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2044.4; Mon, 22
+ Feb 2021 13:58:12 +0300
+Subject: Re: [RFC PATCH v5 01/19] af_vsock: update functions for connectible
+ socket
+To:     Stefano Garzarella <sgarzare@redhat.com>
+CC:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
+ <20210218053607.1066783-1-arseny.krasnov@kaspersky.com>
+ <20210222105023.aqcu25irkeed6div@steredhat>
+From:   Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Message-ID: <279059b2-4c08-16d4-3bca-03640c7932d9@kaspersky.com>
+Date:   Mon, 22 Feb 2021 13:58:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <84a111da-1969-1701-9a6d-cae8d7c285c6@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+In-Reply-To: <20210222105023.aqcu25irkeed6div@steredhat>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+X-Originating-IP: [10.64.68.129]
+X-ClientProxiedBy: hqmailmbx1.avp.ru (10.64.67.241) To hqmailmbx3.avp.ru
+ (10.64.67.243)
+X-KSE-ServerInfo: hqmailmbx3.avp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.16, Database issued on: 02/06/2021 23:52:08
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 161679 [Feb 06 2021]
+X-KSE-AntiSpam-Info: LuaCore: 422 422 763e61bea9fcfcd94e075081cb96e065bc0509b4
+X-KSE-AntiSpam-Info: Version: 5.9.16.0
+X-KSE-AntiSpam-Info: Envelope from: arseny.krasnov@kaspersky.com
+X-KSE-AntiSpam-Info: {Tracking_content_type, plain}
+X-KSE-AntiSpam-Info: {Tracking_date, moscow}
+X-KSE-AntiSpam-Info: {Tracking_c_tr_enc, eight_bit}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/06/2021 23:55:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 06.02.2021 21:17:00
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-KLMS-Rule-ID: 52
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2021/02/22 09:47:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2021/02/22 04:39:00 #16312882
+X-KLMS-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Keqian,
 
-On 2/2/21 1:34 PM, Keqian Zhu wrote:
-> Hi Eric,
-> 
-> On 2020/11/16 19:00, Eric Auger wrote:
->> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+On 22.02.2021 13:50, Stefano Garzarella wrote:
+> On Thu, Feb 18, 2021 at 08:36:03AM +0300, Arseny Krasnov wrote:
+>> This prepares af_vsock.c for SEQPACKET support: some functions such
+>> as setsockopt(), getsockopt(), connect(), recvmsg(), sendmsg() are
+>> shared between both types of sockets, so rename them in general
+>> manner.
 >>
->> This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
->> which aims to pass the virtual iommu guest configuration
->> to the host. This latter takes the form of the so-called
->> PASID table.
->>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
+>> Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
 >> ---
->> v11 -> v12:
->> - use iommu_uapi_set_pasid_table
->> - check SET and UNSET are not set simultaneously (Zenghui)
->>
->> v8 -> v9:
->> - Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
->>   VFIO_IOMMU_SET_PASID_TABLE ioctl.
->>
->> v6 -> v7:
->> - add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
->>
->> v3 -> v4:
->> - restore ATTACH/DETACH
->> - add unwind on failure
->>
->> v2 -> v3:
->> - s/BIND_PASID_TABLE/SET_PASID_TABLE
->>
->> v1 -> v2:
->> - s/BIND_GUEST_STAGE/BIND_PASID_TABLE
->> - remove the struct device arg
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 65 +++++++++++++++++++++++++++++++++
->>  include/uapi/linux/vfio.h       | 19 ++++++++++
->>  2 files changed, 84 insertions(+)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 67e827638995..87ddd9e882dc 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -2587,6 +2587,41 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
->>  	return ret;
->>  }
->>  
->> +static void
->> +vfio_detach_pasid_table(struct vfio_iommu *iommu)
->> +{
->> +	struct vfio_domain *d;
->> +
->> +	mutex_lock(&iommu->lock);
->> +	list_for_each_entry(d, &iommu->domain_list, next)
->> +		iommu_detach_pasid_table(d->domain);
->> +
->> +	mutex_unlock(&iommu->lock);
->> +}
->> +
->> +static int
->> +vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
->> +{
->> +	struct vfio_domain *d;
->> +	int ret = 0;
->> +
->> +	mutex_lock(&iommu->lock);
->> +
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
-> This design is not very clear to me. This assumes all iommu_domains share the same pasid table.
-> 
-> As I understand, it's reasonable when there is only one group in the domain, and only one domain in the vfio_iommu.
-> If more than one group in the vfio_iommu, the guest may put them into different guest iommu_domain, then they have different pasid table.
-> 
-> Is this the use scenario?
-
-the vfio_iommu is attached to a container. all the groups within a
-container share the same set of page tables (linux
-Documentation/driver-api/vfio.rst). So to me if you want to use
-different pasid tables, the groups need to be attached to different
-containers. Does that make sense to you?
-
-Thanks
-
-Eric
-> 
+>> net/vmw_vsock/af_vsock.c | 64 +++++++++++++++++++++-------------------
+>> 1 file changed, 34 insertions(+), 30 deletions(-)
+> IIRC I had already given my R-b to this patch. Please carry it over when 
+> you post a new version.
+>
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>
 > Thanks,
-> Keqian
-> 
->> +		if (ret)
->> +			goto unwind;
->> +	}
->> +	goto unlock;
->> +unwind:
->> +	list_for_each_entry_continue_reverse(d, &iommu->domain_list, next) {
->> +		iommu_detach_pasid_table(d->domain);
->> +	}
->> +unlock:
->> +	mutex_unlock(&iommu->lock);
->> +	return ret;
->> +}
->> +
->>  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
->>  					   struct vfio_info_cap *caps)
->>  {
->> @@ -2747,6 +2782,34 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
->>  			-EFAULT : 0;
->>  }
->>  
->> +static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
->> +					    unsigned long arg)
->> +{
->> +	struct vfio_iommu_type1_set_pasid_table spt;
->> +	unsigned long minsz;
->> +	int ret = -EINVAL;
->> +
->> +	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
->> +
->> +	if (copy_from_user(&spt, (void __user *)arg, minsz))
->> +		return -EFAULT;
->> +
->> +	if (spt.argsz < minsz)
->> +		return -EINVAL;
->> +
->> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET &&
->> +	    spt.flags & VFIO_PASID_TABLE_FLAG_UNSET)
->> +		return -EINVAL;
->> +
->> +	if (spt.flags & VFIO_PASID_TABLE_FLAG_SET)
->> +		ret = vfio_attach_pasid_table(iommu, arg + minsz);
->> +	else if (spt.flags & VFIO_PASID_TABLE_FLAG_UNSET) {
->> +		vfio_detach_pasid_table(iommu);
->> +		ret = 0;
->> +	}
->> +	return ret;
->> +}
->> +
->>  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
->>  					unsigned long arg)
->>  {
->> @@ -2867,6 +2930,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>  		return vfio_iommu_type1_unmap_dma(iommu, arg);
->>  	case VFIO_IOMMU_DIRTY_PAGES:
->>  		return vfio_iommu_type1_dirty_pages(iommu, arg);
->> +	case VFIO_IOMMU_SET_PASID_TABLE:
->> +		return vfio_iommu_type1_set_pasid_table(iommu, arg);
->>  	default:
->>  		return -ENOTTY;
->>  	}
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 2f313a238a8f..78ce3ce6c331 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -14,6 +14,7 @@
->>  
->>  #include <linux/types.h>
->>  #include <linux/ioctl.h>
->> +#include <linux/iommu.h>
->>  
->>  #define VFIO_API_VERSION	0
->>  
->> @@ -1180,6 +1181,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
->>  
->>  #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
->>  
->> +/*
->> + * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 22,
->> + *			struct vfio_iommu_type1_set_pasid_table)
->> + *
->> + * The SET operation passes a PASID table to the host while the
->> + * UNSET operation detaches the one currently programmed. Setting
->> + * a table while another is already programmed replaces the old table.
->> + */
->> +struct vfio_iommu_type1_set_pasid_table {
->> +	__u32	argsz;
->> +	__u32	flags;
->> +#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
->> +#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
->> +	struct iommu_pasid_table_config config; /* used on SET */
->> +};
->> +
->> +#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 22)
->> +
->>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->>  
->>  /*
+> Stefano
+Ack, sorry, didn't know that
+>
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index 5546710d8ac1..656370e11707 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -604,8 +604,8 @@ static void vsock_pending_work(struct work_struct *work)
 >>
-> 
-
+>> /**** SOCKET OPERATIONS ****/
+>>
+>> -static int __vsock_bind_stream(struct vsock_sock *vsk,
+>> -			       struct sockaddr_vm *addr)
+>> +static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> +				    struct sockaddr_vm *addr)
+>> {
+>> 	static u32 port;
+>> 	struct sockaddr_vm new_addr;
+>> @@ -685,7 +685,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
+>> 	switch (sk->sk_socket->type) {
+>> 	case SOCK_STREAM:
+>> 		spin_lock_bh(&vsock_table_lock);
+>> -		retval = __vsock_bind_stream(vsk, addr);
+>> +		retval = __vsock_bind_connectible(vsk, addr);
+>> 		spin_unlock_bh(&vsock_table_lock);
+>> 		break;
+>>
+>> @@ -767,6 +767,11 @@ static struct sock *__vsock_create(struct net *net,
+>> 	return sk;
+>> }
+>>
+>> +static bool sock_type_connectible(u16 type)
+>> +{
+>> +	return type == SOCK_STREAM;
+>> +}
+>> +
+>> static void __vsock_release(struct sock *sk, int level)
+>> {
+>> 	if (sk) {
+>> @@ -785,7 +790,7 @@ static void __vsock_release(struct sock *sk, int level)
+>>
+>> 		if (vsk->transport)
+>> 			vsk->transport->release(vsk);
+>> -		else if (sk->sk_type == SOCK_STREAM)
+>> +		else if (sock_type_connectible(sk->sk_type))
+>> 			vsock_remove_sock(vsk);
+>>
+>> 		sock_orphan(sk);
+>> @@ -947,7 +952,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
+>> 	lock_sock(sk);
+>> 	if (sock->state == SS_UNCONNECTED) {
+>> 		err = -ENOTCONN;
+>> -		if (sk->sk_type == SOCK_STREAM)
+>> +		if (sock_type_connectible(sk->sk_type))
+>> 			goto out;
+>> 	} else {
+>> 		sock->state = SS_DISCONNECTING;
+>> @@ -960,7 +965,7 @@ static int vsock_shutdown(struct socket *sock, int mode)
+>> 		sk->sk_shutdown |= mode;
+>> 		sk->sk_state_change(sk);
+>>
+>> -		if (sk->sk_type == SOCK_STREAM) {
+>> +		if (sock_type_connectible(sk->sk_type)) {
+>> 			sock_reset_flag(sk, SOCK_DONE);
+>> 			vsock_send_shutdown(sk, mode);
+>> 		}
+>> @@ -1015,7 +1020,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
+>> 		if (!(sk->sk_shutdown & SEND_SHUTDOWN))
+>> 			mask |= EPOLLOUT | EPOLLWRNORM | EPOLLWRBAND;
+>>
+>> -	} else if (sock->type == SOCK_STREAM) {
+>> +	} else if (sock_type_connectible(sk->sk_type)) {
+>> 		const struct vsock_transport *transport;
+>>
+>> 		lock_sock(sk);
+>> @@ -1262,8 +1267,8 @@ static void vsock_connect_timeout(struct work_struct *work)
+>> 	sock_put(sk);
+>> }
+>>
+>> -static int vsock_stream_connect(struct socket *sock, struct sockaddr *addr,
+>> -				int addr_len, int flags)
+>> +static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>> +			 int addr_len, int flags)
+>> {
+>> 	int err;
+>> 	struct sock *sk;
+>> @@ -1413,7 +1418,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
+>>
+>> 	lock_sock(listener);
+>>
+>> -	if (sock->type != SOCK_STREAM) {
+>> +	if (!sock_type_connectible(sock->type)) {
+>> 		err = -EOPNOTSUPP;
+>> 		goto out;
+>> 	}
+>> @@ -1490,7 +1495,7 @@ static int vsock_listen(struct socket *sock, int backlog)
+>>
+>> 	lock_sock(sk);
+>>
+>> -	if (sock->type != SOCK_STREAM) {
+>> +	if (!sock_type_connectible(sk->sk_type)) {
+>> 		err = -EOPNOTSUPP;
+>> 		goto out;
+>> 	}
+>> @@ -1534,11 +1539,11 @@ static void vsock_update_buffer_size(struct vsock_sock *vsk,
+>> 	vsk->buffer_size = val;
+>> }
+>>
+>> -static int vsock_stream_setsockopt(struct socket *sock,
+>> -				   int level,
+>> -				   int optname,
+>> -				   sockptr_t optval,
+>> -				   unsigned int optlen)
+>> +static int vsock_connectible_setsockopt(struct socket *sock,
+>> +					int level,
+>> +					int optname,
+>> +					sockptr_t optval,
+>> +					unsigned int optlen)
+>> {
+>> 	int err;
+>> 	struct sock *sk;
+>> @@ -1616,10 +1621,10 @@ static int vsock_stream_setsockopt(struct socket *sock,
+>> 	return err;
+>> }
+>>
+>> -static int vsock_stream_getsockopt(struct socket *sock,
+>> -				   int level, int optname,
+>> -				   char __user *optval,
+>> -				   int __user *optlen)
+>> +static int vsock_connectible_getsockopt(struct socket *sock,
+>> +					int level, int optname,
+>> +					char __user *optval,
+>> +					int __user *optlen)
+>> {
+>> 	int err;
+>> 	int len;
+>> @@ -1687,8 +1692,8 @@ static int vsock_stream_getsockopt(struct socket *sock,
+>> 	return 0;
+>> }
+>>
+>> -static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+>> -				size_t len)
+>> +static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+>> +				     size_t len)
+>> {
+>> 	struct sock *sk;
+>> 	struct vsock_sock *vsk;
+>> @@ -1827,10 +1832,9 @@ static int vsock_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+>> 	return err;
+>> }
+>>
+>> -
+>> static int
+>> -vsock_stream_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>> -		     int flags)
+>> +vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>> +			  int flags)
+>> {
+>> 	struct sock *sk;
+>> 	struct vsock_sock *vsk;
+>> @@ -2006,7 +2010,7 @@ static const struct proto_ops vsock_stream_ops = {
+>> 	.owner = THIS_MODULE,
+>> 	.release = vsock_release,
+>> 	.bind = vsock_bind,
+>> -	.connect = vsock_stream_connect,
+>> +	.connect = vsock_connect,
+>> 	.socketpair = sock_no_socketpair,
+>> 	.accept = vsock_accept,
+>> 	.getname = vsock_getname,
+>> @@ -2014,10 +2018,10 @@ static const struct proto_ops vsock_stream_ops = {
+>> 	.ioctl = sock_no_ioctl,
+>> 	.listen = vsock_listen,
+>> 	.shutdown = vsock_shutdown,
+>> -	.setsockopt = vsock_stream_setsockopt,
+>> -	.getsockopt = vsock_stream_getsockopt,
+>> -	.sendmsg = vsock_stream_sendmsg,
+>> -	.recvmsg = vsock_stream_recvmsg,
+>> +	.setsockopt = vsock_connectible_setsockopt,
+>> +	.getsockopt = vsock_connectible_getsockopt,
+>> +	.sendmsg = vsock_connectible_sendmsg,
+>> +	.recvmsg = vsock_connectible_recvmsg,
+>> 	.mmap = sock_no_mmap,
+>> 	.sendpage = sock_no_sendpage,
+>> };
+>> -- 
+>> 2.25.1
+>>
+>
