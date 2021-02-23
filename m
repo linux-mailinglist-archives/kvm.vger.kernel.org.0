@@ -2,154 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7615E322C60
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 15:32:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03008322C82
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 15:38:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbhBWOcY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 09:32:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27538 "EHLO
+        id S233134AbhBWOgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 09:36:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34272 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233098AbhBWOcL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 09:32:11 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NEODgO079879;
-        Tue, 23 Feb 2021 09:31:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
+        by vger.kernel.org with ESMTP id S233120AbhBWOgP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 09:36:15 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NEWsAs051072;
+        Tue, 23 Feb 2021 09:35:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=1WO8mmr+eKBuOa3nE4/5UJIoESzkeEh1cGsFlVE7cb4=;
- b=fC67toktqHFjeWfXa2k+AnQTWeKD2ocw2JL2M3D+fbsrAc1TWB+Fof6zvEp1V3VvkQNc
- 2GNH61f6NtlulWjwrVcbBZUOMcNmnhR49y/pgLHdFCbIZLLhFWcdKPxUe217YDXtELxI
- 6WkXb5d9R0y7R1pPHDI7mCbHBGSK8zXofOnXCLcsNh5p/vbL5n9obdIkA6dlVRfECvZT
- oyTNpRYUGB94XSLmbpAc2gexqfeejxj2fr17sJJIpLi7kdpQTWwyfekOel82EAkI/+dZ
- 0NqsoK9XLM1eE6/qLZwPXjj3QJ8ivBMuG8vIJUuE0AIaC7uLjLb4UrZabsjta+sUMMw/ tQ== 
+ bh=ddCkdU+ctWpszHTsD4SbMD3fbLLXDXQq7PmNprWw1Ic=;
+ b=hPx0R9ken5hwO7t6QYB+xu67hQO4KmW2ZkSC18oSxdN9rnWYoYSOf9TjCc6HFy4HOoE4
+ udwjvScUx1FdQwWGIaVpEZzieRplsm4DHxDrKcLB2uSJCxu6xi7G16sJMs3cVC6aLtxI
+ g/LaWDWvPuAfOTlfZsMoKr22HcI64XQH+g58l2DfP+RqKkJfe8O4T1HmOdAByy/94Ey1
+ l6n2jQpScuqK9MZRMtINjXwuAXyzORyzKGDMWH/wTC6L+Bhgd26ZcR66Apb6WGDPRjMi
+ ZHpJJOnZpu0LL93656kEf91VvjCbTbljzMNuj8DZ9bsm7GjeTDuxYF0R7RsU5YKgNCjL 2g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfkrw76-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkg33dgt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 09:31:30 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NEPce7086203;
-        Tue, 23 Feb 2021 09:31:14 -0500
+        Tue, 23 Feb 2021 09:35:34 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NEWuvp052498;
+        Tue, 23 Feb 2021 09:35:34 -0500
 Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfkrw3u-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkg33dfd-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 09:31:14 -0500
+        Tue, 23 Feb 2021 09:35:34 -0500
 Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NESfPI001549;
-        Tue, 23 Feb 2021 14:31:10 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 36tt282pca-1
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NEW3jU005924;
+        Tue, 23 Feb 2021 14:35:32 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 36tt282pfy-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 14:31:10 +0000
+        Tue, 23 Feb 2021 14:35:31 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NEUtvp35586518
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NEZGSQ29950332
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Feb 2021 14:30:55 GMT
+        Tue, 23 Feb 2021 14:35:16 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B04D9A405C;
-        Tue, 23 Feb 2021 14:31:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id EE920A4062;
+        Tue, 23 Feb 2021 14:35:28 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51C1EA405F;
-        Tue, 23 Feb 2021 14:31:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 857A3A4054;
+        Tue, 23 Feb 2021 14:35:28 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.67.183])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Feb 2021 14:31:07 +0000 (GMT)
+        Tue, 23 Feb 2021 14:35:28 +0000 (GMT)
+Subject: Re: [kvm-unit-tests PATCH v2 3/5] s390x: lib: improve pgtable.h
 To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
         cohuck@redhat.com, pmorel@linux.ibm.com
 References: <20210223140759.255670-1-imbrenda@linux.ibm.com>
- <20210223140759.255670-3-imbrenda@linux.ibm.com>
+ <20210223140759.255670-4-imbrenda@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] s390x: lib: fix pgtable.h
-Message-ID: <518e0f86-bbba-bd52-3962-2816b2f8ccf6@linux.ibm.com>
-Date:   Tue, 23 Feb 2021 15:31:06 +0100
+Message-ID: <3e87c3ec-2b32-05d2-aaed-d844be847bf2@linux.ibm.com>
+Date:   Tue, 23 Feb 2021 15:35:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210223140759.255670-3-imbrenda@linux.ibm.com>
+In-Reply-To: <20210223140759.255670-4-imbrenda@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-23_07:2021-02-23,2021-02-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- priorityscore=1501 mlxlogscore=999 bulkscore=0 suspectscore=0 phishscore=0
- clxscore=1015 malwarescore=0 adultscore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102230119
+ definitions=2021-02-23_08:2021-02-23,2021-02-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 adultscore=0 priorityscore=1501 malwarescore=0
+ mlxlogscore=999 mlxscore=0 impostorscore=0 bulkscore=0 spamscore=0
+ phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2102230119
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 2/23/21 3:07 PM, Claudio Imbrenda wrote:
-> Fix pgtable.h:
+> Improve pgtable.h:
 > 
-> * SEGMENT_ENTRY_SFAA had one extra bit set
-> * pmd entries don't have a length
-> * ipte does not need to clear the lower bits
-> * pud entries should use SEGMENT_TABLE_LENGTH, as they point to segment tables
+> * add macros to check whether a pmd or a pud are large / huge
+> * add idte functions for pmd, pud, p4d and pgd
 > 
 > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+Could you please make the subject more specific?
+"s390x: lib: Add idte and huge entry check functions"
+
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
+
 > ---
->  lib/s390x/asm/pgtable.h | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+>  lib/s390x/asm/pgtable.h | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
 > 
 > diff --git a/lib/s390x/asm/pgtable.h b/lib/s390x/asm/pgtable.h
-> index 277f3480..a2ff2d4e 100644
+> index a2ff2d4e..70d4afde 100644
 > --- a/lib/s390x/asm/pgtable.h
 > +++ b/lib/s390x/asm/pgtable.h
-> @@ -60,7 +60,7 @@
->  #define SEGMENT_SHIFT			20
+> @@ -100,6 +100,9 @@
+>  #define pmd_none(entry) (pmd_val(entry) & SEGMENT_ENTRY_I)
+>  #define pte_none(entry) (pte_val(entry) & PAGE_ENTRY_I)
 >  
->  #define SEGMENT_ENTRY_ORIGIN		0xfffffffffffff800UL
-> -#define SEGMENT_ENTRY_SFAA		0xfffffffffff80000UL
-> +#define SEGMENT_ENTRY_SFAA		0xfffffffffff00000UL
->  #define SEGMENT_ENTRY_AV		0x0000000000010000UL
->  #define SEGMENT_ENTRY_ACC		0x000000000000f000UL
->  #define SEGMENT_ENTRY_F			0x0000000000000800UL
-> @@ -183,7 +183,7 @@ static inline pmd_t *pmd_alloc(pud_t *pud, unsigned long addr)
->  	if (pud_none(*pud)) {
->  		pmd_t *pmd = pmd_alloc_one();
->  		pud_val(*pud) = __pa(pmd) | REGION_ENTRY_TT_REGION3 |
-> -				REGION_TABLE_LENGTH;
-> +				SEGMENT_TABLE_LENGTH;
-
-@David: I'd much rather have REGION_ENTRY_LENGTH instead of
-REGION_TABLE_LENGTH and SEGMENT_TABLE_LENGTH.
-
-My argument is that this is not really an attribute of the table and
-very much specific to the format of the (region table) entry. We already
-have the table order as a length anyway...
-
-Could you tell me what you had in mind when splitting this?
-
->  	}
->  	return pmd_offset(pud, addr);
->  }
-> @@ -202,15 +202,14 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
->  {
->  	if (pmd_none(*pmd)) {
->  		pte_t *pte = pte_alloc_one();
-> -		pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT |
-> -				SEGMENT_TABLE_LENGTH;
-> +		pmd_val(*pmd) = __pa(pte) | SEGMENT_ENTRY_TT_SEGMENT;
-
-Uhhhh good catch!
-
->  	}
->  	return pte_offset(pmd, addr);
+> +#define pud_huge(entry)  (pud_val(entry) & REGION3_ENTRY_FC)
+> +#define pmd_large(entry) (pmd_val(entry) & SEGMENT_ENTRY_FC)
+> +
+>  #define pgd_addr(entry) __va(pgd_val(entry) & REGION_ENTRY_ORIGIN)
+>  #define p4d_addr(entry) __va(p4d_val(entry) & REGION_ENTRY_ORIGIN)
+>  #define pud_addr(entry) __va(pud_val(entry) & REGION_ENTRY_ORIGIN)
+> @@ -216,6 +219,34 @@ static inline void ipte(unsigned long vaddr, pteval_t *p_pte)
+>  		: : "a" (table_origin), "a" (vaddr) : "memory");
 >  }
 >  
->  static inline void ipte(unsigned long vaddr, pteval_t *p_pte)
->  {
-> -	unsigned long table_origin = (unsigned long)p_pte & PAGE_MASK;
-> +	unsigned long table_origin = (unsigned long)p_pte;
+> +static inline void idte(unsigned long table_origin, unsigned long vaddr)
+> +{
+> +	vaddr &= SEGMENT_ENTRY_SFAA;
+> +	asm volatile(
+> +		"	idte %0,0,%1\n"
+> +		: : "a" (table_origin), "a" (vaddr) : "memory");
+> +}
+> +
+> +static inline void idte_pmdp(unsigned long vaddr, pmdval_t *pmdp)
+> +{
+> +	idte((unsigned long)(pmdp - pmd_index(vaddr)) | ASCE_DT_SEGMENT, vaddr);
+> +}
+> +
+> +static inline void idte_pudp(unsigned long vaddr, pudval_t *pudp)
+> +{
+> +	idte((unsigned long)(pudp - pud_index(vaddr)) | ASCE_DT_REGION3, vaddr);
+> +}
+> +
+> +static inline void idte_p4dp(unsigned long vaddr, p4dval_t *p4dp)
+> +{
+> +	idte((unsigned long)(p4dp - p4d_index(vaddr)) | ASCE_DT_REGION2, vaddr);
+> +}
+> +
+> +static inline void idte_pgdp(unsigned long vaddr, pgdval_t *pgdp)
+> +{
+> +	idte((unsigned long)(pgdp - pgd_index(vaddr)) | ASCE_DT_REGION1, vaddr);
+> +}
+> +
+>  void configure_dat(int enable);
 >  
->  	asm volatile(
->  		"	ipte %0,%1\n"
+>  #endif /* _ASMS390X_PGTABLE_H_ */
 > 
-
-IPTE ignores that data but having the page mask also doesn't hurt so
-generally this is not a fix, right?
 
