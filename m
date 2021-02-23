@@ -2,98 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E452B3232C4
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:03:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD349323312
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:13:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234029AbhBWVCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 16:02:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49692 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232290AbhBWVAu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 16:00:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614113964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kOG5ouxkHwJB92685qf8wFfHRaVUmiy9Jy0UpVAA4qk=;
-        b=PksWX4v9X2I+gnoh3xUGv2OzkOoqI9omQIBGd6VSuUeiBoqxSxjlBZ/nkN0aGYUpuWPbv5
-        JibHIk0Rs98oUDtyeh8uVwFQONj37qw3idGE8eveF5vJL+v71MwGCbpkTudW6+egYP1nd9
-        Xm4Mj2wOHhSiqBWuqZBUmMqGFMdaEgQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-b6LrOC1WOhKPQ2PX5vTztw-1; Tue, 23 Feb 2021 15:59:20 -0500
-X-MC-Unique: b6LrOC1WOhKPQ2PX5vTztw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88AFE107ACFC;
-        Tue, 23 Feb 2021 20:59:17 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B8D605D9D0;
-        Tue, 23 Feb 2021 20:59:01 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
-        maz@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
-        alex.williamson@redhat.com, tn@semihalf.com, zhukeqian1@huawei.com
-Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        wangxingang5@huawei.com, jiangkunkun@huawei.com,
-        jean-philippe@linaro.org, zhangfei.gao@linaro.org,
-        zhangfei.gao@gmail.com, vivek.gautam@arm.com,
-        shameerali.kolothum.thodi@huawei.com, yuzenghui@huawei.com,
-        nicoleotsuka@gmail.com, lushenming@huawei.com, vsethi@nvidia.com
-Subject: [PATCH v14 13/13] iommu/smmuv3: Accept configs with more than one context descriptor
-Date:   Tue, 23 Feb 2021 21:56:34 +0100
-Message-Id: <20210223205634.604221-14-eric.auger@redhat.com>
-In-Reply-To: <20210223205634.604221-1-eric.auger@redhat.com>
-References: <20210223205634.604221-1-eric.auger@redhat.com>
+        id S234640AbhBWVMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 16:12:12 -0500
+Received: from 197.237.153.5.wananchi.com ([197.237.153.5]:63641 "EHLO
+        mail.detahost.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234576AbhBWVKa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 16:10:30 -0500
+X-Greylist: delayed 471 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Feb 2021 16:10:27 EST
+Message-ID: <285b12bf5c476d65999c2a8660d4fef0ed7812@documents.co.ke>
+Reply-To: "Kenya Business Plans" <info@documents.co.ke>
+From:   "Kenya Business Plans" <newsletter@documents.co.ke>
+To:     <kvm@vger.kernel.org>
+Subject: Kenya Cutomized Business Plans for only Kes 499/=
+Date:   Wed, 24 Feb 2021 00:01:41 +0300
+Organization: Kenya Business Plans
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="utf-8";
+Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; d=documents.co.ke; s=default;
+        c=relaxed/relaxed; t=1614114101;
+        h=message-id:from:to:subject:date:mime-version;
+        bh=8BwyX4f9rAOXp44Y3cUBvaUTSdqFDEf96x4lvcYxHAk=;
+        b=esTqtzmKeb7maK+FAu4ql+fKJ2w11446XZTCxbXf8RASWsxE7nf0AfeDKTlEEn
+        4ak7Z7SXZ3YehObyTgjCSEXKPh3j0eMYTerNxlDaUZXz6hxafY4ZsL/RAAHLF6so
+        2/LbZtASQknX7YZq7vST9pUWxcEOdD9Rp+Y6PpvRxrj6jzbqRc0VpYbskM0earBZ
+        lYZTvAmjfoR3i+eqtcd7R4eIukYDGoFkod4XOQ4np3IkPwFKEX1n0k8+4I6XH4UD
+        goN6yhM8e8jy1vzjmzs5DaAVJ0jBOO0MJy4eWznzblLYIajzKKSBvawLtkvdcR4T
+        iOCptqQYk0Lx4WCPQx6IxO8w==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation for vSVA, let's accept userspace provided configs
-with more than one CD. We check the max CD against the host iommu
-capability and also the format (linear versus 2 level).
+ =20
+Customized Kenya Business Plans
+Invest wisely by getting street smart market surveys, guides and info pac=
+ks with the sweet or harsh reality of the market.
+Actual Facts & Figures on Revenue, Mark Up, Wholesale, Retail prices, Com=
+petition, Survival rate, Differentiation, Capital, Process, Equipment, Su=
+ppliers, Opportunities, Licenses, Consumer Behaviour, Manpower Tips, Tric=
+ks & so so much more.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+We have comprehensive business plans in these categories:
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 332d31c0680f..ab74a0289893 100644
---- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -3038,14 +3038,17 @@ static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
- 		if (smmu_domain->s1_cfg.set)
- 			goto out;
- 
--		/*
--		 * we currently support a single CD so s1fmt and s1dss
--		 * fields are also ignored
--		 */
--		if (cfg->pasid_bits)
-+		list_for_each_entry(master, &smmu_domain->devices, domain_head) {
-+			if (cfg->pasid_bits > master->ssid_bits)
-+				goto out;
-+		}
-+		if (cfg->vendor_data.smmuv3.s1fmt == STRTAB_STE_0_S1FMT_64K_L2 &&
-+				!(smmu->features & ARM_SMMU_FEAT_2_LVL_CDTAB))
- 			goto out;
- 
- 		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
-+		smmu_domain->s1_cfg.s1cdmax = cfg->pasid_bits;
-+		smmu_domain->s1_cfg.s1fmt = cfg->vendor_data.smmuv3.s1fmt;
- 		smmu_domain->s1_cfg.set = true;
- 		smmu_domain->abort = false;
- 		break;
--- 
-2.26.2
+Agrovet
+Auto Glass Retail -17 Pages
+Bank Agency Fact-sheet
+Beef Butchery - 31 pages
+Boda Boda
+Bottled Water - 53 Pages
+Building Materials Yard - Dynamics & Case Study
+Car Wash Quick Guide
+Chapati Wholesale (Case Study)
+Chemist -Retail - 31 Pages
+Chicken Butchery
+Chips & Chicken Cafe - 31 Pages
+Concreting ( Koroga) Equipment Leasing - 29 Pages
+Corn Chips Snacks Making - 37 Pages
+Cosmetics Retail - 30 Pages
+Cosmetics Retail -30 Pages
+Courier - 35 Pages
+Cyber Cafe
+Day-care
+Electrical Parts Retail - 27 Pages
+Executive Barber Shop - 42 Pages
+Fish Supply - Nairobi Hotels Quick Overview
+Fish Supply - Nairobi Hotels Quick Survey
+Flowers - Nairobi (Retail/ Wholesale )
+Free Advertiser Magazine ( Quick Guide & Case Study )
+Fruit / Juice Parlour
+Gas (LPG) Retail
+Gift Service
+Gym - 38 pages
+Hair Salon
+Ice Lollies Making
+Ice Lollies Making ( Quick Guide )
+Imaging Clinic (Ultrasound and X-ray) - 46 Pages
+Inner-wear Retail - 27 Pages
+Laundry - 31 pages
+Leather: Skins Trade -26 Pages
+'Local' Bar - 48 Pages
+Maize Milling (Unga wa Ugali)
+Milk Distributorship
+Mitumba Clothes
+Money Lending - Informal Overview
+Motorcycle Spare Parts Retail -33 Pages
+Movie Shop
+M-pesa Sub Agent
+Nails (Misumari) Making - 60 Pages
+Non-Woven Bags Making -39 Pages
+Petrol Station (Independent) - 47 Pages
+Plumbing Hardware Retail - 35 Pages *New
+Primary School Business - 38 Pages
+Printing Business - 55 Pages
+Real Estate Agency - 42 Pages
+Second Hand Novels (R)
+Selling Cake Boxes
+Selling Cookies
+Senator Keg Bar
+Slot Machines Quick Guide
+Small Scale FMCG Distribution - New
+Smokies & Egg Vending
+Supermarket - 75 Pages
+Supermarket Shelf Space Guide
+Tents & Chairs Leasing
+Tiles Retail Business Fact-sheet
+Timber Yard - 32 Pages
+Tomato ( Greenhouse ) - Quick Market & Production Guide
+Tyres Retail Business - 29 Pages
 
+Invest wisely in 2020 by getting street smart market surveys with:
+- Market Analysis
+- Step by step establishing Process
+- Licenses - Issuing authority, cost, requirements
+- Equipment - Suppliers, Considerations, Cost
+- Other requirements
+- Suppliers & Prices
+- Raw Materials
+- Buying Selling Prices
+- Production Costs
+- Operational Costs
+- Day to day Operations
+- Revenue & Margins
+- Sample wholesale retail prices
+- Case Studies
+- Manpower
+- Capital breakdown
+- Opportunities
+- Competition
+- Surviving & Thriving
+- Analysis, figures, observations, dos & don'ts
+- Trends ,Tips, Tricks and so much more.
+
+To Download a Sample Business Plan Copy and paste the link below to your =
+browser
+
+https://drive.google.com/open?id=3D1gO2UiWble5J9oEvd8qH3oJ0XsrwvVdtQ
+
+The whole package of 65 Business Plans above is available Offer Price @ K=
+shs. 499. We are only selling the guides as a package.
+
+To Order Kindly use Lipa Na M-Pesa Buy Goods and Services Till No. 234931=
+.
+
+On payment kindly forward the Mpesa payment confirmation text and your em=
+ail address to +254 721 351 269.
+
+We deliver via email within 15 minutes of payment.
+
+TRIED, TESTED AND TRUSTED. Helping You Start a Business in Kenya With Les=
+s Risk!
+
+Kind Regards;
+
+
+Hashna A. Noor
+Manager - Sales & Marketing
+Kenya Business Plans Limited
++254721351269 | +254707559080
+78 Brookside Drive | Nairobi | Kenya
