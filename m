@@ -2,195 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A9A1322B7C
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:31:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03788322B81
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:34:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232844AbhBWNb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 08:31:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30481 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232655AbhBWNb1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 08:31:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614087000;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fSWdvo347njL+CLR2QBkSptIhJRRO13Vs6LTYTryDno=;
-        b=ZbG/8aVbnba5N/AnoFSjmzonyY9MDVrOLt8F+BYj3vKH7CN87MdQ9Jb6+Pq9Wdj8W2aL7H
-        O8PSOFCgqSjTi0miixdF+b0H+LeB8h2QYTKS7S8hgP1hZzpzX1Ea1AgciNJCKM76oqjlWt
-        vNMk5CyJPttnUb7118bJcyTBp7yU3OM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-6H-3devQMIufPt1SXmOSuA-1; Tue, 23 Feb 2021 08:29:56 -0500
-X-MC-Unique: 6H-3devQMIufPt1SXmOSuA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA20B18B9EF0;
-        Tue, 23 Feb 2021 13:29:54 +0000 (UTC)
-Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D3320513F6;
-        Tue, 23 Feb 2021 13:29:48 +0000 (UTC)
-Date:   Tue, 23 Feb 2021 14:29:46 +0100
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v3 5/5] s390x: css: testing measurement
- block format 1
-Message-ID: <20210223142946.2ac05ca7.cohuck@redhat.com>
-In-Reply-To: <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
-References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
-        <1613669204-6464-6-git-send-email-pmorel@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S232949AbhBWNcn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 08:32:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45002 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232933AbhBWNcl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 08:32:41 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82C04C061574
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 05:32:01 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id o63so12351527pgo.6
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 05:32:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding;
+        bh=hHZUbJhPLk9o6DvZseTdExs1WtaGzP9WxZ6tEy/AWRo=;
+        b=mmGQYRlAnN7UxkLvDn6c7WB5vR1PpEjdXmsaas7+e4jlQXfOAHgxMdLPXasF5grUwK
+         vt9L8O+WYzicfLsvT8DQcYascau7927v4ps38M72XQq7nKkZpx76h0gg3qynYXUJ3T62
+         15IGIOM28ZmCzyK5gTn2smrLTR1YEzAqmax4Ho0kDQKzA1GGRyvxkJv5sNpfeydf1rpd
+         oKuNxG3x4T6ZjGlQIgN4QX0BUXbwCsXpxmZZK7POg3+9NyQldO1OT2+w24qoOCScefL6
+         ThyBttjIML+i/PVXlsA0Y/SDf3lYmMCFvTS4XyZ9DCYOoVn12UKgL7+1LMWGaJMe5ExX
+         563g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
+        bh=hHZUbJhPLk9o6DvZseTdExs1WtaGzP9WxZ6tEy/AWRo=;
+        b=t8EwgG39wgAOKPo4grpMtQdDVxWJ5wD0EANfkSHxc5W0N6VYKl9O71NQJbdmmp4WI1
+         hM+DILy7E9qwlZdUISqEv5GVGoK/pdv4ki3iCQ7rwTPsZmtGLDLhwmFUM5ksqy5NS0wK
+         kEHajfmyRnBjLN894vJe4US+lN3DgOIiZOx3O6ONFwHLrAHKn1zqbbAnQMQt4G/OC+S6
+         FjF9R1oSWS9a5px91R/BPoPYPCavHYXp2zr0GpehlOmtliXrhg49uEVY1n/Fw/kmThA/
+         NjTCgo+8wy7ZXdhEtOH4m5NK5AynO3AlrR65Xyd3YwwlsT06Lm7O4xFcgA1K+AXsDYnV
+         XCiw==
+X-Gm-Message-State: AOAM531ic9A9IzENaQjb8HH3m71nCFynh2OlK1QUWkINF64Zkd4+tqMd
+        QYk2fCVGg2wCl+skbKTo97zt2w==
+X-Google-Smtp-Source: ABdhPJzI3rFr/Pef902twsyvVGLNIEXBsXMAmh/IEFaa4WGuj5Egp0mrBwsnge3YbeO5tBkpdp0zAA==
+X-Received: by 2002:a63:4956:: with SMTP id y22mr24558205pgk.309.1614087121032;
+        Tue, 23 Feb 2021 05:32:01 -0800 (PST)
+Received: from [10.85.116.39] ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id 72sm7965127pfv.5.2021.02.23.05.31.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Feb 2021 05:32:00 -0800 (PST)
+Subject: Re: [External] Re: [RESEND RFC: timer passthrough 0/9] Support timer
+ passthrough for VM
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        fweisbec@gmail.com, zhouyibo@bytedance.com,
+        zhanghaozhong@bytedance.com
+References: <20210205100317.24174-1-fengzhimin@bytedance.com>
+ <YCF/ZzI3OTBRMgVf@Konrads-MacBook-Pro.local>
+From:   Zhimin Feng <fengzhimin@bytedance.com>
+Message-ID: <99d0a029-9523-0dc4-aa37-e22fc9080960@bytedance.com>
+Date:   Tue, 23 Feb 2021 21:31:53 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <YCF/ZzI3OTBRMgVf@Konrads-MacBook-Pro.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Feb 2021 18:26:44 +0100
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Hi
 
-> Measurement block format 1 is made available by the extended
-> measurement block facility and is indicated in the SCHIB by
-> the bit in the PMCW.
-> 
-> The MBO is specified in the SCHIB of each channel and the MBO
-> defined by the SCHM instruction is ignored.
-> 
-> The test of the MB format 1 is just skipped if the feature is
-> not available.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/s390x/css.h     | 16 ++++++++++++++
->  lib/s390x/css_lib.c | 25 ++++++++++++++++++++-
->  s390x/css.c         | 53 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 93 insertions(+), 1 deletion(-)
-> 
+The host timer would be saved when cpu entry the non-root mode, and it 
+would be restored when cpu entry the root mode. So the guest doesn't the 
+host timer.
 
-(...)
+The host timer would be written to the preemption timer in non-root 
+mode. When the host timer is expired(preemption timer value is '0'), the 
+preemption timer would trigger immediate VMExit, so the host timer would 
+be handled in the preemption timer handler.
 
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index 4c8a6ae..1f09f93 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -298,7 +298,7 @@ static bool schib_update_mb(int schid, uint64_t mb, uint16_t mbi,
->  			pmcw->flags2 &= ~PMCW_MBF1;
->  
->  		pmcw->mbi = mbi;
-> -		schib.mbo = mb;
-> +		schib.mbo = mb & ~0x3f;
+Thanks!
 
-Merge this into the patch introducing the function?
+Zhimin
 
->  	} else {
->  		pmcw->flags &= ~(PMCW_MBUE | PMCW_DCTME);
->  	}
-> @@ -527,3 +527,26 @@ void enable_io_isc(uint8_t isc)
->  	value = (uint64_t)isc << 24;
->  	lctlg(6, value);
->  }
-> +
-> +void msch_with_wrong_fmt1_mbo(unsigned int schid, uint64_t mb)
-> +{
-> +	struct pmcw *pmcw = &schib.pmcw;
-> +	int cc;
-> +
-> +	/* Read the SCHIB for this subchannel */
-> +	cc = stsch(schid, &schib);
-> +	if (cc) {
-> +		report(0, "stsch: sch %08x failed with cc=%d", schid, cc);
-> +		return;
-> +	}
-> +
-> +	/* Update the SCHIB to enable the measurement block */
-> +	pmcw->flags |= PMCW_MBUE;
-> +	pmcw->flags2 |= PMCW_MBF1;
-> +	schib.mbo = mb;
-> +
-> +	/* Tell the CSS we want to modify the subchannel */
-> +	expect_pgm_int();
-> +	cc = msch(schid, &schib);
-> +	check_pgm_int_code(PGM_INT_CODE_OPERAND);
-> +}
-> diff --git a/s390x/css.c b/s390x/css.c
-> index b65aa89..576df48 100644
-> --- a/s390x/css.c
-> +++ b/s390x/css.c
-> @@ -257,6 +257,58 @@ end:
->  	report_prefix_pop();
->  }
->  
-> +/*
-> + * test_schm_fmt1:
-> + * With measurement block format 1 the mesurement block is
-> + * dedicated to a subchannel.
-> + */
-> +static void test_schm_fmt1(void)
-> +{
-> +	struct measurement_block_format1 *mb1;
-> +
-> +	report_prefix_push("Format 1");
-> +
-> +	if (!test_device_sid) {
-> +		report_skip("No device");
-> +		goto end;
-> +	}
-> +
-> +	if (!css_general_feature(CSSC_EXTENDED_MEASUREMENT_BLOCK)) {
-> +		report_skip("Extended measurement block not available");
-> +		goto end;
-> +	}
-> +
-> +	/* Allocate zeroed Measurement block */
-> +	mb1 = alloc_io_mem(sizeof(struct measurement_block_format1), 0);
-> +	if (!mb1) {
-> +		report_abort("measurement_block_format1 allocation failed");
-> +		goto end;
-> +	}
-> +
-> +	schm(NULL, 0); /* Stop any previous measurement */
-> +	schm(0, SCHM_MBU);
-> +
-> +	/* Expect error for non aligned MB */
-> +	report_prefix_push("Unaligned MB origin");
-> +	msch_with_wrong_fmt1_mbo(test_device_sid, (uint64_t)mb1 + 1);
-> +	report_prefix_pop();
-> +
-> +	/* Clear the measurement block for the next test */
-> +	memset(mb1, 0, sizeof(*mb1));
-> +
-> +	/* Expect success */
-> +	report_prefix_push("Valid MB address and index");
-> +	report(start_measure((u64)mb1, 0, true) &&
-> +	       mb1->ssch_rsch_count == SCHM_UPDATE_CNT,
-> +	       "SSCH measured %d", mb1->ssch_rsch_count);
-> +	report_prefix_pop();
-> +
-> +	schm(NULL, 0); /* Stop the measurement */
-
-Same here, I think you should call css_disable_mb().
-
-> +	free_io_mem(mb1, sizeof(struct measurement_block_format1));
-> +end:
-> +	report_prefix_pop();
-> +}
-> +
->  static struct {
->  	const char *name;
->  	void (*func)(void);
-> @@ -268,6 +320,7 @@ static struct {
->  	{ "sense (ssch/tsch)", test_sense },
->  	{ "measurement block (schm)", test_schm },
->  	{ "measurement block format0", test_schm_fmt0 },
-> +	{ "measurement block format1", test_schm_fmt1 },
->  	{ NULL, NULL }
->  };
->  
-
+在 2021/2/9 上午2:13, Konrad Rzeszutek Wilk 写道:
+> On Fri, Feb 05, 2021 at 06:03:08PM +0800, Zhimin Feng wrote:
+>> The main motivation for this patch is to improve the performance of VM.
+>> This patch series introduces how to enable the timer passthrough in
+>> non-root mode.
+> Nice! Those are impressive numbers!
+>
+>> The main idea is to offload the host timer to the preemtion timer in
+>> non-root mode. Through doing this, guest can write tscdeadline msr directly
+>> in non-root mode and host timer isn't lost. If CPU is in root mode,
+>> guest timer is switched to software timer.
+> I am sorry - but I am having a hard time understanding the sentence
+> above so let me ask some specific questions.
+>
+> - How do you protect against the guest DoS-ing the host and mucking with
+>    the host timer?
+>
+> - As in can you explain how the host can still continue scheduling it's
+>    own quanta?
+>
+> And one more - what happens with Live Migration? I would assume that
+> becomes a no-go anymore unless you swap in the guest timer back in? So
+> we end up emulating the MSR again?
+>
+> Thanks!
+>
+>> Testing on Intel(R) Xeon(R) Platinum 8260 server.
+>>
+>> The guest OS is Debian(kernel: 4.19.28). The specific configuration is
+>>   is as follows: 8 cpu, 16GB memory, guest idle=poll
+>> memcached in guest(memcached -d -t 8 -u root)
+>>
+>> I use the memtier_benchmark tool to test performance
+>> (memtier_benchmark -P memcache_text -s guest_ip -c 16 -t 32
+>>   --key-maximum=10000000000 --random-data --data-size-range=64-128 -p 11211
+>>   --generate-keys --ratio 5:1 --test-time=500)
+>>
+>> Total Ops can be improved 25% and Avg.Latency can be improved 20% when
+>> the timer-passthrough is enabled.
+>>
+>> =============================================================
+>>                 | Enable timer-passth | Disable timer-passth |
+>> =============================================================
+>> Totals Ops/sec |    514869.67        |     411766.67        |
+>> -------------------------------------------------------------
+>> Avg.Latency    |    0.99483          |     1.24294          |
+>> =============================================================
+>>
+>>
+>> Zhimin Feng (9):
+>>    KVM: vmx: hook set_next_event for getting the host tscd
+>>    KVM: vmx: enable host lapic timer offload preemtion timer
+>>    KVM: vmx: enable passthrough timer to guest
+>>    KVM: vmx: enable passth timer switch to sw timer
+>>    KVM: vmx: use tsc_adjust to enable tsc_offset timer passthrough
+>>    KVM: vmx: check enable_timer_passth strictly
+>>    KVM: vmx: save the initial value of host tscd
+>>    KVM: vmx: Dynamically open or close the timer-passthrough for pre-vm
+>>    KVM: vmx: query the state of timer-passth for vm
+>>
+>>   arch/x86/include/asm/kvm_host.h |  27 ++++
+>>   arch/x86/kvm/lapic.c            |   1 +
+>>   arch/x86/kvm/vmx/vmx.c          | 331 +++++++++++++++++++++++++++++++++++++++-
+>>   arch/x86/kvm/x86.c              |  26 +++-
+>>   include/linux/kvm_host.h        |   1 +
+>>   include/uapi/linux/kvm.h        |   3 +
+>>   kernel/time/tick-common.c       |   1 +
+>>   tools/include/uapi/linux/kvm.h  |   3 +
+>>   virt/kvm/kvm_main.c             |   1 +
+>>   9 files changed, 389 insertions(+), 5 deletions(-)
+>>
+>> -- 
+>> 2.11.0
+>>
