@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 634E03232F2
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:09:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52AF13232F6
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:09:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233117AbhBWVIQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 16:08:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38311 "EHLO
+        id S233166AbhBWVIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 16:08:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35689 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229460AbhBWVIN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 16:08:13 -0500
+        by vger.kernel.org with ESMTP id S232793AbhBWVIS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 16:08:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614114406;
+        s=mimecast20190719; t=1614114411;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CnOB9upSv3gmXiLbJB7XG4Tyob3YoikXOx0RnJ+CFUM=;
-        b=V+Jl/rTrqxFYkOoYpKSiOINeFFZBH3gO5rXFr6a5MOaZrBe/vP0q4NeovXa2OXPbQn8mU+
-        yvEhItGBHkc1tPD2rWcRKy75wwopN8KxRhzOJZ6Y8trVKAHT0DYiLwpTezYEC17NurANYN
-        1Q/k0T/BWzJhpSDWgDzTwZVN8EfkD34=
+        bh=E9G2bztNz5IPbAK0KIvufDi3eJyNQQv8IrYp7rCvMds=;
+        b=HXOAYdV+a/EtnRF2aQFUoAeVittXW8G4Qv/oUmgSVlYdNzzxVh4fJCGZi4o62szd+7WNi7
+        i2M4mi5oGeDwGkDMqIDV+FrVvAxF3iGqudunOPYUyNiEdC+8Zf6+v0dDciwjdCtWS8D9D5
+        fADhalOzVaYDy019WmS8lSpToy3BQMQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-q7OeracxNimw3F203Asihg-1; Tue, 23 Feb 2021 16:06:42 -0500
-X-MC-Unique: q7OeracxNimw3F203Asihg-1
+ us-mta-484-4up_iTJ7MWKlcCG1Zdk3LQ-1; Tue, 23 Feb 2021 16:06:48 -0500
+X-MC-Unique: 4up_iTJ7MWKlcCG1Zdk3LQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 788208030CC;
-        Tue, 23 Feb 2021 21:06:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B039CC624;
+        Tue, 23 Feb 2021 21:06:45 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F23E5D9D0;
-        Tue, 23 Feb 2021 21:06:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CFABE5D9D0;
+        Tue, 23 Feb 2021 21:06:39 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
         zhangfei.gao@gmail.com, vivek.gautam@arm.com,
         shameerali.kolothum.thodi@huawei.com, yuzenghui@huawei.com,
         nicoleotsuka@gmail.com, lushenming@huawei.com, vsethi@nvidia.com
-Subject: [PATCH v12 01/13] vfio: VFIO_IOMMU_SET_PASID_TABLE
-Date:   Tue, 23 Feb 2021 22:06:13 +0100
-Message-Id: <20210223210625.604517-2-eric.auger@redhat.com>
+Subject: [PATCH v12 02/13] vfio: VFIO_IOMMU_CACHE_INVALIDATE
+Date:   Tue, 23 Feb 2021 22:06:14 +0100
+Message-Id: <20210223210625.604517-3-eric.auger@redhat.com>
 In-Reply-To: <20210223210625.604517-1-eric.auger@redhat.com>
 References: <20210223210625.604517-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -59,160 +59,154 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
 
-This patch adds an VFIO_IOMMU_SET_PASID_TABLE ioctl
-which aims to pass the virtual iommu guest configuration
-to the host. This latter takes the form of the so-called
-PASID table.
+When the guest "owns" the stage 1 translation structures,  the host
+IOMMU driver has no knowledge of caching structure updates unless
+the guest invalidation requests are trapped and passed down to the
+host.
 
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims
+at propagating guest stage1 IOMMU cache invalidations to the host.
+
 Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 v11 -> v12:
-- use iommu_uapi_set_pasid_table
-- Rework the flags checks [Zenghui, Alex]
-- use VFIO_BASE + 19 [Alex]
-- rework the unwind in vfio_attach_pasid_table() [Alex]
+- share VFIO_BASE + 19 with VFIO_IOMMU_SPAPR_TCE_CREATE
+
+v10 -> v11:
+- renamed ustruct into cache_inv
 
 v8 -> v9:
-- Merge VFIO_IOMMU_ATTACH/DETACH_PASID_TABLE into a single
-  VFIO_IOMMU_SET_PASID_TABLE ioctl.
+- change the ioctl ID
 
 v6 -> v7:
-- add a comment related to VFIO_IOMMU_DETACH_PASID_TABLE
-
-v3 -> v4:
-- restore ATTACH/DETACH
-- add unwind on failure
+- Use iommu_capsule struct
+- renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
+  due to checkpatch error related to for_each_dev suffix
 
 v2 -> v3:
-- s/BIND_PASID_TABLE/SET_PASID_TABLE
+- introduce vfio_iommu_for_each_dev back in this patch
 
 v1 -> v2:
-- s/BIND_GUEST_STAGE/BIND_PASID_TABLE
-- remove the struct device arg
+- s/TLB/CACHE
+- remove vfio_iommu_task usage
+- commit message rewording
 ---
  drivers/vfio/vfio_iommu_type1.c | 58 +++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       | 19 +++++++++++
- 2 files changed, 77 insertions(+)
+ include/uapi/linux/vfio.h       | 13 ++++++++
+ 2 files changed, 71 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 0b4dedaa9128..50c4f8ae5b03 100644
+index 50c4f8ae5b03..b4057ce809b0 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2587,6 +2587,39 @@ static int vfio_iommu_iova_build_caps(struct vfio_iommu *iommu,
- 	return ret;
- }
+@@ -143,6 +143,34 @@ struct vfio_regions {
+ #define DIRTY_BITMAP_PAGES_MAX	 ((u64)INT_MAX)
+ #define DIRTY_BITMAP_SIZE_MAX	 DIRTY_BITMAP_BYTES(DIRTY_BITMAP_PAGES_MAX)
  
-+static void
-+vfio_detach_pasid_table(struct vfio_iommu *iommu)
-+{
-+	struct vfio_domain *d;
++struct domain_capsule {
++	struct iommu_domain *domain;
++	void *data;
++};
 +
-+	mutex_lock(&iommu->lock);
-+	list_for_each_entry(d, &iommu->domain_list, next)
-+		iommu_detach_pasid_table(d->domain);
-+
-+	mutex_unlock(&iommu->lock);
-+}
-+
++/* iommu->lock must be held */
 +static int
-+vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
++vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
++		      int (*fn)(struct device *dev, void *data),
++		      unsigned long arg)
 +{
++	struct domain_capsule dc = {.data = &arg};
 +	struct vfio_domain *d;
++	struct vfio_group *g;
 +	int ret = 0;
 +
-+	mutex_lock(&iommu->lock);
-+
 +	list_for_each_entry(d, &iommu->domain_list, next) {
-+		ret = iommu_uapi_attach_pasid_table(d->domain, (void __user *)arg);
-+		if (ret) {
-+			list_for_each_entry_continue_reverse(d, &iommu->domain_list, next)
-+				iommu_detach_pasid_table(d->domain);
-+			break;
++		dc.domain = d->domain;
++		list_for_each_entry(g, &d->group_list, next) {
++			ret = iommu_group_for_each_dev(g->iommu_group,
++						       &dc, fn);
++			if (ret)
++				break;
 +		}
 +	}
-+
-+	mutex_unlock(&iommu->lock);
 +	return ret;
 +}
 +
+ static int put_pfn(unsigned long pfn, int prot);
+ 
+ static struct vfio_group *vfio_iommu_find_iommu_group(struct vfio_iommu *iommu,
+@@ -2619,6 +2647,13 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu, unsigned long arg)
+ 	mutex_unlock(&iommu->lock);
+ 	return ret;
+ }
++static int vfio_cache_inv_fn(struct device *dev, void *data)
++{
++	struct domain_capsule *dc = (struct domain_capsule *)data;
++	unsigned long arg = *(unsigned long *)dc->data;
++
++	return iommu_uapi_cache_invalidate(dc->domain, dev, (void __user *)arg);
++}
+ 
  static int vfio_iommu_migration_build_caps(struct vfio_iommu *iommu,
  					   struct vfio_info_cap *caps)
- {
-@@ -2747,6 +2780,29 @@ static int vfio_iommu_type1_unmap_dma(struct vfio_iommu *iommu,
- 			-EFAULT : 0;
+@@ -2803,6 +2838,27 @@ static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
+ 	return -EINVAL;
  }
  
-+static int vfio_iommu_type1_set_pasid_table(struct vfio_iommu *iommu,
++static int vfio_iommu_type1_cache_invalidate(struct vfio_iommu *iommu,
 +					    unsigned long arg)
 +{
-+	struct vfio_iommu_type1_set_pasid_table spt;
++	struct vfio_iommu_type1_cache_invalidate cache_inv;
 +	unsigned long minsz;
++	int ret;
 +
-+	minsz = offsetofend(struct vfio_iommu_type1_set_pasid_table, flags);
++	minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate, flags);
 +
-+	if (copy_from_user(&spt, (void __user *)arg, minsz))
++	if (copy_from_user(&cache_inv, (void __user *)arg, minsz))
 +		return -EFAULT;
 +
-+	if (spt.argsz < minsz)
++	if (cache_inv.argsz < minsz || cache_inv.flags)
 +		return -EINVAL;
 +
-+	if (spt.flags == VFIO_PASID_TABLE_FLAG_SET) {
-+		return vfio_attach_pasid_table(iommu, arg + minsz);
-+	} else if (spt.flags == VFIO_PASID_TABLE_FLAG_UNSET) {
-+		vfio_detach_pasid_table(iommu);
-+		return 0;
-+	}
-+	return -EINVAL;
++	mutex_lock(&iommu->lock);
++	ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn, arg + minsz);
++	mutex_unlock(&iommu->lock);
++	return ret;
 +}
 +
  static int vfio_iommu_type1_dirty_pages(struct vfio_iommu *iommu,
  					unsigned long arg)
  {
-@@ -2867,6 +2923,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 		return vfio_iommu_type1_unmap_dma(iommu, arg);
- 	case VFIO_IOMMU_DIRTY_PAGES:
+@@ -2925,6 +2981,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
  		return vfio_iommu_type1_dirty_pages(iommu, arg);
-+	case VFIO_IOMMU_SET_PASID_TABLE:
-+		return vfio_iommu_type1_set_pasid_table(iommu, arg);
+ 	case VFIO_IOMMU_SET_PASID_TABLE:
+ 		return vfio_iommu_type1_set_pasid_table(iommu, arg);
++	case VFIO_IOMMU_CACHE_INVALIDATE:
++		return vfio_iommu_type1_cache_invalidate(iommu, arg);
  	default:
  		return -ENOTTY;
  	}
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index d1812777139f..6d77779c941d 100644
+index 6d77779c941d..ee6747ff8006 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -14,6 +14,7 @@
+@@ -1200,6 +1200,19 @@ struct vfio_iommu_type1_set_pasid_table {
  
- #include <linux/types.h>
- #include <linux/ioctl.h>
-+#include <linux/iommu.h>
+ #define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 18)
  
- #define VFIO_API_VERSION	0
- 
-@@ -1181,6 +1182,24 @@ struct vfio_iommu_type1_dirty_bitmap_get {
- 
- #define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
- 
-+/*
-+ * VFIO_IOMMU_SET_PASID_TABLE - _IOWR(VFIO_TYPE, VFIO_BASE + 18,
-+ *			struct vfio_iommu_type1_set_pasid_table)
++/**
++ * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 19,
++ *			struct vfio_iommu_type1_cache_invalidate)
 + *
-+ * The SET operation passes a PASID table to the host while the
-+ * UNSET operation detaches the one currently programmed. Setting
-+ * a table while another is already programmed replaces the old table.
++ * Propagate guest IOMMU cache invalidation to the host.
 + */
-+struct vfio_iommu_type1_set_pasid_table {
-+	__u32	argsz;
-+	__u32	flags;
-+#define VFIO_PASID_TABLE_FLAG_SET	(1 << 0)
-+#define VFIO_PASID_TABLE_FLAG_UNSET	(1 << 1)
-+	struct iommu_pasid_table_config config; /* used on SET */
++struct vfio_iommu_type1_cache_invalidate {
++	__u32   argsz;
++	__u32   flags;
++	struct iommu_cache_invalidate_info info;
 +};
-+
-+#define VFIO_IOMMU_SET_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 18)
++#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 19)
 +
  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
  
