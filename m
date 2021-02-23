@@ -2,131 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 498613233E7
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 23:52:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E96532340B
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 00:10:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbhBWWqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 17:46:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50750 "EHLO
+        id S232267AbhBWWzQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 17:55:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232847AbhBWWnb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Feb 2021 17:43:31 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C60C06178A
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 14:42:47 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id e9so3006826pjj.0
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 14:42:47 -0800 (PST)
+        with ESMTP id S233544AbhBWWwL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 17:52:11 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6951C061786
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 14:51:30 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id q20so9784137pfu.8
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 14:51:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=3X9RsbT+EkP8KOLo4leGyvzPPYNl+5jnHk95JrGfpNc=;
-        b=DjiTtFBjXhh9NgpVr88R1zSE+9jtAiD2zCqSurmyDlmqYcv1kenhoFbpwv+QJeI4gH
-         SE5QjjM6ifKOMzpNB/7YEGBydTNOOd5g3RL3DtT3zoTxwJ00KG0h25BCJ0EXjze+0rP3
-         wmNhbBsGke79Hl/tW5Akvj7RVk2vRSIPQr4kIk4yOkxE1OiV9gbFqEfXe2nbUBpERlU3
-         xq172LBuxoZuYxHi8Scp1BKF0fqSBZv8jQnhKkoTR8KrT7kDeApPXGDLmC+fbPZFQRRA
-         iNS3AMxBmj7nJxPKjcxg31GM1WPEU1uM5g8sjuDyC098sIp0NyHpRUeF7k2vFfNsmPQY
-         rgNg==
+        bh=ttBsWjyLSVhAbB5Dr48jKcxza7yyyr0KgTN3fQrwYqc=;
+        b=peI5aM6IZ95/RV+lZK+vuJZJEWrN2dJDppCY0s5O5C1eMe/u0uGvUdXrucQPBOssY7
+         ut22yq4EIIR8hbLTUEzQ3gTJ22xM/q+qro0cq5v0HVjjD0wJLIXUVge9PppWRO3FQX2z
+         j6pL7xHwxsVI/haWeP9LVgX/rwaeHjrJJf1Vt2MhihwW2NgzwhGLm/8yWgCUShAbycWc
+         cRbZPKOujYMDRiQ2AiE7fjMtL5bFDErZ5PuK6Rdp0YXLTKTVr5q0XLthLm0zR/oNFjlL
+         nYpKHwhXjeXLaSyi8gGtBmfrSeR7NBPQdqc73OGwwqhXcZp4IrDTDO9sgpyoxrzNPrFT
+         o4cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=3X9RsbT+EkP8KOLo4leGyvzPPYNl+5jnHk95JrGfpNc=;
-        b=pwskEPfXUAYoSRLUmxJjhuy3oYflhwL3dSVhglVC9JOXCI7vE9jnZ3UmngPFHGS35h
-         ujgvchru+wQstZyl14vjtnRq2K6eo1aqIbqqhaa1l8QpumpzXP6fG7GxKXhYiD8bIX21
-         T6YTj/4LDhyvLb2h1uq3O2ZrepbEDfcBVf5WXD83X9dNYZhEdmPrrjVoOesa69Vg/HOt
-         qsSNRs4QJcPlu5h0YPyuloVhnMfpbUq26j/x5WEA5XsjpSp7rTxPocPFrm8p0YSoo6wJ
-         Su58UQPsCa7V/JQ4jt/yGjmdjQxzruLCAHZGxW6PtICSMJOp+IBPamQFj3p2qlj0mLrN
-         oz9Q==
-X-Gm-Message-State: AOAM532rAnyt9SNa06Yvv59iDZaT80E+9EY5bPWzH6PfeGIk65L5CpiX
-        6jTjDksm9rHt4Igwn5od03A84mH2nqme/A==
-X-Google-Smtp-Source: ABdhPJyT1f4IHJ5oXjH7bwHWT4VnjXnzUZIyBmJPepe9KUByAVJ95lPhNMmCH36wQXbZmpn9AvmAHw==
-X-Received: by 2002:a17:90b:941:: with SMTP id dw1mr1036216pjb.35.1614120166898;
-        Tue, 23 Feb 2021 14:42:46 -0800 (PST)
+        bh=ttBsWjyLSVhAbB5Dr48jKcxza7yyyr0KgTN3fQrwYqc=;
+        b=Z3cl5SnOH+oBQgBMQFBrKWUn0L+k09VLASRejoq6e66EaaPE+nNZp/I077l/LyeSYq
+         3+vI9zhw670wvCYK/Ibat5NRCllO4k01243BbyOUVWcZSXLJ93gSJsOqkwEvqVXPiHn4
+         FoZu9IPuFhJGK3vQhzxMbNGmfTsZgd+BPh38s8zLYJ3IHruQZf08rP0IxUyUboiQMBup
+         Oydk+BLn1a+7PA3gTB0HWGmpdkhF8OMyfE0weyuVwTh8GkjUsDQa+DhHH6MQi55jFakn
+         kSSXuwN5K8uEButb6XrzOQDB/pzfMDrygv0n9jGXDqXW4QBZIqL0nNDsgSO0KsvrCtJI
+         Wawg==
+X-Gm-Message-State: AOAM533FUo8whiGPTTAEChrgEFlZ4xesVQPTOR7cdItf2hTmkeJxsnpu
+        A1VQ/IyPfJOYWcKKlmv/u9pTxqjHQGzEKg==
+X-Google-Smtp-Source: ABdhPJyv/nNxjK2cfks0xqxZ7ShsLpN+vjAq8wBNnw/7e9+HFI8TGSySz9yIOROT3agpGQdIy/HWUQ==
+X-Received: by 2002:aa7:94b7:0:b029:1ed:c7e8:d7f3 with SMTP id a23-20020aa794b70000b02901edc7e8d7f3mr7062926pfl.28.1614120690132;
+        Tue, 23 Feb 2021 14:51:30 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:c939:813f:76bc:d651])
-        by smtp.gmail.com with ESMTPSA id ga17sm162200pjb.7.2021.02.23.14.42.45
+        by smtp.gmail.com with ESMTPSA id d189sm223746pfd.42.2021.02.23.14.51.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 14:42:46 -0800 (PST)
-Date:   Tue, 23 Feb 2021 14:42:37 -0800
+        Tue, 23 Feb 2021 14:51:29 -0800 (PST)
+Date:   Tue, 23 Feb 2021 14:51:19 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH 1/4 v3] KVM: nSVM: Do not advance RIP following VMRUN
- completion if the latter is single-stepped
-Message-ID: <YDWE3cYXoQRq+XZ3@google.com>
-References: <20210223191958.24218-1-krish.sadhukhan@oracle.com>
- <20210223191958.24218-2-krish.sadhukhan@oracle.com>
+To:     David Edmondson <david.edmondson@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86: dump_vmcs should not assume
+ GUEST_IA32_EFER is valid
+Message-ID: <YDWG51Io0VJEBHGg@google.com>
+References: <20210219144632.2288189-1-david.edmondson@oracle.com>
+ <20210219144632.2288189-2-david.edmondson@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210223191958.24218-2-krish.sadhukhan@oracle.com>
+In-Reply-To: <20210219144632.2288189-2-david.edmondson@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 23, 2021, Krish Sadhukhan wrote:
-> Currently, svm_vcpu_run() advances the RIP following VMRUN completion when
-> control returns to host. This works fine if there is no trap flag set
-> on the VMRUN instruction i.e., if VMRUN is not single-stepped. But if
-> VMRUN is single-stepped, this advancement of the RIP leads to an incorrect
-> RIP in the #DB handler invoked for the single-step trap. Therefore, check
-> if the VMRUN instruction is single-stepped and if so, do not advance the RIP
-> when the #DB intercept #VMEXIT happens.
-
-This really needs to clarify which VMRUN, i.e. L0 vs. L1.  AFAICT, you're
-talking about both at separate times.  Is this an issue with L1 single-stepping
-its VMRUN, L0 single-stepping its VMRUN, L0 single-stepping L1's VMRUN, ???
- 
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oraacle.com>
-> ---
->  arch/x86/kvm/svm/svm.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+On Fri, Feb 19, 2021, David Edmondson wrote:
+> If the VM entry/exit controls for loading/saving MSR_EFER are either
+> not available (an older processor or explicitly disabled) or not
+> used (host and guest values are the same), reading GUEST_IA32_EFER
+> from the VMCS returns an inaccurate value.
 > 
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3442d44ca53b..427d32213f51 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -3740,6 +3740,8 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu,
->  	instrumentation_end();
->  }
->  
-> +static bool single_step_vmrun = false;
+> Because of this, in dump_vmcs() don't use GUEST_IA32_EFER to decide
+> whether to print the PDPTRs - do so if the EPT is in use and CR4.PAE
+> is set.
 
-Sharing a global flag amongst all vCPUs isn't going to fare well...
+This isn't necessarily correct either.  In a way, it's less correct as PDPTRs
+are more likely to be printed when they shouldn't, assuming most guests are
+64-bit guests.  It's annoying to calculate the effective guest EFER, but so
+awful that it's worth risking confusion over PDTPRs.
 
-> +
->  static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
-> @@ -3800,6 +3802,10 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+> Fixes: 4eb64dce8d0a ("KVM: x86: dump VMCS on invalid entry")
+> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index eb69fef57485..818051c9fa10 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5759,7 +5759,6 @@ void dump_vmcs(void)
+>  	u32 vmentry_ctl, vmexit_ctl;
+>  	u32 cpu_based_exec_ctrl, pin_based_exec_ctrl, secondary_exec_control;
+>  	unsigned long cr4;
+> -	u64 efer;
 >  
->  	svm_vcpu_enter_exit(vcpu, svm);
->  
-> +	if (svm->vmcb->control.exit_code == SVM_EXIT_VMRUN &&
-> +	    (svm->vmcb->save.rflags & X86_EFLAGS_TF))
-> +                single_step_vmrun = true;
-> +
->  	/*
->  	 * We do not use IBRS in the kernel. If this vCPU has used the
->  	 * SPEC_CTRL MSR it may have left it on; save the value and
-> @@ -3827,7 +3833,11 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->  		vcpu->arch.cr2 = svm->vmcb->save.cr2;
->  		vcpu->arch.regs[VCPU_REGS_RAX] = svm->vmcb->save.rax;
->  		vcpu->arch.regs[VCPU_REGS_RSP] = svm->vmcb->save.rsp;
-> -		vcpu->arch.regs[VCPU_REGS_RIP] = svm->vmcb->save.rip;
-> +		if (single_step_vmrun && svm->vmcb->control.exit_code ==
-> +		    SVM_EXIT_EXCP_BASE + DB_VECTOR)
-> +			single_step_vmrun = false;
-
-Even if you fix the global flag issue, this can't possibly work if userspace
-changes state, if VMRUN fails and leaves a timebomb, and probably any number of
-other conditions.
-
-> +		else
-> +			vcpu->arch.regs[VCPU_REGS_RIP] = svm->vmcb->save.rip;
->  	}
->  
->  	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+>  	if (!dump_invalid_vmcs) {
+>  		pr_warn_ratelimited("set kvm_intel.dump_invalid_vmcs=1 to dump internal KVM state.\n");
+> @@ -5771,7 +5770,6 @@ void dump_vmcs(void)
+>  	cpu_based_exec_ctrl = vmcs_read32(CPU_BASED_VM_EXEC_CONTROL);
+>  	pin_based_exec_ctrl = vmcs_read32(PIN_BASED_VM_EXEC_CONTROL);
+>  	cr4 = vmcs_readl(GUEST_CR4);
+> -	efer = vmcs_read64(GUEST_IA32_EFER);
+>  	secondary_exec_control = 0;
+>  	if (cpu_has_secondary_exec_ctrls())
+>  		secondary_exec_control = vmcs_read32(SECONDARY_VM_EXEC_CONTROL);
+> @@ -5784,8 +5782,7 @@ void dump_vmcs(void)
+>  	       cr4, vmcs_readl(CR4_READ_SHADOW), vmcs_readl(CR4_GUEST_HOST_MASK));
+>  	pr_err("CR3 = 0x%016lx\n", vmcs_readl(GUEST_CR3));
+>  	if ((secondary_exec_control & SECONDARY_EXEC_ENABLE_EPT) &&
+> -	    (cr4 & X86_CR4_PAE) && !(efer & EFER_LMA))
+> -	{
+> +	    (cr4 & X86_CR4_PAE)) {
+>  		pr_err("PDPTR0 = 0x%016llx  PDPTR1 = 0x%016llx\n",
+>  		       vmcs_read64(GUEST_PDPTR0), vmcs_read64(GUEST_PDPTR1));
+>  		pr_err("PDPTR2 = 0x%016llx  PDPTR3 = 0x%016llx\n",
+> @@ -5811,7 +5808,8 @@ void dump_vmcs(void)
+>  	if ((vmexit_ctl & (VM_EXIT_SAVE_IA32_PAT | VM_EXIT_SAVE_IA32_EFER)) ||
+>  	    (vmentry_ctl & (VM_ENTRY_LOAD_IA32_PAT | VM_ENTRY_LOAD_IA32_EFER)))
+>  		pr_err("EFER =     0x%016llx  PAT = 0x%016llx\n",
+> -		       efer, vmcs_read64(GUEST_IA32_PAT));
+> +		       vmcs_read64(GUEST_IA32_EFER),
+> +		       vmcs_read64(GUEST_IA32_PAT));
+>  	pr_err("DebugCtl = 0x%016llx  DebugExceptions = 0x%016lx\n",
+>  	       vmcs_read64(GUEST_IA32_DEBUGCTL),
+>  	       vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS));
 > -- 
-> 2.27.0
+> 2.30.0
 > 
