@@ -2,140 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD9803220B8
-	for <lists+kvm@lfdr.de>; Mon, 22 Feb 2021 21:18:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A041E3223D2
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 02:49:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233418AbhBVURT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 15:17:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbhBVURR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 15:17:17 -0500
-X-Greylist: delayed 707 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 22 Feb 2021 12:16:37 PST
-Received: from zero.eik.bme.hu (zero.eik.bme.hu [IPv6:2001:738:2001:2001::2001])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD78C061574
-        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 12:16:37 -0800 (PST)
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
-        by localhost (Postfix) with SMTP id 02F4C7462D3;
-        Mon, 22 Feb 2021 21:03:56 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
-        id B583A7462BD; Mon, 22 Feb 2021 21:03:55 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by zero.eik.bme.hu (Postfix) with ESMTP id B37E474581E;
-        Mon, 22 Feb 2021 21:03:55 +0100 (CET)
-Date:   Mon, 22 Feb 2021 21:03:55 +0100 (CET)
-From:   BALATON Zoltan <balaton@eik.bme.hu>
-To:     =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-cc:     qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
-        Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org,
-        Paul Durrant <paul@xen.org>,
-        David Hildenbrand <david@redhat.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        xen-devel@lists.xenproject.org, Leif Lindholm <leif@nuviainc.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Greg Kurz <groug@kaod.org>, qemu-s390x@nongnu.org,
-        qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        qemu-ppc@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>
-Subject: Re: [PATCH v2 04/11] hw/arm: Restrit KVM to the virt & versal
- machines
-In-Reply-To: <20210219173847.2054123-5-philmd@redhat.com>
-Message-ID: <36692cea-e747-b054-51ff-bbcfbbdd4151@eik.bme.hu>
-References: <20210219173847.2054123-1-philmd@redhat.com> <20210219173847.2054123-5-philmd@redhat.com>
+        id S230248AbhBWBss (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 20:48:48 -0500
+Received: from mga01.intel.com ([192.55.52.88]:61186 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230099AbhBWBss (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 20:48:48 -0500
+IronPort-SDR: 7FhznoiHTqU5i/ixzuUKyErezaQgRbIjVK3/13WowIu1j9V2K6gFQLjj4w11wXNaU6YCyDUOHQ
+ yA1o0NOvamGQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9903"; a="204074435"
+X-IronPort-AV: E=Sophos;i="5.81,198,1610438400"; 
+   d="scan'208";a="204074435"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2021 17:47:02 -0800
+IronPort-SDR: TnqcXWgI8AzeQoutJT/a0nG3o/Kg5Ru5L7vxJfg/4eMqupzJMgW45FmjKX22B5H/C6J3AOQRzV
+ Cj9N5heluTNw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,198,1610438400"; 
+   d="scan'208";a="423349289"
+Received: from clx-ap-likexu.sh.intel.com ([10.239.48.108])
+  by fmsmga004.fm.intel.com with ESMTP; 22 Feb 2021 17:46:59 -0800
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] KVM: vmx/pmu: Fix dummy check if lbr_desc->event is created
+Date:   Tue, 23 Feb 2021 09:39:57 +0800
+Message-Id: <20210223013958.1280444-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="3866299591-317435051-1614024235=:60531"
-X-Spam-Checker-Version: Sophos PMX: 6.4.8.2820816, Antispam-Engine: 2.7.2.2107409, Antispam-Data: 2021.2.22.191817, AntiVirus-Engine: 5.79.0, AntiVirus-Data: 2020.12.21.5790000
-X-Spam-Flag: NO
-X-Spam-Probability: 9%
-X-Spam-Level: 
-X-Spam-Status: No, score=9% required=50%
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+If lbr_desc->event is successfully created, the intel_pmu_create_
+guest_lbr_event() will return 0, otherwise it will return -ENOENT,
+and then jump to LBR msrs dummy handling.
 
---3866299591-317435051-1614024235=:60531
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Fixes: 1b5ac3226a1a ("KVM: vmx/pmu: Pass-through LBR msrs when the guest LBR event is ACTIVE")
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
+---
+ arch/x86/kvm/vmx/pmu_intel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Fri, 19 Feb 2021, Philippe Mathieu-Daudé wrote:
-> Restrit KVM to the following ARM machines:
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index d1df618cb7de..d6a5fe19ff09 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -320,7 +320,7 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+ 	if (!intel_pmu_is_valid_lbr_msr(vcpu, index))
+ 		return false;
+ 
+-	if (!lbr_desc->event && !intel_pmu_create_guest_lbr_event(vcpu))
++	if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu))
+ 		goto dummy;
+ 
+ 	/*
+-- 
+2.29.2
 
-Typo: "Restrict" (also in patch title).
-
-Regards,
-BALATON Zoltan
-
-> - virt
-> - xlnx-versal-virt
->
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> hw/arm/virt.c             | 5 +++++
-> hw/arm/xlnx-versal-virt.c | 5 +++++
-> 2 files changed, 10 insertions(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 371147f3ae9..8e9861b61a9 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2527,6 +2527,10 @@ static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
->     return NULL;
-> }
->
-> +static const char *const valid_accels[] = {
-> +    "tcg", "kvm", "hvf", NULL
-> +};
-> +
-> /*
->  * for arm64 kvm_type [7-0] encodes the requested number of bits
->  * in the IPA address space
-> @@ -2582,6 +2586,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
->     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
->     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
->     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
-> +    mc->valid_accelerators = valid_accels;
->     mc->kvm_type = virt_kvm_type;
->     assert(!mc->get_hotplug_handler);
->     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-> index 8482cd61960..d424813cae1 100644
-> --- a/hw/arm/xlnx-versal-virt.c
-> +++ b/hw/arm/xlnx-versal-virt.c
-> @@ -610,6 +610,10 @@ static void versal_virt_machine_instance_init(Object *obj)
-> {
-> }
->
-> +static const char *const valid_accels[] = {
-> +    "tcg", "kvm", NULL
-> +};
-> +
-> static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
-> {
->     MachineClass *mc = MACHINE_CLASS(oc);
-> @@ -621,6 +625,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
->     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
->     mc->no_cdrom = true;
->     mc->default_ram_id = "ddr";
-> +    mc->valid_accelerators = valid_accels;
-> }
->
-> static const TypeInfo versal_virt_machine_init_typeinfo = {
->
---3866299591-317435051-1614024235=:60531--
