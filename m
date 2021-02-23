@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74CAF3232C0
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:03:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEABF3232C2
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:03:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234512AbhBWVB6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 16:01:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44735 "EHLO
+        id S234538AbhBWVCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 16:02:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49619 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233440AbhBWVA3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 16:00:29 -0500
+        by vger.kernel.org with ESMTP id S233880AbhBWVAg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 16:00:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614113943;
+        s=mimecast20190719; t=1614113948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SXWc8ATTZ4eP+hdUawfXEBN7iawZP9INSzT40ei/Jzs=;
-        b=JDmKD7gEbXCB9kQzQMGPQguZbW/vcEtucTWXVTHfbUXS+M7ObaZrwXXpcBvD6SILFMqhxQ
-        0HDeYez8JkhIxz7bK2ck+1XceQVPR3y2dBozaWSFstJFDIy2Ux5m4yYPSif8TQppGjFTDt
-        MSGL62aCRifer+OzVwCPugccSUGVggM=
+        bh=6KSpT1FbOAqYUqrvBZJhhKgkhDwdTSNDdC2+YnJkNps=;
+        b=bXOKe/VxlurgsRZvoQjFQ5nH2+TN0SDFZW6foTMiIbi8sEug1FJ7DR+b+wBJyf74PxQetS
+        u7e1ZjHuIXeWY4XF/OHcA8PqN/o9j9zvtmm1xy4MiX306jqcwuijb7lVbx4F7kFQZwPscv
+        Ha7r+egPonYiKeV41Z6bbUj0bWXtelQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-eRb9Sc1COni79CumsNAESQ-1; Tue, 23 Feb 2021 15:58:58 -0500
-X-MC-Unique: eRb9Sc1COni79CumsNAESQ-1
+ us-mta-450-DZIK0oIfPQCxpvlqgmZyDg-1; Tue, 23 Feb 2021 15:59:04 -0500
+X-MC-Unique: DZIK0oIfPQCxpvlqgmZyDg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBA22835E27;
-        Tue, 23 Feb 2021 20:58:54 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60C9F80197D;
+        Tue, 23 Feb 2021 20:59:01 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 26D2C5D9D0;
-        Tue, 23 Feb 2021 20:58:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FBCB5D9D0;
+        Tue, 23 Feb 2021 20:58:55 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
         zhangfei.gao@gmail.com, vivek.gautam@arm.com,
         shameerali.kolothum.thodi@huawei.com, yuzenghui@huawei.com,
         nicoleotsuka@gmail.com, lushenming@huawei.com, vsethi@nvidia.com
-Subject: [PATCH v14 11/13] iommu/smmuv3: Implement bind/unbind_guest_msi
-Date:   Tue, 23 Feb 2021 21:56:32 +0100
-Message-Id: <20210223205634.604221-12-eric.auger@redhat.com>
+Subject: [PATCH v14 12/13] iommu/smmuv3: report additional recoverable faults
+Date:   Tue, 23 Feb 2021 21:56:33 +0100
+Message-Id: <20210223205634.604221-13-eric.auger@redhat.com>
 In-Reply-To: <20210223205634.604221-1-eric.auger@redhat.com>
 References: <20210223205634.604221-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -57,80 +57,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bind/unbind_guest_msi() callbacks check the domain
-is NESTED and redirect to the dma-iommu implementation.
+Up to now we have only reported translation faults. Now that
+the guest can induce some configuration faults, let's report them
+too. Add propagation for BAD_SUBSTREAMID, CD_FETCH, BAD_CD, WALK_EABT.
+We also fix the transcoding for some existing translation faults.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-v6 -> v7:
-- remove device handle argument
----
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 43 +++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 41 +++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  4 ++
+ 2 files changed, 42 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index ca6f796aeb95..f783c2804872 100644
+index f783c2804872..332d31c0680f 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2922,6 +2922,47 @@ static void arm_smmu_get_resv_regions(struct device *dev,
- 	iommu_dma_get_resv_regions(dev, head);
- }
+@@ -1472,6 +1472,7 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
+ 	u32 perm = 0;
+ 	struct arm_smmu_master *master;
+ 	bool ssid_valid = evt[0] & EVTQ_0_SSV;
++	u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
+ 	u32 sid = FIELD_GET(EVTQ_0_SID, evt[0]);
+ 	struct iommu_fault_event fault_evt = { };
+ 	struct iommu_fault *flt = &fault_evt.fault;
+@@ -1524,9 +1525,6 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
+ 	} else {
+ 		flt->type = IOMMU_FAULT_DMA_UNRECOV;
+ 		flt->event = (struct iommu_fault_unrecoverable) {
+-			.reason = reason,
+-			.flags = IOMMU_FAULT_UNRECOV_ADDR_VALID |
+-				 IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID,
+ 			.perm = perm,
+ 			.addr = FIELD_GET(EVTQ_2_ADDR, evt[2]),
+ 			.fetch_addr = FIELD_GET(EVTQ_3_IPA, evt[3]),
+@@ -1536,6 +1534,43 @@ static int arm_smmu_handle_evt(struct arm_smmu_device *smmu, u64 *evt)
+ 			flt->event.flags |= IOMMU_FAULT_UNRECOV_PASID_VALID;
+ 			flt->event.pasid = FIELD_GET(EVTQ_0_SSID, evt[0]);
+ 		}
++
++		switch (type) {
++		case EVT_ID_TRANSLATION_FAULT:
++			flt->event.reason = IOMMU_FAULT_REASON_PTE_FETCH;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_ADDR_VALID;
++			break;
++		case EVT_ID_ADDR_SIZE_FAULT:
++			flt->event.reason = IOMMU_FAULT_REASON_OOR_ADDRESS;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_ADDR_VALID;
++			break;
++		case EVT_ID_ACCESS_FAULT:
++			flt->event.reason = IOMMU_FAULT_REASON_ACCESS;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_ADDR_VALID;
++			break;
++		case EVT_ID_PERMISSION_FAULT:
++			flt->event.reason = IOMMU_FAULT_REASON_PERMISSION;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_ADDR_VALID;
++			break;
++		case EVT_ID_BAD_SUBSTREAMID:
++			flt->event.reason = IOMMU_FAULT_REASON_PASID_INVALID;
++			break;
++		case EVT_ID_CD_FETCH:
++			flt->event.reason = IOMMU_FAULT_REASON_PASID_FETCH;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID;
++			break;
++		case EVT_ID_BAD_CD:
++			flt->event.reason = IOMMU_FAULT_REASON_BAD_PASID_ENTRY;
++			break;
++		case EVT_ID_WALK_EABT:
++			flt->event.reason = IOMMU_FAULT_REASON_WALK_EABT;
++			flt->event.flags |= IOMMU_FAULT_UNRECOV_ADDR_VALID |
++					    IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID;
++			break;
++		default:
++			/* TODO: report other unrecoverable faults. */
++			return -EFAULT;
++		}
+ 	}
  
-+static int
-+arm_smmu_bind_guest_msi(struct iommu_domain *domain,
-+			dma_addr_t giova, phys_addr_t gpa, size_t size)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_device *smmu;
-+	int ret = -EINVAL;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+	smmu = smmu_domain->smmu;
-+	if (!smmu)
-+		goto out;
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto out;
-+
-+	ret = iommu_dma_bind_guest_msi(domain, giova, gpa, size);
-+out:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+	return ret;
-+}
-+
-+static void
-+arm_smmu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t giova)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_device *smmu;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+	smmu = smmu_domain->smmu;
-+	if (!smmu)
-+		goto unlock;
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto unlock;
-+
-+	iommu_dma_unbind_guest_msi(domain, giova);
-+unlock:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+}
-+
- static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
- 				       struct iommu_pasid_table_config *cfg)
- {
-@@ -3182,6 +3223,8 @@ static struct iommu_ops arm_smmu_ops = {
- 	.attach_pasid_table	= arm_smmu_attach_pasid_table,
- 	.detach_pasid_table	= arm_smmu_detach_pasid_table,
- 	.cache_invalidate	= arm_smmu_cache_invalidate,
-+	.bind_guest_msi		= arm_smmu_bind_guest_msi,
-+	.unbind_guest_msi	= arm_smmu_unbind_guest_msi,
- 	.dev_has_feat		= arm_smmu_dev_has_feature,
- 	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
- 	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+ 	ret = iommu_report_device_fault(master->dev, &fault_evt);
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index eb0cc08e8240..9c37dbec75b2 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -378,6 +378,10 @@
+ 
+ #define EVTQ_0_ID			GENMASK_ULL(7, 0)
+ 
++#define EVT_ID_BAD_SUBSTREAMID		0x08
++#define EVT_ID_CD_FETCH			0x09
++#define EVT_ID_BAD_CD			0x0a
++#define EVT_ID_WALK_EABT		0x0b
+ #define EVT_ID_TRANSLATION_FAULT	0x10
+ #define EVT_ID_ADDR_SIZE_FAULT		0x11
+ #define EVT_ID_ACCESS_FAULT		0x12
 -- 
 2.26.2
 
