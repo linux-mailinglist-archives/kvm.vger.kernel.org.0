@@ -2,186 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 698B832247F
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 04:09:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4E8C322479
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 04:08:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231326AbhBWDIc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 22:08:32 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:35553 "EHLO ozlabs.org"
+        id S231199AbhBWDIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 22:08:09 -0500
+Received: from mga18.intel.com ([134.134.136.126]:39519 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231294AbhBWDI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 22:08:29 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 4Dl3rS5NJnz9sTD; Tue, 23 Feb 2021 14:07:36 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1614049656;
-        bh=lB2qhVhVvCNwKnLEP9cyVRt4kgQq0RQXnIPlpk7dq2g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KFOWhcID0dtdiNAomEpDaPts1jSJ82Ytxndpt+d2goQHThz6ePo193JIsAGJiwYUo
-         P86LbDcu1xNkh2QLXqPt/+rGLma2RlyYfZGg3c2dZ4Rw4FNWTs8HtM/WMOo8D/0hW2
-         WkZKKs7NJTNCZUbJTm/cdhZcKb3yIEEd5MCTIJEI=
-Date:   Tue, 23 Feb 2021 10:37:01 +1100
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        BALATON Zoltan <balaton@eik.bme.hu>,
-        Leif Lindholm <leif@nuviainc.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Radoslaw Biernacki <rad@semihalf.com>,
-        Alistair Francis <alistair@alistair23.me>,
-        Paul Durrant <paul@xen.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
-        Greg Kurz <groug@kaod.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        David Hildenbrand <david@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v2 01/11] accel/kvm: Check MachineClass kvm_type() return
- value
-Message-ID: <YDRAHW1ds1eh0Lav@yekko.fritz.box>
-References: <20210219173847.2054123-1-philmd@redhat.com>
- <20210219173847.2054123-2-philmd@redhat.com>
- <20210222182405.3e6e9a6f.cohuck@redhat.com>
- <bc37276d-74cc-22f0-fcc0-4ee5e62cf1df@redhat.com>
- <20210222185044.23fccecc.cohuck@redhat.com>
- <YDQ/Y1KozPSyNGjo@yekko.fritz.box>
+        id S230371AbhBWDIG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 22:08:06 -0500
+IronPort-SDR: I8wXa8ArozbdbxPwY53kk5faNHIMnlQrp+QCWQlkM0D78onUvC1p8l3h/a6rnRWCSvriJcCtGM
+ NiAqvaiBEibw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9903"; a="172328668"
+X-IronPort-AV: E=Sophos;i="5.81,199,1610438400"; 
+   d="scan'208";a="172328668"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2021 19:06:20 -0800
+IronPort-SDR: /6nIHWVZ2rpqTZY1ehs80a1kmL2cWW/xE31i8LO+JI9Cxx8taUxDi58kqjnss8+AUxM1dUD9GM
+ PXRmw2W6g5eQ==
+X-IronPort-AV: E=Sophos;i="5.81,199,1610438400"; 
+   d="scan'208";a="402919857"
+Received: from unknown (HELO [10.238.130.200]) ([10.238.130.200])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2021 19:06:16 -0800
+Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
+ <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
+ <YCFzztFESzcnKRqQ@google.com>
+ <c33335d3-abbe-04e0-2fa1-47f57ad154ac@linux.intel.com>
+ <YDPWn70DTA64psQb@google.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <9d23ae5b-9b85-88d7-a2d7-44fd75a068b9@linux.intel.com>
+Date:   Tue, 23 Feb 2021 11:06:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="iHciYgIJJ+RNzZ6R"
-Content-Disposition: inline
-In-Reply-To: <YDQ/Y1KozPSyNGjo@yekko.fritz.box>
+In-Reply-To: <YDPWn70DTA64psQb@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---iHciYgIJJ+RNzZ6R
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 23, 2021 at 10:33:55AM +1100, David Gibson wrote:
-> On Mon, Feb 22, 2021 at 06:50:44PM +0100, Cornelia Huck wrote:
-> > On Mon, 22 Feb 2021 18:41:07 +0100
-> > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
-> >=20
-> > > On 2/22/21 6:24 PM, Cornelia Huck wrote:
-> > > > On Fri, 19 Feb 2021 18:38:37 +0100
-> > > > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
-> > > >  =20
-> > > >> MachineClass::kvm_type() can return -1 on failure.
-> > > >> Document it, and add a check in kvm_init().
-> > > >>
-> > > >> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > > >> ---
-> > > >>  include/hw/boards.h | 3 ++-
-> > > >>  accel/kvm/kvm-all.c | 6 ++++++
-> > > >>  2 files changed, 8 insertions(+), 1 deletion(-)
-> > > >>
-> > > >> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > >> index a46dfe5d1a6..68d3d10f6b0 100644
-> > > >> --- a/include/hw/boards.h
-> > > >> +++ b/include/hw/boards.h
-> > > >> @@ -127,7 +127,8 @@ typedef struct {
-> > > >>   *    implement and a stub device is required.
-> > > >>   * @kvm_type:
-> > > >>   *    Return the type of KVM corresponding to the kvm-type string=
- option or
-> > > >> - *    computed based on other criteria such as the host kernel ca=
-pabilities.
-> > > >> + *    computed based on other criteria such as the host kernel ca=
-pabilities
-> > > >> + *    (which can't be negative), or -1 on error.
-> > > >>   * @numa_mem_supported:
-> > > >>   *    true if '--numa node.mem' option is supported and false oth=
-erwise
-> > > >>   * @smp_parse:
-> > > >> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > > >> index 84c943fcdb2..b069938d881 100644
-> > > >> --- a/accel/kvm/kvm-all.c
-> > > >> +++ b/accel/kvm/kvm-all.c
-> > > >> @@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
-> > > >>                                                              "kvm-=
-type",
-> > > >>                                                              &erro=
-r_abort);
-> > > >>          type =3D mc->kvm_type(ms, kvm_type);
-> > > >> +        if (type < 0) {
-> > > >> +            ret =3D -EINVAL;
-> > > >> +            fprintf(stderr, "Failed to detect kvm-type for machin=
-e '%s'\n",
-> > > >> +                    mc->name);
-> > > >> +            goto err;
-> > > >> +        }
-> > > >>      }
-> > > >> =20
-> > > >>      do { =20
-> > > >=20
-> > > > No objection to this patch; but I'm wondering why some non-pseries
-> > > > machines implement the kvm_type callback, when I see the kvm-type
-> > > > property only for pseries? Am I holding my git grep wrong? =20
-> > >=20
-> > > Can it be what David commented here?
-> > > https://www.mail-archive.com/qemu-devel@nongnu.org/msg784508.html
-> > >=20
-> >=20
-> > Ok, I might be confused about the other ppc machines; but I'm wondering
-> > about the kvm_type callback for mips and arm/virt. Maybe I'm just
-> > confused by the whole mechanism?
->=20
-> For ppc at least, not sure about in general, pseries is the only
-> machine type that can possibly work under more than one KVM flavour
-> (HV or PR).  So, it's the only one where it's actually useful to be
-> able to configure this.
+On 2/23/2021 12:06 AM, Sean Christopherson wrote:
+> On Mon, Feb 22, 2021, Liu, Jing2 wrote:
+>> On 2/9/2021 1:24 AM, Sean Christopherson wrote:
+>>> On Mon, Feb 08, 2021, Dave Hansen wrote:
+>>>> On 2/8/21 8:16 AM, Jing Liu wrote:
+>>>>> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
+>>>>> -
+>>>>>    static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
+>>>>>    {
+>>>>>    	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
+>>>>> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
+>>>>>    	/* Set XSTATE_BV and possibly XCOMP_BV.  */
+>>>>>    	xsave->header.xfeatures = xstate_bv;
+>>>>>    	if (boot_cpu_has(X86_FEATURE_XSAVES))
+>>>>> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
+>>>>> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
+>>>>> +					 xfeatures_mask_all;
+>>> This is wrong, xfeatures_mask_all also tracks supervisor states.
+>> When looking at SDM Vol2 XSAVES instruction Operation part, it says as
+>> follows,
+>>
+>> RFBM ← (XCR0 OR IA32_XSS) AND EDX:EAX;
+>> COMPMASK ← RFBM OR 80000000_00000000H;
+>> ...
+>>
+>> XCOMP_BV field in XSAVE header ← COMPMASK;
+>>
+>>
+>> So it seems xcomp_bv also tracks supervisor states?
+> Yes, sorry, I got distracted by Dave's question and didn't read the changelog
+> closely.
+>
+> Now that I have, I find "Since fpstate_init() has initialized xcomp_bv, let's
+> just use that." confusing.  I think what you intend to say is that we can use
+> the same _logic_ as fpstate_init_xstate() for calculating xcomp_bv.
+Yes, that's the idea.
+>
+> That said, it would be helpful for the changelog to explain why it's correct to
+> use xfeatures_mask_all, e.g. just a short comment stating that the variable holds
+> all XCR0 and XSS bits enabled by the host kernel.  Justifying a change with
+> "because other code does it" is sketchy, becuse there's no guarantee that what
+> something else does is also correct for KVM, or that the existing code itself is
+> even correct.
+Got it, thanks for the details on this.
+Then how about making the commit message like,
 
-Wait... I'm not sure that's true.  At least theoretically, some of the
-Book3E platforms could work with either PR or the Book3E specific
-KVM.  Not sure if KVM PR supports all the BookE instructions it would
-need to in practice.
+XCOMP_BV[63] field indicates that the save area is in the
+compacted format and XCOMP_BV[62:0] indicates the states that
+have space allocated in the save area, including both XCR0
+and XSS bits enable by the host kernel. Use xfeatures_mask_all
+for calculating xcomp_bv and reuse XCOMP_BV_COMPACTED_FORMAT
+defined by kernel.
 
-Possibly pseries is just the platform where there's been enough people
-interested in setting the KVM flavour so far.
+Thanks,
+Jing
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---iHciYgIJJ+RNzZ6R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmA0QB0ACgkQbDjKyiDZ
-s5JQqBAA2HMmkpdhk4iK7XRStsDCbxBXZysxhFDBM0qLWfKEbOKqcRzv9BiIFbRb
-Ioh4AG1Vvt/cxatFBRkKOOIML8ICtAm/hhBBo3A/6gwi5ogzlRO54Jkr+GIWiRSH
-0iY9VKPGnsjTaf6SrE7GKxdYiPdGTR+6+2snq/f0EUjcz15LsWujsrB2Vyr/F/Oe
-KEYH+S+Pwot39s3mGSOIR0QYHsfN4+oYLPajZXdmcrGjBsTNM6s7+fDGb6oAC7Yg
-7cvOCbL6EAOJ1P3wmYySwu1rVM/vU6IFW7LUfZcP33JynhPYWWh7J84zCTBwNgJF
-IQvlIEQU3Qta+SieLJma+ZTwALAiYSDKSJ1n4vIEWQ21FoQLSbzP4oxqDMiTZha+
-LW5mzqPTQuF/MZg+B+dZtpCKWiLhkG7SWVB7Gb8hq7wat+AZONUJU/BaqQq2QVdN
-a7YiR95k/6rsUFyN0I8NYsrIIMbR6IlI+ivVCukvurwo3iP9m+4/UyM/gM3XRBNc
-ekYjyglLGj9pztFIC0JVBPodTG/8OSkAuvVDh2fVaefjfj0nckXJ9oxJDc1D6LH2
-vocCjxis9Dv2YgQgzem8pUAQ//Z1WGIiiyWD1gPDt/A3EDbvjxHPZK0w7ZOxKLYR
-cagHb4ijSlK6htqbMaqOJ3zM7FOgPwHvc0xLzUttBEolVXQia1E=
-=kPBL
------END PGP SIGNATURE-----
-
---iHciYgIJJ+RNzZ6R--
