@@ -2,151 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E6C1322A24
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 13:01:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91F58322ABE
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 13:47:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232680AbhBWL7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 06:59:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232647AbhBWL4S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Feb 2021 06:56:18 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BC6C061A2B
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 03:52:24 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id e9so1744799pjj.0
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 03:52:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=kx223F6I1hgIgXiIIDDOAsjioq86iWLsXACPrPS1HVA=;
-        b=OFtGQpWO+Ir3PPk881mk0o6vjPCtTLRoAY9YCPtCzHzPxYm6IB1YUZjgQT9z6+E/QI
-         IaBQIWiMv+r0McIu60scEAKEcdu8iwRQT81n6DUoMPYWWU08HXKnUAhhiVK61x+NCRPO
-         U//hQ7GB3QxU+gJEAwfhogNVQmGxyjJef5wfd0A34jTOLkNnxNSuC/IE6xBmw9/mUoW+
-         J9GKcsOGDYWdIYcqrqQGlzm+s0VikurzM64kmzpTkSruhKrVsGNeVPXVnezDCnhMh/Xe
-         uLgy5fUWCctul2mjq0okYPD9noMzO+5/tv1wstLqxTK/OFKd9xw6EJOGxM1VIwzhrcgK
-         nIcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=kx223F6I1hgIgXiIIDDOAsjioq86iWLsXACPrPS1HVA=;
-        b=alX+QiKoJtsOtYGT4icfKm2lSRUA0FDV0WzsxUQObABPcJYbWBHWS2bimzE2HdaFsb
-         3WtJyIEBDNFO0+OsDuiipJeucv5IMKe1uz5KNocRn6/eqMlHNUJKnzYSpGoEeimrd7zY
-         QK6gLkzId+aUhzIplJZoGpHtMtrXLqAsiFUG5Jy48nG3eUCdek94MWLDFZwt2afLwQaM
-         Qr26dBuw2RBLAkHSNEFIFFMzembvMnTOr4kOoIZEDA0VmcDNB8xGrBU8pOM9dCIIO7RE
-         gQEBQHJJ3H6XWBzmidDoHu9/FrehFbLMf07WJXUVa718CojPc5JhcCCkU2Y0zOj2A5Io
-         TwJA==
-X-Gm-Message-State: AOAM532PhFpQlfvAIY1ZQQ4gtIj+2H50vSniinORRbajLJgtROJj71Ie
-        5nsvgB4WnzxjO8KDoC95b0HI
-X-Google-Smtp-Source: ABdhPJxCiZTw6J3O+SU1cFtjM3nZVrWxHdWG5XNpfJsIliABcgypEMAFrFZB+4ShrIxtU+FhvocD7w==
-X-Received: by 2002:a17:90a:f87:: with SMTP id 7mr20859866pjz.98.1614081143880;
-        Tue, 23 Feb 2021 03:52:23 -0800 (PST)
-Received: from localhost ([139.177.225.253])
-        by smtp.gmail.com with ESMTPSA id m6sm3872111pfc.56.2021.02.23.03.52.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 03:52:23 -0800 (PST)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        sgarzare@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
-        hch@infradead.org, rdunlap@infradead.org, willy@infradead.org,
-        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
-        corbet@lwn.net
-Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org
-Subject: [RFC v4 11/11] vduse: Support binding irq to the specified cpu
-Date:   Tue, 23 Feb 2021 19:50:48 +0800
-Message-Id: <20210223115048.435-12-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210223115048.435-1-xieyongji@bytedance.com>
-References: <20210223115048.435-1-xieyongji@bytedance.com>
+        id S232387AbhBWMqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 07:46:30 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:12944 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232491AbhBWMqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 07:46:25 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DlJf212MhzjQX2;
+        Tue, 23 Feb 2021 20:44:26 +0800 (CST)
+Received: from [10.174.184.135] (10.174.184.135) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 23 Feb 2021 20:45:37 +0800
+Subject: Re: [PATCH v11 04/13] vfio/pci: Add VFIO_REGION_TYPE_NESTED region
+ type
+To:     Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+        <will@kernel.org>, <joro@8bytes.org>, <maz@kernel.org>,
+        <robin.murphy@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     <jean-philippe@linaro.org>, <jacob.jun.pan@linux.intel.com>,
+        <nicoleotsuka@gmail.com>, <vivek.gautam@arm.com>,
+        <yi.l.liu@intel.com>, <zhangfei.gao@linaro.org>,
+        <wanghaibin.wang@huawei.com>, Keqian Zhu <zhukeqian1@huawei.com>,
+        <yuzenghui@huawei.com>, Kunkun Jiang <jiangkunkun@huawei.com>
+References: <20201116110030.32335-1-eric.auger@redhat.com>
+ <20201116110030.32335-5-eric.auger@redhat.com>
+ <2b5031d4-fa1a-c893-e7e4-56c68da600e4@huawei.com>
+From:   Shenming Lu <lushenming@huawei.com>
+Message-ID: <081265c6-a579-6041-5a74-99bf74cc3d5f@huawei.com>
+Date:   Tue, 23 Feb 2021 20:45:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2b5031d4-fa1a-c893-e7e4-56c68da600e4@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.184.135]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a parameter for the ioctl VDUSE_INJECT_VQ_IRQ to support
-injecting virtqueue's interrupt to the specified cpu.
+> +static int vfio_pci_dma_fault_init(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_region_dma_fault *header;
+> +	struct iommu_domain *domain;
+> +	size_t size;
+> +	bool nested;
+> +	int ret;
+> +
+> +	domain = iommu_get_domain_for_dev(&vdev->pdev->dev);
+> +	ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_NESTING, &nested);
+> +	if (ret || !nested)
+> +		return ret;
 
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
----
- drivers/vdpa/vdpa_user/vduse_dev.c | 22 +++++++++++++++++-----
- include/uapi/linux/vduse.h         |  7 ++++++-
- 2 files changed, 23 insertions(+), 6 deletions(-)
+Hi Eric,
 
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index f5adeb9ee027..df3d467fff40 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -923,14 +923,27 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
- 		break;
- 	}
- 	case VDUSE_INJECT_VQ_IRQ: {
-+		struct vduse_vq_irq irq;
- 		struct vduse_virtqueue *vq;
- 
-+		ret = -EFAULT;
-+		if (copy_from_user(&irq, argp, sizeof(irq)))
-+			break;
-+
- 		ret = -EINVAL;
--		if (arg >= dev->vq_num)
-+		if (irq.index >= dev->vq_num)
-+			break;
-+
-+		if (irq.cpu != -1 && (irq.cpu >= nr_cpu_ids ||
-+		    !cpu_online(irq.cpu)))
- 			break;
- 
--		vq = &dev->vqs[arg];
--		queue_work(vduse_irq_wq, &vq->inject);
-+		ret = 0;
-+		vq = &dev->vqs[irq.index];
-+		if (irq.cpu == -1)
-+			queue_work(vduse_irq_wq, &vq->inject);
-+		else
-+			queue_work_on(irq.cpu, vduse_irq_wq, &vq->inject);
- 		break;
- 	}
- 	case VDUSE_INJECT_CONFIG_IRQ:
-@@ -1342,8 +1355,7 @@ static int vduse_init(void)
- 	if (ret)
- 		goto err_chardev;
- 
--	vduse_irq_wq = alloc_workqueue("vduse-irq",
--				WQ_HIGHPRI | WQ_SYSFS | WQ_UNBOUND, 0);
-+	vduse_irq_wq = alloc_workqueue("vduse-irq", WQ_HIGHPRI, 0);
- 	if (!vduse_irq_wq)
- 		goto err_wq;
- 
-diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-index 9070cd512cb4..9c70fd842ce5 100644
---- a/include/uapi/linux/vduse.h
-+++ b/include/uapi/linux/vduse.h
-@@ -116,6 +116,11 @@ struct vduse_vq_eventfd {
- 	int fd; /* eventfd, -1 means de-assigning the eventfd */
- };
- 
-+struct vduse_vq_irq {
-+	__u32 index; /* virtqueue index */
-+	int cpu; /* bind irq to the specified cpu, -1 means running on the current cpu */
-+};
-+
- #define VDUSE_BASE	0x81
- 
- /* Create a vduse device which is represented by a char device (/dev/vduse/<name>) */
-@@ -131,7 +136,7 @@ struct vduse_vq_eventfd {
- #define VDUSE_VQ_SETUP_KICKFD	_IOW(VDUSE_BASE, 0x04, struct vduse_vq_eventfd)
- 
- /* Inject an interrupt for specific virtqueue */
--#define VDUSE_INJECT_VQ_IRQ	_IO(VDUSE_BASE, 0x05)
-+#define VDUSE_INJECT_VQ_IRQ	_IOW(VDUSE_BASE, 0x05, struct vduse_vq_irq)
- 
- /* Inject a config interrupt */
- #define VDUSE_INJECT_CONFIG_IRQ	_IO(VDUSE_BASE, 0x06)
--- 
-2.11.0
+It seems that the type of nested should be int, the use of bool might trigger
+a panic in arm_smmu_domain_get_attr().
 
+Thanks,
+Shenming
