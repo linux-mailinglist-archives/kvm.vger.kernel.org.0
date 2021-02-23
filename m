@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E62833232B7
+	by mail.lfdr.de (Postfix) with ESMTP id 02CDF3232B5
 	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 22:01:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233607AbhBWVA0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 16:00:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27673 "EHLO
+        id S232658AbhBWU7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 15:59:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36172 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234567AbhBWU7U (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 15:59:20 -0500
+        by vger.kernel.org with ESMTP id S234530AbhBWU7R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 15:59:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614113872;
+        s=mimecast20190719; t=1614113870;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3kJ6TWOt/p80uj+6+Eq/EfnbOyetkOgNMu4Azy/OeP8=;
-        b=FqcGY6q7RUeQml5yUTACmRt+w37gKaN2+iUybxKrox1CZYqtUZImswTmBA0RMoMDraTZLl
-        zlcc8lFaxQeQFq8X3FXPjaaJ5CSpiEDihuzRKlUWn+6wQsy+xO3++6daWWnmNVycfggRiF
-        RPM2FQmn7OXpH3D3m8XT1Ks3jRzKoNU=
+        bh=vXo5Ny5RPqrxMbmK96jXWOW3+XmwgeCaBu6QZll4YCc=;
+        b=fY+FYC/3MQ3TjUEO4lfR/sWRyrbbriuOMolJcfT0fOmlIrpXFhAa20CgpN7MEkOT+NtSvv
+        nj0LX8kAYSfsrKQTKdLZNc6H3vwJ2VcWv4SdeEcW1/uVnOvaPCI5IkeOCO2kkCaX1GEOIv
+        HFYybNCZCTYXYBMjpFUEHzc2Uvrf/yQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-Muz_jJo-OpysFgIpmRwwYg-1; Tue, 23 Feb 2021 15:57:38 -0500
-X-MC-Unique: Muz_jJo-OpysFgIpmRwwYg-1
+ us-mta-377-wwYdtQDkNc6HcgElWlgCjw-1; Tue, 23 Feb 2021 15:57:48 -0500
+X-MC-Unique: wwYdtQDkNc6HcgElWlgCjw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBB23835E20;
-        Tue, 23 Feb 2021 20:57:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FC68E760;
+        Tue, 23 Feb 2021 20:57:45 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-114-34.ams2.redhat.com [10.36.114.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9DB2F5D9D0;
-        Tue, 23 Feb 2021 20:57:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 47F495D9D0;
+        Tue, 23 Feb 2021 20:57:35 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -45,9 +45,9 @@ Cc:     jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
         zhangfei.gao@gmail.com, vivek.gautam@arm.com,
         shameerali.kolothum.thodi@huawei.com, yuzenghui@huawei.com,
         nicoleotsuka@gmail.com, lushenming@huawei.com, vsethi@nvidia.com
-Subject: [PATCH v14 05/13] iommu/smmuv3: Implement attach/detach_pasid_table
-Date:   Tue, 23 Feb 2021 21:56:26 +0100
-Message-Id: <20210223205634.604221-6-eric.auger@redhat.com>
+Subject: [PATCH v14 06/13] iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+Date:   Tue, 23 Feb 2021 21:56:27 +0100
+Message-Id: <20210223205634.604221-7-eric.auger@redhat.com>
 In-Reply-To: <20210223205634.604221-1-eric.auger@redhat.com>
 References: <20210223205634.604221-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -57,149 +57,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On attach_pasid_table() we program STE S1 related info set
-by the guest into the actual physical STEs. At minimum
-we need to program the context descriptor GPA and compute
-whether the stage1 is translated/bypassed or aborted.
-
-On detach, the stage 1 config is unset and the abort flag is
-unset.
+With nested stage support, soon we will need to invalidate
+S1 contexts and ranges tagged with an unmanaged asid, this
+latter being managed by the guest. So let's introduce 2 helpers
+that allow to invalidate with externally managed ASIDs
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
-v13 -> v14:
-- on PASID table detach, reset the abort flag (Keqian)
 
-v7 -> v8:
-- remove smmu->features check, now done on domain finalize
-
-v6 -> v7:
-- check versions and comment the fact we don't need to take
-  into account s1dss and s1fmt
-v3 -> v4:
-- adapt to changes in iommu_pasid_table_config
-- different programming convention at s1_cfg/s2_cfg/ste.abort
-
-v2 -> v3:
-- callback now is named set_pasid_table and struct fields
-  are laid out differently.
-
-v1 -> v2:
-- invalidate the STE before changing them
-- hold init_mutex
-- handle new fields
+v13 -> v14
+- Actually send the NH_ASID command (reported by Xingang Wang)
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 89 +++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 38 ++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 085a784dfaee..5579ec4fccc8 100644
+index 5579ec4fccc8..4c19a1114de4 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -2842,6 +2842,93 @@ static void arm_smmu_get_resv_regions(struct device *dev,
- 	iommu_dma_get_resv_regions(dev, head);
+@@ -1843,9 +1843,9 @@ int arm_smmu_atc_inv_domain(struct arm_smmu_domain *smmu_domain, int ssid,
  }
  
-+static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
-+				       struct iommu_pasid_table_config *cfg)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_master *master;
-+	struct arm_smmu_device *smmu;
-+	unsigned long flags;
-+	int ret = -EINVAL;
-+
-+	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
-+		return -EINVAL;
-+
-+	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
-+	    cfg->vendor_data.smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
-+		return -EINVAL;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+
-+	smmu = smmu_domain->smmu;
-+
-+	if (!smmu)
-+		goto out;
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto out;
-+
-+	switch (cfg->config) {
-+	case IOMMU_PASID_CONFIG_ABORT:
-+		smmu_domain->s1_cfg.set = false;
-+		smmu_domain->abort = true;
-+		break;
-+	case IOMMU_PASID_CONFIG_BYPASS:
-+		smmu_domain->s1_cfg.set = false;
-+		smmu_domain->abort = false;
-+		break;
-+	case IOMMU_PASID_CONFIG_TRANSLATE:
-+		/* we do not support S1 <-> S1 transitions */
-+		if (smmu_domain->s1_cfg.set)
-+			goto out;
-+
-+		/*
-+		 * we currently support a single CD so s1fmt and s1dss
-+		 * fields are also ignored
-+		 */
-+		if (cfg->pasid_bits)
-+			goto out;
-+
-+		smmu_domain->s1_cfg.cdcfg.cdtab_dma = cfg->base_ptr;
-+		smmu_domain->s1_cfg.set = true;
-+		smmu_domain->abort = false;
-+		break;
-+	default:
-+		goto out;
-+	}
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(master, &smmu_domain->devices, domain_head)
-+		arm_smmu_install_ste_for_dev(master);
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+	ret = 0;
-+out:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+	return ret;
-+}
-+
-+static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
-+{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct arm_smmu_master *master;
-+	unsigned long flags;
-+
-+	mutex_lock(&smmu_domain->init_mutex);
-+
-+	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-+		goto unlock;
-+
-+	smmu_domain->s1_cfg.set = false;
-+	smmu_domain->abort = false;
-+
-+	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-+	list_for_each_entry(master, &smmu_domain->devices, domain_head)
-+		arm_smmu_install_ste_for_dev(master);
-+	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-+
-+unlock:
-+	mutex_unlock(&smmu_domain->init_mutex);
-+}
-+
- static bool arm_smmu_dev_has_feature(struct device *dev,
- 				     enum iommu_dev_features feat)
+ /* IO_PGTABLE API */
+-static void arm_smmu_tlb_inv_context(void *cookie)
++static void __arm_smmu_tlb_inv_context(struct arm_smmu_domain *smmu_domain,
++				       int ext_asid)
  {
-@@ -2939,6 +3026,8 @@ static struct iommu_ops arm_smmu_ops = {
- 	.of_xlate		= arm_smmu_of_xlate,
- 	.get_resv_regions	= arm_smmu_get_resv_regions,
- 	.put_resv_regions	= generic_iommu_put_resv_regions,
-+	.attach_pasid_table	= arm_smmu_attach_pasid_table,
-+	.detach_pasid_table	= arm_smmu_detach_pasid_table,
- 	.dev_has_feat		= arm_smmu_dev_has_feature,
- 	.dev_feat_enabled	= arm_smmu_dev_feature_enabled,
- 	.dev_enable_feat	= arm_smmu_dev_enable_feature,
+-	struct arm_smmu_domain *smmu_domain = cookie;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+ 	struct arm_smmu_cmdq_ent cmd;
+ 
+@@ -1856,7 +1856,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 	 * insertion to guarantee those are observed before the TLBI. Do be
+ 	 * careful, 007.
+ 	 */
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
++	if (ext_asid >= 0) { /* guest stage 1 invalidation */
++		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
++		cmd.tlbi.asid	= ext_asid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++		arm_smmu_cmdq_issue_cmd(smmu, &cmd);
++		arm_smmu_cmdq_issue_sync(smmu);
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		arm_smmu_tlb_inv_asid(smmu, smmu_domain->s1_cfg.cd.asid);
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+@@ -1867,6 +1873,13 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 	arm_smmu_atc_inv_domain(smmu_domain, 0, 0, 0);
+ }
+ 
++static void arm_smmu_tlb_inv_context(void *cookie)
++{
++	struct arm_smmu_domain *smmu_domain = cookie;
++
++	__arm_smmu_tlb_inv_context(smmu_domain, -1);
++}
++
+ static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+ 				     unsigned long iova, size_t size,
+ 				     size_t granule,
+@@ -1926,9 +1939,10 @@ static void __arm_smmu_tlb_inv_range(struct arm_smmu_cmdq_ent *cmd,
+ 	arm_smmu_cmdq_batch_submit(smmu, &cmds);
+ }
+ 
+-static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+-					  size_t granule, bool leaf,
+-					  struct arm_smmu_domain *smmu_domain)
++static void
++arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
++			      size_t granule, bool leaf, int ext_asid,
++			      struct arm_smmu_domain *smmu_domain)
+ {
+ 	struct arm_smmu_cmdq_ent cmd = {
+ 		.tlbi = {
+@@ -1936,7 +1950,12 @@ static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+ 		},
+ 	};
+ 
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
++	if (ext_asid >= 0) {  /* guest stage 1 invalidation */
++		cmd.opcode	= smmu_domain->smmu->features & ARM_SMMU_FEAT_E2H ?
++				  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
++		cmd.tlbi.asid	= ext_asid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++	} else if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= smmu_domain->smmu->features & ARM_SMMU_FEAT_E2H ?
+ 				  CMDQ_OP_TLBI_EL2_VA : CMDQ_OP_TLBI_NH_VA;
+ 		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
+@@ -1944,6 +1963,7 @@ static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+ 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+ 		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
+ 	}
++
+ 	__arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
+ 
+ 	/*
+@@ -1982,7 +2002,7 @@ static void arm_smmu_tlb_inv_page_nosync(struct iommu_iotlb_gather *gather,
+ static void arm_smmu_tlb_inv_walk(unsigned long iova, size_t size,
+ 				  size_t granule, void *cookie)
+ {
+-	arm_smmu_tlb_inv_range_domain(iova, size, granule, false, cookie);
++	arm_smmu_tlb_inv_range_domain(iova, size, granule, false, -1, cookie);
+ }
+ 
+ static const struct iommu_flush_ops arm_smmu_flush_ops = {
+@@ -2523,7 +2543,7 @@ static void arm_smmu_iotlb_sync(struct iommu_domain *domain,
+ 
+ 	arm_smmu_tlb_inv_range_domain(gather->start,
+ 				      gather->end - gather->start + 1,
+-				      gather->pgsize, true, smmu_domain);
++				      gather->pgsize, true, -1, smmu_domain);
+ }
+ 
+ static phys_addr_t
 -- 
 2.26.2
 
