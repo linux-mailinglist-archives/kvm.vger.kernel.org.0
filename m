@@ -2,150 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13486322B3C
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:11:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1F9C322B5A
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:24:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232878AbhBWNIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 08:08:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39840 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232849AbhBWNIh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Feb 2021 08:08:37 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1C2C061574
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 05:07:56 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id t25so12322121pga.2
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 05:07:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding;
-        bh=vuDCQjPHpW2W/RRC7MxCqnjH5uwfq99HojvmeGSPmzE=;
-        b=WI4R9QKudc2VpGzt96CWPx5Yx0Tt4A0l7O4AO4MVazJJ0SoDptkJyI4jDmFeVTawCF
-         A+IZT/WPcPklZn/CfA48Y/aPoeacx9rwXWl6vwg5BkfDnI+dGIZjCKFJdsGnNYMMkT6Y
-         oupDqON9OD/y7Ux2XHeyWPXtTQTLlUyWhbCa/Quu+dYk9ohE9zkei+IuwIJz8v6eMAif
-         o2RiJxcNS02ZQc5tv+5rbrQl82oREwcK0XhG9LOrn2mcpxtlv4U6oop92XuGHmAZ8SnC
-         g6dy2Z/ab+/xdjntNAok0tpEwDroxwoSl6IxCytgY+L7Ww3PnGjBZl8fOxT6Z+JXzle6
-         Aa9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
-        bh=vuDCQjPHpW2W/RRC7MxCqnjH5uwfq99HojvmeGSPmzE=;
-        b=hfxS8PIv9PqRiRpnhQY46BCO3H0BoEn5nEhTflM9rKx+YdvTaLTckifBtlg/N25l+i
-         ZjQtHFx2qnxgZCk4xjVJHl4Y9j8/6p3SKKsz0O16frb3nr4JmJR8unG+okB6HM47rmEW
-         2mY5YKwahmsYCDdHe9Oy+jve5B/7+yyx07Q7LvMDAef4xAwEZY+FzLK7ST89CKge26ZP
-         Rn8v5SZUcmlOx1fbsN3QW7L5GsI68N2LkcRNhOl9tMLrUV8mKoey3Mv9MrWclrToRM/7
-         y1nb+3wbq5XbJke5SDdYNb1nYI7vaGLi/kGSOblV5t6vE7NHRKoJn/vnNCxy5a9jtQhB
-         KaWw==
-X-Gm-Message-State: AOAM530nn2rF6F8gKCu+AzacoFnWNw+E8CT0mncgXjIyxA6z6fNmCc5H
-        ikpNISzktGpLIDWd0hQYJBaQ5g==
-X-Google-Smtp-Source: ABdhPJz2IS1tTz23bXe5XUHYjZbPd8wUb+tcayoN1kKsLrDBnO5kdi0ufmUNmu2LI8keX9dk/B1X4A==
-X-Received: by 2002:a62:7d8a:0:b029:1ed:7164:291 with SMTP id y132-20020a627d8a0000b02901ed71640291mr14176641pfc.65.1614085676394;
-        Tue, 23 Feb 2021 05:07:56 -0800 (PST)
-Received: from [10.85.116.39] ([139.177.225.255])
-        by smtp.gmail.com with ESMTPSA id t6sm21550974pgp.57.2021.02.23.05.07.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Feb 2021 05:07:55 -0800 (PST)
-Subject: Re: [External] Re: [RFC: timer passthrough 1/9] KVM: vmx: hook
- set_next_event for getting the host tscd
-To:     Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, fweisbec@gmail.com,
-        zhouyibo@bytedance.com, zhanghaozhong@bytedance.com
-References: <20210205100317.24174-1-fengzhimin@bytedance.com>
- <20210205100317.24174-2-fengzhimin@bytedance.com>
- <87ft2a8jv5.fsf@nanos.tec.linutronix.de>
-From:   Zhimin Feng <fengzhimin@bytedance.com>
-Message-ID: <de39a4cf-8286-1511-1e94-1cf5d6da91cc@bytedance.com>
-Date:   Tue, 23 Feb 2021 21:07:48 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        id S232538AbhBWNYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 08:24:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56447 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232441AbhBWNX7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 08:23:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614086551;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XCdSW0hy14Xm5N5F++0E25LPG0UixPo9zSJmCjDyI6M=;
+        b=e5JTBGY3Z8nzbkRCq0tLhI5W/LhKl3uZllFKsMqCI7fSeEjJf2JuyP9nwMjDtSjRbJsLh3
+        gG0W5nvbtm9nR+FAMapX3TxzgQHwUWspiX3lmU+nFKsYHsSAff3/iYLwo2Wfn0nKrI6WRW
+        qGCqM3wL4O7C3G0C4DhGQS4qBuhRMa0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-cc8ZrSypMrujPzCOnTh2mQ-1; Tue, 23 Feb 2021 08:22:27 -0500
+X-MC-Unique: cc8ZrSypMrujPzCOnTh2mQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13252107ACED;
+        Tue, 23 Feb 2021 13:22:26 +0000 (UTC)
+Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB9AA614FF;
+        Tue, 23 Feb 2021 13:22:21 +0000 (UTC)
+Date:   Tue, 23 Feb 2021 14:22:19 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH v3 3/5] s390x: css: implementing Set
+ CHannel Monitor
+Message-ID: <20210223142219.0f42a303.cohuck@redhat.com>
+In-Reply-To: <1613669204-6464-4-git-send-email-pmorel@linux.ibm.com>
+References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
+        <1613669204-6464-4-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <87ft2a8jv5.fsf@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi tglx
+On Thu, 18 Feb 2021 18:26:42 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-This question is very nice,  we should be considered to judge whether 
-the current active device is the tsc deadline timer. I will fix this in V2.
+> We implement the call of the Set CHannel Monitor instruction,
+> starting the monitoring of the all Channel Sub System, and
+> initializing channel subsystem monitoring.
+> 
+> Initial tests report the presence of the extended measurement block
+> feature, and verify the error reporting of the hypervisor for SCHM.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  lib/s390x/css.h     |  21 +++++++++-
+>  lib/s390x/css_lib.c | 100 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/css.c         |  35 ++++++++++++++++
+>  3 files changed, 155 insertions(+), 1 deletion(-)
 
-Thanks
+(...)
 
-Zhimin
+> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
+> index 65b58ff..4c8a6ae 100644
+> --- a/lib/s390x/css_lib.c
+> +++ b/lib/s390x/css_lib.c
+> @@ -265,6 +265,106 @@ retry:
+>  	return -1;
+>  }
+>  
+> +/*
+> + * schib_update_mb: update the subchannel Mesurement Block
 
-在 2021/2/6 上午2:11, Thomas Gleixner 写道:
-> On Fri, Feb 05 2021 at 18:03, Zhimin Feng wrote:
->> @@ -520,6 +521,24 @@ struct kvm_vcpu_hv {
->>   	cpumask_t tlb_flush;
->>   };
->>   
->> +enum tick_device_mode {
->> +	TICKDEV_MODE_PERIODIC,
->> +	TICKDEV_MODE_ONESHOT,
->> +};
->> +
->> +struct tick_device {
->> +	struct clock_event_device *evtdev;
->> +	enum tick_device_mode mode;
->> +};
-> There is a reason why these things are defined in a header file which is
-> not public. Nothing outside of kernel/time/ has to fiddle with
-> this. Aside of that how are these things supposed to stay in sync?
->
->> diff --git a/kernel/time/tick-common.c b/kernel/time/tick-common.c
->> index 6c9c342dd0e5..bc50f4a1a7c0 100644
->> --- a/kernel/time/tick-common.c
->> +++ b/kernel/time/tick-common.c
->> @@ -26,6 +26,7 @@
->>    * Tick devices
->>    */
->>   DEFINE_PER_CPU(struct tick_device, tick_cpu_device);
->> +EXPORT_SYMBOL_GPL(tick_cpu_device);
-> Not going to happen ever.
->
->> +#define TSC_DIVISOR  8
->> +static DEFINE_PER_CPU(struct timer_passth_info, passth_info);
->> +
->> +static int override_lapic_next_event(unsigned long delta,
->> +		struct clock_event_device *evt)
->> +{
->> +	struct timer_passth_info *local_timer_info;
->> +	u64 tsc;
->> +	u64 tscd;
->> +
->> +	local_timer_info = &per_cpu(passth_info, smp_processor_id());
->> +	tsc = rdtsc();
->> +	tscd = tsc + (((u64) delta) * TSC_DIVISOR);
->> +	local_timer_info->host_tscd = tscd;
->> +	wrmsrl(MSR_IA32_TSCDEADLINE, tscd);
->> +	return 0;
->> +}
->> +
->> +static void vmx_host_timer_passth_init(void *junk)
->> +{
->> +	struct timer_passth_info *local_timer_info;
->> +	int cpu = smp_processor_id();
->> +
->> +	local_timer_info = &per_cpu(passth_info, cpu);
->> +	local_timer_info->curr_dev = per_cpu(tick_cpu_device, cpu).evtdev;
->> +	local_timer_info->orig_set_next_event =
->> +		local_timer_info->curr_dev->set_next_event;
->> +	local_timer_info->curr_dev->set_next_event = override_lapic_next_event;
-> So when loading the KVM module you steal the set_next_event pointer of
-> the clock event device which is currently active. What guarantees that
->
->      1) The current active device is the tsc deadline timer
->      2) The active device does not change
->
-> Nothing.
->
-> Thanks,
->
->          tglx
+s/Mesurement/Measurement/
+
+I guess that one is hard to get out of one's fingers :)
+
+> + * @schid: Subchannel Identifier
+> + * @mb   : 64bit address of the measurement block
+> + * @mbi : the measurement block offset
+> + * @flags : PMCW_MBUE to enable measurement block update
+> + *	    PMCW_DCTME to enable device connect time
+> + *	    0 to disable measurement
+> + * @format1: set if format 1 is to be used
+> + */
+> +static bool schib_update_mb(int schid, uint64_t mb, uint16_t mbi,
+> +			    uint16_t flags, bool format1)
+> +{
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +	int cc;
+> +
+> +	/* Read the SCHIB for this subchannel */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +		return false;
+> +	}
+> +
+> +	/* Update the SCHIB to enable the measurement block */
+> +	if (flags) {
+> +		pmcw->flags |= flags;
+> +
+> +		if (format1)
+> +			pmcw->flags2 |= PMCW_MBF1;
+> +		else
+> +			pmcw->flags2 &= ~PMCW_MBF1;
+> +
+> +		pmcw->mbi = mbi;
+> +		schib.mbo = mb;
+> +	} else {
+> +		pmcw->flags &= ~(PMCW_MBUE | PMCW_DCTME);
+> +	}
+> +
+> +	/* Tell the CSS we want to modify the subchannel */
+> +	cc = msch(schid, &schib);
+> +	if (cc) {
+> +		/*
+> +		 * If the subchannel is status pending or
+> +		 * if a function is in progress,
+> +		 * we consider both cases as errors.
+> +		 */
+> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
+> +		return false;
+> +	}
+> +
+> +	/*
+> +	 * Read the SCHIB again
+> +	 */
+> +	cc = stsch(schid, &schib);
+> +	if (cc) {
+> +		report_info("stsch: updating sch %08x failed with cc=%d",
+> +			    schid, cc);
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +/*
+> + * css_enable_mb: enable the subchannel Mesurement Block
+
+s/Mesurement/Measurement/
+
+> + * @schid: Subchannel Identifier
+> + * @mb   : 64bit address of the measurement block
+> + * @format1: set if format 1 is to be used
+> + * @mbi : the measurement block offset
+> + * @flags : PMCW_MBUE to enable measurement block update
+> + *	    PMCW_DCTME to enable device connect time
+> + */
+> +bool css_enable_mb(int schid, uint64_t mb, uint16_t mbi, uint16_t flags,
+> +		   bool format1)
+> +{
+> +	int retry_count = MAX_ENABLE_RETRIES;
+> +	struct pmcw *pmcw = &schib.pmcw;
+> +
+> +	while (retry_count-- &&
+> +	       !schib_update_mb(schid, mb, mbi, flags, format1))
+> +		mdelay(10); /* the hardware was not ready, give it some time */
+> +
+> +	return schib.mbo == mb && pmcw->mbi == mbi;
+> +}
+> +
+> +/*
+> + * css_disable_mb: enable the subchannel Mesurement Block
+
+s/enable/disable/
+s/Mesurement/Measurement/
+
+> + * @schid: Subchannel Identifier
+> + */
+> +bool css_disable_mb(int schid)
+> +{
+> +	int retry_count = MAX_ENABLE_RETRIES;
+> +
+> +	while (retry_count-- &&
+> +	       !schib_update_mb(schid, 0, 0, 0, 0))
+> +		mdelay(10); /* the hardware was not ready, give it some time */
+> +
+> +	return retry_count > 0;
+> +}
+> +
+>  static struct irb irb;
+>  
+>  void css_irq_io(void)
+
+(...)
+
+I'd still have split out the subchannel-modifying functions into a
+separate patch, but no strong opinion.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
