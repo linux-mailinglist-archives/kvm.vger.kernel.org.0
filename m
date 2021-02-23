@@ -2,90 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE53E323429
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 00:26:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 595E732342C
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 00:26:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbhBWXXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 18:23:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57418 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233935AbhBWXOq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Feb 2021 18:14:46 -0500
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 794B7C061574
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 15:14:06 -0800 (PST)
-Received: by mail-ot1-x32a.google.com with SMTP id e45so355319ote.9
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 15:14:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=w5LHMVXfGGl3hxeLafXJooEHPX5Ay/rdElBayKDuOUg=;
-        b=be8bS/Vt5TH1uycrmc7J6eu5kop7HbA4Mg3Tp5SitIgNFwgJaZF1x5YtvXbzLvJi8i
-         TnNp5xCUyS42XEY12WUu445YR25j8jdIUIE1LxG+OsEIpaTrsjUDP+0hVoL+cQj0xPFC
-         nJgfz57W/gqmXm5lwlUhp9sKiC/x31UGG3VMQkn6JOuKj8ySHDEHl6/LtHVJhRBjiXrd
-         ddoZGYVvpMFCctHaza8hxdzbRHpufXtAPFeXQ/DAYXFnhryqv6PVQJs071HPdsoVbcrT
-         AeFeK3DhErHcxByhMSakJphk3FA77s5i+DdIi+mF64mBWB3YERoHEpdlJxLkv8iZq427
-         xo+w==
+        id S233671AbhBWXZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 18:25:08 -0500
+Received: from mail-il1-f200.google.com ([209.85.166.200]:41639 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233019AbhBWXRu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 18:17:50 -0500
+Received: by mail-il1-f200.google.com with SMTP id d11so169350ilu.8
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 15:17:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=w5LHMVXfGGl3hxeLafXJooEHPX5Ay/rdElBayKDuOUg=;
-        b=EjmQYlFQffsX/SpN0jkUO2TdkMt27FuJWtHWH7FkUxEm+muQH6TBXp6A1w68V9DIxk
-         xN3oWsTTDnMJc+S8SmiSG2H/Xgim782P0HQe0TzArFYCxxjAzOAHxJyjqR6dgYV/gdKm
-         2ImdKXcIWqkZIouO1it1WpdQ/ILCCsCKG0gQCdkYQWlLyy/ptzTUPhELAf+ex2NMMYqu
-         DHnUve+cfy5KPW/LQeo2lKX0W47N0+Mq2ov0JQ60PduEKQkeS+hzl7CvpBGYGL8H9TZ1
-         opVw0wnwIRtSZYWAVGXqwZ9tHn2zBZgDSBtGf2d6+Mdp+ylYZEt8wwE87oOiEMBeK6ZE
-         Mg7w==
-X-Gm-Message-State: AOAM533niz5ogQpvKz/omqO750r2KHnkwTkkQNMNWw6rLallCh6eBxLE
-        LCg9MWAlUhPD8HzTJLhdzSrUFHsknqH/O5SqCJZzig==
-X-Google-Smtp-Source: ABdhPJwqkBSojVrg37c64FQ7AF0usw/0mWmYXkLKHIBzSFq8pC/Q258uyFr1Fz2VZNEkCVh4oliJSDNCz1GP1hkCMwY=
-X-Received: by 2002:a05:6830:902:: with SMTP id v2mr22285371ott.56.1614122045232;
- Tue, 23 Feb 2021 15:14:05 -0800 (PST)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=gxwmyLE4SO4oZCr9Sp7tYxHthtIvfwFjtggaVC9TLEY=;
+        b=qRsRXBlpvEXxcqTqIHIgoQUbPnqRiQzA1S/ZEVza35gmcOZ/6vpWqwGqFhJ6JS9cbW
+         ZmOFkGt37idrYB5Cv804AaAgSICyG9n+g3nw/5xGcduZuXslpxSG30khE2vmCgEFcE1k
+         piKaNizCWk9a67XZYlUZ/4K0Q80lYXL4Lh/WUgjohjDe7OAttZKnoP1m8dipYgcVj0vZ
+         0+esVofSGMiiYPVvHclcONfagRPKc46TtN8Xtg1drsUK7sF8YcwjTVDplViA57fheULl
+         9O6rPCud/d+kKRr5yx2UC7jPvfTbd1RXuK/eVtKsYbNuFqPUrJWrugSSWPRQaEnA1S3+
+         x+/A==
+X-Gm-Message-State: AOAM530jFYiVPfDweAlXGQ6rSm+WnkpAVNYYrEPyF+gbMt8cG1f0xW+e
+        Yl7fMVy8esa/itwmtgYK7GUZit5X2oJZDwAloCzOVBSKMLeV
+X-Google-Smtp-Source: ABdhPJxYMQRLjCGcu4le9+pAKne7p4M1hhMXnq5Lth1vDibAlbh+oMC6vk0slJxcCfpjngyHErXn1JGb1zpfvJVCqGsT9oaRHYFP
 MIME-Version: 1.0
-References: <20210219144632.2288189-1-david.edmondson@oracle.com>
- <20210219144632.2288189-2-david.edmondson@oracle.com> <YDWG51Io0VJEBHGg@google.com>
-In-Reply-To: <YDWG51Io0VJEBHGg@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 23 Feb 2021 15:13:54 -0800
-Message-ID: <CALMp9eQ5HQqRRBu0HJbuTOJwKSUA950JWSHrLkXz7cHWKt+ymg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86: dump_vmcs should not assume
- GUEST_IA32_EFER is valid
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Edmondson <david.edmondson@oracle.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <joro@8bytes.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
+X-Received: by 2002:a02:1909:: with SMTP id b9mr23360492jab.141.1614122227911;
+ Tue, 23 Feb 2021 15:17:07 -0800 (PST)
+Date:   Tue, 23 Feb 2021 15:17:07 -0800
+In-Reply-To: <0000000000007ff56205ba985b60@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000004e7d105bc091e06@google.com>
+Subject: Re: general protection fault in vmx_vcpu_run (2)
+From:   syzbot <syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com>
+To:     bp@alien8.de, bp@suse.de, dave.hansen@intel.com, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org,
+        kirill.shutemov@linux.intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lstoakes@gmail.com, mingo@redhat.com,
+        pbonzini@redhat.com, seanjc@google.com,
+        syzkaller-bugs@googlegroups.com, tglx@linutronix.de,
+        vkuznets@redhat.com, wanpengli@tencent.com, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 23, 2021 at 2:51 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Feb 19, 2021, David Edmondson wrote:
-> > If the VM entry/exit controls for loading/saving MSR_EFER are either
-> > not available (an older processor or explicitly disabled) or not
-> > used (host and guest values are the same), reading GUEST_IA32_EFER
-> > from the VMCS returns an inaccurate value.
-> >
-> > Because of this, in dump_vmcs() don't use GUEST_IA32_EFER to decide
-> > whether to print the PDPTRs - do so if the EPT is in use and CR4.PAE
-> > is set.
->
-> This isn't necessarily correct either.  In a way, it's less correct as PDPTRs
-> are more likely to be printed when they shouldn't, assuming most guests are
-> 64-bit guests.  It's annoying to calculate the effective guest EFER, but so
-> awful that it's worth risking confusion over PDTPRs.
+syzbot has bisected this issue to:
 
-I still prefer a dump_vmcs that always dumps every VMCS field. But if
-you really want to skip printing the PDPTEs when they're irrelevant,
-can't you just use the "IA-32e mode guest" VM-entry control as a proxy
-for EFER.LMA?
+commit 167dcfc08b0b1f964ea95d410aa496fd78adf475
+Author: Lorenzo Stoakes <lstoakes@gmail.com>
+Date:   Tue Dec 15 20:56:41 2020 +0000
+
+    x86/mm: Increase pgt_buf size for 5-level page tables
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13fe3ea8d00000
+start commit:   a99163e9 Merge tag 'devicetree-for-5.12' of git://git.kern..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10013ea8d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17fe3ea8d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=49116074dd53b631
+dashboard link: https://syzkaller.appspot.com/bug?extid=42a71c84ef04577f1aef
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=141f3f04d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17de4f12d00000
+
+Reported-by: syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com
+Fixes: 167dcfc08b0b ("x86/mm: Increase pgt_buf size for 5-level page tables")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
