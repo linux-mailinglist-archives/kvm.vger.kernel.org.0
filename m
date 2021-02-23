@@ -2,144 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDC34322BB6
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:52:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56FAC322BEF
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 15:08:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232731AbhBWNu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 08:50:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29683 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232572AbhBWNuz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 08:50:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614088168;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GOvexyYc/ObMQAaHFdie5/nomXHMwOs8rdABZEM/9Ps=;
-        b=K0ItB7EQyxic1DYoMmmsyQTV9a0z1KHzipxJc1w24WSzqQ3M30NkXl9hLs/EVxyukVuTtQ
-        9KGDAClM5/NvaXM6vtVK4HB8eLTF8L8V3xg+KuypfiiWntJJy+T/PL0zn0mHJQXwxtUFJv
-        aIJX/iJXv+N0MCQszS0XKbBvn3dDuv0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-268-EPlwDjlXOiON2bkoKiSlNA-1; Tue, 23 Feb 2021 08:49:24 -0500
-X-MC-Unique: EPlwDjlXOiON2bkoKiSlNA-1
-Received: by mail-wm1-f69.google.com with SMTP id j204so1224059wmj.4
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 05:49:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GOvexyYc/ObMQAaHFdie5/nomXHMwOs8rdABZEM/9Ps=;
-        b=bUjaDKAQ5axH7T8vqIXtXBYoLrFhWX3c43WHrn/jUbh4svMJtFS1/olJPlySEFQ40i
-         c8zIqSrncG8OpjyRetW0fE79uRgNBk9YFSO4g4JC+zbMHMV6HTrQYQTaWDutghfvnDUj
-         +nZHb0wLt0d+J37a1kbDe63GBUth3uhC00bnG0TzdQlkpodz89lzPJXbDHGstGGDZaz6
-         NNZaPwKOce6zQwFqQ04iDfCmikmDNAVWeVXbwv3B51yAchqXaar8yABa7kR+OPDikDjB
-         h6641JQ2cmpO1EP8bWDt9mRMXCPqRhloKhoof3DcJ0efq0tJOIWLZMn69sOrqdeRj+/6
-         m8Qg==
-X-Gm-Message-State: AOAM532YqnD+mGR0jrG9d6W2tF0SpKJrqp/sGqu6o3HeUmbA/cH0eePX
-        J+skj1kFhl3i0bD90/gyVxwZTPfvtUoUYNMqp1lVbMg4A7K/9pmT5gEmouOJQvcsizZpyslsWdf
-        DNpq0MlWirvCw
-X-Received: by 2002:a1c:b741:: with SMTP id h62mr17331288wmf.85.1614088163362;
-        Tue, 23 Feb 2021 05:49:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzWyIcShiLHe07mw9HE/r5BInLl+NukEK8C2wh6/ekL9Dgw0dtDjxRuJKOsywf6vYjLteh5cg==
-X-Received: by 2002:a1c:b741:: with SMTP id h62mr17331273wmf.85.1614088163149;
-        Tue, 23 Feb 2021 05:49:23 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id s84sm198526wme.11.2021.02.23.05.49.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 05:49:22 -0800 (PST)
-Date:   Tue, 23 Feb 2021 14:49:20 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v5 10/19] virtio/vsock: simplify credit update
- function API
-Message-ID: <20210223134920.nvecqujytdfcqnbt@steredhat>
-References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
- <20210218053926.1068053-1-arseny.krasnov@kaspersky.com>
+        id S231478AbhBWOIu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 09:08:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45176 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230165AbhBWOIr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 09:08:47 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NE4804036949;
+        Tue, 23 Feb 2021 09:08:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=ySQiB4YasbBPzqhTJdzSqSt993KdrOQGK0tllJJ677Y=;
+ b=b4gm3v7q+xxQjPPmOYEsfU0sdAhJr6Ol+nwYOOLtvfo3hxxmmn+CfW7qmG8V0BAIOsJD
+ 5S/c3flhU/guaXmj6MypMjL2kUESUXCkOpui0xaNUs5TQ1EXhN5MTzU7fPP5nOWzjqhn
+ g9/yYisdhy7GXfDHZNWy0zrvXDEP07JbqueC6fdbAD/YAFEtExG8mSBkkThJkeEpQLUJ
+ sWQTqjE2CQ5jV+8x11TaPPeH5muz8CPrLCqejSKdsxomuVw/QlUQ12VAS5gjeTsgjtiC
+ a+g770okmrr1V3jCPvTDpAgqTj5+7hoAaFQPtIJ+hT+uDbk2+diRafbPEIsJ2mup2V/R ng== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfuaay7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 09:08:06 -0500
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NE4J73037532;
+        Tue, 23 Feb 2021 09:08:06 -0500
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfuaaww-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 09:08:06 -0500
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NE7xrd002394;
+        Tue, 23 Feb 2021 14:08:03 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04fra.de.ibm.com with ESMTP id 36tt289d68-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 14:08:03 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NE80Qx28705044
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Feb 2021 14:08:00 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 969BFA4083;
+        Tue, 23 Feb 2021 14:08:00 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 384BCA4082;
+        Tue, 23 Feb 2021 14:08:00 +0000 (GMT)
+Received: from ibm-vm.ibmuc.com (unknown [9.145.5.213])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Feb 2021 14:08:00 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        frankja@linux.ibm.com, cohuck@redhat.com, pmorel@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/5] s390: Add support for large pages
+Date:   Tue, 23 Feb 2021 15:07:54 +0100
+Message-Id: <20210223140759.255670-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210218053926.1068053-1-arseny.krasnov@kaspersky.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-23_07:2021-02-23,2021-02-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 spamscore=0 impostorscore=0 malwarescore=0 bulkscore=0
+ adultscore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102230119
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 08:39:23AM +0300, Arseny Krasnov wrote:
->'virtio_transport_send_credit_update()' has some extra args:
->1) 'type' may be set in 'virtio_transport_send_pkt_info()' using type
->   of socket.
->2) This function is static and 'hdr' arg was always NULL.
->
->Signed-off-by: Arseny Krasnov <arseny.krasnov@kaspersky.com>
->---
-> net/vmw_vsock/virtio_transport_common.c | 15 ++++-----------
-> 1 file changed, 4 insertions(+), 11 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 1c9d71ca5e8e..833104b71a1c 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -271,13 +271,10 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_put_credit);
->
->-static int virtio_transport_send_credit_update(struct vsock_sock *vsk,
->-					       int type,
->-					       struct virtio_vsock_hdr *hdr)
->+static int virtio_transport_send_credit_update(struct vsock_sock *vsk)
-> {
-> 	struct virtio_vsock_pkt_info info = {
-> 		.op = VIRTIO_VSOCK_OP_CREDIT_UPDATE,
->-		.type = type,
-> 		.vsk = vsk,
-> 	};
+Introduce support for large (1M) and huge (2G) pages.
 
-I don't know if it's better to remove type with the others changes in 
-the previous patch, maybe it's more consistent.
+Add a simple testcase for EDAT1 and EDAT2.
 
-I mean only the removal of 'type' parameter, the 'hdr' parameter should 
-be removed with this patch.
+v1->v2
 
->
->@@ -385,11 +382,8 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 	 * messages, we set the limit to a high value. TODO: experiment
-> 	 * with different values.
-> 	 */
->-	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE) {
->-		virtio_transport_send_credit_update(vsk,
->-						    
->VIRTIO_VSOCK_TYPE_STREAM,
->-						    NULL);
->-	}
->+	if (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
->+		virtio_transport_send_credit_update(vsk);
->
-> 	return total;
->
->@@ -498,8 +492,7 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val)
->
-> 	vvs->buf_alloc = *val;
->
->-	virtio_transport_send_credit_update(vsk, VIRTIO_VSOCK_TYPE_STREAM,
->-					    NULL);
->+	virtio_transport_send_credit_update(vsk);
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_notify_buffer_size);
->
->-- 
->2.25.1
->
+* split patch 2 -> new patch 2 and new patch 3
+* patch 2: fixes pgtable.h, also fixes wrong usage of REGION_TABLE_LENGTH
+  instead of SEGMENT_TABLE_LENGTH
+* patch 3: introduces new macros and functions for large pages
+* patch 4: remove erroneous double call to pte_alloc in get_pte
+* patch 4: added comment in mmu.c to bridge the s390x architecural names
+  with the Linux ones used in the kvm-unit-tests
+* patch 5: added and fixed lots of comments to explain what's going on
+* patch 5: set FC for region 3 after writing the canary, like for segments
+* patch 5: use uintptr_t instead of intptr_t for set_prefix
+* patch 5: introduce new macro PGD_PAGE_SHIFT instead of using magic value 41
+* patch 5: use VIRT(0) instead of mem to make it more clear what we are
+  doing, even though VIRT(0) expands to mem
+
+Claudio Imbrenda (5):
+  libcflat: add SZ_1M and SZ_2G
+  s390x: lib: fix pgtable.h
+  s390x: lib: improve pgtable.h
+  s390x: mmu: add support for large pages
+  s390x: edat test
+
+ s390x/Makefile          |   1 +
+ lib/s390x/asm/pgtable.h |  40 +++++-
+ lib/libcflat.h          |   2 +
+ lib/s390x/mmu.h         |  73 +++++++++-
+ lib/s390x/mmu.c         | 260 ++++++++++++++++++++++++++++++++----
+ s390x/edat.c            | 285 ++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg     |   3 +
+ 7 files changed, 633 insertions(+), 31 deletions(-)
+ create mode 100644 s390x/edat.c
+
+-- 
+2.26.2
 
