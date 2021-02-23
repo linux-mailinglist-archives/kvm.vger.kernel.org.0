@@ -2,216 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4F6322E0D
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 16:54:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07FD6322E18
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 16:56:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233501AbhBWPy2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 10:54:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17480 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233302AbhBWPyZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 10:54:25 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NFX1dP069497;
-        Tue, 23 Feb 2021 10:53:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=ORXoAhGBWyKV/A/oflNlufrmWt97iR8Me/DNZjtzNvY=;
- b=H4S+zF4oQuDQRtv71IUFky83PKUsJNVEzpLNWeUYrcFpFHeNKSwlr8r0Q9Nmjp7OXrMn
- 8TX5iVqUz5AtDu27mIvpVDarUTgFNP8JPQ402JwDu3d0QieKTuYDk2s+cd/FQ3Fb2uQM
- pfWk72GLPZH1BABwwWUOH/mqz3KzInf8I93Lm7HvuMQNnK+B3tYRp0BevakLpCyTUOLw
- vOi67MTndSk6cMplRIwAH34WbNhMFlYtsC4o5ZMAJgEF3w82TY0ReTuFvnvfapL5/ng9
- riyKFYRh/gVtA5VQGPfBq8tinrT5Zny3BYw35zcNdFDKEYlsaAuuQnbt5fhmqGT5kFG8 tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkg4d35h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 10:53:43 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NFXFmC071075;
-        Tue, 23 Feb 2021 10:53:42 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkg4d34f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 10:53:42 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NFr7qd017933;
-        Tue, 23 Feb 2021 15:53:40 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 36tsph2ra4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 15:53:40 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NFrbGW42860944
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Feb 2021 15:53:37 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A465F52052;
-        Tue, 23 Feb 2021 15:53:37 +0000 (GMT)
-Received: from ibm-vm (unknown [9.145.5.213])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 413F55204F;
-        Tue, 23 Feb 2021 15:53:37 +0000 (GMT)
-Date:   Tue, 23 Feb 2021 16:53:35 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, cohuck@redhat.com, pmorel@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/5] s390x: lib: fix pgtable.h
-Message-ID: <20210223165335.749d0d88@ibm-vm>
-In-Reply-To: <acdcd652-55ef-0573-f51a-4b6a1c9434fa@linux.ibm.com>
-References: <20210223140759.255670-1-imbrenda@linux.ibm.com>
-        <20210223140759.255670-3-imbrenda@linux.ibm.com>
-        <518e0f86-bbba-bd52-3962-2816b2f8ccf6@linux.ibm.com>
-        <20210223162116.12fbd4ad@ibm-vm>
-        <acdcd652-55ef-0573-f51a-4b6a1c9434fa@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S233396AbhBWPz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 10:55:56 -0500
+Received: from foss.arm.com ([217.140.110.172]:57320 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233499AbhBWPzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 10:55:41 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 655831FB;
+        Tue, 23 Feb 2021 07:54:53 -0800 (PST)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0C103F70D;
+        Tue, 23 Feb 2021 07:54:51 -0800 (PST)
+Subject: Re: [RFC PATCH 0/4] KVM: arm64: Improve efficiency of stage2 page
+ table
+To:     Yanan Wang <wangyanan55@huawei.com>, Marc Zyngier <maz@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Gavin Shan <gshan@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210208112250.163568-1-wangyanan55@huawei.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <3a128c43-ff18-2132-1eaa-1fc882c80b1e@arm.com>
+Date:   Tue, 23 Feb 2021 15:55:04 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210208112250.163568-1-wangyanan55@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-23_08:2021-02-23,2021-02-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
- malwarescore=0 bulkscore=0 mlxlogscore=999 spamscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102230131
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Feb 2021 16:44:43 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Hi Yanan,
 
-> On 2/23/21 4:21 PM, Claudio Imbrenda wrote:
-> > On Tue, 23 Feb 2021 15:31:06 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >   
-> >> On 2/23/21 3:07 PM, Claudio Imbrenda wrote:  
-> >>> Fix pgtable.h:
-> >>>
-> >>> * SEGMENT_ENTRY_SFAA had one extra bit set
-> >>> * pmd entries don't have a length
-> >>> * ipte does not need to clear the lower bits
-> >>> * pud entries should use SEGMENT_TABLE_LENGTH, as they point to
-> >>> segment tables
-> >>>
-> >>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> >>> ---
-> >>>  lib/s390x/asm/pgtable.h | 9 ++++-----
-> >>>  1 file changed, 4 insertions(+), 5 deletions(-)
-> >>>
-> >>> diff --git a/lib/s390x/asm/pgtable.h b/lib/s390x/asm/pgtable.h
-> >>> index 277f3480..a2ff2d4e 100644
-> >>> --- a/lib/s390x/asm/pgtable.h
-> >>> +++ b/lib/s390x/asm/pgtable.h
-> >>> @@ -60,7 +60,7 @@
-> >>>  #define SEGMENT_SHIFT			20
-> >>>  
-> >>>  #define SEGMENT_ENTRY_ORIGIN		0xfffffffffffff800UL
-> >>> -#define SEGMENT_ENTRY_SFAA		0xfffffffffff80000UL
-> >>> +#define SEGMENT_ENTRY_SFAA		0xfffffffffff00000UL
-> >>>  #define SEGMENT_ENTRY_AV		0x0000000000010000UL
-> >>>  #define SEGMENT_ENTRY_ACC		0x000000000000f000UL
-> >>>  #define SEGMENT_ENTRY_F
-> >>> 0x0000000000000800UL @@ -183,7 +183,7 @@ static inline pmd_t
-> >>> *pmd_alloc(pud_t *pud, unsigned long addr) if (pud_none(*pud)) {
-> >>>  		pmd_t *pmd = pmd_alloc_one();
-> >>>  		pud_val(*pud) = __pa(pmd) |
-> >>> REGION_ENTRY_TT_REGION3 |
-> >>> -				REGION_TABLE_LENGTH;
-> >>> +				SEGMENT_TABLE_LENGTH;    
-> >>
-> >> @David: I'd much rather have REGION_ENTRY_LENGTH instead of
-> >> REGION_TABLE_LENGTH and SEGMENT_TABLE_LENGTH.  
-> > 
-> > I'm weakly against it
-> >   
-> >> My argument is that this is not really an attribute of the table
-> >> and  
-> > 
-> > it actually is an attribute of the table. the *_TABLE_LENGTH fields
-> > tell how long the _table pointed to_ is. we always allocate the
-> > full 4 pages, so in our case it will always be 0x3.
-> >   
-> 
-> It's part of the entry nevertheless and should not be a *_TABLE_*
-> constant. It's used in entries and has a very specific format that
-> only makes sense if it's being used in a region entry.
+I wanted to review the patches, but unfortunately I get an error when trying to
+apply the first patch in the series:
 
-or in the ASCE, yes
+Applying: KVM: arm64: Move the clean of dcache to the map handler
+error: patch failed: arch/arm64/kvm/hyp/pgtable.c:464
+error: arch/arm64/kvm/hyp/pgtable.c: patch does not apply
+error: patch failed: arch/arm64/kvm/mmu.c:882
+error: arch/arm64/kvm/mmu.c: patch does not apply
+Patch failed at 0001 KVM: arm64: Move the clean of dcache to the map handler
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
 
-> Every other thing that you or into the entry apart from the address is
-> named *_ENTRY_* so this should be too.
+Tried this with Linux tags v5.11-rc1 to v5.11-rc7. It looks like pgtable.c and
+mmu.c from your patch is different than what is found on upstream master. Did you
+use another branch as the base for your patches?
 
-fair enough
+Thanks,
 
-> > segment table entries don't have a length because they point to page
-> > tables. region3 table entries point to segment tables, so they have
-> > SEGMENT_TABLE_LENGTH in their length field.  
-> 
-> Btw. I'd guess the SEGMENT_TABLE_LENGTH name is the reason that you
-> had to fix the problem in the next hunk...
+Alex
 
-yes, I am quite sure of this too :)
-
-I'll figure out a better name and respin
-
-> >> very much specific to the format of the (region table) entry. We
-> >> already have the table order as a length anyway...
-> >>
-> >> Could you tell me what you had in mind when splitting this?
-> >>  
-> >>>  	}
-> >>>  	return pmd_offset(pud, addr);
-> >>>  }
-> >>> @@ -202,15 +202,14 @@ static inline pte_t *pte_alloc(pmd_t *pmd,
-> >>> unsigned long addr) {
-> >>>  	if (pmd_none(*pmd)) {
-> >>>  		pte_t *pte = pte_alloc_one();
-> >>> -		pmd_val(*pmd) = __pa(pte) |
-> >>> SEGMENT_ENTRY_TT_SEGMENT |
-> >>> -				SEGMENT_TABLE_LENGTH;
-> >>> +		pmd_val(*pmd) = __pa(pte) |
-> >>> SEGMENT_ENTRY_TT_SEGMENT;    
-> >>
-> >> Uhhhh good catch!
-> >>  
-> >>>  	}
-> >>>  	return pte_offset(pmd, addr);
-> >>>  }
-> >>>  
-> >>>  static inline void ipte(unsigned long vaddr, pteval_t *p_pte)
-> >>>  {
-> >>> -	unsigned long table_origin = (unsigned long)p_pte &
-> >>> PAGE_MASK;
-> >>> +	unsigned long table_origin = (unsigned long)p_pte;
-> >>>  
-> >>>  	asm volatile(
-> >>>  		"	ipte %0,%1\n"
-> >>>     
-> >>
-> >> IPTE ignores that data but having the page mask also doesn't hurt
-> >> so generally this is not a fix, right?  
-> > 
-> > apart from avoiding an unnecessary operation, there is a small nit:
-> > IPTE wants the address of the page table, ignoring the rightmost
-> > _11_ bits. with PAGE_MASK we ignore the rightmost _12_ bits instead.
-> > it's not an issue in practice, because we allocate one page table
-> > per page anyway, wasting the second half of the page, so in our
-> > case that stray bit will always be 0. but in case we decide to
-> > allocate the page tables more tightly, or in case some testcase
-> > wants to manually play tricks with the page tables, there might be
-> > the risk that IPTE would target the wrong page table.
-> > 
-> > by not clearing the lower 12 bits we not only save an unnecessary
-> > operation, but we are actually more architecturally correct.
-> >   
-> 
-> Right, the old 2k pgtable thing...
-> Would you mind putting that into the patch description?
-
-will do
-
-
+On 2/8/21 11:22 AM, Yanan Wang wrote:
+> Hi,
+>
+> This series makes some efficiency improvement of stage2 page table code,
+> and there are some test results to present the performance changes, which
+> were tested by a kvm selftest [1] that I have post:
+> [1] https://lore.kernel.org/lkml/20210208090841.333724-1-wangyanan55@huawei.com/ 
+>
+> About patch 1:
+> We currently uniformly clean dcache in user_mem_abort() before calling the
+> fault handlers, if we take a translation fault and the pfn is cacheable.
+> But if there are concurrent translation faults on the same page or block,
+> clean of dcache for the first time is necessary while the others are not.
+>
+> By moving clean of dcache to the map handler, we can easily identify the
+> conditions where CMOs are really needed and avoid the unnecessary ones.
+> As it's a time consuming process to perform CMOs especially when flushing
+> a block range, so this solution reduces much load of kvm and improve the
+> efficiency of creating mappings.
+>
+> Test results:
+> (1) when 20 vCPUs concurrently access 20G ram (all 1G hugepages):
+> KVM create block mappings time: 52.83s -> 3.70s
+> KVM recover block mappings time(after dirty-logging): 52.0s -> 2.87s
+>
+> (2) when 40 vCPUs concurrently access 20G ram (all 1G hugepages):
+> KVM creating block mappings time: 104.56s -> 3.70s
+> KVM recover block mappings time(after dirty-logging): 103.93s -> 2.96s
+>
+> About patch 2, 3:
+> When KVM needs to coalesce the normal page mappings into a block mapping,
+> we currently invalidate the old table entry first followed by invalidation
+> of TLB, then unmap the page mappings, and install the block entry at last.
+>
+> It will cost a lot of time to unmap the numerous page mappings, which means
+> the table entry will be left invalid for a long time before installation of
+> the block entry, and this will cause many spurious translation faults.
+>
+> So let's quickly install the block entry at first to ensure uninterrupted
+> memory access of the other vCPUs, and then unmap the page mappings after
+> installation. This will reduce most of the time when the table entry is
+> invalid, and avoid most of the unnecessary translation faults.
+>
+> Test results based on patch 1:
+> (1) when 20 vCPUs concurrently access 20G ram (all 1G hugepages):
+> KVM recover block mappings time(after dirty-logging): 2.87s -> 0.30s
+>
+> (2) when 40 vCPUs concurrently access 20G ram (all 1G hugepages):
+> KVM recover block mappings time(after dirty-logging): 2.96s -> 0.35s
+>
+> So combined with patch 1, it makes a big difference of KVM creating mappings
+> and recovering block mappings with not much code change.
+>
+> About patch 4:
+> A new method to distinguish cases of memcache allocations is introduced.
+> By comparing fault_granule and vma_pagesize, cases that require allocations
+> from memcache and cases that don't can be distinguished completely.
+>
+> ---
+>
+> Details of test results
+> platform: HiSilicon Kunpeng920 (FWB not supported)
+> host kernel: Linux mainline (v5.11-rc6)
+>
+> (1) performance change of patch 1
+> cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 20
+> 	   (20 vcpus, 20G memory, block mappings(granule 1G))
+> Before patch: KVM_CREATE_MAPPINGS: 52.8338s 52.8327s 52.8336s 52.8255s 52.8303s
+> After  patch: KVM_CREATE_MAPPINGS:  3.7022s  3.7031s  3.7028s  3.7012s  3.7024s
+>
+> Before patch: KVM_ADJUST_MAPPINGS: 52.0466s 52.0473s 52.0550s 52.0518s 52.0467s
+> After  patch: KVM_ADJUST_MAPPINGS:  2.8787s  2.8781s  2.8785s  2.8742s  2.8759s
+>
+> cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 40
+> 	   (40 vcpus, 20G memory, block mappings(granule 1G))
+> Before patch: KVM_CREATE_MAPPINGS: 104.560s 104.556s 104.554s 104.556s 104.550s
+> After  patch: KVM_CREATE_MAPPINGS:  3.7011s  3.7103s  3.7005s  3.7024s  3.7106s
+>
+> Before patch: KVM_ADJUST_MAPPINGS: 103.931s 103.936s 103.927s 103.942s 103.927s
+> After  patch: KVM_ADJUST_MAPPINGS:  2.9621s  2.9648s  2.9474s  2.9587s  2.9603s
+>
+> (2) performance change of patch 2, 3(based on patch 1)
+> cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 1
+> 	   (1 vcpu, 20G memory, block mappings(granule 1G))
+> Before patch: KVM_ADJUST_MAPPINGS: 2.8241s 2.8234s 2.8245s 2.8230s 2.8652s
+> After  patch: KVM_ADJUST_MAPPINGS: 0.2444s 0.2442s 0.2423s 0.2441s 0.2429s
+>
+> cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 20
+> 	   (20 vcpus, 20G memory, block mappings(granule 1G))
+> Before patch: KVM_ADJUST_MAPPINGS: 2.8787s 2.8781s 2.8785s 2.8742s 2.8759s
+> After  patch: KVM_ADJUST_MAPPINGS: 0.3008s 0.3004s 0.2974s 0.2917s 0.2900s
+>
+> cmdline: ./kvm_page_table_test -m 4 -t 2 -g 1G -s 20G -v 40
+> 	   (40 vcpus, 20G memory, block mappings(granule 1G))
+> Before patch: KVM_ADJUST_MAPPINGS: 2.9621s 2.9648s 2.9474s 2.9587s 2.9603s
+> After  patch: KVM_ADJUST_MAPPINGS: 0.3541s 0.3694s 0.3656s 0.3693s 0.3687s
+>
+> ---
+>
+> Yanan Wang (4):
+>   KVM: arm64: Move the clean of dcache to the map handler
+>   KVM: arm64: Add an independent API for coalescing tables
+>   KVM: arm64: Install the block entry before unmapping the page mappings
+>   KVM: arm64: Distinguish cases of memcache allocations completely
+>
+>  arch/arm64/include/asm/kvm_mmu.h | 16 -------
+>  arch/arm64/kvm/hyp/pgtable.c     | 82 +++++++++++++++++++++-----------
+>  arch/arm64/kvm/mmu.c             | 39 ++++++---------
+>  3 files changed, 69 insertions(+), 68 deletions(-)
+>
