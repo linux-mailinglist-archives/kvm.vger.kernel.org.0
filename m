@@ -2,154 +2,420 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 592CD322CDC
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 15:52:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FC22322CFC
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 15:58:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233155AbhBWOwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 09:52:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50637 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232698AbhBWOv4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 09:51:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614091830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M2OsuZx3r6NZflw0QWxaOyg4KYFKBmW4S9BSyB7K63o=;
-        b=TsThiW2yX0wp9P166tJDvFqmNJMyu+T351We00fGmUgKY/bZZ+S3Q4eXBp7pAL6TwpiFC8
-        yxTq4avZ4OCDefdEWPc9vX8EAMw3KSS8XjNwMn0wu5gMY00GdwL65CoSvUxNHukA8ad2wO
-        Znf70BlilDtT9az6tX4pwVb41QmUJR0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-585-o54DRjYSOuqy17b50yVrFw-1; Tue, 23 Feb 2021 09:50:21 -0500
-X-MC-Unique: o54DRjYSOuqy17b50yVrFw-1
-Received: by mail-wr1-f69.google.com with SMTP id x14so6796787wrr.13
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 06:50:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=M2OsuZx3r6NZflw0QWxaOyg4KYFKBmW4S9BSyB7K63o=;
-        b=i8aFOtby/on9rsckACQYXutrxRgVqVX51szzDeFklwN7O2ILNR8YbRnzZp7Mh0YI8u
-         x2uhaI9TqmoYOb8Np2c3ETuDXDuwJQmcQY1G9bFV7NMIvxB8JwJIETtnX7XA0bkwmP26
-         iDOwG8Y7lB0rMziwSXtoybILebNy0SmSJMwAWHjIZbt2E1ywy2C7NR8JwKR57CcmgGFx
-         K1Xlg3nhAG1ii4faTlCu2GWB73L/no0/986X4a6mUi85+TooQ0VQb3bEYsNHy7UHjxq5
-         6qAJ92VQEO3zJROXlFRhYK4OcU1bunGuzkWtV6uCDYPsuHdDh0zDv4fZRJ6+LBbb0eQ5
-         fOCg==
-X-Gm-Message-State: AOAM5300Z6VESw1BMk4LMzIflygsSv14gIf8kH/Q3FwYjWz6kFbZSCev
-        fvwJbgQVY/31RAt5ef97V2G/yabXAN5ywqyJAWNbyWcoZYI1At916CU+rjqSPdWAE730kEnMl5l
-        6FYkpUFgZJK/3
-X-Received: by 2002:a1c:98c2:: with SMTP id a185mr9344412wme.72.1614091819958;
-        Tue, 23 Feb 2021 06:50:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz9tKk0w/iRNRhb7cnm0SfH7twj8rmJO83bREpU9MxKNF6QINjG5A2hMiz9ZZMxEqXDfAr0og==
-X-Received: by 2002:a1c:98c2:: with SMTP id a185mr9344394wme.72.1614091819741;
-        Tue, 23 Feb 2021 06:50:19 -0800 (PST)
-Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
-        by smtp.gmail.com with ESMTPSA id o15sm2891607wmh.39.2021.02.23.06.50.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Feb 2021 06:50:19 -0800 (PST)
-Date:   Tue, 23 Feb 2021 15:50:16 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jorgen Hansen <jhansen@vmware.com>,
-        Andra Paraschiv <andraprs@amazon.com>,
-        Norbert Slusarek <nslusarek@gmx.net>,
-        Colin Ian King <colin.king@canonical.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stsp2@yandex.ru, oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v5 00/19] virtio/vsock: introduce SOCK_SEQPACKET
- support
-Message-ID: <20210223145016.ddavx6fihq4akdim@steredhat>
-References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
- <20210222142311.gekdd7gsm33wglos@steredhat>
+        id S232769AbhBWO6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 09:58:30 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34450 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232790AbhBWO6V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 09:58:21 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NEYTmv079280;
+        Tue, 23 Feb 2021 09:57:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
+ from : subject : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=XiXQehaFtvt7zrUOYuGoqiKu//DRgZs73XiGtDwDuZo=;
+ b=paXTrcqb6X6R6ky6kxlhtFLxevSQiws+xvoEPwMIUCPdQKp2Z03ul3lVWN8jTdYpOBJA
+ lRNntQKJoYNQQNLgMy6KZxiZ00amSFHMxG+LksfKpao1bmlPtj/7h87eY0ORBPixOf1o
+ yFyWDzc5xLeuzrvQlxwQZBU6XShG3+1Td8nZ4//q8PnH6EuniaLOIDX5z2VrVcykKZR1
+ U7z2ELzu84ghOMWnCGiuwfNUbe43ShuvPs8QA3fuHRgJaWcdeyknpTlCz0FxPV5yrIof
+ o3goLGe68XF2agpLibO8mUCIieT55+hvR/7a5Gwv1sdowJ/ISvXVCGd8glYWHCmncl0r 0A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfp9j6y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 09:57:39 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NEYgqJ079753;
+        Tue, 23 Feb 2021 09:57:38 -0500
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36vkfp9j5k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 09:57:38 -0500
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NEq4u3024316;
+        Tue, 23 Feb 2021 14:57:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma03ams.nl.ibm.com with ESMTP id 36tt282q27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 23 Feb 2021 14:57:34 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NEvVk135324342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Feb 2021 14:57:32 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D18F3A4067;
+        Tue, 23 Feb 2021 14:57:31 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E9CCA4054;
+        Tue, 23 Feb 2021 14:57:31 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.67.183])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 23 Feb 2021 14:57:31 +0000 (GMT)
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, pmorel@linux.ibm.com
+References: <20210223140759.255670-1-imbrenda@linux.ibm.com>
+ <20210223140759.255670-6-imbrenda@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 5/5] s390x: edat test
+Message-ID: <66b9a460-c02a-e337-ab33-470c357baf1e@linux.ibm.com>
+Date:   Tue, 23 Feb 2021 15:57:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20210222142311.gekdd7gsm33wglos@steredhat>
+In-Reply-To: <20210223140759.255670-6-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-23_08:2021-02-23,2021-02-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 suspectscore=0
+ mlxlogscore=999 malwarescore=0 adultscore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102230124
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Feb 22, 2021 at 03:23:11PM +0100, Stefano Garzarella wrote:
->Hi Arseny,
->
->On Thu, Feb 18, 2021 at 08:33:44AM +0300, Arseny Krasnov wrote:
->>	This patchset impelements support of SOCK_SEQPACKET for virtio
->>transport.
->>	As SOCK_SEQPACKET guarantees to save record boundaries, so to
->>do it, two new packet operations were added: first for start of record
->>and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
->>both operations carries metadata - to maintain boundaries and payload
->>integrity. Metadata is introduced by adding special header with two
->>fields - message count and message length:
->>
->>	struct virtio_vsock_seq_hdr {
->>		__le32  msg_cnt;
->>		__le32  msg_len;
->>	} __attribute__((packed));
->>
->>	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
->>packets(buffer of second virtio descriptor in chain) in the same way as
->>data transmitted in RW packets. Payload was chosen as buffer for this
->>header to avoid touching first virtio buffer which carries header of
->>packet, because someone could check that size of this buffer is equal
->>to size of packet header. To send record, packet with start marker is
->>sent first(it's header contains length of record and counter), then
->>counter is incremented and all data is sent as usual 'RW' packets and
->>finally SEQ_END is sent(it also carries counter of message, which is
->>counter of SEQ_BEGIN + 1), also after sedning SEQ_END counter is
->>incremented again. On receiver's side, length of record is known from
->>packet with start record marker. To check that no packets were dropped
->>by transport, counters of two sequential SEQ_BEGIN and SEQ_END are
->>checked(counter of SEQ_END must be bigger that counter of SEQ_BEGIN by
->>1) and length of data between two markers is compared to length in
->>SEQ_BEGIN header.
->>	Now as  packets of one socket are not reordered neither on
->>vsock nor on vhost transport layers, such markers allows to restore
->>original record on receiver's side. If user's buffer is smaller that
->>record length, when all out of size data is dropped.
->>	Maximum length of datagram is not limited as in stream socket,
->>because same credit logic is used. Difference with stream socket is
->>that user is not woken up until whole record is received or error
->>occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
->>	Tests also implemented.
->
->I reviewed the first part (af_vsock.c changes), tomorrow I'll review 
->the rest. That part looks great to me, only found a few minor issues.
+On 2/23/21 3:07 PM, Claudio Imbrenda wrote:
+> Simple EDAT test.
+> 
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>  s390x/Makefile      |   1 +
+>  s390x/edat.c        | 285 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |   3 +
+>  3 files changed, 289 insertions(+)
+>  create mode 100644 s390x/edat.c
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 08d85c9f..fc885150 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -20,6 +20,7 @@ tests += $(TEST_DIR)/sclp.elf
+>  tests += $(TEST_DIR)/css.elf
+>  tests += $(TEST_DIR)/uv-guest.elf
+>  tests += $(TEST_DIR)/sie.elf
+> +tests += $(TEST_DIR)/edat.elf
+>  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/edat.c b/s390x/edat.c
+> new file mode 100644
+> index 00000000..0bd16efc
+> --- /dev/null
+> +++ b/s390x/edat.c
+> @@ -0,0 +1,285 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * EDAT test.
+> + *
+> + * Copyright (c) 2021 IBM Corp
+> + *
+> + * Authors:
+> + *	Claudio Imbrenda <imbrenda@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include <vmalloc.h>
+> +#include <asm/facility.h>
+> +#include <asm/interrupt.h>
+> +#include <mmu.h>
+> +#include <asm/pgtable.h>
+> +#include <asm-generic/barrier.h>
+> +
+> +#define PGD_PAGE_SHIFT (REGION1_SHIFT - PAGE_SHIFT)
+> +
+> +#define TEID_ADDR	PAGE_MASK
+> +#define TEID_AI		0x003
+> +#define TEID_M		0x004
+> +#define TEID_A		0x008
+> +#define TEID_FS		0xc00
 
-I revieiwed the rest of it as well, left a few minor comments, but I 
-think we're well on track.
 
-I'll take a better look at the specification patch tomorrow.
+I'm thinking about presenting faults in more detail in the future i.e.
+printing the TEID or at least the important parts of it. I'd guess this
+should go into the library.
 
-Thanks,
-Stefano
 
->
->In the meantime, however, I'm getting a doubt, especially with regard 
->to other transports besides virtio.
->
->Should we hide the begin/end marker sending in the transport?
->
->I mean, should the transport just provide a seqpacket_enqueue() 
->callbacl?
->Inside it then the transport will send the markers. This is because 
->some transports might not need to send markers.
->
->But thinking about it more, they could actually implement stubs for 
->that calls, if they don't need to send markers.
->
->So I think for now it's fine since it allows us to reuse a lot of 
->code, unless someone has some objection.
->
->Thanks,
->Stefano
->
+> +
+> +#define LC_SIZE	(2 * PAGE_SIZE)
+> +#define VIRT(x)	((void *)((unsigned long)(x) + (unsigned long)mem))
+> +
+> +static uint8_t prefix_buf[LC_SIZE] __attribute__((aligned(LC_SIZE)));
+> +static unsigned int tmp[1024] __attribute__((aligned(PAGE_SIZE)));
+> +static void *root, *mem, *m;
+> +static struct lowcore *lc;
+> +volatile unsigned int *p;
+> +
+> +/* Expect a program interrupt, and clear the TEID */
+> +static void expect_dat_fault(void)
+> +{
+> +	expect_pgm_int();
+> +	lc->trans_exc_id = 0;
+> +}
+> +
+> +/*
+> + * Check if a non-access-list protection exception happened for the given
+> + * address, in the primary address space.
+> + */
+> +static bool check_pgm_prot(void *ptr)
+> +{
+> +	unsigned long teid = lc->trans_exc_id;
+> +
+> +	if (lc->pgm_int_code != PGM_INT_CODE_PROTECTION)
+> +		return false;
+> +	/*
+> +	 * if for any reason TEID_M is not present, the rest of the field is
+> +	 * not meaningful, so no point in checking it
+> +	 */
+> +	if (~teid & TEID_M)
+> +		return true;
+> +	return (~teid & TEID_A) &&
+> +		((teid & TEID_ADDR) == ((uint64_t)ptr & PAGE_MASK)) &&
+> +		!(teid & TEID_AI);
+> +}
+> +
+> +static void test_dat(void)
+> +{
+> +	report_prefix_push("edat off");
+> +	/* disable EDAT */
+> +	ctl_clear_bit(0, 23);
+
+It's about time we properly define CTL0 bits.
+
+> +
+> +	/* Check some basics */
+> +	p[0] = 42;
+> +	report(p[0] == 42, "pte, r/w");
+> +	p[0] = 0;
+> +
+> +	/* Write protect the page and try to write, expect a fault */
+> +	protect_page(m, PAGE_ENTRY_P);
+> +	expect_dat_fault();
+> +	p[0] = 42;
+> +	unprotect_page(m, PAGE_ENTRY_P);
+> +	report(!p[0] && check_pgm_prot(m), "pte, ro");
+> +
+> +	/*
+> +	 * The FC bit (for large pages) should be ignored because EDAT is
+> +	 * off. We set a value and then we try to read it back again after
+> +	 * setting the FC bit. This way we can check if large pages were
+> +	 * erroneously enabled despite EDAT being off.
+> +	 */
+> +	p[0] = 42;
+> +	protect_dat_entry(m, SEGMENT_ENTRY_FC, 4);
+> +	report(p[0] == 42, "pmd, fc=1, r/w");
+> +	unprotect_dat_entry(m, SEGMENT_ENTRY_FC, 4);
+> +	p[0] = 0;
+> +
+> +	/*
+> +	 * Segment protection should work even with EDAT off, try to write
+> +	 * anyway and expect a fault
+> +	 */
+> +	protect_dat_entry(m, SEGMENT_ENTRY_P, 4);
+> +	expect_dat_fault();
+> +	p[0] = 42;
+> +	report(!p[0] && check_pgm_prot(m), "pmd, ro");
+> +	unprotect_dat_entry(m, SEGMENT_ENTRY_P, 4);
+> +
+> +	/* The FC bit should be ignored because EDAT is off, like above */
+> +	p[0] = 42;
+> +	protect_dat_entry(m, REGION3_ENTRY_FC, 3);
+> +	report(p[0] == 42, "pud, fc=1, r/w");
+> +	unprotect_dat_entry(m, REGION3_ENTRY_FC, 3);
+> +	p[0] = 0;
+> +
+> +	/*
+> +	 * Region1/2/3 protection should not work, because EDAT is off.
+> +	 * Protect the various region1/2/3 entries and write, expect the
+> +	 * write to be successful.
+> +	 */
+> +	protect_dat_entry(m, REGION_ENTRY_P, 3);
+> +	p[0] = 42;
+> +	report(p[0] == 42, "pud, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 3);
+> +	p[0] = 0;
+> +
+> +	protect_dat_entry(m, REGION_ENTRY_P, 2);
+> +	p[0] = 42;
+> +	report(p[0] == 42, "p4d, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 2);
+> +	p[0] = 0;
+> +
+> +	protect_dat_entry(m, REGION_ENTRY_P, 1);
+> +	p[0] = 42;
+> +	report(p[0] == 42, "pgd, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 1);
+> +	p[0] = 0;
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_edat1(void)
+> +{
+> +	report_prefix_push("edat1");
+> +	/* Enable EDAT */
+> +	ctl_set_bit(0, 23);
+> +	p[0] = 0;
+> +
+> +	/*
+> +	 * Segment protection should work normally, try to write and expect
+> +	 * a fault.
+> +	 */
+> +	expect_dat_fault();
+> +	protect_dat_entry(m, SEGMENT_ENTRY_P, 4);
+> +	p[0] = 42;
+> +	report(!p[0] && check_pgm_prot(m), "pmd, ro");
+> +	unprotect_dat_entry(m, SEGMENT_ENTRY_P, 4);
+> +
+> +	/*
+> +	 * Region1/2/3 protection should work now, because EDAT is on. Try
+> +	 * to write anyway and expect a fault.
+> +	 */
+> +	expect_dat_fault();
+> +	protect_dat_entry(m, REGION_ENTRY_P, 3);
+> +	p[0] = 42;
+> +	report(!p[0] && check_pgm_prot(m), "pud, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 3);
+> +
+> +	expect_dat_fault();
+> +	protect_dat_entry(m, REGION_ENTRY_P, 2);
+> +	p[0] = 42;
+> +	report(!p[0] && check_pgm_prot(m), "p4d, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 2);
+> +
+> +	expect_dat_fault();
+> +	protect_dat_entry(m, REGION_ENTRY_P, 1);
+> +	p[0] = 42;
+> +	report(!p[0] && check_pgm_prot(m), "pgd, ro");
+> +	unprotect_dat_entry(m, REGION_ENTRY_P, 1);
+> +
+> +	/* Large pages should work */
+> +	p[0] = 42;
+> +	install_large_page(root, 0, mem);
+> +	report(p[0] == 42, "pmd, large");
+> +
+> +	/*
+> +	 * Prefixing should not work with large pages. Since the lower
+> +	 * addresses are mapped with small pages, which are subject to
+> +	 * prefixing, and the pages mapped with large pages are not subject
+> +	 * to prefixing, this is the resulting scenario:
+> +	 *
+> +	 * virtual 0 = real 0 -> absolute prefix_buf
+> +	 * virtual prefix_buf = real prefix_buf -> absolute 0
+> +	 * VIRT(0) -> absolute 0
+> +	 * VIRT(prefix_buf) -> absolute prefix_buf
+> +	 *
+> +	 * The testcase checks if the memory at virtual 0 has the same
+> +	 * content as the memory at VIRT(prefix_buf) and the memory at
+> +	 * VIRT(0) has the same content as the memory at virtual prefix_buf.
+> +	 * If prefixing is erroneously applied for large pages, the testcase
+> +	 * will therefore fail.
+> +	 */
+> +	report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
+> +		!memcmp(prefix_buf, VIRT(0), LC_SIZE),
+> +		"pmd, large, prefixing");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static void test_edat2(void)
+> +{
+> +	report_prefix_push("edat2");
+> +	p[0] = 42;
+> +
+> +	/* Huge pages should work */
+> +	install_huge_page(root, 0, mem);
+> +	report(p[0] == 42, "pud, huge");
+> +
+> +	/* Prefixing should not work with huge pages, just like large pages */
+> +	report(!memcmp(0, VIRT(prefix_buf), LC_SIZE) &&
+> +		!memcmp(prefix_buf, VIRT(0), LC_SIZE),
+> +		"pmd, large, prefixing");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+> +static unsigned int setup(void)
+> +{
+> +	bool has_edat1 = test_facility(8);
+> +	bool has_edat2 = test_facility(78);
+> +	unsigned long pa, va;
+> +
+> +	if (has_edat2 && !has_edat1)
+> +		report_abort("EDAT2 available, but EDAT1 not available");
+> +
+> +	/* Setup DAT 1:1 mapping and memory management */
+> +	setup_vm();
+> +	root = (void *)(stctg(1) & PAGE_MASK);
+> +
+> +	/*
+> +	 * Get a pgd worth of virtual memory, so we can test things later
+> +	 * without interfering with the test code or the interrupt handler
+> +	 */
+> +	mem = alloc_vpages_aligned(BIT_ULL(PGD_PAGE_SHIFT), PGD_PAGE_SHIFT);
+> +	assert(mem);
+> +	va = (unsigned long)mem;
+> +
+> +	/* Map the first 1GB of real memory */
+> +	for (pa = 0; pa < SZ_1G; pa += PAGE_SIZE, va += PAGE_SIZE)
+> +		install_page(root, pa, (void *)va);
+> +
+> +	/*
+> +	 * Move the lowcore to a known non-zero location. This is needed
+> +	 * later to check whether prefixing is working with large pages.
+> +	 */
+> +	assert((unsigned long)&prefix_buf < SZ_2G);
+> +	memcpy(prefix_buf, 0, LC_SIZE);
+> +	set_prefix((uint32_t)(uintptr_t)prefix_buf);
+> +	/* Clear the old copy */
+> +	memset(prefix_buf, 0, LC_SIZE);
+> +
+> +	/* m will point to tmp through the new virtual mapping */
+> +	m = VIRT(&tmp);
+> +	/* p is the same as m but volatile */
+> +	p = (volatile unsigned int *)m;
+> +
+> +	return has_edat1 + has_edat2;
+> +}
+> +
+> +int main(void)
+> +{
+> +	unsigned int edat;
+> +
+> +	report_prefix_push("edat");
+> +	edat = setup();
+> +
+> +	test_dat();
+> +
+> +	if (edat)
+> +		test_edat1();
+> +	else
+> +		report_skip("EDAT not available");
+> +
+> +	if (edat >= 2)
+> +		test_edat2();
+> +	else
+> +		report_skip("EDAT2 not available");
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 2298be6c..8da4a0a3 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -99,3 +99,6 @@ file = uv-guest.elf
+>  
+>  [sie]
+>  file = sie.elf
+> +
+> +[edat]
+> +file = edat.elf
+> 
 
