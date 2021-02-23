@@ -2,114 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E4E8C322479
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 04:08:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E99E932249C
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 04:24:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231199AbhBWDIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Feb 2021 22:08:09 -0500
-Received: from mga18.intel.com ([134.134.136.126]:39519 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230371AbhBWDIG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Feb 2021 22:08:06 -0500
-IronPort-SDR: I8wXa8ArozbdbxPwY53kk5faNHIMnlQrp+QCWQlkM0D78onUvC1p8l3h/a6rnRWCSvriJcCtGM
- NiAqvaiBEibw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9903"; a="172328668"
-X-IronPort-AV: E=Sophos;i="5.81,199,1610438400"; 
-   d="scan'208";a="172328668"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2021 19:06:20 -0800
-IronPort-SDR: /6nIHWVZ2rpqTZY1ehs80a1kmL2cWW/xE31i8LO+JI9Cxx8taUxDi58kqjnss8+AUxM1dUD9GM
- PXRmw2W6g5eQ==
-X-IronPort-AV: E=Sophos;i="5.81,199,1610438400"; 
-   d="scan'208";a="402919857"
-Received: from unknown (HELO [10.238.130.200]) ([10.238.130.200])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Feb 2021 19:06:16 -0800
-Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
- <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
- <YCFzztFESzcnKRqQ@google.com>
- <c33335d3-abbe-04e0-2fa1-47f57ad154ac@linux.intel.com>
- <YDPWn70DTA64psQb@google.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <9d23ae5b-9b85-88d7-a2d7-44fd75a068b9@linux.intel.com>
-Date:   Tue, 23 Feb 2021 11:06:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S230498AbhBWDXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Feb 2021 22:23:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230010AbhBWDXo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Feb 2021 22:23:44 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9DDDC061574
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 19:23:04 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id t25so11530385pga.2
+        for <kvm@vger.kernel.org>; Mon, 22 Feb 2021 19:23:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=cM912ElSbEnONaB2LnB0Nv6OpxFH4i0/1HVfdpaNpY8=;
+        b=b4d0cm7hkKVINHwLJCwsdiOkchqjj595BNkiLzaMaLexd3IxpbCdJSaQLu6kHyFe+W
+         Bfj9wd5P+BQC0k0gabkOKehVZVrSiDBCO//LMM0AHJIJ2/hdI2QfkALKZQ6WdH+u3AmV
+         7iV7d4AQx0sZOZyt5NxBP34JQgjmyOkDz9RiCQ6dyLZwuijMTZp5lkHG2Ot0AbjCntCJ
+         CcBZeE50uepyb1+Xs13FB5OVKxOGGJDKf1yraXA/vaTypwBAZb3NnU2ogp7mGRMCYc+x
+         lEEA44k447FxFfd1LMmveMN7gzzmYDNNo3Tt+PO1835lyisSqFPumOoc4RbPz5ZjQNnt
+         lk/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=cM912ElSbEnONaB2LnB0Nv6OpxFH4i0/1HVfdpaNpY8=;
+        b=fIsHMjNoKAUVqHWtFRHLlakWC7SI+aA62BQSc3TszoqaiTh0dIyKs6iVL8enV7w3xA
+         mUsP2DOLC5jFqM6D7TFLhX3P0MUdZxBNc0KWByVDylFNQG7wkZ6yoSTfG4/oeI+SRSrK
+         cfl3T3eQGNPF7FngAHq8cFk2ij+AYLS5X0FqdE2CFDplbNBXct1YglRzTYgN+ysE4ww1
+         a5lYK8xsNSl8taOJH+y7sMH5GWq2+vn1X+KiiezkpyjrrPHW49aSE+YbsbdgTcPdYT8B
+         mhVCdip9iGmAYNC9q+l9MDbjPgdpezMR0Qj9tPxNT0E6T9aPDZcn1txFSSbnnuvV0gVT
+         zsNg==
+X-Gm-Message-State: AOAM531KYOWNCkkTkUDRg8ds8d7qh6k2I+glEo+9iUrsqb4h+K0J33Ph
+        wtKKHIzsibJVUMrKSNwqyMkrMBXzXh8=
+X-Google-Smtp-Source: ABdhPJx4pbCN+FlBi6x4ZQDEoRd7U6TRRM1VjdRM15KAGRnEAwhX0I37KHAiGQ4uiPZNSD/sdFUqEg==
+X-Received: by 2002:a63:66c7:: with SMTP id a190mr22422890pgc.117.1614050584040;
+        Mon, 22 Feb 2021 19:23:04 -0800 (PST)
+Received: from localhost ([2601:647:4600:11e1:d2fd:ba5d:619c:c25d])
+        by smtp.gmail.com with ESMTPSA id c29sm12962672pgb.58.2021.02.22.19.23.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 19:23:03 -0800 (PST)
+Date:   Mon, 22 Feb 2021 19:23:01 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc:     Isaku Yamahata <isaku.yamahata@intel.com>, qemu-devel@nongnu.org,
+        pbonzini@redhat.com, alistair@alistair23.me, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, mst@redhat.com, cohuck@redhat.com,
+        mtosatti@redhat.com, xiaoyao.li@intel.com, seanjc@google.com,
+        kvm@vger.kernel.org, isaku.yamahata@gmail.com
+Subject: Re: [RFC PATCH 02/23] kvm: Switch KVM_CAP_READONLY_MEM to a per-VM
+ ioctl()
+Message-ID: <20210223032301.GA88084@private.email.ne.jp>
+References: <cover.1613188118.git.isaku.yamahata@intel.com>
+ <1c93f5dabe2ef573302ff362c0c6c525bbe8af43.1613188118.git.isaku.yamahata@intel.com>
+ <0f29a789-9822-3dd8-b827-e5b86b933059@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YDPWn70DTA64psQb@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <0f29a789-9822-3dd8-b827-e5b86b933059@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Feb 16, 2021 at 08:56:45AM +0100,
+Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
 
+> Hi Isaku,
+> 
+> On 2/16/21 3:12 AM, Isaku Yamahata wrote:
+> > Switch to making a VM ioctl() call for KVM_CAP_READONLY_MEM, which may
+> > be conditional on VM type in recent versions of KVM, e.g. when TDX is
+> > supported.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  accel/kvm/kvm-all.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > index 47516913b7..351c25a5cb 100644
+> > --- a/accel/kvm/kvm-all.c
+> > +++ b/accel/kvm/kvm-all.c
+> > @@ -2164,7 +2164,7 @@ static int kvm_init(MachineState *ms)
+> >      }
+> >  
+> >      kvm_readonly_mem_allowed =
+> > -        (kvm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
+> > +        (kvm_vm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
+> 
+> Can this check with "recent KVM" be a problem with older ones?
+> 
+> Maybe for backward compatibility we need:
+> 
+>           = (kvm_vm_check_extension(s, KVM_CAP_READONLY_MEM) > 0) ||
+>             (kvm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
 
-On 2/23/2021 12:06 AM, Sean Christopherson wrote:
-> On Mon, Feb 22, 2021, Liu, Jing2 wrote:
->> On 2/9/2021 1:24 AM, Sean Christopherson wrote:
->>> On Mon, Feb 08, 2021, Dave Hansen wrote:
->>>> On 2/8/21 8:16 AM, Jing Liu wrote:
->>>>> -#define XSTATE_COMPACTION_ENABLED (1ULL << 63)
->>>>> -
->>>>>    static void fill_xsave(u8 *dest, struct kvm_vcpu *vcpu)
->>>>>    {
->>>>>    	struct xregs_state *xsave = &vcpu->arch.guest_fpu->state.xsave;
->>>>> @@ -4494,7 +4492,8 @@ static void load_xsave(struct kvm_vcpu *vcpu, u8 *src)
->>>>>    	/* Set XSTATE_BV and possibly XCOMP_BV.  */
->>>>>    	xsave->header.xfeatures = xstate_bv;
->>>>>    	if (boot_cpu_has(X86_FEATURE_XSAVES))
->>>>> -		xsave->header.xcomp_bv = host_xcr0 | XSTATE_COMPACTION_ENABLED;
->>>>> +		xsave->header.xcomp_bv = XCOMP_BV_COMPACTED_FORMAT |
->>>>> +					 xfeatures_mask_all;
->>> This is wrong, xfeatures_mask_all also tracks supervisor states.
->> When looking at SDM Vol2 XSAVES instruction Operation part, it says as
->> follows,
->>
->> RFBM ← (XCR0 OR IA32_XSS) AND EDX:EAX;
->> COMPMASK ← RFBM OR 80000000_00000000H;
->> ...
->>
->> XCOMP_BV field in XSAVE header ← COMPMASK;
->>
->>
->> So it seems xcomp_bv also tracks supervisor states?
-> Yes, sorry, I got distracted by Dave's question and didn't read the changelog
-> closely.
->
-> Now that I have, I find "Since fpstate_init() has initialized xcomp_bv, let's
-> just use that." confusing.  I think what you intend to say is that we can use
-> the same _logic_ as fpstate_init_xstate() for calculating xcomp_bv.
-Yes, that's the idea.
->
-> That said, it would be helpful for the changelog to explain why it's correct to
-> use xfeatures_mask_all, e.g. just a short comment stating that the variable holds
-> all XCR0 and XSS bits enabled by the host kernel.  Justifying a change with
-> "because other code does it" is sketchy, becuse there's no guarantee that what
-> something else does is also correct for KVM, or that the existing code itself is
-> even correct.
-Got it, thanks for the details on this.
-Then how about making the commit message like,
-
-XCOMP_BV[63] field indicates that the save area is in the
-compacted format and XCOMP_BV[62:0] indicates the states that
-have space allocated in the save area, including both XCR0
-and XSS bits enable by the host kernel. Use xfeatures_mask_all
-for calculating xcomp_bv and reuse XCOMP_BV_COMPACTED_FORMAT
-defined by kernel.
+Agreed. That's safer and it's difficult to check the very old version of kenel
+and non-x86 arch.
 
 Thanks,
-Jing
 
-
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
