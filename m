@@ -2,120 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DBEE432298A
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 12:35:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCCB93229B8
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 12:54:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbhBWLd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 06:33:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19962 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232244AbhBWLdW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 06:33:22 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11NBED1W172784;
-        Tue, 23 Feb 2021 06:32:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=0XBfgEU7BZs1NdxFVkqj+s6A3mdt3lFr1nu8j0jr+F4=;
- b=E90njqZwh0Uhx0pekXea+PufpY54ImGoZnh9yVxDRsSmP/lOqs0hLd7fTClEu3oOnH9Z
- D6CffLmJG2xDVggbOtCx2W4L1Xp3I2Xw497G5PBt5vH9NgFIcZrNXjzg36cP7Yvm+dVN
- /2eK78KvcRb7M4GG6g3mFEDaGvlvVowSWWBJLfEd5OCa2KnOf8guW3CmUyQtcdK/S2AL
- KXMsEkL2ObWybGfd7SV8lVbBgy1SqVrt6t921l99iI6X2LaRXwuBUzN4PAz6eLbhDuLR
- 8cMW3B7jz0cJnMTHLkfQB4qUWwrGsxFanrih+ZRKXu+DVHfaaqmXDXtC6NUam8UfJ6G9 ag== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36w0ndrcj9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 06:32:40 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11NBHM9e176843;
-        Tue, 23 Feb 2021 06:32:39 -0500
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36w0ndrch2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 06:32:39 -0500
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11NBWLsx009663;
-        Tue, 23 Feb 2021 11:32:37 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma03ams.nl.ibm.com with ESMTP id 36tt282hx4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 11:32:37 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11NBWYPt41419134
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Feb 2021 11:32:34 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 77F6052057;
-        Tue, 23 Feb 2021 11:32:34 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.149.57])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2357D52050;
-        Tue, 23 Feb 2021 11:32:34 +0000 (GMT)
-Subject: Re: [PATCH v4 1/1] KVM: s390: diag9c (directed yield) forwarding
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        thuth@redhat.com
-References: <1613997661-22525-1-git-send-email-pmorel@linux.ibm.com>
- <1613997661-22525-2-git-send-email-pmorel@linux.ibm.com>
- <20210223121444.28543783.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Message-ID: <ceb33789-dad3-4cbc-e9a3-b80c0446bd86@linux.ibm.com>
-Date:   Tue, 23 Feb 2021 12:32:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S232431AbhBWLx2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 06:53:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51718 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232452AbhBWLwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Feb 2021 06:52:32 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A66C061574
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 03:51:46 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id t5so1514017pjd.0
+        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 03:51:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xdz76Pr5X2U4qGHNaBUqTnUQFn7wjtLgR16d6odDiDY=;
+        b=KqAJzp4Ub9NgdWZX0Vx+kHhWD2qcuxAU6AlaIr1cTEa34WXruEbOqzAduVnsyuTiVq
+         Qrj6vhsW64HXdsYLwgt1DG1lA+9TBfZc692wNCowM9cPgj7jJnYpvmm/cvgJvHoJExvV
+         Xxv9RFF5PRqatMwzSs7jXOqar4QnqNbmRljz1DSrtU5dIG0PRZ6lgyriHVoG9LQCpKAG
+         CPGyxiEwaf+JQABA6jerjDMlAAj+c7c0yRibE9YyayEvUVlVTFEnuSSb1M8pu50stbnL
+         LGbS+/8NrESm09jnrN+7TNWR7JMY7D24qOMgkvxMbUPorHkxamXnkMMD8Ks3aGu/oSOZ
+         kaUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Xdz76Pr5X2U4qGHNaBUqTnUQFn7wjtLgR16d6odDiDY=;
+        b=BzNoMZQubi9lQunxFQKJJmeRXZIkOWuXv0xUexKxuMB5KHuluziS93TFb9ZpTLvpua
+         Klrj2wosJEeB3HQFmbIm8sL9PzP1QOgNiRC9gRAdyyiawkCJ8UOgTXHE3gnziY/cC3hm
+         NkJIPtYdNjLBjxgsi/fvLktKcwA4Qbx9zGJ1rJhAD3NlKXadx6TXMpAxPGdPuY0X9zcx
+         bOVLz84+mqMnuZqKU3RTa8HJdSmQNbstKhHzghM0a9buJtKcLw7ryofE/NIGldEJPP4U
+         jBis/qW1kGjSZ4qkD+epNmF75b+D3lu12dhqvwmIU07sE2qOKxefz1ieZusLTMbsl1rK
+         jMXA==
+X-Gm-Message-State: AOAM533ajGSa8C1A34axYyBOSWkH62Sl3eei0W6ym6B/gj4LkU11z3qx
+        ySZJNMP1o8rLMNv15a6JRk41
+X-Google-Smtp-Source: ABdhPJz+79mE6shXBsPb0acvIFtMPBgzHOe2E85ktwi8FRo2C3PHXFv0KX2CxiJB+oN/aw8FRop8mg==
+X-Received: by 2002:a17:90a:ba02:: with SMTP id s2mr29110785pjr.53.1614081105834;
+        Tue, 23 Feb 2021 03:51:45 -0800 (PST)
+Received: from localhost ([139.177.225.253])
+        by smtp.gmail.com with ESMTPSA id ca19sm3086493pjb.31.2021.02.23.03.51.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Feb 2021 03:51:45 -0800 (PST)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
+        sgarzare@redhat.com, parav@nvidia.com, bob.liu@oracle.com,
+        hch@infradead.org, rdunlap@infradead.org, willy@infradead.org,
+        viro@zeniv.linux.org.uk, axboe@kernel.dk, bcrl@kvack.org,
+        corbet@lwn.net
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Subject: [RFC v4 00/11] Introduce VDUSE - vDPA Device in Userspace
+Date:   Tue, 23 Feb 2021 19:50:37 +0800
+Message-Id: <20210223115048.435-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210223121444.28543783.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-23_05:2021-02-23,2021-02-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 priorityscore=1501 lowpriorityscore=0 phishscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 bulkscore=0 adultscore=0
- spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102230094
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series introduces a framework, which can be used to implement
+vDPA Devices in a userspace program. The work consist of two parts:
+control path forwarding and data path offloading.
 
+In the control path, the VDUSE driver will make use of message
+mechnism to forward the config operation from vdpa bus driver
+to userspace. Userspace can use read()/write() to receive/reply
+those control messages.
 
-On 2/23/21 12:14 PM, Cornelia Huck wrote:
-> On Mon, 22 Feb 2021 13:41:01 +0100
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> When we intercept a DIAG_9C from the guest we verify that the
->> target real CPU associated with the virtual CPU designated by
->> the guest is running and if not we forward the DIAG_9C to the
->> target real CPU.
->>
->> To avoid a diag9c storm we allow a maximal rate of diag9c forwarding.
->>
->> The rate is calculated as a count per second defined as a new
->> parameter of the s390 kvm module: diag9c_forwarding_hz .
->>
->> The default value of 0 is to not forward diag9c.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   Documentation/virt/kvm/s390-diag.rst | 33 ++++++++++++++++++++++++++++
->>   arch/s390/include/asm/kvm_host.h     |  1 +
->>   arch/s390/include/asm/smp.h          |  1 +
->>   arch/s390/kernel/smp.c               |  1 +
->>   arch/s390/kvm/diag.c                 | 31 +++++++++++++++++++++++---
->>   arch/s390/kvm/kvm-s390.c             |  6 +++++
->>   arch/s390/kvm/kvm-s390.h             |  8 +++++++
->>   7 files changed, 78 insertions(+), 3 deletions(-)
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> 
+In the data path, the core is mapping dma buffer into VDUSE
+daemon's address space, which can be implemented in different ways
+depending on the vdpa bus to which the vDPA device is attached.
 
-Thanks,
-Pierre
+In virtio-vdpa case, we implements a MMU-based on-chip IOMMU driver with
+bounce-buffering mechanism to achieve that. And in vhost-vdpa case, the dma
+buffer is reside in a userspace memory region which can be shared to the
+VDUSE userspace processs via transferring the shmfd.
+
+The details and our user case is shown below:
+
+------------------------    -------------------------   ----------------------------------------------
+|            Container |    |              QEMU(VM) |   |                               VDUSE daemon |
+|       ---------      |    |  -------------------  |   | ------------------------- ---------------- |
+|       |dev/vdx|      |    |  |/dev/vhost-vdpa-x|  |   | | vDPA device emulation | | block driver | |
+------------+-----------     -----------+------------   -------------+----------------------+---------
+            |                           |                            |                      |
+            |                           |                            |                      |
+------------+---------------------------+----------------------------+----------------------+---------
+|    | block device |           |  vhost device |            | vduse driver |          | TCP/IP |    |
+|    -------+--------           --------+--------            -------+--------          -----+----    |
+|           |                           |                           |                       |        |
+| ----------+----------       ----------+-----------         -------+-------                |        |
+| | virtio-blk driver |       |  vhost-vdpa driver |         | vdpa device |                |        |
+| ----------+----------       ----------+-----------         -------+-------                |        |
+|           |      virtio bus           |                           |                       |        |
+|   --------+----+-----------           |                           |                       |        |
+|                |                      |                           |                       |        |
+|      ----------+----------            |                           |                       |        |
+|      | virtio-blk device |            |                           |                       |        |
+|      ----------+----------            |                           |                       |        |
+|                |                      |                           |                       |        |
+|     -----------+-----------           |                           |                       |        |
+|     |  virtio-vdpa driver |           |                           |                       |        |
+|     -----------+-----------           |                           |                       |        |
+|                |                      |                           |    vdpa bus           |        |
+|     -----------+----------------------+---------------------------+------------           |        |
+|                                                                                        ---+---     |
+-----------------------------------------------------------------------------------------| NIC |------
+                                                                                         ---+---
+                                                                                            |
+                                                                                   ---------+---------
+                                                                                   | Remote Storages |
+                                                                                   -------------------
+
+We make use of it to implement a block device connecting to
+our distributed storage, which can be used both in containers and
+VMs. Thus, we can have an unified technology stack in this two cases.
+
+To test it with null-blk:
+
+  $ qemu-storage-daemon \
+      --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server,nowait \
+      --monitor chardev=charmonitor \
+      --blockdev driver=host_device,cache.direct=on,aio=native,filename=/dev/nullb0,node-name=disk0 \
+      --export type=vduse-blk,id=test,node-name=disk0,writable=on,name=vduse-null,num-queues=16,queue-size=128
+
+The qemu-storage-daemon can be found at https://github.com/bytedance/qemu/tree/vduse
+
+Future work:
+  - Improve performance
+  - Userspace library (find a way to reuse device emulation code in qemu/rust-vmm)
+
+V3 to V4:
+- Rebase to vhost.git
+- Split some patches
+- Add some documents
+- Use ioctl to inject interrupt rather than eventfd
+- Enable config interrupt support
+- Support binding irq to the specified cpu
+- Add two module parameter to limit bounce/iova size
+- Create char device rather than anon inode per vduse
+- Reuse vhost IOTLB for iova domain
+- Rework the message mechnism in control path
+
+V2 to V3:
+- Rework the MMU-based IOMMU driver
+- Use the iova domain as iova allocator instead of genpool
+- Support transferring vma->vm_file in vhost-vdpa
+- Add SVA support in vhost-vdpa
+- Remove the patches on bounce pages reclaim
+
+V1 to V2:
+- Add vhost-vdpa support
+- Add some documents
+- Based on the vdpa management tool
+- Introduce a workqueue for irq injection
+- Replace interval tree with array map to store the iova_map
+
+Xie Yongji (11):
+  eventfd: Increase the recursion depth of eventfd_signal()
+  vhost-vdpa: protect concurrent access to vhost device iotlb
+  vhost-iotlb: Add an opaque pointer for vhost IOTLB
+  vdpa: Add an opaque pointer for vdpa_config_ops.dma_map()
+  vdpa: Support transferring virtual addressing during DMA mapping
+  vduse: Implement an MMU-based IOMMU driver
+  vduse: Introduce VDUSE - vDPA Device in Userspace
+  vduse: Add config interrupt support
+  Documentation: Add documentation for VDUSE
+  vduse: Introduce a workqueue for irq injection
+  vduse: Support binding irq to the specified cpu
+
+ Documentation/userspace-api/index.rst              |    1 +
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+ Documentation/userspace-api/vduse.rst              |  112 ++
+ drivers/vdpa/Kconfig                               |   10 +
+ drivers/vdpa/Makefile                              |    1 +
+ drivers/vdpa/ifcvf/ifcvf_main.c                    |    2 +-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  |    2 +-
+ drivers/vdpa/vdpa.c                                |    9 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |    8 +-
+ drivers/vdpa/vdpa_user/Makefile                    |    5 +
+ drivers/vdpa/vdpa_user/iova_domain.c               |  486 +++++++
+ drivers/vdpa/vdpa_user/iova_domain.h               |   61 +
+ drivers/vdpa/vdpa_user/vduse_dev.c                 | 1399 ++++++++++++++++++++
+ drivers/vhost/iotlb.c                              |   20 +-
+ drivers/vhost/vdpa.c                               |  106 +-
+ fs/eventfd.c                                       |    2 +-
+ include/linux/eventfd.h                            |    5 +-
+ include/linux/vdpa.h                               |   22 +-
+ include/linux/vhost_iotlb.h                        |    3 +
+ include/uapi/linux/vduse.h                         |  144 ++
+ 20 files changed, 2363 insertions(+), 36 deletions(-)
+ create mode 100644 Documentation/userspace-api/vduse.rst
+ create mode 100644 drivers/vdpa/vdpa_user/Makefile
+ create mode 100644 drivers/vdpa/vdpa_user/iova_domain.c
+ create mode 100644 drivers/vdpa/vdpa_user/iova_domain.h
+ create mode 100644 drivers/vdpa/vdpa_user/vduse_dev.c
+ create mode 100644 include/uapi/linux/vduse.h
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.11.0
+
