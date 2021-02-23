@@ -2,204 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B1F9C322B5A
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:24:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2A37322B78
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 14:29:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232538AbhBWNYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 08:24:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56447 "EHLO
+        id S232903AbhBWN3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 08:29:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59618 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232441AbhBWNX7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 08:23:59 -0500
+        by vger.kernel.org with ESMTP id S232755AbhBWN3H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 08:29:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614086551;
+        s=mimecast20190719; t=1614086860;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XCdSW0hy14Xm5N5F++0E25LPG0UixPo9zSJmCjDyI6M=;
-        b=e5JTBGY3Z8nzbkRCq0tLhI5W/LhKl3uZllFKsMqCI7fSeEjJf2JuyP9nwMjDtSjRbJsLh3
-        gG0W5nvbtm9nR+FAMapX3TxzgQHwUWspiX3lmU+nFKsYHsSAff3/iYLwo2Wfn0nKrI6WRW
-        qGCqM3wL4O7C3G0C4DhGQS4qBuhRMa0=
+        bh=U5VFS9IheNaRwVtaLk7fZ8B/Vddicb/zZXH2138JOcE=;
+        b=bpn28QDVHOs2lT6LDRpki8WEwvHE0OuuyR1WXCqC3iy2WmnOlWseBG+XRWP7h2VP20uJcn
+        OtLh9OBBrG0vjS2m3IXo+NLE7MpExg6Gqsm8zEAob/mawOQTjAguyS85Hdvq0QQ1Ou84i1
+        4uV9/fuoIOUMHYQBcZsEQWWaDaW0qX4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-499-cc8ZrSypMrujPzCOnTh2mQ-1; Tue, 23 Feb 2021 08:22:27 -0500
-X-MC-Unique: cc8ZrSypMrujPzCOnTh2mQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-477-ZtrkoKj8M2-MuedEBxvnjA-1; Tue, 23 Feb 2021 08:27:38 -0500
+X-MC-Unique: ZtrkoKj8M2-MuedEBxvnjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13252107ACED;
-        Tue, 23 Feb 2021 13:22:26 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3418106BB4C;
+        Tue, 23 Feb 2021 13:27:37 +0000 (UTC)
 Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB9AA614FF;
-        Tue, 23 Feb 2021 13:22:21 +0000 (UTC)
-Date:   Tue, 23 Feb 2021 14:22:19 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E7C110016FA;
+        Tue, 23 Feb 2021 13:27:33 +0000 (UTC)
+Date:   Tue, 23 Feb 2021 14:27:30 +0100
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         thuth@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v3 3/5] s390x: css: implementing Set
- CHannel Monitor
-Message-ID: <20210223142219.0f42a303.cohuck@redhat.com>
-In-Reply-To: <1613669204-6464-4-git-send-email-pmorel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 4/5] s390x: css: testing measurement
+ block format 0
+Message-ID: <20210223142730.4509bfc3.cohuck@redhat.com>
+In-Reply-To: <1613669204-6464-5-git-send-email-pmorel@linux.ibm.com>
 References: <1613669204-6464-1-git-send-email-pmorel@linux.ibm.com>
-        <1613669204-6464-4-git-send-email-pmorel@linux.ibm.com>
+        <1613669204-6464-5-git-send-email-pmorel@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 18 Feb 2021 18:26:42 +0100
+On Thu, 18 Feb 2021 18:26:43 +0100
 Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-> We implement the call of the Set CHannel Monitor instruction,
-> starting the monitoring of the all Channel Sub System, and
-> initializing channel subsystem monitoring.
-> 
-> Initial tests report the presence of the extended measurement block
-> feature, and verify the error reporting of the hypervisor for SCHM.
+> We test the update of the measurement block format 0, the
+> measurement block origin is calculated from the mbo argument
+> used by the SCHM instruction and the offset calculated using
+> the measurement block index of the SCHIB.
 > 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  lib/s390x/css.h     |  21 +++++++++-
->  lib/s390x/css_lib.c | 100 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/css.c         |  35 ++++++++++++++++
->  3 files changed, 155 insertions(+), 1 deletion(-)
+>  lib/s390x/css.h | 12 +++++++++
+>  s390x/css.c     | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 79 insertions(+)
+> 
 
 (...)
 
-> diff --git a/lib/s390x/css_lib.c b/lib/s390x/css_lib.c
-> index 65b58ff..4c8a6ae 100644
-> --- a/lib/s390x/css_lib.c
-> +++ b/lib/s390x/css_lib.c
-> @@ -265,6 +265,106 @@ retry:
->  	return -1;
+> diff --git a/s390x/css.c b/s390x/css.c
+> index fc693f3..b65aa89 100644
+> --- a/s390x/css.c
+> +++ b/s390x/css.c
+> @@ -191,6 +191,72 @@ static void test_schm(void)
+>  	report_prefix_pop();
 >  }
 >  
-> +/*
-> + * schib_update_mb: update the subchannel Mesurement Block
+> +#define SCHM_UPDATE_CNT 10
+> +static bool start_measure(uint64_t mbo, uint16_t mbi, bool fmt1)
 
-s/Mesurement/Measurement/
+Maybe "start_measuring"? Or "start_measurements"?
 
-I guess that one is hard to get out of one's fingers :)
-
-> + * @schid: Subchannel Identifier
-> + * @mb   : 64bit address of the measurement block
-> + * @mbi : the measurement block offset
-> + * @flags : PMCW_MBUE to enable measurement block update
-> + *	    PMCW_DCTME to enable device connect time
-> + *	    0 to disable measurement
-> + * @format1: set if format 1 is to be used
-> + */
-> +static bool schib_update_mb(int schid, uint64_t mb, uint16_t mbi,
-> +			    uint16_t flags, bool format1)
 > +{
-> +	struct pmcw *pmcw = &schib.pmcw;
-> +	int cc;
+> +	int i;
 > +
-> +	/* Read the SCHIB for this subchannel */
-> +	cc = stsch(schid, &schib);
-> +	if (cc) {
-> +		report_info("stsch: sch %08x failed with cc=%d", schid, cc);
+> +	if (!css_enable_mb(test_device_sid, mbo, mbi, PMCW_MBUE, fmt1)) {
+> +		report(0, "Enabling measurement_block_format");
 > +		return false;
 > +	}
 > +
-> +	/* Update the SCHIB to enable the measurement block */
-> +	if (flags) {
-> +		pmcw->flags |= flags;
-> +
-> +		if (format1)
-> +			pmcw->flags2 |= PMCW_MBF1;
-> +		else
-> +			pmcw->flags2 &= ~PMCW_MBF1;
-> +
-> +		pmcw->mbi = mbi;
-> +		schib.mbo = mb;
-> +	} else {
-> +		pmcw->flags &= ~(PMCW_MBUE | PMCW_DCTME);
-> +	}
-> +
-> +	/* Tell the CSS we want to modify the subchannel */
-> +	cc = msch(schid, &schib);
-> +	if (cc) {
-> +		/*
-> +		 * If the subchannel is status pending or
-> +		 * if a function is in progress,
-> +		 * we consider both cases as errors.
-> +		 */
-> +		report_info("msch: sch %08x failed with cc=%d", schid, cc);
-> +		return false;
-> +	}
-> +
-> +	/*
-> +	 * Read the SCHIB again
-> +	 */
-> +	cc = stsch(schid, &schib);
-> +	if (cc) {
-> +		report_info("stsch: updating sch %08x failed with cc=%d",
-> +			    schid, cc);
-> +		return false;
+> +	for (i = 0; i < SCHM_UPDATE_CNT; i++) {
+> +		if (!do_test_sense()) {
+> +			report(0, "Error during sense");
+> +			return false;
+> +		}
 > +	}
 > +
 > +	return true;
 > +}
 > +
 > +/*
-> + * css_enable_mb: enable the subchannel Mesurement Block
+> + * test_schm_fmt0:
+> + * With measurement block format 0 a memory space is shared
+> + * by all subchannels, each subchannel can provide an index
+> + * for the measurement block facility to store the measures.
 
-s/Mesurement/Measurement/
+s/measures/measurements/
 
-> + * @schid: Subchannel Identifier
-> + * @mb   : 64bit address of the measurement block
-> + * @format1: set if format 1 is to be used
-> + * @mbi : the measurement block offset
-> + * @flags : PMCW_MBUE to enable measurement block update
-> + *	    PMCW_DCTME to enable device connect time
 > + */
-> +bool css_enable_mb(int schid, uint64_t mb, uint16_t mbi, uint16_t flags,
-> +		   bool format1)
+> +static void test_schm_fmt0(void)
 > +{
-> +	int retry_count = MAX_ENABLE_RETRIES;
-> +	struct pmcw *pmcw = &schib.pmcw;
+> +	struct measurement_block_format0 *mb0;
+> +	int shared_mb_size = 2 * sizeof(struct measurement_block_format0);
 > +
-> +	while (retry_count-- &&
-> +	       !schib_update_mb(schid, mb, mbi, flags, format1))
-> +		mdelay(10); /* the hardware was not ready, give it some time */
+> +	report_prefix_push("Format 0");
 > +
-> +	return schib.mbo == mb && pmcw->mbi == mbi;
+> +	/* Allocate zeroed Measurement block */
+> +	mb0 = alloc_io_mem(shared_mb_size, 0);
+> +	if (!mb0) {
+> +		report_abort("measurement_block_format0 allocation failed");
+> +		goto end;
+> +	}
+> +
+> +	schm(NULL, 0); /* Stop any previous measurement */
+
+Probably not strictly needed, but cannot hurt.
+
+> +	schm(mb0, SCHM_MBU);
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index 0");
+> +	report(start_measure(0, 0, false) &&
+> +	       mb0->ssch_rsch_count == SCHM_UPDATE_CNT,
+> +	       "SSCH measured %d", mb0->ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	/* Clear the measurement block for the next test */
+> +	memset(mb0, 0, shared_mb_size);
+> +
+> +	/* Expect success */
+> +	report_prefix_push("Valid MB address and index 1");
+> +	report(start_measure(0, 1, false) &&
+> +	       mb0[1].ssch_rsch_count == SCHM_UPDATE_CNT,
+> +	       "SSCH measured %d", mb0[1].ssch_rsch_count);
+> +	report_prefix_pop();
+> +
+> +	schm(NULL, 0); /* Stop the measurement */
+
+Shouldn't you call css_disable_mb() here as well?
+
+> +	free_io_mem(mb0, shared_mb_size);
+> +end:
+> +	report_prefix_pop();
 > +}
 > +
-> +/*
-> + * css_disable_mb: enable the subchannel Mesurement Block
-
-s/enable/disable/
-s/Mesurement/Measurement/
-
-> + * @schid: Subchannel Identifier
-> + */
-> +bool css_disable_mb(int schid)
-> +{
-> +	int retry_count = MAX_ENABLE_RETRIES;
-> +
-> +	while (retry_count-- &&
-> +	       !schib_update_mb(schid, 0, 0, 0, 0))
-> +		mdelay(10); /* the hardware was not ready, give it some time */
-> +
-> +	return retry_count > 0;
-> +}
-> +
->  static struct irb irb;
+>  static struct {
+>  	const char *name;
+>  	void (*func)(void);
+> @@ -201,6 +267,7 @@ static struct {
+>  	{ "enable (msch)", test_enable },
+>  	{ "sense (ssch/tsch)", test_sense },
+>  	{ "measurement block (schm)", test_schm },
+> +	{ "measurement block format0", test_schm_fmt0 },
+>  	{ NULL, NULL }
+>  };
 >  
->  void css_irq_io(void)
-
-(...)
-
-I'd still have split out the subchannel-modifying functions into a
-separate patch, but no strong opinion.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
