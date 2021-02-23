@@ -2,91 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6FA1322F85
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 18:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A44503230AF
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 19:27:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233711AbhBWRVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 12:21:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36789 "EHLO
+        id S233837AbhBWS0q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 13:26:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28183 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233704AbhBWRVO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 12:21:14 -0500
+        by vger.kernel.org with ESMTP id S232885AbhBWS0p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 13:26:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614100788;
+        s=mimecast20190719; t=1614104719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EsllZvb5aY/YCacxiEhrsEkqyhREKB3RZGWTsSboykY=;
-        b=Hf/+WhtV55TrktYV2Ep76rnsm6czsgPAj7zRxyMri3bGnjI9KS+99uWs4rPY2M5IKE2nAD
-        oyLiTb6lliJfhkOE9FZeefVVVm3swWiyyVf3BxDFUB9hf3tYLjzvrOw5DLr6waPr/8A1nV
-        buY95zneiBtQIeHZcFQ3kNq94+zBDUc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-F-QgIzHpMcWoIr1NoCh09A-1; Tue, 23 Feb 2021 12:19:46 -0500
-X-MC-Unique: F-QgIzHpMcWoIr1NoCh09A-1
-Received: by mail-wr1-f71.google.com with SMTP id v18so5330143wrr.8
-        for <kvm@vger.kernel.org>; Tue, 23 Feb 2021 09:19:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EsllZvb5aY/YCacxiEhrsEkqyhREKB3RZGWTsSboykY=;
-        b=b3mML4eBXx2EnAPZhRZx3i5zGiNlH2Vf8nn/8620LEZq5O6F/GaogQqXheT7PCr0rB
-         TGolKjESxSjREd7Wl+JJQGJhidSM2RxtgmF9VKaVGaqikczi37L5NMPnOMkr/nazbwxk
-         oA73mveFDbz14WuuKxQZbhpUr6lT4xzMt+lOS9jExQ6Ye0eqwqQ0AgzD1MeC+A+WTnrX
-         nkna55zjdDm3XPPfVE3Slj/7tD1wuZBYqvn9svwh3ogDqqZFmtVhXnnp7OGZUao3wLO1
-         GLGgcpSiCpHOWkM5qqbt9j13wNW4SxLealjsKY9X2vfN8MPFhHT9kn+WTMISqUJxi3M6
-         kO4A==
-X-Gm-Message-State: AOAM530k9XK9XBfyxoUA/f6ti8CYx0ZPOvQLi/4GY1a5b6SnueepeiVj
-        1vVz7DcNxEg0XK8Coh9xgBjcRMxOvEdK0y6Ut7yv3unUdK0XFjLT1tcgkAzXKooJ/KRNgYmiJhg
-        i0pZK89ppistS
-X-Received: by 2002:a05:600c:2184:: with SMTP id e4mr25495741wme.107.1614100784989;
-        Tue, 23 Feb 2021 09:19:44 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyTqsbeZfswgBPjjTp7acWcwMD3JJBfE4MKCQO22zeb+8dT2melZmGj9anF8RdYT8XU3Oww2A==
-X-Received: by 2002:a05:600c:2184:: with SMTP id e4mr25495729wme.107.1614100784852;
-        Tue, 23 Feb 2021 09:19:44 -0800 (PST)
-Received: from ?IPv6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.gmail.com with ESMTPSA id o124sm3591810wmo.41.2021.02.23.09.19.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Feb 2021 09:19:44 -0800 (PST)
-Subject: Re: [PATCH 1/2] KVM: vmx/pmu: Fix dummy check if lbr_desc->event is
- created
-To:     Sean Christopherson <seanjc@google.com>,
-        Like Xu <like.xu@linux.intel.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-References: <20210223013958.1280444-1-like.xu@linux.intel.com>
- <YDU4II6Jt+E5nFmG@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <52a30738-08b5-740c-7c6e-b7a6edcbe552@redhat.com>
-Date:   Tue, 23 Feb 2021 18:19:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        bh=aNQlCLzZcYzbOTIxENd+gbQNtMQVBm5Wl9PZiGh2RGw=;
+        b=AqPbi7rvnplLusxNLH73L2t8NA8bD0qy9LwVBoIMfv25Q72KiM/eba+y7wzT0WJaj0Sm/n
+        lLleoq7z5I2gqlDFrkCfiJ1zyKoluo98s/VP8sID4ySSLqY9CuP5GNUymRUf1mjShTn8d7
+        y/k8tOPGYJ6advsE0Sl+LzNyoCyG51k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-_iNLiPGdPkiALx9MjROixQ-1; Tue, 23 Feb 2021 13:24:30 -0500
+X-MC-Unique: _iNLiPGdPkiALx9MjROixQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA83C80197C;
+        Tue, 23 Feb 2021 18:24:28 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 122F81001281;
+        Tue, 23 Feb 2021 18:24:27 +0000 (UTC)
+Date:   Tue, 23 Feb 2021 11:24:27 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Pavel Tatashin <pasha.tatashin@soleen.com>,
+        Steven Sistare <steven.sistare@oracle.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vfio/type1: Batch page pinning
+Message-ID: <20210223112427.682b8ce9@omen.home.shazbot.org>
+In-Reply-To: <20210219161305.36522-1-daniel.m.jordan@oracle.com>
+References: <20210219161305.36522-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <YDU4II6Jt+E5nFmG@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/02/21 18:15, Sean Christopherson wrote:
-> If event
-> creation fails in that flow, I would think KVM would do its best to create an
-> event in future runs without waiting for additional actions from the guest.
+On Fri, 19 Feb 2021 11:13:02 -0500
+Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+
+> v2:
+>  - Fixed missing error unwind in patch 3 (Alex).  After more thought,
+>    the ENODEV case is fine, so it stayed the same.
 > 
-> Also, this bug suggests there's a big gaping hole in the test coverage.  AFAICT,
-> event contention would lead to a #GP crash in the host due to lbr_desc->event
-> being dereferenced, no?
+>  - Rebased on linux-vfio.git/next (no conflicts).
+> 
+> ---
+> 
+> The VFIO type1 driver is calling pin_user_pages_remote() once per 4k page, so
+> let's do it once per 512 4k pages to bring VFIO in line with other drivers such
+> as IB and vDPA.
+> 
+> qemu guests with at least 2G memory start about 8% faster on a Xeon server,
+> with more detailed results in the last changelog.
+> 
+> Thanks to Matthew, who first suggested the idea to me.
+> 
+> Daniel
+> 
+> 
+> Test Cases
+> ----------
+> 
+>  1) qemu passthrough with IOMMU-capable PCI device
+> 
+>  2) standalone program to hit
+>         vfio_pin_map_dma() -> vfio_pin_pages_remote()
+> 
+>  3) standalone program to hit
+>         vfio_iommu_replay() -> vfio_pin_pages_remote()
+> 
+> Each was run...
+> 
+>  - with varying sizes
+>  - with/without disable_hugepages=1
+>  - with/without LOCKED_VM exceeded
+> 
+> I didn't test vfio_pin_page_external() because there was no readily available
+> hardware, but the changes there are pretty minimal.
+> 
+> Daniel Jordan (3):
+>   vfio/type1: Change success value of vaddr_get_pfn()
+>   vfio/type1: Prepare for batched pinning with struct vfio_batch
+>   vfio/type1: Batch page pinning
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 215 +++++++++++++++++++++++---------
+>  1 file changed, 155 insertions(+), 60 deletions(-)
+> 
+> base-commit: 76adb20f924f8d27ed50d02cd29cadedb59fd88f
 
-Yes, testing contention would use the tools/testing/selftests/kvm 
-framework rather than just kvm-unit-tests.
+Applied to vfio next branch for v5.12.  Thanks,
 
-Paolo
+Alex
 
