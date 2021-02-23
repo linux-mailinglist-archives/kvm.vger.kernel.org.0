@@ -2,312 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BD97322814
-	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 10:54:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53E653228F0
+	for <lists+kvm@lfdr.de>; Tue, 23 Feb 2021 11:39:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbhBWJvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Feb 2021 04:51:19 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:61624 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231944AbhBWJtN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 04:49:13 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11N9Y7rJ066210;
-        Tue, 23 Feb 2021 04:48:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=CNh+Qi5+6FfU2MT5IAkTZy4w15teQtMhWGVk4aN2qRI=;
- b=WrMOSBI908SocpUJ35XR8aR7UplRTp+dlvEXtRl0kjqrliPPfEVF2mjpryIV4kkjhktI
- qnx+4e3Xq6qKyIYyjGRk5w9Cd81WFCDkA8cVnvtuFzDKNTdzybGdqYxd3b9gNRkP1jEm
- K7mz4il8WiAVPKQhjQy5euOWWZ/q6LLYyBhZRr4srpEuZGd9ZfmGQUQWCz1obm+lfRzn
- j2S3oWoMwz/U6pKp9XsmIQDkF5E1PFaFb2ngTHp4pTjfc8sRJEr13+BmX2rFccWqj9Xp
- tytmP4tFWsDEWOu62KKaM7QUKozTKOajziGPqUdZ6qTsEJhtmLpEgoE3NV2DBPvE/Po0 xQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36vkmy92ja-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 04:48:24 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11N9aS9s072130;
-        Tue, 23 Feb 2021 04:48:24 -0500
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 36vkmy92hn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 04:48:24 -0500
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11N9gWgm006346;
-        Tue, 23 Feb 2021 09:48:22 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 36tt2899mg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Feb 2021 09:48:22 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11N9m68534275590
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Feb 2021 09:48:06 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 325BDA405B;
-        Tue, 23 Feb 2021 09:48:19 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E99BA405C;
-        Tue, 23 Feb 2021 09:48:18 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.41.180])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue, 23 Feb 2021 09:48:18 +0000 (GMT)
-Date:   Tue, 23 Feb 2021 10:48:05 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v2 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210223104805.6a8d1872.pasic@linux.ibm.com>
-In-Reply-To: <20210216011547.22277-2-akrowiak@linux.ibm.com>
-References: <20210216011547.22277-1-akrowiak@linux.ibm.com>
-        <20210216011547.22277-2-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S231384AbhBWKim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Feb 2021 05:38:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45387 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230472AbhBWKih (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Feb 2021 05:38:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614076630;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bIGzZAHT2IrR97nIWaOZh13hqXqdEEn4ZaBsZNS2Jg0=;
+        b=dm/IFsAWqyWNKfmyDJhvhQzJgaTwszU23r5M9Bn/t3kL1FPLIOkpvYXtJ2GQfeJ6JKDAmt
+        PC/vLl/sC/Tck9Smg4p9z1J+CYn1QDfhJwiq/JLv1LriFXl7wlNqkj4LIdBFd6kzoUoMK9
+        BmnB/F9gCmZKL34IyJcSisq0g1qchG4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-QvMczwhUMS6WpidU3ya6Pg-1; Tue, 23 Feb 2021 05:37:06 -0500
+X-MC-Unique: QvMczwhUMS6WpidU3ya6Pg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6226801986;
+        Tue, 23 Feb 2021 10:37:01 +0000 (UTC)
+Received: from gondolin (ovpn-113-126.ams2.redhat.com [10.36.113.126])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D59045D9D0;
+        Tue, 23 Feb 2021 10:36:47 +0000 (UTC)
+Date:   Tue, 23 Feb 2021 11:36:34 +0100
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        qemu-ppc@nongnu.org, qemu-s390x@nongnu.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        qemu-arm@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        BALATON Zoltan <balaton@eik.bme.hu>,
+        Leif Lindholm <leif@nuviainc.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Radoslaw Biernacki <rad@semihalf.com>,
+        Alistair Francis <alistair@alistair23.me>,
+        Paul Durrant <paul@xen.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        =?UTF-8?B?SGVy?= =?UTF-8?B?dsOp?= Poussineau 
+        <hpoussin@reactos.org>, Greg Kurz <groug@kaod.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        David Hildenbrand <david@redhat.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+        Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v2 01/11] accel/kvm: Check MachineClass kvm_type()
+ return value
+Message-ID: <20210223113634.6626c8f8.cohuck@redhat.com>
+In-Reply-To: <YDRAHW1ds1eh0Lav@yekko.fritz.box>
+References: <20210219173847.2054123-1-philmd@redhat.com>
+        <20210219173847.2054123-2-philmd@redhat.com>
+        <20210222182405.3e6e9a6f.cohuck@redhat.com>
+        <bc37276d-74cc-22f0-fcc0-4ee5e62cf1df@redhat.com>
+        <20210222185044.23fccecc.cohuck@redhat.com>
+        <YDQ/Y1KozPSyNGjo@yekko.fritz.box>
+        <YDRAHW1ds1eh0Lav@yekko.fritz.box>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-23_04:2021-02-22,2021-02-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0
- mlxscore=0 phishscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102230077
+Content-Type: multipart/signed; boundary="Sig_/nudo1.j=xV83/2pyII4Lt07";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 15 Feb 2021 20:15:47 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+--Sig_/nudo1.j=xV83/2pyII4Lt07
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> This patch fixes a circular locking dependency in the CI introduced by
-> commit f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM
-> pointer invalidated"). The lockdep only occurs when starting a Secure
-> Execution guest. Crypto virtualization (vfio_ap) is not yet supported for
-> SE guests; however, in order to avoid CI errors, this fix is being
-> provided.
-> 
-> The circular lockdep was introduced when the masks in the guest's APCB
-> were taken under the matrix_dev->lock. While the lock is definitely
-> needed to protect the setting/unsetting of the KVM pointer, it is not
-> necessarily critical for setting the masks, so this will not be done under
-> protection of the matrix_dev->lock.
+On Tue, 23 Feb 2021 10:37:01 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
+> On Tue, Feb 23, 2021 at 10:33:55AM +1100, David Gibson wrote:
+> > On Mon, Feb 22, 2021 at 06:50:44PM +0100, Cornelia Huck wrote: =20
+> > > On Mon, 22 Feb 2021 18:41:07 +0100
+> > > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> > >  =20
+> > > > On 2/22/21 6:24 PM, Cornelia Huck wrote: =20
+> > > > > On Fri, 19 Feb 2021 18:38:37 +0100
+> > > > > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> > > > >    =20
+> > > > >> MachineClass::kvm_type() can return -1 on failure.
+> > > > >> Document it, and add a check in kvm_init().
+> > > > >>
+> > > > >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > > >> ---
+> > > > >>  include/hw/boards.h | 3 ++-
+> > > > >>  accel/kvm/kvm-all.c | 6 ++++++
+> > > > >>  2 files changed, 8 insertions(+), 1 deletion(-)
+> > > > >>
+> > > > >> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > > >> index a46dfe5d1a6..68d3d10f6b0 100644
+> > > > >> --- a/include/hw/boards.h
+> > > > >> +++ b/include/hw/boards.h
+> > > > >> @@ -127,7 +127,8 @@ typedef struct {
+> > > > >>   *    implement and a stub device is required.
+> > > > >>   * @kvm_type:
+> > > > >>   *    Return the type of KVM corresponding to the kvm-type stri=
+ng option or
+> > > > >> - *    computed based on other criteria such as the host kernel =
+capabilities.
+> > > > >> + *    computed based on other criteria such as the host kernel =
+capabilities
+> > > > >> + *    (which can't be negative), or -1 on error.
+> > > > >>   * @numa_mem_supported:
+> > > > >>   *    true if '--numa node.mem' option is supported and false o=
+therwise
+> > > > >>   * @smp_parse:
+> > > > >> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> > > > >> index 84c943fcdb2..b069938d881 100644
+> > > > >> --- a/accel/kvm/kvm-all.c
+> > > > >> +++ b/accel/kvm/kvm-all.c
+> > > > >> @@ -2057,6 +2057,12 @@ static int kvm_init(MachineState *ms)
+> > > > >>                                                              "kv=
+m-type",
+> > > > >>                                                              &er=
+ror_abort);
+> > > > >>          type =3D mc->kvm_type(ms, kvm_type);
+> > > > >> +        if (type < 0) {
+> > > > >> +            ret =3D -EINVAL;
+> > > > >> +            fprintf(stderr, "Failed to detect kvm-type for mach=
+ine '%s'\n",
+> > > > >> +                    mc->name);
+> > > > >> +            goto err;
+> > > > >> +        }
+> > > > >>      }
+> > > > >> =20
+> > > > >>      do {   =20
+> > > > >=20
+> > > > > No objection to this patch; but I'm wondering why some non-pseries
+> > > > > machines implement the kvm_type callback, when I see the kvm-type
+> > > > > property only for pseries? Am I holding my git grep wrong?   =20
+> > > >=20
+> > > > Can it be what David commented here?
+> > > > https://www.mail-archive.com/qemu-devel@nongnu.org/msg784508.html
+> > > >  =20
+> > >=20
+> > > Ok, I might be confused about the other ppc machines; but I'm wonderi=
+ng
+> > > about the kvm_type callback for mips and arm/virt. Maybe I'm just
+> > > confused by the whole mechanism? =20
+> >=20
+> > For ppc at least, not sure about in general, pseries is the only
+> > machine type that can possibly work under more than one KVM flavour
+> > (HV or PR).  So, it's the only one where it's actually useful to be
+> > able to configure this. =20
+>=20
+> Wait... I'm not sure that's true.  At least theoretically, some of the
+> Book3E platforms could work with either PR or the Book3E specific
+> KVM.  Not sure if KVM PR supports all the BookE instructions it would
+> need to in practice.
+>=20
+> Possibly pseries is just the platform where there's been enough people
+> interested in setting the KVM flavour so far.
 
+If I'm not utterly confused by the code, it seems the pseries machines
+are the only ones where you can actually get to an invocation of
+->kvm_type(): You need to have a 'kvm-type' machine property, and
+AFAICS only the pseries machine has that.
 
-With the one little thing I commented on below addressed: 
-Acked-by: Halil Pasic <pasic@linux.ibm.com>  
+(Or is something hiding behind some macro magic?)
 
-This solution probably ain't a perfect one, but can't say I see a simple
-way to get around this problem. For instance I played with the thought of
-taking locks in a different order and keeping the critical sections
-intact, but that has problems of its own. Tony should have the best
-understanding of vfio_ap anyway.
+--Sig_/nudo1.j=xV83/2pyII4Lt07
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-In theory the execution of vfio_ap_mdev_group_notifier() and
-vfio_ap_mdev_release() could interleave, and we could loose a clear because
-in theory some permutations of the critical sections need to be
-considered. In practice I hope that won't happen with QEMU.
+-----BEGIN PGP SIGNATURE-----
 
-Tony, you gave this a decent amount of testing or? 
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAmA02rMACgkQ3s9rk8bw
+L69Sng//SPiU5hi/9Db125/S0xZG5O8UzQoag2vh8Q68aGY9pmkB5pUsF5xCYvq4
+v3GT9vtpCT+urKHCNhQcPD0nLLumzQxaz3GKTHvqOWkOwGI3HJhCg9HAutC4d77k
+pAQpFCiDaxRw98uRREJDiG1tM9xzhU/qb1Ujs90aYALeZ3B4wmQQTRVXTiZjto++
+PqJyNULu02yA4sFyZy+iCvv8dT8Ex2uyxV0JzeNS9RV4xsOGH8jMqElRPJiioJhf
+20o5RAL+tpkM71Z1OMj3mBfrdui2K6ordXZKs7OoIkrjb01l/oZXSvVSjxzbKOTn
+LKQYKIZ2/0SHH1IIxovfDJYm/1iV0JHmmW7klM2U1OSmMlZx0TsRmZ6ArWAE6/7z
+CJhC/PpeE8bX9fRuXzAwuBRbT3Cgp6XurESExT1BDWMF3Gym3FaiIz2FHyVnvlPR
+yFcVjR7pgAKWSRI1/EddICKWb2paYhSpzZ9QjbhOISelEslzJU57WQIAUjVPnSho
+lrgY/XuKSJA+ZnRQdY3LX5IADVpA0rn7W2nW0JkJN0nJn4dw3P6Ikp14W1qUC8UR
+AcsnC9Xqbj9D+xRgf1yoCBez7D9kthUXY226A3DYJJcp0qfsquXw0+cxN71CqPhb
+dcvq0J1IEjbx4ir/qN2R8hxfCm3vwXG+w/3ZhKx69rUI5w4PA8Q=
+=u9hO
+-----END PGP SIGNATURE-----
 
-I think we should move forward with this. Any objections? 
-> 
-> Fixes: f21916ec4826 ("s390/vfio-ap: clean up vfio_ap resources when KVM pointer invalidated")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 119 +++++++++++++++++++++---------
->  1 file changed, 84 insertions(+), 35 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 41fc2e4135fe..8574b6ecc9c5 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -1027,8 +1027,21 @@ static const struct attribute_group *vfio_ap_mdev_attr_groups[] = {
->   * @matrix_mdev: a mediated matrix device
->   * @kvm: reference to KVM instance
->   *
-> - * Verifies no other mediated matrix device has @kvm and sets a reference to
-> - * it in @matrix_mdev->kvm.
-> + * Sets all data for @matrix_mdev that are needed to manage AP resources
-> + * for the guest whose state is represented by @kvm:
-> + * 1. Verifies no other mediated device has a reference to @kvm.
-> + * 2. Increments the ref count for @kvm so it doesn't disappear until the
-> + *    vfio_ap driver is notified the pointer is being nullified.
-> + * 3. Sets a reference to the PQAP hook (i.e., handle_pqap() function) into
-> + *    @kvm to handle interception of the PQAP(AQIC) instruction.
-> + * 4. Sets the masks supplying the AP configuration to the KVM guest.
-> + * 5. Sets the KVM pointer into @kvm so the vfio_ap driver can access it.
-> + *
-
-Could for example a PQAP AQIC run across an unset matrix_mdev->kvm like
-this, in theory? I don't think it's likely to happen in the wild though.
-Why not set it up before setting the mask?
-
-> + * Note: The matrix_dev->lock must be taken prior to calling
-> + * this function; however, the lock will be temporarily released to avoid a
-> + * potential circular lock dependency with other asynchronous processes that
-> + * lock the kvm->lock mutex which is also needed to supply the guest's AP
-> + * configuration.
->   *
->   * Return 0 if no other mediated matrix device has a reference to @kvm;
->   * otherwise, returns an -EPERM.
-> @@ -1043,9 +1056,17 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
->  			return -EPERM;
->  	}
->  
-> -	matrix_mdev->kvm = kvm;
-> -	kvm_get_kvm(kvm);
-> -	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
-> +	if (kvm->arch.crypto.crycbd) {
-> +		kvm_get_kvm(kvm);
-> +		kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
-> +		mutex_unlock(&matrix_dev->lock);
-> +		kvm_arch_crypto_set_masks(kvm,
-> +					  matrix_mdev->matrix.apm,
-> +					  matrix_mdev->matrix.aqm,
-> +					  matrix_mdev->matrix.adm);
-> +		mutex_lock(&matrix_dev->lock);
-> +		matrix_mdev->kvm = kvm;
-> +	}
->  
->  	return 0;
->  }
-> @@ -1079,51 +1100,80 @@ static int vfio_ap_mdev_iommu_notifier(struct notifier_block *nb,
->  	return NOTIFY_DONE;
->  }
->  
-> +/**
-> + * vfio_ap_mdev_unset_kvm
-> + *
-> + * @matrix_mdev: a matrix mediated device
-> + *
-> + * Performs clean-up of resources no longer needed by @matrix_mdev.
-> + *
-> + * Note: The matrix_dev->lock must be taken prior to calling this
-> + * function; however,  the lock will be temporarily released to avoid a
-> + * potential circular lock dependency with other asynchronous processes that
-> + * lock the kvm->lock mutex which is also needed to update the guest's AP
-> + * configuration as follows:
-> + *	1.  Grab a reference to the KVM pointer stored in @matrix_mdev.
-> + *	2.  Set the KVM pointer in @matrix_mdev to NULL so no other asynchronous
-> + *	    process uses it (e.g., assign_adapter store function) after
-> + *	    unlocking the matrix_dev->lock mutex.
-> + *	3.  Set the PQAP hook to NULL so it will not be invoked after unlocking
-> + *	    the matrix_dev->lock mutex.
-> + *	4.  Unlock the matrix_dev->lock mutex to avoid circular lock
-> + *	    dependencies.
-> + *	5.  Clear the masks in the guest's APCB to remove guest access to AP
-> + *	    resources assigned to @matrix_mdev.
-> + *	6.  Lock the matrix_dev->lock mutex to prevent access to resources
-> + *	    assigned to @matrix_mdev while the remainder of the cleanup
-> + *	    operations take place.
-> + *	7.  Decrement the reference counter incremented in #1.
-> + *	8.  Set the reference to the KVM pointer grabbed in #1 into @matrix_mdev
-> + *	    (set to NULL in #2) because it will be needed when the queues are
-> + *	    reset to clean up any IRQ resources being held.
-> + *	9.  Decrement the reference count that was incremented when the KVM
-> + *	    pointer was originally set by the group notifier.
-> + *	10. Set the KVM pointer @matrix_mdev to NULL to prevent its usage from
-> + *	    here on out.
-> + *
-> + */
->  static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
->  {
-> -	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
-> -	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
-> -	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> -	kvm_put_kvm(matrix_mdev->kvm);
-> -	matrix_mdev->kvm = NULL;
-> +	struct kvm *kvm;
-> +
-> +	if (matrix_mdev->kvm) {
-> +		kvm = matrix_mdev->kvm;
-> +		kvm_get_kvm(kvm);
-> +		matrix_mdev->kvm = NULL;
-
-I think if there were two threads dong the unset in parallel, one
-of them could bail out and carry on before the cleanup is done. But
-since nothing much happens in release after that, I don't see an
-immediate problem.
-
-Another thing to consider is, that setting ->kvm to NULL arms
-vfio_ap_mdev_remove()...
-
-> +		kvm->arch.crypto.pqap_hook = NULL;
-> +		mutex_unlock(&matrix_dev->lock);
-> +		kvm_arch_crypto_clear_masks(kvm);
-> +		mutex_lock(&matrix_dev->lock);
-> +		kvm_put_kvm(kvm);
-> +		matrix_mdev->kvm = kvm;
-> +		vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
-> +		kvm_put_kvm(matrix_mdev->kvm);
-> +		matrix_mdev->kvm = NULL;
-> +	}
->  }
->  
->  static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
->  				       unsigned long action, void *data)
->  {
-> -	int ret, notify_rc = NOTIFY_OK;
-> +	int notify_rc = NOTIFY_OK;
->  	struct ap_matrix_mdev *matrix_mdev;
->  
->  	if (action != VFIO_GROUP_NOTIFY_SET_KVM)
->  		return NOTIFY_OK;
->  
-> -	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
->  	mutex_lock(&matrix_dev->lock);
-> +	matrix_mdev = container_of(nb, struct ap_matrix_mdev, group_notifier);
->  
-> -	if (!data) {
-> -		if (matrix_mdev->kvm)
-> -			vfio_ap_mdev_unset_kvm(matrix_mdev);
-> -		goto notify_done;
-> -	}
-> -
-> -	ret = vfio_ap_mdev_set_kvm(matrix_mdev, data);
-> -	if (ret) {
-> -		notify_rc = NOTIFY_DONE;
-> -		goto notify_done;
-> -	}
-> -
-> -	/* If there is no CRYCB pointer, then we can't copy the masks */
-> -	if (!matrix_mdev->kvm->arch.crypto.crycbd) {
-> +	if (!data)
-> +		vfio_ap_mdev_unset_kvm(matrix_mdev);
-> +	else if (vfio_ap_mdev_set_kvm(matrix_mdev, data))
->  		notify_rc = NOTIFY_DONE;
-> -		goto notify_done;
-> -	}
-> -
-> -	kvm_arch_crypto_set_masks(matrix_mdev->kvm, matrix_mdev->matrix.apm,
-> -				  matrix_mdev->matrix.aqm,
-> -				  matrix_mdev->matrix.adm);
->  
-> -notify_done:
->  	mutex_unlock(&matrix_dev->lock);
-> +
->  	return notify_rc;
->  }
->  
-> @@ -1258,8 +1308,7 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
->  	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->  
->  	mutex_lock(&matrix_dev->lock);
-> -	if (matrix_mdev->kvm)
-> -		vfio_ap_mdev_unset_kvm(matrix_mdev);
-> +	vfio_ap_mdev_unset_kvm(matrix_mdev);
->  	mutex_unlock(&matrix_dev->lock);
->  
->  	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+--Sig_/nudo1.j=xV83/2pyII4Lt07--
 
