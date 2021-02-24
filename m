@@ -2,121 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6458F3242C8
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 18:03:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F38C2324305
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 18:16:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236092AbhBXQ7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 11:59:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
+        id S235856AbhBXRN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 12:13:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235860AbhBXQ7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 11:59:18 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A28C061786
-        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 08:58:38 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id e9so1565212plh.3
-        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 08:58:38 -0800 (PST)
+        with ESMTP id S235242AbhBXRNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 12:13:51 -0500
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A248C061574
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 09:13:10 -0800 (PST)
+Received: by mail-qk1-x72e.google.com with SMTP id z128so2822013qkc.12
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 09:13:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VZ8hDIsebAJtpkdsWq0Ncs/LoZE4TgngyErMbP2wux4=;
-        b=AJFeiAeOxt5enEH/SbChIUSGWKDmlV3O6D/Q6SDmzqamQTNgQ2CcEryVke+mnGcGjs
-         nXnC4mDw/C/0kL74iMmpR8Y7Do3IF5Oy248Kc7J73HkuISucq40xKocn/4pLzEiMZT3n
-         SBc0q+vDTJKKj5i9nu05qbDJ4DGk1t4ZJopzy+2j7EYbJ/UFvoiBOb5gHwqEs/rjuIYN
-         ZQ3uFnkVNX4iTpJ/7+w1cGLDxTYHfi+a1yIKwcOCBEBbASuiApSZo8rDJd2CwxXOCpD4
-         Ar+J36nQUwsZ1/Tio30o2roLr9dBqcQnl/Otn/1PWDw2ioZD0aSY5xZv7fWZ7RW8tD8F
-         U08Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mtACNUPOTKFJMR28JTicXGvA4n2KurcOaH8kXxHNFz0=;
+        b=eI6oM53GsMawJK3MX0YJNSdvTX2/qszUFCKStACoOBqn20F5iStdT+dsZMLCJuAB/n
+         wip1Khr9NF3AtCXg0a6oIucpojk+uRWMLq5AdLKQywyo/WeOxgB6vzTBbFC/Gj8XdBo4
+         cVJs9ZhZQmV69Hi+YDKxkUCL14U++5ffXxHE8OFK237hQwOCmA/7zmyJmIEMHkLCFUBX
+         LPSxM/IDjghuIFELD5+KVBwKhhP7C0r4UAs+u7cwTxmrZrh9MSwTtUCzlcJhMf+5PhJ4
+         hsu9WYwjWv2PQZmQndQHzticH0NfFPeY8Y8DMvrVraQNjMHgYVAeYSv7Uot/wY2Jzfrf
+         mM2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VZ8hDIsebAJtpkdsWq0Ncs/LoZE4TgngyErMbP2wux4=;
-        b=tSJ36tKIMeOxAn2mWFRxYCastXxtJ35Q7RkoJiDt3nbTDJmYpXGpSFWXDE3KJeKjze
-         w+FO/kz1YJDf9A+xXchXAKvP5aZaXN6rWIXehqJL2AC7AnYB6UUpX6IsSOWNF+81ieSl
-         s7/+D4XJomSXeZqpcAJ99T1Iw6aQb359ojhcaOnmXFaGmU5+luCd2TDK+50LcmE3zFd+
-         SEnlc+lM4bWGGEPjoLV/fqWSwMSbQTT2dxNln2ph9Ml2p4/6zSqGSfWGfbjfnUoV2+tn
-         498cuF0q07U2Q/RHKtqBKrCSun0cn/8ZZ21rudeoMx0+MvdEwjX3gk95Ni3y/phRi1Hm
-         M10w==
-X-Gm-Message-State: AOAM531qVIy+qLaEcwy8UFCb5/g3ZQGLCYHaayTXwrpHmcdE2gIuq59C
-        7RcCSyVRuKb8c8kpQW30SHQc4w==
-X-Google-Smtp-Source: ABdhPJxIQ9BUuRnnxN6f7J64+/5yVcBvCFTS5YeZJPajgqrOmYZy7dnxwt2OmxE99iMRdGvBxg9eBg==
-X-Received: by 2002:a17:90a:e016:: with SMTP id u22mr5517771pjy.155.1614185917838;
-        Wed, 24 Feb 2021 08:58:37 -0800 (PST)
-Received: from google.com ([2620:15c:f:10:385f:4012:d20f:26b5])
-        by smtp.gmail.com with ESMTPSA id c10sm3468728pfj.28.2021.02.24.08.58.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Feb 2021 08:58:37 -0800 (PST)
-Date:   Wed, 24 Feb 2021 08:58:29 -0800
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Nathan Tempelman <natet@google.com>, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        Ashish.Kalra@amd.com, Nathaniel McCallum <npmccallum@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>
-Subject: Re: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-Message-ID: <YDaFtRUAZ+P6Nrpy@google.com>
-References: <20210224085915.28751-1-natet@google.com>
- <04b37d71-c887-660b-5046-17dec4bb4115@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mtACNUPOTKFJMR28JTicXGvA4n2KurcOaH8kXxHNFz0=;
+        b=Vi/FSnOWw9nvaxGuEu58SurpbROqr02AU/T0HJnQFauaOo5UDRXSDS9elDprdCBgIP
+         GS/1auHgyxFZwkbGrFp3nItZywds4z0AOe/DJRT4W1qmJaVm5+/yj6opcQyzJ5sLMpJj
+         nC5tPOVMEl9+oamF/F4sED7AoGNFw54Dq95QddGKepXzsrizsDXzJBYFtZIPHTxY1vSS
+         BvhpDZVbmfhoFXusBdtB7XCqb4XxR4yhOzr5hzQvGh5g0SqXHNQ8IhVxTYgKJjJ+SKTX
+         p9h2Mq1rlucosfdudUNUrTl7B5sGQIL1NNR+Z82FsMAzKmepNKRT+2OxGohmwJ68Lzkn
+         QVaA==
+X-Gm-Message-State: AOAM531SQ/Y9HhFHWGIqXrTtihop5fg1JWpc6Q8MRswMzpj4+Dd5oycR
+        EKl7UOOh0rRmDrXnwxT7BZs68523hzD2bmUy3/R9Kg==
+X-Google-Smtp-Source: ABdhPJx0PiOREpVR7i9mJVHqO8PGscLL9eaNv3hBd8dNLOLqkCfG1mLQOV7o7VrvBi+IfrAMCb1o5hJFRJ10QHVIUoo=
+X-Received: by 2002:a37:a757:: with SMTP id q84mr31057613qke.501.1614186789469;
+ Wed, 24 Feb 2021 09:13:09 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <04b37d71-c887-660b-5046-17dec4bb4115@redhat.com>
+References: <0000000000007ff56205ba985b60@google.com> <00000000000004e7d105bc091e06@google.com>
+ <20210224122710.GB20344@zn.tnic>
+In-Reply-To: <20210224122710.GB20344@zn.tnic>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Wed, 24 Feb 2021 18:12:57 +0100
+Message-ID: <CACT4Y+ZaGOpJ1+dxfTVWhNuV5hFJmx=HgPqVf6bqWE==7PeFFQ@mail.gmail.com>
+Subject: Re: general protection fault in vmx_vcpu_run (2)
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     syzbot <syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        KVM list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Lorenzo Stoakes <lstoakes@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
+        "the arch/x86 maintainers" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Marc and Wooky
+On Wed, Feb 24, 2021 at 1:27 PM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Tue, Feb 23, 2021 at 03:17:07PM -0800, syzbot wrote:
+> > syzbot has bisected this issue to:
+> >
+> > commit 167dcfc08b0b1f964ea95d410aa496fd78adf475
+> > Author: Lorenzo Stoakes <lstoakes@gmail.com>
+> > Date:   Tue Dec 15 20:56:41 2020 +0000
+> >
+> >     x86/mm: Increase pgt_buf size for 5-level page tables
+> >
+> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13fe3ea8d00000
+> > start commit:   a99163e9 Merge tag 'devicetree-for-5.12' of git://git.kern..
+> > git tree:       upstream
+> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=10013ea8d00000
+>
+> No oops here.
+>
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=17fe3ea8d00000
+>
+> Nothing special here too.
+>
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=49116074dd53b631
+>
+> Tried this on two boxes, the Intel one doesn't even boot with that
+> config - and it is pretty standard one - and on the AMD one the
+> reproducer doesn't trigger anything. It probably won't because the GP
+> is in vmx_vcpu_run() but since the ioctls were doing something with
+> IRQCHIP, I thought it is probably vendor-agnostic.
+>
+> So, all in all, I could use some more info on how you're reproducing and
+> maybe you could show the oops too.
 
-On Wed, Feb 24, 2021, Paolo Bonzini wrote:
-> [CCing Nathaniel McCallum]
+Hi Boris,
 
-Ah, I assume Enarx can use this to share an asid across multiple workloads?
- 
-> On 24/02/21 09:59, Nathan Tempelman wrote:
-> > 
-> > +7.23 KVM_CAP_VM_COPY_ENC_CONTEXT_TO
-> > +-----------------------------------
-> > +
-> > +Architectures: x86 SEV enabled
-> > +Type: system
-> 
-> vm ioctl, not system (/dev/kvm).  But, see below.
-> 
-> > +Parameters: args[0] is the fd of the kvm to mirror encryption context to
-> > +Returns: 0 on success; ENOTTY on error
-> > +
-> > +This capability enables userspace to copy encryption context from a primary
-> > +vm to the vm indicated by the fd.
-> > +
-> > +This is intended to support in-guest workloads scheduled by the host. This
-> > +allows the in-guest workload to maintain its own NPTs and keeps the two vms
-> > +from accidentally clobbering each other with interrupts and the like (separate
-> > +APIC/MSRs/etc).
-> 
-> From purely an API design standpoint, I think I'd prefer a "set context
-> from" API (the other way round) to match the existing KVM_SEV_INIT.
-> 
-> Apart from this, the code is very nice and I would have no issues merging
-> this in 5.12 even after the merge window.
-
-And I don't think it would prevent us from refcounting the asid itself in the
-future, e.g. to avoid pinning the "parent" KVM, which was my biggest hesitation
-with the approach.
-
-That being said, is there a strong need to get this into 5.12?  AIUI, this hasn't
-had any meaningful testing, selftests/kvm-unit-tests or otherwise.  Pushing out
-to 5.13 might give us a good chance of getting some real testing before merging,
-depending on the readiness of SEV testing support.
-
-> As an aside, do you happen to have SEV selftests at Google?  I would gladly
-> volunteer to write the selftest myself for this ioctl given the
-> infrastructure.
-
-No, but I believe someone(s) from AMD is working on selftests.
-
-On a related topic, Marc and Wooky are working on adapting kvm-unit-tests to run
-SEV guests.  IIUC, the last open before posting an RFC is how best to make
-kvm-unit-tests play nice with UEFI.
+Looking at the bisection log, the bisection was distracted by something else.
+You can always find the original reported issue over the dashboard link:
+https://syzkaller.appspot.com/bug?extid=42a71c84ef04577f1aef
+or on lore:
+https://lore.kernel.org/lkml/0000000000007ff56205ba985b60@google.com/
