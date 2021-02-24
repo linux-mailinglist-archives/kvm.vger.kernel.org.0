@@ -2,87 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAF51324357
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 18:51:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD4232435E
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 18:54:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232700AbhBXRu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 12:50:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42296 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbhBXRuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 12:50:25 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E42FC061786;
-        Wed, 24 Feb 2021 09:49:45 -0800 (PST)
-Received: from zn.tnic (p200300ec2f0d18008c044bec5d14e7fe.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:1800:8c04:4bec:5d14:e7fe])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6A99C1EC0531;
-        Wed, 24 Feb 2021 18:49:41 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1614188981;
+        id S234644AbhBXRwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 12:52:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58174 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234202AbhBXRvu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 12:51:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614189018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=UnSGBFPmpQGqlrhDmBc2nnYtZYpR52FfmiTAsW6NcAQ=;
-        b=D4lTT1hsfeIzIWYgO4MpDODdZ65bEVmsbDLPCzfmXS5nQt5MeHGGfmF34wEoTJkZWEHTqY
-        FUGRlY+2bH6Pq753tiPOh7qFVa0AsgpJ1FFwctpwaC2by/MbxgY2ychRmLKXOAat7sWlYt
-        GBqtFb5Ii9JBcNcc3lfMIdF+igj5pm8=
-Date:   Wed, 24 Feb 2021 18:49:36 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Lorenzo Stoakes <lstoakes@gmail.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, wanpengli@tencent.com,
-        the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: general protection fault in vmx_vcpu_run (2)
-Message-ID: <20210224174936.GG20344@zn.tnic>
-References: <0000000000007ff56205ba985b60@google.com>
- <00000000000004e7d105bc091e06@google.com>
- <20210224122710.GB20344@zn.tnic>
- <CACT4Y+ZaGOpJ1+dxfTVWhNuV5hFJmx=HgPqVf6bqWE==7PeFFQ@mail.gmail.com>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=X9cy0F4zcJr85qheHgGEfaSe+Yv6NngaYwEOKPQ/d5U=;
+        b=VrPGu/6vKGF8jSgsnW9cy6rj8iVT/K7Hi/kfgdP0aQi6nmeg97qlj0CdYaBmMAxFBPvVA/
+        99HIRkGyLlIYTkuI8RbewtV2gzFsUQBvErPkNcdYoIwocGcRb0Rgb/7p/lffZlsMiF0yZy
+        9244hkzW6ukQVCBxYnk893omae66xOU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-w0kKXsMvP2ujtHkiVK0RtA-1; Wed, 24 Feb 2021 12:50:15 -0500
+X-MC-Unique: w0kKXsMvP2ujtHkiVK0RtA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D58FF180E469;
+        Wed, 24 Feb 2021 17:50:13 +0000 (UTC)
+Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9E58110016F0;
+        Wed, 24 Feb 2021 17:50:13 +0000 (UTC)
+Date:   Wed, 24 Feb 2021 10:50:13 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [GIT PULL] VFIO updates for v5.12-rc1
+Message-ID: <20210224105013.03713eb6@omen.home.shazbot.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CACT4Y+ZaGOpJ1+dxfTVWhNuV5hFJmx=HgPqVf6bqWE==7PeFFQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dmitry,
+Hi Linus,
 
-On Wed, Feb 24, 2021 at 06:12:57PM +0100, Dmitry Vyukov wrote:
-> Looking at the bisection log, the bisection was distracted by something else.
+The following changes since commit 3e10585335b7967326ca7b4118cada0d2d00a2ab:
 
-Meaning the bisection result:
+  Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm (2021-02-21 13:31:43 -0800)
 
-167dcfc08b0b ("x86/mm: Increase pgt_buf size for 5-level page tables")
+are available in the Git repository at:
 
-is bogus?
+  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.12-rc1
 
-> You can always find the original reported issue over the dashboard link:
-> https://syzkaller.appspot.com/bug?extid=42a71c84ef04577f1aef
-> or on lore:
-> https://lore.kernel.org/lkml/0000000000007ff56205ba985b60@google.com/
+for you to fetch changes up to 4d83de6da265cd84e74c19d876055fa5f261cde4:
 
-Ok, so this looks like this is trying to run kvm ioctls *in* a guest,
-i.e., nested. Right?
+  vfio/type1: Batch page pinning (2021-02-22 16:30:47 -0700)
 
-Thx.
+----------------------------------------------------------------
+VFIO updates for v5.12-rc1
 
--- 
-Regards/Gruss,
-    Boris.
+ - Virtual address update handling (Steve Sistare)
 
-https://people.kernel.org/tglx/notes-about-netiquette
+ - s390/zpci fixes and cleanups (Max Gurtovoy)
+
+ - Fixes for dirty bitmap handling, non-mdev page pinning,
+   and improved pinned dirty scope tracking (Keqian Zhu)
+
+ - Batched page pinning enhancement (Daniel Jordan)
+
+ - Page access permission fix (Alex Williamson)
+
+----------------------------------------------------------------
+Alex Williamson (3):
+      Merge branch 'v5.12/vfio/next-vaddr' into v5.12/vfio/next
+      Merge commit '3e10585335b7967326ca7b4118cada0d2d00a2ab' into v5.12/vfio/next
+      vfio/type1: Use follow_pte()
+
+Daniel Jordan (3):
+      vfio/type1: Change success value of vaddr_get_pfn()
+      vfio/type1: Prepare for batched pinning with struct vfio_batch
+      vfio/type1: Batch page pinning
+
+Heiner Kallweit (1):
+      vfio/pci: Fix handling of pci use accessor return codes
+
+Keqian Zhu (3):
+      vfio/iommu_type1: Populate full dirty when detach non-pinned group
+      vfio/iommu_type1: Fix some sanity checks in detach group
+      vfio/iommu_type1: Mantain a counter for non_pinned_groups
+
+Max Gurtovoy (3):
+      vfio-pci/zdev: remove unused vdev argument
+      vfio-pci/zdev: fix possible segmentation fault issue
+      vfio/pci: remove CONFIG_VFIO_PCI_ZDEV from Kconfig
+
+Steve Sistare (9):
+      vfio: option to unmap all
+      vfio/type1: unmap cleanup
+      vfio/type1: implement unmap all
+      vfio: interfaces to update vaddr
+      vfio/type1: massage unmap iteration
+      vfio/type1: implement interfaces to update vaddr
+      vfio: iommu driver notify callback
+      vfio/type1: implement notify callback
+      vfio/type1: block on invalid vaddr
+
+Tian Tao (1):
+      vfio/iommu_type1: Fix duplicate included kthread.h
+
+ drivers/vfio/pci/Kconfig            |  12 -
+ drivers/vfio/pci/Makefile           |   2 +-
+ drivers/vfio/pci/vfio_pci.c         |  12 +-
+ drivers/vfio/pci/vfio_pci_igd.c     |  10 +-
+ drivers/vfio/pci/vfio_pci_private.h |   2 +-
+ drivers/vfio/pci/vfio_pci_zdev.c    |  24 +-
+ drivers/vfio/vfio.c                 |   5 +
+ drivers/vfio/vfio_iommu_type1.c     | 564 ++++++++++++++++++++++++++----------
+ include/linux/vfio.h                |   7 +
+ include/uapi/linux/vfio.h           |  27 ++
+ 10 files changed, 475 insertions(+), 190 deletions(-)
+
