@@ -2,178 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47AAB323AB3
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 11:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEAFD323AC5
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 11:50:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234892AbhBXKoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 05:44:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24720 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234872AbhBXKoX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 05:44:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614163376;
+        id S234785AbhBXKuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 05:50:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36644 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234375AbhBXKuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 05:50:37 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BADC061574;
+        Wed, 24 Feb 2021 02:49:57 -0800 (PST)
+Received: from zn.tnic (p200300ec2f0d180081510bd8ee909965.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:1800:8151:bd8:ee90:9965])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 440591EC0598;
+        Wed, 24 Feb 2021 11:49:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1614163794;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UTVd4S7ljIh8nNs+MiuU7+qAtTiHBayqj5CsLuUeR1g=;
-        b=Ur8kNTJNmreg7Ck8D/giIn3eJf6OrrYmKqZwAwTZAQWifLyhLTa9q/sR8GH0RzjET0QEgz
-        uDZOqNxXlLwPdhWwJ1mbVeh0+he+1U+5e8mXoxPDiHb+shaKKRdqACGJlLyHhFu1IXpcXZ
-        6mxIey3dPfjnlOuAAkLQSd7FKvDbl84=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-23SowbrHP5mqAOthw7XO6w-1; Wed, 24 Feb 2021 05:42:52 -0500
-X-MC-Unique: 23SowbrHP5mqAOthw7XO6w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 096FF801978;
-        Wed, 24 Feb 2021 10:42:51 +0000 (UTC)
-Received: from localhost (ovpn-115-137.ams2.redhat.com [10.36.115.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A0D3919C46;
-        Wed, 24 Feb 2021 10:42:47 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 10:42:46 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, pbonzini@redhat.com,
-        jasowang@redhat.com, mst@redhat.com, cohuck@redhat.com,
-        john.levon@nutanix.com
-Subject: Re: [RFC v3 2/5] KVM: x86: add support for ioregionfd signal handling
-Message-ID: <YDYtpuiMcxnyRa/E@stefanha-x1.localdomain>
-References: <cover.1613828726.git.eafanasova@gmail.com>
- <575df1656277c55f26e660b7274a7c570b448636.1613828727.git.eafanasova@gmail.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=ZM0t91q7XsXZUuvaXIua4IFViIknTuFeIw/XCzZmzfA=;
+        b=FJbcg0KGjeOlpWEgwB8zHiDdWukpITxv+sFNTzRnRtpdlU2qTiax8xEaHYXgBEnFwxx8HH
+        vdFObudelZT9IVnuTvkPx822sDrD7zQ3kZV0BlrzTeLrbrPEcZmPRgOsqlrTVEtQ8soXig
+        oQuooKEsfTjRO5XXnaqiWC/ERlBo9nI=
+Date:   Wed, 24 Feb 2021 11:49:52 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Joerg Roedel <jroedel@suse.de>, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH 3/7] x86/boot/compressed/64: Setup IDT in startup_32 boot
+ path
+Message-ID: <20210224104952.GA20344@zn.tnic>
+References: <20210210102135.30667-1-joro@8bytes.org>
+ <20210210102135.30667-4-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="PKAe4kVN/j8SF5Oj"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <575df1656277c55f26e660b7274a7c570b448636.1613828727.git.eafanasova@gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210210102135.30667-4-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Feb 10, 2021 at 11:21:31AM +0100, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> This boot path needs exception handling when it is used with SEV-ES.
 
---PKAe4kVN/j8SF5Oj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+For ?
 
-On Sun, Feb 21, 2021 at 03:04:38PM +0300, Elena Afanasova wrote:
-> The vCPU thread may receive a signal during ioregionfd communication,
-> ioctl(KVM_RUN) needs to return to userspace and then ioctl(KVM_RUN)
-> must resume ioregionfd.
->=20
-> Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+Let's explain pls.
 
-Functionally what this patch does makes sense to me. I'm not familiar
-enough with the arch/x86/kvm mmio/pio code to say whether it's possible
-to unify mmio/pio/ioregionfd state somehow so that this code can be
-simplified.
-
-> +static int complete_ioregion_io(struct kvm_vcpu *vcpu)
-> +{
-> +	if (vcpu->mmio_needed)
-> +		return complete_ioregion_mmio(vcpu);
-> +	if (vcpu->arch.pio.count)
-> +		return complete_ioregion_pio(vcpu);
-
-Can this be written as:
-
-  if ... {
-  } else if ... {
-  } else {
-      BUG();
-  }
-
-?
-
-In other words, I'm not sure if ever get here without either
-vcpu->mmio_needed or vcpu->arch.pio.count set.
-
-> +}
-> +#endif /* CONFIG_KVM_IOREGION */
-> +
->  static void kvm_save_current_fpu(struct fpu *fpu)
->  {
->  	/*
-> @@ -9309,6 +9549,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  	else
->  		r =3D vcpu_run(vcpu);
-> =20
-> +#ifdef CONFIG_KVM_IOREGION
-> +	if (vcpu->ioregion_ctx.is_interrupted &&
-> +	    vcpu->run->exit_reason =3D=3D KVM_EXIT_INTR)
-> +		r =3D -EINTR;
+> Setup an IDT and provide a helper function to write IDT entries for
+> use in 32-bit protected mode.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/head_64.S | 73 +++++++++++++++++++++++++++++-
+>  1 file changed, 72 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+> index c59c80ca546d..8deeec78cdb4 100644
+> --- a/arch/x86/boot/compressed/head_64.S
+> +++ b/arch/x86/boot/compressed/head_64.S
+> @@ -116,6 +116,11 @@ SYM_FUNC_START(startup_32)
+>  	lretl
+>  1:
+>  
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	/* Setup Exception handling for SEV-ES */
+> +	call	startup32_load_idt
 > +#endif
-
-Userspace can write to vcpu->run->exit_reason memory so its value cannot
-be trusted. It's not obvious to me what happens when is_interrupted =3D=3D
-true if userspace has corrupted vcpu->run->exit_reason. Since I can't
-easily tell if it's safe, I suggest finding another way to perform this
-check that does not rely on vcpu->run->exit_reason. Is just checking
-vcpu->ioregion_ctx.is_interrupted enough?
-
-(The same applies to other instances of vcpu->run->exit_reason in this
-patch.)
-
 > +
->  out:
->  	kvm_put_guest_fpu(vcpu);
->  	if (kvm_run->kvm_valid_regs)
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f35f0976f5cf..84f07597d131 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -318,6 +318,16 @@ struct kvm_vcpu {
->  #endif
->  	bool preempted;
->  	bool ready;
-> +#ifdef CONFIG_KVM_IOREGION
-> +	struct {
 
-A comment would be nice to explain the purpose of this struct:
+You can push that ifdeffery out of the main path (diff ontop):
 
-/*
- * MMIO/PIO state kept when a signal interrupts ioregionfd. When
- * ioctl(KVM_RUN) is invoked again we resume from this state.
- */
+---
+diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+index 8deeec78cdb4..cb5a6849fb29 100644
+--- a/arch/x86/boot/compressed/head_64.S
++++ b/arch/x86/boot/compressed/head_64.S
+@@ -116,10 +116,7 @@ SYM_FUNC_START(startup_32)
+ 	lretl
+ 1:
+ 
+-#ifdef CONFIG_AMD_MEM_ENCRYPT
+-	/* Setup Exception handling for SEV-ES */
+ 	call	startup32_load_idt
+-#endif
+ 
+ 	/* Make sure cpu supports long mode. */
+ 	call	verify_cpu
+@@ -854,16 +851,18 @@ SYM_FUNC_START(startup32_set_idt_entry)
+ 	pop     %ebx
+ 	ret
+ SYM_FUNC_END(startup32_set_idt_entry)
++#endif
+ 
++/* Setup Exception handling for SEV-ES */
+ SYM_FUNC_START(startup32_load_idt)
++#ifdef CONFIG_AMD_MEM_ENCRYPT
+ 	/* Load IDT */
+ 	leal	rva(boot32_idt)(%ebp), %eax
+ 	movl	%eax, rva(boot32_idt_desc+2)(%ebp)
+ 	lidt    rva(boot32_idt_desc)(%ebp)
+-
++#endif
+ 	ret
+ SYM_FUNC_END(startup32_load_idt)
+-#endif
+ /*
+  * Stack and heap for uncompression
+  */
+---
 
-> +		u64 addr;
-> +		void *val;
-> +		int pio;
+> +SYM_FUNC_START(startup32_set_idt_entry)
+> +	push    %ebx
+> +	push    %ecx
+> +
+> +	/* IDT entry address to %ebx */
+> +	leal    rva(boot32_idt)(%ebp), %ebx
+> +	shl	$3, %edx
+> +	addl    %edx, %ebx
+> +
+> +	/* Build IDT entry, lower 4 bytes */
+> +	movl    %eax, %edx
 
-"int pio" could be a boolean indicating whether this is pio or mmio.
-Calling it cur_pio or pio_offset might be clearer.
+Let's add some side comments here:
 
-> +		u8 state; /* SEND_CMD/GET_REPLY */
-> +		bool in;
+ +	andl    $0x0000ffff, %edx		# Target code segment offset [15:0]
 
-/* true - read, false - write */
 
-> +		bool is_interrupted;
-> +	} ioregion_ctx;
-> +#endif
+ +	movl    $__KERNEL32_CS, %ecx		# Target code segment selector 
+> +	shl     $16, %ecx
+> +	orl     %ecx, %edx
+> +
+> +	/* Store lower 4 bytes to IDT */
+> +	movl    %edx, (%ebx)
+> +
+> +	/* Build IDT entry, upper 4 bytes */
+> +	movl    %eax, %edx
+ +	andl    $0xffff0000, %edx		# Target code segment offset [31:16]
+ +	orl     $0x00008e00, %edx		# Present, Type 32-bit Interrupt Gate
 
-The ioregion_ctx fields are not set in this patch. Either they are
-unused or a later patch will set them. You can help reviewers by noting
-this in the commit description. That way they won't need to worry about
-whether there are unused fields that were accidentally left in the code.
+so that a reader like me can quickly find interrupt gates in the docs.
 
---PKAe4kVN/j8SF5Oj
-Content-Type: application/pgp-signature; name="signature.asc"
+Thx.
 
------BEGIN PGP SIGNATURE-----
+-- 
+Regards/Gruss,
+    Boris.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmA2LaYACgkQnKSrs4Gr
-c8jJBgf9HwfGABlCOK1b6g/+LLY6aq7zBe9Et74+HWHqy2QaujfeyLmu0L+I3V4u
-K9TiVpQbYAGcK+h5G+DcpD3Ns3KWkc9I25QXUvySKcBRONN6wUzlyPnnd+6TzlCR
-pId6tkVCZE4DG++k/DtlXITBUNxkTVleT13Rzye9rG9pn4JOgmRU4BZcjelmUFCO
-OBIjjl/hgyhrbQkKuq4TSRXFQ0APXNGwKNrNmAkZlz6OwuNFNxPonoF37wmccl0f
-IB7vGnJy+ufO6cYXmRpWdrQ4db4PNGHhAkOw9UObtp76jIozBO+GuMTCw3w/EQnc
-o9duYwQXDIsODZht6u3RLE2MG7YtAQ==
-=V3m/
------END PGP SIGNATURE-----
-
---PKAe4kVN/j8SF5Oj--
-
+https://people.kernel.org/tglx/notes-about-netiquette
