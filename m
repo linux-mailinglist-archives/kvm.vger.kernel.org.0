@@ -2,215 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC3EB32460C
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 23:01:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0880324607
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 23:00:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236172AbhBXWBt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 17:01:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34894 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233002AbhBXWBo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 17:01:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614204016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6lRQ8B1lOEgqC+efJdYDMJddI/iSKH9Jht7GW4/kcEY=;
-        b=BKrVS0DVmu0joiCx+q7p8lkk2jYQ4EMMfHf7L7p919P7oHZ0ueACj/2bUXgLMLpaa1YCQo
-        ax2Eb97LW3Qv4cKmHSgwuj3QlBWXGsA+/5ADZj495D99myX9hOdnM2e3RUMh0m3peM8gib
-        t44V9DqwRig9f7csY9ol3xmMC3RYh2Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-FIOlqrjeMEe-HaUHnOg2oQ-1; Wed, 24 Feb 2021 17:00:14 -0500
-X-MC-Unique: FIOlqrjeMEe-HaUHnOg2oQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00F991E565;
-        Wed, 24 Feb 2021 22:00:13 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 978F85C230;
-        Wed, 24 Feb 2021 22:00:12 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 14:55:08 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
-Subject: Re: [RFC PATCH 10/10] vfio/type1: Register device notifier
-Message-ID: <20210224145508.1f0edb06@omen.home.shazbot.org>
-In-Reply-To: <20210222175523.GQ4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
-        <161401275279.16443.6350471385325897377.stgit@gimli.home>
-        <20210222175523.GQ4247@nvidia.com>
+        id S233218AbhBXWAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 17:00:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39322 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230330AbhBXWAK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 17:00:10 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8E7BC061574
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 13:59:30 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id d2so2272502pjs.4
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 13:59:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=/CVEf8kH6OkawN7bK/tRH/T7unq1LCdjukFz2ij9PiQ=;
+        b=d+0UgUy/b3iC3Mlj9DJa7YkAh7g3jXDKDphlIZ9elfaKoBV6AnK2TDVf1wljEPlsOL
+         f3H8i1yxJL/+q/Ms1SHB1k+rQv4gl+h7wyTDzpHz0MNBwPR1dCmnz77KdR4xZ5kAnHKZ
+         Y8MoRrhBw9Hgcbu342BzEcV+MMv99xyqwyJ+IDCQd0FaiQ+q3V/0/NGCuBuc2DueT/DO
+         JK6ALKWcV6lI5d19XBgnuVoVEk8lTBt5xlHiDFrSJDfZOYohgzrYripV0D3/3BnleFpM
+         fJL+qYBRSMUfRcEG8Sk+0ONYg3GXeTjPkMwbkcTGHJ+9NeuX8tKkKO3fZJQW4vPoCi17
+         v1mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=/CVEf8kH6OkawN7bK/tRH/T7unq1LCdjukFz2ij9PiQ=;
+        b=cEIA3r1rwGTwkiuPmsHaMfjIEz3AIjhZxJxNT/fWz6FqLIXGXmD0vT2Yr+I30UgcD/
+         Wg6YleruGViMu7lSjQ9abMoacACvpNmpI+0PGu2pP8maLnWQNtK9rANjwSrqf39nn9zl
+         UEYJs5ZU7sWKTpOiFcMaVlHwAnlzocf+sU+C1tB0wHGbSLaUCdjaHpZf0tUaHWcezgpL
+         hAfmOTjBoWYGZblxvN5pg+0wNH29DBdklnaz7h1KvVhvVPdwsaRp6iYg0cPUpJQH5Wj7
+         21RTwupl3TmsXDWeGe6b5A+j6BhlK9uSoVQGnfSFxLKCKN24aW7ccZe5MFjTKe+brQyq
+         RcIw==
+X-Gm-Message-State: AOAM530Xp23gvJyE1TwdADGokwRrpnMexIc8p3WLRQzqvfNTf+Dlpovc
+        PodM7l3w7QyZMBRgwd1b4xHGDw==
+X-Google-Smtp-Source: ABdhPJwG44FiiM2evw+bPBEUnGZcVMY/rhrbUhY1OLzKfEvnswxmkZpAu6qqNdJj78R6DvI7amvDPg==
+X-Received: by 2002:a17:90a:f987:: with SMTP id cq7mr6808461pjb.47.1614203969972;
+        Wed, 24 Feb 2021 13:59:29 -0800 (PST)
+Received: from google.com ([2620:15c:f:10:385f:4012:d20f:26b5])
+        by smtp.gmail.com with ESMTPSA id p23sm3648145pfn.204.2021.02.24.13.59.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Feb 2021 13:59:29 -0800 (PST)
+Date:   Wed, 24 Feb 2021 13:59:23 -0800
+From:   Sean Christopherson <seanjc@google.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH 1/4 v3] KVM: nSVM: Do not advance RIP following VMRUN
+ completion if the latter is single-stepped
+Message-ID: <YDbMOxqQLw5Q2Iy1@google.com>
+References: <20210223191958.24218-1-krish.sadhukhan@oracle.com>
+ <20210223191958.24218-2-krish.sadhukhan@oracle.com>
+ <YDWE3cYXoQRq+XZ3@google.com>
+ <0e553de2-2797-9811-b2a4-8d1467ab64e8@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0e553de2-2797-9811-b2a4-8d1467ab64e8@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Feb 2021 13:55:23 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Mon, Feb 22, 2021 at 09:52:32AM -0700, Alex Williamson wrote:
-> > Introduce a new default strict MMIO mapping mode where the vma for
-> > a VM_PFNMAP mapping must be backed by a vfio device.  This allows
-> > holding a reference to the device and registering a notifier for the
-> > device, which additionally keeps the device in an IOMMU context for
-> > the extent of the DMA mapping.  On notification of device release,
-> > automatically drop the DMA mappings for it.
-> > 
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> >  drivers/vfio/vfio_iommu_type1.c |  124 +++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 123 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > index b34ee4b96a4a..2a16257bd5b6 100644
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -61,6 +61,11 @@ module_param_named(dma_entry_limit, dma_entry_limit, uint, 0644);
-> >  MODULE_PARM_DESC(dma_entry_limit,
-> >  		 "Maximum number of user DMA mappings per container (65535).");
-> >  
-> > +static bool strict_mmio_maps = true;
-> > +module_param_named(strict_mmio_maps, strict_mmio_maps, bool, 0644);
-> > +MODULE_PARM_DESC(strict_mmio_maps,
-> > +		 "Restrict to safe DMA mappings of device memory (true).");  
+On Wed, Feb 24, 2021, Krish Sadhukhan wrote:
 > 
-> I think this should be a kconfig, historically we've required kconfig
-> to opt-in to unsafe things that could violate kernel security. Someone
-> building a secure boot trusted kernel system should not have an
-> options for userspace to just turn off protections.
+> On 2/23/21 2:42 PM, Sean Christopherson wrote:
+> > On Tue, Feb 23, 2021, Krish Sadhukhan wrote:
+> > > Currently, svm_vcpu_run() advances the RIP following VMRUN completion when
+> > > control returns to host. This works fine if there is no trap flag set
+> > > on the VMRUN instruction i.e., if VMRUN is not single-stepped. But if
+> > > VMRUN is single-stepped, this advancement of the RIP leads to an incorrect
+> > > RIP in the #DB handler invoked for the single-step trap. Therefore, check
 
-It could certainly be further protected that this option might not
-exist based on a Kconfig, but I think we're already risking breaking
-some existing users and I'd rather allow it with an opt-in (like we
-already do for lack of interrupt isolation), possibly even with a
-kernel taint if used, if necessary.
+Whose #DB handler?  L1's?
 
-> > +/* Req separate object for async removal from notifier vs dropping vfio_dma */
-> > +struct pfnmap_obj {
-> > +	struct notifier_block	nb;
-> > +	struct work_struct	work;
-> > +	struct vfio_iommu	*iommu;
-> > +	struct vfio_device	*device;
-> > +};  
+> > > if the VMRUN instruction is single-stepped and if so, do not advance the RIP
+> > > when the #DB intercept #VMEXIT happens.
+> > This really needs to clarify which VMRUN, i.e. L0 vs. L1.  AFAICT, you're
+> > talking about both at separate times.  Is this an issue with L1 single-stepping
+> > its VMRUN, L0 single-stepping its VMRUN, L0 single-stepping L1's VMRUN, ???
 > 
-> So this is basically the dmabuf, I think it would be simple enough to
-> go in here and change it down the road if someone had interest.
 > 
-> > +static void unregister_device_bg(struct work_struct *work)
-> > +{
-> > +	struct pfnmap_obj *pfnmap = container_of(work, struct pfnmap_obj, work);
-> > +
-> > +	vfio_device_unregister_notifier(pfnmap->device, &pfnmap->nb);
-> > +	vfio_device_put(pfnmap->device);  
+> The issue is seen when L1 single-steps its own VMRUN. I will fix the
+> wording.
+
+...
+
+> > > @@ -3827,7 +3833,11 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+> > >   		vcpu->arch.cr2 = svm->vmcb->save.cr2;
+> > >   		vcpu->arch.regs[VCPU_REGS_RAX] = svm->vmcb->save.rax;
+> > >   		vcpu->arch.regs[VCPU_REGS_RSP] = svm->vmcb->save.rsp;
+> > > -		vcpu->arch.regs[VCPU_REGS_RIP] = svm->vmcb->save.rip;
+> > > +		if (single_step_vmrun && svm->vmcb->control.exit_code ==
+> > > +		    SVM_EXIT_EXCP_BASE + DB_VECTOR)
+> > > +			single_step_vmrun = false;
+> > Even if you fix the global flag issue, this can't possibly work if userspace
+> > changes state, if VMRUN fails and leaves a timebomb, and probably any number of
+> > other conditions.
 > 
-> The device_put keeps the device from becoming unregistered, but what
-> happens during the hot reset case? Is this what the cover letter
-> was talking about? CPU access is revoked but P2P is still possible?
-
-Yes, this only addresses cutting off DMA mappings to a released device
-where we can safely drop the DMA mapping entirely.  I think we can
-consider complete removal of the mapping object safe in this case
-because the user has no ongoing access to the device and after
-re-opening the device it would be reasonable to expect mappings would
-need to be re-established.
-
-Doing the same around disabling device memory or a reset has a much
-greater potential to break userspace.  In some of these cases QEMU will
-do the right thing, but reset with dependent devices gets into
-scenarios that I can't be sure about.  Other userspace drivers also
-exist and I can't verify them all.  So ideally we'd want to temporarily
-remove the IOMMU mapping, leaving the mapping object, and restoring it
-on the other side.  But I don't think we have a way to do that in the
-IOMMU API currently, other than unmap and later remap.  So we might
-need to support a zombie mode for the mapping object or enhance the
-IOMMU API where we could leave the iotlb entry in place but drop r+w
-permissions.
-
-At this point we're also just trying to define which error we get,
-perhaps an unsupported request if we do nothing or an IOMMU fault if we
-invalidate or suspend the mapping.  It's not guaranteed that one of
-these has better behavior on the system than the other.
- 
-> > +static int vfio_device_nb_cb(struct notifier_block *nb,
-> > +			     unsigned long action, void *unused)
-> > +{
-> > +	struct pfnmap_obj *pfnmap = container_of(nb, struct pfnmap_obj, nb);
-> > +
-> > +	switch (action) {
-> > +	case VFIO_DEVICE_RELEASE:
-> > +	{
-> > +		struct vfio_dma *dma, *dma_last = NULL;
-> > +		int retries = 0;
-> > +again:
-> > +		mutex_lock(&pfnmap->iommu->lock);
-> > +		dma = pfnmap_find_dma(pfnmap);  
 > 
-> Feels a bit strange that the vfio_dma isn't linked to the pfnmap_obj
-> instead of searching the entire list?
+>  Are you saying that I need to adjust the RIP in cases where VMRUN fails ?
 
-It does, I've been paranoid about whether we can trust that the
-vfio_dma is still valid in all cases.  I had myself convinced that if
-our notifier actions expand we could get another callback before our
-workqueue removes the notifier, but that might be more simply handled
-by having a vfio_dma pointer that gets cleared once we remove the
-vfio_dma.  I'll take another look.
+If VMRUN fails, the #DB exit will never occur and single_step_vmrun will be left
+set.  Ditto if a higher priority exit occurs, though I'm not sure that can cause
+problems in practice.  Anyways, my point is that setting a flag that must be
+consumed on an exact instruction is almost always fragile, there are just too
+many corner cases that pop up.
 
-
-> > @@ -549,8 +625,48 @@ static int vaddr_get_pfn(struct vfio_iommu *iommu, struct vfio_dma *dma,
-> >  		if (ret == -EAGAIN)
-> >  			goto retry;  
-> 
-> I'd prefer this was written a bit differently, I would like it very
-> much if this doesn't mis-use follow_pte() by returning pfn outside
-> the lock.
-> 
-> vaddr_get_bar_pfn(..)
-> {
->         vma = find_vma_intersection(mm, vaddr, vaddr + 1);
-> 	if (!vma)
->            return -ENOENT;
->         if ((vma->vm_flags & VM_DENYWRITE) && (prot & PROT_WRITE)) // Check me
->            return -EFAULT;
->         device = vfio_device_get_from_vma(vma);
-> 	if (!device)
->            return -ENOENT;
-> 
-> 	/*
->          * Now do the same as vfio_pci_mmap_fault() - the vm_pgoff must
-> 	 * be the physical pfn when using this mechanism. Delete follow_pte entirely()
->          */
->         pfn = (vaddr - vma->vm_start)/PAGE_SIZE + vma->vm_pgoff
-> 	
->         /* de-dup device and record that we are using device's pages in the
-> 	   pfnmap */
->         ...
-> }
-
-
-This seems to undo both:
-
-5cbf3264bc71 ("vfio/type1: Fix VA->PA translation for PFNMAP VMAs in vaddr_get_pfn()")
-
-(which also suggests we are going to break users without the module
-option opt-in above)
-
-And:
-
-41311242221e ("vfio/type1: Support faulting PFNMAP vmas")
-
-So we'd have an alternate path in the un-safe mode and we'd lose the
-ability to fault in mappings.
-
-> This would be significantly better if it could do whole ranges instead
-> of page at a time.
-
-There are some patches I just put in from Daniel Jordan that use
-batching.  Thanks,
-
-Alex
-
+Can you elaborate more on who/what incorrectly advances RIP?  The changelog says
+"svm_vcpu_run() advances the RIP", but it's not advancing anything it's just
+grabbing RIP from the VMCB, which IIUC is L2's RIP.
