@@ -2,120 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EF7CE3238F0
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 09:48:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE6B9323890
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 09:25:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234538AbhBXIrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 03:47:43 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43726 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234516AbhBXIqj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 03:46:39 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11O8YjJM121355;
-        Wed, 24 Feb 2021 03:45:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=to : cc : references :
- from : subject : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=TxcwqJ1VYX/wleTMbwHADHldTjKwEtQqFfrjWBJx910=;
- b=UZUn16eAJEN/mW31thH55urqk7u18PZe0hWNklWSjD2XVTXslu3EqTntLUQGzdSxeyVG
- 4cUTS8SriTNAq9d2Ae8lsGO3deeboUVN+PARk94TKkaW+28IKbr15VYluoy6u2MJ8is/
- K+O7wuXpJWIedSWWCyh2Zm0xWPmTorKTgDCbCGJxgzsA6EFJhTMgoi3Cn47Ehe6K2KO3
- LIUo1J0WvRnFFQf+zeShUukqYR42lXwlPbrjWe0NMlbNJSj3Wktr+vQyJMa/asFgduT7
- ucQuJFBT9oRQWqn212QtVROawwEF3EGZtoBBEGx5i6SYSoX/3La1oSd0veIAlCustBLn VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36wgu5vxpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Feb 2021 03:45:58 -0500
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11O8Z6RH123608;
-        Wed, 24 Feb 2021 03:45:58 -0500
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36wgu5vxmm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Feb 2021 03:45:57 -0500
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11O8gAFh006162;
-        Wed, 24 Feb 2021 08:45:55 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 36tsph3cf6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 24 Feb 2021 08:45:55 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11O8jd4735389872
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Feb 2021 08:45:39 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C23B421AA;
-        Wed, 24 Feb 2021 08:45:50 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39E691121E8;
-        Wed, 24 Feb 2021 08:16:00 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.70.202])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 24 Feb 2021 08:16:00 +0000 (GMT)
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-kernel@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, david@redhat.com, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20210223191353.267981-1-imbrenda@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v4 0/2] s390/kvm: fix MVPG when in VSIE
-Message-ID: <e35ab218-3725-86b5-cea0-c403cf39b0a6@linux.ibm.com>
-Date:   Wed, 24 Feb 2021 09:15:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S231790AbhBXIY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 03:24:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46594 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231809AbhBXIYx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 03:24:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614155006;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1JbGPMGc3zR5mJ9ryS3aC3fSGYocZkjlOuNb6WBZZ3I=;
+        b=KSGq+666prtCURPW2NWMu9TT5irzC6T/ytkR3X0+dQZAp65bfqyRkCkL0+ZZklzaFoRmdC
+        a4kx0Wy28vYagEajpFldjPPd9MCwmrRxbbpRVk6Jt/rA1CFq+8aiW9jaD31ozJgEG8Xtf2
+        hUvTV3bR9mLtlMEP+vzC1iqSwXl1u9A=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-L_A6cU2vOdyqq2Q7Twa3sw-1; Wed, 24 Feb 2021 03:23:24 -0500
+X-MC-Unique: L_A6cU2vOdyqq2Q7Twa3sw-1
+Received: by mail-wr1-f69.google.com with SMTP id h30so702258wrh.10
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 00:23:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=1JbGPMGc3zR5mJ9ryS3aC3fSGYocZkjlOuNb6WBZZ3I=;
+        b=O78keT4zMaEp7RF3Sbq9ZLKRkXrl0JfyBRIbB/tu5OSIl3h1DS3aANACjHxxWxl6DC
+         FU+pgsqE7nNa6niu/4LsNQDb573wQVxBynlBn2LgacotETJ8GxwUtgWyzdjybwcdj5OK
+         v6hUAWbgsLFYqfEHz+a0cbSfPkDubuFa2dDuQ25AZlmdIj5N9PlRIJ6VWnTQgHQQKi8o
+         xMJzxl2xP58VBlbyrlAh2wGHqGnN3k0/lmqO3rbEbv9XiINn4JRfooya6AqumR/S6LUn
+         9ekYjq2wvHr/VEpxDSp4Td3xpeM5PGom8+c62WDoJu6r3/ZgHfxmn1AA4MSLIWkWN0r+
+         iwcw==
+X-Gm-Message-State: AOAM533R+BGWV/OSVicDX9U9MkZWBFdpZFPdaNr33MRBGftySKJLrM2Z
+        b93kJMGKbWaJ2g9BVT7aOXACLeBD0yIHo2nDK/G4ekSV7qxau9/BUb9p4dFJNyXJz6IKhCRSlyV
+        Uxt7wz74lnj8/
+X-Received: by 2002:a7b:cb81:: with SMTP id m1mr2574141wmi.117.1614155003181;
+        Wed, 24 Feb 2021 00:23:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwr2zof1ZDDqJMUOF+ohaSrHn1X03ArrZY1vRa0Mt+0/xGnqxU7+pV+gRMZdhng3Liw6tsb4Q==
+X-Received: by 2002:a7b:cb81:: with SMTP id m1mr2574122wmi.117.1614155002974;
+        Wed, 24 Feb 2021 00:23:22 -0800 (PST)
+Received: from steredhat (host-79-34-249-199.business.telecomitalia.it. [79.34.249.199])
+        by smtp.gmail.com with ESMTPSA id a1sm2056803wrx.95.2021.02.24.00.23.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Feb 2021 00:23:22 -0800 (PST)
+Date:   Wed, 24 Feb 2021 09:23:19 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Arseny Krasnov <arseny.krasnov@kaspersky.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jorgen Hansen <jhansen@vmware.com>,
+        Andra Paraschiv <andraprs@amazon.com>,
+        Norbert Slusarek <nslusarek@gmx.net>,
+        Colin Ian King <colin.king@canonical.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stsp2@yandex.ru" <stsp2@yandex.ru>,
+        "oxffffaa@gmail.com" <oxffffaa@gmail.com>
+Subject: Re: [RFC PATCH v5 00/19] virtio/vsock: introduce SOCK_SEQPACKET
+ support
+Message-ID: <20210224082319.yrmqr6zs7emvghw3@steredhat>
+References: <20210218053347.1066159-1-arseny.krasnov@kaspersky.com>
+ <20210222142311.gekdd7gsm33wglos@steredhat>
+ <20210223145016.ddavx6fihq4akdim@steredhat>
+ <7a280168-cb54-ae26-4697-c797f6b04708@kaspersky.com>
 MIME-Version: 1.0
-In-Reply-To: <20210223191353.267981-1-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-24_02:2021-02-23,2021-02-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- impostorscore=0 malwarescore=0 adultscore=0 phishscore=0 spamscore=0
- bulkscore=0 priorityscore=1501 mlxlogscore=922 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102240066
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <7a280168-cb54-ae26-4697-c797f6b04708@kaspersky.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/23/21 8:13 PM, Claudio Imbrenda wrote:
-> The current handling of the MVPG instruction when executed in a nested
-> guest is wrong, and can lead to the nested guest hanging.
-> 
-> This patchset fixes the behaviour to be more architecturally correct,
-> and fixes the hangs observed.
+On Wed, Feb 24, 2021 at 07:29:25AM +0300, Arseny Krasnov wrote:
+>
+>On 23.02.2021 17:50, Stefano Garzarella wrote:
+>> On Mon, Feb 22, 2021 at 03:23:11PM +0100, Stefano Garzarella wrote:
+>>> Hi Arseny,
+>>>
+>>> On Thu, Feb 18, 2021 at 08:33:44AM +0300, Arseny Krasnov wrote:
+>>>> 	This patchset impelements support of SOCK_SEQPACKET for virtio
+>>>> transport.
+>>>> 	As SOCK_SEQPACKET guarantees to save record boundaries, so to
+>>>> do it, two new packet operations were added: first for start of record
+>>>> and second to mark end of record(SEQ_BEGIN and SEQ_END later). Also,
+>>>> both operations carries metadata - to maintain boundaries and payload
+>>>> integrity. Metadata is introduced by adding special header with two
+>>>> fields - message count and message length:
+>>>>
+>>>> 	struct virtio_vsock_seq_hdr {
+>>>> 		__le32  msg_cnt;
+>>>> 		__le32  msg_len;
+>>>> 	} __attribute__((packed));
+>>>>
+>>>> 	This header is transmitted as payload of SEQ_BEGIN and SEQ_END
+>>>> packets(buffer of second virtio descriptor in chain) in the same way as
+>>>> data transmitted in RW packets. Payload was chosen as buffer for this
+>>>> header to avoid touching first virtio buffer which carries header of
+>>>> packet, because someone could check that size of this buffer is equal
+>>>> to size of packet header. To send record, packet with start marker is
+>>>> sent first(it's header contains length of record and counter), then
+>>>> counter is incremented and all data is sent as usual 'RW' packets and
+>>>> finally SEQ_END is sent(it also carries counter of message, which is
+>>>> counter of SEQ_BEGIN + 1), also after sedning SEQ_END counter is
+>>>> incremented again. On receiver's side, length of record is known from
+>>>> packet with start record marker. To check that no packets were dropped
+>>>> by transport, counters of two sequential SEQ_BEGIN and SEQ_END are
+>>>> checked(counter of SEQ_END must be bigger that counter of SEQ_BEGIN by
+>>>> 1) and length of data between two markers is compared to length in
+>>>> SEQ_BEGIN header.
+>>>> 	Now as  packets of one socket are not reordered neither on
+>>>> vsock nor on vhost transport layers, such markers allows to restore
+>>>> original record on receiver's side. If user's buffer is smaller that
+>>>> record length, when all out of size data is dropped.
+>>>> 	Maximum length of datagram is not limited as in stream socket,
+>>>> because same credit logic is used. Difference with stream socket is
+>>>> that user is not woken up until whole record is received or error
+>>>> occurred. Implementation also supports 'MSG_EOR' and 'MSG_TRUNC' flags.
+>>>> 	Tests also implemented.
+>>> I reviewed the first part (af_vsock.c changes), tomorrow I'll review
+>>> the rest. That part looks great to me, only found a few minor issues.
+>> I revieiwed the rest of it as well, left a few minor comments, but I
+>> think we're well on track.
+>>
+>> I'll take a better look at the specification patch tomorrow.
+>Great, Thank You
+>>
+>> Thanks,
+>> Stefano
+>>
+>>> In the meantime, however, I'm getting a doubt, especially with regard
+>>> to other transports besides virtio.
+>>>
+>>> Should we hide the begin/end marker sending in the transport?
+>>>
+>>> I mean, should the transport just provide a seqpacket_enqueue()
+>>> callbacl?
+>>> Inside it then the transport will send the markers. This is because
+>>> some transports might not need to send markers.
+>>>
+>>> But thinking about it more, they could actually implement stubs for
+>>> that calls, if they don't need to send markers.
+>>>
+>>> So I think for now it's fine since it allows us to reuse a lot of
+>>> code, unless someone has some objection.
+>
+>I thought about that, I'll try to implement it in next version. Let's see...
 
-Could you please push this to devel so we get some CI coverage.
+If you want to discuss it first, write down the idea you want to 
+implement, I wouldn't want to make you do unnecessary work. :-)
 
-And before you do that please exchange my ACK mail address in the first
-patch for the linux one.
-
-
-> 
-> v3->v4
-> * added PEI_ prefix to DAT_PROT and NOT_PTE macros
-> * added small comment to explain what they are about
-> 
-> v2->v3
-> * improved some comments
-> * improved some variable and parameter names for increased readability
-> * fixed missing handling of page faults in the MVPG handler
-> * small readability improvements
-> 
-> v1->v2
-> * complete rewrite
-> 
-> Claudio Imbrenda (2):
->   s390/kvm: extend kvm_s390_shadow_fault to return entry pointer
->   s390/kvm: VSIE: correctly handle MVPG when in VSIE
-> 
->  arch/s390/kvm/gaccess.c |  30 ++++++++++--
->  arch/s390/kvm/gaccess.h |   6 ++-
->  arch/s390/kvm/vsie.c    | 101 ++++++++++++++++++++++++++++++++++++----
->  3 files changed, 122 insertions(+), 15 deletions(-)
-> 
+Cheers,
+Stefano
 
