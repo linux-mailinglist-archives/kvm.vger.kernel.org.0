@@ -2,199 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2296F323F9B
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 16:21:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81AF8324161
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 17:06:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235840AbhBXOOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 09:14:18 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:34096 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbhBXOHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 09:07:21 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11OE4iVa095666;
-        Wed, 24 Feb 2021 14:05:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=corp-2020-01-29; bh=uvFeAWBXTu0gwLlT2ZXkYAyKT7A3jO9ZRxUCFG5wi0o=;
- b=nDg6sACJo7pJ/iWW3cTtdJvkgr89JF1pXEbW8f2Yts4pavNLE2oZc640SICaiM1TM5fh
- OCHlyxGjphp3XFOBl83KhFf8a9iKdMfWWVrW+l0/4bw9kIpb+kNAAo9Eb9es/2d1auUn
- MWyY9AnVo5GmII4bGP1/YR+tXkV0wEq/3gPCoZSSiGFEkazaRZqRr90OomzMCg9hyNTi
- LdOULr0gXlPZWxWls9kE3nmCE2q1DANrs3qf1x2HaumaFOMjxmhWKXVYgxlrOKksmAta
- Xi8pUbXpY/Z4GD//pgoWl2BBayVFTFna8XvOGHVg7fUhKgYFCetY8jRxXmdHr0Pf7q1Y Mg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 36ugq3hvmu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Feb 2021 14:05:11 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11ODscsn012587;
-        Wed, 24 Feb 2021 14:05:10 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2170.outbound.protection.outlook.com [104.47.56.170])
-        by aserp3020.oracle.com with ESMTP id 36ucb0sbe5-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 24 Feb 2021 14:05:10 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AAYNVWFhI/Qoc8Kqj9TY93xKzFkAC84jzzIwjL+PepD+smTurKdpYuVtXL/ziWFiAzdqfX0FesZuDcRZj3G4P0esMdHEPakRm20iW0HI+XzHtBCl/2XYphinYkyp32M5KcleH7jh/WQOokNDGubeNWx59C7cNKG3XaddQW+MLvO1wxQdH8ZyAOh2ORB2Y8jHv5gpsOrp3P8av8GcFGEn0Y1M39mEHOuFsDdxGe2eUeFYB+tWIBURV0fB5KPEnsidT+JZBrZ6znn6kU8cYxKks+qX1bxEaTYa1mGzY1xMtBLZ1byVpXMDWR+y/166alyTnMWkbDUMiKLBKVCgskYjOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvFeAWBXTu0gwLlT2ZXkYAyKT7A3jO9ZRxUCFG5wi0o=;
- b=SkbNjpZS9TUJ5LdK9JFeZ2h2mYj2tzJkMhEg7g04KKdAAnDGdLWR+rfeYVU35KD0bHW2kd4RB/qsERpCSi/uudlegMTTotZv8G2glN6b5TqeaGHO20F8wlEkuIRhUGgKKViBi379ZA7fIwewNQjpwE31wTQU2MzmLhbD1h5oAuQOYTf/UdMbTdsgaFZ8xqPYX1mEsnMnAh0Pysu1RlFKot65fwei7ZBTGheQkPJLBR6GhGXgBofIaOTl1Qetj+ovnXxDPOFJ4HxLtcZzKzdxFom+a3cSt7N0W9ovs7aO9m+vcwZlVM9B1WmMR1/XUjUoGAyeKChMLtn1eACu1YzlIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvFeAWBXTu0gwLlT2ZXkYAyKT7A3jO9ZRxUCFG5wi0o=;
- b=YKBmOptsszHSVN8fO0Ko1VRkxAhWbJsqz6qFfoWEGZiB0McIrx6ghpybRzTYxgBgSN20UNgOho7did47cqlYj4iHXruMnuDARZfWCCqDjezVEt8Le0DiFMSl4lrN/t73o9B6iwwSSuzb65cmQVZXZDCIplgOn4UtpkBe1VNNjck=
-Authentication-Results: zytor.com; dkim=none (message not signed)
- header.d=none;zytor.com; dmarc=none action=none header.from=oracle.com;
-Received: from DM6PR10MB3148.namprd10.prod.outlook.com (2603:10b6:5:1a4::21)
- by DM5PR1001MB2153.namprd10.prod.outlook.com (2603:10b6:4:2c::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.33; Wed, 24 Feb
- 2021 14:05:07 +0000
-Received: from DM6PR10MB3148.namprd10.prod.outlook.com
- ([fe80::f871:5965:2081:3934]) by DM6PR10MB3148.namprd10.prod.outlook.com
- ([fe80::f871:5965:2081:3934%5]) with mapi id 15.20.3868.033; Wed, 24 Feb 2021
- 14:05:07 +0000
-From:   David Edmondson <david.edmondson@oracle.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@alien8.de>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, David Edmondson <david.edmondson@oracle.com>
-Subject: [PATCH v4 5/5] KVM: x86: dump_vmcs should include the autoload/autostore MSR lists
-Date:   Wed, 24 Feb 2021 14:04:56 +0000
-Message-Id: <20210224140456.2558033-6-david.edmondson@oracle.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210224140456.2558033-1-david.edmondson@oracle.com>
-References: <20210224140456.2558033-1-david.edmondson@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [2001:8b0:bb71:7140:64::1]
-X-ClientProxiedBy: LO4P123CA0411.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:189::20) To DM6PR10MB3148.namprd10.prod.outlook.com
- (2603:10b6:5:1a4::21)
+        id S236115AbhBXPup convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 24 Feb 2021 10:50:45 -0500
+Received: from foss.arm.com ([217.140.110.172]:35232 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234565AbhBXO4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 09:56:11 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14F15101E;
+        Wed, 24 Feb 2021 06:55:25 -0800 (PST)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D28A53F70D;
+        Wed, 24 Feb 2021 06:55:23 -0800 (PST)
+Date:   Wed, 24 Feb 2021 14:54:22 +0000
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 13/21] hw/serial: Refactor trap handler
+Message-ID: <20210224145422.6bfd0ff2@slackpad.fritz.box>
+In-Reply-To: <85c714de-edb8-666d-49be-90539e347e30@arm.com>
+References: <20201210142908.169597-1-andre.przywara@arm.com>
+        <20201210142908.169597-14-andre.przywara@arm.com>
+        <5c91e8f2-7bdf-4c4a-1da3-08dac79fd9a4@arm.com>
+        <20210218144153.776fb089@slackpad.fritz.box>
+        <85c714de-edb8-666d-49be-90539e347e30@arm.com>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from disaster-area.hh.sledj.net (2001:8b0:bb71:7140:64::1) by LO4P123CA0411.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600:189::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.30 via Frontend Transport; Wed, 24 Feb 2021 14:05:05 +0000
-Received: from localhost (disaster-area.hh.sledj.net [local])   by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 4dda7ddb;      Wed, 24 Feb 2021 14:04:57 +0000 (UTC)
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e1254655-00cc-4c95-e595-08d8d8cd3103
-X-MS-TrafficTypeDiagnostic: DM5PR1001MB2153:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1001MB215312C137148C74780B3BFB889F9@DM5PR1001MB2153.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bKqK9tgthmwX3h0/dSjJMEfwmpcj9pJQA6TwY7jjrv0KAXKpICg/dqK8YDj9PMLH01+pGr+HU0GTStG8hzrsc95HkLt50i97O4pr0Xo8R9Kf3BF+EOFXEhGDGAb4oYtQRk+3SbAzLG0zXjgCR3NGpCW7r/3kzG+MVlXPsIrHlffUO65FN5FkF6E0K7aqiV+3bhk3ikkrvOVVwI6Cc4u1pGa3WJ6pQHLrZhfyEDw+Ib8yxvNDvRTLGfRT0GiiQmwDZBsA6EUWOttzDA4g5JU2hVBfyWMjnlOIAweBWOyGP8VwLeXwKGUsE+hdAbLhLcj86I718R3+5yRrMW53Wow1triAThspBBF9jsz4ZWtX60NTmmIh/tE1EKe1r2yQYQoawPlBMmFjmW8kVoW/kzPrbq7jBHJc5onqJp1ILwkgmibH6casjd02tX1E65PA83zQ4YxUaGHvYL75tqYH/6nBV2+HFTTrlE4XYzHZpzK0GOOydl4q2qipJdrF3XJGijlji8er5ZB12gI64+ADePYmoA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR10MB3148.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(39860400002)(346002)(396003)(366004)(376002)(83380400001)(316002)(66476007)(44832011)(8936002)(186003)(2906002)(86362001)(7416002)(8676002)(66556008)(52116002)(36756003)(5660300002)(6916009)(54906003)(1076003)(2616005)(4326008)(478600001)(66946007)(107886003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?vEkkc6SRxA1mTn1zd+SAlgepokDtcKbba+yzzuBuWxsB5CbBu9oeEsFV6WCK?=
- =?us-ascii?Q?WzIQ5hJ0CARdhALV6b4Q7wM2RXO4EHCcF2sfHUDwfoSF/QSMnuTanbUOHWXB?=
- =?us-ascii?Q?RxoVXJPWRgn4VI5UF1GUtIZUQm4F+Q0bfQClcrrD65GvJLOw0C5GHtfkj2VY?=
- =?us-ascii?Q?jesEC9ZnC936HrFyeK1yAeWyKagttUOMynYit22de6tfioDykPKJy7v6wjpZ?=
- =?us-ascii?Q?UAUE6zMLfGN5QzjMlYNWqC+DZTaHkE5GEYGB+3MJjBarq82cUoaGgyfnIABC?=
- =?us-ascii?Q?GprmrPOzO1Lh6x0n5L99XWcJCf+zsV9uW+OSafpwJeHov4OW1fI3R43OTUmX?=
- =?us-ascii?Q?oIeyab8jeVJyfO+BwxypGdTczl5rNVZNr0+/sdDDcBLTivRehLrOjdXfwf5J?=
- =?us-ascii?Q?du0L87pPQuTogcJAa9psWyLUwVfiWqv8CMifL931QY5cq2fehX9UjWLjftqH?=
- =?us-ascii?Q?/ensJp2l9KgneoWLk0qtxVLVxgRQ/3hEcvy0QpHmuQqGDqxwR0ISB3J1GNBo?=
- =?us-ascii?Q?kE6FZagoQsXsXiWCgTseIIs57vBSLtzc595EJKxSiaNZepfJhcYXrmG2m7Vt?=
- =?us-ascii?Q?K9JxHe2OBVU1LTuTr1VRD/VGbLps8VjMfIwkpuZUU7sofTt39RQwsJKuHpVu?=
- =?us-ascii?Q?raIq7eF3mIBeeYaGOxXXYxbDWUy/NdIGW1ZYkskS7EknRtxXRoy34W4O7SKN?=
- =?us-ascii?Q?pPq1+tq84alcjtcU+dMFo1Q35KS6cHVrp3LiZnnJB7FafXv4AMk2UZjgLpmW?=
- =?us-ascii?Q?+fmF6BYa54QKCQd5QGn7b1Jqyq5+KprrN5D7bdI8nQUP3g4t9Z2c3P97qOxb?=
- =?us-ascii?Q?faUbdPoKaIrYYUTWG9TKpEmX5gHqqH9LrOqvKAclUVVgvsdqJvhc16zDeGDM?=
- =?us-ascii?Q?0zYydLNF/IRCFopUsb1ki994IDbiNmDYgI+pSNwODubSsKNPYLONiiJUOT1R?=
- =?us-ascii?Q?r1Cxuh8JZqjPXm0sNn5uqpxZm1z+WRnCDY/NaLL//jaNzCKysQFmIsjGnJiP?=
- =?us-ascii?Q?E/ZzAZJ5HIm4D+9V1CY3YnCUzWy+jjGey/NlmXMNR1ALlMUDiiaEQVDz4xVy?=
- =?us-ascii?Q?+UnUTPPoWCEy6EnE+77XbxUPNqKKdedhW8QP+/Jq55LlCi9dZ1kzGlEOQ/mt?=
- =?us-ascii?Q?PwxWQvKS8JPaAPZQH1mpateE3HWK9Yf1bokRSA2GdXKRMo4aYY6f2SsO5/3F?=
- =?us-ascii?Q?41MFv92cVvQDy8DGNVBEiSKXGX40vT72zd8gGsKE5hE5ZTIeOZ2urvLroIWD?=
- =?us-ascii?Q?MWdXP54bYW4RS7oSsHodsqAB260Sn6FvAsI7aiOX9H91rU6F03oIgnSZujCx?=
- =?us-ascii?Q?CWrQhXkJyeORhSPvAbkQpfRnu+oa8CcBuKlf3lyzhP48oQ=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1254655-00cc-4c95-e595-08d8d8cd3103
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR10MB3148.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2021 14:05:07.7218
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /FQS24TtsUswtqeqUTOvHh9FRwjwFbfrfp3ADyi/ak2bOcXsRhYOyuUUsbMgtg8lIa1/dRDplwL+o8s8Ez+zsfLuxDGK4a4CBaHYwp4o29c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1001MB2153
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9904 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0
- malwarescore=0 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102240108
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9904 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- malwarescore=0 spamscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- clxscore=1015 impostorscore=0 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102240109
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When dumping the current VMCS state, include the MSRs that are being
-automatically loaded/stored during VM entry/exit.
+On Mon, 22 Feb 2021 17:40:36 +0000
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
----
- arch/x86/kvm/vmx/vmx.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Hi Alex,
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b9bb66ad2ac4..de42b8c14a38 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5810,6 +5810,16 @@ static void vmx_dump_dtsel(char *name, uint32_t limit)
- 	       vmcs_readl(limit + GUEST_GDTR_BASE - GUEST_GDTR_LIMIT));
- }
- 
-+static void vmx_dump_msrs(char *name, struct vmx_msrs *m)
-+{
-+	unsigned int i;
-+	struct vmx_msr_entry *e;
-+
-+	pr_err("MSR %s:\n", name);
-+	for (i = 0, e = m->val; i < m->nr; ++i, ++e)
-+		pr_err("  %2d: msr=0x%08x value=0x%016llx\n", i, e->index, e->value);
-+}
-+
- void dump_vmcs(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -5891,6 +5901,10 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	if (secondary_exec_control & SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY)
- 		pr_err("InterruptStatus = %04x\n",
- 		       vmcs_read16(GUEST_INTR_STATUS));
-+	if (vmcs_read32(VM_ENTRY_MSR_LOAD_COUNT) > 0)
-+		vmx_dump_msrs("guest autoload", &vmx->msr_autoload.guest);
-+	if (vmcs_read32(VM_EXIT_MSR_STORE_COUNT) > 0)
-+		vmx_dump_msrs("guest autostore", &vmx->msr_autostore.guest);
- 
- 	pr_err("*** Host State ***\n");
- 	pr_err("RIP = 0x%016lx  RSP = 0x%016lx\n",
-@@ -5920,6 +5934,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 	    vmexit_ctl & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL)
- 		pr_err("PerfGlobCtl = 0x%016llx\n",
- 		       vmcs_read64(HOST_IA32_PERF_GLOBAL_CTRL));
-+	if (vmcs_read32(VM_EXIT_MSR_LOAD_COUNT) > 0)
-+		vmx_dump_msrs("host autoload", &vmx->msr_autoload.host);
- 
- 	pr_err("*** Control State ***\n");
- 	pr_err("PinBased=%08x CPUBased=%08x SecondaryExec=%08x\n",
--- 
-2.30.0
+> On 2/18/21 2:41 PM, Andre Przywara wrote:
+> > On Tue, 16 Feb 2021 14:22:05 +0000
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> >  
+> >> Hi Andre,
+> >>
+> >> Patch looks good, nitpicks below.
+> >>
+> >> On 12/10/20 2:29 PM, Andre Przywara wrote:  
+> >>> With the planned retirement of the special ioport emulation code, we
+> >>> need to provide an emulation function compatible with the MMIO prototype.
+> >>>
+> >>> Adjust the trap handler to use that new function, and provide shims to
+> >>> implement the old ioport interface, for now.
+> >>>
+> >>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >>> ---
+> >>>  hw/serial.c | 97 +++++++++++++++++++++++++++++++++++------------------
+> >>>  1 file changed, 65 insertions(+), 32 deletions(-)
+> >>>
+> >>> diff --git a/hw/serial.c b/hw/serial.c
+> >>> index b0465d99..2907089c 100644
+> >>> --- a/hw/serial.c
+> >>> +++ b/hw/serial.c
+> >>> @@ -242,36 +242,31 @@ void serial8250__inject_sysrq(struct kvm *kvm, char sysrq)
+> >>>  	sysrq_pending = sysrq;
+> >>>  }
+> >>>  
+> >>> -static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+> >>> -			   void *data, int size)
+> >>> +static bool serial8250_out(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> >>> +			   u16 offset, u8 data)
+> >>>  {
+> >>> -	struct serial8250_device *dev = ioport->priv;
+> >>> -	u16 offset;
+> >>>  	bool ret = true;
+> >>> -	char *addr = data;
+> >>>  
+> >>>  	mutex_lock(&dev->mutex);
+> >>>  
+> >>> -	offset = port - dev->iobase;
+> >>> -
+> >>>  	switch (offset) {
+> >>>  	case UART_TX:
+> >>>  		if (dev->lcr & UART_LCR_DLAB) {
+> >>> -			dev->dll = ioport__read8(data);
+> >>> +			dev->dll = data;
+> >>>  			break;
+> >>>  		}
+> >>>  
+> >>>  		/* Loopback mode */
+> >>>  		if (dev->mcr & UART_MCR_LOOP) {
+> >>>  			if (dev->rxcnt < FIFO_LEN) {
+> >>> -				dev->rxbuf[dev->rxcnt++] = *addr;
+> >>> +				dev->rxbuf[dev->rxcnt++] = data;
+> >>>  				dev->lsr |= UART_LSR_DR;
+> >>>  			}
+> >>>  			break;
+> >>>  		}
+> >>>  
+> >>>  		if (dev->txcnt < FIFO_LEN) {
+> >>> -			dev->txbuf[dev->txcnt++] = *addr;
+> >>> +			dev->txbuf[dev->txcnt++] = data;
+> >>>  			dev->lsr &= ~UART_LSR_TEMT;
+> >>>  			if (dev->txcnt == FIFO_LEN / 2)
+> >>>  				dev->lsr &= ~UART_LSR_THRE;
+> >>> @@ -283,18 +278,18 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+> >>>  		break;
+> >>>  	case UART_IER:
+> >>>  		if (!(dev->lcr & UART_LCR_DLAB))
+> >>> -			dev->ier = ioport__read8(data) & 0x0f;
+> >>> +			dev->ier = data & 0x0f;
+> >>>  		else
+> >>> -			dev->dlm = ioport__read8(data);
+> >>> +			dev->dlm = data;
+> >>>  		break;
+> >>>  	case UART_FCR:
+> >>> -		dev->fcr = ioport__read8(data);
+> >>> +		dev->fcr = data;
+> >>>  		break;
+> >>>  	case UART_LCR:
+> >>> -		dev->lcr = ioport__read8(data);
+> >>> +		dev->lcr = data;
+> >>>  		break;
+> >>>  	case UART_MCR:
+> >>> -		dev->mcr = ioport__read8(data);
+> >>> +		dev->mcr = data;
+> >>>  		break;
+> >>>  	case UART_LSR:
+> >>>  		/* Factory test */
+> >>> @@ -303,7 +298,7 @@ static bool serial8250_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port
+> >>>  		/* Not used */
+> >>>  		break;
+> >>>  	case UART_SCR:
+> >>> -		dev->scr = ioport__read8(data);
+> >>> +		dev->scr = data;
+> >>>  		break;
+> >>>  	default:
+> >>>  		ret = false;
+> >>> @@ -336,46 +331,43 @@ static void serial8250_rx(struct serial8250_device *dev, void *data)
+> >>>  	}
+> >>>  }
+> >>>  
+> >>> -static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *data, int size)
+> >>> +static bool serial8250_in(struct serial8250_device *dev, struct kvm_cpu *vcpu,
+> >>> +			  u16 offset, u8 *data)
+> >>>  {
+> >>> -	struct serial8250_device *dev = ioport->priv;
+> >>> -	u16 offset;
+> >>>  	bool ret = true;
+> >>>  
+> >>>  	mutex_lock(&dev->mutex);
+> >>>  
+> >>> -	offset = port - dev->iobase;
+> >>> -
+> >>>  	switch (offset) {
+> >>>  	case UART_RX:
+> >>>  		if (dev->lcr & UART_LCR_DLAB)
+> >>> -			ioport__write8(data, dev->dll);
+> >>> +			*data = dev->dll;
+> >>>  		else
+> >>>  			serial8250_rx(dev, data);
+> >>>  		break;
+> >>>  	case UART_IER:
+> >>>  		if (dev->lcr & UART_LCR_DLAB)
+> >>> -			ioport__write8(data, dev->dlm);
+> >>> +			*data = dev->dlm;
+> >>>  		else
+> >>> -			ioport__write8(data, dev->ier);
+> >>> +			*data = dev->ier;
+> >>>  		break;
+> >>>  	case UART_IIR:
+> >>> -		ioport__write8(data, dev->iir | UART_IIR_TYPE_BITS);
+> >>> +		*data = dev->iir | UART_IIR_TYPE_BITS;
+> >>>  		break;
+> >>>  	case UART_LCR:
+> >>> -		ioport__write8(data, dev->lcr);
+> >>> +		*data = dev->lcr;
+> >>>  		break;
+> >>>  	case UART_MCR:
+> >>> -		ioport__write8(data, dev->mcr);
+> >>> +		*data = dev->mcr;
+> >>>  		break;
+> >>>  	case UART_LSR:
+> >>> -		ioport__write8(data, dev->lsr);
+> >>> +		*data = dev->lsr;
+> >>>  		break;
+> >>>  	case UART_MSR:
+> >>> -		ioport__write8(data, dev->msr);
+> >>> +		*data = dev->msr;
+> >>>  		break;
+> >>>  	case UART_SCR:
+> >>> -		ioport__write8(data, dev->scr);
+> >>> +		*data = dev->scr;
+> >>>  		break;
+> >>>  	default:
+> >>>  		ret = false;
+> >>> @@ -389,6 +381,47 @@ static bool serial8250_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port,
+> >>>  	return ret;
+> >>>  }
+> >>>  
+> >>> +static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len,
+> >>> +			    u8 is_write, void *ptr)
+> >>> +{
+> >>> +	struct serial8250_device *dev = ptr;
+> >>> +	u8 value = 0;
+> >>> +
+> >>> +	if (is_write) {
+> >>> +		 value = *data;    
+> >> Extra space before value.
+> >>  
+> >>> +
+> >>> +		serial8250_out(dev, vcpu, addr - dev->iobase, value);
+> >>> +	} else {
+> >>> +		if (serial8250_in(dev, vcpu, addr - dev->iobase, &value))
+> >>> +			*data = value;
+> >>> +	}
+> >>> +}
+> >>> +
+> >>> +static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+> >>> +				  u16 port, void *data, int size)
+> >>> +{
+> >>> +	struct serial8250_device *dev = ioport->priv;
+> >>> +	u8 value = ioport__read8(data);
+> >>> +
+> >>> +	serial8250_mmio(vcpu, port, &value, 1, true, dev);
+> >>> +
+> >>> +	return true;
+> >>> +}
+> >>> +
+> >>> +static bool serial8250_ioport_in(struct ioport *ioport, struct kvm_cpu *vcpu,
+> >>> +				 u16 port, void *data, int size)
+> >>> +{
+> >>> +	struct serial8250_device *dev = ioport->priv;
+> >>> +	u8 value = 0;
+> >>> +
+> >>> +
+> >>> +	serial8250_mmio(vcpu, port, &value, 1, false, dev);
+> >>> +
+> >>> +	ioport__write8(data, value);    
+> >> This is correct, but confusing. You pass the address of a local variable as *data
+> >> to serial8250_mmio, serial8250_mmio conditionally updates the value at data (which
+> >> is &value from here), and then here we update the *data unconditionally. Why not
+> >> pass data directly to serial8250_mmio and skip the local variable? Am I missing
+> >> something?  
+> > The idea is to keep the abstraction of ioport__write<x>. I agree this
+> > is somewhat pointless for a single byte write, since the purpose of
+> > those wrappers is to deal with endianness, but it seems nice to use
+> > that anyway, anywhere, in case we need to add something to the wrappers
+> > at some point.  
+> 
+> What I was thinking was something like this:
+> 
+> @@ -385,25 +386,19 @@ static void serial8250_mmio(struct kvm_cpu *vcpu, u64 addr,
+> u8 *data, u32 len,
+>                             u8 is_write, void *ptr)
+>  {
+>         struct serial8250_device *dev = ptr;
+> -       u8 value = 0;
+>  
+> -       if (is_write) {
+> -                value = *data;
+> -
+> -               serial8250_out(dev, vcpu, addr - dev->iobase, value);
+> -       } else {
+> -               if (serial8250_in(dev, vcpu, addr - dev->iobase, &value))
+> -                       *data = value;
+> -       }
+> +       if (is_write)
+> +               serial8250_out(dev, vcpu, addr - dev->iobase, data);
+> +       else
+> +               serial8250_in(dev, vcpu, addr - dev->iobase, data);
+>  }
+>  
+>  static bool serial8250_ioport_out(struct ioport *ioport, struct kvm_cpu *vcpu,
+>                                   u16 port, void *data, int size)
+>  {
+>         struct serial8250_device *dev = ioport->priv;
+> -       u8 value = ioport__read8(data);
+>  
+> -       serial8250_mmio(vcpu, port, &value, 1, true, dev);
+> +       serial8250_mmio(vcpu, port, data, 1, true, dev);
+>  
+>         return true;
+>  }
+> @@ -412,12 +407,8 @@ static bool serial8250_ioport_in(struct ioport *ioport,
+> struct kvm_cpu *vcpu,
+>                                  u16 port, void *data, int size)
+>  {
+>         struct serial8250_device *dev = ioport->priv;
+> -       u8 value = 0;
+> -
+> -
+> -       serial8250_mmio(vcpu, port, &value, 1, false, dev);
+>  
+> -       ioport__write8(data, value);
+> +       serial8250_mmio(vcpu, port, data, 1, false, dev);
+>  
+>         return true;
+>  }
+> 
+> And the ioport_{read,write}8 function will used inside the serial8250_{out,in}
+> functions, like they were before this patch, which should also make the diff
+> smaller. Or is there something that I'm missing which makes this unfeasible?
+
+Now I remember what the problem was:
+The comment before the definition of ioport__read16() says the PowerPC
+needs to byteswap specifically PCI port I/O, but apparently not MMIO.
+So I moved the ioport wrappers out of the actual handlers, and in *this*
+patch they are just in the PIO path, so make it fit for both kind of
+traps.
+Now with dropping the PIO specific path in the next patch we lose this
+differentiation. This is not a real problem here, since all accesses
+are 8 bit wide only, which doesn't do anything, really.
+
+I think a proper fix for this problem would be to do the byteswapping
+*once*, very early (write) or late (read) in the KVM_RUN
+exit handling, or in the kvm__emulate_io() function. So that the
+whole device emulation always works in native endianness, and can use
+pointers at will. But this would obviously be another patch.
+
+So in preparation for this I could drop all usage of
+ioport__{read,write}8 from this file, and use pointers all the way.
+That wouldn't change anything (since it's byte accesses only anyway),
+but would already prepare for this move.
+
+What do you think?
+
+Cheers,
+Andre
+
+> > ioport__write8() is a static inline in a header file, so it shouldn't
+> > really hurt, the compiler is able to see through it. The generated code
+> > is almost the same, at least.
+> >
+> > Let me know what you think!
+> >
+> > Cheers,
+> > Andre
+> >  
+> >>> +
+> >>> +	return true;
+> >>> +}
+> >>> +
+> >>>  #ifdef CONFIG_HAS_LIBFDT
+> >>>  
+> >>>  char *fdt_stdout_path = NULL;
+> >>> @@ -427,8 +460,8 @@ void serial8250_generate_fdt_node(void *fdt, struct device_header *dev_hdr,
+> >>>  #endif
+> >>>  
+> >>>  static struct ioport_operations serial8250_ops = {
+> >>> -	.io_in			= serial8250_in,
+> >>> -	.io_out			= serial8250_out,
+> >>> +	.io_in			= serial8250_ioport_in,
+> >>> +	.io_out			= serial8250_ioport_out,
+> >>>  };
+> >>>  
+> >>>  static int serial8250__device_init(struct kvm *kvm,    
 
