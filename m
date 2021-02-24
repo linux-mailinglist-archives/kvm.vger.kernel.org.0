@@ -2,86 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C3E5323BDF
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 13:28:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49CB1323F89
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 16:21:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234493AbhBXM15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 07:27:57 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:54080 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233576AbhBXM1z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 07:27:55 -0500
-Received: from zn.tnic (p200300ec2f0d18008b247b078bad9a72.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:1800:8b24:7b07:8bad:9a72])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C29331EC026D;
-        Wed, 24 Feb 2021 13:27:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1614169632;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=M5+WPT6nlnouK7l+/mNJ2w4w6/uAxYuT5kmxmJdTrr8=;
-        b=Bh9v/pSs45AhY7FHbXtE6kMBWaXUyiyLPh6m+VmffZT9J/uY1S3B8646j7EZh3TCT/nqif
-        o9qnHs0SEoo0N6ezBOCq1jupROaDgALvEViKXWMWpBkFtM09TyANDkym0h76IGNNvIFM8T
-        Flc9DrovFcGIpMmR9lY37tnfodMsVL0=
-Date:   Wed, 24 Feb 2021 13:27:10 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     syzbot <syzbot+42a71c84ef04577f1aef@syzkaller.appspotmail.com>
-Cc:     dave.hansen@intel.com, hpa@zytor.com, jmattson@google.com,
-        joro@8bytes.org, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lstoakes@gmail.com, mingo@redhat.com, pbonzini@redhat.com,
-        seanjc@google.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: general protection fault in vmx_vcpu_run (2)
-Message-ID: <20210224122710.GB20344@zn.tnic>
-References: <0000000000007ff56205ba985b60@google.com>
- <00000000000004e7d105bc091e06@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S233656AbhBXOJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 09:09:03 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:11530 "EHLO
+        hqnvemgate24.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234204AbhBXNBA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:01:00 -0500
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+        id <B60364de30001>; Wed, 24 Feb 2021 05:00:19 -0800
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 24 Feb
+ 2021 13:00:19 +0000
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Wed, 24 Feb 2021 13:00:19 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ekr4J8ELrYx5LtD7zgzq37/rV/wU69b+xbBiU41JRI9wPhmFEQ5DK7PDqlfn7EJXzjmq6UNHUvuGI9zZJKSw+H3lYRJRtanZBOSynONRXRnTe76jR0grNU5UlT91rT+aeYNcy8dc4txVjoc7pTcQ+L/HkJZAPaVrNwByXqYING24u77UP1mKmOZAqeH9yxvNEXO0mhHbM1qLSLfCCcStJkyJaN1TpObu4imF9G8pm+QLeG2H9HbgMXn+hPKRo4gjVz9wPgsJROKTTPF18+coEQ6ZbCFCqbIUpVhtX5hWWFfvmyIMZG4LHf0DOJRFXca3aVD60pE8Z7vaATccmZnexg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xXDoUMTRaO7xCKbxZPqwlzAv3JXVbcMH15jIhmSrnjE=;
+ b=Kxb5sbFacXaCYhb7SniIZmSDZ9+Ft39tN+jlF8Fvbjfy/d7D34HpSs0SQRcncQ7h9qvv+pmWH7OGSjCfiNO8PDhaZjgNXOcu/hkSe2TCh9yYup/OPVFRRxQuTcKwzv+2MxgMT+tu2q2aQ9lxdfxHk7BlzeNVnQ0wqwQEqSrfLEZO96LAp55yu6PC0TQ2u4VgcU2O4fOmxUaBQtPnvqeDKz7xPvJuVtPZyn2EcNw2jNt73lI6k4JyXdygu7AJ5x9gldrqRMGheM0Iw7XjEQoxhF3zLhsfsjhRbTMZ00W3e+t0dBcXSPIPp6fJRv5enKbwOP1RQeysE4UNUOpxwRBx2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM5PR1201MB0108.namprd12.prod.outlook.com (2603:10b6:4:58::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.33; Wed, 24 Feb
+ 2021 13:00:18 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3868.033; Wed, 24 Feb 2021
+ 13:00:18 +0000
+Date:   Wed, 24 Feb 2021 09:00:16 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Auger Eric <eric.auger@redhat.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, <kvm@vger.kernel.org>
+Subject: Re: [PATCH 2/3] vfio-platform: Add COMPILE_TEST to VFIO_PLATFORM
+Message-ID: <20210224130016.GK4247@nvidia.com>
+References: <2-v1-df057e0f92c3+91-vfio_arm_compile_test_jgg@nvidia.com>
+ <8b7dad1c-6597-49a5-15ba-715fcb3e478b@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <00000000000004e7d105bc091e06@google.com>
+In-Reply-To: <8b7dad1c-6597-49a5-15ba-715fcb3e478b@redhat.com>
+X-ClientProxiedBy: BL1PR13CA0404.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::19) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0404.namprd13.prod.outlook.com (2603:10b6:208:2c2::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.10 via Frontend Transport; Wed, 24 Feb 2021 13:00:18 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lEtm4-00GgNv-Jp; Wed, 24 Feb 2021 09:00:16 -0400
+X-Header: ProcessedBy-CMR-outbound
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1614171619; bh=xXDoUMTRaO7xCKbxZPqwlzAv3JXVbcMH15jIhmSrnjE=;
+        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
+         From:To:CC:Subject:Message-ID:References:Content-Type:
+         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
+         X-MS-Exchange-MessageSentRepresentingType:X-Header;
+        b=Cqd2F5y6giOmKLfQeryIusOF6uJPrU0axU74aDigrfKt6UOD8ahhRYRjLBz6jDXRL
+         2xF4k+jN9mr6REurgovISImFBV26tpupxTQyHNtVlbqv4I+ev5b+YwcDlykkE9i9sU
+         JBPqJNyMG1H8fZlr5OEUSONeF0TlCxCpbMvzThQCRNbQGy0pN2duE3QYFhP5xQgsmc
+         IDNJoSnBqbyG3FCMbuLM1rdKdh0o9xc5OWMqTwVkAVVv1CYrwvMlgbufpYdgk8N3HG
+         X7uz898KI3LHejlh6zPP8GKI6jszhxkROtnZUa67sWqtUOXP0UFW0vzE8HNKND2mKX
+         XxQetf9+Hm/Rg==
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Feb 23, 2021 at 03:17:07PM -0800, syzbot wrote:
-> syzbot has bisected this issue to:
+On Wed, Feb 24, 2021 at 10:42:10AM +0100, Auger Eric wrote:
+> Hi Jason,
+> On 2/23/21 8:17 PM, Jason Gunthorpe wrote:
+> > x86 can build platform bus code too, so vfio-platform and all the platform
+> > reset implementations compile successfully on x86.
 > 
-> commit 167dcfc08b0b1f964ea95d410aa496fd78adf475
-> Author: Lorenzo Stoakes <lstoakes@gmail.com>
-> Date:   Tue Dec 15 20:56:41 2020 +0000
-> 
->     x86/mm: Increase pgt_buf size for 5-level page tables
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13fe3ea8d00000
-> start commit:   a99163e9 Merge tag 'devicetree-for-5.12' of git://git.kern..
-> git tree:       upstream
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=10013ea8d00000
+> A similar patch was sent recently, see
+> [PATCH v1] vfio: platform: enable compile test
+> https://www.spinics.net/lists/kvm/msg230677.html
 
-No oops here.
+Well, it does look like it got lost/abandoned, so lets focus on this
+series.
 
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17fe3ea8d00000
-
-Nothing special here too.
-
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=49116074dd53b631
-
-Tried this on two boxes, the Intel one doesn't even boot with that
-config - and it is pretty standard one - and on the AMD one the
-reproducer doesn't trigger anything. It probably won't because the GP
-is in vmx_vcpu_run() but since the ioctls were doing something with
-IRQCHIP, I thought it is probably vendor-agnostic.
-
-So, all in all, I could use some more info on how you're reproducing and
-maybe you could show the oops too.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Jason
