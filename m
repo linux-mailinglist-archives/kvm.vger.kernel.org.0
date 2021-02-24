@@ -2,103 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57692323B58
-	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 12:36:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9275323B7E
+	for <lists+kvm@lfdr.de>; Wed, 24 Feb 2021 12:51:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234949AbhBXLfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 06:35:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24680 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234900AbhBXLfi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Feb 2021 06:35:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614166450;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GztiOhY4vNIEM/XK5kioI43l4GhFLRpSzqvc3Vvbygs=;
-        b=UtvLcxvrChPS04BhnQz+wwKYlitFjJdAm4wsVfulRS1AMz7CcLKu9wQnyZzbMqjcIv0Q0T
-        Mhb0izjaYKXRWAysZyP2cKPA37mBRFIXpnWxFhuqJLWysOa0wm1din5BF81Npszey9i8ja
-        r2ne2M+rKf4pP9JCCPkW34SEFzgLvDw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-OJdNhx_yO0Sd3PDf_JEadg-1; Wed, 24 Feb 2021 06:34:08 -0500
-X-MC-Unique: OJdNhx_yO0Sd3PDf_JEadg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB7A5107ACE4;
-        Wed, 24 Feb 2021 11:34:06 +0000 (UTC)
-Received: from localhost (ovpn-115-137.ams2.redhat.com [10.36.115.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BFB2A17577;
-        Wed, 24 Feb 2021 11:34:03 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 11:34:02 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Elena Afanasova <eafanasova@gmail.com>
-Cc:     kvm@vger.kernel.org, jag.raman@oracle.com,
-        elena.ufimtseva@oracle.com, pbonzini@redhat.com,
-        jasowang@redhat.com, mst@redhat.com, cohuck@redhat.com,
-        john.levon@nutanix.com
-Subject: Re: [RFC v3 0/5] Introduce MMIO/PIO dispatch file descriptors
- (ioregionfd)
-Message-ID: <YDY5qrhIJM//VQ0z@stefanha-x1.localdomain>
-References: <cover.1613828726.git.eafanasova@gmail.com>
+        id S235065AbhBXLui (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 06:50:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234493AbhBXLt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 06:49:56 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28717C061574;
+        Wed, 24 Feb 2021 03:49:16 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id o38so1269733pgm.9;
+        Wed, 24 Feb 2021 03:49:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iKXu5MTD/qNOkcWSg8bnOE00gDFp+RLdj201NypZGkc=;
+        b=KKBBnpxYRiqICn8VUoFHfqlpocIoktHL4QfBR1OT8Xvc1+/veBc+D5nj8QMdgbjEwK
+         1yes/Xz/5+dBGfZfK5rBMgrvkm8wyTUv9ozrjZqeorOJwYfVaXIgvVOeaTxScEgm6uxe
+         ShSM1T4kGf/HKJ7o92OvMPKvMd2MtMwNXJfpv4zWmtN4vZFk68JK9AeETv6DaSkPTaX2
+         Q0eNTMfrQyKvVO3cB9nEzDjn+uugTxpR1NA/SAkxX9dttovsdlENoepSTauut08ZtS6D
+         RIhc0TTMYYczzbwHhAkg659qMxVfsalOutdE5pYFZ7KFyMTQEQL71StaqkENpqS+OQ3X
+         YjkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iKXu5MTD/qNOkcWSg8bnOE00gDFp+RLdj201NypZGkc=;
+        b=jBR5EKN+RAZu9+d/+Mw8Ko/X5j/u7FZMe3lAG+5267MG1+J8SstH2PfBCdx+DmsXEi
+         MQX+BjkaVsYiQtZEZ+AfxokNds97PIRUl18lYrc9oO9DqYFbSCdmbp5uHsyP1Ozy68q6
+         XKN/RS10fwtPwjZclaqtXpLGmx5IE/iVf+qPbth+lJpdIMwzt/ypqkshgvwdsjpVqbLU
+         gdXQDjVXUu/3ERS1T8fz/1nyBbx9h/YPBDPhIehqWEJs6hyfWAHrImqDGkfVlf0EMaHN
+         E1134jmcY16kbhgQEJgXG/6bKml5lBehFHbOyxkY5QIYynEOi3bpti5ZbzJjRBaVvY3D
+         72hQ==
+X-Gm-Message-State: AOAM531QAYrBKid6nlhvoyluTFIFc7oziyMzvxg1SeLJYpfHywzeKUqs
+        mqUaaVtbVH8CEv6FDoGXr9Xg0JBc1MplMLzv
+X-Google-Smtp-Source: ABdhPJy6zT+ozN8jYuxk5CjeXkIK3JoA1vELHsGjU/enp38Jl4Qv64XF+ot1sMiM9QL4epMFQG0Dlw==
+X-Received: by 2002:a05:6a00:16c7:b029:1bc:6eb9:ee47 with SMTP id l7-20020a056a0016c7b02901bc6eb9ee47mr32285893pfc.0.1614167355611;
+        Wed, 24 Feb 2021 03:49:15 -0800 (PST)
+Received: from ndr730u.nd.solarflarecom.com ([182.71.24.30])
+        by smtp.googlemail.com with ESMTPSA id q23sm2533479pfl.123.2021.02.24.03.49.12
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Feb 2021 03:49:15 -0800 (PST)
+From:   Gautam Dawar <gdawar.xilinx@gmail.com>
+To:     mst@redhat.com
+Cc:     martinh@xilinx.com, hanand@xilinx.com, gdawar@xilinx.com,
+        Gautam Dawar <gdawar.xilinx@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] vhost_vdpa: fix the missing irq_bypass_unregister_producer() invocation
+Date:   Wed, 24 Feb 2021 17:18:45 +0530
+Message-Id: <20210224114845.104173-1-gdawar.xilinx@gmail.com>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="paWvJmHFw/6B/xvh"
-Content-Disposition: inline
-In-Reply-To: <cover.1613828726.git.eafanasova@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+When qemu with vhost-vdpa netdevice is run for the first time,
+it works well. But after the VM is powered off, the next qemu run
+causes kernel panic due to a NULL pointer dereference in
+irq_bypass_register_producer().
 
---paWvJmHFw/6B/xvh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+When the VM is powered off, vhost_vdpa_clean_irq() misses on calling
+irq_bypass_unregister_producer() for irq 0 because of the existing check.
 
-On Sun, Feb 21, 2021 at 03:04:36PM +0300, Elena Afanasova wrote:
-> This patchset introduces a KVM dispatch mechanism which can be used=20
-> for handling MMIO/PIO accesses over file descriptors without returning=20
-> from ioctl(KVM_RUN). This allows device emulation to run in another task=
-=20
-> separate from the vCPU task.
->=20
-> This is achieved through KVM vm ioctl for registering MMIO/PIO regions an=
-d=20
-> a wire protocol that KVM uses to communicate with a task handling an=20
-> MMIO/PIO access.
->=20
-> TODOs:
-> * Implement KVM_EXIT_IOREGIONFD_FAILURE
-> * Add non-x86 arch support
-> * Add kvm-unittests
-> * Flush waiters if ioregion is deleted
- * Add ioctl docs to api.rst
- * Add wire protocol docs to <linux/ioregionfd.h>
+This leaves stale producer nodes, which are reset in
+vhost_vring_call_reset() when vhost_dev_init() is invoked during the
+second qemu run.
 
-Great, looks like userspace can really start trying out ioregionfd now -
-most features are implemented. I will do a deeper review of the state
-machine when you send the next revision.
+As the node member of struct irq_bypass_producer is also initialized
+to zero, traversal on the producers list causes crash due to NULL
+pointer dereference.
 
-Stefan
+Fixes: 2cf1ba9a4d15c ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=211711
+Signed-off-by: Gautam Dawar <gdawar.xilinx@gmail.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/vdpa.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
---paWvJmHFw/6B/xvh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmA2OaoACgkQnKSrs4Gr
-c8g89QgAxWZJEMU0XbyR4e2FdvuOKuhiez/Fy+w1HhcS0Hz+KLDMsCeMrdYU43FB
-BhJx+TlNIEUavFSwvws0onrPRNx4G9vLX+d7sFzQDObkp4ny32G1PEune0YGuL8S
-chN416tFZa6QoUjwmUfEymZmuKgA2n8pxqNGBrluX8uXQ0z6ELdkECndJ4HjAaFE
-jXh49dU1O1kUJgh+PrwUU1Jcaj0K6r/IWE5uKOSdCFJPGAgXudJI/bABZMWIG6bm
-KBtPfNt7vNaxsDM8J7PrcSGVhho0vhO+I1xed2WJsGQZGzWoMsq7yfEvOesFYD3e
-oh74ap6ltQaO13zN0E6RCgwAgE9H2A==
-=bAuI
------END PGP SIGNATURE-----
-
---paWvJmHFw/6B/xvh--
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 62a9bb0efc55..e00573b87aba 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -844,14 +844,10 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+ 
+ static void vhost_vdpa_clean_irq(struct vhost_vdpa *v)
+ {
+-	struct vhost_virtqueue *vq;
+ 	int i;
+ 
+-	for (i = 0; i < v->nvqs; i++) {
+-		vq = &v->vqs[i];
+-		if (vq->call_ctx.producer.irq)
+-			irq_bypass_unregister_producer(&vq->call_ctx.producer);
+-	}
++	for (i = 0; i < v->nvqs; i++)
++		vhost_vdpa_unsetup_vq_irq(v, i);
+ }
+ 
+ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
+-- 
+2.30.1
 
