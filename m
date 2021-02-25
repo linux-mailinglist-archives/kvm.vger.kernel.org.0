@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB8CC32580C
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:53:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DCCB325809
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:53:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232770AbhBYUxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 15:53:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50784 "EHLO
+        id S234684AbhBYUwh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 15:52:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234282AbhBYUuV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 15:50:21 -0500
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7A0C06121D
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:20 -0800 (PST)
-Received: by mail-qv1-xf49.google.com with SMTP id t18so5213036qva.6
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:20 -0800 (PST)
+        with ESMTP id S234302AbhBYUuW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 15:50:22 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C65C061221
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:22 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id f81so7561326yba.8
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=hmkVhLp1GC7NIyuf9NPmUl90mCViucnjMMJ9e8WzMHo=;
-        b=dUYOs8ob4aIG9pQFtyyXzH3bzJ8rsFLrxxUirvqk6GDqVEdmKd6dCmw4myHH+sjNYc
-         6B5GbjL3IAlA3gXpv6nY52kevEkoZtwUDCNGGYV90DL6f3uP9sQzi2K219qXf64aH5Tx
-         +c1Cq1S2rr1TbFIeNLDSiXCUgK5keT4DONM+65FFVqqBubgKeyulZj4DrXU9y77PaYW6
-         7vZuPRPktSaomGM7NSWI0iHJtPgTWbn3amdZsmoKKakaqBTkQw818B2ZPRAX2d2Tle9F
-         ftnDWHPiDP+tN6S877e49DPrjHuFv1NxrdWtjaBWNCHpfniEfi10b/DEiotfkwUFWt63
-         KJlg==
+        bh=F0eh9ylPJtSN4o5lYqN1SeY0/rJOFsJfLsPIo1Pupz8=;
+        b=SFlQq5dFvBgj2J0+Jqc8nAq1vFDpNsrCAgZdo7CnGM0JUX9pgq6RC2kR/H4KF51R4H
+         BF2igNp4At4zh5epKOeIkGLVHnxJB3ZS5RxI16DKPLlB/GntMUL89QrQ6LpItibaIVj4
+         V9BuS5W/eEXyK2osPIIix51xjoZqt6t8TrOD3LLjFV6bSunArGSL6wM9XRe6WVd+x27J
+         kan84s1LjotT4s1OAwkI+Gh4Xtmc6q50W06A5PfSvYb3GUJto0LvThi5CnaD+jqEZCQV
+         plwyIJKaa492WzerGv5jrHiCpS2HriyP5K8fSjF9uVxYrQPbu6gPwQ8X82sPlNKe5ImW
+         q6GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=hmkVhLp1GC7NIyuf9NPmUl90mCViucnjMMJ9e8WzMHo=;
-        b=qsZmF3b943hYviSrA74XOd39UHEJuj/l0ajJhsxYvWPzY8xSIhTmVbwJGy+Fqe75xw
-         VH+K5QqCbMaMPzCfZkz2TdUSUiBK0A/Td/ziIubdPupQ3DC9PUNgDiAOHV0lisMLqLNx
-         9smAaeSj6eUxf3w2K52OWSmZY3CUE4eM0RuUN6F34RIAL0PG61L8fIe1nK0fJOMutFSq
-         4BEd5aRPLlVCaq0hunBts9mbCa3rXhcIu8ArZ0FseSNfhPDTGde4nTJ1C2+HoXO/xouY
-         VvSKL9DhGaUdpzZuHWf7H8eUbmsEy+xMiVF8n77LP4Tbf7eu3E/OjUVB8jC/8Rf6CCyY
-         sWew==
-X-Gm-Message-State: AOAM532VrN/Zc2upmgYXuIuckAdSU6sOgeh8+zlginbkQVswEsQNwJGC
-        OWhEx1d9KXRMsWpwMiNdjYqXKisnlwE=
-X-Google-Smtp-Source: ABdhPJwsArN9RBH6GJNh6qdRsI1Sg9jrkAfcEjBj31C2XnPtrMZuIAoQMw2x/HhJKBeQUdH5kqOVRVtWaNE=
+        bh=F0eh9ylPJtSN4o5lYqN1SeY0/rJOFsJfLsPIo1Pupz8=;
+        b=ruxt6BBQBQACveiT6L7jWizaZhyW7t9561OmEgBJjPwSX3ay5waxL8gqx95nEAZ5jF
+         70grYxY+iL5zqSZZ9DDtlPkMmHwBY6686ww34X5N6KBTpNm8EPrGZKqkWT5zyGFR6JdK
+         lLnAbckBORnRIx3OxgZltYE09bep+SsipZeeRZXnnXBl9kEvZHmMQCluotSJFkowZ3Kv
+         Cv6yZhLleybaVPhG34PoxBUsG/Evdnz+MnxnHp5h/92giWJcz2ZkCxrgWTIQS3eEcAbO
+         to0n3EewNp0nMNP+yQPCxHjSCUv8Ndkr1y8pkslt3sYjHa7KR9acAct7Ljm+EojbNePZ
+         ZgdA==
+X-Gm-Message-State: AOAM531u4FsXFSjHTwTUE3iW/FWirUeTPzaEyC3XQ1WaQD1yE66JqW7g
+        YeZtSy+IvT3wUjNlema5Kp/X67BxpeE=
+X-Google-Smtp-Source: ABdhPJx3w04ypNexMcAliwGECnbLKlW0y3JTQsT0wE66V6WzKtiGvpxXGgLwGA12LK/s+jUC+eaKDpDhjAg=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:34c4:7c1d:f9ba:4576])
- (user=seanjc job=sendgmr) by 2002:a05:6214:d6d:: with SMTP id
- 13mr4706063qvs.60.1614286099247; Thu, 25 Feb 2021 12:48:19 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:aae2:: with SMTP id t89mr7485713ybi.63.1614286101914;
+ Thu, 25 Feb 2021 12:48:21 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Feb 2021 12:47:33 -0800
+Date:   Thu, 25 Feb 2021 12:47:34 -0800
 In-Reply-To: <20210225204749.1512652-1-seanjc@google.com>
-Message-Id: <20210225204749.1512652-9-seanjc@google.com>
+Message-Id: <20210225204749.1512652-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210225204749.1512652-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 08/24] KVM: x86/mmu: Drop redundant trace_kvm_mmu_set_spte()
- in the TDP MMU
+Subject: [PATCH 09/24] KVM: x86/mmu: Rename 'mask' to 'spte' in MMIO SPTE helpers
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,37 +66,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove TDP MMU's call to trace_kvm_mmu_set_spte() that is done for both
-shadow-present SPTEs and MMIO SPTEs.  It's fully redundant for the
-former, and unnecessary for the latter.  This aligns TDP MMU tracing
-behavior with that of the legacy MMU.
+The value returned by make_mmio_spte() is a SPTE, it is not a mask.
+Name it accordingly.
 
-Fixes: 33dd3574f5fe ("kvm: x86/mmu: Add existing trace points to TDP MMU")
-Cc: Ben Gardon <bgardon@google.com>
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c  |  6 +++---
+ arch/x86/kvm/mmu/spte.c | 10 +++++-----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index f46972892a2d..782cae1eb5e1 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -773,12 +773,11 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu, int write,
- 		trace_mark_mmio_spte(rcu_dereference(iter->sptep), iter->gfn,
- 				     new_spte);
- 		ret = RET_PF_EMULATE;
--	} else
-+	} else {
- 		trace_kvm_mmu_set_spte(iter->level, iter->gfn,
- 				       rcu_dereference(iter->sptep));
-+	}
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4a24beefff94..ced412f90b7d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -215,10 +215,10 @@ bool is_nx_huge_page_enabled(void)
+ static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
+ 			   unsigned int access)
+ {
+-	u64 mask = make_mmio_spte(vcpu, gfn, access);
++	u64 spte = make_mmio_spte(vcpu, gfn, access);
  
--	trace_kvm_mmu_set_spte(iter->level, iter->gfn,
--			       rcu_dereference(iter->sptep));
- 	if (!prefault)
- 		vcpu->stat.pf_fixed++;
+-	trace_mark_mmio_spte(sptep, gfn, mask);
+-	mmu_spte_set(sptep, mask);
++	trace_mark_mmio_spte(sptep, gfn, spte);
++	mmu_spte_set(sptep, spte);
+ }
  
+ static gfn_t get_mmio_spte_gfn(u64 spte)
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index dcba9c1cbe29..e4ef3267f9ac 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -48,18 +48,18 @@ static u64 generation_mmio_spte_mask(u64 gen)
+ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+ {
+ 	u64 gen = kvm_vcpu_memslots(vcpu)->generation & MMIO_SPTE_GEN_MASK;
+-	u64 mask = generation_mmio_spte_mask(gen);
++	u64 spte = generation_mmio_spte_mask(gen);
+ 	u64 gpa = gfn << PAGE_SHIFT;
+ 
+ 	WARN_ON_ONCE(!shadow_mmio_value);
+ 
+ 	access &= shadow_mmio_access_mask;
+-	mask |= shadow_mmio_value | access;
+-	mask |= gpa | shadow_nonpresent_or_rsvd_mask;
+-	mask |= (gpa & shadow_nonpresent_or_rsvd_mask)
++	spte |= shadow_mmio_value | access;
++	spte |= gpa | shadow_nonpresent_or_rsvd_mask;
++	spte |= (gpa & shadow_nonpresent_or_rsvd_mask)
+ 		<< SHADOW_NONPRESENT_OR_RSVD_MASK_LEN;
+ 
+-	return mask;
++	return spte;
+ }
+ 
+ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
