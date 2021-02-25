@@ -2,138 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FD903255E9
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 19:57:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32C9332563C
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 20:10:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232723AbhBYS45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 13:56:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25450 "EHLO
+        id S233337AbhBYTJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 14:09:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28511 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230166AbhBYS4w (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 13:56:52 -0500
+        by vger.kernel.org with ESMTP id S233871AbhBYTIV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 14:08:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614279325;
+        s=mimecast20190719; t=1614280015;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=V2KuMziu842JMfiM/AqGMgt14XmhOnxGCT/IAIzioz4=;
-        b=gU2BqgbntiNhgBncilt+huDXgjrG7on6rRMauWP2o1vwM5Dc9KHU3JCQvmhDJWfOxub5WW
-        4SzML5WMQMzGKWi2iZqc5t9GHQs52VcEtAV24VmgNsTcvjNDYTKNkV7KoNQtP6J3N4S1wr
-        hXwQP5p/YmhgiawVtknxu54MOfkb63Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-lUrrAByYOcuxgzJK52RQTg-1; Thu, 25 Feb 2021 13:55:23 -0500
-X-MC-Unique: lUrrAByYOcuxgzJK52RQTg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CFC01083E8F;
-        Thu, 25 Feb 2021 18:55:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.194.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 729D860C16;
-        Thu, 25 Feb 2021 18:55:09 +0000 (UTC)
-Date:   Thu, 25 Feb 2021 19:55:06 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Yanan Wang <wangyanan55@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Ingo Molnar <mingo@kernel.org>, Peter Xu <peterx@redhat.com>,
-        Marc Zyngier <maz@kernel.org>, wanghaibin.wang@huawei.com,
-        yuzenghui@huawei.com
-Subject: Re: [RFC PATCH v2 3/7] KVM: selftests: Make a generic helper to get
- vm guest mode strings
-Message-ID: <20210225185506.r54k2z6e6xual7ag@kamzik.brq.redhat.com>
-References: <20210225055940.18748-1-wangyanan55@huawei.com>
- <20210225055940.18748-4-wangyanan55@huawei.com>
+        bh=0ntq0VlGIcmn4gcxkIRxd3iIu35CFerEbtANCfGiVdM=;
+        b=c92gdkub3c/rogDMr0M/hF5HbyhycnKiMhHhW5NCDwiiI+Zq+5vbesRRX+GasOos3BmP/U
+        yQtUwhL6q95sIAkqI9j95bM66GpmHRNK9Z+R8GbJLoIAuxxc/b0/0JcdpMb5gpCH13HJMC
+        V0kzSjwjwQ2zWC36RpknNjEJpBhNIaE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-526-ROfyiNDkOnmGCVJc_cwUyg-1; Thu, 25 Feb 2021 14:06:51 -0500
+X-MC-Unique: ROfyiNDkOnmGCVJc_cwUyg-1
+Received: by mail-qv1-f72.google.com with SMTP id h10so4962477qvf.19
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 11:06:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0ntq0VlGIcmn4gcxkIRxd3iIu35CFerEbtANCfGiVdM=;
+        b=X2sPn1MNc1HRgNYp9I5/sV5jfhTqJlG9l5cfP8V3dtzzl5Je8PLW3qHOuGfUFpv0Qe
+         uA5/6+gz3uEDfuIZWA5q7oO5TY7NovffnVNgE0tPNy/W1Spz/2rzfBxXaKYkbY78ZLer
+         4lOA64SOL/aNtHw48meA9km5d3TOtqOy9qj+1VM0HMua1KtNRo8u0xRhNJEhfohGmRAV
+         iAaqQiJkBRJIZjDrMBR3I+7u3AAjFjJ1d/oR8juEKZYOlvrClE6yDqDonm/bYmk/BAzD
+         qCSp1X+Nm9gdHSPuvTGgzLc0ggOLhTy2BhyjcKGd1pFfNpMvSNv+sjse022Lw7eOrWzf
+         8+NA==
+X-Gm-Message-State: AOAM531lALXtNub4Pg3So3KTMLq3JyI4MXcYCwKJIs/MjYgZgeSacV5e
+        9+i0PL4q4B41GuEfVUtf6N1OmY6XhkZH39Goq5u59j0l/VbGmGr+eQIKF58+gKeDfb3xG6+aN+w
+        F2uya3WOHgI7X
+X-Received: by 2002:a37:a183:: with SMTP id k125mr4205722qke.332.1614280011439;
+        Thu, 25 Feb 2021 11:06:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxfK+N05IVgdsA0MDZcag+sGz5potbwSbK8mKsg4vfzFYEPeycGT3qjurTXgTTNpmL/fJDJmQ==
+X-Received: by 2002:a37:a183:: with SMTP id k125mr4205707qke.332.1614280011193;
+        Thu, 25 Feb 2021 11:06:51 -0800 (PST)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-25-174-95-95-253.dsl.bell.ca. [174.95.95.253])
+        by smtp.gmail.com with ESMTPSA id j2sm4373993qkk.96.2021.02.25.11.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Feb 2021 11:06:50 -0800 (PST)
+Date:   Thu, 25 Feb 2021 14:06:46 -0500
+From:   Peter Xu <peterx@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 10/10] vfio/type1: Register device notifier
+Message-ID: <20210225190646.GE250483@xz-x1>
+References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
+ <161401275279.16443.6350471385325897377.stgit@gimli.home>
+ <20210222175523.GQ4247@nvidia.com>
+ <20210224145508.1f0edb06@omen.home.shazbot.org>
+ <20210225002216.GQ4247@nvidia.com>
+ <20210225175457.GD250483@xz-x1>
+ <20210225181945.GT4247@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210225055940.18748-4-wangyanan55@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210225181945.GT4247@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 01:59:36PM +0800, Yanan Wang wrote:
-> For generality and conciseness, make an API which can be used in all
-> kvm libs and selftests to get vm guest mode strings. And the index i
-> is checked in the API in case of possiable faults.
+On Thu, Feb 25, 2021 at 02:19:45PM -0400, Jason Gunthorpe wrote:
+> On Thu, Feb 25, 2021 at 12:54:57PM -0500, Peter Xu wrote:
+>  
+> > I can't say I fully understand the whole rational behind 5cbf3264bc71, but that
+> > commit still sounds reasonable to me, since I don't see why VFIO cannot do
+> > VFIO_IOMMU_MAP_DMA upon another memory range that's neither anonymous memory
+> > nor vfio mapped MMIO range.
 > 
-> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
-> ---
->  .../testing/selftests/kvm/include/kvm_util.h  |  4 +--
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 29 ++++++++++++-------
->  2 files changed, 19 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 2d7eb6989e83..f52a7492f47f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -68,9 +68,6 @@ enum vm_guest_mode {
->  #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
->  #define PTES_PER_MIN_PAGE	ptes_per_page(MIN_PAGE_SIZE)
->  
-> -#define vm_guest_mode_string(m) vm_guest_mode_string[m]
-> -extern const char * const vm_guest_mode_string[];
-> -
->  struct vm_guest_mode_params {
->  	unsigned int pa_bits;
->  	unsigned int va_bits;
-> @@ -84,6 +81,7 @@ int vm_enable_cap(struct kvm_vm *vm, struct kvm_enable_cap *cap);
->  int vcpu_enable_cap(struct kvm_vm *vm, uint32_t vcpu_id,
->  		    struct kvm_enable_cap *cap);
->  void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size);
-> +const char *vm_guest_mode_string(uint32_t i);
->  
->  struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm);
->  void kvm_vm_free(struct kvm_vm *vmp);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index d787cb802b4a..cc22c4ab7d67 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -141,17 +141,24 @@ static void vm_open(struct kvm_vm *vm, int perm)
->  		"rc: %i errno: %i", vm->fd, errno);
->  }
->  
-> -const char * const vm_guest_mode_string[] = {
-> -	"PA-bits:52,  VA-bits:48,  4K pages",
-> -	"PA-bits:52,  VA-bits:48, 64K pages",
-> -	"PA-bits:48,  VA-bits:48,  4K pages",
-> -	"PA-bits:48,  VA-bits:48, 64K pages",
-> -	"PA-bits:40,  VA-bits:48,  4K pages",
-> -	"PA-bits:40,  VA-bits:48, 64K pages",
-> -	"PA-bits:ANY, VA-bits:48,  4K pages",
-> -};
-> -_Static_assert(sizeof(vm_guest_mode_string)/sizeof(char *) == NUM_VM_MODES,
-> -	       "Missing new mode strings?");
-> +const char *vm_guest_mode_string(uint32_t i)
-> +{
-> +	static const char * const strings[] = {
-> +		[VM_MODE_P52V48_4K]	= "PA-bits:52,  VA-bits:48,  4K pages",
-> +		[VM_MODE_P52V48_64K]	= "PA-bits:52,  VA-bits:48, 64K pages",
-> +		[VM_MODE_P48V48_4K]	= "PA-bits:48,  VA-bits:48,  4K pages",
-> +		[VM_MODE_P48V48_64K]	= "PA-bits:48,  VA-bits:48, 64K pages",
-> +		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
-> +		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
-> +		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-> +	};
-> +	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
-> +		       "Missing new mode strings?");
-> +
-> +	TEST_ASSERT(i < NUM_VM_MODES, "Guest mode ID %d too big", i);
-> +
-> +	return strings[i];
-> +}
->  
->  const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  	{ 52, 48,  0x1000, 12 },
-> -- 
-> 2.19.1
->
+> It is not so much it can't, more that it doesn't and doesn't need to.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+OK.
+
+> 
+> > In those cases, vm_pgoff namespace defined by vfio may not be true
+> > anymore, iiuc.
+> 
+> Since this series is proposing linking the VMA to an address_space all
+> the vm_pgoffs must be in the same namespace
+
+Agreed.  I saw discussions around on redefining the vm_pgoff namespace, I can't
+say I followed that closely either, but yes it definitely makes sense to always
+use an unified namespace.  Maybe we should even comment it somewhere on how
+vm_pgoff is encoded?
+
+> 
+> > Or does it mean that we don't want to allow VFIO dma to those unknown memory
+> > backends, for some reason?
+> 
+> Correct. VFIO can map into the IOMMU PFNs it can get a reference
+> to. pin_user_pages() works for the majority, special VFIO VMAs cover
+> the rest, and everthing else must be blocked for security.
+
+If we all agree that the current follow_pfn() should only apply to vfio
+internal vmas, then it seems we can drop it indeed, as long as the crash
+reported in 5cbf3264b would fail gracefully at e.g. VFIO_IOMMU_MAP_DMA rather
+than triggering a kernel warning somehow.
+
+However I'm still confused on why it's more secure - the current process to do
+VFIO_IOMMU_MAP_DMA should at least has proper permission for everything to be
+setup, including the special vma, right?  Say, if the process can write to
+those memories, then shouldn't we also allow it to grant this write permission
+to other devices too?
+
+Thanks,
+
+-- 
+Peter Xu
 
