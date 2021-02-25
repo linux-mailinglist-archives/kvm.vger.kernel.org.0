@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6728324848
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 02:04:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C2FD324843
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 02:04:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234024AbhBYBE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 20:04:29 -0500
-Received: from foss.arm.com ([217.140.110.172]:58550 "EHLO foss.arm.com"
+        id S235508AbhBYBDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 20:03:43 -0500
+Received: from foss.arm.com ([217.140.110.172]:58508 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235094AbhBYBCw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 20:02:52 -0500
+        id S236589AbhBYBCd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 20:02:33 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 36C5A14FF;
-        Wed, 24 Feb 2021 17:00:57 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BCA3C1509;
+        Wed, 24 Feb 2021 17:00:58 -0800 (PST)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE02D3F73B;
-        Wed, 24 Feb 2021 17:00:55 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 714B23F73B;
+        Wed, 24 Feb 2021 17:00:57 -0800 (PST)
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Will Deacon <will@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
         Sami Mujawar <sami.mujawar@arm.com>
-Subject: [PATCH kvmtool v2 20/22] arm: Reorganise and document memory map
-Date:   Thu, 25 Feb 2021 00:59:13 +0000
-Message-Id: <20210225005915.26423-21-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v2 21/22] hw/serial: ARM/arm64: Use MMIO at higher addresses
+Date:   Thu, 25 Feb 2021 00:59:14 +0000
+Message-Id: <20210225005915.26423-22-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.14.1
 In-Reply-To: <20210225005915.26423-1-andre.przywara@arm.com>
 References: <20210225005915.26423-1-andre.przywara@arm.com>
@@ -33,89 +33,170 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hardcoded memory map we expose to a guest is currently described
-using a series of partially interconnected preprocessor constants,
-which is hard to read and follow.
+Using the UART devices at their legacy I/O addresses as set by IBM in
+1981 was a kludge we used for simplicity on ARM platforms as well.
+However this imposes problems due to their missing alignment and overlap
+with the PCI I/O address space.
 
-In preparation for moving the UART and RTC to some different MMIO
-region, document the current map with some ASCII art, and clean up the
-definition of the sections.
+Now that we can switch a device easily between using ioports and MMIO,
+let's move the UARTs out of the first 4K of memory on ARM platforms.
 
-No functional change.
+That should be transparent for well behaved guests, since the change is
+naturally reflected in the device tree. Even "earlycon" keeps working,
+as the stdout-path property is adjusted automatically.
+
+People providing direct earlycon parameters via the command line need to
+adjust it to: "earlycon=uart,mmio,0x1000000".
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/include/arm-common/kvm-arch.h | 41 ++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 12 deletions(-)
+ arm/include/arm-common/kvm-arch.h |  3 +++
+ hw/serial.c                       | 45 ++++++++++++++++++++-----------
+ 2 files changed, 32 insertions(+), 16 deletions(-)
 
 diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index d84e50cd..b12255b0 100644
+index b12255b0..633ea8fa 100644
 --- a/arm/include/arm-common/kvm-arch.h
 +++ b/arm/include/arm-common/kvm-arch.h
-@@ -7,14 +7,33 @@
+@@ -28,6 +28,9 @@
+ #define ARM_IOPORT_SIZE		(1U << 16)
  
- #include "arm-common/gic.h"
  
-+/*
-+ * The memory map used for ARM guests (not to scale):
-+ *
-+ * 0      64K  16M     32M     48M            1GB       2GB
-+ * +-------+-..-+-------+-------+--....--+-----+--.....--+---......
-+ * | (PCI) |////| int.  |       |        |     |         |
-+ * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
-+ * | ports |////| UART, |       |  MMIO  |     |  (AXI)  |
-+ * |       |////| RTC   |       |        |     |         |
-+ * +-------+-..-+-------+-------+--....--+-----+--.....--+---......
-+ */
++#define ARM_UART_MMIO_BASE	ARM_MMIO_AREA
++#define ARM_UART_MMIO_SIZE	0x10000
 +
- #define ARM_IOPORT_AREA		_AC(0x0000000000000000, UL)
--#define ARM_FLASH_AREA		_AC(0x0000000002000000, UL)
--#define ARM_MMIO_AREA		_AC(0x0000000003000000, UL)
-+#define ARM_MMIO_AREA		_AC(0x0000000001000000, UL)
- #define ARM_AXI_AREA		_AC(0x0000000040000000, UL)
- #define ARM_MEMORY_AREA		_AC(0x0000000080000000, UL)
+ #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
+ #define KVM_FLASH_MAX_SIZE	0x1000000
  
--#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
--#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-+#define KVM_IOPORT_AREA		ARM_IOPORT_AREA
-+#define ARM_IOPORT_SIZE		(1U << 16)
+diff --git a/hw/serial.c b/hw/serial.c
+index 4be188a1..1854add2 100644
+--- a/hw/serial.c
++++ b/hw/serial.c
+@@ -13,6 +13,17 @@
+ 
+ #include <pthread.h>
+ 
++#if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
++#define serial_iobase(nr)	(ARM_UART_MMIO_BASE + (nr) * 0x1000)
++#define serial_irq(nr)		(32 + (nr))
++#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
++#else
++#define serial_iobase(nr)	((((nr) & 1) ? 0x200 : 0x300) +	\
++				 ((nr) >= 2 ? 0xe8 : 0xf8))
++#define serial_irq(nr)		(((nr) & 1) ? 3 : 4)
++#define SERIAL8250_BUS_TYPE	DEVICE_BUS_IOPORT
++#endif
 +
-+
-+#define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
-+#define KVM_FLASH_MAX_SIZE	0x1000000
-+
-+#define KVM_VIRTIO_MMIO_AREA	(KVM_FLASH_MMIO_BASE + KVM_FLASH_MAX_SIZE)
-+#define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - \
-+				(KVM_VIRTIO_MMIO_AREA + ARM_GIC_SIZE))
+ /*
+  * This fakes a U6_16550A. The fifo len needs to be 64 as the kernel
+  * expects that for autodetection.
+@@ -27,7 +38,7 @@ struct serial8250_device {
+ 	struct mutex		mutex;
+ 	u8			id;
  
- #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
- #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
-@@ -22,19 +41,17 @@
- #define ARM_GIC_DIST_SIZE	0x10000
- #define ARM_GIC_CPUI_SIZE	0x20000
+-	u16			iobase;
++	u32			iobase;
+ 	u8			irq;
+ 	u8			irq_state;
+ 	int			txcnt;
+@@ -65,56 +76,56 @@ static struct serial8250_device devices[] = {
+ 	/* ttyS0 */
+ 	[0]	= {
+ 		.dev_hdr = {
+-			.bus_type	= DEVICE_BUS_IOPORT,
++			.bus_type	= SERIAL8250_BUS_TYPE,
+ 			.data		= serial8250_generate_fdt_node,
+ 		},
+ 		.mutex			= MUTEX_INITIALIZER,
  
--#define KVM_FLASH_MMIO_BASE	ARM_FLASH_AREA
--#define KVM_FLASH_MAX_SIZE	(ARM_MMIO_AREA - ARM_FLASH_AREA)
+ 		.id			= 0,
+-		.iobase			= 0x3f8,
+-		.irq			= 4,
++		.iobase			= serial_iobase(0),
++		.irq			= serial_irq(0),
  
--#define ARM_IOPORT_SIZE		(1U << 16)
--#define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
-+#define KVM_PCI_CFG_AREA	ARM_AXI_AREA
- #define ARM_PCI_CFG_SIZE	(1ULL << 24)
-+#define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
- #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
- 				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
+ 		SERIAL_REGS_SETTING
+ 	},
+ 	/* ttyS1 */
+ 	[1]	= {
+ 		.dev_hdr = {
+-			.bus_type	= DEVICE_BUS_IOPORT,
++			.bus_type	= SERIAL8250_BUS_TYPE,
+ 			.data		= serial8250_generate_fdt_node,
+ 		},
+ 		.mutex			= MUTEX_INITIALIZER,
  
--#define KVM_IOPORT_AREA		ARM_IOPORT_AREA
--#define KVM_PCI_CFG_AREA	ARM_AXI_AREA
--#define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
--#define KVM_VIRTIO_MMIO_AREA	ARM_MMIO_AREA
-+
-+#define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
-+#define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-+
+ 		.id			= 1,
+-		.iobase			= 0x2f8,
+-		.irq			= 3,
++		.iobase			= serial_iobase(1),
++		.irq			= serial_irq(1),
  
- #define KVM_IOEVENTFD_HAS_PIO	0
+ 		SERIAL_REGS_SETTING
+ 	},
+ 	/* ttyS2 */
+ 	[2]	= {
+ 		.dev_hdr = {
+-			.bus_type	= DEVICE_BUS_IOPORT,
++			.bus_type	= SERIAL8250_BUS_TYPE,
+ 			.data		= serial8250_generate_fdt_node,
+ 		},
+ 		.mutex			= MUTEX_INITIALIZER,
  
+ 		.id			= 2,
+-		.iobase			= 0x3e8,
+-		.irq			= 4,
++		.iobase			= serial_iobase(2),
++		.irq			= serial_irq(2),
+ 
+ 		SERIAL_REGS_SETTING
+ 	},
+ 	/* ttyS3 */
+ 	[3]	= {
+ 		.dev_hdr = {
+-			.bus_type	= DEVICE_BUS_IOPORT,
++			.bus_type	= SERIAL8250_BUS_TYPE,
+ 			.data		= serial8250_generate_fdt_node,
+ 		},
+ 		.mutex			= MUTEX_INITIALIZER,
+ 
+ 		.id			= 3,
+-		.iobase			= 0x2e8,
+-		.irq			= 3,
++		.iobase			= serial_iobase(3),
++		.irq			= serial_irq(3),
+ 
+ 		SERIAL_REGS_SETTING
+ 	},
+@@ -439,7 +450,8 @@ static int serial8250__device_init(struct kvm *kvm,
+ 		return r;
+ 
+ 	ioport__map_irq(&dev->irq);
+-	r = kvm__register_pio(kvm, dev->iobase, 8, serial8250_mmio, dev);
++	r = kvm__register_iotrap(kvm, dev->iobase, 8, serial8250_mmio, dev,
++				 SERIAL8250_BUS_TYPE);
+ 
+ 	return r;
+ }
+@@ -462,7 +474,7 @@ cleanup:
+ 	for (j = 0; j <= i; j++) {
+ 		struct serial8250_device *dev = &devices[j];
+ 
+-		kvm__deregister_pio(kvm, dev->iobase);
++		kvm__deregister_iotrap(kvm, dev->iobase, SERIAL8250_BUS_TYPE);
+ 		device__unregister(&dev->dev_hdr);
+ 	}
+ 
+@@ -478,7 +490,8 @@ int serial8250__exit(struct kvm *kvm)
+ 	for (i = 0; i < ARRAY_SIZE(devices); i++) {
+ 		struct serial8250_device *dev = &devices[i];
+ 
+-		r = kvm__deregister_pio(kvm, dev->iobase);
++		r = kvm__deregister_iotrap(kvm, dev->iobase,
++					   SERIAL8250_BUS_TYPE);
+ 		if (r < 0)
+ 			return r;
+ 		device__unregister(&dev->dev_hdr);
 -- 
 2.17.5
 
