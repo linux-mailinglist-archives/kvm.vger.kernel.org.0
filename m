@@ -2,120 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C9332563C
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 20:10:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34227325682
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 20:17:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233337AbhBYTJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 14:09:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28511 "EHLO
+        id S234256AbhBYTQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 14:16:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51150 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233871AbhBYTIV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 14:08:21 -0500
+        by vger.kernel.org with ESMTP id S234545AbhBYTOH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 14:14:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614280015;
+        s=mimecast20190719; t=1614280359;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0ntq0VlGIcmn4gcxkIRxd3iIu35CFerEbtANCfGiVdM=;
-        b=c92gdkub3c/rogDMr0M/hF5HbyhycnKiMhHhW5NCDwiiI+Zq+5vbesRRX+GasOos3BmP/U
-        yQtUwhL6q95sIAkqI9j95bM66GpmHRNK9Z+R8GbJLoIAuxxc/b0/0JcdpMb5gpCH13HJMC
-        V0kzSjwjwQ2zWC36RpknNjEJpBhNIaE=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-ROfyiNDkOnmGCVJc_cwUyg-1; Thu, 25 Feb 2021 14:06:51 -0500
-X-MC-Unique: ROfyiNDkOnmGCVJc_cwUyg-1
-Received: by mail-qv1-f72.google.com with SMTP id h10so4962477qvf.19
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 11:06:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0ntq0VlGIcmn4gcxkIRxd3iIu35CFerEbtANCfGiVdM=;
-        b=X2sPn1MNc1HRgNYp9I5/sV5jfhTqJlG9l5cfP8V3dtzzl5Je8PLW3qHOuGfUFpv0Qe
-         uA5/6+gz3uEDfuIZWA5q7oO5TY7NovffnVNgE0tPNy/W1Spz/2rzfBxXaKYkbY78ZLer
-         4lOA64SOL/aNtHw48meA9km5d3TOtqOy9qj+1VM0HMua1KtNRo8u0xRhNJEhfohGmRAV
-         iAaqQiJkBRJIZjDrMBR3I+7u3AAjFjJ1d/oR8juEKZYOlvrClE6yDqDonm/bYmk/BAzD
-         qCSp1X+Nm9gdHSPuvTGgzLc0ggOLhTy2BhyjcKGd1pFfNpMvSNv+sjse022Lw7eOrWzf
-         8+NA==
-X-Gm-Message-State: AOAM531lALXtNub4Pg3So3KTMLq3JyI4MXcYCwKJIs/MjYgZgeSacV5e
-        9+i0PL4q4B41GuEfVUtf6N1OmY6XhkZH39Goq5u59j0l/VbGmGr+eQIKF58+gKeDfb3xG6+aN+w
-        F2uya3WOHgI7X
-X-Received: by 2002:a37:a183:: with SMTP id k125mr4205722qke.332.1614280011439;
-        Thu, 25 Feb 2021 11:06:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxfK+N05IVgdsA0MDZcag+sGz5potbwSbK8mKsg4vfzFYEPeycGT3qjurTXgTTNpmL/fJDJmQ==
-X-Received: by 2002:a37:a183:: with SMTP id k125mr4205707qke.332.1614280011193;
-        Thu, 25 Feb 2021 11:06:51 -0800 (PST)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-25-174-95-95-253.dsl.bell.ca. [174.95.95.253])
-        by smtp.gmail.com with ESMTPSA id j2sm4373993qkk.96.2021.02.25.11.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Feb 2021 11:06:50 -0800 (PST)
-Date:   Thu, 25 Feb 2021 14:06:46 -0500
-From:   Peter Xu <peterx@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, cohuck@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 10/10] vfio/type1: Register device notifier
-Message-ID: <20210225190646.GE250483@xz-x1>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401275279.16443.6350471385325897377.stgit@gimli.home>
- <20210222175523.GQ4247@nvidia.com>
- <20210224145508.1f0edb06@omen.home.shazbot.org>
- <20210225002216.GQ4247@nvidia.com>
- <20210225175457.GD250483@xz-x1>
- <20210225181945.GT4247@nvidia.com>
+        bh=06Wk8j084czweIl2sAHUw6QfIrOuQIVq2H1D3mFdUrw=;
+        b=innT8SjbUgQlVZVDBXqwti84HaJ6AEwk2xlI4e/+rmiBysi+IC4LTHFgUvbiU6J5Wv+TAO
+        YZ1tVwGf0Wg/lbq9qmSPULjcHVgZwgjvpKYt0cZwUNudk3n+fr7yxvwM0BzMa+1Ob0FuzX
+        omJZXu/nSrpO2pvJYO6JpiscvQ5X8lE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-FRsNhabSOcWl8_2jz3Lyag-1; Thu, 25 Feb 2021 14:12:36 -0500
+X-MC-Unique: FRsNhabSOcWl8_2jz3Lyag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD79A107ACF3;
+        Thu, 25 Feb 2021 19:12:34 +0000 (UTC)
+Received: from [10.36.114.58] (ovpn-114-58.ams2.redhat.com [10.36.114.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B7585D9D2;
+        Thu, 25 Feb 2021 19:12:32 +0000 (UTC)
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-kernel@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        stable@vger.kernel.org
+References: <20210223191353.267981-1-imbrenda@linux.ibm.com>
+ <20210223191353.267981-3-imbrenda@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Subject: Re: [PATCH v4 2/2] s390/kvm: VSIE: correctly handle MVPG when in VSIE
+Message-ID: <2978d95c-62d9-556a-186f-9534e202f4c9@redhat.com>
+Date:   Thu, 25 Feb 2021 20:12:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210225181945.GT4247@nvidia.com>
+In-Reply-To: <20210223191353.267981-3-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 02:19:45PM -0400, Jason Gunthorpe wrote:
-> On Thu, Feb 25, 2021 at 12:54:57PM -0500, Peter Xu wrote:
->  
-> > I can't say I fully understand the whole rational behind 5cbf3264bc71, but that
-> > commit still sounds reasonable to me, since I don't see why VFIO cannot do
-> > VFIO_IOMMU_MAP_DMA upon another memory range that's neither anonymous memory
-> > nor vfio mapped MMIO range.
+On 23.02.21 20:13, Claudio Imbrenda wrote:
+> Correctly handle the MVPG instruction when issued by a VSIE guest.
 > 
-> It is not so much it can't, more that it doesn't and doesn't need to.
-
-OK.
-
+> Fixes: a3508fbe9dc6d ("KVM: s390: vsie: initial support for nested virtualization")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Acked-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   arch/s390/kvm/vsie.c | 93 +++++++++++++++++++++++++++++++++++++++++---
+>   1 file changed, 88 insertions(+), 5 deletions(-)
 > 
-> > In those cases, vm_pgoff namespace defined by vfio may not be true
-> > anymore, iiuc.
-> 
-> Since this series is proposing linking the VMA to an address_space all
-> the vm_pgoffs must be in the same namespace
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 78b604326016..dbf4241bc2dc 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -417,11 +417,6 @@ static void unshadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>   		memcpy((void *)((u64)scb_o + 0xc0),
+>   		       (void *)((u64)scb_s + 0xc0), 0xf0 - 0xc0);
+>   		break;
+> -	case ICPT_PARTEXEC:
+> -		/* MVPG only */
+> -		memcpy((void *)((u64)scb_o + 0xc0),
+> -		       (void *)((u64)scb_s + 0xc0), 0xd0 - 0xc0);
+> -		break;
+>   	}
+>   
+>   	if (scb_s->ihcpu != 0xffffU)
+> @@ -983,6 +978,90 @@ static int handle_stfle(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>   	return 0;
+>   }
+>   
+> +static u64 vsie_get_register(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page, u8 reg)
+> +{
+> +	reg &= 0xf;
 
-Agreed.  I saw discussions around on redefining the vm_pgoff namespace, I can't
-say I followed that closely either, but yes it definitely makes sense to always
-use an unified namespace.  Maybe we should even comment it somewhere on how
-vm_pgoff is encoded?
+Nit, I'd mask of that value in the caller where you extract it from the ipb.
 
-> 
-> > Or does it mean that we don't want to allow VFIO dma to those unknown memory
-> > backends, for some reason?
-> 
-> Correct. VFIO can map into the IOMMU PFNs it can get a reference
-> to. pin_user_pages() works for the majority, special VFIO VMAs cover
-> the rest, and everthing else must be blocked for security.
+...
 
-If we all agree that the current follow_pfn() should only apply to vfio
-internal vmas, then it seems we can drop it indeed, as long as the crash
-reported in 5cbf3264b would fail gracefully at e.g. VFIO_IOMMU_MAP_DMA rather
-than triggering a kernel warning somehow.
+> +static int vsie_handle_mvpg(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+> +{
+> +	struct kvm_s390_sie_block *scb_s = &vsie_page->scb_s;
+> +	unsigned long pei_dest, pei_src, src, dest, mask = PAGE_MASK;
+> +	u64 *pei_block = &vsie_page->scb_o->mcic;
+> +	int edat, rc_dest, rc_src;
+> +	union ctlreg0 cr0;
 
-However I'm still confused on why it's more secure - the current process to do
-VFIO_IOMMU_MAP_DMA should at least has proper permission for everything to be
-setup, including the special vma, right?  Say, if the process can write to
-those memories, then shouldn't we also allow it to grant this write permission
-to other devices too?
+...
 
-Thanks,
+const uint8_t r1 = (scb_s->ipb >> 16) & 0xf;
+const uint8_t r3 = (scb_s->ipb >> 20) & 0xf;
+
+(note: r1/r3 is just a guess ;) - and having the actual identifiers here 
+will make the code easier to understand)
+
+> +
+> +	cr0.val = vcpu->arch.sie_block->gcr[0];
+> +	edat = cr0.edat && test_kvm_facility(vcpu->kvm, 8);
+> +	if (psw_bits(scb_s->gpsw).eaba == PSW_BITS_AMODE_24BIT)
+
+What about factoring out that masking like
+
+kvm_s390_logical_to_effective()
+
+introduce
+
+vsie_logical_to_effective()
+
+to handle that.
+
+> +		mask = 0xfff000;
+> +	else if (psw_bits(scb_s->gpsw).eaba == PSW_BITS_AMODE_31BIT)
+> +		mask = 0x7ffff000;
+> +
+> +	dest = vsie_get_register(vcpu, vsie_page, scb_s->ipb >> 16) & mask;
+> +	src = vsie_get_register(vcpu, vsie_page, scb_s->ipb >> 20) & mask;
+> +
+> +	rc_dest = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, dest, &pei_dest);
+> +	rc_src = kvm_s390_shadow_fault(vcpu, vsie_page->gmap, src, &pei_src);
+> +	/*
+> +	 * Either everything went well, or something non-critical went wrong
+> +	 * e.g. beause of a race. In either case, simply retry.
+
+s/beause/because/
+
+> +	 */
+> +	if (rc_dest == -EAGAIN || rc_src == -EAGAIN || (!rc_dest && !rc_src)) {
+> +		retry_vsie_icpt(vsie_page);
+> +		return -EAGAIN;
+
+I remember, because of the retry_vsie_icpt() you can simply return 0. 
+Whatever you prefer.
+
+> +	}
+> +	/* Something more serious went wrong, propagate the error */
+> +	if (rc_dest < 0)
+> +		return rc_dest;
+> +	if (rc_src < 0)
+> +		return rc_src;
+> +
+> +	/* The only possible suppressing exception: just deliver it */
+> +	if (rc_dest == PGM_TRANSLATION_SPEC || rc_src == PGM_TRANSLATION_SPEC) {
+> +		clear_vsie_icpt(vsie_page);
+> +		rc_dest = kvm_s390_inject_program_int(vcpu, PGM_TRANSLATION_SPEC);
+> +		WARN_ON_ONCE(rc_dest);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * Forward the PEI intercept to the guest if it was a page fault, or
+> +	 * also for segment and region table faults if EDAT applies.
+> +	 */
+> +	if (edat) {
+> +		rc_dest = rc_dest == PGM_ASCE_TYPE ? rc_dest : 0;
+> +		rc_src = rc_src == PGM_ASCE_TYPE ? rc_src : 0;
+> +	} else {
+> +		rc_dest = rc_dest != PGM_PAGE_TRANSLATION ? rc_dest : 0;
+> +		rc_src = rc_src != PGM_PAGE_TRANSLATION ? rc_src : 0;
+> +	}
+> +	if (!rc_dest && !rc_src) {
+> +		pei_block[0] = pei_dest;
+> +		pei_block[1] = pei_src;
+> +		return 1;
+> +	}
+> +
+> +	retry_vsie_icpt(vsie_page);
+> +
+> +	/*
+> +	 * The host has edat, and the guest does not, or it was an ASCE type
+> +	 * exception. The host needs to inject the appropriate DAT interrupts
+> +	 * into the guest.
+> +	 */
+> +	if (rc_dest)
+> +		return inject_fault(vcpu, rc_dest, dest, 1);
+> +	return inject_fault(vcpu, rc_src, src, 0);
+
+The rc_dest and rc_src handling towards the end is a little confusing, 
+but I have no real suggestion to make it easier to digest.
+
+
+Only some suggestions to make the code a bit nicer to read. Apart from 
+that LGTM.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
 -- 
-Peter Xu
+Thanks,
+
+David / dhildenb
 
