@@ -2,90 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05562324F28
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 12:29:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB77324F39
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 12:31:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235330AbhBYL2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 06:28:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235260AbhBYL2V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 06:28:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614252414;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sWESMD0nckHAI0xFpXZL4oIkaF2/ZscfrAoYu7OfI+w=;
-        b=LbssIS6RXN08uAPydQKG5f46Ql2Y18zrewLfWv0NgkBtqFS2GKKJzN+Yo1x0Hc9mMrHfDG
-        jxLOnPvw1pDQDLeuOHs+UeX4Y8JFDAUCqzmpgmj+9q3q33B8KmO2Pjo29vL/BxpLtV4lFY
-        MHmct2hw6ADJrgbjOKnI5WaaYcg++qY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-58Va3ZONOQ-mTFeMjb7-5Q-1; Thu, 25 Feb 2021 06:26:52 -0500
-X-MC-Unique: 58Va3ZONOQ-mTFeMjb7-5Q-1
-Received: by mail-ej1-f72.google.com with SMTP id ml13so2300133ejb.2
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 03:26:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sWESMD0nckHAI0xFpXZL4oIkaF2/ZscfrAoYu7OfI+w=;
-        b=VozsKQdvOpR6yjSyz/3oOQYmcnUmq6hOER5E6Qqdbj35zwc6vbDZfMpbBm89EuTp7F
-         qjhE4tJi/o1+Sn/5HYUbSIgnkFd2CgF8c9jeo5OOnAAxK2jON3OK36vOpeyU5apHxXFI
-         sZ56K9sbcLWLB8FUmnwbW9VCXqexe8I/XDDaDKyanUCq2Y6LhLmNsvOq7cuzxMCwNDqB
-         2XWAlR7H3uzrNCqytN+nCiL9zLqkgGU2AV9v0WeuWGIHjM7TQLJNU5zXlJvzSa+UQXQ3
-         DITKgQiklhCxtTbj0seblA6TcI6jdbQwVWlyDYSp6jgHX7zej1cIfkmVHgHZxBuy3G6G
-         +lJQ==
-X-Gm-Message-State: AOAM531oraKWOU4CyKRCnLbaIkqtLbuSF4Ic4Wi/UbhQabkpIpDfQMR/
-        l7M18Kv99q20Y1byOjQ7IkZe96p9zbcZxhJbnzZ+uu6qYrM7yMKhIb64ObbRl26gWDJw3l9ZlrL
-        462ugleZt7aEg
-X-Received: by 2002:a17:906:2b0a:: with SMTP id a10mr2214737ejg.513.1614252411242;
-        Thu, 25 Feb 2021 03:26:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz+FV6cFCWq34Zp4VXzSaCx9CjsJto7qwRC97dXBeI5c95SCD9qPGVFJCozP5ss3voP39HZCA==
-X-Received: by 2002:a17:906:2b0a:: with SMTP id a10mr2214723ejg.513.1614252411050;
-        Thu, 25 Feb 2021 03:26:51 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id dm20sm3237866edb.59.2021.02.25.03.26.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Feb 2021 03:26:50 -0800 (PST)
-Subject: Re: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Nathan Tempelman <natet@google.com>, thomas.lendacky@amd.com,
-        x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        srutherford@google.com, rientjes@google.com, brijesh.singh@amd.com,
-        Ashish.Kalra@amd.com, Nathaniel McCallum <npmccallum@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>
-References: <20210224085915.28751-1-natet@google.com>
- <04b37d71-c887-660b-5046-17dec4bb4115@redhat.com>
- <YDaFtRUAZ+P6Nrpy@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d01c686b-45e0-836a-e144-4330c46f4d42@redhat.com>
-Date:   Thu, 25 Feb 2021 12:26:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S235509AbhBYL3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 06:29:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34936 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235785AbhBYL3T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 06:29:19 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11PB3I0g032389;
+        Thu, 25 Feb 2021 06:28:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=qBoyYnHcCJqYWt10koSEmKWz4/PiSuY2+a7Z/gaa+lc=;
+ b=MmdHCTuGrv6/gNTQceCmdAti2TfQp7HvWaBaus51e0yL0l3p1kL2HQAtyP5o9Xdgv8I3
+ BblM7nc6ymPePZ8tOMheMSAW6+DgM/O7kKCO+E6cf48mmbD4n+zmlS+R0taCCD+rTcQ2
+ nogzVNsWcvHv8Gw/mEbkpgIHpm7eUjDHQpACDP2mQ0GIS3E2o7eQbmlZUnoWDiBoVvEd
+ J9LuuS2s9kXPUcjxrjE/ozFmyX/J5TZh2NbT3EKUmBI+SvgIDk3P0ZU5YqkeIDaDWKON
+ TzlkgPN0bJm2PFM/VC6sUDWNsbr7M94hCGAWFXjEC/14oJDV1fu+Nhiw5cq33a0QuRYX XA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36x0qrrmu5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Feb 2021 06:28:33 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11PB46OM036238;
+        Thu, 25 Feb 2021 06:28:33 -0500
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 36x0qrrmtc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Feb 2021 06:28:32 -0500
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11PBMZTi019320;
+        Thu, 25 Feb 2021 11:28:30 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 36tsph4ctb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Feb 2021 11:28:30 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11PBSRV338994306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 25 Feb 2021 11:28:27 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 883EC42042;
+        Thu, 25 Feb 2021 11:28:27 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C49004203F;
+        Thu, 25 Feb 2021 11:28:26 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.33.39])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with SMTP;
+        Thu, 25 Feb 2021 11:28:26 +0000 (GMT)
+Date:   Thu, 25 Feb 2021 12:28:24 +0100
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, stable@vger.kernel.org,
+        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
+        pbonzini@redhat.com, alex.williamson@redhat.com,
+        pasic@linux.vnet.ibm.com
+Subject: Re: [PATCH v2 1/1] s390/vfio-ap: fix circular lockdep when
+ setting/clearing crypto masks
+Message-ID: <20210225122824.467b8ed9.pasic@linux.ibm.com>
+In-Reply-To: <63bb0d61-efcd-315b-5a1a-0ef4d99600f4@linux.ibm.com>
+References: <20210216011547.22277-1-akrowiak@linux.ibm.com>
+        <20210216011547.22277-2-akrowiak@linux.ibm.com>
+        <20210223104805.6a8d1872.pasic@linux.ibm.com>
+        <63bb0d61-efcd-315b-5a1a-0ef4d99600f4@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <YDaFtRUAZ+P6Nrpy@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-02-25_06:2021-02-24,2021-02-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 spamscore=0 clxscore=1015 phishscore=0
+ suspectscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2102250087
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/02/21 17:58, Sean Christopherson wrote:
-> That being said, is there a strong need to get this into 5.12?  AIUI, this hasn't
-> had any meaningful testing, selftests/kvm-unit-tests or otherwise.  Pushing out
-> to 5.13 might give us a good chance of getting some real testing before merging,
-> depending on the readiness of SEV testing support.
+On Wed, 24 Feb 2021 22:28:50 -0500
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-Note that I don't mean including this in the merge window.  However, I 
-know that there are multiple people working on alternative SEV live 
-migration support, and as long as we are sure that the API is simple and 
-useful, it should be okay to merge this for rc2 or rc3.
+> >>   static void vfio_ap_mdev_unset_kvm(struct ap_matrix_mdev *matrix_mdev)
+> >>   {
+> >> -	kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> >> -	matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> >> -	vfio_ap_mdev_reset_queues(matrix_mdev->mdev);
+> >> -	kvm_put_kvm(matrix_mdev->kvm);
+> >> -	matrix_mdev->kvm = NULL;
+> >> +	struct kvm *kvm;
+> >> +
+> >> +	if (matrix_mdev->kvm) {
+> >> +		kvm = matrix_mdev->kvm;
+> >> +		kvm_get_kvm(kvm);
+> >> +		matrix_mdev->kvm = NULL;  
+> > I think if there were two threads dong the unset in parallel, one
+> > of them could bail out and carry on before the cleanup is done. But
+> > since nothing much happens in release after that, I don't see an
+> > immediate problem.
+> >
+> > Another thing to consider is, that setting ->kvm to NULL arms
+> > vfio_ap_mdev_remove()...  
+> 
+> I'm not entirely sure what you mean by this, but my
+> assumption is that you are talking about the check
+> for matrix_mdev->kvm != NULL at the start of
+> that function. 
 
-Paolo
+Yes I was talking about the check
 
+static int vfio_ap_mdev_remove(struct mdev_device *mdev)                        
+{                                                                               
+        struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);            
+                                                                                
+        if (matrix_mdev->kvm)                                                   
+                return -EBUSY;
+...
+        kfree(matrix_mdev);                                                     
+...                                                               
+} 
+
+As you see, we bail out if kvm is still set, otherwise we clean up the
+matrix_mdev which includes kfree-ing it. And vfio_ap_mdev_remove() is
+initiated via the sysfs, i.e. can be initiated at any time. If we were
+to free matrix_mdev in mdev_remove() and then carry on with kvm_unset()
+with mutex_lock(&matrix_dev->lock); that would be bad.
+
+
+
+> The reason
+> matrix_mdev->kvm is set to NULL before giving up
+> the matrix_dev->lock is so that functions that check
+> for the presence of the matrix_mdev->kvm pointer,
+> such as assign_adapter_store() - will exit if they get
+> control while the masks are being cleared. 
+
+I disagree!
+
+static ssize_t assign_adapter_store(struct device *dev,                         
+                                    struct device_attribute *attr,              
+                                    const char *buf, size_t count)              
+{                                                                               
+        int ret;                                                                
+        unsigned long apid;                                                     
+        struct mdev_device *mdev = mdev_from_dev(dev);                          
+        struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);            
+                                                                                
+        /* If the guest is running, disallow assignment of adapter */           
+        if (matrix_mdev->kvm)                                                   
+                return -EBUSY;
+
+We bail out when kvm != NULL, so having it set to NULL while the
+mask are being cleared will make these not bail out.
+
+> So what we have
+> here is a catch-22; in other words, we have the case
+> you pointed out above and the cases related to
+> assigning/unassigning adapters, domains and
+> control domains which should exit when a guest
+> is running.
+
+
+See above.
+
+> 
+> I may have an idea to resolve this. Suppose we add:
+> 
+> struct ap_matrix_mdev {
+>      ...
+>      bool kvm_busy;
+>      ...
+> }
+> 
+> This flag will be set to true at the start of both the
+> vfio_ap_mdev_set_kvm() and vfio_ap_mdev_unset_kvm()
+> and set to false at the end. The assignment/unassignment
+> and remove callback functions can test this flag and
+> return -EBUSY if the flag is true. That will preclude assigning
+> or unassigning adapters, domains and control domains when
+> the KVM pointer is being set/unset. Likewise, removal of the
+> mediated device will also be prevented while the KVM pointer
+> is being set/unset.
+> 
+> In the case of the PQAP handler function, it can wait for the
+> set/unset of the KVM pointer as follows:
+> 
+> /while (matrix_mdev->kvm_busy) {//
+> //        mutex_unlock(&matrix_dev->lock);//
+> //        msleep(100);//
+> //        mutex_lock(&matrix_dev->lock);//
+> //}//
+> //
+> //if (!matrix_mdev->kvm)//
+> //        goto out_unlock;
+> 
+> /What say you?
+> //
+
+I'm not sure. Since I disagree with your analysis above it is difficult
+to deal with the conclusion. I'm not against decoupling the tracking of
+the state of the mdev_matrix device from the value of the kvm pointer. I
+think we should first get a common understanding of the problem, before
+we proceed to the solution.
+
+Regards,
+Halil
