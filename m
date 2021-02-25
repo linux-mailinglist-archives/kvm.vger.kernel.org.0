@@ -2,149 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A8B43247BF
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 01:07:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F5E43247C5
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 01:08:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234294AbhBYAG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 19:06:59 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:10940 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbhBYAG6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 19:06:58 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B6036e9f90001>; Wed, 24 Feb 2021 16:06:17 -0800
-Received: from HKMAIL101.nvidia.com (10.18.16.10) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 25 Feb
- 2021 00:06:16 +0000
-Received: from HKMAIL104.nvidia.com (10.18.16.13) by HKMAIL101.nvidia.com
- (10.18.16.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 25 Feb
- 2021 00:06:14 +0000
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
- by HKMAIL104.nvidia.com (10.18.16.13) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Thu, 25 Feb 2021 00:06:14 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jmwfna/Ck5qmBzweSQRJhLwa3YoCsoRU0FNIAXz9W/AZv6S4koZSuoDVP+81kc5TJ08BZbfs7lNELmUjSCdvSURLXEb6KkiMvx3JJG1g0mkuqoD5+LryxzSp26M+AQbRvYsEPRE+Eiu3+13C3uSfPhnVELoIeNrvWLfGH4TZLVs78MKMuyJ4VEH4UElQYCZO9ItsrHfI+4QXDFKtzw0/6yFtqndtXq5kVRij5g2eb689xeQFCPU3PeKwvhlxxQ48ayOjp+icObAUPspN5XvZNcFILAT5BhiQO26gRqKc0NTtRtW0cRuCj1gRnE21I1MZBE+d4+IWiD4Ysp5DIiEqDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dHi6xI/xLXftsyt2CiE8rvkm+LSwdKu5yXdlp/xNo5A=;
- b=W60aCsMx8bQAvvhQxfb/qomT1QaXZ7QHNIN7VtfTQqBAB7Xnrntgw5hBEPA2XIndLfgfd04WfJraKQ3YnPbhH25Bvw/4qCKRIxm5fEBk8RFFSajZ1a/Q2L++h7vCLTPrL5Br1iOAjSu9uaZr+CW8AbvZ+fpwlnnopxfqs2T2xP/1hD0M4yDyqLzzlp44Gcjtskj1bw5+z4mPXY8UM722o8YdbWqkzr66FqboTcrrzhQxQdCEEMkOU2iyWl8qo2LIV+1Vo9eRW+GVhXNzhslwVldpV18xDWVz0i9q4fIZAkGSPsQU8rFNOsW689RQoF3n5i6nCxpEmRu54zr6EHNcTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
- by DM5PR12MB1884.namprd12.prod.outlook.com (2603:10b6:3:10d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19; Thu, 25 Feb
- 2021 00:06:12 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3868.033; Thu, 25 Feb 2021
- 00:06:12 +0000
-Date:   Wed, 24 Feb 2021 20:06:10 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
-Subject: Re: [RFC PATCH 05/10] vfio: Create a vfio_device from vma lookup
-Message-ID: <20210225000610.GP4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401268537.16443.2329805617992345365.stgit@gimli.home>
- <20210222172913.GP4247@nvidia.com>
- <20210224145506.48f6e0b4@omen.home.shazbot.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210224145506.48f6e0b4@omen.home.shazbot.org>
-X-ClientProxiedBy: BL0PR02CA0091.namprd02.prod.outlook.com
- (2603:10b6:208:51::32) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
+        id S234900AbhBYAHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 19:07:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229507AbhBYAHc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 19:07:32 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD085C061574
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 16:06:51 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id l2so2628828pgb.1
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 16:06:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=dwsRL0iFuNLsIwlduzLk8A4HpuT+349o+yzvI+GvJGg=;
+        b=FNfLLnAZf2wdLfsTREG5f4CUE90hhdj+9efnR0CcEASFvTBlIxbq2WH8aD66ed0cWP
+         u9dRyt1Oj6/lfDKABYmqQbAGmMmI/X9cRN3qMQgoex1+4N5PBvszos8ZfcL7YE+BQnHc
+         Dh/Dnaa1VnZhDlc8qYhgJFZnCdUpC03FVrogZi77qKJApoq49AGkV+XAN8eOJPhW6uyf
+         Df3zBYK1751kzdlFraymh+st+EgK1j7iViJWlOfxzrePopY3x+EOvXWqZvKzf6XfjChS
+         CLcqOiLshfzlIREJlcF+0l01oRXxU2HSvPTaQejPlLR4yh+2oehsS7SPhi7bE20wq4ax
+         IcIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=dwsRL0iFuNLsIwlduzLk8A4HpuT+349o+yzvI+GvJGg=;
+        b=E0gIqeO8t7PZjHPKcAs5Ds9yGlyJM1zf2eJHRoc5qdjo2qnu1D+Hp5qrB6FWAI2Gy6
+         z7I7JqNq/CVVgnwInZC5Hhz5F8Qp3b6VQ4ZA77GFbOasaWp06eRuZ50CviGxg9R6fDuD
+         zK5KvOiNxwxsjTXuPI7rJMoe/riWP1tZEmHG/H4t+yGsU3eCCM9/u23vFdS74a1KFEqF
+         SBov/UgaUSD2cGZkkpfQlSHABdOkOuwZf0ydXzkuWv9vnuqmnzY4l9JlYKbRuJ8wY4xb
+         o2IguZYnPD6ib0gBM+sIo5GZFRm/onfINyBNY8nFa7hN30VepCa1jOJDAfunvW8LRZTh
+         Jd0g==
+X-Gm-Message-State: AOAM530hpai+hCAxZ2fWpCANX9iMwOmfcG6v5E7jejmZkJYB+sl/NCbF
+        WiJhdo6W0+KbkBEr1HNLu9BUgQ==
+X-Google-Smtp-Source: ABdhPJxABfBShq1Krl8qx+eI5WYhSRtbAKRM77ikODQYw8yEC7MAcrpJKJjlocmRf535KdMK+BW8OA==
+X-Received: by 2002:a63:f202:: with SMTP id v2mr450469pgh.24.1614211610972;
+        Wed, 24 Feb 2021 16:06:50 -0800 (PST)
+Received: from google.com ([2620:0:1008:10:94bf:1b67:285c:b7ce])
+        by smtp.gmail.com with ESMTPSA id i7sm3977728pjs.1.2021.02.24.16.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Feb 2021 16:06:50 -0800 (PST)
+Date:   Wed, 24 Feb 2021 16:06:44 -0800
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     tj@kernel.org, thomas.lendacky@amd.com, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, pbonzini@redhat.com,
+        hannes@cmpxchg.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
+        corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 0/2] cgroup: New misc cgroup controller
+Message-ID: <YDbqFE21UsEaFDuU@google.com>
+References: <20210218195549.1696769-1-vipinsh@google.com>
+ <YDVIYQhZ6ArGsr3n@blackbook>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by BL0PR02CA0091.namprd02.prod.outlook.com (2603:10b6:208:51::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19 via Frontend Transport; Thu, 25 Feb 2021 00:06:11 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lF4AU-00Gt60-IT; Wed, 24 Feb 2021 20:06:10 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614211577; bh=dHi6xI/xLXftsyt2CiE8rvkm+LSwdKu5yXdlp/xNo5A=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=hLLAQM1f1kBdK4SFIjwhnVv8lvzzi1vvf6kPRfIZ6E0Xdoa55SZAEs3TKndNOdp+s
-         +/xszgxYVaYtVtUuC9rTQiy5pinva8qvytrqygSH3ltyQCjkWx5vXSTPAuhwPfYEUG
-         2JYjhzARLCNghBGSyUcE9QlgR9fx2LbGnxviGIyMnizda0uhXEHy8hcZhh44kyPY9U
-         3m9P3Dh+0c38De/VazxgynCe5YyeWppthN48mrd9zn878PFI3B3SAQRzR3UoBv0Er4
-         a+qSvR243o3U9I62MARZzxQAPprUFM+uBJ+DAADSAgwFgCFJMyon33wjBRFatq1i/N
-         JCGgWtX6CiGHA==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YDVIYQhZ6ArGsr3n@blackbook>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 24, 2021 at 02:55:06PM -0700, Alex Williamson wrote:
-
-> > The only use of the special ops would be if there are multiple types
-> > of mmap's going on, but for this narrow use case those would be safely
-> > distinguished by the vm_pgoff instead
+On Tue, Feb 23, 2021 at 07:24:33PM +0100, Michal Koutný wrote:
+> Hello.
 > 
-> We potentially do have device specific regions which can support mmap,
-> for example the migration region.  We'll need to think about how we
-> could even know if portions of those regions map to a device.  We could
-> use the notifier to announce it and require the code supporting those
-> device specific regions manage it.
+> On Thu, Feb 18, 2021 at 11:55:47AM -0800, Vipin Sharma <vipinsh@google.com> wrote:
+> > This patch is creating a new misc cgroup controller for allocation and
+> > tracking of resources which are not abstract like other cgroup
+> > controllers.
+> Please don't refer to this as "allocation" anywhere, that has a specific
+> meaning (see Resource Distribution Models in
+> Documentation/admin-gruide/cgroup-v2.rst).
 
-So, the above basically says any VFIO VMA is allowed for VFIO to map
-to the IOMMU.
+Yeah, it should be "Limits". I will update the text.
 
-If there are places creating mmaps for VFIO that should not go to the
-IOMMU then they need to return NULL from this function.
+> 
+> > This controller was initially proposed as encryption_id but after
+> > the feedbacks, it is now changed to misc cgroup.
+> > https://lore.kernel.org/lkml/20210108012846.4134815-2-vipinsh@google.com/
+> Interesting generalization. I wonder what else could fit under this as
+> well. (It resembles pids controller on the cover.)
+> 
+> > Please provide any feedback for this RFC or if it is good for
+> > merging then I can send a patch for merging.
+> A new controller is added exposed with v1 attributes. I'm not convinced
+> it is desirable to change the frozen v1 controllers' API? (And therefore
+> promote it as well.)
 
-> I'm not really clear what you're getting at with vm_pgoff though, could
-> you explain further?
+This is a very trivial controller. I believe once it becomes public it
+can be helpful down the line to the v1 users, who cannot use v2 yet, for
+some simple resource accounting, like us, we have the need for ASIDs
+accounting in v1 until we move to v2. If the community has strong
+objection then I can remove v1 support.
 
-Ah, so I have to take a side discussion to explain what I ment.
+> 
+> Beware, bikeshedding. The name is very non-descriptive, potentially
+> suggesting catch-all semantics. It'd deserve a further thought. My idea
+> would be limit(s) or counter controller.
 
-The vm_pgoff is a bit confused because we change it here in vfio_pci:
+Limit and counter are kind of suggesting the underlying technique for
+accounting instead of a generic name to denote resource types managed by
+this controller. One can argue that if top level names are similar to
+Resource Destribution Model then may be it makes sense to combine
+resources with similar accounting technique under one controller.
 
-    vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+I am looking at misc as a controller which is for resources not having
+proper home in other controllers or not big enough to deserve their own
+controller.
 
-But the address_space invalidation assumes it still has the region
-based encoding:
+I agree with you coming up with a name which check all boxes of
+requirements won't be possible. We have discussed name sev cgroup,
+kvm cgroup, encryption_id cgroup before reaching to an agreement on misc
+cgroup. I am open to other names if they are better suited for this
+controller and makes more sense.
 
-+	vfio_device_unmap_mapping_range(vdev->device,
-+			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
-+			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
-+			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX));
-
-Those three indexes are in the vm_pgoff numberspace and so vm_pgoff
-must always be set to the same thing - either the
-VFIO_PCI_INDEX_TO_OFFSET() coding or the physical pfn. 
-
-Since you say we need a limited invalidation this looks like a bug to
-me - and it must always be the VFIO_PCI_INDEX_TO_OFFSET coding.
-
-So, the PCI vma needs to get switched to use the
-VFIO_PCI_INDEX_TO_OFFSET coding and then we can always extract the
-region number from the vm_pgoff and thus access any additional data,
-such as the base pfn or a flag saying this cannot be mapped to the
-IOMMU. Do the reverse of VFIO_PCI_INDEX_TO_OFFSET and consult
-information attached to that region ID.
-
-All places creating vfio mmaps have to set the vm_pgoff to
-VFIO_PCI_INDEX_TO_OFFSET().
-
-But we have these violations that need fixing:
-
-drivers/vfio/fsl-mc/vfio_fsl_mc.c:      vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
-drivers/vfio/platform/vfio_platform_common.c:   vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
-
-Couldn't see any purpose to this code, cargo cult copy? Just delete
-it.
-
-drivers/vfio/pci/vfio_pci.c:    vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-
-Used to implement fault() but we could get the region number and
-extract the pfn from the vfio_pci_device's data easy enough.
-
-I manually checked that other parts of VFIO not under drivers/vfio are
-doing it OK, looks fine.
-
-Jason
+Thanks
+Vipin
