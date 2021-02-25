@@ -2,42 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7940B3252BF
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 16:51:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 863EE325314
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 17:08:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233159AbhBYPuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 10:50:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25195 "EHLO
+        id S233511AbhBYQHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 11:07:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45189 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232770AbhBYPt5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 10:49:57 -0500
+        by vger.kernel.org with ESMTP id S233501AbhBYQGs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 11:06:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614268109;
+        s=mimecast20190719; t=1614269120;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N9GLjxM82UmKwC+trKdjUK/mS52WV9a4z9ieR35APG4=;
-        b=eJF0gUvHJ2FbB9vLgivRf2N1uM7lJsH7amrEdX9nV3n9ugF+yu8Zi3fYToo7t5Si/l7UD6
-        2SI77sBFj8M4Dy4zs5D5l+Qel2oM0vpmDk8+a/K1BIJT38CeUEGGqwcjN+GII7CfU+iukG
-        INbfBlCHZPBzoNtAg+ZP2gR/9De1PXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-xOxUSVHhN9CfceFfHUA_Gg-1; Thu, 25 Feb 2021 10:48:26 -0500
-X-MC-Unique: xOxUSVHhN9CfceFfHUA_Gg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B23E8030BB;
-        Thu, 25 Feb 2021 15:48:24 +0000 (UTC)
-Received: from starship (unknown [10.35.207.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 51018189C7;
-        Thu, 25 Feb 2021 15:48:21 +0000 (UTC)
-Message-ID: <ecf0e5d9213d04d0f168c289e840b966210f99d5.camel@redhat.com>
-Subject: Re: [PATCH 0/4] RFC/WIP: KVM: separate injected and pending
- exception +  few more fixes
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
+        bh=ovFMJvcRLAIdbXAQ8NZaWzc1s4GiFyLOYmDRZ23G+WE=;
+        b=jTgEa16a1EvakEUxB41/QYB52RoLiIeOXZfX6cvVwcr/3oaLLdLiURawWbMZbIjCrflZ7v
+        FPKoQrmuxdzdyKFJyRp12nAXUx4ortQl/gga/F6PX0e10AZmG9U0v4/UdY3XDWUYFJ+QVZ
+        ni9/cgvHY73zDzOGRtBTmyb1MnNhOgY=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-huV6pzJ5PpudHua8xrgLTw-1; Thu, 25 Feb 2021 11:05:18 -0500
+X-MC-Unique: huV6pzJ5PpudHua8xrgLTw-1
+Received: by mail-ed1-f71.google.com with SMTP id u2so2979343edj.20
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 08:05:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ovFMJvcRLAIdbXAQ8NZaWzc1s4GiFyLOYmDRZ23G+WE=;
+        b=JutqLK/ezoiCKJ5PRTDuZfSCNweDV4hA9xT7VsOzX/hUpIEWZztPu7UgPFnuaIm1J4
+         o0cuw0I34X2FEX0JqcJMP0V6okX4M7nM+Q7SYQcIvrpee0hyC4N8Tg46z3JYxqXXaVx8
+         27gJ2ZeTaEa+GhCyJ1arUBLuHnr2RALCmOvi/kloswzqQBgeliFpSVSP1ldl0I4OcPjj
+         8Ng352XQFvT3JPxOuiU5OmjWtyKcD8dRcGZIjw2Wb410UacYUUHGdMJVjufZyni8Dc5E
+         ePrankxRnLJ8cbhkFZAEh7MdMIKMZkxrlZNXFG3JpLUy6bRwelvsJVLVuXsiPpAg6vZj
+         RuRQ==
+X-Gm-Message-State: AOAM532/BicGjKqsJVy3xGbCN3A7DiNIdIi8if9VHOKWsF0XqVtPJ0Ui
+        rMpRJjNmhH1WBUZcO+reCheSaeR90zYM4dmP5izfRn39iqM6BXBBvGbwgx3MFFmI4IFO9IO6o1O
+        VSoZjOFL+t5fv
+X-Received: by 2002:a17:907:1b12:: with SMTP id mp18mr3406354ejc.128.1614269117317;
+        Thu, 25 Feb 2021 08:05:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz+9u1IOVp8bmIzUQGXU2jmcvoQW9cC/C8Q7UxGbukt4Sa3TUJK0O1uhRPc5PMU3q9Qs1on8w==
+X-Received: by 2002:a17:907:1b12:: with SMTP id mp18mr3406326ejc.128.1614269117046;
+        Thu, 25 Feb 2021 08:05:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id a7sm3674377edr.29.2021.02.25.08.05.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Feb 2021 08:05:16 -0800 (PST)
+Subject: Re: [PATCH 3/4] KVM: x86: pending exception must be be injected even
+ with an injected event
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Ingo Molnar <mingo@redhat.com>,
         "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
         <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
@@ -47,125 +63,86 @@ Cc:     Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Wanpeng Li <wanpengli@tencent.com>,
         Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Date:   Thu, 25 Feb 2021 17:48:20 +0200
-In-Reply-To: <20210225154135.405125-1-mlevitsk@redhat.com>
 References: <20210225154135.405125-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20210225154135.405125-4-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <358e284b-957a-388b-9729-9ee82b4fd8e3@redhat.com>
+Date:   Thu, 25 Feb 2021 17:05:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <20210225154135.405125-4-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-02-25 at 17:41 +0200, Maxim Levitsky wrote:
-> clone of "kernel-starship-5.11"
+On 25/02/21 16:41, Maxim Levitsky wrote:
+> Injected events should not block a pending exception, but rather,
+> should either be lost or be delivered to the nested hypervisor as part of
+> exitintinfo/IDT_VECTORING_INFO
+> (if nested hypervisor intercepts the pending exception)
 > 
-> Maxim Levitsky (4):
->   KVM: x86: determine if an exception has an error code only when
->     injecting it.
->   KVM: x86: mmu: initialize fault.async_page_fault in walk_addr_generic
->   KVM: x86: pending exception must be be injected even with an injected
->     event
->   kvm: WIP separation of injected and pending exception
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Does this already fix some of your new test cases?
+
+Paolo
+
+> ---
+>   arch/x86/kvm/svm/nested.c | 7 ++++++-
+>   arch/x86/kvm/vmx/nested.c | 9 +++++++--
+>   2 files changed, 13 insertions(+), 3 deletions(-)
 > 
->  arch/x86/include/asm/kvm_host.h |  23 +-
->  arch/x86/include/uapi/asm/kvm.h |  14 +-
->  arch/x86/kvm/mmu/paging_tmpl.h  |   1 +
->  arch/x86/kvm/svm/nested.c       |  57 +++--
->  arch/x86/kvm/svm/svm.c          |   8 +-
->  arch/x86/kvm/vmx/nested.c       | 109 +++++----
->  arch/x86/kvm/vmx/vmx.c          |  14 +-
->  arch/x86/kvm/x86.c              | 377 +++++++++++++++++++-------------
->  arch/x86/kvm/x86.h              |   6 +-
->  include/uapi/linux/kvm.h        |   1 +
->  10 files changed, 374 insertions(+), 236 deletions(-)
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index 881e3954d753b..4c82abce0ea0c 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -1024,7 +1024,12 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	if (vcpu->arch.exception.pending) {
+> -		if (block_nested_events)
+> +		/*
+> +		 * Only pending nested run can block an pending exception
+> +		 * Otherwise an injected NMI/interrupt should either be
+> +		 * lost or delivered to the nested hypervisor in EXITINTINFO
+> +		 * */
+> +		if (svm->nested.nested_run_pending)
+>                           return -EBUSY;
+>   		if (!nested_exit_on_exception(svm))
+>   			return 0;
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index b34e284bfa62a..20ed1a351b2d9 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3810,9 +3810,14 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>   
+>   	/*
+>   	 * Process any exceptions that are not debug traps before MTF.
+> +	 *
+> +	 * Note that only pending nested run can block an pending exception
+> +	 * Otherwise an injected NMI/interrupt should either be
+> +	 * lost or delivered to the nested hypervisor in EXITINTINFO
+>   	 */
+> +
+>   	if (vcpu->arch.exception.pending && !vmx_pending_dbg_trap(vcpu)) {
+> -		if (block_nested_events)
+> +		if (vmx->nested.nested_run_pending)
+>   			return -EBUSY;
+>   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
+>   			goto no_vmexit;
+> @@ -3829,7 +3834,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	if (vcpu->arch.exception.pending) {
+> -		if (block_nested_events)
+> +		if (vmx->nested.nested_run_pending)
+>   			return -EBUSY;
+>   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
+>   			goto no_vmexit;
 > 
-> -- 
-> 2.26.2
-> 
-git-publish ate the cover letter, so here it goes:
-
-
-RFC/WIP: KVM: separate injected and pending exception + few more fixes
-
-This is a result of my deep dive on why do we need special .inject_page_fault
-for cases when TDP paging is disabled on the host for running nested guests.
-
-First 3 patches fix relatively small issues I found.
-Some of them can be squashed with patch 4 assuming that it is accepted.
-
-Patch 4 is WIP and I would like to hear your feedback on it:
-
-Basically the issue is that during delivery of one exception
-we (emulator or mmu) can signal another exception, and if the new exception
-is intercepted by the nested guest, we should do VM exit with
-former exception signaled in exitintinfo (or equivalent IDT_VECTORING_INFO_FIELD)
-
-We sadly either loose the former exception and signal an VM exit, or deliver
-a #DF since we only store either pending or injected exception
-and we merge them in kvm_multiple_exception although we shouldn't.
-
-Only later we deliver the VM exit in .check_nested_events when already wrong
-data is in the pending/injected exception.
-
-There are multiple ways to fix it, and I choose somewhat hard but I think
-the most correct way of dealing with it.
-
-1. I split pending and injected exceptions in kvm_vcpu_arch thus allowing
-both to co-exist.
-
-2. I made kvm_multiple_exception avoid merging exceptions, but instead only
-setup either pending or injected exception
-(there is another bug that we don't deliver triple fault as nested vm exit,
-which I'll fix later)
-
-3. I created kvm_deliver_pending_exception which its goal is to
-convert the pending exception to injected exception or deliver a VM exit
-with both pending and injected exception/interrupt/nmi.
-
-It itself only deals with non-vmexit cases while it calls a new
-'kvm_x86_ops.nested_ops->deliver_exception' to deliver exception VM exit
-if needed.
-
-The later implementation is simple as it just checks if we should VM exit
-and then delivers both exceptions (or interrupt and exception, in case
-interrupt delivery was interrupted by exception).
-This new callback returns 0 if it had delivered this VM exit,
-0 if no vm exit is needed, or -EBUSY when nested run is pending,
-in which case the exception delivery will be retried after nested
-run is done.
-
-kvm_deliver_pending_exception is called each time we inject pending events
-and all exception related code is removed from .check_nested_events which now only deals
-with pending interrupts and events such as INIT,NMI,SMI, etc.
-
-New KVM cap is added to expose both pending and injected exception via
-KVM_GET_VCPU_EVENTS/KVM_SET_VCPU_EVENTS
-
-If this cap is not enabled, and we have both pending and injected exception
-when KVM_GET_VCPU_EVENTS is called, the exception is delivered.
-
-The code was tested with SVM, and it currently seems to pass all the tests I usually
-do (including nested migration). KVM unit tests seem to pass as well.
-
-I still almost sure that I broke something since this is far from trivial change,
-therefore this is RFC/WIP.
-
-Also VMX side was not yet tested other than basic compile and I am sure that there
-are at least few issues that remain to be fixed.
-
-I should also note that with these patches I can boot nested guests with npt=0 without
-any changes to .inject_page_fault.
-
-I also wrote 2 KVM unit tests to test for this issue, and for similar issue when
-interrupt is lost when delivery of it causes exception.
-These tests pass now.
-
-Best regards,
-	Maxim Levitsky
-
 
