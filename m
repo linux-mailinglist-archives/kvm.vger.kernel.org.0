@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15761324832
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 02:02:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A81C324834
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 02:02:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235334AbhBYBBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 20:01:44 -0500
-Received: from foss.arm.com ([217.140.110.172]:58286 "EHLO foss.arm.com"
+        id S233148AbhBYBCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 20:02:10 -0500
+Received: from foss.arm.com ([217.140.110.172]:58502 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236592AbhBYBBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 20:01:19 -0500
+        id S233162AbhBYBB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 20:01:58 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 651AE11D4;
-        Wed, 24 Feb 2021 17:00:32 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA47A11FB;
+        Wed, 24 Feb 2021 17:00:33 -0800 (PST)
 Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E8C13F800;
-        Wed, 24 Feb 2021 17:00:30 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9FA163F73B;
+        Wed, 24 Feb 2021 17:00:32 -0800 (PST)
 From:   Andre Przywara <andre.przywara@arm.com>
 To:     Will Deacon <will@kernel.org>,
         Julien Thierry <julien.thierry.kdev@gmail.com>
 Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
         Sami Mujawar <sami.mujawar@arm.com>
-Subject: [PATCH kvmtool v2 04/22] mmio: Extend handling to include ioport emulation
-Date:   Thu, 25 Feb 2021 00:58:57 +0000
-Message-Id: <20210225005915.26423-5-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v2 05/22] hw/i8042: Clean up data types
+Date:   Thu, 25 Feb 2021 00:58:58 +0000
+Message-Id: <20210225005915.26423-6-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.14.1
 In-Reply-To: <20210225005915.26423-1-andre.przywara@arm.com>
 References: <20210225005915.26423-1-andre.przywara@arm.com>
@@ -33,261 +33,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In their core functionality MMIO and I/O port traps are not really
-different, yet we still have two totally separate code paths for
-handling them. Devices need to decide on one conduit or need to provide
-different handler functions for each of them.
-
-Extend the existing MMIO emulation to also cover ioport handlers.
-This just adds another RB tree root for holding the I/O port handlers,
-but otherwise uses the same tree population and lookup code.
-"ioport" or "mmio" just become a flag in the registration function.
-Provide wrappers to not break existing users, and allow an easy
-transition for the existing ioport handlers.
-
-This also means that ioport handlers now can use the same emulation
-callback prototype as MMIO handlers, which means we have to migrate them
-over. To allow a smooth transition, we hook up the new I/O emulate
-function to the end of the existing ioport emulation code.
+The i8042 is clearly an 8-bit era device, so there is little room for
+32-bit registers.
+Clean up the data types used.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- include/kvm/kvm.h | 49 ++++++++++++++++++++++++++++++++---
- ioport.c          |  4 +--
- mmio.c            | 65 +++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 102 insertions(+), 16 deletions(-)
+ hw/i8042.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index f1f0afd7..306b258a 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -27,10 +27,23 @@
- #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
- #endif
+diff --git a/hw/i8042.c b/hw/i8042.c
+index 37a99a2d..7d1f9772 100644
+--- a/hw/i8042.c
++++ b/hw/i8042.c
+@@ -64,11 +64,11 @@
+ struct kbd_state {
+ 	struct kvm		*kvm;
  
-+/*
-+ * We are reusing the existing DEVICE_BUS_MMIO and DEVICE_BUS_IOPORT constants
-+ * from kvm/devices.h to differentiate between registering an I/O port and an
-+ * MMIO region.
-+ * To avoid collisions with future additions of more bus types, we reserve
-+ * a generous 4 bits for the bus mask here.
-+ */
-+#define IOTRAP_BUS_MASK		0xf
-+#define IOTRAP_COALESCE		(1U << 4)
-+
- #define DEFINE_KVM_EXT(ext)		\
- 	.name = #ext,			\
- 	.code = ext
+-	char			kq[QUEUE_SIZE];	/* Keyboard queue */
++	u8			kq[QUEUE_SIZE];	/* Keyboard queue */
+ 	int			kread, kwrite;	/* Indexes into the queue */
+ 	int			kcount;		/* number of elements in queue */
  
-+struct kvm_cpu;
-+typedef void (*mmio_handler_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-+				u32 len, u8 is_write, void *ptr);
- typedef void (*fdt_irq_fn)(void *fdt, u8 irq, enum irq_type irq_type);
+-	char			mq[QUEUE_SIZE];
++	u8			mq[QUEUE_SIZE];
+ 	int			mread, mwrite;
+ 	int			mcount;
  
- enum {
-@@ -113,6 +126,8 @@ void kvm__irq_line(struct kvm *kvm, int irq, int level);
- void kvm__irq_trigger(struct kvm *kvm, int irq);
- bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction, int size, u32 count);
- bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write);
-+bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-+		      int direction, int size, u32 count);
- int kvm__destroy_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr);
- int kvm__register_mem(struct kvm *kvm, u64 guest_phys, u64 size, void *userspace_addr,
- 		      enum kvm_mem_type type);
-@@ -136,10 +151,36 @@ static inline int kvm__reserve_mem(struct kvm *kvm, u64 guest_phys, u64 size)
- 				 KVM_MEM_TYPE_RESERVED);
- }
- 
--int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
--				    void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
--				    void *ptr);
--bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr);
-+int __must_check kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 len,
-+				      mmio_handler_fn mmio_fn, void *ptr,
-+				      unsigned int flags);
-+
-+static inline
-+int __must_check kvm__register_mmio(struct kvm *kvm, u64 phys_addr,
-+				    u64 phys_addr_len, bool coalesce,
-+				    mmio_handler_fn mmio_fn, void *ptr)
-+{
-+	return kvm__register_iotrap(kvm, phys_addr, phys_addr_len, mmio_fn, ptr,
-+			DEVICE_BUS_MMIO | (coalesce ? IOTRAP_COALESCE : 0));
-+}
-+static inline
-+int __must_check kvm__register_pio(struct kvm *kvm, u16 port, u16 len,
-+				   mmio_handler_fn mmio_fn, void *ptr)
-+{
-+	return kvm__register_iotrap(kvm, port, len, mmio_fn, ptr,
-+				    DEVICE_BUS_IOPORT);
-+}
-+
-+bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags);
-+static inline bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-+{
-+	return kvm__deregister_iotrap(kvm, phys_addr, DEVICE_BUS_MMIO);
-+}
-+static inline bool kvm__deregister_pio(struct kvm *kvm, u16 port)
-+{
-+	return kvm__deregister_iotrap(kvm, port, DEVICE_BUS_IOPORT);
-+}
-+
- void kvm__reboot(struct kvm *kvm);
- void kvm__pause(struct kvm *kvm);
- void kvm__continue(struct kvm *kvm);
-diff --git a/ioport.c b/ioport.c
-index e0123f27..ce29e7e7 100644
---- a/ioport.c
-+++ b/ioport.c
-@@ -162,7 +162,8 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
- 
- 	entry = ioport_get(&ioport_tree, port);
- 	if (!entry)
--		goto out;
-+		return kvm__emulate_pio(vcpu, port, data, direction,
-+					size, count);
- 
- 	ops	= entry->ops;
- 
-@@ -177,7 +178,6 @@ bool kvm__emulate_io(struct kvm_cpu *vcpu, u16 port, void *data, int direction,
- 
- 	ioport_put(&ioport_tree, entry);
- 
--out:
- 	if (ret)
- 		return true;
- 
-diff --git a/mmio.c b/mmio.c
-index cd141cd3..75de04ad 100644
---- a/mmio.c
-+++ b/mmio.c
-@@ -19,13 +19,14 @@ static DEFINE_MUTEX(mmio_lock);
- 
- struct mmio_mapping {
- 	struct rb_int_node	node;
--	void			(*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr);
-+	mmio_handler_fn		mmio_fn;
- 	void			*ptr;
- 	u32			refcount;
- 	bool			remove;
+@@ -82,7 +82,7 @@ struct kbd_state {
+ 	 * Some commands (on port 0x64) have arguments;
+ 	 * we store the command here while we wait for the argument
+ 	 */
+-	u32			write_cmd;
++	u8			write_cmd;
  };
  
- static struct rb_root mmio_tree = RB_ROOT;
-+static struct rb_root pio_tree = RB_ROOT;
- 
- static struct mmio_mapping *mmio_search(struct rb_root *root, u64 addr, u64 len)
+ static struct kbd_state		state;
+@@ -173,9 +173,9 @@ static void kbd_write_command(struct kvm *kvm, u8 val)
+ /*
+  * Called when the OS reads from port 0x60 (PS/2 data)
+  */
+-static u32 kbd_read_data(void)
++static u8 kbd_read_data(void)
  {
-@@ -103,9 +104,14 @@ static void mmio_put(struct kvm *kvm, struct rb_root *root, struct mmio_mapping
- 	mutex_unlock(&mmio_lock);
+-	u32 ret;
++	u8 ret;
+ 	int i;
+ 
+ 	if (state.kcount != 0) {
+@@ -202,9 +202,9 @@ static u32 kbd_read_data(void)
+ /*
+  * Called when the OS read from port 0x64, the command port
+  */
+-static u32 kbd_read_status(void)
++static u8 kbd_read_status(void)
+ {
+-	return (u32)state.status;
++	return state.status;
  }
  
--int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool coalesce,
--		       void (*mmio_fn)(struct kvm_cpu *vcpu, u64 addr, u8 *data, u32 len, u8 is_write, void *ptr),
--			void *ptr)
-+static bool trap_is_mmio(unsigned int flags)
-+{
-+	return (flags & IOTRAP_BUS_MASK) == DEVICE_BUS_MMIO;
-+}
-+
-+int kvm__register_iotrap(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len,
-+			 mmio_handler_fn mmio_fn, void *ptr,
-+			 unsigned int flags)
+ /*
+@@ -212,7 +212,7 @@ static u32 kbd_read_status(void)
+  * Things written here are generally arguments to commands previously
+  * written to port 0x64 and stored in state.write_cmd
+  */
+-static void kbd_write_data(u32 val)
++static void kbd_write_data(u8 val)
  {
- 	struct mmio_mapping *mmio;
- 	struct kvm_coalesced_mmio_zone zone;
-@@ -127,7 +133,7 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
- 		.remove		= false,
- 	};
- 
--	if (coalesce) {
-+	if (trap_is_mmio(flags) && (flags & IOTRAP_COALESCE)) {
- 		zone = (struct kvm_coalesced_mmio_zone) {
- 			.addr	= phys_addr,
- 			.size	= phys_addr_len,
-@@ -138,19 +144,29 @@ int kvm__register_mmio(struct kvm *kvm, u64 phys_addr, u64 phys_addr_len, bool c
- 			return -errno;
- 		}
- 	}
-+
- 	mutex_lock(&mmio_lock);
--	ret = mmio_insert(&mmio_tree, mmio);
-+	if (trap_is_mmio(flags))
-+		ret = mmio_insert(&mmio_tree, mmio);
-+	else
-+		ret = mmio_insert(&pio_tree, mmio);
- 	mutex_unlock(&mmio_lock);
- 
- 	return ret;
- }
- 
--bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
-+bool kvm__deregister_iotrap(struct kvm *kvm, u64 phys_addr, unsigned int flags)
- {
- 	struct mmio_mapping *mmio;
-+	struct rb_root *tree;
-+
-+	if ((flags & IOTRAP_BUS_MASK) == DEVICE_BUS_IOPORT)
-+		tree = &pio_tree;
-+	else
-+		tree = &mmio_tree;
- 
- 	mutex_lock(&mmio_lock);
--	mmio = mmio_search_single(&mmio_tree, phys_addr);
-+	mmio = mmio_search_single(tree, phys_addr);
- 	if (mmio == NULL) {
- 		mutex_unlock(&mmio_lock);
- 		return false;
-@@ -167,7 +183,7 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
- 	 * called mmio_put(). This will trigger use-after-free errors on VCPU0.
- 	 */
- 	if (mmio->refcount == 0)
--		mmio_deregister(kvm, &mmio_tree, mmio);
-+		mmio_deregister(kvm, tree, mmio);
- 	else
- 		mmio->remove = true;
- 	mutex_unlock(&mmio_lock);
-@@ -175,7 +191,8 @@ bool kvm__deregister_mmio(struct kvm *kvm, u64 phys_addr)
- 	return true;
- }
- 
--bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u8 is_write)
-+bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
-+		       u32 len, u8 is_write)
- {
- 	struct mmio_mapping *mmio;
- 
-@@ -194,3 +211,31 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data, u32 len, u
- out:
- 	return true;
- }
-+
-+bool kvm__emulate_pio(struct kvm_cpu *vcpu, u16 port, void *data,
-+		     int direction, int size, u32 count)
-+{
-+	struct mmio_mapping *mmio;
-+	bool is_write = direction == KVM_EXIT_IO_OUT;
-+
-+	mmio = mmio_get(&pio_tree, port, size);
-+	if (!mmio) {
-+		if (vcpu->kvm->cfg.ioport_debug) {
-+			fprintf(stderr, "IO error: %s port=%x, size=%d, count=%u\n",
-+				to_direction(direction), port, size, count);
-+
-+			return false;
+ 	switch (state.write_cmd) {
+ 	case I8042_CMD_CTL_WCTR:
+@@ -266,8 +266,8 @@ static void kbd_write_data(u32 val)
+ 			break;
+ 		default:
+ 			break;
+-	}
+-	break;
 +		}
-+		return true;
-+	}
-+
-+	while (count--) {
-+		mmio->mmio_fn(vcpu, port, data, size, is_write, mmio->ptr);
-+
-+		data += size;
-+	}
-+
-+	mmio_put(vcpu->kvm, &pio_tree, mmio);
-+
-+	return true;
-+}
++		break;
+ 	case 0:
+ 		/* Just send the ID */
+ 		kbd_queue(RESPONSE_ACK);
+@@ -304,8 +304,8 @@ static bool kbd_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void *
+ 		break;
+ 	}
+ 	case I8042_DATA_REG: {
+-		u32 value = kbd_read_data();
+-		ioport__write32(data, value);
++		u8 value = kbd_read_data();
++		ioport__write8(data, value);
+ 		break;
+ 	}
+ 	case I8042_PORT_B_REG: {
+@@ -328,7 +328,7 @@ static bool kbd_out(struct ioport *ioport, struct kvm_cpu *vcpu, u16 port, void
+ 		break;
+ 	}
+ 	case I8042_DATA_REG: {
+-		u32 value = ioport__read32(data);
++		u8 value = ioport__read8(data);
+ 		kbd_write_data(value);
+ 		break;
+ 	}
 -- 
 2.17.5
 
