@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 995253257FF
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:53:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79A87325805
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:53:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbhBYUvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 15:51:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50576 "EHLO
+        id S234568AbhBYUwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 15:52:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233820AbhBYUtq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233826AbhBYUtq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 25 Feb 2021 15:49:46 -0500
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A755C0617A7
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:12 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id 4so1547477qtc.13
-        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:12 -0800 (PST)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF214C0617A9
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:14 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id d8so7628062ybs.11
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:48:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=JwxadR5cbtm2yzkFH/RHMCjjB7zf5B8aQ7otXkvJ48s=;
-        b=C9QD1T5V1WJ4CTYWP1310gEZgpgR0plDlCVznZzCQy5Nm4/4Dow6tXbKlweqgXW3LE
-         Q42BabssrlvmBtzoYJQOBJcLBEHfuicpKTT7ikL0TEVdRoTOLhlmzgM9Net7WJa+b6d5
-         POmfeGzUSRdE6FLzdbYBVtXTLVcA5QZgkshb2EZhON9iET90LZDkH60qwwN6Un6C/ZQh
-         GjgG9TpDFArxNuWo7HQnOb82iFECBJMvkELxHpk+ac/q0i5w+7JRAy1Wk8hV17ZtfKo9
-         VQIgoalOK72b9SdUX2y2qVoT+JV57aR4//hjTVztiTVJyjMgxW9suV2mQlFci5CvxNbo
-         h9/Q==
+        bh=GGYOzagFvlgTV2DLbo1famwEs6BMX66WYjRN/mJyFWY=;
+        b=def5dczjvOSFaygZDthc8G/k41Q0O9ImhfMPy0gokapJeX4wWXG0CiMoWynAaidCAb
+         z4w7OttBdvVv7x9NRq76IdfJnc83a7yn5iZkZ+Af38EZRfDdqCx+Hf+tTvQWG9hxMfOr
+         4zG7XMjtqwqiTgP3trFnwX2nHFX1EsRBOEdfiRg2J+FV4cTAAgRtF/cCs401WQrLo/G+
+         /g/jBeW4Xopfs1vYrMkGqCJ806IED62PRYqs6BXNiUc69/qGzyy6uRn6nAk+UpX+D6R/
+         h8KlSD1uWNa5v0L6FjknDlHPAE2zzrUduOIAPUKO32qCWPfGRBILEUC/MUhKE0fHiXzK
+         8NhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=JwxadR5cbtm2yzkFH/RHMCjjB7zf5B8aQ7otXkvJ48s=;
-        b=uTzw6XFoEtYC5S0sKKDmIsI9mptPrG901affSXBkoFFAfymDgc882ECJUwvj4XmKs5
-         FQyosbR9y4hz4iJFuZVFgXKjEjjdLu/kDpXrEJFtz6DARuso7CSL+FyBhmYQLWHG6nqM
-         1RKW7BMLMoL+lLce/Ahftzq7LaPYYmMS6wdipbTdxR+ifjxUfBPyQUY0UG78SPW6g2U+
-         WYVjDuMRnrmbZtObaXq2yvc+FECJBGRt5wP5cDo/vlmFkYGxC2E5mJMDMTjhR49uR332
-         fo1YOMtsRuv0uYRwHTd+P2Pn9OpHAXFOMKOanQhFGlGUzFZppUZ1kiurw7mowkwv1xZs
-         wP7g==
-X-Gm-Message-State: AOAM531BxF/KoLeDIdhNFWaoI30D+8NMn0RlNRfySSYoxaKYCBpQaCIm
-        MJwasJ5CTDyqRAM9qpuzsb6FF+/2IKA=
-X-Google-Smtp-Source: ABdhPJwfA7FGvLPKnHh7BCxREcyp8iIyRNEkE61CYXrM3B57S/ghI1+CHX4CA/vs+RwgvwpWvp0NF/dAoPA=
+        bh=GGYOzagFvlgTV2DLbo1famwEs6BMX66WYjRN/mJyFWY=;
+        b=iLG4XXCT/zStmrx11efOIEazdGwL/A1i7gfaKURsMxW/6vkcMLnQFQHqolADmZI0S0
+         CRY9w0X9Cudo25WLFZAPoSjoz51ygsbelUdnq5TGEWcZSwi5cAR7O2ixE/iwrljvy5+t
+         0yuMJdfMfzXMWH70PMcefB147XjQ0yN1yRn5H5HiWUAhojolRiqSTnHtqB7v4/PwKs/L
+         SX0LgZ/c5QWK9CFsiTjPjujt5pDvNVc7UYp821qbkM71xmew0PrjfmJ8WbX0CwxriNfT
+         PYmJDvZzeuZ317i2oC9tzGwhBtQZPnpVcjpSPmUfHMTG4OFE1U5xp6U14pvpPXgHs1qa
+         27Jg==
+X-Gm-Message-State: AOAM531E39Nr2mPlgqgxaPZx0L02OUv/6KqXEQSy223rmoFhRQwj4z3v
+        dRYYQ+0s6L9QUUsTivq7hVT2WIsrrls=
+X-Google-Smtp-Source: ABdhPJxsRGocUYYsgIXuSfNkZVwB2TL+p6dacMVjtRSo83IsWBrw/MSeItmOSD8NkeYW2maoZl6E/gQekc4=
 Sender: "seanjc via sendgmr" <seanjc@seanjc798194.pdx.corp.google.com>
 X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:f:10:34c4:7c1d:f9ba:4576])
- (user=seanjc job=sendgmr) by 2002:a05:6214:1c45:: with SMTP id
- if5mr4682368qvb.9.1614286091253; Thu, 25 Feb 2021 12:48:11 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:cbcb:: with SMTP id b194mr6942867ybg.174.1614286094048;
+ Thu, 25 Feb 2021 12:48:14 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Feb 2021 12:47:30 -0800
+Date:   Thu, 25 Feb 2021 12:47:31 -0800
 In-Reply-To: <20210225204749.1512652-1-seanjc@google.com>
-Message-Id: <20210225204749.1512652-6-seanjc@google.com>
+Message-Id: <20210225204749.1512652-7-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210225204749.1512652-1-seanjc@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [PATCH 05/24] KVM: x86/mmu: Retry page faults that hit an invalid memslot
+Subject: [PATCH 06/24] KVM: x86/mmu: Don't install bogus MMIO SPTEs if MMIO
+ caching is disabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,45 +67,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Retry page faults (re-enter the guest) that hit an invalid memslot
-instead of treating the memslot as not existing, i.e. handling the
-page fault as an MMIO access.  When deleting a memslot, SPTEs aren't
-zapped and the TLBs aren't flushed until after the memslot has been
-marked invalid.
+If MMIO caching is disabled, e.g. when using shadow paging on CPUs with
+52 bits of PA space, go straight to MMIO emulation and don't install an
+MMIO SPTE.  The SPTE will just generate a !PRESENT #PF, i.e. can't
+actually accelerate future MMIO.
 
-Handling the invalid slot as MMIO means there's a small window where a
-page fault could replace a valid SPTE with an MMIO SPTE.  The legacy
-MMU handles such a scenario cleanly, but the TDP MMU assumes such
-behavior is impossible (see the BUG() in __handle_changed_spte()).
-There's really no good reason why the legacy MMU should allow such a
-scenario, and closing this hole allows for additional cleanups.
-
-Fixes: 2f2fad0897cb ("kvm: x86/mmu: Add functions to handle changed TDP SPTEs")
-Cc: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/x86/kvm/mmu/mmu.c  | 12 +++++++++++-
+ arch/x86/kvm/mmu/spte.c |  7 ++++++-
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 93b0285e8b38..9eb5ccb66e31 100644
+index 9eb5ccb66e31..37c68abc54b8 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3656,6 +3656,14 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
- 	struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 	bool async;
+@@ -2946,9 +2946,19 @@ static bool handle_abnormal_pfn(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn,
+ 		return true;
+ 	}
  
-+	/*
-+	 * Retry the page fault if the gfn hit a memslot that is being deleted
-+	 * or moved.  This ensures any existing SPTEs for the old memslot will
-+	 * be zapped before KVM inserts a new MMIO SPTE for the gfn.
-+	 */
-+	if (slot && (slot->flags & KVM_MEMSLOT_INVALID))
-+		return true;
+-	if (unlikely(is_noslot_pfn(pfn)))
++	if (unlikely(is_noslot_pfn(pfn))) {
+ 		vcpu_cache_mmio_info(vcpu, gva, gfn,
+ 				     access & shadow_mmio_access_mask);
++		/*
++		 * If MMIO caching is disabled, emulate immediately without
++		 * touching the shadow page tables as attempting to install an
++		 * MMIO SPTE will just be an expensive nop.
++		 */
++		if (unlikely(!shadow_mmio_value)) {
++			*ret_val = RET_PF_EMULATE;
++			return true;
++		}
++	}
+ 
+ 	return false;
+ }
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 9ea097bcb491..dcba9c1cbe29 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -51,6 +51,8 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+ 	u64 mask = generation_mmio_spte_mask(gen);
+ 	u64 gpa = gfn << PAGE_SHIFT;
+ 
++	WARN_ON_ONCE(!shadow_mmio_value);
 +
- 	/* Don't expose private memslots to L2. */
- 	if (is_guest_mode(vcpu) && !kvm_is_visible_memslot(slot)) {
- 		*pfn = KVM_PFN_NOSLOT;
+ 	access &= shadow_mmio_access_mask;
+ 	mask |= shadow_mmio_value | access;
+ 	mask |= gpa | shadow_nonpresent_or_rsvd_mask;
+@@ -258,7 +260,10 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 access_mask)
+ 				  SHADOW_NONPRESENT_OR_RSVD_MASK_LEN)))
+ 		mmio_value = 0;
+ 
+-	shadow_mmio_value = mmio_value | SPTE_MMIO_MASK;
++	if (mmio_value)
++		shadow_mmio_value = mmio_value | SPTE_MMIO_MASK;
++	else
++		shadow_mmio_value = 0;
+ 	shadow_mmio_access_mask = access_mask;
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_set_mmio_spte_mask);
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
