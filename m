@@ -2,75 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D32083248BD
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 03:08:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1C68E324904
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 03:59:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236691AbhBYCE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 21:04:27 -0500
-Received: from mga12.intel.com ([192.55.52.136]:11237 "EHLO mga12.intel.com"
+        id S234375AbhBYC7O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 21:59:14 -0500
+Received: from mga17.intel.com ([192.55.52.151]:39413 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236625AbhBYCEX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 21:04:23 -0500
-IronPort-SDR: dcHnqP8ZhpsSHKcqG9WVXhvJZs+6wCnLp8gM/A9G5oEwXV3N92N496jng/wFidZsB4RfnA5C9g
- +7dufUOt9nwg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9905"; a="164600846"
+        id S229890AbhBYC7N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 21:59:13 -0500
+IronPort-SDR: cnVM5gMeFgQeoFJdlesiQYVnMw3atHDLZKCKAaWEmJxRZ3VdhQn5I88Lt8DZhmP5Ml7/NZAx2x
+ ZI/LXstzIWbQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9905"; a="165256826"
 X-IronPort-AV: E=Sophos;i="5.81,203,1610438400"; 
-   d="scan'208";a="164600846"
+   d="scan'208";a="165256826"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 18:02:31 -0800
-IronPort-SDR: YOAAxv/VPQMb8k0UAuMjlTPE/mMIrCB9QshiZaeenDxclCZ5pjuacKNoquEI6xPOVIZ+CThEPL
- ykzEfnlEtBWA==
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 18:58:33 -0800
+IronPort-SDR: nbXT/+alB64Yrz7rFyCIDbZg5FuJULDgOI0w8g2h1I7f91PufB54sX+eLH9zYdJpH8CwdbplmG
+ /LYbJM0BXPuA==
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.81,203,1610438400"; 
-   d="scan'208";a="391885944"
-Received: from unknown (HELO [10.238.130.200]) ([10.238.130.200])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 18:02:28 -0800
-Subject: Re: [PATCH v1] kvm: x86: Revise guest_fpu xcomp_bv field
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210208161659.63020-1-jing2.liu@linux.intel.com>
- <4e4b37d1-e2f8-6757-003c-d19ae8184088@intel.com>
- <YCFzztFESzcnKRqQ@google.com>
- <c33335d3-abbe-04e0-2fa1-47f57ad154ac@linux.intel.com>
- <YDPWn70DTA64psQb@google.com>
- <9d23ae5b-9b85-88d7-a2d7-44fd75a068b9@linux.intel.com>
- <YDa5saYSU+Zrr8e+@google.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <acf225f2-5783-8a2d-a060-e58aad28e8de@linux.intel.com>
-Date:   Thu, 25 Feb 2021 10:02:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <YDa5saYSU+Zrr8e+@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+   d="scan'208";a="391903158"
+Received: from unknown (HELO local-michael-cet-test.sh.intel.com) ([10.239.159.166])
+  by fmsmga008.fm.intel.com with ESMTP; 24 Feb 2021 18:58:31 -0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH] KVM: nVMX: Set X86_CR4_CET in cr4_fixed1_bits if CET IBT is enabled
+Date:   Thu, 25 Feb 2021 11:09:50 +0800
+Message-Id: <20210225030951.17099-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+CET SHSTK and IBT are independently controlled by kernel, set X86_CR4_CET
+bit in cr4_fixed1_bits if either of them is enabled so that nested guest
+can enjoy the feature.
 
+Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 2/25/2021 4:40 AM, Sean Christopherson wrote:
-> On Tue, Feb 23, 2021, Liu, Jing2 wrote:
->> XCOMP_BV[63] field indicates that the save area is in the
->> compacted format and XCOMP_BV[62:0] indicates the states that
->> have space allocated in the save area, including both XCR0
->> and XSS bits enable by the host kernel. Use xfeatures_mask_all
->> for calculating xcomp_bv and reuse XCOMP_BV_COMPACTED_FORMAT
->> defined by kernel.
-> Works for me, just please wrap at ~73-75 chars, not ~64.
->
-> Thanks!
-Sure, let me update v2.
-
-BRs,
-Jing
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5856c5b81084..e92134ee081c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7258,6 +7258,7 @@ static void nested_vmx_cr_fixed1_bits_update(struct kvm_vcpu *vcpu)
+ 	cr4_fixed1_update(X86_CR4_UMIP,       ecx, feature_bit(UMIP));
+ 	cr4_fixed1_update(X86_CR4_LA57,       ecx, feature_bit(LA57));
+ 	cr4_fixed1_update(X86_CR4_CET,	      ecx, feature_bit(SHSTK));
++	cr4_fixed1_update(X86_CR4_CET,	      edx, feature_bit(IBT));
+ 
+ #undef cr4_fixed1_update
+ }
+-- 
+2.26.2
 
