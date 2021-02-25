@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54193325297
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 16:43:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04D2532529C
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 16:45:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232081AbhBYPnV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 10:43:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23416 "EHLO
+        id S232770AbhBYPnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 10:43:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49789 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232203AbhBYPnQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 10:43:16 -0500
+        by vger.kernel.org with ESMTP id S232608AbhBYPnY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 10:43:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614267709;
+        s=mimecast20190719; t=1614267717;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=45FSWo+t/kzijJoT0ABe1FplAFBSy0hQPH4KIv9auEg=;
-        b=hR9ma4AN4Er6FXZL/w1ulOaJkbUtyC67Xnu0ldJ81AxXuDslVKWsjpIb0Ftpr1BIZVcg1s
-        D0965Bp2Zl03/qWgd7leFsRn0HrOwPeiGJbazpjqtcUppC/zqcZhXeAz9vCXZzzjoIcywL
-        2xMGg2Hb39/xo8AVjGgJJMV75eMe9RE=
+        bh=axaqQIPGaFc+YTyqMCXEXh8BI5G1o+8Zoo95SuSqdjc=;
+        b=dAS6xtkWsrqqvMM67/jfw7qaDhPxAghFPbX6WoEAYtW5yhjOMQq+idKWvi4OOvVPBv44sa
+        EMT7S1xGmw5MM4Rn0SU5oPxt5k2noEA9m9S01TO8B5ew60F4JyVy8P62IJnRGD0+gCRNeX
+        6ibKZttLxvq/lA6TNcybITrAGj93yK0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-J0wYP-EOPeCLEsmUMCiDqA-1; Thu, 25 Feb 2021 10:41:47 -0500
-X-MC-Unique: J0wYP-EOPeCLEsmUMCiDqA-1
+ us-mta-355-CBQ6YWgAMK6-Dvnpj2RAVA-1; Thu, 25 Feb 2021 10:41:50 -0500
+X-MC-Unique: CBQ6YWgAMK6-Dvnpj2RAVA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17E0119611A2;
-        Thu, 25 Feb 2021 15:41:45 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FC7A107ACFE;
+        Thu, 25 Feb 2021 15:41:49 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.207.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 766D350DD2;
-        Thu, 25 Feb 2021 15:41:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B26650DD2;
+        Thu, 25 Feb 2021 15:41:45 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Ingo Molnar <mingo@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Ingo Molnar <mingo@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 1/4] KVM: x86: determine if an exception has an error code only when injecting it.
-Date:   Thu, 25 Feb 2021 17:41:32 +0200
-Message-Id: <20210225154135.405125-2-mlevitsk@redhat.com>
+Subject: [PATCH 2/4] KVM: x86: mmu: initialize fault.async_page_fault in walk_addr_generic
+Date:   Thu, 25 Feb 2021 17:41:33 +0200
+Message-Id: <20210225154135.405125-3-mlevitsk@redhat.com>
 In-Reply-To: <20210225154135.405125-1-mlevitsk@redhat.com>
 References: <20210225154135.405125-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -59,61 +59,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A page fault can be queued while vCPU is in real paged mode on AMD, and
-AMD manual asks the user to always intercept it
-(otherwise result is undefined).
-The resulting VM exit, does have an error code.
+This field was left uninitialized by a mistake.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/x86.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9fa0c7ff6e2fb..a9d814a0b5e4f 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -544,8 +544,6 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index d9f66cc459e84..3dc9a25772bd8 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -503,6 +503,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ #endif
+ 	walker->fault.address = addr;
+ 	walker->fault.nested_page_fault = mmu != vcpu->arch.walk_mmu;
++	walker->fault.async_page_fault = false;
  
- 	if (!vcpu->arch.exception.pending && !vcpu->arch.exception.injected) {
- 	queue:
--		if (has_error && !is_protmode(vcpu))
--			has_error = false;
- 		if (reinject) {
- 			/*
- 			 * On vmentry, vcpu->arch.exception.pending is only
-@@ -8345,6 +8343,13 @@ static void update_cr8_intercept(struct kvm_vcpu *vcpu)
- 	static_call(kvm_x86_update_cr8_intercept)(vcpu, tpr, max_irr);
- }
- 
-+static void kvm_inject_exception(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu->arch.exception.error_code && !is_protmode(vcpu))
-+		vcpu->arch.exception.error_code = false;
-+	static_call(kvm_x86_queue_exception)(vcpu);
-+}
-+
- static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit)
- {
- 	int r;
-@@ -8353,7 +8358,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 	/* try to reinject previous events if any */
- 
- 	if (vcpu->arch.exception.injected) {
--		static_call(kvm_x86_queue_exception)(vcpu);
-+		kvm_inject_exception(vcpu);
- 		can_inject = false;
- 	}
- 	/*
-@@ -8416,7 +8421,7 @@ static void inject_pending_event(struct kvm_vcpu *vcpu, bool *req_immediate_exit
- 			}
- 		}
- 
--		static_call(kvm_x86_queue_exception)(vcpu);
-+		kvm_inject_exception(vcpu);
- 		can_inject = false;
- 	}
- 
+ 	trace_kvm_mmu_walker_error(walker->fault.error_code);
+ 	return 0;
 -- 
 2.26.2
 
