@@ -2,138 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9840F32531A
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 17:09:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9B7132534B
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 17:13:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233443AbhBYQIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 11:08:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34916 "EHLO
+        id S233236AbhBYQN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 11:13:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21221 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233545AbhBYQIh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 11:08:37 -0500
+        by vger.kernel.org with ESMTP id S233597AbhBYQLv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 11:11:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614269218;
+        s=mimecast20190719; t=1614269422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kPlqJMoU9ErSEMEtT1KkqA811b4H3V90AXjiHwKSLXI=;
-        b=haN79t07AbdZVTC5ZQKQ11XOD/MFzaOziCmqlchwiUrD0TiurkbXhXmEta7zZn9vtH7nSl
-        V2S9CJuNu3AaWMvdlc2YBHL7lGAts7SKrnVzPVhrpK6skxa81t0DbVTt36lzsfijy/x2k/
-        t0izHlZ/uYbid6wz4dj8KstRWmTqBPY=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PO3qZUTHG4qkGyWUyaGvKkfQcCTQSsXP6qdxfpaxZig=;
+        b=YthUdM/r2vkIi3tGZTBTivfVpRq0c4a3mEb3rPcYIvVr1+BxefbwbiC7RoDzFW6xzhRsVx
+        2z96in4o6gDhhTBKxOqcTcjm899XzVMT7d7DLVOPY9JchPeuCdq+FesqfmSVfQ22WxetpM
+        lao6F9r0/fh97JCiAUfJSPnMYHoAdU4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-jYMGSjROMGe1Fug5WoRlvA-1; Thu, 25 Feb 2021 11:06:56 -0500
-X-MC-Unique: jYMGSjROMGe1Fug5WoRlvA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-537-YVUNemNvO-Sa4qLNXw8vUg-1; Thu, 25 Feb 2021 11:10:17 -0500
+X-MC-Unique: YVUNemNvO-Sa4qLNXw8vUg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3E9D10066F2;
-        Thu, 25 Feb 2021 16:06:54 +0000 (UTC)
-Received: from starship (unknown [10.35.207.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B7755D9C2;
-        Thu, 25 Feb 2021 16:06:50 +0000 (UTC)
-Message-ID: <ac4e47fbfb7f884b87fd084fe4bc3c7e3db79666.camel@redhat.com>
-Subject: Re: [PATCH 3/4] KVM: x86: pending exception must be be injected
- even with an injected event
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3FB9801997
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 16:10:16 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.207.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E33621001281;
+        Thu, 25 Feb 2021 16:10:13 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Date:   Thu, 25 Feb 2021 18:06:49 +0200
-In-Reply-To: <358e284b-957a-388b-9729-9ee82b4fd8e3@redhat.com>
-References: <20210225154135.405125-1-mlevitsk@redhat.com>
-         <20210225154135.405125-4-mlevitsk@redhat.com>
-         <358e284b-957a-388b-9729-9ee82b4fd8e3@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+To:     kvm@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] SVM: add two tests for exitintinto on exception
+Date:   Thu, 25 Feb 2021 18:10:12 +0200
+Message-Id: <20210225161012.408860-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-02-25 at 17:05 +0100, Paolo Bonzini wrote:
-> On 25/02/21 16:41, Maxim Levitsky wrote:
-> > Injected events should not block a pending exception, but rather,
-> > should either be lost or be delivered to the nested hypervisor as part of
-> > exitintinfo/IDT_VECTORING_INFO
-> > (if nested hypervisor intercepts the pending exception)
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> 
-> Does this already fix some of your new test cases?
+Test that exitintinfo is set correctly when
+exception happens during exception/interrupt delivery
+and that exception is intercepted.
 
-Yes, this fixes the 'interrupted' interrupt delivery test,
-while patch fixes th 'interrupted' exception delivery.
-Both interrupted by an exception.
+Note that those tests currently fail, due to few bugs in KVM.
 
-Best regards
-	Maxim Levitsky
-> 
-> Paolo
-> 
-> > ---
-> >   arch/x86/kvm/svm/nested.c | 7 ++++++-
-> >   arch/x86/kvm/vmx/nested.c | 9 +++++++--
-> >   2 files changed, 13 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> > index 881e3954d753b..4c82abce0ea0c 100644
-> > --- a/arch/x86/kvm/svm/nested.c
-> > +++ b/arch/x86/kvm/svm/nested.c
-> > @@ -1024,7 +1024,12 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-> >   	}
-> >   
-> >   	if (vcpu->arch.exception.pending) {
-> > -		if (block_nested_events)
-> > +		/*
-> > +		 * Only pending nested run can block an pending exception
-> > +		 * Otherwise an injected NMI/interrupt should either be
-> > +		 * lost or delivered to the nested hypervisor in EXITINTINFO
-> > +		 * */
-> > +		if (svm->nested.nested_run_pending)
-> >                           return -EBUSY;
-> >   		if (!nested_exit_on_exception(svm))
-> >   			return 0;
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index b34e284bfa62a..20ed1a351b2d9 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -3810,9 +3810,14 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >   
-> >   	/*
-> >   	 * Process any exceptions that are not debug traps before MTF.
-> > +	 *
-> > +	 * Note that only pending nested run can block an pending exception
-> > +	 * Otherwise an injected NMI/interrupt should either be
-> > +	 * lost or delivered to the nested hypervisor in EXITINTINFO
-> >   	 */
-> > +
-> >   	if (vcpu->arch.exception.pending && !vmx_pending_dbg_trap(vcpu)) {
-> > -		if (block_nested_events)
-> > +		if (vmx->nested.nested_run_pending)
-> >   			return -EBUSY;
-> >   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> >   			goto no_vmexit;
-> > @@ -3829,7 +3834,7 @@ static int vmx_check_nested_events(struct kvm_vcpu *vcpu)
-> >   	}
-> >   
-> >   	if (vcpu->arch.exception.pending) {
-> > -		if (block_nested_events)
-> > +		if (vmx->nested.nested_run_pending)
-> >   			return -EBUSY;
-> >   		if (!nested_vmx_check_exception(vcpu, &exit_qual))
-> >   			goto no_vmexit;
-> > 
+Also note that those bugs are in KVM's common x86 code,
+thus the issue exists on VMX as well and unit tests
+that reproduce those on VMX will be written as well.
 
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ x86/svm_tests.c | 162 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 160 insertions(+), 2 deletions(-)
+
+diff --git a/x86/svm_tests.c b/x86/svm_tests.c
+index 29a0b59..c14129a 100644
+--- a/x86/svm_tests.c
++++ b/x86/svm_tests.c
+@@ -1886,7 +1886,7 @@ static bool reg_corruption_finished(struct svm_test *test)
+                "No RIP corruption detected after %d timer interrupts",
+                isr_cnt);
+         set_test_stage(test, 1);
+-        return true;
++        goto finished;
+     }
+ 
+     if (vmcb->control.exit_code == SVM_EXIT_INTR) {
+@@ -1901,11 +1901,14 @@ static bool reg_corruption_finished(struct svm_test *test)
+             report(false,
+                    "RIP corruption detected after %d timer interrupts",
+                    isr_cnt);
+-            return true;
++            goto finished;
+         }
+ 
+     }
+     return false;
++finished:
++    apic_write(APIC_LVTT, APIC_LVT_TIMER_MASK);
++    return true;
+ }
+ 
+ static bool reg_corruption_check(struct svm_test *test)
+@@ -2382,6 +2385,155 @@ static void svm_vmrun_errata_test(void)
+     }
+ }
+ 
++
++/*
++ * Test that nested exceptions are delivered correctly
++ * when parent exception is intercepted
++ */
++
++static void exception_merging_prepare(struct svm_test *test)
++{
++    default_prepare(test);
++    set_test_stage(test, 0);
++
++    vmcb->control.intercept_exceptions |= (1ULL << GP_VECTOR);
++
++    /* break UD vector idt entry to get #GP*/
++    boot_idt[UD_VECTOR].type = 1;
++}
++
++static void exception_merging_test(struct svm_test *test)
++{
++    asm volatile (
++        "ud2\n\t" :
++        /* no outputs*/ :
++        /* no inputs*/ :
++        /* no clobbers*/
++    );
++}
++
++static bool exception_merging_finished(struct svm_test *test)
++{
++    u32 vec = vmcb->control.exit_int_info & SVM_EXITINTINFO_VEC_MASK;
++    u32 type = vmcb->control.exit_int_info & SVM_EXITINTINFO_TYPE_MASK;
++
++    if (vmcb->control.exit_code != SVM_EXIT_EXCP_BASE + GP_VECTOR) {
++        report(false, "unexpected VM exit");
++        goto out;
++    }
++
++    if (! (vmcb->control.exit_int_info & SVM_EXITINTINFO_VALID)) {
++        report(false, "EXITINTINFO not valid");
++        goto out;
++    }
++
++    if (type != SVM_EXITINTINFO_TYPE_EXEPT) {
++        report(false, "Incorrect event type in EXITINTINFO");
++        goto out;
++    }
++
++    if (vec != UD_VECTOR) {
++        report(false, "Incorrect vector in EXITINTINFO");
++        goto out;
++    }
++
++    set_test_stage(test, 1);
++out:
++    boot_idt[UD_VECTOR].type = 14;
++    return true;
++}
++
++static bool exception_merging_check(struct svm_test *test)
++{
++    return get_test_stage(test) == 1;
++}
++
++
++/*
++ * Test that if exception is raised during interrupt delivery,
++ * and that exception is intercepted, the interrupt is preserved
++ * in EXITINTINFO of the exception
++ */
++
++static void interrupt_merging_prepare(struct svm_test *test)
++{
++    default_prepare(test);
++    set_test_stage(test, 0);
++
++    /* intercept #GP */
++    vmcb->control.intercept_exceptions |= (1ULL << GP_VECTOR);
++
++    /* set local APIC to inject external interrupts */
++    apic_write(APIC_TMICT, 0);
++    apic_write(APIC_TDCR, 0);
++    apic_write(APIC_LVTT, TIMER_VECTOR | APIC_LVT_TIMER_PERIODIC);
++    apic_write(APIC_TMICT, 1000);
++}
++
++static void interrupt_merging_test(struct svm_test *test)
++{
++    /* break timer vector IDT entry to get #GP on interrupt delivery */
++    boot_idt[TIMER_VECTOR].type = 1;
++
++    irq_enable();
++
++    /* just wait forever */
++    for(;;);
++}
++
++static bool interrupt_merging_finished(struct svm_test *test)
++{
++    u32 vec = vmcb->control.exit_int_info & SVM_EXITINTINFO_VEC_MASK;
++    u32 type = vmcb->control.exit_int_info & SVM_EXITINTINFO_TYPE_MASK;
++    u32 error_code = vmcb->control.exit_info_1;
++
++    /* exit on external interrupts is disabled, thus timer interrupt
++     * should be attempted to be delivered, but due to incorrect IDT entry
++     * an #GP should be raised
++     */
++    if (vmcb->control.exit_code != SVM_EXIT_EXCP_BASE + GP_VECTOR) {
++        report(false, "unexpected VM exit");
++        goto out;
++    }
++
++    /* GP error code should be about an IDT entry, and due to external event */
++    if (error_code != (TIMER_VECTOR << 3 | 3)) {
++        report(false, "Incorrect error code of the GP exception");
++        goto out;
++    }
++
++    /* Original interrupt should be preserved in EXITINTINFO */
++    if (! (vmcb->control.exit_int_info & SVM_EXITINTINFO_VALID)) {
++        report(false, "EXITINTINFO not valid");
++        goto out;
++    }
++
++    if (type != SVM_EXITINTINFO_TYPE_INTR) {
++        report(false, "Incorrect event type in EXITINTINFO");
++        goto out;
++    }
++
++    if (vec != TIMER_VECTOR) {
++        report(false, "Incorrect vector in EXITINTINFO");
++        goto out;
++    }
++
++    set_test_stage(test, 1);
++out:
++    boot_idt[TIMER_VECTOR].type = 14;
++    apic_write(APIC_LVTT, APIC_LVT_TIMER_MASK);
++    return true;
++
++}
++
++static bool interrupt_merging_check(struct svm_test *test)
++{
++    return get_test_stage(test) == 1;
++}
++
++////////////////////////////////////////////////
++
++
+ struct svm_test svm_tests[] = {
+     { "null", default_supported, default_prepare,
+       default_prepare_gif_clear, null_test,
+@@ -2492,6 +2644,12 @@ struct svm_test svm_tests[] = {
+     { "svm_init_intercept_test", smp_supported, init_intercept_prepare,
+       default_prepare_gif_clear, init_intercept_test,
+       init_intercept_finished, init_intercept_check, .on_vcpu = 2 },
++    { "exception_merging", default_supported, exception_merging_prepare,
++      default_prepare_gif_clear, exception_merging_test,
++      exception_merging_finished, exception_merging_check },
++    { "interrupt_merging", default_supported, interrupt_merging_prepare,
++      default_prepare_gif_clear, interrupt_merging_test,
++      interrupt_merging_finished, interrupt_merging_check },
+     TEST(svm_cr4_osxsave_test),
+     TEST(svm_guest_state_test),
+     TEST(svm_vmrun_errata_test),
+-- 
+2.26.2
 
