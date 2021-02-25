@@ -2,101 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0495E325284
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 16:37:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE625325295
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 16:43:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbhBYPh0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 10:37:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59994 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229845AbhBYPhT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 10:37:19 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 11PFX335027777;
-        Thu, 25 Feb 2021 10:36:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=bhVw3KMUCaow66xCSd9nAmtx9kPd8ICFEWEh2CVI9OY=;
- b=qEm78qAOdGK8rOtSgvAIm5kz5bwlMBLBa5yjN8gJq6bKiSOpRtXFiFqRdN1PQOb+X3rY
- C8iq76VKapysB9UCazI6KbA+n4WJZY3QrLYOO3XYUko0NIfXJ2zEIO4rH4/bLJswhEBT
- vt3F1MvkydsDd+YCOvTuMm1fBE4DU3VWkvGamZ7zi5ic/3wkRdpGmGGDADuSGOoCdIst
- YE5OkQ1wD841qUZ33RwcT2FMF40mtIdvLH7X7z8wnmaHHAssK/k/0JqKkBEYKyeZmDsc
- xHZK4Nz28p8VKTisiIxvQQ8Y2sAfS1CQKRrGC+n94A5hK/LKVmDZlfbXSn237ZRNaxoZ KQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36xefr8fkm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Feb 2021 10:36:36 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 11PFXfLe030703;
-        Thu, 25 Feb 2021 10:36:35 -0500
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 36xefr8fga-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Feb 2021 10:36:35 -0500
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 11PFMZhG024176;
-        Thu, 25 Feb 2021 15:36:30 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 36tt28cjqt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 25 Feb 2021 15:36:30 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 11PFaRH638928764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Feb 2021 15:36:27 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A813B4C040;
-        Thu, 25 Feb 2021 15:36:27 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E740D4C046;
-        Thu, 25 Feb 2021 15:36:26 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.33.39])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Thu, 25 Feb 2021 15:36:26 +0000 (GMT)
-Date:   Thu, 25 Feb 2021 16:36:24 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, kwankhede@nvidia.com,
-        pbonzini@redhat.com, alex.williamson@redhat.com,
-        pasic@linux.vnet.ibm.com
-Subject: Re: [PATCH v2 1/1] s390/vfio-ap: fix circular lockdep when
- setting/clearing crypto masks
-Message-ID: <20210225163624.01a89051.pasic@linux.ibm.com>
-In-Reply-To: <f5d5cbab-2181-2a95-8a87-b21d05405936@linux.ibm.com>
-References: <20210216011547.22277-1-akrowiak@linux.ibm.com>
-        <20210216011547.22277-2-akrowiak@linux.ibm.com>
-        <20210223104805.6a8d1872.pasic@linux.ibm.com>
-        <63bb0d61-efcd-315b-5a1a-0ef4d99600f4@linux.ibm.com>
-        <20210225122824.467b8ed9.pasic@linux.ibm.com>
-        <f5d5cbab-2181-2a95-8a87-b21d05405936@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S232137AbhBYPnO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 10:43:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57962 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229845AbhBYPnN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 10:43:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614267707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=s3cK62eP5ZGb6zqZ97C6c3P2QiYoHi/l4dd9rsUiLKg=;
+        b=XRwZIY5xJQfI/V5Hrtn68LGqe8KVhVyqXBYLkagaaS2Qn492pPQ4AlY34oyjvcgh+MkcTI
+        zsqhCbqRL/HDZx3gKAIs7Smfm2qmDNiTL1ybxa5/ABgZs5Zb+n/lmRH6t8Rl41RqOee4w0
+        lGrQZ1+MnWv+tBkW15G8QSmw0aDhzBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-591-6Uv32vupNAyDs-gCC2l4TA-1; Thu, 25 Feb 2021 10:41:44 -0500
+X-MC-Unique: 6Uv32vupNAyDs-gCC2l4TA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 132B8107ACC7;
+        Thu, 25 Feb 2021 15:41:41 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.207.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 36D8A39A63;
+        Thu, 25 Feb 2021 15:41:36 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Ingo Molnar <mingo@redhat.com>,
+        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
+        64-BIT)), Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@alien8.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 0/4] RFC/WIP: KVM: separate injected and pending exception +
+ few more fixes
+Date:   Thu, 25 Feb 2021 17:41:31 +0200
+Message-Id: <20210225154135.405125-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
- definitions=2021-02-25_09:2021-02-24,2021-02-25 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 clxscore=1015 mlxscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 priorityscore=1501 phishscore=0 adultscore=0
- mlxlogscore=639 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2102250125
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 25 Feb 2021 08:53:50 -0500
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+clone of "kernel-starship-5.11"=0D
+=0D
+Maxim Levitsky (4):=0D
+  KVM: x86: determine if an exception has an error code only when=0D
+    injecting it.=0D
+  KVM: x86: mmu: initialize fault.async_page_fault in walk_addr_generic=0D
+  KVM: x86: pending exception must be be injected even with an injected=0D
+    event=0D
+  kvm: WIP separation of injected and pending exception=0D
+=0D
+ arch/x86/include/asm/kvm_host.h |  23 +-=0D
+ arch/x86/include/uapi/asm/kvm.h |  14 +-=0D
+ arch/x86/kvm/mmu/paging_tmpl.h  |   1 +=0D
+ arch/x86/kvm/svm/nested.c       |  57 +++--=0D
+ arch/x86/kvm/svm/svm.c          |   8 +-=0D
+ arch/x86/kvm/vmx/nested.c       | 109 +++++----=0D
+ arch/x86/kvm/vmx/vmx.c          |  14 +-=0D
+ arch/x86/kvm/x86.c              | 377 +++++++++++++++++++-------------=0D
+ arch/x86/kvm/x86.h              |   6 +-=0D
+ include/uapi/linux/kvm.h        |   1 +=0D
+ 10 files changed, 374 insertions(+), 236 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
-> If we add the proposed flag to indicate when the matrix_mdev->kvm
-> pointer is in flux, then we can check that before allowing the functions
-> in the list above to proceed.
-
-I'm not against that. Go ahead!
-
-Regards,
-Halil
