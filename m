@@ -2,156 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 681A432599B
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 23:25:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65F4C325A01
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 00:01:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232008AbhBYWXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 17:23:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34127 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233481AbhBYWWu (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 17:22:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614291682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ccfUoSqyqBopC60NplQ5jqhwhcyBVDA6jI4bJ7yvEPI=;
-        b=K1wn7uYhfeDVpj2H2EgxNS+gbYYHrHBzxy/rc9hUmpb2RtERlOjQ9n6E25UdgPZg88OEfy
-        L7RSKwK5bBgvy9rS3xQoDvNPsvi4sAse2UvQtQkf1FBdpOzSApL+evCeanZBBAi+IuOHlY
-        BabP6E6upi67kIH6ZAov582+bwmuExw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-IkYSw3fGPv2SryrOnyVQmQ-1; Thu, 25 Feb 2021 17:21:18 -0500
-X-MC-Unique: IkYSw3fGPv2SryrOnyVQmQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BAB8107ACE3;
-        Thu, 25 Feb 2021 22:21:17 +0000 (UTC)
-Received: from omen.home.shazbot.org (ovpn-112-255.phx2.redhat.com [10.3.112.255])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 414886090F;
-        Thu, 25 Feb 2021 22:21:14 +0000 (UTC)
-Date:   Thu, 25 Feb 2021 15:21:13 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <peterx@redhat.com>
-Subject: Re: [RFC PATCH 05/10] vfio: Create a vfio_device from vma lookup
-Message-ID: <20210225152113.3e083b4a@omen.home.shazbot.org>
-In-Reply-To: <20210225000610.GP4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
-        <161401268537.16443.2329805617992345365.stgit@gimli.home>
-        <20210222172913.GP4247@nvidia.com>
-        <20210224145506.48f6e0b4@omen.home.shazbot.org>
-        <20210225000610.GP4247@nvidia.com>
+        id S232237AbhBYXAs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 18:00:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50564 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230330AbhBYXAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 18:00:46 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D694DC061756
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 15:00:05 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id e2so6444206ilu.0
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 15:00:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5XspxK0PdIQsovjLyVyGdSX6BoQMz+G/8K5JhMr+loc=;
+        b=pkh4T7ynn+GB+pZAd1CZylm7bj8M2Xc+JTtE118zzJdpjKIMiDStQIRKnGP9zdyYf0
+         BcpHSYoF6BYT45oSWTGema+9VDxw3PKp3ap9LoceEXBA/Sknxf7Kr7EZrWKL8BqJ2KUG
+         9ELfgX5pqNvwEb5ihIYdyjdykB5OTHsBKxYeu+A2my1Wgq7Rf0D1r5qbi2QA+3pDlbxm
+         VqiRRMYFfMxVNCRHFejZHzJwJdGqzbxA1snO5BsDXDbRO4kb4a8niLoE3BlbV71085K7
+         h4482SDdLc5pKRUj1JubV008AxQdlD6wElzH+woME/Sk4C/vp1FUil43I/fuMWEtH0tV
+         8REw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5XspxK0PdIQsovjLyVyGdSX6BoQMz+G/8K5JhMr+loc=;
+        b=ZU+O1dz+PYn8cvUGsiUNzGkmcPlTYmmzUgxuosNwRidDiGrbW8KT69ZdD84JyNn5IL
+         DnrWa9N0S6/nUqwWLIY8U/Vsd3VwOsARpK1G0MoCUZfL3ZT+erIAxcxOzqh5QOKBYlpJ
+         8ESorRhimAQouhJkByewWhuzKdXbxXDkjFTAy52mlzYd5e+wDhq5c4iX1OnW1UnMYbop
+         EvM0D1loT6h8UELOo8x9BSEh0PyX2E0N8zp3415TRr96L5V7v7NynWYdusCCNNT5JyUm
+         PgjqFI/7sgutH8D81CrXF+KxEdOwcnJ1ELn33odaKfGOZaWworXQ5F8QC64xj6ALZvha
+         pbew==
+X-Gm-Message-State: AOAM530FxwfyyYiKK3VnJ1M3WMDumTLIWqct6sNU+aUeC2CybyJdHOVe
+        kw9tXfvQR2E6i074v4VEit0FdUQmxVVs66AdA0YQhg==
+X-Google-Smtp-Source: ABdhPJwp0cGVsBrOff0RWqDvOFDayYL0EnOuJDctsNFXCzoR26aNVdPACoTevyNH5XNtYOTmSaV/qHGqQOJBUUo4HNI=
+X-Received: by 2002:a92:cd8a:: with SMTP id r10mr35361ilb.110.1614294004761;
+ Thu, 25 Feb 2021 15:00:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <cover.1612398155.git.ashish.kalra@amd.com> <7266edd714add8ec9d7f63eddfc9bbd4d789c213.1612398155.git.ashish.kalra@amd.com>
+ <YCxrV4u98ZQtInOE@google.com> <SN6PR12MB27672FF8358D122EDD8CC0188E859@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20210224175122.GA19661@ashkalra_ubuntu_server> <YDaZacLqNQ4nK/Ex@google.com> <20210225202008.GA5208@ashkalra_ubuntu_server>
+In-Reply-To: <20210225202008.GA5208@ashkalra_ubuntu_server>
+From:   Steve Rutherford <srutherford@google.com>
+Date:   Thu, 25 Feb 2021 14:59:27 -0800
+Message-ID: <CABayD+cn5e3PR6NtSWLeM_qxs6hKWtjEx=aeKpy=WC2dzPdRLw@mail.gmail.com>
+Subject: Re: [PATCH v10 10/16] KVM: x86: Introduce KVM_GET_SHARED_PAGES_LIST ioctl
+To:     Ashish Kalra <ashish.kalra@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, "bp@suse.de" <bp@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Feb 2021 20:06:10 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Feb 25, 2021 at 12:20 PM Ashish Kalra <ashish.kalra@amd.com> wrote:
+>
+> On Wed, Feb 24, 2021 at 10:22:33AM -0800, Sean Christopherson wrote:
+> > On Wed, Feb 24, 2021, Ashish Kalra wrote:
+> > > # Samples: 19K of event 'kvm:kvm_hypercall'
+> > > # Event count (approx.): 19573
+> > > #
+> > > # Overhead  Command          Shared Object     Symbol
+> > > # ........  ...............  ................  .........................
+> > > #
+> > >    100.00%  qemu-system-x86  [kernel.vmlinux]  [k] kvm_emulate_hypercall
+> > >
+> > > Out of these 19573 hypercalls, # of page encryption status hcalls are 19479,
+> > > so almost all hypercalls here are page encryption status hypercalls.
+> >
+> > Oof.
+> >
+> > > The above data indicates that there will be ~2% more Heavyweight VMEXITs
+> > > during SEV guest boot if we do page encryption status hypercalls
+> > > pass-through to host userspace.
+> > >
+> > > But, then Brijesh pointed out to me and highlighted that currently
+> > > OVMF is doing lot of VMEXITs because they don't use the DMA pool to minimize the C-bit toggles,
+> > > in other words, OVMF bounce buffer does page state change on every DMA allocate and free.
+> > >
+> > > So here is the performance analysis after kernel and initrd have been
+> > > loaded into memory using grub and then starting perf just before booting the kernel.
+> > >
+> > > These are the performance #'s after kernel and initrd have been loaded into memory,
+> > > then perf is attached and kernel is booted :
+> > >
+> > > # Samples: 1M of event 'kvm:kvm_userspace_exit'
+> > > # Event count (approx.): 1081235
+> > > #
+> > > # Overhead  Trace output
+> > > # ........  ........................
+> > > #
+> > >     99.77%  reason KVM_EXIT_IO (2)
+> > >      0.23%  reason KVM_EXIT_MMIO (6)
+> > >
+> > > # Samples: 1K of event 'kvm:kvm_hypercall'
+> > > # Event count (approx.): 1279
+> > > #
+> > >
+> > > So as the above data indicates, Linux is only making ~1K hypercalls,
+> > > compared to ~18K hypercalls made by OVMF in the above use case.
+> > >
+> > > Does the above adds a prerequisite that OVMF needs to be optimized if
+> > > and before hypercall pass-through can be done ?
+> >
+> > Disclaimer: my math could be totally wrong.
+> >
+> > I doubt it's a hard requirement.  Assuming a conversative roundtrip time of 50k
+> > cycles, those 18K hypercalls will add well under a 1/2 a second of boot time.
+> > If userspace can push the roundtrip time down to 10k cycles, the overhead is
+> > more like 50 milliseconds.
+> >
+> > That being said, this does seem like a good OVMF cleanup, irrespective of this
+> > new hypercall.  I assume it's not cheap to convert a page between encrypted and
+> > decrypted.
+> >
+> > Thanks much for getting the numbers!
+>
+> Considering the above data and guest boot time latencies
+> (and potential issues with OVMF and optimizations required there),
+> do we have any consensus on whether we want to do page encryption
+> status hypercall passthrough or not ?
+>
+> Thanks,
+> Ashish
 
-> On Wed, Feb 24, 2021 at 02:55:06PM -0700, Alex Williamson wrote:
-> 
-> > > The only use of the special ops would be if there are multiple types
-> > > of mmap's going on, but for this narrow use case those would be safely
-> > > distinguished by the vm_pgoff instead  
-> > 
-> > We potentially do have device specific regions which can support mmap,
-> > for example the migration region.  We'll need to think about how we
-> > could even know if portions of those regions map to a device.  We could
-> > use the notifier to announce it and require the code supporting those
-> > device specific regions manage it.  
-> 
-> So, the above basically says any VFIO VMA is allowed for VFIO to map
-> to the IOMMU.
-> 
-> If there are places creating mmaps for VFIO that should not go to the
-> IOMMU then they need to return NULL from this function.
-> 
-> > I'm not really clear what you're getting at with vm_pgoff though, could
-> > you explain further?  
-> 
-> Ah, so I have to take a side discussion to explain what I ment.
-> 
-> The vm_pgoff is a bit confused because we change it here in vfio_pci:
-> 
->     vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-> 
-> But the address_space invalidation assumes it still has the region
-> based encoding:
-> 
-> +	vfio_device_unmap_mapping_range(vdev->device,
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX),
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_ROM_REGION_INDEX) -
-> +			VFIO_PCI_INDEX_TO_OFFSET(VFIO_PCI_BAR0_REGION_INDEX));
-> 
-> Those three indexes are in the vm_pgoff numberspace and so vm_pgoff
-> must always be set to the same thing - either the
-> VFIO_PCI_INDEX_TO_OFFSET() coding or the physical pfn. 
+Thanks for grabbing the data!
 
-Aha, I hadn't made that connection.
+I am fine with both paths. Sean has stated an explicit desire for
+hypercall exiting, so I think that would be the current consensus.
 
-> Since you say we need a limited invalidation this looks like a bug to
-> me - and it must always be the VFIO_PCI_INDEX_TO_OFFSET coding.
+If we want to do hypercall exiting, this should be in a follow-up
+series where we implement something more generic, e.g. a hypercall
+exiting bitmap or hypercall exit list. If we are taking the hypercall
+exit route, we can drop the kvm side of the hypercall. Userspace could
+also handle the MSR using MSR filters (would need to confirm that).
+Then userspace could also be in control of the cpuid bit.
 
-Yes, this must have only worked in testing because I mmap'd BAR0 which
-is at index/offset zero, so the pfn range overlapped the user offset.
-I'm glad you caught that...
+Essentially, I think you could drop most of the host kernel work if
+there were generic support for hypercall exiting. Then userspace would
+be responsible for all of that. Thoughts on this?
 
-> So, the PCI vma needs to get switched to use the
-> VFIO_PCI_INDEX_TO_OFFSET coding and then we can always extract the
-> region number from the vm_pgoff and thus access any additional data,
-> such as the base pfn or a flag saying this cannot be mapped to the
-> IOMMU. Do the reverse of VFIO_PCI_INDEX_TO_OFFSET and consult
-> information attached to that region ID.
-> 
-> All places creating vfio mmaps have to set the vm_pgoff to
-> VFIO_PCI_INDEX_TO_OFFSET().
-
-This is where it gets tricky.  The vm_pgoff we get from
-file_operations.mmap is already essentially describing an offset from
-the base of a specific resource.  We could convert that from an absolute
-offset to a pfn offset, but it's only the bus driver code (ex.
-vfio-pci) that knows how to get the base, assuming there is a single
-base per region (we can't assume enough bits per region to store
-absolute pfn).  Also note that you're suggesting that all vfio mmaps
-would need to standardize on the vfio-pci implementation of region
-layouts.  Not that most drivers haven't copied vfio-pci, but we've
-specifically avoided exposing it as a fixed uAPI such that we could have
-the flexibility for a bus driver to implement regions offsets however
-they need.
-
-So I'm not really sure what this looks like.  Within vfio-pci we could
-keep the index bits in place to allow unmmap_mapping_range() to
-selectively zap matching vm_pgoffs but expanding that to a vfio
-standard such that the IOMMU backend can also extract a pfn looks very
-limiting, or ugly.  Thanks,
-
-Alex
-
-> But we have these violations that need fixing:
-> 
-> drivers/vfio/fsl-mc/vfio_fsl_mc.c:      vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
-> drivers/vfio/platform/vfio_platform_common.c:   vma->vm_pgoff = (region.addr >> PAGE_SHIFT) + pgoff;
-> 
-> Couldn't see any purpose to this code, cargo cult copy? Just delete
-> it.
-> 
-> drivers/vfio/pci/vfio_pci.c:    vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
-> 
-> Used to implement fault() but we could get the region number and
-> extract the pfn from the vfio_pci_device's data easy enough.
-> 
-> I manually checked that other parts of VFIO not under drivers/vfio are
-> doing it OK, looks fine.
-> 
-> Jason
-> 
-
+--Steve
