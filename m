@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CBC38324991
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 04:46:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E217F32499C
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 04:57:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233232AbhBYDp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Feb 2021 22:45:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56900 "EHLO
+        id S233396AbhBYD5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Feb 2021 22:57:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232984AbhBYDp6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Feb 2021 22:45:58 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2274C06174A
-        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 19:45:17 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id y202so4465331iof.1
-        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 19:45:17 -0800 (PST)
+        with ESMTP id S231604AbhBYD5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Feb 2021 22:57:09 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7329C061574
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 19:56:28 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id y202so4484574iof.1
+        for <kvm@vger.kernel.org>; Wed, 24 Feb 2021 19:56:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=RWBwTIueuYncqBnoLNaT06f86OMdHzkNoeJqjL3eUCg=;
-        b=Y/EhyyN6fQJaxq/oxM7enYR4Lp336hl0snpi8FibiCF6+VrMkfWzhz1MfohCebHuRB
-         D1K+Nm/B3GvAzFMAJrfbguIYCBJXNWbIpcjtsKRmJha86adl+9RXkO9ImqLnzbSFfTS2
-         Ftxcz66AgxPIp4v3knkNUTUDbt1PETRTnJQHD++F22UGTYrjZiG2Pf692udfOEKlsQHW
-         62gKmEJc4iSrxjVn+miYswUcxDm0nL7h2XofDrtjfStUXJr8WCF3ijrQWv/inFXT8OW0
-         75KOrwOVls4zK6qCHOSyYNMuItJtQNN24e/jSOumWd/dz5WUjHvkcujTDGPUfehLzB2M
-         Rdjw==
+        bh=VMhssfkntbp6BkEdgeddf6ITSgH2/sACeJhofv7G7Qk=;
+        b=pxq5QeWUzVL/vGfbVNLb2osJm/A4y0MvKWH4ryodlpu0IGEyWYJkLK62EquwoT5vXh
+         NjkZcEXppruaW6kFhkh974WJiWPRwzLu45wO2HtCpV4jNukAZT1RhMTu43qeag0yBWJz
+         po+gSu7r6sRDp+sqq853uK73AqEBXX/5Ci5/PgDbWFH8WHeFGpLcwOUqddgQPo53HFJU
+         p8XlSL2wWT8u/rrxAc7omZUYo/nQEJDVAE/+Dxk9+arLL2hPE/xen1C9gnqBQGfnytTY
+         j+FXMPiW8pn8RweYVtBm5CtEflk1w5nPIbrkJEb/9RmPioWT6g7WR8pqwby6N9rhNJo7
+         R9Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=RWBwTIueuYncqBnoLNaT06f86OMdHzkNoeJqjL3eUCg=;
-        b=ZXieb12Weo+65WwJyoPFRyFpQM1kUBJPtOrFje56D9UKjxW0Hw2dS2YJhoJiq+fr8q
-         j9PQVnuK04cgsnxX9Sxcw+1nk8jA/jTZIolbiVD01HKMWG8bE8d59YT7RyKGDm7G1aGJ
-         OEJeG7k9taaGfOW1ISE/Y70PryQumcE9l5v0oqAqRzK4coeOqCQRCVBzMR0ikChcfPx9
-         mlxJMSPRT2mjs6p69+64dLHe+UAJdwK/QGB4WIe800uemjikSNkssWTUL9v9cODOxAZk
-         wyUAOMOEHWKqItbnmT3QaAPsb8C2AO+VjuxxrdJZbiCSCtTynXUJq41MeNhsZQeRFj4u
-         b10Q==
-X-Gm-Message-State: AOAM530H4A1pSatFwA1RfRJYPNwySqpzD6PPa9a+yrDDzYFX1Bjv1Jgf
-        Hnvrx+Aka2XzOsnkz2WCz91bzqIk8rShQnTNbS+VtQ==
-X-Google-Smtp-Source: ABdhPJx0uoKO+fxnyqUKxS0lMGFg3W5bsBtpg9uwlb9QAmwFNpXmlVkQeWdCu0PBZp4tfjx6cj//5x7z4O5Qm47SttQ=
-X-Received: by 2002:a05:6602:584:: with SMTP id v4mr1020635iox.156.1614224716835;
- Wed, 24 Feb 2021 19:45:16 -0800 (PST)
+        bh=VMhssfkntbp6BkEdgeddf6ITSgH2/sACeJhofv7G7Qk=;
+        b=ivxMBINhVO6oUYb3+t7QnMA4iKbv+73QFMLnj5dAYPkqfkAOHlvc8sQ+XN7MW+HHE7
+         CiMK9JK2SMOH2d2BUIkjzM0wEfoI6yYf/9ba+Hl0XaBKzrU8gZ7/ACW2Do60lTS1ViN9
+         R+oTteCTyh/4GcqBdQsc1DOaHo5ED8YyjrGARbYWuifMOkA1p/ZFi5iQ/pRR+O5ZzAtc
+         5mRx5+LAyJSOm7LWQ9cWzxzvJxRhzJS1HgPK8bC5o7FjIXBPMqlf3S0vocTM9UAAAAwM
+         cJ4dNaL8h4bV8KVXXH5DpfEF/dyV0j9hGuif/NaklQe3SRNXICP8mJccwRDGK5rmNs8F
+         WXyQ==
+X-Gm-Message-State: AOAM530zlev+RWuX86wN8fc05FBU6pDW72YCjwQlJw51NRK151sQWSE8
+        RXSIzewfKWYFtnER8hgZlOw3nnznGMWllylGe/I6uw==
+X-Google-Smtp-Source: ABdhPJyLZIGwvciSXuv0EOvVOClNo6/DzD3V+vVlnTp1m0pld87jItvthB4sJcyYaZwS1w1U59K0L9OT7StOa8lDIJM=
+X-Received: by 2002:a6b:c40b:: with SMTP id y11mr991070ioa.205.1614225387929;
+ Wed, 24 Feb 2021 19:56:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20210224085915.28751-1-natet@google.com>
-In-Reply-To: <20210224085915.28751-1-natet@google.com>
+References: <20210224085915.28751-1-natet@google.com> <YDaOw48Ug7Tgr+M6@google.com>
+In-Reply-To: <YDaOw48Ug7Tgr+M6@google.com>
 From:   Steve Rutherford <srutherford@google.com>
-Date:   Wed, 24 Feb 2021 19:44:40 -0800
-Message-ID: <CABayD+cZ1nRwuFWKHGh5a2sVXG5AEB_AyTGqZs_xVQLoWwmaSA@mail.gmail.com>
+Date:   Wed, 24 Feb 2021 19:55:51 -0800
+Message-ID: <CABayD+f6q0q2v7pT-hjD=oP_+hAyEW5VA2WoTQNn=5-=OD1e1w@mail.gmail.com>
 Subject: Re: [RFC] KVM: x86: Support KVM VMs sharing SEV context
-To:     Nathan Tempelman <natet@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Nathan Tempelman <natet@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         X86 ML <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
         David Rientjes <rientjes@google.com>,
         Brijesh Singh <brijesh.singh@amd.com>,
         Ashish Kalra <Ashish.Kalra@amd.com>
@@ -64,80 +64,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 24, 2021 at 1:00 AM Nathan Tempelman <natet@google.com> wrote:
+On Wed, Feb 24, 2021 at 9:37 AM Sean Christopherson <seanjc@google.com> wrote:
+> > +     unsigned int asid;
+> > +     int ret;
+> > +
+> > +     if (!sev_guest(kvm))
+> > +             return -ENOTTY;
+> > +
+> > +     mutex_lock(&kvm->lock);
+> > +
+> > +     /* Mirrors of mirrors should work, but let's not get silly */
 >
-> @@ -1186,6 +1195,10 @@ int svm_register_enc_region(struct kvm *kvm,
->         if (!sev_guest(kvm))
->                 return -ENOTTY;
->
-> +       /* If kvm is mirroring encryption context it isn't responsible for it */
-> +       if (is_mirroring_enc_context(kvm))
-> +               return -ENOTTY;
-> +
+> Do we really care?
+Yes, unless you reparent mirrors of mirrors to the original ASID
+owner. If you don't do that, I think userspace could pump a chain of
+mirrors to blow the kernel stack when it closes the leaf vm, since you
+could build up a chain of sev_vm_destroys. Refcounting the ASIDs
+directly would also fix this.
 
-Is this necessary? Same for unregister. When we looked at
-sev_pin_memory, I believe we concluded that double pinning was safe.
+Nate's early implementation did the reparenting, but I pushed for the
+simplification since it made the locking a bit hairy.
 >
->         if (range->addr > ULONG_MAX || range->size > ULONG_MAX)
->                 return -EINVAL;
->
-> @@ -1252,6 +1265,10 @@ int svm_unregister_enc_region(struct kvm *kvm,
->         struct enc_region *region;
->         int ret;
->
-> +       /* If kvm is mirroring encryption context it isn't responsible for it */
-> +       if (is_mirroring_enc_context(kvm))
-> +               return -ENOTTY;
-> +
->         mutex_lock(&kvm->lock);
->
->         if (!sev_guest(kvm)) {
-> @@ -1282,6 +1299,65 @@ int svm_unregister_enc_region(struct kvm *kvm,
->         return ret;
->  }
->
-> +int svm_vm_copy_asid_to(struct kvm *kvm, unsigned int mirror_kvm_fd)
-> +{
-> +       struct file *mirror_kvm_file;
-> +       struct kvm *mirror_kvm;
-> +       struct kvm_sev_info *mirror_kvm_sev;
-> +       unsigned int asid;
-> +       int ret;
-> +
-> +       if (!sev_guest(kvm))
-> +               return -ENOTTY;
-
-You definitely don't want this: this is the function that turns the vm
-into an SEV guest (marks SEV as active).
-
-(Not an issue with this patch, but a broader issue) I believe
-sev_guest lacks the necessary acquire/release barriers on sev->active,
-since it's called without the kvm lock. I mean, it's x86, so the only
-one that's going to hose you is the compiler for this type of access.
-There should be an smp_rmb() after the access in sev_guest and an
-smp_wmb() before the access in SEV_GUEST_INIT and here.
->
-> +
-> +       mutex_lock(&kvm->lock);
-> +
-> +       /* Mirrors of mirrors should work, but let's not get silly */
-> +       if (is_mirroring_enc_context(kvm)) {
-> +               ret = -ENOTTY;
-> +               goto failed;
-> +       }
-> +
-> +       mirror_kvm_file = fget(mirror_kvm_fd);
-> +       if (!kvm_is_kvm(mirror_kvm_file)) {
-> +               ret = -EBADF;
-> +               goto failed;
-> +       }
-> +
-> +       mirror_kvm = mirror_kvm_file->private_data;
-> +
-> +       if (mirror_kvm == kvm || is_mirroring_enc_context(mirror_kvm)) {
-Just check if the source is an sev_guest and that the destination is
-not an sev_guest.
-
-I reviewed earlier incarnations of this, and think the high-level idea
-is sound. I'd like to see kvm-selftests for this patch, and plan on
-collaborating with AMD to help make those happen.
+> > +     if (is_mirroring_enc_context(kvm)) {
+> > +             ret = -ENOTTY;
+> > +             goto failed;
+> > +     }
+> > +
