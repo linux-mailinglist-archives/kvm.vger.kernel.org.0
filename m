@@ -2,71 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 866DE3257B0
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:32:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDFE03257D4
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 21:37:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234410AbhBYUbk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 15:31:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43682 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234087AbhBYUab (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 15:30:31 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 56FF964F32;
-        Thu, 25 Feb 2021 20:29:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614284990;
-        bh=fmzexBSIfWb47JkIPrZNPmcrb7SH3FBEATmvFBYUfD0=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=oqcux6qN0uI6LifZYaDpDyY+9BABnFbWj1andck/5elvftav0Kj99uVq2h7CUO+XE
-         2VjXZrPkpo8h7+fxHDUlec+DQ2iZzhvivH66DSJeE/c2mkFFdS96Y+hzOlithb4fz2
-         YFScToiuY6SoaSPSTcYdLvwttH5sK7XnuxhAHckVIyvW2xgA0tjCvch9XMFxDv2UL4
-         f9lmwLr5U8Q/MLov0iaOzWfyvaQpyc9sYxa4GCN3q3d9CQheiAGaVv3ZCrwr6PktSG
-         /DghOU+/gxQ6rkyq+b9M1n6KWCTmOkYb5WfN6sWhUu6lma3U5e5j39icHy9pMJumlF
-         r8vBrjtWAEdag==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 43F59609F5;
-        Thu, 25 Feb 2021 20:29:50 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: features, fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210225143333-mutt-send-email-mst@kernel.org>
-References: <20210225143333-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210225143333-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 16c10bede8b3d8594279752bf53153491f3f944f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ffc1759676bed0bff046427dd7d00cb68660190d
-Message-Id: <161428499022.20173.13248373429390310648.pr-tracker-bot@kernel.org>
-Date:   Thu, 25 Feb 2021 20:29:50 +0000
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        abaci-bugfix@linux.alibaba.com, abaci@linux.alibaba.com,
-        anders.roxell@linaro.org, arnd@arndb.de,
-        aruna.ramakrishna@oracle.com, colin.xu@intel.com, david@redhat.com,
-        dongli.zhang@oracle.com, edumazet@google.com, elic@nvidia.com,
-        gustavoars@kernel.org, jasowang@redhat.com, joe.jin@oracle.com,
-        joseph.qi@linux.alibaba.com, linux@roeck-us.net,
-        mathias.crombez@faurecia.com, mst@redhat.com,
-        naresh.kamboju@linaro.org, parav@nvidia.com, sgarzare@redhat.com,
-        stable@vger.kernel.org, syzkaller@googlegroups.com,
-        tiantao6@hisilicon.com, vasyl.vavrychuk@opensynergy.com,
-        xianting_tian@126.com
+        id S234234AbhBYUhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 15:37:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48567 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234109AbhBYUez (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Feb 2021 15:34:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614285194;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qrF+Ni2Yvil2kIq/7VfKLEGp6/CXFjij6cAq88xAmxE=;
+        b=fOLV0jvcXfr2ilU4CWZfdXDJqRJPaDuXFph5nK4Z6nKNN+wpn3NzfsMwWM5QOuUtuU/f6s
+        YyeuLk2JYtia3WAo2GtOgmbB/gsXt+H36Ns005a/OVlNq18VYPJPqXDBjzwXKUliOgm5Jm
+        kyulFCL5jyHjgA2i/N4WP/m8V5mxxYw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-569-S-hGoYDlMWyb0M8rGTofJg-1; Thu, 25 Feb 2021 15:33:12 -0500
+X-MC-Unique: S-hGoYDlMWyb0M8rGTofJg-1
+Received: by mail-wm1-f70.google.com with SMTP id b201so2701107wmb.9
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 12:33:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qrF+Ni2Yvil2kIq/7VfKLEGp6/CXFjij6cAq88xAmxE=;
+        b=Rp3g5EOYxw5Xln+fspaXQTUgO2TldwY6r7JeZO3ZQCdU/6l4DRSrbP5iioRHIRziTp
+         a3gq+98pVNKqQCENPqKhTmAPFbfJbP00v92xU9qTz19ETUgV8vdkUGK4tJ8qJqCNwioB
+         57Pg2OMCRakZQ4y1bOTwHPJbg4mG23mhyQbRGzffkIuxXpM3jpgCx6iyve2iRqoJmLyz
+         aV9pICOWIXe8132SN8uos4UjdMy2tloSrR4PGU/KWpeXn/HFhoGep3vLOeb7jCt9B9f5
+         S9s7G1SkPvPSH5DERNrMfknDRJX/Cnu3qKGHiP6l6dJGx7yvjYWsgvPm2RCAnY+YabxT
+         A2ug==
+X-Gm-Message-State: AOAM532vF5+/lbPa5CrI3LlxJW5klS80ksWtVCXTEFEoTHMQwKVNn/ut
+        A8M0ldrg6WI0btyFgJZDrPaHUAQ6sk1WrU+gEkT3/pI21k/2L0mHscxJGs3Q20iZecPAmv5nVhL
+        sOswYS6F6DS3e
+X-Received: by 2002:adf:c54a:: with SMTP id s10mr5332871wrf.58.1614285191799;
+        Thu, 25 Feb 2021 12:33:11 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyiUc9+l4ySZeqyFxoKprpfooBMz8zXXybLQPxr5oMIikAdNnqwvHSl61IP+s6ufodA9vyIZQ==
+X-Received: by 2002:adf:c54a:: with SMTP id s10mr5332864wrf.58.1614285191591;
+        Thu, 25 Feb 2021 12:33:11 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id k15sm8569395wmj.6.2021.02.25.12.33.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Feb 2021 12:33:10 -0800 (PST)
+Subject: Re: [RFC] KVM: x86: Support KVM VMs sharing SEV context
+To:     Ashish Kalra <ashish.kalra@amd.com>,
+        James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     natet@google.com, brijesh.singh@amd.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rientjes@google.com,
+        seanjc@google.com, srutherford@google.com, thomas.lendacky@amd.com,
+        x86@kernel.org, Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        DOV MURIK <Dov.Murik1@il.ibm.com>
+References: <20210224085915.28751-1-natet@google.com>
+ <7cb132ce522728f7689618832a65e31e37788201.camel@HansenPartnership.com>
+ <20210225181812.GA5046@ashkalra_ubuntu_server>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b885c283-ceb3-b9bc-516b-c28771652a7c@redhat.com>
+Date:   Thu, 25 Feb 2021 21:33:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <20210225181812.GA5046@ashkalra_ubuntu_server>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Thu, 25 Feb 2021 14:33:33 -0500:
+On 25/02/21 19:18, Ashish Kalra wrote:
+> I do believe that some of these alternative SEV live migration support
+> or Migration helper (MH) solutions will still use SEV PSP migration for
+> migrating the MH itself, therefore the SEV live migration patches
+> (currently v10 posted upstream) still make sense and will be used.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+I think that since the migration helper (at least for SEV, not -ES) is 
+part of the attested firmware, it can be started on the destination 
+before the rest of the VM.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ffc1759676bed0bff046427dd7d00cb68660190d
+Paolo
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
