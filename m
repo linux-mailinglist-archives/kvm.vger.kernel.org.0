@@ -2,125 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8CD2325727
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 20:57:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2C9E3256BB
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 20:32:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbhBYT45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 14:56:57 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44766 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234592AbhBYTzR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 14:55:17 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11PJoGkB141068;
-        Thu, 25 Feb 2021 19:54:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2020-01-29;
- bh=VjXJGwSMw8GdU9G0Fstg4nGMaqu6u6fs9lwl/KkMb+U=;
- b=zjNqg/z3eHDEuyaVQBL4wTrpyAghzVjctJ0+fhqoYN28oq33+GORer8uksDj7DFN6r23
- PsEshD8JyOJtp+XiLBz3CKFis5BIrfu4hQC3TfyFeTFMPz52gJzEd6JQpOdLFWNhTEHv
- SepPlAVleLI6r0hSZqdb/kewy17O4QvmOK8DfDUIfYqn7dgFpCuW2rR8xjylNIWaZr6J
- V6rdotgXyYrLldyOh8LhdRaQp/Yyd3bI7rLmaj8qtNnJ2oeBN8P89j8RxswPWBwAlJxL
- cn8Sr5Rvnc4EgquVMNh65Ct+M11JPL54B+aBVVTB7NhFSVWdPlFVL/NKvD0VSxhyYJ2C 5Q== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 36tsur7rbs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Feb 2021 19:54:25 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11PJoFFp141810;
-        Thu, 25 Feb 2021 19:54:24 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 36uc6ux8e7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Feb 2021 19:54:24 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 11PJsNGZ028249;
-        Thu, 25 Feb 2021 19:54:23 GMT
-Received: from ca-dev63.us.oracle.com (/10.211.8.221)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 25 Feb 2021 11:54:22 -0800
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH] vfio/type1: fix unmap all on ILP32
-Date:   Thu, 25 Feb 2021 11:25:02 -0800
-Message-Id: <1614281102-230747-1-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Proofpoint-IMR: 1
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9906 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 malwarescore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102250150
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9906 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 mlxscore=0 malwarescore=0
- clxscore=1015 phishscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102250150
+        id S234612AbhBYTcJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 14:32:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33286 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234796AbhBYT3e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 14:29:34 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F86FC061788
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 11:28:54 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id l7so76612pfd.3
+        for <kvm@vger.kernel.org>; Thu, 25 Feb 2021 11:28:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=eg2T+GAall58PHie1pc/1M6D3b3c5ZA2F5gwbRjHzXI=;
+        b=XAH5DbX0NmfVOZxrBQ+uQ636JLbgHKyf211mfe0oio2b5HL4OwBHllfrayb5aPqFAn
+         nWNdqykSp2SPQx8Gx5x6frsT1jZ7KF1iNTaqjfzHL6P/RXcS9j0n0kFaXHlVnybSjAmr
+         T1sA3Q5mtuCtDlkBw7zl9DfLWWrlAGvpl4t6ID1wDcTcdcLipJRr/R+Yj5j6iqpt21sw
+         zKLoW2cRYxfCfjqcqsZD9GL+j3uWv5aUfKAsQ8t9kBvHkV5GMMwUeXIPqFKbR0oElrRx
+         m9ja9x2qv+DAe51QHMjWLI/k1N14adZPcUKSnBErPA5m/lSfEBsTmqVhKa5otSB0NDb0
+         fhQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=eg2T+GAall58PHie1pc/1M6D3b3c5ZA2F5gwbRjHzXI=;
+        b=YJ/PWzMemv5TfF59NzJPuG1yJ0fPQwppyIj4Yq0fyBlAKJyTLtw07NiBnHmbJXiTZF
+         JD1rprN15Fwf5fBUOA3aofJorh9OoZKxsJ9R44+PPxtQ8c/Xm11vWHSO9k84mCLtrYaP
+         snNPDuy1WHjYRwNDGUHRfJ+Pd0I4eDHJuKuFKDIu/Qk6xQUoqgR+JL/TjFQW/AclY7MH
+         O6UxA4qjJK3W71AnHJ89qv2Pr6FnWUwsqulZwx7iR/j35bBlkn7ZKU1w1c7yWXSYHJJ9
+         MNL8ocWKCmfIycnxHaf2rguzGbGLwRqvC3kStV76XJQpNlUdaaQsPvgg7Az+Qv/i/c7S
+         RUNA==
+X-Gm-Message-State: AOAM530rMr6XZxkTwUHzBY3tfYJ/LGbwAnNSfPeU2yrORDwYr94OQe9D
+        evjfCCqS8XCtWWbF761ZxeuLEw==
+X-Google-Smtp-Source: ABdhPJyXQztSjriJUwr+YzP+mFraH1PK/i2Qee5tybeVsmvbD3+TQKAmth+5mPNoDOkUQyEtlsqkJg==
+X-Received: by 2002:a63:6705:: with SMTP id b5mr4351009pgc.165.1614281333590;
+        Thu, 25 Feb 2021 11:28:53 -0800 (PST)
+Received: from google.com ([2620:0:1008:10:9474:84b:e7ae:d5fc])
+        by smtp.gmail.com with ESMTPSA id gj24sm6736615pjb.4.2021.02.25.11.28.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Feb 2021 11:28:52 -0800 (PST)
+Date:   Thu, 25 Feb 2021 11:28:46 -0800
+From:   Vipin Sharma <vipinsh@google.com>
+To:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc:     thomas.lendacky@amd.com, tj@kernel.org, brijesh.singh@amd.com,
+        jon.grimm@amd.com, eric.vantassell@amd.com, pbonzini@redhat.com,
+        hannes@cmpxchg.org, frankja@linux.ibm.com, borntraeger@de.ibm.com,
+        corbet@lwn.net, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        gingell@google.com, rientjes@google.com, dionnaglaze@google.com,
+        kvm@vger.kernel.org, x86@kernel.org, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 1/2] cgroup: sev: Add misc cgroup controller
+Message-ID: <YDf6bpSxX6I5xdqZ@google.com>
+References: <20210218195549.1696769-1-vipinsh@google.com>
+ <20210218195549.1696769-2-vipinsh@google.com>
+ <YDVIdycgk8XL0Zgx@blackbook>
+ <YDcuQFMbe5MaatBe@google.com>
+ <YDdzcfLxsCeYxLNG@blackbook>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YDdzcfLxsCeYxLNG@blackbook>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some ILP32 architectures support mapping a 32-bit vaddr within a 64-bit
-iova space.  The unmap-all code uses 32-bit SIZE_MAX as an upper bound on
-the extent of the mappings within iova space, so mappings above 4G cannot
-be found and unmapped.  Use U64_MAX instead, and use u64 for size variables.
-This also fixes a static analysis bug found by the kernel test robot running
-smatch for ILP32.
+On Thu, Feb 25, 2021 at 10:52:49AM +0100, Michal Koutný wrote:
+> On Wed, Feb 24, 2021 at 08:57:36PM -0800, Vipin Sharma <vipinsh@google.com> wrote:
+> > This function is meant for hot unplug functionality too.
+> Then I'm wondering if the current form is sufficient, i.e. the generic
+> controller can hardly implement preemption but possibly it should
+> prevent any additional charges of the resource. (Or this can be
+> implemented the other subsystem and explained in the
+> misc_cg_set_capacity() docs.)
 
-Fixes: 0f53afa12bae ("vfio/type1: unmap cleanup")
-Fixes: c19650995374 ("vfio/type1: implement unmap all")
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/vfio_iommu_type1.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+My approach here is that it is the responsibility of the caller to:
+1. Check the return value and proceed accordingly.
+2. Ideally, let all of the usage be 0 before deactivating this resource
+   by setting capacity to 0
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 6cf1dad..b1be0a6 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -181,7 +181,7 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- }
- 
- static struct rb_node *vfio_find_dma_first_node(struct vfio_iommu *iommu,
--						dma_addr_t start, size_t size)
-+						dma_addr_t start, u64 size)
- {
- 	struct rb_node *res = NULL;
- 	struct rb_node *node = iommu->dma_list.rb_node;
-@@ -1184,7 +1184,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	int ret = -EINVAL, retries = 0;
- 	unsigned long pgshift;
- 	dma_addr_t iova = unmap->iova;
--	unsigned long size = unmap->size;
-+	u64 size = unmap->size;
- 	bool unmap_all = unmap->flags & VFIO_DMA_UNMAP_FLAG_ALL;
- 	bool invalidate_vaddr = unmap->flags & VFIO_DMA_UNMAP_FLAG_VADDR;
- 	struct rb_node *n, *first_n;
-@@ -1200,14 +1200,12 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
- 	if (unmap_all) {
- 		if (iova || size)
- 			goto unlock;
--		size = SIZE_MAX;
--	} else if (!size || size & (pgsize - 1)) {
-+		size = U64_MAX;
-+	} else if (!size || size & (pgsize - 1) ||
-+		   iova + size - 1 < iova || size > SIZE_MAX) {
- 		goto unlock;
- 	}
- 
--	if (iova + size - 1 < iova || size > SIZE_MAX)
--		goto unlock;
--
- 	/* When dirty tracking is enabled, allow only min supported pgsize */
- 	if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
- 	    (!iommu->dirty_page_tracking || (bitmap->pgsize != pgsize))) {
--- 
-1.8.3.1
+But I see your point that it makes sense for this call to always
+succeed. I think I can simplify this function now to just have xchg() (for
+memory barrier) so that new value is immediately reflected in
+misc_cg_try_charge() and no new charges will succeed.
 
+Is the above change good?
+
+> 
+> > Just to be on the same page are you talking about adding an events file
+> > like in pids?
+> Actually, I meant just the kernel log message. As it's the simpler part
+> and even pid events have some inconsistencies wrt hierarchical
+> reporting.
+
+I see, thanks, I will add some log messages, 
+
+if (new_usage > res->max || new_usage > misc_res_capacity[type)) {
+  pr_info("cgroup: charge rejected by misc controller for %s resource in ",
+          misc_res_name[type]);
+  pr_cont_cgroup_path(i->css.cgroup);
+  pr_cont("\n");
+  ...
+}
+
+Only difference compared to pids will be that here logs will be printed
+for every failure.
+
+I was thinking to add more information in the log like what is the current
+limits (max and capacity) and what new usage would have been. Will there
+be any objection to extra information?
+
+> 
+> > However, if I take reference at the first charge and remove reference at
+> > last uncharge then I can keep the ref count in correct sync.
+> I see now how it works. I still find it a bit complex. What about making
+> misc_cg an input parameter and making it the callers responsibility to
+> keep a reference? (Perhaps with helpers for the most common case.)
+
+Yeah, that can simplify the misc controller, I will have to add couple of
+more helper APIs for callers having simple use cases. I will make this
+change.
+
+Thanks
+Vipin
