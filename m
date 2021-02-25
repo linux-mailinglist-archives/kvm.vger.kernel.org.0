@@ -2,100 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B65132555A
-	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 19:21:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 325DF325588
+	for <lists+kvm@lfdr.de>; Thu, 25 Feb 2021 19:32:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232631AbhBYSUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Feb 2021 13:20:38 -0500
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:14159 "EHLO
-        hqnvemgate26.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232350AbhBYSU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Feb 2021 13:20:29 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B6037ea440000>; Thu, 25 Feb 2021 10:19:48 -0800
-Received: from HQMAIL101.nvidia.com (172.20.187.10) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 25 Feb
- 2021 18:19:48 +0000
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.103)
- by HQMAIL101.nvidia.com (172.20.187.10) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2 via Frontend Transport; Thu, 25 Feb 2021 18:19:47 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UKNmxKRQd0SDm/PH+3hcBwoEh6Zt+FGXgOv94qWkqSViZRSGkWgJ0Qfqk5xopqTiKjMcavNd4CjrdX6OZNnrD5dcZ4+dEMQpDtl7xdBQd8OZsLCoavM6IhkYbLt7+d0/ROc/3akTuGw2ka/mit9sWnkWPYBwqXPBFTLZl5OK/GfkBYWHxYU+6XZWZuDzJxXS2cV5L5h/mJALpnnmhzBCkFhPy3OwYGRaKlkk3C3IqACWWM5btEKCqtc6tBXfOCk/EtZhvbXUru5F7bDyKZOSSc7WL/4Z7uMmZqpV6NFRPKwPqPlv1hNe94VBYkF0ZWiCCqQrAenw9wth5/WZgQw0Og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kw6k5W19b2WUMuWfUHT7yBCBQx1aOPwjzT6MwRdeaZs=;
- b=jwDAv40AcPYHIeOnZKQ5jLF99+AGi8cEP+2HOpSGM8vrizpv5gznMmeAZnGoheVP5PF1+icOI0YjXSF4wMTgfkfYQq8OMk5Wyn/0Lvm8n90v/5prWUTzSi64RcLxUC0aQkXMlBM5suql/oLF3pTGWdLaHiDPq3t5S8qrxuWzCvziaklTPzmTcrvNxuxrN9kFzZBjBmcnblOKLrpna0Owz1u1/cEuxRPBAr7ViRirLI4U5s8LfSkQP9wM11D0V+zuNVi8K7VzQ9opo8yml1ocNydian+GeK+0oZ0d/ElrgzaBRNrni2L03AD4YbE6Fn2JJ5hYkPJn/cALaeWt1FDIKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com (10.255.76.76) by
- DM6PR12MB4498.namprd12.prod.outlook.com (20.180.252.145) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3890.19; Thu, 25 Feb 2021 18:19:47 +0000
-Received: from DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
- ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3868.033; Thu, 25 Feb 2021
- 18:19:47 +0000
-Date:   Thu, 25 Feb 2021 14:19:45 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Peter Xu <peterx@redhat.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>, <cohuck@redhat.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 10/10] vfio/type1: Register device notifier
-Message-ID: <20210225181945.GT4247@nvidia.com>
-References: <161401167013.16443.8389863523766611711.stgit@gimli.home>
- <161401275279.16443.6350471385325897377.stgit@gimli.home>
- <20210222175523.GQ4247@nvidia.com>
- <20210224145508.1f0edb06@omen.home.shazbot.org>
- <20210225002216.GQ4247@nvidia.com> <20210225175457.GD250483@xz-x1>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210225175457.GD250483@xz-x1>
-X-ClientProxiedBy: MN2PR19CA0012.namprd19.prod.outlook.com
- (2603:10b6:208:178::25) To DM6PR12MB3834.namprd12.prod.outlook.com
- (2603:10b6:5:14a::12)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mlx.ziepe.ca (142.162.115.133) by MN2PR19CA0012.namprd19.prod.outlook.com (2603:10b6:208:178::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19 via Frontend Transport; Thu, 25 Feb 2021 18:19:46 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lFLEn-000Bcs-2q; Thu, 25 Feb 2021 14:19:45 -0400
-X-Header: ProcessedBy-CMR-outbound
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1614277188; bh=Kw6k5W19b2WUMuWfUHT7yBCBQx1aOPwjzT6MwRdeaZs=;
-        h=ARC-Seal:ARC-Message-Signature:ARC-Authentication-Results:Date:
-         From:To:CC:Subject:Message-ID:References:Content-Type:
-         Content-Disposition:In-Reply-To:X-ClientProxiedBy:MIME-Version:
-         X-MS-Exchange-MessageSentRepresentingType:X-Header;
-        b=SLoAfl8i9N05q7M2KzahlvVrg80/DvexHxGA+Oj1TX1foELF8v8cIGnfxMtcrrXgO
-         XXqOeky7GF+k/JpjfuHHXy4fW5C7qDefLdrR6c6LaHlZIX9e1JPgSRzmUeoBEf2Q47
-         6zfhwRjBixMLgI0gbtfsH+RboX9M9v3UUNEQpWRiYsWChh45q2hUjV+mdrrpMFV00m
-         r12aP9OKCgBkf8hr2YiJpfTDuznmr5+F1+rBEIj3Sy4UsdfwNFL1aan2DpZxvYIMB3
-         eUwmMeB3tJC3UTnHuPNn+Ie7SLc4vKrOSaM4H11sAnPSQNEqlryubRRrERuaF0ayEO
-         RvHTO0nBeN9pA==
+        id S233604AbhBYSck (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Feb 2021 13:32:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59588 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233637AbhBYSas (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Feb 2021 13:30:48 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3091E64F03;
+        Thu, 25 Feb 2021 18:30:06 +0000 (UTC)
+Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94)
+        (envelope-from <maz@kernel.org>)
+        id 1lFLOm-00FuZb-5g; Thu, 25 Feb 2021 18:30:04 +0000
+Date:   Thu, 25 Feb 2021 18:30:03 +0000
+Message-ID: <87wnuwyp90.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Yanan Wang <wangyanan55@huawei.com>, kvm@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+Subject: Re: [RFC PATCH 1/4] KVM: arm64: Move the clean of dcache to the map handler
+In-Reply-To: <43f05bfa-6b8b-a7d3-4355-0f1486aa6634@arm.com>
+References: <20210208112250.163568-1-wangyanan55@huawei.com>
+        <20210208112250.163568-2-wangyanan55@huawei.com>
+        <871rd41ngf.wl-maz@kernel.org>
+        <43f05bfa-6b8b-a7d3-4355-0f1486aa6634@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 62.31.163.78
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, wangyanan55@huawei.com, kvm@vger.kernel.org, catalin.marinas@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 12:54:57PM -0500, Peter Xu wrote:
- 
-> I can't say I fully understand the whole rational behind 5cbf3264bc71, but that
-> commit still sounds reasonable to me, since I don't see why VFIO cannot do
-> VFIO_IOMMU_MAP_DMA upon another memory range that's neither anonymous memory
-> nor vfio mapped MMIO range.
+On Thu, 25 Feb 2021 17:39:00 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2/25/21 9:55 AM, Marc Zyngier wrote:
+> > Hi Yanan,
+> >
+> > On Mon, 08 Feb 2021 11:22:47 +0000,
+> > Yanan Wang <wangyanan55@huawei.com> wrote:
+> >> We currently uniformly clean dcache in user_mem_abort() before calling the
+> >> fault handlers, if we take a translation fault and the pfn is cacheable.
+> >> But if there are concurrent translation faults on the same page or block,
+> >> clean of dcache for the first time is necessary while the others are not.
+> >>
+> >> By moving clean of dcache to the map handler, we can easily identify the
+> >> conditions where CMOs are really needed and avoid the unnecessary ones.
+> >> As it's a time consuming process to perform CMOs especially when flushing
+> >> a block range, so this solution reduces much load of kvm and improve the
+> >> efficiency of creating mappings.
+> > That's an interesting approach. However, wouldn't it be better to
+> > identify early that there is already something mapped, and return to
+> > the guest ASAP?
+> 
+> Wouldn't that introduce overhead for the common case, when there's
+> only one VCPU that faults on an address? For each data abort caused
+> by a missing stage 2 entry we would now have to determine if the IPA
+> isn't already mapped and that means walking the stage 2 tables.
 
-It is not so much it can't, more that it doesn't and doesn't need to.
+The problem is that there is no easy to define "common case". It all
+depends on what you are running in the guest.
 
-> In those cases, vm_pgoff namespace defined by vfio may not be true
-> anymore, iiuc.
+> Or am I mistaken and either:
+> 
+> (a) The common case is multiple simultaneous translation faults from
+> different VCPUs on the same IPA. Or
+> 
+> (b) There's a fast way to check if an IPA is mapped at stage 2 and
+> the overhead would be negligible.
 
-Since this series is proposing linking the VMA to an address_space all
-the vm_pgoffs must be in the same namespace
+Checking that something is mapped is simple enough: walk the S2 PT (in
+SW or using AT/PAR), and return early if there is *anything*. You
+already have taken the fault, which is the most expensive part of the
+handling.
 
-> Or does it mean that we don't want to allow VFIO dma to those unknown memory
-> backends, for some reason?
+> 
+> >
+> > Can you quantify the benefit of this patch alone?
 
-Correct. VFIO can map into the IOMMU PFNs it can get a reference
-to. pin_user_pages() works for the majority, special VFIO VMAs cover
-the rest, and everthing else must be blocked for security.
+And this ^^^ part is crucial to evaluating the merit of this patch,
+specially outside of the micro-benchmark space.
 
-Jason
+> >
+> >> Signed-off-by: Yanan Wang <wangyanan55@huawei.com>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_mmu.h | 16 --------------
+> >>  arch/arm64/kvm/hyp/pgtable.c     | 38 ++++++++++++++++++++------------
+> >>  arch/arm64/kvm/mmu.c             | 14 +++---------
+> >>  3 files changed, 27 insertions(+), 41 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> >> index e52d82aeadca..4ec9879e82ed 100644
+> >> --- a/arch/arm64/include/asm/kvm_mmu.h
+> >> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> >> @@ -204,22 +204,6 @@ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+> >>  	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+> >>  }
+> >>  
+> >> -static inline void __clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> >> -{
+> >> -	void *va = page_address(pfn_to_page(pfn));
+> >> -
+> >> -	/*
+> >> -	 * With FWB, we ensure that the guest always accesses memory using
+> >> -	 * cacheable attributes, and we don't have to clean to PoC when
+> >> -	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+> >> -	 * PoU is not required either in this case.
+> >> -	 */
+> >> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> >> -		return;
+> >> -
+> >> -	kvm_flush_dcache_to_poc(va, size);
+> >> -}
+> >> -
+> >>  static inline void __invalidate_icache_guest_page(kvm_pfn_t pfn,
+> >>  						  unsigned long size)
+> >>  {
+> >> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> >> index 4d177ce1d536..2f4f87021980 100644
+> >> --- a/arch/arm64/kvm/hyp/pgtable.c
+> >> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> >> @@ -464,6 +464,26 @@ static int stage2_map_set_prot_attr(enum kvm_pgtable_prot prot,
+> >>  	return 0;
+> >>  }
+> >>  
+> >> +static bool stage2_pte_cacheable(kvm_pte_t pte)
+> >> +{
+> >> +	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> >> +	return memattr == PAGE_S2_MEMATTR(NORMAL);
+> >> +}
+> >> +
+> >> +static void stage2_flush_dcache(void *addr, u64 size)
+> >> +{
+> >> +	/*
+> >> +	 * With FWB, we ensure that the guest always accesses memory using
+> >> +	 * cacheable attributes, and we don't have to clean to PoC when
+> >> +	 * faulting in pages. Furthermore, FWB implies IDC, so cleaning to
+> >> +	 * PoU is not required either in this case.
+> >> +	 */
+> >> +	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> >> +		return;
+> >> +
+> >> +	__flush_dcache_area(addr, size);
+> >> +}
+> >> +
+> >>  static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> >>  				      kvm_pte_t *ptep,
+> >>  				      struct stage2_map_data *data)
+> >> @@ -495,6 +515,10 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> >>  		put_page(page);
+> >>  	}
+> >>  
+> >> +	/* Flush data cache before installation of the new PTE */
+> >> +	if (stage2_pte_cacheable(new))
+> >> +		stage2_flush_dcache(__va(phys), granule);
+> >> +
+> >>  	smp_store_release(ptep, new);
+> >>  	get_page(page);
+> >>  	data->phys += granule;
+> >> @@ -651,20 +675,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >>  	return ret;
+> >>  }
+> >>  
+> >> -static void stage2_flush_dcache(void *addr, u64 size)
+> >> -{
+> >> -	if (cpus_have_const_cap(ARM64_HAS_STAGE2_FWB))
+> >> -		return;
+> >> -
+> >> -	__flush_dcache_area(addr, size);
+> >> -}
+> >> -
+> >> -static bool stage2_pte_cacheable(kvm_pte_t pte)
+> >> -{
+> >> -	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> >> -	return memattr == PAGE_S2_MEMATTR(NORMAL);
+> >> -}
+> >> -
+> >>  static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> >>  			       enum kvm_pgtable_walk_flags flag,
+> >>  			       void * const arg)
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index 77cb2d28f2a4..d151927a7d62 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -609,11 +609,6 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+> >>  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+> >>  }
+> >>  
+> >> -static void clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> >> -{
+> >> -	__clean_dcache_guest_page(pfn, size);
+> >> -}
+> >> -
+> >>  static void invalidate_icache_guest_page(kvm_pfn_t pfn, unsigned long size)
+> >>  {
+> >>  	__invalidate_icache_guest_page(pfn, size);
+> >> @@ -882,9 +877,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>  	if (writable)
+> >>  		prot |= KVM_PGTABLE_PROT_W;
+> >>  
+> >> -	if (fault_status != FSC_PERM && !device)
+> >> -		clean_dcache_guest_page(pfn, vma_pagesize);
+> >> -
+> >>  	if (exec_fault) {
+> >>  		prot |= KVM_PGTABLE_PROT_X;
+> >>  		invalidate_icache_guest_page(pfn, vma_pagesize);
+> > It seems that the I-side CMO now happens *before* the D-side, which
+> > seems odd. What prevents the CPU from speculatively fetching
+> > instructions in the interval? I would also feel much more confident if
+> > the two were kept close together.
+> 
+> I noticed yet another thing which I don't understand. When the CPU
+> has the ARM64_HAS_CACHE_DIC featue (CTR_EL0.DIC = 1), which means
+> instruction invalidation is not required for data to instruction
+> coherence, we still do the icache invalidation. I am wondering if
+> the invalidation is necessary in this case.
+
+It isn't, and DIC is already taken care of in the leaf functions (see
+__flush_icache_all() and invalidate_icache_range()).
+
+> If it's not, then I think it's correct (and straightforward) to move
+> the icache invalidation to stage2_map_walker_try_leaf() after the
+> dcache clean+inval and make it depend on the new mapping being
+> executable *and* !cpus_have_const_cap(ARM64_HAS_CACHE_DIC).
+
+It would also need to be duplicated on the permission fault path.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
