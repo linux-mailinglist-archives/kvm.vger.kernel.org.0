@@ -2,93 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2328326A0B
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 23:35:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DB3A326A31
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 23:48:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbhBZWf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 17:35:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42766 "EHLO
+        id S230099AbhBZWrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 17:47:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbhBZWfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 17:35:25 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051BEC06174A
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 14:34:44 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id t5so132617pjd.0
-        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 14:34:44 -0800 (PST)
+        with ESMTP id S229999AbhBZWrp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 17:47:45 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B8EC061574
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 14:47:05 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id a4so7060748pgc.11
+        for <kvm@vger.kernel.org>; Fri, 26 Feb 2021 14:47:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Joz7f24QnnxewLllirX/ZIoWPXA5ldI5c4mM+WeSQyg=;
-        b=WmfTC+QGWmT8QNUXUUaILVKCS+3acc5vgFONkWE2IElpeHR3G77DVMok7u6a/xbKP3
-         aydPpJ00Fu+t44++6od8vIb/pfcofOvzGmXcEBAl7e+O3DJgJuUb0Yc3qb9oyxHTdPbH
-         oJ3Bec+m2sVN7ztsVWJV1bbeO9SHpRI93wZFQ8+N8z5xZKf2P0CBYKoMq4l+6dvbqg99
-         I59z710bYY8p0riwzPCtFTRaVViZmG8TslRjP0h5TSiRO9k73kWibcNzs/duXZ38sdHU
-         sNQNE+YsYsTMfMTiLzdJOWH4MzjUC8DEEhPU40HHLhm7zVmJ8R2tSmonFEpYge5CK/L0
-         Sgaw==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=FWfKwt6kX8wvyCzXU6S1wzKG11gxPLhSQUXPm/zfyRo=;
+        b=BFoe7wL57k1glMCiP+TaTWRj6VJ5zCjEDlz8+lad9Fzz+M+mlAFI6XqQD6dF1v9HlB
+         ZOfON2h9r/7U4alRF/PMshKlZ+ONIj+3+l9DUuT2dl/2+r+owhnr00JhXlqTR7q2mKeu
+         ixt7ZQ50544Lgn3fQfJJsekG3jMOhzTHEAKPCN0L0iyDauUgjvQDcn+8/TKnXJtK1rkt
+         iHs9d8cDsU3YyRxnJVhEFn2qFjsOVO0813bQXS2YeUDtPGT7Je6Quz8ZBee4nbdyIjDF
+         A5Gsq92iZpx4cAspVOBYQKN4x1glYF9VrpoLum8/VKGhsW+5kzXLK9Sa6Zzihj9c6ine
+         6mqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Joz7f24QnnxewLllirX/ZIoWPXA5ldI5c4mM+WeSQyg=;
-        b=MN4rJCs0eyTnsIP62+XJz3N8g+44Jz0JWLFxocfi34HofqeK65dYdnoiCDRkjYYFvy
-         xMOkNfzJqwxEw9K4vzf7V8nCGZqtHUDsJMi59jYXM33g46aHFqvtGZSfYWvan1rK1u8f
-         nCZrbeQDlq0r8EJvMk/9ll/LGHMtLwk/94w5s+WlZuhP5bsV0Z0CfsbHPnf8KaSM6Cl6
-         dLoXWBJtHC3vF4f+glTXE1RjTO9wLnrKMNB4Aw9bCyNIZd0hIbzwIFrzppdcgTLqcsmm
-         nvyLJe0x3NTiA5jtzd2w6KwmpRgoAjLkpqOgVVOoniuM7U0mT8mgs/w15t1Tr87mfVKC
-         +KWw==
-X-Gm-Message-State: AOAM531ihZMYKaBJjJ7IBhXqa2pfSUhnNFJfd9jwoXOz5Urr7HdrKAFI
-        uFwKw3YU1d3n6KwsnmXlWDBp8g==
-X-Google-Smtp-Source: ABdhPJyIAprGG60fuQNZQv79X6q90PZvn6mAwuuY4iaLsqStXaV7kV76EJv+JTNOEvC2Krm6nwdIow==
-X-Received: by 2002:a17:90a:6383:: with SMTP id f3mr5437829pjj.14.1614378884331;
-        Fri, 26 Feb 2021 14:34:44 -0800 (PST)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=FWfKwt6kX8wvyCzXU6S1wzKG11gxPLhSQUXPm/zfyRo=;
+        b=VtpGg6yPdnq0EWZO8wtV5AbyYGf4Sw43E2rSYp8jlpRqLz+HshY4ea+zFkBS/NYesh
+         kuR0zD7MOURPQxhs9rUNdeDUg07rEmKfWciLXi738Y/T3SPBAUb700QNgJYI10VHSx0f
+         s/lcsklPXLid+25R//GxbdEiRzrNUOoXSl7CLPvSEPN9xd5vYkWRVmKn+xMyNvKr949t
+         NTmcjK4ek7LQji6I/nqbsi+Slp0iy0Ro5f4/rKtig7lnXKpiJ++HBqHEkMxW0iZ1VFyv
+         k2xu61BpkAN8ZnBclkqfyGxizTI18JmrIbAZs6T3nW8xJUVIp+LmPXlNzcz5oNfs1zpY
+         irmQ==
+X-Gm-Message-State: AOAM530/SBWUfcL9hmpnrLEQ25MqD0bypQ8HPGVZsVgwPEyNEGH85Ct7
+        Oo2D66sxN5+eyA2uka5h+14ebA==
+X-Google-Smtp-Source: ABdhPJysX1Gy5qQjxhZxEfRalgZ8Np1GGaCY1UR8vYL+V5Gxo7+xl49YaHAqcCOn+yAnbwJnn5Jp0Q==
+X-Received: by 2002:a65:62c7:: with SMTP id m7mr4776831pgv.50.1614379624821;
+        Fri, 26 Feb 2021 14:47:04 -0800 (PST)
 Received: from google.com ([2620:15c:f:10:e190:bf4c:e355:6c55])
-        by smtp.gmail.com with ESMTPSA id e185sm10755991pfe.117.2021.02.26.14.34.42
+        by smtp.gmail.com with ESMTPSA id y72sm10658312pfg.126.2021.02.26.14.47.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Feb 2021 14:34:43 -0800 (PST)
-Date:   Fri, 26 Feb 2021 14:34:37 -0800
+        Fri, 26 Feb 2021 14:47:04 -0800 (PST)
+Date:   Fri, 26 Feb 2021 14:46:57 -0800
 From:   Sean Christopherson <seanjc@google.com>
-To:     Dave Hansen <dave@sr71.net>
-Cc:     Kai Huang <kai.huang@intel.com>, linux-sgx@vger.kernel.org,
-        kvm@vger.kernel.org, x86@kernel.org, jarkko@kernel.org,
-        luto@kernel.org, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
-Subject: Re: [RFC PATCH v6 03/25] x86/sgx: Wipe out EREMOVE from
- sgx_free_epc_page()
-Message-ID: <YDl3fTOZiQe5O7jW@google.com>
-References: <cover.1614338774.git.kai.huang@intel.com>
- <308bd5a53199d1bf520d488f748e11ce76156a33.1614338774.git.kai.huang@intel.com>
- <746450bb-917d-ab6c-9a6a-671112cd203e@sr71.net>
- <YDlRgtnVS4+KkzUW@google.com>
- <55e0f003-ca2b-24d2-5a23-31a77c5b943d@sr71.net>
+To:     "Xu, Like" <like.xu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: vmx/pmu: Fix dummy check if lbr_desc->event is
+ created
+Message-ID: <YDl6YaJJqaApUALx@google.com>
+References: <20210223013958.1280444-1-like.xu@linux.intel.com>
+ <YDU4II6Jt+E5nFmG@google.com>
+ <ca26c4e9-207a-2882-649d-fe82604f68f9@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <55e0f003-ca2b-24d2-5a23-31a77c5b943d@sr71.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ca26c4e9-207a-2882-649d-fe82604f68f9@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Feb 26, 2021, Dave Hansen wrote:
-> On 2/26/21 11:52 AM, Sean Christopherson wrote:
-> >> We must give a more informative message saying that the page is leaked.
-> >>  Ideally, we'd also make this debuggable by dumping out how many of
-> >> these pages there have been somewhere.  That can wait, though, until we
-> >> have some kind of stats coming out of the code (there's nothing now).  A
-> >> comment to remind us to do this would be nice.
-> > Eh, having debugged these several times, the WARN_ONCE in sgx_reset_epc_page()
-> > is probably sufficient.  IIRC, when I hit this, things were either laughably
-> > broken and every page was failing, or there was another ENCLS failure somewhere
-> > else that provided additional info.  Not saying don't add more debug info,
-> > rather that it's probably not a priority.
-> 
-> Minimally, I just want a warning that says, "Whoops, I leaked a page".
-> Or EREMOVE could even say, "whoops, this *MIGHT* leak a page".
-> 
-> My beef is mostly that "EREMOVE failed" doesn't tell and end user squat
-> about what this means for their system.  At least if we say "leaked",
-> they have some inclination that they've got to reboot to get the page back.
+On Wed, Feb 24, 2021, Xu, Like wrote:
+> On 2021/2/24 1:15, Sean Christopherson wrote:
+> > On Tue, Feb 23, 2021, Like Xu wrote:
+> > > If lbr_desc->event is successfully created, the intel_pmu_create_
+> > > guest_lbr_event() will return 0, otherwise it will return -ENOENT,
+> > > and then jump to LBR msrs dummy handling.
+> > > 
+> > > Fixes: 1b5ac3226a1a ("KVM: vmx/pmu: Pass-through LBR msrs when the guest LBR event is ACTIVE")
+> > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> > > ---
+> > >   arch/x86/kvm/vmx/pmu_intel.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> > > index d1df618cb7de..d6a5fe19ff09 100644
+> > > --- a/arch/x86/kvm/vmx/pmu_intel.c
+> > > +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> > > @@ -320,7 +320,7 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+> > >   	if (!intel_pmu_is_valid_lbr_msr(vcpu, index))
+> > >   		return false;
+> > > -	if (!lbr_desc->event && !intel_pmu_create_guest_lbr_event(vcpu))
+> > > +	if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu))
+> > >   		goto dummy;
 
-Oh yeah, no argument there.
+...
+ 
+> > AFAICT, event contention would lead to a #GP crash in the host due to
+> > lbr_desc->event being dereferenced, no?
+> 
+> a #GP crash in the host ？Can you share more understanding about it ?
+
+The original code is will dereference a null lbr_desc->event if
+intel_pmu_create_guest_lbr_event() fails.
+
+	if (!lbr_desc->event && intel_pmu_create_guest_lbr_event(vcpu))  <- falls through
+		goto dummy;
+
+	/*
+	 * Disable irq to ensure the LBR feature doesn't get reclaimed by the
+	 * host at the time the value is read from the msr, and this avoids the
+	 * host LBR value to be leaked to the guest. If LBR has been reclaimed,
+	 * return 0 on guest reads.
+	 */
+	local_irq_disable();
+	if (lbr_desc->event->state == PERF_EVENT_STATE_ACTIVE) { <--------- kaboom
+		if (read)
+			rdmsrl(index, msr_info->data);
+		else
+			wrmsrl(index, msr_info->data);
+		__set_bit(INTEL_PMC_IDX_FIXED_VLBR, vcpu_to_pmu(vcpu)->pmc_in_use);
+		local_irq_enable();
+		return true;
+	}
