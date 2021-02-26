@@ -2,180 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C748326296
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 13:19:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F1173262FC
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 13:57:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230206AbhBZMS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 07:18:29 -0500
-Received: from mga17.intel.com ([192.55.52.151]:16961 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230446AbhBZMRo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 07:17:44 -0500
-IronPort-SDR: hgMyJKMG11y39GlAPcVxr6cUCjqQvebMY1MerDm3vTSZiHHzjyGVJ9W3YoOSzArC+IpfRSbZtn
- IX1Jvpw73F0w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="165724008"
-X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="165724008"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:59 -0800
-IronPort-SDR: zvw07z8vimGoAc2BxVNeZVuITMxbtCmthp/zR0u3tLfVayJamBa8BBz/V+eFNnd4suCgL+P109
- 72hvgsl54P7w==
-X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="598420847"
-Received: from ciparjol-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.175])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:55 -0800
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
-Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
-        dave.hansen@intel.com, rick.p.edgecombe@intel.com,
-        haitao.huang@intel.com, pbonzini@redhat.com, bp@alien8.de,
-        tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, corbet@lwn.net,
-        Andy Lutomirski <luto@amacapital.net>,
-        Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v6 25/25] KVM: x86: Add capability to grant VM access to privileged SGX attribute
-Date:   Sat, 27 Feb 2021 01:16:45 +1300
-Message-Id: <22e2be6c2e721154b403ccbabd99af8def6f1508.1614338774.git.kai.huang@intel.com>
+        id S229894AbhBZM5H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 07:57:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59930 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbhBZM5G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 07:57:06 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F2FC061574;
+        Fri, 26 Feb 2021 04:56:25 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id cf12so10011064edb.8;
+        Fri, 26 Feb 2021 04:56:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jaergPFFsfPW93kbmHCbVQ0vZ9RjLcsMl8m5iUEbS3E=;
+        b=FFpcIOsV0q6mKbXaHG8rv7+yS3t+c7qga/dKvM4bQKkru+hax+Z2EMhUgVkhgRSgqG
+         VMlVcfkYbIVhkv71eSZKDfrJKgGxrh5LEHCgqpcU9xI0VOxCtXm3qJA04qUFOcYcUos5
+         heCT+b0WDoMeu2OhW5SzQ5K4bEbRqLJjf54WZ2HWPpHaXzlZDhe7vbu3g9Dp4gSiT14b
+         qwrdNhWXqaPU35zYf4vjYk+eiUYrn3D8iLzmoTTaRIFAUXFo/bC4jEHqLj4kuLmN7UQ/
+         crH3PjwUFnk2qrL1qOBZOOvDppdehpPkcfIDGLl3yp8XXyHMIZbluIX1khFJvS7PuNSH
+         ke3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jaergPFFsfPW93kbmHCbVQ0vZ9RjLcsMl8m5iUEbS3E=;
+        b=G5jdvD8w9DZXvRukab8VIP8yQZi7eao/QRiYh0MIuK2SiwtNM+HooQlLiDZ2novxU+
+         7bhaHbG+TkHiI2Y6f0G/sRzLgDhfQtTJwcs//QlafEwHYuKMWsmlVfmBtvFPOWmMn56F
+         AgePLs+Y1NYp4R59nD/bMZ9Ez+cEn2Bv094W1JI3xECPp+LvH5oQZPyObo2zgSwmTQIX
+         1RxfR+GOe67lmbd1QDrgf0bCknS6ZomwSXHDiSudr8b9RwG0bcFQVrKOkwU84IasP7KV
+         3FmHhJKKOsgnVkgDfCxLI4FX746igxsKI/ugtUEksYTA5Tq/Vsbe2+LD8QF7UFPq3/n1
+         1ycQ==
+X-Gm-Message-State: AOAM530WTN8TOEc5ytcdta9ZaMsk5F6Cfe/rWOoCPq2nuPHC66RfbOqE
+        YbcfYztbcacDjPW1tNv84MFtnI8d2Ga6wA==
+X-Google-Smtp-Source: ABdhPJxx+Mt2qgGNb6QwegwSCbm5VrKR19qYN+VGhqPn8DAOgv2ASvaOX+razj8v/hKJUDx61HtkEA==
+X-Received: by 2002:a05:6402:1aca:: with SMTP id ba10mr3164723edb.6.1614344184418;
+        Fri, 26 Feb 2021 04:56:24 -0800 (PST)
+Received: from localhost.localdomain (93-103-18-160.static.t-2.net. [93.103.18.160])
+        by smtp.gmail.com with ESMTPSA id bn2sm5270463ejb.35.2021.02.26.04.56.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Feb 2021 04:56:23 -0800 (PST)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM/SVM: Move vmenter.S exception fixups out of line
+Date:   Fri, 26 Feb 2021 13:56:21 +0100
+Message-Id: <20210226125621.111723-1-ubizjak@gmail.com>
 X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.1614338774.git.kai.huang@intel.com>
-References: <cover.1614338774.git.kai.huang@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+Avoid jump by moving exception fixups out of line.
 
-Add a capability, KVM_CAP_SGX_ATTRIBUTE, that can be used by userspace
-to grant a VM access to a priveleged attribute, with args[0] holding a
-file handle to a valid SGX attribute file.
-
-The SGX subsystem restricts access to a subset of enclave attributes to
-provide additional security for an uncompromised kernel, e.g. to prevent
-malware from using the PROVISIONKEY to ensure its nodes are running
-inside a geniune SGX enclave and/or to obtain a stable fingerprint.
-
-To prevent userspace from circumventing such restrictions by running an
-enclave in a VM, KVM restricts guest access to privileged attributes by
-default.
-
-Cc: Andy Lutomirski <luto@amacapital.net>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 ---
- Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
- arch/x86/kvm/cpuid.c           |  2 +-
- arch/x86/kvm/x86.c             | 21 +++++++++++++++++++++
- include/uapi/linux/kvm.h       |  1 +
- 4 files changed, 46 insertions(+), 1 deletion(-)
+ arch/x86/kvm/svm/vmenter.S | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index aed52b0fc16e..d65016a05a8b 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6227,6 +6227,29 @@ KVM_RUN_BUS_LOCK flag is used to distinguish between them.
- This capability can be used to check / enable 2nd DAWR feature provided
- by POWER10 processor.
+diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+index 343108bf0f8c..4fa17df123cd 100644
+--- a/arch/x86/kvm/svm/vmenter.S
++++ b/arch/x86/kvm/svm/vmenter.S
+@@ -80,15 +80,9 @@ SYM_FUNC_START(__svm_vcpu_run)
+ 	/* Enter guest mode */
+ 	sti
  
-+7.24 KVM_CAP_SGX_ATTRIBUTE
-+----------------------
-+
-+:Architectures: x86
-+:Target: VM
-+:Parameters: args[0] is a file handle of a SGX attribute file in securityfs
-+:Returns: 0 on success, -EINVAL if the file handle is invalid or if a requested
-+          attribute is not supported by KVM.
-+
-+KVM_CAP_SGX_ATTRIBUTE enables a userspace VMM to grant a VM access to one or
-+more priveleged enclave attributes.  args[0] must hold a file handle to a valid
-+SGX attribute file corresponding to an attribute that is supported/restricted
-+by KVM (currently only PROVISIONKEY).
-+
-+The SGX subsystem restricts access to a subset of enclave attributes to provide
-+additional security for an uncompromised kernel, e.g. use of the PROVISIONKEY
-+is restricted to deter malware from using the PROVISIONKEY to obtain a stable
-+system fingerprint.  To prevent userspace from circumventing such restrictions
-+by running an enclave in a VM, KVM prevents access to privileged attributes by
-+default.
-+
-+See Documentation/x86/sgx/2.Kernel-internals.rst for more details.
-+
- 8. Other capabilities.
- ======================
+-3:	vmrun %_ASM_AX
+-	jmp 5f
+-4:	cmpb $0, kvm_rebooting
+-	jne 5f
+-	ud2
+-	_ASM_EXTABLE(3b, 4b)
++1:	vmrun %_ASM_AX
  
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index a0d45607b702..6dc12d949f86 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -849,7 +849,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		 * expected to derive it from supported XCR0.
- 		 */
- 		entry->eax &= SGX_ATTR_DEBUG | SGX_ATTR_MODE64BIT |
--			      /* PROVISIONKEY | */ SGX_ATTR_EINITTOKENKEY |
-+			      SGX_ATTR_PROVISIONKEY | SGX_ATTR_EINITTOKENKEY |
- 			      SGX_ATTR_KSS;
- 		entry->ebx &= 0;
- 		break;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4d2868d0a747..20629834d2e8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -75,6 +75,7 @@
- #include <asm/tlbflush.h>
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
-+#include <asm/sgx.h>
- #include <clocksource/hyperv_timer.h>
+-5:
+-	cli
++2:	cli
  
- #define CREATE_TRACE_POINTS
-@@ -3791,6 +3792,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_USER_SPACE_MSR:
- 	case KVM_CAP_X86_MSR_FILTER:
- 	case KVM_CAP_ENFORCE_PV_FEATURE_CPUID:
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_XEN_HVM:
-@@ -5367,6 +5371,23 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 			kvm->arch.bus_lock_detection_enabled = true;
- 		r = 0;
- 		break;
-+#ifdef CONFIG_X86_SGX_KVM
-+	case KVM_CAP_SGX_ATTRIBUTE: {
-+		unsigned long allowed_attributes = 0;
+ #ifdef CONFIG_RETPOLINE
+ 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+@@ -155,6 +149,13 @@ SYM_FUNC_START(__svm_vcpu_run)
+ #endif
+ 	pop %_ASM_BP
+ 	ret
 +
-+		r = sgx_set_attribute(&allowed_attributes, cap->args[0]);
-+		if (r)
-+			break;
++3:	cmpb $0, kvm_rebooting
++	jne 2b
++	ud2
 +
-+		/* KVM only supports the PROVISIONKEY privileged attribute. */
-+		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
-+		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
-+			kvm->arch.sgx_provisioning_allowed = true;
-+		else
-+			r = -EINVAL;
-+		break;
-+	}
-+#endif
- 	default:
- 		r = -EINVAL;
- 		break;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 8b281f722e5b..df37fcf41a74 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1078,6 +1078,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_DIRTY_LOG_RING 192
- #define KVM_CAP_X86_BUS_LOCK_EXIT 193
- #define KVM_CAP_PPC_DAWR1 194
-+#define KVM_CAP_SGX_ATTRIBUTE 195
++	_ASM_EXTABLE(1b, 3b)
++
+ SYM_FUNC_END(__svm_vcpu_run)
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ /**
+@@ -174,18 +175,15 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ #endif
+ 	push %_ASM_BX
  
+-	/* Enter guest mode */
++	/* Move @vmcb to RAX. */
+ 	mov %_ASM_ARG1, %_ASM_AX
++
++	/* Enter guest mode */
+ 	sti
+ 
+ 1:	vmrun %_ASM_AX
+-	jmp 3f
+-2:	cmpb $0, kvm_rebooting
+-	jne 3f
+-	ud2
+-	_ASM_EXTABLE(1b, 2b)
+ 
+-3:	cli
++2:	cli
+ 
+ #ifdef CONFIG_RETPOLINE
+ 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
+@@ -205,4 +203,11 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+ #endif
+ 	pop %_ASM_BP
+ 	ret
++
++3:	cmpb $0, kvm_rebooting
++	jne 2b
++	ud2
++
++	_ASM_EXTABLE(1b, 3b)
++
+ SYM_FUNC_END(__svm_sev_es_vcpu_run)
 -- 
 2.29.2
 
