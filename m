@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DCC832628F
+	by mail.lfdr.de (Postfix) with ESMTP id AE254326290
 	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 13:18:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbhBZMR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 07:17:56 -0500
-Received: from mga03.intel.com ([134.134.136.65]:51428 "EHLO mga03.intel.com"
+        id S230435AbhBZMSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 07:18:01 -0500
+Received: from mga03.intel.com ([134.134.136.65]:51463 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230423AbhBZMQu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 07:16:50 -0500
-IronPort-SDR: FR2YTMU3joevCuMx7mzvn/a0jHophzOMCp6b3DEynz74M1G6xxD0rYQooLZOASjrBy6qRFL4IB
- GNmOrWqq8fCw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185913201"
+        id S229953AbhBZMQ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 07:16:58 -0500
+IronPort-SDR: Ke/f65ibRwHFFNozdXQC1MdKDFNHKbxSJLRbItgxPH9t5zfITJtY0Ha3JwjkDIJz8lPd0wTB4l
+ uCl48VdG/Sqg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9906"; a="185913219"
 X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="185913201"
+   d="scan'208";a="185913219"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:22 -0800
-IronPort-SDR: e+tYMOZwHVZlYFnuizQ3B50svCH/RYTJ3n+XakbKJjHDV1RmpS33WYNknwhrNfK/P47IZQoJof
- ElzOQTmVdryQ==
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:26 -0800
+IronPort-SDR: BSwcoBg3vdyxckENrSUISirMcAELcKydtX4itStQFZ9x085fdvKhjnkN9m7Vt9q8lTE+SYxZMe
+ FNtEg3zhAr3Q==
 X-IronPort-AV: E=Sophos;i="5.81,208,1610438400"; 
-   d="scan'208";a="598420709"
+   d="scan'208";a="598420721"
 Received: from ciparjol-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.255.230.175])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:17 -0800
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 04:16:22 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-sgx@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
 Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
@@ -32,9 +32,9 @@ Cc:     seanjc@google.com, jarkko@kernel.org, luto@kernel.org,
         tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
         jmattson@google.com, joro@8bytes.org, vkuznets@redhat.com,
         wanpengli@tencent.com, Kai Huang <kai.huang@intel.com>
-Subject: [RFC PATCH v6 19/25] KVM: VMX: Add basic handling of VM-Exit from SGX enclave
-Date:   Sat, 27 Feb 2021 01:15:46 +1300
-Message-Id: <9628d81905cdb4339a69b488182efe9d0f960c1c.1614338774.git.kai.huang@intel.com>
+Subject: [RFC PATCH v6 20/25] KVM: VMX: Frame in ENCLS handler for SGX virtualization
+Date:   Sat, 27 Feb 2021 01:15:47 +1300
+Message-Id: <fc3ca34bd93f16a5f56519c59d8400c3ff40313b.1614338774.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <cover.1614338774.git.kai.huang@intel.com>
 References: <cover.1614338774.git.kai.huang@intel.com>
@@ -46,183 +46,146 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add support for handling VM-Exits that originate from a guest SGX
-enclave.  In SGX, an "enclave" is a new CPL3-only execution environment,
-wherein the CPU and memory state is protected by hardware to make the
-state inaccesible to code running outside of the enclave.  When exiting
-an enclave due to an asynchronous event (from the perspective of the
-enclave), e.g. exceptions, interrupts, and VM-Exits, the enclave's state
-is automatically saved and scrubbed (the CPU loads synthetic state), and
-then reloaded when re-entering the enclave.  E.g. after an instruction
-based VM-Exit from an enclave, vmcs.GUEST_RIP will not contain the RIP
-of the enclave instruction that trigered VM-Exit, but will instead point
-to a RIP in the enclave's untrusted runtime (the guest userspace code
-that coordinates entry/exit to/from the enclave).
-
-To help a VMM recognize and handle exits from enclaves, SGX adds bits to
-existing VMCS fields, VM_EXIT_REASON.VMX_EXIT_REASON_FROM_ENCLAVE and
-GUEST_INTERRUPTIBILITY_INFO.GUEST_INTR_STATE_ENCLAVE_INTR.  Define the
-new architectural bits, and add a boolean to struct vcpu_vmx to cache
-VMX_EXIT_REASON_FROM_ENCLAVE.  Clear the bit in exit_reason so that
-checks against exit_reason do not need to account for SGX, e.g.
-"if (exit_reason == EXIT_REASON_EXCEPTION_NMI)" continues to work.
-
-KVM is a largely a passive observer of the new bits, e.g. KVM needs to
-account for the bits when propagating information to a nested VMM, but
-otherwise doesn't need to act differently for the majority of VM-Exits
-from enclaves.
-
-The one scenario that is directly impacted is emulation, which is for
-all intents and purposes impossible[1] since KVM does not have access to
-the RIP or instruction stream that triggered the VM-Exit.  The inability
-to emulate is a non-issue for KVM, as most instructions that might
-trigger VM-Exit unconditionally #UD in an enclave (before the VM-Exit
-check.  For the few instruction that conditionally #UD, KVM either never
-sets the exiting control, e.g. PAUSE_EXITING[2], or sets it if and only
-if the feature is not exposed to the guest in order to inject a #UD,
-e.g. RDRAND_EXITING.
-
-But, because it is still possible for a guest to trigger emulation,
-e.g. MMIO, inject a #UD if KVM ever attempts emulation after a VM-Exit
-from an enclave.  This is architecturally accurate for instruction
-VM-Exits, and for MMIO it's the least bad choice, e.g. it's preferable
-to killing the VM.  In practice, only broken or particularly stupid
-guests should ever encounter this behavior.
-
-Add a WARN in skip_emulated_instruction to detect any attempt to
-modify the guest's RIP during an SGX enclave VM-Exit as all such flows
-should either be unreachable or must handle exits from enclaves before
-getting to skip_emulated_instruction.
-
-[1] Impossible for all practical purposes.  Not truly impossible
-    since KVM could implement some form of para-virtualization scheme.
-
-[2] PAUSE_LOOP_EXITING only affects CPL0 and enclaves exist only at
-    CPL3, so we also don't need to worry about that interaction.
+Introduce sgx.c and sgx.h, along with the framework for handling ENCLS
+VM-Exits.  Add a bool, enable_sgx, that will eventually be wired up to a
+module param to control whether or not SGX virtualization is enabled at
+runtime.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/include/asm/vmx.h      |  1 +
- arch/x86/include/uapi/asm/vmx.h |  1 +
- arch/x86/kvm/vmx/nested.c       |  2 ++
- arch/x86/kvm/vmx/vmx.c          | 38 +++++++++++++++++++++++++++++++--
- 4 files changed, 40 insertions(+), 2 deletions(-)
+ arch/x86/kvm/Makefile  |  2 ++
+ arch/x86/kvm/vmx/sgx.c | 50 ++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/sgx.h | 15 +++++++++++++
+ arch/x86/kvm/vmx/vmx.c |  9 +++++---
+ 4 files changed, 73 insertions(+), 3 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/sgx.c
+ create mode 100644 arch/x86/kvm/vmx/sgx.h
 
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 358707f60d99..0ffaa3156a4e 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -373,6 +373,7 @@ enum vmcs_field {
- #define GUEST_INTR_STATE_MOV_SS		0x00000002
- #define GUEST_INTR_STATE_SMI		0x00000004
- #define GUEST_INTR_STATE_NMI		0x00000008
-+#define GUEST_INTR_STATE_ENCLAVE_INTR	0x00000010
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index aeab168c5711..64c5e7655daf 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -22,6 +22,8 @@ kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
  
- /* GUEST_ACTIVITY_STATE flags */
- #define GUEST_ACTIVITY_ACTIVE		0
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index b8e650a985e3..946d761adbd3 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -27,6 +27,7 @@
+ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+ 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
++kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
++
+ kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o svm/nested.o svm/avic.o svm/sev.o
  
- 
- #define VMX_EXIT_REASONS_FAILED_VMENTRY         0x80000000
-+#define VMX_EXIT_REASONS_SGX_ENCLAVE_MODE	0x08000000
- 
- #define EXIT_REASON_EXCEPTION_NMI       0
- #define EXIT_REASON_EXTERNAL_INTERRUPT  1
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index fdd80dd8e781..6c0dc7053658 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4099,6 +4099,8 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- {
- 	/* update exit information fields: */
- 	vmcs12->vm_exit_reason = vm_exit_reason;
-+	if (to_vmx(vcpu)->exit_reason.enclave_mode)
-+		vmcs12->vm_exit_reason |= VMX_EXIT_REASONS_SGX_ENCLAVE_MODE;
- 	vmcs12->exit_qualification = exit_qualification;
- 	vmcs12->vm_exit_intr_info = exit_intr_info;
- 
+ obj-$(CONFIG_KVM)	+= kvm.o
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+new file mode 100644
+index 000000000000..f68adbe38750
+--- /dev/null
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -0,0 +1,50 @@
++// SPDX-License-Identifier: GPL-2.0
++/*  Copyright(c) 2021 Intel Corporation. */
++
++#include <asm/sgx.h>
++
++#include "cpuid.h"
++#include "kvm_cache_regs.h"
++#include "sgx.h"
++#include "vmx.h"
++#include "x86.h"
++
++bool __read_mostly enable_sgx;
++
++static inline bool encls_leaf_enabled_in_guest(struct kvm_vcpu *vcpu, u32 leaf)
++{
++	if (!enable_sgx || !guest_cpuid_has(vcpu, X86_FEATURE_SGX))
++		return false;
++
++	if (leaf >= ECREATE && leaf <= ETRACK)
++		return guest_cpuid_has(vcpu, X86_FEATURE_SGX1);
++
++	if (leaf >= EAUG && leaf <= EMODT)
++		return guest_cpuid_has(vcpu, X86_FEATURE_SGX2);
++
++	return false;
++}
++
++static inline bool sgx_enabled_in_guest_bios(struct kvm_vcpu *vcpu)
++{
++	const u64 bits = FEAT_CTL_SGX_ENABLED | FEAT_CTL_LOCKED;
++
++	return (to_vmx(vcpu)->msr_ia32_feature_control & bits) == bits;
++}
++
++int handle_encls(struct kvm_vcpu *vcpu)
++{
++	u32 leaf = (u32)vcpu->arch.regs[VCPU_REGS_RAX];
++
++	if (!encls_leaf_enabled_in_guest(vcpu, leaf)) {
++		kvm_queue_exception(vcpu, UD_VECTOR);
++	} else if (!sgx_enabled_in_guest_bios(vcpu)) {
++		kvm_inject_gp(vcpu, 0);
++	} else {
++		WARN(1, "KVM: unexpected exit on ENCLS[%u]", leaf);
++		vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
++		vcpu->run->hw.hardware_exit_reason = EXIT_REASON_ENCLS;
++		return 0;
++	}
++	return 1;
++}
+diff --git a/arch/x86/kvm/vmx/sgx.h b/arch/x86/kvm/vmx/sgx.h
+new file mode 100644
+index 000000000000..6e17ecd4aca3
+--- /dev/null
++++ b/arch/x86/kvm/vmx/sgx.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __KVM_X86_SGX_H
++#define __KVM_X86_SGX_H
++
++#include <linux/kvm_host.h>
++
++#ifdef CONFIG_X86_SGX_KVM
++extern bool __read_mostly enable_sgx;
++
++int handle_encls(struct kvm_vcpu *vcpu);
++#else
++#define enable_sgx 0
++#endif
++
++#endif /* __KVM_X86_SGX_H */
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 908f7a8af064..68c6731cabe6 100644
+index 68c6731cabe6..c55c19d17c61 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1570,12 +1570,18 @@ static int vmx_rtit_ctl_check(struct kvm_vcpu *vcpu, u64 data)
- 
- static bool vmx_can_emulate_instruction(struct kvm_vcpu *vcpu, void *insn, int insn_len)
- {
-+	if (to_vmx(vcpu)->exit_reason.enclave_mode) {
-+		kvm_queue_exception(vcpu, UD_VECTOR);
-+		return false;
-+	}
- 	return true;
+@@ -57,6 +57,7 @@
+ #include "mmu.h"
+ #include "nested.h"
+ #include "pmu.h"
++#include "sgx.h"
+ #include "trace.h"
+ #include "vmcs.h"
+ #include "vmcs12.h"
+@@ -5610,16 +5611,18 @@ static int handle_vmx_instruction(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
- static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
++#ifndef CONFIG_X86_SGX_KVM
+ static int handle_encls(struct kvm_vcpu *vcpu)
  {
-+	union vmx_exit_reason exit_reason = to_vmx(vcpu)->exit_reason;
- 	unsigned long rip, orig_rip;
-+	u32 instr_len;
- 
  	/*
- 	 * Using VMCS.VM_EXIT_INSTRUCTION_LEN on EPT misconfig depends on
-@@ -1586,9 +1592,33 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
- 	 * i.e. we end up advancing IP with some random value.
+-	 * SGX virtualization is not yet supported.  There is no software
+-	 * enable bit for SGX, so we have to trap ENCLS and inject a #UD
+-	 * to prevent the guest from executing ENCLS.
++	 * SGX virtualization is disabled.  There is no software enable bit for
++	 * SGX, so KVM intercepts all ENCLS leafs and injects a #UD to prevent
++	 * the guest from executing ENCLS (when SGX is supported by hardware).
  	 */
- 	if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
--	    to_vmx(vcpu)->exit_reason.basic != EXIT_REASON_EPT_MISCONFIG) {
-+	    exit_reason.basic != EXIT_REASON_EPT_MISCONFIG) {
-+		instr_len = vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
-+
-+		/*
-+		 * Emulating an enclave's instructions isn't supported as KVM
-+		 * cannot access the enclave's memory or its true RIP, e.g. the
-+		 * vmcs.GUEST_RIP points at the exit point of the enclave, not
-+		 * the RIP that actually triggered the VM-Exit.  But, because
-+		 * most instructions that cause VM-Exit will #UD in an enclave,
-+		 * most instruction-based VM-Exits simply do not occur.
-+		 *
-+		 * There are a few exceptions, notably the debug instructions
-+		 * INT1ICEBRK and INT3, as they are allowed in debug enclaves
-+		 * and generate #DB/#BP as expected, which KVM might intercept.
-+		 * But again, the CPU does the dirty work and saves an instr
-+		 * length of zero so VMMs don't shoot themselves in the foot.
-+		 * WARN if KVM tries to skip a non-zero length instruction on
-+		 * a VM-Exit from an enclave.
-+		 */
-+		if (!instr_len)
-+			goto rip_updated;
-+
-+		WARN(exit_reason.enclave_mode,
-+		     "KVM: skipping instruction after SGX enclave VM-Exit");
-+
- 		orig_rip = kvm_rip_read(vcpu);
--		rip = orig_rip + vmcs_read32(VM_EXIT_INSTRUCTION_LEN);
-+		rip = orig_rip + instr_len;
- #ifdef CONFIG_X86_64
- 		/*
- 		 * We need to mask out the high 32 bits of RIP if not in 64-bit
-@@ -1604,6 +1634,7 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
- 			return 0;
- 	}
+ 	kvm_queue_exception(vcpu, UD_VECTOR);
+ 	return 1;
+ }
++#endif /* CONFIG_X86_SGX_KVM */
  
-+rip_updated:
- 	/* skipping an emulated instruction also counts */
- 	vmx_set_interrupt_shadow(vcpu, 0);
- 
-@@ -5351,6 +5382,9 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
+ static int handle_bus_lock_vmexit(struct kvm_vcpu *vcpu)
  {
- 	gpa_t gpa;
- 
-+	if (!vmx_can_emulate_instruction(vcpu, NULL, 0))
-+		return 1;
-+
- 	/*
- 	 * A nested guest cannot optimize MMIO vmexits, because we have an
- 	 * nGPA here instead of the required GPA.
 -- 
 2.29.2
 
