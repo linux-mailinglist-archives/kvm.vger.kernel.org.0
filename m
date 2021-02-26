@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1614532685C
-	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 21:21:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70177326860
+	for <lists+kvm@lfdr.de>; Fri, 26 Feb 2021 21:21:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbhBZUOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Feb 2021 15:14:42 -0500
-Received: from mga17.intel.com ([192.55.52.151]:35659 "EHLO mga17.intel.com"
+        id S231308AbhBZUPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Feb 2021 15:15:36 -0500
+Received: from mga17.intel.com ([192.55.52.151]:35622 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231161AbhBZUNC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Feb 2021 15:13:02 -0500
-IronPort-SDR: WoXaGExp3AugKtPPIZSszoWlVajphvks6EWzIR8NYyHwF0bHmmtxKDHuGTLXMi7/gIYYxKk6tv
- uGevjAsIcClw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9907"; a="165846899"
+        id S230270AbhBZUNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Feb 2021 15:13:15 -0500
+IronPort-SDR: 8TO5F6dT2/aj1KVT61bRd5px51vZdXs0SB+kjBGce3RO6+PHAoR1Aur/2Db5BUYwIRnx9rCBU4
+ O4D4/XmuMCZg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9907"; a="165846902"
 X-IronPort-AV: E=Sophos;i="5.81,209,1610438400"; 
-   d="scan'208";a="165846899"
+   d="scan'208";a="165846902"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
   by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2021 12:11:13 -0800
-IronPort-SDR: +EpK/x9VncNDE5qsC6U/B0HcBszgCBpXa4e1qFTeKEWYJgpXogusVejBQoXRMwu4tztbv7ye9z
- g5dY5zB++ODA==
+IronPort-SDR: y7CQvh0OBMkfU1WnZvVOq3OpfLMKf9+PoRB9UzpxcEbdVh/52C0uVg1LfVfikdX5NAtCQdJ4a1
+ G117bxFFcWmw==
 X-IronPort-AV: E=Sophos;i="5.81,209,1610438400"; 
-   d="scan'208";a="405109442"
+   d="scan'208";a="405109444"
 Received: from megha-z97x-ud7-th.sc.intel.com ([143.183.85.154])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-SHA; 26 Feb 2021 12:11:13 -0800
 From:   Megha Dey <megha.dey@intel.com>
@@ -33,9 +33,9 @@ Cc:     linux-kernel@vger.kernel.org, dave.jiang@intel.com,
         iommu@lists.linux-foundation.org, alex.williamson@redhat.com,
         bhelgaas@google.com, maz@kernel.org, linux-pci@vger.kernel.org,
         baolu.lu@linux.intel.com, ravi.v.shankar@intel.com
-Subject: [Patch V2 07/13] irqdomain/msi: Provide msi_alloc/free_store() callbacks
-Date:   Fri, 26 Feb 2021 12:11:11 -0800
-Message-Id: <1614370277-23235-8-git-send-email-megha.dey@intel.com>
+Subject: [Patch V2 08/13] genirq: Set auxiliary data for an interrupt
+Date:   Fri, 26 Feb 2021 12:11:12 -0800
+Message-Id: <1614370277-23235-9-git-send-email-megha.dey@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
 References: <1614370277-23235-1-git-send-email-megha.dey@intel.com>
@@ -43,92 +43,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Gleixner <tglx@linutronix.de>
-
-For devices which don't have a standard storage for MSI messages like the
-upcoming IMS (Interrupt Message Store) it's required to allocate storage
-space before allocating interrupts and after freeing them.
-
-This could be achieved with the existing callbacks, but that would be
-awkward because they operate on msi_alloc_info_t which is not uniform
-across architectures. Also these callbacks are invoked per interrupt but
-the allocation might have bulk requirements depending on the device.
-
-As such devices can operate on different architectures it is simpler to
-have separate callbacks which operate on struct device. The resulting
-storage information has to be stored in struct msi_desc so the underlying
-irq chip implementation can retrieve it for the relevant operations.
+Introduce a new function pointer in the irq_chip structure(irq_set_auxdata)
+which is responsible for updating data which is stored in a shared register
+or data storage. For example, the idxd driver uses the auxiliary data API
+to enable/set and disable PASID field that is in the IMS entry (introduced
+in a later patch) and that data are not typically present in MSI entry.
 
 Reviewed-by: Tony Luck <tony.luck@intel.com>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Megha Dey <megha.dey@intel.com>
 ---
- include/linux/msi.h |  8 ++++++++
- kernel/irq/msi.c    | 11 +++++++++++
- 2 files changed, 19 insertions(+)
+ include/linux/interrupt.h |  2 ++
+ include/linux/irq.h       |  4 ++++
+ kernel/irq/manage.c       | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 46e879c..e915932 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -323,6 +323,10 @@ struct msi_domain_info;
-  *			function.
-  * @domain_free_irqs:	Optional function to override the default free
-  *			function.
-+ * @msi_alloc_store:	Optional callback to allocate storage in a device
-+ *			specific non-standard MSI store
-+ * @msi_alloc_free:	Optional callback to free storage in a device
-+ *			specific non-standard MSI store
-  *
-  * @get_hwirq, @msi_init and @msi_free are callbacks used by
-  * msi_create_irq_domain() and related interfaces
-@@ -372,6 +376,10 @@ struct msi_domain_ops {
- 					     struct device *dev, int nvec);
- 	void		(*domain_free_irqs)(struct irq_domain *domain,
- 					    struct device *dev);
-+	int		(*msi_alloc_store)(struct irq_domain *domain,
-+					   struct device *dev, int nvec);
-+	void		(*msi_free_store)(struct irq_domain *domain,
-+					  struct device *dev);
- };
+diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+index 967e257..461ed1c 100644
+--- a/include/linux/interrupt.h
++++ b/include/linux/interrupt.h
+@@ -496,6 +496,8 @@ extern int irq_get_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
+ extern int irq_set_irqchip_state(unsigned int irq, enum irqchip_irq_state which,
+ 				 bool state);
  
- /**
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index c54316d..047b59d 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -434,6 +434,12 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
- 	if (ret)
- 		return ret;
++int irq_set_auxdata(unsigned int irq, unsigned int which, u64 val);
++
+ #ifdef CONFIG_IRQ_FORCED_THREADING
+ # ifdef CONFIG_PREEMPT_RT
+ #  define force_irqthreads	(true)
+diff --git a/include/linux/irq.h b/include/linux/irq.h
+index 2efde6a..fc19f32 100644
+--- a/include/linux/irq.h
++++ b/include/linux/irq.h
+@@ -491,6 +491,8 @@ static inline irq_hw_number_t irqd_to_hwirq(struct irq_data *d)
+  *				irq_request_resources
+  * @irq_compose_msi_msg:	optional to compose message content for MSI
+  * @irq_write_msi_msg:	optional to write message content for MSI
++ * @irq_set_auxdata:	Optional function to update auxiliary data e.g. in
++ *			shared registers
+  * @irq_get_irqchip_state:	return the internal state of an interrupt
+  * @irq_set_irqchip_state:	set the internal state of a interrupt
+  * @irq_set_vcpu_affinity:	optional to target a vCPU in a virtual machine
+@@ -538,6 +540,8 @@ struct irq_chip {
+ 	void		(*irq_compose_msi_msg)(struct irq_data *data, struct msi_msg *msg);
+ 	void		(*irq_write_msi_msg)(struct irq_data *data, struct msi_msg *msg);
  
-+	if (ops->msi_alloc_store) {
-+		ret = ops->msi_alloc_store(domain, dev, nvec);
-+		if (ret)
-+			return ret;
++	int		(*irq_set_auxdata)(struct irq_data *data, unsigned int which, u64 auxval);
++
+ 	int		(*irq_get_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool *state);
+ 	int		(*irq_set_irqchip_state)(struct irq_data *data, enum irqchip_irq_state which, bool state);
+ 
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index 85ede4e..68ff559 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -2860,3 +2860,35 @@ bool irq_check_status_bit(unsigned int irq, unsigned int bitmask)
+ 	return res;
+ }
+ EXPORT_SYMBOL_GPL(irq_check_status_bit);
++
++/**
++ * irq_set_auxdata - Set auxiliary data
++ * @irq:	Interrupt to update
++ * @which:	Selector which data to update
++ * @auxval:	Auxiliary data value
++ *
++ * Function to update auxiliary data for an interrupt, e.g. to update data
++ * which is stored in a shared register or data storage (e.g. IMS).
++ */
++int irq_set_auxdata(unsigned int irq, unsigned int which, u64 val)
++{
++	struct irq_desc *desc;
++	struct irq_data *data;
++	unsigned long flags;
++	int res = -ENODEV;
++
++	desc = irq_get_desc_buslock(irq, &flags, 0);
++	if (!desc)
++		return -EINVAL;
++
++	for (data = &desc->irq_data; data; data = irqd_get_parent_data(data)) {
++		if (data->chip->irq_set_auxdata) {
++			res = data->chip->irq_set_auxdata(data, which, val);
++			break;
++		}
 +	}
 +
- 	for_each_msi_entry(desc, dev) {
- 		ops->set_desc(&arg, desc);
- 
-@@ -529,6 +535,8 @@ int msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
- 
- void __msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
- {
-+	struct msi_domain_info *info = domain->host_data;
-+	struct msi_domain_ops *ops = info->ops;
- 	struct msi_desc *desc;
- 
- 	for_each_msi_entry(desc, dev) {
-@@ -542,6 +550,9 @@ void __msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
- 			desc->irq = 0;
- 		}
- 	}
-+
-+	if (ops->msi_free_store)
-+		ops->msi_free_store(domain, dev);
- }
- 
- /**
++	irq_put_desc_busunlock(desc, flags);
++	return res;
++}
++EXPORT_SYMBOL_GPL(irq_set_auxdata);
 -- 
 2.7.4
 
